@@ -689,8 +689,9 @@ export default {
         moreLayer.className = 'se-toolbar-more-layer';
 
         buttonGroupLoop:
-        for (let i = 0, more, moreContainer, moreCommand, buttonGroup; i < buttonList.length; i++) {
+        for (let i = 0, more, moreContainer, moreCommand, buttonGroup, align; i < buttonList.length; i++) {
             more = false;
+            align = '';
             buttonGroup = buttonList[i];
             moduleElement = this._createModuleGroup();
 
@@ -718,6 +719,13 @@ export default {
                             module = [button.buttonClass, button.title, button.name, button.dataDisplay, button.innerHTML, button._disabled];
                         }
                     } else {
+                        // align
+                        if (/^\./.test(button)) {
+                            align = button.substr(1);
+                            moduleElement.div.style.float = align;
+                            continue;
+                        }
+                        
                         // more button
                         if (/^\:/.test(button)) {
                             moreButton = true;
@@ -726,7 +734,9 @@ export default {
                             const title = matched[2].trim();
                             const innerHTML = matched[3].trim();
                             module = ['se-btn-more', title, moreCommand, 'MORE', innerHTML];
-                        } else {
+                        }
+                        // buttons
+                        else {
                             module = defaultButtonList[button];
                         }
 
@@ -750,13 +760,18 @@ export default {
                         more = true;
                         moreContainer = util.createElement('DIV');
                         moreContainer.className = 'se-more-layer ' + moreCommand;
-                        moreContainer.innerHTML = '<div class="se-more-form"><ul class="se-menu-list"></ul></div>';
+                        moreContainer.innerHTML = '<div class="se-more-form"><ul class="se-menu-list"' + (align ? ' style="float: ' + align + ';"' : '') + '></ul></div>';
                         moreLayer.appendChild(moreContainer);
                         moreContainer = moreContainer.firstElementChild.firstElementChild;
                     }
                 }
 
-                if (vertical) _buttonTray.appendChild(separator_vertical.cloneNode(false));
+                if (vertical) {
+                    const sv =  separator_vertical.cloneNode(false);
+                    if (align) sv.style.float = align;
+                    _buttonTray.appendChild(sv);
+                }
+                
                 _buttonTray.appendChild(moduleElement.div);
                 vertical = true;
             }

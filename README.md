@@ -676,6 +676,13 @@ buttonList      : Defines button list to array {Array}
                     ['undo', 'redo', 'bold', 'underline', 'fontColor', 'table', 'link', 'image', 'video']
                   ]
 
+                  ex) Alignment of button groups.
+                  // Set ".align" to the first item in the group. (default: left)
+                  [
+                      ['bold', 'underline', 'italic', 'strike'],
+                      ['.right', 'undo', 'redo']
+                  ]
+
                   ex) More button: 
                   // The more button is defined as a string starting with a colon.(":").
                   // :Identifier - Title attribute - Button's innerHTML
@@ -699,7 +706,7 @@ buttonList      : Defines button list to array {Array}
                     ],
                     [':moreRich-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'math'],
                     [':moreView-View-text.View', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
-                    [':moreOthers-More Others-<i class="xxx"></i>', 'save', 'template'],
+                    ['.right', ':moreOthers-More Others-<i class="xxx"></i>', 'save', 'template'], // Used with alignment
                   ]
 
                   ex) Responsive setting: 
@@ -715,7 +722,7 @@ buttonList      : Defines button list to array {Array}
                         ['undo', 'redo'],
                         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
                         [':moreCommand1-More Rich-default.more_horizontal', 'table', 'link', 'image', 'video', 'math'],
-                        [':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
+                        ['.right', ':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
                     ]],
                     // (min-width:768px)
                     ['%768', [
@@ -725,7 +732,7 @@ buttonList      : Defines button list to array {Array}
                             'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle'
                         ],
                         [':moreCommand1-More Rich-default.more_horizontal', 'table', 'link', 'image', 'video', 'math'],
-                        [':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
+                        ['.right', ':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
                     ]]
                   ]
                   
