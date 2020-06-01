@@ -5753,6 +5753,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             if (context.element.toolbar.offsetWidth === 0) return;
 
+            if (context.fileBrowser && context.fileBrowser.area.style.display === 'block') {
+                context.fileBrowser.body.style.height = (_w.innerHeight - context.fileBrowser.header.offsetHeight - 40) + 'px';
+            }
+
             if (core.submenuActiveButton && core.submenu) {
                 core._setMenuPosition(core.submenuActiveButton, core.submenu);
             }

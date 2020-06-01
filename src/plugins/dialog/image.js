@@ -145,7 +145,7 @@ export default {
                                 '<label>' + lang.dialogBox.imageBox.url + '</label>' +
                                 '<div class="se-dialog-form-files">' +
                                     '<input class="se-input-form se-input-url" type="text" />' +
-                                    (option.imageGalleryUrl ? '<button type="button" class="se-btn se-dialog-files-edge-button __se__gallery" title="' + lang.controller.remove + '">' + this.icons.image_gallery + '</button>' : '') +
+                                    (option.imageGalleryUrl ? '<button type="button" class="se-btn se-dialog-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '">' + this.icons.image_gallery + '</button>' : '') +
                                 '</div>' +
                             '</div>';
                     }

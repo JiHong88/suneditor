@@ -48,6 +48,8 @@
             browser_div.appendChild(content);
 
             context.fileBrowser.area = browser_div;
+            context.fileBrowser.header = content.querySelector('.se-file-browser-header');
+            context.fileBrowser.body = content.querySelector('.se-file-browser-body');
             context.fileBrowser.list = content.querySelector('.se-file-browser-list');
             context.fileBrowser.tags = content.querySelector('.se-file-browser-tags');
 
@@ -115,6 +117,8 @@
                 this.plugins.fileBrowser._bindClose = null;
             }
 
+            this.plugins.fileBrowser.drawFileList.call(this);
+
             this.plugins.fileBrowser._bindClose = function (e) {
                 if (!/27/.test(e.keyCode)) return;
                 this.plugins.fileBrowser.close.call(this);
@@ -131,7 +135,10 @@
                 this.context.fileBrowser.area.style.position = 'absolute';
             }
 
+            this.context.fileBrowser.area.style.visibility = 'hidden';
             this.context.fileBrowser.area.style.display = 'block';
+            this.context.fileBrowser.body.style.height = (this._w.innerHeight - this.context.fileBrowser.header.offsetHeight - 40) + 'px';
+            this.context.fileBrowser.area.style.visibility = '';
         },
 
         _bindClose: null,
@@ -147,7 +154,97 @@
             }
 
             this.context.fileBrowser.area.style.display = 'none';
-        }
+        },
+
+        drawFileList: function () {
+            const temp = [
+                {
+                    src: 'http://suneditor.com/docs/cat.jpg',
+                    tag: 'tag'
+                },
+                {
+                    src: 'http://suneditor.com/docs/cat2.jpg',
+                    tag: 'tag-2'
+                },
+                {
+                    src: 'http://suneditor.com/docs/cat.jpg',
+                    tag: 'tag'
+                },
+                {
+                    src: 'http://suneditor.com/docs/cat1.jpg',
+                    tag: 'tag-1'
+                },
+                {
+                    src: 'http://suneditor.com/docs/cat.jpg',
+                    tag: 'tag'
+                },
+                {
+                    src: 'http://suneditor.com/docs/cat1.jpg',
+                    tag: 'tag-1'
+                },
+                {
+                    src: 'http://suneditor.com/docs/cat1.jpg',
+                    tag: 'tag-1'
+                },
+                {
+                    src: 'http://suneditor.com/docs/cat2.jpg',
+                    tag: 'tag-2'
+                },
+                {
+                    src: 'http://suneditor.com/docs/cat2.jpg',
+                    tag: 'tag-2'
+                },
+                {
+                    src: 'http://suneditor.com/docs/cat2.jpg',
+                    tag: 'tag-2'
+                },
+                {
+                    src: 'http://suneditor.com/docs/cat2.jpg',
+                    tag: 'tag-2'
+                },
+                {
+                    src: 'http://suneditor.com/docs/cat2.jpg',
+                    tag: 'tag-2'
+                },
+                {
+                    src: 'http://suneditor.com/docs/cat2.jpg',
+                    tag: 'tag-2'
+                },
+                {
+                    src: 'http://suneditor.com/docs/cat2.jpg',
+                    tag: 'tag-2'
+                },
+            ];
+
+            this.plugins.fileBrowser._tags = [];
+            const html = this.plugins.fileBrowser._drawListItem(temp);
+            this.context.fileBrowser.list.innerHTML = html;
+        },
+
+        _drawListItem: function (items) {
+            const len = items.length;
+            const splitSize = Math.round(len/3) || 1;
+            
+            let html = '';//'<div class="se-file-item-column">';
+            let columns = 1;
+            for (let i = 0, item; i < len; i++) {
+                item = items[i];
+                html += '<div class="se-file-item-img"><img src="' + item.src + '"></div>';
+                // if ((i + 1) % splitSize === 0 && columns < 3) {
+                //     columns++;
+                //     html += '</div><div class="se-file-item-column">'
+                // }
+
+                if (item.tag && this._tags.indexOf(item.tag) === -1) {
+                    this._tags.push(item.tag);
+                }
+            }
+            // html += '</div>';
+
+            return html;
+        },
+
+        _tags: []
     };
 
     if (typeof noGlobal === typeof undefined) {
