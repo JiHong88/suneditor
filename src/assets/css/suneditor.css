@@ -395,4 +395,4 @@
 
 /** animation */
 @keyframes blinker { 50% {opacity:0;} }
-@keyframes spinner { to {transform:rotate(360deg);} }
+@keyframes spinner { to {transform:rotate(361deg);} }
