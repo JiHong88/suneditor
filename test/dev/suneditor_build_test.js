@@ -558,6 +558,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     // maxHeight: '400px',
     height: '700px',
     defaultStyle: 'height: 500px; font-size:10px;',
+    imageGalleryUrl: 'http://localhost:3000/editor/gallery',
     // height: 400,
     fontSizeUnit: 'pt',
     imageResizing: true,

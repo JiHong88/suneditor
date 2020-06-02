@@ -33,11 +33,15 @@
                 _closeSignal: false,
                 area: null,
                 header: null,
-                tags: null,
+                tagArea: null,
                 body: null,
                 list: null,
+                tagElements: null,
+                items: [],
+                selectedTags: [],
                 selectorHandler: null,
-                contextPlugin: ''
+                contextPlugin: '',
+                columnSize: 4
             };
 
             /** fileBrowser */
@@ -56,11 +60,12 @@
 
             context.fileBrowser.area = browser_div;
             context.fileBrowser.header = content.querySelector('.se-file-browser-header');
-            context.fileBrowser.tags = content.querySelector('.se-file-browser-tags');
+            context.fileBrowser.tagArea = content.querySelector('.se-file-browser-tags');
             context.fileBrowser.body = content.querySelector('.se-file-browser-body');
             context.fileBrowser.list = content.querySelector('.se-file-browser-list');
 
             /** add event listeners */
+            context.fileBrowser.tagArea.addEventListener('click', this.onClickTag.bind(core));
             context.fileBrowser.list.addEventListener('click', this.onClickFile.bind(core));
             content.addEventListener('mousedown', this._onMouseDown_browser.bind(core));
             content.addEventListener('click', this._onClick_browser.bind(core));
@@ -81,7 +86,7 @@
                         core.icons.cancel +
                         '</button>' +
                         '<span class="se-file-browser-title">' + lang.toolbar.imageGallery + '</span>' +
-                        '<div class="se-file-browser-tags"><a>aaa</a><a>bbb</a><a>ccc</a><a>ddd</a></div>' +
+                        '<div class="se-file-browser-tags"></div>' +
                     '</div>' +
                     '<div class="se-file-browser-body">' +
                         '<div class="se-file-browser-list"></div>' +
@@ -161,18 +166,19 @@
          * The plugin's "init" method is called.
          */
         close: function () {
-            if (this.plugins.fileBrowser._bindClose) {
-                this._d.removeEventListener('keydown', this.plugins.fileBrowser._bindClose);
-                this.plugins.fileBrowser._bindClose = null;
+            const fileBrowserPlugin = this.plugins.fileBrowser;
+            if (fileBrowserPlugin._bindClose) {
+                this._d.removeEventListener('keydown', fileBrowserPlugin._bindClose);
+                fileBrowserPlugin._bindClose = null;
             }
 
             const fileBrowserContext = this.context.fileBrowser;
             fileBrowserContext.area.style.display = 'none';
             fileBrowserContext.selectorHandler = null;
+            fileBrowserContext.selectedTags = [];
+            fileBrowserContext.items = [];
             fileBrowserContext.contextPlugin = '';
         },
-
-        _tags: [],
 
         drawFileList: function () {
             const temp = [
@@ -234,32 +240,71 @@
                 },
             ];
 
-            this.plugins.fileBrowser._tags = [];
-            const html = this.plugins.fileBrowser._drawListItem(temp);
-            this.context.fileBrowser.list.innerHTML = html;
+            this.plugins.fileBrowser._drawListItem.call(this, temp, true);
         },
 
-        _drawListItem: function (items) {
+        _drawListItem: function (items, update) {
+            const fileBrowserPlugin = this.plugins.fileBrowser;
+            const fileBrowserContext = this.context.fileBrowser;
+
+            const _tags = [];
             const len = items.length;
-            const splitSize = Math.round(len/3) || 1;
+            const columnSize = this.context[fileBrowserContext.contextPlugin].columnSize || fileBrowserContext.columnSize;
+            const splitSize = columnSize <= 1 ? 1 : (Math.round(len/columnSize) || 1);
             
-            let html = '<div class="se-file-item-column">';
+            let tagsHTML = '';
+            let listHTML = '<div class="se-file-item-column">';
             let columns = 1;
-            for (let i = 0, item; i < len; i++) {
+            for (let i = 0, item, tag; i < len; i++) {
                 item = items[i];
-                html += '<div class="se-file-item-img"><img src="' + item.src + '" data-command="pick"></div>';
-                if ((i + 1) % splitSize === 0 && columns < 3) {
+                listHTML += '<div class="se-file-item-img"><img src="' + item.src + '" alt="' + (item.alt || item.src.split('/').pop()) + '" data-command="pick"></div>';
+                if ((i + 1) % splitSize === 0 && columns < columnSize) {
                     columns++;
-                    html += '</div><div class="se-file-item-column">';
+                    listHTML += '</div><div class="se-file-item-column">';
                 }
 
-                if (item.tag && this._tags.indexOf(item.tag) === -1) {
-                    this._tags.push(item.tag);
+                if (update) {
+                    tag = item.tag;
+                    if (tag && _tags.indexOf(tag) === -1) {
+                        _tags.push(tag);
+                        tagsHTML += '<a title="' + tag + '">' + tag + '</a>';
+                    }
                 }
             }
-            html += '</div>';
+            listHTML += '</div>';
 
-            return html;
+            fileBrowserContext.list.innerHTML = listHTML;
+
+            if (update) {
+                fileBrowserContext.items = items;
+                fileBrowserContext.tagArea.innerHTML = tagsHTML;
+                fileBrowserContext.tagElements = fileBrowserContext.tagArea.querySelectorAll('A');
+            }
+        },
+
+        onClickTag: function (e) {
+            const target = e.target;
+            if (!this.util.isAnchor(target)) return;
+
+            const tagName = target.textContent;
+            const fileBrowserPlugin = this.plugins.fileBrowser;
+            const fileBrowserContext = this.context.fileBrowser;
+
+            const selectTag = fileBrowserContext.tagArea.querySelector('a[title="' + tagName + '"]');
+            const selectedTags = fileBrowserContext.selectedTags;
+            const sTagIndex = selectedTags.indexOf(tagName);
+
+            if (sTagIndex > -1){
+                selectedTags.splice(sTagIndex, 1);
+                this.util.removeClass(selectTag, 'on');
+            } else {
+                selectedTags.push(tagName);
+                this.util.addClass(selectTag, 'on');
+            }
+
+            fileBrowserPlugin._drawListItem.call(this, selectedTags.length === 0 ? fileBrowserContext.items : fileBrowserContext.items.filter(function (item) {
+                return selectedTags.indexOf(item.tag) > -1;
+            }), false);
         },
 
         onClickFile: function (e) {

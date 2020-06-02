@@ -21,7 +21,8 @@ export default {
         const context = core.context;
         context.imageGallery = {
             listClass: 'se-image-list',
-            itemTemplate: '<div class="se-file-item-img"><img src="${src}"></div>',
+            itemTemplate: '<div class="se-file-item-img"><img src="${item.src}" alt="${item.alt || item.src.split(\'/\').pop()}" data-command="pick"></div>',
+            columnSize: 4,
             url: context.options.imageGalleryUrl,
             selectorHandler: this.setImage.bind(core)
         };

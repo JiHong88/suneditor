@@ -1,7 +1,7 @@
 /* used color #000 , #fff , #CCC, #f5f5f5, #f9f9f9 */
 /* font color #333, background color: #fff */
 /* grey color #e1e1e1 , #d1d1d1 , #c1c1c1 , #b1b1b1 */
-/* blue color #c7deff , #80bdff , #3f9dff , #4592ff */
+/* blue color #c7deff , #80bdff , #3f9dff , #4592ff, #006aff */
 /* red color #b94a48 , #f2dede , #eed3d7 */
 
 /** --- suneditor main */
@@ -366,7 +366,7 @@
 .sun-editor .se-file-browser .se-file-browser-header .se-file-browser-close {float:right; font-weight:bold; text-shadow:0 1px 0 #fff; -webkit-appearance:none; filter:alpha(opacity=100); opacity:1;}
 .sun-editor .se-file-browser .se-file-browser-header .se-file-browser-title {font-size:16px; font-weight:bold; margin:0; padding:0; line-height:2.2;}
 /* --- browser - header - tags */
-.sun-editor .se-file-browser .se-file-browser-tags {display:none; width:100%; padding:0; text-align:left; margin:0 -15px;}
+.sun-editor .se-file-browser .se-file-browser-tags {display:block; width:100%; padding:0; text-align:left; margin:0 -15px;}
 .sun-editor .se-file-browser .se-file-browser-tags a {display:inline-block; background-color:#f5f5f5; padding:6px 12px; margin:8px 0 8px 8px; text-decoration:none; border-radius:32px; -moz-border-radius:32px; -webkit-border-radius:32px; -moz-background-clip:padding; -webkit-background-clip:padding-box; background-clip:padding-box; cursor:pointer;}
 .sun-editor .se-file-browser .se-file-browser-tags a:hover {background-color:#e1e1e1;}
 .sun-editor .se-file-browser .se-file-browser-tags a:active {background-color:#d1d1d1;}
@@ -376,10 +376,20 @@
 /* --- browser - body */
 .sun-editor .se-file-browser .se-file-browser-body {position:relative; min-height:350px; padding:20px; overflow-y:auto;}
 .sun-editor .se-file-browser .se-file-browser-body .se-file-browser-list {position:relative; width:100%;}
+/* --- browser - column, body @media */
+.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {position:relative; display:block; width:calc(25% - 20px); height:auto; float:left; margin:0 10px;}
+@media screen and (max-width:992px) {
+    .sun-editor .se-file-browser .se-file-browser-inner .se-file-browser-content {width:748px;}
+    .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {width:calc(33% - 20px);}
+}
+@media screen and (max-width:768px) {
+    .sun-editor .se-file-browser .se-file-browser-inner .se-file-browser-content {width:600px;}
+    .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {width:calc(50% - 20px);}
+}
 
-/* --- browxer --- image --- */
-.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {position:relative; display:inline-block; width:50%; height:auto; margin:0 10px;}
+/* --- browser --- image --- */
 .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img {position:relative; display:flex; width:100%; height:auto; margin:10px 0;}
+.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img:hover {outline:2px solid #006aff; opacity:0.8;}
 .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img > img {position:relative; display:block; width:100%; height:auto;}
 
 /** --- notice */
