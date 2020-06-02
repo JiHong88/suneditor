@@ -23,6 +23,9 @@
 }(typeof window !== 'undefined' ? window : this, function (window, noGlobal) {
     const fileBrowser = {
         name: 'fileBrowser',
+        _xmlHttp: null,
+        _loading: null,
+
         /**
          * @description Constructor
          * @param {Object} core Core object 
@@ -57,6 +60,7 @@
 
             browser_div.appendChild(back);
             browser_div.appendChild(content);
+            this._loading = browser_div.querySelector('.se-loading-box');
 
             context.fileBrowser.area = browser_div;
             context.fileBrowser.header = content.querySelector('.se-file-browser-header');
@@ -89,6 +93,7 @@
                         '<div class="se-file-browser-tags"></div>' +
                     '</div>' +
                     '<div class="se-file-browser-body">' +
+                        '<div class="se-loading-box sun-editor-common"><div class="se-loading-effect"></div></div>' +
                         '<div class="se-file-browser-list"></div>' +
                     '</div>' +
                 '</div>';
@@ -121,8 +126,9 @@
         },
 
         /**
-         * @description Open a browser plugin
-         * @param {String} styles browser style
+         * @description Open a file browser plugin
+         * @param {String} pluginName Plugin name using the file browser
+         * @param {Function|null} selectorHandler When the function comes as an argument value, it substitutes "context.selectorHandler".
          */
         open: function (pluginName, selectorHandler)  {
             if (this.plugins.fileBrowser._bindClose) {
@@ -134,7 +140,7 @@
             fileBrowserContext.contextPlugin = pluginName;
             fileBrowserContext.selectorHandler = selectorHandler;
 
-            this.plugins.fileBrowser.drawFileList.call(this);
+            this.plugins.fileBrowser._drawFileList.call(this, this.context[pluginName].url);
 
             this.plugins.fileBrowser._bindClose = function (e) {
                 if (!/27/.test(e.keyCode)) return;
@@ -155,7 +161,7 @@
 
             fileBrowserContext.area.style.visibility = 'hidden';
             fileBrowserContext.area.style.display = 'block';
-            fileBrowserContext.body.style.height = (this._w.innerHeight - fileBrowserContext.header.offsetHeight - 40) + 'px';
+            fileBrowserContext.body.style.maxHeight = (this._w.innerHeight - fileBrowserContext.header.offsetHeight - 50) + 'px';
             fileBrowserContext.area.style.visibility = '';
         },
 
@@ -177,87 +183,72 @@
             fileBrowserContext.selectorHandler = null;
             fileBrowserContext.selectedTags = [];
             fileBrowserContext.items = [];
+
+            if (typeof this.plugins[fileBrowserContext.contextPlugin].init === 'function') this.plugins[fileBrowserContext.contextPlugin].init.call(this);
             fileBrowserContext.contextPlugin = '';
         },
 
-        drawFileList: function () {
-            const temp = [
-                {
-                    src: 'http://suneditor.com/docs/cat.jpg',
-                    tag: 'tag'
-                },
-                {
-                    src: 'http://suneditor.com/docs/cat2.jpg',
-                    tag: 'tag-2'
-                },
-                {
-                    src: 'http://suneditor.com/docs/cat.jpg',
-                    tag: 'tag'
-                },
-                {
-                    src: 'http://suneditor.com/docs/cat1.jpg',
-                    tag: 'tag-1'
-                },
-                {
-                    src: 'http://suneditor.com/docs/cat.jpg',
-                    tag: 'tag'
-                },
-                {
-                    src: 'http://suneditor.com/docs/cat1.jpg',
-                    tag: 'tag-1'
-                },
-                {
-                    src: 'http://suneditor.com/docs/cat1.jpg',
-                    tag: 'tag-1'
-                },
-                {
-                    src: 'http://suneditor.com/docs/cat2.jpg',
-                    tag: 'tag-2'
-                },
-                {
-                    src: 'http://suneditor.com/docs/cat2.jpg',
-                    tag: 'tag-2'
-                },
-                {
-                    src: 'http://suneditor.com/docs/cat2.jpg',
-                    tag: 'tag-2'
-                },
-                {
-                    src: 'http://suneditor.com/docs/cat2.jpg',
-                    tag: 'tag-2'
-                },
-                {
-                    src: 'http://suneditor.com/docs/cat2.jpg',
-                    tag: 'tag-2'
-                },
-                {
-                    src: 'http://suneditor.com/docs/cat2.jpg',
-                    tag: 'tag-2'
-                },
-                {
-                    src: 'http://suneditor.com/docs/cat2.jpg',
-                    tag: 'tag-2'
-                },
-            ];
+        /**
+         * @description Show file browser loading box
+         */
+        showBrowserLoading: function () {
+            this._loading.style.display = 'block';
+        },
 
-            this.plugins.fileBrowser._drawListItem.call(this, temp, true);
+        /**
+         * @description Close file browser loading box
+         */
+        closeBrowserLoading: function () {
+            this._loading.style.display = 'none';
+        },
+
+        _drawFileList: function (url) {
+            const fileBrowserPlugin = this.plugins.fileBrowser;
+
+            const xmlHttp = fileBrowserPlugin._xmlHttp = this.util.getXMLHttpRequest();
+            xmlHttp.onreadystatechange = fileBrowserPlugin._callBackGet.bind(this, xmlHttp);
+            xmlHttp.open('get', url, true);
+            xmlHttp.send(null);
+
+            this.plugins.fileBrowser.showBrowserLoading();
+        },
+
+        _callBackGet: function (xmlHttp) {
+            if (xmlHttp.readyState === 4) {
+                if (xmlHttp.status === 200) {
+                    try {
+                        this.plugins.fileBrowser._drawListItem.call(this, JSON.parse(xmlHttp.responseText).result, true);
+                    } catch (e) {
+                        throw Error('[SUNEDITOR.fileBrowser.drawList.fail] cause : "' + e.message + '"');
+                    } finally {
+                        this.plugins.fileBrowser.closeBrowserLoading();
+                    }
+                } else { // exception
+                    this.plugins.fileBrowser.closeBrowserLoading();
+                    const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
+                    const err = '[SUNEDITOR.fileBrowser.get.serverException] status: ' + xmlHttp.status + ', response: ' + (res.errorMessage || xmlHttp.responseText);
+                    throw Error(err);
+                }
+            }
         },
 
         _drawListItem: function (items, update) {
-            const fileBrowserPlugin = this.plugins.fileBrowser;
             const fileBrowserContext = this.context.fileBrowser;
+            const pluginContext = this.context[fileBrowserContext.contextPlugin];
 
             const _tags = [];
             const len = items.length;
-            const columnSize = this.context[fileBrowserContext.contextPlugin].columnSize || fileBrowserContext.columnSize;
+            const columnSize = pluginContext.columnSize || fileBrowserContext.columnSize;
             const splitSize = columnSize <= 1 ? 1 : (Math.round(len/columnSize) || 1);
+            const drawItemHandler = pluginContext.itemTemplateHandler;
             
             let tagsHTML = '';
             let listHTML = '<div class="se-file-item-column">';
             let columns = 1;
             for (let i = 0, item, tag; i < len; i++) {
                 item = items[i];
-                listHTML += '<div class="se-file-item-img"><img src="' + item.src + '" alt="' + (item.alt || item.src.split('/').pop()) + '" data-command="pick"></div>';
+                listHTML += drawItemHandler(item);
+
                 if ((i + 1) % splitSize === 0 && columns < columnSize) {
                     columns++;
                     listHTML += '</div><div class="se-file-item-column">';

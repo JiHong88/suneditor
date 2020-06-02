@@ -5756,7 +5756,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (context.element.toolbar.offsetWidth === 0) return;
 
             if (context.fileBrowser && context.fileBrowser.area.style.display === 'block') {
-                context.fileBrowser.body.style.height = (_w.innerHeight - context.fileBrowser.header.offsetHeight - 40) + 'px';
+                context.fileBrowser.body.style.maxHeight = (_w.innerHeight - context.fileBrowser.header.offsetHeight - 50) + 'px';
             }
 
             if (core.submenuActiveButton && core.submenu) {

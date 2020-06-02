@@ -374,21 +374,19 @@
 .sun-editor .se-file-browser .se-file-browser-tags a.on:hover {background-color:#d8e8fe;}
 .sun-editor .se-file-browser .se-file-browser-tags a.on:active {background-color:#c7deff;}
 /* --- browser - body */
-.sun-editor .se-file-browser .se-file-browser-body {position:relative; min-height:350px; padding:20px; overflow-y:auto;}
+.sun-editor .se-file-browser .se-file-browser-body {position:relative; height:auto; min-height:350px; padding:20px; overflow-y:auto;}
 .sun-editor .se-file-browser .se-file-browser-body .se-file-browser-list {position:relative; width:100%;}
-/* --- browser - column, body @media */
-.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {position:relative; display:block; width:calc(25% - 20px); height:auto; float:left; margin:0 10px;}
-@media screen and (max-width:992px) {
-    .sun-editor .se-file-browser .se-file-browser-inner .se-file-browser-content {width:748px;}
-    .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {width:calc(33% - 20px);}
-}
-@media screen and (max-width:768px) {
-    .sun-editor .se-file-browser .se-file-browser-inner .se-file-browser-content {width:600px;}
-    .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {width:calc(50% - 20px);}
-}
+@media screen and (max-width:992px) { .sun-editor .se-file-browser .se-file-browser-inner .se-file-browser-content {width:748px;} }
+@media screen and (max-width:768px) { .sun-editor .se-file-browser .se-file-browser-inner .se-file-browser-content {width:600px;} }
+/* --- browser - column */
+.sun-editor .se-file-browser .se-file-browser-list .se-file-item-column {position:relative; display:block; height:auto; float:left;}
 
-/* --- browser --- image --- */
-.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img {position:relative; display:flex; width:100%; height:auto; margin:10px 0;}
+/* --- browser --- custom - "se-image-list" - column */
+.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {width:calc(25% - 20px); margin:0 10px;}
+@media screen and (max-width:992px) { .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {width:calc(33% - 20px);} }
+@media screen and (max-width:768px) { .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {width:calc(50% - 20px);} }
+/* --- browser --- custom - "se-image-list" - item */
+.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img {position:relative; display:flex; cursor: pointer; width:100%; height:auto; margin:10px 0;}
 .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img:hover {outline:2px solid #006aff; opacity:0.8;}
 .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img > img {position:relative; display:block; width:100%; height:auto;}
 

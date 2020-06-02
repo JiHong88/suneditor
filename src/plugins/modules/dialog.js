@@ -148,7 +148,7 @@
             this.context.dialog.back.style.display = 'none';
             this.context.dialog.modalArea.style.display = 'none';
             this.context.dialog.updateModal = false;
-            this.plugins[kind].init.call(this);
+            if (typeof this.plugins[kind].init === 'function') this.plugins[kind].init.call(this);
             this.context.dialog.kind = '';
             this.modalForm = null;
             this.focus();
