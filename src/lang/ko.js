@@ -57,6 +57,7 @@
             math: '수식',
             image: '이미지',
             video: '동영상',
+            audio: '오디오',
             fullScreen: '전체 화면',
             showBlocks: '블록 보기',
             codeView: 'HTML 편집',

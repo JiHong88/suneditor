@@ -58,6 +58,7 @@
             math: 'Matemática',
             image: 'Imagem',
             video: 'Vídeo',
+            audio: 'Áudio',
             fullScreen: 'Tela cheia',
             showBlocks: 'Mostrar blocos',
             codeView: 'Mostrar códigos',

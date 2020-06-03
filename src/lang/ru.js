@@ -57,6 +57,7 @@
             math: 'математический',
             image: 'Изображение',
             video: 'Видео',
+            audio: 'Аудио',
             fullScreen: 'Полный экран',
             showBlocks: 'Блочный вид',
             codeView: 'Редактировать HTML',

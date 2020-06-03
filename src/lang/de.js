@@ -57,6 +57,7 @@
             math: 'Mathematik',
             image: 'Bild',
             video: 'Video',
+            audio: 'Audio',
             fullScreen: 'Vollbild',
             showBlocks: 'Blockformatierungen anzeigen',
             codeView: 'Quelltext anzeigen',

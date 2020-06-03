@@ -60,6 +60,7 @@
             math: 'Math',
             image: 'Billede',
             video: 'Video',
+            audio: 'Audio',
             fullScreen: 'Fuld skærm',
             showBlocks: 'Vis blokke',
             codeView: 'Vis koder',

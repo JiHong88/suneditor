@@ -57,6 +57,7 @@
             math: 'Matematică',
             image: 'Imagine',
             video: 'Video',
+            audio: 'Audio',
             fullScreen: 'Tot ecranul',
             showBlocks: 'Arată blocuri',
             codeView: 'Vizualizare cod',

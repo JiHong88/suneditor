@@ -57,6 +57,7 @@
             math: '数学',
             image: '画像',
             video: '動画',
+            audio: 'オーディオ',
             fullScreen: 'フルスクリーン',
             showBlocks: 'ブロック表示',
             codeView: 'HTMLの編集',

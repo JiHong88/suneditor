@@ -57,6 +57,7 @@
             math: '数学',
             image: '图片',
             video: '视频',
+            audio: '音讯',
             fullScreen: '全屏',
             showBlocks: '显示块区域',
             codeView: '代码视图',
