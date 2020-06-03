@@ -325,7 +325,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'align', 'horizontalRule', 'list', 'lineHeight',
         'table', 
         'link', 'image', 'video', 'audio', 'math',
-        'fullScreen', 'showBlocks', 'codeView',
+        'fullScreen', 'showBlocks', 'codeView', 'imageGallery',
         'preview', 'print', 'save', 'template']
     ],
     // maxCharCount: 20,

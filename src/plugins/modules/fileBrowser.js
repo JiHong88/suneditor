@@ -136,18 +136,16 @@
                 this.plugins.fileBrowser._bindClose = null;
             }
 
-            const fileBrowserContext = this.context.fileBrowser;
-            fileBrowserContext.contextPlugin = pluginName;
-            fileBrowserContext.selectorHandler = selectorHandler;
-
-            this.plugins.fileBrowser._drawFileList.call(this, this.context[pluginName].url);
-
             this.plugins.fileBrowser._bindClose = function (e) {
                 if (!/27/.test(e.keyCode)) return;
                 this.plugins.fileBrowser.close.call(this);
             }.bind(this);
             this._d.addEventListener('keydown', this.plugins.fileBrowser._bindClose);
 
+            const fileBrowserContext = this.context.fileBrowser;
+            fileBrowserContext.contextPlugin = pluginName;
+            fileBrowserContext.selectorHandler = selectorHandler;
+            
             const listClassName = this.context[pluginName].listClass;
             if (!this.util.hasClass(fileBrowserContext.list, listClassName)) {
                 fileBrowserContext.list.className = 'se-file-browser-list ' + listClassName;
@@ -158,10 +156,11 @@
             } else {
                 fileBrowserContext.area.style.position = 'absolute';
             }
+            
+            this.plugins.fileBrowser._drawFileList.call(this, this.context[pluginName].url);
 
             fileBrowserContext.area.style.visibility = 'hidden';
             fileBrowserContext.area.style.display = 'block';
-            fileBrowserContext.body.style.maxHeight = (this._w.innerHeight - fileBrowserContext.header.offsetHeight - 50) + 'px';
             fileBrowserContext.area.style.visibility = '';
         },
 
@@ -173,6 +172,11 @@
          */
         close: function () {
             const fileBrowserPlugin = this.plugins.fileBrowser;
+
+            if (fileBrowserPlugin._xmlHttp) {
+                fileBrowserPlugin._xmlHttp.abort();
+            }
+
             if (fileBrowserPlugin._bindClose) {
                 this._d.removeEventListener('keydown', fileBrowserPlugin._bindClose);
                 fileBrowserPlugin._bindClose = null;
@@ -183,6 +187,7 @@
             fileBrowserContext.selectorHandler = null;
             fileBrowserContext.selectedTags = [];
             fileBrowserContext.items = [];
+            fileBrowserContext.list.innerHTML = fileBrowserContext.tagArea.innerHTML = '';
 
             if (typeof this.plugins[fileBrowserContext.contextPlugin].init === 'function') this.plugins[fileBrowserContext.contextPlugin].init.call(this);
             fileBrowserContext.contextPlugin = '';
@@ -215,6 +220,7 @@
 
         _callBackGet: function (xmlHttp) {
             if (xmlHttp.readyState === 4) {
+                this.plugins.fileBrowser._xmlHttp = null;
                 if (xmlHttp.status === 200) {
                     try {
                         this.plugins.fileBrowser._drawListItem.call(this, JSON.parse(xmlHttp.responseText).result, true);
@@ -222,12 +228,15 @@
                         throw Error('[SUNEDITOR.fileBrowser.drawList.fail] cause : "' + e.message + '"');
                     } finally {
                         this.plugins.fileBrowser.closeBrowserLoading();
+                        this.context.fileBrowser.body.style.maxHeight = (this._w.innerHeight - this.context.fileBrowser.header.offsetHeight - 50) + 'px';
                     }
                 } else { // exception
                     this.plugins.fileBrowser.closeBrowserLoading();
-                    const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
-                    const err = '[SUNEDITOR.fileBrowser.get.serverException] status: ' + xmlHttp.status + ', response: ' + (res.errorMessage || xmlHttp.responseText);
-                    throw Error(err);
+                    if (xmlHttp.status !== 0) {
+                        const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
+                        const err = '[SUNEDITOR.fileBrowser.get.serverException] status: ' + xmlHttp.status + ', response: ' + (res.errorMessage || xmlHttp.responseText);
+                        throw Error(err);
+                    }
                 }
             }
         },
@@ -249,7 +258,7 @@
                 item = items[i];
                 listHTML += drawItemHandler(item);
 
-                if ((i + 1) % splitSize === 0 && columns < columnSize) {
+                if ((i + 1) % splitSize === 0 && columns < columnSize && (i + 1) < len) {
                     columns++;
                     listHTML += '</div><div class="se-file-item-column">';
                 }
@@ -303,11 +312,11 @@
             e.stopPropagation();
 
             const fileBrowserContext = this.context.fileBrowser;
-            const listTag = fileBrowserContext.list;
+            const listEl = fileBrowserContext.list;
             let target = e.target;
             let command = null;
 
-            while (listTag !== target.parentNode) {
+            while (listEl !== target.parentNode) {
                 command = target.getAttribute('data-command');
                 if (command) break;
                 target = target.parentNode;

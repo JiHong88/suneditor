@@ -224,10 +224,11 @@ export default {
     },
 
     _openGallery: function () {
-        this.callPlugin('imageGallery', this.plugins.imageGallery.open.bind(this, this.plugins.image._setUrlInput.bind(this, this.context.image.imgUrlFile)), null);
+        this.callPlugin('imageGallery', this.plugins.imageGallery.open.bind(this, this.plugins.image._setUrlInput.bind(this, this.context.image.imgUrlFile, this.context.image.altText)), null);
     },
 
-    _setUrlInput: function (urlInput, target) {
+    _setUrlInput: function (urlInput, altText, target) {
+        altText.value = target.alt;
         urlInput.value = target.src;
         urlInput.focus();
     },

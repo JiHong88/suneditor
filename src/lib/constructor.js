@@ -580,7 +580,9 @@ export default {
             image: ['', lang.toolbar.image, 'image', 'dialog', icons.image],
             video: ['', lang.toolbar.video, 'video', 'dialog', icons.video],
             audio: ['', lang.toolbar.audio, 'audio', 'dialog', icons.audio],
-            math: ['', lang.toolbar.math, 'math', 'dialog', icons.math]
+            math: ['', lang.toolbar.math, 'math', 'dialog', icons.math],
+            /** plugins - fileBrowser */
+            imageGallery: ['', lang.toolbar.imageGallery, 'imageGallery', 'fileBrowser', icons.image_gallery]
         };
     },
 

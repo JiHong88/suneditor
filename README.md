@@ -527,7 +527,7 @@ imageUrlInput   : Choose whether to create a image url input tag in the image up
                   If the value of imageFileInput is false, it will be unconditionally.   default: true {Boolean}
 imageUploadHeader : Http Header when uploading images.              default: null {Object}
 imageUploadUrl  : The image upload to server mapping address.       default: null {String}
-                  ex) "/editor/uploadImage.ajax"
+                  ex) "/editor/uploadImage"
                   request format: {
                             "file-0": File,
                             "file-1": File
@@ -549,6 +549,19 @@ imageUploadSizeLimit: The size of the total uploadable images (in bytes).
 imageGalleryUrl     : The url of the image gallery, if you use the image gallery.
                       When "imageUrlInput" is true, an image gallery button is created in the image modal.
                       You can also use it by adding "imageGallery" to the button list.   default: null {String}
+                      ex) "/editor/getGallery"
+                      response format: {
+                            "errorMessage": "insert error message",
+                            "result": [
+                                {
+                                    "src": "/download/editorImg/test_image.jpg", // @Require
+                                    "name": "Test image", // @Option - default: src.split('/').pop()
+                                    "alt": "Alt text", // @Option - default: src.split('/').pop()
+                                    "tag": "Tag name" // @Option
+                                }
+                            ]
+                        }
+                      You can redefine the "plugins.imageGallery.drawItems" method.
 
 // Video----------------------------------------------------------------------------------------------------------
 videoResizing   : Can resize the video (iframe, video).                         default: true {Boolean}
@@ -581,7 +594,7 @@ videoUrlInput   : Choose whether to create a video url input tag in the video up
                   If the value of videoFileInput is false, it will be unconditionally.   default: true {Boolean}
 videoUploadHeader : Http Header when uploading videos.              default: null {Object}
 videoUploadUrl  : The video upload to server mapping address.       default: null {String}
-                  ex) "/editor/uploadVideo.ajax"
+                  ex) "/editor/uploadVideo"
                   request format: {
                             "file-0": File,
                             "file-1": File
@@ -608,7 +621,7 @@ audioUrlInput   : Choose whether to create a audio url input tag in the audio up
                   If the value of audioFileInput is false, it will be unconditionally.   default: true {Boolean}
 audioUploadHeader : Http Header when uploading audios.              default: null {Object}
 audioUploadUrl  : The audio upload to server mapping address.       default: null {String}
-                  ex) "/editor/uploadAudio.ajax"
+                  ex) "/editor/uploadAudio"
                   request format: {
                             "file-0": File,
                             "file-1": File

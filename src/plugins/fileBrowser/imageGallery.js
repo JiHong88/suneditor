@@ -41,15 +41,22 @@ export default {
      * @Required @Override fileBrowser
      * @description Define the HTML of the item to be put in "div.se-file-item-column".
      * Format: [
-     *      { src: "image src", alt: "image alt(@option)", tag: "tag name(@option)" }
+     *      { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" }
      * ]
      * @param {Object} item Item of the response data's array
      */
     drawItems: function (item) {
-        return  '<div class="se-file-item-img"><img src="' + item.src + '" alt="' + (item.alt || item.src.split('/').pop()) + '" data-command="pick"></div>';
+        const srcName = item.src.split('/').pop();
+        return  '<div class="se-file-item-img"><img src="' + item.src + '" alt="' + (item.alt || srcName) + '" data-command="pick">' +
+                    '<div class="se-file-img-name se-file-name-back"></div>' +
+                    '<div class="se-file-img-name">' + (item.name || srcName) + '</div>' +
+                '</div>';
     },
 
     setImage: function (target) {
-        this.callPlugin('image', this.plugins.image.create_image.bind(this, target.src, '', false, this.context.image._origin_w, this.context.image._origin_h, 'none', null), null);
+        this.callPlugin('image', function () {
+            this.context.image._altText = target.alt;
+            this.plugins.image.create_image.call(this, target.src, '', false, this.context.image._origin_w, this.context.image._origin_h, 'none', null);
+        }.bind(this), null);
     }
 };
