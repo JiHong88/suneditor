@@ -698,10 +698,10 @@ buttonList      : Defines button list to array {Array}
                   ]
 
                   ex) Alignment of button groups.
-                  // Set ".align" to the first item in the group. (default: left)
+                  // Set "-[align]" to the first item in the group. (default: left)
                   [
                       ['bold', 'underline', 'italic', 'strike'],
-                      ['.right', 'undo', 'redo']
+                      ['-right', 'undo', 'redo']
                   ]
 
                   ex) More button: 
@@ -727,7 +727,7 @@ buttonList      : Defines button list to array {Array}
                     ],
                     [':moreRich-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'math'],
                     [':moreView-View-text.View', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
-                    ['.right', ':moreOthers-More Others-<i class="xxx"></i>', 'save', 'template'], // Used with alignment
+                    ['-right', ':moreOthers-More Others-<i class="xxx"></i>', 'save', 'template'], // Used with alignment
                   ]
 
                   ex) Responsive setting: 
@@ -743,7 +743,7 @@ buttonList      : Defines button list to array {Array}
                         ['undo', 'redo'],
                         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
                         [':moreCommand1-More Rich-default.more_horizontal', 'table', 'link', 'image', 'video', 'math'],
-                        ['.right', ':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
+                        ['-right', ':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
                     ]],
                     // (min-width:768px)
                     ['%768', [
@@ -753,7 +753,7 @@ buttonList      : Defines button list to array {Array}
                             'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle'
                         ],
                         [':moreCommand1-More Rich-default.more_horizontal', 'table', 'link', 'image', 'video', 'math'],
-                        ['.right', ':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
+                        ['-right', ':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
                     ]]
                   ]
                   

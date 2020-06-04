@@ -73,9 +73,9 @@ let ssss = suneditor.create(("sample1"), {
     fontSize: fs,
     buttonList: [
         ['align'],
-        ['.right', 'link'],
-        ['.right', 'table'],
-        ['.right', ':more1-More Text-default.more_text', 'font', 'fontSize', 'formatBlock'],
+        ['-right', 'link'],
+        ['-right', 'table'],
+        ['-right', ':more1-More Text-default.more_text', 'font', 'fontSize', 'formatBlock'],
         [':more2-More Text-default.more_paragraph', 'fontColor', 'bold', 'underline', 'italic'],
         [':more3-More Text-default.more_plus', 'undo', 'redo', 'image'],
         // [{

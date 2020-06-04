@@ -1,12 +1,7 @@
 import { Module } from '../Module';
 
 /**
- * @description Require context properties when fileBrowser module
-    url(@Required): "File server url",
-    listClass(@Required): "Class name of list div",
-    itemTemplateHandler(@Required): "Function that defines the HTML of an file item",
-    selectorHandler(@Required): "Function that action when item click",
-    columnSize(@Option): "Number of "div.se-file-item-column" to be created (default: 4)"
+ * @description This is a required module of fileBrowser plugin.
 */
 declare interface fileBrowser extends Module {
     /**
@@ -18,9 +13,9 @@ declare interface fileBrowser extends Module {
     open(kind: string, update: boolean): void;
 
     /**
-     * @description Close a Dialog window
+     * @description Close a file browser window
      * The plugin's "init" method is called.
-     * @example this.plugins.dialog.close.call(this);
+     * @example this.plugins.fileBrowser.close.call(this);
      */
     close(): void;
 }

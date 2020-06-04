@@ -722,7 +722,7 @@ export default {
                         }
                     } else {
                         // align
-                        if (/^\./.test(button)) {
+                        if (/^\-/.test(button)) {
                             align = button.substr(1);
                             moduleElement.div.style.float = align;
                             continue;

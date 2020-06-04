@@ -64,6 +64,7 @@
 
             context.fileBrowser.area = browser_div;
             context.fileBrowser.header = content.querySelector('.se-file-browser-header');
+            context.fileBrowser.titleArea = content.querySelector('.se-file-browser-title');
             context.fileBrowser.tagArea = content.querySelector('.se-file-browser-tags');
             context.fileBrowser.body = content.querySelector('.se-file-browser-body');
             context.fileBrowser.list = content.querySelector('.se-file-browser-list');
@@ -89,7 +90,7 @@
                         '<button type="button" data-command="close" class="se-btn se-file-browser-close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
                         core.icons.cancel +
                         '</button>' +
-                        '<span class="se-file-browser-title">' + lang.toolbar.imageGallery + '</span>' +
+                        '<span class="se-file-browser-title"></span>' +
                         '<div class="se-file-browser-tags"></div>' +
                     '</div>' +
                     '<div class="se-file-browser-body">' +
@@ -146,7 +147,8 @@
             fileBrowserContext.contextPlugin = pluginName;
             fileBrowserContext.selectorHandler = selectorHandler;
             
-            const listClassName = this.context[pluginName].listClass;
+            const pluginContext = this.context[pluginName];
+            const listClassName = pluginContext.listClass;
             if (!this.util.hasClass(fileBrowserContext.list, listClassName)) {
                 fileBrowserContext.list.className = 'se-file-browser-list ' + listClassName;
             }
@@ -157,11 +159,10 @@
                 fileBrowserContext.area.style.position = 'absolute';
             }
             
-            this.plugins.fileBrowser._drawFileList.call(this, this.context[pluginName].url);
-
-            fileBrowserContext.area.style.visibility = 'hidden';
+            fileBrowserContext.titleArea.textContent = pluginContext.title;
             fileBrowserContext.area.style.display = 'block';
-            fileBrowserContext.area.style.visibility = '';
+
+            this.plugins.fileBrowser._drawFileList.call(this, this.context[pluginName].url);
         },
 
         _bindClose: null,
@@ -187,7 +188,7 @@
             fileBrowserContext.selectorHandler = null;
             fileBrowserContext.selectedTags = [];
             fileBrowserContext.items = [];
-            fileBrowserContext.list.innerHTML = fileBrowserContext.tagArea.innerHTML = '';
+            fileBrowserContext.list.innerHTML = fileBrowserContext.tagArea.innerHTML = fileBrowserContext.titleArea.textContent = '';
 
             if (typeof this.plugins[fileBrowserContext.contextPlugin].init === 'function') this.plugins[fileBrowserContext.contextPlugin].init.call(this);
             fileBrowserContext.contextPlugin = '';

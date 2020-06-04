@@ -20,6 +20,7 @@ export default {
 
         const context = core.context;
         context.imageGallery = {
+            title: core.lang.toolbar.imageGallery, // @Required @Override fileBrowser - File browser window title.
             url: context.options.imageGalleryUrl, // @Required @Override fileBrowser - File server url.
             listClass: 'se-image-list', // @Required @Override fileBrowser - Class name of list div.
             itemTemplateHandler: this.drawItems, // @Required @Override fileBrowser - Function that defines the HTML of an file item.
