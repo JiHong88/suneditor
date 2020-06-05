@@ -411,7 +411,7 @@ export default {
         if (typeof this.functions.onImageUploadBefore === 'function') {
             const result = this.functions.onImageUploadBefore(files, info, this);
             if (!result) return;
-            if (typeof result === 'object' && result.length > 0) files = result;
+            if (this._w.Array.isArray(result) && result.length > 0) files = result;
         }
 
         // server upload

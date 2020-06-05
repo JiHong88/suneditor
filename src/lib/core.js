@@ -4654,34 +4654,48 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     command = 'selectAll';
                     break;
                 case 'B':
-                    command = 'STRONG';
+                    if (options.shortcutsDisable.indexOf('bold') === -1) {
+                        command = 'STRONG';
+                    }
                     break;
                 case 'S':
-                    if (shift) {
+                    if (shift && options.shortcutsDisable.indexOf('strike') === -1) {
                         command = 'DEL';
                     }
                     break;
                 case 'U':
-                    command = 'U';
+                    if (options.shortcutsDisable.indexOf('underline') === -1) {
+                        command = 'U';
+                    }
                     break;
                 case 'I':
-                    command = 'EM';
+                    if (options.shortcutsDisable.indexOf('italic') === -1) {
+                        command = 'EM';
+                    }
                     break;
                 case 'Z':
-                    if (shift) {
-                        command = 'redo';
-                    } else {
-                        command = 'undo';
+                    if (options.shortcutsDisable.indexOf('undo') === -1) {
+                        if (shift) {
+                            command = 'redo';
+                        } else {
+                            command = 'undo';
+                        }
                     }
                     break;
                 case 'Y':
-                    command = 'redo';
+                    if (options.shortcutsDisable.indexOf('undo') === -1) {
+                        command = 'redo';
+                    }
                     break;
                 case '[':
-                    command = 'outdent';
+                    if (options.shortcutsDisable.indexOf('indent') === -1) {
+                        command = 'outdent';
+                    }
                     break;
                 case ']':
-                    command = 'indent';
+                    if (options.shortcutsDisable.indexOf('indent') === -1) {
+                        command = 'indent';
+                    }
                     break;
             }
 
@@ -6361,7 +6375,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             core.submenuOff();
             core.containerOff();
             
-            const newToolbar = _Constructor._createToolBar(_d, buttonList, core.plugins, options.lang);
+            const newToolbar = _Constructor._createToolBar(_d, buttonList, core.plugins, options);
             _responsiveButtons = newToolbar.responsiveButtons;
             core._moreLayerActiveButton = null;
             core._cachingButtons();

@@ -645,6 +645,9 @@ tableCellControllerPosition : Define position to the table cell controller('cell
 
 // Key actions----------------------------------------------------------------------------------------------------
 tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {Boolean}
+shortcutsDisable: You can disable shortcuts.    default: [] {Array}
+                  ex) ['bold', 'strike', 'underline', 'italic', 'undo', 'indent']
+shortcutsHint   : If false, hide the shortcuts hint.    default: true {Boolean}
 
 // Defining save button-------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. 

@@ -358,6 +358,8 @@ export interface SunEditorOptions {
      * If true, disables the interaction of the editor and tab key
      */
     tabDisable?: boolean;
+    shortcutsDisable?: string[];
+    shortcutsHint?: boolean;
     /**
      * Defining save button
      * ====================

@@ -133,6 +133,7 @@ let s1 = suneditor.create('editor', {
     mode: 'balloon-always',
     katex: Katex,
     fontSize: fs,
+    shortcutsDisable: ['bold'],
     // attributesWhitelist: 'style',
     buttonList: [
         ['undo', 'redo',
@@ -314,6 +315,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     height: '500px',
     // fontSize: fs,
     // mode: 'inline',
+    shortcutsDisable: ['bold', 'underline'],
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',

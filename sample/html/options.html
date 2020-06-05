@@ -91,6 +91,7 @@
                 <option value="ja">ja</option>
                 <option value="ko">ko</option>
                 <option value="pt_br">pt_br</option>
+                <option value="ro">ro</option>
                 <option value="ru">ru</option>
                 <option value="zh_cn">zh_cn</option>
             </select>
@@ -306,6 +307,8 @@
             <br>
             <h4 style="color: #b94a48;">--Key actions</h4>
             <label><input type="checkbox" id="tabDisable">&nbsp;&nbsp;tabDisable</label><br>
+            <label><input type="checkbox" id="shortcutsDisable">&nbsp;&nbsp;shortcutsDisable</label> ['bold', 'strike', 'underline', 'italic', 'undo', 'indent']<br>
+            <label><input type="checkbox" id="shortcutsHint" checked>&nbsp;&nbsp;shortcutsHint</label><br>
 
             <h4 style="color: #b94a48;">--Defining save button</h4>
             <label><input type="checkbox" id="callBackSave">&nbsp;&nbsp;callBackSave</label><br>
@@ -509,6 +512,8 @@ function sun_create () {
         audioUploadSizeLimit: document.getElementById('audioUploadSizeLimit').checked ? document.getElementById('audioUploadSizeLimit_value').value : undefined,
         tableCellControllerPosition: document.getElementById('tableCellControllerPosition').checked ? document.getElementById('tableCellControllerPosition_value').value : undefined,
         tabDisable: document.getElementById('tabDisable').checked,
+        shortcutsDisable: document.getElementById('shortcutsDisable').checked ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent'] : undefined,
+        shortcutsHint: document.getElementById('shortcutsHint').checked ? undefined : false,
         callBackSave: document.getElementById('callBackSave').checked ? function (contents) { alert(contents) } : undefined,
         lineHeights: document.getElementById('lineHeights').checked ? [{text: 'Single', value: 1}, {text: 'Double', value: 2}] : undefined,
         paragraphStyles: document.getElementById('paragraphStyles').checked ? ['spaced', {name: 'Box', class: '__se__customClass'}] : undefined,
