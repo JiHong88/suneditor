@@ -886,12 +886,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let tempCon, tempOffset, tempChild;
 
             if (util.isFormatElement(startCon)) {
-                startCon = startCon.childNodes[startOff];
+                console.log(startCon.childNodes[startOff])
+                startCon = startCon.childNodes[startOff] || startCon.firstChild;
                 startOff = 0;
             }
             if (util.isFormatElement(endCon)) {
-                endCon = endCon.childNodes[endOff];
-                endOff = 0;
+                endCon = endCon.childNodes[endOff] || endCon.lastChild;
+                endOff = endCon.textContent.length;
             }
 
             // startContainer
@@ -2043,11 +2044,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             if (util.isFormatElement(startCon)) {
-                startCon = startCon.childNodes[startOff];
+                startCon = startCon.childNodes[startOff] || startCon.firstChild;
                 startOff = 0;
             }
             if (util.isFormatElement(endCon)) {
-                endCon = endCon.childNodes[endOff];
+                endCon = endCon.childNodes[endOff] || endCon.lastChild;
                 endOff = endCon.textContent.length;
             }
 
@@ -4406,7 +4407,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             this._fileManager.queryString = this._fileManager.tags.join(',');
             this._fileManager.regExp = new _w.RegExp('^(' +  this._fileManager.tags.join('|') + ')$', 'i');
-            this._fileManager.pluginRegExp = new _w.RegExp('^(' +  filePluginRegExp.join('|') + ')$', 'i');
+            this._fileManager.pluginRegExp = new _w.RegExp('^(' +  (filePluginRegExp.length === 0 ? 'undefined' : filePluginRegExp.join('|')) + ')$', 'i');
             
             // cache editor's element
             this._variable._originCssText = context.element.topArea.style.cssText;
