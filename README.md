@@ -1107,6 +1107,24 @@ editor.imageUploadHandler = function (xmlHttpRequest, info, core) {
     }
 }
 
+// An event when toggling between code view and wysiwyg view.
+/**
+ * isCodeView: Whether the current code view mode
+ * core: Core object
+ */
+editor.toggleCodeView = function (isCodeView, core) {
+    console.log('isCodeView', isCodeView);
+}
+
+// An event when toggling full screen.
+/**
+ * isFullScreen: Whether the current full screen mode
+ * core: Core object
+ */
+editor.toggleFullScreen = function (isFullScreen, core) {
+    console.log('isFullScreen', isFullScreen);
+}
+
 // Called just before the inline toolbar is positioned and displayed on the screen.
 /**
  * toolbar: Toolbar Element

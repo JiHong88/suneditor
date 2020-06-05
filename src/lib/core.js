@@ -886,7 +886,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let tempCon, tempOffset, tempChild;
 
             if (util.isFormatElement(startCon)) {
-                console.log(startCon.childNodes[startOff])
                 startCon = startCon.childNodes[startOff] || startCon.firstChild;
                 startOff = 0;
             }
@@ -3733,6 +3732,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             this._checkPlaceholder();
+
+            if (typeof functions.toggleCodeView === 'function') functions.toggleCodeView(this._variable.isCodeView, core);
         },
 
         /**
@@ -3876,6 +3877,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 event.onScroll_window();
                 util.changeElement(element.firstElementChild, icons.expansion);
             }
+
+            if (typeof functions.toggleFullScreen === 'function') functions.toggleFullScreen(this._variable.isFullScreen, core);
         },
 
         /**
@@ -4842,7 +4845,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 event._hideToolbar();
             }
 
-            if (functions.onMouseDown) functions.onMouseDown(e, core);
+            if (typeof functions.onMouseDown === 'function') functions.onMouseDown(e, core);
         },
 
         onClick_wysiwyg: function (e) {
@@ -4900,7 +4903,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             if (core._isBalloon) _w.setTimeout(event._toggleToolbarBalloon);
-            if (functions.onClick) functions.onClick(e, core);
+            if (typeof functions.onClick === 'function') functions.onClick(e, core);
         },
 
         _balloonDelay: null,
@@ -5087,7 +5090,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             // history stack
             core.history.push(true);
 
-            if (functions.onInput) functions.onInput(e, core);
+            if (typeof functions.onInput === 'function') functions.onInput(e, core);
         },
 
         _onShortcutKey: false,
@@ -5622,7 +5625,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 core.setRange(zeroWidth, 1, zeroWidth, 1);
             }
 
-            if (functions.onKeyDown) functions.onKeyDown(e, core);
+            if (typeof functions.onKeyDown === 'function') functions.onKeyDown(e, core);
         },
 
         onKeyUp_wysiwyg: function (e) {
@@ -5688,21 +5691,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             // history stack
             core.history.push(true);
 
-            if (functions.onKeyUp) functions.onKeyUp(e, core);
+            if (typeof functions.onKeyUp === 'function') functions.onKeyUp(e, core);
         },
 
         onScroll_wysiwyg: function (e) {
             core.controllersOff();
             core._lineBreaker.style.display = 'none';
             if (core._isBalloon) event._hideToolbar();
-            if (functions.onScroll) functions.onScroll(e, core);
+            if (typeof functions.onScroll === 'function') functions.onScroll(e, core);
         },
 
         onFocus_wysiwyg: function (e) {
             if (core._antiBlur) return;
             core.hasFocus = true;
             if (core._isInline) event._showToolbarInline();
-            if (functions.onFocus) functions.onFocus(e, core);
+            if (typeof functions.onFocus === 'function') functions.onFocus(e, core);
         },
 
         onBlur_wysiwyg: function (e) {
@@ -5710,7 +5713,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             core.hasFocus = false;
             core.controllersOff();
             if (core._isInline || core._isBalloon) event._hideToolbar();
-            if (functions.onBlur) functions.onBlur(e, core);
+            if (typeof functions.onBlur === 'function') functions.onBlur(e, core);
         },
 
         onMouseDown_resizingBar: function (e) {
@@ -6224,6 +6227,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Object} core Core object
          */
         showController: null,
+
+        /**
+         * @description An event when toggling between code view and wysiwyg view.
+         * @param {Boolean} isCodeView Whether the current code view mode
+         * @param {Object} core Core object
+         */
+        toggleCodeView: null,
+
+        /**
+         * @description An event when toggling full screen.
+         * @param {Boolean} isFullScreen Whether the current full screen mode
+         * @param {Object} core Core object
+         */
+        toggleFullScreen: null,
 
         /**
          * @description It replaces the default callback function of the image upload
