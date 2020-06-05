@@ -5860,12 +5860,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const range = core.getRange();
             const sCell = util.getRangeFormatElement(range.startContainer);
             const eCell = util.getRangeFormatElement(range.endContainer);
+            const sIsCell = util.isCell(sCell);
+            const eIsCell = util.isCell(eCell);
 
-            if (util.isCell(sCell) && util.isCell(eCell) && !sCell.previousElementSibling && !eCell.nextElementSibling) {
-                const table = util.getParentElement(sCell, util.isComponent);
-                util.removeItem(table);
-                core.nativeFocus();
-                return true;
+            if (((sIsCell && !sCell.previousElementSibling && !sCell.parentElement.previousElementSibling) || (eIsCell && !eCell.nextElementSibling && !eCell.parentElement.nextElementSibling)) && sCell !== eCell) {
+                if (!sIsCell) {
+                    util.removeItem(util.getParentElement(eCell, util.isComponent));
+                } else if (!eIsCell) {
+                    util.removeItem(util.getParentElement(sCell, util.isComponent));
+                } else {
+                    util.removeItem(util.getParentElement(sCell, util.isComponent));
+                    core.nativeFocus();
+                    return true;
+                }
             }
 
             return false;
