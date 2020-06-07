@@ -4885,9 +4885,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     core._variable._lineBreakComp = container;
                     core._variable._lineBreakDir = 'b';
                     event._onLineBreak();
+                } else {
+                    core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
                 }
 
-                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
                 return;
             }
 
