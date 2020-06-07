@@ -1116,10 +1116,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
-         * @description The method to insert a element. (used elements : table, hr, image, video)
-         * This method is add the element next line and insert the new line.
-         * When used in a tag in "LI", it is inserted into the LI tag.
-         * Returns the first node of next line added.
+         * @description The method to insert a element and return. (used elements : table, hr, image, video)
+         * If "element" is "HR", insert and return the new line.
          * @param {Element} element Element to be inserted
          * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          * @returns {Element}
@@ -1131,33 +1129,27 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let formatEl = util.getFormatElement(selectionNode, null);
 
             if (util.isListCell(formatEl)) {
-                if (/^HR$/i.test(element.nodeName)) {
-                    const newLi = util.createElement('LI');
-                    const textNode = util.createTextNode(util.zeroWidthSpace);
-                    newLi.appendChild(element);
-                    newLi.appendChild(textNode);
-                    formatEl.parentNode.insertBefore(newLi, formatEl.nextElementSibling);
-                    this.setRange(textNode, 1, textNode, 1);
-                } else {
-                    this.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling);
-                    if (!element.nextSibling) element.parentNode.appendChild(util.createElement('BR'));
-                    oNode = util.createElement('LI');
-                    formatEl.parentNode.insertBefore(oNode, formatEl.nextElementSibling);
-                }
+                this.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling);
+                if (!element.nextSibling) element.parentNode.appendChild(util.createElement('BR'));
             } else {
                 if (this.getRange().collapsed && (r.container.nodeType === 3 || util.isBreak(r.container))) {
                     const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current); }.bind(util));
                     oNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
                     if (oNode) formatEl = oNode.previousSibling;
                 }
-
                 this.insertNode(element, formatEl);
-                if (!oNode) oNode = this.appendFormatTag(element, util.isFormatElement(formatEl) ? formatEl : null);
+                if (formatEl && util.onlyZeroWidthSpace(formatEl)) util.removeItem(formatEl);
             }
 
-            const edgeNode = util.getEdgeChildNodes(oNode, null).sc;
-            oNode = edgeNode || oNode;
-            this.setRange(oNode, 0, oNode, 0);
+            const fileComponentInfo = this.getFileComponent(element);
+            if (fileComponentInfo) {
+                this.selectComponent(element, fileComponentInfo.pluginName);
+            } else if (!oNode) {
+                oNode = element;
+            } else {
+                oNode = util.getEdgeChildNodes(oNode, null).sc || oNode;
+                this.setRange(oNode, 0, oNode, 0);
+            }
 
             // history stack
             if (!notHistoryPush) this.history.push(1);
@@ -1172,6 +1164,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Object|null}
          */
         getFileComponent: function (element) {
+            if (!element) return null;
+
             let fileComponent, pluginName;
             if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
                 fileComponent = element.querySelector(core._fileManager.queryString);
@@ -1218,7 +1212,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (!afterNode && isComp) {
                 const r = this.removeNode();
                 if (r.container.nodeType === 3 || util.isBreak(r.container)) {
-                    const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current); }.bind(util));
+                    const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
                     afterNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
                     if (afterNode) afterNode = afterNode.previousSibling;
                 }
@@ -1324,6 +1318,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     if (util.isList(afterNode)) {
                         parentNode = afterNode;
                         afterNode = null;
+                    } else if (util.isListCell(afterNode)) {
+                        parentNode = afterNode.previousElementSibling || afterNode;
                     } else if (!originAfter && !afterNode) {
                         const r = this.removeNode();
                         const container = r.container.nodeType === 3 ? (util.isListCell(util.getFormatElement(r.container, null)) ? r.container : (util.getFormatElement(r.container, null) || r.container.parentNode)) : r.container;
@@ -1343,45 +1339,48 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             } catch (e) {
                 parentNode.appendChild(oNode);
             } finally {
-                let offset = 1;
-                if (oNode.nodeType === 3) {
-                    const previous = oNode.previousSibling;
-                    const next = oNode.nextSibling;
-                    const previousText = (!previous ||  previous.nodeType !== 3 || util.onlyZeroWidthSpace(previous)) ? '' : previous.textContent;
-                    const nextText = (!next || next.nodeType !== 3 || util.onlyZeroWidthSpace(next)) ? '' : next.textContent;
+                if (!util.isComponent(oNode)) {
+                    let offset = 1;
+                    if (oNode.nodeType === 3) {
+                        const previous = oNode.previousSibling;
+                        const next = oNode.nextSibling;
+                        const previousText = (!previous ||  previous.nodeType !== 3 || util.onlyZeroWidthSpace(previous)) ? '' : previous.textContent;
+                        const nextText = (!next || next.nodeType !== 3 || util.onlyZeroWidthSpace(next)) ? '' : next.textContent;
+        
+                        if (previous && previousText.length > 0) {
+                            oNode.textContent = previousText + oNode.textContent;
+                            util.removeItem(previous);
+                        }
+        
+                        if (next && next.length > 0) {
+                            oNode.textContent += nextText;
+                            util.removeItem(next);
+                        }
     
-                    if (previous && previousText.length > 0) {
-                        oNode.textContent = previousText + oNode.textContent;
-                        util.removeItem(previous);
+                        return {
+                            startOffset: previousText.length,
+                            endOffset: oNode.textContent.length - nextText.length
+                        };
+                    } else if (!util.isBreak(oNode) && util.isFormatElement(parentNode)) {
+                        let zeroWidth = null;
+                        if (!oNode.previousSibling) {
+                            zeroWidth = util.createTextNode(util.zeroWidthSpace);
+                            oNode.parentNode.insertBefore(zeroWidth, oNode);
+                        }
+                        
+                        if (!oNode.nextSibling) {
+                            zeroWidth = util.createTextNode(util.zeroWidthSpace);
+                            oNode.parentNode.appendChild(zeroWidth);
+                        }
+    
+                        if (util._isIgnoreNodeChange(oNode)) {
+                            oNode = oNode.nextSibling;
+                            offset = 0;
+                        }
                     }
     
-                    if (next && next.length > 0) {
-                        oNode.textContent += nextText;
-                        util.removeItem(next);
-                    }
-
-                    return {
-                        startOffset: previousText.length,
-                        endOffset: oNode.textContent.length - nextText.length
-                    };
-                } else if (!util.isBreak(oNode) && util.isFormatElement(parentNode)) {
-                    let zeroWidth = null;
-                    if (!oNode.previousSibling) {
-                        zeroWidth = util.createTextNode(util.zeroWidthSpace);
-                        oNode.parentNode.insertBefore(zeroWidth, oNode);
-                    }
-                    if (!oNode.nextSibling) {
-                        zeroWidth = util.createTextNode(util.zeroWidthSpace);
-                        oNode.parentNode.appendChild(zeroWidth);
-                    }
-
-                    if (util._isIgnoreNodeChange(oNode)) {
-                        oNode = oNode.nextSibling;
-                        offset = 0;
-                    }
+                    this.setRange(oNode, offset, oNode, offset);
                 }
-
-                this.setRange(oNode, offset, oNode, offset);
 
                 // history stack
                 this.history.push(true);
@@ -1516,7 +1515,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : (range.endContainer || range.startContainer);
             
             if (!util.isWysiwygDiv(container)) {
-                const rc = util.removeItemAllParents(container, null, null);
+                const rc = util.removeItemAllParents(container, function (current) {
+                    if (this.isComponent(current)) return false;
+                    const text = current.textContent;
+                    return text.length === 0 || /^(\n|\u200B)+$/.test(text);
+                }.bind(util), null);
+                
                 if (rc) container = rc.sc || rc.ec || context.element.wysiwyg;
             }
 
@@ -4869,6 +4873,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const fileComponentInfo = core.getFileComponent(targetElement);
             if (fileComponentInfo) {
                 e.preventDefault();
+                const container = util.getParentElement(fileComponentInfo.component, util.isComponent);
+                let cm = container.offsetWidth / 2;
+                cm = (cm - 17) < e.offsetX && (cm + 17) > e.offsetX;
+
+                if (!util.isFormatElement(container.previousElementSibling) && e.offsetY < 20 && cm) {
+                    core._variable._lineBreakComp = container;
+                    core._variable._lineBreakDir = 't';
+                    event._onLineBreak();
+                } else if (!util.isFormatElement(container.nextElementSibling) && (container.offsetHeight - 20) > 20 && cm) {
+                    core._variable._lineBreakComp = container;
+                    core._variable._lineBreakDir = 'b';
+                    event._onLineBreak();
+                }
+
                 core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
                 return;
             }
@@ -6044,7 +6062,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 lineBreakerStyle.top = (top - wScroll) + 'px';
                 lineBreakerStyle.visibility = 'hidden';
                 lineBreakerStyle.display = 'block';
-                core._lineBreakerButton.style.left = (component.offsetLeft + (component.offsetWidth / 2) - (core._lineBreakerButton.offsetWidth / 2)) + 'px';
+                core._lineBreakerButton.style.left = (util.getOffset(component).left + (component.offsetWidth / 2) - (core._lineBreakerButton.offsetWidth / 2)) + 'px';
                 lineBreakerStyle.visibility = '';
             } // off line breaker
             else if (lineBreakerStyle.display !== 'none') {

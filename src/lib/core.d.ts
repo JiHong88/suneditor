@@ -322,10 +322,8 @@ interface Core {
     appendFormatTag(element: Element, formatNode?: string | Element): Element;
 
     /**
-     * @description The method to insert a element. (used elements : table, hr, image, video)
-     * This method is add the element next line and insert the new line.
-     * When used in a tag in "LI", it is inserted into the LI tag.
-     * Returns the first node of next line added.
+     * @description The method to insert a element and return. (used elements : table, hr, image, video)
+     * If "element" is "HR", insert and return the new line.
      * @param element Element to be inserted
      * @param notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
      * @returns

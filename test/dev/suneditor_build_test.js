@@ -133,6 +133,8 @@ let s1 = suneditor.create('editor', {
     mode: 'balloon-always',
     katex: Katex,
     fontSize: fs,
+    resizingBar: true,
+    height: '500px',
     shortcutsDisable: ['bold'],
     // attributesWhitelist: 'style',
     buttonList: [
@@ -160,7 +162,6 @@ let s1 = suneditor.create('editor', {
         bold: '<span class="se-icon-text">B</span>'
     },
     width: '100%',
-    height: '200px',
     defaultStyle: 'font-size: 10px;',
     // fullPage: true,
     // pasteTagsWhitelist: 'p|h[1-6]',
@@ -336,7 +337,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     placeholder: 'SSSFdjskfdsff.f.fdsa.f...',
     // fullPage: true,
-    imageGalleryUrl: 'http://localhost:3000/editor/gallery',
+    imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     // videoHeight: '56.22%',
     videoRatio: 0.75,
     // imageHeight: 400,
@@ -404,6 +405,7 @@ ss.onKeyUp = function (e) {
 };
 ss.onDrop = function (e) {
     // console.log('onDrop', e);
+    return false;
 };
 ss.onAudioUpload = function (targetElement, index, state, videoInfo) {
     // console.log('targetElement:${targetElement}, index:${index}, state:${state}')

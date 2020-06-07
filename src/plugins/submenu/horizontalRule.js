@@ -58,7 +58,7 @@ export default {
         oHr.className = className;
         this.focus();
 
-        let oNode = this.insertComponent(oHr, false);
+        const oNode = this.insertComponent(oHr, false);
         this.setRange(oNode, 0, oNode, 0);
     },
 
