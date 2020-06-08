@@ -640,6 +640,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         controllersOff: function (e) {
             if (this._fileManager.pluginRegExp.test(this.currentControllerName) && e && e.type === 'keydown' && e.keyCode !== 27) return;
+            context.element.lineBreaker_t.style.display = context.element.lineBreaker_b.style.display = 'none';
 
             this.currentControllerName = '';
             this.currentControllerTarget = null;
@@ -1143,7 +1144,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             const fileComponentInfo = this.getFileComponent(element);
             if (fileComponentInfo) {
-                this.selectComponent(element, fileComponentInfo.pluginName);
+                this.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
             } else if (!oNode) {
                 oNode = element;
             } else {
@@ -1193,9 +1194,42 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {String} pluginName Plugin name (image, video)
          */
         selectComponent: function (element, pluginName) {
-            const plugin = core.plugins[pluginName];
-            if (!plugin || !plugin.select) return;
-            this.callPlugin(pluginName, plugin.select.bind(this, element), null);
+            const plugin = this.plugins[pluginName];
+            if (!plugin) return;
+            if (typeof plugin.select === 'function') this.callPlugin(pluginName, plugin.select.bind(this, element), null);
+            
+            // line breaker
+            this._lineBreaker.style.display = 'none';
+            const container = util.getParentElement(element, util.isComponent);
+            let componentTop, wScroll, w, lineBreakerStyle;
+            // top
+            if (!util.isFormatElement(container.previousElementSibling)) {
+                this._variable._lineBreakComp = container;
+                wScroll = context.element.wysiwyg.scrollTop;
+                componentTop = util.getOffset(element, context.element.wysiwygFrame).top + wScroll;
+                w = (element.offsetWidth / 2) / 2;
+
+                this._variable._lineBreakDir = 't';
+                lineBreakerStyle = context.element.lineBreaker_t.style;
+                lineBreakerStyle.top = (componentTop - wScroll - 12) + 'px';
+                lineBreakerStyle.left = (util.getOffset(element).left + w) + 'px';
+                lineBreakerStyle.display = 'block';
+            }
+            // bottom
+            if (!util.isFormatElement(container.nextElementSibling)) {
+                if (!componentTop) {
+                    this._variable._lineBreakComp = container;
+                    wScroll = context.element.wysiwyg.scrollTop;
+                    componentTop = util.getOffset(element, context.element.wysiwygFrame).top + wScroll;
+                    w = (element.offsetWidth / 2) / 2;
+                }
+
+                this._variable._lineBreakDir = 'b';
+                lineBreakerStyle = context.element.lineBreaker_b.style;
+                lineBreakerStyle.top = (componentTop + element.offsetHeight - wScroll - 12) + 'px';
+                lineBreakerStyle.left = (util.getOffset(element).left + element.offsetWidth - w - 24) + 'px';
+                lineBreakerStyle.display = 'block';
+            }
         },
 
         /**
@@ -4618,6 +4652,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 _charWrapper: contextEl.charWrapper,
                 _loading: contextEl.loading,
                 _lineBreaker: contextEl.lineBreaker,
+                _lineBreaker_t: contextEl.lineBreaker_t,
+                _lineBreaker_b: contextEl.lineBreaker_b,
                 _resizeBack: contextEl.resizeBackground,
                 _stickyDummy: contextEl._stickyDummy,
                 _arrow: contextEl._arrow
@@ -4873,22 +4909,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const fileComponentInfo = core.getFileComponent(targetElement);
             if (fileComponentInfo) {
                 e.preventDefault();
-                const container = util.getParentElement(fileComponentInfo.component, util.isComponent);
-                let cm = container.offsetWidth / 2;
-                cm = (cm - 17) < e.offsetX && (cm + 17) > e.offsetX;
-
-                if (!util.isFormatElement(container.previousElementSibling) && e.offsetY < 20 && cm) {
-                    core._variable._lineBreakComp = container;
-                    core._variable._lineBreakDir = 't';
-                    event._onLineBreak();
-                } else if (!util.isFormatElement(container.nextElementSibling) && (container.offsetHeight - 20) > 20 && cm) {
-                    core._variable._lineBreakComp = container;
-                    core._variable._lineBreakDir = 'b';
-                    event._onLineBreak();
-                } else {
-                    core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
-                }
-
+                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
                 return;
             }
 
@@ -5307,8 +5328,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                             if (fileComponentInfo) {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
                                 if (formatEl.textContent.length === 0) util.removeItem(formatEl);
+                                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
                             }
                             break;
                         }
@@ -6032,7 +6053,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const component = util.getParentElement(e.target, util.isComponent);
             const lineBreakerStyle = core._lineBreaker.style;
 
-            if (component) {
+            if (component && !core.currentControllerName) {
                 let scrollTop = 0;
                 let el = context.element.wysiwyg;
                 do {
@@ -6061,10 +6082,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 core._variable._lineBreakComp = component;
                 core._variable._lineBreakDir = dir;
                 lineBreakerStyle.top = (top - wScroll) + 'px';
-                lineBreakerStyle.visibility = 'hidden';
+                core._lineBreakerButton.style.left = (util.getOffset(component).left + (component.offsetWidth / 2) - 17) + 'px';
                 lineBreakerStyle.display = 'block';
-                core._lineBreakerButton.style.left = (util.getOffset(component).left + (component.offsetWidth / 2) - (core._lineBreakerButton.offsetWidth / 2)) + 'px';
-                lineBreakerStyle.visibility = '';
             } // off line breaker
             else if (lineBreakerStyle.display !== 'none') {
                 lineBreakerStyle.display = 'none';
@@ -6075,7 +6094,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             e.preventDefault();
         },
 
-        _onLineBreak: function () {
+        _onLineBreak: function (e) {
+            e.preventDefault();
             const component = core._variable._lineBreakComp;
 
             const format = util.createElement('P');
@@ -6129,6 +6149,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             eventWysiwyg.addEventListener('mousemove', event.onMouseMove_wysiwyg, false);
             core._lineBreakerButton.addEventListener('mousedown', event._onMouseDown_lineBreak, false);
             core._lineBreakerButton.addEventListener('click', event._onLineBreak, false);
+            context.element.lineBreaker_t.addEventListener('mousedown', event._onLineBreak, false);
+            context.element.lineBreaker_b.addEventListener('mousedown', event._onLineBreak, false);
 
             /** Events are registered only when there is a table plugin.  */
             if (core.plugins.table) {
@@ -6183,6 +6205,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             eventWysiwyg.removeEventListener('mousemove', event.onMouseMove_wysiwyg);
             core._lineBreakerButton.removeEventListener('mousedown', event._onMouseDown_lineBreak);
             core._lineBreakerButton.removeEventListener('click', event._onLineBreak);
+            context.element.lineBreaker_t.removeEventListener('mousedown', event._onLineBreak);
+            context.element.lineBreaker_b.removeEventListener('mousedown', event._onLineBreak);
             
             eventWysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
             

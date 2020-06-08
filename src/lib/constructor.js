@@ -74,6 +74,10 @@ export default {
         const line_breaker = doc.createElement('DIV');
         line_breaker.className = 'se-line-breaker';
         line_breaker.innerHTML = '<button class="se-btn">' + this.icons.line_break + '</button>';
+        const line_breaker_t = doc.createElement('DIV');
+        line_breaker_t.className += 'se-line-breaker-component';
+        const line_breaker_b = line_breaker_t.cloneNode(true);
+        line_breaker_t.innerHTML = line_breaker_b.innerHTML = this.icons.line_break;
     
         // resize operation background
         const resize_back = doc.createElement('DIV');
@@ -95,6 +99,8 @@ export default {
         relative.appendChild(resize_back);
         relative.appendChild(loading_box);
         relative.appendChild(line_breaker);
+        relative.appendChild(line_breaker_t);
+        relative.appendChild(line_breaker_b);
         if (resizing_bar) relative.appendChild(resizing_bar);
         top_div.appendChild(relative);
 
@@ -116,6 +122,8 @@ export default {
                 _charCounter: char_counter,
                 _loading: loading_box,
                 _lineBreaker: line_breaker,
+                _lineBreaker_t: line_breaker_t,
+                _lineBreaker_b: line_breaker_b,
                 _resizeBack: resize_back,
                 _stickyDummy: sticky_dummy,
                 _arrow: arrow

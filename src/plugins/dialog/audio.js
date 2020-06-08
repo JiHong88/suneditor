@@ -364,7 +364,7 @@ export default {
         }
 
         this.plugins.fileManager.setInfo.call(this, 'audio', element, this.functions.onAudioUpload, file, false);
-        this.history.push(false);
+        if (isUpdate) this.history.push(false);
     },
 
     updateCover: function (element) {
@@ -407,7 +407,7 @@ export default {
             controller.firstElementChild.style.left = '20px';
         }
         
-        this.controllersOn(controller, selectionTag, this.plugins.audio.init.bind(this), 'audio');
+        this.controllersOn(controller, selectionTag, this.plugins.audio.onControllerOff.bind(this, selectionTag), 'audio');
 
         this.util.addClass(selectionTag, 'active');
         context._element = selectionTag;
@@ -441,6 +441,11 @@ export default {
         this.controllersOff();
     },
 
+    onControllerOff: function (selectionTag) {
+        this.util.removeClass(selectionTag, 'active');
+        this.context.audio.controller.style.display = 'none';
+    },
+
     /**
      * @Required @Override dialog
      */
@@ -448,13 +453,10 @@ export default {
         if (this.context.dialog.updateModal) return;
         const context = this.context.audio;
 
-        if (context._element) this.util.removeClass(context._element, 'active');
-
         if (context.audioInputFile) context.audioInputFile.value = '';
         if (context.audioUrlFile) context.audioUrlFile.value = '';
         if (context.audioInputFile && context.audioUrlFile) context.audioUrlFile.removeAttribute('disabled');
 
-        context.controller.style.display = 'none';
         context._element = null;
     }
 };
