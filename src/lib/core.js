@@ -1209,7 +1209,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 componentTop = util.getOffset(element, context.element.wysiwygFrame).top + wScroll;
                 w = (element.offsetWidth / 2) / 2;
 
-                this._variable._lineBreakDir = 't';
                 lineBreakerStyle = context.element.lineBreaker_t.style;
                 lineBreakerStyle.top = (componentTop - wScroll - 12) + 'px';
                 lineBreakerStyle.left = (util.getOffset(element).left + w) + 'px';
@@ -1224,7 +1223,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     w = (element.offsetWidth / 2) / 2;
                 }
 
-                this._variable._lineBreakDir = 'b';
                 lineBreakerStyle = context.element.lineBreaker_b.style;
                 lineBreakerStyle.top = (componentTop + element.offsetHeight - wScroll - 12) + 'px';
                 lineBreakerStyle.left = (util.getOffset(element).left + element.offsetWidth - w - 24) + 'px';
@@ -4665,6 +4663,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
      * @description event function
      */
     const event = {
+        _lineBreakerBind: null,
         _responsiveCurrentSize: 'default',
         _responsiveButtonSize: null,
         _responsiveButtons: null,
@@ -6097,10 +6096,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         _onLineBreak: function (e) {
             e.preventDefault();
             const component = core._variable._lineBreakComp;
+            const dir = !this ? core._variable._lineBreakDir : this;
 
             const format = util.createElement('P');
             format.innerHTML = '<br>';
-            component.parentNode.insertBefore(format, core._variable._lineBreakDir === 't' ? component : component.nextSibling);
+            component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
 
             core._lineBreaker.style.display = 'none';
             core._variable._lineBreakComp = null;
@@ -6146,11 +6146,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             eventWysiwyg.addEventListener('blur', event.onBlur_wysiwyg, false);
 
             /** line breaker */
+            event._lineBreakerBind = { a: event._onLineBreak.bind(''), t: event._onLineBreak.bind('t'), b: event._onLineBreak.bind('b') };
             eventWysiwyg.addEventListener('mousemove', event.onMouseMove_wysiwyg, false);
             core._lineBreakerButton.addEventListener('mousedown', event._onMouseDown_lineBreak, false);
-            core._lineBreakerButton.addEventListener('click', event._onLineBreak, false);
-            context.element.lineBreaker_t.addEventListener('mousedown', event._onLineBreak, false);
-            context.element.lineBreaker_b.addEventListener('mousedown', event._onLineBreak, false);
+            core._lineBreakerButton.addEventListener('click', event._lineBreakerBind.a, false);
+            context.element.lineBreaker_t.addEventListener('mousedown', event._lineBreakerBind.t, false);
+            context.element.lineBreaker_b.addEventListener('mousedown', event._lineBreakerBind.b, false);
 
             /** Events are registered only when there is a table plugin.  */
             if (core.plugins.table) {
@@ -6204,9 +6205,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             eventWysiwyg.removeEventListener('mousemove', event.onMouseMove_wysiwyg);
             core._lineBreakerButton.removeEventListener('mousedown', event._onMouseDown_lineBreak);
-            core._lineBreakerButton.removeEventListener('click', event._onLineBreak);
-            context.element.lineBreaker_t.removeEventListener('mousedown', event._onLineBreak);
-            context.element.lineBreaker_b.removeEventListener('mousedown', event._onLineBreak);
+            core._lineBreakerButton.removeEventListener('click', event._lineBreakerBind.a);
+            context.element.lineBreaker_t.removeEventListener('mousedown', event._lineBreakerBind.t);
+            context.element.lineBreaker_b.removeEventListener('mousedown', event._lineBreakerBind.b);
+            event._lineBreakerBind = null;
             
             eventWysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
             

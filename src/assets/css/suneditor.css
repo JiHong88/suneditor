@@ -120,10 +120,10 @@
 
 /** --- line breaker */
 .sun-editor .se-line-breaker {position:absolute; display:none; width:100%; height:1px; cursor:text; border-top:2px solid #4592ff; z-index:7;}
-.sun-editor .se-line-breaker > button.se-btn {position:relative; display:inline-block; top:-17px; float:none; left:-50%; background-color:#80bdff; border:1px solid #0c2240; opacity:0.4; cursor:pointer;}
-.sun-editor .se-line-breaker > button.se-btn:hover {opacity:0.8; background-color:#80bdff; border-color:#041b39;}
+.sun-editor .se-line-breaker > button.se-btn {position:relative; display:inline-block; top:-17px; float:none; left:-50%; background-color:#fff; border:1px solid #0c2240; opacity:0.6; cursor:pointer;}
+.sun-editor .se-line-breaker > button.se-btn:hover {opacity:0.9; background-color:#fff; border-color:#041b39;}
 /** --- line breaker --- component - top, bottom */
-.sun-editor .se-line-breaker-component {position:absolute; display:none; width:24px; height:24px; background-color:#fff; border:1px solid #0c2240; opacity:0.6; cursor:pointer; z-index:7;}
+.sun-editor .se-line-breaker-component {position:absolute; display:none; width:24px; height:24px; background-color:#fff; border:1px solid #0c2240; opacity:0.6; border-radius:4px; cursor:pointer; z-index:7;}
 .sun-editor .se-line-breaker-component:hover {opacity:0.9;}
 
 /** --- toolbar ---------------------------------------------------------- */
