@@ -15,6 +15,7 @@ const util = {
     _w: window,
     isIE: navigator.userAgent.indexOf('Trident') > -1,
     isIE_Edge: (navigator.userAgent.indexOf('Trident') > -1) || (navigator.appVersion.indexOf('Edge') > -1),
+    isOSX_IOS: /(Mac|iPhone|iPod|iPad)/.test(navigator.platform),
 
     /**
      * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.

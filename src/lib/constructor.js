@@ -552,7 +552,7 @@ export default {
     _defaultButtons: function (options) {
         const icons = this.icons;
         const lang = options.lang;
-        const cmd = /(Mac|iPhone|iPod|iPad)/.test(navigator.platform) ? '⌘' : 'CTRL';
+        const cmd = util.isOSX_IOS ? '⌘' : 'CTRL';
         const shortcutsDisable = !options.shortcutsHint ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent'] : options.shortcutsDisable;
 
         return {
