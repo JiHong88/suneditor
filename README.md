@@ -24,6 +24,7 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 - [Browser Support](#browser-support)
 - [Install](#install)
 - [Getting Started](#getting-started)
+- [When inserting custom tags in the editor](#when-inserting-custom-tags-in-the-editor)
 - [Use import statement](#use-import-statement)
     - [Load only what you want](#1-load-only-what-you-want)
     - [Load all plugins](#2-load-all-plugins)
@@ -98,6 +99,14 @@ When you display a document created by suneditor
 You need to include "src/assets/css/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
 Then add "sun-editor-editable" to the class name of the Tag element that displays the content.
 In "suneditor-contents.css", you can define the style of all the tags created in suneditor.
+```
+
+## When inserting custom tags in the editor
+```text
+- Empty tags without meaning or tags that do not fit the editor's format are modified or deleted.
+    Tags with the class name "se-component" or "__se__tag" of the top-level tag will not be deleted.
+        "se-component" is the component type of the editor.
+        Class name for wrapper tags such as images and videos.
 ```
 
 ## Use import statement
