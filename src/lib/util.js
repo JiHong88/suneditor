@@ -13,8 +13,8 @@
 const util = {
     _d: document,
     _w: window,
-    isIE: window.navigator.userAgent.match(/(MSIE|Trident.*rv[ :])([0-9]+)/) !== null,
-    isIE_Edge: (window.navigator.userAgent.match(/(MSIE|Trident.*rv[ :])([0-9]+)/) !== null) || (window.navigator.appVersion.indexOf('Edge') > -1),
+    isIE: navigator.userAgent.indexOf('Trident') > -1,
+    isIE_Edge: (navigator.userAgent.indexOf('Trident') > -1) || (navigator.appVersion.indexOf('Edge') > -1),
 
     /**
      * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
@@ -45,7 +45,7 @@ const util = {
     /**
      * @description Unicode Character 'ZERO WIDTH SPACE' (\u200B)
      */
-    zeroWidthSpace: '\u200B',
+    zeroWidthSpace: String.fromCharCode(8203),
 
     /**
      * @description Regular expression to find 'zero width space' (/\u200B/g)
