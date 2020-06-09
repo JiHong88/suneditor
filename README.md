@@ -698,25 +698,25 @@ buttonList      : Defines button list to array {Array}
                     ['removeFormat'],
                     ['outdent', 'indent'],
                     // ['align', 'horizontalRule', 'list', 'lineHeight'],
-                    // ['table', 'link', 'image', 'video', 'math'],
-                    // ['imageGallery'],
+                    // ['table', 'link', 'image', 'video', 'math'], // You must add the 'katex' library at options to use the 'math' plugin.
+                    // ['imageGallery'], // You must add the "imageGalleryUrl".
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
                     // ['save', 'template'],
                     // '/', Line break
                   ]
 
-                  ex) When do not use group.
+                  ex) When do not use group:
                   // If you don't want to use a group, put all the buttons in one array.
                   [
                     ['undo', 'redo', 'bold', 'underline', 'fontColor', 'table', 'link', 'image', 'video']
                   ]
 
-                  ex) Alignment of button groups.
+                  ex) Alignment of button groups:
                   // Set "-[align]" to the first item in the group. (default: left)
                   [
-                      ['bold', 'underline', 'italic', 'strike'],
-                      ['-right', 'undo', 'redo']
+                    ['bold', 'underline', 'italic', 'strike'],
+                    ['-right', 'undo', 'redo']
                   ]
 
                   ex) More button: 
@@ -727,22 +727,17 @@ buttonList      : Defines button list to array {Array}
                    * "Title attribute": Title attribute of the button to be displayed as a tooltip.
                    * "Button's innerHTML": Define the button's "innerHTML".
                    * default.xxx -> Use the attributes of "defaultIcons".
+                   * (more_text, more_paragraph, more_plus, more_horizontal, more_vertical)
                    * text.xxx -> Use the text.
                    * xxx -> HTML
                    */
                   [
-                    ['undo', 'redo', 'removeFormat'],
-                    [
-                        ':moreText-More Text-default.more_text', 'bold', 'underline', 'italic',
-                        'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle'
-                    ],
-                    [
-                        ':moreParagraph-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock',
-                        'paragraphStyle', 'blockquote', 'align', 'horizontalRule', 'list', 'lineHeight'
-                    ],
-                    [':moreRich-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'math'],
-                    [':moreView-View-text.View', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
-                    ['-right', ':moreOthers-More Others-<i class="xxx"></i>', 'save', 'template'], // Used with alignment
+                    ['undo', 'redo'],
+                    [':t-More Text-default.more_text', 'bold', 'underline', 'italic'],
+                    [':p-More Paragraph-default.more_paragraph', 'font', 'formatBlock', 'align', 'list'],
+                    [':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video'],
+                    [':v-View-text.View', 'fullScreen', 'codeView', 'print'],
+                    ['-right', ':o-More Others-<i class="xxx"></i>', 'save', 'template'], // Used with alignment
                   ]
 
                   ex) Responsive setting: 
@@ -752,23 +747,38 @@ buttonList      : Defines button list to array {Array}
                   [
                     // Default
                     ['undo', 'redo'],
+                    ['font', 'fontSize', 'formatBlock'],
+                    ['paragraphStyle', 'blockquote'],
                     ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+                    ['fontColor', 'hiliteColor', 'textStyle'],
+                    ['removeFormat'],
+                    ['outdent', 'indent'],
+                    ['align', 'horizontalRule', 'list', 'lineHeight'],
+                    ['table', 'link', 'image', 'video', 'audio', 'math'],
+                    ['imageGallery'],
+                    ['fullScreen', 'showBlocks', 'codeView'],
+                    ['preview', 'print'],
+                    ['save', 'template'],
                     // (min-width:992px)
                     ['%992', [
                         ['undo', 'redo'],
-                        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-                        [':moreCommand1-More Rich-default.more_horizontal', 'table', 'link', 'image', 'video', 'math'],
-                        ['-right', ':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
+                        [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
+                        ['bold', 'underline', 'italic', 'strike'],
+                        [':t-More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle'],
+                        ['removeFormat'],
+                        ['outdent', 'indent'],
+                        ['align', 'horizontalRule', 'list', 'lineHeight'],
+                        ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template'],
+                        ['-right', ':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
                     ]],
                     // (min-width:768px)
                     ['%768', [
                         ['undo', 'redo'],
-                        [
-                            ':moreText-More Text-default.more_text', 'bold', 'underline', 'italic',
-                            'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle'
-                        ],
-                        [':moreCommand1-More Rich-default.more_horizontal', 'table', 'link', 'image', 'video', 'math'],
-                        ['-right', ':moreCommand2-Insert-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print'],
+                        [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
+                        [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle', 'removeFormat'],
+                        [':e-More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'horizontalRule', 'list', 'lineHeight'],
+                        [':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
+                        ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template']
                     ]]
                   ]
                   
