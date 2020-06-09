@@ -214,6 +214,8 @@ export default {
 
     /**
      * @Override core, resizing, fileManager
+     * @description It is called from core.selectComponent.
+     * @param {Element} element Target element
      */
     select: function (element) {
         this.plugins.video.onModifyMode.call(this, element, this.plugins.resizing.call_controller_resize.call(this, element, 'video'));
@@ -519,6 +521,10 @@ export default {
 
         if (init) {
             this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.functions.onVideoUpload, file, true);
+        }
+
+        if (isUpdate) {
+            this.selectComponent(oFrame, 'video');
         }
 
         this.context.resizing._resize_plugin = '';

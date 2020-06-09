@@ -641,6 +641,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         controllersOff: function (e) {
             if (this._fileManager.pluginRegExp.test(this.currentControllerName) && e && e.type === 'keydown' && e.keyCode !== 27) return;
             context.element.lineBreaker_t.style.display = context.element.lineBreaker_b.style.display = 'none';
+            this._variable._lineBreakComp = null;
 
             this.currentControllerName = '';
             this.currentControllerTarget = null;
@@ -1196,12 +1197,26 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         selectComponent: function (element, pluginName) {
             const plugin = this.plugins[pluginName];
             if (!plugin) return;
-            if (typeof plugin.select === 'function') this.callPlugin(pluginName, plugin.select.bind(this, element), null);
-            
+            _w.setTimeout(function () {
+                if (typeof plugin.select === 'function') this.callPlugin(pluginName, plugin.select.bind(this, element), null);
+                this._setComponentLineBreaker(element);
+            }.bind(this));
+        },
+
+        /**
+         * @description Set line breaker of component
+         * @param {Element} element Element tag (img, iframe, video)
+         * @private
+         */
+        _setComponentLineBreaker: function (element) {
             // line breaker
             this._lineBreaker.style.display = 'none';
             const container = util.getParentElement(element, util.isComponent);
-            let componentTop, wScroll, w, lineBreakerStyle;
+            const t_style = context.element.lineBreaker_t.style;
+            const b_style = context.element.lineBreaker_b.style;
+            element = this.context.resizing.resizeContainer.style.display === 'block' ? this.context.resizing.resizeContainer : element;
+
+            let componentTop, wScroll, w;
             // top
             if (!util.isFormatElement(container.previousElementSibling)) {
                 this._variable._lineBreakComp = container;
@@ -1209,10 +1224,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 componentTop = util.getOffset(element, context.element.wysiwygFrame).top + wScroll;
                 w = (element.offsetWidth / 2) / 2;
 
-                lineBreakerStyle = context.element.lineBreaker_t.style;
-                lineBreakerStyle.top = (componentTop - wScroll - 12) + 'px';
-                lineBreakerStyle.left = (util.getOffset(element).left + w) + 'px';
-                lineBreakerStyle.display = 'block';
+                t_style.top = (componentTop - wScroll - 12) + 'px';
+                t_style.left = (util.getOffset(element).left + w) + 'px';
+                t_style.display = 'block';
+            } else {
+                t_style.display = 'none';
             }
             // bottom
             if (!util.isFormatElement(container.nextElementSibling)) {
@@ -1223,10 +1239,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     w = (element.offsetWidth / 2) / 2;
                 }
 
-                lineBreakerStyle = context.element.lineBreaker_b.style;
-                lineBreakerStyle.top = (componentTop + element.offsetHeight - wScroll - 12) + 'px';
-                lineBreakerStyle.left = (util.getOffset(element).left + element.offsetWidth - w - 24) + 'px';
-                lineBreakerStyle.display = 'block';
+                b_style.top = (componentTop + element.offsetHeight - wScroll - 12) + 'px';
+                b_style.left = (util.getOffset(element).left + element.offsetWidth - w - 24) + 'px';
+                b_style.display = 'block';
+            } else {
+                b_style.display = 'none';
             }
         },
 
@@ -5642,8 +5659,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         container.parentNode.insertBefore(newEl, container);
                         
                         core.callPlugin(fileComponentName, function () {
-                            const size = (core.plugins.resizing && core.context[fileComponentName]._resizing !== undefined) ? core.plugins.resizing.call_controller_resize.call(core, compContext._element, fileComponentName) : null;
-                            core.plugins[fileComponentName].onModifyMode.call(core, compContext._element, size);
+                            core.selectComponent(compContext._element, fileComponentName);
                         }, null);
                     }
                     

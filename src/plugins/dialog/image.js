@@ -240,6 +240,8 @@ export default {
 
     /**
      * @Override core, fileManager, resizing
+     * @description It is called from core.selectComponent.
+     * @param {Element} element Target element
      */
     select: function (element) {
         this.plugins.image.onModifyMode.call(this, element, this.plugins.resizing.call_controller_resize.call(this, element, 'image'));
@@ -347,7 +349,7 @@ export default {
 
         try {
             if (this.context.dialog.updateModal) {
-                imagePlugin.update_image.call(this, false, false, false);
+                imagePlugin.update_image.call(this, false, true, false);
             }
             
             if (contextImage.imgInputFile && contextImage.imgInputFile.files.length > 0) {
@@ -715,8 +717,7 @@ export default {
 
         if (openController) {
             this.plugins.image.init.call(this);
-            const size = this.plugins.resizing.call_controller_resize.call(this, imageEl, 'image');
-            this.plugins.image.onModifyMode.call(this, imageEl, size);
+            this.selectComponent(imageEl, 'image');
         }
 
         // history stack

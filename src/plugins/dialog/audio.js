@@ -167,6 +167,8 @@ export default {
 
     /**
      * @Override core, fileManager, resizing
+     * @description It is called from core.selectComponent.
+     * @param {Element} element Target element
      */
     select: function (element) {
         this.plugins.audio.onModifyMode.call(this, element);
@@ -359,11 +361,13 @@ export default {
             if (element && element.src !== src) {
                 element.src = src;
             } else {
+                this.selectComponent(element, 'audio');
                 return;
             }
         }
 
         this.plugins.fileManager.setInfo.call(this, 'audio', element, this.functions.onAudioUpload, file, false);
+        this.selectComponent(element, 'audio');
         if (isUpdate) this.history.push(false);
     },
 
