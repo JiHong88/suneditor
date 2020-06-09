@@ -706,20 +706,20 @@ buttonList      : Defines button list to array {Array}
                     // '/', Line break
                   ]
 
-                  ex) When do not use group:
+----------------- ex) When do not use group: ----------------------------------------------------------------------
                   // If you don't want to use a group, put all the buttons in one array.
                   [
                     ['undo', 'redo', 'bold', 'underline', 'fontColor', 'table', 'link', 'image', 'video']
                   ]
 
-                  ex) Alignment of button groups:
+------------------ex) Alignment of button groups:------------------------------------------------------------------
                   // Set "-[align]" to the first item in the group. (default: left)
                   [
                     ['bold', 'underline', 'italic', 'strike'],
                     ['-right', 'undo', 'redo']
                   ]
 
-                  ex) More button: 
+----------------- ex) More button: --------------------------------------------------------------------------------
                   // The more button is defined as a string starting with a colon.(":").
                   // :Identifier - Title attribute - Button's innerHTML
                   /**
@@ -739,8 +739,8 @@ buttonList      : Defines button list to array {Array}
                     [':v-View-text.View', 'fullScreen', 'codeView', 'print'],
                     ['-right', ':o-More Others-<i class="xxx"></i>', 'save', 'template'], // Used with alignment
                   ]
-
-                  ex) Responsive setting: 
+                  
+----------------- ex) Responsive setting: -------------------------------------------------------------------------
                   // You can specify the arrangement of buttons according to the screen size in advance.
                   // Responsive settings start with a percent sign.("%").
                   // %510(Number based on "px")
