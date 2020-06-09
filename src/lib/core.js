@@ -25,7 +25,7 @@ import _notice from '../plugins/modules/_notice';
  * @param {Object} _icons
  * @returns {Object} functions Object
  */
-export default function (context, pluginCallButtons, plugins, lang, options, _icons) {
+export default function (context, pluginCallButtons, plugins, lang, options, _icons, _responsiveButtons) {
     const _d = context.element.originElement.ownerDocument || document;
     const _w = _d.defaultView || window;
     const util = _util;
@@ -110,6 +110,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         _targetPlugins: {},
 
         /**
+         * @description Save rendered submenus and containers
+         * @private
+         */
+        _menuTray: {},
+
+        /**
          * @description loaded language
          */
         lang: lang,
@@ -183,6 +189,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         resizingDisabledButtons: null,
 
         /**
+         * @description active more layer element in submenu
+         * @private
+         */
+        _moreLayerActiveButton: null,
+
+        /**
          * @description Tag whitelist RegExp object used in "_consistencyCheckOfHTML" method
          * ^(options._editorTagsWhitelist)$
          * @private
@@ -205,6 +217,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description Boolean value of whether the editor has focus
          */
         hasFocus: false,
+
+        /**
+         * @description Boolean value of whether the editor is disabled
+         */
+        isDisabled: false,
 
         /**
          * @description Attributes whitelist used by the cleanHTML method
@@ -430,8 +447,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (!target) {
                 this._targetPlugins[pluginName] = menu;
             } else {
-                target.parentNode.appendChild(menu);
+                context.element._menuTray.appendChild(menu);
                 this._targetPlugins[pluginName] = true;
+                this._menuTray[target.getAttribute('data-command')] = menu;
             }
         },
 
@@ -444,43 +462,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (this._bindControllersOff) this.controllersOff();
 
             const submenuName = this._submenuName = element.getAttribute('data-command');
-            const submenu = this.submenu = element.nextElementSibling;
-
-            submenu.style.top = '-10000px';
-            submenu.style.visibility = 'hidden';
-            submenu.style.display = 'block';
-            util.addClass(element, 'on');
+            const menu = this.submenu = this._menuTray[submenuName];
             this.submenuActiveButton = element;
-
-            const toolbar = this.context.element.toolbar;
-            const toolbarW = toolbar.offsetWidth;
-            const menuW = submenu.offsetWidth;
-            const overLeft = toolbarW <= menuW ? 0 : toolbarW - (element.parentElement.offsetLeft + menuW);
-            if (overLeft < 0) submenu.style.left = overLeft + 'px';
-            else submenu.style.left = '1px';
-
-
-            let t = 0;
-            let offsetEl = element;
-            while (offsetEl && offsetEl !== toolbar) {
-                t += offsetEl.offsetTop;
-                offsetEl = offsetEl.offsetParent;
-            }
-
-            if (this._isBalloon) {
-                t += toolbar.offsetTop + element.offsetHeight;
-            } else {
-                t -= element.offsetHeight;
-            }
-
-            const space = t + submenu.offsetHeight - context.element.wysiwyg.offsetHeight + 3;
-            if (space > 0 && event._getPageBottomSpace() < space) {
-                submenu.style.top = (-1 * (submenu.offsetHeight + 3)) + 'px';
-            } else {
-                submenu.style.top = '';
-            }
-
-            submenu.style.visibility = '';
+            this._setMenuPosition(element, menu);
+            
             this._bindedSubmenuOff = this.submenuOff.bind(this);
             this.addDocEvent('mousedown', this._bindedSubmenuOff, false);
 
@@ -515,18 +500,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (this._bindedContainerOff) this._bindedContainerOff();
 
             const containerName = this._containerName = element.getAttribute('data-command');
-            const container = this.container = element.nextElementSibling;
-
-            container.style.display = 'block';
-            util.addClass(element, 'on');
+            const menu = this.container = this._menuTray[containerName];
             this.containerActiveButton = element;
-
-            const toolbarW = this.context.element.toolbar.offsetWidth;
-            const menuW = container.offsetWidth;
-            const overLeft = toolbarW <= menuW ? 0 : toolbarW - (element.parentElement.offsetLeft + menuW);
-            if (overLeft < 0) container.style.left = overLeft + 'px';
-            else container.style.left = '1px';
-
+            this._setMenuPosition(element, menu);
+            
             this._bindedContainerOff = this.containerOff.bind(this);
             this.addDocEvent('mousedown', this._bindedContainerOff, false);
 
@@ -551,6 +528,74 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             this._antiBlur = false;
+        },
+
+        /**
+         * @description Set the menu position. (submenu, container)
+         * @param {*} element Button element
+         * @param {*} menu Menu element
+         * @private
+         */
+        _setMenuPosition: function (element, menu) {
+            menu.style.top = '-10000px';
+            menu.style.visibility = 'hidden';
+            menu.style.display = 'block';
+            menu.style.height = '';
+            util.addClass(element, 'on');
+
+            const toolbar = this.context.element.toolbar;
+            const toolbarW = toolbar.offsetWidth;
+            const menuW = menu.offsetWidth;
+            const l = element.parentElement.offsetLeft + 3;
+            const overLeft = toolbarW <= menuW ? 0 : toolbarW - (l + menuW);
+            if (overLeft < 0) menu.style.left = (l + overLeft) + 'px';
+            else menu.style.left = l + 'px';
+
+            // get element top
+            let t = 0;
+            let offsetEl = element;
+            while (offsetEl && offsetEl !== toolbar) {
+                t += offsetEl.offsetTop;
+                offsetEl = offsetEl.offsetParent;
+            }
+
+            const bt = t;
+            if (this._isBalloon) {
+                t += toolbar.offsetTop + element.offsetHeight;
+            } else {
+                t -= element.offsetHeight;
+            }
+
+            // set menu position
+            const toolbarTop = event._getEditorOffsets(context.element.toolbar).top;
+            let menuHeight = menu.offsetHeight;
+            let el = context.element.topArea;
+            let scrollTop = 0;
+            while (!!el) {
+                scrollTop += el.scrollTop;
+                el = el.parentElement;
+            }
+
+            const menuHeight_bottom = _w.innerHeight - (toolbarTop - scrollTop + bt + element.parentElement.offsetHeight);
+            if (menuHeight_bottom < menuHeight) {
+                let menuTop = -1 * (menuHeight - bt + 3);
+                const insTop = toolbarTop - scrollTop + menuTop;
+                const menuHeight_top = menuHeight + (insTop < 0 ? insTop : 0);
+                
+                if (menuHeight_top > menuHeight_bottom) {
+                    menu.style.height = menuHeight_top + 'px';
+                    menuTop = -1 * (menuHeight_top - bt + 3);
+                } else {
+                    menu.style.height = menuHeight_bottom + 'px';
+                    menuTop = bt + element.parentElement.offsetHeight;
+                }
+
+                menu.style.top = menuTop + 'px';
+            } else {
+                menu.style.top = (bt + element.parentElement.offsetHeight) + 'px';
+            }
+
+            menu.style.visibility = '';
         },
 
         /**
@@ -595,6 +640,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         controllersOff: function (e) {
             if (this._fileManager.pluginRegExp.test(this.currentControllerName) && e && e.type === 'keydown' && e.keyCode !== 27) return;
+            context.element.lineBreaker_t.style.display = context.element.lineBreaker_b.style.display = 'none';
+            this._variable._lineBreakComp = null;
 
             this.currentControllerName = '';
             this.currentControllerTarget = null;
@@ -772,8 +819,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Node}
          */
         getSelectionNode: function () {
-            if (!this._variable._selectionNode || util.isWysiwygDiv(this._variable._selectionNode)) this._editorRange();
-            return this._variable._selectionNode || context.element.wysiwyg.firstChild;
+            if (util.isWysiwygDiv(this._variable._selectionNode)) this._editorRange();
+            if (!this._variable._selectionNode) {
+                const selectionNode = util.getChildElement(context.element.wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
+                if (!selectionNode) {
+                    this._editorRange();
+                } else {
+                    this._variable._selectionNode = selectionNode;
+                    return selectionNode;
+                }
+            }
+            return this._variable._selectionNode;
         },
 
         /**
@@ -832,12 +888,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let tempCon, tempOffset, tempChild;
 
             if (util.isFormatElement(startCon)) {
-                startCon = startCon.childNodes[startOff];
+                startCon = startCon.childNodes[startOff] || startCon.firstChild;
                 startOff = 0;
             }
             if (util.isFormatElement(endCon)) {
-                endCon = endCon.childNodes[endOff];
-                endOff = 0;
+                endCon = endCon.childNodes[endOff] || endCon.lastChild;
+                endOff = endCon.textContent.length;
             }
 
             // startContainer
@@ -1062,10 +1118,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
-         * @description The method to insert a element. (used elements : table, hr, image, video)
-         * This method is add the element next line and insert the new line.
-         * When used in a tag in "LI", it is inserted into the LI tag.
-         * Returns the first node of next line added.
+         * @description The method to insert a element and return. (used elements : table, hr, image, video)
+         * If "element" is "HR", insert and return the new line.
          * @param {Element} element Element to be inserted
          * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          * @returns {Element}
@@ -1077,33 +1131,27 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let formatEl = util.getFormatElement(selectionNode, null);
 
             if (util.isListCell(formatEl)) {
-                if (/^HR$/i.test(element.nodeName)) {
-                    const newLi = util.createElement('LI');
-                    const textNode = util.createTextNode(util.zeroWidthSpace);
-                    newLi.appendChild(element);
-                    newLi.appendChild(textNode);
-                    formatEl.parentNode.insertBefore(newLi, formatEl.nextElementSibling);
-                    this.setRange(textNode, 1, textNode, 1);
-                } else {
-                    this.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling);
-                    if (!element.nextSibling) element.parentNode.appendChild(util.createElement('BR'));
-                    oNode = util.createElement('LI');
-                    formatEl.parentNode.insertBefore(oNode, formatEl.nextElementSibling);
-                }
+                this.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling);
+                if (!element.nextSibling) element.parentNode.appendChild(util.createElement('BR'));
             } else {
                 if (this.getRange().collapsed && (r.container.nodeType === 3 || util.isBreak(r.container))) {
                     const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current); }.bind(util));
                     oNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
                     if (oNode) formatEl = oNode.previousSibling;
                 }
-
                 this.insertNode(element, formatEl);
-                if (!oNode) oNode = this.appendFormatTag(element, util.isFormatElement(formatEl) ? formatEl : null);
+                if (formatEl && util.onlyZeroWidthSpace(formatEl)) util.removeItem(formatEl);
             }
 
-            const edgeNode = util.getEdgeChildNodes(oNode, null).sc;
-            oNode = edgeNode || oNode;
-            this.setRange(oNode, 0, oNode, 0);
+            const fileComponentInfo = this.getFileComponent(element);
+            if (fileComponentInfo) {
+                this.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
+            } else if (!oNode) {
+                oNode = element;
+            } else {
+                oNode = util.getEdgeChildNodes(oNode, null).sc || oNode;
+                this.setRange(oNode, 0, oNode, 0);
+            }
 
             // history stack
             if (!notHistoryPush) this.history.push(1);
@@ -1118,6 +1166,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Object|null}
          */
         getFileComponent: function (element) {
+            if (!element) return null;
+
             let fileComponent, pluginName;
             if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
                 fileComponent = element.querySelector(core._fileManager.queryString);
@@ -1145,9 +1195,56 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {String} pluginName Plugin name (image, video)
          */
         selectComponent: function (element, pluginName) {
-            const plugin = core.plugins[pluginName];
-            if (!plugin || !plugin.select) return;
-            this.callPlugin(pluginName, plugin.select.bind(this, element), null);
+            const plugin = this.plugins[pluginName];
+            if (!plugin) return;
+            _w.setTimeout(function () {
+                if (typeof plugin.select === 'function') this.callPlugin(pluginName, plugin.select.bind(this, element), null);
+                this._setComponentLineBreaker(element);
+            }.bind(this));
+        },
+
+        /**
+         * @description Set line breaker of component
+         * @param {Element} element Element tag (img, iframe, video)
+         * @private
+         */
+        _setComponentLineBreaker: function (element) {
+            // line breaker
+            this._lineBreaker.style.display = 'none';
+            const container = util.getParentElement(element, util.isComponent);
+            const t_style = context.element.lineBreaker_t.style;
+            const b_style = context.element.lineBreaker_b.style;
+            element = this.context.resizing.resizeContainer.style.display === 'block' ? this.context.resizing.resizeContainer : element;
+
+            let componentTop, wScroll, w;
+            // top
+            if (!util.isFormatElement(container.previousElementSibling)) {
+                this._variable._lineBreakComp = container;
+                wScroll = context.element.wysiwyg.scrollTop;
+                componentTop = util.getOffset(element, context.element.wysiwygFrame).top + wScroll;
+                w = (element.offsetWidth / 2) / 2;
+
+                t_style.top = (componentTop - wScroll - 12) + 'px';
+                t_style.left = (util.getOffset(element).left + w) + 'px';
+                t_style.display = 'block';
+            } else {
+                t_style.display = 'none';
+            }
+            // bottom
+            if (!util.isFormatElement(container.nextElementSibling)) {
+                if (!componentTop) {
+                    this._variable._lineBreakComp = container;
+                    wScroll = context.element.wysiwyg.scrollTop;
+                    componentTop = util.getOffset(element, context.element.wysiwygFrame).top + wScroll;
+                    w = (element.offsetWidth / 2) / 2;
+                }
+
+                b_style.top = (componentTop + element.offsetHeight - wScroll - 12) + 'px';
+                b_style.left = (util.getOffset(element).left + element.offsetWidth - w - 24) + 'px';
+                b_style.display = 'block';
+            } else {
+                b_style.display = 'none';
+            }
         },
 
         /**
@@ -1164,7 +1261,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (!afterNode && isComp) {
                 const r = this.removeNode();
                 if (r.container.nodeType === 3 || util.isBreak(r.container)) {
-                    const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current); }.bind(util));
+                    const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
                     afterNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
                     if (afterNode) afterNode = afterNode.previousSibling;
                 }
@@ -1270,6 +1367,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     if (util.isList(afterNode)) {
                         parentNode = afterNode;
                         afterNode = null;
+                    } else if (util.isListCell(afterNode)) {
+                        parentNode = afterNode.previousElementSibling || afterNode;
                     } else if (!originAfter && !afterNode) {
                         const r = this.removeNode();
                         const container = r.container.nodeType === 3 ? (util.isListCell(util.getFormatElement(r.container, null)) ? r.container : (util.getFormatElement(r.container, null) || r.container.parentNode)) : r.container;
@@ -1289,45 +1388,48 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             } catch (e) {
                 parentNode.appendChild(oNode);
             } finally {
-                let offset = 1;
-                if (oNode.nodeType === 3) {
-                    const previous = oNode.previousSibling;
-                    const next = oNode.nextSibling;
-                    const previousText = (!previous ||  previous.nodeType !== 3 || util.onlyZeroWidthSpace(previous)) ? '' : previous.textContent;
-                    const nextText = (!next || next.nodeType !== 3 || util.onlyZeroWidthSpace(next)) ? '' : next.textContent;
+                if (!util.isComponent(oNode)) {
+                    let offset = 1;
+                    if (oNode.nodeType === 3) {
+                        const previous = oNode.previousSibling;
+                        const next = oNode.nextSibling;
+                        const previousText = (!previous ||  previous.nodeType !== 3 || util.onlyZeroWidthSpace(previous)) ? '' : previous.textContent;
+                        const nextText = (!next || next.nodeType !== 3 || util.onlyZeroWidthSpace(next)) ? '' : next.textContent;
+        
+                        if (previous && previousText.length > 0) {
+                            oNode.textContent = previousText + oNode.textContent;
+                            util.removeItem(previous);
+                        }
+        
+                        if (next && next.length > 0) {
+                            oNode.textContent += nextText;
+                            util.removeItem(next);
+                        }
     
-                    if (previous && previousText.length > 0) {
-                        oNode.textContent = previousText + oNode.textContent;
-                        util.removeItem(previous);
+                        return {
+                            startOffset: previousText.length,
+                            endOffset: oNode.textContent.length - nextText.length
+                        };
+                    } else if (!util.isBreak(oNode) && util.isFormatElement(parentNode)) {
+                        let zeroWidth = null;
+                        if (!oNode.previousSibling) {
+                            zeroWidth = util.createTextNode(util.zeroWidthSpace);
+                            oNode.parentNode.insertBefore(zeroWidth, oNode);
+                        }
+                        
+                        if (!oNode.nextSibling) {
+                            zeroWidth = util.createTextNode(util.zeroWidthSpace);
+                            oNode.parentNode.appendChild(zeroWidth);
+                        }
+    
+                        if (util._isIgnoreNodeChange(oNode)) {
+                            oNode = oNode.nextSibling;
+                            offset = 0;
+                        }
                     }
     
-                    if (next && next.length > 0) {
-                        oNode.textContent += nextText;
-                        util.removeItem(next);
-                    }
-
-                    return {
-                        startOffset: previousText.length,
-                        endOffset: oNode.textContent.length - nextText.length
-                    };
-                } else if (!util.isBreak(oNode) && util.isFormatElement(parentNode)) {
-                    let zeroWidth = null;
-                    if (!oNode.previousSibling) {
-                        zeroWidth = util.createTextNode(util.zeroWidthSpace);
-                        oNode.parentNode.insertBefore(zeroWidth, oNode);
-                    }
-                    if (!oNode.nextSibling) {
-                        zeroWidth = util.createTextNode(util.zeroWidthSpace);
-                        oNode.parentNode.appendChild(zeroWidth);
-                    }
-
-                    if (util._isIgnoreNodeChange(oNode)) {
-                        oNode = oNode.nextSibling;
-                        offset = 0;
-                    }
+                    this.setRange(oNode, offset, oNode, offset);
                 }
-
-                this.setRange(oNode, offset, oNode, offset);
 
                 // history stack
                 this.history.push(true);
@@ -1382,7 +1484,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     startCon = endCon = commonCon;
                 } else {
                     startCon = endCon = childNodes[0];
-                    if (util.isBreak(startCon)) {
+                    if (util.isBreak(startCon) || util.onlyZeroWidthSpace(startCon)) {
                         return {
                             container: startCon,
                             offset: 0
@@ -1462,7 +1564,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : (range.endContainer || range.startContainer);
             
             if (!util.isWysiwygDiv(container)) {
-                const rc = util.removeItemAllParents(container, null, null);
+                const rc = util.removeItemAllParents(container, function (current) {
+                    if (this.isComponent(current)) return false;
+                    const text = current.textContent;
+                    return text.length === 0 || /^(\n|\u200B)+$/.test(text);
+                }.bind(util), null);
+                
                 if (rc) container = rc.sc || rc.ec || context.element.wysiwyg;
             }
 
@@ -1989,11 +2096,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             if (util.isFormatElement(startCon)) {
-                startCon = startCon.childNodes[startOff];
+                startCon = startCon.childNodes[startOff] || startCon.firstChild;
                 startOff = 0;
             }
             if (util.isFormatElement(endCon)) {
-                endCon = endCon.childNodes[endOff];
+                endCon = endCon.childNodes[endOff] || endCon.lastChild;
                 endOff = endCon.textContent.length;
             }
 
@@ -3428,7 +3535,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         actionCall: function (command, display, target) {
             // call plugins
             if (display) {
-                if (/submenu/.test(display) && (target.nextElementSibling === null || target !== this.submenuActiveButton)) {
+                if (/more/i.test(display) && target !== this._moreLayerActiveButton) {
+                    const layer = context.element.toolbar.querySelector('.' + command);
+                    if (layer) {
+                        if (this._moreLayerActiveButton) {
+                            (context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'))).style.display = 'none';
+                            util.removeClass(this._moreLayerActiveButton, 'on');
+                        }
+                        util.addClass(target, 'on');
+                        this._moreLayerActiveButton = target;
+                        layer.style.display = 'block';
+
+                        event._showToolbarBalloon();
+                        event._showToolbarInline();
+                    }
+                    return;
+                } else if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
                     this.callPlugin(command, this.submenuOn.bind(this, target), target);
                     return;
                 } else if (/dialog/.test(display)) {
@@ -3436,16 +3558,28 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     return;
                 } else if (/command/.test(display)) {
                     this.callPlugin(command, this.plugins[command].action.bind(this), target);
-                } else if (/container/.test(display) && (target.nextElementSibling === null || target !== this.containerActiveButton)) {
+                } else if (/container/.test(display) && (this._menuTray[command] === null || target !== this.containerActiveButton)) {
                     this.callPlugin(command, this.containerOn.bind(this, target), target);
                     return;
-                }                
+                } else if (/fileBrowser/.test(display)) {
+                    this.callPlugin(command, this.plugins[command].open.bind(this, null), target);
+                }
             } // default command
             else if (command) {
                 this.commandHandler(target, command);
             }
 
-            if (/submenu/.test(display)) {
+            if (/more/i.test(display)) {
+                const layer = context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
+                if (layer) {
+                    util.removeClass(this._moreLayerActiveButton, 'on');
+                    this._moreLayerActiveButton = null;
+                    layer.style.display = 'none';
+
+                    event._showToolbarBalloon();
+                    event._showToolbarInline();
+                }
+            } else if (/submenu/.test(display)) {
                 this.submenuOff();
             } else {
                 this.submenuOff();
@@ -3651,6 +3785,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             this._checkPlaceholder();
+
+            if (typeof functions.toggleCodeView === 'function') functions.toggleCodeView(this._variable.isCodeView, core);
         },
 
         /**
@@ -3781,7 +3917,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     util.removeClass(toolbar, 'se-toolbar-sticky');
                 }
 
-                if (_var._fullScreenAttrs.sticky) {
+                if (_var._fullScreenAttrs.sticky && !options.toolbarContainer) {
                     _var._fullScreenAttrs.sticky = false;
                     context.element._stickyDummy.style.display = 'block';
                     util.addClass(toolbar, "se-toolbar-sticky");
@@ -3794,6 +3930,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 event.onScroll_window();
                 util.changeElement(element.firstElementChild, icons.expansion);
             }
+
+            if (typeof functions.toggleFullScreen === 'function') functions.toggleFullScreen(this._variable.isFullScreen, core);
         },
 
         /**
@@ -4285,22 +4423,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this._attributesWhitelistRegExp = new _w.RegExp('((?:' + allAttr + 'contenteditable|colspan|rowspan|target|href|src|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")', 'ig');
             this._attributesTagsWhitelist = tagsAttr;
 
-            this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-code-view-enabled"])');
-            this.resizingDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-resizing-enabled"])');
             this._isInline = /inline/i.test(options.mode);
             this._isBalloon = /balloon|balloon-always/i.test(options.mode);
             this._isBalloonAlways = /balloon-always/i.test(options.mode);
 
-            this.commandMap = {
-                STRONG: context.tool.bold,
-                U: context.tool.underline,
-                EM: context.tool.italic,
-                DEL: context.tool.strike,
-                SUB: context.tool.subscript,
-                SUP: context.tool.superscript,
-                OUTDENT: context.tool.outdent,
-                INDENT: context.tool.indent
-            };
+            this._cachingButtons();
 
             // file components
             this._fileInfoPluginsCheck = [];
@@ -4336,7 +4463,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             this._fileManager.queryString = this._fileManager.tags.join(',');
             this._fileManager.regExp = new _w.RegExp('^(' +  this._fileManager.tags.join('|') + ')$', 'i');
-            this._fileManager.pluginRegExp = new _w.RegExp('^(' +  filePluginRegExp.join('|') + ')$', 'i');
+            this._fileManager.pluginRegExp = new _w.RegExp('^(' +  (filePluginRegExp.length === 0 ? 'undefined' : filePluginRegExp.join('|')) + ')$', 'i');
             
             // cache editor's element
             this._variable._originCssText = context.element.topArea.style.cssText;
@@ -4370,6 +4497,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                 if (typeof functions.onload === 'function') return functions.onload(this, reload);
             }.bind(this));
+        },
+
+        _cachingButtons: function () {
+            this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-code-view-enabled"])');
+            this.resizingDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-resizing-enabled"])');
+            this.commandMap = {
+                STRONG: context.tool.bold,
+                U: context.tool.underline,
+                EM: context.tool.italic,
+                DEL: context.tool.strike,
+                SUB: context.tool.subscript,
+                SUP: context.tool.superscript,
+                OUTDENT: context.tool.outdent,
+                INDENT: context.tool.indent
+            };
         },
 
         /**
@@ -4501,6 +4643,36 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             this.effectNode = null;
             this.nativeFocus();
+        },
+
+        /**
+         * @description Create and return an object to cache the new context.
+         * @param {Element} contextEl context.element
+         * @returns {Object}
+         * @private
+         */
+        _getConstructed: function (contextEl) {
+            return {
+                _top: contextEl.topArea,
+                _relative: contextEl.relative,
+                _toolBar: contextEl.toolbar,
+                _menuTray: contextEl._menuTray,
+                _editorArea: contextEl.editorArea,
+                _wysiwygArea: contextEl.wysiwygFrame,
+                _codeArea: contextEl.code,
+                _placeholder: contextEl.placeholder,
+                _resizingBar: contextEl.resizingBar,
+                _navigation: contextEl.navigation,
+                _charCounter: contextEl.charCounter,
+                _charWrapper: contextEl.charWrapper,
+                _loading: contextEl.loading,
+                _lineBreaker: contextEl.lineBreaker,
+                _lineBreaker_t: contextEl.lineBreaker_t,
+                _lineBreaker_b: contextEl.lineBreaker_b,
+                _resizeBack: contextEl.resizeBackground,
+                _stickyDummy: contextEl._stickyDummy,
+                _arrow: contextEl._arrow
+            };
         }
     };
 
@@ -4508,6 +4680,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
      * @description event function
      */
     const event = {
+        _lineBreakerBind: null,
+        _responsiveCurrentSize: 'default',
+        _responsiveButtonSize: null,
+        _responsiveButtons: null,
         _directionKeyCode: new _w.RegExp('^(8|13|3[2-9]|40|46)$'),
         _nonTextKeyCode: new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$'),
         _historyIgnoreKeyCode: new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
@@ -4534,34 +4710,48 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     command = 'selectAll';
                     break;
                 case 'B':
-                    command = 'STRONG';
+                    if (options.shortcutsDisable.indexOf('bold') === -1) {
+                        command = 'STRONG';
+                    }
                     break;
                 case 'S':
-                    if (shift) {
+                    if (shift && options.shortcutsDisable.indexOf('strike') === -1) {
                         command = 'DEL';
                     }
                     break;
                 case 'U':
-                    command = 'U';
+                    if (options.shortcutsDisable.indexOf('underline') === -1) {
+                        command = 'U';
+                    }
                     break;
                 case 'I':
-                    command = 'EM';
+                    if (options.shortcutsDisable.indexOf('italic') === -1) {
+                        command = 'EM';
+                    }
                     break;
                 case 'Z':
-                    if (shift) {
-                        command = 'redo';
-                    } else {
-                        command = 'undo';
+                    if (options.shortcutsDisable.indexOf('undo') === -1) {
+                        if (shift) {
+                            command = 'redo';
+                        } else {
+                            command = 'undo';
+                        }
                     }
                     break;
                 case 'Y':
-                    command = 'redo';
+                    if (options.shortcutsDisable.indexOf('undo') === -1) {
+                        command = 'redo';
+                    }
                     break;
                 case '[':
-                    command = 'outdent';
+                    if (options.shortcutsDisable.indexOf('indent') === -1) {
+                        command = 'outdent';
+                    }
                     break;
                 case ']':
-                    command = 'indent';
+                    if (options.shortcutsDisable.indexOf('indent') === -1) {
+                        command = 'indent';
+                    }
                     break;
             }
 
@@ -4658,7 +4848,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this.removeEventListener('blur', event._cancelCaptionEdit);
         },
 
-        onMouseDown_toolbar: function (e) {
+        _buttonsEventHandler: function (e) {
             let target = e.target;
             if (core._bindControllersOff) e.stopPropagation();
 
@@ -4675,7 +4865,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 let command = target.getAttribute('data-command');
                 let className = target.className;
     
-                while (!command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
+                while (!command && !/se-menu-list/.test(className) && !/sun-editor-common/.test(className)) {
                     target = target.parentNode;
                     command = target.getAttribute('data-command');
                     className = target.className;
@@ -4725,7 +4915,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 event._hideToolbar();
             }
 
-            if (functions.onMouseDown) functions.onMouseDown(e, core);
+            if (typeof functions.onMouseDown === 'function') functions.onMouseDown(e, core);
         },
 
         onClick_wysiwyg: function (e) {
@@ -4783,7 +4973,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             if (core._isBalloon) _w.setTimeout(event._toggleToolbarBalloon);
-            if (functions.onClick) functions.onClick(e, core);
+            if (typeof functions.onClick === 'function') functions.onClick(e, core);
         },
 
         _balloonDelay: null,
@@ -4836,7 +5026,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             const editorWidth = context.element.topArea.offsetWidth;
-            const offsets = event._getEditorOffsets();
+            const offsets = event._getEditorOffsets(null);
             const stickyTop = offsets.top;
             const editorLeft = offsets.left;
             
@@ -4904,7 +5094,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
 
             let resetTop = false;
-            const space = t + (isDirTop ? (event._getEditorOffsets().top) : (toolbar.offsetHeight - context.element.wysiwyg.offsetHeight));
+            const space = t + (isDirTop ? (event._getEditorOffsets(null).top) : (toolbar.offsetHeight - context.element.wysiwyg.offsetHeight));
             if (!isDirTop && space > 0 && event._getPageBottomSpace() < space) {
                 isDirTop = true;
                 resetTop = true;
@@ -4936,10 +5126,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (!core._isInline) return;
 
             const toolbar = context.element.toolbar;
+            if (options.toolbarContainer) toolbar.style.position = 'relative';
+            else toolbar.style.position = 'absolute';
+            
             toolbar.style.visibility = 'hidden';
             toolbar.style.display = 'block';
             core._inlineToolbarAttr.width = toolbar.style.width = options.toolbarWidth;
-            core._inlineToolbarAttr.top = toolbar.style.top = (-1 - toolbar.offsetHeight) + 'px';
+            core._inlineToolbarAttr.top = toolbar.style.top = (options.toolbarContainer ? 0 : (-1 - toolbar.offsetHeight)) + 'px';
             
             if (typeof functions.showInline === 'function') functions.showInline(toolbar, context, core);
 
@@ -4967,7 +5160,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             // history stack
             core.history.push(true);
 
-            if (functions.onInput) functions.onInput(e, core);
+            if (typeof functions.onInput === 'function') functions.onInput(e, core);
         },
 
         _onShortcutKey: false,
@@ -5151,8 +5344,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                             if (fileComponentInfo) {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
                                 if (formatEl.textContent.length === 0) util.removeItem(formatEl);
+                                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
                             }
                             break;
                         }
@@ -5466,8 +5659,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         container.parentNode.insertBefore(newEl, container);
                         
                         core.callPlugin(fileComponentName, function () {
-                            const size = (core.plugins.resizing && core.context[fileComponentName]._resizing !== undefined) ? core.plugins.resizing.call_controller_resize.call(core, compContext._element, fileComponentName) : null;
-                            core.plugins[fileComponentName].onModifyMode.call(core, compContext._element, size);
+                            core.selectComponent(compContext._element, fileComponentName);
                         }, null);
                     }
                     
@@ -5502,7 +5694,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 core.setRange(zeroWidth, 1, zeroWidth, 1);
             }
 
-            if (functions.onKeyDown) functions.onKeyDown(e, core);
+            if (typeof functions.onKeyDown === 'function') functions.onKeyDown(e, core);
         },
 
         onKeyUp_wysiwyg: function (e) {
@@ -5568,21 +5760,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             // history stack
             core.history.push(true);
 
-            if (functions.onKeyUp) functions.onKeyUp(e, core);
+            if (typeof functions.onKeyUp === 'function') functions.onKeyUp(e, core);
         },
 
         onScroll_wysiwyg: function (e) {
             core.controllersOff();
             core._lineBreaker.style.display = 'none';
             if (core._isBalloon) event._hideToolbar();
-            if (functions.onScroll) functions.onScroll(e, core);
+            if (typeof functions.onScroll === 'function') functions.onScroll(e, core);
         },
 
         onFocus_wysiwyg: function (e) {
             if (core._antiBlur) return;
             core.hasFocus = true;
             if (core._isInline) event._showToolbarInline();
-            if (functions.onFocus) functions.onFocus(e, core);
+            if (typeof functions.onFocus === 'function') functions.onFocus(e, core);
         },
 
         onBlur_wysiwyg: function (e) {
@@ -5590,7 +5782,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             core.hasFocus = false;
             core.controllersOff();
             if (core._isInline || core._isBalloon) event._hideToolbar();
-            if (functions.onBlur) functions.onBlur(e, core);
+            if (typeof functions.onBlur === 'function') functions.onBlur(e, core);
         },
 
         onMouseDown_resizingBar: function (e) {
@@ -5617,7 +5809,32 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         onResize_window: function () {
             core.controllersOff();
+
+            const responsiveSize = event._responsiveButtonSize;
+            if (responsiveSize) {
+                const windowWidth = _w.innerWidth;
+                let responsiveWidth = 'default';
+                for (let i = 1, len = responsiveSize.length; i < len; i++) {
+                    if (windowWidth < responsiveSize[i]) {
+                        responsiveWidth = responsiveSize[i] + '';
+                    }
+                }
+
+                if (event._responsiveCurrentSize !== responsiveWidth) {
+                    event._responsiveCurrentSize = responsiveWidth;
+                    functions.setToolbarButtons(event._responsiveButtons[responsiveWidth]);
+                }
+            }
+
             if (context.element.toolbar.offsetWidth === 0) return;
+
+            if (context.fileBrowser && context.fileBrowser.area.style.display === 'block') {
+                context.fileBrowser.body.style.maxHeight = (_w.innerHeight - context.fileBrowser.header.offsetHeight - 50) + 'px';
+            }
+
+            if (core.submenuActiveButton && core.submenu) {
+                core._setMenuPosition(core.submenuActiveButton, core.submenu);
+            }
 
             if (core._variable.isFullScreen) {
                 core._variable.innerHeight_fullScreen += (_w.innerHeight - context.element.toolbar.offsetHeight) - core._variable.innerHeight_fullScreen;
@@ -5644,7 +5861,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const element = context.element;
             const editorHeight = element.editorArea.offsetHeight;
             const y = (this.scrollY || _d.documentElement.scrollTop) + options.stickyToolbar;
-            const editorTop = event._getEditorOffsets().top - (core._isInline ? element.toolbar.offsetHeight : 0);
+            const editorTop = event._getEditorOffsets(options.toolbarContainer).top - (core._isInline ? element.toolbar.offsetHeight : 0);
             
             if (y < editorTop) {
                 event._offStickyToolbar();
@@ -5658,8 +5875,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
         },
 
-        _getEditorOffsets: function () {
-            let offsetEl = context.element.topArea;
+        _getEditorOffsets: function (container) {
+            let offsetEl = container || context.element.topArea;
             let t = 0, l = 0, s = 0;
 
             while (offsetEl) {
@@ -5677,13 +5894,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         _getPageBottomSpace: function () {
-            return _d.documentElement.scrollHeight - (event._getEditorOffsets().top + context.element.topArea.offsetHeight);
+            return _d.documentElement.scrollHeight - (event._getEditorOffsets(null).top + context.element.topArea.offsetHeight);
         },
 
         _onStickyToolbar: function () {
             const element = context.element;
 
-            if (!core._isInline) {
+            if (!core._isInline && !options.toolbarContainer) {
                 element._stickyDummy.style.height = element.toolbar.offsetHeight + 'px';
                 element._stickyDummy.style.display = 'block';
             }
@@ -5715,12 +5932,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const range = core.getRange();
             const sCell = util.getRangeFormatElement(range.startContainer);
             const eCell = util.getRangeFormatElement(range.endContainer);
+            const sIsCell = util.isCell(sCell);
+            const eIsCell = util.isCell(eCell);
 
-            if (util.isCell(sCell) && util.isCell(eCell) && !sCell.previousElementSibling && !eCell.nextElementSibling) {
-                const table = util.getParentElement(sCell, util.isComponent);
-                util.removeItem(table);
-                core.nativeFocus();
-                return true;
+            if (((sIsCell && !sCell.previousElementSibling && !sCell.parentElement.previousElementSibling) || (eIsCell && !eCell.nextElementSibling && !eCell.parentElement.nextElementSibling)) && sCell !== eCell) {
+                if (!sIsCell) {
+                    util.removeItem(util.getParentElement(eCell, util.isComponent));
+                } else if (!eIsCell) {
+                    util.removeItem(util.getParentElement(sCell, util.isComponent));
+                } else {
+                    util.removeItem(util.getParentElement(sCell, util.isComponent));
+                    core.nativeFocus();
+                    return true;
+                }
             }
 
             return false;
@@ -5767,8 +5991,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         _setClipboardData: function (e, plainText, cleanData) {
+            // MS word
+            if (/class=["']*Mso(Normal|List)/i.test(cleanData) || /content=["']*Word.Document/i.test(cleanData) || /content=["']*OneNote.File/i.test(cleanData)) {
+                cleanData = cleanData.replace(/\n/g, ' ');
+                plainText = plainText.replace(/\n/g, ' ');
+            } else {
+                plainText = plainText.replace(/\n/g, '');
+            }
+
             cleanData = core.cleanHTML(cleanData, core.pasteTagsWhitelistRegExp);
-            plainText = plainText.replace(/\n/g, '');
             const maxCharCount = core._charCount(options.charCounterType === 'byte-html' ? cleanData : plainText);
 
             if (typeof functions.onPaste === 'function' && !functions.onPaste(e, cleanData, maxCharCount, core)) {
@@ -5832,11 +6063,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
         },
 
-        onmouseMove_wysiwyg: function (e) {
+        onMouseMove_wysiwyg: function (e) {
+            if (core.isDisabled) return;
             const component = util.getParentElement(e.target, util.isComponent);
             const lineBreakerStyle = core._lineBreaker.style;
 
-            if (component) {
+            if (component && !core.currentControllerName) {
                 let scrollTop = 0;
                 let el = context.element.wysiwyg;
                 do {
@@ -5845,9 +6077,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 } while (el && !/^(BODY|HTML)$/i.test(el.nodeName));
 
                 const wScroll = context.element.wysiwyg.scrollTop;
-                const offsets = event._getEditorOffsets();
+                const offsets = event._getEditorOffsets(null);
                 const componentTop = util.getOffset(component, context.element.wysiwygFrame).top + wScroll;
-                const y = e.pageY + scrollTop + (options.iframe ? context.element.toolbar.offsetHeight : 0);
+                const y = e.pageY + scrollTop + (options.iframe && !options.toolbarContainer ? context.element.toolbar.offsetHeight : 0);
                 const c = componentTop + (options.iframe ? scrollTop : offsets.top);
 
                 let dir = '', top = '';
@@ -5865,10 +6097,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 core._variable._lineBreakComp = component;
                 core._variable._lineBreakDir = dir;
                 lineBreakerStyle.top = (top - wScroll) + 'px';
-                lineBreakerStyle.visibility = 'hidden';
+                core._lineBreakerButton.style.left = (util.getOffset(component).left + (component.offsetWidth / 2) - 17) + 'px';
                 lineBreakerStyle.display = 'block';
-                core._lineBreakerButton.style.left = (component.offsetLeft + (component.offsetWidth / 2) - (core._lineBreakerButton.offsetWidth / 2)) + 'px';
-                lineBreakerStyle.visibility = '';
             } // off line breaker
             else if (lineBreakerStyle.display !== 'none') {
                 lineBreakerStyle.display = 'none';
@@ -5879,12 +6109,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             e.preventDefault();
         },
 
-        _onLineBreak: function () {
+        _onLineBreak: function (e) {
+            e.preventDefault();
             const component = core._variable._lineBreakComp;
+            const dir = !this ? core._variable._lineBreakDir : this;
 
             const format = util.createElement('P');
             format.innerHTML = '<br>';
-            component.parentNode.insertBefore(format, core._variable._lineBreakDir === 't' ? component : component.nextSibling);
+            component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
 
             core._lineBreaker.style.display = 'none';
             core._variable._lineBreakComp = null;
@@ -5912,7 +6144,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const eventWysiwyg = options.iframe ? core._ww : context.element.wysiwyg;
 
             /** toolbar event */
-            context.element.toolbar.addEventListener('mousedown', event.onMouseDown_toolbar, false);
+            context.element.toolbar.addEventListener('mousedown', event._buttonsEventHandler, false);
+            context.element._menuTray.addEventListener('mousedown', event._buttonsEventHandler, false);
             context.element.toolbar.addEventListener('click', event.onClick_toolbar, false);
             /** editor area */
             eventWysiwyg.addEventListener('mousedown', event.onMouseDown_wysiwyg, false);
@@ -5929,9 +6162,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             eventWysiwyg.addEventListener('blur', event.onBlur_wysiwyg, false);
 
             /** line breaker */
-            eventWysiwyg.addEventListener('mousemove', event.onmouseMove_wysiwyg, false);
+            event._lineBreakerBind = { a: event._onLineBreak.bind(''), t: event._onLineBreak.bind('t'), b: event._onLineBreak.bind('b') };
+            eventWysiwyg.addEventListener('mousemove', event.onMouseMove_wysiwyg, false);
             core._lineBreakerButton.addEventListener('mousedown', event._onMouseDown_lineBreak, false);
-            core._lineBreakerButton.addEventListener('click', event._onLineBreak, false);
+            core._lineBreakerButton.addEventListener('click', event._lineBreakerBind.a, false);
+            context.element.lineBreaker_t.addEventListener('mousedown', event._lineBreakerBind.t, false);
+            context.element.lineBreaker_b.addEventListener('mousedown', event._lineBreakerBind.b, false);
 
             /** Events are registered only when there is a table plugin.  */
             if (core.plugins.table) {
@@ -5955,6 +6191,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
             
             /** window event */
+            event._setResponsiveToolbar();
             _w.removeEventListener('resize', event.onResize_window);
             _w.removeEventListener('scroll', event.onScroll_window);
 
@@ -5967,7 +6204,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         _removeEvent: function () {
             const eventWysiwyg = options.iframe ? core._ww : context.element.wysiwyg;
 
-            context.element.toolbar.removeEventListener('mousedown', event.onMouseDown_toolbar);
+            context.element.toolbar.removeEventListener('mousedown', event._buttonsEventHandler);
+            context.element._menuTray.removeEventListener('mousedown', event._buttonsEventHandler);
             context.element.toolbar.removeEventListener('click', event.onClick_toolbar);
 
             eventWysiwyg.removeEventListener('mousedown', event.onMouseDown_wysiwyg);
@@ -5981,9 +6219,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             eventWysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
             eventWysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
 
-            eventWysiwyg.removeEventListener('mousemove', event.onmouseMove_wysiwyg);
+            eventWysiwyg.removeEventListener('mousemove', event.onMouseMove_wysiwyg);
             core._lineBreakerButton.removeEventListener('mousedown', event._onMouseDown_lineBreak);
-            core._lineBreakerButton.removeEventListener('click', event._onLineBreak);
+            core._lineBreakerButton.removeEventListener('click', event._lineBreakerBind.a);
+            context.element.lineBreaker_t.removeEventListener('mousedown', event._lineBreakerBind.t);
+            context.element.lineBreaker_b.removeEventListener('mousedown', event._lineBreakerBind.b);
+            event._lineBreakerBind = null;
             
             eventWysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
             
@@ -6000,6 +6241,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             
             _w.removeEventListener('resize', event.onResize_window);
             _w.removeEventListener('scroll', event.onScroll_window);
+        },
+
+        _setResponsiveToolbar: function () {
+            if (_responsiveButtons.length === 0) {
+                _responsiveButtons = null;
+                return;
+            }
+
+            const sizeArray = event._responsiveButtonSize = ['default'];
+            const buttonsObj = event._responsiveButtons = {default: _responsiveButtons[0]};
+            for (let i = 1, len = _responsiveButtons.length, size, buttonGroup; i < len; i++) {
+                buttonGroup = _responsiveButtons[i];
+                size = buttonGroup[0] * 1;
+                sizeArray.push(size);
+                buttonsObj[size] = buttonGroup[1];
+            }
         }
     };
 
@@ -6047,6 +6304,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         showController: null,
 
         /**
+         * @description An event when toggling between code view and wysiwyg view.
+         * @param {Boolean} isCodeView Whether the current code view mode
+         * @param {Object} core Core object
+         */
+        toggleCodeView: null,
+
+        /**
+         * @description An event when toggling full screen.
+         * @param {Boolean} isFullScreen Whether the current full screen mode
+         * @param {Object} core Core object
+         */
+        toggleFullScreen: null,
+
+        /**
          * @description It replaces the default callback function of the image upload
          * @param {Object} response Response object
          * @param {Object} info Input information
@@ -6064,6 +6335,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Called before the image is uploaded
          * If false is returned, no image upload is performed.
+         * If new fileList are returned,  replaced the previous fileList
          * @param {Array} files Files array
          * @param {Object} info info: {
          * - linkValue: Link url value
@@ -6081,6 +6353,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Called before the video is uploaded
          * If false is returned, no video(iframe, video) upload is performed.
+         * If new fileList are returned,  replaced the previous fileList
          * @param {Array} files Files array
          * @param {Object} info info: {
          * - inputWidth: Value of width input
@@ -6096,6 +6369,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Called before the audio is uploaded
          * If false is returned, no audio upload is performed.
+         * If new fileList are returned,  replaced the previous fileList
          * @param {Array} files Files array
          * @param {Object} info info: {
          * - isUpdate: Update audio if true, create audio if false
@@ -6154,15 +6428,56 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         onAudioUploadError: null,
 
         /**
-         * @description Add or reset option property
-         * @param {Object} options Options
+         * @description Reset the buttons on the toolbar. (Editor is not reloaded)
+         * You cannot set a new plugin for the button.
+         * @param {Array} buttonList Button list 
+         */
+        setToolbarButtons: function (buttonList) {
+            core.submenuOff();
+            core.containerOff();
+            
+            const newToolbar = _Constructor._createToolBar(_d, buttonList, core.plugins, options);
+            _responsiveButtons = newToolbar.responsiveButtons;
+            core._moreLayerActiveButton = null;
+            core._cachingButtons();
+            event._setResponsiveToolbar();
+            
+            core.activePlugins = [];
+            const oldCallButtons = pluginCallButtons;
+            pluginCallButtons = newToolbar.pluginCallButtons;
+            let plugin, button, oldButton;
+            for (let key in pluginCallButtons) {
+                plugin = plugins[key];
+                button = pluginCallButtons[key];
+                if (plugin.active && button) {
+                    oldButton = oldCallButtons[key];
+                    core.callPlugin(key, null, oldButton || button);
+                    if (oldButton) {
+                        button.parentElement.replaceChild(oldButton, button);
+                        pluginCallButtons[key] = oldButton;
+                    }
+                }
+            }
+
+            context.element.toolbar.replaceChild(newToolbar._buttonTray, context.element._buttonTray);
+
+            const newContext = _Context(context.element.originElement, core._getConstructed(context.element), options);
+            context.element = newContext.element;
+            context.tool = newContext.tool;
+
+            core.history._resetCachingButton();
+        },
+
+        /**
+         * @description Add or reset option property (Editor is reloaded)
+         * @param {Object} _options Options
          */
         setOptions: function (_options) {
             event._removeEvent();
             core._resetComponents();
 
             core.plugins = _options.plugins || core.plugins;
-            const mergeOptions = [_options, _options].reduce(function (init, option) {
+            const mergeOptions = [options, _options].reduce(function (init, option) {
                 for (let key in option) {
                     if (key === 'plugins' && option[key] && init[key]) {
                         let i = init[key], o = option[key];
@@ -6177,7 +6492,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }, {});
 
             // set option
-            const cons = _Constructor._setOptions(mergeOptions, context, core.plugins, _options);
+            const cons = _Constructor._setOptions(mergeOptions, context, core.plugins, options);
+            cons.toolbar.element.style.visibility = '';
 
             if (cons.callButtons) {
                 pluginCallButtons = cons.callButtons;
@@ -6191,34 +6507,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             // reset context
             const _initHTML = context.element.wysiwyg.innerHTML;
             const el = context.element;
-            const constructed = {
-                _top: el.topArea,
-                _relative: el.relative,
-                _toolBar: el.toolbar,
-                _editorArea: el.editorArea,
-                _wysiwygArea: el.wysiwygFrame,
-                _codeArea: el.code,
-                _placeholder: el.placeholder,
-                _resizingBar: el.resizingBar,
-                _navigation: el.navigation,
-                _charCounter: el.charCounter,
-                _charWrapper: el.charWrapper,
-                _loading: el.loading,
-                _lineBreaker: el.lineBreaker,
-                _resizeBack: el.resizeBackground,
-                _stickyDummy: el._stickyDummy,
-                _arrow: el._arrow
-            };
+
+            if (el._menuTray.children.length === 0) this._menuTray = {};
             
+            _responsiveButtons = cons.toolbar.responsiveButtons;
             options = mergeOptions;
             core.lang = lang = options.lang;
-            core.context = context = _Context(context.element.originElement, constructed, options);
-
+            core.context = context = _Context(context.element.originElement, core._getConstructed(el), options);
             core._componentsInfoReset = true;
+
+            // initialize core and add event listeners
             core._init(true, _initHTML);
             event._addEvent();
             core._charCount('');
-
             event._offStickyToolbar();
             event.onResize_window();
         },
@@ -6413,6 +6714,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         disabled: function () {
             context.tool.cover.style.display = 'block';
             context.element.wysiwyg.setAttribute('contenteditable', false);
+            core.isDisabled = true;
 
             if (options.codeMirrorEditor) {
                 options.codeMirrorEditor.setOption('readOnly', true);
@@ -6427,6 +6729,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         enabled: function () {
             context.tool.cover.style.display = 'none';
             context.element.wysiwyg.setAttribute('contenteditable', true);
+            core.isDisabled = false;
 
             if (options.codeMirrorEditor) {
                 options.codeMirrorEditor.setOption('readOnly', false);
@@ -6454,6 +6757,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description Destroy the suneditor
          */
         destroy: function () {
+            /** off menus */
+            core.submenuOff();
+            core.containerOff();
+            core.controllersOff();
+            if (core.notice) core.notice.close.call(core);
+            if (core.modalForm) core.plugins.dialog.close.call(core);
+
             /** remove history */
             core.history._destroy();
 
@@ -6461,6 +6771,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             event._removeEvent();
             
             /** remove element */
+            util.removeItem(context.element.toolbar);
             util.removeItem(context.element.topArea);
 
             /** remove object reference */
@@ -6517,10 +6828,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         }
     };
 
-    /** initialize core and add event listeners */
+    // initialize core and add event listeners
     core._init(false, null);
     event._addEvent();
     core._charCount('');
+    event._offStickyToolbar();
+    event.onResize_window();
+
+    // toolbar visibility
+    context.element.toolbar.style.visibility = '';
 
     // functionss
     core.functions = functions;

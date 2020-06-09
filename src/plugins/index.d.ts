@@ -25,7 +25,10 @@ import video from './dialog/video';
 import audio from './dialog/audio';
 import math from './dialog/math';
 
+// file browser
+import imageGallery from './fileBrowser/imageGallery';
+
 declare const _plugins: Plugin[];
 
-export { blockquote, align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math };
+export { blockquote, align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };
 export default _plugins;

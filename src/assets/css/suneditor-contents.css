@@ -60,9 +60,6 @@
 .sun-editor-editable span.katex {
     display: inline-block;
 }
-.sun-editor-editable[contenteditable="true"] span.katex {
-    outline: 1px dashed #e1e1e1;
-}
 
 /* a */
 .sun-editor-editable a {

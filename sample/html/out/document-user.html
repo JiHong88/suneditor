@@ -33,10 +33,37 @@
             <div class="description">
             </div>
 
+            <h4 class="name" id="setToolbarButtons"><span class="type-signature"></span>setToolbarButtons<span
+                    class="signature">(buttonList)</span></h4>
+            <div class="description">
+                Reset the buttons on the toolbar. (Editor is not reloaded)<br>
+                You cannot set a new plugin for the button.
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>buttonList</code></td>
+                    <td class="type">
+                        <span class="param-type">Array</span>
+                    </td>
+                    <td class="description last">Button list</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="setOptions"><span class="type-signature"></span>setOptions<span
                     class="signature">(options)</span></h4>
             <div class="description">
-                Add or reset option property.
+                Add or reset option property. (Editor is reloaded)
             </div>
             <table class="params">
                 <thead>
@@ -53,6 +80,34 @@
                         <span class="param-type">Object</span>
                     </td>
                     <td class="description last">Options</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="setDefaultStyle"><span class="type-signature"></span>setDefaultStyle<span
+                    class="signature">(style)</span></h4>
+            <div class="description">
+                Set "options.defaultStyle" style.<br>
+                Define the style of the edit area.<br>
+                It can also be defined with the "setOptions" method, but the "setDefaultStyle" method does not render the editor again.
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>style</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">Style string</td>
                 </tr>
                 </tbody>
             </table>
@@ -1399,6 +1454,72 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="toggleCodeView"><span class="type-signature"></span>toggleCodeView<span
+                    class="signature">(isCodeView, core)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                An event when toggling between code view and wysiwyg view.
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>isCodeView</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean</span>
+                    </td>
+                    <td class="description last">Whether the current code view mode</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="toggleFullScreen"><span class="type-signature"></span>toggleFullScreen<span
+                    class="signature">(isFullScreen, core)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                An event when toggling full screen.
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>isFullScreen</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean</span>
+                    </td>
+                    <td class="description last">Whether the current full screen mode</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="showController"><span class="type-signature"></span>showController<span
                     class="signature">(name, controllers, core)</span><span class="type-signature"></span></h4>
             <div class="description">
@@ -1449,7 +1570,9 @@
     <h3>Functions & Events</h3>
     <ul>
         <li><a href="document-user.html#titleFunction"><h4 class="subsection-title" style="font-size: 20px;">functions</h4></a></li>
+        <li><a href="document-user.html#setToolbarButtons">setToolbarButtons</a></li>
         <li><a href="document-user.html#setOptions">setOptions</a></li>
+        <li><a href="document-user.html#setDefaultStyle">setDefaultStyle</a></li>
         <li><a href="document-user.html#noticeOpen">noticeOpen</a></li>
         <li><a href="document-user.html#noticeClose">noticeClose</a></li>
         <li><a href="document-user.html#save">save</a></li>
@@ -1491,6 +1614,8 @@
         <li><a href="document-user.html#onAudioUploadBefore">onAudioUploadBefore</a></li>
         <li><a href="document-user.html#onAudioUpload">onAudioUpload</a></li>
         <li><a href="document-user.html#onAudioUploadError">onAudioUploadError</a></li>
+        <li><a href="document-user.html#toggleCodeView">toggleCodeView</a></li>
+        <li><a href="document-user.html#toggleFullScreen">toggleFullScreen</a></li>
         <li><a href="document-user.html#showInline">showInline</a></li>
         <li><a href="document-user.html#showController">showController</a></li>
     </ul>

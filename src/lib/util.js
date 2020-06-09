@@ -13,8 +13,9 @@
 const util = {
     _d: document,
     _w: window,
-    isIE: window.navigator.userAgent.match(/(MSIE|Trident.*rv[ :])([0-9]+)/) !== null,
-    isIE_Edge: (window.navigator.userAgent.match(/(MSIE|Trident.*rv[ :])([0-9]+)/) !== null) || (window.navigator.appVersion.indexOf('Edge') > -1),
+    isIE: navigator.userAgent.indexOf('Trident') > -1,
+    isIE_Edge: (navigator.userAgent.indexOf('Trident') > -1) || (navigator.appVersion.indexOf('Edge') > -1),
+    isOSX_IOS: /(Mac|iPhone|iPod|iPad)/.test(navigator.platform),
 
     /**
      * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
@@ -45,7 +46,7 @@ const util = {
     /**
      * @description Unicode Character 'ZERO WIDTH SPACE' (\u200B)
      */
-    zeroWidthSpace: '\u200B',
+    zeroWidthSpace: String.fromCharCode(8203),
 
     /**
      * @description Regular expression to find 'zero width space' (/\u200B/g)
@@ -293,7 +294,7 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the component [img, iframe] cover(element className - ".se-component") and table, hr
+     * @description It is judged whether it is the component [img, iframe, video, audio] cover(element className - ".se-component") and table, hr
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
@@ -1532,8 +1533,9 @@ const util = {
             }
 
             return current.parentNode !== documentFragment &&
-             (this.isFormatElement(current) || this.isComponent(current) || this.isList(current) || (((this.isMedia(current) && !this.isAnchor(current.parentNode)) || (this.isMedia(current.firstElementChild) && this.isAnchor(current))) && !this.getParentElement(current, this.isComponent))) &&
-              !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode);
+             (this.isFormatElement(current) || this.isComponent(current) || this.isList(current)) &&
+             !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode) && !this.getParentElement(current, this.isComponent) &&
+             !this.getParentElement(current, '.__se__tag');
         }.bind(this));
 
         for (let i in emptyWhitelistTags) {
@@ -1587,14 +1589,14 @@ const util = {
         // table cells without format
         const withoutFormatCells = this.getListChildNodes(documentFragment, function (current) {
             if (current.nodeType !== 1) return false;
-            return this.isCell(current) && !this.isFormatElement(current.firstElementChild);
+            return this.isCell(current) && (!this.isFormatElement(current.firstElementChild) || current.textContent.trim().length === 0);
         }.bind(this));
 
         for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {
             t = withoutFormatCells[i];
 
             f = this.createElement('DIV');
-            f.innerHTML = t.innerHTML;
+            f.innerHTML = t.textContent.trim().length === 0 ? '<br>' : t.innerHTML;
             t.innerHTML = f.outerHTML;
         }
     },

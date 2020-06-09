@@ -72,8 +72,11 @@ export default {
         /** add event listeners */
         image_dialog.querySelector('.se-dialog-tabs').addEventListener('click', this.openTab.bind(core));
         image_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
-        if (contextImage.imgInputFile) image_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(core, contextImage.imgInputFile, contextImage.imgUrlFile));
+        if (contextImage.imgInputFile) image_dialog.querySelector('.__se__file_remove').addEventListener('click', this._removeSelectedFiles.bind(core, contextImage.imgInputFile, contextImage.imgUrlFile));
         if (contextImage.imgInputFile && contextImage.imgUrlFile) contextImage.imgInputFile.addEventListener('change', this._fileInputChange.bind(contextImage));
+
+        const imageGalleryButton = image_dialog.querySelector('.__se__gallery');
+        if (imageGalleryButton) imageGalleryButton.addEventListener('click', this._openGallery.bind(core));
         
         contextImage.proportion = {};
         contextImage.inputX = {};
@@ -132,7 +135,7 @@ export default {
                                 '<label>' + lang.dialogBox.imageBox.file + '</label>' +
                                 '<div class="se-dialog-form-files">' +
                                     '<input class="se-input-form _se_image_file" type="file" accept="image/*" multiple="multiple" />' +
-                                    '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
+                                    '<button type="button" class="se-btn se-dialog-files-edge-button __se__file_remove" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
                                 '</div>' +
                             '</div>' ;
                     }
@@ -141,7 +144,10 @@ export default {
                         html += '' +
                             '<div class="se-dialog-form">' +
                                 '<label>' + lang.dialogBox.imageBox.url + '</label>' +
-                                '<input class="se-input-form se-input-url" type="text" />' +
+                                '<div class="se-dialog-form-files">' +
+                                    '<input class="se-input-form se-input-url" type="text" />' +
+                                    ((option.imageGalleryUrl && this.plugins.imageGallery) ? '<button type="button" class="se-btn se-dialog-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '">' + this.icons.image_gallery + '</button>' : '') +
+                                '</div>' +
                             '</div>';
                     }
         
@@ -217,6 +223,16 @@ export default {
         if (urlInput) urlInput.removeAttribute('disabled');
     },
 
+    _openGallery: function () {
+        this.callPlugin('imageGallery', this.plugins.imageGallery.open.bind(this, this.plugins.image._setUrlInput.bind(this, this.context.image.imgUrlFile, this.context.image.altText)), null);
+    },
+
+    _setUrlInput: function (urlInput, altText, target) {
+        altText.value = target.alt;
+        urlInput.value = target.src;
+        urlInput.focus();
+    },
+
     /**
      * @Override @Required fileManager
      */
@@ -224,6 +240,8 @@ export default {
 
     /**
      * @Override core, fileManager, resizing
+     * @description It is called from core.selectComponent.
+     * @param {Element} element Target element
      */
     select: function (element) {
         this.plugins.image.onModifyMode.call(this, element, this.plugins.resizing.call_controller_resize.call(this, element, 'image'));
@@ -331,7 +349,7 @@ export default {
 
         try {
             if (this.context.dialog.updateModal) {
-                imagePlugin.update_image.call(this, false, false, false);
+                imagePlugin.update_image.call(this, false, true, false);
             }
             
             if (contextImage.imgInputFile && contextImage.imgInputFile.files.length > 0) {
@@ -352,7 +370,7 @@ export default {
         if (fileList.length === 0) return;
 
         let fileSize = 0;
-        const files = [];
+        let files = [];
         for (let i = 0, len = fileList.length; i < len; i++) {
             if (/image/i.test(fileList[i].type)) {
                 files.push(fileList[i]);
@@ -392,7 +410,11 @@ export default {
             element: contextImage._element
         };
 
-        if (typeof this.functions.onImageUploadBefore === 'function' && !this.functions.onImageUploadBefore(files, info, this)) return;
+        if (typeof this.functions.onImageUploadBefore === 'function') {
+            const result = this.functions.onImageUploadBefore(files, info, this);
+            if (!result) return;
+            if (this._w.Array.isArray(result) && result.length > 0) files = result;
+        }
 
         // server upload
         if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
@@ -595,6 +617,9 @@ export default {
         } else if (isNewContainer) {
             container.innerHTML = '';
             container.appendChild(cover);
+            contextImage._cover = cover;
+            contextImage._element = imageEl;
+            isNewContainer = false;
         }
 
         // check size
@@ -692,8 +717,7 @@ export default {
 
         if (openController) {
             this.plugins.image.init.call(this);
-            const size = this.plugins.resizing.call_controller_resize.call(this, imageEl, 'image');
-            this.plugins.image.onModifyMode.call(this, imageEl, size);
+            this.selectComponent(imageEl, 'image');
         }
 
         // history stack

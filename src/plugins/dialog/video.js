@@ -214,6 +214,8 @@ export default {
 
     /**
      * @Override core, resizing, fileManager
+     * @description It is called from core.selectComponent.
+     * @param {Element} element Target element
      */
     select: function (element) {
         this.plugins.video.onModifyMode.call(this, element, this.plugins.resizing.call_controller_resize.call(this, element, 'video'));
@@ -332,7 +334,7 @@ export default {
         if (fileList.length === 0) return;
 
         let fileSize = 0;
-        const files = [];
+        let files = [];
         for (let i = 0, len = fileList.length; i < len; i++) {
             if (/video/i.test(fileList[i].type)) {
                 files.push(fileList[i]);
@@ -370,7 +372,11 @@ export default {
             element: contextVideo._element
         };
 
-        if (typeof this.functions.onVideoUploadBefore === 'function' && !this.functions.onVideoUploadBefore(files, info, this)) return;
+        if (typeof this.functions.onVideoUploadBefore === 'function') {
+            const result = this.functions.onVideoUploadBefore(files, info, this);
+            if (!result) return;
+            if (typeof result === 'object' && result.length > 0) files = result;
+        }
 
         // server upload
         if (typeof videoUploadUrl === 'string' && videoUploadUrl.length > 0) {
@@ -517,6 +523,10 @@ export default {
             this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.functions.onVideoUpload, file, true);
         }
 
+        if (isUpdate) {
+            this.selectComponent(oFrame, 'video');
+        }
+
         this.context.resizing._resize_plugin = '';
 
         // history stack
@@ -525,20 +535,20 @@ export default {
         }
     },
 
-    _update_videoCover: function (oIframe) {
-        if (!oIframe) return;
+    _update_videoCover: function (oFrame) {
+        if (!oFrame) return;
 
         const contextVideo = this.context.video;
-        oIframe.frameBorder = '0';
-        oIframe.allowFullscreen = true;
+        oFrame.frameBorder = '0';
+        oFrame.allowFullscreen = true;
         
-        const existElement = this.util.getParentElement(oIframe, this.util.isMediaComponent) || 
-            this.util.getParentElement(oIframe, function (current) {
+        const existElement = this.util.getParentElement(oFrame, this.util.isMediaComponent) || 
+            this.util.getParentElement(oFrame, function (current) {
                 return this.isWysiwygDiv(current.parentNode);
             }.bind(this.util));
 
-        contextVideo._element = oIframe = oIframe.cloneNode(false);
-        const cover = contextVideo._cover = this.plugins.component.set_cover.call(this, oIframe);
+        contextVideo._element = oFrame = oFrame.cloneNode(true);
+        const cover = contextVideo._cover = this.plugins.component.set_cover.call(this, oFrame);
         const container = contextVideo._container = this.plugins.component.set_container.call(this, cover, 'se-video-container');
 
         const figcaption = existElement.querySelector('figcaption');
@@ -549,12 +559,12 @@ export default {
             this.util.removeItem(figcaption);
         }
 
-        const size = (oIframe.getAttribute('data-size') || oIframe.getAttribute('data-origin') || '').split(',');
+        const size = (oFrame.getAttribute('data-size') || oFrame.getAttribute('data-origin') || '').split(',');
         this.plugins.video.applySize.call(this, size[0], size[1]);
 
         existElement.parentNode.replaceChild(container, existElement);
         if (!!caption) existElement.parentNode.insertBefore(caption, container.nextElementSibling);
-        this.plugins.fileManager.setInfo.call(this, 'video', oIframe, this.functions.onVideoUpload, null, true);
+        this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.functions.onVideoUpload, null, true);
     },
 
     /**
@@ -593,7 +603,7 @@ export default {
     openModify: function (notOpen) {
         const contextVideo = this.context.video;
 
-        if (contextVideo.videoUrlFile) contextVideo.videoUrlFile.value = contextVideo._element.src;
+        if (contextVideo.videoUrlFile) contextVideo.videoUrlFile.value = (contextVideo._element.src || (contextVideo._element.querySelector('source') || '').src || '');
         contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="' + contextVideo._align + '"]').checked = true;
 
         if (contextVideo._resizing) {

@@ -9,10 +9,11 @@
 
 export default function (core, change) {
     const _w = window;
-    const editor = core.context.element;
     const util = core.util;
-    const undo = core.context.tool.undo;
-    const redo = core.context.tool.redo;
+    let editor = core.context.element;
+    let undo = core.context.tool.undo;
+    let redo = core.context.tool.redo;
+
     let pushDelay = null;
     let stackIndex = 0;
     let stack = [];
@@ -171,6 +172,24 @@ export default function (core, change) {
             };
 
             if (!ignoreChangeEvent) change();
+        },
+
+        /**
+         * @description Reset the disabled state of the buttons to fit the current stack.
+         * @private
+         */
+        _resetCachingButton: function () {
+            editor = core.context.element;
+            undo = core.context.tool.undo;
+            redo = core.context.tool.redo;
+
+            if (stackIndex === 0) {
+                if (undo) undo.setAttribute('disabled', true);
+                if (redo && stackIndex === stack.length - 1) redo.setAttribute('disabled', true);
+                if (core.context.tool.save) core.context.tool.save.setAttribute('disabled', true);
+            } else if (stackIndex === stack.length - 1) {
+                if (redo) redo.setAttribute('disabled', true);
+            }
         },
 
         /**

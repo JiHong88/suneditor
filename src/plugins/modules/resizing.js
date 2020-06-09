@@ -468,9 +468,11 @@
                     contextPlugin._captionChecked = false;
                 }
             }
-    
-            this.util.toggleDisabledButtons(true, this.resizingDisabledButtons);
-            this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton, this.util.toggleDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
+
+            if (this.currentControllerName !== plugin) {
+                this.util.toggleDisabledButtons(true, this.resizingDisabledButtons);
+                this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton, this.util.toggleDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
+            }
     
             // button group
             const overLeft = this.context.element.wysiwygFrame.offsetWidth - l - contextResizing.resizeButton.offsetWidth;
@@ -547,8 +549,9 @@
     
             switch (command) {
                 case 'auto':
+                    this.plugins.resizing.resetTransform.call(this, contextEl);
                     currentModule.setAutoSize.call(this);
-                    currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
+                    this.selectComponent(contextEl, pluginName);
                     break;
                 case 'percent':
                     let percentY = this.plugins.resizing._module_getSizeY.call(this, currentContext);
@@ -559,7 +562,7 @@
     
                     this.plugins.resizing.resetTransform.call(this, contextEl);
                     currentModule.setPercentSize.call(this, (value * 100), (this.util.getNumber(percentY, 0) === null || !/%$/.test(percentY)) ? '' : percentY);
-                    currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
+                    this.selectComponent(contextEl, pluginName);
                     break;
                 case 'mirror':
                     const r = contextEl.getAttribute('data-rotate') || '0';
@@ -586,7 +589,7 @@
                     contextResizing._rotateVertical = /^(90|270)$/.test(this._w.Math.abs(deg).toString());
                     this.plugins.resizing.setTransformSize.call(this, contextEl, null, null);
         
-                    currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
+                    this.selectComponent(contextEl, pluginName);
                     break;
                 case 'onalign':
                     this.plugins.resizing.openAlignMenu.call(this);
@@ -594,7 +597,7 @@
                 case 'align':
                     const alignValue = value === 'basic' ? 'none' : value;
                     currentModule.setAlign.call(this, alignValue, null, null, null);
-                    currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
+                    this.selectComponent(contextEl, pluginName);
                     break;
                 case 'caption':
                     const caption = !currentContext._captionChecked;
@@ -616,14 +619,14 @@
     
                         this.controllersOff();
                     } else {
-                        currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
+                        this.selectComponent(contextEl, pluginName);
                         currentModule.openModify.call(this, true);
                     }
     
                     break;
                 case 'revert':
                     currentModule.setOriginSize.call(this);
-                    currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, pluginName));
+                    this.selectComponent(contextEl, pluginName);
                     break;
                 case 'update':
                     currentModule.openModify.call(this);
@@ -757,12 +760,9 @@
         onMouseDown_resize_handle: function (e) {
             const contextResizing = this.context.resizing;
             const direction = contextResizing._resize_direction = e.target.classList[0];
+
             e.stopPropagation();
             e.preventDefault();
-    
-            const pluginName = this.context.resizing._resize_plugin;
-            const contextEl = this.context[pluginName]._element;
-            const currentModule = this.plugins[pluginName];
     
             contextResizing._resizeClientX = e.clientX;
             contextResizing._resizeClientY = e.clientY;
@@ -790,8 +790,6 @@
                     // history stack
                     if (change) this.history.push(false);
                 }
-                
-                currentModule.onModifyMode.call(this, contextEl, this.plugins.resizing.call_controller_resize.call(this, contextEl, contextResizing._resize_plugin));
             }.bind(this);
     
             const resizing_element_bind = this.plugins.resizing.resizing_element.bind(this, contextResizing, direction, this.context[contextResizing._resize_plugin]);
@@ -865,8 +863,9 @@
                 }
             }
     
-            this.plugins[this.context.resizing._resize_plugin].setSize.call(this, w, h, false, direction);
-            this.plugins[this.context.resizing._resize_plugin].init.call(this);
+            const pluginName = this.context.resizing._resize_plugin;
+            this.plugins[pluginName].setSize.call(this, w, h, false, direction);
+            this.selectComponent(this.context[pluginName]._element, pluginName);
         }
     };
 

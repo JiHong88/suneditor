@@ -22,6 +22,8 @@ const _Context = function (element, cons, options) {
             topArea: cons._top,
             relative: cons._relative,
             toolbar: cons._toolBar,
+            _buttonTray: cons._toolBar.querySelector('.se-btn-tray'),
+            _menuTray: cons._menuTray,
             resizingBar: cons._resizingBar,
             navigation: cons._navigation,
             charWrapper: cons._charWrapper,
@@ -33,6 +35,8 @@ const _Context = function (element, cons, options) {
             placeholder: cons._placeholder,
             loading: cons._loading,
             lineBreaker: cons._lineBreaker,
+            lineBreaker_t: cons._lineBreaker_t,
+            lineBreaker_b: cons._lineBreaker_b,
             resizeBackground: cons._resizeBack,
             _stickyDummy: cons._stickyDummy,
             _arrow: cons._arrow

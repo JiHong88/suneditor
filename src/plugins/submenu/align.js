@@ -45,9 +45,9 @@ export default {
         const icons = this.icons;
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'se-list-layer';
+        listDiv.className = 'se-submenu se-list-layer se-list-align';
         listDiv.innerHTML = '' +
-            '<div class="se-submenu se-list-inner se-list-align">' +
+            '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
                     '<li>' +
                         '<button type="button" class="se-btn-list se-btn-align" data-command="justifyleft" data-value="left" title="' + lang.toolbar.alignLeft + '">' +

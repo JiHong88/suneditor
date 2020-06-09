@@ -25,5 +25,8 @@ import video from './dialog/video';
 import audio from './dialog/audio';
 import math from './dialog/math';
 
-export { blockquote, align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math };
-export default { blockquote, align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math };
+// file browser
+import imageGallery from './fileBrowser/imageGallery';
+
+export { blockquote, align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };
+export default { blockquote, align, font, fontSize, fontColor, hiliteColor, horizontalRule, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };

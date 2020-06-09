@@ -14,7 +14,7 @@ import util from './util';
 export default {
     icons: null,
     /**
-     * @description document create - call _createToolBar()
+     * @description document create
      * @param {Element} element Textarea
      * @param {Object} options Options
      * @returns {Object}
@@ -37,7 +37,8 @@ export default {
         relative.className = 'se-container';
     
         // toolbar
-        const tool_bar = this._createToolBar(doc, options.buttonList, options.plugins, options.lang);
+        const tool_bar = this._createToolBar(doc, options.buttonList, options.plugins, options);
+        tool_bar.element.style.visibility = 'hidden';
         if (tool_bar.pluginCallButtons.math) this._checkKatexMath(options.katex);
         const arrow = doc.createElement('DIV');
         arrow.className = 'se-arrow';
@@ -73,21 +74,33 @@ export default {
         const line_breaker = doc.createElement('DIV');
         line_breaker.className = 'se-line-breaker';
         line_breaker.innerHTML = '<button class="se-btn">' + this.icons.line_break + '</button>';
+        const line_breaker_t = doc.createElement('DIV');
+        line_breaker_t.className += 'se-line-breaker-component';
+        const line_breaker_b = line_breaker_t.cloneNode(true);
+        line_breaker_t.innerHTML = line_breaker_b.innerHTML = this.icons.line_break;
     
         // resize operation background
         const resize_back = doc.createElement('DIV');
         resize_back.className = 'se-resizing-back';
+
+        // toolbar container
+        const toolbarContainer = options.toolbarContainer;
+        if (toolbarContainer) {
+            toolbarContainer.appendChild(tool_bar.element);
+        }
     
         /** append html */
         editor_div.appendChild(wysiwyg_div);
         editor_div.appendChild(textarea);
         if (placeholder_span) editor_div.appendChild(placeholder_span);
-        relative.appendChild(tool_bar.element);
+        if (!toolbarContainer) relative.appendChild(tool_bar.element);
         relative.appendChild(sticky_dummy);
         relative.appendChild(editor_div);
         relative.appendChild(resize_back);
         relative.appendChild(loading_box);
         relative.appendChild(line_breaker);
+        relative.appendChild(line_breaker_t);
+        relative.appendChild(line_breaker_b);
         if (resizing_bar) relative.appendChild(resizing_bar);
         top_div.appendChild(relative);
 
@@ -98,6 +111,7 @@ export default {
                 _top: top_div,
                 _relative: relative,
                 _toolBar: tool_bar.element,
+                _menuTray: tool_bar._menuTray,
                 _editorArea: editor_div,
                 _wysiwygArea: wysiwyg_div,
                 _codeArea: textarea,
@@ -108,6 +122,8 @@ export default {
                 _charCounter: char_counter,
                 _loading: loading_box,
                 _lineBreaker: line_breaker,
+                _lineBreaker_t: line_breaker_t,
+                _lineBreaker_b: line_breaker_b,
                 _resizeBack: resize_back,
                 _stickyDummy: sticky_dummy,
                 _arrow: arrow
@@ -115,6 +131,7 @@ export default {
             options: options,
             plugins: tool_bar.plugins,
             pluginCallButtons: tool_bar.pluginCallButtons,
+            _responsiveButtons: tool_bar.responsiveButtons,
             _icons: this.icons
         };
     },
@@ -190,17 +207,27 @@ export default {
         const el = context.element;
         const relative = el.relative;
         const editorArea = el.editorArea;
-        const isNewToolbar = !!mergeOptions.buttonList || mergeOptions.mode !== originOptions.mode;
+        const isNewToolbarContainer = mergeOptions.toolbarContainer && mergeOptions.toolbarContainer !== originOptions.toolbarContainer;
+        const isNewToolbar = !!mergeOptions.buttonList || mergeOptions.mode !== originOptions.mode || isNewToolbarContainer;
         const isNewPlugins = !!mergeOptions.plugins;
 
-        const tool_bar = this._createToolBar(document, (isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList), (isNewPlugins ? mergeOptions.plugins : plugins), mergeOptions.lang);
+        const tool_bar = this._createToolBar(document, (isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList), (isNewPlugins ? mergeOptions.plugins : plugins), mergeOptions);
         if (tool_bar.pluginCallButtons.math) this._checkKatexMath(mergeOptions.katex);
         const arrow = document.createElement('DIV');
         arrow.className = 'se-arrow';
 
         if (isNewToolbar) {
-            relative.replaceChild(tool_bar.element, el.toolbar);
+            tool_bar.element.style.visibility = 'hidden';
+            // toolbar container
+            if (isNewToolbarContainer) {
+                mergeOptions.toolbarContainer.appendChild(tool_bar.element);
+                el.toolbar.parentElement.removeChild(el.toolbar);
+            } else {
+                el.toolbar.parentElement.replaceChild(tool_bar.element, el.toolbar);
+            }
+
             el.toolbar = tool_bar.element;
+            el._menuTray = tool_bar._menuTray;
             el._arrow = arrow;
         }
         
@@ -223,7 +250,6 @@ export default {
         editorArea.appendChild(wysiwygFrame);
         editorArea.appendChild(code);
 
-        if (el.placeholder) editorArea.removeChild(el.placeholder);
         if (placeholder_span) editorArea.appendChild(placeholder_span);
 
         code = this._checkCodeMirror(mergeOptions, code);
@@ -234,7 +260,8 @@ export default {
 
         return {
             callButtons: isNewToolbar ? tool_bar.pluginCallButtons : null,
-            plugins: isNewToolbar || isNewPlugins ? tool_bar.plugins : null
+            plugins: isNewToolbar || isNewPlugins ? tool_bar.plugins : null,
+            toolbar: tool_bar
         };
     },
 
@@ -407,13 +434,14 @@ export default {
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
+        options.toolbarContainer = /balloon/i.test(options.mode) ? null : (typeof options.toolbarContainer === 'string' ? document.querySelector(options.toolbarContainer) : options.toolbarContainer);
         options.stickyToolbar = /balloon/i.test(options.mode) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);
         options.fullPage = !!options.fullPage;
         options.iframe = options.fullPage || options.iframe;
         options.iframeCSSFileName = options.iframe ? typeof options.iframeCSSFileName === 'string' ? [options.iframeCSSFileName] : (options.iframeCSSFileName || ['suneditor']) : null;
         options.codeMirror = options.codeMirror ? options.codeMirror.src ? options.codeMirror : {src: options.codeMirror} : null;
         /** Display */
-        // options.position = options.position;
+        options.position = typeof options.position === 'string' ? options.position : null;
         options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
         options.popupDisplay = options.popupDisplay || 'full';
         /** Bottom resizing bar */
@@ -454,8 +482,10 @@ export default {
         options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
         options.imageUploadHeader = options.imageUploadHeader || null;
-        options.imageUploadUrl = options.imageUploadUrl || null;
+        options.imageUploadUrl = typeof options.imageUploadUrl === 'string' ? options.imageUploadUrl : null;
         options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? util.getNumber(options.imageUploadSizeLimit, 0) : null;
+        /** Image - image gallery */
+        options.imageGalleryUrl = typeof options.imageGalleryUrl === 'string' ? options.imageGalleryUrl : null;
         /** Video */
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
         options.videoHeightShow = options.videoHeightShow === undefined ? true : !!options.videoHeightShow;
@@ -471,7 +501,7 @@ export default {
         options.videoFileInput = !!options.videoFileInput;
         options.videoUrlInput = (options.videoUrlInput === undefined || !options.videoFileInput) ? true : options.videoUrlInput;
         options.videoUploadHeader = options.videoUploadHeader || null;
-        options.videoUploadUrl = options.videoUploadUrl || null;
+        options.videoUploadUrl = typeof options.videoUploadUrl === 'string' ? options.videoUploadUrl : null;
         options.videoUploadSizeLimit = /\d+/.test(options.videoUploadSizeLimit) ? util.getNumber(options.videoUploadSizeLimit, 0) : null;
         /** Audio */
         options.audioWidth = !options.audioWidth ? '' : util.isNumber(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth;
@@ -479,12 +509,14 @@ export default {
         options.audioFileInput = !!options.audioFileInput;
         options.audioUrlInput = (options.audioUrlInput === undefined || !options.audioFileInput) ? true : options.audioUrlInput;
         options.audioUploadHeader = options.audioUploadHeader || null;
-        options.audioUploadUrl = options.audioUploadUrl || null;
+        options.audioUploadUrl = typeof options.audioUploadUrl === 'string' ? options.audioUploadUrl : null;
         options.audioUploadSizeLimit = /\d+/.test(options.audioUploadSizeLimit) ? util.getNumber(options.audioUploadSizeLimit, 0) : null;
         /** Table */
         options.tableCellControllerPosition = typeof options.tableCellControllerPosition === 'string' ? options.tableCellControllerPosition.toLowerCase() : 'cell';
         /** Key actions */
         options.tabDisable = !!options.tabDisable;
+        options.shortcutsDisable = (Array.isArray(options.shortcutsDisable) && options.shortcutsDisable.length > 0) ? options.shortcutsDisable.map(function (v) { return v.toLowerCase(); }) : [];
+        options.shortcutsHint = options.shortcutsHint === undefined ? true : !!options.shortcutsHint;
         /** Defining save button */
         options.callBackSave = !options.callBackSave ? null : options.callBackSave;
         /** Templates Array */
@@ -514,26 +546,31 @@ export default {
 
     /**
      * @description Suneditor's Default button list
+     * @param {Object} options options
      * @private
      */
-    _defaultButtons: function (lang) {
+    _defaultButtons: function (options) {
         const icons = this.icons;
+        const lang = options.lang;
+        const cmd = util.isOSX_IOS ? '⌘' : 'CTRL';
+        const shortcutsDisable = !options.shortcutsHint ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent'] : options.shortcutsDisable;
+
         return {
             /** default command */
-            bold: ['_se_command_bold', lang.toolbar.bold + ' (CTRL+B)', 'STRONG', '', icons.bold],
-            underline: ['_se_command_underline', lang.toolbar.underline + ' (CTRL+U)', 'U', '', icons.underline],
-            italic: ['_se_command_italic', lang.toolbar.italic + ' (CTRL+I)', 'EM', '', icons.italic],
-            strike: ['_se_command_strike', lang.toolbar.strike + ' (CTRL+SHIFT+S)', 'DEL', '', icons.strike],
+            bold: ['_se_command_bold', lang.toolbar.bold + (shortcutsDisable.indexOf('bold') > -1 ? '' : ' (' + cmd + '+B)'), 'STRONG', '', icons.bold],
+            underline: ['_se_command_underline', lang.toolbar.underline + (shortcutsDisable.indexOf('underline') > -1 ? '' : ' (' + cmd + '+U)'), 'U', '', icons.underline],
+            italic: ['_se_command_italic', lang.toolbar.italic + (shortcutsDisable.indexOf('italic') > -1 ? '' : ' (' + cmd + '+I)'), 'EM', '', icons.italic],
+            strike: ['_se_command_strike', lang.toolbar.strike + (shortcutsDisable.indexOf('strike') > -1 ? '' : ' (' + cmd + '+SHIFT+S)'), 'DEL', '', icons.strike],
             subscript: ['_se_command_subscript', lang.toolbar.subscript, 'SUB', '', icons.subscript],
             superscript: ['_se_command_superscript', lang.toolbar.superscript, 'SUP', '', icons.superscript],
             removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', icons.erase],
-            indent: ['_se_command_indent', lang.toolbar.indent + ' (CTRL+])', 'indent', '', icons.outdent],
-            outdent: ['_se_command_outdent', lang.toolbar.outdent + ' (CTRL+[)', 'outdent', '', icons.indent],
+            indent: ['_se_command_indent', lang.toolbar.indent + (shortcutsDisable.indexOf('indent') > -1 ? '' : ' (' + cmd + '+])'), 'indent', '', icons.outdent],
+            outdent: ['_se_command_outdent', lang.toolbar.outdent + (shortcutsDisable.indexOf('indent') > -1 ? '' : ' (' + cmd + '+[)'), 'outdent', '', icons.indent],
             fullScreen: ['se-code-view-enabled se-resizing-enabled', lang.toolbar.fullScreen, 'fullScreen', '', icons.expansion],
             showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '', icons.show_blocks],
             codeView: ['se-code-view-enabled se-resizing-enabled', lang.toolbar.codeView, 'codeView', '', icons.code_view],
-            undo: ['_se_command_undo se-resizing-enabled', lang.toolbar.undo + ' (CTRL+Z)', 'undo', '', icons.undo],
-            redo: ['_se_command_redo se-resizing-enabled', lang.toolbar.redo + ' (CTRL+Y / CTRL+SHIFT+Z)', 'redo', '', icons.redo],
+            undo: ['_se_command_undo se-resizing-enabled', lang.toolbar.undo + (shortcutsDisable.indexOf('undo') > -1 ? '' : ' (' + cmd + '+Z)'), 'undo', '', icons.undo],
+            redo: ['_se_command_redo se-resizing-enabled', lang.toolbar.redo + (shortcutsDisable.indexOf('undo') > -1 ? '' : ' (' + cmd + '+Y / ' + cmd + '+SHIFT+Z)'), 'redo', '', icons.redo],
             preview: ['se-resizing-enabled', lang.toolbar.preview, 'preview', '', icons.preview],
             print: ['se-resizing-enabled', lang.toolbar.print, 'print', '', icons.print],
             save: ['_se_command_save se-resizing-enabled', lang.toolbar.save, 'save', '', icons.save],
@@ -558,7 +595,9 @@ export default {
             image: ['', lang.toolbar.image, 'image', 'dialog', icons.image],
             video: ['', lang.toolbar.video, 'video', 'dialog', icons.video],
             audio: ['', lang.toolbar.audio, 'audio', 'dialog', icons.audio],
-            math: ['', lang.toolbar.math, 'math', 'dialog', icons.math]
+            math: ['', lang.toolbar.math, 'math', 'dialog', icons.math],
+            /** plugins - fileBrowser */
+            imageGallery: ['', lang.toolbar.imageGallery, 'imageGallery', 'fileBrowser', icons.image_gallery]
         };
     },
 
@@ -567,9 +606,9 @@ export default {
      * @returns {Object}
      * @private
      */
-    _createModuleGroup: function (oneModule) {
+    _createModuleGroup: function () {
         const oDiv = util.createElement('DIV');
-        oDiv.className = 'se-btn-module' + (oneModule ? '' : ' se-btn-module-border');
+        oDiv.className = 'se-btn-module se-btn-module-border';
 
         const oUl = util.createElement('UL');
         oUl.className = 'se-menu-list';
@@ -600,7 +639,17 @@ export default {
         oButton.setAttribute('class', 'se-btn' + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip');
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);
+        oButton.setAttribute('tabindex', '-1');
+        
         if (!innerHTML) innerHTML = '<span class="se-icon-text">!</span>';
+        if (/^default\./i.test(innerHTML)) {
+            innerHTML = this.icons[innerHTML.replace(/^default\./i, '')];
+        }
+        if (/^text\./i.test(innerHTML)) {
+            innerHTML = innerHTML.replace(/^text\./i, '');
+            oButton.className += ' se-btn-more-text';
+        }
+
         innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (title || dataCommand) + '</span></span>';
 
         if (_disabled) oButton.setAttribute('disabled', true);
@@ -618,19 +667,26 @@ export default {
      * @description Create editor HTML
      * @param {Array} doc document object
      * @param {Array} buttonList option.buttonList
-     * @param {Array} lang option.lang
+     * @param {Array|Object|null} _plugins Plugins
+     * @param {Array} options options
+     * @returns {Object} { element: (Element) Toolbar element, plugins: (Array|null) Plugins Array, pluginCallButtons: (Object), responsiveButtons: (Array) }
      * @private
      */
-    _createToolBar: function (doc, buttonList, _plugins, lang) {
+    _createToolBar: function (doc, buttonList, _plugins, options) {
         const separator_vertical = doc.createElement('DIV');
         separator_vertical.className = 'se-toolbar-separator-vertical';
 
         const tool_bar = doc.createElement('DIV');
         tool_bar.className = 'se-toolbar sun-editor-common';
 
+        const _buttonTray = doc.createElement('DIV');
+        _buttonTray.className = 'se-btn-tray';
+        tool_bar.appendChild(_buttonTray);
+
         /** create button list */
-        const defaultButtonList = this._defaultButtons(lang);
+        const defaultButtonList = this._defaultButtons(options);
         const pluginCallButtons = {};
+        const responsiveButtons = [];
         const plugins = {};
         if (_plugins) {
             const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function(name) { return _plugins[name]; });
@@ -646,18 +702,30 @@ export default {
         let buttonElement = null;
         let pluginName = '';
         let vertical = false;
-        const oneModule = buttonList.length === 1;
+        const moreLayer = util.createElement('DIV');
+        moreLayer.className = 'se-toolbar-more-layer';
 
-        for (let i = 0; i < buttonList.length; i++) {
+        buttonGroupLoop:
+        for (let i = 0, more, moreContainer, moreCommand, buttonGroup, align; i < buttonList.length; i++) {
+            more = false;
+            align = '';
+            buttonGroup = buttonList[i];
+            moduleElement = this._createModuleGroup();
 
-            const buttonGroup = buttonList[i];
-            moduleElement = this._createModuleGroup(oneModule);
-
-            /** button object */
+            // button object
             if (typeof buttonGroup === 'object') {
-                for (let j = 0; j < buttonGroup.length; j++) {
-
+                // buttons loop
+                for (let j = 0, moreButton; j < buttonGroup.length; j++) {
                     button = buttonGroup[j];
+                    moreButton = false;
+
+                    if (/^\%\d+/.test(button) && j === 0) {
+                        buttonGroup[0] = button.replace(/[^\d]/g, '');
+                        responsiveButtons.push(buttonGroup);
+                        buttonList.splice(i--, 1);
+                        continue buttonGroupLoop;
+                    }
+                    
                     if (typeof button === 'object') {
                         if (typeof button.add === 'function') {
                             pluginName = button.name;
@@ -668,7 +736,27 @@ export default {
                             module = [button.buttonClass, button.title, button.name, button.dataDisplay, button.innerHTML, button._disabled];
                         }
                     } else {
-                        module = defaultButtonList[button];
+                        // align
+                        if (/^\-/.test(button)) {
+                            align = button.substr(1);
+                            moduleElement.div.style.float = align;
+                            continue;
+                        }
+                        
+                        // more button
+                        if (/^\:/.test(button)) {
+                            moreButton = true;
+                            const matched = button.match(/^\:([^\-]+)\-([^\-]+)\-([^\-]+)/);
+                            moreCommand = '__se__' + matched[1].trim();
+                            const title = matched[2].trim();
+                            const innerHTML = matched[3].trim();
+                            module = ['se-btn-more', title, moreCommand, 'MORE', innerHTML];
+                        }
+                        // buttons
+                        else {
+                            module = defaultButtonList[button];
+                        }
+
                         pluginName = button;
                         if (!module) {
                             const custom = plugins[pluginName];
@@ -678,26 +766,51 @@ export default {
                     }
 
                     buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4], module[5]);
-                    moduleElement.ul.appendChild(buttonElement.li);
+                    (more ? moreContainer : moduleElement.ul).appendChild(buttonElement.li);
 
                     if (plugins[pluginName]) {
                         pluginCallButtons[pluginName] = buttonElement.button;
                     }
+
+                    // more button
+                    if (moreButton) {
+                        more = true;
+                        moreContainer = util.createElement('DIV');
+                        moreContainer.className = 'se-more-layer ' + moreCommand;
+                        moreContainer.innerHTML = '<div class="se-more-form"><ul class="se-menu-list"' + (align ? ' style="float: ' + align + ';"' : '') + '></ul></div>';
+                        moreLayer.appendChild(moreContainer);
+                        moreContainer = moreContainer.firstElementChild.firstElementChild;
+                    }
                 }
 
-                if (vertical) tool_bar.appendChild(separator_vertical.cloneNode(false));
-                tool_bar.appendChild(moduleElement.div);
+                if (vertical) {
+                    const sv =  separator_vertical.cloneNode(false);
+                    if (align) sv.style.float = align;
+                    _buttonTray.appendChild(sv);
+                }
+                
+                _buttonTray.appendChild(moduleElement.div);
                 vertical = true;
             }
             /** line break  */
             else if (/^\/$/.test(buttonGroup)) {
                 const enterDiv = doc.createElement('DIV');
                 enterDiv.className = 'se-btn-module-enter';
-                tool_bar.appendChild(enterDiv);
+                _buttonTray.appendChild(enterDiv);
                 vertical = false;
             }
         }
 
+        if (_buttonTray.children.length === 1) util.removeClass(_buttonTray.firstElementChild, 'se-btn-module-border');
+        if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
+        if (moreLayer.children.length > 0) _buttonTray.appendChild(moreLayer);
+
+        // menu tray
+        const _menuTray = doc.createElement('DIV');
+        _menuTray.className = 'se-menu-tray';
+        tool_bar.appendChild(_menuTray);
+
+        // cover
         const tool_cover = doc.createElement('DIV');
         tool_cover.className = 'se-toolbar-cover';
         tool_bar.appendChild(tool_cover);
@@ -705,7 +818,10 @@ export default {
         return {
             'element': tool_bar,
             'plugins': plugins,
-            'pluginCallButtons': pluginCallButtons
+            'pluginCallButtons': pluginCallButtons,
+            'responsiveButtons': responsiveButtons,
+            '_menuTray': _menuTray,
+            '_buttonTray': _buttonTray
         };
     }
 };

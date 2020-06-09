@@ -34,6 +34,7 @@ export interface Lang {
     math: string,
     image: string,
     video: string,
+    audio: string,
     fullScreen: string,
     showBlocks: string,
     codeView: string,
@@ -49,7 +50,8 @@ export interface Lang {
     template: string,
     lineHeight: string,
     paragraphStyle: string,
-    textStyle: string
+    textStyle: string,
+    imageGallery: string
   };
   dialogBox: {
     linkBox: {
@@ -79,6 +81,10 @@ export interface Lang {
       title: string,
       file: string,
       url: string
+    },
+    browser: {
+      tags: string,
+      search: string,
     },
     caption: string,
     close: string,

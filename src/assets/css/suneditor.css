@@ -1,7 +1,7 @@
-/* used color #000 , #fff , #CCC, #f9f9f9 */
+/* used color #000 , #fff , #CCC, #f5f5f5, #f9f9f9 */
 /* font color #333, background color: #fff */
 /* grey color #e1e1e1 , #d1d1d1 , #c1c1c1 , #b1b1b1 */
-/* blue color #c7deff , #80bdff , #3f9dff , #4592ff */
+/* blue color #c7deff , #80bdff , #3f9dff , #4592ff, #1f7cff */
 /* red color #b94a48 , #f2dede , #eed3d7 */
 
 /** --- suneditor main */
@@ -119,14 +119,17 @@
 .sun-editor .se-loading-box .se-loading-effect {position:absolute; display:block; top:50%; left:50%; height:25px; width:25px; border-top:2px solid #07d; border-right:2px solid transparent; border-radius:50%; animation:spinner .8s linear infinite; margin:-25px 0 0 -25px;}
 
 /** --- line breaker */
-.sun-editor .se-line-breaker {position:absolute; display:none; width:100%; height:1px; cursor:text; border-top:1px solid #4592ff; z-index:3;}
-.sun-editor .se-line-breaker > button.se-btn {position:relative; display:inline-block; top:-17px; float:none; left:-50%; background-color:#80bdff; border:1px solid #3f9dff; opacity:0.4; cursor:pointer;}
-.sun-editor .se-line-breaker > button.se-btn:hover {opacity:0.8; background-color:#80bdff; border-color:#4592ff;}
+.sun-editor .se-line-breaker {position:absolute; display:none; width:100%; height:1px; cursor:text; border-top:2px solid #4592ff; z-index:7;}
+.sun-editor .se-line-breaker > button.se-btn {position:relative; display:inline-block; top:-17px; float:none; left:-50%; background-color:#fff; border:1px solid #0c2240; opacity:0.6; cursor:pointer;}
+.sun-editor .se-line-breaker > button.se-btn:hover {opacity:0.9; background-color:#fff; border-color:#041b39;}
+/** --- line breaker --- component - top, bottom */
+.sun-editor .se-line-breaker-component {position:absolute; display:none; width:24px; height:24px; background-color:#fff; border:1px solid #0c2240; opacity:0.6; border-radius:4px; cursor:pointer; z-index:7;}
+.sun-editor .se-line-breaker-component:hover {opacity:0.9;}
 
 /** --- toolbar ---------------------------------------------------------- */
 .sun-editor .se-toolbar {display:block; position:relative; height:auto; width:100%; overflow:visible; padding:4px 3px 0 3px; margin:0; background-color:#fafafa; outline:1px solid #dadada; z-index:5;}
 .sun-editor .se-toolbar-cover {position:absolute; display:none; font-size:36px; width:100%; height:100%; top:0; left:0; background-color:#fefefe; opacity:.5; filter:alpha(opacity=50); cursor:not-allowed; z-index:4;}
-.sun-editor .se-toolbar-separator-vertical {display:inline-block; height:0px; width:0px; margin:2px; vertical-align:top;}
+.sun-editor .se-toolbar-separator-vertical {display:inline-block; height:0px; width:0px; margin:1px; vertical-align:top;}
 /* inline toolbar */
 .sun-editor .se-toolbar.se-toolbar-inline {display:none; position:absolute; z-index:2147483647; box-shadow:0 3px 9px rgba(0,0,0,.5); -webkit-box-shadow:0 3px 9px rgba(0,0,0,.5);}
 /* balloon toolbar */
@@ -135,11 +138,21 @@
 .sun-editor .se-toolbar.se-toolbar-sticky {position:fixed; top:0px;}
 .sun-editor .se-toolbar-sticky-dummy {display:none; position:static; z-index:-1;}
 
-/** --- tool bar module group ----------------------------------------------------------  */
+/** --- tool bar --- module --- button, module, group ----------------------------------------------------------  */
+/* module */
 .sun-editor .se-btn-module {display:inline-block;}
 .sun-editor .se-btn-module-border {border:1px solid #dadada; border-radius:4px;}
 .sun-editor .se-btn-module-enter {display:block; width:100%; height:1px; margin-bottom:5px; background-color:transparent;}
-/* module innser ul */
+/* ---more - layer */
+.sun-editor .se-toolbar-more-layer {margin:0 -3px; background-color:#f3f3f3;}
+.sun-editor .se-toolbar-more-layer .se-more-layer {display:none;  border-top:1px solid #dadada;}
+.sun-editor .se-toolbar-more-layer .se-more-layer .se-more-form {display:inline-block; width:100%; height:auto; padding:4px 3px 0 3px;}
+/* ---more - button */
+.sun-editor .se-btn-module .se-btn-more.se-btn-more-text {width:auto; padding:0 4px;}
+.sun-editor .se-btn-module .se-btn-more:hover, .sun-editor .se-btn-module .se-btn-more:focus {color:#000; background-color:#d1d1d1; border-color:#c1c1c1; outline:0 none;}
+.sun-editor .se-btn-module .se-btn-more.on {color:#333; background-color:#d1d1d1; border-color:#c1c1c1; outline:0 none;}
+.sun-editor .se-btn-module .se-btn-more.on:hover {color:#000; background-color:#c1c1c1; border-color:#b1b1b1; outline:0 none;}
+/* innser ul */
 .sun-editor .se-menu-list {float:left; padding:0; margin:0;}
 .sun-editor .se-menu-list li {position:relative; float:left; padding:0; margin:0;}
 /* tool bar select button (font, fontSize, formatBlock) */
@@ -149,8 +162,13 @@
 .sun-editor .se-btn-select.se-btn-tool-format {width:80px;}
 .sun-editor .se-btn-select.se-btn-tool-size {width:80px;}
 
+/** --- menu tray -------------------------------------------------------------- */
+.sun-editor .se-btn-tray {position:relative; width:100%; height:100%; margin:0; padding:0;}
+.sun-editor .se-menu-tray {position:absolute; top:0px; left:0px; width:100%; height:0px;}
+
 /** --- submenu layer ---------------------------------------------------------- */
-.sun-editor .se-list-layer {display:none; position:absolute; top:37px; z-index:4; left:1px; border:1px solid #bababa; border-radius:4px; padding:6px 0; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
+.sun-editor .se-submenu {overflow-x:hidden; overflow-y:auto;}
+.sun-editor .se-list-layer {display:none; position:absolute; top:0px; left:0px; height:auto; z-index:5; border:1px solid #bababa; border-radius:4px; padding:6px 0; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
 .sun-editor .se-list-layer .se-list-inner {padding:0; margin:0; overflow-x:initial; overflow-y:initial; overflow:visible;}
 .sun-editor .se-list-layer button {margin:0; width:100%;}
 /* submenu layer - common list form */
@@ -161,46 +179,44 @@
 .sun-editor .se-list-inner .se-list-basic li button.active {background-color:#80bdff; border:1px solid #3f9dff; border-left:0; border-right:0;}
 .sun-editor .se-list-inner .se-list-basic li button.active:active {background-color:#3f9dff; border:1px solid #4592ff; border-left:0; border-right:0; -webkit-box-shadow:inset 0 3px 5px #4592ff; box-shadow:inset 0 3px 5px #4592ff;}
 /* submenu layer - list button */
-.sun-editor .se-btn-list {width:100%; height:auto; min-height:32px; max-height:100px; padding:0 14px; cursor:pointer; font-size:12px; line-height:normal; text-indent:0; text-decoration:none; text-align:left;}
+.sun-editor .se-btn-list {width:100%; height:auto; min-height:32px; padding:0 14px; cursor:pointer; font-size:12px; line-height:normal; text-indent:0; text-decoration:none; text-align:left;}
 .sun-editor .se-btn-list.default_value {background-color:#f3f3f3; border-top:1px dotted #b1b1b1; border-bottom:1px dotted #b1b1b1;}
 .sun-editor .se-btn-list:hover, .sun-editor .se-btn-list:focus {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
 .sun-editor .se-btn-list:active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
 /** --- submenu layer - se-list-inner > exception */
-/* submenu layer - font family */
-.sun-editor .se-list-layer .se-list-font-family {min-width:156px;}
-.sun-editor .se-list-layer .se-list-font-family .default {border-bottom:1px solid #CCC;}
-/** submenu layer - format block */
-.sun-editor .se-list-layer .se-list-format {min-width:156px;}
-.sun-editor .se-list-layer .se-list-format li {padding:0; width:100%;}
-.sun-editor .se-list-layer .se-list-format .se-btn-list {line-height:100%;}
-.sun-editor .se-list-layer .se-list-format .se-btn-list[data-value="h1"] {height:40px;}
-.sun-editor .se-list-layer .se-list-format .se-btn-list[data-value="h2"] {height:34px;}
-.sun-editor .se-list-layer .se-list-format p {font-size:13px;}
-.sun-editor .se-list-layer .se-list-format div {font-size:13px;}
-.sun-editor .se-list-layer .se-list-format h1 {font-size:2em; font-weight:bold; color:#333;}
-.sun-editor .se-list-layer .se-list-format h2 {font-size:1.5em; font-weight:bold; color:#333;}
-.sun-editor .se-list-layer .se-list-format h3 {font-size:1.17em; font-weight:bold; color:#333;}
-.sun-editor .se-list-layer .se-list-format h4 {font-size:1em; font-weight:bold; color:#333;}
-.sun-editor .se-list-layer .se-list-format h5 {font-size:0.83em; font-weight:bold; color:#333;}
-.sun-editor .se-list-layer .se-list-format h6 {font-size:0.67em; font-weight:bold; color:#333;}
-.sun-editor .se-list-layer .se-list-format blockquote {font-size:13px; color:#999; height:22px; margin:0; background-color:transparent; line-height:1.5; border-style:solid; border-color:#b1b1b1; padding:0 0 0 7px; border-left-width:5px;}
-.sun-editor .se-list-layer .se-list-format pre {font-size:13px; color:#666; padding:4px 11px; margin:0; background-color:#f9f9f9; border:1px solid #e1e1e1; border-radius:4px;}
 /* submenu layer - font size */
-.sun-editor .se-list-layer .se-list-font-size {min-width:140px; max-height:300px; overflow-x:hidden; overflow-y:auto;}
+.sun-editor .se-list-layer.se-list-font-size {min-width:140px; max-height:300px;}
+/* submenu layer - font family */
+.sun-editor .se-list-layer.se-list-font-family {min-width:156px;}
+.sun-editor .se-list-layer.se-list-font-family .default {border-bottom:1px solid #CCC;}
 /* submenu layer - hr */
-.sun-editor .se-list-layer .se-list-line {width:125px;}
+.sun-editor .se-list-layer.se-list-line {width:125px;}
 /* submenu layer - align */
-.sun-editor .se-list-layer .se-list-align {left:9px; width:125px;}
-/* submenu layer - paragraph style, text style */
-.sun-editor .se-list-layer .se-list-format div {padding:4px 2px;}
+.sun-editor .se-list-layer.se-list-align .se-list-inner {left:9px; width:125px;}
+/** submenu layer - format block, paragraph style, text style */
+.sun-editor .se-list-layer.se-list-format {min-width:156px;}
+.sun-editor .se-list-layer.se-list-format li {padding:0; width:100%;}
+.sun-editor .se-list-layer.se-list-format ul .se-btn-list {line-height:100%;}
+.sun-editor .se-list-layer.se-list-format ul .se-btn-list[data-value="h1"] {height:40px;}
+.sun-editor .se-list-layer.se-list-format ul .se-btn-list[data-value="h2"] {height:34px;}
+.sun-editor .se-list-layer.se-list-format ul p {font-size:13px;}
+.sun-editor .se-list-layer.se-list-format ul div {font-size:13px; padding:4px 2px;}
+.sun-editor .se-list-layer.se-list-format ul h1 {font-size:2em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer.se-list-format ul h2 {font-size:1.5em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer.se-list-format ul h3 {font-size:1.17em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer.se-list-format ul h4 {font-size:1em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer.se-list-format ul h5 {font-size:0.83em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer.se-list-format ul h6 {font-size:0.67em; font-weight:bold; color:#333;}
+.sun-editor .se-list-layer.se-list-format ul blockquote {font-size:13px; color:#999; height:22px; margin:0; background-color:transparent; line-height:1.5; border-style:solid; border-color:#b1b1b1; padding:0 0 0 7px; border-left-width:5px;}
+.sun-editor .se-list-layer.se-list-format ul pre {font-size:13px; color:#666; padding:4px 11px; margin:0; background-color:#f9f9f9; border:1px solid #e1e1e1; border-radius:4px;}
 /* submenu layer --- table selector */
-.sun-editor .se-selector-table {display:none; position:absolute; top:34px; left:1px; z-index:4; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:4px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
+.sun-editor .se-selector-table {display:none; position:absolute; top:34px; left:1px; z-index:5; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:4px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
 .sun-editor .se-selector-table .se-table-size {font-size:18px; padding:0 5px;}
 .sun-editor .se-selector-table .se-table-size-picker {position:absolute !important; z-index:3; font-size:18px; width:10em; height:10em; cursor:pointer;}
 .sun-editor .se-selector-table .se-table-size-highlighted {position:absolute !important; z-index:2; font-size:18px; width:1em; height:1em; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAAZdEVYdFNvZnR3YXJlAEFkb2JlIEltYWdlUmVhZHlxyWU8AAADJmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo4QTZCNzMzN0I3RUYxMUU4ODcwQ0QwMjM1NTgzRTJDNyIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo4QTZCNzMzNkI3RUYxMUU4ODcwQ0QwMjM1NTgzRTJDNyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxOCAoV2luZG93cykiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo0MzYyNEUxRUI3RUUxMUU4ODZGQzgwRjNBODgyNTdFOSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0MzYyNEUxRkI3RUUxMUU4ODZGQzgwRjNBODgyNTdFOSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pl0yAuwAAABBSURBVDhPY/wPBAxUAGCDGvdBeWSAeicIDTfIXREiQArYeR9hEBOEohyMGkQYjBpEGAxjg6ib+yFMygCVvMbAAABj0hwMTNeKJwAAAABJRU5ErkJggg==') repeat;}
 .sun-editor .se-selector-table .se-table-size-unhighlighted {position:relative !important; z-index:1; font-size:18px; width:10em; height:10em; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIj4+Pjp6ekKlAqjAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKhmnaJzPAAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat;}
 .sun-editor .se-selector-table .se-table-size-display {padding-left:5px;}
-/* submenu layer - color selector */
+/* submenu layer --- color selector button */
 .sun-editor .se-list-layer .se-selector-color {display:flex; width:max-content; max-width:270px; height:auto; padding:0; margin:auto;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet {width:100%; height:100%; padding:0;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet li {display:flex; float:left; position:relative; margin:0;}
@@ -247,6 +263,8 @@
 .sun-editor .se-dialog .se-dialog-inner {position:absolute; width:100%; height:100%; top:0; left:0;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-content {position:relative; width:auto; max-width:500px; margin:20px auto; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:4px; outline:0; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5);}
 @media screen and (max-width:509px) { .sun-editor .se-dialog .se-dialog-inner .se-dialog-content {width:100%;} }
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-content label {display:inline-block; max-width:100%; margin-bottom:5px; font-weight:bold;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-content .se-btn-primary {display:inline-block; padding:6px 12px; margin:0 0 10px 0 !important; font-size:14px; font-weight:normal; line-height:1.42857143; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation; border-radius:4px;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-header {height:50px; padding:6px 15px 6px 15px; border-bottom:1px solid #e5e5e5;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-header .se-dialog-close {float:right; font-weight:bold; text-shadow:0 1px 0 #fff; -webkit-appearance:none; filter:alpha(opacity=100); opacity:1;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-header .se-modal-title {font-size:14px; font-weight:bold; margin:0; padding:0; line-height:2.5;}
@@ -258,8 +276,6 @@
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-size-text .size-w {width:70px; text-align:center;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-size-text .size-h {width:70px; text-align:center;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-size-x {margin:0 8px 0 8px; width:25px; text-align:center;}
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-content label {display:inline-block; max-width:100%; margin-bottom:5px; font-weight:bold;}
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-content .se-btn-primary {display:inline-block; padding:6px 12px; margin:0 0 10px 0 !important; font-size:14px; font-weight:normal; line-height:1.42857143; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation; border-radius:4px;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-footer {padding:10px 15px 0px 15px; text-align:right; border-top:1px solid #e5e5e5;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-footer > div {float:left;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-footer > div > label {margin-top:5px;}
@@ -270,7 +286,7 @@
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files {position:relative; display:flex; align-items:center;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files > input {flex:auto;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files .se-dialog-files-edge-button {flex:auto; opacity:0.8; border:1px solid #ccc;}
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files .se-dialog-files-edge-button > svg {width:8px; height:8px;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files .se-dialog-files-edge-button.__se__file_remove > svg {width:8px; height:8px;} /* custom."remove icon" */
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files .se-dialog-files-edge-button:hover {background-color:#f0f0f0; outline:0 none;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files .se-dialog-files-edge-button:active {background-color:#e9e9e9; -webkit-box-shadow:inset 0 3px 5px #d6d6d6; box-shadow:inset 0 3px 5px #d6d6d6;}
 /* dialog - modal - input */
@@ -320,7 +336,7 @@
 /* controller - resizing(image, iframe) */
 .sun-editor .se-controller-resizing {margin-top:-50px !important; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-controller-resizing .se-btn-group .se-btn-group-sub.se-resizing-align-list {left:57px; width:74px;}
-.sun-editor .se-resizing-container {position:absolute; display:none; border:1px solid #80bdff; background-color:transparent;}
+.sun-editor .se-resizing-container {position:absolute; display:none; outline:1px solid #3f9dff; background-color:transparent;}
 .sun-editor .se-resizing-container .se-modal-resize {position:absolute; display:inline-block; background-color:#3f9dff; opacity:0.3;}
 .sun-editor .se-resizing-container .se-resize-dot {position:absolute; top:0px; left:0px; width:100%; height:100%}
 .sun-editor .se-resizing-container .se-resize-dot > span {position:absolute; width:7px; height:7px; background-color:#3f9dff; border:1px solid #4592ff;}
@@ -342,8 +358,45 @@
 .sun-editor .se-controller-link .link-content {padding:0; margin:0;}
 .sun-editor .se-controller-link .link-content a {display:inline-block; color:#4592ff; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}
 
+/* --- browser ---------------------------------------------------------- */
+.sun-editor .se-file-browser {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
+.sun-editor .se-file-browser label, .sun-editor .se-file-browser input, .sun-editor .se-file-browser button {font-size:14px; line-height:1.5; color:#111; margin:0;}
+.sun-editor .se-file-browser .se-file-browser-back {position:absolute; display:block; width:100%; height:100%; top:0; left:0; background-color:#222; opacity:0.5;}
+.sun-editor .se-file-browser .se-file-browser-inner {position:absolute; display:block; width:100%; height:100%; top:0; left:0;}
+.sun-editor .se-file-browser .se-file-browser-inner .se-file-browser-content {position:relative; width:960px; max-width:100%; margin:20px auto; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:4px; outline:0; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5);}
+/* --- browser - header */
+.sun-editor .se-file-browser .se-file-browser-header {height:auto; min-height:50px; padding:6px 15px 6px 15px; border-bottom:1px solid #e5e5e5;}
+.sun-editor .se-file-browser .se-file-browser-header .se-file-browser-close {float:right; font-weight:bold; text-shadow:0 1px 0 #fff; -webkit-appearance:none; filter:alpha(opacity=100); opacity:1;}
+.sun-editor .se-file-browser .se-file-browser-header .se-file-browser-title {font-size:16px; font-weight:bold; margin:0; padding:0; line-height:2.2;}
+/* --- browser - header - tags */
+.sun-editor .se-file-browser .se-file-browser-tags {display:block; width:100%; padding:0; text-align:left; margin:0 -15px;}
+.sun-editor .se-file-browser .se-file-browser-tags a {display:inline-block; background-color:#f5f5f5; padding:6px 12px; margin:8px 0 8px 8px; color:#333; text-decoration:none; border-radius:32px; -moz-border-radius:32px; -webkit-border-radius:32px; -moz-background-clip:padding; -webkit-background-clip:padding-box; background-clip:padding-box; cursor:pointer;}
+.sun-editor .se-file-browser .se-file-browser-tags a:hover {background-color:#e1e1e1;}
+.sun-editor .se-file-browser .se-file-browser-tags a:active {background-color:#d1d1d1;}
+.sun-editor .se-file-browser .se-file-browser-tags a.on {background-color:#ebf3fe; color:#4592ff;}
+.sun-editor .se-file-browser .se-file-browser-tags a.on:hover {background-color:#d8e8fe;}
+.sun-editor .se-file-browser .se-file-browser-tags a.on:active {background-color:#c7deff;}
+/* --- browser - body */
+.sun-editor .se-file-browser .se-file-browser-body {position:relative; height:auto; min-height:350px; padding:20px; overflow-y:auto;}
+.sun-editor .se-file-browser .se-file-browser-body .se-file-browser-list {position:relative; width:100%;}
+@media screen and (max-width:992px) { .sun-editor .se-file-browser .se-file-browser-inner .se-file-browser-content {width:748px;} }
+@media screen and (max-width:768px) { .sun-editor .se-file-browser .se-file-browser-inner .se-file-browser-content {width:600px;} }
+/* --- browser - column */
+.sun-editor .se-file-browser .se-file-browser-list .se-file-item-column {position:relative; display:block; height:auto; float:left;}
+
+/* --- browser --- custom - "se-image-list" - column */
+.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {width:calc(25% - 20px); margin:0 10px;}
+@media screen and (max-width:992px) { .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {width:calc(33% - 20px);} }
+@media screen and (max-width:768px) { .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {width:calc(50% - 20px);} }
+/* --- browser --- custom - "se-image-list" - item */
+.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img {position:relative; display:flex; cursor: pointer; width:100%; height:auto; border-radius:4px; outline:0; margin:10px 0;}
+.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img:hover {opacity:0.8; -webkit-box-shadow:0 0 0 0.2rem #1f7cff; box-shadow:0 0 0 0.2rem #1f7cff;}
+.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img > img {position:relative; display:block; width:100%; border-radius:4px; outline:0; height:auto;}
+.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img > .se-file-img-name {position: absolute; font-size:13px; color:#fff; bottom:0; padding:5px 10px; background-color:transparent; width:100%; height:30px; border-bottom-right-radius:4px; border-bottom-left-radius:4px;}
+.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img > .se-file-img-name.se-file-name-back {background-color:#333; opacity:0.6;}
+
 /** --- notice */
-.sun-editor .se-notice {position:absolute; top:0; display:none; width:100%; height:auto; word-break:break-all; font-size:13px; color:#b94a48; background-color:#f2dede; padding:15px; margin:0; border:1px solid #eed3d7; user-select:text; -o-user-select:text; -moz-user-select:text; -khtml-user-select:text; -webkit-user-select:text; -ms-user-select:text;}
+.sun-editor .se-notice {position:absolute; top:0; display:none; z-index:7; width:100%; height:auto; word-break:break-all; font-size:13px; color:#b94a48; background-color:#f2dede; padding:15px; margin:0; border:1px solid #eed3d7; user-select:text; -o-user-select:text; -moz-user-select:text; -khtml-user-select:text; -webkit-user-select:text; -ms-user-select:text;}
 .sun-editor .se-notice button {float:right; padding:7px;}
 
 /** --- tooltip */
@@ -355,4 +408,4 @@
 
 /** animation */
 @keyframes blinker { 50% {opacity:0;} }
-@keyframes spinner { to {transform:rotate(360deg);} }
+@keyframes spinner { to {transform:rotate(361deg);} }

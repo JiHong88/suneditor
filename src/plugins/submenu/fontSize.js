@@ -38,11 +38,11 @@ export default {
         const lang = this.lang;
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'se-submenu se-list-layer';
+        listDiv.className = 'se-submenu se-list-layer se-list-font-size';
 
         const sizeList = !option.fontSize ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : option.fontSize;
 
-        let list = '<div class="se-list-inner se-list-font-size">' +
+        let list = '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
                     '<li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
         for (let i = 0, unit = option.fontSizeUnit, len = sizeList.length, size; i < len; i++) {

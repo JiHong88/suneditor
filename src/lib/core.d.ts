@@ -322,10 +322,8 @@ interface Core {
     appendFormatTag(element: Element, formatNode?: string | Element): Element;
 
     /**
-     * @description The method to insert a element. (used elements : table, hr, image, video)
-     * This method is add the element next line and insert the new line.
-     * When used in a tag in "LI", it is inserted into the LI tag.
-     * Returns the first node of next line added.
+     * @description The method to insert a element and return. (used elements : table, hr, image, video)
+     * If "element" is "HR", insert and return the new line.
      * @param element Element to be inserted
      * @param notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
      * @returns
@@ -613,7 +611,7 @@ export default class SunEditor {
      * @param core Core object
      * @returns
      */
-    onImageUploadBefore: (files: any[], info: imageInputInformation, core: Core) => boolean;
+    onImageUploadBefore: (files: any[], info: imageInputInformation, core: Core) => boolean | any[];
 
     /**
      * @description Called before the video is uploaded
@@ -623,7 +621,7 @@ export default class SunEditor {
      * @param core Core object
      * @returns
      */
-    onVideoUploadBefore: (files: any[], info: videoInputInformation, core: Core) => boolean;
+    onVideoUploadBefore: (files: any[], info: videoInputInformation, core: Core) => boolean | any[];
 
     /**
      * @description Called before the audio is uploaded
@@ -633,7 +631,7 @@ export default class SunEditor {
      * @param core Core object
      * @returns
      */
-    onAudioUploadBefore: (files: any[], info: audioInputInformation, core: Core) => boolean;
+    onAudioUploadBefore: (files: any[], info: audioInputInformation, core: Core) => boolean | any[];
 
     /**
      * @description Called when the image is uploaded, updated, deleted
@@ -715,6 +713,13 @@ export default class SunEditor {
      * @returns
      */
     onAudioUploadError: (errorMessage: string, result: any, core: Core) => boolean;
+
+    /**
+     * @description Reset the buttons on the toolbar. (Editor is not reloaded)
+     * You cannot set a new plugin for the button.
+     * @param buttonList Button list 
+     */
+    setToolbarButtons(buttonList: Array): void;
 
     /**
      * @description Add or reset option property

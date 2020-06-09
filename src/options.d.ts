@@ -37,6 +37,12 @@ export interface SunEditorOptions {
      */
     toolbarWidth?: string;
     /**
+     * A custom HTML selector placing the toolbar inside.
+     The class name of the element must be 'sun-editor'.
+     Element or querySelector argument.
+     */
+    toolbarContainer?: HTMLElement | string;
+    /**
      * Reference height value that should be changed to sticky toolbar mode
      */
     stickyToolbar?: number;
@@ -232,6 +238,12 @@ export interface SunEditorOptions {
      */
     imageUploadSizeLimit?: number;
     /**
+     * Image - image gallery
+     * =====
+     * The url of the image gallery, if you use the image gallery
+     */
+    imageGalleryUrl?: string;
+    /**
      * Video
      * =====
      */
@@ -339,6 +351,16 @@ export interface SunEditorOptions {
      */
     tableCellControllerPosition?: string;
     /**
+     * Key actions
+     * =====
+     */
+    /**
+     * If true, disables the interaction of the editor and tab key
+     */
+    tabDisable?: boolean;
+    shortcutsDisable?: string[];
+    shortcutsHint?: boolean;
+    /**
      * Defining save button
      * ====================
      */
@@ -418,5 +440,6 @@ export type ButtonListDefaults =
   | 'link'
   | 'image'
   | 'video'
-  | 'math';
-export type ButtonListItem = ButtonListDefaults | ButtonListDefaults[];
+  | 'math'
+  | 'imageGallery';
+export type ButtonListItem = ButtonListDefaults | ButtonListDefaults[] | string[];

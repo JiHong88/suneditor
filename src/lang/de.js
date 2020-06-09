@@ -57,6 +57,7 @@
             math: 'Mathematik',
             image: 'Bild',
             video: 'Video',
+            audio: 'Audio',
             fullScreen: 'Vollbild',
             showBlocks: 'Blockformatierungen anzeigen',
             codeView: 'Quelltext anzeigen',
@@ -72,7 +73,8 @@
             template: 'Vorlage',
             lineHeight: 'Zeilenhöhe',
             paragraphStyle: 'Absatzstil',
-            textStyle: 'Textstil'
+            textStyle: 'Textstil',
+            imageGallery: 'Bildergalerie'
         },
         dialogBox: {
             linkBox: {
@@ -102,6 +104,10 @@
                 title: 'Audio enfügen',
                 file: 'Datei auswählen',
                 url: 'Audio-URL'
+            },
+            browser: {
+                tags: 'Stichworte',
+                search: 'Suche',
             },
             caption: 'Beschreibung eingeben',
             close: 'Schließen',

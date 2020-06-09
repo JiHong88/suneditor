@@ -57,6 +57,7 @@
             math: '수식',
             image: '이미지',
             video: '동영상',
+            audio: '오디오',
             fullScreen: '전체 화면',
             showBlocks: '블록 보기',
             codeView: 'HTML 편집',
@@ -72,7 +73,8 @@
             template: '템플릿',
             lineHeight: '줄 높이',
             paragraphStyle: '문단 스타일',
-            textStyle: '글자 스타일'
+            textStyle: '글자 스타일',
+            imageGallery: '이미지 갤러리'
         },
         dialogBox: {
             linkBox: {
@@ -102,6 +104,10 @@
                 title: '오디오 삽입',
                 file: '파일 선택',
                 url: '오디오 파일 주소'
+            },
+            browser: {
+                tags: '태그',
+                search: '검색',
             },
             caption: '설명 넣기',
             close: '닫기',

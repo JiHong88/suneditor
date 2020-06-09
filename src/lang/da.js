@@ -60,6 +60,7 @@
             math: 'Math',
             image: 'Billede',
             video: 'Video',
+            audio: 'Audio',
             fullScreen: 'Fuld skærm',
             showBlocks: 'Vis blokke',
             codeView: 'Vis koder',
@@ -75,7 +76,8 @@
             template: 'Schablone',
             lineHeight: 'Linjehøjde',
             paragraphStyle: 'Afsnitstil',
-            textStyle: 'Tekststil'
+            textStyle: 'Tekststil',
+            imageGallery: 'Billedgalleri'
         },
         dialogBox: {
             linkBox: {
@@ -105,6 +107,10 @@
                 title: 'Indsæt Audio',
                 file: 'Indsæt fra fil',
                 url: 'Indsæt fra URL'
+            },
+            browser: {
+                tags: 'Tags',
+                search: 'Søg',
             },
             caption: 'Indsæt beskrivelse',
             close: 'Luk',

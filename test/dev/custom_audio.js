@@ -228,6 +228,7 @@ export default {
 
     /**
      * @Override core, fileManager, resizing
+     * @description It is called from core.selectComponent.
      * @param {Element} element Target element
      */
     select: function (element) {

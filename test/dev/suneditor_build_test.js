@@ -7,6 +7,7 @@ import suneditor from '../../src/suneditor';
 import plugins from '../../src/plugins';
 import { ko } from '../../src/lang';
 import lang from '../../src/lang';
+import u from '../../src/lib/util';
 
 import custom_plugin_submenu from './custom_plugin_submenu';
 import custom_plugin_dialog from './custom_plugin_dialog';
@@ -26,20 +27,57 @@ import Katex from 'katex';
 
 const align = require('../../src/plugins/submenu/align')
 
+// const shadow = document.querySelector('#app').attachShadow({ mode: 'open' })
+// const appEl = document.createElement('textarea')
+// const appStyle = document.createElement('style')
+// appStyle.textContent = u.getPageStyle();
+
+// shadow.appendChild(appStyle);
+// shadow.appendChild(appEl);
+// suneditor.create(appEl, {
+//     width: '400px',
+//     height: 500
+// })
+
+const fs = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
+    ];
 
 let ssss = suneditor.create(("sample1"), {
-    plugins: [custom_audio], //[sunEditorNpsButtonBgColor, sunEditorNpsButtonFontColor, sunEditorNpsButtonFontSize],
+    plugins: plugins, //[sunEditorNpsButtonBgColor, sunEditorNpsButtonFontColor, sunEditorNpsButtonFontSize],
     // font: [
     //     'Arial', 'Impact', 'Georgia', 'tahoma', 'Verdana'
     // ],
+    toolbarContainer: document.getElementById('test_tool2'),
     tabDisable: true,
+    fontSize: fs,
     buttonList: [
-        ['undo', 'redo', 'customAudio', plugins.image],
-        // ['font', 'fontSize'],
-        // ['fontColor', 'bold', 'underline', 'italic'],
-        // ['align'],
-        // ['link'],
-        // ['table'],
+        ['align'],
+        ['-right', 'link'],
+        ['-right', 'table'],
+        ['-right', ':more1-More Text-default.more_text', 'font', 'fontSize', 'formatBlock'],
+        [':more2-More Text-default.more_paragraph', 'fontColor', 'bold', 'underline', 'italic'],
+        [':more3-More Text-default.more_plus', 'undo', 'redo', 'image'],
         // [{
         //         name: 'npsButtonBgColor',
         //         dataCommand: 'npsButtonBgColor',
@@ -65,18 +103,39 @@ let ssss = suneditor.create(("sample1"), {
         //         innerHTML: NPS_FONT_SIZE_ICON
         //     }
         // ],
-        ['codeView', 'preview']
+        ['%510', [
+            [':moreText-More Text-default.more_paragraph', 'undo', 'redo', 'image'],
+            [':command2-title2-text.Insert', 'codeView', 'preview', 'font', 'fontSize', 'formatBlock'],
+            ['outdent', 'indent'],
+        ]]
     ],
     // lang: langToUse
 });
 
-ssss.setContents('dddddd')
+// ssss.disabled();
 
+// ssss.setContents(`<p><br /></p><div class="se-component se-image-container __se__float-none"><img src="http://suneditor.com/docs/cat.jpg" alt="" style="" /></div><p><br /></p>`)
+
+
+suneditor.create('scrolleditor', {
+    plugins: plugins,
+    // mode: 'balloon-always',
+    katex: Katex,
+    fontSize: fs,
+    // attributesWhitelist: 'style',
+    buttonList: [
+        ['font', 'fontSize', 'formatBlock'],
+    ],
+})
 
 let s1 = suneditor.create('editor', {
     plugins: plugins,
     mode: 'balloon-always',
     katex: Katex,
+    fontSize: fs,
+    resizingBar: true,
+    height: '500px',
+    shortcutsDisable: ['bold'],
     // attributesWhitelist: 'style',
     buttonList: [
         ['undo', 'redo',
@@ -90,7 +149,12 @@ let s1 = suneditor.create('editor', {
         'align', 'horizontalRule', 'lineHeight',
         'table', 'link', 'image', 'video', 'math',
         'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print', 'save', 'template']
+        'preview', 'print', 'save', 'template'],
+        ['%510', [
+            [':moreText-More Text-default.more_horizontal', 'undo', 'redo', 'image'],
+            [':command2-title2-text.Insert', 'codeView', 'preview'],
+            ['outdent', 'indent'],
+        ]]
     ],
     imageFileInput: false,
     icons: {
@@ -98,7 +162,6 @@ let s1 = suneditor.create('editor', {
         bold: '<span class="se-icon-text">B</span>'
     },
     width: '100%',
-    height: '200px',
     defaultStyle: 'font-size: 10px;',
     // fullPage: true,
     // pasteTagsWhitelist: 'p|h[1-6]',
@@ -203,8 +266,10 @@ window.cm = CodeMirror
 // });
 
 window.sun_destroy1 = function () {
-    // s1.destroy()
-    s1.setDefaultStyle('height: 100px; font-family: cursive; font-size: 10px;');
+    s1.destroy()
+
+    // s1.setDefaultStyle('height: 100px; font-family: cursive; font-size: 10px;');
+
     // s1.setContents('<!DOCTYPE html>'+
     // '<html lang="en">'+
     // '<head>'+
@@ -225,12 +290,12 @@ window.sun_destroy1 = function () {
 
 window.sun_create1 = function () {
     // s1.destroy();
-    // s1 = suneditor.create('editor', {
-    //     plugins: [align, plugins.link],
-    //     buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'removeFormat', 'codeView']],
-    //     width: '100%',
-    //     height: 'auto'
-    //   })
+    s1 = suneditor.create('editor', {
+        plugins: [align, plugins.link],
+        buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'removeFormat', 'codeView']],
+        width: '100%',
+        height: 'auto'
+      })
 }
 
 s1.onKeyDown = function (e, core) {
@@ -246,10 +311,12 @@ s1.onKeyDown = function (e, core) {
 }
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
-    // lang: lang.ko,
+    lang: lang.ko,
     plugins: plugins,
     height: '500px',
-    // mode: 'balloon-always',
+    // fontSize: fs,
+    // mode: 'inline',
+    shortcutsDisable: ['bold', 'underline'],
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',
@@ -261,7 +328,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'align', 'horizontalRule', 'list', 'lineHeight',
         'table', 
         'link', 'image', 'video', 'audio', 'math',
-        'fullScreen', 'showBlocks', 'codeView',
+        'fullScreen', 'showBlocks', 'codeView', 'imageGallery',
         'preview', 'print', 'save', 'template']
     ],
     // maxCharCount: 20,
@@ -269,7 +336,8 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     width: '100%',
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     placeholder: 'SSSFdjskfdsff.f.fdsa.f...',
-    fullPage: true,
+    // fullPage: true,
+    imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     // videoHeight: '56.22%',
     videoRatio: 0.75,
     // imageHeight: 400,
@@ -337,6 +405,7 @@ ss.onKeyUp = function (e) {
 };
 ss.onDrop = function (e) {
     // console.log('onDrop', e);
+    return false;
 };
 ss.onAudioUpload = function (targetElement, index, state, videoInfo) {
     // console.log('targetElement:${targetElement}, index:${index}, state:${state}')
@@ -455,11 +524,16 @@ window.sun_hide = function () {
 }
 
 window.sun_destroy = function () {
-    ss.destroy();
+    // ss.destroy();
+    ss.setToolbarButtons([
+        [':command2-title2-text.Insert', 'codeView', 'preview'],
+        ['outdent', 'indent']
+    ])
 }
 
 window.sun_create = function () {
     ss = suneditor.create('editor1', {
+        plugins: plugins,
         height: 148
     });
 }
@@ -484,9 +558,11 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     // mode: 'inline',
     // toolbarWidth: 150,
     plugins: plugins,
+    fontSize: fs,
     // maxHeight: '400px',
     height: '700px',
     defaultStyle: 'height: 500px; font-size:10px;',
+    imageGalleryUrl: 'http://localhost:3000/editor/gallery',
     // height: 400,
     fontSizeUnit: 'pt',
     imageResizing: true,
@@ -551,6 +627,7 @@ const newOption = {
     mode: 'balloon',
     iframe: false,
     plugins: plugins,
+    fontSize: fs,
     minHeight: '300',
     textSizeUnit: 'pt',
     buttonList: [
@@ -575,6 +652,7 @@ const newOption = {
 const newOption2 = {
     plugins: [plugins.align],
     mode: 'classic',
+    toolbarContainer: document.getElementById('test_tool'),
     maxHeight: '400px',
     height: 150,
     imageWidth: '100%',

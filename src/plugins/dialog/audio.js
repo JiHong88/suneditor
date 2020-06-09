@@ -167,6 +167,8 @@ export default {
 
     /**
      * @Override core, fileManager, resizing
+     * @description It is called from core.selectComponent.
+     * @param {Element} element Target element
      */
     select: function (element) {
         this.plugins.audio.onModifyMode.call(this, element);
@@ -258,7 +260,7 @@ export default {
         if (fileList.length === 0) return;
 
         let fileSize = 0;
-        const files = [];
+        let files = [];
         for (let i = 0, len = fileList.length; i < len; i++) {
             if (/audio/i.test(fileList[i].type)) {
                 files.push(fileList[i]);
@@ -295,7 +297,11 @@ export default {
             element: context._element
         };
 
-        if (typeof this.functions.onAudioUploadBefore === 'function' && !this.functions.onAudioUploadBefore(files, info, this)) return;
+        if (typeof this.functions.onAudioUploadBefore === 'function') {
+            const result = this.functions.onAudioUploadBefore(files, info, this);
+            if (!result) return;
+            if (typeof result === 'object' && result.length > 0) files = result;
+        }
 
         // create formData
         const formData = new FormData();
@@ -355,12 +361,14 @@ export default {
             if (element && element.src !== src) {
                 element.src = src;
             } else {
+                this.selectComponent(element, 'audio');
                 return;
             }
         }
 
         this.plugins.fileManager.setInfo.call(this, 'audio', element, this.functions.onAudioUpload, file, false);
-        this.history.push(false);
+        this.selectComponent(element, 'audio');
+        if (isUpdate) this.history.push(false);
     },
 
     updateCover: function (element) {
@@ -403,7 +411,7 @@ export default {
             controller.firstElementChild.style.left = '20px';
         }
         
-        this.controllersOn(controller, selectionTag, this.plugins.audio.init.bind(this), 'audio');
+        this.controllersOn(controller, selectionTag, this.plugins.audio.onControllerOff.bind(this, selectionTag), 'audio');
 
         this.util.addClass(selectionTag, 'active');
         context._element = selectionTag;
@@ -437,6 +445,11 @@ export default {
         this.controllersOff();
     },
 
+    onControllerOff: function (selectionTag) {
+        this.util.removeClass(selectionTag, 'active');
+        this.context.audio.controller.style.display = 'none';
+    },
+
     /**
      * @Required @Override dialog
      */
@@ -444,13 +457,10 @@ export default {
         if (this.context.dialog.updateModal) return;
         const context = this.context.audio;
 
-        if (context._element) this.util.removeClass(context._element, 'active');
-
         if (context.audioInputFile) context.audioInputFile.value = '';
         if (context.audioUrlFile) context.audioUrlFile.value = '';
         if (context.audioInputFile && context.audioUrlFile) context.audioUrlFile.removeAttribute('disabled');
 
-        context.controller.style.display = 'none';
         context._element = null;
     }
 };

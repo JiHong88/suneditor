@@ -57,6 +57,7 @@
             math: 'Math',
             image: 'Image',
             video: 'Video',
+            audio: 'Audio',
             fullScreen: 'Full screen',
             showBlocks: 'Show blocks',
             codeView: 'Code view',
@@ -72,7 +73,8 @@
             template: 'Template',
             lineHeight: 'Line height',
             paragraphStyle: 'Paragraph style',
-            textStyle: 'Text style'
+            textStyle: 'Text style',
+            imageGallery: 'Image gallery'
         },
         dialogBox: {
             linkBox: {
@@ -102,6 +104,10 @@
                 title: 'Insert Audio',
                 file: 'Select from files',
                 url: 'Audio URL'
+            },
+            browser: {
+                tags: 'Tags',
+                search: 'Search',
             },
             caption: 'Insert description',
             close: 'Close',

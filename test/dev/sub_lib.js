@@ -45,9 +45,9 @@ export default {
         const assigneables = [{name: 'JiHong'}, {name: 'Henry'}]
         assigneables.map(user => userOptions += `<option value="${user.name}">${user.name}</option>`);
 
-        listDiv.className = 'se-list-layer';
+        listDiv.className = 'se-list-layer se-list-align';
         listDiv.innerHTML = '' + 
-            `<div class="se-list-inner se-list-align" style="width: auto;">
+            `<div class="se-list-inner" style="width: auto;">
                <form class="se-submenu-form-group">
                <ul class="se-list-basic">
                    <li><div class="form-group form-material floating" data-plugin="formMaterial"><label class="form-control-label">Action</label><input class="form-control" type="text" style="width: 250px; border-bottom: none; text-transform: none;" /></div></li>

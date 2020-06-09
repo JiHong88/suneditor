@@ -23,7 +23,7 @@ export default {
         let listDiv = this.setSubmenu.call(core);
 
         /** add event listeners */
-        listDiv.querySelector('.se-list-font-family').addEventListener('click', this.pickup.bind(core));
+        listDiv.querySelector('.se-list-inner').addEventListener('click', this.pickup.bind(core));
 
         context.font._fontList = listDiv.querySelectorAll('ul li button');
 
@@ -39,7 +39,7 @@ export default {
         const lang = this.lang;
         const listDiv = this.util.createElement('DIV');
 
-        listDiv.className = 'se-list-layer';
+        listDiv.className = 'se-submenu se-list-layer se-list-font-family';
 
         let font, text, i, len;
         let fontList = !option.font ?
@@ -54,7 +54,7 @@ export default {
                 'Verdana'
             ] : option.font;
 
-        let list = '<div class="se-submenu se-list-inner se-list-font-family">' +
+        let list = '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
                     '<li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
         for (i = 0, len = fontList.length; i < len; i++) {

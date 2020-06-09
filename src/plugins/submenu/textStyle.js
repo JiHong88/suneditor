@@ -35,7 +35,7 @@ export default {
     setSubmenu: function () {
         const option = this.context.option;
         const listDiv = this.util.createElement('DIV');
-        listDiv.className = 'se-submenu se-list-layer';
+        listDiv.className = 'se-submenu se-list-layer se-list-format';
 
         const defaultList = {
             translucent: {
@@ -51,7 +51,7 @@ export default {
         };
         const styleList = !option.textStyles ? ['translucent', 'shadow'] : option.textStyles;
 
-        let list = '<div class="se-list-inner"><ul class="se-list-basic se-list-format">';
+        let list = '<div class="se-list-inner"><ul class="se-list-basic">';
         for (let i = 0, len = styleList.length, t, tag, name, attrs, command, value, _class; i < len; i++) {
             t = styleList[i];
             attrs = '', value = '', command = [];

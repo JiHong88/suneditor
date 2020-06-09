@@ -57,6 +57,7 @@
             math: 'Matematica',
             image: 'Immagine',
             video: 'Video',
+            audio: 'Audio',
             fullScreen: 'Tutto Schermo',
             showBlocks: 'Visualizza Blocchi',
             codeView: 'Visualizza Codice',
@@ -72,7 +73,8 @@
             template: 'Template',
             lineHeight: 'Altezza linea',
             paragraphStyle: 'Stile Paragrafo',
-            textStyle: 'Stile Testo'
+            textStyle: 'Stile Testo',
+            imageGallery: 'Galleria di immagini'
         },
         dialogBox: {
             linkBox: {
@@ -102,6 +104,10 @@
                 title: 'Insertar Audio',
                 file: 'Seleziona da file',
                 url: 'Indirizzo audio'
+            },
+            browser: {
+                tags: 'tag',
+                search: 'Ricerca',
             },
             caption: 'Inserisci descrizione',
             close: 'ClChiudiose',
