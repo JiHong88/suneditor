@@ -317,11 +317,14 @@ export default {
 
         try {
             if (contextVideo.videoInputFile && contextVideo.videoInputFile.files.length > 0) {
+                this.showLoading();
                 videoPlugin.submitAction.call(this, this.context.video.videoInputFile.files);
             } else if (contextVideo.videoUrlFile && contextVideo.videoUrlFile.value.trim().length > 0) {
+                this.showLoading();
                 videoPlugin.setup_url.call(this);
             }
         } catch (error) {
+            this.closeLoading();
             throw Error('[SUNEDITOR.video.submit.fail] cause : "' + error.message + '"');
         } finally {
             this.plugins.dialog.close.call(this);
@@ -351,6 +354,7 @@ export default {
             }
 
             if ((fileSize + infoSize) > limitSize) {
+                this.closeLoading();
                 const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable total videos: ' + (limitSize/1000) + 'KB';
                 if (this.functions.onVideoUploadError !== 'function' || this.functions.onVideoUploadError(err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize }, this)) {
                     this.functions.noticeOpen(err);
@@ -361,8 +365,6 @@ export default {
 
         const contextVideo = this.context.video;
         contextVideo._uploadFileLength = files.length;
-        const videoUploadUrl = this.context.option.videoUploadUrl;
-        const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
         const info = {
             inputWidth: contextVideo.inputX.value,
@@ -374,9 +376,19 @@ export default {
 
         if (typeof this.functions.onVideoUploadBefore === 'function') {
             const result = this.functions.onVideoUploadBefore(files, info, this);
-            if (!result) return;
+            if (!result) {
+                this.closeLoading();
+                return;
+            }
             if (typeof result === 'object' && result.length > 0) files = result;
         }
+
+        this.plugins.video.upload.call(this, info, files);
+    },
+
+    upload: function (info, files) {
+        const videoUploadUrl = this.context.option.videoUploadUrl;
+        const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
         // server upload
         if (typeof videoUploadUrl === 'string' && videoUploadUrl.length > 0) {
@@ -414,7 +426,6 @@ export default {
 
     setup_url: function () {
         try {
-            this.showLoading();
             const contextVideo = this.context.video;
             let oIframe = null;
             let url = contextVideo.videoUrlFile.value.trim();

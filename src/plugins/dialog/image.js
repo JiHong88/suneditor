@@ -353,11 +353,14 @@ export default {
             }
             
             if (contextImage.imgInputFile && contextImage.imgInputFile.files.length > 0) {
+                this.showLoading();
                 imagePlugin.submitAction.call(this, this.context.image.imgInputFile.files);
             } else if (contextImage.imgUrlFile && contextImage.imgUrlFile.value.trim().length > 0) {
+                this.showLoading();
                 imagePlugin.onRender_imgUrl.call(this);
             }
         } catch (error) {
+            this.closeLoading();
             throw Error('[SUNEDITOR.image.submit.fail] cause : "' + error.message + '"');
         } finally {
             this.plugins.dialog.close.call(this);
@@ -387,6 +390,7 @@ export default {
             }
 
             if ((fileSize + infoSize) > limitSize) {
+                this.closeLoading();
                 const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + (limitSize/1000) + 'KB';
                 if (this.functions.onImageUploadError !== 'function' || this.functions.onImageUploadError(err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize }, this)) {
                     this.functions.noticeOpen(err);
@@ -397,9 +401,7 @@ export default {
 
         const contextImage = this.context.image;
         contextImage._uploadFileLength = files.length;
-        const imageUploadUrl = this.context.option.imageUploadUrl;
-        const filesLen = this.context.dialog.updateModal ? 1 : files.length;
-
+        
         const info = {
             linkValue: contextImage._linkValue,
             linkNewWindow: contextImage.imgLinkNewWindowCheck.checked,
@@ -412,9 +414,19 @@ export default {
 
         if (typeof this.functions.onImageUploadBefore === 'function') {
             const result = this.functions.onImageUploadBefore(files, info, this);
-            if (!result) return;
+            if (!result) {
+                this.closeLoading();
+                return;
+            }
             if (this._w.Array.isArray(result) && result.length > 0) files = result;
         }
+
+        this.plugins.image.upload.call(this, info, files);
+    },
+
+    upload: function (info, files) {
+        const imageUploadUrl = this.context.option.imageUploadUrl;
+        const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
         // server upload
         if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
@@ -487,7 +499,6 @@ export default {
         if (contextImage.imgUrlFile.value.trim().length === 0) return false;
 
         try {
-            this.showLoading();
             const file = {name: contextImage.imgUrlFile.value.split('/').pop(), size: 0};
             if (this.context.dialog.updateModal) this.plugins.image.update_src.call(this, contextImage.imgUrlFile.value, contextImage._element, file);
             else this.plugins.image.create_image.call(this, contextImage.imgUrlFile.value, contextImage._linkValue, contextImage.imgLinkNewWindowCheck.checked, contextImage.inputX.value, contextImage.inputY.value, contextImage._align, file);

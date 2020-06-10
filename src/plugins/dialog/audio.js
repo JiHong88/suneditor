@@ -241,13 +241,14 @@ export default {
 
         try {
             if (context.audioInputFile && context.audioInputFile.files.length > 0) {
-                // upload files
+                this.showLoading();
                 this.plugins.audio.submitAction.call(this, context.audioInputFile.files);
             } else if (context.audioUrlFile && context.audioUrlFile.value.trim().length > 0) {
-                // url
+                this.showLoading();
                 this.plugins.audio.setupUrl.call(this, context.audioUrlFile);
             }
         } catch (error) {
+            this.closeLoading();
             throw Error('[SUNEDITOR.audio.submit.fail] cause : "' + error.message + '"');
         } finally {
             this.plugins.dialog.close.call(this);
@@ -277,6 +278,7 @@ export default {
             }
 
             if ((fileSize + infoSize) > limitSize) {
+                this.closeLoading();
                 const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable total audios: ' + (limitSize/1000) + 'KB';
                 if (this.functions.onAudioUploadError !== 'function' || this.functions.onAudioUploadError(err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize }, this)) {
                     this.functions.noticeOpen(err);
@@ -286,11 +288,7 @@ export default {
         }
 
         const context = this.context.audio;
-        const audioPlugin = this.plugins.audio;
-
         context._uploadFileLength = files.length;
-        const audioUploadUrl = this.context.option.audioUploadUrl;
-        const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
         const info = {
             isUpdate: this.context.dialog.updateModal,
@@ -299,9 +297,19 @@ export default {
 
         if (typeof this.functions.onAudioUploadBefore === 'function') {
             const result = this.functions.onAudioUploadBefore(files, info, this);
-            if (!result) return;
+            if (!result) {
+                this.closeLoading();
+                return;
+            }
             if (typeof result === 'object' && result.length > 0) files = result;
         }
+
+        this.plugins.audio.upload.call(this, info, files);
+    },
+
+    upload: function (info, files) {
+        const audioUploadUrl = this.context.option.audioUploadUrl;
+        const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
         // create formData
         const formData = new FormData();
@@ -310,7 +318,7 @@ export default {
         }
 
         // server upload
-        this.plugins.fileManager.upload.call(this, audioUploadUrl, this.context.option.audioUploadHeader, formData, audioPlugin.callBack_upload.bind(this, info), this.functions.onAudioUploadError);
+        this.plugins.fileManager.upload.call(this, audioUploadUrl, this.context.option.audioUploadHeader, formData, this.plugins.audio.callBack_upload.bind(this, info), this.functions.onAudioUploadError);
     },
 
     callBack_upload: function (info, xmlHttp) {
@@ -334,7 +342,6 @@ export default {
 
     setupUrl: function (urlFile) {
         try {
-            this.showLoading();
             const src = urlFile.value.trim();
             if (src.length === 0) return false;
 

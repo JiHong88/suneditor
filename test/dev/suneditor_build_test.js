@@ -407,6 +407,9 @@ ss.onDrop = function (e) {
     // console.log('onDrop', e);
     return false;
 };
+ss.onPaste = function () {
+    return true
+}
 ss.onAudioUpload = function (targetElement, index, state, videoInfo) {
     // console.log('targetElement:${targetElement}, index:${index}, state:${state}')
     console.log('videoInfo-----', videoInfo)
