@@ -5964,6 +5964,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const clipboardData = isIE ? _w.clipboardData : e.clipboardData;
             if (!clipboardData) return true;
 
+            const files = clipboardData.files;
             let plainText, cleanData;
             if (isIE) {
                 plainText = clipboardData.getData('Text');
@@ -5988,18 +5989,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     cleanData = tempDiv.innerHTML;
                     util.removeItem(tempDiv);
                     core.setRange(tempRange.sc, tempRange.so, tempRange.ec, tempRange.eo);
-                    event._setClipboardData(e, plainText, cleanData);
+                    event._setClipboardData(e, plainText, cleanData, files);
                 });
 
                 return true;
             } else {
                 plainText = clipboardData.getData('text/plain');
                 cleanData = clipboardData.getData('text/html');
-                return event._setClipboardData(e, plainText, cleanData);
+                return event._setClipboardData(e, plainText, cleanData, files);
             }
         },
 
-        _setClipboardData: function (e, plainText, cleanData) {
+        _setClipboardData: function (e, plainText, cleanData, files) {
             // MS word
             if (/class=["']*Mso(Normal|List)/i.test(cleanData) || /content=["']*Word.Document/i.test(cleanData) || /content=["']*OneNote.File/i.test(cleanData)) {
                 cleanData = cleanData.replace(/\n/g, ' ');
@@ -6014,6 +6015,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (typeof functions.onPaste === 'function' && !functions.onPaste(e, cleanData, maxCharCount, core)) {
                 e.preventDefault();
                 e.stopPropagation();
+                return false;
+            }
+
+            // files
+            if (files.length > 0 && core.plugins.image) {
+                event._setDropLocationSelection(e);
+                core.callPlugin('image', core.plugins.image.submitAction.bind(core, files), null);
                 return false;
             }
 

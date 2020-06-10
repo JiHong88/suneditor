@@ -407,7 +407,8 @@ ss.onDrop = function (e) {
     // console.log('onDrop', e);
     return false;
 };
-ss.onPaste = function () {
+ss.onPaste = function (e) {
+    console.log('onPaste', e.clipboardData.files)
     return true
 }
 ss.onAudioUpload = function (targetElement, index, state, videoInfo) {
