@@ -88,7 +88,6 @@
     
             let resize_button = this.setController_button.call(core);
             context.resizing.resizeButton = resize_button;
-            resize_button.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
     
             let resize_handles = context.resizing.resizeHandles = context.resizing.resizeDot.querySelectorAll('span');
             context.resizing.resizeButtonGroup = resize_button.querySelector('._se_resizing_btn_group');
@@ -103,6 +102,8 @@
             context.resizing.captionButton = resize_button.querySelector('._se_resizing_caption_button');
     
             /** add event listeners */
+            resize_div_container.addEventListener('mousedown', function (e) { e.preventDefault(); });
+            resize_button.addEventListener('mousedown', core.eventStop);
             resize_handles[0].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
             resize_handles[1].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
             resize_handles[2].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
@@ -758,11 +759,11 @@
          * @param {MouseEvent} e Event object 
          */
         onMouseDown_resize_handle: function (e) {
-            const contextResizing = this.context.resizing;
-            const direction = contextResizing._resize_direction = e.target.classList[0];
-
             e.stopPropagation();
             e.preventDefault();
+            
+            const contextResizing = this.context.resizing;
+            const direction = contextResizing._resize_direction = e.target.classList[0];
     
             contextResizing._resizeClientX = e.clientX;
             contextResizing._resizeClientY = e.clientY;

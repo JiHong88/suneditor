@@ -666,6 +666,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
+         * @description Run event.stopPropagation and event.preventDefault.
+         * @param {Object} e Event Object
+         */
+        eventStop: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        },
+
+        /**
          * @description javascript execCommand
          * @param {String} command javascript execCommand function property
          * @param {Boolean} showDefaultUI javascript execCommand function property

@@ -35,7 +35,7 @@ export default {
         let math_controller = this.setController_MathButton.call(core);
         context.math.mathController = math_controller;
         context.math._mathExp = null;
-        math_controller.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
+        math_controller.addEventListener('mousedown', core.eventStop);
 
         /** add event listeners */
         math_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core), false);

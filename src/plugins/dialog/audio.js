@@ -43,7 +43,7 @@ export default {
         let audio_controller = this.setController.call(core);
         contextAudio.controller = audio_controller;
 
-        audio_controller.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
+        audio_controller.addEventListener('mousedown', core.eventStop);
 
         /** add event listeners */
         audio_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
