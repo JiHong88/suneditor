@@ -727,7 +727,6 @@ export default {
         }
 
         if (openController) {
-            this.plugins.image.init.call(this);
             this.selectComponent(imageEl, 'image');
         }
 
