@@ -5214,7 +5214,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         }
                     }
 
-                    if (event._tableDelete()) {
+                    if (event._hardDelete()) {
                         e.preventDefault();
                         e.stopPropagation();
                         break;
@@ -5369,7 +5369,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         break;
                     }
 
-                    if (event._tableDelete()) {
+                    if (event._hardDelete()) {
                         e.preventDefault();
                         e.stopPropagation();
                         break;
@@ -5936,14 +5936,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             context.element.code.style.height = context.element.code.scrollHeight + 'px';
         },
 
-        // FireFox - table delete
-        _tableDelete: function () {
+        // FireFox - table delete, Chrome - image, video, audio
+        _hardDelete: function () {
             const range = core.getRange();
+            
+            // table
             const sCell = util.getRangeFormatElement(range.startContainer);
             const eCell = util.getRangeFormatElement(range.endContainer);
             const sIsCell = util.isCell(sCell);
             const eIsCell = util.isCell(eCell);
-
             if (((sIsCell && !sCell.previousElementSibling && !sCell.parentElement.previousElementSibling) || (eIsCell && !eCell.nextElementSibling && !eCell.parentElement.nextElementSibling)) && sCell !== eCell) {
                 if (!sIsCell) {
                     util.removeItem(util.getParentElement(eCell, util.isComponent));
@@ -5955,6 +5956,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     return true;
                 }
             }
+
+            // image, video, audio
+            const sComp = util.getParentElement(range.startContainer, '.se-component');
+            const eComp = util.getParentElement(range.endContainer, '.se-component');
+            if (sComp) util.removeItem(sComp);
+            if (eComp) util.removeItem(eComp);
 
             return false;
         },
