@@ -134,7 +134,7 @@ export default {
             const contextLink = this.context.link;
             let url = contextLink.focusElement.value;
 
-            if (contextLink.linkProtocol && url.indexOf('://') === -1 && url.indexOf('#') === -1) {
+            if (contextLink.linkProtocol && url.indexOf('://') === -1 && url.indexOf('#') !== 0) {
                 url = `${contextLink.linkProtocol}${url}`
             }
             
