@@ -20,7 +20,8 @@ export default {
             focusElement: null,
             linkNewWindowCheck: null,
             linkAnchorText: null,
-            _linkAnchor: null
+            _linkAnchor: null,
+            linkProtocol: context.option.linkProtocol
         };
 
         /** link dialog */
@@ -131,7 +132,12 @@ export default {
             if (this.context.link.focusElement.value.trim().length === 0) return false;
 
             const contextLink = this.context.link;
-            const url = contextLink.focusElement.value;
+            let url = contextLink.focusElement.value;
+
+            if (contextLink.linkProtocol && url.indexOf('://') === -1 && url.indexOf('#') === -1) {
+                url = `${contextLink.linkProtocol}${url}`
+            }
+            
             const anchor = contextLink.linkAnchorText;
             const anchorText = anchor.value.length === 0 ? url : anchor.value;
 

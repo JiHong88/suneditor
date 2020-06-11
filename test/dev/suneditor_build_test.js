@@ -71,6 +71,7 @@ let ssss = suneditor.create(("sample1"), {
     toolbarContainer: document.getElementById('test_tool2'),
     tabDisable: true,
     fontSize: fs,
+    linkProtocol: 'https://',
     buttonList: [
         ['align'],
         ['-right', 'link'],
@@ -132,6 +133,7 @@ let s1 = suneditor.create('editor', {
     plugins: plugins,
     mode: 'balloon-always',
     katex: Katex,
+    linkProtocol: 'http://',
     fontSize: fs,
     resizingBar: true,
     height: '500px',

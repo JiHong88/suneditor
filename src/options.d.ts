@@ -16,6 +16,10 @@ export interface SunEditorOptions {
      */
     attributesWhitelist?: Record<string, string>;
     /**
+     * Protocol for the links (if link has been added without any protocol this one will be used).
+     */
+    linkProtocol?: string;
+    /**
      * Layout
      * ======
      */
