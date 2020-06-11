@@ -114,6 +114,7 @@ const util = {
     },
 
     /**
+     * @deprecated
      * @description Get the the tag path of the arguments value
      * If not found, return the first found value
      * @param {Array} nameArray File name array
@@ -158,6 +159,7 @@ const util = {
     },
 
     /**
+     * @deprecated
      * @description Returns the CSS text that has been applied to the current page.
      * @param {Document|null} doc To get the CSS text of an document(core._wd). If null get the current document.
      * @returns {String} Styles string
@@ -1560,7 +1562,7 @@ const util = {
         // remove empty tags
         const emptyTags = this.getListChildNodes(documentFragment, function (current) {
             if (current.nodeType !== 1) return false;
-            return (!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && !util.getParentElement(current, '.katex');
+            return (!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && !this.getParentElement(current, '.katex');
         }.bind(this));
 
         for (let i in emptyTags) {

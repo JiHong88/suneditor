@@ -21,7 +21,7 @@ import 'codemirror/mode/htmlmixed/htmlmixed';
 import CodeMirror from 'codemirror';
 
 
-import 'katex/dist/katex.min.css';
+// import 'katex/dist/katex.min.css';
 import Katex from 'katex';
 
 
@@ -337,6 +337,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     youtubeQuery :'autoplay=1&mute=1&enablejsapi=1',
     placeholder: 'SSSFdjskfdsff.f.fdsa.f...',
     // fullPage: true,
+    iframeCSSFileName: ['.+'],
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     // videoHeight: '56.22%',
     videoRatio: 0.75,

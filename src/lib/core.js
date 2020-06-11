@@ -3962,41 +3962,53 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     '<!DOCTYPE html><html>' +
                     '<head>' +
                     wDoc.head.innerHTML +
-                    '<style>' + util.getPageStyle(wDoc) + '</style>' +
                     '</head>' +
                     '<body ' + arrts + '>' + contentsHTML + '</body>' +
                     '</html>'
                 );
             } else {
-                const contents = util.createElement('DIV');
-                const style = util.createElement('STYLE');
+                const links = _d.head.getElementsByTagName('link');
+                const styles = _d.head.getElementsByTagName('style');
+                let linkHTML = '';
+                for (let i = 0, len = links.length; i < len; i++) {
+                    linkHTML += links[i].outerHTML;
+                }
+                for (let i = 0, len = styles.length; i < len; i++) {
+                    linkHTML += styles[i].outerHTML;
+                }
 
-                style.innerHTML = util.getPageStyle(wDoc);
-                contents.className = 'sun-editor-editable';
-                contents.innerHTML = contentsHTML;
-
-                printDocument.head.appendChild(style);
-                printDocument.body.appendChild(contents);
+                printDocument.write('' +
+                    '<!DOCTYPE html><html>' +
+                    '<head>' +
+                    linkHTML +
+                    '</head>' +
+                    '<body class="sun-editor-editable">' + contentsHTML + '</body>' +
+                    '</html>'
+                );
             }
 
-            try {
-                iframe.focus();
-                // IE or Edge
-                if (util.isIE_Edge || !!_d.documentMode || !!_w.StyleMedia) {
-                    try {
-                        iframe.contentWindow.document.execCommand('print', false, null);
-                    } catch (e) {
+            core.showLoading();
+            _w.setTimeout(function () {
+                try {
+                    iframe.focus();
+                    // IE or Edge
+                    if (util.isIE_Edge || !!_d.documentMode || !!_w.StyleMedia) {
+                        try {
+                            iframe.contentWindow.document.execCommand('print', false, null);
+                        } catch (e) {
+                            iframe.contentWindow.print();
+                        }
+                    } else {
+                        // Other browsers
                         iframe.contentWindow.print();
                     }
-                } else {
-                    // Other browsers
-                    iframe.contentWindow.print();
+                } catch (error) {
+                    throw Error('[SUNEDITOR.core.print.fail] error: ' + error);
+                } finally {
+                    core.closeLoading();
+                    util.removeItem(iframe);
                 }
-            } catch (error) {
-                throw Error('[SUNEDITOR.core.print.fail] error: ' + error);
-            } finally {
-                util.removeItem(iframe);
-            }
+            }, 500);
         },
 
         /**
@@ -4006,6 +4018,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const contentsHTML = this.getContents(true);
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
+            const w = context.element.wysiwygFrame.offsetWidth + 'px !important';
             const wDoc = this._wd;
 
             if (options.iframe) {
@@ -4015,21 +4028,31 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     '<!DOCTYPE html><html>' +
                     '<head>' +
                     wDoc.head.innerHTML +
-                    '<style>body {overflow: auto !important;}</style>' +
+                    '<style>body {overflow:auto !important; width:' + w + '; border:1px solid #ccc; margin: 10px auto !important; height:auto !important;}</style>' +
                     '</head>' +
                     '<body ' + arrts + '>' + contentsHTML + '</body>' +
                     '</html>'
                 );
             } else {
+                const links = _d.head.getElementsByTagName('link');
+                const styles = _d.head.getElementsByTagName('style');
+                let linkHTML = '';
+                for (let i = 0, len = links.length; i < len; i++) {
+                    linkHTML += links[i].outerHTML;
+                }
+                for (let i = 0, len = styles.length; i < len; i++) {
+                    linkHTML += styles[i].outerHTML;
+                }
+                
                 windowObject.document.write('' +
                     '<!DOCTYPE html><html>' +
                     '<head>' +
                     '<meta charset="utf-8" />' +
                     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
                     '<title>' + lang.toolbar.preview + '</title>' +
-                    '<style>' + util.getPageStyle(wDoc) + '</style>' +
+                    linkHTML +
                     '</head>' +
-                    '<body class="sun-editor-editable">' + contentsHTML + '</body>' +
+                    '<body class="sun-editor-editable" style="width:' + w + '; border:1px solid #ccc; margin:10px auto !important; height:auto !important;">' + contentsHTML + '</body>' +
                     '</html>'
                 );
             }
@@ -5001,7 +5024,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         _toggleToolbarBalloon: function () {
             core._editorRange();
             const range = core.getRange();
-            if (core.currentControllerName === 'table' || (!core._isBalloonAlways && range.collapsed)) event._hideToolbar();
+            if (core._bindControllersOff || (!core._isBalloonAlways && range.collapsed)) event._hideToolbar();
             else event._showToolbarBalloon(range);
         },
 

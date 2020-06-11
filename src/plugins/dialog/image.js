@@ -267,7 +267,7 @@ export default {
         this.focusEdge(focusEl);
         
         // event
-        this.plugins.fileManager.deleteInfo.call('image', dataIndex, this.functions.onImageUpload);
+        this.plugins.fileManager.deleteInfo.call(this, 'image', dataIndex, this.functions.onImageUpload);
 
         // history stack
         this.history.push(false);

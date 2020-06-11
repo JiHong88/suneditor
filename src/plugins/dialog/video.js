@@ -241,7 +241,7 @@ export default {
         this.focusEdge(focusEl);
 
         // event
-        this.plugins.fileManager.deleteInfo.call('video', dataIndex, this.functions.onVideoUpload);
+        this.plugins.fileManager.deleteInfo.call(this, 'video', dataIndex, this.functions.onVideoUpload);
 
         // history stack
         this.history.push(false);
