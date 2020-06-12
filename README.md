@@ -681,6 +681,7 @@ templates       : If you use a template plugin, add it.
 
 // ETC------------------------------------------------------------------------------------------------------------
 placeholder     : The placeholder text.                              default: null {String}
+linkProtocol    : Protocol for the links. (if link has been added without any protocol this one will be used). default: null {String}
 icons           : You can redefine icons.                            default: null {Object}
                   ex) {
                       bold: '<span class="se-icon-text">B</span>',
