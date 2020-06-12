@@ -135,7 +135,7 @@ export default {
             let url = contextLink.focusElement.value;
 
             if (contextLink.linkProtocol && url.indexOf('://') === -1 && url.indexOf('#') !== 0) {
-                url = `${contextLink.linkProtocol}${url}`
+                url = `${contextLink.linkProtocol}${url}`;
             }
             
             const anchor = contextLink.linkAnchorText;
