@@ -6053,7 +6053,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             // files
             if (files.length > 0 && core.plugins.image) {
                 event._setDropLocationSelection(e);
-                core.callPlugin('image', core.plugins.image.submitAction.bind(core, files), null);
+                functions.insertImage(files);
                 return false;
             }
 
@@ -6096,7 +6096,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const files = dataTransfer.files;
             if (files.length > 0 && core.plugins.image) {
                 event._setDropLocationSelection(e);
-                core.callPlugin('image', core.plugins.image.submitAction.bind(core, files), null);
+                functions.insertImage(files);
             // check char count
             } else if (!core._charCount(dataTransfer.getData('text/plain'))) {
                 e.preventDefault();
