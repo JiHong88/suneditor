@@ -523,6 +523,7 @@ export default {
         options.templates = !options.templates ? null : options.templates;
         /** ETC */
         options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
+        options.linkProtocol = typeof options.linkProtocol === 'string' ? options.linkProtocol : null;
         /** Math (katex) */
         options.katex = options.katex ? options.katex.src ? options.katex : {src: options.katex} : null;
         /** Buttons */
