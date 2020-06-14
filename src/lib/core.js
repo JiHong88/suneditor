@@ -4008,7 +4008,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     core.closeLoading();
                     util.removeItem(iframe);
                 }
-            }, 500);
+            }, 1000);
         },
 
         /**
@@ -4181,17 +4181,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     if (tAttr) v = m.match(tAttr);
                     else v = m.match(this._attributesWhitelistRegExp);
 
+                    if (/<span/i.test(t) && (!v || !/style=/i.test(v.toString()))) {
+                        const sv = m.match(/style\s*=\s*"[^"]*"/);
+                        if (sv) {
+                            if (!v) v = [];
+                            v.push(sv[0]);
+                        }
+                    }
+
                     if (v) {
                         for (let i = 0, len = v.length; i < len; i++) {
-                            if (/^class="(?!(__se__|se-))/.test(v[i])) continue;
+                            if (/^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
                             t += ' ' + v[i];
                         }
                     }
 
                     return t;
                 }.bind(this));
-            
-            if (!this._attributesTagsWhitelist.span) cleanHTML = cleanHTML.replace(/<\/?(span[^>^<]*)>/g, '');
+
             cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
             
             return util._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, ''));
@@ -4434,6 +4441,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             }
             
+            const defaultAttr = 'contenteditable|colspan|rowspan|target|href|src|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
             this._htmlCheckWhitelistRegExp = new _w.RegExp('^(' + options._editorTagsWhitelist.replace('|//', '') + ')$', 'i');
             this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|__comment__'));
@@ -4447,12 +4455,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     if (k === 'all') {
                         allAttr = _attr[k] + '|';
                     } else {
-                        tagsAttr[k] = new _w.RegExp('((?:' + _attr[k] + ')\s*=\s*"[^"]*")', 'ig');
+                        tagsAttr[k] = new _w.RegExp('((?:' + _attr[k] + '|' + defaultAttr + ')\s*=\s*"[^"]*")', 'ig');
                     }
                 }
             }
             
-            this._attributesWhitelistRegExp = new _w.RegExp('((?:' + allAttr + 'contenteditable|colspan|rowspan|target|href|src|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size)\s*=\s*"[^"]*")', 'ig');
+            this._attributesWhitelistRegExp = new _w.RegExp('((?:' + allAttr + defaultAttr + ')\s*=\s*"[^"]*")', 'ig');
             this._attributesTagsWhitelist = tagsAttr;
 
             this._isInline = /inline/i.test(options.mode);

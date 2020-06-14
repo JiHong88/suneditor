@@ -158,20 +158,7 @@ export default {
                 katexEl.parentNode.insertBefore(empty, katexEl.nextSibling);
                 this.setRange(katexEl, 0, katexEl, 1);
             } else {
-                const findParent = function (child, className) {
-                    if (child.classList.contains(className)) return child;
-
-                    const parent = child.parentNode;
-
-                    if (parent === document.body) return;
-
-                    if (parent.classList.contains(className)) {
-                        return parent;
-                    } else {
-                        findParent(parent, className);
-                    }
-                };
-                const containerEl = findParent(contextMath._mathExp, 'katex');
+                const containerEl = this.util.getParentElement(contextMath._mathExp, '.katex');
                 containerEl.parentNode.replaceChild(katexEl, containerEl);
                 this.setRange(katexEl, 0, katexEl, 1);
             }
