@@ -1524,13 +1524,32 @@ const util = {
          * It is can use ".children(util.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
          * So check the node type and exclude the text no (current.nodeType !== 1)
          */
-        // empty whitelist
-        const emptyWhitelistTags = [];
+        const emptyWhitelistTags = [], emptyTags = [], wrongList = [], withoutFormatCells = [];
         // wrong position
         const wrongTags = this.getListChildNodes(documentFragment, function (current) {
             if (current.nodeType !== 1) return false;
+
+            // white list
             if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0) {
                 emptyWhitelistTags.push(current);
+                return false;
+            }
+
+            // empty tags
+            if ((!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && !this.getParentElement(current, '.katex')) {
+                emptyTags.push(current);
+                return false;
+            }
+
+            // wrong list
+            if (this.isList(current.parentNode) && !this.isList(current) && !this.isListCell(current)) {
+                wrongList.push(current);
+                return false;
+            }
+
+            // table cells
+            if (this.isCell(current) && (!this.isFormatElement(current.firstElementChild) || current.textContent.trim().length === 0)) {
+                withoutFormatCells.push(current);
                 return false;
             }
 
@@ -1545,11 +1564,12 @@ const util = {
         }
         
         const checkTags = [];
-        for (let i = 0, len = wrongTags.length, t, tp; i < len; i++) {
+        for (let i = 0, len = wrongTags.length, t, p; i < len; i++) {
             t = wrongTags[i];
-            tp = t.parentNode;
-            tp.parentNode.insertBefore(t, tp);
-            checkTags.push(tp);
+            p = t.parentNode;
+            if (!p || !p.parentNode) continue;
+            p.parentNode.insertBefore(t, p);
+            checkTags.push(p);
         }
 
         for (let i = 0, len = checkTags.length, t; i < len; i++) {
@@ -1559,23 +1579,11 @@ const util = {
             }
         }
 
-        // remove empty tags
-        const emptyTags = this.getListChildNodes(documentFragment, function (current) {
-            if (current.nodeType !== 1) return false;
-            return (!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && !this.getParentElement(current, '.katex');
-        }.bind(this));
-
         for (let i in emptyTags) {
             this.removeItem(emptyTags[i]);
         }
 
-        // wrong list
-        const wrongList = this.getListChildNodes(documentFragment, function (current) {
-            if (current.nodeType !== 1) return false;
-            return this.isList(current.parentNode) && !this.isList(current) && !this.isListCell(current);
-        }.bind(this));
-
-        for (let i = 0, len = wrongList.length, t, tp, children; i < len; i++) {
+        for (let i = 0, len = wrongList.length, t, tp, children, p; i < len; i++) {
             t = wrongList[i];
 
             tp = this.createElement('LI');
@@ -1584,19 +1592,14 @@ const util = {
                 tp.appendChild(children[0]);
             }
             
-            t.parentNode.insertBefore(tp, t);
+            p = t.parentNode;
+            if (!p) continue;
+            p.insertBefore(tp, t);
             this.removeItem(t);
         }
 
-        // table cells without format
-        const withoutFormatCells = this.getListChildNodes(documentFragment, function (current) {
-            if (current.nodeType !== 1) return false;
-            return this.isCell(current) && (!this.isFormatElement(current.firstElementChild) || current.textContent.trim().length === 0);
-        }.bind(this));
-
         for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {
             t = withoutFormatCells[i];
-
             f = this.createElement('DIV');
             f.innerHTML = t.textContent.trim().length === 0 ? '<br>' : t.innerHTML;
             t.innerHTML = f.outerHTML;
