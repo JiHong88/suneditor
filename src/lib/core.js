@@ -304,6 +304,36 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         activePlugins: null,
 
         /**
+         * @description Information of tags that should maintain HTML structure, style, class name, etc. (In use by "math" plugin)
+         * When inserting "html" such as paste, it is executed on the "html" to be inserted. (core.cleanHTML)
+         * Basic Editor Actions:
+         * 1. All classes not starting with "__se__" or "se-" in the editor are removed.
+         * 2. The style of all tags except the "span" tag is removed from the editor.
+         * "managedTagsInfo" structure ex:
+         * managedTagsInfo: {
+         *   query: '.__se__xxx, se-xxx'
+         *   map: {
+         *     '__se__xxx': method.bind(core),
+         *     'se-xxx': method.bind(core),
+         *   }
+         * }
+         * @example
+         * Define in the following return format in the "managedTagInfo" function of the plugin.
+         * managedTagInfo() => {
+         *  return {
+         *    className: 'string', // Class name to identify the tag. ("__se__xxx", "se-xxx")
+         *    // Change the html of the "element". ("element" is the element found with "className".)
+         *    // "method" is executed by binding "core".
+         *    method: function (element) {
+         *      // this === core
+         *      element.innerHTML = // (rendered html);
+         *    }
+         *  }
+         * }
+         */
+        managedTagsInfo: null,
+
+        /**
          * @description Array of "checkFileInfo" functions with the core bound
          * (Plugins with "checkFileInfo" and "resetFileInfo" methods)
          * "fileInfoPlugins" runs the "add" method when creating the editor.
@@ -4132,7 +4162,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
             // comments
             if (node.nodeType === 8 && this._allowHTMLComments) {
-                return '<__comment__>' + node.textContent.trim() + '</__comment__>';
+                return '<!--' + node.textContent.trim() + '-->';
             }
 
             return '';
@@ -4146,35 +4176,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {String}
          */
         cleanHTML: function (html, whitelist) {
-            const dom = _d.createRange().createContextualFragment(html);
-            try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
-            } catch (error) {
-                console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
-            }
-            
-            const domTree = dom.childNodes;
-            let cleanHTML = '';
-            let requireFormat = false;
-
-            for (let i = 0, len = domTree.length, t; i < len; i++) {
-                t = domTree[i];
-                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !util._notAllowedTags(t)) {
-                    requireFormat = true;
-                    break;
-                }
-            }
-
-            for (let i = 0, len = domTree.length; i < len; i++) {
-                cleanHTML += this._makeLine(domTree[i], requireFormat);
-            }
-
-            cleanHTML = cleanHTML
+            html = html
                 .replace(/\n/g, '')
                 .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
                 .replace(this.editorTagsWhitelistRegExp, '')
-                .replace(/<__comment__>/g, '<!-- ')
-                .replace(/<\/__comment__>/g, ' -->')
                 .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
                     let v = null;
                     const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z]+/)[0].toLowerCase()];
@@ -4199,8 +4204,44 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     return t;
                 }.bind(this));
 
-            cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
+            const dom = _d.createRange().createContextualFragment(html);
+            try {
+                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
+            } catch (error) {
+                console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
+            }
             
+            if (this.managedTagsInfo) {
+                const textCompList = dom.querySelectorAll(this.managedTagsInfo.query);
+                for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
+                    classList = [].slice.call(textCompList[i].classList);
+                    for (let c in classList) {
+                        initMethod = this.managedTagsInfo.map[classList[c]];
+                        if (initMethod) {
+                            initMethod(textCompList[i]);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            const domTree = dom.childNodes;
+            let cleanHTML = '';
+            let requireFormat = false;
+
+            for (let i = 0, len = domTree.length, t; i < len; i++) {
+                t = domTree[i];
+                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !util._notAllowedTags(t)) {
+                    requireFormat = true;
+                    break;
+                }
+            }
+
+            for (let i = 0, len = domTree.length; i < len; i++) {
+                cleanHTML += this._makeLine(domTree[i], requireFormat);
+            }
+
+            cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
             return util._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, ''));
         },
 
@@ -4210,6 +4251,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
+            contents = contents
+                .replace(/\n/g, '')
+                .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
+                .replace(this.editorTagsWhitelistRegExp, '');
+                
             const dom = _d.createRange().createContextualFragment(contents);
             try {
                 util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
@@ -4217,22 +4263,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
             }
             
-            let returnHTML = '';
             const domTree = dom.childNodes;
+            let cleanHTML = '';
             for (let i = 0, len = domTree.length; i < len; i++) {
-                returnHTML += this._makeLine(domTree[i], true);
+                cleanHTML += this._makeLine(domTree[i], true);
             }
 
-            if (returnHTML.length === 0) return '<p><br></p>';
+            if (cleanHTML.length === 0) return '<p><br></p>';
 
-            returnHTML = util.htmlRemoveWhiteSpace(returnHTML);
-            returnHTML = returnHTML
-                .replace(this.editorTagsWhitelistRegExp, '')
-                .replace(/\n/g, '')
-                .replace(/<__comment__>/g, '<!-- ')
-                .replace(/<\/__comment__>/g, ' -->');
-
-            return util._tagConvertor(returnHTML);
+            cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
+            return util._tagConvertor(cleanHTML);
         },
 
         /**
@@ -4444,7 +4484,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const defaultAttr = 'contenteditable|colspan|rowspan|target|href|src|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
             this._htmlCheckWhitelistRegExp = new _w.RegExp('^(' + options._editorTagsWhitelist.replace('|//', '') + ')$', 'i');
-            this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|__comment__'));
+            this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|<!--|-->'));
             this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(options.pasteTagsWhitelist);
 
             const _attr = options.attributesWhitelist;
@@ -4473,6 +4513,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this._fileInfoPluginsCheck = [];
             this._fileInfoPluginsReset = [];
 
+            // text components
+            this.managedTagsInfo = { query: '', map: {} };
+            const managedClass = [];
+
             // Command and file plugins registration
             this.activePlugins = [];
             this._fileManager.tags = [];
@@ -4499,8 +4543,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         this._fileManager.pluginMap[plugin.fileTags[tag].toLowerCase()] = key;
                     }
                 }
+                if (plugin.managedTags) {
+                    const info = plugin.managedTags();
+                    managedClass.push('.' + info.className);
+                    this.managedTagsInfo.map[info.className] = info.method.bind(this);
+                }
             }
 
+            this.managedTagsInfo.query = managedClass.toString();
             this._fileManager.queryString = this._fileManager.tags.join(',');
             this._fileManager.regExp = new _w.RegExp('^(' +  this._fileManager.tags.join('|') + ')$', 'i');
             this._fileManager.pluginRegExp = new _w.RegExp('^(' +  (filePluginRegExp.length === 0 ? 'undefined' : filePluginRegExp.join('|')) + ')$', 'i');

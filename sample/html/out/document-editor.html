@@ -11,6 +11,7 @@
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
     <link type="text/css" rel="stylesheet" href="styles/prettify-jsdoc.css">
     <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/3.0.1/github-markdown.min.css">
 </head>
 
 <body>
@@ -542,6 +543,46 @@
             <div class="description">
                 Plugins array with "active" method.<br>
                 "activePlugins" runs the "add" method when creating the editor.
+            </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="managedTagsInfo"><span class="type-signature"></span>managedTagsInfo<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                
+                @description Information of tags that should maintain HTML structure, style, class name, etc. (In use by "math" plugin)<br>
+                When inserting "html" such as paste, it is executed on the "html" to be inserted. (core.cleanHTML)<br>
+                Basic Editor Actions:<br>
+                1. All classes not starting with "__se__" or "se-" in the editor are removed.<br>
+                2. The style of all tags except the "span" tag is removed from the editor.<br><br>
+
+<span style="color:#ffe4c4;">"managedTagsInfo" structure ex:</span>
+<div class="markdown-body">
+<div class="highlight highlight-source-js"><pre><span class="pl-en">managedTagsInfo</span><span class="pl-kos">(</span><span class="pl-kos">)</span><span class="pl-kos"></span> <span class="pl-kos">{</span>
+    query: <span class="pl-s">'.__se__xxx, se-xxx'</span>
+    map: <span class="pl-kos">{</span>
+    <span class="pl-s">'__se__xxx'</span>: <span class="pl-s1">method</span><span class="pl-kos">.</span><span class="pl-en">bind</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">,</span>
+    <span class="pl-s">'se-xxx'</span>: <span class="pl-s1">method</span><span class="pl-kos">.</span><span class="pl-en">bind</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">,</span>
+    <span class="pl-kos">}</span>
+<span class="pl-kos">}</span></pre></div>
+</div>
+<br>
+<span style="color:#ffe4c4;">@example</span><br>
+<span style="color:#ffe4c4;">Define in the following return format in the "managedTagInfo" function of the plugin.</span>
+<div class="markdown-body">
+<div class="highlight highlight-source-js"><pre><span class="pl-en">managedTagInfo</span><span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-kos">{</span>
+    <span class="pl-k">return</span> <span class="pl-kos">{</span>
+        <span class="pl-c1">className</span>: <span class="pl-s">'string'</span><span class="pl-kos">,</span> <span class="pl-c">// Class name to identify the tag. ("__se__xxx", "se-xxx")</span>
+        <span class="pl-c">// Change the html of the "element". ("element" is the element found with "className".)</span>
+        <span class="pl-c">// "method" is executed by binding "core".</span>
+        <span class="pl-en">method</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">element</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+            <span class="pl-c">// this === core</span>
+            <span class="pl-s1">element</span><span class="pl-kos">.</span><span class="pl-c1">innerHTML</span> <span class="pl-c1">=</span> <span class="pl-c">// (rendered html);</span>
+        <span class="pl-kos">}</span>
+    <span class="pl-kos">}</span>
+<span class="pl-kos">}</span></pre></div>
+</div>
             </div>
             <dl class="details"></dl>
 
@@ -2003,6 +2044,7 @@
         <li><a href="document-editor.html#pasteTagsWhitelistRegExp">pasteTagsWhitelistRegExp</a></li>
         <li><a href="document-editor.html#hasFocus">hasFocus</a></li>
         <li><a href="document-editor.html#activePlugins">activePlugins</a></li>
+        <li><a href="document-editor.html#managedTagsInfo">managedTagsInfo</a></li>
         <li><a href="document-editor.html#commandMap">commandMap</a></li>
         <li><a href="document-editor.html#_variable">_variable</a></li>
         <li><b>Methods</b></li>

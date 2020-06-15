@@ -19,7 +19,7 @@
 
 <div id="main">
     <!--<h1 class="page-title">Global</h1>-->
-    <section>
+    <section>d
         <header>
             <h2>Modules</h2>
         </header>
@@ -32,6 +32,7 @@
                     <dd><span style="color: #f4b124;">- component : </span> image, video (<a style="color:#ff5565" href="../customPlugins.html#dialog_component_filemanager">example</a>)</dd>
                     <dd><span style="color: #f4b124;">- fileManager : </span> image, video (<a style="color:#ff5565" href="../customPlugins.html#dialog_component_filemanager">example</a>)</dd>
                     <dd><span style="color: #f4b124;">- resizing : </span> image, video</dd>
+                    <dd><span style="color: #f4b124;">- fileBrowser : </span> imageGallery</dd>
                 </dl>
             </div>
             <h3 class="subsection-title"></h3>
@@ -324,6 +325,49 @@
 <span class="pl-c">     */</span>
     <span class="pl-c1">cancel_controller_resize</span><span class="pl-kos">(</span><span class="pl-s1">direction</span>: <span class="pl-smi">string</span><span class="pl-kos">)</span>: <span class="pl-smi"><span class="pl-k">void</span></span><span class="pl-kos">;</span>
 <span class="pl-kos">}</span></pre></div>
+
+<!-- fileBrowser -->
+<h3 class="subsection-title" id="titleFileBrowser">fileBrowser</h3>
+<div class="highlight highlight-source-ts"><pre><span class="pl-c">/**</span>
+<span class="pl-c"> * <span class="pl-k">@description</span> This is a required module of fileBrowser plugin.</span>
+<span class="pl-c">    Require context properties when using fileBrowser module:</span>
+<span class="pl-c">    title(@Required): "File browser window title",</span>
+<span class="pl-c">    url(@Required): "File server url",</span>
+<span class="pl-c">    listClass(@Required): "Class name of list div",</span>
+<span class="pl-c">    itemTemplateHandler(@Required): "Function that defines the HTML of an file item",</span>
+<span class="pl-c">    selectorHandler(@Required): "Function that action when item click",</span>
+<span class="pl-c">    columnSize(@Option): "Number of "div.se-file-item-column" to be created (default: 4)"</span>
+<span class="pl-c">*/</span>
+<span class="pl-k">declare</span> <span class="pl-k">interface</span> <span class="pl-smi">fileBrowser</span> <span class="pl-k">extends</span> <span class="pl-smi">Module</span> <span class="pl-kos">{</span>
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * <span class="pl-k">@description</span> Open a file browser window</span>
+<span class="pl-c">     * <span class="pl-k">@param</span> pluginName Plugin name using the file browser</span>
+<span class="pl-c">     * <span class="pl-k">@param</span> selectorHandler When the function comes as an argument value, it substitutes "context.selectorHandler".</span>
+<span class="pl-c">     * <span class="pl-k">@example</span> this.plugins.fileBrowser.open.call(this, 'imageGallery', (selectorHandler || null));</span>
+<span class="pl-c">     */</span>
+    <span class="pl-c1">open</span><span class="pl-kos">(</span><span class="pl-s1">kind</span>: <span class="pl-smi">string</span><span class="pl-kos">,</span> <span class="pl-s1">update</span>: <span class="pl-smi">boolean</span><span class="pl-kos">)</span>: <span class="pl-smi"><span class="pl-k">void</span></span><span class="pl-kos">;</span>
+
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * <span class="pl-k">@description</span> Define the HTML of the item to be put in "div.se-file-item-column".</span>
+<span class="pl-c">     * <span class="pl-k">@param</span> item Item of the response data's array</span>
+<span class="pl-c">     */</span>
+    <span class="pl-c1">drawItems</span>: <span class="pl-kos">(</span><span class="pl-s1">item</span>: <span class="pl-smi">object</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-smi">string</span><span class="pl-kos">;</span>
+
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * <span class="pl-k">@description</span> Close a file browser window</span>
+<span class="pl-c">     * The plugin's "init" method is called.</span>
+<span class="pl-c">     * <span class="pl-k">@example</span> this.plugins.fileBrowser.close.call(this);</span>
+<span class="pl-c">     */</span>
+    <span class="pl-c1">close</span><span class="pl-kos">(</span><span class="pl-kos">)</span>: <span class="pl-smi"><span class="pl-k">void</span></span><span class="pl-kos">;</span>
+
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * <span class="pl-k">@description</span> This method is called when the file browser window is closed.</span>
+<span class="pl-c">     * Initialize the properties.</span>
+<span class="pl-c">     */</span>
+    <span class="pl-c1">init</span>?: <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-c1">=&gt;</span> <span class="pl-smi"><span class="pl-k">void</span></span><span class="pl-kos">;</span>
+<span class="pl-kos">}</span></pre></div>
+
+
 </article>
   </div>
 <!-- /readme-->
@@ -342,6 +386,7 @@
         <li><a href="document-module.html#titleComponent">component</a></li>
         <li><a href="document-module.html#titleFileManager">fileManager</a></li>
         <li><a href="document-module.html#titleResizing">resizing</a></li>
+        <li><a href="document-module.html#titleFileBrowser">fileBrowser</a></li>
     </ul>
 </nav>
 

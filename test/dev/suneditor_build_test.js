@@ -344,7 +344,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // videoHeight: '56.22%',
     videoRatio: 0.75,
     // imageHeight: 400,
-    addTagsWhitelist: 'mark|canvas|label|select|option|input|nav|button',
+    addTagsWhitelist: 'mark|canvas|label|select|option|input|nav|button|//',
     // videoFileInput: true,
     videoUrlInput: false,
     imageFileInput: false,
@@ -411,7 +411,7 @@ ss.onDrop = function (e) {
     return false;
 };
 ss.onPaste = function (e) {
-    console.log('onPaste', e.clipboardData.files)
+    // console.log('onPaste', e.clipboardData.files)
     return true
 }
 ss.onAudioUpload = function (targetElement, index, state, videoInfo) {

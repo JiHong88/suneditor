@@ -13,6 +13,11 @@ declare interface dialog extends Module {
     open(kind: string, update: boolean): void;
 
     /**
+     * @description Called after the submenu has been rendered
+     */
+    on?: () => void;
+
+    /**
      * @description Close a Dialog plugin
      * The plugin's "init" method is called.
      * @example this.plugins.dialog.close.call(this);
