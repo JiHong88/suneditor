@@ -296,7 +296,8 @@ export default {
         };
 
         if (typeof this.functions.onAudioUploadBefore === 'function') {
-            const result = this.functions.onAudioUploadBefore(files, info, this);
+            const result = this.functions.onAudioUploadBefore(files, info, this, this.plugins.audio.upload.bind(this, info));
+            if (typeof result === 'undefined') return;
             if (!result) {
                 this.closeLoading();
                 return;
@@ -307,7 +308,24 @@ export default {
         this.plugins.audio.upload.call(this, info, files);
     },
 
+    error: function (message, response) {
+        this.closeLoading();
+        if (typeof this.functions.onAudioUploadError !== 'function' || this.functions.onAudioUploadError(message, response, this)) {
+            this.functions.noticeOpen(message);
+            throw Error('[SUNEDITOR.plugin.audio.exception] response: ' + message);
+        }
+    },
+
     upload: function (info, files) {
+        if (!files) {
+            this.closeLoading();
+            return;
+        }
+        if (typeof files === 'string') {
+            this.plugins.audio.error.call(this, files, null);
+            return;
+        }
+
         const audioUploadUrl = this.context.option.audioUploadUrl;
         const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
@@ -322,20 +340,23 @@ export default {
     },
 
     callBack_upload: function (info, xmlHttp) {
-        const response = JSON.parse(xmlHttp.responseText);
-
-        if (response.errorMessage) {
-            if (this.functions.onAudioUploadError !== 'function' || this.functions.onAudioUploadError(response.errorMessage, response, this)) {
-                this.functions.noticeOpen(response.errorMessage);
-            }
+        if (typeof this.functions.audioUploadHandler === 'function') {
+            this.functions.audioUploadHandler(xmlHttp, info, this);
         } else {
-            const fileList = response.result;
-            for (let i = 0, len = fileList.length, file, oAudio; i < len; i++) {
-                if (info.isUpdate) oAudio = info.element;
-                else oAudio = this.plugins.audio._createAudioTag.call(this);
-
-                file = { name: fileList[i].name, size: fileList[i].size };
-                this.plugins.audio.create_audio.call(this, oAudio, fileList[i].url, file, info.isUpdate);
+            const response = JSON.parse(xmlHttp.responseText);
+            if (response.errorMessage) {
+                if (this.functions.onAudioUploadError !== 'function' || this.functions.onAudioUploadError(response.errorMessage, response, this)) {
+                    this.functions.noticeOpen(response.errorMessage);
+                }
+            } else {
+                const fileList = response.result;
+                for (let i = 0, len = fileList.length, file, oAudio; i < len; i++) {
+                    if (info.isUpdate) oAudio = info.element;
+                    else oAudio = this.plugins.audio._createAudioTag.call(this);
+    
+                    file = { name: fileList[i].name, size: fileList[i].size };
+                    this.plugins.audio.create_audio.call(this, oAudio, fileList[i].url, file, info.isUpdate);
+                }
             }
         }
     },

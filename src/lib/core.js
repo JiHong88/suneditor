@@ -6438,6 +6438,28 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Object} core Core object
          */
         imageUploadHandler: null,
+        /**
+         * @description It replaces the default callback function of the video upload
+         * @param xmlHttpRequest xmlHttpRequest object
+         * @param info Input information
+         * - inputWidth: Value of width input
+         * - inputHeight: Value of height input
+         * - align: Align Check Value
+         * - isUpdate: Update video if true, create video if false
+         * - element: If isUpdate is true, the currently selected video.
+         * @param core Core object
+         */
+        videoUploadHandler: null,
+
+        /**
+         * @description It replaces the default callback function of the audio upload
+         * @param xmlHttpRequest xmlHttpRequest object
+         * @param info Input information
+         * - isUpdate: Update audio if true, create audio if false
+         * - element: If isUpdate is true, the currently selected audio.
+         * @param core Core object
+         */
+        audioUploadHandler: null,
 
         /**
          * @description Called before the image is uploaded

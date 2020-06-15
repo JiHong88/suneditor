@@ -1070,7 +1070,7 @@ editor.onAudioUpload = function (targetElement, index, state, info, remainingFil
 // If you return false, the default notices are not called.
 /**
  * errorMessage: Error message
- * result: Response Objectz
+ * result: Response Object
  * core: Core object
  * return {Boolean}
 */

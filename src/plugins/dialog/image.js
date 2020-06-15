@@ -413,7 +413,8 @@ export default {
         };
 
         if (typeof this.functions.onImageUploadBefore === 'function') {
-            const result = this.functions.onImageUploadBefore(files, info, this);
+            const result = this.functions.onImageUploadBefore(files, info, this, this.plugins.image.upload.bind(this, info));
+            if (typeof result === 'undefined') return;
             if (!result) {
                 this.closeLoading();
                 return;
@@ -424,7 +425,24 @@ export default {
         this.plugins.image.upload.call(this, info, files);
     },
 
+    error: function (message, response) {
+        this.closeLoading();
+        if (typeof this.functions.onImageUploadError !== 'function' || this.functions.onImageUploadError(message, response, this)) {
+            this.functions.noticeOpen(message);
+            throw Error('[SUNEDITOR.plugin.image.error] response: ' + message);
+        }
+    },
+
     upload: function (info, files) {
+        if (!files) {
+            this.closeLoading();
+            return;
+        }
+        if (typeof files === 'string') {
+            this.plugins.image.error.call(this, files, null);
+            return;
+        }
+
         const imageUploadUrl = this.context.option.imageUploadUrl;
         const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
@@ -445,11 +463,8 @@ export default {
             this.functions.imageUploadHandler(xmlHttp, info, this);
         } else {
             const response = JSON.parse(xmlHttp.responseText);
-
             if (response.errorMessage) {
-                if (this.functions.onImageUploadError !== 'function' || this.functions.onImageUploadError(response.errorMessage, response, this)) {
-                    this.functions.noticeOpen(response.errorMessage);
-                }
+                this.plugins.image.error.call(this, response.errorMessage, response);
             } else {
                 const fileList = response.result;
                 for (let i = 0, len = fileList.length, file; i < len; i++) {

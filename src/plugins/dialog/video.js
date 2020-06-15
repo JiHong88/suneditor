@@ -375,7 +375,8 @@ export default {
         };
 
         if (typeof this.functions.onVideoUploadBefore === 'function') {
-            const result = this.functions.onVideoUploadBefore(files, info, this);
+            const result = this.functions.onVideoUploadBefore(files, info, this, this.plugins.video.upload.bind(this, info));
+            if (typeof result === 'undefined') return;
             if (!result) {
                 this.closeLoading();
                 return;
@@ -386,7 +387,24 @@ export default {
         this.plugins.video.upload.call(this, info, files);
     },
 
+    error: function (message, response) {
+        this.closeLoading();
+        if (typeof this.functions.onVideoUploadError !== 'function' || this.functions.onVideoUploadError(message, response, this)) {
+            this.functions.noticeOpen(message);
+            throw Error('[SUNEDITOR.plugin.video.error] response: ' + message);
+        }
+    },
+
     upload: function (info, files) {
+        if (!files) {
+            this.closeLoading();
+            return;
+        }
+        if (typeof files === 'string') {
+            this.plugins.video.error.call(this, files, null);
+            return;
+        }
+
         const videoUploadUrl = this.context.option.videoUploadUrl;
         const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
@@ -407,11 +425,8 @@ export default {
             this.functions.videoUploadHandler(xmlHttp, info, this);
         } else {
             const response = JSON.parse(xmlHttp.responseText);
-
             if (response.errorMessage) {
-                if (this.functions.onVideoUploadError !== 'function' || this.functions.onVideoUploadError(response.errorMessage, response, this)) {
-                    this.functions.noticeOpen(response.errorMessage);
-                }
+                this.plugins.video.error.call(this, response.errorMessage, response);
             } else {
                 const fileList = response.result;
                 const videoTag = this.plugins.video.createVideoTag.call(this);
