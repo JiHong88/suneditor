@@ -265,7 +265,7 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI)
+     * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI | class="__se__format__replace_xxx")
      * Format element also contain "free format Element"
      * @param {Node} element The node to check
      * @returns {Boolean}
@@ -275,7 +275,7 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)
+     * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__range_xxx")
      * * Range format element is wrap the format element  (util.isFormatElement)
      * @param {Node} element The node to check
      * @returns {Boolean}
@@ -285,9 +285,10 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the free format element. (PRE)
+     * @description It is judged whether it is the free format element. (PRE | class="__se__format__free_xxx")
      * Free format elements's line break is "BR" tag.
      * Free format elements is included in the format element.
+     * ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
@@ -296,7 +297,20 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the component [img, iframe, video, audio] cover(element className - ".se-component") and table, hr
+     * @description It is judged whether it is the closure free format element. (class="__se__format__free__closure_xxx")
+     * Closure free format elements's line break is "BR" tag.
+     * Closure free format elements is included in the free format element.
+     * ※ You cannot exit this format with the Enter key.
+     * ※ Use it only in special cases. ([ex] format of table cells)
+     * @param {Node} element The node to check
+     * @returns {Boolean}
+     */
+    isClosureFreeFormatElement: function (element) {
+        return (element && element.nodeType === 1 && this.hasClass(element, '(\\s|^)__se__format__free__closure_.+(\\s|$)'));
+    },
+
+    /**
+     * @description It is judged whether it is the component [img, iframe, video, audio] cover(class="se-component") and table, hr
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
@@ -305,7 +319,7 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the component [img, iframe] cover(element className - ".se-component")
+     * @description It is judged whether it is the component [img, iframe] cover(class="se-component")
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
@@ -372,6 +386,28 @@ const util = {
         while (element) {
             if (this.isWysiwygDiv(element)) return null;
             if (this.isFreeFormatElement(element) && validation(element)) return element;
+
+            element = element.parentNode;
+        }
+        
+        return null;
+    },
+
+    /**
+     * @description If a parent node that contains an argument node finds a closure free format node (util.isClosureFreeFormatElement), it returns that node.
+     * @param {Node} element Reference node.
+     * @param {Function|null} validation Additional validation function.
+     * @returns {Element|null}
+     */
+    getClosureFreeFormatElement: function (element, validation) {
+        if (!element) return null;
+        if (!validation) {
+            validation = function () { return true; };
+        }
+
+        while (element) {
+            if (this.isWysiwygDiv(element)) return null;
+            if (this.isClosureFreeFormatElement(element) && validation(element)) return element;
 
             element = element.parentNode;
         }

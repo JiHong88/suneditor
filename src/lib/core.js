@@ -5659,7 +5659,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         const wSelection = core.getSelection();
                         const children = selectionNode.childNodes, offset = wSelection.focusOffset, prev = selectionNode.previousElementSibling, next = selectionNode.nextSibling;
 
-                        if (!!children && ((selectionFormat && range.collapsed && children.length - 1 <= offset + 1 && util.isBreak(children[offset]) && (!children[offset + 1] || ((!children[offset + 2] || util.onlyZeroWidthSpace(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && util.onlyZeroWidthSpace(children[offset + 1].textContent))) &&  offset > 0 && util.isBreak(children[offset - 1])) ||
+                        if (!util.isClosureFreeFormatElement(freeFormatEl) && !!children && ((selectionFormat && range.collapsed && children.length - 1 <= offset + 1 && util.isBreak(children[offset]) && (!children[offset + 1] || ((!children[offset + 2] || util.onlyZeroWidthSpace(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && util.onlyZeroWidthSpace(children[offset + 1].textContent))) &&  offset > 0 && util.isBreak(children[offset - 1])) ||
                           (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(prev) && (util.isBreak(prev.previousSibling) || !util.onlyZeroWidthSpace(prev.previousSibling.textContent)) && (!next || (!util.isBreak(next) && util.onlyZeroWidthSpace(next.textContent)))))) {
                             if (selectionFormat) util.removeItem(children[offset - 1]);
                             else util.removeItem(selectionNode);
@@ -6438,28 +6438,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Object} core Core object
          */
         imageUploadHandler: null,
-        /**
-         * @description It replaces the default callback function of the video upload
-         * @param xmlHttpRequest xmlHttpRequest object
-         * @param info Input information
-         * - inputWidth: Value of width input
-         * - inputHeight: Value of height input
-         * - align: Align Check Value
-         * - isUpdate: Update video if true, create video if false
-         * - element: If isUpdate is true, the currently selected video.
-         * @param core Core object
-         */
-        videoUploadHandler: null,
-
-        /**
-         * @description It replaces the default callback function of the audio upload
-         * @param xmlHttpRequest xmlHttpRequest object
-         * @param info Input information
-         * - isUpdate: Update audio if true, create audio if false
-         * - element: If isUpdate is true, the currently selected audio.
-         * @param core Core object
-         */
-        audioUploadHandler: null,
 
         /**
          * @description Called before the image is uploaded
@@ -6476,7 +6454,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * - element: If isUpdate is true, the currently selected image.
          * }
          * @param {Object} core Core object
-         * @returns {Boolean}
+         * @param {Function} uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
+         *                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
+         *                [upload files] : uploadHandler(files or [new File(...),])
+         *                [error]        : uploadHandler("Error message")
+         *                [Just finish]  : uploadHandler()
+         * @returns {Boolean|Array|undefined}
          */
         onImageUploadBefore: null,
         /**
@@ -6492,7 +6475,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * - element: If isUpdate is true, the currently selected video.
          * }
          * @param {Object} core Core object
-         * @returns {Boolean}
+         * @param {Function} uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
+         *                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
+         *                [upload files] : uploadHandler(files or [new File(...),])
+         *                [error]        : uploadHandler("Error message")
+         *                [Just finish]  : uploadHandler()
+         * @returns {Boolean|Array|undefined}
          */
         onVideoUploadBefore: null,
         /**
@@ -6505,7 +6493,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * - element: If isUpdate is true, the currently selected audio.
          * }
          * @param {Object} core Core object
-         * @returns {Boolean}
+         * @param {Function} uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
+         *                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
+         *                [upload files] : uploadHandler(files or [new File(...),])
+         *                [error]        : uploadHandler("Error message")
+         *                [Just finish]  : uploadHandler()
+         * @returns {Boolean|Array|undefined}
          */
         onAudioUploadBefore: null,
 

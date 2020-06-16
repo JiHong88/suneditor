@@ -98,7 +98,7 @@ declare interface util {
     isTextStyleElement(element: Node): boolean;
 
     /**
-     * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI)
+     * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI | class="__se__format__replace_xxx")
      * Format element also contain "free format Element"
      * @param element The node to check
      * @returns
@@ -106,7 +106,7 @@ declare interface util {
     isFormatElement(element: Node): boolean;
 
     /**
-     * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)
+     * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__range_xxx")
      * * Range format element is wrap the format element  (util.isFormatElement)
      * @param element The node to check
      * @returns
@@ -114,23 +114,35 @@ declare interface util {
     isRangeFormatElement(element: Node): boolean;
 
     /**
-     * @description It is judged whether it is the free format element. (PRE)
+     * @description It is judged whether it is the free format element. (PRE | class="__se__format__free_xxx")
      * Free format elements's line break is "BR" tag.
      * Free format elements is included in the format element.
+     * ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
      * @param element The node to check
      * @returns
      */
     isFreeFormatElement(element: Node): boolean;
 
     /**
-     * @description It is judged whether it is the component [img, iframe] cover(element className - ".se-component") and table, hr
+     * @description It is judged whether it is the closure free format element. (class="__se__format__free__closure_xxx")
+     * Closure free format elements's line break is "BR" tag.
+     * Closure free format elements is included in the free format element.
+     * ※ You cannot exit this format with the Enter key.
+     * ※ Use it only in special cases. ([ex] format of table cells)
+     * @param element The node to check
+     * @returns
+     */
+    isClosureFreeFormatElement(element: Node): boolean;
+
+    /**
+     * @description It is judged whether it is the component [img, iframe, video, audio] cover(class="se-component") and table, hr
      * @param element The node to check
      * @returns
      */
     isComponent(element: Node): boolean;
 
     /**
-     * @description It is judged whether it is the component [img, iframe] cover(element className - ".se-component")
+     * @description It is judged whether it is the component [img, iframe] cover(class="se-component")
      * @param element The node to check
      * @returns
      */
@@ -159,6 +171,14 @@ declare interface util {
      * @returns
      */
     getFreeFormatElement(element: Node, validation?: Function): Element | null;
+
+    /**
+     * @description If a parent node that contains an argument node finds a closure free format node (util.isClosureFreeFormatElement), it returns that node.
+     * @param element Reference node.
+     * @param validation Additional validation function.
+     * @returns
+     */
+    getClosureFreeFormatElement(element: Node, validation?: Function): Element | null;
 
     /**
      * @description Add style and className of copyEl to originEl
