@@ -120,7 +120,7 @@ export default {
                         '<div class="se-dialog-form">' +
                             '<label>' + lang.dialogBox.videoBox.file + '</label>' +
                             '<div class="se-dialog-form-files">' +
-                                '<input class="se-input-form _se_video_file" type="file" accept="video/*" multiple="multiple" />' +
+                                '<input class="se-input-form _se_video_file" type="file" accept="video/*"' + (option.videoMultipleFile ? ' multiple="multiple"' : '') + '/>' +
                                 '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
                             '</div>' +
                         '</div>' ;
@@ -257,6 +257,9 @@ export default {
             contextVideo.inputX.value = contextVideo._origin_w = this.context.option.videoWidth === contextVideo._defaultSizeX ? '' : this.context.option.videoWidth;
             contextVideo.inputY.value = contextVideo._origin_h = this.context.option.videoHeight === contextVideo._defaultSizeY ? '' : this.context.option.videoHeight;
             contextVideo.proportion.disabled = true;
+            if (contextVideo.videoInputFile && this.context.options.videoMultipleFile) contextVideo.videoInputFile.setAttribute('multiple', 'multiple');
+        } else {
+            if (contextVideo.videoInputFile && this.context.options.videoMultipleFile) contextVideo.videoInputFile.removeAttribute('multiple');
         }
 
         if (contextVideo._resizing) {

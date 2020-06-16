@@ -84,7 +84,7 @@ export default {
                         '<div class="se-dialog-form">' +
                             '<label>' + lang.dialogBox.audioBox.file + '</label>' +
                             '<div class="se-dialog-form-files">' +
-                                '<input class="se-input-form _se_audio_files" type="file" accept="audio/*" multiple="multiple" />' +
+                                '<input class="se-input-form _se_audio_files" type="file" accept="audio/*"' + (option.audioMultipleFile ? ' multiple="multiple"' : '') + '/>' +
                                 '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
                             '</div>' +
                         '</div>';
@@ -218,11 +218,17 @@ export default {
      * @Required @Override dialog
      */
     on: function (update) {
+        const contextAudio = this.context.audio;
+
         if (!update) {
             this.plugins.audio.init.call(this);
-        } else if (this.context.audio._element) {
+            if (contextAudio.audioInputFile && this.context.options.audioMultipleFile) contextAudio.audioInputFile.setAttribute('multiple', 'multiple');
+        } else if (contextAudio._element) {
             this.context.dialog.updateModal = true;
-            this.context.audio.audioUrlFile.value = this.context.audio._element.src;
+            contextAudio.audioUrlFile.value = contextAudio._element.src;
+            if (contextAudio.audioInputFile && this.context.options.audioMultipleFile) contextAudio.audioInputFile.removeAttribute('multiple');
+        } else {
+            if (contextAudio.audioInputFile && this.context.options.audioMultipleFile) contextAudio.audioInputFile.removeAttribute('multiple');
         }
     },
 

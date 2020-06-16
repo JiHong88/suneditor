@@ -484,6 +484,7 @@ export default {
         options.imageUploadHeader = options.imageUploadHeader || null;
         options.imageUploadUrl = typeof options.imageUploadUrl === 'string' ? options.imageUploadUrl : null;
         options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? util.getNumber(options.imageUploadSizeLimit, 0) : null;
+        options.imageMultipleFile = !!options.imageMultipleFile;
         /** Image - image gallery */
         options.imageGalleryUrl = typeof options.imageGalleryUrl === 'string' ? options.imageGalleryUrl : null;
         /** Video */
@@ -503,6 +504,7 @@ export default {
         options.videoUploadHeader = options.videoUploadHeader || null;
         options.videoUploadUrl = typeof options.videoUploadUrl === 'string' ? options.videoUploadUrl : null;
         options.videoUploadSizeLimit = /\d+/.test(options.videoUploadSizeLimit) ? util.getNumber(options.videoUploadSizeLimit, 0) : null;
+        options.videoMultipleFile = !!options.videoMultipleFile;
         /** Audio */
         options.audioWidth = !options.audioWidth ? '' : util.isNumber(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth;
         options.audioHeight = !options.audioHeight ? '' : util.isNumber(options.audioHeight) ? options.audioHeight + 'px' : options.audioHeight;
@@ -511,6 +513,7 @@ export default {
         options.audioUploadHeader = options.audioUploadHeader || null;
         options.audioUploadUrl = typeof options.audioUploadUrl === 'string' ? options.audioUploadUrl : null;
         options.audioUploadSizeLimit = /\d+/.test(options.audioUploadSizeLimit) ? util.getNumber(options.audioUploadSizeLimit, 0) : null;
+        options.audioMultipleFile = !!options.audioMultipleFile;
         /** Table */
         options.tableCellControllerPosition = typeof options.tableCellControllerPosition === 'string' ? options.tableCellControllerPosition.toLowerCase() : 'cell';
         /** Key actions */

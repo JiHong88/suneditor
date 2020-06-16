@@ -134,7 +134,7 @@ export default {
                             '<div class="se-dialog-form">' +
                                 '<label>' + lang.dialogBox.imageBox.file + '</label>' +
                                 '<div class="se-dialog-form-files">' +
-                                    '<input class="se-input-form _se_image_file" type="file" accept="image/*" multiple="multiple" />' +
+                                    '<input class="se-input-form _se_image_file" type="file" accept="image/*"' + (option.imageMultipleFile ? ' multiple="multiple"' : '') + '/>' +
                                     '<button type="button" class="se-btn se-dialog-files-edge-button __se__file_remove" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
                                 '</div>' +
                             '</div>' ;
@@ -282,9 +282,9 @@ export default {
         if (!update) {
             contextImage.inputX.value = contextImage._origin_w = this.context.option.imageWidth === contextImage._defaultSizeX ? '' : this.context.option.imageWidth;
             contextImage.inputY.value = contextImage._origin_h = this.context.option.imageHeight === contextImage._defaultSizeY ? '' : this.context.option.imageHeight;
-            if (contextImage.imgInputFile) contextImage.imgInputFile.setAttribute('multiple', 'multiple');
+            if (contextImage.imgInputFile && this.context.options.imageMultipleFile) contextImage.imgInputFile.setAttribute('multiple', 'multiple');
         } else {
-            if (contextImage.imgInputFile) contextImage.imgInputFile.removeAttribute('multiple');
+            if (contextImage.imgInputFile && this.context.options.imageMultipleFile) contextImage.imgInputFile.removeAttribute('multiple');
         }
     },
 

@@ -345,7 +345,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     videoRatio: 0.75,
     // imageHeight: 400,
     addTagsWhitelist: 'mark|canvas|label|select|option|input|nav|button|//',
-    // videoFileInput: true,
+    videoFileInput: true,
     videoUrlInput: false,
     // imageFileInput: false,
     // videoUploadUrl: 'http://localhost:3000/editor/upload',
