@@ -196,6 +196,73 @@
         <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_hide()">Hide toolbar</button>
         <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_show()">Show toolbar</button>
 
+
+        <!-- image resize -->
+        <a id="image" href="#image"><h4 class="sub-title">Toolbar : Responsive and more buttons</h4></a>
+        <p style="height:0px; float:right; margin-top:-30px;"><span id="responsive_Toolbar_size" style="font-weight:bold; color:#ffe4c4;">1200px</span></p>
+        <textarea id="responsive_Toolbar" style="display: none;"><p>Resize the browser window.</p></textarea>
+        <p></p>
+<div class="highlight highlight-source-js"><pre><span class="pl-c1">SUNEDITOR</span><span class="pl-kos">.</span><span class="pl-en">create</span><span class="pl-kos">(</span><span class="pl-s">'responsive_Toolbar'</span><span class="pl-kos">,</span> <span class="pl-kos">{</span>
+    <span class="pl-c1">templates</span>: <span class="pl-kos">[</span>
+        <span class="pl-kos">{</span>
+            <span class="pl-c1">name</span>: <span class="pl-s">'Template-1'</span><span class="pl-kos">,</span>
+            <span class="pl-c1">html</span>: <span class="pl-s">'&lt;p&gt;HTML source1&lt;/p&gt;'</span>
+        <span class="pl-kos">}</span><span class="pl-kos">,</span>
+        <span class="pl-kos">{</span>
+            <span class="pl-c1">name</span>: <span class="pl-s">'Template-2'</span><span class="pl-kos">,</span>
+            <span class="pl-c1">html</span>: <span class="pl-s">'&lt;p&gt;HTML source2&lt;/p&gt;'</span>
+        <span class="pl-kos">}</span>
+    <span class="pl-kos">]</span><span class="pl-kos">,</span>
+    <span class="pl-c1">codeMirror</span>: <span class="pl-v">CodeMirror</span><span class="pl-kos">,</span>
+    <span class="pl-c1">katex</span>: <span class="pl-s1">katex</span><span class="pl-kos">,</span>
+    <span class="pl-c1">buttonList</span>: <span class="pl-kos">[</span>
+        <span class="pl-c">// default</span>
+        <span class="pl-kos">[</span><span class="pl-s">'undo'</span><span class="pl-kos">,</span> <span class="pl-s">'redo'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-kos">[</span><span class="pl-s">':p-More Paragraph-default.more_paragraph'</span><span class="pl-kos">,</span> <span class="pl-s">'font'</span><span class="pl-kos">,</span> <span class="pl-s">'fontSize'</span><span class="pl-kos">,</span> <span class="pl-s">'formatBlock'</span><span class="pl-kos">,</span> <span class="pl-s">'paragraphStyle'</span><span class="pl-kos">,</span> <span class="pl-s">'blockquote'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-kos">[</span><span class="pl-s">'bold'</span><span class="pl-kos">,</span> <span class="pl-s">'underline'</span><span class="pl-kos">,</span> <span class="pl-s">'italic'</span><span class="pl-kos">,</span> <span class="pl-s">'strike'</span><span class="pl-kos">,</span> <span class="pl-s">'subscript'</span><span class="pl-kos">,</span> <span class="pl-s">'superscript'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-kos">[</span><span class="pl-s">'fontColor'</span><span class="pl-kos">,</span> <span class="pl-s">'hiliteColor'</span><span class="pl-kos">,</span> <span class="pl-s">'textStyle'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-kos">[</span><span class="pl-s">'removeFormat'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-kos">[</span><span class="pl-s">'outdent'</span><span class="pl-kos">,</span> <span class="pl-s">'indent'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-kos">[</span><span class="pl-s">'align'</span><span class="pl-kos">,</span> <span class="pl-s">'horizontalRule'</span><span class="pl-kos">,</span> <span class="pl-s">'list'</span><span class="pl-kos">,</span> <span class="pl-s">'lineHeight'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-kos">[</span><span class="pl-s">'-right'</span><span class="pl-kos">,</span> <span class="pl-s">':i-More Misc-default.more_vertical'</span><span class="pl-kos">,</span> <span class="pl-s">'fullScreen'</span><span class="pl-kos">,</span> <span class="pl-s">'showBlocks'</span><span class="pl-kos">,</span> <span class="pl-s">'codeView'</span><span class="pl-kos">,</span> <span class="pl-s">'preview'</span><span class="pl-kos">,</span> <span class="pl-s">'print'</span><span class="pl-kos">,</span> <span class="pl-s">'save'</span><span class="pl-kos">,</span> <span class="pl-s">'template'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-kos">[</span><span class="pl-s">'-right'</span><span class="pl-kos">,</span> <span class="pl-s">':r-More Rich-default.more_plus'</span><span class="pl-kos">,</span> <span class="pl-s">'table'</span><span class="pl-kos">,</span> <span class="pl-s">'math'</span><span class="pl-kos">,</span> <span class="pl-s">'imageGallery'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-kos">[</span><span class="pl-s">'-right'</span><span class="pl-kos">,</span> <span class="pl-s">'image'</span><span class="pl-kos">,</span> <span class="pl-s">'video'</span><span class="pl-kos">,</span> <span class="pl-s">'audio'</span><span class="pl-kos">,</span> <span class="pl-s">'link'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-c">// (min-width: 992)</span>
+        <span class="pl-kos">[</span><span class="pl-s">'%992'</span><span class="pl-kos">,</span> <span class="pl-kos">[</span>
+            <span class="pl-kos">[</span><span class="pl-s">'undo'</span><span class="pl-kos">,</span> <span class="pl-s">'redo'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">':p-More Paragraph-default.more_paragraph'</span><span class="pl-kos">,</span> <span class="pl-s">'font'</span><span class="pl-kos">,</span> <span class="pl-s">'fontSize'</span><span class="pl-kos">,</span> <span class="pl-s">'formatBlock'</span><span class="pl-kos">,</span> <span class="pl-s">'paragraphStyle'</span><span class="pl-kos">,</span> <span class="pl-s">'blockquote'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">'bold'</span><span class="pl-kos">,</span> <span class="pl-s">'underline'</span><span class="pl-kos">,</span> <span class="pl-s">'italic'</span><span class="pl-kos">,</span> <span class="pl-s">'strike'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">':t-More Text-default.more_text'</span><span class="pl-kos">,</span> <span class="pl-s">'subscript'</span><span class="pl-kos">,</span> <span class="pl-s">'superscript'</span><span class="pl-kos">,</span> <span class="pl-s">'fontColor'</span><span class="pl-kos">,</span> <span class="pl-s">'hiliteColor'</span><span class="pl-kos">,</span> <span class="pl-s">'textStyle'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">'removeFormat'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">'outdent'</span><span class="pl-kos">,</span> <span class="pl-s">'indent'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">'align'</span><span class="pl-kos">,</span> <span class="pl-s">'horizontalRule'</span><span class="pl-kos">,</span> <span class="pl-s">'list'</span><span class="pl-kos">,</span> <span class="pl-s">'lineHeight'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">'-right'</span><span class="pl-kos">,</span> <span class="pl-s">':i-More Misc-default.more_vertical'</span><span class="pl-kos">,</span> <span class="pl-s">'fullScreen'</span><span class="pl-kos">,</span> <span class="pl-s">'showBlocks'</span><span class="pl-kos">,</span> <span class="pl-s">'codeView'</span><span class="pl-kos">,</span> <span class="pl-s">'preview'</span><span class="pl-kos">,</span> <span class="pl-s">'print'</span><span class="pl-kos">,</span> <span class="pl-s">'save'</span><span class="pl-kos">,</span> <span class="pl-s">'template'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">'-right'</span><span class="pl-kos">,</span> <span class="pl-s">':r-More Rich-default.more_plus'</span><span class="pl-kos">,</span> <span class="pl-s">'table'</span><span class="pl-kos">,</span> <span class="pl-s">'link'</span><span class="pl-kos">,</span> <span class="pl-s">'image'</span><span class="pl-kos">,</span> <span class="pl-s">'video'</span><span class="pl-kos">,</span> <span class="pl-s">'audio'</span><span class="pl-kos">,</span> <span class="pl-s">'math'</span><span class="pl-kos">,</span> <span class="pl-s">'imageGallery'</span><span class="pl-kos">]</span>
+        <span class="pl-kos">]</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-c">// (min-width: 767)</span>
+        <span class="pl-kos">[</span><span class="pl-s">'%767'</span><span class="pl-kos">,</span> <span class="pl-kos">[</span>
+            <span class="pl-kos">[</span><span class="pl-s">'undo'</span><span class="pl-kos">,</span> <span class="pl-s">'redo'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">':p-More Paragraph-default.more_paragraph'</span><span class="pl-kos">,</span> <span class="pl-s">'font'</span><span class="pl-kos">,</span> <span class="pl-s">'fontSize'</span><span class="pl-kos">,</span> <span class="pl-s">'formatBlock'</span><span class="pl-kos">,</span> <span class="pl-s">'paragraphStyle'</span><span class="pl-kos">,</span> <span class="pl-s">'blockquote'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">':t-More Text-default.more_text'</span><span class="pl-kos">,</span> <span class="pl-s">'bold'</span><span class="pl-kos">,</span> <span class="pl-s">'underline'</span><span class="pl-kos">,</span> <span class="pl-s">'italic'</span><span class="pl-kos">,</span> <span class="pl-s">'strike'</span><span class="pl-kos">,</span> <span class="pl-s">'subscript'</span><span class="pl-kos">,</span> <span class="pl-s">'superscript'</span><span class="pl-kos">,</span> <span class="pl-s">'fontColor'</span><span class="pl-kos">,</span> <span class="pl-s">'hiliteColor'</span><span class="pl-kos">,</span> <span class="pl-s">'textStyle'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">'removeFormat'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">'outdent'</span><span class="pl-kos">,</span> <span class="pl-s">'indent'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">':e-More Line-default.more_horizontal'</span><span class="pl-kos">,</span> <span class="pl-s">'align'</span><span class="pl-kos">,</span> <span class="pl-s">'horizontalRule'</span><span class="pl-kos">,</span> <span class="pl-s">'list'</span><span class="pl-kos">,</span> <span class="pl-s">'lineHeight'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">':r-More Rich-default.more_plus'</span><span class="pl-kos">,</span> <span class="pl-s">'table'</span><span class="pl-kos">,</span> <span class="pl-s">'link'</span><span class="pl-kos">,</span> <span class="pl-s">'image'</span><span class="pl-kos">,</span> <span class="pl-s">'video'</span><span class="pl-kos">,</span> <span class="pl-s">'audio'</span><span class="pl-kos">,</span> <span class="pl-s">'math'</span><span class="pl-kos">,</span> <span class="pl-s">'imageGallery'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">'-right'</span><span class="pl-kos">,</span> <span class="pl-s">':i-More Misc-default.more_vertical'</span><span class="pl-kos">,</span> <span class="pl-s">'fullScreen'</span><span class="pl-kos">,</span> <span class="pl-s">'showBlocks'</span><span class="pl-kos">,</span> <span class="pl-s">'codeView'</span><span class="pl-kos">,</span> <span class="pl-s">'preview'</span><span class="pl-kos">,</span> <span class="pl-s">'print'</span><span class="pl-kos">,</span> <span class="pl-s">'save'</span><span class="pl-kos">,</span> <span class="pl-s">'template'</span><span class="pl-kos">]</span>
+        <span class="pl-kos">]</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+        <span class="pl-c">// (min-width: 480)</span>
+        <span class="pl-kos">[</span><span class="pl-s">'%480'</span><span class="pl-kos">,</span> <span class="pl-kos">[</span>
+            <span class="pl-kos">[</span><span class="pl-s">'undo'</span><span class="pl-kos">,</span> <span class="pl-s">'redo'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">':p-More Paragraph-default.more_paragraph'</span><span class="pl-kos">,</span> <span class="pl-s">'font'</span><span class="pl-kos">,</span> <span class="pl-s">'fontSize'</span><span class="pl-kos">,</span> <span class="pl-s">'formatBlock'</span><span class="pl-kos">,</span> <span class="pl-s">'paragraphStyle'</span><span class="pl-kos">,</span> <span class="pl-s">'blockquote'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">':t-More Text-default.more_text'</span><span class="pl-kos">,</span> <span class="pl-s">'bold'</span><span class="pl-kos">,</span> <span class="pl-s">'underline'</span><span class="pl-kos">,</span> <span class="pl-s">'italic'</span><span class="pl-kos">,</span> <span class="pl-s">'strike'</span><span class="pl-kos">,</span> <span class="pl-s">'subscript'</span><span class="pl-kos">,</span> <span class="pl-s">'superscript'</span><span class="pl-kos">,</span> <span class="pl-s">'fontColor'</span><span class="pl-kos">,</span> <span class="pl-s">'hiliteColor'</span><span class="pl-kos">,</span> <span class="pl-s">'textStyle'</span><span class="pl-kos">,</span> <span class="pl-s">'removeFormat'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">':e-More Line-default.more_horizontal'</span><span class="pl-kos">,</span> <span class="pl-s">'outdent'</span><span class="pl-kos">,</span> <span class="pl-s">'indent'</span><span class="pl-kos">,</span> <span class="pl-s">'align'</span><span class="pl-kos">,</span> <span class="pl-s">'horizontalRule'</span><span class="pl-kos">,</span> <span class="pl-s">'list'</span><span class="pl-kos">,</span> <span class="pl-s">'lineHeight'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">':r-More Rich-default.more_plus'</span><span class="pl-kos">,</span> <span class="pl-s">'table'</span><span class="pl-kos">,</span> <span class="pl-s">'link'</span><span class="pl-kos">,</span> <span class="pl-s">'image'</span><span class="pl-kos">,</span> <span class="pl-s">'video'</span><span class="pl-kos">,</span> <span class="pl-s">'audio'</span><span class="pl-kos">,</span> <span class="pl-s">'math'</span><span class="pl-kos">,</span> <span class="pl-s">'imageGallery'</span><span class="pl-kos">]</span><span class="pl-kos">,</span>
+            <span class="pl-kos">[</span><span class="pl-s">'-right'</span><span class="pl-kos">,</span> <span class="pl-s">':i-More Misc-default.more_vertical'</span><span class="pl-kos">,</span> <span class="pl-s">'fullScreen'</span><span class="pl-kos">,</span> <span class="pl-s">'showBlocks'</span><span class="pl-kos">,</span> <span class="pl-s">'codeView'</span><span class="pl-kos">,</span> <span class="pl-s">'preview'</span><span class="pl-kos">,</span> <span class="pl-s">'print'</span><span class="pl-kos">,</span> <span class="pl-s">'save'</span><span class="pl-kos">,</span> <span class="pl-s">'template'</span><span class="pl-kos">]</span>
+        <span class="pl-kos">]</span><span class="pl-kos">]</span>
+    <span class="pl-kos">]</span>
+<span class="pl-kos">}</span><span class="pl-kos">)</span></pre></div>
+
+
         <!-- image resize -->
         <a id="image" href="#image"><h4 class="sub-title">Image file resize</h4></a>
         <p></p>
@@ -511,6 +578,8 @@
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/htmlmixed/htmlmixed.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/xml/xml.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/codemirror@5.49.0/mode/css/css.js"></script>
+<!-- KaTeX -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script>
 <script>
     SUNEDITOR.create('exampleOptions',{
         font : [
@@ -591,6 +660,72 @@
         width: 'auto',
         fullPage: true,
     });
+
+    // response toolbar
+    SUNEDITOR.create('responsive_Toolbar', {
+        templates: [
+            {
+                name: 'Template-1',
+                html: '<p>HTML source1</p>'
+            },
+            {
+                name: 'Template-2',
+                html: '<p>HTML source2</p>'
+            }
+        ],
+        codeMirror: CodeMirror,
+        katex: katex,
+        buttonList: [
+            // default
+            ['undo', 'redo'],
+            [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
+            ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+            ['fontColor', 'hiliteColor', 'textStyle'],
+            ['removeFormat'],
+            ['outdent', 'indent'],
+            ['align', 'horizontalRule', 'list', 'lineHeight'],
+            ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template'],
+            ['-right', ':r-More Rich-default.more_plus', 'table', 'math', 'imageGallery'],
+            ['-right', 'image', 'video', 'audio', 'link'],
+            // (min-width: 992)
+            ['%992', [
+                ['undo', 'redo'],
+                [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
+                ['bold', 'underline', 'italic', 'strike'],
+                [':t-More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle'],
+                ['removeFormat'],
+                ['outdent', 'indent'],
+                ['align', 'horizontalRule', 'list', 'lineHeight'],
+                ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template'],
+                ['-right', ':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
+            ]],
+            // (min-width: 767)
+            ['%767', [
+                ['undo', 'redo'],
+                [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
+                [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle'],
+                ['removeFormat'],
+                ['outdent', 'indent'],
+                [':e-More Line-default.more_horizontal', 'align', 'horizontalRule', 'list', 'lineHeight'],
+                [':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
+                ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template']
+            ]],
+            // (min-width: 480)
+            ['%480', [
+                ['undo', 'redo'],
+                [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
+                [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle', 'removeFormat'],
+                [':e-More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'horizontalRule', 'list', 'lineHeight'],
+                [':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
+                ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template']
+            ]]
+        ]
+    })
+
+    var spanDis = document.querySelector('#responsive_Toolbar_size');
+    window.addEventListener('resize', function (e) {
+        spanDis.innerText = (window.innerWidth > 1200 ? 1200 : window.innerWidth) + 'px';
+    })
 
     // resize example
     var editorimageResize = SUNEDITOR.create('imageResize', {
