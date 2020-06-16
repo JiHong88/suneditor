@@ -235,6 +235,8 @@
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="imageUploadSizeLimit">&nbsp;&nbsp;imageUploadSizeLimit</label>
             <input type="text" id="imageUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
+            <br><br>
+            <label><input type="checkbox" id="imageMultipleFile">&nbsp;&nbsp;imageMultipleFile</label>
             <br>
             <h4 style="color: #b94a48;">--Image - image gallery</h4>
             <label><input type="checkbox" id="imageGalleryUrl" checked>&nbsp;&nbsp;imageGalleryUrl</label>
@@ -279,6 +281,8 @@
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="videoUploadSizeLimit">&nbsp;&nbsp;videoUploadSizeLimit</label>
             <input type="text" id="videoUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
+            <br><br>
+            <label><input type="checkbox" id="videoMultipleFile">&nbsp;&nbsp;videoMultipleFile</label>
 
             <br>
             <h4 style="color: #b94a48;">--Audio</h4>
@@ -299,6 +303,8 @@
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="audioUploadSizeLimit">&nbsp;&nbsp;audioUploadSizeLimit</label>
             <input type="text" id="audioUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
+            <br><br>
+            <label><input type="checkbox" id="audioMultipleFile">&nbsp;&nbsp;audioMultipleFile</label>
 
             <br>
             <h4 style="color: #b94a48;">--Table</h4>
@@ -486,6 +492,7 @@ function sun_create () {
         imageRotation: document.getElementById('imageRotation').checked ? document.getElementById('radio_imageRotation_1').checked : undefined,
         imageUploadHeader: document.getElementById('imageUploadHeader').checked ? JSON.parse(document.getElementById('imageUploadHeader_value').value) : undefined,
         imageUploadUrl: document.getElementById('imageUploadUrl').checked ? document.getElementById('imageUploadUrl_value').value : undefined,
+        imageMultipleFile: document.getElementById('imageMultipleFile').checked ? true : undefined,
         imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : undefined,
         imageGalleryUrl: document.getElementById('imageGalleryUrl').checked ? document.getElementById('imageGalleryUrl_value').value : undefined,
         videoResizing: document.getElementById('videoResizing').checked ? undefined : false,
@@ -504,6 +511,7 @@ function sun_create () {
         youtubeQuery: document.getElementById('youtubeQuery').checked ? document.getElementById('youtubeQuery_value').value : undefined,
         videoUploadHeader: document.getElementById('videoUploadHeader').checked ? JSON.parse(document.getElementById('videoUploadHeader_value').value) : undefined,
         videoUploadUrl: document.getElementById('videoUploadUrl').checked ? document.getElementById('videoUploadUrl_value').value : undefined,
+        videoMultipleFile: document.getElementById('videoMultipleFile').checked ? true : undefined,
         videoUploadSizeLimit: document.getElementById('videoUploadSizeLimit').checked ? document.getElementById('videoUploadSizeLimit_value').value : undefined,
         audioFileInput: document.getElementById('audioFileInput').checked ? true : undefined,
         audioUrlInput: document.getElementById('audioUrlInput').checked ? undefined : false,
@@ -511,6 +519,7 @@ function sun_create () {
         audioHeight: document.getElementById('audioHeight').checked ? document.getElementById('audioHeight_value').value : undefined,
         audioUploadHeader: document.getElementById('audioUploadHeader').checked ? JSON.parse(document.getElementById('audioUploadHeader_value').value) : undefined,
         audioUploadUrl: document.getElementById('audioUploadUrl').checked ? document.getElementById('audioUploadUrl_value').value : undefined,
+        audioMultipleFile: document.getElementById('audioMultipleFile').checked ? true : undefined,
         audioUploadSizeLimit: document.getElementById('audioUploadSizeLimit').checked ? document.getElementById('audioUploadSizeLimit_value').value : undefined,
         tableCellControllerPosition: document.getElementById('tableCellControllerPosition').checked ? document.getElementById('tableCellControllerPosition_value').value : undefined,
         tabDisable: document.getElementById('tabDisable').checked,

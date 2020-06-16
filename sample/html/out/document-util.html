@@ -346,7 +346,7 @@
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
                 It is judged whether it is a node related to the text style.<br>
-                (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)
+                <span style="color: #ffe4c4;">(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)</span>
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -373,7 +373,7 @@
             <h4 class="name" id="isFormatElement"><span class="type-signature"></span>isFormatElement<span class="signature">(element)</span><span
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
-                It is judged whether it is the format element. (P, DIV, H[1-6], PRE, LI)<br>
+                It is judged whether it is the format element. <span style="color: #ffe4c4;">(P, DIV, H[1-6], PRE, LI | class="__se__format__replace_xxx")</span><br>
                 Format element also contain "free format Element"
             </div>
             <h5>Parameters:</h5>
@@ -401,7 +401,7 @@
             <h4 class="name" id="isRangeFormatElement"><span class="type-signature"></span>isRangeFormatElement<span class="signature">(element)</span><span
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
-                It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)<br>
+                It is judged whether it is the range format element. <span style="color: #ffe4c4;">(BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__range_xxx")</span><br>
                 Range format element is wrap the format element  (<a href="#isFormatElement">util.isFormatElement</a>)
             </div>
             <h5>Parameters:</h5>
@@ -429,9 +429,41 @@
             <h4 class="name" id="isFreeFormatElement"><span class="type-signature"></span>isFreeFormatElement<span class="signature">(element)</span><span
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
-                It is judged whether it is the free format element. (PRE)<br>
+                It is judged whether it is the free format element. <span style="color: #ffe4c4;">(PRE | class="__se__format__free_xxx")</span><br>
                 Free format elements's line break is "BR" tag.<br>
-                Free format elements is included in the format element.
+                Free format elements is included in the format element.<br>
+                ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">Node</span>
+                    </td>
+                    <td class="description last">The element to check</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="isClosureFreeFormatElement"><span class="type-signature"></span>isClosureFreeFormatElement<span class="signature">(element)</span><span
+                    class="type-signature"> &rarr; {Boolean}</span></h4>
+            <div class="description">
+                It is judged whether it is the closure free format element. <span style="color: #ffe4c4;">(class="__se__format__free__closure_xxx")</span><br>
+                Closure free format elements's line break is "BR" tag.<br>
+                Closure free format elements is included in the free format element.<br>
+                ※ You cannot exit this format with the Enter key.<br>
+                ※ Use it only in special cases. ([ex] format of table cells)
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -581,6 +613,40 @@
                 class="signature">(element, validation)</span><span class="type-signature"> &rarr; {Element|null}</span></h4>
             <div class="description">
                 If a parent node that contains an argument node finds a free format node (<a href="#isFreeFormatElement">util.isFreeFormatElement</a>), it returns that node.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">Node</span>
+                    </td>
+                    <td class="description last">Reference element if null or no value, it is relative to the current focus node.</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>validation</code></td>
+                    <td class="type">
+                        <span class="param-type">Function|null</span>
+                    </td>
+                    <td class="description last">Additional validation function.</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="getClosureFreeFormatElement"><span class="type-signature"></span>getClosureFreeFormatElement<span
+                class="signature">(element, validation)</span><span class="type-signature"> &rarr; {Element|null}</span></h4>
+            <div class="description">
+                If a parent node that contains an argument node finds a closure free format node (<a href="#isClosureFreeFormatElement">util.isClosureFreeFormatElement</a>), it returns that node.
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -2190,11 +2256,13 @@
         <li><a href="document-util.html#isFormatElement">isFormatElement</a></li>
         <li><a href="document-util.html#isRangeFormatElement">isRangeFormatElement</a></li>
         <li><a href="document-util.html#isFreeFormatElement">isFreeFormatElement</a></li>
+        <li><a href="document-util.html#isClosureFreeFormatElement">isClosureFreeFormatElement</a></li>
         <li><a href="document-util.html#isComponent">isComponent</a></li>
         <li><a href="document-util.html#isMediaComponent">isMediaComponent</a></li>
         <li><a href="document-util.html#getFormatElement">getFormatElement</a></li>
         <li><a href="document-util.html#getRangeFormatElement">getRangeFormatElement</a></li>
         <li><a href="document-util.html#getFreeFormatElement">getFreeFormatElement</a></li>
+        <li><a href="document-util.html#getClosureFreeFormatElement">getClosureFreeFormatElement</a></li>
         <li><a href="document-util.html#copyTagAttributes">copyTagAttributes</a></li>
         <li><a href="document-util.html#copyFormatAttributes">copyFormatAttributes</a></li>
         <li><a href="document-util.html#getArrayItem">getArrayItem</a></li>
