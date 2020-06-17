@@ -915,6 +915,25 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
+         * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
+         * Returns a new "range" or argument "range".
+         * @param {Object} range core.getRange()
+         * @returns {Object} range
+         * @private
+         */
+        _getRange_addLine: function (range) {
+            if (util.isWysiwygDiv(range.startContainer) || /FIGURE/i.test(range.commonAncestorContainer.nodeName)) {
+                const wysiwyg = context.element.wysiwyg;
+                const op = util.createElement('P');
+                op.innerHTML = '<br>';
+                wysiwyg.insertBefore(op, wysiwyg.firstElementChild);
+                core.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
+                range = this._variable._range;
+            }
+            return range;
+        },
+
+        /**
          * @description Reset range object to text node selected status.
          * @private
          */
@@ -1164,6 +1183,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Element}
          */
         insertComponent: function (element, notHistoryPush) {
+            this._getRange_addLine(this.getRange());
             const r = this.removeNode();
             let oNode = null;
             let selectionNode = this.getSelectionNode();
@@ -2094,7 +2114,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
          */
         nodeChange: function (appendNode, styleArray, removeNodeArray, strictRemove) {
-            let range = this.getRange();
+            let range = this._getRange_addLine(this.getRange());
             styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
             removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
 
@@ -6119,7 +6139,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             } else {
                 plainText = data.getData('text/plain');
                 cleanData = data.getData('text/html');
-                return event._setClipboardData(type, e, plainText, cleanData, data);
+                if (event._setClipboardData(type, e, plainText, cleanData, data) === false) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
             }
         },
 
@@ -6137,35 +6161,25 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             // paste event
             if (type === 'paste' && typeof functions.onPaste === 'function' && !functions.onPaste(e, cleanData, maxCharCount, core)) {
-                e.preventDefault();
-                e.stopPropagation();
                 return false;
             }
             // drop event
             if (type === 'drop' && typeof functions.onDrop === 'function' && !functions.onDrop(e, data, core)) {
-                e.preventDefault();
-                e.stopPropagation();
                 return false;
             }
 
             // files
             const files = data.files;
             if (files.length > 0 && core.plugins.image) {
-                e.preventDefault();
-                e.stopPropagation();
                 functions.insertImage(files);
                 return false;
             }
 
             if (!maxCharCount) {
-                e.preventDefault();
-                e.stopPropagation();
                 return false;
             }
 
             if (cleanData) {
-                e.stopPropagation();
-                e.preventDefault();
                 functions.insertHTML(cleanData, true);
                 return false;
             }
