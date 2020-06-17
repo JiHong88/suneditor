@@ -6050,14 +6050,42 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         onPaste_wysiwyg: function (e) {
-            const isIE = util.isIE;
-            const clipboardData = isIE ? _w.clipboardData : e.clipboardData;
+            const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
             if (!clipboardData) return true;
+            return event._dataTransferAction('paste', e, clipboardData);
+        },
 
-            const files = clipboardData.files;
+        onCut_wysiwyg: function () {
+            _w.setTimeout(function () {
+                // history stack
+                core.history.push(false);
+            });
+        },
+
+        onDrop_wysiwyg: function (e) {
+            const dataTransfer = e.dataTransfer;
+            if (!dataTransfer) return true;
+            core.removeNode();
+            event._setDropLocationSelection(e);
+            return event._dataTransferAction('drop', e, dataTransfer);
+        },
+
+        _setDropLocationSelection: function (e) {
+            if (e.rangeParent) {
+                core.setRange(e.rangeParent, e.rangeOffset, e.rangeParent, e.rangeOffset);
+            } else if (core._wd.caretRangeFromPoint) {
+                const r = core._wd.caretRangeFromPoint(e.clientX, e.clientY);
+                core.setRange(r.startContainer, r.startOffset, r.endContainer, r.endOffset);
+            } else {
+                const r = core.getRange();
+                core.setRange(r.startContainer, r.startOffset, r.endContainer, r.endOffset);
+            }
+        },
+
+        _dataTransferAction: function (type, e, data) {
             let plainText, cleanData;
-            if (isIE) {
-                plainText = clipboardData.getData('Text');
+            if (util.isIE) {
+                plainText = data.getData('Text');
                 
                 const range = core.getRange();
                 const tempDiv = util.createElement('DIV');
@@ -6079,18 +6107,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     cleanData = tempDiv.innerHTML;
                     util.removeItem(tempDiv);
                     core.setRange(tempRange.sc, tempRange.so, tempRange.ec, tempRange.eo);
-                    event._setClipboardData(e, plainText, cleanData, files);
+                    event._setClipboardData(type, e, plainText, cleanData, data);
                 });
 
                 return true;
             } else {
-                plainText = clipboardData.getData('text/plain');
-                cleanData = clipboardData.getData('text/html');
-                return event._setClipboardData(e, plainText, cleanData, files);
+                plainText = data.getData('text/plain');
+                cleanData = data.getData('text/html');
+                return event._setClipboardData(type, e, plainText, cleanData, data);
             }
         },
 
-        _setClipboardData: function (e, plainText, cleanData, files) {
+        _setClipboardData: function (type, e, plainText, cleanData, data) {
             // MS word
             if (/class=["']*Mso(Normal|List)/i.test(cleanData) || /content=["']*Word.Document/i.test(cleanData) || /content=["']*OneNote.File/i.test(cleanData)) {
                 cleanData = cleanData.replace(/\n/g, ' ');
@@ -6102,15 +6130,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             cleanData = core.cleanHTML(cleanData, core.pasteTagsWhitelistRegExp);
             const maxCharCount = core._charCount(options.charCounterType === 'byte-html' ? cleanData : plainText);
 
-            if (typeof functions.onPaste === 'function' && !functions.onPaste(e, cleanData, maxCharCount, core)) {
+            // paste event
+            if (type === 'paste' && typeof functions.onPaste === 'function' && !functions.onPaste(e, cleanData, maxCharCount, core)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+            // drop event
+            if (type === 'drop' && typeof functions.onDrop === 'function' && !functions.onDrop(e, data, core)) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
             }
 
             // files
+            const files = data.files;
             if (files.length > 0 && core.plugins.image) {
-                event._setDropLocationSelection(e);
                 functions.insertImage(files);
                 return false;
             }
@@ -6126,47 +6161,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 e.preventDefault();
                 functions.insertHTML(cleanData, true);
                 return false;
-            }
-        },
-
-        onCut_wysiwyg: function () {
-            _w.setTimeout(function () {
-                // history stack
-                core.history.push(false);
-            });
-        },
-
-        onDragOver_wysiwyg: function (e) {
-            e.preventDefault();
-        },
-
-        onDrop_wysiwyg: function (e) {
-            const dataTransfer = e.dataTransfer;
-            if (!dataTransfer) return true;
-
-            if (typeof functions.onDrop === 'function' && !functions.onDrop(e, dataTransfer, core)) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            }
-
-            // files
-            const files = dataTransfer.files;
-            if (files.length > 0 && core.plugins.image) {
-                event._setDropLocationSelection(e);
-                functions.insertImage(files);
-            // check char count
-            } else if (!core._charCount(dataTransfer.getData('text/plain'))) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            // html paste
-            } else {
-                const cleanData = core.cleanHTML(dataTransfer.getData('text/html'), core.pasteTagsWhitelistRegExp);
-                if (cleanData) {
-                    event._setDropLocationSelection(e);
-                    functions.insertHTML(cleanData, true);
-                }
             }
         },
 
@@ -6233,14 +6227,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             core.history.push(false);
         },
 
-        _setDropLocationSelection: function (e) {
-            e.stopPropagation();
-            e.preventDefault();
-            
-            const range = core.getRange();
-            core.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
-        },
-
         _onChange_historyStack: function () {
             event._applyTagEffects();
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
@@ -6262,7 +6248,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             eventWysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
             eventWysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
             eventWysiwyg.addEventListener('cut', event.onCut_wysiwyg, false);
-            eventWysiwyg.addEventListener('dragover', event.onDragOver_wysiwyg, false);
             eventWysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
             eventWysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
             eventWysiwyg.addEventListener('focus', event.onFocus_wysiwyg, false);
@@ -6322,7 +6307,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             eventWysiwyg.removeEventListener('keyup', event.onKeyUp_wysiwyg);
             eventWysiwyg.removeEventListener('paste', event.onPaste_wysiwyg);
             eventWysiwyg.removeEventListener('cut', event.onCut_wysiwyg);
-            eventWysiwyg.removeEventListener('dragover', event.onDragOver_wysiwyg);
             eventWysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
             eventWysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
 
@@ -6960,7 +6944,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
     // toolbar visibility
     context.element.toolbar.style.visibility = '';
 
-    // functionss
+    // functions
     core.functions = functions;
 
     return functions;

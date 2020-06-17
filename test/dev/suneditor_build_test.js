@@ -408,7 +408,7 @@ ss.onKeyUp = function (e) {
 };
 ss.onDrop = function (e) {
     // console.log('onDrop', e);
-    return false;
+    return true;
 };
 ss.onPaste = function (e) {
     // console.log('onPaste', e.clipboardData.files)
