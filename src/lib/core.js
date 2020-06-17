@@ -4211,7 +4211,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
             }
             
-            if (this.managedTagsInfo) {
+            if (this.managedTagsInfo && this.managedTagsInfo.query) {
                 const textCompList = dom.querySelectorAll(this.managedTagsInfo.query);
                 for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
                     classList = [].slice.call(textCompList[i].classList);
@@ -6049,12 +6049,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             return false;
         },
 
-        onPaste_wysiwyg: function (e) {
-            const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
-            if (!clipboardData) return true;
-            return event._dataTransferAction('paste', e, clipboardData);
-        },
-
         onCut_wysiwyg: function () {
             _w.setTimeout(function () {
                 // history stack
@@ -6062,9 +6056,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             });
         },
 
+        onPaste_wysiwyg: function (e) {
+            const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
+            if (!clipboardData) return true;
+            return event._dataTransferAction('paste', e, clipboardData);
+        },
+
         onDrop_wysiwyg: function (e) {
             const dataTransfer = e.dataTransfer;
             if (!dataTransfer) return true;
+            if (util.isIE) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+
             core.removeNode();
             event._setDropLocationSelection(e);
             return event._dataTransferAction('drop', e, dataTransfer);
@@ -6101,7 +6107,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 
                 context.element.relative.appendChild(tempDiv);
                 tempDiv.focus();
-                core._editorRange();
 
                 _w.setTimeout(function () {
                     cleanData = tempDiv.innerHTML;
@@ -6146,6 +6151,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             // files
             const files = data.files;
             if (files.length > 0 && core.plugins.image) {
+                e.preventDefault();
+                e.stopPropagation();
                 functions.insertImage(files);
                 return false;
             }
