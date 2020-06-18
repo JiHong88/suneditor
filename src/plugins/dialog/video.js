@@ -66,7 +66,7 @@ export default {
 
         /** add event listeners */
         video_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
-        if (contextVideo.videoInputFile) video_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(core, contextVideo.videoInputFile, contextVideo.videoUrlFile));
+        if (contextVideo.videoInputFile) video_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(contextVideo.videoInputFile, contextVideo.videoUrlFile, contextVideo.preview));
         if (contextVideo.videoInputFile && contextVideo.videoUrlFile) contextVideo.videoInputFile.addEventListener('change', this._fileInputChange.bind(contextVideo));
         if (contextVideo.videoUrlFile) contextVideo.videoUrlFile.addEventListener('input', this._onLinkPreview.bind(contextVideo.preview, contextVideo, context.options.linkProtocol));
 
@@ -124,7 +124,7 @@ export default {
                             '<label>' + lang.dialogBox.videoBox.file + '</label>' +
                             '<div class="se-dialog-form-files">' +
                                 '<input class="se-input-form _se_video_file" type="file" accept="video/*"' + (option.videoMultipleFile ? ' multiple="multiple"' : '') + '/>' +
-                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
+                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
                             '</div>' +
                         '</div>' ;
                 }
@@ -134,7 +134,7 @@ export default {
                         '<div class="se-dialog-form">' +
                             '<label>' + lang.dialogBox.videoBox.url + '</label>' +
                             '<input class="se-input-form se-input-url" type="text" />' +
-                            '<label class="se-link-preview"></label>' +
+                            '<pre class="se-link-preview"></pre>' +
                         '</div>';
                 }
 
@@ -189,13 +189,21 @@ export default {
     },
 
     _fileInputChange: function () {
-        if (!this.videoInputFile.value) this.videoUrlFile.removeAttribute('disabled');
-        else this.videoUrlFile.setAttribute('disabled', true);
+        if (!this.videoInputFile.value) {
+            this.videoUrlFile.removeAttribute('disabled');
+            this.preview.style.textDecoration = '';
+        } else {
+            this.videoUrlFile.setAttribute('disabled', true);
+            this.preview.style.textDecoration = 'line-through';
+        }
     },
 
-    _removeSelectedFiles: function (fileInput, urlInput) {
-        fileInput.value = '';
-        if (urlInput) urlInput.removeAttribute('disabled');
+    _removeSelectedFiles: function (urlInput, preview) {
+        this.value = '';
+        if (urlInput) {
+            urlInput.removeAttribute('disabled');
+            preview.style.textDecoration = '';
+        }
     },
 
     _onLinkPreview: function (context, protocol, e) {
@@ -878,7 +886,10 @@ export default {
         const contextVideo = this.context.video;
         if (contextVideo.videoInputFile) contextVideo.videoInputFile.value = '';
         if (contextVideo.videoUrlFile) contextVideo._linkValue = contextVideo.preview.textContent = contextVideo.videoUrlFile.value = '';
-        if (contextVideo.videoInputFile && contextVideo.videoUrlFile) contextVideo.videoUrlFile.removeAttribute('disabled');
+        if (contextVideo.videoInputFile && contextVideo.videoUrlFile) {
+            contextVideo.videoUrlFile.removeAttribute('disabled');
+            contextVideo.preview.style.textDecoration = '';
+        }
 
         contextVideo._origin_w = this.context.option.videoWidth;
         contextVideo._origin_h = this.context.option.videoHeight;

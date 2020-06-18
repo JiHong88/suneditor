@@ -72,7 +72,7 @@ export default {
                     '<div class="se-dialog-form">' +
                         '<label>' + lang.dialogBox.linkBox.url + '</label>' +
                         '<input class="se-input-form _se_link_url" type="text" />' +
-                        '<label class="se-link-preview"></label>' +
+                        '<pre class="se-link-preview"></pre>' +
                     '</div>' +
                     '<div class="se-dialog-form">' +
                         '<label>' + lang.dialogBox.linkBox.text + '</label><input class="se-input-form _se_link_text" type="text" />' +

@@ -1099,7 +1099,7 @@
         <span class="pl-s1">audio_controller</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'mousedown'</span><span class="pl-kos">,</span> <span class="pl-k">core</span>.<span class="pl-en">eventStop</span>)</span><span class="pl-kos">;</span>
 
         <span class="pl-c">/** add event listeners */</span>
-        <span class="pl-s1">audio_dialog</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'.se-dialog-files-edge-button'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'click'</span><span class="pl-kos">,</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">_removeSelectedFiles</span><span class="pl-kos">.</span><span class="pl-en">bind</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">,</span> <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">fileInput</span><span class="pl-kos">,</span> <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">urlInput</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-s1">audio_dialog</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'.se-dialog-files-edge-button'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'click'</span><span class="pl-kos">,</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">_removeSelectedFiles</span><span class="pl-kos">.</span><span class="pl-en">bind</span><span class="pl-kos">(</span><span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">fileInput</span><span class="pl-kos">,</span> <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">urlInput</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-s1">audio_dialog</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'.se-btn-primary'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'click'</span><span class="pl-kos">,</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">submit</span><span class="pl-kos">.</span><span class="pl-en">bind</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-s1">audio_controller</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'click'</span><span class="pl-kos">,</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">onClick_controller</span><span class="pl-kos">.</span><span class="pl-en">bind</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
 
@@ -1177,8 +1177,8 @@
     <span class="pl-kos">}</span><span class="pl-kos">,</span>
 
     <span class="pl-c">// Disable url input when uploading files</span>
-    <span class="pl-en">_removeSelectedFiles</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">fileInput</span><span class="pl-kos">,</span> <span class="pl-s1">urlInput</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-        <span class="pl-s1">fileInput</span><span class="pl-kos">.</span><span class="pl-c1">value</span> <span class="pl-c1">=</span> <span class="pl-s">''</span><span class="pl-kos">;</span>
+    <span class="pl-en">_removeSelectedFiles</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">urlInput</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">value</span> <span class="pl-c1">=</span> <span class="pl-s">''</span><span class="pl-kos">;</span>
         <span class="pl-k">if</span> <span class="pl-kos">(</span><span class="pl-s1">urlInput</span><span class="pl-kos">)</span> <span class="pl-s1">urlInput</span><span class="pl-kos">.</span><span class="pl-en">removeAttribute</span><span class="pl-kos">(</span><span class="pl-s">'disabled'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
     <span class="pl-kos">}</span><span class="pl-kos">,</span>
 
@@ -2328,7 +2328,7 @@
             audio_controller.addEventListener('mousedown', core.eventStop);
 
             /** add event listeners */
-            audio_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(core, context.fileInput, context.urlInput));
+            audio_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(context.fileInput, context.urlInput));
             audio_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
             audio_controller.addEventListener('click', this.onClick_controller.bind(core));
 
@@ -2406,8 +2406,8 @@
         },
 
         // Disable url input when uploading files
-        _removeSelectedFiles: function (fileInput, urlInput) {
-            fileInput.value = '';
+        _removeSelectedFiles: function (urlInput) {
+            this.value = '';
             if (urlInput) urlInput.removeAttribute('disabled');
         },
 

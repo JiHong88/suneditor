@@ -75,11 +75,11 @@ export default {
         /** add event listeners */
         image_dialog.querySelector('.se-dialog-tabs').addEventListener('click', this.openTab.bind(core));
         image_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
-        if (contextImage.imgInputFile) image_dialog.querySelector('.__se__file_remove').addEventListener('click', this._removeSelectedFiles.bind(core, contextImage.imgInputFile, contextImage.imgUrlFile));
+        if (contextImage.imgInputFile) image_dialog.querySelector('.se-file-remove').addEventListener('click', this._removeSelectedFiles.bind(contextImage.imgInputFile, contextImage.imgUrlFile, contextImage.previewSrc));
         if (contextImage.imgInputFile && contextImage.imgUrlFile) contextImage.imgInputFile.addEventListener('change', this._fileInputChange.bind(contextImage));
 
-        contextImage.imgLink.addEventListener('input', this._onLinkPreview.bind(contextImage.previewLink, contextImage._v_link, context.options.linkProtocol, 'link'));
-        if (contextImage.imgUrlFile) contextImage.imgUrlFile.addEventListener('input', this._onLinkPreview.bind(contextImage.previewSrc, contextImage._v_src, context.options.linkProtocol, 'src'));
+        contextImage.imgLink.addEventListener('input', this._onLinkPreview.bind(contextImage.previewLink, contextImage._v_link, context.options.linkProtocol));
+        if (contextImage.imgUrlFile) contextImage.imgUrlFile.addEventListener('input', this._onLinkPreview.bind(contextImage.previewSrc, contextImage._v_src, context.options.linkProtocol));
 
         const imageGalleryButton = image_dialog.querySelector('.__se__gallery');
         if (imageGalleryButton) imageGalleryButton.addEventListener('click', this._openGallery.bind(core));
@@ -141,7 +141,7 @@ export default {
                                 '<label>' + lang.dialogBox.imageBox.file + '</label>' +
                                 '<div class="se-dialog-form-files">' +
                                     '<input class="se-input-form _se_image_file" type="file" accept="image/*"' + (option.imageMultipleFile ? ' multiple="multiple"' : '') + '/>' +
-                                    '<button type="button" class="se-btn se-dialog-files-edge-button __se__file_remove" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
+                                    '<button type="button" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
                                 '</div>' +
                             '</div>' ;
                     }
@@ -154,7 +154,7 @@ export default {
                                     '<input class="se-input-form se-input-url" type="text" />' +
                                     ((option.imageGalleryUrl && this.plugins.imageGallery) ? '<button type="button" class="se-btn se-dialog-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '">' + this.icons.image_gallery + '</button>' : '') +
                                 '</div>' +
-                                '<label class="se-link-preview"></label>' +
+                                '<pre class="se-link-preview"></pre>' +
                             '</div>';
                     }
         
@@ -200,7 +200,7 @@ export default {
                     '<div class="se-dialog-body">' +
                         '<div class="se-dialog-form">' +
                             '<label>' + lang.dialogBox.linkBox.url + '</label><input class="se-input-form _se_image_link" type="text" />' +
-                            '<label class="se-link-preview"></label>' +
+                            '<pre class="se-link-preview"></pre>' +
                         '</div>' +
                         '<label><input type="checkbox" class="_se_image_link_check"/>&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
                     '</div>' +
@@ -222,13 +222,21 @@ export default {
     },
 
     _fileInputChange: function () {
-        if (!this.imgInputFile.value) this.imgUrlFile.removeAttribute('disabled');
-        else this.imgUrlFile.setAttribute('disabled', true);
+        if (!this.imgInputFile.value) {
+            this.imgUrlFile.removeAttribute('disabled');
+            this.previewSrc.style.textDecoration = '';
+        } else {
+            this.imgUrlFile.setAttribute('disabled', true);
+            this.previewSrc.style.textDecoration = 'line-through';
+        }
     },
 
-    _removeSelectedFiles: function (fileInput, urlInput) {
-        fileInput.value = '';
-        if (urlInput) urlInput.removeAttribute('disabled');
+    _removeSelectedFiles: function (urlInput, previewSrc) {
+        this.value = '';
+        if (urlInput) {
+            urlInput.removeAttribute('disabled');
+            previewSrc.style.textDecoration = '';
+        }
     },
 
     _openGallery: function () {
@@ -241,14 +249,9 @@ export default {
         urlInput.focus();
     },
 
-    _onLinkPreview: function (context, protocol, type, e) {
+    _onLinkPreview: function (context, protocol, e) {
         const value = e.target.value.trim();
-        if (type === 'src' && /^data:/.test(value)) {
-            context._linkValue = value;
-            this.textContent = '[base64]';
-        } else {
-            context._linkValue = this.textContent = !value ? '' : (protocol && value.indexOf('://') === -1 && value.indexOf('#') !== 0) ? protocol + value : value.indexOf('://') === -1 ? '/' + value : value;
-        }
+        context._linkValue = this.textContent = !value ? '' : (protocol && value.indexOf('://') === -1 && value.indexOf('#') !== 0) ? protocol + value : value.indexOf('://') === -1 ? '/' + value : value;
     },
 
     /**
@@ -809,12 +812,7 @@ export default {
     openModify: function (notOpen) {
         const contextImage = this.context.image;
         if (contextImage.imgUrlFile) {
-            const value = contextImage._v_src._linkValue = contextImage.imgUrlFile.value = contextImage._element.src;
-            if (/^data:/.test(value)) {
-                contextImage.previewSrc.textContent = '[base64]';
-            } else {
-                contextImage.previewSrc.textContent = value;
-            }
+            contextImage._v_src._linkValue = contextImage.previewSrc.textContent = contextImage.imgUrlFile.value = contextImage._element.src;
         }
         contextImage._altText = contextImage.altText.value = contextImage._element.alt;
         contextImage._v_link._linkValue = contextImage.previewLink.textContent = contextImage.imgLink.value = contextImage._linkElement === null ? '' : contextImage._linkElement.href;
@@ -1017,7 +1015,10 @@ export default {
         const contextImage = this.context.image;
         if (contextImage.imgInputFile) contextImage.imgInputFile.value = '';
         if (contextImage.imgUrlFile) contextImage._v_src._linkValue = contextImage.previewSrc.textContent = contextImage.imgUrlFile.value = '';
-        if (contextImage.imgInputFile && contextImage.imgUrlFile) contextImage.imgUrlFile.removeAttribute('disabled');
+        if (contextImage.imgInputFile && contextImage.imgUrlFile) {
+            contextImage.imgUrlFile.removeAttribute('disabled');
+            contextImage.previewSrc.style.textDecoration = '';
+        }
 
         contextImage.altText.value = '';
         contextImage._v_link._linkValue = contextImage.previewLink.textContent = contextImage.imgLink.value = '';
