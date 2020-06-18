@@ -29,6 +29,7 @@ export default {
             _youtubeQuery: context.option.youtubeQuery,
             _videoRatio: (context.option.videoRatio * 100) + '%',
             _defaultRatio: (context.option.videoRatio * 100) + '%',
+            _linkValue: '',
             // @require @Override component
             _element: null,
             _cover: null,
@@ -61,11 +62,13 @@ export default {
         contextVideo.videoInputFile = video_dialog.querySelector('._se_video_file');
         contextVideo.videoUrlFile = video_dialog.querySelector('.se-input-url');
         contextVideo.focusElement = contextVideo.videoUrlFile || contextVideo.videoInputFile;
+        contextVideo.preview = video_dialog.querySelector('.se-link-preview');
 
         /** add event listeners */
         video_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
         if (contextVideo.videoInputFile) video_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(core, contextVideo.videoInputFile, contextVideo.videoUrlFile));
         if (contextVideo.videoInputFile && contextVideo.videoUrlFile) contextVideo.videoInputFile.addEventListener('change', this._fileInputChange.bind(contextVideo));
+        if (contextVideo.videoUrlFile) contextVideo.videoUrlFile.addEventListener('input', this._onLinkPreview.bind(contextVideo.preview, contextVideo, context.options.linkProtocol));
 
         contextVideo.proportion = {};
         contextVideo.videoRatioOption = {};
@@ -131,6 +134,7 @@ export default {
                         '<div class="se-dialog-form">' +
                             '<label>' + lang.dialogBox.videoBox.url + '</label>' +
                             '<input class="se-input-form se-input-url" type="text" />' +
+                            '<label class="se-link-preview"></label>' +
                         '</div>';
                 }
 
@@ -192,6 +196,16 @@ export default {
     _removeSelectedFiles: function (fileInput, urlInput) {
         fileInput.value = '';
         if (urlInput) urlInput.removeAttribute('disabled');
+    },
+
+    _onLinkPreview: function (context, protocol, e) {
+        const value = e.target.value.trim();
+        if (/^<iframe.*\/iframe>$/.test(value)) {
+            context._linkValue = value;
+            this.textContent = '<IFrame :src=".."></IFrame>';
+        } else {
+            context._linkValue = this.textContent = !value ? '' : (protocol && value.indexOf('://') === -1 && value.indexOf('#') !== 0) ? protocol + value : value.indexOf('://') === -1 ? '/' + value : value;
+        }
     },
 
     createVideoTag: function () {
@@ -322,7 +336,7 @@ export default {
             if (contextVideo.videoInputFile && contextVideo.videoInputFile.files.length > 0) {
                 this.showLoading();
                 videoPlugin.submitAction.call(this, this.context.video.videoInputFile.files);
-            } else if (contextVideo.videoUrlFile && contextVideo.videoUrlFile.value.trim().length > 0) {
+            } else if (contextVideo.videoUrlFile && contextVideo._linkValue.length > 0) {
                 this.showLoading();
                 videoPlugin.setup_url.call(this);
             }
@@ -445,38 +459,36 @@ export default {
     setup_url: function () {
         try {
             const contextVideo = this.context.video;
-            let oIframe = null;
-            let url = contextVideo.videoUrlFile.value.trim();
+            let url = contextVideo._linkValue;
 
             if (url.length === 0) return false;
 
             /** iframe source */
             if (/^<iframe.*\/iframe>$/.test(url)) {
-                oIframe = (new this._w.DOMParser()).parseFromString(url, 'text/html').querySelector('iframe');
+                const oIframe = (new this._w.DOMParser()).parseFromString(url, 'text/html').querySelector('iframe');
+                url = oIframe.src;
+                if (url.length === 0) return false;
             }
-            /** url */
-            else {
-                oIframe = this.plugins.video.createIframeTag.call(this);
-                /** youtube */
-                if (/youtu\.?be/.test(url)) {
-                    if (!/^http/.test(url)) url = 'https://' + url;
-                    url = url.replace('watch?v=', '');
-                    if (!/^\/\/.+\/embed\//.test(url)) {
-                        url = url.replace(url.match(/\/\/.+\//)[0], '//www.youtube.com/embed/').replace('&', '?&');
-                    }
+            
+            /** youtube */
+            if (/youtu\.?be/.test(url)) {
+                if (!/^http/.test(url)) url = 'https://' + url;
+                url = url.replace('watch?v=', '');
+                if (!/^\/\/.+\/embed\//.test(url)) {
+                    url = url.replace(url.match(/\/\/.+\//)[0], '//www.youtube.com/embed/').replace('&', '?&');
+                }
 
-                    if (contextVideo._youtubeQuery.length > 0) {
-                        if (/\?/.test(url)) {
-                            const splitUrl = url.split('?');
-                            url = splitUrl[0] + '?' + contextVideo._youtubeQuery + '&' + splitUrl[1];
-                        } else {
-                            url += '?' + contextVideo._youtubeQuery;
-                        }
+                if (contextVideo._youtubeQuery.length > 0) {
+                    if (/\?/.test(url)) {
+                        const splitUrl = url.split('?');
+                        url = splitUrl[0] + '?' + contextVideo._youtubeQuery + '&' + splitUrl[1];
+                    } else {
+                        url += '?' + contextVideo._youtubeQuery;
                     }
                 }
             }
 
-            this.plugins.video.create_video.call(this, oIframe, url, contextVideo.inputX.value, contextVideo.inputY.value, contextVideo._align, null, this.context.dialog.updateModal);
+            this.plugins.video.create_video.call(this, this.plugins.video.createIframeTag.call(this), url, contextVideo.inputX.value, contextVideo.inputY.value, contextVideo._align, null, this.context.dialog.updateModal);
         } catch (error) {
             throw Error('[SUNEDITOR.video.upload.fail] cause : "' + error.message + '"');
         } finally {
@@ -632,7 +644,7 @@ export default {
     openModify: function (notOpen) {
         const contextVideo = this.context.video;
 
-        if (contextVideo.videoUrlFile) contextVideo.videoUrlFile.value = (contextVideo._element.src || (contextVideo._element.querySelector('source') || '').src || '');
+        if (contextVideo.videoUrlFile) contextVideo._linkValue = contextVideo.preview.textContent = contextVideo.videoUrlFile.value = (contextVideo._element.src || (contextVideo._element.querySelector('source') || '').src || '');
         contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="' + contextVideo._align + '"]').checked = true;
 
         if (contextVideo._resizing) {
@@ -865,7 +877,7 @@ export default {
     init: function () {
         const contextVideo = this.context.video;
         if (contextVideo.videoInputFile) contextVideo.videoInputFile.value = '';
-        if (contextVideo.videoUrlFile) contextVideo.videoUrlFile.value = '';
+        if (contextVideo.videoUrlFile) contextVideo._linkValue = contextVideo.preview.textContent = contextVideo.videoUrlFile.value = '';
         if (contextVideo.videoInputFile && contextVideo.videoUrlFile) contextVideo.videoUrlFile.removeAttribute('disabled');
 
         contextVideo._origin_w = this.context.option.videoWidth;

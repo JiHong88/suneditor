@@ -21,7 +21,7 @@ export default {
             linkNewWindowCheck: null,
             linkAnchorText: null,
             _linkAnchor: null,
-            linkProtocol: context.option.linkProtocol
+            _linkValue: ''
         };
 
         /** link dialog */
@@ -30,6 +30,7 @@ export default {
         context.link.focusElement = link_dialog.querySelector('._se_link_url');
         context.link.linkAnchorText = link_dialog.querySelector('._se_link_text');
         context.link.linkNewWindowCheck = link_dialog.querySelector('._se_link_check');
+        context.link.preview = link_dialog.querySelector('.se-link-preview');
 
         /** link controller */
         let link_controller = this.setController_LinkButton.call(core);
@@ -40,6 +41,7 @@ export default {
         /** add event listeners */
         link_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
         link_controller.addEventListener('click', this.onClick_linkController.bind(core));
+        context.link.focusElement.addEventListener('input', this._onLinkPreview.bind(context.link.preview, context.link, context.options.linkProtocol));
 
         /** append html */
         context.dialog.modal.appendChild(link_dialog);
@@ -70,6 +72,7 @@ export default {
                     '<div class="se-dialog-form">' +
                         '<label>' + lang.dialogBox.linkBox.url + '</label>' +
                         '<input class="se-input-form _se_link_url" type="text" />' +
+                        '<label class="se-link-preview"></label>' +
                     '</div>' +
                     '<div class="se-dialog-form">' +
                         '<label>' + lang.dialogBox.linkBox.text + '</label><input class="se-input-form _se_link_text" type="text" />' +
@@ -122,6 +125,11 @@ export default {
         this.plugins.dialog.open.call(this, 'link', 'link' === this.currentControllerName);
     },
 
+    _onLinkPreview: function (context, protocol, e) {
+        const value = e.target.value.trim();
+        context._linkValue = this.textContent = !value ? '' : (protocol && value.indexOf('://') === -1 && value.indexOf('#') !== 0) ? protocol + value : value.indexOf('://') === -1 ? '/' + value : value;
+    },
+
     submit: function (e) {
         this.showLoading();
 
@@ -129,15 +137,10 @@ export default {
         e.stopPropagation();
 
         const submitAction = function () {
-            if (this.context.link.focusElement.value.trim().length === 0) return false;
-
             const contextLink = this.context.link;
-            let url = contextLink.focusElement.value;
-
-            if (contextLink.linkProtocol && url.indexOf('://') === -1 && url.indexOf('#') !== 0) {
-                url = contextLink.linkProtocol + url;
-            }
+            if (contextLink._linkValue.length === 0) return false;
             
+            const url = contextLink._linkValue;
             const anchor = contextLink.linkAnchorText;
             const anchorText = anchor.value.length === 0 ? url : anchor.value;
 
@@ -170,8 +173,7 @@ export default {
             // history stack
             this.history.push(false);
 
-            contextLink.focusElement.value = '';
-            contextLink.linkAnchorText.value = '';
+            contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = contextLink.linkAnchorText.value = '';
         }.bind(this);
 
         try {
@@ -207,14 +209,15 @@ export default {
      * @Override dialog
      */
     on: function (update) {
+        const contextLink = this.context.link;
         if (!update) {
             this.plugins.link.init.call(this);
-            this.context.link.linkAnchorText.value = this.getSelection().toString();
-        } else if (this.context.link._linkAnchor) {
+            contextLink.linkAnchorText.value = this.getSelection().toString();
+        } else if (contextLink._linkAnchor) {
             this.context.dialog.updateModal = true;
-            this.context.link.focusElement.value = this.context.link._linkAnchor.href;
-            this.context.link.linkAnchorText.value = this.context.link._linkAnchor.textContent;
-            this.context.link.linkNewWindowCheck.checked = (/_blank/i.test(this.context.link._linkAnchor.target) ? true : false);
+            contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = contextLink._linkAnchor.href;
+            contextLink.linkAnchorText.value = contextLink._linkAnchor.textContent;
+            contextLink.linkNewWindowCheck.checked = (/_blank/i.test(contextLink._linkAnchor.target) ? true : false);
         }
     },
 
@@ -254,7 +257,7 @@ export default {
 
         if (/update/.test(command)) {
             const contextLink = this.context.link;
-            contextLink.focusElement.value = contextLink._linkAnchor.href;
+            contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = contextLink._linkAnchor.href;
             contextLink.linkAnchorText.value = contextLink._linkAnchor.textContent;
             contextLink.linkNewWindowCheck.checked = (/_blank/i.test(contextLink._linkAnchor.target) ? true : false);
             this.plugins.dialog.open.call(this, 'link', true);
@@ -285,7 +288,7 @@ export default {
         const contextLink = this.context.link;
         contextLink.linkController.style.display = 'none';
         contextLink._linkAnchor = null;
-        contextLink.focusElement.value = '';
+        contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = '';
         contextLink.linkAnchorText.value = '';
         contextLink.linkNewWindowCheck.checked = false;
     }

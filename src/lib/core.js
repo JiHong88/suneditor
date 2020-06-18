@@ -6189,8 +6189,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             // files
             const files = data.files;
-            if (files.length > 0 && core.plugins.image) {
-                functions.insertImage(files);
+            if (files.length > 0) {
+                if (/^image/.test(files[0].type) && core.plugins.image) {
+                    functions.insertImage(files);
+                }
                 return false;
             }
 

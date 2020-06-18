@@ -26,6 +26,7 @@ export default {
             targetSelect: null,
             _origin_w: context.option.audioWidth,
             _origin_h: context.option.audioHeight,
+            _linkValue: '',
             // @require @Override component
             _element: null,
             _cover: null,
@@ -38,6 +39,7 @@ export default {
         contextAudio.audioInputFile = audio_dialog.querySelector('._se_audio_files');
         contextAudio.audioUrlFile = audio_dialog.querySelector('.se-input-url');
         contextAudio.focusElement = contextAudio.audioInputFile || contextAudio.audioUrlFile;
+        contextAudio.preview = audio_dialog.querySelector('.se-link-preview');
 
         /** controller */
         let audio_controller = this.setController.call(core);
@@ -50,6 +52,7 @@ export default {
         if (contextAudio.audioInputFile) audio_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(core, context.audioInputFile, context.audioUrlFile));
         if (contextAudio.audioInputFile && contextAudio.audioUrlFile) contextAudio.audioInputFile.addEventListener('change', this._fileInputChange.bind(contextAudio));
         audio_controller.addEventListener('click', this.onClick_controller.bind(core));
+        if (contextAudio.audioUrlFile) contextAudio.audioUrlFile.addEventListener('input', this._onLinkPreview.bind(contextAudio.preview, contextAudio, context.options.linkProtocol));
 
         /** append html */
         context.dialog.modal.appendChild(audio_dialog);
@@ -95,6 +98,7 @@ export default {
                         '<div class="se-dialog-form">' +
                             '<label>' + lang.dialogBox.audioBox.url + '</label>' +
                             '<input class="se-input-form se-input-url" type="text" />' +
+                            '<label class="se-link-preview"></label>' +
                         '</div>';
                 }
                     
@@ -158,6 +162,11 @@ export default {
         oAudio.style.cssText = (w ? ('width:' + w + '; ') : '') + (h ? ('height:' + h + ';') : '');
 
         return oAudio;
+    },
+
+    _onLinkPreview: function (context, protocol, e) {
+        const value = e.target.value.trim();
+        context._linkValue = this.textContent = !value ? '' : (protocol && value.indexOf('://') === -1 && value.indexOf('#') !== 0) ? protocol + value : value.indexOf('://') === -1 ? '/' + value : value;
     },
 
     /**
@@ -225,7 +234,7 @@ export default {
             if (contextAudio.audioInputFile && this.context.options.audioMultipleFile) contextAudio.audioInputFile.setAttribute('multiple', 'multiple');
         } else if (contextAudio._element) {
             this.context.dialog.updateModal = true;
-            contextAudio.audioUrlFile.value = contextAudio._element.src;
+            contextAudio._linkValue = contextAudio.preview.textContent = contextAudio.audioUrlFile.value = contextAudio._element.src;
             if (contextAudio.audioInputFile && this.context.options.audioMultipleFile) contextAudio.audioInputFile.removeAttribute('multiple');
         } else {
             if (contextAudio.audioInputFile && this.context.options.audioMultipleFile) contextAudio.audioInputFile.removeAttribute('multiple');
@@ -249,9 +258,9 @@ export default {
             if (context.audioInputFile && context.audioInputFile.files.length > 0) {
                 this.showLoading();
                 this.plugins.audio.submitAction.call(this, context.audioInputFile.files);
-            } else if (context.audioUrlFile && context.audioUrlFile.value.trim().length > 0) {
+            } else if (context.audioUrlFile && context._linkValue.length > 0) {
                 this.showLoading();
-                this.plugins.audio.setupUrl.call(this, context.audioUrlFile);
+                this.plugins.audio.setupUrl.call(this, context._linkValue);
             }
         } catch (error) {
             this.closeLoading();
@@ -367,11 +376,9 @@ export default {
         }
     },
 
-    setupUrl: function (urlFile) {
+    setupUrl: function (src) {
         try {
-            const src = urlFile.value.trim();
             if (src.length === 0) return false;
-
             this.plugins.audio.create_audio.call(this, this.plugins.audio._createAudioTag.call(this), src, null, this.context.dialog.updateModal);
         } catch (error) {
             throw Error('[SUNEDITOR.audio.audio.fail] cause : "' + error.message + '"');
@@ -457,7 +464,10 @@ export default {
      * @Required @Override fileManager, resizing
      */
     openModify: function (notOpen) {
-        if (this.context.audio.audioUrlFile) this.context.audio.audioUrlFile.value = this.context.audio._element.src;
+        if (this.context.audio.audioUrlFile) {
+            const contextAudio = this.context.audio;
+            contextAudio._linkValue = contextAudio.preview.textContent = contextAudio.audioUrlFile.value = contextAudio._element.src;
+        }
         if (!notOpen) this.plugins.dialog.open.call(this, 'audio', true);
     },
 
@@ -492,7 +502,7 @@ export default {
         const context = this.context.audio;
 
         if (context.audioInputFile) context.audioInputFile.value = '';
-        if (context.audioUrlFile) context.audioUrlFile.value = '';
+        if (context.audioUrlFile) context._linkValue = context.preview.textContent = context.audioUrlFile.value = '';
         if (context.audioInputFile && context.audioUrlFile) context.audioUrlFile.removeAttribute('disabled');
 
         context._element = null;

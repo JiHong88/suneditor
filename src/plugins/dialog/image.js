@@ -26,9 +26,10 @@ export default {
             sizeUnit: context.option._imageSizeUnit,
             _altText: '',
             _linkElement: null,
-            _linkValue: '',
             _align: 'none',
             _floatClassRegExp: '__se__float\\-[a-z]+',
+            _v_link: {_linkValue: ''},
+            _v_src: {_linkValue: ''},
             // @require @Override component
             _element: null,
             _cover: null,
@@ -68,12 +69,17 @@ export default {
         contextImage.imgLink = image_dialog.querySelector('._se_image_link');
         contextImage.imgLinkNewWindowCheck = image_dialog.querySelector('._se_image_link_check');
         contextImage.captionCheckEl = image_dialog.querySelector('._se_image_check_caption');
+        contextImage.previewLink = image_dialog.querySelector('._se_tab_content_url .se-link-preview');
+        contextImage.previewSrc = image_dialog.querySelector('._se_tab_content_image .se-link-preview');
 
         /** add event listeners */
         image_dialog.querySelector('.se-dialog-tabs').addEventListener('click', this.openTab.bind(core));
         image_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
         if (contextImage.imgInputFile) image_dialog.querySelector('.__se__file_remove').addEventListener('click', this._removeSelectedFiles.bind(core, contextImage.imgInputFile, contextImage.imgUrlFile));
         if (contextImage.imgInputFile && contextImage.imgUrlFile) contextImage.imgInputFile.addEventListener('change', this._fileInputChange.bind(contextImage));
+
+        contextImage.imgLink.addEventListener('input', this._onLinkPreview.bind(contextImage.previewLink, contextImage._v_link, context.options.linkProtocol, 'link'));
+        if (contextImage.imgUrlFile) contextImage.imgUrlFile.addEventListener('input', this._onLinkPreview.bind(contextImage.previewSrc, contextImage._v_src, context.options.linkProtocol, 'src'));
 
         const imageGalleryButton = image_dialog.querySelector('.__se__gallery');
         if (imageGalleryButton) imageGalleryButton.addEventListener('click', this._openGallery.bind(core));
@@ -148,6 +154,7 @@ export default {
                                     '<input class="se-input-form se-input-url" type="text" />' +
                                     ((option.imageGalleryUrl && this.plugins.imageGallery) ? '<button type="button" class="se-btn se-dialog-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '">' + this.icons.image_gallery + '</button>' : '') +
                                 '</div>' +
+                                '<label class="se-link-preview"></label>' +
                             '</div>';
                     }
         
@@ -193,6 +200,7 @@ export default {
                     '<div class="se-dialog-body">' +
                         '<div class="se-dialog-form">' +
                             '<label>' + lang.dialogBox.linkBox.url + '</label><input class="se-input-form _se_image_link" type="text" />' +
+                            '<label class="se-link-preview"></label>' +
                         '</div>' +
                         '<label><input type="checkbox" class="_se_image_link_check"/>&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
                     '</div>' +
@@ -231,6 +239,16 @@ export default {
         altText.value = target.alt;
         urlInput.value = target.src;
         urlInput.focus();
+    },
+
+    _onLinkPreview: function (context, protocol, type, e) {
+        const value = e.target.value.trim();
+        if (type === 'src' && /^data:/.test(value)) {
+            context._linkValue = value;
+            this.textContent = '[base64]';
+        } else {
+            context._linkValue = this.textContent = !value ? '' : (protocol && value.indexOf('://') === -1 && value.indexOf('#') !== 0) ? protocol + value : value.indexOf('://') === -1 ? '/' + value : value;
+        }
     },
 
     /**
@@ -341,7 +359,6 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
-        contextImage._linkValue = contextImage.imgLink.value;
         contextImage._altText = contextImage.altText.value;
         contextImage._align = contextImage.modal.querySelector('input[name="suneditor_image_radio"]:checked').value;
         contextImage._captionChecked = contextImage.captionCheckEl.checked;
@@ -355,7 +372,7 @@ export default {
             if (contextImage.imgInputFile && contextImage.imgInputFile.files.length > 0) {
                 this.showLoading();
                 imagePlugin.submitAction.call(this, this.context.image.imgInputFile.files);
-            } else if (contextImage.imgUrlFile && contextImage.imgUrlFile.value.trim().length > 0) {
+            } else if (contextImage.imgUrlFile && contextImage._v_src._linkValue.length > 0) {
                 this.showLoading();
                 imagePlugin.onRender_imgUrl.call(this);
             }
@@ -403,7 +420,7 @@ export default {
         contextImage._uploadFileLength = files.length;
         
         const info = {
-            linkValue: contextImage._linkValue,
+            linkValue: contextImage._v_link._linkValue,
             linkNewWindow: contextImage.imgLinkNewWindowCheck.checked,
             inputWidth: contextImage.inputX.value,
             inputHeight: contextImage.inputY.value,
@@ -511,12 +528,12 @@ export default {
 
     onRender_imgUrl: function () {
         const contextImage = this.context.image;
-        if (contextImage.imgUrlFile.value.trim().length === 0) return false;
+        if (contextImage._v_src._linkValue.length === 0) return false;
 
         try {
-            const file = {name: contextImage.imgUrlFile.value.split('/').pop(), size: 0};
-            if (this.context.dialog.updateModal) this.plugins.image.update_src.call(this, contextImage.imgUrlFile.value, contextImage._element, file);
-            else this.plugins.image.create_image.call(this, contextImage.imgUrlFile.value, contextImage._linkValue, contextImage.imgLinkNewWindowCheck.checked, contextImage.inputX.value, contextImage.inputY.value, contextImage._align, file);
+            const file = {name: contextImage._v_src._linkValue.split('/').pop(), size: 0};
+            if (this.context.dialog.updateModal) this.plugins.image.update_src.call(this, contextImage._v_src._linkValue, contextImage._element, file);
+            else this.plugins.image.create_image.call(this, contextImage._v_src._linkValue, contextImage._v_link._linkValue, contextImage.imgLinkNewWindowCheck.checked, contextImage.inputX.value, contextImage.inputY.value, contextImage._align, file);
         } catch (e) {
             throw Error('[SUNEDITOR.image.URLRendering.fail] cause : "' + e.message + '"');
         } finally {
@@ -623,7 +640,7 @@ export default {
 
     update_image: function (init, openController, notHistoryPush) {
         const contextImage = this.context.image;
-        const linkValue = contextImage._linkValue;
+        const linkValue = contextImage._v_link._linkValue;
         let imageEl = contextImage._element;
         let cover = contextImage._cover;
         let container = contextImage._container;
@@ -791,9 +808,16 @@ export default {
      */
     openModify: function (notOpen) {
         const contextImage = this.context.image;
-        if (contextImage.imgUrlFile) contextImage.imgUrlFile.value = contextImage._element.src;
+        if (contextImage.imgUrlFile) {
+            const value = contextImage._v_src._linkValue = contextImage.imgUrlFile.value = contextImage._element.src;
+            if (/^data:/.test(value)) {
+                contextImage.previewSrc.textContent = '[base64]';
+            } else {
+                contextImage.previewSrc.textContent = value;
+            }
+        }
         contextImage._altText = contextImage.altText.value = contextImage._element.alt;
-        contextImage._linkValue = contextImage.imgLink.value = contextImage._linkElement === null ? '' : contextImage._linkElement.href;
+        contextImage._v_link._linkValue = contextImage.previewLink.textContent = contextImage.imgLink.value = contextImage._linkElement === null ? '' : contextImage._linkElement.href;
         contextImage.imgLinkNewWindowCheck.checked = contextImage._linkElement && contextImage._linkElement.target === '_blank';
         contextImage.modal.querySelector('input[name="suneditor_image_radio"][value="' + contextImage._align + '"]').checked = true;
         contextImage._align = contextImage.modal.querySelector('input[name="suneditor_image_radio"]:checked').value;
@@ -992,11 +1016,11 @@ export default {
     init: function () {
         const contextImage = this.context.image;
         if (contextImage.imgInputFile) contextImage.imgInputFile.value = '';
-        if (contextImage.imgUrlFile) contextImage.imgUrlFile.value = '';
+        if (contextImage.imgUrlFile) contextImage._v_src._linkValue = contextImage.previewSrc.textContent = contextImage.imgUrlFile.value = '';
         if (contextImage.imgInputFile && contextImage.imgUrlFile) contextImage.imgUrlFile.removeAttribute('disabled');
 
         contextImage.altText.value = '';
-        contextImage.imgLink.value = '';
+        contextImage._v_link._linkValue = contextImage.previewLink.textContent = contextImage.imgLink.value = '';
         contextImage.imgLinkNewWindowCheck.checked = false;
         contextImage.modal.querySelector('input[name="suneditor_image_radio"][value="none"]').checked = true;
         contextImage.captionCheckEl.checked = false;
