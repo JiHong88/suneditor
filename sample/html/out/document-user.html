@@ -899,10 +899,11 @@
 
 
             <h4 class="name" id="onImageUploadBefore"><span class="type-signature"></span>onImageUploadBefore<span
-                    class="signature">(files, info, core)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+                    class="signature">(files, info, core, uploadHandler)</span><span class="type-signature"> &rarr; {Boolean|Array|undefined}</span></h4>
             <div class="description">
                 Called before the image is uploaded.<br>
-                If false is returned, no image upload is performed.
+                If false is returned, no image upload is performed.<br>
+                If new fileList are returned,  replaced the previous fileList
             </div>
             <table class="params">
                 <thead>
@@ -941,6 +942,19 @@
                         <span class="param-type">Object</span>
                     </td>
                     <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                <tr>
+                    <td class="name"><code>uploadHandler</code></td>
+                    <td class="type">
+                        <span class="param-type">Function</span>
+                    </td>
+                    <td class="description last">
+                        If undefined is returned, it waits until "uploadHandler" is executed.<br>
+                        "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))<br>
+                        [upload files] : <span style="color: #ffe4c4;">uploadHandler(files or [new File(...),])</span><br>
+                        [error] &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : <span style="color: #ffe4c4;">uploadHandler("Error message")</span><br>
+                        [Just finish] &nbsp; &nbsp;: <span style="color: #ffe4c4;">uploadHandler()</span>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -1106,10 +1120,11 @@
 
 
             <h4 class="name" id="onVideoUploadBefore"><span class="type-signature"></span>onVideoUploadBefore<span
-                    class="signature">(files, info, core)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+                    class="signature">(files, info, core, uploadHandler)</span><span class="type-signature"> &rarr; {Boolean|Array|undefined}</span></h4>
             <div class="description">
                 Called before the video is uploaded.<br>
-                If false is returned, no video(iframe, video) upload is performed.
+                If false is returned, no video(iframe, video) upload is performed.<br>
+                If new fileList are returned,  replaced the previous fileList
             </div>
             <table class="params">
                 <thead>
@@ -1146,6 +1161,19 @@
                         <span class="param-type">Object</span>
                     </td>
                     <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                <tr>
+                    <td class="name"><code>uploadHandler</code></td>
+                    <td class="type">
+                        <span class="param-type">Function</span>
+                    </td>
+                    <td class="description last">
+                        If undefined is returned, it waits until "uploadHandler" is executed.<br>
+                        "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))<br>
+                        [upload files] : <span style="color: #ffe4c4;">uploadHandler(files or [new File(...),])</span><br>
+                        [error] &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : <span style="color: #ffe4c4;">uploadHandler("Error message")</span><br>
+                        [Just finish] &nbsp; &nbsp;: <span style="color: #ffe4c4;">uploadHandler()</span>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -1262,10 +1290,11 @@
 
 
             <h4 class="name" id="onAudioUploadBefore"><span class="type-signature"></span>onAudioUploadBefore<span
-                    class="signature">(files, info, core)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+                    class="signature">(files, info, core, uploadHandler)</span><span class="type-signature"> &rarr; {Boolean|Array|undefined}</span></h4>
             <div class="description">
                 Called before the audio is uploaded.<br>
-                If false is returned, no audio upload is performed.
+                If false is returned, no audio upload is performed.<br>
+                If new fileList are returned,  replaced the previous fileList
             </div>
             <table class="params">
                 <thead>
@@ -1291,6 +1320,66 @@
                     <td class="description last">
                         <strong>isUpdate</strong>: Update audio if true, create audio if false<br>
                         <strong>element</strong>: If isUpdate is true, the currently selected audio<br>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                <tr>
+                    <td class="name"><code>uploadHandler</code></td>
+                    <td class="type">
+                        <span class="param-type">Function</span>
+                    </td>
+                    <td class="description last">
+                        If undefined is returned, it waits until "uploadHandler" is executed.<br>
+                        "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))<br>
+                        [upload files] : <span style="color: #ffe4c4;">uploadHandler(files or [new File(...),])</span><br>
+                        [error] &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : <span style="color: #ffe4c4;">uploadHandler("Error message")</span><br>
+                        [Just finish] &nbsp; &nbsp;: <span style="color: #ffe4c4;">uploadHandler()</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="videoUploadHandler"><span class="type-signature"></span>videoUploadHandler<span
+                    class="signature">(xmlHttpRequest, info, core)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                It replaces the default callback function of the video upload.
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>xmlHttpRequest</code></td>
+                    <td class="type">
+                        <span class="param-type">XMLHttpRequest</span>
+                    </td>
+                    <td class="description last">xmlHttpRequest object</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>info</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">
+                        -- Input information --<br>
+                        <strong>inputWidth:</strong> Value of width input<br>
+                        <strong>inputHeight:</strong> Value of height input<br>
+                        <strong>align:</strong> Align Check Value<br>
+                        <strong>isUpdate:</strong> Update video if true, create video if false<br>
+                        <strong>element:</strong> If isUpdate is true, the currently selected video.<br>
                     </td>
                 </tr>
                 <tr>
@@ -1401,6 +1490,50 @@
                         <span class="param-type">Object</span>
                     </td>
                     <td class="description last">Response object</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="videoUploadHandler"><span class="type-signature"></span>videoUploadHandler<span
+                    class="signature">(xmlHttpRequest, info, core)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                It replaces the default callback function of the audio upload.
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>xmlHttpRequest</code></td>
+                    <td class="type">
+                        <span class="param-type">XMLHttpRequest</span>
+                    </td>
+                    <td class="description last">xmlHttpRequest object</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>info</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">
+                        -- Input information --<br>
+                        <strong>isUpdate:</strong> Update audio if true, create audio if false<br>
+                        <strong>element:</strong> If isUpdate is true, the currently selected audio.<br>
+                    </td>
                 </tr>
                 <tr>
                     <td class="name"><code>core</code></td>
@@ -1611,9 +1744,11 @@
         <li><a href="document-user.html#onVideoUploadBefore">onVideoUploadBefore</a></li>
         <li><a href="document-user.html#onVideoUpload">onVideoUpload</a></li>
         <li><a href="document-user.html#onVideoUploadError">onVideoUploadError</a></li>
+        <li><a href="document-user.html#videoUploadHandler">videoUploadHandler</a></li>
         <li><a href="document-user.html#onAudioUploadBefore">onAudioUploadBefore</a></li>
         <li><a href="document-user.html#onAudioUpload">onAudioUpload</a></li>
         <li><a href="document-user.html#onAudioUploadError">onAudioUploadError</a></li>
+        <li><a href="document-user.html#audioUploadHandler">audioUploadHandler</a></li>
         <li><a href="document-user.html#toggleCodeView">toggleCodeView</a></li>
         <li><a href="document-user.html#toggleFullScreen">toggleFullScreen</a></li>
         <li><a href="document-user.html#showInline">showInline</a></li>

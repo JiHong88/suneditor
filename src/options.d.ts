@@ -238,6 +238,10 @@ export interface SunEditorOptions {
      */
     imageUploadSizeLimit?: number;
     /**
+     * If true, multiple images can be selected.
+     */
+    imageMultipleFile?: boolean;
+    /**
      * Image - image gallery
      * =====
      * The url of the image gallery, if you use the image gallery
@@ -311,6 +315,10 @@ export interface SunEditorOptions {
      */
     videoUploadSizeLimit?: number;
     /**
+     * If true, multiple videos can be selected.
+     */
+    videoMultipleFile?: boolean;
+    /**
      * Audio
      * =====
      */
@@ -342,6 +350,10 @@ export interface SunEditorOptions {
      * The size of the total uploadable audios (in bytes)
      */
     audioUploadSizeLimit?: number;
+    /**
+     * If true, videos images can be selected.
+     */
+    audioMultipleFile?: boolean;
     /**
      * Table
      * =====
@@ -384,6 +396,10 @@ export interface SunEditorOptions {
      * The placeholder text
      */
     placeholder?: string;
+    /**
+     * Protocol for the links (if link has been added without any protocol this one will be used).
+     */
+    linkProtocol?: string;
     /**
      * You can redefine icons.
      */

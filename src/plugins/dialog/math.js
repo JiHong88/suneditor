@@ -13,8 +13,7 @@ export default {
             focusElement: null,
             previewElement: null,
             fontSizeElement: null,
-            _mathExp: null,
-            _renderer: null
+            _mathExp: null
         };
 
         /** math dialog */
@@ -23,19 +22,15 @@ export default {
         context.math.focusElement = math_dialog.querySelector('.se-math-exp');
         context.math.previewElement = math_dialog.querySelector('.se-math-preview');
         context.math.fontSizeElement = math_dialog.querySelector('.se-math-size');
-        context.math._renderer = function (exp) {
-            return this.src.renderToString(exp, this.options);
-        }.bind(core.context.option.katex);
-
-        context.math.focusElement.addEventListener('keyup', this._renderMathExp.bind(context.math), false);
-        context.math.focusElement.addEventListener('change', this._renderMathExp.bind(context.math), false);
+        context.math.focusElement.addEventListener('keyup', this._renderMathExp.bind(core, context.math), false);
+        context.math.focusElement.addEventListener('change', this._renderMathExp.bind(core, context.math), false);
         context.math.fontSizeElement.addEventListener('change', function (e) { this.fontSize = e.target.value; }.bind(context.math.previewElement.style), false);
 
         /** math controller */
         let math_controller = this.setController_MathButton.call(core);
         context.math.mathController = math_controller;
         context.math._mathExp = null;
-        math_controller.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
+        math_controller.addEventListener('mousedown', core.eventStop);
 
         /** add event listeners */
         math_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core), false);
@@ -116,12 +111,34 @@ export default {
         return math_btn;
     },
 
+    /**
+     * @Required @Override dialog
+     */
     open: function () {
         this.plugins.dialog.open.call(this, 'math', 'math' === this.currentControllerName);
     },
 
-    _renderMathExp: function (e) {
-        this.previewElement.innerHTML = this._renderer(e.target.value);
+    /**
+     * @Override core - managedTagsInfo
+     */
+    managedTags: function () {
+        return {
+            className: 'katex',
+            method: function (element) {
+                if (!element.getAttribute('data-exp')) return;
+                const dom = this._d.createRange().createContextualFragment(this.plugins.math._renderer.call(this, element.getAttribute('data-exp')));
+                element.innerHTML = dom.querySelector('.katex').innerHTML;
+            }
+        };
+    },
+
+    _renderer: function (exp) {
+        const katex = this.context.option.katex;
+        return katex.src.renderToString(exp, katex.options);
+    },
+
+    _renderMathExp: function (contextMath, e) {
+        contextMath.previewElement.innerHTML = this.plugins.math._renderer.call(this, e.target.value);
     },
 
     submit: function (e) {
@@ -138,6 +155,7 @@ export default {
             const katexEl = contextMath.previewElement.querySelector('.katex');
 
             if (!katexEl) return false;
+            katexEl.className = '__se__katex ' + katexEl.className;
             katexEl.setAttribute('contenteditable', false);
             katexEl.setAttribute('data-exp', mathExp);
             katexEl.setAttribute('data-font-size', contextMath.fontSizeElement.value);
@@ -158,20 +176,7 @@ export default {
                 katexEl.parentNode.insertBefore(empty, katexEl.nextSibling);
                 this.setRange(katexEl, 0, katexEl, 1);
             } else {
-                const findParent = function (child, className) {
-                    if (child.classList.contains(className)) return child;
-
-                    const parent = child.parentNode;
-
-                    if (parent === document.body) return;
-
-                    if (parent.classList.contains(className)) {
-                        return parent;
-                    } else {
-                        findParent(parent, className);
-                    }
-                };
-                const containerEl = findParent(contextMath._mathExp, 'katex');
+                const containerEl = this.util.getParentElement(contextMath._mathExp, '.katex');
                 containerEl.parentNode.replaceChild(katexEl, containerEl);
                 this.setRange(katexEl, 0, katexEl, 1);
             }
@@ -226,7 +231,7 @@ export default {
                 this.context.dialog.updateModal = true;
                 contextMath.focusElement.value = exp;
                 contextMath.fontSizeElement.value = fontSize;
-                contextMath.previewElement.innerHTML = contextMath._renderer(exp);
+                contextMath.previewElement.innerHTML = this.plugins.math._renderer.call(this, exp);
                 contextMath.previewElement.style.fontSize = fontSize;
             }
         }

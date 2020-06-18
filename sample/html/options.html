@@ -90,6 +90,7 @@
                 <option value="it">it</option>
                 <option value="ja">ja</option>
                 <option value="ko">ko</option>
+                <option value="pl">pl</option>
                 <option value="pt_br">pt_br</option>
                 <option value="ro">ro</option>
                 <option value="ru">ru</option>
@@ -234,6 +235,8 @@
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="imageUploadSizeLimit">&nbsp;&nbsp;imageUploadSizeLimit</label>
             <input type="text" id="imageUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
+            <br><br>
+            <label><input type="checkbox" id="imageMultipleFile">&nbsp;&nbsp;imageMultipleFile</label>
             <br>
             <h4 style="color: #b94a48;">--Image - image gallery</h4>
             <label><input type="checkbox" id="imageGalleryUrl" checked>&nbsp;&nbsp;imageGalleryUrl</label>
@@ -278,6 +281,8 @@
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="videoUploadSizeLimit">&nbsp;&nbsp;videoUploadSizeLimit</label>
             <input type="text" id="videoUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
+            <br><br>
+            <label><input type="checkbox" id="videoMultipleFile">&nbsp;&nbsp;videoMultipleFile</label>
 
             <br>
             <h4 style="color: #b94a48;">--Audio</h4>
@@ -298,6 +303,8 @@
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="audioUploadSizeLimit">&nbsp;&nbsp;audioUploadSizeLimit</label>
             <input type="text" id="audioUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
+            <br><br>
+            <label><input type="checkbox" id="audioMultipleFile">&nbsp;&nbsp;audioMultipleFile</label>
 
             <br>
             <h4 style="color: #b94a48;">--Table</h4>
@@ -332,6 +339,9 @@
             <h4 style="color: #b94a48;">--ETC</h4>
             <label><input type="checkbox" id="placeholder">&nbsp;&nbsp;placeholder</label>
             <input type="text" id="placeholder_value" placeholder="String" style="width: 200px">
+            <br><br>
+            <label><input type="checkbox" id="linkProtocol">&nbsp;&nbsp;linkProtocol</label>
+            <input type="text" id="linkProtocol_value" placeholder="https://" style="width: 200px">
             <br><br>
             <label><input type="checkbox" id="icons">&nbsp;&nbsp;icons</label><br>
             <span>{</span><br>
@@ -404,6 +414,7 @@
 <script src="../../src/lang/it.js"></script>
 <script src="../../src/lang/ja.js"></script>
 <script src="../../src/lang/ko.js"></script>
+<script src="../../src/lang/pl.js"></script>
 <script src="../../src/lang/pt_br.js"></script>
 <script src="../../src/lang/ro.js"></script>
 <script src="../../src/lang/ru.js"></script>
@@ -484,6 +495,7 @@ function sun_create () {
         imageRotation: document.getElementById('imageRotation').checked ? document.getElementById('radio_imageRotation_1').checked : undefined,
         imageUploadHeader: document.getElementById('imageUploadHeader').checked ? JSON.parse(document.getElementById('imageUploadHeader_value').value) : undefined,
         imageUploadUrl: document.getElementById('imageUploadUrl').checked ? document.getElementById('imageUploadUrl_value').value : undefined,
+        imageMultipleFile: document.getElementById('imageMultipleFile').checked ? true : undefined,
         imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : undefined,
         imageGalleryUrl: document.getElementById('imageGalleryUrl').checked ? document.getElementById('imageGalleryUrl_value').value : undefined,
         videoResizing: document.getElementById('videoResizing').checked ? undefined : false,
@@ -502,6 +514,7 @@ function sun_create () {
         youtubeQuery: document.getElementById('youtubeQuery').checked ? document.getElementById('youtubeQuery_value').value : undefined,
         videoUploadHeader: document.getElementById('videoUploadHeader').checked ? JSON.parse(document.getElementById('videoUploadHeader_value').value) : undefined,
         videoUploadUrl: document.getElementById('videoUploadUrl').checked ? document.getElementById('videoUploadUrl_value').value : undefined,
+        videoMultipleFile: document.getElementById('videoMultipleFile').checked ? true : undefined,
         videoUploadSizeLimit: document.getElementById('videoUploadSizeLimit').checked ? document.getElementById('videoUploadSizeLimit_value').value : undefined,
         audioFileInput: document.getElementById('audioFileInput').checked ? true : undefined,
         audioUrlInput: document.getElementById('audioUrlInput').checked ? undefined : false,
@@ -509,6 +522,7 @@ function sun_create () {
         audioHeight: document.getElementById('audioHeight').checked ? document.getElementById('audioHeight_value').value : undefined,
         audioUploadHeader: document.getElementById('audioUploadHeader').checked ? JSON.parse(document.getElementById('audioUploadHeader_value').value) : undefined,
         audioUploadUrl: document.getElementById('audioUploadUrl').checked ? document.getElementById('audioUploadUrl_value').value : undefined,
+        audioMultipleFile: document.getElementById('audioMultipleFile').checked ? true : undefined,
         audioUploadSizeLimit: document.getElementById('audioUploadSizeLimit').checked ? document.getElementById('audioUploadSizeLimit_value').value : undefined,
         tableCellControllerPosition: document.getElementById('tableCellControllerPosition').checked ? document.getElementById('tableCellControllerPosition_value').value : undefined,
         tabDisable: document.getElementById('tabDisable').checked,
@@ -520,6 +534,7 @@ function sun_create () {
         textStyles: document.getElementById('textStyles').checked ? ['translucent', {name: 'Emphasis', style: '-webkit-text-emphasis: filled;', tag: 'span'}] : undefined,
         templates: document.getElementById('templates').checked ? [{name: 'Template-1', html: '<p>HTML source1</p>'},{name: 'Template-2', html: '<p>HTML source2</p>'}] : undefined,
         placeholder: document.getElementById('placeholder').checked ? document.getElementById('placeholder_value').value : undefined,
+        linkProtocol: document.getElementById('linkProtocol').checked ? document.getElementById('linkProtocol_value').value : undefined,
         icons: document.getElementById('icons').checked ? { paragraph_style: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>' } : undefined,
         buttonList: [
             ['undo', 'redo',

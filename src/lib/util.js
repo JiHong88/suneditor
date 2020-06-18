@@ -114,6 +114,7 @@ const util = {
     },
 
     /**
+     * @deprecated
      * @description Get the the tag path of the arguments value
      * If not found, return the first found value
      * @param {Array} nameArray File name array
@@ -158,6 +159,7 @@ const util = {
     },
 
     /**
+     * @deprecated
      * @description Returns the CSS text that has been applied to the current page.
      * @param {Document|null} doc To get the CSS text of an document(core._wd). If null get the current document.
      * @returns {String} Styles string
@@ -263,7 +265,7 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI)
+     * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI | class="__se__format__replace_xxx")
      * Format element also contain "free format Element"
      * @param {Node} element The node to check
      * @returns {Boolean}
@@ -273,7 +275,7 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD)
+     * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__range_xxx")
      * * Range format element is wrap the format element  (util.isFormatElement)
      * @param {Node} element The node to check
      * @returns {Boolean}
@@ -283,9 +285,10 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the free format element. (PRE)
+     * @description It is judged whether it is the free format element. (PRE | class="__se__format__free_xxx")
      * Free format elements's line break is "BR" tag.
      * Free format elements is included in the format element.
+     * ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
@@ -294,7 +297,20 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the component [img, iframe, video, audio] cover(element className - ".se-component") and table, hr
+     * @description It is judged whether it is the closure free format element. (class="__se__format__free__closure_xxx")
+     * Closure free format elements's line break is "BR" tag.
+     * Closure free format elements is included in the free format element.
+     * ※ You cannot exit this format with the Enter key.
+     * ※ Use it only in special cases. ([ex] format of table cells)
+     * @param {Node} element The node to check
+     * @returns {Boolean}
+     */
+    isClosureFreeFormatElement: function (element) {
+        return (element && element.nodeType === 1 && this.hasClass(element, '(\\s|^)__se__format__free__closure_.+(\\s|$)'));
+    },
+
+    /**
+     * @description It is judged whether it is the component [img, iframe, video, audio] cover(class="se-component") and table, hr
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
@@ -303,7 +319,7 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the component [img, iframe] cover(element className - ".se-component")
+     * @description It is judged whether it is the component [img, iframe] cover(class="se-component")
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
@@ -370,6 +386,28 @@ const util = {
         while (element) {
             if (this.isWysiwygDiv(element)) return null;
             if (this.isFreeFormatElement(element) && validation(element)) return element;
+
+            element = element.parentNode;
+        }
+        
+        return null;
+    },
+
+    /**
+     * @description If a parent node that contains an argument node finds a closure free format node (util.isClosureFreeFormatElement), it returns that node.
+     * @param {Node} element Reference node.
+     * @param {Function|null} validation Additional validation function.
+     * @returns {Element|null}
+     */
+    getClosureFreeFormatElement: function (element, validation) {
+        if (!element) return null;
+        if (!validation) {
+            validation = function () { return true; };
+        }
+
+        while (element) {
+            if (this.isWysiwygDiv(element)) return null;
+            if (this.isClosureFreeFormatElement(element) && validation(element)) return element;
 
             element = element.parentNode;
         }
@@ -1522,13 +1560,32 @@ const util = {
          * It is can use ".children(util.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
          * So check the node type and exclude the text no (current.nodeType !== 1)
          */
-        // empty whitelist
-        const emptyWhitelistTags = [];
+        const emptyWhitelistTags = [], emptyTags = [], wrongList = [], withoutFormatCells = [];
         // wrong position
         const wrongTags = this.getListChildNodes(documentFragment, function (current) {
             if (current.nodeType !== 1) return false;
+
+            // white list
             if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0) {
                 emptyWhitelistTags.push(current);
+                return false;
+            }
+
+            // empty tags
+            if ((!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && !this.getParentElement(current, '.katex')) {
+                emptyTags.push(current);
+                return false;
+            }
+
+            // wrong list
+            if (this.isList(current.parentNode) && !this.isList(current) && !this.isListCell(current)) {
+                wrongList.push(current);
+                return false;
+            }
+
+            // table cells
+            if (this.isCell(current) && (!this.isFormatElement(current.firstElementChild) || current.textContent.trim().length === 0)) {
+                withoutFormatCells.push(current);
                 return false;
             }
 
@@ -1543,11 +1600,12 @@ const util = {
         }
         
         const checkTags = [];
-        for (let i = 0, len = wrongTags.length, t, tp; i < len; i++) {
+        for (let i = 0, len = wrongTags.length, t, p; i < len; i++) {
             t = wrongTags[i];
-            tp = t.parentNode;
-            tp.parentNode.insertBefore(t, tp);
-            checkTags.push(tp);
+            p = t.parentNode;
+            if (!p || !p.parentNode) continue;
+            p.parentNode.insertBefore(t, p);
+            checkTags.push(p);
         }
 
         for (let i = 0, len = checkTags.length, t; i < len; i++) {
@@ -1557,23 +1615,11 @@ const util = {
             }
         }
 
-        // remove empty tags
-        const emptyTags = this.getListChildNodes(documentFragment, function (current) {
-            if (current.nodeType !== 1) return false;
-            return (!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && !util.getParentElement(current, '.katex');
-        }.bind(this));
-
         for (let i in emptyTags) {
             this.removeItem(emptyTags[i]);
         }
 
-        // wrong list
-        const wrongList = this.getListChildNodes(documentFragment, function (current) {
-            if (current.nodeType !== 1) return false;
-            return this.isList(current.parentNode) && !this.isList(current) && !this.isListCell(current);
-        }.bind(this));
-
-        for (let i = 0, len = wrongList.length, t, tp, children; i < len; i++) {
+        for (let i = 0, len = wrongList.length, t, tp, children, p; i < len; i++) {
             t = wrongList[i];
 
             tp = this.createElement('LI');
@@ -1582,19 +1628,14 @@ const util = {
                 tp.appendChild(children[0]);
             }
             
-            t.parentNode.insertBefore(tp, t);
+            p = t.parentNode;
+            if (!p) continue;
+            p.insertBefore(tp, t);
             this.removeItem(t);
         }
 
-        // table cells without format
-        const withoutFormatCells = this.getListChildNodes(documentFragment, function (current) {
-            if (current.nodeType !== 1) return false;
-            return this.isCell(current) && (!this.isFormatElement(current.firstElementChild) || current.textContent.trim().length === 0);
-        }.bind(this));
-
         for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {
             t = withoutFormatCells[i];
-
             f = this.createElement('DIV');
             f.innerHTML = t.textContent.trim().length === 0 ? '<br>' : t.innerHTML;
             t.innerHTML = f.outerHTML;

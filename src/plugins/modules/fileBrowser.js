@@ -317,6 +317,8 @@
             let target = e.target;
             let command = null;
 
+            if (target === listEl) return;
+
             while (listEl !== target.parentNode) {
                 command = target.getAttribute('data-command');
                 if (command) break;

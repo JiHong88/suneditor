@@ -138,7 +138,7 @@ export default {
         audio_controller.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** add event listeners */
-        audio_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(core, context.fileInput, context.urlInput));
+        audio_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(context.fileInput, context.urlInput));
         audio_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
         audio_controller.addEventListener('click', this.onClick_controller.bind(core));
 
@@ -172,7 +172,7 @@ export default {
                         '<label>' + lang.audio.file + '</label>' +
                         '<div class="se-dialog-form-files">' +
                             '<input class="se-input-form _se_audio_files" type="file" accept="audio/*" multiple="multiple" />' +
-                            '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
+                            '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
                         '</div>' +
                     '</div>' +
                     '<div class="se-dialog-form">' +
@@ -216,8 +216,8 @@ export default {
     },
 
     // Disable url input when uploading files
-    _removeSelectedFiles: function (fileInput, urlInput) {
-        fileInput.value = '';
+    _removeSelectedFiles: function (urlInput) {
+        this.value = '';
         if (urlInput) urlInput.removeAttribute('disabled');
     },
 

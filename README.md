@@ -337,7 +337,7 @@ pasteTagsWhitelist    : Whitelist of tags when pasting. default: _editorTagsWhit
 attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.
                         // -- Fixed whitelist --
                         // Native attributes: 'contenteditable|colspan|rowspan|target|href|src|class|type|controls'
-                        // Editor attributes: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size'
+                        // Editor attributes: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size'
                         ex) {
                             'all': 'style', // Apply to all tags
                             'input': 'checked' // Apply to input tag
@@ -358,9 +358,10 @@ stickyToolbar   : Reference height value that should be changed to sticky toolba
 iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {Boolean}
 fullPage        : Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.  default: false {Boolean}
 iframeCSSFileName : Name or Array of the CSS file to apply inside the iframe.
+                    You can also use regular expressions.
                     Applied by searching by filename in the link tag of document,
-                    or put the URL value.                                        default: 'suneditor' {Array|String}
-                    ex) 'main' or ['suneditor', 'http://suneditor.com/sample/css/sample.css']
+                    or put the URL value (".css" can be omitted).   default: 'suneditor' {Array|String}
+                    ex) '.+' or ['suneditor', 'http://suneditor.com/sample/css/sample.css', '.+\\.min\\.css']
 codeMirror      : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
                   Use version 5.x.x // https://github.com/codemirror/CodeMirror
                   ex) codeMirror: CodeMirror // Default option
@@ -447,7 +448,7 @@ formats         : Change default formatBlock array.                 default: [..
                     tag: 'div', // Tag name
                     name: 'Custom div' || null, // default: tag name
                     command: 'replace' || 'range' || 'free', // default: "replace"
-                    class: '__se__format__replace_xxx' || '__se__format__range_xxx' || '__se__format__free_xxx'
+                    class: '__se__format__replace_xxx' || '__se__format__range_xxx' || '__se__format__free_xxx' || '__se__format__free__closure_xxx'
                     // Class names must always begin with "__se__format__(replace, range, free)_"
                   }]
 colorList       : Change default color array of color picker.       default: [..[..]..] {Array}
@@ -556,6 +557,7 @@ imageUploadUrl  : The image upload to server mapping address.       default: nul
                         }
 imageUploadSizeLimit: The size of the total uploadable images (in bytes).
                       Invokes the "onImageUploadError" method.  default: null {Number}
+imageMultipleFile: If true, multiple images can be selected.    default: false {Boolean}
 // Image - image gallery
 imageGalleryUrl     : The url of the image gallery, if you use the image gallery.
                       When "imageUrlInput" is true, an image gallery button is created in the image modal.
@@ -623,6 +625,7 @@ videoUploadUrl  : The video upload to server mapping address.       default: nul
                         }
 videoUploadSizeLimit: The size of the total uploadable videos (in bytes).
                       Invokes the "onVideoUploadError" method.  default: null {Number}
+videoMultipleFile: If true, multiple videos can be selected.    default: false {Boolean}
 
 // Audio----------------------------------------------------------------------------------------------------------
 audioWidth      : The default width size of the audio frame.           default: '300px' {String}
@@ -650,6 +653,7 @@ audioUploadUrl  : The audio upload to server mapping address.       default: nul
                         }
 audioUploadSizeLimit: The size of the total uploadable audios (in bytes).
                       Invokes the "onAudioUploadError" method.  default: null {Number}
+audioMultipleFile: If true, multiple audios can be selected.    default: false {Boolean}
 
 // Table----------------------------------------------------------------------------------------------------------
 tableCellControllerPosition : Define position to the table cell controller('cell', 'top'). default: 'cell' {String}
@@ -680,6 +684,8 @@ templates       : If you use a template plugin, add it.
 
 // ETC------------------------------------------------------------------------------------------------------------
 placeholder     : The placeholder text.                              default: null {String}
+linkProtocol    : Default protocol for the links. ('link', 'image', 'video', 'audio')
+                  This applies to all plugins that enter the internet url.   default: null {String}
 icons           : You can redefine icons.                            default: null {Object}
                   ex) {
                       bold: '<span class="se-icon-text">B</span>',
@@ -975,16 +981,19 @@ editor.onDrop = function (e, core) { console.log('onDrop', e) }
  * - isUpdate: Update image if true, create image if false
  * - element: If isUpdate is true, the currently selected image.
  * }
- * core: Core object
- * return {Boolean|Array}
+ * core: Core object,
+ * uploadHandler: If undefined is returned, it waits until "uploadHandler" is executed.
+ *                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
+ *                [upload files] : uploadHandler(files or [new File(...),])
+ *                [error]        : uploadHandler("Error message")
+ *                [Just finish]  : uploadHandler()
+ * return {Boolean|Array|undefined}
  */
-editor.onImageUploadBefore: function (files, info, core) {
+editor.onImageUploadBefore: function (files, info, core, uploadHandler) {
     console.log('files', files);
     console.log('info', info);
 
-    return Boolean;
-    // or
-    return [] // (new files);
+    return Boolean || return (new FileList) || return undefined;
 }
 // Called before the video is uploaded
 // If false is returned, no video(iframe, video) upload is performed.
@@ -998,16 +1007,19 @@ editor.onImageUploadBefore: function (files, info, core) {
  * - isUpdate: Update video if true, create video if false
  * - element: If isUpdate is true, the currently selected video.
  * }
- * core: Core object
- * return {Boolean}
+ * core: Core object,
+ * uploadHandler: If undefined is returned, it waits until "uploadHandler" is executed.
+ *                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
+ *                [upload files] : uploadHandler(files or [new File(...),])
+ *                [error]        : uploadHandler("Error message")
+ *                [Just finish]  : uploadHandler()
+ * return {Boolean|Array|undefined}
  */
-editor.onVideoUploadBefore: function (files, info, core) {
+editor.onVideoUploadBefore: function (files, info, core, uploadHandler) {
     console.log('files', files);
     console.log('info', info);
     
-    return Boolean;
-    // or
-    return [] // (new files);
+    return Boolean || return (new FileList) || return undefined;
 }
 // Called before the audio is uploaded
 // If false is returned, no audio upload is performed.
@@ -1018,16 +1030,19 @@ editor.onVideoUploadBefore: function (files, info, core) {
 * - isUpdate: Update audio if true, create audio if false
 * - currentaudio: If isUpdate is true, the currently selected audio.
 * }
-* core: Core object
-* return {Boolean}
+* core: Core object,
+* uploadHandler: If undefined is returned, it waits until "uploadHandler" is executed.
+*                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
+*                [upload files] : uploadHandler(files or [new File(...),])
+*                [error]        : uploadHandler("Error message")
+*                [Just finish]  : uploadHandler()
+* return {Boolean|Array|undefined}
 */
-editor.onAudioUploadBefore: function (files, info, core) {
+editor.onAudioUploadBefore: function (files, info, core, uploadHandler) {
     console.log('files', files);
     console.log('info', info);
 
-    return Boolean;
-    // or
-    return [] // (new files);
+    return Boolean || return (new FileList) || return undefined;
 }
 
 // Called when the image is uploaded, updated, deleted.
@@ -1068,7 +1083,7 @@ editor.onAudioUpload = function (targetElement, index, state, info, remainingFil
 // If you return false, the default notices are not called.
 /**
  * errorMessage: Error message
- * result: Response Objectz
+ * result: Response Object
  * core: Core object
  * return {Boolean}
 */

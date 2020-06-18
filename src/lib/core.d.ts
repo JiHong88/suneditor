@@ -604,34 +604,75 @@ export default class SunEditor {
     imageUploadHandler: (xmlHttpRequest: XMLHttpRequest, info: imageInputInformation, core: Core) => void;
 
     /**
+     * @description It replaces the default callback function of the video upload
+     * @param xmlHttpRequest xmlHttpRequest object
+     * @param info Input information
+     * - inputWidth: Value of width input
+     * - inputHeight: Value of height input
+     * - align: Align Check Value
+     * - isUpdate: Update video if true, create video if false
+     * - element: If isUpdate is true, the currently selected video.
+     * @param core Core object
+     */
+    videoUploadHandler: (xmlHttpRequest: XMLHttpRequest, info: videoInputInformation, core: Core) => void;
+
+    /**
+     * @description It replaces the default callback function of the audio upload
+     * @param xmlHttpRequest xmlHttpRequest object
+     * @param info Input information
+     * - isUpdate: Update audio if true, create audio if false
+     * - element: If isUpdate is true, the currently selected audio.
+     * @param core Core object
+     */
+    audioUploadHandler: (xmlHttpRequest: XMLHttpRequest, info: audioInputInformation, core: Core) => void;
+
+    /**
      * @description Called before the image is uploaded
      * If false is returned, no image upload is performed.
+     * If new fileList are returned,  replaced the previous fileList
      * @param files Files array
      * @param info Input information
      * @param core Core object
+     * @param uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
+     *                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
+     *                [upload files] : uploadHandler(files or [new File(...),])
+     *                [error]        : uploadHandler("Error message")
+     *                [Just finish]  : uploadHandler()
      * @returns
      */
-    onImageUploadBefore: (files: any[], info: imageInputInformation, core: Core) => boolean | any[];
+    onImageUploadBefore: (files: any[], info: imageInputInformation, core: Core, uploadHandler: Function) => boolean | any[] | undefined;
 
     /**
      * @description Called before the video is uploaded
      * If false is returned, no video upload is performed.
+     * If new fileList are returned,  replaced the previous fileList
      * @param files Files array
      * @param info Input information
      * @param core Core object
+     * @param uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
+     *                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
+     *                [upload files] : uploadHandler(files or [new File(...),])
+     *                [error]        : uploadHandler("Error message")
+     *                [Just finish]  : uploadHandler()
      * @returns
      */
-    onVideoUploadBefore: (files: any[], info: videoInputInformation, core: Core) => boolean | any[];
+    onVideoUploadBefore: (files: any[], info: videoInputInformation, core: Core, uploadHandler: Function) => boolean | any[] | undefined;
 
     /**
      * @description Called before the audio is uploaded
      * If false is returned, no audio upload is performed.
+     * If new fileList are returned,  replaced the previous fileList
      * @param files Files array
      * @param info Input information
      * @param core Core object
+     * @param uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
+     *                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
+     *                [upload files] : uploadHandler(files or [new File(...),])
+     *                [error]        : uploadHandler("Error message")
+     *                [Just finish]  : uploadHandler()
      * @returns
      */
-    onAudioUploadBefore: (files: any[], info: audioInputInformation, core: Core) => boolean | any[];
+    onAudioUploadBefore: (files: any[], info: audioInputInformation, core: Core, uploadHandler: Function) => boolean | any[] | undefined;
 
     /**
      * @description Called when the image is uploaded, updated, deleted
