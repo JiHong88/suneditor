@@ -922,7 +922,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _getRange_addLine: function (range) {
-            if (util.isWysiwygDiv(range.startContainer) || /FIGURE/i.test(range.commonAncestorContainer.nodeName)) {
+            if (this._selectionVoid(range)) {
                 const wysiwyg = context.element.wysiwyg;
                 const op = util.createElement('P');
                 op.innerHTML = '<br>';
@@ -934,11 +934,25 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
+         * @description Returns true if there is no valid "selection".
+         * @param {Object} range core.getRange()
+         * @returns {Object} range
+         * @private
+         */
+        _selectionVoid: function (range) {
+            const comm = range.commonAncestorContainer;
+            return (util.isWysiwygDiv(range.startContainer) && util.isWysiwygDiv(range.endContainer)) || /FIGURE/i.test(comm.nodeName) || this._fileManager.regExp.test(comm.nodeName) || util.isMediaComponent(comm);
+        },
+
+        /**
          * @description Reset range object to text node selected status.
+         * @returns {Boolean} Returns false if there is no valid selection.
          * @private
          */
         _resetRangeToTextNode: function () {
             const range = this.getRange();
+            if (this._selectionVoid(range)) return false;
+            
             let startCon = range.startContainer;
             let startOff = range.startOffset;
             let endCon = range.endContainer;
@@ -1030,6 +1044,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             // set Range
             this.setRange(startCon, startOff, endCon, endOff);
+            return true;
         },
 
         /**
@@ -1038,13 +1053,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Array}
          */
         getSelectedElements: function (validation) {
-            this._resetRangeToTextNode();
+            if (!this._resetRangeToTextNode()) return [];
             let range = this.getRange();
 
-            if (util.isWysiwygDiv(range.startContainer)) {
+            if (util.isWysiwygDiv(range.commonAncestorContainer)) {
                 const children = context.element.wysiwyg.children;
+                if (children.length === 0) return [];
 
-                if (children.length === 0) return null;
                 this.setRange(children[0], 0, children[children.length - 1], children[children.length - 1].textContent.trim().length);
                 range = this.getRange();
             }
@@ -1649,6 +1664,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Element} rangeElement Element of wrap the arguments (BLOCKQUOTE...)
          */
         applyRangeFormatElement: function (rangeElement) {
+            this._getRange_addLine(this.getRange());
             const rangeLines = this.getSelectedElementsAndComponents(false);
             if (!rangeLines || rangeLines.length === 0) return;
 
@@ -4501,6 +4517,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             }
             
+            // set whitelist
             const defaultAttr = 'contenteditable|colspan|rowspan|target|href|src|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
             this._htmlCheckWhitelistRegExp = new _w.RegExp('^(' + options._editorTagsWhitelist.replace('|//', '') + ')$', 'i');
@@ -4519,14 +4536,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     }
                 }
             }
-            
+
             this._attributesWhitelistRegExp = new _w.RegExp('((?:' + allAttr + defaultAttr + ')\s*=\s*"[^"]*")', 'ig');
             this._attributesTagsWhitelist = tagsAttr;
 
+            // set modes
             this._isInline = /inline/i.test(options.mode);
             this._isBalloon = /balloon|balloon-always/i.test(options.mode);
             this._isBalloonAlways = /balloon-always/i.test(options.mode);
 
+            // caching buttons
             this._cachingButtons();
 
             // file components
