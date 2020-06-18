@@ -3947,6 +3947,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 topArea.style.top = '0';
                 topArea.style.left = '0';
                 topArea.style.width = '100%';
+                topArea.style.maxWidth = '100%';
                 topArea.style.height = '100%';
                 topArea.style.zIndex = '2147483647';
 

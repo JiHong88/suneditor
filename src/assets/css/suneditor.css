@@ -392,7 +392,7 @@
 @media screen and (max-width:992px) { .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {width:calc(33% - 20px);} }
 @media screen and (max-width:768px) { .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-column {width:calc(50% - 20px);} }
 /* --- browser --- custom - "se-image-list" - item */
-.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img {position:relative; display:flex; cursor: pointer; width:100%; height:auto; border-radius:4px; outline:0; margin:10px 0;}
+.sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img {position:relative; display:block; cursor: pointer; width:100%; height:auto; border-radius:4px; outline:0; margin:10px 0;}
 .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img:hover {opacity:0.8; -webkit-box-shadow:0 0 0 0.2rem #1f7cff; box-shadow:0 0 0 0.2rem #1f7cff;}
 .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img > img {position:relative; display:block; width:100%; border-radius:4px; outline:0; height:auto;}
 .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img > .se-file-img-name {position: absolute; z-index:1; font-size:13px; color:#fff; left:0px; bottom:0; padding:5px 10px; background-color:transparent; width:100%; height:30px; border-bottom-right-radius:4px; border-bottom-left-radius:4px;}
