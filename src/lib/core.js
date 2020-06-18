@@ -3940,6 +3940,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     this._isInline = false;
                     this._isBalloon = false;
                 }
+                
+                if (!!options.toolbarContainer) context.element.relative.insertBefore(toolbar, editorArea);
 
                 topArea.style.position = 'fixed';
                 topArea.style.top = '0';
@@ -3988,6 +3990,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 topArea.style.cssText = _var._originCssText;
                 _d.body.style.overflow = _var._bodyOverflow;
 
+                if (!!options.toolbarContainer) options.toolbarContainer.appendChild(toolbar);
+
                 if (options.stickyToolbar > -1) {
                     util.removeClass(toolbar, 'se-toolbar-sticky');
                 }
@@ -4001,6 +4005,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 this._isInline = _var._fullScreenAttrs.inline;
                 this._isBalloon = _var._fullScreenAttrs.balloon;
                 if (this._isInline) event._showToolbarInline();
+                if (!!options.toolbarContainer) util.removeClass(toolbar, 'se-toolbar-balloon');
 
                 event.onScroll_window();
                 util.changeElement(element.firstElementChild, icons.expansion);

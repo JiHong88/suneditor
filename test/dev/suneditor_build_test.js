@@ -73,7 +73,7 @@ let ssss = suneditor.create(("sample1"), {
     fontSize: fs,
     linkProtocol: 'https://',
     buttonList: [
-        ['align'],
+        ['align', 'fullScreen'],
         ['-right', 'link'],
         ['-right', 'table'],
         ['-right', ':more1-More Text-default.more_text', 'font', 'fontSize', 'formatBlock'],
@@ -105,6 +105,7 @@ let ssss = suneditor.create(("sample1"), {
         //     }
         // ],
         ['%510', [
+            ['align', 'fullScreen'],
             [':moreText-More Text-default.more_paragraph', 'undo', 'redo', 'image'],
             [':command2-title2-text.Insert', 'codeView', 'preview', 'font', 'fontSize', 'formatBlock'],
             ['outdent', 'indent'],
@@ -153,6 +154,7 @@ let s1 = suneditor.create('editor', {
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template'],
         ['%510', [
+            ['fullScreen'],
             [':moreText-More Text-default.more_horizontal', 'undo', 'redo', 'image'],
             [':command2-title2-text.Insert', 'codeView', 'preview'],
             ['outdent', 'indent'],
