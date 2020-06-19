@@ -327,9 +327,9 @@
 
             if (!command) return;
 
-            (fileBrowserContext.selectorHandler || this.context[fileBrowserContext.contextPlugin].selectorHandler)(target);
-
+            const handler = (fileBrowserContext.selectorHandler || this.context[fileBrowserContext.contextPlugin].selectorHandler);
             this.plugins.fileBrowser.close.call(this);
+            handler(target);
         }
     };
 

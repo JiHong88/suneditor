@@ -240,13 +240,13 @@ export default {
     },
 
     _openGallery: function () {
-        this.callPlugin('imageGallery', this.plugins.imageGallery.open.bind(this, this.plugins.image._setUrlInput.bind(this, this.context.image.imgUrlFile, this.context.image.altText)), null);
+        this.callPlugin('imageGallery', this.plugins.imageGallery.open.bind(this, this.plugins.image._setUrlInput.bind(this.context.image)), null);
     },
 
-    _setUrlInput: function (urlInput, altText, target) {
-        altText.value = target.alt;
-        urlInput.value = target.src;
-        urlInput.focus();
+    _setUrlInput: function (target) {
+        this.altText.value = target.alt;
+        this._v_src._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = target.src;
+        this.imgUrlFile.focus();
     },
 
     _onLinkPreview: function (context, protocol, e) {
