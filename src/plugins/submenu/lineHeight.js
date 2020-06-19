@@ -67,7 +67,8 @@ export default {
     on: function () {
         const lineHeightContext = this.context.lineHeight;
         const sizeList = lineHeightContext._sizeList;
-        const currentSize = this.util.getFormatElement(this.getSelectionNode()).style.lineHeight + '';
+        const format = this.util.getFormatElement(this.getSelectionNode());
+        const currentSize = !format ? '' : format.style.lineHeight + '';
 
         if (currentSize !== lineHeightContext.currentSize) {
             for (let i = 0, len = sizeList.length; i < len; i++) {

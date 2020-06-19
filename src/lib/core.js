@@ -846,6 +846,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
+         * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
+         * Returns a new "range" or argument "range".
+         * @param {Object} range core.getRange()
+         * @returns {Object} range
+         */
+        getRange_addLine: function (range) {
+            if (this._selectionVoid(range)) {
+                const wysiwyg = context.element.wysiwyg;
+                const op = util.createElement('P');
+                op.innerHTML = '<br>';
+                wysiwyg.insertBefore(op, wysiwyg.firstElementChild);
+                core.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
+                range = this._variable._range;
+            }
+            return range;
+        },
+
+        /**
          * @description Get window selection obejct
          * @returns {Object}
          */
@@ -911,25 +929,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             range.setStart(context.element.wysiwyg.firstChild, 0);
             range.setEnd(context.element.wysiwyg.firstChild, 0);
             
-            return range;
-        },
-
-        /**
-         * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
-         * Returns a new "range" or argument "range".
-         * @param {Object} range core.getRange()
-         * @returns {Object} range
-         * @private
-         */
-        _getRange_addLine: function (range) {
-            if (this._selectionVoid(range)) {
-                const wysiwyg = context.element.wysiwyg;
-                const op = util.createElement('P');
-                op.innerHTML = '<br>';
-                wysiwyg.insertBefore(op, wysiwyg.firstElementChild);
-                core.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
-                range = this._variable._range;
-            }
             return range;
         },
 
@@ -1198,7 +1197,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Element}
          */
         insertComponent: function (element, notHistoryPush) {
-            this._getRange_addLine(this.getRange());
+            this.getRange_addLine(this.getRange());
             const r = this.removeNode();
             let oNode = null;
             let selectionNode = this.getSelectionNode();
@@ -1341,7 +1340,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             }
 
-            const range = this.getRange();
+            const range = (!afterNode && !isComp) ? this.getRange_addLine(this.getRange()) : this.getRange();
             const startCon = range.startContainer;
             const startOff = range.startOffset;
             const endCon = range.endContainer;
@@ -1664,7 +1663,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Element} rangeElement Element of wrap the arguments (BLOCKQUOTE...)
          */
         applyRangeFormatElement: function (rangeElement) {
-            this._getRange_addLine(this.getRange());
+            this.getRange_addLine(this.getRange());
             const rangeLines = this.getSelectedElementsAndComponents(false);
             if (!rangeLines || rangeLines.length === 0) return;
 
@@ -2130,7 +2129,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
          */
         nodeChange: function (appendNode, styleArray, removeNodeArray, strictRemove) {
-            let range = this._getRange_addLine(this.getRange());
+            let range = this.getRange_addLine(this.getRange());
             styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
             removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
 

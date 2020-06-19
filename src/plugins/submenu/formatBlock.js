@@ -159,14 +159,19 @@ export default {
         }
         // free, replace
         else {
-            const range = this.getRange();
+            let range = this.getRange();
+            let selectedFormsts = this.getSelectedElementsAndComponents(false);
+
+            if (selectedFormsts.length === 0) {
+                range = this.getRange_addLine(range);
+                selectedFormsts = this.getSelectedElementsAndComponents(false);
+                if (selectedFormsts.length === 0) return;
+            }
+
             const startOffset = range.startOffset;
             const endOffset = range.endOffset;
 
             const util = this.util;
-            const selectedFormsts = this.getSelectedElementsAndComponents(false);
-            if (selectedFormsts.length === 0) return;
-
             let first = selectedFormsts[0];
             let last = selectedFormsts[selectedFormsts.length - 1];
             const firstPath = util.getNodePath(range.startContainer, first, null, null);

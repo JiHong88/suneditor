@@ -107,8 +107,15 @@ export default {
     },
 
     editList: function (command, selectedCells, detach) {
-        const selectedFormats = !selectedCells ? this.getSelectedElementsAndComponents(false) : selectedCells;
-        if (!selectedFormats || selectedFormats.length === 0) return;
+        let range = this.getRange();
+        let selectedFormats = !selectedCells ? this.getSelectedElementsAndComponents(false) : selectedCells;
+
+        if (selectedFormats.length === 0) {
+            if (selectedCells) return;
+            range = this.getRange_addLine(range);
+            selectedFormats = this.getSelectedElementsAndComponents(false);
+            if (selectedFormats.length === 0) return;
+        }
         
         const util = this.util;
         util.sortByDepth(selectedFormats, true);
@@ -119,7 +126,6 @@ export default {
         let topEl = (util.isListCell(firstSel) || util.isComponent(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentNode.previousElementSibling : firstSel.previousElementSibling;
         let bottomEl = (util.isListCell(lastSel) || util.isComponent(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentNode.nextElementSibling : lastSel.nextElementSibling;
 
-        const range = this.getRange();
         const originRange = {
             sc: range.startContainer,
             so: range.startOffset,
@@ -431,7 +437,7 @@ export default {
         if (!command) return;
 
         const range = this.plugins.list.editList.call(this, command, null, false);
-        this.setRange(range.sc, range.so, range.ec, range.eo);
+        if (range) this.setRange(range.sc, range.so, range.ec, range.eo);
 
         this.submenuOff();
 
