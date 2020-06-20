@@ -4816,6 +4816,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
      * @description event function
      */
     const event = {
+        _IEisComposing: false, // In IE, there is no "e.isComposing" in the key-up event.
         _lineBreakerBind: null,
         _responsiveCurrentSize: 'default',
         _responsiveButtonSize: null,
@@ -5304,8 +5305,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         onKeyDown_wysiwyg: function (e) {
             const keyCode = e.keyCode;
             const shift = e.shiftKey;
-            const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92;
+            const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
             const alt = e.altKey;
+            event._IEisComposing = keyCode === 229;
 
             core.submenuOff();
 
@@ -5840,7 +5842,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             const range = core.getRange();
             const keyCode = e.keyCode;
-            const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92;
+            const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
             const alt = e.altKey;
             let selectionNode = core.getSelectionNode();
 
@@ -5883,7 +5885,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
-            if (textKey && selectionNode.nodeType === 3 && util.zeroWidthRegExp.test(selectionNode.textContent) && util.getByteLength(e.key) < 3) {
+            if (textKey && selectionNode.nodeType === 3 && util.zeroWidthRegExp.test(selectionNode.textContent) && !(e.isComposing !== undefined ? e.isComposing : event._IEisComposing)) {
                 let so = range.startOffset, eo = range.endOffset;
                 const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(event._frontZeroWidthReg) || '').length;
                 so = range.startOffset - frontZeroWidthCnt;
