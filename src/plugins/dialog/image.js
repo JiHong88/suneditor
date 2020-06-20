@@ -512,14 +512,17 @@ export default {
                     this.context.image._element.setAttribute('data-file-size', file.size);
                 }
         
-                reader.onload = function (update, updateElement, file) {
+                reader.onload = function (update, updateElement, file, close) {
                     this.context.image.inputX.value = width;
                     this.context.image.inputY.value = height;
                     if (update) this.plugins.image.update_src.call(this, reader.result, updateElement, file);
                     else this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, height, align, file);
     
-                    if (i === filesLen) this.closeLoading();
-                }.bind(this, isUpdate, this.context.image._element, file);
+                    if (close) {
+                        this.closeLoading();
+                        this.selectComponent(updateElement, 'image');
+                    }
+                }.bind(this, isUpdate, this.context.image._element, file, i === filesLen);
         
                 reader.readAsDataURL(file);
             }

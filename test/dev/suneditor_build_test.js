@@ -545,13 +545,13 @@ function ResizeImage (files, uploadHandler) {
     reader.readAsDataURL(uploadFile);
 }
 
-ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
-    console.log('files--', files);
-    console.log('info--', info);
-    ResizeImage(files, uploadHandler)
+// ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
+//     console.log('files--', files);
+//     console.log('info--', info);
+//     ResizeImage(files, uploadHandler)
     
-    // return true;
-}
+//     // return true;
+// }
 
 ss.onImageUpload = function (targetElement, index, state, info, core) {
     console.log('imageInfo-----', info);
