@@ -410,6 +410,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             codeIndent: 4,
             minResizingSize: util.getNumber((context.element.wysiwygFrame.style.minHeight || '65'), 0),
             currentNodes: [],
+            currentNodesMap: [],
             _range: null,
             _selectionNode: null,
             _originCssText: context.element.topArea.style.cssText,
@@ -2363,7 +2364,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 start.offset = newRange.startOffset;
                 end.container = newRange.endContainer;
                 end.offset = newRange.endOffset;
-                if (start.container === end.container && util.zeroWidthRegExp.test(start.container.textContent)) {
+                if (start.container === end.container && util.onlyZeroWidthSpace(start.container)) {
                     start.offset = end.offset = 1;
                 }
             }
@@ -3724,16 +3725,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     command = this._defaultCommand[command.toLowerCase()] || command;
                     if (!this.commandMap[command]) this.commandMap[command] = target;
 
-                    const btn = util.hasClass(this.commandMap[command], 'active') ? null : util.createElement(command);
+                    const nodesMap = this._variable.currentNodesMap;
+                    const cmd = nodesMap.indexOf(command) > -1 ? null : util.createElement(command);
                     let removeNode = command;
 
-                    if (/^SUB$/i.test(command) && util.hasClass(this.commandMap.SUP, 'active')) {
+                    if (/^SUB$/i.test(command) && nodesMap.indexOf('SUP') > -1) {
                         removeNode = 'SUP';
-                    } else if (/^SUP$/i.test(command) && util.hasClass(this.commandMap.SUB, 'active')) {
+                    } else if (/^SUP$/i.test(command) && nodesMap.indexOf('SUB') > -1) {
                         removeNode = 'SUB';
                     }
 
-                    this.nodeChange(btn, null, [removeNode], false);
+                    this.nodeChange(cmd, null, [removeNode], false);
                     this.focus();
             }
         },
@@ -4972,6 +4974,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             /** save current nodes */
             core._variable.currentNodes = currentNodes.reverse();
+            core._variable.currentNodesMap = commandMapNodes;
 
             /**  Displays the current node structure to resizingBar */
             if (options.showPathLabel) context.element.navigation.textContent = core._variable.currentNodes.join(' > ');

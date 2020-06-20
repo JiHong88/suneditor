@@ -138,7 +138,7 @@ let s1 = suneditor.create('editor', {
     fontSize: fs,
     resizingBar: true,
     height: '500px',
-    shortcutsDisable: ['bold'],
+    // shortcutsDisable: ['bold'],
     // attributesWhitelist: 'style',
     buttonList: [
         ['undo', 'redo',
@@ -321,7 +321,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // linkProtocol: 'https://',
     // fontSize: fs,
     // mode: 'inline',
-    shortcutsDisable: ['bold', 'underline'],
+    // shortcutsDisable: ['bold', 'underline'],
     buttonList: [
         ['undo', 'redo',
         'font', 'fontSize', 'formatBlock',
