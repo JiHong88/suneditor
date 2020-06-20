@@ -167,9 +167,9 @@ export default {
                 if (selectedFormats.length > 1) {
                     const oFormat = this.util.createElement(selectedFormats[0].nodeName);
                     oFormat.appendChild(katexEl);
-                    this.insertNode(oFormat);
+                    this.insertNode(oFormat, null);
                 } else {
-                    this.insertNode(katexEl);
+                    this.insertNode(katexEl, null);
                 }
 
                 const empty = this.util.createTextNode(this.util.zeroWidthSpace);

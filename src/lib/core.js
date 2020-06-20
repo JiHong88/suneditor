@@ -410,6 +410,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             codeIndent: 4,
             minResizingSize: util.getNumber((context.element.wysiwygFrame.style.minHeight || '65'), 0),
             currentNodes: [],
+            currentNodesMap: [],
             _range: null,
             _selectionNode: null,
             _originCssText: context.element.topArea.style.cssText,
@@ -846,6 +847,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
+         * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
+         * Returns a new "range" or argument "range".
+         * @param {Object} range core.getRange()
+         * @returns {Object} range
+         */
+        getRange_addLine: function (range) {
+            if (this._selectionVoid(range)) {
+                const wysiwyg = context.element.wysiwyg;
+                const op = util.createElement('P');
+                op.innerHTML = '<br>';
+                wysiwyg.insertBefore(op, wysiwyg.firstElementChild);
+                core.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
+                range = this._variable._range;
+            }
+            return range;
+        },
+
+        /**
          * @description Get window selection obejct
          * @returns {Object}
          */
@@ -911,25 +930,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             range.setStart(context.element.wysiwyg.firstChild, 0);
             range.setEnd(context.element.wysiwyg.firstChild, 0);
             
-            return range;
-        },
-
-        /**
-         * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
-         * Returns a new "range" or argument "range".
-         * @param {Object} range core.getRange()
-         * @returns {Object} range
-         * @private
-         */
-        _getRange_addLine: function (range) {
-            if (this._selectionVoid(range)) {
-                const wysiwyg = context.element.wysiwyg;
-                const op = util.createElement('P');
-                op.innerHTML = '<br>';
-                wysiwyg.insertBefore(op, wysiwyg.firstElementChild);
-                core.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
-                range = this._variable._range;
-            }
             return range;
         },
 
@@ -1198,7 +1198,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Element}
          */
         insertComponent: function (element, notHistoryPush) {
-            this._getRange_addLine(this.getRange());
+            this.getRange_addLine(this.getRange());
             const r = this.removeNode();
             let oNode = null;
             let selectionNode = this.getSelectionNode();
@@ -1341,7 +1341,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             }
 
-            const range = this.getRange();
+            const range = (!afterNode && !isComp) ? this.getRange_addLine(this.getRange()) : this.getRange();
             const startCon = range.startContainer;
             const startOff = range.startOffset;
             const endCon = range.endContainer;
@@ -1664,7 +1664,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Element} rangeElement Element of wrap the arguments (BLOCKQUOTE...)
          */
         applyRangeFormatElement: function (rangeElement) {
-            this._getRange_addLine(this.getRange());
+            this.getRange_addLine(this.getRange());
             const rangeLines = this.getSelectedElementsAndComponents(false);
             if (!rangeLines || rangeLines.length === 0) return;
 
@@ -2130,7 +2130,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
          */
         nodeChange: function (appendNode, styleArray, removeNodeArray, strictRemove) {
-            let range = this._getRange_addLine(this.getRange());
+            let range = this.getRange_addLine(this.getRange());
             styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
             removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
 
@@ -2364,7 +2364,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 start.offset = newRange.startOffset;
                 end.container = newRange.endContainer;
                 end.offset = newRange.endOffset;
-                if (start.container === end.container && util.zeroWidthRegExp.test(start.container.textContent)) {
+                if (start.container === end.container && util.onlyZeroWidthSpace(start.container)) {
                     start.offset = end.offset = 1;
                 }
             }
@@ -3725,16 +3725,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     command = this._defaultCommand[command.toLowerCase()] || command;
                     if (!this.commandMap[command]) this.commandMap[command] = target;
 
-                    const btn = util.hasClass(this.commandMap[command], 'active') ? null : util.createElement(command);
+                    const nodesMap = this._variable.currentNodesMap;
+                    const cmd = nodesMap.indexOf(command) > -1 ? null : util.createElement(command);
                     let removeNode = command;
 
-                    if (/^SUB$/i.test(command) && util.hasClass(this.commandMap.SUP, 'active')) {
+                    if (/^SUB$/i.test(command) && nodesMap.indexOf('SUP') > -1) {
                         removeNode = 'SUP';
-                    } else if (/^SUP$/i.test(command) && util.hasClass(this.commandMap.SUB, 'active')) {
+                    } else if (/^SUP$/i.test(command) && nodesMap.indexOf('SUB') > -1) {
                         removeNode = 'SUB';
                     }
 
-                    this.nodeChange(btn, null, [removeNode], false);
+                    this.nodeChange(cmd, null, [removeNode], false);
                     this.focus();
             }
         },
@@ -4815,6 +4816,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
      * @description event function
      */
     const event = {
+        _IEisComposing: false, // In IE, there is no "e.isComposing" in the key-up event.
         _lineBreakerBind: null,
         _responsiveCurrentSize: 'default',
         _responsiveButtonSize: null,
@@ -4973,6 +4975,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             /** save current nodes */
             core._variable.currentNodes = currentNodes.reverse();
+            core._variable.currentNodesMap = commandMapNodes;
 
             /**  Displays the current node structure to resizingBar */
             if (options.showPathLabel) context.element.navigation.textContent = core._variable.currentNodes.join(' > ');
@@ -5302,8 +5305,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         onKeyDown_wysiwyg: function (e) {
             const keyCode = e.keyCode;
             const shift = e.shiftKey;
-            const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92;
+            const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
             const alt = e.altKey;
+            event._IEisComposing = keyCode === 229;
 
             core.submenuOff();
 
@@ -5838,7 +5842,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             const range = core.getRange();
             const keyCode = e.keyCode;
-            const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92;
+            const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
             const alt = e.altKey;
             let selectionNode = core.getSelectionNode();
 
@@ -5881,7 +5885,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
-            if (textKey && selectionNode.nodeType === 3 && util.zeroWidthRegExp.test(selectionNode.textContent) && util.getByteLength(e.key) < 3) {
+            if (textKey && selectionNode.nodeType === 3 && util.zeroWidthRegExp.test(selectionNode.textContent) && !(e.isComposing !== undefined ? e.isComposing : event._IEisComposing)) {
                 let so = range.startOffset, eo = range.endOffset;
                 const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(event._frontZeroWidthReg) || '').length;
                 so = range.startOffset - frontZeroWidthCnt;
@@ -5918,6 +5922,28 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             core.controllersOff();
             if (core._isInline || core._isBalloon) event._hideToolbar();
             if (typeof functions.onBlur === 'function') functions.onBlur(e, core);
+
+            // active class reset of buttons
+            const commandMap = core.commandMap;
+            const activePlugins = core.activePlugins;
+            for (let key in commandMap) {
+                if (activePlugins.indexOf(key) > -1) {
+                    plugins[key].active.call(core, null);
+                }
+                else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
+                    commandMap.OUTDENT.setAttribute('disabled', true);
+                }
+                else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
+                    commandMap.INDENT.removeAttribute('disabled');
+                }
+                else {
+                    util.removeClass(commandMap[key], 'active');
+                }
+            }
+
+            core._variable.currentNodes = [];
+            core._variable.currentNodesMap = [];
+            if (options.showPathLabel) context.element.navigation.textContent = '';
         },
 
         onMouseDown_resizingBar: function (e) {
@@ -6593,9 +6619,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const newToolbar = _Constructor._createToolBar(_d, buttonList, core.plugins, options);
             _responsiveButtons = newToolbar.responsiveButtons;
             core._moreLayerActiveButton = null;
-            core._cachingButtons();
             event._setResponsiveToolbar();
-            
+
+            context.element.toolbar.replaceChild(newToolbar._buttonTray, context.element._buttonTray);
+            const newContext = _Context(context.element.originElement, core._getConstructed(context.element), options);
+
+            context.element = newContext.element;
+            context.tool = newContext.tool;
+            core._cachingButtons();
+            core.history._resetCachingButton();
+
             core.activePlugins = [];
             const oldCallButtons = pluginCallButtons;
             pluginCallButtons = newToolbar.pluginCallButtons;
@@ -6613,13 +6646,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             }
 
-            context.element.toolbar.replaceChild(newToolbar._buttonTray, context.element._buttonTray);
-
-            const newContext = _Context(context.element.originElement, core._getConstructed(context.element), options);
-            context.element = newContext.element;
-            context.tool = newContext.tool;
-
-            core.history._resetCachingButton();
+            event._applyTagEffects();
         },
 
         /**

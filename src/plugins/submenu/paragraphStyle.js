@@ -115,12 +115,14 @@ export default {
         if (!value) return;
 
         let selectedFormsts = this.getSelectedElements();
-        if (selectedFormsts.length === 0) return;
+        if (selectedFormsts.length === 0) {
+            this.getRange_addLine(this.getRange());
+            selectedFormsts = this.getSelectedElements();
+            if (selectedFormsts.length === 0) return;
+        }
 
         // change format class
         const toggleClass = this.util.hasClass(target, 'active') ? this.util.removeClass.bind(this.util) : this.util.addClass.bind(this.util);
-        selectedFormsts = this.getSelectedElements();
-        
         for (let i = 0, len = selectedFormsts.length; i < len; i++) {
             toggleClass(selectedFormsts[i], value);
         }

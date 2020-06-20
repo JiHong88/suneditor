@@ -248,10 +248,10 @@ interface Core {
 
     /**
      * @description Set current editor's range object
-     * @param {Node} startCon The startContainer property of the selection object.
-     * @param {Number} startOff The startOffset property of the selection object.
-     * @param {Node} endCon The endContainer property of the selection object.
-     * @param {Number} endOff The endOffset property of the selection object.
+     * @param startCon The startContainer property of the selection object.
+     * @param startOff The startOffset property of the selection object.
+     * @param endCon The endContainer property of the selection object.
+     * @param endOff The endOffset property of the selection object.
      */
     setRange(startCon: Node, startOff: number, endCon: Node, endOff: number): void;
 
@@ -265,6 +265,13 @@ interface Core {
      * @returns
      */
     getRange(): Range;
+
+    /**
+     * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
+     * Returns a new "range" or argument "range".
+     * @param range core.getRange()
+     */
+    getRange_addLine(range: Range): Range;
 
     /**
      * @description Get window selection obejct
