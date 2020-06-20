@@ -5922,6 +5922,28 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             core.controllersOff();
             if (core._isInline || core._isBalloon) event._hideToolbar();
             if (typeof functions.onBlur === 'function') functions.onBlur(e, core);
+
+            // active class reset of buttons
+            const commandMap = core.commandMap;
+            const activePlugins = core.activePlugins;
+            for (let key in commandMap) {
+                if (activePlugins.indexOf(key) > -1) {
+                    plugins[key].active.call(core, null);
+                }
+                else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
+                    commandMap.OUTDENT.setAttribute('disabled', true);
+                }
+                else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
+                    commandMap.INDENT.removeAttribute('disabled');
+                }
+                else {
+                    util.removeClass(commandMap[key], 'active');
+                }
+            }
+
+            core._variable.currentNodes = [];
+            core._variable.currentNodesMap = [];
+            if (options.showPathLabel) context.element.navigation.textContent = '';
         },
 
         onMouseDown_resizingBar: function (e) {
@@ -6597,7 +6619,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const newToolbar = _Constructor._createToolBar(_d, buttonList, core.plugins, options);
             _responsiveButtons = newToolbar.responsiveButtons;
             core._moreLayerActiveButton = null;
-            core._cachingButtons();
             event._setResponsiveToolbar();
             
             core.activePlugins = [];
@@ -6623,7 +6644,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             context.element = newContext.element;
             context.tool = newContext.tool;
 
+            core._cachingButtons();
             core.history._resetCachingButton();
+
+            event._applyTagEffects();
         },
 
         /**
