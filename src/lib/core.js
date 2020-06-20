@@ -6620,7 +6620,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             _responsiveButtons = newToolbar.responsiveButtons;
             core._moreLayerActiveButton = null;
             event._setResponsiveToolbar();
-            
+
+            context.element.toolbar.replaceChild(newToolbar._buttonTray, context.element._buttonTray);
+            const newContext = _Context(context.element.originElement, core._getConstructed(context.element), options);
+
+            context.element = newContext.element;
+            context.tool = newContext.tool;
+            core._cachingButtons();
+            core.history._resetCachingButton();
+
             core.activePlugins = [];
             const oldCallButtons = pluginCallButtons;
             pluginCallButtons = newToolbar.pluginCallButtons;
@@ -6637,15 +6645,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     }
                 }
             }
-
-            context.element.toolbar.replaceChild(newToolbar._buttonTray, context.element._buttonTray);
-
-            const newContext = _Context(context.element.originElement, core._getConstructed(context.element), options);
-            context.element = newContext.element;
-            context.tool = newContext.tool;
-
-            core._cachingButtons();
-            core.history._resetCachingButton();
 
             event._applyTagEffects();
         },
