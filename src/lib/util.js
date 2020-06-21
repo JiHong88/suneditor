@@ -1561,6 +1561,7 @@ const util = {
          * So check the node type and exclude the text no (current.nodeType !== 1)
          */
         const emptyWhitelistTags = [], emptyTags = [], wrongList = [], withoutFormatCells = [];
+        const compClass = function (current) { return /katex|__se__tag/i.test(current.className); };
         // wrong position
         const wrongTags = this.getListChildNodes(documentFragment, function (current) {
             if (current.nodeType !== 1) return false;
@@ -1571,8 +1572,9 @@ const util = {
                 return false;
             }
 
+            const nrtag = !this.getParentElement(current, compClass);
             // empty tags
-            if ((!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && !this.getParentElement(current, '.katex')) {
+            if ((!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && nrtag) {
                 emptyTags.push(current);
                 return false;
             }
@@ -1591,8 +1593,8 @@ const util = {
 
             return current.parentNode !== documentFragment &&
              (this.isFormatElement(current) || this.isComponent(current) || this.isList(current)) &&
-             !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode) && !this.getParentElement(current, this.isComponent) &&
-             !this.getParentElement(current, '.__se__tag');
+             !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode) &&
+             !this.getParentElement(current, this.isComponent) && nrtag;
         }.bind(this));
 
         for (let i in emptyWhitelistTags) {
