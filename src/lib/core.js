@@ -3676,7 +3676,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     const last = util.getChildElement(wysiwyg.lastChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true) || wysiwyg.lastChild;
                     if (!first || !last) return;
                     this.setRange(first, 0, last, last.textContent.length);
-                    this.focus();
                     break;
                 case 'codeView':
                     util.toggleClass(target, 'active');
@@ -5478,10 +5477,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                     // component
                     if (!selectRange && (range.startOffset === 0 || (selectionNode === formatEl ? !!formatEl.childNodes[range.startOffset] : false))) {
-                        selectionNode = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : selectionNode;
+                        const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : selectionNode;
                         // select file component
                         const ignoreZWS = (commonCon.nodeType === 3 || util.isBreak(commonCon)) && !commonCon.previousSibling && range.startOffset === 0;
-                        if (!selectionNode.previousSibling && (util.isComponent(commonCon.previousSibling) || (ignoreZWS && util.isComponent(formatEl.previousSibling)))) {
+                        if (!sel.previousSibling && (util.isComponent(commonCon.previousSibling) || (ignoreZWS && util.isComponent(formatEl.previousSibling)))) {
                             const fileComponentInfo = core.getFileComponent(formatEl.previousSibling);
                             if (fileComponentInfo) {
                                 e.preventDefault();
@@ -5492,10 +5491,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                             break;
                         }
                         // delete nonEditable
-                        if (util.isNonEditable(selectionNode.previousSibling)) {
+                        if (util.isNonEditable(sel.previousSibling)) {
                             e.preventDefault();
                             e.stopPropagation();
-                            util.removeItem(selectionNode.previousSibling);
+                            util.removeItem(sel.previousSibling);
                             break;
                         }
                     }
