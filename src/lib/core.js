@@ -2141,7 +2141,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let endCon = range.endContainer;
             let endOff = range.endOffset;
 
-            if ((isRemoveFormat && range.collapsed && util.isFormatElement(startCon.parentNode) && util.isFormatElement(endCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && startCon.getAttribute('contenteditable') === 'false')) {
+            if ((isRemoveFormat && range.collapsed && util.isFormatElement(startCon.parentNode) && util.isFormatElement(endCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && util.isNonEditable(startCon))) {
                 return;
             }
 
@@ -5037,7 +5037,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         onMouseDown_wysiwyg: function (e) {
-            if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
+            if (util.isNonEditable(context.element.wysiwyg)) return;
             
             const tableCell = util.getParentElement(e.target, util.isCell);
             if (tableCell) {
@@ -5058,7 +5058,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         onClick_wysiwyg: function (e) {
             const targetElement = e.target;
-            if (context.element.wysiwyg.getAttribute('contenteditable') === 'false') return;
+            if (util.isNonEditable(context.element.wysiwyg)) return;
 
             const fileComponentInfo = core.getFileComponent(targetElement);
             if (fileComponentInfo) {
@@ -5068,7 +5068,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
-            if (figcaption && (!figcaption.getAttribute('contenteditable') || figcaption.getAttribute('contenteditable') === 'false')) {
+            if (util.isNonEditable(figcaption)) {
                 e.preventDefault();
                 figcaption.setAttribute('contenteditable', true);
                 figcaption.focus();
@@ -5091,7 +5091,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const selectionNode = core.getSelectionNode();
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
-            if (((!formatEl || formatEl === rangeEl) && targetElement.getAttribute('contenteditable') !== 'false')) {
+            if ((!formatEl || formatEl === rangeEl) && !util.isNonEditable(targetElement)) {
                 const range = core.getRange();
                 if (util.getFormatElement(range.startContainer) === util.getFormatElement(range.endContainer)) {
                     if (util.isList(rangeEl)) {
@@ -5477,8 +5477,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     }
 
                     // component
-                    if (!selectRange && range.startOffset === 0) {
-                        if (util.isComponent(commonCon.previousSibling) || (commonCon.nodeType === 3 && !commonCon.previousSibling && range.startOffset === 0 && range.endOffset === 0 && util.isComponent(formatEl.previousSibling))) {
+                    if (!selectRange && (range.startOffset === 0 || (selectionNode === formatEl ? !!formatEl.childNodes[range.startOffset] : false))) {
+                        selectionNode = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : selectionNode;
+                        // select file component
+                        const ignoreZWS = (commonCon.nodeType === 3 || util.isBreak(commonCon)) && !commonCon.previousSibling && range.startOffset === 0;
+                        if (!selectionNode.previousSibling && (util.isComponent(commonCon.previousSibling) || (ignoreZWS && util.isComponent(formatEl.previousSibling)))) {
                             const fileComponentInfo = core.getFileComponent(formatEl.previousSibling);
                             if (fileComponentInfo) {
                                 e.preventDefault();
@@ -5486,6 +5489,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                                 if (formatEl.textContent.length === 0) util.removeItem(formatEl);
                                 core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
                             }
+                            break;
+                        }
+                        // delete nonEditable
+                        if (util.isNonEditable(selectionNode.previousSibling)) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            util.removeItem(selectionNode.previousSibling);
                             break;
                         }
                     }
@@ -5527,13 +5537,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                                 }
                             }
 
-                            // component
+                            // select file component
                             const fileComponentInfo = core.getFileComponent(nextEl);
                             if (fileComponentInfo) {
                                 e.stopPropagation();
                                 core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
                             }
 
+                            break;
+                        }
+                    }
+
+                    if (!selectRange && (range.endOffset === range.endContainer.textContent.length || (selectionNode === formatEl ? !!formatEl.childNodes[range.startOffset] : false))) {
+                        const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : selectionNode;
+                        // delete nonEditable
+                        if (util.isNonEditable(sel.nextSibling)) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            util.removeItem(sel.nextSibling);
                             break;
                         }
                     }

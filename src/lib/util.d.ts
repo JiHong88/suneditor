@@ -90,6 +90,13 @@ declare interface util {
     isWysiwygDiv(element: Node): boolean;
 
     /**
+     * @description It is judged whether it is the contenteditable property is false.
+     * @param element The node to check
+     * @returns
+     */
+    isNonEditable(element: Node): boolean;
+
+    /**
      * @description It is judged whether it is a node related to the text style.
      * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)
      * @param element The node to check

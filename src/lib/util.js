@@ -250,8 +250,16 @@ const util = {
      * @returns {Boolean}
      */
     isWysiwygDiv: function (element) {
-        if (element && element.nodeType === 1 && (this.hasClass(element, 'se-wrapper-wysiwyg') || /^BODY$/i.test(element.nodeName))) return true;
-        return false;
+        return element && element.nodeType === 1 && (this.hasClass(element, 'se-wrapper-wysiwyg') || /^BODY$/i.test(element.nodeName));
+    },
+
+    /**
+     * @description It is judged whether it is the contenteditable property is false.
+     * @param {Node} element The node to check
+     * @returns {Boolean}
+     */
+    isNonEditable: function (element) {
+        return element && element.nodeType === 1 && element.getAttribute('contenteditable') === 'false';
     },
 
     /**
@@ -1444,7 +1452,7 @@ const util = {
         }
         
         (function recursionFunc(current) {
-            if (inst._notTextNode(current) || current === notRemoveNode || current.getAttribute('contenteditable') === 'false') return 0;
+            if (inst._notTextNode(current) || current === notRemoveNode || inst.isNonEditable(current)) return 0;
             if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && (!current.firstChild || !inst.isBreak(current.firstChild))) {
                 if (current.parentNode) {
                     current.parentNode.removeChild(current);
@@ -1498,7 +1506,7 @@ const util = {
      * @private
      */
     _isIgnoreNodeChange: function (element) {
-        return element.nodeType !== 3 && (element.getAttribute('contenteditable') === 'false' || !this.isTextStyleElement(element));
+        return element.nodeType !== 3 && (this.isNonEditable(element) || !this.isTextStyleElement(element));
     },
 
     /**
