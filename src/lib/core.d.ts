@@ -767,7 +767,7 @@ export default class SunEditor {
      * You cannot set a new plugin for the button.
      * @param buttonList Button list 
      */
-    setToolbarButtons(buttonList: Array): void;
+    setToolbarButtons(buttonList: any[]): void;
 
     /**
      * @description Add or reset option property
