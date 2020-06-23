@@ -4431,14 +4431,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
 
                 if (over) {
-                    const charWrapper = context.element.charWrapper;
-                    if (charWrapper && !util.hasClass(charWrapper, 'se-blink')) {
-                        util.addClass(charWrapper, 'se-blink');
-                        _w.setTimeout(function () {
-                            util.removeClass(charWrapper, 'se-blink');
-                        }, 600);
-                    }
-
+                    this._callCounterBlink();
                     if (nextCharCount > 0) return false;
                 }
             }
@@ -4455,6 +4448,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         _getCharLength: function (content, charCounterType) {
             return /byte/.test(charCounterType) ? util.getByteLength(content) : content.length;
+        },
+
+        /**
+         * @description The character counter blinks.
+         * @private
+         */
+        _callCounterBlink: function () {
+            const charWrapper = context.element.charWrapper;
+            if (charWrapper && !util.hasClass(charWrapper, 'se-blink')) {
+                util.addClass(charWrapper, 'se-blink');
+                _w.setTimeout(function () {
+                    util.removeClass(charWrapper, 'se-blink');
+                }, 600);
+            }
         },
 
         /**
