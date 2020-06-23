@@ -279,42 +279,55 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        return (element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI|TD|TH)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace_.+(\\s|$)|(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element));
+        return element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace_.+(\\s|$)|(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element);
     },
 
     /**
      * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__range_xxx")
-     * * Range format element is wrap the format element  (util.isFormatElement)
+     * Range format element is wrap the "format element" and "component"
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        return (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__range_.+(\\s|$)')));
+        return element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__range_.+(\\s|$)'));
+    },
+
+    /**
+     * @description It is judged whether it is the closure range format element. (TH, TD | class="__se__format__range__closure_xxx")
+     * Closure range format elements is included in the range format element.
+     *  - Closure range format element is wrap the "format element" and "component"
+     * ※ You cannot exit this format with the Enter key or Backspace key.
+     * ※ Use it only in special cases. ([ex] format of table cells)
+     * @param {Node} element The node to check
+     * @returns {Boolean}
+     */
+    isClosureRangeFormatElement: function (element) {
+        return element && element.nodeType === 1 && (/^(TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__range__closure_.+(\\s|$)'));
     },
 
     /**
      * @description It is judged whether it is the free format element. (PRE | class="__se__format__free_xxx")
-     * Free format elements's line break is "BR" tag.
      * Free format elements is included in the format element.
+     * Free format elements's line break is "BR" tag.
      * ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isFreeFormatElement: function (element) {
-        return (element && element.nodeType === 1 && (/^PRE$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element));
+        return element && element.nodeType === 1 && (/^PRE$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element);
     },
 
     /**
      * @description It is judged whether it is the closure free format element. (class="__se__format__free__closure_xxx")
-     * Closure free format elements's line break is "BR" tag.
      * Closure free format elements is included in the free format element.
-     * ※ You cannot exit this format with the Enter key.
+     *  - Closure free format elements's line break is "BR" tag.
+     * ※ You cannot exit this format with the Enter key or Backspace key.
      * ※ Use it only in special cases. ([ex] format of table cells)
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isClosureFreeFormatElement: function (element) {
-        return (element && element.nodeType === 1 && this.hasClass(element, '(\\s|^)__se__format__free__closure_.+(\\s|$)'));
+        return element && element.nodeType === 1 && this.hasClass(element, '(\\s|^)__se__format__free__closure_.+(\\s|$)');
     },
 
     /**

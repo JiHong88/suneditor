@@ -5356,17 +5356,28 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         return false;
                     }
 
-                    if (!selectRange && !formatEl.previousElementSibling && (util.isWysiwygDiv(formatEl.parentNode) && (util.isFormatElement(formatEl) && !util.isFreeFormatElement(formatEl)) && !util.isListCell(formatEl) &&
-                     (formatEl.childNodes.length <= 1 && (!formatEl.firstChild || util.onlyZeroWidthSpace(formatEl.textContent))))) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        formatEl.innerHTML = '<br>';
-                        const attrs = formatEl.attributes;
-                        while (attrs[0]) {
-                            formatEl.removeAttribute(attrs[0].name);
+                    if (!selectRange && !formatEl.previousElementSibling && (range.startOffset === 0 && !util.isListCell(formatEl) && 
+                     (util.isFormatElement(formatEl) && (!util.isFreeFormatElement(formatEl) || util.isClosureFreeFormatElement(formatEl))))) {
+                        // closure range
+                        if (util.isClosureRangeFormatElement(formatEl.parentNode)) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            return false;
                         }
-                        core.nativeFocus();
-                        return false;
+                        // maintain default format
+                        if (util.isWysiwygDiv(formatEl.parentNode) && formatEl.childNodes.length <= 1 && (!formatEl.firstChild || util.onlyZeroWidthSpace(formatEl.textContent))) {
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            formatEl.innerHTML = '<br>';
+                            const attrs = formatEl.attributes;
+                            while (attrs[0]) {
+                                formatEl.removeAttribute(attrs[0].name);
+                            }
+                            core.nativeFocus();
+
+                            return false;
+                        }
                     }
 
                     // clean remove tag
