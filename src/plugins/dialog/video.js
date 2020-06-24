@@ -562,26 +562,25 @@ export default {
             this.plugins.video.setAlign.call(this, null, oFrame, cover, container);
         }
 
+        let changed = true;
         if (!isUpdate) {
-            this.insertComponent(container, false);
+            changed = this.insertComponent(container, false, true);
         } else if (contextVideo._resizing && this.context.resizing._rotateVertical && changeSize) {
             this.plugins.resizing.setTransformSize.call(this, oFrame, null, null);
         }
 
-        if (init) {
-            this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.functions.onVideoUpload, file, true);
-        }
-
-        if (isUpdate) {
-            this.selectComponent(oFrame, 'video');
+        if (changed) {
+            if (init) {
+                this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.functions.onVideoUpload, file, true);
+            }
+            if (isUpdate) {
+                this.selectComponent(oFrame, 'video');
+                // history stack
+                this.history.push(false);
+            }
         }
 
         this.context.resizing._resize_plugin = '';
-
-        // history stack
-        if (isUpdate) {
-            this.history.push(false);
-        }
     },
 
     _update_videoCover: function (oFrame) {

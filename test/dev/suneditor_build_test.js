@@ -132,7 +132,7 @@ suneditor.create('scrolleditor', {
 
 let s1 = suneditor.create('editor', {
     plugins: plugins,
-    mode: 'balloon-always',
+    // mode: 'balloon-always',
     katex: Katex,
     linkProtocol: 'http://',
     fontSize: fs,
@@ -194,7 +194,7 @@ let s1 = suneditor.create('editor', {
         'pre',
         'blockquote'
     ],
-    charCounterType: 'char',
+    charCounterType: 'byte-html',
     charCounterLabel: 'HTML BYTE : ',
     maxCharCount: 650
 })
@@ -322,7 +322,9 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     height: 'auto',
     popupDisplay: 'full',
     charCounter: true,
+    charCounterType: 'byte-html',
     charCounterLabel: 'Characters :',
+    // maxCharCount: 670,
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     buttonList: [
         // default
@@ -596,7 +598,7 @@ window.sun_getImagesInfo = function () {
 }
 
 window.sun_insertHTML = function (html) {
-    ss.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" />', true)
+    ss.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" /><p>fdafds</p>', true, true)
 }
 
 window.sun_getContents = function () {
@@ -676,6 +678,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     // lang: lang.ru,
     // mode: 'inline',
     // toolbarWidth: 150,
+    attributesWhitelist: {'all': 'uk-icon'}, 
     plugins: plugins,
     fontSize: fs,
     // maxHeight: '400px',
@@ -746,8 +749,9 @@ const newOption = {
     mode: 'balloon',
     iframe: false,
     plugins: plugins,
+    // defaultStyle: 'height: 200px;',
     fontSize: fs,
-    minHeight: '300',
+    height: 150,
     textSizeUnit: 'pt',
     buttonList: [
         ['undo', 'redo'],

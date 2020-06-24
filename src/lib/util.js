@@ -1256,8 +1256,8 @@ const util = {
                     util.removeItem(temp.firstElementChild);
                     if (temp.children.length > 0) newEl.appendChild(temp);
                 } else {
+                    newEl.appendChild(temp);
                 }
-                newEl.appendChild(temp);
             }
 
             while (children[index]) {

@@ -636,8 +636,7 @@ export default {
         // align
         this.plugins.image.setAlign.call(this, align, oImg, cover, container);
 
-        this.insertComponent(container, true);
-        this.plugins.fileManager.setInfo.call(this, 'image', oImg, this.functions.onImageUpload, file, true);
+        if (this.insertComponent(container, true, true)) this.plugins.fileManager.setInfo.call(this, 'image', oImg, this.functions.onImageUpload, file, true);
         this.context.resizing._resize_plugin = '';
     },
 

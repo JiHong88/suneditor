@@ -403,7 +403,10 @@ export default {
             element.src = src;
             const cover = this.plugins.component.set_cover.call(this, element);
             const container = this.plugins.component.set_container.call(this, cover, '');
-            this.insertComponent(container, false);
+            if (!this.insertComponent(container, false, true)) {
+                this.focus();
+                return;
+            }
         } // update
         else {
             if (contextAudio._element) element = contextAudio._element;

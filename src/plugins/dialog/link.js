@@ -154,9 +154,9 @@ export default {
                 if (selectedFormats.length > 1) {
                     const oFormat = this.util.createElement(selectedFormats[0].nodeName);
                     oFormat.appendChild(oA);
-                    this.insertNode(oFormat);
+                    if (!this.insertNode(oFormat, null, true)) return;
                 } else {
-                    this.insertNode(oA);
+                    if (!this.insertNode(oA, null, true)) return;
                 }
 
                 this.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
