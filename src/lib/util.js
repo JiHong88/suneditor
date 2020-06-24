@@ -1607,9 +1607,12 @@ const util = {
             }
 
             // table cells
-            if (this.isCell(current) && (!this.isFormatElement(current.firstElementChild) || current.textContent.trim().length === 0)) {
-                withoutFormatCells.push(current);
-                return false;
+            if (this.isCell(current)) {
+                const fel = current.firstElementChild;
+                if (!this.isFormatElement(fel) && !this.isRangeFormatElement(fel) && !this.isComponent(fel)) {
+                    withoutFormatCells.push(current);
+                    return false;
+                }
             }
 
             return current.parentNode !== documentFragment &&
