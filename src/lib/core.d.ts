@@ -333,9 +333,10 @@ interface Core {
      * If "element" is "HR", insert and return the new line.
      * @param element Element to be inserted
      * @param notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
+     * @param checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
      * @returns
      */
-    insertComponent(element: Element, notHistoryPush: boolean): Element;
+    insertComponent(element: Element, notHistoryPush?: boolean, checkCharCount?: boolean): Element;
     
     /**
      * @description Gets the file component and that plugin name
@@ -353,14 +354,14 @@ interface Core {
     selectComponent(element: Element, pluginName: string): void;
 
     /**
-     * @description Delete selected node and insert argument value node
+     * @description Delete selected node and insert argument value node and return.
      * If the "afterNode" exists, it is inserted after the "afterNode"
      * Inserting a text node merges with both text nodes on both sides and returns a new "{ startOffset, endOffset }".
      * @param oNode Element to be inserted
      * @param afterNode If the node exists, it is inserted after the node
      * @returns
      */
-    insertNode(oNode: Node, afterNode?: Node): { startOffset: Node, endOffset: number } | undefined;
+    insertNode(oNode: Node, afterNode?: Node, checkCharCount?: boolean): { startOffset: Node, endOffset: number } | Node | null;
     
     /**
      * @description Delete the currently selected nodes and reset selection range
@@ -525,6 +526,21 @@ interface Core {
      * @param listener Event listener
      */
     removeDocEvent(type: string, listener: EventListener): void;
+
+    /**
+     * @description When "element" is added, if it is greater than "options.maxCharCount", false is returned.
+     * @param element Element node or String.
+     * @param charCounterType charCounterType. If it is null, the options.charCounterType
+     */
+    checkCharCount(element: Node | string, charCounterType?: string): boolean;
+
+    /**
+     * @description Get the length of the content.
+     * Depending on the option, the length of the character is taken. (charCounterType)
+     * @param content Content to count
+     * @param charCounterType options.charCounterType
+     */
+    getCharLength(content: string, charCounterType: string): number;
 }
 
 interface Toolbar {
@@ -767,7 +783,7 @@ export default class SunEditor {
      * You cannot set a new plugin for the button.
      * @param buttonList Button list 
      */
-    setToolbarButtons(buttonList: Array): void;
+    setToolbarButtons(buttonList: any[]): void;
 
     /**
      * @description Add or reset option property
@@ -860,8 +876,9 @@ export default class SunEditor {
      * @description Inserts an HTML element or HTML string or plain string at the current cursor position
      * @param html HTML Element or HTML string or plain string
      * @param notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
+     * @param checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
      */
-    insertHTML(html: Element | string, notCleaningData: boolean): void;
+    insertHTML(html: Element | string, notCleaningData?: boolean, checkCharCount?: boolean): void;
 
     /**
      * @description Change the contents of the suneditor

@@ -874,7 +874,11 @@ editor.getFilesInfo(pluginName);
 editor.insertImage(FileList);
 
 // Inserts an HTML element or HTML string or plain string at the current cursor position
-editor.insertHTML('<img src="http://suneditor.com/sample/img/sunset.jpg">');
+/**
+ * @param {Boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
+ * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+ */
+editor.insertHTML('<img src="http://suneditor.com/sample/img/sunset.jpg">', true, true);
 
 // Change the contents of the suneditor
 editor.setContents('set contents');

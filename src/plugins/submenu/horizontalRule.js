@@ -57,9 +57,7 @@ export default {
         const oHr = this.util.createElement('HR');
         oHr.className = className;
         this.focus();
-
-        const oNode = this.insertComponent(oHr, false);
-        this.setRange(oNode, 0, oNode, 0);
+        return this.insertComponent(oHr, false, true);
     },
 
     horizontalRulePick: function (e) {
@@ -76,8 +74,10 @@ export default {
 
         if (!value) return;
 
-        this.plugins.horizontalRule.appendHr.call(this, '__se__' + value);
-
-        this.submenuOff();
+        const oNode = this.plugins.horizontalRule.appendHr.call(this, '__se__' + value);
+        if (oNode) {
+            this.setRange(oNode, 0, oNode, 0);
+            this.submenuOff();
+        }
     }
 };

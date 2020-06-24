@@ -202,11 +202,13 @@ export default {
         tableHTML += '</tbody>';
         oTable.innerHTML = tableHTML;
 
-        this.insertComponent(oTable, false);
+        const changed = this.insertComponent(oTable, false, true);
         
-        const firstTd = oTable.querySelector('td div');
-        this.setRange(firstTd, 0, firstTd, 0);
-        this.plugins.table.reset_table_picker.call(this);
+        if (changed) {
+            const firstTd = oTable.querySelector('td div');
+            this.setRange(firstTd, 0, firstTd, 0);
+            this.plugins.table.reset_table_picker.call(this);
+        }
     },
 
     createCells: function (nodeName, cnt, returnElement) {

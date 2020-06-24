@@ -250,8 +250,16 @@ const util = {
      * @returns {Boolean}
      */
     isWysiwygDiv: function (element) {
-        if (element && element.nodeType === 1 && (this.hasClass(element, 'se-wrapper-wysiwyg') || /^BODY$/i.test(element.nodeName))) return true;
-        return false;
+        return element && element.nodeType === 1 && (this.hasClass(element, 'se-wrapper-wysiwyg') || /^BODY$/i.test(element.nodeName));
+    },
+
+    /**
+     * @description It is judged whether it is the contenteditable property is false.
+     * @param {Node} element The node to check
+     * @returns {Boolean}
+     */
+    isNonEditable: function (element) {
+        return element && element.nodeType === 1 && element.getAttribute('contenteditable') === 'false';
     },
 
     /**
@@ -271,42 +279,55 @@ const util = {
      * @returns {Boolean}
      */
     isFormatElement: function (element) {
-        return (element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI|TD|TH)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace_.+(\\s|$)|(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element));
+        return element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__replace_.+(\\s|$)|(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element);
     },
 
     /**
      * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__range_xxx")
-     * * Range format element is wrap the format element  (util.isFormatElement)
+     * Range format element is wrap the "format element" and "component"
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isRangeFormatElement: function (element) {
-        return (element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__range_.+(\\s|$)')));
+        return element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__range_.+(\\s|$)'));
+    },
+
+    /**
+     * @description It is judged whether it is the closure range format element. (TH, TD | class="__se__format__range__closure_xxx")
+     * Closure range format elements is included in the range format element.
+     *  - Closure range format element is wrap the "format element" and "component"
+     * ※ You cannot exit this format with the Enter key or Backspace key.
+     * ※ Use it only in special cases. ([ex] format of table cells)
+     * @param {Node} element The node to check
+     * @returns {Boolean}
+     */
+    isClosureRangeFormatElement: function (element) {
+        return element && element.nodeType === 1 && (/^(TH|TD)$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__range__closure_.+(\\s|$)'));
     },
 
     /**
      * @description It is judged whether it is the free format element. (PRE | class="__se__format__free_xxx")
-     * Free format elements's line break is "BR" tag.
      * Free format elements is included in the format element.
+     * Free format elements's line break is "BR" tag.
      * ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isFreeFormatElement: function (element) {
-        return (element && element.nodeType === 1 && (/^PRE$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element));
+        return element && element.nodeType === 1 && (/^PRE$/i.test(element.nodeName) || this.hasClass(element, '(\\s|^)__se__format__free_.+(\\s|$)')) && !this.isComponent(element) && !this.isWysiwygDiv(element);
     },
 
     /**
      * @description It is judged whether it is the closure free format element. (class="__se__format__free__closure_xxx")
-     * Closure free format elements's line break is "BR" tag.
      * Closure free format elements is included in the free format element.
-     * ※ You cannot exit this format with the Enter key.
+     *  - Closure free format elements's line break is "BR" tag.
+     * ※ You cannot exit this format with the Enter key or Backspace key.
      * ※ Use it only in special cases. ([ex] format of table cells)
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isClosureFreeFormatElement: function (element) {
-        return (element && element.nodeType === 1 && this.hasClass(element, '(\\s|^)__se__format__free__closure_.+(\\s|$)'));
+        return element && element.nodeType === 1 && this.hasClass(element, '(\\s|^)__se__format__free__closure_.+(\\s|$)');
     },
 
     /**
@@ -1235,8 +1256,8 @@ const util = {
                     util.removeItem(temp.firstElementChild);
                     if (temp.children.length > 0) newEl.appendChild(temp);
                 } else {
+                    newEl.appendChild(temp);
                 }
-                newEl.appendChild(temp);
             }
 
             while (children[index]) {
@@ -1444,7 +1465,7 @@ const util = {
         }
         
         (function recursionFunc(current) {
-            if (inst._notTextNode(current) || current === notRemoveNode || current.getAttribute('contenteditable') === 'false') return 0;
+            if (inst._notTextNode(current) || current === notRemoveNode || inst.isNonEditable(current)) return 0;
             if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && (!current.firstChild || !inst.isBreak(current.firstChild))) {
                 if (current.parentNode) {
                     current.parentNode.removeChild(current);
@@ -1498,7 +1519,7 @@ const util = {
      * @private
      */
     _isIgnoreNodeChange: function (element) {
-        return element.nodeType !== 3 && (element.getAttribute('contenteditable') === 'false' || !this.isTextStyleElement(element));
+        return element.nodeType !== 3 && (this.isNonEditable(element) || !this.isTextStyleElement(element));
     },
 
     /**
@@ -1561,6 +1582,7 @@ const util = {
          * So check the node type and exclude the text no (current.nodeType !== 1)
          */
         const emptyWhitelistTags = [], emptyTags = [], wrongList = [], withoutFormatCells = [];
+        const compClass = function (current) { return /katex|__se__tag/i.test(current.className); };
         // wrong position
         const wrongTags = this.getListChildNodes(documentFragment, function (current) {
             if (current.nodeType !== 1) return false;
@@ -1571,8 +1593,9 @@ const util = {
                 return false;
             }
 
+            const nrtag = !this.getParentElement(current, compClass);
             // empty tags
-            if ((!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && !this.getParentElement(current, '.katex')) {
+            if ((!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && nrtag) {
                 emptyTags.push(current);
                 return false;
             }
@@ -1584,15 +1607,18 @@ const util = {
             }
 
             // table cells
-            if (this.isCell(current) && (!this.isFormatElement(current.firstElementChild) || current.textContent.trim().length === 0)) {
-                withoutFormatCells.push(current);
-                return false;
+            if (this.isCell(current)) {
+                const fel = current.firstElementChild;
+                if (!this.isFormatElement(fel) && !this.isRangeFormatElement(fel) && !this.isComponent(fel)) {
+                    withoutFormatCells.push(current);
+                    return false;
+                }
             }
 
             return current.parentNode !== documentFragment &&
              (this.isFormatElement(current) || this.isComponent(current) || this.isList(current)) &&
-             !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode) && !this.getParentElement(current, this.isComponent) &&
-             !this.getParentElement(current, '.__se__tag');
+             !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode) &&
+             !this.getParentElement(current, this.isComponent) && nrtag;
         }.bind(this));
 
         for (let i in emptyWhitelistTags) {

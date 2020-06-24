@@ -90,6 +90,13 @@ declare interface util {
     isWysiwygDiv(element: Node): boolean;
 
     /**
+     * @description It is judged whether it is the contenteditable property is false.
+     * @param element The node to check
+     * @returns
+     */
+    isNonEditable(element: Node): boolean;
+
+    /**
      * @description It is judged whether it is a node related to the text style.
      * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)
      * @param element The node to check
@@ -112,11 +119,22 @@ declare interface util {
      * @returns
      */
     isRangeFormatElement(element: Node): boolean;
+    
+    /**
+     * @description It is judged whether it is the closure range format element. (TH, TD | class="__se__format__range__closure_xxx")
+     * Closure range format elements is included in the range format element.
+     *  - Closure range format element is wrap the "format element" and "component"
+     * ※ You cannot exit this format with the Enter key or Backspace key.
+     * ※ Use it only in special cases. ([ex] format of table cells)
+     * @param element The node to check
+     * @returns
+     */
+    isClosureRangeFormatElement(element: Node): boolean;
 
     /**
      * @description It is judged whether it is the free format element. (PRE | class="__se__format__free_xxx")
-     * Free format elements's line break is "BR" tag.
      * Free format elements is included in the format element.
+     * Free format elements's line break is "BR" tag.
      * ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
      * @param element The node to check
      * @returns
@@ -125,8 +143,8 @@ declare interface util {
 
     /**
      * @description It is judged whether it is the closure free format element. (class="__se__format__free__closure_xxx")
-     * Closure free format elements's line break is "BR" tag.
      * Closure free format elements is included in the free format element.
+     *  - Closure free format elements's line break is "BR" tag.
      * ※ You cannot exit this format with the Enter key.
      * ※ Use it only in special cases. ([ex] format of table cells)
      * @param element The node to check

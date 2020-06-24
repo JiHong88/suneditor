@@ -518,10 +518,7 @@ export default {
                     if (update) this.plugins.image.update_src.call(this, reader.result, updateElement, file);
                     else this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, height, align, file);
     
-                    if (close) {
-                        this.closeLoading();
-                        this.selectComponent(updateElement, 'image');
-                    }
+                    if (close) this.closeLoading();
                 }.bind(this, isUpdate, this.context.image._element, file, i === filesLen);
         
                 reader.readAsDataURL(file);
@@ -639,8 +636,7 @@ export default {
         // align
         this.plugins.image.setAlign.call(this, align, oImg, cover, container);
 
-        this.insertComponent(container, true);
-        this.plugins.fileManager.setInfo.call(this, 'image', oImg, this.functions.onImageUpload, file, true);
+        if (this.insertComponent(container, true, true)) this.plugins.fileManager.setInfo.call(this, 'image', oImg, this.functions.onImageUpload, file, true);
         this.context.resizing._resize_plugin = '';
     },
 
@@ -775,6 +771,7 @@ export default {
     update_src: function (src, element, file) {
         element.src = src;
         this._w.setTimeout(this.plugins.fileManager.setInfo.bind(this, 'image', element, this.functions.onImageUpload, file, true));
+        this.selectComponent(element, 'image');
     },
 
     /**

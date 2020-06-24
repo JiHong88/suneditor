@@ -38,7 +38,7 @@ export default function (core, change) {
 
         core.controllersOff();
         core._checkComponents();
-        core._charCount('');
+        core._setCharCount();
         core._resourcesStateChange();
         
         // onChange
@@ -80,7 +80,7 @@ export default function (core, change) {
 
         if (stackIndex === 1 && undo) undo.removeAttribute('disabled');
 
-        core._charCount('');
+        core._setCharCount();
         // onChange
         change();
     }
