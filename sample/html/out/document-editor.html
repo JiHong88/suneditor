@@ -1343,6 +1343,13 @@
                     </td>
                     <td class="description last">When true, it does not update the history stack and the selection object and return EdgeNodes (<a href="./document-util.html#getEdgeChildNodes">util.getEdgeChildNodes</a>)</td>
                 </tr>
+                <tr>
+                    <td class="name"><code>checkCharCount</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean</span>
+                    </td>
+                    <td class="description last">If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.</td>
+                </tr>
                 </tbody>
             </table>
             <dl class="details"></dl>
@@ -1411,9 +1418,9 @@
 
             
             <h4 class="name" id="insertNode"><span class="type-signature"></span>insertNode<span class="signature">(oNode, afterNode)</span><span
-                    class="type-signature"> &rarr; {undefined|Object}</span></h4>
+                    class="type-signature"> &rarr; {Object|Node|null}</span></h4>
             <div class="description">
-                Deletes the selected area and inserts the node.<br>
+                Deletes the selected area and inserts the node and return.<br>
                 If the "afterNode" exists, it is inserted after the "afterNode"<br>
                 Inserting a text node merges with both text nodes on both sides and returns a new "{ startOffset, endOffset }".
             </div>
@@ -1904,6 +1911,75 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="checkCharCount"><span class="type-signature"></span>checkCharCount<span class="signature">(element, charCounterType)</span><span
+                class="type-signature"> &rarr; {Boolean}</span></h4>
+            <div class="description">
+                When "element" is added, if it is greater than "options.maxCharCount", false is returned.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">Node|String</span>
+                    </td>
+                    <td class="description last">Element node or String</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>charCounterType</code></td>
+                    <td class="type">
+                        <span class="param-type">String|null</span>
+                    </td>
+                    <td class="description last">charCounterType. If it is null, the options.charCounterType</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="getCharLength"><span class="type-signature"></span>getCharLength<span class="signature">(content, charCounterType)</span><span
+                class="type-signature"> &rarr; {Number}</span></h4>
+            <div class="description">
+                Get the length of the content.
+                Depending on the option, the length of the character is taken. (charCounterType)
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>content</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">Content to count</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>charCounterType</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">options.charCounterType</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="addDocEvent"><span class="type-signature"></span>addDocEvent<span 
                 class="signature">(type, listener, useCapture)</span><span class="type-signature"></span></h4>
             <div class="description">
@@ -2123,6 +2199,8 @@
         <li><a href="document-editor.html#setContents">setContents</a></li>
         <li><a href="document-editor.html#getContents">getContents</a></li>
         <li><a href="document-editor.html#cleanHTML">cleanHTML</a></li>
+        <li><a href="document-editor.html#checkCharCount">checkCharCount</a></li>
+        <li><a href="document-editor.html#getCharLength">getCharLength</a></li>
         <li><a href="document-editor.html#addDocEvent">addDocEvent</a></li>
         <li><a href="document-editor.html#removeDocEvent">removeDocEvent</a></li>
         <li><a href="document-editor.html#convertContentsForEditor">convertContentsForEditor</a></li>
