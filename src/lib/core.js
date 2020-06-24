@@ -5882,6 +5882,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                             if (util.isListCell(rangeEl.parentNode)) {
                                 rangeEl = formatEl.parentNode.parentNode.parentNode;
                                 newEl = util.splitElement(formatEl, null, util.getElementDepth(formatEl) - 2);
+                                if (!newEl) {
+                                    const newListCell = util.createElement('LI');
+                                    newListCell.innerHTML = '<br>';
+                                    rangeEl.insertBefore(newListCell, newEl);
+                                    newEl = newListCell;
+                                }
                             } else {
                                 const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : util.isFormatElement(rangeEl.nextElementSibling) ? rangeEl.nextElementSibling.nodeName : util.isFormatElement(rangeEl.previousElementSibling) ? rangeEl.previousElementSibling.nodeName : 'P';
                                 newEl = util.createElement(newFormat);
