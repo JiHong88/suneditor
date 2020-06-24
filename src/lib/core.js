@@ -2158,8 +2158,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
          */
         nodeChange: function (appendNode, styleArray, removeNodeArray, strictRemove) {
-            if (appendNode && this._charTypeHTML && !this.checkCharCount(appendNode.outerHTML, 'byte-html')) return;
-
             let range = this.getRange_addLine(this.getRange());
             styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
             removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
