@@ -453,15 +453,21 @@ export default {
             if (response.errorMessage) {
                 this.plugins.video.error.call(this, response.errorMessage, response);
             } else {
-                const fileList = response.result;
-                const videoTag = this.plugins.video.createVideoTag.call(this);
-
-                for (let i = 0, len = fileList.length, file; i < len; i++) {
-                    file = { name: fileList[i].name, size: fileList[i].size };
-                    this.plugins.video.create_video.call(this, (info.isUpdate ? info.element : videoTag.cloneNode(false)), fileList[i].url, info.inputWidth, info.inputHeight, info.align, file, info.isUpdate);
-                }
+                this.plugins.video.register.call(this, info, response);
             }
         }
+    },
+
+    register: function (info, response) {
+        const fileList = response.result;
+        const videoTag = this.plugins.video.createVideoTag.call(this);
+
+        for (let i = 0, len = fileList.length, file; i < len; i++) {
+            file = { name: fileList[i].name, size: fileList[i].size };
+            this.plugins.video.create_video.call(this, (info.isUpdate ? info.element : videoTag.cloneNode(false)), fileList[i].url, info.inputWidth, info.inputHeight, info.align, file, info.isUpdate);
+        }
+
+        this.closeLoading();
     },
 
     setup_url: function () {

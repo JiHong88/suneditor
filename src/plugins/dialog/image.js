@@ -486,18 +486,25 @@ export default {
             if (response.errorMessage) {
                 this.plugins.image.error.call(this, response.errorMessage, response);
             } else {
-                const fileList = response.result;
-                for (let i = 0, len = fileList.length, file; i < len; i++) {
-                    file = { name: fileList[i].name, size: fileList[i].size };
-                    if (info.isUpdate) {
-                        this.plugins.image.update_src.call(this, fileList[i].url, info.element, file);
-                        break;
-                    } else {
-                        this.plugins.image.create_image.call(this, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
-                    }
-                }
+                this.plugins.image.register.call(this, info, response);
             }
         }
+    },
+
+    register: function (info, response) {
+        const fileList = response.result;
+
+        for (let i = 0, len = fileList.length, file; i < len; i++) {
+            file = { name: fileList[i].name, size: fileList[i].size };
+            if (info.isUpdate) {
+                this.plugins.image.update_src.call(this, fileList[i].url, info.element, file);
+                break;
+            } else {
+                this.plugins.image.create_image.call(this, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
+            }
+        }
+        
+        this.closeLoading();
     },
 
     setup_reader: function (files, imgLinkValue, newWindowCheck, width, height, align, filesLen, isUpdate) {

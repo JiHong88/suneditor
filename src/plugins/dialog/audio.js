@@ -372,16 +372,23 @@ export default {
                     this.functions.noticeOpen(response.errorMessage);
                 }
             } else {
-                const fileList = response.result;
-                for (let i = 0, len = fileList.length, file, oAudio; i < len; i++) {
-                    if (info.isUpdate) oAudio = info.element;
-                    else oAudio = this.plugins.audio._createAudioTag.call(this);
-    
-                    file = { name: fileList[i].name, size: fileList[i].size };
-                    this.plugins.audio.create_audio.call(this, oAudio, fileList[i].url, file, info.isUpdate);
-                }
+                this.plugins.audio.register.call(this, info, response);
             }
         }
+    },
+
+    register: function (info, response) {
+        const fileList = response.result;
+
+        for (let i = 0, len = fileList.length, file, oAudio; i < len; i++) {
+            if (info.isUpdate) oAudio = info.element;
+            else oAudio = this.plugins.audio._createAudioTag.call(this);
+
+            file = { name: fileList[i].name, size: fileList[i].size };
+            this.plugins.audio.create_audio.call(this, oAudio, fileList[i].url, file, info.isUpdate);
+        }
+
+        this.closeLoading();
     },
 
     setupUrl: function (src) {

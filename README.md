@@ -1136,18 +1136,7 @@ editor.imageUploadHandler = function (xmlHttpRequest, info, core) {
     }
     // Success
     else {
-        const fileList = res.result;
-        const imagePlugin = core.plugins.image;
-
-        for (let i = 0, len = fileList.length, file; i < len; i++) {
-            // The file object must have name and size attributes.
-            file = {name: fileList[i].name, size: fileList[i].size};
-            // For existing image updates, the "info" attributes are predefined in the element.
-            // The "imagePlugin.update_src" function is only changes the "src" attribute of an image.
-            if (info.isUpdate) imagePlugin.update_src.call(core, fileList[i].url, info.element, file);
-            // The image is created and a format element(p, div..) is added below it.
-            else imagePlugin.create_image.call(core, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
-        }
+        core.plugins.image.register.call(core, info, res);
     }
 }
 
