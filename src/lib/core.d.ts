@@ -613,7 +613,7 @@ export default class SunEditor {
 
     /**
      * @description It replaces the default callback function of the image upload
-     * @param xmlHttpRequest xmlHttpRequest object
+     * @param xmlHttp xmlHttpRequest object
      * @param info Input information
      * - linkValue: Link url value
      * - linkNewWindow: Open in new window Check Value
@@ -624,11 +624,11 @@ export default class SunEditor {
      * - element: If isUpdate is true, the currently selected image.
      * @param core Core object
      */
-    imageUploadHandler: (xmlHttpRequest: XMLHttpRequest, info: imageInputInformation, core: Core) => void;
+    imageUploadHandler: (xmlHttp: XMLHttpRequest, info: imageInputInformation, core: Core) => void;
 
     /**
      * @description It replaces the default callback function of the video upload
-     * @param xmlHttpRequest xmlHttpRequest object
+     * @param xmlHttp xmlHttpRequest object
      * @param info Input information
      * - inputWidth: Value of width input
      * - inputHeight: Value of height input
@@ -637,17 +637,17 @@ export default class SunEditor {
      * - element: If isUpdate is true, the currently selected video.
      * @param core Core object
      */
-    videoUploadHandler: (xmlHttpRequest: XMLHttpRequest, info: videoInputInformation, core: Core) => void;
+    videoUploadHandler: (xmlHttp: XMLHttpRequest, info: videoInputInformation, core: Core) => void;
 
     /**
      * @description It replaces the default callback function of the audio upload
-     * @param xmlHttpRequest xmlHttpRequest object
+     * @param xmlHttp xmlHttpRequest object
      * @param info Input information
      * - isUpdate: Update audio if true, create audio if false
      * - element: If isUpdate is true, the currently selected audio.
      * @param core Core object
      */
-    audioUploadHandler: (xmlHttpRequest: XMLHttpRequest, info: audioInputInformation, core: Core) => void;
+    audioUploadHandler: (xmlHttp: XMLHttpRequest, info: audioInputInformation, core: Core) => void;
 
     /**
      * @description Called before the image is uploaded
