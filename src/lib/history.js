@@ -99,7 +99,7 @@ export default function (core, change) {
          * @param {Boolean|Number} delay If true, delays 400 milliseconds
          */
         push: function (delay) {
-            _w.setTimeout(core._resourcesStateChange);
+            _w.setTimeout(core._resourcesStateChange.bind(core));
             const time = typeof delay === 'number' ? (delay > 0 ? delay : 0) : (!delay ? 0 : 400);
             
             if (!time || pushDelay) {

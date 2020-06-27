@@ -986,7 +986,7 @@ editor.onDrop = function (e, core) { console.log('onDrop', e) }
  * - element: If isUpdate is true, the currently selected image.
  * }
  * core: Core object,
- * uploadHandler: If undefined is returned, it waits until "uploadHandler" is executed.
+ * uploadHandler: If undefined is returned, it waits until "uploadHandler" or "core.plugins.image.register()" is executed.
  *                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
  *                [upload files] : uploadHandler(files or [new File(...),])
  *                [error]        : uploadHandler("Error message")
@@ -994,9 +994,15 @@ editor.onDrop = function (e, core) { console.log('onDrop', e) }
  * return {Boolean|Array|undefined}
  */
 editor.onImageUploadBefore: function (files, info, core, uploadHandler) {
-    console.log('files', files);
-    console.log('info', info);
+    // Also you can call directly image register not execute "uploadHandler"
+    // This work is not execute default upload handler
+    const response = { // Same format as "imageUploadUrl" response
+        "errorMessage": "insert error message",
+        "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+    };
+    core.plugins.image.register.call(core, info, response);
 
+    // return values
     return Boolean || return (new FileList) || return undefined;
 }
 // Called before the video is uploaded
@@ -1020,9 +1026,15 @@ editor.onImageUploadBefore: function (files, info, core, uploadHandler) {
  * return {Boolean|Array|undefined}
  */
 editor.onVideoUploadBefore: function (files, info, core, uploadHandler) {
-    console.log('files', files);
-    console.log('info', info);
+    // Also you can call directly video register not execute "uploadHandler"
+    // This work is not execute default upload handler
+    const response = { // Same format as "videoUploadUrl" response
+        "errorMessage": "insert error message",
+        "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+    };
+    core.plugins.video.register.call(core, info, response);
     
+    // return values
     return Boolean || return (new FileList) || return undefined;
 }
 // Called before the audio is uploaded
@@ -1043,9 +1055,15 @@ editor.onVideoUploadBefore: function (files, info, core, uploadHandler) {
 * return {Boolean|Array|undefined}
 */
 editor.onAudioUploadBefore: function (files, info, core, uploadHandler) {
-    console.log('files', files);
-    console.log('info', info);
+    // Also you can call directly audio register not execute "uploadHandler"
+    // This work is not execute default upload handler
+    const response = { // Same format as "audioUploadUrl" response
+        "errorMessage": "insert error message",
+        "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+    };
+    core.plugins.audio.register.call(core, info, response);
 
+    // return values
     return Boolean || return (new FileList) || return undefined;
 }
 
@@ -1136,18 +1154,7 @@ editor.imageUploadHandler = function (xmlHttpRequest, info, core) {
     }
     // Success
     else {
-        const fileList = res.result;
-        const imagePlugin = core.plugins.image;
-
-        for (let i = 0, len = fileList.length, file; i < len; i++) {
-            // The file object must have name and size attributes.
-            file = {name: fileList[i].name, size: fileList[i].size};
-            // For existing image updates, the "info" attributes are predefined in the element.
-            // The "imagePlugin.update_src" function is only changes the "src" attribute of an image.
-            if (info.isUpdate) imagePlugin.update_src.call(core, fileList[i].url, info.element, file);
-            // The image is created and a format element(p, div..) is added below it.
-            else imagePlugin.create_image.call(core, fileList[i].url, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, file);
-        }
+        core.plugins.image.register.call(core, info, res);
     }
 }
 

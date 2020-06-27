@@ -317,6 +317,8 @@ s1.onKeyDown = function (e, core) {
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     lang: lang.ko,
     plugins: plugins,
+    katex: Katex,
+    codeMirror: CodeMirror,
     display: 'block',
     width: '100%',
     height: 'auto',
@@ -324,6 +326,22 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     charCounter: true,
     charCounterType: 'byte-html',
     charCounterLabel: 'Characters :',
+    videoFileInput: true,
+    audioFileInput: true,
+    imageUploadUrl: 'http://localhost:3000/editor/upload',
+    videoUploadUrl: 'http://localhost:3000/editor/upload',
+    audioUploadUrl: 'http://localhost:3000/editor/upload',
+    placeholder: 'Start typing something...',
+    templates: [
+        {
+            name: 'Template-1',
+            html: '<p>HTML source1</p>'
+        },
+        {
+            name: 'Template-2',
+            html: '<p>HTML source2</p>'
+        }
+    ],
     // maxCharCount: 670,
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     buttonList: [
@@ -439,18 +457,6 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
             ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template']
         ]]
     ],
-    placeholder: 'Start typing something...',
-    templates: [
-        {
-            name: 'Template-1',
-            html: '<p>HTML source1</p>'
-        },
-        {
-            name: 'Template-2',
-            html: '<p>HTML source2</p>'
-        }
-    ],
-    katex: Katex
 });
 // ss.setContents('fsafsa')
 ss.onload = function (core) {

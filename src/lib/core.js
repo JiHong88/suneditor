@@ -763,7 +763,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             event._applyTagEffects();
-            if (core._isBalloon) event._toggleToolbarBalloon();
+            if (this._isBalloon) event._toggleToolbarBalloon();
         },
 
         /**
@@ -830,7 +830,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const activePlugins = this.activePlugins;
             for (let key in commandMap) {
                 if (activePlugins.indexOf(key) > -1) {
-                    plugins[key].active.call(core, null);
+                    plugins[key].active.call(this, null);
                 }
                 else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
                     commandMap.OUTDENT.setAttribute('disabled', true);
@@ -864,7 +864,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 const op = util.createElement('P');
                 op.innerHTML = '<br>';
                 wysiwyg.insertBefore(op, wysiwyg.firstElementChild);
-                core.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
+                this.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
                 range = this._variable._range;
             }
             return range;
@@ -1253,14 +1253,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             let fileComponent, pluginName;
             if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
-                fileComponent = element.querySelector(core._fileManager.queryString);
+                fileComponent = element.querySelector(this._fileManager.queryString);
             }
-            if (!fileComponent && element.nodeName && core._fileManager.regExp.test(element.nodeName)) {
+            if (!fileComponent && element.nodeName && this._fileManager.regExp.test(element.nodeName)) {
                 fileComponent = element;
             }
 
             if (fileComponent) {
-                pluginName = core._fileManager.pluginMap[fileComponent.nodeName.toLowerCase()];
+                pluginName = this._fileManager.pluginMap[fileComponent.nodeName.toLowerCase()];
                 if (pluginName) {
                     return {
                         component: fileComponent,
@@ -3889,7 +3889,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             this._checkPlaceholder();
 
-            if (typeof functions.toggleCodeView === 'function') functions.toggleCodeView(this._variable.isCodeView, core);
+            if (typeof functions.toggleCodeView === 'function') functions.toggleCodeView(this._variable.isCodeView, this);
         },
 
         /**
@@ -4040,7 +4040,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 util.changeElement(element.firstElementChild, icons.expansion);
             }
 
-            if (typeof functions.toggleFullScreen === 'function') functions.toggleFullScreen(this._variable.isFullScreen, core);
+            if (typeof functions.toggleFullScreen === 'function') functions.toggleFullScreen(this._variable.isFullScreen, this);
         },
 
         /**
@@ -4087,7 +4087,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 );
             }
 
-            core.showLoading();
+            this.showLoading();
             _w.setTimeout(function () {
                 try {
                     iframe.focus();
@@ -4166,13 +4166,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const convertValue = this.convertContentsForEditor(html);
             this._resetComponents();
 
-            if (!core._variable.isCodeView) {
+            if (!this._variable.isCodeView) {
                 context.element.wysiwyg.innerHTML = convertValue;
                 // history stack
-                core.history.push(false);
+                this.history.push(false);
             } else {
                 const value = this.convertHTMLForCodeView(convertValue);
-                core._setCodeView(value);
+                this._setCodeView(value);
             }
         },
 
@@ -4432,7 +4432,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const maxCharCount = options.maxCharCount;
             const countType = options.charCounterType;
             let nextCharCount = 0;
-            if (!!inputText) nextCharCount = core.getCharLength(inputText, countType);
+            if (!!inputText) nextCharCount = this.getCharLength(inputText, countType);
 
             this._setCharCount();
 
@@ -4670,7 +4670,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this._lineBreakerButton = this._lineBreaker.querySelector('button');
 
             // Excute history function
-            this.history = _history(this, event._onChange_historyStack);
+            this.history = _history(this, this._onChange_historyStack.bind(this));
 
             // register notice module
             this.addModule([_notice]);
@@ -4735,8 +4735,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _resourcesStateChange: function () {
-            core._iframeAutoHeight();
-            core._checkPlaceholder();
+            this._iframeAutoHeight();
+            this._checkPlaceholder();
+        },
+
+        /**
+         * @description Called when after execute "history.push"
+         * @private
+         */
+        _onChange_historyStack: function () {
+            event._applyTagEffects();
+            if (context.tool.save) context.tool.save.removeAttribute('disabled');
+            if (functions.onChange) functions.onChange(this.getContents(true), this);
         },
 
         /**
@@ -5115,6 +5125,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 event._hideToolbar();
             }
 
+            if (/FIGURE/i.test(e.target.nodeName)) e.preventDefault();
             if (typeof functions.onMouseDown === 'function') functions.onMouseDown(e, core);
         },
 
@@ -6400,7 +6411,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 core._variable._lineBreakComp = component;
                 core._variable._lineBreakDir = dir;
                 lineBreakerStyle.top = (top - wScroll) + 'px';
-                core._lineBreakerButton.style.left = (util.getOffset(component).left + (component.offsetWidth / 2) - 17) + 'px';
+                core._lineBreakerButton.style.left = (util.getOffset(component).left + (component.offsetWidth / 2) - 15) + 'px';
                 lineBreakerStyle.display = 'block';
             } // off line breaker
             else if (lineBreakerStyle.display !== 'none') {
@@ -6432,12 +6443,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             core.setRange(focusEl, 1, focusEl, 1);
             // history stack
             core.history.push(false);
-        },
-
-        _onChange_historyStack: function () {
-            event._applyTagEffects();
-            if (context.tool.save) context.tool.save.removeAttribute('disabled');
-            if (functions.onChange) functions.onChange(core.getContents(true), core);
         },
 
         _addEvent: function () {
@@ -6650,6 +6655,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          *                [upload files] : uploadHandler(files or [new File(...),])
          *                [error]        : uploadHandler("Error message")
          *                [Just finish]  : uploadHandler()
+         * @example Also you can call directly image register not execute "uploadHandler"
+                This work is not execute default upload handler
+                const response = { // Same format as "imageUploadUrl" response
+                    "errorMessage": "insert error message",
+                    "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+                };
+                core.plugins.image.register.call(core, info, response);
          * @returns {Boolean|Array|undefined}
          */
         onImageUploadBefore: null,
@@ -6671,6 +6683,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          *                [upload files] : uploadHandler(files or [new File(...),])
          *                [error]        : uploadHandler("Error message")
          *                [Just finish]  : uploadHandler()
+         * @example Also you can call directly video register not execute "uploadHandler"
+                This work is not execute default upload handler
+                const response = { // Same format as "videoUploadUrl" response
+                    "errorMessage": "insert error message",
+                    "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+                };
+                core.plugins.video.register.call(core, info, response);
          * @returns {Boolean|Array|undefined}
          */
         onVideoUploadBefore: null,
@@ -6689,6 +6708,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          *                [upload files] : uploadHandler(files or [new File(...),])
          *                [error]        : uploadHandler("Error message")
          *                [Just finish]  : uploadHandler()
+         * @example Also you can call directly audio register not execute "uploadHandler"
+                This work is not execute default upload handler
+                const response = { // Same format as "audioUploadUrl" response
+                    "errorMessage": "insert error message",
+                    "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+                };
+                core.plugins.audio.register.call(core, info, response);
          * @returns {Boolean|Array|undefined}
          */
         onAudioUploadBefore: null,
