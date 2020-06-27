@@ -4670,7 +4670,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this._lineBreakerButton = this._lineBreaker.querySelector('button');
 
             // Excute history function
-            this.history = _history(this, event._onChange_historyStack);
+            this.history = _history(this, this._onChange_historyStack.bind(this));
 
             // register notice module
             this.addModule([_notice]);
@@ -4735,8 +4735,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _resourcesStateChange: function () {
-            core._iframeAutoHeight();
-            core._checkPlaceholder();
+            this._iframeAutoHeight();
+            this._checkPlaceholder();
+        },
+
+        /**
+         * @description Called when after execute "history.push"
+         * @private
+         */
+        _onChange_historyStack: function () {
+            event._applyTagEffects();
+            if (context.tool.save) context.tool.save.removeAttribute('disabled');
+            if (functions.onChange) functions.onChange(this.getContents(true), this);
         },
 
         /**
@@ -6432,12 +6442,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             core.setRange(focusEl, 1, focusEl, 1);
             // history stack
             core.history.push(false);
-        },
-
-        _onChange_historyStack: function () {
-            event._applyTagEffects();
-            if (context.tool.save) context.tool.save.removeAttribute('disabled');
-            if (functions.onChange) functions.onChange(core.getContents(true), core);
         },
 
         _addEvent: function () {
