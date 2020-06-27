@@ -1128,8 +1128,8 @@ editor.onAudioUploadError = function (errorMessage, result, core) {
 
 // It replaces the default callback function of the image upload
 /**
- * xmlHttpRequest: xmlHttpRequest object
- * info (Input information): {
+ * xmlHttp: xmlHttpRequest object
+ * info: Input information
  * - linkValue: Link url value
  * - linkNewWindow: Open in new window Check Value
  * - inputWidth: Value of width input
@@ -1137,24 +1137,53 @@ editor.onAudioUploadError = function (errorMessage, result, core) {
  * - align: Align Check Value
  * - isUpdate: Update image if true, create image if false
  * - element: If isUpdate is true, the currently selected image.
- * }
  * core: Core object
  */
-editor.imageUploadHandler = function (xmlHttpRequest, info, core) {
-    // Example of upload method
-    const res = JSON.parse(xmlHttpRequest.responseText);
-    
-    // Error
-    if (res.errorMessage) {
-        if (core.functions.onImageUploadError !== 'function' || core.functions.onImageUploadError(res.errorMessage, res, core)) {
-            core.notice.open.call(core, res.errorMessage);
-        } else {
-            core.notice.open.call(core, res.errorMessage);
-        }
+editor.imageUploadHandler = function (xmlHttp, info, core) {
+    // Editor code
+    const response = JSON.parse(xmlHttp.responseText);
+    if (response.errorMessage) {
+        this.plugins.image.error.call(this, response.errorMessage, response);
+    } else {
+        this.plugins.image.register.call(this, info, response);
     }
-    // Success
-    else {
-        core.plugins.image.register.call(core, info, res);
+}
+/**
+ * @description It replaces the default callback function of the video upload
+ * xmlHttp: xmlHttpRequest object
+ * info: Input information
+ * - inputWidth: Value of width input
+ * - inputHeight: Value of height input
+ * - align: Align Check Value
+ * - isUpdate: Update video if true, create video if false
+ * - element: If isUpdate is true, the currently selected video.
+ * core: Core object
+ */
+editor.videoUploadHandler = function (xmlHttp, info, core) {
+    // Editor code
+    const response = JSON.parse(xmlHttp.responseText);
+    if (response.errorMessage) {
+        this.plugins.video.error.call(this, response.errorMessage, response);
+    } else {
+        this.plugins.video.register.call(this, info, response);
+    }
+}
+
+/**
+ * @description It replaces the default callback function of the audio upload
+ * xmlHttp xmlHttpRequest object
+ * info Input information
+ * - isUpdate: Update audio if true, create audio if false
+ * - element: If isUpdate is true, the currently selected audio.
+ * core Core object
+ */
+editor.audioUploadHandler = function (xmlHttp, info, core) {
+    // Editor code
+    const response = JSON.parse(xmlHttp.responseText);
+    if (response.errorMessage) {
+        this.plugins.audio.error.call(this, response.errorMessage, response);
+    } else {
+        this.plugins.audio.register.call(this, info, response);
     }
 }
 
