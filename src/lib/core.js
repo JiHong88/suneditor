@@ -763,7 +763,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             event._applyTagEffects();
-            if (core._isBalloon) event._toggleToolbarBalloon();
+            if (this._isBalloon) event._toggleToolbarBalloon();
         },
 
         /**
@@ -830,7 +830,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const activePlugins = this.activePlugins;
             for (let key in commandMap) {
                 if (activePlugins.indexOf(key) > -1) {
-                    plugins[key].active.call(core, null);
+                    plugins[key].active.call(this, null);
                 }
                 else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
                     commandMap.OUTDENT.setAttribute('disabled', true);
@@ -864,7 +864,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 const op = util.createElement('P');
                 op.innerHTML = '<br>';
                 wysiwyg.insertBefore(op, wysiwyg.firstElementChild);
-                core.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
+                this.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
                 range = this._variable._range;
             }
             return range;
@@ -1253,14 +1253,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             let fileComponent, pluginName;
             if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
-                fileComponent = element.querySelector(core._fileManager.queryString);
+                fileComponent = element.querySelector(this._fileManager.queryString);
             }
-            if (!fileComponent && element.nodeName && core._fileManager.regExp.test(element.nodeName)) {
+            if (!fileComponent && element.nodeName && this._fileManager.regExp.test(element.nodeName)) {
                 fileComponent = element;
             }
 
             if (fileComponent) {
-                pluginName = core._fileManager.pluginMap[fileComponent.nodeName.toLowerCase()];
+                pluginName = this._fileManager.pluginMap[fileComponent.nodeName.toLowerCase()];
                 if (pluginName) {
                     return {
                         component: fileComponent,
@@ -3889,7 +3889,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             this._checkPlaceholder();
 
-            if (typeof functions.toggleCodeView === 'function') functions.toggleCodeView(this._variable.isCodeView, core);
+            if (typeof functions.toggleCodeView === 'function') functions.toggleCodeView(this._variable.isCodeView, this);
         },
 
         /**
@@ -4040,7 +4040,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 util.changeElement(element.firstElementChild, icons.expansion);
             }
 
-            if (typeof functions.toggleFullScreen === 'function') functions.toggleFullScreen(this._variable.isFullScreen, core);
+            if (typeof functions.toggleFullScreen === 'function') functions.toggleFullScreen(this._variable.isFullScreen, this);
         },
 
         /**
@@ -4087,7 +4087,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 );
             }
 
-            core.showLoading();
+            this.showLoading();
             _w.setTimeout(function () {
                 try {
                     iframe.focus();
@@ -4166,13 +4166,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const convertValue = this.convertContentsForEditor(html);
             this._resetComponents();
 
-            if (!core._variable.isCodeView) {
+            if (!this._variable.isCodeView) {
                 context.element.wysiwyg.innerHTML = convertValue;
                 // history stack
-                core.history.push(false);
+                this.history.push(false);
             } else {
                 const value = this.convertHTMLForCodeView(convertValue);
-                core._setCodeView(value);
+                this._setCodeView(value);
             }
         },
 
@@ -4432,7 +4432,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const maxCharCount = options.maxCharCount;
             const countType = options.charCounterType;
             let nextCharCount = 0;
-            if (!!inputText) nextCharCount = core.getCharLength(inputText, countType);
+            if (!!inputText) nextCharCount = this.getCharLength(inputText, countType);
 
             this._setCharCount();
 
