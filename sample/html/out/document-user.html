@@ -910,7 +910,15 @@
             <div class="description">
                 Called before the image is uploaded.<br>
                 If false is returned, no image upload is performed.<br>
-                If new fileList are returned,  replaced the previous fileList
+                If new fileList are returned,  replaced the previous fileList<br>
+                <span style="color:#ffe4c4;">@example</span><br>
+                <span style="color:#ffe4c4;">Also you can call directly image register not execute "uploadHandler".</span><br>
+                <span style="color:#ffe4c4;">This work is not execute default upload handler.</span><br>
+                const response = { // Same format as "imageUploadUrl" response<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;"errorMessage": "insert error message",<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;"result": [ { "url": "...", "name": "...", "size": "999" }, ]<br>
+                };<br>
+                core.plugins.image.register.call(core, info, response);
             </div>
             <table class="params">
                 <thead>
@@ -1131,7 +1139,15 @@
             <div class="description">
                 Called before the video is uploaded.<br>
                 If false is returned, no video(iframe, video) upload is performed.<br>
-                If new fileList are returned,  replaced the previous fileList
+                If new fileList are returned,  replaced the previous fileList<br>
+                <span style="color:#ffe4c4;">@example</span><br>
+                <span style="color:#ffe4c4;">Also you can call directly image register not execute "uploadHandler".</span><br>
+                <span style="color:#ffe4c4;">This work is not execute default upload handler.</span><br>
+                const response = { // Same format as "imageUploadUrl" response<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;"errorMessage": "insert error message",<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;"result": [ { "url": "...", "name": "...", "size": "999" }, ]<br>
+                };<br>
+                core.plugins.image.register.call(core, info, response);
             </div>
             <table class="params">
                 <thead>
@@ -1301,7 +1317,15 @@
             <div class="description">
                 Called before the audio is uploaded.<br>
                 If false is returned, no audio upload is performed.<br>
-                If new fileList are returned,  replaced the previous fileList
+                If new fileList are returned,  replaced the previous fileList<br>
+                <span style="color:#ffe4c4;">@example</span><br>
+                <span style="color:#ffe4c4;">Also you can call directly image register not execute "uploadHandler".</span><br>
+                <span style="color:#ffe4c4;">This work is not execute default upload handler.</span><br>
+                const response = { // Same format as "imageUploadUrl" response<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;"errorMessage": "insert error message",<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;"result": [ { "url": "...", "name": "...", "size": "999" }, ]<br>
+                };<br>
+                core.plugins.image.register.call(core, info, response);
             </div>
             <table class="params">
                 <thead>

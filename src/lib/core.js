@@ -6650,6 +6650,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          *                [upload files] : uploadHandler(files or [new File(...),])
          *                [error]        : uploadHandler("Error message")
          *                [Just finish]  : uploadHandler()
+         * @example Also you can call directly image register not execute "uploadHandler"
+                This work is not execute default upload handler
+                const response = { // Same format as "imageUploadUrl" response
+                    "errorMessage": "insert error message",
+                    "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+                };
+                core.plugins.image.register.call(core, info, response);
          * @returns {Boolean|Array|undefined}
          */
         onImageUploadBefore: null,
@@ -6671,6 +6678,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          *                [upload files] : uploadHandler(files or [new File(...),])
          *                [error]        : uploadHandler("Error message")
          *                [Just finish]  : uploadHandler()
+         * @example Also you can call directly video register not execute "uploadHandler"
+                This work is not execute default upload handler
+                const response = { // Same format as "videoUploadUrl" response
+                    "errorMessage": "insert error message",
+                    "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+                };
+                core.plugins.video.register.call(core, info, response);
          * @returns {Boolean|Array|undefined}
          */
         onVideoUploadBefore: null,
@@ -6689,6 +6703,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          *                [upload files] : uploadHandler(files or [new File(...),])
          *                [error]        : uploadHandler("Error message")
          *                [Just finish]  : uploadHandler()
+         * @example Also you can call directly audio register not execute "uploadHandler"
+                This work is not execute default upload handler
+                const response = { // Same format as "audioUploadUrl" response
+                    "errorMessage": "insert error message",
+                    "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+                };
+                core.plugins.audio.register.call(core, info, response);
          * @returns {Boolean|Array|undefined}
          */
         onAudioUploadBefore: null,
