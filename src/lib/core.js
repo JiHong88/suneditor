@@ -5125,6 +5125,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 event._hideToolbar();
             }
 
+            if (/FIGURE/i.test(e.target.nodeName)) e.preventDefault();
             if (typeof functions.onMouseDown === 'function') functions.onMouseDown(e, core);
         },
 
