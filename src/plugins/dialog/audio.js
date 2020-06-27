@@ -368,9 +368,7 @@ export default {
         } else {
             const response = JSON.parse(xmlHttp.responseText);
             if (response.errorMessage) {
-                if (this.functions.onAudioUploadError !== 'function' || this.functions.onAudioUploadError(response.errorMessage, response, this)) {
-                    this.functions.noticeOpen(response.errorMessage);
-                }
+                this.plugins.audio.error.call(this, response.errorMessage, response);
             } else {
                 this.plugins.audio.register.call(this, info, response);
             }
