@@ -997,12 +997,13 @@ editor.onImageUploadBefore: function (files, info, core, uploadHandler) {
     // Also you can call directly image register not execute "uploadHandler"
     // This work is not execute default upload handler
     const response = { // Same format as "imageUploadUrl" response
-        "errorMessage": "insert error message",
         "result": [ { "url": "...", "name": "...", "size": "999" }, ]
     };
     core.plugins.image.register.call(core, info, response);
+    // also you can call directly error method
+    core.plugins.image.error.call(core, "errorMessage", response);
 
-    // return values
+    /** return values */
     return Boolean || return (new FileList) || return undefined;
 }
 // Called before the video is uploaded
@@ -1029,12 +1030,13 @@ editor.onVideoUploadBefore: function (files, info, core, uploadHandler) {
     // Also you can call directly video register not execute "uploadHandler"
     // This work is not execute default upload handler
     const response = { // Same format as "videoUploadUrl" response
-        "errorMessage": "insert error message",
         "result": [ { "url": "...", "name": "...", "size": "999" }, ]
     };
     core.plugins.video.register.call(core, info, response);
+    // also you can call directly error method
+    core.plugins.video.error.call(core, "errorMessage", response);
     
-    // return values
+    /** return values */
     return Boolean || return (new FileList) || return undefined;
 }
 // Called before the audio is uploaded
@@ -1058,12 +1060,13 @@ editor.onAudioUploadBefore: function (files, info, core, uploadHandler) {
     // Also you can call directly audio register not execute "uploadHandler"
     // This work is not execute default upload handler
     const response = { // Same format as "audioUploadUrl" response
-        "errorMessage": "insert error message",
         "result": [ { "url": "...", "name": "...", "size": "999" }, ]
     };
     core.plugins.audio.register.call(core, info, response);
+    // also you can call directly error method
+    core.plugins.audio.error.call(core, "errorMessage", response);
 
-    // return values
+    /** return values */
     return Boolean || return (new FileList) || return undefined;
 }
 
