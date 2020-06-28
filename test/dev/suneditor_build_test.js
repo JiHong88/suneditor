@@ -321,7 +321,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     codeMirror: CodeMirror,
     display: 'block',
     width: '100%',
-    height: 'auto',
+    height: '500px',
     popupDisplay: 'full',
     charCounter: true,
     charCounterType: 'byte-html',
@@ -661,10 +661,13 @@ window.sun_destroy = function () {
 }
 
 window.sun_create = function () {
-    ss = suneditor.create('editor1', {
-        plugins: plugins,
-        height: 148
-    });
+    // ss = suneditor.create('editor1', {
+    //     plugins: plugins,
+    //     height: 148
+    // });
+    ss.setOptions({
+        height: 'auto'
+    })
 }
 
 

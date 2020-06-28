@@ -4570,8 +4570,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this._wd = _d;
             this._charTypeHTML = options.charCounterType === 'byte-html';
 
-            if (options.iframe && options.height === 'auto') this._iframeAuto = this._wd.body;
-            
             if (!options.iframe && typeof _w.ShadowRoot === 'function') {
                 let child = context.element.wysiwygFrame;
                 while (child) {
@@ -6838,6 +6836,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         setOptions: function (_options) {
             event._removeEvent();
             core._resetComponents();
+            core._iframeAuto = null;
 
             core.plugins = _options.plugins || core.plugins;
             const mergeOptions = [options, _options].reduce(function (init, option) {
