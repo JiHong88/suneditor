@@ -6828,7 +6828,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             }
 
-            event._applyTagEffects();
+            if (core.hasFocus) event._applyTagEffects();
         },
 
         /**
