@@ -1062,7 +1062,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (!this._resetRangeToTextNode()) return [];
             let range = this.getRange();
 
-            if (util.isWysiwygDiv(range.commonAncestorContainer)) {
+            if (util.isWysiwygDiv(range.startContainer)) {
                 const children = context.element.wysiwyg.children;
                 if (children.length === 0) return [];
 
@@ -4718,7 +4718,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         _initWysiwygArea: function (reload, _initHTML) {
             // Default style
-            if (options.defaultStyle) context.element.wysiwyg.style.cssText = options.defaultStyle;
+            if (options._bodyStyle) context.element.wysiwyg.style.cssText = options._bodyStyle;
 
             // Set html
             if (!reload) {
@@ -6836,7 +6836,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         setOptions: function (_options) {
             event._removeEvent();
             core._resetComponents();
-            core._iframeAuto = null;
+            options._bodyStyle = '';
 
             core.plugins = _options.plugins || core.plugins;
             const mergeOptions = [options, _options].reduce(function (init, option) {
@@ -6853,6 +6853,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 return init;
             }, {});
 
+            const _initHTML = context.element.wysiwyg.innerHTML;
+
             // set option
             const cons = _Constructor._setOptions(mergeOptions, context, core.plugins, options);
             cons.toolbar.element.style.visibility = '';
@@ -6867,9 +6869,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             // reset context
-            const _initHTML = context.element.wysiwyg.innerHTML;
             const el = context.element;
-
             if (el._menuTray.children.length === 0) this._menuTray = {};
             
             _responsiveButtons = cons.toolbar.responsiveButtons;
