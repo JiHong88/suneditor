@@ -4674,12 +4674,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this.addModule([_notice]);
 
             // Init, validate
-            this._initWysiwygArea(reload, _initHTML);
             if (options.iframe) {
                 this._wd = context.element.wysiwygFrame.contentDocument;
                 context.element.wysiwyg = this._wd.body;
                 if (options.height === 'auto') this._iframeAuto = this._wd.body;
             }
+            this._initWysiwygArea(reload, _initHTML);
 
             _w.setTimeout(function () {
                 this._checkComponents();
