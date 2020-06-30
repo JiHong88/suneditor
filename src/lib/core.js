@@ -902,6 +902,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         _editorRange: function () {
             const selection = this.getSelection();
+            if (!selection) return null;
             let range = null;
             let selectionNode = null;
 
@@ -3706,11 +3707,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     this.setRange(first, 0, last, last.textContent.length);
                     break;
                 case 'codeView':
-                    util.toggleClass(target, 'active');
                     this.toggleCodeView();
                     break;
                 case 'fullScreen':
-                    util.toggleClass(target, 'active');
                     this.toggleFullScreen(target);
                     break;
                 case 'indent':
@@ -3734,7 +3733,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     this.preview();
                     break;
                 case 'showBlocks':
-                    util.toggleClass(target, 'active');
                     this.toggleDisplayBlocks();
                     break;
                 case 'save':
@@ -3748,7 +3746,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                     if (context.tool.save) context.tool.save.setAttribute('disabled', true);
                     break;
-                default : // 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'
+                default : // 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'..
                     command = this._defaultCommand[command.toLowerCase()] || command;
                     if (!this.commandMap[command]) this.commandMap[command] = target;
 
@@ -3823,7 +3821,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description Add or remove the class name of "body" so that the code block is visible
          */
         toggleDisplayBlocks: function () {
-            util.toggleClass(context.element.wysiwyg, 'se-show-block');
+            const wysiwyg = context.element.wysiwyg;
+            util.toggleClass(wysiwyg, 'se-show-block');
+            if (util.hasClass(wysiwyg, 'se-show-block')) {
+                util.addClass(this.commandMap.showBlocks, 'active');
+            } else {
+                util.removeClass(this.commandMap.showBlocks, 'active');
+            }
             this._resourcesStateChange();
         },
 
@@ -3859,6 +3863,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
 
                 this.nativeFocus();
+                util.removeClass(this.commandMap.codeView, 'active');
 
                 // history stack
                 this.history.push(false);
@@ -3885,6 +3890,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 
                 this._variable._range = null;
                 context.element.code.focus();
+                util.addClass(this.commandMap.codeView, 'active');
             }
 
             this._checkPlaceholder();
@@ -4008,6 +4014,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     editorArea.style.overflow = 'auto';
                     this._iframeAutoHeight();
                 }
+
+                util.addClass(this.commandMap.fullScreen, 'active');
             }
             else {
                 _var.isFullScreen = false;
@@ -4038,6 +4046,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                 event.onScroll_window();
                 util.changeElement(element.firstElementChild, icons.expansion);
+
+                util.removeClass(this.commandMap.fullScreen, 'active');
             }
 
             if (typeof functions.toggleFullScreen === 'function') functions.toggleFullScreen(this._variable.isFullScreen, this);
@@ -4700,15 +4710,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         _cachingButtons: function () {
             this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-code-view-enabled"])');
             this.resizingDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-resizing-enabled"])');
+            const tool = context.tool;
             this.commandMap = {
-                STRONG: context.tool.bold,
-                U: context.tool.underline,
-                EM: context.tool.italic,
-                DEL: context.tool.strike,
-                SUB: context.tool.subscript,
-                SUP: context.tool.superscript,
-                OUTDENT: context.tool.outdent,
-                INDENT: context.tool.indent
+                STRONG: tool.bold,
+                U: tool.underline,
+                EM: tool.italic,
+                DEL: tool.strike,
+                SUB: tool.subscript,
+                SUP: tool.superscript,
+                OUTDENT: tool.outdent,
+                INDENT: tool.indent,
+                fullScreen: tool.fullScreen,
+                showBlocks: tool.showBlocks,
+                codeView: tool.codeView
             };
         },
 
@@ -4857,11 +4871,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @description Initialization after "setOptions"
          * @param {Object} el context.element
          * @param {String} _initHTML Initial html string
-         * @param {Element} codeArea Code view element
          * @private
          */
-        _setOptionsInit: function (el, _initHTML, codeArea) {
-            el.code = _Constructor._checkCodeMirror(options, codeArea);
+        _setOptionsInit: function (el, _initHTML) {
             this.context = context = _Context(el.originElement, this._getConstructed(el), options);
             this._componentsInfoReset = true;
             this._editorInit(true, _initHTML);
@@ -6840,6 +6852,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             context.element = newContext.element;
             context.tool = newContext.tool;
+            if (options.iframe) context.element.wysiwyg = core._wd.body;
             core._cachingButtons();
             core.history._resetCachingButton();
 
@@ -6861,6 +6874,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             }
 
             if (core.hasFocus) event._applyTagEffects();
+
+            if (core._variable.isCodeView) util.addClass(core.commandMap.codeView, 'active');
+            if (core._variable.isFullScreen) util.addClass(core.commandMap.fullScreen, 'active');
+            if (util.hasClass(context.element.wysiwyg, 'se-show-block')) util.addClass(core.commandMap.showBlocks, 'active');
         },
 
         /**
@@ -6871,6 +6888,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             event._removeEvent();
             core._resetComponents();
             
+            util.removeClass(core.commandMap.showBlocks, 'active');
+            util.removeClass(core.commandMap.codeView, 'active');
+            core._variable.isCodeView = false;
             core._iframeAuto = null;
             options._bodyStyle = '';
 
@@ -6913,19 +6933,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             if (options.iframe) {
                 el.wysiwygFrame.addEventListener('load', function () {
                     util._setIframeDocument(this, options);
-                    core._setOptionsInit(el, _initHTML, cons.code);
+                    core._setOptionsInit(el, _initHTML);
                 });
             }
 
-            const editorArea = el.editorArea;
-            const placeholder_span = el.placeholder;
-            editorArea.innerHTML = '';
-            editorArea.appendChild(el.wysiwygFrame);
-            editorArea.appendChild(cons.code);
-            if (placeholder_span) editorArea.appendChild(placeholder_span);
+            el.editorArea.appendChild(el.wysiwygFrame);
 
             if (!options.iframe) {
-                core._setOptionsInit(el, _initHTML, cons.code);
+                core._setOptionsInit(el, _initHTML);
             }
         },
 
@@ -7269,6 +7284,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
     } else {
         originEl.parentNode.appendChild(topEl);
     }
+
     contextEl.editorArea.appendChild(contextEl.wysiwygFrame);
     contextEl = originEl = topEl = null;
 

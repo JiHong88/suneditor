@@ -235,22 +235,29 @@ export default {
         const bottomBar = initElements.bottomBar;
         const wysiwygFrame = initElements.wysiwygFrame;
         const placeholder_span = initElements.placeholder;
+        let code = initElements.codeView;
 
         if (el.resizingBar) relative.removeChild(el.resizingBar);
         if (bottomBar.resizingBar) relative.appendChild(bottomBar.resizingBar);
+
+        editorArea.innerHTML = '';
+        editorArea.appendChild(code);
+        if (placeholder_span) editorArea.appendChild(placeholder_span);
+
+        code = this._checkCodeMirror(mergeOptions, code);
         
         el.resizingBar = bottomBar.resizingBar;
         el.navigation = bottomBar.navigation;
         el.charWrapper = bottomBar.charWrapper;
         el.charCounter = bottomBar.charCounter;
         el.wysiwygFrame = wysiwygFrame;
+        el.code = code;
         el.placeholder = placeholder_span;
 
         return {
             callButtons: isNewToolbar ? tool_bar.pluginCallButtons : null,
             plugins: isNewToolbar || isNewPlugins ? tool_bar.plugins : null,
-            toolbar: tool_bar,
-            code: initElements.codeView
+            toolbar: tool_bar
         };
     },
 
@@ -524,9 +531,9 @@ export default {
             removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', icons.erase],
             indent: ['_se_command_indent', lang.toolbar.indent + (shortcutsDisable.indexOf('indent') > -1 ? '' : ' (' + cmd + '+])'), 'indent', '', icons.outdent],
             outdent: ['_se_command_outdent', lang.toolbar.outdent + (shortcutsDisable.indexOf('indent') > -1 ? '' : ' (' + cmd + '+[)'), 'outdent', '', icons.indent],
-            fullScreen: ['se-code-view-enabled se-resizing-enabled', lang.toolbar.fullScreen, 'fullScreen', '', icons.expansion],
-            showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '', icons.show_blocks],
-            codeView: ['se-code-view-enabled se-resizing-enabled', lang.toolbar.codeView, 'codeView', '', icons.code_view],
+            fullScreen: ['se-code-view-enabled se-resizing-enabled _se_command_fullScreen', lang.toolbar.fullScreen, 'fullScreen', '', icons.expansion],
+            showBlocks: ['_se_command_showBlocks', lang.toolbar.showBlocks, 'showBlocks', '', icons.show_blocks],
+            codeView: ['se-code-view-enabled se-resizing-enabled _se_command_codeView', lang.toolbar.codeView, 'codeView', '', icons.code_view],
             undo: ['_se_command_undo se-resizing-enabled', lang.toolbar.undo + (shortcutsDisable.indexOf('undo') > -1 ? '' : ' (' + cmd + '+Z)'), 'undo', '', icons.undo],
             redo: ['_se_command_redo se-resizing-enabled', lang.toolbar.redo + (shortcutsDisable.indexOf('undo') > -1 ? '' : ' (' + cmd + '+Y / ' + cmd + '+SHIFT+Z)'), 'redo', '', icons.redo],
             preview: ['se-resizing-enabled', lang.toolbar.preview, 'preview', '', icons.preview],
