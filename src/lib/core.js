@@ -4875,9 +4875,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         _editorInit: function (reload, _initHTML) {
             // initialize core and add event listeners
-            core._init(reload, _initHTML);
+            this._init(reload, _initHTML);
             event._addEvent();
-            core._setCharCount();
+            this._setCharCount();
             event._offStickyToolbar();
             event.onResize_window();
 
