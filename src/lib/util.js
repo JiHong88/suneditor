@@ -1674,6 +1674,45 @@ const util = {
         if (options.minHeight) optionStyle += 'min-height:' + options.minHeight + ';';
         if (options.maxHeight) optionStyle += 'max-height:' + options.maxHeight + ';';
         return optionStyle;
+    },
+
+    _setIframeDocument: function (frame, options) {
+        frame.setAttribute('scrolling', 'auto');
+        frame.contentDocument.head.innerHTML = '' +
+            '<meta charset="utf-8" />' +
+            '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+            '<title></title>' + 
+            this._setIframeCssTags(options);
+        frame.contentDocument.body.className = 'sun-editor-editable';
+        frame.contentDocument.body.setAttribute('contenteditable', true);
+    },
+
+    _setIframeCssTags: function (options) {
+        const linkNames = options.iframeCSSFileName;
+        let tagString = '';
+
+        for (let f = 0, len = linkNames.length, path; f < len; f++) {
+            path = [];
+
+            if (/(^https?:\/\/)|(^data:text\/css,)/.test(linkNames[f])) {
+                path.push(linkNames[f]);
+            } else {
+                const CSSFileName = new RegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?\\.css(?:\\?.*|;.*)?$', 'i');
+
+                for (let c = document.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
+                    styleTag = c[i].href.match(CSSFileName);
+                    if (styleTag) path.push(styleTag[0]);
+                }
+            }
+
+            if (!path || path.length === 0) throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframeCSSFileName" before creating editor instances.';
+
+            for (let i = 0, len = path.length; i < len; i++) {
+                tagString += '<link href="' + path[i] + '" rel="stylesheet">';
+            }
+        }
+
+        return tagString + (options.height === 'auto' ? '<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>' : '');
     }
 };
 

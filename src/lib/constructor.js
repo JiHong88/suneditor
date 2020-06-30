@@ -90,7 +90,6 @@ export default {
         }
     
         /** append html */
-        editor_div.appendChild(wysiwyg_div);
         editor_div.appendChild(textarea);
         if (placeholder_span) editor_div.appendChild(placeholder_span);
         if (!toolbarContainer) relative.appendChild(tool_bar.element);
@@ -236,7 +235,6 @@ export default {
         const bottomBar = initElements.bottomBar;
         const wysiwygFrame = initElements.wysiwygFrame;
         const placeholder_span = initElements.placeholder;
-        let code = initElements.codeView;
 
         if (el.resizingBar) relative.removeChild(el.resizingBar);
         if (bottomBar.resizingBar) relative.appendChild(bottomBar.resizingBar);
@@ -245,23 +243,14 @@ export default {
         el.navigation = bottomBar.navigation;
         el.charWrapper = bottomBar.charWrapper;
         el.charCounter = bottomBar.charCounter;
-
-        editorArea.innerHTML = '';
-        editorArea.appendChild(wysiwygFrame);
-        editorArea.appendChild(code);
-
-        if (placeholder_span) editorArea.appendChild(placeholder_span);
-
-        code = this._checkCodeMirror(mergeOptions, code);
-
         el.wysiwygFrame = wysiwygFrame;
-        el.code = code;
         el.placeholder = placeholder_span;
 
         return {
             callButtons: isNewToolbar ? tool_bar.pluginCallButtons : null,
             plugins: isNewToolbar || isNewPlugins ? tool_bar.plugins : null,
-            toolbar: tool_bar
+            toolbar: tool_bar,
+            code: initElements.codeView
         };
     },
 
@@ -302,46 +291,8 @@ export default {
             wysiwygDiv.setAttribute('scrolling', 'auto');
             wysiwygDiv.className += ' sun-editor-editable';
         } else {
-            const cssTags = (function () {
-                const linkNames = options.iframeCSSFileName;
-                let tagString = '';
-
-                for (let f = 0, len = linkNames.length, path; f < len; f++) {
-                    path = [];
-
-                    if (/(^https?:\/\/)|(^data:text\/css,)/.test(linkNames[f])) {
-                        path.push(linkNames[f]);
-                    } else {
-                        const CSSFileName = new RegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?\\.css(?:\\?.*|;.*)?$', 'i');
-        
-                        for (let c = document.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
-                            styleTag = c[i].href.match(CSSFileName);
-                            if (styleTag) path.push(styleTag[0]);
-                        }
-                    }
-        
-                    if (!path || path.length === 0) throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframeCSSFileName" before creating editor instances.';
-        
-                    for (let i = 0, len = path.length; i < len; i++) {
-                        tagString += '<link href="' + path[i] + '" rel="stylesheet">';
-                    }
-                }
-
-                return tagString;
-            })() + (options.height === 'auto' ? '<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>' : '');
-
             wysiwygDiv.allowFullscreen = true;
             wysiwygDiv.frameBorder = 0;
-            wysiwygDiv.addEventListener('load', function () {
-                this.setAttribute('scrolling', 'auto');
-                this.contentDocument.head.innerHTML = '' +
-                    '<meta charset="utf-8" />' +
-                    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-                    '<title></title>' + 
-                    cssTags;
-                this.contentDocument.body.className = 'sun-editor-editable';
-                this.contentDocument.body.setAttribute('contenteditable', true);
-            });
         }
         
         wysiwygDiv.style.cssText = util._setDefaultOptionStyle(options);

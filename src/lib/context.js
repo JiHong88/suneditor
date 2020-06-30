@@ -30,7 +30,7 @@ const _Context = function (element, cons, options) {
             charCounter: cons._charCounter,
             editorArea: cons._editorArea,
             wysiwygFrame: cons._wysiwygArea,
-            wysiwyg: options.iframe ? cons._wysiwygArea.contentDocument.body : cons._wysiwygArea,
+            wysiwyg: cons._wysiwygArea,
             code: cons._codeArea,
             placeholder: cons._placeholder,
             loading: cons._loading,
