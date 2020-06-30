@@ -1297,7 +1297,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const container = util.getParentElement(element, util.isComponent);
             const t_style = context.element.lineBreaker_t.style;
             const b_style = context.element.lineBreaker_b.style;
-            element = this.context.resizing.resizeContainer.style.display === 'block' ? this.context.resizing.resizeContainer : element;
+            const target = this.context.resizing.resizeContainer.style.display === 'block' ? this.context.resizing.resizeContainer : element;
 
             const isList = util.isListCell(container.parentNode);
             let componentTop, wScroll, w;
@@ -1306,10 +1306,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 this._variable._lineBreakComp = container;
                 wScroll = context.element.wysiwyg.scrollTop;
                 componentTop = util.getOffset(element, context.element.wysiwygFrame).top + wScroll;
-                w = (element.offsetWidth / 2) / 2;
+                w = (target.offsetWidth / 2) / 2;
 
                 t_style.top = (componentTop - wScroll - 12) + 'px';
-                t_style.left = (util.getOffset(element).left + w) + 'px';
+                t_style.left = (util.getOffset(target).left + w) + 'px';
                 t_style.display = 'block';
             } else {
                 t_style.display = 'none';
@@ -1320,11 +1320,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     this._variable._lineBreakComp = container;
                     wScroll = context.element.wysiwyg.scrollTop;
                     componentTop = util.getOffset(element, context.element.wysiwygFrame).top + wScroll;
-                    w = (element.offsetWidth / 2) / 2;
+                    w = (target.offsetWidth / 2) / 2;
                 }
 
-                b_style.top = (componentTop + element.offsetHeight - wScroll - 12) + 'px';
-                b_style.left = (util.getOffset(element).left + element.offsetWidth - w - 24) + 'px';
+                b_style.top = (componentTop + target.offsetHeight - wScroll - 12) + 'px';
+                b_style.left = (util.getOffset(target).left + target.offsetWidth - w - 24) + 'px';
                 b_style.display = 'block';
             } else {
                 b_style.display = 'none';
@@ -4674,14 +4674,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this.addModule([_notice]);
 
             // Init, validate
-            if (options.iframe) {
-                this._wd = context.element.wysiwygFrame.contentDocument;
-                context.element.wysiwyg = this._wd.body;
-                if (options.height === 'auto') this._iframeAuto = this._wd.body;
-            }
-            this._initWysiwygArea(reload, _initHTML);
-
             _w.setTimeout(function () {
+                if (options.iframe) {
+                    this._wd = context.element.wysiwygFrame.contentDocument;
+                    context.element.wysiwyg = this._wd.body;
+                    if (options.height === 'auto') this._iframeAuto = this._wd.body;
+                }
+                this._initWysiwygArea(reload, _initHTML);
+
                 this._checkComponents();
                 this._componentsInfoInit = false;
                 this._componentsInfoReset = false;
