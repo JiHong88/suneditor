@@ -1689,6 +1689,7 @@ const util = {
 
     _setIframeCssTags: function (options) {
         const linkNames = options.iframeCSSFileName;
+        const wRegExp = this._w.RegExp;
         let tagString = '';
 
         for (let f = 0, len = linkNames.length, path; f < len; f++) {
@@ -1697,8 +1698,7 @@ const util = {
             if (/(^https?:\/\/)|(^data:text\/css,)/.test(linkNames[f])) {
                 path.push(linkNames[f]);
             } else {
-                const CSSFileName = new RegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?\\.css(?:\\?.*|;.*)?$', 'i');
-
+                const CSSFileName = new wRegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?\\.css(?:\\?.*|;.*)?$', 'i');
                 for (let c = document.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
                     styleTag = c[i].href.match(CSSFileName);
                     if (styleTag) path.push(styleTag[0]);

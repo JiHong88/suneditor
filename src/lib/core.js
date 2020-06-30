@@ -2212,6 +2212,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 appendNode = util.createElement('DIV');
             }
 
+            const wRegExp = _w.RegExp;
             const newNodeName = appendNode.nodeName;
 
             /* checked same style property */
@@ -2235,7 +2236,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         for (let i = 0; i < checkAttrs.length; i++) {
                             if (sNode.nodeType === 1) {
                                 const s = checkAttrs[i];
-                                const classReg = /^\./.test(s) ? new _w.RegExp('\\s*' + s.replace(/^\./, '') + '(\\s+|$)', 'ig') : false;
+                                const classReg = /^\./.test(s) ? new wRegExp('\\s*' + s.replace(/^\./, '') + '(\\s+|$)', 'ig') : false;
     
                                 const styleCheck = isRemoveNode ? !!sNode.style[s] : (!!sNode.style[s] && !!appendNode.style[s] && sNode.style[s] === appendNode.style[s]);
                                 const classCheck = classReg === false ? false : isRemoveNode ? !!sNode.className.match(classReg) : !!sNode.className.match(classReg) && !!appendNode.className.match(classReg);
@@ -2266,12 +2267,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
                 if (styleRegExp) {
                     styleRegExp += ')\\s*:[^;]*\\s*(?:;|$)';
-                    styleRegExp = new _w.RegExp(styleRegExp, 'ig');
+                    styleRegExp = new wRegExp(styleRegExp, 'ig');
                 }
 
                 if (classRegExp) {
                     classRegExp += ')(?=\\s+|$)';
-                    classRegExp = new _w.RegExp(classRegExp, 'ig');
+                    classRegExp = new wRegExp(classRegExp, 'ig');
                 }
             }
 
@@ -2281,10 +2282,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     removeNodeRegExp += '|' + removeNodeArray[i];
                 }
                 removeNodeRegExp += ')$';
-                removeNodeRegExp = new _w.RegExp(removeNodeRegExp, 'i');
+                removeNodeRegExp = new wRegExp(removeNodeRegExp, 'i');
             }
 
             /** validation check function*/
+            const wBoolean = _w.Boolean;
             const _removeCheck = {v: false};
             const validation = function (checkNode) {
                 const vNode = checkNode.cloneNode(false);
@@ -2328,7 +2330,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
 
                 // change
-                if (style || classes || vNode.nodeName !== newNodeName || (_w.Boolean(styleRegExp) !== _w.Boolean(originStyle)) || (_w.Boolean(classRegExp) !== _w.Boolean(originClasses))) {
+                if (style || classes || vNode.nodeName !== newNodeName || (wBoolean(styleRegExp) !== wBoolean(originStyle)) || (wBoolean(classRegExp) !== wBoolean(originClasses))) {
                     if (styleRegExp && originStyle.length > 0) vNode.style.cssText = style;
                     if (!vNode.style.cssText) {
                         vNode.removeAttribute('style');
@@ -2545,8 +2547,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let endPass = false;
             let pCurrent, newNode, appendNode, cssText, anchorNode;
 
+            const wRegExp = _w.RegExp;
             function checkCss (vNode) {
-                const regExp = new _w.RegExp('(?:;|^|\\s)(?:' + cssText + 'null)\\s*:[^;]*\\s*(?:;|$)', 'ig');
+                const regExp = new wRegExp('(?:;|^|\\s)(?:' + cssText + 'null)\\s*:[^;]*\\s*(?:;|$)', 'ig');
                 let style = '';
 
                 if (regExp && vNode.style.cssText.length > 0) {
@@ -4362,8 +4365,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         convertHTMLForCodeView: function (html) {
             let returnHTML = '';
-            const reg = _w.RegExp;
-            const brReg = new reg('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
+            const wRegExp = _w.RegExp;
+            const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
             const isFormatElement = util.isFormatElement.bind(util);
             const wDoc = typeof html === 'string' ? _d.createRange().createContextualFragment(html) : html;
 
@@ -4396,7 +4399,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     
                     node.innerHTML = node.innerHTML;
                     const tag = node.nodeName.toLowerCase();
-                    returnHTML += (lineBR || (elementRegTest ? '' : br)) + (elementIndent || nodeRegTest ? indent : '') + node.outerHTML.match(reg('<' + tag + '[^>]*>', 'i'))[0] + br;
+                    returnHTML += (lineBR || (elementRegTest ? '' : br)) + (elementIndent || nodeRegTest ? indent : '') + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
                     recursionFunc(node, indent + indentSize, '');
                     returnHTML += (nodeRegTest ? indent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? '\n' : '' || /^(TH|TD)$/i.test(node.nodeName) ? '\n' : '');
                 }
@@ -4594,10 +4597,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
             }
             
+            const wRegExp = _w.RegExp;
             // set whitelist
             const defaultAttr = 'contenteditable|colspan|rowspan|target|href|src|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
-            this._htmlCheckWhitelistRegExp = new _w.RegExp('^(' + options._editorTagsWhitelist.replace('|//', '') + ')$', 'i');
+            this._htmlCheckWhitelistRegExp = new wRegExp('^(' + options._editorTagsWhitelist.replace('|//', '') + ')$', 'i');
             this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|<!--|-->'));
             this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(options.pasteTagsWhitelist);
 
@@ -4609,12 +4613,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     if (k === 'all') {
                         allAttr = _attr[k] + '|';
                     } else {
-                        tagsAttr[k] = new _w.RegExp('((?:' + _attr[k] + '|' + defaultAttr + ')\s*=\s*"[^"]*")', 'ig');
+                        tagsAttr[k] = new wRegExp('((?:' + _attr[k] + '|' + defaultAttr + ')\s*=\s*"[^"]*")', 'ig');
                     }
                 }
             }
 
-            this._attributesWhitelistRegExp = new _w.RegExp('((?:' + allAttr + defaultAttr + ')\s*=\s*"[^"]*")', 'ig');
+            this._attributesWhitelistRegExp = new wRegExp('((?:' + allAttr + defaultAttr + ')\s*=\s*"[^"]*")', 'ig');
             this._attributesTagsWhitelist = tagsAttr;
 
             // set modes
@@ -4668,8 +4672,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             this.managedTagsInfo.query = managedClass.toString();
             this._fileManager.queryString = this._fileManager.tags.join(',');
-            this._fileManager.regExp = new _w.RegExp('^(' +  this._fileManager.tags.join('|') + ')$', 'i');
-            this._fileManager.pluginRegExp = new _w.RegExp('^(' +  (filePluginRegExp.length === 0 ? 'undefined' : filePluginRegExp.join('|')) + ')$', 'i');
+            this._fileManager.regExp = new wRegExp('^(' +  this._fileManager.tags.join('|') + ')$', 'i');
+            this._fileManager.pluginRegExp = new wRegExp('^(' +  (filePluginRegExp.length === 0 ? 'undefined' : filePluginRegExp.join('|')) + ')$', 'i');
             
             // cache editor's element
             this._variable._originCssText = context.element.topArea.style.cssText;
