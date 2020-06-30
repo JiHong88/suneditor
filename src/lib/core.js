@@ -4867,6 +4867,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this._editorInit(true, _initHTML);
         },
 
+        /**
+         * @description Initializ editor
+         * @param {Boolean} reload Is relooad?
+         * @param {String} _initHTML initial html string when "reload" is true
+         * @private
+         */
         _editorInit: function (reload, _initHTML) {
             // initialize core and add event listeners
             core._init(reload, _initHTML);
@@ -6864,6 +6870,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         setOptions: function (_options) {
             event._removeEvent();
             core._resetComponents();
+            
+            core._iframeAuto = null;
             options._bodyStyle = '';
 
             core.plugins = _options.plugins || core.plugins;
