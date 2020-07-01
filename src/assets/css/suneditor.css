@@ -58,6 +58,12 @@
     margin: -1px 10px 0 0;
     vertical-align: middle;
 }
+/* se-line-breaker inner icon */
+.sun-editor .se-line-breaker > button > svg {
+    width: 24px;
+    height: 24px;
+}
+
 /* icon class */
 .sun-editor button > i::before {
     -moz-osx-font-smoothing:grayscale;
