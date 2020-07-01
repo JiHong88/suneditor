@@ -270,9 +270,9 @@ window.cm = CodeMirror
 // });
 
 window.sun_destroy1 = function () {
-    s1.destroy()
+    // s1.destroy()
 
-    // s1.setDefaultStyle('height: 100px; font-family: cursive; font-size: 10px;');
+    s1.setDefaultStyle('height: 100px; font-family: cursive; font-size: 10px; width:300px;');
 
     // s1.setContents('<!DOCTYPE html>'+
     // '<html lang="en">'+

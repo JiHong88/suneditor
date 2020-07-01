@@ -1668,12 +1668,38 @@ const util = {
         }
     },
 
-    _setDefaultOptionStyle: function (options) {
+    _setDefaultOptionStyle: function (options, defaultStyle) {
         let optionStyle = '';
         if (options.height) optionStyle += 'height:' + options.height + ';';
         if (options.minHeight) optionStyle += 'min-height:' + options.minHeight + ';';
         if (options.maxHeight) optionStyle += 'max-height:' + options.maxHeight + ';';
-        return optionStyle;
+        if (options.position) optionStyle += 'position:' + options.position + ';';
+        if (options.width) optionStyle += 'width:' + options.width + ';';
+        if (options.minWidth) optionStyle += 'min-width:' + options.minWidth + ';';
+        if (options.maxWidth) optionStyle += 'max-width:' + options.maxWidth + ';';
+
+        let top = '', frame = '', editor = '';
+        defaultStyle = optionStyle + defaultStyle;
+        const styleArr = defaultStyle.split(';');
+        for (let i = 0, len = styleArr.length, s; i < len; i++) {
+            s = styleArr[i].trim();
+            if (!s) continue;
+            if (/^(min-|max-)?width\s*:/.test(s)) {
+                top += s + ';';
+                continue;
+            }
+            if (/^(min-|max-)?height\s*:/.test(s)) {
+                frame += s + ';';
+                continue;
+            }
+            editor += s + ';';
+        }
+
+        return {
+            top: top,
+            frame: frame,
+            editor: editor
+        };
     },
 
     _setIframeDocument: function (frame, options) {

@@ -441,7 +441,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             if (!this.plugins[pluginName]) {
                 throw Error('[SUNEDITOR.core.callPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
-            } else if (!this.initPlugins[pluginName]){
+            } else if (!this.initPlugins[pluginName]) {
                 this.plugins[pluginName].add(this, _target);
                 this.initPlugins[pluginName] = true;
             } else if (typeof this._targetPlugins[pluginName] === 'object' && !!_target) {
@@ -4692,6 +4692,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 if (options.iframe) {
                     this._wd = context.element.wysiwygFrame.contentDocument;
                     context.element.wysiwyg = this._wd.body;
+                    if (options._editorStyles.editor) context.element.wysiwyg.style.cssText = options._editorStyles.editor;
                     if (options.height === 'auto') this._iframeAuto = this._wd.body;
                 }
                 this._initWysiwygArea(reload, _initHTML);
@@ -4737,10 +4738,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _initWysiwygArea: function (reload, _initHTML) {
-            // Default style
-            if (options._bodyStyle) context.element.wysiwyg.style.cssText = options._bodyStyle;
-
-            // Set html
             if (!reload) {
                 context.element.wysiwyg.innerHTML = this.convertContentsForEditor(context.element.originElement.value);
             } else if (_initHTML) {
@@ -6896,7 +6893,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             util.removeClass(core.commandMap.codeView, 'active');
             core._variable.isCodeView = false;
             core._iframeAuto = null;
-            options._bodyStyle = '';
 
             core.plugins = _options.plugins || core.plugins;
             const mergeOptions = [options, _options].reduce(function (init, option) {
@@ -6955,12 +6951,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @param {String} style Style string
          */
         setDefaultStyle: function (style) {
-            const optionStyle = util._setDefaultOptionStyle(options);
+            const newStyles = options._editorStyles = util._setDefaultOptionStyle(options, style);
 
-            if (typeof style === 'string' && style.trim().length > 0) {
-                context.element.wysiwyg.style.cssText = optionStyle + style;
+            context.element.topArea.style.cssText = newStyles.top;
+
+            if (!options.iframe) {
+                context.element.wysiwygFrame.style.cssText = newStyles.frame + newStyles.editor;
             } else {
-                context.element.wysiwyg.style.cssText = optionStyle;
+                context.element.wysiwygFrame.style.cssText = newStyles.frame;
+                context.element.wysiwyg.style.cssText = newStyles.editor;
             }
         },
 

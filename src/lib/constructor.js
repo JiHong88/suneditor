@@ -272,11 +272,7 @@ export default {
      */
     _initElements: function (options, topDiv, toolBar, toolBarArrow) {
         /** top div */
-        topDiv.style.width = options.width;
-        topDiv.style.minWidth = options.minWidth;
-        topDiv.style.maxWidth = options.maxWidth;
-        topDiv.style.display = options.display;
-        if (typeof options.position === 'string') topDiv.style.position = options.position;
+        topDiv.style.cssText = options._editorStyles.top;
 
         /** toolbar */
         if (/inline/i.test(options.mode)) {
@@ -297,12 +293,12 @@ export default {
             wysiwygDiv.setAttribute('contenteditable', true);
             wysiwygDiv.setAttribute('scrolling', 'auto');
             wysiwygDiv.className += ' sun-editor-editable';
+            wysiwygDiv.style.cssText = options._editorStyles.frame + options._editorStyles.editor;
         } else {
             wysiwygDiv.allowFullscreen = true;
             wysiwygDiv.frameBorder = 0;
+            wysiwygDiv.style.cssText = options._editorStyles.frame;
         }
-        
-        wysiwygDiv.style.cssText = util._setDefaultOptionStyle(options);
 
         // textarea for code view
         const textarea = document.createElement('TEXTAREA');
@@ -506,7 +502,7 @@ export default {
         }, {});
 
         /** _init options */
-        options._bodyStyle = util._setDefaultOptionStyle(options) + options.defaultStyle;
+        options._editorStyles = util._setDefaultOptionStyle(options, options.defaultStyle);
     },
 
     /**
