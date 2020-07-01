@@ -154,7 +154,7 @@ let s1 = suneditor.create('editor', {
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template'],
         ['%510', [
-            ['fullScreen'],
+            ['fullScreen', 'codeView'],
             [':moreText-More Text-default.more_horizontal', 'undo', 'redo', 'image'],
             [':command2-title2-text.Insert', 'codeView', 'preview'],
             ['outdent', 'indent'],
@@ -270,9 +270,9 @@ window.cm = CodeMirror
 // });
 
 window.sun_destroy1 = function () {
-    s1.destroy()
+    // s1.destroy()
 
-    // s1.setDefaultStyle('height: 100px; font-family: cursive; font-size: 10px;');
+    s1.setDefaultStyle('height: auto; font-family: cursive; font-size: 10px; width:300px;');
 
     // s1.setContents('<!DOCTYPE html>'+
     // '<html lang="en">'+
@@ -321,11 +321,14 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     codeMirror: CodeMirror,
     display: 'block',
     width: '100%',
-    height: 'auto',
+    height: '500px',
+    // height: 'auto',
+    iframeCSSFileName: '.+',
     popupDisplay: 'full',
     charCounter: true,
     charCounterType: 'byte-html',
     charCounterLabel: 'Characters :',
+    iframe: true,
     videoFileInput: true,
     audioFileInput: true,
     imageUploadUrl: 'http://localhost:3000/editor/upload',
@@ -553,13 +556,14 @@ function ResizeImage (files, uploadHandler) {
     reader.readAsDataURL(uploadFile);
 }
 
-// ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
-//     console.log('files--', files);
-//     console.log('info--', info);
-//     ResizeImage(files, uploadHandler)
+ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
+    // ResizeImage(files, uploadHandler)
     
-//     // return true;
-// }
+    const response = { // Same format as "videoUploadUrl" response
+        "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
+    };
+    core.plugins.image.register.call(core, info, response);
+}
 
 ss.onImageUpload = function (targetElement, index, state, info, core) {
     console.log('imageInfo-----', info);
@@ -659,10 +663,13 @@ window.sun_destroy = function () {
 }
 
 window.sun_create = function () {
-    ss = suneditor.create('editor1', {
-        plugins: plugins,
-        height: 148
-    });
+    // ss = suneditor.create('editor1', {
+    //     plugins: plugins,
+    //     height: 148
+    // });
+    ss.setOptions({
+        height: 'auto'
+    })
 }
 
 

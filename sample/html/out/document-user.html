@@ -911,14 +911,15 @@
                 Called before the image is uploaded.<br>
                 If false is returned, no image upload is performed.<br>
                 If new fileList are returned,  replaced the previous fileList<br>
-                <span style="color:#ffe4c4;">@example</span><br>
+                <span style="color:#ffe4c4;">//</span><br>
                 <span style="color:#ffe4c4;">Also you can call directly image register not execute "uploadHandler".</span><br>
                 <span style="color:#ffe4c4;">This work is not execute default upload handler.</span><br>
                 const response = { <span style="color:#ffe4c4;">// Same format as "imageUploadUrl" response</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;"errorMessage": "insert error message",<br>
                 &nbsp;&nbsp;&nbsp;&nbsp;"result": [ { "url": "...", "name": "...", "size": "999" }, ]<br>
                 };<br>
-                core.plugins.image.register.call(core, info, response);
+                core.plugins.image.register.call(core, info, response);<br>
+                <span style="color:#ffe4c4;">also you can call directly error method</span><br>
+                core.plugins.image.error.call(core, "errorMessage", response);
             </div>
             <table class="params">
                 <thead>
@@ -1140,14 +1141,15 @@
                 Called before the video is uploaded.<br>
                 If false is returned, no video(iframe, video) upload is performed.<br>
                 If new fileList are returned,  replaced the previous fileList<br>
-                <span style="color:#ffe4c4;">@example</span><br>
-                <span style="color:#ffe4c4;">Also you can call directly image register not execute "uploadHandler".</span><br>
+                <span style="color:#ffe4c4;">//</span><br>
+                <span style="color:#ffe4c4;">Also you can call directly video register not execute "uploadHandler".</span><br>
                 <span style="color:#ffe4c4;">This work is not execute default upload handler.</span><br>
-                const response = { <span style="color:#ffe4c4;">// Same format as "imageUploadUrl" response</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;"errorMessage": "insert error message",<br>
+                const response = { <span style="color:#ffe4c4;">// Same format as "videoUploadUrl" response</span><br>
                 &nbsp;&nbsp;&nbsp;&nbsp;"result": [ { "url": "...", "name": "...", "size": "999" }, ]<br>
                 };<br>
-                core.plugins.image.register.call(core, info, response);
+                core.plugins.video.register.call(core, info, response);<br>
+                <span style="color:#ffe4c4;">also you can call directly error method</span><br>
+                core.plugins.video.error.call(core, "errorMessage", response);
             </div>
             <table class="params">
                 <thead>
@@ -1365,14 +1367,15 @@
                 Called before the audio is uploaded.<br>
                 If false is returned, no audio upload is performed.<br>
                 If new fileList are returned,  replaced the previous fileList<br>
-                <span style="color:#ffe4c4;">@example</span><br>
-                <span style="color:#ffe4c4;">Also you can call directly image register not execute "uploadHandler".</span><br>
+                <span style="color:#ffe4c4;">//</span><br>
+                <span style="color:#ffe4c4;">Also you can call directly audio register not execute "uploadHandler".</span><br>
                 <span style="color:#ffe4c4;">This work is not execute default upload handler.</span><br>
-                const response = { <span style="color:#ffe4c4;">// Same format as "imageUploadUrl" response</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;"errorMessage": "insert error message",<br>
+                const response = { <span style="color:#ffe4c4;">// Same format as "audioUploadUrl" response</span><br>
                 &nbsp;&nbsp;&nbsp;&nbsp;"result": [ { "url": "...", "name": "...", "size": "999" }, ]<br>
                 };<br>
-                core.plugins.image.register.call(core, info, response);
+                core.plugins.audio.register.call(core, info, response);<br>
+                <span style="color:#ffe4c4;">also you can call directly error method</span><br>
+                core.plugins.audio.error.call(core, "errorMessage", response);
             <table class="params">
                 <thead>
                 <tr>

@@ -90,7 +90,6 @@ export default {
         }
     
         /** append html */
-        editor_div.appendChild(wysiwyg_div);
         editor_div.appendChild(textarea);
         if (placeholder_span) editor_div.appendChild(placeholder_span);
         if (!toolbarContainer) relative.appendChild(tool_bar.element);
@@ -240,20 +239,17 @@ export default {
 
         if (el.resizingBar) relative.removeChild(el.resizingBar);
         if (bottomBar.resizingBar) relative.appendChild(bottomBar.resizingBar);
+
+        editorArea.innerHTML = '';
+        editorArea.appendChild(code);
+        if (placeholder_span) editorArea.appendChild(placeholder_span);
+
+        code = this._checkCodeMirror(mergeOptions, code);
         
         el.resizingBar = bottomBar.resizingBar;
         el.navigation = bottomBar.navigation;
         el.charWrapper = bottomBar.charWrapper;
         el.charCounter = bottomBar.charCounter;
-
-        editorArea.innerHTML = '';
-        editorArea.appendChild(wysiwygFrame);
-        editorArea.appendChild(code);
-
-        if (placeholder_span) editorArea.appendChild(placeholder_span);
-
-        code = this._checkCodeMirror(mergeOptions, code);
-
         el.wysiwygFrame = wysiwygFrame;
         el.code = code;
         el.placeholder = placeholder_span;
@@ -276,11 +272,7 @@ export default {
      */
     _initElements: function (options, topDiv, toolBar, toolBarArrow) {
         /** top div */
-        topDiv.style.width = options.width;
-        topDiv.style.minWidth = options.minWidth;
-        topDiv.style.maxWidth = options.maxWidth;
-        topDiv.style.display = options.display;
-        if (typeof options.position === 'string') topDiv.style.position = options.position;
+        topDiv.style.cssText = options._editorStyles.top;
 
         /** toolbar */
         if (/inline/i.test(options.mode)) {
@@ -301,59 +293,18 @@ export default {
             wysiwygDiv.setAttribute('contenteditable', true);
             wysiwygDiv.setAttribute('scrolling', 'auto');
             wysiwygDiv.className += ' sun-editor-editable';
+            wysiwygDiv.style.cssText = options._editorStyles.frame + options._editorStyles.editor;
         } else {
-            const cssTags = (function () {
-                const linkNames = options.iframeCSSFileName;
-                let tagString = '';
-
-                for (let f = 0, len = linkNames.length, path; f < len; f++) {
-                    path = [];
-
-                    if (/(^https?:\/\/)|(^data:text\/css,)/.test(linkNames[f])) {
-                        path.push(linkNames[f]);
-                    } else {
-                        const CSSFileName = new RegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?\\.css(?:\\?.*|;.*)?$', 'i');
-        
-                        for (let c = document.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
-                            styleTag = c[i].href.match(CSSFileName);
-                            if (styleTag) path.push(styleTag[0]);
-                        }
-                    }
-        
-                    if (!path || path.length === 0) throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframeCSSFileName" before creating editor instances.';
-        
-                    for (let i = 0, len = path.length; i < len; i++) {
-                        tagString += '<link href="' + path[i] + '" rel="stylesheet">';
-                    }
-                }
-
-                return tagString;
-            })() + (options.height === 'auto' ? '<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>' : '');
-
             wysiwygDiv.allowFullscreen = true;
             wysiwygDiv.frameBorder = 0;
-            wysiwygDiv.addEventListener('load', function () {
-                this.setAttribute('scrolling', 'auto');
-                this.contentDocument.head.innerHTML = '' +
-                    '<meta charset="utf-8" />' +
-                    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-                    '<title></title>' + 
-                    cssTags;
-                this.contentDocument.body.className = 'sun-editor-editable';
-                this.contentDocument.body.setAttribute('contenteditable', true);
-            });
+            wysiwygDiv.style.cssText = options._editorStyles.frame;
         }
-        
-        wysiwygDiv.style.cssText = util._setDefaultOptionStyle(options);
 
         // textarea for code view
         const textarea = document.createElement('TEXTAREA');
         textarea.className = 'se-wrapper-inner se-wrapper-code';
+        textarea.style.cssText = options._editorStyles.frame;
         textarea.style.display = 'none';
-
-        textarea.style.height = options.height;
-        textarea.style.minHeight = options.minHeight;
-        textarea.style.maxHeight = options.maxHeight;
         if (options.height === 'auto') textarea.style.overflow = 'hidden';
 
         /** resize bar */
@@ -461,7 +412,7 @@ export default {
         options.minHeight = (util.isNumber(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (util.isNumber(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
         /** Editing area default style */
-        options.defaultStyle = util._setDefaultOptionStyle(options) + (typeof options.defaultStyle === 'string' ? options.defaultStyle : '');
+        options.defaultStyle = typeof options.defaultStyle === 'string' ? options.defaultStyle : '';
         /** Defining menu items */
         options.font = !options.font ? null : options.font;
         options.fontSize = !options.fontSize ? null : options.fontSize;
@@ -546,6 +497,9 @@ export default {
             }
             return _default;
         }, {});
+
+        /** _init options */
+        options._editorStyles = util._setDefaultOptionStyle(options, options.defaultStyle);
     },
 
     /**
@@ -570,9 +524,9 @@ export default {
             removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', icons.erase],
             indent: ['_se_command_indent', lang.toolbar.indent + (shortcutsDisable.indexOf('indent') > -1 ? '' : ' (' + cmd + '+])'), 'indent', '', icons.outdent],
             outdent: ['_se_command_outdent', lang.toolbar.outdent + (shortcutsDisable.indexOf('indent') > -1 ? '' : ' (' + cmd + '+[)'), 'outdent', '', icons.indent],
-            fullScreen: ['se-code-view-enabled se-resizing-enabled', lang.toolbar.fullScreen, 'fullScreen', '', icons.expansion],
-            showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '', icons.show_blocks],
-            codeView: ['se-code-view-enabled se-resizing-enabled', lang.toolbar.codeView, 'codeView', '', icons.code_view],
+            fullScreen: ['se-code-view-enabled se-resizing-enabled _se_command_fullScreen', lang.toolbar.fullScreen, 'fullScreen', '', icons.expansion],
+            showBlocks: ['_se_command_showBlocks', lang.toolbar.showBlocks, 'showBlocks', '', icons.show_blocks],
+            codeView: ['se-code-view-enabled se-resizing-enabled _se_command_codeView', lang.toolbar.codeView, 'codeView', '', icons.code_view],
             undo: ['_se_command_undo se-resizing-enabled', lang.toolbar.undo + (shortcutsDisable.indexOf('undo') > -1 ? '' : ' (' + cmd + '+Z)'), 'undo', '', icons.undo],
             redo: ['_se_command_redo se-resizing-enabled', lang.toolbar.redo + (shortcutsDisable.indexOf('undo') > -1 ? '' : ' (' + cmd + '+Y / ' + cmd + '+SHIFT+Z)'), 'redo', '', icons.redo],
             preview: ['se-resizing-enabled', lang.toolbar.preview, 'preview', '', icons.preview],

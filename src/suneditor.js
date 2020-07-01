@@ -66,16 +66,6 @@ export default {
             throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed._top.id + '")');
         }
 
-        element.style.display = 'none';
-        cons.constructed._top.style.display = 'block';
-
-        /** Create to sibling node */
-        if (typeof element.nextElementSibling === 'object') {
-            element.parentNode.insertBefore(cons.constructed._top, element.nextElementSibling);
-        } else {
-            element.parentNode.appendChild(cons.constructed._top);
-        }
-
         return core(_Context(element, cons.constructed, cons.options), cons.pluginCallButtons, cons.plugins, cons.options.lang, options, cons._icons, cons._responsiveButtons);
     }
 };

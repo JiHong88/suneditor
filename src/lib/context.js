@@ -30,7 +30,7 @@ const _Context = function (element, cons, options) {
             charCounter: cons._charCounter,
             editorArea: cons._editorArea,
             wysiwygFrame: cons._wysiwygArea,
-            wysiwyg: options.iframe ? cons._wysiwygArea.contentDocument.body : cons._wysiwygArea,
+            wysiwyg: cons._wysiwygArea, // if (options.iframe) cons._wysiwygArea.contentDocument.body
             code: cons._codeArea,
             placeholder: cons._placeholder,
             loading: cons._loading,
@@ -53,7 +53,10 @@ const _Context = function (element, cons, options) {
             redo: cons._toolBar.querySelector('._se_command_redo'),
             save: cons._toolBar.querySelector('._se_command_save'),
             outdent: cons._toolBar.querySelector('._se_command_outdent'),
-            indent: cons._toolBar.querySelector('._se_command_indent')
+            indent: cons._toolBar.querySelector('._se_command_indent'),
+            fullScreen: cons._toolBar.querySelector('._se_command_fullScreen'),
+            showBlocks: cons._toolBar.querySelector('._se_command_showBlocks'),
+            codeView: cons._toolBar.querySelector('._se_command_codeView')
         },
         options: options,
         option: options
