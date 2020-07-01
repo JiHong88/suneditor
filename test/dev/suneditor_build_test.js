@@ -154,7 +154,7 @@ let s1 = suneditor.create('editor', {
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template'],
         ['%510', [
-            ['fullScreen'],
+            ['fullScreen', 'codeView'],
             [':moreText-More Text-default.more_horizontal', 'undo', 'redo', 'image'],
             [':command2-title2-text.Insert', 'codeView', 'preview'],
             ['outdent', 'indent'],
@@ -272,7 +272,7 @@ window.cm = CodeMirror
 window.sun_destroy1 = function () {
     // s1.destroy()
 
-    s1.setDefaultStyle('height: 100px; font-family: cursive; font-size: 10px; width:300px;');
+    s1.setDefaultStyle('height: auto; font-family: cursive; font-size: 10px; width:300px;');
 
     // s1.setContents('<!DOCTYPE html>'+
     // '<html lang="en">'+

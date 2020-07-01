@@ -383,6 +383,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         commandMap: null,
 
         /**
+         * @description Style button related to edit area
+         * @property {Element} fullScreen fullScreen button element
+         * @property {Element} showBlocks showBlocks button element
+         * @property {Element} codeView codeView button element
+         */
+        _styleCommandMap: null,
+
+        /**
          * @description Map of default command
          * @private
          */
@@ -831,14 +839,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             for (let key in commandMap) {
                 if (activePlugins.indexOf(key) > -1) {
                     plugins[key].active.call(this, null);
-                }
-                else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
+                } else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
                     commandMap.OUTDENT.setAttribute('disabled', true);
-                }
-                else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
+                } else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
                     commandMap.INDENT.removeAttribute('disabled');
-                }
-                else {
+                } else {
                     util.removeClass(commandMap[key], 'active');
                 }
             }
@@ -908,8 +913,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             if (selection.rangeCount > 0) {
                 range = selection.getRangeAt(0);
-            }
-            else {
+            } else {
                 range = this._createDefaultRange();
             }
 
@@ -1807,8 +1811,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         listParent = null;
                         nested = false;
                     }
-                }
-                else {
+                } else {
                     if (parentDepth >= depth) {
                         parentDepth = depth;
                         pElement = originParent;
@@ -1833,9 +1836,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 const depthFormat = util.getParentElement(beforeTag, function (current) { return this.isRangeFormatElement(current) && !this.isList(current); }.bind(util));
                 const splitRange = util.splitElement(beforeTag, null, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
                 splitRange.parentNode.insertBefore(rangeElement, splitRange);
-            }
-            // basic
-            else {
+            } else { // basic
                 pElement.insertBefore(rangeElement, beforeTag);
                 removeItems(rangeElement, beforeTag);
             }
@@ -1957,8 +1958,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 if (selectedFormats && lineIndex === -1) {
                     if (!rangeEl) rangeEl = rangeElement.cloneNode(false);
                     rangeEl.appendChild(insNode);
-                }
-                else {
+                } else {
                     if (selectedFormats) next = selectedFormats[lineIndex + 1];
                     if (rangeEl && rangeEl.children.length > 0) {
                         parent.insertBefore(rangeEl, rangeElement);
@@ -2398,9 +2398,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 if (start.container === end.container && util.onlyZeroWidthSpace(start.container)) {
                     start.offset = end.offset = 1;
                 }
-            }
-            // multi line 
-            else {
+            } else { // multi line 
                 // end
                 if (endLength > 0) {
                     newNode = appendNode.cloneNode(false);
@@ -3827,9 +3825,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const wysiwyg = context.element.wysiwyg;
             util.toggleClass(wysiwyg, 'se-show-block');
             if (util.hasClass(wysiwyg, 'se-show-block')) {
-                util.addClass(this.commandMap.showBlocks, 'active');
+                util.addClass(this._styleCommandMap.showBlocks, 'active');
             } else {
-                util.removeClass(this.commandMap.showBlocks, 'active');
+                util.removeClass(this._styleCommandMap.showBlocks, 'active');
             }
             this._resourcesStateChange();
         },
@@ -3866,7 +3864,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 }
 
                 this.nativeFocus();
-                util.removeClass(this.commandMap.codeView, 'active');
+                util.removeClass(this._styleCommandMap.codeView, 'active');
 
                 // history stack
                 this.history.push(false);
@@ -3893,7 +3891,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 
                 this._variable._range = null;
                 context.element.code.focus();
-                util.addClass(this.commandMap.codeView, 'active');
+                util.addClass(this._styleCommandMap.codeView, 'active');
             }
 
             this._checkPlaceholder();
@@ -4018,9 +4016,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     this._iframeAutoHeight();
                 }
 
-                util.addClass(this.commandMap.fullScreen, 'active');
-            }
-            else {
+                util.addClass(this._styleCommandMap.fullScreen, 'active');
+            } else {
                 _var.isFullScreen = false;
 
                 wysiwygFrame.style.cssText = _var._wysiwygOriginCssText;
@@ -4050,7 +4047,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 event.onScroll_window();
                 util.changeElement(element.firstElementChild, icons.expansion);
 
-                util.removeClass(this.commandMap.fullScreen, 'active');
+                util.removeClass(this._styleCommandMap.fullScreen, 'active');
             }
 
             if (typeof functions.toggleFullScreen === 'function') functions.toggleFullScreen(this._variable.isFullScreen, this);
@@ -4724,7 +4721,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 SUB: tool.subscript,
                 SUP: tool.superscript,
                 OUTDENT: tool.outdent,
-                INDENT: tool.indent,
+                INDENT: tool.indent
+            };
+            this._styleCommandMap = {
                 fullScreen: tool.fullScreen,
                 showBlocks: tool.showBlocks,
                 codeView: tool.codeView
@@ -5078,14 +5077,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 
                 if (activePlugins.indexOf(key) > -1) {
                     plugins[key].active.call(core, null);
-                }
-                else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
+                } else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
                     commandMap.OUTDENT.setAttribute('disabled', true);
-                }
-                else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
+                } else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
                     commandMap.INDENT.removeAttribute('disabled');
-                }
-                else {
+                } else {
                     util.removeClass(commandMap[key], 'active');
                 }
             }
@@ -6112,14 +6108,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             for (let key in commandMap) {
                 if (activePlugins.indexOf(key) > -1) {
                     plugins[key].active.call(core, null);
-                }
-                else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
+                } else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
                     commandMap.OUTDENT.setAttribute('disabled', true);
-                }
-                else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
+                } else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
                     commandMap.INDENT.removeAttribute('disabled');
-                }
-                else {
+                } else {
                     util.removeClass(commandMap[key], 'active');
                 }
             }
@@ -6876,9 +6869,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             if (core.hasFocus) event._applyTagEffects();
 
-            if (core._variable.isCodeView) util.addClass(core.commandMap.codeView, 'active');
-            if (core._variable.isFullScreen) util.addClass(core.commandMap.fullScreen, 'active');
-            if (util.hasClass(context.element.wysiwyg, 'se-show-block')) util.addClass(core.commandMap.showBlocks, 'active');
+            if (core._variable.isCodeView) util.addClass(core._styleCommandMap.codeView, 'active');
+            if (core._variable.isFullScreen) util.addClass(core._styleCommandMap.fullScreen, 'active');
+            if (util.hasClass(context.element.wysiwyg, 'se-show-block')) util.addClass(core._styleCommandMap.showBlocks, 'active');
         },
 
         /**
@@ -6889,8 +6882,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             event._removeEvent();
             core._resetComponents();
             
-            util.removeClass(core.commandMap.showBlocks, 'active');
-            util.removeClass(core.commandMap.codeView, 'active');
+            util.removeClass(core._styleCommandMap.showBlocks, 'active');
+            util.removeClass(core._styleCommandMap.codeView, 'active');
             core._variable.isCodeView = false;
             core._iframeAuto = null;
 
@@ -6952,14 +6945,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         setDefaultStyle: function (style) {
             const newStyles = options._editorStyles = util._setDefaultOptionStyle(options, style);
+            const el = context.element;
 
-            context.element.topArea.style.cssText = newStyles.top;
-
-            if (!options.iframe) {
-                context.element.wysiwygFrame.style.cssText = newStyles.frame + newStyles.editor;
+            // top area
+            el.topArea.style.cssText = newStyles.top;
+            // code view
+            el.code.style.cssText = options._editorStyles.frame;
+            el.code.style.display = 'none';
+            if (options.height === 'auto') {
+                el.code.style.overflow = 'hidden';
             } else {
-                context.element.wysiwygFrame.style.cssText = newStyles.frame;
-                context.element.wysiwyg.style.cssText = newStyles.editor;
+                el.code.style.overflow = '';
+            }
+            // wysiwyg frame
+            if (!options.iframe) {
+                el.wysiwygFrame.style.cssText = newStyles.frame + newStyles.editor;
+            } else {
+                el.wysiwygFrame.style.cssText = newStyles.frame;
+                el.wysiwyg.style.cssText = newStyles.editor;
             }
         },
 

@@ -1689,6 +1689,9 @@ const util = {
                 continue;
             }
             if (/^(min-|max-)?height\s*:/.test(s)) {
+                if (/^height/.test(s) && s.split(':')[1].trim() === 'auto') {
+                    options.height = 'auto';
+                }
                 frame += s + ';';
                 continue;
             }

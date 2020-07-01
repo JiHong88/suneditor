@@ -303,11 +303,8 @@ export default {
         // textarea for code view
         const textarea = document.createElement('TEXTAREA');
         textarea.className = 'se-wrapper-inner se-wrapper-code';
+        textarea.style.cssText = options._editorStyles.frame;
         textarea.style.display = 'none';
-
-        textarea.style.height = options.height;
-        textarea.style.minHeight = options.minHeight;
-        textarea.style.maxHeight = options.maxHeight;
         if (options.height === 'auto') textarea.style.overflow = 'hidden';
 
         /** resize bar */
