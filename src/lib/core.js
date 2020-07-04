@@ -387,6 +387,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @property {Element} fullScreen fullScreen button element
          * @property {Element} showBlocks showBlocks button element
          * @property {Element} codeView codeView button element
+         * @private
          */
         _styleCommandMap: null,
 
@@ -7285,6 +7286,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         contextEl.wysiwygFrame.addEventListener('load', function () {
             util._setIframeDocument(this, options);
             core._editorInit(false, options.value);
+            options.value = null;
         });
     }
 
@@ -7301,6 +7303,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
     // init
     if (!options.iframe) {
         core._editorInit(false, options.value);
+        options.value = null;
     }
 
     return functions;
