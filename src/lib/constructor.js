@@ -375,8 +375,9 @@ export default {
      * @private
      */
     _initOptions: function (element, options) {
-        /** user options */
+        /** Values */
         options.lang = options.lang || _defaultLang;
+        options.value = typeof options.value === 'string' ? options.value : '';
         /** Whitelist */
         options._defaultTagsWhitelist = typeof options._defaultTagsWhitelist === 'string' ? options._defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup';
         options._editorTagsWhitelist = options._defaultTagsWhitelist + (typeof options.addTagsWhitelist === 'string' && options.addTagsWhitelist.length > 0 ? '|' + options.addTagsWhitelist : '');

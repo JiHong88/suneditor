@@ -4572,7 +4572,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Initializ core variable
          * @param {Boolean} reload Is relooad?
-         * @param {String} _initHTML initial html string when "reload" is true
+         * @param {String} _initHTML initial html string
          * @private
          */
         _init: function (reload, _initHTML) {
@@ -4723,15 +4723,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Initializ wysiwyg area (Only called from core._init)
          * @param {Boolean} reload Is relooad?
-         * @param {String} _initHTML initial html string when "reload" is true
+         * @param {String} _initHTML initial html string
          * @private
          */
         _initWysiwygArea: function (reload, _initHTML) {
-            if (!reload) {
-                context.element.wysiwyg.innerHTML = this.convertContentsForEditor(context.element.originElement.value);
-            } else if (_initHTML) {
-                context.element.wysiwyg.innerHTML = _initHTML;
-            }
+            context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentsForEditor(_initHTML || context.element.originElement.value);
         },
 
         /**
@@ -4872,7 +4868,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Initializ editor
          * @param {Boolean} reload Is relooad?
-         * @param {String} _initHTML initial html string when "reload" is true
+         * @param {String} _initHTML initial html string
          * @private
          */
         _editorInit: function (reload, _initHTML) {
@@ -7279,7 +7275,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
     if (options.iframe) {
         contextEl.wysiwygFrame.addEventListener('load', function () {
             util._setIframeDocument(this, options);
-            core._editorInit(false, null);
+            core._editorInit(false, options.value);
         });
     }
 
@@ -7295,7 +7291,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
     // init
     if (!options.iframe) {
-        core._editorInit(false, null);
+        core._editorInit(false, options.value);
     }
 
     return functions;
