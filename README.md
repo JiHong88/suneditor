@@ -327,14 +327,18 @@ plugins: [
 ]
 : Plugins array.     default: null {Array}
 
+// Vaues
+lang            : language object.   default : en {Object}
+value           : Initial Contents html string. If not, the value of "target textarea".   default: '' {String}
+
 // Whitelist--------------------------------------å---------------------------------------------------------
 // _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup'
-addTagsWhitelist      : Add tags to the default tags whitelist of editor. default: '' {String}
+addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
-pasteTagsWhitelist    : Whitelist of tags when pasting. default: _editorTagsWhitelist {String}
+pasteTagsWhitelist    : Whitelist of tags when pasting.   default: _editorTagsWhitelist {String}
                         ex) 'p|h[1-6]'
-attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.
+attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}
                         // -- Fixed whitelist --
                         // Native attributes: 'contenteditable|colspan|rowspan|target|href|src|class|type|controls'
                         // Editor attributes: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size'
@@ -343,7 +347,6 @@ attributesWhitelist   : Add attributes whitelist of tags that should be kept und
                             'input': 'checked' // Apply to input tag
                         }
 // Layout-------------------------------------------------------------------------------------------------------
-lang            : language object.   default : en {Object}
 mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {String}
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
                   'inline' or 'balloon' mode.     default: 'auto' {Number|String}
