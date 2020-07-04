@@ -132,71 +132,14 @@ suneditor.create('scrolleditor', {
 
 let s1 = suneditor.create('editor', {
     plugins: plugins,
-    // mode: 'balloon-always',
-    katex: Katex,
-    linkProtocol: 'http://',
-    fontSize: fs,
-    resizingBar: true,
-    height: '500px',
-    // shortcutsDisable: ['bold'],
-    // attributesWhitelist: 'style',
-    buttonList: [
-        ['undo', 'redo',
-        'font', 'fontSize', 'formatBlock',
-        'blockquote', 'paragraphStyle',
-        'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
-        'fontColor', 'hiliteColor', 'textStyle',
-        'removeFormat',
-        'outdent', 'indent',
-        'list',
-        'align', 'horizontalRule', 'lineHeight',
-        'table', 'link', 'image', 'video', 'math',
-        'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print', 'save', 'template'],
-        ['%510', [
-            ['fullScreen', 'codeView'],
-            [':moreText-More Text-default.more_horizontal', 'undo', 'redo', 'image'],
-            [':command2-title2-text.Insert', 'codeView', 'preview'],
-            ['outdent', 'indent'],
-        ]]
-    ],
-    imageFileInput: false,
-    icons: {
-        undo: 'U',
-        bold: '<span class="se-icon-text">B</span>'
-    },
-    width: '100%',
-    defaultStyle: 'font-size: 10px;',
-    // fullPage: true,
-    // pasteTagsWhitelist: 'p|h[1-6]',
-    // attributesWhitelist: {
-    //     table: "style",
-    //     tbody: "style",
-    //     thead: "style",
-    //     tr: "style",
-    //     td: "style"
-    // },
-    addTagsWhitelist: '//',
-    // addTagsWhitelist: '//',
-    formats: [
-        { 
-            tag: 'div', // Tag name
-            name: 'NORMAL', // default: tag name 
-            command: 'free', // default: "replace" 
-            class: '__se__format__free_NORMAL', // Class names must always begin with "__se__format__" 
-        }, 
-        { 
-            tag: 'div', // Tag name
-            name: 'CODE', // default: tag name 
-            command: 'replace', // default: "replace" 
-            class: '__se__format__replace_CODE', // Class names must always begin with "__se__format__" 
-        },
-        'pre',
-        'blockquote'
-    ],
-    charCounterType: 'byte-html',
-    charCounterLabel: 'HTML BYTE : ',
-    maxCharCount: 650
+    mode: "balloon-always",
+    value: '',
+    resizingBar: false,
+    showPathLabel: false,
+    display: "inline",  
+    tabDisable: false,
+    placeholder: "Enter the question image here",
+    buttonList: [["table","removeFormat"]],
 })
 
 // s1.core._charCount = function (nextCharCount, blink) {

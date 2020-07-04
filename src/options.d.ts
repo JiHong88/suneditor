@@ -12,8 +12,8 @@ export interface SunEditorOptions {
      */
     lang?: Lang;
     /**
-     * Editor's Initial Contents html string
-     * If not, the value of "target textarea"
+     * Initial value(html string) of the edit area.
+     * If not, the value of the "target textarea".
      */
     value?: string;
     /**

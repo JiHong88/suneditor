@@ -50,14 +50,15 @@ export default {
         const srcName = item.src.split('/').pop();
         return  '<div class="se-file-item-img"><img src="' + item.src + '" alt="' + (item.alt || srcName) + '" data-command="pick">' +
                     '<div class="se-file-img-name se-file-name-back"></div>' +
-                    '<div class="se-file-img-name">' + (item.name || srcName) + '</div>' +
+                    '<div class="se-file-img-name __se__img_name">' + (item.name || srcName) + '</div>' +
                 '</div>';
     },
 
     setImage: function (target) {
         this.callPlugin('image', function () {
+            const file = {name: target.parentNode.querySelector('.__se__img_name').textContent, size: 0};
             this.context.image._altText = target.alt;
-            this.plugins.image.create_image.call(this, target.src, '', false, this.context.image._origin_w, this.context.image._origin_h, 'none', null);
+            this.plugins.image.create_image.call(this, target.src, '', false, this.context.image._origin_w, this.context.image._origin_h, 'none', file);
         }.bind(this), null);
     }
 };

@@ -761,6 +761,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         const format = util.createElement('P');
                         const br = util.createElement('BR');
                         format.appendChild(br);
+                        context.element.wysiwyg.appendChild(format);
                         this.setRange(br, 0, br, 0);
                     } else {
                         this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
@@ -790,7 +791,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 if (!focusEl) this.nativeFocus();
                 else this.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
             } else {
-                this.nativeFocus();
+                this.focus();
             }
         },
 
@@ -812,7 +813,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 range.setStart(startCon, startOff);
                 range.setEnd(endCon, endOff);
             } catch (error) {
+                console.warn('[SUNEDITOR.core.focus.error] ' + error);
                 this.nativeFocus();
+                return;
             }
 
             const selection = this.getSelection();
@@ -934,12 +937,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _createDefaultRange: function () {
-            context.element.wysiwyg.focus();
+            const wysiwyg = context.element.wysiwyg;
+            wysiwyg.focus();
             const range = this._wd.createRange();
-            if (!context.element.wysiwyg.firstChild) this.execCommand('formatBlock', false, 'P');
 
-            range.setStart(context.element.wysiwyg.firstChild, 0);
-            range.setEnd(context.element.wysiwyg.firstChild, 0);
+            let focusEl = wysiwyg.firstElementChild;
+            if (!focusEl) {
+                focusEl = util.createElement('P');
+                focusEl.innerHTML = '<br>';
+                wysiwyg.appendChild(focusEl);
+            }
+
+            range.setStart(focusEl, 0);
+            range.setEnd(focusEl, 0);
             
             return range;
         },
@@ -4727,7 +4737,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _initWysiwygArea: function (reload, _initHTML) {
-            context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentsForEditor(_initHTML || context.element.originElement.value);
+            context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentsForEditor(typeof _initHTML === 'string' ? _initHTML : context.element.originElement.value);
         },
 
         /**
@@ -4781,7 +4791,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description If there is no default format, add a format and move "selection".
-         * Alternative code for - execCommand('formatBlock');
          * @param {String|null} formatName Format tag name (default: 'P')
          * @private
          */

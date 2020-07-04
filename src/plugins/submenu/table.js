@@ -1437,9 +1437,8 @@ export default {
                 this.controllersOff();
 
                 if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
+                this.focus();
         }
-
-        this.focus();
 
         // history stack
         this.history.push(false);
