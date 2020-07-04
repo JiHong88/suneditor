@@ -4685,24 +4685,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this.addModule([_notice]);
 
             // Init, validate
-            _w.setTimeout(function () {
-                if (options.iframe) {
-                    this._wd = context.element.wysiwygFrame.contentDocument;
-                    context.element.wysiwyg = this._wd.body;
-                    if (options._editorStyles.editor) context.element.wysiwyg.style.cssText = options._editorStyles.editor;
-                    if (options.height === 'auto') this._iframeAuto = this._wd.body;
-                }
-                this._initWysiwygArea(reload, _initHTML);
-
-                this._checkComponents();
-                this._componentsInfoInit = false;
-                this._componentsInfoReset = false;
-                
-                this.history.reset(true);
-                this._resourcesStateChange();
-
-                if (typeof functions.onload === 'function') return functions.onload(this, reload);
-            }.bind(this));
+            if (options.iframe) {
+                this._wd = context.element.wysiwygFrame.contentDocument;
+                context.element.wysiwyg = this._wd.body;
+                if (options._editorStyles.editor) context.element.wysiwyg.style.cssText = options._editorStyles.editor;
+                if (options.height === 'auto') this._iframeAuto = this._wd.body;
+            }
+            
+            this._initWysiwygArea(reload, _initHTML);
         },
 
         /**
@@ -4731,7 +4721,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
-         * @description Initializ wysiwyg area (Only called from core._init())
+         * @description Initializ wysiwyg area (Only called from core._init)
          * @param {Boolean} reload Is relooad?
          * @param {String} _initHTML initial html string when "reload" is true
          * @private
@@ -4895,6 +4885,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             // toolbar visibility
             context.element.toolbar.style.visibility = '';
+
+            this._checkComponents();
+            this._componentsInfoInit = false;
+            this._componentsInfoReset = false;
+
+            this.history.reset(true);
+            this._resourcesStateChange();
+
+            if (typeof functions.onload === 'function') return functions.onload(this, reload);
         },
 
         /**
