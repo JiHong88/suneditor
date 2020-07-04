@@ -329,12 +329,15 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     charCounter: true,
     charCounterType: 'byte-html',
     charCounterLabel: 'Characters :',
+    imageMultipleFile: true,
+    videoMultipleFile: true,
+    audioMultipleFile: true,
+    // imageUploadUrl: 'http://localhost:3000/editor/upload',
+    // videoUploadUrl: 'http://localhost:3000/editor/upload',
+    // audioUploadUrl: 'http://localhost:3000/editor/upload',
     iframe: true,
     videoFileInput: true,
     audioFileInput: true,
-    imageUploadUrl: 'http://localhost:3000/editor/upload',
-    videoUploadUrl: 'http://localhost:3000/editor/upload',
-    audioUploadUrl: 'http://localhost:3000/editor/upload',
     placeholder: 'Start typing something...',
     templates: [
         {
@@ -557,18 +560,18 @@ function ResizeImage (files, uploadHandler) {
     reader.readAsDataURL(uploadFile);
 }
 
-ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
-    // ResizeImage(files, uploadHandler)
+// ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
+//     // ResizeImage(files, uploadHandler)
     
-    const response = { // Same format as "videoUploadUrl" response
-        "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
-    };
-    core.plugins.image.register.call(core, info, response);
-}
+//     const response = { // Same format as "videoUploadUrl" response
+//         "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
+//     };
+//     core.plugins.image.register.call(core, info, response);
+// }
 
-ss.onImageUpload = function (targetElement, index, state, info, core) {
-    console.log('imageInfo-----', info);
-}
+// ss.onImageUpload = function (targetElement, index, state, info, core) {
+//     console.log('imageInfo-----', info);
+// }
 
 ss.showInline = function (toolbar, context) {
 
