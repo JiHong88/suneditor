@@ -57,6 +57,10 @@
 <div class="content">
     <article class="markdown-body entry-content">
         <div style="background-color: #f3f3f3; padding: 4px 20px 20px 20px;">
+            <h4 style="color: #b94a48;">--Value</h4>
+            <label><input type="checkbox" id="editor_value">&nbsp;&nbsp;value&nbsp;&nbsp;&nbsp;</label><br>
+            <textarea id="editor_value_value" placeholder="HTML String ('&lt;p&gt;..&lt;/p&gt;')" style="width:320px"></textarea>
+            <br>
             <h4 style="color: #b94a48;">--Whitelist</h4>
             <label><input type="checkbox" id="addTagsWhitelist">&nbsp;&nbsp;addTagsWhitelist&nbsp;&nbsp;&nbsp;</label>
             <input type="text" id="addTagsWhitelist_value" placeholder="String (mark|canvas|label|select|option|input)" style="width:320px">
@@ -439,6 +443,7 @@ function sun_create () {
     imageTable.innerHTML = '';
 
     var options = {
+        value: document.getElementById('editor_value').checked ? document.getElementById('editor_value_value').value : undefined,
         addTagsWhitelist: document.getElementById('addTagsWhitelist').checked ? document.getElementById('addTagsWhitelist_value').value : undefined,
         pasteTagsWhitelist: document.getElementById('pasteTagsWhitelist').checked ? document.getElementById('pasteTagsWhitelist_value').value : undefined,
         attributesWhitelist: !document.getElementById('attributesWhitelist').checked ? undefined : {

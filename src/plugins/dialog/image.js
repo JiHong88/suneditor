@@ -509,9 +509,10 @@ export default {
 
     setup_reader: function (files, imgLinkValue, newWindowCheck, width, height, align, filesLen, isUpdate) {
         try {
-            const reader = new FileReader();
+            const wFileReader = this._w.FileReader;
     
-            for (let i = 0, file; i <= filesLen; i++) {
+            for (let i = 0, reader, file; i <= filesLen; i++) {
+                reader = new wFileReader();
                 file = files[i];
     
                 if (isUpdate) {

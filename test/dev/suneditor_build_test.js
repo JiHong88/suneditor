@@ -132,71 +132,14 @@ suneditor.create('scrolleditor', {
 
 let s1 = suneditor.create('editor', {
     plugins: plugins,
-    // mode: 'balloon-always',
-    katex: Katex,
-    linkProtocol: 'http://',
-    fontSize: fs,
-    resizingBar: true,
-    height: '500px',
-    // shortcutsDisable: ['bold'],
-    // attributesWhitelist: 'style',
-    buttonList: [
-        ['undo', 'redo',
-        'font', 'fontSize', 'formatBlock',
-        'blockquote', 'paragraphStyle',
-        'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
-        'fontColor', 'hiliteColor', 'textStyle',
-        'removeFormat',
-        'outdent', 'indent',
-        'list',
-        'align', 'horizontalRule', 'lineHeight',
-        'table', 'link', 'image', 'video', 'math',
-        'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print', 'save', 'template'],
-        ['%510', [
-            ['fullScreen', 'codeView'],
-            [':moreText-More Text-default.more_horizontal', 'undo', 'redo', 'image'],
-            [':command2-title2-text.Insert', 'codeView', 'preview'],
-            ['outdent', 'indent'],
-        ]]
-    ],
-    imageFileInput: false,
-    icons: {
-        undo: 'U',
-        bold: '<span class="se-icon-text">B</span>'
-    },
-    width: '100%',
-    defaultStyle: 'font-size: 10px;',
-    // fullPage: true,
-    // pasteTagsWhitelist: 'p|h[1-6]',
-    // attributesWhitelist: {
-    //     table: "style",
-    //     tbody: "style",
-    //     thead: "style",
-    //     tr: "style",
-    //     td: "style"
-    // },
-    addTagsWhitelist: '//',
-    // addTagsWhitelist: '//',
-    formats: [
-        { 
-            tag: 'div', // Tag name
-            name: 'NORMAL', // default: tag name 
-            command: 'free', // default: "replace" 
-            class: '__se__format__free_NORMAL', // Class names must always begin with "__se__format__" 
-        }, 
-        { 
-            tag: 'div', // Tag name
-            name: 'CODE', // default: tag name 
-            command: 'replace', // default: "replace" 
-            class: '__se__format__replace_CODE', // Class names must always begin with "__se__format__" 
-        },
-        'pre',
-        'blockquote'
-    ],
-    charCounterType: 'byte-html',
-    charCounterLabel: 'HTML BYTE : ',
-    maxCharCount: 650
+    mode: "balloon-always",
+    value: '',
+    resizingBar: false,
+    showPathLabel: false,
+    display: "inline",  
+    tabDisable: false,
+    placeholder: "Enter the question image here",
+    buttonList: [["table","removeFormat"]],
 })
 
 // s1.core._charCount = function (nextCharCount, blink) {
@@ -318,6 +261,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     lang: lang.ko,
     plugins: plugins,
     katex: Katex,
+    value: '',
     codeMirror: CodeMirror,
     display: 'block',
     width: '100%',
@@ -328,12 +272,15 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     charCounter: true,
     charCounterType: 'byte-html',
     charCounterLabel: 'Characters :',
+    imageMultipleFile: true,
+    videoMultipleFile: true,
+    audioMultipleFile: true,
+    // imageUploadUrl: 'http://localhost:3000/editor/upload',
+    // videoUploadUrl: 'http://localhost:3000/editor/upload',
+    // audioUploadUrl: 'http://localhost:3000/editor/upload',
     iframe: true,
     videoFileInput: true,
     audioFileInput: true,
-    imageUploadUrl: 'http://localhost:3000/editor/upload',
-    videoUploadUrl: 'http://localhost:3000/editor/upload',
-    audioUploadUrl: 'http://localhost:3000/editor/upload',
     placeholder: 'Start typing something...',
     templates: [
         {
@@ -556,18 +503,18 @@ function ResizeImage (files, uploadHandler) {
     reader.readAsDataURL(uploadFile);
 }
 
-ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
-    // ResizeImage(files, uploadHandler)
+// ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
+//     // ResizeImage(files, uploadHandler)
     
-    const response = { // Same format as "videoUploadUrl" response
-        "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
-    };
-    core.plugins.image.register.call(core, info, response);
-}
+//     const response = { // Same format as "videoUploadUrl" response
+//         "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
+//     };
+//     core.plugins.image.register.call(core, info, response);
+// }
 
-ss.onImageUpload = function (targetElement, index, state, info, core) {
-    console.log('imageInfo-----', info);
-}
+// ss.onImageUpload = function (targetElement, index, state, info, core) {
+//     console.log('imageInfo-----', info);
+// }
 
 ss.showInline = function (toolbar, context) {
 

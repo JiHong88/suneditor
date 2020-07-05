@@ -4,6 +4,23 @@ import { Plugin } from './plugins/Plugin';
 export interface SunEditorOptions {
     plugins: Plugin[] | Record<string, Plugin>;
     /**
+     * Values
+     * ======
+     */
+    /**
+     * language object
+     */
+    lang?: Lang;
+    /**
+     * Initial value(html string) of the edit area.
+     * If not, the value of the "target textarea".
+     */
+    value?: string;
+    /**
+     * Whitelist
+     * ======
+     */
+    /**
      * Add tags to the default tags whitelist of editor.
      */
     addTagsWhitelist?: string;
@@ -19,10 +36,6 @@ export interface SunEditorOptions {
      * Layout
      * ======
      */
-    /**
-     * language object
-     */
-    lang?: Lang;
     /**
      * The mode of the editor (classic, inline, balloon, balloon-always)
      */

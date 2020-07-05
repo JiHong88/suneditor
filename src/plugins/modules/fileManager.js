@@ -46,7 +46,7 @@
                     xmlHttp.setRequestHeader(key, uploadHeader[key]);
                 }
             }
-            xmlHttp.send(formData);  
+            xmlHttp.send(formData);
         },
 
         _callBackUpload: function (xmlHttp, callBack, errorCallBack) {

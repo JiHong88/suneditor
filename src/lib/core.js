@@ -387,6 +387,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @property {Element} fullScreen fullScreen button element
          * @property {Element} showBlocks showBlocks button element
          * @property {Element} codeView codeView button element
+         * @private
          */
         _styleCommandMap: null,
 
@@ -761,6 +762,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         const format = util.createElement('P');
                         const br = util.createElement('BR');
                         format.appendChild(br);
+                        context.element.wysiwyg.appendChild(format);
                         this.setRange(br, 0, br, 0);
                     } else {
                         this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
@@ -790,7 +792,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 if (!focusEl) this.nativeFocus();
                 else this.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
             } else {
-                this.nativeFocus();
+                this.focus();
             }
         },
 
@@ -812,7 +814,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 range.setStart(startCon, startOff);
                 range.setEnd(endCon, endOff);
             } catch (error) {
+                console.warn('[SUNEDITOR.core.focus.error] ' + error);
                 this.nativeFocus();
+                return;
             }
 
             const selection = this.getSelection();
@@ -934,12 +938,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _createDefaultRange: function () {
-            context.element.wysiwyg.focus();
+            const wysiwyg = context.element.wysiwyg;
+            wysiwyg.focus();
             const range = this._wd.createRange();
-            if (!context.element.wysiwyg.firstChild) this.execCommand('formatBlock', false, 'P');
 
-            range.setStart(context.element.wysiwyg.firstChild, 0);
-            range.setEnd(context.element.wysiwyg.firstChild, 0);
+            let focusEl = wysiwyg.firstElementChild;
+            if (!focusEl) {
+                focusEl = util.createElement('P');
+                focusEl.innerHTML = '<br>';
+                wysiwyg.appendChild(focusEl);
+            }
+
+            range.setStart(focusEl, 0);
+            range.setEnd(focusEl, 0);
             
             return range;
         },
@@ -4572,7 +4583,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Initializ core variable
          * @param {Boolean} reload Is relooad?
-         * @param {String} _initHTML initial html string when "reload" is true
+         * @param {String} _initHTML initial html string
          * @private
          */
         _init: function (reload, _initHTML) {
@@ -4685,24 +4696,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             this.addModule([_notice]);
 
             // Init, validate
-            _w.setTimeout(function () {
-                if (options.iframe) {
-                    this._wd = context.element.wysiwygFrame.contentDocument;
-                    context.element.wysiwyg = this._wd.body;
-                    if (options._editorStyles.editor) context.element.wysiwyg.style.cssText = options._editorStyles.editor;
-                    if (options.height === 'auto') this._iframeAuto = this._wd.body;
-                }
-                this._initWysiwygArea(reload, _initHTML);
-
-                this._checkComponents();
-                this._componentsInfoInit = false;
-                this._componentsInfoReset = false;
-                
-                this.history.reset(true);
-                this._resourcesStateChange();
-
-                if (typeof functions.onload === 'function') return functions.onload(this, reload);
-            }.bind(this));
+            if (options.iframe) {
+                this._wd = context.element.wysiwygFrame.contentDocument;
+                context.element.wysiwyg = this._wd.body;
+                if (options._editorStyles.editor) context.element.wysiwyg.style.cssText = options._editorStyles.editor;
+                if (options.height === 'auto') this._iframeAuto = this._wd.body;
+            }
+            
+            this._initWysiwygArea(reload, _initHTML);
         },
 
         /**
@@ -4731,17 +4732,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
-         * @description Initializ wysiwyg area (Only called from core._init())
+         * @description Initializ wysiwyg area (Only called from core._init)
          * @param {Boolean} reload Is relooad?
-         * @param {String} _initHTML initial html string when "reload" is true
+         * @param {String} _initHTML initial html string
          * @private
          */
         _initWysiwygArea: function (reload, _initHTML) {
-            if (!reload) {
-                context.element.wysiwyg.innerHTML = this.convertContentsForEditor(context.element.originElement.value);
-            } else if (_initHTML) {
-                context.element.wysiwyg.innerHTML = _initHTML;
-            }
+            context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentsForEditor(typeof _initHTML === 'string' ? _initHTML : context.element.originElement.value);
         },
 
         /**
@@ -4795,7 +4792,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
         /**
          * @description If there is no default format, add a format and move "selection".
-         * Alternative code for - execCommand('formatBlock');
          * @param {String|null} formatName Format tag name (default: 'P')
          * @private
          */
@@ -4882,7 +4878,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         /**
          * @description Initializ editor
          * @param {Boolean} reload Is relooad?
-         * @param {String} _initHTML initial html string when "reload" is true
+         * @param {String} _initHTML initial html string
          * @private
          */
         _editorInit: function (reload, _initHTML) {
@@ -4895,6 +4891,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             // toolbar visibility
             context.element.toolbar.style.visibility = '';
+
+            this._checkComponents();
+            this._componentsInfoInit = false;
+            this._componentsInfoReset = false;
+
+            this.history.reset(true);
+            this._resourcesStateChange();
+
+            if (typeof functions.onload === 'function') return functions.onload(this, reload);
         },
 
         /**
@@ -7280,7 +7285,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
     if (options.iframe) {
         contextEl.wysiwygFrame.addEventListener('load', function () {
             util._setIframeDocument(this, options);
-            core._editorInit(false, null);
+            core._editorInit(false, options.value);
+            options.value = null;
         });
     }
 
@@ -7296,7 +7302,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
     // init
     if (!options.iframe) {
-        core._editorInit(false, null);
+        core._editorInit(false, options.value);
+        options.value = null;
     }
 
     return functions;
