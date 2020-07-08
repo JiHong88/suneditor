@@ -1265,7 +1265,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Object|null}
          */
         getFileComponent: function (element) {
-            if (!element) return null;
+            if (!this._fileManager.queryString || !element) return null;
 
             let fileComponent, pluginName;
             if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
