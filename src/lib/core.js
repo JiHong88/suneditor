@@ -7011,6 +7011,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
         },
 
         /**
+         * @description Gets only the text of the suneditor contents
+         * @returns {String}
+         */
+        getText: function () {
+            return context.element.wysiwyg.textContent;
+        },
+
+        /**
          * @description Get the editor's number of characters or binary data size.
          * You can use the "charCounterType" option format.
          * @param {String|null} charCounterType options - charCounterType ('char', 'byte', 'byte-html')

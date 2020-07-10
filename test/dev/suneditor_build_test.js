@@ -561,7 +561,7 @@ window.sun_insertHTML = function (html) {
 window.sun_getContents = function () {
     // alert(ss.getContents());
 
-    console.log(ss.getContents());
+    console.log(ss.getText());
 
     // ss.core.commandHandler(null, 'selectAll')
     // let t = '';
