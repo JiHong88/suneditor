@@ -44,6 +44,24 @@ declare interface util {
     createTextNode(text: string): Node;
 
     /**
+     * @description The editor checks tags by string.
+     * If there is "<" or ">" in the attribute of tag, HTML is broken when checking the tag.
+     * When using an attribute with "<" or ">", use "HTMLEncoder" to save. (ex: math(katex))
+     * @param contents HTML or Text string
+     * @returns
+     */
+    HTMLEncoder(contents: string): string;
+
+    /**
+     * @description The editor checks tags by string.
+     * If there is "<" or ">" in the attribute of tag, HTML is broken when checking the tag.
+     * Decoder of data stored as "HTMLEncoder" (ex: math(katex))
+     * @param contents HTML or Text string
+     * @returns
+     */
+    HTMLDecoder(contents: string): string;
+
+    /**
      * @description Get the the tag path of the arguments value
      * If not found, return the first found value
      * @param nameArray File name array

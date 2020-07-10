@@ -114,6 +114,34 @@ const util = {
     },
 
     /**
+     * @description The editor checks tags by string.
+     * If there is "<" or ">" in the attribute of tag, HTML is broken when checking the tag.
+     * When using an attribute with "<" or ">", use "HTMLEncoder" to save. (ex: math(katex))
+     * @param {String} contents HTML or Text string
+     * @returns {String}
+     */
+    HTMLEncoder: function (contents) {
+        const ec = {'<': '$lt;', '>': '$gt;'};
+        return contents.replace(/<|>/g, function (m) {
+            return (typeof ec[m] === 'string') ? ec[m] : m;
+        });
+    },
+
+    /**
+     * @description The editor checks tags by string.
+     * If there is "<" or ">" in the attribute of tag, HTML is broken when checking the tag.
+     * Decoder of data stored as "HTMLEncoder" (ex: math(katex))
+     * @param {String} contents HTML or Text string
+     * @returns {String}
+     */
+    HTMLDecoder: function (contents) {
+        const ec = {'$lt;': '<', '$gt;': '>'};
+        return contents.replace(/\$lt;|\$gt;/g, function (m) {
+            return (typeof ec[m] === 'string') ? ec[m] : m;
+        });
+    },
+
+    /**
      * @deprecated
      * @description Get the the tag path of the arguments value
      * If not found, return the first found value

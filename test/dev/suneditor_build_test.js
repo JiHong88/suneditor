@@ -261,7 +261,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     lang: lang.ko,
     plugins: plugins,
     katex: Katex,
-    value: '',
+    // value: '',
     codeMirror: CodeMirror,
     display: 'block',
     width: '100%',

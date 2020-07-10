@@ -163,6 +163,64 @@
             </table>
             <dl class="details"></dl>
 
+            
+            <h4 class="name" id="HTMLEncoder"><span class="type-signature"></span>HTMLEncoder<span
+                class="signature">(contents)</span><span class="type-signature"> &rarr; {String}</span></h4>
+            <div class="description">
+                The editor checks tags by string.<br>
+                If there is "&lt;" or "&gt;" in the attribute of tag, HTML is broken when checking the tag.<br>
+                When using an attribute with "&lt;" or "&gt;", use "HTMLEncoder" to save. (ex: math(katex))
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>contents</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">HTML or Text string</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="HTMLDecoder"><span class="type-signature"></span>HTMLDecoder<span
+                class="signature">(contents)</span><span class="type-signature"> &rarr; {String}</span></h4>
+            <div class="description">
+                The editor checks tags by string.<br>
+                If there is "&lt;" or "&gt;" in the attribute of tag, HTML is broken when checking the tag.<br>
+                Decoder of data stored as "HTMLEncoder" (ex: math(katex))
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>contents</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">HTML or Text string</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
 
             <h4 class="name" id="getIncludePath"><span class="type-signature"></span>getIncludePath<span class="signature">(nameArray, extension)</span><span
                     class="type-signature"> &rarr; {String}</span> <span style="color:#ff5565">@deprecated</span></h4>
@@ -2331,6 +2389,8 @@
         <li><a href="document-util.html#getXMLHttpRequest">getXMLHttpRequest</a></li>
         <li><a href="document-util.html#createElement">createElement</a></li>
         <li><a href="document-util.html#createTextNode">createTextNode</a></li>
+        <li><a href="document-util.html#HTMLEncoder">HTMLEncoder</a></li>
+        <li><a href="document-util.html#HTMLDecoder">HTMLDecoder</a></li>
         <li><a href="document-util.html#getIncludePath">getIncludePath</a></li>
         <li><a href="document-util.html#getPageStyle">getPageStyle</a></li>
         <li><a href="document-util.html#getIframeDocument">getIframeDocument</a></li>
