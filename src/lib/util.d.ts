@@ -160,11 +160,18 @@ declare interface util {
     isComponent(element: Node): boolean;
 
     /**
-     * @description It is judged whether it is the component [img, iframe] cover(class="se-component")
+     * @description It is judged whether it is the not checking node. (class="katex", "__se__tag")
      * @param element The node to check
      * @returns
      */
     isMediaComponent(element: Node): boolean;
+
+    /**
+     * @description It is judged whether it is the component [img, iframe] cover(class="se-component")
+     * @param element The node to check
+     * @returns
+     */
+    isNotCheckingNode(element: Node): boolean;
 
     /**
      * @description If a parent node that contains an argument node finds a format node (util.isFormatElement), it returns that node.

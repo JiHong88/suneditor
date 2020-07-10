@@ -349,6 +349,15 @@ const util = {
     },
 
     /**
+     * @description It is judged whether it is the not checking node. (class="katex", "__se__tag")
+     * @param {Node} element The node to check
+     * @returns {Boolean}
+     */
+    isNotCheckingNode: function (element) {
+        return element && /katex|__se__tag/.test(element.className);
+    },
+
+    /**
      * @description If a parent node that contains an argument node finds a format node (util.isFormatElement), it returns that node.
      * @param {Node} element Reference node.
      * @param {Function|null} validation Additional validation function.
@@ -1582,7 +1591,7 @@ const util = {
          * So check the node type and exclude the text no (current.nodeType !== 1)
          */
         const emptyWhitelistTags = [], emptyTags = [], wrongList = [], withoutFormatCells = [];
-        const compClass = function (current) { return /katex|__se__tag/i.test(current.className); };
+
         // wrong position
         const wrongTags = this.getListChildNodes(documentFragment, function (current) {
             if (current.nodeType !== 1) return false;
@@ -1593,7 +1602,7 @@ const util = {
                 return false;
             }
 
-            const nrtag = !this.getParentElement(current, compClass);
+            const nrtag = !this.getParentElement(current, this.isNotCheckingNode);
             // empty tags
             if ((!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && nrtag) {
                 emptyTags.push(current);

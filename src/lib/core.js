@@ -4401,7 +4401,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         continue;
                     }
                     if (node.childNodes.length === 0) {
-                        returnHTML += (/^(HR)$/i.test(node.nodeName) ? '\n' : '') + elementIndent + node.outerHTML + br;
+                        returnHTML += (/^HR$/i.test(node.nodeName) ? '\n' : '') + elementIndent + node.outerHTML + br;
                         continue;
                     }
                     
