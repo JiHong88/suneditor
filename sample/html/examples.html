@@ -179,6 +179,7 @@
         <button type="button" class="btn btn-md btn-success" onclick="sun_save()">save</button>
         <button type="button" class="btn btn-md btn-success" onclick="sun_getContext()">getContext</button>
         <button type="button" class="btn btn-md btn-success" onclick="sun_getContents()">getContents</button>
+        <button type="button" class="btn btn-md btn-success" onclick="sun_getText()">getText</button>
         <button type="button" class="btn btn-md btn-success" onclick="sun_getImagesInfo()">getImagesInfo</button>
         <button type="button" class="btn btn-md btn-success" onclick="sun_getFilesInfo('video')">getFilesInfo('video')</button>
         <div>
@@ -846,6 +847,10 @@
 
     function sun_getContents() {
         alert(suneditor.getContents());
+    }
+
+    function sun_getText() {
+        alert(suneditor.getText());
     }
 
     function sun_getImagesInfo() {

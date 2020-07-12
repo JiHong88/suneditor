@@ -842,6 +842,9 @@ editor.getContext();
 // onlyContents {Boolean}: Return only the contents of the body without headers when the "fullPage" option is true
 editor.getContents(onlyContents: Boolean);
 
+// Gets only the text of the suneditor contents
+editor.getText();
+
 // Gets a list of images uploaded to the editor
 /** 
  * {
