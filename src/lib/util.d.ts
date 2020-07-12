@@ -44,6 +44,32 @@ declare interface util {
     createTextNode(text: string): Node;
 
     /**
+     * @description The editor checks tags by string.
+     * If there is "<" or ">" in the attribute of tag, HTML is broken when checking the tag.
+     * When using an attribute with "<" or ">", use "HTMLEncoder" to save. (ex: math(katex))
+     * @param contents HTML or Text string
+     * @returns
+     */
+    HTMLEncoder(contents: string): string;
+
+    /**
+     * @description The editor checks tags by string.
+     * If there is "<" or ">" in the attribute of tag, HTML is broken when checking the tag.
+     * Decoder of data stored as "HTMLEncoder" (ex: math(katex))
+     * @param contents HTML or Text string
+     * @returns
+     */
+    HTMLDecoder(contents: string): string;
+
+    /**
+     * @description This method run Object.prototype.hasOwnProperty.call(obj, key)
+     * @param obj Object
+     * @param key obj.key
+     * @returns
+     */
+    hasOwn(obj: any, key: string): boolean;
+
+    /**
      * @description Get the the tag path of the arguments value
      * If not found, return the first found value
      * @param nameArray File name array
@@ -160,11 +186,18 @@ declare interface util {
     isComponent(element: Node): boolean;
 
     /**
-     * @description It is judged whether it is the component [img, iframe] cover(class="se-component")
+     * @description It is judged whether it is the not checking node. (class="katex", "__se__tag")
      * @param element The node to check
      * @returns
      */
     isMediaComponent(element: Node): boolean;
+
+    /**
+     * @description It is judged whether it is the component [img, iframe] cover(class="se-component")
+     * @param element The node to check
+     * @returns
+     */
+    isNotCheckingNode(element: Node): boolean;
 
     /**
      * @description If a parent node that contains an argument node finds a format node (util.isFormatElement), it returns that node.

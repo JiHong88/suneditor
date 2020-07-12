@@ -13,6 +13,7 @@
 const util = {
     _d: document,
     _w: window,
+    _hasOwn: Object.prototype.hasOwnProperty,
     isIE: navigator.userAgent.indexOf('Trident') > -1,
     isIE_Edge: (navigator.userAgent.indexOf('Trident') > -1) || (navigator.appVersion.indexOf('Edge') > -1),
     isOSX_IOS: /(Mac|iPhone|iPod|iPad)/.test(navigator.platform),
@@ -111,6 +112,44 @@ const util = {
      */
     createTextNode: function (text) {
         return this._d.createTextNode(text || '');
+    },
+
+    /**
+     * @description The editor checks tags by string.
+     * If there is "<" or ">" in the attribute of tag, HTML is broken when checking the tag.
+     * When using an attribute with "<" or ">", use "HTMLEncoder" to save. (ex: math(katex))
+     * @param {String} contents HTML or Text string
+     * @returns {String}
+     */
+    HTMLEncoder: function (contents) {
+        const ec = {'<': '$lt;', '>': '$gt;'};
+        return contents.replace(/<|>/g, function (m) {
+            return (typeof ec[m] === 'string') ? ec[m] : m;
+        });
+    },
+
+    /**
+     * @description The editor checks tags by string.
+     * If there is "<" or ">" in the attribute of tag, HTML is broken when checking the tag.
+     * Decoder of data stored as "HTMLEncoder" (ex: math(katex))
+     * @param {String} contents HTML or Text string
+     * @returns {String}
+     */
+    HTMLDecoder: function (contents) {
+        const ec = {'$lt;': '<', '$gt;': '>'};
+        return contents.replace(/\$lt;|\$gt;/g, function (m) {
+            return (typeof ec[m] === 'string') ? ec[m] : m;
+        });
+    },
+
+    /**
+     * @description This method run Object.prototype.hasOwnProperty.call(obj, key)
+     * @param {Object} obj Object
+     * @param {String} key obj.key
+     * @returns {Boolean}
+     */
+    hasOwn: function (obj, key) {
+        return this._hasOwn.call(obj, key);
     },
 
     /**
@@ -346,6 +385,15 @@ const util = {
      */
     isMediaComponent: function (element) {
         return element && /se-component/.test(element.className);
+    },
+
+    /**
+     * @description It is judged whether it is the not checking node. (class="katex", "__se__tag")
+     * @param {Node} element The node to check
+     * @returns {Boolean}
+     */
+    isNotCheckingNode: function (element) {
+        return element && /katex|__se__tag/.test(element.className);
     },
 
     /**
@@ -1293,9 +1341,11 @@ const util = {
      */
     mergeSameTags: function (element, nodePathArray, onlyText) {
         const inst = this;
+        const nodePathLen = nodePathArray ? nodePathArray.length : 0;
         let offsets = null;
-        if (nodePathArray && nodePathArray.length > 0) {
-            offsets = this._w.Array.apply(null, new this._w.Array(nodePathArray.length)).map(this._w.Number.prototype.valueOf, 0);
+        
+        if (nodePathLen) {
+            offsets = this._w.Array.apply(null, new this._w.Array(nodePathLen)).map(this._w.Number.prototype.valueOf, 0);
         }
 
         (function recursionFunc(current, depth, depthIndex) {
@@ -1313,9 +1363,9 @@ const util = {
                 }
                 if (len === 1 && current.nodeName === child.nodeName && current.parentNode) {
                     // update nodePath
-                    if (nodePathArray) {
+                    if (nodePathLen) {
                         let path, c, p, cDepth, spliceDepth;
-                        for (let n in nodePathArray) {
+                        for (let n = 0; n < nodePathLen; n++) {
                             path = nodePathArray[n];
                             if (path && path[depth] === i) {
                                 c = child, p = current, cDepth = depth, spliceDepth = true;
@@ -1367,9 +1417,9 @@ const util = {
 
                         if (childLength > 0 && l.nodeType === 3 && r.nodeType === 3 && (l.textContent.length > 0 || r.textContent.length > 0)) childLength--;
 
-                        if (nodePathArray) {
+                        if (nodePathLen) {
                             let path = null;
-                            for (let n in nodePathArray) {
+                            for (let n = 0; n < nodePathLen; n++) {
                                 path = nodePathArray[n];
                                 if (path && path[depth] > i) {
                                     if (depth > 0 && path[depth - 1] !== depthIndex) continue;
@@ -1391,9 +1441,9 @@ const util = {
                     if (child.nodeType === 3) {
                         addOffset = child.textContent.length;
                         child.textContent += next.textContent;
-                        if (nodePathArray) {
+                        if (nodePathLen) {
                             let path = null;
-                            for (let n in nodePathArray) {
+                            for (let n = 0; n < nodePathLen; n++) {
                                 path = nodePathArray[n];
                                 if (path && path[depth] > i) {
                                     if (depth > 0 && path[depth - 1] !== depthIndex) continue;
@@ -1582,7 +1632,7 @@ const util = {
          * So check the node type and exclude the text no (current.nodeType !== 1)
          */
         const emptyWhitelistTags = [], emptyTags = [], wrongList = [], withoutFormatCells = [];
-        const compClass = function (current) { return /katex|__se__tag/i.test(current.className); };
+
         // wrong position
         const wrongTags = this.getListChildNodes(documentFragment, function (current) {
             if (current.nodeType !== 1) return false;
@@ -1593,7 +1643,7 @@ const util = {
                 return false;
             }
 
-            const nrtag = !this.getParentElement(current, compClass);
+            const nrtag = !this.getParentElement(current, this.isNotCheckingNode);
             // empty tags
             if ((!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && nrtag) {
                 emptyTags.push(current);
@@ -1621,7 +1671,7 @@ const util = {
              !this.getParentElement(current, this.isComponent) && nrtag;
         }.bind(this));
 
-        for (let i in emptyWhitelistTags) {
+        for (let i = 0, len = emptyWhitelistTags.length; i < len; i++) {
             this.removeItem(emptyWhitelistTags[i]);
         }
         
@@ -1641,7 +1691,7 @@ const util = {
             }
         }
 
-        for (let i in emptyTags) {
+        for (let i = 0, len = emptyTags.length; i < len; i++) {
             this.removeItem(emptyTags[i]);
         }
 

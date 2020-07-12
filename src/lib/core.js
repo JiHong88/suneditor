@@ -841,6 +841,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const commandMap = this.commandMap;
             const activePlugins = this.activePlugins;
             for (let key in commandMap) {
+                if (!util.hasOwn(commandMap, key)) continue;
                 if (activePlugins.indexOf(key) > -1) {
                     plugins[key].active.call(this, null);
                 } else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
@@ -1265,7 +1266,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @returns {Object|null}
          */
         getFileComponent: function (element) {
-            if (!element) return null;
+            if (!this._fileManager.queryString || !element) return null;
 
             let fileComponent, pluginName;
             if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
@@ -4306,7 +4307,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                 const textCompList = dom.querySelectorAll(this.managedTagsInfo.query);
                 for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
                     classList = [].slice.call(textCompList[i].classList);
-                    for (let c in classList) {
+                    for (let c = 0, cLen = classList.length; c < cLen; c++) {
                         initMethod = this.managedTagsInfo.map[classList[c]];
                         if (initMethod) {
                             initMethod(textCompList[i]);
@@ -4401,7 +4402,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                         continue;
                     }
                     if (node.childNodes.length === 0) {
-                        returnHTML += (/^(HR)$/i.test(node.nodeName) ? '\n' : '') + elementIndent + node.outerHTML + br;
+                        returnHTML += (/^HR$/i.test(node.nodeName) ? '\n' : '') + elementIndent + node.outerHTML + br;
                         continue;
                     }
                     
@@ -4544,7 +4545,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _checkComponents: function () {
-            for (let i in this._fileInfoPluginsCheck) {
+            for (let i = 0, len = this._fileInfoPluginsCheck.length; i < len; i++) {
                 this._fileInfoPluginsCheck[i]();
             }
         },
@@ -4554,7 +4555,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          * @private
          */
         _resetComponents: function () {
-            for (let i in this._fileInfoPluginsReset) {
+            for (let i = 0, len = this._fileInfoPluginsReset.length; i < len; i++) {
                 this._fileInfoPluginsReset[i]();
             }
         },
@@ -4618,6 +4619,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let allAttr = '';
             if (!!_attr) {
                 for (let k in _attr) {
+                    if (!util.hasOwn(_attr, k)) continue;
                     if (k === 'all') {
                         allAttr = _attr[k] + '|';
                     } else {
@@ -4653,6 +4655,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             let filePluginRegExp = [];
             let plugin, button;
             for (let key in plugins) {
+                if (!util.hasOwn(plugins, key)) continue;
                 plugin = plugins[key];
                 button = pluginCallButtons[key];
                 if (plugin.active && button) {
@@ -4663,12 +4666,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
                     this._fileInfoPluginsCheck.push(plugin.checkFileInfo.bind(this));
                     this._fileInfoPluginsReset.push(plugin.resetFileInfo.bind(this));
                 }
-                if (plugin.fileTags) {
+                if (_w.Array.isArray(plugin.fileTags)) {
+                    const fileTags = plugin.fileTags;
                     this.callPlugin(key, null, button);
-                    this._fileManager.tags = this._fileManager.tags.concat(plugin.fileTags);
+                    this._fileManager.tags = this._fileManager.tags.concat(fileTags);
                     filePluginRegExp.push(key);
-                    for (let tag in plugin.fileTags) {
-                        this._fileManager.pluginMap[plugin.fileTags[tag].toLowerCase()] = key;
+                    for (let tag = 0, tLen = fileTags.length; tag < tLen; tag++) {
+                        this._fileManager.pluginMap[fileTags[tag].toLowerCase()] = key;
                     }
                 }
                 if (plugin.managedTags) {
@@ -5078,8 +5082,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
 
             /** remove class, display text */
             for (let key in commandMap) {
-                if (commandMapNodes.indexOf(key) > -1) continue;
-                
+                if (commandMapNodes.indexOf(key) > -1 || !util.hasOwn(commandMap, key)) continue;
                 if (activePlugins.indexOf(key) > -1) {
                     plugins[key].active.call(core, null);
                 } else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
@@ -6111,6 +6114,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             const commandMap = core.commandMap;
             const activePlugins = core.activePlugins;
             for (let key in commandMap) {
+                if (!util.hasOwn(commandMap, key)) continue;
                 if (activePlugins.indexOf(key) > -1) {
                     plugins[key].active.call(core, null);
                 } else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
@@ -6860,6 +6864,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             pluginCallButtons = newToolbar.pluginCallButtons;
             let plugin, button, oldButton;
             for (let key in pluginCallButtons) {
+                if (!util.hasOwn(pluginCallButtons, key)) continue;
                 plugin = plugins[key];
                 button = pluginCallButtons[key];
                 if (plugin.active && button) {
@@ -6895,6 +6900,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             core.plugins = _options.plugins || core.plugins;
             const mergeOptions = [options, _options].reduce(function (init, option) {
                 for (let key in option) {
+                    if (!util.hasOwn(option, key)) continue;
                     if (key === 'plugins' && option[key] && init[key]) {
                         let i = init[key], o = option[key];
                         i = i.length ? i : _w.Object.keys(i).map(function(name) { return i[name]; });
@@ -7008,6 +7014,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
          */
         getContents: function (onlyContents) {
             return core.getContents(onlyContents);
+        },
+
+        /**
+         * @description Gets only the text of the suneditor contents
+         * @returns {String}
+         */
+        getText: function () {
+            return context.element.wysiwyg.textContent;
         },
 
         /**
@@ -7217,13 +7231,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _ic
             util.removeItem(context.element.topArea);
 
             /** remove object reference */
-            for (var k in core) { delete core[k]; }
-            for (var k in event) { delete event[k]; }
-            for (var k in context) { delete context[k]; }
-            for (var k in pluginCallButtons) { delete pluginCallButtons[k]; }
+            for (let k in core) { if (util.hasOwn(core, k)) delete core[k]; }
+            for (let k in event) { if (util.hasOwn(event, k)) delete event[k]; }
+            for (let k in context) { if (util.hasOwn(context, k)) delete context[k]; }
+            for (let k in pluginCallButtons) { if (util.hasOwn(pluginCallButtons, k)) delete pluginCallButtons[k]; }
             
             /** remove user object */
-            for (var k in this) { delete this[k]; }
+            for (let k in this) { if (util.hasOwn(this, k)) delete this[k]; }
         },
 
         /**

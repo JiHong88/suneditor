@@ -850,6 +850,12 @@ export default class SunEditor {
     getContents(onlyContents: boolean): string;
 
     /**
+     * @description Gets only the text of the suneditor contents
+     * @returns
+     */
+    getText(): string;
+
+    /**
      * @description Get the editor's number of characters or binary data size.
      * You can use the "charCounterType" option format.
      * @param charCounterType options - charCounterType ('char', 'byte', 'byte-html')

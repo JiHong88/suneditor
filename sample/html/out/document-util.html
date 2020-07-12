@@ -163,6 +163,98 @@
             </table>
             <dl class="details"></dl>
 
+            
+            <h4 class="name" id="HTMLEncoder"><span class="type-signature"></span>HTMLEncoder<span
+                class="signature">(contents)</span><span class="type-signature"> &rarr; {String}</span></h4>
+            <div class="description">
+                The editor checks tags by string.<br>
+                If there is "&lt;" or "&gt;" in the attribute of tag, HTML is broken when checking the tag.<br>
+                When using an attribute with "&lt;" or "&gt;", use "HTMLEncoder" to save. (ex: math(katex))
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>contents</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">HTML or Text string</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="HTMLDecoder"><span class="type-signature"></span>HTMLDecoder<span
+                class="signature">(contents)</span><span class="type-signature"> &rarr; {String}</span></h4>
+            <div class="description">
+                The editor checks tags by string.<br>
+                If there is "&lt;" or "&gt;" in the attribute of tag, HTML is broken when checking the tag.<br>
+                Decoder of data stored as "HTMLEncoder" (ex: math(katex))
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>contents</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">HTML or Text string</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="hasOwn"><span class="type-signature"></span>hasOwn<span
+                class="signature">(obj, key)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+            <div class="description">
+                This method run Object.prototype.hasOwnProperty.call(obj, key)
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>obj</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">Object</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>key</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">obj.key</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
 
             <h4 class="name" id="getIncludePath"><span class="type-signature"></span>getIncludePath<span class="signature">(nameArray, extension)</span><span
                     class="type-signature"> &rarr; {String}</span> <span style="color:#ff5565">@deprecated</span></h4>
@@ -576,6 +668,33 @@
                     class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
                 It is judged whether it is the component [img, iframe, video, audio] cover(element className - ".se-component")
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">Node</span>
+                    </td>
+                    <td class="description last">The element to check</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="isNotCheckingNode"><span class="type-signature"></span>isNotCheckingNode<span class="signature">(element)</span><span
+                    class="type-signature"> &rarr; {Boolean}</span></h4>
+            <div class="description">
+                It is judged whether it is the not checking node. (class="katex", "__se__tag")
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -2304,6 +2423,9 @@
         <li><a href="document-util.html#getXMLHttpRequest">getXMLHttpRequest</a></li>
         <li><a href="document-util.html#createElement">createElement</a></li>
         <li><a href="document-util.html#createTextNode">createTextNode</a></li>
+        <li><a href="document-util.html#HTMLEncoder">HTMLEncoder</a></li>
+        <li><a href="document-util.html#HTMLDecoder">HTMLDecoder</a></li>
+        <li><a href="document-util.html#hasOwn">hasOwn</a></li>
         <li><a href="document-util.html#getIncludePath">getIncludePath</a></li>
         <li><a href="document-util.html#getPageStyle">getPageStyle</a></li>
         <li><a href="document-util.html#getIframeDocument">getIframeDocument</a></li>
@@ -2319,6 +2441,7 @@
         <li><a href="document-util.html#isClosureFreeFormatElement">isClosureFreeFormatElement</a></li>
         <li><a href="document-util.html#isComponent">isComponent</a></li>
         <li><a href="document-util.html#isMediaComponent">isMediaComponent</a></li>
+        <li><a href="document-util.html#isNotCheckingNode">isNotCheckingNode</a></li>
         <li><a href="document-util.html#getFormatElement">getFormatElement</a></li>
         <li><a href="document-util.html#getRangeFormatElement">getRangeFormatElement</a></li>
         <li><a href="document-util.html#getFreeFormatElement">getFreeFormatElement</a></li>
