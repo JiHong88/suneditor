@@ -62,6 +62,14 @@ declare interface util {
     HTMLDecoder(contents: string): string;
 
     /**
+     * @description This method run Object.prototype.hasOwnProperty.call(obj, key)
+     * @param obj Object
+     * @param key obj.key
+     * @returns
+     */
+    hasOwn(obj: any, key: string): boolean;
+
+    /**
      * @description Get the the tag path of the arguments value
      * If not found, return the first found value
      * @param nameArray File name array

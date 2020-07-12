@@ -88,7 +88,7 @@
          */
         checkInfo: function (pluginName, tagNames, uploadEventHandler, modifyHandler, resizing) {
             let tags = [];
-            for (let i in tagNames) {
+            for (let i = 0, len = tagNames.length; i < len; i++) {
                 tags = tags.concat([].slice.call(this.context.element.wysiwyg.getElementsByTagName(tagNames[i])));
             }
 

@@ -24,6 +24,10 @@ import CodeMirror from 'codemirror';
 // import 'katex/dist/katex.min.css';
 import Katex from 'katex';
 
+Array.prototype._move = function(from, to)
+{
+    this.splice(to, 0, this.splice(from, 1)[0]);
+};
 
 const align = require('../../src/plugins/submenu/align')
 
@@ -213,9 +217,9 @@ window.cm = CodeMirror
 // });
 
 window.sun_destroy1 = function () {
-    // s1.destroy()
+    s1.destroy()
 
-    s1.setDefaultStyle('height: auto; font-family: cursive; font-size: 10px; width:300px;');
+    // s1.setDefaultStyle('height: auto; font-family: cursive; font-size: 10px; width:300px;');
 
     // s1.setContents('<!DOCTYPE html>'+
     // '<html lang="en">'+

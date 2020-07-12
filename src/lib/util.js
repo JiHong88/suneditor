@@ -13,6 +13,7 @@
 const util = {
     _d: document,
     _w: window,
+    _hasOwn: Object.prototype.hasOwnProperty,
     isIE: navigator.userAgent.indexOf('Trident') > -1,
     isIE_Edge: (navigator.userAgent.indexOf('Trident') > -1) || (navigator.appVersion.indexOf('Edge') > -1),
     isOSX_IOS: /(Mac|iPhone|iPod|iPad)/.test(navigator.platform),
@@ -139,6 +140,16 @@ const util = {
         return contents.replace(/\$lt;|\$gt;/g, function (m) {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
+    },
+
+    /**
+     * @description This method run Object.prototype.hasOwnProperty.call(obj, key)
+     * @param {Object} obj Object
+     * @param {String} key obj.key
+     * @returns {Boolean}
+     */
+    hasOwn: function (obj, key) {
+        return this._hasOwn.call(obj, key);
     },
 
     /**
@@ -1330,9 +1341,11 @@ const util = {
      */
     mergeSameTags: function (element, nodePathArray, onlyText) {
         const inst = this;
+        const nodePathLen = nodePathArray ? nodePathArray.length : 0;
         let offsets = null;
-        if (nodePathArray && nodePathArray.length > 0) {
-            offsets = this._w.Array.apply(null, new this._w.Array(nodePathArray.length)).map(this._w.Number.prototype.valueOf, 0);
+        
+        if (nodePathLen) {
+            offsets = this._w.Array.apply(null, new this._w.Array(nodePathLen)).map(this._w.Number.prototype.valueOf, 0);
         }
 
         (function recursionFunc(current, depth, depthIndex) {
@@ -1350,9 +1363,9 @@ const util = {
                 }
                 if (len === 1 && current.nodeName === child.nodeName && current.parentNode) {
                     // update nodePath
-                    if (nodePathArray) {
+                    if (nodePathLen) {
                         let path, c, p, cDepth, spliceDepth;
-                        for (let n in nodePathArray) {
+                        for (let n = 0; n < nodePathLen; n++) {
                             path = nodePathArray[n];
                             if (path && path[depth] === i) {
                                 c = child, p = current, cDepth = depth, spliceDepth = true;
@@ -1404,9 +1417,9 @@ const util = {
 
                         if (childLength > 0 && l.nodeType === 3 && r.nodeType === 3 && (l.textContent.length > 0 || r.textContent.length > 0)) childLength--;
 
-                        if (nodePathArray) {
+                        if (nodePathLen) {
                             let path = null;
-                            for (let n in nodePathArray) {
+                            for (let n = 0; n < nodePathLen; n++) {
                                 path = nodePathArray[n];
                                 if (path && path[depth] > i) {
                                     if (depth > 0 && path[depth - 1] !== depthIndex) continue;
@@ -1428,9 +1441,9 @@ const util = {
                     if (child.nodeType === 3) {
                         addOffset = child.textContent.length;
                         child.textContent += next.textContent;
-                        if (nodePathArray) {
+                        if (nodePathLen) {
                             let path = null;
-                            for (let n in nodePathArray) {
+                            for (let n = 0; n < nodePathLen; n++) {
                                 path = nodePathArray[n];
                                 if (path && path[depth] > i) {
                                     if (depth > 0 && path[depth - 1] !== depthIndex) continue;
@@ -1658,7 +1671,7 @@ const util = {
              !this.getParentElement(current, this.isComponent) && nrtag;
         }.bind(this));
 
-        for (let i in emptyWhitelistTags) {
+        for (let i = 0, len = emptyWhitelistTags.length; i < len; i++) {
             this.removeItem(emptyWhitelistTags[i]);
         }
         
@@ -1678,7 +1691,7 @@ const util = {
             }
         }
 
-        for (let i in emptyTags) {
+        for (let i = 0, len = emptyTags.length; i < len; i++) {
             this.removeItem(emptyTags[i]);
         }
 

@@ -150,7 +150,7 @@ export default {
                 lineWrapping: true
             }, (options.codeMirror.options || {})].reduce(function (init, option) {
                 for (let key in option) {
-                    init[key] = option[key];
+                    if (util.hasOwn(option, key)) init[key] = option[key];
                 }
                 return init;
             }, {});
@@ -183,7 +183,7 @@ export default {
             throwOnError: false,
         }, (katex.options || {})].reduce(function (init, option) {
             for (let key in option) {
-                init[key] = option[key];
+                if (util.hasOwn(option, key)) init[key] = option[key];
             }
             return init;
         }, {});
@@ -494,7 +494,7 @@ export default {
         /** --- Define icons --- */
         this.icons = (!options.icons || typeof options.icons !== 'object') ? _icons : [_icons, options.icons].reduce(function (_default, _new) {
             for (let key in _new) {
-                _default[key] = _new[key];
+                if (util.hasOwn(_new, key)) _default[key] = _new[key];
             }
             return _default;
         }, {});
