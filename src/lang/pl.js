@@ -98,7 +98,7 @@
             videoBox: {
                 title: 'Wstaw wideo',
                 file: 'Wybierz plik',
-                url: 'Adres URL video, np. YouTube'
+                url: 'Adres URL video, np. YouTube/Vimeo'
             },
             audioBox: {
                 title: 'Wstaw audio',

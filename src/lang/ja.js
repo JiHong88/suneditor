@@ -98,7 +98,7 @@
             videoBox: {
                 title: '動画を挿入',
                 file: 'ファイルの選択',
-                url: 'メディア埋め込まアドレス,YouTube'
+                url: 'メディア埋め込みアドレス, YouTube/Vimeo'
             },
             audioBox: {
                 title: 'オーディオを挿入',

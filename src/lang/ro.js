@@ -98,7 +98,7 @@
             videoBox: {
                 title: 'Inserează video',
                 file: 'Selectează',
-                url: 'Include URL, youtube'
+                url: 'Include URL, youtube/vimeo'
             },
             audioBox: {
                 title: 'Inserează Audio',

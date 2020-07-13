@@ -98,7 +98,7 @@
             videoBox: {
                 title: '동영상 삽입',
                 file: '파일 선택',
-                url: '미디어 임베드 주소, 유튜브'
+                url: '미디어 임베드 주소, 유튜브/뷔메오'
             },
             audioBox: {
                 title: '오디오 삽입',
