@@ -98,7 +98,7 @@
             videoBox: {
                 title: '插入视频',
                 file: '上传图片',
-                url: '嵌入网址'
+                url: '嵌入网址, Youtube,Vimeo'
             },
             audioBox: {
                 title: '插入音频',

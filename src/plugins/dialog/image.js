@@ -433,7 +433,14 @@ export default {
         };
 
         if (typeof this.functions.onImageUploadBefore === 'function') {
-            const result = this.functions.onImageUploadBefore(files, info, this, this.plugins.image.upload.bind(this, info));
+            const result = this.functions.onImageUploadBefore(files, info, this, function (data) {
+                if (data && this._w.Array.isArray(data.result)) {
+                    this.plugins.image.register.call(this, info, data);
+                } else {
+                    this.plugins.image.upload.call(this, info, data);
+                }
+            }.bind(this));
+            
             if (typeof result === 'undefined') return;
             if (!result) {
                 this.closeLoading();

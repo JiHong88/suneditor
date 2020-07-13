@@ -98,7 +98,7 @@
             videoBox: {
                 title: 'Вставить видео',
                 file: 'Выберите файл',
-                url: 'Ссылка на видео'
+                url: 'Ссылка на видео, Youtube,Vimeo'
             },
             audioBox: {
                 title: 'Вставить аудио',

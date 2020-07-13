@@ -400,7 +400,14 @@ export default {
         };
 
         if (typeof this.functions.onVideoUploadBefore === 'function') {
-            const result = this.functions.onVideoUploadBefore(files, info, this, this.plugins.video.upload.bind(this, info));
+            const result = this.functions.onVideoUploadBefore(files, info, this, function (data) {
+                if (data && this._w.Array.isArray(data.result)) {
+                    this.plugins.video.register.call(this, info, data);
+                } else {
+                    this.plugins.video.upload.call(this, info, data);
+                }
+            }.bind(this));
+
             if (typeof result === 'undefined') return;
             if (!result) {
                 this.closeLoading();
@@ -535,7 +542,7 @@ export default {
                     newTag.src = src;
                     oFrame.parentNode.replaceChild(newTag, oFrame);
                     contextVideo._element = oFrame = newTag;
-                } else if (!isYoutube && !isVimeo && !/^videoo$/i.test(oFrame, nodeName)) {
+                } else if (!isYoutube && !isVimeo && !/^videoo$/i.test(oFrame.nodeName)) {
                     const newTag = this.plugins.customVideo.createVideoTag.call(this);
                     newTag.src = src;
                     oFrame.parentNode.replaceChild(newTag, oFrame);
