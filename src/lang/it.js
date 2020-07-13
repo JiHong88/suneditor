@@ -98,7 +98,7 @@
             videoBox: {
                 title: 'Inserisci Video',
                 file: 'Seleziona da file',
-                url: 'Indirizzo video, YouTube'
+                url: 'Indirizzo video, YouTube/Vimeo'
             },
             audioBox: {
                 title: 'Insertar Audio',

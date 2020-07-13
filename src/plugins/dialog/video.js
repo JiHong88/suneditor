@@ -500,6 +500,11 @@ export default {
                         url += '?' + contextVideo._youtubeQuery;
                     }
                 }
+            } else if (/vimeo\.com/.test(url)) {
+                if (url.endsWith('/')) {
+                    url = url.slice(0, -1);
+                }
+                url = 'https://player.vimeo.com/video/' + url.slice(url.lastIndexOf('/') + 1);
             }
 
             this.plugins.video.create_video.call(this, this.plugins.video.createIframeTag.call(this), url, contextVideo.inputX.value, contextVideo.inputY.value, contextVideo._align, null, this.context.dialog.updateModal);
@@ -524,8 +529,14 @@ export default {
             if (oFrame.src !== src) {
                 init = true;
                 const isYoutube = /youtu\.?be/.test(src);
-                if ((isYoutube && !/^iframe$/i.test(oFrame.nodeName)) || (!isYoutube && !/^videoo$/i.test(oFrame.nodeName))) {
-                    const newTag = isYoutube ? this.plugins.video.createIframeTag.call(this) : this.plugins.video.createVideoTag.call(this);
+                const isVimeo = /vimeo\.com/.test(src);
+                if ((isYoutube || isVimeo) && !/^iframe$/i.test(oFrame.nodeName)) {
+                    const newTag = this.plugins.customVideo.createIframeTag.call(this);
+                    newTag.src = src;
+                    oFrame.parentNode.replaceChild(newTag, oFrame);
+                    contextVideo._element = oFrame = newTag;
+                } else if (!isYoutube && !isVimeo && !/^videoo$/i.test(oFrame, nodeName)) {
+                    const newTag = this.plugins.customVideo.createVideoTag.call(this);
                     newTag.src = src;
                     oFrame.parentNode.replaceChild(newTag, oFrame);
                     contextVideo._element = oFrame = newTag;

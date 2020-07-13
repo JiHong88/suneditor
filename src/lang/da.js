@@ -101,7 +101,7 @@
             videoBox: {
                 title: 'Indsæt Video',
                 file: 'Indsæt fra fil',
-                url: 'Indlejr video / YouTube'
+                url: 'Indlejr video / YouTube,Vimeo'
             },
             audioBox: {
                 title: 'Indsæt Audio',
