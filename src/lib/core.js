@@ -22,14 +22,14 @@ import _notice from '../plugins/modules/_notice';
  * @param {Object} plugins 
  * @param {Object} lang
  * @param {Object} options
- * @param {Object} _icons
+ * @param {Object} _responsiveButtons
  * @returns {Object} functions Object
  */
-export default function (context, pluginCallButtons, plugins, lang, options, _icons, _responsiveButtons) {
+export default function (context, pluginCallButtons, plugins, lang, options, _responsiveButtons) {
     const _d = context.element.originElement.ownerDocument || document;
     const _w = _d.defaultView || window;
     const util = _util;
-    const icons = _icons;
+    const icons = options.icons;
 
     /**
      * @description editor core object

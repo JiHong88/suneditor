@@ -282,6 +282,10 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // imageUploadUrl: 'http://localhost:3000/editor/upload',
     // videoUploadUrl: 'http://localhost:3000/editor/upload',
     // audioUploadUrl: 'http://localhost:3000/editor/upload',
+    icons: {
+        expansion: "<span>A</span>",
+        reduction: "<span>Z</span>"
+    },
     iframe: true,
     videoFileInput: true,
     audioFileInput: true,

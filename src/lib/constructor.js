@@ -12,7 +12,6 @@ import _defaultLang from '../lang/en';
 import util from './util';
 
 export default {
-    icons: null,
     /**
      * @description document create
      * @param {Element} element Textarea
@@ -73,11 +72,11 @@ export default {
         // enter line
         const line_breaker = doc.createElement('DIV');
         line_breaker.className = 'se-line-breaker';
-        line_breaker.innerHTML = '<button class="se-btn">' + this.icons.line_break + '</button>';
+        line_breaker.innerHTML = '<button class="se-btn">' + options.icons.line_break + '</button>';
         const line_breaker_t = doc.createElement('DIV');
         line_breaker_t.className += 'se-line-breaker-component';
         const line_breaker_b = line_breaker_t.cloneNode(true);
-        line_breaker_t.innerHTML = line_breaker_b.innerHTML = this.icons.line_break;
+        line_breaker_t.innerHTML = line_breaker_b.innerHTML = options.icons.line_break;
     
         // resize operation background
         const resize_back = doc.createElement('DIV');
@@ -130,8 +129,7 @@ export default {
             options: options,
             plugins: tool_bar.plugins,
             pluginCallButtons: tool_bar.pluginCallButtons,
-            _responsiveButtons: tool_bar.responsiveButtons,
-            _icons: this.icons
+            _responsiveButtons: tool_bar.responsiveButtons
         };
     },
 
@@ -492,7 +490,7 @@ export default {
         ];
 
         /** --- Define icons --- */
-        this.icons = (!options.icons || typeof options.icons !== 'object') ? _icons : [_icons, options.icons].reduce(function (_default, _new) {
+        options.icons = (!options.icons || typeof options.icons !== 'object') ? _icons : [_icons, options.icons].reduce(function (_default, _new) {
             for (let key in _new) {
                 if (util.hasOwn(_new, key)) _default[key] = _new[key];
             }
@@ -509,7 +507,7 @@ export default {
      * @private
      */
     _defaultButtons: function (options) {
-        const icons = this.icons;
+        const icons = options.icons;
         const lang = options.lang;
         const cmd = util.isOSX_IOS ? '⌘' : 'CTRL';
         const shortcutsDisable = !options.shortcutsHint ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent'] : options.shortcutsDisable;
@@ -587,10 +585,11 @@ export default {
      * @param {string} dataDisplay The data-display property of the button ('dialog', 'submenu', 'command')
      * @param {string} innerHTML Html in button
      * @param {string} _disabled Button disabled
+     * @param {Object} _icons Icons
      * @returns {Object}
      * @private
      */
-    _createButton: function (buttonClass, title, dataCommand, dataDisplay, innerHTML, _disabled) {
+    _createButton: function (buttonClass, title, dataCommand, dataDisplay, innerHTML, _disabled, _icons) {
         const oLi = util.createElement('LI');
         const oButton = util.createElement('BUTTON');
 
@@ -602,7 +601,7 @@ export default {
         
         if (!innerHTML) innerHTML = '<span class="se-icon-text">!</span>';
         if (/^default\./i.test(innerHTML)) {
-            innerHTML = this.icons[innerHTML.replace(/^default\./i, '')];
+            innerHTML = _icons[innerHTML.replace(/^default\./i, '')];
         }
         if (/^text\./i.test(innerHTML)) {
             innerHTML = innerHTML.replace(/^text\./i, '');
@@ -643,6 +642,7 @@ export default {
         tool_bar.appendChild(_buttonTray);
 
         /** create button list */
+        const icons = options.icons;
         const defaultButtonList = this._defaultButtons(options);
         const pluginCallButtons = {};
         const responsiveButtons = [];
@@ -724,7 +724,7 @@ export default {
                         }
                     }
 
-                    buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4], module[5]);
+                    buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4], module[5], icons);
                     (more ? moreContainer : moduleElement.ul).appendChild(buttonElement.li);
 
                     if (plugins[pluginName]) {
