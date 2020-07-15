@@ -28,11 +28,17 @@ footer {
     background-color: inherit;
  }
 
- .badge > * {
+ .badge > a {
     float: left;
-    padding: 0 0 0 10px !important;
+    padding: 0 !important;
+    margin-left: 10px;
  }
 
+ .badge .donate-btn {
+    width: 100px;
+    height: auto;
+ }
+ 
  /** image list */
  .component-list {
     display: flex;
