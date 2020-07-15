@@ -657,18 +657,16 @@ export default class SunEditor {
      * @param info Input information
      * @param core Core object
      * @param uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
-     *                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
+     *                "uploadHandler" is an upload function with "core" and "info" bound.
      *                [upload files] : uploadHandler(files or [new File(...),])
      *                [error]        : uploadHandler("Error message")
      *                [Just finish]  : uploadHandler()
+     *                [directly register] : uploadHandler(response) // Same format as "imageUploadUrl" response
+     *                                   ex) {
+     *                                      // "errorMessage": "insert error message",
+     *                                      "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+     *                                   }
      * @returns
-     * @example Also you can call directly image register not execute "uploadHandler"
-                This work is not execute default upload handler
-                const response = { // Same format as "imageUploadUrl" response
-                    "errorMessage": "insert error message",
-                    "result": [ { "url": "...", "name": "...", "size": "999" }, ]
-                };
-                core.plugins.image.register.call(core, info, response);
      */
     onImageUploadBefore: (files: any[], info: imageInputInformation, core: Core, uploadHandler: Function) => boolean | any[] | undefined;
 
@@ -680,17 +678,15 @@ export default class SunEditor {
      * @param info Input information
      * @param core Core object
      * @param uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
-     *                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
+     *                "uploadHandler" is an upload function with "core" and "info" bound.
      *                [upload files] : uploadHandler(files or [new File(...),])
      *                [error]        : uploadHandler("Error message")
      *                [Just finish]  : uploadHandler()
-     * @example Also you can call directly video register not execute "uploadHandler"
-                This work is not execute default upload handler
-                const response = { // Same format as "videoUploadUrl" response
-                    "errorMessage": "insert error message",
-                    "result": [ { "url": "...", "name": "...", "size": "999" }, ]
-                };
-                core.plugins.video.register.call(core, info, response);
+     *                [directly register] : uploadHandler(response) // Same format as "videoUploadUrl" response
+     *                                   ex) {
+     *                                      // "errorMessage": "insert error message",
+     *                                      "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+     *                                   }
      * @returns
      */
     onVideoUploadBefore: (files: any[], info: videoInputInformation, core: Core, uploadHandler: Function) => boolean | any[] | undefined;
@@ -703,17 +699,15 @@ export default class SunEditor {
      * @param info Input information
      * @param core Core object
      * @param uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
-     *                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
+     *                "uploadHandler" is an upload function with "core" and "info" bound.
      *                [upload files] : uploadHandler(files or [new File(...),])
      *                [error]        : uploadHandler("Error message")
      *                [Just finish]  : uploadHandler()
-     * @example Also you can call directly audio register not execute "uploadHandler"
-                This work is not execute default upload handler
-                const response = { // Same format as "audioUploadUrl" response
-                    "errorMessage": "insert error message",
-                    "result": [ { "url": "...", "name": "...", "size": "999" }, ]
-                };
-                core.plugins.audio.register.call(core, info, response);
+     *                [directly register] : uploadHandler(response) // Same format as "audioUploadUrl" response
+     *                                   ex) {
+     *                                      // "errorMessage": "insert error message",
+     *                                      "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+     *                                   }
      * @returns
      */
     onAudioUploadBefore: (files: any[], info: audioInputInformation, core: Core, uploadHandler: Function) => boolean | any[] | undefined;

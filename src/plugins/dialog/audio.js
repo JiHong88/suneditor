@@ -319,7 +319,14 @@ export default {
         };
 
         if (typeof this.functions.onAudioUploadBefore === 'function') {
-            const result = this.functions.onAudioUploadBefore(files, info, this, this.plugins.audio.upload.bind(this, info));
+            const result = this.functions.onAudioUploadBefore(files, info, this, function (data) {
+                if (data && this._w.Array.isArray(data.result)) {
+                    this.plugins.audio.register.call(this, info, data);
+                } else {
+                    this.plugins.audio.upload.call(this, info, data);
+                }
+            }.bind(this));
+
             if (typeof result === 'undefined') return;
             if (!result) {
                 this.closeLoading();

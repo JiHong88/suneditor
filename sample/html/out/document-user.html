@@ -918,16 +918,7 @@
             <div class="description">
                 Called before the image is uploaded.<br>
                 If false is returned, no image upload is performed.<br>
-                If new fileList are returned,  replaced the previous fileList<br>
-                <span style="color:#ffe4c4;">//</span><br>
-                <span style="color:#ffe4c4;">Also you can call directly image register not execute "uploadHandler".</span><br>
-                <span style="color:#ffe4c4;">This work is not execute default upload handler.</span><br>
-                const response = { <span style="color:#ffe4c4;">// Same format as "imageUploadUrl" response</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;"result": [ { "url": "...", "name": "...", "size": "999" }, ]<br>
-                };<br>
-                core.plugins.image.register.call(core, info, response);<br>
-                <span style="color:#ffe4c4;">also you can call directly error method</span><br>
-                core.plugins.image.error.call(core, "errorMessage", response);
+                If new fileList are returned,  replaced the previous fileList
             </div>
             <table class="params">
                 <thead>
@@ -974,10 +965,15 @@
                     </td>
                     <td class="description last">
                         If undefined is returned, it waits until "uploadHandler" is executed.<br>
-                        "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))<br>
+                        "uploadHandler" is an upload function with "core" and "info" bound.<br>
                         [upload files] : <span style="color: #ffe4c4;">uploadHandler(files or [new File(...),])</span><br>
                         [error] &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : <span style="color: #ffe4c4;">uploadHandler("Error message")</span><br>
-                        [Just finish] &nbsp; &nbsp;: <span style="color: #ffe4c4;">uploadHandler()</span>
+                        [Just finish] &nbsp; &nbsp;: <span style="color: #ffe4c4;">uploadHandler()</span><br>
+                        [directly register] : <span style="color: #ffe4c4;">uploadHandler(response)</span> // Same format as "imageUploadUrl" response<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;ex) {<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;// "errorMessage": "insert error message",<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"result": [ { "url": "...", "name": "...", "size": "999" }, ]<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
                     </td>
                 </tr>
                 </tbody>
@@ -1148,16 +1144,7 @@
             <div class="description">
                 Called before the video is uploaded.<br>
                 If false is returned, no video(iframe, video) upload is performed.<br>
-                If new fileList are returned,  replaced the previous fileList<br>
-                <span style="color:#ffe4c4;">//</span><br>
-                <span style="color:#ffe4c4;">Also you can call directly video register not execute "uploadHandler".</span><br>
-                <span style="color:#ffe4c4;">This work is not execute default upload handler.</span><br>
-                const response = { <span style="color:#ffe4c4;">// Same format as "videoUploadUrl" response</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;"result": [ { "url": "...", "name": "...", "size": "999" }, ]<br>
-                };<br>
-                core.plugins.video.register.call(core, info, response);<br>
-                <span style="color:#ffe4c4;">also you can call directly error method</span><br>
-                core.plugins.video.error.call(core, "errorMessage", response);
+                If new fileList are returned,  replaced the previous fileList
             </div>
             <table class="params">
                 <thead>
@@ -1202,10 +1189,15 @@
                     </td>
                     <td class="description last">
                         If undefined is returned, it waits until "uploadHandler" is executed.<br>
-                        "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))<br>
+                        "uploadHandler" is an upload function with "core" and "info" bound.<br>
                         [upload files] : <span style="color: #ffe4c4;">uploadHandler(files or [new File(...),])</span><br>
                         [error] &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : <span style="color: #ffe4c4;">uploadHandler("Error message")</span><br>
-                        [Just finish] &nbsp; &nbsp;: <span style="color: #ffe4c4;">uploadHandler()</span>
+                        [Just finish] &nbsp; &nbsp;: <span style="color: #ffe4c4;">uploadHandler()</span><br>
+                        [directly register] : <span style="color: #ffe4c4;">uploadHandler(response)</span> // Same format as "videoUploadUrl" response<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;ex) {<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;// "errorMessage": "insert error message",<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"result": [ { "url": "...", "name": "...", "size": "999" }, ]<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
                     </td>
                 </tr>
                 </tbody>
@@ -1374,16 +1366,7 @@
             <div class="description">
                 Called before the audio is uploaded.<br>
                 If false is returned, no audio upload is performed.<br>
-                If new fileList are returned,  replaced the previous fileList<br>
-                <span style="color:#ffe4c4;">//</span><br>
-                <span style="color:#ffe4c4;">Also you can call directly audio register not execute "uploadHandler".</span><br>
-                <span style="color:#ffe4c4;">This work is not execute default upload handler.</span><br>
-                const response = { <span style="color:#ffe4c4;">// Same format as "audioUploadUrl" response</span><br>
-                &nbsp;&nbsp;&nbsp;&nbsp;"result": [ { "url": "...", "name": "...", "size": "999" }, ]<br>
-                };<br>
-                core.plugins.audio.register.call(core, info, response);<br>
-                <span style="color:#ffe4c4;">also you can call directly error method</span><br>
-                core.plugins.audio.error.call(core, "errorMessage", response);
+                If new fileList are returned,  replaced the previous fileList
             <table class="params">
                 <thead>
                 <tr>
@@ -1424,10 +1407,15 @@
                     </td>
                     <td class="description last">
                         If undefined is returned, it waits until "uploadHandler" is executed.<br>
-                        "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))<br>
+                        "uploadHandler" is an upload function with "core" and "info" bound.<br>
                         [upload files] : <span style="color: #ffe4c4;">uploadHandler(files or [new File(...),])</span><br>
                         [error] &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; : <span style="color: #ffe4c4;">uploadHandler("Error message")</span><br>
-                        [Just finish] &nbsp; &nbsp;: <span style="color: #ffe4c4;">uploadHandler()</span>
+                        [Just finish] &nbsp; &nbsp;: <span style="color: #ffe4c4;">uploadHandler()</span><br>
+                        [directly register] : <span style="color: #ffe4c4;">uploadHandler(response)</span> // Same format as "audioUploadUrl" response<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;ex) {<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;// "errorMessage": "insert error message",<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"result": [ { "url": "...", "name": "...", "size": "999" }, ]<br>
+                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }
                     </td>
                 </tr>
                 </tbody>

@@ -99,7 +99,7 @@
             videoBox: {
                 title: 'Inserir vídeo',
                 file: 'Selecionar arquivos',
-                url: 'URL do YouTube'
+                url: 'URL do YouTube/Vimeo'
             },
             audioBox: {
                 title: 'Inserir audio',

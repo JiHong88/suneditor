@@ -282,6 +282,10 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // imageUploadUrl: 'http://localhost:3000/editor/upload',
     // videoUploadUrl: 'http://localhost:3000/editor/upload',
     // audioUploadUrl: 'http://localhost:3000/editor/upload',
+    icons: {
+        expansion: "<span>A</span>",
+        reduction: "<span>Z</span>"
+    },
     iframe: true,
     videoFileInput: true,
     audioFileInput: true,
@@ -507,14 +511,14 @@ function ResizeImage (files, uploadHandler) {
     reader.readAsDataURL(uploadFile);
 }
 
-// ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
-//     // ResizeImage(files, uploadHandler)
+ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
+    // ResizeImage(files, uploadHandler)
     
-//     const response = { // Same format as "videoUploadUrl" response
-//         "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
-//     };
-//     core.plugins.image.register.call(core, info, response);
-// }
+    const response = { // Same format as "videoUploadUrl" response
+        "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
+    };
+    uploadHandler(response);
+}
 
 // ss.onImageUpload = function (targetElement, index, state, info, core) {
 //     console.log('imageInfo-----', info);
