@@ -284,6 +284,11 @@
 <span class="pl-c">[upload files] : uploadHandler(files or [new File(...),])</span>
 <span class="pl-c">[error]        : uploadHandler("Error message")</span>
 <span class="pl-c">[Just finish]  : uploadHandler()</span>
+<span class="pl-c">[directly register] : uploadHandler(response) // Same format as "imageUploadUrl" response</span>
+<span class="pl-c"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;ex) {</span>
+<span class="pl-c"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;// "errorMessage": "insert error message",</span>
+<span class="pl-c">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"result": [ { "url": "...", "name": "...", "size": "999" }, ]</span>
+<span class="pl-c">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }</span>
 <span class="pl-c">*/</span>
 <span class="pl-s1">editorimageResize</span><span class="pl-kos">.</span><span class="pl-en">onImageUploadBefore</span> <span class="pl-c1">=</span> <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-s1">files</span><span class="pl-kos">,</span> <span class="pl-s1">info</span><span class="pl-kos">,</span> <span class="pl-s1">core</span><span class="pl-kos">,</span> <span class="pl-s1">uploadHandler</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
     <span class="pl-k">try</span> <span class="pl-kos">{</span>

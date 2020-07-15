@@ -998,19 +998,14 @@ editor.onDrop = function (e, core) { console.log('onDrop', e) }
  *                [upload files] : uploadHandler(files or [new File(...),])
  *                [error]        : uploadHandler("Error message")
  *                [Just finish]  : uploadHandler()
+ *                [directly register] : uploadHandler(response) // Same format as "imageUploadUrl" response
+ *                                   ex) {
+ *                                      // "errorMessage": "insert error message",
+ *                                      "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+ *                                   }
  * return {Boolean|Array|undefined}
  */
 editor.onImageUploadBefore: function (files, info, core, uploadHandler) {
-    // Also you can call directly image register not execute "uploadHandler"
-    // This work is not execute default upload handler
-    const response = { // Same format as "imageUploadUrl" response
-        "result": [ { "url": "...", "name": "...", "size": "999" }, ]
-    };
-    core.plugins.image.register.call(core, info, response);
-    // also you can call directly error method
-    core.plugins.image.error.call(core, "errorMessage", response);
-
-    /** return values */
     return Boolean || return (new FileList) || return undefined;
 }
 // Called before the video is uploaded
@@ -1031,49 +1026,39 @@ editor.onImageUploadBefore: function (files, info, core, uploadHandler) {
  *                [upload files] : uploadHandler(files or [new File(...),])
  *                [error]        : uploadHandler("Error message")
  *                [Just finish]  : uploadHandler()
+ *                [directly register] : uploadHandler(response) // Same format as "videoUploadUrl" response
+ *                                   ex) {
+ *                                      // "errorMessage": "insert error message",
+ *                                      "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+ *                                   }
  * return {Boolean|Array|undefined}
  */
 editor.onVideoUploadBefore: function (files, info, core, uploadHandler) {
-    // Also you can call directly video register not execute "uploadHandler"
-    // This work is not execute default upload handler
-    const response = { // Same format as "videoUploadUrl" response
-        "result": [ { "url": "...", "name": "...", "size": "999" }, ]
-    };
-    core.plugins.video.register.call(core, info, response);
-    // also you can call directly error method
-    core.plugins.video.error.call(core, "errorMessage", response);
-    
-    /** return values */
     return Boolean || return (new FileList) || return undefined;
 }
 // Called before the audio is uploaded
 // If false is returned, no audio upload is performed.
 // If new fileList are returned,  replaced the previous fileList
 /** 
-* files: Files array
-* info: {
-* - isUpdate: Update audio if true, create audio if false
-* - currentaudio: If isUpdate is true, the currently selected audio.
-* }
-* core: Core object,
-* uploadHandler: If undefined is returned, it waits until "uploadHandler" is executed.
-*                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
-*                [upload files] : uploadHandler(files or [new File(...),])
-*                [error]        : uploadHandler("Error message")
-*                [Just finish]  : uploadHandler()
-* return {Boolean|Array|undefined}
-*/
+ * files: Files array
+ * info: {
+ * - isUpdate: Update audio if true, create audio if false
+ * - currentaudio: If isUpdate is true, the currently selected audio.
+ * }
+ * core: Core object,
+ * uploadHandler: If undefined is returned, it waits until "uploadHandler" is executed.
+ *                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
+ *                [upload files] : uploadHandler(files or [new File(...),])
+ *                [error]        : uploadHandler("Error message")
+ *                [Just finish]  : uploadHandler()
+ *                [directly register] : uploadHandler(response) // Same format as "audioUploadUrl" response
+ *                                   ex) {
+ *                                      // "errorMessage": "insert error message",
+ *                                      "result": [ { "url": "...", "name": "...", "size": "999" }, ]
+ *                                   }
+ * return {Boolean|Array|undefined}
+ */
 editor.onAudioUploadBefore: function (files, info, core, uploadHandler) {
-    // Also you can call directly audio register not execute "uploadHandler"
-    // This work is not execute default upload handler
-    const response = { // Same format as "audioUploadUrl" response
-        "result": [ { "url": "...", "name": "...", "size": "999" }, ]
-    };
-    core.plugins.audio.register.call(core, info, response);
-    // also you can call directly error method
-    core.plugins.audio.error.call(core, "errorMessage", response);
-
-    /** return values */
     return Boolean || return (new FileList) || return undefined;
 }
 
