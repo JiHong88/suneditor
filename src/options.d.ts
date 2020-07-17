@@ -352,6 +352,11 @@ export interface SunEditorOptions {
      */
     audioUrlInput?: boolean;
     /**
+     * Define "Attributes" of the audio tag.
+     * @example audioTagAttrs: { controlslist: "nodownload", autoplay: true }
+     */
+    audioTagAttrs?: Record<string, string | boolean>;
+    /**
      * Http Header when uploading audios.
      */
     audioUploadHeader?: Record<string, string>;

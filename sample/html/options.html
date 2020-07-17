@@ -293,6 +293,9 @@
             <label><input type="checkbox" id="audioFileInput">&nbsp;&nbsp;audioFileInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="audioUrlInput" checked>&nbsp;&nbsp;audioUrlInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <br><br>
+            <label><input type="checkbox" id="audioTagAttrs">&nbsp;&nbsp;audioTagAttrs</label>
+            <textarea type="text" id="audioTagAttrs_value" placeholder='{"controlslist": "nodownload", "autoplay": "true"}' style="width: 300px; height: 100px;; vertical-align: top;"></textarea>
+            <br><br>
             <label><input type="checkbox" id="audioWidth">&nbsp;&nbsp;audioWidth</label>
             <input type="text" id="audioWidth_value" placeholder="String.. (300px)">
             <br><br>
@@ -523,6 +526,7 @@ function sun_create () {
         videoUploadSizeLimit: document.getElementById('videoUploadSizeLimit').checked ? document.getElementById('videoUploadSizeLimit_value').value : undefined,
         audioFileInput: document.getElementById('audioFileInput').checked ? true : undefined,
         audioUrlInput: document.getElementById('audioUrlInput').checked ? undefined : false,
+        audioTagAttrs: document.getElementById('audioTagAttrs').checked ? JSON.parse(document.getElementById('audioTagAttrs_value').value) : undefined,
         audioWidth: document.getElementById('audioWidth').checked ? document.getElementById('audioWidth_value').value : undefined,
         audioHeight: document.getElementById('audioHeight').checked ? document.getElementById('audioHeight_value').value : undefined,
         audioUploadHeader: document.getElementById('audioUploadHeader').checked ? JSON.parse(document.getElementById('audioUploadHeader_value').value) : undefined,
