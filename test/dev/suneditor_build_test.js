@@ -270,6 +270,9 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     display: 'block',
     width: '100%',
     height: '500px',
+    audioTagAttrs: {
+        controlslist: "nodownload",
+    },
     // height: 'auto',
     iframeCSSFileName: '.+',
     popupDisplay: 'full',

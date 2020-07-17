@@ -162,7 +162,7 @@ export default {
     // create new audio tag
     _createAudioTag: function () {
         const oAudio = this.util.createElement('AUDIO');
-        oAudio.setAttribute('controls', true);
+        this.plugins.audio._setTagAttrs.call(this, oAudio);
 
         const w = this.context.audio._origin_w;
         const h = this.context.audio._origin_h;
@@ -170,6 +170,18 @@ export default {
         oAudio.style.cssText = (w ? ('width:' + w + '; ') : '') + (h ? ('height:' + h + ';') : '');
 
         return oAudio;
+    },
+
+    _setTagAttrs: function (element) {
+        element.setAttribute('controls', true);
+
+        const attrs = this.context.options.audioTagAttrs;
+        if (!attrs) return;
+
+        for (const key in attrs) {
+            if (!this.util.hasOwn(attrs, key)) continue;
+            element.setAttribute(key, attrs[key]);
+        }
     },
 
     _onLinkPreview: function (context, protocol, e) {
@@ -437,7 +449,7 @@ export default {
 
     updateCover: function (element) {
         const contextAudio = this.context.audio;
-        element.setAttribute('controls', true);
+        this.plugins.audio._setTagAttrs.call(this, element);
         
         // find component element
         const existElement = this.util.getParentElement(element, this.util.isMediaComponent) || 

@@ -147,7 +147,7 @@ export default {
                 lineNumbers: true,
                 lineWrapping: true
             }, (options.codeMirror.options || {})].reduce(function (init, option) {
-                for (let key in option) {
+                for (const key in option) {
                     if (util.hasOwn(option, key)) init[key] = option[key];
                 }
                 return init;
@@ -180,7 +180,7 @@ export default {
         const katexOptions = [{
             throwOnError: false,
         }, (katex.options || {})].reduce(function (init, option) {
-            for (let key in option) {
+            for (const key in option) {
                 if (util.hasOwn(option, key)) init[key] = option[key];
             }
             return init;
@@ -460,6 +460,7 @@ export default {
         options.audioHeight = !options.audioHeight ? '' : util.isNumber(options.audioHeight) ? options.audioHeight + 'px' : options.audioHeight;
         options.audioFileInput = !!options.audioFileInput;
         options.audioUrlInput = (options.audioUrlInput === undefined || !options.audioFileInput) ? true : options.audioUrlInput;
+        options.audioTagAttrs = options.audioTagAttrs || null;
         options.audioUploadHeader = options.audioUploadHeader || null;
         options.audioUploadUrl = typeof options.audioUploadUrl === 'string' ? options.audioUploadUrl : null;
         options.audioUploadSizeLimit = /\d+/.test(options.audioUploadSizeLimit) ? util.getNumber(options.audioUploadSizeLimit, 0) : null;
@@ -491,7 +492,7 @@ export default {
 
         /** --- Define icons --- */
         options.icons = (!options.icons || typeof options.icons !== 'object') ? _icons : [_icons, options.icons].reduce(function (_default, _new) {
-            for (let key in _new) {
+            for (const key in _new) {
                 if (util.hasOwn(_new, key)) _default[key] = _new[key];
             }
             return _default;

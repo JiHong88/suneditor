@@ -37,7 +37,7 @@ export default {
         if (typeof options !== 'object') options = {};
         if (_init_options) {
             options =  [_init_options, options].reduce(function (init, option) {
-                            for (let key in option) {
+                            for (const key in option) {
                                 if (!util.hasOwn(option, key)) continue;
                                 if (key === 'plugins' && option[key] && init[key]) {
                                     let i = init[key], o = option[key];
