@@ -17,6 +17,7 @@ type fileInfo =  {
     element: Element;
     src: string;
 };
+type seledtedFileInfo = Record<string, string | Element>;
 ​​
 interface Core {
     /**
@@ -108,6 +109,11 @@ interface Core {
      * @description The target element of current controller
      */
     currentControllerTarget: Element;
+
+    /**
+     * @description The file component object of current selected file tag (getFileComponent(): {target, component, pluginName})
+     */
+    currentFileComponentInfo: seledtedFileInfo;
 
     /**
      * @description An array of buttons whose class name is not "se-code-view-enabled"
@@ -340,11 +346,11 @@ interface Core {
     
     /**
      * @description Gets the file component and that plugin name
-     * return: {component, pluginName} | null
+     * return: {target, component, pluginName} | null
      * @param element Target element (figure tag, component div, file tag)
      * @returns
      */
-    getFileComponent(element: Element): Record<string, string | Element> | null;
+    getFileComponent(element: Element): seledtedFileInfo | null;
 
     /**
      * @description The component(image, video) is selected and the resizing module is called.
@@ -593,6 +599,8 @@ export default class SunEditor {
     onChange: (contents: string, core: Core) => void;
     onBlur: (e: FocusEvent, core: Core) => void;
     onPaste: (e: Event, cleanData: string, maxCharCount: number, core: Core) => void;
+    onCopy: (e: Event, clipboardData: any, core: Core) => void;
+    onCut: (e: Event, clipboardData: any, core: Core) => void;
 
     /**
      * @description Called just before the inline toolbar is positioned and displayed on the screen.
