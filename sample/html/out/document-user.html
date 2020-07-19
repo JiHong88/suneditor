@@ -913,6 +913,90 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="onCopy"><span class="type-signature"></span>onCopy<span
+                    class="signature">(event, clipboardData, core)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Copy event.<br>
+                Called before the editor's default event action.<br>
+                If it returns false, it stops without executing the rest of the action.
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>event</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">Event Object</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>clipboardData</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">event.clipboardData</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="onCut"><span class="type-signature"></span>onCut<span
+                    class="signature">(event, clipboardData, core)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Cut event.<br>
+                Called before the editor's default event action.<br>
+                If it returns false, it stops without executing the rest of the action.
+            </div>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>event</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">Event Object</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>clipboardData</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">event.clipboardData</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>core</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="onImageUploadBefore"><span class="type-signature"></span>onImageUploadBefore<span
                     class="signature">(files, info, core, uploadHandler)</span><span class="type-signature"> &rarr; {Boolean|Array|undefined}</span></h4>
             <div class="description">
@@ -1767,6 +1851,8 @@
         <li><a href="document-user.html#onFocus">onFocus</a></li>
         <li><a href="document-user.html#onBlur">onBlur</a></li>
         <li><a href="document-user.html#onPaste">onPaste</a></li>
+        <li><a href="document-user.html#onCopy">onCopy</a></li>
+        <li><a href="document-user.html#onCut">onCut</a></li>
         <li><a href="document-user.html#onImageUploadBefore">onImageUploadBefore</a></li>
         <li><a href="document-user.html#onImageUpload">onImageUpload</a></li>
         <li><a href="document-user.html#onImageUploadError">onImageUploadError</a></li>

@@ -630,6 +630,10 @@ videoUploadUrl  : The video upload to server mapping address.       default: nul
 videoUploadSizeLimit: The size of the total uploadable videos (in bytes).
                       Invokes the "onVideoUploadError" method.  default: null {Number}
 videoMultipleFile: If true, multiple videos can be selected.    default: false {Boolean}
+videoTagAttrs    : Define "Attributes" of the video tag.                      default: null {Object} 
+                   ex) { poster: "http://suneditor.com/docs/loading.gif", autoplay: true }
+videoIframeAttrs : Define "Attributes" of the iframe tag. (Youtube, Vimeo).   default: null {Object}
+                   ex) { style: "border: 2px solid red;" }
 
 // Audio----------------------------------------------------------------------------------------------------------
 audioWidth      : The default width size of the audio frame.        default: '300px' {String}
@@ -637,8 +641,6 @@ audioHeight     : The default height size of the audio frame.       default: '54
 audioFileInput  : Choose whether to create a file input tag in the audio upload window.  default: false {Boolean}
 audioUrlInput   : Choose whether to create a audio url input tag in the audio upload window.
                   If the value of audioFileInput is false, it will be unconditionally.   default: true {Boolean}
-audioTagAttrs   : Define "Attributes" of the audio tag.             default: null {Object} 
-                  ex) { controlslist: "nodownload", autoplay: true }
 audioUploadHeader : Http Header when uploading audios.              default: null {Object}
 audioUploadUrl  : The audio upload to server mapping address.       default: null {String}
                   ex) "/editor/uploadAudio"
@@ -660,6 +662,8 @@ audioUploadUrl  : The audio upload to server mapping address.       default: nul
 audioUploadSizeLimit: The size of the total uploadable audios (in bytes).
                       Invokes the "onAudioUploadError" method.  default: null {Number}
 audioMultipleFile: If true, multiple audios can be selected.    default: false {Boolean}
+audioTagAttrs    : Define "Attributes" of the audio tag.        default: null {Object} 
+                   ex) { controlslist: "nodownload", autoplay: true }
 
 // Table----------------------------------------------------------------------------------------------------------
 tableCellControllerPosition : Define position to the table cell controller('cell', 'top'). default: 'cell' {String}
@@ -959,16 +963,31 @@ editor.onload = function (core, reload) {
     console.log('onload-reload', reload)
 }
 
-// Paste event.
+// Clipboard event.
 // Called before the editor's default event action.
 // If it returns false, it stops without executing the rest of the action.
 /**
+ * paste event
  * e: Event object
  * cleanData: HTML string modified for editor format
  * maxCharCount: maxChartCount option (true if max character is exceeded)
  * core: Core object
  */
 editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e) }
+/**
+ * copy event
+ * e: Event object
+ * clipboardData: event.clipboardData
+ * core: Core object
+ */
+editor.onCopy = function (e, clipboardData, core) { console.log('onCopy', e) }
+/**
+ * cut event
+ * e: Event object
+ * clipboardData: event.clipboardData
+ * core: Core object
+ */
+editor.onCut = function (e, clipboardData, core) { console.log('onCut', e) }
 
 // Drop event.
 // Called before the editor's default event action.
