@@ -222,7 +222,7 @@ export default {
         const attrs = this.context.options.videoTagAttrs;
         if (!attrs) return;
 
-        for (const key in attrs) {
+        for (let key in attrs) {
             if (!this.util.hasOwn(attrs, key)) continue;
             element.setAttribute(key, attrs[key]);
         }
@@ -241,7 +241,7 @@ export default {
         const attrs = this.context.options.videoIframeAttrs;
         if (!attrs) return;
 
-        for (const key in attrs) {
+        for (let key in attrs) {
             if (!this.util.hasOwn(attrs, key)) continue;
             element.setAttribute(key, attrs[key]);
         }

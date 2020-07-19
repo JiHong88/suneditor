@@ -847,7 +847,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const commandMap = this.commandMap;
             const activePlugins = this.activePlugins;
-            for (const key in commandMap) {
+            for (let key in commandMap) {
                 if (!util.hasOwn(commandMap, key)) continue;
                 if (activePlugins.indexOf(key) > -1) {
                     plugins[key].active.call(this, null);
@@ -4631,7 +4631,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const tagsAttr = {};
             let allAttr = '';
             if (!!_attr) {
-                for (const k in _attr) {
+                for (let k in _attr) {
                     if (!util.hasOwn(_attr, k)) continue;
                     if (k === 'all') {
                         allAttr = _attr[k] + '|';
@@ -4667,7 +4667,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             let filePluginRegExp = [];
             let plugin, button;
-            for (const key in plugins) {
+            for (let key in plugins) {
                 if (!util.hasOwn(plugins, key)) continue;
                 plugin = plugins[key];
                 button = pluginCallButtons[key];
@@ -5094,7 +5094,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             /** remove class, display text */
-            for (const key in commandMap) {
+            for (let key in commandMap) {
                 if (commandMapNodes.indexOf(key) > -1 || !util.hasOwn(commandMap, key)) continue;
                 if (activePlugins.indexOf(key) > -1) {
                     plugins[key].active.call(core, null);
@@ -6126,7 +6126,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // active class reset of buttons
             const commandMap = core.commandMap;
             const activePlugins = core.activePlugins;
-            for (const key in commandMap) {
+            for (let key in commandMap) {
                 if (!util.hasOwn(commandMap, key)) continue;
                 if (activePlugins.indexOf(key) > -1) {
                     plugins[key].active.call(core, null);
@@ -6339,7 +6339,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             const info = core.currentFileComponentInfo;
-            if (info) {
+            if (info && !util.isIE) {
                 event._setClipboardComponent(e, info, clipboardData);
                 util.addClass(info.component, 'se-component-copy');
                 // copy effect
@@ -6358,7 +6358,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             const info = core.currentFileComponentInfo;
-            if (info) {
+            if (info && !util.isIE) {
                 event._setClipboardComponent(e, info, clipboardData);
                 util.removeItem(info.component);
                 core.controllersOff();
@@ -6913,7 +6913,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const oldCallButtons = pluginCallButtons;
             pluginCallButtons = newToolbar.pluginCallButtons;
             let plugin, button, oldButton;
-            for (const key in pluginCallButtons) {
+            for (let key in pluginCallButtons) {
                 if (!util.hasOwn(pluginCallButtons, key)) continue;
                 plugin = plugins[key];
                 button = pluginCallButtons[key];
@@ -6949,7 +6949,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             core.plugins = _options.plugins || core.plugins;
             const mergeOptions = [options, _options].reduce(function (init, option) {
-                for (const key in option) {
+                for (let key in option) {
                     if (!util.hasOwn(option, key)) continue;
                     if (key === 'plugins' && option[key] && init[key]) {
                         let i = init[key], o = option[key];
@@ -7281,13 +7281,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             util.removeItem(context.element.topArea);
 
             /** remove object reference */
-            for (const k in core) { if (util.hasOwn(core, k)) delete core[k]; }
-            for (const k in event) { if (util.hasOwn(event, k)) delete event[k]; }
-            for (const k in context) { if (util.hasOwn(context, k)) delete context[k]; }
-            for (const k in pluginCallButtons) { if (util.hasOwn(pluginCallButtons, k)) delete pluginCallButtons[k]; }
+            for (let k in core) { if (util.hasOwn(core, k)) delete core[k]; }
+            for (let k in event) { if (util.hasOwn(event, k)) delete event[k]; }
+            for (let k in context) { if (util.hasOwn(context, k)) delete context[k]; }
+            for (let k in pluginCallButtons) { if (util.hasOwn(pluginCallButtons, k)) delete pluginCallButtons[k]; }
             
             /** remove user object */
-            for (const k in this) { if (util.hasOwn(this, k)) delete this[k]; }
+            for (let k in this) { if (util.hasOwn(this, k)) delete this[k]; }
         },
 
         /**
