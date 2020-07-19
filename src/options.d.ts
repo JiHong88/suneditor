@@ -316,6 +316,16 @@ export interface SunEditorOptions {
      */
     videoUrlInput?: boolean;
     /**
+     * Define "Attributes" of the video tag. 
+     * @example { poster: "http://suneditor.com/docs/loading.gif", autoplay: true }
+     */
+    videoTagAttrs?: Record<string, string | boolean>;
+    /**
+     * Define "Attributes" of the iframe tag. (Youtube, Vimeo).
+     * @example { style: "border: 2px solid red;" }
+     */
+    videoIframeAttrs?: Record<string, string | boolean>;
+    /**
      * Http Header when uploading videos.
      */
     videoUploadHeader?: Record<string, string>;
@@ -353,7 +363,7 @@ export interface SunEditorOptions {
     audioUrlInput?: boolean;
     /**
      * Define "Attributes" of the audio tag.
-     * @example audioTagAttrs: { controlslist: "nodownload", autoplay: true }
+     * @example { controlslist: "nodownload", autoplay: true }
      */
     audioTagAttrs?: Record<string, string | boolean>;
     /**

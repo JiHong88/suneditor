@@ -6552,9 +6552,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             eventWysiwyg.addEventListener(util.isIE ? 'textinput' : 'input', event.onInput_wysiwyg, false);
             eventWysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
             eventWysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
+            eventWysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
             eventWysiwyg.addEventListener('copy', event.onCopy_wysiwyg, false);
             eventWysiwyg.addEventListener('cut', event.onCut_wysiwyg, false);
-            eventWysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
             eventWysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
             eventWysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
             eventWysiwyg.addEventListener('focus', event.onFocus_wysiwyg, false);
@@ -6612,9 +6612,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             eventWysiwyg.removeEventListener(util.isIE ? 'textinput' : 'input', event.onInput_wysiwyg);
             eventWysiwyg.removeEventListener('keydown', event.onKeyDown_wysiwyg);
             eventWysiwyg.removeEventListener('keyup', event.onKeyUp_wysiwyg);
+            eventWysiwyg.removeEventListener('paste', event.onPaste_wysiwyg);
             eventWysiwyg.removeEventListener('copy', event.onCopy_wysiwyg);
             eventWysiwyg.removeEventListener('cut', event.onCut_wysiwyg);
-            eventWysiwyg.removeEventListener('paste', event.onPaste_wysiwyg);
             eventWysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
             eventWysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
 

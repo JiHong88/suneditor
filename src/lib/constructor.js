@@ -451,6 +451,8 @@ export default {
         options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
         options.videoFileInput = !!options.videoFileInput;
         options.videoUrlInput = (options.videoUrlInput === undefined || !options.videoFileInput) ? true : options.videoUrlInput;
+        options.videoTagAttrs = options.videoTagAttrs || null;
+        options.videoIframeAttrs = options.videoIframeAttrs || null;
         options.videoUploadHeader = options.videoUploadHeader || null;
         options.videoUploadUrl = typeof options.videoUploadUrl === 'string' ? options.videoUploadUrl : null;
         options.videoUploadSizeLimit = /\d+/.test(options.videoUploadSizeLimit) ? util.getNumber(options.videoUploadSizeLimit, 0) : null;
