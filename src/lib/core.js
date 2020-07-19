@@ -6324,12 +6324,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             return event._dataTransferAction('paste', e, clipboardData);
         },
 
-        _setClipboardComponent: function (e, clipboardData) {
-            if (core.currentFileComponentInfo) {
-                e.preventDefault();
-                e.stopPropagation();
-                clipboardData.setData('text/html', core.currentFileComponentInfo.component.outerHTML);
-            }
+        _setClipboardComponent: function (e, info, clipboardData) {
+            e.preventDefault();
+            e.stopPropagation();
+            clipboardData.setData('text/html', info.component.outerHTML);
         },
 
         onCopy_wysiwyg: function (e) {
@@ -6340,8 +6338,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return false;
             }
 
-            if (core.currentFileComponentInfo) {
-                event._setClipboardComponent(e, clipboardData);
+            const info = core.currentFileComponentInfo;
+            if (info) {
+                event._setClipboardComponent(e, info, clipboardData);
+                util.addClass(info.component, 'se-component-copy');
+                // copy effect
+                _w.setTimeout(function () {
+                    util.removeClass(info.component, 'se-component-copy');
+                }, 150);
             }
         },
 
@@ -6353,9 +6357,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return false;
             }
 
-            if (core.currentFileComponentInfo) {
-                event._setClipboardComponent(e, clipboardData);
-                util.removeItem(core.currentFileComponentInfo.component);
+            const info = core.currentFileComponentInfo;
+            if (info) {
+                event._setClipboardComponent(e, info, clipboardData);
+                util.removeItem(info.component);
                 core.controllersOff();
             }
 
