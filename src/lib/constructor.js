@@ -455,6 +455,8 @@ export default {
         options.videoUploadUrl = typeof options.videoUploadUrl === 'string' ? options.videoUploadUrl : null;
         options.videoUploadSizeLimit = /\d+/.test(options.videoUploadSizeLimit) ? util.getNumber(options.videoUploadSizeLimit, 0) : null;
         options.videoMultipleFile = !!options.videoMultipleFile;
+        options.videoTagAttrs = options.videoTagAttrs || null;
+        options.videoIframeAttrs = options.videoIframeAttrs || null;
         /** Audio */
         options.audioWidth = !options.audioWidth ? '' : util.isNumber(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth;
         options.audioHeight = !options.audioHeight ? '' : util.isNumber(options.audioHeight) ? options.audioHeight + 'px' : options.audioHeight;
@@ -464,6 +466,7 @@ export default {
         options.audioUploadUrl = typeof options.audioUploadUrl === 'string' ? options.audioUploadUrl : null;
         options.audioUploadSizeLimit = /\d+/.test(options.audioUploadSizeLimit) ? util.getNumber(options.audioUploadSizeLimit, 0) : null;
         options.audioMultipleFile = !!options.audioMultipleFile;
+        options.audioTagAttrs = options.audioTagAttrs || null;
         /** Table */
         options.tableCellControllerPosition = typeof options.tableCellControllerPosition === 'string' ? options.tableCellControllerPosition.toLowerCase() : 'cell';
         /** Key actions */

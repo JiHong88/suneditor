@@ -179,6 +179,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         currentControllerTarget: null,
 
         /**
+         * @description The file component object of current selected file tag (getFileComponent)
+         */
+        currentFileComponentInfo: null,
+
+        /**
          * @description An array of buttons whose class name is not "se-code-view-enabled"
          */
         codeViewDisabledButtons: null,
@@ -666,6 +671,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
                 if (!util.hasClass(arg, 'se-controller')) {
                     this.currentControllerTarget = arg;
+                    this.currentFileComponentInfo = this.getFileComponent(arg);
                     continue;
                 }
                 if (arg.style) arg.style.display = 'block';
@@ -691,6 +697,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             this.currentControllerName = '';
             this.currentControllerTarget = null;
+            this.currentFileComponentInfo = null;
             this.effectNode = null;
             if (!this._bindControllersOff) return;
 
@@ -786,7 +793,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const fileComponentInfo = this.getFileComponent(focusEl);
             if (fileComponentInfo) {
-                this.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
+                this.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
             } else if (focusEl) {
                 focusEl = util.getChildElement(focusEl, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
                 if (!focusEl) this.nativeFocus();
@@ -1247,7 +1254,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const fileComponentInfo = this.getFileComponent(element);
             if (fileComponentInfo) {
-                this.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
+                this.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
             } else if (oNode) {
                 oNode = util.getEdgeChildNodes(oNode, null).sc || oNode;
                 this.setRange(oNode, 0, oNode, 0);
@@ -1261,26 +1268,27 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Gets the file component and that plugin name
-         * return: {component, pluginName} | null
+         * return: {target, component, pluginName} | null
          * @param {Element} element Target element (figure tag, component div, file tag)
          * @returns {Object|null}
          */
         getFileComponent: function (element) {
             if (!this._fileManager.queryString || !element) return null;
 
-            let fileComponent, pluginName;
+            let target, pluginName;
             if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
-                fileComponent = element.querySelector(this._fileManager.queryString);
+                target = element.querySelector(this._fileManager.queryString);
             }
-            if (!fileComponent && element.nodeName && this._fileManager.regExp.test(element.nodeName)) {
-                fileComponent = element;
+            if (!target && element.nodeName && this._fileManager.regExp.test(element.nodeName)) {
+                target = element;
             }
 
-            if (fileComponent) {
-                pluginName = this._fileManager.pluginMap[fileComponent.nodeName.toLowerCase()];
+            if (target) {
+                pluginName = this._fileManager.pluginMap[target.nodeName.toLowerCase()];
                 if (pluginName) {
                     return {
-                        component: fileComponent,
+                        target: target,
+                        component: util.getParentElement(target, util.isComponent),
                         pluginName: pluginName
                     };
                 }
@@ -1295,6 +1303,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {String} pluginName Plugin name (image, video)
          */
         selectComponent: function (element, pluginName) {
+            if (!this.hasFocus) this.focus();
             const plugin = this.plugins[pluginName];
             if (!plugin) return;
             _w.setTimeout(function () {
@@ -4137,6 +4146,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Open the preview window.
          */
         preview: function () {
+            core.submenuOff();
+            core.containerOff();
+            core.controllersOff();
+            
             const contentsHTML = this.getContents(true);
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
@@ -5185,7 +5198,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const fileComponentInfo = core.getFileComponent(targetElement);
             if (fileComponentInfo) {
                 e.preventDefault();
-                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
+                core.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
                 return;
             }
 
@@ -5620,7 +5633,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 e.preventDefault();
                                 e.stopPropagation();
                                 if (formatEl.textContent.length === 0) util.removeItem(formatEl);
-                                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
+                                core.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
                             }
                             break;
                         }
@@ -5674,7 +5687,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             const fileComponentInfo = core.getFileComponent(nextEl);
                             if (fileComponentInfo) {
                                 e.stopPropagation();
-                                core.selectComponent(fileComponentInfo.component, fileComponentInfo.pluginName);
+                                core.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
                             }
 
                             break;
@@ -6305,17 +6318,56 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             return false;
         },
 
-        onCut_wysiwyg: function () {
-            _w.setTimeout(function () {
-                // history stack
-                core.history.push(false);
-            });
-        },
-
         onPaste_wysiwyg: function (e) {
             const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
             if (!clipboardData) return true;
             return event._dataTransferAction('paste', e, clipboardData);
+        },
+
+        _setClipboardComponent: function (e, info, clipboardData) {
+            e.preventDefault();
+            e.stopPropagation();
+            clipboardData.setData('text/html', info.component.outerHTML);
+        },
+
+        onCopy_wysiwyg: function (e) {
+            const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
+            if (typeof functions.onCopy === 'function' && !functions.onCopy(e, clipboardData, core)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+
+            const info = core.currentFileComponentInfo;
+            if (info && !util.isIE) {
+                event._setClipboardComponent(e, info, clipboardData);
+                util.addClass(info.component, 'se-component-copy');
+                // copy effect
+                _w.setTimeout(function () {
+                    util.removeClass(info.component, 'se-component-copy');
+                }, 150);
+            }
+        },
+
+        onCut_wysiwyg: function (e) {
+            const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
+            if (typeof functions.onCut === 'function' && !functions.onCut(e, clipboardData, core)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+
+            const info = core.currentFileComponentInfo;
+            if (info && !util.isIE) {
+                event._setClipboardComponent(e, info, clipboardData);
+                util.removeItem(info.component);
+                core.controllersOff();
+            }
+
+            _w.setTimeout(function () {
+                // history stack
+                core.history.push(false);
+            });
         },
 
         onDrop_wysiwyg: function (e) {
@@ -6506,6 +6558,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             eventWysiwyg.addEventListener('keydown', event.onKeyDown_wysiwyg, false);
             eventWysiwyg.addEventListener('keyup', event.onKeyUp_wysiwyg, false);
             eventWysiwyg.addEventListener('paste', event.onPaste_wysiwyg, false);
+            eventWysiwyg.addEventListener('copy', event.onCopy_wysiwyg, false);
             eventWysiwyg.addEventListener('cut', event.onCut_wysiwyg, false);
             eventWysiwyg.addEventListener('drop', event.onDrop_wysiwyg, false);
             eventWysiwyg.addEventListener('scroll', event.onScroll_wysiwyg, false);
@@ -6565,6 +6618,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             eventWysiwyg.removeEventListener('keydown', event.onKeyDown_wysiwyg);
             eventWysiwyg.removeEventListener('keyup', event.onKeyUp_wysiwyg);
             eventWysiwyg.removeEventListener('paste', event.onPaste_wysiwyg);
+            eventWysiwyg.removeEventListener('copy', event.onCopy_wysiwyg);
             eventWysiwyg.removeEventListener('cut', event.onCut_wysiwyg);
             eventWysiwyg.removeEventListener('drop', event.onDrop_wysiwyg);
             eventWysiwyg.removeEventListener('scroll', event.onScroll_wysiwyg);
@@ -6632,6 +6686,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onKeyUp: null,
         onDrop: null,
         onChange: null,
+        onCopy: null,
+        onCut: null,
         onPaste: null,
         onFocus: null,
         onBlur: null,

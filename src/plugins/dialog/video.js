@@ -216,16 +216,40 @@ export default {
         }
     },
 
+    _setTagAttrs: function (element) {
+        element.setAttribute('controls', true);
+
+        const attrs = this.context.options.videoTagAttrs;
+        if (!attrs) return;
+
+        for (let key in attrs) {
+            if (!this.util.hasOwn(attrs, key)) continue;
+            element.setAttribute(key, attrs[key]);
+        }
+    },
+
     createVideoTag: function () {
         const videoTag = this.util.createElement('VIDEO');
-        videoTag.setAttribute('controls', true);
+        this.plugins.video._setTagAttrs.call(this, videoTag);
         return videoTag;
+    },
+
+    _setIframeAttrs: function (element) {
+        element.frameBorder = '0';
+        element.allowFullscreen = true;
+
+        const attrs = this.context.options.videoIframeAttrs;
+        if (!attrs) return;
+
+        for (let key in attrs) {
+            if (!this.util.hasOwn(attrs, key)) continue;
+            element.setAttribute(key, attrs[key]);
+        }
     },
 
     createIframeTag: function () {
         const iframeTag = this.util.createElement('IFRAME');
-        iframeTag.frameBorder = '0';
-        iframeTag.allowFullscreen = true;
+        this.plugins.video._setIframeAttrs.call(this, iframeTag);
         return iframeTag;
     },
 
@@ -538,12 +562,12 @@ export default {
                 const isYoutube = /youtu\.?be/.test(src);
                 const isVimeo = /vimeo\.com/.test(src);
                 if ((isYoutube || isVimeo) && !/^iframe$/i.test(oFrame.nodeName)) {
-                    const newTag = this.plugins.customVideo.createIframeTag.call(this);
+                    const newTag = this.plugins.video.createIframeTag.call(this);
                     newTag.src = src;
                     oFrame.parentNode.replaceChild(newTag, oFrame);
                     contextVideo._element = oFrame = newTag;
                 } else if (!isYoutube && !isVimeo && !/^videoo$/i.test(oFrame.nodeName)) {
-                    const newTag = this.plugins.customVideo.createVideoTag.call(this);
+                    const newTag = this.plugins.video.createVideoTag.call(this);
                     newTag.src = src;
                     oFrame.parentNode.replaceChild(newTag, oFrame);
                     contextVideo._element = oFrame = newTag;
@@ -611,8 +635,9 @@ export default {
         if (!oFrame) return;
 
         const contextVideo = this.context.video;
-        oFrame.frameBorder = '0';
-        oFrame.allowFullscreen = true;
+        
+        if (/^video$/i.test(oFrame.nodeName)) this.plugins.video._setTagAttrs.call(this, oFrame);
+        else this.plugins.video._setIframeAttrs.call(this, oFrame);
         
         const existElement = this.util.getParentElement(oFrame, this.util.isMediaComponent) || 
             this.util.getParentElement(oFrame, function (current) {
@@ -648,8 +673,6 @@ export default {
         contextVideo._cover = this.util.getParentElement(element, 'FIGURE');
         contextVideo._container = this.util.getParentElement(element, this.util.isMediaComponent);
         contextVideo._align = element.getAttribute('data-align') || 'none';
-
-        if (/^video$/i.test(element.nodeName)) element.setAttribute('controls', true);
 
         if (size) {
             contextVideo._element_w = size.w;

@@ -287,6 +287,12 @@
             <input type="text" id="videoUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
             <br><br>
             <label><input type="checkbox" id="videoMultipleFile">&nbsp;&nbsp;videoMultipleFile</label>
+            <br><br>
+            <label><input type="checkbox" id="videoTagAttrs">&nbsp;&nbsp;videoTagAttrs&nbsp; &nbsp; &nbsp; </label>
+            <textarea type="text" id="videoTagAttrs_value" placeholder='{"poster": "http://suneditor.com/docs/loading.gif", "autoplay": "true"}' style="width: 300px; height: 100px;; vertical-align: top;"></textarea>
+            <br><br>
+            <label><input type="checkbox" id="videoIframeAttrs">&nbsp;&nbsp;videoIframeAttrs</label>
+            <textarea type="text" id="videoIframeAttrs_value" placeholder='{"style": "border: 2px solid red;"}' style="width: 300px; height: 100px;; vertical-align: top;"></textarea>
 
             <br>
             <h4 style="color: #b94a48;">--Audio</h4>
@@ -309,6 +315,9 @@
             <input type="text" id="audioUploadSizeLimit_value" placeholder="Number(Byte)" style="width: 200px">
             <br><br>
             <label><input type="checkbox" id="audioMultipleFile">&nbsp;&nbsp;audioMultipleFile</label>
+            <br><br>
+            <label><input type="checkbox" id="audioTagAttrs">&nbsp;&nbsp;audioTagAttrs</label>
+            <textarea type="text" id="audioTagAttrs_value" placeholder='{"controlslist": "nodownload", "autoplay": "true"}' style="width: 300px; height: 100px;; vertical-align: top;"></textarea>
 
             <br>
             <h4 style="color: #b94a48;">--Table</h4>
@@ -521,6 +530,8 @@ function sun_create () {
         videoUploadUrl: document.getElementById('videoUploadUrl').checked ? document.getElementById('videoUploadUrl_value').value : undefined,
         videoMultipleFile: document.getElementById('videoMultipleFile').checked ? true : undefined,
         videoUploadSizeLimit: document.getElementById('videoUploadSizeLimit').checked ? document.getElementById('videoUploadSizeLimit_value').value : undefined,
+        videoTagAttrs: document.getElementById('videoTagAttrs').checked ? JSON.parse(document.getElementById('videoTagAttrs_value').value) : undefined,
+        videoIframeAttrs: document.getElementById('videoIframeAttrs').checked ? JSON.parse(document.getElementById('videoIframeAttrs_value').value) : undefined,
         audioFileInput: document.getElementById('audioFileInput').checked ? true : undefined,
         audioUrlInput: document.getElementById('audioUrlInput').checked ? undefined : false,
         audioWidth: document.getElementById('audioWidth').checked ? document.getElementById('audioWidth_value').value : undefined,
@@ -529,6 +540,7 @@ function sun_create () {
         audioUploadUrl: document.getElementById('audioUploadUrl').checked ? document.getElementById('audioUploadUrl_value').value : undefined,
         audioMultipleFile: document.getElementById('audioMultipleFile').checked ? true : undefined,
         audioUploadSizeLimit: document.getElementById('audioUploadSizeLimit').checked ? document.getElementById('audioUploadSizeLimit_value').value : undefined,
+        audioTagAttrs: document.getElementById('audioTagAttrs').checked ? JSON.parse(document.getElementById('audioTagAttrs_value').value) : undefined,
         tableCellControllerPosition: document.getElementById('tableCellControllerPosition').checked ? document.getElementById('tableCellControllerPosition_value').value : undefined,
         tabDisable: document.getElementById('tabDisable').checked,
         shortcutsDisable: document.getElementById('shortcutsDisable').checked ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent'] : undefined,

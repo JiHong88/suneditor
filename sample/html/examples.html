@@ -932,6 +932,8 @@
         suneditor.onDrop = function (e) { console.log('onDrop', e) }
         suneditor.onChange = function (contents) { console.log('onChange', contents) }
         suneditor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e, cleanData, maxCharCount) }
+        suneditor.onCopy = function (e, clipboardData, core) { console.log('onCopy', e, clipboardData) }
+        suneditor.onCut = function (e, clipboardData, core) { console.log('onCut', e, clipboardData) }
         suneditor.onFocus = function (contents) { console.log('onFocus', contents) }
         suneditor.onBlur = function (contents) { console.log('onBlur', contents) }
         suneditor.onImageUpload = function (targetElement, index, state, imageInfo, remainingFilesCount) { 

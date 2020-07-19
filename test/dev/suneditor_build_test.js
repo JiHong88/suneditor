@@ -270,6 +270,16 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     display: 'block',
     width: '100%',
     height: '500px',
+    audioTagAttrs: {
+        controlslist: "nodownload",
+    },
+    videoTagAttrs: {
+        poster: "http://suneditor.com/docs/loading.gif",
+        autoplay: true
+    },
+    videoIframeAttrs: {
+        style: "border: 2px solid red;" 
+    },
     // height: 'auto',
     iframeCSSFileName: '.+',
     popupDisplay: 'full',
@@ -279,9 +289,9 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     imageMultipleFile: true,
     videoMultipleFile: true,
     audioMultipleFile: true,
-    // imageUploadUrl: 'http://localhost:3000/editor/upload',
-    // videoUploadUrl: 'http://localhost:3000/editor/upload',
-    // audioUploadUrl: 'http://localhost:3000/editor/upload',
+    imageUploadUrl: 'http://localhost:3000/editor/upload',
+    videoUploadUrl: 'http://localhost:3000/editor/upload',
+    audioUploadUrl: 'http://localhost:3000/editor/upload',
     icons: {
         expansion: "<span>A</span>",
         reduction: "<span>Z</span>"
