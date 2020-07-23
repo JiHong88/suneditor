@@ -5,10 +5,10 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 
 [![GitHub](https://img.shields.io/github/license/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt)
 [![GitHub release](https://img.shields.io/github/release/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases)
-[![npm version](https://img.shields.io/npm/v/suneditor.svg?style=flat-square)](https://nodei.co/npm/suneditor/)
+[![npm version](https://img.shields.io/npm/v/suneditor.svg?style=flat-square)](https://www.npmjs.com/package/suneditor)
 [![bower version](https://img.shields.io/bower/v/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases/latest)
 [![](https://data.jsdelivr.com/v1/package/npm/suneditor/badge)](https://www.jsdelivr.com/package/npm/suneditor)
-[![npm](https://img.shields.io/npm/dt/suneditor.svg?style=flat-square)](https://nodei.co/npm/suneditor/)
+[![npm](https://img.shields.io/npm/dt/suneditor.svg?style=flat-square)](https://www.npmjs.com/package/suneditor)
 ![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/suneditor.svg?style=flat-square)
 
 > The Suneditor is a lightweight, flexible, customizable WYSIWYG text editor for your web applications.
