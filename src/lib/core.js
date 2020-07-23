@@ -4916,7 +4916,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.history.reset(true);
             this._resourcesStateChange();
 
-            if (typeof functions.onload === 'function') return functions.onload(this, reload);
+            _w.setTimeout(function () {
+              if (typeof functions.onload === 'function') functions.onload(core, reload);
+            });
         },
 
         /**
