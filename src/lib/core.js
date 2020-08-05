@@ -4287,7 +4287,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 .replace(this.editorTagsWhitelistRegExp, '')
                 .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
                     let v = null;
-                    const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z]+/)[0].toLowerCase()];
+                    const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z]+:?[a-zA-Z]+/)[0].toLowerCase()];
                     if (tAttr) v = m.match(tAttr);
                     else v = m.match(this._attributesWhitelistRegExp);
 
