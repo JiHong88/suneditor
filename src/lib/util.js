@@ -1593,12 +1593,13 @@ const util = {
     },
 
     /**
-     * @description Check not Allowed tags
+     * @description Check disallowed tags
      * @param {Node} element Element to check
+     * @returns {Boolean}
      * @private
      */
-    _notAllowedTags: function (element) {
-        return  /^(meta|script|link|style|[a-z]+\:[a-z]+)$/i.test(element.nodeName);
+    _disallowedTags: function (element) {
+        return /^(meta|script|link|style|[a-z]+\:[a-z]+)$/i.test(element.nodeName);
     },
 
     /**
@@ -1615,7 +1616,7 @@ const util = {
             regStr += '(?!\\b' + exclusionTags[i] + '\\b)';
         }
 
-        regStr += '[^>^<])+>';
+        regStr += ')[^>]>';
 
         return new RegExp(regStr, 'g');
     },
@@ -1631,7 +1632,7 @@ const util = {
          * It is can use ".children(util.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
          * So check the node type and exclude the text no (current.nodeType !== 1)
          */
-        const emptyWhitelistTags = [], emptyTags = [], wrongList = [], withoutFormatCells = [];
+        const removeTags = [], emptyTags = [], wrongList = [], withoutFormatCells = [];
 
         // wrong position
         const wrongTags = this.getListChildNodes(documentFragment, function (current) {
@@ -1639,7 +1640,7 @@ const util = {
 
             // white list
             if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0) {
-                emptyWhitelistTags.push(current);
+                removeTags.push(current);
                 return false;
             }
 
@@ -1671,8 +1672,8 @@ const util = {
              !this.getParentElement(current, this.isComponent) && nrtag;
         }.bind(this));
 
-        for (let i = 0, len = emptyWhitelistTags.length; i < len; i++) {
-            this.removeItem(emptyWhitelistTags[i]);
+        for (let i = 0, len = removeTags.length; i < len; i++) {
+            this.removeItem(removeTags[i]);
         }
         
         const checkTags = [];
