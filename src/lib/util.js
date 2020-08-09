@@ -780,10 +780,10 @@ const util = {
      * @returns {Number}
      */
     getNumber: function (text, maxDec) {
-        if (!text) return null;
+        if (!text) return 0;
         
         let number = (text + '').match(/-?\d+(\.\d+)?/);
-        if (!number || !number[0]) return null;
+        if (!number || !number[0]) return 0;
 
         number = number[0];
         return maxDec < 0 ? number * 1 : maxDec === 0 ? this._w.Math.round(number * 1) : (number * 1).toFixed(maxDec) * 1;
