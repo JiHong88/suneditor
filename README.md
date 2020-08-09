@@ -509,6 +509,11 @@ textStyles      : You can apply custom style or class to selected text.
                                      '.sun-editor .__se__customClass' // If you want to apply styles to menu items as well
                   Default value: [
                     {
+                        name: 'Code',
+                        class: '__se__t-code',
+                        tag: 'span',
+                    },
+                    {
                         name: 'Translucent', // Text style name
                         style: 'opacity: 0.5;', // Style query
                         tag: 'span', // Style tag name (default: span)
@@ -521,7 +526,7 @@ textStyles      : You can apply custom style or class to selected text.
                     }
                   ]
                   ex) [
-                      'translucent', // The default value is called by name only and the name is called in the language file.
+                      'Code', // The default value is called by name only and the name is called in the language file.
                       {
                           name: 'Emphasis',
                           style: '-webkit-text-emphasis: filled;',

@@ -516,3 +516,12 @@
         0 0 0.8rem #666,
         0 0 1rem #555;
 }
+/* Code */
+.sun-editor-editable .__se__t-code, .sun-editor .__se__t-code {
+    font-family: monospace;
+    color: #666;
+    background-color: #f9f9f9;
+    border: 1px solid #e1e1e1;
+    border-radius: 2px;
+    padding: 4px;
+}
