@@ -156,7 +156,8 @@
             bordered: 'Robežojās',
             neon: 'Neona',
             translucent: 'Caurspīdīgs',
-            shadow: 'Ēna'
+            shadow: 'Ēna',
+            code: 'Kods'
         }
     };
 

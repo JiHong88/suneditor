@@ -134,5 +134,6 @@ export interface Lang {
     neon: string,
     translucent: string,
     shadow: string
+    code: string
   };
 }

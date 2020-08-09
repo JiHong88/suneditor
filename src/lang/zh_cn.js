@@ -155,7 +155,8 @@
             bordered: '边界线',
             neon: '霓虹灯',
             translucent: '半透明',
-            shadow: '阴影'
+            shadow: '阴影',
+            code: '代码'
         }
     };
 

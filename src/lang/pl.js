@@ -156,7 +156,8 @@
             bordered: 'Z obwódką',
             neon: 'Neon',
             translucent: 'Półprzezroczysty',
-            shadow: 'Cień'
+            shadow: 'Cień',
+            code: 'Kod'
         }
     };
 

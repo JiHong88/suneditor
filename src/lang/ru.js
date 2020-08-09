@@ -156,7 +156,8 @@
             bordered: 'Граничная Линия',
             neon: 'неон',
             translucent: 'полупрозрачный',
-            shadow: 'Тень'
+            shadow: 'Тень',
+            code: 'Код'
         }
     };
 
