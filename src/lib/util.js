@@ -303,12 +303,12 @@ const util = {
 
     /**
      * @description It is judged whether it is a node related to the text style.
-     * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)
+     * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code)
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isTextStyleElement: function (element) {
-        return element && element.nodeType !== 3 && /^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(element.nodeName);
+        return element && element.nodeType !== 3 && /^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code)$/i.test(element.nodeName);
     },
 
     /**
@@ -1542,7 +1542,7 @@ const util = {
      */
     htmlRemoveWhiteSpace: function (html) {
         if (!html) return '';
-        return html.trim().replace(/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)[^>^<]+>\s+(?=<)/ig, function (m) { return m.trim(); });
+        return html.trim().replace(/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code)[^>^<]+>\s+(?=<)/ig, function (m) { return m.trim(); });
     },
 
     /**
@@ -1579,7 +1579,7 @@ const util = {
      * @private
      */
     _isMaintainedNode: function (element) {
-        return element.nodeType !== 3 && /^(a|label)$/i.test(typeof element === 'string' ? element : element.nodeName);
+        return element.nodeType !== 3 && /^(a|label|code)$/i.test(typeof element === 'string' ? element : element.nodeName);
     },
 
     /**

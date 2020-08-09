@@ -41,7 +41,7 @@ export default {
             code: {
                 name: this.lang.menu.code,
                 class: '__se__t-code',
-                tag: 'span',
+                tag: 'code',
             },
             translucent: {
                 name: this.lang.menu.translucent,

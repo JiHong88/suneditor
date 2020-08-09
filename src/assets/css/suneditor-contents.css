@@ -520,8 +520,7 @@
 .sun-editor-editable .__se__t-code, .sun-editor .__se__t-code {
     font-family: monospace;
     color: #666;
-    background-color: #f9f9f9;
-    border: 1px solid #e1e1e1;
-    border-radius: 2px;
-    padding: 4px;
+    background-color: rgba(27,31,35,.05);
+    border-radius: 6px;
+    padding: 0.2em 0.4em;
 }

@@ -333,7 +333,7 @@ value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {String}
 
 // Whitelist--------------------------------------å---------------------------------------------------------
-// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup'
+// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
@@ -511,7 +511,7 @@ textStyles      : You can apply custom style or class to selected text.
                     {
                         name: 'Code',
                         class: '__se__t-code',
-                        tag: 'span',
+                        tag: 'code',
                     },
                     {
                         name: 'Translucent', // Text style name
