@@ -19,19 +19,6 @@ const util = {
     isOSX_IOS: /(Mac|iPhone|iPod|iPad)/.test(navigator.platform),
 
     /**
-     * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
-     * @param {String} text 
-     * @returns {String} HTML string
-     * @private
-     */
-    _tagConvertor: function (text) {
-        const ec = {'b': 'strong', 'i': 'em', 'ins': 'u', 'strike': 'del', 's': 'del'};
-        return text.replace(/(<\/?)(b|strong|i|em|ins|u|s|strike|del)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
-            return t + ((typeof ec[n] === 'string') ? ec[n] : n);
-        });
-    },
-
-    /**
      * @description HTML Reserved Word Converter.
      * @param {String} contents 
      * @returns {String} HTML string
@@ -1639,7 +1626,7 @@ const util = {
             if (current.nodeType !== 1) return false;
 
             // white list
-            if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0) {
+            if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && this.isNotCheckingNode(current)) {
                 removeTags.push(current);
                 return false;
             }

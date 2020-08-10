@@ -282,6 +282,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     },
     // height: 'auto',
     iframeCSSFileName: '.+',
+    addTagsWhitelist: 'i',
     popupDisplay: 'full',
     charCounter: true,
     charCounterType: 'byte-html',
