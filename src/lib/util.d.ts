@@ -517,7 +517,7 @@ declare interface util {
      * @param disabled Disabled value
      * @param buttonList Button array
      */
-    toggleDisabledButtons(disabled: boolean, buttonList: Element[] | HTMLCollection | NodeList): void;
+    setDisabledButtons(disabled: boolean, buttonList: Element[] | HTMLCollection | NodeList): void;
 
     /**
      * @description Delete argumenu value element

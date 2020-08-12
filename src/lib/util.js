@@ -1113,7 +1113,7 @@ const util = {
      * @param {Boolean} disabled Disabled value
      * @param {Array|HTMLCollection|NodeList} buttonList Button array
      */
-    toggleDisabledButtons: function (disabled, buttonList) {
+    setDisabledButtons: function (disabled, buttonList) {
         for (let i = 0, len = buttonList.length; i < len; i++) {
             buttonList[i].disabled = disabled;
         }

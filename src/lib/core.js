@@ -3865,7 +3865,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         toggleCodeView: function () {
             const isCodeView = this._variable.isCodeView;
             this.controllersOff();
-            util.toggleDisabledButtons(!isCodeView, this.codeViewDisabledButtons);
+            util.setDisabledButtons(!isCodeView, this.codeViewDisabledButtons);
 
             if (isCodeView) {
                 this._setCodeDataToEditor();
