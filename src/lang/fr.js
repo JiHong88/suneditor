@@ -156,7 +156,8 @@
             bordered: 'Ligne de démarcation',
             neon: 'Néon',
             translucent: 'Translucide',
-            shadow: 'L\'ombre'
+            shadow: 'L\'ombre',
+            code: 'Code'
         }
     };
 

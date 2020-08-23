@@ -156,7 +156,8 @@
             bordered: '境界線',
             neon: 'ネオン',
             translucent: '半透明',
-            shadow: '影'
+            shadow: '影',
+            code: 'コード'
         }
     };
 

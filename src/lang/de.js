@@ -156,7 +156,8 @@
             bordered: 'Umrandet',
             neon: 'Neon',
             translucent: 'Durchscheinend',
-            shadow: 'Schatten'
+            shadow: 'Schatten',
+            code: 'Quellcode'
         }
     };
 

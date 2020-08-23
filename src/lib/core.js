@@ -207,6 +207,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _htmlCheckWhitelistRegExp: null,
 
         /**
+         * @description RegExp when using check disallowd tags. (b, i, ins, strike, s)
+         * @private
+         */
+        _disallowedTextTagsRegExp: null,
+
+        /**
          * @description Editor tags whitelist (RegExp object)
          * util.createTagsWhitelist(options._editorTagsWhitelist)
          */
@@ -3898,7 +3904,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         toggleCodeView: function () {
             const isCodeView = this._variable.isCodeView;
             this.controllersOff();
-            util.toggleDisabledButtons(!isCodeView, this.codeViewDisabledButtons);
+            util.setDisabledButtons(!isCodeView, this.codeViewDisabledButtons);
 
             if (isCodeView) {
                 this._setCodeDataToEditor();
@@ -4286,7 +4292,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _makeLine: function (node, requireFormat) {
             // element
             if (node.nodeType === 1) {
-                if (util._notAllowedTags(node)) return '';
+                if (util._disallowedTags(node)) return '';
                 if (!requireFormat || (util.isFormatElement(node) || util.isRangeFormatElement(node) || util.isComponent(node) || util.isMedia(node) || (util.isAnchor(node) && util.isMedia(node.firstElementChild)))) {
                     return node.outerHTML;
                 } else {
@@ -4313,6 +4319,35 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
+         * @param {String} text 
+         * @returns {String} HTML string
+         * @private
+         */
+        _tagConvertor: function (text) {
+            if (!this._disallowedTextTagsRegExp) return text;
+
+            const ec = {'b': 'strong', 'i': 'em', 'ins': 'u', 'strike': 'del', 's': 'del'};
+            return text.replace(this._disallowedTextTagsRegExp, function (m, t, n) {
+                return t + (typeof ec[n] === 'string' ? ec[n] : n);
+            });
+        },
+
+        /**
+         * @description Delete disallowed tags
+         * @param {String} html HTML string
+         * @returns {String}
+         * @private
+         */
+        _deleteDisallowedTags: function (html) {
+            return html
+                .replace(/\n/g, '')
+                .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/gi, '')
+                .replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '')
+                .replace(this.editorTagsWhitelistRegExp, '');
+        },
+
+        /**
          * @description Gets the clean HTML code for editor
          * @param {String} html HTML string
          * @param {String|RegExp} whitelist Regular expression of allowed tags.
@@ -4320,11 +4355,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist) {
-            html = html
-                .replace(/\n/g, '')
-                .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
-                .replace(this.editorTagsWhitelistRegExp, '')
+            html = this._deleteDisallowedTags(html)
                 .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
+                    if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
+
                     let v = null;
                     const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z0-9]+/)[0].toLowerCase()];
                     if (tAttr) v = m.match(tAttr);
@@ -4375,7 +4409,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             for (let i = 0, len = domTree.length, t; i < len; i++) {
                 t = domTree[i];
-                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !util._notAllowedTags(t)) {
+                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !util._disallowedTags(t)) {
                     requireFormat = true;
                     break;
                 }
@@ -4386,7 +4420,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
-            return util._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, ''));
+            return this._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, ''));
         },
 
         /**
@@ -4395,12 +4429,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
-            contents = contents
-                .replace(/\n/g, '')
-                .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
-                .replace(this.editorTagsWhitelistRegExp, '');
-                
-            const dom = _d.createRange().createContextualFragment(contents);
+            const dom = _d.createRange().createContextualFragment(this._deleteDisallowedTags(contents));
+
             try {
                 util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
             } catch (error) {
@@ -4416,7 +4446,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (cleanHTML.length === 0) return '<p><br></p>';
 
             cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
-            return util._tagConvertor(cleanHTML);
+            return this._tagConvertor(cleanHTML);
         },
 
         /**
@@ -4640,6 +4670,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _init: function (reload, _initHTML) {
+            const wRegExp = _w.RegExp;
             this._ww = options.iframe ? context.element.wysiwygFrame.contentWindow : _w;
             this._wd = _d;
             this._charTypeHTML = options.charCounterType === 'byte-html';
@@ -4657,8 +4688,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     child = child.parentNode;
                 }
             }
-            
-            const wRegExp = _w.RegExp;
+
+            // set disallow text nodes
+            const disallowTextTags = ['b', 'i', 'ins', 's', 'strike'];
+            const allowTextTags = !options.addTagsWhitelist ? [] : options.addTagsWhitelist.split('|').filter(function (v) { return /b|i|ins|s|strike/i.test(v); });
+            for (let i = 0; i < allowTextTags.length; i++) {
+                disallowTextTags.splice(disallowTextTags.indexOf(allowTextTags[i].toLowerCase()), 1);
+            }
+            this._disallowedTextTagsRegExp = disallowTextTags.length === 0 ? null : new wRegExp('(<\\/?)(' + disallowTextTags.join('|') + ')\\b\\s*(?:[^>^<]+)?\\s*(?=>)', 'gi');
+
             // set whitelist
             const defaultAttr = 'contenteditable|colspan|rowspan|target|href|src|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
@@ -5267,7 +5305,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const selectionNode = core.getSelectionNode();
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
-            if ((!formatEl || formatEl === rangeEl) && !util.isNonEditable(targetElement)) {
+            if ((!formatEl || formatEl === rangeEl) && !util.isNonEditable(targetElement) && !util.isList(rangeEl)) {
                 const range = core.getRange();
                 if (util.getFormatElement(range.startContainer) === util.getFormatElement(range.endContainer)) {
                     if (util.isList(rangeEl)) {
@@ -6116,7 +6154,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
-            if (((!formatEl && range.collapsed) || formatEl === rangeEl) && !util.isComponent(selectionNode)) {
+            if (((!formatEl && range.collapsed) || formatEl === rangeEl) && !util.isComponent(selectionNode) && !util.isList(selectionNode)) {
                 core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
                 selectionNode = core.getSelectionNode();
             }

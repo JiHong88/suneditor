@@ -156,7 +156,8 @@
             bordered: 'Mărginit',
             neon: 'Neon',
             translucent: 'Translucent',
-            shadow: 'Umbră'
+            shadow: 'Umbră',
+            code: 'Citat'
         }
     };
 

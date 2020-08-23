@@ -333,7 +333,7 @@ value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {String}
 
 // Whitelist--------------------------------------å---------------------------------------------------------
-// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup'
+// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
@@ -509,6 +509,11 @@ textStyles      : You can apply custom style or class to selected text.
                                      '.sun-editor .__se__customClass' // If you want to apply styles to menu items as well
                   Default value: [
                     {
+                        name: 'Code',
+                        class: '__se__t-code',
+                        tag: 'code',
+                    },
+                    {
                         name: 'Translucent', // Text style name
                         style: 'opacity: 0.5;', // Style query
                         tag: 'span', // Style tag name (default: span)
@@ -521,7 +526,7 @@ textStyles      : You can apply custom style or class to selected text.
                     }
                   ]
                   ex) [
-                      'translucent', // The default value is called by name only and the name is called in the language file.
+                      'Code', // The default value is called by name only and the name is called in the language file.
                       {
                           name: 'Emphasis',
                           style: '-webkit-text-emphasis: filled;',

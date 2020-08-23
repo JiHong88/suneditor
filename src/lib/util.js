@@ -19,19 +19,6 @@ const util = {
     isOSX_IOS: /(Mac|iPhone|iPod|iPad)/.test(navigator.platform),
 
     /**
-     * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
-     * @param {String} text 
-     * @returns {String} HTML string
-     * @private
-     */
-    _tagConvertor: function (text) {
-        const ec = {'b': 'strong', 'i': 'em', 'ins': 'u', 'strike': 'del', 's': 'del'};
-        return text.replace(/(<\/?)(b|strong|i|em|ins|u|s|strike|del)\b\s*(?:[^>^<]+)?\s*(?=>)/ig, function (m, t, n) {
-            return t + ((typeof ec[n] === 'string') ? ec[n] : n);
-        });
-    },
-
-    /**
      * @description HTML Reserved Word Converter.
      * @param {String} contents 
      * @returns {String} HTML string
@@ -303,12 +290,12 @@ const util = {
 
     /**
      * @description It is judged whether it is a node related to the text style.
-     * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)
+     * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code)
      * @param {Node} element The node to check
      * @returns {Boolean}
      */
     isTextStyleElement: function (element) {
-        return element && element.nodeType !== 3 && /^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)$/i.test(element.nodeName);
+        return element && element.nodeType !== 3 && /^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code)$/i.test(element.nodeName);
     },
 
     /**
@@ -780,10 +767,10 @@ const util = {
      * @returns {Number}
      */
     getNumber: function (text, maxDec) {
-        if (!text) return null;
+        if (!text) return 0;
         
         let number = (text + '').match(/-?\d+(\.\d+)?/);
-        if (!number || !number[0]) return null;
+        if (!number || !number[0]) return 0;
 
         number = number[0];
         return maxDec < 0 ? number * 1 : maxDec === 0 ? this._w.Math.round(number * 1) : (number * 1).toFixed(maxDec) * 1;
@@ -1126,7 +1113,7 @@ const util = {
      * @param {Boolean} disabled Disabled value
      * @param {Array|HTMLCollection|NodeList} buttonList Button array
      */
-    toggleDisabledButtons: function (disabled, buttonList) {
+    setDisabledButtons: function (disabled, buttonList) {
         for (let i = 0, len = buttonList.length; i < len; i++) {
             buttonList[i].disabled = disabled;
         }
@@ -1542,7 +1529,7 @@ const util = {
      */
     htmlRemoveWhiteSpace: function (html) {
         if (!html) return '';
-        return html.trim().replace(/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)[^>^<]+>\s+(?=<)/ig, function (m) { return m.trim(); });
+        return html.trim().replace(/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code)[^>^<]+>\s+(?=<)/ig, function (m) { return m.trim(); });
     },
 
     /**
@@ -1579,7 +1566,7 @@ const util = {
      * @private
      */
     _isMaintainedNode: function (element) {
-        return element.nodeType !== 3 && /^(a|label)$/i.test(typeof element === 'string' ? element : element.nodeName);
+        return element.nodeType !== 3 && /^(a|label|code)$/i.test(typeof element === 'string' ? element : element.nodeName);
     },
 
     /**
@@ -1593,12 +1580,13 @@ const util = {
     },
 
     /**
-     * @description Check not Allowed tags
+     * @description Check disallowed tags
      * @param {Node} element Element to check
+     * @returns {Boolean}
      * @private
      */
-    _notAllowedTags: function (element) {
-        return  /^(meta|script|link|style|[a-z]+\:[a-z]+)$/i.test(element.nodeName);
+    _disallowedTags: function (element) {
+        return /^(meta|script|link|style|[a-z]+\:[a-z]+)$/i.test(element.nodeName);
     },
 
     /**
@@ -1615,7 +1603,7 @@ const util = {
             regStr += '(?!\\b' + exclusionTags[i] + '\\b)';
         }
 
-        regStr += '[^>^<])+>';
+        regStr += ')[^>]>';
 
         return new RegExp(regStr, 'g');
     },
@@ -1631,15 +1619,15 @@ const util = {
          * It is can use ".children(util.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
          * So check the node type and exclude the text no (current.nodeType !== 1)
          */
-        const emptyWhitelistTags = [], emptyTags = [], wrongList = [], withoutFormatCells = [];
+        const removeTags = [], emptyTags = [], wrongList = [], withoutFormatCells = [];
 
         // wrong position
         const wrongTags = this.getListChildNodes(documentFragment, function (current) {
             if (current.nodeType !== 1) return false;
 
             // white list
-            if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0) {
-                emptyWhitelistTags.push(current);
+            if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && this.isNotCheckingNode(current)) {
+                removeTags.push(current);
                 return false;
             }
 
@@ -1671,8 +1659,8 @@ const util = {
              !this.getParentElement(current, this.isComponent) && nrtag;
         }.bind(this));
 
-        for (let i = 0, len = emptyWhitelistTags.length; i < len; i++) {
-            this.removeItem(emptyWhitelistTags[i]);
+        for (let i = 0, len = removeTags.length; i < len; i++) {
+            this.removeItem(removeTags[i]);
         }
         
         const checkTags = [];

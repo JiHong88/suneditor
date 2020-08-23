@@ -159,7 +159,8 @@
             bordered: 'Afgrænsningslinje',
             neon: 'Neon',
             translucent: 'Gennemsigtig',
-            shadow: 'Skygge'
+            shadow: 'Skygge',
+            code: 'Code'
         }
     };
 

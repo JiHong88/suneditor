@@ -471,8 +471,8 @@
             }
 
             if (this.currentControllerName !== plugin) {
-                this.util.toggleDisabledButtons(true, this.resizingDisabledButtons);
-                this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton, this.util.toggleDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
+                this.util.setDisabledButtons(true, this.resizingDisabledButtons);
+                this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton, this.util.setDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
             }
     
             // button group
