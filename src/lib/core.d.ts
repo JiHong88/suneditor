@@ -362,7 +362,7 @@ interface Core {
     /**
      * @description Delete selected node and insert argument value node and return.
      * If the "afterNode" exists, it is inserted after the "afterNode"
-     * Inserting a text node merges with both text nodes on both sides and returns a new "{ startOffset, endOffset }".
+     * Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
      * @param oNode Element to be inserted
      * @param afterNode If the node exists, it is inserted after the node
      * @returns

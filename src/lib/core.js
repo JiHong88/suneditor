@@ -1360,7 +1360,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Delete selected node and insert argument value node and return.
          * If the "afterNode" exists, it is inserted after the "afterNode"
-         * Inserting a text node merges with both text nodes on both sides and returns a new "{ startOffset, endOffset }".
+         * Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
          * @param {Node} oNode Element to be inserted
          * @param {Node|null} afterNode If the node exists, it is inserted after the node
          * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
@@ -1371,9 +1371,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return null;
             }
 
-            const isComp = util.isFormatElement(oNode) || util.isRangeFormatElement(oNode) || util.isComponent(oNode);
+            const freeFormat = util.getFreeFormatElement(this.getSelectionNode(), null);
+            const isFormats = (!freeFormat && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) || util.isComponent(oNode);
 
-            if (!afterNode && isComp) {
+            if (!afterNode && isFormats) {
                 const r = this.removeNode();
                 if (r.container.nodeType === 3 || util.isBreak(r.container)) {
                     const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
@@ -1382,12 +1383,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            const range = (!afterNode && !isComp) ? this.getRange_addLine(this.getRange()) : this.getRange();
-            const startCon = range.startContainer;
-            const startOff = range.startOffset;
-            const endCon = range.endContainer;
-            const endOff = range.endOffset;
+            const range = (!afterNode && !isFormats) ? this.getRange_addLine(this.getRange()) : this.getRange();
             const commonCon = range.commonAncestorContainer;
+            const startOff = range.startOffset;
+            const endOff = range.endOffset;
+            const formatRange = range.startContainer === commonCon;
+            const startCon = formatRange ? commonCon.childNodes[startOff] : range.startContainer;
+            const endCon = formatRange ? commonCon.childNodes[endOff] : range.endContainer;
             let parentNode, originAfter = null;
 
             if (!afterNode) {
@@ -1431,7 +1433,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         if (!this.isEdgePoint(startCon, startOff)) removeNode = startCon.splitText(startOff);
 
                         parentNode.removeChild(removeNode);
-                        if (parentNode.childNodes.length === 0 && isComp) {
+                        if (parentNode.childNodes.length === 0 && isFormats) {
                             parentNode.innerHTML = '<br>';
                         }
                     }
@@ -1439,7 +1441,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         const removedTag = this.removeNode();
                         const container = removedTag.container;
                         const prevContainer = removedTag.prevContainer;
-                        if (container && container.childNodes.length === 0 && isComp) {
+                        if (container && container.childNodes.length === 0 && isFormats) {
                             if (util.isFormatElement(container)) {
                                 container.innerHTML = '<br>';
                             } else if (util.isRangeFormatElement(container)) {
@@ -1447,7 +1449,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             }
                         }
 
-                        if (!isComp && prevContainer) {
+                        if (!isFormats && prevContainer) {
                             parentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
                             if (parentNode.contains(container)) {
                                 afterNode = container;
@@ -1458,8 +1460,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 afterNode = null;
                             }
                         } else {
-                            parentNode = isComp ? commonCon : container;
-                            afterNode = isComp ? endCon : null;
+                            parentNode = isFormats ? commonCon : container;
+                            afterNode = isFormats ? endCon : null;
                         }
 
                         while (afterNode && afterNode.parentNode !== commonCon) {
@@ -1495,7 +1497,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (oldParent.childNodes.length === 0 && parentNode !== oldParent) util.removeItem(oldParent);
                 }
 
-                if (isComp && !util.isRangeFormatElement(parentNode) && !util.isListCell(parentNode) && !util.isWysiwygDiv(parentNode)) {
+                if (isFormats && !freeFormat && !util.isRangeFormatElement(parentNode) && !util.isListCell(parentNode) && !util.isWysiwygDiv(parentNode)) {
                     afterNode = parentNode.nextElementSibling;
                     parentNode = parentNode.parentNode;
                 }
@@ -1503,6 +1505,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             } catch (e) {
                 parentNode.appendChild(oNode);
             } finally {
+                if (freeFormat && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) {
+                    oNode = this._setIntoFreeFormat(oNode);
+                }
+
                 if (!util.isComponent(oNode)) {
                     let offset = 1;
                     if (oNode.nodeType === 3) {
@@ -1520,11 +1526,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             oNode.textContent += nextText;
                             util.removeItem(next);
                         }
-    
-                        return {
+
+                        const newRange = {
+                            container: oNode,
                             startOffset: previousText.length,
                             endOffset: oNode.textContent.length - nextText.length
                         };
+
+                        this.setRange(oNode, newRange.startOffset, oNode, newRange.endOffset);
+    
+                        return newRange;
                     } else if (!util.isBreak(oNode) && util.isFormatElement(parentNode)) {
                         let zeroWidth = null;
                         if (!oNode.previousSibling) {
@@ -1551,6 +1562,34 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 return oNode;
             }
+        },
+
+        _setIntoFreeFormat: function (oNode) {
+            const parentNode = oNode.parentNode;
+            let oNodeChildren, lastONode;
+            
+            while (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode)) {
+                oNodeChildren = oNode.childNodes;
+                lastONode = null;
+                
+                while (oNodeChildren[0]) {
+                    lastONode = oNodeChildren[0];
+                    if (util.isFormatElement(lastONode) || util.isRangeFormatElement(lastONode)) {
+                        this._setIntoFreeFormat(lastONode);
+                        if (!oNode.parentNode) break;
+                        oNodeChildren = oNode.childNodes;
+                        continue;
+                    }
+                    
+                    parentNode.insertBefore(lastONode, oNode);
+                }
+                
+                if (oNode.childNodes.length === 0) util.removeItem(oNode);
+                oNode = util.createElement('BR');
+                parentNode.insertBefore(oNode, lastONode.nextSibling);
+            }
+
+            return oNode;
         },
 
         /**
@@ -4287,7 +4326,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 .replace(this.editorTagsWhitelistRegExp, '')
                 .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
                     let v = null;
-                    const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z]+:?[a-zA-Z]+/)[0].toLowerCase()];
+                    const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z0-9]+/)[0].toLowerCase()];
                     if (tAttr) v = m.match(tAttr);
                     else v = m.match(this._attributesWhitelistRegExp);
 
@@ -7158,7 +7197,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     let c, a, t;
                     while ((c = domTree[0])) {
                         t = core.insertNode(c, a, false);
-                        a = c;
+                        a = t.container || t;
                     }
                     const offset = a.nodeType === 3 ? (t.endOffset || a.textContent.length): a.childNodes.length;
                     core.setRange(a, offset, a, offset);
