@@ -1560,13 +1560,13 @@ const util = {
     },
 
     /**
-     * @description Nodes that must remain undetached when changing text nodes
+     * @description Nodes that must remain undetached when changing text nodes (A, Label, Code, Span(font-size))
      * @param {Node} element Element to check
      * @returns {Boolean}
      * @private
      */
     _isMaintainedNode: function (element) {
-        return element.nodeType !== 3 && /^(a|label|code)$/i.test(typeof element === 'string' ? element : element.nodeName);
+        return element.nodeType !== 3 && (/^(a|label|code)$/i.test(element.nodeName) || !!element.style.fontSize);
     },
 
     /**
