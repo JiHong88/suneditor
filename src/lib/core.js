@@ -1393,7 +1393,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const commonCon = range.commonAncestorContainer;
             const startOff = range.startOffset;
             const endOff = range.endOffset;
-            const formatRange = range.startContainer === commonCon;
+            const formatRange = range.startContainer === commonCon && util.isFormatElement(commonCon);
             const startCon = formatRange ? commonCon.childNodes[startOff] : range.startContainer;
             const endCon = formatRange ? commonCon.childNodes[endOff] : range.endContainer;
             let parentNode, originAfter = null;
