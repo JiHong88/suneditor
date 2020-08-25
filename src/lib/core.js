@@ -1604,6 +1604,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Object}
          */
         removeNode: function () {
+            if (!this._resetRangeToTextNode()) console.warn('[SUNEDITOR.core.removeNode.exception] An exception occurred while resetting the "Range" object.');
+
             const range = this.getRange();
             let container, offset = 0;
             let startCon = range.startContainer;
