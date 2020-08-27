@@ -567,6 +567,8 @@ imageUploadUrl  : The image upload to server mapping address.       default: nul
 imageUploadSizeLimit: The size of the total uploadable images (in bytes).
                       Invokes the "onImageUploadError" method.  default: null {Number}
 imageMultipleFile: If true, multiple images can be selected.    default: false {Boolean}
+imageAccept      : Define the "accept" attribute of the input.  default: "*" {String}
+                   ex) "*" or ".jpg, .png .."
 // Image - image gallery
 imageGalleryUrl     : The url of the image gallery, if you use the image gallery.
                       When "imageUrlInput" is true, an image gallery button is created in the image modal.
@@ -639,6 +641,8 @@ videoTagAttrs    : Define "Attributes" of the video tag.                      de
                    ex) { poster: "http://suneditor.com/docs/loading.gif", autoplay: true }
 videoIframeAttrs : Define "Attributes" of the iframe tag. (Youtube, Vimeo).   default: null {Object}
                    ex) { style: "border: 2px solid red;" }
+videoAccept      : Define the "accept" attribute of the input.  default: "*" {String}
+                   ex) "*" or ".mp4, .avi .."
 
 // Audio----------------------------------------------------------------------------------------------------------
 audioWidth      : The default width size of the audio frame.        default: '300px' {String}
@@ -669,6 +673,8 @@ audioUploadSizeLimit: The size of the total uploadable audios (in bytes).
 audioMultipleFile: If true, multiple audios can be selected.    default: false {Boolean}
 audioTagAttrs    : Define "Attributes" of the audio tag.        default: null {Object} 
                    ex) { controlslist: "nodownload", autoplay: true }
+videoAccept      : Define the "accept" attribute of the input.  default: "*" {String}
+                   ex) "*" or ".mp3, .wav .."
 
 // Table----------------------------------------------------------------------------------------------------------
 tableCellControllerPosition : Define position to the table cell controller('cell', 'top'). default: 'cell' {String}

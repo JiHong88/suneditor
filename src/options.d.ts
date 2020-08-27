@@ -255,6 +255,11 @@ export interface SunEditorOptions {
      */
     imageMultipleFile?: boolean;
     /**
+     * Define the "accept" attribute of the input.
+     * ex) "*" or ".jpg, .png .."
+     */
+    imageAccept?: string;               
+    /**
      * Image - image gallery
      * =====
      * The url of the image gallery, if you use the image gallery
@@ -342,6 +347,11 @@ export interface SunEditorOptions {
      */
     videoIframeAttrs?: Record<string, string | boolean>;
     /**
+     * Define the "accept" attribute of the input.
+     * "*" or ".mp4, .avi .."
+     */
+    videoAccept?: string;
+    /**
      * Audio
      * =====
      */
@@ -382,6 +392,11 @@ export interface SunEditorOptions {
      * @example { controlslist: "nodownload", autoplay: true }
      */
     audioTagAttrs?: Record<string, string | boolean>;
+    /**
+     * Define the "accept" attribute of the input.
+     * "*" or ".mp3, .wav .."
+     */
+    audioAccept?: string;
     /**
      * Table
      * =====
