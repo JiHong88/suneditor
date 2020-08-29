@@ -810,11 +810,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
-         * @description Set current editor's range object
+         * @description Set current editor's range object and return.
          * @param {Node} startCon The startContainer property of the selection object.
          * @param {Number} startOff The startOffset property of the selection object.
          * @param {Node} endCon The endContainer property of the selection object.
          * @param {Number} endOff The endOffset property of the selection object.
+         * @returns {Object} Range object.
          */
         setRange: function (startCon, startOff, endCon, endOff) {
             if (!startCon || !endCon) return;
@@ -841,6 +842,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             selection.addRange(range);
             this._editorRange();
             if (options.iframe) this.nativeFocus();
+
+            return range;
         },
 
         /**
@@ -872,7 +875,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Object}
          */
         getRange: function () {
-            return this._variable._range || this._createDefaultRange();
+            const range = this._variable._range || this._createDefaultRange();
+            const selection = this.getSelection();
+            if (range.collapsed === selection.isCollapsed) return range;
+            
+            if (selection.rangeCount > 0) {
+                this._variable._range = selection.getRangeAt(0);
+                return this._variable._range;
+            } else {
+                const sc = selection.anchorNode, ec = selection.focusNode, so = selection.anchorOffset, eo = selection.focusOffset;
+                const compareValue = util.compareElements(sc, ec);
+                const rightDir = compareValue.ancestor && (compareValue.result === 0 ? so <= eo : compareValue.result > 1 ? true : false);
+                return this.setRange(
+                    rightDir ? sc : ec,
+                    rightDir ? so : eo,
+                    rightDir ? ec : sc,
+                    rightDir ? eo : so
+                );
+            }
         },
 
         /**
@@ -2227,6 +2247,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
          */
         nodeChange: function (appendNode, styleArray, removeNodeArray, strictRemove) {
+            this._resetRangeToTextNode();
             let range = this.getRange_addLine(this.getRange());
             styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
             removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
@@ -2446,12 +2467,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // node Changes
             newNode = appendNode.cloneNode(false);
 
-            const isRemoveAnchor = isRemoveFormat || (isRemoveNode && (function (arr, _isMaintainedNode) {
+            const isRemoveAnchor = isRemoveFormat || (isRemoveNode && (function (arr) {
                 for (let n = 0, len = arr.length; n < len; n++) {
-                    if (_isMaintainedNode(arr[n])) return true;
+                    if (util._isMaintainedNode(arr[n])) return true;
                 }
                 return false;
-            })(removeNodeArray, util._isMaintainedNode));
+            })(removeNodeArray));
 
             const _getMaintainedNode = this._util_getMaintainedNode.bind(util, isRemoveAnchor);
             const _isMaintainedNode = this._util_isMaintainedNode.bind(util, isRemoveAnchor);

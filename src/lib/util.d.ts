@@ -405,6 +405,14 @@ declare interface util {
     getElementDepth(element: Node): number;
 
     /**
+     * @description Compares two elements to find a common ancestor, and returns the order of the two elements.
+     * @param a Node to compare.
+     * @param b Node to compare.
+     * @returns
+     */
+    compareElements(a: Node, b: Node): {ancestor: Element | null, a: Node, b: Node, result: number};
+
+    /**
      * @description Get the parent element of the argument value.
      * A tag that satisfies the query condition is imported.
      * Returns null if not found.

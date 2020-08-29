@@ -253,13 +253,14 @@ interface Core {
     focusEdge(focusEl: Element | null): void;
 
     /**
-     * @description Set current editor's range object
+     * @description Set current editor's range object and return.
      * @param startCon The startContainer property of the selection object.
      * @param startOff The startOffset property of the selection object.
      * @param endCon The endContainer property of the selection object.
      * @param endOff The endOffset property of the selection object.
+     * @returns
      */
-    setRange(startCon: Node, startOff: number, endCon: Node, endOff: number): void;
+    setRange(startCon: Node, startOff: number, endCon: Node, endOff: number): Range;
 
     /**
      * @description Remove range object and button effect

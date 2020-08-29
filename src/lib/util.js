@@ -848,6 +848,33 @@ const util = {
     },
 
     /**
+     * @description Compares two elements to find a common ancestor, and returns the order of the two elements.
+     * @param {Node} a Node to compare.
+     * @param {Node} b Node to compare.
+     * @returns {Object} { ancesstor, a, b, result: (a > b ? 1 : a < b ? -1 : 0) };
+     */
+    compareElements: function (a, b) {
+        let aNode = a, bNode = b;
+        while (aNode && bNode && aNode.parentNode !== bNode.parentNode) {
+            aNode = aNode.parentNode;
+            bNode = bNode.parentNode;
+        }
+
+        if (!aNode || !bNode) return { ancestor: null, a: a, b: b, result: 0 };
+
+        const children = aNode.parentNode.childNodes;
+        const aIndex = this.getArrayIndex(children, aNode);
+        const bIndex = this.getArrayIndex(children, bNode);
+
+        return {
+            ancestor: aNode.parentNode,
+            a: aNode,
+            b: bNode,
+            result: aIndex > bIndex ? 1 : aIndex < bIndex ? -1 : 0
+        };
+    },
+
+    /**
      * @description Get the parent element of the argument value.
      * A tag that satisfies the query condition is imported.
      * Returns null if not found.
@@ -1561,12 +1588,13 @@ const util = {
 
     /**
      * @description Nodes that must remain undetached when changing text nodes (A, Label, Code, Span(font-size))
-     * @param {Node} element Element to check
+     * @param {Node|String} element Element to check
      * @returns {Boolean}
      * @private
      */
     _isMaintainedNode: function (element) {
-        return element.nodeType !== 3 && (/^(a|label|code)$/i.test(element.nodeName) || !!element.style.fontSize);
+        const isStr = typeof element === 'string';
+        return element.nodeType !== 3 && (/^(a|label|code)$/i.test(isStr ? element : element.nodeName) || (!isStr && !this.isWysiwygDiv(element) && !!element.style.fontSize));
     },
 
     /**
