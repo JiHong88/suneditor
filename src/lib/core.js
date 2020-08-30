@@ -7238,8 +7238,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Element|String} html HTML Element or HTML string or plain string
          * @param {Boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
          * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+         * @param {Boolean} rangeSelection If true, range select the inserted node.
          */
-        insertHTML: function (html, notCleaningData, checkCharCount) {
+        insertHTML: function (html, notCleaningData, checkCharCount, rangeSelection) {
             if (typeof html === 'string') {
                 if (!notCleaningData) html = core.cleanHTML(html, null);
                 try {
@@ -7255,13 +7256,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         if (!core.checkCharCount(checkHTML, null)) return;
                     }
 
-                    let c, a, t;
+                    let c, a, t, firstCon;
                     while ((c = domTree[0])) {
                         t = core.insertNode(c, a, false);
                         a = t.container || t;
+                        if (!firstCon) firstCon = t;
                     }
+
                     const offset = a.nodeType === 3 ? (t.endOffset || a.textContent.length): a.childNodes.length;
-                    core.setRange(a, offset, a, offset);
+                    if (rangeSelection) core.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
+                    else core.setRange(a, offset, a, offset);
                 } catch (error) {
                     core.execCommand('insertHTML', false, html);
                 }
