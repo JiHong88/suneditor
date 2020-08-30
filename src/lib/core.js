@@ -2473,9 +2473,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
                 return false;
             })(removeNodeArray));
+            const isMaintainedEl = util._isMaintainedNode(newNode);
 
-            const _getMaintainedNode = this._util_getMaintainedNode.bind(util, isRemoveAnchor);
-            const _isMaintainedNode = this._util_isMaintainedNode.bind(util, isRemoveAnchor);
+            const _getMaintainedNode = this._util_getMaintainedNode.bind(util, isRemoveAnchor, isMaintainedEl);
+            const _isMaintainedNode = this._util_isMaintainedNode.bind(util, isRemoveAnchor, isMaintainedEl);
 
             // one line
             if (oneLine) {
@@ -2487,6 +2488,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (start.container === end.container && util.onlyZeroWidthSpace(start.container)) {
                     start.offset = end.offset = 1;
                 }
+                this._setCommonListStyle(newRange.ancestor, null);
             } else { // multi line 
                 // end
                 if (endLength > 0) {
@@ -2495,24 +2497,35 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
 
                 // mid
-                for (let i = endLength - 1, renewedEndContainer; i > 0; i--) {
+                for (let i = endLength - 1, newRange; i > 0; i--) {
                     newNode = appendNode.cloneNode(false);
-                    renewedEndContainer = this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, end.container);
-                    if (renewedEndContainer) end.container = renewedEndContainer;
+                    newRange = this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, end.container);
+                    if (newRange.endContainer) {
+                        end.ancestor = null;
+                        end.container = newRange.endContainer;
+                    }
+                    this._setCommonListStyle(newRange.ancestor, null);
                 }
 
                 // start
                 newNode = appendNode.cloneNode(false);
                 start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, end.container);
 
-                if (start.endContainer) end.container = start.endContainer;
+                if (start.endContainer) {
+                    end.ancestor = null;
+                    end.container = start.endContainer;
+                }
 
                 if (endLength <= 0) {
                     end = start;
                 } else if (!end.container) {
+                    end.ancestor = null;
                     end.container = start.container;
                     end.offset = start.container.textContent.length;
                 }
+
+                this._setCommonListStyle(start.ancestor, null);
+                this._setCommonListStyle(end.ancestor || util.getFormatElement(end.container), null);
             }
 
             // set range
@@ -2521,6 +2534,36 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // history stack
             this.history.push(false);
+        },
+
+        /**
+         * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
+         * @param {Element} el List cell element. <li>
+         * @param {Element|null} child Variable for recursive call. ("null" on the first call)
+         * @private
+         */
+        _setCommonListStyle: function (el, child) {
+            if (!util.isListCell(el)) return;
+            if (!child) el.removeAttribute('style');
+            
+            const children = util.getArrayItem((child || el).childNodes, function (current) { return !util.isBreak(current) && !util.onlyZeroWidthSpace(current.textContent.trim()); }, true);
+            if (children[0] && children.length === 1){
+                child = children[0];
+                if (!child || child.nodeType !== 1) return;
+
+                const childStyle = child.style;
+                const elStyle = el.style;
+
+                // bold
+                if (/STRONG/i.test(child.nodeName)) elStyle.fontWeight = 'bold'; // bold
+                else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
+
+                // styles
+                if (childStyle.color) elStyle.color = childStyle.color; // color
+                if (childStyle.fontSize) elStyle.fontSize = childStyle.fontSize; // size
+
+                this._setCommonListStyle(el, child);
+            }
         },
 
         /**
@@ -2543,12 +2586,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Return the parent maintained tag. (bind and use a util object)
          * @param {Boolean} isRemove Delete maintained tag
+         * @param {Boolean} isSameNode Same maintained node.
          * @param {Element} element Element
          * @returns {Element}
          * @private
          */
-        _util_getMaintainedNode: function (isRemove, element) {
-            return element && !isRemove ? this.getParentElement(element, function (current) {return this._isMaintainedNode(current);}.bind(this)) : null;
+        _util_getMaintainedNode: function (isRemove, isSameNode, element) {
+            return element && !isSameNode && (!isRemove ? this.getParentElement(element, function (current) { return this._isMaintainedNode(current); }.bind(this)) : null);
         },
 
         /**
@@ -2558,8 +2602,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Element}
          * @private
          */
-        _util_isMaintainedNode: function (isRemove, element) {
-            return element && !isRemove && element.nodeType !== 3 && this._isMaintainedNode(element);
+        _util_isMaintainedNode: function (isRemove, isSameNode, element) {
+            return element && !isSameNode && !isRemove && element.nodeType !== 3 && this._isMaintainedNode(element);
         },
 
         /**
@@ -2574,7 +2618,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
          * @param {Boolean} collapsed range.collapsed
-         * @returns {{startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
+         * @returns {{ancestor: *, startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
          * @private
          */
         _nodeChange_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
@@ -2916,6 +2960,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // not remove tag
             if (isRemoveNode && !isRemoveFormat && !_removeCheck.v) {
                 return {
+                    ancestor: element,
                     startContainer: startCon,
                     startOffset: startOff,
                     endContainer: endCon,
@@ -3001,6 +3046,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             endContainer = util.getNodeFromPath(endPath, pNode);
 
             return {
+                ancestor: pNode,
                 startContainer: startContainer,
                 startOffset: startOffset + newOffsets[0],
                 endContainer: endContainer,
@@ -3018,7 +3064,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
          * @returns {null|Node} If end container is renewed, returned renewed node
-         * @returns {Object} { container, offset, endContainer }
+         * @returns {Object} { ancestor, container, offset, endContainer }
          * @private
          */
         _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, _endContainer) {
@@ -3044,6 +3090,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     util.copyTagAttributes(parentCon, newInnerNode);
     
                     return {
+                        ancestor: element,
                         container: startCon,
                         offset: startOff
                     };
@@ -3232,6 +3279,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // not remove tag
             if (isRemoveNode && !isRemoveFormat && !_removeCheck.v) {
                 return {
+                    ancestor: element,
                     container: startCon,
                     offset: startOff,
                     endContainer: _endContainer
@@ -3289,6 +3337,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             return {
+                ancestor: pNode,
                 container: container,
                 offset: offset,
                 endContainer: _endContainer
@@ -3303,7 +3352,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
          * @param {Node} _endContainer Offset node of last line already modified (end.container)
-         * @returns {null|Node} If end container is renewed, returned renewed node
+         * @returns {Object} { ancestor, endContainer: "If end container is renewed, returned renewed node" }
          * @private
          */
         _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, _endContainer) {
@@ -3340,7 +3389,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 if (len > 0 && i === len) {
                     element.innerHTML = tempNode.innerHTML;
-                    return endPath ? util.getNodeFromPath(endPath, element) : null;
+                    return {
+                        ancestor: element,
+                        endContainer: endPath ? util.getNodeFromPath(endPath, element) : null
+                    };
                 }
             }
 
@@ -3391,7 +3443,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             })(element, newInnerNode);
 
             // not remove tag
-            if (noneChange || (isRemoveNode && !isRemoveFormat && !_removeCheck.v)) return _endContainer;
+            if (noneChange || (isRemoveNode && !isRemoveFormat && !_removeCheck.v)) return { ancestor: element, endContainer: _endContainer };
 
             pNode.appendChild(newInnerNode);
 
@@ -3416,7 +3468,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // node change
             element.parentNode.replaceChild(pNode, element);
-            return _endContainer;
+            return { ancestor: pNode, endContainer: _endContainer };
         },
 
         /**
@@ -3428,7 +3480,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Number} endOff The endOffset property of the selection object.
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
-         * @returns {Object} { container, offset }
+         * @returns {Object} { ancestor, container, offset }
          * @private
          */
         _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
@@ -3454,6 +3506,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     util.copyTagAttributes(parentCon, newInnerNode);
     
                     return {
+                        ancestor: element,
                         container: endCon,
                         offset: endOff
                     };
@@ -3644,6 +3697,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // not remove tag
             if (isRemoveNode && !isRemoveFormat && !_removeCheck.v) {
                 return {
+                    ancestor: element,
                     container: endCon,
                     offset: endOff
                 };
@@ -3685,6 +3739,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (!isRemoveNode && newInnerNode.textContent.length === 0) {
                     util.removeEmptyNode(pNode, null);
                     return {
+                        ancestor: null,
                         container: null,
                         offset: 0
                     };
@@ -3715,6 +3770,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             return {
+                ancestor: pNode,
                 container: container,
                 offset: offset
             };

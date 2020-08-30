@@ -507,7 +507,7 @@ const util = {
      * @param {Function|null} validation Conditional function
      * @param {Boolean} multi If true, returns all items that meet the criteria otherwise, returns an empty array.
      * If false, returns only one item that meet the criteria otherwise return null.
-     * @returns {Array|Object}
+     * @returns {Array|Node|null}
      */
     getArrayItem: function (array, validation, multi) {
         if (!array || array.length === 0) return null;

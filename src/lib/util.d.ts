@@ -253,7 +253,7 @@ declare interface util {
      * If false, returns only one item that meet the criteria otherwise return null.
      * @returns
      */
-    getArrayItem(array: any[] | HTMLCollection | NodeList, validation: Function | null, multi: boolean): any[] | null;
+    getArrayItem(array: any[] | HTMLCollection | NodeList, validation: Function | null, multi: boolean): any[] | Node | null;
     
     /**
      * @description Get the index of the argument value in the element array
