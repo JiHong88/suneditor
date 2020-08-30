@@ -612,7 +612,7 @@ export default {
 
         let changed = true;
         if (!isUpdate) {
-            changed = this.insertComponent(container, false, true);
+            changed = this.insertComponent(container, false, true, false);
         } else if (contextVideo._resizing && this.context.resizing._rotateVertical && changeSize) {
             this.plugins.resizing.setTransformSize.call(this, oFrame, null, null);
         }

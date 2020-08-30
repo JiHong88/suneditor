@@ -1252,9 +1252,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Element} element Element to be inserted
          * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+         * @param {Boolean} notSelect If true, Do not automatically select the inserted component.
          * @returns {Element}
          */
-        insertComponent: function (element, notHistoryPush, checkCharCount) {
+        insertComponent: function (element, notHistoryPush, checkCharCount, notSelect) {
             if (checkCharCount && !this.checkCharCount(element, null)) {
                 return null;
             }
@@ -1278,12 +1279,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (formatEl && util.onlyZeroWidthSpace(formatEl)) util.removeItem(formatEl);
             }
 
-            const fileComponentInfo = this.getFileComponent(element);
-            if (fileComponentInfo) {
-                this.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
-            } else if (oNode) {
-                oNode = util.getEdgeChildNodes(oNode, null).sc || oNode;
-                this.setRange(oNode, 0, oNode, 0);
+            if (!notSelect) {
+                const fileComponentInfo = this.getFileComponent(element);
+                if (fileComponentInfo) {
+                    this.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
+                } else if (oNode) {
+                    oNode = util.getEdgeChildNodes(oNode, null).sc || oNode;
+                    this.setRange(oNode, 0, oNode, 0);
+                }
             }
 
             // history stack
@@ -7327,7 +7330,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             } else {
                 if (util.isComponent(html)) {
-                    core.insertComponent(html, false, checkCharCount);
+                    core.insertComponent(html, false, checkCharCount, false);
                 } else {
                     let afterNode = null;
                     if (util.isFormatElement(html) || util.isMedia(html)) {

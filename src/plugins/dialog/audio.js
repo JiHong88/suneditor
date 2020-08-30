@@ -427,7 +427,7 @@ export default {
             element.src = src;
             const cover = this.plugins.component.set_cover.call(this, element);
             const container = this.plugins.component.set_container.call(this, cover, '');
-            if (!this.insertComponent(container, false, true)) {
+            if (!this.insertComponent(container, false, true, false)) {
                 this.focus();
                 return;
             }

@@ -341,9 +341,10 @@ interface Core {
      * @param element Element to be inserted
      * @param notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
      * @param checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+     * @param notSelect If true, Do not automatically select the inserted component.
      * @returns
      */
-    insertComponent(element: Element, notHistoryPush?: boolean, checkCharCount?: boolean): Element;
+    insertComponent(element: Element, notHistoryPush?: boolean, checkCharCount?: boolean, notSelect?:boolean): Element;
     
     /**
      * @description Gets the file component and that plugin name

@@ -30,6 +30,7 @@ export default {
             _floatClassRegExp: '__se__float\\-[a-z]+',
             _v_link: {_linkValue: ''},
             _v_src: {_linkValue: ''},
+            svgDefaultSize: '33%',
             // @require @Override component
             _element: null,
             _cover: null,
@@ -621,6 +622,9 @@ export default {
         const contextImage = this.context.image;
         this.context.resizing._resize_plugin = 'image';
 
+        // svg exception handling
+        if (!width && (/svg\+xml$/i.test(file.type) || /\.svg$/.test(src))) width = contextImage.svgDefaultSize;
+
         let oImg = this.util.createElement('IMG');
         oImg.src = src;
         oImg.alt = contextImage._altText;
@@ -651,7 +655,8 @@ export default {
         // align
         this.plugins.image.setAlign.call(this, align, oImg, cover, container);
 
-        if (this.insertComponent(container, true, true)) this.plugins.fileManager.setInfo.call(this, 'image', oImg, this.functions.onImageUpload, file, true);
+        oImg.onload = this.selectComponent.bind(this, oImg, 'image');
+        if (this.insertComponent(container, true, true, true)) this.plugins.fileManager.setInfo.call(this, 'image', oImg, this.functions.onImageUpload, file, true);
         this.context.resizing._resize_plugin = '';
     },
 
