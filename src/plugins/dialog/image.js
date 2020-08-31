@@ -30,7 +30,7 @@ export default {
             _floatClassRegExp: '__se__float\\-[a-z]+',
             _v_link: {_linkValue: ''},
             _v_src: {_linkValue: ''},
-            svgDefaultSize: '33%',
+            svgDefaultSize: '30%',
             // @require @Override component
             _element: null,
             _cover: null,
@@ -619,16 +619,14 @@ export default {
     },
 
     create_image: function (src, linkValue, linkNewWindow, width, height, align, file) {
+        const imagePlugin = this.plugins.image;
         const contextImage = this.context.image;
         this.context.resizing._resize_plugin = 'image';
-
-        // svg exception handling
-        if (!width && (/svg\+xml$/i.test(file.type) || /\.svg$/.test(src))) width = contextImage.svgDefaultSize;
 
         let oImg = this.util.createElement('IMG');
         oImg.src = src;
         oImg.alt = contextImage._altText;
-        oImg = this.plugins.image.onRender_link.call(this, oImg, linkValue, linkNewWindow);
+        oImg = imagePlugin.onRender_link.call(this, oImg, linkValue, linkNewWindow);
         oImg.setAttribute('data-rotate', '0');
 
         if (contextImage._resizing) {
@@ -650,14 +648,20 @@ export default {
         contextImage._container = container;
 
         // set size
-        this.plugins.image.applySize.call(this, width, height);
+        imagePlugin.applySize.call(this, width, height);
 
         // align
-        this.plugins.image.setAlign.call(this, align, oImg, cover, container);
+        imagePlugin.setAlign.call(this, align, oImg, cover, container);
 
-        oImg.onload = this.selectComponent.bind(this, oImg, 'image');
+        oImg.onload = imagePlugin._image_create_onload.bind(this, oImg, contextImage.svgDefaultSize);
         if (this.insertComponent(container, true, true, true)) this.plugins.fileManager.setInfo.call(this, 'image', oImg, this.functions.onImageUpload, file, true);
         this.context.resizing._resize_plugin = '';
+    },
+
+    _image_create_onload: function (oImg, svgDefaultSize) {
+        // svg exception handling
+        if (oImg.offsetWidth === 0) this.plugins.image.applySize.call(this, svgDefaultSize, '');
+        this.selectComponent.call(this, oImg, 'image');
     },
 
     update_image: function (init, openController, notHistoryPush) {
