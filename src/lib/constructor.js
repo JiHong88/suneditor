@@ -28,7 +28,7 @@ export default {
     
         // suneditor div
         const top_div = doc.createElement('DIV');
-        top_div.className = 'sun-editor';
+        top_div.className = 'sun-editor' + (options.rtl ? ' se-rtl' : '');
         if (element.id) top_div.id = 'suneditor_' + element.id;
     
         // relative div
@@ -252,6 +252,9 @@ export default {
         el.code = code;
         el.placeholder = placeholder_span;
 
+        if (mergeOptions.rtl) util.addClass(el.topArea, 'se-rtl');
+        else util.removeClass(el.topArea, 'se-rtl');
+
         return {
             callButtons: isNewToolbar ? tool_bar.pluginCallButtons : null,
             plugins: isNewToolbar || isNewPlugins ? tool_bar.plugins : null,
@@ -290,7 +293,7 @@ export default {
         if (!options.iframe) {
             wysiwygDiv.setAttribute('contenteditable', true);
             wysiwygDiv.setAttribute('scrolling', 'auto');
-            wysiwygDiv.className += ' sun-editor-editable';
+            wysiwygDiv.className += ' sun-editor-editable' + (options.rtl ? ' se-rtl' : '');
             wysiwygDiv.style.cssText = options._editorStyles.frame + options._editorStyles.editor;
         } else {
             wysiwygDiv.allowFullscreen = true;
@@ -383,6 +386,7 @@ export default {
         options.attributesWhitelist = (!options.attributesWhitelist || typeof options.attributesWhitelist !== 'object') ? null : options.attributesWhitelist;
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
+        options.rtl = !!options.rtl;
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
         options.toolbarContainer = /balloon/i.test(options.mode) ? null : (typeof options.toolbarContainer === 'string' ? document.querySelector(options.toolbarContainer) : options.toolbarContainer);
         options.stickyToolbar = (/balloon/i.test(options.mode) || !!options.toolbarContainer) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);

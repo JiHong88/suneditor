@@ -262,6 +262,7 @@ s1.onKeyDown = function (e, core) {
 }
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
+    rtl: true,
     lang: lang.ko,
     plugins: plugins,
     katex: Katex,
@@ -297,7 +298,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         expansion: "<span>A</span>",
         reduction: "<span>Z</span>"
     },
-    iframe: true,
+    // iframe: true,
     videoFileInput: true,
     audioFileInput: true,
     placeholder: 'Start typing something...',
