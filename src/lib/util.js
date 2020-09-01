@@ -11,12 +11,19 @@
  * @description utility function
  */
 const util = {
-    _d: document,
-    _w: window,
-    _hasOwn: Object.prototype.hasOwnProperty,
-    isIE: navigator.userAgent.indexOf('Trident') > -1,
-    isIE_Edge: (navigator.userAgent.indexOf('Trident') > -1) || (navigator.appVersion.indexOf('Edge') > -1),
-    isOSX_IOS: /(Mac|iPhone|iPod|iPad)/.test(navigator.platform),
+    _d: null,
+    _w: null,
+    isIE: null,
+    isIE_Edge: null,
+    isOSX_IOS: null,
+    _propertiesInit: function () {
+        if (this._d) return;
+        this._d =  document;
+        this._w = window;
+        this.isIE = navigator.userAgent.indexOf('Trident') > -1;
+        this.isIE_Edge = (navigator.userAgent.indexOf('Trident') > -1) || (navigator.appVersion.indexOf('Edge') > -1);
+        this.isOSX_IOS = /(Mac|iPhone|iPod|iPad)/.test(navigator.platform);
+    },
 
     /**
      * @description HTML Reserved Word Converter.
@@ -138,6 +145,7 @@ const util = {
     hasOwn: function (obj, key) {
         return this._hasOwn.call(obj, key);
     },
+    _hasOwn: Object.prototype.hasOwnProperty,
 
     /**
      * @deprecated
