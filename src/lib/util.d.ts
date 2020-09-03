@@ -253,7 +253,7 @@ declare interface util {
      * If false, returns only one item that meet the criteria otherwise return null.
      * @returns
      */
-    getArrayItem(array: any[] | HTMLCollection | NodeList, validation: Function | null, multi: boolean): any[] | null;
+    getArrayItem(array: any[] | HTMLCollection | NodeList, validation: Function | null, multi: boolean): any[] | Node | null;
     
     /**
      * @description Get the index of the argument value in the element array
@@ -405,6 +405,14 @@ declare interface util {
     getElementDepth(element: Node): number;
 
     /**
+     * @description Compares two elements to find a common ancestor, and returns the order of the two elements.
+     * @param a Node to compare.
+     * @param b Node to compare.
+     * @returns
+     */
+    compareElements(a: Node, b: Node): {ancestor: Element | null, a: Node, b: Node, result: number};
+
+    /**
      * @description Get the parent element of the argument value.
      * A tag that satisfies the query condition is imported.
      * Returns null if not found.
@@ -517,7 +525,7 @@ declare interface util {
      * @param disabled Disabled value
      * @param buttonList Button array
      */
-    toggleDisabledButtons(disabled: boolean, buttonList: Element[] | HTMLCollection | NodeList): void;
+    setDisabledButtons(disabled: boolean, buttonList: Element[] | HTMLCollection | NodeList): void;
 
     /**
      * @description Delete argumenu value element

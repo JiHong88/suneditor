@@ -156,7 +156,8 @@
             bordered: '경계선',
             neon: '네온',
             translucent: '반투명',
-            shadow: '그림자'
+            shadow: '그림자',
+            code: '코드'
         }
     };
 

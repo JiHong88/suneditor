@@ -282,6 +282,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     },
     // height: 'auto',
     iframeCSSFileName: '.+',
+    addTagsWhitelist: 'i',
     popupDisplay: 'full',
     charCounter: true,
     charCounterType: 'byte-html',
@@ -289,9 +290,9 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     imageMultipleFile: true,
     videoMultipleFile: true,
     audioMultipleFile: true,
-    imageUploadUrl: 'http://localhost:3000/editor/upload',
-    videoUploadUrl: 'http://localhost:3000/editor/upload',
-    audioUploadUrl: 'http://localhost:3000/editor/upload',
+    // imageUploadUrl: 'http://localhost:3000/editor/upload',
+    // videoUploadUrl: 'http://localhost:3000/editor/upload',
+    // audioUploadUrl: 'http://localhost:3000/editor/upload',
     icons: {
         expansion: "<span>A</span>",
         reduction: "<span>Z</span>"
@@ -521,14 +522,14 @@ function ResizeImage (files, uploadHandler) {
     reader.readAsDataURL(uploadFile);
 }
 
-ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
-    // ResizeImage(files, uploadHandler)
+// ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
+//     // ResizeImage(files, uploadHandler)
     
-    const response = { // Same format as "videoUploadUrl" response
-        "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
-    };
-    uploadHandler(response);
-}
+//     const response = { // Same format as "videoUploadUrl" response
+//         "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
+//     };
+//     uploadHandler(response);
+// }
 
 // ss.onImageUpload = function (targetElement, index, state, info, core) {
 //     console.log('imageInfo-----', info);
@@ -573,7 +574,7 @@ window.sun_getImagesInfo = function () {
 }
 
 window.sun_insertHTML = function (html) {
-    ss.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" /><p>fdafds</p>', true, true)
+    ss.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" /><p>fdafds</p>', true, true, true)
 }
 
 window.sun_getContents = function () {

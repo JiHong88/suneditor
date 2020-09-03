@@ -38,6 +38,11 @@ export default {
         listDiv.className = 'se-submenu se-list-layer se-list-format';
 
         const defaultList = {
+            code: {
+                name: this.lang.menu.code,
+                class: '__se__t-code',
+                tag: 'code',
+            },
             translucent: {
                 name: this.lang.menu.translucent,
                 style: 'opacity: 0.5;',
@@ -49,7 +54,7 @@ export default {
                 tag: 'span',
             }
         };
-        const styleList = !option.textStyles ? ['translucent', 'shadow'] : option.textStyles;
+        const styleList = !option.textStyles ? this._w.Object.keys(defaultList) : option.textStyles;
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic">';
         for (let i = 0, len = styleList.length, t, tag, name, attrs, command, value, _class; i < len; i++) {
@@ -108,7 +113,7 @@ export default {
                 node = selectionNode;
                 active = false;
                 
-                while (!util.isFormatElement(node)) {
+                while (node && !util.isFormatElement(node) && !util.isComponent(node)) {
                     if (node.nodeName.toLowerCase() === btn.getAttribute('data-command').toLowerCase()) {
                         value = data[v];
                         if (/^\./.test(value) ? util.hasClass(node, value.replace(/^\./, '')) : !!node.style[value]) {

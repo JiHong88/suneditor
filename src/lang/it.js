@@ -156,7 +156,8 @@
             bordered: 'Bordo',
             neon: 'Luminoso',
             translucent: 'Translucente',
-            shadow: 'Ombra'
+            shadow: 'Ombra',
+            code: 'Codice'
         }
     };
 

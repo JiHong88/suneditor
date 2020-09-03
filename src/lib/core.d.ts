@@ -253,13 +253,14 @@ interface Core {
     focusEdge(focusEl: Element | null): void;
 
     /**
-     * @description Set current editor's range object
+     * @description Set current editor's range object and return.
      * @param startCon The startContainer property of the selection object.
      * @param startOff The startOffset property of the selection object.
      * @param endCon The endContainer property of the selection object.
      * @param endOff The endOffset property of the selection object.
+     * @returns
      */
-    setRange(startCon: Node, startOff: number, endCon: Node, endOff: number): void;
+    setRange(startCon: Node, startOff: number, endCon: Node, endOff: number): Range;
 
     /**
      * @description Remove range object and button effect
@@ -340,9 +341,10 @@ interface Core {
      * @param element Element to be inserted
      * @param notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
      * @param checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+     * @param notSelect If true, Do not automatically select the inserted component.
      * @returns
      */
-    insertComponent(element: Element, notHistoryPush?: boolean, checkCharCount?: boolean): Element;
+    insertComponent(element: Element, notHistoryPush?: boolean, checkCharCount?: boolean, notSelect?:boolean): Element;
     
     /**
      * @description Gets the file component and that plugin name
@@ -362,7 +364,7 @@ interface Core {
     /**
      * @description Delete selected node and insert argument value node and return.
      * If the "afterNode" exists, it is inserted after the "afterNode"
-     * Inserting a text node merges with both text nodes on both sides and returns a new "{ startOffset, endOffset }".
+     * Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
      * @param oNode Element to be inserted
      * @param afterNode If the node exists, it is inserted after the node
      * @returns
@@ -906,8 +908,9 @@ export default class SunEditor {
      * @param html HTML Element or HTML string or plain string
      * @param notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
      * @param checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+     * @param rangeSelection If true, range select the inserted node.
      */
-    insertHTML(html: Element | string, notCleaningData?: boolean, checkCharCount?: boolean): void;
+    insertHTML(html: Element | string, notCleaningData?: boolean, checkCharCount?: boolean, rangeSelection?: boolean): void;
 
     /**
      * @description Change the contents of the suneditor

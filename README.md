@@ -333,7 +333,7 @@ value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {String}
 
 // Whitelist--------------------------------------å---------------------------------------------------------
-// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup'
+// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
@@ -509,6 +509,11 @@ textStyles      : You can apply custom style or class to selected text.
                                      '.sun-editor .__se__customClass' // If you want to apply styles to menu items as well
                   Default value: [
                     {
+                        name: 'Code',
+                        class: '__se__t-code',
+                        tag: 'code',
+                    },
+                    {
                         name: 'Translucent', // Text style name
                         style: 'opacity: 0.5;', // Style query
                         tag: 'span', // Style tag name (default: span)
@@ -521,7 +526,7 @@ textStyles      : You can apply custom style or class to selected text.
                     }
                   ]
                   ex) [
-                      'translucent', // The default value is called by name only and the name is called in the language file.
+                      'Code', // The default value is called by name only and the name is called in the language file.
                       {
                           name: 'Emphasis',
                           style: '-webkit-text-emphasis: filled;',
@@ -562,6 +567,8 @@ imageUploadUrl  : The image upload to server mapping address.       default: nul
 imageUploadSizeLimit: The size of the total uploadable images (in bytes).
                       Invokes the "onImageUploadError" method.  default: null {Number}
 imageMultipleFile: If true, multiple images can be selected.    default: false {Boolean}
+imageAccept      : Define the "accept" attribute of the input.  default: "*" {String}
+                   ex) "*" or ".jpg, .png .."
 // Image - image gallery
 imageGalleryUrl     : The url of the image gallery, if you use the image gallery.
                       When "imageUrlInput" is true, an image gallery button is created in the image modal.
@@ -634,6 +641,8 @@ videoTagAttrs    : Define "Attributes" of the video tag.                      de
                    ex) { poster: "http://suneditor.com/docs/loading.gif", autoplay: true }
 videoIframeAttrs : Define "Attributes" of the iframe tag. (Youtube, Vimeo).   default: null {Object}
                    ex) { style: "border: 2px solid red;" }
+videoAccept      : Define the "accept" attribute of the input.  default: "*" {String}
+                   ex) "*" or ".mp4, .avi .."
 
 // Audio----------------------------------------------------------------------------------------------------------
 audioWidth      : The default width size of the audio frame.        default: '300px' {String}
@@ -664,6 +673,8 @@ audioUploadSizeLimit: The size of the total uploadable audios (in bytes).
 audioMultipleFile: If true, multiple audios can be selected.    default: false {Boolean}
 audioTagAttrs    : Define "Attributes" of the audio tag.        default: null {Object} 
                    ex) { controlslist: "nodownload", autoplay: true }
+videoAccept      : Define the "accept" attribute of the input.  default: "*" {String}
+                   ex) "*" or ".mp3, .wav .."
 
 // Table----------------------------------------------------------------------------------------------------------
 tableCellControllerPosition : Define position to the table cell controller('cell', 'top'). default: 'cell' {String}

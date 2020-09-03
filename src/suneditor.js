@@ -34,6 +34,8 @@ export default {
      * @returns {Object}
      */
     create: function (idOrElement, options, _init_options) {
+        util._propertiesInit();
+
         if (typeof options !== 'object') options = {};
         if (_init_options) {
             options =  [_init_options, options].reduce(function (init, option) {

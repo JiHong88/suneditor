@@ -157,7 +157,8 @@
             bordered: 'Com borda',
             neon: 'Néon',
             translucent: 'Translúcido',
-            shadow: 'Sombreado'
+            shadow: 'Sombreado',
+            code: 'Código'
         }
     };
 

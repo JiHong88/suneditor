@@ -156,7 +156,8 @@
             bordered: 'Bordered',
             neon: 'Neon',
             translucent: 'Translucent',
-            shadow: 'Shadow'
+            shadow: 'Shadow',
+            code: 'Code'
         }
     };
 

@@ -312,7 +312,7 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="insertHTML"><span class="type-signature"></span>insertHTML<span class="signature">(html, notCleaningData)</span><span
+            <h4 class="name" id="insertHTML"><span class="type-signature"></span>insertHTML<span class="signature">(html, notCleaningData, checkCharCount, rangeSelection)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
                 Inserts an HTML element or HTML string or plain string at the current cursor position
@@ -347,6 +347,13 @@
                         <span class="param-type">Boolean</span>
                     </td>
                     <td class="description last">If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>rangeSelection</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean</span>
+                    </td>
+                    <td class="description last">If true, range select the inserted node.</td>
                 </tr>
                 </tbody>
             </table>

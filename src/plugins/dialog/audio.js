@@ -87,7 +87,7 @@ export default {
                         '<div class="se-dialog-form">' +
                             '<label>' + lang.dialogBox.audioBox.file + '</label>' +
                             '<div class="se-dialog-form-files">' +
-                                '<input class="se-input-form _se_audio_files" type="file" accept="audio/*"' + (option.audioMultipleFile ? ' multiple="multiple"' : '') + '/>' +
+                                '<input class="se-input-form _se_audio_files" type="file" accept="audio/"' + option.audioAccept + (option.audioMultipleFile ? ' multiple="multiple"' : '') + '/>' +
                                 '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
                             '</div>' +
                         '</div>';
@@ -427,7 +427,7 @@ export default {
             element.src = src;
             const cover = this.plugins.component.set_cover.call(this, element);
             const container = this.plugins.component.set_container.call(this, cover, '');
-            if (!this.insertComponent(container, false, true)) {
+            if (!this.insertComponent(container, false, true, false)) {
                 this.focus();
                 return;
             }

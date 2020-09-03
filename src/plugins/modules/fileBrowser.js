@@ -255,20 +255,24 @@
             let tagsHTML = '';
             let listHTML = '<div class="se-file-item-column">';
             let columns = 1;
-            for (let i = 0, item, tag; i < len; i++) {
+            for (let i = 0, item, tags; i < len; i++) {
                 item = items[i];
+                tags = !item.tag ? [] : typeof item.tag === 'string' ? item.tag.split(',') : item.tag;
+                tags = item.tag = tags.map(function (v) { return v.trim(); });
                 listHTML += drawItemHandler(item);
 
                 if ((i + 1) % splitSize === 0 && columns < columnSize && (i + 1) < len) {
                     columns++;
                     listHTML += '</div><div class="se-file-item-column">';
                 }
-
-                if (update) {
-                    tag = item.tag;
-                    if (tag && _tags.indexOf(tag) === -1) {
-                        _tags.push(tag);
-                        tagsHTML += '<a title="' + tag + '">' + tag + '</a>';
+                
+                if (update && tags.length > 0) {
+                    for (let t = 0, tLen = tags.length, tag; t < tLen; t++) {
+                        tag = tags[t];
+                        if (tag && _tags.indexOf(tag) === -1) {
+                            _tags.push(tag);
+                            tagsHTML += '<a title="' + tag + '">' + tag + '</a>';
+                        }
                     }
                 }
             }
@@ -303,9 +307,14 @@
                 this.util.addClass(selectTag, 'on');
             }
 
-            fileBrowserPlugin._drawListItem.call(this, selectedTags.length === 0 ? fileBrowserContext.items : fileBrowserContext.items.filter(function (item) {
-                return selectedTags.indexOf(item.tag) > -1;
-            }), false);
+            fileBrowserPlugin._drawListItem.call(this,
+                selectedTags.length === 0 ?
+                fileBrowserContext.items :
+                fileBrowserContext.items.filter(function (item) {
+                    return item.tag.some(function (tag) {
+                        return selectedTags.indexOf(tag) > -1;
+                    });
+                }), false);
         },
 
         onClickFile: function (e) {

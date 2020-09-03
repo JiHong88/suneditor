@@ -207,6 +207,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _htmlCheckWhitelistRegExp: null,
 
         /**
+         * @description RegExp when using check disallowd tags. (b, i, ins, strike, s)
+         * @private
+         */
+        _disallowedTextTagsRegExp: null,
+
+        /**
          * @description Editor tags whitelist (RegExp object)
          * util.createTagsWhitelist(options._editorTagsWhitelist)
          */
@@ -804,11 +810,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
-         * @description Set current editor's range object
+         * @description Set current editor's range object and return.
          * @param {Node} startCon The startContainer property of the selection object.
          * @param {Number} startOff The startOffset property of the selection object.
          * @param {Node} endCon The endContainer property of the selection object.
          * @param {Number} endOff The endOffset property of the selection object.
+         * @returns {Object} Range object.
          */
         setRange: function (startCon, startOff, endCon, endOff) {
             if (!startCon || !endCon) return;
@@ -835,6 +842,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             selection.addRange(range);
             this._editorRange();
             if (options.iframe) this.nativeFocus();
+
+            return range;
         },
 
         /**
@@ -866,7 +875,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Object}
          */
         getRange: function () {
-            return this._variable._range || this._createDefaultRange();
+            const range = this._variable._range || this._createDefaultRange();
+            const selection = this.getSelection();
+            if (range.collapsed === selection.isCollapsed) return range;
+            
+            if (selection.rangeCount > 0) {
+                this._variable._range = selection.getRangeAt(0);
+                return this._variable._range;
+            } else {
+                const sc = selection.anchorNode, ec = selection.focusNode, so = selection.anchorOffset, eo = selection.focusOffset;
+                const compareValue = util.compareElements(sc, ec);
+                const rightDir = compareValue.ancestor && (compareValue.result === 0 ? so <= eo : compareValue.result > 1 ? true : false);
+                return this.setRange(
+                    rightDir ? sc : ec,
+                    rightDir ? so : eo,
+                    rightDir ? ec : sc,
+                    rightDir ? eo : so
+                );
+            }
         },
 
         /**
@@ -1226,9 +1252,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Element} element Element to be inserted
          * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
          * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+         * @param {Boolean} notSelect If true, Do not automatically select the inserted component.
          * @returns {Element}
          */
-        insertComponent: function (element, notHistoryPush, checkCharCount) {
+        insertComponent: function (element, notHistoryPush, checkCharCount, notSelect) {
             if (checkCharCount && !this.checkCharCount(element, null)) {
                 return null;
             }
@@ -1252,12 +1279,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (formatEl && util.onlyZeroWidthSpace(formatEl)) util.removeItem(formatEl);
             }
 
-            const fileComponentInfo = this.getFileComponent(element);
-            if (fileComponentInfo) {
-                this.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
-            } else if (oNode) {
-                oNode = util.getEdgeChildNodes(oNode, null).sc || oNode;
-                this.setRange(oNode, 0, oNode, 0);
+            if (!notSelect) {
+                const fileComponentInfo = this.getFileComponent(element);
+                if (fileComponentInfo) {
+                    this.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
+                } else if (oNode) {
+                    oNode = util.getEdgeChildNodes(oNode, null).sc || oNode;
+                    this.setRange(oNode, 0, oNode, 0);
+                }
             }
 
             // history stack
@@ -1360,7 +1389,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Delete selected node and insert argument value node and return.
          * If the "afterNode" exists, it is inserted after the "afterNode"
-         * Inserting a text node merges with both text nodes on both sides and returns a new "{ startOffset, endOffset }".
+         * Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
          * @param {Node} oNode Element to be inserted
          * @param {Node|null} afterNode If the node exists, it is inserted after the node
          * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
@@ -1371,9 +1400,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return null;
             }
 
-            const isComp = util.isFormatElement(oNode) || util.isRangeFormatElement(oNode) || util.isComponent(oNode);
+            const freeFormat = util.getFreeFormatElement(this.getSelectionNode(), null);
+            const isFormats = (!freeFormat && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) || util.isComponent(oNode);
 
-            if (!afterNode && isComp) {
+            if (!afterNode && isFormats) {
                 const r = this.removeNode();
                 if (r.container.nodeType === 3 || util.isBreak(r.container)) {
                     const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
@@ -1382,12 +1412,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            const range = (!afterNode && !isComp) ? this.getRange_addLine(this.getRange()) : this.getRange();
-            const startCon = range.startContainer;
-            const startOff = range.startOffset;
-            const endCon = range.endContainer;
-            const endOff = range.endOffset;
+            const range = (!afterNode && !isFormats) ? this.getRange_addLine(this.getRange()) : this.getRange();
             const commonCon = range.commonAncestorContainer;
+            const startOff = range.startOffset;
+            const endOff = range.endOffset;
+            const formatRange = range.startContainer === commonCon && util.isFormatElement(commonCon);
+            const startCon = formatRange ? commonCon.childNodes[startOff] : range.startContainer;
+            const endCon = formatRange ? commonCon.childNodes[endOff] : range.endContainer;
             let parentNode, originAfter = null;
 
             if (!afterNode) {
@@ -1431,7 +1462,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         if (!this.isEdgePoint(startCon, startOff)) removeNode = startCon.splitText(startOff);
 
                         parentNode.removeChild(removeNode);
-                        if (parentNode.childNodes.length === 0 && isComp) {
+                        if (parentNode.childNodes.length === 0 && isFormats) {
                             parentNode.innerHTML = '<br>';
                         }
                     }
@@ -1439,7 +1470,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         const removedTag = this.removeNode();
                         const container = removedTag.container;
                         const prevContainer = removedTag.prevContainer;
-                        if (container && container.childNodes.length === 0 && isComp) {
+                        if (container && container.childNodes.length === 0 && isFormats) {
                             if (util.isFormatElement(container)) {
                                 container.innerHTML = '<br>';
                             } else if (util.isRangeFormatElement(container)) {
@@ -1447,7 +1478,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             }
                         }
 
-                        if (!isComp && prevContainer) {
+                        if (!isFormats && prevContainer) {
                             parentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
                             if (parentNode.contains(container)) {
                                 afterNode = container;
@@ -1458,8 +1489,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 afterNode = null;
                             }
                         } else {
-                            parentNode = isComp ? commonCon : container;
-                            afterNode = isComp ? endCon : null;
+                            parentNode = isFormats ? commonCon : container;
+                            afterNode = isFormats ? endCon : null;
                         }
 
                         while (afterNode && afterNode.parentNode !== commonCon) {
@@ -1495,7 +1526,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (oldParent.childNodes.length === 0 && parentNode !== oldParent) util.removeItem(oldParent);
                 }
 
-                if (isComp && !util.isRangeFormatElement(parentNode) && !util.isListCell(parentNode) && !util.isWysiwygDiv(parentNode)) {
+                if (isFormats && !freeFormat && !util.isRangeFormatElement(parentNode) && !util.isListCell(parentNode) && !util.isWysiwygDiv(parentNode)) {
                     afterNode = parentNode.nextElementSibling;
                     parentNode = parentNode.parentNode;
                 }
@@ -1503,13 +1534,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             } catch (e) {
                 parentNode.appendChild(oNode);
             } finally {
+                if (freeFormat && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) {
+                    oNode = this._setIntoFreeFormat(oNode);
+                }
+
                 if (!util.isComponent(oNode)) {
                     let offset = 1;
                     if (oNode.nodeType === 3) {
                         const previous = oNode.previousSibling;
                         const next = oNode.nextSibling;
-                        const previousText = (!previous ||  previous.nodeType !== 3 || util.onlyZeroWidthSpace(previous)) ? '' : previous.textContent;
-                        const nextText = (!next || next.nodeType !== 3 || util.onlyZeroWidthSpace(next)) ? '' : next.textContent;
+                        const previousText = (!previous ||  previous.nodeType === 1 || util.onlyZeroWidthSpace(previous)) ? '' : previous.textContent;
+                        const nextText = (!next || next.nodeType === 1 || util.onlyZeroWidthSpace(next)) ? '' : next.textContent;
         
                         if (previous && previousText.length > 0) {
                             oNode.textContent = previousText + oNode.textContent;
@@ -1520,11 +1555,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             oNode.textContent += nextText;
                             util.removeItem(next);
                         }
-    
-                        return {
+
+                        const newRange = {
+                            container: oNode,
                             startOffset: previousText.length,
                             endOffset: oNode.textContent.length - nextText.length
                         };
+
+                        this.setRange(oNode, newRange.startOffset, oNode, newRange.endOffset);
+    
+                        return newRange;
                     } else if (!util.isBreak(oNode) && util.isFormatElement(parentNode)) {
                         let zeroWidth = null;
                         if (!oNode.previousSibling) {
@@ -1553,12 +1593,42 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
         },
 
+        _setIntoFreeFormat: function (oNode) {
+            const parentNode = oNode.parentNode;
+            let oNodeChildren, lastONode;
+            
+            while (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode)) {
+                oNodeChildren = oNode.childNodes;
+                lastONode = null;
+                
+                while (oNodeChildren[0]) {
+                    lastONode = oNodeChildren[0];
+                    if (util.isFormatElement(lastONode) || util.isRangeFormatElement(lastONode)) {
+                        this._setIntoFreeFormat(lastONode);
+                        if (!oNode.parentNode) break;
+                        oNodeChildren = oNode.childNodes;
+                        continue;
+                    }
+                    
+                    parentNode.insertBefore(lastONode, oNode);
+                }
+                
+                if (oNode.childNodes.length === 0) util.removeItem(oNode);
+                oNode = util.createElement('BR');
+                parentNode.insertBefore(oNode, lastONode.nextSibling);
+            }
+
+            return oNode;
+        },
+
         /**
          * @description Delete the currently selected nodes and reset selection range
          * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
          * @returns {Object}
          */
         removeNode: function () {
+            if (!this._resetRangeToTextNode()) console.warn('[SUNEDITOR.core.removeNode.exception] An exception occurred while resetting the "Range" object.');
+
             const range = this.getRange();
             let container, offset = 0;
             let startCon = range.startContainer;
@@ -2180,6 +2250,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
          */
         nodeChange: function (appendNode, styleArray, removeNodeArray, strictRemove) {
+            this._resetRangeToTextNode();
             let range = this.getRange_addLine(this.getRange());
             styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
             removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
@@ -2399,15 +2470,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // node Changes
             newNode = appendNode.cloneNode(false);
 
-            const isRemoveAnchor = isRemoveFormat || (isRemoveNode && (function (arr, _isMaintainedNode) {
+            const isRemoveAnchor = isRemoveFormat || (isRemoveNode && (function (arr) {
                 for (let n = 0, len = arr.length; n < len; n++) {
-                    if (_isMaintainedNode(arr[n])) return true;
+                    if (util._isMaintainedNode(arr[n]) || util._isSizeNode(arr[n])) return true;
                 }
                 return false;
-            })(removeNodeArray, util._isMaintainedNode));
+            })(removeNodeArray));
 
-            const _getMaintainedNode = this._util_getMaintainedNode.bind(util, isRemoveAnchor);
-            const _isMaintainedNode = this._util_isMaintainedNode.bind(util, isRemoveAnchor);
+            const isSizeNode = util._isSizeNode(newNode);
+            const _getMaintainedNode = this._util_getMaintainedNode.bind(util, isRemoveAnchor, isSizeNode);
+            const _isMaintainedNode = this._util_isMaintainedNode.bind(util, isRemoveAnchor, isSizeNode);
 
             // one line
             if (oneLine) {
@@ -2419,6 +2491,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (start.container === end.container && util.onlyZeroWidthSpace(start.container)) {
                     start.offset = end.offset = 1;
                 }
+                this._setCommonListStyle(newRange.ancestor, null);
             } else { // multi line 
                 // end
                 if (endLength > 0) {
@@ -2427,24 +2500,35 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
 
                 // mid
-                for (let i = endLength - 1, renewedEndContainer; i > 0; i--) {
+                for (let i = endLength - 1, newRange; i > 0; i--) {
                     newNode = appendNode.cloneNode(false);
-                    renewedEndContainer = this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, end.container);
-                    if (renewedEndContainer) end.container = renewedEndContainer;
+                    newRange = this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, end.container);
+                    if (newRange.endContainer) {
+                        end.ancestor = null;
+                        end.container = newRange.endContainer;
+                    }
+                    this._setCommonListStyle(newRange.ancestor, null);
                 }
 
                 // start
                 newNode = appendNode.cloneNode(false);
                 start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, end.container);
 
-                if (start.endContainer) end.container = start.endContainer;
+                if (start.endContainer) {
+                    end.ancestor = null;
+                    end.container = start.endContainer;
+                }
 
                 if (endLength <= 0) {
                     end = start;
                 } else if (!end.container) {
+                    end.ancestor = null;
                     end.container = start.container;
                     end.offset = start.container.textContent.length;
                 }
+
+                this._setCommonListStyle(start.ancestor, null);
+                this._setCommonListStyle(end.ancestor || util.getFormatElement(end.container), null);
             }
 
             // set range
@@ -2453,6 +2537,36 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // history stack
             this.history.push(false);
+        },
+
+        /**
+         * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
+         * @param {Element} el List cell element. <li>
+         * @param {Element|null} child Variable for recursive call. ("null" on the first call)
+         * @private
+         */
+        _setCommonListStyle: function (el, child) {
+            if (!util.isListCell(el)) return;
+            if (!child) el.removeAttribute('style');
+            
+            const children = util.getArrayItem((child || el).childNodes, function (current) { return !util.isBreak(current) && !util.onlyZeroWidthSpace(current.textContent.trim()); }, true);
+            if (children[0] && children.length === 1){
+                child = children[0];
+                if (!child || child.nodeType !== 1) return;
+
+                const childStyle = child.style;
+                const elStyle = el.style;
+
+                // bold
+                if (/STRONG/i.test(child.nodeName)) elStyle.fontWeight = 'bold'; // bold
+                else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
+
+                // styles
+                if (childStyle.color) elStyle.color = childStyle.color; // color
+                if (childStyle.fontSize) elStyle.fontSize = childStyle.fontSize; // size
+
+                this._setCommonListStyle(el, child);
+            }
         },
 
         /**
@@ -2474,24 +2588,25 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Return the parent maintained tag. (bind and use a util object)
-         * @param {Boolean} isRemove Delete maintained tag
          * @param {Element} element Element
          * @returns {Element}
          * @private
          */
-        _util_getMaintainedNode: function (isRemove, element) {
-            return element && !isRemove ? this.getParentElement(element, function (current) {return this._isMaintainedNode(current);}.bind(this)) : null;
+        _util_getMaintainedNode: function (_isRemove, _isSizeNode, element) {
+            if (!element || _isRemove) return null;
+            return this.getParentElement(element, this._isMaintainedNode.bind(this)) || (!_isSizeNode ? this.getParentElement(element, this._isSizeNode.bind(this)) : null);
         },
 
         /**
          * @description Check if element is a tag that should be persisted. (bind and use a util object)
-         * @param {Boolean} isRemove Delete maintained tag
          * @param {Element} element Element
          * @returns {Element}
          * @private
          */
-        _util_isMaintainedNode: function (isRemove, element) {
-            return element && !isRemove && element.nodeType !== 3 && this._isMaintainedNode(element);
+        _util_isMaintainedNode: function (_isRemove, _isSizeNode, element) {
+            if (!element || _isRemove || element.nodeType !== 1) return false;
+            const anchor = this._isMaintainedNode(element);
+            return this.getParentElement(element, this._isMaintainedNode.bind(this)) ? anchor : (anchor || (!_isSizeNode ? this._isSizeNode(element) : false));
         },
 
         /**
@@ -2506,7 +2621,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
          * @param {Boolean} collapsed range.collapsed
-         * @returns {{startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
+         * @returns {{ancestor: *, startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
          * @private
          */
         _nodeChange_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
@@ -2775,12 +2890,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
                             vNode = endPass ? newNode.cloneNode(false) : validation(newNode);
                             if (newNode.nodeType === 1 && !util.isBreak(child) && vNode && checkCss(newNode)) {
-                                if (vNode) {
-                                    if (_isMaintainedNode(vNode)) {
-                                        if (!anchorNode) anchors.push(vNode);
-                                    } else {
-                                        pCurrent.push(vNode);
-                                    }
+                                if (_isMaintainedNode(newNode)) {
+                                    if (!anchorNode) anchors.push(vNode);
+                                } else {
+                                    pCurrent.push(vNode);
                                 }
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                             }
@@ -2848,6 +2961,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // not remove tag
             if (isRemoveNode && !isRemoveFormat && !_removeCheck.v) {
                 return {
+                    ancestor: element,
                     startContainer: startCon,
                     startOffset: startOff,
                     endContainer: endCon,
@@ -2933,6 +3047,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             endContainer = util.getNodeFromPath(endPath, pNode);
 
             return {
+                ancestor: pNode,
                 startContainer: startContainer,
                 startOffset: startOffset + newOffsets[0],
                 endContainer: endContainer,
@@ -2950,7 +3065,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
          * @returns {null|Node} If end container is renewed, returned renewed node
-         * @returns {Object} { container, offset, endContainer }
+         * @returns {Object} { ancestor, container, offset, endContainer }
          * @private
          */
         _nodeChange_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, _endContainer) {
@@ -2976,6 +3091,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     util.copyTagAttributes(parentCon, newInnerNode);
     
                     return {
+                        ancestor: element,
                         container: startCon,
                         offset: startOff
                     };
@@ -3027,7 +3143,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
                             vNode = validation(newNode);
                             if (newNode.nodeType === 1 && vNode) {
-                                if (_isMaintainedNode(vNode)) {
+                                if (_isMaintainedNode(newNode)) {
                                     if (!anchorNode) anchors.push(vNode);
                                 } else {
                                     pCurrent.push(vNode);
@@ -3164,6 +3280,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // not remove tag
             if (isRemoveNode && !isRemoveFormat && !_removeCheck.v) {
                 return {
+                    ancestor: element,
                     container: startCon,
                     offset: startOff,
                     endContainer: _endContainer
@@ -3221,6 +3338,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             return {
+                ancestor: pNode,
                 container: container,
                 offset: offset,
                 endContainer: _endContainer
@@ -3235,7 +3353,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
          * @param {Node} _endContainer Offset node of last line already modified (end.container)
-         * @returns {null|Node} If end container is renewed, returned renewed node
+         * @returns {Object} { ancestor, endContainer: "If end container is renewed, returned renewed node" }
          * @private
          */
         _nodeChange_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, _endContainer) {
@@ -3272,7 +3390,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 if (len > 0 && i === len) {
                     element.innerHTML = tempNode.innerHTML;
-                    return endPath ? util.getNodeFromPath(endPath, element) : null;
+                    return {
+                        ancestor: element,
+                        endContainer: endPath ? util.getNodeFromPath(endPath, element) : null
+                    };
                 }
             }
 
@@ -3323,7 +3444,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             })(element, newInnerNode);
 
             // not remove tag
-            if (noneChange || (isRemoveNode && !isRemoveFormat && !_removeCheck.v)) return _endContainer;
+            if (noneChange || (isRemoveNode && !isRemoveFormat && !_removeCheck.v)) return { ancestor: element, endContainer: _endContainer };
 
             pNode.appendChild(newInnerNode);
 
@@ -3348,7 +3469,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // node change
             element.parentNode.replaceChild(pNode, element);
-            return _endContainer;
+            return { ancestor: pNode, endContainer: _endContainer };
         },
 
         /**
@@ -3360,7 +3481,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Number} endOff The endOffset property of the selection object.
          * @param {Boolean} isRemoveFormat Is the remove all formats command?
          * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
-         * @returns {Object} { container, offset }
+         * @returns {Object} { ancestor, container, offset }
          * @private
          */
         _nodeChange_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
@@ -3386,6 +3507,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     util.copyTagAttributes(parentCon, newInnerNode);
     
                     return {
+                        ancestor: element,
                         container: endCon,
                         offset: endOff
                     };
@@ -3431,7 +3553,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
                             vNode = validation(newNode);
                             if (vNode && newNode.nodeType === 1) {
-                                if (_isMaintainedNode(vNode)) {
+                                if (_isMaintainedNode(newNode)) {
                                     if (!anchorNode) anchors.push(vNode);
                                 } else {
                                     pCurrent.push(vNode);
@@ -3576,6 +3698,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // not remove tag
             if (isRemoveNode && !isRemoveFormat && !_removeCheck.v) {
                 return {
+                    ancestor: element,
                     container: endCon,
                     offset: endOff
                 };
@@ -3617,6 +3740,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (!isRemoveNode && newInnerNode.textContent.length === 0) {
                     util.removeEmptyNode(pNode, null);
                     return {
+                        ancestor: null,
                         container: null,
                         offset: 0
                     };
@@ -3647,6 +3771,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             return {
+                ancestor: pNode,
                 container: container,
                 offset: offset
             };
@@ -3859,7 +3984,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         toggleCodeView: function () {
             const isCodeView = this._variable.isCodeView;
             this.controllersOff();
-            util.toggleDisabledButtons(!isCodeView, this.codeViewDisabledButtons);
+            util.setDisabledButtons(!isCodeView, this.codeViewDisabledButtons);
 
             if (isCodeView) {
                 this._setCodeDataToEditor();
@@ -4247,7 +4372,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _makeLine: function (node, requireFormat) {
             // element
             if (node.nodeType === 1) {
-                if (util._notAllowedTags(node)) return '';
+                if (util._disallowedTags(node)) return '';
                 if (!requireFormat || (util.isFormatElement(node) || util.isRangeFormatElement(node) || util.isComponent(node) || util.isMedia(node) || (util.isAnchor(node) && util.isMedia(node.firstElementChild)))) {
                     return node.outerHTML;
                 } else {
@@ -4274,6 +4399,35 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
+         * @param {String} text 
+         * @returns {String} HTML string
+         * @private
+         */
+        _tagConvertor: function (text) {
+            if (!this._disallowedTextTagsRegExp) return text;
+
+            const ec = {'b': 'strong', 'i': 'em', 'ins': 'u', 'strike': 'del', 's': 'del'};
+            return text.replace(this._disallowedTextTagsRegExp, function (m, t, n) {
+                return t + (typeof ec[n] === 'string' ? ec[n] : n);
+            });
+        },
+
+        /**
+         * @description Delete disallowed tags
+         * @param {String} html HTML string
+         * @returns {String}
+         * @private
+         */
+        _deleteDisallowedTags: function (html) {
+            return html
+                .replace(/\n/g, '')
+                .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/gi, '')
+                .replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '')
+                .replace(this.editorTagsWhitelistRegExp, '');
+        },
+
+        /**
          * @description Gets the clean HTML code for editor
          * @param {String} html HTML string
          * @param {String|RegExp} whitelist Regular expression of allowed tags.
@@ -4281,13 +4435,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist) {
-            html = html
-                .replace(/\n/g, '')
-                .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
-                .replace(this.editorTagsWhitelistRegExp, '')
+            html = this._deleteDisallowedTags(html)
                 .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
+                    if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
+
                     let v = null;
-                    const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z]+/)[0].toLowerCase()];
+                    const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z0-9]+/)[0].toLowerCase()];
                     if (tAttr) v = m.match(tAttr);
                     else v = m.match(this._attributesWhitelistRegExp);
 
@@ -4336,7 +4489,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             for (let i = 0, len = domTree.length, t; i < len; i++) {
                 t = domTree[i];
-                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !util._notAllowedTags(t)) {
+                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !util._disallowedTags(t)) {
                     requireFormat = true;
                     break;
                 }
@@ -4347,7 +4500,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
-            return util._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, ''));
+            return this._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, ''));
         },
 
         /**
@@ -4356,12 +4509,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
-            contents = contents
-                .replace(/\n/g, '')
-                .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/g, '')
-                .replace(this.editorTagsWhitelistRegExp, '');
-                
-            const dom = _d.createRange().createContextualFragment(contents);
+            const dom = _d.createRange().createContextualFragment(this._deleteDisallowedTags(contents));
+
             try {
                 util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
             } catch (error) {
@@ -4377,7 +4526,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (cleanHTML.length === 0) return '<p><br></p>';
 
             cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
-            return util._tagConvertor(cleanHTML);
+            return this._tagConvertor(cleanHTML);
         },
 
         /**
@@ -4601,6 +4750,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _init: function (reload, _initHTML) {
+            const wRegExp = _w.RegExp;
             this._ww = options.iframe ? context.element.wysiwygFrame.contentWindow : _w;
             this._wd = _d;
             this._charTypeHTML = options.charCounterType === 'byte-html';
@@ -4618,8 +4768,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     child = child.parentNode;
                 }
             }
-            
-            const wRegExp = _w.RegExp;
+
+            // set disallow text nodes
+            const disallowTextTags = ['b', 'i', 'ins', 's', 'strike'];
+            const allowTextTags = !options.addTagsWhitelist ? [] : options.addTagsWhitelist.split('|').filter(function (v) { return /b|i|ins|s|strike/i.test(v); });
+            for (let i = 0; i < allowTextTags.length; i++) {
+                disallowTextTags.splice(disallowTextTags.indexOf(allowTextTags[i].toLowerCase()), 1);
+            }
+            this._disallowedTextTagsRegExp = disallowTextTags.length === 0 ? null : new wRegExp('(<\\/?)(' + disallowTextTags.join('|') + ')\\b\\s*(?:[^>^<]+)?\\s*(?=>)', 'gi');
+
             // set whitelist
             const defaultAttr = 'contenteditable|colspan|rowspan|target|href|src|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
@@ -5228,7 +5385,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const selectionNode = core.getSelectionNode();
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
-            if ((!formatEl || formatEl === rangeEl) && !util.isNonEditable(targetElement)) {
+            if ((!formatEl || formatEl === rangeEl) && !util.isNonEditable(targetElement) && !util.isList(rangeEl)) {
                 const range = core.getRange();
                 if (util.getFormatElement(range.startContainer) === util.getFormatElement(range.endContainer)) {
                     if (util.isList(rangeEl)) {
@@ -6077,7 +6234,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
-            if (((!formatEl && range.collapsed) || formatEl === rangeEl) && !util.isComponent(selectionNode)) {
+            if (((!formatEl && range.collapsed) || formatEl === rangeEl) && !util.isComponent(selectionNode) && !util.isList(selectionNode)) {
                 core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
                 selectionNode = core.getSelectionNode();
             }
@@ -7138,8 +7295,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Element|String} html HTML Element or HTML string or plain string
          * @param {Boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
          * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+         * @param {Boolean} rangeSelection If true, range select the inserted node.
          */
-        insertHTML: function (html, notCleaningData, checkCharCount) {
+        insertHTML: function (html, notCleaningData, checkCharCount, rangeSelection) {
             if (typeof html === 'string') {
                 if (!notCleaningData) html = core.cleanHTML(html, null);
                 try {
@@ -7155,19 +7313,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         if (!core.checkCharCount(checkHTML, null)) return;
                     }
 
-                    let c, a, t;
+                    let c, a, t, firstCon;
                     while ((c = domTree[0])) {
                         t = core.insertNode(c, a, false);
-                        a = c;
+                        a = t.container || t;
+                        if (!firstCon) firstCon = t;
                     }
+
                     const offset = a.nodeType === 3 ? (t.endOffset || a.textContent.length): a.childNodes.length;
-                    core.setRange(a, offset, a, offset);
+                    if (rangeSelection) core.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
+                    else core.setRange(a, offset, a, offset);
                 } catch (error) {
                     core.execCommand('insertHTML', false, html);
                 }
             } else {
                 if (util.isComponent(html)) {
-                    core.insertComponent(html, false, checkCharCount);
+                    core.insertComponent(html, false, checkCharCount, false);
                 } else {
                     let afterNode = null;
                     if (util.isFormatElement(html) || util.isMedia(html)) {
