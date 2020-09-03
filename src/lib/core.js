@@ -1543,8 +1543,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (oNode.nodeType === 3) {
                         const previous = oNode.previousSibling;
                         const next = oNode.nextSibling;
-                        const previousText = (!previous ||  previous.nodeType !== 3 || util.onlyZeroWidthSpace(previous)) ? '' : previous.textContent;
-                        const nextText = (!next || next.nodeType !== 3 || util.onlyZeroWidthSpace(next)) ? '' : next.textContent;
+                        const previousText = (!previous ||  previous.nodeType === 1 || util.onlyZeroWidthSpace(previous)) ? '' : previous.textContent;
+                        const nextText = (!next || next.nodeType === 1 || util.onlyZeroWidthSpace(next)) ? '' : next.textContent;
         
                         if (previous && previousText.length > 0) {
                             oNode.textContent = previousText + oNode.textContent;
@@ -2472,14 +2472,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const isRemoveAnchor = isRemoveFormat || (isRemoveNode && (function (arr) {
                 for (let n = 0, len = arr.length; n < len; n++) {
-                    if (util._isMaintainedNode(arr[n])) return true;
+                    if (util._isMaintainedNode(arr[n]) || util._isSizeNode(arr[n])) return true;
                 }
                 return false;
             })(removeNodeArray));
-            const isMaintainedEl = util._isMaintainedNode(newNode);
 
-            const _getMaintainedNode = this._util_getMaintainedNode.bind(util, isRemoveAnchor, isMaintainedEl);
-            const _isMaintainedNode = this._util_isMaintainedNode.bind(util, isRemoveAnchor, isMaintainedEl);
+            const isSizeNode = util._isSizeNode(newNode);
+            const _getMaintainedNode = this._util_getMaintainedNode.bind(util, isRemoveAnchor, isSizeNode);
+            const _isMaintainedNode = this._util_isMaintainedNode.bind(util, isRemoveAnchor, isSizeNode);
 
             // one line
             if (oneLine) {
@@ -2588,25 +2588,25 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Return the parent maintained tag. (bind and use a util object)
-         * @param {Boolean} isRemove Delete maintained tag
-         * @param {Boolean} isSameNode Same maintained node.
          * @param {Element} element Element
          * @returns {Element}
          * @private
          */
-        _util_getMaintainedNode: function (isRemove, isSameNode, element) {
-            return element && !isSameNode && (!isRemove ? this.getParentElement(element, function (current) { return this._isMaintainedNode(current); }.bind(this)) : null);
+        _util_getMaintainedNode: function (_isRemove, _isSizeNode, element) {
+            if (!element || _isRemove) return null;
+            return this.getParentElement(element, this._isMaintainedNode.bind(this)) || (!_isSizeNode ? this.getParentElement(element, this._isSizeNode.bind(this)) : null);
         },
 
         /**
          * @description Check if element is a tag that should be persisted. (bind and use a util object)
-         * @param {Boolean} isRemove Delete maintained tag
          * @param {Element} element Element
          * @returns {Element}
          * @private
          */
-        _util_isMaintainedNode: function (isRemove, isSameNode, element) {
-            return element && !isSameNode && !isRemove && element.nodeType !== 3 && this._isMaintainedNode(element);
+        _util_isMaintainedNode: function (_isRemove, _isSizeNode, element) {
+            if (!element || _isRemove || element.nodeType !== 1) return false;
+            const anchor = this._isMaintainedNode(element);
+            return this.getParentElement(element, this._isMaintainedNode.bind(this)) ? anchor : (anchor || (!_isSizeNode ? this._isSizeNode(element) : false));
         },
 
         /**
@@ -2890,12 +2890,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
                             vNode = endPass ? newNode.cloneNode(false) : validation(newNode);
                             if (newNode.nodeType === 1 && !util.isBreak(child) && vNode && checkCss(newNode)) {
-                                if (vNode) {
-                                    if (_isMaintainedNode(vNode)) {
-                                        if (!anchorNode) anchors.push(vNode);
-                                    } else {
-                                        pCurrent.push(vNode);
-                                    }
+                                if (_isMaintainedNode(newNode)) {
+                                    if (!anchorNode) anchors.push(vNode);
+                                } else {
+                                    pCurrent.push(vNode);
                                 }
                                 cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
                             }
@@ -3145,7 +3143,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
                             vNode = validation(newNode);
                             if (newNode.nodeType === 1 && vNode) {
-                                if (_isMaintainedNode(vNode)) {
+                                if (_isMaintainedNode(newNode)) {
                                     if (!anchorNode) anchors.push(vNode);
                                 } else {
                                     pCurrent.push(vNode);
@@ -3555,7 +3553,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
                             vNode = validation(newNode);
                             if (vNode && newNode.nodeType === 1) {
-                                if (_isMaintainedNode(vNode)) {
+                                if (_isMaintainedNode(newNode)) {
                                     if (!anchorNode) anchors.push(vNode);
                                 } else {
                                     pCurrent.push(vNode);
