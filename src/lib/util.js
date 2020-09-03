@@ -11,12 +11,19 @@
  * @description utility function
  */
 const util = {
-    _d: document,
-    _w: window,
-    _hasOwn: Object.prototype.hasOwnProperty,
-    isIE: navigator.userAgent.indexOf('Trident') > -1,
-    isIE_Edge: (navigator.userAgent.indexOf('Trident') > -1) || (navigator.appVersion.indexOf('Edge') > -1),
-    isOSX_IOS: /(Mac|iPhone|iPod|iPad)/.test(navigator.platform),
+    _d: null,
+    _w: null,
+    isIE: null,
+    isIE_Edge: null,
+    isOSX_IOS: null,
+    _propertiesInit: function () {
+        if (this._d) return;
+        this._d =  document;
+        this._w = window;
+        this.isIE = navigator.userAgent.indexOf('Trident') > -1;
+        this.isIE_Edge = (navigator.userAgent.indexOf('Trident') > -1) || (navigator.appVersion.indexOf('Edge') > -1);
+        this.isOSX_IOS = /(Mac|iPhone|iPod|iPad)/.test(navigator.platform);
+    },
 
     /**
      * @description HTML Reserved Word Converter.
@@ -138,6 +145,7 @@ const util = {
     hasOwn: function (obj, key) {
         return this._hasOwn.call(obj, key);
     },
+    _hasOwn: Object.prototype.hasOwnProperty,
 
     /**
      * @deprecated
@@ -295,7 +303,7 @@ const util = {
      * @returns {Boolean}
      */
     isTextStyleElement: function (element) {
-        return element && element.nodeType !== 3 && /^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code)$/i.test(element.nodeName);
+        return element && element.nodeType === 1 && /^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code)$/i.test(element.nodeName);
     },
 
     /**
@@ -1583,18 +1591,27 @@ const util = {
      * @private
      */
     _isIgnoreNodeChange: function (element) {
-        return element.nodeType !== 3 && (this.isNonEditable(element) || !this.isTextStyleElement(element));
+        return element && element.nodeType === 1 && (this.isNonEditable(element) || !this.isTextStyleElement(element));
     },
 
     /**
-     * @description Nodes that must remain undetached when changing text nodes (A, Label, Code, Span(font-size))
+     * @description Nodes that must remain undetached when changing text nodes (A, Label, Code)
      * @param {Node|String} element Element to check
      * @returns {Boolean}
      * @private
      */
     _isMaintainedNode: function (element) {
-        const isStr = typeof element === 'string';
-        return element.nodeType !== 3 && (/^(a|label|code)$/i.test(isStr ? element : element.nodeName) || (!isStr && !this.isWysiwygDiv(element) && !!element.style.fontSize));
+        return element && element.nodeType === 1 && /^(a|label|code)$/i.test(typeof element === 'string' ? element : element.nodeName);
+    },
+
+    /**
+     * @description Node with font-size style
+     * @param {Node} element Element to check
+     * @returns {Boolean}
+     * @private
+     */
+    _isSizeNode: function (element) {
+        return element && element.nodeType === 1 && this.isTextStyleElement(element) && !!element.style.fontSize;
     },
 
     /**
@@ -1604,7 +1621,7 @@ const util = {
      * @private
      */
     _notTextNode: function (element) {
-        return element.nodeType !== 3 && (this.isComponent(element) || /^(br|input|select|canvas|img|iframe|audio|video)$/i.test(typeof element === 'string' ? element : element.nodeName));
+        return element.nodeType === 1 && (this.isComponent(element) || /^(br|input|select|canvas|img|iframe|audio|video)$/i.test(typeof element === 'string' ? element : element.nodeName));
     },
 
     /**
