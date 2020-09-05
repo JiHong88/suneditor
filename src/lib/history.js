@@ -8,8 +8,9 @@
 'use strict';
 
 export default function (core, change) {
-    const _w = window;
+    const _w = core._w;
     const util = core.util;
+    const delayTime = core.context.options.historyStackDelayTime;
     let editor = core.context.element;
     let undo = core.context.tool.undo;
     let redo = core.context.tool.redo;
@@ -93,14 +94,14 @@ export default function (core, change) {
 
         /**
          * @description Saving the current status to the history object stack
-         * If "delay" is true, it will be saved after 500 miliseconds
+         * If "delay" is true, it will be saved after (options.historyStackDelayTime || 400) miliseconds
          * If the function is called again with the "delay" argument true before it is saved, the delay time is renewal
          * You can specify the delay time by sending a number.
-         * @param {Boolean|Number} delay If true, delays 400 milliseconds
+         * @param {Boolean|Number} delay If true, Add stack without delay time.
          */
         push: function (delay) {
             _w.setTimeout(core._resourcesStateChange.bind(core));
-            const time = typeof delay === 'number' ? (delay > 0 ? delay : 0) : (!delay ? 0 : 400);
+            const time = typeof delay === 'number' ? (delay > 0 ? delay : 0) : (!delay ? 0 : delayTime);
             
             if (!time || pushDelay) {
                 _w.clearTimeout(pushDelay);
