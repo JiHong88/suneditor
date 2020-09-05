@@ -1260,8 +1260,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return null;
             }
 
-            this.getRange_addLine(this.getRange());
             const r = this.removeNode();
+            this.getRange_addLine(this.getRange());
             let oNode = null;
             let selectionNode = this.getSelectionNode();
             let formatEl = util.getFormatElement(selectionNode, null);
