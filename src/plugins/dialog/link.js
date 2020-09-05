@@ -170,9 +170,6 @@ export default {
                 this.setRange(textNode, 0, textNode, textNode.textContent.length);
             }
 
-            // history stack
-            this.history.push(false);
-
             contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = contextLink.linkAnchorText.value = '';
         }.bind(this);
 
@@ -181,7 +178,8 @@ export default {
         } finally {
             this.plugins.dialog.close.call(this);
             this.closeLoading();
-            this.focus();
+            // history stack
+            this.history.push(false);
         }
 
         return false;

@@ -877,7 +877,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         getRange: function () {
             const range = this._variable._range || this._createDefaultRange();
             const selection = this.getSelection();
-            if (range.collapsed === selection.isCollapsed) return range;
+            if (range.collapsed === selection.isCollapsed || !context.element.wysiwyg.contains(selection.focusNode)) return range;
             
             if (selection.rangeCount > 0) {
                 this._variable._range = selection.getRangeAt(0);
@@ -1016,8 +1016,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let tempCon, tempOffset, tempChild;
 
             if (util.isFormatElement(startCon)) {
-                startCon = startCon.childNodes[startOff] || startCon.firstChild;
-                startOff = 0;
+                startCon = startCon.childNodes[startOff] || startCon.lastChild;
+                startOff = startCon.textContent.length;
             }
             if (util.isFormatElement(endCon)) {
                 endCon = endCon.childNodes[endOff] || endCon.lastChild;
@@ -1260,8 +1260,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return null;
             }
 
-            this.getRange_addLine(this.getRange());
             const r = this.removeNode();
+            this.getRange_addLine(this.getRange());
             let oNode = null;
             let selectionNode = this.getSelectionNode();
             let formatEl = util.getFormatElement(selectionNode, null);
@@ -1493,7 +1493,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             afterNode = isFormats ? endCon : null;
                         }
 
-                        while (afterNode && afterNode.parentNode !== commonCon) {
+                        while (afterNode && !util.isFormatElement(afterNode) && afterNode.parentNode !== commonCon) {
                             afterNode = afterNode.parentNode;
                         }
                     }
@@ -1530,7 +1530,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     afterNode = parentNode.nextElementSibling;
                     parentNode = parentNode.parentNode;
                 }
-                parentNode.insertBefore(oNode, afterNode);
+                parentNode.insertBefore(oNode, parentNode === afterNode ? parentNode.lastChild : afterNode);
             } catch (e) {
                 parentNode.appendChild(oNode);
             } finally {
