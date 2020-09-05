@@ -877,7 +877,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         getRange: function () {
             const range = this._variable._range || this._createDefaultRange();
             const selection = this.getSelection();
-            if (range.collapsed === selection.isCollapsed) return range;
+            if (range.collapsed === selection.isCollapsed || !context.element.wysiwyg.contains(selection.focusNode)) return range;
             
             if (selection.rangeCount > 0) {
                 this._variable._range = selection.getRangeAt(0);
@@ -1493,7 +1493,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             afterNode = isFormats ? endCon : null;
                         }
 
-                        while (afterNode && afterNode.parentNode !== commonCon) {
+                        while (afterNode && !util.isFormatElement(afterNode) && afterNode.parentNode !== commonCon) {
                             afterNode = afterNode.parentNode;
                         }
                     }
@@ -1530,7 +1530,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     afterNode = parentNode.nextElementSibling;
                     parentNode = parentNode.parentNode;
                 }
-                parentNode.insertBefore(oNode, afterNode);
+                parentNode.insertBefore(oNode, parentNode === afterNode ? parentNode.lastChild : afterNode);
             } catch (e) {
                 parentNode.appendChild(oNode);
             } finally {
