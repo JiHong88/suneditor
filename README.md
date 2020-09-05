@@ -331,6 +331,7 @@ plugins: [
 lang            : language object.   default : en {Object}
 value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {String}
+historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {Number}
 
 // Whitelist--------------------------------------å---------------------------------------------------------
 // _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code'

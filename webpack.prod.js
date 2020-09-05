@@ -16,6 +16,7 @@ module.exports = merge(common, {
 	},
 
 	plugins: [
+		new webpack.SourceMapDevToolPlugin(),
 		new webpack.HashedModuleIdsPlugin(),
 		new webpack.optimize.ModuleConcatenationPlugin(),
 		new CleanWebpackPlugin(['dist']),
