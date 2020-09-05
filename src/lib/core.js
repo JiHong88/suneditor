@@ -1016,8 +1016,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let tempCon, tempOffset, tempChild;
 
             if (util.isFormatElement(startCon)) {
-                startCon = startCon.childNodes[startOff] || startCon.firstChild;
-                startOff = 0;
+                startCon = startCon.childNodes[startOff] || startCon.lastChild;
+                startOff = startCon.textContent.length;
             }
             if (util.isFormatElement(endCon)) {
                 endCon = endCon.childNodes[endOff] || endCon.lastChild;
