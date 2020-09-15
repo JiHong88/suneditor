@@ -28,7 +28,7 @@
 }
 
 /* RTL - editable */
-.sun-editor-editable.se-rtl {
+.sun-editor-editable.se-rtl * {
     direction: rtl;
 }
 

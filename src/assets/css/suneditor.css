@@ -21,7 +21,6 @@
 .sun-editor button .txt {display:block; margin-top:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
 
-/** --- Icons ---------------------------------------------------------- */
 /* button children are pointer event none */
 .sun-editor button * {
     pointer-events: none;
@@ -29,6 +28,15 @@
     -webkit-backface-visibility: hidden;
     -moz-backface-visibility: hidden;
 }
+/* RTL - button */
+.sun-editor.se-rtl button {
+    transform: rotate(0deg) rotateY(180deg);
+}
+.sun-editor.se-rtl * {
+    direction: rtl;
+}
+
+/** --- Icons ---------------------------------------------------------- */
 /* default svg */
 .sun-editor button > svg, .sun-editor .se-svg {
     width: 16px;
@@ -62,10 +70,6 @@
 .sun-editor .se-line-breaker > button > svg {
     width: 24px;
     height: 24px;
-}
-/* RTL - button */
-.sun-editor.se-rtl button {
-    transform: rotate(0deg) rotateY(180deg);
 }
 
 /* icon class */
@@ -241,7 +245,7 @@
 /* submenu layer - form group (color selector) */
 .sun-editor .se-submenu-form-group {display:flex; width:100%; height:auto; padding:4px;}
 .sun-editor .se-submenu-form-group input {flex:auto; display:inline-block; width:auto; height:33px; color:#555; font-size:12px; margin:1px 0 1px 0; padding:0; border-radius:0.25rem; border:1px solid #ccc;}
-.sun-editor .se-submenu-form-group button {float:right; width:34px; height:34px; margin:0 0 0 4px !important;}
+.sun-editor .se-submenu-form-group button {float:right; width:34px; height:34px; margin:0 2px !important;}
 .sun-editor .se-submenu-form-group button.se-btn {border:1px solid #ccc;}
 .sun-editor .se-submenu-form-group > div {position:relative;}
 /** submenu layer - color input */
