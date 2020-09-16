@@ -436,7 +436,7 @@ export default {
         options.imageUploadUrl = typeof options.imageUploadUrl === 'string' ? options.imageUploadUrl : null;
         options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? util.getNumber(options.imageUploadSizeLimit, 0) : null;
         options.imageMultipleFile = !!options.imageMultipleFile;
-        options.imageAccept = typeof options.imageAccept === 'string' ? options.imageAccept.trim() || '*' : '*';
+        options.imageAccept = (typeof options.imageAccept !== 'string' || options.imageAccept.trim() === "*") ? 'image/*' : options.imageAccept.trim() || 'image/*';
         /** Image - image gallery */
         options.imageGalleryUrl = typeof options.imageGalleryUrl === 'string' ? options.imageGalleryUrl : null;
         /** Video */
@@ -459,7 +459,7 @@ export default {
         options.videoMultipleFile = !!options.videoMultipleFile;
         options.videoTagAttrs = options.videoTagAttrs || null;
         options.videoIframeAttrs = options.videoIframeAttrs || null;
-        options.videoAccept = typeof options.videoAccept === 'string' ? options.videoAccept.trim() || '*' : '*';
+        options.videoAccept = (typeof options.videoAccept !== 'string' || options.videoAccept.trim() === "*") ? 'video/*' : options.videoAccept.trim() || 'video/*';
         /** Audio */
         options.audioWidth = !options.audioWidth ? '' : util.isNumber(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth;
         options.audioHeight = !options.audioHeight ? '' : util.isNumber(options.audioHeight) ? options.audioHeight + 'px' : options.audioHeight;
@@ -470,7 +470,7 @@ export default {
         options.audioUploadSizeLimit = /\d+/.test(options.audioUploadSizeLimit) ? util.getNumber(options.audioUploadSizeLimit, 0) : null;
         options.audioMultipleFile = !!options.audioMultipleFile;
         options.audioTagAttrs = options.audioTagAttrs || null;
-        options.audioAccept = typeof options.audioAccept === 'string' ? options.audioAccept.trim() || '*' : '*';
+        options.audioAccept = (typeof options.audioAccept !== 'string' || options.audioAccept.trim() === "*") ? 'audio/*' : options.audioAccept.trim() || 'audio/*';
         /** Table */
         options.tableCellControllerPosition = typeof options.tableCellControllerPosition === 'string' ? options.tableCellControllerPosition.toLowerCase() : 'cell';
         /** Key actions */
