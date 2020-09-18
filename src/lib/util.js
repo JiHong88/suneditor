@@ -303,7 +303,7 @@ const util = {
      * @returns {Boolean}
      */
     isTextStyleElement: function (element) {
-        return element && element.nodeType === 1 && /^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code)$/i.test(element.nodeName);
+        return element && element.nodeType !== 3 && /^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code)$/i.test(element.nodeName);
     },
 
     /**
@@ -1591,7 +1591,7 @@ const util = {
      * @private
      */
     _isIgnoreNodeChange: function (element) {
-        return element && element.nodeType === 1 && (this.isNonEditable(element) || !this.isTextStyleElement(element));
+        return element && element.nodeType !== 3 && (this.isNonEditable(element) || !this.isTextStyleElement(element));
     },
 
     /**
@@ -1601,7 +1601,7 @@ const util = {
      * @private
      */
     _isMaintainedNode: function (element) {
-        return element && element.nodeType === 1 && /^(a|label|code)$/i.test(typeof element === 'string' ? element : element.nodeName);
+        return element && element.nodeType !== 3 && /^(a|label|code)$/i.test(typeof element === 'string' ? element : element.nodeName);
     },
 
     /**
@@ -1611,7 +1611,7 @@ const util = {
      * @private
      */
     _isSizeNode: function (element) {
-        return element && element.nodeType === 1 && this.isTextStyleElement(element) && !!element.style.fontSize;
+        return element && element.nodeType !== 3 && this.isTextStyleElement(element) && !!element.style.fontSize;
     },
 
     /**
@@ -1621,7 +1621,7 @@ const util = {
      * @private
      */
     _notTextNode: function (element) {
-        return element.nodeType === 1 && (this.isComponent(element) || /^(br|input|select|canvas|img|iframe|audio|video)$/i.test(typeof element === 'string' ? element : element.nodeName));
+        return element && element.nodeType !== 3 && (this.isComponent(element) || /^(br|input|select|canvas|img|iframe|audio|video)$/i.test(typeof element === 'string' ? element : element.nodeName));
     },
 
     /**
