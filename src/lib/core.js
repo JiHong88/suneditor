@@ -3929,6 +3929,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const rangeLines = this.getSelectedElements(null);
             const cells = [];
             const shift = 'indent' !== command;
+            const marginDir = options.rtl ? 'marginRight' : 'marginLeft';
             let sc = range.startContainer;
             let ec = range.endContainer;
             let so = range.startOffset;
@@ -3938,13 +3939,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 f = rangeLines[i];
 
                 if (!util.isListCell(f) || !this.plugins.list) {
-                    margin = /\d+/.test(f.style.marginLeft) ? util.getNumber(f.style.marginLeft, 0) : 0;
+                    margin = /\d+/.test(f.style[marginDir]) ? util.getNumber(f.style[marginDir], 0) : 0;
                     if (shift) {
                         margin -= 25;
                     } else {
                         margin += 25;
                     }
-                    util.setStyle(f, 'marginLeft', (margin <= 0 ? '' : margin + 'px'));
+                    util.setStyle(f, marginDir, (margin <= 0 ? '' : margin + 'px'));
                 } else {
                     if (shift || f.previousElementSibling) {
                         cells.push(f);
@@ -6276,7 +6277,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onBlur_wysiwyg: function (e) {
-            if (core._antiBlur) return;
+            if (core._antiBlur || core._variable.isCodeView) return;
             core.hasFocus = false;
             core.controllersOff();
             if (core._isInline || core._isBalloon) event._hideToolbar();
