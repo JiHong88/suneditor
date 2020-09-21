@@ -427,15 +427,15 @@
 /* button - select text */
 .sun-editor.se-rtl .se-btn-select .txt {flex:auto; text-align:right; direction:rtl;}
 /* button - se-menu-list */
-.sun-editor .se-btn-list {text-align:right;}
+.sun-editor.se-rtl .se-btn-list {text-align:right;}
 /* button - se-menu-list - li */
-.sun-editor .se-menu-list li {float:right;}
+.sun-editor.se-rtl .se-menu-list li {float:right;}
 /* menu list */
-.sun-editor .se-list-layer * {direction:rtl;}
+.sun-editor.se-rtl .se-list-layer * {direction:rtl;}
 /* menu list - format block */
-.sun-editor .se-list-layer.se-list-format ul blockquote {padding:0 7px 0 0; border-right-width:5px; border-left-width:0;}
+.sun-editor.se-rtl .se-list-layer.se-list-format ul blockquote {padding:0 7px 0 0; border-right-width:5px; border-left-width:0;}
 /* menu list - color picker */
-.sun-editor .se-list-layer .se-selector-color .se-color-pallet li {float:right;}
+.sun-editor.se-rtl .se-list-layer .se-selector-color .se-color-pallet li {float:right;}
 /* placeholder */
 .sun-editor.se-rtl .se-wrapper .se-placeholder {direction:rtl;}
 /* dialog */
@@ -451,10 +451,10 @@
 .sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-footer > div {float:right;}
 .sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-footer > div > label {margin:0 0 0 5px;}
 /* fileBrowser */
-.sun-editor .se-file-browser * {direction:rtl;}
+.sun-editor.se-rtl .se-file-browser * {direction:rtl;}
 /* fileBrowser - header */
-.sun-editor .se-file-browser .se-file-browser-tags {text-align:right;}
-.sun-editor .se-file-browser .se-file-browser-tags a {margin: 8px 8px 0 8px;}
+.sun-editor.se-rtl .se-file-browser .se-file-browser-tags {text-align:right;}
+.sun-editor.se-rtl .se-file-browser .se-file-browser-tags a {margin: 8px 8px 0 8px;}
 .sun-editor.se-rtl .se-file-browser .se-file-browser-header .se-file-browser-close {float:left;}
 
 
