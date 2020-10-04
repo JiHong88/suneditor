@@ -263,7 +263,7 @@ s1.onKeyDown = function (e, core) {
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     value: "",
-    rtl: true,
+    direction: 'rtl',
     lang: lang.ko,
     plugins: plugins,
     katex: Katex,

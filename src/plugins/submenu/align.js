@@ -17,6 +17,7 @@ export default {
             targetButton: targetElement,
             _alignList: null,
             currentAlign: '',
+            defaultDir: context.options.rtl ? 'right' : 'left', 
             icons: {
                 justify: icons.align_justify,
                 left: icons.align_left,
@@ -44,26 +45,31 @@ export default {
         const lang = this.lang;
         const icons = this.icons;
         const listDiv = this.util.createElement('DIV');
+        const leftDir = this.context.align.defaultDir === 'left';
+
+        const leftMenu = '<li>' +
+            '<button type="button" class="se-btn-list se-btn-align" data-command="justifyleft" data-value="left" title="' + lang.toolbar.alignLeft + '">' +
+                '<span class="se-list-icon">' + icons.align_left + '</span>' + lang.toolbar.alignLeft +
+            '</button>' +
+        '</li>';
+
+        const rightMenu = '<li>' +
+            '<button type="button" class="se-btn-list se-btn-align" data-command="justifyright" data-value="right" title="' + lang.toolbar.alignRight + '">' +
+                '<span class="se-list-icon">' + icons.align_right +'</span>' + lang.toolbar.alignRight +
+            '</button>' +
+        '</li>';
 
         listDiv.className = 'se-submenu se-list-layer se-list-align';
         listDiv.innerHTML = '' +
             '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
-                    '<li>' +
-                        '<button type="button" class="se-btn-list se-btn-align" data-command="justifyleft" data-value="left" title="' + lang.toolbar.alignLeft + '">' +
-                            '<span class="se-list-icon">' + icons.align_left + '</span>' + lang.toolbar.alignLeft +
-                        '</button>' +
-                    '</li>' +
+                    (leftDir ? leftMenu : rightMenu) +
                     '<li>' +
                         '<button type="button" class="se-btn-list se-btn-align" data-command="justifycenter" data-value="center" title="' + lang.toolbar.alignCenter + '">' +
                             '<span class="se-list-icon">' + icons.align_center + '</span>' + lang.toolbar.alignCenter +
                         '</button>' +
                     '</li>' +
-                    '<li>' +
-                        '<button type="button" class="se-btn-list se-btn-align" data-command="justifyright" data-value="right" title="' + lang.toolbar.alignRight + '">' +
-                            '<span class="se-list-icon">' + icons.align_right +'</span>' + lang.toolbar.alignRight +
-                        '</button>' +
-                    '</li>' +
+                    (leftDir? rightMenu : leftMenu) +
                     '<li>' +
                         '<button type="button" class="se-btn-list se-btn-align" data-command="justifyfull" data-value="justify" title="' + lang.toolbar.alignJustify + '">' +
                             '<span class="se-list-icon">' + icons.align_justify + '</span>' + lang.toolbar.alignJustify +
@@ -79,16 +85,17 @@ export default {
      * @Override core
      */
     active: function (element) {
-        const targetButton = this.context.align.targetButton;
+        const alignContext = this.context.align;
+        const targetButton = alignContext.targetButton;
         const target = targetButton.firstElementChild;
 
         if (!element) {
-            this.util.changeElement(target, this.context.align.icons.left);
+            this.util.changeElement(target, alignContext.icons[alignContext.defaultDir]);
             targetButton.removeAttribute('data-focus');
         } else if (this.util.isFormatElement(element)) {
             const textAlign = element.style.textAlign;
             if (textAlign) {
-                this.util.changeElement(target, this.context.align.icons[textAlign]);
+                this.util.changeElement(target, alignContext.icons[textAlign]);
                 targetButton.setAttribute('data-focus', textAlign);
                 return true;
             }
@@ -103,7 +110,7 @@ export default {
     on: function () {
         const alignContext = this.context.align;
         const alignList = alignContext._alignList;
-        const currentAlign = alignContext.targetButton.getAttribute('data-focus') || 'left';
+        const currentAlign = alignContext.targetButton.getAttribute('data-focus') || alignContext.defaultDir;
 
         if (currentAlign !== alignContext.currentAlign) {
             for (let i = 0, len = alignList.length; i < len; i++) {
@@ -132,9 +139,10 @@ export default {
 
         if (!value) return;
 
+        const defaultDir = this.context.align.defaultDir;
         const selectedFormsts = this.getSelectedElements();
         for (let i = 0, len = selectedFormsts.length; i < len; i++) {
-            this.util.setStyle(selectedFormsts[i], 'textAlign', (value === 'left' ? '' : value));
+            this.util.setStyle(selectedFormsts[i], 'textAlign', (value === defaultDir ? '' : value));
         }
 
         this.effectNode = null;

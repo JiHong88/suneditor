@@ -5201,6 +5201,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (selectionNode === core.effectNode) return;
             core.effectNode = selectionNode;
 
+            const marginDir = options.rtl ? 'marginRight' : 'marginLeft';
             const commandMap = core.commandMap;
             const classOnCheck = this._onButtonsCheck;
             const commandMapNodes = [];
@@ -5231,7 +5232,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (util.isFormatElement(element)) {
                     /* Outdent */
                     if (commandMapNodes.indexOf('OUTDENT') === -1 && commandMap.OUTDENT) {
-                        if (util.isListCell(element) || (element.style.marginLeft && util.getNumber(element.style.marginLeft, 0) > 0)) {
+                        if (util.isListCell(element) || (element.style[marginDir] && util.getNumber(element.style[marginDir], 0) > 0)) {
                             commandMapNodes.push('OUTDENT');
                             commandMap.OUTDENT.removeAttribute('disabled');
                         }

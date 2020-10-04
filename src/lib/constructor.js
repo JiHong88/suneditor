@@ -387,7 +387,7 @@ export default {
         options.attributesWhitelist = (!options.attributesWhitelist || typeof options.attributesWhitelist !== 'object') ? null : options.attributesWhitelist;
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
-        options.rtl = !!options.rtl;
+        options.rtl = /rtl/i.test(options.direction);
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
         options.toolbarContainer = /balloon/i.test(options.mode) ? null : (typeof options.toolbarContainer === 'string' ? document.querySelector(options.toolbarContainer) : options.toolbarContainer);
         options.stickyToolbar = (/balloon/i.test(options.mode) || !!options.toolbarContainer) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);
@@ -550,7 +550,7 @@ export default {
             fontSize: ['se-btn-select se-btn-tool-size', lang.toolbar.fontSize, 'fontSize', 'submenu', '<span class="txt">' + lang.toolbar.fontSize + '</span>' + icons.arrow_down],
             fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu', icons.font_color],
             hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', icons.highlight_color],
-            align: ['se-btn-align', lang.toolbar.align, 'align', 'submenu', icons.align_left],
+            align: ['se-btn-align', lang.toolbar.align, 'align', 'submenu', (options.rtl ? icons.align_right : icons.align_left)],
             list: ['', lang.toolbar.list, 'list', 'submenu', '<span class="se-rtl-icon">' + icons.list_number + '</span>'],
             horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'submenu', icons.horizontal_rule],
             table: ['', lang.toolbar.table, 'table', 'submenu', icons.table],
