@@ -602,11 +602,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const toolbar = this.context.element.toolbar;
             const toolbarW = toolbar.offsetWidth;
+            const toolbarOffset = event._getEditorOffsets(context.element.toolbar);
             const menuW = menu.offsetWidth;
-            const l = element.parentElement.offsetLeft + 3;
-            const overLeft = toolbarW <= menuW ? 0 : toolbarW - (l + menuW);
-            if (overLeft < 0) menu.style.left = (l + overLeft) + 'px';
-            else menu.style.left = l + 'px';
+            const rtlW = (options.rtl && menuW > element.offsetWidth) ? menuW - element.offsetWidth : 0;
+            const l = element.parentElement.offsetLeft + 3 - rtlW;
+
+            // rtl
+            if (options.rtl) {
+                menu.style.left = l + 'px';
+                if (toolbarOffset.left > event._getEditorOffsets(menu).left) {
+                    menu.style.left = toolbarOffset.left + 'px';
+                }
+            } else {
+                const overLeft = toolbarW <= menuW ? 0 : toolbarW - (l + menuW);
+                if (overLeft < 0) menu.style.left = (l + overLeft) + 'px';
+                else menu.style.left = l + 'px';
+            }
 
             // get element top
             let t = 0;
@@ -624,7 +635,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             // set menu position
-            const toolbarTop = event._getEditorOffsets(context.element.toolbar).top;
+            const toolbarTop = toolbarOffset.top;
             let menuHeight = menu.offsetHeight;
             let el = context.element.topArea;
             let scrollTop = 0;
