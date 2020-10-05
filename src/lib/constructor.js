@@ -501,7 +501,15 @@ export default {
         ];
 
         /** --- Define icons --- */
+        // custom icons
         options.icons = (!options.icons || typeof options.icons !== 'object') ? _icons : [_icons, options.icons].reduce(function (_default, _new) {
+            for (let key in _new) {
+                if (util.hasOwn(_new, key)) _default[key] = _new[key];
+            }
+            return _default;
+        }, {});
+        // rtl icons
+        options.icons = !options.rtl ? options.icons : [options.icons, options.icons.rtl].reduce(function (_default, _new) {
             for (let key in _new) {
                 if (util.hasOwn(_new, key)) _default[key] = _new[key];
             }
@@ -532,8 +540,8 @@ export default {
             subscript: ['_se_command_subscript', lang.toolbar.subscript, 'SUB', '', icons.subscript],
             superscript: ['_se_command_superscript', lang.toolbar.superscript, 'SUP', '', icons.superscript],
             removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', icons.erase],
-            indent: ['_se_command_indent', lang.toolbar.indent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : ' (' + cmd + '+])') + '</span>', 'indent', '', '<span class="se-rtl-icon">' + icons.outdent + '</span>'],
-            outdent: ['_se_command_outdent', lang.toolbar.outdent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : ' (' + cmd + '+[)') + '</span>', 'outdent', '', '<span class="se-rtl-icon">' + icons.indent + '</span>'],
+            indent: ['_se_command_indent', lang.toolbar.indent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : ' (' + cmd + '+])') + '</span>', 'indent', '', icons.outdent],
+            outdent: ['_se_command_outdent', lang.toolbar.outdent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : ' (' + cmd + '+[)') + '</span>', 'outdent', '', icons.indent],
             fullScreen: ['se-code-view-enabled se-resizing-enabled _se_command_fullScreen', lang.toolbar.fullScreen, 'fullScreen', '', icons.expansion],
             showBlocks: ['_se_command_showBlocks', lang.toolbar.showBlocks, 'showBlocks', '', icons.show_blocks],
             codeView: ['se-code-view-enabled se-resizing-enabled _se_command_codeView', lang.toolbar.codeView, 'codeView', '', icons.code_view],
@@ -551,7 +559,7 @@ export default {
             fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu', icons.font_color],
             hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', icons.highlight_color],
             align: ['se-btn-align', lang.toolbar.align, 'align', 'submenu', (options.rtl ? icons.align_right : icons.align_left)],
-            list: ['', lang.toolbar.list, 'list', 'submenu', '<span class="se-rtl-icon">' + icons.list_number + '</span>'],
+            list: ['', lang.toolbar.list, 'list', 'submenu', icons.list_number],
             horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'submenu', icons.horizontal_rule],
             table: ['', lang.toolbar.table, 'table', 'submenu', icons.table],
             lineHeight: ['', lang.toolbar.lineHeight, 'lineHeight', 'submenu', icons.line_height],
