@@ -263,8 +263,9 @@ s1.onKeyDown = function (e, core) {
 
 plugins.mention.getItems = async term => 
   [
-    {name: 'user1'},
-    {name: 'user2'}
+    {name: 'auser1'},
+    {name: 'buser2'},
+    {name: 'cuser2'},
   ].filter(u => u.name.includes(term));
 
 plugins.mention.getValue = ({ name }) => `@${name}`;
