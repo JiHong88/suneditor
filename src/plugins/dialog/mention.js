@@ -9,7 +9,6 @@
 
 import dialog from "../modules/dialog";
 
-const icon = '<svg class="MuiSvgIcon-root" focusable="false" viewBox="0 0 24 24" aria-hidden="true"><path fill-opacity=".9" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10h5v-2h-5c-4.34 0-8-3.66-8-8s3.66-8 8-8 8 3.66 8 8v1.43c0 .79-.71 1.57-1.5 1.57s-1.5-.78-1.5-1.57V12c0-2.76-2.24-5-5-5s-5 2.24-5 5 2.24 5 5 5c1.38 0 2.64-.56 3.54-1.47.65.89 1.77 1.47 2.96 1.47 1.97 0 3.5-1.6 3.5-3.57V12c0-5.52-4.48-10-10-10zm0 13c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"></path></svg>';
 
 function insertAt(parent, child, index) {
   if (!index) index = 0;
@@ -23,8 +22,6 @@ function insertAt(parent, child, index) {
 export default {
   name: "mention",
   display: "dialog",
-  title: "Mention", //TODO: how do i translate this?
-  innerHTML: icon,
 
   renderItem: function(item) {
     return `<span>${item}</span>`;
@@ -45,7 +42,7 @@ export default {
       mention.focussed = 0;
       mention.term = term;
       promise = mention.getItems(term).then((items) => {
-        mention.items = items;
+        mention._items = items;
 
         Object.keys(mention._itemElements).forEach((id) => {
           if (!items.find((i) => mention.getId(i) === id)) {
@@ -64,9 +61,9 @@ export default {
             el.innerHTML = mention.renderItem(item);
             el.addEventListener("click", () => {
               mention.focussed = idx;
-              mention.addMention();
+              mention._addMention();
             });
-            insertAt(mention.list, el, idx);
+            insertAt(mention._list, el, idx);
             mention._itemElements[id] = el;
           }
         });
@@ -74,11 +71,11 @@ export default {
     }
 
     promise.then(() => {
-      const current = mention.list.querySelectorAll(".se-mention-item")[
+      const current = mention._list.querySelectorAll(".se-mention-item")[
         mention.focussed
       ];
       if (current && !this.util.hasClass(current, "se-mention-active")) {
-        const prev = mention.list.querySelector(".se-mention-active");
+        const prev = mention._list.querySelector(".se-mention-active");
         if (prev) this.util.removeClass(prev, "se-mention-active");
         this.util.addClass(current, "se-mention-active");
       }
@@ -128,7 +125,7 @@ export default {
       "mention",
       "mention" === this.currentControllerName
     );
-    mention.search.focus();
+    mention._search.focus();
     mention.renderList("");
   },
 
@@ -139,11 +136,11 @@ export default {
 
   init: function() {
     const { mention } = this.context;
-    mention.search.value = "";
+    mention._search.value = "";
     mention.focussed = 0;
-    mention.items = [];
+    mention._items = [];
     mention._itemElements = {};
-    mention.list.innerHTML = "";
+    mention._list.innerHTML = "";
     delete mention.term;
   },
 
@@ -165,7 +162,7 @@ export default {
         break;
 
       case "Enter":
-        mention.addMention();
+        mention._addMention();
         e.preventDefault();
         e.stopPropagation();
         break;
@@ -189,9 +186,9 @@ export default {
     });
   },
 
-  addMention: function() {
+  _addMention: function() {
     const { mention } = this.context;
-    const new_mention = mention.items[mention.focussed];
+    const new_mention = mention._items[mention.focussed];
     if (new_mention) {
       if (
         !mention.mentions.find(
@@ -218,29 +215,27 @@ export default {
     const _dialog = this.setDialog.call(core);
     core.getMentions = this.getMentions.bind(core);
 
-    const search = _dialog.querySelector(".se-mention-search");
-    search.addEventListener("keyup", this.onKeyUp.bind(core));
-    search.addEventListener("keydown", this.onKeyPress.bind(core));
-    const list = _dialog.querySelector(".se-mention-list");
+    const _search = _dialog.querySelector(".se-mention-search");
+    _search.addEventListener("keyup", this.onKeyUp.bind(core));
+    _search.addEventListener("keydown", this.onKeyPress.bind(core));
+    const _list = _dialog.querySelector(".se-mention-list");
 
     core.context.mention = {
-      modal: _dialog,
-      search,
-      list,
-      triggerKey: this.triggerKey,
-      visible: false,
-      addMention: this.addMention.bind(core),
-      mentions: [],
-      items: [],
+      _addMention: this._addMention.bind(core),
       _itemElements: {},
-      renderList: this.renderList.bind(core),
-      getId: this.getId.bind(core),
-      getValue: this.getValue.bind(core),
-      getLinkHref: this.getLinkHref.bind(core),
-      open: this.open.bind(core),
+      _items: [],
+      _list,
+      _search,
       focussed: 0,
-      renderItem: this.renderItem,
+      getId: this.getId.bind(core),
       getItems: this.getItems,
+      getLinkHref: this.getLinkHref.bind(core),
+      getValue: this.getValue.bind(core),
+      mentions: [],
+      modal: _dialog,
+      open: this.open.bind(core),
+      renderItem: this.renderItem,
+      renderList: this.renderList.bind(core),
     };
     core.context.dialog.modal.appendChild(_dialog);
   },
