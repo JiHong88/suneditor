@@ -110,6 +110,9 @@
                 tags: 'Tag',
                 search: 'Procurar',
             },
+            mentionBox: {
+              title: 'Adicionar menção',
+            },
             caption: 'Inserir descrição',
             close: 'Fechar',
             submitButton: 'Enviar',

@@ -109,6 +109,9 @@
                 tags: 'Tags',
                 search: 'Search',
             },
+            mentionBox: {
+              title: 'Add Mention',
+            },
             caption: 'Insert description',
             close: 'Close',
             submitButton: 'Submit',

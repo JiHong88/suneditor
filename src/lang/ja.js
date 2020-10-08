@@ -109,6 +109,9 @@
                 tags: 'タグ',
                 search: '探す',
             },
+            mentionBox: {
+              title: '言及を追加',
+            },
             caption: '説明付け',
             close: '閉じる',
             submitButton: '確認',

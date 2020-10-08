@@ -109,6 +109,9 @@
                 tags: 'Tagi',
                 search: 'Meklēt'
             },
+            mentionBox: {
+              title: 'Pievienot pieminēšanu',
+            },
             caption: 'Ievietot aprakstu',
             close: 'Aizvērt',
             submitButton: 'Iesniegt',
