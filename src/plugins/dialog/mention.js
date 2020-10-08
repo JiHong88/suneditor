@@ -102,6 +102,7 @@ export default {
     const { mention } = this.context;
     mention.search.value = "";
     mention.focussed = 0;
+    mention.items = [];
   },
 
   onKeyPress: function(e) {
