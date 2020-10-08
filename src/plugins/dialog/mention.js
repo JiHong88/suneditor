@@ -5,16 +5,16 @@
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-'use strict';
+"use strict";
 
-import dialog from '../modules/dialog';
+import dialog from "../modules/dialog";
 
 export default {
-  name: 'mention',
-  display: 'dialog',
-  title: 'mention',
-  buttonClass: '',
-  innerHTML: '@',
+  name: "mention",
+  display: "dialog",
+  title: "mention",
+  buttonClass: "",
+  innerHTML: "@",
   focussed: 0,
 
   renderItem: function(item) {
@@ -22,35 +22,35 @@ export default {
   },
 
   getItems: function(term) {
-    return Promise.resolve([
-      'overwite',
-      'the',
-      'mention',
-      'plugin',
-      'getItems',
-      'method',
-    ].filter(w => w.includes(term.toLowerCase())));
+    return Promise.resolve(
+      ["overwite", "the", "mention", "plugin", "getItems", "method"].filter(
+        (w) => w.includes(term.toLowerCase())
+      )
+    );
   },
 
   renderList: function(term) {
     const { mention } = this.context;
-    mention.getItems(term).then(items => {
+    mention.getItems(term).then((items) => {
       mention.items = items;
-      mention.list.innerHTML = items.map((item, idx) => 
-        `<li class="se-mention-item ${
-          idx === mention.focussed ? 'se-mention-active' : ''
-        }">
+      mention.list.innerHTML = items
+        .map(
+          (item, idx) =>
+            `<li class="se-mention-item ${
+              idx === mention.focussed ? "se-mention-active" : ""
+            }">
           ${mention.renderItem(item)}
         </li>`
-      ).join('')
-    })
+        )
+        .join("");
+    });
   },
 
   setDialog: function() {
-    const mention_dialog = this.util.createElement('DIV');
+    const mention_dialog = this.util.createElement("DIV");
     const lang = this.lang;
-    mention_dialog.className = 'se-dialog-content';
-    mention_dialog.style.display = 'none';
+    mention_dialog.className = "se-dialog-content";
+    mention_dialog.style.display = "none";
     const html = `
       <form class="se-dialog-form">
         <div class="se-dialog-header">
@@ -65,7 +65,7 @@ export default {
           </ul>
         </div>
       </form>
-    `
+    `;
     mention_dialog.innerHTML = html;
     return mention_dialog;
   },
@@ -78,15 +78,19 @@ export default {
     return `@${mention}`;
   },
 
-  getLinkHref(mention) {
-    return '';
+  getLinkHref(/*mention*/) {
+    return "";
   },
 
   open: function() {
     const { mention } = this.context;
-    this.plugins.dialog.open.call(this, 'mention', 'mention' === this.currentControllerName);
+    this.plugins.dialog.open.call(
+      this,
+      "mention",
+      "mention" === this.currentControllerName
+    );
     mention.search.focus();
-    mention.renderList('');
+    mention.renderList("");
   },
 
   on: function(update) {
@@ -96,20 +100,20 @@ export default {
 
   init: function() {
     const { mention } = this.context;
-    mention.search.value = '';
+    mention.search.value = "";
     mention.focussed = 0;
   },
 
   onKeyPress: function(e) {
     const { mention } = this.context;
     switch (e.key) {
-      case 'ArrowDown':
+      case "ArrowDown":
         mention.focussed += 1;
         e.preventDefault();
         e.stopPropagation();
         break;
 
-      case 'ArrowUp':
+      case "ArrowUp":
         if (mention.focussed > 0) {
           mention.focussed -= 1;
         }
@@ -117,16 +121,15 @@ export default {
         e.stopPropagation();
         break;
 
-      case 'Enter':
+      case "Enter":
         mention.add();
         e.preventDefault();
         e.stopPropagation();
         break;
-        
+
       default:
         mention.focussed = 0;
     }
-
   },
 
   onKeyUp: function(e) {
@@ -136,29 +139,34 @@ export default {
 
   getMentions: function() {
     const { mentions, getId } = this.context.mention;
-    return mentions.filter(mention => {
+    return mentions.filter((mention) => {
       const id = getId(mention);
-      return this.context.element.wysiwyg.querySelector(`[data-mention="${id}"]`)
-    }
-    )
+      return this.context.element.wysiwyg.querySelector(
+        `[data-mention="${id}"]`
+      );
+    });
   },
 
   addMention: function() {
     const { mention } = this.context;
     const new_mention = mention.items[mention.focussed];
     if (new_mention) {
-      if (!mention.mentions.find(m => mention.getId(m) === mention.getId(new_mention))) {
+      if (
+        !mention.mentions.find(
+          (m) => mention.getId(m) === mention.getId(new_mention)
+        )
+      ) {
         mention.mentions.push(new_mention);
       }
-      const el = this.util.createElement('A')
+      const el = this.util.createElement("A");
       el.href = mention.getLinkHref(new_mention);
-      el.target = '_blank';
+      el.target = "_blank";
       el.innerHTML = mention.getValue(new_mention);
-      el.setAttribute('data-mention', mention.getId(new_mention));
+      el.setAttribute("data-mention", mention.getId(new_mention));
       this.insertNode(el, null, false);
-      const spacer =this.util.createElement('SPAN'); 
-      spacer.innerHTML = ' ';
-      this.insertNode(spacer, el, false)
+      const spacer = this.util.createElement("SPAN");
+      spacer.innerHTML = " ";
+      this.insertNode(spacer, el, false);
     }
     this.plugins.dialog.close.call(this);
   },
@@ -167,10 +175,10 @@ export default {
     const _dialog = this.setDialog.call(core);
     core.getMentions = this.getMentions.bind(core);
 
-    const search = _dialog.querySelector('.se-mention-search');
-    search.addEventListener('keyup', this.onKeyUp.bind(core));
-    search.addEventListener('keydown', this.onKeyPress.bind(core));
-    const list = _dialog.querySelector('.se-mention-list');
+    const search = _dialog.querySelector(".se-mention-search");
+    search.addEventListener("keyup", this.onKeyUp.bind(core));
+    search.addEventListener("keydown", this.onKeyPress.bind(core));
+    const list = _dialog.querySelector(".se-mention-list");
 
     core.context.mention = {
       modal: _dialog,
@@ -189,8 +197,8 @@ export default {
       focussed: this.focussed,
       renderItem: this.renderItem,
       getItems: this.getItems,
-    }
+    };
     core.context.dialog.modal.appendChild(_dialog);
   },
-  action: function() { }
+  action: function() {},
 };
