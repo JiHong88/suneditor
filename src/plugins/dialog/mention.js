@@ -60,8 +60,7 @@ export default {
             this.util.addClass(el, 'se-mention-item');
             el.innerHTML = mention.renderItem(item);
             el.addEventListener("click", () => {
-              mention.focussed = idx;
-              mention._addMention();
+              mention._addMention(item);
             });
             insertAt(mention._list, el, idx);
             mention._itemElements[id] = el;
@@ -186,9 +185,9 @@ export default {
     });
   },
 
-  _addMention: function() {
+  _addMention: function(item) {
     const { mention } = this.context;
-    const new_mention = mention._items[mention.focussed];
+    const new_mention = item || mention._items[mention.focussed];
     if (new_mention) {
       if (
         !mention.mentions.find(
