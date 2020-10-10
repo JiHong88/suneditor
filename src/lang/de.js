@@ -74,7 +74,8 @@
             lineHeight: 'Zeilenhöhe',
             paragraphStyle: 'Absatzstil',
             textStyle: 'Textstil',
-            imageGallery: 'Bildergalerie'
+            imageGallery: 'Bildergalerie',
+            mention: 'Erwähnen',
         },
         dialogBox: {
             linkBox: {
@@ -108,6 +109,9 @@
             browser: {
                 tags: 'Stichworte',
                 search: 'Suche',
+            },
+            mentionBox: {
+              title: 'Erwähnung hinzufügen',
             },
             caption: 'Beschreibung eingeben',
             close: 'Schließen',

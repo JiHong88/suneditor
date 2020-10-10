@@ -261,6 +261,17 @@ s1.onKeyDown = function (e, core) {
     }
 }
 
+plugins.mention.getItems = async term => 
+  [
+    {name: 'auser1'},
+    {name: 'buser2'},
+    {name: 'cuser2'},
+  ].filter(u => u.name.includes(term));
+
+plugins.mention.getValue = ({ name }) => `@${name}`;
+plugins.mention.getId = ({ name }) => name;
+plugins.mention.renderItem = ({name}) => `<span>${name}</span>`;
+
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     lang: lang.ko,
     plugins: plugins,
@@ -677,6 +688,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
         // ['paragraphStyle'],
         // ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
         ['fontColor', 'hiliteColor', 'textStyle'],
+        ['mention'],
         // ['removeFormat'],
         // ['outdent', 'indent'],
         // ['align', 'horizontalRule', 'list', 'lineHeight', 'table'],
@@ -726,6 +738,15 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     // placeholder: 'Start typing something.3..'
     // imageUploadSizeLimit: 30000
 });
+
+s2.core.callPlugin('mention');
+s2.onKeyDown = e => {
+  if (e.key === '@') {
+    s2.core.context.mention.open();
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}
 
 const newOption = {
     mode: 'balloon',

@@ -74,7 +74,8 @@
 			lineHeight: 'Altura de la línea',
 			paragraphStyle: 'Estilo del parrafo',
 			textStyle: 'Estilo del texto',
-            imageGallery: 'Galería de imágenes'
+      imageGallery: 'Galería de imágenes',
+      mention: 'Mencionar',
 		},
 		dialogBox: {
 			linkBox: {
@@ -108,6 +109,9 @@
             browser: {
                 tags: 'Etiquetas',
                 search: 'Buscar',
+            },
+            mentionBox: {
+              title: 'Agregar mención',
             },
 			caption: 'Insertar descripción',
 			close: 'Cerrar',

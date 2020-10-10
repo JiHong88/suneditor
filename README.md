@@ -294,6 +294,57 @@ suneditor.create('sample', {
 });
 ```
 
+## Use mention plugin
+```javascript
+import { mention } from 'suneditor/dist/plugins';
+
+// implement your api to find the user to mention.
+mention.getItems = async function(term) {
+  return callApi('/users?q='+escape(term));
+}
+
+// renderItem shows a user in the list
+mention.renderItem = function(user) {
+  return '<span>' + user.name + '</span>';
+}
+
+// getId should return a unique id
+mention.getId = function(user) {
+  return user.id;
+}
+
+// getValue should return what you want to display in the editor
+mention.getValue = function(user) {
+  return '@' + user.name;
+}
+
+// getLinkHref should return the link target
+mention.getLinkHref = function(user) {
+  return user.profile;
+}
+
+let editor = suneditor.create('sample', {
+    plugins: [mention],
+    buttonList: [
+        ['mention']
+    ]
+})
+
+// if you would like to have this triggered when pressing @
+editor.core.callPlugin('mention');
+editor.onKeyDown = e => {
+  if (e.key === '@') {
+    editor.core.context.mention.open();
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}
+
+// when saving changes from the editor you will want to obtain the mentions added
+let newMentions = editor.core.getMentions();
+
+```
+
 ## Options
 ```java
 plugins: [

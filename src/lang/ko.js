@@ -74,7 +74,8 @@
             lineHeight: '줄 높이',
             paragraphStyle: '문단 스타일',
             textStyle: '글자 스타일',
-            imageGallery: '이미지 갤러리'
+            imageGallery: '이미지 갤러리',
+            mention: '언급하다',
         },
         dialogBox: {
             linkBox: {
@@ -108,6 +109,9 @@
             browser: {
                 tags: '태그',
                 search: '검색',
+            },
+            mentionBox: {
+              title: '언급 추가',
             },
             caption: '설명 넣기',
             close: '닫기',

@@ -77,7 +77,8 @@
             lineHeight: 'Linjehøjde',
             paragraphStyle: 'Afsnitstil',
             textStyle: 'Tekststil',
-            imageGallery: 'Billedgalleri'
+            imageGallery: 'Billedgalleri',
+            mention: 'Nævne'
         },
         dialogBox: {
             linkBox: {
@@ -111,6 +112,9 @@
             browser: {
                 tags: 'Tags',
                 search: 'Søg',
+            },
+            mentionBox: {
+              title: 'Tilføj omtale',
             },
             caption: 'Indsæt beskrivelse',
             close: 'Luk',

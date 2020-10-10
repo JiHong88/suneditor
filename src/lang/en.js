@@ -74,7 +74,8 @@
             lineHeight: 'Line height',
             paragraphStyle: 'Paragraph style',
             textStyle: 'Text style',
-            imageGallery: 'Image gallery'
+            imageGallery: 'Image gallery',
+            mention: 'Mention',
         },
         dialogBox: {
             linkBox: {
@@ -108,6 +109,9 @@
             browser: {
                 tags: 'Tags',
                 search: 'Search',
+            },
+            mentionBox: {
+              title: 'Add Mention',
             },
             caption: 'Insert description',
             close: 'Close',

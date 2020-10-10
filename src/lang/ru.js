@@ -74,7 +74,8 @@
             lineHeight: 'Высота линии',
             paragraphStyle: 'Стиль абзаца',
             textStyle: 'Стиль текста',
-            imageGallery: 'Галерея'
+            imageGallery: 'Галерея',
+            mention: 'Упоминание',
         },
         dialogBox: {
             linkBox: {
@@ -108,6 +109,9 @@
             browser: {
                 tags: 'Теги',
                 search: 'Поиск',
+            },
+            mentionBox: {
+              title: 'Добавить упоминание',
             },
             caption: 'Добавить подпись',
             close: 'Закрыть',
