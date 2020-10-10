@@ -423,6 +423,8 @@
 /** --- RTL ---------------------------------------------------------- */
 /* tray */
 .sun-editor.se-rtl .se-btn-tray {direction:rtl;}
+
+/* button--- */
 /* button - select text */
 .sun-editor.se-rtl .se-btn-select .txt {flex:auto; text-align:right; direction:rtl;}
 /* button - se-menu-list */
@@ -430,18 +432,22 @@
 .sun-editor.se-rtl .se-btn-list > .se-list-icon {margin:-1px 0 0 10px;}
 /* button - se-menu-list - li */
 .sun-editor.se-rtl .se-menu-list li {float:right;}
-/* menu list */
+
+/* menu list--- */
 .sun-editor.se-rtl .se-list-layer * {direction:rtl;}
 /* menu list - format block */
 .sun-editor.se-rtl .se-list-layer.se-list-format ul blockquote {padding:0 7px 0 0; border-right-width:5px; border-left-width:0;}
 /* menu list - color picker */
 .sun-editor.se-rtl .se-list-layer .se-selector-color .se-color-pallet li {float:right;}
+
 /* placeholder */
 .sun-editor.se-rtl .se-wrapper .se-placeholder {direction:rtl;}
+
 /* tooltip */
 .sun-editor.se-rtl .se-tooltip .se-tooltip-inner .se-tooltip-text {direction:rtl;}
 .sun-editor.se-rtl .se-tooltip .se-tooltip-inner .se-tooltip-text .se-shortcut {direction:ltr;}
-/* dialog */
+
+/* dialog--- */
 .sun-editor.se-rtl .se-dialog * {direction:rtl;}
 /* dialog - header */
 .sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-header .se-dialog-close {float:left;}
@@ -453,12 +459,17 @@
 .sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-content .se-btn-primary {float:left}
 .sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-footer > div {float:right;}
 .sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-footer > div > label {margin:0 0 0 5px;}
-/* fileBrowser */
+
+/* fileBrowser--- */
 .sun-editor.se-rtl .se-file-browser * {direction:rtl;}
 /* fileBrowser - header */
 .sun-editor.se-rtl .se-file-browser .se-file-browser-tags {text-align:right;}
 .sun-editor.se-rtl .se-file-browser .se-file-browser-tags a {margin: 8px 8px 0 8px;}
 .sun-editor.se-rtl .se-file-browser .se-file-browser-header .se-file-browser-close {float:left;}
+
+/** controller--- */
+.sun-editor.se-rtl .se-controller .se-btn-group {direction:rtl;}
+/** --- RTL ---------------------------------------------------------- */
 
 
 /** animation */
