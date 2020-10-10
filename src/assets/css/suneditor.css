@@ -423,8 +423,6 @@
 /** --- RTL ---------------------------------------------------------- */
 /* tray */
 .sun-editor.se-rtl .se-btn-tray {direction:rtl;}
-/* button - se-rtl-icon */
-.sun-editor.se-rtl button .se-rtl-icon {display:initial; transform:rotate(0deg) rotateY(180deg);}
 /* button - select text */
 .sun-editor.se-rtl .se-btn-select .txt {flex:auto; text-align:right; direction:rtl;}
 /* button - se-menu-list */
