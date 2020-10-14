@@ -236,6 +236,8 @@ interface Core {
      * When using the "bottom" position there should be an arrow on the controller.
      * @param addOffset These are the left and top values that need to be added specially. 
      * This argument is required. - {left: 0, top: 0}
+     * Please enter the value based on ltr mode.
+     * Calculated automatically in rtl mode.
      */
     setControllerPosition(controller: Element, referEl: Element, position: 'top' | 'bottom', addOffset: {left: number, top: number}): void;
 

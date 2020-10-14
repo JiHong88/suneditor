@@ -604,12 +604,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const toolbarW = toolbar.offsetWidth;
             const toolbarOffset = event._getEditorOffsets(context.element.toolbar);
             const menuW = menu.offsetWidth;
-            const rtlW = (options.rtl && menuW > element.offsetWidth) ? menuW - element.offsetWidth : 0;
-            const l = element.parentElement.offsetLeft + 3 - rtlW;
+            const l = element.parentElement.offsetLeft + 3;
 
             // rtl
             if (options.rtl) {
-                menu.style.left = l + 'px';
+                const elementW = element.offsetWidth;
+                const rtlW = menuW > elementW ? menuW - elementW : 0;
+                const rtlL = rtlW > 0 ? 0 : elementW - menuW;
+                menu.style.left = (l - rtlW + rtlL) + 'px';
                 if (toolbarOffset.left > event._getEditorOffsets(menu).left) {
                     menu.style.left = toolbarOffset.left + 'px';
                 }
@@ -744,19 +746,34 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * When using the "bottom" position there should be an arrow on the controller.
          * @param {Object} addOffset These are the left and top values that need to be added specially. 
          * This argument is required. - {left: 0, top: 0}
+         * Please enter the value based on ltr mode.
+         * Calculated automatically in rtl mode.
          */
         setControllerPosition: function (controller, referEl, position, addOffset) {
+            if (options.rtl) addOffset.left *= -1;
+
             const offset = util.getOffset(referEl, context.element.wysiwygFrame);
             controller.style.visibility = 'hidden';
             controller.style.display = 'block';
 
             const topMargin = position === 'top' ? -(controller.offsetHeight + 2) : (referEl.offsetHeight + 12);
-            controller.style.left = (offset.left - context.element.wysiwygFrame.scrollLeft + addOffset.left) + 'px';
             controller.style.top = (offset.top + topMargin + addOffset.top) + 'px';
 
-            // overleft
-            if (position === 'bottom') {
-                const overLeft = context.element.wysiwygFrame.offsetWidth - (controller.offsetLeft + controller.offsetWidth);
+            const l = offset.left - context.element.wysiwygFrame.scrollLeft + addOffset.left;
+            const controllerW = controller.offsetWidth;
+            const referElW = referEl.offsetWidth;
+
+            // rtl
+            if (options.rtl) {
+                const rtlW = (controllerW > referElW) ? controllerW - referElW : 0;
+                const rtlL = rtlW > 0 ? 0 : referElW - controllerW;
+                controller.style.left = (l - rtlW + rtlL) + 'px';
+                if (rtlW > 0) {
+                    controller.firstElementChild.style.left = (20 + rtlW) + 'px';
+                }
+            } else {
+                controller.style.left = l + 'px';
+                const overLeft = context.element.wysiwygFrame.offsetWidth - (controller.offsetLeft + controllerW);
                 if (overLeft < 0) {
                     controller.style.left = (controller.offsetLeft + overLeft) + 'px';
                     controller.firstElementChild.style.left = (20 - overLeft) + 'px';

@@ -472,8 +472,9 @@
 
             if (this.currentControllerName !== plugin) {
                 this.util.setDisabledButtons(true, this.resizingDisabledButtons);
-                this.controllersOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
+                resizeContainer.style.display = 'block';
                 this.setControllerPosition(contextResizing.resizeButton, resizeContainer, 'bottom', {left: 0, top: 50});
+                this.controllersOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
             }
     
             contextResizing._resize_w = w;

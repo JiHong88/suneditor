@@ -264,7 +264,7 @@ s1.onKeyDown = function (e, core) {
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     value: "",
     direction: 'rtl',
-    // tableCellControllerPosition: 'top',
+    tableCellControllerPosition: 'top',
     lang: lang.ko,
     plugins: plugins,
     katex: Katex,
