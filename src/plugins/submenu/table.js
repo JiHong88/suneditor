@@ -334,11 +334,7 @@ export default {
     },
 
     setPositionControllerTop: function (tableElement) {
-        const tableController = this.context.table.tableController;
-        const offset = this.util.getOffset(tableElement, this.context.element.wysiwygFrame);
-        tableController.style.left = offset.left + 'px';
-        tableController.style.display = 'block';
-        tableController.style.top = (offset.top - tableController.offsetHeight - 2) + 'px';
+        this.setControllerPosition(this.context.table.tableController, tableElement, 'top', {left: 0, top: 0});
     },
 
     setPositionControllerDiv: function (tdElement, reset) {
@@ -347,28 +343,11 @@ export default {
         
         this.plugins.table.setCellInfo.call(this, tdElement, reset);
         
-        resizeDiv.style.visibility = 'hidden';
-        resizeDiv.style.display = 'block';
-
         if (contextTable.cellControllerTop) {
-            const offset = this.util.getOffset(contextTable._element, this.context.element.wysiwygFrame);
-            resizeDiv.style.top = (offset.top - resizeDiv.offsetHeight - 2) + 'px';
-            resizeDiv.style.left = (offset.left + contextTable.tableController.offsetWidth) + 'px';
+            this.setControllerPosition(resizeDiv, contextTable._element, 'top', {left: contextTable.tableController.offsetWidth, top: 0});
         } else {
-            const offset = this.util.getOffset(tdElement, this.context.element.wysiwygFrame);
-            resizeDiv.style.left = (offset.left - this.context.element.wysiwygFrame.scrollLeft) + 'px';
-            resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
-    
-            const overLeft = this.context.element.wysiwygFrame.offsetWidth - (resizeDiv.offsetLeft + resizeDiv.offsetWidth);
-            if (overLeft < 0) {
-                resizeDiv.style.left = (resizeDiv.offsetLeft + overLeft) + 'px';
-                resizeDiv.firstElementChild.style.left = (20 - overLeft) + 'px';
-            } else {
-                resizeDiv.firstElementChild.style.left = '20px';
-            }
+            this.setControllerPosition(resizeDiv, tdElement, 'bottom', {left: 0, top: 0});
         }
-
-        resizeDiv.style.visibility = '';
     },
 
     setCellInfo: function (tdElement, reset) {

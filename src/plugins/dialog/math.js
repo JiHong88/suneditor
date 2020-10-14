@@ -241,20 +241,7 @@ export default {
         this.context.math._mathExp = mathTag;
         const mathBtn = this.context.math.mathController;
 
-        const offset = this.util.getOffset(mathTag, this.context.element.wysiwygFrame);
-        mathBtn.style.top = (offset.top + mathTag.offsetHeight + 10) + 'px';
-        mathBtn.style.left = (offset.left - this.context.element.wysiwygFrame.scrollLeft) + 'px';
-
-        mathBtn.style.display = 'block';
-
-        const overLeft = this.context.element.wysiwygFrame.offsetWidth - (mathBtn.offsetLeft + mathBtn.offsetWidth);
-        if (overLeft < 0) {
-            mathBtn.style.left = (mathBtn.offsetLeft + overLeft) + 'px';
-            mathBtn.firstElementChild.style.left = (20 - overLeft) + 'px';
-        } else {
-            mathBtn.firstElementChild.style.left = '20px';
-        }
-
+        this.setControllerPosition(mathBtn, mathTag, 'bottom', {left: 0, top: 0});
         this.controllersOn(mathBtn, mathTag, 'math');
     },
 

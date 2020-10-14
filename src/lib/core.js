@@ -736,6 +736,39 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Specify the position of the controller.
+         * @param {Element} controller Controller element.
+         * @param {Element} referEl Element that is the basis of the controller's position.
+         * @param {String} position Type of position ("top" | "bottom")
+         * When using the "top" position, there should not be an arrow on the controller.
+         * When using the "bottom" position there should be an arrow on the controller.
+         * @param {Object} addOffset These are the left and top values that need to be added specially. 
+         * This argument is required. - {left: 0, top: 0}
+         */
+        setControllerPosition: function (controller, referEl, position, addOffset) {
+            const offset = util.getOffset(referEl, context.element.wysiwygFrame);
+            controller.style.visibility = 'hidden';
+            controller.style.display = 'block';
+
+            const topMargin = position === 'top' ? -(controller.offsetHeight + 2) : (referEl.offsetHeight + 12);
+            controller.style.left = (offset.left - context.element.wysiwygFrame.scrollLeft + addOffset.left) + 'px';
+            controller.style.top = (offset.top + topMargin + addOffset.top) + 'px';
+
+            // overleft
+            if (position === 'bottom') {
+                const overLeft = context.element.wysiwygFrame.offsetWidth - (controller.offsetLeft + controller.offsetWidth);
+                if (overLeft < 0) {
+                    controller.style.left = (controller.offsetLeft + overLeft) + 'px';
+                    controller.firstElementChild.style.left = (20 - overLeft) + 'px';
+                } else {
+                    controller.firstElementChild.style.left = '20px';
+                }
+            }
+
+            controller.style.visibility = '';
+        },
+
+        /**
          * @description Run event.stopPropagation and event.preventDefault.
          * @param {Object} e Event Object
          */

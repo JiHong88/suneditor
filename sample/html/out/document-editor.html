@@ -959,6 +959,61 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="setControllerPosition"><span class="type-signature"></span>setControllerPosition<span
+                    class="signature">(controller, referEl, position, addOffset)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Specify the position of the controller.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>controller</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Controller element</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>referEl</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Element that is the basis of the controller's position</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>position</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">
+                        Type of position (<span style="color:#ff5565">"top" | "bottom"</span>)<br>
+                        When using the "top" position, there should not be an arrow on the controller.<br>
+                        When using the "bottom" position there should be an arrow on the controller.
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>addOffset</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">
+                        These are the left and top values that need to be added specially.<br>
+                        This argument is required. - <span style="color:#ff5565">{left: 0, top: 0}</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="eventStop"><span class="type-signature"></span>eventStop<span class="signature">(e)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
@@ -2185,6 +2240,7 @@
         <li><a href="document-editor.html#containerOff">containerOff</a></li>
         <li><a href="document-editor.html#controllersOn">controllersOn</a></li>
         <li><a href="document-editor.html#controllersOff">controllersOff</a></li>
+        <li><a href="document-editor.html#setControllerPosition">setControllerPosition</a></li>
         <li><a href="document-editor.html#eventStop">eventStop</a></li>
         <li><a href="document-editor.html#execCommand">execCommand</a></li>
         <li><a href="document-editor.html#nativeFocus">nativeFocus</a></li>
