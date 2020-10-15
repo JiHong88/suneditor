@@ -304,6 +304,7 @@
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-select {display:inline-block; width:auto; height:34px; font-size:14px; text-align:center; line-height:1.42857143;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-control {display:inline-block; width:70px; height:34px; font-size:14px; text-align:center; line-height:1.42857143;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-form {display:block; width:100%; height:34px; font-size:14px; line-height:1.42857143; padding:0 4px;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-form.se-input-url {direction:ltr;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-form.se-input-url:disabled {text-decoration:line-through; color:#999;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-video-ratio {width:70px; margin-left:4px;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form a {color:#004cff;}
