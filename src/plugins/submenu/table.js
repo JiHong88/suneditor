@@ -323,11 +323,11 @@ export default {
         }
 
         const tableElement = contextTable._element || this.plugins.table._selectedTable || this.util.getParentElement(tdElement, 'TABLE');
-        tablePlugin.setPositionControllerTop.call(this, tableElement);
         contextTable._maxWidth = this.util.hasClass(tableElement, 'se-table-size-100') || tableElement.style.width === '100%' || (!tableElement.style.width && !this.util.hasClass(tableElement, 'se-table-size-auto'));
         contextTable._fixedColumn = this.util.hasClass(tableElement, 'se-table-layout-fixed') || tableElement.style.tableLayout === 'fixed';
         tablePlugin.setTableStyle.call(this, contextTable._maxWidth ? 'width|column' : 'width');
-
+        
+        tablePlugin.setPositionControllerTop.call(this, tableElement);
         tablePlugin.setPositionControllerDiv.call(this, tdElement, tablePlugin._shift);
         
         if (!tablePlugin._shift) this.controllersOn(contextTable.resizeDiv, contextTable.tableController, tablePlugin.init.bind(this), tdElement, 'table');

@@ -768,15 +768,23 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const rtlW = (controllerW > referElW) ? controllerW - referElW : 0;
                 const rtlL = rtlW > 0 ? 0 : referElW - controllerW;
                 controller.style.left = (l - rtlW + rtlL) + 'px';
+                
                 if (rtlW > 0) {
                     controller.firstElementChild.style.left = (20 + rtlW) + 'px';
                 }
+                
+                const overSize = context.element.wysiwygFrame.offsetLeft - controller.offsetLeft;
+                if (overSize > 0) {
+                    controller.style.left = '0px';
+                    controller.firstElementChild.style.left = overSize + 'px';
+                }
             } else {
                 controller.style.left = l + 'px';
-                const overLeft = context.element.wysiwygFrame.offsetWidth - (controller.offsetLeft + controllerW);
-                if (overLeft < 0) {
-                    controller.style.left = (controller.offsetLeft + overLeft) + 'px';
-                    controller.firstElementChild.style.left = (20 - overLeft) + 'px';
+
+                const overSize = context.element.wysiwygFrame.offsetWidth - (controller.offsetLeft + controllerW);
+                if (overSize < 0) {
+                    controller.style.left = (controller.offsetLeft + overSize) + 'px';
+                    controller.firstElementChild.style.left = (20 - overSize) + 'px';
                 } else {
                     controller.firstElementChild.style.left = '20px';
                 }
