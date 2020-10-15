@@ -500,6 +500,11 @@ export default {
             ['preview', 'print']
         ];
 
+        /** RTL - buttons */
+        if (options.rtl) {
+            options.buttonList = options.buttonList.reverse();
+        }
+
         /** --- Define icons --- */
         // custom icons
         options.icons = (!options.icons || typeof options.icons !== 'object') ? _icons : [_icons, options.icons].reduce(function (_default, _new) {
