@@ -41,6 +41,10 @@ export interface SunEditorOptions {
      */
     mode?: 'classic' | 'inline' | 'balloon' | 'balloon-always';
     /**
+     * If true, the editor is set to RTL(Right To Left) mode.
+     */
+    rtl?: boolean;
+    /**
      * Button List
      */
     buttonList?: ButtonListItem[];

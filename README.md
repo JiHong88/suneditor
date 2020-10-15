@@ -350,6 +350,7 @@ attributesWhitelist   : Add attributes whitelist of tags that should be kept und
                         }
 // Layout-------------------------------------------------------------------------------------------------------
 mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {String}
+rtl             : If true, the editor is set to RTL(Right To Left) mode.   default: false {Boolean}
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
                   'inline' or 'balloon' mode.     default: 'auto' {Number|String}
 toolbarContainer: A custom HTML selector placing the toolbar inside.
