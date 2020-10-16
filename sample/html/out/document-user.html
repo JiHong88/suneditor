@@ -740,7 +740,7 @@
 
 
             <h4 class="name" id="onDrop"><span class="type-signature"></span>onDrop<span
-                    class="signature">(event, core)</span><span class="type-signature"></span></h4>
+                    class="signature">(event, cleanData, maxCharCount, core)</span><span class="type-signature"></span></h4>
             <div class="description">
                 Drop event
             </div>
@@ -759,6 +759,20 @@
                         <span class="param-type">Object</span>
                     </td>
                     <td class="description last">Event Object</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>cleanData</code></td>
+                    <td class="type">
+                        <span class="param-type">String</span>
+                    </td>
+                    <td class="description last">HTML string modified for editor format</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>maxCharCount</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean</span>
+                    </td>
+                    <td class="description last">maxCharCount option (true if max character is exceeded)</td>
                 </tr>
                 <tr>
                     <td class="name"><code>core</code></td>

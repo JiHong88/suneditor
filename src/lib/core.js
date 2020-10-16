@@ -756,6 +756,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             controller.style.visibility = 'hidden';
             controller.style.display = 'block';
 
+            // Height value of the arrow element is 11px
             const topMargin = position === 'top' ? -(controller.offsetHeight + 2) : (referEl.offsetHeight + 12);
             controller.style.top = (offset.top + topMargin + addOffset.top) + 'px';
 
@@ -763,14 +764,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const controllerW = controller.offsetWidth;
             const referElW = referEl.offsetWidth;
 
-            // rtl
+            // rtl (Width value of the arrow element is 22px)
             if (options.rtl) {
                 const rtlW = (controllerW > referElW) ? controllerW - referElW : 0;
                 const rtlL = rtlW > 0 ? 0 : referElW - controllerW;
                 controller.style.left = (l - rtlW + rtlL) + 'px';
                 
                 if (rtlW > 0) {
-                    controller.firstElementChild.style.left = (20 + rtlW) + 'px';
+                    controller.firstElementChild.style.left = ((controllerW - 14 < 10 + rtlW) ? (controllerW - 14) : (10 + rtlW)) + 'px';
                 }
                 
                 const overSize = context.element.wysiwygFrame.offsetLeft - controller.offsetLeft;
@@ -6656,7 +6657,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return true;
             } else {
                 plainText = data.getData('text/plain');
-                cleanData = data.getData('text/html');
+                cleanData = data.getData('text/html') || plainText;
                 if (event._setClipboardData(type, e, plainText, cleanData, data) === false) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -6678,12 +6679,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const maxCharCount = core._charCount(core._charTypeHTML ? cleanData : plainText);
 
             // paste event
-            if (type === 'paste' && typeof functions.onPaste === 'function' && !functions.onPaste(e, cleanData, maxCharCount, core)) {
-                return false;
+            if (type === 'paste' && typeof functions.onPaste === 'function') {
+                const value = functions.onPaste(e, cleanData, maxCharCount, core);
+                if (!value) return false;
+                if (typeof value === 'string') cleanData = value;
             }
             // drop event
-            if (type === 'drop' && typeof functions.onDrop === 'function' && !functions.onDrop(e, data, core)) {
-                return false;
+            if (type === 'drop' && typeof functions.onDrop === 'function') {
+                const value = functions.onDrop(e, cleanData, maxCharCount, core);
+                if (!value) return false;
+                if (typeof value === 'string') cleanData = value;
             }
 
             // files
@@ -6914,13 +6919,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onInput: null,
         onKeyDown: null,
         onKeyUp: null,
-        onDrop: null,
         onChange: null,
         onCopy: null,
         onCut: null,
-        onPaste: null,
         onFocus: null,
         onBlur: null,
+
+        /**
+         * @description Event functions (drop, paste)
+         * When false is returned, the default behavior is stopped.
+         * If the string is returned, the cleanData value is modified to the return value.
+         * @param {Object} e Event object.
+         * @param {String} cleanData HTML string modified for editor format.
+         * @param {Boolean} maxChartCount option (true if max character is exceeded)
+         * @param {Object} core Core object
+         * @returns {Boolean|String}
+         */
+        onDrop: null,
+        onPaste: null,
 
         /**
          * @description Called just before the inline toolbar is positioned and displayed on the screen.

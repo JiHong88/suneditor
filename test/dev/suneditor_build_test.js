@@ -460,9 +460,24 @@ ss.onDrop = function (e) {
     // console.log('onDrop', e);
     return true;
 };
-ss.onPaste = function (e) {
-    // console.log('onPaste', e.clipboardData.files)
-    return true
+ss.onPaste = function (e, cleanData, maxCharCount, core) {
+    // replace () > span.katex
+    cleanData = cleanData.replaceAll("(", '<span class="temp-katex">').replaceAll(")", "</span>");
+
+    // set attribute "data-exp"
+    // create html string
+    let html = "";
+    const children = core._d.createRange().createContextualFragment(cleanData).childNodes;
+    for (let i = 0, len = children.length, node; i < len; i++) {
+        node = children[i];
+        if (node.className === "temp-katex") {
+            node.className = "katex";
+            node.setAttribute("data-exp", node.textContent);
+        }
+        html += node.outerHTML || node.textContent;
+    }
+
+    return core.cleanHTML(html, core.pasteTagsWhitelistRegExp);
 }
 ss.onAudioUpload = function (targetElement, index, state, videoInfo) {
     // console.log('targetElement:${targetElement}, index:${index}, state:${state}')
