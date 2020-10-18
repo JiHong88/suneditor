@@ -1637,14 +1637,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         return newRange;
                     } else if (!util.isBreak(oNode) && util.isFormatElement(parentNode)) {
                         let zeroWidth = null;
-                        if (!oNode.previousSibling) {
+                        if (!oNode.previousSibling || util.isBreak(oNode.previousSibling)) {
                             zeroWidth = util.createTextNode(util.zeroWidthSpace);
                             oNode.parentNode.insertBefore(zeroWidth, oNode);
                         }
                         
-                        if (!oNode.nextSibling) {
+                        if (!oNode.nextSibling || util.isBreak(oNode.nextSibling)) {
                             zeroWidth = util.createTextNode(util.zeroWidthSpace);
-                            oNode.parentNode.appendChild(zeroWidth);
+                            oNode.parentNode.insertBefore(zeroWidth, oNode.nextSibling);
                         }
     
                         if (util._isIgnoreNodeChange(oNode)) {
