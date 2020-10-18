@@ -77,7 +77,8 @@
             lineHeight: 'Linjehøjde',
             paragraphStyle: 'Afsnitstil',
             textStyle: 'Tekststil',
-            imageGallery: 'Billedgalleri'
+            imageGallery: 'Billedgalleri',
+            mention: 'Nævne'
         },
         dialogBox: {
             linkBox: {

@@ -74,7 +74,8 @@
             lineHeight: 'Zeilenhöhe',
             paragraphStyle: 'Absatzstil',
             textStyle: 'Textstil',
-            imageGallery: 'Bildergalerie'
+            imageGallery: 'Bildergalerie',
+            mention: 'Erwähnen'
         },
         dialogBox: {
             linkBox: {

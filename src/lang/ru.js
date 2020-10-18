@@ -74,7 +74,8 @@
             lineHeight: 'Высота линии',
             paragraphStyle: 'Стиль абзаца',
             textStyle: 'Стиль текста',
-            imageGallery: 'Галерея'
+            imageGallery: 'Галерея',
+            mention: 'Упоминание'
         },
         dialogBox: {
             linkBox: {

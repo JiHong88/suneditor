@@ -74,7 +74,8 @@
             lineHeight: 'Odstęp między wierszami',
             paragraphStyle: 'Styl akapitu',
             textStyle: 'Styl tekstu',
-            imageGallery: 'Galeria obrazów'
+            imageGallery: 'Galeria obrazów',
+            mention: 'Wzmianka'
         },
         dialogBox: {
             linkBox: {

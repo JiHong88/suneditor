@@ -74,7 +74,8 @@
             lineHeight: 'Līnijas augstums',
             paragraphStyle: 'Paragrāfa stils',
             textStyle: 'Teksta stils',
-            imageGallery: 'Attēlu galerija'
+            imageGallery: 'Attēlu galerija',
+            mention: 'Pieminēt'
         },
         dialogBox: {
             linkBox: {

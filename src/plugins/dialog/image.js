@@ -64,7 +64,7 @@ export default {
         let image_dialog = this.setDialog.call(core);
         contextImage.modal = image_dialog;
         contextImage.imgInputFile = image_dialog.querySelector('._se_image_file');
-        contextImage.imgUrlFile = image_dialog.querySelector('.se-input-url');
+        contextImage.imgUrlFile = image_dialog.querySelector('._se_image_url');
         contextImage.focusElement = contextImage.imgInputFile || contextImage.imgUrlFile;
         contextImage.altText = image_dialog.querySelector('._se_image_alt');
         contextImage.imgLink = image_dialog.querySelector('._se_image_link');
@@ -152,7 +152,7 @@ export default {
                             '<div class="se-dialog-form">' +
                                 '<label>' + lang.dialogBox.imageBox.url + '</label>' +
                                 '<div class="se-dialog-form-files">' +
-                                    '<input class="se-input-form se-input-url" type="text" />' +
+                                    '<input class="se-input-form se-input-url _se_image_url" type="text" />' +
                                     ((option.imageGalleryUrl && this.plugins.imageGallery) ? '<button type="button" class="se-btn se-dialog-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '">' + this.icons.image_gallery + '</button>' : '') +
                                 '</div>' +
                                 '<pre class="se-link-preview"></pre>' +
@@ -200,7 +200,7 @@ export default {
                 '<div class="_se_tab_content _se_tab_content_url" style="display: none">' +
                     '<div class="se-dialog-body">' +
                         '<div class="se-dialog-form">' +
-                            '<label>' + lang.dialogBox.linkBox.url + '</label><input class="se-input-form _se_image_link" type="text" />' +
+                            '<label>' + lang.dialogBox.linkBox.url + '</label><input class="se-input-form se-input-url _se_image_link" type="text" />' +
                             '<pre class="se-link-preview"></pre>' +
                         '</div>' +
                         '<label><input type="checkbox" class="_se_image_link_check"/>&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +

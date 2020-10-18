@@ -602,11 +602,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const toolbar = this.context.element.toolbar;
             const toolbarW = toolbar.offsetWidth;
+            const toolbarOffset = event._getEditorOffsets(context.element.toolbar);
             const menuW = menu.offsetWidth;
             const l = element.parentElement.offsetLeft + 3;
-            const overLeft = toolbarW <= menuW ? 0 : toolbarW - (l + menuW);
-            if (overLeft < 0) menu.style.left = (l + overLeft) + 'px';
-            else menu.style.left = l + 'px';
+
+            // rtl
+            if (options.rtl) {
+                const elementW = element.offsetWidth;
+                const rtlW = menuW > elementW ? menuW - elementW : 0;
+                const rtlL = rtlW > 0 ? 0 : elementW - menuW;
+                menu.style.left = (l - rtlW + rtlL) + 'px';
+                if (toolbarOffset.left > event._getEditorOffsets(menu).left) {
+                    menu.style.left = toolbarOffset.left + 'px';
+                }
+            } else {
+                const overLeft = toolbarW <= menuW ? 0 : toolbarW - (l + menuW);
+                if (overLeft < 0) menu.style.left = (l + overLeft) + 'px';
+                else menu.style.left = l + 'px';
+            }
 
             // get element top
             let t = 0;
@@ -624,7 +637,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             // set menu position
-            const toolbarTop = event._getEditorOffsets(context.element.toolbar).top;
+            const toolbarTop = toolbarOffset.top;
             let menuHeight = menu.offsetHeight;
             let el = context.element.topArea;
             let scrollTop = 0;
@@ -722,6 +735,63 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             this._antiBlur = false;
+        },
+
+        /**
+         * @description Specify the position of the controller.
+         * @param {Element} controller Controller element.
+         * @param {Element} referEl Element that is the basis of the controller's position.
+         * @param {String} position Type of position ("top" | "bottom")
+         * When using the "top" position, there should not be an arrow on the controller.
+         * When using the "bottom" position there should be an arrow on the controller.
+         * @param {Object} addOffset These are the left and top values that need to be added specially. 
+         * This argument is required. - {left: 0, top: 0}
+         * Please enter the value based on ltr mode.
+         * Calculated automatically in rtl mode.
+         */
+        setControllerPosition: function (controller, referEl, position, addOffset) {
+            if (options.rtl) addOffset.left *= -1;
+
+            const offset = util.getOffset(referEl, context.element.wysiwygFrame);
+            controller.style.visibility = 'hidden';
+            controller.style.display = 'block';
+
+            // Height value of the arrow element is 11px
+            const topMargin = position === 'top' ? -(controller.offsetHeight + 2) : (referEl.offsetHeight + 12);
+            controller.style.top = (offset.top + topMargin + addOffset.top) + 'px';
+
+            const l = offset.left - context.element.wysiwygFrame.scrollLeft + addOffset.left;
+            const controllerW = controller.offsetWidth;
+            const referElW = referEl.offsetWidth;
+
+            // rtl (Width value of the arrow element is 22px)
+            if (options.rtl) {
+                const rtlW = (controllerW > referElW) ? controllerW - referElW : 0;
+                const rtlL = rtlW > 0 ? 0 : referElW - controllerW;
+                controller.style.left = (l - rtlW + rtlL) + 'px';
+                
+                if (rtlW > 0) {
+                    controller.firstElementChild.style.left = ((controllerW - 14 < 10 + rtlW) ? (controllerW - 14) : (10 + rtlW)) + 'px';
+                }
+                
+                const overSize = context.element.wysiwygFrame.offsetLeft - controller.offsetLeft;
+                if (overSize > 0) {
+                    controller.style.left = '0px';
+                    controller.firstElementChild.style.left = overSize + 'px';
+                }
+            } else {
+                controller.style.left = l + 'px';
+
+                const overSize = context.element.wysiwygFrame.offsetWidth - (controller.offsetLeft + controllerW);
+                if (overSize < 0) {
+                    controller.style.left = (controller.offsetLeft + overSize) + 'px';
+                    controller.firstElementChild.style.left = (20 - overSize) + 'px';
+                } else {
+                    controller.firstElementChild.style.left = '20px';
+                }
+            }
+
+            controller.style.visibility = '';
         },
 
         /**
@@ -1567,14 +1637,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         return newRange;
                     } else if (!util.isBreak(oNode) && util.isFormatElement(parentNode)) {
                         let zeroWidth = null;
-                        if (!oNode.previousSibling) {
+                        if (!oNode.previousSibling || util.isBreak(oNode.previousSibling)) {
                             zeroWidth = util.createTextNode(util.zeroWidthSpace);
                             oNode.parentNode.insertBefore(zeroWidth, oNode);
                         }
                         
-                        if (!oNode.nextSibling) {
+                        if (!oNode.nextSibling || util.isBreak(oNode.nextSibling)) {
                             zeroWidth = util.createTextNode(util.zeroWidthSpace);
-                            oNode.parentNode.appendChild(zeroWidth);
+                            oNode.parentNode.insertBefore(zeroWidth, oNode.nextSibling);
                         }
     
                         if (util._isIgnoreNodeChange(oNode)) {
@@ -1665,6 +1735,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         return {
                             container: commonCon,
                             offset: 0
+                        };
+                    } else if (commonCon.nodeType === 3) {
+                        return {
+                            container: commonCon,
+                            offset: endOff
                         };
                     }
                     childNodes.push(commonCon);
@@ -3303,6 +3378,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (i === 0) container = textNode;
                 }
             } else if (isRemoveNode) {
+                newInnerNode = newInnerNode.firstChild;
                 for (let i = 0; i < nNodeArray.length; i++) {
                     this._stripRemoveNode(nNodeArray[i]);
                 }
@@ -3459,6 +3535,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     util.removeItem(removeNode);
                 }
             } else if (isRemoveNode) {
+                newInnerNode = newInnerNode.firstChild;
                 for (let i = 0; i < nNodeArray.length; i++) {
                     this._stripRemoveNode(nNodeArray[i]);
                 }
@@ -3724,6 +3801,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
                 }
             } else if (isRemoveNode) {
+                newInnerNode = newInnerNode.firstChild;
                 for (let i = 0; i < nNodeArray.length; i++) {
                     this._stripRemoveNode(nNodeArray[i]);
                 }
@@ -3929,6 +4007,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const rangeLines = this.getSelectedElements(null);
             const cells = [];
             const shift = 'indent' !== command;
+            const marginDir = options.rtl ? 'marginRight' : 'marginLeft';
             let sc = range.startContainer;
             let ec = range.endContainer;
             let so = range.startOffset;
@@ -3938,13 +4017,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 f = rangeLines[i];
 
                 if (!util.isListCell(f) || !this.plugins.list) {
-                    margin = /\d+/.test(f.style.marginLeft) ? util.getNumber(f.style.marginLeft, 0) : 0;
+                    margin = /\d+/.test(f.style[marginDir]) ? util.getNumber(f.style[marginDir], 0) : 0;
                     if (shift) {
                         margin -= 25;
                     } else {
                         margin += 25;
                     }
-                    util.setStyle(f, 'marginLeft', (margin <= 0 ? '' : margin + 'px'));
+                    util.setStyle(f, marginDir, (margin <= 0 ? '' : margin + 'px'));
                 } else {
                     if (shift || f.previousElementSibling) {
                         cells.push(f);
@@ -4275,7 +4354,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.containerOff();
             core.controllersOff();
             
-            const contentsHTML = this.getContents(true);
+            const contentsHTML = options.previewTemplate ? options.previewTemplate.replace(/\{\{\s*contents\s*\}\}/i, this.getContents(true)) : this.getContents(true);
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
             const w = context.element.wysiwygFrame.offsetWidth + 'px !important';
@@ -5200,6 +5279,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (selectionNode === core.effectNode) return;
             core.effectNode = selectionNode;
 
+            const marginDir = options.rtl ? 'marginRight' : 'marginLeft';
             const commandMap = core.commandMap;
             const classOnCheck = this._onButtonsCheck;
             const commandMapNodes = [];
@@ -5230,7 +5310,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (util.isFormatElement(element)) {
                     /* Outdent */
                     if (commandMapNodes.indexOf('OUTDENT') === -1 && commandMap.OUTDENT) {
-                        if (util.isListCell(element) || (element.style.marginLeft && util.getNumber(element.style.marginLeft, 0) > 0)) {
+                        if (util.isListCell(element) || (element.style[marginDir] && util.getNumber(element.style[marginDir], 0) > 0)) {
                             commandMapNodes.push('OUTDENT');
                             commandMap.OUTDENT.removeAttribute('disabled');
                         }
@@ -6276,7 +6356,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onBlur_wysiwyg: function (e) {
-            if (core._antiBlur) return;
+            if (core._antiBlur || core._variable.isCodeView) return;
             core.hasFocus = false;
             core.controllersOff();
             if (core._isInline || core._isBalloon) event._hideToolbar();
@@ -6585,7 +6665,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return true;
             } else {
                 plainText = data.getData('text/plain');
-                cleanData = data.getData('text/html');
+                cleanData = data.getData('text/html') || plainText;
                 if (event._setClipboardData(type, e, plainText, cleanData, data) === false) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -6607,12 +6687,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const maxCharCount = core._charCount(core._charTypeHTML ? cleanData : plainText);
 
             // paste event
-            if (type === 'paste' && typeof functions.onPaste === 'function' && !functions.onPaste(e, cleanData, maxCharCount, core)) {
-                return false;
+            if (type === 'paste' && typeof functions.onPaste === 'function') {
+                const value = functions.onPaste(e, cleanData, maxCharCount, core);
+                if (!value) return false;
+                if (typeof value === 'string') cleanData = value;
             }
             // drop event
-            if (type === 'drop' && typeof functions.onDrop === 'function' && !functions.onDrop(e, data, core)) {
-                return false;
+            if (type === 'drop' && typeof functions.onDrop === 'function') {
+                const value = functions.onDrop(e, cleanData, maxCharCount, core);
+                if (!value) return false;
+                if (typeof value === 'string') cleanData = value;
             }
 
             // files
@@ -6843,13 +6927,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onInput: null,
         onKeyDown: null,
         onKeyUp: null,
-        onDrop: null,
         onChange: null,
         onCopy: null,
         onCut: null,
-        onPaste: null,
         onFocus: null,
         onBlur: null,
+
+        /**
+         * @description Event functions (drop, paste)
+         * When false is returned, the default behavior is stopped.
+         * If the string is returned, the cleanData value is modified to the return value.
+         * @param {Object} e Event object.
+         * @param {String} cleanData HTML string modified for editor format.
+         * @param {Boolean} maxChartCount option (true if max character is exceeded)
+         * @param {Object} core Core object
+         * @returns {Boolean|String}
+         */
+        onDrop: null,
+        onPaste: null,
 
         /**
          * @description Called just before the inline toolbar is positioned and displayed on the screen.

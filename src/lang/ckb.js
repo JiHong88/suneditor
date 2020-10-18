@@ -74,7 +74,8 @@
             lineHeight: 'بڵندی دێر',
             paragraphStyle: 'ستایلی په‌ره‌گراف',
             textStyle: 'ستایلی نوسین',
-            imageGallery: 'گاله‌ری وێنه‌كان'
+            imageGallery: 'گاله‌ری وێنه‌كان',
+            mention: 'تنويه ب'
         },
         dialogBox: {
             linkBox: {

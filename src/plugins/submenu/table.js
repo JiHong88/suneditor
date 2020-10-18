@@ -12,7 +12,7 @@ export default {
     display: 'submenu',
     add: function (core, targetElement) {
         const context = core.context;
-        context.table = {
+        let contextTable = context.table = {
             _element: null,
             _tdElement: null,
             _trElement: null,
@@ -20,6 +20,7 @@ export default {
             _tableXY: [],
             _maxWidth: true,
             _fixedColumn: false,
+            _rtl: context.options.rtl,
             cellControllerTop: context.options.tableCellControllerPosition === 'top',
             resizeText: null,
             headerButton: null,
@@ -46,31 +47,32 @@ export default {
         let listDiv = this.setSubmenu.call(core);
         let tablePicker = listDiv.querySelector('.se-controller-table-picker');
 
-        context.table.tableHighlight = listDiv.querySelector('.se-table-size-highlighted');
-        context.table.tableUnHighlight = listDiv.querySelector('.se-table-size-unhighlighted');
-        context.table.tableDisplay = listDiv.querySelector('.se-table-size-display');
+        contextTable.tableHighlight = listDiv.querySelector('.se-table-size-highlighted');
+        contextTable.tableUnHighlight = listDiv.querySelector('.se-table-size-unhighlighted');
+        contextTable.tableDisplay = listDiv.querySelector('.se-table-size-display');
+        if (context.options.rtl) contextTable.tableHighlight.style.left = (10 * 18 - 13) + 'px';
 
         /** set table controller */
         let tableController = this.setController_table.call(core);
-        context.table.tableController = tableController;
-        context.table.resizeButton = tableController.querySelector('._se_table_resize');
-        context.table.resizeText = tableController.querySelector('._se_table_resize > span > span');
-        context.table.columnFixedButton = tableController.querySelector('._se_table_fixed_column');
-        context.table.headerButton = tableController.querySelector('._se_table_header');
+        contextTable.tableController = tableController;
+        contextTable.resizeButton = tableController.querySelector('._se_table_resize');
+        contextTable.resizeText = tableController.querySelector('._se_table_resize > span > span');
+        contextTable.columnFixedButton = tableController.querySelector('._se_table_fixed_column');
+        contextTable.headerButton = tableController.querySelector('._se_table_header');
         tableController.addEventListener('mousedown', core.eventStop);
 
         /** set resizing */
-        let resizeDiv = this.setController_tableEditor.call(core, context.table.cellControllerTop);
-        context.table.resizeDiv = resizeDiv;
-        context.table.splitMenu = resizeDiv.querySelector('.se-btn-group-sub');
-        context.table.mergeButton = resizeDiv.querySelector('._se_table_merge_button');
-        context.table.splitButton = resizeDiv.querySelector('._se_table_split_button');
-        context.table.insertRowAboveButton = resizeDiv.querySelector('._se_table_insert_row_a');
-        context.table.insertRowBelowButton = resizeDiv.querySelector('._se_table_insert_row_b');
+        let resizeDiv = this.setController_tableEditor.call(core, contextTable.cellControllerTop);
+        contextTable.resizeDiv = resizeDiv;
+        contextTable.splitMenu = resizeDiv.querySelector('.se-btn-group-sub');
+        contextTable.mergeButton = resizeDiv.querySelector('._se_table_merge_button');
+        contextTable.splitButton = resizeDiv.querySelector('._se_table_split_button');
+        contextTable.insertRowAboveButton = resizeDiv.querySelector('._se_table_insert_row_a');
+        contextTable.insertRowBelowButton = resizeDiv.querySelector('._se_table_insert_row_b');
         resizeDiv.addEventListener('mousedown', core.eventStop);
         
         /** add event listeners */
-        tablePicker.addEventListener('mousemove', this.onMouseMove_tablePicker.bind(core));
+        tablePicker.addEventListener('mousemove', this.onMouseMove_tablePicker.bind(core, contextTable));
         tablePicker.addEventListener('click', this.appendTable.bind(core));
         resizeDiv.addEventListener('click', this.onClick_tableController.bind(core));
         tableController.addEventListener('click', this.onClick_tableController.bind(core));
@@ -83,7 +85,7 @@ export default {
         context.element.relative.appendChild(tableController);
 
         /** empty memory */
-        listDiv = null, tablePicker = null, resizeDiv = null, tableController = null;
+        listDiv = null, tablePicker = null, resizeDiv = null, tableController = null, contextTable = null;
     },
 
     setSubmenu: function () {
@@ -228,23 +230,29 @@ export default {
         }
     },
 
-    onMouseMove_tablePicker: function (e) {
+    onMouseMove_tablePicker: function (contextTable, e) {
         e.stopPropagation();
 
         let x = this._w.Math.ceil(e.offsetX / 18);
         let y = this._w.Math.ceil(e.offsetY / 18);
         x = x < 1 ? 1 : x;
         y = y < 1 ? 1 : y;
-        this.context.table.tableHighlight.style.width = x + 'em';
-        this.context.table.tableHighlight.style.height = y + 'em';
+        
+        if (contextTable._rtl) {
+            contextTable.tableHighlight.style.left = (x * 18 - 13) + 'px';
+            x = 11 - x;
+        }
+        
+        contextTable.tableHighlight.style.width = x + 'em';
+        contextTable.tableHighlight.style.height = y + 'em';
 
-        let x_u = 10; // x < 5 ? 5 : (x > 9 ? 10 : x + 1);
-        let y_u = 10; //y < 5 ? 5 : (y > 9 ? 10 : y + 1);
-        this.context.table.tableUnHighlight.style.width = x_u + 'em';
-        this.context.table.tableUnHighlight.style.height = y_u + 'em';
+        // let x_u = x < 5 ? 5 : (x > 9 ? 10 : x + 1);
+        // let y_u = y < 5 ? 5 : (y > 9 ? 10 : y + 1);
+        // contextTable.tableUnHighlight.style.width = x_u + 'em';
+        // contextTable.tableUnHighlight.style.height = y_u + 'em';
 
-        this.util.changeTxt(this.context.table.tableDisplay, x + ' x ' + y);
-        this.context.table._tableXY = [x, y];
+        this.util.changeTxt(contextTable.tableDisplay, x + ' x ' + y);
+        contextTable._tableXY = [x, y];
     },
 
     reset_table_picker: function () {
@@ -315,22 +323,18 @@ export default {
         }
 
         const tableElement = contextTable._element || this.plugins.table._selectedTable || this.util.getParentElement(tdElement, 'TABLE');
-        tablePlugin.setPositionControllerTop.call(this, tableElement);
         contextTable._maxWidth = this.util.hasClass(tableElement, 'se-table-size-100') || tableElement.style.width === '100%' || (!tableElement.style.width && !this.util.hasClass(tableElement, 'se-table-size-auto'));
         contextTable._fixedColumn = this.util.hasClass(tableElement, 'se-table-layout-fixed') || tableElement.style.tableLayout === 'fixed';
         tablePlugin.setTableStyle.call(this, contextTable._maxWidth ? 'width|column' : 'width');
-
+        
+        tablePlugin.setPositionControllerTop.call(this, tableElement);
         tablePlugin.setPositionControllerDiv.call(this, tdElement, tablePlugin._shift);
         
         if (!tablePlugin._shift) this.controllersOn(contextTable.resizeDiv, contextTable.tableController, tablePlugin.init.bind(this), tdElement, 'table');
     },
 
     setPositionControllerTop: function (tableElement) {
-        const tableController = this.context.table.tableController;
-        const offset = this.util.getOffset(tableElement, this.context.element.wysiwygFrame);
-        tableController.style.left = offset.left + 'px';
-        tableController.style.display = 'block';
-        tableController.style.top = (offset.top - tableController.offsetHeight - 2) + 'px';
+        this.setControllerPosition(this.context.table.tableController, tableElement, 'top', {left: 0, top: 0});
     },
 
     setPositionControllerDiv: function (tdElement, reset) {
@@ -339,28 +343,11 @@ export default {
         
         this.plugins.table.setCellInfo.call(this, tdElement, reset);
         
-        resizeDiv.style.visibility = 'hidden';
-        resizeDiv.style.display = 'block';
-
         if (contextTable.cellControllerTop) {
-            const offset = this.util.getOffset(contextTable._element, this.context.element.wysiwygFrame);
-            resizeDiv.style.top = (offset.top - resizeDiv.offsetHeight - 2) + 'px';
-            resizeDiv.style.left = (offset.left + contextTable.tableController.offsetWidth) + 'px';
+            this.setControllerPosition(resizeDiv, contextTable._element, 'top', {left: contextTable.tableController.offsetWidth, top: 0});
         } else {
-            const offset = this.util.getOffset(tdElement, this.context.element.wysiwygFrame);
-            resizeDiv.style.left = (offset.left - this.context.element.wysiwygFrame.scrollLeft) + 'px';
-            resizeDiv.style.top = (offset.top + tdElement.offsetHeight + 12) + 'px';
-    
-            const overLeft = this.context.element.wysiwygFrame.offsetWidth - (resizeDiv.offsetLeft + resizeDiv.offsetWidth);
-            if (overLeft < 0) {
-                resizeDiv.style.left = (resizeDiv.offsetLeft + overLeft) + 'px';
-                resizeDiv.firstElementChild.style.left = (20 - overLeft) + 'px';
-            } else {
-                resizeDiv.firstElementChild.style.left = '20px';
-            }
+            this.setControllerPosition(resizeDiv, tdElement, 'bottom', {left: 0, top: 0});
         }
-
-        resizeDiv.style.visibility = '';
     },
 
     setCellInfo: function (tdElement, reset) {

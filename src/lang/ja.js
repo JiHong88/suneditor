@@ -74,7 +74,8 @@
             lineHeight: '行の高さ',
             paragraphStyle: '段落スタイル',
             textStyle: 'テキストスタイル',
-            imageGallery: 'イメージギャラリー'
+            imageGallery: 'イメージギャラリー',
+            mention: '言及する'
         },
         dialogBox: {
             linkBox: {

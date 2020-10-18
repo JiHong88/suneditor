@@ -74,7 +74,8 @@
             lineHeight: '行高',
             paragraphStyle: '段落样式',
             textStyle: '文字样式',
-            imageGallery: '图片库'
+            imageGallery: '图片库',
+            mention: '提到'
         },
         dialogBox: {
             linkBox: {

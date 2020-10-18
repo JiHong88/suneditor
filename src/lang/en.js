@@ -74,7 +74,8 @@
             lineHeight: 'Line height',
             paragraphStyle: 'Paragraph style',
             textStyle: 'Text style',
-            imageGallery: 'Image gallery'
+            imageGallery: 'Image gallery',
+            mention: 'Mention'
         },
         dialogBox: {
             linkBox: {

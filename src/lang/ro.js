@@ -74,7 +74,8 @@
             lineHeight: 'Înălțime linie',
             paragraphStyle: 'Stil paragraf',
             textStyle: 'Stil text',
-            imageGallery: 'Galerie de imagini'
+            imageGallery: 'Galerie de imagini',
+            mention: 'Mentiune'
         },
         dialogBox: {
             linkBox: {

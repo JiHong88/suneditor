@@ -471,23 +471,9 @@ export default {
      */
     onModifyMode: function (selectionTag) {
         const contextAudio = this.context.audio;
-
-        const controller = contextAudio.controller;
-        const offset = this.util.getOffset(selectionTag, this.context.element.wysiwygFrame);
-        controller.style.top = (offset.top + selectionTag.offsetHeight + 10) + 'px';
-        controller.style.left = (offset.left - this.context.element.wysiwygFrame.scrollLeft) + 'px';
-
-        controller.style.display = 'block';
-
-        const overLeft = this.context.element.wysiwygFrame.offsetWidth - (controller.offsetLeft + controller.offsetWidth);
-        if (overLeft < 0) {
-            controller.style.left = (controller.offsetLeft + overLeft) + 'px';
-            controller.firstElementChild.style.left = (20 - overLeft) + 'px';
-        } else {
-            controller.firstElementChild.style.left = '20px';
-        }
         
-        this.controllersOn(controller, selectionTag, this.plugins.audio.onControllerOff.bind(this, selectionTag), 'audio');
+        this.setControllerPosition(contextAudio.controller, selectionTag, 'bottom', {left: 0, top: 0});
+        this.controllersOn(contextAudio.controller, selectionTag, this.plugins.audio.onControllerOff.bind(this, selectionTag), 'audio');
 
         this.util.addClass(selectionTag, 'active');
         contextAudio._element = selectionTag;
