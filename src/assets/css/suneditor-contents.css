@@ -292,6 +292,12 @@
     border-spacing: 0;
     border-collapse: collapse;
 }
+
+/* RTL - table */
+.sun-editor-editable.se-rtl table {
+    margin: 0 0 10px auto;
+}
+
 .sun-editor-editable table thead {
     border-bottom: 2px solid #333;
 }
