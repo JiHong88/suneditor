@@ -1736,6 +1736,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             container: commonCon,
                             offset: 0
                         };
+                    } else if (commonCon.nodeType === 3) {
+                        return {
+                            container: commonCon,
+                            offset: endOff
+                        };
                     }
                     childNodes.push(commonCon);
                     startCon = endCon = commonCon;
