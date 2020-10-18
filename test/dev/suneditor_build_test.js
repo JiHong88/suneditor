@@ -678,6 +678,10 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     // lang: lang.ru,
     // mode: 'inline',
     value: "",
+    previewTemplate: `
+    <h1>Preview Template</h1>
+    {{ contents }}
+    <div style="background: #ccc;">Footer</div>`,
     // toolbarWidth: 150,
     attributesWhitelist: {'all': 'uk-icon'}, 
     plugins: plugins,

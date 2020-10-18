@@ -76,11 +76,17 @@ export interface SunEditorOptions {
      */
     iframeCSSFileName?: string | string[];
     /**
-     * CodeMirror core object
+     * A template of the "preview".
+     * The {{contents}} part in the HTML string is replaced with the contents of the editor.
+     * @example "<h1>Preview Template</h1> {{contents}} <div>_Footer_</div>"
+     */
+    previewTemplate?: string;
+    /**
+     * CodeMirror object
      */
     codeMirror?: any | { src: any; options: object };
     /**
-     * Use "math" plugin
+     * Katex object (Use "math" plugin)
      */
     katex?: any | { src: any; options: object };
     /**

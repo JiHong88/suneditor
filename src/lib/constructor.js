@@ -391,10 +391,14 @@ export default {
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
         options.toolbarContainer = /balloon/i.test(options.mode) ? null : (typeof options.toolbarContainer === 'string' ? document.querySelector(options.toolbarContainer) : options.toolbarContainer);
         options.stickyToolbar = (/balloon/i.test(options.mode) || !!options.toolbarContainer) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);
-        options.fullPage = !!options.fullPage;
         options.iframe = options.fullPage || options.iframe;
+        options.fullPage = !!options.fullPage;
         options.iframeCSSFileName = options.iframe ? typeof options.iframeCSSFileName === 'string' ? [options.iframeCSSFileName] : (options.iframeCSSFileName || ['suneditor']) : null;
+        options.previewTemplate = typeof options.previewTemplate === 'string' ? options.previewTemplate : null;
+        /** CodeMirror object */
         options.codeMirror = options.codeMirror ? options.codeMirror.src ? options.codeMirror : {src: options.codeMirror} : null;
+        /** katex object (Math plugin) */
+        options.katex = options.katex ? options.katex.src ? options.katex : {src: options.katex} : null;
         /** Display */
         options.position = typeof options.position === 'string' ? options.position : null;
         options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);
@@ -488,8 +492,6 @@ export default {
         /** ETC */
         options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
         options.linkProtocol = typeof options.linkProtocol === 'string' ? options.linkProtocol : null;
-        /** Math (katex) */
-        options.katex = options.katex ? options.katex.src ? options.katex : {src: options.katex} : null;
         /** Buttons */
         options.buttonList = options.buttonList || [
             ['undo', 'redo'],

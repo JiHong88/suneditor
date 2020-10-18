@@ -4354,7 +4354,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.containerOff();
             core.controllersOff();
             
-            const contentsHTML = this.getContents(true);
+            const contentsHTML = options.previewTemplate ? options.previewTemplate.replace(/\{\{\s*contents\s*\}\}/i, this.getContents(true)) : this.getContents(true);
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
             const w = context.element.wysiwygFrame.offsetWidth + 'px !important';
