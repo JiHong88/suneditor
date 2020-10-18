@@ -294,7 +294,7 @@ suneditor.create('sample', {
 });
 ```
 
-## Use mention plugin
+<!-- ## Use mention plugin
 ```javascript
 import { mention } from 'suneditor/dist/plugins';
 
@@ -343,7 +343,7 @@ editor.onKeyDown = e => {
 // when saving changes from the editor you will want to obtain the mentions added
 let newMentions = editor.core.getMentions();
 
-```
+``` -->
 
 ## Options
 ```java

@@ -51,7 +51,8 @@ export interface Lang {
     lineHeight: string,
     paragraphStyle: string,
     textStyle: string,
-    imageGallery: string
+    imageGallery: string,
+    mention: string
   };
   dialogBox: {
     linkBox: {

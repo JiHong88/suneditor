@@ -261,16 +261,6 @@ s1.onKeyDown = function (e, core) {
     }
 }
 
-plugins.mention.getItems = async term => 
-  [
-    {name: 'auser1'},
-    {name: 'buser2'},
-    {name: 'cuser2'},
-  ].filter(u => u.name.includes(term));
-
-plugins.mention.getValue = ({ name }) => `@${name}`;
-plugins.mention.getId = ({ name }) => name;
-plugins.mention.renderItem = ({name}) => `<span>${name}</span>`;
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     lang: lang.ko,
@@ -683,19 +673,17 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     imageResizing: true,
     // imageWidth: '400',
     buttonList: [
-        // ['undo', 'redo'],
-        // ['font', 'fontSize', 'formatBlock'],
-        // ['paragraphStyle'],
-        // ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        ['fontColor', 'hiliteColor', 'textStyle'],
-        ['mention'],
-        // ['removeFormat'],
-        // ['outdent', 'indent'],
-        // ['align', 'horizontalRule', 'list', 'lineHeight', 'table'],
-        ['link', 'image', 'video'],
-        // ['fullScreen', 'showBlocks', 'codeView'],
-        // ['preview', 'print'],
-        // ['save', 'template'],
+        ['undo', 'redo'],
+        ['font', 'fontSize', 'formatBlock'],
+        ['paragraphStyle'],
+        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+        ['removeFormat'],
+        ['outdent', 'indent'],
+        ['align', 'horizontalRule', 'list', 'lineHeight', 'table'],
+        ['fullScreen', 'showBlocks', 'codeView'],
+        ['preview', 'print'],
+        ['save', 'template'],
+        // ['mention'],
     ],
     icons: {
         underline: '',
@@ -739,14 +727,25 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     // imageUploadSizeLimit: 30000
 });
 
-s2.core.callPlugin('mention');
-s2.onKeyDown = e => {
-  if (e.key === '@') {
-    s2.core.context.mention.open();
-    e.preventDefault();
-    e.stopPropagation();
-  }
-}
+// plugins.mention.getItems = async term => 
+//   [
+//     {name: 'auser1'},
+//     {name: 'buser2'},
+//     {name: 'cuser2'},
+//   ].filter(u => u.name.includes(term));
+
+// plugins.mention.getValue = ({ name }) => `@${name}`;
+// plugins.mention.getId = ({ name }) => name;
+// plugins.mention.renderItem = ({name}) => `<span>${name}</span>`;
+
+// s2.core.callPlugin('mention');
+// s2.onKeyDown = e => {
+//   if (e.key === '@') {
+//     s2.core.context.mention.open();
+//     e.preventDefault();
+//     e.stopPropagation();
+//   }
+// }
 
 const newOption = {
     mode: 'balloon',

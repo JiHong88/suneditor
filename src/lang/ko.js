@@ -75,7 +75,7 @@
             paragraphStyle: '문단 스타일',
             textStyle: '글자 스타일',
             imageGallery: '이미지 갤러리',
-            mention: '언급하다',
+            mention: '멘션',
         },
         dialogBox: {
             linkBox: {

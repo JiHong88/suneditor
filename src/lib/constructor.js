@@ -561,9 +561,7 @@ export default {
             audio: ['', lang.toolbar.audio, 'audio', 'dialog', icons.audio],
             math: ['', lang.toolbar.math, 'math', 'dialog', icons.math],
             /** plugins - fileBrowser */
-            imageGallery: ['', lang.toolbar.imageGallery, 'imageGallery', 'fileBrowser', icons.image_gallery],
-            /** plugins - mention */
-            mention: ['', lang.toolbar.mention, 'mention', 'dialog', icons.mention]
+            imageGallery: ['', lang.toolbar.imageGallery, 'imageGallery', 'fileBrowser', icons.image_gallery]
         };
     },
 
