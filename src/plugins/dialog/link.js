@@ -71,7 +71,7 @@ export default {
                 '<div class="se-dialog-body">' +
                     '<div class="se-dialog-form">' +
                         '<label>' + lang.dialogBox.linkBox.url + '</label>' +
-                        '<input class="se-input-form _se_link_url" type="text" />' +
+                        '<input class="se-input-form se-input-url _se_link_url" type="text" />' +
                         '<pre class="se-link-preview"></pre>' +
                     '</div>' +
                     '<div class="se-dialog-form">' +
@@ -228,20 +228,7 @@ export default {
         link.title = selectionATag.textContent;
         link.textContent = selectionATag.textContent;
 
-        const offset = this.util.getOffset(selectionATag, this.context.element.wysiwygFrame);
-        linkBtn.style.top = (offset.top + selectionATag.offsetHeight + 10) + 'px';
-        linkBtn.style.left = (offset.left - this.context.element.wysiwygFrame.scrollLeft) + 'px';
-
-        linkBtn.style.display = 'block';
-
-        const overLeft = this.context.element.wysiwygFrame.offsetWidth - (linkBtn.offsetLeft + linkBtn.offsetWidth);
-        if (overLeft < 0) {
-            linkBtn.style.left = (linkBtn.offsetLeft + overLeft) + 'px';
-            linkBtn.firstElementChild.style.left = (20 - overLeft) + 'px';
-        } else {
-            linkBtn.firstElementChild.style.left = '20px';
-        }
-        
+        this.setControllerPosition(linkBtn, selectionATag, 'bottom', {left: 0, top: 0});
         this.controllersOn(linkBtn, selectionATag, 'link');
     },
 

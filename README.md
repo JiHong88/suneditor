@@ -350,6 +350,7 @@ attributesWhitelist   : Add attributes whitelist of tags that should be kept und
                         }
 // Layout-------------------------------------------------------------------------------------------------------
 mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {String}
+rtl             : If true, the editor is set to RTL(Right To Left) mode.   default: false {Boolean}
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
                   'inline' or 'balloon' mode.     default: 'auto' {Number|String}
 toolbarContainer: A custom HTML selector placing the toolbar inside.
@@ -1006,10 +1007,11 @@ editor.onCut = function (e, clipboardData, core) { console.log('onCut', e) }
 // If it returns false, it stops without executing the rest of the action.
 /**
  * e: Event object
- * dataTransfer: e.dataTransfer
+ * cleanData: HTML string modified for editor format
+ * maxCharCount: maxChartCount option (true if max character is exceeded)
  * core: Core object
  */
-editor.onDrop = function (e, core) { console.log('onDrop', e) }
+editor.onDrop = function (e, cleanData, maxCharCount, core) { console.log('onDrop', e) }
 
 // Called before the image is uploaded
 // If false is returned, no image upload is performed.

@@ -472,19 +472,9 @@
 
             if (this.currentControllerName !== plugin) {
                 this.util.setDisabledButtons(true, this.resizingDisabledButtons);
-                this.controllersOn(contextResizing.resizeContainer, contextResizing.resizeButton, this.util.setDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
-            }
-    
-            // button group
-            const overLeft = this.context.element.wysiwygFrame.offsetWidth - l - contextResizing.resizeButton.offsetWidth;
-    
-            contextResizing.resizeButton.style.top = (h + t + 60) + 'px';
-            contextResizing.resizeButton.style.left = (l + (overLeft < 0 ? overLeft : 0)) + 'px';
-    
-            if (overLeft < 0) {
-                contextResizing.resizeButton.firstElementChild.style.left = (20 - overLeft) + 'px';
-            } else {
-                contextResizing.resizeButton.firstElementChild.style.left = '20px';
+                resizeContainer.style.display = 'block';
+                this.setControllerPosition(contextResizing.resizeButton, resizeContainer, 'bottom', {left: 0, top: 50});
+                this.controllersOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
             }
     
             contextResizing._resize_w = w;

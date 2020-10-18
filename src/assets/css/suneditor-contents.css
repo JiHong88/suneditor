@@ -11,7 +11,6 @@
     font-size: 13px;
     color: #333;
     line-height: 1.5;
-    text-align: left;
     background-color: #fff;
     word-break: normal;
     word-wrap: break-word;
@@ -26,6 +25,11 @@
     font-family: inherit;
     font-size: inherit;
     color: inherit;
+}
+
+/* RTL - editable */
+.sun-editor-editable.se-rtl * {
+    direction: rtl;
 }
 
 /** controllers on tag */
@@ -93,6 +97,7 @@
 
 /* ol, ul */
 .sun-editor-editable ol {
+    list-style-position: inside;
     display: block;
     list-style-type: decimal;
     margin-block-start: 1em;
@@ -102,6 +107,7 @@
     padding-inline-start: 40px;
 }
 .sun-editor-editable ul {
+    list-style-position: inside;
     display: block;
     list-style-type: disc;
     margin-block-start: 1em;
@@ -172,10 +178,11 @@
     border-width: 0;
     padding-top: 0;
     padding-bottom: 0;
+    border-color: #b1b1b1;
     padding-left: 20px;
     padding-right: 5px;
     border-left-width: 5px;
-    border-color: #b1b1b1;
+    border-right-width: 0px;
 }
 .sun-editor-editable blockquote blockquote {
     border-color: #c1c1c1;
@@ -185,6 +192,13 @@
 }
 .sun-editor-editable blockquote blockquote blockquote blockquote {
     border-color: #e1e1e1;
+}
+/* RTL - blockquote */
+.sun-editor-editable.se-rtl blockquote {
+    padding-left: 5px;
+    padding-right: 20px;
+    border-left-width: 0px;
+    border-right-width: 5px;
 }
 
 /* h1 */
@@ -278,6 +292,12 @@
     border-spacing: 0;
     border-collapse: collapse;
 }
+
+/* RTL - table */
+.sun-editor-editable.se-rtl table {
+    margin: 0 0 10px auto;
+}
+
 .sun-editor-editable table thead {
     border-bottom: 2px solid #333;
 }
