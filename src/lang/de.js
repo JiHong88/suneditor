@@ -110,9 +110,6 @@
                 tags: 'Stichworte',
                 search: 'Suche',
             },
-            mentionBox: {
-              title: 'Erwähnung hinzufügen',
-            },
             caption: 'Beschreibung eingeben',
             close: 'Schließen',
             submitButton: 'Übernehmen',

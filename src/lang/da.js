@@ -78,7 +78,7 @@
             paragraphStyle: 'Afsnitstil',
             textStyle: 'Tekststil',
             imageGallery: 'Billedgalleri',
-            mention: 'Nævne' 
+            mention: 'Nævne'
         },
         dialogBox: {
             linkBox: {
@@ -112,9 +112,6 @@
             browser: {
                 tags: 'Tags',
                 search: 'Søg',
-            },
-            mentionBox: {
-              title: 'Tilføj omtale',
             },
             caption: 'Indsæt beskrivelse',
             close: 'Luk',

@@ -106,6 +106,8 @@
                 <option value="zh_cn">zh_cn</option>
             </select>
             <br><br>
+            <label><input type="checkbox" id="rtl">&nbsp;&nbsp;rtl (Right To Left)</label>
+            <br><br>
             <label><input type="checkbox" id="toolbarWidth">&nbsp;&nbsp;toolbarWidth</label>
             <input type="text" id="toolbarWidth_value" placeholder="Number, ...px, ...%">
             <br><br>
@@ -477,6 +479,7 @@ function sun_create () {
             'input': 'checked'
         },
         mode: modeSelect.options[modeSelect.selectedIndex].value,
+        rtl: document.getElementById('rtl').checked,
         toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : undefined,
         toolbarContainer: document.getElementById('toolbarContainer').checked ? '#custom_toolbar' : undefined,
         stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : undefined,

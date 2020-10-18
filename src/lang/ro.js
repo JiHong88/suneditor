@@ -110,9 +110,6 @@
                 tags: 'Etichete',
                 search: 'Căutareim',
             },
-            mentionBox: {
-              title: 'Adăugați mențiune',
-            },
             caption: 'Inserează descriere',
             close: 'Închide',
             submitButton: 'Salvează',

@@ -110,9 +110,6 @@
                 tags: '标签',
                 search: '搜索',
             },
-            mentionBox: {
-              title: '添加提及',
-            },
             caption: '标题',
             close: '取消',
             submitButton: '确定',

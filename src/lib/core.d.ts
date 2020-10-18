@@ -228,6 +228,26 @@ interface Core {
     controllersOff(e?: KeyboardEvent | MouseEvent): void;
 
     /**
+     * @description Specify the position of the controller.
+     * @param controller Controller element.
+     * @param referEl Element that is the basis of the controller's position.
+     * @param position Type of position ("top" | "bottom")
+     * When using the "top" position, there should not be an arrow on the controller.
+     * When using the "bottom" position there should be an arrow on the controller.
+     * @param addOffset These are the left and top values that need to be added specially. 
+     * This argument is required. - {left: 0, top: 0}
+     * Please enter the value based on ltr mode.
+     * Calculated automatically in rtl mode.
+     */
+    setControllerPosition(controller: Element, referEl: Element, position: 'top' | 'bottom', addOffset: {left: number, top: number}): void;
+
+    /**
+     * @description Run event.stopPropagation and event.preventDefault.
+     * @param e Event Object
+     */
+    eventStop(e: Event): void;
+
+    /**
      * @description javascript execCommand
      * @param command javascript execCommand function property
      * @param showDefaultUI javascript execCommand function property
@@ -434,7 +454,7 @@ interface Core {
      * @param display Display type string ('command', 'submenu', 'dialog', 'container')
      * @param target The element of command button
      */
-    actionCall(command: string, display: string, target: Element): void;
+    actionCall(command: string, display: 'command' | 'submenu' | 'dialog' | 'container', target: Element): void;
 
     /**
      * @description Execute command of command button(All Buttons except submenu and dialog)
@@ -454,7 +474,7 @@ interface Core {
      * Setted "margin-left" to "25px" in the top "P" tag of the parameter node.
      * @param command Separator ("indent" or "outdent")
      */
-    indent (command: string): void;
+    indent(command: 'indent' | 'outdent'): void;
 
     /**
      * @description Add or remove the class name of "body" so that the code block is visible
@@ -597,10 +617,10 @@ export default class SunEditor {
     onInput: EventFn;
     onKeyDown: EventFn;
     onKeyUp: EventFn;
-    onDrop: EventFn;
     onChange: (contents: string, core: Core) => void;
     onBlur: (e: FocusEvent, core: Core) => void;
-    onPaste: (e: Event, cleanData: string, maxCharCount: number, core: Core) => void;
+    onDrop: (e: Event, cleanData: string, maxCharCount: number, core: Core) => boolean | string;
+    onPaste: (e: Event, cleanData: string, maxCharCount: number, core: Core) => boolean | string;
     onCopy: (e: Event, clipboardData: any, core: Core) => void;
     onCut: (e: Event, clipboardData: any, core: Core) => void;
 
@@ -738,7 +758,7 @@ export default class SunEditor {
      * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
      * @param core Core object
      */
-    onImageUpload: (targetElement: HTMLImageElement, index: number, state: string, info: fileInfo, remainingFilesCount: number, core: Core) => void;
+    onImageUpload: (targetElement: HTMLImageElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number, core: Core) => void;
 
     /**
      * @description Called when the video(iframe, video) is uploaded, updated, deleted
@@ -756,7 +776,7 @@ export default class SunEditor {
      * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
      * @param core Core object
      */
-    onVideoUpload: (targetElement: HTMLIFrameElement | HTMLVideoElement, index: number, state: string, info: fileInfo, remainingFilesCount: number, core: Core) => void;
+    onVideoUpload: (targetElement: HTMLIFrameElement | HTMLVideoElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number, core: Core) => void;
 
     /**
      * @description Called when the audio is uploaded, updated, deleted
@@ -774,7 +794,7 @@ export default class SunEditor {
      * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
      * @param core Core object
      */
-    onAudioUpload: (targetElement: HTMLAudioElement, index: number, state: string, info: fileInfo, remainingFilesCount: number, core: Core) => void;
+    onAudioUpload: (targetElement: HTMLAudioElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number, core: Core) => void;
 
     /**
      * @description Called when the image is upload failed

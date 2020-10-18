@@ -110,9 +110,6 @@
                 tags: '태그',
                 search: '검색',
             },
-            mentionBox: {
-              title: '언급 추가',
-            },
             caption: '설명 넣기',
             close: '닫기',
             submitButton: '확인',

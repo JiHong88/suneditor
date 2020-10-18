@@ -51,7 +51,7 @@
 
         _callBackUpload: function (xmlHttp, callBack, errorCallBack) {
             if (xmlHttp.readyState === 4) {
-                if (xmlHttp.status >= 200 && xmlHttp.status < 300) {
+                if (xmlHttp.status === 200) {
                     try {
                         callBack(xmlHttp);
                     } catch (e) {

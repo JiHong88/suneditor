@@ -110,9 +110,6 @@
                 tags: 'Теги',
                 search: 'Поиск',
             },
-            mentionBox: {
-              title: 'Добавить упоминание',
-            },
             caption: 'Добавить подпись',
             close: 'Закрыть',
             submitButton: 'Подтвердить',
