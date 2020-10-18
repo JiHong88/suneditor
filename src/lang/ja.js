@@ -75,7 +75,7 @@
             paragraphStyle: '段落スタイル',
             textStyle: 'テキストスタイル',
             imageGallery: 'イメージギャラリー',
-            mention: '言及する',
+            mention: '言及する'
         },
         dialogBox: {
             linkBox: {

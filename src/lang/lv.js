@@ -75,7 +75,7 @@
             paragraphStyle: 'Paragrāfa stils',
             textStyle: 'Teksta stils',
             imageGallery: 'Attēlu galerija',
-            mention: 'Pieminēt',
+            mention: 'Pieminēt'
         },
         dialogBox: {
             linkBox: {

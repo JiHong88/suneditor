@@ -75,7 +75,7 @@
             paragraphStyle: 'Styl akapitu',
             textStyle: 'Styl tekstu',
             imageGallery: 'Galeria obrazów',
-            mention: 'Wzmianka',
+            mention: 'Wzmianka'
         },
         dialogBox: {
             linkBox: {

@@ -75,7 +75,7 @@
             paragraphStyle: 'Absatzstil',
             textStyle: 'Textstil',
             imageGallery: 'Bildergalerie',
-            mention: 'Erwähnen',
+            mention: 'Erwähnen'
         },
         dialogBox: {
             linkBox: {

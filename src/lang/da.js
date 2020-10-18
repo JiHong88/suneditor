@@ -78,7 +78,7 @@
             paragraphStyle: 'Afsnitstil',
             textStyle: 'Tekststil',
             imageGallery: 'Billedgalleri',
-            mention: 'Nævne'
+            mention: 'Nævne' 
         },
         dialogBox: {
             linkBox: {

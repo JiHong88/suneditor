@@ -75,7 +75,7 @@
             paragraphStyle: 'Paragraph style',
             textStyle: 'Text style',
             imageGallery: 'Image gallery',
-            mention: 'Mention',
+            mention: 'Mention'
         },
         dialogBox: {
             linkBox: {

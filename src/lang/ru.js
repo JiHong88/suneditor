@@ -75,7 +75,7 @@
             paragraphStyle: 'Стиль абзаца',
             textStyle: 'Стиль текста',
             imageGallery: 'Галерея',
-            mention: 'Упоминание',
+            mention: 'Упоминание'
         },
         dialogBox: {
             linkBox: {
