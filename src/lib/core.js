@@ -3378,6 +3378,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (i === 0) container = textNode;
                 }
             } else if (isRemoveNode) {
+                newInnerNode = newInnerNode.firstChild;
                 for (let i = 0; i < nNodeArray.length; i++) {
                     this._stripRemoveNode(nNodeArray[i]);
                 }
@@ -3534,6 +3535,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     util.removeItem(removeNode);
                 }
             } else if (isRemoveNode) {
+                newInnerNode = newInnerNode.firstChild;
                 for (let i = 0; i < nNodeArray.length; i++) {
                     this._stripRemoveNode(nNodeArray[i]);
                 }
@@ -3799,6 +3801,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
                 }
             } else if (isRemoveNode) {
+                newInnerNode = newInnerNode.firstChild;
                 for (let i = 0; i < nNodeArray.length; i++) {
                     this._stripRemoveNode(nNodeArray[i]);
                 }
