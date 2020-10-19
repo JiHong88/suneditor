@@ -5513,6 +5513,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const range = rangeObj || core.getRange();
             const toolbar = context.element.toolbar;
+            const topArea = context.element.topArea;
             const selection = core.getSelection();
 
             let isDirTop;
@@ -5530,14 +5531,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             let scrollLeft = 0;
             let scrollTop = 0;
-            let el = context.element.topArea;
+            let el = topArea;
             while (!!el) {
                 scrollLeft += el.scrollLeft;
                 scrollTop += el.scrollTop;
                 el = el.parentElement;
             }
 
-            const editorWidth = context.element.topArea.offsetWidth;
+            const editorWidth = topArea.offsetWidth;
             const offsets = event._getEditorOffsets(null);
             const stickyTop = offsets.top;
             const editorLeft = offsets.left;
@@ -5589,6 +5590,23 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             event._setToolbarOffset(isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
             if (toolbarWidth !== toolbar.offsetWidth || toolbarHeight !== toolbar.offsetHeight) {
                 event._setToolbarOffset(isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
+            }
+
+            if (options.toolbarContainer) {
+                const editorParent = topArea.parentElement;
+
+                let container = options.toolbarContainer;
+                let left = container.offsetLeft;
+                let top = container.offsetTop;
+
+                while(!container.parentElement.contains(editorParent) || !/^(BODY|HTML)$/i.test(container.parentElement.nodeName)) {
+                    container = container.offsetParent;
+                    left += container.offsetLeft;
+                    top += container.offsetTop;
+                }
+
+                toolbar.style.left = (toolbar.offsetLeft - left + topArea.offsetLeft) + 'px';
+                toolbar.style.top = (toolbar.offsetTop - top + topArea.offsetTop) + 'px';
             }
 
             toolbar.style.visibility = '';

@@ -74,6 +74,7 @@ let ssss = suneditor.create(("sample1"), {
     // ],
     toolbarContainer: document.getElementById('test_tool2'),
     tabDisable: true,
+    mode: "balloon",
     fontSize: fs,
     linkProtocol: 'https://',
     buttonList: [
