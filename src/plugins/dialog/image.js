@@ -31,6 +31,7 @@ export default {
             _v_link: {_linkValue: ''},
             _v_src: {_linkValue: ''},
             svgDefaultSize: '30%',
+            base64RenderIndex: 0,
             // @require @Override component
             _element: null,
             _cover: null,
@@ -482,7 +483,7 @@ export default {
             }
             this.plugins.fileManager.upload.call(this, imageUploadUrl, this.context.option.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.functions.onImageUploadError);
         } else { // base64
-            this.plugins.image.setup_reader.call(this, files, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, filesLen - 1, info.isUpdate);
+            this.plugins.image.setup_reader.call(this, files, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, filesLen, info.isUpdate);
         }
     },
 
@@ -517,31 +518,45 @@ export default {
 
     setup_reader: function (files, imgLinkValue, newWindowCheck, width, height, align, filesLen, isUpdate) {
         try {
+            this.context.image.base64RenderIndex = filesLen;
             const wFileReader = this._w.FileReader;
+            const filesStack = [filesLen];
+            this.context.image.inputX.value = width;
+            this.context.image.inputY.value = height;
     
-            for (let i = 0, reader, file; i <= filesLen; i++) {
+            for (let i = 0, reader, file; i < filesLen; i++) {
                 reader = new wFileReader();
                 file = files[i];
     
-                if (isUpdate) {
-                    this.context.image._element.setAttribute('data-file-name', file.name);
-                    this.context.image._element.setAttribute('data-file-size', file.size);
-                }
-        
-                reader.onload = function (update, updateElement, file, close) {
-                    this.context.image.inputX.value = width;
-                    this.context.image.inputY.value = height;
-                    if (update) this.plugins.image.update_src.call(this, reader.result, updateElement, file);
-                    else this.plugins.image.create_image.call(this, reader.result, imgLinkValue, newWindowCheck, width, height, align, file);
-    
-                    if (close) this.closeLoading();
-                }.bind(this, isUpdate, this.context.image._element, file, i === filesLen);
-        
+                reader.onload = function (reader, update, updateElement, file, index) {
+                    filesStack[index] = { result: reader.result, file: file };
+
+                    if (--this.context.image.base64RenderIndex === 0) {
+                        this.plugins.image.onRender_imgBase64.call(this, update, filesStack, updateElement, imgLinkValue, newWindowCheck, width, height, align);
+                        this.closeLoading();
+                    }
+                }.bind(this, reader, isUpdate, this.context.image._element, file, i);
+
                 reader.readAsDataURL(file);
             }
         } catch (e) {
             this.closeLoading();
             throw Error('[SUNEDITOR.image.setup_reader.fail] cause : "' + e.message + '"');
+        }
+    },
+
+    onRender_imgBase64: function (update, filesStack, updateElement, imgLinkValue, newWindowCheck, width, height, align) {
+        const updateMethod = this.plugins.image.update_src;
+        const createMethod = this.plugins.image.create_image;
+        
+        for (let i = 0, len = filesStack.length; i < len; i++) {
+            if (update) {
+                this.context.image._element.setAttribute('data-file-name', filesStack[i].file.name);
+                this.context.image._element.setAttribute('data-file-size', filesStack[i].file.size);
+                updateMethod.call(this, filesStack[i].result, updateElement, filesStack[i].file);
+            } else {
+                createMethod.call(this, filesStack[i].result, imgLinkValue, newWindowCheck, width, height, align, filesStack[i].file);
+            }
         }
     },
 
