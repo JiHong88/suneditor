@@ -594,7 +594,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _setMenuPosition: function (element, menu) {
-            menu.style.top = '-10000px';
             menu.style.visibility = 'hidden';
             menu.style.display = 'block';
             menu.style.height = '';
@@ -613,7 +612,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const rtlL = rtlW > 0 ? 0 : elementW - menuW;
                 menu.style.left = (l - rtlW + rtlL) + 'px';
                 if (toolbarOffset.left > event._getEditorOffsets(menu).left) {
-                    menu.style.left = toolbarOffset.left + 'px';
+                    menu.style.left = '0px';
                 }
             } else {
                 const overLeft = toolbarW <= menuW ? 0 : toolbarW - (l + menuW);
