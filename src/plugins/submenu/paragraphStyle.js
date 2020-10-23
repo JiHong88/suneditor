@@ -116,7 +116,7 @@ export default {
 
         let selectedFormsts = this.getSelectedElements();
         if (selectedFormsts.length === 0) {
-            this.getRange_addLine(this.getRange());
+            this.getRange_addLine(this.getRange(), null);
             selectedFormsts = this.getSelectedElements();
             if (selectedFormsts.length === 0) return;
         }

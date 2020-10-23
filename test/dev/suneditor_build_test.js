@@ -658,6 +658,9 @@ window.sun_create = function () {
     ss.setOptions({
         height: 'auto'
     })
+
+    // ss.core.commandHandler(null, 'selectAll');
+    // ss.core.removeNode();
 }
 
 

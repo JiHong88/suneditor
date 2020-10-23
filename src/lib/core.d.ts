@@ -297,8 +297,9 @@ interface Core {
      * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
      * Returns a new "range" or argument "range".
      * @param range core.getRange()
+     * @param container If there is "container" argument, it creates a line in front of the container.
      */
-    getRange_addLine(range: Range): Range;
+    getRange_addLine(range: Range, container?: Element): Range;
 
     /**
      * @description Get window selection obejct

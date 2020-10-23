@@ -163,7 +163,7 @@ export default {
             let selectedFormsts = this.getSelectedElementsAndComponents(false);
 
             if (selectedFormsts.length === 0) {
-                range = this.getRange_addLine(range);
+                range = this.getRange_addLine(range, null);
                 selectedFormsts = this.getSelectedElementsAndComponents(false);
                 if (selectedFormsts.length === 0) return;
             }

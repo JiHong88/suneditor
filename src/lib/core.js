@@ -968,14 +968,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
          * Returns a new "range" or argument "range".
          * @param {Object} range core.getRange()
+         * @param {Element|null} container If there is "container" argument, it creates a line in front of the container.
          * @returns {Object} range
          */
-        getRange_addLine: function (range) {
+        getRange_addLine: function (range, container) {
             if (this._selectionVoid(range)) {
                 const wysiwyg = context.element.wysiwyg;
                 const op = util.createElement('P');
                 op.innerHTML = '<br>';
-                wysiwyg.insertBefore(op, wysiwyg.firstElementChild);
+                wysiwyg.insertBefore(op, container ? container.nextElementSibling : wysiwyg.firstElementChild);
                 this.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
                 range = this._variable._range;
             }
@@ -1330,7 +1331,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             const r = this.removeNode();
-            this.getRange_addLine(this.getRange());
+            this.getRange_addLine(this.getRange(), r.container);
             let oNode = null;
             let selectionNode = this.getSelectionNode();
             let formatEl = util.getFormatElement(selectionNode, null);
@@ -1347,6 +1348,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 this.insertNode(element, formatEl, false);
                 if (formatEl && util.onlyZeroWidthSpace(formatEl)) util.removeItem(formatEl);
             }
+
+            this.setRange(element, 0, element, 0);
 
             if (!notSelect) {
                 const fileComponentInfo = this.getFileComponent(element);
@@ -1481,7 +1484,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            const range = (!afterNode && !isFormats) ? this.getRange_addLine(this.getRange()) : this.getRange();
+            const range = (!afterNode && !isFormats) ? this.getRange_addLine(this.getRange(), null) : this.getRange();
             const commonCon = range.commonAncestorContainer;
             const startOff = range.startOffset;
             const endOff = range.endOffset;
@@ -1747,7 +1750,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     startCon = endCon = childNodes[0];
                     if (util.isBreak(startCon) || util.onlyZeroWidthSpace(startCon)) {
                         return {
-                            container: startCon,
+                            container: util.isMedia(commonCon) ? commonCon : startCon,
                             offset: 0
                         };
                     }
@@ -1851,7 +1854,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Element} rangeElement Element of wrap the arguments (BLOCKQUOTE...)
          */
         applyRangeFormatElement: function (rangeElement) {
-            this.getRange_addLine(this.getRange());
+            this.getRange_addLine(this.getRange(), null);
             const rangeLines = this.getSelectedElementsAndComponents(false);
             if (!rangeLines || rangeLines.length === 0) return;
 
@@ -2325,7 +2328,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         nodeChange: function (appendNode, styleArray, removeNodeArray, strictRemove) {
             this._resetRangeToTextNode();
-            let range = this.getRange_addLine(this.getRange());
+            let range = this.getRange_addLine(this.getRange(), null);
             styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
             removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
             
