@@ -266,7 +266,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     value: "",
     rtl: true,
     tableCellControllerPosition: 'top',
-    lang: lang.ko,
+    lang: lang.ckb,
     plugins: plugins,
     katex: Katex,
     // value: '',

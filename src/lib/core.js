@@ -5260,12 +5260,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
                 case '[':
                     if (options.shortcutsDisable.indexOf('indent') === -1) {
-                        command = 'outdent';
+                        command = options.rtl ? 'indent' : 'outdent';
                     }
                     break;
                 case ']':
                     if (options.shortcutsDisable.indexOf('indent') === -1) {
-                        command = 'indent';
+                        command = options.rtl ? 'outdent' : 'indent';
                     }
                     break;
             }

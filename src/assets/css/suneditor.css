@@ -424,6 +424,8 @@
 .sun-editor .se-tooltip .se-tooltip-inner .se-tooltip-text {position:relative; display:inline-block; width:auto; left:-50%; font-size:0.9em; margin:0; padding:4px 6px; border-radius:2px; background-color:#333; color:#fff; text-align:center; line-height:unset; white-space:nowrap; cursor:auto;}
 .sun-editor .se-tooltip .se-tooltip-inner .se-tooltip-text::after {content:""; position:absolute; bottom:100%; left:50%; margin-left:-5px; border-width:5px; border-style:solid; border-color:transparent transparent #333 transparent;}
 .sun-editor .se-tooltip:hover .se-tooltip-inner {visibility:visible; opacity:1;}
+.sun-editor .se-tooltip .se-tooltip-inner .se-tooltip-text .se-shortcut {display:block !important;}
+.sun-editor .se-tooltip .se-tooltip-inner .se-tooltip-text .se-shortcut > .se-shortcut-key {display:inline; font-weight:bold;}
 
 
 /** --- RTL ---------------------------------------------------------- */

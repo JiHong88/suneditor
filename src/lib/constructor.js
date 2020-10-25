@@ -536,24 +536,26 @@ export default {
         const icons = options.icons;
         const lang = options.lang;
         const cmd = util.isOSX_IOS ? '⌘' : 'CTRL';
+        const addShift = util.isOSX_IOS ? '⇧' : '+SHIFT';
         const shortcutsDisable = !options.shortcutsHint ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent'] : options.shortcutsDisable;
+        const indentKey = options.rtl ? ['[',']'] : [']','['];
 
         return {
             /** default command */
-            bold: ['_se_command_bold', lang.toolbar.bold + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('bold') > -1 ? '' : ' (' + cmd + '+B)') + '</span>', 'STRONG', '', icons.bold],
-            underline: ['_se_command_underline', lang.toolbar.underline + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('underline') > -1 ? '' : ' (' + cmd + '+U)') + '</span>', 'U', '', icons.underline],
-            italic: ['_se_command_italic', lang.toolbar.italic + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('italic') > -1 ? '' : ' (' + cmd + '+I)') + '</span>', 'EM', '', icons.italic],
-            strike: ['_se_command_strike', lang.toolbar.strike + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('strike') > -1 ? '' : ' (' + cmd + '+SHIFT+S)') + '</span>', 'DEL', '', icons.strike],
+            bold: ['_se_command_bold', lang.toolbar.bold + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('bold') > -1 ? '' : cmd + '+<span class="se-shortcut-key">B</span>') + '</span>', 'STRONG', '', icons.bold],
+            underline: ['_se_command_underline', lang.toolbar.underline + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('underline') > -1 ? '' : cmd + '+<span class="se-shortcut-key">U</span>') + '</span>', 'U', '', icons.underline],
+            italic: ['_se_command_italic', lang.toolbar.italic + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('italic') > -1 ? '' : cmd + '+<span class="se-shortcut-key">I</span>') + '</span>', 'EM', '', icons.italic],
+            strike: ['_se_command_strike', lang.toolbar.strike + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('strike') > -1 ? '' : cmd + addShift + '+<span class="se-shortcut-key">S</span>') + '</span>', 'DEL', '', icons.strike],
             subscript: ['_se_command_subscript', lang.toolbar.subscript, 'SUB', '', icons.subscript],
             superscript: ['_se_command_superscript', lang.toolbar.superscript, 'SUP', '', icons.superscript],
             removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', icons.erase],
-            indent: ['_se_command_indent', lang.toolbar.indent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : ' (' + cmd + '+])') + '</span>', 'indent', '', icons.outdent],
-            outdent: ['_se_command_outdent', lang.toolbar.outdent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : ' (' + cmd + '+[)') + '</span>', 'outdent', '', icons.indent],
+            indent: ['_se_command_indent', lang.toolbar.indent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmd + '+<span class="se-shortcut-key">' + indentKey[0] + '</span>') + '</span>', 'indent', '', icons.outdent],
+            outdent: ['_se_command_outdent', lang.toolbar.outdent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmd + '+<span class="se-shortcut-key">' + indentKey[1] + '</span>') + '</span>', 'outdent', '', icons.indent],
             fullScreen: ['se-code-view-enabled se-resizing-enabled _se_command_fullScreen', lang.toolbar.fullScreen, 'fullScreen', '', icons.expansion],
             showBlocks: ['_se_command_showBlocks', lang.toolbar.showBlocks, 'showBlocks', '', icons.show_blocks],
             codeView: ['se-code-view-enabled se-resizing-enabled _se_command_codeView', lang.toolbar.codeView, 'codeView', '', icons.code_view],
-            undo: ['_se_command_undo se-resizing-enabled', lang.toolbar.undo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : ' (' + cmd + '+Z)') + '</span>', 'undo', '', icons.undo],
-            redo: ['_se_command_redo se-resizing-enabled', lang.toolbar.redo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : ' (' + cmd + '+Y / ' + cmd + '+SHIFT+Z)') + '</span>', 'redo', '', icons.redo],
+            undo: ['_se_command_undo se-resizing-enabled', lang.toolbar.undo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmd + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'undo', '', icons.undo],
+            redo: ['_se_command_redo se-resizing-enabled', lang.toolbar.redo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmd + '+<span class="se-shortcut-key">Y</span> / ' + cmd + addShift + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'redo', '', icons.redo],
             preview: ['se-resizing-enabled', lang.toolbar.preview, 'preview', '', icons.preview],
             print: ['se-resizing-enabled', lang.toolbar.print, 'print', '', icons.print],
             save: ['_se_command_save se-resizing-enabled', lang.toolbar.save, 'save', '', icons.save],
