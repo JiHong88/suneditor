@@ -6440,6 +6440,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 for (let i = 1, len = responsiveSize.length; i < len; i++) {
                     if (windowWidth < responsiveSize[i]) {
                         responsiveWidth = responsiveSize[i] + '';
+                        break;
                     }
                 }
 
@@ -6921,7 +6922,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return;
             }
 
-            const sizeArray = event._responsiveButtonSize = ['default'];
+            const sizeArray = event._responsiveButtonSize = [];
             const buttonsObj = event._responsiveButtons = {default: _responsiveButtons[0]};
             for (let i = 1, len = _responsiveButtons.length, size, buttonGroup; i < len; i++) {
                 buttonGroup = _responsiveButtons[i];
@@ -6929,6 +6930,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 sizeArray.push(size);
                 buttonsObj[size] = buttonGroup[1];
             }
+
+            sizeArray.sort(function (a, b) { return a - b; }).unshift('default');
         }
     };
 
