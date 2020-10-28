@@ -265,6 +265,7 @@ s1.onKeyDown = function (e, core) {
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     value: "",
     rtl: true,
+    fullPage: true,
     tableCellControllerPosition: 'top',
     lang: lang.ckb,
     plugins: plugins,
@@ -575,7 +576,8 @@ ss.showInline = function (toolbar, context) {
 // }
 
 window.sun_noticeOpen = function () {
-    ss.noticeOpen('test notice');
+    // ss.noticeOpen('test notice');
+    ss.setContents('<html><head>aaa</head><body><div>abc</div></body></html>')
 }
 
 window.sun_noticeClose = function () {

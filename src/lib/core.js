@@ -4152,7 +4152,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (attrs[i].name === 'contenteditable') continue;
                     this._wd.body.setAttribute(attrs[i].name, attrs[i].value);
                 }
-                if (!util.hasClass(this._wd.body, 'sun-editor-editable')) util.addClass(this._wd.body, 'sun-editor-editable');
+                if (!util.hasClass(this._wd.body, 'sun-editor-editable')) {
+                    const editableClasses = options._editableClass.split(' ');
+                    for (let i = 0; i < editableClasses.length; i++) {
+                        util.addClass(this._wd.body, options._editableClass[i]);
+                    }
+                }
             } else {
                 context.element.wysiwyg.innerHTML = code_html.length > 0 ? this.convertContentsForEditor(code_html) : '<p><br></p>';
             }
@@ -4293,7 +4298,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const wDoc = this._wd;
 
             if (options.iframe) {
-                const arrts = options.fullPage ? util.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="sun-editor-editable"';
+                const arrts = options.fullPage ? util.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + options._editableClass + '"';
 
                 printDocument.write('' +
                     '<!DOCTYPE html><html>' +
@@ -4319,7 +4324,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     '<head>' +
                     linkHTML +
                     '</head>' +
-                    '<body class="sun-editor-editable">' + contentsHTML + '</body>' +
+                    '<body class="' + options._editableClass + '">' + contentsHTML + '</body>' +
                     '</html>'
                 );
             }
@@ -4363,7 +4368,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const wDoc = this._wd;
 
             if (options.iframe) {
-                const arrts = options.fullPage ? util.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="sun-editor-editable"';
+                const arrts = options.fullPage ? util.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + options._editableClass + '"';
 
                 windowObject.document.write('' +
                     '<!DOCTYPE html><html>' +
@@ -4393,7 +4398,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     '<title>' + lang.toolbar.preview + '</title>' +
                     linkHTML +
                     '</head>' +
-                    '<body class="sun-editor-editable" style="width:' + w + '; border:1px solid #ccc; margin:10px auto !important; height:auto !important;">' + contentsHTML + '</body>' +
+                    '<body class="' + options._editableClass + '" style="width:' + w + '; border:1px solid #ccc; margin:10px auto !important; height:auto !important;">' + contentsHTML + '</body>' +
                     '</html>'
                 );
             }

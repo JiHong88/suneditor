@@ -1795,7 +1795,7 @@ const util = {
             '<meta name="viewport" content="width=device-width, initial-scale=1">' +
             '<title></title>' + 
             this._setIframeCssTags(options);
-        frame.contentDocument.body.className = 'sun-editor-editable';
+        frame.contentDocument.body.className = options._editableClass;
         frame.contentDocument.body.setAttribute('contenteditable', true);
     },
 
