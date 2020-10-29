@@ -789,6 +789,13 @@ export default {
             }
         }
 
+        const lastFloat = _buttonTray.lastElementChild.style.float;
+        if (!!lastFloat) {
+            const sv =  separator_vertical.cloneNode(false);
+            sv.style.float = lastFloat;
+            _buttonTray.appendChild(sv);
+        }
+
         if (_buttonTray.children.length === 1) util.removeClass(_buttonTray.firstElementChild, 'se-btn-module-border');
         if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
         if (moreLayer.children.length > 0) _buttonTray.appendChild(moreLayer);
