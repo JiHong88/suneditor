@@ -439,6 +439,7 @@
 .sun-editor.se-rtl .se-btn-list {text-align:right;}
 .sun-editor.se-rtl .se-btn-list > .se-list-icon {margin:-1px 0 0 10px;}
 /* button - se-menu-list - li */
+.sun-editor.se-rtl .se-menu-list {float:right;}
 .sun-editor.se-rtl .se-menu-list li {float:right;}
 
 /* menu list--- */
