@@ -1192,7 +1192,7 @@
             <dl class="details"></dl>
 
             
-            <h4 class="name" id="getRange_addLine"><span class="type-signature"></span>getRange_addLine<span class="signature">(range)</span><span
+            <h4 class="name" id="getRange_addLine"><span class="type-signature"></span>getRange_addLine<span class="signature">(range, container)</span><span
                 class="type-signature"></span><span class="type-signature"> &rarr; {Object}</span></h4>
             <div class="description">
                 If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.<br>
@@ -1214,6 +1214,13 @@
                         <span class="param-type">Object</span>
                     </td>
                     <td class="description last">core.getRange()</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>container</code></td>
+                    <td class="type">
+                        <span class="param-type">Element|null</span>
+                    </td>
+                    <td class="description last">If there is "container" argument, it creates a line in front of the container.</td>
                 </tr>
                 </tbody>
             </table>

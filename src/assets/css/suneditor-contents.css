@@ -54,7 +54,7 @@
 }
 
 /** span */
-.sun-editor-editable :not(.se-code-language .katex) span {
+.sun-editor-editable span {
     display: inline;
     vertical-align: baseline;
     margin: 0;

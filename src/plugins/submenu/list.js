@@ -112,7 +112,7 @@ export default {
 
         if (selectedFormats.length === 0) {
             if (selectedCells) return;
-            range = this.getRange_addLine(range);
+            range = this.getRange_addLine(range, null);
             selectedFormats = this.getSelectedElementsAndComponents(false);
             if (selectedFormats.length === 0) return;
         }

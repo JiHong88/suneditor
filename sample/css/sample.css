@@ -159,13 +159,13 @@ footer {
     display: inline-block;
     margin: 3px;
     width: 60px;
-    height: 60px;
+    height: auto;
     border: 3px solid #fff;
 }
 
 .component-list .file-list ul li .image-wrapper {
     width: 54px;
-    height: 54px;;
+    height: auto;;
 }
 
 .component-list .file-list ul li.checked {
