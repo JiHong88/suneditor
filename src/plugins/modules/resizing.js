@@ -473,7 +473,14 @@
             if (this.currentControllerName !== plugin) {
                 this.util.setDisabledButtons(true, this.resizingDisabledButtons);
                 resizeContainer.style.display = 'block';
-                this.setControllerPosition(contextResizing.resizeButton, resizeContainer, 'bottom', {left: 0, top: 50});
+
+                const addOffset = {left: 0, top: 50};
+                if (this.context.options.iframe) {
+                    addOffset.left -= this.context.element.wysiwygFrame.parentElement.offsetLeft;
+                    addOffset.top -= this.context.element.wysiwygFrame.parentElement.offsetTop;
+                }
+
+                this.setControllerPosition(contextResizing.resizeButton, resizeContainer, 'bottom', addOffset);
                 this.controllersOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
             }
     
@@ -498,7 +505,10 @@
          * @description Open align submenu of module
          */
         openAlignMenu: function () {
-            this.util.addClass(this.context.resizing.alignButton, 'on');
+            const alignButton = this.context.resizing.alignButton;
+            this.util.addClass(alignButton, 'on');
+            this.context.resizing.alignMenu.style.top = (alignButton.offsetTop + alignButton.offsetHeight) + 'px';
+            this.context.resizing.alignMenu.style.left = (alignButton.offsetLeft - alignButton.offsetWidth / 2) + 'px';
             this.context.resizing.alignMenu.style.display = 'block';
     
             this.plugins.resizing._closeAlignMenu = function () {
