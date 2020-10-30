@@ -1546,7 +1546,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             if (util.isFormatElement(container)) {
                                 container.innerHTML = '<br>';
                             } else if (util.isRangeFormatElement(container)) {
-                                container.innerHTML = '<p><br></p>';
+                                container.innerHTML = '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
                             }
                         }
 
@@ -4159,7 +4159,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
                 }
             } else {
-                context.element.wysiwyg.innerHTML = code_html.length > 0 ? this.convertContentsForEditor(code_html) : '<p><br></p>';
+                context.element.wysiwyg.innerHTML = code_html.length > 0 ? this.convertContentsForEditor(code_html) : '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
             }
         },
 
@@ -4456,13 +4456,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _makeLine: function (node, requireFormat) {
+            const defaultTag = options.defaultTag;
             // element
             if (node.nodeType === 1) {
                 if (util._disallowedTags(node)) return '';
                 if (!requireFormat || (util.isFormatElement(node) || util.isRangeFormatElement(node) || util.isComponent(node) || util.isMedia(node) || (util.isAnchor(node) && util.isMedia(node.firstElementChild)))) {
                     return node.outerHTML;
                 } else {
-                    return '<p>' + node.outerHTML + '</p>';
+                    return '<' + defaultTag + '>' + node.outerHTML + '</' + defaultTag + '>';
                 }
             }
             // text
@@ -4472,7 +4473,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 let html = '';
                 for (let i = 0, tLen = textArray.length, text; i < tLen; i++) {
                     text = textArray[i].trim();
-                    if (text.length > 0) html += '<p>' + text + '</p>';
+                    if (text.length > 0) html += '<' + defaultTag + '>' + text + '</' + defaultTag + '>';
                 }
                 return html;
             }
@@ -4609,7 +4610,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 cleanHTML += this._makeLine(domTree[i], true);
             }
 
-            if (cleanHTML.length === 0) return '<p><br></p>';
+            if (cleanHTML.length === 0) return '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
 
             cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
             return this._tagConvertor(cleanHTML);

@@ -378,6 +378,7 @@ export default {
     _initOptions: function (element, options) {
         /** Values */
         options.lang = options.lang || _defaultLang;
+        options.defaultTag = typeof options.defaultTag === 'string' ? options.defaultTag : 'p';
         options.value = typeof options.value === 'string' ? options.value : null;
         options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
         /** Whitelist */
