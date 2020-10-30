@@ -380,6 +380,7 @@ plugins: [
 
 // Vaues
 lang            : language object.   default : en {Object}
+defaultTag      : Specifies default tag name of the editor.     default: 'p' {String}
 value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {String}
 historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {Number}

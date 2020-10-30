@@ -12,6 +12,10 @@ export interface SunEditorOptions {
      */
     lang?: Lang;
     /**
+     * Specifies default tag name of the editor. (default: "p")
+     */
+    defaultTag?: string;
+    /**
      * Initial value(html string) of the edit area.
      * If not, the value of the "target textarea".
      */
