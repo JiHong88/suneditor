@@ -510,6 +510,12 @@ interface Core {
     setContents(html: string): void;
 
     /**
+     * @description Sets the contents of the iframe's head tag and body tag when using the "iframe" or "fullPage" option.
+     * @param ctx { head: HTML string, body: HTML string}
+     */
+    setIframeContents(ctx: { head?: string, body?: string }): void;
+
+    /**
      * @description Gets the current contents
      * @param onlyContents Return only the contents of the body without headers when the "fullPage" option is true
      * @returns

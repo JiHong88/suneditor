@@ -4423,6 +4423,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Sets the contents of the iframe's head tag and body tag when using the "iframe" or "fullPage" option.
+         * @param {Object} ctx { head: HTML string, body: HTML string}
+         */
+        setIframeContents: function (ctx) {
+            if (!options.iframe) return false;
+            if (ctx.head) this._wd.head.innerHTML = ctx.head.replace(/<script\s*.*>.*<\/script>/g, '');
+            if (ctx.body) this._wd.body.innerHTML = this.convertContentsForEditor(ctx.body);
+        },
+
+        /**
          * @description Gets the current contents
          * @param {Boolean} onlyContents Return only the contents of the body without headers when the "fullPage" option is true
          * @returns {Object}
