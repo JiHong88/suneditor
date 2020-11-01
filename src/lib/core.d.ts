@@ -253,7 +253,7 @@ interface Core {
      * @param showDefaultUI javascript execCommand function property
      * @param value javascript execCommand function property
      */
-    execCommand(command: string, showDefaultUI: boolean, value: string): void;
+    execCommand(command: string, showDefaultUI?: boolean, value?: string): void;
 
     /**
      * @description Focus to wysiwyg area using "native focus function"
@@ -463,7 +463,7 @@ interface Core {
      * @param target The element of command button
      * @param command Property of command button (data-value)
      */
-    commandHandler(target: Element, command: string): void;
+    commandHandler(target: Element | null, command: string): void;
 
     /**
      * @description Remove format of the currently selected range

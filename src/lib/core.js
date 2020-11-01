@@ -805,8 +805,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description javascript execCommand
          * @param {String} command javascript execCommand function property
-         * @param {Boolean} showDefaultUI javascript execCommand function property
-         * @param {String} value javascript execCommand function property
+         * @param {Boolean|undefined} showDefaultUI javascript execCommand function property
+         * @param {String|undefined} value javascript execCommand function property
          */
         execCommand: function (command, showDefaultUI, value) {
             this._wd.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
@@ -3921,7 +3921,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Execute command of command button(All Buttons except submenu and dialog)
          * (undo, redo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print)
-         * @param {Element} target The element of command button
+         * @param {Element|null} target The element of command button
          * @param {String} command Property of command button (data-value)
          */
         commandHandler: function (target, command) {
