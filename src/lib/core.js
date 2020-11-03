@@ -6288,7 +6288,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
             }
 
-            if (shift && /16/.test(keyCode)) {
+            if (shift && keyCode === 16) {
                 e.preventDefault();
                 e.stopPropagation();
                 const tablePlugin = core.plugins.table;
