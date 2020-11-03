@@ -4409,6 +4409,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {String} html HTML string
          */
         setContents: function (html) {
+            this.removeRange();
+            
             const convertValue = this.convertContentsForEditor(html);
             this._resetComponents();
 
