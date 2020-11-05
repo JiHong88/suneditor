@@ -3920,7 +3920,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Execute command of command button(All Buttons except submenu and dialog)
-         * (undo, redo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print)
+         * (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript)
          * @param {Element|null} target The element of command button
          * @param {String} command Property of command button (data-value)
          */
