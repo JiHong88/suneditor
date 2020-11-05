@@ -1699,7 +1699,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Object}
          */
         removeNode: function () {
-            if (!this._resetRangeToTextNode()) console.warn('[SUNEDITOR.core.removeNode.exception] An exception occurred while resetting the "Range" object.');
+            this._resetRangeToTextNode();
 
             const range = this.getRange();
             let container, offset = 0;
@@ -1707,7 +1707,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let endCon = range.endContainer;
             const startOff = range.startOffset;
             const endOff = range.endOffset;
-            const commonCon = range.commonAncestorContainer;
+            const commonCon = (range.commonAncestorContainer.nodeType === 3 && range.commonAncestorContainer.parentNode === startCon.parentNode) ? startCon.parentNode : range.commonAncestorContainer;
 
             let beforeNode = null;
             let afterNode = null;
