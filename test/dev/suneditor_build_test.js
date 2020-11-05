@@ -376,10 +376,11 @@ s1.onKeyDown = function (e, core) {
 }
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
-    value: "",
-    rtl: true,
-    defaultTag: 'div',
-    fullPage: true,
+    // value: "",
+    // rtl: true,
+    // iframe: true,
+    // defaultTag: 'div',
+    // fullPage: true,
     tableCellControllerPosition: 'top',
     lang: lang.ckb,
     plugins: plugins,
@@ -437,6 +438,8 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     buttonList: complexEditor
 });
+
+// ss.setContents("")
 // ss.setContents('fsafsa')
 ss.onload = function (core) {
     console.log('onload', core.context.video._infoList);
@@ -579,9 +582,11 @@ ss.showInline = function (toolbar, context) {
 
 window.sun_noticeOpen = function () {
     // ss.noticeOpen('test notice');
-    ss.setContents('<html><head>aaa</head><body><div>abc</div></body></html>')
+    // ss.setContents('<html><head>aaa</head><body><div>abc</div></body></html>')
     // const { core } = ss;
     // core.commandHandler(core._styleCommandMap.fullScreen, 'fullScreen')
+    ss.core.commandHandler(null, 'selectAll');
+    ss.core.removeNode()
 }
 
 window.sun_noticeClose = function () {
