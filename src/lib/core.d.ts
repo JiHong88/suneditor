@@ -689,8 +689,10 @@ export default class SunEditor {
 
     /**
      * @description Called before the image is uploaded
+     * If true is returned, the internal upload process runs normally.
      * If false is returned, no image upload is performed.
      * If new fileList are returned,  replaced the previous fileList
+     * If undefined is returned, it waits until "uploadHandler" is executed.
      * @param files Files array
      * @param info Input information
      * @param core Core object
@@ -710,8 +712,10 @@ export default class SunEditor {
 
     /**
      * @description Called before the video is uploaded
+     * If true is returned, the internal upload process runs normally.
      * If false is returned, no video upload is performed.
      * If new fileList are returned,  replaced the previous fileList
+     * If undefined is returned, it waits until "uploadHandler" is executed.
      * @param files Files array
      * @param info Input information
      * @param core Core object
@@ -731,8 +735,10 @@ export default class SunEditor {
 
     /**
      * @description Called before the audio is uploaded
+     * If true is returned, the internal upload process runs normally.
      * If false is returned, no audio upload is performed.
      * If new fileList are returned,  replaced the previous fileList
+     * If undefined is returned, it waits until "uploadHandler" is executed.
      * @param files Files array
      * @param info Input information
      * @param core Core object

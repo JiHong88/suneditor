@@ -7058,8 +7058,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Called before the image is uploaded
+         * If true is returned, the internal upload process runs normally.
          * If false is returned, no image upload is performed.
          * If new fileList are returned,  replaced the previous fileList
+         * If undefined is returned, it waits until "uploadHandler" is executed.
          * @param {Array} files Files array
          * @param {Object} info info: {
          * - linkValue: Link url value
@@ -7086,8 +7088,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onImageUploadBefore: null,
         /**
          * @description Called before the video is uploaded
+         * If true is returned, the internal upload process runs normally.
          * If false is returned, no video(iframe, video) upload is performed.
          * If new fileList are returned,  replaced the previous fileList
+         * If undefined is returned, it waits until "uploadHandler" is executed.
          * @param {Array} files Files array
          * @param {Object} info info: {
          * - inputWidth: Value of width input
@@ -7112,8 +7116,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onVideoUploadBefore: null,
         /**
          * @description Called before the audio is uploaded
+         * If true is returned, the internal upload process runs normally.
          * If false is returned, no audio upload is performed.
          * If new fileList are returned,  replaced the previous fileList
+         * If undefined is returned, it waits until "uploadHandler" is executed.
          * @param {Array} files Files array
          * @param {Object} info info: {
          * - isUpdate: Update audio if true, create audio if false
