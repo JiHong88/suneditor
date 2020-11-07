@@ -4406,12 +4406,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Sets the HTML string
-         * @param {String} html HTML string
+         * @param {String|undefined} html HTML string
          */
         setContents: function (html) {
             this.removeRange();
             
-            const convertValue = this.convertContentsForEditor(html);
+            const convertValue = (html === null || html === undefined) ? '' : this.convertContentsForEditor(html);
             this._resetComponents();
 
             if (!this._variable.isCodeView) {
@@ -7489,7 +7489,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Change the contents of the suneditor
-         * @param {String} contents Contents to Input
+         * @param {String|undefined} contents Contents to Input
          */
         setContents: function (contents) {
             core.setContents(contents);

@@ -380,7 +380,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // rtl: true,
     // fullPage: true,
     pasteTagsWhitelist: 'p|a|strong|em|h3|h4|h5|ul|ol|li|blockquote|table|thead|tbody|tfoot|tr|td|sup|sub',
-    iframe: true,
+    // iframe: true,
     // defaultTag: 'div',
     tableCellControllerPosition: 'top',
     lang: lang.ckb,
@@ -586,8 +586,10 @@ window.sun_noticeOpen = function () {
     // ss.setContents('<html><head>aaa</head><body><div>abc</div></body></html>')
     // const { core } = ss;
     // core.commandHandler(core._styleCommandMap.fullScreen, 'fullScreen')
-    ss.core.commandHandler(null, 'selectAll');
-    ss.core.removeNode()
+    // ss.core.commandHandler(null, 'selectAll');
+    // ss.core.removeNode()
+    ss.setContents()
+    // ss.core.focus();
 }
 
 window.sun_noticeClose = function () {
