@@ -1648,7 +1648,7 @@ const util = {
             regStr += '(?!\\b' + exclusionTags[i] + '\\b)';
         }
 
-        regStr += ')[^>]>';
+        regStr += ')[^>]*>';
 
         return new RegExp(regStr, 'g');
     },
