@@ -1699,7 +1699,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Object}
          */
         removeNode: function () {
-            if (!this._resetRangeToTextNode()) console.warn('[SUNEDITOR.core.removeNode.exception] An exception occurred while resetting the "Range" object.');
+            this._resetRangeToTextNode();
 
             const range = this.getRange();
             let container, offset = 0;
@@ -1707,7 +1707,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let endCon = range.endContainer;
             const startOff = range.startOffset;
             const endOff = range.endOffset;
-            const commonCon = range.commonAncestorContainer;
+            const commonCon = (range.commonAncestorContainer.nodeType === 3 && range.commonAncestorContainer.parentNode === startCon.parentNode) ? startCon.parentNode : range.commonAncestorContainer;
 
             let beforeNode = null;
             let afterNode = null;
@@ -3920,7 +3920,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Execute command of command button(All Buttons except submenu and dialog)
-         * (undo, redo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print)
+         * (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript)
          * @param {Element|null} target The element of command button
          * @param {String} command Property of command button (data-value)
          */

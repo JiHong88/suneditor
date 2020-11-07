@@ -18,6 +18,7 @@ type fileInfo =  {
     src: string;
 };
 type seledtedFileInfo = Record<string, string | Element>;
+type commands = 'selectAll' | 'codeView' | 'fullScreen' | 'indent' | 'outdent' | 'undo' | 'redo' | 'removeFormat' | 'print' | 'preview' | 'showBlocks' | 'save' | 'bold' | 'underline' | 'italic' | 'strike' | 'subscript' | 'superscript';
 ​​
 interface Core {
     /**
@@ -463,7 +464,7 @@ interface Core {
      * @param target The element of command button
      * @param command Property of command button (data-value)
      */
-    commandHandler(target: Element | null, command: string): void;
+    commandHandler(target: Element | null, command: commands): void;
 
     /**
      * @description Remove format of the currently selected range
