@@ -976,7 +976,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const wysiwyg = context.element.wysiwyg;
                 const op = util.createElement('P');
                 op.innerHTML = '<br>';
-                wysiwyg.insertBefore(op, container ? container.nextElementSibling : wysiwyg.firstElementChild);
+                wysiwyg.insertBefore(op, container && container !== wysiwyg ? container.nextElementSibling : wysiwyg.firstElementChild);
                 this.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
                 range = this._variable._range;
             }
