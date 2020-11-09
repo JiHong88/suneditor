@@ -644,7 +644,7 @@ export default {
                 return this.isWysiwygDiv(current.parentNode);
             }.bind(this.util));
 
-        contextVideo._element = oFrame = oFrame.cloneNode(true);
+        oFrame = oFrame.cloneNode(true);
         const cover = contextVideo._cover = this.plugins.component.set_cover.call(this, oFrame);
         const container = contextVideo._container = this.plugins.component.set_container.call(this, cover, 'se-video-container');
 
@@ -659,7 +659,14 @@ export default {
         const size = (oFrame.getAttribute('data-size') || oFrame.getAttribute('data-origin') || '').split(',');
         this.plugins.video.applySize.call(this, size[0], size[1]);
 
-        existElement.parentNode.replaceChild(container, existElement);
+        if (this.util.isFormatElement(existElement) && existElement.textContent.length > 0) {
+            existElement.parentNode.insertBefore(container, existElement.nextElementSibling);
+            this.util.removeItem(contextVideo._element);
+            contextVideo._element = oFrame;
+        } else {
+            existElement.parentNode.replaceChild(container, existElement);
+        }
+
         if (!!caption) existElement.parentNode.insertBefore(caption, container.nextElementSibling);
         this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.functions.onVideoUpload, null, true);
     },

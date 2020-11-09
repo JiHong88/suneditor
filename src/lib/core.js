@@ -1476,11 +1476,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const isFormats = (!freeFormat && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) || util.isComponent(oNode);
 
             if (!afterNode && isFormats) {
-                const r = this.removeNode();
-                if (r.container.nodeType === 3 || util.isBreak(r.container)) {
-                    const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
-                    afterNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
-                    if (afterNode) afterNode = afterNode.previousSibling;
+                const range = this.getRange();
+                if (range.startOffset !== range.endOffset || range.startContainer !== range.endContainer) {
+                    const r = this.removeNode();
+                    if (r.container.nodeType === 3 || util.isBreak(r.container)) {
+                        const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
+                        afterNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
+                        if (afterNode) afterNode = afterNode.previousSibling;
+                    }
                 }
             }
 
