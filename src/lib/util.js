@@ -1642,13 +1642,13 @@ const util = {
      */
     createTagsWhitelist: function (list) {
         const exclusionTags = list.split('|');
-        let regStr = '<\\/?(';
+        let regStr = '<\\/?\\b(?!';
 
         for (let i = 0, len = exclusionTags.length; i < len; i++) {
-            regStr += '(?!\\b' + exclusionTags[i] + '\\b)';
+            regStr += exclusionTags[i] + (i < len - 1 ? '|' : '');
         }
 
-        regStr += ')[^>]*>';
+        regStr += ')\\b[^>^<]*>';
 
         return new RegExp(regStr, 'g');
     },
