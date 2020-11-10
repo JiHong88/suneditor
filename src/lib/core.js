@@ -4141,7 +4141,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const headChildren = parseDocument.head.children;
 
                 for (let i = 0, len = headChildren.length; i < len; i++) {
-                    if (/script/i.test(headChildren[i].tagName)) {
+                    if (/^script$/i.test(headChildren[i].tagName)) {
                         parseDocument.head.removeChild(headChildren[i]);
                         i--, len--;
                     }
