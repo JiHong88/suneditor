@@ -1636,21 +1636,12 @@ const util = {
 
     /**
      * @description Create whitelist RegExp object.
-     * Return RegExp format: new RegExp("<\\/?(" + (?!\\b list[i] \\b) + ")[^>^<])+>", "g")
+     * Return RegExp format: new RegExp("<\\/?\\b(?!" + list + ")\\b[^>^<]*+>", "gi")
      * @param {String} list Tags list ("br|p|div|pre...")
      * @returns {RegExp}
      */
     createTagsWhitelist: function (list) {
-        const exclusionTags = list.split('|');
-        let regStr = '<\\/?\\b(?!';
-
-        for (let i = 0, len = exclusionTags.length; i < len; i++) {
-            regStr += exclusionTags[i] + (i < len - 1 ? '|' : '');
-        }
-
-        regStr += ')\\b[^>^<]*>';
-
-        return new RegExp(regStr, 'g');
+        return new RegExp('<\\/?\\b(?!' + list + ')\\b[^>^<]*>', 'gi');
     },
 
     /**

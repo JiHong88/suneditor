@@ -603,7 +603,7 @@ declare interface util {
 
     /**
      * @description Create whitelist RegExp object.
-     * Return RegExp format: new RegExp("<\\/?(" + (?!\\b list[i] \\b) + ")[^>^<])+>", "g")
+     * Return RegExp format: new RegExp("<\\/?\\b(?!" + list + ")\\b[^>^<]*+>", "gi")
      * @param list Tags list ("br|p|div|pre...")
      * @returns
      */

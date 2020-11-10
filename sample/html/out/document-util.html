@@ -2415,7 +2415,7 @@
                 class="type-signature"> &rarr; {RegExp}</span></h4>
         <div class="description">
             Create whitelist RegExp object.<br>
-            Return RegExp format: new RegExp("<span style="color:#ff5565">&lt;\\/?(</span><span style="color: #44fd6f;"><i style="font-size: 10px;">Loop</i>(</span><span style="color:#0d80ff">?!\\b<span style="color: #44fd6f;">list[i]</span>\\b</span><span style="color: #44fd6f;">)</span><span style="color:#ff5565">)[^>^&gt;])+></span>", "<span style="color:#ff5565">g</span>")
+            Return RegExp format: new RegExp("&lt;\\/?\\b(?!" + list + ")\\b[^>^&lt;]*+&gt;", "gi")
         </div>
         <h5>Parameters:</h5>
         <table class="params">
