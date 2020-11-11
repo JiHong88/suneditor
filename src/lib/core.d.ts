@@ -531,13 +531,6 @@ interface Core {
      * @returns
      */
     cleanHTML(html: string, whitelist?: string | RegExp): string;
-
-    /**
-     * @description Converts contents into a format that can be placed in an editor
-     * @param contents contents
-     * @returns 
-     */
-    convertContentsForEditor(contents: string): string;
     
     /**
      * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode

@@ -4148,7 +4148,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
 
                 this._wd.head.innerHTML = parseDocument.head.innerHTML;
-                this._wd.body.innerHTML = this.convertContentsForEditor(parseDocument.body.innerHTML);
+                this._wd.body.innerHTML = this.cleanHTML(parseDocument.body.innerHTML, null);
 
                 const attrs = parseDocument.body.attributes;
                 for (let i = 0, len = attrs.length; i < len; i++) {
@@ -4162,7 +4162,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
                 }
             } else {
-                context.element.wysiwyg.innerHTML = code_html.length > 0 ? this.convertContentsForEditor(code_html) : '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
+                context.element.wysiwyg.innerHTML = code_html.length > 0 ? this.cleanHTML(code_html, null) : '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
             }
         },
 
@@ -4414,7 +4414,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         setContents: function (html) {
             this.removeRange();
             
-            const convertValue = (html === null || html === undefined) ? '' : this.convertContentsForEditor(html);
+            const convertValue = (html === null || html === undefined) ? '' : this.cleanHTML(html, null);
             this._resetComponents();
 
             if (!this._variable.isCodeView) {
@@ -4434,7 +4434,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         setIframeContents: function (ctx) {
             if (!options.iframe) return false;
             if (ctx.head) this._wd.head.innerHTML = ctx.head.replace(/<script\s*.*>.*<\/script>/g, '');
-            if (ctx.body) this._wd.body.innerHTML = this.convertContentsForEditor(ctx.body);
+            if (ctx.body) this._wd.body.innerHTML = this.cleanHTML(ctx.body, null);
         },
 
         /**
@@ -4465,7 +4465,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Returns HTML string according to tag type and configuration.
-         * Use only "cleanHTML", "convertContentsForEditor"
+         * Use only "cleanHTML"
          * @param {Node} node Node
          * @param {Boolean} requireFormat If true, text nodes that do not have a format node is wrapped with the format tag.
          * @private
@@ -4532,7 +4532,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Gets the clean HTML code for editor
          * @param {String} html HTML string
-         * @param {String|RegExp} whitelist Regular expression of allowed tags.
+         * @param {String|RegExp|null} whitelist Regular expression of allowed tags.
          * RegExp object is create by util.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
          * @returns {String}
          */
@@ -4603,32 +4603,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
             return this._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, ''));
-        },
-
-        /**
-         * @description Converts contents into a format that can be placed in an editor
-         * @param {String} contents contents
-         * @returns {String}
-         */
-        convertContentsForEditor: function (contents) {
-            const dom = _d.createRange().createContextualFragment(this._deleteDisallowedTags(contents));
-
-            try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
-            } catch (error) {
-                console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
-            }
-            
-            const domTree = dom.childNodes;
-            let cleanHTML = '';
-            for (let i = 0, len = domTree.length; i < len; i++) {
-                cleanHTML += this._makeLine(domTree[i], true);
-            }
-
-            if (cleanHTML.length === 0) return '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
-
-            cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
-            return this._tagConvertor(cleanHTML);
         },
 
         /**
@@ -5014,7 +4988,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _initWysiwygArea: function (reload, _initHTML) {
-            context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentsForEditor(typeof _initHTML === 'string' ? _initHTML : context.element.originElement.value);
+            context.element.wysiwyg.innerHTML = reload ? _initHTML : this.cleanHTML(typeof _initHTML === 'string' ? _initHTML : context.element.originElement.value, null);
         },
 
         /**
@@ -7503,7 +7477,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {String} contents Contents to Input
          */
         appendContents: function (contents) {
-            const convertValue = core.convertContentsForEditor(contents);
+            const convertValue = core.cleanHTML(contents, null);
             
             if (!core._variable.isCodeView) {
                 const temp = util.createElement('DIV');
