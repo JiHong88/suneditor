@@ -381,7 +381,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // fullPage: true,
     pasteTagsWhitelist: 'p|a|strong|em|h3|h4|h5|ul|ol|li|blockquote|table|thead|tbody|tfoot|tr|td|sup|sub',
     iframe: true,
-    // defaultTag: 'div',
+    defaultTag: 'div',
     tableCellControllerPosition: 'top',
     lang: lang.ckb,
     plugins: plugins,
@@ -437,7 +437,8 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     ],
     // maxCharCount: 670,
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
-    buttonList: complexEditor
+    buttonList: complexEditor,
+    // buttonList: undefined
 });
 
 // ss.setContents("")
@@ -586,8 +587,8 @@ window.sun_noticeOpen = function () {
     // ss.setContents('<html><head>aaa</head><body><div>abc</div></body></html>')
     // const { core } = ss;
     // core.commandHandler(core._styleCommandMap.fullScreen, 'fullScreen')
-    // ss.core.commandHandler(null, 'selectAll');
-    // ss.core.removeNode()
+    ss.core.commandHandler(null, 'selectAll');
+    ss.core.removeNode()
     // \vec{P}.\vec{Q}=PQ
 //     ss.setContents(`
 //     <p>If&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{P}.\\vec{Q}=PQ" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>P</mi><mo>⃗</mo></mover><mi mathvariant="normal">.</mi><mover accent="true"><mi>Q</mi><mo>⃗</mo></mover><mo>=</mo><mi>P</mi><mi>Q</mi></mrow><annotation encoding="application/x-tex">\\vec{P}.\\vec{Q}=PQ</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1607699999999999em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
@@ -617,9 +618,9 @@ window.sun_noticeOpen = function () {
 // c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span></span></span></span>​&nbsp;is</p>
 //     `)
     // ss.core.focus();
-    ss.core.setIframeContents({
-        head: '<style>* {color: red;}</style>'
-    })
+    // ss.core.setIframeContents({
+    //     head: '<style>* {color: red;}</style>'
+    // })
 }
 
 window.sun_noticeClose = function () {

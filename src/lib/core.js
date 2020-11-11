@@ -841,7 +841,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     const range = this.getRange();
 
                     if (range.startContainer === range.endContainer && util.isWysiwygDiv(range.startContainer)) {
-                        const format = util.createElement('P');
+                        const format = util.createElement(options.defaultTag);
                         const br = util.createElement('BR');
                         format.appendChild(br);
                         context.element.wysiwyg.appendChild(format);
@@ -974,7 +974,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         getRange_addLine: function (range, container) {
             if (this._selectionVoid(range)) {
                 const wysiwyg = context.element.wysiwyg;
-                const op = util.createElement('P');
+                const op = util.createElement(options.defaultTag);
                 op.innerHTML = '<br>';
                 wysiwyg.insertBefore(op, container && container !== wysiwyg ? container.nextElementSibling : wysiwyg.firstElementChild);
                 this.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
@@ -1048,7 +1048,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             let focusEl = wysiwyg.firstElementChild;
             if (!focusEl) {
-                focusEl = util.createElement('P');
+                focusEl = util.createElement(options.defaultTag);
                 focusEl.innerHTML = '<br>';
                 wysiwyg.appendChild(focusEl);
             }
@@ -1108,7 +1108,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
     
                     let format = util.getFormatElement(tempCon, null);
                     if (format === util.getRangeFormatElement(format, null)) {
-                        format = util.createElement(util.getParentElement(tempCon, util.isCell) ? 'DIV' : 'P');
+                        format = util.createElement(util.getParentElement(tempCon, util.isCell) ? 'DIV' : options.defaultTag);
                         tempCon.parentNode.insertBefore(format, tempCon);
                         format.appendChild(tempCon);
                     }
@@ -1147,7 +1147,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
     
                     let format = util.getFormatElement(tempCon, null);
                     if (format === util.getRangeFormatElement(format, null)) {
-                        format = util.createElement(util.isCell(format) ? 'DIV' : 'P');
+                        format = util.createElement(util.isCell(format) ? 'DIV' : options.defaultTag);
                         tempCon.parentNode.insertBefore(format, tempCon);
                         format.appendChild(tempCon);
                     }
@@ -1302,7 +1302,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         appendFormatTag: function (element, formatNode) {
             const currentFormatEl = util.getFormatElement(this.getSelectionNode(), null);
-            const oFormatName = formatNode ? (typeof formatNode === 'string' ? formatNode : formatNode.nodeName) : (util.isFormatElement(currentFormatEl) && !util.isFreeFormatElement(currentFormatEl)) ? currentFormatEl.nodeName : 'P';
+            const oFormatName = formatNode ? (typeof formatNode === 'string' ? formatNode : formatNode.nodeName) : (util.isFormatElement(currentFormatEl) && !util.isFreeFormatElement(currentFormatEl)) ? currentFormatEl.nodeName : options.defaultTag;
             const oFormat = util.createElement(oFormatName);
             oFormat.innerHTML = '<br>';
 
@@ -2146,7 +2146,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             }
                         } else {
                             const inner = insNode;
-                            insNode = util.createElement(remove ? inner.nodeName : (util.isList(rangeElement.parentNode) || util.isListCell(rangeElement.parentNode)) ? 'LI' : util.isCell(rangeElement.parentNode) ? 'DIV' : 'P');
+                            insNode = util.createElement(remove ? inner.nodeName : (util.isList(rangeElement.parentNode) || util.isListCell(rangeElement.parentNode)) ? 'LI' : util.isCell(rangeElement.parentNode) ? 'DIV' : options.defaultTag);
                             const isCell = util.isListCell(insNode);
                             const innerChildren = inner.childNodes;
                             while (innerChildren[0]) {
@@ -5059,7 +5059,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if((util.isRangeFormatElement(startCon) || util.isWysiwygDiv(startCon)) && util.isComponent(startCon.childNodes[range.startOffset])) return;
 
             if (rangeEl) {
-                format = util.createElement(formatName || 'P');
+                format = util.createElement(formatName || options.defaultTag);
                 format.innerHTML = rangeEl.innerHTML;
                 if (format.childNodes.length === 0) format.innerHTML = util.zeroWidthSpace;
 
@@ -5090,7 +5090,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return;
             }
 
-            this.execCommand('formatBlock', false, (formatName || 'P'));
+            this.execCommand('formatBlock', false, (formatName || options.defaultTag));
             focusNode = util.getEdgeChildNodes(commonCon, commonCon);
             focusNode = focusNode ? focusNode.ec : commonCon;
 
@@ -5471,7 +5471,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         oLi.appendChild(selectionNode);
                         rangeEl.insertBefore(oLi, prevLi);
                     } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode) && (!util.isTable(selectionNode) || util.isCell(selectionNode))) {
-                        core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
+                        core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag);
                     }
                     
                     e.preventDefault();
@@ -5742,7 +5742,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (!util.isFormatElement(formatEl) && !context.element.wysiwyg.firstElementChild && !util.isComponent(selectionNode)) {
                         e.preventDefault();
                         e.stopPropagation();
-                        core._setDefaultFormat('P');
+                        core._setDefaultFormat(options.defaultTag);
                         return false;
                     }
 
@@ -6214,7 +6214,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                     newEl = newListCell;
                                 }
                             } else {
-                                const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : util.isFormatElement(rangeEl.nextElementSibling) ? rangeEl.nextElementSibling.nodeName : util.isFormatElement(rangeEl.previousElementSibling) ? rangeEl.previousElementSibling.nodeName : 'P';
+                                const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : util.isFormatElement(rangeEl.nextElementSibling) ? rangeEl.nextElementSibling.nodeName : util.isFormatElement(rangeEl.previousElementSibling) ? rangeEl.previousElementSibling.nodeName : options.defaultTag;
                                 newEl = util.createElement(newFormat);
                                 const edge = core.detachRangeFormatElement(rangeEl, [formatEl], null, true, true);
                                 edge.cc.insertBefore(newEl, edge.ec);
@@ -6245,7 +6245,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         if (util.isListCell(container.parentNode)) {
                             newEl = util.createElement('BR');
                         } else {
-                            newEl = util.createElement(util.isFormatElement(sibling) ? sibling.nodeName : 'P');
+                            newEl = util.createElement(util.isFormatElement(sibling) ? sibling.nodeName : options.defaultTag);
                             newEl.innerHTML = '<br>';
                         }
 
@@ -6316,7 +6316,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 selectionNode.innerHTML = '';
 
-                const oFormatTag = util.createElement(util.isFormatElement(core._variable.currentNodes[0]) ? core._variable.currentNodes[0] : 'P');
+                const oFormatTag = util.createElement(util.isFormatElement(core._variable.currentNodes[0]) ? core._variable.currentNodes[0] : options.defaultTag);
                 oFormatTag.innerHTML = '<br>';
 
                 selectionNode.appendChild(oFormatTag);
@@ -6330,7 +6330,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
             if (((!formatEl && range.collapsed) || formatEl === rangeEl) && !util.isComponent(selectionNode) && !util.isList(selectionNode)) {
-                core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
+                core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag);
                 selectionNode = core.getSelectionNode();
             }
 
@@ -6788,7 +6788,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const dir = !this ? core._variable._lineBreakDir : this;
             const isList = util.isListCell(component.parentNode);
 
-            const format = util.createElement(isList ? 'BR' : util.isCell(component.parentNode) ? 'DIV' : 'P');
+            const format = util.createElement(isList ? 'BR' : util.isCell(component.parentNode) ? 'DIV' : options.defaultTag);
             if (!isList) format.innerHTML = '<br>';
 
             if (core._charTypeHTML && !core.checkCharCount(format.outerHTML, 'byte-html')) return;
