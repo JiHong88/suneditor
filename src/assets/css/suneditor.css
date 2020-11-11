@@ -32,7 +32,7 @@
 
 /** --- Icons ---------------------------------------------------------- */
 /* default svg */
-.sun-editor button > svg, .sun-editor .se-svg, .sun-editor span > svg {
+.sun-editor button > svg, .sun-editor .se-svg {
     width: 16px;
     height: 16px;
     margin: auto;

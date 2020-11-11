@@ -134,7 +134,7 @@ export default {
 
     _renderer: function (exp) {
         const katex = this.context.option.katex;
-        return katex.src.renderToString(exp.replace(/\\\\\\/g, "\\"), katex.options);
+        return katex.src.renderToString(exp, katex.options);
     },
 
     _renderMathExp: function (contextMath, e) {
@@ -157,7 +157,7 @@ export default {
             if (!katexEl) return false;
             katexEl.className = '__se__katex ' + katexEl.className;
             katexEl.setAttribute('contenteditable', false);
-            katexEl.setAttribute('data-exp', this.util.HTMLEncoder(mathExp).replace(/\\/g, '\\\\\\'));
+            katexEl.setAttribute('data-exp', this.util.HTMLEncoder(mathExp));
             katexEl.setAttribute('data-font-size', contextMath.fontSizeElement.value);
             katexEl.style.fontSize = contextMath.fontSizeElement.value;
 
@@ -229,7 +229,7 @@ export default {
                 const exp = this.util.HTMLDecoder(contextMath._mathExp.getAttribute('data-exp'));
                 const fontSize = contextMath._mathExp.getAttribute('data-font-size') || '1em';
                 this.context.dialog.updateModal = true;
-                contextMath.focusElement.value = exp.replace(/\\\\\\/g, "\\");
+                contextMath.focusElement.value = exp;
                 contextMath.fontSizeElement.value = fontSize;
                 contextMath.previewElement.innerHTML = this.plugins.math._renderer.call(this, exp);
                 contextMath.previewElement.style.fontSize = fontSize;
@@ -254,7 +254,7 @@ export default {
         e.preventDefault();
 
         if (/update/.test(command)) {
-            this.context.math.focusElement.value = this.util.HTMLDecoder(this.context.math._mathExp.getAttribute('data-exp')).replace(/\\\\\\/g, "\\");
+            this.context.math.focusElement.value = this.util.HTMLDecoder(this.context.math._mathExp.getAttribute('data-exp'));
             this.plugins.dialog.open.call(this, 'math', true);
         } else {
             /** delete */

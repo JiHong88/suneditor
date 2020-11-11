@@ -1636,21 +1636,12 @@ const util = {
 
     /**
      * @description Create whitelist RegExp object.
-     * Return RegExp format: new RegExp("<\\/?(" + (?!\\b list[i] \\b) + ")[^>^<])+>", "g")
+     * Return RegExp format: new RegExp("<\\/?\\b(?!" + list + ")\\b[^>^<]*+>", "gi")
      * @param {String} list Tags list ("br|p|div|pre...")
      * @returns {RegExp}
      */
     createTagsWhitelist: function (list) {
-        const exclusionTags = list.split('|');
-        let regStr = '<\\/?(';
-
-        for (let i = 0, len = exclusionTags.length; i < len; i++) {
-            regStr += '(?!\\b' + exclusionTags[i] + '\\b)';
-        }
-
-        regStr += ')[^>]>';
-
-        return new RegExp(regStr, 'g');
+        return new RegExp('<\\/?\\b(?!' + list + ')\\b[^>^<]*>', 'gi');
     },
 
     /**
@@ -1793,7 +1784,6 @@ const util = {
         frame.contentDocument.head.innerHTML = '' +
             '<meta charset="utf-8" />' +
             '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-            '<title></title>' + 
             this._setIframeCssTags(options);
         frame.contentDocument.body.className = options._editableClass;
         frame.contentDocument.body.setAttribute('contenteditable', true);

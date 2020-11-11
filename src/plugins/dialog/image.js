@@ -761,7 +761,13 @@ export default {
                 contextImage._element : 
                 /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
                 
-            existElement.parentNode.replaceChild(container, existElement);
+            if (this.util.isFormatElement(existElement) && existElement.textContent.length > 0) {
+                existElement.parentNode.insertBefore(container, existElement.nextElementSibling);
+                this.util.removeItem(contextImage._element);
+            } else {
+                existElement.parentNode.replaceChild(container, existElement);
+            }
+
             imageEl = container.querySelector('img');
 
             contextImage._element = imageEl;

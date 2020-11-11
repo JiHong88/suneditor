@@ -378,6 +378,7 @@ export default {
     _initOptions: function (element, options) {
         /** Values */
         options.lang = options.lang || _defaultLang;
+        options.defaultTag = typeof options.defaultTag === 'string' ? options.defaultTag : 'p';
         options.value = typeof options.value === 'string' ? options.value : null;
         options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
         /** Whitelist */
@@ -494,7 +495,7 @@ export default {
         options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
         options.linkProtocol = typeof options.linkProtocol === 'string' ? options.linkProtocol : null;
         /** Buttons */
-        options.buttonList = JSON.parse(JSON.stringify(options.buttonList)) || [
+        options.buttonList = !!options.buttonList ? JSON.parse(JSON.stringify(options.buttonList)) : [
             ['undo', 'redo'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
             ['removeFormat'],

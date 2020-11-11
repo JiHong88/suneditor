@@ -805,8 +805,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description javascript execCommand
          * @param {String} command javascript execCommand function property
-         * @param {Boolean} showDefaultUI javascript execCommand function property
-         * @param {String} value javascript execCommand function property
+         * @param {Boolean|undefined} showDefaultUI javascript execCommand function property
+         * @param {String|undefined} value javascript execCommand function property
          */
         execCommand: function (command, showDefaultUI, value) {
             this._wd.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
@@ -841,7 +841,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     const range = this.getRange();
 
                     if (range.startContainer === range.endContainer && util.isWysiwygDiv(range.startContainer)) {
-                        const format = util.createElement('P');
+                        const format = util.createElement(options.defaultTag);
                         const br = util.createElement('BR');
                         format.appendChild(br);
                         context.element.wysiwyg.appendChild(format);
@@ -974,9 +974,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         getRange_addLine: function (range, container) {
             if (this._selectionVoid(range)) {
                 const wysiwyg = context.element.wysiwyg;
-                const op = util.createElement('P');
+                const op = util.createElement(options.defaultTag);
                 op.innerHTML = '<br>';
-                wysiwyg.insertBefore(op, container ? container.nextElementSibling : wysiwyg.firstElementChild);
+                wysiwyg.insertBefore(op, container && container !== wysiwyg ? container.nextElementSibling : wysiwyg.firstElementChild);
                 this.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
                 range = this._variable._range;
             }
@@ -1048,7 +1048,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             let focusEl = wysiwyg.firstElementChild;
             if (!focusEl) {
-                focusEl = util.createElement('P');
+                focusEl = util.createElement(options.defaultTag);
                 focusEl.innerHTML = '<br>';
                 wysiwyg.appendChild(focusEl);
             }
@@ -1108,7 +1108,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
     
                     let format = util.getFormatElement(tempCon, null);
                     if (format === util.getRangeFormatElement(format, null)) {
-                        format = util.createElement(util.getParentElement(tempCon, util.isCell) ? 'DIV' : 'P');
+                        format = util.createElement(util.getParentElement(tempCon, util.isCell) ? 'DIV' : options.defaultTag);
                         tempCon.parentNode.insertBefore(format, tempCon);
                         format.appendChild(tempCon);
                     }
@@ -1147,7 +1147,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
     
                     let format = util.getFormatElement(tempCon, null);
                     if (format === util.getRangeFormatElement(format, null)) {
-                        format = util.createElement(util.isCell(format) ? 'DIV' : 'P');
+                        format = util.createElement(util.isCell(format) ? 'DIV' : options.defaultTag);
                         tempCon.parentNode.insertBefore(format, tempCon);
                         format.appendChild(tempCon);
                     }
@@ -1302,7 +1302,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         appendFormatTag: function (element, formatNode) {
             const currentFormatEl = util.getFormatElement(this.getSelectionNode(), null);
-            const oFormatName = formatNode ? (typeof formatNode === 'string' ? formatNode : formatNode.nodeName) : (util.isFormatElement(currentFormatEl) && !util.isFreeFormatElement(currentFormatEl)) ? currentFormatEl.nodeName : 'P';
+            const oFormatName = formatNode ? (typeof formatNode === 'string' ? formatNode : formatNode.nodeName) : (util.isFormatElement(currentFormatEl) && !util.isFreeFormatElement(currentFormatEl)) ? currentFormatEl.nodeName : options.defaultTag;
             const oFormat = util.createElement(oFormatName);
             oFormat.innerHTML = '<br>';
 
@@ -1476,11 +1476,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const isFormats = (!freeFormat && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) || util.isComponent(oNode);
 
             if (!afterNode && isFormats) {
-                const r = this.removeNode();
-                if (r.container.nodeType === 3 || util.isBreak(r.container)) {
-                    const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
-                    afterNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
-                    if (afterNode) afterNode = afterNode.previousSibling;
+                const range = this.getRange();
+                if (range.startOffset !== range.endOffset || range.startContainer !== range.endContainer) {
+                    const r = this.removeNode();
+                    if (r.container.nodeType === 3 || util.isBreak(r.container)) {
+                        const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
+                        afterNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
+                        if (afterNode) afterNode = afterNode.previousSibling;
+                    }
                 }
             }
 
@@ -1546,7 +1549,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             if (util.isFormatElement(container)) {
                                 container.innerHTML = '<br>';
                             } else if (util.isRangeFormatElement(container)) {
-                                container.innerHTML = '<p><br></p>';
+                                container.innerHTML = '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
                             }
                         }
 
@@ -1699,7 +1702,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Object}
          */
         removeNode: function () {
-            if (!this._resetRangeToTextNode()) console.warn('[SUNEDITOR.core.removeNode.exception] An exception occurred while resetting the "Range" object.');
+            this._resetRangeToTextNode();
 
             const range = this.getRange();
             let container, offset = 0;
@@ -1707,7 +1710,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let endCon = range.endContainer;
             const startOff = range.startOffset;
             const endOff = range.endOffset;
-            const commonCon = range.commonAncestorContainer;
+            const commonCon = (range.commonAncestorContainer.nodeType === 3 && range.commonAncestorContainer.parentNode === startCon.parentNode) ? startCon.parentNode : range.commonAncestorContainer;
 
             let beforeNode = null;
             let afterNode = null;
@@ -2143,7 +2146,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             }
                         } else {
                             const inner = insNode;
-                            insNode = util.createElement(remove ? inner.nodeName : (util.isList(rangeElement.parentNode) || util.isListCell(rangeElement.parentNode)) ? 'LI' : util.isCell(rangeElement.parentNode) ? 'DIV' : 'P');
+                            insNode = util.createElement(remove ? inner.nodeName : (util.isList(rangeElement.parentNode) || util.isListCell(rangeElement.parentNode)) ? 'LI' : util.isCell(rangeElement.parentNode) ? 'DIV' : options.defaultTag);
                             const isCell = util.isListCell(insNode);
                             const innerChildren = inner.childNodes;
                             while (innerChildren[0]) {
@@ -3920,8 +3923,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Execute command of command button(All Buttons except submenu and dialog)
-         * (undo, redo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print)
-         * @param {Element} target The element of command button
+         * (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript)
+         * @param {Element|null} target The element of command button
          * @param {String} command Property of command button (data-value)
          */
         commandHandler: function (target, command) {
@@ -4138,14 +4141,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const headChildren = parseDocument.head.children;
 
                 for (let i = 0, len = headChildren.length; i < len; i++) {
-                    if (/script/i.test(headChildren[i].tagName)) {
+                    if (/^script$/i.test(headChildren[i].tagName)) {
                         parseDocument.head.removeChild(headChildren[i]);
                         i--, len--;
                     }
                 }
 
                 this._wd.head.innerHTML = parseDocument.head.innerHTML;
-                this._wd.body.innerHTML = this.convertContentsForEditor(parseDocument.body.innerHTML);
+                this._wd.body.innerHTML = this.cleanHTML(parseDocument.body.innerHTML, null);
 
                 const attrs = parseDocument.body.attributes;
                 for (let i = 0, len = attrs.length; i < len; i++) {
@@ -4159,7 +4162,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
                 }
             } else {
-                context.element.wysiwyg.innerHTML = code_html.length > 0 ? this.convertContentsForEditor(code_html) : '<p><br></p>';
+                context.element.wysiwyg.innerHTML = code_html.length > 0 ? this.cleanHTML(code_html, null) : '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
             }
         },
 
@@ -4406,10 +4409,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Sets the HTML string
-         * @param {String} html HTML string
+         * @param {String|undefined} html HTML string
          */
         setContents: function (html) {
-            const convertValue = this.convertContentsForEditor(html);
+            this.removeRange();
+            
+            const convertValue = (html === null || html === undefined) ? '' : this.cleanHTML(html, null);
             this._resetComponents();
 
             if (!this._variable.isCodeView) {
@@ -4420,6 +4425,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const value = this.convertHTMLForCodeView(convertValue);
                 this._setCodeView(value);
             }
+        },
+
+        /**
+         * @description Sets the contents of the iframe's head tag and body tag when using the "iframe" or "fullPage" option.
+         * @param {Object} ctx { head: HTML string, body: HTML string}
+         */
+        setIframeContents: function (ctx) {
+            if (!options.iframe) return false;
+            if (ctx.head) this._wd.head.innerHTML = ctx.head.replace(/<script\s*.*>.*<\/script>/g, '');
+            if (ctx.body) this._wd.body.innerHTML = this.cleanHTML(ctx.body, null);
         },
 
         /**
@@ -4450,19 +4465,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Returns HTML string according to tag type and configuration.
-         * Use only "cleanHTML", "convertContentsForEditor"
+         * Use only "cleanHTML"
          * @param {Node} node Node
          * @param {Boolean} requireFormat If true, text nodes that do not have a format node is wrapped with the format tag.
          * @private
          */
         _makeLine: function (node, requireFormat) {
+            const defaultTag = options.defaultTag;
             // element
             if (node.nodeType === 1) {
                 if (util._disallowedTags(node)) return '';
                 if (!requireFormat || (util.isFormatElement(node) || util.isRangeFormatElement(node) || util.isComponent(node) || util.isMedia(node) || (util.isAnchor(node) && util.isMedia(node.firstElementChild)))) {
                     return node.outerHTML;
                 } else {
-                    return '<p>' + node.outerHTML + '</p>';
+                    return '<' + defaultTag + '>' + node.outerHTML + '</' + defaultTag + '>';
                 }
             }
             // text
@@ -4472,7 +4488,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 let html = '';
                 for (let i = 0, tLen = textArray.length, text; i < tLen; i++) {
                     text = textArray[i].trim();
-                    if (text.length > 0) html += '<p>' + text + '</p>';
+                    if (text.length > 0) html += '<' + defaultTag + '>' + text + '</' + defaultTag + '>';
                 }
                 return html;
             }
@@ -4516,7 +4532,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Gets the clean HTML code for editor
          * @param {String} html HTML string
-         * @param {String|RegExp} whitelist Regular expression of allowed tags.
+         * @param {String|RegExp|null} whitelist Regular expression of allowed tags.
          * RegExp object is create by util.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
          * @returns {String}
          */
@@ -4587,32 +4603,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
             return this._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, ''));
-        },
-
-        /**
-         * @description Converts contents into a format that can be placed in an editor
-         * @param {String} contents contents
-         * @returns {String}
-         */
-        convertContentsForEditor: function (contents) {
-            const dom = _d.createRange().createContextualFragment(this._deleteDisallowedTags(contents));
-
-            try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
-            } catch (error) {
-                console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
-            }
-            
-            const domTree = dom.childNodes;
-            let cleanHTML = '';
-            for (let i = 0, len = domTree.length; i < len; i++) {
-                cleanHTML += this._makeLine(domTree[i], true);
-            }
-
-            if (cleanHTML.length === 0) return '<p><br></p>';
-
-            cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
-            return this._tagConvertor(cleanHTML);
         },
 
         /**
@@ -4998,7 +4988,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _initWysiwygArea: function (reload, _initHTML) {
-            context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentsForEditor(typeof _initHTML === 'string' ? _initHTML : context.element.originElement.value);
+            context.element.wysiwyg.innerHTML = reload ? _initHTML : this.cleanHTML(typeof _initHTML === 'string' ? _initHTML : context.element.originElement.value, null);
         },
 
         /**
@@ -5069,7 +5059,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if((util.isRangeFormatElement(startCon) || util.isWysiwygDiv(startCon)) && util.isComponent(startCon.childNodes[range.startOffset])) return;
 
             if (rangeEl) {
-                format = util.createElement(formatName || 'P');
+                format = util.createElement(formatName || options.defaultTag);
                 format.innerHTML = rangeEl.innerHTML;
                 if (format.childNodes.length === 0) format.innerHTML = util.zeroWidthSpace;
 
@@ -5100,7 +5090,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return;
             }
 
-            this.execCommand('formatBlock', false, (formatName || 'P'));
+            this.execCommand('formatBlock', false, (formatName || options.defaultTag));
             focusNode = util.getEdgeChildNodes(commonCon, commonCon);
             focusNode = focusNode ? focusNode.ec : commonCon;
 
@@ -5481,7 +5471,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         oLi.appendChild(selectionNode);
                         rangeEl.insertBefore(oLi, prevLi);
                     } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode) && (!util.isTable(selectionNode) || util.isCell(selectionNode))) {
-                        core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
+                        core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag);
                     }
                     
                     e.preventDefault();
@@ -5752,7 +5742,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (!util.isFormatElement(formatEl) && !context.element.wysiwyg.firstElementChild && !util.isComponent(selectionNode)) {
                         e.preventDefault();
                         e.stopPropagation();
-                        core._setDefaultFormat('P');
+                        core._setDefaultFormat(options.defaultTag);
                         return false;
                     }
 
@@ -6224,7 +6214,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                     newEl = newListCell;
                                 }
                             } else {
-                                const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : util.isFormatElement(rangeEl.nextElementSibling) ? rangeEl.nextElementSibling.nodeName : util.isFormatElement(rangeEl.previousElementSibling) ? rangeEl.previousElementSibling.nodeName : 'P';
+                                const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : util.isFormatElement(rangeEl.nextElementSibling) ? rangeEl.nextElementSibling.nodeName : util.isFormatElement(rangeEl.previousElementSibling) ? rangeEl.previousElementSibling.nodeName : options.defaultTag;
                                 newEl = util.createElement(newFormat);
                                 const edge = core.detachRangeFormatElement(rangeEl, [formatEl], null, true, true);
                                 edge.cc.insertBefore(newEl, edge.ec);
@@ -6255,7 +6245,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         if (util.isListCell(container.parentNode)) {
                             newEl = util.createElement('BR');
                         } else {
-                            newEl = util.createElement(util.isFormatElement(sibling) ? sibling.nodeName : 'P');
+                            newEl = util.createElement(util.isFormatElement(sibling) ? sibling.nodeName : options.defaultTag);
                             newEl.innerHTML = '<br>';
                         }
 
@@ -6277,7 +6267,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
             }
 
-            if (shift && /16/.test(keyCode)) {
+            if (shift && keyCode === 16) {
                 e.preventDefault();
                 e.stopPropagation();
                 const tablePlugin = core.plugins.table;
@@ -6326,7 +6316,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 selectionNode.innerHTML = '';
 
-                const oFormatTag = util.createElement(util.isFormatElement(core._variable.currentNodes[0]) ? core._variable.currentNodes[0] : 'P');
+                const oFormatTag = util.createElement(util.isFormatElement(core._variable.currentNodes[0]) ? core._variable.currentNodes[0] : options.defaultTag);
                 oFormatTag.innerHTML = '<br>';
 
                 selectionNode.appendChild(oFormatTag);
@@ -6340,7 +6330,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
             if (((!formatEl && range.collapsed) || formatEl === rangeEl) && !util.isComponent(selectionNode) && !util.isList(selectionNode)) {
-                core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : 'P');
+                core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag);
                 selectionNode = core.getSelectionNode();
             }
 
@@ -6798,7 +6788,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const dir = !this ? core._variable._lineBreakDir : this;
             const isList = util.isListCell(component.parentNode);
 
-            const format = util.createElement(isList ? 'BR' : util.isCell(component.parentNode) ? 'DIV' : 'P');
+            const format = util.createElement(isList ? 'BR' : util.isCell(component.parentNode) ? 'DIV' : options.defaultTag);
             if (!isList) format.innerHTML = '<br>';
 
             if (core._charTypeHTML && !core.checkCharCount(format.outerHTML, 'byte-html')) return;
@@ -7045,8 +7035,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Called before the image is uploaded
+         * If true is returned, the internal upload process runs normally.
          * If false is returned, no image upload is performed.
          * If new fileList are returned,  replaced the previous fileList
+         * If undefined is returned, it waits until "uploadHandler" is executed.
          * @param {Array} files Files array
          * @param {Object} info info: {
          * - linkValue: Link url value
@@ -7073,8 +7065,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onImageUploadBefore: null,
         /**
          * @description Called before the video is uploaded
+         * If true is returned, the internal upload process runs normally.
          * If false is returned, no video(iframe, video) upload is performed.
          * If new fileList are returned,  replaced the previous fileList
+         * If undefined is returned, it waits until "uploadHandler" is executed.
          * @param {Array} files Files array
          * @param {Object} info info: {
          * - inputWidth: Value of width input
@@ -7099,8 +7093,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onVideoUploadBefore: null,
         /**
          * @description Called before the audio is uploaded
+         * If true is returned, the internal upload process runs normally.
          * If false is returned, no audio upload is performed.
          * If new fileList are returned,  replaced the previous fileList
+         * If undefined is returned, it waits until "uploadHandler" is executed.
          * @param {Array} files Files array
          * @param {Object} info info: {
          * - isUpdate: Update audio if true, create audio if false
@@ -7470,7 +7466,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Change the contents of the suneditor
-         * @param {String} contents Contents to Input
+         * @param {String|undefined} contents Contents to Input
          */
         setContents: function (contents) {
             core.setContents(contents);
@@ -7481,7 +7477,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {String} contents Contents to Input
          */
         appendContents: function (contents) {
-            const convertValue = core.convertContentsForEditor(contents);
+            const convertValue = core.cleanHTML(contents, null);
             
             if (!core._variable.isCodeView) {
                 const temp = util.createElement('DIV');

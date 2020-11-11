@@ -18,6 +18,7 @@ type fileInfo =  {
     src: string;
 };
 type seledtedFileInfo = Record<string, string | Element>;
+type commands = 'selectAll' | 'codeView' | 'fullScreen' | 'indent' | 'outdent' | 'undo' | 'redo' | 'removeFormat' | 'print' | 'preview' | 'showBlocks' | 'save' | 'bold' | 'underline' | 'italic' | 'strike' | 'subscript' | 'superscript';
 ​​
 interface Core {
     /**
@@ -253,7 +254,7 @@ interface Core {
      * @param showDefaultUI javascript execCommand function property
      * @param value javascript execCommand function property
      */
-    execCommand(command: string, showDefaultUI: boolean, value: string): void;
+    execCommand(command: string, showDefaultUI?: boolean, value?: string): void;
 
     /**
      * @description Focus to wysiwyg area using "native focus function"
@@ -463,7 +464,7 @@ interface Core {
      * @param target The element of command button
      * @param command Property of command button (data-value)
      */
-    commandHandler(target: Element, command: string): void;
+    commandHandler(target: Element | null, command: commands): void;
 
     /**
      * @description Remove format of the currently selected range
@@ -510,6 +511,12 @@ interface Core {
     setContents(html: string): void;
 
     /**
+     * @description Sets the contents of the iframe's head tag and body tag when using the "iframe" or "fullPage" option.
+     * @param ctx { head: HTML string, body: HTML string}
+     */
+    setIframeContents(ctx: { head?: string, body?: string }): void;
+
+    /**
      * @description Gets the current contents
      * @param onlyContents Return only the contents of the body without headers when the "fullPage" option is true
      * @returns
@@ -524,13 +531,6 @@ interface Core {
      * @returns
      */
     cleanHTML(html: string, whitelist?: string | RegExp): string;
-
-    /**
-     * @description Converts contents into a format that can be placed in an editor
-     * @param contents contents
-     * @returns 
-     */
-    convertContentsForEditor(contents: string): string;
     
     /**
      * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
@@ -682,8 +682,10 @@ export default class SunEditor {
 
     /**
      * @description Called before the image is uploaded
+     * If true is returned, the internal upload process runs normally.
      * If false is returned, no image upload is performed.
      * If new fileList are returned,  replaced the previous fileList
+     * If undefined is returned, it waits until "uploadHandler" is executed.
      * @param files Files array
      * @param info Input information
      * @param core Core object
@@ -703,8 +705,10 @@ export default class SunEditor {
 
     /**
      * @description Called before the video is uploaded
+     * If true is returned, the internal upload process runs normally.
      * If false is returned, no video upload is performed.
      * If new fileList are returned,  replaced the previous fileList
+     * If undefined is returned, it waits until "uploadHandler" is executed.
      * @param files Files array
      * @param info Input information
      * @param core Core object
@@ -724,8 +728,10 @@ export default class SunEditor {
 
     /**
      * @description Called before the audio is uploaded
+     * If true is returned, the internal upload process runs normally.
      * If false is returned, no audio upload is performed.
      * If new fileList are returned,  replaced the previous fileList
+     * If undefined is returned, it waits until "uploadHandler" is executed.
      * @param files Files array
      * @param info Input information
      * @param core Core object

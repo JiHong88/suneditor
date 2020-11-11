@@ -49,7 +49,7 @@ export default function (core, change) {
     function pushStack () {
         core._checkComponents();
         const current = core.getContents(true);
-        if (!!stack[stackIndex] && current === stack[stackIndex].contents) return;
+        if (!current || (!!stack[stackIndex] && current === stack[stackIndex].contents)) return;
 
         stackIndex++;
         const range = core._variable._range;

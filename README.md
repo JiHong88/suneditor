@@ -380,6 +380,7 @@ plugins: [
 
 // Vaues
 lang            : language object.   default : en {Object}
+defaultTag      : Specifies default tag name of the editor.     default: 'p' {String}
 value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {String}
 historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {Number}
@@ -1068,8 +1069,10 @@ editor.onCut = function (e, clipboardData, core) { console.log('onCut', e) }
 editor.onDrop = function (e, cleanData, maxCharCount, core) { console.log('onDrop', e) }
 
 // Called before the image is uploaded
+// If true is returned, the internal upload process runs normally.
 // If false is returned, no image upload is performed.
 // If new fileList are returned,  replaced the previous fileList
+// If undefined is returned, it waits until "uploadHandler" is executed.
 /**
  * files: Files array
  * info: {
@@ -1082,7 +1085,7 @@ editor.onDrop = function (e, cleanData, maxCharCount, core) { console.log('onDro
  * - element: If isUpdate is true, the currently selected image.
  * }
  * core: Core object,
- * uploadHandler: If undefined is returned, it waits until "uploadHandler" or "core.plugins.image.register()" is executed.
+ * uploadHandler: If undefined is returned, it waits until "uploadHandler" is executed.
  *                "uploadHandler" is an upload function with "core" and "info" bound. (plugin.upload.bind(core, info))
  *                [upload files] : uploadHandler(files or [new File(...),])
  *                [error]        : uploadHandler("Error message")
@@ -1098,8 +1101,10 @@ editor.onImageUploadBefore: function (files, info, core, uploadHandler) {
     return Boolean || return (new FileList) || return undefined;
 }
 // Called before the video is uploaded
+// If true is returned, the internal upload process runs normally.
 // If false is returned, no video(iframe, video) upload is performed.
 // If new fileList are returned,  replaced the previous fileList
+// If undefined is returned, it waits until "uploadHandler" is executed.
 /** 
  * files: Files array
  * info: {
@@ -1126,8 +1131,10 @@ editor.onVideoUploadBefore: function (files, info, core, uploadHandler) {
     return Boolean || return (new FileList) || return undefined;
 }
 // Called before the audio is uploaded
+// If true is returned, the internal upload process runs normally.
 // If false is returned, no audio upload is performed.
 // If new fileList are returned,  replaced the previous fileList
+// If undefined is returned, it waits until "uploadHandler" is executed.
 /** 
  * files: Files array
  * info: {

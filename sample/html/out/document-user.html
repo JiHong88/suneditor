@@ -1022,8 +1022,10 @@
                     class="signature">(files, info, core, uploadHandler)</span><span class="type-signature"> &rarr; {Boolean|Array|undefined}</span></h4>
             <div class="description">
                 Called before the image is uploaded.<br>
+                If true is returned, the internal upload process runs normally.<br>
                 If false is returned, no image upload is performed.<br>
-                If new fileList are returned,  replaced the previous fileList
+                If new fileList are returned,  replaced the previous fileList.<br>
+                If undefined is returned, it waits until "uploadHandler" is executed.
             </div>
             <table class="params">
                 <thead>
@@ -1248,8 +1250,10 @@
                     class="signature">(files, info, core, uploadHandler)</span><span class="type-signature"> &rarr; {Boolean|Array|undefined}</span></h4>
             <div class="description">
                 Called before the video is uploaded.<br>
+                If true is returned, the internal upload process runs normally.<br>
                 If false is returned, no video(iframe, video) upload is performed.<br>
-                If new fileList are returned,  replaced the previous fileList
+                If new fileList are returned,  replaced the previous fileList.<br>
+                If undefined is returned, it waits until "uploadHandler" is executed.
             </div>
             <table class="params">
                 <thead>
@@ -1470,8 +1474,10 @@
                     class="signature">(files, info, core, uploadHandler)</span><span class="type-signature"> &rarr; {Boolean|Array|undefined}</span></h4>
             <div class="description">
                 Called before the audio is uploaded.<br>
+                If true is returned, the internal upload process runs normally.<br>
                 If false is returned, no audio upload is performed.<br>
-                If new fileList are returned,  replaced the previous fileList
+                If new fileList are returned,  replaced the previous fileList.<br>
+                If undefined is returned, it waits until "uploadHandler" is executed.
             <table class="params">
                 <thead>
                 <tr>

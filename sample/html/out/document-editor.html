@@ -1068,14 +1068,14 @@
                 <tr>
                     <td class="name"><code>showDefaultUI</code></td>
                     <td class="type">
-                        <span class="param-type">Boolean</span>
+                        <span class="param-type">Boolean|undefined</span>
                     </td>
                     <td class="description last">javascript execCommand function property</td>
                 </tr>
                 <tr>
                     <td class="name"><code>value</code></td>
                     <td class="type">
-                        <span class="param-type">String</span>
+                        <span class="param-type">String|undefined</span>
                     </td>
                     <td class="description last">javascript execCommand function property</td>
                 </tr>
@@ -1773,7 +1773,7 @@
                     class="signature">(target, command)</span><span class="type-signature"></span></h4>
             <div class="description">
                 Execute command of command button(All Buttons except submenu and dialog)<br>
-                (redo, undo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print)
+                (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript)
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1786,7 +1786,7 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td class="name"><code>target</code></td>
+                    <td class="name"><code>target|null</code></td>
                     <td class="type">
                         <span class="param-type">Element</span>
                     </td>
@@ -1920,6 +1920,33 @@
                         <span class="param-type">String</span>
                     </td>
                     <td class="description last">HTML string</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+            
+
+            <h4 class="name" id="setIframeContents"><span class="type-signature"></span>setIframeContents<span 
+                class="signature">(ctx)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Sets the contents of the iframe's head tag and body tag when using the "iframe" or "fullPage" option.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>ctx</code></td>
+                    <td class="type">
+                        <span class="param-type">Object</span>
+                    </td>
+                    <td class="description last">{ head: HTML string, body: HTML string}</td>
                 </tr>
                 </tbody>
             </table>
@@ -2144,33 +2171,6 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="convertContentsForEditor"><span class="type-signature"></span>convertContentsForEditor<span class="signature">(contents)</span><span
-                    class="type-signature"> &rarr; {String}</span></h4>
-            <div class="description">
-                Converts contents into a format that can be placed in an editor.
-            </div>
-            <h5>Parameters:</h5>
-            <table class="params">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th class="last">Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="name"><code>contents</code></td>
-                    <td class="type">
-                        <span class="param-type">String</span>
-                    </td>
-                    <td class="description last">Contents</td>
-                </tr>
-                </tbody>
-            </table>
-            <dl class="details"></dl>
-
-
             <h4 class="name" id="convertHTMLForCodeView"><span class="type-signature"></span>convertHTMLForCodeView<span class="signature">(html)</span><span
                     class="type-signature"> &rarr; {String}</span></h4>
             <div class="description">
@@ -2286,6 +2286,7 @@
         <li><a href="document-editor.html#print">print</a></li>
         <li><a href="document-editor.html#preview">preview</a></li>
         <li><a href="document-editor.html#setContents">setContents</a></li>
+        <li><a href="document-editor.html#setIframeContents">setIframeContents</a></li>
         <li><a href="document-editor.html#getContents">getContents</a></li>
         <li><a href="document-editor.html#getText">getText</a></li>
         <li><a href="document-editor.html#cleanHTML">cleanHTML</a></li>
@@ -2293,7 +2294,6 @@
         <li><a href="document-editor.html#getCharLength">getCharLength</a></li>
         <li><a href="document-editor.html#addDocEvent">addDocEvent</a></li>
         <li><a href="document-editor.html#removeDocEvent">removeDocEvent</a></li>
-        <li><a href="document-editor.html#convertContentsForEditor">convertContentsForEditor</a></li>
         <li><a href="document-editor.html#convertHTMLForCodeView">convertHTMLForCodeView</a></li>
     </ul>
 </nav>
