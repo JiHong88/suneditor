@@ -1641,7 +1641,7 @@ const util = {
      * @returns {RegExp}
      */
     createTagsWhitelist: function (list) {
-        return new RegExp('<\\/?\\b(?!' + list + ')\\b[^>^<]*>', 'gi');
+        return new RegExp('<\\/?\\b(?!\\b' + list.replace(/\|/g, '\\b|\\b') + '\\b)[^>]*>', 'gi');
     },
 
     /**
