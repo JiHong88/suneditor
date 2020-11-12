@@ -6330,6 +6330,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         return;
                     }
                 }
+            } else if (shift && (util.isOSX_IOS ? alt : ctrl) && keyCode === 32) {
+                e.preventDefault();
+                e.stopPropagation();
+                const nbsp = core.insertNode(util.createTextNode('\u00a0'));
+                if (nbsp && nbsp.container) {
+                    core.setRange(nbsp.container, nbsp.endOffset, nbsp.container, nbsp.endOffset);
+                    return;
+                }
             }
 
             const textKey = !ctrl && !alt && !selectRange && !event._nonTextKeyCode.test(keyCode);
