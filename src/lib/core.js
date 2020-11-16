@@ -5811,11 +5811,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             e.preventDefault();
                             e.stopPropagation();
 
-                            formatEl.innerHTML = '<br>';
-                            const attrs = formatEl.attributes;
-                            while (attrs[0]) {
-                                formatEl.removeAttribute(attrs[0].name);
-                            }
+                            formatEl.outerHTML = '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
                             core.nativeFocus();
 
                             return false;
