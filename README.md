@@ -98,6 +98,7 @@ const editor = SUNEDITOR.create((document.getElementById('sample') || 'sample'),
 When you display a document created by suneditor
 You need to include "src/assets/css/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
 Then add "sun-editor-editable" to the class name of the Tag element that displays the content.
+If you are using RTL mode, you also need to add "se-rtl".
 In "suneditor-contents.css", you can define the style of all the tags created in suneditor.
 ```
 
