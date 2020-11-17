@@ -387,6 +387,7 @@ value           : Initial value(html string) of the edit area.
 historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {Number}
 
 // Whitelist--------------------------------------å---------------------------------------------------------
+// (You can use regular expression syntax.)
 // _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
@@ -398,7 +399,7 @@ attributesWhitelist   : Add attributes whitelist of tags that should be kept und
                         // Native attributes: 'contenteditable|colspan|rowspan|target|href|src|class|type|controls'
                         // Editor attributes: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size'
                         ex) {
-                            'all': 'style', // Apply to all tags
+                            'all': 'style|data-.+', // Apply to all tags
                             'input': 'checked|name' // Apply to input tag
                         }
 // Layout-------------------------------------------------------------------------------------------------------
