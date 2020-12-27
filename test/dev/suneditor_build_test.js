@@ -29,7 +29,7 @@ Array.prototype._move = function(from, to)
     this.splice(to, 0, this.splice(from, 1)[0]);
 };
 
-const align = require('../../src/plugins/submenu/align')
+import align from '../../src/plugins/submenu/align'
 
 // const shadow = document.querySelector('#app').attachShadow({ mode: 'open' })
 // const appEl = document.createElement('textarea')
@@ -711,7 +711,7 @@ window.sun_create = function () {
     //     height: 148
     // });
     ss.setOptions({
-        height: 'auto'
+        defaultTag: 'p'
     })
 
     // ss.core.commandHandler(null, 'selectAll');
