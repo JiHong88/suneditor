@@ -407,10 +407,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _defaultCommand: {
-            bold: 'STRONG',
-            underline: 'U',
-            italic: 'EM',
-            strike: 'DEL',
+            bold: options.textTags.bold,
+            underline: options.textTags.underline,
+            italic: options.textTags.italic,
+            strike: options.textTags.strike,
             subscript: 'SUB',
             superscript: 'SUP'
         },
@@ -4509,7 +4509,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _tagConvertor: function (text) {
             if (!this._disallowedTextTagsRegExp) return text;
 
-            const ec = {'b': 'strong', 'i': 'em', 'ins': 'u', 'strike': 'del', 's': 'del'};
+            const ec = options._textTagsMap;
             return text.replace(this._disallowedTextTagsRegExp, function (m, t, n) {
                 return t + (typeof ec[n] === 'string' ? ec[n] : n);
             });
@@ -4898,7 +4898,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             // set disallow text nodes
-            const disallowTextTags = ['b', 'i', 'ins', 's', 'strike'];
+            const disallowTextTags = _w.Object.keys(options._textTagsMap);
             const allowTextTags = !options.addTagsWhitelist ? [] : options.addTagsWhitelist.split('|').filter(function (v) { return /b|i|ins|s|strike/i.test(v); });
             for (let i = 0; i < allowTextTags.length; i++) {
                 disallowTextTags.splice(disallowTextTags.indexOf(allowTextTags[i].toLowerCase()), 1);
@@ -5017,15 +5017,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.resizingDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-resizing-enabled"])');
             const tool = context.tool;
             this.commandMap = {
-                STRONG: tool.bold,
-                U: tool.underline,
-                EM: tool.italic,
-                DEL: tool.strike,
                 SUB: tool.subscript,
                 SUP: tool.superscript,
                 OUTDENT: tool.outdent,
                 INDENT: tool.indent
             };
+            this.commandMap[options.textTags.bold.toUpperCase()] = tool.bold;
+            this.commandMap[options.textTags.underline.toUpperCase()] = tool.underline;
+            this.commandMap[options.textTags.italic.toUpperCase()] = tool.italic;
+            this.commandMap[options.textTags.strike.toUpperCase()] = tool.strike;
+            
             this._styleCommandMap = {
                 fullScreen: tool.fullScreen,
                 showBlocks: tool.showBlocks,
@@ -5249,7 +5250,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _directionKeyCode: new _w.RegExp('^(8|13|3[2-9]|40|46)$'),
         _nonTextKeyCode: new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$'),
         _historyIgnoreKeyCode: new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
-        _onButtonsCheck: new _w.RegExp('^(STRONG|U|EM|DEL|SUB|SUP)$'),
+        _onButtonsCheck: new _w.RegExp('^(' + _w.Object.keys(options._textTagsMap).join('|') + ')$', 'i'),
         _frontZeroWidthReg: new _w.RegExp(util.zeroWidthSpace + '+', ''),
         _keyCodeShortcut: {
             65: 'A',
@@ -5273,22 +5274,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
                 case 'B':
                     if (options.shortcutsDisable.indexOf('bold') === -1) {
-                        command = 'STRONG';
+                        command = 'bold';
                     }
                     break;
                 case 'S':
                     if (shift && options.shortcutsDisable.indexOf('strike') === -1) {
-                        command = 'DEL';
+                        command = 'strike';
                     }
                     break;
                 case 'U':
                     if (options.shortcutsDisable.indexOf('underline') === -1) {
-                        command = 'U';
+                        command = 'underline';
                     }
                     break;
                 case 'I':
                     if (options.shortcutsDisable.indexOf('italic') === -1) {
-                        command = 'EM';
+                        command = 'italic';
                     }
                     break;
                 case 'Z':

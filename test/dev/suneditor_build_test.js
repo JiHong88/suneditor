@@ -376,12 +376,18 @@ s1.onKeyDown = function (e, core) {
 }
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
-    value: "",
+    value: "aa",
     // rtl: true,
     // fullPage: true,
     pasteTagsWhitelist: 'p|a|strong|em|h3|h4|h5|ul|ol|li|blockquote|table|thead|tbody|tfoot|tr|td|sup|sub',
     iframe: true,
     defaultTag: 'div',
+    textTags: {
+        strike:'s',
+        bold: 'b',
+        underline: 'em',
+        italic: 'u'
+    },
     tableCellControllerPosition: 'top',
     lang: lang.ckb,
     plugins: plugins,
