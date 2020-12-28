@@ -2989,7 +2989,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             appendNode = newNode;
                         }
                         
-                        if (_isMaintainedNode(newInnerNode.parentNode) && !_isMaintainedNode(childNode)) {
+                        if (_isMaintainedNode(newInnerNode.parentNode) && !_isMaintainedNode(childNode) && !util.onlyZeroWidthSpace(newInnerNode)) {
                             newInnerNode = newInnerNode.cloneNode(false);
                             pNode.appendChild(newInnerNode);
                             nNodeArray.push(newInnerNode);
