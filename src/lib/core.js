@@ -6188,6 +6188,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         }
                     }
 
+                    if (!shift && /^H[1-6]$/i.test(formatEl.nodeName)) {
+                        e.preventDefault();
+                        const newFormat = core.appendFormatTag(formatEl, options.defaultTag);
+                        core.setRange(newFormat, 1, newFormat, 1);
+                        break;
+                    }
+
                     if (!shift && freeFormatEl) {
                         e.preventDefault();
                         const selectionFormat = selectionNode === freeFormatEl;
