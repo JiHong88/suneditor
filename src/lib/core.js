@@ -709,6 +709,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {KeyboardEvent|MouseEvent|null} e Event object when called from mousedown and keydown events registered in "core.controllersOn"
          */
         controllersOff: function (e) {
+            const len = this.controllerArray.length;
+
+            if (e && e.target && len > 0) {
+                for (let i = 0; i < len; i++) {
+                    if (typeof this.controllerArray[i].contains === 'function' && this.controllerArray[i].contains(e.target)) return;
+                }
+            }
+            
             if (this._fileManager.pluginRegExp.test(this.currentControllerName) && e && e.type === 'keydown' && e.keyCode !== 27) return;
             context.element.lineBreaker_t.style.display = context.element.lineBreaker_b.style.display = 'none';
             this._variable._lineBreakComp = null;
@@ -723,7 +731,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.removeDocEvent('keydown', this._bindControllersOff);
             this._bindControllersOff = null;
 
-            const len = this.controllerArray.length;
             if (len > 0) {
                 for (let i = 0; i < len; i++) {
                     if (typeof this.controllerArray[i] === 'function') this.controllerArray[i]();
@@ -791,15 +798,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             controller.style.visibility = '';
-        },
-
-        /**
-         * @description Run event.stopPropagation and event.preventDefault.
-         * @param {Object} e Event Object
-         */
-        eventStop: function (e) {
-            e.stopPropagation();
-            e.preventDefault();
         },
 
         /**

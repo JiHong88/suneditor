@@ -243,12 +243,6 @@ interface Core {
     setControllerPosition(controller: Element, referEl: Element, position: 'top' | 'bottom', addOffset: {left: number, top: number}): void;
 
     /**
-     * @description Run event.stopPropagation and event.preventDefault.
-     * @param e Event Object
-     */
-    eventStop(e: Event): void;
-
-    /**
      * @description javascript execCommand
      * @param command javascript execCommand function property
      * @param showDefaultUI javascript execCommand function property

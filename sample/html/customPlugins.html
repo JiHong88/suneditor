@@ -639,11 +639,6 @@
         <span class="pl-k">let</span> <span class="pl-s1">link_controller</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">setController_LinkButton</span><span class="pl-kos">.</span><span class="pl-en">call</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">linkController</span> <span class="pl-c1">=</span> <span class="pl-s1">link_controller</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">_linkAnchor</span> <span class="pl-c1">=</span> null<span class="pl-kos">;</span>
-        <span class="pl-c">// <span class="pl-k">@Required</span></span>
-        <span class="pl-c">// To maintain the editor's focus when operating the controller,</span>
-        <span class="pl-c">// You need to run event.preventDefault and event.stopPropagation in the mousedown event.</span>
-        <span class="pl-c">// You can use "core.eventStop" (run preventDefault and stopPropagation).</span>
-        <span class="pl-s1">link_controller</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'mousedown'</span><span class="pl-kos">,</span> <span class="pl-k">core</span>.<span class="pl-en">eventStop</span>)</span><span class="pl-kos">;</span>
 
         <span class="pl-c">/** add event listeners */</span>
         <span class="pl-s1">link_dialog</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'.se-btn-primary'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'click'</span><span class="pl-kos">,</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">submit</span><span class="pl-kos">.</span><span class="pl-en">bind</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
@@ -1091,12 +1086,6 @@
         <span class="pl-c">/** controller */</span>
         <span class="pl-k">let</span> <span class="pl-s1">audio_controller</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">setController</span><span class="pl-kos">.</span><span class="pl-en">call</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customAudio</span><span class="pl-kos">.</span><span class="pl-c1">controller</span> <span class="pl-c1">=</span> <span class="pl-s1">audio_controller</span><span class="pl-kos">;</span>
-
-        <span class="pl-c">// </span><span class="pl-k">@Required</span>
-        <span class="pl-c">// To maintain the editor's focus when operating the controller,</span>
-        <span class="pl-c">// You need to run event.preventDefault and event.stopPropagation in the mousedown event.</span>
-        <span class="pl-c">// You can use "core.eventStop" (run preventDefault and stopPropagation).</span>
-        <span class="pl-s1">audio_controller</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'mousedown'</span><span class="pl-kos">,</span> <span class="pl-k">core</span>.<span class="pl-en">eventStop</span>)</span><span class="pl-kos">;</span>
 
         <span class="pl-c">/** add event listeners */</span>
         <span class="pl-s1">audio_dialog</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'.se-dialog-files-edge-button'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'click'</span><span class="pl-kos">,</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">_removeSelectedFiles</span><span class="pl-kos">.</span><span class="pl-en">bind</span><span class="pl-kos">(</span><span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">fileInput</span><span class="pl-kos">,</span> <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">urlInput</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
@@ -1919,11 +1908,6 @@
             let link_controller = this.setController_LinkButton.call(core);
             context.customLink.linkController = link_controller;
             context.customLink._linkAnchor = null;
-            // @Required
-            // To maintain the editor's focus when operating the controller,
-            // You need to run event.preventDefault and event.stopPropagation in the mousedown event.
-            // You can use "core.eventStop" (run preventDefault and stopPropagation).
-            link_controller.addEventListener('mousedown', core.eventStop);
 
             /** add event listeners */
             link_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
@@ -2320,12 +2304,6 @@
             /** controller */
             let audio_controller = this.setController.call(core);
             context.customAudio.controller = audio_controller;
-
-            // @Required
-            // To maintain the editor's focus when operating the controller,
-            // You need to run event.preventDefault and event.stopPropagation in the mousedown event.
-            // You can use "core.eventStop" (run preventDefault and stopPropagation).
-            audio_controller.addEventListener('mousedown', core.eventStop);
 
             /** add event listeners */
             audio_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(context.fileInput, context.urlInput));

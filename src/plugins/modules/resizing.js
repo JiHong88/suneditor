@@ -103,7 +103,6 @@
     
             /** add event listeners */
             resize_div_container.addEventListener('mousedown', function (e) { e.preventDefault(); });
-            resize_button.addEventListener('mousedown', core.eventStop);
             resize_handles[0].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
             resize_handles[1].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
             resize_handles[2].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));

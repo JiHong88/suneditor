@@ -36,7 +36,6 @@ export default {
         let link_controller = this.setController_LinkButton.call(core);
         context.link.linkController = link_controller;
         context.link._linkAnchor = null;
-        link_controller.addEventListener('mousedown', core.eventStop);
 
         /** add event listeners */
         link_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));

@@ -59,7 +59,6 @@ export default {
         contextTable.resizeText = tableController.querySelector('._se_table_resize > span > span');
         contextTable.columnFixedButton = tableController.querySelector('._se_table_fixed_column');
         contextTable.headerButton = tableController.querySelector('._se_table_header');
-        tableController.addEventListener('mousedown', core.eventStop);
 
         /** set resizing */
         let resizeDiv = this.setController_tableEditor.call(core, contextTable.cellControllerTop);
@@ -69,7 +68,6 @@ export default {
         contextTable.splitButton = resizeDiv.querySelector('._se_table_split_button');
         contextTable.insertRowAboveButton = resizeDiv.querySelector('._se_table_insert_row_a');
         contextTable.insertRowBelowButton = resizeDiv.querySelector('._se_table_insert_row_b');
-        resizeDiv.addEventListener('mousedown', core.eventStop);
         
         /** add event listeners */
         tablePicker.addEventListener('mousemove', this.onMouseMove_tablePicker.bind(core, contextTable));
