@@ -72,7 +72,7 @@ export default {
                 }
             }
             list += '' +
-            '<form class="se-submenu-form-group">' +
+            '<form class="se-form-group">' +
                 '<input type="text" maxlength="9" class="_se_color_picker_input se-color-input"/>' +
                 '<button type="submit" class="se-btn-primary _se_color_picker_submit" title="' + lang.dialogBox.submitButton + '">' +
                     core.icons.checked +

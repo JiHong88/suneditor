@@ -219,7 +219,7 @@ export default {
     _setTagAttrs: function (element) {
         element.setAttribute('controls', true);
 
-        const attrs = this.context.options.videoTagAttrs;
+        const attrs = this.options.videoTagAttrs;
         if (!attrs) return;
 
         for (let key in attrs) {
@@ -238,7 +238,7 @@ export default {
         element.frameBorder = '0';
         element.allowFullscreen = true;
 
-        const attrs = this.context.options.videoIframeAttrs;
+        const attrs = this.options.videoIframeAttrs;
         if (!attrs) return;
 
         for (let key in attrs) {
@@ -303,9 +303,9 @@ export default {
             contextVideo.inputX.value = contextVideo._origin_w = this.context.option.videoWidth === contextVideo._defaultSizeX ? '' : this.context.option.videoWidth;
             contextVideo.inputY.value = contextVideo._origin_h = this.context.option.videoHeight === contextVideo._defaultSizeY ? '' : this.context.option.videoHeight;
             contextVideo.proportion.disabled = true;
-            if (contextVideo.videoInputFile && this.context.options.videoMultipleFile) contextVideo.videoInputFile.setAttribute('multiple', 'multiple');
+            if (contextVideo.videoInputFile && this.options.videoMultipleFile) contextVideo.videoInputFile.setAttribute('multiple', 'multiple');
         } else {
-            if (contextVideo.videoInputFile && this.context.options.videoMultipleFile) contextVideo.videoInputFile.removeAttribute('multiple');
+            if (contextVideo.videoInputFile && this.options.videoMultipleFile) contextVideo.videoInputFile.removeAttribute('multiple');
         }
 
         if (contextVideo._resizing) {

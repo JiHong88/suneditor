@@ -42,7 +42,7 @@ export default {
             '<div class="se-list-inner">' +
                 '<ul>' +
                     '<li>' +
-                        '<div class="se-submenu-form-group __se_container">' +
+                        '<div class="se-form-group __se_container">' +
                             // The "position" of each element surrounding the button must be "relative".
                             '<div style="position:relative;">' +
                                 // Enter the button name of the plug-in or default command in the button's "data-command"

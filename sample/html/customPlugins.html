@@ -229,7 +229,7 @@
 
         <span class="pl-c">// You must bind "core" object when registering an event.</span>
         <span class="pl-c">/** add event listeners */</span>
-        <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'.se-submenu-form-group'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'click'</span><span class="pl-kos">,</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">onClick</span><span class="pl-kos">.</span><span class="pl-en">bind</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'.se-form-group'</span><span class="pl-kos">)</span><span class="pl-kos">.</span><span class="pl-en">addEventListener</span><span class="pl-kos">(</span><span class="pl-s">'click'</span><span class="pl-kos">,</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">onClick</span><span class="pl-kos">.</span><span class="pl-en">bind</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
 
         <span class="pl-c">// <span class="pl-k">@Required</span></span>
         <span class="pl-c">// You must add the "submenu" element using the "core.initMenuTarget" method.</span>
@@ -243,10 +243,10 @@
         <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'se-list-layer'</span><span class="pl-kos">;</span>
         <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">innerHTML</span> <span class="pl-c1">=</span> <span class="pl-s">''</span> <span class="pl-c1">+</span>
             <span class="pl-s">'&lt;div class="se-list-inner"&gt;'</span> <span class="pl-c1">+</span>
-                <span class="pl-s">'&lt;div class="se-submenu-form-group"&gt;'</span> <span class="pl-c1">+</span>
+                <span class="pl-s">'&lt;div class="se-form-group"&gt;'</span> <span class="pl-c1">+</span>
                     <span class="pl-c">// <span class="pl-k">@Required</span></span>
                     <span class="pl-c">// The "position" style of each element surrounding the button must be "relative".</span>
-                    <span class="pl-c">// suneditor.css: .sun-editor .se-submenu-form-group &gt; div {position:relative;}</span>
+                    <span class="pl-c">// suneditor.css: .sun-editor .se-form-group &gt; div {position:relative;}</span>
                     <span class="pl-s">'&lt;div&gt;'</span> <span class="pl-c1">+</span>
                         <span class="pl-c">// <span class="pl-k">@Required</span></span>
                         <span class="pl-c">// Enter the button name of the plug-in or default command in the button's "data-command"</span>
@@ -505,7 +505,7 @@
             <span class="pl-s">'&lt;div class="se-list-inner"&gt;'</span> <span class="pl-c1">+</span>
                 <span class="pl-s">'&lt;ul class="se-list-basic" style="width: 230px;"&gt;'</span> <span class="pl-c1">+</span>
                     <span class="pl-s">'&lt;li&gt;'</span> <span class="pl-c1">+</span>
-                        <span class="pl-s">'&lt;div class="se-submenu-form-group"&gt;'</span> <span class="pl-c1">+</span>
+                        <span class="pl-s">'&lt;div class="se-form-group"&gt;'</span> <span class="pl-c1">+</span>
                             <span class="pl-s">'&lt;input class="se-input-form" type="text" placeholder="insert text" style="border: 1px solid #CCC;" /&gt;'</span> <span class="pl-c1">+</span>
                             <span class="pl-s">'&lt;button type="button" class="se-btn-primary se-tooltip"&gt;'</span> <span class="pl-c1">+</span>
                                 <span class="pl-s">'&lt;strong&gt;OK&lt;/strong&gt;'</span> <span class="pl-c1">+</span>
@@ -1554,7 +1554,7 @@
 
             // You must bind "core" object when registering an event.
             /** add event listeners */
-            listDiv.querySelector('.se-submenu-form-group').addEventListener('click', this.onClick.bind(core));
+            listDiv.querySelector('.se-form-group').addEventListener('click', this.onClick.bind(core));
 
             // @Required
             // You must add the "submenu" element using the "core.initMenuTarget" method.
@@ -1568,10 +1568,10 @@
             listDiv.className = 'se-list-layer';
             listDiv.innerHTML = '' +
                 '<div class="se-list-inner">' +
-                    '<div class="se-submenu-form-group">' +
+                    '<div class="se-form-group">' +
                         // @Required
                         // The "position" style of each element surrounding the button must be "relative".
-                        // suneditor.css: .sun-editor .se-submenu-form-group > div {position:relative;}
+                        // suneditor.css: .sun-editor .se-form-group > div {position:relative;}
                         '<div>' +
                             // @Required
                             // Enter the button name of the plug-in or default command in the button's "data-command"
@@ -1793,7 +1793,7 @@
                 '<div class="se-list-inner">' +
                     '<ul class="se-list-basic" style="width: 230px;">' +
                         '<li>' +
-                            '<div class="se-submenu-form-group">' +
+                            '<div class="se-form-group">' +
                                 '<input class="se-input-form" type="text" placeholder="insert text" style="border: 1px solid #CCC;" />' +
                                 '<button type="button" class="se-btn-primary se-tooltip">' +
                                     '<strong>OK</strong>' +

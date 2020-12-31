@@ -173,7 +173,7 @@ export default {
     _setTagAttrs: function (element) {
         element.setAttribute('controls', true);
 
-        const attrs = this.context.options.audioTagAttrs;
+        const attrs = this.options.audioTagAttrs;
         if (!attrs) return;
 
         for (let key in attrs) {
@@ -249,13 +249,13 @@ export default {
 
         if (!update) {
             this.plugins.audio.init.call(this);
-            if (contextAudio.audioInputFile && this.context.options.audioMultipleFile) contextAudio.audioInputFile.setAttribute('multiple', 'multiple');
+            if (contextAudio.audioInputFile && this.options.audioMultipleFile) contextAudio.audioInputFile.setAttribute('multiple', 'multiple');
         } else if (contextAudio._element) {
             this.context.dialog.updateModal = true;
             contextAudio._linkValue = contextAudio.preview.textContent = contextAudio.audioUrlFile.value = contextAudio._element.src;
-            if (contextAudio.audioInputFile && this.context.options.audioMultipleFile) contextAudio.audioInputFile.removeAttribute('multiple');
+            if (contextAudio.audioInputFile && this.options.audioMultipleFile) contextAudio.audioInputFile.removeAttribute('multiple');
         } else {
-            if (contextAudio.audioInputFile && this.context.options.audioMultipleFile) contextAudio.audioInputFile.removeAttribute('multiple');
+            if (contextAudio.audioInputFile && this.options.audioMultipleFile) contextAudio.audioInputFile.removeAttribute('multiple');
         }
     },
 

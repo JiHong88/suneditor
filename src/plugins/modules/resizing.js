@@ -474,7 +474,7 @@
                 resizeContainer.style.display = 'block';
 
                 const addOffset = {left: 0, top: 50};
-                if (this.context.options.iframe) {
+                if (this.options.iframe) {
                     addOffset.left -= this.context.element.wysiwygFrame.parentElement.offsetLeft;
                     addOffset.top -= this.context.element.wysiwygFrame.parentElement.offsetTop;
                 }

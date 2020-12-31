@@ -48,7 +48,7 @@ export default {
         listDiv.className = 'se-list-layer se-list-align';
         listDiv.innerHTML = '' + 
             `<div class="se-list-inner" style="width: auto;">
-               <form class="se-submenu-form-group">
+               <form class="se-form-group">
                <ul class="se-list-basic">
                    <li><div class="form-group form-material floating" data-plugin="formMaterial"><label class="form-control-label">Action</label><input class="form-control" type="text" style="width: 250px; border-bottom: none; text-transform: none;" /></div></li>
                    <li><div class="form-group form-material" data-plugin="formMaterial"><label class="form-control-label">Assignee</label><select class="form-control" style="width: 250px; border-bottom: none;">${userOptions}</select></div></li>

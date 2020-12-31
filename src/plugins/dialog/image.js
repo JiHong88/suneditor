@@ -305,9 +305,9 @@ export default {
         if (!update) {
             contextImage.inputX.value = contextImage._origin_w = this.context.option.imageWidth === contextImage._defaultSizeX ? '' : this.context.option.imageWidth;
             contextImage.inputY.value = contextImage._origin_h = this.context.option.imageHeight === contextImage._defaultSizeY ? '' : this.context.option.imageHeight;
-            if (contextImage.imgInputFile && this.context.options.imageMultipleFile) contextImage.imgInputFile.setAttribute('multiple', 'multiple');
+            if (contextImage.imgInputFile && this.options.imageMultipleFile) contextImage.imgInputFile.setAttribute('multiple', 'multiple');
         } else {
-            if (contextImage.imgInputFile && this.context.options.imageMultipleFile) contextImage.imgInputFile.removeAttribute('multiple');
+            if (contextImage.imgInputFile && this.options.imageMultipleFile) contextImage.imgInputFile.removeAttribute('multiple');
         }
     },
 

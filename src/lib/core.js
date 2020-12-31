@@ -7321,7 +7321,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // reset context
             if (el._menuTray.children.length === 0) this._menuTray = {};
             _responsiveButtons = cons.toolbar.responsiveButtons;
-            options = mergeOptions;
+            core.options = options = mergeOptions;
             core.lang = lang = options.lang;
 
             if (options.iframe) {
@@ -7681,6 +7681,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
     /************ Core init ************/
     // functions
     core.functions = functions;
+    core.options = options;
 
     // Create to sibling node
     let contextEl = context.element;

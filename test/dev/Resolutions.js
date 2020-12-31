@@ -54,7 +54,7 @@ export default {
             '<div class="se-list-inner">' +
                 '<ul class="se-list-basic" style="width: 230px;">' +
                     '<li>' +
-                        '<div class="se-submenu-form-group">' +
+                        '<div class="se-form-group">' +
                             '<input class="se-input-form" type="text" placeholder="insert text" style="border: 1px solid #CCC;" />' +
                             '<button type="button" class="se-btn-primary se-tooltip">' +
                                 '<strong>OK</strong>' +
