@@ -1270,10 +1270,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Determine if this offset is the edge offset of container
          * @param {Node} container The node of the selection object. (range.startContainer..)
          * @param {Number} offset The offset of the selection object. (core.getRange().startOffset...)
+         * @param {String|undefined} dir Select check point - Both edge, Front edge or End edge. ("front": Front edge, "end": End edge, undefined: Both edge)
          * @returns {Boolean}
          */
         isEdgePoint: function (container, offset) {
-            return (offset === 0) || (!container.nodeValue && offset === 1) || (!!container.nodeValue && offset === container.nodeValue.length);
+            return (offset === 0) || ((!dir || dir === 'front') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && !!container.nodeValue && offset === container.nodeValue.length);
         },
 
         /**
