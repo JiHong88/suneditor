@@ -1273,7 +1273,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Boolean}
          */
         isEdgePoint: function (container, offset) {
-            return (offset === 0) || (!container.nodeValue && offset === 1) || (offset === container.nodeValue.length);
+            return (offset === 0) || (!container.nodeValue && offset === 1) || (!!container.nodeValue && offset === container.nodeValue.length);
         },
 
         /**
