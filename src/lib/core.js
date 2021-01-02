@@ -5811,9 +5811,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             e.preventDefault();
                             e.stopPropagation();
 
-                            formatEl.outerHTML = '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
-                            core.nativeFocus();
+                            if (formatEl.nodeName.toUpperCase() === options.defaultTag.toUpperCase()) {
+                                formatEl.innerHTML = '<br>';
+                                const attrs = formatEl.attributes;
+                                while (attrs[0]) {
+                                    formatEl.removeAttribute(attrs[0].name);
+                                }
+                            } else {
+                                const defaultFormat = util.createElement(options.defaultTag);
+                                defaultFormat.innerHTML = '<br>';
+                                formatEl.parentElement.replaceChild(defaultFormat, formatEl);
+                            }
 
+                            core.nativeFocus();
                             return false;
                         }
                     }
