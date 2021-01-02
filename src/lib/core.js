@@ -1273,7 +1273,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {String|undefined} dir Select check point - Both edge, Front edge or End edge. ("front": Front edge, "end": End edge, undefined: Both edge)
          * @returns {Boolean}
          */
-        isEdgePoint: function (container, offset) {
+        isEdgePoint: function (container, offset, dir) {
             return (offset === 0) || ((!dir || dir === 'front') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && !!container.nodeValue && offset === container.nodeValue.length);
         },
 
