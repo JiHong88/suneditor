@@ -268,6 +268,11 @@ interface Core {
     focusEdge(focusEl: Element | null): void;
 
     /**
+     * @description Focusout to wysiwyg area (.blur())
+     */
+    blur(): void;
+
+    /**
      * @description Set current editor's range object and return.
      * @param startCon The startContainer property of the selection object.
      * @param startOff The startOffset property of the selection object.

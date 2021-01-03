@@ -374,6 +374,16 @@ const util = {
     },
 
     /**
+     * @description Checks for "__se__uneditable" in the class list.
+     * Components with class "__se__uneditable" cannot be modified.
+     * @param {Element} element The element to check
+     * @returns {Boolean}
+     */
+    isUneditableComponent: function (element) {
+        return element && this.hasClass(element, '__se__uneditable');
+    },
+
+    /**
      * @description It is judged whether it is the component [img, iframe] cover(class="se-component")
      * @param {Node} element The node to check
      * @returns {Boolean}

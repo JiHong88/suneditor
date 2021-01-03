@@ -877,6 +877,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Focusout to wysiwyg area (.blur())
+         */
+        blur: function () {
+            if (options.iframe) {
+                context.element.wysiwygFrame.blur();
+            } else {
+                context.element.wysiwyg.blur();
+            }
+        },
+
+        /**
          * @description Set current editor's range object and return.
          * @param {Node} startCon The startContainer property of the selection object.
          * @param {Number} startOff The startOffset property of the selection object.
@@ -1403,6 +1414,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {String} pluginName Plugin name (image, video)
          */
         selectComponent: function (element, pluginName) {
+            if (util.isUneditableComponent(util.getParentElement(element, util.isComponent)) || util.isUneditableComponent(element)) return false;
             if (!this.hasFocus) this.focus();
             const plugin = this.plugins[pluginName];
             if (!plugin) return;
@@ -5742,6 +5754,36 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (typeof functions.onInput === 'function') functions.onInput(e, core);
         },
 
+        _isUneditableNode: function (range, isFront) {
+            const container = isFront ? range.startContainer : range.endContainer;
+            const offset = isFront ? range.startOffset : range.endOffset;
+            const siblingKey = isFront ? 'previousSibling' : 'nextSibling';
+            const isElement = container.nodeType === 1;
+            let siblingNode;
+
+            if (isElement) {
+                siblingNode = event._isUneditableNode_getSibling(container.childNodes[offset], siblingKey, container);
+                return siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false';
+            } else {
+                siblingNode = event._isUneditableNode_getSibling(container, siblingKey, container);
+                return core.isEdgePoint(container, offset, isFront ? 'front' : 'end') && (siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false');
+            }
+        },
+
+        _isUneditableNode_getSibling: function (selectNode, siblingKey, container) {
+            if (!selectNode) return null;
+            let siblingNode = selectNode[siblingKey];
+
+            if (!siblingNode) {
+                siblingNode = util.getFormatElement(container);
+                siblingNode = siblingNode ? siblingNode[siblingKey] : null;
+                if (siblingNode && !util.isComponent(siblingNode)) siblingNode = siblingKey === 'previousSibling' ? siblingNode.firstElementChild : siblingNode.lastElementChild;
+                else return null;
+            }
+
+            return siblingNode;
+        },
+
         _onShortcutKey: false,
         onKeyDown_wysiwyg: function (e) {
             const keyCode = e.keyCode;
@@ -5854,6 +5896,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         }
                     }
 
+                    // tag[contenteditable="false"]
+                    if (event._isUneditableNode(range, true)) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        break;
+                    }
+
                     // nested list
                     const commonCon = range.commonAncestorContainer;
                     formatEl = util.getFormatElement(range.startContainer, null);
@@ -5945,7 +5994,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 e.preventDefault();
                                 e.stopPropagation();
                                 if (formatEl.textContent.length === 0) util.removeItem(formatEl);
-                                core.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
+                                if (core.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName) === false) core.blur();
                             }
                             break;
                         }
@@ -5968,6 +6017,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     if (selectRange && event._hardDelete()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        break;
+                    }
+
+                    // tag[contenteditable="false"]
+                    if (event._isUneditableNode(range, false)) {
                         e.preventDefault();
                         e.stopPropagation();
                         break;
@@ -5999,7 +6055,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             const fileComponentInfo = core.getFileComponent(nextEl);
                             if (fileComponentInfo) {
                                 e.stopPropagation();
-                                core.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
+                                if (core.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName) === false) core.blur();
                             }
 
                             break;
@@ -6317,7 +6373,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         container.parentNode.insertBefore(newEl, container);
                         
                         core.callPlugin(fileComponentName, function () {
-                            core.selectComponent(compContext._element, fileComponentName);
+                            if (core.selectComponent(compContext._element, fileComponentName) === false) core.blur();
                         }, null);
                     }
                     

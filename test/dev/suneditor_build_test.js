@@ -380,6 +380,9 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // rtl: true,
     // fullPage: true,
     pasteTagsWhitelist: 'p|a|strong|em|h3|h4|h5|ul|ol|li|blockquote|table|thead|tbody|tfoot|tr|td|sup|sub',
+    attributesWhitelist: {
+        all: 'style'
+    },
     iframe: true,
     defaultTag: 'div',
     textTags: {
@@ -412,7 +415,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     },
     // height: 'auto',
     iframeCSSFileName: '.+',
-    addTagsWhitelist: 'i',
+    addTagsWhitelist: 'i|label',
     popupDisplay: 'full',
     charCounter: true,
     charCounterType: 'byte-html',
@@ -434,7 +437,31 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     templates: [
         {
             name: 'Template-1',
-            html: '<p>HTML source1</p>'
+            html: `
+            <div class="__se__tag" style="display: flex; max-width: 480px;">
+                <div class="__se__format__range_div" style="flex: 2; border: 1px solid #5f5f5f; background: #d2e2f1; border-right: none; padding: 5px;">
+                    <img src="http://suneditor.com/ks/test_img.png" data-align="center" class="__se__uneditable"/>
+                </div>
+                <div style="flex: 4; background: #b7b7b7;">
+                    <div
+                    class="__se__format__range_div"
+                    style="border: 1px solid #5f5f5f; border-bottom: none; height: 50%; position: relative;"
+                    contenteditable="false"
+                    >
+                        <div style="position: absolute; top: calc(50% - 10px); left: 10px;">
+                            ABC, Incorporate
+                        </div>
+                    </div>
+                    <div
+                    class="__se__format__range_div"
+                    style="border: 1px solid #5f5f5f; height: 50%; padding: 10px; background: #dce9d5;"
+                    >
+                        <div><label contenteditable="false">Sales Contact : </label><br /></div>
+                        <div><label contenteditable="false">Last Sale : </label><br /></div>
+                        <div><label contenteditable="false">YTD Sale : </label><br /></div>
+                    </div>
+                </div>
+            </div>`
         },
         {
             name: 'Template-2',

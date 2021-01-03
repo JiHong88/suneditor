@@ -186,6 +186,14 @@ declare interface util {
     isComponent(element: Node): boolean;
 
     /**
+     * @description Checks for "__se__uneditable" in the class list.
+     * Components with class "__se__uneditable" cannot be modified.
+     * @param element The node to check
+     * @returns
+     */
+    isUneditableComponent(element: Element): boolean;
+
+    /**
      * @description It is judged whether it is the not checking node. (class="katex", "__se__tag")
      * @param element The node to check
      * @returns
