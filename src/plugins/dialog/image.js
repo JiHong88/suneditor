@@ -875,14 +875,7 @@ export default {
     },
 
     /**
-     * @Override resizing
-     */
-    sizeRevert: function () {
-        this.plugins.resizing._module_sizeRevert.call(this, this.context.image);
-    },
-
-    /**
-     * @Override resizing
+     * @Override fileManager
      */
     applySize: function (w, h) {
         const contextImage = this.context.image;
@@ -900,6 +893,13 @@ export default {
         }
 
         return false;
+    },
+
+    /**
+     * @Override resizing
+     */
+    sizeRevert: function () {
+        this.plugins.resizing._module_sizeRevert.call(this, this.context.image);
     },
 
     /**

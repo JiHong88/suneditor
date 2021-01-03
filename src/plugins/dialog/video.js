@@ -755,14 +755,7 @@ export default {
     },
 
     /**
-     * @Override resizing
-     */
-    sizeRevert: function () {
-        this.plugins.resizing._module_sizeRevert.call(this, this.context.video);
-    },
-
-    /**
-     * @Override resizing
+     * @Override fileManager
      */
     applySize: function (w, h) {
         const contextVideo = this.context.video;
@@ -780,6 +773,13 @@ export default {
         }
 
         return false;
+    },
+
+    /**
+     * @Override resizing
+     */
+    sizeRevert: function () {
+        this.plugins.resizing._module_sizeRevert.call(this, this.context.video);
     },
 
     /**
