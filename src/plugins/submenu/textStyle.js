@@ -17,7 +17,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = this.setSubmenu.call(core);
+        let listDiv = this.setSubmenu(core);
         let listUl = listDiv.querySelector('ul');
 
         /** add event listeners */
@@ -32,29 +32,29 @@ export default {
         listDiv = null, listUl = null;
     },
 
-    setSubmenu: function () {
-        const option = this.context.option;
-        const listDiv = this.util.createElement('DIV');
+    setSubmenu: function (core) {
+        const option = core.options;
+        const listDiv = core.util.createElement('DIV');
         listDiv.className = 'se-submenu se-list-layer se-list-format';
 
         const defaultList = {
             code: {
-                name: this.lang.menu.code,
+                name: core.lang.menu.code,
                 class: '__se__t-code',
                 tag: 'code',
             },
             translucent: {
-                name: this.lang.menu.translucent,
+                name: core.lang.menu.translucent,
                 style: 'opacity: 0.5;',
                 tag: 'span',
             },
             shadow: {
-                name: this.lang.menu.shadow,
+                name: core.lang.menu.shadow,
                 class: '__se__t-shadow',
                 tag: 'span',
             }
         };
-        const styleList = !option.textStyles ? this._w.Object.keys(defaultList) : option.textStyles;
+        const styleList = !option.textStyles ? core._w.Object.keys(defaultList) : option.textStyles;
 
         let list = '<div class="se-list-inner"><ul class="se-list-basic">';
         for (let i = 0, len = styleList.length, t, tag, name, attrs, command, value, _class; i < len; i++) {

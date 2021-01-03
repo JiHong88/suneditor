@@ -16,7 +16,7 @@ export default {
 
         // Generate submenu HTML
         // Always bind "core" when calling a plugin function
-        let listDiv = this.setSubmenu.call(core);
+        let listDiv = this.setSubmenu(core);
 
         // Input tag caching
         context.custom.textElement = [...listDiv.getElementsByTagName('INPUT'), listDiv.getElementsByTagName('SELECT')[0]];
@@ -38,8 +38,8 @@ export default {
         });
     },
 
-    setSubmenu: function () {
-        const listDiv = this.util.createElement('DIV');
+    setSubmenu: function (core) {
+        const listDiv = core.util.createElement('DIV');
 
         let userOptions = '';
         const assigneables = [{name: 'JiHong'}, {name: 'Henry'}]

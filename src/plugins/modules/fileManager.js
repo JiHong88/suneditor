@@ -32,7 +32,7 @@
          * @param {FormData} formData FormData in body
          * @param {Function|null} callBack Success call back function
          * @param {Function|null} errorCallBack Error call back function
-         * @example this.plugins.fileManager.upload.call(this, imageUploadUrl, this.context.option.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.functions.onImageUploadError);
+         * @example this.plugins.fileManager.upload.call(this, imageUploadUrl, this.options.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.functions.onImageUploadError);
          */
         upload: function (uploadUrl, uploadHeader, formData, callBack, errorCallBack) {
             this.showLoading();

@@ -23,7 +23,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = this.setSubmenu.call(core);
+        let listDiv = this.setSubmenu(core);
         context.hiliteColor.colorInput = listDiv.querySelector('._se_color_picker_input');
 
         /** add event listeners */
@@ -41,9 +41,9 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function () {
-        const colorArea = this.context.colorPicker.colorListHTML;
-        const listDiv = this.util.createElement('DIV');
+    setSubmenu: function (core) {
+        const colorArea = core.context.colorPicker.colorListHTML;
+        const listDiv = core.util.createElement('DIV');
 
         listDiv.className = 'se-submenu se-list-layer';
         listDiv.innerHTML = colorArea;

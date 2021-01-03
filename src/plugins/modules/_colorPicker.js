@@ -41,7 +41,7 @@ export default {
      * @returns {String} HTML string
      */
     createColorList: function (core, makeColor) {
-        const option = core.context.option;
+        const option = core.options;
         const lang = core.lang;
         const colorList = !option.colorList || option.colorList.length === 0 ?
             [

@@ -20,8 +20,8 @@ export default {
             _tableXY: [],
             _maxWidth: true,
             _fixedColumn: false,
-            _rtl: context.options.rtl,
-            cellControllerTop: context.options.tableCellControllerPosition === 'top',
+            _rtl: core.options.rtl,
+            cellControllerTop: core.options.tableCellControllerPosition === 'top',
             resizeText: null,
             headerButton: null,
             mergeButton: null,
@@ -44,16 +44,16 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = this.setSubmenu.call(core);
+        let listDiv = this.setSubmenu(core);
         let tablePicker = listDiv.querySelector('.se-controller-table-picker');
 
         contextTable.tableHighlight = listDiv.querySelector('.se-table-size-highlighted');
         contextTable.tableUnHighlight = listDiv.querySelector('.se-table-size-unhighlighted');
         contextTable.tableDisplay = listDiv.querySelector('.se-table-size-display');
-        if (context.options.rtl) contextTable.tableHighlight.style.left = (10 * 18 - 13) + 'px';
+        if (core.options.rtl) contextTable.tableHighlight.style.left = (10 * 18 - 13) + 'px';
 
         /** set table controller */
-        let tableController = this.setController_table.call(core);
+        let tableController = this.setController_table(core);
         contextTable.tableController = tableController;
         contextTable.resizeButton = tableController.querySelector('._se_table_resize');
         contextTable.resizeText = tableController.querySelector('._se_table_resize > span > span');
@@ -61,7 +61,7 @@ export default {
         contextTable.headerButton = tableController.querySelector('._se_table_header');
 
         /** set resizing */
-        let resizeDiv = this.setController_tableEditor.call(core, contextTable.cellControllerTop);
+        let resizeDiv = this.setController_tableEditor(core, contextTable.cellControllerTop);
         contextTable.resizeDiv = resizeDiv;
         contextTable.splitMenu = resizeDiv.querySelector('.se-btn-group-sub');
         contextTable.mergeButton = resizeDiv.querySelector('._se_table_merge_button');
@@ -86,8 +86,8 @@ export default {
         listDiv = null, tablePicker = null, resizeDiv = null, tableController = null, contextTable = null;
     },
 
-    setSubmenu: function () {
-        const listDiv = this.util.createElement('DIV');
+    setSubmenu: function (core) {
+        const listDiv = core.util.createElement('DIV');
         listDiv.className = 'se-submenu se-selector-table';
         listDiv.innerHTML = '' +
             '<div class="se-table-size">' +
@@ -100,10 +100,10 @@ export default {
         return listDiv;
     },
 
-    setController_table: function () {
-        const lang = this.lang;
-        const icons = this.icons;
-        const tableResize = this.util.createElement('DIV');
+    setController_table: function (core) {
+        const lang = core.lang;
+        const icons = core.icons;
+        const tableResize = core.util.createElement('DIV');
 
         tableResize.className = 'se-controller se-controller-table';
         tableResize.innerHTML = '' +
@@ -131,10 +131,10 @@ export default {
         return tableResize;
     },
 
-    setController_tableEditor: function (cellControllerTop) {
-        const lang = this.lang;
-        const icons = this.icons;
-        const tableResize = this.util.createElement('DIV');
+    setController_tableEditor: function (core, cellControllerTop) {
+        const lang = core.lang;
+        const icons = core.icons;
+        const tableResize = core.util.createElement('DIV');
 
         tableResize.className = 'se-controller se-controller-table-cell';
         tableResize.innerHTML = (cellControllerTop ? '' : '<div class="se-arrow se-arrow-up"></div>') +

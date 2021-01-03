@@ -14,7 +14,7 @@ declare interface fileManager extends Module {
      * @param  formData FormData in body
      * @param  callBack Success call back function
      * @param  errorCallBack Error call back function
-     * @example this.plugins.fileManager.upload.call(this, imageUploadUrl, this.context.option.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.functions.onImageUploadError);
+     * @example this.plugins.fileManager.upload.call(this, imageUploadUrl, this.options.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.functions.onImageUploadError);
      */
     upload(uploadUrl: string, uploadHeader: Record<string, string> | null, formData: FormData, callBack: Function | null, errorCallBack: Function | null): void;
 

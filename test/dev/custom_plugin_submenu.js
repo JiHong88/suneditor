@@ -18,7 +18,7 @@ export default {
         };
 
         // Generate submenu HTML
-        let listDiv = this.setSubmenu.call(core);
+        let listDiv = this.setSubmenu(core);
 
         // Input tag caching
         // context.custom.textElement = listDiv.getElementsByTagName('INPUT')[0];
@@ -34,8 +34,8 @@ export default {
         targetElement.parentNode.appendChild(listDiv);
     },
 
-    setSubmenu: function () {
-        const listDiv = this.util.createElement('DIV');
+    setSubmenu: function (core) {
+        const listDiv = core.util.createElement('DIV');
 
         listDiv.className = 'se-submenu se-list-layer se-list-align';
         listDiv.style.display = 'none';

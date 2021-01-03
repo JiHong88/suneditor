@@ -32,6 +32,11 @@ interface Core {
     functions: SunEditor;
 
     /**
+     * @description Editor options
+     */
+    options: SunEditorOptions;
+
+    /**
      * @description Notice object
      */
     notice: _Notice;

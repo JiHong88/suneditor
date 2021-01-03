@@ -18,12 +18,13 @@ export default {
     add: function (core) {
         core.addModule([dialog, component, resizing, fileManager]);
         
+        const options = core.options;
         const context = core.context;
         const contextImage = context.image = {
             _infoList: [], // @Override fileManager
             _infoIndex: 0, // @Override fileManager
             _uploadFileLength: 0, // @Override fileManager
-            sizeUnit: context.option._imageSizeUnit,
+            sizeUnit: options._imageSizeUnit,
             _altText: '',
             _linkElement: null,
             _align: 'none',
@@ -45,13 +46,13 @@ export default {
             _element_t: 0,
             _defaultSizeX: 'auto',
             _defaultSizeY: 'auto',
-            _origin_w: context.option.imageWidth === 'auto' ? '' : context.option.imageWidth,
-            _origin_h: context.option.imageHeight === 'auto' ? '' : context.option.imageHeight,
+            _origin_w: options.imageWidth === 'auto' ? '' : options.imageWidth,
+            _origin_h: options.imageHeight === 'auto' ? '' : options.imageHeight,
             _proportionChecked: true,
-            _resizing: context.option.imageResizing,
-            _resizeDotHide: !context.option.imageHeightShow,
-            _rotation: context.option.imageRotation,
-            _onlyPercentage: context.option.imageSizeOnlyPercentage,
+            _resizing: options.imageResizing,
+            _resizeDotHide: !options.imageHeightShow,
+            _rotation: options.imageRotation,
+            _onlyPercentage: options.imageSizeOnlyPercentage,
             _ratio: false,
             _ratioX: 1,
             _ratioY: 1,
@@ -62,7 +63,7 @@ export default {
         };
 
         /** image dialog */
-        let image_dialog = this.setDialog.call(core);
+        let image_dialog = this.setDialog(core);
         contextImage.modal = image_dialog;
         contextImage.imgInputFile = image_dialog.querySelector('._se_image_file');
         contextImage.imgUrlFile = image_dialog.querySelector('._se_image_url');
@@ -80,8 +81,8 @@ export default {
         if (contextImage.imgInputFile) image_dialog.querySelector('.se-file-remove').addEventListener('click', this._removeSelectedFiles.bind(contextImage.imgInputFile, contextImage.imgUrlFile, contextImage.previewSrc));
         if (contextImage.imgInputFile && contextImage.imgUrlFile) contextImage.imgInputFile.addEventListener('change', this._fileInputChange.bind(contextImage));
 
-        contextImage.imgLink.addEventListener('input', this._onLinkPreview.bind(contextImage.previewLink, contextImage._v_link, context.options.linkProtocol));
-        if (contextImage.imgUrlFile) contextImage.imgUrlFile.addEventListener('input', this._onLinkPreview.bind(contextImage.previewSrc, contextImage._v_src, context.options.linkProtocol));
+        contextImage.imgLink.addEventListener('input', this._onLinkPreview.bind(contextImage.previewLink, contextImage._v_link, options.linkProtocol));
+        if (contextImage.imgUrlFile) contextImage.imgUrlFile.addEventListener('input', this._onLinkPreview.bind(contextImage.previewSrc, contextImage._v_src, options.linkProtocol));
 
         const imageGalleryButton = image_dialog.querySelector('.__se__gallery');
         if (imageGalleryButton) imageGalleryButton.addEventListener('click', this._openGallery.bind(core));
@@ -89,12 +90,12 @@ export default {
         contextImage.proportion = {};
         contextImage.inputX = {};
         contextImage.inputY = {};
-        if (context.option.imageResizing) {
+        if (options.imageResizing) {
             contextImage.proportion = image_dialog.querySelector('._se_image_check_proportion');
             contextImage.inputX = image_dialog.querySelector('._se_image_size_x');
             contextImage.inputY = image_dialog.querySelector('._se_image_size_y');
-            contextImage.inputX.value = context.option.imageWidth;
-            contextImage.inputY.value = context.option.imageHeight;
+            contextImage.inputX.value = options.imageWidth;
+            contextImage.inputY.value = options.imageHeight;
             
             contextImage.inputX.addEventListener('keyup', this.setInputSize.bind(core, 'x'));
             contextImage.inputY.addEventListener('keyup', this.setInputSize.bind(core, 'y'));
@@ -114,10 +115,10 @@ export default {
     },
 
     /** dialog */
-    setDialog: function () {
-        const option = this.context.option;
-        const lang = this.lang;
-        const dialog = this.util.createElement('DIV');
+    setDialog: function (core) {
+        const option = core.options;
+        const lang = core.lang;
+        const dialog = core.util.createElement('DIV');
 
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
@@ -125,7 +126,7 @@ export default {
         let html = '' +
             '<div class="se-dialog-header">' +
                 '<button type="button" data-command="close" class="se-btn se-dialog-close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                    this.icons.cancel +
+                    core.icons.cancel +
                 '</button>' +
                 '<span class="se-modal-title">' + lang.dialogBox.imageBox.title + '</span>' +
             '</div>' +
@@ -143,7 +144,7 @@ export default {
                                 '<label>' + lang.dialogBox.imageBox.file + '</label>' +
                                 '<div class="se-dialog-form-files">' +
                                     '<input class="se-input-form _se_image_file" type="file" accept="' + option.imageAccept + '"' + (option.imageMultipleFile ? ' multiple="multiple"' : '') + '/>' +
-                                    '<button type="button" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
+                                    '<button type="button" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '">' + core.icons.cancel + '</button>' +
                                 '</div>' +
                             '</div>' ;
                     }
@@ -154,7 +155,7 @@ export default {
                                 '<label>' + lang.dialogBox.imageBox.url + '</label>' +
                                 '<div class="se-dialog-form-files">' +
                                     '<input class="se-input-form se-input-url _se_image_url" type="text" />' +
-                                    ((option.imageGalleryUrl && this.plugins.imageGallery) ? '<button type="button" class="se-btn se-dialog-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '">' + this.icons.image_gallery + '</button>' : '') +
+                                    ((option.imageGalleryUrl && core.plugins.imageGallery) ? '<button type="button" class="se-btn se-dialog-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '">' + core.icons.image_gallery + '</button>' : '') +
                                 '</div>' +
                                 '<pre class="se-link-preview"></pre>' +
                             '</div>';
@@ -188,7 +189,7 @@ export default {
                             '<label class="se-dialog-size-x"' + heightDisplay + '>' + (onlyPercentage ? '%' : 'x') + '</label>' +
                             '<input type="text" class="se-input-control _se_image_size_y" placeholder="auto"' + onlyPercentDisplay + (onlyPercentage ? ' max="100"' : '') + heightDisplay + '/>' +
                             '<label' + onlyPercentDisplay + heightDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                            '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;">' + this.icons.revert + '</button>' +
+                            '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;">' + core.icons.revert + '</button>' +
                         '</div>' ;
             }
 
@@ -303,8 +304,8 @@ export default {
         const contextImage = this.context.image;
         
         if (!update) {
-            contextImage.inputX.value = contextImage._origin_w = this.context.option.imageWidth === contextImage._defaultSizeX ? '' : this.context.option.imageWidth;
-            contextImage.inputY.value = contextImage._origin_h = this.context.option.imageHeight === contextImage._defaultSizeY ? '' : this.context.option.imageHeight;
+            contextImage.inputX.value = contextImage._origin_w = this.options.imageWidth === contextImage._defaultSizeX ? '' : this.options.imageWidth;
+            contextImage.inputY.value = contextImage._origin_h = this.options.imageHeight === contextImage._defaultSizeY ? '' : this.options.imageHeight;
             if (contextImage.imgInputFile && this.options.imageMultipleFile) contextImage.imgInputFile.setAttribute('multiple', 'multiple');
         } else {
             if (contextImage.imgInputFile && this.options.imageMultipleFile) contextImage.imgInputFile.removeAttribute('multiple');
@@ -403,7 +404,7 @@ export default {
             }
         }
 
-        const limitSize = this.context.option.imageUploadSizeLimit;
+        const limitSize = this.options.imageUploadSizeLimit;
         if (limitSize > 0) {
             let infoSize = 0;
             const imagesInfo = this.context.image._infoList;
@@ -472,7 +473,7 @@ export default {
             return;
         }
 
-        const imageUploadUrl = this.context.option.imageUploadUrl;
+        const imageUploadUrl = this.options.imageUploadUrl;
         const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
         // server upload
@@ -481,7 +482,7 @@ export default {
             for (let i = 0; i < filesLen; i++) {
                 formData.append('file-' + i, files[i]);
             }
-            this.plugins.fileManager.upload.call(this, imageUploadUrl, this.context.option.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.functions.onImageUploadError);
+            this.plugins.fileManager.upload.call(this, imageUploadUrl, this.options.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.functions.onImageUploadError);
         } else { // base64
             this.plugins.image.setup_reader.call(this, files, info.linkValue, info.linkNewWindow, info.inputWidth, info.inputHeight, info.align, filesLen, info.isUpdate);
         }
@@ -886,8 +887,8 @@ export default {
     applySize: function (w, h) {
         const contextImage = this.context.image;
 
-        if (!w) w = contextImage.inputX.value || this.context.option.imageWidth;
-        if (!h) h = contextImage.inputY.value || this.context.option.imageHeight;
+        if (!w) w = contextImage.inputX.value || this.options.imageWidth;
+        if (!h) h = contextImage.inputY.value || this.options.imageHeight;
         
         if ((contextImage._onlyPercentage && !!w) || /%$/.test(w)) {
             this.plugins.image.setPercentSize.call(this, w, h);
@@ -1074,8 +1075,8 @@ export default {
         this.plugins.image.openTab.call(this, 'init');
 
         if (contextImage._resizing) {
-            contextImage.inputX.value = this.context.option.imageWidth === contextImage._defaultSizeX ? '' : this.context.option.imageWidth;
-            contextImage.inputY.value = this.context.option.imageHeight === contextImage._defaultSizeY ? '' : this.context.option.imageHeight;
+            contextImage.inputX.value = this.options.imageWidth === contextImage._defaultSizeX ? '' : this.options.imageWidth;
+            contextImage.inputY.value = this.options.imageHeight === contextImage._defaultSizeY ? '' : this.options.imageHeight;
             contextImage.proportion.checked = true;
             contextImage._ratio = false;
             contextImage._ratioX = 1;

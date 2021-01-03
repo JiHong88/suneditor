@@ -12,7 +12,7 @@ export default {
     display: 'submenu',
     add: function (core, targetElement) {
         /** set submenu */
-        let listDiv = this.setSubmenu.call(core);
+        let listDiv = this.setSubmenu(core);
 
         /** add event listeners */
         listDiv.querySelector('ul').addEventListener('click', this.horizontalRulePick.bind(core));
@@ -24,9 +24,9 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function () {
-        const lang = this.lang;
-        const listDiv = this.util.createElement('DIV');
+    setSubmenu: function (core) {
+        const lang = core.lang;
+        const listDiv = core.util.createElement('DIV');
 
         listDiv.className = 'se-submenu se-list-layer se-list-line';
         listDiv.innerHTML = '' +

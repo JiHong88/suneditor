@@ -19,7 +19,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = this.setSubmenu.call(core);
+        let listDiv = this.setSubmenu(core);
         let listUl = listDiv.querySelector('ul');
 
         /** add event listeners */
@@ -33,10 +33,10 @@ export default {
         listDiv = null, listUl = null;
     },
 
-    setSubmenu: function () {
-        const option = this.context.option;
-        const lang = this.lang;
-        const listDiv = this.util.createElement('DIV');
+    setSubmenu: function (core) {
+        const option = core.options;
+        const lang = core.lang;
+        const listDiv = core.util.createElement('DIV');
 
         listDiv.className = 'se-submenu se-list-layer se-list-font-size';
 

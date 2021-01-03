@@ -69,6 +69,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         functions: null,
 
         /**
+         * @description Editor options
+         */
+        options: null,
+
+        /**
          * @description Notice object
          */
         notice: _notice,

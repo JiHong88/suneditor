@@ -17,7 +17,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = this.setSubmenu.call(core);
+        let listDiv = this.setSubmenu(core);
 
         /** add event listeners */
         listDiv.querySelector('ul').addEventListener('click', this.pickUp.bind(core));
@@ -31,12 +31,12 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function () {
-        const option = this.context.option;
-        const listDiv = this.util.createElement('DIV');
+    setSubmenu: function (core) {
+        const option = core.options;
+        const listDiv = core.util.createElement('DIV');
         listDiv.className = 'se-submenu se-list-layer se-list-format';
 
-        const menuLang = this.lang.menu;
+        const menuLang = core.lang.menu;
         const defaultList = {
             spaced: {
                 name: menuLang.spaced,

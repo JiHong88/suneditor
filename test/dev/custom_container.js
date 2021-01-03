@@ -22,7 +22,7 @@ export default {
 
         // Generate submenu HTML
         // Always bind "core" when calling a plugin function
-        let listDiv = this.setSubmenu.call(core);
+        let listDiv = this.setSubmenu(core);
 
         // You must bind "core" object when registering an event.
         /** add event listeners */
@@ -34,8 +34,8 @@ export default {
         core.initMenuTarget(this.name, targetElement, listDiv);
     },
 
-    setSubmenu: function () {
-        const listDiv = this.util.createElement('DIV');
+    setSubmenu: function (core) {
+        const listDiv = core.util.createElement('DIV');
 
         listDiv.className = 'se-submenu se-list-layer';
         listDiv.innerHTML = '' +

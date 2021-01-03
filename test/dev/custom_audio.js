@@ -121,14 +121,14 @@ export default {
         core.lang.audio = customAudioLang[core.lang.code];
         
         /** dialog */
-        let audio_dialog = this.setDialog.call(core);
+        let audio_dialog = this.setDialog(core);
         context.customAudio.modal = audio_dialog;
         context.customAudio.fileInput = audio_dialog.querySelector('._se_audio_files');
         context.customAudio.urlInput = audio_dialog.querySelector('.se-input-url');
         context.customAudio.focusElement = context.customAudio.fileInput;
 
         /** controller */
-        let audio_controller = this.setController.call(core);
+        let audio_controller = this.setController(core);
         context.customAudio.controller = audio_controller;
 
         /**
@@ -153,9 +153,9 @@ export default {
     },
 
     /** HTML - dialog */
-    setDialog: function () {
-        const lang = this.lang;
-        const dialog = this.util.createElement('DIV');
+    setDialog: function (core) {
+        const lang = core.lang;
+        const dialog = core.util.createElement('DIV');
 
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
@@ -163,7 +163,7 @@ export default {
             '<form class="editor_link">' +
                 '<div class="se-dialog-header">' +
                     '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                        this.icons.cancel +
+                        core.icons.cancel +
                     '</button>' +
                     '<span class="se-modal-title">' + lang.audio.title + '</span>' +
                 '</div>' +
@@ -172,7 +172,7 @@ export default {
                         '<label>' + lang.audio.file + '</label>' +
                         '<div class="se-dialog-form-files">' +
                             '<input class="se-input-form _se_audio_files" type="file" accept="audio/*" multiple="multiple" />' +
-                            '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
+                            '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '">' + core.icons.cancel + '</button>' +
                         '</div>' +
                     '</div>' +
                     '<div class="se-dialog-form">' +
@@ -191,10 +191,10 @@ export default {
     },
 
     /** HTML - controller */
-    setController: function () {
-        const lang = this.lang;
-        const icons = this.icons;
-        const link_btn = this.util.createElement('DIV');
+    setController: function (core) {
+        const lang = core.lang;
+        const icons = core.icons;
+        const link_btn = core.util.createElement('DIV');
 
         link_btn.className = 'se-controller se-controller-link';
         link_btn.innerHTML = '' +

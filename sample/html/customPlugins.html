@@ -225,7 +225,7 @@
 
         <span class="pl-c">// Generate submenu HTML</span>
         <span class="pl-c">// Always bind "core" when calling a plugin function</span>
-        <span class="pl-k">let</span> <span class="pl-s1">listDiv</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">setSubmenu</span><span class="pl-kos">.</span><span class="pl-en">call</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-k">let</span> <span class="pl-s1">listDiv</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">setSubmenu</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
 
         <span class="pl-c">// You must bind "core" object when registering an event.</span>
         <span class="pl-c">/** add event listeners */</span>
@@ -237,9 +237,9 @@
         <span class="pl-s1">core</span><span class="pl-kos">.</span><span class="pl-en">initMenuTarget</span><span class="pl-kos">(</span><span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">name</span><span class="pl-kos">,</span> <span class="pl-s1">targetElement</span><span class="pl-kos">,</span> <span class="pl-s1">listDiv</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
     <span class="pl-kos">}</span><span class="pl-kos">,</span>
 
-    <span class="pl-en">setSubmenu</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-        <span class="pl-k">const</span> <span class="pl-s1">listDiv</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
-        <span class="pl-k">const</span> <span class="pl-s1">icons</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">icons</span><span class="pl-kos">;</span> <span class="pl-c">// assets/defaultIcons.js</span>
+    <span class="pl-en">setSubmenu</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-smi">core</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">const</span> <span class="pl-s1">listDiv</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-k">const</span> <span class="pl-s1">icons</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">icons</span><span class="pl-kos">;</span> <span class="pl-c">// assets/defaultIcons.js</span>
         <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'se-list-layer'</span><span class="pl-kos">;</span>
         <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">innerHTML</span> <span class="pl-c1">=</span> <span class="pl-s">''</span> <span class="pl-c1">+</span>
             <span class="pl-s">'&lt;div class="se-list-inner"&gt;'</span> <span class="pl-c1">+</span>
@@ -480,7 +480,7 @@
 
         <span class="pl-c">// Generate submenu HTML</span>
         <span class="pl-c">// Always bind "core" when calling a plugin function</span>
-        <span class="pl-k">let</span> <span class="pl-s1">listDiv</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">setSubmenu</span><span class="pl-kos">.</span><span class="pl-en">call</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-k">let</span> <span class="pl-s1">listDiv</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">setSubmenu</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
 
         <span class="pl-c">// Input tag caching</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customSubmenu</span><span class="pl-kos">.</span><span class="pl-c1">textElement</span> <span class="pl-c1">=</span> <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'input'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
@@ -496,8 +496,8 @@
         <span class="pl-s1">core</span><span class="pl-kos">.</span><span class="pl-en">initMenuTarget</span><span class="pl-kos">(</span><span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">name</span><span class="pl-kos">,</span> <span class="pl-s1">targetElement</span><span class="pl-kos">,</span> <span class="pl-s1">listDiv</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
     <span class="pl-kos">}</span><span class="pl-kos">,</span>
 
-    <span class="pl-en">setSubmenu</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-        <span class="pl-k">const</span> <span class="pl-s1">listDiv</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-en">setSubmenu</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-smi">core</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">const</span> <span class="pl-s1">listDiv</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-c">// <span class="pl-k">@Required</span></span>
         <span class="pl-c">// A "se-submenu" class is required for the top level element.</span>
         <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'se-submenu se-list-layer'</span><span class="pl-kos">;</span>
@@ -629,14 +629,14 @@
         <span class="pl-kos">}</span><span class="pl-kos">;</span>
 
         <span class="pl-c">/** link dialog */</span>
-        <span class="pl-k">let</span> <span class="pl-s1">link_dialog</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">setDialog</span><span class="pl-kos">.</span><span class="pl-en">call</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-k">let</span> <span class="pl-s1">link_dialog</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">setDialog</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">modal</span> <span class="pl-c1">=</span> <span class="pl-s1">link_dialog</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">focusElement</span> <span class="pl-c1">=</span> <span class="pl-s1">link_dialog</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'._se_link_url'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">linkAnchorText</span> <span class="pl-c1">=</span> <span class="pl-s1">link_dialog</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'._se_link_text'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">targetSelect</span> <span class="pl-c1">=</span> <span class="pl-s1">link_dialog</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'.se-input-select'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
 
         <span class="pl-c">/** link controller */</span>
-        <span class="pl-k">let</span> <span class="pl-s1">link_controller</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">setController_LinkButton</span><span class="pl-kos">.</span><span class="pl-en">call</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-k">let</span> <span class="pl-s1">link_controller</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">setController_LinkButton</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">linkController</span> <span class="pl-c1">=</span> <span class="pl-s1">link_controller</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customLink</span><span class="pl-kos">.</span><span class="pl-c1">_linkAnchor</span> <span class="pl-c1">=</span> null<span class="pl-kos">;</span>
 
@@ -655,9 +655,9 @@
     <span class="pl-kos">}</span><span class="pl-kos">,</span>
 
     <span class="pl-c">/** dialog */</span>
-    <span class="pl-en">setDialog</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-        <span class="pl-k">const</span> <span class="pl-s1">lang</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">lang</span><span class="pl-kos">;</span>
-        <span class="pl-k">const</span> <span class="pl-s1">dialog</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-en">setDialog</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-smi">core</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">const</span> <span class="pl-s1">lang</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">lang</span><span class="pl-kos">;</span>
+        <span class="pl-k">const</span> <span class="pl-s1">dialog</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-k">const</span> <span class="pl-s1">targetList</span> <span class="pl-c1">=</span> <span class="pl-kos">[</span>
             <span class="pl-kos">{</span> <span class="pl-c1">target</span>: <span class="pl-s">'_blank'</span><span class="pl-kos">,</span> <span class="pl-c1">name</span>: <span class="pl-s">'New window'</span><span class="pl-kos">}</span><span class="pl-kos">,</span>
             <span class="pl-kos">{</span> <span class="pl-c1">target</span>: <span class="pl-s">'_parent'</span><span class="pl-kos">,</span> <span class="pl-c1">name</span>: <span class="pl-s">'Parent frame'</span><span class="pl-kos">}</span><span class="pl-kos">,</span>
@@ -672,7 +672,7 @@
             <span class="pl-s">'&lt;form class="editor_link"&gt;'</span> <span class="pl-c1">+</span>
                 <span class="pl-s">'&lt;div class="se-dialog-header"&gt;'</span> <span class="pl-c1">+</span>
                     <span class="pl-s">'&lt;button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="'</span> <span class="pl-c1">+</span> <span class="pl-s1">lang</span><span class="pl-kos">.</span><span class="pl-c1">dialogBox</span><span class="pl-kos">.</span><span class="pl-c1">close</span> <span class="pl-c1">+</span> <span class="pl-s">'"&gt;'</span> <span class="pl-c1">+</span>
-                        <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">icons</span><span class="pl-kos">.</span><span class="pl-c1">cancel</span> <span class="pl-c1">+</span>
+                        <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">icons</span><span class="pl-kos">.</span><span class="pl-c1">cancel</span> <span class="pl-c1">+</span>
                     <span class="pl-s">'&lt;/button&gt;'</span> <span class="pl-c1">+</span>
                     <span class="pl-s">'&lt;span class="se-modal-title"&gt;'</span> <span class="pl-c1">+</span> <span class="pl-s1">lang</span><span class="pl-kos">.</span><span class="pl-c1">dialogBox</span><span class="pl-kos">.</span><span class="pl-c1">linkBox</span><span class="pl-kos">.</span><span class="pl-c1">title</span> <span class="pl-c1">+</span> <span class="pl-s">'&lt;/span&gt;'</span> <span class="pl-c1">+</span>
                 <span class="pl-s">'&lt;/div&gt;'</span> <span class="pl-c1">+</span>
@@ -706,10 +706,10 @@
     <span class="pl-kos">}</span><span class="pl-kos">,</span>
 
     <span class="pl-c">/** modify controller button */</span>
-    <span class="pl-en">setController_LinkButton</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-        <span class="pl-k">const</span> <span class="pl-s1">lang</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">lang</span><span class="pl-kos">;</span>
-        <span class="pl-k">const</span> <span class="pl-s1">icons</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">icons</span><span class="pl-kos">;</span>
-        <span class="pl-k">const</span> <span class="pl-s1">link_btn</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-en">setController_LinkButton</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-smi">core</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">const</span> <span class="pl-s1">lang</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">lang</span><span class="pl-kos">;</span>
+        <span class="pl-k">const</span> <span class="pl-s1">icons</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">icons</span><span class="pl-kos">;</span>
+        <span class="pl-k">const</span> <span class="pl-s1">link_btn</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
 
         <span class="pl-s1">link_btn</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'se-controller se-controller-link'</span><span class="pl-kos">;</span>
         <span class="pl-s1">link_btn</span><span class="pl-kos">.</span><span class="pl-c1">innerHTML</span> <span class="pl-c1">=</span> <span class="pl-s">''</span> <span class="pl-c1">+</span>
@@ -1077,14 +1077,14 @@
         <span class="pl-s1">core</span><span class="pl-kos">.</span><span class="pl-c1">lang</span><span class="pl-kos">.</span><span class="pl-c1">audio</span> <span class="pl-c1">=</span> <span class="pl-s1">customAudioLang</span><span class="pl-kos">[</span><span class="pl-s1">core</span><span class="pl-kos">.</span><span class="pl-c1">lang</span><span class="pl-kos">.</span><span class="pl-c1">code</span><span class="pl-kos">]</span><span class="pl-kos">;</span>
         
         <span class="pl-c">/** dialog */</span>
-        <span class="pl-k">let</span> <span class="pl-s1">audio_dialog</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">setDialog</span><span class="pl-kos">.</span><span class="pl-en">call</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-k">let</span> <span class="pl-s1">audio_dialog</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">setDialog</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customAudio</span><span class="pl-kos">.</span><span class="pl-c1">modal</span> <span class="pl-c1">=</span> <span class="pl-s1">audio_dialog</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customAudio</span><span class="pl-kos">.</span><span class="pl-c1">fileInput</span> <span class="pl-c1">=</span> <span class="pl-s1">audio_dialog</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'._se_audio_files'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customAudio</span><span class="pl-kos">.</span><span class="pl-c1">urlInput</span> <span class="pl-c1">=</span> <span class="pl-s1">audio_dialog</span><span class="pl-kos">.</span><span class="pl-en">querySelector</span><span class="pl-kos">(</span><span class="pl-s">'.se-input-url'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customAudio</span><span class="pl-kos">.</span><span class="pl-c1">focusElement</span> <span class="pl-c1">=</span> <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customAudio</span><span class="pl-kos">.</span><span class="pl-c1">fileInput</span><span class="pl-kos">;</span>
 
         <span class="pl-c">/** controller */</span>
-        <span class="pl-k">let</span> <span class="pl-s1">audio_controller</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">setController</span><span class="pl-kos">.</span><span class="pl-en">call</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+        <span class="pl-k">let</span> <span class="pl-s1">audio_controller</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-en">setController</span><span class="pl-kos">(</span><span class="pl-s1">core</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-s1">context</span><span class="pl-kos">.</span><span class="pl-c1">customAudio</span><span class="pl-kos">.</span><span class="pl-c1">controller</span> <span class="pl-c1">=</span> <span class="pl-s1">audio_controller</span><span class="pl-kos">;</span>
 
         <span class="pl-c">/** add event listeners */</span>
@@ -1103,9 +1103,9 @@
     <span class="pl-kos">}</span><span class="pl-kos">,</span>
 
     <span class="pl-c">/** HTML - dialog */</span>
-    <span class="pl-en">setDialog</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-        <span class="pl-k">const</span> <span class="pl-s1">lang</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">lang</span><span class="pl-kos">;</span>
-        <span class="pl-k">const</span> <span class="pl-s1">dialog</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-en">setDialog</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-smi">core</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">const</span> <span class="pl-s1">lang</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">lang</span><span class="pl-kos">;</span>
+        <span class="pl-k">const</span> <span class="pl-s1">dialog</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
 
         <span class="pl-s1">dialog</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'se-dialog-content'</span><span class="pl-kos">;</span>
         <span class="pl-s1">dialog</span><span class="pl-kos">.</span><span class="pl-c1">style</span><span class="pl-kos">.</span><span class="pl-c1">display</span> <span class="pl-c1">=</span> <span class="pl-s">'none'</span><span class="pl-kos">;</span>
@@ -1113,7 +1113,7 @@
             <span class="pl-s">'&lt;form class="editor_link"&gt;'</span> <span class="pl-c1">+</span>
                 <span class="pl-s">'&lt;div class="se-dialog-header"&gt;'</span> <span class="pl-c1">+</span>
                     <span class="pl-s">'&lt;button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="'</span> <span class="pl-c1">+</span> <span class="pl-s1">lang</span><span class="pl-kos">.</span><span class="pl-c1">dialogBox</span><span class="pl-kos">.</span><span class="pl-c1">close</span> <span class="pl-c1">+</span> <span class="pl-s">'"&gt;'</span> <span class="pl-c1">+</span>
-                        <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">icons</span><span class="pl-kos">.</span><span class="pl-c1">cancel</span> <span class="pl-c1">+</span>
+                        <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">icons</span><span class="pl-kos">.</span><span class="pl-c1">cancel</span> <span class="pl-c1">+</span>
                     <span class="pl-s">'&lt;/button&gt;'</span> <span class="pl-c1">+</span>
                     <span class="pl-s">'&lt;span class="se-modal-title"&gt;'</span> <span class="pl-c1">+</span> <span class="pl-s1">lang</span><span class="pl-kos">.</span><span class="pl-c1">audio</span><span class="pl-kos">.</span><span class="pl-c1">title</span> <span class="pl-c1">+</span> <span class="pl-s">'&lt;/span&gt;'</span> <span class="pl-c1">+</span>
                 <span class="pl-s">'&lt;/div&gt;'</span> <span class="pl-c1">+</span>
@@ -1122,7 +1122,7 @@
                         <span class="pl-s">'&lt;label&gt;'</span> <span class="pl-c1">+</span> <span class="pl-s1">lang</span><span class="pl-kos">.</span><span class="pl-c1">audio</span><span class="pl-kos">.</span><span class="pl-c1">file</span> <span class="pl-c1">+</span> <span class="pl-s">'&lt;/label&gt;'</span> <span class="pl-c1">+</span>
                         <span class="pl-s">'&lt;div class="se-dialog-form-files"&gt;'</span> <span class="pl-c1">+</span>
                             <span class="pl-s">'&lt;input class="se-input-form _se_audio_files" type="file" accept="audio/*" multiple="multiple" /&gt;'</span> <span class="pl-c1">+</span>
-                            <span class="pl-s">'&lt;button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="'</span> <span class="pl-c1">+</span> <span class="pl-s1">lang</span><span class="pl-kos">.</span><span class="pl-c1">controller</span><span class="pl-kos">.</span><span class="pl-c1">remove</span> <span class="pl-c1">+</span> <span class="pl-s">'"&gt;'</span> <span class="pl-c1">+</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">icons</span><span class="pl-kos">.</span><span class="pl-c1">cancel</span> <span class="pl-c1">+</span> <span class="pl-s">'&lt;/button&gt;'</span> <span class="pl-c1">+</span>
+                            <span class="pl-s">'&lt;button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="'</span> <span class="pl-c1">+</span> <span class="pl-s1">lang</span><span class="pl-kos">.</span><span class="pl-c1">controller</span><span class="pl-kos">.</span><span class="pl-c1">remove</span> <span class="pl-c1">+</span> <span class="pl-s">'"&gt;'</span> <span class="pl-c1">+</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">icons</span><span class="pl-kos">.</span><span class="pl-c1">cancel</span> <span class="pl-c1">+</span> <span class="pl-s">'&lt;/button&gt;'</span> <span class="pl-c1">+</span>
                         <span class="pl-s">'&lt;/div&gt;'</span> <span class="pl-c1">+</span>
                     <span class="pl-s">'&lt;/div&gt;'</span> <span class="pl-c1">+</span>
                     <span class="pl-s">'&lt;div class="se-dialog-form"&gt;'</span> <span class="pl-c1">+</span>
@@ -1141,10 +1141,10 @@
     <span class="pl-kos">}</span><span class="pl-kos">,</span>
 
     <span class="pl-c">/** HTML - controller */</span>
-    <span class="pl-en">setController</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
-        <span class="pl-k">const</span> <span class="pl-s1">lang</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">lang</span><span class="pl-kos">;</span>
-        <span class="pl-k">const</span> <span class="pl-s1">icons</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">icons</span><span class="pl-kos">;</span>
-        <span class="pl-k">const</span> <span class="pl-s1">link_btn</span> <span class="pl-c1">=</span> <span class="pl-smi">this</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
+    <span class="pl-en">setController</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-smi">core</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
+        <span class="pl-k">const</span> <span class="pl-s1">lang</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">lang</span><span class="pl-kos">;</span>
+        <span class="pl-k">const</span> <span class="pl-s1">icons</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">icons</span><span class="pl-kos">;</span>
+        <span class="pl-k">const</span> <span class="pl-s1">link_btn</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
 
         <span class="pl-s1">link_btn</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'se-controller se-controller-link'</span><span class="pl-kos">;</span>
         <span class="pl-s1">link_btn</span><span class="pl-kos">.</span><span class="pl-c1">innerHTML</span> <span class="pl-c1">=</span> <span class="pl-s">''</span> <span class="pl-c1">+</span>
@@ -1550,7 +1550,7 @@
 
             // Generate submenu HTML
             // Always bind "core" when calling a plugin function
-            let listDiv = this.setSubmenu.call(core);
+            let listDiv = this.setSubmenu(core);
 
             // You must bind "core" object when registering an event.
             /** add event listeners */
@@ -1562,9 +1562,9 @@
             core.initMenuTarget(this.name, targetElement, listDiv);
         },
 
-        setSubmenu: function () {
-            const listDiv = this.util.createElement('DIV');
-            const icons = this.icons; // assets/defaultIcons.js
+        setSubmenu: function (core) {
+            const listDiv = core.util.createElement('DIV');
+            const icons = core.icons; // assets/defaultIcons.js
             listDiv.className = 'se-list-layer';
             listDiv.innerHTML = '' +
                 '<div class="se-list-inner">' +
@@ -1768,7 +1768,7 @@
 
             // Generate submenu HTML
             // Always bind "core" when calling a plugin function
-            let listDiv = this.setSubmenu.call(core);
+            let listDiv = this.setSubmenu(core);
 
             // Input tag caching
             context.customSubmenu.textElement = listDiv.querySelector('input');
@@ -1784,8 +1784,8 @@
             core.initMenuTarget(this.name, targetElement, listDiv);
         },
 
-        setSubmenu: function () {
-            const listDiv = this.util.createElement('DIV');
+        setSubmenu: function (core) {
+            const listDiv = core.util.createElement('DIV');
             // @Required
             // A "se-submenu" class is required for the top level element.
             listDiv.className = 'se-submenu se-list-layer';
@@ -1898,14 +1898,14 @@
             };
 
             /** link dialog */
-            let link_dialog = this.setDialog.call(core);
+            let link_dialog = this.setDialog(core);
             context.customLink.modal = link_dialog;
             context.customLink.focusElement = link_dialog.querySelector('._se_link_url');
             context.customLink.linkAnchorText = link_dialog.querySelector('._se_link_text');
             context.customLink.targetSelect = link_dialog.querySelector('.se-input-select');
 
             /** link controller */
-            let link_controller = this.setController_LinkButton.call(core);
+            let link_controller = this.setController_LinkButton(core);
             context.customLink.linkController = link_controller;
             context.customLink._linkAnchor = null;
 
@@ -1924,9 +1924,9 @@
         },
 
         /** dialog */
-        setDialog: function () {
-            const lang = this.lang;
-            const dialog = this.util.createElement('DIV');
+        setDialog: function (core) {
+            const lang = core.lang;
+            const dialog = core.util.createElement('DIV');
             const targetList = [
                 { target: '_blank', name: 'New window'},
                 { target: '_parent', name: 'Parent frame'},
@@ -1941,7 +1941,7 @@
                 '<form class="editor_link">' +
                     '<div class="se-dialog-header">' +
                         '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                            this.icons.cancel +
+                            core.icons.cancel +
                         '</button>' +
                         '<span class="se-modal-title">' + lang.dialogBox.linkBox.title + '</span>' +
                     '</div>' +
@@ -1975,10 +1975,10 @@
         },
 
         /** modify controller button */
-        setController_LinkButton: function () {
-            const lang = this.lang;
-            const icons = this.icons;
-            const link_btn = this.util.createElement('DIV');
+        setController_LinkButton: function (core) {
+            const lang = core.lang;
+            const icons = core.icons;
+            const link_btn = core.util.createElement('DIV');
 
             link_btn.className = 'se-controller se-controller-link';
             link_btn.innerHTML = '' +
@@ -2295,14 +2295,14 @@
             core.lang.audio = customAudioLang[core.lang.code];
             
             /** dialog */
-            let audio_dialog = this.setDialog.call(core);
+            let audio_dialog = this.setDialog(core);
             context.customAudio.modal = audio_dialog;
             context.customAudio.fileInput = audio_dialog.querySelector('._se_audio_files');
             context.customAudio.urlInput = audio_dialog.querySelector('.se-input-url');
             context.customAudio.focusElement = context.customAudio.fileInput;
 
             /** controller */
-            let audio_controller = this.setController.call(core);
+            let audio_controller = this.setController(core);
             context.customAudio.controller = audio_controller;
 
             /** add event listeners */
@@ -2321,9 +2321,9 @@
         },
 
         /** HTML - dialog */
-        setDialog: function () {
-            const lang = this.lang;
-            const dialog = this.util.createElement('DIV');
+        setDialog: function (core) {
+            const lang = core.lang;
+            const dialog = core.util.createElement('DIV');
 
             dialog.className = 'se-dialog-content';
             dialog.style.display = 'none';
@@ -2331,7 +2331,7 @@
                 '<form class="editor_link">' +
                     '<div class="se-dialog-header">' +
                         '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                            this.icons.cancel +
+                            core.icons.cancel +
                         '</button>' +
                         '<span class="se-modal-title">' + lang.audio.title + '</span>' +
                     '</div>' +
@@ -2340,7 +2340,7 @@
                             '<label>' + lang.audio.file + '</label>' +
                             '<div class="se-dialog-form-files">' +
                                 '<input class="se-input-form _se_audio_files" type="file" accept="audio/*" multiple="multiple" />' +
-                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
+                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button" title="' + lang.controller.remove + '">' + core.icons.cancel + '</button>' +
                             '</div>' +
                         '</div>' +
                         '<div class="se-dialog-form">' +
@@ -2359,10 +2359,10 @@
         },
 
         /** HTML - controller */
-        setController: function () {
-            const lang = this.lang;
-            const icons = this.icons;
-            const link_btn = this.util.createElement('DIV');
+        setController: function (core) {
+            const lang = core.lang;
+            const icons = core.icons;
+            const link_btn = core.util.createElement('DIV');
 
             link_btn.className = 'se-controller se-controller-link';
             link_btn.innerHTML = '' +
