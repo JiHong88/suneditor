@@ -13,6 +13,7 @@ import pt_br from './pt_br';
 import ro from './ro';
 import ru from './ru';
 import se from './se';
+import ua from './ua';
 import zh_cn from './zh_cn';
 
-export { ckb, da, de, en, es, fr, it, ja, ko, lv, pl, pt_br, ro, ru, se, zh_cn };
+export { ckb, da, de, en, es, fr, it, ja, ko, lv, pl, pt_br, ro, ru, se, ua, zh_cn };
