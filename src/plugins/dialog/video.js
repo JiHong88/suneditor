@@ -66,7 +66,7 @@ export default {
         contextVideo.preview = video_dialog.querySelector('.se-link-preview');
 
         /** add event listeners */
-        video_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        video_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core));
         if (contextVideo.videoInputFile) video_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(contextVideo.videoInputFile, contextVideo.videoUrlFile, contextVideo.preview));
         if (contextVideo.videoInputFile && contextVideo.videoUrlFile) contextVideo.videoInputFile.addEventListener('change', this._fileInputChange.bind(contextVideo));
         if (contextVideo.videoUrlFile) contextVideo.videoUrlFile.addEventListener('input', this._onLinkPreview.bind(contextVideo.preview, contextVideo, options.linkProtocol));

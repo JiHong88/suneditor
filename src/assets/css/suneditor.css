@@ -239,8 +239,8 @@
 /** --- form group - input -------------------------------------------------------------- */
 .sun-editor .se-form-group {display:flex; width:100%; min-height:40px; height:auto; padding:4px;}
 .sun-editor .se-form-group input {flex:auto; display:inline-block; width:auto; height:33px; font-size:12px; margin:1px 0 1px 0; padding:0; border-radius:0.25rem; border:1px solid #ccc;}
-.sun-editor .se-form-group button {float:right; width:34px; height:34px; margin:0 2px !important;}
-.sun-editor .se-form-group button.se-btn {border:1px solid #ccc;}
+.sun-editor .se-form-group button, .sun-editor .se-submenu-form-group button {float:right; width:34px; height:34px; margin:0 2px !important;}
+.sun-editor .se-form-group button.se-btn, .sun-editor .se-form-group button.se-btn {border:1px solid #ccc;}
 .sun-editor .se-form-group > div {position:relative;}
 .sun-editor .se-form-group label {display:inline-block; max-width:100%; margin-bottom:5px; font-weight:bold;}
 

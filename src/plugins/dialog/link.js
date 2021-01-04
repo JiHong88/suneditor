@@ -38,7 +38,7 @@ export default {
         context.link._linkAnchor = null;
 
         /** add event listeners */
-        link_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        link_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core));
         link_controller.addEventListener('click', this.onClick_linkController.bind(core));
         context.link.focusElement.addEventListener('input', this._onLinkPreview.bind(context.link.preview, context.link, core.options.linkProtocol));
 

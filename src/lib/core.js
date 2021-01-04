@@ -774,6 +774,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const l = offset.left - context.element.wysiwygFrame.scrollLeft + addOffset.left;
             const controllerW = controller.offsetWidth;
             const referElW = referEl.offsetWidth;
+            
+            const allow = util.hasClass(controller.firstElementChild, 'se-arrow') ? controller.firstElementChild : null;
 
             // rtl (Width value of the arrow element is 22px)
             if (options.rtl) {
@@ -782,13 +784,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 controller.style.left = (l - rtlW + rtlL) + 'px';
                 
                 if (rtlW > 0) {
-                    controller.firstElementChild.style.left = ((controllerW - 14 < 10 + rtlW) ? (controllerW - 14) : (10 + rtlW)) + 'px';
+                    if (allow) allow.style.left = ((controllerW - 14 < 10 + rtlW) ? (controllerW - 14) : (10 + rtlW)) + 'px';
                 }
                 
                 const overSize = context.element.wysiwygFrame.offsetLeft - controller.offsetLeft;
                 if (overSize > 0) {
                     controller.style.left = '0px';
-                    controller.firstElementChild.style.left = overSize + 'px';
+                    if (allow) allow.style.left = overSize + 'px';
                 }
             } else {
                 controller.style.left = l + 'px';
@@ -796,9 +798,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const overSize = context.element.wysiwygFrame.offsetWidth - (controller.offsetLeft + controllerW);
                 if (overSize < 0) {
                     controller.style.left = (controller.offsetLeft + overSize) + 'px';
-                    controller.firstElementChild.style.left = (20 - overSize) + 'px';
+                    if (allow) allow.style.left = (20 - overSize) + 'px';
                 } else {
-                    controller.firstElementChild.style.left = '20px';
+                    if (allow) allow.style.left = '20px';
                 }
             }
 

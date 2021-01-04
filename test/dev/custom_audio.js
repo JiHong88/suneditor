@@ -139,7 +139,7 @@ export default {
 
         /** add event listeners */
         audio_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(context.fileInput, context.urlInput));
-        audio_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        audio_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core));
         audio_controller.addEventListener('click', this.onClick_controller.bind(core));
 
         /** append html */

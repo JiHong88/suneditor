@@ -46,7 +46,7 @@ export default {
         contextAudio.controller = audio_controller;
 
         /** add event listeners */
-        audio_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        audio_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core));
         if (contextAudio.audioInputFile) audio_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(contextAudio.audioInputFile, contextAudio.audioUrlFile, contextAudio.preview));
         if (contextAudio.audioInputFile && contextAudio.audioUrlFile) contextAudio.audioInputFile.addEventListener('change', this._fileInputChange.bind(contextAudio));
         audio_controller.addEventListener('click', this.onClick_controller.bind(core));

@@ -32,7 +32,7 @@ export default {
         context.math._mathExp = null;
 
         /** add event listeners */
-        math_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core), false);
+        math_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core), false);
         math_controller.addEventListener('click', this.onClick_mathController.bind(core));
 
         /** append html */

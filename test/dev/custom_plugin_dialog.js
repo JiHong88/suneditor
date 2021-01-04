@@ -52,7 +52,7 @@ export default {
         link_controller.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** add event listeners */
-        link_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        link_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core));
         link_controller.addEventListener('click', this.onClick_linkController.bind(core));
 
         /** append html */
