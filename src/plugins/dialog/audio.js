@@ -22,7 +22,7 @@ export default {
             _infoList: [], // @Override fileManager
             _infoIndex: 0, // @Override fileManager
             _uploadFileLength: 0, // @Override fileManager
-            focusElement: null, // @Override // This element has focus when the dialog is opened.
+            focusElement: null, // @Override dialog // This element has focus when the dialog is opened.
             targetSelect: null,
             _origin_w: core.options.audioWidth,
             _origin_h: core.options.audioHeight,

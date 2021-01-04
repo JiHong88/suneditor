@@ -24,6 +24,7 @@ export default {
             _infoList: [], // @Override fileManager
             _infoIndex: 0, // @Override fileManager
             _uploadFileLength: 0, // @Override fileManager
+            focusElement: null, // @Override dialog // This element has focus when the dialog is opened.
             sizeUnit: options._videoSizeUnit,
             _align: 'none',
             _floatClassRegExp: '__se__float\\-[a-z]+',

@@ -17,7 +17,7 @@ export default {
 
         const context = core.context;
         context.link = {
-            focusElement: null,
+            focusElement: null, // @Override dialog // This element has focus when the dialog is opened.
             linkNewWindowCheck: null,
             linkAnchorText: null,
             _linkAnchor: null,

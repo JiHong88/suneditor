@@ -10,7 +10,7 @@ export default {
 
         const context = core.context;
         context.math = {
-            focusElement: null,
+            focusElement: null, // @Override dialog // This element has focus when the dialog is opened.
             previewElement: null,
             fontSizeElement: null,
             _mathExp: null
