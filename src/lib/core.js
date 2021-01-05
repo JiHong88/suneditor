@@ -6537,6 +6537,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onMouseDown_resizingBar: function (e) {
             e.stopPropagation();
 
+            core.submenuOff();
+            core.controllersOff();
+
             core._variable.resizeClientY = e.clientY;
             context.element.resizeBackground.style.display = 'block';
 
