@@ -469,19 +469,17 @@
                 }
             }
 
-            if (this.currentControllerName !== plugin) {
-                this.util.setDisabledButtons(true, this.resizingDisabledButtons);
-                resizeContainer.style.display = 'block';
+            this.util.setDisabledButtons(true, this.resizingDisabledButtons);
+            resizeContainer.style.display = 'block';
 
-                const addOffset = {left: 0, top: 50};
-                if (this.options.iframe) {
-                    addOffset.left -= this.context.element.wysiwygFrame.parentElement.offsetLeft;
-                    addOffset.top -= this.context.element.wysiwygFrame.parentElement.offsetTop;
-                }
-
-                this.setControllerPosition(contextResizing.resizeButton, resizeContainer, 'bottom', addOffset);
-                this.controllersOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
+            const addOffset = {left: 0, top: 50};
+            if (this.options.iframe) {
+                addOffset.left -= this.context.element.wysiwygFrame.parentElement.offsetLeft;
+                addOffset.top -= this.context.element.wysiwygFrame.parentElement.offsetTop;
             }
+
+            this.setControllerPosition(contextResizing.resizeButton, resizeContainer, 'bottom', addOffset);
+            this.controllersOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
     
             contextResizing._resize_w = w;
             contextResizing._resize_h = h;
@@ -513,11 +511,11 @@
             this.plugins.resizing._closeAlignMenu = function () {
                 this.util.removeClass(this.context.resizing.alignButton, 'on');
                 this.context.resizing.alignMenu.style.display = 'none';
-                this.removeDocEvent('mousedown', this.plugins.resizing._closeAlignMenu);
+                this.removeDocEvent('click', this.plugins.resizing._closeAlignMenu);
                 this.plugins.resizing._closeAlignMenu = null;
             }.bind(this);
     
-            this.addDocEvent('mousedown', this.plugins.resizing._closeAlignMenu);
+            this.addDocEvent('click', this.plugins.resizing._closeAlignMenu);
         },
     
         /**
