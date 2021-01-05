@@ -3933,7 +3933,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             } else if (/submenu/.test(display)) {
                 this.submenuOff();
-            } else {
+            } else if (!/command/.test(display)) {
                 this.submenuOff();
                 this.containerOff();
             }
