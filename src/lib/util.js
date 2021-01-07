@@ -1018,7 +1018,7 @@ const util = {
 
         return {
             left: offsetLeft + (iframe ? wysiwygFrame.parentElement.offsetLeft : 0),
-            top: (offsetTop - wysiwyg.scrollTop) + (iframe ? wysiwygFrame.parentElement.offsetTop : 0)
+            top: (offsetTop - wysiwyg ? wysiwyg.scrollTop : 0) + (iframe ? wysiwygFrame.parentElement.offsetTop : 0)
         };
     },
 
