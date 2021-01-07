@@ -925,15 +925,6 @@ export default {
         element.setAttribute('data-align', align);
     },
 
-    resetAlign: function () {
-        const contextVideo = this.context.video;
-
-        contextVideo._element.setAttribute('data-align', '');
-        contextVideo._align = 'none';
-        contextVideo._cover.style.margin = '0';
-        this.util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
-    },
-
     /**
      * @Override dialog
      */

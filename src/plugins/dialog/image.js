@@ -1046,15 +1046,6 @@ export default {
         element.setAttribute('data-align', align);
     },
 
-    resetAlign: function () {
-        const contextImage = this.context.image;
-
-        contextImage._element.setAttribute('data-align', '');
-        contextImage._align = 'none';
-        contextImage._cover.style.margin = '0';
-        this.util.removeClass(contextImage._container, contextImage._floatClassRegExp);
-    },
-
     /**
      * @Override dialog
      */
