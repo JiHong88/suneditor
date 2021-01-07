@@ -7084,11 +7084,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onInput: null,
         onKeyDown: null,
         onKeyUp: null,
-        onChange: null,
         onCopy: null,
         onCut: null,
         onFocus: null,
         onBlur: null,
+
+        /**
+         * @description Event functions
+         * @param {String} contents Current contents
+         * @param {Object} core Core object
+         */
+        onChange: null,
 
         /**
          * @description Event functions (drop, paste)

@@ -2,7 +2,7 @@ import { Lang } from './lang/Lang';
 import { Plugin } from './plugins/Plugin';
 
 export interface SunEditorOptions {
-    plugins: Plugin[] | Record<string, Plugin>;
+    plugins?: Plugin[] | Record<string, Plugin>;
     /**
      * Values
      * ======
@@ -478,41 +478,4 @@ export type TemplatesItem = { name: string; html: string };
 export type LineHeightsItem = { text: string; value: number };
 export type ParagraphStyles = (string | { name: string; class: string; _class?: string })[];
 export type TextStyles = (string | { name: string; style: string; tag: string; _class?: string })[];
-export type ButtonListDefaults =
-  | '/' // Line Break
-  | 'bold'
-  | 'underline'
-  | 'italic'
-  | 'strike'
-  | 'subscript'
-  | 'superscript'
-  | 'removeFormat'
-  | 'indent'
-  | 'outdent'
-  | 'fullScreen'
-  | 'showBlocks'
-  | 'codeView'
-  | 'undo'
-  | 'redo'
-  | 'preview'
-  | 'print'
-  | 'save'
-  | 'font'
-  | 'formatBlock'
-  | 'fontSize'
-  | 'fontColor'
-  | 'hiliteColor'
-  | 'align'
-  | 'list'
-  | 'horizontalRule'
-  | 'table'
-  | 'lineHeight'
-  | 'template'
-  | 'paragraphStyle'
-  | 'textStyle'
-  | 'link'
-  | 'image'
-  | 'video'
-  | 'math'
-  | 'imageGallery';
-export type ButtonListItem = ButtonListDefaults | ButtonListDefaults[] | string[];
+export type ButtonListItem = any;
