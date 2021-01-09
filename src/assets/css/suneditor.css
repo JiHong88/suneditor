@@ -488,6 +488,7 @@
 
 /** controller--- */
 .sun-editor.se-rtl .se-controller .se-btn-group {direction:rtl;}
+.sun-editor.se-rtl .se-resizing-container .se-resize-display {direction:rtl;}
 /** --- RTL ---------------------------------------------------------- */
 
 

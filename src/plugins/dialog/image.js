@@ -911,10 +911,13 @@ export default {
         const onlyW = /^(rw|lw)$/.test(direction);
         const onlyH = /^(th|bh)$/.test(direction);
 
-        this.plugins.image.cancelPercentAttr.call(this);
-
-        if (!onlyH) contextImage._element.style.width = this.util.isNumber(w) ? w + contextImage.sizeUnit : w;
-        if (!onlyW) contextImage._element.style.height = this.util.isNumber(h) ? h + contextImage.sizeUnit : /%$/.test(h) ? '' : h;
+        if (!onlyH) {
+            contextImage._element.style.width = this.util.isNumber(w) ? w + contextImage.sizeUnit : w;
+            this.plugins.image.cancelPercentAttr.call(this);
+        }
+        if (!onlyW) {
+            contextImage._element.style.height = this.util.isNumber(h) ? h + contextImage.sizeUnit : /%$/.test(h) ? '' : h;
+        }
 
         if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
         if (!notResetPercentage) contextImage._element.removeAttribute('data-percentage');
