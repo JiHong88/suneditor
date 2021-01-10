@@ -75,7 +75,7 @@ export default {
                         '<label>' + lang.dialogBox.linkBox.url + '</label>' +
                         '<div class="se-dialog-form-files">' +
                             '<input class="se-input-form se-input-url _se_link_url" type="text" placeholder="' + (core.options.protocol || '') + '" />' +
-                            '<button type="button" class="se-btn se-dialog-files-edge-button _se_bookmark_button" title="' + lang.controller.remove + '">' + core.icons.bookmark + '</button>' +
+                            '<button type="button" class="se-btn se-dialog-files-edge-button _se_bookmark_button" title="' + lang.controller.bookmark + '">' + core.icons.bookmark + '</button>' +
                         '</div>' +
                     '</div>' +
                     '<div style="width: 100%; display: flex;">' +

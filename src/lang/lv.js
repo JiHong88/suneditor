@@ -82,7 +82,8 @@
                 title: 'Ievietot saiti',
                 url: 'Saites URL',
                 text: 'Parādāmais teksts',
-                newWindowCheck: 'Atvērt jaunā logā'
+                newWindowCheck: 'Atvērt jaunā logā',
+                bookmark: 'Grāmatzīme'
             },
             mathBox: {
                 title: 'Matemātika',

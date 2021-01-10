@@ -82,7 +82,8 @@
                 title: '插入超链接',
                 url: '网址',
                 text: '字体',
-                newWindowCheck: '在新标签页中打开'
+                newWindowCheck: '在新标签页中打开',
+                bookmark: '书签'
             },
             mathBox: {
                 title: '数学',

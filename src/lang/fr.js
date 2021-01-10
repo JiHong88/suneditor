@@ -82,7 +82,8 @@
                 title: 'Insérer un lien',
                 url: 'Adresse URL du lien',
                 text: 'Texte à afficher',
-                newWindowCheck: 'Ouvrir dans une nouvelle fenêtre'
+                newWindowCheck: 'Ouvrir dans une nouvelle fenêtre',
+                bookmark: 'Signet'
             },
             mathBox: {
                 title: 'Math',

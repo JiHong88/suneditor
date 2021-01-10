@@ -82,7 +82,8 @@
 				title: 'Insertar Link',
 				url: '¿Hacia que URL lleva el link?',
 				text: 'Texto para mostrar',
-				newWindowCheck: 'Abrir en una nueva ventana'
+				newWindowCheck: 'Abrir en una nueva ventana',
+                bookmark: 'Marcador'
 			},
 			mathBox: {
                 title: 'Matemáticas',
