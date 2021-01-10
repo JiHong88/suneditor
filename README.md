@@ -743,6 +743,28 @@ videoAccept      : Define the "accept" attribute of the input.  default: "*" {St
 // Table----------------------------------------------------------------------------------------------------------
 tableCellControllerPosition : Define position to the table cell controller('cell', 'top'). default: 'cell' {String}
 
+// Link-----------------------------------------------------------------------------------------------------------
+linkProtocol    : Default protocol for the links. ('link', 'image', 'video', 'audio')
+                  This applies to all plugins that enter the internet url.   default: null {String}
+linkRel         : Defines "rel" attribute list of anchor tag.   default: [] {Array}
+                  // https://www.w3schools.com/tags/att_a_rel.asp
+                  ex) [
+                    'alternate',
+                    'author',
+                    'bookmark',
+                    'external',
+                    'help',
+                    'license',
+                    'next',
+                    'nofollow',
+                    'noreferrer',
+                    'noopener',
+                    'prev',
+                    'search',
+                    'tag'
+                ]
+                  
+
 // Key actions----------------------------------------------------------------------------------------------------
 tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {Boolean}
 shortcutsDisable: You can disable shortcuts.    default: [] {Array}
@@ -769,8 +791,6 @@ templates       : If you use a template plugin, add it.
 
 // ETC------------------------------------------------------------------------------------------------------------
 placeholder     : The placeholder text.                              default: null {String}
-linkProtocol    : Default protocol for the links. ('link', 'image', 'video', 'audio')
-                  This applies to all plugins that enter the internet url.   default: null {String}
 icons           : You can redefine icons.                            default: null {Object}
                   ex) {
                       bold: '<span class="se-icon-text">B</span>',

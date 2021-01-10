@@ -33,6 +33,7 @@ export default {
         context.link.preview = link_dialog.querySelector('.se-link-preview');
         context.link.bookmark = link_dialog.querySelector('.se-link-bookmark');
         context.link.bookmarkButton = link_dialog.querySelector('._se_bookmark_button');
+        context.link.rel = core.options.linkRel.length > 0 ? link_dialog.querySelector('.se-link-rel') : null;
 
         /** link controller */
         let link_controller = this.setController_LinkButton(core);
@@ -59,10 +60,11 @@ export default {
     setDialog: function (core) {
         const lang = core.lang;
         const dialog = core.util.createElement('DIV');
+        const rel = core.options.linkRel;
 
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
-        dialog.innerHTML = '' +
+        let html = '' +
             '<form class="editor_link">' +
                 '<div class="se-dialog-header">' +
                     '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
@@ -75,7 +77,7 @@ export default {
                         '<label>' + lang.dialogBox.linkBox.url + '</label>' +
                         '<div class="se-dialog-form-files">' +
                             '<input class="se-input-form se-input-url _se_link_url" type="text" placeholder="' + (core.options.protocol || '') + '" />' +
-                            '<button type="button" class="se-btn se-dialog-files-edge-button _se_bookmark_button" title="' + lang.controller.bookmark + '">' + core.icons.bookmark + '</button>' +
+                            '<button type="button" class="se-btn se-dialog-files-edge-button _se_bookmark_button" title="' + lang.dialogBox.linkBox.bookmark + '">' + core.icons.bookmark + '</button>' +
                         '</div>' +
                     '</div>' +
                     '<div style="width: 100%; display: flex;">' +
@@ -89,11 +91,20 @@ export default {
                         '<label><input type="checkbox" class="se-dialog-btn-check _se_link_check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
                     '</div>' +
                 '</div>' +
-                '<div class="se-dialog-footer">' +
+                '<div class="se-dialog-footer">';
+                    if (rel.length > 0) {
+                        html += '<select class="se-input-select se-link-rel" title="rel">';
+                        for (let i = 0, len = rel.length; i < len; i++) {
+                            html += '<option value="' + rel[i] + '">' + rel[i] + '</option>';
+                        }
+                        html += '</select>';
+                    }
+                    html += '' +
                     '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
                 '</div>' +
             '</form>';
 
+        dialog.innerHTML = html;
         return dialog;
     },
 
@@ -146,12 +157,21 @@ export default {
         }
     },
 
-    _updateID: function (anchor, url) {
+    _updateAnchor: function (anchor, url, alt, targetEl, relEl) {
         if (/^\#/.test(url)) {
             anchor.id = url.substr(1);
         } else {
             anchor.removeAttribute('id');
         }
+
+        anchor.href = url;
+        anchor.textContent = alt;
+
+        if (targetEl.checked) anchor.target = '_blank';
+        else anchor.removeAttribute('target');
+
+        if (relEl) anchor.rel = relEl.options[relEl.selectedIndex].value;
+        else anchor.removeAttribute('rel');
     },
 
     submit: function (e) {
@@ -170,10 +190,7 @@ export default {
 
             if (!this.context.dialog.updateModal) {
                 const oA = this.util.createElement('A');
-                oA.href = url;
-                oA.textContent = anchorText;
-                oA.target = (contextLink.linkNewWindowCheck.checked ? '_blank' : '');
-                this.plugins.link._updateID(oA, url);
+                this.plugins.link._updateAnchor(oA, url, anchorText, contextLink.linkNewWindowCheck, contextLink.rel);
 
                 const selectedFormats = this.getSelectedElements();
                 if (selectedFormats.length > 1) {
@@ -186,10 +203,7 @@ export default {
 
                 this.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
             } else {
-                contextLink._linkAnchor.href = url;
-                contextLink._linkAnchor.textContent = anchorText;
-                contextLink._linkAnchor.target = (contextLink.linkNewWindowCheck.checked ? '_blank' : '');
-                this.plugins.link._updateID(contextLink._linkAnchor, url);
+                this.plugins.link._updateAnchor(contextLink._linkAnchor, url, anchorText, contextLink.linkNewWindowCheck, contextLink.rel);
 
                 // set range
                 const textNode = contextLink._linkAnchor.childNodes[0];
@@ -242,6 +256,7 @@ export default {
             contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = (contextLink._linkAnchor.id ? '#' + contextLink._linkAnchor.id : contextLink._linkAnchor.href);
             contextLink.linkAnchorText.value = contextLink._linkAnchor.textContent;
             contextLink.linkNewWindowCheck.checked = (/_blank/i.test(contextLink._linkAnchor.target) ? true : false);
+            contextLink.rel.value = contextLink._linkAnchor.rel;
         }
 
         this.plugins.link._onLinkPreview.call(this, contextLink.preview, contextLink, this.options.linkProtocol, contextLink._linkValue);
@@ -291,6 +306,7 @@ export default {
             contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = contextLink._linkAnchor.href;
             contextLink.linkAnchorText.value = contextLink._linkAnchor.textContent;
             contextLink.linkNewWindowCheck.checked = (/_blank/i.test(contextLink._linkAnchor.target) ? true : false);
+            contextLink.rel.value = contextLink._linkAnchor.rel;
             this.plugins.dialog.open.call(this, 'link', true);
         }
         else if (/unlink/.test(command)) {
@@ -322,5 +338,6 @@ export default {
         contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = '';
         contextLink.linkAnchorText.value = '';
         contextLink.linkNewWindowCheck.checked = false;
+        contextLink.rel.value = contextLink.rel.options[0].value;
     }
 };

@@ -500,6 +500,9 @@ export default {
         options.audioAccept = (typeof options.audioAccept !== 'string' || options.audioAccept.trim() === "*") ? 'audio/*' : options.audioAccept.trim() || 'audio/*';
         /** Table */
         options.tableCellControllerPosition = typeof options.tableCellControllerPosition === 'string' ? options.tableCellControllerPosition.toLowerCase() : 'cell';
+        /** Link */
+        options.linkProtocol = typeof options.linkProtocol === 'string' ? options.linkProtocol : null;
+        options.linkRel = Array.isArray(options.linkRel) ? options.linkRel : [];
         /** Key actions */
         options.tabDisable = !!options.tabDisable;
         options.shortcutsDisable = (Array.isArray(options.shortcutsDisable) && options.shortcutsDisable.length > 0) ? options.shortcutsDisable.map(function (v) { return v.toLowerCase(); }) : [];
@@ -510,7 +513,6 @@ export default {
         options.templates = !options.templates ? null : options.templates;
         /** ETC */
         options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
-        options.linkProtocol = typeof options.linkProtocol === 'string' ? options.linkProtocol : null;
         /** Buttons */
         options.buttonList = !!options.buttonList ? JSON.parse(JSON.stringify(options.buttonList)) : [
             ['undo', 'redo'],
