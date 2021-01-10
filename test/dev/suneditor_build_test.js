@@ -383,7 +383,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     attributesWhitelist: {
         all: 'style'
     },
-    iframe: true,
+    // iframe: true,
     defaultTag: 'div',
     textTags: {
         strike:'s',

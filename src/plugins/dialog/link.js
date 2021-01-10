@@ -31,6 +31,8 @@ export default {
         context.link.linkAnchorText = link_dialog.querySelector('._se_link_text');
         context.link.linkNewWindowCheck = link_dialog.querySelector('._se_link_check');
         context.link.preview = link_dialog.querySelector('.se-link-preview');
+        context.link.bookmark = link_dialog.querySelector('.se-link-bookmark');
+        context.link.bookmarkButton = link_dialog.querySelector('._se_bookmark_button');
 
         /** link controller */
         let link_controller = this.setController_LinkButton(core);
@@ -40,7 +42,8 @@ export default {
         /** add event listeners */
         link_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core));
         link_controller.addEventListener('click', this.onClick_linkController.bind(core));
-        context.link.focusElement.addEventListener('input', this._onLinkPreview.bind(context.link.preview, context.link, core.options.linkProtocol));
+        context.link.focusElement.addEventListener('input', this._onLinkPreview.bind(core, context.link.preview, context.link, core.options.linkProtocol));
+        context.link.bookmarkButton.addEventListener('click', this.onClick_bookmarkButton.bind(core));
 
         /** append html */
         context.dialog.modal.appendChild(link_dialog);
@@ -70,8 +73,14 @@ export default {
                 '<div class="se-dialog-body">' +
                     '<div class="se-dialog-form">' +
                         '<label>' + lang.dialogBox.linkBox.url + '</label>' +
-                        '<input class="se-input-form se-input-url _se_link_url" type="text" />' +
-                        '<pre class="se-link-preview"></pre>' +
+                        '<div class="se-dialog-form-files">' +
+                            '<input class="se-input-form se-input-url _se_link_url" type="text" placeholder="' + (core.options.protocol || '') + '" />' +
+                            '<button type="button" class="se-btn se-dialog-files-edge-button _se_bookmark_button" title="' + lang.controller.remove + '">' + core.icons.bookmark + '</button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div style="width: 100%; display: flex;">' +
+                        '<span class="se-svg se-link-bookmark" style="flex: unset; display: none;">' + core.icons.bookmark + '</span>' +
+                        '<pre class="se-link-preview" style="flex: auto;"></pre>' +
                     '</div>' +
                     '<div class="se-dialog-form">' +
                         '<label>' + lang.dialogBox.linkBox.text + '</label><input class="se-input-form _se_link_text" type="text" />' +
@@ -124,9 +133,25 @@ export default {
         this.plugins.dialog.open.call(this, 'link', 'link' === this.currentControllerName);
     },
 
-    _onLinkPreview: function (context, protocol, e) {
-        const value = e.target.value.trim();
-        context._linkValue = this.textContent = !value ? '' : (protocol && value.indexOf('://') === -1 && value.indexOf('#') !== 0) ? protocol + value : value.indexOf('://') === -1 ? '/' + value : value;
+    _onLinkPreview: function (preview, context, protocol, e) {
+        const value = typeof e === 'string' ? e : e.target.value.trim();
+        const linkHTTP = value.indexOf('://') === -1 && value.indexOf('#') !== 0;
+        context._linkValue = preview.textContent = !value ? '' : (protocol && linkHTTP) ? protocol + value : linkHTTP ? '/' + value : value;
+        if (value.indexOf('#') === 0) {
+            context.bookmark.style.display = 'block';
+            this.util.addClass(context.bookmarkButton, 'active');
+        } else {
+            context.bookmark.style.display = 'none';
+            this.util.removeClass(context.bookmarkButton, 'active');
+        }
+    },
+
+    _updateID: function (anchor, url) {
+        if (/^\#/.test(url)) {
+            anchor.id = url.substr(1);
+        } else {
+            anchor.removeAttribute('id');
+        }
     },
 
     submit: function (e) {
@@ -148,6 +173,7 @@ export default {
                 oA.href = url;
                 oA.textContent = anchorText;
                 oA.target = (contextLink.linkNewWindowCheck.checked ? '_blank' : '');
+                this.plugins.link._updateID(oA, url);
 
                 const selectedFormats = this.getSelectedElements();
                 if (selectedFormats.length > 1) {
@@ -163,6 +189,7 @@ export default {
                 contextLink._linkAnchor.href = url;
                 contextLink._linkAnchor.textContent = anchorText;
                 contextLink._linkAnchor.target = (contextLink.linkNewWindowCheck.checked ? '_blank' : '');
+                this.plugins.link._updateID(contextLink._linkAnchor, url);
 
                 // set range
                 const textNode = contextLink._linkAnchor.childNodes[0];
@@ -212,10 +239,12 @@ export default {
             contextLink.linkAnchorText.value = this.getSelection().toString();
         } else if (contextLink._linkAnchor) {
             this.context.dialog.updateModal = true;
-            contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = contextLink._linkAnchor.href;
+            contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = (contextLink._linkAnchor.id ? '#' + contextLink._linkAnchor.id : contextLink._linkAnchor.href);
             contextLink.linkAnchorText.value = contextLink._linkAnchor.textContent;
             contextLink.linkNewWindowCheck.checked = (/_blank/i.test(contextLink._linkAnchor.target) ? true : false);
         }
+
+        this.plugins.link._onLinkPreview.call(this, contextLink.preview, contextLink, this.options.linkProtocol, contextLink._linkValue);
     },
 
     call_controller: function (selectionATag) {
@@ -227,8 +256,26 @@ export default {
         link.title = selectionATag.textContent;
         link.textContent = selectionATag.textContent;
 
+        this.util.addClass(selectionATag, 'on');
         this.setControllerPosition(linkBtn, selectionATag, 'bottom', {left: 0, top: 0});
-        this.controllersOn(linkBtn, selectionATag, 'link');
+        this.controllersOn(linkBtn, selectionATag, 'link', this.util.removeClass.bind(this.util, this.context.link._linkAnchor, 'on'));
+    },
+
+    onClick_bookmarkButton: function () {
+        const contextLink = this.context.link;
+        let url = contextLink.focusElement.value;
+        if (/^\#/.test(url)) {
+            url = url.substr(1);
+            contextLink.bookmark.style.display = 'none';
+            this.util.removeClass(contextLink.bookmarkButton, 'active');
+        } else {
+            url = '#' + url;
+            contextLink.bookmark.style.display = 'block';
+            this.util.addClass(contextLink.bookmarkButton, 'active');
+        }
+
+        contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = url;
+        contextLink.focusElement.focus();
     },
 
     onClick_linkController: function (e) {

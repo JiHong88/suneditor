@@ -4572,6 +4572,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         }
                     }
 
+                    if (/<a\b/i.test(t)) {
+                        const sv = m.match(/id\s*=\s*"[^"]*"/);
+                        if (sv) {
+                            if (!v) v = [];
+                            v.push(sv[0]);
+                        }
+                    }
+
                     if (v) {
                         for (let i = 0, len = v.length; i < len; i++) {
                             if (/^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
@@ -4640,6 +4648,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                     if (/<span/i.test(t) && (!v || !/style=/i.test(v.toString()))) {
                         const sv = m.match(/style\s*=\s*"[^"]*"/);
+                        if (sv) {
+                            if (!v) v = [];
+                            v.push(sv[0]);
+                        }
+                    }
+
+                    if (/<a\b/i.test(t)) {
+                        const sv = m.match(/id\s*=\s*"[^"]*"/);
                         if (sv) {
                             if (!v) v = [];
                             v.push(sv[0]);

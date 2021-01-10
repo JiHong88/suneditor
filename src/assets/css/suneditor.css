@@ -332,7 +332,9 @@
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-math-preview {font-size:13px;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-math-preview > span {display:inline-block; -webkit-box-shadow:0 0 0 0.1rem #c7deff; box-shadow:0 0 0 0.1rem #c7deff;}
 /* dialog - modal - se-link-preview */
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-link-preview {display:block; height:auto; max-height:18px; margin:4px 0 0 4px; font-size:13px; font-weight:normal; font-family:inherit; color:#666; background-color:transparent; overflow:hidden; text-overflow:ellipsis; word-break:break-all; white-space:pre;}
+.sun-editor .se-dialog .se-dialog-inner .se-link-preview {display:block; height:auto; max-height:18px; margin:4px 0 0 4px; font-size:13px; font-weight:normal; font-family:inherit; color:#666; background-color:transparent; overflow:hidden; text-overflow:ellipsis; word-break:break-all; white-space:pre;}
+/* dialog - modal - se-link-bookmark icon */
+.sun-editor .se-dialog .se-dialog-inner .se-svg.se-link-bookmark {color:#0093ff;}
 /* .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-mention-item {line-height:28px;min-height:25px;padding:0 5px;cursor:pointer;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-mention-item:hover {background-color:#e1e1e1}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-mention-item.se-mention-active {background-color: #d1d1d1; border-radius:3px;}
