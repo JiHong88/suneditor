@@ -4550,7 +4550,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _deleteDisallowedTags: function (html) {
             return html
                 .replace(/\n/g, '')
-                .replace(/<(script|style).*>(\n|.)*<\/(script|style)>/gi, '')
+                .replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '')
                 .replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '')
                 .replace(this.editorTagsWhitelistRegExp, '');
         },
