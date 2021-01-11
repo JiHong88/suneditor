@@ -379,7 +379,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     value: "aa",
     // rtl: true,
     // fullPage: true,
-    pasteTagsWhitelist: 'p|a|strong|em|h3|h4|h5|ul|ol|li|blockquote|table|thead|tbody|tfoot|tr|td|sup|sub',
+    // pasteTagsWhitelist: 'p|a|strong|em|h3|h4|h5|ul|ol|li|blockquote|table|thead|tbody|tfoot|tr|td|sup|sub',
     linkRel: [
         'alternate',
         'author',
@@ -517,25 +517,25 @@ ss.onDrop = function (e) {
     // console.log('onDrop', e);
     return true;
 };
-ss.onPaste = function (e, cleanData, maxCharCount, core) {
-    // replace () > span.katex
-    cleanData = cleanData.replaceAll("(", '<span class="temp-katex">').replaceAll(")", "</span>");
+// ss.onPaste = function (e, cleanData, maxCharCount, core) {
+//     // replace () > span.katex
+//     cleanData = cleanData.replaceAll("(", '<span class="temp-katex">').replaceAll(")", "</span>");
 
-    // set attribute "data-exp"
-    // create html string
-    let html = "";
-    const children = core._d.createRange().createContextualFragment(cleanData).childNodes;
-    for (let i = 0, len = children.length, node; i < len; i++) {
-        node = children[i];
-        if (node.className === "temp-katex") {
-            node.className = "katex";
-            node.setAttribute("data-exp", node.textContent);
-        }
-        html += node.outerHTML || node.textContent;
-    }
+//     // set attribute "data-exp"
+//     // create html string
+//     let html = "";
+//     const children = core._d.createRange().createContextualFragment(cleanData).childNodes;
+//     for (let i = 0, len = children.length, node; i < len; i++) {
+//         node = children[i];
+//         if (node.className === "temp-katex") {
+//             node.className = "katex";
+//             node.setAttribute("data-exp", node.textContent);
+//         }
+//         html += node.outerHTML || node.textContent;
+//     }
 
-    return core.cleanHTML(html, core.pasteTagsWhitelistRegExp);
-}
+//     return core.cleanHTML(html, core.pasteTagsWhitelistRegExp);
+// }
 ss.onAudioUpload = function (targetElement, index, state, videoInfo) {
     // console.log('targetElement:${targetElement}, index:${index}, state:${state}')
     console.log('videoInfo-----', videoInfo)
@@ -784,7 +784,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     {{ contents }}
     <div style="background: #ccc;">Footer</div>`,
     // toolbarWidth: 150,
-    attributesWhitelist: {'all': 'uk-icon'}, 
+    attributesWhitelist: {'all': 'style'},
     plugins: plugins,
     fontSize: fs,
     // maxHeight: '400px',

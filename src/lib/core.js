@@ -1856,7 +1856,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : (range.endContainer || range.startContainer);
             
-            if (!util.isWysiwygDiv(container)) {
+            if (!util.isWysiwygDiv(container) && container.childNodes.length === 0) {
                 const rc = util.removeItemAllParents(container, function (current) {
                     if (this.isComponent(current)) return false;
                     const text = current.textContent;
@@ -6017,15 +6017,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     // component
                     if (!selectRange && (range.startOffset === 0 || (selectionNode === formatEl ? !!formatEl.childNodes[range.startOffset] : false))) {
                         const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : selectionNode;
+                        const prev = formatEl.previousSibling;
                         // select file component
                         const ignoreZWS = (commonCon.nodeType === 3 || util.isBreak(commonCon)) && !commonCon.previousSibling && range.startOffset === 0;
-                        if (!sel.previousSibling && (util.isComponent(commonCon.previousSibling) || (ignoreZWS && util.isComponent(formatEl.previousSibling)))) {
-                            const fileComponentInfo = core.getFileComponent(formatEl.previousSibling);
+                        if (!sel.previousSibling && (util.isComponent(commonCon.previousSibling) || (ignoreZWS && util.isComponent(prev)))) {
+                            const fileComponentInfo = core.getFileComponent(prev);
                             if (fileComponentInfo) {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 if (formatEl.textContent.length === 0) util.removeItem(formatEl);
                                 if (core.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName) === false) core.blur();
+                            } else if (util.isComponent(prev)) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                util.removeItem(prev);
                             }
                             break;
                         }
@@ -6087,6 +6092,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             if (fileComponentInfo) {
                                 e.stopPropagation();
                                 if (core.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName) === false) core.blur();
+                            } else if (util.isComponent(nextEl)) {
+                                e.stopPropagation();
+                                util.removeItem(nextEl);
                             }
 
                             break;
