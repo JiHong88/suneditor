@@ -7083,6 +7083,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return;
             }
 
+            event._responsiveCurrentSize = 'default';
             const sizeArray = event._responsiveButtonSize = [];
             const buttonsObj = event._responsiveButtons = {default: _responsiveButtons[0]};
             for (let i = 1, len = _responsiveButtons.length, size, buttonGroup; i < len; i++) {
@@ -7422,7 +7423,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const _initHTML = el.wysiwyg.innerHTML;
 
             // set option
-            const cons = _Constructor._setOptions(mergeOptions, context, core.plugins, options);        
+            const cons = _Constructor._setOptions(mergeOptions, context, options);        
 
             if (cons.callButtons) {
                 pluginCallButtons = cons.callButtons;

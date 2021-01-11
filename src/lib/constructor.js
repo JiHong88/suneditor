@@ -193,22 +193,20 @@ export default {
      * @description Add or reset options
      * @param {Object} mergeOptions New options property
      * @param {Object} context Context object of core
-     * @param {Object} plugins Origin plugins
      * @param {Object} originOptions Origin options
      * @returns {Object} pluginCallButtons
      * @private
      */
-    _setOptions: function (mergeOptions, context, plugins, originOptions) {
+    _setOptions: function (mergeOptions, context, originOptions) {
         this._initOptions(context.element.originElement, mergeOptions);
 
         const el = context.element;
         const relative = el.relative;
         const editorArea = el.editorArea;
         const isNewToolbarContainer = mergeOptions.toolbarContainer && mergeOptions.toolbarContainer !== originOptions.toolbarContainer;
-        const isNewToolbar = !!mergeOptions.buttonList || mergeOptions.mode !== originOptions.mode || isNewToolbarContainer;
-        const isNewPlugins = !!mergeOptions.plugins;
+        const isNewToolbar = mergeOptions.buttonList !== originOptions.buttonList || mergeOptions.mode !== originOptions.mode || isNewToolbarContainer;
 
-        const tool_bar = this._createToolBar(document, (isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList), (isNewPlugins ? mergeOptions.plugins : plugins), mergeOptions);
+        const tool_bar = this._createToolBar(document, (isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList), mergeOptions.plugins, mergeOptions);
         if (tool_bar.pluginCallButtons.math) this._checkKatexMath(mergeOptions.katex);
         const arrow = document.createElement('DIV');
         arrow.className = 'se-arrow';
@@ -256,8 +254,8 @@ export default {
         else util.removeClass(el.topArea, 'se-rtl');
 
         return {
-            callButtons: isNewToolbar ? tool_bar.pluginCallButtons : null,
-            plugins: isNewToolbar || isNewPlugins ? tool_bar.plugins : null,
+            callButtons: tool_bar.pluginCallButtons,
+            plugins: tool_bar.plugins,
             toolbar: tool_bar
         };
     },
@@ -514,7 +512,7 @@ export default {
         /** ETC */
         options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
         /** Buttons */
-        options.buttonList = !!options.buttonList ? JSON.parse(JSON.stringify(options.buttonList)) : [
+        options.buttonList = !!options.buttonList ? options.buttonList : [
             ['undo', 'redo'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
             ['removeFormat'],
@@ -691,6 +689,7 @@ export default {
         tool_bar.appendChild(_buttonTray);
 
         /** create button list */
+        buttonList = JSON.parse(JSON.stringify(buttonList));
         const icons = options.icons;
         const defaultButtonList = this._defaultButtons(options);
         const pluginCallButtons = {};
