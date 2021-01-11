@@ -1575,7 +1575,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             parentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
                             if (parentNode.contains(container)) {
                                 afterNode = container;
-                                while (afterNode.parentNode === parentNode) {
+                                while (afterNode.parentNode !== parentNode) {
                                     afterNode = afterNode.parentNode;
                                 }
                             } else {
