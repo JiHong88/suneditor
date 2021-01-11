@@ -808,11 +808,13 @@ export default {
             }
         }
 
-        const lastFloat = _buttonTray.lastElementChild.style.float;
-        if (!!lastFloat) {
+        const lastBtnElement = _buttonTray.lastElementChild;
+        if (!!lastBtnElement) {
             const sv =  separator_vertical.cloneNode(false);
-            sv.style.float = lastFloat;
+            sv.style.float = lastBtnElement.style.float;
             _buttonTray.appendChild(sv);
+        } else {
+            _buttonTray.style.display = 'none';
         }
 
         if (_buttonTray.children.length === 1) util.removeClass(_buttonTray.firstElementChild, 'se-btn-module-border');

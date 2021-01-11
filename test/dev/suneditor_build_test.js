@@ -1058,7 +1058,8 @@ s2.onVideoUpload = function (targetElement, index, state, videoInfo, remainingFi
 
 window.sun_setOptions2 = function () {
     s2.setOptions({
-        placeholder: 'fdsfda'
+        placeholder: 'fdsfda',
+        buttonList: []
     });
 }
 
