@@ -906,6 +906,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!startCon || !endCon) return;
             if (startOff > startCon.textContent.length) startOff = startCon.textContent.length;
             if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
+            if (util.isFormatElement(startCon)) {
+                startCon = startCon.childNodes[startOff] || startCon;
+                startOff = 1;
+            }
+            if (util.isFormatElement(endCon)) {
+                endCon = endCon.childNodes[endOff] || endCon;
+                endOff = startOff > 1 ? startOff : 1;
+            }
             
             const range = this._wd.createRange();
 

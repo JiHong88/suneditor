@@ -95,7 +95,7 @@ export default {
         } else if (this.util.isFormatElement(element)) {
             const textAlign = element.style.textAlign;
             if (textAlign) {
-                this.util.changeElement(target, alignContext.icons[textAlign]);
+                this.util.changeElement(target, alignContext.icons[textAlign] || alignContext.icons[alignContext.defaultDir]);
                 targetButton.setAttribute('data-focus', textAlign);
                 return true;
             }
