@@ -1747,7 +1747,7 @@ const util = {
         for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {
             t = withoutFormatCells[i];
             f = this.createElement('DIV');
-            f.innerHTML = t.textContent.trim().length === 0 ? '<br>' : t.innerHTML;
+            f.innerHTML = (t.textContent.trim().length === 0 && t.children.length === 0) ? '<br>' : t.innerHTML;
             t.innerHTML = f.outerHTML;
         }
     },
