@@ -1300,7 +1300,30 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Boolean}
          */
         isEdgePoint: function (container, offset, dir) {
-            return (offset === 0) || ((!dir || dir === 'front') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && !!container.nodeValue && offset === container.nodeValue.length);
+            return (dir !== 'end' && offset === 0) || ((!dir || dir !== 'front') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && !!container.nodeValue && offset === container.nodeValue.length);
+        },
+
+        /**
+         * @description Check if the container and offset values are the edges of the format tag
+         * @param {Node} container The node of the selection object. (range.startContainer..)
+         * @param {Number} offset The offset of the selection object. (core.getRange().startOffset...)
+         * @param {String} dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
+         * @returns {Boolean}
+         */
+        isEdgeFormat: function (node, offset, dir) {
+            if (!this.isEdgePoint(node, offset, dir)) return false;
+
+            let result = true;
+            dir = dir === 'front' ? 'previousSibling' : 'nextSibling';
+            while (node && !util.isFormatElement(node) && !util.isWysiwygDiv(node)) {
+                if (!node[dir]) {
+                    node = node.parentNode;
+                } else {
+                    result = false;
+                    node = null;
+                }
+            }
+            return result;
         },
 
         /**
@@ -6292,7 +6315,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         }
                     }
 
-                    if (!shift && /^H[1-6]$/i.test(formatEl.nodeName)) {
+                    if (!shift && /^H[1-6]$/i.test(formatEl.nodeName) && core.isEdgeFormat(range.endContainer, range.endOffset, 'end')) {
                         e.preventDefault();
                         const newFormat = core.appendFormatTag(formatEl, options.defaultTag);
                         core.setRange(newFormat, 1, newFormat, 1);
