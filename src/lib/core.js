@@ -4300,6 +4300,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     this._iframeAutoHeight();
                 }
 
+                context.element.topArea.style.marginTop = options.fullScreenOffset + 'px';
                 util.addClass(this._styleCommandMap.fullScreen, 'active');
             } else {
                 _var.isFullScreen = false;
@@ -4331,6 +4332,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 event.onScroll_window();
                 util.changeElement(element.firstElementChild, icons.expansion);
 
+                context.element.topArea.style.marginTop = '';
                 util.removeClass(this._styleCommandMap.fullScreen, 'active');
             }
 

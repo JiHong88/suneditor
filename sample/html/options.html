@@ -127,6 +127,9 @@
             <label><input type="checkbox" id="stickyToolbar">&nbsp;&nbsp;stickyToolbar</label>
             <input type="text" id="stickyToolbar_value" placeholder="Number, ...px">
             <br><br>
+            <label><input type="checkbox" id="fullScreenOffset">&nbsp;&nbsp;fullScreenOffset</label>
+            <input type="text" id="fullScreenOffset_value" placeholder="Number, ...px">
+            <br><br>
             <label><input type="checkbox" id="iframe">&nbsp;&nbsp;iframe</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="fullPage">&nbsp;&nbsp;fullPage</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="iframeCSSFileName">&nbsp;&nbsp;iframeCSSFileName</label>
@@ -529,6 +532,7 @@ function sun_create () {
         toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : undefined,
         toolbarContainer: document.getElementById('toolbarContainer').checked ? '#custom_toolbar' : undefined,
         stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : undefined,
+        fullScreenOffset: document.getElementById('fullScreenOffset').checked ? document.getElementById('fullScreenOffset_value').value : undefined,
         iframe: document.getElementById('iframe').checked ? true : undefined,
         fullPage: document.getElementById('fullPage').checked? true : undefined,
         iframeCSSFileName: document.getElementById('iframeCSSFileName').checked ? document.getElementById('iframeCSSFileName_value').value : undefined,

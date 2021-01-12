@@ -416,10 +416,11 @@ toolbarContainer: A custom HTML selector placing the toolbar inside.
                   The class name of the element must be 'sun-editor'.
                   Element or querySelector argument.     default: null {Element|String}
                   ex) document.querySelector('#id') || '#id'
-stickyToolbar   : Reference height value that should be changed to sticky toolbar mode.
-                  It can also be used when there is another fixed toolbar at the top.
-                  Set to 0, '0px', '50px', etc.
+stickyToolbar   : Top offset value of "sticky toolbar".
+                  Set to 0, '0px', '50px'...
                   If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
+fullScreenOffset: Top offset value of "full Screen".
+                  Set to 0, '0px', '50px'...     default: 0 {Number|String}
 iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {Boolean}
 fullPage        : Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.  default: false {Boolean}
 iframeCSSFileName : Name or Array of the CSS file to apply inside the iframe.

@@ -68,9 +68,13 @@ export interface SunEditorOptions {
      */
     toolbarContainer?: HTMLElement | string;
     /**
-     * Reference height value that should be changed to sticky toolbar mode
+     * Top offset value of "sticky toolbar".
      */
-    stickyToolbar?: number;
+    stickyToolbar?: number | string;
+    /**
+     * Top offset value of "full Screen".
+     */
+    fullScreenOffset?: number | string;
     /**
      * Content will be placed in an iframe and isolated from the rest of the page
      */
