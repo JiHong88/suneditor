@@ -4484,7 +4484,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         setIframeContents: function (ctx) {
             if (!options.iframe) return false;
-            if (ctx.head) this._wd.head.innerHTML = ctx.head.replace(/<script\s*.*>.*<\/script>/g, '');
+            if (ctx.head) this._wd.head.innerHTML = ctx.head.replace(/<script)[\s\S]*>[\s\S]*<\/script>/gi, '');
             if (ctx.body) this._wd.body.innerHTML = this.convertContentsForEditor(ctx.body);
         },
 
