@@ -833,7 +833,8 @@ export default {
         contextImage._cover = this.util.getParentElement(element, 'FIGURE');
         contextImage._container = this.util.getParentElement(element, this.util.isMediaComponent);
         contextImage._caption = this.util.getChildElement(contextImage._cover, 'FIGCAPTION');
-        contextImage._align = element.getAttribute('data-align') || 'none';
+        contextImage._align = element.style.float || element.getAttribute('data-align') || 'none';
+        element.style.float = '';
 
         if (size) {
             contextImage._element_w = size.w;

@@ -681,7 +681,8 @@ export default {
         contextVideo._element = element;
         contextVideo._cover = this.util.getParentElement(element, 'FIGURE');
         contextVideo._container = this.util.getParentElement(element, this.util.isMediaComponent);
-        contextVideo._align = element.getAttribute('data-align') || 'none';
+        contextVideo._align = element.style.float || element.getAttribute('data-align') || 'none';
+        element.style.float = '';
 
         if (size) {
             contextVideo._element_w = size.w;
