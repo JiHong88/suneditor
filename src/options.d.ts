@@ -41,6 +41,20 @@ export interface SunEditorOptions {
      */
     attributesWhitelist?: Record<string, string>;
     /**
+     * Specify the styles allowed for each format and tag.
+     * {
+     *  format: ['margin-left', 'margin-right', 'text-align', 'line-height'], 
+     *  rangeFormat: [],
+     *  closureRangeFormat: [],
+     *  freeFormat: [],
+     *  closureFreeFormat: [],
+     *  component: [],
+     *  span: ['font-family', 'color', 'background-color', 'font-size']
+     * }
+     */
+    // @v3
+    // allowStyles?: Record<string, string[]>
+    /**
      * Layout
      * ======
      */

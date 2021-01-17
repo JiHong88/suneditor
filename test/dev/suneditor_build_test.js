@@ -397,6 +397,11 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'search',
         'tag'
     ],
+    allowStyles: {
+        span: ['opacity'],
+        format: '',
+        rangeFormat: 'a|b'
+    },
     attributesWhitelist: {
         all: 'style'
     },
@@ -1059,17 +1064,20 @@ s2.onVideoUpload = function (targetElement, index, state, videoInfo, remainingFi
 }
 
 window.sun_setOptions2 = function () {
-    s2.setOptions({
-        placeholder: 'fdsfda',
-        buttonList: []
-    });
+    // s2.setOptions({
+    //     placeholder: 'fdsfda',
+    //     buttonList: []
+    // });
+    s2.core.commandHandler(null, 'copy');
 }
 
 window.sun_setOptions3 = function () {
-    s2.setOptions(newOption2);
+    // s2.setOptions(newOption2);
+    s2.core.commandHandler(null, 'cut');
 }
 window.sun_setOptions4 = function () {
-    s2.setOptions(newOption3);
+    s2.core.commandHandler(null, 'paste');
+    // s2.setOptions(newOption3);
 }
 
 window.sun_insertImage2 = function () {

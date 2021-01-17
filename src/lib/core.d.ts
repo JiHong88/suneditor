@@ -18,7 +18,7 @@ type fileInfo =  {
     src: string;
 };
 type seledtedFileInfo = Record<string, string | Element>;
-type commands = 'selectAll' | 'codeView' | 'fullScreen' | 'indent' | 'outdent' | 'undo' | 'redo' | 'removeFormat' | 'print' | 'preview' | 'showBlocks' | 'save' | 'bold' | 'underline' | 'italic' | 'strike' | 'subscript' | 'superscript';
+type commands = 'selectAll' | 'codeView' | 'fullScreen' | 'indent' | 'outdent' | 'undo' | 'redo' | 'removeFormat' | 'print' | 'preview' | 'showBlocks' | 'save' | 'bold' | 'underline' | 'italic' | 'strike' | 'subscript' | 'superscript' | 'copy' | 'cut' | 'paste';
 ​​
 interface Core {
     /**
@@ -474,7 +474,7 @@ interface Core {
 
     /**
      * @description Execute command of command button(All Buttons except submenu and dialog)
-     * (undo, redo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print)
+     * (undo, redo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print, copy, cut, paste)
      * @param target The element of command button
      * @param command Property of command button (data-value)
      */

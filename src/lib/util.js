@@ -1655,12 +1655,29 @@ const util = {
     },
 
     /**
+     * @description Get key of the options.allowStyles
+     * @param {Node} node Node
+     * @returns {String}
+     * @private
+     */
+    _getCheckFormat: function (node) {
+        return node.nodeType === 3 ? 'null' :
+         this.isComponent(node) ? 'component' :
+         this.isClosureFreeFormatElement(node) ? 'closureFreeFormat' :
+         this.isFreeFormatElement(node) ? 'freeFormat' :
+         this.isClosureRangeFormatElement(node) ? 'closureRangeFormat' :
+         this.isRangeFormatElement(node) ? 'rangeFormat' :
+         this.isFormatElement(node) ? 'format' : node.nodeName.toLowerCase();
+    },
+
+    /**
      * @description Fix tags that do not fit the editor format.
      * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
      * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist (core._htmlCheckWhitelistRegExp)
+     * @param {Object} allowStyles options.allowStyles
      * @private
      */
-    _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp) {
+    _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, allowStyles) {
         /**
          * It is can use ".children(util.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
          * So check the node type and exclude the text no (current.nodeType !== 1)
@@ -1699,10 +1716,27 @@ const util = {
                 }
             }
 
-            return current.parentNode !== documentFragment &&
+            const result = current.parentNode !== documentFragment &&
              (this.isFormatElement(current) || this.isComponent(current) || this.isList(current)) &&
              !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode) &&
              !this.getParentElement(current, this.isComponent) && nrtag;
+
+            // @v3
+            //  if (!result) {
+            //     const styles = allowStyles[this._getCheckFormat(current)];
+            //     if (!!styles && styles.length > 0) {
+            //         let s = '';
+            //         const currentStyle = current.style;
+            //         for (let i = 0, len = styles.length; i < len; i++) {
+            //             s += styles[i] + ':' + currentStyle[styles[i]] + '; ';
+            //         }
+                    
+            //         if (!s) current.removeAttribute('style');
+            //         else current.style.cssText = s;
+            //     }
+            //  }
+
+            return result;
         }.bind(this));
 
         for (let i = 0, len = removeTags.length; i < len; i++) {
