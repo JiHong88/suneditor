@@ -279,8 +279,11 @@
 .sun-editor .se-dialog label, .sun-editor .se-dialog input, .sun-editor .se-dialog button {font-size:14px; line-height:1.5; color:#111; margin:0;}
 .sun-editor .se-dialog .se-dialog-back {position:absolute; width:100%; height:100%; top:0; left:0; background-color:#222; opacity:0.5;}
 /* dialog - modal */
+/* @v3 */
+/* .sun-editor .se-dialog .se-dialog-inner {position:fixed; width:100%; height:100%; top:0; left:0; right:0; bottom:0; margin:0; padding:0; align-items:center; justify-content:center;} */
+/* .sun-editor .se-dialog .se-dialog-inner .se-dialog-content {position:relative; width:500px; max-width:500px; margin:0; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:4px; outline:0; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5);} */
 .sun-editor .se-dialog .se-dialog-inner {position:absolute; width:100%; height:100%; top:0; left:0;}
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-content {position:relative; width:auto; max-width:500px; margin:20px auto; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:4px; outline:0; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5);}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-content {position:relative; width:auto; max-width:500px; margin:1.75rem auto; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid rgba(0, 0, 0, .2); border-radius:4px; outline:0; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5);}
 @media screen and (max-width:509px) { .sun-editor .se-dialog .se-dialog-inner .se-dialog-content {width:100%;} }
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-content label {display:inline-block; max-width:100%; margin-bottom:5px; font-weight:bold;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-content .se-btn-primary {display:inline-block; padding:6px 12px; margin:0 0 10px 0 !important; font-size:14px; font-weight:normal; line-height:1.42857143; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation; border-radius:4px;}
@@ -326,6 +329,8 @@
 .sun-editor .se-dialog-tabs button:hover {background-color:#fff;}
 .sun-editor .se-dialog-tabs button.active {background-color:#fff;border-bottom:0;}
 
+/* dialog - modal - image @v3*/
+/* .sun-editor .se-dialog .se-dialog-inner .se-dialog-content.se-dialog-image form {min-height:400px;} */
 /* dialog - modal - math */
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-form.se-math-exp {resize:vertical; height:4rem; border:1px solid #ccc; font-size:13px; padding:4px;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-select.se-math-size {width:6em; height:28px; margin-left:1em;}

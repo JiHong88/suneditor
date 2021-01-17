@@ -121,7 +121,7 @@ export default {
         const lang = core.lang;
         const dialog = core.util.createElement('DIV');
 
-        dialog.className = 'se-dialog-content';
+        dialog.className = 'se-dialog-content se-dialog-image';
         dialog.style.display = 'none';
 
         let html = '' +

@@ -125,6 +125,7 @@
 
             this.context.dialog.modalArea.style.display = 'block';
             this.context.dialog.back.style.display = 'block';
+            // this.context.dialog.modal.style.display = 'flex'; @v3
             this.context.dialog.modal.style.display = 'block';
             this.modalForm.style.display = 'block';
 
