@@ -16,7 +16,6 @@ const util = {
     isIE: null,
     isIE_Edge: null,
     isOSX_IOS: null,
-    isSafari: null,
     _propertiesInit: function () {
         if (this._d) return;
         this._d =  document;
@@ -24,7 +23,6 @@ const util = {
         this.isIE = navigator.userAgent.indexOf('Trident') > -1;
         this.isIE_Edge = (navigator.userAgent.indexOf('Trident') > -1) || (navigator.appVersion.indexOf('Edge') > -1);
         this.isOSX_IOS = /(Mac|iPhone|iPod|iPad)/.test(navigator.platform);
-        this.isSafari = navigator.vendor.indexOf('Apple') > -1;
     },
 
     /**
