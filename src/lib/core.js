@@ -5388,6 +5388,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 case 'S':
                     if (shift && options.shortcutsDisable.indexOf('strike') === -1) {
                         command = 'strike';
+                    } else if (!shift && options.shortcutsDisable.indexOf('save') === -1) {
+                        command = 'save';
                     }
                     break;
                 case 'U':

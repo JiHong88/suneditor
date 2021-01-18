@@ -397,6 +397,9 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     //     'search',
     //     'tag'
     // ],
+    callBackSave: function (contents){
+        console.log('save', contents)
+    },
     allowStyles: {
         span: ['opacity'],
         format: '',
