@@ -1317,7 +1317,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let result = true;
             dir = dir === 'front' ? 'previousSibling' : 'nextSibling';
             while (node && !util.isFormatElement(node) && !util.isWysiwygDiv(node)) {
-                if (!node[dir]) {
+                if (!node[dir] || (util.isBreak(node[dir]) && !node[dir][dir])) {
                     node = node.parentNode;
                 } else {
                     result = false;
@@ -6081,7 +6081,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     // component
-                    if (!selectRange && (range.startOffset === 0 || (selectionNode === formatEl ? !!formatEl.childNodes[range.startOffset] : false))) {
+                    if (!selectRange && formatEl && (range.startOffset === 0 || (selectionNode === formatEl ? !!formatEl.childNodes[range.startOffset] : false))) {
                         const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : selectionNode;
                         const prev = formatEl.previousSibling;
                         // select file component
