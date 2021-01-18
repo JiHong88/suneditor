@@ -4738,6 +4738,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             } catch (error) {
                 console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
             }
+
+            if (this.managedTagsInfo && this.managedTagsInfo.query) {
+                const textCompList = dom.querySelectorAll(this.managedTagsInfo.query);
+                for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
+                    classList = [].slice.call(textCompList[i].classList);
+                    for (let c = 0, cLen = classList.length; c < cLen; c++) {
+                        initMethod = this.managedTagsInfo.map[classList[c]];
+                        if (initMethod) {
+                            initMethod(textCompList[i]);
+                            break;
+                        }
+                    }
+                }
+            }
             
             const domTree = dom.childNodes;
             let cleanHTML = '';
