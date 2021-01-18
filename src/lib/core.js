@@ -4451,7 +4451,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     '<!DOCTYPE html><html>' +
                     '<head>' +
                     wDoc.head.innerHTML +
-                    '<style>body {overflow:auto !important; width:' + w + '; border:1px solid #ccc; margin: 10px auto !important; height:auto !important;}</style>' +
+                    '<style>body {overflow:auto !important; margin: 10px auto !important; height:auto !important;}</style>' +
                     '</head>' +
                     '<body ' + arrts + '>' + contentsHTML + '</body>' +
                     '</html>'
@@ -4475,7 +4475,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     '<title>' + lang.toolbar.preview + '</title>' +
                     linkHTML +
                     '</head>' +
-                    '<body class="' + options._editableClass + '" style="width:' + w + '; border:1px solid #ccc; margin:10px auto !important; height:auto !important;">' + contentsHTML + '</body>' +
+                    '<body class="' + options._editableClass + '" style="margin:10px auto !important; height:auto !important;">' + contentsHTML + '</body>' +
                     '</html>'
                 );
             }
