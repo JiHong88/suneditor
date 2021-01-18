@@ -256,7 +256,7 @@ export default {
             contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = (contextLink._linkAnchor.id ? '#' + contextLink._linkAnchor.id : contextLink._linkAnchor.href);
             contextLink.linkAnchorText.value = contextLink._linkAnchor.textContent;
             contextLink.linkNewWindowCheck.checked = (/_blank/i.test(contextLink._linkAnchor.target) ? true : false);
-            contextLink.rel.value = contextLink._linkAnchor.rel;
+            if (contextLink.rel) contextLink.rel.value = contextLink._linkAnchor.rel;
         }
 
         this.plugins.link._onLinkPreview.call(this, contextLink.preview, contextLink, this.options.linkProtocol, contextLink._linkValue);
@@ -306,7 +306,7 @@ export default {
             contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = contextLink._linkAnchor.href;
             contextLink.linkAnchorText.value = contextLink._linkAnchor.textContent;
             contextLink.linkNewWindowCheck.checked = (/_blank/i.test(contextLink._linkAnchor.target) ? true : false);
-            contextLink.rel.value = contextLink._linkAnchor.rel;
+            if (contextLink.rel) contextLink.rel.value = contextLink._linkAnchor.rel;
             this.plugins.dialog.open.call(this, 'link', true);
         }
         else if (/unlink/.test(command)) {
@@ -338,6 +338,6 @@ export default {
         contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = '';
         contextLink.linkAnchorText.value = '';
         contextLink.linkNewWindowCheck.checked = false;
-        contextLink.rel.value = contextLink.rel.options[0].value;
+        if (contextLink.rel) contextLink.rel.value = contextLink.rel.options[0].value;
     }
 };
