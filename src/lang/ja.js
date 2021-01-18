@@ -82,7 +82,8 @@
                 title: 'リンクの挿入',
                 url: 'インターネットアドレス',
                 text: '画面のテキスト',
-                newWindowCheck: '別ウィンドウで開く'
+                newWindowCheck: '別ウィンドウで開く',
+                bookmark: 'ブックマーク'
             },
             mathBox: {
                 title: '数学',

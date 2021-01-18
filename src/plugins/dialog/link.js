@@ -17,7 +17,7 @@ export default {
 
         const context = core.context;
         context.link = {
-            focusElement: null,
+            focusElement: null, // @Override dialog // This element has focus when the dialog is opened.
             linkNewWindowCheck: null,
             linkAnchorText: null,
             _linkAnchor: null,
@@ -25,23 +25,26 @@ export default {
         };
 
         /** link dialog */
-        let link_dialog = this.setDialog.call(core);
+        let link_dialog = this.setDialog(core);
         context.link.modal = link_dialog;
         context.link.focusElement = link_dialog.querySelector('._se_link_url');
         context.link.linkAnchorText = link_dialog.querySelector('._se_link_text');
         context.link.linkNewWindowCheck = link_dialog.querySelector('._se_link_check');
         context.link.preview = link_dialog.querySelector('.se-link-preview');
+        context.link.bookmark = link_dialog.querySelector('.se-link-bookmark');
+        context.link.bookmarkButton = link_dialog.querySelector('._se_bookmark_button');
+        context.link.rel = core.options.linkRel.length > 0 ? link_dialog.querySelector('.se-link-rel') : null;
 
         /** link controller */
-        let link_controller = this.setController_LinkButton.call(core);
+        let link_controller = this.setController_LinkButton(core);
         context.link.linkController = link_controller;
         context.link._linkAnchor = null;
-        link_controller.addEventListener('mousedown', core.eventStop);
 
         /** add event listeners */
-        link_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        link_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core));
         link_controller.addEventListener('click', this.onClick_linkController.bind(core));
-        context.link.focusElement.addEventListener('input', this._onLinkPreview.bind(context.link.preview, context.link, context.options.linkProtocol));
+        context.link.focusElement.addEventListener('input', this._onLinkPreview.bind(core, context.link.preview, context.link, core.options.linkProtocol));
+        context.link.bookmarkButton.addEventListener('click', this.onClick_bookmarkButton.bind(core));
 
         /** append html */
         context.dialog.modal.appendChild(link_dialog);
@@ -54,25 +57,32 @@ export default {
     },
 
     /** dialog */
-    setDialog: function () {
-        const lang = this.lang;
-        const dialog = this.util.createElement('DIV');
+    setDialog: function (core) {
+        const lang = core.lang;
+        const dialog = core.util.createElement('DIV');
+        const rel = core.options.linkRel;
 
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
-        dialog.innerHTML = '' +
+        let html = '' +
             '<form class="editor_link">' +
                 '<div class="se-dialog-header">' +
                     '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                        this.icons.cancel +
+                        core.icons.cancel +
                     '</button>' +
                     '<span class="se-modal-title">' + lang.dialogBox.linkBox.title + '</span>' +
                 '</div>' +
                 '<div class="se-dialog-body">' +
                     '<div class="se-dialog-form">' +
                         '<label>' + lang.dialogBox.linkBox.url + '</label>' +
-                        '<input class="se-input-form se-input-url _se_link_url" type="text" />' +
-                        '<pre class="se-link-preview"></pre>' +
+                        '<div class="se-dialog-form-files">' +
+                            '<input class="se-input-form se-input-url _se_link_url" type="text" placeholder="' + (core.options.protocol || '') + '" />' +
+                            '<button type="button" class="se-btn se-dialog-files-edge-button _se_bookmark_button" title="' + lang.dialogBox.linkBox.bookmark + '">' + core.icons.bookmark + '</button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div style="width: 100%; display: flex;">' +
+                        '<span class="se-svg se-link-bookmark" style="flex: unset; display: none;">' + core.icons.bookmark + '</span>' +
+                        '<pre class="se-link-preview" style="flex: auto;"></pre>' +
                     '</div>' +
                     '<div class="se-dialog-form">' +
                         '<label>' + lang.dialogBox.linkBox.text + '</label><input class="se-input-form _se_link_text" type="text" />' +
@@ -81,19 +91,28 @@ export default {
                         '<label><input type="checkbox" class="se-dialog-btn-check _se_link_check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
                     '</div>' +
                 '</div>' +
-                '<div class="se-dialog-footer">' +
+                '<div class="se-dialog-footer">';
+                    if (rel.length > 0) {
+                        html += '<select class="se-input-select se-link-rel" title="rel">';
+                        for (let i = 0, len = rel.length; i < len; i++) {
+                            html += '<option value="' + rel[i] + '">' + rel[i] + '</option>';
+                        }
+                        html += '</select>';
+                    }
+                    html += '' +
                     '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
                 '</div>' +
             '</form>';
 
+        dialog.innerHTML = html;
         return dialog;
     },
 
     /** modify controller button */
-    setController_LinkButton: function () {
-        const lang = this.lang;
-        const icons = this.icons;
-        const link_btn = this.util.createElement('DIV');
+    setController_LinkButton: function (core) {
+        const lang = core.lang;
+        const icons = core.icons;
+        const link_btn = core.util.createElement('DIV');
 
         link_btn.className = 'se-controller se-controller-link';
         link_btn.innerHTML = '' +
@@ -125,9 +144,39 @@ export default {
         this.plugins.dialog.open.call(this, 'link', 'link' === this.currentControllerName);
     },
 
-    _onLinkPreview: function (context, protocol, e) {
-        const value = e.target.value.trim();
-        context._linkValue = this.textContent = !value ? '' : (protocol && value.indexOf('://') === -1 && value.indexOf('#') !== 0) ? protocol + value : value.indexOf('://') === -1 ? '/' + value : value;
+    _onLinkPreview: function (preview, context, protocol, e) {
+        const value = typeof e === 'string' ? e : e.target.value.trim();
+        const linkHTTP = value.indexOf('://') === -1 && value.indexOf('#') !== 0;
+        context._linkValue = preview.textContent = !value ? '' : (protocol && linkHTTP) ? protocol + value : linkHTTP ? '/' + value : value;
+        if (value.indexOf('#') === 0) {
+            context.bookmark.style.display = 'block';
+            this.util.addClass(context.bookmarkButton, 'active');
+        } else {
+            context.bookmark.style.display = 'none';
+            this.util.removeClass(context.bookmarkButton, 'active');
+        }
+    },
+
+    _updateAnchor: function (anchor, url, alt, targetEl, relEl) {
+        if (/^\#/.test(url)) {
+            anchor.id = url.substr(1);
+        } else {
+            anchor.removeAttribute('id');
+        }
+
+        anchor.href = url;
+        anchor.textContent = alt;
+
+        if (targetEl.checked) anchor.target = '_blank';
+        else anchor.removeAttribute('target');
+
+        if (relEl) {
+            anchor.rel = relEl.options[relEl.selectedIndex].value;
+        } else if (anchor.id) {
+            anchor.rel = 'bookmark';
+        } else {
+            anchor.removeAttribute('rel');
+        }
     },
 
     submit: function (e) {
@@ -146,9 +195,7 @@ export default {
 
             if (!this.context.dialog.updateModal) {
                 const oA = this.util.createElement('A');
-                oA.href = url;
-                oA.textContent = anchorText;
-                oA.target = (contextLink.linkNewWindowCheck.checked ? '_blank' : '');
+                this.plugins.link._updateAnchor(oA, url, anchorText, contextLink.linkNewWindowCheck, contextLink.rel);
 
                 const selectedFormats = this.getSelectedElements();
                 if (selectedFormats.length > 1) {
@@ -161,9 +208,7 @@ export default {
 
                 this.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
             } else {
-                contextLink._linkAnchor.href = url;
-                contextLink._linkAnchor.textContent = anchorText;
-                contextLink._linkAnchor.target = (contextLink.linkNewWindowCheck.checked ? '_blank' : '');
+                this.plugins.link._updateAnchor(contextLink._linkAnchor, url, anchorText, contextLink.linkNewWindowCheck, contextLink.rel);
 
                 // set range
                 const textNode = contextLink._linkAnchor.childNodes[0];
@@ -213,10 +258,13 @@ export default {
             contextLink.linkAnchorText.value = this.getSelection().toString();
         } else if (contextLink._linkAnchor) {
             this.context.dialog.updateModal = true;
-            contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = contextLink._linkAnchor.href;
+            contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = (contextLink._linkAnchor.id ? '#' + contextLink._linkAnchor.id : contextLink._linkAnchor.href);
             contextLink.linkAnchorText.value = contextLink._linkAnchor.textContent;
             contextLink.linkNewWindowCheck.checked = (/_blank/i.test(contextLink._linkAnchor.target) ? true : false);
+            if (contextLink.rel) contextLink.rel.value = contextLink._linkAnchor.rel;
         }
+
+        this.plugins.link._onLinkPreview.call(this, contextLink.preview, contextLink, this.options.linkProtocol, contextLink._linkValue);
     },
 
     call_controller: function (selectionATag) {
@@ -228,8 +276,26 @@ export default {
         link.title = selectionATag.textContent;
         link.textContent = selectionATag.textContent;
 
+        this.util.addClass(selectionATag, 'on');
         this.setControllerPosition(linkBtn, selectionATag, 'bottom', {left: 0, top: 0});
-        this.controllersOn(linkBtn, selectionATag, 'link');
+        this.controllersOn(linkBtn, selectionATag, 'link', this.util.removeClass.bind(this.util, this.context.link._linkAnchor, 'on'));
+    },
+
+    onClick_bookmarkButton: function () {
+        const contextLink = this.context.link;
+        let url = contextLink.focusElement.value;
+        if (/^\#/.test(url)) {
+            url = url.substr(1);
+            contextLink.bookmark.style.display = 'none';
+            this.util.removeClass(contextLink.bookmarkButton, 'active');
+        } else {
+            url = '#' + url;
+            contextLink.bookmark.style.display = 'block';
+            this.util.addClass(contextLink.bookmarkButton, 'active');
+        }
+
+        contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = url;
+        contextLink.focusElement.focus();
     },
 
     onClick_linkController: function (e) {
@@ -245,6 +311,7 @@ export default {
             contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = contextLink._linkAnchor.href;
             contextLink.linkAnchorText.value = contextLink._linkAnchor.textContent;
             contextLink.linkNewWindowCheck.checked = (/_blank/i.test(contextLink._linkAnchor.target) ? true : false);
+            if (contextLink.rel) contextLink.rel.value = contextLink._linkAnchor.rel;
             this.plugins.dialog.open.call(this, 'link', true);
         }
         else if (/unlink/.test(command)) {
@@ -276,5 +343,6 @@ export default {
         contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = '';
         contextLink.linkAnchorText.value = '';
         contextLink.linkNewWindowCheck.checked = false;
+        if (contextLink.rel) contextLink.rel.value = contextLink.rel.options[0].value;
     }
 };

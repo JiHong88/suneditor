@@ -17,7 +17,7 @@ export default {
             targetButton: targetElement,
             _alignList: null,
             currentAlign: '',
-            defaultDir: context.options.rtl ? 'right' : 'left', 
+            defaultDir: core.options.rtl ? 'right' : 'left', 
             icons: {
                 justify: icons.align_justify,
                 left: icons.align_left,
@@ -27,7 +27,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = this.setSubmenu.call(core);
+        let listDiv = this.setSubmenu(core);
         let listUl = listDiv.querySelector('ul');
 
         /** add event listeners */
@@ -41,11 +41,11 @@ export default {
         listDiv = null, listUl = null;
     },
 
-    setSubmenu: function () {
-        const lang = this.lang;
-        const icons = this.icons;
-        const listDiv = this.util.createElement('DIV');
-        const leftDir = this.context.align.defaultDir === 'left';
+    setSubmenu: function (core) {
+        const lang = core.lang;
+        const icons = core.icons;
+        const listDiv = core.util.createElement('DIV');
+        const leftDir = core.context.align.defaultDir === 'left';
 
         const leftMenu = '<li>' +
             '<button type="button" class="se-btn-list se-btn-align" data-command="justifyleft" data-value="left" title="' + lang.toolbar.alignLeft + '">' +
@@ -95,7 +95,7 @@ export default {
         } else if (this.util.isFormatElement(element)) {
             const textAlign = element.style.textAlign;
             if (textAlign) {
-                this.util.changeElement(target, alignContext.icons[textAlign]);
+                this.util.changeElement(target, alignContext.icons[textAlign] || alignContext.icons[alignContext.defaultDir]);
                 targetButton.setAttribute('data-focus', textAlign);
                 return true;
             }

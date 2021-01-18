@@ -61,6 +61,14 @@
             <label><input type="checkbox" id="defaultTag">&nbsp;&nbsp;defaultTag&nbsp;&nbsp;&nbsp;</label>
             <input type="text" id="defaultTag_value" placeholder="String ('p', 'div'..)"></input>
             <br><br>
+            <label><input type="checkbox" id="textTags">&nbsp;&nbsp;textTags&nbsp;&nbsp;&nbsp;</label>
+            <span>{</span><br>
+            <span>&nbsp;&nbsp;bold: 'b',</span><br>
+            <span>&nbsp;&nbsp;underline: 'u',</span><br>
+            <span>&nbsp;&nbsp;italic: 'i',</span><br>
+            <span>&nbsp;&nbsp;strike: 's'</span><br>
+            <span>}</span>
+            <br><br>
             <label><input type="checkbox" id="editor_value">&nbsp;&nbsp;value&nbsp;&nbsp;&nbsp;</label><br>
             <textarea id="editor_value_value" placeholder="HTML String ('&lt;p&gt;..&lt;/p&gt;')" style="width:320px"></textarea>
             <br><br>
@@ -100,12 +108,14 @@
                 <option value="fr">fr</option>
                 <option value="it">it</option>
                 <option value="ja">ja</option>
-                <option value="ko">ko</option>
+                <option value="ko">ko</option>s
                 <option value="lv">lv</option>
                 <option value="pl">pl</option>
                 <option value="pt_br">pt_br</option>
                 <option value="ro">ro</option>
                 <option value="ru">ru</option>
+                <option value="se">se</option>
+                <option value="ua">ua</option>
                 <option value="zh_cn">zh_cn</option>
             </select>
             <br><br>
@@ -119,16 +129,21 @@
             <label><input type="checkbox" id="stickyToolbar">&nbsp;&nbsp;stickyToolbar</label>
             <input type="text" id="stickyToolbar_value" placeholder="Number, ...px">
             <br><br>
+            <label><input type="checkbox" id="fullScreenOffset">&nbsp;&nbsp;fullScreenOffset</label>
+            <input type="text" id="fullScreenOffset_value" placeholder="Number, ...px">
+            <br><br>
             <label><input type="checkbox" id="iframe">&nbsp;&nbsp;iframe</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="fullPage">&nbsp;&nbsp;fullPage</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="iframeCSSFileName">&nbsp;&nbsp;iframeCSSFileName</label>
             <input type="text" id="iframeCSSFileName_value" placeholder="String (suneditor)">
             <br><br>
             <label><input type="checkbox" id="previewTemplate">&nbsp;&nbsp;previewTemplate</label><br>
-            <textarea id="previewTemplate_value" placeholder='&lt;h1&gt;Preview&lt;/h1&gt; {{contents}} &lt;div&gt;_Footer_&lt;/div&gt;' style="width: 420px; height: 100px; vertical-align: top;">
-<h1>Preview</h1>
-{{contents}}
-<div>_Footer_</div>
+            <textarea id="previewTemplate_value" placeholder='&lt;h1&gt;Preview&lt;/h1&gt; {{contents}} &lt;div&gt;_Footer_&lt;/div&gt;' style="width: 420px; height: 130px; vertical-align: top;">
+<div style='width:auto; max-width:1080px; margin:auto;'>
+    <h1>Preview Template</h1> 
+    {{contents}} 
+    <div>_Footer_</div>
+</div>
             </textarea>
             <br><br>
             <label><input type="checkbox" id="codeMirror">&nbsp;&nbsp;codeMirror</label> { codeMirror: CodeMirror }<br>
@@ -350,6 +365,29 @@
             <h4 style="color: #b94a48;">--Table</h4>
             <label><input type="checkbox" id="tableCellControllerPosition">&nbsp;&nbsp;tableCellControllerPosition</label>
             <input type="text" id="tableCellControllerPosition_value" placeholder="String.. (cell, top)">
+
+            <br>
+            <h4 style="color: #b94a48;">--Link</h4>
+            <label><input type="checkbox" id="linkProtocol">&nbsp;&nbsp;linkProtocol</label>
+            <input type="text" id="linkProtocol_value" placeholder="https://" style="width: 200px">
+            <br><br>
+            <label><input type="checkbox" id="linkRel">&nbsp;&nbsp;linkRel</label>
+            <br>
+            <span>[</span>
+            <span>'alternate',</span>
+            <span>&nbsp;'author',</span>
+            <span>&nbsp;'bookmark',</span>
+            <span>&nbsp;'external',</span>
+            <span>&nbsp;'help',</span>
+            <span>&nbsp;'license',</span>
+            <span>&nbsp;'next',</span>
+            <span>&nbsp;'nofollow',</span>
+            <span>&nbsp;'noreferrer',</span>
+            <span>&nbsp;'noopener',</span>
+            <span>&nbsp;'prev',</span>
+            <span>&nbsp;'search',</span>
+            <span>&nbsp;'tag'</span>
+            <span>]</span>
             
             <br>
             <h4 style="color: #b94a48;">--Key actions</h4>
@@ -379,9 +417,6 @@
             <h4 style="color: #b94a48;">--ETC</h4>
             <label><input type="checkbox" id="placeholder">&nbsp;&nbsp;placeholder</label>
             <input type="text" id="placeholder_value" placeholder="String" style="width: 200px">
-            <br><br>
-            <label><input type="checkbox" id="linkProtocol">&nbsp;&nbsp;linkProtocol</label>
-            <input type="text" id="linkProtocol_value" placeholder="https://" style="width: 200px">
             <br><br>
             <label><input type="checkbox" id="icons">&nbsp;&nbsp;icons</label><br>
             <span>{</span><br>
@@ -460,6 +495,8 @@
 <script src="../../src/lang/pt_br.js"></script>
 <script src="../../src/lang/ro.js"></script>
 <script src="../../src/lang/ru.js"></script>
+<script src="../../src/lang/se.js"></script>
+<script src="../../src/lang/ua.js"></script>
 <script src="../../src/lang/zh_cn.js"></script>
 <script>
 var langSelect = document.getElementById('language');
@@ -482,6 +519,12 @@ function sun_create () {
 
     var options = {
         defaultTag: document.getElementById('defaultTag').checked ? document.getElementById('defaultTag_value').value : undefined,
+        textTags: document.getElementById('textTags').checked ? {
+            bold: 'b',
+            underline: 'u',
+            italic: 'i',
+            strike: 's'
+        } : undefined,
         value: document.getElementById('editor_value').checked ? document.getElementById('editor_value_value').value : undefined,
         historyStackDelayTime: document.getElementById('historyStackDelayTime').checked ? document.getElementById('historyStackDelayTime_value').value * 1 : undefined,
         addTagsWhitelist: document.getElementById('addTagsWhitelist').checked ? document.getElementById('addTagsWhitelist_value').value : undefined,
@@ -495,6 +538,7 @@ function sun_create () {
         toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : undefined,
         toolbarContainer: document.getElementById('toolbarContainer').checked ? '#custom_toolbar' : undefined,
         stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : undefined,
+        fullScreenOffset: document.getElementById('fullScreenOffset').checked ? document.getElementById('fullScreenOffset_value').value : undefined,
         iframe: document.getElementById('iframe').checked ? true : undefined,
         fullPage: document.getElementById('fullPage').checked? true : undefined,
         iframeCSSFileName: document.getElementById('iframeCSSFileName').checked ? document.getElementById('iframeCSSFileName_value').value : undefined,
@@ -588,6 +632,7 @@ function sun_create () {
         templates: document.getElementById('templates').checked ? [{name: 'Template-1', html: '<p>HTML source1</p>'},{name: 'Template-2', html: '<p>HTML source2</p>'}] : undefined,
         placeholder: document.getElementById('placeholder').checked ? document.getElementById('placeholder_value').value : undefined,
         linkProtocol: document.getElementById('linkProtocol').checked ? document.getElementById('linkProtocol_value').value : undefined,
+        linkRel: document.getElementById('linkRel').checked ? ['alternate', 'author', 'bookmark', 'external', 'help', 'license', 'next', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'] : undefined,
         icons: document.getElementById('icons').checked ? { paragraph_style: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>' } : undefined,
         buttonList: [
             ['undo', 'redo',

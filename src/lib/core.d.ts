@@ -18,7 +18,7 @@ type fileInfo =  {
     src: string;
 };
 type seledtedFileInfo = Record<string, string | Element>;
-type commands = 'selectAll' | 'codeView' | 'fullScreen' | 'indent' | 'outdent' | 'undo' | 'redo' | 'removeFormat' | 'print' | 'preview' | 'showBlocks' | 'save' | 'bold' | 'underline' | 'italic' | 'strike' | 'subscript' | 'superscript';
+type commands = 'selectAll' | 'codeView' | 'fullScreen' | 'indent' | 'outdent' | 'undo' | 'redo' | 'removeFormat' | 'print' | 'preview' | 'showBlocks' | 'save' | 'bold' | 'underline' | 'italic' | 'strike' | 'subscript' | 'superscript' | 'copy' | 'cut' | 'paste';
 ​​
 interface Core {
     /**
@@ -30,6 +30,11 @@ interface Core {
      * @description Functions object
      */
     functions: SunEditor;
+
+    /**
+     * @description Editor options
+     */
+    options: SunEditorOptions;
 
     /**
      * @description Notice object
@@ -243,12 +248,6 @@ interface Core {
     setControllerPosition(controller: Element, referEl: Element, position: 'top' | 'bottom', addOffset: {left: number, top: number}): void;
 
     /**
-     * @description Run event.stopPropagation and event.preventDefault.
-     * @param e Event Object
-     */
-    eventStop(e: Event): void;
-
-    /**
      * @description javascript execCommand
      * @param command javascript execCommand function property
      * @param showDefaultUI javascript execCommand function property
@@ -272,6 +271,11 @@ interface Core {
      * @param focusEl Focus element
      */
     focusEdge(focusEl: Element | null): void;
+
+    /**
+     * @description Focusout to wysiwyg area (.blur())
+     */
+    blur(): void;
 
     /**
      * @description Set current editor's range object and return.
@@ -333,9 +337,19 @@ interface Core {
      * @description Determine if this offset is the edge offset of container
      * @param container The container property of the selection object.
      * @param offset The offset property of the selection object.
+     * @param dir Select check point - Both edge, Front edge or End edge. ("front": Front edge, "end": End edge, undefined: Both edge)
      * @returns
      */
-    isEdgePoint(container: Node, offset: number): boolean;
+    isEdgePoint(container: Node, offset: number, dir?: 'front' | 'end'): boolean;
+
+    /**
+     * @description Check if the container and offset values are the edges of the format tag
+     * @param container The container property of the selection object.
+     * @param offset The offset property of the selection object.
+     * @param dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
+     * @returns
+     */
+    isEdgeFormat(container: Node, offset: number, dir: 'front' | 'end'): boolean;
 
     /**
      * @description Show loading box
@@ -460,7 +474,7 @@ interface Core {
 
     /**
      * @description Execute command of command button(All Buttons except submenu and dialog)
-     * (undo, redo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print)
+     * (undo, redo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print, copy, cut, paste)
      * @param target The element of command button
      * @param command Property of command button (data-value)
      */

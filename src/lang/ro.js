@@ -82,7 +82,8 @@
                 title: 'Inserează Link',
                 url: 'Adresă link',
                 text: 'Text de afișat',
-                newWindowCheck: 'Deschide în fereastră nouă'
+                newWindowCheck: 'Deschide în fereastră nouă',
+                bookmark: 'Marcaj'
             },
             mathBox: {
                 title: 'Matematică',

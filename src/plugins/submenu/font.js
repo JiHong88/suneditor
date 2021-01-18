@@ -20,7 +20,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = this.setSubmenu.call(core);
+        let listDiv = this.setSubmenu(core);
 
         /** add event listeners */
         listDiv.querySelector('.se-list-inner').addEventListener('click', this.pickup.bind(core));
@@ -34,10 +34,10 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function () {
-        const option = this.context.option;
-        const lang = this.lang;
-        const listDiv = this.util.createElement('DIV');
+    setSubmenu: function (core) {
+        const option = core.options;
+        const lang = core.lang;
+        const listDiv = core.util.createElement('DIV');
 
         listDiv.className = 'se-submenu se-list-layer se-list-font-family';
 

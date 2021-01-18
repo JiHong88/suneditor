@@ -85,7 +85,8 @@
                 title: 'Indsæt link',
                 url: 'URL til link',
                 text: 'Tekst for link',
-                newWindowCheck: 'Åben i nyt faneblad'
+                newWindowCheck: 'Åben i nyt faneblad',
+                bookmark: 'Bogmærke'
             },
             mathBox: {
                 title: 'Math',

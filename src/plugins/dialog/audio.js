@@ -22,10 +22,10 @@ export default {
             _infoList: [], // @Override fileManager
             _infoIndex: 0, // @Override fileManager
             _uploadFileLength: 0, // @Override fileManager
-            focusElement: null, // @Override // This element has focus when the dialog is opened.
+            focusElement: null, // @Override dialog // This element has focus when the dialog is opened.
             targetSelect: null,
-            _origin_w: context.option.audioWidth,
-            _origin_h: context.option.audioHeight,
+            _origin_w: core.options.audioWidth,
+            _origin_h: core.options.audioHeight,
             _linkValue: '',
             // @require @Override component
             _element: null,
@@ -34,7 +34,7 @@ export default {
         };
 
         /** dialog */
-        let audio_dialog = this.setDialog.call(core);
+        let audio_dialog = this.setDialog(core);
         contextAudio.modal = audio_dialog;
         contextAudio.audioInputFile = audio_dialog.querySelector('._se_audio_files');
         contextAudio.audioUrlFile = audio_dialog.querySelector('.se-input-url');
@@ -42,17 +42,15 @@ export default {
         contextAudio.preview = audio_dialog.querySelector('.se-link-preview');
 
         /** controller */
-        let audio_controller = this.setController.call(core);
+        let audio_controller = this.setController(core);
         contextAudio.controller = audio_controller;
 
-        audio_controller.addEventListener('mousedown', core.eventStop);
-
         /** add event listeners */
-        audio_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        audio_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core));
         if (contextAudio.audioInputFile) audio_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(contextAudio.audioInputFile, contextAudio.audioUrlFile, contextAudio.preview));
         if (contextAudio.audioInputFile && contextAudio.audioUrlFile) contextAudio.audioInputFile.addEventListener('change', this._fileInputChange.bind(contextAudio));
         audio_controller.addEventListener('click', this.onClick_controller.bind(core));
-        if (contextAudio.audioUrlFile) contextAudio.audioUrlFile.addEventListener('input', this._onLinkPreview.bind(contextAudio.preview, contextAudio, context.options.linkProtocol));
+        if (contextAudio.audioUrlFile) contextAudio.audioUrlFile.addEventListener('input', this._onLinkPreview.bind(contextAudio.preview, contextAudio, core.options.linkProtocol));
 
         /** append html */
         context.dialog.modal.appendChild(audio_dialog);
@@ -65,10 +63,10 @@ export default {
     },
 
     /** HTML - dialog */
-    setDialog: function () {
-        const option = this.context.option;
-        const lang = this.lang;
-        const dialog = this.util.createElement('DIV');
+    setDialog: function (core) {
+        const option = core.options;
+        const lang = core.lang;
+        const dialog = core.util.createElement('DIV');
 
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
@@ -76,7 +74,7 @@ export default {
             '<form method="post" enctype="multipart/form-data">' +
                 '<div class="se-dialog-header">' +
                     '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                        this.icons.cancel +
+                        core.icons.cancel +
                     '</button>' +
                     '<span class="se-modal-title">' + lang.dialogBox.audioBox.title + '</span>' +
                 '</div>' +
@@ -88,7 +86,7 @@ export default {
                             '<label>' + lang.dialogBox.audioBox.file + '</label>' +
                             '<div class="se-dialog-form-files">' +
                                 '<input class="se-input-form _se_audio_files" type="file" accept="' + option.audioAccept + '"' + (option.audioMultipleFile ? ' multiple="multiple"' : '') + '/>' +
-                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
+                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '">' + core.icons.cancel + '</button>' +
                             '</div>' +
                         '</div>';
                 }
@@ -115,10 +113,10 @@ export default {
     },
 
     /** HTML - controller */
-    setController: function () {
-        const lang = this.lang;
-        const icons = this.icons;
-        const link_btn = this.util.createElement('DIV');
+    setController: function (core) {
+        const lang = core.lang;
+        const icons = core.icons;
+        const link_btn = core.util.createElement('DIV');
 
         link_btn.className = 'se-controller se-controller-link';
         link_btn.innerHTML = '' +
@@ -175,7 +173,7 @@ export default {
     _setTagAttrs: function (element) {
         element.setAttribute('controls', true);
 
-        const attrs = this.context.options.audioTagAttrs;
+        const attrs = this.options.audioTagAttrs;
         if (!attrs) return;
 
         for (let key in attrs) {
@@ -251,13 +249,13 @@ export default {
 
         if (!update) {
             this.plugins.audio.init.call(this);
-            if (contextAudio.audioInputFile && this.context.options.audioMultipleFile) contextAudio.audioInputFile.setAttribute('multiple', 'multiple');
+            if (contextAudio.audioInputFile && this.options.audioMultipleFile) contextAudio.audioInputFile.setAttribute('multiple', 'multiple');
         } else if (contextAudio._element) {
             this.context.dialog.updateModal = true;
             contextAudio._linkValue = contextAudio.preview.textContent = contextAudio.audioUrlFile.value = contextAudio._element.src;
-            if (contextAudio.audioInputFile && this.context.options.audioMultipleFile) contextAudio.audioInputFile.removeAttribute('multiple');
+            if (contextAudio.audioInputFile && this.options.audioMultipleFile) contextAudio.audioInputFile.removeAttribute('multiple');
         } else {
-            if (contextAudio.audioInputFile && this.context.options.audioMultipleFile) contextAudio.audioInputFile.removeAttribute('multiple');
+            if (contextAudio.audioInputFile && this.options.audioMultipleFile) contextAudio.audioInputFile.removeAttribute('multiple');
         }
     },
 
@@ -304,7 +302,7 @@ export default {
             }
         }
 
-        const limitSize = this.context.option.audioUploadSizeLimit;
+        const limitSize = this.options.audioUploadSizeLimit;
         if (limitSize > 0) {
             let infoSize = 0;
             const audiosInfo = this.context.audio._infoList;
@@ -368,7 +366,7 @@ export default {
             return;
         }
 
-        const audioUploadUrl = this.context.option.audioUploadUrl;
+        const audioUploadUrl = this.options.audioUploadUrl;
         const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
         // create formData
@@ -378,7 +376,7 @@ export default {
         }
 
         // server upload
-        this.plugins.fileManager.upload.call(this, audioUploadUrl, this.context.option.audioUploadHeader, formData, this.plugins.audio.callBack_upload.bind(this, info), this.functions.onAudioUploadError);
+        this.plugins.fileManager.upload.call(this, audioUploadUrl, this.options.audioUploadHeader, formData, this.plugins.audio.callBack_upload.bind(this, info), this.functions.onAudioUploadError);
     },
 
     callBack_upload: function (info, xmlHttp) {

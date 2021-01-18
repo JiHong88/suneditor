@@ -78,6 +78,10 @@
     color: #0093ff;
     text-decoration: underline;
 }
+.sun-editor-editable a.on {
+    color: #0093ff;
+    background-color: #e8f7ff;
+}
 
 /* pre */
 .sun-editor-editable pre {

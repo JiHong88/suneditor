@@ -41,7 +41,7 @@ export default {
      * @returns {String} HTML string
      */
     createColorList: function (core, makeColor) {
-        const option = core.context.option;
+        const option = core.options;
         const lang = core.lang;
         const colorList = !option.colorList || option.colorList.length === 0 ?
             [
@@ -72,7 +72,7 @@ export default {
                 }
             }
             list += '' +
-            '<form class="se-submenu-form-group">' +
+            '<form class="se-form-group">' +
                 '<input type="text" maxlength="9" class="_se_color_picker_input se-color-input"/>' +
                 '<button type="submit" class="se-btn-primary _se_color_picker_submit" title="' + lang.dialogBox.submitButton + '">' +
                     core.icons.checked +

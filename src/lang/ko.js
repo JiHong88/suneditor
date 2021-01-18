@@ -82,7 +82,8 @@
                 title: '링크 삽입',
                 url: '인터넷 주소',
                 text: '화면 텍스트',
-                newWindowCheck: '새창으로 열기'
+                newWindowCheck: '새창으로 열기',
+                bookmark: '북마크'
             },
             mathBox: {
                 title: '수식',

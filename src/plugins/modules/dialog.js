@@ -111,7 +111,7 @@
 
             this.context.dialog.updateModal = update;
 
-            if (this.context.option.popupDisplay === 'full') {
+            if (this.options.popupDisplay === 'full') {
                 this.context.dialog.modalArea.style.position = 'fixed';
             } else {
                 this.context.dialog.modalArea.style.position = 'absolute';
@@ -125,6 +125,7 @@
 
             this.context.dialog.modalArea.style.display = 'block';
             this.context.dialog.back.style.display = 'block';
+            // this.context.dialog.modal.style.display = 'flex'; @v3
             this.context.dialog.modal.style.display = 'block';
             this.modalForm.style.display = 'block';
 

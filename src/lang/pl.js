@@ -82,7 +82,8 @@
                 title: 'Wstaw odnośnik',
                 url: 'Adres URL',
                 text: 'Tekst do wyświetlenia',
-                newWindowCheck: 'Otwórz w nowym oknie'
+                newWindowCheck: 'Otwórz w nowym oknie',
+                bookmark: 'Zakładka'
             },
             mathBox: {
                 title: 'Matematyczne',

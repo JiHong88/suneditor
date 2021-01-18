@@ -81,16 +81,16 @@ export default {
     });
   },
 
-  setDialog: function() {
-    const mention_dialog = this.util.createElement("DIV");
-    const lang = this.lang;
+  setDialog: function(core) {
+    const mention_dialog = core.util.createElement("DIV");
+    const lang = core.lang;
     mention_dialog.className = "se-dialog-content";
     mention_dialog.style.display = "none";
     const html = `
       <form class="se-dialog-form">
         <div class="se-dialog-header">
           <button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="${lang.dialogBox.close}">
-            ${this.icons.cancel}
+            ${core.icons.cancel}
           </button>
           <span class="se-modal-title">${lang.dialogBox.mentionBox.title}</span>
         </div>
@@ -175,11 +175,11 @@ export default {
     mention.renderList(e.target.value);
   },
 
-  getMentions: function() {
-    const { mentions, getId } = this.context.mention;
+  getMentions: function(core) {
+    const { mentions, getId } = core.context.mention;
     return mentions.filter((mention) => {
       const id = getId(mention);
-      return this.context.element.wysiwyg.querySelector(
+      return core.context.element.wysiwyg.querySelector(
         `[data-mention="${id}"]`
       );
     });
@@ -211,8 +211,8 @@ export default {
   add: function(core) {
     core.addModule([dialog]);
     this.title = core.lang.toolbar.mention;
-    const _dialog = this.setDialog.call(core);
-    core.getMentions = this.getMentions.bind(core);
+    const _dialog = this.setDialog(core);
+    core.getMentions = this.getMentions(core);
 
     const _search = _dialog.querySelector(".se-mention-search");
     _search.addEventListener("keyup", this.onKeyUp.bind(core));

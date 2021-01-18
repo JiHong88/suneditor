@@ -29,7 +29,7 @@ Array.prototype._move = function(from, to)
     this.splice(to, 0, this.splice(from, 1)[0]);
 };
 
-const align = require('../../src/plugins/submenu/align')
+import align from '../../src/plugins/submenu/align'
 
 // const shadow = document.querySelector('#app').attachShadow({ mode: 'open' })
 // const appEl = document.createElement('textarea')
@@ -376,14 +376,48 @@ s1.onKeyDown = function (e, core) {
 }
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
-    value: "",
+    value: "aa",
+    stickyToolbar: 50,
+    fullScreenOffset: '10px',
     // rtl: true,
     // fullPage: true,
-    pasteTagsWhitelist: 'p|a|strong|em|h3|h4|h5|ul|ol|li|blockquote|table|thead|tbody|tfoot|tr|td|sup|sub',
-    iframe: true,
+    // pasteTagsWhitelist: 'p|a|strong|em|h3|h4|h5|ul|ol|li|blockquote|table|thead|tbody|tfoot|tr|td|sup|sub',
+    // linkRel: [
+    //     'alternate',
+    //     'author',
+    //     'bookmark',
+    //     'external',
+    //     'help',
+    //     'license',
+    //     'next',
+    //     'nofollow',
+    //     'noreferrer',
+    //     'noopener',
+    //     'prev',
+    //     'search',
+    //     'tag'
+    // ],
+    callBackSave: function (contents){
+        console.log('save', contents)
+    },
+    allowStyles: {
+        span: ['opacity'],
+        format: '',
+        rangeFormat: 'a|b'
+    },
+    attributesWhitelist: {
+        all: 'style'
+    },
+    // iframe: true,
     defaultTag: 'div',
+    textTags: {
+        strike:'s',
+        bold: 'b',
+        underline: 'em',
+        italic: 'u'
+    },
     tableCellControllerPosition: 'top',
-    lang: lang.ckb,
+    lang: lang.ko,
     plugins: plugins,
     katex: Katex,
     // value: '',
@@ -406,7 +440,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     },
     // height: 'auto',
     iframeCSSFileName: '.+',
-    addTagsWhitelist: 'i',
+    addTagsWhitelist: 'i|label',
     popupDisplay: 'full',
     charCounter: true,
     charCounterType: 'byte-html',
@@ -424,11 +458,35 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // iframe: true,
     videoFileInput: true,
     audioFileInput: true,
-    placeholder: 'Start typing something...',
+    placeholder: window.aa || 'Start typing something...',
     templates: [
         {
             name: 'Template-1',
-            html: '<p>HTML source1</p>'
+            html: `
+            <div class="__se__tag" style="display: flex; max-width: 480px;">
+                <div class="__se__format__range_div" style="flex: 2; border: 1px solid #5f5f5f; background: #d2e2f1; border-right: none; padding: 5px;">
+                    <img src="http://suneditor.com/ks/test_img.png" data-align="center" class="__se__uneditable"/>
+                </div>
+                <div style="flex: 4; background: #b7b7b7;">
+                    <div
+                    class="__se__format__range_div"
+                    style="border: 1px solid #5f5f5f; border-bottom: none; height: 50%; position: relative;"
+                    contenteditable="false"
+                    >
+                        <div style="position: absolute; top: calc(50% - 10px); left: 10px;">
+                            ABC, Incorporate
+                        </div>
+                    </div>
+                    <div
+                    class="__se__format__range_div"
+                    style="border: 1px solid #5f5f5f; height: 50%; padding: 10px; background: #dce9d5;"
+                    >
+                        <div><label contenteditable="false">Sales Contact : </label><br /></div>
+                        <div><label contenteditable="false">Last Sale : </label><br /></div>
+                        <div><label contenteditable="false">YTD Sale : </label><br /></div>
+                    </div>
+                </div>
+            </div>`
         },
         {
             name: 'Template-2',
@@ -469,25 +527,25 @@ ss.onDrop = function (e) {
     // console.log('onDrop', e);
     return true;
 };
-ss.onPaste = function (e, cleanData, maxCharCount, core) {
-    // replace () > span.katex
-    cleanData = cleanData.replaceAll("(", '<span class="temp-katex">').replaceAll(")", "</span>");
+// ss.onPaste = function (e, cleanData, maxCharCount, core) {
+//     // replace () > span.katex
+//     cleanData = cleanData.replaceAll("(", '<span class="temp-katex">').replaceAll(")", "</span>");
 
-    // set attribute "data-exp"
-    // create html string
-    let html = "";
-    const children = core._d.createRange().createContextualFragment(cleanData).childNodes;
-    for (let i = 0, len = children.length, node; i < len; i++) {
-        node = children[i];
-        if (node.className === "temp-katex") {
-            node.className = "katex";
-            node.setAttribute("data-exp", node.textContent);
-        }
-        html += node.outerHTML || node.textContent;
-    }
+//     // set attribute "data-exp"
+//     // create html string
+//     let html = "";
+//     const children = core._d.createRange().createContextualFragment(cleanData).childNodes;
+//     for (let i = 0, len = children.length, node; i < len; i++) {
+//         node = children[i];
+//         if (node.className === "temp-katex") {
+//             node.className = "katex";
+//             node.setAttribute("data-exp", node.textContent);
+//         }
+//         html += node.outerHTML || node.textContent;
+//     }
 
-    return core.cleanHTML(html, core.pasteTagsWhitelistRegExp);
-}
+//     return core.cleanHTML(html, core.pasteTagsWhitelistRegExp);
+// }
 ss.onAudioUpload = function (targetElement, index, state, videoInfo) {
     // console.log('targetElement:${targetElement}, index:${index}, state:${state}')
     console.log('videoInfo-----', videoInfo)
@@ -590,33 +648,33 @@ window.sun_noticeOpen = function () {
     ss.core.commandHandler(null, 'selectAll');
     ss.core.removeNode()
     // \vec{P}.\vec{Q}=PQ
-//     ss.setContents(`
-//     <p>If&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{P}.\\vec{Q}=PQ" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>P</mi><mo>⃗</mo></mover><mi mathvariant="normal">.</mi><mover accent="true"><mi>Q</mi><mo>⃗</mo></mover><mo>=</mo><mi>P</mi><mi>Q</mi></mrow><annotation encoding="application/x-tex">\\vec{P}.\\vec{Q}=PQ</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1607699999999999em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
-// 3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
-// 10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
-// -1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
-// -7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
-// H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-// c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span></span></span></span><span class="mord">.</span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">Q</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
-// 3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
-// 10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
-// -1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
-// -7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
-// H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-// c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault">Q</span></span></span></span>​, then angle between&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{P}" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>P</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\\vec{P}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9663299999999999em;vertical-align:0em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
-// 3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
-// 10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
-// -1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
-// -7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
-// H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-// c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span></span></span></span></span></span></span>​&nbsp;and&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{Q}" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>Q</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\\vec{Q}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1607699999999999em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">Q</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
-// 3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
-// 10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
-// -1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
-// -7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
-// H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-// c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span></span></span></span>​&nbsp;is</p>
-//     `)
+    ss.setContents(`
+    <p>If&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{P}.\\vec{Q}=PQ" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>P</mi><mo>⃗</mo></mover><mi mathvariant="normal">.</mi><mover accent="true"><mi>Q</mi><mo>⃗</mo></mover><mo>=</mo><mi>P</mi><mi>Q</mi></mrow><annotation encoding="application/x-tex">\\vec{P}.\\vec{Q}=PQ</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1607699999999999em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span></span></span></span><span class="mord">.</span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">Q</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault">Q</span></span></span></span>​, then angle between&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{P}" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>P</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\\vec{P}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9663299999999999em;vertical-align:0em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span></span></span></span></span></span></span>​&nbsp;and&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{Q}" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>Q</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\\vec{Q}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1607699999999999em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">Q</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+-1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+-7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span></span></span></span>​&nbsp;is</p>
+    `)
     // ss.core.focus();
     // ss.core.setIframeContents({
     //     head: '<style>* {color: red;}</style>'
@@ -705,7 +763,7 @@ window.sun_create = function () {
     //     height: 148
     // });
     ss.setOptions({
-        height: 'auto'
+        defaultTag: 'p'
     })
 
     // ss.core.commandHandler(null, 'selectAll');
@@ -736,7 +794,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     {{ contents }}
     <div style="background: #ccc;">Footer</div>`,
     // toolbarWidth: 150,
-    attributesWhitelist: {'all': 'uk-icon'}, 
+    attributesWhitelist: {'all': 'style'},
     plugins: plugins,
     fontSize: fs,
     // maxHeight: '400px',
@@ -1009,14 +1067,20 @@ s2.onVideoUpload = function (targetElement, index, state, videoInfo, remainingFi
 }
 
 window.sun_setOptions2 = function () {
-    s2.setOptions(newOption);
+    // s2.setOptions({
+    //     placeholder: 'fdsfda',
+    //     buttonList: []
+    // });
+    s2.core.commandHandler(null, 'copy');
 }
 
 window.sun_setOptions3 = function () {
-    s2.setOptions(newOption2);
+    // s2.setOptions(newOption2);
+    s2.core.commandHandler(null, 'cut');
 }
 window.sun_setOptions4 = function () {
-    s2.setOptions(newOption3);
+    s2.core.commandHandler(null, 'paste');
+    // s2.setOptions(newOption3);
 }
 
 window.sun_insertImage2 = function () {

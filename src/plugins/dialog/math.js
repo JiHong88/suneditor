@@ -10,14 +10,14 @@ export default {
 
         const context = core.context;
         context.math = {
-            focusElement: null,
+            focusElement: null, // @Override dialog // This element has focus when the dialog is opened.
             previewElement: null,
             fontSizeElement: null,
             _mathExp: null
         };
 
         /** math dialog */
-        let math_dialog = this.setDialog.call(core);
+        let math_dialog = this.setDialog(core);
         context.math.modal = math_dialog;
         context.math.focusElement = math_dialog.querySelector('.se-math-exp');
         context.math.previewElement = math_dialog.querySelector('.se-math-preview');
@@ -27,13 +27,12 @@ export default {
         context.math.fontSizeElement.addEventListener('change', function (e) { this.fontSize = e.target.value; }.bind(context.math.previewElement.style), false);
 
         /** math controller */
-        let math_controller = this.setController_MathButton.call(core);
+        let math_controller = this.setController_MathButton(core);
         context.math.mathController = math_controller;
         context.math._mathExp = null;
-        math_controller.addEventListener('mousedown', core.eventStop);
 
         /** add event listeners */
-        math_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core), false);
+        math_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core), false);
         math_controller.addEventListener('click', this.onClick_mathController.bind(core));
 
         /** append html */
@@ -45,9 +44,9 @@ export default {
     },
 
     /** dialog */
-    setDialog: function () {
-        const lang = this.lang;
-        const dialog = this.util.createElement('DIV');
+    setDialog: function (core) {
+        const lang = core.lang;
+        const dialog = core.util.createElement('DIV');
 
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
@@ -55,7 +54,7 @@ export default {
         '<form>' +
             '<div class="se-dialog-header">' +
                 '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                    this.icons.cancel +
+                    core.icons.cancel +
                 '</button>' +
                 '<span class="se-modal-title">' + lang.dialogBox.mathBox.title + '</span>' +
             '</div>' +
@@ -87,9 +86,9 @@ export default {
     },
 
     /** modify controller button */
-    setController_MathButton: function () {
-        const lang = this.lang;
-        const math_btn = this.util.createElement('DIV');
+    setController_MathButton: function (core) {
+        const lang = core.lang;
+        const math_btn = core.util.createElement('DIV');
 
         math_btn.className = 'se-controller se-controller-link';
         math_btn.innerHTML = '' +
@@ -97,11 +96,11 @@ export default {
         '<div class="link-content">' +
             '<div class="se-btn-group">' +
                 '<button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">' +
-                    this.icons.edit +
+                    core.icons.edit +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
                 '</button>' +
                 '<button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">' +
-                    this.icons.delete +
+                    core.icons.delete +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
                 '</button>' +
             '</div>' +
@@ -133,7 +132,7 @@ export default {
     },
 
     _renderer: function (exp) {
-        const katex = this.context.option.katex;
+        const katex = this.options.katex;
         return katex.src.renderToString(exp, katex.options);
     },
 

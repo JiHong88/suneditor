@@ -15,7 +15,7 @@ export default {
         context.template = {};
 
         /** set submenu */
-        let templateDiv = this.setSubmenu.call(core);
+        let templateDiv = this.setSubmenu(core);
 
         /** add event listeners */
         templateDiv.querySelector('ul').addEventListener('click', this.pickup.bind(core));
@@ -27,13 +27,13 @@ export default {
         templateDiv = null;
     },
 
-    setSubmenu: function () {
-        const templateList = this.context.option.templates;
+    setSubmenu: function (core) {
+        const templateList = core.options.templates;
         if (!templateList || templateList.length === 0) {
             throw Error('[SUNEDITOR.plugins.template.fail] To use the "template" plugin, please define the "templates" option.');
         }
 
-        const listDiv = this.util.createElement('DIV');
+        const listDiv = core.util.createElement('DIV');
         listDiv.className = 'se-list-layer';
 
         let list = '<div class="se-submenu se-list-inner">' +
@@ -55,7 +55,7 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
-        const temp = this.context.option.templates[e.target.getAttribute('data-value')];
+        const temp = this.options.templates[e.target.getAttribute('data-value')];
 
         if (temp.html) {
             this.setContents(temp.html);

@@ -82,7 +82,8 @@
                 title: 'Вставить ссылку',
                 url: 'Ссылка',
                 text: 'Текст',
-                newWindowCheck: 'Открывать в новом окне'
+                newWindowCheck: 'Открывать в новом окне',
+                bookmark: 'Закладка'
             },
             mathBox: {
                 title: 'математический',

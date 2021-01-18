@@ -20,7 +20,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = this.setSubmenu.call(core);
+        let listDiv = this.setSubmenu(core);
 
         /** add event listeners */
         listDiv.querySelector('ul').addEventListener('click', this.pickUp.bind(core));
@@ -33,10 +33,10 @@ export default {
         listDiv = null;
     },
 
-    setSubmenu: function () {
-        const option = this.context.option;
-        const lang_toolbar = this.lang.toolbar;
-        const listDiv = this.util.createElement('DIV');
+    setSubmenu: function (core) {
+        const option = core.options;
+        const lang_toolbar = core.lang.toolbar;
+        const listDiv = core.util.createElement('DIV');
         listDiv.className = 'se-submenu se-list-layer se-list-format';
 
         const defaultFormats = ['p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];

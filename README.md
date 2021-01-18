@@ -98,6 +98,7 @@ const editor = SUNEDITOR.create((document.getElementById('sample') || 'sample'),
 When you display a document created by suneditor
 You need to include "src/assets/css/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
 Then add "sun-editor-editable" to the class name of the Tag element that displays the content.
+If you are using RTL mode, you also need to add "se-rtl".
 In "suneditor-contents.css", you can define the style of all the tags created in suneditor.
 ```
 
@@ -381,11 +382,17 @@ plugins: [
 // Vaues
 lang            : language object.   default : en {Object}
 defaultTag      : Specifies default tag name of the editor.     default: 'p' {String}
+textTags        : You can change the tag of the default text button.   default: { bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL' }
+                  ex) {
+                      bold: 'b',
+                      strike: 's'
+                  }
 value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {String}
 historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {Number}
 
 // Whitelist--------------------------------------å---------------------------------------------------------
+// (You can use regular expression syntax.)
 // _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
@@ -397,7 +404,7 @@ attributesWhitelist   : Add attributes whitelist of tags that should be kept und
                         // Native attributes: 'contenteditable|colspan|rowspan|target|href|src|class|type|controls'
                         // Editor attributes: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size'
                         ex) {
-                            'all': 'style', // Apply to all tags
+                            'all': 'style|data-.+', // Apply to all tags
                             'input': 'checked|name' // Apply to input tag
                         }
 // Layout-------------------------------------------------------------------------------------------------------
@@ -409,10 +416,11 @@ toolbarContainer: A custom HTML selector placing the toolbar inside.
                   The class name of the element must be 'sun-editor'.
                   Element or querySelector argument.     default: null {Element|String}
                   ex) document.querySelector('#id') || '#id'
-stickyToolbar   : Reference height value that should be changed to sticky toolbar mode.
-                  It can also be used when there is another fixed toolbar at the top.
-                  Set to 0, '0px', '50px', etc.
+stickyToolbar   : Top offset value of "sticky toolbar".
+                  Set to 0, '0px', '50px'...
                   If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
+fullScreenOffset: Top offset value of "full Screen".
+                  Set to 0, '0px', '50px'...     default: 0 {Number|String}
 iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {Boolean}
 fullPage        : Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.  default: false {Boolean}
 iframeCSSFileName : Name or Array of the CSS file to apply inside the iframe.
@@ -422,7 +430,7 @@ iframeCSSFileName : Name or Array of the CSS file to apply inside the iframe.
                     ex) '.+' or ['suneditor', 'http://suneditor.com/sample/css/sample.css', '.+\\.min\\.css']
 previewTemplate : A template of the "preview".
                   The {{contents}} part in the HTML string is replaced with the contents of the editor. default: null {String}
-                  ex) "<h1>Preview Template</h1> {{contents}} <div>_Footer_</div>"
+                  ex) "<div style='width:auto; max-width:1080px; margin:auto;'><h1>Preview Template</h1> {{contents}} <div>_Footer_</div></div>"
 codeMirror      : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
                   Use version 5.x.x // https://github.com/codemirror/CodeMirror
                   ex) codeMirror: CodeMirror // Default option
@@ -736,10 +744,32 @@ videoAccept      : Define the "accept" attribute of the input.  default: "*" {St
 // Table----------------------------------------------------------------------------------------------------------
 tableCellControllerPosition : Define position to the table cell controller('cell', 'top'). default: 'cell' {String}
 
+// Link-----------------------------------------------------------------------------------------------------------
+linkProtocol    : Default protocol for the links. ('link', 'image', 'video', 'audio')
+                  This applies to all plugins that enter the internet url.   default: null {String}
+linkRel         : Defines "rel" attribute list of anchor tag.   default: [] {Array}
+                  // https://www.w3schools.com/tags/att_a_rel.asp
+                  ex) [
+                    'alternate',
+                    'author',
+                    'bookmark',
+                    'external',
+                    'help',
+                    'license',
+                    'next',
+                    'nofollow',
+                    'noreferrer',
+                    'noopener',
+                    'prev',
+                    'search',
+                    'tag'
+                ]
+                  
+
 // Key actions----------------------------------------------------------------------------------------------------
 tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {Boolean}
 shortcutsDisable: You can disable shortcuts.    default: [] {Array}
-                  ex) ['bold', 'strike', 'underline', 'italic', 'undo', 'indent']
+                  ex) ['bold', 'strike', 'underline', 'italic', 'undo', 'indent', 'save']
 shortcutsHint   : If false, hide the shortcuts hint.    default: true {Boolean}
 
 // Defining save button-------------------------------------------------------------------------------------------
@@ -762,8 +792,6 @@ templates       : If you use a template plugin, add it.
 
 // ETC------------------------------------------------------------------------------------------------------------
 placeholder     : The placeholder text.                              default: null {String}
-linkProtocol    : Default protocol for the links. ('link', 'image', 'video', 'audio')
-                  This applies to all plugins that enter the internet url.   default: null {String}
 icons           : You can redefine icons.                            default: null {Object}
                   ex) {
                       bold: '<span class="se-icon-text">B</span>',

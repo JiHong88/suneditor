@@ -10,7 +10,7 @@
 export default function (core, change) {
     const _w = core._w;
     const util = core.util;
-    const delayTime = core.context.options.historyStackDelayTime;
+    const delayTime = core.options.historyStackDelayTime;
     let editor = core.context.element;
     let undo = core.context.tool.undo;
     let redo = core.context.tool.redo;

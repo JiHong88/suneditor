@@ -29,7 +29,7 @@ export default {
 
         // Generate submenu HTML
         // Always bind "core" when calling a plugin function
-        let listDiv = this.setSubmenu.call(core);
+        let listDiv = this.setSubmenu(core);
 
         // Input tag caching
         context.customSubmenu.textElement = listDiv.querySelector('input');
@@ -45,8 +45,8 @@ export default {
         core.initMenuTarget(this.name, targetElement, listDiv);
     },
 
-    setSubmenu: function () {
-        const listDiv = this.util.createElement('DIV');
+    setSubmenu: function (core) {
+        const listDiv = core.util.createElement('DIV');
         // @Required
         // A "se-submenu" class is required for the top level element.
         listDiv.className = 'se-submenu se-list-layer';
@@ -54,7 +54,7 @@ export default {
             '<div class="se-list-inner">' +
                 '<ul class="se-list-basic" style="width: 230px;">' +
                     '<li>' +
-                        '<div class="se-submenu-form-group">' +
+                        '<div class="se-form-group">' +
                             '<input class="se-input-form" type="text" placeholder="insert text" style="border: 1px solid #CCC;" />' +
                             '<button type="button" class="se-btn-primary se-tooltip">' +
                                 '<strong>OK</strong>' +

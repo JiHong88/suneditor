@@ -193,22 +193,20 @@ export default {
      * @description Add or reset options
      * @param {Object} mergeOptions New options property
      * @param {Object} context Context object of core
-     * @param {Object} plugins Origin plugins
      * @param {Object} originOptions Origin options
      * @returns {Object} pluginCallButtons
      * @private
      */
-    _setOptions: function (mergeOptions, context, plugins, originOptions) {
+    _setOptions: function (mergeOptions, context, originOptions) {
         this._initOptions(context.element.originElement, mergeOptions);
 
         const el = context.element;
         const relative = el.relative;
         const editorArea = el.editorArea;
         const isNewToolbarContainer = mergeOptions.toolbarContainer && mergeOptions.toolbarContainer !== originOptions.toolbarContainer;
-        const isNewToolbar = !!mergeOptions.buttonList || mergeOptions.mode !== originOptions.mode || isNewToolbarContainer;
-        const isNewPlugins = !!mergeOptions.plugins;
+        const isNewToolbar = mergeOptions.buttonList !== originOptions.buttonList || mergeOptions.mode !== originOptions.mode || isNewToolbarContainer;
 
-        const tool_bar = this._createToolBar(document, (isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList), (isNewPlugins ? mergeOptions.plugins : plugins), mergeOptions);
+        const tool_bar = this._createToolBar(document, (isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList), mergeOptions.plugins, mergeOptions);
         if (tool_bar.pluginCallButtons.math) this._checkKatexMath(mergeOptions.katex);
         const arrow = document.createElement('DIV');
         arrow.className = 'se-arrow';
@@ -256,8 +254,8 @@ export default {
         else util.removeClass(el.topArea, 'se-rtl');
 
         return {
-            callButtons: isNewToolbar ? tool_bar.pluginCallButtons : null,
-            plugins: isNewToolbar || isNewPlugins ? tool_bar.plugins : null,
+            callButtons: tool_bar.pluginCallButtons,
+            plugins: tool_bar.plugins,
             toolbar: tool_bar
         };
     },
@@ -379,6 +377,23 @@ export default {
         /** Values */
         options.lang = options.lang || _defaultLang;
         options.defaultTag = typeof options.defaultTag === 'string' ? options.defaultTag : 'p';
+        const textTags = options.textTags = [{bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL'}, (options.textTags || {})].reduce(function (_default, _new) {
+            for (let key in _new) {
+                if (util.hasOwn(_new, key)) _default[key] = _new[key];
+            }
+            return _default;
+        }, {});
+        options._textTagsMap = {
+            'strong': textTags.bold,
+            'b': textTags.bold,
+            'u': textTags.underline,
+            'ins': textTags.underline,
+            'em': textTags.italic,
+            'i': textTags.italic,
+            'del': textTags.strike,
+            'strike': textTags.strike,
+            's': textTags.strike
+        };
         options.value = typeof options.value === 'string' ? options.value : null;
         options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
         /** Whitelist */
@@ -386,6 +401,31 @@ export default {
         options._editorTagsWhitelist = options._defaultTagsWhitelist + (typeof options.addTagsWhitelist === 'string' && options.addTagsWhitelist.length > 0 ? '|' + options.addTagsWhitelist : '');
         options.pasteTagsWhitelist = typeof options.pasteTagsWhitelist === 'string' ? options.pasteTagsWhitelist : options._editorTagsWhitelist;
         options.attributesWhitelist = (!options.attributesWhitelist || typeof options.attributesWhitelist !== 'object') ? null : options.attributesWhitelist;
+        // @v3
+        // const defaultAllowStyles = {
+        //     format: ['margin-left', 'margin-right', 'text-align', 'line-height'],
+        //     rangeFormat: [],
+        //     closureRangeFormat: [],
+        //     freeFormat: [],
+        //     closureFreeFormat: [],
+        //     component: [],
+        //     span: ['font-family', 'color', 'background-color', 'font-size']
+        // };
+        // options.allowStyles = (!options.allowStyles || typeof options.allowStyles !== 'object') ? defaultAllowStyles : [defaultAllowStyles, options.allowStyles].reduce(function (_default, _new) {
+        //     for (let key in _new) {
+        //         if (!_default[key]) _default[key] = [];
+        //         const newStyle = _new[key];
+        //         if (typeof newStyle === 'string') {
+        //             _default[key] = !newStyle ? [] : newStyle.split('|');
+        //         } else {
+        //             for (let i = 0, len = newStyle.length, n; i < len; i++) {
+        //                 n = newStyle[i];
+        //                 if (_default[key].indexOf(n) === -1) _default[key].push(n)
+        //             }
+        //         }
+        //     }
+        //     return _default;
+        // }, {});
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
         options.rtl = !!options.rtl;
@@ -393,6 +433,7 @@ export default {
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
         options.toolbarContainer = typeof options.toolbarContainer === 'string' ? document.querySelector(options.toolbarContainer) : options.toolbarContainer;
         options.stickyToolbar = (/balloon/i.test(options.mode) || !!options.toolbarContainer) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);
+        options.fullScreenOffset = options.fullScreenOffset === undefined ? 0 : (/^\d+/.test(options.fullScreenOffset) ? util.getNumber(options.fullScreenOffset, 0) : 0);
         options.iframe = options.fullPage || options.iframe;
         options.fullPage = !!options.fullPage;
         options.iframeCSSFileName = options.iframe ? typeof options.iframeCSSFileName === 'string' ? [options.iframeCSSFileName] : (options.iframeCSSFileName || ['suneditor']) : null;
@@ -483,9 +524,12 @@ export default {
         options.audioAccept = (typeof options.audioAccept !== 'string' || options.audioAccept.trim() === "*") ? 'audio/*' : options.audioAccept.trim() || 'audio/*';
         /** Table */
         options.tableCellControllerPosition = typeof options.tableCellControllerPosition === 'string' ? options.tableCellControllerPosition.toLowerCase() : 'cell';
+        /** Link */
+        options.linkProtocol = typeof options.linkProtocol === 'string' ? options.linkProtocol : null;
+        options.linkRel = Array.isArray(options.linkRel) ? options.linkRel : [];
         /** Key actions */
         options.tabDisable = !!options.tabDisable;
-        options.shortcutsDisable = (Array.isArray(options.shortcutsDisable) && options.shortcutsDisable.length > 0) ? options.shortcutsDisable.map(function (v) { return v.toLowerCase(); }) : [];
+        options.shortcutsDisable = Array.isArray(options.shortcutsDisable) ? options.shortcutsDisable : [];
         options.shortcutsHint = options.shortcutsHint === undefined ? true : !!options.shortcutsHint;
         /** Defining save button */
         options.callBackSave = !options.callBackSave ? null : options.callBackSave;
@@ -493,9 +537,8 @@ export default {
         options.templates = !options.templates ? null : options.templates;
         /** ETC */
         options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
-        options.linkProtocol = typeof options.linkProtocol === 'string' ? options.linkProtocol : null;
         /** Buttons */
-        options.buttonList = !!options.buttonList ? JSON.parse(JSON.stringify(options.buttonList)) : [
+        options.buttonList = !!options.buttonList ? options.buttonList : [
             ['undo', 'redo'],
             ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
             ['removeFormat'],
@@ -539,15 +582,15 @@ export default {
         const lang = options.lang;
         const cmd = util.isOSX_IOS ? '⌘' : 'CTRL';
         const addShift = util.isOSX_IOS ? '⇧' : '+SHIFT';
-        const shortcutsDisable = !options.shortcutsHint ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent'] : options.shortcutsDisable;
+        const shortcutsDisable = !options.shortcutsHint ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent', 'save'] : options.shortcutsDisable;
         const indentKey = options.rtl ? ['[',']'] : [']','['];
 
         return {
             /** default command */
-            bold: ['_se_command_bold', lang.toolbar.bold + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('bold') > -1 ? '' : cmd + '+<span class="se-shortcut-key">B</span>') + '</span>', 'STRONG', '', icons.bold],
-            underline: ['_se_command_underline', lang.toolbar.underline + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('underline') > -1 ? '' : cmd + '+<span class="se-shortcut-key">U</span>') + '</span>', 'U', '', icons.underline],
-            italic: ['_se_command_italic', lang.toolbar.italic + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('italic') > -1 ? '' : cmd + '+<span class="se-shortcut-key">I</span>') + '</span>', 'EM', '', icons.italic],
-            strike: ['_se_command_strike', lang.toolbar.strike + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('strike') > -1 ? '' : cmd + addShift + '+<span class="se-shortcut-key">S</span>') + '</span>', 'DEL', '', icons.strike],
+            bold: ['_se_command_bold', lang.toolbar.bold + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('bold') > -1 ? '' : cmd + '+<span class="se-shortcut-key">B</span>') + '</span>', 'bold', '', icons.bold],
+            underline: ['_se_command_underline', lang.toolbar.underline + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('underline') > -1 ? '' : cmd + '+<span class="se-shortcut-key">U</span>') + '</span>', 'underline', '', icons.underline],
+            italic: ['_se_command_italic', lang.toolbar.italic + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('italic') > -1 ? '' : cmd + '+<span class="se-shortcut-key">I</span>') + '</span>', 'italic', '', icons.italic],
+            strike: ['_se_command_strike', lang.toolbar.strike + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('strike') > -1 ? '' : cmd + addShift + '+<span class="se-shortcut-key">S</span>') + '</span>', 'strike', '', icons.strike],
             subscript: ['_se_command_subscript', lang.toolbar.subscript, 'SUB', '', icons.subscript],
             superscript: ['_se_command_superscript', lang.toolbar.superscript, 'SUP', '', icons.superscript],
             removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', icons.erase],
@@ -560,7 +603,7 @@ export default {
             redo: ['_se_command_redo se-resizing-enabled', lang.toolbar.redo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmd + '+<span class="se-shortcut-key">Y</span> / ' + cmd + addShift + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'redo', '', icons.redo],
             preview: ['se-resizing-enabled', lang.toolbar.preview, 'preview', '', icons.preview],
             print: ['se-resizing-enabled', lang.toolbar.print, 'print', '', icons.print],
-            save: ['_se_command_save se-resizing-enabled', lang.toolbar.save, 'save', '', icons.save],
+            save: ['_se_command_save se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmd + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save],
             /** plugins - command */
             blockquote: ['', lang.toolbar.tag_blockquote, 'blockquote', 'command', icons.blockquote],
             /** plugins - submenu */
@@ -672,6 +715,7 @@ export default {
         tool_bar.appendChild(_buttonTray);
 
         /** create button list */
+        buttonList = JSON.parse(JSON.stringify(buttonList));
         const icons = options.icons;
         const defaultButtonList = this._defaultButtons(options);
         const pluginCallButtons = {};
@@ -790,14 +834,15 @@ export default {
             }
         }
 
-        const lastFloat = _buttonTray.lastElementChild.style.float;
-        if (!!lastFloat) {
-            const sv =  separator_vertical.cloneNode(false);
-            sv.style.float = lastFloat;
-            _buttonTray.appendChild(sv);
+        switch (_buttonTray.children.length) {
+            case 0:
+                _buttonTray.style.display = 'none';
+                break;
+            case 1:
+                util.removeClass(_buttonTray.firstElementChild, 'se-btn-module-border');
+                break;
         }
 
-        if (_buttonTray.children.length === 1) util.removeClass(_buttonTray.firstElementChild, 'se-btn-module-border');
         if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
         if (moreLayer.children.length > 0) _buttonTray.appendChild(moreLayer);
 

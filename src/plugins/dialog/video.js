@@ -18,17 +18,19 @@ export default {
     add: function (core) {
         core.addModule([dialog, component, resizing, fileManager]);
 
+        const options = core.options;
         const context = core.context;
         const contextVideo = context.video = {
             _infoList: [], // @Override fileManager
             _infoIndex: 0, // @Override fileManager
             _uploadFileLength: 0, // @Override fileManager
-            sizeUnit: context.option._videoSizeUnit,
+            focusElement: null, // @Override dialog // This element has focus when the dialog is opened.
+            sizeUnit: options._videoSizeUnit,
             _align: 'none',
             _floatClassRegExp: '__se__float\\-[a-z]+',
-            _youtubeQuery: context.option.youtubeQuery,
-            _videoRatio: (context.option.videoRatio * 100) + '%',
-            _defaultRatio: (context.option.videoRatio * 100) + '%',
+            _youtubeQuery: options.youtubeQuery,
+            _videoRatio: (options.videoRatio * 100) + '%',
+            _defaultRatio: (options.videoRatio * 100) + '%',
             _linkValue: '',
             // @require @Override component
             _element: null,
@@ -42,14 +44,14 @@ export default {
             _element_l: 0,
             _element_t: 0,
             _defaultSizeX: '100%',
-            _defaultSizeY: (context.option.videoRatio * 100) + '%',
-            _origin_w: context.option.videoWidth === '100%' ? '' : context.option.videoWidth,
-            _origin_h: context.option.videoHeight === '56.25%' ? '' : context.option.videoHeight,
+            _defaultSizeY: (options.videoRatio * 100) + '%',
+            _origin_w: options.videoWidth === '100%' ? '' : options.videoWidth,
+            _origin_h: options.videoHeight === '56.25%' ? '' : options.videoHeight,
             _proportionChecked: true,
-            _resizing: context.option.videoResizing,
-            _resizeDotHide: !context.option.videoHeightShow,
-            _rotation: context.option.videoRotation,
-            _onlyPercentage: context.option.videoSizeOnlyPercentage,
+            _resizing: options.videoResizing,
+            _resizeDotHide: !options.videoHeightShow,
+            _rotation: options.videoRotation,
+            _onlyPercentage: options.videoSizeOnlyPercentage,
             _ratio: false,
             _ratioX: 1,
             _ratioY: 1,
@@ -57,7 +59,7 @@ export default {
         };
 
         /** video dialog */
-        let video_dialog = this.setDialog.call(core);
+        let video_dialog = this.setDialog(core);
         contextVideo.modal = video_dialog;
         contextVideo.videoInputFile = video_dialog.querySelector('._se_video_file');
         contextVideo.videoUrlFile = video_dialog.querySelector('.se-input-url');
@@ -65,22 +67,22 @@ export default {
         contextVideo.preview = video_dialog.querySelector('.se-link-preview');
 
         /** add event listeners */
-        video_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        video_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core));
         if (contextVideo.videoInputFile) video_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(contextVideo.videoInputFile, contextVideo.videoUrlFile, contextVideo.preview));
         if (contextVideo.videoInputFile && contextVideo.videoUrlFile) contextVideo.videoInputFile.addEventListener('change', this._fileInputChange.bind(contextVideo));
-        if (contextVideo.videoUrlFile) contextVideo.videoUrlFile.addEventListener('input', this._onLinkPreview.bind(contextVideo.preview, contextVideo, context.options.linkProtocol));
+        if (contextVideo.videoUrlFile) contextVideo.videoUrlFile.addEventListener('input', this._onLinkPreview.bind(contextVideo.preview, contextVideo, options.linkProtocol));
 
         contextVideo.proportion = {};
         contextVideo.videoRatioOption = {};
         contextVideo.inputX = {};
         contextVideo.inputY = {};
-        if (context.option.videoResizing) {
+        if (options.videoResizing) {
             contextVideo.proportion = video_dialog.querySelector('._se_video_check_proportion');
             contextVideo.videoRatioOption = video_dialog.querySelector('.se-video-ratio');
             contextVideo.inputX = video_dialog.querySelector('._se_video_size_x');
             contextVideo.inputY = video_dialog.querySelector('._se_video_size_y');
-            contextVideo.inputX.value = context.option.videoWidth;
-            contextVideo.inputY.value = context.option.videoHeight;
+            contextVideo.inputX.value = options.videoWidth;
+            contextVideo.inputY.value = options.videoHeight;
 
             contextVideo.inputX.addEventListener('keyup', this.setInputSize.bind(core, 'x'));
             contextVideo.inputY.addEventListener('keyup', this.setInputSize.bind(core, 'y'));
@@ -101,10 +103,10 @@ export default {
     },
 
     /** dialog */
-    setDialog: function () {
-        const option = this.context.option;
-        const lang = this.lang;
-        const dialog = this.util.createElement('DIV');
+    setDialog: function (core) {
+        const option = core.options;
+        const lang = core.lang;
+        const dialog = core.util.createElement('DIV');
 
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
@@ -112,7 +114,7 @@ export default {
             '<form method="post" enctype="multipart/form-data">' +
                 '<div class="se-dialog-header">' +
                     '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                        this.icons.cancel +
+                        core.icons.cancel +
                     '</button>' +
                     '<span class="se-modal-title">' + lang.dialogBox.videoBox.title + '</span>' +
                 '</div>' +
@@ -124,7 +126,7 @@ export default {
                             '<label>' + lang.dialogBox.videoBox.file + '</label>' +
                             '<div class="se-dialog-form-files">' +
                                 '<input class="se-input-form _se_video_file" type="file" accept="' + option.videoAccept + '"' + (option.videoMultipleFile ? ' multiple="multiple"' : '') + '/>' +
-                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '">' + this.icons.cancel + '</button>' +
+                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '">' + core.icons.cancel + '</button>' +
                             '</div>' +
                         '</div>' ;
                 }
@@ -163,7 +165,7 @@ export default {
                                 html += '<option value="' + ratioList[i].value + '"' + (ratio.toString() === ratioList[i].value.toString() ? ' selected' : '') + '>' + ratioList[i].name + '</option>';
                             }
                         html += '</select>' +
-                        '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;">' + this.icons.revert + '</button>' +
+                        '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;">' + core.icons.revert + '</button>' +
                     '</div>' +
                     '<div class="se-dialog-form se-dialog-form-footer"' + onlyPercentDisplay + onlyWidthDisplay + '>' +
                         '<label><input type="checkbox" class="se-dialog-btn-check _se_video_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
@@ -219,7 +221,7 @@ export default {
     _setTagAttrs: function (element) {
         element.setAttribute('controls', true);
 
-        const attrs = this.context.options.videoTagAttrs;
+        const attrs = this.options.videoTagAttrs;
         if (!attrs) return;
 
         for (let key in attrs) {
@@ -238,7 +240,7 @@ export default {
         element.frameBorder = '0';
         element.allowFullscreen = true;
 
-        const attrs = this.context.options.videoIframeAttrs;
+        const attrs = this.options.videoIframeAttrs;
         if (!attrs) return;
 
         for (let key in attrs) {
@@ -300,12 +302,12 @@ export default {
         const contextVideo = this.context.video;
 
         if (!update) {
-            contextVideo.inputX.value = contextVideo._origin_w = this.context.option.videoWidth === contextVideo._defaultSizeX ? '' : this.context.option.videoWidth;
-            contextVideo.inputY.value = contextVideo._origin_h = this.context.option.videoHeight === contextVideo._defaultSizeY ? '' : this.context.option.videoHeight;
+            contextVideo.inputX.value = contextVideo._origin_w = this.options.videoWidth === contextVideo._defaultSizeX ? '' : this.options.videoWidth;
+            contextVideo.inputY.value = contextVideo._origin_h = this.options.videoHeight === contextVideo._defaultSizeY ? '' : this.options.videoHeight;
             contextVideo.proportion.disabled = true;
-            if (contextVideo.videoInputFile && this.context.options.videoMultipleFile) contextVideo.videoInputFile.setAttribute('multiple', 'multiple');
+            if (contextVideo.videoInputFile && this.options.videoMultipleFile) contextVideo.videoInputFile.setAttribute('multiple', 'multiple');
         } else {
-            if (contextVideo.videoInputFile && this.context.options.videoMultipleFile) contextVideo.videoInputFile.removeAttribute('multiple');
+            if (contextVideo.videoInputFile && this.options.videoMultipleFile) contextVideo.videoInputFile.removeAttribute('multiple');
         }
 
         if (contextVideo._resizing) {
@@ -394,7 +396,7 @@ export default {
             }
         }
 
-        const limitSize = this.context.option.videoUploadSizeLimit;
+        const limitSize = this.options.videoUploadSizeLimit;
         if (limitSize > 0) {
             let infoSize = 0;
             const videosInfo = this.context.video._infoList;
@@ -461,7 +463,7 @@ export default {
             return;
         }
 
-        const videoUploadUrl = this.context.option.videoUploadUrl;
+        const videoUploadUrl = this.options.videoUploadUrl;
         const filesLen = this.context.dialog.updateModal ? 1 : files.length;
 
         // server upload
@@ -470,7 +472,7 @@ export default {
             for (let i = 0; i < filesLen; i++) {
                 formData.append('file-' + i, files[i]);
             }
-            this.plugins.fileManager.upload.call(this, videoUploadUrl, this.context.option.videoUploadHeader, formData, this.plugins.video.callBack_videoUpload.bind(this, info), this.functions.onVideoUploadError);
+            this.plugins.fileManager.upload.call(this, videoUploadUrl, this.options.videoUploadHeader, formData, this.plugins.video.callBack_videoUpload.bind(this, info), this.functions.onVideoUploadError);
         } else {
             throw Error('[SUNEDITOR.videoUpload.fail] cause : There is no "videoUploadUrl" option.');
         }
@@ -679,7 +681,8 @@ export default {
         contextVideo._element = element;
         contextVideo._cover = this.util.getParentElement(element, 'FIGURE');
         contextVideo._container = this.util.getParentElement(element, this.util.isMediaComponent);
-        contextVideo._align = element.getAttribute('data-align') || 'none';
+        contextVideo._align = element.style.float || element.getAttribute('data-align') || 'none';
+        element.style.float = '';
 
         if (size) {
             contextVideo._element_w = size.w;
@@ -754,20 +757,13 @@ export default {
     },
 
     /**
-     * @Override resizing
-     */
-    sizeRevert: function () {
-        this.plugins.resizing._module_sizeRevert.call(this, this.context.video);
-    },
-
-    /**
-     * @Override resizing
+     * @Override fileManager
      */
     applySize: function (w, h) {
         const contextVideo = this.context.video;
 
-        if (!w) w = contextVideo.inputX.value || this.context.option.videoWidth;
-        if (!h) h = contextVideo.inputY.value || this.context.option.videoHeight;
+        if (!w) w = contextVideo.inputX.value || this.options.videoWidth;
+        if (!h) h = contextVideo.inputY.value || this.options.videoHeight;
         
         if (contextVideo._onlyPercentage || /%$/.test(w) || !w) {
             this.plugins.video.setPercentSize.call(this, (w || '100%'), (h || (/%$/.test(contextVideo._videoRatio) ? contextVideo._videoRatio : contextVideo._defaultRatio)));
@@ -779,6 +775,13 @@ export default {
         }
 
         return false;
+    },
+
+    /**
+     * @Override resizing
+     */
+    sizeRevert: function () {
+        this.plugins.resizing._module_sizeRevert.call(this, this.context.video);
     },
 
     /**
@@ -923,15 +926,6 @@ export default {
         element.setAttribute('data-align', align);
     },
 
-    resetAlign: function () {
-        const contextVideo = this.context.video;
-
-        contextVideo._element.setAttribute('data-align', '');
-        contextVideo._align = 'none';
-        contextVideo._cover.style.margin = '0';
-        this.util.removeClass(contextVideo._container, contextVideo._floatClassRegExp);
-    },
-
     /**
      * @Override dialog
      */
@@ -944,13 +938,13 @@ export default {
             contextVideo.preview.style.textDecoration = '';
         }
 
-        contextVideo._origin_w = this.context.option.videoWidth;
-        contextVideo._origin_h = this.context.option.videoHeight;
+        contextVideo._origin_w = this.options.videoWidth;
+        contextVideo._origin_h = this.options.videoHeight;
         contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="none"]').checked = true;
         
         if (contextVideo._resizing) {
-            contextVideo.inputX.value = this.context.option.videoWidth === contextVideo._defaultSizeX ? '' : this.context.option.videoWidth;
-            contextVideo.inputY.value = this.context.option.videoHeight === contextVideo._defaultSizeY ? '' : this.context.option.videoHeight;
+            contextVideo.inputX.value = this.options.videoWidth === contextVideo._defaultSizeX ? '' : this.options.videoWidth;
+            contextVideo.inputY.value = this.options.videoHeight === contextVideo._defaultSizeY ? '' : this.options.videoHeight;
             contextVideo.proportion.checked = true;
             contextVideo.proportion.disabled = true;
             this.plugins.video.setVideoRatioSelect.call(this, contextVideo._defaultRatio);

@@ -37,14 +37,14 @@
             _element_t: 0,
             _defaultSizeX: 'auto',
             _defaultSizeY: 'auto',
-            _origin_w: context.option.imageWidth === 'auto' ? '' : context.option.imageWidth,
-            _origin_h: context.option.imageHeight === 'auto' ? '' : context.option.imageHeight,
+            _origin_w: core.options.imageWidth === 'auto' ? '' : core.options.imageWidth,
+            _origin_h: core.options.imageHeight === 'auto' ? '' : core.options.imageHeight,
             _proportionChecked: true,
             // -- select function --
-            _resizing: context.option.imageResizing,
-            _resizeDotHide: !context.option.imageHeightShow,
-            _rotation: context.option.imageRotation,
-            _onlyPercentage: context.option.imageSizeOnlyPercentage,
+            _resizing: core.options.imageResizing,
+            _resizeDotHide: !core.options.imageHeightShow,
+            _rotation: core.options.imageRotation,
+            _onlyPercentage: core.options.imageSizeOnlyPercentage,
             _ratio: false,
             _ratioX: 1,
             _ratioY: 1
@@ -79,14 +79,14 @@
             };
     
             /** resize controller, button */
-            let resize_div_container = this.setController_resize.call(core);
+            let resize_div_container = this.setController_resize(core);
             context.resizing.resizeContainer = resize_div_container;
     
             context.resizing.resizeDiv = resize_div_container.querySelector('.se-modal-resize');
             context.resizing.resizeDot = resize_div_container.querySelector('.se-resize-dot');
             context.resizing.resizeDisplay = resize_div_container.querySelector('.se-resize-display');
     
-            let resize_button = this.setController_button.call(core);
+            let resize_button = this.setController_button(core);
             context.resizing.resizeButton = resize_button;
     
             let resize_handles = context.resizing.resizeHandles = context.resizing.resizeDot.querySelectorAll('span');
@@ -103,7 +103,6 @@
     
             /** add event listeners */
             resize_div_container.addEventListener('mousedown', function (e) { e.preventDefault(); });
-            resize_button.addEventListener('mousedown', core.eventStop);
             resize_handles[0].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
             resize_handles[1].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
             resize_handles[2].addEventListener('mousedown', this.onMouseDown_resize_handle.bind(core));
@@ -123,8 +122,8 @@
         },
     
         /** resize controller, button (image, iframe, video) */
-        setController_resize: function () {
-            const resize_container = this.util.createElement('DIV');
+        setController_resize: function (core) {
+            const resize_container = core.util.createElement('DIV');
             
             resize_container.className = 'se-controller se-resizing-container';
             resize_container.style.display = 'none';
@@ -145,10 +144,10 @@
             return resize_container;
         },
     
-        setController_button: function () {
-            const lang = this.lang;
-            const icons = this.icons;
-            const resize_button = this.util.createElement("DIV");
+        setController_button: function (core) {
+            const lang = core.lang;
+            const icons = core.icons;
+            const resize_button = core.util.createElement("DIV");
     
             resize_button.className = "se-controller se-controller-resizing";
             resize_button.innerHTML = '' +
@@ -470,19 +469,17 @@
                 }
             }
 
-            if (this.currentControllerName !== plugin) {
-                this.util.setDisabledButtons(true, this.resizingDisabledButtons);
-                resizeContainer.style.display = 'block';
+            this.util.setDisabledButtons(true, this.resizingDisabledButtons);
+            resizeContainer.style.display = 'block';
 
-                const addOffset = {left: 0, top: 50};
-                if (this.context.options.iframe) {
-                    addOffset.left -= this.context.element.wysiwygFrame.parentElement.offsetLeft;
-                    addOffset.top -= this.context.element.wysiwygFrame.parentElement.offsetTop;
-                }
-
-                this.setControllerPosition(contextResizing.resizeButton, resizeContainer, 'bottom', addOffset);
-                this.controllersOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
+            const addOffset = {left: 0, top: 50};
+            if (this.options.iframe) {
+                addOffset.left -= this.context.element.wysiwygFrame.parentElement.offsetLeft;
+                addOffset.top -= this.context.element.wysiwygFrame.parentElement.offsetTop;
             }
+
+            this.setControllerPosition(contextResizing.resizeButton, resizeContainer, 'bottom', addOffset);
+            this.controllersOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
     
             contextResizing._resize_w = w;
             contextResizing._resize_h = h;
@@ -514,11 +511,11 @@
             this.plugins.resizing._closeAlignMenu = function () {
                 this.util.removeClass(this.context.resizing.alignButton, 'on');
                 this.context.resizing.alignMenu.style.display = 'none';
-                this.removeDocEvent('mousedown', this.plugins.resizing._closeAlignMenu);
+                this.removeDocEvent('click', this.plugins.resizing._closeAlignMenu);
                 this.plugins.resizing._closeAlignMenu = null;
             }.bind(this);
     
-            this.addDocEvent('mousedown', this.plugins.resizing._closeAlignMenu);
+            this.addDocEvent('click', this.plugins.resizing._closeAlignMenu);
         },
     
         /**

@@ -59,7 +59,8 @@ export interface Lang {
       title: string,
       url: string,
       text: string,
-      newWindowCheck: string
+      newWindowCheck: string,
+      bookmark: string
     },
     mathBox: {
       title: string,

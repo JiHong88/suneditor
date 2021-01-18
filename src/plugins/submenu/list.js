@@ -23,7 +23,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = this.setSubmenu.call(core);
+        let listDiv = this.setSubmenu(core);
         let listUl = listDiv.querySelector('ul');
 
         /** add event listeners */
@@ -37,19 +37,19 @@ export default {
         listDiv = null, listUl = null;
     },
 
-    setSubmenu: function () {
-        const lang = this.lang;
-        const listDiv = this.util.createElement('DIV');
+    setSubmenu: function (core) {
+        const lang = core.lang;
+        const listDiv = core.util.createElement('DIV');
 
         listDiv.className = 'se-submenu se-list-layer';
         listDiv.innerHTML = '' +
             '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
                     '<li><button type="button" class="se-btn-list se-tooltip" data-command="OL" title="' + lang.toolbar.orderList + '">' +
-                        this.icons.list_number +
+                        core.icons.list_number +
                     '</button></li>' +
                     '<li><button type="button" class="se-btn-list se-tooltip" data-command="UL" title="' + lang.toolbar.unorderList + '">' +
-                        this.icons.list_bullets +
+                        core.icons.list_bullets +
                     '</button></li>' +
                 '</ul>' +
             '</div>';

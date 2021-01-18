@@ -2,7 +2,7 @@ import { Lang } from './lang/Lang';
 import { Plugin } from './plugins/Plugin';
 
 export interface SunEditorOptions {
-    plugins: Plugin[] | Record<string, Plugin>;
+    plugins?: Plugin[] | Record<string, Plugin>;
     /**
      * Values
      * ======
@@ -15,6 +15,10 @@ export interface SunEditorOptions {
      * Specifies default tag name of the editor. (default: "p")
      */
     defaultTag?: string;
+    /**
+     * You can change the tag of the default text button.   default: { bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL' }
+     */
+    textTags?: {bold: string; underline: string; italic: string; strike: string;};
     /**
      * Initial value(html string) of the edit area.
      * If not, the value of the "target textarea".
@@ -36,6 +40,20 @@ export interface SunEditorOptions {
      * Add attributes whitelist of tags that should be kept undeleted from the editor.
      */
     attributesWhitelist?: Record<string, string>;
+    /**
+     * Specify the styles allowed for each format and tag.
+     * {
+     *  format: ['margin-left', 'margin-right', 'text-align', 'line-height'], 
+     *  rangeFormat: [],
+     *  closureRangeFormat: [],
+     *  freeFormat: [],
+     *  closureFreeFormat: [],
+     *  component: [],
+     *  span: ['font-family', 'color', 'background-color', 'font-size']
+     * }
+     */
+    // @v3
+    // allowStyles?: Record<string, string[]>
     /**
      * Layout
      * ======
@@ -64,9 +82,13 @@ export interface SunEditorOptions {
      */
     toolbarContainer?: HTMLElement | string;
     /**
-     * Reference height value that should be changed to sticky toolbar mode
+     * Top offset value of "sticky toolbar".
      */
-    stickyToolbar?: number;
+    stickyToolbar?: number | string;
+    /**
+     * Top offset value of "full Screen".
+     */
+    fullScreenOffset?: number | string;
     /**
      * Content will be placed in an iframe and isolated from the rest of the page
      */
@@ -458,6 +480,10 @@ export interface SunEditorOptions {
      */
     linkProtocol?: string;
     /**
+     * Defines "rel" attribute list of anchor tag.
+     */
+    linkRel?: string[];
+    /**
      * You can redefine icons.
      */
     icons?: Record<string, string>;
@@ -478,41 +504,4 @@ export type TemplatesItem = { name: string; html: string };
 export type LineHeightsItem = { text: string; value: number };
 export type ParagraphStyles = (string | { name: string; class: string; _class?: string })[];
 export type TextStyles = (string | { name: string; style: string; tag: string; _class?: string })[];
-export type ButtonListDefaults =
-  | '/' // Line Break
-  | 'bold'
-  | 'underline'
-  | 'italic'
-  | 'strike'
-  | 'subscript'
-  | 'superscript'
-  | 'removeFormat'
-  | 'indent'
-  | 'outdent'
-  | 'fullScreen'
-  | 'showBlocks'
-  | 'codeView'
-  | 'undo'
-  | 'redo'
-  | 'preview'
-  | 'print'
-  | 'save'
-  | 'font'
-  | 'formatBlock'
-  | 'fontSize'
-  | 'fontColor'
-  | 'hiliteColor'
-  | 'align'
-  | 'list'
-  | 'horizontalRule'
-  | 'table'
-  | 'lineHeight'
-  | 'template'
-  | 'paragraphStyle'
-  | 'textStyle'
-  | 'link'
-  | 'image'
-  | 'video'
-  | 'math'
-  | 'imageGallery';
-export type ButtonListItem = ButtonListDefaults | ButtonListDefaults[] | string[];
+export type ButtonListItem = any;

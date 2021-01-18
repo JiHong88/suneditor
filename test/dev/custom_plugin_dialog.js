@@ -37,14 +37,14 @@ export default {
         };
 
         /** link dialog */
-        let link_dialog = this.setDialog.call(core);
+        let link_dialog = this.setDialog(core);
         context.customLink.modal = link_dialog;
         context.customLink.focusElement = link_dialog.querySelector('._se_link_url');
         context.customLink.linkAnchorText = link_dialog.querySelector('._se_link_text');
         context.customLink.targetSelect = link_dialog.querySelector('.se-input-select');
 
         /** link controller */
-        let link_controller = this.setController_LinkButton.call(core);
+        let link_controller = this.setController_LinkButton(core);
         context.customLink.linkController = link_controller;
         context.customLink._linkAnchor = null;
         // @Required
@@ -52,7 +52,7 @@ export default {
         link_controller.addEventListener('mousedown', function (e) { e.stopPropagation(); }, false);
 
         /** add event listeners */
-        link_dialog.querySelector('.se-btn-primary').addEventListener('click', this.submit.bind(core));
+        link_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core));
         link_controller.addEventListener('click', this.onClick_linkController.bind(core));
 
         /** append html */
@@ -66,9 +66,9 @@ export default {
     },
 
     /** dialog */
-    setDialog: function () {
-        const lang = this.lang;
-        const dialog = this.util.createElement('DIV');
+    setDialog: function (core) {
+        const lang = core.lang;
+        const dialog = core.util.createElement('DIV');
         const targetList = [
             { target: '_blank', name: 'New window'},
             { target: '_parent', name: 'Parent frame'},
@@ -83,7 +83,7 @@ export default {
             '<form class="editor_link">' +
                 '<div class="se-dialog-header">' +
                     '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
-                        this.icons.cancel +
+                        core.icons.cancel +
                     '</button>' +
                     '<span class="se-modal-title">' + lang.dialogBox.linkBox.title + '</span>' +
                 '</div>' +
@@ -117,10 +117,10 @@ export default {
     },
 
     /** modify controller button */
-    setController_LinkButton: function () {
-        const lang = this.lang;
-        const icons = this.icons;
-        const link_btn = this.util.createElement('DIV');
+    setController_LinkButton: function (core) {
+        const lang = core.lang;
+        const icons = core.icons;
+        const link_btn = core.util.createElement('DIV');
 
         link_btn.className = 'se-controller se-controller-link';
         link_btn.innerHTML = '' +

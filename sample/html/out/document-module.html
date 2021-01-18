@@ -123,7 +123,7 @@
 <span class="pl-c">     * <span class="pl-k">@param</span>  formData FormData in body</span>
 <span class="pl-c">     * <span class="pl-k">@param</span>  callBack Success call back function</span>
 <span class="pl-c">     * <span class="pl-k">@param</span>  errorCallBack Error call back function</span>
-<span class="pl-c">     * <span class="pl-k">@example</span> this.plugins.fileManager.upload.call(this, imageUploadUrl, this.context.option.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.functions.onImageUploadError);</span>
+<span class="pl-c">     * <span class="pl-k">@example</span> this.plugins.fileManager.upload.call(this, imageUploadUrl, this.options.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.functions.onImageUploadError);</span>
 <span class="pl-c">     */</span>
     <span class="pl-c1">upload</span><span class="pl-kos">(</span><span class="pl-s1">uploadUrl</span>: <span class="pl-smi">string</span><span class="pl-kos">,</span> <span class="pl-s1">uploadHeader</span>: <span class="pl-smi">Record</span><span class="pl-kos">&lt;</span><span class="pl-smi">string</span><span class="pl-kos">,</span> <span class="pl-smi">string</span><span class="pl-kos">&gt;</span> | <span class="pl-smi">null</span><span class="pl-kos">,</span> <span class="pl-s1">formData</span>: <span class="pl-smi">FormData</span><span class="pl-kos">,</span> <span class="pl-s1">callBack</span>: <span class="pl-smi">Function</span> | <span class="pl-smi">null</span><span class="pl-kos">,</span> <span class="pl-s1">errorCallBack</span>: <span class="pl-smi">Function</span> | <span class="pl-smi">null</span><span class="pl-kos">)</span>: <span class="pl-smi"><span class="pl-k">void</span></span><span class="pl-kos">;</span>
 
@@ -188,14 +188,14 @@
 <span class="pl-c">    _element_t: 0,</span>
 <span class="pl-c">    _defaultSizeX: 'auto',</span>
 <span class="pl-c">    _defaultSizeY: 'auto',</span>
-<span class="pl-c">    _origin_w: context.option.imageWidth === 'auto' ? '' : context.option.imageWidth,</span>
-<span class="pl-c">    _origin_h: context.option.imageHeight === 'auto' ? '' : context.option.imageHeight,</span>
+<span class="pl-c">    _origin_w: core.options.imageWidth === 'auto' ? '' : core.options.imageWidth,</span>
+<span class="pl-c">    _origin_h: core.options.imageHeight === 'auto' ? '' : core.options.imageHeight,</span>
 <span class="pl-c">    _proportionChecked: true,</span>
 <span class="pl-c">    // -- select function --</span>
-<span class="pl-c">    _resizing: context.option.imageResizing,</span>
-<span class="pl-c">    _resizeDotHide: !context.option.imageHeightShow,</span>
-<span class="pl-c">    _rotation: context.option.imageRotation,</span>
-<span class="pl-c">    _onlyPercentage: context.option.imageSizeOnlyPercentage,</span>
+<span class="pl-c">    _resizing: core.options.imageResizing,</span>
+<span class="pl-c">    _resizeDotHide: !core.options.imageHeightShow,</span>
+<span class="pl-c">    _rotation: core.options.imageRotation,</span>
+<span class="pl-c">    _onlyPercentage: core.options.imageSizeOnlyPercentage,</span>
 <span class="pl-c">    _ratio: false,</span>
 <span class="pl-c">    _ratioX: 1,</span>
 <span class="pl-c">    _ratioY: 1</span>
