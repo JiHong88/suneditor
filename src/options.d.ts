@@ -480,6 +480,10 @@ export interface SunEditorOptions {
      */
     linkProtocol?: string;
     /**
+     * Defines "rel" attribute list of anchor tag.
+     */
+    linkRel?: string[];
+    /**
      * You can redefine icons.
      */
     icons?: Record<string, string>;

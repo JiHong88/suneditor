@@ -170,8 +170,13 @@ export default {
         if (targetEl.checked) anchor.target = '_blank';
         else anchor.removeAttribute('target');
 
-        if (relEl) anchor.rel = relEl.options[relEl.selectedIndex].value;
-        else anchor.removeAttribute('rel');
+        if (relEl) {
+            anchor.rel = relEl.options[relEl.selectedIndex].value;
+        } else if (anchor.id) {
+            anchor.rel = 'bookmark';
+        } else {
+            anchor.removeAttribute('rel');
+        }
     },
 
     submit: function (e) {

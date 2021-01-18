@@ -4314,7 +4314,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 toolbar.style.display = 'block';
 
                 _var.innerHeight_fullScreen = (_w.innerHeight - toolbar.offsetHeight);
-                editorArea.style.height = _var.innerHeight_fullScreen + 'px';
+                editorArea.style.height = (_var.innerHeight_fullScreen - options.fullScreenOffset) + 'px';
 
                 util.changeElement(element.firstElementChild, icons.reduction);
 
