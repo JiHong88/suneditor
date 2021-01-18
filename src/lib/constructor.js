@@ -834,16 +834,20 @@ export default {
             }
         }
 
-        const lastBtnElement = _buttonTray.lastElementChild;
-        if (!!lastBtnElement) {
-            const sv =  separator_vertical.cloneNode(false);
-            sv.style.float = lastBtnElement.style.float;
-            _buttonTray.appendChild(sv);
-        } else {
-            _buttonTray.style.display = 'none';
+        switch (_buttonTray.children.length) {
+            case 0:
+                _buttonTray.style.display = 'none';
+                break;
+            case 1:
+                util.removeClass(_buttonTray.firstElementChild, 'se-btn-module-border');
+                break;
+            default:
+                const lastBtnElement = _buttonTray.lastElementChild;
+                const sv =  separator_vertical.cloneNode(false);
+                sv.style.float = lastBtnElement.style.float;
+                _buttonTray.appendChild(sv);
         }
 
-        if (_buttonTray.children.length === 1) util.removeClass(_buttonTray.firstElementChild, 'se-btn-module-border');
         if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
         if (moreLayer.children.length > 0) _buttonTray.appendChild(moreLayer);
 
