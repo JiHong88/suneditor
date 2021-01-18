@@ -3990,21 +3990,23 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     let first = util.getChildElement(wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false) || wysiwyg.firstChild;
                     let last = util.getChildElement(wysiwyg.lastChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true) || wysiwyg.lastChild;
                     if (!first || !last) return;
-                    if (util.isMedia(first)) {
-                        const info = this.getFileComponent(first);
-                        const br = util.createElement('BR');
-                        const format = util.createElement(options.defaultTag);
-                        format.appendChild(br);
-                        first = info ? info.component : first;
-                        first.parentNode.insertBefore(format, first);
-                        first = br;
-                    }
-                    if (util.isMedia(last)) {
-                        const br = util.createElement('BR');
-                        const format = util.createElement(options.defaultTag);
-                        format.appendChild(br);
-                        wysiwyg.appendChild(format);
-                        last = br;
+                    if (util.isSafari) {
+                        if (util.isMedia(first)) {
+                            const info = this.getFileComponent(first);
+                            const br = util.createElement('BR');
+                            const format = util.createElement(options.defaultTag);
+                            format.appendChild(br);
+                            first = info ? info.component : first;
+                            first.parentNode.insertBefore(format, first);
+                            first = br;
+                        }
+                        if (util.isMedia(last)) {
+                            const br = util.createElement('BR');
+                            const format = util.createElement(options.defaultTag);
+                            format.appendChild(br);
+                            wysiwyg.appendChild(format);
+                            last = br;
+                        }
                     }
                     this.setRange(first, 0, last, last.textContent.length);
                     break;
