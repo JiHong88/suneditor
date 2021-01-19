@@ -83,6 +83,7 @@
                 url: 'URL to link',
                 text: 'Text to display',
                 newWindowCheck: 'Open in new window',
+                downloadLink: 'Download link',
                 bookmark: 'Bookmark'
             },
             mathBox: {

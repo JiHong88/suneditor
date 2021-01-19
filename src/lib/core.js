@@ -433,6 +433,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _variable: {
+            isChanged: false,
             isCodeView: false,
             isFullScreen: false,
             innerHeight_fullScreen: 0,
@@ -4039,13 +4040,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
                 case 'save':
                     if (typeof options.callBackSave === 'function') {
-                        options.callBackSave(this.getContents(false));
-                    } else if (typeof functions.save === 'function') {
+                        options.callBackSave(this.getContents(false), this._variable.isChanged);
+                    } else if (this._variable.isChanged && typeof functions.save === 'function') {
                         functions.save();
                     } else {
                         throw Error('[SUNEDITOR.core.commandHandler.fail] Please register call back function in creation option. (callBackSave : Function)');
                     }
 
+                    this._variable.isChanged = false;
                     if (context.tool.save) context.tool.save.setAttribute('disabled', true);
                     break;
                 default : // 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'..
@@ -4441,7 +4443,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const contentsHTML = options.previewTemplate ? options.previewTemplate.replace(/\{\{\s*contents\s*\}\}/i, this.getContents(true)) : this.getContents(true);
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
-            const w = context.element.wysiwygFrame.offsetWidth + 'px !important';
             const wDoc = this._wd;
 
             if (options.iframe) {
@@ -4451,7 +4452,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     '<!DOCTYPE html><html>' +
                     '<head>' +
                     wDoc.head.innerHTML +
-                    '<style>body {overflow:auto !important; margin: 10px auto !important; height:auto !important;}</style>' +
+                    '<style>body {overflow:auto !important; margin: 10px auto !important; height:auto !important; outline:1px dashed #ccc;}</style>' +
                     '</head>' +
                     '<body ' + arrts + '>' + contentsHTML + '</body>' +
                     '</html>'
@@ -4475,7 +4476,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     '<title>' + lang.toolbar.preview + '</title>' +
                     linkHTML +
                     '</head>' +
-                    '<body class="' + options._editableClass + '" style="margin:10px auto !important; height:auto !important;">' + contentsHTML + '</body>' +
+                    '<body class="' + options._editableClass + '" style="margin:10px auto !important; height:auto !important; outline:1px dashed #ccc;">' + contentsHTML + '</body>' +
                     '</html>'
                 );
             }
@@ -5167,6 +5168,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         _onChange_historyStack: function () {
             event._applyTagEffects();
+            core._variable.isChanged = true;
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
             if (functions.onChange) functions.onChange(this.getContents(true), this);
         },

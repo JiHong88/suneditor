@@ -774,7 +774,7 @@ shortcutsHint   : If false, hide the shortcuts hint.    default: true {Boolean}
 
 // Defining save button-------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. 
-                  Arguments - (contents).                            default: functions.save {Function}
+                  Arguments - (contents, isChanged).                            default: functions.save {Function}
 
 // Templates Array------------------------------------------------------------------------------------------------
 templates       : If you use a template plugin, add it.

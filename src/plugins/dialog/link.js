@@ -18,8 +18,6 @@ export default {
         const context = core.context;
         context.link = {
             focusElement: null, // @Override dialog // This element has focus when the dialog is opened.
-            linkNewWindowCheck: null,
-            linkAnchorText: null,
             _linkAnchor: null,
             _linkValue: ''
         };
@@ -30,8 +28,10 @@ export default {
         context.link.focusElement = link_dialog.querySelector('._se_link_url');
         context.link.linkAnchorText = link_dialog.querySelector('._se_link_text');
         context.link.linkNewWindowCheck = link_dialog.querySelector('._se_link_check');
+        context.link.downloadCheck = link_dialog.querySelector('._se_link_download');
+        context.link.download = link_dialog.querySelector('._se_link_download_icon');
         context.link.preview = link_dialog.querySelector('.se-link-preview');
-        context.link.bookmark = link_dialog.querySelector('.se-link-bookmark');
+        context.link.bookmark = link_dialog.querySelector('._se_link_bookmark_icon');
         context.link.bookmarkButton = link_dialog.querySelector('._se_bookmark_button');
         context.link.rel = core.options.linkRel.length > 0 ? link_dialog.querySelector('.se-link-rel') : null;
 
@@ -41,6 +41,7 @@ export default {
         context.link._linkAnchor = null;
 
         /** add event listeners */
+        context.link.downloadCheck.addEventListener('change', this.onChange_download.bind(core));
         link_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core));
         link_controller.addEventListener('click', this.onClick_linkController.bind(core));
         context.link.focusElement.addEventListener('input', this._onLinkPreview.bind(core, context.link.preview, context.link, core.options.linkProtocol));
@@ -79,16 +80,18 @@ export default {
                             '<input class="se-input-form se-input-url _se_link_url" type="text" placeholder="' + (core.options.protocol || '') + '" />' +
                             '<button type="button" class="se-btn se-dialog-files-edge-button _se_bookmark_button" title="' + lang.dialogBox.linkBox.bookmark + '">' + core.icons.bookmark + '</button>' +
                         '</div>' +
-                    '</div>' +
-                    '<div style="width: 100%; display: flex;">' +
-                        '<span class="se-svg se-link-bookmark" style="flex: unset; display: none;">' + core.icons.bookmark + '</span>' +
-                        '<pre class="se-link-preview" style="flex: auto;"></pre>' +
+                        '<div class="se-link-preview-form">' +
+                            '<span class="se-svg se-link-preview-icon _se_link_bookmark_icon">' + core.icons.bookmark + '</span>' +
+                            '<span class="se-svg se-link-preview-icon _se_link_download_icon">' + core.icons.download + '</span>' +
+                            '<pre class="se-link-preview"></pre>' +
+                        '</div>' +
                     '</div>' +
                     '<div class="se-dialog-form">' +
                         '<label>' + lang.dialogBox.linkBox.text + '</label><input class="se-input-form _se_link_text" type="text" />' +
                     '</div>' +
                     '<div class="se-dialog-form-footer">' +
                         '<label><input type="checkbox" class="se-dialog-btn-check _se_link_check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+                        '<label><input type="checkbox" class="se-dialog-btn-check _se_link_download" style="margin-left:20px;" />&nbsp;' + lang.dialogBox.linkBox.downloadLink + '</label>' +
                     '</div>' +
                 '</div>' +
                 '<div class="se-dialog-footer">';
@@ -148,6 +151,7 @@ export default {
         const value = typeof e === 'string' ? e : e.target.value.trim();
         const linkHTTP = value.indexOf('://') === -1 && value.indexOf('#') !== 0;
         context._linkValue = preview.textContent = !value ? '' : (protocol && linkHTTP) ? protocol + value : linkHTTP ? '/' + value : value;
+
         if (value.indexOf('#') === 0) {
             context.bookmark.style.display = 'block';
             this.util.addClass(context.bookmarkButton, 'active');
@@ -155,13 +159,29 @@ export default {
             context.bookmark.style.display = 'none';
             this.util.removeClass(context.bookmarkButton, 'active');
         }
+
+        if (value.indexOf('#') === -1 && context.downloadCheck.checked) {
+            context.download.style.display = 'block';
+        } else {
+            context.download.style.display = 'none';
+        }
     },
 
-    _updateAnchor: function (anchor, url, alt, targetEl, relEl) {
+    _updateAnchor: function (anchor, url, alt, contextLink) {
+        const targetEl = contextLink.linkNewWindowCheck;
+        const relEl = contextLink.rel;
+        const downloadEl = contextLink.downloadCheck;
+
         if (/^\#/.test(url)) {
             anchor.id = url.substr(1);
         } else {
             anchor.removeAttribute('id');
+        }
+
+        if (!/^\#/.test(url) && downloadEl.checked) {
+            anchor.removeAttribute('download');
+        } else {
+            anchor.setAttribute('download', alt || url);
         }
 
         anchor.href = url;
@@ -195,7 +215,7 @@ export default {
 
             if (!this.context.dialog.updateModal) {
                 const oA = this.util.createElement('A');
-                this.plugins.link._updateAnchor(oA, url, anchorText, contextLink.linkNewWindowCheck, contextLink.rel);
+                this.plugins.link._updateAnchor(oA, url, anchorText, contextLink);
 
                 const selectedFormats = this.getSelectedElements();
                 if (selectedFormats.length > 1) {
@@ -208,7 +228,7 @@ export default {
 
                 this.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
             } else {
-                this.plugins.link._updateAnchor(contextLink._linkAnchor, url, anchorText, contextLink.linkNewWindowCheck, contextLink.rel);
+                this.plugins.link._updateAnchor(contextLink._linkAnchor, url, anchorText, contextLink);
 
                 // set range
                 const textNode = contextLink._linkAnchor.childNodes[0];
@@ -261,6 +281,7 @@ export default {
             contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = (contextLink._linkAnchor.id ? '#' + contextLink._linkAnchor.id : contextLink._linkAnchor.href);
             contextLink.linkAnchorText.value = contextLink._linkAnchor.textContent;
             contextLink.linkNewWindowCheck.checked = (/_blank/i.test(contextLink._linkAnchor.target) ? true : false);
+            contextLink.downloadCheck.checked = contextLink._linkAnchor.download;
             if (contextLink.rel) contextLink.rel.value = contextLink._linkAnchor.rel;
         }
 
@@ -292,10 +313,24 @@ export default {
             url = '#' + url;
             contextLink.bookmark.style.display = 'block';
             this.util.addClass(contextLink.bookmarkButton, 'active');
+            contextLink.downloadCheck.checked = false;
+            contextLink.download.style.display = 'none';
         }
 
         contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = url;
         contextLink.focusElement.focus();
+    },
+
+    onChange_download(e) {
+        const contextLink = this.context.link;
+        if (e.target.checked) {
+            contextLink.download.style.display = 'block';
+            contextLink.bookmark.style.display = 'none';
+            this.util.removeClass(contextLink.bookmarkButton, 'active');
+            contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = contextLink.focusElement.value.replace(/^\#+/, '');
+        } else {
+            contextLink.download.style.display = 'none';
+        }
     },
 
     onClick_linkController: function (e) {
@@ -311,6 +346,7 @@ export default {
             contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = contextLink._linkAnchor.href;
             contextLink.linkAnchorText.value = contextLink._linkAnchor.textContent;
             contextLink.linkNewWindowCheck.checked = (/_blank/i.test(contextLink._linkAnchor.target) ? true : false);
+            contextLink.downloadCheck.checked = contextLink._linkAnchor.download;
             if (contextLink.rel) contextLink.rel.value = contextLink._linkAnchor.rel;
             this.plugins.dialog.open.call(this, 'link', true);
         }
@@ -343,6 +379,7 @@ export default {
         contextLink._linkValue = contextLink.preview.textContent = contextLink.focusElement.value = '';
         contextLink.linkAnchorText.value = '';
         contextLink.linkNewWindowCheck.checked = false;
+        contextLink.downloadCheck.checked = false;
         if (contextLink.rel) contextLink.rel.value = contextLink.rel.options[0].value;
     }
 };

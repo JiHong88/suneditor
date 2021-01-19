@@ -458,7 +458,7 @@ export interface SunEditorOptions {
     /**
      * Callback functions that is called when the Save button is clicked
      */
-    callBackSave?: (contents: string) => void;
+    callBackSave?: (contents: string, isChanged: boolean) => void;
     /**
      * Templates Array
      * ===============
