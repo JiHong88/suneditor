@@ -6977,19 +6977,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (core.isDisabled) return;
             const component = util.getParentElement(e.target, util.isComponent);
             const lineBreakerStyle = core._lineBreaker.style;
-
+            
             if (component && !core.currentControllerName) {
+                const ctxEl = context.element;
                 let scrollTop = 0;
-                let el = context.element.wysiwyg;
+                let el = ctxEl.wysiwyg;
                 do {
                     scrollTop += el.scrollTop;
                     el = el.parentElement;
                 } while (el && !/^(BODY|HTML)$/i.test(el.nodeName));
 
-                const wScroll = context.element.wysiwyg.scrollTop;
+                const wScroll = ctxEl.wysiwyg.scrollTop;
                 const offsets = event._getEditorOffsets(null);
-                const componentTop = util.getOffset(component, context.element.wysiwygFrame).top + wScroll;
-                const y = e.pageY + scrollTop + (options.iframe && !options.toolbarContainer ? context.element.toolbar.offsetHeight : 0);
+                const componentTop = util.getOffset(component, ctxEl.wysiwygFrame).top + wScroll;
+                const y = e.pageY + scrollTop + (options.iframe && !options.toolbarContainer ? ctxEl.toolbar.offsetHeight : 0);
                 const c = componentTop + (options.iframe ? scrollTop : offsets.top);
 
                 const isList = util.isListCell(component.parentNode);
@@ -7008,7 +7009,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 core._variable._lineBreakComp = component;
                 core._variable._lineBreakDir = dir;
                 lineBreakerStyle.top = (top - wScroll) + 'px';
-                core._lineBreakerButton.style.left = (util.getOffset(component).left + (component.offsetWidth / 2) - 15) + 'px';
+                core._lineBreakerButton.style.left = ((ctxEl.wysiwygFrame.offsetWidth / 2) - 15) + 'px';
                 lineBreakerStyle.display = 'block';
             } // off line breaker
             else if (lineBreakerStyle.display !== 'none') {
