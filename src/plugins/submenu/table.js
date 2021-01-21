@@ -173,7 +173,7 @@ export default {
                     icons.split_cell +
                     '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.splitCells + '</span></span>' +
                 '</button>' +
-                '<div class="se-btn-group-sub sun-editor-common se-list-layer">' +
+                '<div class="se-btn-group-sub sun-editor-common se-list-layer se-table-split">' +
                     '<div class="se-list-inner">' +
                         '<ul class="se-list-basic">' +
                             '<li class="se-btn-list" data-command="split" data-value="vertical" style="line-height:32px;" title="' + lang.controller.VerticalSplit + '">' + 
@@ -790,11 +790,11 @@ export default {
         this.plugins.table._closeSplitMenu = function () {
             this.util.removeClass(this.context.table.splitButton, 'on');
             this.context.table.splitMenu.style.display = 'none';
-            this.removeDocEvent('mousedown', this.plugins.table._closeSplitMenu);
+            this.removeDocEvent('click', this.plugins.table._closeSplitMenu);
             this.plugins.table._closeSplitMenu = null;
         }.bind(this);
 
-        this.addDocEvent('mousedown', this.plugins.table._closeSplitMenu);
+        this.addDocEvent('click', this.plugins.table._closeSplitMenu);
     },
 
     splitCells: function (direction) {
