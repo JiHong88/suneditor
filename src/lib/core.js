@@ -7009,7 +7009,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 core._variable._lineBreakComp = component;
                 core._variable._lineBreakDir = dir;
                 lineBreakerStyle.top = (top - wScroll) + 'px';
-                core._lineBreakerButton.style.left = ((ctxEl.wysiwygFrame.offsetWidth / 2) - 15) + 'px';
+                core._lineBreakerButton.style.left = (util.getOffset(component).left + (component.offsetWidth / 2) - 15) + 'px'
                 lineBreakerStyle.display = 'block';
             } // off line breaker
             else if (lineBreakerStyle.display !== 'none') {
