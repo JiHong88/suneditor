@@ -6931,8 +6931,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         _setClipboardData: function (type, e, plainText, cleanData, data) {
-            // MS word
-            if (/class=["']*Mso(Normal|List)/i.test(cleanData) || /content=["']*Word.Document/i.test(cleanData) || /content=["']*OneNote.File/i.test(cleanData)) {
+            // MS word, OneNode, Excel
+            const MSData = /class=["']*Mso(Normal|List)/i.test(cleanData) || /content=["']*Word.Document/i.test(cleanData) || /content=["']*OneNote.File/i.test(cleanData) || /content=["']*Excel.Sheet/i.test(cleanData);
+            if (MSData) {
                 cleanData = cleanData.replace(/\n/g, ' ');
                 plainText = plainText.replace(/\n/g, ' ');
             } else {
@@ -6957,7 +6958,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // files
             const files = data.files;
-            if (files.length > 0) {
+            if (files.length > 0 && !MSData) {
                 if (/^image/.test(files[0].type) && core.plugins.image) {
                     functions.insertImage(files);
                 }
@@ -6978,19 +6979,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (core.isDisabled) return;
             const component = util.getParentElement(e.target, util.isComponent);
             const lineBreakerStyle = core._lineBreaker.style;
-
+            
             if (component && !core.currentControllerName) {
+                const ctxEl = context.element;
                 let scrollTop = 0;
-                let el = context.element.wysiwyg;
+                let el = ctxEl.wysiwyg;
                 do {
                     scrollTop += el.scrollTop;
                     el = el.parentElement;
                 } while (el && !/^(BODY|HTML)$/i.test(el.nodeName));
 
-                const wScroll = context.element.wysiwyg.scrollTop;
+                const wScroll = ctxEl.wysiwyg.scrollTop;
                 const offsets = event._getEditorOffsets(null);
-                const componentTop = util.getOffset(component, context.element.wysiwygFrame).top + wScroll;
-                const y = e.pageY + scrollTop + (options.iframe && !options.toolbarContainer ? context.element.toolbar.offsetHeight : 0);
+                const componentTop = util.getOffset(component, ctxEl.wysiwygFrame).top + wScroll;
+                const y = e.pageY + scrollTop + (options.iframe && !options.toolbarContainer ? ctxEl.toolbar.offsetHeight : 0);
                 const c = componentTop + (options.iframe ? scrollTop : offsets.top);
 
                 const isList = util.isListCell(component.parentNode);
