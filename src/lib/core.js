@@ -6929,8 +6929,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         _setClipboardData: function (type, e, plainText, cleanData, data) {
-            // MS word
-            if (/class=["']*Mso(Normal|List)/i.test(cleanData) || /content=["']*Word.Document/i.test(cleanData) || /content=["']*OneNote.File/i.test(cleanData)) {
+            // MS word, OneNode, Excel
+            const MSData = /class=["']*Mso(Normal|List)/i.test(cleanData) || /content=["']*Word.Document/i.test(cleanData) || /content=["']*OneNote.File/i.test(cleanData) || /content=["']*Excel.Sheet/i.test(cleanData);
+            if (MSData) {
                 cleanData = cleanData.replace(/\n/g, ' ');
                 plainText = plainText.replace(/\n/g, ' ');
             } else {
@@ -6955,7 +6956,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // files
             const files = data.files;
-            if (files.length > 0) {
+            if (files.length > 0 && !MSData) {
                 if (/^image/.test(files[0].type) && core.plugins.image) {
                     functions.insertImage(files);
                 }
