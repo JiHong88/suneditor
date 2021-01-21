@@ -212,8 +212,8 @@ export default {
                                 '<pre class="se-link-preview"></pre>' +
                             '</div>' +
                         '</div>' +
-                        '<label><input type="checkbox" class="se-dialog-btn-check _se_image_link_check"/>&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
-                        '<label><input type="checkbox" class="se-dialog-btn-check _se_link_download" style="margin-left:20px;" />&nbsp;' + lang.dialogBox.linkBox.downloadLink + '</label>' +
+                        '<label><input type="checkbox" class="se-dialog-btn-check _se_image_link_check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
+                        '<label><input type="checkbox" class="se-dialog-btn-check _se_link_download" />&nbsp;' + lang.dialogBox.linkBox.downloadLinkCheck + '</label>' +
                     '</div>' +
                 '</div>' +
                 '<div class="se-dialog-footer">' +

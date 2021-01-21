@@ -417,7 +417,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         italic: 'u'
     },
     tableCellControllerPosition: 'top',
-    lang: lang.ko,
+    lang: lang.fr,
     plugins: plugins,
     katex: Katex,
     // value: '',

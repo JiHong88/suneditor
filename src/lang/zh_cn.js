@@ -83,6 +83,7 @@
                 url: '网址',
                 text: '字体',
                 newWindowCheck: '在新标签页中打开',
+                downloadLinkCheck: '下载链接',
                 bookmark: '书签'
             },
             mathBox: {

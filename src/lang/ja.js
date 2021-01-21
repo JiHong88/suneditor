@@ -83,6 +83,7 @@
                 url: 'インターネットアドレス',
                 text: '画面のテキスト',
                 newWindowCheck: '別ウィンドウで開く',
+                downloadLinkCheck: 'ダウンロードリンク',
                 bookmark: 'ブックマーク'
             },
             mathBox: {

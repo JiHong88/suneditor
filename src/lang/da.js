@@ -86,6 +86,7 @@
                 url: 'URL til link',
                 text: 'Tekst for link',
                 newWindowCheck: 'Åben i nyt faneblad',
+                downloadLinkCheck: 'Download link',
                 bookmark: 'Bogmærke'
             },
             mathBox: {

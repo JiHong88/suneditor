@@ -83,6 +83,7 @@
                 url: 'Indirizzo in link',
                 text: 'Applica Testo da visualizzare',
                 newWindowCheck: 'Apri in una nuova finestra',
+                downloadLinkCheck: 'Link per scaricare',
                 bookmark: 'Segnalibro'
             },
             mathBox: {

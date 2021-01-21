@@ -84,6 +84,7 @@
                 url: 'URL para link',
                 text: 'Texto à mostrar',
                 newWindowCheck: 'Abrir em nova guia',
+                downloadLinkCheck: 'Link para Download',
                 bookmark: 'marca páginas'
             },
             mathBox: {

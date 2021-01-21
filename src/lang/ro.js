@@ -83,6 +83,7 @@
                 url: 'Adresă link',
                 text: 'Text de afișat',
                 newWindowCheck: 'Deschide în fereastră nouă',
+                downloadLinkCheck: 'Link de descărcare',
                 bookmark: 'Marcaj'
             },
             mathBox: {

@@ -83,6 +83,7 @@
                 url: '인터넷 주소',
                 text: '화면 텍스트',
                 newWindowCheck: '새창으로 열기',
+                downloadLinkCheck: '다운로드 링크',
                 bookmark: '북마크'
             },
             mathBox: {

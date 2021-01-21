@@ -91,7 +91,7 @@ export default {
                     '</div>' +
                     '<div class="se-dialog-form-footer">' +
                         '<label><input type="checkbox" class="se-dialog-btn-check _se_link_check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
-                        '<label><input type="checkbox" class="se-dialog-btn-check _se_link_download" style="margin-left:20px;" />&nbsp;' + lang.dialogBox.linkBox.downloadLink + '</label>' +
+                        '<label><input type="checkbox" class="se-dialog-btn-check _se_link_download" />&nbsp;' + lang.dialogBox.linkBox.downloadLinkCheck + '</label>' +
                     '</div>' +
                 '</div>' +
                 '<div class="se-dialog-footer">';
