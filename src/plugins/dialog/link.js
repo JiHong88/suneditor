@@ -179,9 +179,9 @@ export default {
         }
 
         if (!/^\#/.test(url) && downloadEl.checked) {
-            anchor.removeAttribute('download');
-        } else {
             anchor.setAttribute('download', alt || url);
+        } else {
+            anchor.removeAttribute('download');
         }
 
         anchor.href = url;

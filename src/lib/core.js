@@ -1615,8 +1615,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 afterNode = null;
                             }
                         } else {
-                            parentNode = isFormats ? commonCon : container;
-                            afterNode = isFormats ? endCon : null;
+                            parentNode = isFormats ? commonCon : util.isFormatElement(container) ? container : container.parentNode;
+                            afterNode = isFormats ? endCon : util.isFormatElement(container) ? null : container;
                         }
 
                         while (afterNode && !util.isFormatElement(afterNode) && afterNode.parentNode !== commonCon) {
