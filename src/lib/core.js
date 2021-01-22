@@ -5631,16 +5631,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const range = core.getRange();
                 if (util.getFormatElement(range.startContainer) === util.getFormatElement(range.endContainer)) {
                     if (util.isList(rangeEl)) {
+                        e.preventDefault();
                         const oLi = util.createElement('LI');
                         const prevLi = selectionNode.nextElementSibling;
                         oLi.appendChild(selectionNode);
                         rangeEl.insertBefore(oLi, prevLi);
+                        core.focus();
                     } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode) && (!util.isTable(selectionNode) || util.isCell(selectionNode))) {
+                        e.preventDefault();
                         core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag);
+                        core.focus();
+                    } else {
+                        event._applyTagEffects();
                     }
-                    
-                    e.preventDefault();
-                    core.focus();
                 }
             } else {
                 event._applyTagEffects();
