@@ -370,6 +370,8 @@
     padding: 0;
     width: auto;
     height: auto;
+    min-width: 16px;
+    min-height: 8px;
     max-width: 100%;
 }
 /*  image, video - select index  */

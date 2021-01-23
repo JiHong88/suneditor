@@ -887,8 +887,13 @@ export default {
         contextImage._altText = contextImage.altText.value = contextImage._element.alt;
         contextImage._v_link._linkValue = contextImage.previewLink.textContent = contextImage.imgLink.value = contextImage._linkElement === null ? '' : contextImage._linkElement.href;
         contextImage.imgLinkNewWindowCheck.checked = contextImage._linkElement && contextImage._linkElement.target === '_blank';
-        contextImage.downloadCheck.checked = contextImage._linkElement.download;
-        contextImage.download.style.display = contextImage._linkElement.download ? 'block' : 'none';
+        if (contextImage._linkElement) {
+            contextImage.downloadCheck.checked = contextImage._linkElement.download;
+            contextImage.download.style.display = contextImage._linkElement.download ? 'block' : 'none';
+        } else {
+            contextImage.downloadCheck.checked = false;
+            contextImage.download.style.display = 'none';
+        }
         contextImage.modal.querySelector('input[name="suneditor_image_radio"][value="' + contextImage._align + '"]').checked = true;
         contextImage._align = contextImage.modal.querySelector('input[name="suneditor_image_radio"]:checked').value;
         contextImage._captionChecked = contextImage.captionCheckEl.checked = !!contextImage._caption;
