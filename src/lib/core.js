@@ -1607,16 +1607,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         if (!isFormats && prevContainer) {
                             parentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
                             if (parentNode.contains(container)) {
+                                let sameParent = true;
                                 afterNode = container;
                                 while (afterNode.parentNode !== parentNode) {
                                     afterNode = afterNode.parentNode;
+                                    sameParent = false;
                                 }
+                                if (sameParent && container === prevContainer) afterNode = afterNode.nextSibling;
                             } else {
                                 afterNode = null;
                             }
                         } else {
-                            parentNode = isFormats ? commonCon : util.isFormatElement(container) ? container : container.parentNode;
-                            afterNode = isFormats ? endCon : util.isFormatElement(container) ? null : container;
+                            afterNode = isFormats ? endCon : container === prevContainer ? container.nextSibling : container;
+                            parentNode = (!afterNode || !afterNode.parentNode) ? commonCon : afterNode.parentNode;
                         }
 
                         while (afterNode && !util.isFormatElement(afterNode) && afterNode.parentNode !== commonCon) {
