@@ -646,7 +646,7 @@ export default {
                 return this.isWysiwygDiv(current.parentNode);
             }.bind(this.util));
 
-        oFrame = oFrame.cloneNode(true);
+        contextVideo._element = oFrame = oFrame.cloneNode(true);
         const cover = contextVideo._cover = this.plugins.component.set_cover.call(this, oFrame);
         const container = contextVideo._container = this.plugins.component.set_container.call(this, cover, 'se-video-container');
 
