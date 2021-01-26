@@ -84,8 +84,6 @@
          * @private
          */
         _onClick_dialog: function (e) {
-            e.stopPropagation();
-
             if (/close/.test(e.target.getAttribute('data-command')) || this.context.dialog._closeSignal) {
                 this.plugins.dialog.close.call(this);
             }

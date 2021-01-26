@@ -382,21 +382,25 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // rtl: true,
     // fullPage: true,
     // pasteTagsWhitelist: 'p|a|strong|em|h3|h4|h5|ul|ol|li|blockquote|table|thead|tbody|tfoot|tr|td|sup|sub',
-    // linkRel: [
-    //     'alternate',
-    //     'author',
-    //     'bookmark',
-    //     'external',
-    //     'help',
-    //     'license',
-    //     'next',
-    //     'nofollow',
-    //     'noreferrer',
-    //     'noopener',
-    //     'prev',
-    //     'search',
-    //     'tag'
-    // ],
+    linkRel: [
+        'alternate',
+        'author',
+        'external',
+        'help',
+        'license',
+        'next',
+        'nofollow',
+        'noreferrer',
+        'noopener',
+        'prev',
+        'search',
+        'tag'
+    ],
+    linkRelDefault: {
+        default: 'bookmark author',
+        newWindowCheck: 'noreferrer noopener',
+        bookmarkCheck: 'bookmark'
+    },
     callBackSave: function (contents){
         console.log('save', contents)
     },

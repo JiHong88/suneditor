@@ -25,13 +25,7 @@ export default {
         };
 
         /** set submenu */
-        let listDiv = this.createColorList(core, this._makeColorList);
-
-        /** caching */
-        context.colorPicker.colorListHTML = listDiv;
-
-        /** empty memory */
-        listDiv = null;
+        context.colorPicker.colorListHTML = this.createColorList(core, this._makeColorList);
     },
 
     /**

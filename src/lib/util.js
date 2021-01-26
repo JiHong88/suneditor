@@ -1136,19 +1136,23 @@ const util = {
      * @description Argument value If there is no class name, insert it and delete the class name if it exists
      * @param {Element} element Elements to replace class name
      * @param {String} className Class name to be change
+     * @returns {Boolean|undefined}
      */
     toggleClass: function (element, className) {
         if (!element) return;
+        let result = false;
 
         const check = new this._w.RegExp('(\\s|^)' + className + '(\\s|$)');
         if (check.test(element.className)) {
             element.className = element.className.replace(check, ' ').trim();
-        }
-        else {
+        } else {
             element.className += ' ' + className;
+            result = true;
         }
 
         if (!element.className.trim()) element.removeAttribute('class');
+
+        return result;
     },
 
     /**
