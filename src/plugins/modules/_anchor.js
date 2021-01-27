@@ -12,7 +12,8 @@ export default {
     add: function (core) {
         core.context.anchor = {
             caller: {},
-            forms: this.setDialogForm(core)
+            forms: this.setDialogForm(core),
+            host: core._w.location.origin + core._w.location.pathname
         };
     },
 
@@ -189,7 +190,7 @@ export default {
         const value = typeof e === 'string' ? e : e.target.value.trim();
         const reservedProtocol  = /^(mailto\:|https*\:\/\/)/.test(value);
         const sameProtocol = !protocol ? false : this._w.RegExp('^' + value.substr(0, protocol.length)).test(protocol);
-        context.linkValue = preview.textContent = !value ? '' : (protocol && !reservedProtocol && !sameProtocol) ? protocol + value : value;
+        context.linkValue = preview.textContent = !value ? '' : (protocol && !reservedProtocol && !sameProtocol) ? protocol + value : reservedProtocol ? value : /^www\./.test(value) ? 'http://' + value : this.context.anchor.host + value;
 
         if (value.indexOf('#') === 0) {
             context.bookmark.style.display = 'block';
