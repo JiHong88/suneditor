@@ -365,7 +365,7 @@ const util = {
     },
 
     /**
-     * @description It is judged whether it is the component [img, iframe, video, audio] cover(class="se-component") and table, hr
+     * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
      * @param {Node} element The node to check
      * @returns {Boolean}
      */

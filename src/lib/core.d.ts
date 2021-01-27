@@ -17,7 +17,7 @@ type fileInfo =  {
     element: Element;
     src: string;
 };
-type seledtedFileInfo = Record<string, string | Element>;
+type seledtedFileInfo = {target: Element; component: Element; pluginName: string;};
 type commands = 'selectAll' | 'codeView' | 'fullScreen' | 'indent' | 'outdent' | 'undo' | 'redo' | 'removeFormat' | 'print' | 'preview' | 'showBlocks' | 'save' | 'bold' | 'underline' | 'italic' | 'strike' | 'subscript' | 'superscript' | 'copy' | 'cut' | 'paste';
 ​​
 interface Core {
