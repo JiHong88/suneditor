@@ -750,13 +750,12 @@ linkProtocol    : Default protocol for the links. ('link', 'image', 'video', 'au
 linkRel         : Defines "rel" attribute list of anchor tag.   default: [] {Array}
                   // https://www.w3schools.com/tags/att_a_rel.asp
                   ex) [
-                    'alternate',
                     'author',
-                    'bookmark',
                     'external',
                     'help',
                     'license',
                     'next',
+                    'follow',
                     'nofollow',
                     'noreferrer',
                     'noopener',
@@ -764,7 +763,16 @@ linkRel         : Defines "rel" attribute list of anchor tag.   default: [] {Arr
                     'search',
                     'tag'
                 ]
-                  
+linkRelDefault  : Defines default "rel" attributes of anchor tag.   default: {} {Object}
+                  ex) linkRelDefault: {
+                        default: 'nofollow', // Default rel
+                        check_new_window: 'noreferrer noopener', // When "open new window" is checked 
+                        check_bookmark: 'bookmark' // When "bookmark" is checked 
+                    },
+                    // If properties other than "default" start with "only:", the existing "rel" is cleared and applied. 
+                    linkRelDefault: {
+                        check_new_window: 'only:noreferrer noopener'
+                    }
 
 // Key actions----------------------------------------------------------------------------------------------------
 tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {Boolean}

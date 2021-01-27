@@ -374,13 +374,12 @@
             <label><input type="checkbox" id="linkRel">&nbsp;&nbsp;linkRel</label>
             <br>
             <span>[</span>
-            <span>'alternate',</span>
             <span>&nbsp;'author',</span>
-            <span>&nbsp;'bookmark',</span>
             <span>&nbsp;'external',</span>
             <span>&nbsp;'help',</span>
             <span>&nbsp;'license',</span>
             <span>&nbsp;'next',</span>
+            <span>&nbsp;'follow',</span>
             <span>&nbsp;'nofollow',</span>
             <span>&nbsp;'noreferrer',</span>
             <span>&nbsp;'noopener',</span>
@@ -388,6 +387,14 @@
             <span>&nbsp;'search',</span>
             <span>&nbsp;'tag'</span>
             <span>]</span>
+            <br><br>
+            <label><input type="checkbox" id="linkRelDefault">&nbsp;&nbsp;linkRelDefault</label>
+            <br>
+            <span>{</span>
+            <span>&nbsp;default: 'nofollow',</span>
+            <span>&nbsp;check_new_window: 'noreferrer noopener',</span>
+            <span>&nbsp;check_bookmark: 'bookmark'</span>
+            <span>}</span>
             
             <br>
             <h4 style="color: #b94a48;">--Key actions</h4>
@@ -632,7 +639,8 @@ function sun_create () {
         templates: document.getElementById('templates').checked ? [{name: 'Template-1', html: '<p>HTML source1</p>'},{name: 'Template-2', html: '<p>HTML source2</p>'}] : undefined,
         placeholder: document.getElementById('placeholder').checked ? document.getElementById('placeholder_value').value : undefined,
         linkProtocol: document.getElementById('linkProtocol').checked ? document.getElementById('linkProtocol_value').value : undefined,
-        linkRel: document.getElementById('linkRel').checked ? ['alternate', 'author', 'bookmark', 'external', 'help', 'license', 'next', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'] : undefined,
+        linkRel: document.getElementById('linkRel').checked ? ['author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'] : undefined,
+        linkRelDefault: document.getElementById('linkRelDefault').checked ? {default: 'nofollow', check_new_window: 'noreferrer noopener', check_bookmark: 'bookmark'} : undefined,
         icons: document.getElementById('icons').checked ? { paragraph_style: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>' } : undefined,
         buttonList: [
             ['undo', 'redo',
