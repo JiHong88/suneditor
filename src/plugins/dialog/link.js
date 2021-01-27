@@ -117,7 +117,7 @@ export default {
         e.stopPropagation();
 
         try {
-            const oA = this.plugins.anchor.createAnchor.call(this, this.context.anchor.caller.link);
+            const oA = this.plugins.anchor.createAnchor.call(this, this.context.anchor.caller.link, false);
     
             if (!this.context.dialog.updateModal) {
                 const selectedFormats = this.getSelectedElements();

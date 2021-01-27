@@ -42,7 +42,7 @@ export default {
             '</div>' +
             '<div class="se-dialog-form-footer">' +
                 '<label><input type="checkbox" class="se-dialog-btn-check _se_anchor_check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
-                '<label><input type="checkbox" class="se-dialog-btn-check _se_anchor_download" />&nbsp;' + lang.dialogBox.linkBox.downloadLinkCheck + '</label>';;
+                '<label><input type="checkbox" class="se-dialog-btn-check _se_anchor_download" />&nbsp;' + lang.dialogBox.linkBox.downloadLinkCheck + '</label>';
             if (relList.length > 0) {
                 html += '<div class="se-anchor-rel"><button type="button" class="se-btn se-btn-select se-anchor-rel-btn">&lt;rel&gt;</button>' +
                     '<div class="se-anchor-rel-wrapper"><pre class="se-link-preview se-anchor-rel-preview"></pre></div>' +
@@ -74,9 +74,13 @@ export default {
             linkValue: ''
         };
 
+        if (typeof context.linkDefaultRel.default === 'string') context.linkDefaultRel.default = context.linkDefaultRel.default.trim();
+        if (typeof context.linkDefaultRel.check_new_window === 'string') context.linkDefaultRel.check_new_window = context.linkDefaultRel.check_new_window.trim();
+        if (typeof context.linkDefaultRel.check_bookmark === 'string') context.linkDefaultRel.check_bookmark = context.linkDefaultRel.check_bookmark.trim();
+
         context.urlInput = forms.querySelector('.se-input-url');
-        context.linkAnchorText = forms.querySelector('._se_anchor_text');
-        context.linkNewWindowCheck = forms.querySelector('._se_anchor_check');
+        context.anchorText = forms.querySelector('._se_anchor_text');
+        context.newWindowCheck = forms.querySelector('._se_anchor_check');
         context.downloadCheck = forms.querySelector('._se_anchor_download');
         context.download = forms.querySelector('._se_anchor_download_icon');
         context.preview = forms.querySelector('.se-link-preview');
@@ -92,7 +96,7 @@ export default {
             context.relList.addEventListener('click', anchorPlugin.onClick_relList.bind(this, context));
         }
 
-        context.linkNewWindowCheck.addEventListener('change', anchorPlugin.onChange_newWindowCheck.bind(this, context));
+        context.newWindowCheck.addEventListener('change', anchorPlugin.onChange_newWindowCheck.bind(this, context));
         context.downloadCheck.addEventListener('change', anchorPlugin.onChange_downloadCheck.bind(this, context));
         context.urlInput.addEventListener('input', anchorPlugin.setLinkPreview.bind(this, context, this.options.linkProtocol));
         context.bookmarkButton.addEventListener('click', anchorPlugin.onClick_bookmarkButton.bind(this, context));
@@ -101,12 +105,12 @@ export default {
     on: function (contextAnchor, update) {
         if (!update) {
             this.plugins.anchor.init.call(this, contextAnchor);
-            contextAnchor.linkAnchorText.value = this.getSelection().toString();
+            contextAnchor.anchorText.value = this.getSelection().toString();
         } else if (contextAnchor.linkAnchor) {
             this.context.dialog.updateModal = true;
             contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = (contextAnchor.linkAnchor.id ? '#' + contextAnchor.linkAnchor.id : contextAnchor.linkAnchor.href);
-            contextAnchor.linkAnchorText.value = contextAnchor.linkAnchor.textContent;
-            contextAnchor.linkNewWindowCheck.checked = (/_blank/i.test(contextAnchor.linkAnchor.target) ? true : false);
+            contextAnchor.anchorText.value = contextAnchor.linkAnchor.getAttribute('alt') || contextAnchor.linkAnchor.textContent;
+            contextAnchor.newWindowCheck.checked = (/_blank/i.test(contextAnchor.linkAnchor.target) ? true : false);
             contextAnchor.downloadCheck.checked = contextAnchor.linkAnchor.download;
         }
 
@@ -164,7 +168,7 @@ export default {
 
     setRel: function (contextAnchor, relAttr) {
         const relListEl = contextAnchor.relList;
-        const rels = contextAnchor.currentRel = !relAttr ? [] : relAttr.trim().split(' ');
+        const rels = contextAnchor.currentRel = !relAttr ? [] : relAttr.split(' ');
         if (!relListEl) return;
 
         const checkedRel = relListEl.querySelectorAll('button');
@@ -201,7 +205,7 @@ export default {
         }
     },
 
-    updateAnchor: function (anchor, url, alt, contextAnchor) {
+    updateAnchor: function (anchor, url, alt, contextAnchor, notText) {
         // bookmark
         if (/^\#/.test(url)) {
             anchor.id = url.substr(1);
@@ -217,7 +221,7 @@ export default {
         }
 
         // new window
-        if (contextAnchor.linkNewWindowCheck.checked) anchor.target = '_blank';
+        if (contextAnchor.newWindowCheck.checked) anchor.target = '_blank';
         else anchor.removeAttribute('target');
         
         // rel
@@ -227,26 +231,21 @@ export default {
 
         // est url, alt
         anchor.href = url;
-        anchor.textContent = alt;
+        anchor.setAttribute('alt', alt);
+        anchor.textContent = notText ? '' : alt;
     },
 
-    createAnchor: function (contextAnchor) {
+    createAnchor: function (contextAnchor, notText) {
         if (contextAnchor.linkValue.length === 0) return null;
         
-        let oA;
         const url = contextAnchor.linkValue;
-        const anchor = contextAnchor.linkAnchorText;
+        const anchor = contextAnchor.anchorText;
         const anchorText = anchor.value.length === 0 ? url : anchor.value;
 
-        if (!this.context.dialog.updateModal) {
-            oA = this.util.createElement('A');
-            this.plugins.anchor.updateAnchor(oA, url, anchorText, contextAnchor);
-        } else {
-            oA = contextAnchor.linkAnchor;
-            this.plugins.anchor.updateAnchor(contextAnchor.linkAnchor, url, anchorText, contextAnchor);
-        }
+        const oA = contextAnchor.linkAnchor || this.util.createElement('A');
+        this.plugins.anchor.updateAnchor(oA, url, anchorText, contextAnchor, notText);
 
-        contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = contextAnchor.linkAnchorText.value = '';
+        contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = contextAnchor.anchorText.value = '';
 
         return oA;
     },
@@ -269,54 +268,65 @@ export default {
         contextAnchor.urlInput.focus();
     },
 
-    onChange_newWindowCheck(contextAnchor, e) {
+    onChange_newWindowCheck: function (contextAnchor, e) {
+        if (typeof contextAnchor.linkDefaultRel.check_new_window !== 'string') return;
         if (e.target.checked) {
-            this.plugins.anchor.setRel.call(this, contextAnchor, this.plugins.anchor._relMerge.call(this, contextAnchor, contextAnchor.linkDefaultRel.newWindowCheck));
+            this.plugins.anchor.setRel.call(this, contextAnchor, this.plugins.anchor._relMerge.call(this, contextAnchor, contextAnchor.linkDefaultRel.check_new_window));
         } else {
-            this.plugins.anchor.setRel.call(this, contextAnchor, this.plugins.anchor._relDelete.call(this, contextAnchor, contextAnchor.linkDefaultRel.newWindowCheck));
+            this.plugins.anchor.setRel.call(this, contextAnchor, this.plugins.anchor._relDelete.call(this, contextAnchor, contextAnchor.linkDefaultRel.check_new_window));
         }
     },
 
-    onChange_downloadCheck(contextAnchor, e) {
+    onChange_downloadCheck: function (contextAnchor, e) {
         if (e.target.checked) {
             contextAnchor.download.style.display = 'block';
             contextAnchor.bookmark.style.display = 'none';
             this.util.removeClass(contextAnchor.bookmarkButton, 'active');
             contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = contextAnchor.urlInput.value.replace(/^\#+/, '');
-            if (contextAnchor.linkDefaultRel.downloadCheck) {
-                this.plugins.anchor.setRel.call(this, contextAnchor, this.plugins.anchor._relMerge.call(this, contextAnchor, contextAnchor.linkDefaultRel.downloadCheck));
+            if (typeof contextAnchor.linkDefaultRel.check_bookmark === 'string') {
+                this.plugins.anchor.setRel.call(this, contextAnchor, this.plugins.anchor._relMerge.call(this, contextAnchor, contextAnchor.linkDefaultRel.check_bookmark));
             }
         } else {
             contextAnchor.download.style.display = 'none';
-            if (contextAnchor.linkDefaultRel.downloadCheck) {
-                this.plugins.anchor.setRel.call(this, contextAnchor, this.plugins.anchor._relDelete.call(this, contextAnchor, contextAnchor.linkDefaultRel.downloadCheck));
+            if (typeof contextAnchor.linkDefaultRel.check_bookmark === 'string') {
+                this.plugins.anchor.setRel.call(this, contextAnchor, this.plugins.anchor._relDelete.call(this, contextAnchor, contextAnchor.linkDefaultRel.check_bookmark));
             }
         }
     },
 
-    _relMerge(contextAnchor, relAttr) {
+    _relMerge: function (contextAnchor, relAttr) {
         const current = contextAnchor.currentRel;
         if (!relAttr) return current.join(' ');
+        
+        if (/^only\:/.test(relAttr)) {
+            relAttr = relAttr.replace(/^only\:/, '').trim();
+            contextAnchor.currentRel = relAttr.split(' ');
+            return relAttr;
+        }
 
         const rels = relAttr.split(' ');
         for (let i = 0, len = rels.length, index; i < len; i++) {
             index = current.indexOf(rels[i]);
-            if (index > -1) rels.splice(index, 1);
+            if (index === -1) current.push(rels[i]);
         }
 
-        return current.join(' ') + ' ' + relAttr;
+        return current.join(' ');
     },
 
-    _relDelete(contextAnchor, relAttr) {
+    _relDelete: function (contextAnchor, relAttr) {
         if (!relAttr) return contextAnchor.currentRel.join(' ');
-        return contextAnchor.currentRel.join(' ').replace(this._w.RegExp(relAttr + '\\s*'), '');
+        if (/^only\:/.test(relAttr)) relAttr = relAttr.replace(/^only\:/, '').trim();
+
+        const rels = contextAnchor.currentRel.join(' ').replace(this._w.RegExp(relAttr + '\\s*'), '');
+        contextAnchor.currentRel = rels.split(' ');
+        return rels;
     },
 
     init: function (contextAnchor) {
         contextAnchor.linkAnchor = null;
         contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = '';
-        contextAnchor.linkAnchorText.value = '';
-        contextAnchor.linkNewWindowCheck.checked = false;
+        contextAnchor.anchorText.value = '';
+        contextAnchor.newWindowCheck.checked = false;
         contextAnchor.downloadCheck.checked = false;
         this.plugins.anchor.setRel.call(this, contextAnchor, contextAnchor.defaultRel);
         if (contextAnchor.relList) {

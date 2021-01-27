@@ -486,7 +486,7 @@ export interface SunEditorOptions {
     /**
      * Defines default "rel" attribute list of anchor tag.
      */
-    linkRelDefault?: {default?: string; newWindowCheck?: string; bookmarkCheck?: string;};
+    linkRelDefault?: {default?: string; check_new_window?: string; check_bookmark?: string;};
     /**
      * You can redefine icons.
      */

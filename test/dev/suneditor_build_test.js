@@ -389,6 +389,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'help',
         'license',
         'next',
+        'follow',
         'nofollow',
         'noreferrer',
         'noopener',
@@ -397,9 +398,9 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         'tag'
     ],
     linkRelDefault: {
-        default: 'bookmark author',
-        newWindowCheck: 'noreferrer noopener',
-        bookmarkCheck: 'bookmark'
+        default: 'nofollow',
+        check_new_window: 'only: noreferrer noopener',
+        check_bookmark: 'bookmark'
     },
     callBackSave: function (contents){
         console.log('save', contents)
