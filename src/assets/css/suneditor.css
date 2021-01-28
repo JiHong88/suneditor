@@ -303,13 +303,13 @@
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-size-text .size-w {width:70px; text-align:center;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-size-text .size-h {width:70px; text-align:center;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-size-x {margin:0 8px 0 8px; width:25px; text-align:center;}
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-footer {height:auto; padding:10px 15px 0px 15px; text-align:right; border-top:1px solid #e5e5e5;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-footer {height:auto; min-height:55px; padding:10px 15px 0px 15px; text-align:right; border-top:1px solid #e5e5e5;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-footer > div {float:left;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-footer > div > label {margin:0 5px 0 0;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-btn-radio {margin-left:12px; margin-right:6px;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-btn-check {margin-left:12px; margin-right:4px;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form-footer .se-dialog-btn-check {margin-left:0; margin-right:4px;}
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-form-footer label:first-child {margin-right:16px;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form-footer label:first-child {margin-right:16px; margin-left:0px;}
 /* dialog - modal - form - files */
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files {position:relative; display:flex; align-items:center;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-dialog-form-files > input {flex:auto;}
@@ -351,7 +351,7 @@
 /* dialog - modal - anchor module - rel select */
 .sun-editor .se-dialog .se-dialog-inner .se-anchor-rel {height:34px;}
 .sun-editor .se-dialog .se-dialog-inner .se-anchor-rel-btn {width:46px; color:#3f9dff;}
-.sun-editor .se-dialog .se-dialog-inner .se-anchor-rel-wrapper {display:flex; padding-top:9px;}
+.sun-editor .se-dialog .se-dialog-inner .se-anchor-rel-wrapper {display:flex; line-height:1.5; padding-top:6px;}
 .sun-editor .se-dialog .se-dialog-inner .se-anchor-rel-preview {text-align:left;}
 /* .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-mention-item {line-height:28px;min-height:25px;padding:0 5px;cursor:pointer;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-mention-item:hover {background-color:#e1e1e1}
@@ -498,11 +498,15 @@
 .sun-editor.se-rtl .se-dialog-tabs button {float:right;}
 .sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-size-text {padding-right:34px;}
 /* dialog - footer */
-.sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-content .se-btn-primary {float:left}
+.sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-footer .se-btn-primary {float:left}
 .sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-footer > div {float:right;}
 .sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-footer > div > label {margin:0 0 0 5px;}
+.sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-form-footer label:first-child {margin-left:16px; margin-right:0px;}
 /* dialog - footer - link preview*/
 .sun-editor.se-rtl .se-dialog .se-dialog-inner .se-anchor-rel-preview {margin-left:4px; text-align:right;}
+
+/* anchor module */
+.sun-editor.se-rtl .se-dialog .se-dialog-inner .se-anchor-rel-btn {float:right;}
 
 /* fileBrowser--- */
 .sun-editor.se-rtl .se-file-browser * {direction:rtl;}
