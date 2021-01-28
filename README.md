@@ -800,6 +800,7 @@ templates       : If you use a template plugin, add it.
 
 // ETC------------------------------------------------------------------------------------------------------------
 placeholder     : The placeholder text.                              default: null {String}
+mediaAutoSelect : Choose whether to activate the media selection status immediately after inserting the media tag.  default: true {Boolean}
 icons           : You can redefine icons.                            default: null {Object}
                   ex) {
                       bold: '<span class="se-icon-text">B</span>',
