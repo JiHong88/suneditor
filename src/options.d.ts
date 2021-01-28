@@ -492,7 +492,7 @@ export interface SunEditorOptions {
      */
     placeholder?: string;
     /**
-     * Choose whether to activate the media selection status immediately after inserting the media tag.  (default: true)
+     * Activate the media[image, video, audio] selection status immediately after inserting the media tag. (default: true)
      */
     mediaAutoSelect?: boolean;
     /**
