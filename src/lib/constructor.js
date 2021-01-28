@@ -538,6 +538,7 @@ export default {
         options.templates = !options.templates ? null : options.templates;
         /** ETC */
         options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
+        options.mediaAutoSelect = options.mediaAutoSelect === undefined ? true : !!options.mediaAutoSelect;
         /** Buttons */
         options.buttonList = !!options.buttonList ? options.buttonList : [
             ['undo', 'redo'],

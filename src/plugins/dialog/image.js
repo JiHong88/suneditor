@@ -660,15 +660,20 @@ export default {
         // align
         imagePlugin.setAlign.call(this, align, oImg, cover, container);
 
-        oImg.onload = imagePlugin._image_create_onload.bind(this, oImg, contextImage.svgDefaultSize);
+        oImg.onload = imagePlugin._image_create_onload.bind(this, oImg, contextImage.svgDefaultSize, container);
         if (this.insertComponent(container, true, true, true)) this.plugins.fileManager.setInfo.call(this, 'image', oImg, this.functions.onImageUpload, file, true);
         this.context.resizing._resize_plugin = '';
     },
 
-    _image_create_onload: function (oImg, svgDefaultSize) {
+    _image_create_onload: function (oImg, svgDefaultSize, container) {
         // svg exception handling
         if (oImg.offsetWidth === 0) this.plugins.image.applySize.call(this, svgDefaultSize, '');
-        this.selectComponent.call(this, oImg, 'image');
+        if (this.options.mediaAutoSelect) {
+            this.selectComponent(oImg, 'image');
+        } else {
+            const line = this.appendFormatTag(container, null);
+            this.setRange(line, 0, line, 0);
+        }
     },
 
     update_image: function (init, openController, notHistoryPush) {

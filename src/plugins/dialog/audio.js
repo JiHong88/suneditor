@@ -425,15 +425,20 @@ export default {
             element.src = src;
             const cover = this.plugins.component.set_cover.call(this, element);
             const container = this.plugins.component.set_container.call(this, cover, '');
-            if (!this.insertComponent(container, false, true, false)) {
+            if (!this.insertComponent(container, false, true, !this.options.mediaAutoSelect)) {
                 this.focus();
                 return;
+            }
+            if (!this.options.mediaAutoSelect) {
+                const line = this.appendFormatTag(container, null);
+                this.setRange(line, 0, line, 0);
             }
         } // update
         else {
             if (contextAudio._element) element = contextAudio._element;
             if (element && element.src !== src) {
                 element.src = src;
+                this.selectComponent(element, 'audio');
             } else {
                 this.selectComponent(element, 'audio');
                 return;
@@ -441,7 +446,6 @@ export default {
         }
 
         this.plugins.fileManager.setInfo.call(this, 'audio', element, this.functions.onAudioUpload, file, false);
-        this.selectComponent(element, 'audio');
         if (isUpdate) this.history.push(false);
     },
 
