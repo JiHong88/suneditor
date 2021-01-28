@@ -83,6 +83,7 @@
                 url: 'Saites URL',
                 text: 'Parādāmais teksts',
                 newWindowCheck: 'Atvērt jaunā logā',
+                downloadLinkCheck: 'Lejupielādes saite',
                 bookmark: 'Grāmatzīme'
             },
             mathBox: {

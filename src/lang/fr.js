@@ -83,6 +83,7 @@
                 url: 'Adresse URL du lien',
                 text: 'Texte à afficher',
                 newWindowCheck: 'Ouvrir dans une nouvelle fenêtre',
+                downloadLinkCheck: 'Lien de téléchargement',
                 bookmark: 'Signet'
             },
             mathBox: {

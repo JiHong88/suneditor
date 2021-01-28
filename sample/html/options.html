@@ -374,13 +374,12 @@
             <label><input type="checkbox" id="linkRel">&nbsp;&nbsp;linkRel</label>
             <br>
             <span>[</span>
-            <span>'alternate',</span>
             <span>&nbsp;'author',</span>
-            <span>&nbsp;'bookmark',</span>
             <span>&nbsp;'external',</span>
             <span>&nbsp;'help',</span>
             <span>&nbsp;'license',</span>
             <span>&nbsp;'next',</span>
+            <span>&nbsp;'follow',</span>
             <span>&nbsp;'nofollow',</span>
             <span>&nbsp;'noreferrer',</span>
             <span>&nbsp;'noopener',</span>
@@ -388,6 +387,14 @@
             <span>&nbsp;'search',</span>
             <span>&nbsp;'tag'</span>
             <span>]</span>
+            <br><br>
+            <label><input type="checkbox" id="linkRelDefault">&nbsp;&nbsp;linkRelDefault</label>
+            <br>
+            <span>{</span>
+            <span>&nbsp;default: 'nofollow',</span>
+            <span>&nbsp;check_new_window: 'noreferrer noopener',</span>
+            <span>&nbsp;check_bookmark: 'bookmark'</span>
+            <span>}</span>
             
             <br>
             <h4 style="color: #b94a48;">--Key actions</h4>
@@ -417,6 +424,8 @@
             <h4 style="color: #b94a48;">--ETC</h4>
             <label><input type="checkbox" id="placeholder">&nbsp;&nbsp;placeholder</label>
             <input type="text" id="placeholder_value" placeholder="String" style="width: 200px">
+            <br><br>
+            <label><input type="checkbox" id="mediaAutoSelect" checked>&nbsp;&nbsp;mediaAutoSelect</label>
             <br><br>
             <label><input type="checkbox" id="icons">&nbsp;&nbsp;icons</label><br>
             <span>{</span><br>
@@ -623,6 +632,9 @@ function sun_create () {
         audioAccept: document.getElementById('audioAccept').checked ? document.getElementById('audioAccept_value').value : undefined,
         tableCellControllerPosition: document.getElementById('tableCellControllerPosition').checked ? document.getElementById('tableCellControllerPosition_value').value : undefined,
         tabDisable: document.getElementById('tabDisable').checked,
+        linkProtocol: document.getElementById('linkProtocol').checked ? document.getElementById('linkProtocol_value').value : undefined,
+        linkRel: document.getElementById('linkRel').checked ? ['author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'] : undefined,
+        linkRelDefault: document.getElementById('linkRelDefault').checked ? {default: 'nofollow', check_new_window: 'noreferrer noopener', check_bookmark: 'bookmark'} : undefined,
         shortcutsDisable: document.getElementById('shortcutsDisable').checked ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent'] : undefined,
         shortcutsHint: document.getElementById('shortcutsHint').checked ? undefined : false,
         callBackSave: document.getElementById('callBackSave').checked ? function (contents) { alert(contents) } : undefined,
@@ -631,8 +643,7 @@ function sun_create () {
         textStyles: document.getElementById('textStyles').checked ? ['translucent', {name: 'Emphasis', style: '-webkit-text-emphasis: filled;', tag: 'span'}] : undefined,
         templates: document.getElementById('templates').checked ? [{name: 'Template-1', html: '<p>HTML source1</p>'},{name: 'Template-2', html: '<p>HTML source2</p>'}] : undefined,
         placeholder: document.getElementById('placeholder').checked ? document.getElementById('placeholder_value').value : undefined,
-        linkProtocol: document.getElementById('linkProtocol').checked ? document.getElementById('linkProtocol_value').value : undefined,
-        linkRel: document.getElementById('linkRel').checked ? ['alternate', 'author', 'bookmark', 'external', 'help', 'license', 'next', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'] : undefined,
+        mediaAutoSelect: !document.getElementById('mediaAutoSelect').checked ? false : undefined,
         icons: document.getElementById('icons').checked ? { paragraph_style: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>' } : undefined,
         buttonList: [
             ['undo', 'redo',

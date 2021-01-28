@@ -433,6 +433,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _variable: {
+            isChanged: false,
             isCodeView: false,
             isFullScreen: false,
             innerHeight_fullScreen: 0,
@@ -1606,16 +1607,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         if (!isFormats && prevContainer) {
                             parentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
                             if (parentNode.contains(container)) {
+                                let sameParent = true;
                                 afterNode = container;
                                 while (afterNode.parentNode !== parentNode) {
                                     afterNode = afterNode.parentNode;
+                                    sameParent = false;
                                 }
+                                if (sameParent && container === prevContainer) afterNode = afterNode.nextSibling;
                             } else {
                                 afterNode = null;
                             }
                         } else {
-                            parentNode = isFormats ? commonCon : container;
-                            afterNode = isFormats ? endCon : null;
+                            afterNode = isFormats ? endCon : container === prevContainer ? container.nextSibling : container;
+                            parentNode = (!afterNode || !afterNode.parentNode) ? commonCon : afterNode.parentNode;
                         }
 
                         while (afterNode && !util.isFormatElement(afterNode) && afterNode.parentNode !== commonCon) {
@@ -4039,13 +4043,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
                 case 'save':
                     if (typeof options.callBackSave === 'function') {
-                        options.callBackSave(this.getContents(false));
-                    } else if (typeof functions.save === 'function') {
+                        options.callBackSave(this.getContents(false), this._variable.isChanged);
+                    } else if (this._variable.isChanged && typeof functions.save === 'function') {
                         functions.save();
                     } else {
                         throw Error('[SUNEDITOR.core.commandHandler.fail] Please register call back function in creation option. (callBackSave : Function)');
                     }
 
+                    this._variable.isChanged = false;
                     if (context.tool.save) context.tool.save.setAttribute('disabled', true);
                     break;
                 default : // 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'..
@@ -4441,7 +4446,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const contentsHTML = options.previewTemplate ? options.previewTemplate.replace(/\{\{\s*contents\s*\}\}/i, this.getContents(true)) : this.getContents(true);
             const windowObject = _w.open('', '_blank');
             windowObject.mimeType = 'text/html';
-            const w = context.element.wysiwygFrame.offsetWidth + 'px !important';
             const wDoc = this._wd;
 
             if (options.iframe) {
@@ -4451,7 +4455,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     '<!DOCTYPE html><html>' +
                     '<head>' +
                     wDoc.head.innerHTML +
-                    '<style>body {overflow:auto !important; margin: 10px auto !important; height:auto !important;}</style>' +
+                    '<style>body {overflow:auto !important; margin: 10px auto !important; height:auto !important; outline:1px dashed #ccc;}</style>' +
                     '</head>' +
                     '<body ' + arrts + '>' + contentsHTML + '</body>' +
                     '</html>'
@@ -4475,7 +4479,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     '<title>' + lang.toolbar.preview + '</title>' +
                     linkHTML +
                     '</head>' +
-                    '<body class="' + options._editableClass + '" style="margin:10px auto !important; height:auto !important;">' + contentsHTML + '</body>' +
+                    '<body class="' + options._editableClass + '" style="margin:10px auto !important; height:auto !important; outline:1px dashed #ccc;">' + contentsHTML + '</body>' +
                     '</html>'
                 );
             }
@@ -5014,7 +5018,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._disallowedTextTagsRegExp = disallowTextTags.length === 0 ? null : new wRegExp('(<\\/?)(' + disallowTextTags.join('|') + ')\\b\\s*(?:[^>^<]+)?\\s*(?=>)', 'gi');
 
             // set whitelist
-            const defaultAttr = 'contenteditable|colspan|rowspan|target|href|src|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
+            const defaultAttr = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
             this._htmlCheckWhitelistRegExp = new wRegExp('^(' + options._editorTagsWhitelist.replace('|//', '') + ')$', 'i');
             this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|<!--|-->'));
@@ -5167,6 +5171,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         _onChange_historyStack: function () {
             event._applyTagEffects();
+            core._variable.isChanged = true;
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
             if (functions.onChange) functions.onChange(this.getContents(true), this);
         },
@@ -5629,16 +5634,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const range = core.getRange();
                 if (util.getFormatElement(range.startContainer) === util.getFormatElement(range.endContainer)) {
                     if (util.isList(rangeEl)) {
+                        e.preventDefault();
                         const oLi = util.createElement('LI');
                         const prevLi = selectionNode.nextElementSibling;
                         oLi.appendChild(selectionNode);
                         rangeEl.insertBefore(oLi, prevLi);
+                        core.focus();
                     } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode) && (!util.isTable(selectionNode) || util.isCell(selectionNode))) {
+                        e.preventDefault();
                         core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag);
+                        core.focus();
+                    } else {
+                        event._applyTagEffects();
                     }
-                    
-                    e.preventDefault();
-                    core.focus();
                 }
             } else {
                 event._applyTagEffects();

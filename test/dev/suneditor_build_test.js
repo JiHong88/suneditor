@@ -379,24 +379,30 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     value: "aa",
     stickyToolbar: 50,
     fullScreenOffset: '10px',
+    mediaAutoSelect: false,
     // rtl: true,
     // fullPage: true,
     // pasteTagsWhitelist: 'p|a|strong|em|h3|h4|h5|ul|ol|li|blockquote|table|thead|tbody|tfoot|tr|td|sup|sub',
-    // linkRel: [
-    //     'alternate',
-    //     'author',
-    //     'bookmark',
-    //     'external',
-    //     'help',
-    //     'license',
-    //     'next',
-    //     'nofollow',
-    //     'noreferrer',
-    //     'noopener',
-    //     'prev',
-    //     'search',
-    //     'tag'
-    // ],
+    linkRel: [
+        'alternate',
+        'author',
+        'external',
+        'help',
+        'license',
+        'next',
+        'follow',
+        'nofollow',
+        'noreferrer',
+        'noopener',
+        'prev',
+        'search',
+        'tag'
+    ],
+    linkRelDefault: {
+        default: 'nofollow',
+        check_new_window: 'only: noreferrer noopener',
+        check_bookmark: 'bookmark'
+    },
     callBackSave: function (contents){
         console.log('save', contents)
     },
@@ -417,7 +423,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         italic: 'u'
     },
     tableCellControllerPosition: 'top',
-    lang: lang.ko,
+    lang: lang.fr,
     plugins: plugins,
     katex: Katex,
     // value: '',

@@ -58,7 +58,7 @@ export default {
         this.callPlugin('image', function () {
             const file = {name: target.parentNode.querySelector('.__se__img_name').textContent, size: 0};
             this.context.image._altText = target.alt;
-            this.plugins.image.create_image.call(this, target.src, '', false, this.context.image._origin_w, this.context.image._origin_h, 'none', file);
+            this.plugins.image.create_image.call(this, target.src, null, this.context.image._origin_w, this.context.image._origin_h, 'none', file);
         }.bind(this), null);
     }
 };

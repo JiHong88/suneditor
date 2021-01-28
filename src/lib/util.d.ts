@@ -523,8 +523,9 @@ declare interface util {
      * @description Argument value If there is no class name, insert it and delete the class name if it exists
      * @param element Elements to replace class name
      * @param className Class name to be change
+     * @returns
      */
-    toggleClass(element: Element, className: string): void;
+    toggleClass(element: Element, className: string): boolean | undefined;
 
     /**
      * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.

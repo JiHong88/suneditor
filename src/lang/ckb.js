@@ -83,6 +83,7 @@
                 url: 'به‌سته‌ر',
                 text: 'تێكستی به‌سته‌ر',
                 newWindowCheck: 'له‌ په‌نجه‌ره‌یه‌كی نوێ بكه‌ره‌وه‌',
+                downloadLinkCheck: 'رابط التحميل',
                 bookmark: 'المرجعية'
             },
             mathBox: {

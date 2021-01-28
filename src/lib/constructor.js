@@ -527,6 +527,7 @@ export default {
         /** Link */
         options.linkProtocol = typeof options.linkProtocol === 'string' ? options.linkProtocol : null;
         options.linkRel = Array.isArray(options.linkRel) ? options.linkRel : [];
+        options.linkRelDefault = options.linkRelDefault || {};
         /** Key actions */
         options.tabDisable = !!options.tabDisable;
         options.shortcutsDisable = Array.isArray(options.shortcutsDisable) ? options.shortcutsDisable : [];
@@ -537,6 +538,7 @@ export default {
         options.templates = !options.templates ? null : options.templates;
         /** ETC */
         options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
+        options.mediaAutoSelect = options.mediaAutoSelect === undefined ? true : !!options.mediaAutoSelect;
         /** Buttons */
         options.buttonList = !!options.buttonList ? options.buttonList : [
             ['undo', 'redo'],
@@ -841,6 +843,12 @@ export default {
             case 1:
                 util.removeClass(_buttonTray.firstElementChild, 'se-btn-module-border');
                 break;
+            default:
+                if (options.rtl) {
+                    const sv =  separator_vertical.cloneNode(false);
+                    sv.style.float = _buttonTray.lastElementChild.style.float;
+                    _buttonTray.appendChild(sv);
+                }
         }
 
         if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);

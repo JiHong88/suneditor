@@ -442,6 +442,22 @@ export interface SunEditorOptions {
      */
     tableCellControllerPosition?: string;
     /**
+     * Link
+     * =====
+     */
+    /**
+     * Protocol for the links (if link has been added without any protocol this one will be used).
+     */
+    linkProtocol?: string;
+    /**
+     * Defines "rel" attribute list of anchor tag.
+     */
+    linkRel?: string[];
+    /**
+     * Defines default "rel" attribute list of anchor tag.
+     */
+    linkRelDefault?: {default?: string; check_new_window?: string; check_bookmark?: string;};
+    /**
      * Key actions
      * =====
      */
@@ -458,7 +474,7 @@ export interface SunEditorOptions {
     /**
      * Callback functions that is called when the Save button is clicked
      */
-    callBackSave?: (contents: string) => void;
+    callBackSave?: (contents: string, isChanged: boolean) => void;
     /**
      * Templates Array
      * ===============
@@ -476,13 +492,9 @@ export interface SunEditorOptions {
      */
     placeholder?: string;
     /**
-     * Protocol for the links (if link has been added without any protocol this one will be used).
+     * Activate the media[image, video, audio] selection status immediately after inserting the media tag. (default: true)
      */
-    linkProtocol?: string;
-    /**
-     * Defines "rel" attribute list of anchor tag.
-     */
-    linkRel?: string[];
+    mediaAutoSelect?: boolean;
     /**
      * You can redefine icons.
      */

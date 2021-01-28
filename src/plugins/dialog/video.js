@@ -407,7 +407,7 @@ export default {
             if ((fileSize + infoSize) > limitSize) {
                 this.closeLoading();
                 const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable total videos: ' + (limitSize/1000) + 'KB';
-                if (this.functions.onVideoUploadError !== 'function' || this.functions.onVideoUploadError(err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize }, this)) {
+                if (typeof this.functions.onVideoUploadError !== 'function' || this.functions.onVideoUploadError(err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize }, this)) {
                     this.functions.noticeOpen(err);
                 }
                 return;
@@ -614,7 +614,11 @@ export default {
 
         let changed = true;
         if (!isUpdate) {
-            changed = this.insertComponent(container, false, true, false);
+            changed = this.insertComponent(container, false, true, !this.options.mediaAutoSelect);
+            if (!this.options.mediaAutoSelect) {
+                const line = this.appendFormatTag(container, null);
+                this.setRange(line, 0, line, 0);
+            }
         } else if (contextVideo._resizing && this.context.resizing._rotateVertical && changeSize) {
             this.plugins.resizing.setTransformSize.call(this, oFrame, null, null);
         }
@@ -646,7 +650,7 @@ export default {
                 return this.isWysiwygDiv(current.parentNode);
             }.bind(this.util));
 
-        oFrame = oFrame.cloneNode(true);
+        contextVideo._element = oFrame = oFrame.cloneNode(true);
         const cover = contextVideo._cover = this.plugins.component.set_cover.call(this, oFrame);
         const container = contextVideo._container = this.plugins.component.set_container.call(this, cover, 'se-video-container');
 

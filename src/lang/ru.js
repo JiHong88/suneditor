@@ -83,6 +83,7 @@
                 url: 'Ссылка',
                 text: 'Текст',
                 newWindowCheck: 'Открывать в новом окне',
+                downloadLinkCheck: 'Ссылка для скачивания',
                 bookmark: 'Закладка'
             },
             mathBox: {

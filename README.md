@@ -401,7 +401,7 @@ pasteTagsWhitelist    : Whitelist of tags when pasting.   default: _editorTagsWh
                         ex) 'p|h[1-6]'
 attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}
                         // -- Fixed whitelist --
-                        // Native attributes: 'contenteditable|colspan|rowspan|target|href|src|class|type|controls'
+                        // Native attributes: 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls'
                         // Editor attributes: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size'
                         ex) {
                             'all': 'style|data-.+', // Apply to all tags
@@ -750,13 +750,12 @@ linkProtocol    : Default protocol for the links. ('link', 'image', 'video', 'au
 linkRel         : Defines "rel" attribute list of anchor tag.   default: [] {Array}
                   // https://www.w3schools.com/tags/att_a_rel.asp
                   ex) [
-                    'alternate',
                     'author',
-                    'bookmark',
                     'external',
                     'help',
                     'license',
                     'next',
+                    'follow',
                     'nofollow',
                     'noreferrer',
                     'noopener',
@@ -764,7 +763,16 @@ linkRel         : Defines "rel" attribute list of anchor tag.   default: [] {Arr
                     'search',
                     'tag'
                 ]
-                  
+linkRelDefault  : Defines default "rel" attributes of anchor tag.   default: {} {Object}
+                  ex) linkRelDefault: {
+                        default: 'nofollow', // Default rel
+                        check_new_window: 'noreferrer noopener', // When "open new window" is checked 
+                        check_bookmark: 'bookmark' // When "bookmark" is checked 
+                    },
+                    // If properties other than "default" start with "only:", the existing "rel" is cleared and applied. 
+                    linkRelDefault: {
+                        check_new_window: 'only:noreferrer noopener'
+                    }
 
 // Key actions----------------------------------------------------------------------------------------------------
 tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {Boolean}
@@ -774,7 +782,7 @@ shortcutsHint   : If false, hide the shortcuts hint.    default: true {Boolean}
 
 // Defining save button-------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. 
-                  Arguments - (contents).                            default: functions.save {Function}
+                  Arguments - (contents, isChanged).                            default: functions.save {Function}
 
 // Templates Array------------------------------------------------------------------------------------------------
 templates       : If you use a template plugin, add it.
@@ -792,6 +800,7 @@ templates       : If you use a template plugin, add it.
 
 // ETC------------------------------------------------------------------------------------------------------------
 placeholder     : The placeholder text.                              default: null {String}
+mediaAutoSelect : Activate the media[image, video, audio] selection status immediately after inserting the media tag.  default: true {Boolean}
 icons           : You can redefine icons.                            default: null {Object}
                   ex) {
                       bold: '<span class="se-icon-text">B</span>',

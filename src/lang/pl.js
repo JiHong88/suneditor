@@ -83,6 +83,7 @@
                 url: 'Adres URL',
                 text: 'Tekst do wyświetlenia',
                 newWindowCheck: 'Otwórz w nowym oknie',
+                downloadLinkCheck: 'Link do pobrania',
                 bookmark: 'Zakładka'
             },
             mathBox: {

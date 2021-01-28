@@ -83,6 +83,7 @@
 				url: '¿Hacia que URL lleva el link?',
 				text: 'Texto para mostrar',
 				newWindowCheck: 'Abrir en una nueva ventana',
+				downloadLinkCheck: 'Enlace de descarga',
                 bookmark: 'Marcador'
 			},
 			mathBox: {
