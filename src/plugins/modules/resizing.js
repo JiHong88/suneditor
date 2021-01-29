@@ -469,7 +469,6 @@
                 }
             }
 
-            this.util.setDisabledButtons(true, this.resizingDisabledButtons);
             resizeContainer.style.display = 'block';
 
             const addOffset = {left: 0, top: 50};
@@ -480,6 +479,7 @@
 
             this.setControllerPosition(contextResizing.resizeButton, resizeContainer, 'bottom', addOffset);
             this.controllersOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
+            this.util.setDisabledButtons(true, this.resizingDisabledButtons);
     
             contextResizing._resize_w = w;
             contextResizing._resize_h = h;
