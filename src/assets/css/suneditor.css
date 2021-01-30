@@ -110,7 +110,7 @@
 
 /** --- Input */
 .sun-editor input, .sun-editor select, .sun-editor textarea {color:#000; border:1px solid #ccc; border-radius:4px;}
-.sun-editor input:focus, .sun-editor select:focus, .sun-editor textarea:focus {border:1px solid #80bdff !important; outline:0; -webkit-box-shadow:0 0 0 0.2rem #c7deff; box-shadow:0 0 0 0.2rem #c7deff; transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out;}
+.sun-editor input:focus, .sun-editor select:focus, .sun-editor textarea:focus {border:1px solid #80bdff; outline:0; -webkit-box-shadow:0 0 0 0.2rem #c7deff; box-shadow:0 0 0 0.2rem #c7deff; transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out;}
 
 /* se-btn button active*/
 .sun-editor .se-btn:enabled.active {color:#4592ff; outline:0 none;}
