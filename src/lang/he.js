@@ -70,7 +70,7 @@
             tag_h: 'כותרת',
             tag_blockquote: 'ציטוט',
             tag_pre: 'קוד',
-            template: 'תבניט',
+            template: 'תבנית',
             lineHeight: 'גובה השורה',
             paragraphStyle: 'סגנון פסקה',
             textStyle: 'סגנון גופן',
@@ -89,7 +89,7 @@
             mathBox: {
                 title: 'נוסחה',
                 inputLabel: 'סימנים מתמטים',
-                fontSizeLabel: 'גודל דופן',
+                fontSizeLabel: 'גודל גופן',
                 previewLabel: 'תצוגה מקדימה'
             },
             imageBox: {
