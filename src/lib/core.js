@@ -59,6 +59,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _shadowRoot: null,
 
         /**
+         * @description Block controller mousedown events in "shadowRoot" environment
+         * @private
+         */
+        _shadowRootControllerEventTarget: null,
+
+        /**
          * @description Util object
          */
         util: util,
@@ -698,7 +704,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     this.currentFileComponentInfo = this.getFileComponent(arg);
                     continue;
                 }
-                if (arg.style) arg.style.display = 'block';
+                if (arg.style) {
+                    arg.style.display = 'block';
+                    if (this._shadowRoot && this._shadowRootControllerEventTarget.indexOf(arg) === -1) {
+                        arg.addEventListener('mousedown', function (e) { e.preventDefault(); e.stopPropagation(); });
+                        this._shadowRootControllerEventTarget.push(arg);
+                    }
+                }
                 this.controllerArray.push(arg);
             }
 
@@ -4982,6 +4994,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
                     child = child.parentNode;
                 }
+                if (this._shadowRoot) this._shadowRootControllerEventTarget = [];
             }
 
             // set disallow text nodes
