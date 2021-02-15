@@ -415,9 +415,9 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         format: '',
         rangeFormat: 'a|b'
     },
-    attributesWhitelist: {
-        all: 'style'
-    },
+    // attributesWhitelist: {
+    //     all: 'style'
+    // },
     // iframe: true,
     defaultTag: 'div',
     textTags: {

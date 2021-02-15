@@ -4621,9 +4621,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Tag and tag attribute check RegExp function. (used by "cleanHTML" and "convertContentsForEditor")
-         * @param {*} classCheck Whether to check the class value as well 
-         * @param {*} m RegExp value
-         * @param {*} t RegExp value
+         * @param {Boolean} classCheck Whether to check the class value as well 
+         * @param {String} m RegExp value
+         * @param {String} t RegExp value
          * @returns {String}
          * @private
          */
