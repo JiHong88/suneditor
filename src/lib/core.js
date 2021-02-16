@@ -6659,10 +6659,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const responsiveSize = event._responsiveButtonSize;
             if (responsiveSize) {
-                const windowWidth = context.element.toolbar.offsetWidth;
+                let w = 0;
+                if ((core._isBalloon || core._isInline) && options.toolbarWidth === 'auto') {
+                    w = context.element.topArea.offsetWidth;
+                } else {
+                    w = context.element.toolbar.offsetWidth;
+                }
+
                 let responsiveWidth = 'default';
                 for (let i = 1, len = responsiveSize.length; i < len; i++) {
-                    if (windowWidth < responsiveSize[i]) {
+                    if (w < responsiveSize[i]) {
                         responsiveWidth = responsiveSize[i] + '';
                         break;
                     }
