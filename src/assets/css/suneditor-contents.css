@@ -63,6 +63,7 @@
 /* katex */
 .sun-editor-editable span.katex {
     display: inline-block;
+    direction: ltr;
 }
 
 /* a */

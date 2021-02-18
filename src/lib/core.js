@@ -59,6 +59,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _shadowRoot: null,
 
         /**
+         * @description Block controller mousedown events in "shadowRoot" environment
+         * @private
+         */
+        _shadowRootControllerEventTarget: null,
+
+        /**
          * @description Util object
          */
         util: util,
@@ -698,7 +704,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     this.currentFileComponentInfo = this.getFileComponent(arg);
                     continue;
                 }
-                if (arg.style) arg.style.display = 'block';
+                if (arg.style) {
+                    arg.style.display = 'block';
+                    if (this._shadowRoot && this._shadowRootControllerEventTarget.indexOf(arg) === -1) {
+                        arg.addEventListener('mousedown', function (e) { e.preventDefault(); e.stopPropagation(); });
+                        this._shadowRootControllerEventTarget.push(arg);
+                    }
+                }
                 this.controllerArray.push(arg);
             }
 
@@ -4608,6 +4620,50 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Tag and tag attribute check RegExp function. (used by "cleanHTML" and "convertContentsForEditor")
+         * @param {Boolean} rowLevelCheck Row level check
+         * @param {String} m RegExp value
+         * @param {String} t RegExp value
+         * @returns {String}
+         * @private
+         */
+        _cleanTags: function (rowLevelCheck, m, t) {
+            if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
+
+            let v = null;
+            const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z0-9]+/)[0].toLowerCase()];
+            if (tAttr) v = m.match(tAttr);
+            else v = m.match(this._attributesWhitelistRegExp);
+
+            if ((rowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
+            // @v3
+            // if (!v || !/style=/i.test(v.toString())) {
+                const sv = m.match(/style\s*=\s*"[^"]*"/);
+                if (sv) {
+                    if (!v) v = [];
+                    v.push(sv[0]);
+                }
+            }
+
+            if (/<a\b/i.test(t)) {
+                const sv = m.match(/id\s*=\s*"[^"]*"/);
+                if (sv) {
+                    if (!v) v = [];
+                    v.push(sv[0]);
+                }
+            }
+
+            if (v) {
+                for (let i = 0, len = v.length; i < len; i++) {
+                    if (rowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
+                    t += ' ' + (/^href\s*=\s*('|"|\s)*javascript\s*\:/.test(v[i]) ? '' : v[i]);
+                }
+            }
+
+            return t;
+        },
+
+        /**
          * @description Gets the clean HTML code for editor
          * @param {String} html HTML string
          * @param {String|RegExp|null} whitelist Regular expression of allowed tags.
@@ -4615,42 +4671,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist) {
-            html = this._deleteDisallowedTags(html)
-                .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
-                    if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
-
-                    let v = null;
-                    const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z0-9]+/)[0].toLowerCase()];
-                    if (tAttr) v = m.match(tAttr);
-                    else v = m.match(this._attributesWhitelistRegExp);
-
-                    if (/<span/i.test(t) && (!v || !/style=/i.test(v.toString()))) {
-                    // @v3
-                    // if (!v || !/style=/i.test(v.toString())) {
-                        const sv = m.match(/style\s*=\s*"[^"]*"/);
-                        if (sv) {
-                            if (!v) v = [];
-                            v.push(sv[0]);
-                        }
-                    }
-
-                    if (/<a\b/i.test(t)) {
-                        const sv = m.match(/id\s*=\s*"[^"]*"/);
-                        if (sv) {
-                            if (!v) v = [];
-                            v.push(sv[0]);
-                        }
-                    }
-
-                    if (v) {
-                        for (let i = 0, len = v.length; i < len; i++) {
-                            if (/^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
-                            t += ' ' + v[i];
-                        }
-                    }
-
-                    return t;
-                }.bind(this));
+            html = this._deleteDisallowedTags(html).replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, this._cleanTags.bind(this, false));
 
             const dom = _d.createRange().createContextualFragment(html);
             try {
@@ -4699,41 +4720,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
-            contents = this._deleteDisallowedTags(contents)
-                .replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, function (m, t) {
-                    if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
-
-                    let v = null;
-                    const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z0-9]+/)[0].toLowerCase()];
-                    if (tAttr) v = m.match(tAttr);
-                    else v = m.match(this._attributesWhitelistRegExp);
-
-                    if (/<span/i.test(t) && (!v || !/style=/i.test(v.toString()))) {
-                    // @v3
-                    // if (!v || !/style=/i.test(v.toString())) {
-                        const sv = m.match(/style\s*=\s*"[^"]*"/);
-                        if (sv) {
-                            if (!v) v = [];
-                            v.push(sv[0]);
-                        }
-                    }
-
-                    if (/<a\b/i.test(t)) {
-                        const sv = m.match(/id\s*=\s*"[^"]*"/);
-                        if (sv) {
-                            if (!v) v = [];
-                            v.push(sv[0]);
-                        }
-                    }
-
-                    if (v) {
-                        for (let i = 0, len = v.length; i < len; i++) {
-                            t += ' ' + v[i];
-                        }
-                    }
-
-                    return t;
-                }.bind(this));
+            contents = this._deleteDisallowedTags(contents).replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
 
             const dom = _d.createRange().createContextualFragment(this._deleteDisallowedTags(contents));
 
@@ -5007,6 +4994,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
                     child = child.parentNode;
                 }
+                if (this._shadowRoot) this._shadowRootControllerEventTarget = [];
             }
 
             // set disallow text nodes
@@ -6671,10 +6659,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const responsiveSize = event._responsiveButtonSize;
             if (responsiveSize) {
-                const windowWidth = context.element.toolbar.offsetWidth;
+                let w = 0;
+                if ((core._isBalloon || core._isInline) && options.toolbarWidth === 'auto') {
+                    w = context.element.topArea.offsetWidth;
+                } else {
+                    w = context.element.toolbar.offsetWidth;
+                }
+
                 let responsiveWidth = 'default';
                 for (let i = 1, len = responsiveSize.length; i < len; i++) {
-                    if (windowWidth < responsiveSize[i]) {
+                    if (w < responsiveSize[i]) {
                         responsiveWidth = responsiveSize[i] + '';
                         break;
                     }

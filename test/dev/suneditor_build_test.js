@@ -31,18 +31,6 @@ Array.prototype._move = function(from, to)
 
 import align from '../../src/plugins/submenu/align'
 
-// const shadow = document.querySelector('#app').attachShadow({ mode: 'open' })
-// const appEl = document.createElement('textarea')
-// const appStyle = document.createElement('style')
-// appStyle.textContent = u.getPageStyle();
-
-// shadow.appendChild(appStyle);
-// shadow.appendChild(appEl);
-// suneditor.create(appEl, {
-//     width: '400px',
-//     height: 500
-// })
-
 const fs = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
     ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
     ,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72,8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
@@ -179,6 +167,22 @@ const complexEditor = [
             ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template']
         ]]
 ]
+
+// shadowroot test
+const shadow = document.querySelector('#app').attachShadow({ mode: 'open' })
+const appEl = document.createElement('textarea')
+const appStyle = document.createElement('style')
+appStyle.textContent = u.getPageStyle(document);
+
+shadow.appendChild(appStyle);
+shadow.appendChild(appEl);
+suneditor.create(appEl, {
+    plugins: plugins,
+    katex: Katex,
+    width: '400px',
+    height: 500,
+    buttonList: complexEditor
+})
 
 let ssss = suneditor.create(("sample1"), {
     plugins: plugins, //[sunEditorNpsButtonBgColor, sunEditorNpsButtonFontColor, sunEditorNpsButtonFontSize],
@@ -411,9 +415,9 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         format: '',
         rangeFormat: 'a|b'
     },
-    attributesWhitelist: {
-        all: 'style'
-    },
+    // attributesWhitelist: {
+    //     all: 'style'
+    // },
     // iframe: true,
     defaultTag: 'div',
     textTags: {
