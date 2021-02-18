@@ -1,6 +1,6 @@
 {
   "name": "suneditor",
-  "version": "2.36.1",
+  "version": "2.36.2",
   "description": "Pure JavaScript based WYSIWYG web editor",
   "main": "src/suneditor.js",
   "keywords": [
