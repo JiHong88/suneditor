@@ -338,7 +338,7 @@
 /* dialog - modal - image @v3*/
 /* .sun-editor .se-dialog .se-dialog-inner .se-dialog-content.se-dialog-image form {min-height:400px;} */
 /* dialog - modal - math */
-.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-form.se-math-exp {resize:vertical; height:4rem; border:1px solid #ccc; font-size:13px; padding:4px;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-form.se-math-exp {resize:vertical; height:4rem; border:1px solid #ccc; font-size:13px; padding:4px; direction:ltr;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-select.se-math-size {width:6em; height:28px; margin-left:1em;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-math-preview {font-size:13px;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-math-preview > span {display:inline-block; -webkit-box-shadow:0 0 0 0.1rem #c7deff; box-shadow:0 0 0 0.1rem #c7deff;}
