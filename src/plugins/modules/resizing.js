@@ -863,6 +863,8 @@
     
             const pluginName = this.context.resizing._resize_plugin;
             this.plugins[pluginName].setSize.call(this, w, h, false, direction);
+            if (isVertical) this.plugins.resizing.setTransformSize.call(this, this.context[this.context.resizing._resize_plugin]._element, w, h);
+
             this.selectComponent(this.context[pluginName]._element, pluginName);
         }
     };
