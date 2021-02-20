@@ -820,7 +820,6 @@ export default {
 
                 if (vertical) {
                     const sv =  separator_vertical.cloneNode(false);
-                    if (align) sv.style.float = align;
                     _buttonTray.appendChild(sv);
                 }
                 
