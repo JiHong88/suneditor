@@ -505,6 +505,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
         },
 
+        getGlobalScrollOffset: function () {
+            const shadowRootScroll = this._shadowRoot ? this._shadowRoot.ownerDocument.scrollingElement : null;
+            let el = context.element.topArea;
+            let t = 0, l = 0;
+            while (!!el) {
+                t += el.scrollTop;
+                l += el.scrollLeft;
+                el = el.parentElement;
+            }
+
+            return {
+                top: t + shadowRootScroll ? shadowRootScroll.scrollTop : 0,
+                left: l + shadowRootScroll ? shadowRootScroll.scrollLeft : 0
+            };
+        },
+
         /**
          * @description Method for managing submenu element.
          * You must add the "submenu" element using the this method at custom plugin.
@@ -649,13 +665,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // set menu position
             const toolbarTop = toolbarOffset.top;
-            let menuHeight = menu.offsetHeight;
-            let el = context.element.topArea;
-            let scrollTop = 0;
-            while (!!el) {
-                scrollTop += el.scrollTop;
-                el = el.parentElement;
-            }
+            const menuHeight = menu.offsetHeight;
+            const scrollTop = this.getGlobalScrollOffset().top;
 
             const menuHeight_bottom = _w.innerHeight - (toolbarTop - scrollTop + bt + element.parentElement.offsetHeight);
             if (menuHeight_bottom < menuHeight) {
@@ -5685,14 +5696,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let rects = range.getClientRects();
             rects = rects[isDirTop ? 0 : rects.length - 1];
 
-            let scrollLeft = 0;
-            let scrollTop = 0;
-            let el = topArea;
-            while (!!el) {
-                scrollLeft += el.scrollLeft;
-                scrollTop += el.scrollTop;
-                el = el.parentElement;
-            }
+            const globalScroll = core.getGlobalScrollOffset();
+            let scrollLeft = globalScroll.left;
+            let scrollTop = globalScroll.top; 
 
             const editorWidth = topArea.offsetWidth;
             const offsets = event._getEditorOffsets(null);
