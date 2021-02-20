@@ -510,18 +510,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Object} {top, left}
          */
         getGlobalScrollOffset: function () {
-            const shadowRootScroll = this._shadowRoot ? this._shadowRoot.ownerDocument.scrollingElement : null;
-            let el = context.element.topArea;
             let t = 0, l = 0;
-            while (!!el) {
+            let el = context.element.topArea;
+            while (el) {
+                t += el.scrollTop;
+                l += el.scrollLeft;
+                el = el.parentElement;
+            }
+            
+            el = this._shadowRoot ? this._shadowRoot.host : null;
+            while (el) {
                 t += el.scrollTop;
                 l += el.scrollLeft;
                 el = el.parentElement;
             }
 
             return {
-                top: t + shadowRootScroll ? shadowRootScroll.scrollTop : 0,
-                left: l + shadowRootScroll ? shadowRootScroll.scrollLeft : 0
+                top: t,
+                left: l
             };
         },
 
