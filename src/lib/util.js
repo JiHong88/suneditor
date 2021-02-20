@@ -209,8 +209,10 @@ const util = {
                 continue;
             }
             
-            for (let c = 0, cLen = rules.length; c < cLen; c++) {
-                cssText += rules[c].cssText;
+            if (rules) {
+                for (let c = 0, cLen = rules.length; c < cLen; c++) {
+                    cssText += rules[c].cssText;
+                }
             }
         }
 

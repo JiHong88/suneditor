@@ -5183,6 +5183,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core._variable.isChanged = true;
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
             if (functions.onChange) functions.onChange(this.getContents(true), this);
+            if (context.element.toolbar.style.display === 'block') event._showToolbarBalloon();
         },
 
         /**
@@ -5708,7 +5709,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const globalScroll = core.getGlobalScrollOffset();
             let scrollLeft = globalScroll.left;
-            let scrollTop = globalScroll.top; 
+            let scrollTop = globalScroll.top;
 
             const editorWidth = topArea.offsetWidth;
             const offsets = event._getEditorOffsets(null);
