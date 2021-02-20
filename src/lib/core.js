@@ -505,6 +505,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
         },
 
+        /**
+         * @description Gets the current editor-relative scroll offset.
+         * @returns {Object} {top, left}
+         */
         getGlobalScrollOffset: function () {
             const shadowRootScroll = this._shadowRoot ? this._shadowRoot.ownerDocument.scrollingElement : null;
             let el = context.element.topArea;
