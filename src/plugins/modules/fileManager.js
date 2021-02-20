@@ -25,6 +25,15 @@
         name: 'fileManager',
         _xmlHttp: null,
 
+        _checkMediaComponent: function (tag) {
+            if (/IMG/i.test(tag)) {
+                return !/FIGURE/i.test(tag.parentElement.nodeName) || !/FIGURE/i.test(tag.parentElement.parentElement.nodeName);
+            } else if (/VIDEO/i.test(tag)) {
+                return !/FIGURE/i.test(tag.parentElement.nodeName);
+            }
+            return true;
+        },
+
         /**
          * @description Upload the file to the server.
          * @param {String} uploadUrl Upload server url
@@ -92,9 +101,10 @@
                 tags = tags.concat([].slice.call(this.context.element.wysiwyg.getElementsByTagName(tagNames[i])));
             }
 
+            const fileManagerPlugin = this.plugins.fileManager;
             const context = this.context[pluginName];
             const infoList = context._infoList;
-            const setFileInfo = this.plugins.fileManager.setInfo.bind(this);
+            const setFileInfo = fileManagerPlugin.setInfo.bind(this);
 
             if (tags.length === infoList.length) {
                 // reset
@@ -128,7 +138,7 @@
             
             for (let i = 0, len = tags.length, tag; i < len; i++) {
                 tag = tags[i];
-                if (!this.util.getParentElement(tag, this.util.isMediaComponent) || !/FIGURE/i.test(tag.parentElement.nodeName)) {
+                if (!this.util.getParentElement(tag, this.util.isMediaComponent) || !fileManagerPlugin._checkMediaComponent(tag)) {
                     currentTags.push(context._infoIndex);
                     modifyHandler(tag);
                 } else if (!tag.getAttribute('data-index') || infoIndex.indexOf(tag.getAttribute('data-index') * 1) < 0) {

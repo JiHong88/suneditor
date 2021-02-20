@@ -191,6 +191,11 @@ interface Core {
     addModule(moduleArray: Module[]): void;
 
     /**
+     * @description Gets the current editor-relative scroll offset.
+     */
+    getGlobalScrollOffset(): {top: number; left: number};
+
+    /**
      * @description Method for managing submenu element.
      * You must add the "submenu" element using the this method at custom plugin.
      * @param pluginName Plugin name
