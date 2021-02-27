@@ -204,7 +204,7 @@ export default {
         const relative = el.relative;
         const editorArea = el.editorArea;
         const isNewToolbarContainer = mergeOptions.toolbarContainer && mergeOptions.toolbarContainer !== originOptions.toolbarContainer;
-        const isNewToolbar = mergeOptions.buttonList !== originOptions.buttonList || mergeOptions.mode !== originOptions.mode || isNewToolbarContainer;
+        const isNewToolbar = mergeOptions.lang !== originOptions.lang || mergeOptions.buttonList !== originOptions.buttonList || mergeOptions.mode !== originOptions.mode || isNewToolbarContainer;
 
         const tool_bar = this._createToolBar(document, (isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList), mergeOptions.plugins, mergeOptions);
         if (tool_bar.pluginCallButtons.math) this._checkKatexMath(mergeOptions.katex);
@@ -401,31 +401,6 @@ export default {
         options._editorTagsWhitelist = options._defaultTagsWhitelist + (typeof options.addTagsWhitelist === 'string' && options.addTagsWhitelist.length > 0 ? '|' + options.addTagsWhitelist : '');
         options.pasteTagsWhitelist = typeof options.pasteTagsWhitelist === 'string' ? options.pasteTagsWhitelist : options._editorTagsWhitelist;
         options.attributesWhitelist = (!options.attributesWhitelist || typeof options.attributesWhitelist !== 'object') ? null : options.attributesWhitelist;
-        // @v3
-        // const defaultAllowStyles = {
-        //     format: ['margin-left', 'margin-right', 'text-align', 'line-height'],
-        //     rangeFormat: [],
-        //     closureRangeFormat: [],
-        //     freeFormat: [],
-        //     closureFreeFormat: [],
-        //     component: [],
-        //     span: ['font-family', 'color', 'background-color', 'font-size']
-        // };
-        // options.allowStyles = (!options.allowStyles || typeof options.allowStyles !== 'object') ? defaultAllowStyles : [defaultAllowStyles, options.allowStyles].reduce(function (_default, _new) {
-        //     for (let key in _new) {
-        //         if (!_default[key]) _default[key] = [];
-        //         const newStyle = _new[key];
-        //         if (typeof newStyle === 'string') {
-        //             _default[key] = !newStyle ? [] : newStyle.split('|');
-        //         } else {
-        //             for (let i = 0, len = newStyle.length, n; i < len; i++) {
-        //                 n = newStyle[i];
-        //                 if (_default[key].indexOf(n) === -1) _default[key].push(n)
-        //             }
-        //         }
-        //     }
-        //     return _default;
-        // }, {});
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
         options.rtl = !!options.rtl;

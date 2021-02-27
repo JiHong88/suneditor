@@ -412,11 +412,6 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     callBackSave: function (contents){
         console.log('save', contents)
     },
-    allowStyles: {
-        span: ['opacity'],
-        format: '',
-        rangeFormat: 'a|b'
-    },
     // attributesWhitelist: {
     //     all: 'style'
     // },
@@ -774,8 +769,9 @@ window.sun_create = function () {
     //     plugins: plugins,
     //     height: 148
     // });
+    console.log("langlang")
     ss.setOptions({
-        defaultTag: 'p'
+        lang: lang.ko
     })
 
     // ss.core.commandHandler(null, 'selectAll');
