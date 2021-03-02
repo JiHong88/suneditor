@@ -4140,7 +4140,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             for (let i = 0, len = rangeLines.length, f, margin; i < len; i++) {
                 f = rangeLines[i];
-
                 if (!util.isListCell(f) || !this.plugins.list) {
                     margin = /\d+/.test(f.style[marginDir]) ? util.getNumber(f.style[marginDir], 0) : 0;
                     if (shift) {
@@ -5500,9 +5499,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     /* Indent */
-                    if (commandMapNodes.indexOf('INDENT') === -1 && commandMap.INDENT && util.isListCell(element) && !element.previousElementSibling) {
+                    if (commandMapNodes.indexOf('INDENT') === -1 && commandMap.INDENT) {
                         commandMapNodes.push('INDENT');
-                        commandMap.INDENT.setAttribute('disabled', true);
+                        if (util.isListCell(element) && !element.previousElementSibling) {
+                            commandMap.INDENT.setAttribute('disabled', true);
+                        } else {
+                            commandMap.INDENT.removeAttribute('disabled');
+                        }
                     }
 
                     continue;
