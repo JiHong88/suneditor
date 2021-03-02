@@ -286,6 +286,11 @@
 .sun-editor-editable hr.__se__dashed {
     border-style: dashed none none;
 }
+.sun-editor-editable hr.on {
+    border-color: #4592ff;
+    -webkit-box-shadow:0 0 0 0.1rem #c7deff;
+    box-shadow:0 0 0 0.1rem #c7deff;
+}
 
 /* table */
 .sun-editor-editable table {

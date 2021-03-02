@@ -879,16 +879,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             } else {
                 try {
                     const range = this.getRange();
-
                     if (range.startContainer === range.endContainer && util.isWysiwygDiv(range.startContainer)) {
-                        const format = util.createElement(options.defaultTag);
-                        const br = util.createElement('BR');
-                        format.appendChild(br);
-                        context.element.wysiwyg.appendChild(format);
-                        this.setRange(br, 0, br, 0);
-                    } else {
-                        this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+                        const currentNode = range.commonAncestorContainer.children[range.startOffset];
+                        if (!util.isFormatElement(currentNode) && !util.isComponent(currentNode)) {
+                            const format = util.createElement(options.defaultTag);
+                            const br = util.createElement('BR');
+                            format.appendChild(br);
+                            context.element.wysiwyg.insertBefore(format, currentNode);
+                            this.setRange(br, 0, br, 0);
+                            return;
+                        }
                     }
+                    this.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
                 } catch (e) {
                     this.nativeFocus();
                 }
@@ -1087,7 +1089,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._variable._range = range;
 
             if (range.collapsed) {
-                selectionNode = range.commonAncestorContainer;
+                if (util.isWysiwygDiv(range.commonAncestorContainer)) selectionNode = range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
+                else selectionNode = range.commonAncestorContainer;
             } else {
                 selectionNode = selection.extentNode || selection.anchorNode;
             }
@@ -1795,9 +1798,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let container, offset = 0;
             let startCon = range.startContainer;
             let endCon = range.endContainer;
-            const startOff = range.startOffset;
-            const endOff = range.endOffset;
+            let startOff = range.startOffset;
+            let endOff = range.endOffset;
             const commonCon = (range.commonAncestorContainer.nodeType === 3 && range.commonAncestorContainer.parentNode === startCon.parentNode) ? startCon.parentNode : range.commonAncestorContainer;
+            if (commonCon === startCon && commonCon === endCon) {
+                startCon = commonCon.children[startOff];
+                endCon = commonCon.children[endOff];
+                startOff = endOff = 0;
+            }
 
             let beforeNode = null;
             let afterNode = null;
@@ -1876,7 +1884,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 if (item === startCon) {
                     if (startCon.nodeType === 1) {
-                        beforeNode = util.createTextNode(startCon.textContent);
+                        if (util.isComponent(startCon)) continue;
+                        else beforeNode = util.createTextNode(startCon.textContent);
                     } else {
                         if (item === endCon) {
                             beforeNode = util.createTextNode(startCon.substringData(0, startOff) + endCon.substringData(endOff, (endCon.length - endOff)));
@@ -1898,7 +1907,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 if (item === endCon) {
                     if (endCon.nodeType === 1) {
-                        afterNode = util.createTextNode(endCon.textContent);
+                        if (util.isComponent(endCon)) continue;
+                        else afterNode = util.createTextNode(endCon.textContent);
                     } else {
                         afterNode = util.createTextNode(endCon.substringData(endOff, (endCon.length - endOff)));
                     }
@@ -5230,7 +5240,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const fileComponent = util.getParentElement(commonCon, util.isComponent);
             if (fileComponent && !util.isTable(fileComponent)) return;
-            if((util.isRangeFormatElement(startCon) || util.isWysiwygDiv(startCon)) && util.isComponent(startCon.childNodes[range.startOffset])) return;
+            if((util.isRangeFormatElement(startCon) || util.isWysiwygDiv(startCon)) && (util.isComponent(startCon.children[range.startOffset]) || util.isComponent(startCon.children[range.startOffset - 1]))) return;
 
             if (rangeEl) {
                 format = util.createElement(formatName || options.defaultTag);
