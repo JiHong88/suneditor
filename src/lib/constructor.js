@@ -405,6 +405,7 @@ export default {
         options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
         options.rtl = !!options.rtl;
         options._editableClass = 'sun-editor-editable' + (options.rtl ? ' se-rtl' : '');
+        options._printClass = typeof options._printClass === 'string' ? options._printClass : null;
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
         options.toolbarContainer = typeof options.toolbarContainer === 'string' ? document.querySelector(options.toolbarContainer) : options.toolbarContainer;
         options.stickyToolbar = (/balloon/i.test(options.mode) || !!options.toolbarContainer) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);

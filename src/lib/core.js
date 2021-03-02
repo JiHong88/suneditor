@@ -4422,7 +4422,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const wDoc = this._wd;
 
             if (options.iframe) {
-                const arrts = options.fullPage ? util.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + options._editableClass + '"';
+                const arrts = options._printClass !== null ? 'class="' + options._printClass + '"' : options.fullPage ? util.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + options._editableClass + '"';
 
                 printDocument.write('' +
                     '<!DOCTYPE html><html>' +
@@ -4448,7 +4448,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     '<head>' +
                     linkHTML +
                     '</head>' +
-                    '<body class="' + options._editableClass + '">' + contentsHTML + '</body>' +
+                    '<body class="' + (options._printClass !== null ? options._printClass : options._editableClass) + '">' + contentsHTML + '</body>' +
                     '</html>'
                 );
             }
@@ -4491,7 +4491,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const wDoc = this._wd;
 
             if (options.iframe) {
-                const arrts = options.fullPage ? util.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + options._editableClass + '"';
+                const arrts = options._printClass !== null ? 'class="' + options._printClass + '"' : options.fullPage ? util.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + options._editableClass + '"';
 
                 windowObject.document.write('' +
                     '<!DOCTYPE html><html>' +
@@ -4521,7 +4521,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     '<title>' + lang.toolbar.preview + '</title>' +
                     linkHTML +
                     '</head>' +
-                    '<body class="' + options._editableClass + '" style="margin:10px auto !important; height:auto !important; outline:1px dashed #ccc;">' + contentsHTML + '</body>' +
+                    '<body class="' + (options._printClass !== null ? options._printClass : options._editableClass) + '" style="margin:10px auto !important; height:auto !important; outline:1px dashed #ccc;">' + contentsHTML + '</body>' +
                     '</html>'
                 );
             }

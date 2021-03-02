@@ -485,6 +485,11 @@ export interface SunEditorOptions {
      * You can redefine icons.
      */
     icons?: Record<string, string>;
+
+    /**
+     * private options
+     */
+    _printClass?: string;
   }
   export type FormatTagName =
   'p'
