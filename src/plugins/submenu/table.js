@@ -209,6 +209,33 @@ export default {
             this.setRange(firstTd, 0, firstTd, 0);
             this.plugins.table.reset_table_picker.call(this);
         }
+        var elements = document.getElementsByClassName("resizer");
+        for(let div of elements){
+            var pageX, curCol, nxtCol, curColWidth, nxtColWidth;
+            div.addEventListener("mousedown", function (e) {
+                curCol = e.target.parentElement;
+                nxtCol = curCol.nextElementSibling;
+                pageX = e.pageX;
+                curColWidth = curCol.offsetWidth;
+                if (nxtCol) nxtColWidth = nxtCol.offsetWidth;
+            });
+            
+            document.addEventListener("mousemove", function (e) {
+                if (curCol) {
+                    var diffX = e.pageX - pageX;
+                    if (nxtCol) 
+                        nxtCol.style.width = (nxtColWidth - (diffX))+'px';
+                        curCol.style.width = (curColWidth + diffX)+'px';       }
+            });
+            
+            document.addEventListener("mouseup", function (e) {
+                curCol = undefined;
+                nxtCol = undefined;
+                pageX = undefined;
+                nxtColWidth = undefined;
+                curColWidth = undefined;
+            });
+        }
     },
 
     createCells: function (nodeName, cnt, returnElement) {
@@ -216,8 +243,10 @@ export default {
 
         if (!returnElement) {
             let cellsHTML = '';
+            let style = `contenteditable="false" class="resizer" style="width:2px;height:100%;position:absolute;right:0;top:0;cursor:col-resize;"`
+            let max = 100 / cnt;
             while (cnt > 0) {
-                cellsHTML += '<' +nodeName + '><div><br></div></' + nodeName + '>';
+                cellsHTML += '<' +nodeName + ' style="flex-grow: 1;max-width:'+max+'%" ><div><br></div><div '+style+'></div></' + nodeName + '>';
                 cnt--;
             }
             return cellsHTML;

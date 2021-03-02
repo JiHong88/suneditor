@@ -317,12 +317,24 @@
     padding:0.4em;
     background-clip: padding-box;
 }
+
+.sun-editor-editable table td div {
+    white-space: normal;
+    word-break: break-all;
+}
+.sun-editor-editable table td span {
+    white-space: normal;
+    word-break: break-all;
+}
+
 /** table style class */
 .sun-editor-editable table.se-table-size-auto {
     width: auto !important;
+    max-width: 100% !important;
 }
 .sun-editor-editable table.se-table-size-100 {
     width: 100% !important;
+    max-width: 100% !important;
 }
 .sun-editor-editable table.se-table-layout-auto {
     table-layout: auto !important;
