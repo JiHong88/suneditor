@@ -11,6 +11,10 @@ export default {
     name: 'horizontalRule',
     display: 'submenu',
     add: function (core, targetElement) {
+        core.context.horizontalRule = {
+            currentHR: null,
+        };
+
         /** set submenu */
         let listDiv = this.setSubmenu(core);
 
@@ -51,6 +55,23 @@ export default {
             '</div>';
 
         return listDiv;
+    },
+
+    active: function (element) {
+        if (!element) {
+            if (this.util.hasClass(this.context.horizontalRule.currentHR, 'on')) {
+                this.controllersOff();
+            }
+        } else if (/HR/i.test(element.nodeName)) {
+            this.context.horizontalRule.currentHR = element;
+            if (!this.util.hasClass(element, 'on')) {
+                this.util.addClass(element, 'on');
+                this.controllersOn('hr', this.util.removeClass.bind(this.util, element, 'on'));
+            }
+            return true;
+        }
+
+        return false;
     },
 
     appendHr: function (className) {

@@ -63,6 +63,8 @@
 /* katex */
 .sun-editor-editable span.katex {
     display: inline-block;
+}
+.sun-editor-editable span.katex * {
     direction: ltr;
 }
 
@@ -284,6 +286,11 @@
 .sun-editor-editable hr.__se__dashed {
     border-style: dashed none none;
 }
+.sun-editor-editable hr.on {
+    border-color: #4592ff;
+    -webkit-box-shadow:0 0 0 0.1rem #c7deff;
+    box-shadow:0 0 0 0.1rem #c7deff;
+}
 
 /* table */
 .sun-editor-editable table {
@@ -332,8 +339,7 @@
 }
 /** table - select class */
 .sun-editor-editable table td.se-table-selected-cell, .sun-editor-editable table th.se-table-selected-cell {
-    border: 1px double #4592ff;
-    background-color: #f1f7ff;
+    outline: 1px double #4592ff;
 }
 .sun-editor-editable.se-disabled * {
     user-select: none;
