@@ -279,9 +279,11 @@
             <label><input type="checkbox" id="imageAccept">&nbsp;&nbsp;imageAccept</label>
             <input type="text" id="imageAccept_value" placeholder='String( * or .jpg, .png...)'>
             <br>
-            <h4 style="color: #b94a48;">--Image - image gallery</h4>
+            <h4 style="color: #b94a48;">--image gallery</h4>
             <label><input type="checkbox" id="imageGalleryUrl" checked>&nbsp;&nbsp;imageGalleryUrl</label>
             <input type="text" id="imageGalleryUrl_value" placeholder="String(URL address)" style="width: 200px" value="https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo">
+            <label><input type="checkbox" id="imageGalleryHeader" checked>&nbsp;&nbsp;imageGalleryHeader</label>
+            <textarea id="imageGalleryHeader_value" placeholder='{"xxx": "xxx"}' style="width: 300px; vertical-align: top;"></textarea>
 
             <br>
             <h4 style="color: #b94a48;">--Video</h4>
@@ -601,6 +603,7 @@ function sun_create () {
         imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : undefined,
         imageAccept: document.getElementById('imageAccept').checked ? document.getElementById('imageAccept_value').value : undefined,
         imageGalleryUrl: document.getElementById('imageGalleryUrl').checked ? document.getElementById('imageGalleryUrl_value').value : undefined,
+        imageGalleryHeader: document.getElementById('imageGalleryHeader').checked ? JSON.parse(document.getElementById('imageGalleryHeader_value').value) : undefined,
         videoResizing: document.getElementById('videoResizing').checked ? undefined : false,
         videoHeightShow: document.getElementById('videoHeightShow').checked ? undefined : false,
         videoFileInput: document.getElementById('videoFileInput').checked ? undefined : false,

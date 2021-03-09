@@ -651,6 +651,7 @@ imageGalleryUrl     : The url of the image gallery, if you use the image gallery
                             ]
                         }
                       You can redefine the "plugins.imageGallery.drawItems" method.
+imageGalleryHeader: Http Header when get image gallery.         default: null {Object}
 
 // Video----------------------------------------------------------------------------------------------------------
 videoResizing   : Can resize the video (iframe, video).                         default: true {Boolean}

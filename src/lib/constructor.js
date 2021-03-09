@@ -466,6 +466,7 @@ export default {
         options.imageAccept = (typeof options.imageAccept !== 'string' || options.imageAccept.trim() === "*") ? 'image/*' : options.imageAccept.trim() || 'image/*';
         /** Image - image gallery */
         options.imageGalleryUrl = typeof options.imageGalleryUrl === 'string' ? options.imageGalleryUrl : null;
+        options.imageGalleryHeader = options.imageGalleryHeader || null;
         /** Video */
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
         options.videoHeightShow = options.videoHeightShow === undefined ? true : !!options.videoHeightShow;

@@ -284,9 +284,15 @@ export interface SunEditorOptions {
     /**
      * Image - image gallery
      * =====
+     */
+    /**
      * The url of the image gallery, if you use the image gallery
      */
     imageGalleryUrl?: string;
+    /**
+     * Http Header when get image gallery.
+     */
+    imageGalleryHeader?: Record<string, string>;
     /**
      * Video
      * =====
