@@ -1057,7 +1057,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Node}
          */
         getSelectionNode: function () {
-            if (util.isWysiwygDiv(this._variable._selectionNode)) this._editorRange();
+            if (!context.element.wysiwyg.contains(this._variable._selectionNode)) this._editorRange();
             if (!this._variable._selectionNode) {
                 const selectionNode = util.getChildElement(context.element.wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
                 if (!selectionNode) {

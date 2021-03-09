@@ -207,6 +207,13 @@ export default {
         }
     },
 
+    setCtx: function (anchor, contextAnchor) {
+        if (!anchor) return;
+        contextAnchor.linkAnchor = anchor;
+        contextAnchor.linkValue = anchor.href;
+        contextAnchor.currentRel = anchor.rel.split(" ");
+    },
+
     updateAnchor: function (anchor, url, alt, contextAnchor, notText) {
         // bookmark
         if (/^\#/.test(url)) {
@@ -234,7 +241,11 @@ export default {
         // est url, alt
         anchor.href = url;
         anchor.setAttribute('alt', alt);
-        anchor.textContent = notText ? '' : alt;
+        if (notText) {
+            if (anchor.children.length === 0) anchor.textContent = '';
+        } else {
+            anchor.textContent = alt;
+        }
     },
 
     createAnchor: function (contextAnchor, notText) {
