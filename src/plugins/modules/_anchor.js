@@ -99,7 +99,7 @@ export default {
 
         context.newWindowCheck.addEventListener('change', anchorPlugin.onChange_newWindowCheck.bind(this, context));
         context.downloadCheck.addEventListener('change', anchorPlugin.onChange_downloadCheck.bind(this, context));
-        context.urlInput.addEventListener('input', anchorPlugin.setLinkPreview.bind(this, context, this.options.linkProtocol));
+        context.urlInput.addEventListener('input', anchorPlugin.onChangeUrlInput.bind(this, context, this.options.linkProtocol));
         context.bookmarkButton.addEventListener('click', anchorPlugin.onClick_bookmarkButton.bind(this, context));
     },
 
@@ -109,7 +109,8 @@ export default {
             contextAnchor.anchorText.value = this.getSelection().toString();
         } else if (contextAnchor.linkAnchor) {
             this.context.dialog.updateModal = true;
-            contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = (contextAnchor.linkAnchor.id ? '#' + contextAnchor.linkAnchor.id : contextAnchor.linkAnchor.href);
+            const href = contextAnchor.linkAnchor.href;
+            contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = /\#.+$/.test(href) ? href.substr(href.lastIndexOf('#')) : href;
             contextAnchor.anchorText.value = contextAnchor.linkAnchor.getAttribute('alt') || contextAnchor.linkAnchor.textContent;
             contextAnchor.newWindowCheck.checked = (/_blank/i.test(contextAnchor.linkAnchor.target) ? true : false);
             contextAnchor.downloadCheck.checked = contextAnchor.linkAnchor.download;
@@ -185,9 +186,13 @@ export default {
         contextAnchor.relPreview.title = contextAnchor.relPreview.textContent = rels.join(' ');
     },
 
-    setLinkPreview: function (context, protocol, e) {
+    onChangeUrlInput: function (anchorContext, protocol, e) {
+        const value = e.target.value.trim();
+        this.plugins.anchor.setLinkPreview.call(this, anchorContext, protocol, value);
+    },
+
+    setLinkPreview: function (context, protocol, value) {
         const preview = context.preview;
-        const value = typeof e === 'string' ? e : e.target.value.trim();
         const reservedProtocol  = /^(mailto\:|https*\:\/\/)/.test(value);
         const sameProtocol = !protocol ? false : this._w.RegExp('^' + value.substr(0, protocol.length)).test(protocol);
         context.linkValue = preview.textContent = !value ? '' : (protocol && !reservedProtocol && !sameProtocol) ? protocol + value : reservedProtocol ? value : /^www\./.test(value) ? 'http://' + value : this.context.anchor.host + (/^\//.test(value) ? '' : '/') + value;
@@ -215,13 +220,6 @@ export default {
     },
 
     updateAnchor: function (anchor, url, alt, contextAnchor, notText) {
-        // bookmark
-        if (/^\#/.test(url)) {
-            anchor.id = url.substr(1);
-        } else {
-            anchor.removeAttribute('id');
-        }
-
         // download
         if (!/^\#/.test(url) && contextAnchor.downloadCheck.checked) {
             anchor.setAttribute('download', alt || url);

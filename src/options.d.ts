@@ -102,6 +102,10 @@ export interface SunEditorOptions {
      */
     katex?: any | { src: any; options: object };
     /**
+     * Math plugin font size list 
+     */
+    mathFontSize?: { text: string; value: string }[];
+    /**
      * Display
      * =======
      */

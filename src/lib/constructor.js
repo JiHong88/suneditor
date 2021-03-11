@@ -418,6 +418,12 @@ export default {
         options.codeMirror = options.codeMirror ? options.codeMirror.src ? options.codeMirror : {src: options.codeMirror} : null;
         /** katex object (Math plugin) */
         options.katex = options.katex ? options.katex.src ? options.katex : {src: options.katex} : null;
+        options.mathFontSize = !!options.mathFontSize ? options.mathFontSize : [
+            {text: '1', value: '1em'},
+            {text: '1.5', value: '1.5em'},
+            {text: '2', value: '2em'},
+            {text: '2.5', value: '2.5em'}
+        ];
         /** Display */
         options.position = typeof options.position === 'string' ? options.position : null;
         options.display = options.display || (element.style.display === 'none' || !element.style.display ? 'block' : element.style.display);

@@ -148,7 +148,11 @@
             </textarea>
             <br><br>
             <label><input type="checkbox" id="codeMirror">&nbsp;&nbsp;codeMirror</label> { codeMirror: CodeMirror }<br>
-            <label><input type="checkbox" id="katex" checked disabled>&nbsp;&nbsp;katex</label> { katex: katex } // Use "math" plugin
+            <label><input type="checkbox" id="katex" checked disabled>&nbsp;&nbsp;katex</label> { katex: katex } // Use "math" plugin<br>
+            <label><input type="checkbox" id="mathFontSize">&nbsp;&nbsp;mathFontSize</label>
+            <span>[</span><br>
+            <span>&nbsp;&nbsp;{text: '1', value: '1em'},</span><br>
+            <span>]</span>
             <br><br>
 
             <br>
@@ -282,7 +286,7 @@
             <h4 style="color: #b94a48;">--image gallery</h4>
             <label><input type="checkbox" id="imageGalleryUrl" checked>&nbsp;&nbsp;imageGalleryUrl</label>
             <input type="text" id="imageGalleryUrl_value" placeholder="String(URL address)" style="width: 200px" value="https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo">
-            <label><input type="checkbox" id="imageGalleryHeader" checked>&nbsp;&nbsp;imageGalleryHeader</label>
+            <label><input type="checkbox" id="imageGalleryHeader">&nbsp;&nbsp;imageGalleryHeader</label>
             <textarea id="imageGalleryHeader_value" placeholder='{"xxx": "xxx"}' style="width: 300px; vertical-align: top;"></textarea>
 
             <br>
@@ -558,6 +562,7 @@ function sun_create () {
         previewTemplate: document.getElementById('previewTemplate').checked ? document.getElementById('previewTemplate_value').value.replace(/\n/g, '') : undefined,
         codeMirror: document.getElementById('codeMirror').checked ? CodeMirror : undefined,
         katex: katex,
+        mathFontSize: document.getElementById('mathFontSize').checked ? [{text: '1', value: '1em'}] : undefined,
         position: document.getElementById('position').checked ? document.getElementById('position_value').value : undefined,
         popupDisplay: document.getElementById('popupDisplay').checked ? document.getElementById('popupDisplay_value').value : undefined,
         resizingBar: document.getElementById('resizingBar').checked ? undefined : false,
