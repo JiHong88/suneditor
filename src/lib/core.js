@@ -4913,7 +4913,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         checkCharCount: function (element, charCounterType) {
             if (options.maxCharCount) {
                 const countType = charCounterType || options.charCounterType;
-                const length = this.getCharLength((typeof element === 'string' ? element : this._charTypeHTML ? element.outerHTML : element.textContent), countType);
+                const length = this.getCharLength((typeof element === 'string' ? element : (this._charTypeHTML && element.nodeType === 1) ? element.outerHTML : element.textContent), countType);
                 if (length > 0 && length + functions.getCharCount(countType) > options.maxCharCount) {
                     this._callCounterBlink();
                     return false;
