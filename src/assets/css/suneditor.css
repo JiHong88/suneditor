@@ -402,6 +402,13 @@
 .sun-editor .se-controller-link .link-content {padding:0; margin:0;}
 .sun-editor .se-controller-link .link-content a {display:inline-block; color:#4592ff; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}
 
+/* --- select list ---------------------------------------------------------- */
+.sun-editor .se-select-list {position:absolute; display:none; width:auto; max-width:100%; background-color:#fff; padding:0; margin:0; border:1px solid #bababa; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
+.sun-editor .se-select-list .se-select-item {line-height:28px; min-height:28px; font-size:13px; padding:0 5px; margin:2px 0; cursor:pointer;}
+.sun-editor .se-select-list .se-select-item:hover {background-color:#e1e1e1;}
+.sun-editor .se-select-list .se-select-item.active {background-color: #e1e1e1;}
+.sun-editor .se-dialog-form-files .se-select-list {width:100%;}
+
 /* --- browser ---------------------------------------------------------- */
 .sun-editor .se-file-browser {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
 .sun-editor .se-file-browser label, .sun-editor .se-file-browser input, .sun-editor .se-file-browser button {font-size:14px; line-height:1.5; color:#111; margin:0;}

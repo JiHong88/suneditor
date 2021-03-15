@@ -7,13 +7,18 @@
  */
 'use strict';
 
+import listMenu from './_selectMenu';
+
 export default {
     name: 'anchor',
     add: function (core) {
+        core.addModule([listMenu]);
+        
         core.context.anchor = {
             caller: {},
             forms: this.setDialogForm(core),
-            host: core._w.location.origin + core._w.location.pathname
+            host: (core._w.location.origin + core._w.location.pathname).replace(/\/$/, ''),
+            callerContext: null
         };
     },
 
@@ -31,6 +36,7 @@ export default {
                 '<div class="se-dialog-form-files">' +
                     '<input class="se-input-form se-input-url" type="text" placeholder="' + (core.options.protocol || '') + '" />' +
                     '<button type="button" class="se-btn se-dialog-files-edge-button _se_bookmark_button" title="' + lang.dialogBox.linkBox.bookmark + '">' + icons.bookmark + '</button>' +
+                    core.plugins.selectMenu.setForm() +
                 '</div>' +
                 '<div class="se-anchor-preview-form">' +
                     '<span class="se-svg se-anchor-preview-icon _se_anchor_bookmark_icon">' + icons.bookmark + '</span>' +
@@ -72,7 +78,9 @@ export default {
             defaultRel: this.options.linkRelDefault.default || '',
             currentRel: [],
             linkAnchor: null,
-            linkValue: ''
+            linkValue: '',
+            _change: false,
+            callerName: pluginName
         };
 
         if (typeof context.linkDefaultRel.default === 'string') context.linkDefaultRel.default = context.linkDefaultRel.default.trim();
@@ -87,6 +95,9 @@ export default {
         context.preview = forms.querySelector('.se-link-preview');
         context.bookmark = forms.querySelector('._se_anchor_bookmark_icon');
         context.bookmarkButton = forms.querySelector('._se_bookmark_button');
+
+        this.plugins.selectMenu.initEvent.call(this, pluginName, forms);
+        const listContext = this.context.selectMenu.caller[pluginName];
         
         /** rel */
         if (this.options.linkRel.length > 0) {
@@ -99,7 +110,11 @@ export default {
 
         context.newWindowCheck.addEventListener('change', anchorPlugin.onChange_newWindowCheck.bind(this, context));
         context.downloadCheck.addEventListener('change', anchorPlugin.onChange_downloadCheck.bind(this, context));
-        context.urlInput.addEventListener('input', anchorPlugin.onChangeUrlInput.bind(this, context, this.options.linkProtocol));
+        context.anchorText.addEventListener('input', anchorPlugin.onChangeAnchorText.bind(this, context));
+        context.urlInput.addEventListener('input', anchorPlugin.onChangeUrlInput.bind(this, context));
+        context.urlInput.addEventListener('keydown', anchorPlugin.onKeyDownUrlInput.bind(this, context, listContext));
+        context.urlInput.addEventListener('focus', anchorPlugin.onFocusUrlInput.bind(this, context, listContext));
+        context.urlInput.addEventListener('blur', anchorPlugin.onBlurUrlInput.bind(this, listContext));
         context.bookmarkButton.addEventListener('click', anchorPlugin.onClick_bookmarkButton.bind(this, context));
     },
 
@@ -116,8 +131,10 @@ export default {
             contextAnchor.downloadCheck.checked = contextAnchor.linkAnchor.download;
         }
 
+        this.context.anchor.callerContext = contextAnchor;
         this.plugins.anchor.setRel.call(this, contextAnchor, (update && contextAnchor.linkAnchor) ? contextAnchor.linkAnchor.rel : contextAnchor.defaultRel);
-        this.plugins.anchor.setLinkPreview.call(this, contextAnchor, this.options.linkProtocol, contextAnchor.linkValue);
+        this.plugins.anchor.setLinkPreview.call(this, contextAnchor, contextAnchor.linkValue);
+        this.plugins.selectMenu.on.call(this, contextAnchor.callerName, this.plugins.anchor.setHeaderBookmark);
     },
 
     _closeRelMenu: null,
@@ -186,13 +203,96 @@ export default {
         contextAnchor.relPreview.title = contextAnchor.relPreview.textContent = rels.join(' ');
     },
 
-    onChangeUrlInput: function (anchorContext, protocol, e) {
-        const value = e.target.value.trim();
-        this.plugins.anchor.setLinkPreview.call(this, anchorContext, protocol, value);
+    createHeaderList: function (contextAnchor, contextList, urlValue) {
+        const headers = this.util.getListChildren(this.context.element.wysiwyg, function(current) {
+            return /h[1-6]/i.test(current.nodeName);
+        }.bind(this.util));
+        if (headers.length === 0) return;
+
+        const valueRegExp = new this._w.RegExp('^' + urlValue.replace(/^#/, ''), 'i');
+        const list = [];
+        let html = '';
+        for(let i = 0, len = headers.length, h; i < len; i++) {
+            h = headers[i];
+            if (!valueRegExp.test(h.textContent)) continue;
+            list.push(h);
+            html += '<li class="se-select-item" data-index="' + i + '">' + h.textContent + '</li>';
+        }
+
+        if (list.length === 0) {
+            this.plugins.selectMenu.close.call(this, contextList);
+        } else {
+            this.plugins.selectMenu.createList(contextList, list, html);
+            this.plugins.selectMenu.open.call(this, contextList, this.plugins.anchor._setMenuListPosition.bind(this, contextAnchor));
+        }
     },
 
-    setLinkPreview: function (context, protocol, value) {
+    _setMenuListPosition: function (contextAnchor, list) {
+        list.style.top = (contextAnchor.urlInput.offsetHeight + 1) + 'px';
+    },
+
+    onKeyDownUrlInput: function (contextAnchor, contextList, e) {
+        const keyCode = e.keyCode;
+        switch (keyCode) {
+            case 38: // up
+                e.preventDefault();
+                e.stopPropagation();
+                this.plugins.selectMenu.moveItem.call(this, contextList, -1);
+                break;
+            case 40: // down
+                e.preventDefault();
+                e.stopPropagation();
+                this.plugins.selectMenu.moveItem.call(this, contextList, 1);
+                break;
+            case 13: // enter
+                if (contextList.index > -1) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.plugins.anchor.setHeaderBookmark.call(this, this.plugins.selectMenu.getItem(contextList, null));
+                }
+                break;
+        }
+    },
+
+    setHeaderBookmark: function (header) {
+        const contextAnchor = this.context.anchor.callerContext;
+        const id = header.id || 'h_' + this._w.Math.random().toString().replace(/.+\./, '');
+        header.id = id;
+        contextAnchor.urlInput.value = '#' + id;
+
+        if (!contextAnchor.anchorText.value.trim() || !contextAnchor._change) {
+            contextAnchor.anchorText.value = header.textContent;
+        }
+        
+        this.plugins.anchor.setLinkPreview.call(this, contextAnchor, contextAnchor.urlInput.value);
+        this.plugins.selectMenu.close.call(this, this.context.selectMenu.callerContext);
+        this.context.anchor.callerContext.urlInput.focus();
+    },
+
+    onChangeAnchorText: function (contextAnchor, e) {
+        contextAnchor._change = !!e.target.value.trim();
+    },
+
+    onChangeUrlInput: function (contextAnchor, e) {
+        const value = e.target.value.trim();
+        this.plugins.anchor.setLinkPreview.call(this, contextAnchor, value);
+
+        if (/^#/.test(value)) this.plugins.anchor.createHeaderList.call(this, contextAnchor, this.context.selectMenu.callerContext, value);
+        else this.plugins.selectMenu.close.call(this, this.context.selectMenu.callerContext);
+    },
+
+    onFocusUrlInput: function (contextAnchor, contextLink) {
+        const value = contextAnchor.urlInput.value;
+        if (/^#/.test(value)) this.plugins.anchor.createHeaderList.call(this, contextAnchor, contextLink, value);
+    },
+
+    onBlurUrlInput: function (contextList) {
+        this.plugins.selectMenu.close.call(this, contextList);
+    },
+
+    setLinkPreview: function (context, value) {
         const preview = context.preview;
+        const protocol = this.options.linkProtocol;
         const reservedProtocol  = /^(mailto\:|https*\:\/\/)/.test(value);
         const sameProtocol = !protocol ? false : this._w.RegExp('^' + value.substr(0, protocol.length)).test(protocol);
         context.linkValue = preview.textContent = !value ? '' : (protocol && !reservedProtocol && !sameProtocol) ? protocol + value : reservedProtocol ? value : /^www\./.test(value) ? 'http://' + value : this.context.anchor.host + (/^\//.test(value) ? '' : '/') + value;
@@ -267,15 +367,18 @@ export default {
             url = url.substr(1);
             contextAnchor.bookmark.style.display = 'none';
             this.util.removeClass(contextAnchor.bookmarkButton, 'active');
+            this.plugins.selectMenu.close.call(this, this.context.selectMenu.callerContext);
         } else {
             url = '#' + url;
             contextAnchor.bookmark.style.display = 'block';
             this.util.addClass(contextAnchor.bookmarkButton, 'active');
             contextAnchor.downloadCheck.checked = false;
             contextAnchor.download.style.display = 'none';
+            this.plugins.anchor.createHeaderList.call(this, contextAnchor, this.context.selectMenu.callerContext, url);
         }
 
-        contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = url;
+        contextAnchor.urlInput.value = url;
+        this.plugins.anchor.setLinkPreview.call(this, contextAnchor, url);
         contextAnchor.urlInput.focus();
     },
 
@@ -339,9 +442,12 @@ export default {
         contextAnchor.anchorText.value = '';
         contextAnchor.newWindowCheck.checked = false;
         contextAnchor.downloadCheck.checked = false;
+        contextAnchor._change = false;
         this.plugins.anchor.setRel.call(this, contextAnchor, contextAnchor.defaultRel);
         if (contextAnchor.relList) {
             this.plugins.anchor.toggleRelList.call(this, contextAnchor, false);
         }
+        this.context.anchor.callerContext = null;
+        this.plugins.selectMenu.init.call(this, this.context.selectMenu.callerContext);
     }
 };
