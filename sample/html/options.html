@@ -82,6 +82,12 @@
             <label><input type="checkbox" id="pasteTagsWhitelist">&nbsp;&nbsp;pasteTagsWhitelist</label>
             <input type="text" id="pasteTagsWhitelist_value" placeholder="String (p|h1|h2|h3)" style="width:320px">
             <br><br>
+            <label><input type="checkbox" id="tagsBlacklist">&nbsp;&nbsp;tagsBlacklist</label>
+            <input type="text" id="tagsBlacklist_value" placeholder="String (h1|h2)" style="width:320px">
+            <br><br>
+            <label><input type="checkbox" id="pasteTagsBlacklist">&nbsp;&nbsp;pasteTagsBlacklist</label>
+            <input type="text" id="pasteTagsBlacklist_value" placeholder="String (h1|h2)" style="width:320px">
+            <br><br>
             <label><input type="checkbox" id="attributesWhitelist">&nbsp;&nbsp;attributesWhitelist</label><br>
             <span>{</span><br>
             <span>&nbsp;&nbsp;all: 'style',</span><br>
@@ -442,7 +448,7 @@
         <br>
         
         <button type="button" class="btn btn-md btn-primary" onclick="sun_create()">Create</button>
-        <textarea id="sample_editor" style="display: none;"></textarea>
+        <textarea id="sample_editor" style="display: none;"><h1>Insert into..</h1></textarea>
         <div id="custom_toolbar" class="sun-editor" style="margin-top: 20px;"></div>
 
         <div class="component-list">
@@ -546,6 +552,8 @@ function sun_create () {
         historyStackDelayTime: document.getElementById('historyStackDelayTime').checked ? document.getElementById('historyStackDelayTime_value').value * 1 : undefined,
         addTagsWhitelist: document.getElementById('addTagsWhitelist').checked ? document.getElementById('addTagsWhitelist_value').value : undefined,
         pasteTagsWhitelist: document.getElementById('pasteTagsWhitelist').checked ? document.getElementById('pasteTagsWhitelist_value').value : undefined,
+        tagsBlacklist: document.getElementById('tagsBlacklist').checked ? document.getElementById('tagsBlacklist_value').value : undefined,
+        pasteTagsBlacklist: document.getElementById('pasteTagsBlacklist').checked ? document.getElementById('pasteTagsBlacklist_value').value : undefined,
         attributesWhitelist: !document.getElementById('attributesWhitelist').checked ? undefined : {
             'all': 'style',
             'input': 'checked'

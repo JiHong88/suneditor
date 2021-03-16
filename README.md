@@ -397,8 +397,12 @@ historyStackDelayTime : When recording the history stack, this is the delay time
 addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
-pasteTagsWhitelist    : Whitelist of tags when pasting.   default: _editorTagsWhitelist {String}
+pasteTagsWhitelist    : Whitelist of tags when pasting.                     default: _editorTagsWhitelist {String}
                         ex) 'p|h1|h2|h3'
+tagsBlacklist         : Blacklist of the editor default tags.               default: null {String}
+                        ex) 'h1|h2'
+pasteTagsBlacklist    : Blacklist of tags when pasting.                     default: null {String}
+                        ex) 'h1|h2'
 attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}
                         // -- Fixed whitelist --
                         // Native attributes: 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls'
