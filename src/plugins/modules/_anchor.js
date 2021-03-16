@@ -126,7 +126,7 @@ export default {
             this.context.dialog.updateModal = true;
             const href = contextAnchor.linkAnchor.href;
             contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = /\#.+$/.test(href) ? href.substr(href.lastIndexOf('#')) : href;
-            contextAnchor.anchorText.value = contextAnchor.linkAnchor.getAttribute('alt') || contextAnchor.linkAnchor.textContent;
+            contextAnchor.anchorText.value = contextAnchor.linkAnchor.textContent.trim() || contextAnchor.linkAnchor.getAttribute('alt');
             contextAnchor.newWindowCheck.checked = (/_blank/i.test(contextAnchor.linkAnchor.target) ? true : false);
             contextAnchor.downloadCheck.checked = contextAnchor.linkAnchor.download;
         }
