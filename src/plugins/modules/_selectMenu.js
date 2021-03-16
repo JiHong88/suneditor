@@ -39,12 +39,20 @@ export default {
         };
 
         form.addEventListener('mousedown', this.plugins.selectMenu.onMousedown_list);
+        form.addEventListener('mousemove', this.plugins.selectMenu.onMouseMove_list.bind(this, context));
         form.addEventListener('click', this.plugins.selectMenu.onClick_list.bind(this, context));
     },
 
     onMousedown_list: function (e) {
         e.preventDefault();
         e.stopPropagation();
+    },
+
+    onMouseMove_list: function (context, e) {
+        this.util.addClass(context.form, '__se_select-menu-mouse-move');
+        const index = e.target.getAttribute('data-index');
+        if (!index) return;
+        context.index = index * 1;
     },
 
     onClick_list: function (context, e) {
@@ -54,6 +62,7 @@ export default {
     },
 
     moveItem(listContext, num) {
+        this.util.removeClass(listContext.form, '__se_select-menu-mouse-move');
         num = listContext.index + num;
         const menus = listContext.menus;
         const len = menus.length;
