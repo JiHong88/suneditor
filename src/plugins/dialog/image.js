@@ -734,8 +734,8 @@ export default {
         // link
         const anchor = this.plugins.anchor.createAnchor.call(this, contextImage.anchorCtx, true);
         if (anchor) {
-            contextImage._linkElement = anchor;
-            cover.insertBefore(this.plugins.image.onRender_link.call(this, imageEl, anchor), contextImage._caption);
+            contextImage._linkElement = contextImage._linkElement === anchor ? anchor.cloneNode(false) : anchor;
+            cover.insertBefore(this.plugins.image.onRender_link.call(this, imageEl, contextImage._linkElement), contextImage._caption);
         } else if (contextImage._linkElement !== null) {
             const imageElement = imageEl;
 
@@ -755,7 +755,13 @@ export default {
                 existElement.parentNode.insertBefore(container, existElement.nextElementSibling);
                 this.util.removeItem(contextImage._element);
             } else {
-                existElement.parentNode.replaceChild(container, existElement);
+                if (this.util.isFormatElement(existElement.parentNode)) {
+                    const formats = existElement.parentNode;
+                    formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
+                    this.util.removeItem(existElement);
+                } else {
+                    existElement.parentNode.replaceChild(container, existElement);
+                }
             }
 
             imageEl = container.querySelector('img');
@@ -823,6 +829,7 @@ export default {
         contextImage._caption = this.util.getChildElement(contextImage._cover, 'FIGCAPTION');
         contextImage._align = element.style.float || element.getAttribute('data-align') || 'none';
         element.style.float = '';
+        this.plugins.anchor.setCtx(contextImage._linkElement, contextImage.anchorCtx);
 
         if (size) {
             contextImage._element_w = size.w;

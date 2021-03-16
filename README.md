@@ -456,6 +456,13 @@ katex           : Required library for math plugins.               default: null
                             */
                         }
                       }
+mathFontSize    : Math plugin font size list.                       default: [{..}] {Array}
+                  Default value: [
+                    {text: '1', value: '1em'},
+                    {text: '1.5', value: '1.5em'},
+                    {text: '2', value: '2em'},
+                    {text: '2.5', value: '2.5em'}
+                  ]
 
 // Display-------------------------------------------------------------------------------------------------------
 position        : The position property of suneditor.               default: null {String}
@@ -651,6 +658,7 @@ imageGalleryUrl     : The url of the image gallery, if you use the image gallery
                             ]
                         }
                       You can redefine the "plugins.imageGallery.drawItems" method.
+imageGalleryHeader: Http Header when get image gallery.         default: null {Object}
 
 // Video----------------------------------------------------------------------------------------------------------
 videoResizing   : Can resize the video (iframe, video).                         default: true {Boolean}

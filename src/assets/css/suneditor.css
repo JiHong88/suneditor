@@ -337,6 +337,7 @@
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-input-select.se-math-size {width:6em; height:28px; margin-left:1em;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-math-preview {font-size:13px;}
 .sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-math-preview > span {display:inline-block; -webkit-box-shadow:0 0 0 0.1rem #c7deff; box-shadow:0 0 0 0.1rem #c7deff;}
+.sun-editor .se-dialog .se-dialog-inner .se-dialog-form .se-math-preview > span * {direction:ltr;}
 /* dialog - modal - link preview */
 .sun-editor .se-dialog .se-dialog-inner .se-link-preview {display:block; height:auto; max-height:18px; font-size:13px; font-weight:normal; font-family:inherit; color:#666; background-color:transparent; overflow:hidden; text-overflow:ellipsis; word-break:break-all; white-space:pre;}
 /* dialog - modal - anchor module */
@@ -400,6 +401,13 @@
 .sun-editor .se-controller-link::before, .sun-editor .se-controller-link::after {-webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box;}
 .sun-editor .se-controller-link .link-content {padding:0; margin:0;}
 .sun-editor .se-controller-link .link-content a {display:inline-block; color:#4592ff; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}
+
+/* --- select list ---------------------------------------------------------- */
+.sun-editor .se-select-list {position:absolute; display:none; width:auto; max-width:100%; background-color:#fff; padding:0; margin:0; border:1px solid #bababa; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
+.sun-editor .se-select-list .se-select-item {line-height:28px; min-height:28px; font-size:13px; padding:0 5px; margin:2px 0; cursor:pointer;}
+.sun-editor .se-select-list .se-select-item:hover {background-color:#e1e1e1;}
+.sun-editor .se-select-list .se-select-item.active {background-color: #e1e1e1;}
+.sun-editor .se-dialog-form-files .se-select-list {width:100%;}
 
 /* --- browser ---------------------------------------------------------- */
 .sun-editor .se-file-browser {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:2147483647;}

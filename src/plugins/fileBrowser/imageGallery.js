@@ -22,6 +22,7 @@ export default {
         context.imageGallery = {
             title: core.lang.toolbar.imageGallery, // @Required @Override fileBrowser - File browser window title.
             url: core.options.imageGalleryUrl, // @Required @Override fileBrowser - File server url.
+            header: core.options.imageGalleryHeader, // @Required @Override fileBrowser - File server http header.
             listClass: 'se-image-list', // @Required @Override fileBrowser - Class name of list div.
             itemTemplateHandler: this.drawItems, // @Required @Override fileBrowser - Function that defines the HTML of an file item.
             selectorHandler: this.setImage.bind(core), // @Required @Override fileBrowser - Function that action when item click.

@@ -257,23 +257,26 @@ const util = {
      * @returns {Number}
      */
     getByteLength: function(text) {
+        if (!text || !text.toString) return 0;
+        text = text.toString();
+
         const encoder = this._w.encodeURIComponent;
         let cr, cl;
         if (this.isIE_Edge) {
-            cl = this._w.unescape(encoder(text.toString())).length;
+            cl = this._w.unescape(encoder(text)).length;
             cr = 0;
 
-            if (encoder(text.toString()).match(/(%0A|%0D)/gi) !== null) {
-                cr = encoder(text.toString()).match(/(%0A|%0D)/gi).length;
+            if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
+                cr = encoder(text).match(/(%0A|%0D)/gi).length;
             }
 
             return cl + cr;
         } else {
-            cl = (new this._w.TextEncoder('utf-8').encode(text.toString())).length;
+            cl = (new this._w.TextEncoder('utf-8').encode(text)).length;
             cr = 0;
 
-            if (encoder(text.toString()).match(/(%0A|%0D)/gi) !== null) {
-                cr = encoder(text.toString()).match(/(%0A|%0D)/gi).length;
+            if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
+                cr = encoder(text).match(/(%0A|%0D)/gi).length;
             }
 
             return cl + cr;

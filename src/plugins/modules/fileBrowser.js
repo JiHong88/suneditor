@@ -162,7 +162,7 @@
             fileBrowserContext.titleArea.textContent = pluginContext.title;
             fileBrowserContext.area.style.display = 'block';
 
-            this.plugins.fileBrowser._drawFileList.call(this, this.context[pluginName].url);
+            this.plugins.fileBrowser._drawFileList.call(this, this.context[pluginName].url, this.context[pluginName].header);
         },
 
         _bindClose: null,
@@ -208,11 +208,16 @@
             this._loading.style.display = 'none';
         },
 
-        _drawFileList: function (url) {
+        _drawFileList: function (url, browserHeader) {
             const fileBrowserPlugin = this.plugins.fileBrowser;
 
             const xmlHttp = fileBrowserPlugin._xmlHttp = this.util.getXMLHttpRequest();
             xmlHttp.onreadystatechange = fileBrowserPlugin._callBackGet.bind(this, xmlHttp);
+            if(browserHeader !== null && typeof browserHeader === 'object' && this._w.Object.keys(browserHeader).length > 0){
+                for(let key in browserHeader){
+                    xmlHttp.setRequestHeader(key, browserHeader[key]);
+                }
+            }
             xmlHttp.open('get', url, true);
             xmlHttp.send(null);
 

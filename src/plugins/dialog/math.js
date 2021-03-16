@@ -47,10 +47,11 @@ export default {
     setDialog: function (core) {
         const lang = core.lang;
         const dialog = core.util.createElement('DIV');
+        const fontSize = core.options.mathFontSize;
 
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
-        dialog.innerHTML = '' +
+        let html = '' +
         '<form>' +
             '<div class="se-dialog-header">' +
                 '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
@@ -65,12 +66,11 @@ export default {
                 '</div>' +
                 '<div class="se-dialog-form">' +
                     '<label>' + lang.dialogBox.mathBox.fontSizeLabel + '</label>' +
-                    '<select class="se-input-select se-math-size">' +
-                        '<option value="1em">1</option>' +
-                        '<option value="1.5em">1.5</option>' +
-                        '<option value="2em">2</option>' +
-                        '<option value="2.5em">2.5</option>' +
-                    '</select>' +
+                    '<select class="se-input-select se-math-size">';
+                    for (let i = 0, len = fontSize.length; i < len; i++) {
+                        html += '<option value="' + fontSize[i].value + '">' + fontSize[i].text + '</option>';
+                    }
+                html += '</select>' +
                 '</div>' +
                 '<div class="se-dialog-form">' +
                     '<label>' + lang.dialogBox.mathBox.previewLabel + '</label>' +
@@ -82,6 +82,7 @@ export default {
             '</div>' +
         '</form>';
 
+        dialog.innerHTML = html;
         return dialog;
     },
 

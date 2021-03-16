@@ -148,7 +148,11 @@
             </textarea>
             <br><br>
             <label><input type="checkbox" id="codeMirror">&nbsp;&nbsp;codeMirror</label> { codeMirror: CodeMirror }<br>
-            <label><input type="checkbox" id="katex" checked disabled>&nbsp;&nbsp;katex</label> { katex: katex } // Use "math" plugin
+            <label><input type="checkbox" id="katex" checked disabled>&nbsp;&nbsp;katex</label> { katex: katex } // Use "math" plugin<br>
+            <label><input type="checkbox" id="mathFontSize">&nbsp;&nbsp;mathFontSize</label>
+            <span>[</span><br>
+            <span>&nbsp;&nbsp;{text: '1', value: '1em'},</span><br>
+            <span>]</span>
             <br><br>
 
             <br>
@@ -279,9 +283,11 @@
             <label><input type="checkbox" id="imageAccept">&nbsp;&nbsp;imageAccept</label>
             <input type="text" id="imageAccept_value" placeholder='String( * or .jpg, .png...)'>
             <br>
-            <h4 style="color: #b94a48;">--Image - image gallery</h4>
+            <h4 style="color: #b94a48;">--image gallery</h4>
             <label><input type="checkbox" id="imageGalleryUrl" checked>&nbsp;&nbsp;imageGalleryUrl</label>
             <input type="text" id="imageGalleryUrl_value" placeholder="String(URL address)" style="width: 200px" value="https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo">
+            <label><input type="checkbox" id="imageGalleryHeader">&nbsp;&nbsp;imageGalleryHeader</label>
+            <textarea id="imageGalleryHeader_value" placeholder='{"xxx": "xxx"}' style="width: 300px; vertical-align: top;"></textarea>
 
             <br>
             <h4 style="color: #b94a48;">--Video</h4>
@@ -556,6 +562,7 @@ function sun_create () {
         previewTemplate: document.getElementById('previewTemplate').checked ? document.getElementById('previewTemplate_value').value.replace(/\n/g, '') : undefined,
         codeMirror: document.getElementById('codeMirror').checked ? CodeMirror : undefined,
         katex: katex,
+        mathFontSize: document.getElementById('mathFontSize').checked ? [{text: '1', value: '1em'}] : undefined,
         position: document.getElementById('position').checked ? document.getElementById('position_value').value : undefined,
         popupDisplay: document.getElementById('popupDisplay').checked ? document.getElementById('popupDisplay_value').value : undefined,
         resizingBar: document.getElementById('resizingBar').checked ? undefined : false,
@@ -601,6 +608,7 @@ function sun_create () {
         imageUploadSizeLimit: document.getElementById('imageUploadSizeLimit').checked ? document.getElementById('imageUploadSizeLimit_value').value : undefined,
         imageAccept: document.getElementById('imageAccept').checked ? document.getElementById('imageAccept_value').value : undefined,
         imageGalleryUrl: document.getElementById('imageGalleryUrl').checked ? document.getElementById('imageGalleryUrl_value').value : undefined,
+        imageGalleryHeader: document.getElementById('imageGalleryHeader').checked ? JSON.parse(document.getElementById('imageGalleryHeader_value').value) : undefined,
         videoResizing: document.getElementById('videoResizing').checked ? undefined : false,
         videoHeightShow: document.getElementById('videoHeightShow').checked ? undefined : false,
         videoFileInput: document.getElementById('videoFileInput').checked ? undefined : false,
