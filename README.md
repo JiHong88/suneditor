@@ -393,12 +393,12 @@ historyStackDelayTime : When recording the history stack, this is the delay time
 
 // Whitelist--------------------------------------å---------------------------------------------------------
 // (You can use regular expression syntax.)
-// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code'
+// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
 pasteTagsWhitelist    : Whitelist of tags when pasting.   default: _editorTagsWhitelist {String}
-                        ex) 'p|h[1-6]'
+                        ex) 'p|h1|h2|h3'
 attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}
                         // -- Fixed whitelist --
                         // Native attributes: 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls'
