@@ -13,6 +13,7 @@ export default {
             focusElement: null, // @Override dialog // This element has focus when the dialog is opened.
             previewElement: null,
             fontSizeElement: null,
+            defaultFontSize: '',
             _mathExp: null
         };
 
@@ -34,6 +35,7 @@ export default {
         /** add event listeners */
         math_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core), false);
         math_controller.addEventListener('click', this.onClick_mathController.bind(core));
+        context.math.previewElement.style.fontSize = context.math.defaultFontSize;
 
         /** append html */
         context.dialog.modal.appendChild(math_dialog);
@@ -48,6 +50,7 @@ export default {
         const lang = core.lang;
         const dialog = core.util.createElement('DIV');
         const fontSize = core.options.mathFontSize;
+        let defaultFontSize = fontSize[0].value;
 
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
@@ -67,8 +70,10 @@ export default {
                 '<div class="se-dialog-form">' +
                     '<label>' + lang.dialogBox.mathBox.fontSizeLabel + '</label>' +
                     '<select class="se-input-select se-math-size">';
-                    for (let i = 0, len = fontSize.length; i < len; i++) {
-                        html += '<option value="' + fontSize[i].value + '">' + fontSize[i].text + '</option>';
+                    for (let i = 0, len = fontSize.length, f; i < len; i++) {
+                        f = fontSize[i];
+                        if (f.default) defaultFontSize = f.value;
+                        html += '<option value="' + f.value + '"' + (f.default ? ' selected' : '') + '>' + f.text + '</option>';
                     }
                 html += '</select>' +
                 '</div>' +
@@ -82,6 +87,7 @@ export default {
             '</div>' +
         '</form>';
 
+        core.context.math.defaultFontSize = defaultFontSize;
         dialog.innerHTML = html;
         return dialog;
     },

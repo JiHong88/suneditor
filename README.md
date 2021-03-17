@@ -462,7 +462,7 @@ katex           : Required library for math plugins.               default: null
                       }
 mathFontSize    : Math plugin font size list.                       default: [{..}] {Array}
                   Default value: [
-                    {text: '1', value: '1em'},
+                    {text: '1', value: '1em', default: true},
                     {text: '1.5', value: '1.5em'},
                     {text: '2', value: '2em'},
                     {text: '2.5', value: '2.5em'}

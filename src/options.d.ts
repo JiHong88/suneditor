@@ -112,7 +112,7 @@ export interface SunEditorOptions {
     /**
      * Math plugin font size list 
      */
-    mathFontSize?: { text: string; value: string }[];
+    mathFontSize?: { text: string; value: string; default?: boolean; }[];
     /**
      * Display
      * =======

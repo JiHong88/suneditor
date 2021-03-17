@@ -158,6 +158,7 @@
             <label><input type="checkbox" id="mathFontSize">&nbsp;&nbsp;mathFontSize</label>
             <span>[</span><br>
             <span>&nbsp;&nbsp;{text: '1', value: '1em'},</span><br>
+            <span>&nbsp;&nbsp;{text: '2', value: '2em', default: true}</span><br>
             <span>]</span>
             <br><br>
 
@@ -570,7 +571,7 @@ function sun_create () {
         previewTemplate: document.getElementById('previewTemplate').checked ? document.getElementById('previewTemplate_value').value.replace(/\n/g, '') : undefined,
         codeMirror: document.getElementById('codeMirror').checked ? CodeMirror : undefined,
         katex: katex,
-        mathFontSize: document.getElementById('mathFontSize').checked ? [{text: '1', value: '1em'}] : undefined,
+        mathFontSize: document.getElementById('mathFontSize').checked ? [{text: '1', value: '1em'}, {text: '2', value: '2em', default: true}] : undefined,
         position: document.getElementById('position').checked ? document.getElementById('position_value').value : undefined,
         popupDisplay: document.getElementById('popupDisplay').checked ? document.getElementById('popupDisplay_value').value : undefined,
         resizingBar: document.getElementById('resizingBar').checked ? undefined : false,
