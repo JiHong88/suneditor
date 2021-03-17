@@ -13,6 +13,7 @@ export default {
             focusElement: null, // @Override dialog // This element has focus when the dialog is opened.
             previewElement: null,
             fontSizeElement: null,
+            defaultFontSize: '',
             _mathExp: null
         };
 
@@ -34,6 +35,7 @@ export default {
         /** add event listeners */
         math_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core), false);
         math_controller.addEventListener('click', this.onClick_mathController.bind(core));
+        context.math.previewElement.style.fontSize = context.math.defaultFontSize;
 
         /** append html */
         context.dialog.modal.appendChild(math_dialog);
@@ -47,10 +49,12 @@ export default {
     setDialog: function (core) {
         const lang = core.lang;
         const dialog = core.util.createElement('DIV');
+        const fontSize = core.options.mathFontSize;
+        let defaultFontSize = fontSize[0].value;
 
         dialog.className = 'se-dialog-content';
         dialog.style.display = 'none';
-        dialog.innerHTML = '' +
+        let html = '' +
         '<form>' +
             '<div class="se-dialog-header">' +
                 '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
@@ -65,12 +69,13 @@ export default {
                 '</div>' +
                 '<div class="se-dialog-form">' +
                     '<label>' + lang.dialogBox.mathBox.fontSizeLabel + '</label>' +
-                    '<select class="se-input-select se-math-size">' +
-                        '<option value="1em">1</option>' +
-                        '<option value="1.5em">1.5</option>' +
-                        '<option value="2em">2</option>' +
-                        '<option value="2.5em">2.5</option>' +
-                    '</select>' +
+                    '<select class="se-input-select se-math-size">';
+                    for (let i = 0, len = fontSize.length, f; i < len; i++) {
+                        f = fontSize[i];
+                        if (f.default) defaultFontSize = f.value;
+                        html += '<option value="' + f.value + '"' + (f.default ? ' selected' : '') + '>' + f.text + '</option>';
+                    }
+                html += '</select>' +
                 '</div>' +
                 '<div class="se-dialog-form">' +
                     '<label>' + lang.dialogBox.mathBox.previewLabel + '</label>' +
@@ -82,6 +87,8 @@ export default {
             '</div>' +
         '</form>';
 
+        core.context.math.defaultFontSize = defaultFontSize;
+        dialog.innerHTML = html;
         return dialog;
     },
 

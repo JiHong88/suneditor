@@ -393,15 +393,19 @@ historyStackDelayTime : When recording the history stack, this is the delay time
 
 // Whitelist--------------------------------------å---------------------------------------------------------
 // (You can use regular expression syntax.)
-// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h[1-6]|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code'
+// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
-pasteTagsWhitelist    : Whitelist of tags when pasting.   default: _editorTagsWhitelist {String}
-                        ex) 'p|h[1-6]'
+pasteTagsWhitelist    : Whitelist of tags when pasting.                     default: _editorTagsWhitelist {String}
+                        ex) 'p|h1|h2|h3'
+tagsBlacklist         : Blacklist of the editor default tags.               default: null {String}
+                        ex) 'h1|h2'
+pasteTagsBlacklist    : Blacklist of tags when pasting.                     default: null {String}
+                        ex) 'h1|h2'
 attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}
                         // -- Fixed whitelist --
-                        // Native attributes: 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls'
+                        // Native attributes: 'contenteditable|id|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls'
                         // Editor attributes: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size'
                         ex) {
                             'all': 'style|data-.+', // Apply to all tags
@@ -456,6 +460,13 @@ katex           : Required library for math plugins.               default: null
                             */
                         }
                       }
+mathFontSize    : Math plugin font size list.                       default: [{..}] {Array}
+                  Default value: [
+                    {text: '1', value: '1em', default: true},
+                    {text: '1.5', value: '1.5em'},
+                    {text: '2', value: '2em'},
+                    {text: '2.5', value: '2.5em'}
+                  ]
 
 // Display-------------------------------------------------------------------------------------------------------
 position        : The position property of suneditor.               default: null {String}
@@ -651,6 +662,7 @@ imageGalleryUrl     : The url of the image gallery, if you use the image gallery
                             ]
                         }
                       You can redefine the "plugins.imageGallery.drawItems" method.
+imageGalleryHeader: Http Header when get image gallery.         default: null {Object}
 
 // Video----------------------------------------------------------------------------------------------------------
 videoResizing   : Can resize the video (iframe, video).                         default: true {Boolean}

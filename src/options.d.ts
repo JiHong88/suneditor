@@ -37,6 +37,14 @@ export interface SunEditorOptions {
      */
     pasteTagsWhitelist?: string;
     /**
+     * Blacklist of the editor default tags.
+     */
+    tagsBlacklist?: string;
+    /**
+     * Blacklist of tags when pasting.
+     */
+    pasteTagsBlacklist?: string;
+    /**
      * Add attributes whitelist of tags that should be kept undeleted from the editor.
      */
     attributesWhitelist?: Record<string, string>;
@@ -101,6 +109,10 @@ export interface SunEditorOptions {
      * Katex object (Use "math" plugin)
      */
     katex?: any | { src: any; options: object };
+    /**
+     * Math plugin font size list 
+     */
+    mathFontSize?: { text: string; value: string; default?: boolean; }[];
     /**
      * Display
      * =======
@@ -284,9 +296,15 @@ export interface SunEditorOptions {
     /**
      * Image - image gallery
      * =====
+     */
+    /**
      * The url of the image gallery, if you use the image gallery
      */
     imageGalleryUrl?: string;
+    /**
+     * Http Header when get image gallery.
+     */
+    imageGalleryHeader?: Record<string, string>;
     /**
      * Video
      * =====
