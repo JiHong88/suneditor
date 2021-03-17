@@ -405,7 +405,7 @@ pasteTagsBlacklist    : Blacklist of tags when pasting.                     defa
                         ex) 'h1|h2'
 attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}
                         // -- Fixed whitelist --
-                        // Native attributes: 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls'
+                        // Native attributes: 'contenteditable|id|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls'
                         // Editor attributes: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size'
                         ex) {
                             'all': 'style|data-.+', // Apply to all tags
