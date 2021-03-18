@@ -377,9 +377,9 @@ export default {
         /** Values */
         options.lang = options.lang || _defaultLang;
         options.defaultTag = typeof options.defaultTag === 'string' ? options.defaultTag : 'p';
-        const textTags = options.textTags = [{bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL'}, (options.textTags || {})].reduce(function (_default, _new) {
+        const textTags = options.textTags = [{bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL', sub: 'SUB', sup: 'SUP'}, (options.textTags || {})].reduce(function (_default, _new) {
             for (let key in _new) {
-                if (util.hasOwn(_new, key)) _default[key] = _new[key];
+                _default[key] = _new[key];
             }
             return _default;
         }, {});
@@ -392,7 +392,9 @@ export default {
             'i': textTags.italic,
             'del': textTags.strike,
             'strike': textTags.strike,
-            's': textTags.strike
+            's': textTags.strike,
+            'sub': textTags.sub,
+            'sup': textTags.sup
         };
         options.value = typeof options.value === 'string' ? options.value : null;
         options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;

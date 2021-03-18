@@ -7,12 +7,12 @@
  */
 'use strict';
 
-import listMenu from './_selectMenu';
+import selectMenu from './_selectMenu';
 
 export default {
     name: 'anchor',
     add: function (core) {
-        core.addModule([listMenu]);
+        core.addModule([selectMenu]);
         
         core.context.anchor = {
             caller: {},
@@ -112,7 +112,7 @@ export default {
         context.downloadCheck.addEventListener('change', anchorPlugin.onChange_downloadCheck.bind(this, context));
         context.anchorText.addEventListener('input', anchorPlugin.onChangeAnchorText.bind(this, context));
         context.urlInput.addEventListener('input', anchorPlugin.onChangeUrlInput.bind(this, context));
-        context.urlInput.addEventListener('keydown', anchorPlugin.onKeyDownUrlInput.bind(this, context, listContext));
+        context.urlInput.addEventListener('keydown', anchorPlugin.onKeyDownUrlInput.bind(this, listContext));
         context.urlInput.addEventListener('focus', anchorPlugin.onFocusUrlInput.bind(this, context, listContext));
         context.urlInput.addEventListener('blur', anchorPlugin.onBlurUrlInput.bind(this, listContext));
         context.bookmarkButton.addEventListener('click', anchorPlugin.onClick_bookmarkButton.bind(this, context));
@@ -206,7 +206,7 @@ export default {
     createHeaderList: function (contextAnchor, contextList, urlValue) {
         const headers = this.util.getListChildren(this.context.element.wysiwyg, function(current) {
             return /h[1-6]/i.test(current.nodeName);
-        }.bind(this.util));
+        });
         if (headers.length === 0) return;
 
         const valueRegExp = new this._w.RegExp('^' + urlValue.replace(/^#/, ''), 'i');
@@ -231,7 +231,7 @@ export default {
         list.style.top = (contextAnchor.urlInput.offsetHeight + 1) + 'px';
     },
 
-    onKeyDownUrlInput: function (contextAnchor, contextList, e) {
+    onKeyDownUrlInput: function (contextList, e) {
         const keyCode = e.keyCode;
         switch (keyCode) {
             case 38: // up

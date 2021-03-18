@@ -403,7 +403,7 @@
 .sun-editor .se-controller-link .link-content a {display:inline-block; color:#4592ff; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}
 
 /* --- select list ---------------------------------------------------------- */
-.sun-editor .se-select-list {position:absolute; display:none; width:auto; max-width:100%; background-color:#fff; padding:0; margin:0; border:1px solid #bababa; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
+.sun-editor .se-select-list {position:absolute; top:0px; left:0px; display:none; width:auto; max-width:100%; background-color:#fff; padding:0; margin:0; border:1px solid #bababa; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
 .sun-editor .se-select-list .se-select-item {line-height:28px; min-height:28px; font-size:13px; padding:0 5px; margin:2px 0; cursor:pointer;}
 .sun-editor .se-select-list.__se_select-menu-mouse-move .se-select-item:hover, .sun-editor .se-select-list:not(.__se_select-menu-mouse-move) .se-select-item.active {background-color:#e1e1e1;}
 .sun-editor .se-dialog-form-files .se-select-list {width:100%;}

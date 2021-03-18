@@ -816,8 +816,10 @@ const util = {
                 children.push(current);
             }
 
-            for (let i = 0, len = current.children.length; i < len; i++) {
-                recursionFunc(current.children[i]);
+            if (!!current.children) {
+                for (let i = 0, len = current.children.length; i < len; i++) {
+                    recursionFunc(current.children[i]);
+                }
             }
         })(element);
 
