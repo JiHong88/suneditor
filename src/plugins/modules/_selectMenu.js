@@ -61,7 +61,7 @@ export default {
         context.clickMethod.call(this, context.items[index]);
     },
 
-    moveItem(listContext, num) {
+    moveItem: function (listContext, num) {
         this.util.removeClass(listContext.form, '__se_select-menu-mouse-move');
         num = listContext.index + num;
         const menus = listContext.menus;
@@ -79,7 +79,7 @@ export default {
         listContext.item = listContext.items[selectIndex];
     },
 
-    getItem(listContext, index) {
+    getItem: function (listContext, index) {
         index = (!index || index < 0) ? listContext.index : index;
         return listContext.items[index];
     },
