@@ -104,7 +104,7 @@
 
 /* ol, ul */
 .sun-editor-editable ol {
-    list-style-position: inside;
+    list-style-position: outside;
     display: block;
     list-style-type: decimal;
     margin-block-start: 1em;
@@ -114,7 +114,7 @@
     padding-inline-start: 40px;
 }
 .sun-editor-editable ul {
-    list-style-position: inside;
+    list-style-position: outside;
     display: block;
     list-style-type: disc;
     margin-block-start: 1em;
