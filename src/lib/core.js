@@ -422,8 +422,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             underline: options.textTags.underline,
             italic: options.textTags.italic,
             strike: options.textTags.strike,
-            subscript: 'SUB',
-            superscript: 'SUP'
+            subscript: options.textTags.sub,
+            superscript: options.textTags.sup
         },
 
         /**
