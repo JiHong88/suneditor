@@ -7730,7 +7730,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                     let c, a, t, prev, firstCon;
                     while ((c = domTree[0])) {
-                        if (prev && prev.nodeType === 3 && util.isBreak(c)) {
+                        if (prev && prev.nodeType === 3 && a && a.nodeType === 1 && util.isBreak(c)) {
                             prev = c;
                             util.removeItem(c);
                             continue;
