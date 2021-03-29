@@ -1711,6 +1711,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             } catch (e) {
                 parentNode.appendChild(oNode);
             } finally {
+                if ((util.isFormatElement(oNode) || util.isComponent(oNode)) && startCon === endCon) {
+                    const cItem = util.getFormatElement(commonCon, null);
+                    if (cItem && cItem.nodeType === 1 && util.onlyZeroWidthSpace(cItem.textContent)) {
+                        util.removeItem(cItem);
+                    }
+                }
+
                 if (freeFormat && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) {
                     oNode = this._setIntoFreeFormat(oNode);
                 }
