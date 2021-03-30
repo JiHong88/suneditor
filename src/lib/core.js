@@ -982,7 +982,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         removeRange: function () {
             this._variable._range = null;
             this._variable._selectionNode = null;
-            this.getSelection().removeAllRanges();
+            if (this.hasFocus) this.getSelection().removeAllRanges();
 
             const commandMap = this.commandMap;
             const activePlugins = this.activePlugins;
