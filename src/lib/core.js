@@ -982,7 +982,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         removeRange: function () {
             this._variable._range = null;
             this._variable._selectionNode = null;
-            this.getSelection().removeAllRanges();
+            if (this.hasFocus) this.getSelection().removeAllRanges();
 
             const commandMap = this.commandMap;
             const activePlugins = this.activePlugins;
@@ -5068,12 +5068,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (k === 'all') {
                         allAttr = _attr[k] + '|';
                     } else {
-                        tagsAttr[k] = new wRegExp('((?:' + _attr[k] + '|' + defaultAttr + ')\\s*=\\s*[^\\s]*\\S)', 'ig');
+                        tagsAttr[k] = new wRegExp('((?:' + _attr[k] + '|' + defaultAttr + ')\\s*=.*\\S)', 'ig');
                     }
                 }
             }
 
-            this._attributesWhitelistRegExp = new wRegExp('((?:' + allAttr + defaultAttr + ')\\s*=\\s*[^\\s]*\\S)', 'ig');
+            this._attributesWhitelistRegExp = new wRegExp('((?:' + allAttr + defaultAttr + ')\\s*=.*\\S)', 'ig');
             this._attributesTagsWhitelist = tagsAttr;
 
             // set modes
