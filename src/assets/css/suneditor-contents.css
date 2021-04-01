@@ -25,6 +25,7 @@
     font-family: inherit;
     font-size: inherit;
     color: inherit;
+    white-space: normal !important;
 }
 
 /* RTL - editable */
@@ -97,7 +98,7 @@
     background-color: #f9f9f9;
     border: 1px solid #e1e1e1;
     border-radius: 2px;
-    white-space: pre-wrap;
+    white-space: pre-wrap !important;
     word-wrap: break-word;
     overflow: visible;
 }
