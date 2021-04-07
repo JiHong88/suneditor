@@ -1,3 +1,5 @@
+import { Plugin } from './Plugin';
+
 // command
 import blockquote from './command/blockquote';
 
