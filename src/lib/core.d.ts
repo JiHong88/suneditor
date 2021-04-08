@@ -707,6 +707,20 @@ export default class SunEditor {
     audioUploadHandler: (xmlHttp: XMLHttpRequest, info: audioInputInformation, core: Core) => void;
 
     /**
+     * @description An event when toggling between code view and wysiwyg view.
+     * @param isCodeView: Whether the current code view mode
+     * @paran core: Core object
+     */
+    toggleCodeView: (isCodeView: boolean, core: Core) => void;
+
+    /**
+     * @description An event when toggling full screen.
+     * @param isFullScreen: Whether the current full screen mode
+     * @param core: Core object
+     */
+    toggleFullScreen: (isFullScreen: boolean, core: Core) => void;
+
+    /**
      * @description Called before the image is uploaded
      * If true is returned, the internal upload process runs normally.
      * If false is returned, no image upload is performed.
