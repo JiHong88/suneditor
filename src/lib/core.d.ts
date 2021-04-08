@@ -708,15 +708,15 @@ export default class SunEditor {
 
     /**
      * @description An event when toggling between code view and wysiwyg view.
-     * @param isCodeView: Whether the current code view mode
-     * @paran core: Core object
+     * @param isCodeView Whether the current code view mode
+     * @param core Core object
      */
     toggleCodeView: (isCodeView: boolean, core: Core) => void;
 
     /**
      * @description An event when toggling full screen.
-     * @param isFullScreen: Whether the current full screen mode
-     * @param core: Core object
+     * @param isFullScreen Whether the current full screen mode
+     * @param core Core object
      */
     toggleFullScreen: (isFullScreen: boolean, core: Core) => void;
 
