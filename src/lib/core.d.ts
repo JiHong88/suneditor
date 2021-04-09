@@ -639,6 +639,7 @@ export default class SunEditor {
     
     onload: (core: Core, reload: boolean) => void;
     onScroll: EventFn;
+    onFocus: EventFn;
     onMouseDown: EventFn;
     onClick: EventFn;
     onInput: EventFn;

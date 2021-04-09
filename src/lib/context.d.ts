@@ -25,6 +25,7 @@ export interface Context {
     tool: Record<string, Element>;
     options: SunEditorOptions;
     option: SunEditorOptions;
+    [key: string]: any;
 }
 
 type Constructor = {
