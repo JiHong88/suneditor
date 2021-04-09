@@ -470,7 +470,7 @@ export default {
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(prevElement);
                 // clean format tag
-                this.util.removeEmptyNode(existElement, null)
+                this.util.removeEmptyNode(existElement, null);
                 if (existElement.children.length === 0) existElement.innerHTML = this.util.htmlRemoveWhiteSpace(existElement.innerHTML);
             } else {
                 existElement.parentNode.replaceChild(container, existElement);

@@ -4436,8 +4436,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             iframe.style.display = 'none';
             _d.body.appendChild(iframe);
 
+            const contentsHTML = options.printTemplate ? options.printTemplate.replace(/\{\{\s*contents\s*\}\}/i, this.getContents(true)) : this.getContents(true);
             const printDocument = util.getIframeDocument(iframe);
-            const contentsHTML = this.getContents(true);
             const wDoc = this._wd;
 
             if (options.iframe) {
