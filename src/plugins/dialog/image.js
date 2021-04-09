@@ -751,9 +751,12 @@ export default {
                 contextImage._element : 
                 /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
                 
-            if (this.util.isFormatElement(existElement) && existElement.textContent.length > 0) {
-                existElement.parentNode.insertBefore(container, existElement.nextElementSibling);
+            if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
+                existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(contextImage._element);
+                // clean format tag
+                this.util.removeEmptyNode(existElement, null)
+                if (existElement.children.length === 0) existElement.innerHTML = this.util.htmlRemoveWhiteSpace(existElement.innerHTML);
             } else {
                 if (this.util.isFormatElement(existElement.parentNode)) {
                     const formats = existElement.parentNode;

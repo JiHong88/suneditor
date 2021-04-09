@@ -650,30 +650,38 @@ export default {
                 return this.isWysiwygDiv(current.parentNode);
             }.bind(this.util));
 
+        const prevFrame = oFrame;
         contextVideo._element = oFrame = oFrame.cloneNode(true);
         const cover = contextVideo._cover = this.plugins.component.set_cover.call(this, oFrame);
         const container = contextVideo._container = this.plugins.component.set_container.call(this, cover, 'se-video-container');
 
-        const figcaption = existElement.querySelector('figcaption');
-        let caption = null;
-        if (!!figcaption) {
-            caption = this.util.createElement('DIV');
-            caption.innerHTML = figcaption.innerHTML;
-            this.util.removeItem(figcaption);
+        try {
+            const figcaption = existElement.querySelector('figcaption');
+            let caption = null;
+            if (!!figcaption) {
+                caption = this.util.createElement('DIV');
+                caption.innerHTML = figcaption.innerHTML;
+                this.util.removeItem(figcaption);
+            }
+
+            const size = (oFrame.getAttribute('data-size') || oFrame.getAttribute('data-origin') || '').split(',');
+            this.plugins.video.applySize.call(this, size[0], size[1]);
+
+            if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
+                existElement.parentNode.insertBefore(container, existElement);
+                this.util.removeItem(prevFrame);
+                // clean format tag
+                this.util.removeEmptyNode(existElement, null)
+                if (existElement.children.length === 0) existElement.innerHTML = this.util.htmlRemoveWhiteSpace(existElement.innerHTML);
+            } else {
+                existElement.parentNode.replaceChild(container, existElement);
+            }
+
+            if (!!caption) existElement.parentNode.insertBefore(caption, container.nextElementSibling);
+        } catch (error) {
+            console.warn('[SUNEDITOR.video.error] Maybe the video tag is nested.', error);
         }
 
-        const size = (oFrame.getAttribute('data-size') || oFrame.getAttribute('data-origin') || '').split(',');
-        this.plugins.video.applySize.call(this, size[0], size[1]);
-
-        if (this.util.isFormatElement(existElement) && existElement.textContent.length > 0) {
-            existElement.parentNode.insertBefore(container, existElement.nextElementSibling);
-            this.util.removeItem(contextVideo._element);
-            contextVideo._element = oFrame;
-        } else {
-            existElement.parentNode.replaceChild(container, existElement);
-        }
-
-        if (!!caption) existElement.parentNode.insertBefore(caption, container.nextElementSibling);
         this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.functions.onVideoUpload, null, true);
     },
 
