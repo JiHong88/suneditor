@@ -6968,7 +6968,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return true;
             } else {
                 plainText = data.getData('text/plain');
-                cleanData = data.getData('text/html') || plainText;
+                cleanData = data.getData('text/html');
                 if (event._setClipboardData(type, e, plainText, cleanData, data) === false) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -6980,16 +6980,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _setClipboardData: function (type, e, plainText, cleanData, data) {
             // MS word, OneNode, Excel
             const MSData = /class=["']*Mso(Normal|List)/i.test(cleanData) || /content=["']*Word.Document/i.test(cleanData) || /content=["']*OneNote.File/i.test(cleanData) || /content=["']*Excel.Sheet/i.test(cleanData);
-            if (MSData) {
-                cleanData = cleanData.replace(/\n/g, ' ');
-                plainText = plainText.replace(/\n/g, ' ');
-            } else if (plainText === cleanData) {
-                cleanData = plainText.replace(/\n/g, '<br>');
+            const onlyText = !cleanData;
+
+            if (!onlyText) {
+                if (MSData) {
+                    cleanData = cleanData.replace(/\n/g, ' ');
+                    plainText = plainText.replace(/\n/g, ' ');
+                } else if (plainText === cleanData) {
+                    cleanData = plainText.replace(/\n/g, '<br>');
+                }
+                cleanData = core.cleanHTML(cleanData, core.pasteTagsWhitelistRegExp);
+            } else {
+                cleanData = plainText;
             }
 
-            cleanData = core.cleanHTML(cleanData, core.pasteTagsWhitelistRegExp);
             const maxCharCount = core._charCount(core._charTypeHTML ? cleanData : plainText);
-
             // paste event
             if (type === 'paste' && typeof functions.onPaste === 'function') {
                 const value = functions.onPaste(e, cleanData, maxCharCount, core);
@@ -7002,6 +7007,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (!value) return false;
                 if (typeof value === 'string') cleanData = value;
             }
+
+            if (onlyText) cleanData = util._HTMLConvertor(cleanData);
 
             // files
             const files = data.files;
