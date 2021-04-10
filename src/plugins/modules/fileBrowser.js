@@ -213,12 +213,12 @@
 
             const xmlHttp = fileBrowserPlugin._xmlHttp = this.util.getXMLHttpRequest();
             xmlHttp.onreadystatechange = fileBrowserPlugin._callBackGet.bind(this, xmlHttp);
+            xmlHttp.open('get', url, true);
             if(browserHeader !== null && typeof browserHeader === 'object' && this._w.Object.keys(browserHeader).length > 0){
                 for(let key in browserHeader){
                     xmlHttp.setRequestHeader(key, browserHeader[key]);
                 }
             }
-            xmlHttp.open('get', url, true);
             xmlHttp.send(null);
 
             this.plugins.fileBrowser.showBrowserLoading();
