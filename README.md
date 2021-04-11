@@ -509,6 +509,7 @@ maxHeight       : The max-height size of the editor.
 // Editing area default style------------------------------------------------------------------------------------
 defaultStyle    : You can define the style of the edit area. (className: 'sun-editor-editable')
                   It affects the entire editing area.               default: '' {String}
+                  ('z-index', 'position' and 'width' properties apply to the top div.)
                   ex) 'font-family: cursive; font-size: 10px;'
 
 // Defining menu items-------------------------------------------------------------------------------------------
