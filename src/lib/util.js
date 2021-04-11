@@ -1781,7 +1781,7 @@ const util = {
         for (let i = 0, len = styleArr.length, s; i < len; i++) {
             s = styleArr[i].trim();
             if (!s) continue;
-            if (/^(min-|max-)?width\s*:/.test(s)) {
+            if (/^(min-|max-)?width\s*:/.test(s) || /^(z-index|position)\s*:/.test(s)) {
                 top += s + ';';
                 continue;
             }
