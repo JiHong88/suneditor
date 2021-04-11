@@ -5205,8 +5205,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _onChange_historyStack: function () {
-            event._applyTagEffects();
-            core._variable.isChanged = true;
+            if (this.hasFocus) event._applyTagEffects();
+            this._variable.isChanged = true;
             if (context.tool.save) context.tool.save.removeAttribute('disabled');
             if (functions.onChange) functions.onChange(this.getContents(true), this);
             if (context.element.toolbar.style.display === 'block') event._showToolbarBalloon();
