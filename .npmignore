@@ -4,6 +4,7 @@
 # project files
 .vscode/
 .idea/
+.github/
 out
 gen
 

@@ -131,7 +131,7 @@ export default {
         return {
             className: 'katex',
             method: function (element) {
-                if (!element.getAttribute('data-exp')) return;
+                if (!element.getAttribute('data-exp') || !this.options.katex) return;
                 const dom = this._d.createRange().createContextualFragment(this.plugins.math._renderer.call(this, this.util.HTMLDecoder(element.getAttribute('data-exp'))));
                 element.innerHTML = dom.querySelector('.katex').innerHTML;
             }

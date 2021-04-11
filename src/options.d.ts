@@ -102,6 +102,12 @@ export interface SunEditorOptions {
      */
     previewTemplate?: string;
     /**
+     * A template of the "print".
+     * The {{contents}} part in the HTML string is replaced with the contents of the editor.
+     * @example "<h1>Print Template</h1> {{contents}} <div>_Footer_</div>"
+     */
+    printTemplate?: string;
+    /**
      * CodeMirror object
      */
     codeMirror?: any | { src: any; options: object };

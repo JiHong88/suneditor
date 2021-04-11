@@ -460,11 +460,25 @@ export default {
             }.bind(this.util));
 
         // clone element
+        const prevElement = element;
         contextAudio._element = element = element.cloneNode(false);
         const cover = this.plugins.component.set_cover.call(this, element);
         const container = this.plugins.component.set_container.call(this, cover, 'se-audio-container');
 
-        existElement.parentNode.replaceChild(container, existElement);
+        try {
+            if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
+                existElement.parentNode.insertBefore(container, existElement);
+                this.util.removeItem(prevElement);
+                // clean format tag
+                this.util.removeEmptyNode(existElement, null);
+                if (existElement.children.length === 0) existElement.innerHTML = this.util.htmlRemoveWhiteSpace(existElement.innerHTML);
+            } else {
+                existElement.parentNode.replaceChild(container, existElement);
+            }
+        } catch (error) {
+            console.warn('[SUNEDITOR.audio.error] Maybe the audio tag is nested.', error);
+        }
+
         this.plugins.fileManager.setInfo.call(this, 'audio', element, this.functions.onAudioUpload, null, false);
     },
 

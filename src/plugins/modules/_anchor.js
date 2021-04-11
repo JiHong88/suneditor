@@ -293,7 +293,7 @@ export default {
     setLinkPreview: function (context, value) {
         const preview = context.preview;
         const protocol = this.options.linkProtocol;
-        const reservedProtocol  = /^(mailto\:|https*\:\/\/|#)/.test(value);
+        const reservedProtocol  = /^(mailto\:|tel\:|sms\:|https*\:\/\/|#)/.test(value);
         const sameProtocol = !protocol ? false : this._w.RegExp('^' + value.substr(0, protocol.length)).test(protocol);
         context.linkValue = preview.textContent = !value ? '' : (protocol && !reservedProtocol && !sameProtocol) ? protocol + value : reservedProtocol ? value : /^www\./.test(value) ? 'http://' + value : this.context.anchor.host + (/^\//.test(value) ? '' : '/') + value;
 
