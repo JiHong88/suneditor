@@ -400,7 +400,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     mediaAutoSelect: false,
     // mode: 'balloon',
     // rtl: true,
-    fullPage: true,
+    // fullPage: true,
     // pasteTagsWhitelist: 'p|a|strong|em|h3|h4|h5|ul|ol|li|blockquote|table|thead|tbody|tfoot|tr|td|sup|sub',
     linkRel: [
         'alternate',

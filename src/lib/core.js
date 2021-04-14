@@ -4622,12 +4622,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
             // text
             if (node.nodeType === 3) {
-                if (!requireFormat) return node.textContent;
+                if (!requireFormat) return util._HTMLConvertor(node.textContent);
                 const textArray = node.textContent.split(/\n/g);
                 let html = '';
                 for (let i = 0, tLen = textArray.length, text; i < tLen; i++) {
                     text = textArray[i].trim();
-                    if (text.length > 0) html += '<' + defaultTag + '>' + text + '</' + defaultTag + '>';
+                    if (text.length > 0) html += '<' + defaultTag + '>' + util._HTMLConvertor(text) + '</' + defaultTag + '>';
                 }
                 return html;
             }
