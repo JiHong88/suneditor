@@ -856,8 +856,8 @@ export default {
             h = size.h;
         }
 
-        contextImage._origin_w = w || element.style.width || element.width;
-        contextImage._origin_h = h || element.style.height || element.height;
+        contextImage._origin_w = w || element.style.width || element.width || '';
+        contextImage._origin_h = h || element.style.height || element.height || '';
     },
 
     /**

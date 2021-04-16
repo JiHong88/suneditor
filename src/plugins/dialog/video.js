@@ -666,7 +666,7 @@ export default {
 
             // size
             const size = (oFrame.getAttribute('data-size') || oFrame.getAttribute('data-origin') || '').split(',');
-            this.plugins.video.applySize.call(this, (size[0] || prevFrame.style.width || prevFrame.width), (size[1] || prevFrame.style.height || prevFrame.height));
+            this.plugins.video.applySize.call(this, (size[0] || prevFrame.style.width || prevFrame.width || ''), (size[1] || prevFrame.style.height || prevFrame.height || ''));
 
             // align
             const format = this.util.getFormatElement(prevFrame);
@@ -720,8 +720,8 @@ export default {
             h = size.h;
         }
 
-        contextVideo._origin_w = w || element.style.width || element.width;
-        contextVideo._origin_h = h || element.style.height || element.height;
+        contextVideo._origin_w = w || element.style.width || element.width || '';
+        contextVideo._origin_h = h || element.style.height || element.height || '';
     },
 
     /**
