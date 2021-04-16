@@ -358,8 +358,6 @@
 }
 .sun-editor-editable[contenteditable=true] .se-component {
     outline: 1px dashed #e1e1e1;
-    min-width: 16px;
-    min-height: 16px;
 }
 /** component copy effect */
 .sun-editor-editable[contenteditable=true] .se-component.se-component-copy {

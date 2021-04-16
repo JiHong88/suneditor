@@ -400,7 +400,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     mediaAutoSelect: false,
     // mode: 'balloon',
     // rtl: true,
-    fullPage: true,
+    // fullPage: true,
     // pasteTagsWhitelist: 'p|a|strong|em|h3|h4|h5|ul|ol|li|blockquote|table|thead|tbody|tfoot|tr|td|sup|sub',
     linkRel: [
         'alternate',
@@ -425,19 +425,19 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     callBackSave: function (contents){
         console.log('save', contents)
     },
-    attributesWhitelist: {
-        all: "style|bgcolor|border|cellpadding|colspan|cellspacing|align",
-        input: "checked"
-    },
-    addTagsWhitelist: "table|thead|tbody|tr|td|title|html|body|meta",
+    // attributesWhitelist: {
+    //     all: "style|bgcolor|border|cellpadding|colspan|cellspacing|align",
+    //     input: "checked"
+    // },
+    // addTagsWhitelist: "table|thead|tbody|tr|td|title|html|body|meta",
     // iframe: true,
-    defaultTag: 'div',
-    textTags: {
-        strike:'s',
-        bold: 'b',
-        underline: 'em',
-        italic: 'u'
-    },
+    // defaultTag: 'div',
+    // textTags: {
+    //     strike:'s',
+    //     bold: 'b',
+    //     underline: 'em',
+    //     italic: 'u'
+    // },
     tableCellControllerPosition: 'top',
     lang: lang.fr,
     plugins: plugins,
@@ -450,19 +450,19 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     display: 'block',
     width: '100%',
     height: '500px',
-    audioTagAttrs: {
-        controlslist: "nodownload",
-    },
-    videoTagAttrs: {
-        poster: "http://suneditor.com/docs/loading.gif",
-        autoplay: true
-    },
-    videoIframeAttrs: {
-        style: "border: 2px solid red;" 
-    },
+    // audioTagAttrs: {
+    //     controlslist: "nodownload",
+    // },
+    // videoTagAttrs: {
+    //     poster: "http://suneditor.com/docs/loading.gif",
+    //     autoplay: true
+    // },
+    // videoIframeAttrs: {
+    //     style: "border: 2px solid red;" 
+    // },
     // height: 'auto',
     iframeCSSFileName: '.+',
-    addTagsWhitelist: 'i|label',
+    // addTagsWhitelist: 'i|label',
     popupDisplay: 'full',
     charCounter: true,
     charCounterType: 'byte-html',

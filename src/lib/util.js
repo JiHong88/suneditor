@@ -711,6 +711,15 @@ const util = {
     },
 
     /**
+     * @description Check the line element(util.isFormatElement) is empty.
+     * @param {Element} element Format element node
+     * @returns {Boolean}
+     */
+    isEmptyLine: function (element) {
+        return !element || !element.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && this.onlyZeroWidthSpace(element.textContent));
+    },
+
+    /**
      * @description Check the node is a list (ol, ul)
      * @param {Node|String} node The element or element name to check
      * @returns {Boolean}

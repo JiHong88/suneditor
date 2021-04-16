@@ -1579,8 +1579,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const startOff = range.startOffset;
             const endOff = range.endOffset;
             const formatRange = range.startContainer === commonCon && util.isFormatElement(commonCon);
-            const startCon = formatRange ? commonCon.childNodes[startOff] : range.startContainer;
-            const endCon = formatRange ? commonCon.childNodes[endOff] : range.endContainer;
+            const startCon = formatRange ? (commonCon.childNodes[startOff] || commonCon.childNodes[0]) : range.startContainer;
+            const endCon = formatRange ? (commonCon.childNodes[endOff] || commonCon.childNodes[commonCon.childNodes.length - 1]) : range.endContainer;
             let parentNode, originAfter = null;
 
             if (!afterNode) {
@@ -1713,7 +1713,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             } finally {
                 if ((util.isFormatElement(oNode) || util.isComponent(oNode)) && startCon === endCon) {
                     const cItem = util.getFormatElement(commonCon, null);
-                    if (cItem && cItem.nodeType === 1 && util.onlyZeroWidthSpace(cItem.textContent)) {
+                    if (cItem && cItem.nodeType === 1 && util.isEmptyLine(cItem)) {
                         util.removeItem(cItem);
                     }
                 }
@@ -4622,12 +4622,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
             // text
             if (node.nodeType === 3) {
-                if (!requireFormat) return node.textContent;
+                if (!requireFormat) return util._HTMLConvertor(node.textContent);
                 const textArray = node.textContent.split(/\n/g);
                 let html = '';
                 for (let i = 0, tLen = textArray.length, text; i < tLen; i++) {
                     text = textArray[i].trim();
-                    if (text.length > 0) html += '<' + defaultTag + '>' + text + '</' + defaultTag + '>';
+                    if (text.length > 0) html += '<' + defaultTag + '>' + util._HTMLConvertor(text) + '</' + defaultTag + '>';
                 }
                 return html;
             }
@@ -7753,6 +7753,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (rangeSelection) core.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
                     else core.setRange(a, offset, a, offset);
                 } catch (error) {
+                    console.warn('[SUNEDITOR.insertHTML.fail] ' + error);
                     core.execCommand('insertHTML', false, html);
                 }
             } else {

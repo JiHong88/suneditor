@@ -664,8 +664,14 @@ export default {
                 this.util.removeItem(figcaption);
             }
 
+            // size
             const size = (oFrame.getAttribute('data-size') || oFrame.getAttribute('data-origin') || '').split(',');
-            this.plugins.video.applySize.call(this, size[0], size[1]);
+            this.plugins.video.applySize.call(this, (size[0] || prevFrame.style.width || prevFrame.width || ''), (size[1] || prevFrame.style.height || prevFrame.height || ''));
+
+            // align
+            const format = this.util.getFormatElement(prevFrame);
+            if (format) contextVideo._align = format.style.textAlign || format.style.float;
+            this.plugins.video.setAlign.call(this, null, oFrame, cover, container);
 
             if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
@@ -704,14 +710,18 @@ export default {
         }
 
         let origin = contextVideo._element.getAttribute('data-size') || contextVideo._element.getAttribute('data-origin');
+        let w, h;
         if (origin) {
             origin = origin.split(',');
-            contextVideo._origin_w = origin[0];
-            contextVideo._origin_h = origin[1];
+            w = origin[0];
+            h = origin[1];
         } else if (size) {
-            contextVideo._origin_w = size.w;
-            contextVideo._origin_h = size.h;
+            w = size.w;
+            h = size.h;
         }
+
+        contextVideo._origin_w = w || element.style.width || element.width || '';
+        contextVideo._origin_h = h || element.style.height || element.height || '';
     },
 
     /**
