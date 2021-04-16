@@ -670,7 +670,7 @@ export default {
 
             // align
             const format = this.util.getFormatElement(prevFrame);
-            if (format) contextVideo._align = format.style.textAlign;
+            if (format) contextVideo._align = format.style.textAlign || format.style.float;
             this.plugins.video.setAlign.call(this, null, oFrame, cover, container);
 
             if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {

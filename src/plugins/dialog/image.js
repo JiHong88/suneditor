@@ -613,11 +613,15 @@ export default {
         const modifyHandler = function (tag) {
             imagePlugin.onModifyMode.call(this, tag, null);
             imagePlugin.openModify.call(this, true);
-
+            // get size
             contextImage.inputX.value = contextImage._origin_w;
             contextImage.inputY.value = contextImage._origin_h;
+            // get align
             const format = this.util.getFormatElement(tag);
-            if (format) contextImage._align = format.style.textAlign;
+            if (format) contextImage._align = format.style.textAlign || format.style.float;
+            // link
+            const link = this.util.getParentElement(tag, this.util.isAnchor);
+            if (link && !contextImage.anchorCtx.linkValue) contextImage.anchorCtx.linkValue = ' ';
             
             imagePlugin.update_image.call(this, true, false, true);
         }.bind(this);
@@ -745,12 +749,13 @@ export default {
             cover.insertBefore(this.plugins.image.onRender_link.call(this, imageEl, contextImage._linkElement), contextImage._caption);
         } else if (contextImage._linkElement !== null) {
             const imageElement = imageEl;
-
             imageElement.setAttribute('data-image-link', '');
-            const newEl = imageElement.cloneNode(true);
-            cover.removeChild(contextImage._linkElement);
-            cover.insertBefore(newEl, contextImage._caption);
-            imageEl = newEl;
+            if (cover.contains(contextImage._linkElement)) {
+                const newEl = imageElement.cloneNode(true);
+                cover.removeChild(contextImage._linkElement);
+                cover.insertBefore(newEl, contextImage._caption);
+                imageEl = newEl;
+            }
         }
 
         if (isNewContainer) {
