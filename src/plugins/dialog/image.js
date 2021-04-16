@@ -608,10 +608,17 @@ export default {
      */
     checkFileInfo: function () {
         const imagePlugin = this.plugins.image;
+        const contextImage = this.context.image;
 
         const modifyHandler = function (tag) {
             imagePlugin.onModifyMode.call(this, tag, null);
             imagePlugin.openModify.call(this, true);
+
+            contextImage.inputX.value = contextImage._origin_w;
+            contextImage.inputY.value = contextImage._origin_h;
+            const format = this.util.getFormatElement(tag);
+            if (format) contextImage._align = format.style.textAlign;
+            
             imagePlugin.update_image.call(this, true, false, true);
         }.bind(this);
 
@@ -786,7 +793,6 @@ export default {
         }
 
         // size
-        let isPercent = false;
         if (contextImage._resizing) {
             imageEl.setAttribute('data-proportion', contextImage._proportionChecked);
             if (changeSize) {
@@ -795,9 +801,7 @@ export default {
         }
 
         // align
-        if (!(isPercent && contextImage._align === 'center')) {
-            this.plugins.image.setAlign.call(this, null, imageEl, null, null);
-        }
+        this.plugins.image.setAlign.call(this, null, imageEl, null, null);
 
         // set imagesInfo
         if (init) {
@@ -842,14 +846,18 @@ export default {
         }
 
         let userSize = contextImage._element.getAttribute('data-size') || contextImage._element.getAttribute('data-origin');
+        let w, h;
         if (userSize) {
             userSize = userSize.split(',');
-            contextImage._origin_w = userSize[0];
-            contextImage._origin_h = userSize[1];
+            w = userSize[0];
+            h = userSize[1];
         } else if (size) {
-            contextImage._origin_w = size.w;
-            contextImage._origin_h = size.h;
+            w = size.w;
+            h = size.h;
         }
+
+        contextImage._origin_w = w || element.style.width || element.width;
+        contextImage._origin_h = h || element.style.height || element.height;
     },
 
     /**
