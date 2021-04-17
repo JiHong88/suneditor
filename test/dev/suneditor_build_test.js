@@ -398,6 +398,16 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     fullScreenOffset: '10px',
     charCounterType: "byte-html",
     mediaAutoSelect: false,
+    addTagsWhitelist: 'x-foo',
+    formats: [
+        'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        {
+            tag: 'x-foo',
+            name: 'x-foo',
+            command: 'replace',
+            class: '__se__format__replace_x_foo',
+        }
+    ],
     // mode: 'balloon',
     // rtl: true,
     // fullPage: true,
