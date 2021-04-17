@@ -4680,7 +4680,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
 
             let v = null;
-            const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z0-9]+/)[0].toLowerCase()];
+            const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z0-9\-]+/)[0].toLowerCase()];
             if (tAttr) v = m.match(tAttr);
             else v = m.match(this._attributesWhitelistRegExp);
 
@@ -4718,7 +4718,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist) {
-            html = this._deleteDisallowedTags(html).replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, this._cleanTags.bind(this, false));
+            html = this._deleteDisallowedTags(html).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, false));
 
             const dom = _d.createRange().createContextualFragment(html);
             try {
@@ -4767,7 +4767,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
-            contents = this._deleteDisallowedTags(contents).replace(/(<[a-zA-Z0-9]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
+            contents = this._deleteDisallowedTags(contents).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
 
             const dom = _d.createRange().createContextualFragment(this._deleteDisallowedTags(contents));
 
@@ -6403,9 +6403,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         }
                     }
 
-                    if (!shift && /^H[1-6]$/i.test(formatEl.nodeName) && core.isEdgeFormat(range.endContainer, range.endOffset, 'end')) {
+                    if (!shift && core.isEdgeFormat(range.endContainer, range.endOffset, 'end')) {
                         e.preventDefault();
-                        const newFormat = core.appendFormatTag(formatEl, options.defaultTag);
+                        const newFormat = core.appendFormatTag(formatEl, /^H[1-6]$/i.test(formatEl.nodeName) ? options.defaultTag : formatEl.cloneNode(true));
                         core.setRange(newFormat, 1, newFormat, 1);
                         break;
                     }
