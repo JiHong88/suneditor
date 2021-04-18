@@ -324,6 +324,13 @@ declare interface util {
     isSameAttributes(a: Node, b: Node): boolean;
 
     /**
+     * @description Check the line element(util.isFormatElement) is empty.
+     * @param {Element} element Format element node
+     * @returns {Boolean}
+     */
+    isEmptyLine(element: Element): boolean;
+
+    /**
      * @description Check the node is a list (ol, ul)
      * @param node The element or element name to check
      * @returns
