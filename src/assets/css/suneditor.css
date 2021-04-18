@@ -178,6 +178,7 @@
 
 /** --- submenu layer ---------------------------------------------------------- */
 .sun-editor .se-submenu {overflow-x:hidden; overflow-y:auto;}
+.sun-editor .se-menu-container {overflow-x:unset; overflow-y:unset;}
 .sun-editor .se-list-layer {display:none; position:absolute; top:0px; left:0px; height:auto; z-index:5; border:1px solid #bababa; border-radius:4px; padding:6px 0; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
 .sun-editor .se-list-layer .se-list-inner {padding:0; margin:0; overflow-x:initial; overflow-y:initial; overflow:visible;}
 .sun-editor .se-list-layer button {margin:0; width:100%;}

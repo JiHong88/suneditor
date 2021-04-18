@@ -5598,6 +5598,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let display = target.getAttribute('data-display');
             let command = target.getAttribute('data-command');
             let className = target.className;
+            core.controllersOff();
 
             while (target.parentNode && !command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
                 target = target.parentNode;
