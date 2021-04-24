@@ -6404,55 +6404,57 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         }
                     }
 
-                    if (!shift && core.isEdgeFormat(range.endContainer, range.endOffset, 'end')) {
-                        e.preventDefault();
-                        const newFormat = core.appendFormatTag(formatEl, /^H[1-6]$/i.test(formatEl.nodeName) ? options.defaultTag : formatEl.cloneNode(true));
-                        core.setRange(newFormat, 1, newFormat, 1);
-                        break;
-                    }
-
-                    if (!shift && freeFormatEl) {
-                        e.preventDefault();
-                        const selectionFormat = selectionNode === freeFormatEl;
-                        const wSelection = core.getSelection();
-                        const children = selectionNode.childNodes, offset = wSelection.focusOffset, prev = selectionNode.previousElementSibling, next = selectionNode.nextSibling;
-
-                        if (!util.isClosureFreeFormatElement(freeFormatEl) && !!children && ((selectionFormat && range.collapsed && children.length - 1 <= offset + 1 && util.isBreak(children[offset]) && (!children[offset + 1] || ((!children[offset + 2] || util.onlyZeroWidthSpace(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && util.onlyZeroWidthSpace(children[offset + 1].textContent))) &&  offset > 0 && util.isBreak(children[offset - 1])) ||
-                          (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(prev) && (util.isBreak(prev.previousSibling) || !util.onlyZeroWidthSpace(prev.previousSibling.textContent)) && (!next || (!util.isBreak(next) && util.onlyZeroWidthSpace(next.textContent)))))) {
-                            if (selectionFormat) util.removeItem(children[offset - 1]);
-                            else util.removeItem(selectionNode);
-                            const newEl = core.appendFormatTag(freeFormatEl, util.isFormatElement(freeFormatEl.nextElementSibling) ? freeFormatEl.nextElementSibling : null);
-                            util.copyFormatAttributes(newEl, freeFormatEl);
-                            core.setRange(newEl, 1, newEl, 1);
+                    if (!shift) {
+                        if (core.isEdgeFormat(range.endContainer, range.endOffset, 'end') || /^HR$/i.test(formatEl.nodeName)) {
+                            e.preventDefault();
+                            const newFormat = core.appendFormatTag(formatEl, /^H[1-6r]$/i.test(formatEl.nodeName) ? options.defaultTag : formatEl.cloneNode(true));
+                            core.setRange(newFormat, 1, newFormat, 1);
                             break;
                         }
-                        
-                        if (selectionFormat) {
-                            functions.insertHTML(((range.collapsed && util.isBreak(range.startContainer.childNodes[range.startOffset - 1])) ? '<br>' : '<br><br>'), true, false);
 
-                            let focusNode = wSelection.focusNode;
-                            const wOffset = wSelection.focusOffset;
-                            if (freeFormatEl === focusNode) {
-                                focusNode = focusNode.childNodes[wOffset - offset > 1 ? wOffset - 1 : wOffset];
+                        if (freeFormatEl) {
+                            e.preventDefault();
+                            const selectionFormat = selectionNode === freeFormatEl;
+                            const wSelection = core.getSelection();
+                            const children = selectionNode.childNodes, offset = wSelection.focusOffset, prev = selectionNode.previousElementSibling, next = selectionNode.nextSibling;
+    
+                            if (!util.isClosureFreeFormatElement(freeFormatEl) && !!children && ((selectionFormat && range.collapsed && children.length - 1 <= offset + 1 && util.isBreak(children[offset]) && (!children[offset + 1] || ((!children[offset + 2] || util.onlyZeroWidthSpace(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && util.onlyZeroWidthSpace(children[offset + 1].textContent))) &&  offset > 0 && util.isBreak(children[offset - 1])) ||
+                              (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(prev) && (util.isBreak(prev.previousSibling) || !util.onlyZeroWidthSpace(prev.previousSibling.textContent)) && (!next || (!util.isBreak(next) && util.onlyZeroWidthSpace(next.textContent)))))) {
+                                if (selectionFormat) util.removeItem(children[offset - 1]);
+                                else util.removeItem(selectionNode);
+                                const newEl = core.appendFormatTag(freeFormatEl, util.isFormatElement(freeFormatEl.nextElementSibling) ? freeFormatEl.nextElementSibling : null);
+                                util.copyFormatAttributes(newEl, freeFormatEl);
+                                core.setRange(newEl, 1, newEl, 1);
+                                break;
                             }
-
-                            core.setRange(focusNode, 1, focusNode, 1);
-                        } else {
-                            const focusNext = wSelection.focusNode.nextSibling;
-                            const br = util.createElement('BR');
-                            core.insertNode(br, null, false);
-
-                            const brPrev = br.previousSibling, brNext = br.nextSibling;
-                            if (!util.isBreak(focusNext) && !util.isBreak(brPrev) && (!brNext || util.onlyZeroWidthSpace(brNext))) {
-                                br.parentNode.insertBefore(br.cloneNode(false), br);
-                                core.setRange(br, 1, br, 1);
+                            
+                            if (selectionFormat) {
+                                functions.insertHTML(((range.collapsed && util.isBreak(range.startContainer.childNodes[range.startOffset - 1])) ? '<br>' : '<br><br>'), true, false);
+    
+                                let focusNode = wSelection.focusNode;
+                                const wOffset = wSelection.focusOffset;
+                                if (freeFormatEl === focusNode) {
+                                    focusNode = focusNode.childNodes[wOffset - offset > 1 ? wOffset - 1 : wOffset];
+                                }
+    
+                                core.setRange(focusNode, 1, focusNode, 1);
                             } else {
-                                core.setRange(brNext, 0, brNext, 0);
+                                const focusNext = wSelection.focusNode.nextSibling;
+                                const br = util.createElement('BR');
+                                core.insertNode(br, null, false);
+    
+                                const brPrev = br.previousSibling, brNext = br.nextSibling;
+                                if (!util.isBreak(focusNext) && !util.isBreak(brPrev) && (!brNext || util.onlyZeroWidthSpace(brNext))) {
+                                    br.parentNode.insertBefore(br.cloneNode(false), br);
+                                    core.setRange(br, 1, br, 1);
+                                } else {
+                                    core.setRange(brNext, 0, brNext, 0);
+                                }
                             }
+    
+                            event._onShortcutKey = true;
+                            break;
                         }
-
-                        event._onShortcutKey = true;
-                        break;
                     }
 
                     if (selectRange) break;
