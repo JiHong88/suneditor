@@ -16,9 +16,9 @@ export interface SunEditorOptions {
      */
     defaultTag?: string;
     /**
-     * You can change the tag of the default text button.   default: { bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL' }
+     * You can change the tag of the default text button.   default: { bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL', sub: 'SUB', sup: 'SUP' }
      */
-    textTags?: {bold: string; underline: string; italic: string; strike: string;};
+    textTags?: { bold?: string; underline?: string; italic?: string; strike?: string; sub?: string; sup?: string;};
     /**
      * Initial value(html string) of the edit area.
      * If not, the value of the "target textarea".
