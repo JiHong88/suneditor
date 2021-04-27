@@ -80,6 +80,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         options: null,
 
         /**
+         * @description Computed style of the wysiwyg area (window.getComputedStyle(context.element.wysiwyg))
+         */
+        wwComputedStyle: _w.getComputedStyle(context.element.wysiwyg),
+
+        /**
          * @description Notice object
          */
         notice: _notice,
