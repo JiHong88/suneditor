@@ -240,7 +240,7 @@
     <span class="pl-en">setSubmenu</span>: <span class="pl-k">function</span> <span class="pl-kos">(</span><span class="pl-smi">core</span><span class="pl-kos">)</span> <span class="pl-kos">{</span>
         <span class="pl-k">const</span> <span class="pl-s1">listDiv</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-k">const</span> <span class="pl-s1">icons</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">icons</span><span class="pl-kos">;</span> <span class="pl-c">// assets/defaultIcons.js</span>
-        <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'se-list-layer'</span><span class="pl-kos">;</span>
+        <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'se-menu-container se-submenu se-list-layer'</span><span class="pl-kos">;</span>
         <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">innerHTML</span> <span class="pl-c1">=</span> <span class="pl-s">''</span> <span class="pl-c1">+</span>
             <span class="pl-s">'&lt;div class="se-list-inner"&gt;'</span> <span class="pl-c1">+</span>
                 <span class="pl-s">'&lt;div class="se-form-group"&gt;'</span> <span class="pl-c1">+</span>
@@ -500,7 +500,7 @@
         <span class="pl-k">const</span> <span class="pl-s1">listDiv</span> <span class="pl-c1">=</span> <span class="pl-smi">core</span><span class="pl-kos">.</span><span class="pl-c1">util</span><span class="pl-kos">.</span><span class="pl-en">createElement</span><span class="pl-kos">(</span><span class="pl-s">'DIV'</span><span class="pl-kos">)</span><span class="pl-kos">;</span>
         <span class="pl-c">// <span class="pl-k">@Required</span></span>
         <span class="pl-c">// A "se-submenu" class is required for the top level element.</span>
-        <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'se-submenu se-list-layer'</span><span class="pl-kos">;</span>
+        <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">className</span> <span class="pl-c1">=</span> <span class="pl-s">'se-menu-container se-submenu se-list-layer'</span><span class="pl-kos">;</span>
         <span class="pl-s1">listDiv</span><span class="pl-kos">.</span><span class="pl-c1">innerHTML</span> <span class="pl-c1">=</span> <span class="pl-s">''</span> <span class="pl-c1">+</span>
             <span class="pl-s">'&lt;div class="se-list-inner"&gt;'</span> <span class="pl-c1">+</span>
                 <span class="pl-s">'&lt;ul class="se-list-basic" style="width: 230px;"&gt;'</span> <span class="pl-c1">+</span>
@@ -1565,7 +1565,7 @@
         setSubmenu: function (core) {
             const listDiv = core.util.createElement('DIV');
             const icons = core.icons; // assets/defaultIcons.js
-            listDiv.className = 'se-list-layer';
+            listDiv.className = 'se-menu-container se-submenu se-list-layer';
             listDiv.innerHTML = '' +
                 '<div class="se-list-inner">' +
                     '<div class="se-form-group">' +
@@ -1788,7 +1788,7 @@
             const listDiv = core.util.createElement('DIV');
             // @Required
             // A "se-submenu" class is required for the top level element.
-            listDiv.className = 'se-submenu se-list-layer';
+            listDiv.className = 'se-menu-container se-submenu se-list-layer';
             listDiv.innerHTML = '' +
                 '<div class="se-list-inner">' +
                     '<ul class="se-list-basic" style="width: 230px;">' +

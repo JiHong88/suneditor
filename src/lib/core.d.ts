@@ -37,6 +37,11 @@ interface Core {
     options: SunEditorOptions;
 
     /**
+     * @description Computed style of the wysiwyg area (window.getComputedStyle(context.element.wysiwyg))
+     */
+    wwComputedStyle: any;
+
+    /**
      * @description Notice object
      */
     notice: _Notice;

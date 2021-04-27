@@ -37,7 +37,7 @@ export default {
     setSubmenu: function (core) {
         const listDiv = core.util.createElement('DIV');
 
-        listDiv.className = 'se-submenu se-list-layer';
+        listDiv.className = 'se-menu-container se-submenu se-list-layer';
         listDiv.innerHTML = '' +
             '<div class="se-list-inner">' +
                 '<ul>' +
