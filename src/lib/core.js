@@ -1562,15 +1562,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const freeFormat = util.getFreeFormatElement(this.getSelectionNode(), null);
             const isFormats = (!freeFormat && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) || util.isComponent(oNode);
 
-            if (!afterNode && isFormats) {
-                const range = this.getRange();
-                if (range.startOffset !== range.endOffset || range.startContainer !== range.endContainer) {
-                    const r = this.removeNode();
-                    if (r.container.nodeType === 3 || util.isBreak(r.container)) {
-                        const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
-                        afterNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
-                        if (afterNode) afterNode = afterNode.previousSibling;
-                    }
+            if (!afterNode && (isFormats || util.isComponent(oNode) || util.isMedia(oNode))) {
+                const r = this.removeNode();
+                if (r.container.nodeType === 3 || util.isBreak(r.container)) {
+                    const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
+                    afterNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
+                    if (afterNode) afterNode = afterNode.previousSibling;
                 }
             }
 
@@ -4685,7 +4682,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             else v = m.match(this._attributesWhitelistRegExp);
 
             if ((rowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
-                const sv = m.match(/style\s*=\s*"[^"]*"/);
+                const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (sv) {
                     if (!v) v = [];
                     v.push(sv[0]);
@@ -4693,7 +4690,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             if (/<a\b/i.test(t)) {
-                const sv = m.match(/id\s*=\s*"[^"]*"/);
+                const sv = m.match(/id\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (sv) {
                     if (!v) v = [];
                     v.push(sv[0]);
