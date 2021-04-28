@@ -2675,7 +2675,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return false;
             })(removeNodeArray));
 
-            const isSizeNode = util._isSizeNode(newNode);
+            const isSizeNode = isRemoveNode || util._isSizeNode(newNode);
             const _getMaintainedNode = this._util_getMaintainedNode.bind(util, isRemoveAnchor, isSizeNode);
             const _isMaintainedNode = this._util_isMaintainedNode.bind(util, isRemoveAnchor, isSizeNode);
 
