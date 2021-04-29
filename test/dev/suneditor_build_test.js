@@ -768,7 +768,7 @@ window.sun_setContents = function (content) {
     ss.setContents('<style>div{color: red;}</style><p><br></p><img src="https://picsum.photos/200/300"><img src="https://picsum.photos/200/300"><p><br></p>');
     ss.core.history.reset(true);
     ss.core.focusEdge(null);
-    // ss.core.context.tool.save.disabled = true;
+    // ss.core.context.buttons.save.disabled = true;
 }
 
 window.sun_appendContents = function (content) {

@@ -3,7 +3,7 @@ import { Plugin } from './../plugins/Plugin.d';
 import { Lang } from './../lang/Lang.d';
 import { SunEditorOptions } from './../options.d';
 import { Context } from './context';
-import Util from './util';
+import Util from '../helper/util';
 import { Module } from '../plugins/Module';
 import _Notice from '../plugins/modules/_notice';
 

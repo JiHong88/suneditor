@@ -11,11 +11,10 @@
  * @description Elements and variables you should have
  * @param {Element} element textarea element
  * @param {object} cons Toolbar element you created
- * @param {JSON|Object} options Inserted options
  * @returns {Object} {Elements, variables of the editor, option}
  * @private
  */
-const _Context = function (element, cons, options) {
+const _Context = function (element, cons) {
     return {
         element: {
             originElement: element,
@@ -41,7 +40,7 @@ const _Context = function (element, cons, options) {
             _stickyDummy: cons._stickyDummy,
             _arrow: cons._arrow
         },
-        tool: {
+        buttons: {
             cover: cons._toolBar.querySelector('.se-toolbar-cover'),
             bold: cons._toolBar.querySelector('._se_command_bold'),
             underline: cons._toolBar.querySelector('._se_command_underline'),
@@ -57,9 +56,7 @@ const _Context = function (element, cons, options) {
             fullScreen: cons._toolBar.querySelector('._se_command_fullScreen'),
             showBlocks: cons._toolBar.querySelector('._se_command_showBlocks'),
             codeView: cons._toolBar.querySelector('._se_command_codeView')
-        },
-        options: options,
-        option: options
+        }
     };
 };
 

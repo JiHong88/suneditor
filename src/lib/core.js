@@ -10,7 +10,7 @@
 import _Constructor from './constructor';
 import _Context from './context';
 import _history from './history';
-import _util from './util';
+import _util from '../helper/util';
 import _notice from '../plugins/modules/_notice';
 
 /**
@@ -4115,7 +4115,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     this._variable.isChanged = false;
-                    if (context.tool.save) context.tool.save.setAttribute('disabled', true);
+                    if (context.buttons.save) context.buttons.save.setAttribute('disabled', true);
                     break;
                 default : // 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'..
                     command = this._defaultCommand[command.toLowerCase()] || command;
@@ -4479,7 +4479,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 try {
                     iframe.focus();
                     // IE or Edge
-                    if (util.isIE_Edge || !!_d.documentMode || !!_w.StyleMedia) {
+                    if (util.isIE || util.isEdge || !!_d.documentMode || !!_w.StyleMedia) {
                         try {
                             iframe.contentWindow.document.execCommand('print', false, null);
                         } catch (e) {
@@ -4624,12 +4624,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
             // text
             if (node.nodeType === 3) {
-                if (!requireFormat) return util._HTMLConvertor(node.textContent);
+                if (!requireFormat) return util.HTMLToEntity(node.textContent);
                 const textArray = node.textContent.split(/\n/g);
                 let html = '';
                 for (let i = 0, tLen = textArray.length, text; i < tLen; i++) {
                     text = textArray[i].trim();
-                    if (text.length > 0) html += '<' + defaultTag + '>' + util._HTMLConvertor(text) + '</' + defaultTag + '>';
+                    if (text.length > 0) html += '<' + defaultTag + '>' + util.HTMLToEntity(text) + '</' + defaultTag + '>';
                 }
                 return html;
             }
@@ -4836,7 +4836,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         continue;
                     }
                     if (node.nodeType === 3) {
-                        returnHTML += util._HTMLConvertor((/^\n+$/.test(node.data) ? '' : node.data));
+                        returnHTML += util.HTMLToEntity((/^\n+$/.test(node.data) ? '' : node.data));
                         continue;
                     }
                     if (node.childNodes.length === 0) {
@@ -4879,102 +4879,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             _d.removeEventListener(type, listener);
             if (options.iframe) {
                 this._wd.removeEventListener(type, listener);
-            }
-        },
-
-        /**
-         * @description The current number of characters is counted and displayed.
-         * @param {String} inputText Text added.
-         * @returns {Boolean}
-         * @private
-         */
-        _charCount: function (inputText) {
-            const maxCharCount = options.maxCharCount;
-            const countType = options.charCounterType;
-            let nextCharCount = 0;
-            if (!!inputText) nextCharCount = this.getCharLength(inputText, countType);
-
-            this._setCharCount();
-
-            if (maxCharCount > 0) {
-                let over = false;
-                const count = functions.getCharCount(countType);
-                
-                if (count > maxCharCount) {
-                    over = true;
-                    if (nextCharCount > 0) {
-                        this._editorRange();
-                        const range = this.getRange();
-                        const endOff = range.endOffset - 1;
-                        const text = this.getSelectionNode().textContent;
-                        const slicePosition = range.endOffset - (count - maxCharCount);
-    
-                        this.getSelectionNode().textContent = text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
-                        this.setRange(range.endContainer, endOff, range.endContainer, endOff);
-                    }
-                } else if ((count + nextCharCount) > maxCharCount) {
-                    over = true;
-                }
-
-                if (over) {
-                    this._callCounterBlink();
-                    if (nextCharCount > 0) return false;
-                }
-            }
-
-            return true;
-        },
-
-        /**
-         * @description When "element" is added, if it is greater than "options.maxCharCount", false is returned.
-         * @param {Node|String} element Element node or String.
-         * @param {String|null} charCounterType charCounterType. If it is null, the options.charCounterType
-         * @returns {Boolean}
-         */
-        checkCharCount: function (element, charCounterType) {
-            if (options.maxCharCount) {
-                const countType = charCounterType || options.charCounterType;
-                const length = this.getCharLength((typeof element === 'string' ? element : (this._charTypeHTML && element.nodeType === 1) ? element.outerHTML : element.textContent), countType);
-                if (length > 0 && length + functions.getCharCount(countType) > options.maxCharCount) {
-                    this._callCounterBlink();
-                    return false;
-                }
-            }
-            return true;
-        },
-
-        /**
-         * @description Get the length of the content.
-         * Depending on the option, the length of the character is taken. (charCounterType)
-         * @param {String} content Content to count
-         * @param {String} charCounterType options.charCounterType
-         * @returns {Number}
-         */
-        getCharLength: function (content, charCounterType) {
-            return /byte/.test(charCounterType) ? util.getByteLength(content) : content.length;
-        },
-
-        /**
-         * @description Set the char count to charCounter element textContent.
-         * @private
-         */
-        _setCharCount: function () {
-            if (context.element.charCounter) {
-                _w.setTimeout(function () { context.element.charCounter.textContent = functions.getCharCount(options.charCounterType); });
-            }
-        },
-
-        /**
-         * @description The character counter blinks.
-         * @private
-         */
-        _callCounterBlink: function () {
-            const charWrapper = context.element.charWrapper;
-            if (charWrapper && !util.hasClass(charWrapper, 'se-blink')) {
-                util.addClass(charWrapper, 'se-blink');
-                _w.setTimeout(function () {
-                    util.removeClass(charWrapper, 'se-blink');
-                }, 600);
             }
         },
 
@@ -5164,22 +5068,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _cachingButtons: function () {
             this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-code-view-enabled"])');
             this.resizingDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-resizing-enabled"])');
-            const tool = context.tool;
+            const buttons = context.buttons;
             this.commandMap = {
-                SUB: tool.subscript,
-                SUP: tool.superscript,
-                OUTDENT: tool.outdent,
-                INDENT: tool.indent
+                SUB: buttons.subscript,
+                SUP: buttons.superscript,
+                OUTDENT: buttons.outdent,
+                INDENT: buttons.indent
             };
-            this.commandMap[options.textTags.bold.toUpperCase()] = tool.bold;
-            this.commandMap[options.textTags.underline.toUpperCase()] = tool.underline;
-            this.commandMap[options.textTags.italic.toUpperCase()] = tool.italic;
-            this.commandMap[options.textTags.strike.toUpperCase()] = tool.strike;
+            this.commandMap[options.textTags.bold.toUpperCase()] = buttons.bold;
+            this.commandMap[options.textTags.underline.toUpperCase()] = buttons.underline;
+            this.commandMap[options.textTags.italic.toUpperCase()] = buttons.italic;
+            this.commandMap[options.textTags.strike.toUpperCase()] = buttons.strike;
             
             this._styleCommandMap = {
-                fullScreen: tool.fullScreen,
-                showBlocks: tool.showBlocks,
-                codeView: tool.codeView
+                fullScreen: buttons.fullScreen,
+                showBlocks: buttons.showBlocks,
+                codeView: buttons.codeView
             };
         },
 
@@ -5209,7 +5113,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _onChange_historyStack: function () {
             if (this.hasFocus) event._applyTagEffects();
             this._variable.isChanged = true;
-            if (context.tool.save) context.tool.save.removeAttribute('disabled');
+            if (context.buttons.save) context.buttons.save.removeAttribute('disabled');
             if (functions.onChange) functions.onChange(this.getContents(true), this);
             if (context.element.toolbar.style.display === 'block') event._showToolbarBalloon();
         },
@@ -5324,7 +5228,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _setOptionsInit: function (el, _initHTML) {
-            this.context = context = _Context(el.originElement, this._getConstructed(el), options);
+            this.context = context = _Context(el.originElement, this._getConstructed(el));
             this._componentsInfoReset = true;
             this._editorInit(true, _initHTML);
         },
@@ -7013,7 +6917,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (typeof value === 'string') cleanData = value;
             }
 
-            if (onlyText) cleanData = util._HTMLConvertor(cleanData);
+            if (onlyText) cleanData = util.HTMLToEntity(cleanData);
 
             // files
             const files = data.files;
@@ -7492,7 +7396,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const newContext = _Context(context.element.originElement, core._getConstructed(context.element), options);
 
             context.element = newContext.element;
-            context.tool = newContext.tool;
+            context.buttons = newContext.buttons;
             if (options.iframe) context.element.wysiwyg = core._wd.body;
             core._cachingButtons();
             core.history._resetCachingButton();
@@ -7662,17 +7566,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             return context.element.wysiwyg.textContent;
         },
 
-        /**
-         * @description Get the editor's number of characters or binary data size.
-         * You can use the "charCounterType" option format.
-         * @param {String|null} charCounterType options - charCounterType ('char', 'byte', 'byte-html')
-         * If argument is no value, the currently set "charCounterType" option is used.
-         * @returns {Number}
-         */
-        getCharCount: function (charCounterType) {
-            charCounterType = typeof charCounterType === 'string' ? charCounterType : options.charCounterType;
-            return core.getCharLength((core._charTypeHTML ? context.element.wysiwyg.innerHTML : context.element.wysiwyg.textContent), charCounterType);
-        },
+        
         
         /**
          * @description Gets uploaded files(plugin using fileManager) information list.
@@ -7790,7 +7684,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Disable the suneditor
          */
         disabled: function () {
-            context.tool.cover.style.display = 'block';
+            context.buttons.cover.style.display = 'block';
             context.element.wysiwyg.setAttribute('contenteditable', false);
             core.isDisabled = true;
 
@@ -7805,7 +7699,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Enable the suneditor
          */
         enabled: function () {
-            context.tool.cover.style.display = 'none';
+            context.buttons.cover.style.display = 'none';
             context.element.wysiwyg.setAttribute('contenteditable', true);
             core.isDisabled = false;
 
@@ -7870,14 +7764,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
              * @description Disable the toolbar
              */
             disabled: function () {
-                context.tool.cover.style.display = 'block';
+                context.buttons.cover.style.display = 'block';
             },
 
             /**
              * @description Enable the toolbar
              */
             enabled: function () {
-                context.tool.cover.style.display = 'none';
+                context.buttons.cover.style.display = 'none';
             },
 
             /**

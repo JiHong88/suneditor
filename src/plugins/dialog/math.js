@@ -132,7 +132,7 @@ export default {
             className: 'katex',
             method: function (element) {
                 if (!element.getAttribute('data-exp') || !this.options.katex) return;
-                const dom = this._d.createRange().createContextualFragment(this.plugins.math._renderer.call(this, this.util.HTMLDecoder(element.getAttribute('data-exp'))));
+                const dom = this._d.createRange().createContextualFragment(this.plugins.math._renderer.call(this, this.util.entityToHTML(element.getAttribute('data-exp'))));
                 element.innerHTML = dom.querySelector('.katex').innerHTML;
             }
         };
@@ -163,7 +163,7 @@ export default {
             if (!katexEl) return false;
             katexEl.className = '__se__katex ' + katexEl.className;
             katexEl.setAttribute('contenteditable', false);
-            katexEl.setAttribute('data-exp', this.util.HTMLEncoder(mathExp));
+            katexEl.setAttribute('data-exp', this.util.HTMLToEntity(mathExp));
             katexEl.setAttribute('data-font-size', contextMath.fontSizeElement.value);
             katexEl.style.fontSize = contextMath.fontSizeElement.value;
 
@@ -232,7 +232,7 @@ export default {
         } else {
             const contextMath = this.context.math;
             if (contextMath._mathExp) {
-                const exp = this.util.HTMLDecoder(contextMath._mathExp.getAttribute('data-exp'));
+                const exp = this.util.entityToHTML(contextMath._mathExp.getAttribute('data-exp'));
                 const fontSize = contextMath._mathExp.getAttribute('data-font-size') || '1em';
                 this.context.dialog.updateModal = true;
                 contextMath.focusElement.value = exp;
@@ -260,7 +260,7 @@ export default {
         e.preventDefault();
 
         if (/update/.test(command)) {
-            this.context.math.focusElement.value = this.util.HTMLDecoder(this.context.math._mathExp.getAttribute('data-exp'));
+            this.context.math.focusElement.value = this.util.entityToHTML(this.context.math._mathExp.getAttribute('data-exp'));
             this.plugins.dialog.open.call(this, 'math', true);
         } else {
             /** delete */

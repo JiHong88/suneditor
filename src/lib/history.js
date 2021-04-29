@@ -12,8 +12,8 @@ export default function (core, change) {
     const util = core.util;
     const delayTime = core.options.historyStackDelayTime;
     let editor = core.context.element;
-    let undo = core.context.tool.undo;
-    let redo = core.context.tool.redo;
+    let undo = core.context.buttons.undo;
+    let redo = core.context.buttons.redo;
 
     let pushDelay = null;
     let stackIndex = 0;
@@ -155,7 +155,7 @@ export default function (core, change) {
             if (undo) undo.setAttribute('disabled', true);
             if (redo) redo.setAttribute('disabled', true);
             core._variable.isChanged = false;
-            if (core.context.tool.save) core.context.tool.save.setAttribute('disabled', true);
+            if (core.context.buttons.save) core.context.buttons.save.setAttribute('disabled', true);
             
             stack.splice(0);
             stackIndex = 0;
@@ -182,14 +182,14 @@ export default function (core, change) {
          */
         _resetCachingButton: function () {
             editor = core.context.element;
-            undo = core.context.tool.undo;
-            redo = core.context.tool.redo;
+            undo = core.context.buttons.undo;
+            redo = core.context.buttons.redo;
 
             if (stackIndex === 0) {
                 if (undo) undo.setAttribute('disabled', true);
                 if (redo && stackIndex === stack.length - 1) redo.setAttribute('disabled', true);
                 core._variable.isChanged = false;
-                if (core.context.tool.save) core.context.tool.save.setAttribute('disabled', true);
+                if (core.context.buttons.save) core.context.buttons.save.setAttribute('disabled', true);
             } else if (stackIndex === stack.length - 1) {
                 if (redo) redo.setAttribute('disabled', true);
             }

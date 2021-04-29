@@ -9,7 +9,7 @@
 
 import _icons from '../assets/defaultIcons';
 import _defaultLang from '../lang/en';
-import util from './util';
+import util from '../helper/util';
 
 export default {
     /**

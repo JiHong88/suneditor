@@ -6,6 +6,13 @@
   "version": "2.38.5",
   "description": "Pure JavaScript based WYSIWYG web editor",
   "main": "src/suneditor.js",
+  "scripts": {
+    "dev": "webpack-dev-server --open --config webpack.dev.js",
+    "start": "npm run dev",
+    "build": "webpack --config webpack.prod.js",
+    "lint": "jshint src",
+    "test": "karma start"
+  },
   "keywords": [
     "wysiwyg",
     "wysiwyg editor",
@@ -54,17 +61,10 @@
     "katex": "^0.11.1",
     "mini-css-extract-plugin": "^0.4.5",
     "optimize-css-assets-webpack-plugin": "^5.0.4",
+    "prettier": "^2.2.1",
     "url-loader": "^1.1.2",
     "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0",
     "webpack-merge": "^4.2.2"
-  },
-  "scripts": {
-    "dev": "webpack-dev-server --open --config webpack.dev.js",
-    "start": "npm run dev",
-    "build": "webpack --config webpack.prod.js",
-    "lint": "jshint src",
-    "test": "karma start"
   }
 }
