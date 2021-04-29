@@ -1,4 +1,6 @@
-function Editor(editor) {
+function Editor(core) {
+	this._w = core._w;
+	this._d = core._d;
 	this.editor = core;
 	this.plugins = core.plugins;
     this.status = core.status;

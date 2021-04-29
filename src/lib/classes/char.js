@@ -1,4 +1,5 @@
 import Editor from "../../interface/editor";
+import { _w } from "../../helper/global";
 
 const Char = function(editor) {
 	Editor.call(this, editor);
@@ -42,7 +43,7 @@ Char.prototype = {
 			}
 
 			if (over) {
-				this._callCounterBlink();
+				Char.CounterBlink(context.element.charWrapper);
 				if (nextCharCount > 0) return false;
 			}
 		}
@@ -52,23 +53,23 @@ Char.prototype = {
 
 	/**
 	 * @description When "element" is added, if it is greater than "options.maxCharCount", false is returned.
-	 * @param {Node|String} element Element node or String.
+	 * @param {Node|String} html Element node or String.
 	 * @param {String|null} charCounterType charCounterType. If it is null, the options.charCounterType
 	 * @returns {Boolean}
 	 */
-	checkCharCount: function(element, charCounterType) {
+	checkCharCount: function(html, charCounterType) {
 		if (options.maxCharCount) {
 			const countType = charCounterType || options.charCounterType;
 			const length = this.getCharLength(
-				typeof element === "string"
-					? element
-					: this._charTypeHTML && element.nodeType === 1
-					? element.outerHTML
-					: element.textContent,
+				typeof html === "string"
+					? html
+					: this._charTypeHTML && html.nodeType === 1
+					? html.outerHTML
+					: html.textContent,
 				countType
 			);
 			if (length > 0 && length + functions.getCharCount(countType) > options.maxCharCount) {
-				this._callCounterBlink();
+				Char.CounterBlink(context.element.charWrapper);
 				return false;
 			}
 		}
@@ -83,7 +84,7 @@ Char.prototype = {
 	 * @returns {Number}
 	 */
 	getCharLength: function(content, charCounterType) {
-		return /byte/.test(charCounterType) ? util.getByteLength(content) : content.length;
+		return /byte/.test(charCounterType) ? util._getByteLength(content) : content.length;
 	},
 
 	/**
@@ -95,20 +96,6 @@ Char.prototype = {
 			_w.setTimeout(function() {
 				context.element.charCounter.textContent = functions.getCharCount(options.charCounterType);
 			});
-		}
-	},
-
-	/**
-	 * @description The character counter blinks.
-	 * @private
-	 */
-	_callCounterBlink: function() {
-		const charWrapper = context.element.charWrapper;
-		if (charWrapper && !util.hasClass(charWrapper, "se-blink")) {
-			util.addClass(charWrapper, "se-blink");
-			_w.setTimeout(function() {
-				util.removeClass(charWrapper, "se-blink");
-			}, 600);
 		}
 	},
 
@@ -133,7 +120,7 @@ Char.prototype = {
 	 * @param {String} text String text
 	 * @returns {Number}
 	 */
-	getByteLength: function(text) {
+	_getByteLength: function(text) {
 		if (!text || !text.toString) return 0;
 		text = text.toString();
 
@@ -161,6 +148,20 @@ Char.prototype = {
 	},
 
 	constructor: Char
+};
+
+/**
+ * @description The character counter blinks.
+ * @param charWrapper {Element} context.element.charWrapper
+ * @private
+ */
+Char.CounterBlink = function(charWrapper) {
+	if (charWrapper && !util.hasClass(charWrapper, "se-blink")) {
+		util.addClass(charWrapper, "se-blink");
+		_w.setTimeout(function() {
+			util.removeClass(charWrapper, "se-blink");
+		}, 600);
+	}
 };
 
 export default Char;
