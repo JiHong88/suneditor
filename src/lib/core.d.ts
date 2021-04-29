@@ -942,22 +942,8 @@ export default class SunEditor {
     getCharCount(charCounterType?: string): number;
 
     /**
-     * @description Gets uploaded images informations
-     * - index: data index
-     * - name: file name
-     * - size: file size
-     * - select: select function
-     * - delete: delete function
-     * - element: img element
-     * - src: src attribute of img tag
-     * @returns
-     */
-    getImagesInfo(): fileInfo[];
-
-    /**
      * @description Gets uploaded files(plugin using fileManager) information list.
      * image: [img], video: [video, iframe], audio: [audio]
-     * When the argument value is 'image', it is the same function as "getImagesInfo".
      * - index: data index
      * - name: file name
      * - size: file size
@@ -969,12 +955,6 @@ export default class SunEditor {
      * @returns
      */
     getFilesInfo(pluginName: string): fileInfo[];
-
-     /**
-     * @description Upload images using image plugin
-     * @param files FileList
-     */
-    insertImage(files: FileList): void;
 
     /**
      * @description Inserts an HTML element or HTML string or plain string at the current cursor position

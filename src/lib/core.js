@@ -7019,7 +7019,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const files = data.files;
             if (files.length > 0 && !MSData) {
                 if (/^image/.test(files[0].type) && core.plugins.image) {
-                    functions.insertImage(files);
+                    if (!core.initPlugins.image) core.callPlugin('image', core.plugins.image.submitAction.bind(core, files), null);
+                    else core.plugins.image.submitAction.call(core, files);
+                    core.focus();
                 }
                 return false;
             }
@@ -7671,26 +7673,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             charCounterType = typeof charCounterType === 'string' ? charCounterType : options.charCounterType;
             return core.getCharLength((core._charTypeHTML ? context.element.wysiwyg.innerHTML : context.element.wysiwyg.textContent), charCounterType);
         },
-
-        /**
-         * @description Gets uploaded images informations
-         * - index: data index
-         * - name: file name
-         * - size: file size
-         * - select: select function
-         * - delete: delete function
-         * - element: target element
-         * - src: src attribute of tag
-         * @returns {Array}
-         */
-        getImagesInfo: function () {
-            return context.image ? context.image._infoList : [];
-        },
         
         /**
          * @description Gets uploaded files(plugin using fileManager) information list.
          * image: [img], video: [video, iframe], audio: [audio]
-         * When the argument value is 'image', it is the same function as "getImagesInfo".
          * - index: data index
          * - name: file name
          * - size: file size
@@ -7703,18 +7689,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         getFilesInfo: function (pluginName) {
             return context[pluginName] ? context[pluginName]._infoList : [];
-        },
-
-        /**
-         * @description Upload images using image plugin
-         * @param {FileList} files FileList
-         */
-        insertImage: function (files) {
-            if (!core.plugins.image || !files) return;
-
-            if (!core.initPlugins.image) core.callPlugin('image', core.plugins.image.submitAction.bind(core, files), null);
-            else core.plugins.image.submitAction.call(core, files);
-            core.focus();
         },
 
         /**

@@ -972,23 +972,8 @@ editor.getContents(onlyContents: Boolean);
 // Gets only the text of the suneditor contents
 editor.getText();
 
-// Gets a list of images uploaded to the editor
-/** 
- * {
- *  element: image element
- *  src: imgage src
- *  index: data index
- *  name: file name
- *  size: file size
- *  select: select function
- *  delete: delete function
- * }
- **/
-editor.getImagesInfo();
-
 // Gets uploaded files(plugin using fileManager) information list.
 // image: [img], video: [video, iframe], audio: [audio]
-// When the argument value is 'image', it is the same function as "getImagesInfo".
 /** 
  * {
  *  element: image element
