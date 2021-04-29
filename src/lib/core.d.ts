@@ -586,21 +586,6 @@ interface Core {
      * @param listener Event listener
      */
     removeDocEvent(type: string, listener: EventListener): void;
-
-    /**
-     * @description When "element" is added, if it is greater than "options.maxCharCount", false is returned.
-     * @param element Element node or String.
-     * @param charCounterType charCounterType. If it is null, the options.charCounterType
-     */
-    checkCharCount(element: Node | string, charCounterType?: string): boolean;
-
-    /**
-     * @description Get the length of the content.
-     * Depending on the option, the length of the character is taken. (charCounterType)
-     * @param content Content to count
-     * @param charCounterType options.charCounterType
-     */
-    getCharLength(content: string, charCounterType: string): number;
 }
 
 interface Toolbar {

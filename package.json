@@ -44,12 +44,13 @@
   ],
   "devDependencies": {
     "@babel/core": "7.0.0",
-    "@webpack-cli/init": "^0.2.2",
     "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^0.1.19",
     "codemirror": "^5.57.0",
     "css-loader": "^1.0.1",
     "csstype": "^2.6.13",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
     "file-loader": "^2.0.0",
     "html-webpack-plugin": "^3.2.0",
     "jasmine": "^2.99.0",
@@ -66,5 +67,6 @@
     "webpack": "^4.44.1",
     "webpack-dev-server": "^3.11.0",
     "webpack-merge": "^4.2.2"
-  }
+  },
+  "dependencies": {}
 }

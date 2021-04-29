@@ -1,5 +1,6 @@
 import Editor from "../../interface/editor";
 import { _w } from "../../helper/global";
+import env from "../../helper/env";
 
 const Char = function(editor) {
 	Editor.call(this, editor);
@@ -8,22 +9,73 @@ const Char = function(editor) {
 
 Char.prototype = {
 	/**
-	 * @description The current number of characters is counted and displayed.
+	 * @description Returns false if char count is greater than "options.maxCharCount" when "html" is added to the current editor.
+	 * @param {Node|String} html Element node or String.
+	 * @returns {Boolean}
+	 */
+	check: function(html) {
+		if (this.options.maxCharCount) {
+			const length = this.getLength(
+				typeof html === "string"
+					? html
+					: this.options.charCounterType === "byte-html" && html.nodeType === 1
+					? html.outerHTML
+					: html.textContent
+			);
+			if (length > 0 && length + this.getLength() > this.options.maxCharCount) {
+				Char.CounterBlink(this.context.element.charWrapper);
+				return false;
+			}
+		}
+		return true;
+	},
+
+	/**
+	 * @description Get the [content]'s number of characters or binary data size. (options.charCounterType)
+	 * If [content] is undefined, get the current editor's number of characters or binary data size.
+	 * @param {String|undefined} content Content to count. (defalut: this.context.element.wysiwyg)
+	 * @returns {Number}
+	 */
+	getLength: function(content) {
+		if (typeof content !== "string") {
+			content =
+				this.options.charCounterType === "byte-html"
+					? this.context.element.wysiwyg.innerHTML
+					: this.context.element.wysiwyg.textContent;
+		}
+		return /byte/.test(this.options.charCounterType) ? Char.GetByteLength(content) : content.length;
+	},
+
+	/**
+	 * @description Set the char count to charCounter element textContent.
+	 */
+	display: function() {
+		if (context.element.charCounter) {
+			_w.setTimeout(
+				function() {
+					this.context.element.charCounter.textContent = this.getLength();
+				}.bind(this)
+			);
+		}
+	},
+
+	/**
+	 * @description Returns false if char count is greater than "options.maxCharCount" when "inputText" is added to the current editor.
+	 * If the current number of characters is greater than "maxCharCount", the excess characters are removed.
+	 * And call the char.display()
 	 * @param {String} inputText Text added.
 	 * @returns {Boolean}
-	 * @private
 	 */
-	_charCount: function(inputText) {
-		const maxCharCount = options.maxCharCount;
-		const countType = options.charCounterType;
+	test: function(inputText) {
+		const maxCharCount = this.options.maxCharCount;
 		let nextCharCount = 0;
-		if (!!inputText) nextCharCount = this.getCharLength(inputText, countType);
+		if (!!inputText) nextCharCount = this.getLength(inputText);
 
-		this._setCharCount();
+		this.display();
 
 		if (maxCharCount > 0) {
 			let over = false;
-			const count = functions.getCharCount(countType);
+			const count = this.getLength();
 
 			if (count > maxCharCount) {
 				over = true;
@@ -51,102 +103,6 @@ Char.prototype = {
 		return true;
 	},
 
-	/**
-	 * @description When "element" is added, if it is greater than "options.maxCharCount", false is returned.
-	 * @param {Node|String} html Element node or String.
-	 * @param {String|null} charCounterType charCounterType. If it is null, the options.charCounterType
-	 * @returns {Boolean}
-	 */
-	checkCharCount: function(html, charCounterType) {
-		if (options.maxCharCount) {
-			const countType = charCounterType || options.charCounterType;
-			const length = this.getCharLength(
-				typeof html === "string"
-					? html
-					: this._charTypeHTML && html.nodeType === 1
-					? html.outerHTML
-					: html.textContent,
-				countType
-			);
-			if (length > 0 && length + functions.getCharCount(countType) > options.maxCharCount) {
-				Char.CounterBlink(context.element.charWrapper);
-				return false;
-			}
-		}
-		return true;
-	},
-
-	/**
-	 * @description Get the length of the content.
-	 * Depending on the option, the length of the character is taken. (charCounterType)
-	 * @param {String} content Content to count
-	 * @param {String} charCounterType options.charCounterType
-	 * @returns {Number}
-	 */
-	getCharLength: function(content, charCounterType) {
-		return /byte/.test(charCounterType) ? util._getByteLength(content) : content.length;
-	},
-
-	/**
-	 * @description Set the char count to charCounter element textContent.
-	 * @private
-	 */
-	_setCharCount: function() {
-		if (context.element.charCounter) {
-			_w.setTimeout(function() {
-				context.element.charCounter.textContent = functions.getCharCount(options.charCounterType);
-			});
-		}
-	},
-
-	/**
-	 * @description Get the editor's number of characters or binary data size.
-	 * You can use the "charCounterType" option format.
-	 * @param {String|null} charCounterType options - charCounterType ('char', 'byte', 'byte-html')
-	 * If argument is no value, the currently set "charCounterType" option is used.
-	 * @returns {Number}
-	 */
-	getCharCount: function(charCounterType) {
-		charCounterType = typeof charCounterType === "string" ? charCounterType : options.charCounterType;
-		return core.getCharLength(
-			core._charTypeHTML ? context.element.wysiwyg.innerHTML : context.element.wysiwyg.textContent,
-			charCounterType
-		);
-	},
-
-	/**
-	 * @descriptionGets Get the length in bytes of a string.
-	 * referencing code: "https://github.com/shaan1974/myrdin/blob/master/expressions/string.js#L11"
-	 * @param {String} text String text
-	 * @returns {Number}
-	 */
-	_getByteLength: function(text) {
-		if (!text || !text.toString) return 0;
-		text = text.toString();
-
-		const encoder = this._w.encodeURIComponent;
-		let cr, cl;
-		if (this.isIE || this.isEdge) {
-			cl = this._w.unescape(encoder(text)).length;
-			cr = 0;
-
-			if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
-				cr = encoder(text).match(/(%0A|%0D)/gi).length;
-			}
-
-			return cl + cr;
-		} else {
-			cl = new this._w.TextEncoder("utf-8").encode(text).length;
-			cr = 0;
-
-			if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
-				cr = encoder(text).match(/(%0A|%0D)/gi).length;
-			}
-
-			return cl + cr;
-		}
-	},
-
 	constructor: Char
 };
 
@@ -161,6 +117,39 @@ Char.CounterBlink = function(charWrapper) {
 		_w.setTimeout(function() {
 			util.removeClass(charWrapper, "se-blink");
 		}, 600);
+	}
+};
+
+/**
+ * @descriptionGets Get the length in bytes of a string.
+ * referencing code: "https://github.com/shaan1974/myrdin/blob/master/expressions/string.js#L11"
+ * @param {String} text String text
+ * @returns {Number}
+ */
+Char.GetByteLength = function(text) {
+	if (!text || !text.toString) return 0;
+	text = text.toString();
+
+	const encoder = _w.encodeURIComponent;
+	let cr, cl;
+	if (env.isIE || env.isEdge) {
+		cl = _w.unescape(encoder(text)).length;
+		cr = 0;
+
+		if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
+			cr = encoder(text).match(/(%0A|%0D)/gi).length;
+		}
+
+		return cl + cr;
+	} else {
+		cl = new _w.TextEncoder("utf-8").encode(text).length;
+		cr = 0;
+
+		if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
+			cr = encoder(text).match(/(%0A|%0D)/gi).length;
+		}
+
+		return cl + cr;
 	}
 };
 

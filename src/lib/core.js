@@ -7,11 +7,11 @@
  */
 'use strict';
 
-import _Constructor from './constructor';
-import _Context from './context';
-import _history from './history';
+import Constructor from './constructor';
+import Context from './context';
+import history from './history';
 import _util from '../helper/util';
-import _notice from '../plugins/modules/_notice';
+import notice from './classes/notice';
 
 /**
  * @description SunEditor constuctor function.
@@ -87,7 +87,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Notice object
          */
-        notice: _notice,
+        notice: new notice(this),
 
         /**
          * @description Default icons object
@@ -130,6 +130,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _menuTray: {},
+
+        _events: {},
 
         /**
          * @description loaded language
@@ -359,12 +361,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * }
          */
         managedTagsInfo: null,
-
-        /**
-         * @description cashing: options.charCounterType === 'byte-html'
-         * @private
-         */
-        _charTypeHTML: false,
 
         /**
          * @description Array of "checkFileInfo" functions with the core bound
@@ -1417,7 +1413,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Element}
          */
         insertComponent: function (element, notHistoryPush, checkCharCount, notSelect) {
-            if (checkCharCount && !this.checkCharCount(element, null)) {
+            if (checkCharCount && !this.char.check(element)) {
                 return null;
             }
 
@@ -1560,7 +1556,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Object|Node|null}
          */
         insertNode: function (oNode, afterNode, checkCharCount) {
-            if (checkCharCount && !this.checkCharCount(oNode, null)) {
+            if (checkCharCount && !this.char.check(oNode)) {
                 return null;
             }
 
@@ -4855,6 +4851,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             return returnHTML.trim() + '\n';
         },
 
+        addEvent: function(target, type, handler) {
+            target.addEventListener(type, handler, false);
+            this._events.push({ target: target, type: type, handler: handler });
+        },
+    
+        removeAllEvents: function() {
+            for (let i = 0, len = this._events.length, e; i < len; i++) {
+                e = this._events[i];
+                e.target.removeEventListener(e.type, e.handler);
+            }
+            this._events = null;
+        },
+
         /**
          * @description Add an event to document.
          * When created as an Iframe, the same event is added to the document in the Iframe.
@@ -4933,7 +4942,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const wRegExp = _w.RegExp;
             this._ww = options.iframe ? context.element.wysiwygFrame.contentWindow : _w;
             this._wd = _d;
-            this._charTypeHTML = options.charCounterType === 'byte-html';
 
             if (!options.iframe && typeof _w.ShadowRoot === 'function') {
                 let child = context.element.wysiwygFrame;
@@ -5045,7 +5053,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._lineBreakerButton = this._lineBreaker.querySelector('button');
 
             // Excute history function
-            this.history = _history(this, this._onChange_historyStack.bind(this));
+            this.history = history(this, this._onChange_historyStack.bind(this));
 
             // register notice module
             this.addModule([_notice]);
@@ -5228,7 +5236,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _setOptionsInit: function (el, _initHTML) {
-            this.context = context = _Context(el.originElement, this._getConstructed(el));
+            this.context = context = Context(el.originElement, this._getConstructed(el));
             this._componentsInfoReset = true;
             this._editorInit(true, _initHTML);
         },
@@ -5243,7 +5251,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // initialize core and add event listeners
             this._init(reload, _initHTML);
             event._addEvent();
-            this._setCharCount();
+            this.char.display();
             event._offStickyToolbar();
             event.onResize_window();
 
@@ -5792,7 +5800,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core._editorRange();
 
             const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';       
-            if (!core._charCount(data)) {
+            if (!core.char.test(data)) {
                 e.preventDefault();
                 e.stopPropagation();
             }
@@ -6296,7 +6304,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 case 13: /** enter key */
                     const freeFormatEl = util.getFreeFormatElement(selectionNode, null);
 
-                    if (core._charTypeHTML) {
+                    if (options.charCounterType === "byte-html") {
                         let enterHTML = '';
                         if ((!shift && freeFormatEl) || shift) {
                             enterHTML = '<br>';
@@ -6304,7 +6312,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             enterHTML = '<' + formatEl.nodeName + '><br></' + formatEl.nodeName + '>';
                         }
 
-                        if (!core.checkCharCount(enterHTML, 'byte-html')) {
+                        if (!core.this.char.check(enterHTML)) {
                             e.preventDefault();
                             return false;
                         }
@@ -6536,7 +6544,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 core.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
             }
 
-            core._charCount('');
+            core.char.test('');
 
             // history stack
             core.history.push(true);
@@ -6903,7 +6911,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 cleanData = plainText;
             }
 
-            const maxCharCount = core._charCount(core._charTypeHTML ? cleanData : plainText);
+            const maxCharCount = core.char.test(options.charCounterType === 'byte-html' ? cleanData : plainText);
             // paste event
             if (type === 'paste' && typeof functions.onPaste === 'function') {
                 const value = functions.onPaste(e, cleanData, maxCharCount, core);
@@ -6998,7 +7006,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const format = util.createElement(isList ? 'BR' : util.isCell(component.parentNode) ? 'DIV' : options.defaultTag);
             if (!isList) format.innerHTML = '<br>';
 
-            if (core._charTypeHTML && !core.checkCharCount(format.outerHTML, 'byte-html')) return;
+            if (options.charCounterType === 'byte-html' && !this.char.check(format.outerHTML)) return;
 
             component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
             core._lineBreaker.style.display = 'none';
@@ -7387,13 +7395,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.submenuOff();
             core.containerOff();
             
-            const newToolbar = _Constructor._createToolBar(_d, buttonList, core.plugins, options);
+            const newToolbar = Constructor._createToolBar(_d, buttonList, core.plugins, options);
             _responsiveButtons = newToolbar.responsiveButtons;
             core._moreLayerActiveButton = null;
             event._setResponsiveToolbar();
 
             context.element.toolbar.replaceChild(newToolbar._buttonTray, context.element._buttonTray);
-            const newContext = _Context(context.element.originElement, core._getConstructed(context.element), options);
+            const newContext = Context(context.element.originElement, core._getConstructed(context.element), options);
 
             context.element = newContext.element;
             context.buttons = newContext.buttons;
@@ -7459,7 +7467,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const _initHTML = el.wysiwyg.innerHTML;
 
             // set option
-            const cons = _Constructor._setOptions(mergeOptions, context, options);        
+            const cons = Constructor._setOptions(mergeOptions, context, options);        
 
             if (cons.callButtons) {
                 pluginCallButtons = cons.callButtons;
@@ -7600,12 +7608,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     const domTree = dom.childNodes;
 
                     if (checkCharCount) {
-                        const type = core._charTypeHTML ? 'outerHTML' : 'textContent';
+                        const type = options.charCounterType === 'byte-html' ? 'outerHTML' : 'textContent';
                         let checkHTML = '';
                         for (let i = 0, len = domTree.length; i < len; i++) {
                             checkHTML += domTree[i][type];
                         }
-                        if (!core.checkCharCount(checkHTML, null)) return;
+                        if (!core.char.check(checkHTML)) return;
                     }
 
                     let c, a, t, prev, firstCon;

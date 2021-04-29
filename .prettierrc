@@ -15,5 +15,6 @@
   "tabWidth": 4,
   "trailingComma": "none",
   "useTabs": true,
-  "vueIndentScriptAndStyle": false
+  "vueIndentScriptAndStyle": false,
+  "extends": ["plugin:prettier/recommended", "prettier/@typescript-eslint"]
 }
