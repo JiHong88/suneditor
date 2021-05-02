@@ -1,7 +1,7 @@
-import Editor from "../../interface/editor";
+import CoreInterface from "../../interface/_core";
 
 const Notice = function(editor) {
-	Editor.call(this, editor);
+	CoreInterface.call(this, editor);
 
 	this.modal = core.util.createElement("DIV");
 	this.message = core.util.createElement("SPAN");

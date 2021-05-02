@@ -1,9 +1,16 @@
-import Editor from "../../interface/editor";
-import { _w } from "../../helper/global";
+/**
+ * @fileoverview Char class
+ * @author JiHong Lee.
+ */
+"use strict";
+
+import CoreInterface from "../../interface/_core";
 import env from "../../helper/env";
+import { window } from "../../helper/global";
+import { addClass, removeClass, hasClass } from "../../helper/dom";
 
 const Char = function(editor) {
-	Editor.call(this, editor);
+	CoreInterface.call(this, editor);
 	this.selection = editor.selection;
 };
 
@@ -51,7 +58,7 @@ Char.prototype = {
 	 */
 	display: function() {
 		if (context.element.charCounter) {
-			_w.setTimeout(
+			window.setTimeout(
 				function() {
 					this.context.element.charCounter.textContent = this.getLength();
 				}.bind(this)
@@ -80,22 +87,22 @@ Char.prototype = {
 			if (count > maxCharCount) {
 				over = true;
 				if (nextCharCount > 0) {
-					this._editorRange();
-					const range = this.getRange();
+					this.selection._editorRange();
+					const range = this.selection.getRange();
 					const endOff = range.endOffset - 1;
-					const text = this.getSelectionNode().textContent;
+					const text = this.selection.getSelectionNode().textContent;
 					const slicePosition = range.endOffset - (count - maxCharCount);
 
-					this.getSelectionNode().textContent =
+					this.selection.getSelectionNode().textContent =
 						text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
-					this.setRange(range.endContainer, endOff, range.endContainer, endOff);
+					this.selection.setRange(range.endContainer, endOff, range.endContainer, endOff);
 				}
 			} else if (count + nextCharCount > maxCharCount) {
 				over = true;
 			}
 
 			if (over) {
-				Char.CounterBlink(context.element.charWrapper);
+				Char.CounterBlink(this.context.element.charWrapper);
 				if (nextCharCount > 0) return false;
 			}
 		}
@@ -112,10 +119,10 @@ Char.prototype = {
  * @private
  */
 Char.CounterBlink = function(charWrapper) {
-	if (charWrapper && !util.hasClass(charWrapper, "se-blink")) {
-		util.addClass(charWrapper, "se-blink");
-		_w.setTimeout(function() {
-			util.removeClass(charWrapper, "se-blink");
+	if (charWrapper && !hasClass(charWrapper, "se-blink")) {
+		addClass(charWrapper, "se-blink");
+		window.setTimeout(function() {
+			removeClass(charWrapper, "se-blink");
 		}, 600);
 	}
 };
@@ -130,10 +137,10 @@ Char.GetByteLength = function(text) {
 	if (!text || !text.toString) return 0;
 	text = text.toString();
 
-	const encoder = _w.encodeURIComponent;
+	const encoder = window.encodeURIComponent;
 	let cr, cl;
 	if (env.isIE || env.isEdge) {
-		cl = _w.unescape(encoder(text)).length;
+		cl = window.unescape(encoder(text)).length;
 		cr = 0;
 
 		if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
@@ -142,7 +149,7 @@ Char.GetByteLength = function(text) {
 
 		return cl + cr;
 	} else {
-		cl = new _w.TextEncoder("utf-8").encode(text).length;
+		cl = new window.TextEncoder("utf-8").encode(text).length;
 		cr = 0;
 
 		if (encoder(text).match(/(%0A|%0D)/gi) !== null) {

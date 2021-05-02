@@ -1,9 +1,9 @@
-export const _w = window;
-export const _d = document;
+export const window = window;
+export const document = document;
 
 const global = {
-    _w: _w,
-    _d: _d
-}
+	window: window,
+	document: document
+};
 
 export default global;

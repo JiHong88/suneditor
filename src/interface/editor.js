@@ -1,14 +1,8 @@
-function Editor(core) {
-	this._w = core._w;
-	this._d = core._d;
-	this.editor = core;
-	this.plugins = core.plugins;
-    this.status = core.status;
-	this.options = core.options;
-	this.context = core.context;
-	this.history = core.history;
-    this.util = core.util;
+import CoreInterface from "./_core";
+
+function Editor(editor) {
+	CoreInterface.call(this, editor);
+	this.selection = editor.selection;
 }
 
 export default Editor;
-
