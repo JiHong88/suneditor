@@ -3847,6 +3847,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (this.hasFocus) event._applyTagEffects();
             this._variable.isChanged = true;
             if (context.buttons.save) context.buttons.save.removeAttribute('disabled');
+            // user event
             if (functions.onChange) functions.onChange(this.getContents(true), this);
             if (context.element.toolbar.style.display === 'block') event._showToolbarBalloon();
         },
@@ -3991,7 +3992,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._resourcesStateChange();
 
             _w.setTimeout(function () {
-              if (typeof functions.onload === 'function') functions.onload(core, reload);
+                // user event
+                if (typeof functions.onload === 'function') functions.onload(core, reload);
             });
         },
 
@@ -4256,6 +4258,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         onMouseDown_wysiwyg: function (e) {
             if (util.isNonEditable(context.element.wysiwyg)) return;
+
+            // user event
+            if (typeof functions.onMouseDown === 'function') functions.onMouseDown(e, core);
             
             const tableCell = util.getParentElement(e.target, util.isCell);
             if (tableCell) {
@@ -4272,12 +4277,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             if (/FIGURE/i.test(e.target.nodeName)) e.preventDefault();
-            if (typeof functions.onMouseDown === 'function') functions.onMouseDown(e, core);
         },
 
         onClick_wysiwyg: function (e) {
             const targetElement = e.target;
             if (util.isNonEditable(context.element.wysiwyg)) return;
+
+            // user event
+            if (typeof functions.onClick === 'function') functions.onClick(e, core);
 
             const fileComponentInfo = core.getFileComponent(targetElement);
             if (fileComponentInfo) {
@@ -4333,7 +4340,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             if (core._isBalloon) _w.setTimeout(event._toggleToolbarBalloon);
-            if (typeof functions.onClick === 'function') functions.onClick(e, core);
         },
 
         _balloonDelay: null,
@@ -4524,6 +4530,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onInput_wysiwyg: function (e) {
             core._editorRange();
 
+            // user event
+            if (typeof functions.onInput === 'function') functions.onInput(e, core);
+
             const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';       
             if (!core.char.test(data)) {
                 e.preventDefault();
@@ -4532,8 +4541,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // history stack
             core.history.push(true);
-
-            if (typeof functions.onInput === 'function') functions.onInput(e, core);
         },
 
         _isUneditableNode: function (range, isFront) {
@@ -4579,6 +4586,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (core._isBalloon) {
                 event._hideToolbar();
             }
+
+            // user event
+            if (typeof functions.onKeyDown === 'function') functions.onKeyDown(e, core);
 
             /** Shortcuts */
             if (ctrl && event._shortcutCommand(keyCode, shift)) {
@@ -5207,8 +5217,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 core.insertNode(zeroWidth, null, false);
                 core.setRange(zeroWidth, 1, zeroWidth, 1);
             }
-
-            if (typeof functions.onKeyDown === 'function') functions.onKeyDown(e, core);
         },
 
         onKeyUp_wysiwyg: function (e) {
@@ -5229,6 +5237,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     return;
                 }
             }
+
+            // user event
+            if (typeof functions.onKeyUp === 'function') functions.onKeyUp(e, core);
 
             /** when format tag deleted */
             if (keyCode === 8 && util.isWysiwygDiv(selectionNode) && selectionNode.textContent === '' && selectionNode.children.length === 0) {
@@ -5273,13 +5284,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // history stack
             core.history.push(true);
-
-            if (typeof functions.onKeyUp === 'function') functions.onKeyUp(e, core);
         },
 
         onScroll_wysiwyg: function (e) {
             core.controllersOff();
             if (core._isBalloon) event._hideToolbar();
+
+            // user event
             if (typeof functions.onScroll === 'function') functions.onScroll(e, core);
         },
 
@@ -5287,6 +5298,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (core._antiBlur) return;
             core.hasFocus = true;
             if (core._isInline) event._showToolbarInline();
+
+            // user event
             if (typeof functions.onFocus === 'function') functions.onFocus(e, core);
         },
 
@@ -5295,6 +5308,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.hasFocus = false;
             core.controllersOff();
             if (core._isInline || core._isBalloon) event._hideToolbar();
+
+            // user event
             if (typeof functions.onBlur === 'function') functions.onBlur(e, core);
 
             // active class reset of buttons
@@ -5516,6 +5531,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         onCopy_wysiwyg: function (e) {
             const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
+            
+            // user event
             if (typeof functions.onCopy === 'function' && !functions.onCopy(e, clipboardData, core)) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -5535,6 +5552,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         onCut_wysiwyg: function (e) {
             const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
+
+            // user event
             if (typeof functions.onCut === 'function' && !functions.onCut(e, clipboardData, core)) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -5637,13 +5656,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             const maxCharCount = core.char.test(options.charCounterType === 'byte-html' ? cleanData : plainText);
-            // paste event
+            // user event - paste
             if (type === 'paste' && typeof functions.onPaste === 'function') {
                 const value = functions.onPaste(e, cleanData, maxCharCount, core);
                 if (!value) return false;
                 if (typeof value === 'string') cleanData = value;
             }
-            // drop event
+            // user event - drop
             if (type === 'drop' && typeof functions.onDrop === 'function') {
                 const value = functions.onDrop(e, cleanData, maxCharCount, core);
                 if (!value) return false;
