@@ -155,7 +155,7 @@ export default {
         // blockquote
         if (command === 'range') {
             const rangeElement = tag.cloneNode(false);
-            this.applyRangeFormatElement(rangeElement);
+            this.format.applyRangeBlock(rangeElement);
         }
         // free, replace
         else {
@@ -178,7 +178,7 @@ export default {
             const lastPath = util.getNodePath(range.endContainer, last, null, null);
             
             // remove selected list
-            const rlist = this.detachList(selectedFormsts, false);
+            const rlist = this.removeList(selectedFormsts, false);
             if (rlist.sc) first = rlist.sc;
             if (rlist.ec) last = rlist.ec;
 

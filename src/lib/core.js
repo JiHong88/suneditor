@@ -435,7 +435,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @property {Number} innerHeight_fullScreen InnerHeight in editor when in full screen
          * @property {Number} resizeClientY Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
          * @property {Number} tabSize Indent size of tab (4)
-         * @property {Number} codeIndent Indent size of Code view mode (4)
+         * @property {Number} indentSize Indent size (25)px
+         * @property {Number} codeIndentSize Indent size of Code view mode (4)
          * @property {Number} minResizingSize Minimum size of editing area when resized {Number} (.se-wrapper-inner {min-height: 65px;} || 65)
          * @property {Array} currentNodes  An array of the current cursor's node structure
          * @private
@@ -446,8 +447,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             isFullScreen: false,
             innerHeight_fullScreen: 0,
             resizeClientY: 0,
+            indentSize: 25,
             tabSize: 4,
-            codeIndent: 4,
+            codeIndentSize: 4,
             minResizingSize: util.getNumber((context.element.wysiwygFrame.style.minHeight || '65'), 0),
             currentNodes: [],
             currentNodesMap: [],
@@ -979,30 +981,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         closeLoading: function () {
             context.element.loading.style.display = 'none';
-        },
-
-        /**
-         * @description Append format element to sibling node of argument element.
-         * If the "formatNodeName" argument value is present, the tag of that argument value is inserted,
-         * If not, the currently selected format tag is inserted.
-         * @param {Element} element Insert as siblings of that element
-         * @param {String|Element|null} formatNode Node name or node obejct to be inserted
-         * @returns {Element}
-         */
-        appendFormatTag: function (element, formatNode) {
-            const currentFormatEl = util.getFormatElement(this.getSelectionNode(), null);
-            const oFormatName = formatNode ? (typeof formatNode === 'string' ? formatNode : formatNode.nodeName) : (util.isFormatElement(currentFormatEl) && !util.isFreeFormatElement(currentFormatEl)) ? currentFormatEl.nodeName : options.defaultTag;
-            const oFormat = util.createElement(oFormatName);
-            oFormat.innerHTML = '<br>';
-
-            if ((formatNode && typeof formatNode !== 'string') || (!formatNode && util.isFormatElement(currentFormatEl))) {
-                util.copyTagAttributes(oFormat, formatNode || currentFormatEl);
-            }
-
-            if (util.isCell(element)) element.insertBefore(oFormat, element.nextElementSibling);
-            else element.parentNode.insertBefore(oFormat, element.nextElementSibling);
-
-            return oFormat;
         },
 
         /**
@@ -2804,8 +2782,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     this.toggleFullScreen(target);
                     break;
                 case 'indent':
+                    this.format.indent();
+                    break;
                 case 'outdent':
-                    this.indent(command);
+                    this.format.outdent();
                     break;
                 case 'undo':
                     this.history.undo();
@@ -2862,51 +2842,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         removeFormat: function () {
             this.nodeChange(null, null, null, null);
-        },
-
-        /**
-         * @description This method implements indentation to selected range.
-         * Setted "margin-left" to "25px" in the top "P" tag of the parameter node.
-         * @param {String} command Separator ("indent" or "outdent")
-         */
-        indent: function (command) {
-            const range = this.getRange();
-            const rangeLines = this.getSelectedElements(null);
-            const cells = [];
-            const shift = 'indent' !== command;
-            const marginDir = options.rtl ? 'marginRight' : 'marginLeft';
-            let sc = range.startContainer;
-            let ec = range.endContainer;
-            let so = range.startOffset;
-            let eo = range.endOffset;
-
-            for (let i = 0, len = rangeLines.length, f, margin; i < len; i++) {
-                f = rangeLines[i];
-                if (!util.isListCell(f) || !this.plugins.list) {
-                    margin = /\d+/.test(f.style[marginDir]) ? util.getNumber(f.style[marginDir], 0) : 0;
-                    if (shift) {
-                        margin -= 25;
-                    } else {
-                        margin += 25;
-                    }
-                    util.setStyle(f, marginDir, (margin <= 0 ? '' : margin + 'px'));
-                } else {
-                    if (shift || f.previousElementSibling) {
-                        cells.push(f);
-                    }
-                }
-            }
-
-            // list cells
-            if (cells.length > 0) {
-                this.plugins.list.editInsideList.call(this, shift, cells);
-            }
-
-            this.effectNode = null;
-            this.setRange(sc, so, ec, eo);
-
-            // history stack
-            this.history.push(false);
         },
 
         /**
@@ -3538,7 +3473,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const isFormatElement = util.isFormatElement.bind(util);
             const wDoc = typeof html === 'string' ? _d.createRange().createContextualFragment(html) : html;
 
-            let indentSize = this._variable.codeIndent * 1;
+            let indentSize = this._variable.codeIndentSize * 1;
             indentSize = indentSize > 0 ? new _w.Array(indentSize + 1).join(' ') : '';
 
             (function recursionFunc (element, indent, lineBR) {
@@ -4767,7 +4702,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
     
                             if (detach && rangeEl.parentNode) {
                                 e.preventDefault();
-                                core.detachRangeFormatElement(rangeEl, (util.isListCell(formatEl) ? [formatEl] : null), null, false, false);
+                                core.format.removeRangeBlock(rangeEl, (util.isListCell(formatEl) ? [formatEl] : null), null, false, false);
                                 // history stack
                                 core.history.push(true);
                                 break;
@@ -4936,8 +4871,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
                     
                     // Nested list
-                    if (cells.length > 0 && isEdge && core.plugins.list) {
-                        r = core.plugins.list.editInsideList.call(core, shift, cells);
+                    if (cells.length > 0 && isEdge) {
+                        r = core.format._applyNestedList(cells, shift);
                     } else {
                         // table
                         const tableCell = util.getParentElement(selectionNode, util.isCell);
@@ -5056,7 +4991,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (!shift) {
                         if (core.isEdgeFormat(range.endContainer, range.endOffset, 'end') || /^HR$/i.test(formatEl.nodeName)) {
                             e.preventDefault();
-                            const newFormat = core.appendFormatTag(formatEl, /^H[1-6r]$/i.test(formatEl.nodeName) ? options.defaultTag : formatEl.cloneNode(true));
+                            const newFormat = core.format.appendLine(formatEl, /^H[1-6r]$/i.test(formatEl.nodeName) ? options.defaultTag : formatEl.cloneNode(true));
                             core.setRange(newFormat, 1, newFormat, 1);
                             break;
                         }
@@ -5071,7 +5006,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                               (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(prev) && (util.isBreak(prev.previousSibling) || !util.onlyZeroWidthSpace(prev.previousSibling.textContent)) && (!next || (!util.isBreak(next) && util.onlyZeroWidthSpace(next.textContent)))))) {
                                 if (selectionFormat) util.removeItem(children[offset - 1]);
                                 else util.removeItem(selectionNode);
-                                const newEl = core.appendFormatTag(freeFormatEl, util.isFormatElement(freeFormatEl.nextElementSibling) ? freeFormatEl.nextElementSibling : null);
+                                const newEl = core.format.appendLine(freeFormatEl, util.isFormatElement(freeFormatEl.nextElementSibling) ? freeFormatEl.nextElementSibling : null);
                                 util.copyFormatAttributes(newEl, freeFormatEl);
                                 core.setRange(newEl, 1, newEl, 1);
                                 break;
@@ -5139,7 +5074,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             } else {
                                 const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : util.isFormatElement(rangeEl.nextElementSibling) ? rangeEl.nextElementSibling.nodeName : util.isFormatElement(rangeEl.previousElementSibling) ? rangeEl.previousElementSibling.nodeName : options.defaultTag;
                                 newEl = util.createElement(newFormat);
-                                const edge = core.detachRangeFormatElement(rangeEl, [formatEl], null, true, true);
+                                const edge = core.format.removeRangeBlock(rangeEl, [formatEl], null, true, true);
                                 edge.cc.insertBefore(newEl, edge.ec);
                             }
                             
@@ -5153,7 +5088,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                     if (rangeEl && util.getParentElement(rangeEl, 'FIGCAPTION') && util.getParentElement(rangeEl, util.isList)) {
                         e.preventDefault();
-                        formatEl = core.appendFormatTag(formatEl, null);
+                        formatEl = core.format.appendLine(formatEl, null);
                         core.setRange(formatEl, 0, formatEl, 0);
                     }
 

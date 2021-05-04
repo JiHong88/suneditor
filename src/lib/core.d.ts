@@ -372,16 +372,6 @@ interface Core {
     closeLoading(): void;
 
     /**
-     * @description Append format element to sibling node of argument element.
-     * If the "formatNodeName" argument value is present, the tag of that argument value is inserted,
-     * If not, the currently selected format tag is inserted.
-     * @param element Insert as siblings of that element
-     * @param formatNode Node name or node obejct to be inserted
-     * @returns
-     */
-    appendFormatTag(element: Element, formatNode?: string | Element): Element;
-
-    /**
      * @description The method to insert a element and return. (used elements : table, hr, image, video)
      * If "element" is "HR", insert and return the new line.
      * @param element Element to be inserted
@@ -425,34 +415,6 @@ interface Core {
     removeNode(): { container: Node; offset: number; prevContainer?: Node };
 
     /**
-     * @description Appended all selected format Element to the argument element and insert
-     * @param rangeElement Element of wrap the arguments (BLOCKQUOTE...)
-     */
-    applyRangeFormatElement(rangeElement: Element): void;
-
-    /**
-     * @description The elements of the "selectedFormats" array are detached from the "rangeElement" element. ("LI" tags are converted to "P" tags)
-     * When "selectedFormats" is null, all elements are detached and return {cc: parentNode, sc: nextSibling, ec: previousSibling, removeArray: [Array of removed elements]}.
-     * @param rangeElement Range format element (PRE, BLOCKQUOTE, OL, UL...)
-     * @param selectedFormats Array of format elements (P, DIV, LI...) to remove.
-     * If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}
-     * @param newRangeElement The node(rangeElement) to replace the currently wrapped node.
-     * @param remove If true, deleted without detached.
-     * @param notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
-     * @returns
-     */
-    detachRangeFormatElement(rangeElement: Element, selectedFormats: Element[] | null, newRangeElement: Element | null, remove: boolean, notHistoryPush: boolean): {cc: Node, sc: Node, ec: Node, removeArray: Element[]}
-
-    /**
-     * @description "selectedFormats" array are detached from the list element.
-     * The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
-     * @param selectedFormats Array of format elements (LI, P...) to remove.
-     * @param remove If true, deleted without detached.
-     * @returns {sc: <LI>, ec: <LI>}.
-     */
-    detachList(selectedFormats: Element[], remove: boolean): {sc: Element, ec: Element};
-
-    /**
      * @description Add, update, and delete nodes from selected text.
      * 1. If there is a node in the "appendNode" argument, a node with the same tags and attributes as "appendNode" is added to the selection text.
      * 2. If it is in the same tag, only the tag's attributes are changed without adding a tag.
@@ -494,13 +456,6 @@ interface Core {
      * @description Remove format of the currently selected range
      */
     removeFormat(): void;
-
-    /**
-     * @description This method implements indentation to selected range.
-     * Setted "margin-left" to "25px" in the top "P" tag of the parameter node.
-     * @param command Separator ("indent" or "outdent")
-     */
-    indent(command: 'indent' | 'outdent'): void;
 
     /**
      * @description Add or remove the class name of "body" so that the code block is visible

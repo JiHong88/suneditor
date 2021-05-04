@@ -558,15 +558,6 @@ declare interface util {
      * @returns
      */
     removeItemAllParents(item: Node, validation?: Function, stopParent?: Element): Record<string, Node | null> | null;
-    
-    /**
-     * @description Detach Nested all nested lists under the "baseNode".
-     * Returns a list with nested removed.
-     * @param baseNode Element on which to base.
-     * @param all If true, it also detach all nested lists of a returned list.
-     * @returns
-     */
-    detachNestedList(baseNode: Node, all: boolean): Element;
 
     /**
      * @description Split all tags based on "baseNode"

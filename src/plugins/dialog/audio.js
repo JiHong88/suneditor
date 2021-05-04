@@ -430,7 +430,7 @@ export default {
                 return;
             }
             if (!this.options.mediaAutoSelect) {
-                const line = this.appendFormatTag(container, null);
+                const line = this.format.appendLine(container, null);
                 this.setRange(line, 0, line, 0);
             }
         } // update

@@ -682,7 +682,7 @@ export default {
         if (this.options.mediaAutoSelect) {
             this.selectComponent(oImg, 'image');
         } else {
-            const line = this.appendFormatTag(container, null);
+            const line = this.format.appendLine(container, null);
             this.setRange(line, 0, line, 0);
         }
     },

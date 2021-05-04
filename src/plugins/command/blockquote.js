@@ -39,9 +39,9 @@ export default {
         const currentBlockquote = this.util.getParentElement(this.getSelectionNode(), 'blockquote');
 
         if (currentBlockquote) {
-            this.detachRangeFormatElement(currentBlockquote, null, null, false, false);
+            this.format.removeRangeBlock(currentBlockquote, null, null, false, false);
         } else {
-            this.applyRangeFormatElement(this.context.blockquote.tag.cloneNode(false));
+            this.format.applyRangeBlock(this.context.blockquote.tag.cloneNode(false));
         }
     }
 };
