@@ -3809,7 +3809,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
 
                 const wysiwyg = context.element.wysiwyg;
-                if (!util.onlyZeroWidthSpace(wysiwyg.textContent) || wysiwyg.querySelector('.se-component, pre, blockquote, hr, li, table, img, iframe, video') || (wysiwyg.innerText.match(/\n/g) || '').length > 1) {
+                if (!util.onlyZeroWidthSpace(wysiwyg.textContent) || wysiwyg.querySelector(util._allowedEmptyNodeList) || (wysiwyg.innerText.match(/\n/g) || '').length > 1) {
                     this._placeholder.style.display = 'none';
                 } else {
                     this._placeholder.style.display = 'block';
@@ -4195,7 +4195,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (util.isNonEditable(context.element.wysiwyg)) return;
 
             // user event
-            if (typeof functions.onMouseDown === 'function') functions.onMouseDown(e, core);
+            if (typeof functions.onMouseDown === 'function' && functions.onMouseDown(e, core) === false) return;
             
             const tableCell = util.getParentElement(e.target, util.isCell);
             if (tableCell) {
@@ -4219,7 +4219,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (util.isNonEditable(context.element.wysiwyg)) return;
 
             // user event
-            if (typeof functions.onClick === 'function') functions.onClick(e, core);
+            if (typeof functions.onClick === 'function' && functions.onClick(e, core) === false) return;
 
             const fileComponentInfo = core.getFileComponent(targetElement);
             if (fileComponentInfo) {
@@ -4466,7 +4466,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core._editorRange();
 
             // user event
-            if (typeof functions.onInput === 'function') functions.onInput(e, core);
+            if (typeof functions.onInput === 'function' && functions.onInput(e, core) === false) return;
 
             const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';       
             if (!core.char.test(data)) {
@@ -4523,7 +4523,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             // user event
-            if (typeof functions.onKeyDown === 'function') functions.onKeyDown(e, core);
+            if (typeof functions.onKeyDown === 'function' && functions.onKeyDown(e, core) === false) return;
 
             /** Shortcuts */
             if (ctrl && event._shortcutCommand(keyCode, shift)) {
@@ -5174,7 +5174,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             // user event
-            if (typeof functions.onKeyUp === 'function') functions.onKeyUp(e, core);
+            if (typeof functions.onKeyUp === 'function' && functions.onKeyUp(e, core) === false) return;
 
             /** when format tag deleted */
             if (keyCode === 8 && util.isWysiwygDiv(selectionNode) && selectionNode.textContent === '' && selectionNode.children.length === 0) {

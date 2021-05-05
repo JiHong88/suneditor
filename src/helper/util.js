@@ -11,6 +11,8 @@
  * @description utility function
  */
 const util = {
+    _allowedEmptyNodeList: '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas',
+    
     /**
      * @description Unicode Character 'ZERO WIDTH SPACE' (\u200B)
      */

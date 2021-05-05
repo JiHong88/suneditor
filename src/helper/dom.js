@@ -103,7 +103,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 
 	this.getParentElement(
 		node,
-		function(el) {
+		function (el) {
 			if (el === parentNode) finds = false;
 			if (finds && !this.isWysiwygDiv(el)) {
 				// merge text nodes
@@ -197,7 +197,8 @@ export function isSameAttributes(a, b) {
 	return (
 		compStyle === style_b.length &&
 		compStyle === style_a.length &&
-		(compClass === class_b.length && compClass === class_a.length)
+		compClass === class_b.length &&
+		compClass === class_a.length
 	);
 }
 
@@ -276,7 +277,7 @@ export function getListChildren(element, validation) {
 
 	validation =
 		validation ||
-		function() {
+		function () {
 			return true;
 		};
 
@@ -307,7 +308,7 @@ export function getListChildNodes(element, validation) {
 
 	validation =
 		validation ||
-		function() {
+		function () {
 			return true;
 		};
 
@@ -405,7 +406,7 @@ export function getParentElement(element, query) {
 		}
 
 		const regExp = new this._w.RegExp(query, "i");
-		check = function(el) {
+		check = function (el) {
 			return regExp.test(el[attr]);
 		};
 	}
@@ -453,12 +454,12 @@ export function getChildElement(element, query, last) {
 		}
 
 		const regExp = new this._w.RegExp(query, "i");
-		check = function(el) {
+		check = function (el) {
 			return regExp.test(el[attr]);
 		};
 	}
 
-	const childList = this.getListChildNodes(element, function(current) {
+	const childList = this.getListChildNodes(element, function (current) {
 		return check(current);
 	});
 
@@ -601,11 +602,8 @@ export function toggleClass(element, className) {
  */
 export function removeItem(item) {
 	if (!item) return;
-	try {
-		item.remove();
-	} catch (e) {
-		if (item.parentNode) item.parentNode.removeChild(item);
-	}
+	if (typeof item.remove === "function") item.remove();
+	else if (item.parentNode) item.parentNode.removeChild(item);
 }
 
 /**
@@ -620,7 +618,7 @@ export function removeItemAllParents(item, validation, stopParent) {
 	if (!item) return null;
 	let cc = null;
 	if (!validation) {
-		validation = function(current) {
+		validation = function (current) {
 			if (current === stopParent || this.isComponent(current)) return false;
 			const text = current.textContent.trim();
 			return text.length === 0 || /^(\n|\u200B)+$/.test(text);
@@ -710,7 +708,7 @@ export function splitElement(baseNode, offset, depth) {
 	this.mergeSameTags(newEl, null, false);
 	this.mergeNestedTags(
 		newEl,
-		function(current) {
+		function (current) {
 			return this.isList(current);
 		}.bind(this)
 	);
@@ -883,11 +881,11 @@ export function mergeSameTags(element, nodePathArray, onlyText) {
  */
 export function mergeNestedTags(element, validation) {
 	if (typeof validation === "string") {
-		validation = function(current) {
+		validation = function (current) {
 			return this.test(current.tagName);
 		}.bind(new this._w.RegExp("^(" + (validation ? validation : ".+") + ")$", "i"));
 	} else if (typeof validation !== "function") {
-		validation = function() {
+		validation = function () {
 			return true;
 		};
 	}
@@ -918,7 +916,7 @@ export function removeEmptyNode(element, notRemoveNode) {
 	const inst = this;
 
 	if (notRemoveNode) {
-		notRemoveNode = inst.getParentElement(notRemoveNode, function(current) {
+		notRemoveNode = inst.getParentElement(notRemoveNode, function (current) {
 			return element === current.parentElement;
 		});
 	}
@@ -928,7 +926,8 @@ export function removeEmptyNode(element, notRemoveNode) {
 		if (
 			current !== element &&
 			inst.onlyZeroWidthSpace(current.textContent) &&
-			(!current.firstChild || !inst.isBreak(current.firstChild))
+			(!current.firstChild || !inst.isBreak(current.firstChild)) &&
+			!current.querySelector(inst._allowedEmptyNodeList)
 		) {
 			if (current.parentNode) {
 				current.parentNode.removeChild(current);
