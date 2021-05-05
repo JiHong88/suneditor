@@ -1055,7 +1055,7 @@ editor.toolbar.show();
 
 // Event functions -------------------------------------------------------------------------------------
 // It can be redefined by receiving event object as parameter.
-// It is not called in exceptional cases and is called after the default event function has finished.
+// It is not called in exceptional cases and is called after the default event function has before finished.
 // e: event object, core: Core object
 editor.onScroll = function (e, core) { console.log('onScroll', e) }
 

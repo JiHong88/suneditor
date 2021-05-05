@@ -25,6 +25,8 @@ const util = {
         this.isOSX_IOS = /(Mac|iPhone|iPod|iPad)/.test(navigator.platform);
     },
 
+    _allowedEmptyNodeList: '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas',
+
     /**
      * @description HTML Reserved Word Converter.
      * @param {String} contents 
@@ -1190,11 +1192,9 @@ const util = {
      */
     removeItem: function (item) {
         if (!item) return;
-        try {
-            item.remove();
-        } catch (e) {
-            if (item.parentNode) item.parentNode.removeChild(item);
-        }
+
+        if(typeof item.remove === 'function') item.remove();
+        else if (item.parentNode) item.parentNode.removeChild(item);
     },
 
     /**
@@ -1568,7 +1568,7 @@ const util = {
         
         (function recursionFunc(current) {
             if (inst._notTextNode(current) || current === notRemoveNode || inst.isNonEditable(current)) return 0;
-            if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && (!current.firstChild || !inst.isBreak(current.firstChild))) {
+            if (current !== element && inst.onlyZeroWidthSpace(current.textContent) && (!current.firstChild || !inst.isBreak(current.firstChild)) && !current.querySelector(inst._allowedEmptyNodeList)) {
                 if (current.parentNode) {
                     current.parentNode.removeChild(current);
                     return -1;
