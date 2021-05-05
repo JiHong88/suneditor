@@ -381,21 +381,21 @@ s1.onKeyDown = function (e, core) {
 }
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
-    value: "aa",
-    value: `
-    <h1>header111</h1>
-    <p>fdafds</p>
-    <h2>header22222</h2>
-    <p>fdafds13fsoiph</p>
-    <h3>header--33333</h3>
-    <p>fd23584jkfsoiph</p>
-    <p>fdaf5555oiph</p>
-    <p>102389kjfsaph</p>
-    `,
-    value: `
-    <p>​<strong><span style="color: rgb(255, 94, 0);">SunEditor</span></strong>&nbsp;<em><span style="background-color: rgb(250, 237, 125);">distributed under</span></em>&nbsp;the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a>&nbsp;license.<br>
-    </p>
-    `,
+    value: "<p>This is just an example</p>",
+    // value: `
+    // <h1>header111</h1>
+    // <p>fdafds</p>
+    // <h2>header22222</h2>
+    // <p>fdafds13fsoiph</p>
+    // <h3>header--33333</h3>
+    // <p>fd23584jkfsoiph</p>
+    // <p>fdaf5555oiph</p>
+    // <p>102389kjfsaph</p>
+    // `,
+    // value: `
+    // <p>​<strong><span style="color: rgb(255, 94, 0);">SunEditor</span></strong>&nbsp;<em><span style="background-color: rgb(250, 237, 125);">distributed under</span></em>&nbsp;the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a>&nbsp;license.<br>
+    // </p>
+    // `,
     plugins: {...{custom_container}, ...plugins},
     katex: Katex,
     codeMirror: CodeMirror,
