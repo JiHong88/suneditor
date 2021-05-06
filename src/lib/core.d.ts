@@ -415,28 +415,6 @@ interface Core {
     removeNode(): { container: Node; offset: number; prevContainer?: Node };
 
     /**
-     * @description Add, update, and delete nodes from selected text.
-     * 1. If there is a node in the "appendNode" argument, a node with the same tags and attributes as "appendNode" is added to the selection text.
-     * 2. If it is in the same tag, only the tag's attributes are changed without adding a tag.
-     * 3. If the "appendNode" argument is null, the node of the selection is update or remove without adding a new node.
-     * 4. The same style as the style attribute of the "styleArray" argument is deleted.
-     *    (Styles should be put with attribute names from css. ["background-color"])
-     * 5. The same class name as the class attribute of the "styleArray" argument is deleted.
-     *    (The class name is preceded by "." [".className"])
-     * 6. Use a list of styles and classes of "appendNode" in "styleArray" to avoid duplicate property values.
-     * 7. If a node with all styles and classes removed has the same tag name as "appendNode" or "removeNodeArray", or "appendNode" is null, that node is deleted.
-     * 8. Regardless of the style and class of the node, the tag with the same name as the "removeNodeArray" argument value is deleted.
-     * 9. If the "strictRemove" argument is true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
-     * 10. It won't work if the parent node has the same class and same value style.
-     *    However, if there is a value in "removeNodeArray", it works and the text node is separated even if there is no node to replace.
-     * @param appendNode The element to be added to the selection. If it is null, only delete the node.
-     * @param styleArray The style or className attribute name Array to check (['font-size'], ['.className'], ['font-family', 'color', '.className']...])
-     * @param removeNodeArray An array of node names to remove types from, remove all formats when "appendNode" is null and there is an empty array or null value. (['span'], ['strong', 'em'] ...])
-     * @param strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
-     */
-    nodeChange(appendNode?: Element, styleArray?: string[], removeNodeArray?: string[], strictRemove?: boolean): void;
-
-    /**
      * @description Run plugin calls and basic commands.
      * @param command Command string
      * @param display Display type string ('command', 'submenu', 'dialog', 'container')
@@ -451,11 +429,6 @@ interface Core {
      * @param command Property of command button (data-value)
      */
     commandHandler(target: Element | null, command: commands): void;
-
-    /**
-     * @description Remove format of the currently selected range
-     */
-    removeFormat(): void;
 
     /**
      * @description Add or remove the class name of "body" so that the code block is visible

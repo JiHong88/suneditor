@@ -11,7 +11,7 @@ import { addClass, removeClass, hasClass } from "../../helper/dom";
 
 const Char = function(editor) {
 	CoreInterface.call(this, editor);
-	this.__selection = editor.selection;
+	this.selection = editor.selection;
 };
 
 Char.prototype = {
@@ -87,15 +87,15 @@ Char.prototype = {
 			if (count > maxCharCount) {
 				over = true;
 				if (nextCharCount > 0) {
-					this.__selection._editorRange();
-					const range = this.__selection.getRange();
+					this.selection._editorRange();
+					const range = this.selection.getRange();
 					const endOff = range.endOffset - 1;
-					const text = this.__selection.getSelectionNode().textContent;
+					const text = this.selection.getSelectionNode().textContent;
 					const slicePosition = range.endOffset - (count - maxCharCount);
 
-					this.__selection.getSelectionNode().textContent =
+					this.selection.getSelectionNode().textContent =
 						text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
-					this.__selection.setRange(range.endContainer, endOff, range.endContainer, endOff);
+					this.selection.setRange(range.endContainer, endOff, range.endContainer, endOff);
 				}
 			} else if (count + nextCharCount > maxCharCount) {
 				over = true;

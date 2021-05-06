@@ -11,8 +11,6 @@
  * @description utility function
  */
 const util = {
-    _allowedEmptyNodeList: '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas',
-    
     /**
      * @description Unicode Character 'ZERO WIDTH SPACE' (\u200B)
      */
@@ -562,26 +560,6 @@ const util = {
      */
     _isIgnoreNodeChange: function (element) {
         return element && element.nodeType !== 3 && (this.isNonEditable(element) || !this.isTextStyleElement(element));
-    },
-
-    /**
-     * @description Nodes that must remain undetached when changing text nodes (A, Label, Code, Span:font-size)
-     * @param {Node|String} element Element to check
-     * @returns {Boolean}
-     * @private
-     */
-    _isMaintainedNode: function (element) {
-        return element && element.nodeType !== 3 && /^(a|label|code)$/i.test(typeof element === 'string' ? element : element.nodeName);
-    },
-
-    /**
-     * @description Node with font-size style
-     * @param {Node} element Element to check
-     * @returns {Boolean}
-     * @private
-     */
-    _isSizeNode: function (element) {
-        return element && element.nodeType !== 3 && this.isTextStyleElement(element) && !!element.style.fontSize;
     },
 
     /**

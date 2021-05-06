@@ -289,7 +289,7 @@ export default {
             const sc = this.util.getChildElement(this.context.customLink._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
             const ec = this.util.getChildElement(this.context.customLink._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
             this.setRange(sc, 0, ec, ec.textContent.length);
-            this.nodeChange(null, null, ['A'], false);
+            this.applyStyleNode(null, null, ['A'], false);
         }
         else {
             /** delete */

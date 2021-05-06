@@ -1,3 +1,5 @@
+import { _allowedEmptyNodeList } from "./env";
+
 /**
  * @description Get the argument iframe's document object
  * @param {Element} iframe Iframe element (context.element.wysiwygFrame)
@@ -727,7 +729,7 @@ export function splitElement(baseNode, offset, depth) {
  * An array containing change offsets is returned in the order of the "nodePathArray" array.
  * @param {Element} element Element
  * @param {Array|null} nodePathArray Array of NodePath object ([util.getNodePath(), ..])
- * @param {Boolean} onlyText If true, non-text nodes(!util._isIgnoreNodeChange) like 'span', 'strong'.. are ignored.
+ * @param {Boolean} onlyText If true, non-text nodes like 'span', 'strong'.. are ignored.
  * @returns {Array} [offset, ..]
  */
 export function mergeSameTags(element, nodePathArray, onlyText) {
@@ -927,7 +929,7 @@ export function removeEmptyNode(element, notRemoveNode) {
 			current !== element &&
 			inst.onlyZeroWidthSpace(current.textContent) &&
 			(!current.firstChild || !inst.isBreak(current.firstChild)) &&
-			!current.querySelector(inst._allowedEmptyNodeList)
+			!current.querySelector(_allowedEmptyNodeList)
 		) {
 			if (current.parentNode) {
 				current.parentNode.removeChild(current);

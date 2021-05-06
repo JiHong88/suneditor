@@ -575,7 +575,7 @@ declare interface util {
      * An array containing change offsets is returned in the order of the "nodePathArray" array.
      * @param element Element
      * @param nodePathArray Array of NodePath object ([util.getNodePath(), ..])
-     * @param onlyText If true, non-text nodes(!util._isIgnoreNodeChange) like 'span', 'strong'.. are ignored.
+     * @param onlyText If true, non-text nodes like 'span', 'strong'.. are ignored.
      * @returns [offset, ..]
      */
     mergeSameTags(element: Element, nodePathArray: any[], onlyText: boolean): number[];

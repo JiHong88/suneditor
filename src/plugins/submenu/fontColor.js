@@ -85,7 +85,7 @@ export default {
     },
 
     remove: function () {
-        this.nodeChange(null, ['color'], ['span'], true);
+        this.applyStyleNode(null, ['color'], ['span'], true);
         this.submenuOff();
     },
 
@@ -94,7 +94,7 @@ export default {
 
         const newNode = this.util.createElement('SPAN');
         newNode.style.color = color;
-        this.nodeChange(newNode, ['color'], null, null);
+        this.applyStyleNode(newNode, ['color'], null, null);
 
         this.submenuOff();
     }
