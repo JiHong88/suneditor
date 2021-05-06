@@ -3947,12 +3947,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (MSData) {
                     cleanData = cleanData.replace(/\n/g, ' ');
                     plainText = plainText.replace(/\n/g, ' ');
-                } else if (plainText === cleanData) {
-                    cleanData = plainText.replace(/\n/g, '<br>');
+                } else {
+                    cleanData = (plainText === cleanData ? plainText : cleanData).replace(/\n/g, '<br>');
                 }
                 cleanData = core.cleanHTML(cleanData, core.pasteTagsWhitelistRegExp);
             } else {
-                cleanData = plainText;
+                cleanData = plainText.replace(/\n/g, '<br>');
             }
 
             const maxCharCount = core.char.test(options.charCounterType === 'byte-html' ? cleanData : plainText);
