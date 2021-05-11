@@ -353,15 +353,6 @@ interface Core {
     isEdgePoint(container: Node, offset: number, dir?: 'front' | 'end'): boolean;
 
     /**
-     * @description Check if the container and offset values are the edges of the format tag
-     * @param container The container property of the selection object.
-     * @param offset The offset property of the selection object.
-     * @param dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
-     * @returns
-     */
-    isEdgeFormat(container: Node, offset: number, dir: 'front' | 'end'): boolean;
-
-    /**
      * @description Show loading box
      */
     showLoading(): void;
