@@ -836,7 +836,7 @@ const editor = suneditor.init({
 });
 
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
-    // lang: lang.ru,
+    lang: lang.ko,
     // mode: 'inline',
     value: `<p>111</p>
 
