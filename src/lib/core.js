@@ -1359,7 +1359,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let result = true;
             dir = dir === 'front' ? 'previousSibling' : 'nextSibling';
             while (node && !util.isFormatElement(node) && !util.isWysiwygDiv(node)) {
-                if (!node[dir] || (util.isBreak(node[dir]) && !node[dir][dir])) {
+                if (!node[dir] || (node.nodeType === 3 && util.isBreak(node[dir]) && !node[dir][dir])) {
                     node = node.parentNode;
                 } else {
                     result = false;
@@ -6660,6 +6660,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onFocus_wysiwyg: function (e) {
             if (core._antiBlur) return;
             core.hasFocus = true;
+            event._applyTagEffects();
+            
             if (core._isInline) event._showToolbarInline();
 
             // user event
