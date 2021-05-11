@@ -1351,21 +1351,23 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Node} container The node of the selection object. (range.startContainer..)
          * @param {Number} offset The offset of the selection object. (core.getRange().startOffset...)
          * @param {String} dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
-         * @returns {Boolean}
+         * @returns {Array|null}
+         * @private
          */
-        isEdgeFormat: function (node, offset, dir) {
+        _isEdgeFormat: function (node, offset, dir) {
             if (!this.isEdgePoint(node, offset, dir)) return false;
 
-            let result = true;
+            const result = [];
             dir = dir === 'front' ? 'previousSibling' : 'nextSibling';
             while (node && !util.isFormatElement(node) && !util.isWysiwygDiv(node)) {
-                if (node.nodeType === 3 && (!node[dir] || (util.isBreak(node[dir]) && !node[dir][dir]))) {
+                if (!node[dir] || (util.isBreak(node[dir]) && !node[dir][dir])) {
+                    if (node.nodeType === 1) result.push(node.cloneNode(false));
                     node = node.parentNode;
                 } else {
-                    result = false;
-                    node = null;
+                    return null;
                 }
             }
+
             return result;
         },
 
@@ -6417,10 +6419,23 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     if (!shift) {
-                        if (core.isEdgeFormat(range.endContainer, range.endOffset, 'end') || /^HR$/i.test(formatEl.nodeName)) {
+                        const formatInners = core._isEdgeFormat(range.endContainer, range.endOffset, 'end');
+                        if ((formatInners && /^H[1-6]$/i.test(formatEl.nodeName)) || /^HR$/i.test(formatEl.nodeName)) {
                             e.preventDefault();
-                            const newFormat = core.appendFormatTag(formatEl, /^H[1-6r]$/i.test(formatEl.nodeName) ? options.defaultTag : formatEl.cloneNode(true));
-                            core.setRange(newFormat, 1, newFormat, 1);
+                            let temp = null;
+                            const newFormat = core.appendFormatTag(formatEl, options.defaultTag);
+
+                            if (formatInners && formatInners.length > 0) {
+                                temp = formatInners.pop();
+                                const innerNode = temp;
+                                while(formatInners.length > 0) {
+                                    temp = temp.appendChild(formatInners.pop());
+                                }
+                                newFormat.appendChild(innerNode);
+                            }
+
+                            temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
+                            core.setRange(temp, 0, temp, 0);
                             break;
                         }
 
