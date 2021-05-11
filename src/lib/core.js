@@ -1359,7 +1359,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let result = true;
             dir = dir === 'front' ? 'previousSibling' : 'nextSibling';
             while (node && !util.isFormatElement(node) && !util.isWysiwygDiv(node)) {
-                if (!node[dir] || (node.nodeType === 3 && util.isBreak(node[dir]) && !node[dir][dir])) {
+                if (node.nodeType === 3 && (!node[dir] || (util.isBreak(node[dir]) && !node[dir][dir]))) {
                     node = node.parentNode;
                 } else {
                     result = false;
