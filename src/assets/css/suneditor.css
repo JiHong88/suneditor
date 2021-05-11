@@ -274,7 +274,7 @@
 .sun-editor .se-resizing-bar.se-resizing-none {cursor:default;}
 .sun-editor .se-resizing-back {position:absolute; display:none; cursor:default; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
 /** resizing bar - nabigation */
-.sun-editor .se-resizing-bar .se-navigation {flex:auto; position:relative; width:auto; height:auto; color:#666; margin:0; padding:0; font-size:10px; font-weight:bold; line-height:1.5; background:transparent;}
+.sun-editor .se-resizing-bar .se-navigation {flex:auto; position:relative; width:auto; height:auto; color:#666; margin:0; padding:0; font-size:10px; line-height:1.5; background:transparent;}
 /** resizing bar - charCounter */
 .sun-editor .se-resizing-bar .se-char-counter-wrapper {flex:none; position:relative; display:block; width:auto; height:auto; margin:0; padding:0; color:#999; font-size:13px; background:transparent;}
 .sun-editor .se-resizing-bar .se-char-counter-wrapper.se-blink {color:#b94a48; animation:blinker 0.2s linear infinite;}
