@@ -7032,7 +7032,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
                 cleanData = core.cleanHTML(cleanData, core.pasteTagsWhitelistRegExp);
             } else {
-                cleanData = plainText.replace(/\n/g, '<br>');
+                cleanData = util._HTMLConvertor(plainText).replace(/\n/g, '<br>');
             }
 
             const maxCharCount = core._charCount(core._charTypeHTML ? cleanData : plainText);
@@ -7048,8 +7048,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (!value) return false;
                 if (typeof value === 'string') cleanData = value;
             }
-
-            if (onlyText) cleanData = util._HTMLConvertor(cleanData);
 
             // files
             const files = data.files;
