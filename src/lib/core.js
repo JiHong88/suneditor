@@ -6719,6 +6719,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.submenuOff();
             core.controllersOff();
 
+            const prevHeight = util.getNumber(context.element.wysiwygFrame.style.height, 0);
             core._variable.resizeClientY = e.clientY;
             context.element.resizeBackground.style.display = 'block';
 
@@ -6726,6 +6727,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.resizeBackground.style.display = 'none';
                 _d.removeEventListener('mousemove', event._resize_editor);
                 _d.removeEventListener('mouseup', closureFunc);
+                if (typeof functions.onResizeEditor === 'function') functions.onResizeEditor(util.getNumber(context.element.wysiwygFrame.style.height, 0), prevHeight, core);
             }
 
             _d.addEventListener('mousemove', event._resize_editor);
@@ -7507,6 +7509,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onAudioUploadError: null,
 
         /**
+         * @description Called when the editor is resized using the bottom bar
+         */
+        onResizeEditor: null,
+
+        /**
          * @description Reset the buttons on the toolbar. (Editor is not reloaded)
          * You cannot set a new plugin for the button.
          * @param {Array} buttonList Button list 
@@ -7913,6 +7920,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             util.removeItem(context.element.topArea);
 
             /** remove object reference */
+            for (let k in core.functions) { if (util.hasOwn(core, k)) delete core.functions[k]; }
             for (let k in core) { if (util.hasOwn(core, k)) delete core[k]; }
             for (let k in event) { if (util.hasOwn(event, k)) delete event[k]; }
             for (let k in context) { if (util.hasOwn(context, k)) delete context[k]; }

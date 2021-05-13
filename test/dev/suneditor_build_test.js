@@ -913,6 +913,12 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     // imageUploadSizeLimit: 30000
 });
 
+s2.onResizeEditor = (height, prevHeight, core) => {
+    console.log("heig", height)
+    console.log("prevHeight", prevHeight)
+    console.log("core", core)
+}
+
 // plugins.mention.getItems = async term => 
 //   [
 //     {name: 'auser1'},

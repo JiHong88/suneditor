@@ -1270,6 +1270,12 @@ editor.onAudioUploadError = function (errorMessage, result, core) {
     return Boolean
 }
 
+// Called when the editor is resized using the bottom bar
+// height, prevHeight are number
+editor.onResizeEditor = function (height, prevHeight, core) {
+    console.log(`height: ${height}, prevHeight: ${prevHeight}`)
+}
+
 // It replaces the default callback function of the image upload
 /**
  * xmlHttp: xmlHttpRequest object
