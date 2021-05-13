@@ -838,21 +838,21 @@ const editor = suneditor.init({
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     lang: lang.ko,
     // mode: 'inline',
-    value: `<p>111</p>
+    // value: `<p>111</p>
 
-    <p>222</p>
+    // <p>222</p>
     
-    <p>333</p>
+    // <p>333</p>
     
-    <hr class="__se__solid">
+    // <hr class="__se__solid">
     
-    <p>444</p>
+    // <p>444</p>
     
-    <p>555</p>
+    // <p>555</p>
     
-    <p>666<br>
-    </p>
-    `,
+    // <p>666<br>
+    // </p>
+    // `,
     previewTemplate: `
     <h1>Preview Template</h1>
     {{ contents }}

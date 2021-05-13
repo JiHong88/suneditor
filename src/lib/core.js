@@ -5063,6 +5063,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|<!--|-->'));
             this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(options.pasteTagsWhitelist);
 
+            const regEndStr = '\\s*=\\s*(\"|\')*[^\"\']*\\2';
             const _attr = options.attributesWhitelist;
             const tagsAttr = {};
             let allAttr = '';
@@ -5072,12 +5073,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (k === 'all') {
                         allAttr = _attr[k] + '|';
                     } else {
-                        tagsAttr[k] = new wRegExp('((?:' + _attr[k] + '|' + defaultAttr + ')\\s*=[^=]*(\\s|\"|\'))', 'ig');
+                        tagsAttr[k] = new wRegExp('((?:' + _attr[k] + '|' + defaultAttr + ')' + regEndStr + ')', 'ig');
                     }
                 }
             }
 
-            this._attributesWhitelistRegExp = new wRegExp('((?:' + allAttr + defaultAttr + ')\\s*=[^=]*(\\s|\"|\'))', 'ig');
+            this._attributesWhitelistRegExp = new wRegExp('((?:' + allAttr + defaultAttr + ')' + regEndStr + ')', 'ig');
             this._attributesTagsWhitelist = tagsAttr;
 
             // set modes
