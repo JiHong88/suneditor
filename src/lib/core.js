@@ -5072,12 +5072,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (k === 'all') {
                         allAttr = _attr[k] + '|';
                     } else {
-                        tagsAttr[k] = new wRegExp('((?:' + _attr[k] + '|' + defaultAttr + ')\\s*=.*\\S)', 'ig');
+                        tagsAttr[k] = new wRegExp('((?:' + _attr[k] + '|' + defaultAttr + ')\\s*=[^=]*(\\s|\"|\'))', 'ig');
                     }
                 }
             }
 
-            this._attributesWhitelistRegExp = new wRegExp('((?:' + allAttr + defaultAttr + ')\\s*=.*\\S)', 'ig');
+            this._attributesWhitelistRegExp = new wRegExp('((?:' + allAttr + defaultAttr + ')\\s*=[^=]*(\\s|\"|\'))', 'ig');
             this._attributesTagsWhitelist = tagsAttr;
 
             // set modes
@@ -7036,13 +7036,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             const maxCharCount = core._charCount(core._charTypeHTML ? cleanData : plainText);
-            // // user event - paste
+            // user event - paste
             if (type === 'paste' && typeof functions.onPaste === 'function') {
                 const value = functions.onPaste(e, cleanData, maxCharCount, core);
                 if (!value) return false;
                 if (typeof value === 'string') cleanData = value;
             }
-            // // user event - drop
+            // user event - drop
             if (type === 'drop' && typeof functions.onDrop === 'function') {
                 const value = functions.onDrop(e, cleanData, maxCharCount, core);
                 if (!value) return false;
