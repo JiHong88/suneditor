@@ -4722,7 +4722,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist) {
-            html = this._deleteDisallowedTags(html).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, false));
+            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, false));
 
             const dom = _d.createRange().createContextualFragment(html);
             try {
@@ -4771,9 +4771,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
-            contents = this._deleteDisallowedTags(contents).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
-
-            const dom = _d.createRange().createContextualFragment(this._deleteDisallowedTags(contents));
+            contents = this._deleteDisallowedTags(this._parser.parseFromString(contents, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
+            const dom = _d.createRange().createContextualFragment(contents);
 
             try {
                 util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
@@ -4845,12 +4844,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         returnHTML += (/^HR$/i.test(node.nodeName) ? '\n' : '') + elementIndent + node.outerHTML + br;
                         continue;
                     }
-                    
-                    node.innerHTML = node.innerHTML;
-                    const tag = node.nodeName.toLowerCase();
-                    returnHTML += (lineBR || (elementRegTest ? '' : br)) + (elementIndent || nodeRegTest ? indent : '') + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
-                    recursionFunc(node, indent + indentSize, '');
-                    returnHTML += (nodeRegTest ? indent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? '\n' : '' || /^(TH|TD)$/i.test(node.nodeName) ? '\n' : '');
+
+                    if (!node.outerHTML) { // IE
+                        returnHTML += new _w.XMLSerializer().serializeToString(node);
+                    } else {
+                        const tag = node.nodeName.toLowerCase();
+                        returnHTML += (lineBR || (elementRegTest ? '' : br)) + (elementIndent || nodeRegTest ? indent : '') + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
+                        recursionFunc(node, indent + indentSize, '');
+                        returnHTML += (nodeRegTest ? indent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? '\n' : '' || /^(TH|TD)$/i.test(node.nodeName) ? '\n' : '');
+                    }
                 }
             }(wDoc, '', '\n'));
 
@@ -5063,7 +5065,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|<!--|-->'));
             this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(options.pasteTagsWhitelist);
 
-            const regEndStr = '\\s*=\\s*(\"|\')*[^\"\']*\\2';
+            const regEndStr = '\\s*=\\s*(\")[^\"]*\\1';
             const _attr = options.attributesWhitelist;
             const tagsAttr = {};
             let allAttr = '';
@@ -5073,12 +5075,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (k === 'all') {
                         allAttr = _attr[k] + '|';
                     } else {
-                        tagsAttr[k] = new wRegExp('((?:' + _attr[k] + '|' + defaultAttr + ')' + regEndStr + ')', 'ig');
+                        tagsAttr[k] = new wRegExp('(?:' + _attr[k] + '|' + defaultAttr + ')' + regEndStr, 'ig');
                     }
                 }
             }
 
-            this._attributesWhitelistRegExp = new wRegExp('((?:' + allAttr + defaultAttr + ')' + regEndStr + ')', 'ig');
+            this._attributesWhitelistRegExp = new wRegExp('(?:' + allAttr + defaultAttr + ')' + regEndStr, 'ig');
             this._attributesTagsWhitelist = tagsAttr;
 
             // set modes
