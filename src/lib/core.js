@@ -438,7 +438,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @property {Number} innerHeight_fullScreen InnerHeight in editor when in full screen
          * @property {Number} resizeClientY Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
          * @property {Number} tabSize Indent size of tab (4)
-         * @property {Number} codeIndent Indent size of Code view mode (4)
+         * @property {Number} codeIndent Indent size of Code view mode (2)
          * @property {Number} minResizingSize Minimum size of editing area when resized {Number} (.se-wrapper-inner {min-height: 65px;} || 65)
          * @property {Array} currentNodes  An array of the current cursor's node structure
          * @private
@@ -450,7 +450,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             innerHeight_fullScreen: 0,
             resizeClientY: 0,
             tabSize: 4,
-            codeIndent: 4,
+            codeIndent: 2,
             minResizingSize: util.getNumber((context.element.wysiwygFrame.style.minHeight || '65'), 0),
             currentNodes: [],
             currentNodesMap: [],
@@ -4267,7 +4267,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             this._checkPlaceholder();
-
+            // user event
             if (typeof functions.toggleCodeView === 'function') functions.toggleCodeView(this._variable.isCodeView, this);
         },
 
@@ -4429,6 +4429,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 util.removeClass(this._styleCommandMap.fullScreen, 'active');
             }
 
+            // user event
             if (typeof functions.toggleFullScreen === 'function') functions.toggleFullScreen(this._variable.isFullScreen, this);
         },
 
@@ -4826,7 +4827,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const elementRegTest = brReg.test(element.nodeName);
                 const elementIndent = (elementRegTest ? indent : '');
 
-                for (let i = 0, len = children.length, node, br, nodeRegTest; i < len; i++) {
+                for (let i = 0, len = children.length, node, br, nodeRegTest, tag, tagIndent; i < len; i++) {
                     node = children[i];
                     nodeRegTest = brReg.test(node.nodeName);
                     br = nodeRegTest ? '\n' : '';
@@ -4837,7 +4838,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         continue;
                     }
                     if (node.nodeType === 3) {
-                        returnHTML += util._HTMLConvertor((/^\n+$/.test(node.data) ? '' : node.data));
+                        if (!util.isList(node.parentElement)) returnHTML += util._HTMLConvertor((/^\n+$/.test(node.data) ? '' : node.data));
                         continue;
                     }
                     if (node.childNodes.length === 0) {
@@ -4848,10 +4849,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (!node.outerHTML) { // IE
                         returnHTML += new _w.XMLSerializer().serializeToString(node);
                     } else {
-                        const tag = node.nodeName.toLowerCase();
-                        returnHTML += (lineBR || (elementRegTest ? '' : br)) + (elementIndent || nodeRegTest ? indent : '') + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
+                        tag = node.nodeName.toLowerCase();
+                        tagIndent = elementIndent || nodeRegTest ? indent : '';
+                        returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
                         recursionFunc(node, indent + indentSize, '');
-                        returnHTML += (nodeRegTest ? indent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? '\n' : '' || /^(TH|TD)$/i.test(node.nodeName) ? '\n' : '');
+                        returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? '\n' : '' || /^(TH|TD)$/i.test(node.nodeName) ? '\n' : '');
                     }
                 }
             }(wDoc, '', '\n'));
