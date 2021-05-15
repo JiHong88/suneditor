@@ -4240,6 +4240,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 // history stack
                 this.history.push(false);
+                this.history._resetCachingButton();
             } else {
                 this._setEditorDataToCodeView();
                 this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
