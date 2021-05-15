@@ -4817,8 +4817,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let returnHTML = '';
             const wRegExp = _w.RegExp;
             const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
-            const isFormatElement = function (current) { return this.isFormatElement(current) || this.isComponent(current); }.bind(util);
             const wDoc = typeof html === 'string' ? _d.createRange().createContextualFragment(html) : html;
+            const isFormat = function (current) { return this.isFormatElement(current) || this.isComponent(current); }.bind(util);
 
             let indentSize = this._variable.codeIndent * 1;
             indentSize = indentSize > 0 ? new _w.Array(indentSize + 1).join(' ') : '';
@@ -4832,18 +4832,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     node = children[i];
                     nodeRegTest = brReg.test(node.nodeName);
                     br = nodeRegTest ? '\n' : '';
-                    lineBR = isFormatElement(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? '\n' : '';
+                    lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? '\n' : '';
 
                     if (node.nodeType === 8) {
                         returnHTML += '\n<!-- ' + node.textContent.trim() + ' -->' + br;
                         continue;
                     }
                     if (node.nodeType === 3) {
-                        if (!util.isList(node.parentElement)) returnHTML += util._HTMLConvertor((/^\n+$/.test(node.data) ? '' : node.data));
+                        if (!util.isList(node.parentElement)) returnHTML += util._HTMLConvertor(/^\n+$/.test(node.data) ? '' : node.data);
                         continue;
                     }
                     if (node.childNodes.length === 0) {
-                        returnHTML += (/^HR$/i.test(node.nodeName) ? '\n' : '') + elementIndent + node.outerHTML + br;
+                        returnHTML += (/^HR$/i.test(node.nodeName) ? '\n' : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + node.outerHTML + br;
                         continue;
                     }
 
