@@ -4816,7 +4816,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let returnHTML = '';
             const wRegExp = _w.RegExp;
             const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
-            const isFormatElement = util.isFormatElement.bind(util);
+            const isFormatElement = function (current) { return this.isFormatElement(current) || this.isComponent(current); }.bind(util);
             const wDoc = typeof html === 'string' ? _d.createRange().createContextualFragment(html) : html;
 
             let indentSize = this._variable.codeIndent * 1;
