@@ -114,7 +114,7 @@
             },
             caption: 'Omschrijving toevoegen',
             close: 'Sluiten',
-            submitButton: 'Opslaan',
+            submitButton: 'Toepassen',
             revertButton: 'Standaardwaarden herstellen',
             proportion: 'Verhouding behouden',
             basic: 'Standaard',
