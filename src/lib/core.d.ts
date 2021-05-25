@@ -874,7 +874,7 @@ export default class SunEditor {
      * @param core Core object
      * @returns
      */
-    onResizeEditor: (height: number, prevHeight: number, core: core) => {};
+    onResizeEditor: (height: number, prevHeight: number, core: Core) => {};
 
     /**
      * @description Reset the buttons on the toolbar. (Editor is not reloaded)
