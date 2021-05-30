@@ -79,11 +79,9 @@ export default {
     active: function (element) {
         let formatTitle = this.lang.toolbar.formats;
         const target = this.context.formatBlock.targetText;
-        const tooltip = this.context.formatBlock.targetTooltip;
 
         if (!element) {
             this.util.changeTxt(target, formatTitle);
-            this.util.changeTxt(tooltip, formatTitle);
         } else if (this.util.isFormatElement(element)) {
             const formatContext = this.context.formatBlock;
             const formatList = formatContext._formatList;
@@ -99,7 +97,6 @@ export default {
             }
 
             this.util.changeTxt(target, formatTitle);
-            this.util.changeTxt(tooltip, formatTitle);
             target.setAttribute('data-value', nodeName);
             target.setAttribute('data-class', className);
 

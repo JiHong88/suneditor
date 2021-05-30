@@ -728,6 +728,15 @@ export default class SunEditor {
     onAudioUploadError: (errorMessage: string, result: any, core: Core) => boolean;
 
     /**
+     * @description Called when the audio upload failed
+     * @param height Height after resized (px)
+     * @param prevHeight Prev height before resized (px)
+     * @param core Core object
+     * @returns
+     */
+    onResizeEditor: (height: number, prevHeight: number, core: Core) => {};
+
+    /**
      * @description Reset the buttons on the toolbar. (Editor is not reloaded)
      * You cannot set a new plugin for the button.
      * @param buttonList Button list 

@@ -379,7 +379,7 @@ plugins: [
 ]
 : Plugins array.     default: null {Array}
 
-// Vaues
+// Values
 lang            : language object.   default : en {Object}
 defaultTag      : Specifies default tag name of the editor.     default: 'p' {String}
 textTags        : You can change the tag of the default text button.   default: { bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL' }
@@ -1253,6 +1253,12 @@ editor.onVideoUploadError = function (errorMessage, result, core) {
 editor.onAudioUploadError = function (errorMessage, result, core) {
     alert(errorMessage)
     return Boolean
+}
+
+// Called when the editor is resized using the bottom bar
+// height, prevHeight are number
+editor.onResizeEditor = function (height, prevHeight, core) {
+    console.log(`height: ${height}, prevHeight: ${prevHeight}`)
 }
 
 // It replaces the default callback function of the image upload

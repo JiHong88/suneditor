@@ -368,16 +368,17 @@ Node.prototype = {
 	 isEdgeLine: function (node, offset, dir) {
 		if (!this.isEdgePoint(node, offset, dir)) return false;
 
-		let result = true;
-		dir = dir === "front" ? "previousSibling" : "nextSibling";
+		const result = [];
+		dir = dir === 'front' ? 'previousSibling' : 'nextSibling';
 		while (node && !this.isFormatElement(node) && !util.isWysiwygDiv(node)) {
 			if (!node[dir] || (util.isBreak(node[dir]) && !node[dir][dir])) {
+				if (node.nodeType === 1) result.push(node.cloneNode(false));
 				node = node.parentNode;
 			} else {
-				result = false;
-				node = null;
+				return null;
 			}
 		}
+
 		return result;
 	},
 

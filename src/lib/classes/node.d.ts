@@ -25,7 +25,7 @@ class Node {
 	 * @param element Element object
 	 * @param validation Validation function / String("tag1|tag2..") / If null, all tags are applicable.
 	 */
-	mergeNestedTags(element: Element, validation?: TimerHandler): void;
+	mergeNestedTags(element: Element, validation?: string | Function): void;
 
 	/**
 	 * @description Delete argumenu value element

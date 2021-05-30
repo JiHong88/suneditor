@@ -436,7 +436,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @property {Number} resizeClientY Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
          * @property {Number} tabSize Indent size of tab (4)
          * @property {Number} indentSize Indent size (25)px
-         * @property {Number} codeIndentSize Indent size of Code view mode (4)
+         * @property {Number} codeIndentSize Indent size of Code view mode (2)
          * @property {Number} minResizingSize Minimum size of editing area when resized {Number} (.se-wrapper-inner {min-height: 65px;} || 65)
          * @property {Array} currentNodes  An array of the current cursor's node structure
          * @private
@@ -449,7 +449,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             resizeClientY: 0,
             indentSize: 25,
             tabSize: 4,
-            codeIndentSize: 4,
+            codeIndentSize: 2,
             minResizingSize: util.getNumber((context.element.wysiwygFrame.style.minHeight || '65'), 0),
             currentNodes: [],
             currentNodesMap: [],
@@ -1319,6 +1319,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 // history stack
                 this.history.push(false);
+                this.history._resetCachingButton();
             } else {
                 this._setEditorDataToCodeView();
                 this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
@@ -1346,7 +1347,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             this._checkPlaceholder();
-
+            // user event
             if (typeof functions.toggleCodeView === 'function') functions.toggleCodeView(this._variable.isCodeView, this);
         },
 
@@ -1508,6 +1509,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 util.removeClass(this._styleCommandMap.fullScreen, 'active');
             }
 
+            // user event
             if (typeof functions.toggleFullScreen === 'function') functions.toggleFullScreen(this._variable.isFullScreen, this);
         },
 
@@ -1732,8 +1734,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!this._disallowedTextTagsRegExp) return text;
 
             const ec = options._textTagsMap;
-            return text.replace(this._disallowedTextTagsRegExp, function (m, t, n) {
-                return t + (typeof ec[n] === 'string' ? ec[n] : n);
+            return text.replace(this._disallowedTextTagsRegExp, function (m, t, n, p) {
+                return t + (typeof ec[n] === 'string' ? ec[n] : n) + (p ? ' ' + p : '');
             });
         },
 
@@ -1785,7 +1787,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (v) {
                 for (let i = 0, len = v.length; i < len; i++) {
-                    if (rowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
+                    if (!rowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
                     t += ' ' + (/^href\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i]) ? '' : v[i]);
                 }
             }
@@ -1801,7 +1803,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist) {
-            html = this._deleteDisallowedTags(html).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, false));
+            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, false));
 
             const dom = _d.createRange().createContextualFragment(html);
             try {
@@ -1850,9 +1852,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
-            contents = this._deleteDisallowedTags(contents).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
-
-            const dom = _d.createRange().createContextualFragment(this._deleteDisallowedTags(contents));
+            contents = this._deleteDisallowedTags(this._parser.parseFromString(contents, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
+            const dom = _d.createRange().createContextualFragment(contents);
 
             try {
                 this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
@@ -1895,8 +1896,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let returnHTML = '';
             const wRegExp = _w.RegExp;
             const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
-            const isFormatElement = util.isFormatElement.bind(util);
             const wDoc = typeof html === 'string' ? _d.createRange().createContextualFragment(html) : html;
+            const isFormat = function (current) { return this.isFormatElement(current) || this.isComponent(current); }.bind(util);
 
             let indentSize = this._variable.codeIndentSize * 1;
             indentSize = indentSize > 0 ? new _w.Array(indentSize + 1).join(' ') : '';
@@ -1906,30 +1907,34 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const elementRegTest = brReg.test(element.nodeName);
                 const elementIndent = (elementRegTest ? indent : '');
 
-                for (let i = 0, len = children.length, node, br, nodeRegTest; i < len; i++) {
+                for (let i = 0, len = children.length, node, br, nodeRegTest, tag, tagIndent; i < len; i++) {
                     node = children[i];
                     nodeRegTest = brReg.test(node.nodeName);
                     br = nodeRegTest ? '\n' : '';
-                    lineBR = isFormatElement(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? '\n' : '';
+                    lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? '\n' : '';
 
                     if (node.nodeType === 8) {
                         returnHTML += '\n<!-- ' + node.textContent.trim() + ' -->' + br;
                         continue;
                     }
                     if (node.nodeType === 3) {
-                        returnHTML += util.HTMLToEntity((/^\n+$/.test(node.data) ? '' : node.data));
+                        if (!util.isList(node.parentElement)) returnHTML += util.HTMLToEntity((/^\n+$/.test(node.data) ? '' : node.data));
                         continue;
                     }
                     if (node.childNodes.length === 0) {
-                        returnHTML += (/^HR$/i.test(node.nodeName) ? '\n' : '') + elementIndent + node.outerHTML + br;
+                        returnHTML += (/^HR$/i.test(node.nodeName) ? '\n' : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + node.outerHTML + br;
                         continue;
                     }
-                    
-                    node.innerHTML = node.innerHTML;
-                    const tag = node.nodeName.toLowerCase();
-                    returnHTML += (lineBR || (elementRegTest ? '' : br)) + (elementIndent || nodeRegTest ? indent : '') + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
-                    recursionFunc(node, indent + indentSize, '');
-                    returnHTML += (nodeRegTest ? indent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? '\n' : '' || /^(TH|TD)$/i.test(node.nodeName) ? '\n' : '');
+
+                    if (!node.outerHTML) { // IE
+                        returnHTML += new _w.XMLSerializer().serializeToString(node);
+                    } else {
+                        tag = node.nodeName.toLowerCase();
+                        tagIndent = elementIndent || nodeRegTest ? indent : '';
+                        returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
+                        recursionFunc(node, indent + indentSize, '');
+                        returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? '\n' : '' || /^(TH|TD)$/i.test(node.nodeName) ? '\n' : '');
+                    }
                 }
             }(wDoc, '', '\n'));
 
@@ -2149,7 +2154,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             for (let i = 0; i < allowTextTags.length; i++) {
                 disallowTextTags.splice(disallowTextTags.indexOf(allowTextTags[i].toLowerCase()), 1);
             }
-            this._disallowedTextTagsRegExp = disallowTextTags.length === 0 ? null : new wRegExp('(<\\/?)(' + disallowTextTags.join('|') + ')\\b\\s*(?:[^>^<]+)?\\s*(?=>)', 'gi');
+            this._disallowedTextTagsRegExp = disallowTextTags.length === 0 ? null : new wRegExp('(<\\/?)(' + disallowTextTags.join('|') + ')\\b\\s*([^>^<]+)?\\s*(?=>)', 'gi');
 
             // set whitelist
             const defaultAttr = 'contenteditable|id|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
@@ -2158,21 +2163,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|<!--|-->'));
             this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(options.pasteTagsWhitelist);
 
+            const regEndStr = '\\s*=\\s*(\")[^\"]*\\1';
             const _attr = options.attributesWhitelist;
             const tagsAttr = {};
             let allAttr = '';
             if (!!_attr) {
                 for (let k in _attr) {
-                    if (!util.hasOwn(_attr, k)) continue;
+                    if (!util.hasOwn(_attr, k) || /^on[a-z]+$/i.test(_attr[k])) continue;
                     if (k === 'all') {
                         allAttr = _attr[k] + '|';
                     } else {
-                        tagsAttr[k] = new wRegExp('((?:' + _attr[k] + '|' + defaultAttr + ')\\s*=.*\\S)', 'ig');
+                        tagsAttr[k] = new wRegExp('(?:' + _attr[k] + '|' + defaultAttr + ')' + regEndStr, 'ig');
                     }
                 }
             }
 
-            this._attributesWhitelistRegExp = new wRegExp('((?:' + allAttr + defaultAttr + ')\\s*=.*\\S)', 'ig');
+            this._attributesWhitelistRegExp = new wRegExp('(?:' + allAttr + defaultAttr + ')' + regEndStr, 'ig');
             this._attributesTagsWhitelist = tagsAttr;
 
             // set modes
@@ -2259,8 +2265,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _cachingButtons: function () {
-            this.codeViewDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-code-view-enabled"])');
-            this.resizingDisabledButtons = context.element.toolbar.querySelectorAll('.se-toolbar button:not([class~="se-resizing-enabled"])');
+            _w.setTimeout(function () {
+                this.codeViewDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"])');
+                this.resizingDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-resizing-enabled"]):not([data-display="MORE"])');
+            }.bind(this));
+
             const buttons = context.buttons;
             this.commandMap = {
                 SUB: buttons.subscript,
@@ -3514,10 +3523,23 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     if (!shift) {
-                        if (core.format.isEdgeLine(range.endContainer, range.endOffset, 'end') || /^HR$/i.test(formatEl.nodeName)) {
+                        const formatInners = core.format.isEdgeLine(range.endContainer, range.endOffset, 'end');
+                        if ((formatInners && /^H[1-6]$/i.test(formatEl.nodeName)) || /^HR$/i.test(formatEl.nodeName)) {
                             e.preventDefault();
-                            const newFormat = core.format.appendLine(formatEl, /^H[1-6r]$/i.test(formatEl.nodeName) ? options.defaultTag : formatEl.cloneNode(true));
-                            core.setRange(newFormat, 1, newFormat, 1);
+                            let temp = null;
+                            const newFormat = core.format.appendLine(formatEl, options.defaultTag);
+
+                            if (formatInners && formatInners.length > 0) {
+                                temp = formatInners.pop();
+                                const innerNode = temp;
+                                while(formatInners.length > 0) {
+                                    temp = temp.appendChild(formatInners.pop());
+                                }
+                                newFormat.appendChild(innerNode);
+                            }
+
+                            temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
+                            core.setRange(temp, 0, temp, 0);
                             break;
                         }
 
@@ -3757,6 +3779,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onFocus_wysiwyg: function (e) {
             if (core._antiBlur) return;
             core.hasFocus = true;
+            event._applyTagEffects();
+            
             if (core._isInline) event._showToolbarInline();
 
             // user event
@@ -3799,6 +3823,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.submenuOff();
             core.controllersOff();
 
+            const prevHeight = util.getNumber(context.element.wysiwygFrame.style.height, 0);
             core._variable.resizeClientY = e.clientY;
             context.element.resizeBackground.style.display = 'block';
 
@@ -3806,6 +3831,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.resizeBackground.style.display = 'none';
                 _d.removeEventListener('mousemove', event._resize_editor);
                 _d.removeEventListener('mouseup', closureFunc);
+                if (typeof functions.onResizeEditor === 'function') functions.onResizeEditor(util.getNumber(context.element.wysiwygFrame.style.height, 0), prevHeight, core);
             }
 
             _d.addEventListener('mousemove', event._resize_editor);
@@ -3880,16 +3906,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const editorHeight = element.editorArea.offsetHeight;
             const y = (this.scrollY || _d.documentElement.scrollTop) + options.stickyToolbar;
             const editorTop = event._getEditorOffsets(options.toolbarContainer).top - (core._isInline ? element.toolbar.offsetHeight : 0);
+            const inlineOffset = core._isInline && (y - editorTop) > 0 ? y - editorTop - context.element.toolbar.offsetHeight : 0;
             
             if (y < editorTop) {
                 event._offStickyToolbar();
             }
             else if (y + core._variable.minResizingSize >= editorHeight + editorTop) {
-                if (!core._sticky) event._onStickyToolbar();
-                element.toolbar.style.top = (editorHeight + editorTop + options.stickyToolbar -y - core._variable.minResizingSize) + 'px';
+                if (!core._sticky) event._onStickyToolbar(inlineOffset);
+                element.toolbar.style.top = (inlineOffset + editorHeight + editorTop + options.stickyToolbar - y - core._variable.minResizingSize) + 'px';
             }
             else if (y >= editorTop) {
-                event._onStickyToolbar();
+                event._onStickyToolbar(inlineOffset);
             }
         },
 
@@ -3915,7 +3942,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             return _d.documentElement.scrollHeight - (event._getEditorOffsets(null).top + context.element.topArea.offsetHeight);
         },
 
-        _onStickyToolbar: function () {
+        _onStickyToolbar: function (inlineOffset) {
             const element = context.element;
 
             if (!core._isInline && !options.toolbarContainer) {
@@ -3923,7 +3950,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 element._stickyDummy.style.display = 'block';
             }
 
-            element.toolbar.style.top = options.stickyToolbar + 'px';
+            element.toolbar.style.top = (options.stickyToolbar + inlineOffset) + 'px';
             element.toolbar.style.width = core._isInline ? core._inlineToolbarAttr.width : element.toolbar.offsetWidth + 'px';
             util.addClass(element.toolbar, 'se-toolbar-sticky');
             core._sticky = true;
@@ -4112,7 +4139,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
                 cleanData = core.cleanHTML(cleanData, core.pasteTagsWhitelistRegExp);
             } else {
-                cleanData = plainText.replace(/\n/g, '<br>');
+                cleanData = util.HTMLToEntity(plainText).replace(/\n/g, '<br>');
             }
 
             const maxCharCount = core.char.test(options.charCounterType === 'byte-html' ? cleanData : plainText);
@@ -4128,8 +4155,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (!value) return false;
                 if (typeof value === 'string') cleanData = value;
             }
-
-            if (onlyText) cleanData = util.HTMLToEntity(cleanData);
 
             // files
             const files = data.files;
@@ -4591,6 +4616,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onAudioUploadError: null,
 
         /**
+         * @description Called when the editor is resized using the bottom bar
+         */
+        onResizeEditor: null,
+
+        /**
          * @description Reset the buttons on the toolbar. (Editor is not reloaded)
          * You cannot set a new plugin for the button.
          * @param {Array} buttonList Button list 
@@ -4959,6 +4989,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             util.removeItem(context.element.topArea);
 
             /** remove object reference */
+            for (let k in core.functions) { if (util.hasOwn(core, k)) delete core.functions[k]; }
             for (let k in core) { if (util.hasOwn(core, k)) delete core[k]; }
             for (let k in event) { if (util.hasOwn(event, k)) delete event[k]; }
             for (let k in context) { if (util.hasOwn(context, k)) delete context[k]; }

@@ -346,7 +346,7 @@ declare interface util {
 	 * Only one condition can be entered at a time.
 	 * @returns
 	 */
-	getParentElement(element: Node, query: TimerHandler): Element;
+	getParentElement(element: Node, query: string | Function): Element;
 
 	/**
 	 * @description Get the child element of the argument value.
@@ -359,7 +359,7 @@ declare interface util {
 	 * Only one condition can be entered at a time.
 	 * @returns
 	 */
-	getChildElement(element: Node, query: TimerHandler, last: boolean): Element;
+	getChildElement(element: Node, query: string | Function, last: boolean): Element;
 
 	/**
 	 * @description 1. The first node of all the child nodes of the "first" element is returned.
