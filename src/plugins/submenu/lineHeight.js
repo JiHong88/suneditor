@@ -67,7 +67,7 @@ export default {
     on: function () {
         const lineHeightContext = this.context.lineHeight;
         const sizeList = lineHeightContext._sizeList;
-        const format = this.util.getFormatElement(this.getSelectionNode());
+        const format = this.format.getLine(this.selection.getNode());
         const currentSize = !format ? '' : format.style.lineHeight + '';
 
         if (currentSize !== lineHeightContext.currentSize) {
@@ -90,7 +90,7 @@ export default {
         e.stopPropagation();
 
         const value = e.target.getAttribute('data-value') || '';
-        const formats = this.getSelectedElements();
+        const formats = this.selection.getLines();
 
         for (let i = 0, len = formats.length; i < len; i++) {
             formats[i].style.lineHeight = value;

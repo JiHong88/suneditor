@@ -36,7 +36,7 @@ export default {
      * @Override core
      */
     action: function () {
-        const currentBlockquote = this.util.getParentElement(this.getSelectionNode(), 'blockquote');
+        const currentBlockquote = this.util.getParentElement(this.selection.getNode(), 'blockquote');
 
         if (currentBlockquote) {
             this.format.removeRangeBlock(currentBlockquote, null, null, false, false);

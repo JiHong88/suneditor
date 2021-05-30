@@ -121,7 +121,7 @@ export default {
     on: function (contextAnchor, update) {
         if (!update) {
             this.plugins.anchor.init.call(this, contextAnchor);
-            contextAnchor.anchorText.value = this.getSelection().toString();
+            contextAnchor.anchorText.value = this.selection.get().toString();
         } else if (contextAnchor.linkAnchor) {
             this.context.dialog.updateModal = true;
             const href = contextAnchor.linkAnchor.href;

@@ -64,7 +64,7 @@ export default {
         contextPicker._styleProperty = 'backgroundColor';
         contextPicker._colorList = contextHiliteColor.colorList;
         
-        this.plugins.colorPicker.init.call(this, this.getSelectionNode(), null);
+        this.plugins.colorPicker.init.call(this, this.selection.getNode(), null);
     },
 
      /**

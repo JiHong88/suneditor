@@ -87,13 +87,13 @@ Char.prototype = {
 			if (count > maxCharCount) {
 				over = true;
 				if (nextCharCount > 0) {
-					this.selection._editorRange();
+					this.selection._init();
 					const range = this.selection.getRange();
 					const endOff = range.endOffset - 1;
-					const text = this.selection.getSelectionNode().textContent;
+					const text = this.selection.getNode().textContent;
 					const slicePosition = range.endOffset - (count - maxCharCount);
 
-					this.selection.getSelectionNode().textContent =
+					this.selection.getNode().textContent =
 						text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
 					this.selection.setRange(range.endContainer, endOff, range.endContainer, endOff);
 				}

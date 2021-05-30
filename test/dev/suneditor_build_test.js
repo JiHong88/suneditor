@@ -265,55 +265,6 @@ let s1 = suneditor.create('editor', {
     buttonList: [["table","removeFormat"]],
 })
 
-// s1.core._charCount = function (nextCharCount, blink) {
-//     const charCounter = this.context.element.charCounter;
-//     if (!charCounter) return true;
-//     if (!nextCharCount || nextCharCount < 0) nextCharCount = 0;
-
-//     const maxCharCount = this.context.options.maxCharCount;
-//     const wysiwyg = this.context.element.wysiwyg;
-
-//     ///// -- get empty list ////
-//     const emptyListCount = this.util.getListChildren(wysiwyg, function (current) {
-//         return this.isListCell(current) && current.childNodes.length === 1 && this.isBreak(current.firstChild)
-//     }.bind(this.util)).length;
-//     //// ------------------ ////
-
-//     this._w.setTimeout(function () {
-//         charCounter.textContent = wysiwyg.textContent.length + emptyListCount; // add empty list
-//     });
-
-//     if (maxCharCount > 0) {
-//         let over = false;
-//         const count = wysiwyg.textContent.length + emptyListCount; // add empty list
-        
-//         if (count > maxCharCount) {
-//             this._editorRange();
-//             const range = this.getRange();
-//             const endOff = range.endOffset - 1;
-//             const text = this.getSelectionNode().textContent;
-
-//             this.getSelectionNode().textContent = text.slice(0, range.endOffset - 1) + text.slice(range.endOffset, text.length);
-//             this.setRange(range.endContainer, endOff, range.endContainer, endOff);
-//             over = true;
-//         } else if ((count + nextCharCount) > maxCharCount) {
-//             over = true;
-//         }
-
-//         if (over) {
-//             if (blink && !this.util.hasClass(charCounter, 'se-blink')) {
-//                 this.util.addClass(charCounter, 'se-blink');
-//                 this._w.setTimeout(function () {
-//                     this.removeClass(charCounter, 'se-blink');
-//                 }.bind(this.util), 600);
-//             }
-
-//             return false;
-//         }
-//     }
-
-//     return true;
-// }.bind(s1.core)
 
 window.cm = CodeMirror
 
@@ -373,7 +324,7 @@ s1.onKeyDown = function (e, core) {
     const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92;
     if (ctrl && keyCode === 187) {
         e.preventDefault();
-        const anchor = core.util.getParentElement(core.getSelectionNode(), core.util.isAnchor)
+        const anchor = core.util.getParentElement(core.selection.getNode(), core.util.isAnchor)
         if (anchor) {
             window.open(anchor.href)
         }
@@ -413,7 +364,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
             tag: 'x-foo',
             name: 'x-foo',
             command: 'replace',
-            class: '__se__format__replace_x_foo',
+            class: '__se__format__line_x_foo',
         }
     ],
     // mode: 'balloon',
@@ -501,12 +452,12 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
             name: 'Template-1',
             html: `
             <div class="__se__tag" style="display: flex; max-width: 480px;">
-                <div class="__se__format__range_div" style="flex: 2; border: 1px solid #5f5f5f; background: #d2e2f1; border-right: none; padding: 5px;">
+                <div class="__se__format__range_block_div" style="flex: 2; border: 1px solid #5f5f5f; background: #d2e2f1; border-right: none; padding: 5px;">
                     <img src="http://suneditor.com/ks/test_img.png" data-align="center" class="__se__uneditable"/>
                 </div>
                 <div style="flex: 4; background: #b7b7b7;">
                     <div
-                    class="__se__format__range_div"
+                    class="__se__format__range_block_div"
                     style="border: 1px solid #5f5f5f; border-bottom: none; height: 50%; position: relative;"
                     contenteditable="false"
                     >
@@ -515,7 +466,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
                         </div>
                     </div>
                     <div
-                    class="__se__format__range_div"
+                    class="__se__format__range_block_div"
                     style="border: 1px solid #5f5f5f; height: 50%; padding: 10px; background: #dce9d5;"
                     >
                         <div><label contenteditable="false">Sales Contact : </label><br /></div>
@@ -759,16 +710,6 @@ window.sun_getContents = function () {
     // alert(ss.getContents());
 
     console.log(ss.getText());
-
-    // ss.core.commandHandler(null, 'selectAll')
-    // let t = '';
-    // const lines = ss.core.getSelectedElements();
-    // for (let i = 0, len = lines.length; i < len; i++) {
-    //     t += lines[i].textContent + '\n';
-    // }
-    // console.log(t);
-
-    // console.log(ss.core.context.element.wysiwyg.textContent)
 }
 
 window.sun_setContents = function (content) {

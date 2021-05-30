@@ -7,8 +7,8 @@ import Util from '../helper/util';
 import { Module } from '../plugins/Module';
 import _Notice from '../plugins/modules/_notice';
 
-type Controllers = Array<string | Function | Element>;
-type fileInfo =  {
+export type Controllers = Array<string | Function | Element>;
+export type fileInfo =  {
     index: number;
     name: string;
     size: string | number;
@@ -17,10 +17,13 @@ type fileInfo =  {
     element: Element;
     src: string;
 };
-type seledtedFileInfo = {target: Element; component: Element; pluginName: string;};
-type commands = 'selectAll' | 'codeView' | 'fullScreen' | 'indent' | 'outdent' | 'undo' | 'redo' | 'removeFormat' | 'print' | 'preview' | 'showBlocks' | 'save' | 'bold' | 'underline' | 'italic' | 'strike' | 'subscript' | 'superscript' | 'copy' | 'cut' | 'paste';
-​​
-interface Core {
+export type seledtedFileInfo = {target: Element; component: Element; pluginName: string;};
+export type commands = 'selectAll' | 'codeView' | 'fullScreen' | 'indent' | 'outdent' | 'undo' | 'redo' | 'removeFormat' | 'print' | 'preview' | 'showBlocks' | 'save' | 'bold' | 'underline' | 'italic' | 'strike' | 'subscript' | 'superscript' | 'copy' | 'cut' | 'paste';
+export type status = {
+    
+}
+
+export interface Core {
     /**
      * @description Util object
      */
@@ -82,7 +85,7 @@ interface Core {
     lang: Lang;
 
     /**
-     * @description The selection node (core.getSelectionNode()) to which the effect was last applied
+     * @description The selection node (selection.getNode()) to which the effect was last applied
      */
     effectNode: Node;
 
@@ -288,62 +291,6 @@ interface Core {
     blur(): void;
 
     /**
-     * @description Set current editor's range object and return.
-     * @param startCon The startContainer property of the selection object.
-     * @param startOff The startOffset property of the selection object.
-     * @param endCon The endContainer property of the selection object.
-     * @param endOff The endOffset property of the selection object.
-     * @returns
-     */
-    setRange(startCon: Node, startOff: number, endCon: Node, endOff: number): Range;
-
-    /**
-     * @description Remove range object and button effect
-     */
-    removeRange(): void;
-
-    /**
-     * @description Get current editor's range object
-     * @returns
-     */
-    getRange(): Range;
-
-    /**
-     * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
-     * Returns a new "range" or argument "range".
-     * @param range core.getRange()
-     * @param container If there is "container" argument, it creates a line in front of the container.
-     */
-    getRange_addLine(range: Range, container?: Element): Range;
-
-    /**
-     * @description Get window selection obejct
-     * @returns
-     */
-    getSelection(): Selection;
-
-    /**
-     * @description Get current select node
-     * @returns
-     */
-    getSelectionNode(): Node;
-
-    /**
-     * @description Returns a "formatElement"(util.isFormatElement) array from the currently selected range.
-     * @param validation The validation function. (Replaces the default validation function-util.isFormatElement(current))
-     * @returns
-     */
-    getSelectedElements(validation?: Function): Node[];
-
-    /**
-     * @description Get format elements and components from the selected area. (P, DIV, H[1-6], OL, UL, TABLE..)
-     * If some of the component are included in the selection, get the entire that component.
-     * @param removeDuplicate If true, if there is a parent and child tag among the selected elements, the child tag is excluded.
-     * @returns
-     */
-    getSelectedElementsAndComponents(removeDuplicate: boolean): Node[];
-
-    /**
      * @description Determine if this offset is the edge offset of container
      * @param container The container property of the selection object.
      * @param offset The offset property of the selection object.
@@ -351,15 +298,6 @@ interface Core {
      * @returns
      */
     isEdgePoint(container: Node, offset: number, dir?: 'front' | 'end'): boolean;
-
-    /**
-     * @description Check if the container and offset values are the edges of the format tag
-     * @param container The container property of the selection object.
-     * @param offset The offset property of the selection object.
-     * @param dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
-     * @returns
-     */
-    isEdgeFormat(container: Node, offset: number, dir: 'front' | 'end'): boolean;
 
     /**
      * @description Show loading box
@@ -516,7 +454,7 @@ interface Core {
     removeDocEvent(type: string, listener: EventListener): void;
 }
 
-interface Toolbar {
+export interface Toolbar {
     /**
      * @description Disable the toolbar
      */

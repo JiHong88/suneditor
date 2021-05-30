@@ -120,7 +120,7 @@ export default {
             const oA = this.plugins.anchor.createAnchor.call(this, this.context.anchor.caller.link, false);
     
             if (!this.context.dialog.updateModal) {
-                const selectedFormats = this.getSelectedElements();
+                const selectedFormats = this.selection.getLines();
                 if (selectedFormats.length > 1) {
                     const oFormat = this.util.createElement(selectedFormats[0].nodeName);
                     oFormat.appendChild(oA);

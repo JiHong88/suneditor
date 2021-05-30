@@ -140,7 +140,7 @@ export default {
         if (!value) return;
 
         const defaultDir = this.context.align.defaultDir;
-        const selectedFormsts = this.getSelectedElements();
+        const selectedFormsts = this.selection.getLines();
         for (let i = 0, len = selectedFormsts.length; i < len; i++) {
             this.util.setStyle(selectedFormsts[i], 'textAlign', (value === defaultDir ? '' : value));
         }

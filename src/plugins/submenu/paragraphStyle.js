@@ -88,7 +88,7 @@ export default {
     on: function () {
         const paragraphContext = this.context.paragraphStyle;
         const paragraphList = paragraphContext._classList;
-        const currentFormat = this.util.getFormatElement(this.getSelectionNode());
+        const currentFormat = this.format.getLine(this.selection.getNode());
 
         for (let i = 0, len = paragraphList.length; i < len; i++) {
             if (this.util.hasClass(currentFormat, paragraphList[i].getAttribute('data-value'))) {
@@ -114,10 +114,10 @@ export default {
 
         if (!value) return;
 
-        let selectedFormsts = this.getSelectedElements();
+        let selectedFormsts = this.selection.getLines();
         if (selectedFormsts.length === 0) {
             this.getRange_addLine(this.getRange(), null);
-            selectedFormsts = this.getSelectedElements();
+            selectedFormsts = this.selection.getLines();
             if (selectedFormsts.length === 0) return;
         }
 

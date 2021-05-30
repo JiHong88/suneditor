@@ -526,14 +526,14 @@ fontSizeUnit    : The font size unit.                               default: 'px
 formats         : Change default formatBlock array.                 default: [...] {Array}
                   Default value: [
                     'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
-                    // "blockquote": range format, "pre": free format, "Other tags": replace format
+                    // "blockquote": rangeBlock, "pre": brLine, "Other tags": line
                   ],
                   Custom: [{
                     tag: 'div', // Tag name
                     name: 'Custom div' || null, // default: tag name
-                    command: 'replace' || 'range' || 'free', // default: "replace"
-                    class: '__se__format__replace_xxx' || '__se__format__range_xxx' || '__se__format__free_xxx' || '__se__format__free__closure_xxx'
-                    // Class names must always begin with "__se__format__(replace, range, free)_"
+                    command: 'line' || 'br-line' || 'range-block', // default: "replace"
+                    class: '__se__format__line_xxx' || '__se__format__br_line_xxx' || '__se__format__range_block_xxx' || '__se__format__br_line_closure_xxx' || '__se__format__range_block_closure_xxx'
+                    // Class names must always begin with "__se__format__(line, br_line, range_block)_"
                   }]
 colorList       : Change default color array of color picker.       default: [..[..]..] {Array}
                   Default value: [

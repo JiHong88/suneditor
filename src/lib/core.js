@@ -140,7 +140,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         lang: lang,
 
         /**
-         * @description The selection node (core.getSelectionNode()) to which the effect was last applied
+         * @description The selection node (selection.getNode()) to which the effect was last applied
          */
         effectNode: null,
 
@@ -859,6 +859,89 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Focus to wysiwyg area using "native focus function"
+         */
+        nativeFocus: function () {
+            const caption = util.getParentElement(this.selection.getNode(), "figcaption");
+            if (caption) {
+                caption.focus();
+            } else {
+                context.element.wysiwyg.focus();
+            }
+
+            this.selection._init();
+        },
+
+        /**
+         * @description Focus to wysiwyg area
+         */
+        focus: function () {
+            if (context.element.wysiwygFrame.style.display === "none") return;
+
+            if (options.iframe) {
+                this.nativeFocus();
+            } else {
+                try {
+                    const range = this.selection.getRange();
+                    if (range.startContainer === range.endContainer && util.isWysiwygDiv(range.startContainer)) {
+                        const currentNode = range.commonAncestorContainer.children[range.startOffset];
+                        if (!util.isFormatElement(currentNode) && !util.isComponent(currentNode)) {
+                            const format = util.createElement(options.defaultTag);
+                            const br = util.createElement("BR");
+                            format.appendChild(br);
+                            context.element.wysiwyg.insertBefore(format, currentNode);
+                            this.selection.setRange(br, 0, br, 0);
+                            return;
+                        }
+                    }
+                    this.selection.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+                } catch (e) {
+                    this.nativeFocus();
+                }
+            }
+
+            event._applyTagEffects();
+            if (this._isBalloon) event._toggleToolbarBalloon();
+        },
+
+        /**
+         * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
+         * If "focusEdge" is null, then selected last element
+         * @param {Element|null} focusEl Focus element
+         */
+        focusEdge: function (focusEl) {
+            if (!focusEl) focusEl = context.element.wysiwyg.lastElementChild;
+
+            const fileComponentInfo = this.getFileComponent(focusEl);
+            if (fileComponentInfo) {
+                this.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
+            } else if (focusEl) {
+                focusEl = util.getChildElement(
+                    focusEl,
+                    function (current) {
+                        return current.childNodes.length === 0 || current.nodeType === 3;
+                    },
+                    true
+                );
+                if (!focusEl) this.nativeFocus();
+                else this.selection.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
+            } else {
+                this.focus();
+            }
+        },
+
+        /**
+         * @description Focusout to wysiwyg area (.blur())
+         */
+        blur: function () {
+            if (options.iframe) {
+                context.element.wysiwygFrame.blur();
+            } else {
+                context.element.wysiwyg.blur();
+            }
+        },
+
+        /**
          * @description Determine if this offset is the edge offset of container
          * @param {Node} container The node of the selection object. (range.startContainer..)
          * @param {Number} offset The offset of the selection object. (core.getRange().startOffset...)
@@ -867,29 +950,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         isEdgePoint: function (container, offset, dir) {
             return (dir !== 'end' && offset === 0) || ((!dir || dir !== 'front') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && !!container.nodeValue && offset === container.nodeValue.length);
-        },
-
-        /**
-         * @description Check if the container and offset values are the edges of the format tag
-         * @param {Node} container The node of the selection object. (range.startContainer..)
-         * @param {Number} offset The offset of the selection object. (core.getRange().startOffset...)
-         * @param {String} dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
-         * @returns {Boolean}
-         */
-        isEdgeFormat: function (node, offset, dir) {
-            if (!this.isEdgePoint(node, offset, dir)) return false;
-
-            let result = true;
-            dir = dir === 'front' ? 'previousSibling' : 'nextSibling';
-            while (node && !util.isFormatElement(node) && !util.isWysiwygDiv(node)) {
-                if (!node[dir] || (util.isBreak(node[dir]) && !node[dir][dir])) {
-                    node = node.parentNode;
-                } else {
-                    result = false;
-                    node = null;
-                }
-            }
-            return result;
         },
 
         /**
@@ -923,8 +983,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const r = this.removeNode();
             this.getRange_addLine(this.getRange(), r.container);
             let oNode = null;
-            let selectionNode = this.getSelectionNode();
-            let formatEl = util.getFormatElement(selectionNode, null);
+            let selectionNode = this.selection.getNode();
+            let formatEl = this.format.getLine(selectionNode, null);
 
             if (util.isListCell(formatEl)) {
                 this.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling, false);
@@ -932,7 +992,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             } else {
                 if (this.getRange().collapsed && (r.container.nodeType === 3 || util.isBreak(r.container))) {
                     const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current); }.bind(util));
-                    oNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
+                    oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
                     if (oNode) formatEl = oNode.previousSibling;
                 }
                 this.insertNode(element, formatEl, false);
@@ -1745,7 +1805,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const dom = _d.createRange().createContextualFragment(html);
             try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
+                this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
             } catch (error) {
                 console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
             }
@@ -1770,7 +1830,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             for (let i = 0, len = domTree.length, t; i < len; i++) {
                 t = domTree[i];
-                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !util._disallowedTags(t)) {
+                if (t.nodeType === 1 && !util.isTextStyleNode(t) && !util.isBreak(t) && !util._disallowedTags(t)) {
                     requireFormat = true;
                     break;
                 }
@@ -1795,7 +1855,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const dom = _d.createRange().createContextualFragment(this._deleteDisallowedTags(contents));
 
             try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
+                this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
             } catch (error) {
                 console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
             }
@@ -1913,6 +1973,106 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             _d.removeEventListener(type, listener);
             if (options.iframe) {
                 this._wd.removeEventListener(type, listener);
+            }
+        },
+
+        /**
+         * @description Fix tags that do not fit the editor format.
+         * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
+         * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist (core._htmlCheckWhitelistRegExp)
+         * @private
+         */
+        _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp) {
+            /**
+             * It is can use ".children(util.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
+             * So check the node type and exclude the text no (current.nodeType !== 1)
+             */
+            const removeTags = [], emptyTags = [], wrongList = [], withoutFormatCells = [];
+
+            // wrong position
+            const wrongTags = util.getListChildNodes(documentFragment, function (current) {
+                if (current.nodeType !== 1) return false;
+
+                // white list
+                if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && util.isNotCheckingNode(current)) {
+                    removeTags.push(current);
+                    return false;
+                }
+
+                const nrtag = !util.getParentElement(current, util.isNotCheckingNode);
+                // empty tags
+                if ((!util.isTable(current) && !util.isListCell(current)) && (util.isFormatElement(current) || util.isRangeFormatElement(current) || util.isTextStyleNode(current)) && current.childNodes.length === 0 && nrtag) {
+                    emptyTags.push(current);
+                    return false;
+                }
+
+                // wrong list
+                if (util.isList(current.parentNode) && !util.isList(current) && !util.isListCell(current)) {
+                    wrongList.push(current);
+                    return false;
+                }
+
+                // table cells
+                if (util.isTableCell(current)) {
+                    const fel = current.firstElementChild;
+                    if (!util.isFormatElement(fel) && !util.isRangeFormatElement(fel) && !util.isComponent(fel)) {
+                        withoutFormatCells.push(current);
+                        return false;
+                    }
+                }
+
+                const result = current.parentNode !== documentFragment &&
+                (util.isFormatElement(current) || util.isComponent(current) || util.isList(current)) &&
+                !util.isRangeFormatElement(current.parentNode) && !util.isListCell(current.parentNode) &&
+                !util.getParentElement(current, util.isComponent) && nrtag;
+
+                return result;
+            }.bind(this));
+
+            for (let i = 0, len = removeTags.length; i < len; i++) {
+                util.removeItem(removeTags[i]);
+            }
+            
+            const checkTags = [];
+            for (let i = 0, len = wrongTags.length, t, p; i < len; i++) {
+                t = wrongTags[i];
+                p = t.parentNode;
+                if (!p || !p.parentNode) continue;
+                p.parentNode.insertBefore(t, p);
+                checkTags.push(p);
+            }
+
+            for (let i = 0, len = checkTags.length, t; i < len; i++) {
+                t = checkTags[i];
+                if (util.onlyZeroWidthSpace(t.textContent.trim())) {
+                    util.removeItem(t);
+                }
+            }
+
+            for (let i = 0, len = emptyTags.length; i < len; i++) {
+                util.removeItem(emptyTags[i]);
+            }
+
+            for (let i = 0, len = wrongList.length, t, tp, children, p; i < len; i++) {
+                t = wrongList[i];
+
+                tp = util.createElement('LI');
+                children = t.childNodes;
+                while (children[0]) {
+                    tp.appendChild(children[0]);
+                }
+                
+                p = t.parentNode;
+                if (!p) continue;
+                p.insertBefore(tp, t);
+                util.removeItem(t);
+            }
+
+            for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {
+                t = withoutFormatCells[i];
+                f = util.createElement('DIV');
+                f.innerHTML = (t.textContent.trim().length === 0 && t.children.length === 0) ? '<br>' : t.innerHTML;
+                t.innerHTML = f.outerHTML;
             }
         },
 
@@ -2193,7 +2353,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const range = this.getRange();
             const commonCon = range.commonAncestorContainer;
             const startCon = range.startContainer;
-            const rangeEl = util.getRangeFormatElement(commonCon, null);
+            const rangeEl = this.format.getRangeBlock(commonCon, null);
             let focusNode, offset, format;
 
             const fileComponent = util.getParentElement(commonCon, util.isComponent);
@@ -2236,10 +2396,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             focusNode = util.getEdgeChildNodes(commonCon, commonCon);
             focusNode = focusNode ? focusNode.ec : commonCon;
 
-            format = util.getFormatElement(focusNode, null);
+            format = this.format.getLine(focusNode, null);
             if (!format) {
                 this.removeRange();
-                this._editorRange();
+                this.selection._init();
                 return;
             }
             
@@ -2417,7 +2577,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         _applyTagEffects: function () {
-            let selectionNode = core.getSelectionNode();
+            let selectionNode = core.selection.getNode();
             if (selectionNode === core.effectNode) return;
             core.effectNode = selectionNode;
 
@@ -2551,7 +2711,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!command && !display) return;
             if (target.disabled) return;
             if (!core.hasFocus) core.nativeFocus();
-            if (!core._variable.isCodeView) core._editorRange();
+            if (!core._variable.isCodeView) core.selection._init();
 
             core.actionCall(command, display, target);
         },
@@ -2562,7 +2722,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // user event
             if (typeof functions.onMouseDown === 'function' && functions.onMouseDown(e, core) === false) return;
             
-            const tableCell = util.getParentElement(e.target, util.isCell);
+            const tableCell = util.getParentElement(e.target, util.isTableCell);
             if (tableCell) {
                 const tablePlugin = core.plugins.table;
                 if (tablePlugin && tableCell !== tablePlugin._fixedCell && !tablePlugin._shift) {
@@ -2611,15 +2771,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            _w.setTimeout(core._editorRange.bind(core));
-            core._editorRange();
+            _w.setTimeout(core.selection._init.bind(core));
+            core.selection._init();
 
-            const selectionNode = core.getSelectionNode();
-            const formatEl = util.getFormatElement(selectionNode, null);
-            const rangeEl = util.getRangeFormatElement(selectionNode, null);
+            const selectionNode = core.selection.getNode();
+            const formatEl = this.format.getLine(selectionNode, null);
+            const rangeEl = this.format.getRangeBlock(selectionNode, null);
             if ((!formatEl || formatEl === rangeEl) && !util.isNonEditable(targetElement) && !util.isList(rangeEl)) {
                 const range = core.getRange();
-                if (util.getFormatElement(range.startContainer) === util.getFormatElement(range.endContainer)) {
+                if (this.format.getLine(range.startContainer) === this.format.getLine(range.endContainer)) {
                     if (util.isList(rangeEl)) {
                         e.preventDefault();
                         const oLi = util.createElement('LI');
@@ -2627,7 +2787,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         oLi.appendChild(selectionNode);
                         rangeEl.insertBefore(oLi, prevLi);
                         core.focus();
-                    } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode) && (!util.isTable(selectionNode) || util.isCell(selectionNode))) {
+                    } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode) && (!util.isTable(selectionNode) || util.isTableCell(selectionNode))) {
                         e.preventDefault();
                         core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag);
                         core.focus();
@@ -2656,7 +2816,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         _toggleToolbarBalloon: function () {
-            core._editorRange();
+            core.selection._init();
             const range = core.getRange();
             if (core._bindControllersOff || (!core._isBalloonAlways && range.collapsed)) event._hideToolbar();
             else event._showToolbarBalloon(range);
@@ -2668,7 +2828,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const range = rangeObj || core.getRange();
             const toolbar = context.element.toolbar;
             const topArea = context.element.topArea;
-            const selection = core.getSelection();
+            const selection = core.selection.get();
 
             let isDirTop;
             if (core._isBalloonAlways && range.collapsed) {
@@ -2697,12 +2857,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             toolbar.style.display = 'block';
 
             if (!rects) {
-                const node = core.getSelectionNode();
+                const node = core.selection.getNode();
                 if (util.isFormatElement(node)) {
                     const zeroWidth = util.createTextNode(util.zeroWidthSpace);
                     core.insertNode(zeroWidth, null, false);
                     core.setRange(zeroWidth, 1, zeroWidth, 1);
-                    core._editorRange();
+                    core.selection._init();
                     rects = core.getRange().getClientRects();
                     rects = rects[isDirTop ? 0 : rects.length - 1];
                 }
@@ -2828,7 +2988,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onInput_wysiwyg: function (e) {
-            core._editorRange();
+            core.selection._init();
 
             // user event
             if (typeof functions.onInput === 'function' && functions.onInput(e, core) === false) return;
@@ -2864,7 +3024,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let siblingNode = selectNode[siblingKey];
 
             if (!siblingNode) {
-                siblingNode = util.getFormatElement(container);
+                siblingNode = this.format.getLine(container);
                 siblingNode = siblingNode ? siblingNode[siblingKey] : null;
                 if (siblingNode && !util.isComponent(siblingNode)) siblingNode = siblingKey === 'previousSibling' ? siblingNode.firstElementChild : siblingNode.lastElementChild;
                 else return null;
@@ -2901,12 +3061,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             /** default key action */
-            let selectionNode = core.getSelectionNode();
+            let selectionNode = core.selection.getNode();
             const range = core.getRange();
             const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
             const fileComponentName = core._fileManager.pluginRegExp.test(core.currentControllerName) ? core.currentControllerName : '';
-            let formatEl = util.getFormatElement(selectionNode, null) || selectionNode;
-            let rangeEl = util.getRangeFormatElement(formatEl, null);
+            let formatEl = this.format.getLine(selectionNode, null) || selectionNode;
+            let rangeEl = this.format.getRangeBlock(formatEl, null);
 
             switch (keyCode) {
                 case 8: /** backspace key */
@@ -2997,11 +3157,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                     // nested list
                     const commonCon = range.commonAncestorContainer;
-                    formatEl = util.getFormatElement(range.startContainer, null);
-                    rangeEl = util.getRangeFormatElement(formatEl, null);
-                    if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
+                    formatEl = this.format.getLine(range.startContainer, null);
+                    rangeEl = this.format.getRangeBlock(formatEl, null);
+                    if (rangeEl && formatEl && !util.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
                         if (util.isListCell(formatEl) && util.isList(rangeEl) && (util.isListCell(rangeEl.parentNode) || formatEl.previousElementSibling) && (selectionNode === formatEl || (selectionNode.nodeType === 3 && (!selectionNode.previousSibling || util.isList(selectionNode.previousSibling)))) &&
-                         (util.getFormatElement(range.startContainer, null) !== util.getFormatElement(range.endContainer, null) ? rangeEl.contains(range.startContainer) : (range.startOffset === 0  && range.collapsed))) {
+                         (this.format.getLine(range.startContainer, null) !== this.format.getLine(range.endContainer, null) ? rangeEl.contains(range.startContainer) : (range.startOffset === 0  && range.collapsed))) {
                             if (range.startContainer !== range.endContainer) {
                                 e.preventDefault();
 
@@ -3141,7 +3301,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 util.removeItem(formatEl);
                                 // table component
                                 if (util.isTable(nextEl)) {
-                                    let cell = util.getChildElement(nextEl, util.isCell, false);
+                                    let cell = util.getChildElement(nextEl, util.isTableCell, false);
                                     cell = cell.firstElementChild || cell;
                                     core.setRange(cell, 0, cell, 0);
                                     break;
@@ -3174,10 +3334,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     // nested list
-                    formatEl = util.getFormatElement(range.startContainer, null);
-                    rangeEl = util.getRangeFormatElement(formatEl, null);
+                    formatEl = this.format.getLine(range.startContainer, null);
+                    rangeEl = this.format.getRangeBlock(formatEl, null);
                     if (util.isListCell(formatEl) && util.isList(rangeEl) && (selectionNode === formatEl || (selectionNode.nodeType === 3 && (!selectionNode.nextSibling || util.isList(selectionNode.nextSibling)) &&
-                     (util.getFormatElement(range.startContainer, null) !== util.getFormatElement(range.endContainer, null) ? rangeEl.contains(range.endContainer) : (range.endOffset === selectionNode.textContent.length && range.collapsed))))) {
+                     (this.format.getLine(range.startContainer, null) !== this.format.getLine(range.endContainer, null) ? rangeEl.contains(range.endContainer) : (range.endOffset === selectionNode.textContent.length && range.collapsed))))) {
                         if (range.startContainer !== range.endContainer) core.removeNode();
                         
                         let next = util.getArrayItem(formatEl.children, util.isList, false);
@@ -3216,8 +3376,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (ctrl || alt || util.isWysiwygDiv(selectionNode)) break;
 
                     const isEdge = (!range.collapsed || core.isEdgePoint(range.startContainer, range.startOffset));            
-                    const selectedFormats = core.getSelectedElements(null);
-                    selectionNode = core.getSelectionNode();
+                    const selectedFormats = core.selection.getLines(null);
+                    selectionNode = core.selection.getNode();
                     const cells = [];
                     let lines = [];
                     let fc = util.isListCell(selectedFormats[0]), lc = util.isListCell(selectedFormats[selectedFormats.length - 1]);
@@ -3240,10 +3400,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         r = core.format._applyNestedList(cells, shift);
                     } else {
                         // table
-                        const tableCell = util.getParentElement(selectionNode, util.isCell);
+                        const tableCell = util.getParentElement(selectionNode, util.isTableCell);
                         if (tableCell && isEdge) {
                             const table = util.getParentElement(tableCell, 'table');
-                            const cells = util.getListChildren(table, util.isCell);
+                            const cells = util.getListChildren(table, util.isTableCell);
                             let idx = shift ? util.prevIdx(cells, tableCell) : util.nextIdx(cells, tableCell);
 
                             if (idx === cells.length && !shift) idx = 0;
@@ -3337,11 +3497,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     
                     break;
                 case 13: /** enter key */
-                    const freeFormatEl = util.getFreeFormatElement(selectionNode, null);
+                    const brLine = this.format.getBrLine(selectionNode, null);
 
                     if (options.charCounterType === "byte-html") {
                         let enterHTML = '';
-                        if ((!shift && freeFormatEl) || shift) {
+                        if ((!shift && brLine) || shift) {
                             enterHTML = '<br>';
                         } else {
                             enterHTML = '<' + formatEl.nodeName + '><br></' + formatEl.nodeName + '>';
@@ -3354,25 +3514,25 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     if (!shift) {
-                        if (core.isEdgeFormat(range.endContainer, range.endOffset, 'end') || /^HR$/i.test(formatEl.nodeName)) {
+                        if (core.format.isEdgeLine(range.endContainer, range.endOffset, 'end') || /^HR$/i.test(formatEl.nodeName)) {
                             e.preventDefault();
                             const newFormat = core.format.appendLine(formatEl, /^H[1-6r]$/i.test(formatEl.nodeName) ? options.defaultTag : formatEl.cloneNode(true));
                             core.setRange(newFormat, 1, newFormat, 1);
                             break;
                         }
 
-                        if (freeFormatEl) {
+                        if (brLine) {
                             e.preventDefault();
-                            const selectionFormat = selectionNode === freeFormatEl;
-                            const wSelection = core.getSelection();
+                            const selectionFormat = selectionNode === brLine;
+                            const wSelection = core.selection.get();
                             const children = selectionNode.childNodes, offset = wSelection.focusOffset, prev = selectionNode.previousElementSibling, next = selectionNode.nextSibling;
     
-                            if (!util.isClosureFreeFormatElement(freeFormatEl) && !!children && ((selectionFormat && range.collapsed && children.length - 1 <= offset + 1 && util.isBreak(children[offset]) && (!children[offset + 1] || ((!children[offset + 2] || util.onlyZeroWidthSpace(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && util.onlyZeroWidthSpace(children[offset + 1].textContent))) &&  offset > 0 && util.isBreak(children[offset - 1])) ||
+                            if (!util.isClosureFreeFormatElement(brLine) && !!children && ((selectionFormat && range.collapsed && children.length - 1 <= offset + 1 && util.isBreak(children[offset]) && (!children[offset + 1] || ((!children[offset + 2] || util.onlyZeroWidthSpace(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && util.onlyZeroWidthSpace(children[offset + 1].textContent))) &&  offset > 0 && util.isBreak(children[offset - 1])) ||
                               (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(prev) && (util.isBreak(prev.previousSibling) || !util.onlyZeroWidthSpace(prev.previousSibling.textContent)) && (!next || (!util.isBreak(next) && util.onlyZeroWidthSpace(next.textContent)))))) {
                                 if (selectionFormat) util.removeItem(children[offset - 1]);
                                 else util.removeItem(selectionNode);
-                                const newEl = core.format.appendLine(freeFormatEl, util.isFormatElement(freeFormatEl.nextElementSibling) ? freeFormatEl.nextElementSibling : null);
-                                util.copyFormatAttributes(newEl, freeFormatEl);
+                                const newEl = core.format.appendLine(brLine, util.isFormatElement(brLine.nextElementSibling) ? brLine.nextElementSibling : null);
+                                util.copyFormatAttributes(newEl, brLine);
                                 core.setRange(newEl, 1, newEl, 1);
                                 break;
                             }
@@ -3382,7 +3542,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
     
                                 let focusNode = wSelection.focusNode;
                                 const wOffset = wSelection.focusOffset;
-                                if (freeFormatEl === focusNode) {
+                                if (brLine === focusNode) {
                                     focusNode = focusNode.childNodes[wOffset - offset > 1 ? wOffset - 1 : wOffset];
                                 }
     
@@ -3408,7 +3568,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                     if (selectRange) break;
                     
-                    if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
+                    if (rangeEl && formatEl && !util.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
                         const range = core.getRange();
                         if(core.isEdgePoint(range.endContainer, range.endOffset) && util.isList(selectionNode.nextSibling)) {
                             e.preventDefault();
@@ -3429,7 +3589,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                             if (util.isListCell(rangeEl.parentNode)) {
                                 rangeEl = formatEl.parentNode.parentNode.parentNode;
-                                newEl = util.splitElement(formatEl, null, util.getElementDepth(formatEl) - 2);
+                                newEl = this.node.split(formatEl, null, util.getElementDepth(formatEl) - 2);
                                 if (!newEl) {
                                     const newListCell = util.createElement('LI');
                                     newListCell.innerHTML = '<br>';
@@ -3437,7 +3597,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                     newEl = newListCell;
                                 }
                             } else {
-                                const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : util.isFormatElement(rangeEl.nextElementSibling) ? rangeEl.nextElementSibling.nodeName : util.isFormatElement(rangeEl.previousElementSibling) ? rangeEl.previousElementSibling.nodeName : options.defaultTag;
+                                const newFormat = util.isTableCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : util.isFormatElement(rangeEl.nextElementSibling) ? rangeEl.nextElementSibling.nodeName : util.isFormatElement(rangeEl.previousElementSibling) ? rangeEl.previousElementSibling.nodeName : options.defaultTag;
                                 newEl = util.createElement(newFormat);
                                 const edge = core.format.removeRangeBlock(rangeEl, [formatEl], null, true, true);
                                 edge.cc.insertBefore(newEl, edge.ec);
@@ -3495,7 +3655,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 e.stopPropagation();
                 const tablePlugin = core.plugins.table;
                 if (tablePlugin && !tablePlugin._shift && !tablePlugin._ref) {
-                    const cell = util.getParentElement(formatEl, util.isCell);
+                    const cell = util.getParentElement(formatEl, util.isTableCell);
                     if (cell) {
                         tablePlugin.onTableCellMultiSelect.call(core, cell, true);
                         return;
@@ -3521,13 +3681,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         onKeyUp_wysiwyg: function (e) {
             if (event._onShortcutKey) return;
-            core._editorRange();
+            core.selection._init();
 
             const range = core.getRange();
             const keyCode = e.keyCode;
             const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
             const alt = e.altKey;
-            let selectionNode = core.getSelectionNode();
+            let selectionNode = core.selection.getNode();
 
             if (core._isBalloon && ((core._isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
                 if (core._isBalloonAlways) {
@@ -3559,11 +3719,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return;
             }
 
-            const formatEl = util.getFormatElement(selectionNode, null);
-            const rangeEl = util.getRangeFormatElement(selectionNode, null);
+            const formatEl = this.format.getLine(selectionNode, null);
+            const rangeEl = this.format.getRangeBlock(selectionNode, null);
             if (((!formatEl && range.collapsed) || formatEl === rangeEl) && !util.isComponent(selectionNode) && !util.isList(selectionNode)) {
                 core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag);
-                selectionNode = core.getSelectionNode();
+                selectionNode = core.selection.getNode();
             }
 
             if (event._directionKeyCode.test(keyCode)) {
@@ -3792,10 +3952,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const ec = range.endContainer;
             
             // table
-            const sCell = util.getRangeFormatElement(sc);
-            const eCell = util.getRangeFormatElement(ec);
-            const sIsCell = util.isCell(sCell);
-            const eIsCell = util.isCell(eCell);
+            const sCell = this.format.getRangeBlock(sc);
+            const eCell = this.format.getRangeBlock(ec);
+            const sIsCell = util.isTableCell(sCell);
+            const eIsCell = util.isTableCell(eCell);
             if (((sIsCell && !sCell.previousElementSibling && !sCell.parentElement.previousElementSibling) || (eIsCell && !eCell.nextElementSibling && !eCell.parentElement.nextElementSibling)) && sCell !== eCell) {
                 if (!sIsCell) {
                     util.removeItem(util.getParentElement(eCell, util.isComponent));
@@ -4047,7 +4207,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const dir = !this ? core._variable._lineBreakDir : this;
             const isList = util.isListCell(component.parentNode);
 
-            const format = util.createElement(isList ? 'BR' : util.isCell(component.parentNode) ? 'DIV' : options.defaultTag);
+            const format = util.createElement(isList ? 'BR' : util.isTableCell(component.parentNode) ? 'DIV' : options.defaultTag);
             if (!isList) format.innerHTML = '<br>';
 
             if (options.charCounterType === 'byte-html' && !this.char.check(format.outerHTML)) return;
@@ -4687,7 +4847,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 } else {
                     let afterNode = null;
                     if (util.isFormatElement(html) || util.isMedia(html)) {
-                        afterNode = util.getFormatElement(core.getSelectionNode(), null);	
+                        afterNode = this.format.getLine(core.selection.getNode(), null);	
                     }
                     core.insertNode(html, afterNode, checkCharCount);
                 }

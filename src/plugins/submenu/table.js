@@ -314,7 +314,7 @@ export default {
         const tablePlugin = this.plugins.table;
         const contextTable = this.context.table;
 
-        if (!this.getSelection().isCollapsed && !tablePlugin._selectedCell) {
+        if (!this.selection.get().isCollapsed && !tablePlugin._selectedCell) {
             this.controllersOff();
             this.util.removeClass(tdElement, 'se-table-selected-cell');
             return;
@@ -1175,7 +1175,7 @@ export default {
     _onCellMultiSelect: function (e) {
         this._antiBlur = true;
         const tablePlugin = this.plugins.table;
-        const target = this.util.getParentElement(e.target, this.util.isCell);
+        const target = this.util.getParentElement(e.target, this.util.isTableCell);
 
         if (tablePlugin._shift) {
             if (target === tablePlugin._fixedCell) tablePlugin._toggleEditor.call(this, true);

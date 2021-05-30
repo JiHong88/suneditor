@@ -18,6 +18,5 @@
     "globals": {
         "ActiveXObject": true,
         "window": true
-    },
-    "extends": [ "prettier"]
+    }
 }

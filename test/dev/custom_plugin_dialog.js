@@ -173,7 +173,7 @@ export default {
                 oA.textContent = anchorText;
                 oA.target = contextLink.targetSelect.selectedOptions[0].value;
 
-                const selectedFormats = this.getSelectedElements();
+                const selectedFormats = this.selection.getLines();
                 if (selectedFormats.length > 1) {
                     const oFormat = this.util.createElement(selectedFormats[0].nodeName);
                     oFormat.appendChild(oA);
@@ -234,7 +234,7 @@ export default {
     on: function (update) {
         if (!update) {
             this.plugins.customLink.init.call(this);
-            this.context.customLink.linkAnchorText.value = this.getSelection().toString();
+            this.context.customLink.linkAnchorText.value = this.selection.get().toString();
         } else if (this.context.customLink._linkAnchor) {
             this.context.dialog.updateModal = true;
             this.context.customLink.focusElement.value = this.context.customLink._linkAnchor.href;

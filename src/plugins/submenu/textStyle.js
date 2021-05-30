@@ -103,7 +103,7 @@ export default {
         const util = this.util;
         const textStyleContext = this.context.textStyle;
         const styleButtonList = textStyleContext._styleList;
-        const selectionNode = this.getSelectionNode();
+        const selectionNode = this.selection.getNode();
 
         for (let i = 0, len = styleButtonList.length, btn, data, active; i < len; i++) {
             btn = styleButtonList[i];

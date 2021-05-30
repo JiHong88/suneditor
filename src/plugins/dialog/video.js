@@ -669,7 +669,7 @@ export default {
             this.plugins.video.applySize.call(this, (size[0] || prevFrame.style.width || prevFrame.width || ''), (size[1] || prevFrame.style.height || prevFrame.height || ''));
 
             // align
-            const format = this.util.getFormatElement(prevFrame);
+            const format = this.format.getLine(prevFrame);
             if (format) contextVideo._align = format.style.textAlign || format.style.float;
             this.plugins.video.setAlign.call(this, null, oFrame, cover, container);
 

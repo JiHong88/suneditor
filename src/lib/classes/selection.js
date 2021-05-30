@@ -6,7 +6,7 @@
 
 import CoreInterface from "../../interface/_core";
 
-const Selection = function(editor) {
+const Selection = function (editor) {
 	CoreInterface.call(this, editor);
 
 	this.range = null;
@@ -15,11 +15,34 @@ const Selection = function(editor) {
 
 Selection.prototype = {
 	/**
+	 * @description Return the range object of editor's first child node
+	 * @returns {Object}
+	 * @private
+	 */
+	_createDefaultRange: function () {
+		const wysiwyg = context.element.wysiwyg;
+		wysiwyg.focus();
+		const range = this._wd.createRange();
+
+		let focusEl = wysiwyg.firstElementChild;
+		if (!focusEl) {
+			focusEl = util.createElement(options.defaultTag);
+			focusEl.innerHTML = "<br>";
+			wysiwyg.appendChild(focusEl);
+		}
+
+		range.setStart(focusEl, 0);
+		range.setEnd(focusEl, 0);
+
+		return range;
+	},
+
+	/**
 	 * @description Saving the range object and the currently selected node of editor
 	 * @private
 	 */
-	_editorRange: function() {
-		const selection = this.getSelection();
+	_init: function () {
+		const selection = this.get();
 		if (!selection) return null;
 		let range = null;
 		let selectionNode = null;
@@ -45,6 +68,32 @@ Selection.prototype = {
 	},
 
 	/**
+	 * @description Get current editor's range object
+	 * @returns {Object}
+	 */
+	getRange: function () {
+		const range = this._variable._range || this._createDefaultRange();
+		const selection = this.get();
+		if (range.collapsed === selection.isCollapsed || !context.element.wysiwyg.contains(selection.focusNode))
+			return range;
+
+		if (selection.rangeCount > 0) {
+			this._variable._range = selection.getRangeAt(0);
+			return this._variable._range;
+		} else {
+			const sc = selection.anchorNode,
+				ec = selection.focusNode,
+				so = selection.anchorOffset,
+				eo = selection.focusOffset;
+			const compareValue = util.compareElements(sc, ec);
+			const rightDir =
+				compareValue.ancestor &&
+				(compareValue.result === 0 ? so <= eo : compareValue.result > 1 ? true : false);
+			return this.setRange(rightDir ? sc : ec, rightDir ? so : eo, rightDir ? ec : sc, rightDir ? eo : so);
+		}
+	},
+
+	/**
 	 * @description Set current editor's range object and return.
 	 * @param {Node} startCon The startContainer property of the selection object.
 	 * @param {Number} startOff The startOffset property of the selection object.
@@ -52,7 +101,7 @@ Selection.prototype = {
 	 * @param {Number} endOff The endOffset property of the selection object.
 	 * @returns {Object} Range object.
 	 */
-	setRange: function(startCon, startOff, endCon, endOff) {
+	setRange: function (startCon, startOff, endCon, endOff) {
 		if (!startCon || !endCon) return;
 		if (startOff > startCon.textContent.length) startOff = startCon.textContent.length;
 		if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
@@ -76,14 +125,14 @@ Selection.prototype = {
 			return;
 		}
 
-		const selection = this.getSelection();
+		const selection = this.get();
 
 		if (selection.removeAllRanges) {
 			selection.removeAllRanges();
 		}
 
 		selection.addRange(range);
-		this._editorRange();
+		this._init();
 		if (options.iframe) this.nativeFocus();
 
 		return range;
@@ -92,10 +141,10 @@ Selection.prototype = {
 	/**
 	 * @description Remove range object and button effect
 	 */
-	removeRange: function() {
+	removeRange: function () {
 		this._variable._range = null;
 		this._variable._selectionNode = null;
-		if (this.hasFocus) this.getSelection().removeAllRanges();
+		if (this.hasFocus) this.get().removeAllRanges();
 
 		const commandMap = this.commandMap;
 		const activePlugins = this.activePlugins;
@@ -114,40 +163,14 @@ Selection.prototype = {
 	},
 
 	/**
-	 * @description Get current editor's range object
-	 * @returns {Object}
-	 */
-	getRange: function() {
-		const range = this._variable._range || this._createDefaultRange();
-		const selection = this.getSelection();
-		if (range.collapsed === selection.isCollapsed || !context.element.wysiwyg.contains(selection.focusNode))
-			return range;
-
-		if (selection.rangeCount > 0) {
-			this._variable._range = selection.getRangeAt(0);
-			return this._variable._range;
-		} else {
-			const sc = selection.anchorNode,
-				ec = selection.focusNode,
-				so = selection.anchorOffset,
-				eo = selection.focusOffset;
-			const compareValue = util.compareElements(sc, ec);
-			const rightDir =
-				compareValue.ancestor &&
-				(compareValue.result === 0 ? so <= eo : compareValue.result > 1 ? true : false);
-			return this.setRange(rightDir ? sc : ec, rightDir ? so : eo, rightDir ? ec : sc, rightDir ? eo : so);
-		}
-	},
-
-	/**
 	 * @description If the "range" object is a non-editable area, add a line at the top of the editor and update the "range" object.
 	 * Returns a new "range" or argument "range".
 	 * @param {Object} range core.getRange()
 	 * @param {Element|null} container If there is "container" argument, it creates a line in front of the container.
 	 * @returns {Object} range
 	 */
-	getRange_addLine: function(range, container) {
-		if (this._selectionVoid(range)) {
+	getRange_addLine: function (range, container) {
+		if (this.isNone(range)) {
 			const wysiwyg = context.element.wysiwyg;
 			const op = util.createElement(options.defaultTag);
 			op.innerHTML = "<br>";
@@ -165,7 +188,7 @@ Selection.prototype = {
 	 * @description Get window selection obejct
 	 * @returns {Object}
 	 */
-	getSelection: function() {
+	get: function () {
 		return this._shadowRoot && this._shadowRoot.getSelection
 			? this._shadowRoot.getSelection()
 			: this._ww.getSelection();
@@ -175,18 +198,18 @@ Selection.prototype = {
 	 * @description Get current select node
 	 * @returns {Node}
 	 */
-	getSelectionNode: function() {
-		if (!context.element.wysiwyg.contains(this._variable._selectionNode)) this._editorRange();
+	getNode: function () {
+		if (!context.element.wysiwyg.contains(this._variable._selectionNode)) this._init();
 		if (!this._variable._selectionNode) {
 			const selectionNode = util.getChildElement(
 				context.element.wysiwyg.firstChild,
-				function(current) {
+				function (current) {
 					return current.childNodes.length === 0 || current.nodeType === 3;
 				},
 				false
 			);
 			if (!selectionNode) {
-				this._editorRange();
+				this._init();
 			} else {
 				this._variable._selectionNode = selectionNode;
 				return selectionNode;
@@ -196,52 +219,13 @@ Selection.prototype = {
 	},
 
 	/**
-	 * @description Return the range object of editor's first child node
-	 * @returns {Object}
-	 * @private
-	 */
-	_createDefaultRange: function() {
-		const wysiwyg = context.element.wysiwyg;
-		wysiwyg.focus();
-		const range = this._wd.createRange();
-
-		let focusEl = wysiwyg.firstElementChild;
-		if (!focusEl) {
-			focusEl = util.createElement(options.defaultTag);
-			focusEl.innerHTML = "<br>";
-			wysiwyg.appendChild(focusEl);
-		}
-
-		range.setStart(focusEl, 0);
-		range.setEnd(focusEl, 0);
-
-		return range;
-	},
-
-	/**
-	 * @description Returns true if there is no valid "selection".
-	 * @param {Object} range core.getRange()
-	 * @returns {Object} range
-	 * @private
-	 */
-	_selectionVoid: function(range) {
-		const comm = range.commonAncestorContainer;
-		return (
-			(util.isWysiwygDiv(range.startContainer) && util.isWysiwygDiv(range.endContainer)) ||
-			/FIGURE/i.test(comm.nodeName) ||
-			this._fileManager.regExp.test(comm.nodeName) ||
-			util.isMediaComponent(comm)
-		);
-	},
-
-	/**
 	 * @description Reset range object to text node selected status.
 	 * @returns {Boolean} Returns false if there is no valid selection.
 	 * @private
 	 */
-	_resetRangeToTextNode: function() {
+	_resetRangeToTextNode: function () {
 		const range = this.getRange();
-		if (this._selectionVoid(range)) return false;
+		if (this.isNone(range)) return false;
 
 		let startCon = range.startContainer;
 		let startOff = range.startOffset;
@@ -270,10 +254,10 @@ Selection.prototype = {
 					tempOffset = 0;
 				}
 
-				let format = util.getFormatElement(tempCon, null);
-				if (format === util.getRangeFormatElement(format, null)) {
+				let format = this.format.getLine(tempCon, null);
+				if (format === this.format.getRangeBlock(format, null)) {
 					format = util.createElement(
-						util.getParentElement(tempCon, util.isCell) ? "DIV" : options.defaultTag
+						util.getParentElement(tempCon, util.isTableCell) ? "DIV" : options.defaultTag
 					);
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
@@ -315,9 +299,9 @@ Selection.prototype = {
 					tempOffset = tempOffset > 0 ? tempCon.textContent.length : tempOffset;
 				}
 
-				let format = util.getFormatElement(tempCon, null);
-				if (format === util.getRangeFormatElement(format, null)) {
-					format = util.createElement(util.isCell(format) ? "DIV" : options.defaultTag);
+				let format = this.format.getLine(tempCon, null);
+				if (format === this.format.getRangeBlock(format, null)) {
+					format = util.createElement(util.isTableCell(format) ? "DIV" : options.defaultTag);
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
 				}
@@ -344,11 +328,11 @@ Selection.prototype = {
 	},
 
 	/**
-	 * @description Returns a "formatElement"(util.isFormatElement) array from the currently selected range.
-	 * @param {Function|null} validation The validation function. (Replaces the default validation function-util.isFormatElement(current))
+	 * @description Returns a "line" array from the currently selected range.
+	 * @param {Function|null} validation The validation function. (Replaces the default validation format.isLine(current))
 	 * @returns {Array}
 	 */
-	getSelectedElements: function(validation) {
+	getLines: function (validation) {
 		if (!this._resetRangeToTextNode()) return [];
 		let range = this.getRange();
 
@@ -370,25 +354,25 @@ Selection.prototype = {
 		const commonCon = range.commonAncestorContainer;
 
 		// get line nodes
-		const lineNodes = util.getListChildren(commonCon, function(current) {
+		const lineNodes = util.getListChildren(commonCon, function (current) {
 			return validation ? validation(current) : util.isFormatElement(current);
 		});
 
 		if (!util.isWysiwygDiv(commonCon) && !util.isRangeFormatElement(commonCon))
-			lineNodes.unshift(util.getFormatElement(commonCon, null));
+			lineNodes.unshift(this.format.getLine(commonCon, null));
 		if (startCon === endCon || lineNodes.length === 1) return lineNodes;
 
-		let startLine = util.getFormatElement(startCon, null);
-		let endLine = util.getFormatElement(endCon, null);
+		let startLine = this.format.getLine(startCon, null);
+		let endLine = this.format.getLine(endCon, null);
 		let startIdx = null;
 		let endIdx = null;
 
-		const onlyTable = function(current) {
+		const onlyTable = function (current) {
 			return util.isTable(current) ? /^TABLE$/i.test(current.nodeName) : true;
 		};
 
-		let startRangeEl = util.getRangeFormatElement(startLine, onlyTable);
-		let endRangeEl = util.getRangeFormatElement(endLine, onlyTable);
+		let startRangeEl = this.format.getRangeBlock(startLine, onlyTable);
+		let endRangeEl = this.format.getRangeBlock(endLine, onlyTable);
 		if (util.isTable(startRangeEl) && util.isListCell(startRangeEl.parentNode))
 			startRangeEl = startRangeEl.parentNode;
 		if (util.isTable(endRangeEl) && util.isListCell(endRangeEl.parentNode)) endRangeEl = endRangeEl.parentNode;
@@ -415,24 +399,24 @@ Selection.prototype = {
 	},
 
 	/**
-	 * @description Get format elements and components from the selected area. (P, DIV, H[1-6], OL, UL, TABLE..)
+	 * @description Get lines and components from the selected area. (P, DIV, H[1-6], OL, UL, TABLE..)
 	 * If some of the component are included in the selection, get the entire that component.
 	 * @param {Boolean} removeDuplicate If true, if there is a parent and child tag among the selected elements, the child tag is excluded.
 	 * @returns {Array}
 	 */
-	getSelectedElementsAndComponents: function(removeDuplicate) {
+	getLinesAndComponents: function (removeDuplicate) {
 		const commonCon = this.getRange().commonAncestorContainer;
 		const myComponent = util.getParentElement(commonCon, util.isComponent);
 		const selectedLines = util.isTable(commonCon)
-			? this.getSelectedElements(null)
-			: this.getSelectedElements(
-					function(current) {
-						const component = this.getParentElement(current, this.isComponent);
+			? this.getLines(null)
+			: this.getLines(
+					function (current) {
+						const component = util.getParentElement(current, this.isComponent);
 						return (
 							(this.isFormatElement(current) && (!component || component === myComponent)) ||
-							(this.isComponent(current) && !this.getFormatElement(current))
+							(this.isComponent(current) && !this.getLine(current))
 						);
-					}.bind(util)
+					}.bind(this.format)
 			  );
 
 		if (removeDuplicate) {
@@ -460,26 +444,25 @@ Selection.prototype = {
 	 * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
 	 * @returns {Object|Node|null}
 	 */
-	insertNode: function(oNode, afterNode, checkCharCount) {
+	insertNode: function (oNode, afterNode, checkCharCount) {
 		if (checkCharCount && !this.char.check(oNode)) {
 			return null;
 		}
 
-		const freeFormat = util.getFreeFormatElement(this.getSelectionNode(), null);
+		const brLine = this.format.getBrLine(this.selection.getNode(), null);
 		const isFormats =
-			(!freeFormat && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) ||
-			util.isComponent(oNode);
+			(!brLine && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) || util.isComponent(oNode);
 
 		if (!afterNode && (isFormats || util.isComponent(oNode) || util.isMedia(oNode))) {
 			const r = this.removeNode();
 			if (r.container.nodeType === 3 || util.isBreak(r.container)) {
 				const depthFormat = util.getParentElement(
 					r.container,
-					function(current) {
+					function (current) {
 						return this.isRangeFormatElement(current) || this.isListCell(current);
 					}.bind(util)
 				);
-				afterNode = util.splitElement(
+				afterNode = this.editor.node.split(
 					r.container,
 					r.offset,
 					!depthFormat ? 0 : util.getElementDepth(depthFormat) + 1
@@ -618,9 +601,9 @@ Selection.prototype = {
 					const r = this.removeNode();
 					const container =
 						r.container.nodeType === 3
-							? util.isListCell(util.getFormatElement(r.container, null))
+							? util.isListCell(this.format.getLine(r.container, null))
 								? r.container
-								: util.getFormatElement(r.container, null) || r.container.parentNode
+								: this.format.getLine(r.container, null) || r.container.parentNode
 							: r.container;
 					const rangeCon = util.isWysiwygDiv(container) || util.isRangeFormatElement(container);
 					parentNode = rangeCon ? container : container.parentNode;
@@ -632,7 +615,7 @@ Selection.prototype = {
 
 			if (
 				isFormats &&
-				!freeFormat &&
+				!brLine &&
 				!util.isRangeFormatElement(parentNode) &&
 				!util.isListCell(parentNode) &&
 				!util.isWysiwygDiv(parentNode)
@@ -652,13 +635,13 @@ Selection.prototype = {
 			parentNode.appendChild(oNode);
 		} finally {
 			if ((util.isFormatElement(oNode) || util.isComponent(oNode)) && startCon === endCon) {
-				const cItem = util.getFormatElement(commonCon, null);
+				const cItem = this.format.getLine(commonCon, null);
 				if (cItem && cItem.nodeType === 1 && util.isEmptyLine(cItem)) {
 					util.removeItem(cItem);
 				}
 			}
 
-			if (freeFormat && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) {
+			if (brLine && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) {
 				oNode = this._setIntoFreeFormat(oNode);
 			}
 
@@ -721,7 +704,7 @@ Selection.prototype = {
 		}
 	},
 
-	_setIntoFreeFormat: function(oNode) {
+	_setIntoFreeFormat: function (oNode) {
 		const parentNode = oNode.parentNode;
 		let oNodeChildren, lastONode;
 
@@ -754,7 +737,7 @@ Selection.prototype = {
 	 * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
 	 * @returns {Object}
 	 */
-	removeNode: function() {
+	removeNode: function () {
 		this._resetRangeToTextNode();
 
 		const range = this.getRange();
@@ -835,8 +818,8 @@ Selection.prototype = {
 			startIndex = endIndex = 0;
 		}
 
-		function remove(item) {
-			const format = util.getFormatElement(item, null);
+		const remove = function (item) {
+			const format = this.format.getLine(item, null);
 			util.removeItem(item);
 
 			if (util.isListCell(format)) {
@@ -850,7 +833,7 @@ Selection.prototype = {
 					util.removeItemAllParents(child, null, null);
 				}
 			}
-		}
+		}.bind(this);
 
 		for (let i = startIndex; i <= endIndex; i++) {
 			const item = childNodes[i];
@@ -915,7 +898,7 @@ Selection.prototype = {
 		if (!util.isWysiwygDiv(container) && container.childNodes.length === 0) {
 			const rc = util.removeItemAllParents(
 				container,
-				function(current) {
+				function (current) {
 					if (this.isComponent(current)) return false;
 					const text = current.textContent;
 					return text.length === 0 || /^(\n|\u200B)+$/.test(text);
@@ -936,6 +919,21 @@ Selection.prototype = {
 			offset: offset,
 			prevContainer: startCon && startCon.parentNode ? startCon : null
 		};
+	},
+
+	/**
+	 * @description Returns true if there is no valid selection.
+	 * @param {Object} range selection.getRange()
+	 * @returns {Boolean}
+	 */
+	isNone: function (range) {
+		const comm = range.commonAncestorContainer;
+		return (
+			(util.isWysiwygDiv(range.startContainer) && util.isWysiwygDiv(range.endContainer)) ||
+			/FIGURE/i.test(comm.nodeName) ||
+			this._fileManager.regExp.test(comm.nodeName) ||
+			util.isMediaComponent(comm)
+		);
 	},
 
 	constructor: Selection

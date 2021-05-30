@@ -617,7 +617,7 @@ export default {
             contextImage.inputX.value = contextImage._origin_w;
             contextImage.inputY.value = contextImage._origin_h;
             // get align
-            const format = this.util.getFormatElement(tag);
+            const format = this.format.getLine(tag);
             if (format) contextImage._align = format.style.textAlign || format.style.float;
             // link
             const link = this.util.getParentElement(tag, this.util.isAnchor);
@@ -761,7 +761,7 @@ export default {
         if (isNewContainer) {
             const existElement = (this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode)) ? 
                 contextImage._element : 
-                /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
+                /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.format.getLine(contextImage._element) || contextImage._element;
                 
             if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);

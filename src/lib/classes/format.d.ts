@@ -112,6 +112,39 @@ class Format {
 	 * @description Remove format of the currently selected text
 	 */
 	removeStyleNode(): void;
+
+	/**
+	 * @description If a parent node that contains an argument node finds a line element, it returns that node.
+	 * @param element Reference node.
+	 * @param validation Additional validation function.
+	 * @returns
+	 */
+	getLine(element: Node, validation?: Function): Element | null;
+
+	/**
+	 * @description If a parent node that contains an argument node finds a format node (util.isRangeFormatElement), it returns that node.
+	 * @param element Reference node.
+	 * @param validation Additional validation function.
+	 * @returns
+	 */
+	getRangeBlock(element: Node, validation?: Function): Element | null;
+
+	/**
+	 * @description If a parent node that contains an argument node finds a free format node (util.isFreeFormatElement), it returns that node.
+	 * @param element Reference node.
+	 * @param validation Additional validation function.
+	 * @returns
+	 */
+	getBrLine(element: Node, validation?: Function): Element | null;
+
+	/**
+	 * @description Check if the container and offset values are the edges of the "line"
+	 * @param container The container property of the selection object.
+	 * @param offset The offset property of the selection object.
+	 * @param dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
+	 * @returns
+	 */
+	isEdgeFormat(container: Node, offset: number, dir: "front" | "end"): boolean;
 }
 
 export default Format;
