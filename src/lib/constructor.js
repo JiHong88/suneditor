@@ -384,17 +384,17 @@ export default {
             return _default;
         }, {});
         options._textTagsMap = {
-            'strong': textTags.bold,
-            'b': textTags.bold,
-            'u': textTags.underline,
-            'ins': textTags.underline,
-            'em': textTags.italic,
-            'i': textTags.italic,
-            'del': textTags.strike,
-            'strike': textTags.strike,
-            's': textTags.strike,
-            'sub': textTags.sub,
-            'sup': textTags.sup
+            'strong': textTags.bold.toLowerCase(),
+            'b': textTags.bold.toLowerCase(),
+            'u': textTags.underline.toLowerCase(),
+            'ins': textTags.underline.toLowerCase(),
+            'em': textTags.italic.toLowerCase(),
+            'i': textTags.italic.toLowerCase(),
+            'del': textTags.strike.toLowerCase(),
+            'strike': textTags.strike.toLowerCase(),
+            's': textTags.strike.toLowerCase(),
+            'sub': textTags.sub.toLowerCase(),
+            'sup': textTags.sup.toLowerCase()
         };
         options.value = typeof options.value === 'string' ? options.value : null;
         options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
