@@ -6202,12 +6202,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                     // component
                     if ((util.isFormatElement(selectionNode) || selectionNode.nextSibling === null || (util.onlyZeroWidthSpace(selectionNode.nextSibling) && selectionNode.nextSibling.nextSibling === null)) && range.startOffset === selectionNode.textContent.length) {
-                        let nextEl = formatEl.nextElementSibling;
-                        if (!nextEl) {
-                            e.preventDefault();
-                            break;
-                        }
-
+                        const nextEl = formatEl.nextElementSibling;
+                        if (!nextEl) break;
                         if (util.isComponent(nextEl)) {
                             e.preventDefault();
 
