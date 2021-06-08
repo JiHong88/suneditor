@@ -1153,11 +1153,23 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let tempCon, tempOffset, tempChild;
 
             if (util.isFormatElement(startCon)) {
-                startCon = startCon.childNodes[startOff] || startCon.lastChild;
-                startOff = startCon.textContent.length;
+                if (!startCon.childNodes[startOff]) {
+                    startCon = startCon.lastChild;
+                    startOff = startCon.textContent.length;
+                } else {
+                    startCon = startCon.childNodes[startOff];
+                    startOff = 0;
+                }
+                while (startCon && startCon.nodeType === 1 && startCon.firstChild) {
+                    startCon = startCon.firstChild;
+                    startOff = 0;
+                }
             }
             if (util.isFormatElement(endCon)) {
                 endCon = endCon.childNodes[endOff] || endCon.lastChild;
+                while (endCon && endCon.nodeType === 1 && endCon.lastChild) {
+                    endCon = endCon.lastChild;
+                }
                 endOff = endCon.textContent.length;
             }
 
@@ -2749,7 +2761,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!util.isListCell(el)) return;
             if (!child) el.removeAttribute('style');
             
-            const children = util.getArrayItem((child || el).childNodes, function (current) { return !util.isBreak(current) && !util.onlyZeroWidthSpace(current.textContent.trim()); }, true);
+            const children = util.getArrayItem((child || el).childNodes, function (current) { return !util.isBreak(current); }, true);
             if (children[0] && children.length === 1){
                 child = children[0];
                 if (!child || child.nodeType !== 1) return;
@@ -2757,9 +2769,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const childStyle = child.style;
                 const elStyle = el.style;
 
-                // bold
-                if (/STRONG/i.test(child.nodeName)) elStyle.fontWeight = 'bold'; // bold
+                // bold, italic
+                if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
                 else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
+                if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
+                else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
 
                 // styles
                 if (childStyle.color) elStyle.color = childStyle.color; // color
@@ -6527,7 +6541,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             }
                             
                             newEl.innerHTML = '<br>';
-                            util.copyFormatAttributes(newEl, formatEl);
                             util.removeItemAllParents(formatEl, null, null);
                             core.setRange(newEl, 1, newEl, 1);
                             break;
