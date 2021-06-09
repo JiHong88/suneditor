@@ -1153,11 +1153,23 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let tempCon, tempOffset, tempChild;
 
             if (util.isFormatElement(startCon)) {
-                startCon = startCon.childNodes[startOff] || startCon.lastChild;
-                startOff = startCon.textContent.length;
+                if (!startCon.childNodes[startOff]) {
+                    startCon = startCon.lastChild;
+                    startOff = startCon.textContent.length;
+                } else {
+                    startCon = startCon.childNodes[startOff];
+                    startOff = 0;
+                }
+                while (startCon && startCon.nodeType === 1 && startCon.firstChild) {
+                    startCon = startCon.firstChild;
+                    startOff = 0;
+                }
             }
             if (util.isFormatElement(endCon)) {
                 endCon = endCon.childNodes[endOff] || endCon.lastChild;
+                while (endCon && endCon.nodeType === 1 && endCon.lastChild) {
+                    endCon = endCon.lastChild;
+                }
                 endOff = endCon.textContent.length;
             }
 
@@ -2749,7 +2761,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!util.isListCell(el)) return;
             if (!child) el.removeAttribute('style');
             
-            const children = util.getArrayItem((child || el).childNodes, function (current) { return !util.isBreak(current) && !util.onlyZeroWidthSpace(current.textContent.trim()); }, true);
+            const children = util.getArrayItem((child || el).childNodes, function (current) { return !util.isBreak(current); }, true);
             if (children[0] && children.length === 1){
                 child = children[0];
                 if (!child || child.nodeType !== 1) return;
@@ -2757,9 +2769,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const childStyle = child.style;
                 const elStyle = el.style;
 
-                // bold
-                if (/STRONG/i.test(child.nodeName)) elStyle.fontWeight = 'bold'; // bold
+                // bold, italic
+                if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
                 else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
+                if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
+                else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
 
                 // styles
                 if (childStyle.color) elStyle.color = childStyle.color; // color
@@ -4655,8 +4669,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!this._disallowedTextTagsRegExp) return text;
 
             const ec = options._textTagsMap;
-            return text.replace(this._disallowedTextTagsRegExp, function (m, t, n) {
-                return t + (typeof ec[n] === 'string' ? ec[n] : n);
+            return text.replace(this._disallowedTextTagsRegExp, function (m, t, n, p) {
+                return t + (typeof ec[n] === 'string' ? ec[n] : n) + (p ? ' ' + p : '');
             });
         },
 
@@ -4690,6 +4704,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (tAttr) v = m.match(tAttr);
             else v = m.match(this._attributesWhitelistRegExp);
 
+            if (rowLevelCheck || /<a\b/i.test(t)) {
+                const sv = m.match(/id\s*=\s*(?:"|')[^"']*(?:"|')/);
+                if (sv) {
+                    if (!v) v = [];
+                    v.push(sv[0]);
+                }
+            }
+
             if ((rowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
                 const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (sv) {
@@ -4698,17 +4720,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            if (/<a\b/i.test(t)) {
-                const sv = m.match(/id\s*=\s*(?:"|')[^"']*(?:"|')/);
-                if (sv) {
-                    if (!v) v = [];
-                    v.push(sv[0]);
-                }
-            }
-
             if (v) {
                 for (let i = 0, len = v.length; i < len; i++) {
-                    if (rowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
+                    if (!rowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
                     t += ' ' + (/^href\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i]) ? '' : v[i]);
                 }
             }
@@ -5059,10 +5073,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             for (let i = 0; i < allowTextTags.length; i++) {
                 disallowTextTags.splice(disallowTextTags.indexOf(allowTextTags[i].toLowerCase()), 1);
             }
-            this._disallowedTextTagsRegExp = disallowTextTags.length === 0 ? null : new wRegExp('(<\\/?)(' + disallowTextTags.join('|') + ')\\b\\s*(?:[^>^<]+)?\\s*(?=>)', 'gi');
+            this._disallowedTextTagsRegExp = disallowTextTags.length === 0 ? null : new wRegExp('(<\\/?)(' + disallowTextTags.join('|') + ')\\b\\s*([^>^<]+)?\\s*(?=>)', 'gi');
 
             // set whitelist
-            const defaultAttr = 'contenteditable|id|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
+            const defaultAttr = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
             this._htmlCheckWhitelistRegExp = new wRegExp('^(' + options._editorTagsWhitelist.replace('|//', '') + ')$', 'i');
             this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|<!--|-->'));
@@ -5074,7 +5088,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let allAttr = '';
             if (!!_attr) {
                 for (let k in _attr) {
-                    if (!util.hasOwn(_attr, k)) continue;
+                    if (!util.hasOwn(_attr, k) || /^on[a-z]+$/i.test(_attr[k])) continue;
                     if (k === 'all') {
                         allAttr = _attr[k] + '|';
                     } else {
@@ -6202,12 +6216,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                     // component
                     if ((util.isFormatElement(selectionNode) || selectionNode.nextSibling === null || (util.onlyZeroWidthSpace(selectionNode.nextSibling) && selectionNode.nextSibling.nextSibling === null)) && range.startOffset === selectionNode.textContent.length) {
-                        let nextEl = formatEl.nextElementSibling;
-                        if (!nextEl) {
-                            e.preventDefault();
-                            break;
-                        }
-
+                        const nextEl = formatEl.nextElementSibling;
+                        if (!nextEl) break;
                         if (util.isComponent(nextEl)) {
                             e.preventDefault();
 
@@ -6531,7 +6541,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             }
                             
                             newEl.innerHTML = '<br>';
-                            util.copyFormatAttributes(newEl, formatEl);
                             util.removeItemAllParents(formatEl, null, null);
                             core.setRange(newEl, 1, newEl, 1);
                             break;
@@ -6811,16 +6820,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const editorHeight = element.editorArea.offsetHeight;
             const y = (this.scrollY || _d.documentElement.scrollTop) + options.stickyToolbar;
             const editorTop = event._getEditorOffsets(options.toolbarContainer).top - (core._isInline ? element.toolbar.offsetHeight : 0);
+            const inlineOffset = core._isInline && (y - editorTop) > 0 ? y - editorTop - context.element.toolbar.offsetHeight : 0;
             
             if (y < editorTop) {
                 event._offStickyToolbar();
             }
             else if (y + core._variable.minResizingSize >= editorHeight + editorTop) {
-                if (!core._sticky) event._onStickyToolbar();
-                element.toolbar.style.top = (editorHeight + editorTop + options.stickyToolbar -y - core._variable.minResizingSize) + 'px';
+                if (!core._sticky) event._onStickyToolbar(inlineOffset);
+                element.toolbar.style.top = (inlineOffset + editorHeight + editorTop + options.stickyToolbar - y - core._variable.minResizingSize) + 'px';
             }
             else if (y >= editorTop) {
-                event._onStickyToolbar();
+                event._onStickyToolbar(inlineOffset);
             }
         },
 
@@ -6846,7 +6856,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             return _d.documentElement.scrollHeight - (event._getEditorOffsets(null).top + context.element.topArea.offsetHeight);
         },
 
-        _onStickyToolbar: function () {
+        _onStickyToolbar: function (inlineOffset) {
             const element = context.element;
 
             if (!core._isInline && !options.toolbarContainer) {
@@ -6854,7 +6864,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 element._stickyDummy.style.display = 'block';
             }
 
-            element.toolbar.style.top = options.stickyToolbar + 'px';
+            element.toolbar.style.top = (options.stickyToolbar + inlineOffset) + 'px';
             element.toolbar.style.width = core._isInline ? core._inlineToolbarAttr.width : element.toolbar.offsetWidth + 'px';
             util.addClass(element.toolbar, 'se-toolbar-sticky');
             core._sticky = true;
