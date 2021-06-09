@@ -698,7 +698,7 @@ Format.prototype = {
 
 		const originRange = {
 			sc: range.startContainer,
-			so: range.startOffset,
+			so: (range.startContainer === range.endContainer && util.onlyZeroWidthSpace(range.startContainer) && range.startOffset === 0 && range.endOffset === 1) ? range.endOffset : range.startOffset,
 			ec: range.endContainer,
 			eo: range.endOffset
 		};
@@ -1354,7 +1354,7 @@ Format.prototype = {
 			if (start.container === end.container && util.onlyZeroWidthSpace(start.container)) {
 				start.offset = end.offset = 1;
 			}
-			Format.SN_SetCommonListStyle(newRange.ancestor, null);
+			this._ns_setCommonListStyle(newRange.ancestor, null);
 		} else {
 			// multi line
 			// end
@@ -1390,7 +1390,7 @@ Format.prototype = {
 					end.ancestor = null;
 					end.container = newRange.endContainer;
 				}
-				Format.SN_SetCommonListStyle(newRange.ancestor, null);
+				this._ns_setCommonListStyle(newRange.ancestor, null);
 			}
 
 			// start
@@ -1422,8 +1422,8 @@ Format.prototype = {
 				end.offset = start.container.textContent.length;
 			}
 
-			Format.SN_SetCommonListStyle(start.ancestor, null);
-			Format.SN_SetCommonListStyle(end.ancestor || this.getLine(end.container), null);
+			this._ns_setCommonListStyle(start.ancestor, null);
+			this._ns_setCommonListStyle(end.ancestor || this.getLine(end.container), null);
 		}
 
 		// set range
@@ -3036,6 +3036,45 @@ Format.prototype = {
 			: anchor || (!_isSizeNode ? Format.IsSizeNode(element) : false);
 	},
 
+	/**
+	 * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
+	 * @param {Element} el List cell element. <li>
+	 * @param {Element|null} child Variable for recursive call. ("null" on the first call)
+	 * @private
+	 */
+	_ns_setCommonListStyle: function (el, child) {
+		if (!util.isListCell(el)) return;
+		if (!child) el.removeAttribute("style");
+
+		const children = util.getArrayItem(
+			(child || el).childNodes,
+			function (current) {
+				return !util.isBreak(current);
+			},
+			true
+		);
+
+		if (children[0] && children.length === 1) {
+			child = children[0];
+			if (!child || child.nodeType !== 1) return;
+
+			const childStyle = child.style;
+			const elStyle = el.style;
+
+			// bold, italic
+			if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.editor._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
+			else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
+			if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.editor._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
+			else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
+
+			// styles
+			if (childStyle.color) elStyle.color = childStyle.color; // color
+			if (childStyle.fontSize) elStyle.fontSize = childStyle.fontSize; // size
+
+			this._ns_setCommonListStyle(el, child);
+		}
+	},
+
 	constructor: Format
 };
 
@@ -3089,43 +3128,6 @@ Format.SetLineMargin = function (lines, size, dir) {
 	}
 
 	return cells;
-};
-
-/**
- * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
- * @param {Element} el List cell element. <li>
- * @param {Element|null} child Variable for recursive call. ("null" on the first call)
- * @private
- */
-Format.SN_SetCommonListStyle = function (el, child) {
-	if (!util.isListCell(el)) return;
-	if (!child) el.removeAttribute("style");
-
-	const children = util.getArrayItem(
-		(child || el).childNodes,
-		function (current) {
-			return !util.isBreak(current) && !util.onlyZeroWidthSpace(current.textContent.trim());
-		},
-		true
-	);
-	if (children[0] && children.length === 1) {
-		child = children[0];
-		if (!child || child.nodeType !== 1) return;
-
-		const childStyle = child.style;
-		const elStyle = el.style;
-
-		// bold
-		if (/STRONG/i.test(child.nodeName)) elStyle.fontWeight = "bold";
-		// bold
-		else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
-
-		// styles
-		if (childStyle.color) elStyle.color = childStyle.color; // color
-		if (childStyle.fontSize) elStyle.fontSize = childStyle.fontSize; // size
-
-		Format.SN_SetCommonListStyle(el, child);
-	}
 };
 
 /**

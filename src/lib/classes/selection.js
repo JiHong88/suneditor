@@ -234,11 +234,23 @@ Selection.prototype = {
 		let tempCon, tempOffset, tempChild;
 
 		if (util.isFormatElement(startCon)) {
-			startCon = startCon.childNodes[startOff] || startCon.lastChild;
-			startOff = startCon.textContent.length;
+			if (!startCon.childNodes[startOff]) {
+				startCon = startCon.lastChild;
+				startOff = startCon.textContent.length;
+			} else {
+				startCon = startCon.childNodes[startOff];
+				startOff = 0;
+			}
+			while (startCon && startCon.nodeType === 1 && startCon.firstChild) {
+				startCon = startCon.firstChild;
+				startOff = 0;
+			}
 		}
 		if (util.isFormatElement(endCon)) {
 			endCon = endCon.childNodes[endOff] || endCon.lastChild;
+			while (endCon && endCon.nodeType === 1 && endCon.lastChild) {
+				endCon = endCon.lastChild;
+			}
 			endOff = endCon.textContent.length;
 		}
 

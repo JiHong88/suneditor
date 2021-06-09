@@ -50,7 +50,7 @@ export default {
         let list = '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
                     '<li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
-        for (let i = 0, len = sizeList.length, text, size; i < len; i++) {
+        for (let i = 0, len = sizeList.length, size; i < len; i++) {
             size = sizeList[i];
             list += '<li><button type="button" class="se-btn-list" data-value="' + size.value + '" title="' + size.text + '">' + size.text + '</button></li>';
         }
