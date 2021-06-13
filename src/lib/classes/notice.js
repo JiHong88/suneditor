@@ -1,6 +1,6 @@
 import CoreInterface from "../../interface/_core";
 
-const Notice = function(editor) {
+const Notice = function (editor) {
 	CoreInterface.call(this, editor);
 
 	this.modal = core.util.createElement("DIV");
@@ -17,7 +17,7 @@ const Notice = function(editor) {
 	this.modal.appendChild(notice_button);
 
 	/** add event */
-	this.editor.addEvent(notice_button, "click", Notice.onClick_cancel.bind(this));
+	this.editor.addEvent(notice_button, "click", OnClick_cancel.bind(this));
 
 	/** append html */
 	this.context.element.editorArea.appendChild(this.modal);
@@ -30,7 +30,7 @@ Notice.prototype = {
 	 * @description  Open the notice panel
 	 * @param {String} text Notice message
 	 */
-	open: function(text) {
+	open: function (text) {
 		this.message.textContent = text;
 		this.modal.style.display = "block";
 	},
@@ -38,7 +38,7 @@ Notice.prototype = {
 	/**
 	 * @description  Close the notice panel
 	 */
-	close: function() {
+	close: function () {
 		this.modal.style.display = "none";
 	},
 
@@ -49,10 +49,10 @@ Notice.prototype = {
  * @description Event when clicking the cancel button
  * @param {MouseEvent} e Event object
  */
-Notice.onClick_cancel = function(e) {
+function OnClick_cancel(e) {
 	e.preventDefault();
 	e.stopPropagation();
 	this.close.call(this);
-};
+}
 
 export default Notice;

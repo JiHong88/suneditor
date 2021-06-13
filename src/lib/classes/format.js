@@ -984,7 +984,7 @@ Format.prototype = {
 		const eo = range.endOffset;
 
 		const lines = this.selection.getLines(null);
-		const cells = Format.SetLineMargin(
+		const cells = SetLineMargin(
 			lines,
 			this._variable.indentSize,
 			options.rtl ? "marginRight" : "marginLeft"
@@ -1014,7 +1014,7 @@ Format.prototype = {
 		const eo = range.endOffset;
 
 		const lines = this.selection.getLines(null);
-		const cells = Format.SetLineMargin(
+		const cells = SetLineMargin(
 			lines,
 			this._variable.indentSize * -1,
 			options.rtl ? "marginRight" : "marginLeft"
@@ -1321,14 +1321,14 @@ Format.prototype = {
 			(isRemoveNode &&
 				(function (inst, arr) {
 					for (let n = 0, len = arr.length; n < len; n++) {
-						if (inst.node.isNonSplitNode(arr[n]) || inst._ns_isSizeNode(arr[n])) return true;
+						if (inst.node.isNonSplitNode(arr[n]) || inst._sn_isSizeNode(arr[n])) return true;
 					}
 					return false;
 				})(this, removeNodeArray));
 
-		const isSizeNode = isRemoveNode || this._ns_isSizeNode(newNode);
-		const _getMaintainedNode = this._ns_getMaintainedNode.bind(isRemoveAnchor, isSizeNode);
-		const _isMaintainedNode = this._ns_isMaintainedNode.bind(isRemoveAnchor, isSizeNode);
+		const isSizeNode = isRemoveNode || this._sn_isSizeNode(newNode);
+		const _getMaintainedNode = this._sn_getMaintainedNode.bind(isRemoveAnchor, isSizeNode);
+		const _isMaintainedNode = this._sn_isMaintainedNode.bind(isRemoveAnchor, isSizeNode);
 
 		// one line
 		if (oneLine) {
@@ -1354,7 +1354,7 @@ Format.prototype = {
 			if (start.container === end.container && util.onlyZeroWidthSpace(start.container)) {
 				start.offset = end.offset = 1;
 			}
-			this._ns_setCommonListStyle(newRange.ancestor, null);
+			this._sn_setCommonListStyle(newRange.ancestor, null);
 		} else {
 			// multi line
 			// end
@@ -1390,7 +1390,7 @@ Format.prototype = {
 					end.ancestor = null;
 					end.container = newRange.endContainer;
 				}
-				this._ns_setCommonListStyle(newRange.ancestor, null);
+				this._sn_setCommonListStyle(newRange.ancestor, null);
 			}
 
 			// start
@@ -1422,8 +1422,8 @@ Format.prototype = {
 				end.offset = start.container.textContent.length;
 			}
 
-			this._ns_setCommonListStyle(start.ancestor, null);
-			this._ns_setCommonListStyle(end.ancestor || this.getLine(end.container), null);
+			this._sn_setCommonListStyle(start.ancestor, null);
+			this._sn_setCommonListStyle(end.ancestor || this.getLine(end.container), null);
 		}
 
 		// set range
@@ -1660,7 +1660,7 @@ Format.prototype = {
 	 * @private
 	 */
 	_removeNestedList: function (baseNode, all) {
-		const rNode = Format.DeleteNestedList(baseNode);
+		const rNode = DeleteNestedList(baseNode);
 		let rangeElement, cNodes;
 
 		if (rNode) {
@@ -1697,7 +1697,7 @@ Format.prototype = {
 		}
 
 		for (let i = 0, len = rChildren.length; i < len; i++) {
-			Format.DeleteNestedList(rChildren[i]);
+			DeleteNestedList(rChildren[i]);
 		}
 
 		if (rNode) {
@@ -2144,7 +2144,7 @@ Format.prototype = {
 		} else {
 			if (isRemoveNode) {
 				for (let i = 0; i < nNodeArray.length; i++) {
-					Format.SN_StripRemoveNode(nNodeArray[i]);
+					SN_StripRemoveNode(nNodeArray[i]);
 				}
 			}
 
@@ -2484,7 +2484,7 @@ Format.prototype = {
 		} else if (isRemoveNode) {
 			newInnerNode = newInnerNode.firstChild;
 			for (let i = 0; i < nNodeArray.length; i++) {
-				Format.SN_StripRemoveNode(nNodeArray[i]);
+				SN_StripRemoveNode(nNodeArray[i]);
 			}
 		}
 
@@ -2651,7 +2651,7 @@ Format.prototype = {
 		} else if (isRemoveNode) {
 			newInnerNode = newInnerNode.firstChild;
 			for (let i = 0; i < nNodeArray.length; i++) {
-				Format.SN_StripRemoveNode(nNodeArray[i]);
+				SN_StripRemoveNode(nNodeArray[i]);
 			}
 		}
 
@@ -2946,7 +2946,7 @@ Format.prototype = {
 		} else if (isRemoveNode) {
 			newInnerNode = newInnerNode.firstChild;
 			for (let i = 0; i < nNodeArray.length; i++) {
-				Format.SN_StripRemoveNode(nNodeArray[i]);
+				SN_StripRemoveNode(nNodeArray[i]);
 			}
 		}
 
@@ -3004,7 +3004,7 @@ Format.prototype = {
 	 * @returns {Boolean}
 	 * @private
 	 */
-	_ns_isSizeNode: function (element) {
+	_sn_isSizeNode: function (element) {
 		return element && element.nodeType !== 3 && this.node.isTextStyleNode(element) && !!element.style.fontSize;
 	},
 
@@ -3014,7 +3014,7 @@ Format.prototype = {
 	 * @returns {Element}
 	 * @private
 	 */
-	_ns_getMaintainedNode: function (_isRemove, _isSizeNode, element) {
+	_sn_getMaintainedNode: function (_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove) return null;
 		return (
 			util.getParentElement(element, this.node.isNonSplitNode) ||
@@ -3028,7 +3028,7 @@ Format.prototype = {
 	 * @returns {Element}
 	 * @private
 	 */
-	_ns_isMaintainedNode = function (_isRemove, _isSizeNode, element) {
+	_sn_isMaintainedNode = function (_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove || element.nodeType !== 1) return false;
 		const anchor = this.node.isNonSplitNode(element);
 		return util.getParentElement(element, this.node.isNonSplitNode)
@@ -3042,7 +3042,7 @@ Format.prototype = {
 	 * @param {Element|null} child Variable for recursive call. ("null" on the first call)
 	 * @private
 	 */
-	_ns_setCommonListStyle: function (el, child) {
+	_sn_setCommonListStyle: function (el, child) {
 		if (!util.isListCell(el)) return;
 		if (!child) el.removeAttribute("style");
 
@@ -3071,14 +3071,14 @@ Format.prototype = {
 			if (childStyle.color) elStyle.color = childStyle.color; // color
 			if (childStyle.fontSize) elStyle.fontSize = childStyle.fontSize; // size
 
-			this._ns_setCommonListStyle(el, child);
+			this._sn_setCommonListStyle(el, child);
 		}
 	},
 
 	constructor: Format
 };
 
-Format.DeleteNestedList = function (baseNode) {
+function DeleteNestedList(baseNode) {
 	const baseParent = baseNode.parentNode;
 	let sibling = baseParent;
 	let parent = sibling.parentNode;
@@ -3111,7 +3111,7 @@ Format.DeleteNestedList = function (baseNode) {
 	return liParent;
 };
 
-Format.SetLineMargin = function (lines, size, dir) {
+function SetLineMargin(lines, size, dir) {
 	const cells = [];
 
 	for (let i = 0, len = lines.length, f, margin; i < len; i++) {
@@ -3135,7 +3135,7 @@ Format.SetLineMargin = function (lines, size, dir) {
  * @param {Node} removeNode The remove node
  * @private
  */
-Format.SN_StripRemoveNode = function (removeNode) {
+function SN_StripRemoveNode(removeNode) {
 	const element = removeNode.parentNode;
 	if (!removeNode || removeNode.nodeType === 3 || !element) return;
 

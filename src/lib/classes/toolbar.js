@@ -61,7 +61,7 @@ Toolbar.prototype = {
 		const newToolbar = Constructor._createToolBar(_d, buttonList, core.plugins, options);
 		_responsiveButtons = newToolbar.responsiveButtons;
 		core._moreLayerActiveButton = null;
-		event._setResponsiveToolbar();
+		this._setResponsive();
 
 		context.element.toolbar.replaceChild(newToolbar._buttonTray, context.element._buttonTray);
 		const newContext = Context(context.element.originElement, core._getConstructed(context.element), options);
@@ -90,11 +90,34 @@ Toolbar.prototype = {
 			}
 		}
 
-		if (core.hasFocus) event._applyTagEffects();
+		if (core.hasFocus) this.editor.applyTagEffect();
 
 		if (core._variable.isCodeView) util.addClass(core._styleCommandMap.codeView, "active");
 		if (core._variable.isFullScreen) util.addClass(core._styleCommandMap.fullScreen, "active");
 		if (util.hasClass(context.element.wysiwyg, "se-show-block")) util.addClass(core._styleCommandMap.showBlocks, "active");
+	},
+
+	_setResponsive: function () {
+		if (_responsiveButtons.length === 0) {
+			_responsiveButtons = null;
+			return;
+		}
+
+		event._responsiveCurrentSize = "default";
+		const sizeArray = (event._responsiveButtonSize = []);
+		const buttonsObj = (event._responsiveButtons = { default: _responsiveButtons[0] });
+		for (let i = 1, len = _responsiveButtons.length, size, buttonGroup; i < len; i++) {
+			buttonGroup = _responsiveButtons[i];
+			size = buttonGroup[0] * 1;
+			sizeArray.push(size);
+			buttonsObj[size] = buttonGroup[1];
+		}
+
+		sizeArray
+			.sort(function (a, b) {
+				return a - b;
+			})
+			.unshift("default");
 	},
 
 	constructor: Toolbar

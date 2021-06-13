@@ -1,5 +1,5 @@
 /**
- * @fileoverview Toolbar class
+ * @fileoverview Shortcuts class
  * @author JiHong Lee.
  */
  "use strict";

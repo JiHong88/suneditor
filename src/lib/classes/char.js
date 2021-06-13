@@ -9,7 +9,7 @@ import env from "../../helper/env";
 import { window } from "../../helper/global";
 import { addClass, removeClass, hasClass } from "../../helper/dom";
 
-const Char = function(editor) {
+const Char = function (editor) {
 	CoreInterface.call(this, editor);
 	this.selection = editor.selection;
 };
@@ -20,17 +20,11 @@ Char.prototype = {
 	 * @param {Node|String} html Element node or String.
 	 * @returns {Boolean}
 	 */
-	check: function(html) {
+	check: function (html) {
 		if (this.options.maxCharCount) {
-			const length = this.getLength(
-				typeof html === "string"
-					? html
-					: this.options.charCounterType === "byte-html" && html.nodeType === 1
-					? html.outerHTML
-					: html.textContent
-			);
+			const length = this.getLength(typeof html === "string" ? html : this.options.charCounterType === "byte-html" && html.nodeType === 1 ? html.outerHTML : html.textContent);
 			if (length > 0 && length + this.getLength() > this.options.maxCharCount) {
-				Char.CounterBlink(this.context.element.charWrapper);
+				CounterBlink(this.context.element.charWrapper);
 				return false;
 			}
 		}
@@ -43,23 +37,20 @@ Char.prototype = {
 	 * @param {String|undefined} content Content to count. (defalut: this.context.element.wysiwyg)
 	 * @returns {Number}
 	 */
-	getLength: function(content) {
+	getLength: function (content) {
 		if (typeof content !== "string") {
-			content =
-				this.options.charCounterType === "byte-html"
-					? this.context.element.wysiwyg.innerHTML
-					: this.context.element.wysiwyg.textContent;
+			content = this.options.charCounterType === "byte-html" ? this.context.element.wysiwyg.innerHTML : this.context.element.wysiwyg.textContent;
 		}
-		return /byte/.test(this.options.charCounterType) ? Char.GetByteLength(content) : content.length;
+		return /byte/.test(this.options.charCounterType) ? GetByteLength(content) : content.length;
 	},
 
 	/**
 	 * @description Set the char count to charCounter element textContent.
 	 */
-	display: function() {
+	display: function () {
 		if (context.element.charCounter) {
 			window.setTimeout(
-				function() {
+				function () {
 					this.context.element.charCounter.textContent = this.getLength();
 				}.bind(this)
 			);
@@ -73,7 +64,7 @@ Char.prototype = {
 	 * @param {String} inputText Text added.
 	 * @returns {Boolean}
 	 */
-	test: function(inputText) {
+	test: function (inputText) {
 		const maxCharCount = this.options.maxCharCount;
 		let nextCharCount = 0;
 		if (!!inputText) nextCharCount = this.getLength(inputText);
@@ -93,8 +84,7 @@ Char.prototype = {
 					const text = this.selection.getNode().textContent;
 					const slicePosition = range.endOffset - (count - maxCharCount);
 
-					this.selection.getNode().textContent =
-						text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
+					this.selection.getNode().textContent = text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
 					this.selection.setRange(range.endContainer, endOff, range.endContainer, endOff);
 				}
 			} else if (count + nextCharCount > maxCharCount) {
@@ -102,7 +92,7 @@ Char.prototype = {
 			}
 
 			if (over) {
-				Char.CounterBlink(this.context.element.charWrapper);
+				CounterBlink(this.context.element.charWrapper);
 				if (nextCharCount > 0) return false;
 			}
 		}
@@ -118,14 +108,14 @@ Char.prototype = {
  * @param charWrapper {Element} context.element.charWrapper
  * @private
  */
-Char.CounterBlink = function(charWrapper) {
+function CounterBlink(charWrapper) {
 	if (charWrapper && !hasClass(charWrapper, "se-blink")) {
 		addClass(charWrapper, "se-blink");
-		window.setTimeout(function() {
+		window.setTimeout(function () {
 			removeClass(charWrapper, "se-blink");
 		}, 600);
 	}
-};
+}
 
 /**
  * @descriptionGets Get the length in bytes of a string.
@@ -133,7 +123,7 @@ Char.CounterBlink = function(charWrapper) {
  * @param {String} text String text
  * @returns {Number}
  */
-Char.GetByteLength = function(text) {
+function GetByteLength(text) {
 	if (!text || !text.toString) return 0;
 	text = text.toString();
 
@@ -158,6 +148,6 @@ Char.GetByteLength = function(text) {
 
 		return cl + cr;
 	}
-};
+}
 
 export default Char;
