@@ -798,7 +798,7 @@ shortcutsHint   : If false, hide the shortcuts hint.    default: true {Boolean}
 
 // Defining save button-------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. 
-                  Arguments - (contents, isChanged).                            default: functions.save {Function}
+                  Arguments - (contents, isChanged).                            default: editorInstance.save {Function}
 
 // Templates Array------------------------------------------------------------------------------------------------
 templates       : If you use a template plugin, add it.
@@ -927,16 +927,6 @@ import suneditor from 'suneditor'
 
 const editor = suneditor.create('example');
 
-editor.core; // core object (The core object contains "util" and "functions".)
-editor.util; // util object
-
-// Reset the buttons on the toolbar. (Editor is not reloaded)
-// You cannot set a new plugin for the button.
-editor.setToolbarButtons([
-    [':moreText-More Text-default.more_horizontal', 'bold', 'underline', 'strike', 'subscript', 'superscript'],
-    ['undo', 'redo']
-]);
-
 // Add or reset option property. (Editor is reloaded)
 editor.setOptions({
     minHeight: '300px',
@@ -953,17 +943,8 @@ editor.setOptions({
 // It can also be defined with the "setOptions" method, but the "setDefaultStyle" method does not render the editor again.
 editor.setDefaultStyle('font-family: cursive; font-size: 10px;');
 
-// Open a notice area
-editor.noticeOpen('test notice');
-
-// Close a notice area
-editor.noticeClose();
-
 // Copies the contents of the suneditor into a [textarea]
 editor.save();
-
-// Gets the suneditor's context object. Contains settings, plugins, and cached element objects
-editor.getContext();
 
 // Gets the contents of the suneditor
 // onlyContents {Boolean}: Return only the contents of the body without headers when the "fullPage" option is true
@@ -1024,19 +1005,6 @@ editor.show();
     
 // Destroy the suneditor
 editor.destroy();
-
-// Toolbar methods
-// Disable the suneditor
-editor.toolbar.disabled();
-
-// Enabled the suneditor
-editor.toolbar.enabled();
-
-// Hide the suneditor
-editor.toolbar.hide();
-
-// Show the suneditor
-editor.toolbar.show();
 
 // Event functions -------------------------------------------------------------------------------------
 // It can be redefined by receiving event object as parameter.
@@ -1343,7 +1311,7 @@ editor.toggleFullScreen = function (isFullScreen, core) {
 // Called just before the inline toolbar is positioned and displayed on the screen.
 /**
  * toolbar: Toolbar Element
- * context: The editor's context object (editor.getContext()|core.context)
+ * context: The editor's context object
  * core Core object
 */
 editor.showInline = function (toolbar, context, core) {

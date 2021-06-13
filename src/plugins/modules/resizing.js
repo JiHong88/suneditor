@@ -549,7 +549,7 @@
                 case 'auto':
                     this.plugins.resizing.resetTransform.call(this, contextEl);
                     currentModule.setAutoSize.call(this);
-                    this.selectComponent(contextEl, pluginName);
+                    this.component.select(contextEl, pluginName);
                     break;
                 case 'percent':
                     let percentY = this.plugins.resizing._module_getSizeY.call(this, currentContext);
@@ -560,7 +560,7 @@
     
                     this.plugins.resizing.resetTransform.call(this, contextEl);
                     currentModule.setPercentSize.call(this, (value * 100), (this.util.getNumber(percentY, 0) === null || !/%$/.test(percentY)) ? '' : percentY);
-                    this.selectComponent(contextEl, pluginName);
+                    this.component.select(contextEl, pluginName);
                     break;
                 case 'mirror':
                     const r = contextEl.getAttribute('data-rotate') || '0';
@@ -587,7 +587,7 @@
                     contextResizing._rotateVertical = /^(90|270)$/.test(this._w.Math.abs(deg).toString());
                     this.plugins.resizing.setTransformSize.call(this, contextEl, null, null);
         
-                    this.selectComponent(contextEl, pluginName);
+                    this.component.select(contextEl, pluginName);
                     break;
                 case 'onalign':
                     this.plugins.resizing.openAlignMenu.call(this);
@@ -595,7 +595,7 @@
                 case 'align':
                     const alignValue = value === 'basic' ? 'none' : value;
                     currentModule.setAlign.call(this, alignValue, null, null, null);
-                    this.selectComponent(contextEl, pluginName);
+                    this.component.select(contextEl, pluginName);
                     break;
                 case 'caption':
                     const caption = !currentContext._captionChecked;
@@ -617,14 +617,14 @@
     
                         this.controllersOff();
                     } else {
-                        this.selectComponent(contextEl, pluginName);
+                        this.component.select(contextEl, pluginName);
                         currentModule.openModify.call(this, true);
                     }
     
                     break;
                 case 'revert':
                     currentModule.setOriginSize.call(this);
-                    this.selectComponent(contextEl, pluginName);
+                    this.component.select(contextEl, pluginName);
                     break;
                 case 'update':
                     currentModule.openModify.call(this);
@@ -865,7 +865,7 @@
             this.plugins[pluginName].setSize.call(this, w, h, false, direction);
             if (isVertical) this.plugins.resizing.setTransformSize.call(this, this.context[this.context.resizing._resize_plugin]._element, w, h);
 
-            this.selectComponent(this.context[pluginName]._element, pluginName);
+            this.component.select(this.context[pluginName]._element, pluginName);
         }
     };
 

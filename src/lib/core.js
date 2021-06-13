@@ -198,7 +198,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         currentControllerTarget: null,
 
         /**
-         * @description The file component object of current selected file tag (getFileComponent)
+         * @description The file component object of current selected file tag (component.get)
          */
         currentFileComponentInfo: null,
 
@@ -375,7 +375,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Array of "resetFileInfo" functions with the core bound
          * (Plugins with "checkFileInfo" and "resetFileInfo" methods)
-         * "checkFileInfo" method is always call just before the "functions.setOptions" method.
+         * "checkFileInfo" method is always call just before the "editorInstance.setOptions" method.
          * @private
          */
         _fileInfoPluginsReset: null,
@@ -706,7 +706,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
-         * @param {*} arguments controller elements, functions..
+         * @param {*} arguments controller elements, function..
          */
         controllersOn: function () {
             if (this._bindControllersOff) this._bindControllersOff();
@@ -726,7 +726,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
                 if (!util.hasClass(arg, 'se-controller')) {
                     this.currentControllerTarget = arg;
-                    this.currentFileComponentInfo = this.getFileComponent(arg);
+                    this.currentFileComponentInfo = this.component.get(arg);
                     continue;
                 }
                 if (arg.style) {
@@ -744,7 +744,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.addDocEvent('keydown', this._bindControllersOff, false);
             this._antiBlur = true;
 
-            if (typeof functions.showController === 'function') functions.showController(this.currentControllerName, this.controllerArray, this);
+            if (typeof this.events.showController === 'function') this.events.showController(this.currentControllerName, this.controllerArray);
         },
 
         /**
@@ -912,9 +912,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         focusEdge: function (focusEl) {
             if (!focusEl) focusEl = context.element.wysiwyg.lastElementChild;
 
-            const fileComponentInfo = this.getFileComponent(focusEl);
+            const fileComponentInfo = this.component.get(focusEl);
             if (fileComponentInfo) {
-                this.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
+                this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
             } else if (focusEl) {
                 focusEl = util.getChildElement(
                     focusEl,
@@ -964,149 +964,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         closeLoading: function () {
             context.element.loading.style.display = 'none';
-        },
-
-        /**
-         * @description The method to insert a element and return. (used elements : table, hr, image, video)
-         * If "element" is "HR", insert and return the new line.
-         * @param {Element} element Element to be inserted
-         * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
-         * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
-         * @param {Boolean} notSelect If true, Do not automatically select the inserted component.
-         * @returns {Element}
-         */
-        insertComponent: function (element, notHistoryPush, checkCharCount, notSelect) {
-            if (checkCharCount && !this.char.check(element)) {
-                return null;
-            }
-
-            const r = this.removeNode();
-            this.getRange_addLine(this.getRange(), r.container);
-            let oNode = null;
-            let selectionNode = this.selection.getNode();
-            let formatEl = this.format.getLine(selectionNode, null);
-
-            if (util.isListCell(formatEl)) {
-                this.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling, false);
-                if (!element.nextSibling) element.parentNode.appendChild(util.createElement('BR'));
-            } else {
-                if (this.getRange().collapsed && (r.container.nodeType === 3 || util.isBreak(r.container))) {
-                    const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current); }.bind(util));
-                    oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
-                    if (oNode) formatEl = oNode.previousSibling;
-                }
-                this.insertNode(element, formatEl, false);
-                if (formatEl && util.onlyZeroWidthSpace(formatEl)) util.removeItem(formatEl);
-            }
-
-            this.setRange(element, 0, element, 0);
-
-            if (!notSelect) {
-                const fileComponentInfo = this.getFileComponent(element);
-                if (fileComponentInfo) {
-                    this.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
-                } else if (oNode) {
-                    oNode = util.getEdgeChildNodes(oNode, null).sc || oNode;
-                    this.setRange(oNode, 0, oNode, 0);
-                }
-            }
-
-            // history stack
-            if (!notHistoryPush) this.history.push(1);
-
-            return oNode || element;
-        },
-
-        /**
-         * @description Gets the file component and that plugin name
-         * return: {target, component, pluginName} | null
-         * @param {Element} element Target element (figure tag, component div, file tag)
-         * @returns {Object|null}
-         */
-        getFileComponent: function (element) {
-            if (!this._fileManager.queryString || !element) return null;
-
-            let target, pluginName;
-            if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
-                target = element.querySelector(this._fileManager.queryString);
-            }
-            if (!target && element.nodeName && this._fileManager.regExp.test(element.nodeName)) {
-                target = element;
-            }
-
-            if (target) {
-                pluginName = this._fileManager.pluginMap[target.nodeName.toLowerCase()];
-                if (pluginName) {
-                    return {
-                        target: target,
-                        component: util.getParentElement(target, util.isComponent),
-                        pluginName: pluginName
-                    };
-                }
-            }
-
-            return null;
-        },
-
-        /**
-         * @description The component(image, video) is selected and the resizing module is called.
-         * @param {Element} element Element tag (img, iframe, video)
-         * @param {String} pluginName Plugin name (image, video)
-         */
-        selectComponent: function (element, pluginName) {
-            if (util.isUneditableComponent(util.getParentElement(element, util.isComponent)) || util.isUneditableComponent(element)) return false;
-            if (!this.hasFocus) this.focus();
-            const plugin = this.plugins[pluginName];
-            if (!plugin) return;
-            _w.setTimeout(function () {
-                if (typeof plugin.select === 'function') this.callPlugin(pluginName, plugin.select.bind(this, element), null);
-                this._setComponentLineBreaker(element);
-            }.bind(this));
-        },
-
-        /**
-         * @description Set line breaker of component
-         * @param {Element} element Element tag (img, iframe, video)
-         * @private
-         */
-        _setComponentLineBreaker: function (element) {
-            // line breaker
-            this._lineBreaker.style.display = 'none';
-            const container = util.getParentElement(element, util.isComponent);
-            const t_style = context.element.lineBreaker_t.style;
-            const b_style = context.element.lineBreaker_b.style;
-            const target = this.context.resizing.resizeContainer.style.display === 'block' ? this.context.resizing.resizeContainer : element;
-
-            const isList = util.isListCell(container.parentNode);
-            let componentTop, wScroll, w;
-            // top
-            if (isList ? !container.previousSibling : !util.isFormatElement(container.previousElementSibling)) {
-                this._variable._lineBreakComp = container;
-                wScroll = context.element.wysiwyg.scrollTop;
-                componentTop = util.getOffset(element, context.element.wysiwygFrame).top + wScroll;
-                w = (target.offsetWidth / 2) / 2;
-
-                t_style.top = (componentTop - wScroll - 12) + 'px';
-                t_style.left = (util.getOffset(target).left + w) + 'px';
-                t_style.display = 'block';
-            } else {
-                t_style.display = 'none';
-            }
-            // bottom
-            if (isList ? !container.nextSibling : !util.isFormatElement(container.nextElementSibling)) {
-                if (!componentTop) {
-                    this._variable._lineBreakComp = container;
-                    wScroll = context.element.wysiwyg.scrollTop;
-                    componentTop = util.getOffset(element, context.element.wysiwygFrame).top + wScroll;
-                    w = (target.offsetWidth / 2) / 2;
-                }
-
-                b_style.top = (componentTop + target.offsetHeight - wScroll - 12) + 'px';
-                b_style.left = (util.getOffset(target).left + target.offsetWidth - w - 24) + 'px';
-                b_style.display = 'block';
-            } else {
-                b_style.display = 'none';
-            }
         },
 
         /**
@@ -1190,7 +1047,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     let last = util.getChildElement(wysiwyg.lastChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true) || wysiwyg.lastChild;
                     if (!first || !last) return;
                     if (util.isMedia(first)) {
-                        const info = this.getFileComponent(first);
+                        const info = this.component.get(first);
                         const br = util.createElement('BR');
                         const format = util.createElement(options.defaultTag);
                         format.appendChild(br);
@@ -1241,8 +1098,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 case 'save':
                     if (typeof options.callBackSave === 'function') {
                         options.callBackSave(this.getContents(false), this._variable.isChanged);
-                    } else if (this._variable.isChanged && typeof functions.save === 'function') {
-                        functions.save();
+                    } else if (this._variable.isChanged && typeof this.events.save === 'function') {
+                        this.events.save();
                     } else {
                         throw Error('[SUNEDITOR.core.commandHandler.fail] Please register call back function in creation option. (callBackSave : Function)');
                     }
@@ -1348,7 +1205,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             this._checkPlaceholder();
             // user event
-            if (typeof functions.toggleCodeView === 'function') functions.toggleCodeView(this._variable.isCodeView, this);
+            if (typeof this.events.toggleCodeView === 'function') this.events.toggleCodeView(this._variable.isCodeView);
         },
 
         /**
@@ -1510,7 +1367,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             // user event
-            if (typeof functions.toggleFullScreen === 'function') functions.toggleFullScreen(this._variable.isFullScreen, this);
+            if (typeof this.events.toggleFullScreen === 'function') this.events.toggleFullScreen(this._variable.isFullScreen);
         },
 
         /**
@@ -1941,6 +1798,304 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             return returnHTML.trim() + '\n';
         },
 
+        /**
+         * @description Add or reset option property (Editor is reloaded)
+         * @param {Object} _options Options
+         */
+         setOptions: function (_options) {
+            event._removeEvent();
+            core._resetComponents();
+            
+            util.removeClass(core._styleCommandMap.showBlocks, 'active');
+            util.removeClass(core._styleCommandMap.codeView, 'active');
+            core._variable.isCodeView = false;
+            core._iframeAuto = null;
+
+            core.plugins = _options.plugins || core.plugins;
+            const mergeOptions = [options, _options].reduce(function (init, option) {
+                for (let key in option) {
+                    if (!util.hasOwn(option, key)) continue;
+                    if (key === 'plugins' && option[key] && init[key]) {
+                        let i = init[key], o = option[key];
+                        i = i.length ? i : _w.Object.keys(i).map(function(name) { return i[name]; });
+                        o = o.length ? o : _w.Object.keys(o).map(function(name) { return o[name]; });
+                        init[key] = (o.filter(function(val) { return i.indexOf(val) === -1; })).concat(i);
+                    } else {
+                        init[key] = option[key];
+                    }
+                }
+                return init;
+            }, {});
+
+            const el = context.element;
+            const _initHTML = el.wysiwyg.innerHTML;
+
+            // set option
+            const cons = Constructor._setOptions(mergeOptions, context, options);        
+
+            if (cons.callButtons) {
+                pluginCallButtons = cons.callButtons;
+                core.initPlugins = {};
+            }
+
+            if (cons.plugins) {
+                core.plugins = plugins = cons.plugins;
+            }
+
+            // reset context
+            if (el._menuTray.children.length === 0) this._menuTray = {};
+            _responsiveButtons = cons.toolbar.responsiveButtons;
+            core.options = options = mergeOptions;
+            core.lang = lang = options.lang;
+
+            if (options.iframe) {
+                el.wysiwygFrame.addEventListener('load', function () {
+                    util._setIframeDocument(this, options);
+                    core._setOptionsInit(el, _initHTML);
+                });
+            }
+
+            el.editorArea.appendChild(el.wysiwygFrame);
+
+            if (!options.iframe) {
+                core._setOptionsInit(el, _initHTML);
+            }
+        },
+
+        /**
+         * @description Set "options.defaultStyle" style.
+         * Define the style of the edit area
+         * It can also be defined with the "setOptions" method, but the "setDefaultStyle" method does not render the editor again.
+         * @param {String} style Style string
+         */
+        setDefaultStyle: function (style) {
+            const newStyles = options._editorStyles = util._setDefaultOptionStyle(options, style);
+            const el = context.element;
+
+            // top area
+            el.topArea.style.cssText = newStyles.top;
+            // code view
+            el.code.style.cssText = options._editorStyles.frame;
+            el.code.style.display = 'none';
+            if (options.height === 'auto') {
+                el.code.style.overflow = 'hidden';
+            } else {
+                el.code.style.overflow = '';
+            }
+            // wysiwyg frame
+            if (!options.iframe) {
+                el.wysiwygFrame.style.cssText = newStyles.frame + newStyles.editor;
+            } else {
+                el.wysiwygFrame.style.cssText = newStyles.frame;
+                el.wysiwyg.style.cssText = newStyles.editor;
+            }
+        },
+
+        /**
+         * @description Copying the contents of the editor to the original textarea
+         */
+        save: function () {
+            context.element.originElement.value = core.getContents(false);
+        },
+
+        /**
+         * @description Gets the contents of the suneditor
+         * @param {Boolean} onlyContents - Return only the contents of the body without headers when the "fullPage" option is true
+         * @returns {String}
+         */
+        getContents: function (onlyContents) {
+            return core.getContents(onlyContents);
+        },
+
+        /**
+         * @description Gets only the text of the suneditor contents
+         * @returns {String}
+         */
+        getText: function () {
+            return context.element.wysiwyg.textContent;
+        },
+        
+        /**
+         * @description Gets uploaded files(plugin using fileManager) information list.
+         * image: [img], video: [video, iframe], audio: [audio]
+         * - index: data index
+         * - name: file name
+         * - size: file size
+         * - select: select function
+         * - delete: delete function
+         * - element: target element
+         * - src: src attribute of tag
+         * @param {String} pluginName Plugin name (image, video, audio)
+         * @returns {Array}
+         */
+        getFilesInfo: function (pluginName) {
+            return context[pluginName] ? context[pluginName]._infoList : [];
+        },
+
+        /**
+         * @description Inserts an HTML element or HTML string or plain string at the current cursor position
+         * @param {Element|String} html HTML Element or HTML string or plain string
+         * @param {Boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
+         * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+         * @param {Boolean} rangeSelection If true, range select the inserted node.
+         */
+        insertHTML: function (html, notCleaningData, checkCharCount, rangeSelection) {
+            if (typeof html === 'string') {
+                if (!notCleaningData) html = core.cleanHTML(html, null);
+                try {
+                    const dom = _d.createRange().createContextualFragment(html);
+                    const domTree = dom.childNodes;
+
+                    if (checkCharCount) {
+                        const type = options.charCounterType === 'byte-html' ? 'outerHTML' : 'textContent';
+                        let checkHTML = '';
+                        for (let i = 0, len = domTree.length; i < len; i++) {
+                            checkHTML += domTree[i][type];
+                        }
+                        if (!core.char.check(checkHTML)) return;
+                    }
+
+                    let c, a, t, prev, firstCon;
+                    while ((c = domTree[0])) {
+                        if (prev && prev.nodeType === 3 && a && a.nodeType === 1 && util.isBreak(c)) {
+                            prev = c;
+                            util.removeItem(c);
+                            continue;
+                        }
+                        t = core.insertNode(c, a, false);
+                        a = t.container || t;
+                        if (!firstCon) firstCon = t;
+                        prev = c;
+                    }
+
+                    if (prev.nodeType === 3 && a.nodeType === 1) a = prev;
+                    const offset = a.nodeType === 3 ? (t.endOffset || a.textContent.length): a.childNodes.length;
+                    if (rangeSelection) core.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
+                    else core.setRange(a, offset, a, offset);
+                } catch (error) {
+                    console.warn('[SUNEDITOR.insertHTML.fail] ' + error);
+                    core.execCommand('insertHTML', false, html);
+                }
+            } else {
+                if (util.isComponent(html)) {
+                    core.component.insert(html, false, checkCharCount, false);
+                } else {
+                    let afterNode = null;
+                    if (util.isFormatElement(html) || util.isMedia(html)) {
+                        afterNode = this.format.getLine(core.selection.getNode(), null);	
+                    }
+                    core.insertNode(html, afterNode, checkCharCount);
+                }
+            }
+            
+            core.effectNode = null;
+            core.focus();
+
+            // history stack
+            core.history.push(false);
+        },
+
+        /**
+         * @description Add contents to the suneditor
+         * @param {String} contents Contents to Input
+         */
+        appendContents: function (contents) {
+            const convertValue = core.convertContentsForEditor(contents);
+            
+            if (!core._variable.isCodeView) {
+                const temp = util.createElement('DIV');
+                temp.innerHTML = convertValue;
+
+                const wysiwyg = context.element.wysiwyg;
+                const children = temp.children;
+                for (let i = 0, len = children.length; i < len; i++) {
+                    wysiwyg.appendChild(children[i]);
+                }
+            } else {
+                core._setCodeView(core._getCodeView() + '\n' + core.convertHTMLForCodeView(convertValue));
+            }
+
+            // history stack
+            core.history.push(false);
+        },
+
+        /**
+         * @description Disable the suneditor
+         */
+        disabled: function () {
+            context.buttons.cover.style.display = 'block';
+            context.element.wysiwyg.setAttribute('contenteditable', false);
+            core.isDisabled = true;
+
+            if (options.codeMirrorEditor) {
+                options.codeMirrorEditor.setOption('readOnly', true);
+            } else {
+                context.element.code.setAttribute('disabled', 'disabled');
+            }
+        },
+
+        /**
+         * @description Enable the suneditor
+         */
+        enabled: function () {
+            context.buttons.cover.style.display = 'none';
+            context.element.wysiwyg.setAttribute('contenteditable', true);
+            core.isDisabled = false;
+
+            if (options.codeMirrorEditor) {
+                options.codeMirrorEditor.setOption('readOnly', false);
+            } else {
+                context.element.code.removeAttribute('disabled');
+            }
+        },
+
+        /**
+         * @description Show the suneditor
+         */
+        show: function () {
+            const topAreaStyle = context.element.topArea.style;
+            if (topAreaStyle.display === 'none') topAreaStyle.display = options.display;
+        },
+
+        /**
+         * @description Hide the suneditor
+         */
+        hide: function () {
+            context.element.topArea.style.display = 'none';
+        },
+
+        /**
+         * @description Destroy the suneditor
+         */
+        destroy: function () {
+            /** off menus */
+            core.submenuOff();
+            core.containerOff();
+            core.controllersOff();
+            if (core.notice) core.notice.close.call(core);
+            if (core.modalForm) core.plugins.dialog.close.call(core);
+
+            /** remove history */
+            core.history._destroy();
+
+            /** remove event listeners */
+            event._removeEvent();
+            
+            /** remove element */
+            util.removeItem(context.element.toolbar);
+            util.removeItem(context.element.topArea);
+
+            /** remove object reference */
+            for (let k in core.functions) { if (util.hasOwn(core, k)) delete core.functions[k]; }
+            for (let k in core) { if (util.hasOwn(core, k)) delete core[k]; }
+            for (let k in event) { if (util.hasOwn(event, k)) delete event[k]; }
+            for (let k in context) { if (util.hasOwn(context, k)) delete context[k]; }
+            for (let k in pluginCallButtons) { if (util.hasOwn(pluginCallButtons, k)) delete pluginCallButtons[k]; }
+            
+            /** remove user object */
+            for (let k in this) { if (util.hasOwn(this, k)) delete this[k]; }
+        },
+
         addEvent: function(target, type, handler) {
             target.addEventListener(type, handler, false);
             this._events.push({ target: target, type: type, handler: handler });
@@ -2317,7 +2472,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._variable.isChanged = true;
             if (context.buttons.save) context.buttons.save.removeAttribute('disabled');
             // user event
-            if (functions.onChange) functions.onChange(this.getContents(true), this);
+            if (this.events.onChange) this.events.onChange(this.getContents(true));
             if (context.element.toolbar.style.display === 'block') event._showToolbarBalloon();
         },
 
@@ -2462,8 +2617,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             _w.setTimeout(function () {
                 // user event
-                if (typeof functions.onload === 'function') functions.onload(core, reload);
-            });
+                if (typeof this.events.onload === 'function') this.events.onload(core, reload);
+            }.bind(this));
         },
 
         /**
@@ -2729,7 +2884,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (util.isNonEditable(context.element.wysiwyg)) return;
 
             // user event
-            if (typeof functions.onMouseDown === 'function' && functions.onMouseDown(e, core) === false) return;
+            if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown(e) === false) return;
             
             const tableCell = util.getParentElement(e.target, util.isTableCell);
             if (tableCell) {
@@ -2753,12 +2908,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (util.isNonEditable(context.element.wysiwyg)) return;
 
             // user event
-            if (typeof functions.onClick === 'function' && functions.onClick(e, core) === false) return;
+            if (typeof this.events.onClick === 'function' && this.events.onClick(e) === false) return;
 
-            const fileComponentInfo = core.getFileComponent(targetElement);
+            const fileComponentInfo = core.component.get(targetElement);
             if (fileComponentInfo) {
                 e.preventDefault();
-                core.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
+                core.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
                 return;
             }
 
@@ -2982,7 +3137,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core._inlineToolbarAttr.width = toolbar.style.width = options.toolbarWidth;
             core._inlineToolbarAttr.top = toolbar.style.top = (options.toolbarContainer ? 0 : (-1 - toolbar.offsetHeight)) + 'px';
             
-            if (typeof functions.showInline === 'function') functions.showInline(toolbar, context, core);
+            if (typeof this.events.showInline === 'function') this.events.showInline(toolbar, context);
 
             event.onScroll_window();
             core._inlineToolbarAttr.isShow = true;
@@ -3000,7 +3155,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.selection._init();
 
             // user event
-            if (typeof functions.onInput === 'function' && functions.onInput(e, core) === false) return;
+            if (typeof this.events.onInput === 'function' && this.events.onInput(e) === false) return;
 
             const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';       
             if (!core.char.test(data)) {
@@ -3057,7 +3212,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             // user event
-            if (typeof functions.onKeyDown === 'function' && functions.onKeyDown(e, core) === false) return;
+            if (typeof this.events.onKeyDown === 'function' && this.events.onKeyDown(e) === false) return;
 
             /** Shortcuts */
             if (ctrl && event._shortcutCommand(keyCode, shift)) {
@@ -3251,12 +3406,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         // select file component
                         const ignoreZWS = (commonCon.nodeType === 3 || util.isBreak(commonCon)) && !commonCon.previousSibling && range.startOffset === 0;
                         if (!sel.previousSibling && (util.isComponent(commonCon.previousSibling) || (ignoreZWS && util.isComponent(prev)))) {
-                            const fileComponentInfo = core.getFileComponent(prev);
+                            const fileComponentInfo = core.component.get(prev);
                             if (fileComponentInfo) {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 if (formatEl.textContent.length === 0) util.removeItem(formatEl);
-                                if (core.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName) === false) core.blur();
+                                if (core.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) core.blur();
                             } else if (util.isComponent(prev)) {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -3314,10 +3469,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             }
 
                             // select file component
-                            const fileComponentInfo = core.getFileComponent(nextEl);
+                            const fileComponentInfo = core.component.get(nextEl);
                             if (fileComponentInfo) {
                                 e.stopPropagation();
-                                if (core.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName) === false) core.blur();
+                                if (core.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) core.blur();
                             } else if (util.isComponent(nextEl)) {
                                 e.stopPropagation();
                                 util.removeItem(nextEl);
@@ -3556,7 +3711,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             }
                             
                             if (selectionFormat) {
-                                functions.insertHTML(((range.collapsed && util.isBreak(range.startContainer.childNodes[range.startOffset - 1])) ? '<br>' : '<br><br>'), true, false);
+                                core.insertHTML(((range.collapsed && util.isBreak(range.startContainer.childNodes[range.startOffset - 1])) ? '<br>' : '<br><br>'), true, false);
     
                                 let focusNode = wSelection.focusNode;
                                 const wOffset = wSelection.focusOffset;
@@ -3652,7 +3807,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         container.parentNode.insertBefore(newEl, container);
                         
                         core.callPlugin(fileComponentName, function () {
-                            if (core.selectComponent(compContext._element, fileComponentName) === false) core.blur();
+                            if (core.component.select(compContext._element, fileComponentName) === false) core.blur();
                         }, null);
                     }
                     
@@ -3716,7 +3871,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             // user event
-            if (typeof functions.onKeyUp === 'function' && functions.onKeyUp(e, core) === false) return;
+            if (typeof this.events.onKeyUp === 'function' && this.events.onKeyUp(e) === false) return;
 
             /** when format tag deleted */
             if (keyCode === 8 && util.isWysiwygDiv(selectionNode) && selectionNode.textContent === '' && selectionNode.children.length === 0) {
@@ -3768,7 +3923,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (core._isBalloon) event._hideToolbar();
 
             // user event
-            if (typeof functions.onScroll === 'function') functions.onScroll(e, core);
+            if (typeof this.events.onScroll === 'function') this.events.onScroll(e);
         },
 
         onFocus_wysiwyg: function (e) {
@@ -3779,7 +3934,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (core._isInline) event._showToolbarInline();
 
             // user event
-            if (typeof functions.onFocus === 'function') functions.onFocus(e, core);
+            if (typeof this.events.onFocus === 'function') this.events.onFocus(e);
         },
 
         onBlur_wysiwyg: function (e) {
@@ -3789,7 +3944,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (core._isInline || core._isBalloon) event._hideToolbar();
 
             // user event
-            if (typeof functions.onBlur === 'function') functions.onBlur(e, core);
+            if (typeof this.events.onBlur === 'function') this.events.onBlur(e);
 
             // active class reset of buttons
             const commandMap = core.commandMap;
@@ -3826,7 +3981,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.resizeBackground.style.display = 'none';
                 _d.removeEventListener('mousemove', event._resize_editor);
                 _d.removeEventListener('mouseup', closureFunc);
-                if (typeof functions.onResizeEditor === 'function') functions.onResizeEditor(util.getNumber(context.element.wysiwygFrame.style.height, 0), prevHeight, core);
+                if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(util.getNumber(context.element.wysiwygFrame.style.height, 0), prevHeight);
             }
 
             _d.addEventListener('mousemove', event._resize_editor);
@@ -3861,7 +4016,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 if (event._responsiveCurrentSize !== responsiveWidth) {
                     event._responsiveCurrentSize = responsiveWidth;
-                    functions.setToolbarButtons(event._responsiveButtons[responsiveWidth]);
+                    core.toolbar.setButtons(event._responsiveButtons[responsiveWidth]);
                 }
             }
 
@@ -4015,7 +4170,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
             
             // user event
-            if (typeof functions.onCopy === 'function' && !functions.onCopy(e, clipboardData, core)) {
+            if (typeof this.events.onCopy === 'function' && !this.events.onCopy(e, clipboardData)) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -4036,7 +4191,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
 
             // user event
-            if (typeof functions.onCut === 'function' && !functions.onCut(e, clipboardData, core)) {
+            if (typeof this.events.onCut === 'function' && !this.events.onCut(e, clipboardData)) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -4139,14 +4294,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const maxCharCount = core.char.test(options.charCounterType === 'byte-html' ? cleanData : plainText);
             // user event - paste
-            if (type === 'paste' && typeof functions.onPaste === 'function') {
-                const value = functions.onPaste(e, cleanData, maxCharCount, core);
+            if (type === 'paste' && typeof this.events.onPaste === 'function') {
+                const value = this.events.onPaste(e, cleanData, maxCharCount);
                 if (!value) return false;
                 if (typeof value === 'string') cleanData = value;
             }
             // user event - drop
-            if (type === 'drop' && typeof functions.onDrop === 'function') {
-                const value = functions.onDrop(e, cleanData, maxCharCount, core);
+            if (type === 'drop' && typeof this.events.onDrop === 'function') {
+                const value = this.events.onDrop(e, cleanData, maxCharCount);
                 if (!value) return false;
                 if (typeof value === 'string') cleanData = value;
             }
@@ -4167,7 +4322,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             if (cleanData) {
-                functions.insertHTML(cleanData, true, false);
+                core.insertHTML(cleanData, true, false);
                 return false;
             }
         },
@@ -4362,679 +4517,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             sizeArray.sort(function (a, b) { return a - b; }).unshift('default');
-        }
-    };
-
-    /** functions */
-    const functions = {
-        /**
-         * @description Core, Util object
-         */
-        core: core,
-        util: util,
-
-        /**
-         * @description Event functions
-         * @param {Object} e Event Object
-         * @param {Object} core Core object
-         */
-        onload: null,
-        onScroll: null,
-        onMouseDown: null,
-        onClick: null,
-        onInput: null,
-        onKeyDown: null,
-        onKeyUp: null,
-        onCopy: null,
-        onCut: null,
-        onFocus: null,
-        onBlur: null,
-
-        /**
-         * @description Event functions
-         * @param {String} contents Current contents
-         * @param {Object} core Core object
-         */
-        onChange: null,
-
-        /**
-         * @description Event functions (drop, paste)
-         * When false is returned, the default behavior is stopped.
-         * If the string is returned, the cleanData value is modified to the return value.
-         * @param {Object} e Event object.
-         * @param {String} cleanData HTML string modified for editor format.
-         * @param {Boolean} maxChartCount option (true if max character is exceeded)
-         * @param {Object} core Core object
-         * @returns {Boolean|String}
-         */
-        onDrop: null,
-        onPaste: null,
-
-        /**
-         * @description Called just before the inline toolbar is positioned and displayed on the screen.
-         * @param {Element} toolbar Toolbar Element
-         * @param {Object} context The editor's context object (editor.getContext())
-         * @param {Object} core Core object
-         */
-        showInline: null,
-
-        /**
-         * @description Called just after the controller is positioned and displayed on the screen.
-         * controller - editing elements displayed on the screen [image resizing, table editor, link editor..]]
-         * @param {String} name The name of the plugin that called the controller
-         * @param {Array} controllers Array of Controller elements
-         * @param {Object} core Core object
-         */
-        showController: null,
-
-        /**
-         * @description An event when toggling between code view and wysiwyg view.
-         * @param {Boolean} isCodeView Whether the current code view mode
-         * @param {Object} core Core object
-         */
-        toggleCodeView: null,
-
-        /**
-         * @description An event when toggling full screen.
-         * @param {Boolean} isFullScreen Whether the current full screen mode
-         * @param {Object} core Core object
-         */
-        toggleFullScreen: null,
-
-        /**
-         * @description It replaces the default callback function of the image upload
-         * @param {Object} response Response object
-         * @param {Object} info Input information
-         * - linkValue: Link url value
-         * - linkNewWindow: Open in new window Check Value
-         * - inputWidth: Value of width input
-         * - inputHeight: Value of height input
-         * - align: Align Check Value
-         * - isUpdate: Update image if true, create image if false
-         * - element: If isUpdate is true, the currently selected image.
-         * @param {Object} core Core object
-         */
-        imageUploadHandler: null,
-
-        /**
-         * @description It replaces the default callback function of the video upload
-         * @param xmlHttp xmlHttpRequest object
-         * @param info Input information
-         * - inputWidth: Value of width input
-         * - inputHeight: Value of height input
-         * - align: Align Check Value
-         * - isUpdate: Update video if true, create video if false
-         * - element: If isUpdate is true, the currently selected video.
-         * @param core Core object
-         */
-        videoUploadHandler: null,
-
-        /**
-         * @description It replaces the default callback function of the audio upload
-         * @param xmlHttp xmlHttpRequest object
-         * @param info Input information
-         * - isUpdate: Update audio if true, create audio if false
-         * - element: If isUpdate is true, the currently selected audio.
-         * @param core Core object
-         */
-        audioUploadHandler: null,
-
-        /**
-         * @description Called before the image is uploaded
-         * If true is returned, the internal upload process runs normally.
-         * If false is returned, no image upload is performed.
-         * If new fileList are returned,  replaced the previous fileList
-         * If undefined is returned, it waits until "uploadHandler" is executed.
-         * @param {Array} files Files array
-         * @param {Object} info info: {
-         * - linkValue: Link url value
-         * - linkNewWindow: Open in new window Check Value
-         * - inputWidth: Value of width input
-         * - inputHeight: Value of height input
-         * - align: Align Check Value
-         * - isUpdate: Update image if true, create image if false
-         * - element: If isUpdate is true, the currently selected image.
-         * }
-         * @param {Object} core Core object
-         * @param {Function} uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
-         *                "uploadHandler" is an upload function with "core" and "info" bound.
-         *                [upload files] : uploadHandler(files or [new File(...),])
-         *                [error]        : uploadHandler("Error message")
-         *                [Just finish]  : uploadHandler()
-         *                [directly register] : uploadHandler(response) // Same format as "imageUploadUrl" response
-         *                                   ex) {
-         *                                      // "errorMessage": "insert error message",
-         *                                      "result": [ { "url": "...", "name": "...", "size": "999" }, ]
-         *                                   }
-         * @returns {Boolean|Array|undefined}
-         */
-        onImageUploadBefore: null,
-        /**
-         * @description Called before the video is uploaded
-         * If true is returned, the internal upload process runs normally.
-         * If false is returned, no video(iframe, video) upload is performed.
-         * If new fileList are returned,  replaced the previous fileList
-         * If undefined is returned, it waits until "uploadHandler" is executed.
-         * @param {Array} files Files array
-         * @param {Object} info info: {
-         * - inputWidth: Value of width input
-         * - inputHeight: Value of height input
-         * - align: Align Check Value
-         * - isUpdate: Update video if true, create video if false
-         * - element: If isUpdate is true, the currently selected video.
-         * }
-         * @param {Object} core Core object
-         * @param {Function} uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
-         *                "uploadHandler" is an upload function with "core" and "info" bound.
-         *                [upload files] : uploadHandler(files or [new File(...),])
-         *                [error]        : uploadHandler("Error message")
-         *                [Just finish]  : uploadHandler()
-         *                [directly register] : uploadHandler(response) // Same format as "videoUploadUrl" response
-         *                                   ex) {
-         *                                      // "errorMessage": "insert error message",
-         *                                      "result": [ { "url": "...", "name": "...", "size": "999" }, ]
-         *                                   }
-         * @returns {Boolean|Array|undefined}
-         */
-        onVideoUploadBefore: null,
-        /**
-         * @description Called before the audio is uploaded
-         * If true is returned, the internal upload process runs normally.
-         * If false is returned, no audio upload is performed.
-         * If new fileList are returned,  replaced the previous fileList
-         * If undefined is returned, it waits until "uploadHandler" is executed.
-         * @param {Array} files Files array
-         * @param {Object} info info: {
-         * - isUpdate: Update audio if true, create audio if false
-         * - element: If isUpdate is true, the currently selected audio.
-         * }
-         * @param {Object} core Core object
-         * @param {Function} uploadHandler If undefined is returned, it waits until "uploadHandler" is executed.
-         *                "uploadHandler" is an upload function with "core" and "info" bound.
-         *                [upload files] : uploadHandler(files or [new File(...),])
-         *                [error]        : uploadHandler("Error message")
-         *                [Just finish]  : uploadHandler()
-         *                [directly register] : uploadHandler(response) // Same format as "audioUploadUrl" response
-         *                                   ex) {
-         *                                      // "errorMessage": "insert error message",
-         *                                      "result": [ { "url": "...", "name": "...", "size": "999" }, ]
-         *                                   }
-         * @returns {Boolean|Array|undefined}
-         */
-        onAudioUploadBefore: null,
-
-        /**
-         * @description Called when the image is uploaded, updated, deleted
-         * @param {Element} targetElement Target element
-         * @param {Number} index Uploaded index
-         * @param {String} state Upload status ('create', 'update', 'delete')
-         * @param {Object} info Image info object
-         * - index: data index
-         * - name: file name
-         * - size: file size
-         * - select: select function
-         * - delete: delete function
-         * - element: target element
-         * - src: src attribute of tag
-         * @param {Number} remainingFilesCount Count of remaining files to upload (0 when added as a url)
-         * @param {Object} core Core object
-         */
-        onImageUpload: null,
-         /**
-         * @description Called when the video(iframe, video) is is uploaded, updated, deleted
-         * -- arguments is same "onImageUpload" --
-         */
-        onVideoUpload: null,
-         /**
-         * @description Called when the audio is is uploaded, updated, deleted
-         * -- arguments is same "onImageUpload" --
-         */
-        onAudioUpload: null,
-
-        /**
-         * @description Called when the image is upload failed
-         * @param {String} errorMessage Error message
-         * @param {Object} result Response Object
-         * @param {Object} core Core object
-         * @returns {Boolean}
-         */
-        onImageUploadError: null,
-        /**
-         * @description Called when the video(iframe, video) upload failed
-         * -- arguments is same "onImageUploadError" --
-         */
-        onVideoUploadError: null,
-        /**
-         * @description Called when the audio upload failed
-         * -- arguments is same "onImageUploadError" --
-         */
-        onAudioUploadError: null,
-
-        /**
-         * @description Called when the editor is resized using the bottom bar
-         */
-        onResizeEditor: null,
-
-        /**
-         * @description Reset the buttons on the toolbar. (Editor is not reloaded)
-         * You cannot set a new plugin for the button.
-         * @param {Array} buttonList Button list 
-         */
-        setToolbarButtons: function (buttonList) {
-            core.submenuOff();
-            core.containerOff();
-            
-            const newToolbar = Constructor._createToolBar(_d, buttonList, core.plugins, options);
-            _responsiveButtons = newToolbar.responsiveButtons;
-            core._moreLayerActiveButton = null;
-            event._setResponsiveToolbar();
-
-            context.element.toolbar.replaceChild(newToolbar._buttonTray, context.element._buttonTray);
-            const newContext = Context(context.element.originElement, core._getConstructed(context.element), options);
-
-            context.element = newContext.element;
-            context.buttons = newContext.buttons;
-            if (options.iframe) context.element.wysiwyg = core._wd.body;
-            core._cachingButtons();
-            core.history._resetCachingButton();
-
-            core.activePlugins = [];
-            const oldCallButtons = pluginCallButtons;
-            pluginCallButtons = newToolbar.pluginCallButtons;
-            let plugin, button, oldButton;
-            for (let key in pluginCallButtons) {
-                if (!util.hasOwn(pluginCallButtons, key)) continue;
-                plugin = plugins[key];
-                button = pluginCallButtons[key];
-                if (plugin.active && button) {
-                    oldButton = oldCallButtons[key];
-                    core.callPlugin(key, null, oldButton || button);
-                    if (oldButton) {
-                        button.parentElement.replaceChild(oldButton, button);
-                        pluginCallButtons[key] = oldButton;
-                    }
-                }
-            }
-
-            if (core.hasFocus) event._applyTagEffects();
-
-            if (core._variable.isCodeView) util.addClass(core._styleCommandMap.codeView, 'active');
-            if (core._variable.isFullScreen) util.addClass(core._styleCommandMap.fullScreen, 'active');
-            if (util.hasClass(context.element.wysiwyg, 'se-show-block')) util.addClass(core._styleCommandMap.showBlocks, 'active');
-        },
-
-        /**
-         * @description Add or reset option property (Editor is reloaded)
-         * @param {Object} _options Options
-         */
-        setOptions: function (_options) {
-            event._removeEvent();
-            core._resetComponents();
-            
-            util.removeClass(core._styleCommandMap.showBlocks, 'active');
-            util.removeClass(core._styleCommandMap.codeView, 'active');
-            core._variable.isCodeView = false;
-            core._iframeAuto = null;
-
-            core.plugins = _options.plugins || core.plugins;
-            const mergeOptions = [options, _options].reduce(function (init, option) {
-                for (let key in option) {
-                    if (!util.hasOwn(option, key)) continue;
-                    if (key === 'plugins' && option[key] && init[key]) {
-                        let i = init[key], o = option[key];
-                        i = i.length ? i : _w.Object.keys(i).map(function(name) { return i[name]; });
-                        o = o.length ? o : _w.Object.keys(o).map(function(name) { return o[name]; });
-                        init[key] = (o.filter(function(val) { return i.indexOf(val) === -1; })).concat(i);
-                    } else {
-                        init[key] = option[key];
-                    }
-                }
-                return init;
-            }, {});
-
-            const el = context.element;
-            const _initHTML = el.wysiwyg.innerHTML;
-
-            // set option
-            const cons = Constructor._setOptions(mergeOptions, context, options);        
-
-            if (cons.callButtons) {
-                pluginCallButtons = cons.callButtons;
-                core.initPlugins = {};
-            }
-
-            if (cons.plugins) {
-                core.plugins = plugins = cons.plugins;
-            }
-
-            // reset context
-            if (el._menuTray.children.length === 0) this._menuTray = {};
-            _responsiveButtons = cons.toolbar.responsiveButtons;
-            core.options = options = mergeOptions;
-            core.lang = lang = options.lang;
-
-            if (options.iframe) {
-                el.wysiwygFrame.addEventListener('load', function () {
-                    util._setIframeDocument(this, options);
-                    core._setOptionsInit(el, _initHTML);
-                });
-            }
-
-            el.editorArea.appendChild(el.wysiwygFrame);
-
-            if (!options.iframe) {
-                core._setOptionsInit(el, _initHTML);
-            }
-        },
-
-        /**
-         * @description Set "options.defaultStyle" style.
-         * Define the style of the edit area
-         * It can also be defined with the "setOptions" method, but the "setDefaultStyle" method does not render the editor again.
-         * @param {String} style Style string
-         */
-        setDefaultStyle: function (style) {
-            const newStyles = options._editorStyles = util._setDefaultOptionStyle(options, style);
-            const el = context.element;
-
-            // top area
-            el.topArea.style.cssText = newStyles.top;
-            // code view
-            el.code.style.cssText = options._editorStyles.frame;
-            el.code.style.display = 'none';
-            if (options.height === 'auto') {
-                el.code.style.overflow = 'hidden';
-            } else {
-                el.code.style.overflow = '';
-            }
-            // wysiwyg frame
-            if (!options.iframe) {
-                el.wysiwygFrame.style.cssText = newStyles.frame + newStyles.editor;
-            } else {
-                el.wysiwygFrame.style.cssText = newStyles.frame;
-                el.wysiwyg.style.cssText = newStyles.editor;
-            }
-        },
-
-        /**
-         * @description Open a notice area
-         * @param {String} message Notice message
-         */
-        noticeOpen: function (message) {
-            core.notice.open.call(core, message);
-        },
-
-        /**
-         * @description Close a notice area
-         */
-        noticeClose: function () {
-            core.notice.close.call(core);
-        },
-
-        /**
-         * @description Copying the contents of the editor to the original textarea
-         */
-        save: function () {
-            context.element.originElement.value = core.getContents(false);
-        },
-
-        /**
-         * @description Gets the suneditor's context object. Contains settings, plugins, and cached element objects
-         * @returns {Object}
-         */
-        getContext: function () {
-            return context;
-        },
-
-        /**
-         * @description Gets the contents of the suneditor
-         * @param {Boolean} onlyContents - Return only the contents of the body without headers when the "fullPage" option is true
-         * @returns {String}
-         */
-        getContents: function (onlyContents) {
-            return core.getContents(onlyContents);
-        },
-
-        /**
-         * @description Gets only the text of the suneditor contents
-         * @returns {String}
-         */
-        getText: function () {
-            return context.element.wysiwyg.textContent;
-        },
-
-        
-        
-        /**
-         * @description Gets uploaded files(plugin using fileManager) information list.
-         * image: [img], video: [video, iframe], audio: [audio]
-         * - index: data index
-         * - name: file name
-         * - size: file size
-         * - select: select function
-         * - delete: delete function
-         * - element: target element
-         * - src: src attribute of tag
-         * @param {String} pluginName Plugin name (image, video, audio)
-         * @returns {Array}
-         */
-        getFilesInfo: function (pluginName) {
-            return context[pluginName] ? context[pluginName]._infoList : [];
-        },
-
-        /**
-         * @description Inserts an HTML element or HTML string or plain string at the current cursor position
-         * @param {Element|String} html HTML Element or HTML string or plain string
-         * @param {Boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
-         * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
-         * @param {Boolean} rangeSelection If true, range select the inserted node.
-         */
-        insertHTML: function (html, notCleaningData, checkCharCount, rangeSelection) {
-            if (typeof html === 'string') {
-                if (!notCleaningData) html = core.cleanHTML(html, null);
-                try {
-                    const dom = _d.createRange().createContextualFragment(html);
-                    const domTree = dom.childNodes;
-
-                    if (checkCharCount) {
-                        const type = options.charCounterType === 'byte-html' ? 'outerHTML' : 'textContent';
-                        let checkHTML = '';
-                        for (let i = 0, len = domTree.length; i < len; i++) {
-                            checkHTML += domTree[i][type];
-                        }
-                        if (!core.char.check(checkHTML)) return;
-                    }
-
-                    let c, a, t, prev, firstCon;
-                    while ((c = domTree[0])) {
-                        if (prev && prev.nodeType === 3 && a && a.nodeType === 1 && util.isBreak(c)) {
-                            prev = c;
-                            util.removeItem(c);
-                            continue;
-                        }
-                        t = core.insertNode(c, a, false);
-                        a = t.container || t;
-                        if (!firstCon) firstCon = t;
-                        prev = c;
-                    }
-
-                    if (prev.nodeType === 3 && a.nodeType === 1) a = prev;
-                    const offset = a.nodeType === 3 ? (t.endOffset || a.textContent.length): a.childNodes.length;
-                    if (rangeSelection) core.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
-                    else core.setRange(a, offset, a, offset);
-                } catch (error) {
-                    console.warn('[SUNEDITOR.insertHTML.fail] ' + error);
-                    core.execCommand('insertHTML', false, html);
-                }
-            } else {
-                if (util.isComponent(html)) {
-                    core.insertComponent(html, false, checkCharCount, false);
-                } else {
-                    let afterNode = null;
-                    if (util.isFormatElement(html) || util.isMedia(html)) {
-                        afterNode = this.format.getLine(core.selection.getNode(), null);	
-                    }
-                    core.insertNode(html, afterNode, checkCharCount);
-                }
-            }
-            
-            core.effectNode = null;
-            core.focus();
-
-            // history stack
-            core.history.push(false);
-        },
-
-        /**
-         * @description Change the contents of the suneditor
-         * @param {String|undefined} contents Contents to Input
-         */
-        setContents: function (contents) {
-            core.setContents(contents);
-        },
-
-        /**
-         * @description Add contents to the suneditor
-         * @param {String} contents Contents to Input
-         */
-        appendContents: function (contents) {
-            const convertValue = core.convertContentsForEditor(contents);
-            
-            if (!core._variable.isCodeView) {
-                const temp = util.createElement('DIV');
-                temp.innerHTML = convertValue;
-
-                const wysiwyg = context.element.wysiwyg;
-                const children = temp.children;
-                for (let i = 0, len = children.length; i < len; i++) {
-                    wysiwyg.appendChild(children[i]);
-                }
-            } else {
-                core._setCodeView(core._getCodeView() + '\n' + core.convertHTMLForCodeView(convertValue));
-            }
-
-            // history stack
-            core.history.push(false);
-        },
-
-        /**
-         * @description Disable the suneditor
-         */
-        disabled: function () {
-            context.buttons.cover.style.display = 'block';
-            context.element.wysiwyg.setAttribute('contenteditable', false);
-            core.isDisabled = true;
-
-            if (options.codeMirrorEditor) {
-                options.codeMirrorEditor.setOption('readOnly', true);
-            } else {
-                context.element.code.setAttribute('disabled', 'disabled');
-            }
-        },
-
-        /**
-         * @description Enable the suneditor
-         */
-        enabled: function () {
-            context.buttons.cover.style.display = 'none';
-            context.element.wysiwyg.setAttribute('contenteditable', true);
-            core.isDisabled = false;
-
-            if (options.codeMirrorEditor) {
-                options.codeMirrorEditor.setOption('readOnly', false);
-            } else {
-                context.element.code.removeAttribute('disabled');
-            }
-        },
-
-        /**
-         * @description Show the suneditor
-         */
-        show: function () {
-            const topAreaStyle = context.element.topArea.style;
-            if (topAreaStyle.display === 'none') topAreaStyle.display = options.display;
-        },
-
-        /**
-         * @description Hide the suneditor
-         */
-        hide: function () {
-            context.element.topArea.style.display = 'none';
-        },
-
-        /**
-         * @description Destroy the suneditor
-         */
-        destroy: function () {
-            /** off menus */
-            core.submenuOff();
-            core.containerOff();
-            core.controllersOff();
-            if (core.notice) core.notice.close.call(core);
-            if (core.modalForm) core.plugins.dialog.close.call(core);
-
-            /** remove history */
-            core.history._destroy();
-
-            /** remove event listeners */
-            event._removeEvent();
-            
-            /** remove element */
-            util.removeItem(context.element.toolbar);
-            util.removeItem(context.element.topArea);
-
-            /** remove object reference */
-            for (let k in core.functions) { if (util.hasOwn(core, k)) delete core.functions[k]; }
-            for (let k in core) { if (util.hasOwn(core, k)) delete core[k]; }
-            for (let k in event) { if (util.hasOwn(event, k)) delete event[k]; }
-            for (let k in context) { if (util.hasOwn(context, k)) delete context[k]; }
-            for (let k in pluginCallButtons) { if (util.hasOwn(pluginCallButtons, k)) delete pluginCallButtons[k]; }
-            
-            /** remove user object */
-            for (let k in this) { if (util.hasOwn(this, k)) delete this[k]; }
-        },
-
-        /**
-         * @description Toolbar methods
-         */
-        toolbar: {
-            /**
-             * @description Disable the toolbar
-             */
-            disabled: function () {
-                context.buttons.cover.style.display = 'block';
-            },
-
-            /**
-             * @description Enable the toolbar
-             */
-            enabled: function () {
-                context.buttons.cover.style.display = 'none';
-            },
-
-            /**
-             * @description Show the toolbar
-             */
-            show: function () {
-                if (core._isInline) {
-                    event._showToolbarInline();
-                } else {
-                    context.element.toolbar.style.display = '';
-                    context.element._stickyDummy.style.display = '';
-                }
-            },
-
-            /**
-             * @description Hide the toolbar
-             */
-            hide: function () {
-                if (core._isInline) {
-                    event._hideToolbar();
-                } else {
-                    context.element.toolbar.style.display = 'none';
-                    context.element._stickyDummy.style.display = 'none';
-                }
-            },
         }
     };
 

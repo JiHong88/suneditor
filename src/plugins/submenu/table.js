@@ -202,7 +202,7 @@ export default {
         tableHTML += '</tbody>';
         oTable.innerHTML = tableHTML;
 
-        const changed = this.insertComponent(oTable, false, true, false);
+        const changed = this.component.insert(oTable, false, true, false);
         
         if (changed) {
             const firstTd = oTable.querySelector('td div');

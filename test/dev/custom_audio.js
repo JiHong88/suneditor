@@ -228,7 +228,7 @@ export default {
 
     /**
      * @Override core, fileManager, resizing
-     * @description It is called from core.selectComponent.
+     * @description It is called from core.component.select
      * @param {Element} element Target element
      */
     select: function (element) {
@@ -366,7 +366,7 @@ export default {
         const response = JSON.parse(xmlHttp.responseText);
 
         if (response.errorMessage) {
-            this.functions.noticeOpen(response.errorMessage);
+            this.notice.open(response.errorMessage);
         } else {
             const fileList = response.result;
             let oAudio = null;
@@ -385,7 +385,7 @@ export default {
     },
 
     callBack_error: function (errorMessage, response, core) {
-        core.functions.noticeOpen(errorMessage | response.toString());
+        core.notice.open(errorMessage | response.toString());
     },
 
     setupUrl: function () {
@@ -420,7 +420,7 @@ export default {
             // you need to create component tags by calling the "set_cover" and "set_container" functions of the "component" module.
             const cover = this.plugins.component.set_cover.call(this, element);
             const container = this.plugins.component.set_container.call(this, cover, '');
-            this.insertComponent(container, false);
+            this.component.insert(container, false);
         } // update
         else if (context._element.src !== src) {
             element = context._element;

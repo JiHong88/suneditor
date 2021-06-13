@@ -78,7 +78,7 @@ export default {
         const oHr = this.util.createElement('HR');
         oHr.className = className;
         this.focus();
-        return this.insertComponent(oHr, false, true, false);
+        return this.component.insert(oHr, false, true, false);
     },
 
     horizontalRulePick: function (e) {

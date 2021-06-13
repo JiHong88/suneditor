@@ -121,7 +121,7 @@ export default {
             span.textContent = value;
             this.setRange(span, 1, span, 1);
         } else {
-            this.functions.insertHTML('<span class="se-custom-tag">' + value + '</span>');
+            this.insertHTML('<span class="se-custom-tag">' + value + '</span>');
             this.context.customSubmenu.textElement.value = '';
         }
 

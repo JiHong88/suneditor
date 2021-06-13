@@ -262,7 +262,7 @@ export default {
 
     /**
      * @Override core, resizing, fileManager
-     * @description It is called from core.selectComponent.
+     * @description It is called from core.component.select
      * @param {Element} element Target element
      */
     select: function (element) {
@@ -289,7 +289,7 @@ export default {
         this.focusEdge(focusEl);
 
         // event
-        this.plugins.fileManager.deleteInfo.call(this, 'video', dataIndex, this.functions.onVideoUpload);
+        this.plugins.fileManager.deleteInfo.call(this, 'video', dataIndex, this.events.onVideoUpload);
 
         // history stack
         this.history.push(false);
@@ -407,8 +407,8 @@ export default {
             if ((fileSize + infoSize) > limitSize) {
                 this.closeLoading();
                 const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable total videos: ' + (limitSize/1000) + 'KB';
-                if (typeof this.functions.onVideoUploadError !== 'function' || this.functions.onVideoUploadError(err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize }, this)) {
-                    this.functions.noticeOpen(err);
+                if (typeof this.events.onVideoUploadError !== 'function' || this.events.onVideoUploadError.call(this.editor, err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize })) {
+                    this.notice.open(err);
                 }
                 return;
             }
@@ -425,8 +425,8 @@ export default {
             element: contextVideo._element
         };
 
-        if (typeof this.functions.onVideoUploadBefore === 'function') {
-            const result = this.functions.onVideoUploadBefore(files, info, this, function (data) {
+        if (typeof this.events.onVideoUploadBefore === 'function') {
+            const result = this.events.onVideoUploadBefore.call(this.editor, files, info, function (data) {
                 if (data && this._w.Array.isArray(data.result)) {
                     this.plugins.video.register.call(this, info, data);
                 } else {
@@ -447,8 +447,8 @@ export default {
 
     error: function (message, response) {
         this.closeLoading();
-        if (typeof this.functions.onVideoUploadError !== 'function' || this.functions.onVideoUploadError(message, response, this)) {
-            this.functions.noticeOpen(message);
+        if (typeof this.events.onVideoUploadError !== 'function' || this.events.onVideoUploadError.call(this.editor, message, response)) {
+            this.notice.open(message);
             throw Error('[SUNEDITOR.plugin.video.error] response: ' + message);
         }
     },
@@ -472,15 +472,15 @@ export default {
             for (let i = 0; i < filesLen; i++) {
                 formData.append('file-' + i, files[i]);
             }
-            this.plugins.fileManager.upload.call(this, videoUploadUrl, this.options.videoUploadHeader, formData, this.plugins.video.callBack_videoUpload.bind(this, info), this.functions.onVideoUploadError);
+            this.plugins.fileManager.upload.call(this, videoUploadUrl, this.options.videoUploadHeader, formData, this.plugins.video.callBack_videoUpload.bind(this, info), this.events.onVideoUploadError);
         } else {
             throw Error('[SUNEDITOR.videoUpload.fail] cause : There is no "videoUploadUrl" option.');
         }
     },
 
     callBack_videoUpload: function (info, xmlHttp) {
-        if (typeof this.functions.videoUploadHandler === 'function') {
-            this.functions.videoUploadHandler(xmlHttp, info, this);
+        if (typeof this.events.videoUploadHandler === 'function') {
+            this.events.videoUploadHandler.call(this.editor, xmlHttp, info);
         } else {
             const response = JSON.parse(xmlHttp.responseText);
             if (response.errorMessage) {
@@ -614,7 +614,7 @@ export default {
 
         let changed = true;
         if (!isUpdate) {
-            changed = this.insertComponent(container, false, true, !this.options.mediaAutoSelect);
+            changed = this.component.insert(container, false, true, !this.options.mediaAutoSelect);
             if (!this.options.mediaAutoSelect) {
                 const line = this.format.appendLine(container, null);
                 this.setRange(line, 0, line, 0);
@@ -625,10 +625,10 @@ export default {
 
         if (changed) {
             if (init) {
-                this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.functions.onVideoUpload, file, true);
+                this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.events.onVideoUpload, file, true);
             }
             if (isUpdate) {
-                this.selectComponent(oFrame, 'video');
+                this.component.select(oFrame, 'video');
                 // history stack
                 this.history.push(false);
             }
@@ -688,7 +688,7 @@ export default {
             console.warn('[SUNEDITOR.video.error] Maybe the video tag is nested.', error);
         }
 
-        this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.functions.onVideoUpload, null, true);
+        this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.events.onVideoUpload, null, true);
     },
 
     /**
@@ -768,14 +768,14 @@ export default {
      * @Override fileManager
      */
     checkFileInfo: function () {
-        this.plugins.fileManager.checkInfo.call(this, 'video', ['iframe', 'video'], this.functions.onVideoUpload, this.plugins.video._update_videoCover.bind(this), true);
+        this.plugins.fileManager.checkInfo.call(this, 'video', ['iframe', 'video'], this.events.onVideoUpload, this.plugins.video._update_videoCover.bind(this), true);
     },
 
     /**
      * @Override fileManager
      */
     resetFileInfo: function () {
-        this.plugins.fileManager.resetInfo.call(this, 'video', this.functions.onVideoUpload);
+        this.plugins.fileManager.resetInfo.call(this, 'video', this.events.onVideoUpload);
     },
 
     /**

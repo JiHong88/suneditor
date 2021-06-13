@@ -125,7 +125,7 @@ export interface Core {
     currentControllerTarget: Element;
 
     /**
-     * @description The file component object of current selected file tag (getFileComponent(): {target, component, pluginName})
+     * @description The file component object of current selected file tag (component.get(): {target, component, pluginName})
      */
     currentFileComponentInfo: seledtedFileInfo;
 
@@ -236,7 +236,7 @@ export interface Core {
 
     /**
      * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
-     * @param arguments controller elements, functions..
+     * @param arguments controller elements, function.
      */
     controllersOn(...arguments: Controllers): void;
 
@@ -308,32 +308,6 @@ export interface Core {
      * @description Close loading box
      */
     closeLoading(): void;
-
-    /**
-     * @description The method to insert a element and return. (used elements : table, hr, image, video)
-     * If "element" is "HR", insert and return the new line.
-     * @param element Element to be inserted
-     * @param notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
-     * @param checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
-     * @param notSelect If true, Do not automatically select the inserted component.
-     * @returns
-     */
-    insertComponent(element: Element, notHistoryPush?: boolean, checkCharCount?: boolean, notSelect?:boolean): Element;
-    
-    /**
-     * @description Gets the file component and that plugin name
-     * return: {target, component, pluginName} | null
-     * @param element Target element (figure tag, component div, file tag)
-     * @returns
-     */
-    getFileComponent(element: Element): seledtedFileInfo | null;
-
-    /**
-     * @description The component(image, video) is selected and the resizing module is called.
-     * @param element Element tag (img, iframe, video)
-     * @param pluginName Plugin name (image, video)
-     */
-    selectComponent(element: Element, pluginName: string): void;
 
     /**
      * @description Delete selected node and insert argument value node and return.
@@ -511,7 +485,7 @@ export default class SunEditor {
     /**
      * @description Called just before the inline toolbar is positioned and displayed on the screen.
      * @param toolbar Toolbar Element
-     * @param context The editor's context object (editor.getContext())
+     * @param context The editor's context object
      * @param core Core object
      */
     showInline: (toolbar: Element, context: Context, core: Core) => void;
@@ -737,13 +711,6 @@ export default class SunEditor {
     onResizeEditor: (height: number, prevHeight: number, core: Core) => {};
 
     /**
-     * @description Reset the buttons on the toolbar. (Editor is not reloaded)
-     * You cannot set a new plugin for the button.
-     * @param buttonList Button list 
-     */
-    setToolbarButtons(buttonList: any[]): void;
-
-    /**
      * @description Add or reset option property
      * @param options Options
      */
@@ -758,26 +725,9 @@ export default class SunEditor {
     setDefaultStyle(style: string): void;
 
     /**
-     * @description Open a notice area
-     * @param message Notice message
-     */
-    noticeOpen(message: string): void;
-
-    /**
-     * @description Close a notice area
-     */
-    noticeClose(): void;
-
-    /**
      * @description Copying the contents of the editor to the original textarea
      */
     save(): void;
-
-    /**
-     * @description Gets the suneditor's context object. Contains settings, plugins, and cached element objects
-     * @returns
-     */
-    getContext(): Context;
 
     /**
      * @description Gets the contents of the suneditor

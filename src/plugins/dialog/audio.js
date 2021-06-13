@@ -194,7 +194,7 @@ export default {
 
     /**
      * @Override core, fileManager, resizing
-     * @description It is called from core.selectComponent.
+     * @description It is called from core.component.select
      * @param {Element} element Target element
      */
     select: function (element) {
@@ -221,7 +221,7 @@ export default {
         this.focusEdge(focusEl);
 
         // fileManager event
-        this.plugins.fileManager.deleteInfo.call(this, 'audio', dataIndex, this.functions.onAudioUpload);
+        this.plugins.fileManager.deleteInfo.call(this, 'audio', dataIndex, this.events.onAudioUpload);
 
         // history stack
         this.history.push(false);
@@ -231,14 +231,14 @@ export default {
      * @Override fileManager
      */
     checkFileInfo: function () {
-        this.plugins.fileManager.checkInfo.call(this, 'audio', ['audio'], this.functions.onAudioUpload, this.plugins.audio.updateCover.bind(this), false);
+        this.plugins.fileManager.checkInfo.call(this, 'audio', ['audio'], this.events.onAudioUpload, this.plugins.audio.updateCover.bind(this), false);
     },
 
     /**
      * @Override fileManager
      */
     resetFileInfo: function () {
-        this.plugins.fileManager.resetInfo.call(this, 'audio', this.functions.onAudioUpload);
+        this.plugins.fileManager.resetInfo.call(this, 'audio', this.events.onAudioUpload);
     },
 
     /**
@@ -313,8 +313,8 @@ export default {
             if ((fileSize + infoSize) > limitSize) {
                 this.closeLoading();
                 const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable total audios: ' + (limitSize/1000) + 'KB';
-                if (typeof this.functions.onAudioUploadError !== 'function' || this.functions.onAudioUploadError(err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize }, this)) {
-                    this.functions.noticeOpen(err);
+                if (typeof this.events.onAudioUploadError !== 'function' || this.events.onAudioUploadError.call(this.editor, err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize })) {
+                    this.notice.open(err);
                 }
                 return;
             }
@@ -328,8 +328,8 @@ export default {
             element: contextAudio._element
         };
 
-        if (typeof this.functions.onAudioUploadBefore === 'function') {
-            const result = this.functions.onAudioUploadBefore(files, info, this, function (data) {
+        if (typeof this.events.onAudioUploadBefore === 'function') {
+            const result = this.events.onAudioUploadBefore.call(this.editor, files, info, function (data) {
                 if (data && this._w.Array.isArray(data.result)) {
                     this.plugins.audio.register.call(this, info, data);
                 } else {
@@ -350,8 +350,8 @@ export default {
 
     error: function (message, response) {
         this.closeLoading();
-        if (typeof this.functions.onAudioUploadError !== 'function' || this.functions.onAudioUploadError(message, response, this)) {
-            this.functions.noticeOpen(message);
+        if (typeof this.events.onAudioUploadError !== 'function' || this.events.onAudioUploadError.call(this.editor, message, response)) {
+            this.notice.open(message);
             throw Error('[SUNEDITOR.plugin.audio.exception] response: ' + message);
         }
     },
@@ -376,12 +376,12 @@ export default {
         }
 
         // server upload
-        this.plugins.fileManager.upload.call(this, audioUploadUrl, this.options.audioUploadHeader, formData, this.plugins.audio.callBack_upload.bind(this, info), this.functions.onAudioUploadError);
+        this.plugins.fileManager.upload.call(this, audioUploadUrl, this.options.audioUploadHeader, formData, this.plugins.audio.callBack_upload.bind(this, info), this.events.onAudioUploadError);
     },
 
     callBack_upload: function (info, xmlHttp) {
-        if (typeof this.functions.audioUploadHandler === 'function') {
-            this.functions.audioUploadHandler(xmlHttp, info, this);
+        if (typeof this.events.audioUploadHandler === 'function') {
+            this.events.audioUploadHandler.call(this.editor, xmlHttp, info);
         } else {
             const response = JSON.parse(xmlHttp.responseText);
             if (response.errorMessage) {
@@ -425,7 +425,7 @@ export default {
             element.src = src;
             const cover = this.plugins.component.set_cover.call(this, element);
             const container = this.plugins.component.set_container.call(this, cover, '');
-            if (!this.insertComponent(container, false, true, !this.options.mediaAutoSelect)) {
+            if (!this.component.insert(container, false, true, !this.options.mediaAutoSelect)) {
                 this.focus();
                 return;
             }
@@ -438,14 +438,14 @@ export default {
             if (contextAudio._element) element = contextAudio._element;
             if (element && element.src !== src) {
                 element.src = src;
-                this.selectComponent(element, 'audio');
+                this.component.select(element, 'audio');
             } else {
-                this.selectComponent(element, 'audio');
+                this.component.select(element, 'audio');
                 return;
             }
         }
 
-        this.plugins.fileManager.setInfo.call(this, 'audio', element, this.functions.onAudioUpload, file, false);
+        this.plugins.fileManager.setInfo.call(this, 'audio', element, this.events.onAudioUpload, file, false);
         if (isUpdate) this.history.push(false);
     },
 
@@ -479,7 +479,7 @@ export default {
             console.warn('[SUNEDITOR.audio.error] Maybe the audio tag is nested.', error);
         }
 
-        this.plugins.fileManager.setInfo.call(this, 'audio', element, this.functions.onAudioUpload, null, false);
+        this.plugins.fileManager.setInfo.call(this, 'audio', element, this.events.onAudioUpload, null, false);
     },
 
     /**
