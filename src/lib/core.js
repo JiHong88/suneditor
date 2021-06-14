@@ -6634,9 +6634,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            // user event
-            if (typeof functions.onKeyUp === 'function' && functions.onKeyUp(e, core) === false) return;
-
             /** when format tag deleted */
             if (keyCode === 8 && util.isWysiwygDiv(selectionNode) && selectionNode.textContent === '' && selectionNode.children.length === 0) {
                 e.preventDefault();
@@ -6678,6 +6675,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             core._charCount('');
 
+            // user event
+            if (typeof functions.onKeyUp === 'function' && functions.onKeyUp(e, core) === false) return;
+
             // history stack
             core.history.push(true);
         },
@@ -6707,9 +6707,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.controllersOff();
             if (core._isInline || core._isBalloon) event._hideToolbar();
 
-            // user event
-            if (typeof functions.onBlur === 'function') functions.onBlur(e, core);
-
             // active class reset of buttons
             const commandMap = core.commandMap;
             const activePlugins = core.activePlugins;
@@ -6729,6 +6726,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core._variable.currentNodes = [];
             core._variable.currentNodesMap = [];
             if (options.showPathLabel) context.element.navigation.textContent = '';
+
+            // user event
+            if (typeof functions.onBlur === 'function') functions.onBlur(e, core);
         },
 
         onMouseDown_resizingBar: function (e) {
