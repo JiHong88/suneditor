@@ -6679,7 +6679,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (typeof functions.onKeyUp === 'function' && functions.onKeyUp(e, core) === false) return;
 
             // history stack
-            core.history.push(true);
+            if (!ctrl && !alt && !event._historyIgnoreKeyCode.test(keyCode)) {
+                core.history.push(true);
+            }
         },
 
         onScroll_wysiwyg: function (e) {
