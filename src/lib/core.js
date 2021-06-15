@@ -8,6 +8,7 @@
 'use strict';
 
 import { window, document } from "../helper/global"
+import helperDom from '../helper/dom';
 import _util from '../helper/util';
 import Constructor from './constructor';
 import Context from './context';
@@ -413,6 +414,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         _styleCommandMap: null,
 
+        _onButtonsCheck: new _w.RegExp("^(" + _w.Object.keys(options._textTagsMap).join("|") + ")$", "i"),
+
         /**
          * @description Map of default command
          * @private
@@ -564,7 +567,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._setMenuPosition(element, menu);
             
             this._bindedSubmenuOff = this.submenuOff.bind(this);
-            this.addDocEvent('mousedown', this._bindedSubmenuOff, false);
+            this.eventManager.addGlobalEvent('mousedown', this._bindedSubmenuOff, false);
 
             if (this.plugins[submenuName].on) this.plugins[submenuName].on.call(this);
             this._antiBlur = true;
@@ -574,7 +577,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Disable submenu
          */
         submenuOff: function () {
-            this.removeDocEvent('mousedown', this._bindedSubmenuOff);
+            this.eventManager.removeGlobalEvent('mousedown', this._bindedSubmenuOff);
             this._bindedSubmenuOff = null;
 
             if (this.submenu) {
@@ -602,7 +605,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._setMenuPosition(element, menu);
             
             this._bindedContainerOff = this.containerOff.bind(this);
-            this.addDocEvent('mousedown', this._bindedContainerOff, false);
+            this.eventManager.addGlobalEvent('mousedown', this._bindedContainerOff, false);
 
             if (this.plugins[containerName].on) this.plugins[containerName].on.call(this);
             this._antiBlur = true;
@@ -612,7 +615,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Disable container
          */
         containerOff: function () {
-            this.removeDocEvent('mousedown', this._bindedContainerOff);
+            this.eventManager.removeGlobalEvent('mousedown', this._bindedContainerOff);
             this._bindedContainerOff = null;
 
             if (this.container) {
@@ -641,7 +644,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const toolbar = this.context.element.toolbar;
             const toolbarW = toolbar.offsetWidth;
-            const toolbarOffset = event._getEditorOffsets(context.element.toolbar);
+            const toolbarOffset = helperDom.getGlobalOffset(context.element.toolbar);
             const menuW = menu.offsetWidth;
             const l = element.parentElement.offsetLeft + 3;
 
@@ -651,7 +654,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const rtlW = menuW > elementW ? menuW - elementW : 0;
                 const rtlL = rtlW > 0 ? 0 : elementW - menuW;
                 menu.style.left = (l - rtlW + rtlL) + 'px';
-                if (toolbarOffset.left > event._getEditorOffsets(menu).left) {
+                if (toolbarOffset.left > helperDom.getGlobalOffset(menu).left) {
                     menu.style.left = '0px';
                 }
             } else {
@@ -738,8 +741,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             this._bindControllersOff = this.controllersOff.bind(this);
-            this.addDocEvent('mousedown', this._bindControllersOff, false);
-            this.addDocEvent('keydown', this._bindControllersOff, false);
+            this.eventManager.addGlobalEvent('mousedown', this._bindControllersOff, false);
+            this.eventManager.addGlobalEvent('keydown', this._bindControllersOff, false);
             this._antiBlur = true;
 
             if (typeof this.events.showController === 'function') this.events.showController(this.currentControllerName, this.controllerArray);
@@ -769,8 +772,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.effectNode = null;
             if (!this._bindControllersOff) return;
 
-            this.removeDocEvent('mousedown', this._bindControllersOff);
-            this.removeDocEvent('keydown', this._bindControllersOff);
+            this.eventManager.removeGlobalEvent('mousedown', this._bindControllersOff);
+            this.eventManager.removeGlobalEvent('keydown', this._bindControllersOff);
             this._bindControllersOff = null;
 
             if (len > 0) {
@@ -899,7 +902,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             this.applyTagEffect();
-            if (this._isBalloon) event._toggleToolbarBalloon();
+            if (this._isBalloon) this.eventManager._toggleToolbarBalloon();
         },
 
         /**
@@ -1068,8 +1071,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         this._moreLayerActiveButton = target;
                         layer.style.display = 'block';
 
-                        event._showToolbarBalloon();
-                        event._showToolbarInline();
+                        this.toolbar._showBalloon();
+                        this.toolbar._showInline();
                     }
                     return;
                 } else if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
@@ -1098,8 +1101,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     this._moreLayerActiveButton = null;
                     layer.style.display = 'none';
 
-                    event._showToolbarBalloon();
-                    event._showToolbarInline();
+                    this.toolbar._showBalloon();
+                    this.toolbar._showInline();
                 }
             } else if (/submenu/.test(display)) {
                 this.submenuOff();
@@ -1249,7 +1252,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         context.element._arrow.style.display = '';
                         this._isInline = false;
                         this._isBalloon = true;
-                        event._hideToolbar();    
+                        this.eventManager._hideToolbar();    
                     }
                 }
 
@@ -1276,7 +1279,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         context.element.toolbar.style.left = '';
                         this._isInline = true;
                         this._isBalloon = false;
-                        event._showToolbarInline();
+                        this.toolbar._showInline();
                     }
                 }
                 
@@ -1438,7 +1441,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 this._isInline = _var._fullScreenAttrs.inline;
                 this._isBalloon = _var._fullScreenAttrs.balloon;
-                if (this._isInline) event._showToolbarInline();
+                this.toolbar._showInline();
                 if (!!options.toolbarContainer) util.removeClass(toolbar, 'se-toolbar-balloon');
 
                 event.onScroll_window();
@@ -2178,35 +2181,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             for (let k in this) { if (util.hasOwn(this, k)) delete this[k]; }
         },
 
-        
-
-        /**
-         * @description Add an event to document.
-         * When created as an Iframe, the same event is added to the document in the Iframe.
-         * @param {String} type Event type
-         * @param {Function} listener Event listener
-         * @param {Boolean} useCapture Use event capture
-         */
-        addDocEvent: function (type, listener, useCapture) {
-            _d.addEventListener(type, listener, useCapture);
-            if (options.iframe) {
-                this._wd.addEventListener(type, listener);
-            }
-        },
-
-        /**
-         * @description Remove events from document.
-         * When created as an Iframe, the event of the document inside the Iframe is also removed.
-         * @param {String} type Event type
-         * @param {Function} listener Event listener
-         */
-        removeDocEvent: function (type, listener) {
-            _d.removeEventListener(type, listener);
-            if (options.iframe) {
-                this._wd.removeEventListener(type, listener);
-            }
-        },
-
         /**
          * @description Fix tags that do not fit the editor format.
          * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
@@ -2544,7 +2518,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (context.buttons.save) context.buttons.save.removeAttribute('disabled');
             // user event
             if (this.events.onChange) this.events.onChange(this.getContents(true));
-            if (context.element.toolbar.style.display === 'block') event._showToolbarBalloon();
+            if (context.element.toolbar.style.display === 'block') this.toolbar._showBalloon();
         },
 
         /**
@@ -2578,79 +2552,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
-         * @description If there is no default format, add a format and move "selection".
-         * @param {String|null} formatName Format tag name (default: 'P')
-         * @private
-         */
-        _setDefaultFormat: function (formatName) {
-            if (this._fileManager.pluginRegExp.test(this.currentControllerName)) return;
-
-            const range = this.getRange();
-            const commonCon = range.commonAncestorContainer;
-            const startCon = range.startContainer;
-            const rangeEl = this.format.getRangeBlock(commonCon, null);
-            let focusNode, offset, format;
-
-            const fileComponent = util.getParentElement(commonCon, util.isComponent);
-            if (fileComponent && !util.isTable(fileComponent)) return;
-            if((util.isRangeFormatElement(startCon) || util.isWysiwygDiv(startCon)) && (util.isComponent(startCon.children[range.startOffset]) || util.isComponent(startCon.children[range.startOffset - 1]))) return;
-
-            if (rangeEl) {
-                format = util.createElement(formatName || options.defaultTag);
-                format.innerHTML = rangeEl.innerHTML;
-                if (format.childNodes.length === 0) format.innerHTML = util.zeroWidthSpace;
-
-                rangeEl.innerHTML = format.outerHTML;
-                format = rangeEl.firstChild;
-                focusNode = util.getEdgeChildNodes(format, null).sc;
-
-                if (!focusNode) {
-                    focusNode = util.createTextNode(util.zeroWidthSpace);
-                    format.insertBefore(focusNode, format.firstChild);
-                }
-                
-                offset = focusNode.textContent.length;
-                this.setRange(focusNode, offset, focusNode, offset);
-                return;
-            }
-
-            if(util.isRangeFormatElement(commonCon) && (commonCon.childNodes.length <= 1)) {
-                let br = null;
-                if (commonCon.childNodes.length === 1 && util.isBreak(commonCon.firstChild)) {
-                    br = commonCon.firstChild;
-                } else {
-                    br = util.createTextNode(util.zeroWidthSpace);
-                    commonCon.appendChild(br);
-                }
-
-                this.setRange(br, 1, br, 1);
-                return;
-            }
-
-            this.execCommand('formatBlock', false, (formatName || options.defaultTag));
-            focusNode = util.getEdgeChildNodes(commonCon, commonCon);
-            focusNode = focusNode ? focusNode.ec : commonCon;
-
-            format = this.format.getLine(focusNode, null);
-            if (!format) {
-                this.removeRange();
-                this.selection._init();
-                return;
-            }
-            
-            if (util.isBreak(format.nextSibling)) util.removeItem(format.nextSibling);
-            if (util.isBreak(format.previousSibling)) util.removeItem(format.previousSibling);
-            if (util.isBreak(focusNode)) {
-                const zeroWidth = util.createTextNode(util.zeroWidthSpace);
-                focusNode.parentNode.insertBefore(zeroWidth, focusNode);
-                focusNode = zeroWidth;
-            }
-
-            this.effectNode = null;
-            this.nativeFocus();
-        },
-
-        /**
          * @description Initialization after "setOptions"
          * @param {Object} el context.element
          * @param {String} _initHTML Initial html string
@@ -2673,7 +2574,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._init(reload, _initHTML);
             event._addEvent();
             this.char.display();
-            event._offStickyToolbar();
+            this.toolbar._offSticky();
             event.onResize_window();
 
             // toolbar visibility

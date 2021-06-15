@@ -790,11 +790,11 @@ export default {
         this.plugins.table._closeSplitMenu = function () {
             this.util.removeClass(this.context.table.splitButton, 'on');
             this.context.table.splitMenu.style.display = 'none';
-            this.removeDocEvent('click', this.plugins.table._closeSplitMenu);
+            this.eventManager.removeGlobalEvent('click', this.plugins.table._closeSplitMenu);
             this.plugins.table._closeSplitMenu = null;
         }.bind(this);
 
-        this.addDocEvent('click', this.plugins.table._closeSplitMenu);
+        this.eventManager.addGlobalEvent('click', this.plugins.table._closeSplitMenu);
     },
 
     splitCells: function (direction) {

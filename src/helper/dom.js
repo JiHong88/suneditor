@@ -62,6 +62,25 @@ export function isNotCheckingNode(element) {
 	return element && /katex|__se__tag/.test(element.className);
 }
 
+export function getGlobalOffset(container) {
+	let t = 0,
+		l = 0,
+		s = 0;
+
+	while (container) {
+		t += container.offsetTop;
+		l += container.offsetLeft;
+		s += container.scrollTop;
+		container = container.offsetParent;
+	}
+
+	return {
+		top: t,
+		left: l,
+		scroll: s
+	};
+}
+
 /**
  * @description Returns the index compared to other sibling nodes.
  * @param {Node} node The Node to find index

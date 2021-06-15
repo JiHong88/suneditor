@@ -511,11 +511,11 @@
             this.plugins.resizing._closeAlignMenu = function () {
                 this.util.removeClass(this.context.resizing.alignButton, 'on');
                 this.context.resizing.alignMenu.style.display = 'none';
-                this.removeDocEvent('click', this.plugins.resizing._closeAlignMenu);
+                this.eventManager.removeGlobalEvent('click', this.plugins.resizing._closeAlignMenu);
                 this.plugins.resizing._closeAlignMenu = null;
             }.bind(this);
     
-            this.addDocEvent('click', this.plugins.resizing._closeAlignMenu);
+            this.eventManager.addGlobalEvent('click', this.plugins.resizing._closeAlignMenu);
         },
     
         /**
@@ -774,9 +774,9 @@
                 const change = contextResizing._isChange;
                 contextResizing._isChange = false;
     
-                this.removeDocEvent('mousemove', resizing_element_bind);
-                this.removeDocEvent('mouseup', closureFunc_bind);
-                this.removeDocEvent('keydown', closureFunc_bind);
+                this.eventManager.removeGlobalEvent('mousemove', resizing_element_bind);
+                this.eventManager.removeGlobalEvent('mouseup', closureFunc_bind);
+                this.eventManager.removeGlobalEvent('keydown', closureFunc_bind);
                 
                 if (e.type === 'keydown') {
                     this.controllersOff();
@@ -791,9 +791,9 @@
             }.bind(this);
     
             const resizing_element_bind = this.plugins.resizing.resizing_element.bind(this, contextResizing, direction, this.context[contextResizing._resize_plugin]);
-            this.addDocEvent('mousemove', resizing_element_bind);
-            this.addDocEvent('mouseup', closureFunc_bind);
-            this.addDocEvent('keydown', closureFunc_bind);
+            this.eventManager.addGlobalEvent('mousemove', resizing_element_bind);
+            this.eventManager.addGlobalEvent('mouseup', closureFunc_bind);
+            this.eventManager.addGlobalEvent('keydown', closureFunc_bind);
         },
     
         /**

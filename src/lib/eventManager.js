@@ -5,109 +5,64 @@
 "use strict";
 
 import EditorInterface from "../interface/editor";
+import helperDom from "../helper/dom";
 
 function eventManager(editor) {
 	EditorInterface.call(this, editor);
 	this._events = [];
 	this._onShortcutKey = false;
+	this._IEisComposing = false; // In IE, there is no "e.isComposing" in the key-up event.
+	this._directionKeyCode = new this._w.RegExp("^(8|13|3[2-9]|40|46)$");
+	this._nonTextKeyCode = new this._w.RegExp("^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$");
+	this._historyIgnoreKeyCode = new this._w.RegExp("^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$");
+	this._frontZeroWidthReg = new this._w.RegExp(util.zeroWidthSpace + "+", "");
+	this._balloonDelay = null;
 }
 
 eventManager.prototype = {
-	_IEisComposing: false, // In IE, there is no "e.isComposing" in the key-up event.
-	_responsiveCurrentSize: "default",
-	_responsiveButtonSize: null,
-	_responsiveButtons: null,
-	_directionKeyCode: new _w.RegExp("^(8|13|3[2-9]|40|46)$"),
-	_nonTextKeyCode: new _w.RegExp("^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$"),
-	_historyIgnoreKeyCode: new _w.RegExp("^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$"),
-	_onButtonsCheck: new _w.RegExp("^(" + _w.Object.keys(options._textTagsMap).join("|") + ")$", "i"),
-	_frontZeroWidthReg: new _w.RegExp(util.zeroWidthSpace + "+", ""),
-	_keyCodeShortcut: {
-		65: "A",
-		66: "B",
-		83: "S",
-		85: "U",
-		73: "I",
-		89: "Y",
-		90: "Z",
-		219: "[",
-		221: "]"
+	addEvent: function (target, type, handler, useCapture) {
+		target.addEventListener(type, handler, useCapture);
+		this._events.push({ target: target, type: type, handler: handler });
 	},
 
-	_shortcutCommand: function (keyCode, shift) {
-		let command = null;
-		const keyStr = event._keyCodeShortcut[keyCode];
-
-		switch (keyStr) {
-			case "A":
-				command = "selectAll";
-				break;
-			case "B":
-				if (options.shortcutsDisable.indexOf("bold") === -1) {
-					command = "bold";
-				}
-				break;
-			case "S":
-				if (shift && options.shortcutsDisable.indexOf("strike") === -1) {
-					command = "strike";
-				} else if (!shift && options.shortcutsDisable.indexOf("save") === -1) {
-					command = "save";
-				}
-				break;
-			case "U":
-				if (options.shortcutsDisable.indexOf("underline") === -1) {
-					command = "underline";
-				}
-				break;
-			case "I":
-				if (options.shortcutsDisable.indexOf("italic") === -1) {
-					command = "italic";
-				}
-				break;
-			case "Z":
-				if (options.shortcutsDisable.indexOf("undo") === -1) {
-					if (shift) {
-						command = "redo";
-					} else {
-						command = "undo";
-					}
-				}
-				break;
-			case "Y":
-				if (options.shortcutsDisable.indexOf("undo") === -1) {
-					command = "redo";
-				}
-				break;
-			case "[":
-				if (options.shortcutsDisable.indexOf("indent") === -1) {
-					command = options.rtl ? "indent" : "outdent";
-				}
-				break;
-			case "]":
-				if (options.shortcutsDisable.indexOf("indent") === -1) {
-					command = options.rtl ? "outdent" : "indent";
-				}
-				break;
+	/**
+	 * @description Add an event to document.
+	 * When created as an Iframe, the same event is added to the document in the Iframe.
+	 * @param {String} type Event type
+	 * @param {Function} listener Event listener
+	 * @param {Boolean} useCapture Use event capture
+	 */
+	addGlobalEvent: function (type, listener, useCapture) {
+		_d.addEventListener(type, listener, useCapture);
+		if (options.iframe) {
+			this._wd.addEventListener(type, listener);
 		}
-
-		if (!command) return false;
-
-		core.commandHandler(core.commandMap[command], command);
-		return true;
 	},
 
-	_balloonDelay: null,
+	/**
+	 * @description Remove events from document.
+	 * When created as an Iframe, the event of the document inside the Iframe is also removed.
+	 * @param {String} type Event type
+	 * @param {Function} listener Event listener
+	 */
+	removeGlobalEvent: function (type, listener) {
+		_d.removeEventListener(type, listener);
+		if (options.iframe) {
+			this._wd.removeEventListener(type, listener);
+		}
+	},
+
 	_showToolbarBalloonDelay: function () {
-		if (event._balloonDelay) {
-			_w.clearTimeout(event._balloonDelay);
+		if (this._balloonDelay) {
+			this._w.clearTimeout(this._balloonDelay);
 		}
 
-		event._balloonDelay = _w.setTimeout(
+		this._balloonDelay = _w.setTimeout(
 			function () {
 				_w.clearTimeout(this._balloonDelay);
 				this._balloonDelay = null;
-				this._showToolbarBalloon();
-			}.bind(event),
+				this.toolbar._showBalloon();
+			}.bind(this),
 			350
 		);
 	},
@@ -115,172 +70,13 @@ eventManager.prototype = {
 	_toggleToolbarBalloon: function () {
 		core.selection._init();
 		const range = core.getRange();
-		if (core._bindControllersOff || (!core._isBalloonAlways && range.collapsed)) event._hideToolbar();
-		else event._showToolbarBalloon(range);
-	},
-
-	_showToolbarBalloon: function (rangeObj) {
-		if (!core._isBalloon) return;
-
-		const range = rangeObj || core.getRange();
-		const toolbar = context.element.toolbar;
-		const topArea = context.element.topArea;
-		const selection = core.selection.get();
-
-		let isDirTop;
-		if (core._isBalloonAlways && range.collapsed) {
-			isDirTop = true;
-		} else if (selection.focusNode === selection.anchorNode) {
-			isDirTop = selection.focusOffset < selection.anchorOffset;
-		} else {
-			const childNodes = util.getListChildNodes(range.commonAncestorContainer, null);
-			isDirTop = util.getArrayIndex(childNodes, selection.focusNode) < util.getArrayIndex(childNodes, selection.anchorNode);
-		}
-
-		let rects = range.getClientRects();
-		rects = rects[isDirTop ? 0 : rects.length - 1];
-
-		const globalScroll = core.getGlobalScrollOffset();
-		let scrollLeft = globalScroll.left;
-		let scrollTop = globalScroll.top;
-
-		const editorWidth = topArea.offsetWidth;
-		const offsets = event._getEditorOffsets(null);
-		const stickyTop = offsets.top;
-		const editorLeft = offsets.left;
-
-		toolbar.style.top = "-10000px";
-		toolbar.style.visibility = "hidden";
-		toolbar.style.display = "block";
-
-		if (!rects) {
-			const node = core.selection.getNode();
-			if (util.isFormatElement(node)) {
-				const zeroWidth = util.createTextNode(util.zeroWidthSpace);
-				core.insertNode(zeroWidth, null, false);
-				core.setRange(zeroWidth, 1, zeroWidth, 1);
-				core.selection._init();
-				rects = core.getRange().getClientRects();
-				rects = rects[isDirTop ? 0 : rects.length - 1];
-			}
-
-			if (!rects) {
-				const nodeOffset = util.getOffset(node, context.element.wysiwygFrame);
-				rects = {
-					left: nodeOffset.left,
-					top: nodeOffset.top,
-					right: nodeOffset.left,
-					bottom: nodeOffset.top + node.offsetHeight,
-					noText: true
-				};
-				scrollLeft = 0;
-				scrollTop = 0;
-			}
-
-			isDirTop = true;
-		}
-
-		const arrowMargin = _w.Math.round(context.element._arrow.offsetWidth / 2);
-		const toolbarWidth = toolbar.offsetWidth;
-		const toolbarHeight = toolbar.offsetHeight;
-		const iframeRects = /iframe/i.test(context.element.wysiwygFrame.nodeName) ? context.element.wysiwygFrame.getClientRects()[0] : null;
-		if (iframeRects) {
-			rects = {
-				left: rects.left + iframeRects.left,
-				top: rects.top + iframeRects.top,
-				right: rects.right + iframeRects.right - iframeRects.width,
-				bottom: rects.bottom + iframeRects.bottom - iframeRects.height
-			};
-		}
-
-		event._setToolbarOffset(isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
-		if (toolbarWidth !== toolbar.offsetWidth || toolbarHeight !== toolbar.offsetHeight) {
-			event._setToolbarOffset(isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
-		}
-
-		if (options.toolbarContainer) {
-			const editorParent = topArea.parentElement;
-
-			let container = options.toolbarContainer;
-			let left = container.offsetLeft;
-			let top = container.offsetTop;
-
-			while (!container.parentElement.contains(editorParent) || !/^(BODY|HTML)$/i.test(container.parentElement.nodeName)) {
-				container = container.offsetParent;
-				left += container.offsetLeft;
-				top += container.offsetTop;
-			}
-
-			toolbar.style.left = toolbar.offsetLeft - left + topArea.offsetLeft + "px";
-			toolbar.style.top = toolbar.offsetTop - top + topArea.offsetTop + "px";
-		}
-
-		toolbar.style.visibility = "";
-	},
-
-	_setToolbarOffset: function (isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin) {
-		const padding = 1;
-		const toolbarWidth = toolbar.offsetWidth;
-		const toolbarHeight = rects.noText && !isDirTop ? 0 : toolbar.offsetHeight;
-
-		const absoluteLeft = (isDirTop ? rects.left : rects.right) - editorLeft - toolbarWidth / 2 + scrollLeft;
-		const overRight = absoluteLeft + toolbarWidth - editorWidth;
-
-		let t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
-		let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
-
-		let resetTop = false;
-		const space = t + (isDirTop ? event._getEditorOffsets(null).top : toolbar.offsetHeight - context.element.wysiwyg.offsetHeight);
-		if (!isDirTop && space > 0 && event._getPageBottomSpace() < space) {
-			isDirTop = true;
-			resetTop = true;
-		} else if (isDirTop && _d.documentElement.offsetTop > space) {
-			isDirTop = false;
-			resetTop = true;
-		}
-
-		if (resetTop) t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
-
-		toolbar.style.left = _w.Math.floor(l) + "px";
-		toolbar.style.top = _w.Math.floor(t) + "px";
-
-		if (isDirTop) {
-			util.removeClass(context.element._arrow, "se-arrow-up");
-			util.addClass(context.element._arrow, "se-arrow-down");
-			context.element._arrow.style.top = toolbarHeight + "px";
-		} else {
-			util.removeClass(context.element._arrow, "se-arrow-down");
-			util.addClass(context.element._arrow, "se-arrow-up");
-			context.element._arrow.style.top = -arrowMargin + "px";
-		}
-
-		const arrow_left = _w.Math.floor(toolbarWidth / 2 + (absoluteLeft - l));
-		context.element._arrow.style.left = (arrow_left + arrowMargin > toolbar.offsetWidth ? toolbar.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + "px";
-	},
-
-	_showToolbarInline: function () {
-		if (!core._isInline) return;
-
-		const toolbar = context.element.toolbar;
-		if (options.toolbarContainer) toolbar.style.position = "relative";
-		else toolbar.style.position = "absolute";
-
-		toolbar.style.visibility = "hidden";
-		toolbar.style.display = "block";
-		core._inlineToolbarAttr.width = toolbar.style.width = options.toolbarWidth;
-		core._inlineToolbarAttr.top = toolbar.style.top = (options.toolbarContainer ? 0 : -1 - toolbar.offsetHeight) + "px";
-
-		if (typeof this.events.showInline === "function") this.events.showInline(toolbar, context);
-
-		this._resetStickyToolbar();
-		core._inlineToolbarAttr.isShow = true;
-		toolbar.style.visibility = "";
+		if (core._bindControllersOff || (!core._isBalloonAlways && range.collapsed)) this._hideToolbar();
+		else this.toolbar._showBalloon(range);
 	},
 
 	_hideToolbar: function () {
 		if (!core._notHideToolbar && !core._variable.isFullScreen) {
-			context.element.toolbar.style.display = "none";
-			core._inlineToolbarAttr.isShow = false;
+			this.toolbar.hide();
 		}
 	},
 
@@ -320,75 +116,6 @@ eventManager.prototype = {
 		core._variable.resizeClientY = e.clientY;
 	},
 
-	_getPageBottomSpace: function () {
-		return _d.documentElement.scrollHeight - (event._getEditorOffsets(null).top + context.element.topArea.offsetHeight);
-	},
-
-	_onStickyToolbar: function (inlineOffset) {
-		const element = context.element;
-
-		if (!core._isInline && !options.toolbarContainer) {
-			element._stickyDummy.style.height = element.toolbar.offsetHeight + "px";
-			element._stickyDummy.style.display = "block";
-		}
-
-		element.toolbar.style.top = options.stickyToolbar + inlineOffset + "px";
-		element.toolbar.style.width = core._isInline ? core._inlineToolbarAttr.width : element.toolbar.offsetWidth + "px";
-		util.addClass(element.toolbar, "se-toolbar-sticky");
-		core._sticky = true;
-	},
-
-	_offStickyToolbar: function () {
-		const element = context.element;
-
-		element._stickyDummy.style.display = "none";
-		element.toolbar.style.top = core._isInline ? core._inlineToolbarAttr.top : "";
-		element.toolbar.style.width = core._isInline ? core._inlineToolbarAttr.width : "";
-		element.editorArea.style.marginTop = "";
-
-		util.removeClass(element.toolbar, "se-toolbar-sticky");
-		core._sticky = false;
-	},
-
-	_resetStickyToolbar: function () {
-		if (core._variable.isFullScreen || context.element.toolbar.offsetWidth === 0 || options.stickyToolbar < 0) return;
-
-		const element = context.element;
-		const editorHeight = element.editorArea.offsetHeight;
-		const y = (this.scrollY || _d.documentElement.scrollTop) + options.stickyToolbar;
-		const editorTop = event._getEditorOffsets(options.toolbarContainer).top - (core._isInline ? element.toolbar.offsetHeight : 0);
-		const inlineOffset = core._isInline && y - editorTop > 0 ? y - editorTop - context.element.toolbar.offsetHeight : 0;
-
-		if (y < editorTop) {
-			event._offStickyToolbar();
-		} else if (y + core._variable.minResizingSize >= editorHeight + editorTop) {
-			if (!core._sticky) event._onStickyToolbar(inlineOffset);
-			element.toolbar.style.top = inlineOffset + editorHeight + editorTop + options.stickyToolbar - y - core._variable.minResizingSize + "px";
-		} else if (y >= editorTop) {
-			event._onStickyToolbar(inlineOffset);
-		}
-	},
-
-	_getEditorOffsets: function (container) {
-		let offsetEl = container || context.element.topArea;
-		let t = 0,
-			l = 0,
-			s = 0;
-
-		while (offsetEl) {
-			t += offsetEl.offsetTop;
-			l += offsetEl.offsetLeft;
-			s += offsetEl.scrollTop;
-			offsetEl = offsetEl.offsetParent;
-		}
-
-		return {
-			top: t,
-			left: l,
-			scroll: s
-		};
-	},
-
 	// FireFox - table delete, Chrome - image, video, audio
 	_hardDelete: function () {
 		const range = core.getRange();
@@ -419,6 +146,79 @@ eventManager.prototype = {
 		if (eComp) util.removeItem(eComp);
 
 		return false;
+	},
+
+	/**
+	 * @description If there is no default format, add a line and move "selection".
+	 * @param {String|null} formatName Format tag name (default: 'P')
+	 * @private
+	 */
+	_setDefaultLine: function (formatName) {
+		if (this._fileManager.pluginRegExp.test(this.currentControllerName)) return;
+
+		const range = this.getRange();
+		const commonCon = range.commonAncestorContainer;
+		const startCon = range.startContainer;
+		const rangeEl = this.format.getRangeBlock(commonCon, null);
+		let focusNode, offset, format;
+
+		const fileComponent = util.getParentElement(commonCon, util.isComponent);
+		if (fileComponent && !util.isTable(fileComponent)) return;
+		if ((util.isRangeFormatElement(startCon) || util.isWysiwygDiv(startCon)) && (util.isComponent(startCon.children[range.startOffset]) || util.isComponent(startCon.children[range.startOffset - 1]))) return;
+
+		if (rangeEl) {
+			format = util.createElement(formatName || options.defaultTag);
+			format.innerHTML = rangeEl.innerHTML;
+			if (format.childNodes.length === 0) format.innerHTML = util.zeroWidthSpace;
+
+			rangeEl.innerHTML = format.outerHTML;
+			format = rangeEl.firstChild;
+			focusNode = util.getEdgeChildNodes(format, null).sc;
+
+			if (!focusNode) {
+				focusNode = util.createTextNode(util.zeroWidthSpace);
+				format.insertBefore(focusNode, format.firstChild);
+			}
+
+			offset = focusNode.textContent.length;
+			this.setRange(focusNode, offset, focusNode, offset);
+			return;
+		}
+
+		if (util.isRangeFormatElement(commonCon) && commonCon.childNodes.length <= 1) {
+			let br = null;
+			if (commonCon.childNodes.length === 1 && util.isBreak(commonCon.firstChild)) {
+				br = commonCon.firstChild;
+			} else {
+				br = util.createTextNode(util.zeroWidthSpace);
+				commonCon.appendChild(br);
+			}
+
+			this.setRange(br, 1, br, 1);
+			return;
+		}
+
+		this.execCommand("formatBlock", false, formatName || options.defaultTag);
+		focusNode = util.getEdgeChildNodes(commonCon, commonCon);
+		focusNode = focusNode ? focusNode.ec : commonCon;
+
+		format = this.format.getLine(focusNode, null);
+		if (!format) {
+			this.removeRange();
+			this.selection._init();
+			return;
+		}
+
+		if (util.isBreak(format.nextSibling)) util.removeItem(format.nextSibling);
+		if (util.isBreak(format.previousSibling)) util.removeItem(format.previousSibling);
+		if (util.isBreak(focusNode)) {
+			const zeroWidth = util.createTextNode(util.zeroWidthSpace);
+			focusNode.parentNode.insertBefore(zeroWidth, focusNode);
+			focusNode = zeroWidth;
+		}
+
+		this.effectNode = null;
+		this.nativeFocus();
 	},
 
 	_setClipboardComponent: function (e, info, clipboardData) {
@@ -594,7 +394,7 @@ eventManager.prototype = {
 		this.toolbar._setResponsive();
 		this.addEvent(this._w, "resize", OnResize_window.bind(this), false);
 		if (options.stickyToolbar > -1) {
-			this.addEvent(this._w, "scroll", this._resetStickyToolbar.bind(this), false);
+			this.addEvent(this._w, "scroll", this.toolbar.resetSticky.bind(this), false);
 		}
 	},
 
@@ -604,11 +404,6 @@ eventManager.prototype = {
 			e.target.removeEventListener(e.type, e.handler);
 		}
 		this._events = [];
-	},
-
-	addEvent: function (target, type, handler, useCapture) {
-		target.addEventListener(type, handler, useCapture);
-		this._events.push({ target: target, type: type, handler: handler });
 	},
 
 	constructor: eventManager
@@ -686,7 +481,7 @@ function OnMouseDown_wysiwyg(e) {
 	}
 
 	if (core._isBalloon) {
-		event._hideToolbar();
+		this._hideToolbar();
 	}
 
 	if (/FIGURE/i.test(e.target.nodeName)) e.preventDefault();
@@ -713,10 +508,10 @@ function OnClick_wysiwyg(e) {
 		figcaption.focus();
 
 		if (core._isInline && !core._inlineToolbarAttr.isShow) {
-			event._showToolbarInline();
+			this.toolbar._showInline();
 
 			const hideToolbar = function () {
-				event._hideToolbar();
+				this._hideToolbar();
 				figcaption.removeEventListener("blur", hideToolbar);
 			};
 
@@ -742,7 +537,7 @@ function OnClick_wysiwyg(e) {
 				core.focus();
 			} else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode) && (!util.isTable(selectionNode) || util.isTableCell(selectionNode))) {
 				e.preventDefault();
-				core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? "DIV" : options.defaultTag);
+				this._setDefaultLine(util.isRangeFormatElement(rangeEl) ? "DIV" : options.defaultTag);
 				core.focus();
 			} else {
 				this.editor.applyTagEffect();
@@ -752,7 +547,7 @@ function OnClick_wysiwyg(e) {
 		this.editor.applyTagEffect();
 	}
 
-	if (core._isBalloon) _w.setTimeout(event._toggleToolbarBalloon);
+	if (core._isBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this));
 }
 
 function OnInput_wysiwyg(e) {
@@ -776,19 +571,19 @@ function OnKeyDown_wysiwyg(e) {
 	const shift = e.shiftKey;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 	const alt = e.altKey;
-	event._IEisComposing = keyCode === 229;
+	this._IEisComposing = keyCode === 229;
 
 	core.submenuOff();
 
 	if (core._isBalloon) {
-		event._hideToolbar();
+		this._hideToolbar();
 	}
 
 	// user event
 	if (typeof this.events.onKeyDown === "function" && this.events.onKeyDown(e) === false) return;
 
 	/** Shortcuts */
-	if (ctrl && event._shortcutCommand(keyCode, shift)) {
+	if (ctrl && this.shortcuts.command(keyCode, shift)) {
 		event._onShortcutKey = true;
 		e.preventDefault();
 		e.stopPropagation();
@@ -825,7 +620,7 @@ function OnKeyDown_wysiwyg(e) {
 			if (!util.isFormatElement(formatEl) && !context.element.wysiwyg.firstElementChild && !util.isComponent(selectionNode)) {
 				e.preventDefault();
 				e.stopPropagation();
-				core._setDefaultFormat(options.defaultTag);
+				this._setDefaultLine(options.defaultTag);
 				return false;
 			}
 
@@ -1453,7 +1248,7 @@ function OnKeyDown_wysiwyg(e) {
 		}
 	}
 
-	const textKey = !ctrl && !alt && !selectRange && !event._nonTextKeyCode.test(keyCode);
+	const textKey = !ctrl && !alt && !selectRange && !this._nonTextKeyCode.test(keyCode);
 	if (textKey && range.collapsed && range.startContainer === range.endContainer && util.isBreak(range.commonAncestorContainer)) {
 		const zeroWidth = util.createTextNode(util.zeroWidthSpace);
 		core.insertNode(zeroWidth, null, false);
@@ -1475,13 +1270,10 @@ function OnKeyUp_wysiwyg(e) {
 		if (core._isBalloonAlways) {
 			if (keyCode !== 27) event._showToolbarBalloonDelay();
 		} else {
-			event._showToolbarBalloon();
+			this.toolbar._showBalloon();
 			return;
 		}
 	}
-
-	// user event
-	if (typeof this.events.onKeyUp === "function" && this.events.onKeyUp(e) === false) return;
 
 	/** when format tag deleted */
 	if (keyCode === 8 && util.isWysiwygDiv(selectionNode) && selectionNode.textContent === "" && selectionNode.children.length === 0) {
@@ -1504,19 +1296,19 @@ function OnKeyUp_wysiwyg(e) {
 	const formatEl = this.format.getLine(selectionNode, null);
 	const rangeEl = this.format.getRangeBlock(selectionNode, null);
 	if (((!formatEl && range.collapsed) || formatEl === rangeEl) && !util.isComponent(selectionNode) && !util.isList(selectionNode)) {
-		core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? "DIV" : options.defaultTag);
+		this._setDefaultLine(util.isRangeFormatElement(rangeEl) ? "DIV" : options.defaultTag);
 		selectionNode = core.selection.getNode();
 	}
 
-	if (event._directionKeyCode.test(keyCode)) {
+	if (this._directionKeyCode.test(keyCode)) {
 		this.editor.applyTagEffect();
 	}
 
-	const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
-	if (textKey && selectionNode.nodeType === 3 && util.zeroWidthRegExp.test(selectionNode.textContent) && !(e.isComposing !== undefined ? e.isComposing : event._IEisComposing)) {
+	const textKey = !ctrl && !alt && !this._nonTextKeyCode.test(keyCode);
+	if (textKey && selectionNode.nodeType === 3 && util.zeroWidthRegExp.test(selectionNode.textContent) && !(e.isComposing !== undefined ? e.isComposing : this._IEisComposing)) {
 		let so = range.startOffset,
 			eo = range.endOffset;
-		const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(event._frontZeroWidthReg) || "").length;
+		const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(this._frontZeroWidthReg) || "").length;
 		so = range.startOffset - frontZeroWidthCnt;
 		eo = range.endOffset - frontZeroWidthCnt;
 		selectionNode.textContent = selectionNode.textContent.replace(util.zeroWidthRegExp, "");
@@ -1525,8 +1317,13 @@ function OnKeyUp_wysiwyg(e) {
 
 	core.char.test("");
 
+	// user event
+	if (typeof this.events.onKeyUp === "function" && this.events.onKeyUp(e) === false) return;
+
 	// history stack
-	core.history.push(true);
+	if (!ctrl && !alt && !this._historyIgnoreKeyCode.test(keyCode)) {
+		core.history.push(true);
+	}
 }
 
 function OnPaste_wysiwyg(e) {
@@ -1595,7 +1392,7 @@ function OnCut_wysiwyg(e) {
 
 function OnScroll_wysiwyg(e) {
 	core.controllersOff();
-	if (core._isBalloon) event._hideToolbar();
+	if (core._isBalloon) this._hideToolbar();
 
 	// user event
 	if (typeof this.events.onScroll === "function") this.events.onScroll(e);
@@ -1604,9 +1401,9 @@ function OnScroll_wysiwyg(e) {
 function OnFocus_wysiwyg(e) {
 	if (core._antiBlur) return;
 	core.hasFocus = true;
-	this.editor.applyTagEffect();
 
-	if (core._isInline) event._showToolbarInline();
+	this.editor.applyTagEffect();
+	this.toolbar._showInline();
 
 	// user event
 	if (typeof this.events.onFocus === "function") this.events.onFocus(e);
@@ -1616,10 +1413,7 @@ function OnBlur_wysiwyg(e) {
 	if (core._antiBlur || core._variable.isCodeView) return;
 	core.hasFocus = false;
 	core.controllersOff();
-	if (core._isInline || core._isBalloon) event._hideToolbar();
-
-	// user event
-	if (typeof this.events.onBlur === "function") this.events.onBlur(e);
+	if (core._isInline || core._isBalloon) this._hideToolbar();
 
 	// active class reset of buttons
 	const commandMap = core.commandMap;
@@ -1640,6 +1434,9 @@ function OnBlur_wysiwyg(e) {
 	core._variable.currentNodes = [];
 	core._variable.currentNodesMap = [];
 	if (options.showPathLabel) context.element.navigation.textContent = "";
+
+	// user event
+	if (typeof this.events.onBlur === "function") this.events.onBlur(e);
 }
 
 function OnMouseMove_wysiwyg(e) {
@@ -1657,7 +1454,7 @@ function OnMouseMove_wysiwyg(e) {
 		} while (el && !/^(BODY|HTML)$/i.test(el.nodeName));
 
 		const wScroll = ctxEl.wysiwyg.scrollTop;
-		const offsets = event._getEditorOffsets(null);
+		const offsets = helperDom.getGlobalOffset(context.element.topArea);
 		const componentTop = util.getOffset(component, ctxEl.wysiwygFrame).top + wScroll;
 		const y = e.pageY + scrollTop + (options.iframe && !options.toolbarContainer ? ctxEl.toolbar.offsetHeight : 0);
 		const c = componentTop + (options.iframe ? scrollTop : offsets.top);
@@ -1737,7 +1534,7 @@ function CodeViewAutoHeight() {
 function OnResize_window() {
 	core.controllersOff();
 
-	const responsiveSize = event._responsiveButtonSize;
+	const responsiveSize = this.toolbar._responsiveButtonSize;
 	if (responsiveSize) {
 		let w = 0;
 		if ((core._isBalloon || core._isInline) && options.toolbarWidth === "auto") {
@@ -1754,9 +1551,9 @@ function OnResize_window() {
 			}
 		}
 
-		if (event._responsiveCurrentSize !== responsiveWidth) {
-			event._responsiveCurrentSize = responsiveWidth;
-			core.toolbar.setButtons(event._responsiveButtons[responsiveWidth]);
+		if (this.toolbar._responsiveCurrentSize !== responsiveWidth) {
+			this.toolbar._responsiveCurrentSize = responsiveWidth;
+			core.toolbar.setButtons(this.toolbar._responsiveButtons[responsiveWidth]);
 		}
 	}
 
@@ -1777,7 +1574,7 @@ function OnResize_window() {
 	}
 
 	if (core._variable.isCodeView && core._isInline) {
-		event._showToolbarInline();
+		this.toolbar._showInline();
 		return;
 	}
 
@@ -1785,7 +1582,7 @@ function OnResize_window() {
 
 	if (core._sticky) {
 		context.element.toolbar.style.width = context.element.topArea.offsetWidth - 2 + "px";
-		this._resetStickyToolbar();
+		this.toolbar.resetSticky();
 	}
 }
 

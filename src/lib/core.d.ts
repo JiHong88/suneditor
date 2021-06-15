@@ -5,7 +5,7 @@ import { SunEditorOptions } from './../options.d';
 import { Context } from './context';
 import Util from '../helper/util';
 import { Module } from '../plugins/Module';
-import _Notice from '../plugins/modules/_notice';
+import _Notice from './classes/notice.d';
 
 export type Controllers = Array<string | Function | Element>;
 export type fileInfo =  {
@@ -409,23 +409,6 @@ export interface Core {
      * @returns 
      */
     convertHTMLForCodeView(html: Element | string): string;
-
-    /**
-     * @description Add an event to document.
-     * When created as an Iframe, the same event is added to the document in the Iframe.
-     * @param type Event type
-     * @param listener Event listener
-     * @param useCapture Use event capture
-     */
-    addDocEvent(type: string, listener: EventListener, useCapture: boolean): void;
-
-    /**
-     * @description Remove events from document.
-     * When created as an Iframe, the event of the document inside the Iframe is also removed.
-     * @param type Event type
-     * @param listener Event listener
-     */
-    removeDocEvent(type: string, listener: EventListener): void;
 }
 
 export interface Toolbar {
