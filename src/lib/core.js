@@ -5273,6 +5273,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description If there is no default format, add a format and move "selection".
          * @param {String|null} formatName Format tag name (default: 'P')
+         * @returns {undefined|null}
          * @private
          */
         _setDefaultFormat: function (formatName) {
@@ -5286,7 +5287,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const fileComponent = util.getParentElement(commonCon, util.isComponent);
             if (fileComponent && !util.isTable(fileComponent)) return;
-            if((util.isRangeFormatElement(startCon) || util.isWysiwygDiv(startCon)) && (util.isComponent(startCon.children[range.startOffset]) || util.isComponent(startCon.children[range.startOffset - 1]))) return;
+            if ((util.isRangeFormatElement(startCon) || util.isWysiwygDiv(startCon)) && (util.isComponent(startCon.children[range.startOffset]) || util.isComponent(startCon.children[range.startOffset - 1]))) return;
+            if (util.getParentElement(commonCon, util.isNotCheckingNode)) return null;
 
             if (rangeEl) {
                 format = util.createElement(formatName || options.defaultTag);
@@ -5716,9 +5718,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         rangeEl.insertBefore(oLi, prevLi);
                         core.focus();
                     } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode) && (!util.isTable(selectionNode) || util.isCell(selectionNode))) {
-                        e.preventDefault();
-                        core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag);
-                        core.focus();
+                        if (core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag) !== null) {
+                            e.preventDefault();
+                            core.focus();
+                        }
                     } else {
                         event._applyTagEffects();
                     }
@@ -6013,10 +6016,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         break;
                     }
 
-                    if (!util.isFormatElement(formatEl) && !context.element.wysiwyg.firstElementChild && !util.isComponent(selectionNode)) {
+                    if (!util.isFormatElement(formatEl) && !context.element.wysiwyg.firstElementChild && !util.isComponent(selectionNode) && core._setDefaultFormat(options.defaultTag) !== null) {
                         e.preventDefault();
                         e.stopPropagation();
-                        core._setDefaultFormat(options.defaultTag);
                         return false;
                     }
 
@@ -6654,8 +6656,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
-            if (((!formatEl && range.collapsed) || formatEl === rangeEl) && !util.isComponent(selectionNode) && !util.isList(selectionNode)) {
-                core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag);
+            if (((!formatEl && range.collapsed) || formatEl === rangeEl) && !util.isComponent(selectionNode) && !util.isList(selectionNode) && core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag) !== null) {
                 selectionNode = core.getSelectionNode();
             }
 
