@@ -5717,11 +5717,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         oLi.appendChild(selectionNode);
                         rangeEl.insertBefore(oLi, prevLi);
                         core.focus();
-                    } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode) && (!util.isTable(selectionNode) || util.isCell(selectionNode))) {
-                        if (core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag) !== null) {
-                            e.preventDefault();
-                            core.focus();
-                        }
+                    } else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode) && (!util.isTable(selectionNode) || util.isCell(selectionNode)) && core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag) !== null) {
+                        e.preventDefault();
+                        core.focus();
                     } else {
                         event._applyTagEffects();
                     }
