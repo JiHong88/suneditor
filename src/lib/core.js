@@ -251,6 +251,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         isDisabled: false,
 
         /**
+         * @description Boolean value of whether the editor is readOnly
+         */
+        isReadOnly: false,
+
+        /**
          * @description Attributes whitelist used by the cleanHTML method
          * @private
          */
@@ -1437,7 +1442,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Element}
          */
         insertComponent: function (element, notHistoryPush, checkCharCount, notSelect) {
-            if (checkCharCount && !this.checkCharCount(element, null)) {
+            if (this.isReadOnly || (checkCharCount && !this.checkCharCount(element, null))) {
                 return null;
             }
 
@@ -1580,7 +1585,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Object|Node|null}
          */
         insertNode: function (oNode, afterNode, checkCharCount) {
-            if (checkCharCount && !this.checkCharCount(oNode, null)) {
+            if (this.isReadOnly || (checkCharCount && !this.checkCharCount(oNode, null))) {
                 return null;
             }
 
@@ -5631,6 +5636,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onClick_toolbar: function (e) {
+            if (core.isReadOnly) {
+                e.preventDefault();
+                return false;
+            }
+
             let target = e.target;
             let display = target.getAttribute('data-display');
             let command = target.getAttribute('data-command');
@@ -5676,6 +5686,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onClick_wysiwyg: function (e) {
+            if (core.isReadOnly) {
+                e.preventDefault();
+                return false;
+            }
+
             const targetElement = e.target;
             if (util.isNonEditable(context.element.wysiwyg)) return;
 
@@ -5923,6 +5938,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onInput_wysiwyg: function (e) {
+            if (core.isReadOnly) {
+                e.preventDefault();
+                e.stopPropagation();
+                core.history.go(-1);
+                return false;
+            }
+
             core._editorRange();
 
             // user event
@@ -5932,6 +5954,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!core._charCount(data)) {
                 e.preventDefault();
                 e.stopPropagation();
+                return false;
             }
 
             // history stack
@@ -5970,6 +5993,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         _onShortcutKey: false,
         onKeyDown_wysiwyg: function (e) {
+            if (core.isReadOnly) {
+                e.preventDefault();
+                return false;
+            }
+
             const keyCode = e.keyCode;
             const shift = e.shiftKey;
             const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
@@ -6622,7 +6650,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onKeyUp_wysiwyg: function (e) {
-            if (event._onShortcutKey) return;
+            if (core.isReadOnly || event._onShortcutKey) return;
             core._editorRange();
 
             const range = core.getRange();
@@ -7097,7 +7125,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onMouseMove_wysiwyg: function (e) {
-            if (core.isDisabled) return;
+            if (core.isDisabled || core.isReadOnly) return false;
             const component = util.getParentElement(e.target, util.isComponent);
             const lineBreakerStyle = core._lineBreaker.style;
             
@@ -7825,6 +7853,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (rangeSelection) core.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
                     else core.setRange(a, offset, a, offset);
                 } catch (error) {
+                    if (core.isDisabled || core.isReadOnly) return;
                     console.warn('[SUNEDITOR.insertHTML.fail] ' + error);
                     core.execCommand('insertHTML', false, html);
                 }
@@ -7877,6 +7906,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // history stack
             core.history.push(false);
+        },
+
+        /**
+         * @description Switch to or off "ReadOnly" mode.
+         * @param {Boolean} readOnly Boolean value.
+         */
+        readOnly: function (readOnly) {
+            core.isReadOnly = readOnly;
         },
 
         /**
