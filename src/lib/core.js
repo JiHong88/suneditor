@@ -5941,7 +5941,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (core.isReadOnly) {
                 e.preventDefault();
                 e.stopPropagation();
-                core.history.go(-1);
+                core.history.go(core.history.getCurrentIndex());
                 return false;
             }
 
@@ -7010,13 +7010,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onDrop_wysiwyg: function (e) {
-            const dataTransfer = e.dataTransfer;
-            if (!dataTransfer) return true;
-            if (util.isIE) {
+            if (core.isReadOnly || util.isIE) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
             }
+
+            const dataTransfer = e.dataTransfer;
+            if (!dataTransfer) return true;
 
             core.removeNode();
             event._setDropLocationSelection(e);

@@ -27,6 +27,13 @@ export interface History {
      * @param {Number} index Stack index
      */
     go: (index: number) => void;
+
+    /**
+     * @description Get the current history stack index.
+     * @returns
+     */
+    getCurrentIndex: () => number;
+    
     /**
      * @description Reset the history object
      */
