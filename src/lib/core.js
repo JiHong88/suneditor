@@ -7910,10 +7910,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Switch to or off "ReadOnly" mode.
-         * @param {Boolean} readOnly Boolean value.
+         * @param {Boolean} value "readOnly" boolean value.
          */
-        readOnly: function (readOnly) {
-            core.isReadOnly = readOnly;
+        readOnly: function (value) {
+            core.isReadOnly = value;
         },
 
         /**
