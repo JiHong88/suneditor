@@ -1406,13 +1406,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Element}
          */
         appendFormatTag: function (element, formatNode) {
-            const currentFormatEl = util.getFormatElement(this.getSelectionNode(), null);
-            const oFormatName = formatNode ? (typeof formatNode === 'string' ? formatNode : formatNode.nodeName) : (util.isFormatElement(currentFormatEl) && !util.isFreeFormatElement(currentFormatEl)) ? currentFormatEl.nodeName : options.defaultTag;
-            const oFormat = util.createElement(oFormatName);
-            oFormat.innerHTML = '<br>';
+            if (!element.parentNode) return null;
 
-            if ((formatNode && typeof formatNode !== 'string') || (!formatNode && util.isFormatElement(currentFormatEl))) {
-                util.copyTagAttributes(oFormat, formatNode || currentFormatEl);
+            const currentFormatEl = util.getFormatElement(this.getSelectionNode(), null);
+            let oFormat = null;
+            if (util.isFreeFormatElement(currentFormatEl || element.parentNode)) {
+                oFormat = util.createElement('BR');
+            } else {
+                const oFormatName = formatNode ? (typeof formatNode === 'string' ? formatNode : formatNode.nodeName) : (util.isFormatElement(currentFormatEl) && !util.isRangeFormatElement(currentFormatEl) && !util.isFreeFormatElement(currentFormatEl)) ? currentFormatEl.nodeName : options.defaultTag;
+                oFormat = util.createElement(oFormatName);
+                oFormat.innerHTML = '<br>';
+                if ((formatNode && typeof formatNode !== 'string') || (!formatNode && util.isFormatElement(currentFormatEl))) {
+                    util.copyTagAttributes(oFormat, formatNode || currentFormatEl);
+                }
             }
 
             if (util.isCell(element)) element.insertBefore(oFormat, element.nextElementSibling);
@@ -1450,7 +1456,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     oNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
                     if (oNode) formatEl = oNode.previousSibling;
                 }
-                this.insertNode(element, formatEl, false);
+                this.insertNode(element, util.isRangeFormatElement(formatEl) ? null : formatEl, false);
                 if (formatEl && util.onlyZeroWidthSpace(formatEl)) util.removeItem(formatEl);
             }
 
@@ -2340,7 +2346,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             
             if (newRangeElement) firstNode = newRangeElement.previousSibling;
             else if (!firstNode) firstNode = rangeElement.previousSibling;
-            rangeRight = rangeElement.nextSibling;
+            rangeRight = rangeElement.nextSibling !== rangeEl ? rangeElement.nextSibling : rangeEl ? rangeEl.nextSibling : null;
 
             if (rangeElement.children.length === 0 || rangeElement.textContent.length === 0) {
                 util.removeItem(rangeElement);
@@ -4690,13 +4696,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Tag and tag attribute check RegExp function. (used by "cleanHTML" and "convertContentsForEditor")
-         * @param {Boolean} rowLevelCheck Row level check
+         * @param {Boolean} lowLevelCheck Row level check
          * @param {String} m RegExp value
          * @param {String} t RegExp value
          * @returns {String}
          * @private
          */
-        _cleanTags: function (rowLevelCheck, m, t) {
+        _cleanTags: function (lowLevelCheck, m, t) {
             if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
 
             let v = null;
@@ -4704,7 +4710,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (tAttr) v = m.match(tAttr);
             else v = m.match(this._attributesWhitelistRegExp);
 
-            if (rowLevelCheck || /<a\b/i.test(t)) {
+            if (!lowLevelCheck || /<a\b/i.test(t)) {
                 const sv = m.match(/id\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (sv) {
                     if (!v) v = [];
@@ -4712,7 +4718,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            if ((rowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
+            if ((!lowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
                 const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (sv) {
                     if (!v) v = [];
@@ -4722,7 +4728,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (v) {
                 for (let i = 0, len = v.length; i < len; i++) {
-                    if (!rowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
+                    if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
                     t += ' ' + (/^href\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i]) ? '' : v[i]);
                 }
             }
@@ -4738,11 +4744,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist) {
-            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, false));
+            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
 
             const dom = _d.createRange().createContextualFragment(html);
             try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
+                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, true);
             } catch (error) {
                 console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
             }
@@ -4787,11 +4793,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
-            contents = this._deleteDisallowedTags(this._parser.parseFromString(contents, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
+            contents = this._deleteDisallowedTags(this._parser.parseFromString(contents, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, false));
             const dom = _d.createRange().createContextualFragment(contents);
 
             try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
+                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, false);
             } catch (error) {
                 console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
             }
@@ -5707,7 +5713,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const selectionNode = core.getSelectionNode();
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
-            if ((!formatEl || formatEl === rangeEl) && !util.isNonEditable(targetElement) && !util.isList(rangeEl)) {
+            if (!formatEl && !util.isNonEditable(targetElement) && !util.isList(rangeEl)) {
                 const range = core.getRange();
                 if (util.getFormatElement(range.startContainer) === util.getFormatElement(range.endContainer)) {
                     if (util.isList(rangeEl)) {
@@ -6468,7 +6474,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                               (!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(prev) && (util.isBreak(prev.previousSibling) || !util.onlyZeroWidthSpace(prev.previousSibling.textContent)) && (!next || (!util.isBreak(next) && util.onlyZeroWidthSpace(next.textContent)))))) {
                                 if (selectionFormat) util.removeItem(children[offset - 1]);
                                 else util.removeItem(selectionNode);
-                                const newEl = core.appendFormatTag(freeFormatEl, util.isFormatElement(freeFormatEl.nextElementSibling) ? freeFormatEl.nextElementSibling : null);
+                                const newEl = core.appendFormatTag(freeFormatEl, (util.isFormatElement(freeFormatEl.nextElementSibling) && !util.isRangeFormatElement(freeFormatEl.nextElementSibling)) ? freeFormatEl.nextElementSibling : null);
                                 util.copyFormatAttributes(newEl, freeFormatEl);
                                 core.setRange(newEl, 1, newEl, 1);
                                 break;
@@ -6534,7 +6540,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                     newEl = newListCell;
                                 }
                             } else {
-                                const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : util.isFormatElement(rangeEl.nextElementSibling) ? rangeEl.nextElementSibling.nodeName : util.isFormatElement(rangeEl.previousElementSibling) ? rangeEl.previousElementSibling.nodeName : options.defaultTag;
+                                const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : (util.isFormatElement(rangeEl.nextElementSibling) && !util.isRangeFormatElement(rangeEl.nextElementSibling)) ? rangeEl.nextElementSibling.nodeName : (util.isFormatElement(rangeEl.previousElementSibling) && !util.isRangeFormatElement(rangeEl.previousElementSibling)) ? rangeEl.previousElementSibling.nodeName : options.defaultTag;
                                 newEl = util.createElement(newFormat);
                                 const edge = core.detachRangeFormatElement(rangeEl, [formatEl], null, true, true);
                                 edge.cc.insertBefore(newEl, edge.ec);
@@ -6564,7 +6570,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         if (util.isListCell(container.parentNode)) {
                             newEl = util.createElement('BR');
                         } else {
-                            newEl = util.createElement(util.isFormatElement(sibling) ? sibling.nodeName : options.defaultTag);
+                            newEl = util.createElement((util.isFormatElement(sibling) && !util.isRangeFormatElement(sibling)) ? sibling.nodeName : options.defaultTag);
                             newEl.innerHTML = '<br>';
                         }
 
@@ -6654,7 +6660,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
-            if (((!formatEl && range.collapsed) || formatEl === rangeEl) && !util.isComponent(selectionNode) && !util.isList(selectionNode) && core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag) !== null) {
+            if (!formatEl && range.collapsed && !util.isComponent(selectionNode) && !util.isList(selectionNode) && core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag) !== null) {
                 selectionNode = core.getSelectionNode();
             }
 
