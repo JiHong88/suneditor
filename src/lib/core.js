@@ -4029,7 +4029,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         event._showToolbarInline();
                     }
                     return;
-                } else if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
+                }
+                
+                if (/container/.test(display) && (this._menuTray[command] === null || target !== this.containerActiveButton)) {
+                    this.callPlugin(command, this.containerOn.bind(this, target), target);
+                    return;
+                } 
+                
+                if (this.isReadOnly) return;
+                if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
                     this.callPlugin(command, this.submenuOn.bind(this, target), target);
                     return;
                 } else if (/dialog/.test(display)) {
@@ -4037,9 +4045,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     return;
                 } else if (/command/.test(display)) {
                     this.callPlugin(command, this.plugins[command].action.bind(this), target);
-                } else if (/container/.test(display) && (this._menuTray[command] === null || target !== this.containerActiveButton)) {
-                    this.callPlugin(command, this.containerOn.bind(this, target), target);
-                    return;
                 } else if (/fileBrowser/.test(display)) {
                     this.callPlugin(command, this.plugins[command].open.bind(this, null), target);
                 }
@@ -4073,6 +4078,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {String} command Property of command button (data-value)
          */
         commandHandler: function (target, command) {
+            if (core.isReadOnly && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) return;
             switch (command) {
                 case 'copy':
                 case 'cut':
@@ -5636,11 +5642,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onClick_toolbar: function (e) {
-            if (core.isReadOnly) {
-                e.preventDefault();
-                return false;
-            }
-
             let target = e.target;
             let display = target.getAttribute('data-display');
             let command = target.getAttribute('data-command');
@@ -5656,8 +5657,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (!command && !display) return;
             if (target.disabled) return;
-            if (!core.hasFocus) core.nativeFocus();
-            if (!core._variable.isCodeView) core._editorRange();
+            if (!core.isReadOnly && !core.hasFocus) core.nativeFocus();
+            if (!core.isReadOnly && !core._variable.isCodeView) core._editorRange();
 
             core.actionCall(command, display, target);
         },
@@ -7915,6 +7916,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         readOnly: function (value) {
             core.isReadOnly = value;
+            
+            if (value) {
+                context.element.code.setAttribute("readOnly", "true");
+            } else {
+                context.element.code.removeAttribute("readOnly");
+            }
+
+            if (options.codeMirrorEditor) options.codeMirrorEditor.setOption('readOnly', !!value);
         },
 
         /**
