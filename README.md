@@ -1025,6 +1025,9 @@ editor.getCharCount((null || 'char' || 'byte' || 'byte-html'));
 // Add content to the suneditor
 editor.appendContents('append contents');
 
+// Switch to or off "ReadOnly" mode.
+editor.readOnly(true || false)
+
 // Disable the suneditor
 editor.disabled();
 
