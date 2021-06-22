@@ -393,7 +393,7 @@ historyStackDelayTime : When recording the history stack, this is the delay time
 
 // Whitelist--------------------------------------å---------------------------------------------------------
 // (You can use regular expression syntax.)
-// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path'
+// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
@@ -628,12 +628,12 @@ imageUrlInput   : Choose whether to create a image url input tag in the image up
                   If the value of imageFileInput is false, it will be unconditionally.   default: true {Boolean}
 imageUploadHeader : Http Header when uploading images.              default: null {Object}
 imageUploadUrl  : The image upload to server mapping address.       default: null {String}
+                  (When not used the "imageUploadUrl" option, image is enters base64 data)
                   ex) "/editor/uploadImage"
                   request format: {
                             "file-0": File,
                             "file-1": File
                         }
-                  When not used, it enters base64 data
                   response format: {
                             "errorMessage": "insert error message",
                             "result": [

@@ -998,6 +998,12 @@ export default class SunEditor {
     appendContents(contents: string): void;
 
     /**
+     * @description Switch to or off "ReadOnly" mode.
+     * @param value "readOnly" boolean value.
+     */
+    readOnly(value: boolean): void;
+
+    /**
      * @description Disable the suneditor
      */
     disabled(): void;

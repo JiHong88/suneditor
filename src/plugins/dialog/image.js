@@ -683,7 +683,7 @@ export default {
             this.selectComponent(oImg, 'image');
         } else {
             const line = this.appendFormatTag(container, null);
-            this.setRange(line, 0, line, 0);
+            if (line) this.setRange(line, 0, line, 0);
         }
     },
 

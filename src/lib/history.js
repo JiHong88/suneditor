@@ -26,15 +26,20 @@ export default function (core, change) {
         core.setRange(util.getNodeFromPath(item.s.path, editor.wysiwyg), item.s.offset, util.getNodeFromPath(item.e.path, editor.wysiwyg), item.e.offset);
         core.focus();
 
-        if (stackIndex === 0) {
+        if (stack.length <= 1) {
             if (undo) undo.setAttribute('disabled', true);
-            if (redo) redo.removeAttribute('disabled');
-        } else if (stackIndex === stack.length - 1) {
-            if (undo) undo.removeAttribute('disabled');
             if (redo) redo.setAttribute('disabled', true);
         } else {
-            if (undo) undo.removeAttribute('disabled');
-            if (redo) redo.removeAttribute('disabled');
+            if (stackIndex === 0) {
+                if (undo) undo.setAttribute('disabled', true);
+                if (redo) redo.removeAttribute('disabled');
+            } else if (stackIndex === stack.length - 1) {
+                if (undo) undo.removeAttribute('disabled');
+                if (redo) redo.setAttribute('disabled', true);
+            } else {
+                if (undo) undo.removeAttribute('disabled');
+                if (redo) redo.removeAttribute('disabled');
+            }
         }
 
         core.controllersOff();
@@ -141,11 +146,18 @@ export default function (core, change) {
         /**
          * @description Go to the history stack for that index.
          * If "index" is -1, go to the last stack
-         * @param {Number} index Stack index
          */
         go: function (index) {
             stackIndex = index < 0 ? (stack.length - 1) : index;
             setContentsFromStack();
+        },
+
+        /**
+         * @description Get the current history stack index.
+         * @returns {Number} Current Stack index
+         */
+        getCurrentIndex: function () {
+            return stackIndex;
         },
         
         /**

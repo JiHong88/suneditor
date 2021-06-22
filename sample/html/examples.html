@@ -189,6 +189,7 @@
         <button type="button" class="btn btn-md btn-warning" onclick="sun_insertHTML('<img src=\'http://suneditor.com/docs/icon_js.svg\' style=\'width:115px; height:64px;\'>')">insertHTML</button>
         <button type="button" class="btn btn-md btn-warning" onclick="sun_setContents('set contents')">setContents</button>
         <button type="button" class="btn btn-md btn-warning" onclick="sun_appendContents('append contents')">AppendContents</button>
+        <button type="button" class="btn btn-md btn-primary" onclick="sun_readonly()">ReadOnly</button>
         <button type="button" class="btn btn-md btn-primary" onclick="sun_disabled()">Disabled</button>
         <button type="button" class="btn btn-md btn-primary" onclick="sun_enabled()">Enabled</button>
         <button type="button" class="btn btn-md btn-primary" onclick="sun_hide()">Hide</button>
@@ -880,6 +881,10 @@
 
     function sun_appendContents(content) {
         suneditor.appendContents(content);
+    }
+
+    function sun_readonly() {
+        suneditor.readOnly(!suneditor.core.isReadOnly);
     }
 
     function sun_disabled() {
