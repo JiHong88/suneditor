@@ -1720,10 +1720,9 @@ const util = {
                 }
             }
 
-            const result = !lowLevelCheck ? false : (current.parentNode !== documentFragment &&
-             (this.isFormatElement(current) || this.isComponent(current) || this.isList(current)) &&
-             !this.isRangeFormatElement(current.parentNode) && !this.isListCell(current.parentNode) &&
-             !this.getParentElement(current, this.isComponent) && nrtag);
+            const result = current.parentNode !== documentFragment && nrtag &&
+             ((this.isListCell(current) && !this.isList(current.parentNode)) ||
+              (lowLevelCheck && (this.isFormatElement(current) || this.isComponent(current)) && !this.isRangeFormatElement(current.parentNode) && !this.getParentElement(current, this.isComponent)));
 
             return result;
         }.bind(this));
