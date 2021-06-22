@@ -40,7 +40,7 @@
             hiliteColor: 'Couleur en arrière plan',
             indent: 'Indenter',
             outdent: 'Désindenter',
-            align: 'Alignenement',
+            align: 'Alignement',
             alignLeft: 'À gauche',
             alignRight: 'À droite',
             alignCenter: 'Centré',
