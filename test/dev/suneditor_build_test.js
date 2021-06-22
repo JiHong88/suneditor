@@ -482,6 +482,8 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         }
     ],
     // maxCharCount: 670,
+    addTagsWhitelist: 'details|summary',
+    attributesWhitelist: {'details': 'open'},  // html5 <details open="">..</details>
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     buttonList: complexEditor,
     // buttonList: [['custom_container']]
@@ -720,7 +722,8 @@ window.sun_setContents = function (content) {
 }
 
 window.sun_appendContents = function (content) {
-    ss.appendContents(content);
+    // ss.appendContents(content);
+    ss.readOnly(!ss.core.isReadOnly);
 }
 
 window.sun_disabled = function () {

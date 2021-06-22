@@ -457,7 +457,7 @@ Selection.prototype = {
 	 * @returns {Object|Node|null}
 	 */
 	insertNode: function (oNode, afterNode, checkCharCount) {
-		if (checkCharCount && !this.char.check(oNode)) {
+		if (this.editor.isReadOnly || (checkCharCount && !this.char.check(oNode))) {
 			return null;
 		}
 

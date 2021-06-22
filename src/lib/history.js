@@ -7,7 +7,7 @@
 import { window } from "../helper/global";
 import { getNodeFromPath, getNodePath } from "../helper/dom";
 
-export default function(core, change) {
+export default function (core, change) {
 	const delayTime = core.options.historyStackDelayTime;
 	let editor = core.context.element;
 	let undo = core.context.buttons.undo;
@@ -21,23 +21,23 @@ export default function(core, change) {
 		const item = stack[stackIndex];
 		editor.wysiwyg.innerHTML = item.contents;
 
-		core.setRange(
-			getNodeFromPath(item.s.path, editor.wysiwyg),
-			item.s.offset,
-			getNodeFromPath(item.e.path, editor.wysiwyg),
-			item.e.offset
-		);
+		core.setRange(getNodeFromPath(item.s.path, editor.wysiwyg), item.s.offset, getNodeFromPath(item.e.path, editor.wysiwyg), item.e.offset);
 		core.focus();
 
-		if (stackIndex === 0) {
+		if (stack.length <= 1) {
 			if (undo) undo.setAttribute("disabled", true);
-			if (redo) redo.removeAttribute("disabled");
-		} else if (stackIndex === stack.length - 1) {
-			if (undo) undo.removeAttribute("disabled");
 			if (redo) redo.setAttribute("disabled", true);
 		} else {
-			if (undo) undo.removeAttribute("disabled");
-			if (redo) redo.removeAttribute("disabled");
+			if (stackIndex === 0) {
+				if (undo) undo.setAttribute("disabled", true);
+				if (redo) redo.removeAttribute("disabled");
+			} else if (stackIndex === stack.length - 1) {
+				if (undo) undo.removeAttribute("disabled");
+				if (redo) redo.setAttribute("disabled", true);
+			} else {
+				if (undo) undo.removeAttribute("disabled");
+				if (redo) redo.removeAttribute("disabled");
+			}
 		}
 
 		core.controllersOff();
@@ -102,7 +102,7 @@ export default function(core, change) {
 		 * You can specify the delay time by sending a number.
 		 * @param {Boolean|Number} delay If true, Add stack without delay time.
 		 */
-		push: function(delay) {
+		push: function (delay) {
 			window.setTimeout(core._resourcesStateChange.bind(core));
 			const time = typeof delay === "number" ? (delay > 0 ? delay : 0) : !delay ? 0 : delayTime;
 
@@ -114,7 +114,7 @@ export default function(core, change) {
 				}
 			}
 
-			pushDelay = window.setTimeout(function() {
+			pushDelay = window.setTimeout(function () {
 				window.clearTimeout(pushDelay);
 				pushDelay = null;
 				pushStack();
@@ -124,7 +124,7 @@ export default function(core, change) {
 		/**
 		 * @description Undo function
 		 */
-		undo: function() {
+		undo: function () {
 			if (stackIndex > 0) {
 				stackIndex--;
 				setContentsFromStack();
@@ -134,7 +134,7 @@ export default function(core, change) {
 		/**
 		 * @description Redo function
 		 */
-		redo: function() {
+		redo: function () {
 			if (stack.length - 1 > stackIndex) {
 				stackIndex++;
 				setContentsFromStack();
@@ -146,15 +146,23 @@ export default function(core, change) {
 		 * If "index" is -1, go to the last stack
 		 * @param {Number} index Stack index
 		 */
-		go: function(index) {
+		go: function (index) {
 			stackIndex = index < 0 ? stack.length - 1 : index;
 			setContentsFromStack();
 		},
 
 		/**
+		 * @description Get the current history stack index.
+		 * @returns {Number} Current Stack index
+		 */
+		getCurrentIndex: function () {
+			return stackIndex;
+		},
+
+		/**
 		 * @description Reset the history object
 		 */
-		reset: function(ignoreChangeEvent) {
+		reset: function (ignoreChangeEvent) {
 			if (undo) undo.setAttribute("disabled", true);
 			if (redo) redo.setAttribute("disabled", true);
 			core._variable.isChanged = false;
@@ -183,7 +191,7 @@ export default function(core, change) {
 		 * @description Reset the disabled state of the buttons to fit the current stack.
 		 * @private
 		 */
-		_resetCachingButton: function() {
+		_resetCachingButton: function () {
 			editor = core.context.element;
 			undo = core.context.buttons.undo;
 			redo = core.context.buttons.redo;
@@ -202,7 +210,7 @@ export default function(core, change) {
 		 * @description Remove all stacks and remove the timeout function.
 		 * @private
 		 */
-		_destroy: function() {
+		_destroy: function () {
 			if (pushDelay) window.clearTimeout(pushDelay);
 			stack = null;
 		}

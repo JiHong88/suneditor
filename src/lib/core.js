@@ -253,6 +253,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         isDisabled: false,
 
         /**
+         * @description Boolean value of whether the editor is readOnly
+         */
+        isReadOnly: false,
+
+        /**
          * @description Attributes whitelist used by the cleanHTML method
          * @private
          */
@@ -1075,7 +1080,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         this.toolbar._showInline();
                     }
                     return;
-                } else if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
+                }
+                
+                if (/container/.test(display) && (this._menuTray[command] === null || target !== this.containerActiveButton)) {
+                    this.callPlugin(command, this.containerOn.bind(this, target), target);
+                    return;
+                } 
+                
+                if (this.isReadOnly) return;
+                if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
                     this.callPlugin(command, this.submenuOn.bind(this, target), target);
                     return;
                 } else if (/dialog/.test(display)) {
@@ -1083,9 +1096,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     return;
                 } else if (/command/.test(display)) {
                     this.callPlugin(command, this.plugins[command].action.bind(this), target);
-                } else if (/container/.test(display) && (this._menuTray[command] === null || target !== this.containerActiveButton)) {
-                    this.callPlugin(command, this.containerOn.bind(this, target), target);
-                    return;
                 } else if (/fileBrowser/.test(display)) {
                     this.callPlugin(command, this.plugins[command].open.bind(this, null), target);
                 }
@@ -1119,6 +1129,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {String} command Property of command button (data-value)
          */
         commandHandler: function (target, command) {
+            if (this.isReadOnly && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) return;
+
             switch (command) {
                 case 'copy':
                 case 'cut':
@@ -1697,13 +1709,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Tag and tag attribute check RegExp function. (used by "cleanHTML" and "convertContentsForEditor")
-         * @param {Boolean} rowLevelCheck Row level check
+         * @param {Boolean} lowLevelCheck Low level check
          * @param {String} m RegExp value
          * @param {String} t RegExp value
          * @returns {String}
          * @private
          */
-        _cleanTags: function (rowLevelCheck, m, t) {
+        _cleanTags: function (lowLevelCheck, m, t) {
             if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
 
             let v = null;
@@ -1711,7 +1723,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (tAttr) v = m.match(tAttr);
             else v = m.match(this._attributesWhitelistRegExp);
 
-            if (rowLevelCheck || /<a\b/i.test(t)) {
+            if (!lowLevelCheck || /<a\b/i.test(t)) {
                 const sv = m.match(/id\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (sv) {
                     if (!v) v = [];
@@ -1719,7 +1731,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            if ((rowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
+            if ((!lowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
                 const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (sv) {
                     if (!v) v = [];
@@ -1729,7 +1741,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (v) {
                 for (let i = 0, len = v.length; i < len; i++) {
-                    if (!rowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
+                    if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
                     t += ' ' + (/^href\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i]) ? '' : v[i]);
                 }
             }
@@ -1745,9 +1757,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist) {
-            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, false));
+            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
 
-            const dom = _d.createRange().createContextualFragment(html);
+            const dom = _d.createRange().createContextualFragment(html, true);
             try {
                 this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
             } catch (error) {
@@ -1794,8 +1806,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
-            contents = this._deleteDisallowedTags(this._parser.parseFromString(contents, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
-            const dom = _d.createRange().createContextualFragment(contents);
+            contents = this._deleteDisallowedTags(this._parser.parseFromString(contents, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, false));
+            const dom = _d.createRange().createContextualFragment(contents, false);
 
             try {
                 this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
@@ -2058,6 +2070,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (rangeSelection) core.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
                     else core.setRange(a, offset, a, offset);
                 } catch (error) {
+                    if (core.isDisabled || core.isReadOnly) return;
                     console.warn('[SUNEDITOR.insertHTML.fail] ' + error);
                     core.execCommand('insertHTML', false, html);
                 }
@@ -2102,6 +2115,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // history stack
             core.history.push(false);
+        },
+
+        /**
+         * @description Switch to or off "ReadOnly" mode.
+         * @param {Boolean} value "readOnly" boolean value.
+         */
+        readOnly: function (value) {
+            core.isReadOnly = value;
+
+            if (value) {
+                context.element.code.setAttribute("readOnly", "true");
+            } else {
+                context.element.code.removeAttribute("readOnly");
+            }
+
+            if (options.codeMirrorEditor) options.codeMirrorEditor.setOption('readOnly', !!value);
         },
 
         /**
@@ -2185,9 +2214,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Fix tags that do not fit the editor format.
          * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
          * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist (core._htmlCheckWhitelistRegExp)
+         * @param {Boolean} lowLevelCheck Row level check
          * @private
          */
-        _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp) {
+        _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, lowLevelCheck) {
             /**
              * It is can use ".children(util.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
              * So check the node type and exclude the text no (current.nodeType !== 1)
@@ -2226,10 +2256,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
                 }
 
-                const result = current.parentNode !== documentFragment &&
-                (util.isFormatElement(current) || util.isComponent(current) || util.isList(current)) &&
-                !util.isRangeFormatElement(current.parentNode) && !util.isListCell(current.parentNode) &&
-                !util.getParentElement(current, util.isComponent) && nrtag;
+                const result = current.parentNode !== documentFragment && nrtag &&
+                 ((util.isListCell(current) && !util.isList(current.parentNode)) ||
+                  (lowLevelCheck && (util.isFormatElement(current) || util.isComponent(current)) && !util.isRangeFormatElement(current.parentNode) && !util.getParentElement(current, util.isComponent)));
 
                 return result;
             }.bind(this));

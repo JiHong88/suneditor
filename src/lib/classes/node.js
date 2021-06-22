@@ -392,13 +392,13 @@ Node.prototype = {
 		return (
 			element &&
 			element.nodeType !== 3 &&
-			/^(a|label|code)$/i.test(typeof element === "string" ? element : element.nodeName)
+			/^(a|label|code|summary)$/i.test(typeof element === "string" ? element : element.nodeName)
 		);
 	},
 
 	/**
 	 * @description It is judged whether it is a node related to the text style.
-	 * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code)
+	 * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)
 	 * @param {Node} element The node to check
 	 * @returns {Boolean}
 	 */
@@ -406,7 +406,7 @@ Node.prototype = {
 		return (
 			element &&
 			element.nodeType !== 3 &&
-			/^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code)$/i.test(element.nodeName)
+			/^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)$/i.test(element.nodeName)
 		);
 	},
 
@@ -420,7 +420,7 @@ Node.prototype = {
 		return (
 			element &&
 			element.nodeType === 1 &&
-			(/^(P|DIV|H[1-6]|PRE|LI|TH|TD)$/i.test(element.nodeName) ||
+			(/^(P|DIV|H[1-6]|PRE|LI|TH|TD|DETAILS)$/i.test(element.nodeName) ||
 				util.hasClass(element, "(\\s|^)__se__format__line_.+(\\s|$)|(\\s|^)__se__format__br_line_.+(\\s|$)")) &&
 			!this.isComponent(element) &&
 			!this.isWysiwygDiv(element)
@@ -437,7 +437,7 @@ Node.prototype = {
 		return (
 			element &&
 			element.nodeType === 1 &&
-			(/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(element.nodeName) ||
+			(/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD|DETAILS)$/i.test(element.nodeName) ||
 				this.hasClass(element, "(\\s|^)__se__format__range_block_.+(\\s|$)"))
 		);
 	},

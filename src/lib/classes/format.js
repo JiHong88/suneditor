@@ -21,22 +21,22 @@ Format.prototype = {
 	 * @returns {Element}
 	 */
 	appendLine: function (element, lineNode) {
-		const currentFormatEl = this.getLine(this.selection.getNode(), null);
-		const oFormatName = lineNode
-			? typeof lineNode === "string"
-				? lineNode
-				: lineNode.nodeName
-			: util.isFormatElement(currentFormatEl) && !util.isFreeFormatElement(currentFormatEl)
-			? currentFormatEl.nodeName
-			: options.defaultTag;
-		const oFormat = util.createElement(oFormatName);
-		oFormat.innerHTML = "<br>";
+		if (!element.parentNode) return null;
 
-		if ((lineNode && typeof lineNode !== "string") || (!lineNode && util.isFormatElement(currentFormatEl))) {
-			util.copyTagAttributes(oFormat, lineNode || currentFormatEl);
+		const currentFormatEl = util.getFormatElement(this.getSelectionNode(), null);
+		let oFormat = null;
+		if (util.isFreeFormatElement(currentFormatEl || element.parentNode)) {
+			oFormat = util.createElement('BR');
+		} else {
+			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : (util.isFormatElement(currentFormatEl) && !util.isRangeFormatElement(currentFormatEl) && !util.isFreeFormatElement(currentFormatEl)) ? currentFormatEl.nodeName : options.defaultTag;
+			oFormat = util.createElement(oFormatName);
+			oFormat.innerHTML = '<br>';
+			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && util.isFormatElement(currentFormatEl))) {
+				util.copyTagAttributes(oFormat, lineNode || currentFormatEl);
+			}
 		}
 
-		if (util.isTableCell(element)) element.insertBefore(oFormat, element.nextElementSibling);
+		if (util.isCell(element)) element.insertBefore(oFormat, element.nextElementSibling);
 		else element.parentNode.insertBefore(oFormat, element.nextElementSibling);
 
 		return oFormat;
@@ -591,7 +591,7 @@ Format.prototype = {
 
 		if (newRangeElement) firstNode = newRangeElement.previousSibling;
 		else if (!firstNode) firstNode = rangeElement.previousSibling;
-		rangeRight = rangeElement.nextSibling;
+		rangeRight = rangeElement.nextSibling !== rangeEl ? rangeElement.nextSibling : rangeEl ? rangeEl.nextSibling : null;
 
 		if (rangeElement.children.length === 0 || rangeElement.textContent.length === 0) {
 			util.removeItem(rangeElement);

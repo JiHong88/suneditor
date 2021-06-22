@@ -165,6 +165,7 @@ eventManager.prototype = {
 		const fileComponent = util.getParentElement(commonCon, util.isComponent);
 		if (fileComponent && !util.isTable(fileComponent)) return;
 		if ((util.isRangeFormatElement(startCon) || util.isWysiwygDiv(startCon)) && (util.isComponent(startCon.children[range.startOffset]) || util.isComponent(startCon.children[range.startOffset - 1]))) return;
+		if (util.getParentElement(commonCon, util.isNotCheckingNode)) return null;
 
 		if (rangeEl) {
 			format = util.createElement(formatName || options.defaultTag);
@@ -454,8 +455,8 @@ function OnClick_toolbar(e) {
 
 	if (!command && !display) return;
 	if (target.disabled) return;
-	if (!core.hasFocus) core.nativeFocus();
-	if (!core._variable.isCodeView) core.selection._init();
+	if (!core.isReadOnly && !core.hasFocus) core.nativeFocus();
+	if (!core.isReadOnly && !core._variable.isCodeView) core._editorRange();
 
 	core.actionCall(command, display, target);
 }
@@ -488,6 +489,11 @@ function OnMouseDown_wysiwyg(e) {
 }
 
 function OnClick_wysiwyg(e) {
+	if (core.isReadOnly) {
+		e.preventDefault();
+		return false;
+	}
+
 	const targetElement = e.target;
 	if (util.isNonEditable(context.element.wysiwyg)) return;
 
@@ -525,7 +531,7 @@ function OnClick_wysiwyg(e) {
 	const selectionNode = core.selection.getNode();
 	const formatEl = this.format.getLine(selectionNode, null);
 	const rangeEl = this.format.getRangeBlock(selectionNode, null);
-	if ((!formatEl || formatEl === rangeEl) && !util.isNonEditable(targetElement) && !util.isList(rangeEl)) {
+	if (!formatEl && !util.isNonEditable(targetElement) && !util.isList(rangeEl)) {
 		const range = core.getRange();
 		if (this.format.getLine(range.startContainer) === this.format.getLine(range.endContainer)) {
 			if (util.isList(rangeEl)) {
@@ -535,9 +541,8 @@ function OnClick_wysiwyg(e) {
 				oLi.appendChild(selectionNode);
 				rangeEl.insertBefore(oLi, prevLi);
 				core.focus();
-			} else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode) && (!util.isTable(selectionNode) || util.isTableCell(selectionNode))) {
+			} else if (!util.isWysiwygDiv(selectionNode) && !util.isComponent(selectionNode) && (!util.isTable(selectionNode) || util.isTableCell(selectionNode)) && this._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? "DIV" : options.defaultTag) !== null) {
 				e.preventDefault();
-				this._setDefaultLine(util.isRangeFormatElement(rangeEl) ? "DIV" : options.defaultTag);
 				core.focus();
 			} else {
 				this.editor.applyTagEffect();
@@ -551,6 +556,13 @@ function OnClick_wysiwyg(e) {
 }
 
 function OnInput_wysiwyg(e) {
+	if (core.isReadOnly) {
+		e.preventDefault();
+		e.stopPropagation();
+		core.history.go(core.history.getCurrentIndex());
+		return false;
+	}
+
 	core.selection._init();
 
 	// user event
@@ -560,6 +572,7 @@ function OnInput_wysiwyg(e) {
 	if (!core.char.test(data)) {
 		e.preventDefault();
 		e.stopPropagation();
+		return false;
 	}
 
 	// history stack
@@ -567,6 +580,11 @@ function OnInput_wysiwyg(e) {
 }
 
 function OnKeyDown_wysiwyg(e) {
+	if (core.isReadOnly) {
+		e.preventDefault();
+		return false;
+	}
+
 	const keyCode = e.keyCode;
 	const shift = e.shiftKey;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
@@ -617,10 +635,9 @@ function OnKeyDown_wysiwyg(e) {
 				break;
 			}
 
-			if (!util.isFormatElement(formatEl) && !context.element.wysiwyg.firstElementChild && !util.isComponent(selectionNode)) {
+			if (!util.isFormatElement(formatEl) && !context.element.wysiwyg.firstElementChild && !util.isComponent(selectionNode) && core._setDefaultFormat(options.defaultTag) !== null) {
 				e.preventDefault();
 				e.stopPropagation();
-				this._setDefaultLine(options.defaultTag);
 				return false;
 			}
 
@@ -1096,7 +1113,7 @@ function OnKeyDown_wysiwyg(e) {
 					) {
 						if (selectionFormat) util.removeItem(children[offset - 1]);
 						else util.removeItem(selectionNode);
-						const newEl = core.format.appendLine(brLine, util.isFormatElement(brLine.nextElementSibling) ? brLine.nextElementSibling : null);
+						const newEl = core.format.appendLine(brLine, util.isFormatElement(brLine.nextElementSibling) && !util.isRangeFormatElement(brLine.nextElementSibling) ? brLine.nextElementSibling : null);
 						util.copyFormatAttributes(newEl, brLine);
 						core.setRange(newEl, 1, newEl, 1);
 						break;
@@ -1167,11 +1184,12 @@ function OnKeyDown_wysiwyg(e) {
 							? "DIV"
 							: util.isList(rangeEl.parentNode)
 							? "LI"
-							: util.isFormatElement(rangeEl.nextElementSibling)
+							: util.isFormatElement(rangeEl.nextElementSibling) && !util.isRangeFormatElement(rangeEl.nextElementSibling)
 							? rangeEl.nextElementSibling.nodeName
-							: util.isFormatElement(rangeEl.previousElementSibling)
+							: util.isFormatElement(rangeEl.previousElementSibling) && !util.isRangeFormatElement(rangeEl.previousElementSibling)
 							? rangeEl.previousElementSibling.nodeName
 							: options.defaultTag;
+
 						newEl = util.createElement(newFormat);
 						const edge = core.format.removeRangeBlock(rangeEl, [formatEl], null, true, true);
 						edge.cc.insertBefore(newEl, edge.ec);
@@ -1201,7 +1219,7 @@ function OnKeyDown_wysiwyg(e) {
 				if (util.isListCell(container.parentNode)) {
 					newEl = util.createElement("BR");
 				} else {
-					newEl = util.createElement(util.isFormatElement(sibling) ? sibling.nodeName : options.defaultTag);
+					newEl = util.createElement((util.isFormatElement(sibling) && !util.isRangeFormatElement(sibling)) ? sibling.nodeName : options.defaultTag);
 					newEl.innerHTML = "<br>";
 				}
 
@@ -1257,7 +1275,7 @@ function OnKeyDown_wysiwyg(e) {
 }
 
 function OnKeyUp_wysiwyg(e) {
-	if (event._onShortcutKey) return;
+	if (core.isReadOnly || event._onShortcutKey) return;
 	core.selection._init();
 
 	const range = core.getRange();
@@ -1295,8 +1313,7 @@ function OnKeyUp_wysiwyg(e) {
 
 	const formatEl = this.format.getLine(selectionNode, null);
 	const rangeEl = this.format.getRangeBlock(selectionNode, null);
-	if (((!formatEl && range.collapsed) || formatEl === rangeEl) && !util.isComponent(selectionNode) && !util.isList(selectionNode)) {
-		this._setDefaultLine(util.isRangeFormatElement(rangeEl) ? "DIV" : options.defaultTag);
+	if (!formatEl && range.collapsed && !util.isComponent(selectionNode) && !util.isList(selectionNode) && core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag) !== null) {
 		selectionNode = core.selection.getNode();
 	}
 
@@ -1354,13 +1371,14 @@ function OnCopy_wysiwyg(e) {
 }
 
 function OnDrop_wysiwyg(e) {
-	const dataTransfer = e.dataTransfer;
-	if (!dataTransfer) return true;
-	if (util.isIE) {
+	if (core.isReadOnly || util.isIE) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
 	}
+
+	const dataTransfer = e.dataTransfer;
+	if (!dataTransfer) return true;
 
 	core.removeNode();
 	event._setDropLocationSelection(e);
@@ -1440,7 +1458,8 @@ function OnBlur_wysiwyg(e) {
 }
 
 function OnMouseMove_wysiwyg(e) {
-	if (core.isDisabled) return;
+	if (core.isDisabled || core.isReadOnly) return false;
+	
 	const component = util.getParentElement(e.target, util.isComponent);
 	const lineBreakerStyle = core._lineBreaker.style;
 

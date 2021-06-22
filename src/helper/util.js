@@ -405,7 +405,7 @@ const util = {
 		return html
 			.trim()
 			.replace(
-				/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code)[^>^<]+>\s+(?=<)/gi,
+				/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)[^>^<]+>\s+(?=<)/gi,
 				function (m) {
 					return m.trim();
 				}

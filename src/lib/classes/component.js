@@ -21,7 +21,7 @@ Component.prototype = {
 	 * @returns {Element}
 	 */
 	insert: function (element, notHistoryPush, checkCharCount, notSelect) {
-		if (checkCharCount && !this.char.check(element)) {
+		if (this.editor.isReadOnly || (checkCharCount && !this.char.check(element))) {
 			return null;
 		}
 
@@ -45,7 +45,7 @@ Component.prototype = {
 				oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
 				if (oNode) formatEl = oNode.previousSibling;
 			}
-			this.insertNode(element, formatEl, false);
+			this.insertNode(element, util.isRangeFormatElement(formatEl) ? null :formatEl, false);
 			if (formatEl && util.onlyZeroWidthSpace(formatEl)) util.removeItem(formatEl);
 		}
 
