@@ -689,6 +689,7 @@ export default {
         }
 
         this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.functions.onVideoUpload, null, true);
+        this.plugins.video.init.call(this);
     },
 
     /**
