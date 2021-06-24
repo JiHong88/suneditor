@@ -5549,10 +5549,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 currentNodes.push(nodeName);
 
                 /* Active plugins */
-                for (let c = 0, name; c < cLen; c++) {
-                    name = activePlugins[c];
-                    if (commandMapNodes.indexOf(name) === -1 && plugins[name].active.call(core, element)) {
-                        commandMapNodes.push(name);
+                if (!core.isReadOnly) {
+                    for (let c = 0, name; c < cLen; c++) {
+                        name = activePlugins[c];
+                        if (commandMapNodes.indexOf(name) === -1 && plugins[name].active.call(core, element)) {
+                            commandMapNodes.push(name);
+                        }
                     }
                 }
 
@@ -5664,7 +5666,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onMouseDown_wysiwyg: function (e) {
-            if (util.isNonEditable(context.element.wysiwyg)) return;
+            if (core.isReadOnly || util.isNonEditable(context.element.wysiwyg)) return;
 
             // user event
             if (typeof functions.onMouseDown === 'function' && functions.onMouseDown(e, core) === false) return;
@@ -5687,12 +5689,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onClick_wysiwyg: function (e) {
+            const targetElement = e.target;
+
             if (core.isReadOnly) {
                 e.preventDefault();
+                if (util.isAnchor(targetElement)){
+                    _w.open(targetElement.href, targetElement.target);
+                }
                 return false;
             }
 
-            const targetElement = e.target;
             if (util.isNonEditable(context.element.wysiwyg)) return;
 
             // user event
@@ -5994,16 +6000,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         _onShortcutKey: false,
         onKeyDown_wysiwyg: function (e) {
-            if (core.isReadOnly) {
-                e.preventDefault();
-                return false;
-            }
-
             const keyCode = e.keyCode;
             const shift = e.shiftKey;
             const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
             const alt = e.altKey;
             event._IEisComposing = keyCode === 229;
+
+            if (!ctrl && core.isReadOnly && !event._directionKeyCode.test(keyCode)) {
+                e.preventDefault();
+                return false;
+            }
 
             core.submenuOff();
 
@@ -6284,7 +6290,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (!selectRange && (core.isEdgePoint(range.endContainer, range.endOffset) || (selectionNode === formatEl ? !!formatEl.childNodes[range.startOffset] : false))) {
                         const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : selectionNode;
                         // delete nonEditable
-                        if (util.isNonEditable(sel.nextSibling)) {
+                        if (sel && util.isNonEditable(sel.nextSibling)) {
                             e.preventDefault();
                             e.stopPropagation();
                             util.removeItem(sel.nextSibling);
@@ -6651,13 +6657,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onKeyUp_wysiwyg: function (e) {
-            if (core.isReadOnly || event._onShortcutKey) return;
-            core._editorRange();
+            if (event._onShortcutKey) return;
 
-            const range = core.getRange();
+            core._editorRange();
             const keyCode = e.keyCode;
             const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
             const alt = e.altKey;
+
+            if (core.isReadOnly) {
+                if (!ctrl && event._directionKeyCode.test(keyCode)) event._applyTagEffects();
+                return;
+            }
+
+            const range = core.getRange();
             let selectionNode = core.getSelectionNode();
 
             if (core._isBalloon && ((core._isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
