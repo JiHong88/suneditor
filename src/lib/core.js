@@ -993,21 +993,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._variable._range = null;
             this._variable._selectionNode = null;
             if (this.hasFocus) this.getSelection().removeAllRanges();
-
-            const commandMap = this.commandMap;
-            const activePlugins = this.activePlugins;
-            for (let key in commandMap) {
-                if (!util.hasOwn(commandMap, key)) continue;
-                if (activePlugins.indexOf(key) > -1) {
-                    plugins[key].active.call(this, null);
-                } else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
-                    commandMap.OUTDENT.setAttribute('disabled', true);
-                } else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
-                    commandMap.INDENT.removeAttribute('disabled');
-                } else {
-                    util.removeClass(commandMap[key], 'active');
-                }
-            }
+            this._setKeyEffect([]);
         },
 
         /**
@@ -5058,6 +5044,28 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description remove class, display text.
+         * @param {Array|null} ignoredList Igonred button list
+         */
+        _setKeyEffect: function (ignoredList) {
+            const commandMap = this.commandMap;
+            const activePlugins = this.activePlugins;
+
+            for (let key in commandMap) {
+                if (ignoredList.indexOf(key) > -1 || !util.hasOwn(commandMap, key)) continue;
+                if (activePlugins.indexOf(key) > -1) {
+                    plugins[key].active.call(this, null);
+                } else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
+                    if (!this.isReadOnly) commandMap.OUTDENT.setAttribute('disabled', true);
+                } else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
+                    if (!this.isReadOnly) commandMap.INDENT.removeAttribute('disabled');
+                } else {
+                    util.removeClass(commandMap[key], 'active');
+                }
+            }
+        },
+
+        /**
          * @description Initializ core variable
          * @param {Boolean} reload Is relooad?
          * @param {String} _initHTML initial html string
@@ -5558,7 +5566,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
                 }
 
-                if (util.isFormatElement(element)) {
+                if (!core.isReadOnly && util.isFormatElement(element)) {
                     /* Outdent */
                     if (commandMapNodes.indexOf('OUTDENT') === -1 && commandMap.OUTDENT) {
                         if (util.isListCell(element) || (element.style[marginDir] && util.getNumber(element.style[marginDir], 0) > 0)) {
@@ -5587,19 +5595,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            /** remove class, display text */
-            for (let key in commandMap) {
-                if (commandMapNodes.indexOf(key) > -1 || !util.hasOwn(commandMap, key)) continue;
-                if (activePlugins.indexOf(key) > -1) {
-                    plugins[key].active.call(core, null);
-                } else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
-                    commandMap.OUTDENT.setAttribute('disabled', true);
-                } else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
-                    commandMap.INDENT.removeAttribute('disabled');
-                } else {
-                    util.removeClass(commandMap[key], 'active');
-                }
-            }
+            core._setKeyEffect(commandMapNodes);
 
             /** save current nodes */
             core._variable.currentNodes = currentNodes.reverse();
@@ -5945,7 +5941,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onInput_wysiwyg: function (e) {
-            if (core.isReadOnly) {
+            if (core.isReadOnly || core.isDisabled) {
                 e.preventDefault();
                 e.stopPropagation();
                 core.history.go(core.history.getCurrentIndex());
@@ -6760,21 +6756,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.controllersOff();
             if (core._isInline || core._isBalloon) event._hideToolbar();
 
-            // active class reset of buttons
-            const commandMap = core.commandMap;
-            const activePlugins = core.activePlugins;
-            for (let key in commandMap) {
-                if (!util.hasOwn(commandMap, key)) continue;
-                if (activePlugins.indexOf(key) > -1) {
-                    plugins[key].active.call(core, null);
-                } else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
-                    commandMap.OUTDENT.setAttribute('disabled', true);
-                } else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
-                    commandMap.INDENT.removeAttribute('disabled');
-                } else {
-                    util.removeClass(commandMap[key], 'active');
-                }
-            }
+            core._setKeyEffect([]);
 
             core._variable.currentNodes = [];
             core._variable.currentNodesMap = [];
@@ -7941,6 +7923,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.code.removeAttribute("readOnly");
             }
 
+            util.setDisabledButtons(!!value, core.resizingDisabledButtons);
             if (options.codeMirrorEditor) options.codeMirrorEditor.setOption('readOnly', !!value);
         },
 
