@@ -6288,12 +6288,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     if (!selectRange && (core.isEdgePoint(range.endContainer, range.endOffset) || (selectionNode === formatEl ? !!formatEl.childNodes[range.startOffset] : false))) {
-                        const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : selectionNode;
+                        const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] || selectionNode : selectionNode;
                         // delete nonEditable
                         if (sel && util.isNonEditable(sel.nextSibling)) {
                             e.preventDefault();
                             e.stopPropagation();
                             util.removeItem(sel.nextSibling);
+                            break;
+                        } else if (util.isComponent(sel)) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            util.removeItem(sel);
                             break;
                         }
                     }
@@ -6945,13 +6950,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const eCell = util.getRangeFormatElement(ec);
             const sIsCell = util.isCell(sCell);
             const eIsCell = util.isCell(eCell);
+            const ancestor = range.commonAncestorContainer;
             if (((sIsCell && !sCell.previousElementSibling && !sCell.parentElement.previousElementSibling) || (eIsCell && !eCell.nextElementSibling && !eCell.parentElement.nextElementSibling)) && sCell !== eCell) {
                 if (!sIsCell) {
-                    util.removeItem(util.getParentElement(eCell, util.isComponent));
+                    util.removeItem(util.getParentElement(eCell, function(current) {return ancestor === current.parentNode;}));
                 } else if (!eIsCell) {
-                    util.removeItem(util.getParentElement(sCell, util.isComponent));
+                    util.removeItem(util.getParentElement(sCell, function(current) {return ancestor === current.parentNode;}));
                 } else {
-                    util.removeItem(util.getParentElement(sCell, util.isComponent));
+                    util.removeItem(util.getParentElement(sCell, function(current) {return ancestor === current.parentNode;}));
                     core.nativeFocus();
                     return true;
                 }
