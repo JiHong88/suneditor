@@ -4740,7 +4740,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (v) {
                 for (let i = 0, len = v.length; i < len; i++) {
                     if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
-                    t += ' ' + (/^href\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i]) ? '' : v[i]);
+                    t += ' ' + (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i]) ? '' : v[i]);
                 }
             }
 
