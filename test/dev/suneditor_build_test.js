@@ -381,7 +381,7 @@ s1.onKeyDown = function (e, core) {
 }
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
-    value: "<p>This is just an example</p>",
+    // value: "<p>This is just an example</p>",
     // value: `
     // <h1>header111</h1>
     // <p>fdafds</p>
