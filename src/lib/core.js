@@ -4285,6 +4285,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             this._checkPlaceholder();
+            if (this.isReadOnly) util.setDisabledButtons(true, this.resizingDisabledButtons);
+
             // user event
             if (typeof functions.toggleCodeView === 'function') functions.toggleCodeView(this._variable.isCodeView, this);
         },
