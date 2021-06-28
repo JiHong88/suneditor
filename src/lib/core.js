@@ -202,12 +202,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description An array of buttons whose class name is not "se-code-view-enabled"
          */
-        codeViewDisabledButtons: null,
+        codeViewDisabledButtons: [],
 
         /**
          * @description An array of buttons whose class name is not "se-resizing-enabled"
          */
-        resizingDisabledButtons: null,
+        resizingDisabledButtons: [],
 
         /**
          * @description active more layer element in submenu
@@ -5211,10 +5211,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _cachingButtons: function () {
-            _w.setTimeout(function () {
-                this.codeViewDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"])');
-                this.resizingDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-resizing-enabled"]):not([data-display="MORE"])');
-            }.bind(this));
+            this.codeViewDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"])');
+            this.resizingDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-resizing-enabled"]):not([data-display="MORE"])');
 
             const tool = context.tool;
             this.commandMap = {
