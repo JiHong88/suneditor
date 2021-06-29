@@ -145,21 +145,7 @@ Selection.prototype = {
 		this._variable._range = null;
 		this._variable._selectionNode = null;
 		if (this.hasFocus) this.get().removeAllRanges();
-
-		const commandMap = this.commandMap;
-		const activePlugins = this.activePlugins;
-		for (let key in commandMap) {
-			if (!commandMap.hasOwnProperty(key)) continue;
-			if (activePlugins.indexOf(key) > -1) {
-				plugins[key].active.call(this, null);
-			} else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
-				commandMap.OUTDENT.setAttribute("disabled", true);
-			} else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
-				commandMap.INDENT.removeAttribute("disabled");
-			} else {
-				util.removeClass(commandMap[key], "active");
-			}
-		}
+		this.editor.eventManager._setKeyEffect([]);
 	},
 
 	/**

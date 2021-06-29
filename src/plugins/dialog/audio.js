@@ -480,6 +480,7 @@ export default {
         }
 
         this.plugins.fileManager.setInfo.call(this, 'audio', element, this.events.onAudioUpload, null, false);
+        this.plugins.audio.init.call(this);
     },
 
     /**

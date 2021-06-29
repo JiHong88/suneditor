@@ -22,7 +22,11 @@ function eventManager(editor) {
 eventManager.prototype = {
 	addEvent: function (target, type, handler, useCapture) {
 		target.addEventListener(type, handler, useCapture);
-		this._events.push({ target: target, type: type, handler: handler });
+		this._events.push({
+			target: target,
+			type: type,
+			handler: handler
+		});
 	},
 
 	/**
@@ -49,6 +53,102 @@ eventManager.prototype = {
 		_d.removeEventListener(type, listener);
 		if (options.iframe) {
 			this._wd.removeEventListener(type, listener);
+		}
+	},
+
+	applyTagEffect: function () {
+		let selectionNode = core.selection.getNode();
+		if (selectionNode === core.effectNode) return;
+		core.effectNode = selectionNode;
+
+		const marginDir = options.rtl ? "marginRight" : "marginLeft";
+		const commandMap = core.commandMap;
+		const classOnCheck = this._onButtonsCheck;
+		const commandMapNodes = [];
+		const currentNodes = [];
+
+		const activePlugins = core.activePlugins;
+		const cLen = activePlugins.length;
+		let nodeName = "";
+
+		while (selectionNode.firstChild) {
+			selectionNode = selectionNode.firstChild;
+		}
+
+		for (let element = selectionNode; !util.isWysiwygDiv(element); element = element.parentNode) {
+			if (!element) break;
+			if (element.nodeType !== 1 || util.isBreak(element)) continue;
+			nodeName = element.nodeName.toUpperCase();
+			currentNodes.push(nodeName);
+
+			/* Active plugins */
+			if (!core.isReadOnly) {
+				for (let c = 0, name; c < cLen; c++) {
+					name = activePlugins[c];
+					if (commandMapNodes.indexOf(name) === -1 && plugins[name].active.call(core, element)) {
+						commandMapNodes.push(name);
+					}
+				}
+			}
+
+			if (!core.isReadOnly && util.isFormatElement(element)) {
+				/* Outdent */
+				if (commandMapNodes.indexOf("OUTDENT") === -1 && commandMap.OUTDENT) {
+					if (util.isListCell(element) || (element.style[marginDir] && util.getNumber(element.style[marginDir], 0) > 0)) {
+						commandMapNodes.push("OUTDENT");
+						commandMap.OUTDENT.removeAttribute("disabled");
+					}
+				}
+
+				/* Indent */
+				if (commandMapNodes.indexOf("INDENT") === -1 && commandMap.INDENT) {
+					commandMapNodes.push("INDENT");
+					if (util.isListCell(element) && !element.previousElementSibling) {
+						commandMap.INDENT.setAttribute("disabled", true);
+					} else {
+						commandMap.INDENT.removeAttribute("disabled");
+					}
+				}
+
+				continue;
+			}
+
+			/** default active buttons [strong, ins, em, del, sub, sup] */
+			if (classOnCheck.test(nodeName)) {
+				commandMapNodes.push(nodeName);
+				util.addClass(commandMap[nodeName], "active");
+			}
+		}
+
+		core._setKeyEffect(commandMapNodes);
+
+		/** save current nodes */
+		core._variable.currentNodes = currentNodes.reverse();
+		core._variable.currentNodesMap = commandMapNodes;
+
+		/**  Displays the current node structure to resizingBar */
+		if (options.showPathLabel) context.element.navigation.textContent = core._variable.currentNodes.join(" > ");
+	},
+
+	/**
+	 * @description remove class, display text.
+	 * @param {Array|null} ignoredList Igonred button list
+	 */
+	_setKeyEffect: function (ignoredList) {
+		const commandMap = this.commandMap;
+		const activePlugins = this.activePlugins;
+
+		for (let key in commandMap) {
+			if (ignoredList.indexOf(key) > -1 || !util.hasOwn(commandMap, key)) continue;
+			if (activePlugins.indexOf(key) > -1) {
+				plugins[key].active.call(this, null);
+			} else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
+				if (!this.isReadOnly) commandMap.OUTDENT.setAttribute('disabled', true);
+			} else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
+				if (!this.isReadOnly) commandMap.INDENT.removeAttribute('disabled');
+			} else {
+				util.removeClass(commandMap[key], 'active');
+			}
 		}
 	},
 
@@ -127,13 +227,14 @@ eventManager.prototype = {
 		const eCell = this.format.getRangeBlock(ec);
 		const sIsCell = util.isTableCell(sCell);
 		const eIsCell = util.isTableCell(eCell);
+		const ancestor = range.commonAncestorContainer;
 		if (((sIsCell && !sCell.previousElementSibling && !sCell.parentElement.previousElementSibling) || (eIsCell && !eCell.nextElementSibling && !eCell.parentElement.nextElementSibling)) && sCell !== eCell) {
 			if (!sIsCell) {
-				util.removeItem(util.getParentElement(eCell, this.node.isComponent));
+				util.removeItem(util.getParentElement(eCell, function(current) {return ancestor === current.parentNode;}));
 			} else if (!eIsCell) {
-				util.removeItem(util.getParentElement(sCell, this.node.isComponent));
+				util.removeItem(util.getParentElement(sCell, function(current) {return ancestor === current.parentNode;}));
 			} else {
-				util.removeItem(util.getParentElement(sCell, this.node.isComponent));
+				util.removeItem(util.getParentElement(sCell, function(current) {return ancestor === current.parentNode;}));
 				core.nativeFocus();
 				return true;
 			}
@@ -371,7 +472,10 @@ eventManager.prototype = {
 
 		/** Events are registered only when there is a table plugin.  */
 		if (core.plugins.table) {
-			this.addEvent(eventWysiwyg, "touchstart", wwMouseDown, { passive: true, useCapture: false });
+			this.addEvent(eventWysiwyg, "touchstart", wwMouseDown, {
+				passive: true,
+				useCapture: false
+			});
 		}
 
 		/** code view area auto line */
@@ -462,7 +566,7 @@ function OnClick_toolbar(e) {
 }
 
 function OnMouseDown_wysiwyg(e) {
-	if (util.isNonEditable(context.element.wysiwyg)) return;
+	if (core.isReadOnly || util.isNonEditable(context.element.wysiwyg)) return;
 
 	// user event
 	if (typeof this.events.onMouseDown === "function" && this.events.onMouseDown(e) === false) return;
@@ -489,12 +593,16 @@ function OnMouseDown_wysiwyg(e) {
 }
 
 function OnClick_wysiwyg(e) {
+	const targetElement = e.target;
+
 	if (core.isReadOnly) {
 		e.preventDefault();
+		if (util.isAnchor(targetElement)){
+			_w.open(targetElement.href, targetElement.target);
+		}
 		return false;
 	}
 
-	const targetElement = e.target;
 	if (util.isNonEditable(context.element.wysiwyg)) return;
 
 	// user event
@@ -545,18 +653,18 @@ function OnClick_wysiwyg(e) {
 				e.preventDefault();
 				core.focus();
 			} else {
-				this.editor.applyTagEffect();
+				this.applyTagEffect();
 			}
 		}
 	} else {
-		this.editor.applyTagEffect();
+		this.applyTagEffect();
 	}
 
 	if (core._isBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this));
 }
 
 function OnInput_wysiwyg(e) {
-	if (core.isReadOnly) {
+	if (core.isReadOnly || core.isDisabled) {
 		e.preventDefault();
 		e.stopPropagation();
 		core.history.go(core.history.getCurrentIndex());
@@ -580,16 +688,16 @@ function OnInput_wysiwyg(e) {
 }
 
 function OnKeyDown_wysiwyg(e) {
-	if (core.isReadOnly) {
-		e.preventDefault();
-		return false;
-	}
-
 	const keyCode = e.keyCode;
 	const shift = e.shiftKey;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 	const alt = e.altKey;
 	this._IEisComposing = keyCode === 229;
+
+	if (!ctrl && core.isReadOnly && !this._directionKeyCode.test(keyCode)) {
+		e.preventDefault();
+		return false;
+	}
 
 	core.submenuOff();
 
@@ -619,7 +727,7 @@ function OnKeyDown_wysiwyg(e) {
 	let rangeEl = this.format.getRangeBlock(formatEl, null);
 
 	switch (keyCode) {
-		case 8 /** backspace key */:
+		case 8 /** backspace key */ :
 			if (!selectRange) {
 				if (fileComponentName) {
 					e.preventDefault();
@@ -818,7 +926,7 @@ function OnKeyDown_wysiwyg(e) {
 			}
 
 			break;
-		case 46 /** delete key */:
+		case 46 /** delete key */ :
 			if (fileComponentName) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -872,12 +980,17 @@ function OnKeyDown_wysiwyg(e) {
 			}
 
 			if (!selectRange && (core.isEdgePoint(range.endContainer, range.endOffset) || (selectionNode === formatEl ? !!formatEl.childNodes[range.startOffset] : false))) {
-				const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : selectionNode;
+				const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] || selectionNode : selectionNode;
 				// delete nonEditable
-				if (util.isNonEditable(sel.nextSibling)) {
+				if (sel && util.isNonEditable(sel.nextSibling)) {
 					e.preventDefault();
 					e.stopPropagation();
 					util.removeItem(sel.nextSibling);
+					break;
+				} else if (this.node.isComponent(sel)) {
+					e.preventDefault();
+					e.stopPropagation();
+					util.removeItem(sel);
 					break;
 				}
 			}
@@ -925,7 +1038,7 @@ function OnKeyDown_wysiwyg(e) {
 			}
 
 			break;
-		case 9 /** tab key */:
+		case 9 /** tab key */ :
 			if (fileComponentName || options.tabDisable) break;
 			e.preventDefault();
 			if (ctrl || alt || util.isWysiwygDiv(selectionNode)) break;
@@ -937,7 +1050,12 @@ function OnKeyDown_wysiwyg(e) {
 			let lines = [];
 			let fc = util.isListCell(selectedFormats[0]),
 				lc = util.isListCell(selectedFormats[selectedFormats.length - 1]);
-			let r = { sc: range.startContainer, so: range.startOffset, ec: range.endContainer, eo: range.endOffset };
+			let r = {
+				sc: range.startContainer,
+				so: range.startOffset,
+				ec: range.endContainer,
+				eo: range.endOffset
+			};
 			for (let i = 0, len = selectedFormats.length, f; i < len; i++) {
 				f = selectedFormats[i];
 				if (util.isListCell(f)) {
@@ -1052,7 +1170,7 @@ function OnKeyDown_wysiwyg(e) {
 			core.history.push(false);
 
 			break;
-		case 13 /** enter key */:
+		case 13 /** enter key */ :
 			const brLine = this.format.getBrLine(selectionNode, null);
 
 			if (options.charCounterType === "byte-html") {
@@ -1103,12 +1221,12 @@ function OnKeyDown_wysiwyg(e) {
 						!util.isClosureFreeFormatElement(brLine) &&
 						!!children &&
 						((selectionFormat &&
-							range.collapsed &&
-							children.length - 1 <= offset + 1 &&
-							util.isBreak(children[offset]) &&
-							(!children[offset + 1] || ((!children[offset + 2] || util.onlyZeroWidthSpace(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && util.onlyZeroWidthSpace(children[offset + 1].textContent))) &&
-							offset > 0 &&
-							util.isBreak(children[offset - 1])) ||
+								range.collapsed &&
+								children.length - 1 <= offset + 1 &&
+								util.isBreak(children[offset]) &&
+								(!children[offset + 1] || ((!children[offset + 2] || util.onlyZeroWidthSpace(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && util.onlyZeroWidthSpace(children[offset + 1].textContent))) &&
+								offset > 0 &&
+								util.isBreak(children[offset - 1])) ||
 							(!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(prev) && (util.isBreak(prev.previousSibling) || !util.onlyZeroWidthSpace(prev.previousSibling.textContent)) && (!next || (!util.isBreak(next) && util.onlyZeroWidthSpace(next.textContent)))))
 					) {
 						if (selectionFormat) util.removeItem(children[offset - 1]);
@@ -1180,15 +1298,15 @@ function OnKeyDown_wysiwyg(e) {
 							newEl = newListCell;
 						}
 					} else {
-						const newFormat = util.isTableCell(rangeEl.parentNode)
-							? "DIV"
-							: util.isList(rangeEl.parentNode)
-							? "LI"
-							: util.isFormatElement(rangeEl.nextElementSibling) && !util.isRangeFormatElement(rangeEl.nextElementSibling)
-							? rangeEl.nextElementSibling.nodeName
-							: util.isFormatElement(rangeEl.previousElementSibling) && !util.isRangeFormatElement(rangeEl.previousElementSibling)
-							? rangeEl.previousElementSibling.nodeName
-							: options.defaultTag;
+						const newFormat = util.isTableCell(rangeEl.parentNode) ?
+							"DIV" :
+							util.isList(rangeEl.parentNode) ?
+							"LI" :
+							util.isFormatElement(rangeEl.nextElementSibling) && !util.isRangeFormatElement(rangeEl.nextElementSibling) ?
+							rangeEl.nextElementSibling.nodeName :
+							util.isFormatElement(rangeEl.previousElementSibling) && !util.isRangeFormatElement(rangeEl.previousElementSibling) ?
+							rangeEl.previousElementSibling.nodeName :
+							options.defaultTag;
 
 						newEl = util.createElement(newFormat);
 						const edge = core.format.removeRangeBlock(rangeEl, [formatEl], null, true, true);
@@ -1275,13 +1393,19 @@ function OnKeyDown_wysiwyg(e) {
 }
 
 function OnKeyUp_wysiwyg(e) {
-	if (core.isReadOnly || event._onShortcutKey) return;
-	core.selection._init();
+	if (event._onShortcutKey) return;
 
-	const range = core.getRange();
+	core.selection._init();
 	const keyCode = e.keyCode;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 	const alt = e.altKey;
+
+	if (core.isReadOnly) {
+		if (!ctrl && this._directionKeyCode.test(keyCode)) this.applyTagEffect();
+		return;
+	}
+
+	const range = core.getRange();
 	let selectionNode = core.selection.getNode();
 
 	if (core._isBalloon && ((core._isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
@@ -1305,7 +1429,7 @@ function OnKeyUp_wysiwyg(e) {
 
 		selectionNode.appendChild(oFormatTag);
 		core.setRange(oFormatTag, 0, oFormatTag, 0);
-		this.editor.applyTagEffect();
+		this.applyTagEffect();
 
 		core.history.push(false);
 		return;
@@ -1318,7 +1442,7 @@ function OnKeyUp_wysiwyg(e) {
 	}
 
 	if (this._directionKeyCode.test(keyCode)) {
-		this.editor.applyTagEffect();
+		this.applyTagEffect();
 	}
 
 	const textKey = !ctrl && !alt && !this._nonTextKeyCode.test(keyCode);
@@ -1420,7 +1544,7 @@ function OnFocus_wysiwyg(e) {
 	if (core._antiBlur) return;
 	core.hasFocus = true;
 
-	this.editor.applyTagEffect();
+	this.applyTagEffect();
 	this.toolbar._showInline();
 
 	// user event
@@ -1433,21 +1557,7 @@ function OnBlur_wysiwyg(e) {
 	core.controllersOff();
 	if (core._isInline || core._isBalloon) this._hideToolbar();
 
-	// active class reset of buttons
-	const commandMap = core.commandMap;
-	const activePlugins = core.activePlugins;
-	for (let key in commandMap) {
-		if (!commandMap.hasOwnProperty(key)) continue;
-		if (activePlugins.indexOf(key) > -1) {
-			plugins[key].active.call(core, null);
-		} else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
-			commandMap.OUTDENT.setAttribute("disabled", true);
-		} else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
-			commandMap.INDENT.removeAttribute("disabled");
-		} else {
-			util.removeClass(commandMap[key], "active");
-		}
-	}
+	this._setKeyEffect([]);
 
 	core._variable.currentNodes = [];
 	core._variable.currentNodesMap = [];
@@ -1459,7 +1569,7 @@ function OnBlur_wysiwyg(e) {
 
 function OnMouseMove_wysiwyg(e) {
 	if (core.isDisabled || core.isReadOnly) return false;
-	
+
 	const component = util.getParentElement(e.target, this.node.isComponent);
 	const lineBreakerStyle = core._lineBreaker.style;
 

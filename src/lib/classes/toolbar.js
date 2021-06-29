@@ -97,7 +97,7 @@ Toolbar.prototype = {
 			}
 		}
 
-		if (core.hasFocus) this.editor.applyTagEffect();
+		if (core.hasFocus) this.editor.eventManager.applyTagEffect();
 
 		if (core._variable.isCodeView) util.addClass(core._styleCommandMap.codeView, "active");
 		if (core._variable.isFullScreen) util.addClass(core._styleCommandMap.fullScreen, "active");

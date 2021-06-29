@@ -202,12 +202,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description An array of buttons whose class name is not "se-code-view-enabled"
          */
-        codeViewDisabledButtons: null,
+        codeViewDisabledButtons: [],
 
         /**
          * @description An array of buttons whose class name is not "se-resizing-enabled"
          */
-        resizingDisabledButtons: null,
+        resizingDisabledButtons: [],
 
         /**
          * @description active more layer element in submenu
@@ -904,7 +904,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            this.applyTagEffect();
+            this.eventManager.applyTagEffect();
             if (this._isBalloon) this.eventManager._toggleToolbarBalloon();
         },
 
@@ -968,90 +968,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         closeLoading: function () {
             context.element.loading.style.display = 'none';
-        },
-
-        applyTagEffect: function () {
-            let selectionNode = core.selection.getNode();
-            if (selectionNode === core.effectNode) return;
-            core.effectNode = selectionNode;
-    
-            const marginDir = options.rtl ? "marginRight" : "marginLeft";
-            const commandMap = core.commandMap;
-            const classOnCheck = this._onButtonsCheck;
-            const commandMapNodes = [];
-            const currentNodes = [];
-    
-            const activePlugins = core.activePlugins;
-            const cLen = activePlugins.length;
-            let nodeName = "";
-    
-            while (selectionNode.firstChild) {
-                selectionNode = selectionNode.firstChild;
-            }
-    
-            for (let element = selectionNode; !util.isWysiwygDiv(element); element = element.parentNode) {
-                if (!element) break;
-                if (element.nodeType !== 1 || util.isBreak(element)) continue;
-                nodeName = element.nodeName.toUpperCase();
-                currentNodes.push(nodeName);
-    
-                /* Active plugins */
-                for (let c = 0, name; c < cLen; c++) {
-                    name = activePlugins[c];
-                    if (commandMapNodes.indexOf(name) === -1 && plugins[name].active.call(core, element)) {
-                        commandMapNodes.push(name);
-                    }
-                }
-    
-                if (util.isFormatElement(element)) {
-                    /* Outdent */
-                    if (commandMapNodes.indexOf("OUTDENT") === -1 && commandMap.OUTDENT) {
-                        if (util.isListCell(element) || (element.style[marginDir] && util.getNumber(element.style[marginDir], 0) > 0)) {
-                            commandMapNodes.push("OUTDENT");
-                            commandMap.OUTDENT.removeAttribute("disabled");
-                        }
-                    }
-    
-                    /* Indent */
-                    if (commandMapNodes.indexOf("INDENT") === -1 && commandMap.INDENT) {
-                        commandMapNodes.push("INDENT");
-                        if (util.isListCell(element) && !element.previousElementSibling) {
-                            commandMap.INDENT.setAttribute("disabled", true);
-                        } else {
-                            commandMap.INDENT.removeAttribute("disabled");
-                        }
-                    }
-    
-                    continue;
-                }
-    
-                /** default active buttons [strong, ins, em, del, sub, sup] */
-                if (classOnCheck.test(nodeName)) {
-                    commandMapNodes.push(nodeName);
-                    util.addClass(commandMap[nodeName], "active");
-                }
-            }
-    
-            /** remove class, display text */
-            for (let key in commandMap) {
-                if (commandMapNodes.indexOf(key) > -1 || !commandMap.hasOwnProperty(key)) continue;
-                if (activePlugins.indexOf(key) > -1) {
-                    plugins[key].active.call(core, null);
-                } else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
-                    commandMap.OUTDENT.setAttribute("disabled", true);
-                } else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
-                    commandMap.INDENT.removeAttribute("disabled");
-                } else {
-                    util.removeClass(commandMap[key], "active");
-                }
-            }
-    
-            /** save current nodes */
-            core._variable.currentNodes = currentNodes.reverse();
-            core._variable.currentNodesMap = commandMapNodes;
-    
-            /**  Displays the current node structure to resizingBar */
-            if (options.showPathLabel) context.element.navigation.textContent = core._variable.currentNodes.join(" > ");
         },
 
         /**
@@ -1299,6 +1215,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             this._checkPlaceholder();
+            if (this.isReadOnly) domUtil.setDisabled(true, this.resizingDisabledButtons);
+
             // user event
             if (typeof this.events.toggleCodeView === 'function') this.events.toggleCodeView(this._variable.isCodeView);
         },
@@ -1740,7 +1658,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (v) {
                 for (let i = 0, len = v.length; i < len; i++) {
                     if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
-                    t += ' ' + (/^href\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i]) ? '' : v[i]);
+                    t += ' ' + (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i]) ? '' : v[i]);
                 }
             }
 
@@ -2128,6 +2046,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.code.removeAttribute("readOnly");
             }
 
+            domUtil.setDisabled(!!value, core.resizingDisabledButtons);
             if (options.codeMirrorEditor) options.codeMirrorEditor.setOption('readOnly', !!value);
         },
 
@@ -2489,10 +2408,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _cachingButtons: function () {
-            _w.setTimeout(function () {
-                this.codeViewDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"])');
-                this.resizingDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-resizing-enabled"]):not([data-display="MORE"])');
-            }.bind(this));
+            this.codeViewDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"])');
+            this.resizingDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-resizing-enabled"]):not([data-display="MORE"])');
 
             const buttons = context.buttons;
             this.commandMap = {
@@ -2537,7 +2454,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _onChange_historyStack: function () {
-            if (this.hasFocus) this.applyTagEffect();
+            if (this.hasFocus) this.eventManager.applyTagEffect();
             this._variable.isChanged = true;
             if (context.buttons.save) context.buttons.save.removeAttribute('disabled');
             // user event

@@ -624,6 +624,7 @@ export default {
             if (link && !contextImage.anchorCtx.linkValue) contextImage.anchorCtx.linkValue = ' ';
             
             imagePlugin.update_image.call(this, true, false, true);
+            imagePlugin.init.call(this);
         }.bind(this);
 
         this.plugins.fileManager.checkInfo.call(this, 'image', ['img'], this.events.onImageUpload, modifyHandler, true);
