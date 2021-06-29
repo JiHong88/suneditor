@@ -1,4 +1,6 @@
-class Node {
+import CoreInterface from "../../interface/_core";
+
+class Node extends CoreInterface {
 	/**
 	 * @description Split all tags based on "baseNode"
 	 * Returns the last element of the splited tag.
@@ -49,6 +51,20 @@ class Node {
 	 * @param notRemoveNode Do not remove node
 	 */
 	removeEmptyNode(element: Element, notRemoveNode?: Node): void;
+
+	/**
+	 * @description It is judged whether it is the component [img, iframe] cover(class="se-component")
+	 * @param element The node to check
+	 * @returns
+	 */
+	isNotCheckingNode(element: Node): boolean;
+
+	/**
+	 * @description Remove whitespace between tags in HTML string.
+	 * @param html HTML string
+	 * @returns
+	 */
+	htmlRemoveWhiteSpace(html: string): string;
 
 	/**
 	 * @description It is judged whether it is a node related to the text style.

@@ -3,7 +3,7 @@ import { Plugin } from "../plugins/Plugin.d";
 import { SunEditorOptions } from "../options.d";
 import { Context } from "../lib/context.d";
 import { History } from "../lib/history.d";
-import Util from "../helper/util.d";
+import Helpers from "../helpers/index.d";
 
 class CoreInterface {
 	editor: Core;
@@ -14,7 +14,7 @@ class CoreInterface {
 	options: SunEditorOptions;
 	context: Context;
 	history: History;
-	util: Util;
+	helpers: Helpers;
 }
 
 export default CoreInterface;

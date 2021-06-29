@@ -163,7 +163,7 @@ export default {
             if (!katexEl) return false;
             katexEl.className = '__se__katex ' + katexEl.className;
             katexEl.setAttribute('contenteditable', false);
-            katexEl.setAttribute('data-exp', this.util.HTMLToEntity(mathExp));
+            katexEl.setAttribute('data-exp', this.util.htmlToEntity(mathExp));
             katexEl.setAttribute('data-font-size', contextMath.fontSizeElement.value);
             katexEl.style.fontSize = contextMath.fontSizeElement.value;
 

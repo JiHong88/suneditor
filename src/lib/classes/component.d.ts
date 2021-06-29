@@ -1,4 +1,5 @@
-class Component {
+import CoreInterface from "../../interface/_core";
+class Component extends CoreInterface {
 	/**
 	 * @description The method to insert a element and return. (used elements : table, hr, image, video)
 	 * If "element" is "HR", insert and return the new line.
@@ -24,6 +25,13 @@ class Component {
 	 * @param pluginName Plugin name (image, video)
 	 */
 	select(element: Element, pluginName: string): void;
+
+	/**
+	 * @description It is judged whether it is the not checking node. (class="katex", "__se__tag")
+	 * @param element The node to check
+	 * @returns
+	 */
+	is(element: Node): boolean;
 }
 
 export default Component;

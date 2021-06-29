@@ -149,7 +149,7 @@ Selection.prototype = {
 		const commandMap = this.commandMap;
 		const activePlugins = this.activePlugins;
 		for (let key in commandMap) {
-			if (!util.hasOwn(commandMap, key)) continue;
+			if (!commandMap.hasOwnProperty(key)) continue;
 			if (activePlugins.indexOf(key) > -1) {
 				plugins[key].active.call(this, null);
 			} else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
@@ -201,7 +201,7 @@ Selection.prototype = {
 	getNode: function () {
 		if (!context.element.wysiwyg.contains(this._variable._selectionNode)) this._init();
 		if (!this._variable._selectionNode) {
-			const selectionNode = util.getChildElement(
+			const selectionNode = util.getEdgeChild(
 				context.element.wysiwyg.firstChild,
 				function (current) {
 					return current.childNodes.length === 0 || current.nodeType === 3;
@@ -418,15 +418,15 @@ Selection.prototype = {
 	 */
 	getLinesAndComponents: function (removeDuplicate) {
 		const commonCon = this.getRange().commonAncestorContainer;
-		const myComponent = util.getParentElement(commonCon, util.isComponent);
+		const myComponent = util.getParentElement(commonCon, this.node.isComponent);
 		const selectedLines = util.isTable(commonCon)
 			? this.getLines(null)
 			: this.getLines(
 					function (current) {
-						const component = util.getParentElement(current, this.isComponent);
+						const component = util.getParentElement(current, this.node.isComponent);
 						return (
 							(this.isFormatElement(current) && (!component || component === myComponent)) ||
-							(this.isComponent(current) && !this.getLine(current))
+							(this.node.isComponent(current) && !this.getLine(current))
 						);
 					}.bind(this.format)
 			  );
@@ -463,9 +463,9 @@ Selection.prototype = {
 
 		const brLine = this.format.getBrLine(this.selection.getNode(), null);
 		const isFormats =
-			(!brLine && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) || util.isComponent(oNode);
+			(!brLine && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) || this.node.isComponent(oNode);
 
-		if (!afterNode && (isFormats || util.isComponent(oNode) || util.isMedia(oNode))) {
+		if (!afterNode && (isFormats || this.node.isComponent(oNode) || util.isMedia(oNode))) {
 			const r = this.removeNode();
 			if (r.container.nodeType === 3 || util.isBreak(r.container)) {
 				const depthFormat = util.getParentElement(
@@ -474,7 +474,7 @@ Selection.prototype = {
 						return this.isRangeFormatElement(current) || this.isListCell(current);
 					}.bind(util)
 				);
-				afterNode = this.editor.node.split(
+				afterNode = this.node.split(
 					r.container,
 					r.offset,
 					!depthFormat ? 0 : util.getElementDepth(depthFormat) + 1
@@ -601,7 +601,7 @@ Selection.prototype = {
 			if (
 				util.isFormatElement(oNode) ||
 				util.isRangeFormatElement(oNode) ||
-				(!util.isListCell(parentNode) && util.isComponent(oNode))
+				(!util.isListCell(parentNode) && this.node.isComponent(oNode))
 			) {
 				const oldParent = parentNode;
 				if (util.isList(afterNode)) {
@@ -646,7 +646,7 @@ Selection.prototype = {
 		} catch (e) {
 			parentNode.appendChild(oNode);
 		} finally {
-			if ((util.isFormatElement(oNode) || util.isComponent(oNode)) && startCon === endCon) {
+			if ((util.isFormatElement(oNode) || this.node.isComponent(oNode)) && startCon === endCon) {
 				const cItem = this.format.getLine(commonCon, null);
 				if (cItem && cItem.nodeType === 1 && util.isEmptyLine(cItem)) {
 					util.removeItem(cItem);
@@ -657,7 +657,7 @@ Selection.prototype = {
 				oNode = this._setIntoFreeFormat(oNode);
 			}
 
-			if (!util.isComponent(oNode)) {
+			if (!this.node.isComponent(oNode)) {
 				let offset = 1;
 				if (oNode.nodeType === 3) {
 					const previous = oNode.previousSibling;
@@ -857,7 +857,7 @@ Selection.prototype = {
 
 			if (item === startCon) {
 				if (startCon.nodeType === 1) {
-					if (util.isComponent(startCon)) continue;
+					if (this.node.isComponent(startCon)) continue;
 					else beforeNode = util.createTextNode(startCon.textContent);
 				} else {
 					if (item === endCon) {
@@ -882,7 +882,7 @@ Selection.prototype = {
 
 			if (item === endCon) {
 				if (endCon.nodeType === 1) {
-					if (util.isComponent(endCon)) continue;
+					if (this.node.isComponent(endCon)) continue;
 					else afterNode = util.createTextNode(endCon.textContent);
 				} else {
 					afterNode = util.createTextNode(endCon.substringData(endOff, endCon.length - endOff));
@@ -911,7 +911,7 @@ Selection.prototype = {
 			const rc = util.removeItemAllParents(
 				container,
 				function (current) {
-					if (this.isComponent(current)) return false;
+					if (this.node.isComponent(current)) return false;
 					const text = current.textContent;
 					return text.length === 0 || /^(\n|\u200B)+$/.test(text);
 				}.bind(util),
@@ -944,7 +944,7 @@ Selection.prototype = {
 			(util.isWysiwygDiv(range.startContainer) && util.isWysiwygDiv(range.endContainer)) ||
 			/FIGURE/i.test(comm.nodeName) ||
 			this._fileManager.regExp.test(comm.nodeName) ||
-			util.isMediaComponent(comm)
+			this.node.isComponent(comm)
 		);
 	},
 

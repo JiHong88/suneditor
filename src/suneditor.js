@@ -38,7 +38,7 @@ export default {
         if (_init_options) {
             options =  [_init_options, options].reduce(function (init, option) {
                             for (let key in option) {
-                                if (!util.hasOwn(option, key)) continue;
+                                if (!option.hasOwnProperty(key)) continue;
                                 if (key === 'plugins' && option[key] && init[key]) {
                                     let i = init[key], o = option[key];
                                     i = i.length ? i : Object.keys(i).map(function(name) { return i[name]; });

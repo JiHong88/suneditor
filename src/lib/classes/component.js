@@ -5,9 +5,10 @@
 "use strict";
 
 import CoreInterface from "../../interface/_core";
+import domUtil from "../../helpers/dom";
 
 function Component(editor) {
-    CoreInterface.call(this, editor);
+	CoreInterface.call(this, editor);
 }
 
 Component.prototype = {
@@ -45,7 +46,7 @@ Component.prototype = {
 				oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
 				if (oNode) formatEl = oNode.previousSibling;
 			}
-			this.insertNode(element, util.isRangeFormatElement(formatEl) ? null :formatEl, false);
+			this.insertNode(element, util.isRangeFormatElement(formatEl) ? null : formatEl, false);
 			if (formatEl && util.onlyZeroWidthSpace(formatEl)) util.removeItem(formatEl);
 		}
 
@@ -89,7 +90,7 @@ Component.prototype = {
 			if (pluginName) {
 				return {
 					target: target,
-					component: util.getParentElement(target, util.isComponent),
+					component: util.getParentElement(target, this.node.isComponent),
 					pluginName: pluginName
 				};
 			}
@@ -104,7 +105,7 @@ Component.prototype = {
 	 * @param {String} pluginName Plugin name (image, video)
 	 */
 	select: function (element, pluginName) {
-		if (util.isUneditableComponent(util.getParentElement(element, util.isComponent)) || util.isUneditableComponent(element)) return false;
+		if (util.isUneditable(util.getParentElement(element, this.node.isComponent)) || util.isUneditable(element)) return false;
 		if (!this.hasFocus) this.focus();
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;
@@ -124,7 +125,7 @@ Component.prototype = {
 	_setComponentLineBreaker: function (element) {
 		// line breaker
 		this._lineBreaker.style.display = "none";
-		const container = util.getParentElement(element, util.isComponent);
+		const container = util.getParentElement(element, this.node.isComponent);
 		const t_style = context.element.lineBreaker_t.style;
 		const b_style = context.element.lineBreaker_b.style;
 		const target = this.context.resizing.resizeContainer.style.display === "block" ? this.context.resizing.resizeContainer : element;
@@ -135,11 +136,11 @@ Component.prototype = {
 		if (isList ? !container.previousSibling : !util.isFormatElement(container.previousElementSibling)) {
 			this._variable._lineBreakComp = container;
 			wScroll = context.element.wysiwyg.scrollTop;
-			componentTop = util.getOffset(element, context.element.wysiwygFrame).top + wScroll;
+			componentTop = domUtil.getOffset(element, context.element.wysiwygFrame).top + wScroll;
 			w = target.offsetWidth / 2 / 2;
 
 			t_style.top = componentTop - wScroll - 12 + "px";
-			t_style.left = util.getOffset(target).left + w + "px";
+			t_style.left = domUtil.getOffset(target).left + w + "px";
 			t_style.display = "block";
 		} else {
 			t_style.display = "none";
@@ -149,12 +150,12 @@ Component.prototype = {
 			if (!componentTop) {
 				this._variable._lineBreakComp = container;
 				wScroll = context.element.wysiwyg.scrollTop;
-				componentTop = util.getOffset(element, context.element.wysiwygFrame).top + wScroll;
+				componentTop = domUtil.getOffset(element, context.element.wysiwygFrame).top + wScroll;
 				w = target.offsetWidth / 2 / 2;
 			}
 
 			b_style.top = componentTop + target.offsetHeight - wScroll - 12 + "px";
-			b_style.left = util.getOffset(target).left + target.offsetWidth - w - 24 + "px";
+			b_style.left = domUtil.getOffset(target).left + target.offsetWidth - w - 24 + "px";
 			b_style.display = "block";
 		} else {
 			b_style.display = "none";

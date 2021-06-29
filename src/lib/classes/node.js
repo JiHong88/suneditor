@@ -359,13 +359,30 @@ Node.prototype = {
 	},
 
 	/**
+	 * @description Remove whitespace between tags in HTML string.
+	 * @param {String} html HTML string
+	 * @returns {String}
+	 */
+	htmlRemoveWhiteSpace: function (html) {
+		if (!html) return "";
+		return html
+			.trim()
+			.replace(
+				/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)[^>^<]+>\s+(?=<)/gi,
+				function (m) {
+					return m.trim();
+				}
+			);
+	},
+
+	/**
 	 * @description Check if the container and offset values are the edges of the "line"
 	 * @param {Node} container The node of the selection object. (range.startContainer..)
 	 * @param {Number} offset The offset of the selection object. (core.getRange().startOffset...)
 	 * @param {String} dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
 	 * @returns {Boolean}
 	 */
-	 isEdgeLine: function (node, offset, dir) {
+	isEdgeLine: function (node, offset, dir) {
 		if (!this.isEdgePoint(node, offset, dir)) return false;
 
 		const result = [];
@@ -383,12 +400,21 @@ Node.prototype = {
 	},
 
 	/**
+	 * @description It is judged whether it is the not checking node. (class="katex", "__se__tag")
+	 * @param {Node} element The node to check
+	 * @returns {Boolean}
+	 */
+	isNotCheckingNode: function(element) {
+		return element && /katex|__se__tag/.test(element.className);
+	},
+
+	/**
 	 * @description Nodes that must remain undetached when changing text nodes (A, Label, Code, Span:font-size)
 	 * @param {Node|String} element Element to check
 	 * @returns {Boolean}
 	 * @private
 	 */
-	 isNonSplitNode = function (element) {
+	isNonSplitNode: function (element) {
 		return (
 			element &&
 			element.nodeType !== 3 &&

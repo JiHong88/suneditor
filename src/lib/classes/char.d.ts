@@ -1,4 +1,5 @@
-class Char {
+import CoreInterface from "../../interface/_core";
+class Char extends CoreInterface {
   /**
    * @description Returns false if char count is greater than "options.maxCharCount" when "html" is added to the current editor.
    * @param element Element node or String.

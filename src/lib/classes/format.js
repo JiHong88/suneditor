@@ -12,36 +12,6 @@ const Format = function (editor) {
 };
 
 Format.prototype = {
-	/**
-	 * @description Append format element to sibling node of argument element.
-	 * If the "lineNode" argument value is present, the tag of that argument value is inserted,
-	 * If not, the currently selected format tag is inserted.
-	 * @param {Element} element Insert as siblings of that element
-	 * @param {String|Element|null} lineNode Node name or node obejct to be inserted
-	 * @returns {Element}
-	 */
-	appendLine: function (element, lineNode) {
-		if (!element.parentNode) return null;
-
-		const currentFormatEl = util.getFormatElement(this.getSelectionNode(), null);
-		let oFormat = null;
-		if (util.isFreeFormatElement(currentFormatEl || element.parentNode)) {
-			oFormat = util.createElement('BR');
-		} else {
-			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : (util.isFormatElement(currentFormatEl) && !util.isRangeFormatElement(currentFormatEl) && !util.isFreeFormatElement(currentFormatEl)) ? currentFormatEl.nodeName : options.defaultTag;
-			oFormat = util.createElement(oFormatName);
-			oFormat.innerHTML = '<br>';
-			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && util.isFormatElement(currentFormatEl))) {
-				util.copyTagAttributes(oFormat, lineNode || currentFormatEl);
-			}
-		}
-
-		if (util.isCell(element)) element.insertBefore(oFormat, element.nextElementSibling);
-		else element.parentNode.insertBefore(oFormat, element.nextElementSibling);
-
-		return oFormat;
-	},
-
 	setLine: function () {
 		const info = this._lineWork();
 		const lines = info.lines;
@@ -57,7 +27,7 @@ Format.prototype = {
 				!util.isComponent(node)
 			) {
 				newFormat = tag.cloneNode(false);
-				util.copyFormatAttributes(newFormat, node);
+				this.copyAttributes(newFormat, node);
 				newFormat.innerHTML = node.innerHTML;
 
 				node.parentNode.replaceChild(newFormat, node);
@@ -193,6 +163,64 @@ Format.prototype = {
 	},
 
 	/**
+	 * @description Append format element to sibling node of argument element.
+	 * If the "lineNode" argument value is present, the tag of that argument value is inserted,
+	 * If not, the currently selected format tag is inserted.
+	 * @param {Element} element Insert as siblings of that element
+	 * @param {String|Element|null} lineNode Node name or node obejct to be inserted
+	 * @returns {Element}
+	 */
+	appendLine: function (element, lineNode) {
+		if (!element.parentNode) return null;
+
+		const currentFormatEl = util.getFormatElement(this.getSelectionNode(), null);
+		let oFormat = null;
+		if (util.isFreeFormatElement(currentFormatEl || element.parentNode)) {
+			oFormat = util.createElement('BR');
+		} else {
+			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : (util.isFormatElement(currentFormatEl) && !util.isRangeFormatElement(currentFormatEl) && !util.isFreeFormatElement(currentFormatEl)) ? currentFormatEl.nodeName : options.defaultTag;
+			oFormat = util.createElement(oFormatName);
+			oFormat.innerHTML = '<br>';
+			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && util.isFormatElement(currentFormatEl))) {
+				util.copyTagAttributes(oFormat, lineNode || currentFormatEl);
+			}
+		}
+
+		if (util.isTableCell(element)) element.insertBefore(oFormat, element.nextElementSibling);
+		else element.parentNode.insertBefore(oFormat, element.nextElementSibling);
+
+		return oFormat;
+	},
+
+	/**
+	 * @description If a parent node that contains an argument node finds a format node (util.isRangeFormatElement), it returns that node.
+	 * @param {Node} element Reference node.
+	 * @param {Function|null} validation Additional validation function.
+	 * @returns {Element|null}
+	 */
+	getRangeBlock: function (element, validation) {
+		if (!element) return null;
+		if (!validation) {
+			validation = function () {
+				return true;
+			};
+		}
+
+		while (element) {
+			if (this.isWysiwygDiv(element)) return null;
+			if (
+				this.isRangeFormatElement(element) &&
+				!/^(THEAD|TBODY|TR)$/i.test(element.nodeName) &&
+				validation(element)
+			)
+				return element;
+			element = element.parentNode;
+		}
+
+		return null;
+	},
+
+	/**
 	 * @description Appended all selected format Element to the argument element and insert
 	 * @param {Element} rangeBlock Element of wrap the arguments (BLOCKQUOTE...)
 	 */
@@ -265,9 +293,7 @@ Format.prototype = {
 		};
 
 		for (
-			let i = 0, len = rangeLines.length, line, originParent, depth, before, nextLine, nextList, nested;
-			i < len;
-			i++
+			let i = 0, len = rangeLines.length, line, originParent, depth, before, nextLine, nextList, nested; i < len; i++
 		) {
 			line = rangeLines[i];
 			originParent = line.parentNode;
@@ -520,13 +546,13 @@ Format.prototype = {
 					} else {
 						const inner = insNode;
 						insNode = util.createElement(
-							remove
-								? inner.nodeName
-								: util.isList(rangeElement.parentNode) || util.isListCell(rangeElement.parentNode)
-								? "LI"
-								: util.isTableCell(rangeElement.parentNode)
-								? "DIV"
-								: options.defaultTag
+							remove ?
+							inner.nodeName :
+							util.isList(rangeElement.parentNode) || util.isListCell(rangeElement.parentNode) ?
+							"LI" :
+							util.isTableCell(rangeElement.parentNode) ?
+							"DIV" :
+							options.defaultTag
 						);
 						const isCell = util.isListCell(insNode);
 						const innerChildren = inner.childNodes;
@@ -534,7 +560,7 @@ Format.prototype = {
 							if (util.isList(innerChildren[0]) && !isCell) break;
 							insNode.appendChild(innerChildren[0]);
 						}
-						util.copyFormatAttributes(insNode, inner);
+						this.copyAttributes(insNode, inner);
 						moveComplete = true;
 					}
 				} else {
@@ -634,34 +660,6 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description If a parent node that contains an argument node finds a format node (util.isRangeFormatElement), it returns that node.
-	 * @param {Node} element Reference node.
-	 * @param {Function|null} validation Additional validation function.
-	 * @returns {Element|null}
-	 */
-	getRangeBlock: function (element, validation) {
-		if (!element) return null;
-		if (!validation) {
-			validation = function () {
-				return true;
-			};
-		}
-
-		while (element) {
-			if (this.isWysiwygDiv(element)) return null;
-			if (
-				this.isRangeFormatElement(element) &&
-				!/^(THEAD|TBODY|TR)$/i.test(element.nodeName) &&
-				validation(element)
-			)
-				return element;
-			element = element.parentNode;
-		}
-
-		return null;
-	},
-
-	/**
 	 * @description Append all selected format Element to the list and insert.
 	 * @param {String} type List type. (bullet | numbered):[listStyleType]
 	 * @param {Element} selectedCells Format elements or list cells.
@@ -688,13 +686,13 @@ Format.prototype = {
 		let firstSel = selectedFormats[0];
 		let lastSel = selectedFormats[selectedFormats.length - 1];
 		let topEl =
-			(util.isListCell(firstSel) || util.isComponent(firstSel)) && !firstSel.previousElementSibling
-				? firstSel.parentNode.previousElementSibling
-				: firstSel.previousElementSibling;
+			(util.isListCell(firstSel) || util.isComponent(firstSel)) && !firstSel.previousElementSibling ?
+			firstSel.parentNode.previousElementSibling :
+			firstSel.previousElementSibling;
 		let bottomEl =
-			(util.isListCell(lastSel) || util.isComponent(lastSel)) && !lastSel.nextElementSibling
-				? lastSel.parentNode.nextElementSibling
-				: lastSel.nextElementSibling;
+			(util.isListCell(lastSel) || util.isComponent(lastSel)) && !lastSel.nextElementSibling ?
+			lastSel.parentNode.nextElementSibling :
+			lastSel.nextElementSibling;
 
 		const originRange = {
 			sc: range.startContainer,
@@ -757,7 +755,10 @@ Format.prototype = {
 
 				if (!r) {
 					r = o;
-					rangeArr = { r: r, f: [util.getParentElement(selectedFormats[i], "LI")] };
+					rangeArr = {
+						r: r,
+						f: [util.getParentElement(selectedFormats[i], "LI")]
+					};
 				} else {
 					if (r !== o) {
 						if (nested && util.isListCell(o.parentNode)) {
@@ -773,7 +774,10 @@ Format.prototype = {
 						}
 
 						r = o;
-						rangeArr = { r: r, f: [util.getParentElement(selectedFormats[i], "LI")] };
+						rangeArr = {
+							r: r,
+							f: [util.getParentElement(selectedFormats[i], "LI")]
+						};
 					} else {
 						rangeArr.f.push(util.getParentElement(selectedFormats[i], "LI"));
 					}
@@ -791,13 +795,13 @@ Format.prototype = {
 			const topElParent = topEl ? topEl.parentNode : topEl;
 			const bottomElParent = bottomEl ? bottomEl.parentNode : bottomEl;
 			topEl =
-				topElParent && !util.isWysiwygDiv(topElParent) && topElParent.nodeName === listTag
-					? topElParent
-					: topEl;
+				topElParent && !util.isWysiwygDiv(topElParent) && topElParent.nodeName === listTag ?
+				topElParent :
+				topEl;
 			bottomEl =
-				bottomElParent && !util.isWysiwygDiv(bottomElParent) && bottomElParent.nodeName === listTag
-					? bottomElParent
-					: bottomEl;
+				bottomElParent && !util.isWysiwygDiv(bottomElParent) && bottomElParent.nodeName === listTag ?
+				bottomElParent :
+				bottomEl;
 
 			const mergeTop = topEl && topEl.tagName === listTag;
 			const mergeBottom = bottomEl && bottomEl.tagName === listTag;
@@ -824,9 +828,7 @@ Format.prototype = {
 					nextParent,
 					parentTag,
 					siblingTag,
-					rangeTag;
-				i < len;
-				i++
+					rangeTag; i < len; i++
 			) {
 				fTag = selectedFormats[i];
 				if (fTag.childNodes.length === 0 && !util._isIgnoreNodeChange(fTag)) {
@@ -840,14 +842,14 @@ Format.prototype = {
 				rangeTag = util.isRangeFormatElement(originParent) ? originParent : null;
 				parentTag = isCell && !util.isWysiwygDiv(originParent) ? originParent.parentNode : originParent;
 				siblingTag =
-					isCell && !util.isWysiwygDiv(originParent)
-						? !next || util.isListCell(parentTag)
-							? originParent
-							: originParent.nextSibling
-						: fTag.nextSibling;
+					isCell && !util.isWysiwygDiv(originParent) ?
+					!next || util.isListCell(parentTag) ?
+					originParent :
+					originParent.nextSibling :
+					fTag.nextSibling;
 
 				newCell = util.createElement("LI");
-				util.copyFormatAttributes(newCell, fTag);
+				this.copyAttributes(newCell, fTag);
 				if (util.isComponent(fTag)) {
 					const isHR = /^HR$/i.test(fTag.nodeName);
 					if (!isHR) newCell.innerHTML = "<br>";
@@ -928,7 +930,10 @@ Format.prototype = {
 			isList = util.isList(o);
 			if (!r && isList) {
 				r = o;
-				rangeArr = { r: r, f: [util.getParentElement(selectedCells[i], "LI")] };
+				rangeArr = {
+					r: r,
+					f: [util.getParentElement(selectedCells[i], "LI")]
+				};
 				if (i === 0) listFirst = true;
 			} else if (r && isList) {
 				if (r !== o) {
@@ -948,7 +953,10 @@ Format.prototype = {
 
 					if (isList) {
 						r = o;
-						rangeArr = { r: r, f: [util.getParentElement(selectedCells[i], "LI")] };
+						rangeArr = {
+							r: r,
+							f: [util.getParentElement(selectedCells[i], "LI")]
+						};
 						if (lastIndex) listLast = true;
 					} else {
 						r = null;
@@ -1137,19 +1145,19 @@ Format.prototype = {
 					for (let i = 0; i < checkAttrs.length; i++) {
 						if (sNode.nodeType === 1) {
 							const s = checkAttrs[i];
-							const classReg = /^\./.test(s)
-								? new wRegExp("\\s*" + s.replace(/^\./, "") + "(\\s+|$)", "ig")
-								: false;
+							const classReg = /^\./.test(s) ?
+								new wRegExp("\\s*" + s.replace(/^\./, "") + "(\\s+|$)", "ig") :
+								false;
 
-							const styleCheck = isRemoveNode
-								? !!sNode.style[s]
-								: !!sNode.style[s] && !!styleNode.style[s] && sNode.style[s] === styleNode.style[s];
+							const styleCheck = isRemoveNode ?
+								!!sNode.style[s] :
+								!!sNode.style[s] && !!styleNode.style[s] && sNode.style[s] === styleNode.style[s];
 							const classCheck =
-								classReg === false
-									? false
-									: isRemoveNode
-									? !!sNode.className.match(classReg)
-									: !!sNode.className.match(classReg) && !!styleNode.className.match(classReg);
+								classReg === false ?
+								false :
+								isRemoveNode ?
+								!!sNode.className.match(classReg) :
+								!!sNode.className.match(classReg) && !!styleNode.className.match(classReg);
 							if (styleCheck || classCheck) {
 								checkCnt++;
 							}
@@ -1201,7 +1209,9 @@ Format.prototype = {
 
 		/** validation check function*/
 		const wBoolean = _w.Boolean;
-		const _removeCheck = { v: false };
+		const _removeCheck = {
+			v: false
+		};
 		const validation = function (checkNode) {
 			const vNode = checkNode.cloneNode(false);
 
@@ -1289,7 +1299,7 @@ Format.prototype = {
 		endOff = range.endOffset;
 
 		if (!this.getLine(startCon, null)) {
-			startCon = util.getChildElement(
+			startCon = util.getEdgeChild(
 				lineNodes[0],
 				function (current) {
 					return current.nodeType === 3;
@@ -1300,7 +1310,7 @@ Format.prototype = {
 		}
 
 		if (!this.getLine(endCon, null)) {
-			endCon = util.getChildElement(
+			endCon = util.getEdgeChild(
 				lineNodes[lineNodes.length - 1],
 				function (current) {
 					return current.nodeType === 3;
@@ -1432,6 +1442,17 @@ Format.prototype = {
 
 		// history stack
 		this.history.push(false);
+	},
+
+	/**
+	 * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore "__se__format__" class
+	 * @param {Element} originEl Origin element
+	 * @param {Element} copyEl Element to copy
+	 */
+	copyAttributes: function (originEl, copyEl) {
+		copyEl = copyEl.cloneNode(false);
+		copyEl.className = copyEl.className.replace(/(\s|^)__se__format__[^\s]+/g, "");
+		this.copyTagAttributes(originEl, copyEl);
 	},
 
 	/**
@@ -1572,13 +1593,13 @@ Format.prototype = {
 	 * @private
 	 */
 	_applyNestedList: function (selectedCells, nested) {
-		selectedCells = !selectedCells
-			? this.selection.getLines().filter(
-					function (el) {
-						return this.isListCell(el);
-					}.bind(this.util)
-			  )
-			: selectedCells;
+		selectedCells = !selectedCells ?
+			this.selection.getLines().filter(
+				function (el) {
+					return this.isListCell(el);
+				}.bind(this.util)
+			) :
+			selectedCells;
 		const cellsLen = selectedCells.length;
 		if (
 			cellsLen === 0 ||
@@ -1612,8 +1633,8 @@ Format.prototype = {
 			}
 			range = this.applyList(
 				(originList.nodeName.toUpperCase() === "OL" ? "bullet" : "numbered") +
-					":" +
-					originList.style.listStyleType,
+				":" +
+				originList.style.listStyleType,
 				selectedCells,
 				true
 			);
@@ -1621,7 +1642,12 @@ Format.prototype = {
 			let innerList = this.util.createElement(originList.nodeName);
 			let prev = selectedCells[0].previousElementSibling;
 			let next = lastCell.nextElementSibling;
-			const nodePath = { s: null, e: null, sl: originList, el: originList };
+			const nodePath = {
+				s: null,
+				e: null,
+				sl: originList,
+				el: originList
+			};
 
 			for (let i = 0, len = cellsLen, c; i < len; i++) {
 				c = selectedCells[i];
@@ -1804,6 +1830,7 @@ Format.prototype = {
 		let pCurrent, newNode, appendNode, cssText, anchorNode;
 
 		const wRegExp = _w.RegExp;
+
 		function checkCss(vNode) {
 			const regExp = new wRegExp("(?:;|^|\\s)(?:" + cssText + "null)\\s*:[^;]*\\s*(?:;|$)", "ig");
 			let style = "";
@@ -1832,16 +1859,16 @@ Format.prototype = {
 						startContainer.nodeType === 1 ? "" : startContainer.substringData(0, startOffset)
 					);
 					const textNode = util.createTextNode(
-						startContainer.nodeType === 1
-							? ""
-							: startContainer.substringData(
-									startOffset,
-									isSameNode
-										? endOffset >= startOffset
-											? endOffset - startOffset
-											: startContainer.data.length - startOffset
-										: startContainer.data.length - startOffset
-							  )
+						startContainer.nodeType === 1 ?
+						"" :
+						startContainer.substringData(
+							startOffset,
+							isSameNode ?
+							endOffset >= startOffset ?
+							endOffset - startOffset :
+							startContainer.data.length - startOffset :
+							startContainer.data.length - startOffset
+						)
 					);
 
 					if (anchorNode) {
@@ -1911,9 +1938,9 @@ Format.prototype = {
 				if (!endPass && child === endContainer) {
 					anchorNode = _getMaintainedNode(child);
 					const afterNode = util.createTextNode(
-						endContainer.nodeType === 1
-							? ""
-							: endContainer.substringData(endOffset, endContainer.length - endOffset)
+						endContainer.nodeType === 1 ?
+						"" :
+						endContainer.substringData(endOffset, endContainer.length - endOffset)
 					);
 					const textNode = util.createTextNode(
 						isSameNode || endContainer.nodeType === 1 ? "" : endContainer.substringData(0, endOffset)
@@ -2170,22 +2197,28 @@ Format.prototype = {
 		endOffset = endConReset ? endContainer.textContent.length : endOffset;
 
 		// node change
-		const newStartOffset = { s: 0, e: 0 };
+		const newStartOffset = {
+			s: 0,
+			e: 0
+		};
 		const startPath = util.getNodePath(startContainer, pNode, newStartOffset);
 
 		const mergeEndCon = !endContainer.parentNode;
 		if (mergeEndCon) endContainer = startContainer;
-		const newEndOffset = { s: 0, e: 0 };
+		const newEndOffset = {
+			s: 0,
+			e: 0
+		};
 		const endPath = util.getNodePath(endContainer, pNode, !mergeEndCon && !endConReset ? newEndOffset : null);
 
 		startOffset += newStartOffset.s;
-		endOffset = collapsed
-			? startOffset
-			: mergeEndCon
-			? startContainer.textContent.length
-			: endConReset
-			? endOffset + newStartOffset.s
-			: endOffset + newEndOffset.s;
+		endOffset = collapsed ?
+			startOffset :
+			mergeEndCon ?
+			startContainer.textContent.length :
+			endConReset ?
+			endOffset + newStartOffset.s :
+			endOffset + newEndOffset.s;
 
 		// tag merge
 		const newOffsets = util.mergeSameTags(pNode, [startPath, endPath], true);
@@ -2504,7 +2537,10 @@ Format.prototype = {
 			}
 
 			// node change
-			const offsets = { s: 0, e: 0 };
+			const offsets = {
+				s: 0,
+				e: 0
+			};
 			const path = util.getNodePath(container, pNode, offsets);
 			offset += offsets.s;
 
@@ -2634,7 +2670,10 @@ Format.prototype = {
 
 		// not remove tag
 		if (noneChange || (isRemoveNode && !isRemoveFormat && !_removeCheck.v))
-			return { ancestor: element, endContainer: _endContainer };
+			return {
+				ancestor: element,
+				endContainer: _endContainer
+			};
 
 		pNode.appendChild(newInnerNode);
 
@@ -2660,7 +2699,10 @@ Format.prototype = {
 
 		// node change
 		element.parentNode.replaceChild(pNode, element);
-		return { ancestor: pNode, endContainer: _endContainer };
+		return {
+			ancestor: pNode,
+			endContainer: _endContainer
+		};
 	},
 
 	/**
@@ -2978,7 +3020,10 @@ Format.prototype = {
 			}
 
 			// node change
-			const offsets = { s: 0, e: 0 };
+			const offsets = {
+				s: 0,
+				e: 0
+			};
 			const path = util.getNodePath(container, pNode, offsets);
 			offset += offsets.s;
 
@@ -3031,9 +3076,9 @@ Format.prototype = {
 	_sn_isMaintainedNode = function (_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove || element.nodeType !== 1) return false;
 		const anchor = this.node.isNonSplitNode(element);
-		return util.getParentElement(element, this.node.isNonSplitNode)
-			? anchor
-			: anchor || (!_isSizeNode ? Format.IsSizeNode(element) : false);
+		return util.getParentElement(element, this.node.isNonSplitNode) ?
+			anchor :
+			anchor || (!_isSizeNode ? Format.IsSizeNode(element) : false);
 	},
 
 	/**

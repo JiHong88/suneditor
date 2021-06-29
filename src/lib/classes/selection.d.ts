@@ -1,4 +1,6 @@
-class Selection {
+import CoreInterface from "../../interface/_core";
+
+class Selection extends CoreInterface {
 	/**
 	 * @description Get current editor's range object
 	 * @returns

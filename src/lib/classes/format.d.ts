@@ -1,4 +1,6 @@
-class Format {
+import CoreInterface from "../../interface/_core";
+
+class Format extends CoreInterface {
 	/**
 	 * @description Append format element to sibling node of argument element.
 	 * If the "formatNodeName" argument value is present, the tag of that argument value is inserted,
@@ -8,6 +10,13 @@ class Format {
 	 * @returns
 	 */
 	appendLine(element: Element, formatNode?: string | Element): Element;
+
+	/**
+	 * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore "__se__format__" class
+	 * @param originEl Origin element
+	 * @param copyEl Element to copy
+	 */
+	copyAttributes(originEl: Element, copyEl: Element): void;
 
 	/**
 	 * @description Appended all selected format Element to the argument element and insert

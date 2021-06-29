@@ -9,7 +9,7 @@
 
 import _icons from '../assets/defaultIcons';
 import _defaultLang from '../lang/en';
-import util from '../helper/util';
+import util from '../helpers/util';
 
 export default {
     /**
@@ -148,7 +148,7 @@ export default {
                 lineWrapping: true
             }, (options.codeMirror.options || {})].reduce(function (init, option) {
                 for (let key in option) {
-                    if (util.hasOwn(option, key)) init[key] = option[key];
+                    if (option.hasOwnProperty(key)) init[key] = option[key];
                 }
                 return init;
             }, {});
@@ -181,7 +181,7 @@ export default {
             throwOnError: false,
         }, (katex.options || {})].reduce(function (init, option) {
             for (let key in option) {
-                if (util.hasOwn(option, key)) init[key] = option[key];
+                if (option.hasOwnProperty(key)) init[key] = option[key];
             }
             return init;
         }, {});
@@ -545,14 +545,14 @@ export default {
         // custom icons
         options.icons = (!options.icons || typeof options.icons !== 'object') ? _icons : [_icons, options.icons].reduce(function (_default, _new) {
             for (let key in _new) {
-                if (util.hasOwn(_new, key)) _default[key] = _new[key];
+                if (_new.hasOwnProperty(key)) _default[key] = _new[key];
             }
             return _default;
         }, {});
         // rtl icons
         options.icons = !options.rtl ? options.icons : [options.icons, options.icons.rtl].reduce(function (_default, _new) {
             for (let key in _new) {
-                if (util.hasOwn(_new, key)) _default[key] = _new[key];
+                if (_new.hasOwnProperty(key)) _default[key] = _new[key];
             }
             return _default;
         }, {});

@@ -1,4 +1,6 @@
-class Toolbar {
+import CoreInterface from "../../interface/_core";
+
+class Toolbar extends CoreInterface {
 	/**
 	 * @description Disable the toolbar
 	 */

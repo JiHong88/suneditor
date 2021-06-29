@@ -270,7 +270,7 @@ export default {
      */
     destroy: function (element) {
         const imageEl = element || this.context.image._element;
-        const imageContainer = this.util.getParentElement(imageEl, this.util.isMediaComponent) || imageEl;
+        const imageContainer = this.util.getParentElement(imageEl, this.node.isComponent) || imageEl;
         const dataIndex = imageEl.getAttribute('data-index') * 1;
         let focusEl = (imageContainer.previousElementSibling || imageContainer.nextElementSibling);
         
@@ -837,8 +837,8 @@ export default {
         contextImage._linkElement = contextImage.anchorCtx.linkAnchor = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = element;
         contextImage._cover = this.util.getParentElement(element, 'FIGURE');
-        contextImage._container = this.util.getParentElement(element, this.util.isMediaComponent);
-        contextImage._caption = this.util.getChildElement(contextImage._cover, 'FIGCAPTION');
+        contextImage._container = this.util.getParentElement(element, this.node.isComponent);
+        contextImage._caption = this.util.getEdgeChild(contextImage._cover, 'FIGCAPTION');
         contextImage._align = element.style.float || element.getAttribute('data-align') || 'none';
         element.style.float = '';
         this.plugins.anchor.setCtx(contextImage._linkElement, contextImage.anchorCtx);

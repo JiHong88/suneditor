@@ -241,7 +241,7 @@ export default {
      */
     destroy: function (element) {
         element = element || this.context.customAudio._element;
-        const container = this.util.getParentElement(element, this.util.isComponent) || element;
+        const container = this.util.getParentElement(element, this.node.isComponent) || element;
         const dataIndex = element.getAttribute('data-index') * 1;
         const focusEl = (container.previousElementSibling || container.nextElementSibling);
 
@@ -442,7 +442,7 @@ export default {
         element.setAttribute('controls', true);
         
         // find component element
-        const existElement = this.util.getParentElement(element, this.util.isMediaComponent) || 
+        const existElement = this.util.getParentElement(element, this.node.isComponent) || 
             this.util.getParentElement(element, function (current) {
                 return this.isWysiwygDiv(current.parentNode);
             }.bind(this.util));
@@ -489,7 +489,7 @@ export default {
         selectionTag.style.border = '1px solid #80bdff';
         context._element = selectionTag;
         context._cover = this.util.getParentElement(selectionTag, 'FIGURE');
-        context._container = this.util.getParentElement(selectionTag, this.util.isComponent);
+        context._container = this.util.getParentElement(selectionTag, this.node.isComponent);
     },
 
     /**

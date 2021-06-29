@@ -7,9 +7,8 @@
  */
 'use strict';
 
-import { window, document } from "../helper/global"
-import helperDom from '../helper/dom';
-import _util from '../helper/util';
+import { _w, _d } from "../helpers/global"
+import { domUtil } from '../helpers';
 import Constructor from './constructor';
 import Context from './context';
 import history from './history';
@@ -28,9 +27,8 @@ import notice from './classes/notice';
  * @returns {Object} functions Object
  */
 export default function (context, pluginCallButtons, plugins, lang, options, _responsiveButtons) {
-    const _d = context.element.originElement.ownerDocument || document;
-    const _w = _d.defaultView || window;
-    const util = _util;
+    const _d = context.element.originElement.ownerDocument || _d;
+    const _w = _d.defaultView || _w;
     const icons = options.icons;
 
     /**
@@ -649,7 +647,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const toolbar = this.context.element.toolbar;
             const toolbarW = toolbar.offsetWidth;
-            const toolbarOffset = helperDom.getGlobalOffset(context.element.toolbar);
+            const toolbarOffset = domUtil.getGlobalOffset(context.element.toolbar);
             const menuW = menu.offsetWidth;
             const l = element.parentElement.offsetLeft + 3;
 
@@ -659,7 +657,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const rtlW = menuW > elementW ? menuW - elementW : 0;
                 const rtlL = rtlW > 0 ? 0 : elementW - menuW;
                 menu.style.left = (l - rtlW + rtlL) + 'px';
-                if (toolbarOffset.left > helperDom.getGlobalOffset(menu).left) {
+                if (toolbarOffset.left > domUtil.getGlobalOffset(menu).left) {
                     menu.style.left = '0px';
                 }
             } else {
@@ -808,7 +806,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         setControllerPosition: function (controller, referEl, position, addOffset) {
             if (options.rtl) addOffset.left *= -1;
 
-            const offset = util.getOffset(referEl, context.element.wysiwygFrame);
+            const offset = domUtil.getOffset(referEl, context.element.wysiwygFrame);
             controller.style.visibility = 'hidden';
             controller.style.display = 'block';
 
@@ -891,7 +889,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     const range = this.selection.getRange();
                     if (range.startContainer === range.endContainer && util.isWysiwygDiv(range.startContainer)) {
                         const currentNode = range.commonAncestorContainer.children[range.startOffset];
-                        if (!util.isFormatElement(currentNode) && !util.isComponent(currentNode)) {
+                        if (!util.isFormatElement(currentNode) && !this.node.isComponent(currentNode)) {
                             const format = util.createElement(options.defaultTag);
                             const br = util.createElement("BR");
                             format.appendChild(br);
@@ -922,7 +920,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (fileComponentInfo) {
                 this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
             } else if (focusEl) {
-                focusEl = util.getChildElement(
+                focusEl = util.getEdgeChild(
                     focusEl,
                     function (current) {
                         return current.childNodes.length === 0 || current.nodeType === 3;
@@ -1036,7 +1034,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
     
             /** remove class, display text */
             for (let key in commandMap) {
-                if (commandMapNodes.indexOf(key) > -1 || !util.hasOwn(commandMap, key)) continue;
+                if (commandMapNodes.indexOf(key) > -1 || !commandMap.hasOwnProperty(key)) continue;
                 if (activePlugins.indexOf(key) > -1) {
                     plugins[key].active.call(core, null);
                 } else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
@@ -1140,8 +1138,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
                 case 'selectAll':
                     const wysiwyg = context.element.wysiwyg;
-                    let first = util.getChildElement(wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false) || wysiwyg.firstChild;
-                    let last = util.getChildElement(wysiwyg.lastChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true) || wysiwyg.lastChild;
+                    let first = util.getEdgeChild(wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false) || wysiwyg.firstChild;
+                    let last = util.getEdgeChild(wysiwyg.lastChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true) || wysiwyg.lastChild;
                     if (!first || !last) return;
                     if (util.isMedia(first)) {
                         const info = this.component.get(first);
@@ -1243,7 +1241,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         toggleCodeView: function () {
             const isCodeView = this._variable.isCodeView;
             this.controllersOff();
-            util.setDisabledButtons(!isCodeView, this.codeViewDisabledButtons);
+            util.setDisabled(!isCodeView, this.codeViewDisabledButtons);
 
             if (isCodeView) {
                 this._setCodeDataToEditor();
@@ -1653,7 +1651,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // element
             if (node.nodeType === 1) {
                 if (util._disallowedTags(node)) return '';
-                if (!requireFormat || (util.isFormatElement(node) || util.isRangeFormatElement(node) || util.isComponent(node) || util.isMedia(node) || (util.isAnchor(node) && util.isMedia(node.firstElementChild)))) {
+                if (!requireFormat || (util.isFormatElement(node) || util.isRangeFormatElement(node) || this.node.isComponent(node) || util.isMedia(node) || (util.isAnchor(node) && util.isMedia(node.firstElementChild)))) {
                     return node.outerHTML;
                 } else {
                     return '<' + defaultTag + '>' + node.outerHTML + '</' + defaultTag + '>';
@@ -1661,12 +1659,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
             // text
             if (node.nodeType === 3) {
-                if (!requireFormat) return util.HTMLToEntity(node.textContent);
+                if (!requireFormat) return util.htmlToEntity(node.textContent);
                 const textArray = node.textContent.split(/\n/g);
                 let html = '';
                 for (let i = 0, tLen = textArray.length, text; i < tLen; i++) {
                     text = textArray[i].trim();
-                    if (text.length > 0) html += '<' + defaultTag + '>' + util.HTMLToEntity(text) + '</' + defaultTag + '>';
+                    if (text.length > 0) html += '<' + defaultTag + '>' + util.htmlToEntity(text) + '</' + defaultTag + '>';
                 }
                 return html;
             }
@@ -1851,7 +1849,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const wRegExp = _w.RegExp;
             const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
             const wDoc = typeof html === 'string' ? _d.createRange().createContextualFragment(html) : html;
-            const isFormat = function (current) { return this.isFormatElement(current) || this.isComponent(current); }.bind(util);
+            const isFormat = function (current) { return this.isFormatElement(current) || this.node.isComponent(current); }.bind(this);
 
             let indentSize = this._variable.codeIndentSize * 1;
             indentSize = indentSize > 0 ? new _w.Array(indentSize + 1).join(' ') : '';
@@ -1872,7 +1870,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         continue;
                     }
                     if (node.nodeType === 3) {
-                        if (!util.isList(node.parentElement)) returnHTML += util.HTMLToEntity((/^\n+$/.test(node.data) ? '' : node.data));
+                        if (!util.isList(node.parentElement)) returnHTML += util.htmlToEntity((/^\n+$/.test(node.data) ? '' : node.data));
                         continue;
                     }
                     if (node.childNodes.length === 0) {
@@ -1911,7 +1909,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.plugins = _options.plugins || core.plugins;
             const mergeOptions = [options, _options].reduce(function (init, option) {
                 for (let key in option) {
-                    if (!util.hasOwn(option, key)) continue;
+                    if (!option.hasOwnProperty(key)) continue;
                     if (key === 'plugins' && option[key] && init[key]) {
                         let i = init[key], o = option[key];
                         i = i.length ? i : _w.Object.keys(i).map(function(name) { return i[name]; });
@@ -2075,7 +2073,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     core.execCommand('insertHTML', false, html);
                 }
             } else {
-                if (util.isComponent(html)) {
+                if (this.node.isComponent(html)) {
                     core.component.insert(html, false, checkCharCount, false);
                 } else {
                     let afterNode = null;
@@ -2200,14 +2198,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             util.removeItem(context.element.topArea);
 
             /** remove object reference */
-            for (let k in core.functions) { if (util.hasOwn(core, k)) delete core.functions[k]; }
-            for (let k in core) { if (util.hasOwn(core, k)) delete core[k]; }
-            for (let k in event) { if (util.hasOwn(event, k)) delete event[k]; }
-            for (let k in context) { if (util.hasOwn(context, k)) delete context[k]; }
-            for (let k in pluginCallButtons) { if (util.hasOwn(pluginCallButtons, k)) delete pluginCallButtons[k]; }
+            for (let k in context) { if (context.hasOwnProperty(k)) delete context[k]; }
+            for (let k in pluginCallButtons) { if (pluginCallButtons.hasOwnProperty(k)) delete pluginCallButtons[k]; }
             
             /** remove user object */
-            for (let k in this) { if (util.hasOwn(this, k)) delete this[k]; }
+            for (let k in this) { if (this.hasOwnProperty(k)) delete this[k]; }
         },
 
         /**
@@ -2250,7 +2245,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 // table cells
                 if (util.isTableCell(current)) {
                     const fel = current.firstElementChild;
-                    if (!util.isFormatElement(fel) && !util.isRangeFormatElement(fel) && !util.isComponent(fel)) {
+                    if (!util.isFormatElement(fel) && !util.isRangeFormatElement(fel) && !this.node.isComponent(fel)) {
                         withoutFormatCells.push(current);
                         return false;
                     }
@@ -2258,7 +2253,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 const result = current.parentNode !== documentFragment && nrtag &&
                  ((util.isListCell(current) && !util.isList(current.parentNode)) ||
-                  (lowLevelCheck && (util.isFormatElement(current) || util.isComponent(current)) && !util.isRangeFormatElement(current.parentNode) && !util.getParentElement(current, util.isComponent)));
+                  (lowLevelCheck && (util.isFormatElement(current) || this.node.isComponent(current)) && !util.isRangeFormatElement(current.parentNode) && !util.getParentElement(current, this.node.isComponent)));
 
                 return result;
             }.bind(this));
@@ -2398,7 +2393,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let allAttr = '';
             if (!!_attr) {
                 for (let k in _attr) {
-                    if (!util.hasOwn(_attr, k) || /^on[a-z]+$/i.test(_attr[k])) continue;
+                    if (!_attr.hasOwnProperty(k) || /^on[a-z]+$/i.test(_attr[k])) continue;
                     if (k === 'all') {
                         allAttr = _attr[k] + '|';
                     } else {
@@ -2434,7 +2429,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let filePluginRegExp = [];
             let plugin, button;
             for (let key in plugins) {
-                if (!util.hasOwn(plugins, key)) continue;
+                if (!plugins.hasOwnProperty(key)) continue;
                 plugin = plugins[key];
                 button = pluginCallButtons[key];
                 if (plugin.active && button) {

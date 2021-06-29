@@ -113,7 +113,7 @@ export default {
                 node = selectionNode;
                 active = false;
                 
-                while (node && !util.isFormatElement(node) && !util.isComponent(node)) {
+                while (node && !util.isFormatElement(node) && !this.node.isComponent(node)) {
                     if (node.nodeName.toLowerCase() === btn.getAttribute('data-command').toLowerCase()) {
                         value = data[v];
                         if (/^\./.test(value) ? util.hasClass(node, value.replace(/^\./, '')) : !!node.style[value]) {

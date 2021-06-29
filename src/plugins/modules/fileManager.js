@@ -138,7 +138,7 @@
             
             for (let i = 0, len = tags.length, tag; i < len; i++) {
                 tag = tags[i];
-                if (!this.util.getParentElement(tag, this.util.isMediaComponent) || !fileManagerPlugin._checkMediaComponent(tag)) {
+                if (!this.util.getParentElement(tag, this.node.isComponent) || !fileManagerPlugin._checkMediaComponent(tag)) {
                     currentTags.push(context._infoIndex);
                     modifyHandler(tag);
                 } else if (!tag.getAttribute('data-index') || infoIndex.indexOf(tag.getAttribute('data-index') * 1) < 0) {
@@ -244,7 +244,7 @@
                 }
     
                 if (!element.getAttribute('data-origin')) {
-                    const container = this.util.getParentElement(element, this.util.isMediaComponent);
+                    const container = this.util.getParentElement(element, this.node.isComponent);
                     const cover = this.util.getParentElement(element, 'FIGURE');
         
                     const w = this.plugins.resizing._module_getSizeX.call(this, context, element, cover, container);

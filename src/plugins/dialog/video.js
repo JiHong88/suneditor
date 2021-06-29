@@ -225,7 +225,7 @@ export default {
         if (!attrs) return;
 
         for (let key in attrs) {
-            if (!this.util.hasOwn(attrs, key)) continue;
+            if (!attrs.hasOwnProperty(key)) continue;
             element.setAttribute(key, attrs[key]);
         }
     },
@@ -244,7 +244,7 @@ export default {
         if (!attrs) return;
 
         for (let key in attrs) {
-            if (!this.util.hasOwn(attrs, key)) continue;
+            if (!attrs.hasOwnProperty(key)) continue;
             element.setAttribute(key, attrs[key]);
         }
     },
@@ -645,7 +645,7 @@ export default {
         if (/^video$/i.test(oFrame.nodeName)) this.plugins.video._setTagAttrs.call(this, oFrame);
         else this.plugins.video._setIframeAttrs.call(this, oFrame);
         
-        const existElement = this.util.getParentElement(oFrame, this.util.isMediaComponent) || 
+        const existElement = this.util.getParentElement(oFrame, this.node.isComponent) || 
             this.util.getParentElement(oFrame, function (current) {
                 return this.isWysiwygDiv(current.parentNode);
             }.bind(this.util));
@@ -698,7 +698,7 @@ export default {
         const contextVideo = this.context.video;
         contextVideo._element = element;
         contextVideo._cover = this.util.getParentElement(element, 'FIGURE');
-        contextVideo._container = this.util.getParentElement(element, this.util.isMediaComponent);
+        contextVideo._container = this.util.getParentElement(element, this.node.isComponent);
         contextVideo._align = element.style.float || element.getAttribute('data-align') || 'none';
         element.style.float = '';
 

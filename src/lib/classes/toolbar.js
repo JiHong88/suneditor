@@ -5,7 +5,7 @@
 "use strict";
 
 import CoreInterface from "../../interface/_core";
-import helperDom from "../../helper/dom";
+import domUtil from "../../helper/dom";
 
 function Toolbar(editor) {
 	CoreInterface.call(this, editor);
@@ -84,7 +84,7 @@ Toolbar.prototype = {
 		pluginCallButtons = newToolbar.pluginCallButtons;
 		let plugin, button, oldButton;
 		for (let key in pluginCallButtons) {
-			if (!util.hasOwn(pluginCallButtons, key)) continue;
+			if (!pluginCallButtons.hasOwnProperty(key)) continue;
 			plugin = plugins[key];
 			button = pluginCallButtons[key];
 			if (plugin.active && button) {
@@ -110,7 +110,7 @@ Toolbar.prototype = {
 		const element = context.element;
 		const editorHeight = element.editorArea.offsetHeight;
 		const y = (this.scrollY || _d.documentElement.scrollTop) + options.stickyToolbar;
-		const editorTop = helperDom.getGlobalOffset(options.toolbarContainer).top - (core._isInline ? element.toolbar.offsetHeight : 0);
+		const editorTop = domUtil.getGlobalOffset(options.toolbarContainer).top - (core._isInline ? element.toolbar.offsetHeight : 0);
 		const inlineOffset = core._isInline && y - editorTop > 0 ? y - editorTop - context.element.toolbar.offsetHeight : 0;
 
 		if (y < editorTop) {
@@ -198,7 +198,7 @@ Toolbar.prototype = {
 		let scrollTop = globalScroll.top;
 
 		const editorWidth = topArea.offsetWidth;
-		const offsets = helperDom.getGlobalOffset(context.element.topArea);
+		const offsets = domUtil.getGlobalOffset(context.element.topArea);
 		const stickyTop = offsets.top;
 		const editorLeft = offsets.left;
 
@@ -283,7 +283,7 @@ Toolbar.prototype = {
 		let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
 
 		let resetTop = false;
-		const space = t + (isDirTop ? helperDom.getGlobalOffset(context.element.topArea).top : toolbar.offsetHeight - context.element.wysiwyg.offsetHeight);
+		const space = t + (isDirTop ? domUtil.getGlobalOffset(context.element.topArea).top : toolbar.offsetHeight - context.element.wysiwyg.offsetHeight);
 		if (!isDirTop && space > 0 && event._getPageBottomSpace() < space) {
 			isDirTop = true;
 			resetTop = true;
@@ -312,7 +312,7 @@ Toolbar.prototype = {
 	},
 
 	_getPageBottomSpace: function () {
-		return _d.documentElement.scrollHeight - (helperDom.getGlobalOffset(context.element.topArea).top + context.element.topArea.offsetHeight);
+		return _d.documentElement.scrollHeight - (domUtil.getGlobalOffset(context.element.topArea).top + context.element.topArea.offsetHeight);
 	},
 
 	_showInline: function () {

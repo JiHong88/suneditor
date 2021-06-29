@@ -177,7 +177,7 @@ export default {
         if (!attrs) return;
 
         for (let key in attrs) {
-            if (!this.util.hasOwn(attrs, key)) continue;
+            if (!attrs.hasOwnProperty(key)) continue;
             element.setAttribute(key, attrs[key]);
         }
     },
@@ -206,7 +206,7 @@ export default {
      */
     destroy: function (element) {
         element = element || this.context.audio._element;
-        const container = this.util.getParentElement(element, this.util.isComponent) || element;
+        const container = this.util.getParentElement(element, this.node.isComponent) || element;
         const dataIndex = element.getAttribute('data-index') * 1;
         const focusEl = (container.previousElementSibling || container.nextElementSibling);
 
@@ -454,7 +454,7 @@ export default {
         this.plugins.audio._setTagAttrs.call(this, element);
         
         // find component element
-        const existElement = this.util.getParentElement(element, this.util.isMediaComponent) || 
+        const existElement = this.util.getParentElement(element, this.node.isComponent) || 
             this.util.getParentElement(element, function (current) {
                 return this.isWysiwygDiv(current.parentNode);
             }.bind(this.util));
@@ -494,7 +494,7 @@ export default {
         this.util.addClass(selectionTag, 'active');
         contextAudio._element = selectionTag;
         contextAudio._cover = this.util.getParentElement(selectionTag, 'FIGURE');
-        contextAudio._container = this.util.getParentElement(selectionTag, this.util.isComponent);
+        contextAudio._container = this.util.getParentElement(selectionTag, this.node.isComponent);
     },
 
     /**

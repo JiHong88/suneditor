@@ -195,8 +195,8 @@ export default {
         if (/update/.test(command)) {
             this.plugins.dialog.open.call(this, 'link', true);
         } else if (/unlink/.test(command)) {
-            const sc = this.util.getChildElement(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
-            const ec = this.util.getChildElement(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
+            const sc = this.util.getEdgeChild(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
+            const ec = this.util.getEdgeChild(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
             this.setRange(sc, 0, ec, ec.textContent.length);
             this.applyStyleNode(null, null, ['A'], false);
         } else {

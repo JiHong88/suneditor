@@ -286,8 +286,8 @@ export default {
             this.plugins.dialog.open.call(this, 'customLink', true);
         }
         else if (/unlink/.test(command)) {
-            const sc = this.util.getChildElement(this.context.customLink._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
-            const ec = this.util.getChildElement(this.context.customLink._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
+            const sc = this.util.getEdgeChild(this.context.customLink._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
+            const ec = this.util.getEdgeChild(this.context.customLink._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
             this.setRange(sc, 0, ec, ec.textContent.length);
             this.applyStyleNode(null, null, ['A'], false);
         }

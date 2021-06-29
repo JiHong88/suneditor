@@ -56,7 +56,7 @@ export function isAndroid() {
 	return userAgent.indexOf("android") > -1;
 }
 
-export const _allowedEmptyNodeList = '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas';
+export const _allowedEmptyNodeList = '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details';
 
 const env = {
 	isIE: isIE(),

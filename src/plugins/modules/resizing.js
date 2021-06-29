@@ -417,7 +417,7 @@
             align = align === 'none' ? 'basic' : align;
     
             // text
-            const container = this.util.getParentElement(targetElement, this.util.isComponent);
+            const container = this.util.getParentElement(targetElement, this.node.isComponent);
             const cover = this.util.getParentElement(targetElement, 'FIGURE');
             const displayX = this.plugins.resizing._module_getSizeX.call(this, contextPlugin, targetElement, cover, container) || 'auto';
             const displayY = contextPlugin._onlyPercentage && plugin === 'image' ? '' : ', ' + (this.plugins.resizing._module_getSizeY.call(this, contextPlugin, targetElement, cover, container) || 'auto');
@@ -460,7 +460,7 @@
                 contextResizing.captionButton.style.display = 'none';
             } else {
                 contextResizing.captionButton.style.display = '';
-                if (this.util.getChildElement(targetElement.parentNode, 'figcaption')) {
+                if (this.util.getEdgeChild(targetElement.parentNode, 'figcaption')) {
                     this.util.addClass(contextResizing.captionButton, 'active');
                     contextPlugin._captionChecked = true;
                 } else {
@@ -478,8 +478,8 @@
             }
 
             this.setControllerPosition(contextResizing.resizeButton, resizeContainer, 'bottom', addOffset);
-            this.controllersOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabledButtons.bind(this, false, this.resizingDisabledButtons), targetElement, plugin);
-            this.util.setDisabledButtons(true, this.resizingDisabledButtons);
+            this.controllersOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabled.bind(null, false, this.resizingDisabledButtons), targetElement, plugin);
+            this.util.setDisabled(true, this.resizingDisabledButtons);
     
             contextResizing._resize_w = w;
             contextResizing._resize_h = h;
@@ -605,7 +605,7 @@
                     currentModule.update_image.call(this, false, false, false);
     
                     if (caption) {
-                        const captionText = this.util.getChildElement(currentContext._caption, function (current) {
+                        const captionText = this.util.getEdgeChild(currentContext._caption, function (current) {
                             return current.nodeType === 3;
                         });
     
@@ -745,7 +745,7 @@
          * @param {Element} element Target element (not caption element)
          */
         setCaptionPosition: function (element) {
-            const figcaption = this.util.getChildElement(this.util.getParentElement(element, 'FIGURE'), 'FIGCAPTION');
+            const figcaption = this.util.getEdgeChild(this.util.getParentElement(element, 'FIGURE'), 'FIGCAPTION');
             if (figcaption) {
                 figcaption.style.marginTop = (this.context.resizing._rotateVertical ? element.offsetWidth - element.offsetHeight : 0) + 'px';
             }
