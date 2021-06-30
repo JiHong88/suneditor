@@ -1,4 +1,4 @@
-class domUtil {
+class domUtils {
 	/**
 	 * @description Create Element node
 	 * @param elementName Element name
@@ -342,4 +342,4 @@ class domUtil {
 	isUneditable(element: Element): boolean;
 }
 
-export default domUtil;
+export default domUtils;

@@ -2,14 +2,14 @@ import Global from "./global";
 import Env from "./env";
 import Unicode from "./unicode";
 import Converter from "./converter";
-import DomUtil from "./domUtil";
+import domUtils from "./domUtils";
 import Numbers from "./numbers";
 
 export const global = Global;
 export const env = Env;
 export const unicode = Unicode;
 export const converter = Converter;
-export const domUtil = DomUtil;
+export const domUtils = domUtils;
 export const numbers = Numbers;
 
 const helper = {
@@ -17,7 +17,7 @@ const helper = {
 	env: env,
 	unicode: unicode,
 	converter: converter,
-	domUtil: domUtil,
+	domUtils: domUtils,
 	numbers: numbers,
 };
 

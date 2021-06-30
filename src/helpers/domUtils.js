@@ -806,7 +806,7 @@ export function isUneditable(element) {
 	return element && this.hasClass(element, "__se__uneditable");
 }
 
-const domUtil = {
+const domUtils = {
 	createElement: createElement,
 	createTextNode: createTextNode,
 	getIframeDocument: getIframeDocument,
@@ -851,4 +851,4 @@ const domUtil = {
 	isUneditable: isUneditable
 };
 
-export default domUtil;
+export default domUtils;

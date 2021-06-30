@@ -8,7 +8,7 @@
 'use strict';
 
 import { _w, _d } from "../helpers/global"
-import { domUtil } from '../helpers';
+import { domUtils } from '../helpers';
 import Constructor from './constructor';
 import Context from './context';
 import history from './history';
@@ -647,7 +647,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const toolbar = this.context.element.toolbar;
             const toolbarW = toolbar.offsetWidth;
-            const toolbarOffset = domUtil.getGlobalOffset(context.element.toolbar);
+            const toolbarOffset = domUtils.getGlobalOffset(context.element.toolbar);
             const menuW = menu.offsetWidth;
             const l = element.parentElement.offsetLeft + 3;
 
@@ -657,7 +657,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const rtlW = menuW > elementW ? menuW - elementW : 0;
                 const rtlL = rtlW > 0 ? 0 : elementW - menuW;
                 menu.style.left = (l - rtlW + rtlL) + 'px';
-                if (toolbarOffset.left > domUtil.getGlobalOffset(menu).left) {
+                if (toolbarOffset.left > domUtils.getGlobalOffset(menu).left) {
                     menu.style.left = '0px';
                 }
             } else {
@@ -806,7 +806,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         setControllerPosition: function (controller, referEl, position, addOffset) {
             if (options.rtl) addOffset.left *= -1;
 
-            const offset = domUtil.getOffset(referEl, context.element.wysiwygFrame);
+            const offset = domUtils.getOffset(referEl, context.element.wysiwygFrame);
             controller.style.visibility = 'hidden';
             controller.style.display = 'block';
 
@@ -1215,7 +1215,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             this._checkPlaceholder();
-            if (this.isReadOnly) domUtil.setDisabled(true, this.resizingDisabledButtons);
+            if (this.isReadOnly) domUtils.setDisabled(true, this.resizingDisabledButtons);
 
             // user event
             if (typeof this.events.toggleCodeView === 'function') this.events.toggleCodeView(this._variable.isCodeView);
@@ -2046,7 +2046,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.code.removeAttribute("readOnly");
             }
 
-            domUtil.setDisabled(!!value, core.resizingDisabledButtons);
+            domUtils.setDisabled(!!value, core.resizingDisabledButtons);
             if (options.codeMirrorEditor) options.codeMirrorEditor.setOption('readOnly', !!value);
         },
 

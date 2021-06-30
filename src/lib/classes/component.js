@@ -5,7 +5,7 @@
 "use strict";
 
 import CoreInterface from "../../interface/_core";
-import domUtil from "../../helpers/dom";
+import domUtils from "../../helpers/dom";
 
 function Component(editor) {
 	CoreInterface.call(this, editor);
@@ -136,11 +136,11 @@ Component.prototype = {
 		if (isList ? !container.previousSibling : !util.isFormatElement(container.previousElementSibling)) {
 			this._variable._lineBreakComp = container;
 			wScroll = context.element.wysiwyg.scrollTop;
-			componentTop = domUtil.getOffset(element, context.element.wysiwygFrame).top + wScroll;
+			componentTop = domUtils.getOffset(element, context.element.wysiwygFrame).top + wScroll;
 			w = target.offsetWidth / 2 / 2;
 
 			t_style.top = componentTop - wScroll - 12 + "px";
-			t_style.left = domUtil.getOffset(target).left + w + "px";
+			t_style.left = domUtils.getOffset(target).left + w + "px";
 			t_style.display = "block";
 		} else {
 			t_style.display = "none";
@@ -150,12 +150,12 @@ Component.prototype = {
 			if (!componentTop) {
 				this._variable._lineBreakComp = container;
 				wScroll = context.element.wysiwyg.scrollTop;
-				componentTop = domUtil.getOffset(element, context.element.wysiwygFrame).top + wScroll;
+				componentTop = domUtils.getOffset(element, context.element.wysiwygFrame).top + wScroll;
 				w = target.offsetWidth / 2 / 2;
 			}
 
 			b_style.top = componentTop + target.offsetHeight - wScroll - 12 + "px";
-			b_style.left = domUtil.getOffset(target).left + target.offsetWidth - w - 24 + "px";
+			b_style.left = domUtils.getOffset(target).left + target.offsetWidth - w - 24 + "px";
 			b_style.display = "block";
 		} else {
 			b_style.display = "none";

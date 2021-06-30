@@ -2,7 +2,7 @@ import global from "./global.d";
 import env from "./env.d";
 import unicode from "./unicode.d";
 import converter from "./converter.d";
-import domUtil from "./domUtil";
+import domUtils from "./domUtils.d";
 import numbers from "./numbers.d";
 
 class helper {
@@ -10,7 +10,7 @@ class helper {
 	env: env;
 	unicode: unicode;
 	converter: converter;
-	domUtil: domUtil;
+	domUtils: domUtils;
 	numbers: numbers
 };
 

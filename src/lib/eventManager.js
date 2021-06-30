@@ -5,7 +5,7 @@
 "use strict";
 
 import EditorInterface from "../interface/editor";
-import domUtil from "../helpers/dom";
+import domUtils from "../helpers/dom";
 
 function eventManager(editor) {
 	EditorInterface.call(this, editor);
@@ -1583,8 +1583,8 @@ function OnMouseMove_wysiwyg(e) {
 		} while (el && !/^(BODY|HTML)$/i.test(el.nodeName));
 
 		const wScroll = ctxEl.wysiwyg.scrollTop;
-		const offsets = domUtil.getGlobalOffset(context.element.topArea);
-		const componentTop = domUtil.getOffset(component, ctxEl.wysiwygFrame).top + wScroll;
+		const offsets = domUtils.getGlobalOffset(context.element.topArea);
+		const componentTop = domUtils.getOffset(component, ctxEl.wysiwygFrame).top + wScroll;
 		const y = e.pageY + scrollTop + (options.iframe && !options.toolbarContainer ? ctxEl.toolbar.offsetHeight : 0);
 		const c = componentTop + (options.iframe ? scrollTop : offsets.top);
 
@@ -1605,7 +1605,7 @@ function OnMouseMove_wysiwyg(e) {
 		core._variable._lineBreakComp = component;
 		core._variable._lineBreakDir = dir;
 		lineBreakerStyle.top = top - wScroll + "px";
-		core._lineBreakerButton.style.left = domUtil.getOffset(component).left + component.offsetWidth / 2 - 15 + "px";
+		core._lineBreakerButton.style.left = domUtils.getOffset(component).left + component.offsetWidth / 2 - 15 + "px";
 		lineBreakerStyle.display = "block";
 	} // off line breaker
 	else if (lineBreakerStyle.display !== "none") {
