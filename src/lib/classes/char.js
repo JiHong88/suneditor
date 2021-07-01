@@ -18,7 +18,7 @@ Char.prototype = {
 	/**
 	 * @description Returns false if char count is greater than "options.maxCharCount" when "html" is added to the current editor.
 	 * @param {Node|String} html Element node or String.
-	 * @returns {Boolean}
+	 * @returns {boolean}
 	 */
 	check: function (html) {
 		if (this.options.maxCharCount) {
@@ -35,7 +35,7 @@ Char.prototype = {
 	 * @description Get the [content]'s number of characters or binary data size. (options.charCounterType)
 	 * If [content] is undefined, get the current editor's number of characters or binary data size.
 	 * @param {String|undefined} content Content to count. (defalut: this.context.element.wysiwyg)
-	 * @returns {Number}
+	 * @returns {number}
 	 */
 	getLength: function (content) {
 		if (typeof content !== "string") {
@@ -61,8 +61,8 @@ Char.prototype = {
 	 * @description Returns false if char count is greater than "options.maxCharCount" when "inputText" is added to the current editor.
 	 * If the current number of characters is greater than "maxCharCount", the excess characters are removed.
 	 * And call the char.display()
-	 * @param {String} inputText Text added.
-	 * @returns {Boolean}
+	 * @param {string} inputText Text added.
+	 * @returns {boolean}
 	 */
 	test: function (inputText) {
 		const maxCharCount = this.options.maxCharCount;
@@ -120,8 +120,8 @@ function CounterBlink(charWrapper) {
 /**
  * @descriptionGets Get the length in bytes of a string.
  * referencing code: "https://github.com/shaan1974/myrdin/blob/master/expressions/string.js#L11"
- * @param {String} text String text
- * @returns {Number}
+ * @param {string} text String text
+ * @returns {number}
  */
 function GetByteLength(text) {
 	if (!text || !text.toString) return 0;

@@ -310,23 +310,6 @@ export interface Core {
     closeLoading(): void;
 
     /**
-     * @description Delete selected node and insert argument value node and return.
-     * If the "afterNode" exists, it is inserted after the "afterNode"
-     * Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
-     * @param oNode Element to be inserted
-     * @param afterNode If the node exists, it is inserted after the node
-     * @returns
-     */
-    insertNode(oNode: Node, afterNode?: Node, checkCharCount?: boolean): { startOffset: Node, endOffset: number } | Node | null;
-    
-    /**
-     * @description Delete the currently selected nodes and reset selection range
-     * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
-     * @returns
-     */
-    removeNode(): { container: Node; offset: number; prevContainer?: Node };
-
-    /**
      * @description Run plugin calls and basic commands.
      * @param command Command string
      * @param display Display type string ('command', 'submenu', 'dialog', 'container')

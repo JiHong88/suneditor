@@ -128,7 +128,7 @@
 
         /**
          * @description Open a file browser plugin
-         * @param {String} pluginName Plugin name using the file browser
+         * @param {string} pluginName Plugin name using the file browser
          * @param {Function|null} selectorHandler When the function comes as an argument value, it substitutes "context.selectorHandler".
          */
         open: function (pluginName, selectorHandler)  {

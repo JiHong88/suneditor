@@ -1,7 +1,7 @@
 /**
  * @description Convert HTML string to HTML Entity
- * @param {String} contents
- * @returns {String} Contents string
+ * @param {string} contents
+ * @returns {string} Contents string
  * @private
  */
 export function htmlToEntity(contents) {
@@ -20,8 +20,8 @@ export function htmlToEntity(contents) {
 
 /**
  * @description Convert HTML Entity to HTML string
- * @param {String} contents Contents string
- * @returns {String}
+ * @param {string} contents Contents string
+ * @returns {string}
  */
 export function entityToHTML(contents) {
 	const ec = {
@@ -40,7 +40,7 @@ export function entityToHTML(contents) {
 /**
  * @description Create whitelist RegExp object.
  * Return RegExp format: new RegExp("<\\/?\\b(?!" + list + ")\\b[^>^<]*+>", "gi")
- * @param {String} list Tags list ("br|p|div|pre...")
+ * @param {string} list Tags list ("br|p|div|pre...")
  * @returns {RegExp}
  */
 export function createTagsWhitelist(list) {

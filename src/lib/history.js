@@ -144,7 +144,7 @@ export default function (core, change) {
 		/**
 		 * @description Go to the history stack for that index.
 		 * If "index" is -1, go to the last stack
-		 * @param {Number} index Stack index
+		 * @param {number} index Stack index
 		 */
 		go: function (index) {
 			stackIndex = index < 0 ? stack.length - 1 : index;
@@ -153,7 +153,7 @@ export default function (core, change) {
 
 		/**
 		 * @description Get the current history stack index.
-		 * @returns {Number} Current Stack index
+		 * @returns {number} Current Stack index
 		 */
 		getCurrentIndex: function () {
 			return stackIndex;

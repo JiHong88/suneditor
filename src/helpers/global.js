@@ -30,7 +30,7 @@ export function getXMLHttpRequest() {
  * @deprecated
  * @description Returns the CSS text that has been applied to the current page.
  * @param {Document|null} doc To get the CSS text of an document(core._wd). If null get the current document.
- * @returns {String} Styles string
+ * @returns {string} Styles string
  */
 export function getPageStyle(doc) {
 	let cssText = "";
@@ -58,8 +58,8 @@ export function getPageStyle(doc) {
  * @description Get the the tag path of the arguments value
  * If not found, return the first found value
  * @param {Array} nameArray File name array
- * @param {String} extension js, css
- * @returns {String}
+ * @param {string} extension js, css
+ * @returns {string}
  */
 export function getIncludePath(nameArray, extension) {
 	let path = "";

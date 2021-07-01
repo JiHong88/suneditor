@@ -2,6 +2,34 @@ import CoreInterface from "../../interface/_core";
 
 class Format extends CoreInterface {
 	/**
+	 * @description Replace the line tag of the current selection.
+	 * @param element Line element (P, DIV..)
+	 */
+	setLine(element: Element): void;
+
+	/**
+	 * @description If a parent node that contains an argument node finds a format node (node.isLine), it returns that node.
+	 * @param node Reference node.
+	 * @param validation Additional validation function.
+	 * @returns
+	 */
+	getLine(node: Node, validation?: Function | null): Element | null;
+
+	/**
+	 * @description Replace the br-line tag of the current selection. 
+	 * @param element Line element (P, DIV..)
+	 */
+	setBrLine(element: Element)
+	
+	/**
+	 * @description If a parent node that contains an argument node finds a free format node (util.isBrLine), it returns that node.
+	 * @param element Reference node.
+	 * @param validation Additional validation function.
+	 * @returns
+	 */
+	getBrLine(node: Node, validation?: Function | null): Element | null;
+	
+	/**
 	 * @description Append format element to sibling node of argument element.
 	 * If the "formatNodeName" argument value is present, the tag of that argument value is inserted,
 	 * If not, the currently selected format tag is inserted.
@@ -12,11 +40,12 @@ class Format extends CoreInterface {
 	appendLine(element: Element, formatNode?: string | Element): Element;
 
 	/**
-	 * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore "__se__format__" class
-	 * @param originEl Origin element
-	 * @param copyEl Element to copy
+	 * @description If a parent node that contains an argument node finds a format node (util.isRangeBlock), it returns that node.
+	 * @param element Reference node.
+	 * @param validation Additional validation function.
+	 * @returns
 	 */
-	copyAttributes(originEl: Element, copyEl: Element): void;
+	getRangeBlock(element: Node, validation?: Function): Element | null;
 
 	/**
 	 * @description Appended all selected format Element to the argument element and insert
@@ -59,24 +88,6 @@ class Format extends CoreInterface {
 	 * @returns {sc: <LI>, ec: <LI>}.
 	 */
 	removeList(selectedCells: Element[], remove: boolean): { sc: Element; ec: Element };
-
-	/**
-	 * @description Nest list cells or cancel nested cells.
-	 * @param selectedCells List cells.
-	 * @param nested Nested or cancel nested.
-	 * @private
-	 */
-	_applyNestedList(selectedCells: Element[], nested: boolean): void;
-
-	/**
-	 * @description Detach Nested all nested lists under the "baseNode".
-	 * Returns a list with nested removed.
-	 * @param baseNode Element on which to base.
-	 * @param all If true, it also detach all nested lists of a returned list.
-	 * @returns
-	 * @private
-	 */
-	_removeNestedList(baseNode: Node, all: boolean): Element;
 
 	/**
 	 * @description Indent more the selected lines.
@@ -123,37 +134,11 @@ class Format extends CoreInterface {
 	removeStyleNode(): void;
 
 	/**
-	 * @description If a parent node that contains an argument node finds a line element, it returns that node.
-	 * @param element Reference node.
-	 * @param validation Additional validation function.
-	 * @returns
+	 * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore "__se__format__" class
+	 * @param originEl Origin element
+	 * @param copyEl Element to copy
 	 */
-	getLine(element: Node, validation?: Function): Element | null;
-
-	/**
-	 * @description If a parent node that contains an argument node finds a format node (util.isRangeFormatElement), it returns that node.
-	 * @param element Reference node.
-	 * @param validation Additional validation function.
-	 * @returns
-	 */
-	getRangeBlock(element: Node, validation?: Function): Element | null;
-
-	/**
-	 * @description If a parent node that contains an argument node finds a free format node (util.isFreeFormatElement), it returns that node.
-	 * @param element Reference node.
-	 * @param validation Additional validation function.
-	 * @returns
-	 */
-	getBrLine(element: Node, validation?: Function): Element | null;
-
-	/**
-	 * @description Check if the container and offset values are the edges of the "line"
-	 * @param container The container property of the selection object.
-	 * @param offset The offset property of the selection object.
-	 * @param dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
-	 * @returns
-	 */
-	isEdgeFormat(container: Node, offset: number, dir: "front" | "end"): boolean;
+	copyAttributes(originEl: Element, copyEl: Element): void;
 }
 
 export default Format;

@@ -91,8 +91,8 @@
 
         /**
          * @description Open a Dialog plugin
-         * @param {String} kind Dialog plugin name
-         * @param {Boolean} update Whether it will open for update ('image' === this.currentControllerName)
+         * @param {string} kind Dialog plugin name
+         * @param {boolean} update Whether it will open for update ('image' === this.currentControllerName)
          */
         open: function (kind, update)  {
             if (this.modalForm) return false;

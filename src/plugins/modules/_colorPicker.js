@@ -32,7 +32,7 @@ export default {
      * @description Create color list
      * @param {Object} core Core object 
      * @param {Function} makeColor this._makeColorList
-     * @returns {String} HTML string
+     * @returns {string} HTML string
      */
     createColorList: function (core, makeColor) {
         const option = core.options;
@@ -128,7 +128,7 @@ export default {
 
     /**
      * @description Store color values
-     * @param {String} hexColorStr Hax color value
+     * @param {string} hexColorStr Hax color value
      */
     setCurrentColor: function (hexColorStr) {
         this.context.colorPicker._currentColor = hexColorStr;
@@ -137,7 +137,7 @@ export default {
 
     /**
      * @description Set color at input element
-     * @param {String} hexColorStr Hax color value
+     * @param {string} hexColorStr Hax color value
      */
     setInputText: function (hexColorStr) {
         hexColorStr = /^#/.test(hexColorStr) ? hexColorStr : '#' + hexColorStr;
@@ -148,7 +148,7 @@ export default {
     /**
      * @description Gets color value at color property of node
      * @param {Node} node Selected node 
-     * @returns {String}
+     * @returns {string}
      */
     getColorInNode: function (node) {
         let findColor = '';
@@ -164,7 +164,7 @@ export default {
 
     /**
      * @description Function to check hex format color
-     * @param {String} str Color value
+     * @param {string} str Color value
      */
     isHexColor: function (str) {
         return /^#[0-9a-f]{3}(?:[0-9a-f]{3})?$/i.test(str);
@@ -172,8 +172,8 @@ export default {
 
     /**
      * @description Function to convert hex format to a rgb color
-     * @param {String} rgb RGB color format
-     * @returns {String}
+     * @param {string} rgb RGB color format
+     * @returns {string}
      */
     rgb2hex: function (rgb) {
         const rgbMatch = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
@@ -186,8 +186,8 @@ export default {
 
     /**
      * @description Converts color values of other formats to hex color values and returns.
-     * @param {String} colorName Color value
-     * @returns {String}
+     * @param {string} colorName Color value
+     * @returns {string}
      */
     colorName2hex: function (colorName) {
         if (/^#/.test(colorName)) return colorName;

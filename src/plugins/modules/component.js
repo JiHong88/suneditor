@@ -26,7 +26,7 @@
         /**
          * @description Create a container for the resizing component and insert the element.
          * @param {Element} cover Cover element (FIGURE)
-         * @param {String} className Class name of container (fixed: se-component)
+         * @param {string} className Class name of container (fixed: se-component)
          * @returns {Element} Created container element
          */
         set_container: function (cover, className) {
@@ -51,7 +51,7 @@
 
         /**
          * @description Return HTML string of caption(FIGCAPTION) element
-         * @returns {String}
+         * @returns {string}
          */
         create_caption: function () {
             const caption = this.util.createElement('FIGCAPTION');

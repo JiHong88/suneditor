@@ -92,7 +92,7 @@ export default {
         if (!element) {
             this.util.changeElement(target, alignContext.icons[alignContext.defaultDir]);
             targetButton.removeAttribute('data-focus');
-        } else if (this.util.isFormatElement(element)) {
+        } else if (this.util.isLine(element)) {
             const textAlign = element.style.textAlign;
             if (textAlign) {
                 this.util.changeElement(target, alignContext.icons[textAlign] || alignContext.icons[alignContext.defaultDir]);

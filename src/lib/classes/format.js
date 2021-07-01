@@ -12,7 +12,15 @@ const Format = function (editor) {
 };
 
 Format.prototype = {
-	setLine: function () {
+	/**
+	 * @description Replace the line tag of the current selection.
+	 * @param {Element} element Line element (P, DIV..)
+	 */
+	setLine: function (element) {
+		if (!this.node.isBrLine(element)) {
+			throw new Error('[SUNEDITOR.format.setLine.fail] The "element" must satisfy "node.isLine()".');
+		}
+
 		const info = this._lineWork();
 		const lines = info.lines;
 		let firstNode = info.firstNode;
@@ -26,7 +34,7 @@ Format.prototype = {
 					(node.className.match(/(\s|^)__se__format__[^\s]+/) || [""])[0].trim() !== className) &&
 				!util.isComponent(node)
 			) {
-				newFormat = tag.cloneNode(false);
+				newFormat = element.cloneNode(false);
 				this.copyAttributes(newFormat, node);
 				newFormat.innerHTML = node.innerHTML;
 
@@ -50,35 +58,43 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description If a parent node that contains an argument node finds a format node (util.isFormatElement), it returns that node.
-	 * @param {Node} element Reference node.
+	 * @description If a parent node that contains an argument node finds a format node (node.isLine), it returns that node.
+	 * @param {Node} node Reference node.
 	 * @param {Function|null} validation Additional validation function.
 	 * @returns {Element|null}
 	 */
-	getLine: function (element, validation) {
-		if (!element) return null;
+	getLine: function (node, validation) {
+		if (!node) return null;
 		if (!validation) {
 			validation = function () {
 				return true;
 			};
 		}
 
-		while (element) {
-			if (this.isWysiwygDiv(element)) return null;
-			if (this.isRangeFormatElement(element)) element.firstElementChild;
-			if (this.isFormatElement(element) && validation(element)) return element;
+		while (node) {
+			if (this.isWysiwygDiv(node)) return null;
+			if (this.isRangeBlock(node)) node.firstElementChild;
+			if (this.isLine(node) && validation(node)) return node;
 
-			element = element.parentNode;
+			node = node.parentNode;
 		}
 
 		return null;
 	},
 
-	setBrLine: function () {
+	/**
+	 * @description Replace the br-line tag of the current selection. 
+	 * @param {Element} element Line element (P, DIV..)
+	 */
+	setBrLine: function (element) {
+		if (!this.node.isBrLine(element)) {
+			throw new Error('[SUNEDITOR.format.setBrLine.fail] The "element" must satisfy "node.isBrLine()".');
+		}
+
 		const lines = this._lineWork().lines;
 		const len = lines.length - 1;
 		let parentNode = lines[len].parentNode;
-		let freeElement = tag.cloneNode(false);
+		let freeElement = element.cloneNode(false);
 		const focusElement = freeElement;
 
 		for (let i = len, f, html, before, next, inner, isComp, first = true; i >= 0; i--) {
@@ -92,7 +108,7 @@ Format.prototype = {
 			});
 
 			if (parentNode !== f.parentNode || isComp) {
-				if (util.isFormatElement(parentNode)) {
+				if (util.isLine(parentNode)) {
 					parentNode.parentNode.insertBefore(freeElement, parentNode.nextSibling);
 					parentNode = parentNode.parentNode;
 				} else {
@@ -106,7 +122,7 @@ Format.prototype = {
 					util.removeItem(next);
 				}
 
-				freeElement = tag.cloneNode(false);
+				freeElement = element.cloneNode(false);
 				first = true;
 			}
 
@@ -139,7 +155,7 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description If a parent node that contains an argument node finds a free format node (util.isFreeFormatElement), it returns that node.
+	 * @description If a parent node that contains an argument node finds a free format node (util.isBrLine), it returns that node.
 	 * @param {Node} element Reference node.
 	 * @param {Function|null} validation Additional validation function.
 	 * @returns {Element|null}
@@ -154,7 +170,7 @@ Format.prototype = {
 
 		while (element) {
 			if (this.isWysiwygDiv(element)) return null;
-			if (this.isFreeFormatElement(element) && validation(element)) return element;
+			if (this.isBrLine(element) && validation(element)) return element;
 
 			element = element.parentNode;
 		}
@@ -175,13 +191,13 @@ Format.prototype = {
 
 		const currentFormatEl = util.getFormatElement(this.getSelectionNode(), null);
 		let oFormat = null;
-		if (util.isFreeFormatElement(currentFormatEl || element.parentNode)) {
+		if (util.isBrLine(currentFormatEl || element.parentNode)) {
 			oFormat = util.createElement('BR');
 		} else {
-			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : (util.isFormatElement(currentFormatEl) && !util.isRangeFormatElement(currentFormatEl) && !util.isFreeFormatElement(currentFormatEl)) ? currentFormatEl.nodeName : options.defaultTag;
+			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : (util.isLine(currentFormatEl) && !util.isRangeBlock(currentFormatEl) && !util.isBrLine(currentFormatEl)) ? currentFormatEl.nodeName : options.defaultTag;
 			oFormat = util.createElement(oFormatName);
 			oFormat.innerHTML = '<br>';
-			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && util.isFormatElement(currentFormatEl))) {
+			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && util.isLine(currentFormatEl))) {
 				util.copyTagAttributes(oFormat, lineNode || currentFormatEl);
 			}
 		}
@@ -193,7 +209,7 @@ Format.prototype = {
 	},
 
 	/**
-	 * @description If a parent node that contains an argument node finds a format node (util.isRangeFormatElement), it returns that node.
+	 * @description If a parent node that contains an argument node finds a format node (util.isRangeBlock), it returns that node.
 	 * @param {Node} element Reference node.
 	 * @param {Function|null} validation Additional validation function.
 	 * @returns {Element|null}
@@ -209,7 +225,7 @@ Format.prototype = {
 		while (element) {
 			if (this.isWysiwygDiv(element)) return null;
 			if (
-				this.isRangeFormatElement(element) &&
+				this.isRangeBlock(element) &&
 				!/^(THEAD|TBODY|TR)$/i.test(element.nodeName) &&
 				validation(element)
 			)
@@ -265,7 +281,7 @@ Format.prototype = {
 		let last = rangeLines[rangeLines.length - 1];
 		let standTag, beforeTag, pElement;
 
-		if (util.isRangeFormatElement(last) || util.isFormatElement(last)) {
+		if (util.isRangeBlock(last) || util.isLine(last)) {
 			standTag = last;
 		} else {
 			standTag = this.getRangeBlock(last, null) || this.getLine(last, null);
@@ -286,7 +302,7 @@ Format.prototype = {
 			let cc = null;
 			if (parent !== origin && !util.isTable(origin)) {
 				if (origin && util.getElementDepth(parent) === util.getElementDepth(origin)) return before;
-				cc = util.removeItemAllParents(origin, null, parent);
+				cc = util.removeAllParents(origin, null, parent);
 			}
 
 			return cc ? cc.ec : before;
@@ -390,7 +406,7 @@ Format.prototype = {
 			const depthFormat = util.getParentElement(
 				beforeTag,
 				function (current) {
-					return this.isRangeFormatElement(current) && !this.isList(current);
+					return this.isRangeBlock(current) && !this.isList(current);
 				}.bind(util)
 			);
 			const splitRange = this.editor.node.split(
@@ -423,8 +439,8 @@ Format.prototype = {
 	 * @param {Array|null} selectedFormats Array of format elements (P, DIV, LI...) to remove.
 	 * If null, Applies to all elements and return {cc: parentNode, sc: nextSibling, ec: previousSibling}
 	 * @param {Element|null} newRangeElement The node(rangeElement) to replace the currently wrapped node.
-	 * @param {Boolean} remove If true, deleted without detached.
-	 * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
+	 * @param {boolean} remove If true, deleted without detached.
+	 * @param {boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
 	 * @returns {Object}
 	 */
 	removeRangeBlock: function (rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush) {
@@ -661,9 +677,9 @@ Format.prototype = {
 
 	/**
 	 * @description Append all selected format Element to the list and insert.
-	 * @param {String} type List type. (bullet | numbered):[listStyleType]
+	 * @param {string} type List type. (bullet | numbered):[listStyleType]
 	 * @param {Element} selectedCells Format elements or list cells.
-	 * @param {Boolean} nested If true, indenting existing list cells.
+	 * @param {boolean} nested If true, indenting existing list cells.
 	 */
 	applyList: function (type, selectedCells, nested) {
 		const listTag = type.split(":")[0] === "bullet" ? "OL" : "UL";
@@ -839,7 +855,7 @@ Format.prototype = {
 				originParent = fTag.parentNode;
 				nextParent = next ? next.parentNode : null;
 				isCell = util.isListCell(fTag);
-				rangeTag = util.isRangeFormatElement(originParent) ? originParent : null;
+				rangeTag = util.isRangeBlock(originParent) ? originParent : null;
 				parentTag = isCell && !util.isWysiwygDiv(originParent) ? originParent.parentNode : originParent;
 				siblingTag =
 					isCell && !util.isWysiwygDiv(originParent) ?
@@ -864,7 +880,7 @@ Format.prototype = {
 				list.appendChild(newCell);
 
 				if (!next) lastList = list;
-				if (!next || parentTag !== nextParent || util.isRangeFormatElement(siblingTag)) {
+				if (!next || parentTag !== nextParent || util.isRangeBlock(siblingTag)) {
 					if (!firstList) firstList = list;
 					if (
 						(!mergeTop || !next || parentTag !== nextParent) &&
@@ -911,7 +927,7 @@ Format.prototype = {
 	 * @description "selectedCells" array are detached from the list element.
 	 * The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
 	 * @param {Array} selectedCells Array of format elements (LI, P...) to remove.
-	 * @param {Boolean} remove If true, It does not just remove the list, it deletes the contents.
+	 * @param {boolean} remove If true, It does not just remove the list, it deletes the contents.
 	 * @returns {Object} {sc: <LI>, ec: <LI>}.
 	 */
 	removeList: function (selectedCells, remove) {
@@ -1076,8 +1092,8 @@ Format.prototype = {
 		if (
 			(isRemoveFormat &&
 				range.collapsed &&
-				util.isFormatElement(startCon.parentNode) &&
-				util.isFormatElement(endCon.parentNode)) ||
+				util.isLine(startCon.parentNode) &&
+				util.isLine(endCon.parentNode)) ||
 			(startCon === endCon && startCon.nodeType === 1 && util.isNonEditable(startCon))
 		) {
 			return;
@@ -1108,11 +1124,11 @@ Format.prototype = {
 			}
 		}
 
-		if (util.isFormatElement(startCon)) {
+		if (util.isLine(startCon)) {
 			startCon = startCon.childNodes[startOff] || startCon.firstChild;
 			startOff = 0;
 		}
-		if (util.isFormatElement(endCon)) {
+		if (util.isLine(endCon)) {
 			endCon = endCon.childNodes[endOff] || endCon.lastChild;
 			endOff = endCon.textContent.length;
 		}
@@ -1141,7 +1157,7 @@ Format.prototype = {
 			}
 
 			if (checkAttrs.length > 0) {
-				while (!util.isFormatElement(sNode) && !util.isWysiwygDiv(sNode)) {
+				while (!util.isLine(sNode) && !util.isWysiwygDiv(sNode)) {
 					for (let i = 0; i < checkAttrs.length; i++) {
 						if (sNode.nodeType === 1) {
 							const s = checkAttrs[i];
@@ -1331,7 +1347,7 @@ Format.prototype = {
 			(isRemoveNode &&
 				(function (inst, arr) {
 					for (let n = 0, len = arr.length; n < len; n++) {
-						if (inst.node.isNonSplitNode(arr[n]) || inst._sn_isSizeNode(arr[n])) return true;
+						if (inst.node._isNonSplitNode(arr[n]) || inst._sn_isSizeNode(arr[n])) return true;
 					}
 					return false;
 				})(this, removeNodeArray));
@@ -1445,6 +1461,13 @@ Format.prototype = {
 	},
 
 	/**
+	 * @description Remove format of the currently selected text.
+	 */
+	removeStyleNode: function () {
+		this.applyStyleNode(null, null, null, null);
+	},
+
+	/**
 	 * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore "__se__format__" class
 	 * @param {Element} originEl Origin element
 	 * @param {Element} copyEl Element to copy
@@ -1453,13 +1476,6 @@ Format.prototype = {
 		copyEl = copyEl.cloneNode(false);
 		copyEl.className = copyEl.className.replace(/(\s|^)__se__format__[^\s]+/g, "");
 		this.copyTagAttributes(originEl, copyEl);
-	},
-
-	/**
-	 * @description Remove format of the currently selected text.
-	 */
-	removeStyleNode: function () {
-		this.applyStyleNode(null, null, null, null);
 	},
 
 	_lineWork: function () {
@@ -1681,7 +1697,7 @@ Format.prototype = {
 	 * @description Detach Nested all nested lists under the "baseNode".
 	 * Returns a list with nested removed.
 	 * @param {Node} baseNode Element on which to base.
-	 * @param {Boolean} all If true, it also detach all nested lists of a returned list.
+	 * @param {boolean} all If true, it also detach all nested lists of a returned list.
 	 * @returns {Element}
 	 * @private
 	 */
@@ -1740,12 +1756,12 @@ Format.prototype = {
 	 * @param {Element} newInnerNode The dom that will wrap the selected text area
 	 * @param {Function} validation Check if the node should be stripped.
 	 * @param {Node} startCon The startContainer property of the selection object.
-	 * @param {Number} startOff The startOffset property of the selection object.
+	 * @param {number} startOff The startOffset property of the selection object.
 	 * @param {Node} endCon The endContainer property of the selection object.
-	 * @param {Number} endOff The endOffset property of the selection object.
-	 * @param {Boolean} isRemoveFormat Is the remove all formats command?
-	 * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
-	 * @param {Boolean} collapsed range.collapsed
+	 * @param {number} endOff The endOffset property of the selection object.
+	 * @param {boolean} isRemoveFormat Is the remove all formats command?
+	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
+	 * @param {boolean} collapsed range.collapsed
 	 * @returns {{ancestor: *, startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
 	 * @private
 	 */
@@ -1769,7 +1785,7 @@ Format.prototype = {
 		while (
 			!parentCon.nextSibling &&
 			!parentCon.previousSibling &&
-			!util.isFormatElement(parentCon.parentNode) &&
+			!util.isLine(parentCon.parentNode) &&
 			!util.isWysiwygDiv(parentCon.parentNode)
 		) {
 			if (parentCon.nodeName === newInnerNode.nodeName) break;
@@ -2108,7 +2124,7 @@ Format.prototype = {
 					if (anchorNode && child.nodeType === 3) {
 						if (_getMaintainedNode(child)) {
 							const ancestorAnchorNode = util.getParentElement(ancestor, function (current) {
-								return inst.isNonSplitNode(current.parentNode) || current.parentNode === pNode;
+								return inst._isNonSplitNode(current.parentNode) || current.parentNode === pNode;
 							});
 							anchorNode.appendChild(ancestorAnchorNode);
 							newInnerNode = ancestorAnchorNode.cloneNode(false);
@@ -2243,9 +2259,9 @@ Format.prototype = {
 	 * @param {Element} newInnerNode The dom that will wrap the selected text area
 	 * @param {Function} validation Check if the node should be stripped.
 	 * @param {Node} startCon The startContainer property of the selection object.
-	 * @param {Number} startOff The startOffset property of the selection object.
-	 * @param {Boolean} isRemoveFormat Is the remove all formats command?
-	 * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
+	 * @param {number} startOff The startOffset property of the selection object.
+	 * @param {boolean} isRemoveFormat Is the remove all formats command?
+	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
 	 * @returns {null|Node} If end container is renewed, returned renewed node
 	 * @returns {Object} { ancestor, container, offset, endContainer }
 	 * @private
@@ -2268,7 +2284,7 @@ Format.prototype = {
 		while (
 			!parentCon.nextSibling &&
 			!parentCon.previousSibling &&
-			!util.isFormatElement(parentCon.parentNode) &&
+			!util.isLine(parentCon.parentNode) &&
 			!util.isWysiwygDiv(parentCon.parentNode)
 		) {
 			if (parentCon.nodeName === newInnerNode.nodeName) break;
@@ -2278,7 +2294,7 @@ Format.prototype = {
 		if (
 			!isRemoveNode &&
 			parentCon.nodeName === newInnerNode.nodeName &&
-			!util.isFormatElement(parentCon) &&
+			!util.isLine(parentCon) &&
 			!parentCon.nextSibling &&
 			util.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff))
 		) {
@@ -2394,7 +2410,7 @@ Format.prototype = {
 					if (anchorNode && child.nodeType === 3) {
 						if (_getMaintainedNode(child)) {
 							const ancestorAnchorNode = util.getParentElement(ancestor, function (current) {
-								return inst.isNonSplitNode(current.parentNode) || current.parentNode === pNode;
+								return inst._isNonSplitNode(current.parentNode) || current.parentNode === pNode;
 							});
 							anchorNode.appendChild(ancestorAnchorNode);
 							newInnerNode = ancestorAnchorNode.cloneNode(false);
@@ -2566,8 +2582,8 @@ Format.prototype = {
 	 * @param {Element} element The node of the line that contains the selected text node.
 	 * @param {Element} newInnerNode The dom that will wrap the selected text area
 	 * @param {Function} validation Check if the node should be stripped.
-	 * @param {Boolean} isRemoveFormat Is the remove all formats command?
-	 * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
+	 * @param {boolean} isRemoveFormat Is the remove all formats command?
+	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
 	 * @param {Node} _endContainer Offset node of last line already modified (end.container)
 	 * @returns {Object} { ancestor, endContainer: "If end container is renewed, returned renewed node" }
 	 * @private
@@ -2711,9 +2727,9 @@ Format.prototype = {
 	 * @param {Element} newInnerNode The dom that will wrap the selected text area
 	 * @param {Function} validation Check if the node should be stripped.
 	 * @param {Node} endCon The endContainer property of the selection object.
-	 * @param {Number} endOff The endOffset property of the selection object.
-	 * @param {Boolean} isRemoveFormat Is the remove all formats command?
-	 * @param {Boolean} isRemoveNode "newInnerNode" is remove node?
+	 * @param {number} endOff The endOffset property of the selection object.
+	 * @param {boolean} isRemoveFormat Is the remove all formats command?
+	 * @param {boolean} isRemoveNode "newInnerNode" is remove node?
 	 * @returns {Object} { ancestor, container, offset }
 	 * @private
 	 */
@@ -2734,7 +2750,7 @@ Format.prototype = {
 		while (
 			!parentCon.nextSibling &&
 			!parentCon.previousSibling &&
-			!util.isFormatElement(parentCon.parentNode) &&
+			!util.isLine(parentCon.parentNode) &&
 			!util.isWysiwygDiv(parentCon.parentNode)
 		) {
 			if (parentCon.nodeName === newInnerNode.nodeName) break;
@@ -2744,7 +2760,7 @@ Format.prototype = {
 		if (
 			!isRemoveNode &&
 			parentCon.nodeName === newInnerNode.nodeName &&
-			!util.isFormatElement(parentCon) &&
+			!util.isLine(parentCon) &&
 			!parentCon.previousSibling &&
 			util.onlyZeroWidthSpace(endCon.textContent.slice(endOff))
 		) {
@@ -2855,7 +2871,7 @@ Format.prototype = {
 					if (anchorNode && child.nodeType === 3) {
 						if (_getMaintainedNode(child)) {
 							const ancestorAnchorNode = util.getParentElement(ancestor, function (current) {
-								return inst.node.isNonSplitNode(current.parentNode) || current.parentNode === pNode;
+								return inst.node._isNonSplitNode(current.parentNode) || current.parentNode === pNode;
 							});
 							anchorNode.appendChild(ancestorAnchorNode);
 							newInnerNode = ancestorAnchorNode.cloneNode(false);
@@ -3046,7 +3062,7 @@ Format.prototype = {
 	/**
 	 * @description Node with font-size style
 	 * @param {Node} element Element to check
-	 * @returns {Boolean}
+	 * @returns {boolean}
 	 * @private
 	 */
 	_sn_isSizeNode: function (element) {
@@ -3062,7 +3078,7 @@ Format.prototype = {
 	_sn_getMaintainedNode: function (_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove) return null;
 		return (
-			util.getParentElement(element, this.node.isNonSplitNode) ||
+			util.getParentElement(element, this.node._isNonSplitNode) ||
 			(!_isSizeNode ? util.getParentElement(element, Format.IsSizeNode) : null)
 		);
 	},
@@ -3075,8 +3091,8 @@ Format.prototype = {
 	 */
 	_sn_isMaintainedNode = function (_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove || element.nodeType !== 1) return false;
-		const anchor = this.node.isNonSplitNode(element);
-		return util.getParentElement(element, this.node.isNonSplitNode) ?
+		const anchor = this.node._isNonSplitNode(element);
+		return util.getParentElement(element, this.node._isNonSplitNode) ?
 			anchor :
 			anchor || (!_isSizeNode ? Format.IsSizeNode(element) : false);
 	},

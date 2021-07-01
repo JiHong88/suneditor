@@ -10,7 +10,7 @@ export interface History {
      * If "delay" is true, it will be saved after (options.historyStackDelayTime || 400) miliseconds
      * If the function is called again with the "delay" argument true before it is saved, the delay time is renewal
      * You can specify the delay time by sending a number.
-     * @param {Boolean} delay If true, Add stack without delay time.
+     * @param {boolean} delay If true, Add stack without delay time.
      */
     push: (delay: boolean | number) => void;
     /**
@@ -24,7 +24,7 @@ export interface History {
     /**
      * @description Go to the history stack for that index.
      * If "index" is -1, go to the last stack
-     * @param {Number} index Stack index
+     * @param {number} index Stack index
      */
     go: (index: number) => void;
 

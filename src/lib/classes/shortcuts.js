@@ -25,6 +25,12 @@ function Shortcuts(editor) {
 }
 
 Shortcuts.prototype = {
+	/**
+	 * @description If there is a shortcut function, run it.
+	 * @param {number} keyCode event.keyCode
+	 * @param {boolean} shift Whether to press shift key
+	 * @returns {boolean} Whether to execute shortcuts
+	 */
 	command: function (keyCode, shift) {
 		let command = null;
 

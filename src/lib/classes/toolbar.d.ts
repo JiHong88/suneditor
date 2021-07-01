@@ -26,7 +26,7 @@ class Toolbar extends CoreInterface {
 	 * You cannot set a new plugin for the button.
 	 * @param buttonList Button list
 	 */
-	setToolbarButtons(buttonList: any[]): void;
+	setButtons(buttonList: any[]): void;
 }
 
 export default Toolbar;

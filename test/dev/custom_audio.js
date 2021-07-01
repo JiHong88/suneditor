@@ -250,7 +250,7 @@ export default {
         this.plugins.customAudio.init.call(this);
         this.controllersOff();
 
-        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
+        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
 
         // focus
         this.focusEdge(focusEl);
@@ -282,7 +282,7 @@ export default {
     /**
      * @Required @Override dialog
      * This method is called just before the dialog opens.
-     * @param {Boolean} update If "update" argument is true, it is not a new call, but a call to modify an already created element.
+     * @param {boolean} update If "update" argument is true, it is not a new call, but a call to modify an already created element.
      */
     on: function (update) {
         if (!update) {

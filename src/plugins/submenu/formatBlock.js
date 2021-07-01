@@ -82,7 +82,7 @@ export default {
 
         if (!element) {
             this.util.changeTxt(target, formatTitle);
-        } else if (this.util.isFormatElement(element)) {
+        } else if (this.util.isLine(element)) {
             const formatContext = this.context.formatBlock;
             const formatList = formatContext._formatList;
             const nodeName = element.nodeName.toLowerCase();

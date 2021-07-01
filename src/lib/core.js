@@ -434,14 +434,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Variables used internally in editor operation
-         * @property {Boolean} isCodeView State of code view
-         * @property {Boolean} isFullScreen State of full screen
-         * @property {Number} innerHeight_fullScreen InnerHeight in editor when in full screen
-         * @property {Number} resizeClientY Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
-         * @property {Number} tabSize Indent size of tab (4)
-         * @property {Number} indentSize Indent size (25)px
-         * @property {Number} codeIndentSize Indent size of Code view mode (2)
-         * @property {Number} minResizingSize Minimum size of editing area when resized {Number} (.se-wrapper-inner {min-height: 65px;} || 65)
+         * @property {boolean} isCodeView State of code view
+         * @property {boolean} isFullScreen State of full screen
+         * @property {number} innerHeight_fullScreen InnerHeight in editor when in full screen
+         * @property {number} resizeClientY Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
+         * @property {number} tabSize Indent size of tab (4)
+         * @property {number} indentSize Indent size (25)px
+         * @property {number} codeIndentSize Indent size of Code view mode (2)
+         * @property {number} minResizingSize Minimum size of editing area when resized {number} (.se-wrapper-inner {min-height: 65px;} || 65)
          * @property {Array} currentNodes  An array of the current cursor's node structure
          * @private
          */
@@ -472,7 +472,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description If the plugin is not added, add the plugin and call the 'add' function.
          * If the plugin is added call callBack function.
-         * @param {String} pluginName The name of the plugin to call
+         * @param {string} pluginName The name of the plugin to call
          * @param {function} callBackFunction Function to be executed immediately after module call
          * @param {Element|null} _target Plugin target button (This is not necessary if you have a button list when creating the editor)
          */
@@ -542,7 +542,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Method for managing submenu element.
          * You must add the "submenu" element using the this method at custom plugin.
-         * @param {String} pluginName Plugin name
+         * @param {string} pluginName Plugin name
          * @param {Element|null} target Target button
          * @param {Element} menu Submenu element
          */
@@ -795,7 +795,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Specify the position of the controller.
          * @param {Element} controller Controller element.
          * @param {Element} referEl Element that is the basis of the controller's position.
-         * @param {String} position Type of position ("top" | "bottom")
+         * @param {string} position Type of position ("top" | "bottom")
          * When using the "top" position, there should not be an arrow on the controller.
          * When using the "bottom" position there should be an arrow on the controller.
          * @param {Object} addOffset These are the left and top values that need to be added specially. 
@@ -852,7 +852,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description javascript execCommand
-         * @param {String} command javascript execCommand function property
+         * @param {string} command javascript execCommand function property
          * @param {Boolean|undefined} showDefaultUI javascript execCommand function property
          * @param {String|undefined} value javascript execCommand function property
          */
@@ -889,7 +889,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     const range = this.selection.getRange();
                     if (range.startContainer === range.endContainer && util.isWysiwygDiv(range.startContainer)) {
                         const currentNode = range.commonAncestorContainer.children[range.startOffset];
-                        if (!util.isFormatElement(currentNode) && !this.node.isComponent(currentNode)) {
+                        if (!util.isLine(currentNode) && !this.node.isComponent(currentNode)) {
                             const format = util.createElement(options.defaultTag);
                             const br = util.createElement("BR");
                             format.appendChild(br);
@@ -948,9 +948,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Determine if this offset is the edge offset of container
          * @param {Node} container The node of the selection object. (range.startContainer..)
-         * @param {Number} offset The offset of the selection object. (core.getRange().startOffset...)
+         * @param {number} offset The offset of the selection object. (core.getRange().startOffset...)
          * @param {String|undefined} dir Select check point - Both edge, Front edge or End edge. ("front": Front edge, "end": End edge, undefined: Both edge)
-         * @returns {Boolean}
+         * @returns {boolean}
          */
         isEdgePoint: function (container, offset, dir) {
             return (dir !== 'end' && offset === 0) || ((!dir || dir !== 'front') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && !!container.nodeValue && offset === container.nodeValue.length);
@@ -972,8 +972,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Run plugin calls and basic commands.
-         * @param {String} command Command string
-         * @param {String} display Display type string ('command', 'submenu', 'dialog', 'container')
+         * @param {string} command Command string
+         * @param {string} display Display type string ('command', 'submenu', 'dialog', 'container')
          * @param {Element} target The element of command button
          */
         actionCall: function (command, display, target) {
@@ -1040,7 +1040,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Execute command of command button(All Buttons except submenu and dialog)
          * (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
          * @param {Element|null} target The element of command button
-         * @param {String} command Property of command button (data-value)
+         * @param {string} command Property of command button (data-value)
          */
         commandHandler: function (target, command) {
             if (this.isReadOnly && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) return;
@@ -1533,7 +1533,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Gets the current contents
-         * @param {Boolean} onlyContents Return only the contents of the body without headers when the "fullPage" option is true
+         * @param {boolean} onlyContents Return only the contents of the body without headers when the "fullPage" option is true
          * @returns {Object}
          */
         getContents: function (onlyContents) {
@@ -1561,7 +1561,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Returns HTML string according to tag type and configuration.
          * Use only "cleanHTML"
          * @param {Node} node Node
-         * @param {Boolean} requireFormat If true, text nodes that do not have a format node is wrapped with the format tag.
+         * @param {boolean} requireFormat If true, text nodes that do not have a format node is wrapped with the format tag.
          * @private
          */
         _makeLine: function (node, requireFormat) {
@@ -1569,7 +1569,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // element
             if (node.nodeType === 1) {
                 if (util._disallowedTags(node)) return '';
-                if (!requireFormat || (util.isFormatElement(node) || util.isRangeFormatElement(node) || this.node.isComponent(node) || util.isMedia(node) || (util.isAnchor(node) && util.isMedia(node.firstElementChild)))) {
+                if (!requireFormat || (util.isLine(node) || util.isRangeBlock(node) || this.node.isComponent(node) || util.isMedia(node) || (util.isAnchor(node) && util.isMedia(node.firstElementChild)))) {
                     return node.outerHTML;
                 } else {
                     return '<' + defaultTag + '>' + node.outerHTML + '</' + defaultTag + '>';
@@ -1596,8 +1596,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
-         * @param {String} text 
-         * @returns {String} HTML string
+         * @param {string} text 
+         * @returns {string} HTML string
          * @private
          */
         _tagConvertor: function (text) {
@@ -1611,8 +1611,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Delete disallowed tags
-         * @param {String} html HTML string
-         * @returns {String}
+         * @param {string} html HTML string
+         * @returns {string}
          * @private
          */
         _deleteDisallowedTags: function (html) {
@@ -1625,10 +1625,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Tag and tag attribute check RegExp function. (used by "cleanHTML" and "convertContentsForEditor")
-         * @param {Boolean} lowLevelCheck Low level check
-         * @param {String} m RegExp value
-         * @param {String} t RegExp value
-         * @returns {String}
+         * @param {boolean} lowLevelCheck Low level check
+         * @param {string} m RegExp value
+         * @param {string} t RegExp value
+         * @returns {string}
          * @private
          */
         _cleanTags: function (lowLevelCheck, m, t) {
@@ -1667,10 +1667,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Gets the clean HTML code for editor
-         * @param {String} html HTML string
+         * @param {string} html HTML string
          * @param {String|RegExp|null} whitelist Regular expression of allowed tags.
          * RegExp object is create by util.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
-         * @returns {String}
+         * @returns {string}
          */
         cleanHTML: function (html, whitelist) {
             html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
@@ -1718,8 +1718,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Converts contents into a format that can be placed in an editor
-         * @param {String} contents contents
-         * @returns {String}
+         * @param {string} contents contents
+         * @returns {string}
          */
         convertContentsForEditor: function (contents) {
             contents = this._deleteDisallowedTags(this._parser.parseFromString(contents, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, false));
@@ -1760,14 +1760,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
          * @param {Element|String} html WYSIWYG element (context.element.wysiwyg) or HTML string.
-         * @returns {String}
+         * @returns {string}
          */
         convertHTMLForCodeView: function (html) {
             let returnHTML = '';
             const wRegExp = _w.RegExp;
             const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
             const wDoc = typeof html === 'string' ? _d.createRange().createContextualFragment(html) : html;
-            const isFormat = function (current) { return this.isFormatElement(current) || this.node.isComponent(current); }.bind(this);
+            const isFormat = function (current) { return this.isLine(current) || this.node.isComponent(current); }.bind(this);
 
             let indentSize = this._variable.codeIndentSize * 1;
             indentSize = indentSize > 0 ? new _w.Array(indentSize + 1).join(' ') : '';
@@ -1879,7 +1879,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Set "options.defaultStyle" style.
          * Define the style of the edit area
          * It can also be defined with the "setOptions" method, but the "setDefaultStyle" method does not render the editor again.
-         * @param {String} style Style string
+         * @param {string} style Style string
          */
         setDefaultStyle: function (style) {
             const newStyles = options._editorStyles = util._setDefaultOptionStyle(options, style);
@@ -1913,8 +1913,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Gets the contents of the suneditor
-         * @param {Boolean} onlyContents - Return only the contents of the body without headers when the "fullPage" option is true
-         * @returns {String}
+         * @param {boolean} onlyContents - Return only the contents of the body without headers when the "fullPage" option is true
+         * @returns {string}
          */
         getContents: function (onlyContents) {
             return core.getContents(onlyContents);
@@ -1922,7 +1922,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Gets only the text of the suneditor contents
-         * @returns {String}
+         * @returns {string}
          */
         getText: function () {
             return context.element.wysiwyg.textContent;
@@ -1938,7 +1938,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * - delete: delete function
          * - element: target element
          * - src: src attribute of tag
-         * @param {String} pluginName Plugin name (image, video, audio)
+         * @param {string} pluginName Plugin name (image, video, audio)
          * @returns {Array}
          */
         getFilesInfo: function (pluginName) {
@@ -1948,9 +1948,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Inserts an HTML element or HTML string or plain string at the current cursor position
          * @param {Element|String} html HTML Element or HTML string or plain string
-         * @param {Boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
-         * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
-         * @param {Boolean} rangeSelection If true, range select the inserted node.
+         * @param {boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
+         * @param {boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+         * @param {boolean} rangeSelection If true, range select the inserted node.
          */
         insertHTML: function (html, notCleaningData, checkCharCount, rangeSelection) {
             if (typeof html === 'string') {
@@ -1995,7 +1995,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     core.component.insert(html, false, checkCharCount, false);
                 } else {
                     let afterNode = null;
-                    if (util.isFormatElement(html) || util.isMedia(html)) {
+                    if (util.isLine(html) || util.isMedia(html)) {
                         afterNode = this.format.getLine(core.selection.getNode(), null);	
                     }
                     core.insertNode(html, afterNode, checkCharCount);
@@ -2011,7 +2011,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Add contents to the suneditor
-         * @param {String} contents Contents to Input
+         * @param {string} contents Contents to Input
          */
         appendContents: function (contents) {
             const convertValue = core.convertContentsForEditor(contents);
@@ -2035,7 +2035,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Switch to or off "ReadOnly" mode.
-         * @param {Boolean} value "readOnly" boolean value.
+         * @param {boolean} value "readOnly" boolean value.
          */
         readOnly: function (value) {
             core.isReadOnly = value;
@@ -2128,7 +2128,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Fix tags that do not fit the editor format.
          * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
          * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist (core._htmlCheckWhitelistRegExp)
-         * @param {Boolean} lowLevelCheck Row level check
+         * @param {boolean} lowLevelCheck Row level check
          * @private
          */
         _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, lowLevelCheck) {
@@ -2143,14 +2143,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (current.nodeType !== 1) return false;
 
                 // white list
-                if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && util.isNotCheckingNode(current)) {
+                if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && util._isNotCheckingNode(current)) {
                     removeTags.push(current);
                     return false;
                 }
 
-                const nrtag = !util.getParentElement(current, util.isNotCheckingNode);
+                const nrtag = !util.getParentElement(current, util._isNotCheckingNode);
                 // empty tags
-                if ((!util.isTable(current) && !util.isListCell(current)) && (util.isFormatElement(current) || util.isRangeFormatElement(current) || util.isTextStyleNode(current)) && current.childNodes.length === 0 && nrtag) {
+                if ((!util.isTable(current) && !util.isListCell(current)) && (util.isLine(current) || util.isRangeBlock(current) || util.isTextStyleNode(current)) && current.childNodes.length === 0 && nrtag) {
                     emptyTags.push(current);
                     return false;
                 }
@@ -2164,7 +2164,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 // table cells
                 if (util.isTableCell(current)) {
                     const fel = current.firstElementChild;
-                    if (!util.isFormatElement(fel) && !util.isRangeFormatElement(fel) && !this.node.isComponent(fel)) {
+                    if (!util.isLine(fel) && !util.isRangeBlock(fel) && !this.node.isComponent(fel)) {
                         withoutFormatCells.push(current);
                         return false;
                     }
@@ -2172,7 +2172,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 const result = current.parentNode !== documentFragment && nrtag &&
                  ((util.isListCell(current) && !util.isList(current.parentNode)) ||
-                  (lowLevelCheck && (util.isFormatElement(current) || this.node.isComponent(current)) && !util.isRangeFormatElement(current.parentNode) && !util.getParentElement(current, this.node.isComponent)));
+                  (lowLevelCheck && (util.isLine(current) || this.node.isComponent(current)) && !util.isRangeBlock(current.parentNode) && !util.getParentElement(current, this.node.isComponent)));
 
                 return result;
             }.bind(this));
@@ -2246,7 +2246,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Set method in the code view area
-         * @param {String} value HTML string
+         * @param {string} value HTML string
          * @private
          */
         _setCodeView: function (value) {
@@ -2267,8 +2267,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Initializ core variable
-         * @param {Boolean} reload Is relooad?
-         * @param {String} _initHTML initial html string
+         * @param {boolean} reload Is relooad?
+         * @param {string} _initHTML initial html string
          * @private
          */
         _init: function (reload, _initHTML) {
@@ -2432,8 +2432,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Initializ wysiwyg area (Only called from core._init)
-         * @param {Boolean} reload Is relooad?
-         * @param {String} _initHTML initial html string
+         * @param {boolean} reload Is relooad?
+         * @param {string} _initHTML initial html string
          * @private
          */
         _initWysiwygArea: function (reload, _initHTML) {
@@ -2495,7 +2495,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Initialization after "setOptions"
          * @param {Object} el context.element
-         * @param {String} _initHTML Initial html string
+         * @param {string} _initHTML Initial html string
          * @private
          */
         _setOptionsInit: function (el, _initHTML) {
@@ -2506,8 +2506,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Initializ editor
-         * @param {Boolean} reload Is relooad?
-         * @param {String} _initHTML initial html string
+         * @param {boolean} reload Is relooad?
+         * @param {string} _initHTML initial html string
          * @private
          */
         _editorInit: function (reload, _initHTML) {

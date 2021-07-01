@@ -215,7 +215,7 @@ export default {
         this.plugins.audio.init.call(this);
         this.controllersOff();
 
-        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
+        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
 
         // focus
         this.focusEdge(focusEl);
@@ -466,7 +466,7 @@ export default {
         const container = this.plugins.component.set_container.call(this, cover, 'se-audio-container');
 
         try {
-            if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
+            if (this.util.isLine(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(prevElement);
                 // clean format tag

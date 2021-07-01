@@ -16,7 +16,7 @@ Node.prototype = {
 	 * Returns the last element of the splited tag.
 	 * @param {Node} baseNode Element or text node on which to base
 	 * @param {Number|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
-	 * @param {Number} depth The nesting depth of the element being split. (default: 0)
+	 * @param {number} depth The nesting depth of the element being split. (default: 0)
 	 * @returns {Element}
 	 */
 	split: function (baseNode, offset, depth) {
@@ -91,7 +91,7 @@ Node.prototype = {
 	 * An array containing change offsets is returned in the order of the "nodePathArray" array.
 	 * @param {Element} element Element
 	 * @param {Array|null} nodePathArray Array of NodePath object ([util.getNodePath(), ..])
-	 * @param {Boolean} onlyText If true, non-text nodes like 'span', 'strong'.. are ignored.
+	 * @param {boolean} onlyText If true, non-text nodes like 'span', 'strong'.. are ignored.
 	 * @returns {Array} [offset, ..]
 	 */
 	mergeSameTags: function (element, nodePathArray, onlyText) {
@@ -118,7 +118,7 @@ Node.prototype = {
 					(!onlyText &&
 						(dom.isTable(child) ||
 							dom.isListCell(child) ||
-							(inst.format.isFormatElement(child) && !inst.format.isFreeFormatElement(child))))
+							(inst.isLine(child) && !inst.isBrLine(child))))
 				) {
 					if (dom.isTable(child) || dom.isListCell(child)) {
 						recursionFunc(child, depth + 1, i);
@@ -292,7 +292,7 @@ Node.prototype = {
 	 * @param {Element|null} stopParent Stop when the parent node reaches stopParent
 	 * @returns {Object|null} {sc: previousSibling, ec: nextSibling}
 	 */
-	removeItemAllParents: function (item, validation, stopParent) {
+	removeAllParents: function (item, validation, stopParent) {
 		if (!item) return null;
 		let cc = null;
 		if (!validation) {
@@ -360,8 +360,8 @@ Node.prototype = {
 
 	/**
 	 * @description Remove whitespace between tags in HTML string.
-	 * @param {String} html HTML string
-	 * @returns {String}
+	 * @param {string} html HTML string
+	 * @returns {string}
 	 */
 	htmlRemoveWhiteSpace: function (html) {
 		if (!html) return "";
@@ -378,16 +378,16 @@ Node.prototype = {
 	/**
 	 * @description Check if the container and offset values are the edges of the "line"
 	 * @param {Node} container The node of the selection object. (range.startContainer..)
-	 * @param {Number} offset The offset of the selection object. (core.getRange().startOffset...)
-	 * @param {String} dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
-	 * @returns {Boolean}
+	 * @param {number} offset The offset of the selection object. (core.getRange().startOffset...)
+	 * @param {string} dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
+	 * @returns {boolean}
 	 */
 	isEdgeLine: function (node, offset, dir) {
 		if (!this.isEdgePoint(node, offset, dir)) return false;
 
 		const result = [];
 		dir = dir === 'front' ? 'previousSibling' : 'nextSibling';
-		while (node && !this.isFormatElement(node) && !util.isWysiwygDiv(node)) {
+		while (node && !this.isLine(node) && !util.isWysiwygDiv(node)) {
 			if (!node[dir] || (util.isBreak(node[dir]) && !node[dir][dir])) {
 				if (node.nodeType === 1) result.push(node.cloneNode(false));
 				node = node.parentNode;
@@ -400,33 +400,10 @@ Node.prototype = {
 	},
 
 	/**
-	 * @description It is judged whether it is the not checking node. (class="katex", "__se__tag")
-	 * @param {Node} element The node to check
-	 * @returns {Boolean}
-	 */
-	isNotCheckingNode: function(element) {
-		return element && /katex|__se__tag/.test(element.className);
-	},
-
-	/**
-	 * @description Nodes that must remain undetached when changing text nodes (A, Label, Code, Span:font-size)
-	 * @param {Node|String} element Element to check
-	 * @returns {Boolean}
-	 * @private
-	 */
-	isNonSplitNode: function (element) {
-		return (
-			element &&
-			element.nodeType !== 3 &&
-			/^(a|label|code|summary)$/i.test(typeof element === "string" ? element : element.nodeName)
-		);
-	},
-
-	/**
 	 * @description It is judged whether it is a node related to the text style.
 	 * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)
 	 * @param {Node} element The node to check
-	 * @returns {Boolean}
+	 * @returns {boolean}
 	 */
 	isTextStyleNode: function (element) {
 		return (
@@ -440,9 +417,9 @@ Node.prototype = {
 	 * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")
 	 * Format element also contain "free format Element"
 	 * @param {Node} element The node to check
-	 * @returns {Boolean}
+	 * @returns {boolean}
 	 */
-	isFormatElement: function (element) {
+	isLine: function (element) {
 		return (
 			element &&
 			element.nodeType === 1 &&
@@ -454,47 +431,14 @@ Node.prototype = {
 	},
 
 	/**
-	 * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__range_block_xxx")
-	 * Range format element is wrap the "format element" and "component"
-	 * @param {Node} element The node to check
-	 * @returns {Boolean}
-	 */
-	isRangeFormatElement: function (element) {
-		return (
-			element &&
-			element.nodeType === 1 &&
-			(/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD|DETAILS)$/i.test(element.nodeName) ||
-				this.hasClass(element, "(\\s|^)__se__format__range_block_.+(\\s|$)"))
-		);
-	},
-
-	/**
-	 * @description It is judged whether it is the closure range format element. (TH, TD | class="__se__format__range_block_closure_xxx")
-	 * Closure range format elements is included in the range format element.
-	 *  - Closure range format element is wrap the "format element" and "component"
-	 * ※ You cannot exit this format with the Enter key or Backspace key.
-	 * ※ Use it only in special cases. ([ex] format of table cells)
-	 * @param {Node} element The node to check
-	 * @returns {Boolean}
-	 */
-	isClosureRangeFormatElement: function (element) {
-		return (
-			element &&
-			element.nodeType === 1 &&
-			(/^(TH|TD)$/i.test(element.nodeName) ||
-				this.hasClass(element, "(\\s|^)__se__format__range_block_closure_.+(\\s|$)"))
-		);
-	},
-
-	/**
 	 * @description It is judged whether it is the free format element. (PRE | class="__se__format__br_line_xxx")
 	 * Free format elements is included in the format element.
 	 * Free format elements's line break is "BR" tag.
 	 * ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
 	 * @param {Node} element The node to check
-	 * @returns {Boolean}
+	 * @returns {boolean}
 	 */
-	isFreeFormatElement: function (element) {
+	isBrLine: function (element) {
 		return (
 			element &&
 			element.nodeType === 1 &&
@@ -511,9 +455,9 @@ Node.prototype = {
 	 * ※ You cannot exit this format with the Enter key or Backspace key.
 	 * ※ Use it only in special cases. ([ex] format of table cells)
 	 * @param {Node} element The node to check
-	 * @returns {Boolean}
+	 * @returns {boolean}
 	 */
-	isClosureFreeFormatElement: function (element) {
+	isClosureBrLine: function (element) {
 		return (
 			element &&
 			element.nodeType === 1 &&
@@ -522,18 +466,75 @@ Node.prototype = {
 	},
 
 	/**
+	 * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__range_block_xxx")
+	 * Range format element is wrap the "format element" and "component"
+	 * @param {Node} element The node to check
+	 * @returns {boolean}
+	 */
+	isRangeBlock: function (element) {
+		return (
+			element &&
+			element.nodeType === 1 &&
+			(/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD|DETAILS)$/i.test(element.nodeName) ||
+				this.hasClass(element, "(\\s|^)__se__format__range_block_.+(\\s|$)"))
+		);
+	},
+
+	/**
+	 * @description It is judged whether it is the closure range format element. (TH, TD | class="__se__format__range_block_closure_xxx")
+	 * Closure range format elements is included in the range format element.
+	 *  - Closure range format element is wrap the "format element" and "component"
+	 * ※ You cannot exit this format with the Enter key or Backspace key.
+	 * ※ Use it only in special cases. ([ex] format of table cells)
+	 * @param {Node} element The node to check
+	 * @returns {boolean}
+	 */
+	isClosureRangeBlock: function (element) {
+		return (
+			element &&
+			element.nodeType === 1 &&
+			(/^(TH|TD)$/i.test(element.nodeName) ||
+				this.hasClass(element, "(\\s|^)__se__format__range_block_closure_.+(\\s|$)"))
+		);
+	},
+
+	/**
 	 * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
 	 * @param {Node} element The node to check
-	 * @returns {Boolean}
+	 * @returns {boolean}
 	 */
 	isComponent: function (element) {
 		return element && (/se-component/.test(element.className) || /^(TABLE|HR)$/.test(element.nodeName));
 	},
 
 	/**
+	 * @description It is judged whether it is the not checking node. (class="katex", "__se__tag")
+	 * @param {Node} element The node to check
+	 * @returns {boolean}
+	 * @private
+	 */
+	_isNotCheckingNode: function(element) {
+		return element && /katex|__se__tag/.test(element.className);
+	},
+
+	/**
+	 * @description Nodes that must remain undetached when changing text nodes (A, Label, Code, Span:font-size)
+	 * @param {Node|String} element Element to check
+	 * @returns {boolean}
+	 * @private
+	 */
+	_isNonSplitNode: function (element) {
+		return (
+			element &&
+			element.nodeType !== 3 &&
+			/^(a|label|code|summary)$/i.test(typeof element === "string" ? element : element.nodeName)
+		);
+	},
+
+	/**
 	 * @description Nodes that need to be added without modification when changing text nodes
 	 * @param {Node} element Element to check
-	 * @returns {Boolean}
+	 * @returns {boolean}
 	 * @private
 	 */
 	_isIgnoreNodeChange: function (element) {
@@ -543,7 +544,7 @@ Node.prototype = {
 	/**
 	 * @description Nodes without text
 	 * @param {Node} element Element to check
-	 * @returns {Boolean}
+	 * @returns {boolean}
 	 * @private
 	 */
 	_notTextNode: function (element) {
@@ -560,7 +561,7 @@ Node.prototype = {
 	/**
 	 * @description Check disallowed tags
 	 * @param {Node} element Element to check
-	 * @returns {Boolean}
+	 * @returns {boolean}
 	 * @private
 	 */
 	_disallowedTags: function (element) {

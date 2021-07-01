@@ -30,7 +30,7 @@ Events.prototype = {
 
 	/**
 	 * @description Event functions
-	 * @param {String} contents Current contents
+	 * @param {string} contents Current contents
 	 * @param {Object} core Core object
 	 */
 	onChange: null,
@@ -40,8 +40,8 @@ Events.prototype = {
 	 * When false is returned, the default behavior is stopped.
 	 * If the string is returned, the cleanData value is modified to the return value.
 	 * @param {Object} e Event object.
-	 * @param {String} cleanData HTML string modified for editor format.
-	 * @param {Boolean} maxChartCount option (true if max character is exceeded)
+	 * @param {string} cleanData HTML string modified for editor format.
+	 * @param {boolean} maxChartCount option (true if max character is exceeded)
 	 * @param {Object} core Core object
 	 * @returns {Boolean|String}
 	 */
@@ -59,7 +59,7 @@ Events.prototype = {
 	/**
 	 * @description Called just after the controller is positioned and displayed on the screen.
 	 * controller - editing elements displayed on the screen [image resizing, table editor, link editor..]]
-	 * @param {String} name The name of the plugin that called the controller
+	 * @param {string} name The name of the plugin that called the controller
 	 * @param {Array} controllers Array of Controller elements
 	 * @param {Object} core Core object
 	 */
@@ -67,14 +67,14 @@ Events.prototype = {
 
 	/**
 	 * @description An event when toggling between code view and wysiwyg view.
-	 * @param {Boolean} isCodeView Whether the current code view mode
+	 * @param {boolean} isCodeView Whether the current code view mode
 	 * @param {Object} core Core object
 	 */
 	toggleCodeView: null,
 
 	/**
 	 * @description An event when toggling full screen.
-	 * @param {Boolean} isFullScreen Whether the current full screen mode
+	 * @param {boolean} isFullScreen Whether the current full screen mode
 	 * @param {Object} core Core object
 	 */
 	toggleFullScreen: null,
@@ -204,8 +204,8 @@ Events.prototype = {
 	/**
 	 * @description Called when the image is uploaded, updated, deleted
 	 * @param {Element} targetElement Target element
-	 * @param {Number} index Uploaded index
-	 * @param {String} state Upload status ('create', 'update', 'delete')
+	 * @param {number} index Uploaded index
+	 * @param {string} state Upload status ('create', 'update', 'delete')
 	 * @param {Object} info Image info object
 	 * - index: data index
 	 * - name: file name
@@ -214,7 +214,7 @@ Events.prototype = {
 	 * - delete: delete function
 	 * - element: target element
 	 * - src: src attribute of tag
-	 * @param {Number} remainingFilesCount Count of remaining files to upload (0 when added as a url)
+	 * @param {number} remainingFilesCount Count of remaining files to upload (0 when added as a url)
 	 * @param {Object} core Core object
 	 */
 	onImageUpload: null,
@@ -231,10 +231,10 @@ Events.prototype = {
 
 	/**
 	 * @description Called when the image is upload failed
-	 * @param {String} errorMessage Error message
+	 * @param {string} errorMessage Error message
 	 * @param {Object} result Response Object
 	 * @param {Object} core Core object
-	 * @returns {Boolean}
+	 * @returns {boolean}
 	 */
 	onImageUploadError: null,
 	/**

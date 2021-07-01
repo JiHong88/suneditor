@@ -279,7 +279,7 @@ export default {
         this.plugins.image.init.call(this);
         this.controllersOff();
 
-        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
+        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
 
         // focus
         this.focusEdge(focusEl);
@@ -584,7 +584,7 @@ export default {
 
     /**
      * @Override resizing
-     * @param {String} xy 'x': width, 'y': height
+     * @param {string} xy 'x': width, 'y': height
      * @param {KeyboardEvent} e Event object
      */
     setInputSize: function (xy, e) {
@@ -760,18 +760,18 @@ export default {
         }
 
         if (isNewContainer) {
-            const existElement = (this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode)) ? 
+            const existElement = (this.util.isRangeBlock(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode)) ? 
                 contextImage._element : 
                 /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.format.getLine(contextImage._element) || contextImage._element;
                 
-            if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
+            if (this.util.isLine(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(contextImage._element);
                 // clean format tag
                 this.util.removeEmptyNode(existElement, null);
                 if (existElement.children.length === 0) existElement.innerHTML = this.util.htmlRemoveWhiteSpace(existElement.innerHTML);
             } else {
-                if (this.util.isFormatElement(existElement.parentNode)) {
+                if (this.util.isLine(existElement.parentNode)) {
                     const formats = existElement.parentNode;
                     formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
                     this.util.removeItem(existElement);

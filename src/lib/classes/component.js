@@ -16,9 +16,9 @@ Component.prototype = {
 	 * @description The method to insert a element and return. (used elements : table, hr, image, video)
 	 * If "element" is "HR", insert and return the new line.
 	 * @param {Element} element Element to be inserted
-	 * @param {Boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
-	 * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
-	 * @param {Boolean} notSelect If true, Do not automatically select the inserted component.
+	 * @param {boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
+	 * @param {boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+	 * @param {boolean} notSelect If true, Do not automatically select the inserted component.
 	 * @returns {Element}
 	 */
 	insert: function (element, notHistoryPush, checkCharCount, notSelect) {
@@ -40,13 +40,13 @@ Component.prototype = {
 				const depthFormat = util.getParentElement(
 					r.container,
 					function (current) {
-						return this.isRangeFormatElement(current);
+						return this.isRangeBlock(current);
 					}.bind(util)
 				);
 				oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
 				if (oNode) formatEl = oNode.previousSibling;
 			}
-			this.insertNode(element, util.isRangeFormatElement(formatEl) ? null : formatEl, false);
+			this.insertNode(element, util.isRangeBlock(formatEl) ? null : formatEl, false);
 			if (formatEl && util.onlyZeroWidthSpace(formatEl)) util.removeItem(formatEl);
 		}
 
@@ -102,7 +102,7 @@ Component.prototype = {
 	/**
 	 * @description The component(image, video) is selected and the resizing module is called.
 	 * @param {Element} element Element tag (img, iframe, video)
-	 * @param {String} pluginName Plugin name (image, video)
+	 * @param {string} pluginName Plugin name (image, video)
 	 */
 	select: function (element, pluginName) {
 		if (util.isUneditable(util.getParentElement(element, this.node.isComponent)) || util.isUneditable(element)) return false;
@@ -133,7 +133,7 @@ Component.prototype = {
 		const isList = util.isListCell(container.parentNode);
 		let componentTop, wScroll, w;
 		// top
-		if (isList ? !container.previousSibling : !util.isFormatElement(container.previousElementSibling)) {
+		if (isList ? !container.previousSibling : !util.isLine(container.previousElementSibling)) {
 			this._variable._lineBreakComp = container;
 			wScroll = context.element.wysiwyg.scrollTop;
 			componentTop = domUtils.getOffset(element, context.element.wysiwygFrame).top + wScroll;
@@ -146,7 +146,7 @@ Component.prototype = {
 			t_style.display = "none";
 		}
 		// bottom
-		if (isList ? !container.nextSibling : !util.isFormatElement(container.nextElementSibling)) {
+		if (isList ? !container.nextSibling : !util.isLine(container.nextElementSibling)) {
 			if (!componentTop) {
 				this._variable._lineBreakComp = container;
 				wScroll = context.element.wysiwyg.scrollTop;

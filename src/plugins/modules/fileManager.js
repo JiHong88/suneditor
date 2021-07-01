@@ -36,7 +36,7 @@
 
         /**
          * @description Upload the file to the server.
-         * @param {String} uploadUrl Upload server url
+         * @param {string} uploadUrl Upload server url
          * @param {Object|null} uploadHeader Request header
          * @param {FormData} formData FormData in body
          * @param {Function|null} callBack Success call back function
@@ -82,11 +82,11 @@
         
         /**
          * @description Checke the file's information and modify the tag that does not fit the format.
-         * @param {String} pluginName Plugin name
+         * @param {string} pluginName Plugin name
          * @param {Array} tagNames Tag array to check
          * @param {Function|null} uploadEventHandler Event handler to process updated file info after checking (used in "setInfo")
          * @param {Function} modifyHandler A function to modify a tag that does not fit the format (Argument value: Tag element)
-         * @param {Boolean} resizing True if the plugin is using a resizing module
+         * @param {boolean} resizing True if the plugin is using a resizing module
          * @example 
          * const modifyHandler = function (tag) {
          *      imagePlugin.onModifyMode.call(this, tag, null);
@@ -164,11 +164,11 @@
 
         /**
          * @description Create info object of file and add it to "_infoList" (this.context[pluginName]._infoList[])
-         * @param {String} pluginName Plugin name 
+         * @param {string} pluginName Plugin name 
          * @param {Element} element 
          * @param {Function|null} uploadEventHandler Event handler to process updated file info (created in setInfo)
          * @param {Object|null} file 
-         * @param {Boolean} resizing True if the plugin is using a resizing module
+         * @param {boolean} resizing True if the plugin is using a resizing module
          * @example 
          * uploadCallBack {.. file = { name: fileList[i].name, size: fileList[i].size };
          * this.plugins.fileManager.setInfo.call(this, 'image', oImg, this.events.onImageUpload, file, true);
@@ -267,8 +267,8 @@
 
         /**
          * @description Delete info object at "_infoList"
-         * @param {String} pluginName Plugin name 
-         * @param {Number} index index of info object (this.context[pluginName]._infoList[].index)
+         * @param {string} pluginName Plugin name 
+         * @param {number} index index of info object (this.context[pluginName]._infoList[].index)
          * @param {Function|null} uploadEventHandler Event handler to process updated file info (created in setInfo)
          */
         deleteInfo: function (pluginName, index, uploadEventHandler) {
@@ -287,7 +287,7 @@
 
         /**
          * @description Reset info object and "_infoList = []", "_infoIndex = 0"
-         * @param {String} pluginName Plugin name 
+         * @param {string} pluginName Plugin name 
          * @param {Function|null} uploadEventHandler Event handler to process updated file info (created in setInfo)
          */
         resetInfo: function (pluginName, uploadEventHandler) {

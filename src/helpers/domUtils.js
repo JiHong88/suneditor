@@ -7,7 +7,7 @@ import {
 
 /**
  * @description Create Element node
- * @param {String} elementName Element name
+ * @param {string} elementName Element name
  * @param {Object|null|undefined} attributes The attributes of the tag. {style: "font-size:12px;..", class: "el_class",..}
  * @returns {Element}
  */
@@ -23,7 +23,7 @@ export function createElement(elementName, attributes) {
 
 /**
  * @description Create text node
- * @param {String} text text contents
+ * @param {string} text text contents
  * @returns {Node}
  */
 export function createTextNode(text) {
@@ -45,7 +45,7 @@ export function getIframeDocument(iframe) {
  * @description Get attributes of argument element to string ('class="---" name="---" ')
  * @param {Element} element Element object
  * @param {Array|null} exceptAttrs Array of attribute names to exclude from the result
- * @returns {String}
+ * @returns {string}
  */
 export function getAttributesToString(element, exceptAttrs) {
 	if (!element.attributes) return "";
@@ -64,7 +64,7 @@ export function getAttributesToString(element, exceptAttrs) {
 /**
  * @description Returns the index compared to other sibling nodes.
  * @param {Node} node The Node to find index
- * @returns {Number}
+ * @returns {number}
  */
 export function getPositionIndex(node) {
 	let idx = 0;
@@ -218,7 +218,7 @@ export function getListChildNodes(element, validation) {
  * "0" when the parent node is the WYSIWYG area.
  * "-1" when the element argument is the WYSIWYG area.
  * @param {Node} element The element to check
- * @returns {Number}
+ * @returns {number}
  */
 export function getElementDepth(element) {
 	if (!element || isWysiwygDiv(element)) return -1;
@@ -237,7 +237,7 @@ export function getElementDepth(element) {
 /**
  * @description Sort a element array by depth of element.
  * @param {Array} array Array object
- * @param {Boolean} des true: descending order / false: ascending order
+ * @param {boolean} des true: descending order / false: ascending order
  */
 export function sortByDepth(array, des) {
 	const t = !des ? -1 : 1;
@@ -339,7 +339,7 @@ export function getParentElement(element, query) {
  * Returns null if not found.
  * @param {Node} element Reference element
  * @param {String|Function} query Query String (nodeName, .className, #ID, :name) or validation function.
- * @param {Boolean} last If true returns the last node among the found child nodes. (default: first node)
+ * @param {boolean} last If true returns the last node among the found child nodes. (default: first node)
  * Not use it like jquery.
  * Only one condition can be entered at a time.
  * @returns {Element|null}
@@ -405,7 +405,7 @@ export function getEdgeChildNodes(first, last) {
  * @description Get the item from the array that matches the condition.
  * @param {Array|HTMLCollection|NodeList} array Array to get item
  * @param {Function|null} validation Conditional function
- * @param {Boolean} multi If true, returns all items that meet the criteria otherwise, returns an empty array.
+ * @param {boolean} multi If true, returns all items that meet the criteria otherwise, returns an empty array.
  * If false, returns only one item that meet the criteria otherwise return null.
  * @returns {Array|Node|null}
  */
@@ -434,7 +434,7 @@ export function getArrayItem(array, validation, multi) {
  * @description Get the index of the argument value in the element array
  * @param {Array|HTMLCollection|NodeList} array element array
  * @param {Node} element The element to find index
- * @returns {Number}
+ * @returns {number}
  */
 export function getArrayIndex(array, element) {
 	let idx = -1;
@@ -452,7 +452,7 @@ export function getArrayIndex(array, element) {
  * @description Get the next index of the argument value in the element array
  * @param {Array|HTMLCollection|NodeList} array element array
  * @param {Node} item The element to find index
- * @returns {Number}
+ * @returns {number}
  */
 export function nextIndex(array, item) {
 	let idx = getArrayIndex(array, item);
@@ -464,7 +464,7 @@ export function nextIndex(array, item) {
  * @description Get the previous index of the argument value in the element array
  * @param {Array|HTMLCollection|NodeList} array Element array
  * @param {Node} item The element to find index
- * @returns {Number}
+ * @returns {number}
  */
 export function prevIndex(array, item) {
 	let idx = getArrayIndex(array, item);
@@ -496,7 +496,7 @@ export function copyTagAttributes(originEl, copyEl) {
  * Returns true if both are text nodes.
  * @param {Node} a Node to compare
  * @param {Node} b Node to compare
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isSameAttributes(a, b) {
 	if (a.nodeType === 3 && b.nodeType === 3) return true;
@@ -550,7 +550,7 @@ export function changeElement(element, newElement) {
 /**
  * @description Set the text content value of the argument value element
  * @param {Node} element Element to replace text content
- * @param {String} txt Text to be applied
+ * @param {string} txt Text to be applied
  */
 export function changeTxt(element, txt) {
 	if (!element || !txt) return;
@@ -560,7 +560,7 @@ export function changeTxt(element, txt) {
 /**
  * @description Set style, if all styles are deleted, the style properties are deleted.
  * @param {Element} element Element to set style
- * @param {String} styleName Style attribute name (marginLeft, textAlign...)
+ * @param {string} styleName Style attribute name (marginLeft, textAlign...)
  * @param {String|Number} value Style value
  */
 export function setStyle(element, styleName, value) {
@@ -575,7 +575,7 @@ export function setStyle(element, styleName, value) {
  * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
  * core.codeViewDisabledButtons (An array of buttons whose class name is not "se-code-view-enabled")
  * core.resizingDisabledButtons (An array of buttons whose class name is not "se-resizing-enabled")
- * @param {Boolean} disabled Disabled value
+ * @param {boolean} disabled Disabled value
  * @param {Array|HTMLCollection|NodeList} domList Button array
  */
 export function setDisabled(disabled, domList) {
@@ -587,8 +587,8 @@ export function setDisabled(disabled, domList) {
 /**
  * @description Determine whether any of the matched elements are assigned the given class
  * @param {Element} element Elements to search class name
- * @param {String} className Class name to search for
- * @returns {Boolean}
+ * @param {string} className Class name to search for
+ * @returns {boolean}
  */
 export function hasClass(element, className) {
 	if (!element) return;
@@ -599,7 +599,7 @@ export function hasClass(element, className) {
 /**
  * @description Append the className value of the argument value element
  * @param {Element} element Elements to add class name
- * @param {String} className Class name to be add
+ * @param {string} className Class name to be add
  */
 export function addClass(element, className) {
 	if (!element) return;
@@ -613,7 +613,7 @@ export function addClass(element, className) {
 /**
  * @description Delete the className value of the argument value element
  * @param {Element} element Elements to remove class name
- * @param {String} className Class name to be remove
+ * @param {string} className Class name to be remove
  */
 export function removeClass(element, className) {
 	if (!element) return;
@@ -627,7 +627,7 @@ export function removeClass(element, className) {
 /**
  * @description Argument value If there is no class name, insert it and delete the class name if it exists
  * @param {Element} element Elements to replace class name
- * @param {String} className Class name to be change
+ * @param {string} className Class name to be change
  * @returns {Boolean|undefined}
  */
 export function toggleClass(element, className) {
@@ -700,7 +700,7 @@ export function getGlobalOffset(container) {
 /**
  * @description It is judged whether it is the edit region top div element or iframe's body tag.
  * @param {Node} element The node to check
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isWysiwygDiv(element) {
 	return (
@@ -713,7 +713,7 @@ export function isWysiwygDiv(element) {
 /**
  * @description It is judged whether it is the contenteditable property is false.
  * @param {Node} element The node to check
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isNonEditable(element) {
 	return element && element.nodeType === 1 && element.getAttribute("contenteditable") === "false";
@@ -722,7 +722,7 @@ export function isNonEditable(element) {
 /**
  * @description Check the node is a list (ol, ul)
  * @param {Node|String} node The element or element name to check
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isList(node) {
 	return node && /^(OL|UL)$/i.test(typeof node === "string" ? node : node.nodeName);
@@ -731,7 +731,7 @@ export function isList(node) {
 /**
  * @description Check the node is a list cell (li)
  * @param {Node|String} node The element or element name to check
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isListCell(node) {
 	return node && /^LI$/i.test(typeof node === "string" ? node : node.nodeName);
@@ -740,7 +740,7 @@ export function isListCell(node) {
 /**
  * @description Check the node is a table (table, thead, tbody, tr, th, td)
  * @param {Node|String} node The element or element name to check
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isTable(node) {
 	return node && /^(TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(typeof node === "string" ? node : node.nodeName);
@@ -749,7 +749,7 @@ export function isTable(node) {
 /**
  * @description Check the node is a table cell (td, th)
  * @param {Node|String} node The element or element name to check
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isTableCell(node) {
 	return node && /^(TD|TH)$/i.test(typeof node === "string" ? node : node.nodeName);
@@ -758,7 +758,7 @@ export function isTableCell(node) {
 /**
  * @description Check the node is a break node (BR)
  * @param {Node|String} node The element or element name to check
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isBreak(node) {
 	return node && /^BR$/i.test(typeof node === "string" ? node : node.nodeName);
@@ -767,7 +767,7 @@ export function isBreak(node) {
 /**
  * @description Check the node is a anchor node (A)
  * @param {Node|String} node The element or element name to check
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isAnchor(node) {
 	return node && /^A$/i.test(typeof node === "string" ? node : node.nodeName);
@@ -776,7 +776,7 @@ export function isAnchor(node) {
 /**
  * @description Check the node is a media node (img, iframe, audio, video, canvas)
  * @param {Node|String} node The element or element name to check
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isMedia(node) {
 	return node && /^(IMG|IFRAME|AUDIO|VIDEO|CANVAS)$/i.test(typeof node === "string" ? node : node.nodeName);
@@ -785,7 +785,7 @@ export function isMedia(node) {
 /**
  * @description Check the line element is empty.
  * @param {Element} element Format element node
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isEmptyLine(element) {
 	return (
@@ -800,7 +800,7 @@ export function isEmptyLine(element) {
  * @description Checks for "__se__uneditable" in the class list.
  * Components with class "__se__uneditable" cannot be modified.
  * @param {Element} element The element to check
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isUneditable(element) {
 	return element && this.hasClass(element, "__se__uneditable");

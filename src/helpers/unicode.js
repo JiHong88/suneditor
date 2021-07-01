@@ -23,7 +23,7 @@ export const onlyZeroWidthRegExp = new _w.RegExp("^" + String.fromCharCode(zwsp)
 /**
  * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (util.zeroWidthSpace)
  * @param {String|Node} text String value or Node
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function onlyZeroWidthSpace(text) {
     if (typeof text !== "string") text = text.textContent;

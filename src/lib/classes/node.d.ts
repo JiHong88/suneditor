@@ -43,7 +43,7 @@ class Node extends CoreInterface {
 	 * @param stopParent Stop when the parent node reaches stopParent
 	 * @returns
 	 */
-	removeItemAllParents(item: Node, validation?: Function, stopParent?: Element): Record<string, Node | null> | null;
+	removeAllParents(item: Node, validation?: Function, stopParent?: Element): Record<string, Node | null> | null;
 
 	/**
 	 * @description Delete a empty child node of argument element
@@ -53,18 +53,20 @@ class Node extends CoreInterface {
 	removeEmptyNode(element: Element, notRemoveNode?: Node): void;
 
 	/**
-	 * @description It is judged whether it is the component [img, iframe] cover(class="se-component")
-	 * @param element The node to check
-	 * @returns
-	 */
-	isNotCheckingNode(element: Node): boolean;
-
-	/**
 	 * @description Remove whitespace between tags in HTML string.
 	 * @param html HTML string
 	 * @returns
 	 */
 	htmlRemoveWhiteSpace(html: string): string;
+
+	/**
+	 * @description Check if the container and offset values are the edges of the "line"
+	 * @param container The container property of the selection object.
+	 * @param offset The offset property of the selection object.
+	 * @param dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
+	 * @returns
+	 */
+	isEdgeLine(container: Node, offset: number, dir: "front" | "end"): boolean;
 
 	/**
 	 * @description It is judged whether it is a node related to the text style.
@@ -80,7 +82,28 @@ class Node extends CoreInterface {
 	 * @param element The node to check
 	 * @returns
 	 */
-	isFormatElement(element: Node): boolean;
+	isLine(element: Node): boolean;
+
+	/**
+	 * @description It is judged whether it is the free format element. (PRE | class="__se__format__br_line_xxx")
+	 * Free format elements is included in the format element.
+	 * Free format elements's line break is "BR" tag.
+	 * ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
+	 * @param element The node to check
+	 * @returns
+	 */
+	isBrLine(element: Node): boolean;
+
+	 /**
+		* @description It is judged whether it is the closure free format element. (class="__se__format__br_line__closure_xxx")
+		* Closure free format elements is included in the free format element.
+		*  - Closure free format elements's line break is "BR" tag.
+		* ※ You cannot exit this format with the Enter key.
+		* ※ Use it only in special cases. ([ex] format of table cells)
+		* @param element The node to check
+		* @returns
+		*/
+	isClosureBrLine(element: Node): boolean;
 
 	/**
 	 * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__range_block_xxx")
@@ -88,7 +111,7 @@ class Node extends CoreInterface {
 	 * @param element The node to check
 	 * @returns
 	 */
-	isRangeFormatElement(element: Node): boolean;
+	isRangeBlock(element: Node): boolean;
 
 	/**
 	 * @description It is judged whether it is the closure range format element. (TH, TD | class="__se__format__range_block_closure_xxx")
@@ -99,28 +122,7 @@ class Node extends CoreInterface {
 	 * @param element The node to check
 	 * @returns
 	 */
-	isClosureRangeFormatElement(element: Node): boolean;
-
-	/**
-	 * @description It is judged whether it is the free format element. (PRE | class="__se__format__br_line_xxx")
-	 * Free format elements is included in the format element.
-	 * Free format elements's line break is "BR" tag.
-	 * ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
-	 * @param element The node to check
-	 * @returns
-	 */
-	isFreeFormatElement(element: Node): boolean;
-
-	/**
-	 * @description It is judged whether it is the closure free format element. (class="__se__format__br_line__closure_xxx")
-	 * Closure free format elements is included in the free format element.
-	 *  - Closure free format elements's line break is "BR" tag.
-	 * ※ You cannot exit this format with the Enter key.
-	 * ※ Use it only in special cases. ([ex] format of table cells)
-	 * @param element The node to check
-	 * @returns
-	 */
-	isClosureFreeFormatElement(element: Node): boolean;
+	isClosureRangeBlock(element: Node): boolean;
 
 	/**
 	 * @description It is judged whether it is the component [img, iframe, video, audio] cover(class="se-component") and table, hr

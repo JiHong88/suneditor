@@ -1,7 +1,7 @@
 /**
  * @description Checks for numeric (with decimal point).
  * @param {String|Number} text Text string or number
- * @returns {Boolean}
+ * @returns {boolean}
  */
 export function isNumber(text) {
     return !!text && /^-?\d+(\.\d+)?$/.test(text + "");
@@ -10,8 +10,8 @@ export function isNumber(text) {
 /**
  * @description Get a number.
  * @param {String|Number} text Text string or number
- * @param {Number} maxDec Maximum number of decimal places (-1 : Infinity)
- * @returns {Number}
+ * @param {number} maxDec Maximum number of decimal places (-1 : Infinity)
+ * @returns {number}
  */
 export function getNumber(text, maxDec) {
     if (!text) return 0;
@@ -30,11 +30,11 @@ export function getNumber(text, maxDec) {
 /**
  * @description It compares the start and end indexes of "a" and "b" and returns the number of overlapping indexes in the range.
  * ex) 1, 5, 4, 6 => "2" (4,5)
- * @param {Number} aStart Start index of "a"
- * @param {Number} aEnd End index of "a"
- * @param {Number} bStart Start index of "b"
- * @param {Number} bEnd Start index of "b"
- * @returns {Number}
+ * @param {number} aStart Start index of "a"
+ * @param {number} aEnd End index of "a"
+ * @param {number} bStart Start index of "b"
+ * @param {number} bEnd Start index of "b"
+ * @returns {number}
  */
 export function getOverlapRangeAtIndex(aStart, aEnd, bStart, bEnd) {
     if (aStart <= bEnd ? aEnd < bStart : aEnd > bStart) return 0;

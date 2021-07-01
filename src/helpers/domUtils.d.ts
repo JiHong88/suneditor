@@ -329,7 +329,7 @@ class domUtils {
 	/**
 	 * @description Check the line element is empty.
 	 * @param {Element} element Format element node
-	 * @returns {Boolean}
+	 * @returns {boolean}
 	 */
 	isEmptyLine(element: Element): boolean;
 	

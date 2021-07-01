@@ -104,7 +104,7 @@ Toolbar.prototype = {
 		if (util.hasClass(context.element.wysiwyg, "se-show-block")) util.addClass(core._styleCommandMap.showBlocks, "active");
 	},
 
-	resetSticky: function () {
+	_resetSticky: function () {
 		if (core._variable.isFullScreen || context.element.toolbar.offsetWidth === 0 || options.stickyToolbar < 0) return;
 
 		const element = context.element;
@@ -208,7 +208,7 @@ Toolbar.prototype = {
 
 		if (!rects) {
 			const node = core.selection.getNode();
-			if (util.isFormatElement(node)) {
+			if (util.isLine(node)) {
 				const zeroWidth = util.createTextNode(util.zeroWidthSpace);
 				core.insertNode(zeroWidth, null, false);
 				core.setRange(zeroWidth, 1, zeroWidth, 1);
@@ -329,7 +329,7 @@ Toolbar.prototype = {
 
 		if (typeof this.events.showInline === "function") this.events.showInline(toolbar, context);
 
-		this.resetSticky();
+		this._resetSticky();
 		core._inlineToolbarAttr.isShow = true;
 		toolbar.style.visibility = "";
 	},

@@ -381,27 +381,27 @@ plugins: [
 
 // Values
 lang            : language object.   default : en {Object}
-defaultTag      : Specifies default tag name of the editor.     default: 'p' {String}
+defaultTag      : Specifies default tag name of the editor.     default: 'p' {string}
 textTags        : You can change the tag of the default text button.   default: { bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL' }
                   ex) {
                       bold: 'b',
                       strike: 's'
                   }
 value           : Initial value(html string) of the edit area.
-                  If not, the value of the "target textarea".   default: null {String}
-historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {Number}
+                  If not, the value of the "target textarea".   default: null {string}
+historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {number}
 
 // Whitelist--------------------------------------å---------------------------------------------------------
 // (You can use regular expression syntax.)
 // _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary'
-addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
+addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {string}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
-pasteTagsWhitelist    : Whitelist of tags when pasting.                     default: _editorTagsWhitelist {String}
+pasteTagsWhitelist    : Whitelist of tags when pasting.                     default: _editorTagsWhitelist {string}
                         ex) 'p|h1|h2|h3'
-tagsBlacklist         : Blacklist of the editor default tags.               default: null {String}
+tagsBlacklist         : Blacklist of the editor default tags.               default: null {string}
                         ex) 'h1|h2'
-pasteTagsBlacklist    : Blacklist of tags when pasting.                     default: null {String}
+pasteTagsBlacklist    : Blacklist of tags when pasting.                     default: null {string}
                         ex) 'h1|h2'
 attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}
                         // -- Fixed whitelist --
@@ -412,8 +412,8 @@ attributesWhitelist   : Add attributes whitelist of tags that should be kept und
                             'input': 'checked|name' // Apply to input tag
                         }
 // Layout-------------------------------------------------------------------------------------------------------
-mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {String}
-rtl             : If true, the editor is set to RTL(Right To Left) mode.   default: false {Boolean}
+mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {string}
+rtl             : If true, the editor is set to RTL(Right To Left) mode.   default: false {boolean}
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
                   'inline' or 'balloon' mode.     default: 'auto' {Number|String}
 toolbarContainer: A custom HTML selector placing the toolbar inside.
@@ -425,18 +425,18 @@ stickyToolbar   : Top offset value of "sticky toolbar".
                   If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
 fullScreenOffset: Top offset value of "full Screen".
                   Set to 0, '0px', '50px'...     default: 0 {Number|String}
-iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {Boolean}
-fullPage        : Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.  default: false {Boolean}
+iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {boolean}
+fullPage        : Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.  default: false {boolean}
 iframeCSSFileName : Name or Array of the CSS file to apply inside the iframe.
                     You can also use regular expressions.
                     Applied by searching by filename in the link tag of document,
                     or put the URL value (".css" can be omitted).   default: 'suneditor' {Array|String}
                     ex) '.+' or ['suneditor', 'http://suneditor.com/sample/css/sample.css', '.+\\.min\\.css']
 previewTemplate : A template of the "preview".
-                  The {{contents}} part in the HTML string is replaced with the contents of the editor. default: null {String}
+                  The {{contents}} part in the HTML string is replaced with the contents of the editor. default: null {string}
                   ex) "<div style='width:auto; max-width:1080px; margin:auto;'><h1>Preview Template</h1> {{contents}} <div>_Footer_</div></div>"
 printTemplate   : A template of the "print".
-                  The {{contents}} part in the HTML string is replaced with the contents of the editor. default: null {String}
+                  The {{contents}} part in the HTML string is replaced with the contents of the editor. default: null {string}
                   ex) "<div style='width:auto; max-width:1080px; margin:auto;'><h1>Print Template</h1> {{contents}} <div>_Footer_</div></div>"
 codeMirror      : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
                   Use version 5.x.x // https://github.com/codemirror/CodeMirror
@@ -472,25 +472,25 @@ mathFontSize    : Math plugin font size list.                       default: [{.
                   ]
 
 // Display-------------------------------------------------------------------------------------------------------
-position        : The position property of suneditor.               default: null {String}
-display         : The display property of suneditor.                default: 'block' {String}
-popupDisplay    : Size of background area when activating dialog window ('full'||'local') default: 'full' {String}
+position        : The position property of suneditor.               default: null {string}
+display         : The display property of suneditor.                default: 'block' {string}
+popupDisplay    : Size of background area when activating dialog window ('full'||'local') default: 'full' {string}
 
 // Bottom resizing bar-------------------------------------------------------------------------------------------
 resizingBar     : Show the bottom resizing bar.
-                  If 'height' value is 'auto', it will not be resized. default: true {Boolean}
-showPathLabel   : Displays the current node structure to resizingBar.  default: true {Boolean}
+                  If 'height' value is 'auto', it will not be resized. default: true {boolean}
+showPathLabel   : Displays the current node structure to resizingBar.  default: true {boolean}
 
 // Character count-----------------------------------------------------------------------------------------------
 charCounter     : Shows the number of characters in the editor.     
-                  If the maxCharCount option has a value, it becomes true. default: false {Boolean}
+                  If the maxCharCount option has a value, it becomes true. default: false {boolean}
 charCounterType : Defines the calculation method of the "charCounter" option.
                   'char': Characters length.
                   'byte': Binary data size of characters.
-                  'byte-html': Binary data size of the full HTML string.   default: 'char' {String}
+                  'byte-html': Binary data size of the full HTML string.   default: 'char' {string}
 charCounterLabel: Text to be displayed in the "charCounter" area of the bottom bar.
-                  Screen ex) 'charCounterLabel : 20/200'.           default: null {String}
-maxCharCount    : The maximum number of characters allowed to be inserted into the editor. default: null {Number}
+                  Screen ex) 'charCounterLabel : 20/200'.           default: null {string}
+maxCharCount    : The maximum number of characters allowed to be inserted into the editor. default: null {number}
 
 // Width size----------------------------------------------------------------------------------------------------
 width           : The width size of the editor.                     default: clientWidth||'100%' {Number|String}
@@ -508,7 +508,7 @@ maxHeight       : The max-height size of the editor.
 
 // Editing area default style------------------------------------------------------------------------------------
 defaultStyle    : You can define the style of the edit area. (className: 'sun-editor-editable')
-                  It affects the entire editing area.               default: '' {String}
+                  It affects the entire editing area.               default: '' {string}
                   ('z-index', 'position' and 'width' properties apply to the top div.)
                   ex) 'font-family: cursive; font-size: 10px;'
 
@@ -522,7 +522,7 @@ fontSize        : Change default font-size array.                   default: [..
                   Default value: [
                     8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
                   ]
-fontSizeUnit    : The font size unit.                               default: 'px' {String}
+fontSizeUnit    : The font size unit.                               default: 'px' {string}
 formats         : Change default formatBlock array.                 default: [...] {Array}
                   Default value: [
                     'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
@@ -615,19 +615,19 @@ textStyles      : You can apply custom style or class to selected text.
                   ]
 
 // Image---------------------------------------------------------------------------------------------------------
-imageResizing   : Can resize the image.                               default: true {Boolean}
-imageHeightShow : Choose whether the image height input is visible.   default: true {Boolean}
-imageWidth      : The default width size of the image frame.          default: 'auto' {String}
-imageHeight     : The default height size of the image frame.         default: 'auto' {String}
-imageSizeOnlyPercentage : If true, image size can only be scaled by percentage.   default: false {Boolean}
+imageResizing   : Can resize the image.                               default: true {boolean}
+imageHeightShow : Choose whether the image height input is visible.   default: true {boolean}
+imageWidth      : The default width size of the image frame.          default: 'auto' {string}
+imageHeight     : The default height size of the image frame.         default: 'auto' {string}
+imageSizeOnlyPercentage : If true, image size can only be scaled by percentage.   default: false {boolean}
 imageRotation   : Choose whether to image rotation buttons display.
                   When "imageSizeOnlyPercentage" is "true" or  or "imageHeightShow" is "false" the default value is false.                       
-                  If you want the button to be visible, put it a true.     default: true {Boolean}
-imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
+                  If you want the button to be visible, put it a true.     default: true {boolean}
+imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {boolean}
 imageUrlInput   : Choose whether to create a image url input tag in the image upload window.
-                  If the value of imageFileInput is false, it will be unconditionally.   default: true {Boolean}
+                  If the value of imageFileInput is false, it will be unconditionally.   default: true {boolean}
 imageUploadHeader : Http Header when uploading images.              default: null {Object}
-imageUploadUrl  : The image upload to server mapping address.       default: null {String}
+imageUploadUrl  : The image upload to server mapping address.       default: null {string}
                   (When not used the "imageUploadUrl" option, image is enters base64 data)
                   ex) "/editor/uploadImage"
                   request format: {
@@ -645,14 +645,14 @@ imageUploadUrl  : The image upload to server mapping address.       default: nul
                             ]
                         }
 imageUploadSizeLimit: The size of the total uploadable images (in bytes).
-                      Invokes the "onImageUploadError" method.  default: null {Number}
-imageMultipleFile: If true, multiple images can be selected.    default: false {Boolean}
-imageAccept      : Define the "accept" attribute of the input.  default: "*" {String}
+                      Invokes the "onImageUploadError" method.  default: null {number}
+imageMultipleFile: If true, multiple images can be selected.    default: false {boolean}
+imageAccept      : Define the "accept" attribute of the input.  default: "*" {string}
                    ex) "*" or ".jpg, .png .."
 // Image - image gallery
 imageGalleryUrl     : The url of the image gallery, if you use the image gallery.
                       When "imageUrlInput" is true, an image gallery button is created in the image modal.
-                      You can also use it by adding "imageGallery" to the button list.   default: null {String}
+                      You can also use it by adding "imageGallery" to the button list.   default: null {string}
                       ex) "/editor/getGallery"
                       response format: {
                             "errorMessage": "insert error message",
@@ -669,15 +669,15 @@ imageGalleryUrl     : The url of the image gallery, if you use the image gallery
 imageGalleryHeader: Http Header when get image gallery.         default: null {Object}
 
 // Video----------------------------------------------------------------------------------------------------------
-videoResizing   : Can resize the video (iframe, video).                         default: true {Boolean}
-videoHeightShow : Choose whether the video height input is visible.    default: true {Boolean}
-videoRatioShow  : Choose whether the video ratio options is visible.   default: true {Boolean}
-videoWidth      : The default width size of the video frame.           default: '100%' {String}
-videoHeight     : The default height size of the video frame.          default: '56.25%' {String}
-videoSizeOnlyPercentage : If true, video size can only be scaled by percentage.   default: false {Boolean}
+videoResizing   : Can resize the video (iframe, video).                         default: true {boolean}
+videoHeightShow : Choose whether the video height input is visible.    default: true {boolean}
+videoRatioShow  : Choose whether the video ratio options is visible.   default: true {boolean}
+videoWidth      : The default width size of the video frame.           default: '100%' {string}
+videoHeight     : The default height size of the video frame.          default: '56.25%' {string}
+videoSizeOnlyPercentage : If true, video size can only be scaled by percentage.   default: false {boolean}
 videoRotation   : Choose whether to video rotation buttons display.
                   When "videoSizeOnlyPercentage" is "true" or "videoHeightShow" is "false" the default value is false.
-                  If you want the button to be visible, put it a true.     default: true {Boolean}
+                  If you want the button to be visible, put it a true.     default: true {boolean}
 videoRatio      : The default aspect ratio of the video.
                   Up to four decimal places are allowed.             default: 0.5625 (16:9) {Float}
 videoRatioList  : Video ratio selection options.
@@ -690,15 +690,15 @@ videoRatioList  : Video ratio selection options.
                     {name: 'Classic Film 3:2', value: 0.6666},
                     {name: 'HD', value: 0.5625}
                   ]
-youtubeQuery    : The query string of a YouTube embedded URL.        default: '' {String}
+youtubeQuery    : The query string of a YouTube embedded URL.        default: '' {string}
                   It takes precedence over the value user entered.
                   ex) 'autoplay=1&mute=1&enablejsapi=1&controls=0&rel=0&modestbranding=1'
                     // https://developers.google.com/youtube/player_parameters
-videoFileInput  : Choose whether to create a file input tag in the video upload window.  default: false {Boolean}
+videoFileInput  : Choose whether to create a file input tag in the video upload window.  default: false {boolean}
 videoUrlInput   : Choose whether to create a video url input tag in the video upload window.
-                  If the value of videoFileInput is false, it will be unconditionally.   default: true {Boolean}
+                  If the value of videoFileInput is false, it will be unconditionally.   default: true {boolean}
 videoUploadHeader : Http Header when uploading videos.              default: null {Object}
-videoUploadUrl  : The video upload to server mapping address.       default: null {String}
+videoUploadUrl  : The video upload to server mapping address.       default: null {string}
                   ex) "/editor/uploadVideo"
                   request format: {
                             "file-0": File,
@@ -716,23 +716,23 @@ videoUploadUrl  : The video upload to server mapping address.       default: nul
                             ]
                         }
 videoUploadSizeLimit: The size of the total uploadable videos (in bytes).
-                      Invokes the "onVideoUploadError" method.  default: null {Number}
-videoMultipleFile: If true, multiple videos can be selected.    default: false {Boolean}
+                      Invokes the "onVideoUploadError" method.  default: null {number}
+videoMultipleFile: If true, multiple videos can be selected.    default: false {boolean}
 videoTagAttrs    : Define "Attributes" of the video tag.                      default: null {Object} 
                    ex) { poster: "http://suneditor.com/docs/loading.gif", autoplay: true }
 videoIframeAttrs : Define "Attributes" of the iframe tag. (Youtube, Vimeo).   default: null {Object}
                    ex) { style: "border: 2px solid red;" }
-videoAccept      : Define the "accept" attribute of the input.  default: "*" {String}
+videoAccept      : Define the "accept" attribute of the input.  default: "*" {string}
                    ex) "*" or ".mp4, .avi .."
 
 // Audio----------------------------------------------------------------------------------------------------------
-audioWidth      : The default width size of the audio frame.        default: '300px' {String}
-audioHeight     : The default height size of the audio frame.       default: '54px' {String}
-audioFileInput  : Choose whether to create a file input tag in the audio upload window.  default: false {Boolean}
+audioWidth      : The default width size of the audio frame.        default: '300px' {string}
+audioHeight     : The default height size of the audio frame.       default: '54px' {string}
+audioFileInput  : Choose whether to create a file input tag in the audio upload window.  default: false {boolean}
 audioUrlInput   : Choose whether to create a audio url input tag in the audio upload window.
-                  If the value of audioFileInput is false, it will be unconditionally.   default: true {Boolean}
+                  If the value of audioFileInput is false, it will be unconditionally.   default: true {boolean}
 audioUploadHeader : Http Header when uploading audios.              default: null {Object}
-audioUploadUrl  : The audio upload to server mapping address.       default: null {String}
+audioUploadUrl  : The audio upload to server mapping address.       default: null {string}
                   ex) "/editor/uploadAudio"
                   request format: {
                             "file-0": File,
@@ -750,19 +750,19 @@ audioUploadUrl  : The audio upload to server mapping address.       default: nul
                             ]
                         }
 audioUploadSizeLimit: The size of the total uploadable audios (in bytes).
-                      Invokes the "onAudioUploadError" method.  default: null {Number}
-audioMultipleFile: If true, multiple audios can be selected.    default: false {Boolean}
+                      Invokes the "onAudioUploadError" method.  default: null {number}
+audioMultipleFile: If true, multiple audios can be selected.    default: false {boolean}
 audioTagAttrs    : Define "Attributes" of the audio tag.        default: null {Object} 
                    ex) { controlslist: "nodownload", autoplay: true }
-videoAccept      : Define the "accept" attribute of the input.  default: "*" {String}
+videoAccept      : Define the "accept" attribute of the input.  default: "*" {string}
                    ex) "*" or ".mp3, .wav .."
 
 // Table----------------------------------------------------------------------------------------------------------
-tableCellControllerPosition : Define position to the table cell controller('cell', 'top'). default: 'cell' {String}
+tableCellControllerPosition : Define position to the table cell controller('cell', 'top'). default: 'cell' {string}
 
 // Link-----------------------------------------------------------------------------------------------------------
 linkProtocol    : Default protocol for the links. ('link', 'image', 'video', 'audio')
-                  This applies to all plugins that enter the internet url.   default: null {String}
+                  This applies to all plugins that enter the internet url.   default: null {string}
 linkRel         : Defines "rel" attribute list of anchor tag.   default: [] {Array}
                   // https://www.w3schools.com/tags/att_a_rel.asp
                   ex) [
@@ -791,10 +791,10 @@ linkRelDefault  : Defines default "rel" attributes of anchor tag.   default: {} 
                     }
 
 // Key actions----------------------------------------------------------------------------------------------------
-tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {Boolean}
+tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {boolean}
 shortcutsDisable: You can disable shortcuts.    default: [] {Array}
                   ex) ['bold', 'strike', 'underline', 'italic', 'undo', 'indent', 'save']
-shortcutsHint   : If false, hide the shortcuts hint.    default: true {Boolean}
+shortcutsHint   : If false, hide the shortcuts hint.    default: true {boolean}
 
 // Defining save button-------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. 
@@ -815,8 +815,8 @@ templates       : If you use a template plugin, add it.
                   ]
 
 // ETC------------------------------------------------------------------------------------------------------------
-placeholder     : The placeholder text.                              default: null {String}
-mediaAutoSelect : Activate the media[image, video, audio] selection status immediately after inserting the media tag.  default: true {Boolean}
+placeholder     : The placeholder text.                              default: null {string}
+mediaAutoSelect : Activate the media[image, video, audio] selection status immediately after inserting the media tag.  default: true {boolean}
 icons           : You can redefine icons.                            default: null {Object}
                   ex) {
                       bold: '<span class="se-icon-text">B</span>',
@@ -947,7 +947,7 @@ editor.setDefaultStyle('font-family: cursive; font-size: 10px;');
 editor.save();
 
 // Gets the contents of the suneditor
-// onlyContents {Boolean}: Return only the contents of the body without headers when the "fullPage" option is true
+// onlyContents {boolean}: Return only the contents of the body without headers when the "fullPage" option is true
 editor.getContents(onlyContents: Boolean);
 
 // Gets only the text of the suneditor contents
@@ -975,8 +975,8 @@ editor.insertImage(FileList);
 
 // Inserts an HTML element or HTML string or plain string at the current cursor position
 /**
- * @param {Boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
- * @param {Boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+ * @param {boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
+ * @param {boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
  */
 editor.insertHTML('<img src="http://suneditor.com/sample/img/sunset.jpg">', true, true);
 
@@ -1207,7 +1207,7 @@ editor.onAudioUpload = function (targetElement, index, state, info, remainingFil
  * errorMessage: Error message
  * result: Response Object
  * core: Core object
- * return {Boolean}
+ * return {boolean}
 */
 editor.onImageUploadError = function (errorMessage, result, core) {
     alert(errorMessage)

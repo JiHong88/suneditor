@@ -28,7 +28,7 @@ const Notice = function (editor) {
 Notice.prototype = {
 	/**
 	 * @description  Open the notice panel
-	 * @param {String} text Notice message
+	 * @param {string} text Notice message
 	 */
 	open: function (text) {
 		this.message.textContent = text;

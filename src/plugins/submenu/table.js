@@ -990,7 +990,7 @@ export default {
 
             ch = cell.children;
             for (let c = 0, cLen = ch.length; c < cLen; c++) {
-                if (util.isFormatElement(ch[c]) && util.onlyZeroWidthSpace(ch[c].textContent)) {
+                if (util.isLine(ch[c]) && util.onlyZeroWidthSpace(ch[c].textContent)) {
                     util.removeItem(ch[c]);
                 }  
             }
@@ -1421,7 +1421,7 @@ export default {
                 this.util.removeItem(contextTable._element);
                 this.controllersOff();
 
-                if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
+                if (emptyDiv !== this.context.element.wysiwyg) this.util.removeAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
                 this.focus();
         }
 

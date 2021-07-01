@@ -240,7 +240,7 @@
          * @param {Element} element Target element
          * @param {Element} cover Cover element (FIGURE)
          * @param {Element} container Container element (DIV.se-component)
-         * @returns {String}
+         * @returns {string}
          */
         _module_getSizeX: function (contextPlugin, element, cover, container) {
             if (!element) element = contextPlugin._element;
@@ -258,7 +258,7 @@
          * @param {Element} element Target element
          * @param {Element} cover Cover element (FIGURE)
          * @param {Element} container Container element (DIV.se-component)
-         * @returns {String}
+         * @returns {string}
          */
         _module_getSizeY: function (contextPlugin, element, cover, container) {
             if (!element) element = contextPlugin._element;
@@ -304,7 +304,7 @@
          * checks the value entered in the input tag, 
          * calculates the ratio, and sets the calculated value in the input tag of the opposite size.
          * @param {Object} contextPlugin context object of plugin (core.context[plugin])
-         * @param {String} xy 'x': width, 'y': height
+         * @param {string} xy 'x': width, 'y': height
          */
         _module_setInputSize: function (contextPlugin, xy) {
             if (contextPlugin._onlyPercentage) {
@@ -800,7 +800,7 @@
          * @description Mouse move event after call "onMouseDown_resize_handle" of resize handles
          * The size of the module's "div" is adjusted according to the mouse move event.
          * @param {Object} contextResizing "core.context.resizing" object (binding argument)
-         * @param {String} direction Direction ("tl", "tr", "bl", "br", "lw", "th", "rw", "bh") (binding argument)
+         * @param {string} direction Direction ("tl", "tr", "bl", "br", "lw", "th", "rw", "bh") (binding argument)
          * @param {Object} plugin "core.context[currentPlugin]" object (binding argument)
          * @param {MouseEvent} e Event object
          */
@@ -841,7 +841,7 @@
         /**
          * @description Resize the element to the size of the "div" adjusted in the "resizing_element" method.
          * Called at the mouse-up event registered in "onMouseDown_resize_handle".
-         * @param {String} direction Direction ("tl", "tr", "bl", "br", "lw", "th", "rw", "bh")
+         * @param {string} direction Direction ("tl", "tr", "bl", "br", "lw", "th", "rw", "bh")
          */
         cancel_controller_resize: function (direction) {
             const isVertical = this.context.resizing._rotateVertical;

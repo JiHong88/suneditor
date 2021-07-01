@@ -283,7 +283,7 @@ export default {
         this.plugins.video.init.call(this);
         this.controllersOff();
 
-        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeItemAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
+        if (emptyDiv !== this.context.element.wysiwyg) this.util.removeAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
 
         // focus
         this.focusEdge(focusEl);
@@ -333,7 +333,7 @@ export default {
 
     /**
      * @Override resizing
-     * @param {String} xy 'x': width, 'y': height
+     * @param {string} xy 'x': width, 'y': height
      * @param {KeyboardEvent} e Event object
      */
     setInputSize: function (xy, e) {
@@ -673,7 +673,7 @@ export default {
             if (format) contextVideo._align = format.style.textAlign || format.style.float;
             this.plugins.video.setAlign.call(this, null, oFrame, cover, container);
 
-            if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
+            if (this.util.isLine(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(prevFrame);
                 // clean format tag
