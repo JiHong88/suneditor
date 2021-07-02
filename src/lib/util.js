@@ -1736,8 +1736,17 @@ const util = {
             t = wrongTags[i];
             p = t.parentNode;
             if (!p || !p.parentNode) continue;
-            p.parentNode.insertBefore(t, p);
-            checkTags.push(p);
+
+            if (this.getParentElement(t, this.isListCell)) {
+                const cellChildren = t.childNodes;
+                for (let j = cellChildren.length - 1; len >= 0; j--) {
+                    p.insertBefore(t, cellChildren[j]);
+                }
+                checkTags.push(t);
+            } else {
+                p.parentNode.insertBefore(t, p);
+                checkTags.push(p);
+            }
         }
 
         for (let i = 0, len = checkTags.length, t; i < len; i++) {
