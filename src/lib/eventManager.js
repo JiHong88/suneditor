@@ -20,6 +20,14 @@ function eventManager(editor) {
 }
 
 eventManager.prototype = {
+	/**
+	 * @description Register for an event.
+	 * Only events registered with this method are unregistered or re-registered when methods such as "setOptions", "destroy" are called. 
+	 * @param {Element} target Target element
+	 * @param {string} type Event type
+	 * @param {Function} handler Event handler
+	 * @param {boolean|undefined} useCapture Event useCapture option
+	 */
 	addEvent: function (target, type, handler, useCapture) {
 		target.addEventListener(type, handler, useCapture);
 		this._events.push({
@@ -56,6 +64,10 @@ eventManager.prototype = {
 		}
 	},
 
+	/**
+	 * @description Activates the corresponding button with the tags information of the current cursor position, 
+	 * such as "bold", "underline", etc., and executes the "active" method of the plugins.  
+	 */
 	applyTagEffect: function () {
 		let selectionNode = core.selection.getNode();
 		if (selectionNode === core.effectNode) return;
@@ -133,6 +145,7 @@ eventManager.prototype = {
 	/**
 	 * @description remove class, display text.
 	 * @param {Array|null} ignoredList Igonred button list
+	 * @private
 	 */
 	_setKeyEffect: function (ignoredList) {
 		const commandMap = this.commandMap;
