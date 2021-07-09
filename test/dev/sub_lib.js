@@ -107,7 +107,7 @@ export default {
             //     after = child;
             // }
             // this.setRange(after, 1, after, 1);
-            this.insertHTML(data)
+            this.selection.insertHTML(data)
             
             // clear content
             this.context.custom.textElement.value = null;

@@ -241,7 +241,7 @@ export default {
      */
     destroy: function (element) {
         element = element || this.context.customAudio._element;
-        const container = this.util.getParentElement(element, this.node.isComponent) || element;
+        const container = this.util.getParentElement(element, this.component.is) || element;
         const dataIndex = element.getAttribute('data-index') * 1;
         const focusEl = (container.previousElementSibling || container.nextElementSibling);
 
@@ -390,7 +390,7 @@ export default {
 
     setupUrl: function () {
         try {
-            this.showLoading();
+            this.openLoading();
             const context = this.context.customAudio;
             const src = context.urlInput.value.trim();
 
@@ -442,9 +442,9 @@ export default {
         element.setAttribute('controls', true);
         
         // find component element
-        const existElement = this.util.getParentElement(element, this.node.isComponent) || 
+        const existElement = this.util.getParentElement(element, this.component.is) || 
             this.util.getParentElement(element, function (current) {
-                return this.isWysiwygDiv(current.parentNode);
+                return this.isWysiwygFrame(current.parentNode);
             }.bind(this.util));
 
         // clone element
@@ -468,7 +468,7 @@ export default {
         const context = this.context.customAudio;
 
         const controller = context.controller;
-        const offset = this.util.getOffset(selectionTag, this.context.element.wysiwygFrame);
+        const offset = this.offset.get(selectionTag);
         controller.style.top = (offset.top + selectionTag.offsetHeight + 10) + 'px';
         controller.style.left = (offset.left - this.context.element.wysiwygFrame.scrollLeft) + 'px';
 
@@ -489,7 +489,7 @@ export default {
         selectionTag.style.border = '1px solid #80bdff';
         context._element = selectionTag;
         context._cover = this.util.getParentElement(selectionTag, 'FIGURE');
-        context._container = this.util.getParentElement(selectionTag, this.node.isComponent);
+        context._container = this.util.getParentElement(selectionTag, this.component.is);
     },
 
     /**

@@ -12,6 +12,7 @@
     "dev": "webpack-dev-server --open --config webpack.dev.js",
     "start": "npm run dev",
     "build": "webpack --config webpack.prod.js",
+    "interface": "webpack --config webpack.interface.js",
     "lint": "jshint src",
     "test": "karma start"
   },

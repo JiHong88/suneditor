@@ -148,7 +148,7 @@ export default {
     },
 
     submit: function (e) {
-        this.showLoading();
+        this.openLoading();
 
         e.preventDefault();
         e.stopPropagation();

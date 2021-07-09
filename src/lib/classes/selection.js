@@ -5,10 +5,13 @@
 "use strict";
 
 import CoreInterface from "../../interface/_core";
+import {
+	domUtils
+} from "../../helpers";
+import unicode from "../../helpers/unicode";
 
 const Selection = function (editor) {
 	CoreInterface.call(this, editor);
-
 	this.range = null;
 	this.selectionNode = null;
 };
@@ -20,14 +23,13 @@ Selection.prototype = {
 	 * @private
 	 */
 	_createDefaultRange: function () {
-		const wysiwyg = context.element.wysiwyg;
+		const wysiwyg = this.context.element.wysiwyg;
 		wysiwyg.focus();
 		const range = this._wd.createRange();
 
 		let focusEl = wysiwyg.firstElementChild;
 		if (!focusEl) {
-			focusEl = util.createElement(options.defaultTag);
-			focusEl.innerHTML = "<br>";
+			focusEl = domUtils.createElement(options.defaultTag, null, "<br>");
 			wysiwyg.appendChild(focusEl);
 		}
 
@@ -53,18 +55,18 @@ Selection.prototype = {
 			range = this._createDefaultRange();
 		}
 
-		this._variable._range = range;
+		this.status._range = range;
 
 		if (range.collapsed) {
-			if (util.isWysiwygDiv(range.commonAncestorContainer))
+			if (domUtils.isWysiwygFrame(range.commonAncestorContainer))
 				selectionNode =
-					range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
+				range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
 			else selectionNode = range.commonAncestorContainer;
 		} else {
 			selectionNode = selection.extentNode || selection.anchorNode;
 		}
 
-		this._variable._selectionNode = selectionNode;
+		this.status._selectionNode = selectionNode;
 	},
 
 	/**
@@ -72,20 +74,20 @@ Selection.prototype = {
 	 * @returns {Object}
 	 */
 	getRange: function () {
-		const range = this._variable._range || this._createDefaultRange();
+		const range = this.status._range || this._createDefaultRange();
 		const selection = this.get();
 		if (range.collapsed === selection.isCollapsed || !context.element.wysiwyg.contains(selection.focusNode))
 			return range;
 
 		if (selection.rangeCount > 0) {
-			this._variable._range = selection.getRangeAt(0);
-			return this._variable._range;
+			this.status._range = selection.getRangeAt(0);
+			return this.status._range;
 		} else {
 			const sc = selection.anchorNode,
 				ec = selection.focusNode,
 				so = selection.anchorOffset,
 				eo = selection.focusOffset;
-			const compareValue = util.compareElements(sc, ec);
+			const compareValue = domUtils.compareElements(sc, ec);
 			const rightDir =
 				compareValue.ancestor &&
 				(compareValue.result === 0 ? so <= eo : compareValue.result > 1 ? true : false);
@@ -105,11 +107,11 @@ Selection.prototype = {
 		if (!startCon || !endCon) return;
 		if (startOff > startCon.textContent.length) startOff = startCon.textContent.length;
 		if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
-		if (util.isLine(startCon)) {
+		if (this.format.isLine(startCon)) {
 			startCon = startCon.childNodes[startOff] || startCon;
 			startOff = 0;
 		}
-		if (util.isLine(endCon)) {
+		if (this.format.isLine(endCon)) {
 			endCon = endCon.childNodes[endOff] || endCon;
 			endOff = startOff > 1 ? startOff : 0;
 		}
@@ -121,7 +123,7 @@ Selection.prototype = {
 			range.setEnd(endCon, endOff);
 		} catch (error) {
 			console.warn("[SUNEDITOR.core.focus.error] " + error);
-			this.nativeFocus();
+			this.editor.nativeFocus();
 			return;
 		}
 
@@ -133,7 +135,7 @@ Selection.prototype = {
 
 		selection.addRange(range);
 		this._init();
-		if (options.iframe) this.nativeFocus();
+		if (this.options.iframe) this.editor.nativeFocus();
 
 		return range;
 	},
@@ -142,9 +144,9 @@ Selection.prototype = {
 	 * @description Remove range object and button effect
 	 */
 	removeRange: function () {
-		this._variable._range = null;
-		this._variable._selectionNode = null;
-		if (this.hasFocus) this.get().removeAllRanges();
+		this.status._range = null;
+		this.status._selectionNode = null;
+		if (this.status.hasFocus) this.get().removeAllRanges();
 		this.editor.eventManager._setKeyEffect([]);
 	},
 
@@ -157,15 +159,14 @@ Selection.prototype = {
 	 */
 	getRange_addLine: function (range, container) {
 		if (this.isNone(range)) {
-			const wysiwyg = context.element.wysiwyg;
-			const op = util.createElement(options.defaultTag);
-			op.innerHTML = "<br>";
+			const wysiwyg = this.context.element.wysiwyg;
+			const op = domUtils.createElement(options.defaultTag, null, "<br>");
 			wysiwyg.insertBefore(
 				op,
 				container && container !== wysiwyg ? container.nextElementSibling : wysiwyg.firstElementChild
 			);
 			this.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
-			range = this._variable._range;
+			range = this.status._range;
 		}
 		return range;
 	},
@@ -175,9 +176,9 @@ Selection.prototype = {
 	 * @returns {Object}
 	 */
 	get: function () {
-		return this._shadowRoot && this._shadowRoot.getSelection
-			? this._shadowRoot.getSelection()
-			: this._ww.getSelection();
+		return this._shadowRoot && this._shadowRoot.getSelection ?
+			this._shadowRoot.getSelection() :
+			this._ww.getSelection();
 	},
 
 	/**
@@ -185,10 +186,10 @@ Selection.prototype = {
 	 * @returns {Node}
 	 */
 	getNode: function () {
-		if (!context.element.wysiwyg.contains(this._variable._selectionNode)) this._init();
-		if (!this._variable._selectionNode) {
-			const selectionNode = util.getEdgeChild(
-				context.element.wysiwyg.firstChild,
+		if (!this.context.element.wysiwyg.contains(this.status._selectionNode)) this._init();
+		if (!this.status._selectionNode) {
+			const selectionNode = domUtils.getEdgeChild(
+				this.context.element.wysiwyg.firstChild,
 				function (current) {
 					return current.childNodes.length === 0 || current.nodeType === 3;
 				},
@@ -197,11 +198,11 @@ Selection.prototype = {
 			if (!selectionNode) {
 				this._init();
 			} else {
-				this._variable._selectionNode = selectionNode;
+				this.status._selectionNode = selectionNode;
 				return selectionNode;
 			}
 		}
-		return this._variable._selectionNode;
+		return this.status._selectionNode;
 	},
 
 	/**
@@ -213,8 +214,8 @@ Selection.prototype = {
 		if (!this._resetRangeToTextNode()) return [];
 		let range = this.getRange();
 
-		if (util.isWysiwygDiv(range.startContainer)) {
-			const children = context.element.wysiwyg.children;
+		if (domUtils.isWysiwygFrame(range.startContainer)) {
+			const children = this.context.element.wysiwyg.children;
 			if (children.length === 0) return [];
 
 			this.setRange(
@@ -231,11 +232,11 @@ Selection.prototype = {
 		const commonCon = range.commonAncestorContainer;
 
 		// get line nodes
-		const lineNodes = util.getListChildren(commonCon, function (current) {
-			return validation ? validation(current) : util.isLine(current);
-		});
+		const lineNodes = domUtils.getListChildren(commonCon, function (current) {
+			return validation ? validation(current) : this.format.isLine(current);
+		}.bind(this));
 
-		if (!util.isWysiwygDiv(commonCon) && !util.isRangeBlock(commonCon))
+		if (!domUtils.isWysiwygFrame(commonCon) && !this.format.isRangeBlock(commonCon))
 			lineNodes.unshift(this.format.getLine(commonCon, null));
 		if (startCon === endCon || lineNodes.length === 1) return lineNodes;
 
@@ -245,14 +246,14 @@ Selection.prototype = {
 		let endIdx = null;
 
 		const onlyTable = function (current) {
-			return util.isTable(current) ? /^TABLE$/i.test(current.nodeName) : true;
+			return domUtils.isTable(current) ? /^TABLE$/i.test(current.nodeName) : true;
 		};
 
 		let startRangeEl = this.format.getRangeBlock(startLine, onlyTable);
 		let endRangeEl = this.format.getRangeBlock(endLine, onlyTable);
-		if (util.isTable(startRangeEl) && util.isListCell(startRangeEl.parentNode))
+		if (domUtils.isTable(startRangeEl) && domUtils.isListCell(startRangeEl.parentNode))
 			startRangeEl = startRangeEl.parentNode;
-		if (util.isTable(endRangeEl) && util.isListCell(endRangeEl.parentNode)) endRangeEl = endRangeEl.parentNode;
+		if (domUtils.isTable(endRangeEl) && domUtils.isListCell(endRangeEl.parentNode)) endRangeEl = endRangeEl.parentNode;
 
 		const sameRange = startRangeEl === endRangeEl;
 		for (let i = 0, len = lineNodes.length, line; i < len; i++) {
@@ -283,18 +284,18 @@ Selection.prototype = {
 	 */
 	getLinesAndComponents: function (removeDuplicate) {
 		const commonCon = this.getRange().commonAncestorContainer;
-		const myComponent = util.getParentElement(commonCon, this.node.isComponent);
-		const selectedLines = util.isTable(commonCon)
-			? this.getLines(null)
-			: this.getLines(
-					function (current) {
-						const component = util.getParentElement(current, this.node.isComponent);
-						return (
-							(this.isLine(current) && (!component || component === myComponent)) ||
-							(this.node.isComponent(current) && !this.getLine(current))
-						);
-					}.bind(this.format)
-			  );
+		const myComponent = domUtils.getParentElement(commonCon, this.component.is);
+		const selectedLines = domUtils.isTable(commonCon) ?
+			this.format.getLines(null) :
+			this.format.getLines(
+				function (current) {
+					const component = domUtils.getParentElement(current, this.component.is);
+					return (
+						(this.format.isLine(current) && (!component || component === myComponent)) ||
+						(this.component.is(current) && !this.format.getLine(current))
+					);
+				}.bind(this)
+			);
 
 		if (removeDuplicate) {
 			for (let i = 0, len = selectedLines.length; i < len; i++) {
@@ -320,10 +321,10 @@ Selection.prototype = {
 	isNone: function (range) {
 		const comm = range.commonAncestorContainer;
 		return (
-			(util.isWysiwygDiv(range.startContainer) && util.isWysiwygDiv(range.endContainer)) ||
+			(domUtils.isWysiwygFrame(range.startContainer) && domUtils.isWysiwygFrame(range.endContainer)) ||
 			/FIGURE/i.test(comm.nodeName) ||
-			this._fileManager.regExp.test(comm.nodeName) ||
-			this.node.isComponent(comm)
+			this.editor._fileManager.regExp.test(comm.nodeName) ||
+			this.component.is(comm)
 		);
 	},
 
@@ -337,27 +338,27 @@ Selection.prototype = {
 	 * @returns {Object|Node|null}
 	 */
 	insertNode: function (oNode, afterNode, checkCharCount) {
-		if (this.editor.isReadOnly || (checkCharCount && !this.char.check(oNode))) {
+		if (this.editor.isReadOnly || (checkCharCount && !this.editor.char.check(oNode))) {
 			return null;
 		}
 
-		const brLine = this.format.getBrLine(this.selection.getNode(), null);
+		const brLine = this.format.getBrLine(this.getNode(), null);
 		const isFormats =
-			(!brLine && (util.isLine(oNode) || util.isRangeBlock(oNode))) || this.node.isComponent(oNode);
+			(!brLine && (this.format.isLine(oNode) || this.format.isRangeBlock(oNode))) || this.component.is(oNode);
 
-		if (!afterNode && (isFormats || this.node.isComponent(oNode) || util.isMedia(oNode))) {
+		if (!afterNode && (isFormats || this.component.is(oNode) || domUtils.isMedia(oNode))) {
 			const r = this.removeNode();
-			if (r.container.nodeType === 3 || util.isBreak(r.container)) {
-				const depthFormat = util.getParentElement(
+			if (r.container.nodeType === 3 || domUtils.isBreak(r.container)) {
+				const depthFormat = domUtils.getParentElement(
 					r.container,
 					function (current) {
-						return this.isRangeBlock(current) || this.isListCell(current);
-					}.bind(util)
+						return this.format.isRangeBlock(current) || domUtils.isListCell(current);
+					}.bind(this)
 				);
 				afterNode = this.node.split(
 					r.container,
 					r.offset,
-					!depthFormat ? 0 : util.getElementDepth(depthFormat) + 1
+					!depthFormat ? 0 : domUtils.getElementDepth(depthFormat) + 1
 				);
 				if (afterNode) afterNode = afterNode.previousSibling;
 			}
@@ -367,11 +368,11 @@ Selection.prototype = {
 		const commonCon = range.commonAncestorContainer;
 		const startOff = range.startOffset;
 		const endOff = range.endOffset;
-		const formatRange = range.startContainer === commonCon && util.isLine(commonCon);
+		const formatRange = range.startContainer === commonCon && this.format.isLine(commonCon);
 		const startCon = formatRange ? commonCon.childNodes[startOff] || commonCon.childNodes[0] : range.startContainer;
-		const endCon = formatRange
-			? commonCon.childNodes[endOff] || commonCon.childNodes[commonCon.childNodes.length - 1]
-			: range.endContainer;
+		const endCon = formatRange ?
+			commonCon.childNodes[endOff] || commonCon.childNodes[commonCon.childNodes.length - 1] :
+			range.endContainer;
 		let parentNode,
 			originAfter = null;
 
@@ -387,19 +388,19 @@ Selection.prototype = {
 					if (commonCon.textContent.length > endOff) afterNode = commonCon.splitText(endOff);
 					else afterNode = commonCon.nextSibling;
 				} else {
-					if (!util.isBreak(parentNode)) {
+					if (!domUtils.isBreak(parentNode)) {
 						let c = parentNode.childNodes[startOff];
 						const focusNode =
-							c && c.nodeType === 3 && util.onlyZeroWidthSpace(c) && util.isBreak(c.nextSibling)
-								? c.nextSibling
-								: c;
+							c && c.nodeType === 3 && unicode.onlyZeroWidthSpace(c) && domUtils.isBreak(c.nextSibling) ?
+							c.nextSibling :
+							c;
 						if (focusNode) {
 							if (!focusNode.nextSibling) {
 								parentNode.removeChild(focusNode);
 								afterNode = null;
 							} else {
 								afterNode =
-									util.isBreak(focusNode) && !util.isBreak(oNode) ? focusNode : focusNode.nextSibling;
+									domUtils.isBreak(focusNode) && !domUtils.isBreak(oNode) ? focusNode : focusNode.nextSibling;
 							}
 						} else {
 							afterNode = null;
@@ -414,11 +415,11 @@ Selection.prototype = {
 				const isSameContainer = startCon === endCon;
 
 				if (isSameContainer) {
-					if (this.isEdgePoint(endCon, endOff)) afterNode = endCon.nextSibling;
+					if (domUtils.isEdgePoint(endCon, endOff)) afterNode = endCon.nextSibling;
 					else afterNode = endCon.splitText(endOff);
 
 					let removeNode = startCon;
-					if (!this.isEdgePoint(startCon, startOff)) removeNode = startCon.splitText(startOff);
+					if (!domUtils.isEdgePoint(startCon, startOff)) removeNode = startCon.splitText(startOff);
 
 					parentNode.removeChild(removeNode);
 					if (parentNode.childNodes.length === 0 && isFormats) {
@@ -429,9 +430,9 @@ Selection.prototype = {
 					const container = removedTag.container;
 					const prevContainer = removedTag.prevContainer;
 					if (container && container.childNodes.length === 0 && isFormats) {
-						if (util.isLine(container)) {
+						if (this.format.isLine(container)) {
 							container.innerHTML = "<br>";
-						} else if (util.isRangeBlock(container)) {
+						} else if (this.format.isRangeBlock(container)) {
 							container.innerHTML = "<" + options.defaultTag + "><br></" + options.defaultTag + ">";
 						}
 					}
@@ -450,15 +451,15 @@ Selection.prototype = {
 							afterNode = null;
 						}
 					} else {
-						afterNode = isFormats
-							? endCon
-							: container === prevContainer
-							? container.nextSibling
-							: container;
+						afterNode = isFormats ?
+							endCon :
+							container === prevContainer ?
+							container.nextSibling :
+							container;
 						parentNode = !afterNode || !afterNode.parentNode ? commonCon : afterNode.parentNode;
 					}
 
-					while (afterNode && !util.isLine(afterNode) && afterNode.parentNode !== commonCon) {
+					while (afterNode && !this.format.isLine(afterNode) && afterNode.parentNode !== commonCon) {
 						afterNode = afterNode.parentNode;
 					}
 				}
@@ -473,90 +474,86 @@ Selection.prototype = {
 
 		// --- insert node ---
 		try {
-			if (util.isWysiwygDiv(afterNode) || parentNode === context.element.wysiwyg.parentNode) {
+			if (domUtils.isWysiwygFrame(afterNode) || parentNode === context.element.wysiwyg.parentNode) {
 				parentNode = context.element.wysiwyg;
 				afterNode = null;
 			}
 
 			if (
-				util.isLine(oNode) ||
-				util.isRangeBlock(oNode) ||
-				(!util.isListCell(parentNode) && this.node.isComponent(oNode))
+				this.format.isLine(oNode) ||
+				this.format.isRangeBlock(oNode) ||
+				(!domUtils.isListCell(parentNode) && this.component.is(oNode))
 			) {
 				const oldParent = parentNode;
-				if (util.isList(afterNode)) {
+				if (domUtils.isList(afterNode)) {
 					parentNode = afterNode;
 					afterNode = null;
-				} else if (util.isListCell(afterNode)) {
+				} else if (domUtils.isListCell(afterNode)) {
 					parentNode = afterNode.previousElementSibling || afterNode;
 				} else if (!originAfter && !afterNode) {
 					const r = this.removeNode();
 					const container =
-						r.container.nodeType === 3
-							? util.isListCell(this.format.getLine(r.container, null))
-								? r.container
-								: this.format.getLine(r.container, null) || r.container.parentNode
-							: r.container;
-					const rangeCon = util.isWysiwygDiv(container) || util.isRangeBlock(container);
+						r.container.nodeType === 3 ?
+						domUtils.isListCell(this.format.getLine(r.container, null)) ?
+						r.container :
+						this.format.getLine(r.container, null) || r.container.parentNode :
+						r.container;
+					const rangeCon = domUtils.isWysiwygFrame(container) || this.format.isRangeBlock(container);
 					parentNode = rangeCon ? container : container.parentNode;
 					afterNode = rangeCon ? null : container.nextSibling;
 				}
 
-				if (oldParent.childNodes.length === 0 && parentNode !== oldParent) util.removeItem(oldParent);
+				if (oldParent.childNodes.length === 0 && parentNode !== oldParent) domUtils.removeItem(oldParent);
 			}
 
 			if (
 				isFormats &&
 				!brLine &&
-				!util.isRangeBlock(parentNode) &&
-				!util.isListCell(parentNode) &&
-				!util.isWysiwygDiv(parentNode)
+				!this.format.isRangeBlock(parentNode) &&
+				!domUtils.isListCell(parentNode) &&
+				!domUtils.isWysiwygFrame(parentNode)
 			) {
 				afterNode = parentNode.nextElementSibling;
 				parentNode = parentNode.parentNode;
 			}
 
-			if (util.isWysiwygDiv(parentNode) && (oNode.nodeType === 3 || util.isBreak(oNode))) {
-				const fNode = util.createElement(options.defaultTag);
-				fNode.appendChild(oNode);
-				oNode = fNode;
+			if (domUtils.isWysiwygFrame(parentNode) && (oNode.nodeType === 3 || domUtils.isBreak(oNode))) {
+				oNode = domUtils.createElement(options.defaultTag, null, oNode);
 			}
 
 			parentNode.insertBefore(oNode, parentNode === afterNode ? parentNode.lastChild : afterNode);
 		} catch (e) {
 			parentNode.appendChild(oNode);
 		} finally {
-			if ((util.isLine(oNode) || this.node.isComponent(oNode)) && startCon === endCon) {
+			if ((this.format.isLine(oNode) || this.component.is(oNode)) && startCon === endCon) {
 				const cItem = this.format.getLine(commonCon, null);
-				if (cItem && cItem.nodeType === 1 && util.isEmptyLine(cItem)) {
-					util.removeItem(cItem);
+				if (cItem && cItem.nodeType === 1 && domUtils.isEmptyLine(cItem)) {
+					domUtils.removeItem(cItem);
 				}
 			}
 
-			if (brLine && (util.isLine(oNode) || util.isRangeBlock(oNode))) {
+			if (brLine && (this.format.isLine(oNode) || this.format.isRangeBlock(oNode))) {
 				oNode = this._setIntoFreeFormat(oNode);
 			}
 
-			if (!this.node.isComponent(oNode)) {
+			if (!this.component.is(oNode)) {
 				let offset = 1;
 				if (oNode.nodeType === 3) {
 					const previous = oNode.previousSibling;
 					const next = oNode.nextSibling;
-					const previousText =
-						!previous || previous.nodeType === 1 || util.onlyZeroWidthSpace(previous)
-							? ""
-							: previous.textContent;
-					const nextText =
-						!next || next.nodeType === 1 || util.onlyZeroWidthSpace(next) ? "" : next.textContent;
+					const previousText = !previous || previous.nodeType === 1 || unicode.onlyZeroWidthSpace(previous) ?
+						"" :
+						previous.textContent;
+					const nextText = !next || next.nodeType === 1 || unicode.onlyZeroWidthSpace(next) ? "" : next.textContent;
 
 					if (previous && previousText.length > 0) {
 						oNode.textContent = previousText + oNode.textContent;
-						util.removeItem(previous);
+						domUtils.removeItem(previous);
 					}
 
 					if (next && next.length > 0) {
 						oNode.textContent += nextText;
-						util.removeItem(next);
+						domUtils.removeItem(next);
 					}
 
 					const newRange = {
@@ -568,19 +565,19 @@ Selection.prototype = {
 					this.setRange(oNode, newRange.startOffset, oNode, newRange.endOffset);
 
 					return newRange;
-				} else if (!util.isBreak(oNode) && util.isLine(parentNode)) {
+				} else if (!domUtils.isBreak(oNode) && this.format.isLine(parentNode)) {
 					let zeroWidth = null;
-					if (!oNode.previousSibling || util.isBreak(oNode.previousSibling)) {
-						zeroWidth = util.createTextNode(util.zeroWidthSpace);
+					if (!oNode.previousSibling || domUtils.isBreak(oNode.previousSibling)) {
+						zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
 						oNode.parentNode.insertBefore(zeroWidth, oNode);
 					}
 
-					if (!oNode.nextSibling || util.isBreak(oNode.nextSibling)) {
-						zeroWidth = util.createTextNode(util.zeroWidthSpace);
+					if (!oNode.nextSibling || domUtils.isBreak(oNode.nextSibling)) {
+						zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
 						oNode.parentNode.insertBefore(zeroWidth, oNode.nextSibling);
 					}
 
-					if (util._isIgnoreNodeChange(oNode)) {
+					if (this.format._isIgnoreNodeChange(oNode)) {
 						oNode = oNode.nextSibling;
 						offset = 0;
 					}
@@ -594,6 +591,70 @@ Selection.prototype = {
 
 			return oNode;
 		}
+	},
+
+	/**
+	 * @description Inserts an (HTML element / HTML string / plain string) at the current cursor position
+	 * @param {Element|String} html HTML Element or HTML string or plain string
+	 * @param {boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
+	 * @param {boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+	 * @param {boolean} rangeSelection If true, range select the inserted node.
+	 */
+	insertHTML: function (html, notCleaningData, checkCharCount, rangeSelection) {
+		if (typeof html === 'string') {
+			if (!notCleaningData) html = core.cleanHTML(html, null);
+			try {
+				const dom = _d.createRange().createContextualFragment(html);
+				const domTree = dom.childNodes;
+
+				if (checkCharCount) {
+					const type = options.charCounterType === 'byte-html' ? 'outerHTML' : 'textContent';
+					let checkHTML = '';
+					for (let i = 0, len = domTree.length; i < len; i++) {
+						checkHTML += domTree[i][type];
+					}
+					if (!this.char.check(checkHTML)) return;
+				}
+
+				let c, a, t, prev, firstCon;
+				while ((c = domTree[0])) {
+					if (prev && prev.nodeType === 3 && a && a.nodeType === 1 && domUtils.isBreak(c)) {
+						prev = c;
+						domUtils.removeItem(c);
+						continue;
+					}
+					t = core.insertNode(c, a, false);
+					a = t.container || t;
+					if (!firstCon) firstCon = t;
+					prev = c;
+				}
+
+				if (prev.nodeType === 3 && a.nodeType === 1) a = prev;
+				const offset = a.nodeType === 3 ? (t.endOffset || a.textContent.length) : a.childNodes.length;
+				if (rangeSelection) core.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
+				else core.setRange(a, offset, a, offset);
+			} catch (error) {
+				if (this.status.isDisabled || this.status.isReadOnly) return;
+				console.warn('[SUNEDITOR.selection.insertHTML.fail] ' + error);
+				this.editor.execCommand('insertHTML', false, html);
+			}
+		} else {
+			if (this.component.is(html)) {
+				core.component.insert(html, false, checkCharCount, false);
+			} else {
+				let afterNode = null;
+				if (this.format.isLine(html) || domUtils.isMedia(html)) {
+					afterNode = this.format.getLine(core.selection.getNode(), null);
+				}
+				core.insertNode(html, afterNode, checkCharCount);
+			}
+		}
+
+		core.effectNode = null;
+		core.focus();
+
+		// history stack
+		core.history.push(false);
 	},
 
 	/**
@@ -613,9 +674,9 @@ Selection.prototype = {
 		let endOff = range.endOffset;
 		const commonCon =
 			range.commonAncestorContainer.nodeType === 3 &&
-			range.commonAncestorContainer.parentNode === startCon.parentNode
-				? startCon.parentNode
-				: range.commonAncestorContainer;
+			range.commonAncestorContainer.parentNode === startCon.parentNode ?
+			startCon.parentNode :
+			range.commonAncestorContainer;
 		if (commonCon === startCon && commonCon === endCon) {
 			startCon = commonCon.children[startOff];
 			endCon = commonCon.children[endOff];
@@ -625,9 +686,9 @@ Selection.prototype = {
 		let beforeNode = null;
 		let afterNode = null;
 
-		const childNodes = util.getListChildNodes(commonCon, null);
-		let startIndex = util.getArrayIndex(childNodes, startCon);
-		let endIndex = util.getArrayIndex(childNodes, endCon);
+		const childNodes = domUtils.getListChildNodes(commonCon, null);
+		let startIndex = domUtils.getArrayIndex(childNodes, startCon);
+		let endIndex = domUtils.getArrayIndex(childNodes, endCon);
 
 		if (childNodes.length > 0 && startIndex > -1 && endIndex > -1) {
 			for (let i = startIndex + 1, startNode = startCon; i >= 0; i--) {
@@ -651,11 +712,11 @@ Selection.prototype = {
 		} else {
 			if (childNodes.length === 0) {
 				if (
-					util.isLine(commonCon) ||
-					util.isRangeBlock(commonCon) ||
-					util.isWysiwygDiv(commonCon) ||
-					util.isBreak(commonCon) ||
-					util.isMedia(commonCon)
+					this.format.isLine(commonCon) ||
+					this.format.isRangeBlock(commonCon) ||
+					domUtils.isWysiwygFrame(commonCon) ||
+					domUtils.isBreak(commonCon) ||
+					domUtils.isMedia(commonCon)
 				) {
 					return {
 						container: commonCon,
@@ -671,9 +732,9 @@ Selection.prototype = {
 				startCon = endCon = commonCon;
 			} else {
 				startCon = endCon = childNodes[0];
-				if (util.isBreak(startCon) || util.onlyZeroWidthSpace(startCon)) {
+				if (domUtils.isBreak(startCon) || unicode.onlyZeroWidthSpace(startCon)) {
 					return {
-						container: util.isMedia(commonCon) ? commonCon : startCon,
+						container: domUtils.isMedia(commonCon) ? commonCon : startCon,
 						offset: 0
 					};
 				}
@@ -684,17 +745,17 @@ Selection.prototype = {
 
 		const remove = function (item) {
 			const format = this.format.getLine(item, null);
-			util.removeItem(item);
+			domUtils.removeItem(item);
 
-			if (util.isListCell(format)) {
-				const list = util.getArrayItem(format.children, util.isList, false);
+			if (domUtils.isListCell(format)) {
+				const list = domUtils.getArrayItem(format.children, domUtils.isList, false);
 				if (list) {
 					const child = list.firstElementChild;
 					const children = child.childNodes;
 					while (children[0]) {
 						format.insertBefore(children[0], list);
 					}
-					util.removeAllParents(child, null, null);
+					this.node.removeAllParents(child, null, null);
 				}
 			}
 		}.bind(this);
@@ -709,16 +770,16 @@ Selection.prototype = {
 
 			if (item === startCon) {
 				if (startCon.nodeType === 1) {
-					if (this.node.isComponent(startCon)) continue;
-					else beforeNode = util.createTextNode(startCon.textContent);
+					if (this.component.is(startCon)) continue;
+					else beforeNode = domUtils.createTextNode(startCon.textContent);
 				} else {
 					if (item === endCon) {
-						beforeNode = util.createTextNode(
+						beforeNode = domUtils.createTextNode(
 							startCon.substringData(0, startOff) + endCon.substringData(endOff, endCon.length - endOff)
 						);
 						offset = startOff;
 					} else {
-						beforeNode = util.createTextNode(startCon.substringData(0, startOff));
+						beforeNode = domUtils.createTextNode(startCon.substringData(0, startOff));
 					}
 				}
 
@@ -734,10 +795,10 @@ Selection.prototype = {
 
 			if (item === endCon) {
 				if (endCon.nodeType === 1) {
-					if (this.node.isComponent(endCon)) continue;
-					else afterNode = util.createTextNode(endCon.textContent);
+					if (this.component.is(endCon)) continue;
+					else afterNode = domUtils.createTextNode(endCon.textContent);
 				} else {
-					afterNode = util.createTextNode(endCon.substringData(endOff, endCon.length - endOff));
+					afterNode = domUtils.createTextNode(endCon.substringData(endOff, endCon.length - endOff));
 				}
 
 				if (afterNode.length > 0) {
@@ -753,20 +814,20 @@ Selection.prototype = {
 		}
 
 		container =
-			endCon && endCon.parentNode
-				? endCon
-				: startCon && startCon.parentNode
-				? startCon
-				: range.endContainer || range.startContainer;
+			endCon && endCon.parentNode ?
+			endCon :
+			startCon && startCon.parentNode ?
+			startCon :
+			range.endContainer || range.startContainer;
 
-		if (!util.isWysiwygDiv(container) && container.childNodes.length === 0) {
-			const rc = util.removeAllParents(
+		if (!domUtils.isWysiwygFrame(container) && container.childNodes.length === 0) {
+			const rc = this.node.removeAllParents(
 				container,
 				function (current) {
-					if (this.node.isComponent(current)) return false;
+					if (this.component.is(current)) return false;
 					const text = current.textContent;
 					return text.length === 0 || /^(\n|\u200B)+$/.test(text);
-				}.bind(util),
+				}.bind(this),
 				null
 			);
 
@@ -800,7 +861,7 @@ Selection.prototype = {
 		let endOff = range.endOffset;
 		let tempCon, tempOffset, tempChild;
 
-		if (util.isLine(startCon)) {
+		if (this.format.isLine(startCon)) {
 			if (!startCon.childNodes[startOff]) {
 				startCon = startCon.lastChild;
 				startOff = startCon.textContent.length;
@@ -813,7 +874,7 @@ Selection.prototype = {
 				startOff = 0;
 			}
 		}
-		if (util.isLine(endCon)) {
+		if (this.format.isLine(endCon)) {
 			endCon = endCon.childNodes[endOff] || endCon.lastChild;
 			while (endCon && endCon.nodeType === 1 && endCon.lastChild) {
 				endCon = endCon.lastChild;
@@ -822,29 +883,29 @@ Selection.prototype = {
 		}
 
 		// startContainer
-		tempCon = util.isWysiwygDiv(startCon) ? context.element.wysiwyg.firstChild : startCon;
+		tempCon = domUtils.isWysiwygFrame(startCon) ? context.element.wysiwyg.firstChild : startCon;
 		tempOffset = startOff;
 
-		if (util.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
-			const onlyBreak = util.isBreak(tempCon);
+		if (domUtils.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
+			const onlyBreak = domUtils.isBreak(tempCon);
 			if (!onlyBreak) {
-				while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
+				while (tempCon && !domUtils.isBreak(tempCon) && tempCon.nodeType === 1) {
 					tempCon = tempCon.childNodes[tempOffset] || tempCon.nextElementSibling || tempCon.nextSibling;
 					tempOffset = 0;
 				}
 
 				let format = this.format.getLine(tempCon, null);
 				if (format === this.format.getRangeBlock(format, null)) {
-					format = util.createElement(
-						util.getParentElement(tempCon, util.isTableCell) ? "DIV" : options.defaultTag
+					format = domUtils.createElement(
+						domUtils.getParentElement(tempCon, domUtils.isTableCell) ? "DIV" : options.defaultTag
 					);
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
 				}
 			}
 
-			if (util.isBreak(tempCon)) {
-				const emptyText = util.createTextNode(util.zeroWidthSpace);
+			if (domUtils.isBreak(tempCon)) {
+				const emptyText = domUtils.createTextNode(unicode.zeroWidthSpace);
 				tempCon.parentNode.insertBefore(emptyText, tempCon);
 				tempCon = emptyText;
 				if (onlyBreak) {
@@ -861,38 +922,38 @@ Selection.prototype = {
 		startOff = tempOffset;
 
 		// endContainer
-		tempCon = util.isWysiwygDiv(endCon) ? context.element.wysiwyg.lastChild : endCon;
+		tempCon = domUtils.isWysiwygFrame(endCon) ? context.element.wysiwyg.lastChild : endCon;
 		tempOffset = endOff;
 
-		if (util.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
-			const onlyBreak = util.isBreak(tempCon);
+		if (domUtils.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
+			const onlyBreak = domUtils.isBreak(tempCon);
 			if (!onlyBreak) {
-				while (tempCon && !util.isBreak(tempCon) && tempCon.nodeType === 1) {
+				while (tempCon && !domUtils.isBreak(tempCon) && tempCon.nodeType === 1) {
 					tempChild = tempCon.childNodes;
 					if (tempChild.length === 0) break;
 					tempCon =
 						tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] ||
-						!/FIGURE/i.test(tempChild[0].nodeName)
-							? tempChild[0]
-							: tempCon.previousElementSibling || tempCon.previousSibling || startCon;
+						!/FIGURE/i.test(tempChild[0].nodeName) ?
+						tempChild[0] :
+						tempCon.previousElementSibling || tempCon.previousSibling || startCon;
 					tempOffset = tempOffset > 0 ? tempCon.textContent.length : tempOffset;
 				}
 
 				let format = this.format.getLine(tempCon, null);
 				if (format === this.format.getRangeBlock(format, null)) {
-					format = util.createElement(util.isTableCell(format) ? "DIV" : options.defaultTag);
+					format = domUtils.createElement(domUtils.isTableCell(format) ? "DIV" : options.defaultTag);
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
 				}
 			}
 
-			if (util.isBreak(tempCon)) {
-				const emptyText = util.createTextNode(util.zeroWidthSpace);
+			if (domUtils.isBreak(tempCon)) {
+				const emptyText = domUtils.createTextNode(unicode.zeroWidthSpace);
 				tempCon.parentNode.insertBefore(emptyText, tempCon);
 				tempCon = emptyText;
 				tempOffset = 1;
 				if (onlyBreak && !tempCon.previousSibling) {
-					util.removeItem(endCon);
+					domUtils.removeItem(endCon);
 				}
 			}
 		}
@@ -916,13 +977,13 @@ Selection.prototype = {
 		const parentNode = oNode.parentNode;
 		let oNodeChildren, lastONode;
 
-		while (util.isLine(oNode) || util.isRangeBlock(oNode)) {
+		while (this.format.isLine(oNode) || this.format.isRangeBlock(oNode)) {
 			oNodeChildren = oNode.childNodes;
 			lastONode = null;
 
 			while (oNodeChildren[0]) {
 				lastONode = oNodeChildren[0];
-				if (util.isLine(lastONode) || util.isRangeBlock(lastONode)) {
+				if (this.format.isLine(lastONode) || this.format.isRangeBlock(lastONode)) {
 					this._setIntoFreeFormat(lastONode);
 					if (!oNode.parentNode) break;
 					oNodeChildren = oNode.childNodes;
@@ -932,8 +993,8 @@ Selection.prototype = {
 				parentNode.insertBefore(lastONode, oNode);
 			}
 
-			if (oNode.childNodes.length === 0) util.removeItem(oNode);
-			oNode = util.createElement("BR");
+			if (oNode.childNodes.length === 0) domUtils.removeItem(oNode);
+			oNode = domUtils.createElement("BR");
 			parentNode.insertBefore(oNode, lastONode.nextSibling);
 		}
 

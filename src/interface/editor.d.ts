@@ -1,15 +1,7 @@
 import CoreInterface from "./_core.d";
+import ClassesInterface from "./_classes";
 
-class Editor extends CoreInterface {
-	char: any;
-	component: any;
-	events: any;
-	format: any;
-	node: any;
-	notice: any;
-	selection: any;
-	shortcuts: any;
-	toolbar: any;
-}
+class Editor implements CoreInterface, ClassesInterface {}
 
 export default Editor;
+s

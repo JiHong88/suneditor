@@ -1,5 +1,7 @@
-class Events {
-  onload: (core: Core, reload: boolean) => void;
+import EditorInterface from "../interface/editor";
+
+class Events extends EditorInterface {
+  onload: (reload: boolean) => void;
   onScroll: EventFn;
   onFocus: EventFn;
   onMouseDown: EventFn;
@@ -7,12 +9,12 @@ class Events {
   onInput: EventFn;
   onKeyDown: EventFn;
   onKeyUp: EventFn;
-  onChange: (contents: string, core: Core) => void;
-  onBlur: (e: FocusEvent, core: Core) => void;
-  onDrop: (e: Event, cleanData: string, maxCharCount: number, core: Core) => boolean | string;
-  onPaste: (e: Event, cleanData: string, maxCharCount: number, core: Core) => boolean | string;
-  onCopy: (e: Event, clipboardData: any, core: Core) => void;
-  onCut: (e: Event, clipboardData: any, core: Core) => void;
+  onChange: (contents: string) => void;
+  onBlur: (e: FocusEvent) => void;
+  onDrop: (e: Event, cleanData: string, maxCharCount: number) => boolean | string;
+  onPaste: (e: Event, cleanData: string, maxCharCount: number) => boolean | string;
+  onCopy: (e: Event, clipboardData: any) => void;
+  onCut: (e: Event, clipboardData: any) => void;
 
   /**
    * @description Called just before the inline toolbar is positioned and displayed on the screen.
@@ -20,7 +22,7 @@ class Events {
    * @param context The editor's context object
    * @param core Core object
    */
-  showInline: (toolbar: Element, context: Context, core: Core) => void;
+  showInline: (toolbar: Element, context: Context) => void;
 
   /**
    * @description Called just after the controller is positioned and displayed on the screen.
@@ -29,7 +31,7 @@ class Events {
    * @param controllers Array of Controller elements
    * @param core Core object
    */
-  showController: (name: String, controllers: Controllers, core: Core) => void;
+  showController: (name: String, controllers: Controllers) => void;
 
   /**
    * @description It replaces the default callback function of the image upload
@@ -44,7 +46,7 @@ class Events {
    * - element: If isUpdate is true, the currently selected image.
    * @param core Core object
    */
-  imageUploadHandler: (xmlHttp: XMLHttpRequest, info: imageInputInformation, core: Core) => void;
+  imageUploadHandler: (xmlHttp: XMLHttpRequest, info: imageInputInformation) => void;
 
   /**
    * @description It replaces the default callback function of the video upload
@@ -57,7 +59,7 @@ class Events {
    * - element: If isUpdate is true, the currently selected video.
    * @param core Core object
    */
-  videoUploadHandler: (xmlHttp: XMLHttpRequest, info: videoInputInformation, core: Core) => void;
+  videoUploadHandler: (xmlHttp: XMLHttpRequest, info: videoInputInformation) => void;
 
   /**
    * @description It replaces the default callback function of the audio upload
@@ -67,21 +69,21 @@ class Events {
    * - element: If isUpdate is true, the currently selected audio.
    * @param core Core object
    */
-  audioUploadHandler: (xmlHttp: XMLHttpRequest, info: audioInputInformation, core: Core) => void;
+  audioUploadHandler: (xmlHttp: XMLHttpRequest, info: audioInputInformation) => void;
 
   /**
    * @description An event when toggling between code view and wysiwyg view.
    * @param isCodeView Whether the current code view mode
    * @param core Core object
    */
-  toggleCodeView: (isCodeView: boolean, core: Core) => void;
+  toggleCodeView: (isCodeView: boolean) => void;
 
   /**
    * @description An event when toggling full screen.
    * @param isFullScreen Whether the current full screen mode
    * @param core Core object
    */
-  toggleFullScreen: (isFullScreen: boolean, core: Core) => void;
+  toggleFullScreen: (isFullScreen: boolean) => void;
 
   /**
    * @description Called before the image is uploaded
@@ -104,7 +106,7 @@ class Events {
    *                                   }
    * @returns
    */
-  onImageUploadBefore: (files: any[], info: imageInputInformation, core: Core, uploadHandler: Function) => boolean | any[] | undefined;
+  onImageUploadBefore: (files: any[], info: imageInputInformation, uploadHandler: Function) => boolean | any[] | undefined;
 
   /**
    * @description Called before the video is uploaded
@@ -127,7 +129,7 @@ class Events {
    *                                   }
    * @returns
    */
-  onVideoUploadBefore: (files: any[], info: videoInputInformation, core: Core, uploadHandler: Function) => boolean | any[] | undefined;
+  onVideoUploadBefore: (files: any[], info: videoInputInformation, uploadHandler: Function) => boolean | any[] | undefined;
 
   /**
    * @description Called before the audio is uploaded
@@ -150,7 +152,7 @@ class Events {
    *                                   }
    * @returns
    */
-  onAudioUploadBefore: (files: any[], info: audioInputInformation, core: Core, uploadHandler: Function) => boolean | any[] | undefined;
+  onAudioUploadBefore: (files: any[], info: audioInputInformation, uploadHandler: Function) => boolean | any[] | undefined;
 
   /**
    * @description Called when the image is uploaded, updated, deleted
@@ -168,7 +170,7 @@ class Events {
    * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
    * @param core Core object
    */
-  onImageUpload: (targetElement: HTMLImageElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number, core: Core) => void;
+  onImageUpload: (targetElement: HTMLImageElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number) => void;
 
   /**
    * @description Called when the video(iframe, video) is uploaded, updated, deleted
@@ -186,7 +188,7 @@ class Events {
    * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
    * @param core Core object
    */
-  onVideoUpload: (targetElement: HTMLIFrameElement | HTMLVideoElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number, core: Core) => void;
+  onVideoUpload: (targetElement: HTMLIFrameElement | HTMLVideoElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number) => void;
 
   /**
    * @description Called when the audio is uploaded, updated, deleted
@@ -204,7 +206,7 @@ class Events {
    * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
    * @param core Core object
    */
-  onAudioUpload: (targetElement: HTMLAudioElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number, core: Core) => void;
+  onAudioUpload: (targetElement: HTMLAudioElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number) => void;
 
   /**
    * @description Called when the image is upload failed
@@ -213,7 +215,7 @@ class Events {
    * @param core Core object
    * @returns
    */
-  onImageUploadError: (errorMessage: string, result: any, core: Core) => boolean;
+  onImageUploadError: (errorMessage: string, result: any) => boolean;
 
   /**
    * @description Called when the video(iframe, video) upload failed
@@ -222,7 +224,7 @@ class Events {
    * @param core Core object
    * @returns
    */
-  onVideoUploadError: (errorMessage: string, result: any, core: Core) => boolean;
+  onVideoUploadError: (errorMessage: string, result: any) => boolean;
 
   /**
    * @description Called when the audio upload failed
@@ -231,7 +233,7 @@ class Events {
    * @param core Core object
    * @returns
    */
-  onAudioUploadError: (errorMessage: string, result: any, core: Core) => boolean;
+  onAudioUploadError: (errorMessage: string, result: any) => boolean;
 
   /**
    * @description Called when the audio upload failed
@@ -240,7 +242,7 @@ class Events {
    * @param core Core object
    * @returns
    */
-  onResizeEditor: (height: number, prevHeight: number, core: Core) => {};
+  onResizeEditor: (height: number, prevHeight: number) => {};
 }
 
 export default Events;

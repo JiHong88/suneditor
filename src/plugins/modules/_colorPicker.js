@@ -154,7 +154,7 @@ export default {
         let findColor = '';
         const styleProperty = this.context.colorPicker._styleProperty;
 
-        while (node && !this.util.isWysiwygDiv(node) && findColor.length === 0) {
+        while (node && !this.util.isWysiwygFrame(node) && findColor.length === 0) {
             if (node.nodeType === 1 && node.style[styleProperty]) findColor = node.style[styleProperty];
             node = node.parentNode;
         }

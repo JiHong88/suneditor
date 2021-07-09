@@ -44,7 +44,7 @@
          * @example this.plugins.fileManager.upload.call(this, imageUploadUrl, this.options.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.events.onImageUploadError);
          */
         upload: function (uploadUrl, uploadHeader, formData, callBack, errorCallBack) {
-            this.showLoading();
+            this.openLoading();
             const filePlugin = this.plugins.fileManager;
             const xmlHttp = filePlugin._xmlHttp = this.util.getXMLHttpRequest();
 
@@ -71,7 +71,7 @@
                 } else { // exception
                     this.closeLoading();
                     const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
-                    if (typeof errorCallBack !== 'function' || errorCallBack.call(this.editor, '', res)) {
+                    if (typeof errorCallBack !== 'function' || errorCallBack.call(this.events, '', res)) {
                         const err = '[SUNEDITOR.fileManager.upload.serverException] status: ' + xmlHttp.status + ', response: ' + (res.errorMessage || xmlHttp.responseText);
                         this.notice.open(err);
                         throw Error(err);
@@ -138,7 +138,7 @@
             
             for (let i = 0, len = tags.length, tag; i < len; i++) {
                 tag = tags[i];
-                if (!this.util.getParentElement(tag, this.node.isComponent) || !fileManagerPlugin._checkMediaComponent(tag)) {
+                if (!this.util.getParentElement(tag, this.component.is) || !fileManagerPlugin._checkMediaComponent(tag)) {
                     currentTags.push(context._infoIndex);
                     modifyHandler(tag);
                 } else if (!tag.getAttribute('data-index') || infoIndex.indexOf(tag.getAttribute('data-index') * 1) < 0) {
@@ -155,7 +155,7 @@
                 if (currentTags.indexOf(dataIndex) > -1) continue;
 
                 infoList.splice(i, 1);
-                if (typeof uploadEventHandler === 'function') uploadEventHandler.call(this.editor, null, dataIndex, 'delete', null, 0);
+                if (typeof uploadEventHandler === 'function') uploadEventHandler.call(this.events, null, dataIndex, 'delete', null, 0);
                 i--;
             }
 
@@ -244,7 +244,7 @@
                 }
     
                 if (!element.getAttribute('data-origin')) {
-                    const container = this.util.getParentElement(element, this.node.isComponent);
+                    const container = this.util.getParentElement(element, this.component.is);
                     const cover = this.util.getParentElement(element, 'FIGURE');
         
                     const w = this.plugins.resizing._module_getSizeX.call(this, context, element, cover, container);
@@ -262,7 +262,7 @@
                 this.context.resizing._resize_plugin = _resize_plugin;
             }
 
-            if (typeof uploadEventHandler === 'function') uploadEventHandler.call(this.editor, element, dataIndex, state, info, --context._uploadFileLength < 0 ? 0 : context._uploadFileLength);
+            if (typeof uploadEventHandler === 'function') uploadEventHandler.call(this.events, element, dataIndex, state, info, --context._uploadFileLength < 0 ? 0 : context._uploadFileLength);
         },
 
         /**
@@ -278,7 +278,7 @@
                 for (let i = 0, len = infoList.length; i < len; i++) {
                     if (index === infoList[i].index) {
                         infoList.splice(i, 1);
-                        if (typeof uploadEventHandler === 'function') uploadEventHandler.call(this.editor, null, index, 'delete', null, 0);
+                        if (typeof uploadEventHandler === 'function') uploadEventHandler.call(this.events, null, index, 'delete', null, 0);
                         return;
                     }
                 }
@@ -296,7 +296,7 @@
             if (typeof uploadEventHandler === 'function') {
                 const infoList = context._infoList;
                 for (let i = 0, len = infoList.length; i < len; i++) {
-                    uploadEventHandler.call(this.editor, null, infoList[i].index, 'delete', null, 0);
+                    uploadEventHandler.call(this.events, null, infoList[i].index, 'delete', null, 0);
                 }
             }
 

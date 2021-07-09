@@ -1,6 +1,6 @@
-import CoreInterface from "../../interface/_core";
+import EditorInterface from "../../interface/editor";
 
-class Format extends CoreInterface {
+class Format extends EditorInterface {
 	/**
 	 * @description Replace the line tag of the current selection.
 	 * @param element Line element (P, DIV..)
@@ -8,7 +8,7 @@ class Format extends CoreInterface {
 	setLine(element: Element): void;
 
 	/**
-	 * @description If a parent node that contains an argument node finds a format node (node.isLine), it returns that node.
+	 * @description If a parent node that contains an argument node finds a format node (format.isLine), it returns that node.
 	 * @param node Reference node.
 	 * @param validation Additional validation function.
 	 * @returns
@@ -16,19 +16,19 @@ class Format extends CoreInterface {
 	getLine(node: Node, validation?: Function | null): Element | null;
 
 	/**
-	 * @description Replace the br-line tag of the current selection. 
+	 * @description Replace the br-line tag of the current selection.
 	 * @param element Line element (P, DIV..)
 	 */
-	setBrLine(element: Element)
-	
+	setBrLine(element: Element);
+
 	/**
-	 * @description If a parent node that contains an argument node finds a free format node (util.isBrLine), it returns that node.
+	 * @description If a parent node that contains an argument node finds a free format node (format.isBrLine), it returns that node.
 	 * @param element Reference node.
 	 * @param validation Additional validation function.
 	 * @returns
 	 */
 	getBrLine(node: Node, validation?: Function | null): Element | null;
-	
+
 	/**
 	 * @description Append format element to sibling node of argument element.
 	 * If the "formatNodeName" argument value is present, the tag of that argument value is inserted,
@@ -64,13 +64,7 @@ class Format extends CoreInterface {
 	 * @param notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
 	 * @returns
 	 */
-	removeRangeBlock(
-		rangeElement: Element,
-		selectedFormats: Element[] | null,
-		newRangeElement: Element | null,
-		remove: boolean,
-		notHistoryPush: boolean
-	): { cc: Node; sc: Node; ec: Node; removeArray: Element[] };
+	removeRangeBlock(rangeElement: Element, selectedFormats: Element[] | null, newRangeElement: Element | null, remove: boolean, notHistoryPush: boolean): { cc: Node; sc: Node; ec: Node; removeArray: Element[] };
 
 	/**
 	 * @description Append all selected format Element to the list and insert.
@@ -91,13 +85,13 @@ class Format extends CoreInterface {
 
 	/**
 	 * @description Indent more the selected lines.
-	 * margin size - "_variable.indentSize"px
+	 * margin size - "status.indentSize"px
 	 */
 	indent(): void;
 
 	/**
 	 * @description Indent less the selected lines.
-	 * margin size - "_variable.indentSize"px
+	 * margin size - "status.indentSize"px
 	 */
 	outdent(): void;
 
@@ -121,12 +115,7 @@ class Format extends CoreInterface {
 	 * @param removeNodeArray An array of node names to remove types from, remove all formats when "styleNode" is null and there is an empty array or null value. (['span'], ['strong', 'em'] ...])
 	 * @param strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
 	 */
-	applyStyleNode(
-		styleNode?: Element,
-		styleArray?: string[],
-		removeNodeArray?: string[],
-		strictRemove?: boolean
-	): void;
+	applyStyleNode(styleNode?: Element, styleArray?: string[], removeNodeArray?: string[], strictRemove?: boolean): void;
 
 	/**
 	 * @description Remove format of the currently selected text
@@ -139,6 +128,71 @@ class Format extends CoreInterface {
 	 * @param copyEl Element to copy
 	 */
 	copyAttributes(originEl: Element, copyEl: Element): void;
+
+	/**
+	 * @description Check if the container and offset values are the edges of the "line"
+	 * @param container The container property of the selection object.
+	 * @param offset The offset property of the selection object.
+	 * @param dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
+	 * @returns
+	 */
+	isEdgeLine(container: Node, offset: number, dir: "front" | "end"): boolean;
+
+	/**
+	 * @description It is judged whether it is a node related to the text style.
+	 * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)
+	 * @param element The node to check
+	 * @returns
+	 */
+	isTextStyleNode(element: Node): boolean;
+
+	/**
+	 * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")
+	 * Format element also contain "free format Element"
+	 * @param element The node to check
+	 * @returns
+	 */
+	isLine(element: Node): boolean;
+
+	/**
+	 * @description It is judged whether it is the free format element. (PRE | class="__se__format__br_line_xxx")
+	 * Free format elements is included in the format element.
+	 * Free format elements's line break is "BR" tag.
+	 * ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
+	 * @param element The node to check
+	 * @returns
+	 */
+	isBrLine(element: Node): boolean;
+
+	/**
+	 * @description It is judged whether it is the closure free format element. (class="__se__format__br_line__closure_xxx")
+	 * Closure free format elements is included in the free format element.
+	 *  - Closure free format elements's line break is "BR" tag.
+	 * ※ You cannot exit this format with the Enter key.
+	 * ※ Use it only in special cases. ([ex] format of table cells)
+	 * @param element The node to check
+	 * @returns
+	 */
+	isClosureBrLine(element: Node): boolean;
+
+	/**
+	 * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__range_block_xxx")
+	 * * Range format element is wrap the line element
+	 * @param element The node to check
+	 * @returns
+	 */
+	isRangeBlock(element: Node): boolean;
+
+	/**
+	 * @description It is judged whether it is the closure range format element. (TH, TD | class="__se__format__range_block_closure_xxx")
+	 * Closure range format elements is included in the range format element.
+	 *  - Closure range format element is wrap the "format element" and "component"
+	 * ※ You cannot exit this format with the Enter key or Backspace key.
+	 * ※ Use it only in special cases. ([ex] format of table cells)
+	 * @param element The node to check
+	 * @returns
+	 */
+	isClosureRangeBlock(element: Node): boolean;
 }
 
 export default Format;

@@ -270,7 +270,7 @@ export default {
      */
     destroy: function (element) {
         const imageEl = element || this.context.image._element;
-        const imageContainer = this.util.getParentElement(imageEl, this.node.isComponent) || imageEl;
+        const imageContainer = this.util.getParentElement(imageEl, this.component.is) || imageEl;
         const dataIndex = imageEl.getAttribute('data-index') * 1;
         let focusEl = (imageContainer.previousElementSibling || imageContainer.nextElementSibling);
         
@@ -371,10 +371,10 @@ export default {
             }
             
             if (contextImage.imgInputFile && contextImage.imgInputFile.files.length > 0) {
-                this.showLoading();
+                this.openLoading();
                 imagePlugin.submitAction.call(this, this.context.image.imgInputFile.files);
             } else if (contextImage.imgUrlFile && contextImage._v_src._linkValue.length > 0) {
-                this.showLoading();
+                this.openLoading();
                 imagePlugin.onRender_imgUrl.call(this);
             }
         } catch (error) {
@@ -410,7 +410,7 @@ export default {
             if ((fileSize + infoSize) > limitSize) {
                 this.closeLoading();
                 const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + (limitSize/1000) + 'KB';
-                if (typeof this.events.onImageUploadError !== 'function' || this.events.onImageUploadError.call(this.editor, err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize })) {
+                if (typeof this.events.onImageUploadError !== 'function' || this.events.onImageUploadError(err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize })) {
                     this.notice.open(err);
                 }
                 return;
@@ -431,7 +431,7 @@ export default {
         };
 
         if (typeof this.events.onImageUploadBefore === 'function') {
-            const result = this.events.onImageUploadBefore.call(this.editor, files, info, function (data) {
+            const result = this.events.onImageUploadBefore(files, info, function (data) {
                 if (data && this._w.Array.isArray(data.result)) {
                     this.plugins.image.register.call(this, info, data);
                 } else {
@@ -452,7 +452,7 @@ export default {
 
     error: function (message, response) {
         this.closeLoading();
-        if (typeof this.events.onImageUploadError !== 'function' || this.events.onImageUploadError.call(this.editor, message, response)) {
+        if (typeof this.events.onImageUploadError !== 'function' || this.events.onImageUploadError(message, response)) {
             this.notice.open(message);
             throw Error('[SUNEDITOR.plugin.image.error] response: ' + message);
         }
@@ -485,7 +485,7 @@ export default {
 
     callBack_imgUpload: function (info, xmlHttp) {
         if (typeof this.events.imageUploadHandler === 'function') {
-            this.events.imageUploadHandler.call(this.editor, xmlHttp, info);
+            this.events.imageUploadHandler(xmlHttp, info);
         } else {
             const response = JSON.parse(xmlHttp.responseText);
             if (response.errorMessage) {
@@ -760,18 +760,18 @@ export default {
         }
 
         if (isNewContainer) {
-            const existElement = (this.util.isRangeBlock(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode)) ? 
+            const existElement = (this.__format.isRangeBlock(contextImage._element.parentNode) || this.util.isWysiwygFrame(contextImage._element.parentNode)) ? 
                 contextImage._element : 
                 /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.format.getLine(contextImage._element) || contextImage._element;
                 
-            if (this.util.isLine(existElement) && existElement.childNodes.length > 0) {
+            if (this.format.isLine(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(contextImage._element);
                 // clean format tag
                 this.util.removeEmptyNode(existElement, null);
-                if (existElement.children.length === 0) existElement.innerHTML = this.util.htmlRemoveWhiteSpace(existElement.innerHTML);
+                if (existElement.children.length === 0) existElement.innerHTML = this.util.removeWhiteSpace(existElement.innerHTML);
             } else {
-                if (this.util.isLine(existElement.parentNode)) {
+                if (this.format.isLine(existElement.parentNode)) {
                     const formats = existElement.parentNode;
                     formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
                     this.util.removeItem(existElement);
@@ -838,7 +838,7 @@ export default {
         contextImage._linkElement = contextImage.anchorCtx.linkAnchor = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
         contextImage._element = element;
         contextImage._cover = this.util.getParentElement(element, 'FIGURE');
-        contextImage._container = this.util.getParentElement(element, this.node.isComponent);
+        contextImage._container = this.util.getParentElement(element, this.component.is);
         contextImage._caption = this.util.getEdgeChild(contextImage._cover, 'FIGCAPTION');
         contextImage._align = element.style.float || element.getAttribute('data-align') || 'none';
         element.style.float = '';

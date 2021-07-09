@@ -640,8 +640,8 @@ window.sun_noticeOpen = function () {
     // ss.noticeOpen('test notice');
     // ss.setContents('<html><head>aaa</head><body><div>abc</div></body></html>')
     // const { core } = ss;
-    // core.commandHandler(core._styleCommandMap.fullScreen, 'fullScreen')
-    ss.core.commandHandler(null, 'selectAll');
+    // core.commandHandler('fullScreen', core._styleCommandMap.fullScreen)
+    ss.core.commandHandler('selectAll', null);
     ss.core.removeNode()
     // \vec{P}.\vec{Q}=PQ
     ss.setContents(`
@@ -699,7 +699,7 @@ window.sun_getImagesInfo = function () {
 }
 
 window.sun_insertHTML = function (html) {
-    ss.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" /><p>fdafds</p>', true, true, false);
+    ss.selection.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" /><p>fdafds</p>', true, true, false);
     ss.setOptions({
         mathFontSize: [
             {text: '1', value: '1em'},
@@ -723,7 +723,7 @@ window.sun_setContents = function (content) {
 
 window.sun_appendContents = function (content) {
     // ss.appendContents(content);
-    ss.readOnly(!ss.core.isReadOnly);
+    ss.readOnly(!ss.status.isReadOnly);
 }
 
 window.sun_disabled = function () {
@@ -760,7 +760,7 @@ window.sun_create = function () {
         lang: lang.ko
     })
 
-    // ss.core.commandHandler(null, 'selectAll');
+    // ss.core.commandHandler('selectAll', null);
     // ss.core.removeNode();
 }
 
@@ -1085,15 +1085,15 @@ window.sun_setOptions2 = function () {
     //     placeholder: 'fdsfda',
     //     buttonList: []
     // });
-    s2.core.commandHandler(null, 'copy');
+    s2.core.commandHandler('copy', null);
 }
 
 window.sun_setOptions3 = function () {
     // s2.setOptions(newOption2);
-    s2.core.commandHandler(null, 'cut');
+    s2.core.commandHandler('cut', null);
 }
 window.sun_setOptions4 = function () {
-    s2.core.commandHandler(null, 'paste');
+    s2.core.commandHandler('paste', null);
     // s2.setOptions(newOption3);
 }
 

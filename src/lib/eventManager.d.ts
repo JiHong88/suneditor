@@ -1,4 +1,5 @@
-export class eventManager {
+import EditorInterface from "../interface/editor";
+export class eventManager extends EditorInterface {
 	/**
 	 * @description Register for an event.
 	 * Only events registered with this method are unregistered or re-registered when methods such as "setOptions", "destroy" are called. 

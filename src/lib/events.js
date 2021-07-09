@@ -4,10 +4,10 @@
  */
 "use strict";
 
-import CoreInterface from "../../interface/_core";
+import EditorInterface from "../interface/editor";
 
 const Events = function (editor) {
-	CoreInterface.call(this, editor);
+	EditorInterface.call(this, editor);
 };
 
 Events.prototype = {

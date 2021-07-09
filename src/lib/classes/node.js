@@ -5,6 +5,10 @@
 "use strict";
 
 import CoreInterface from "../../interface/_core";
+import {
+	domUtils,
+	unicode
+} from "../../helpers";
 
 const Node = function (editor) {
 	CoreInterface.call(this, editor);
@@ -29,23 +33,23 @@ Node.prototype = {
 		if (!depth || depth < 0) depth = 0;
 
 		if (baseNode.nodeType === 3) {
-			index = util.getPositionIndex(baseNode);
+			index = domUtils.getPositionIndex(baseNode);
 			if (offset >= 0) {
 				baseNode.splitText(offset);
-				const after = util.getNodeFromPath([index + 1], bp);
-				if (util.onlyZeroWidthSpace(after)) after.data = util.zeroWidthSpace;
+				const after = domUtils.getNodeFromPath([index + 1], bp);
+				if (unicode.onlyZeroWidthSpace(after)) after.data = unicode.zeroWidthSpace;
 			}
 		} else if (baseNode.nodeType === 1) {
 			if (!baseNode.previousSibling) {
-				if (util.getElementDepth(baseNode) === depth) next = false;
+				if (domUtils.getElementDepth(baseNode) === depth) next = false;
 			} else {
 				baseNode = baseNode.previousSibling;
 			}
 		}
 
 		let depthEl = baseNode;
-		while (util.getElementDepth(depthEl) > depth) {
-			index = util.getPositionIndex(depthEl) + 1;
+		while (domUtils.getElementDepth(depthEl) > depth) {
+			index = domUtils.getPositionIndex(depthEl) + 1;
 			depthEl = depthEl.parentNode;
 
 			temp = newEl;
@@ -53,9 +57,9 @@ Node.prototype = {
 			children = depthEl.childNodes;
 
 			if (temp) {
-				if (util.isListCell(newEl) && util.isList(temp) && temp.firstElementChild) {
+				if (domUtils.isListCell(newEl) && domUtils.isList(temp) && temp.firstElementChild) {
 					newEl.innerHTML = temp.firstElementChild.innerHTML;
-					util.removeItem(temp.firstElementChild);
+					domUtils.removeItem(temp.firstElementChild);
 					if (temp.children.length > 0) newEl.appendChild(temp);
 				} else {
 					newEl.appendChild(temp);
@@ -75,22 +79,22 @@ Node.prototype = {
 		if (!newEl) return depthEl;
 
 		this.mergeSameTags(newEl, null, false);
-		this.mergeNestedTags(newEl, util.isList);
+		this.mergeNestedTags(newEl, domUtils.isList);
 
 		if (newEl.childNodes.length > 0) pElement.insertBefore(newEl, depthEl);
 		else newEl = depthEl;
 
-		if (bp.childNodes.length === 0) util.removeItem(bp);
+		if (bp.childNodes.length === 0) domUtils.removeItem(bp);
 
 		return newEl;
 	},
 
 	/**
-	 * @description Use with "npdePath (util.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
+	 * @description Use with "npdePath (domUtils.getNodePath)" to merge the same attributes and tags if they are present and modify the nodepath.
 	 * If "offset" has been changed, it will return as much "offset" as it has been modified.
 	 * An array containing change offsets is returned in the order of the "nodePathArray" array.
 	 * @param {Element} element Element
-	 * @param {Array|null} nodePathArray Array of NodePath object ([util.getNodePath(), ..])
+	 * @param {Array|null} nodePathArray Array of NodePath object ([domUtils.getNodePath(), ..])
 	 * @param {boolean} onlyText If true, non-text nodes like 'span', 'strong'.. are ignored.
 	 * @returns {Array} [offset, ..]
 	 */
@@ -114,11 +118,11 @@ Node.prototype = {
 				next = children[i + 1];
 				if (!child) break;
 				if (
-					(onlyText && util._isIgnoreNodeChange(child)) ||
+					(onlyText && inst.format._isIgnoreNodeChange(child)) ||
 					(!onlyText &&
 						(dom.isTable(child) ||
 							dom.isListCell(child) ||
-							(inst.isLine(child) && !inst.isBrLine(child))))
+							(inst.format.isLine(child) && !inst.format.isBrLine(child))))
 				) {
 					if (dom.isTable(child) || dom.isListCell(child)) {
 						recursionFunc(child, depth + 1, i);
@@ -134,7 +138,7 @@ Node.prototype = {
 							if (path && path[depth] === i) {
 								(c = child), (p = current), (cDepth = depth), (spliceDepth = true);
 								while (cDepth >= 0) {
-									if (util.getArrayIndex(p.childNodes, c) !== path[cDepth]) {
+									if (domUtils.getArrayIndex(p.childNodes, c) !== path[cDepth]) {
 										spliceDepth = false;
 										break;
 									}
@@ -275,16 +279,6 @@ Node.prototype = {
 	},
 
 	/**
-	 * @description Delete argumenu value element
-	 * @param {Node} item Node to be remove
-	 */
-	removeItem: function (item) {
-		if (!item) return;
-		if (typeof item.remove === "function") item.remove();
-		else if (item.parentNode) item.parentNode.removeChild(item);
-	},
-
-	/**
 	 * @description Delete itself and all parent nodes that match the condition.
 	 * Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
 	 * @param {Node} item Node to be remove
@@ -297,21 +291,21 @@ Node.prototype = {
 		let cc = null;
 		if (!validation) {
 			validation = function (current) {
-				if (current === stopParent || this.isComponent(current)) return false;
+				if (current === stopParent || this.component.is(current)) return false;
 				const text = current.textContent.trim();
 				return text.length === 0 || /^(\n|\u200B)+$/.test(text);
-			}.bind(util);
+			}.bind(this);
 		}
 
 		(function recursionFunc(element) {
-			if (!util.isWysiwygDiv(element)) {
+			if (!domUtils.isWysiwygFrame(element)) {
 				const parent = element.parentNode;
 				if (parent && validation(element)) {
 					cc = {
 						sc: element.previousElementSibling,
 						ec: element.nextElementSibling
 					};
-					util.removeItem(element);
+					domUtils.removeItem(element);
 					recursionFunc(parent);
 				}
 			}
@@ -326,17 +320,19 @@ Node.prototype = {
 	 * @param {Node|null} notRemoveNode Do not remove node
 	 */
 	removeEmptyNode: function (element, notRemoveNode) {
+		const inst = this;
+
 		if (notRemoveNode) {
-			notRemoveNode = util.getParentElement(notRemoveNode, function (current) {
+			notRemoveNode = domUtils.getParentElement(notRemoveNode, function (current) {
 				return element === current.parentElement;
 			});
 		}
 
 		(function recursionFunc(current) {
-			if (util._notTextNode(current) || current === notRemoveNode || dom.isNonEditable(current)) return 0;
+			if (inst.format._notTextNode(current) || current === notRemoveNode || dom.isNonEditable(current)) return 0;
 			if (
 				current !== element &&
-				util.onlyZeroWidthSpace(current.textContent) &&
+				unicode.onlyZeroWidthSpace(current.textContent) &&
 				(!current.firstChild || !dom.isBreak(current.firstChild)) &&
 				!current.querySelector(_allowedEmptyNodeList)
 			) {
@@ -347,7 +343,7 @@ Node.prototype = {
 			} else {
 				const children = current.children;
 				for (let i = 0, len = children.length, r = 0; i < len; i++) {
-					if (!children[i + r] || util.isComponent(children[i + r])) continue;
+					if (!children[i + r] || inst.component.is(children[i + r])) continue;
 					r += recursionFunc(children[i + r]);
 				}
 			}
@@ -363,7 +359,7 @@ Node.prototype = {
 	 * @param {string} html HTML string
 	 * @returns {string}
 	 */
-	htmlRemoveWhiteSpace: function (html) {
+	removeWhiteSpace: function (html) {
 		if (!html) return "";
 		return html
 			.trim()
@@ -373,199 +369,6 @@ Node.prototype = {
 					return m.trim();
 				}
 			);
-	},
-
-	/**
-	 * @description Check if the container and offset values are the edges of the "line"
-	 * @param {Node} container The node of the selection object. (range.startContainer..)
-	 * @param {number} offset The offset of the selection object. (core.getRange().startOffset...)
-	 * @param {string} dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
-	 * @returns {boolean}
-	 */
-	isEdgeLine: function (node, offset, dir) {
-		if (!this.isEdgePoint(node, offset, dir)) return false;
-
-		const result = [];
-		dir = dir === 'front' ? 'previousSibling' : 'nextSibling';
-		while (node && !this.isLine(node) && !util.isWysiwygDiv(node)) {
-			if (!node[dir] || (util.isBreak(node[dir]) && !node[dir][dir])) {
-				if (node.nodeType === 1) result.push(node.cloneNode(false));
-				node = node.parentNode;
-			} else {
-				return null;
-			}
-		}
-
-		return result;
-	},
-
-	/**
-	 * @description It is judged whether it is a node related to the text style.
-	 * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)
-	 * @param {Node} element The node to check
-	 * @returns {boolean}
-	 */
-	isTextStyleNode: function (element) {
-		return (
-			element &&
-			element.nodeType !== 3 &&
-			/^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)$/i.test(element.nodeName)
-		);
-	},
-
-	/**
-	 * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")
-	 * Format element also contain "free format Element"
-	 * @param {Node} element The node to check
-	 * @returns {boolean}
-	 */
-	isLine: function (element) {
-		return (
-			element &&
-			element.nodeType === 1 &&
-			(/^(P|DIV|H[1-6]|PRE|LI|TH|TD|DETAILS)$/i.test(element.nodeName) ||
-				util.hasClass(element, "(\\s|^)__se__format__line_.+(\\s|$)|(\\s|^)__se__format__br_line_.+(\\s|$)")) &&
-			!this.isComponent(element) &&
-			!this.isWysiwygDiv(element)
-		);
-	},
-
-	/**
-	 * @description It is judged whether it is the free format element. (PRE | class="__se__format__br_line_xxx")
-	 * Free format elements is included in the format element.
-	 * Free format elements's line break is "BR" tag.
-	 * ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
-	 * @param {Node} element The node to check
-	 * @returns {boolean}
-	 */
-	isBrLine: function (element) {
-		return (
-			element &&
-			element.nodeType === 1 &&
-			(/^PRE$/i.test(element.nodeName) || this.hasClass(element, "(\\s|^)__se__format__br_line_.+(\\s|$)")) &&
-			!this.isComponent(element) &&
-			!this.isWysiwygDiv(element)
-		);
-	},
-
-	/**
-	 * @description It is judged whether it is the closure free format element. (class="__se__format__br_line__closure_xxx")
-	 * Closure free format elements is included in the free format element.
-	 *  - Closure free format elements's line break is "BR" tag.
-	 * ※ You cannot exit this format with the Enter key or Backspace key.
-	 * ※ Use it only in special cases. ([ex] format of table cells)
-	 * @param {Node} element The node to check
-	 * @returns {boolean}
-	 */
-	isClosureBrLine: function (element) {
-		return (
-			element &&
-			element.nodeType === 1 &&
-			this.hasClass(element, "(\\s|^)__se__format__br_line__closure_.+(\\s|$)")
-		);
-	},
-
-	/**
-	 * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__range_block_xxx")
-	 * Range format element is wrap the "format element" and "component"
-	 * @param {Node} element The node to check
-	 * @returns {boolean}
-	 */
-	isRangeBlock: function (element) {
-		return (
-			element &&
-			element.nodeType === 1 &&
-			(/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD|DETAILS)$/i.test(element.nodeName) ||
-				this.hasClass(element, "(\\s|^)__se__format__range_block_.+(\\s|$)"))
-		);
-	},
-
-	/**
-	 * @description It is judged whether it is the closure range format element. (TH, TD | class="__se__format__range_block_closure_xxx")
-	 * Closure range format elements is included in the range format element.
-	 *  - Closure range format element is wrap the "format element" and "component"
-	 * ※ You cannot exit this format with the Enter key or Backspace key.
-	 * ※ Use it only in special cases. ([ex] format of table cells)
-	 * @param {Node} element The node to check
-	 * @returns {boolean}
-	 */
-	isClosureRangeBlock: function (element) {
-		return (
-			element &&
-			element.nodeType === 1 &&
-			(/^(TH|TD)$/i.test(element.nodeName) ||
-				this.hasClass(element, "(\\s|^)__se__format__range_block_closure_.+(\\s|$)"))
-		);
-	},
-
-	/**
-	 * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
-	 * @param {Node} element The node to check
-	 * @returns {boolean}
-	 */
-	isComponent: function (element) {
-		return element && (/se-component/.test(element.className) || /^(TABLE|HR)$/.test(element.nodeName));
-	},
-
-	/**
-	 * @description It is judged whether it is the not checking node. (class="katex", "__se__tag")
-	 * @param {Node} element The node to check
-	 * @returns {boolean}
-	 * @private
-	 */
-	_isNotCheckingNode: function(element) {
-		return element && /katex|__se__tag/.test(element.className);
-	},
-
-	/**
-	 * @description Nodes that must remain undetached when changing text nodes (A, Label, Code, Span:font-size)
-	 * @param {Node|String} element Element to check
-	 * @returns {boolean}
-	 * @private
-	 */
-	_isNonSplitNode: function (element) {
-		return (
-			element &&
-			element.nodeType !== 3 &&
-			/^(a|label|code|summary)$/i.test(typeof element === "string" ? element : element.nodeName)
-		);
-	},
-
-	/**
-	 * @description Nodes that need to be added without modification when changing text nodes
-	 * @param {Node} element Element to check
-	 * @returns {boolean}
-	 * @private
-	 */
-	_isIgnoreNodeChange: function (element) {
-		return element && element.nodeType !== 3 && (this.isNonEditable(element) || !this.isTextStyleNode(element));
-	},
-
-	/**
-	 * @description Nodes without text
-	 * @param {Node} element Element to check
-	 * @returns {boolean}
-	 * @private
-	 */
-	_notTextNode: function (element) {
-		return (
-			element &&
-			element.nodeType !== 3 &&
-			(this.isComponent(element) ||
-				/^(br|input|select|canvas|img|iframe|audio|video)$/i.test(
-					typeof element === "string" ? element : element.nodeName
-				))
-		);
-	},
-
-	/**
-	 * @description Check disallowed tags
-	 * @param {Node} element Element to check
-	 * @returns {boolean}
-	 * @private
-	 */
-	_disallowedTags: function (element) {
-		return /^(meta|script|link|style|[a-z]+\:[a-z]+)$/i.test(element.nodeName);
 	},
 
 	constructor: Node

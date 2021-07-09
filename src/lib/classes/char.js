@@ -6,12 +6,17 @@
 
 import CoreInterface from "../../interface/_core";
 import env from "../../helper/env";
-import { window } from "../../helper/global";
-import { addClass, removeClass, hasClass } from "../../helper/dom";
+import {
+	window
+} from "../../helper/global";
+import {
+	addClass,
+	removeClass,
+	hasClass
+} from "../../helper/dom";
 
 const Char = function (editor) {
 	CoreInterface.call(this, editor);
-	this.selection = editor.selection;
 };
 
 Char.prototype = {
@@ -41,15 +46,47 @@ Char.prototype = {
 		if (typeof content !== "string") {
 			content = this.options.charCounterType === "byte-html" ? this.context.element.wysiwyg.innerHTML : this.context.element.wysiwyg.textContent;
 		}
-		return /byte/.test(this.options.charCounterType) ? GetByteLength(content) : content.length;
+		return /byte/.test(this.options.charCounterType) ? this.getByteLength(content) : content.length;
+	},
+
+	/**
+	 * @descriptionGets Get the length in bytes of a string.
+	 * @param {string} text String text
+	 * @returns {number}
+	 */
+	getByteLength: function (text) {
+		if (!text || !text.toString) return 0;
+		text = text.toString();
+
+		const encoder = this._w.encodeURIComponent;
+		let cr, cl;
+		if (env.isIE || env.isEdge) {
+			cl = this._w.unescape(encoder(text)).length;
+			cr = 0;
+
+			if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
+				cr = encoder(text).match(/(%0A|%0D)/gi).length;
+			}
+
+			return cl + cr;
+		} else {
+			cl = new this._w.TextEncoder("utf-8").encode(text).length;
+			cr = 0;
+
+			if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
+				cr = encoder(text).match(/(%0A|%0D)/gi).length;
+			}
+
+			return cl + cr;
+		}
 	},
 
 	/**
 	 * @description Set the char count to charCounter element textContent.
 	 */
 	display: function () {
-		if (context.element.charCounter) {
-			window.setTimeout(
+		if (this.context.element.charCounter) {
+			this._w.setTimeout(
 				function () {
 					this.context.element.charCounter.textContent = this.getLength();
 				}.bind(this)
@@ -114,39 +151,6 @@ function CounterBlink(charWrapper) {
 		window.setTimeout(function () {
 			removeClass(charWrapper, "se-blink");
 		}, 600);
-	}
-}
-
-/**
- * @descriptionGets Get the length in bytes of a string.
- * referencing code: "https://github.com/shaan1974/myrdin/blob/master/expressions/string.js#L11"
- * @param {string} text String text
- * @returns {number}
- */
-function GetByteLength(text) {
-	if (!text || !text.toString) return 0;
-	text = text.toString();
-
-	const encoder = window.encodeURIComponent;
-	let cr, cl;
-	if (env.isIE || env.isEdge) {
-		cl = window.unescape(encoder(text)).length;
-		cr = 0;
-
-		if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
-			cr = encoder(text).match(/(%0A|%0D)/gi).length;
-		}
-
-		return cl + cr;
-	} else {
-		cl = new window.TextEncoder("utf-8").encode(text).length;
-		cr = 0;
-
-		if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
-			cr = encoder(text).match(/(%0A|%0D)/gi).length;
-		}
-
-		return cl + cr;
 	}
 }
 

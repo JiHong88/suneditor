@@ -394,7 +394,7 @@
     
             const resizeContainer = contextResizing.resizeContainer;
             const resizeDiv = contextResizing.resizeDiv;
-            const offset = this.util.getOffset(targetElement, this.context.element.wysiwygFrame);
+            const offset = this.offset.get(targetElement);
     
             const isVertical = contextResizing._rotateVertical = /^(90|270)$/.test(Math.abs(targetElement.getAttribute('data-rotate')).toString());
     
@@ -417,7 +417,7 @@
             align = align === 'none' ? 'basic' : align;
     
             // text
-            const container = this.util.getParentElement(targetElement, this.node.isComponent);
+            const container = this.util.getParentElement(targetElement, this.component.is);
             const cover = this.util.getParentElement(targetElement, 'FIGURE');
             const displayX = this.plugins.resizing._module_getSizeX.call(this, contextPlugin, targetElement, cover, container) || 'auto';
             const displayY = contextPlugin._onlyPercentage && plugin === 'image' ? '' : ', ' + (this.plugins.resizing._module_getSizeY.call(this, contextPlugin, targetElement, cover, container) || 'auto');

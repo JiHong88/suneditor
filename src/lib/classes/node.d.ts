@@ -1,6 +1,6 @@
-import CoreInterface from "../../interface/_core";
+import EditorInterface from "../../interface/editor";
 
-class Node extends CoreInterface {
+class Node extends EditorInterface {
 	/**
 	 * @description Split all tags based on "baseNode"
 	 * Returns the last element of the splited tag.
@@ -30,12 +30,6 @@ class Node extends CoreInterface {
 	mergeNestedTags(element: Element, validation?: string | Function): void;
 
 	/**
-	 * @description Delete argumenu value element
-	 * @param item Node to be remove
-	 */
-	removeItem(item: Node): void;
-
-	/**
 	 * @description Delete all parent nodes that match the condition.
 	 * Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
 	 * @param item Node to be remove
@@ -57,79 +51,7 @@ class Node extends CoreInterface {
 	 * @param html HTML string
 	 * @returns
 	 */
-	htmlRemoveWhiteSpace(html: string): string;
-
-	/**
-	 * @description Check if the container and offset values are the edges of the "line"
-	 * @param container The container property of the selection object.
-	 * @param offset The offset property of the selection object.
-	 * @param dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
-	 * @returns
-	 */
-	isEdgeLine(container: Node, offset: number, dir: "front" | "end"): boolean;
-
-	/**
-	 * @description It is judged whether it is a node related to the text style.
-	 * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label)
-	 * @param element The node to check
-	 * @returns
-	 */
-	isTextStyleNode(element: Node): boolean;
-
-	/**
-	 * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI | class="__se__format__line_xxx")
-	 * Format element also contain "free format Element"
-	 * @param element The node to check
-	 * @returns
-	 */
-	isLine(element: Node): boolean;
-
-	/**
-	 * @description It is judged whether it is the free format element. (PRE | class="__se__format__br_line_xxx")
-	 * Free format elements is included in the format element.
-	 * Free format elements's line break is "BR" tag.
-	 * ※ Entering the Enter key in the space on the last line ends "Free Format" and appends "Format".
-	 * @param element The node to check
-	 * @returns
-	 */
-	isBrLine(element: Node): boolean;
-
-	 /**
-		* @description It is judged whether it is the closure free format element. (class="__se__format__br_line__closure_xxx")
-		* Closure free format elements is included in the free format element.
-		*  - Closure free format elements's line break is "BR" tag.
-		* ※ You cannot exit this format with the Enter key.
-		* ※ Use it only in special cases. ([ex] format of table cells)
-		* @param element The node to check
-		* @returns
-		*/
-	isClosureBrLine(element: Node): boolean;
-
-	/**
-	 * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__range_block_xxx")
-	 * * Range format element is wrap the line element
-	 * @param element The node to check
-	 * @returns
-	 */
-	isRangeBlock(element: Node): boolean;
-
-	/**
-	 * @description It is judged whether it is the closure range format element. (TH, TD | class="__se__format__range_block_closure_xxx")
-	 * Closure range format elements is included in the range format element.
-	 *  - Closure range format element is wrap the "format element" and "component"
-	 * ※ You cannot exit this format with the Enter key or Backspace key.
-	 * ※ Use it only in special cases. ([ex] format of table cells)
-	 * @param element The node to check
-	 * @returns
-	 */
-	isClosureRangeBlock(element: Node): boolean;
-
-	/**
-	 * @description It is judged whether it is the component [img, iframe, video, audio] cover(class="se-component") and table, hr
-	 * @param element The node to check
-	 * @returns
-	 */
-	isComponent(element: Node): boolean;
+	removeWhiteSpace(html: string): string;
 }
 
 export default Node;

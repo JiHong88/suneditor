@@ -1,6 +1,6 @@
-import CoreInterface from "../../interface/_core";
+import EditorInterface from "../../interface/editor";
 
-class Selection extends CoreInterface {
+class Selection extends EditorInterface {
 	/**
 	 * @description Get current editor's range object
 	 * @returns
@@ -72,13 +72,22 @@ class Selection extends CoreInterface {
 	 * @param afterNode If the node exists, it is inserted after the node
 	 * @returns
 	 */
-	insertNode(oNode: Node, afterNode?: Node, checkCharCount?: boolean): { startOffset: Node, endOffset: number } | Node | null;
-	
+	insertNode(oNode: Node, afterNode?: Node, checkCharCount?: boolean): { startOffset: Node; endOffset: number } | Node | null;
+
 	/**
-	* @description Delete the currently selected nodes and reset selection range
-	* Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
-	* @returns
-	*/
+	 * @description Inserts an HTML element or HTML string or plain string at the current cursor position
+	 * @param html HTML Element or HTML string or plain string
+	 * @param notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
+	 * @param checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+	 * @param rangeSelection If true, range select the inserted node.
+	 */
+	insertHTML(html: Element | string, notCleaningData?: boolean, checkCharCount?: boolean, rangeSelection?: boolean): void;
+
+	/**
+	 * @description Delete the currently selected nodes and reset selection range
+	 * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
+	 * @returns
+	 */
 	removeNode(): { container: Node; offset: number; prevContainer?: Node };
 }
 

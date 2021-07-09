@@ -76,9 +76,9 @@ export default {
         const tooltip = this.context.font.targetTooltip;
 
         if (!element) {
-            const font = this.hasFocus ? this.wwComputedStyle.fontFamily : this.lang.toolbar.font;
+            const font = this.status.hasFocus ? this.wwComputedStyle.fontFamily : this.lang.toolbar.font;
             this.util.changeTxt(target, font);
-            this.util.changeTxt(tooltip, this.hasFocus ? this.lang.toolbar.font + ' (' + font + ')' : font);
+            this.util.changeTxt(tooltip, this.status.hasFocus ? this.lang.toolbar.font + ' (' + font + ')' : font);
         } else if (element.style && element.style.fontFamily.length > 0) {
             const selectFont = element.style.fontFamily.replace(/["']/g,'');
             this.util.changeTxt(target, selectFont);

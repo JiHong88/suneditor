@@ -1,5 +1,6 @@
-import CoreInterface from "../../interface/_core";
-class Component extends CoreInterface {
+import EditorInterface from "../../interface/editor";
+
+class Component extends EditorInterface {
 	/**
 	 * @description The method to insert a element and return. (used elements : table, hr, image, video)
 	 * If "element" is "HR", insert and return the new line.
@@ -27,7 +28,7 @@ class Component extends CoreInterface {
 	select(element: Element, pluginName: string): void;
 
 	/**
-	 * @description It is judged whether it is the not checking node. (class="katex", "__se__tag")
+	 * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
 	 * @param element The node to check
 	 * @returns
 	 */

@@ -9,15 +9,24 @@ import {
  * @description Create Element node
  * @param {string} elementName Element name
  * @param {Object|null|undefined} attributes The attributes of the tag. {style: "font-size:12px;..", class: "el_class",..}
+ * @param {string|Element|null|undefined} inner A innerHTML or inner element.
  * @returns {Element}
  */
-export function createElement(elementName, attributes) {
+export function createElement(elementName, attributes, inner) {
 	const el = _d.createElement(elementName);
+
 	if (attributes) {
 		for (let key in attributes) {
 			el.setAttribute(key, attributes[key]);
 		}
 	}
+
+	if (typeof inner === "string") {
+		el.innerHTML = inner;
+	} else if (typeof inner === "object") {
+		el.appendChild(inner);
+	}
+
 	return el;
 }
 
@@ -92,7 +101,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 		node,
 		function (el) {
 			if (el === parentNode) finds = false;
-			if (finds && !isWysiwygDiv(el)) {
+			if (finds && !isWysiwygFrame(el)) {
 				// merge text nodes
 				if (_newOffsets && el.nodeType === 3) {
 					let temp = null,
@@ -221,12 +230,12 @@ export function getListChildNodes(element, validation) {
  * @returns {number}
  */
 export function getElementDepth(element) {
-	if (!element || isWysiwygDiv(element)) return -1;
+	if (!element || isWysiwygFrame(element)) return -1;
 
 	let depth = 0;
 	element = element.parentNode;
 
-	while (element && !isWysiwygDiv(element)) {
+	while (element && !isWysiwygFrame(element)) {
 		depth += 1;
 		element = element.parentNode;
 	}
@@ -324,7 +333,7 @@ export function getParentElement(element, query) {
 	}
 
 	while (element && !check(element)) {
-		if (isWysiwygDiv(element)) {
+		if (isWysiwygFrame(element)) {
 			return null;
 		}
 		element = element.parentNode;
@@ -528,6 +537,16 @@ export function isSameAttributes(a, b) {
 }
 
 /**
+ * @description Delete argumenu value element
+ * @param {Node} item Node to be remove
+ */
+export function removeItem(item) {
+	if (!item) return;
+	if (typeof item.remove === "function") item.remove();
+	else if (item.parentNode) item.parentNode.removeChild(item);
+}
+
+/**
  * @description Replace element
  * @param {Element} element Target element
  * @param {String|Element} newElement String or element of the new element to apply
@@ -648,53 +667,14 @@ export function toggleClass(element, className) {
 }
 
 /**
- * @description Returns the position of the argument, relative to inside the editor. 
- * @param {Node} node Target node
- * @param {Element|null} wysiwygFrame When use iframe option, iframe object should be sent (context.element.wysiwygFrame)
- * @returns {Object} {left, top}
+ * @description Determine if this offset is the edge offset of container
+ * @param {Node} container The node of the selection object. (range.startContainer..)
+ * @param {number} offset The offset of the selection object. (core.getRange().startOffset...)
+ * @param {String|undefined} dir Select check point - Both edge, Front edge or End edge. ("front": Front edge, "end": End edge, undefined: Both edge)
+ * @returns {boolean}
  */
-export function getOffset(node, wysiwygFrame) {
-	let offsetLeft = 0;
-	let offsetTop = 0;
-	let offsetElement = node.nodeType === 3 ? node.parentElement : node;
-	const wysiwyg = this.getParentElement(node, this.isWysiwygDiv.bind(this));
-
-	while (offsetElement && !this.hasClass(offsetElement, "se-container") && offsetElement !== wysiwyg) {
-		offsetLeft += offsetElement.offsetLeft;
-		offsetTop += offsetElement.offsetTop;
-		offsetElement = offsetElement.offsetParent;
-	}
-
-	const iframe = wysiwygFrame && /iframe/i.test(wysiwygFrame.nodeName);
-
-	return {
-		left: offsetLeft + (iframe ? wysiwygFrame.parentElement.offsetLeft : 0),
-		top: offsetTop - (wysiwyg ? wysiwyg.scrollTop : 0) + (iframe ? wysiwygFrame.parentElement.offsetTop : 0)
-	};
-}
-
-/**
- * @description Returns the position of the argument, relative to global document. {left:0, top:0, scroll: 0}
- * @param {Element} container Target element
- * @returns {Object} {left, top, scroll}
- */
-export function getGlobalOffset(container) {
-	let t = 0,
-		l = 0,
-		s = 0;
-
-	while (container) {
-		t += container.offsetTop;
-		l += container.offsetLeft;
-		s += container.scrollTop;
-		container = container.offsetParent;
-	}
-
-	return {
-		top: t,
-		left: l,
-		scroll: s
-	};
+export function isEdgePoint(container, offset, dir) {
+	return (dir !== 'end' && offset === 0) || ((!dir || dir !== 'front') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && !!container.nodeValue && offset === container.nodeValue.length);
 }
 
 /**
@@ -702,7 +682,7 @@ export function getGlobalOffset(container) {
  * @param {Node} element The node to check
  * @returns {boolean}
  */
-export function isWysiwygDiv(element) {
+export function isWysiwygFrame(element) {
 	return (
 		element &&
 		element.nodeType === 1 &&
@@ -828,6 +808,7 @@ const domUtils = {
 	prevIndex: prevIndex,
 	copyTagAttributes: copyTagAttributes,
 	isSameAttributes: isSameAttributes,
+	removeItem: removeItem,
 	changeElement: changeElement,
 	changeTxt: changeTxt,
 	setStyle: setStyle,
@@ -836,9 +817,7 @@ const domUtils = {
 	addClass: addClass,
 	removeClass: removeClass,
 	toggleClass: toggleClass,
-	getOffset: getOffset,
-	getGlobalOffset: getGlobalOffset,
-	isWysiwygDiv: isWysiwygDiv,
+	isWysiwygFrame: isWysiwygFrame,
 	isNonEditable: isNonEditable,
 	isList: isList,
 	isListCell: isListCell,

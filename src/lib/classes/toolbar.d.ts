@@ -1,6 +1,6 @@
-import CoreInterface from "../../interface/_core";
+import EditorInterface from "../../interface/editor";
 
-class Toolbar extends CoreInterface {
+class Toolbar extends EditorInterface {
 	/**
 	 * @description Disable the toolbar
 	 */

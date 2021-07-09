@@ -1,17 +1,23 @@
 import CoreInterface from "../../interface/_core";
+import {
+	domUtils
+} from "../../helpers";
 
 const Notice = function (editor) {
 	CoreInterface.call(this, editor);
 
-	this.modal = core.util.createElement("DIV");
-	this.message = core.util.createElement("SPAN");
-	let notice_button = core.util.createElement("BUTTON");
+	this.modal = domUtils.createElement("DIV", {
+		class: "se-notice"
+	}, null);
 
-	this.modal.className = "se-notice";
-	notice_button.className = "close";
-	notice_button.setAttribute("aria-label", "Close");
-	notice_button.setAttribute("title", core.lang.dialogBox.close);
-	notice_button.innerHTML = this.icons.cancel;
+	this.message = domUtils.createElement("SPAN");
+	let notice_button = domUtils.createElement("BUTTON", {
+			class: "close",
+			"aria-label": "Close",
+			title: core.lang.dialogBox.close
+		},
+		this.icons.cancel);
+
 
 	this.modal.appendChild(this.message);
 	this.modal.appendChild(notice_button);

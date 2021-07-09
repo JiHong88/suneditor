@@ -55,7 +55,7 @@ export default function (core, change) {
 		if (!current || (!!stack[stackIndex] && current === stack[stackIndex].contents)) return;
 
 		stackIndex++;
-		const range = core._variable._range;
+		const range = core.status._range;
 
 		if (stack.length > stackIndex) {
 			stack = stack.slice(0, stackIndex);
@@ -165,7 +165,7 @@ export default function (core, change) {
 		reset: function (ignoreChangeEvent) {
 			if (undo) undo.setAttribute("disabled", true);
 			if (redo) redo.setAttribute("disabled", true);
-			core._variable.isChanged = false;
+			core.status.isChanged = false;
 			if (core.context.buttons.save) core.context.buttons.save.setAttribute("disabled", true);
 
 			stack.splice(0);
@@ -199,7 +199,7 @@ export default function (core, change) {
 			if (stackIndex === 0) {
 				if (undo) undo.setAttribute("disabled", true);
 				if (redo && stackIndex === stack.length - 1) redo.setAttribute("disabled", true);
-				core._variable.isChanged = false;
+				core.status.isChanged = false;
 				if (core.context.buttons.save) core.context.buttons.save.setAttribute("disabled", true);
 			} else if (stackIndex === stack.length - 1) {
 				if (redo) redo.setAttribute("disabled", true);

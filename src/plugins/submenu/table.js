@@ -990,7 +990,7 @@ export default {
 
             ch = cell.children;
             for (let c = 0, cLen = ch.length; c < cLen; c++) {
-                if (util.isLine(ch[c]) && util.onlyZeroWidthSpace(ch[c].textContent)) {
+                if (this.format.isLine(ch[c]) && util.onlyZeroWidthSpace(ch[c].textContent)) {
                     util.removeItem(ch[c]);
                 }  
             }

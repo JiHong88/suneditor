@@ -1,6 +1,6 @@
-import CoreInterface from "../../interface/_core";
+import EditorInterface from "../../interface/editor";
 
-class Shortcuts extends CoreInterface {
+class Shortcuts extends EditorInterface {
   /**
 	 * @description If there is a shortcut function, run it.
 	 * @param keyCode event.keyCode

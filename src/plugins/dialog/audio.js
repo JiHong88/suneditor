@@ -206,7 +206,7 @@ export default {
      */
     destroy: function (element) {
         element = element || this.context.audio._element;
-        const container = this.util.getParentElement(element, this.node.isComponent) || element;
+        const container = this.util.getParentElement(element, this.component.is) || element;
         const dataIndex = element.getAttribute('data-index') * 1;
         const focusEl = (container.previousElementSibling || container.nextElementSibling);
 
@@ -313,7 +313,7 @@ export default {
             if ((fileSize + infoSize) > limitSize) {
                 this.closeLoading();
                 const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable total audios: ' + (limitSize/1000) + 'KB';
-                if (typeof this.events.onAudioUploadError !== 'function' || this.events.onAudioUploadError.call(this.editor, err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize })) {
+                if (typeof this.events.onAudioUploadError !== 'function' || this.events.onAudioUploadError(err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize })) {
                     this.notice.open(err);
                 }
                 return;
@@ -329,7 +329,7 @@ export default {
         };
 
         if (typeof this.events.onAudioUploadBefore === 'function') {
-            const result = this.events.onAudioUploadBefore.call(this.editor, files, info, function (data) {
+            const result = this.events.onAudioUploadBefore(files, info, function (data) {
                 if (data && this._w.Array.isArray(data.result)) {
                     this.plugins.audio.register.call(this, info, data);
                 } else {
@@ -350,7 +350,7 @@ export default {
 
     error: function (message, response) {
         this.closeLoading();
-        if (typeof this.events.onAudioUploadError !== 'function' || this.events.onAudioUploadError.call(this.editor, message, response)) {
+        if (typeof this.events.onAudioUploadError !== 'function' || this.events.onAudioUploadError(message, response)) {
             this.notice.open(message);
             throw Error('[SUNEDITOR.plugin.audio.exception] response: ' + message);
         }
@@ -381,7 +381,7 @@ export default {
 
     callBack_upload: function (info, xmlHttp) {
         if (typeof this.events.audioUploadHandler === 'function') {
-            this.events.audioUploadHandler.call(this.editor, xmlHttp, info);
+            this.events.audioUploadHandler(xmlHttp, info);
         } else {
             const response = JSON.parse(xmlHttp.responseText);
             if (response.errorMessage) {
@@ -454,9 +454,9 @@ export default {
         this.plugins.audio._setTagAttrs.call(this, element);
         
         // find component element
-        const existElement = this.util.getParentElement(element, this.node.isComponent) || 
+        const existElement = this.util.getParentElement(element, this.component.is) || 
             this.util.getParentElement(element, function (current) {
-                return this.isWysiwygDiv(current.parentNode);
+                return this.isWysiwygFrame(current.parentNode);
             }.bind(this.util));
 
         // clone element
@@ -466,12 +466,12 @@ export default {
         const container = this.plugins.component.set_container.call(this, cover, 'se-audio-container');
 
         try {
-            if (this.util.isLine(existElement) && existElement.childNodes.length > 0) {
+            if (this.format.isLine(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(prevElement);
                 // clean format tag
                 this.util.removeEmptyNode(existElement, null);
-                if (existElement.children.length === 0) existElement.innerHTML = this.util.htmlRemoveWhiteSpace(existElement.innerHTML);
+                if (existElement.children.length === 0) existElement.innerHTML = this.util.removeWhiteSpace(existElement.innerHTML);
             } else {
                 existElement.parentNode.replaceChild(container, existElement);
             }
@@ -495,7 +495,7 @@ export default {
         this.util.addClass(selectionTag, 'active');
         contextAudio._element = selectionTag;
         contextAudio._cover = this.util.getParentElement(selectionTag, 'FIGURE');
-        contextAudio._container = this.util.getParentElement(selectionTag, this.node.isComponent);
+        contextAudio._container = this.util.getParentElement(selectionTag, this.component.is);
     },
 
     /**

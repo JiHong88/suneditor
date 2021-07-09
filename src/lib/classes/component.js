@@ -5,7 +5,7 @@
 "use strict";
 
 import CoreInterface from "../../interface/_core";
-import domUtils from "../../helpers/dom";
+import { domUtils, unicode } from "../../helpers";
 
 function Component(editor) {
 	CoreInterface.call(this, editor);
@@ -26,39 +26,39 @@ Component.prototype = {
 			return null;
 		}
 
-		const r = this.removeNode();
-		this.getRange_addLine(this.getRange(), r.container);
+		const r = this.selection.removeNode();
+		this.selection.getRange_addLine(this.selection.getRange(), r.container);
 		let oNode = null;
 		let selectionNode = this.selection.getNode();
 		let formatEl = this.format.getLine(selectionNode, null);
 
-		if (util.isListCell(formatEl)) {
-			this.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling, false);
-			if (!element.nextSibling) element.parentNode.appendChild(util.createElement("BR"));
+		if (domUtils.isListCell(formatEl)) {
+			this.selection.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling, false);
+			if (!element.nextSibling) element.parentNode.appendChild(domUtils.createElement("BR"));
 		} else {
-			if (this.getRange().collapsed && (r.container.nodeType === 3 || util.isBreak(r.container))) {
-				const depthFormat = util.getParentElement(
+			if (this.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
+				const depthFormat = domUtils.getParentElement(
 					r.container,
 					function (current) {
-						return this.isRangeBlock(current);
-					}.bind(util)
+						return this.format.isRangeBlock(current);
+					}.bind(this)
 				);
-				oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
+				oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getElementDepth(depthFormat) + 1);
 				if (oNode) formatEl = oNode.previousSibling;
 			}
-			this.insertNode(element, util.isRangeBlock(formatEl) ? null : formatEl, false);
-			if (formatEl && util.onlyZeroWidthSpace(formatEl)) util.removeItem(formatEl);
+			this.selection.insertNode(element, this.format.isRangeBlock(formatEl) ? null : formatEl, false);
+			if (formatEl && unicode.onlyZeroWidthSpace(formatEl)) domUtils.removeItem(formatEl);
 		}
 
-		this.setRange(element, 0, element, 0);
+		this.selection.setRange(element, 0, element, 0);
 
 		if (!notSelect) {
 			const fileComponentInfo = this.get(element);
 			if (fileComponentInfo) {
 				this.select(fileComponentInfo.target, fileComponentInfo.pluginName);
 			} else if (oNode) {
-				oNode = util.getEdgeChildNodes(oNode, null).sc || oNode;
-				this.setRange(oNode, 0, oNode, 0);
+				oNode = domUtils.getEdgeChildNodes(oNode, null).sc || oNode;
+				this.selection.setRange(oNode, 0, oNode, 0);
 			}
 		}
 
@@ -75,22 +75,22 @@ Component.prototype = {
 	 * @returns {Object|null}
 	 */
 	get: function (element) {
-		if (!this._fileManager.queryString || !element) return null;
+		if (!this.editor._fileManager.queryString || !element) return null;
 
 		let target, pluginName;
 		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
-			target = element.querySelector(this._fileManager.queryString);
+			target = element.querySelector(this.editor._fileManager.queryString);
 		}
-		if (!target && element.nodeName && this._fileManager.regExp.test(element.nodeName)) {
+		if (!target && element.nodeName && this.editor._fileManager.regExp.test(element.nodeName)) {
 			target = element;
 		}
 
 		if (target) {
-			pluginName = this._fileManager.pluginMap[target.nodeName.toLowerCase()];
+			pluginName = this.editor._fileManager.pluginMap[target.nodeName.toLowerCase()];
 			if (pluginName) {
 				return {
 					target: target,
-					component: util.getParentElement(target, this.node.isComponent),
+					component: domUtils.getParentElement(target, this.is),
 					pluginName: pluginName
 				};
 			}
@@ -105,16 +105,25 @@ Component.prototype = {
 	 * @param {string} pluginName Plugin name (image, video)
 	 */
 	select: function (element, pluginName) {
-		if (util.isUneditable(util.getParentElement(element, this.node.isComponent)) || util.isUneditable(element)) return false;
-		if (!this.hasFocus) this.focus();
+		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is)) || domUtils.isUneditable(element)) return false;
+		if (!this.status.hasFocus) this.focus();
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;
 		_w.setTimeout(
 			function () {
-				if (typeof plugin.select === "function") this.callPlugin(pluginName, plugin.select.bind(this, element), null);
+				if (typeof plugin.select === "function") this.editor.callPlugin(pluginName, plugin.select.bind(this, element), null);
 				this._setComponentLineBreaker(element);
 			}.bind(this)
 		);
+	},
+
+	/**
+	 * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
+	 * @param {Node} element The node to check
+	 * @returns {boolean}
+	 */
+	is: function (element) {
+		return element && (/se-component/.test(element.className) || /^(TABLE|HR)$/.test(element.nodeName));
 	},
 
 	/**
@@ -124,38 +133,39 @@ Component.prototype = {
 	 */
 	_setComponentLineBreaker: function (element) {
 		// line breaker
-		this._lineBreaker.style.display = "none";
-		const container = util.getParentElement(element, this.node.isComponent);
-		const t_style = context.element.lineBreaker_t.style;
-		const b_style = context.element.lineBreaker_b.style;
+		this.editor._lineBreaker.style.display = "none";
+		const contextEl = this.context.element;
+		const container = domUtils.getParentElement(element, this.is);
+		const t_style = contextEl.lineBreaker_t.style;
+		const b_style = contextEl.lineBreaker_b.style;
 		const target = this.context.resizing.resizeContainer.style.display === "block" ? this.context.resizing.resizeContainer : element;
 
-		const isList = util.isListCell(container.parentNode);
+		const isList = domUtils.isListCell(container.parentNode);
 		let componentTop, wScroll, w;
 		// top
-		if (isList ? !container.previousSibling : !util.isLine(container.previousElementSibling)) {
-			this._variable._lineBreakComp = container;
-			wScroll = context.element.wysiwyg.scrollTop;
-			componentTop = domUtils.getOffset(element, context.element.wysiwygFrame).top + wScroll;
+		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
+			this.status._lineBreakComp = container;
+			wScroll = contextEl.wysiwyg.scrollTop;
+			componentTop = this.offset.get(element).top + wScroll;
 			w = target.offsetWidth / 2 / 2;
 
 			t_style.top = componentTop - wScroll - 12 + "px";
-			t_style.left = domUtils.getOffset(target).left + w + "px";
+			t_style.left = this.offset.get(target).left + w + "px";
 			t_style.display = "block";
 		} else {
 			t_style.display = "none";
 		}
 		// bottom
-		if (isList ? !container.nextSibling : !util.isLine(container.nextElementSibling)) {
+		if (isList ? !container.nextSibling : !this.format.isLine(container.nextElementSibling)) {
 			if (!componentTop) {
-				this._variable._lineBreakComp = container;
-				wScroll = context.element.wysiwyg.scrollTop;
-				componentTop = domUtils.getOffset(element, context.element.wysiwygFrame).top + wScroll;
+				this.status._lineBreakComp = container;
+				wScroll = contextEl.wysiwyg.scrollTop;
+				componentTop = this.offset.get(element).top + wScroll;
 				w = target.offsetWidth / 2 / 2;
 			}
 
 			b_style.top = componentTop + target.offsetHeight - wScroll - 12 + "px";
-			b_style.left = domUtils.getOffset(target).left + target.offsetWidth - w - 24 + "px";
+			b_style.left = this.offset.get(target).left + target.offsetWidth - w - 24 + "px";
 			b_style.display = "block";
 		} else {
 			b_style.display = "none";

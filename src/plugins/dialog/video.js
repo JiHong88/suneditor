@@ -368,10 +368,10 @@ export default {
 
         try {
             if (contextVideo.videoInputFile && contextVideo.videoInputFile.files.length > 0) {
-                this.showLoading();
+                this.openLoading();
                 videoPlugin.submitAction.call(this, this.context.video.videoInputFile.files);
             } else if (contextVideo.videoUrlFile && contextVideo._linkValue.length > 0) {
-                this.showLoading();
+                this.openLoading();
                 videoPlugin.setup_url.call(this);
             }
         } catch (error) {
@@ -407,7 +407,7 @@ export default {
             if ((fileSize + infoSize) > limitSize) {
                 this.closeLoading();
                 const err = '[SUNEDITOR.videoUpload.fail] Size of uploadable total videos: ' + (limitSize/1000) + 'KB';
-                if (typeof this.events.onVideoUploadError !== 'function' || this.events.onVideoUploadError.call(this.editor, err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize })) {
+                if (typeof this.events.onVideoUploadError !== 'function' || this.events.onVideoUploadError(err, { 'limitSize': limitSize, 'currentSize': infoSize, 'uploadSize': fileSize })) {
                     this.notice.open(err);
                 }
                 return;
@@ -426,7 +426,7 @@ export default {
         };
 
         if (typeof this.events.onVideoUploadBefore === 'function') {
-            const result = this.events.onVideoUploadBefore.call(this.editor, files, info, function (data) {
+            const result = this.events.onVideoUploadBefore(files, info, function (data) {
                 if (data && this._w.Array.isArray(data.result)) {
                     this.plugins.video.register.call(this, info, data);
                 } else {
@@ -447,7 +447,7 @@ export default {
 
     error: function (message, response) {
         this.closeLoading();
-        if (typeof this.events.onVideoUploadError !== 'function' || this.events.onVideoUploadError.call(this.editor, message, response)) {
+        if (typeof this.events.onVideoUploadError !== 'function' || this.events.onVideoUploadError(message, response)) {
             this.notice.open(message);
             throw Error('[SUNEDITOR.plugin.video.error] response: ' + message);
         }
@@ -480,7 +480,7 @@ export default {
 
     callBack_videoUpload: function (info, xmlHttp) {
         if (typeof this.events.videoUploadHandler === 'function') {
-            this.events.videoUploadHandler.call(this.editor, xmlHttp, info);
+            this.events.videoUploadHandler(xmlHttp, info);
         } else {
             const response = JSON.parse(xmlHttp.responseText);
             if (response.errorMessage) {
@@ -645,9 +645,9 @@ export default {
         if (/^video$/i.test(oFrame.nodeName)) this.plugins.video._setTagAttrs.call(this, oFrame);
         else this.plugins.video._setIframeAttrs.call(this, oFrame);
         
-        const existElement = this.util.getParentElement(oFrame, this.node.isComponent) || 
+        const existElement = this.util.getParentElement(oFrame, this.component.is) || 
             this.util.getParentElement(oFrame, function (current) {
-                return this.isWysiwygDiv(current.parentNode);
+                return this.isWysiwygFrame(current.parentNode);
             }.bind(this.util));
 
         const prevFrame = oFrame;
@@ -673,12 +673,12 @@ export default {
             if (format) contextVideo._align = format.style.textAlign || format.style.float;
             this.plugins.video.setAlign.call(this, null, oFrame, cover, container);
 
-            if (this.util.isLine(existElement) && existElement.childNodes.length > 0) {
+            if (this.format.isLine(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(prevFrame);
                 // clean format tag
                 this.util.removeEmptyNode(existElement, null);
-                if (existElement.children.length === 0) existElement.innerHTML = this.util.htmlRemoveWhiteSpace(existElement.innerHTML);
+                if (existElement.children.length === 0) existElement.innerHTML = this.util.removeWhiteSpace(existElement.innerHTML);
             } else {
                 existElement.parentNode.replaceChild(container, existElement);
             }
@@ -699,7 +699,7 @@ export default {
         const contextVideo = this.context.video;
         contextVideo._element = element;
         contextVideo._cover = this.util.getParentElement(element, 'FIGURE');
-        contextVideo._container = this.util.getParentElement(element, this.node.isComponent);
+        contextVideo._container = this.util.getParentElement(element, this.component.is);
         contextVideo._align = element.style.float || element.getAttribute('data-align') || 'none';
         element.style.float = '';
 

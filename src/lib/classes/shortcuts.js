@@ -33,6 +33,7 @@ Shortcuts.prototype = {
 	 */
 	command: function (keyCode, shift) {
 		let command = null;
+		const options = this.options;
 
 		switch (keyCode) {
 			case 65: // A
@@ -88,7 +89,7 @@ Shortcuts.prototype = {
 
 		if (!command) return false;
 
-		this.editor.commandHandler(this.editor.commandMap[command], command);
+		this.editor.commandHandler(command, this.editor.commandMap[command]);
 		return true;
 	},
 
