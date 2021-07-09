@@ -5,7 +5,7 @@
 "use strict";
 
 import CoreInterface from "../../interface/_core";
-import domUtils from "../../helper/dom";
+import domUtils from "../../helpers/domUtils";
 import Context from "../context";
 import unicode from "../../helpers/unicode";
 

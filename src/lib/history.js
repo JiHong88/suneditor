@@ -4,8 +4,8 @@
  */
 "use strict";
 
-import { window } from "../helper/global";
-import { getNodeFromPath, getNodePath } from "../helper/dom";
+import { window } from "../helpers/global";
+import { getNodeFromPath, getNodePath } from "../helpers/domUtils";
 
 export default function (core, change) {
 	const delayTime = core.options.historyStackDelayTime;

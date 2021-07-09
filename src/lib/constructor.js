@@ -9,7 +9,12 @@
 
 import _icons from '../assets/defaultIcons';
 import _defaultLang from '../lang/en';
-import util from '../helpers/util';
+import {
+    domUtils,
+    numbers,
+    converter
+} from '../helpers';
+import env from '../helpers/env';
 
 export default {
     /**
@@ -21,34 +26,27 @@ export default {
     init: function (element, options) {
         if (typeof options !== 'object') options = {};
 
-        const doc = document;
-
         /** --- init options --- */
         this._initOptions(element, options);
-    
+
         // suneditor div
-        const top_div = doc.createElement('DIV');
-        top_div.className = 'sun-editor' + (options.rtl ? ' se-rtl' : '');
+        const top_div = domUtils.createElement('DIV', {class: 'sun-editor' + (options.rtl ? ' se-rtl' : '')});
         if (element.id) top_div.id = 'suneditor_' + element.id;
-    
+
         // relative div
-        const relative = doc.createElement('DIV');
-        relative.className = 'se-container';
-    
+        const relative = domUtils.createElement('DIV', {class: "se-container"});
+
         // toolbar
-        const tool_bar = this._createToolBar(doc, options.buttonList, options.plugins, options);
+        const tool_bar = this._createToolBar(options.buttonList, options.plugins, options);
         tool_bar.element.style.visibility = 'hidden';
         if (tool_bar.pluginCallButtons.math) this._checkKatexMath(options.katex);
-        const arrow = doc.createElement('DIV');
-        arrow.className = 'se-arrow';
+        const arrow = domUtils.createElement('DIV', {class: "se-arrow"});
 
         // sticky toolbar dummy
-        const sticky_dummy = doc.createElement('DIV');
-        sticky_dummy.className = 'se-toolbar-sticky-dummy';
-    
+        const sticky_dummy = domUtils.createElement('DIV', {class: "se-toolbar-sticky-dummy"});
+
         // inner editor div
-        const editor_div = doc.createElement('DIV');
-        editor_div.className = 'se-wrapper';
+        const editor_div = domUtils.createElement('DIV', {class: "se-wrapper"});
 
         /** --- init elements and create bottom bar --- */
         const initElements = this._initElements(options, top_div, tool_bar.element, arrow);
@@ -63,31 +61,24 @@ export default {
         const navigation = bottomBar.navigation;
         const char_wrapper = bottomBar.charWrapper;
         const char_counter = bottomBar.charCounter;
-    
-        // loading box
-        const loading_box = doc.createElement('DIV');
-        loading_box.className = 'se-loading-box sun-editor-common';
-        loading_box.innerHTML = '<div class="se-loading-effect"></div>';
 
+        // loading box
+        const loading_box = domUtils.createElement('DIV', {class: "se-loading-box sun-editor-common"}, '<div class="se-loading-effect"></div>');
         // enter line
-        const line_breaker = doc.createElement('DIV');
-        line_breaker.className = 'se-line-breaker';
-        line_breaker.innerHTML = '<button class="se-btn">' + options.icons.line_break + '</button>';
-        const line_breaker_t = doc.createElement('DIV');
-        line_breaker_t.className += 'se-line-breaker-component';
+        const line_breaker = domUtils.createElement('DIV', {class: "se-line-breaker"}, '<button class="se-btn">' + options.icons.line_break + '</button>');
+        const line_breaker_t = domUtils.createElement('DIV', {class: "se-line-breaker-component"}, '<button class="se-btn">' + options.icons.line_break + '</button>');
         const line_breaker_b = line_breaker_t.cloneNode(true);
         line_breaker_t.innerHTML = line_breaker_b.innerHTML = options.icons.line_break;
-    
+
         // resize operation background
-        const resize_back = doc.createElement('DIV');
-        resize_back.className = 'se-resizing-back';
+        const resize_back = domUtils.createElement('DIV', {class: "se-resizing-back"});
 
         // toolbar container
         const toolbarContainer = options.toolbarContainer;
         if (toolbarContainer) {
             toolbarContainer.appendChild(tool_bar.element);
         }
-    
+
         /** append html */
         editor_div.appendChild(textarea);
         if (placeholder_span) editor_div.appendChild(placeholder_span);
@@ -103,7 +94,7 @@ export default {
         top_div.appendChild(relative);
 
         textarea = this._checkCodeMirror(options, textarea);
-    
+
         return {
             constructed: {
                 _top: top_div,
@@ -157,10 +148,10 @@ export default {
                 cmOptions.viewportMargin = Infinity;
                 cmOptions.height = 'auto';
             }
-            
+
             const cm = options.codeMirror.src.fromTextArea(textarea, cmOptions);
             cm.display.wrapper.style.cssText = textarea.style.cssText;
-            
+
             options.codeMirrorEditor = cm;
             textarea = cm.display.wrapper;
             textarea.className += ' se-wrapper-code-mirror';
@@ -206,10 +197,9 @@ export default {
         const isNewToolbarContainer = mergeOptions.toolbarContainer && mergeOptions.toolbarContainer !== originOptions.toolbarContainer;
         const isNewToolbar = mergeOptions.lang !== originOptions.lang || mergeOptions.buttonList !== originOptions.buttonList || mergeOptions.mode !== originOptions.mode || isNewToolbarContainer;
 
-        const tool_bar = this._createToolBar(document, (isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList), mergeOptions.plugins, mergeOptions);
+        const tool_bar = this._createToolBar((isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList), mergeOptions.plugins, mergeOptions);
         if (tool_bar.pluginCallButtons.math) this._checkKatexMath(mergeOptions.katex);
-        const arrow = document.createElement('DIV');
-        arrow.className = 'se-arrow';
+        const arrow = domUtils.createElement('DIV', {class: "se-arrow"});
 
         if (isNewToolbar) {
             tool_bar.element.style.visibility = 'hidden';
@@ -225,7 +215,7 @@ export default {
             el._menuTray = tool_bar._menuTray;
             el._arrow = arrow;
         }
-        
+
         const initElements = this._initElements(mergeOptions, el.topArea, (isNewToolbar ? tool_bar.element : el.toolbar), arrow);
 
         const bottomBar = initElements.bottomBar;
@@ -241,7 +231,7 @@ export default {
         if (placeholder_span) editorArea.appendChild(placeholder_span);
 
         code = this._checkCodeMirror(mergeOptions, code);
-        
+
         el.resizingBar = bottomBar.resizingBar;
         el.navigation = bottomBar.navigation;
         el.charWrapper = bottomBar.charWrapper;
@@ -250,8 +240,8 @@ export default {
         el.code = code;
         el.placeholder = placeholder_span;
 
-        if (mergeOptions.rtl) util.addClass(el.topArea, 'se-rtl');
-        else util.removeClass(el.topArea, 'se-rtl');
+        if (mergeOptions.rtl) domUtils.addClass(el.topArea, 'se-rtl');
+        else domUtils.removeClass(el.topArea, 'se-rtl');
 
         return {
             callButtons: tool_bar.pluginCallButtons,
@@ -285,9 +275,8 @@ export default {
 
         /** editor */
         // wysiwyg div or iframe
-        const wysiwygDiv = document.createElement(!options.iframe ? 'DIV' : 'IFRAME');
-        wysiwygDiv.className = 'se-wrapper-inner se-wrapper-wysiwyg';
-        
+        const wysiwygDiv = domUtils.createElement(!options.iframe ? 'DIV' : 'IFRAME', {class: "se-wrapper-inner se-wrapper-wysiwyg"});
+
         if (!options.iframe) {
             wysiwygDiv.setAttribute('contenteditable', true);
             wysiwygDiv.setAttribute('scrolling', 'auto');
@@ -300,9 +289,10 @@ export default {
         }
 
         // textarea for code view
-        const textarea = document.createElement('TEXTAREA');
-        textarea.className = 'se-wrapper-inner se-wrapper-code';
-        textarea.style.cssText = options._editorStyles.frame;
+        const textarea = domUtils.createElement('TEXTAREA', {
+            class: "se-wrapper-inner se-wrapper-code",
+            style: options._editorStyles.frame
+        });
         textarea.style.display = 'none';
         if (options.height === 'auto') textarea.style.overflow = 'hidden';
 
@@ -312,33 +302,28 @@ export default {
         let charWrapper = null;
         let charCounter = null;
         if (options.resizingBar) {
-            resizingBar = document.createElement('DIV');
-            resizingBar.className = 'se-resizing-bar sun-editor-common';
+            resizingBar = domUtils.createElement('DIV', {class: "se-resizing-bar sun-editor-common"});
 
             /** navigation */
-            navigation = document.createElement('DIV');
-            navigation.className = 'se-navigation sun-editor-common';
+            navigation = domUtils.createElement('DIV', {class: "se-navigation sun-editor-commo"});
             resizingBar.appendChild(navigation);
 
             /** char counter */
             if (options.charCounter) {
-                charWrapper = document.createElement('DIV');
-                charWrapper.className = 'se-char-counter-wrapper';
+                charWrapper = domUtils.createElement('DIV', {class: "se-char-counter-wrapper"});
 
                 if (options.charCounterLabel) {
-                    const charLabel = document.createElement('SPAN');
-                    charLabel.className = 'se-char-label';
+                    const charLabel = domUtils.createElement('SPAN', {class: "se-char-label"});
                     charLabel.textContent = options.charCounterLabel;
                     charWrapper.appendChild(charLabel);
                 }
-    
-                charCounter = document.createElement('SPAN');
-                charCounter.className = 'se-char-counter';
+
+                charCounter = domUtils.createElement('SPAN', {class: "se-char-counter"});
                 charCounter.textContent = '0';
                 charWrapper.appendChild(charCounter);
-    
+
                 if (options.maxCharCount > 0) {
-                    const char_max = document.createElement('SPAN');
+                    const char_max = domUtils.createElement('SPAN');
                     char_max.textContent = ' / ' + options.maxCharCount;
                     charWrapper.appendChild(char_max);
                 }
@@ -346,11 +331,10 @@ export default {
                 resizingBar.appendChild(charWrapper);
             }
         }
-        
+
         let placeholder = null;
         if (options.placeholder) {
-            placeholder = document.createElement('SPAN');
-            placeholder.className = 'se-placeholder';
+            placeholder = domUtils.createElement('SPAN', {class: "se-placeholder"});
             placeholder.innerText = options.placeholder;
         }
 
@@ -377,7 +361,14 @@ export default {
         /** Values */
         options.lang = options.lang || _defaultLang;
         options.defaultTag = typeof options.defaultTag === 'string' ? options.defaultTag : 'p';
-        const textTags = options.textTags = [{bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL', sub: 'SUB', sup: 'SUP'}, (options.textTags || {})].reduce(function (_default, _new) {
+        const textTags = options.textTags = [{
+            bold: 'STRONG',
+            underline: 'U',
+            italic: 'EM',
+            strike: 'DEL',
+            sub: 'SUB',
+            sup: 'SUP'
+        }, (options.textTags || {})].reduce(function (_default, _new) {
             for (let key in _new) {
                 _default[key] = _new[key];
             }
@@ -409,24 +400,39 @@ export default {
         options.rtl = !!options.rtl;
         options._editableClass = 'sun-editor-editable' + (options.rtl ? ' se-rtl' : '');
         options._printClass = typeof options._printClass === 'string' ? options._printClass : null;
-        options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
+        options.toolbarWidth = options.toolbarWidth ? (numbers.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
         options.toolbarContainer = typeof options.toolbarContainer === 'string' ? document.querySelector(options.toolbarContainer) : options.toolbarContainer;
-        options.stickyToolbar = (/balloon/i.test(options.mode) || !!options.toolbarContainer) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);
-        options.fullScreenOffset = options.fullScreenOffset === undefined ? 0 : (/^\d+/.test(options.fullScreenOffset) ? util.getNumber(options.fullScreenOffset, 0) : 0);
+        options.stickyToolbar = (/balloon/i.test(options.mode) || !!options.toolbarContainer) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? numbers.getNumber(options.stickyToolbar, 0) : -1);
+        options.fullScreenOffset = options.fullScreenOffset === undefined ? 0 : (/^\d+/.test(options.fullScreenOffset) ? numbers.getNumber(options.fullScreenOffset, 0) : 0);
         options.iframe = options.fullPage || options.iframe;
         options.fullPage = !!options.fullPage;
         options.iframeCSSFileName = options.iframe ? typeof options.iframeCSSFileName === 'string' ? [options.iframeCSSFileName] : (options.iframeCSSFileName || ['suneditor']) : null;
         options.previewTemplate = typeof options.previewTemplate === 'string' ? options.previewTemplate : null;
         options.printTemplate = typeof options.printTemplate === 'string' ? options.printTemplate : null;
         /** CodeMirror object */
-        options.codeMirror = options.codeMirror ? options.codeMirror.src ? options.codeMirror : {src: options.codeMirror} : null;
+        options.codeMirror = options.codeMirror ? options.codeMirror.src ? options.codeMirror : {
+            src: options.codeMirror
+        } : null;
         /** katex object (Math plugin) */
-        options.katex = options.katex ? options.katex.src ? options.katex : {src: options.katex} : null;
-        options.mathFontSize = !!options.mathFontSize ? options.mathFontSize : [
-            {text: '1', value: '1em'},
-            {text: '1.5', value: '1.5em'},
-            {text: '2', value: '2em'},
-            {text: '2.5', value: '2.5em'}
+        options.katex = options.katex ? options.katex.src ? options.katex : {
+            src: options.katex
+        } : null;
+        options.mathFontSize = !!options.mathFontSize ? options.mathFontSize : [{
+                text: '1',
+                value: '1em'
+            },
+            {
+                text: '1.5',
+                value: '1.5em'
+            },
+            {
+                text: '2',
+                value: '2em'
+            },
+            {
+                text: '2.5',
+                value: '2.5em'
+            }
         ];
         /** Display */
         options.position = typeof options.position === 'string' ? options.position : null;
@@ -439,15 +445,15 @@ export default {
         options.charCounter = options.maxCharCount > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
         options.charCounterType = typeof options.charCounterType === 'string' ? options.charCounterType : 'char';
         options.charCounterLabel = typeof options.charCounterLabel === 'string' ? options.charCounterLabel.trim() : null;
-        options.maxCharCount = util.isNumber(options.maxCharCount) && options.maxCharCount > -1 ? options.maxCharCount * 1 : null;
+        options.maxCharCount = numbers.isNumber(options.maxCharCount) && options.maxCharCount > -1 ? options.maxCharCount * 1 : null;
         /** Width size */
-        options.width = options.width ? (util.isNumber(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
-        options.minWidth = (util.isNumber(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
-        options.maxWidth = (util.isNumber(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
+        options.width = options.width ? (numbers.isNumber(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
+        options.minWidth = (numbers.isNumber(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
+        options.maxWidth = (numbers.isNumber(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
         /** Height size */
-        options.height = options.height ? (util.isNumber(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
-        options.minHeight = (util.isNumber(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
-        options.maxHeight = (util.isNumber(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
+        options.height = options.height ? (numbers.isNumber(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
+        options.minHeight = (numbers.isNumber(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
+        options.maxHeight = (numbers.isNumber(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
         /** Editing area default style */
         options.defaultStyle = typeof options.defaultStyle === 'string' ? options.defaultStyle : '';
         /** Defining menu items */
@@ -462,8 +468,8 @@ export default {
         /** Image */
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageHeightShow = options.imageHeightShow === undefined ? true : !!options.imageHeightShow;
-        options.imageWidth = !options.imageWidth ? 'auto' : util.isNumber(options.imageWidth) ? options.imageWidth + 'px' : options.imageWidth;
-        options.imageHeight = !options.imageHeight ? 'auto' : util.isNumber(options.imageHeight) ? options.imageHeight + 'px' : options.imageHeight;
+        options.imageWidth = !options.imageWidth ? 'auto' : numbers.isNumber(options.imageWidth) ? options.imageWidth + 'px' : options.imageWidth;
+        options.imageHeight = !options.imageHeight ? 'auto' : numbers.isNumber(options.imageHeight) ? options.imageHeight + 'px' : options.imageHeight;
         options.imageSizeOnlyPercentage = !!options.imageSizeOnlyPercentage;
         options._imageSizeUnit = options.imageSizeOnlyPercentage ? '%' : 'px';
         options.imageRotation = options.imageRotation !== undefined ? options.imageRotation : !(options.imageSizeOnlyPercentage || !options.imageHeightShow);
@@ -471,7 +477,7 @@ export default {
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
         options.imageUploadHeader = options.imageUploadHeader || null;
         options.imageUploadUrl = typeof options.imageUploadUrl === 'string' ? options.imageUploadUrl : null;
-        options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? util.getNumber(options.imageUploadSizeLimit, 0) : null;
+        options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? numbers.getNumber(options.imageUploadSizeLimit, 0) : null;
         options.imageMultipleFile = !!options.imageMultipleFile;
         options.imageAccept = (typeof options.imageAccept !== 'string' || options.imageAccept.trim() === "*") ? 'image/*' : options.imageAccept.trim() || 'image/*';
         /** Image - image gallery */
@@ -481,31 +487,31 @@ export default {
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
         options.videoHeightShow = options.videoHeightShow === undefined ? true : !!options.videoHeightShow;
         options.videoRatioShow = options.videoRatioShow === undefined ? true : !!options.videoRatioShow;
-        options.videoWidth = !options.videoWidth || !util.getNumber(options.videoWidth, 0) ? '' : util.isNumber(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth;
-        options.videoHeight = !options.videoHeight || !util.getNumber(options.videoHeight, 0) ? '' : util.isNumber(options.videoHeight) ? options.videoHeight + 'px' : options.videoHeight;
+        options.videoWidth = !options.videoWidth || !numbers.getNumber(options.videoWidth, 0) ? '' : numbers.isNumber(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth;
+        options.videoHeight = !options.videoHeight || !numbers.getNumber(options.videoHeight, 0) ? '' : numbers.isNumber(options.videoHeight) ? options.videoHeight + 'px' : options.videoHeight;
         options.videoSizeOnlyPercentage = !!options.videoSizeOnlyPercentage;
         options._videoSizeUnit = options.videoSizeOnlyPercentage ? '%' : 'px';
         options.videoRotation = options.videoRotation !== undefined ? options.videoRotation : !(options.videoSizeOnlyPercentage || !options.videoHeightShow);
-        options.videoRatio = (util.getNumber(options.videoRatio, 4) || 0.5625);
+        options.videoRatio = (numbers.getNumber(options.videoRatio, 4) || 0.5625);
         options.videoRatioList = !options.videoRatioList ? null : options.videoRatioList;
         options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
         options.videoFileInput = !!options.videoFileInput;
         options.videoUrlInput = (options.videoUrlInput === undefined || !options.videoFileInput) ? true : options.videoUrlInput;
         options.videoUploadHeader = options.videoUploadHeader || null;
         options.videoUploadUrl = typeof options.videoUploadUrl === 'string' ? options.videoUploadUrl : null;
-        options.videoUploadSizeLimit = /\d+/.test(options.videoUploadSizeLimit) ? util.getNumber(options.videoUploadSizeLimit, 0) : null;
+        options.videoUploadSizeLimit = /\d+/.test(options.videoUploadSizeLimit) ? numbers.getNumber(options.videoUploadSizeLimit, 0) : null;
         options.videoMultipleFile = !!options.videoMultipleFile;
         options.videoTagAttrs = options.videoTagAttrs || null;
         options.videoIframeAttrs = options.videoIframeAttrs || null;
         options.videoAccept = (typeof options.videoAccept !== 'string' || options.videoAccept.trim() === "*") ? 'video/*' : options.videoAccept.trim() || 'video/*';
         /** Audio */
-        options.audioWidth = !options.audioWidth ? '' : util.isNumber(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth;
-        options.audioHeight = !options.audioHeight ? '' : util.isNumber(options.audioHeight) ? options.audioHeight + 'px' : options.audioHeight;
+        options.audioWidth = !options.audioWidth ? '' : numbers.isNumber(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth;
+        options.audioHeight = !options.audioHeight ? '' : numbers.isNumber(options.audioHeight) ? options.audioHeight + 'px' : options.audioHeight;
         options.audioFileInput = !!options.audioFileInput;
         options.audioUrlInput = (options.audioUrlInput === undefined || !options.audioFileInput) ? true : options.audioUrlInput;
         options.audioUploadHeader = options.audioUploadHeader || null;
         options.audioUploadUrl = typeof options.audioUploadUrl === 'string' ? options.audioUploadUrl : null;
-        options.audioUploadSizeLimit = /\d+/.test(options.audioUploadSizeLimit) ? util.getNumber(options.audioUploadSizeLimit, 0) : null;
+        options.audioUploadSizeLimit = /\d+/.test(options.audioUploadSizeLimit) ? numbers.getNumber(options.audioUploadSizeLimit, 0) : null;
         options.audioMultipleFile = !!options.audioMultipleFile;
         options.audioTagAttrs = options.audioTagAttrs || null;
         options.audioAccept = (typeof options.audioAccept !== 'string' || options.audioAccept.trim() === "*") ? 'audio/*' : options.audioAccept.trim() || 'audio/*';
@@ -558,7 +564,7 @@ export default {
         }, {});
 
         /** _init options */
-        options._editorStyles = util._setDefaultOptionStyle(options, options.defaultStyle);
+        options._editorStyles = converter._setDefaultOptionStyle(options, options.defaultStyle);
     },
 
     _setWhitelist: function (whitelist, blacklist) {
@@ -580,10 +586,10 @@ export default {
     _defaultButtons: function (options) {
         const icons = options.icons;
         const lang = options.lang;
-        const cmd = util.isOSX_IOS ? '⌘' : 'CTRL';
-        const addShift = util.isOSX_IOS ? '⇧' : '+SHIFT';
+        const cmd = env.isOSX_IOS ? '⌘' : 'CTRL';
+        const addShift = env.isOSX_IOS ? '⇧' : '+SHIFT';
         const shortcutsDisable = !options.shortcutsHint ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent', 'save'] : options.shortcutsDisable;
-        const indentKey = options.rtl ? ['[',']'] : [']','['];
+        const indentKey = options.rtl ? ['[', ']'] : [']', '['];
 
         return {
             /** default command */
@@ -637,12 +643,8 @@ export default {
      * @private
      */
     _createModuleGroup: function () {
-        const oDiv = util.createElement('DIV');
-        oDiv.className = 'se-btn-module se-btn-module-border';
-
-        const oUl = util.createElement('UL');
-        oUl.className = 'se-menu-list';
-        oDiv.appendChild(oUl);
+        const oUl = domUtils.createElement('UL', {class: 'se-menu-list'});
+        const oDiv = domUtils.createElement('DIV', {class: 'se-btn-module se-btn-module-border'}, oUl);
 
         return {
             'div': oDiv,
@@ -663,15 +665,15 @@ export default {
      * @private
      */
     _createButton: function (buttonClass, title, dataCommand, dataDisplay, innerHTML, _disabled, _icons) {
-        const oLi = util.createElement('LI');
-        const oButton = util.createElement('BUTTON');
+        const oLi = domUtils.createElement('LI');
+        const oButton = domUtils.createElement('BUTTON', {
+            type: "button",
+            class: "se-btn" + (buttonClass ? " " + buttonClass : "") + " se-tooltip",
+            "data-command": dataCommand,
+            "data-display": dataDisplay,
+            tabindex: "-1"
+        });
 
-        oButton.setAttribute('type', 'button');
-        oButton.setAttribute('class', 'se-btn' + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip');
-        oButton.setAttribute('data-command', dataCommand);
-        oButton.setAttribute('data-display', dataDisplay);
-        oButton.setAttribute('tabindex', '-1');
-        
         if (!innerHTML) innerHTML = '<span class="se-icon-text">!</span>';
         if (/^default\./i.test(innerHTML)) {
             innerHTML = _icons[innerHTML.replace(/^default\./i, '')];
@@ -684,7 +686,7 @@ export default {
         innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (title || dataCommand) + '</span></span>';
 
         if (_disabled) oButton.setAttribute('disabled', true);
-        
+
         oButton.innerHTML = innerHTML;
         oLi.appendChild(oButton);
 
@@ -696,23 +698,16 @@ export default {
 
     /**
      * @description Create editor HTML
-     * @param {Array} doc document object
      * @param {Array} buttonList option.buttonList
      * @param {Array|Object|null} _plugins Plugins
      * @param {Array} options options
      * @returns {Object} { element: (Element) Toolbar element, plugins: (Array|null) Plugins Array, pluginCallButtons: (Object), responsiveButtons: (Array) }
      * @private
      */
-    _createToolBar: function (doc, buttonList, _plugins, options) {
-        const separator_vertical = doc.createElement('DIV');
-        separator_vertical.className = 'se-toolbar-separator-vertical';
-
-        const tool_bar = doc.createElement('DIV');
-        tool_bar.className = 'se-toolbar sun-editor-common';
-
-        const _buttonTray = doc.createElement('DIV');
-        _buttonTray.className = 'se-btn-tray';
-        tool_bar.appendChild(_buttonTray);
+    _createToolBar: function (buttonList, _plugins, options) {
+        const _buttonTray = domUtils.createElement('DIV', {class: "se-btn-tray"});
+        const separator_vertical = domUtils.createElement('DIV', {class: "se-toolbar-separator-vertical"});
+        const tool_bar = domUtils.createElement('DIV', {class: "se-toolbar sun-editor-common"}, _buttonTray);
 
         /** create button list */
         buttonList = JSON.parse(JSON.stringify(buttonList));
@@ -722,7 +717,9 @@ export default {
         const responsiveButtons = [];
         const plugins = {};
         if (_plugins) {
-            const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function(name) { return _plugins[name]; });
+            const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function (name) {
+                return _plugins[name];
+            });
             for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
                 p = pluginsValues[i].default || pluginsValues[i];
                 plugins[p.name] = p;
@@ -735,114 +732,114 @@ export default {
         let buttonElement = null;
         let pluginName = '';
         let vertical = false;
-        const moreLayer = util.createElement('DIV');
-        moreLayer.className = 'se-toolbar-more-layer';
+        const moreLayer = domUtils.createElement('DIV', {
+            class: "se-toolbar-more-layer"
+        });
 
         buttonGroupLoop:
-        for (let i = 0, more, moreContainer, moreCommand, buttonGroup, align; i < buttonList.length; i++) {
-            more = false;
-            align = '';
-            buttonGroup = buttonList[i];
-            moduleElement = this._createModuleGroup();
+            for (let i = 0, more, moreContainer, moreCommand, buttonGroup, align; i < buttonList.length; i++) {
+                more = false;
+                align = '';
+                buttonGroup = buttonList[i];
+                moduleElement = this._createModuleGroup();
 
-            // button object
-            if (typeof buttonGroup === 'object') {
-                // buttons loop
-                for (let j = 0, moreButton; j < buttonGroup.length; j++) {
-                    button = buttonGroup[j];
-                    moreButton = false;
+                // button object
+                if (typeof buttonGroup === 'object') {
+                    // buttons loop
+                    for (let j = 0, moreButton; j < buttonGroup.length; j++) {
+                        button = buttonGroup[j];
+                        moreButton = false;
 
-                    if (/^\%\d+/.test(button) && j === 0) {
-                        buttonGroup[0] = button.replace(/[^\d]/g, '');
-                        responsiveButtons.push(buttonGroup);
-                        buttonList.splice(i--, 1);
-                        continue buttonGroupLoop;
-                    }
-                    
-                    if (typeof button === 'object') {
-                        if (typeof button.add === 'function') {
-                            pluginName = button.name;
-                            module = defaultButtonList[pluginName];
-                            plugins[pluginName] = button;
+                        if (/^\%\d+/.test(button) && j === 0) {
+                            buttonGroup[0] = button.replace(/[^\d]/g, '');
+                            responsiveButtons.push(buttonGroup);
+                            buttonList.splice(i--, 1);
+                            continue buttonGroupLoop;
+                        }
+
+                        if (typeof button === 'object') {
+                            if (typeof button.add === 'function') {
+                                pluginName = button.name;
+                                module = defaultButtonList[pluginName];
+                                plugins[pluginName] = button;
+                            } else {
+                                pluginName = button.name;
+                                module = [button.buttonClass, button.title, button.name, button.dataDisplay, button.innerHTML, button._disabled];
+                            }
                         } else {
-                            pluginName = button.name;
-                            module = [button.buttonClass, button.title, button.name, button.dataDisplay, button.innerHTML, button._disabled];
+                            // align
+                            if (/^\-/.test(button)) {
+                                align = button.substr(1);
+                                moduleElement.div.style.float = align;
+                                continue;
+                            }
+
+                            // more button
+                            if (/^\:/.test(button)) {
+                                moreButton = true;
+                                const matched = button.match(/^\:([^\-]+)\-([^\-]+)\-([^\-]+)/);
+                                moreCommand = '__se__' + matched[1].trim();
+                                const title = matched[2].trim();
+                                const innerHTML = matched[3].trim();
+                                module = ['se-btn-more', title, moreCommand, 'MORE', innerHTML];
+                            }
+                            // buttons
+                            else {
+                                module = defaultButtonList[button];
+                            }
+
+                            pluginName = button;
+                            if (!module) {
+                                const custom = plugins[pluginName];
+                                if (!custom) throw Error('[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [' + pluginName + ']');
+                                module = [custom.buttonClass, custom.title, custom.name, custom.display, custom.innerHTML, custom._disabled];
+                            }
                         }
-                    } else {
-                        // align
-                        if (/^\-/.test(button)) {
-                            align = button.substr(1);
-                            moduleElement.div.style.float = align;
-                            continue;
+
+                        buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4], module[5], icons);
+                        (more ? moreContainer : moduleElement.ul).appendChild(buttonElement.li);
+
+                        if (plugins[pluginName]) {
+                            pluginCallButtons[pluginName] = buttonElement.button;
                         }
-                        
+
                         // more button
-                        if (/^\:/.test(button)) {
-                            moreButton = true;
-                            const matched = button.match(/^\:([^\-]+)\-([^\-]+)\-([^\-]+)/);
-                            moreCommand = '__se__' + matched[1].trim();
-                            const title = matched[2].trim();
-                            const innerHTML = matched[3].trim();
-                            module = ['se-btn-more', title, moreCommand, 'MORE', innerHTML];
-                        }
-                        // buttons
-                        else {
-                            module = defaultButtonList[button];
-                        }
-
-                        pluginName = button;
-                        if (!module) {
-                            const custom = plugins[pluginName];
-                            if (!custom) throw Error('[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [' + pluginName + ']');
-                            module = [custom.buttonClass, custom.title, custom.name, custom.display, custom.innerHTML, custom._disabled];
+                        if (moreButton) {
+                            more = true;
+                            moreContainer = domUtils.createElement('DIV', {
+                                    class: 'se-more-layer ' + moreCommand
+                                },
+                                '<div class="se-more-form"><ul class="se-menu-list"' + (align ? ' style="float: ' + align + ';"' : '') + '></ul></div>');
+                            moreLayer.appendChild(moreContainer);
+                            moreContainer = moreContainer.firstElementChild.firstElementChild;
                         }
                     }
 
-                    buttonElement = this._createButton(module[0], module[1], module[2], module[3], module[4], module[5], icons);
-                    (more ? moreContainer : moduleElement.ul).appendChild(buttonElement.li);
-
-                    if (plugins[pluginName]) {
-                        pluginCallButtons[pluginName] = buttonElement.button;
+                    if (vertical) {
+                        const sv = separator_vertical.cloneNode(false);
+                        _buttonTray.appendChild(sv);
                     }
 
-                    // more button
-                    if (moreButton) {
-                        more = true;
-                        moreContainer = util.createElement('DIV');
-                        moreContainer.className = 'se-more-layer ' + moreCommand;
-                        moreContainer.innerHTML = '<div class="se-more-form"><ul class="se-menu-list"' + (align ? ' style="float: ' + align + ';"' : '') + '></ul></div>';
-                        moreLayer.appendChild(moreContainer);
-                        moreContainer = moreContainer.firstElementChild.firstElementChild;
-                    }
+                    _buttonTray.appendChild(moduleElement.div);
+                    vertical = true;
                 }
-
-                if (vertical) {
-                    const sv =  separator_vertical.cloneNode(false);
-                    _buttonTray.appendChild(sv);
+                /** line break  */
+                else if (/^\/$/.test(buttonGroup)) {
+                    _buttonTray.appendChild(domUtils.createElement('DIV', {class: "se-btn-module-enter"}));
+                    vertical = false;
                 }
-                
-                _buttonTray.appendChild(moduleElement.div);
-                vertical = true;
             }
-            /** line break  */
-            else if (/^\/$/.test(buttonGroup)) {
-                const enterDiv = doc.createElement('DIV');
-                enterDiv.className = 'se-btn-module-enter';
-                _buttonTray.appendChild(enterDiv);
-                vertical = false;
-            }
-        }
 
         switch (_buttonTray.children.length) {
             case 0:
                 _buttonTray.style.display = 'none';
                 break;
             case 1:
-                util.removeClass(_buttonTray.firstElementChild, 'se-btn-module-border');
+                domUtils.removeClass(_buttonTray.firstElementChild, 'se-btn-module-border');
                 break;
             default:
                 if (options.rtl) {
-                    const sv =  separator_vertical.cloneNode(false);
+                    const sv = separator_vertical.cloneNode(false);
                     sv.style.float = _buttonTray.lastElementChild.style.float;
                     _buttonTray.appendChild(sv);
                 }
@@ -852,13 +849,11 @@ export default {
         if (moreLayer.children.length > 0) _buttonTray.appendChild(moreLayer);
 
         // menu tray
-        const _menuTray = doc.createElement('DIV');
-        _menuTray.className = 'se-menu-tray';
+        const _menuTray = domUtils.createElement('DIV', {class: "se-menu-tray"});
         tool_bar.appendChild(_menuTray);
 
         // cover
-        const tool_cover = doc.createElement('DIV');
-        tool_cover.className = 'se-toolbar-cover';
+        const tool_cover = domUtils.createElement('DIV', {class: "se-toolbar-cover"});
         tool_bar.appendChild(tool_cover);
 
         return {

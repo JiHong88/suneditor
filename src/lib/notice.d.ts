@@ -1,4 +1,4 @@
-import CoreInterface from "../../interface/_core";
+import CoreInterface from "../interface/_core";
 
 class Notice extends CoreInterface {
     /**

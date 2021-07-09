@@ -3260,7 +3260,7 @@ Format.prototype = {
 	 * @returns {Element}
 	 * @private
 	 */
-	_sn_isMaintainedNode = function (_isRemove, _isSizeNode, element) {
+	_sn_isMaintainedNode: function (_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove || element.nodeType !== 1) return false;
 		const anchor = this._isNonSplitNode(element);
 		return domUtils.getParentElement(element, this._isNonSplitNode) ?

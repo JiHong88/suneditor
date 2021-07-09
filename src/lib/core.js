@@ -7,12 +7,8 @@
  */
 'use strict';
 
-import Helpers from "../helpers";
-import {
-    _w,
-    _d
-} from "../helpers/global"
-import {
+import Helpers, {
+    global,
     domUtils
 } from "../helpers";
 import Constructor from "./constructor";
@@ -20,13 +16,13 @@ import Context from "./context";
 import history from "./history";
 import Events from "./events";
 import EventManager from "./eventManager";
+import Notice from "./notice";
 
 // classes
 import Char from "./classes/char";
 import Component from "./classes/component";
 import Format from "./classes/format";
 import Node from "./classes/node";
-import Notice from "./classes/notice";
 import Offset from "./classes/offset";
 import Selection from "./classes/selection";
 import Shortcuts from "./classes/shortcuts";
@@ -48,8 +44,8 @@ import ClassesInterface from "../interface/_classes";
  * @returns {Object} functions Object
  */
 function Core(context, pluginCallButtons, plugins, lang, options, _responsiveButtons) {
-    const _d = this._d = context.element.originElement.ownerDocument || _d;
-    const _w = this._w = _d.defaultView || _w;
+    const _d = this._d = context.element.originElement.ownerDocument || global._d;
+    const _w = this._w = _d.defaultView || global._w;
 
     this._parser = new _w.DOMParser();
 
@@ -2485,7 +2481,7 @@ Core.prototype = {
  * @description Object for managing submenu elements
  * @private
  */
-TargetPlugins = {};
+const TargetPlugins = {};
 
 /**
  * @description Check disallowed tags
@@ -2551,3 +2547,5 @@ function CleanTags(lowLevelCheck, m, t) {
 
     return t;
 }
+
+export default Core;

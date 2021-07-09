@@ -1650,8 +1650,8 @@ function OnMouseDown_resizingBar(e) {
 function DisplayLineBreak(dir, e) {
 	e.preventDefault();
 
+	dir = !dir ? core.status._lineBreakDir : dir;
 	const component = core.status._lineBreakComp;
-	const dir = !dir ? core.status._lineBreakDir : dir;
 	const isList = util.isListCell(component.parentNode);
 
 	const format = util.createElement(isList ? "BR" : util.isTableCell(component.parentNode) ? "DIV" : options.defaultTag);

@@ -3,9 +3,8 @@ import { Plugin } from "./../plugins/Plugin.d";
 import { Lang } from "./../lang/Lang.d";
 import { SunEditorOptions } from "./../options.d";
 import { Context } from "./context";
-import Util from "../helpers/util";
 import { Module } from "../plugins/Module";
-import _Notice from "./classes/notice.d";
+import _Notice from "./notice.d";
 
 export type Controllers = Array<string | Function | Element>;
 export type fileInfo = {
@@ -22,10 +21,6 @@ export type commands = "selectAll" | "codeView" | "fullScreen" | "indent" | "out
 export type status = {};
 
 export interface Core {
-	/**
-	 * @description Util object
-	 */
-	util: Util;
 
 	/**
 	 * @description Functions object

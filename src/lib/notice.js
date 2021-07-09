@@ -1,7 +1,7 @@
-import CoreInterface from "../../interface/_core";
+import CoreInterface from "../interface/_core";
 import {
 	domUtils
-} from "../../helpers";
+} from "../helpers";
 
 const Notice = function (editor) {
 	CoreInterface.call(this, editor);

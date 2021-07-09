@@ -1,24 +1,24 @@
-import global from "./global.d";
-import env from "./env.d";
-import unicode from "./unicode.d";
-import converter from "./converter.d";
-import domUtils from "./domUtils.d";
-import numbers from "./numbers.d";
+import Global from "./global.d";
+import Env from "./env.d";
+import Unicode from "./unicode.d";
+import Converter from "./converter.d";
+import DomUtils from "./domUtils.d";
+import Numbers from "./numbers.d";
 
-export const global = global;
-export const env = env;
-export const unicode = unicode;
-export const converter = converter;
-export const domUtils = domUtils;
-export const numbers = numbers;
+export const global = Global;
+export const env = Env;
+export const unicode = Unicode;
+export const converter = Converter;
+export const domUtils = DomUtils;
+export const numbers = Numbers;
 
-class helper {
+class helpers {
 	global: global;
 	env: env;
 	unicode: unicode;
 	converter: converter;
 	domUtils: domUtils;
-	numbers: numbers
+	numbers: numbers;
 };
 
-export default helper;
+export default helpers;

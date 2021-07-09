@@ -5,15 +5,15 @@
 "use strict";
 
 import CoreInterface from "../../interface/_core";
-import env from "../../helper/env";
+import env from "../../helpers/env";
 import {
 	window
-} from "../../helper/global";
+} from "../../helpers/global";
 import {
 	addClass,
 	removeClass,
 	hasClass
-} from "../../helper/dom";
+} from "../../helpers/domUtils";
 
 const Char = function (editor) {
 	CoreInterface.call(this, editor);
