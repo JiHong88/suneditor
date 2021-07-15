@@ -645,7 +645,7 @@ export default class SunEditor {
     onBlur: (e: FocusEvent, core: Core) => void;
     onDrop: (e: Event, cleanData: string, maxCharCount: number, core: Core) => boolean | string;
     onPaste: (e: Event, cleanData: string, maxCharCount: number, core: Core) => boolean | string;
-    onCopy: (e: Event, clipboardData: any, core: Core) => void;
+    onCopy: (e: Event, clipboardData: any, core: Core) => boolean;
     onCut: (e: Event, clipboardData: any, core: Core) => void;
 
     /**
