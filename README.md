@@ -1109,6 +1109,10 @@ editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPa
  * core: Core object
  */
 editor.onCopy = function (e, clipboardData, core) { console.log('onCopy', e) }
+
+// Cut event.
+// Called before the editor's default event action.
+// If it returns false, it stops without executing the rest of the action.
 /**
  * cut event
  * e: Event object
