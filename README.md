@@ -40,9 +40,10 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 - [Custom plugins](#custom-plugins)
 - [Document](#document)
 - [Other libraries using SunEditor](#other-libraries-using-sunEditor)
+    - [suneditor-react](#lib-suneditor-react)
+    - [angular-suneditor](#lib-angular-suneditor)
     - [Plugin for Pluxml](#lib-pluxml)
     - [AEM-SunEditor](#lib-pluxml)
-    - [SunEditor-React](#lib-suneditor-react)
 - [License](#license)
 
 
@@ -1473,11 +1474,13 @@ editor.showController = function (name, controllers, core) {
 [Document](http://suneditor.com/sample/html/document.html)
 
 ## Other libraries using SunEditor
+<a id="lib-suneditor-react"></a>[suneditor-react](https://github.com/mkhstar/suneditor-react) ([@mkhstar](https://github.com/mkhstar)) - Pure React Component for SunEditor.
+
+<a id="lib-angular-suneditor"></a>[angular-suneditor](https://github.com/BauViso/angular-suneditor) ([@BauViso](https://github.com/BauViso)) - Angular module for the SunEditor WYSIWYG Editor.
+
 <a id="lib-pluxml"></a>[Plugin for Pluxml](https://forum.pluxml.org/discussion/comment/59339) ([@sudwebdesign](https://github.com/sudwebdesign)) - Plugin for Pluxml.
 
 <a id="lib-aem-suneditor"></a>[AEM-SunEditor](https://blogs.perficientdigital.com/2019/08/13/suneditor-an-alternative-to-the-aem-rte) ([@ahmed-musallam](https://github.com/ahmed-musallam/AEM-SunEditor)) - Enables using SunEditor in AEM dialogs as an RTE replacement.
-
-<a id="lib-suneditor-react"></a>[SunEditor-React](https://github.com/mkhstar/suneditor-react) ([@mkhstar](https://github.com/mkhstar)) - Pure React Component for SunEditor.
     
 ## License
 Suneditor may be freely distributed under the MIT license.
