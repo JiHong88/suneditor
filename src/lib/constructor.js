@@ -376,7 +376,7 @@ export default {
     _initOptions: function (element, options) {
         /** Values */
         options.lang = options.lang || _defaultLang;
-        options.defaultTag = typeof options.defaultTag === 'string' ? options.defaultTag : 'p';
+        options.defaultTag = typeof options.defaultTag === 'string' && options.defaultTag.length > 0 ? options.defaultTag : 'p';
         const textTags = options.textTags = [{bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL', sub: 'SUB', sup: 'SUP'}, (options.textTags || {})].reduce(function (_default, _new) {
             for (let key in _new) {
                 _default[key] = _new[key];
