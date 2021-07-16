@@ -6987,6 +6987,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
         },
 
+        onSave_wysiwyg: function (content) {
+            // user event
+            if (typeof functions.onSave === 'function') {
+                functions.onSave(content, core);
+                return;
+            }
+        },
+
         onCut_wysiwyg: function (e) {
             const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
 
@@ -7350,6 +7358,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Object} core Core object
          */
         onChange: null,
+
+         /**
+         * @description Event functions
+         * @param {String} contents Current contents
+         * @param {Object} core Core object
+         */
+          onSave: null,
 
         /**
          * @description Event functions (drop, paste)
@@ -7726,10 +7741,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
-         * @description Copying the contents of the editor to the original textarea
+         * @description Copying the contents of the editor to the original textarea and execute onSave callback
          */
         save: function () {
-            context.element.originElement.value = core.getContents(false);
+            const contents = core.getContents(false);
+            context.element.originElement.value = contents
+            event.onSave_wysiwyg(contents, core);
         },
 
         /**

@@ -649,6 +649,13 @@ export default class SunEditor {
     onCut: (e: Event, clipboardData: any, core: Core) => boolean;
 
     /**
+     * @description Called just after the save was executed.
+     * @param contents Editor content
+     * @param core Core object
+     */
+    onSave: (contents: string, core: Core) => void;
+
+    /**
      * @description Called just before the inline toolbar is positioned and displayed on the screen.
      * @param toolbar Toolbar Element
      * @param context The editor's context object (editor.getContext())

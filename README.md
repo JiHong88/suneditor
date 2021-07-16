@@ -1132,6 +1132,14 @@ editor.onCut = function (e, clipboardData, core) { console.log('onCut', e) }
  */
 editor.onDrop = function (e, cleanData, maxCharCount, core) { console.log('onDrop', e) }
 
+// Save event
+// Called just after the save was executed.
+/**
+ * contents Editor content
+ * core: Core object
+ */   
+editor.onSave = function (contents, core) {console.log(contents) };
+
 // Called before the image is uploaded
 // If true is returned, the internal upload process runs normally.
 // If false is returned, no image upload is performed.
