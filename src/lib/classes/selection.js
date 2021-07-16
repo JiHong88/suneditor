@@ -6,9 +6,9 @@
 
 import CoreInterface from "../../interface/_core";
 import {
-	domUtils
+	domUtils,
+	unicode
 } from "../../helpers";
-import unicode from "../../helpers/unicode";
 
 const Selection = function (editor) {
 	CoreInterface.call(this, editor);
@@ -29,7 +29,7 @@ Selection.prototype = {
 
 		let focusEl = wysiwyg.firstElementChild;
 		if (!focusEl) {
-			focusEl = domUtils.createElement(options.defaultTag, null, "<br>");
+			focusEl = domUtils.createElement(this.options.defaultTag, null, "<br>");
 			wysiwyg.appendChild(focusEl);
 		}
 
@@ -160,7 +160,7 @@ Selection.prototype = {
 	getRange_addLine: function (range, container) {
 		if (this.isNone(range)) {
 			const wysiwyg = this.context.element.wysiwyg;
-			const op = domUtils.createElement(options.defaultTag, null, "<br>");
+			const op = domUtils.createElement(this.options.defaultTag, null, "<br>");
 			wysiwyg.insertBefore(
 				op,
 				container && container !== wysiwyg ? container.nextElementSibling : wysiwyg.firstElementChild
@@ -212,7 +212,7 @@ Selection.prototype = {
 	 */
 	getLines: function (validation) {
 		if (!this._resetRangeToTextNode()) return [];
-		let range = this.getRange();
+		let range = this.selection.getRange();
 
 		if (domUtils.isWysiwygFrame(range.startContainer)) {
 			const children = this.context.element.wysiwyg.children;
@@ -224,7 +224,7 @@ Selection.prototype = {
 				children[children.length - 1],
 				children[children.length - 1].textContent.trim().length
 			);
-			range = this.getRange();
+			range = this.selection.getRange();
 		}
 
 		const startCon = range.startContainer;
@@ -283,7 +283,7 @@ Selection.prototype = {
 	 * @returns {Array}
 	 */
 	getLinesAndComponents: function (removeDuplicate) {
-		const commonCon = this.getRange().commonAncestorContainer;
+		const commonCon = this.selection.getRange().commonAncestorContainer;
 		const myComponent = domUtils.getParentElement(commonCon, this.component.is);
 		const selectedLines = domUtils.isTable(commonCon) ?
 			this.format.getLines(null) :
@@ -364,7 +364,7 @@ Selection.prototype = {
 			}
 		}
 
-		const range = !afterNode && !isFormats ? this.getRange_addLine(this.getRange(), null) : this.getRange();
+		const range = !afterNode && !isFormats ? this.selection.getRange_addLine(this.selection.getRange(), null) : this.selection.getRange();
 		const commonCon = range.commonAncestorContainer;
 		const startOff = range.startOffset;
 		const endOff = range.endOffset;
@@ -433,7 +433,7 @@ Selection.prototype = {
 						if (this.format.isLine(container)) {
 							container.innerHTML = "<br>";
 						} else if (this.format.isRangeBlock(container)) {
-							container.innerHTML = "<" + options.defaultTag + "><br></" + options.defaultTag + ">";
+							container.innerHTML = "<" + this.options.defaultTag + "><br></" + this.options.defaultTag + ">";
 						}
 					}
 
@@ -518,7 +518,7 @@ Selection.prototype = {
 			}
 
 			if (domUtils.isWysiwygFrame(parentNode) && (oNode.nodeType === 3 || domUtils.isBreak(oNode))) {
-				oNode = domUtils.createElement(options.defaultTag, null, oNode);
+				oNode = domUtils.createElement(this.options.defaultTag, null, oNode);
 			}
 
 			parentNode.insertBefore(oNode, parentNode === afterNode ? parentNode.lastChild : afterNode);
@@ -608,7 +608,7 @@ Selection.prototype = {
 				const domTree = dom.childNodes;
 
 				if (checkCharCount) {
-					const type = options.charCounterType === 'byte-html' ? 'outerHTML' : 'textContent';
+					const type = this.options.charCounterType === 'byte-html' ? 'outerHTML' : 'textContent';
 					let checkHTML = '';
 					for (let i = 0, len = domTree.length; i < len; i++) {
 						checkHTML += domTree[i][type];
@@ -665,7 +665,7 @@ Selection.prototype = {
 	removeNode: function () {
 		this._resetRangeToTextNode();
 
-		const range = this.getRange();
+		const range = this.selection.getRange();
 		let container,
 			offset = 0;
 		let startCon = range.startContainer;
@@ -852,7 +852,7 @@ Selection.prototype = {
 	 * @private
 	 */
 	_resetRangeToTextNode: function () {
-		const range = this.getRange();
+		const range = this.selection.getRange();
 		if (this.isNone(range)) return false;
 
 		let startCon = range.startContainer;
@@ -897,7 +897,7 @@ Selection.prototype = {
 				let format = this.format.getLine(tempCon, null);
 				if (format === this.format.getRangeBlock(format, null)) {
 					format = domUtils.createElement(
-						domUtils.getParentElement(tempCon, domUtils.isTableCell) ? "DIV" : options.defaultTag
+						domUtils.getParentElement(tempCon, domUtils.isTableCell) ? "DIV" : this.options.defaultTag
 					);
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
@@ -941,7 +941,7 @@ Selection.prototype = {
 
 				let format = this.format.getLine(tempCon, null);
 				if (format === this.format.getRangeBlock(format, null)) {
-					format = domUtils.createElement(domUtils.isTableCell(format) ? "DIV" : options.defaultTag);
+					format = domUtils.createElement(domUtils.isTableCell(format) ? "DIV" : this.options.defaultTag);
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
 				}

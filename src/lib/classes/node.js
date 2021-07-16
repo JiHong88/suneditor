@@ -120,11 +120,11 @@ Node.prototype = {
 				if (
 					(onlyText && inst.format._isIgnoreNodeChange(child)) ||
 					(!onlyText &&
-						(dom.isTable(child) ||
-							dom.isListCell(child) ||
+						(domUtils.isTable(child) ||
+						domUtils.isListCell(child) ||
 							(inst.format.isLine(child) && !inst.format.isBrLine(child))))
 				) {
-					if (dom.isTable(child) || dom.isListCell(child)) {
+					if (domUtils.isTable(child) || domUtils.isListCell(child)) {
 						recursionFunc(child, depth + 1, i);
 					}
 					continue;
@@ -155,16 +155,16 @@ Node.prototype = {
 					}
 
 					// merge tag
-					dom.copyTagAttributes(child, current);
+					domUtils.copyTagAttributes(child, current);
 					current.parentNode.insertBefore(child, current);
-					dom.removeItem(current);
+					domUtils.removeItem(current);
 				}
 				if (!next) {
 					if (child.nodeType === 1) recursionFunc(child, depth + 1, i);
 					break;
 				}
 
-				if (child.nodeName === next.nodeName && dom.isSameAttributes(child, next) && child.href === next.href) {
+				if (child.nodeName === next.nodeName && domUtils.isSameAttributes(child, next) && child.href === next.href) {
 					const childs = child.childNodes;
 					let childLength = 0;
 					for (let n = 0, nLen = childs.length; n < nLen; n++) {
@@ -234,7 +234,7 @@ Node.prototype = {
 						child.innerHTML += next.innerHTML;
 					}
 
-					dom.removeItem(next);
+					domUtils.removeItem(next);
 					i--;
 				} else if (child.nodeType === 1) {
 					recursionFunc(child, depth + 1, i);
@@ -329,11 +329,11 @@ Node.prototype = {
 		}
 
 		(function recursionFunc(current) {
-			if (inst.format._notTextNode(current) || current === notRemoveNode || dom.isNonEditable(current)) return 0;
+			if (inst.format._notTextNode(current) || current === notRemoveNode || domUtils.isNonEditable(current)) return 0;
 			if (
 				current !== element &&
 				unicode.onlyZeroWidthSpace(current.textContent) &&
-				(!current.firstChild || !dom.isBreak(current.firstChild)) &&
+				(!current.firstChild || !domUtils.isBreak(current.firstChild)) &&
 				!current.querySelector(_allowedEmptyNodeList)
 			) {
 				if (current.parentNode) {

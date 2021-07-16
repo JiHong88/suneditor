@@ -4,14 +4,14 @@
  */
 "use strict";
 
-import { window } from "../helpers/global";
+import { _w } from "../helpers/global";
 import { getNodeFromPath, getNodePath } from "../helpers/domUtils";
 
-export default function (core, change) {
-	const delayTime = core.options.historyStackDelayTime;
-	let editor = core.context.element;
-	let undo = core.context.buttons.undo;
-	let redo = core.context.buttons.redo;
+export default function (editor, change) {
+	const delayTime = editor.options.historyStackDelayTime;
+	let elements = editor.context.element;
+	let undo = editor.context.buttons.undo;
+	let redo = editor.context.buttons.redo;
 
 	let pushDelay = null;
 	let stackIndex = 0;
@@ -19,10 +19,10 @@ export default function (core, change) {
 
 	function setContentsFromStack() {
 		const item = stack[stackIndex];
-		editor.wysiwyg.innerHTML = item.contents;
+		elements.wysiwyg.innerHTML = item.contents;
 
-		core.setRange(getNodeFromPath(item.s.path, editor.wysiwyg), item.s.offset, getNodeFromPath(item.e.path, editor.wysiwyg), item.e.offset);
-		core.focus();
+		editor.selection.setRange(getNodeFromPath(item.s.path, elements.wysiwyg), item.s.offset, getNodeFromPath(item.e.path, elements.wysiwyg), item.e.offset);
+		editor.focus();
 
 		if (stack.length <= 1) {
 			if (undo) undo.setAttribute("disabled", true);
@@ -40,22 +40,22 @@ export default function (core, change) {
 			}
 		}
 
-		core.controllersOff();
-		core._checkComponents();
-		core.char.display();
-		core._resourcesStateChange();
+		editor.controllersOff();
+		editor._checkComponents();
+		editor.char.display();
+		editor._resourcesStateChange();
 
 		// onChange
 		change();
 	}
 
 	function pushStack() {
-		core._checkComponents();
-		const current = core.getContents(true);
+		editor._checkComponents();
+		const current = editor.getContents(true);
 		if (!current || (!!stack[stackIndex] && current === stack[stackIndex].contents)) return;
 
 		stackIndex++;
-		const range = core.status._range;
+		const range = editor.status._range;
 
 		if (stack.length > stackIndex) {
 			stack = stack.slice(0, stackIndex);
@@ -84,7 +84,7 @@ export default function (core, change) {
 
 		if (stackIndex === 1 && undo) undo.removeAttribute("disabled");
 
-		core.char.display();
+		editor.char.display();
 		// onChange
 		change();
 	}
@@ -103,19 +103,19 @@ export default function (core, change) {
 		 * @param {Boolean|Number} delay If true, Add stack without delay time.
 		 */
 		push: function (delay) {
-			window.setTimeout(core._resourcesStateChange.bind(core));
+			_w.setTimeout(editor._resourcesStateChange.bind(editor));
 			const time = typeof delay === "number" ? (delay > 0 ? delay : 0) : !delay ? 0 : delayTime;
 
 			if (!time || pushDelay) {
-				window.clearTimeout(pushDelay);
+				_w.clearTimeout(pushDelay);
 				if (!time) {
 					pushStack();
 					return;
 				}
 			}
 
-			pushDelay = window.setTimeout(function () {
-				window.clearTimeout(pushDelay);
+			pushDelay = _w.setTimeout(function () {
+				_w.clearTimeout(pushDelay);
 				pushDelay = null;
 				pushStack();
 			}, time);
@@ -165,15 +165,15 @@ export default function (core, change) {
 		reset: function (ignoreChangeEvent) {
 			if (undo) undo.setAttribute("disabled", true);
 			if (redo) redo.setAttribute("disabled", true);
-			core.status.isChanged = false;
-			if (core.context.buttons.save) core.context.buttons.save.setAttribute("disabled", true);
+			editor.status.isChanged = false;
+			if (editor.context.buttons.save) editor.context.buttons.save.setAttribute("disabled", true);
 
 			stack.splice(0);
 			stackIndex = 0;
 
 			// pushStack
 			stack[stackIndex] = {
-				contents: core.getContents(true),
+				contents: editor.getContents(true),
 				s: {
 					path: [0, 0],
 					offset: 0
@@ -192,15 +192,15 @@ export default function (core, change) {
 		 * @private
 		 */
 		_resetCachingButton: function () {
-			editor = core.context.element;
-			undo = core.context.buttons.undo;
-			redo = core.context.buttons.redo;
+			elements = editor.context.element;
+			undo = editor.context.buttons.undo;
+			redo = editor.context.buttons.redo;
 
 			if (stackIndex === 0) {
 				if (undo) undo.setAttribute("disabled", true);
 				if (redo && stackIndex === stack.length - 1) redo.setAttribute("disabled", true);
-				core.status.isChanged = false;
-				if (core.context.buttons.save) core.context.buttons.save.setAttribute("disabled", true);
+				editor.status.isChanged = false;
+				if (editor.context.buttons.save) editor.context.buttons.save.setAttribute("disabled", true);
 			} else if (stackIndex === stack.length - 1) {
 				if (redo) redo.setAttribute("disabled", true);
 			}
@@ -211,7 +211,7 @@ export default function (core, change) {
 		 * @private
 		 */
 		_destroy: function () {
-			if (pushDelay) window.clearTimeout(pushDelay);
+			if (pushDelay) _w.clearTimeout(pushDelay);
 			stack = null;
 		}
 	};

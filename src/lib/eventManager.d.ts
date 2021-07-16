@@ -1,5 +1,5 @@
 import EditorInterface from "../interface/editor";
-export class eventManager extends EditorInterface {
+class EventManager extends EditorInterface {
 	/**
 	 * @description Register for an event.
 	 * Only events registered with this method are unregistered or re-registered when methods such as "setOptions", "destroy" are called. 
@@ -34,4 +34,4 @@ export class eventManager extends EditorInterface {
 	applyTagEffect(): void;
 }
 
-export default eventManager;
+export default EventManager;

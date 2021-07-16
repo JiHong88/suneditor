@@ -36,7 +36,7 @@ Component.prototype = {
 			this.selection.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling, false);
 			if (!element.nextSibling) element.parentNode.appendChild(domUtils.createElement("BR"));
 		} else {
-			if (this.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
+			if (this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
 				const depthFormat = domUtils.getParentElement(
 					r.container,
 					function (current) {

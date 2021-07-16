@@ -48,6 +48,7 @@ Offset.prototype = {
 	 * @returns {Object} {left, top, scroll}
 	 */
 	getGlobal: function (container) {
+		if (!container) container = this.context.element.topArea;
 		let t = 0,
 			l = 0,
 			s = 0;

@@ -5,21 +5,24 @@
 "use strict";
 
 import EditorInterface from "../interface/editor";
-import { domUtils } from "../helpers";
+import { domUtils, unicode, numbers, env, converter } from "../helpers";
+import { _w, _d } from "../helpers/global";
 
-function eventManager(editor) {
+function EventManager(editor) {
 	EditorInterface.call(this, editor);
 	this._events = [];
+	this._onButtonsCheck = new _w.RegExp("^(" + _w.Object.keys(editor.options._textTagsMap).join("|") + ")$", "i");
 	this._onShortcutKey = false;
 	this._IEisComposing = false; // In IE, there is no "e.isComposing" in the key-up event.
-	this._directionKeyCode = new this._w.RegExp("^(8|13|3[2-9]|40|46)$");
-	this._nonTextKeyCode = new this._w.RegExp("^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$");
-	this._historyIgnoreKeyCode = new this._w.RegExp("^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$");
-	this._frontZeroWidthReg = new this._w.RegExp(util.zeroWidthSpace + "+", "");
+	this._directionKeyCode = new _w.RegExp("^(8|13|3[2-9]|40|46)$");
+	this._nonTextKeyCode = new _w.RegExp("^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$");
+	this._historyIgnoreKeyCode = new _w.RegExp("^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$");
+	this._frontZeroWidthReg = new _w.RegExp(unicode.zeroWidthSpace + "+", "");
+	this._lineBreakerButton = editor._lineBreaker.querySelector('button');
 	this._balloonDelay = null;
 }
 
-eventManager.prototype = {
+EventManager.prototype = {
 	/**
 	 * @description Register for an event.
 	 * Only events registered with this method are unregistered or re-registered when methods such as "setOptions", "destroy" are called. 
@@ -46,7 +49,7 @@ eventManager.prototype = {
 	 */
 	addGlobalEvent: function (type, listener, useCapture) {
 		_d.addEventListener(type, listener, useCapture);
-		if (options.iframe) {
+		if (this.options.iframe) {
 			this._wd.addEventListener(type, listener);
 		}
 	},
@@ -59,7 +62,7 @@ eventManager.prototype = {
 	 */
 	removeGlobalEvent: function (type, listener) {
 		_d.removeEventListener(type, listener);
-		if (options.iframe) {
+		if (this.options.iframe) {
 			this._wd.removeEventListener(type, listener);
 		}
 	},
@@ -69,17 +72,17 @@ eventManager.prototype = {
 	 * such as "bold", "underline", etc., and executes the "active" method of the plugins.  
 	 */
 	applyTagEffect: function () {
-		let selectionNode = core.selection.getNode();
-		if (selectionNode === core.effectNode) return;
-		core.effectNode = selectionNode;
+		let selectionNode = this.selection.getNode();
+		if (selectionNode === this.editor.effectNode) return;
+		this.editor.effectNode = selectionNode;
 
-		const marginDir = options.rtl ? "marginRight" : "marginLeft";
-		const commandMap = core.commandMap;
+		const marginDir = this.options.rtl ? "marginRight" : "marginLeft";
+		const commandMap = this.editor.commandMap;
 		const classOnCheck = this._onButtonsCheck;
 		const commandMapNodes = [];
 		const currentNodes = [];
 
-		const activePlugins = core.activePlugins;
+		const activePlugins = this.editor.activePlugins;
 		const cLen = activePlugins.length;
 		let nodeName = "";
 
@@ -87,9 +90,9 @@ eventManager.prototype = {
 			selectionNode = selectionNode.firstChild;
 		}
 
-		for (let element = selectionNode; !util.isWysiwygFrame(element); element = element.parentNode) {
+		for (let element = selectionNode; !domUtils.isWysiwygFrame(element); element = element.parentNode) {
 			if (!element) break;
-			if (element.nodeType !== 1 || util.isBreak(element)) continue;
+			if (element.nodeType !== 1 || domUtils.isBreak(element)) continue;
 			nodeName = element.nodeName.toUpperCase();
 			currentNodes.push(nodeName);
 
@@ -97,7 +100,7 @@ eventManager.prototype = {
 			if (!this.status.isReadOnly) {
 				for (let c = 0, name; c < cLen; c++) {
 					name = activePlugins[c];
-					if (commandMapNodes.indexOf(name) === -1 && plugins[name].active.call(core, element)) {
+					if (commandMapNodes.indexOf(name) === -1 && plugins[name].active.call(this, element)) {
 						commandMapNodes.push(name);
 					}
 				}
@@ -106,7 +109,7 @@ eventManager.prototype = {
 			if (!this.status.isReadOnly && this.format.isLine(element)) {
 				/* Outdent */
 				if (commandMapNodes.indexOf("OUTDENT") === -1 && commandMap.OUTDENT) {
-					if (util.isListCell(element) || (element.style[marginDir] && util.getNumber(element.style[marginDir], 0) > 0)) {
+					if (domUtils.isListCell(element) || (element.style[marginDir] && numbers.getNumber(element.style[marginDir], 0) > 0)) {
 						commandMapNodes.push("OUTDENT");
 						commandMap.OUTDENT.removeAttribute("disabled");
 					}
@@ -115,7 +118,7 @@ eventManager.prototype = {
 				/* Indent */
 				if (commandMapNodes.indexOf("INDENT") === -1 && commandMap.INDENT) {
 					commandMapNodes.push("INDENT");
-					if (util.isListCell(element) && !element.previousElementSibling) {
+					if (domUtils.isListCell(element) && !element.previousElementSibling) {
 						commandMap.INDENT.setAttribute("disabled", true);
 					} else {
 						commandMap.INDENT.removeAttribute("disabled");
@@ -128,18 +131,18 @@ eventManager.prototype = {
 			/** default active buttons [strong, ins, em, del, sub, sup] */
 			if (classOnCheck.test(nodeName)) {
 				commandMapNodes.push(nodeName);
-				util.addClass(commandMap[nodeName], "active");
+				domUtils.addClass(commandMap[nodeName], "active");
 			}
 		}
 
-		core._setKeyEffect(commandMapNodes);
+		this._setKeyEffect(commandMapNodes);
 
 		/** save current nodes */
-		core.status.currentNodes = currentNodes.reverse();
-		core.status.currentNodesMap = commandMapNodes;
+		this.status.currentNodes = currentNodes.reverse();
+		this.status.currentNodesMap = commandMapNodes;
 
 		/**  Displays the current node structure to resizingBar */
-		if (options.showPathLabel) context.element.navigation.textContent = core.status.currentNodes.join(" > ");
+		if (this.options.showPathLabel) this.context.element.navigation.textContent = this.status.currentNodes.join(" > ");
 	},
 
 	/**
@@ -148,11 +151,11 @@ eventManager.prototype = {
 	 * @private
 	 */
 	_setKeyEffect: function (ignoredList) {
-		const commandMap = this.commandMap;
-		const activePlugins = this.activePlugins;
+		const commandMap = this.editor.commandMap;
+		const activePlugins = this.editor.activePlugins;
 
 		for (let key in commandMap) {
-			if (ignoredList.indexOf(key) > -1 || !util.hasOwn(commandMap, key)) continue;
+			if (ignoredList.indexOf(key) > -1 || !commandMap.hasOwnProperty(key)) continue;
 			if (activePlugins.indexOf(key) > -1) {
 				plugins[key].active.call(this, null);
 			} else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
@@ -160,14 +163,14 @@ eventManager.prototype = {
 			} else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
 				if (!this.status.isReadOnly) commandMap.INDENT.removeAttribute('disabled');
 			} else {
-				util.removeClass(commandMap[key], 'active');
+				domUtils.removeClass(commandMap[key], 'active');
 			}
 		}
 	},
 
 	_showToolbarBalloonDelay: function () {
 		if (this._balloonDelay) {
-			this._w.clearTimeout(this._balloonDelay);
+			_w.clearTimeout(this._balloonDelay);
 		}
 
 		this._balloonDelay = _w.setTimeout(
@@ -181,14 +184,14 @@ eventManager.prototype = {
 	},
 
 	_toggleToolbarBalloon: function () {
-		core.selection._init();
-		const range = core.getRange();
-		if (core._bindControllersOff || (!core._isBalloonAlways && range.collapsed)) this._hideToolbar();
+		this.selection._init();
+		const range = this.selection.getRange();
+		if (this.editor._bindControllersOff || (!this.editor._isBalloonAlways && range.collapsed)) this._hideToolbar();
 		else this.toolbar._showBalloon(range);
 	},
 
 	_hideToolbar: function () {
-		if (!core._notHideToolbar && !core.status.isFullScreen) {
+		if (!this.editor._notHideToolbar && !this.status.isFullScreen) {
 			this.toolbar.hide();
 		}
 	},
@@ -201,10 +204,10 @@ eventManager.prototype = {
 		let siblingNode;
 
 		if (isElement) {
-			siblingNode = event._isUneditableNode_getSibling(container.childNodes[offset], siblingKey, container);
+			siblingNode = this._isUneditableNode_getSibling(container.childNodes[offset], siblingKey, container);
 			return siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute("contenteditable") === "false";
 		} else {
-			siblingNode = event._isUneditableNode_getSibling(container, siblingKey, container);
+			siblingNode = this._isUneditableNode_getSibling(container, siblingKey, container);
 			return domUtils.isEdgePoint(container, offset, isFront ? "front" : "end") && siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute("contenteditable") === "false";
 		}
 	},
@@ -224,40 +227,40 @@ eventManager.prototype = {
 	},
 
 	_resize_editor: function (e) {
-		const resizeInterval = context.element.editorArea.offsetHeight + (e.clientY - core.status.resizeClientY);
-		context.element.wysiwygFrame.style.height = context.element.code.style.height = (resizeInterval < core.status.minResizingSize ? core.status.minResizingSize : resizeInterval) + "px";
-		core.status.resizeClientY = e.clientY;
+		const resizeInterval = this.context.element.editorArea.offsetHeight + (e.clientY - this.status.resizeClientY);
+		this.context.element.wysiwygFrame.style.height = this.context.element.code.style.height = (resizeInterval < this.status.minResizingSize ? this.status.minResizingSize : resizeInterval) + "px";
+		this.status.resizeClientY = e.clientY;
 	},
 
 	// FireFox - table delete, Chrome - image, video, audio
 	_hardDelete: function () {
-		const range = core.getRange();
+		const range = this.selection.getRange();
 		const sc = range.startContainer;
 		const ec = range.endContainer;
 
 		// table
 		const sCell = this.format.getRangeBlock(sc);
 		const eCell = this.format.getRangeBlock(ec);
-		const sIsCell = util.isTableCell(sCell);
-		const eIsCell = util.isTableCell(eCell);
+		const sIsCell = domUtils.isTableCell(sCell);
+		const eIsCell = domUtils.isTableCell(eCell);
 		const ancestor = range.commonAncestorContainer;
 		if (((sIsCell && !sCell.previousElementSibling && !sCell.parentElement.previousElementSibling) || (eIsCell && !eCell.nextElementSibling && !eCell.parentElement.nextElementSibling)) && sCell !== eCell) {
 			if (!sIsCell) {
-				util.removeItem(util.getParentElement(eCell, function(current) {return ancestor === current.parentNode;}));
+				domUtils.removeItem(domUtils.getParentElement(eCell, function(current) {return ancestor === current.parentNode;}));
 			} else if (!eIsCell) {
-				util.removeItem(util.getParentElement(sCell, function(current) {return ancestor === current.parentNode;}));
+				domUtils.removeItem(domUtils.getParentElement(sCell, function(current) {return ancestor === current.parentNode;}));
 			} else {
-				util.removeItem(util.getParentElement(sCell, function(current) {return ancestor === current.parentNode;}));
-				core.nativeFocus();
+				domUtils.removeItem(domUtils.getParentElement(sCell, function(current) {return ancestor === current.parentNode;}));
+				this.editor.nativeFocus();
 				return true;
 			}
 		}
 
 		// component
-		const sComp = sc.nodeType === 1 ? util.getParentElement(sc, ".se-component") : null;
-		const eComp = ec.nodeType === 1 ? util.getParentElement(ec, ".se-component") : null;
-		if (sComp) util.removeItem(sComp);
-		if (eComp) util.removeItem(eComp);
+		const sComp = sc.nodeType === 1 ? domUtils.getParentElement(sc, ".se-component") : null;
+		const eComp = ec.nodeType === 1 ? domUtils.getParentElement(ec, ".se-component") : null;
+		if (sComp) domUtils.removeItem(sComp);
+		if (eComp) domUtils.removeItem(eComp);
 
 		return false;
 	},
@@ -268,72 +271,72 @@ eventManager.prototype = {
 	 * @private
 	 */
 	_setDefaultLine: function (formatName) {
-		if (this._fileManager.pluginRegExp.test(this.currentControllerName)) return;
+		if (this.editor._fileManager.pluginRegExp.test(this.editor.currentControllerName)) return;
 
-		const range = this.getRange();
+		const range = this.selection.getRange();
 		const commonCon = range.commonAncestorContainer;
 		const startCon = range.startContainer;
 		const rangeEl = this.format.getRangeBlock(commonCon, null);
 		let focusNode, offset, format;
 
-		const fileComponent = util.getParentElement(commonCon, this.component.is);
-		if (fileComponent && !util.isTable(fileComponent)) return;
-		if ((this.format.isRangeBlock(startCon) || util.isWysiwygFrame(startCon)) && (this.component.is(startCon.children[range.startOffset]) || this.component.is(startCon.children[range.startOffset - 1]))) return;
-		if (util.getParentElement(commonCon, this.format._isNotCheckingNode)) return null;
+		const fileComponent = domUtils.getParentElement(commonCon, this.component.is);
+		if (fileComponent && !domUtils.isTable(fileComponent)) return;
+		if ((this.format.isRangeBlock(startCon) || domUtils.isWysiwygFrame(startCon)) && (this.component.is(startCon.children[range.startOffset]) || this.component.is(startCon.children[range.startOffset - 1]))) return;
+		if (domUtils.getParentElement(commonCon, this.format._isNotCheckingNode)) return null;
 
 		if (rangeEl) {
-			format = util.createElement(formatName || options.defaultTag);
+			format = domUtils.createElement(formatName || this.options.defaultTag);
 			format.innerHTML = rangeEl.innerHTML;
-			if (format.childNodes.length === 0) format.innerHTML = util.zeroWidthSpace;
+			if (format.childNodes.length === 0) format.innerHTML = unicode.zeroWidthSpace;
 
 			rangeEl.innerHTML = format.outerHTML;
 			format = rangeEl.firstChild;
-			focusNode = util.getEdgeChildNodes(format, null).sc;
+			focusNode = domUtils.getEdgeChildNodes(format, null).sc;
 
 			if (!focusNode) {
-				focusNode = util.createTextNode(util.zeroWidthSpace);
+				focusNode = domUtils.createTextNode(unicode.zeroWidthSpace);
 				format.insertBefore(focusNode, format.firstChild);
 			}
 
 			offset = focusNode.textContent.length;
-			this.setRange(focusNode, offset, focusNode, offset);
+			this.selection.setRange(focusNode, offset, focusNode, offset);
 			return;
 		}
 
 		if (this.format.isRangeBlock(commonCon) && commonCon.childNodes.length <= 1) {
 			let br = null;
-			if (commonCon.childNodes.length === 1 && util.isBreak(commonCon.firstChild)) {
+			if (commonCon.childNodes.length === 1 && domUtils.isBreak(commonCon.firstChild)) {
 				br = commonCon.firstChild;
 			} else {
-				br = util.createTextNode(util.zeroWidthSpace);
+				br = domUtils.createTextNode(unicode.zeroWidthSpace);
 				commonCon.appendChild(br);
 			}
 
-			this.setRange(br, 1, br, 1);
+			this.selection.setRange(br, 1, br, 1);
 			return;
 		}
 
-		this.execCommand("formatBlock", false, formatName || options.defaultTag);
-		focusNode = util.getEdgeChildNodes(commonCon, commonCon);
+		this.editor.execCommand("formatBlock", false, formatName || this.options.defaultTag);
+		focusNode = domUtils.getEdgeChildNodes(commonCon, commonCon);
 		focusNode = focusNode ? focusNode.ec : commonCon;
 
 		format = this.format.getLine(focusNode, null);
 		if (!format) {
-			this.removeRange();
+			this.selection.removeRange();
 			this.selection._init();
 			return;
 		}
 
-		if (util.isBreak(format.nextSibling)) util.removeItem(format.nextSibling);
-		if (util.isBreak(format.previousSibling)) util.removeItem(format.previousSibling);
-		if (util.isBreak(focusNode)) {
-			const zeroWidth = util.createTextNode(util.zeroWidthSpace);
+		if (domUtils.isBreak(format.nextSibling)) domUtils.removeItem(format.nextSibling);
+		if (domUtils.isBreak(format.previousSibling)) domUtils.removeItem(format.previousSibling);
+		if (domUtils.isBreak(focusNode)) {
+			const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
 			focusNode.parentNode.insertBefore(zeroWidth, focusNode);
 			focusNode = zeroWidth;
 		}
 
-		this.effectNode = null;
-		this.nativeFocus();
+		this.editor.effectNode = null;
+		this.editor.nativeFocus();
 	},
 
 	_setClipboardComponent: function (e, info, clipboardData) {
@@ -344,23 +347,23 @@ eventManager.prototype = {
 
 	_setDropLocationSelection: function (e) {
 		if (e.rangeParent) {
-			core.setRange(e.rangeParent, e.rangeOffset, e.rangeParent, e.rangeOffset);
-		} else if (core._wd.caretRangeFromPoint) {
-			const r = core._wd.caretRangeFromPoint(e.clientX, e.clientY);
-			core.setRange(r.startContainer, r.startOffset, r.endContainer, r.endOffset);
+			this.selection.setRange(e.rangeParent, e.rangeOffset, e.rangeParent, e.rangeOffset);
+		} else if (this._wd.caretRangeFromPoint) {
+			const r = this._wd.caretRangeFromPoint(e.clientX, e.clientY);
+			this.selection.setRange(r.startContainer, r.startOffset, r.endContainer, r.endOffset);
 		} else {
-			const r = core.getRange();
-			core.setRange(r.startContainer, r.startOffset, r.endContainer, r.endOffset);
+			const r = this.selection.getRange();
+			this.selection.setRange(r.startContainer, r.startOffset, r.endContainer, r.endOffset);
 		}
 	},
 
 	_dataTransferAction: function (type, e, data) {
 		let plainText, cleanData;
-		if (util.isIE) {
+		if (env.isIE) {
 			plainText = data.getData("Text");
 
-			const range = core.getRange();
-			const tempDiv = util.createElement("DIV");
+			const range = this.selection.getRange();
+			const tempDiv = domUtils.createElement("DIV");
 			const tempRange = {
 				sc: range.startContainer,
 				so: range.startOffset,
@@ -371,21 +374,21 @@ eventManager.prototype = {
 			tempDiv.setAttribute("contenteditable", true);
 			tempDiv.style.cssText = "position:absolute; top:0; left:0; width:1px; height:1px; overflow:hidden;";
 
-			context.element.relative.appendChild(tempDiv);
+			this.context.element.relative.appendChild(tempDiv);
 			tempDiv.focus();
 
 			_w.setTimeout(function () {
 				cleanData = tempDiv.innerHTML;
-				util.removeItem(tempDiv);
-				core.setRange(tempRange.sc, tempRange.so, tempRange.ec, tempRange.eo);
-				event._setClipboardData(type, e, plainText, cleanData, data);
-			});
+				domUtils.removeItem(tempDiv);
+				this.selection.setRange(tempRange.sc, tempRange.so, tempRange.ec, tempRange.eo);
+				this._setClipboardData(type, e, plainText, cleanData, data);
+			}.bind(this));
 
 			return true;
 		} else {
 			plainText = data.getData("text/plain");
 			cleanData = data.getData("text/html");
-			if (event._setClipboardData(type, e, plainText, cleanData, data) === false) {
+			if (this._setClipboardData(type, e, plainText, cleanData, data) === false) {
 				e.preventDefault();
 				e.stopPropagation();
 				return false;
@@ -405,12 +408,12 @@ eventManager.prototype = {
 			} else {
 				cleanData = (plainText === cleanData ? plainText : cleanData).replace(/\n/g, "<br>");
 			}
-			cleanData = core.cleanHTML(cleanData, core.pasteTagsWhitelistRegExp);
+			cleanData = this.editor.cleanHTML(cleanData, this.editor.pasteTagsWhitelistRegExp);
 		} else {
-			cleanData = util.htmlToEntity(plainText).replace(/\n/g, "<br>");
+			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, "<br>");
 		}
 
-		const maxCharCount = core.char.test(options.charCounterType === "byte-html" ? cleanData : plainText);
+		const maxCharCount = this.char.test(this.options.charCounterType === "byte-html" ? cleanData : plainText);
 		// user event - paste
 		if (type === "paste" && typeof this.events.onPaste === "function") {
 			const value = this.events.onPaste(e, cleanData, maxCharCount);
@@ -427,10 +430,10 @@ eventManager.prototype = {
 		// files
 		const files = data.files;
 		if (files.length > 0 && !MSData) {
-			if (/^image/.test(files[0].type) && core.plugins.image) {
-				if (!core.initPlugins.image) core.callPlugin("image", core.plugins.image.submitAction.bind(core, files), null);
-				else core.plugins.image.submitAction.call(core, files);
-				core.focus();
+			if (/^image/.test(files[0].type) && this.plugins.image) {
+				if (!this.editor.initPlugins.image) this.editor.callPlugin("image", this.plugins.image.submitAction.bind(this, files), null);
+				else this.plugins.image.submitAction.call(this, files);
+				this.editor.focus();
 			}
 			return false;
 		}
@@ -446,19 +449,19 @@ eventManager.prototype = {
 	},
 
 	_addEvent: function () {
-		const eventWysiwyg = options.iframe ? core._ww : context.element.wysiwyg;
+		const eventWysiwyg = this.options.iframe ? this._ww : this.context.element.wysiwyg;
 
 		/** toolbar event */
 		const toolbarHandler = ToolbarButtonsHandler.bind(this);
-		this.addEvent(context.element.toolbar, "mousedown", toolbarHandler, false);
-		this.addEvent(context.element._menuTray, "mousedown", toolbarHandler, false);
-		this.addEvent(context.element.toolbar, "click", OnClick_toolbar.bind(this), false);
+		this.addEvent(this.context.element.toolbar, "mousedown", toolbarHandler, false);
+		this.addEvent(this.context.element._menuTray, "mousedown", toolbarHandler, false);
+		this.addEvent(this.context.element.toolbar, "click", OnClick_toolbar.bind(this), false);
 
 		/** editor area */
 		const wwMouseDown = OnMouseDown_wysiwyg.bind(this);
 		this.addEvent(eventWysiwyg, "mousedown", wwMouseDown, false);
 		this.addEvent(eventWysiwyg, "click", OnClick_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, util.isIE ? "textinput" : "input", OnInput_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, env.isIE ? "textinput" : "input", OnInput_wysiwyg.bind(this), false);
 		this.addEvent(eventWysiwyg, "keydown", OnKeyDown_wysiwyg.bind(this), false);
 		this.addEvent(eventWysiwyg, "keyup", OnKeyUp_wysiwyg.bind(this), false);
 		this.addEvent(eventWysiwyg, "paste", OnPaste_wysiwyg.bind(this), false);
@@ -472,19 +475,19 @@ eventManager.prototype = {
 		/** line breaker */
 		this.addEvent(eventWysiwyg, "mousemove", OnMouseMove_wysiwyg.bind(this), false);
 		this.addEvent(
-			core._lineBreakerButton,
+			this._lineBreakerButton,
 			"mousedown",
 			function (e) {
 				e.preventDefault();
 			},
 			false
 		);
-		this.addEvent(core._lineBreakerButton, "click", DisplayLineBreak.bind(this, ""), false);
-		this.addEvent(context.element.lineBreaker_t, "mousedown", DisplayLineBreak.bind(this, "t"), false);
-		this.addEvent(context.element.lineBreaker_b, "mousedown", DisplayLineBreak.bind(this, "b"), false);
+		this.addEvent(this._lineBreakerButton, "click", DisplayLineBreak.bind(this, ""), false);
+		this.addEvent(this.context.element.lineBreaker_t, "mousedown", DisplayLineBreak.bind(this, "t"), false);
+		this.addEvent(this.context.element.lineBreaker_b, "mousedown", DisplayLineBreak.bind(this, "b"), false);
 
 		/** Events are registered only when there is a table plugin.  */
-		if (core.plugins.table) {
+		if (this.plugins.table) {
 			this.addEvent(eventWysiwyg, "touchstart", wwMouseDown, {
 				passive: true,
 				useCapture: false
@@ -492,27 +495,27 @@ eventManager.prototype = {
 		}
 
 		/** code view area auto line */
-		if (options.height === "auto" && !options.codeMirrorEditor) {
+		if (this.options.height === "auto" && !this.options.codeMirrorEditor) {
 			const cvAuthHeight = CodeViewAutoHeight.bind(this);
-			this.addEvent(context.element.code, "keydown", cvAuthHeight, false);
-			this.addEvent(context.element.code, "keyup", cvAuthHeight, false);
-			this.addEvent(context.element.code, "paste", cvAuthHeight, false);
+			this.addEvent(this.context.element.code, "keydown", cvAuthHeight, false);
+			this.addEvent(this.context.element.code, "keyup", cvAuthHeight, false);
+			this.addEvent(this.context.element.code, "paste", cvAuthHeight, false);
 		}
 
 		/** resizingBar */
-		if (context.element.resizingBar) {
-			if (/\d+/.test(options.height)) {
-				this.addEvent(context.element.resizingBar, "mousedown", OnMouseDown_resizingBar.bind(this), false);
+		if (this.context.element.resizingBar) {
+			if (/\d+/.test(this.options.height)) {
+				this.addEvent(this.context.element.resizingBar, "mousedown", OnMouseDown_resizingBar.bind(this), false);
 			} else {
-				util.addClass(context.element.resizingBar, "se-resizing-none");
+				domUtils.addClass(this.context.element.resizingBar, "se-resizing-none");
 			}
 		}
 
 		/** window event */
 		this.toolbar._setResponsive();
-		this.addEvent(this._w, "resize", OnResize_window.bind(this), false);
-		if (options.stickyToolbar > -1) {
-			this.addEvent(this._w, "scroll", this.toolbar._resetSticky.bind(this), false);
+		this.addEvent(_w, "resize", OnResize_window.bind(this), false);
+		if (this.options.stickyToolbar > -1) {
+			this.addEvent(_w, "scroll", this.toolbar._resetSticky.bind(this.toolbar), false);
 		}
 	},
 
@@ -524,22 +527,22 @@ eventManager.prototype = {
 		this._events = [];
 	},
 
-	constructor: eventManager
+	constructor: EventManager
 };
 
 function ToolbarButtonsHandler(e) {
 	let target = e.target;
-	if (core._bindControllersOff) e.stopPropagation();
+	if (this.editor._bindControllersOff) e.stopPropagation();
 
 	if (/^(input|textarea|select|option)$/i.test(target.nodeName)) {
-		core._antiBlur = false;
+		this.editor._antiBlur = false;
 	} else {
 		e.preventDefault();
 	}
 
-	if (util.getParentElement(target, ".se-submenu")) {
+	if (domUtils.getParentElement(target, ".se-submenu")) {
 		e.stopPropagation();
-		core._notHideToolbar = true;
+		this.editor._notHideToolbar = true;
 	} else {
 		let command = target.getAttribute("data-command");
 		let className = target.className;
@@ -550,7 +553,7 @@ function ToolbarButtonsHandler(e) {
 			className = target.className;
 		}
 
-		if (command === core._submenuName || command === core._containerName) {
+		if (command === this.editor._submenuName || command === this.editor._containerName) {
 			e.stopPropagation();
 		}
 	}
@@ -561,7 +564,7 @@ function OnClick_toolbar(e) {
 	let display = target.getAttribute("data-display");
 	let command = target.getAttribute("data-command");
 	let className = target.className;
-	core.controllersOff();
+	this.editor.controllersOff();
 
 	while (target.parentNode && !command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
 		target = target.parentNode;
@@ -572,33 +575,33 @@ function OnClick_toolbar(e) {
 
 	if (!command && !display) return;
 	if (target.disabled) return;
-	if (!this.status.isReadOnly && !this.status.hasFocus) core.nativeFocus();
-	if (!this.status.isReadOnly && !core.status.isCodeView) core._editorRange();
+	if (!this.status.isReadOnly && !this.status.hasFocus) this.editor.nativeFocus();
+	if (!this.status.isReadOnly && !this.status.isCodeView) this.selection._init();
 
-	core.actionCall(command, display, target);
+	this.editor.actionCall(command, display, target);
 }
 
 function OnMouseDown_wysiwyg(e) {
-	if (this.status.isReadOnly || util.isNonEditable(context.element.wysiwyg)) return;
+	if (this.status.isReadOnly || domUtils.isNonEditable(this.context.element.wysiwyg)) return;
 
 	// user event
 	if (typeof this.events.onMouseDown === "function" && this.events.onMouseDown(e) === false) return;
 
-	const tableCell = util.getParentElement(e.target, util.isTableCell);
+	const tableCell = domUtils.getParentElement(e.target, domUtils.isTableCell);
 	if (tableCell) {
-		const tablePlugin = core.plugins.table;
+		const tablePlugin = this.plugins.table;
 		if (tablePlugin && tableCell !== tablePlugin._fixedCell && !tablePlugin._shift) {
-			core.callPlugin(
+			this.editor.callPlugin(
 				"table",
 				function () {
-					tablePlugin.onTableCellMultiSelect.call(core, tableCell, false);
+					tablePlugin.onTableCellMultiSelect.call(this, tableCell, false);
 				},
 				null
 			);
 		}
 	}
 
-	if (core._isBalloon) {
+	if (this.editor._isBalloon) {
 		this._hideToolbar();
 	}
 
@@ -610,31 +613,31 @@ function OnClick_wysiwyg(e) {
 
 	if (this.status.isReadOnly) {
 		e.preventDefault();
-		if (util.isAnchor(targetElement)){
+		if (domUtils.isAnchor(targetElement)){
 			_w.open(targetElement.href, targetElement.target);
 		}
 		return false;
 	}
 
-	if (util.isNonEditable(context.element.wysiwyg)) return;
+	if (domUtils.isNonEditable(this.context.element.wysiwyg)) return;
 
 	// user event
 	if (typeof this.events.onClick === "function" && this.events.onClick(e) === false) return;
 
-	const fileComponentInfo = core.component.get(targetElement);
+	const fileComponentInfo = this.component.get(targetElement);
 	if (fileComponentInfo) {
 		e.preventDefault();
-		core.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
+		this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
 		return;
 	}
 
-	const figcaption = util.getParentElement(targetElement, "FIGCAPTION");
-	if (util.isNonEditable(figcaption)) {
+	const figcaption = domUtils.getParentElement(targetElement, "FIGCAPTION");
+	if (domUtils.isNonEditable(figcaption)) {
 		e.preventDefault();
 		figcaption.setAttribute("contenteditable", true);
 		figcaption.focus();
 
-		if (core._isInline && !this.toolbar._inlineToolbarAttr.isShow) {
+		if (this.editor._isInline && !this.toolbar._inlineToolbarAttr.isShow) {
 			this.toolbar._showInline();
 
 			const hideToolbar = function () {
@@ -646,25 +649,24 @@ function OnClick_wysiwyg(e) {
 		}
 	}
 
-	_w.setTimeout(core.selection._init.bind(core));
-	core.selection._init();
+	_w.setTimeout(this.selection._init.bind(this.selection));
+	this.selection._init();
 
-	const selectionNode = core.selection.getNode();
+	const selectionNode = this.selection.getNode();
 	const formatEl = this.format.getLine(selectionNode, null);
 	const rangeEl = this.format.getRangeBlock(selectionNode, null);
-	if (!formatEl && !util.isNonEditable(targetElement) && !util.isList(rangeEl)) {
-		const range = core.getRange();
+	if (!formatEl && !domUtils.isNonEditable(targetElement) && !domUtils.isList(rangeEl)) {
+		const range = this.selection.getRange();
 		if (this.format.getLine(range.startContainer) === this.format.getLine(range.endContainer)) {
-			if (util.isList(rangeEl)) {
+			if (domUtils.isList(rangeEl)) {
 				e.preventDefault();
-				const oLi = util.createElement("LI");
 				const prevLi = selectionNode.nextElementSibling;
-				oLi.appendChild(selectionNode);
+				const oLi = domUtils.createElement("LI", null, selectionNode);
 				rangeEl.insertBefore(oLi, prevLi);
-				core.focus();
-			} else if (!util.isWysiwygFrame(selectionNode) && !this.component.is(selectionNode) && (!util.isTable(selectionNode) || util.isTableCell(selectionNode)) && this._setDefaultFormat(this.format.isRangeBlock(rangeEl) ? "DIV" : options.defaultTag) !== null) {
+				this.editor.focus();
+			} else if (!domUtils.isWysiwygFrame(selectionNode) && !this.component.is(selectionNode) && (!domUtils.isTable(selectionNode) || domUtils.isTableCell(selectionNode)) && this._setDefaultLine(this.format.isRangeBlock(rangeEl) ? "DIV" : this.options.defaultTag) !== null) {
 				e.preventDefault();
-				core.focus();
+				this.editor.focus();
 			} else {
 				this.applyTagEffect();
 			}
@@ -673,31 +675,31 @@ function OnClick_wysiwyg(e) {
 		this.applyTagEffect();
 	}
 
-	if (core._isBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this));
+	if (this.editor._isBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this));
 }
 
 function OnInput_wysiwyg(e) {
 	if (this.status.isReadOnly || this.status.isDisabled) {
 		e.preventDefault();
 		e.stopPropagation();
-		core.history.go(core.history.getCurrentIndex());
+		this.history.go(this.history.getCurrentIndex());
 		return false;
 	}
 
-	core.selection._init();
+	this.selection._init();
 
 	// user event
 	if (typeof this.events.onInput === "function" && this.events.onInput(e) === false) return;
 
 	const data = (e.data === null ? "" : e.data === undefined ? " " : e.data) || "";
-	if (!core.char.test(data)) {
+	if (!this.char.test(data)) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
 	}
 
 	// history stack
-	core.history.push(true);
+	this.history.push(true);
 }
 
 function OnKeyDown_wysiwyg(e) {
@@ -712,9 +714,9 @@ function OnKeyDown_wysiwyg(e) {
 		return false;
 	}
 
-	core.submenuOff();
+	this.editor.submenuOff();
 
-	if (core._isBalloon) {
+	if (this.editor._isBalloon) {
 		this._hideToolbar();
 	}
 
@@ -723,19 +725,19 @@ function OnKeyDown_wysiwyg(e) {
 
 	/** Shortcuts */
 	if (ctrl && this.shortcuts.command(keyCode, shift)) {
-		event._onShortcutKey = true;
+		this._onShortcutKey = true;
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
-	} else if (event._onShortcutKey) {
-		event._onShortcutKey = false;
+	} else if (this._onShortcutKey) {
+		this._onShortcutKey = false;
 	}
 
 	/** default key action */
-	let selectionNode = core.selection.getNode();
-	const range = core.getRange();
+	let selectionNode = this.selection.getNode();
+	const range = this.selection.getRange();
 	const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
-	const fileComponentName = core._fileManager.pluginRegExp.test(core.currentControllerName) ? core.currentControllerName : "";
+	const fileComponentName = this.editor._fileManager.pluginRegExp.test(this.editor.currentControllerName) ? this.editor.currentControllerName : "";
 	let formatEl = this.format.getLine(selectionNode, null) || selectionNode;
 	let rangeEl = this.format.getRangeBlock(formatEl, null);
 
@@ -745,24 +747,24 @@ function OnKeyDown_wysiwyg(e) {
 				if (fileComponentName) {
 					e.preventDefault();
 					e.stopPropagation();
-					core.plugins[fileComponentName].destroy.call(core);
+					this.plugins[fileComponentName].destroy.call(this);
 					break;
 				}
 			}
 
-			if (selectRange && event._hardDelete()) {
+			if (selectRange && this._hardDelete()) {
 				e.preventDefault();
 				e.stopPropagation();
 				break;
 			}
 
-			if (!this.format.isLine(formatEl) && !context.element.wysiwyg.firstElementChild && !this.component.is(selectionNode) && core._setDefaultFormat(options.defaultTag) !== null) {
+			if (!this.format.isLine(formatEl) && !this.context.element.wysiwyg.firstElementChild && !this.component.is(selectionNode) && this._setDefaultLine(this.options.defaultTag) !== null) {
 				e.preventDefault();
 				e.stopPropagation();
 				return false;
 			}
 
-			if (!selectRange && !formatEl.previousElementSibling && range.startOffset === 0 && !selectionNode.previousSibling && !util.isListCell(formatEl) && this.format.isLine(formatEl) && (!this.format.isBrLine(formatEl) || this.format.isClosureBrLine(formatEl))) {
+			if (!selectRange && !formatEl.previousElementSibling && range.startOffset === 0 && !selectionNode.previousSibling && !domUtils.isListCell(formatEl) && this.format.isLine(formatEl) && (!this.format.isBrLine(formatEl) || this.format.isClosureBrLine(formatEl))) {
 				// closure range
 				if (this.format.isClosureRangeBlock(formatEl.parentNode)) {
 					e.preventDefault();
@@ -770,23 +772,21 @@ function OnKeyDown_wysiwyg(e) {
 					return false;
 				}
 				// maintain default format
-				if (util.isWysiwygFrame(formatEl.parentNode) && formatEl.childNodes.length <= 1 && (!formatEl.firstChild || util.onlyZeroWidthSpace(formatEl.textContent))) {
+				if (domUtils.isWysiwygFrame(formatEl.parentNode) && formatEl.childNodes.length <= 1 && (!formatEl.firstChild || unicode.onlyZeroWidthSpace(formatEl.textContent))) {
 					e.preventDefault();
 					e.stopPropagation();
 
-					if (formatEl.nodeName.toUpperCase() === options.defaultTag.toUpperCase()) {
+					if (formatEl.nodeName.toUpperCase() === this.options.defaultTag.toUpperCase()) {
 						formatEl.innerHTML = "<br>";
 						const attrs = formatEl.attributes;
 						while (attrs[0]) {
 							formatEl.removeAttribute(attrs[0].name);
 						}
 					} else {
-						const defaultFormat = util.createElement(options.defaultTag);
-						defaultFormat.innerHTML = "<br>";
-						formatEl.parentElement.replaceChild(defaultFormat, formatEl);
+						formatEl.parentElement.replaceChild(domUtils.createElement(this.options.defaultTag, null, "<br>"), formatEl);
 					}
 
-					core.nativeFocus();
+					this.editor.nativeFocus();
 					return false;
 				}
 			}
@@ -801,7 +801,7 @@ function OnKeyDown_wysiwyg(e) {
 					const next = selectionNode.parentNode.nextSibling;
 					if (!prev) {
 						if (!next) {
-							prev = util.createElement("BR");
+							prev = domUtils.createElement("BR");
 							formatEl.appendChild(prev);
 						} else {
 							prev = next;
@@ -810,15 +810,15 @@ function OnKeyDown_wysiwyg(e) {
 					}
 
 					selectionNode.textContent = "";
-					util.removeAllParents(selectionNode, null, formatEl);
+					this.node.removeAllParents(selectionNode, null, formatEl);
 					offset = typeof offset === "number" ? offset : prev.nodeType === 3 ? prev.textContent.length : 1;
-					core.setRange(prev, offset, prev, offset);
+					this.selection.setRange(prev, offset, prev, offset);
 					break;
 				}
 			}
 
 			// tag[contenteditable="false"]
-			if (event._isUneditableNode(range, true)) {
+			if (this._isUneditableNode(range, true)) {
 				e.preventDefault();
 				e.stopPropagation();
 				break;
@@ -828,32 +828,32 @@ function OnKeyDown_wysiwyg(e) {
 			const commonCon = range.commonAncestorContainer;
 			formatEl = this.format.getLine(range.startContainer, null);
 			rangeEl = this.format.getRangeBlock(formatEl, null);
-			if (rangeEl && formatEl && !util.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
+			if (rangeEl && formatEl && !domUtils.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
 				if (
-					util.isListCell(formatEl) &&
-					util.isList(rangeEl) &&
-					(util.isListCell(rangeEl.parentNode) || formatEl.previousElementSibling) &&
-					(selectionNode === formatEl || (selectionNode.nodeType === 3 && (!selectionNode.previousSibling || util.isList(selectionNode.previousSibling)))) &&
+					domUtils.isListCell(formatEl) &&
+					domUtils.isList(rangeEl) &&
+					(domUtils.isListCell(rangeEl.parentNode) || formatEl.previousElementSibling) &&
+					(selectionNode === formatEl || (selectionNode.nodeType === 3 && (!selectionNode.previousSibling || domUtils.isList(selectionNode.previousSibling)))) &&
 					(this.format.getLine(range.startContainer, null) !== this.format.getLine(range.endContainer, null) ? rangeEl.contains(range.startContainer) : range.startOffset === 0 && range.collapsed)
 				) {
 					if (range.startContainer !== range.endContainer) {
 						e.preventDefault();
 
-						core.removeNode();
+						this.selection.removeNode();
 						if (range.startContainer.nodeType === 3) {
-							core.setRange(range.startContainer, range.startContainer.textContent.length, range.startContainer, range.startContainer.textContent.length);
+							this.selection.setRange(range.startContainer, range.startContainer.textContent.length, range.startContainer, range.startContainer.textContent.length);
 						}
 						// history stack
-						core.history.push(true);
+						this.history.push(true);
 					} else {
 						let prev = formatEl.previousElementSibling || rangeEl.parentNode;
-						if (util.isListCell(prev)) {
+						if (domUtils.isListCell(prev)) {
 							e.preventDefault();
 
 							let prevLast = prev;
-							if (!prev.contains(formatEl) && util.isListCell(prevLast) && util.isList(prevLast.lastElementChild)) {
+							if (!prev.contains(formatEl) && domUtils.isListCell(prevLast) && domUtils.isList(prevLast.lastElementChild)) {
 								prevLast = prevLast.lastElementChild.lastElementChild;
-								while (util.isListCell(prevLast) && util.isList(prevLast.lastElementChild)) {
+								while (domUtils.isListCell(prevLast) && domUtils.isList(prevLast.lastElementChild)) {
 									prevLast = prevLast.lastElementChild && prevLast.lastElementChild.lastElementChild;
 								}
 								prev = prevLast;
@@ -861,7 +861,7 @@ function OnKeyDown_wysiwyg(e) {
 
 							let con = prev === rangeEl.parentNode ? rangeEl.previousSibling : prev.lastChild;
 							if (!con) {
-								con = util.createTextNode(util.zeroWidthSpace);
+								con = domUtils.createTextNode(unicode.zeroWidthSpace);
 								rangeEl.parentNode.insertBefore(con, rangeEl.parentNode.firstChild);
 							}
 							const offset = con.nodeType === 3 ? con.textContent.length : 1;
@@ -873,12 +873,12 @@ function OnKeyDown_wysiwyg(e) {
 								after = child;
 							}
 
-							util.removeItem(formatEl);
-							if (rangeEl.children.length === 0) util.removeItem(rangeEl);
+							domUtils.removeItem(formatEl);
+							if (rangeEl.children.length === 0) domUtils.removeItem(rangeEl);
 
-							core.setRange(con, offset, con, offset);
+							this.selection.setRange(con, offset, con, offset);
 							// history stack
-							core.history.push(true);
+							this.history.push(true);
 						}
 					}
 
@@ -889,9 +889,9 @@ function OnKeyDown_wysiwyg(e) {
 				if (!selectRange && range.startOffset === 0) {
 					let detach = true;
 					let comm = commonCon;
-					while (comm && comm !== rangeEl && !util.isWysiwygFrame(comm)) {
+					while (comm && comm !== rangeEl && !domUtils.isWysiwygFrame(comm)) {
 						if (comm.previousSibling) {
-							if (comm.previousSibling.nodeType === 1 || !util.onlyZeroWidthSpace(comm.previousSibling.textContent.trim())) {
+							if (comm.previousSibling.nodeType === 1 || !unicode.onlyZeroWidthSpace(comm.previousSibling.textContent.trim())) {
 								detach = false;
 								break;
 							}
@@ -901,9 +901,9 @@ function OnKeyDown_wysiwyg(e) {
 
 					if (detach && rangeEl.parentNode) {
 						e.preventDefault();
-						core.format.removeRangeBlock(rangeEl, util.isListCell(formatEl) ? [formatEl] : null, null, false, false);
+						this.format.removeRangeBlock(rangeEl, domUtils.isListCell(formatEl) ? [formatEl] : null, null, false, false);
 						// history stack
-						core.history.push(true);
+						this.history.push(true);
 						break;
 					}
 				}
@@ -914,26 +914,26 @@ function OnKeyDown_wysiwyg(e) {
 				const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : selectionNode;
 				const prev = formatEl.previousSibling;
 				// select file component
-				const ignoreZWS = (commonCon.nodeType === 3 || util.isBreak(commonCon)) && !commonCon.previousSibling && range.startOffset === 0;
+				const ignoreZWS = (commonCon.nodeType === 3 || domUtils.isBreak(commonCon)) && !commonCon.previousSibling && range.startOffset === 0;
 				if (!sel.previousSibling && (this.component.is(commonCon.previousSibling) || (ignoreZWS && this.component.is(prev)))) {
-					const fileComponentInfo = core.component.get(prev);
+					const fileComponentInfo = this.component.get(prev);
 					if (fileComponentInfo) {
 						e.preventDefault();
 						e.stopPropagation();
-						if (formatEl.textContent.length === 0) util.removeItem(formatEl);
-						if (core.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) core.blur();
+						if (formatEl.textContent.length === 0) domUtils.removeItem(formatEl);
+						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.editor.blur();
 					} else if (this.component.is(prev)) {
 						e.preventDefault();
 						e.stopPropagation();
-						util.removeItem(prev);
+						domUtils.removeItem(prev);
 					}
 					break;
 				}
 				// delete nonEditable
-				if (util.isNonEditable(sel.previousSibling)) {
+				if (domUtils.isNonEditable(sel.previousSibling)) {
 					e.preventDefault();
 					e.stopPropagation();
-					util.removeItem(sel.previousSibling);
+					domUtils.removeItem(sel.previousSibling);
 					break;
 				}
 			}
@@ -943,49 +943,49 @@ function OnKeyDown_wysiwyg(e) {
 			if (fileComponentName) {
 				e.preventDefault();
 				e.stopPropagation();
-				core.plugins[fileComponentName].destroy.call(core);
+				this.plugins[fileComponentName].destroy.call(this);
 				break;
 			}
 
-			if (selectRange && event._hardDelete()) {
+			if (selectRange && this._hardDelete()) {
 				e.preventDefault();
 				e.stopPropagation();
 				break;
 			}
 
 			// tag[contenteditable="false"]
-			if (event._isUneditableNode(range, false)) {
+			if (this._isUneditableNode(range, false)) {
 				e.preventDefault();
 				e.stopPropagation();
 				break;
 			}
 
 			// component
-			if ((this.format.isLine(selectionNode) || selectionNode.nextSibling === null || (util.onlyZeroWidthSpace(selectionNode.nextSibling) && selectionNode.nextSibling.nextSibling === null)) && range.startOffset === selectionNode.textContent.length) {
+			if ((this.format.isLine(selectionNode) || selectionNode.nextSibling === null || (unicode.onlyZeroWidthSpace(selectionNode.nextSibling) && selectionNode.nextSibling.nextSibling === null)) && range.startOffset === selectionNode.textContent.length) {
 				const nextEl = formatEl.nextElementSibling;
 				if (!nextEl) break;
 				if (this.component.is(nextEl)) {
 					e.preventDefault();
 
-					if (util.onlyZeroWidthSpace(formatEl)) {
-						util.removeItem(formatEl);
+					if (unicode.onlyZeroWidthSpace(formatEl)) {
+						domUtils.removeItem(formatEl);
 						// table component
-						if (util.isTable(nextEl)) {
-							let cell = util.getEdgeChild(nextEl, util.isTableCell, false);
+						if (domUtils.isTable(nextEl)) {
+							let cell = domUtils.getEdgeChild(nextEl, domUtils.isTableCell, false);
 							cell = cell.firstElementChild || cell;
-							core.setRange(cell, 0, cell, 0);
+							this.selection.setRange(cell, 0, cell, 0);
 							break;
 						}
 					}
 
 					// select file component
-					const fileComponentInfo = core.component.get(nextEl);
+					const fileComponentInfo = this.component.get(nextEl);
 					if (fileComponentInfo) {
 						e.stopPropagation();
-						if (core.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) core.blur();
+						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.editor.blur();
 					} else if (this.component.is(nextEl)) {
 						e.stopPropagation();
-						util.removeItem(nextEl);
+						domUtils.removeItem(nextEl);
 					}
 
 					break;
@@ -995,15 +995,15 @@ function OnKeyDown_wysiwyg(e) {
 			if (!selectRange && (domUtils.isEdgePoint(range.endContainer, range.endOffset) || (selectionNode === formatEl ? !!formatEl.childNodes[range.startOffset] : false))) {
 				const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] || selectionNode : selectionNode;
 				// delete nonEditable
-				if (sel && util.isNonEditable(sel.nextSibling)) {
+				if (sel && domUtils.isNonEditable(sel.nextSibling)) {
 					e.preventDefault();
 					e.stopPropagation();
-					util.removeItem(sel.nextSibling);
+					domUtils.removeItem(sel.nextSibling);
 					break;
 				} else if (this.component.is(sel)) {
 					e.preventDefault();
 					e.stopPropagation();
-					util.removeItem(sel);
+					domUtils.removeItem(sel);
 					break;
 				}
 			}
@@ -1012,57 +1012,57 @@ function OnKeyDown_wysiwyg(e) {
 			formatEl = this.format.getLine(range.startContainer, null);
 			rangeEl = this.format.getRangeBlock(formatEl, null);
 			if (
-				util.isListCell(formatEl) &&
-				util.isList(rangeEl) &&
+				domUtils.isListCell(formatEl) &&
+				domUtils.isList(rangeEl) &&
 				(selectionNode === formatEl ||
 					(selectionNode.nodeType === 3 &&
-						(!selectionNode.nextSibling || util.isList(selectionNode.nextSibling)) &&
+						(!selectionNode.nextSibling || domUtils.isList(selectionNode.nextSibling)) &&
 						(this.format.getLine(range.startContainer, null) !== this.format.getLine(range.endContainer, null) ? rangeEl.contains(range.endContainer) : range.endOffset === selectionNode.textContent.length && range.collapsed)))
 			) {
-				if (range.startContainer !== range.endContainer) core.removeNode();
+				if (range.startContainer !== range.endContainer) this.selection.removeNode();
 
-				let next = util.getArrayItem(formatEl.children, util.isList, false);
+				let next = domUtils.getArrayItem(formatEl.children, domUtils.isList, false);
 				next = next || formatEl.nextElementSibling || rangeEl.parentNode.nextElementSibling;
-				if (next && (util.isList(next) || util.getArrayItem(next.children, util.isList, false))) {
+				if (next && (domUtils.isList(next) || domUtils.getArrayItem(next.children, domUtils.isList, false))) {
 					e.preventDefault();
 
 					let con, children;
-					if (util.isList(next)) {
+					if (domUtils.isList(next)) {
 						const child = next.firstElementChild;
 						children = child.childNodes;
 						con = children[0];
 						while (children[0]) {
 							formatEl.insertBefore(children[0], next);
 						}
-						util.removeItem(child);
+						domUtils.removeItem(child);
 					} else {
 						con = next.firstChild;
 						children = next.childNodes;
 						while (children[0]) {
 							formatEl.appendChild(children[0]);
 						}
-						util.removeItem(next);
+						domUtils.removeItem(next);
 					}
-					core.setRange(con, 0, con, 0);
+					this.selection.setRange(con, 0, con, 0);
 					// history stack
-					core.history.push(true);
+					this.history.push(true);
 				}
 				break;
 			}
 
 			break;
 		case 9 /** tab key */ :
-			if (fileComponentName || options.tabDisable) break;
+			if (fileComponentName || this.options.tabDisable) break;
 			e.preventDefault();
-			if (ctrl || alt || util.isWysiwygFrame(selectionNode)) break;
+			if (ctrl || alt || domUtils.isWysiwygFrame(selectionNode)) break;
 
 			const isEdge = !range.collapsed || domUtils.isEdgePoint(range.startContainer, range.startOffset);
-			const selectedFormats = core.selection.getLines(null);
-			selectionNode = core.selection.getNode();
+			const selectedFormats = this.selection.getLines(null);
+			selectionNode = this.selection.getNode();
 			const cells = [];
 			let lines = [];
-			let fc = util.isListCell(selectedFormats[0]),
-				lc = util.isListCell(selectedFormats[selectedFormats.length - 1]);
+			let fc = domUtils.isListCell(selectedFormats[0]),
+				lc = domUtils.isListCell(selectedFormats[selectedFormats.length - 1]);
 			let r = {
 				sc: range.startContainer,
 				so: range.startOffset,
@@ -1071,7 +1071,7 @@ function OnKeyDown_wysiwyg(e) {
 			};
 			for (let i = 0, len = selectedFormats.length, f; i < len; i++) {
 				f = selectedFormats[i];
-				if (util.isListCell(f)) {
+				if (domUtils.isListCell(f)) {
 					if (!f.previousElementSibling && !shift) {
 						continue;
 					} else {
@@ -1084,14 +1084,14 @@ function OnKeyDown_wysiwyg(e) {
 
 			// Nested list
 			if (cells.length > 0 && isEdge) {
-				r = core.format._applyNestedList(cells, shift);
+				r = this.format._applyNestedList(cells, shift);
 			} else {
 				// table
-				const tableCell = util.getParentElement(selectionNode, util.isTableCell);
+				const tableCell = domUtils.getParentElement(selectionNode, domUtils.isTableCell);
 				if (tableCell && isEdge) {
-					const table = util.getParentElement(tableCell, "table");
-					const cells = util.getListChildren(table, util.isTableCell);
-					let idx = shift ? util.prevIndex(cells, tableCell) : util.nextIndex(cells, tableCell);
+					const table = domUtils.getParentElement(tableCell, "table");
+					const cells = domUtils.getListChildren(table, domUtils.isTableCell);
+					let idx = shift ? domUtils.prevIndex(cells, tableCell) : domUtils.nextIndex(cells, tableCell);
 
 					if (idx === cells.length && !shift) idx = 0;
 					if (idx === -1 && shift) idx = cells.length - 1;
@@ -1099,7 +1099,7 @@ function OnKeyDown_wysiwyg(e) {
 					let moveCell = cells[idx];
 					if (!moveCell) break;
 					moveCell = moveCell.firstElementChild || moveCell;
-					core.setRange(moveCell, 0, moveCell, 0);
+					this.editor.setRange(moveCell, 0, moveCell, 0);
 					break;
 				}
 
@@ -1110,9 +1110,9 @@ function OnKeyDown_wysiwyg(e) {
 			// Lines tab(4)
 			if (lines.length > 0) {
 				if (!shift) {
-					const tabText = util.createTextNode(new _w.Array(core.status.tabSize + 1).join("\u00A0"));
+					const tabText = domUtils.createTextNode(new _w.Array(this.status.tabSize + 1).join("\u00A0"));
 					if (lines.length === 1) {
-						const textRange = core.insertNode(tabText, null, true);
+						const textRange = this.selection.insertNode(tabText, null, true);
 						if (!textRange) return false;
 						if (!fc) {
 							r.sc = tabText;
@@ -1128,15 +1128,15 @@ function OnKeyDown_wysiwyg(e) {
 							child = lines[i].firstChild;
 							if (!child) continue;
 
-							if (util.isBreak(child)) {
+							if (domUtils.isBreak(child)) {
 								lines[i].insertBefore(tabText.cloneNode(false), child);
 							} else {
 								child.textContent = tabText.textContent + child.textContent;
 							}
 						}
 
-						const firstChild = util.getEdgeChild(lines[0], "text", false);
-						const endChild = util.getEdgeChild(lines[len], "text", true);
+						const firstChild = domUtils.getEdgeChild(lines[0], "text", false);
+						const endChild = domUtils.getEdgeChild(lines[len], "text", true);
 						if (!fc && firstChild) {
 							r.sc = firstChild;
 							r.so = 0;
@@ -1153,10 +1153,10 @@ function OnKeyDown_wysiwyg(e) {
 						for (let c = 0, cLen = line.length, child; c < cLen; c++) {
 							child = line[c];
 							if (!child) break;
-							if (util.onlyZeroWidthSpace(child)) continue;
+							if (unicode.onlyZeroWidthSpace(child)) continue;
 
 							if (/^\s{1,4}$/.test(child.textContent)) {
-								util.removeItem(child);
+								domUtils.removeItem(child);
 							} else if (/^\s{1,4}/.test(child.textContent)) {
 								child.textContent = child.textContent.replace(/^\s{1,4}/, "");
 							}
@@ -1165,8 +1165,8 @@ function OnKeyDown_wysiwyg(e) {
 						}
 					}
 
-					const firstChild = util.getEdgeChild(lines[0], "text", false);
-					const endChild = util.getEdgeChild(lines[len], "text", true);
+					const firstChild = domUtils.getEdgeChild(lines[0], "text", false);
+					const endChild = domUtils.getEdgeChild(lines[len], "text", true);
 					if (!fc && firstChild) {
 						r.sc = firstChild;
 						r.so = 0;
@@ -1178,15 +1178,15 @@ function OnKeyDown_wysiwyg(e) {
 				}
 			}
 
-			core.setRange(r.sc, r.so, r.ec, r.eo);
+			this.selection.setRange(r.sc, r.so, r.ec, r.eo);
 			// history stack
-			core.history.push(false);
+			this.history.push(false);
 
 			break;
 		case 13 /** enter key */ :
 			const brLine = this.format.getBrLine(selectionNode, null);
 
-			if (options.charCounterType === "byte-html") {
+			if (this.options.charCounterType === "byte-html") {
 				let enterHTML = "";
 				if ((!shift && brLine) || shift) {
 					enterHTML = "<br>";
@@ -1194,18 +1194,18 @@ function OnKeyDown_wysiwyg(e) {
 					enterHTML = "<" + formatEl.nodeName + "><br></" + formatEl.nodeName + ">";
 				}
 
-				if (!core.this.char.check(enterHTML)) {
+				if (!this.char.check(enterHTML)) {
 					e.preventDefault();
 					return false;
 				}
 			}
 
 			if (!shift) {
-				const formatInners = core.format.isEdgeLine(range.endContainer, range.endOffset, "end");
+				const formatInners = this.format.isEdgeLine(range.endContainer, range.endOffset, "end");
 				if ((formatInners && /^H[1-6]$/i.test(formatEl.nodeName)) || /^HR$/i.test(formatEl.nodeName)) {
 					e.preventDefault();
 					let temp = null;
-					const newFormat = core.format.appendLine(formatEl, options.defaultTag);
+					const newFormat = this.format.appendLine(formatEl, this.options.defaultTag);
 
 					if (formatInners && formatInners.length > 0) {
 						temp = formatInners.pop();
@@ -1217,14 +1217,14 @@ function OnKeyDown_wysiwyg(e) {
 					}
 
 					temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
-					core.setRange(temp, 0, temp, 0);
+					this.selection.setRange(temp, 0, temp, 0);
 					break;
 				}
 
 				if (brLine) {
 					e.preventDefault();
 					const selectionFormat = selectionNode === brLine;
-					const wSelection = core.selection.get();
+					const wSelection = this.selection.get();
 					const children = selectionNode.childNodes,
 						offset = wSelection.focusOffset,
 						prev = selectionNode.previousElementSibling,
@@ -1236,22 +1236,22 @@ function OnKeyDown_wysiwyg(e) {
 						((selectionFormat &&
 								range.collapsed &&
 								children.length - 1 <= offset + 1 &&
-								util.isBreak(children[offset]) &&
-								(!children[offset + 1] || ((!children[offset + 2] || util.onlyZeroWidthSpace(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && util.onlyZeroWidthSpace(children[offset + 1].textContent))) &&
+								domUtils.isBreak(children[offset]) &&
+								(!children[offset + 1] || ((!children[offset + 2] || unicode.onlyZeroWidthSpace(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && unicode.onlyZeroWidthSpace(children[offset + 1].textContent))) &&
 								offset > 0 &&
-								util.isBreak(children[offset - 1])) ||
-							(!selectionFormat && util.onlyZeroWidthSpace(selectionNode.textContent) && util.isBreak(prev) && (util.isBreak(prev.previousSibling) || !util.onlyZeroWidthSpace(prev.previousSibling.textContent)) && (!next || (!util.isBreak(next) && util.onlyZeroWidthSpace(next.textContent)))))
+								domUtils.isBreak(children[offset - 1])) ||
+							(!selectionFormat && unicode.onlyZeroWidthSpace(selectionNode.textContent) && domUtils.isBreak(prev) && (domUtils.isBreak(prev.previousSibling) || !unicode.onlyZeroWidthSpace(prev.previousSibling.textContent)) && (!next || (!domUtils.isBreak(next) && unicode.onlyZeroWidthSpace(next.textContent)))))
 					) {
-						if (selectionFormat) util.removeItem(children[offset - 1]);
-						else util.removeItem(selectionNode);
-						const newEl = core.format.appendLine(brLine, this.format.isLine(brLine.nextElementSibling) && !this.format.isRangeBlock(brLine.nextElementSibling) ? brLine.nextElementSibling : null);
+						if (selectionFormat) domUtils.removeItem(children[offset - 1]);
+						else domUtils.removeItem(selectionNode);
+						const newEl = this.format.appendLine(brLine, this.format.isLine(brLine.nextElementSibling) && !this.format.isRangeBlock(brLine.nextElementSibling) ? brLine.nextElementSibling : null);
 						this.format.copyAttributes(newEl, brLine);
-						core.setRange(newEl, 1, newEl, 1);
+						this.selection.setRange(newEl, 1, newEl, 1);
 						break;
 					}
 
 					if (selectionFormat) {
-						this.selection.insertHTML(range.collapsed && util.isBreak(range.startContainer.childNodes[range.startOffset - 1]) ? "<br>" : "<br><br>", true, false);
+						this.selection.insertHTML(range.collapsed && domUtils.isBreak(range.startContainer.childNodes[range.startOffset - 1]) ? "<br>" : "<br><br>", true, false);
 
 						let focusNode = wSelection.focusNode;
 						const wOffset = wSelection.focusOffset;
@@ -1259,84 +1259,82 @@ function OnKeyDown_wysiwyg(e) {
 							focusNode = focusNode.childNodes[wOffset - offset > 1 ? wOffset - 1 : wOffset];
 						}
 
-						core.setRange(focusNode, 1, focusNode, 1);
+						this.selection.setRange(focusNode, 1, focusNode, 1);
 					} else {
 						const focusNext = wSelection.focusNode.nextSibling;
-						const br = util.createElement("BR");
-						core.insertNode(br, null, false);
+						const br = domUtils.createElement("BR");
+						this.selection.insertNode(br, null, false);
 
 						const brPrev = br.previousSibling,
 							brNext = br.nextSibling;
-						if (!util.isBreak(focusNext) && !util.isBreak(brPrev) && (!brNext || util.onlyZeroWidthSpace(brNext))) {
+						if (!domUtils.isBreak(focusNext) && !domUtils.isBreak(brPrev) && (!brNext || unicode.onlyZeroWidthSpace(brNext))) {
 							br.parentNode.insertBefore(br.cloneNode(false), br);
-							core.setRange(br, 1, br, 1);
+							this.selection.setRange(br, 1, br, 1);
 						} else {
-							core.setRange(brNext, 0, brNext, 0);
+							this.selection.setRange(brNext, 0, brNext, 0);
 						}
 					}
 
-					event._onShortcutKey = true;
+					this._onShortcutKey = true;
 					break;
 				}
 			}
 
 			if (selectRange) break;
 
-			if (rangeEl && formatEl && !util.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
-				const range = core.getRange();
-				if (domUtils.isEdgePoint(range.endContainer, range.endOffset) && util.isList(selectionNode.nextSibling)) {
+			if (rangeEl && formatEl && !domUtils.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
+				const range = this.selection.getRange();
+				if (domUtils.isEdgePoint(range.endContainer, range.endOffset) && domUtils.isList(selectionNode.nextSibling)) {
 					e.preventDefault();
-					const newEl = util.createElement("LI");
-					const br = util.createElement("BR");
-					newEl.appendChild(br);
+					const br = domUtils.createElement("BR");
+					const newEl = domUtils.createElement("LI", null, br);
 
 					formatEl.parentNode.insertBefore(newEl, formatEl.nextElementSibling);
 					newEl.appendChild(selectionNode.nextSibling);
 
-					core.setRange(br, 1, br, 1);
+					this.selection.setRange(br, 1, br, 1);
 					break;
 				}
 
-				if ((range.commonAncestorContainer.nodeType === 3 ? !range.commonAncestorContainer.nextElementSibling : true) && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
+				if ((range.commonAncestorContainer.nodeType === 3 ? !range.commonAncestorContainer.nextElementSibling : true) && unicode.onlyZeroWidthSpace(formatEl.innerText.trim())) {
 					e.preventDefault();
 					let newEl = null;
 
-					if (util.isListCell(rangeEl.parentNode)) {
+					if (domUtils.isListCell(rangeEl.parentNode)) {
 						rangeEl = formatEl.parentNode.parentNode.parentNode;
-						newEl = this.node.split(formatEl, null, util.getElementDepth(formatEl) - 2);
+						newEl = this.node.split(formatEl, null, domUtils.getElementDepth(formatEl) - 2);
 						if (!newEl) {
-							const newListCell = util.createElement("LI");
-							newListCell.innerHTML = "<br>";
+							const newListCell = domUtils.createElement("LI", null, "<br>");
 							rangeEl.insertBefore(newListCell, newEl);
 							newEl = newListCell;
 						}
 					} else {
-						const newFormat = util.isTableCell(rangeEl.parentNode) ?
+						const newFormat = domUtils.isTableCell(rangeEl.parentNode) ?
 							"DIV" :
-							util.isList(rangeEl.parentNode) ?
+							domUtils.isList(rangeEl.parentNode) ?
 							"LI" :
 							this.format.isLine(rangeEl.nextElementSibling) && !this.format.isRangeBlock(rangeEl.nextElementSibling) ?
 							rangeEl.nextElementSibling.nodeName :
 							this.format.isLine(rangeEl.previousElementSibling) && !this.format.isRangeBlock(rangeEl.previousElementSibling) ?
 							rangeEl.previousElementSibling.nodeName :
-							options.defaultTag;
+							this.options.defaultTag;
 
-						newEl = util.createElement(newFormat);
-						const edge = core.format.removeRangeBlock(rangeEl, [formatEl], null, true, true);
+						newEl = domUtils.createElement(newFormat);
+						const edge = this.format.removeRangeBlock(rangeEl, [formatEl], null, true, true);
 						edge.cc.insertBefore(newEl, edge.ec);
 					}
 
 					newEl.innerHTML = "<br>";
-					util.removeAllParents(formatEl, null, null);
-					core.setRange(newEl, 1, newEl, 1);
+					this.node.removeAllParents(formatEl, null, null);
+					this.selection.setRange(newEl, 1, newEl, 1);
 					break;
 				}
 			}
 
-			if (rangeEl && util.getParentElement(rangeEl, "FIGCAPTION") && util.getParentElement(rangeEl, util.isList)) {
+			if (rangeEl && domUtils.getParentElement(rangeEl, "FIGCAPTION") && domUtils.getParentElement(rangeEl, domUtils.isList)) {
 				e.preventDefault();
-				formatEl = core.format.appendLine(formatEl, null);
-				core.setRange(formatEl, 0, formatEl, 0);
+				formatEl = this.format.appendLine(formatEl, null);
+				this.selection.setRange(formatEl, 0, formatEl, 0);
 			}
 
 			if (fileComponentName) {
@@ -1347,19 +1345,18 @@ function OnKeyDown_wysiwyg(e) {
 				const sibling = container.previousElementSibling || container.nextElementSibling;
 
 				let newEl = null;
-				if (util.isListCell(container.parentNode)) {
-					newEl = util.createElement("BR");
+				if (domUtils.isListCell(container.parentNode)) {
+					newEl = domUtils.createElement("BR");
 				} else {
-					newEl = util.createElement((this.format.isLine(sibling) && !this.format.isRangeBlock(sibling)) ? sibling.nodeName : options.defaultTag);
-					newEl.innerHTML = "<br>";
+					newEl = domUtils.createElement((this.format.isLine(sibling) && !this.format.isRangeBlock(sibling)) ? sibling.nodeName : this.options.defaultTag, null, "<br>");
 				}
 
 				container.parentNode.insertBefore(newEl, container);
 
-				core.callPlugin(
+				this.editor.callPlugin(
 					fileComponentName,
 					function () {
-						if (core.component.select(compContext._element, fileComponentName) === false) core.blur();
+						if (this.component.select(compContext._element, fileComponentName) === false) this.editor.blur();
 					},
 					null
 				);
@@ -1370,7 +1367,7 @@ function OnKeyDown_wysiwyg(e) {
 			if (fileComponentName) {
 				e.preventDefault();
 				e.stopPropagation();
-				core.controllersOff();
+				this.editor.controllersOff();
 				return false;
 			}
 			break;
@@ -1379,36 +1376,36 @@ function OnKeyDown_wysiwyg(e) {
 	if (shift && keyCode === 16) {
 		e.preventDefault();
 		e.stopPropagation();
-		const tablePlugin = core.plugins.table;
+		const tablePlugin = this.plugins.table;
 		if (tablePlugin && !tablePlugin._shift && !tablePlugin._ref) {
-			const cell = util.getParentElement(formatEl, util.isTableCell);
+			const cell = domUtils.getParentElement(formatEl, domUtils.isTableCell);
 			if (cell) {
-				tablePlugin.onTableCellMultiSelect.call(core, cell, true);
+				tablePlugin.onTableCellMultiSelect.call(this, cell, true);
 				return;
 			}
 		}
-	} else if (shift && (util.isOSX_IOS ? alt : ctrl) && keyCode === 32) {
+	} else if (shift && (env.isOSX_IOS ? alt : ctrl) && keyCode === 32) {
 		e.preventDefault();
 		e.stopPropagation();
-		const nbsp = core.insertNode(util.createTextNode("\u00a0"));
+		const nbsp = this.selection.insertNode(domUtils.createTextNode("\u00a0"));
 		if (nbsp && nbsp.container) {
-			core.setRange(nbsp.container, nbsp.endOffset, nbsp.container, nbsp.endOffset);
+			this.selection.setRange(nbsp.container, nbsp.endOffset, nbsp.container, nbsp.endOffset);
 			return;
 		}
 	}
 
 	const textKey = !ctrl && !alt && !selectRange && !this._nonTextKeyCode.test(keyCode);
-	if (textKey && range.collapsed && range.startContainer === range.endContainer && util.isBreak(range.commonAncestorContainer)) {
-		const zeroWidth = util.createTextNode(util.zeroWidthSpace);
-		core.insertNode(zeroWidth, null, false);
-		core.setRange(zeroWidth, 1, zeroWidth, 1);
+	if (textKey && range.collapsed && range.startContainer === range.endContainer && domUtils.isBreak(range.commonAncestorContainer)) {
+		const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+		this.selection.insertNode(zeroWidth, null, false);
+		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 	}
 }
 
 function OnKeyUp_wysiwyg(e) {
-	if (event._onShortcutKey) return;
+	if (this._onShortcutKey) return;
 
-	core.selection._init();
+	this.selection._init();
 	const keyCode = e.keyCode;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 	const alt = e.altKey;
@@ -1418,12 +1415,12 @@ function OnKeyUp_wysiwyg(e) {
 		return;
 	}
 
-	const range = core.getRange();
-	let selectionNode = core.selection.getNode();
+	const range = this.selection.getRange();
+	let selectionNode = this.selection.getNode();
 
-	if (core._isBalloon && ((core._isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
-		if (core._isBalloonAlways) {
-			if (keyCode !== 27) event._showToolbarBalloonDelay();
+	if (this.editor._isBalloon && ((this.editor._isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
+		if (this.editor._isBalloonAlways) {
+			if (keyCode !== 27) this._showToolbarBalloonDelay();
 		} else {
 			this.toolbar._showBalloon();
 			return;
@@ -1431,27 +1428,25 @@ function OnKeyUp_wysiwyg(e) {
 	}
 
 	/** when format tag deleted */
-	if (keyCode === 8 && util.isWysiwygFrame(selectionNode) && selectionNode.textContent === "" && selectionNode.children.length === 0) {
+	if (keyCode === 8 && domUtils.isWysiwygFrame(selectionNode) && selectionNode.textContent === "" && selectionNode.children.length === 0) {
 		e.preventDefault();
 		e.stopPropagation();
 
 		selectionNode.innerHTML = "";
 
-		const oFormatTag = util.createElement(this.format.isLine(core.status.currentNodes[0]) ? core.status.currentNodes[0] : options.defaultTag);
-		oFormatTag.innerHTML = "<br>";
-
+		const oFormatTag = domUtils.createElement(this.format.isLine(this.status.currentNodes[0]) ? this.status.currentNodes[0] : this.options.defaultTag, null, "<br>");
 		selectionNode.appendChild(oFormatTag);
-		core.setRange(oFormatTag, 0, oFormatTag, 0);
+		this.selection.setRange(oFormatTag, 0, oFormatTag, 0);
 		this.applyTagEffect();
 
-		core.history.push(false);
+		this.history.push(false);
 		return;
 	}
 
 	const formatEl = this.format.getLine(selectionNode, null);
 	const rangeEl = this.format.getRangeBlock(selectionNode, null);
-	if (!formatEl && range.collapsed && !this.component.is(selectionNode) && !util.isList(selectionNode) && core._setDefaultFormat(this.format.isRangeBlock(rangeEl) ? 'DIV' : options.defaultTag) !== null) {
-		selectionNode = core.selection.getNode();
+	if (!formatEl && range.collapsed && !this.component.is(selectionNode) && !domUtils.isList(selectionNode) && this._setDefaultLine(this.format.isRangeBlock(rangeEl) ? 'DIV' : this.options.defaultTag) !== null) {
+		selectionNode = this.selection.getNode();
 	}
 
 	if (this._directionKeyCode.test(keyCode)) {
@@ -1459,35 +1454,35 @@ function OnKeyUp_wysiwyg(e) {
 	}
 
 	const textKey = !ctrl && !alt && !this._nonTextKeyCode.test(keyCode);
-	if (textKey && selectionNode.nodeType === 3 && util.zeroWidthRegExp.test(selectionNode.textContent) && !(e.isComposing !== undefined ? e.isComposing : this._IEisComposing)) {
+	if (textKey && selectionNode.nodeType === 3 && unicode.zeroWidthRegExp.test(selectionNode.textContent) && !(e.isComposing !== undefined ? e.isComposing : this._IEisComposing)) {
 		let so = range.startOffset,
 			eo = range.endOffset;
 		const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(this._frontZeroWidthReg) || "").length;
 		so = range.startOffset - frontZeroWidthCnt;
 		eo = range.endOffset - frontZeroWidthCnt;
-		selectionNode.textContent = selectionNode.textContent.replace(util.zeroWidthRegExp, "");
-		core.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
+		selectionNode.textContent = selectionNode.textContent.replace(unicode.zeroWidthRegExp, "");
+		this.selection.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
 	}
 
-	core.char.test("");
+	this.char.test("");
 
 	// user event
 	if (typeof this.events.onKeyUp === "function" && this.events.onKeyUp(e) === false) return;
 
 	// history stack
 	if (!ctrl && !alt && !this._historyIgnoreKeyCode.test(keyCode)) {
-		core.history.push(true);
+		this.history.push(true);
 	}
 }
 
 function OnPaste_wysiwyg(e) {
-	const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
+	const clipboardData = env.isIE ? _w.clipboardData : e.clipboardData;
 	if (!clipboardData) return true;
-	return event._dataTransferAction("paste", e, clipboardData);
+	return this._dataTransferAction("paste", e, clipboardData);
 }
 
 function OnCopy_wysiwyg(e) {
-	const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
+	const clipboardData = env.isIE ? _w.clipboardData : e.clipboardData;
 
 	// user event
 	if (typeof this.events.onCopy === "function" && !this.events.onCopy(e, clipboardData)) {
@@ -1496,19 +1491,19 @@ function OnCopy_wysiwyg(e) {
 		return false;
 	}
 
-	const info = core.currentFileComponentInfo;
-	if (info && !util.isIE) {
-		event._setClipboardComponent(e, info, clipboardData);
-		util.addClass(info.component, "se-component-copy");
+	const info = this.editor.currentFileComponentInfo;
+	if (info && !env.isIE) {
+		this._setClipboardComponent(e, info, clipboardData);
+		domUtils.addClass(info.component, "se-component-copy");
 		// copy effect
 		_w.setTimeout(function () {
-			util.removeClass(info.component, "se-component-copy");
+			domUtils.removeClass(info.component, "se-component-copy");
 		}, 150);
 	}
 }
 
 function OnDrop_wysiwyg(e) {
-	if (this.status.isReadOnly || util.isIE) {
+	if (this.status.isReadOnly || env.isIE) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -1517,13 +1512,13 @@ function OnDrop_wysiwyg(e) {
 	const dataTransfer = e.dataTransfer;
 	if (!dataTransfer) return true;
 
-	core.removeNode();
-	event._setDropLocationSelection(e);
-	return event._dataTransferAction("drop", e, dataTransfer);
+	this.selection.removeNode();
+	this._setDropLocationSelection(e);
+	return this._dataTransferAction("drop", e, dataTransfer);
 }
 
 function OnCut_wysiwyg(e) {
-	const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
+	const clipboardData = env.isIE ? _w.clipboardData : e.clipboardData;
 
 	// user event
 	if (typeof this.events.onCut === "function" && !this.events.onCut(e, clipboardData)) {
@@ -1532,29 +1527,29 @@ function OnCut_wysiwyg(e) {
 		return false;
 	}
 
-	const info = core.currentFileComponentInfo;
-	if (info && !util.isIE) {
-		event._setClipboardComponent(e, info, clipboardData);
-		util.removeItem(info.component);
-		core.controllersOff();
+	const info = this.editor.currentFileComponentInfo;
+	if (info && !env.isIE) {
+		this._setClipboardComponent(e, info, clipboardData);
+		domUtils.removeItem(info.component);
+		this.editor.controllersOff();
 	}
 
 	_w.setTimeout(function () {
 		// history stack
-		core.history.push(false);
+		this.history.push(false);
 	});
 }
 
 function OnScroll_wysiwyg(e) {
-	core.controllersOff();
-	if (core._isBalloon) this._hideToolbar();
+	this.editor.controllersOff();
+	if (this.editor._isBalloon) this._hideToolbar();
 
 	// user event
 	if (typeof this.events.onScroll === "function") this.events.onScroll(e);
 }
 
 function OnFocus_wysiwyg(e) {
-	if (core._antiBlur) return;
+	if (this.editor._antiBlur) return;
 	this.status.hasFocus = true;
 
 	this.applyTagEffect();
@@ -1565,16 +1560,16 @@ function OnFocus_wysiwyg(e) {
 }
 
 function OnBlur_wysiwyg(e) {
-	if (core._antiBlur || core.status.isCodeView) return;
+	if (this.editor._antiBlur || this.status.isCodeView) return;
 	this.status.hasFocus = false;
-	core.controllersOff();
-	if (core._isInline || core._isBalloon) this._hideToolbar();
+	this.editor.controllersOff();
+	if (this.editor._isInline || this.editor._isBalloon) this._hideToolbar();
 
 	this._setKeyEffect([]);
 
-	core.status.currentNodes = [];
-	core.status.currentNodesMap = [];
-	if (options.showPathLabel) context.element.navigation.textContent = "";
+	this.status.currentNodes = [];
+	this.status.currentNodesMap = [];
+	if (this.options.showPathLabel) this.context.element.navigation.textContent = "";
 
 	// user event
 	if (typeof this.events.onBlur === "function") this.events.onBlur(e);
@@ -1583,11 +1578,11 @@ function OnBlur_wysiwyg(e) {
 function OnMouseMove_wysiwyg(e) {
 	if (this.status.isDisabled || this.status.isReadOnly) return false;
 
-	const component = util.getParentElement(e.target, this.component.is);
-	const lineBreakerStyle = core._lineBreaker.style;
+	const component = domUtils.getParentElement(e.target, this.component.is);
+	const lineBreakerStyle = this.editor._lineBreaker.style;
 
-	if (component && !core.currentControllerName) {
-		const ctxEl = context.element;
+	if (component && !this.editor.currentControllerName) {
+		const ctxEl = this.context.element;
 		let scrollTop = 0;
 		let el = ctxEl.wysiwyg;
 		do {
@@ -1596,12 +1591,12 @@ function OnMouseMove_wysiwyg(e) {
 		} while (el && !/^(BODY|HTML)$/i.test(el.nodeName));
 
 		const wScroll = ctxEl.wysiwyg.scrollTop;
-		const offsets = this.offset.getGlobal(context.element.topArea);
+		const offsets = this.offset.getGlobal(this.context.element.topArea);
 		const componentTop = this.offset.get(component).top + wScroll;
-		const y = e.pageY + scrollTop + (options.iframe && !options.toolbarContainer ? ctxEl.toolbar.offsetHeight : 0);
-		const c = componentTop + (options.iframe ? scrollTop : offsets.top);
+		const y = e.pageY + scrollTop + (this.options.iframe && !this.options.toolbarContainer ? ctxEl.toolbar.offsetHeight : 0);
+		const c = componentTop + (this.options.iframe ? scrollTop : offsets.top);
 
-		const isList = util.isListCell(component.parentNode);
+		const isList = domUtils.isListCell(component.parentNode);
 		let dir = "",
 			top = "";
 		if ((isList ? !component.previousSibling : !this.format.isLine(component.previousElementSibling)) && y < c + 20) {
@@ -1615,10 +1610,10 @@ function OnMouseMove_wysiwyg(e) {
 			return;
 		}
 
-		core.status._lineBreakComp = component;
-		core.status._lineBreakDir = dir;
+		this.status._lineBreakComp = component;
+		this.status._lineBreakDir = dir;
 		lineBreakerStyle.top = top - wScroll + "px";
-		core._lineBreakerButton.style.left = this.offset.get(component).left + component.offsetWidth / 2 - 15 + "px";
+		this._lineBreakerButton.style.left = this.offset.get(component).left + component.offsetWidth / 2 - 15 + "px";
 		lineBreakerStyle.display = "block";
 	} // off line breaker
 	else if (lineBreakerStyle.display !== "none") {
@@ -1629,18 +1624,18 @@ function OnMouseMove_wysiwyg(e) {
 function OnMouseDown_resizingBar(e) {
 	e.stopPropagation();
 
-	core.submenuOff();
-	core.controllersOff();
+	this.editor.submenuOff();
+	this.editor.controllersOff();
 
-	const prevHeight = util.getNumber(context.element.wysiwygFrame.style.height, 0);
-	core.status.resizeClientY = e.clientY;
-	context.element.resizeBackground.style.display = "block";
+	const prevHeight = numbers.getNumber(this.context.element.wysiwygFrame.style.height, 0);
+	this.status.resizeClientY = e.clientY;
+	this.context.element.resizeBackground.style.display = "block";
 
 	function closureFunc() {
-		context.element.resizeBackground.style.display = "none";
+		this.context.element.resizeBackground.style.display = "none";
 		_d.removeEventListener("mousemove", event._resize_editor);
 		_d.removeEventListener("mouseup", closureFunc);
-		if (typeof this.events.onResizeEditor === "function") this.events.onResizeEditor(util.getNumber(context.element.wysiwygFrame.style.height, 0), prevHeight);
+		if (typeof this.events.onResizeEditor === "function") this.events.onResizeEditor(numbers.getNumber(this.context.element.wysiwygFrame.style.height, 0), prevHeight);
 	}
 
 	_d.addEventListener("mousemove", event._resize_editor);
@@ -1650,39 +1645,39 @@ function OnMouseDown_resizingBar(e) {
 function DisplayLineBreak(dir, e) {
 	e.preventDefault();
 
-	dir = !dir ? core.status._lineBreakDir : dir;
-	const component = core.status._lineBreakComp;
-	const isList = util.isListCell(component.parentNode);
+	dir = !dir ? this.status._lineBreakDir : dir;
+	const component = this.status._lineBreakComp;
+	const isList = domUtils.isListCell(component.parentNode);
 
-	const format = util.createElement(isList ? "BR" : util.isTableCell(component.parentNode) ? "DIV" : options.defaultTag);
+	const format = domUtils.createElement(isList ? "BR" : domUtils.isTableCell(component.parentNode) ? "DIV" : this.options.defaultTag);
 	if (!isList) format.innerHTML = "<br>";
 
-	if (options.charCounterType === "byte-html" && !this.char.check(format.outerHTML)) return;
+	if (this.options.charCounterType === "byte-html" && !this.char.check(format.outerHTML)) return;
 
 	component.parentNode.insertBefore(format, dir === "t" ? component : component.nextSibling);
-	core._lineBreaker.style.display = "none";
-	core.status._lineBreakComp = null;
+	this.editor._lineBreaker.style.display = "none";
+	this.status._lineBreakComp = null;
 
 	const focusEl = isList ? format : format.firstChild;
-	core.setRange(focusEl, 1, focusEl, 1);
+	this.selection.setRange(focusEl, 1, focusEl, 1);
 	// history stack
-	core.history.push(false);
+	this.history.push(false);
 }
 
 function CodeViewAutoHeight() {
-	context.element.code.style.height = context.element.code.scrollHeight + "px";
+	this.context.element.code.style.height = this.context.element.code.scrollHeight + "px";
 }
 
 function OnResize_window() {
-	core.controllersOff();
+	this.editor.controllersOff();
 
 	const responsiveSize = this.toolbar._responsiveButtonSize;
 	if (responsiveSize) {
 		let w = 0;
-		if ((core._isBalloon || core._isInline) && options.toolbarWidth === "auto") {
-			w = context.element.topArea.offsetWidth;
+		if ((this.editor._isBalloon || this.editor._isInline) && this.options.toolbarWidth === "auto") {
+			w = this.context.element.topArea.offsetWidth;
 		} else {
-			w = context.element.toolbar.offsetWidth;
+			w = this.context.element.toolbar.offsetWidth;
 		}
 
 		let responsiveWidth = "default";
@@ -1695,37 +1690,37 @@ function OnResize_window() {
 
 		if (this.toolbar._responsiveCurrentSize !== responsiveWidth) {
 			this.toolbar._responsiveCurrentSize = responsiveWidth;
-			core.toolbar.setButtons(this.toolbar._responsiveButtons[responsiveWidth]);
+			this.toolbar.setButtons(this.toolbar._responsiveButtons[responsiveWidth]);
 		}
 	}
 
-	if (context.element.toolbar.offsetWidth === 0) return;
+	if (this.context.element.toolbar.offsetWidth === 0) return;
 
-	if (context.fileBrowser && context.fileBrowser.area.style.display === "block") {
-		context.fileBrowser.body.style.maxHeight = _w.innerHeight - context.fileBrowser.header.offsetHeight - 50 + "px";
+	if (this.context.fileBrowser && this.context.fileBrowser.area.style.display === "block") {
+		this.context.fileBrowser.body.style.maxHeight = _w.innerHeight - this.context.fileBrowser.header.offsetHeight - 50 + "px";
 	}
 
-	if (core.submenuActiveButton && core.submenu) {
-		core._setMenuPosition(core.submenuActiveButton, core.submenu);
+	if (this.editor.submenuActiveButton && this.editor.submenu) {
+		this.editor._setMenuPosition(this.editor.submenuActiveButton, this.editor.submenu);
 	}
 
-	if (core.status.isFullScreen) {
-		core.status.innerHeight_fullScreen += _w.innerHeight - context.element.toolbar.offsetHeight - core.status.innerHeight_fullScreen;
-		context.element.editorArea.style.height = core.status.innerHeight_fullScreen + "px";
+	if (this.status.isFullScreen) {
+		this.status.innerHeight_fullScreen += _w.innerHeight - this.context.element.toolbar.offsetHeight - this.status.innerHeight_fullScreen;
+		this.context.element.editorArea.style.height = this.status.innerHeight_fullScreen + "px";
 		return;
 	}
 
-	if (core.status.isCodeView && core._isInline) {
+	if (this.status.isCodeView && this.editor._isInline) {
 		this.toolbar._showInline();
 		return;
 	}
 
-	core._iframeAutoHeight();
+	this.editor._iframeAutoHeight();
 
 	if (this.toolbar._sticky) {
-		context.element.toolbar.style.width = context.element.topArea.offsetWidth - 2 + "px";
+		this.context.element.toolbar.style.width = this.context.element.topArea.offsetWidth - 2 + "px";
 		this.toolbar._resetSticky();
 	}
 }
 
-export default eventManager;
+export default EventManager;

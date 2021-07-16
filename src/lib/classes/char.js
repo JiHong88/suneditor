@@ -7,7 +7,7 @@
 import CoreInterface from "../../interface/_core";
 import env from "../../helpers/env";
 import {
-	window
+	_w
 } from "../../helpers/global";
 import {
 	addClass,
@@ -148,7 +148,7 @@ Char.prototype = {
 function CounterBlink(charWrapper) {
 	if (charWrapper && !hasClass(charWrapper, "se-blink")) {
 		addClass(charWrapper, "se-blink");
-		window.setTimeout(function () {
+		_w.setTimeout(function () {
 			removeClass(charWrapper, "se-blink");
 		}, 600);
 	}

@@ -1,10 +1,10 @@
-import CoreInterface from "../interface/_core";
+import EditorInterface from "../interface/editor";
 import {
 	domUtils
 } from "../helpers";
 
 const Notice = function (editor) {
-	CoreInterface.call(this, editor);
+	EditorInterface.call(this, editor);
 
 	this.modal = domUtils.createElement("DIV", {
 		class: "se-notice"
@@ -14,16 +14,15 @@ const Notice = function (editor) {
 	let notice_button = domUtils.createElement("BUTTON", {
 			class: "close",
 			"aria-label": "Close",
-			title: core.lang.dialogBox.close
+			title: editor.lang.dialogBox.close
 		},
 		this.icons.cancel);
-
 
 	this.modal.appendChild(this.message);
 	this.modal.appendChild(notice_button);
 
 	/** add event */
-	this.editor.addEvent(notice_button, "click", OnClick_cancel.bind(this));
+	this.editor.eventManager.addEvent(notice_button, "click", OnClick_cancel.bind(this));
 
 	/** append html */
 	this.context.element.editorArea.appendChild(this.modal);

@@ -5,9 +5,8 @@
 "use strict";
 
 import CoreInterface from "../../interface/_core";
-import domUtils from "../../helpers/domUtils";
-import unicode from "../../helpers/unicode";
-import numbers from "../../helpers/numbers";
+import { domUtils, unicode, numbers } from "../../helpers";
+import { _w } from "../../helpers/global";
 
 const Format = function (editor) {
 	CoreInterface.call(this, editor);
@@ -687,12 +686,12 @@ Format.prototype = {
 		const listTag = type.split(":")[0] === "bullet" ? "OL" : "UL";
 		const listStyle = type.split(":")[1] || "";
 
-		let range = this.getRange();
+		let range = this.selection.getRange();
 		let selectedFormats = !selectedCells ? this.selection.getLinesAndComponents(false) : selectedCells;
 
 		if (selectedFormats.length === 0) {
 			if (selectedCells) return;
-			range = this.getRange_addLine(range, null);
+			range = this.selection.getRange_addLine(range, null);
 			selectedFormats = this.selection.getLinesAndComponents(false);
 			if (selectedFormats.length === 0) return;
 		}
@@ -999,7 +998,7 @@ Format.prototype = {
 	 * margin size - "status.indentSize"px
 	 */
 	indent: function () {
-		const range = this.getRange();
+		const range = this.selection.getRange();
 		const sc = range.startContainer;
 		const ec = range.endContainer;
 		const so = range.startOffset;
@@ -1029,7 +1028,7 @@ Format.prototype = {
 	 * margin size - "status.indentSize"px
 	 */
 	outdent: function () {
-		const range = this.getRange();
+		const range = this.selection.getRange();
 		const sc = range.startContainer;
 		const ec = range.endContainer;
 		const so = range.startOffset;
@@ -1075,8 +1074,8 @@ Format.prototype = {
 	 * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
 	 */
 	applyStyleNode: function (styleNode, styleArray, removeNodeArray, strictRemove) {
-		this._resetRangeToTextNode();
-		let range = this.getRange_addLine(this.getRange(), null);
+		this.selection._resetRangeToTextNode();
+		let range = this.selection.getRange_addLine(this.selection.getRange(), null);
 		styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
 		removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
 
@@ -2408,7 +2407,7 @@ Format.prototype = {
 			endOffset + newEndOffset.s;
 
 		// tag merge
-		const newOffsets = domUtils.mergeSameTags(pNode, [startPath, endPath], true);
+		const newOffsets = this.node.mergeSameTags(pNode, [startPath, endPath], true);
 
 		element.parentNode.replaceChild(pNode, element);
 

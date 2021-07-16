@@ -7,7 +7,7 @@ export const _d = document;
  */
 export function getXMLHttpRequest() {
 	/** IE */
-	if (this._w.ActiveXObject) {
+	if (_w.ActiveXObject) {
 		try {
 			return new ActiveXObject("Msxml2.XMLHTTP");
 		} catch (e) {
@@ -17,7 +17,7 @@ export function getXMLHttpRequest() {
 				return null;
 			}
 		}
-	} else if (this._w.XMLHttpRequest) {
+	} else if (_w.XMLHttpRequest) {
 		/** netscape */
 		return new XMLHttpRequest();
 	} else {
@@ -34,7 +34,7 @@ export function getXMLHttpRequest() {
  */
 export function getPageStyle(doc) {
 	let cssText = "";
-	const sheets = (doc || this._d).styleSheets;
+	const sheets = (doc || _d).styleSheets;
 
 	for (let i = 0, len = sheets.length, rules; i < len; i++) {
 		try {
@@ -72,13 +72,13 @@ export function getIncludePath(nameArray, extension) {
 		fileName += nameArray[i] + (i < len - 1 ? "|" : ")");
 	}
 
-	const regExp = new this._w.RegExp(
+	const regExp = new _w.RegExp(
 		"(^|.*[\\/])" + fileName + "(\\.[^\\/]+)?." + extension + "(?:\\?.*|;.*)?$",
 		"i"
 	);
-	const extRegExp = new this._w.RegExp(".+\\." + extension + "(?:\\?.*|;.*)?$", "i");
+	const extRegExp = new _w.RegExp(".+\\." + extension + "(?:\\?.*|;.*)?$", "i");
 
-	for (let c = this._d.getElementsByTagName(tagName), i = 0; i < c.length; i++) {
+	for (let c = _d.getElementsByTagName(tagName), i = 0; i < c.length; i++) {
 		if (extRegExp.test(c[i][src])) {
 			pathList.push(c[i]);
 		}

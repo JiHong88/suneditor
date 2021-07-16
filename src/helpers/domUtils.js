@@ -2,8 +2,13 @@ import {
 	_allowedEmptyNodeList
 } from "./env";
 import {
-	_d
-} from "./global"
+	_d,
+	_w
+} from "./global";
+import {
+	onlyZeroWidthSpace,
+	zeroWidthRegExp
+} from "./unicode";
 
 /**
  * @description Create Element node
@@ -21,10 +26,12 @@ export function createElement(elementName, attributes, inner) {
 		}
 	}
 
-	if (typeof inner === "string") {
-		el.innerHTML = inner;
-	} else if (typeof inner === "object") {
-		el.appendChild(inner);
+	if (!!inner) {
+		if (typeof inner === "string") {
+			el.innerHTML = inner;
+		} else if (typeof inner === "object") {
+			el.appendChild(inner);
+		}
 	}
 
 	return el;
@@ -110,7 +117,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 
 					let previous = el.previousSibling;
 					while (previous && previous.nodeType === 3) {
-						tempText = previous.textContent.replace(this.zeroWidthRegExp, "");
+						tempText = previous.textContent.replace(zeroWidthRegExp, "");
 						_newOffsets.s += tempText.length;
 						el.textContent = tempText + el.textContent;
 						temp = previous;
@@ -120,7 +127,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 
 					let next = el.nextSibling;
 					while (next && next.nodeType === 3) {
-						tempText = next.textContent.replace(this.zeroWidthRegExp, "");
+						tempText = next.textContent.replace(zeroWidthRegExp, "");
 						_newOffsets.e += tempText.length;
 						el.textContent += tempText;
 						temp = next;
@@ -326,7 +333,7 @@ export function getParentElement(element, query) {
 			query = "^" + query + "$";
 		}
 
-		const regExp = new this._w.RegExp(query, "i");
+		const regExp = new _w.RegExp(query, "i");
 		check = function (el) {
 			return regExp.test(el[attr]);
 		};
@@ -374,7 +381,7 @@ export function getEdgeChild(element, query, last) {
 			query = "^" + (query === "text" ? "#" + query : query) + "$";
 		}
 
-		const regExp = new this._w.RegExp(query, "i");
+		const regExp = new _w.RegExp(query, "i");
 		check = function (el) {
 			return regExp.test(el[attr]);
 		};
@@ -521,7 +528,7 @@ export function isSameAttributes(a, b) {
 
 	const class_a = a.classList;
 	const class_b = b.classList;
-	const reg = this._w.RegExp;
+	const reg = _w.RegExp;
 	let compClass = 0;
 
 	for (let i = 0, len = class_a.length; i < len; i++) {
@@ -612,7 +619,7 @@ export function setDisabled(disabled, domList) {
 export function hasClass(element, className) {
 	if (!element) return;
 
-	return new this._w.RegExp(className).test(element.className);
+	return new _w.RegExp(className).test(element.className);
 }
 
 /**
@@ -623,7 +630,7 @@ export function hasClass(element, className) {
 export function addClass(element, className) {
 	if (!element) return;
 
-	const check = new this._w.RegExp("(\\s|^)" + className + "(\\s|$)");
+	const check = new _w.RegExp("(\\s|^)" + className + "(\\s|$)");
 	if (check.test(element.className)) return;
 
 	element.className += (element.className.length > 0 ? " " : "") + className;
@@ -637,7 +644,7 @@ export function addClass(element, className) {
 export function removeClass(element, className) {
 	if (!element) return;
 
-	const check = new this._w.RegExp("(\\s|^)" + className + "(\\s|$)");
+	const check = new _w.RegExp("(\\s|^)" + className + "(\\s|$)");
 	element.className = element.className.replace(check, " ").trim();
 
 	if (!element.className.trim()) element.removeAttribute("class");
@@ -653,7 +660,7 @@ export function toggleClass(element, className) {
 	if (!element) return;
 	let result = false;
 
-	const check = new this._w.RegExp("(\\s|^)" + className + "(\\s|$)");
+	const check = new _w.RegExp("(\\s|^)" + className + "(\\s|$)");
 	if (check.test(element.className)) {
 		element.className = element.className.replace(check, " ").trim();
 	} else {
@@ -772,7 +779,7 @@ export function isEmptyLine(element) {
 		!element ||
 		!element.parentNode ||
 		(!element.querySelector("IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE") &&
-			this.onlyZeroWidthSpace(element.textContent))
+			onlyZeroWidthSpace(element.textContent))
 	);
 }
 
@@ -817,6 +824,7 @@ const domUtils = {
 	addClass: addClass,
 	removeClass: removeClass,
 	toggleClass: toggleClass,
+	isEdgePoint: isEdgePoint,
 	isWysiwygFrame: isWysiwygFrame,
 	isNonEditable: isNonEditable,
 	isList: isList,
