@@ -7745,7 +7745,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         save: function () {
             const contents = core.getContents(false);
-            context.element.originElement.value = contents
+            context.element.originElement.value = contents;
             event.onSave_wysiwyg(contents, core);
         },
 

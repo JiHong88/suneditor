@@ -291,6 +291,9 @@ export default {
         if (!options.iframe) {
             wysiwygDiv.setAttribute('contenteditable', true);
             wysiwygDiv.setAttribute('scrolling', 'auto');
+            for (let key in options.iframeAttributes) {
+                wysiwygDiv.setAttribute(key, options.iframeAttributes[key]);
+            }
             wysiwygDiv.className += ' ' + options._editableClass;
             wysiwygDiv.style.cssText = options._editorStyles.frame + options._editorStyles.editor;
         } else {
@@ -415,6 +418,7 @@ export default {
         options.fullScreenOffset = options.fullScreenOffset === undefined ? 0 : (/^\d+/.test(options.fullScreenOffset) ? util.getNumber(options.fullScreenOffset, 0) : 0);
         options.iframe = options.fullPage || options.iframe;
         options.fullPage = !!options.fullPage;
+        options.iframeAttributes = options.iframeAttributes || {};
         options.iframeCSSFileName = options.iframe ? typeof options.iframeCSSFileName === 'string' ? [options.iframeCSSFileName] : (options.iframeCSSFileName || ['suneditor']) : null;
         options.previewTemplate = typeof options.previewTemplate === 'string' ? options.previewTemplate : null;
         options.printTemplate = typeof options.printTemplate === 'string' ? options.printTemplate : null;

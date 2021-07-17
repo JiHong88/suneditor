@@ -92,6 +92,10 @@ export interface SunEditorOptions {
      */
     fullPage?: boolean;
     /**
+     * Attributes of the iframe.
+     */
+    iframeAttributes?: Record<string, string>;
+    /**
      * Name of the CSS file(s) to apply inside the iframe.
      */
     iframeCSSFileName?: string | string[];

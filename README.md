@@ -392,7 +392,7 @@ value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {String}
 historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {Number}
 
-// Whitelist--------------------------------------å---------------------------------------------------------
+// Whitelist------------------------------------------------------------------------------------------------
 // (You can use regular expression syntax.)
 // _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
@@ -428,6 +428,8 @@ fullScreenOffset: Top offset value of "full Screen".
                   Set to 0, '0px', '50px'...     default: 0 {Number|String}
 iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {Boolean}
 fullPage        : Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.  default: false {Boolean}
+iframeAttributes  : Attributes of the iframe.                       default: null {Object}
+                    ex) {'scrolling': 'no'}
 iframeCSSFileName : Name or Array of the CSS file to apply inside the iframe.
                     You can also use regular expressions.
                     Applied by searching by filename in the link tag of document,

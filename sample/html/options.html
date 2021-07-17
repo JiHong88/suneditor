@@ -141,6 +141,11 @@
             <br><br>
             <label><input type="checkbox" id="iframe">&nbsp;&nbsp;iframe</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="fullPage">&nbsp;&nbsp;fullPage</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="iframeAttributes">&nbsp;&nbsp;iframeAttributes</label>
+            <span>{</span><br>
+            <span>&nbsp;&nbsp;scrolling: 'no',</span><br>
+            <span>}</span>
+            <br><br>
             <label><input type="checkbox" id="iframeCSSFileName">&nbsp;&nbsp;iframeCSSFileName</label>
             <input type="text" id="iframeCSSFileName_value" placeholder="String (suneditor)">
             <br><br>
@@ -576,6 +581,7 @@ function sun_create () {
         fullScreenOffset: document.getElementById('fullScreenOffset').checked ? document.getElementById('fullScreenOffset_value').value : undefined,
         iframe: document.getElementById('iframe').checked ? true : undefined,
         fullPage: document.getElementById('fullPage').checked? true : undefined,
+        iframeAttributes: document.getElementById('iframeAttributes').checked ? {scrolling: 'no'} : undefined,
         iframeCSSFileName: document.getElementById('iframeCSSFileName').checked ? document.getElementById('iframeCSSFileName_value').value : undefined,
         previewTemplate: document.getElementById('previewTemplate').checked ? document.getElementById('previewTemplate_value').value.replace(/\n/g, '') : undefined,
         printTemplate: document.getElementById('printTemplate').checked ? document.getElementById('printTemplate_value').value.replace(/\n/g, '') : undefined,
