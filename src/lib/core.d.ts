@@ -176,9 +176,9 @@ export interface Core {
 	 * If the plugin is added call callBack function.
 	 * @param pluginName The name of the plugin to call
 	 * @param callBackFunction Function to be executed immediately after module call
-	 * @param _target Plugin target button (This is not necessary if you have a button list when creating the editor)
+	 * @param target Plugin target button (This is not necessary if you have a button list when creating the editor)
 	 */
-	callPlugin(pluginName: string, callBackFunction: Function, _target?: Element): void;
+	callPlugin(pluginName: string, callBackFunction: Function, target?: Element): void;
 
 	/**
 	 * @description If the module is not added, add the module and call the 'add' function

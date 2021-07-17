@@ -7,95 +7,55 @@
  */
 'use strict';
 
-export default {
-    name: 'align',
-    display: 'submenu',
-    add: function (core, targetElement) {
-        const icons = core.icons;
-        const context = core.context;
-        context.align = {
-            targetButton: targetElement,
-            _alignList: null,
-            currentAlign: '',
-            defaultDir: core.options.rtl ? 'right' : 'left', 
-            icons: {
-                justify: icons.align_justify,
-                left: icons.align_left,
-                right: icons.align_right,
-                center: icons.align_center
-            }
-        };
+import EditorInterface from "../../interface/editor";
+import {
+    domUtils
+} from "../../helpers";
 
-        /** set submenu */
-        let listDiv = this.setSubmenu(core);
-        let listUl = listDiv.querySelector('ul');
+function align(editor, targetElement) {
+    EditorInterface.call(this, editor);
+    this.name = "align";
+    this.display = "submenu";
+    this.targetElement = targetElement;
 
-        /** add event listeners */
-        listUl.addEventListener('click', this.pickup.bind(core));
-        context.align._alignList = listUl.querySelectorAll('li button');
+    // create HTML
+    let listDiv = createHTML(editor, !editor.options.rtl);
+    let listUl = listDiv.querySelector('ul');
 
-        /** append target button menu */
-        core.initMenuTarget(this.name, targetElement, listDiv);
+    // append target button menu
+    editor.initMenuTarget(this.name, targetElement, listDiv);
 
-        /** empty memory */
-        listDiv = null, listUl = null;
-    },
+    // members
+    this.currentAlign = "";
+    this.defaultDir = editor.options.rtl ? "right" : "left";
+    this.icons = {
+        justify: editor.icons.align_justify,
+        left: editor.icons.align_left,
+        right: editor.icons.align_right,
+        center: editor.icons.align_center
+    };
+    this._alignList = listUl.querySelectorAll('li button');
 
-    setSubmenu: function (core) {
-        const lang = core.lang;
-        const icons = core.icons;
-        const listDiv = core.util.createElement('DIV');
-        const leftDir = core.context.align.defaultDir === 'left';
+    // event registration 
+    listUl.addEventListener('click', action.bind(this));
+    listDiv = null, listUl = null;
+}
 
-        const leftMenu = '<li>' +
-            '<button type="button" class="se-btn-list se-btn-align" data-command="justifyleft" data-value="left" title="' + lang.toolbar.alignLeft + '">' +
-                '<span class="se-list-icon">' + icons.align_left + '</span>' + lang.toolbar.alignLeft +
-            '</button>' +
-        '</li>';
-
-        const rightMenu = '<li>' +
-            '<button type="button" class="se-btn-list se-btn-align" data-command="justifyright" data-value="right" title="' + lang.toolbar.alignRight + '">' +
-                '<span class="se-list-icon">' + icons.align_right +'</span>' + lang.toolbar.alignRight +
-            '</button>' +
-        '</li>';
-
-        listDiv.className = 'se-submenu se-list-layer se-list-align';
-        listDiv.innerHTML = '' +
-            '<div class="se-list-inner">' +
-                '<ul class="se-list-basic">' +
-                    (leftDir ? leftMenu : rightMenu) +
-                    '<li>' +
-                        '<button type="button" class="se-btn-list se-btn-align" data-command="justifycenter" data-value="center" title="' + lang.toolbar.alignCenter + '">' +
-                            '<span class="se-list-icon">' + icons.align_center + '</span>' + lang.toolbar.alignCenter +
-                        '</button>' +
-                    '</li>' +
-                    (leftDir? rightMenu : leftMenu) +
-                    '<li>' +
-                        '<button type="button" class="se-btn-list se-btn-align" data-command="justifyfull" data-value="justify" title="' + lang.toolbar.alignJustify + '">' +
-                            '<span class="se-list-icon">' + icons.align_justify + '</span>' + lang.toolbar.alignJustify +
-                        '</button>' +
-                    '</li>' +
-                '</ul>' +
-            '</div>';
-
-        return listDiv;
-    },
-
+align.prototype = {
     /**
      * @Override core
      */
     active: function (element) {
-        const alignContext = this.context.align;
-        const targetButton = alignContext.targetButton;
+        const targetButton = this.targetElement;
         const target = targetButton.firstElementChild;
 
         if (!element) {
-            this.util.changeElement(target, alignContext.icons[alignContext.defaultDir]);
+            domUtils.changeElement(target, this.icons[this.defaultDir]);
             targetButton.removeAttribute('data-focus');
         } else if (this.format.isLine(element)) {
             const textAlign = element.style.textAlign;
             if (textAlign) {
-                this.util.changeElement(target, alignContext.icons[textAlign] || alignContext.icons[alignContext.defaultDir]);
+                domUtils.changeElement(target, this.icons[textAlign] || this.icons[this.defaultDir]);
                 targetButton.setAttribute('data-focus', textAlign);
                 return true;
             }
@@ -108,48 +68,89 @@ export default {
      * @Override submenu
      */
     on: function () {
-        const alignContext = this.context.align;
-        const alignList = alignContext._alignList;
-        const currentAlign = alignContext.targetButton.getAttribute('data-focus') || alignContext.defaultDir;
+        const alignList = this._alignList;
+        const currentAlign = this.targetElement.getAttribute('data-focus') || this.defaultDir;
 
-        if (currentAlign !== alignContext.currentAlign) {
+        if (currentAlign !== this.currentAlign) {
             for (let i = 0, len = alignList.length; i < len; i++) {
                 if (currentAlign === alignList[i].getAttribute('data-value')) {
-                    this.util.addClass(alignList[i], 'active');
+                    domUtils.addClass(alignList[i], 'active');
                 } else {
-                    this.util.removeClass(alignList[i], 'active');
+                    domUtils.removeClass(alignList[i], 'active');
                 }
             }
 
-            alignContext.currentAlign = currentAlign;
+            this.currentAlign = currentAlign;
         }
     },
 
-    pickup: function (e) {
-        e.preventDefault();
-        e.stopPropagation();
+    constructor: align
+}
 
-        let target = e.target;
-        let value = null;
+function action(e) {
+    e.preventDefault();
+    e.stopPropagation();
 
-        while (!value && !/UL/i.test(target.tagName)) {
-            value = target.getAttribute('data-value');
-            target = target.parentNode;
-        }
+    let target = e.target;
+    let value = null;
 
-        if (!value) return;
-
-        const defaultDir = this.context.align.defaultDir;
-        const selectedFormsts = this.selection.getLines();
-        for (let i = 0, len = selectedFormsts.length; i < len; i++) {
-            this.util.setStyle(selectedFormsts[i], 'textAlign', (value === defaultDir ? '' : value));
-        }
-
-        this.effectNode = null;
-        this.submenuOff();
-        this.focus();
-        
-        // history stack
-        this.history.push(false);
+    while (!value && !/UL/i.test(target.tagName)) {
+        value = target.getAttribute('data-value');
+        target = target.parentNode;
     }
-};
+
+    if (!value) return;
+
+    const defaultDir = this.defaultDir;
+    const selectedFormsts = this.selection.getLines();
+    for (let i = 0, len = selectedFormsts.length; i < len; i++) {
+        domUtils.setStyle(selectedFormsts[i], 'textAlign', (value === defaultDir ? '' : value));
+    }
+
+    this.editor.submenuOff();
+    this.editor.focus();
+
+    // history stack
+    this.history.push(false);
+}
+
+function createHTML(editor, leftDir) {
+    const lang = editor.lang;
+    const icons = editor.icons;
+
+    const leftMenu = '<li>' +
+        '<button type="button" class="se-btn-list se-btn-align" data-command="justifyleft" data-value="left" title="' + lang.toolbar.alignLeft + '">' +
+        '<span class="se-list-icon">' + icons.align_left + '</span>' + lang.toolbar.alignLeft +
+        '</button>' +
+        '</li>';
+
+    const rightMenu = '<li>' +
+        '<button type="button" class="se-btn-list se-btn-align" data-command="justifyright" data-value="right" title="' + lang.toolbar.alignRight + '">' +
+        '<span class="se-list-icon">' + icons.align_right + '</span>' + lang.toolbar.alignRight +
+        '</button>' +
+        '</li>';
+
+    const html = '' +
+        '<div class="se-list-inner">' +
+        '<ul class="se-list-basic">' +
+        (leftDir ? leftMenu : rightMenu) +
+        '<li>' +
+        '<button type="button" class="se-btn-list se-btn-align" data-command="justifycenter" data-value="center" title="' + lang.toolbar.alignCenter + '">' +
+        '<span class="se-list-icon">' + icons.align_center + '</span>' + lang.toolbar.alignCenter +
+        '</button>' +
+        '</li>' +
+        (leftDir ? rightMenu : leftMenu) +
+        '<li>' +
+        '<button type="button" class="se-btn-list se-btn-align" data-command="justifyfull" data-value="justify" title="' + lang.toolbar.alignJustify + '">' +
+        '<span class="se-list-icon">' + icons.align_justify + '</span>' + lang.toolbar.alignJustify +
+        '</button>' +
+        '</li>' +
+        '</ul>' +
+        '</div>';
+
+    return domUtils.createElement("div", {
+        class: "se-submenu se-list-layer se-list-align"
+    }, html);
+}
+
+export default align;

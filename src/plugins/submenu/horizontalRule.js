@@ -77,7 +77,7 @@ export default {
     appendHr: function (className) {
         const oHr = this.util.createElement('HR');
         oHr.className = className;
-        this.focus();
+        this.editor.focus();
         return this.component.insert(oHr, false, true, false);
     },
 

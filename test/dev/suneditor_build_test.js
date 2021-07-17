@@ -10,6 +10,8 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import CodeMirror from 'codemirror';
 
+import align from '../../src/plugins/submenu/align'
+
 
 const complexEditor = [
     ['undo', 'redo'],
@@ -125,6 +127,7 @@ const complexEditor = [
 ]
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
+    plugins: [align],
     codeMirror: CodeMirror,
     stickyToolbar: 0,
     callBackSave: function (contents){

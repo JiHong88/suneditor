@@ -74,7 +74,7 @@ Offset.prototype = {
 	getGlobalScroll: function () {
 		let t = 0,
 			l = 0;
-		let el = context.element.topArea;
+		let el = this.context.element.topArea;
 		while (el) {
 			t += el.scrollTop;
 			l += el.scrollLeft;

@@ -485,22 +485,22 @@ Core.prototype = {
      * If the plugin is added call callBack function.
      * @param {string} pluginName The name of the plugin to call
      * @param {function} callBackFunction Function to be executed immediately after module call
-     * @param {Element|null} _target Plugin target button (This is not necessary if you have a button list when creating the editor)
+     * @param {Element|null} target Plugin target button (This is not necessary if you have a button list when creating the editor)
      */
-    callPlugin: function (pluginName, callBackFunction, _target) {
-        _target = _target || pluginCallButtons[pluginName];
+    callPlugin: function (pluginName, callBackFunction, target) {
+        target = target || this.pluginCallButtons[pluginName];
 
         if (!this.plugins[pluginName]) {
             throw Error('[SUNEDITOR.core.callPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
         } else if (!this.initPlugins[pluginName]) {
-            this.plugins[pluginName].add(this, _target);
+            this.plugins[pluginName] = new this.plugins[pluginName](this, target);
             this.initPlugins[pluginName] = true;
-        } else if (typeof TargetPlugins[pluginName] === "object" && !!_target) {
-            this.initMenuTarget(pluginName, _target, TargetPlugins[pluginName]);
+        } else if (typeof TargetPlugins[pluginName] === "object" && !!target) {
+            this.initMenuTarget(pluginName, target, TargetPlugins[pluginName]);
         }
 
-        if (this.plugins[pluginName].active && !this.commandMap[pluginName] && !!_target) {
-            this.commandMap[pluginName] = _target;
+        if (this.plugins[pluginName].active && !this.commandMap[pluginName] && !!target) {
+            this.commandMap[pluginName] = target;
             this.activePlugins.push(pluginName);
         }
 
@@ -557,7 +557,7 @@ Core.prototype = {
         this._bindedSubmenuOff = this.submenuOff.bind(this);
         this.eventManager.addGlobalEvent('mousedown', this._bindedSubmenuOff, false);
 
-        if (this.plugins[submenuName].on) this.plugins[submenuName].on.call(this);
+        if (this.plugins[submenuName].on) this.plugins[submenuName].on();
         this._antiBlur = true;
     },
 
@@ -595,7 +595,7 @@ Core.prototype = {
         this._bindedContainerOff = this.containerOff.bind(this);
         this.eventManager.addGlobalEvent('mousedown', this._bindedContainerOff, false);
 
-        if (this.plugins[containerName].on) this.plugins[containerName].on.call(this);
+        if (this.plugins[containerName].on) this.plugins[containerName].on();
         this._antiBlur = true;
     },
 
@@ -973,21 +973,21 @@ Core.prototype = {
             }
 
             if (/container/.test(display) && (this._menuTray[command] === null || target !== this.containerActiveButton)) {
-                this.callPlugin(command, this.containerOn.bind(this, target), target);
+                this.containerOn(target)
                 return;
             }
 
             if (this.status.isReadOnly) return;
             if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
-                this.callPlugin(command, this.submenuOn.bind(this, target), target);
+                this.submenuOn(target);
                 return;
             } else if (/dialog/.test(display)) {
-                this.callPlugin(command, this.plugins[command].open.bind(this), target);
+                this.plugins[command].open();
                 return;
             } else if (/command/.test(display)) {
-                this.callPlugin(command, this.plugins[command].action.bind(this), target);
+                this.plugins[command].action();
             } else if (/fileBrowser/.test(display)) {
-                this.callPlugin(command, this.plugins[command].open.bind(this, null), target);
+                this.plugins[command].open();
             }
         } // default command
         else if (command) {
@@ -1774,7 +1774,7 @@ Core.prototype = {
         const cons = Constructor._setOptions(mergeOptions, this.context, this.options);
 
         if (cons.callButtons) {
-            pluginCallButtons = cons.callButtons;
+            this.pluginCallButtons = cons.callButtons;
             this.initPlugins = {};
         }
 
@@ -1956,7 +1956,7 @@ Core.prototype = {
         this.containerOff();
         this.controllersOff();
         if (this.notice) this.notice.close();
-        if (this.modalForm) this.plugins.dialog.close.call(this);
+        if (this.modalForm) this.plugins.dialog.close();
 
         /** remove history */
         this.history._destroy();
@@ -1972,8 +1972,8 @@ Core.prototype = {
         for (let k in this.context) {
             if (this.context.hasOwnProperty(k)) delete this.context[k];
         }
-        for (let k in pluginCallButtons) {
-            if (pluginCallButtons.hasOwnProperty(k)) delete pluginCallButtons[k];
+        for (let k in this.pluginCallButtons) {
+            if (this.pluginCallButtons.hasOwnProperty(k)) delete this.pluginCallButtons[k];
         }
 
         /** remove user object */
@@ -2204,58 +2204,6 @@ Core.prototype = {
         // caching buttons
         this._cachingButtons();
 
-        // file components
-        this._fileInfoPluginsCheck = [];
-        this._fileInfoPluginsReset = [];
-
-        // text components
-        this.managedTagsInfo = {
-            query: '',
-            map: {}
-        };
-        const managedClass = [];
-
-        // Command and file plugins registration
-        this.activePlugins = [];
-        this._fileManager.tags = [];
-        this._fileManager.pluginMap = {};
-
-        const plugins = this.plugins;
-        let filePluginRegExp = [];
-        let plugin, button;
-        for (let key in plugins) {
-            if (!plugins.hasOwnProperty(key)) continue;
-            plugin = plugins[key];
-            button = pluginCallButtons[key];
-            if (plugin.active && button) {
-                this.callPlugin(key, null, button);
-            }
-            if (typeof plugin.checkFileInfo === 'function' && typeof plugin.resetFileInfo === 'function') {
-                this.callPlugin(key, null, button);
-                this._fileInfoPluginsCheck.push(plugin.checkFileInfo.bind(this));
-                this._fileInfoPluginsReset.push(plugin.resetFileInfo.bind(this));
-            }
-            if (this._w.Array.isArray(plugin.fileTags)) {
-                const fileTags = plugin.fileTags;
-                this.callPlugin(key, null, button);
-                this._fileManager.tags = this._fileManager.tags.concat(fileTags);
-                filePluginRegExp.push(key);
-                for (let tag = 0, tLen = fileTags.length; tag < tLen; tag++) {
-                    this._fileManager.pluginMap[fileTags[tag].toLowerCase()] = key;
-                }
-            }
-            if (plugin.managedTags) {
-                const info = plugin.managedTags();
-                managedClass.push('.' + info.className);
-                this.managedTagsInfo.map[info.className] = info.method.bind(this);
-            }
-        }
-
-        this.managedTagsInfo.query = managedClass.toString();
-        this._fileManager.queryString = this._fileManager.tags.join(',');
-        this._fileManager.regExp = new wRegExp('^(' + this._fileManager.tags.join('|') + ')$', 'i');
-        this._fileManager.pluginRegExp = new wRegExp('^(' + (filePluginRegExp.length === 0 ? 'undefined' : filePluginRegExp.join('|')) + ')$', 'i');
-
         // cache editor's element
         this.status._originCssText = this.context.element.topArea.style.cssText;
         this._placeholder = this.context.element.placeholder;
@@ -2286,6 +2234,55 @@ Core.prototype = {
         this.events = new Events(this);
         this.eventManager = new EventManager(this);
         this.notice = new Notice(this);
+
+        // files, plugins init
+        // file components
+        this._fileInfoPluginsCheck = [];
+        this._fileInfoPluginsReset = [];
+
+        // text components
+        this.managedTagsInfo = {
+            query: '',
+            map: {}
+        };
+        const managedClass = [];
+
+        // Command and file plugins registration
+        this.activePlugins = [];
+        this._fileManager.tags = [];
+        this._fileManager.pluginMap = {};
+
+        const plugins = this.plugins;
+        let filePluginRegExp = [];
+        let plugin;
+        for (let key in plugins) {
+            if (!plugins.hasOwnProperty(key)) continue;
+            plugin = plugins[key];
+            this.callPlugin(key, null, this.pluginCallButtons[key]);
+
+            if (typeof plugin.checkFileInfo === 'function' && typeof plugin.resetFileInfo === 'function') {
+                this._fileInfoPluginsCheck.push(plugin.checkFileInfo.bind(this));
+                this._fileInfoPluginsReset.push(plugin.resetFileInfo.bind(this));
+            }
+            if (this._w.Array.isArray(plugin.fileTags)) {
+                const fileTags = plugin.fileTags;
+                this._fileManager.tags = this._fileManager.tags.concat(fileTags);
+                filePluginRegExp.push(key);
+                for (let tag = 0, tLen = fileTags.length; tag < tLen; tag++) {
+                    this._fileManager.pluginMap[fileTags[tag].toLowerCase()] = key;
+                }
+            }
+            if (plugin.managedTags) {
+                const info = plugin.managedTags();
+                managedClass.push('.' + info.className);
+                this.managedTagsInfo.map[info.className] = info.method.bind(this);
+            }
+        }
+
+        this.managedTagsInfo.query = managedClass.toString();
+        this._fileManager.queryString = this._fileManager.tags.join(',');
+        this._fileManager.regExp = new wRegExp('^(' + this._fileManager.tags.join('|') + ')$', 'i');
+        this._fileManager.pluginRegExp = new wRegExp('^(' + (filePluginRegExp.length === 0 ? 'undefined' : filePluginRegExp.join('|')) + ')$', 'i');
 
         // Init, validate
         if (this.options.iframe) {

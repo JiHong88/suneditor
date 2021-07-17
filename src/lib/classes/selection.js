@@ -76,7 +76,7 @@ Selection.prototype = {
 	getRange: function () {
 		const range = this.status._range || this._createDefaultRange();
 		const selection = this.get();
-		if (range.collapsed === selection.isCollapsed || !context.element.wysiwyg.contains(selection.focusNode))
+		if (range.collapsed === selection.isCollapsed || !this.context.element.wysiwyg.contains(selection.focusNode))
 			return range;
 
 		if (selection.rangeCount > 0) {
@@ -474,8 +474,8 @@ Selection.prototype = {
 
 		// --- insert node ---
 		try {
-			if (domUtils.isWysiwygFrame(afterNode) || parentNode === context.element.wysiwyg.parentNode) {
-				parentNode = context.element.wysiwyg;
+			if (domUtils.isWysiwygFrame(afterNode) || parentNode === this.context.element.wysiwyg.parentNode) {
+				parentNode = this.context.element.wysiwyg;
 				afterNode = null;
 			}
 
@@ -831,7 +831,7 @@ Selection.prototype = {
 				null
 			);
 
-			if (rc) container = rc.sc || rc.ec || context.element.wysiwyg;
+			if (rc) container = rc.sc || rc.ec || this.context.element.wysiwyg;
 		}
 
 		// set range
@@ -883,7 +883,7 @@ Selection.prototype = {
 		}
 
 		// startContainer
-		tempCon = domUtils.isWysiwygFrame(startCon) ? context.element.wysiwyg.firstChild : startCon;
+		tempCon = domUtils.isWysiwygFrame(startCon) ? this.context.element.wysiwyg.firstChild : startCon;
 		tempOffset = startOff;
 
 		if (domUtils.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
@@ -922,7 +922,7 @@ Selection.prototype = {
 		startOff = tempOffset;
 
 		// endContainer
-		tempCon = domUtils.isWysiwygFrame(endCon) ? context.element.wysiwyg.lastChild : endCon;
+		tempCon = domUtils.isWysiwygFrame(endCon) ? this.context.element.wysiwyg.lastChild : endCon;
 		tempOffset = endOff;
 
 		if (domUtils.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {

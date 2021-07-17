@@ -75,28 +75,24 @@ Component.prototype = {
 	 * @returns {Object|null}
 	 */
 	get: function (element) {
-		if (!this.editor._fileManager.queryString || !element) return null;
+		if (!element) return null;
 
-		let target, pluginName;
+		let target;
 		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
-			target = element.querySelector(this.editor._fileManager.queryString);
+			if (this.editor._fileManager.queryString) target = element.querySelector(this.editor._fileManager.queryString);
 		}
 		if (!target && element.nodeName && this.editor._fileManager.regExp.test(element.nodeName)) {
 			target = element;
 		}
-
-		if (target) {
-			pluginName = this.editor._fileManager.pluginMap[target.nodeName.toLowerCase()];
-			if (pluginName) {
-				return {
-					target: target,
-					component: domUtils.getParentElement(target, this.is),
-					pluginName: pluginName
-				};
-			}
+		if (!target) {
+			target = element;
 		}
 
-		return null;
+		return {
+			target: target,
+			component: domUtils.getParentElement(target, this.is),
+			pluginName: this.editor._fileManager.pluginMap[target.nodeName.toLowerCase()] || ""
+		};
 	},
 
 	/**
@@ -106,7 +102,7 @@ Component.prototype = {
 	 */
 	select: function (element, pluginName) {
 		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is)) || domUtils.isUneditable(element)) return false;
-		if (!this.status.hasFocus) this.focus();
+		if (!this.status.hasFocus) this.editor.focus();
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;
 		_w.setTimeout(
