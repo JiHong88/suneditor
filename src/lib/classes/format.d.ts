@@ -40,18 +40,18 @@ class Format extends EditorInterface {
 	appendLine(element: Element, formatNode?: string | Element): Element;
 
 	/**
-	 * @description If a parent node that contains an argument node finds a format node (util.isRangeBlock), it returns that node.
+	 * @description If a parent node that contains an argument node finds a format node (editor.format.isBlock), it returns that node.
 	 * @param element Reference node.
 	 * @param validation Additional validation function.
 	 * @returns
 	 */
-	getRangeBlock(element: Node, validation?: Function): Element | null;
+	getBlock(element: Node, validation?: Function): Element | null;
 
 	/**
 	 * @description Appended all selected format Element to the argument element and insert
-	 * @param rangeElement Element of wrap the arguments (BLOCKQUOTE...)
+	 * @param block Element of wrap the arguments (BLOCKQUOTE...)
 	 */
-	applyRangeBlock(rangeElement: Element): void;
+	applyBlock(block: Element): void;
 
 	/**
 	 * @description The elements of the "selectedFormats" array are detached from the "rangeElement" element. ("LI" tags are converted to "P" tags)
@@ -64,7 +64,7 @@ class Format extends EditorInterface {
 	 * @param notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
 	 * @returns
 	 */
-	removeRangeBlock(rangeElement: Element, selectedFormats: Element[] | null, newRangeElement: Element | null, remove: boolean, notHistoryPush: boolean): { cc: Node; sc: Node; ec: Node; removeArray: Element[] };
+	removeBlock(rangeElement: Element, selectedFormats: Element[] | null, newRangeElement: Element | null, remove: boolean, notHistoryPush: boolean): { cc: Node; sc: Node; ec: Node; removeArray: Element[] };
 
 	/**
 	 * @description Append all selected format Element to the list and insert.
@@ -176,15 +176,15 @@ class Format extends EditorInterface {
 	isClosureBrLine(element: Node): boolean;
 
 	/**
-	 * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__range_block_xxx")
+	 * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__block_xxx")
 	 * * Range format element is wrap the line element
 	 * @param element The node to check
 	 * @returns
 	 */
-	isRangeBlock(element: Node): boolean;
+	isBlock(element: Node): boolean;
 
 	/**
-	 * @description It is judged whether it is the closure range format element. (TH, TD | class="__se__format__range_block_closure_xxx")
+	 * @description It is judged whether it is the closure range format element. (TH, TD | class="__se__format__block_closure_xxx")
 	 * Closure range format elements is included in the range format element.
 	 *  - Closure range format element is wrap the "format element" and "component"
 	 * ※ You cannot exit this format with the Enter key or Backspace key.
@@ -192,7 +192,7 @@ class Format extends EditorInterface {
 	 * @param element The node to check
 	 * @returns
 	 */
-	isClosureRangeBlock(element: Node): boolean;
+	isClosureBlock(element: Node): boolean;
 }
 
 export default Format;

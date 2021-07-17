@@ -40,14 +40,14 @@ Component.prototype = {
 				const depthFormat = domUtils.getParentElement(
 					r.container,
 					function (current) {
-						return this.format.isRangeBlock(current);
+						return this.format.isBlock(current);
 					}.bind(this)
 				);
 				oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getElementDepth(depthFormat) + 1);
 				if (oNode) formatEl = oNode.previousSibling;
 			}
-			this.selection.insertNode(element, this.format.isRangeBlock(formatEl) ? null : formatEl, false);
-			if (formatEl && unicode.onlyZeroWidthSpace(formatEl)) domUtils.removeItem(formatEl);
+			this.selection.insertNode(element, this.format.isBlock(formatEl) ? null : formatEl, false);
+			if (formatEl && unicode.onlyZeroWidthSpace(formatEl)) domUtils.remove(formatEl);
 		}
 
 		this.selection.setRange(element, 0, element, 0);

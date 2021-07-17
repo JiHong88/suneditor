@@ -201,7 +201,7 @@ export default {
             this.format.applyStyleNode(null, null, ['A'], false);
         } else {
             /** delete */
-            this.util.removeItem(this.context.link._linkAnchor);
+            this.util.remove(this.context.link._linkAnchor);
             this.context.anchor.caller.link.linkAnchor = null;
             this.focus();
 

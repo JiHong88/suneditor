@@ -293,7 +293,7 @@ export default {
         }
         else {
             /** delete */
-            this.util.removeItem(this.context.customLink._linkAnchor);
+            this.util.remove(this.context.customLink._linkAnchor);
             this.context.customLink._linkAnchor = null;
             this.focus();
 

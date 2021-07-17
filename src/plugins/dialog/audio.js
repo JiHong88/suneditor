@@ -211,7 +211,7 @@ export default {
         const focusEl = (container.previousElementSibling || container.nextElementSibling);
 
         const emptyDiv = container.parentNode;
-        this.util.removeItem(container);
+        this.util.remove(container);
         this.plugins.audio.init.call(this);
         this.controllersOff();
 
@@ -468,7 +468,7 @@ export default {
         try {
             if (this.format.isLine(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
-                this.util.removeItem(prevElement);
+                this.util.remove(prevElement);
                 // clean format tag
                 this.util.removeEmptyNode(existElement, null);
                 if (existElement.children.length === 0) existElement.innerHTML = this.util.removeWhiteSpace(existElement.innerHTML);

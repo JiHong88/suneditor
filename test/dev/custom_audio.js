@@ -246,7 +246,7 @@ export default {
         const focusEl = (container.previousElementSibling || container.nextElementSibling);
 
         const emptyDiv = container.parentNode;
-        this.util.removeItem(container);
+        this.util.remove(container);
         this.plugins.customAudio.init.call(this);
         this.controllersOff();
 

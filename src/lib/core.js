@@ -1423,7 +1423,7 @@ Core.prototype = {
                 throw Error('[SUNEDITOR.core.print.fail] error: ' + error);
             } finally {
                 this.closeLoading();
-                domUtils.removeItem(iframe);
+                domUtils.remove(iframe);
             }
         }.bind(this), 1000);
     },
@@ -1543,7 +1543,7 @@ Core.prototype = {
         // element
         if (node.nodeType === 1) {
             if (DisallowedTags(node)) return '';
-            if (!requireFormat || (this.format.isLine(node) || this.format.isRangeBlock(node) || this.component.is(node) || domUtils.isMedia(node) || (domUtils.isAnchor(node) && domUtils.isMedia(node.firstElementChild)))) {
+            if (!requireFormat || (this.format.isLine(node) || this.format.isBlock(node) || this.component.is(node) || domUtils.isMedia(node) || (domUtils.isAnchor(node) && domUtils.isMedia(node.firstElementChild)))) {
                 return node.outerHTML;
             } else {
                 return '<' + defaultTag + '>' + node.outerHTML + '</' + defaultTag + '>';
@@ -1965,8 +1965,8 @@ Core.prototype = {
         this.eventManager._removeAllEvents();
 
         /** remove element */
-        domUtils.removeItem(this.context.element.toolbar);
-        domUtils.removeItem(this.context.element.topArea);
+        domUtils.remove(this.context.element.toolbar);
+        domUtils.remove(this.context.element.topArea);
 
         /** remove object reference */
         for (let k in this.context) {
@@ -2011,7 +2011,7 @@ Core.prototype = {
 
             const nrtag = !domUtils.getParentElement(current, this.format._isNotCheckingNode);
             // empty tags
-            if ((!domUtils.isTable(current) && !domUtils.isListCell(current)) && (this.format.isLine(current) || this.format.isRangeBlock(current) || this.format.isTextStyleNode(current)) && current.childNodes.length === 0 && nrtag) {
+            if ((!domUtils.isTable(current) && !domUtils.isListCell(current)) && (this.format.isLine(current) || this.format.isBlock(current) || this.format.isTextStyleNode(current)) && current.childNodes.length === 0 && nrtag) {
                 emptyTags.push(current);
                 return false;
             }
@@ -2025,7 +2025,7 @@ Core.prototype = {
             // table cells
             if (domUtils.isTableCell(current)) {
                 const fel = current.firstElementChild;
-                if (!this.format.isLine(fel) && !this.format.isRangeBlock(fel) && !this.component.is(fel)) {
+                if (!this.format.isLine(fel) && !this.format.isBlock(fel) && !this.component.is(fel)) {
                     withoutFormatCells.push(current);
                     return false;
                 }
@@ -2033,13 +2033,13 @@ Core.prototype = {
 
             const result = current.parentNode !== documentFragment && nrtag &&
                 ((domUtils.isListCell(current) && !domUtils.isList(current.parentNode)) ||
-                    (lowLevelCheck && (this.format.isLine(current) || this.component.is(current)) && !this.format.isRangeBlock(current.parentNode) && !domUtils.getParentElement(current, this.component.is)));
+                    (lowLevelCheck && (this.format.isLine(current) || this.component.is(current)) && !this.format.isBlock(current.parentNode) && !domUtils.getParentElement(current, this.component.is)));
 
             return result;
         }.bind(this));
 
         for (let i = 0, len = removeTags.length; i < len; i++) {
-            domUtils.removeItem(removeTags[i]);
+            domUtils.remove(removeTags[i]);
         }
 
         const checkTags = [];
@@ -2063,12 +2063,12 @@ Core.prototype = {
         for (let i = 0, len = checkTags.length, t; i < len; i++) {
             t = checkTags[i];
             if (unicode.onlyZeroWidthSpace(t.textContent.trim())) {
-                domUtils.removeItem(t);
+                domUtils.remove(t);
             }
         }
 
         for (let i = 0, len = emptyTags.length; i < len; i++) {
-            domUtils.removeItem(emptyTags[i]);
+            domUtils.remove(emptyTags[i]);
         }
 
         for (let i = 0, len = wrongList.length, t, tp, children, p; i < len; i++) {
@@ -2083,7 +2083,7 @@ Core.prototype = {
             p = t.parentNode;
             if (!p) continue;
             p.insertBefore(tp, t);
-            domUtils.removeItem(t);
+            domUtils.remove(t);
         }
 
         for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {

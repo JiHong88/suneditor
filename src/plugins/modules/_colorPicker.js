@@ -195,7 +195,7 @@ export default {
         temp.style.display = 'none';
         temp.style.color = colorName;
         var colors = this._w.getComputedStyle(this._d.body.appendChild(temp)).color.match(/\d+/g).map(function (a) { return parseInt(a,10); });
-        this.util.removeItem(temp);
+        this.util.remove(temp);
         return (colors.length >= 3) ? '#' + (((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substr(1)) : false;
     }
 };

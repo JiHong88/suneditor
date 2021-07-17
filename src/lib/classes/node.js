@@ -59,7 +59,7 @@ Node.prototype = {
 			if (temp) {
 				if (domUtils.isListCell(newEl) && domUtils.isList(temp) && temp.firstElementChild) {
 					newEl.innerHTML = temp.firstElementChild.innerHTML;
-					domUtils.removeItem(temp.firstElementChild);
+					domUtils.remove(temp.firstElementChild);
 					if (temp.children.length > 0) newEl.appendChild(temp);
 				} else {
 					newEl.appendChild(temp);
@@ -84,7 +84,7 @@ Node.prototype = {
 		if (newEl.childNodes.length > 0) pElement.insertBefore(newEl, depthEl);
 		else newEl = depthEl;
 
-		if (bp.childNodes.length === 0) domUtils.removeItem(bp);
+		if (bp.childNodes.length === 0) domUtils.remove(bp);
 
 		return newEl;
 	},
@@ -157,7 +157,7 @@ Node.prototype = {
 					// merge tag
 					domUtils.copyTagAttributes(child, current);
 					current.parentNode.insertBefore(child, current);
-					domUtils.removeItem(current);
+					domUtils.remove(current);
 				}
 				if (!next) {
 					if (child.nodeType === 1) recursionFunc(child, depth + 1, i);
@@ -234,7 +234,7 @@ Node.prototype = {
 						child.innerHTML += next.innerHTML;
 					}
 
-					domUtils.removeItem(next);
+					domUtils.remove(next);
 					i--;
 				} else if (child.nodeType === 1) {
 					recursionFunc(child, depth + 1, i);
@@ -305,7 +305,7 @@ Node.prototype = {
 						sc: element.previousElementSibling,
 						ec: element.nextElementSibling
 					};
-					domUtils.removeItem(element);
+					domUtils.remove(element);
 					recursionFunc(parent);
 				}
 			}

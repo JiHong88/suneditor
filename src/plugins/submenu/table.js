@@ -538,12 +538,12 @@ export default {
             const children = table.children;
             for (let i = 0; i < children.length; i++) {
                 if (children[i].children.length === 0) {
-                    this.util.removeItem(children[i]);
+                    this.util.remove(children[i]);
                     i--;
                 }
             }
 
-            if (table.children.length === 0) this.util.removeItem(table);
+            if (table.children.length === 0) this.util.remove(table);
         }
     },
 
@@ -763,11 +763,11 @@ export default {
             let removeFirst, removeEnd;
             for (let r = 0, rLen = removeCell.length, row; r < rLen; r++) {
                 row = removeCell[r].parentNode;
-                util.removeItem(removeCell[r]);
+                util.remove(removeCell[r]);
                 if (row.cells.length === 0) {
                     if (!removeFirst) removeFirst = util.getArrayIndex(rows, row);
                     removeEnd = util.getArrayIndex(rows, row);
-                    util.removeItem(row);
+                    util.remove(row);
                 }
             }
 
@@ -991,12 +991,12 @@ export default {
             ch = cell.children;
             for (let c = 0, cLen = ch.length; c < cLen; c++) {
                 if (this.format.isLine(ch[c]) && util.onlyZeroWidthSpace(ch[c].textContent)) {
-                    util.removeItem(ch[c]);
+                    util.remove(ch[c]);
                 }  
             }
 
             mergeHTML += cell.innerHTML;
-            util.removeItem(cell);
+            util.remove(cell);
 
             if (row.cells.length === 0) {
                 if (!emptyRowFirst) emptyRowFirst = row;
@@ -1028,7 +1028,7 @@ export default {
             }
 
             for (let i = 0, len = removeRows.length; i < len; i++) {
-                util.removeItem(removeRows[i]);
+                util.remove(removeRows[i]);
             }
         }
 
@@ -1055,7 +1055,7 @@ export default {
             header.innerHTML = '<tr>' + this.plugins.table.createCells.call(this, 'th', this.context.table._logical_cellCnt, false) + '</tr>';
             table.insertBefore(header, table.firstElementChild);
         } else {
-            util.removeItem(table.querySelector('thead'));
+            util.remove(table.querySelector('thead'));
         }
 
         util.toggleClass(headerButton, 'active');
@@ -1418,7 +1418,7 @@ export default {
                 break;
             case 'remove':
                 const emptyDiv = contextTable._element.parentNode;
-                this.util.removeItem(contextTable._element);
+                this.util.remove(contextTable._element);
                 this.controllersOff();
 
                 if (emptyDiv !== this.context.element.wysiwyg) this.util.removeAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);

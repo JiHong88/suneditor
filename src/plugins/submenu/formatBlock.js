@@ -151,7 +151,7 @@ export default {
 
         if (command === 'range-block') {
             const rangeElement = tag.cloneNode(false);
-            this.format.applyRangeBlock(rangeElement);
+            this.format.applyBlock(rangeElement);
         } else {
             if (command === 'br-line') {
                 this.format.setBrLine();

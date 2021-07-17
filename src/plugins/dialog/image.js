@@ -275,7 +275,7 @@ export default {
         let focusEl = (imageContainer.previousElementSibling || imageContainer.nextElementSibling);
         
         const emptyDiv = imageContainer.parentNode;
-        this.util.removeItem(imageContainer);
+        this.util.remove(imageContainer);
         this.plugins.image.init.call(this);
         this.controllersOff();
 
@@ -737,7 +737,7 @@ export default {
             }
         } else {
             if (contextImage._caption) {
-                this.util.removeItem(contextImage._caption);
+                this.util.remove(contextImage._caption);
                 contextImage._caption = null;
                 modifiedCaption = true;
             }
@@ -760,13 +760,13 @@ export default {
         }
 
         if (isNewContainer) {
-            const existElement = (this.__format.isRangeBlock(contextImage._element.parentNode) || this.util.isWysiwygFrame(contextImage._element.parentNode)) ? 
+            const existElement = (this.format.isBlock(contextImage._element.parentNode) || this.util.isWysiwygFrame(contextImage._element.parentNode)) ? 
                 contextImage._element : 
                 /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.format.getLine(contextImage._element) || contextImage._element;
                 
             if (this.format.isLine(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
-                this.util.removeItem(contextImage._element);
+                this.util.remove(contextImage._element);
                 // clean format tag
                 this.util.removeEmptyNode(existElement, null);
                 if (existElement.children.length === 0) existElement.innerHTML = this.util.removeWhiteSpace(existElement.innerHTML);
@@ -774,7 +774,7 @@ export default {
                 if (this.format.isLine(existElement.parentNode)) {
                     const formats = existElement.parentNode;
                     formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
-                    this.util.removeItem(existElement);
+                    this.util.remove(existElement);
                 } else {
                     existElement.parentNode.replaceChild(container, existElement);
                 }

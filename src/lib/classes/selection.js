@@ -236,7 +236,7 @@ Selection.prototype = {
 			return validation ? validation(current) : this.format.isLine(current);
 		}.bind(this));
 
-		if (!domUtils.isWysiwygFrame(commonCon) && !this.format.isRangeBlock(commonCon))
+		if (!domUtils.isWysiwygFrame(commonCon) && !this.format.isBlock(commonCon))
 			lineNodes.unshift(this.format.getLine(commonCon, null));
 		if (startCon === endCon || lineNodes.length === 1) return lineNodes;
 
@@ -249,8 +249,8 @@ Selection.prototype = {
 			return domUtils.isTable(current) ? /^TABLE$/i.test(current.nodeName) : true;
 		};
 
-		let startRangeEl = this.format.getRangeBlock(startLine, onlyTable);
-		let endRangeEl = this.format.getRangeBlock(endLine, onlyTable);
+		let startRangeEl = this.format.getBlock(startLine, onlyTable);
+		let endRangeEl = this.format.getBlock(endLine, onlyTable);
 		if (domUtils.isTable(startRangeEl) && domUtils.isListCell(startRangeEl.parentNode))
 			startRangeEl = startRangeEl.parentNode;
 		if (domUtils.isTable(endRangeEl) && domUtils.isListCell(endRangeEl.parentNode)) endRangeEl = endRangeEl.parentNode;
@@ -344,7 +344,7 @@ Selection.prototype = {
 
 		const brLine = this.format.getBrLine(this.getNode(), null);
 		const isFormats =
-			(!brLine && (this.format.isLine(oNode) || this.format.isRangeBlock(oNode))) || this.component.is(oNode);
+			(!brLine && (this.format.isLine(oNode) || this.format.isBlock(oNode))) || this.component.is(oNode);
 
 		if (!afterNode && (isFormats || this.component.is(oNode) || domUtils.isMedia(oNode))) {
 			const r = this.removeNode();
@@ -352,7 +352,7 @@ Selection.prototype = {
 				const depthFormat = domUtils.getParentElement(
 					r.container,
 					function (current) {
-						return this.format.isRangeBlock(current) || domUtils.isListCell(current);
+						return this.format.isBlock(current) || domUtils.isListCell(current);
 					}.bind(this)
 				);
 				afterNode = this.node.split(
@@ -432,7 +432,7 @@ Selection.prototype = {
 					if (container && container.childNodes.length === 0 && isFormats) {
 						if (this.format.isLine(container)) {
 							container.innerHTML = "<br>";
-						} else if (this.format.isRangeBlock(container)) {
+						} else if (this.format.isBlock(container)) {
 							container.innerHTML = "<" + this.options.defaultTag + "><br></" + this.options.defaultTag + ">";
 						}
 					}
@@ -481,7 +481,7 @@ Selection.prototype = {
 
 			if (
 				this.format.isLine(oNode) ||
-				this.format.isRangeBlock(oNode) ||
+				this.format.isBlock(oNode) ||
 				(!domUtils.isListCell(parentNode) && this.component.is(oNode))
 			) {
 				const oldParent = parentNode;
@@ -498,18 +498,18 @@ Selection.prototype = {
 						r.container :
 						this.format.getLine(r.container, null) || r.container.parentNode :
 						r.container;
-					const rangeCon = domUtils.isWysiwygFrame(container) || this.format.isRangeBlock(container);
+					const rangeCon = domUtils.isWysiwygFrame(container) || this.format.isBlock(container);
 					parentNode = rangeCon ? container : container.parentNode;
 					afterNode = rangeCon ? null : container.nextSibling;
 				}
 
-				if (oldParent.childNodes.length === 0 && parentNode !== oldParent) domUtils.removeItem(oldParent);
+				if (oldParent.childNodes.length === 0 && parentNode !== oldParent) domUtils.remove(oldParent);
 			}
 
 			if (
 				isFormats &&
 				!brLine &&
-				!this.format.isRangeBlock(parentNode) &&
+				!this.format.isBlock(parentNode) &&
 				!domUtils.isListCell(parentNode) &&
 				!domUtils.isWysiwygFrame(parentNode)
 			) {
@@ -528,11 +528,11 @@ Selection.prototype = {
 			if ((this.format.isLine(oNode) || this.component.is(oNode)) && startCon === endCon) {
 				const cItem = this.format.getLine(commonCon, null);
 				if (cItem && cItem.nodeType === 1 && domUtils.isEmptyLine(cItem)) {
-					domUtils.removeItem(cItem);
+					domUtils.remove(cItem);
 				}
 			}
 
-			if (brLine && (this.format.isLine(oNode) || this.format.isRangeBlock(oNode))) {
+			if (brLine && (this.format.isLine(oNode) || this.format.isBlock(oNode))) {
 				oNode = this._setIntoFreeFormat(oNode);
 			}
 
@@ -548,12 +548,12 @@ Selection.prototype = {
 
 					if (previous && previousText.length > 0) {
 						oNode.textContent = previousText + oNode.textContent;
-						domUtils.removeItem(previous);
+						domUtils.remove(previous);
 					}
 
 					if (next && next.length > 0) {
 						oNode.textContent += nextText;
-						domUtils.removeItem(next);
+						domUtils.remove(next);
 					}
 
 					const newRange = {
@@ -620,7 +620,7 @@ Selection.prototype = {
 				while ((c = domTree[0])) {
 					if (prev && prev.nodeType === 3 && a && a.nodeType === 1 && domUtils.isBreak(c)) {
 						prev = c;
-						domUtils.removeItem(c);
+						domUtils.remove(c);
 						continue;
 					}
 					t = core.insertNode(c, a, false);
@@ -713,7 +713,7 @@ Selection.prototype = {
 			if (childNodes.length === 0) {
 				if (
 					this.format.isLine(commonCon) ||
-					this.format.isRangeBlock(commonCon) ||
+					this.format.isBlock(commonCon) ||
 					domUtils.isWysiwygFrame(commonCon) ||
 					domUtils.isBreak(commonCon) ||
 					domUtils.isMedia(commonCon)
@@ -745,7 +745,7 @@ Selection.prototype = {
 
 		const remove = function (item) {
 			const format = this.format.getLine(item, null);
-			domUtils.removeItem(item);
+			domUtils.remove(item);
 
 			if (domUtils.isListCell(format)) {
 				const list = domUtils.getArrayItem(format.children, domUtils.isList, false);
@@ -895,7 +895,7 @@ Selection.prototype = {
 				}
 
 				let format = this.format.getLine(tempCon, null);
-				if (format === this.format.getRangeBlock(format, null)) {
+				if (format === this.format.getBlock(format, null)) {
 					format = domUtils.createElement(
 						domUtils.getParentElement(tempCon, domUtils.isTableCell) ? "DIV" : this.options.defaultTag
 					);
@@ -940,7 +940,7 @@ Selection.prototype = {
 				}
 
 				let format = this.format.getLine(tempCon, null);
-				if (format === this.format.getRangeBlock(format, null)) {
+				if (format === this.format.getBlock(format, null)) {
 					format = domUtils.createElement(domUtils.isTableCell(format) ? "DIV" : this.options.defaultTag);
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
@@ -953,7 +953,7 @@ Selection.prototype = {
 				tempCon = emptyText;
 				tempOffset = 1;
 				if (onlyBreak && !tempCon.previousSibling) {
-					domUtils.removeItem(endCon);
+					domUtils.remove(endCon);
 				}
 			}
 		}
@@ -977,13 +977,13 @@ Selection.prototype = {
 		const parentNode = oNode.parentNode;
 		let oNodeChildren, lastONode;
 
-		while (this.format.isLine(oNode) || this.format.isRangeBlock(oNode)) {
+		while (this.format.isLine(oNode) || this.format.isBlock(oNode)) {
 			oNodeChildren = oNode.childNodes;
 			lastONode = null;
 
 			while (oNodeChildren[0]) {
 				lastONode = oNodeChildren[0];
-				if (this.format.isLine(lastONode) || this.format.isRangeBlock(lastONode)) {
+				if (this.format.isLine(lastONode) || this.format.isBlock(lastONode)) {
 					this._setIntoFreeFormat(lastONode);
 					if (!oNode.parentNode) break;
 					oNodeChildren = oNode.childNodes;
@@ -993,7 +993,7 @@ Selection.prototype = {
 				parentNode.insertBefore(lastONode, oNode);
 			}
 
-			if (oNode.childNodes.length === 0) domUtils.removeItem(oNode);
+			if (oNode.childNodes.length === 0) domUtils.remove(oNode);
 			oNode = domUtils.createElement("BR");
 			parentNode.insertBefore(oNode, lastONode.nextSibling);
 		}

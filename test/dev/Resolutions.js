@@ -104,7 +104,7 @@ export default {
     onClickRemove: function () {
         const span = this.context.customSubmenu.currentSpan;
         if (span) {
-            this.util.removeItem(span);
+            this.util.remove(span);
             this.context.customSubmenu.currentSpan = null;
 
             this.submenuOff();

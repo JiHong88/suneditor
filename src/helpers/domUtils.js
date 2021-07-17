@@ -122,7 +122,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 						el.textContent = tempText + el.textContent;
 						temp = previous;
 						previous = previous.previousSibling;
-						this.removeItem(temp);
+						this.remove(temp);
 					}
 
 					let next = el.nextSibling;
@@ -132,7 +132,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 						el.textContent += tempText;
 						temp = next;
 						next = next.nextSibling;
-						this.removeItem(temp);
+						this.remove(temp);
 					}
 				}
 
@@ -547,7 +547,7 @@ export function isSameAttributes(a, b) {
  * @description Delete argumenu value element
  * @param {Node} item Node to be remove
  */
-export function removeItem(item) {
+export function remove(item) {
 	if (!item) return;
 	if (typeof item.remove === "function") item.remove();
 	else if (item.parentNode) item.parentNode.removeChild(item);
@@ -815,7 +815,7 @@ const domUtils = {
 	prevIndex: prevIndex,
 	copyTagAttributes: copyTagAttributes,
 	isSameAttributes: isSameAttributes,
-	removeItem: removeItem,
+	remove: remove,
 	changeElement: changeElement,
 	changeTxt: changeTxt,
 	setStyle: setStyle,

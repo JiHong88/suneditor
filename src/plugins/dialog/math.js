@@ -264,7 +264,7 @@ export default {
             this.plugins.dialog.open.call(this, 'math', true);
         } else {
             /** delete */
-            this.util.removeItem(this.context.math._mathExp);
+            this.util.remove(this.context.math._mathExp);
             this.context.math._mathExp = null;
             this.focus();
 
