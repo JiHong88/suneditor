@@ -1099,6 +1099,10 @@ editor.onload = function (core, reload) {
  * core: Core object
  */
 editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e) }
+
+// Copy event.
+// Called before the editor's default event action.
+// If it returns false, it stops without executing the rest of the action.
 /**
  * copy event
  * e: Event object
@@ -1106,6 +1110,10 @@ editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPa
  * core: Core object
  */
 editor.onCopy = function (e, clipboardData, core) { console.log('onCopy', e) }
+
+// Cut event.
+// Called before the editor's default event action.
+// If it returns false, it stops without executing the rest of the action.
 /**
  * cut event
  * e: Event object
@@ -1124,6 +1132,14 @@ editor.onCut = function (e, clipboardData, core) { console.log('onCut', e) }
  * core: Core object
  */
 editor.onDrop = function (e, cleanData, maxCharCount, core) { console.log('onDrop', e) }
+
+// Save event
+// Called just after the save was executed.
+/**
+ * contents Editor content
+ * core: Core object
+ */   
+editor.onSave = function (contents, core) {console.log(contents) };
 
 // Called before the image is uploaded
 // If true is returned, the internal upload process runs normally.
