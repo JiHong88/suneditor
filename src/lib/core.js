@@ -7971,6 +7971,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             context.element.wysiwyg.setAttribute('contenteditable', false);
             core.isDisabled = true;
 
+            /** off menus */
+            core.controllersOff();
+            if (core.notice) core.notice.close.call(core);
+            if (core.modalForm) core.plugins.dialog.close.call(core);
+
             if (options.codeMirrorEditor) {
                 options.codeMirrorEditor.setOption('readOnly', true);
             } else {
