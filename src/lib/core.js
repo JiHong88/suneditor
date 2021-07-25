@@ -7972,6 +7972,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.isDisabled = true;
 
             /** off menus */
+            core.submenuOff();
+            core.moreLayerOff();
+            core.containerOff();
             core.controllersOff();
             if (core.notice) core.notice.close.call(core);
             if (core.modalForm) core.plugins.dialog.close.call(core);
