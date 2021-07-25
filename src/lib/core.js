@@ -4351,7 +4351,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Changes to full screen or default screen
-         * @param {Element} element full screen button
+         * @param {Element|null} element full screen button
          */
         toggleFullScreen: function (element) {
             const topArea = context.element.topArea;
@@ -4406,7 +4406,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 _var.innerHeight_fullScreen = (_w.innerHeight - toolbar.offsetHeight);
                 editorArea.style.height = (_var.innerHeight_fullScreen - options.fullScreenOffset) + 'px';
 
-                util.changeElement(element.firstElementChild, icons.reduction);
+                if (element) util.changeElement(element.firstElementChild, icons.reduction);
 
                 if (options.iframe && options.height === 'auto') {
                     editorArea.style.overflow = 'auto';
@@ -4443,7 +4443,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (!!options.toolbarContainer) util.removeClass(toolbar, 'se-toolbar-balloon');
 
                 event.onScroll_window();
-                util.changeElement(element.firstElementChild, icons.expansion);
+                if (element) util.changeElement(element.firstElementChild, icons.expansion);
 
                 context.element.topArea.style.marginTop = '';
                 util.removeClass(this._styleCommandMap.fullScreen, 'active');
