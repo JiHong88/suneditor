@@ -507,7 +507,7 @@ interface Core {
      * @description Changes to full screen or default screen
      * @param element full screen button
      */
-    toggleFullScreen(element: Element): void;
+    toggleFullScreen(element: Element | null): void;
 
     /**
      * @description Prints the current contents of the editor.
