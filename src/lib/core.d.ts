@@ -221,6 +221,11 @@ interface Core {
     submenuOff(): void;
 
     /**
+     * @description Disable more layer
+     */
+    moreLayerOff(): void;
+
+    /**
      * @description Enabled container
      * @param element Container's button element to call
      */

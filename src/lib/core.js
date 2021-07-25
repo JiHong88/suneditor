@@ -598,6 +598,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Disable more layer
+         */
+        moreLayerOff: function() {
+            if (this._moreLayerActiveButton) {
+                (context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'))).style.display = 'none';
+                util.removeClass(this._moreLayerActiveButton, 'on');
+                this._moreLayerActiveButton = null;
+            }
+        },
+
+        /**
          * @description Enabled container
          * @param {Element} element Container's button element to call
          */
@@ -7935,6 +7946,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.isReadOnly = value;
             
             if (value) {
+                /** off menus */
+                core.submenuOff();
+                core.moreLayerOff();
+                core.containerOff();
+                core.controllersOff();
+                if (core.notice) core.notice.close.call(core);
+                if (core.modalForm) core.plugins.dialog.close.call(core);
+
                 context.element.code.setAttribute("readOnly", "true");
             } else {
                 context.element.code.removeAttribute("readOnly");
