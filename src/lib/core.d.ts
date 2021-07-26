@@ -221,6 +221,11 @@ interface Core {
     submenuOff(): void;
 
     /**
+     * @description Disable more layer
+     */
+    moreLayerOff(): void;
+
+    /**
      * @description Enabled container
      * @param element Container's button element to call
      */
@@ -507,7 +512,7 @@ interface Core {
      * @description Changes to full screen or default screen
      * @param element full screen button
      */
-    toggleFullScreen(element: Element): void;
+    toggleFullScreen(element: Element | null): void;
 
     /**
      * @description Prints the current contents of the editor.
@@ -614,6 +619,18 @@ interface Toolbar {
      * @description Hide the toolbar
      */
     hide(): void;
+}
+
+interface Wysiwyg {
+    /**
+     * @description Disable the wysiwyg area
+     */
+    disabled(): void;
+
+    /**
+     * @description Enable the wysiwyg area
+     */
+    enabled(): void;
 }
 
 type EventFn = (e: Event, core: Core) => void;
@@ -1039,4 +1056,9 @@ export default class SunEditor {
      * @description Toolbar methods
      */
     toolbar: Toolbar;
+
+    /**
+     * @description Wysiwyg methods
+     */
+    wysiwyg: Wysiwyg;
 }
