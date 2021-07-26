@@ -4372,6 +4372,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const code = context.element.code;
             const _var = this._variable;
             this.controllersOff();
+            
+            const wasToolbarHidden = (toolbar.style.display === 'none' || (this._isInline && !this._inlineToolbarAttr.isShow));
 
             if (!_var.isFullScreen) {
                 _var.isFullScreen = true;
@@ -4459,6 +4461,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.topArea.style.marginTop = '';
                 util.removeClass(this._styleCommandMap.fullScreen, 'active');
             }
+
+            if (wasToolbarHidden) functions.toolbar.hide();
 
             // user event
             if (typeof functions.toggleFullScreen === 'function') functions.toggleFullScreen(this._variable.isFullScreen, this);
