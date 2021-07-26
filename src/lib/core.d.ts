@@ -621,6 +621,18 @@ interface Toolbar {
     hide(): void;
 }
 
+interface Wysiwyg {
+    /**
+     * @description Disable the wysiwyg area
+     */
+    disabled(): void;
+
+    /**
+     * @description Enable the wysiwyg area
+     */
+    enabled(): void;
+}
+
 type EventFn = (e: Event, core: Core) => void;
 
 type imageInputInformation = { linkValue: string, linkNewWindow: Window, inputWidth: number, inputHeight: number, align: string, isUpdate: boolean, element: any };
@@ -1044,4 +1056,9 @@ export default class SunEditor {
      * @description Toolbar methods
      */
     toolbar: Toolbar;
+
+    /**
+     * @description Wysiwyg methods
+     */
+    wysiwyg: Wysiwyg;
 }

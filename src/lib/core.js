@@ -7947,11 +7947,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             
             if (value) {
                 /** off menus */
-                core.submenuOff();
-                core.moreLayerOff();
-                core.containerOff();
                 core.controllersOff();
-                if (core.notice) core.notice.close.call(core);
                 if (core.modalForm) core.plugins.dialog.close.call(core);
 
                 context.element.code.setAttribute("readOnly", "true");
@@ -7967,38 +7963,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Disable the suneditor
          */
         disabled: function () {
-            context.tool.cover.style.display = 'block';
-            context.element.wysiwyg.setAttribute('contenteditable', false);
-            core.isDisabled = true;
-
-            /** off menus */
-            core.submenuOff();
-            core.moreLayerOff();
-            core.containerOff();
-            core.controllersOff();
-            if (core.notice) core.notice.close.call(core);
-            if (core.modalForm) core.plugins.dialog.close.call(core);
-
-            if (options.codeMirrorEditor) {
-                options.codeMirrorEditor.setOption('readOnly', true);
-            } else {
-                context.element.code.setAttribute('disabled', 'disabled');
-            }
+            this.toolbar.disabled();
+            this.wysiwyg.disabled();
         },
 
         /**
          * @description Enable the suneditor
          */
         enabled: function () {
-            context.tool.cover.style.display = 'none';
-            context.element.wysiwyg.setAttribute('contenteditable', true);
-            core.isDisabled = false;
-
-            if (options.codeMirrorEditor) {
-                options.codeMirrorEditor.setOption('readOnly', false);
-            } else {
-                context.element.code.removeAttribute('disabled');
-            }
+            this.toolbar.enabled();
+            this.wysiwyg.enabled();
         },
 
         /**
@@ -8056,6 +8030,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
              * @description Disable the toolbar
              */
             disabled: function () {
+                /** off menus */
+                core.submenuOff();
+                core.moreLayerOff();
+                core.containerOff();
+
                 context.tool.cover.style.display = 'block';
             },
 
@@ -8089,7 +8068,44 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     context.element._stickyDummy.style.display = 'none';
                 }
             },
-        }
+        },
+
+        /**
+         * @description Wysiwyg methods
+         */
+         wysiwyg: {
+            /**
+             * @description Disable the wysiwyg area
+             */
+            disabled: function () {
+               /** off menus */
+                core.controllersOff();
+                if (core.modalForm) core.plugins.dialog.close.call(core);
+
+                context.element.wysiwyg.setAttribute('contenteditable', false);
+                core.isDisabled = true;
+
+                if (options.codeMirrorEditor) {
+                    options.codeMirrorEditor.setOption('readOnly', true);
+                } else {
+                    context.element.code.setAttribute('disabled', 'disabled');
+                }
+            },
+
+            /**
+             * @description Enable the wysiwyg area
+             */
+            enabled: function () {
+                context.element.wysiwyg.setAttribute('contenteditable', true);
+                core.isDisabled = false;
+
+                if (options.codeMirrorEditor) {
+                    options.codeMirrorEditor.setOption('readOnly', false);
+                } else {
+                    context.element.code.removeAttribute('disabled');
+                }
+            },
+         }
     };
 
     /************ Core init ************/
