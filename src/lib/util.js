@@ -1700,7 +1700,7 @@ const util = {
 
             const nrtag = !this.getParentElement(current, this.isNotCheckingNode);
             // empty tags
-            if ((!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && nrtag) {
+            if ((!this.isTable(current) && !this.isListCell(current) && !this.isAnchor(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && nrtag) {
                 emptyTags.push(current);
                 return false;
             }

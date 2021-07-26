@@ -4710,7 +4710,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             else v = m.match(this._attributesWhitelistRegExp);
 
             if (!lowLevelCheck || /<a\b/i.test(t)) {
-                const sv = m.match(/id\s*=\s*(?:"|')[^"']*(?:"|')/);
+                const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
                 if (sv) {
                     if (!v) v = [];
                     v.push(sv[0]);
