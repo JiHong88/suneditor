@@ -598,6 +598,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Disable more layer
+         */
+        moreLayerOff: function() {
+            if (this._moreLayerActiveButton) {
+                (context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'))).style.display = 'none';
+                util.removeClass(this._moreLayerActiveButton, 'on');
+                this._moreLayerActiveButton = null;
+            }
+        },
+
+        /**
          * @description Enabled container
          * @param {Element} element Container's button element to call
          */
@@ -7935,6 +7946,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.isReadOnly = value;
             
             if (value) {
+                /** off menus */
+                core.controllersOff();
+                if (core.modalForm) core.plugins.dialog.close.call(core);
+
                 context.element.code.setAttribute("readOnly", "true");
             } else {
                 context.element.code.removeAttribute("readOnly");
@@ -7948,30 +7963,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Disable the suneditor
          */
         disabled: function () {
-            context.tool.cover.style.display = 'block';
-            context.element.wysiwyg.setAttribute('contenteditable', false);
-            core.isDisabled = true;
-
-            if (options.codeMirrorEditor) {
-                options.codeMirrorEditor.setOption('readOnly', true);
-            } else {
-                context.element.code.setAttribute('disabled', 'disabled');
-            }
+            this.toolbar.disabled();
+            this.wysiwyg.disabled();
         },
 
         /**
          * @description Enable the suneditor
          */
         enabled: function () {
-            context.tool.cover.style.display = 'none';
-            context.element.wysiwyg.setAttribute('contenteditable', true);
-            core.isDisabled = false;
-
-            if (options.codeMirrorEditor) {
-                options.codeMirrorEditor.setOption('readOnly', false);
-            } else {
-                context.element.code.removeAttribute('disabled');
-            }
+            this.toolbar.enabled();
+            this.wysiwyg.enabled();
         },
 
         /**
@@ -8029,6 +8030,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
              * @description Disable the toolbar
              */
             disabled: function () {
+                /** off menus */
+                core.submenuOff();
+                core.moreLayerOff();
+                core.containerOff();
+
                 context.tool.cover.style.display = 'block';
             },
 
@@ -8062,7 +8068,44 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     context.element._stickyDummy.style.display = 'none';
                 }
             },
-        }
+        },
+
+        /**
+         * @description Wysiwyg methods
+         */
+         wysiwyg: {
+            /**
+             * @description Disable the wysiwyg area
+             */
+            disabled: function () {
+               /** off menus */
+                core.controllersOff();
+                if (core.modalForm) core.plugins.dialog.close.call(core);
+
+                context.element.wysiwyg.setAttribute('contenteditable', false);
+                core.isDisabled = true;
+
+                if (options.codeMirrorEditor) {
+                    options.codeMirrorEditor.setOption('readOnly', true);
+                } else {
+                    context.element.code.setAttribute('disabled', 'disabled');
+                }
+            },
+
+            /**
+             * @description Enable the wysiwyg area
+             */
+            enabled: function () {
+                context.element.wysiwyg.setAttribute('contenteditable', true);
+                core.isDisabled = false;
+
+                if (options.codeMirrorEditor) {
+                    options.codeMirrorEditor.setOption('readOnly', false);
+                } else {
+                    context.element.code.removeAttribute('disabled');
+                }
+            },
+         }
     };
 
     /************ Core init ************/
