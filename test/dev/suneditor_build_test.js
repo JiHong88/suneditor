@@ -660,6 +660,7 @@ ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
     // ResizeImage(files, uploadHandler)
     
     console.log("infoinfoinfo", info);
+    info.alt = "test-123";
     const response = { // Same format as "videoUploadUrl" response
         "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
     };
@@ -750,7 +751,8 @@ window.sun_getImagesInfo = function () {
 }
 
 window.sun_insertHTML = function (html) {
-    ss.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" /><p>fdafds</p>', true, true, false);
+    // ss.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" /><p>fdafds</p>', true, true, false);
+    ss.setContents("");
     ss.setOptions({
         mathFontSize: [
             {text: '1', value: '1em'},

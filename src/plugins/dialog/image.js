@@ -428,6 +428,7 @@ export default {
             inputHeight: contextImage.inputY.value,
             align: contextImage._align,
             isUpdate: this.context.dialog.updateModal,
+            alt: contextImage._altText,
             element: contextImage._element
         };
 
@@ -480,7 +481,7 @@ export default {
             }
             this.plugins.fileManager.upload.call(this, imageUploadUrl, this.options.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.functions.onImageUploadError);
         } else { // base64
-            this.plugins.image.setup_reader.call(this, files, info.anchor, info.inputWidth, info.inputHeight, info.align, filesLen, info.isUpdate);
+            this.plugins.image.setup_reader.call(this, files, info.anchor, info.inputWidth, info.inputHeight, info.align, info.alt, filesLen, info.isUpdate);
         }
     },
 
@@ -506,14 +507,14 @@ export default {
                 this.plugins.image.update_src.call(this, fileList[i].url, info.element, file);
                 break;
             } else {
-                this.plugins.image.create_image.call(this, fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file);
+                this.plugins.image.create_image.call(this, fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt);
             }
         }
         
         this.closeLoading();
     },
 
-    setup_reader: function (files, anchor, width, height, align, filesLen, isUpdate) {
+    setup_reader: function (files, anchor, width, height, align, alt, filesLen, isUpdate) {
         try {
             this.context.image.base64RenderIndex = filesLen;
             const wFileReader = this._w.FileReader;
@@ -529,7 +530,7 @@ export default {
                     filesStack[index] = { result: reader.result, file: file };
 
                     if (--this.context.image.base64RenderIndex === 0) {
-                        this.plugins.image.onRender_imgBase64.call(this, update, filesStack, updateElement, anchor, width, height, align);
+                        this.plugins.image.onRender_imgBase64.call(this, update, filesStack, updateElement, anchor, width, height, align, alt);
                         this.closeLoading();
                     }
                 }.bind(this, reader, isUpdate, this.context.image._element, file, i);
@@ -542,7 +543,7 @@ export default {
         }
     },
 
-    onRender_imgBase64: function (update, filesStack, updateElement, anchor, width, height, align) {
+    onRender_imgBase64: function (update, filesStack, updateElement, anchor, width, height, align, alt) {
         const updateMethod = this.plugins.image.update_src;
         const createMethod = this.plugins.image.create_image;
         
@@ -552,7 +553,7 @@ export default {
                 this.context.image._element.setAttribute('data-file-size', filesStack[i].file.size);
                 updateMethod.call(this, filesStack[i].result, updateElement, filesStack[i].file);
             } else {
-                createMethod.call(this, filesStack[i].result, anchor, width, height, align, filesStack[i].file);
+                createMethod.call(this, filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt);
             }
         }
     },
@@ -564,7 +565,7 @@ export default {
         try {
             const file = {name: contextImage._v_src._linkValue.split('/').pop(), size: 0};
             if (this.context.dialog.updateModal) this.plugins.image.update_src.call(this, contextImage._v_src._linkValue, contextImage._element, file);
-            else this.plugins.image.create_image.call(this, contextImage._v_src._linkValue, this.plugins.anchor.createAnchor.call(this, contextImage.anchorCtx, true), contextImage.inputX.value, contextImage.inputY.value, contextImage._align, file);
+            else this.plugins.image.create_image.call(this, contextImage._v_src._linkValue, this.plugins.anchor.createAnchor.call(this, contextImage.anchorCtx, true), contextImage.inputX.value, contextImage.inputY.value, contextImage._align, file, contextImage._altText);
         } catch (e) {
             throw Error('[SUNEDITOR.image.URLRendering.fail] cause : "' + e.message + '"');
         } finally {
@@ -638,14 +639,14 @@ export default {
         this.plugins.fileManager.resetInfo.call(this, 'image', this.functions.onImageUpload);
     },
 
-    create_image: function (src, anchor, width, height, align, file) {
+    create_image: function (src, anchor, width, height, align, file, alt) {
         const imagePlugin = this.plugins.image;
         const contextImage = this.context.image;
         this.context.resizing._resize_plugin = 'image';
 
         let oImg = this.util.createElement('IMG');
         oImg.src = src;
-        oImg.alt = contextImage._altText;
+        oImg.alt = alt;
         oImg.setAttribute('data-rotate', '0');
         anchor = imagePlugin.onRender_link.call(this, oImg, anchor);
 
