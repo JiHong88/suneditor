@@ -82,7 +82,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Computed style of the wysiwyg area (window.getComputedStyle(context.element.wysiwyg))
          */
-        wwComputedStyle: _w.getComputedStyle(context.element.wysiwyg),
+        wwComputedStyle: null,
 
         /**
          * @description Notice object
@@ -5089,6 +5089,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._ww = options.iframe ? context.element.wysiwygFrame.contentWindow : _w;
             this._wd = _d;
             this._charTypeHTML = options.charCounterType === 'byte-html';
+            this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
 
             if (!options.iframe && typeof _w.ShadowRoot === 'function') {
                 let child = context.element.wysiwygFrame;
