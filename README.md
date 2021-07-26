@@ -620,6 +620,7 @@ textStyles      : You can apply custom style or class to selected text.
 // Image---------------------------------------------------------------------------------------------------------
 imageResizing   : Can resize the image.                               default: true {Boolean}
 imageHeightShow : Choose whether the image height input is visible.   default: true {Boolean}
+imageAlignShow  : Choose whether the image align radio buttons are visible.       default: true {Boolean}
 imageWidth      : The default width size of the image frame.          default: 'auto' {String}
 imageHeight     : The default height size of the image frame.         default: 'auto' {String}
 imageSizeOnlyPercentage : If true, image size can only be scaled by percentage.   default: false {Boolean}
@@ -674,6 +675,7 @@ imageGalleryHeader: Http Header when get image gallery.         default: null {O
 // Video----------------------------------------------------------------------------------------------------------
 videoResizing   : Can resize the video (iframe, video).                         default: true {Boolean}
 videoHeightShow : Choose whether the video height input is visible.    default: true {Boolean}
+videoAlignShow  : Choose whether the video align radio buttons are visible.       default: true {Boolean}
 videoRatioShow  : Choose whether the video ratio options is visible.   default: true {Boolean}
 videoWidth      : The default width size of the video frame.           default: '100%' {String}
 videoHeight     : The default height size of the video frame.          default: '56.25%' {String}

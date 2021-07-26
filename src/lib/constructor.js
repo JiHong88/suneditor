@@ -466,6 +466,7 @@ export default {
         /** Image */
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageHeightShow = options.imageHeightShow === undefined ? true : !!options.imageHeightShow;
+        options.imageAlignShow = options.imageAlignShow === undefined ? true : !!options.imageAlignShow;
         options.imageWidth = !options.imageWidth ? 'auto' : util.isNumber(options.imageWidth) ? options.imageWidth + 'px' : options.imageWidth;
         options.imageHeight = !options.imageHeight ? 'auto' : util.isNumber(options.imageHeight) ? options.imageHeight + 'px' : options.imageHeight;
         options.imageSizeOnlyPercentage = !!options.imageSizeOnlyPercentage;
@@ -484,6 +485,7 @@ export default {
         /** Video */
         options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
         options.videoHeightShow = options.videoHeightShow === undefined ? true : !!options.videoHeightShow;
+        options.videoAlignShow = options.videoAlignShow === undefined ? true : !!options.videoAlignShow;
         options.videoRatioShow = options.videoRatioShow === undefined ? true : !!options.videoRatioShow;
         options.videoWidth = !options.videoWidth || !util.getNumber(options.videoWidth, 0) ? '' : util.isNumber(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth;
         options.videoHeight = !options.videoHeight || !util.getNumber(options.videoHeight, 0) ? '' : util.isNumber(options.videoHeight) ? options.videoHeight + 'px' : options.videoHeight;

@@ -274,7 +274,8 @@
             <label><input type="checkbox" id="imageResizing" checked>&nbsp;&nbsp;imageResizing</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="imageFileInput" checked>&nbsp;&nbsp;imageFileInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="imageUrlInput" checked>&nbsp;&nbsp;imageUrlInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <label><input type="checkbox" id="imageHeightShow" checked>&nbsp;&nbsp;imageHeightShow</label>
+            <label><input type="checkbox" id="imageHeightShow" checked>&nbsp;&nbsp;imageHeightShow</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="imageAlignShow" checked>&nbsp;&nbsp;imageAlignShow</label>
             <br><br>
             <label><input type="checkbox" id="imageWidth">&nbsp;&nbsp;imageWidth</label>
             <input type="text" id="imageWidth_value" placeholder="String.. (auto)" style="width: 200px">
@@ -316,6 +317,7 @@
             <label><input type="checkbox" id="videoFileInput">&nbsp;&nbsp;videoFileInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="videoUrlInput" checked>&nbsp;&nbsp;videoUrlInput</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="videoHeightShow" checked>&nbsp;&nbsp;videoHeightShow</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label><input type="checkbox" id="videoAlignShow" checked>&nbsp;&nbsp;videoAlignShow</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <label><input type="checkbox" id="videoRatioShow" checked>&nbsp;&nbsp;videoRatioShow</label>
             <br><br>
             <label><input type="checkbox" id="videoWidth">&nbsp;&nbsp;videoWidth</label>
@@ -621,6 +623,7 @@ function sun_create () {
         ],
         imageResizing: document.getElementById('imageResizing').checked ? undefined : false,
         imageHeightShow: document.getElementById('imageHeightShow').checked ? undefined : false,
+        imageAlignShow: document.getElementById('imageAlignShow').checked ? undefined : false,
         imageFileInput: document.getElementById('imageFileInput').checked ? undefined : false,
         imageUrlInput: document.getElementById('imageUrlInput').checked ? undefined : false,
         imageWidth: document.getElementById('imageWidth').checked ? document.getElementById('imageWidth_value').value : undefined,
@@ -636,6 +639,7 @@ function sun_create () {
         imageGalleryHeader: document.getElementById('imageGalleryHeader').checked ? JSON.parse(document.getElementById('imageGalleryHeader_value').value) : undefined,
         videoResizing: document.getElementById('videoResizing').checked ? undefined : false,
         videoHeightShow: document.getElementById('videoHeightShow').checked ? undefined : false,
+        videoAlignShow: document.getElementById('videoAlignShow').checked ? undefined : false,
         videoFileInput: document.getElementById('videoFileInput').checked ? undefined : false,
         videoUrlInput: document.getElementById('videoUrlInput').checked ? undefined : false,
         videoRatioShow: document.getElementById('videoRatioShow').checked ? undefined : false,

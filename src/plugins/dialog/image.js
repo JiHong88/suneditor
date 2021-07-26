@@ -53,6 +53,7 @@ export default {
             _resizing: options.imageResizing,
             _resizeDotHide: !options.imageHeightShow,
             _rotation: options.imageRotation,
+            _alignHide: !options.imageAlignShow,
             _onlyPercentage: options.imageSizeOnlyPercentage,
             _ratio: false,
             _ratioX: 1,
@@ -203,7 +204,7 @@ export default {
                     core.context.anchor.forms.innerHTML +
                 '</div>' +
                 '<div class="se-dialog-footer">' +
-                    '<div>' +
+                    '<div' + (option.imageAlignShow ? '' : ' style="display: none"') + '>' +
                         '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
                         '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
                         '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +

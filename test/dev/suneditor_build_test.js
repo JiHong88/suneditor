@@ -396,6 +396,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // <p>​<strong><span style="color: rgb(255, 94, 0);">SunEditor</span></strong>&nbsp;<em><span style="background-color: rgb(250, 237, 125);">distributed under</span></em>&nbsp;the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a>&nbsp;license.<br>
     // </p>
     // `,
+    imageAlignShow: false,
     plugins: {...{custom_container}, ...plugins},
     katex: Katex,
     codeMirror: CodeMirror,
@@ -655,14 +656,15 @@ function ResizeImage (files, uploadHandler) {
     reader.readAsDataURL(uploadFile);
 }
 
-// ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
-//     // ResizeImage(files, uploadHandler)
+ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
+    // ResizeImage(files, uploadHandler)
     
-//     const response = { // Same format as "videoUploadUrl" response
-//         "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
-//     };
-//     uploadHandler(response);
-// }
+    console.log("infoinfoinfo", info);
+    const response = { // Same format as "videoUploadUrl" response
+        "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
+    };
+    uploadHandler(response);
+}
 
 // ss.onImageUpload = function (targetElement, index, state, info, core) {
 //     console.log('imageInfo-----', info);

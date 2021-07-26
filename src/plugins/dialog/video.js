@@ -51,6 +51,7 @@ export default {
             _resizing: options.videoResizing,
             _resizeDotHide: !options.videoHeightShow,
             _rotation: options.videoRotation,
+            _alignHide: !options.videoAlignShow,
             _onlyPercentage: options.videoSizeOnlyPercentage,
             _ratio: false,
             _ratioX: 1,
@@ -175,7 +176,7 @@ export default {
             html += '' +
                 '</div>' +
                 '<div class="se-dialog-footer">' +
-                    '<div>' +
+                    '<div' + (option.videoAlignShow ? '' : ' style="display: none"') + '>' +
                         '<label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
                         '<label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
                         '<label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
