@@ -646,10 +646,8 @@ export default {
         if (/^video$/i.test(oFrame.nodeName)) this.plugins.video._setTagAttrs.call(this, oFrame);
         else this.plugins.video._setIframeAttrs.call(this, oFrame);
         
-        const existElement = this.util.getParentElement(oFrame, this.util.isMediaComponent) || 
-            this.util.getParentElement(oFrame, function (current) {
-                return this.isWysiwygDiv(current.parentNode);
-            }.bind(this.util));
+        const existElement = (this.util.isRangeFormatElement(oFrame.parentNode) || this.util.isWysiwygDiv(oFrame.parentNode)) ? 
+            oFrame : this.util.getFormatElement(oFrame) || oFrame;
 
         const prevFrame = oFrame;
         contextVideo._element = oFrame = oFrame.cloneNode(true);
@@ -674,7 +672,9 @@ export default {
             if (format) contextVideo._align = format.style.textAlign || format.style.float;
             this.plugins.video.setAlign.call(this, null, oFrame, cover, container);
 
-            if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
+            if (this.util.isListCell(existElement) || this.util.isFormatElement(existElement)) {
+                prevFrame.parentNode.replaceChild(container, prevFrame);
+            } else if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(prevFrame);
                 // clean format tag

@@ -1762,17 +1762,23 @@ const util = {
 
         for (let i = 0, len = wrongList.length, t, tp, children, p; i < len; i++) {
             t = wrongList[i];
-
-            tp = this.createElement('LI');
-            children = t.childNodes;
-            while (children[0]) {
-                tp.appendChild(children[0]);
-            }
-            
             p = t.parentNode;
             if (!p) continue;
-            p.insertBefore(tp, t);
-            this.removeItem(t);
+
+            tp = this.createElement('LI');
+
+            if (this.isFormatElement(t)) {
+                children = t.childNodes;
+                while (children[0]) {
+                    tp.appendChild(children[0]);
+                }
+                p.insertBefore(tp, t);
+                this.removeItem(t);
+            } else {
+                t = t.nextSibling;
+                tp.appendChild(wrongList[i]);
+                p.insertBefore(tp, t);
+            }
         }
 
         for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {

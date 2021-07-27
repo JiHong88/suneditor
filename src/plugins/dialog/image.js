@@ -766,7 +766,9 @@ export default {
                 contextImage._element : 
                 /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
                 
-            if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
+            if (this.util.isListCell(existElement) || this.util.isFormatElement(existElement)) {
+                contextImage._element.parentNode.replaceChild(container, contextImage._element);
+            } else if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(contextImage._element);
                 // clean format tag
