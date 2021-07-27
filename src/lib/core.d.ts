@@ -374,12 +374,12 @@ export interface Toolbar {
 	/**
 	 * @description Disable the toolbar
 	 */
-	disabled(): void;
+	disable(): void;
 
 	/**
 	 * @description Enable the toolbar
 	 */
-	enabled(): void;
+	enable(): void;
 
 	/**
 	 * @description Show the toolbar
@@ -481,12 +481,12 @@ export default class SunEditor {
 	/**
 	 * @description Disable the suneditor
 	 */
-	disabled(): void;
+	disable(): void;
 
 	/**
 	 * @description Enable the suneditor
 	 */
-	enabled(): void;
+	enable(): void;
 
 	/**
 	 * @description Show the suneditor

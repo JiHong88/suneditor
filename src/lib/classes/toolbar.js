@@ -6,8 +6,14 @@
 
 import CoreInterface from "../../interface/_core";
 import Context from "../context";
-import { domUtils, unicode } from "../../helpers";
-import { _w, _d } from "../../helpers/global";
+import {
+	domUtils,
+	unicode
+} from "../../helpers";
+import {
+	_w,
+	_d
+} from "../../helpers/global";
 
 function Toolbar(editor) {
 	CoreInterface.call(this, editor);
@@ -26,14 +32,14 @@ Toolbar.prototype = {
 	/**
 	 * @description Disable the toolbar
 	 */
-	disabled: function () {
+	disable: function () {
 		this.context.buttons.cover.style.display = "block";
 	},
 
 	/**
 	 * @description Enable the toolbar
 	 */
-	enabled: function () {
+	enable: function () {
 		this.context.buttons.cover.style.display = "none";
 	},
 

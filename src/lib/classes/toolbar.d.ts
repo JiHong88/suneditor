@@ -4,12 +4,12 @@ class Toolbar extends EditorInterface {
 	/**
 	 * @description Disable the toolbar
 	 */
-	disabled(): void;
+	disable(): void;
 
 	/**
 	 * @description Enable the toolbar
 	 */
-	enabled(): void;
+	enable(): void;
 
 	/**
 	 * @description Show the toolbar

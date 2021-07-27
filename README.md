@@ -995,10 +995,10 @@ editor.appendContents('append contents');
 editor.readOnly(true || false)
 
 // Disable the suneditor
-editor.disabled();
+editor.disable();
 
 // Enabled the suneditor
-editor.enabled();
+editor.enable();
 
 // Hide the suneditor
 editor.hide();

@@ -1905,7 +1905,7 @@ Core.prototype = {
     /**
      * @description Disable the suneditor
      */
-    disabled: function () {
+    disable: function () {
         this.context.buttons.cover.style.display = 'block';
         this.context.element.wysiwyg.setAttribute('contenteditable', false);
         this.status.isDisabled = true;
@@ -1920,7 +1920,7 @@ Core.prototype = {
     /**
      * @description Enable the suneditor
      */
-    enabled: function () {
+    enable: function () {
         this.context.buttons.cover.style.display = 'none';
         this.context.element.wysiwyg.setAttribute('contenteditable', true);
         this.status.isDisabled = false;
