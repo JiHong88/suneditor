@@ -1029,10 +1029,10 @@ editor.appendContents('append contents');
 editor.readOnly(true || false)
 
 // Disable the suneditor
-editor.disabled();
+editor.disable();
 
-// Enabled the suneditor
-editor.enabled();
+// Enable the suneditor
+editor.enable();
 
 // Hide the suneditor
 editor.hide();
@@ -1044,16 +1044,16 @@ editor.show();
 editor.destroy();
 
 // Toolbar methods
-// Disable the suneditor
-editor.toolbar.disabled();
+// Disable the toolbar
+editor.toolbar.disable();
 
-// Enabled the suneditor
-editor.toolbar.enabled();
+// Enable the toolbar
+editor.toolbar.enable();
 
-// Hide the suneditor
+// Hide the toolbar
 editor.toolbar.hide();
 
-// Show the suneditor
+// Show the toolbar
 editor.toolbar.show();
 
 // Event functions -------------------------------------------------------------------------------------

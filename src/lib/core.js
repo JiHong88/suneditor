@@ -559,7 +559,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
-         * @description Enabled submenu
+         * @description Enable submenu
          * @param {Element} element Submenu's button element to call
          */
         submenuOn: function (element) {
@@ -609,7 +609,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
-         * @description Enabled container
+         * @description Enable container
          * @param {Element} element Container's button element to call
          */
         containerOn: function (element) {
@@ -4372,6 +4372,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const code = context.element.code;
             const _var = this._variable;
             this.controllersOff();
+            
+            const wasToolbarHidden = (toolbar.style.display === 'none' || (this._isInline && !this._inlineToolbarAttr.isShow));
 
             if (!_var.isFullScreen) {
                 _var.isFullScreen = true;
@@ -4459,6 +4461,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.topArea.style.marginTop = '';
                 util.removeClass(this._styleCommandMap.fullScreen, 'active');
             }
+
+            if (wasToolbarHidden) functions.toolbar.hide();
 
             // user event
             if (typeof functions.toggleFullScreen === 'function') functions.toggleFullScreen(this._variable.isFullScreen, this);
@@ -7962,17 +7966,31 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Disable the suneditor
          */
-        disabled: function () {
-            this.toolbar.disabled();
-            this.wysiwyg.disabled();
+        disable: function () {
+            this.toolbar.disable();
+            this.wysiwyg.disable();
+        },
+
+        /**
+         * @description Provided for backward compatibility and will be removed in 3.0.0 version
+         */
+         disabled: function () {
+            this.disable();
         },
 
         /**
          * @description Enable the suneditor
          */
-        enabled: function () {
-            this.toolbar.enabled();
-            this.wysiwyg.enabled();
+        enable: function () {
+            this.toolbar.enable();
+            this.wysiwyg.enable();
+        },
+
+        /**
+         * @description Provided for backward compatibility and will be removed in 3.0.0 version
+         */
+         enabled: function () {
+            this.enable();
         },
 
         /**
@@ -8029,7 +8047,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             /**
              * @description Disable the toolbar
              */
-            disabled: function () {
+            disable: function () {
                 /** off menus */
                 core.submenuOff();
                 core.moreLayerOff();
@@ -8039,10 +8057,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             },
 
             /**
+             * @description Provided for backward compatibility and will be removed in 3.0.0 version
+             */
+            disabled: function () {
+                this.disable();
+            },
+
+            /**
              * @description Enable the toolbar
              */
-            enabled: function () {
+            enable: function () {
                 context.tool.cover.style.display = 'none';
+            },
+
+            /**
+             * @description Provided for backward compatibility and will be removed in 3.0.0 version
+             */
+             enabled: function () {
+                this.enable();
             },
 
             /**
@@ -8077,7 +8109,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             /**
              * @description Disable the wysiwyg area
              */
-            disabled: function () {
+            disable: function () {
                /** off menus */
                 core.controllersOff();
                 if (core.modalForm) core.plugins.dialog.close.call(core);
@@ -8095,7 +8127,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             /**
              * @description Enable the wysiwyg area
              */
-            enabled: function () {
+            enable: function () {
                 context.element.wysiwyg.setAttribute('contenteditable', true);
                 core.isDisabled = false;
 

@@ -210,7 +210,7 @@ interface Core {
     initMenuTarget(pluginName: string, target: Element | null, menu: Element): void;
 
     /**
-     * @description Enabled submenu
+     * @description Enable submenu
      * @param element Submenu's button element to call
      */
     submenuOn(element: Element): void;
@@ -226,7 +226,7 @@ interface Core {
     moreLayerOff(): void;
 
     /**
-     * @description Enabled container
+     * @description Enable container
      * @param element Container's button element to call
      */
     containerOn(element: Element): void;
@@ -603,12 +603,12 @@ interface Toolbar {
     /**
      * @description Disable the toolbar
      */
-    disabled(): void;
+    disable(): void;
 
     /**
      * @description Enable the toolbar
      */
-    enabled(): void;
+    enable(): void;
 
     /**
      * @description Show the toolbar
@@ -625,12 +625,12 @@ interface Wysiwyg {
     /**
      * @description Disable the wysiwyg area
      */
-    disabled(): void;
+    disable(): void;
 
     /**
      * @description Enable the wysiwyg area
      */
-    enabled(): void;
+    enable(): void;
 }
 
 type EventFn = (e: Event, core: Core) => void;
@@ -1030,12 +1030,12 @@ export default class SunEditor {
     /**
      * @description Disable the suneditor
      */
-    disabled(): void;
+    disable(): void;
 
     /**
      * @description Enable the suneditor
      */
-    enabled(): void;
+    enable(): void;
 
     /**
      * @description Show the suneditor
