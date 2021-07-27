@@ -559,7 +559,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
-         * @description Enabled submenu
+         * @description Enable submenu
          * @param {Element} element Submenu's button element to call
          */
         submenuOn: function (element) {
@@ -609,7 +609,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
-         * @description Enabled container
+         * @description Enable container
          * @param {Element} element Container's button element to call
          */
         containerOn: function (element) {
@@ -7966,17 +7966,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Disable the suneditor
          */
-        disabled: function () {
-            this.toolbar.disabled();
-            this.wysiwyg.disabled();
+        disable: function () {
+            this.toolbar.disable();
+            this.wysiwyg.disable();
         },
 
         /**
          * @description Enable the suneditor
          */
-        enabled: function () {
-            this.toolbar.enabled();
-            this.wysiwyg.enabled();
+        enable: function () {
+            this.toolbar.enable();
+            this.wysiwyg.enable();
         },
 
         /**
@@ -8033,7 +8033,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             /**
              * @description Disable the toolbar
              */
-            disabled: function () {
+            disable: function () {
                 /** off menus */
                 core.submenuOff();
                 core.moreLayerOff();
@@ -8045,7 +8045,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             /**
              * @description Enable the toolbar
              */
-            enabled: function () {
+            enable: function () {
                 context.tool.cover.style.display = 'none';
             },
 
@@ -8081,7 +8081,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             /**
              * @description Disable the wysiwyg area
              */
-            disabled: function () {
+            disable: function () {
                /** off menus */
                 core.controllersOff();
                 if (core.modalForm) core.plugins.dialog.close.call(core);
@@ -8099,7 +8099,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             /**
              * @description Enable the wysiwyg area
              */
-            enabled: function () {
+            enable: function () {
                 context.element.wysiwyg.setAttribute('contenteditable', true);
                 core.isDisabled = false;
 
