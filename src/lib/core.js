@@ -7972,11 +7972,25 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Provided for backward compatibility and will be removed in 3.0.0 version
+         */
+         disabled: function () {
+            this.disable();
+        },
+
+        /**
          * @description Enable the suneditor
          */
         enable: function () {
             this.toolbar.enable();
             this.wysiwyg.enable();
+        },
+
+        /**
+         * @description Provided for backward compatibility and will be removed in 3.0.0 version
+         */
+         enabled: function () {
+            this.enable();
         },
 
         /**
@@ -8043,10 +8057,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             },
 
             /**
+             * @description Provided for backward compatibility and will be removed in 3.0.0 version
+             */
+            disabled: function () {
+                this.disable();
+            },
+
+            /**
              * @description Enable the toolbar
              */
             enable: function () {
                 context.tool.cover.style.display = 'none';
+            },
+
+            /**
+             * @description Provided for backward compatibility and will be removed in 3.0.0 version
+             */
+             enabled: function () {
+                this.enable();
             },
 
             /**
