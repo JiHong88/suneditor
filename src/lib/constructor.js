@@ -521,6 +521,8 @@ export default {
         options.linkProtocol = typeof options.linkProtocol === 'string' ? options.linkProtocol : null;
         options.linkRel = Array.isArray(options.linkRel) ? options.linkRel : [];
         options.linkRelDefault = options.linkRelDefault || {};
+        /** HR */
+        // options.hrItems = options.hrItems;
         /** Key actions */
         options.tabDisable = !!options.tabDisable;
         options.shortcutsDisable = Array.isArray(options.shortcutsDisable) ? options.shortcutsDisable : [];

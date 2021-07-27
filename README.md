@@ -795,6 +795,17 @@ linkRelDefault  : Defines default "rel" attributes of anchor tag.   default: {} 
                         check_new_window: 'only:noreferrer noopener'
                     }
 
+// HR----------------------------------------------------------------------------------------------------
+hrItems         : Defines the hr items.
+                  "class" or "style" must be specified.
+                  default: [
+                      {name: lang.toolbar.hr_solid, class: '__se__solid'},
+                      {name: lang.toolbar.hr_dashed, class: '__se__dashed'},
+                      {name: lang.toolbar.hr_dotted, class: '__se__dotted'}
+                  ]
+                  ex) [ {name: "Outset", style: "border-style: outset;"} ]
+
+
 // Key actions----------------------------------------------------------------------------------------------------
 tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {Boolean}
 shortcutsDisable: You can disable shortcuts.    default: [] {Array}

@@ -425,6 +425,11 @@
             <span>&nbsp;check_new_window: 'noreferrer noopener',</span>
             <span>&nbsp;check_bookmark: 'bookmark'</span>
             <span>}</span>
+
+            <br>
+            <h4 style="color: #b94a48;">--HR</h4>
+            <label><input type="checkbox" id="hrItems">&nbsp;&nbsp;hrItems</label>
+            <span>[ {name: "Outset", style: "border-style: outset;"} ]</span>
             
             <br>
             <h4 style="color: #b94a48;">--Key actions</h4>
@@ -670,6 +675,7 @@ function sun_create () {
         audioTagAttrs: document.getElementById('audioTagAttrs').checked ? JSON.parse(document.getElementById('audioTagAttrs_value').value) : undefined,
         audioAccept: document.getElementById('audioAccept').checked ? document.getElementById('audioAccept_value').value : undefined,
         tableCellControllerPosition: document.getElementById('tableCellControllerPosition').checked ? document.getElementById('tableCellControllerPosition_value').value : undefined,
+        hrItems: document.getElementById('hrItems').checked ? [ {name: "Outset", style: "border-style: outset;"} ] : undefined,
         tabDisable: document.getElementById('tabDisable').checked,
         linkProtocol: document.getElementById('linkProtocol').checked ? document.getElementById('linkProtocol_value').value : undefined,
         linkRel: document.getElementById('linkRel').checked ? ['author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'] : undefined,

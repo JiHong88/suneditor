@@ -472,6 +472,14 @@ export interface SunEditorOptions {
      */
     linkRelDefault?: {default?: string; check_new_window?: string; check_bookmark?: string;};
     /**
+     * HR
+     * =====
+     */
+    // Defines the hr items.
+    // "class" or "style" must be specified. 
+    // EX) [{name: "solid", class: "__se__xxx", style: "border-style: outset;"}]
+    hrItems?: { name: string; class?: string; style?: string }[];
+    /**
      * Key actions
      * =====
      */
