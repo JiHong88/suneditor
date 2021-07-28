@@ -415,6 +415,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         commandMap: null,
 
         /**
+         * @description CSS properties related to style tags 
+         * @private
+         */
+        _commandMapStyles: {
+            STRONG: ['font-weight'],
+            U: ['text-decoration'],
+            EM: ['font-style'],
+            DEL: ['text-decoration']
+        },
+
+        /**
          * @description Style button related to edit area
          * @property {Element} fullScreen fullScreen button element
          * @property {Element} showBlocks showBlocks button element
@@ -3998,7 +4009,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             return {
                 ancestor: pNode,
                 container: container,
-                offset: offset
+                offset: container.nodeType === 1 && offset === 1 ? container.childNodes.length : offset
             };
         },
 
@@ -4161,7 +4172,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         removeNode = 'SUB';
                     }
 
-                    this.nodeChange(cmd, null, [removeNode], false);
+                    this.nodeChange(cmd, this._commandMapStyles[command] || null, [removeNode], false);
                     this.focus();
             }
         },
