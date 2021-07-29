@@ -4017,7 +4017,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         const layer = context.element.toolbar.querySelector('.' + command);
                         if (layer) {
                             if (this._moreLayerActiveButton) this.moreLayerOff();
-                            
+
                             this._moreLayerActiveButton = target;
                             layer.style.display = 'block';
 
@@ -7951,9 +7951,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         readOnly: function (value) {
             core.isReadOnly = value;
             
+            util.setDisabledButtons(!!value, core.resizingDisabledButtons);
+
             if (value) {
                 /** off menus */
                 core.controllersOff();
+                if (core.submenuActiveButton && core.submenuActiveButton.disabled) core.submenuOff();
+                if (core._moreLayerActiveButton && core._moreLayerActiveButton.disabled) core.moreLayerOff();
+                if (core.containerActiveButton && core.containerActiveButton.disabled) core.containerOff();
                 if (core.modalForm) core.plugins.dialog.close.call(core);
 
                 context.element.code.setAttribute("readOnly", "true");
@@ -7961,7 +7966,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.code.removeAttribute("readOnly");
             }
 
-            util.setDisabledButtons(!!value, core.resizingDisabledButtons);
             if (options.codeMirrorEditor) options.codeMirrorEditor.setOption('readOnly', !!value);
         },
 
