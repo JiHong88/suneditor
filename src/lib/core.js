@@ -7619,9 +7619,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             context.element = newContext.element;
             context.tool = newContext.tool;
             if (options.iframe) context.element.wysiwyg = core._wd.body;
-            core._cachingButtons();
-            core.history._resetCachingButton();
-
+            
             core.activePlugins = [];
             const oldCallButtons = pluginCallButtons;
             pluginCallButtons = newToolbar.pluginCallButtons;
@@ -7640,7 +7638,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
+            core._cachingButtons();
+            core.history._resetCachingButton();
+
             if (core.hasFocus) event._applyTagEffects();
+
+            if (core.isReadOnly) util.setDisabledButtons(true, core.resizingDisabledButtons);
 
             if (core._variable.isCodeView) util.addClass(core._styleCommandMap.codeView, 'active');
             if (core._variable.isFullScreen) util.addClass(core._styleCommandMap.fullScreen, 'active');
