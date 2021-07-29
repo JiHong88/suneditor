@@ -602,7 +602,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         moreLayerOff: function() {
             if (this._moreLayerActiveButton) {
-                (context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'))).style.display = 'none';
+                const layer = context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
+                layer.style.display = 'none';
                 util.removeClass(this._moreLayerActiveButton, 'on');
                 this._moreLayerActiveButton = null;
             }
@@ -4011,19 +4012,27 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         actionCall: function (command, display, target) {
             // call plugins
             if (display) {
-                if (/more/i.test(display) && target !== this._moreLayerActiveButton) {
-                    const layer = context.element.toolbar.querySelector('.' + command);
-                    if (layer) {
-                        if (this._moreLayerActiveButton) {
-                            (context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'))).style.display = 'none';
-                            util.removeClass(this._moreLayerActiveButton, 'on');
+                if (/more/i.test(display)) {
+                    if (target !== this._moreLayerActiveButton) {
+                        const layer = context.element.toolbar.querySelector('.' + command);
+                        if (layer) {
+                            if (this._moreLayerActiveButton) this.moreLayerOff();
+                            
+                            this._moreLayerActiveButton = target;
+                            layer.style.display = 'block';
+
+                            event._showToolbarBalloon();
+                            event._showToolbarInline();
                         }
                         util.addClass(target, 'on');
-                        this._moreLayerActiveButton = target;
-                        layer.style.display = 'block';
+                    } else {
+                        const layer = context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
+                        if (layer) {
+                            this.moreLayerOff();
 
-                        event._showToolbarBalloon();
-                        event._showToolbarInline();
+                            event._showToolbarBalloon();
+                            event._showToolbarInline();
+                        }        
                     }
                     return;
                 }
@@ -4050,17 +4059,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 this.commandHandler(target, command);
             }
 
-            if (/more/i.test(display)) {
-                const layer = context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
-                if (layer) {
-                    util.removeClass(this._moreLayerActiveButton, 'on');
-                    this._moreLayerActiveButton = null;
-                    layer.style.display = 'none';
-
-                    event._showToolbarBalloon();
-                    event._showToolbarInline();
-                }
-            } else if (/submenu/.test(display)) {
+            if (/submenu/.test(display)) {
                 this.submenuOff();
             } else if (!/command/.test(display)) {
                 this.submenuOff();
