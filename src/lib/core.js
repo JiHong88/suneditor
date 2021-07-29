@@ -4839,8 +4839,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             
             const domTree = dom.childNodes;
             let cleanHTML = '';
-            for (let i = 0, len = domTree.length; i < len; i++) {
-                cleanHTML += this._makeLine(domTree[i], true);
+            for (let i = 0, t, p; i < domTree.length; i++) {
+                t = domTree[i];
+                if (!util.isFormatElement(t)) {
+                    if (!p) p = util.createElement(options.defaultTag);
+                    p.appendChild(t);
+                    i--;
+                    if (domTree[i + 1] && !util.isFormatElement(domTree[i + 1])) {
+                        continue;
+                    } else {
+                        t = p;
+                        p = null;
+                    }
+                }
+                cleanHTML += this._makeLine(t, true);
             }
 
             if (cleanHTML.length === 0) return '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
