@@ -35,7 +35,7 @@
             strike: 'Barré',
             subscript: 'Indice',
             superscript: 'Exposant',
-            removeFormat: 'Éffacer  le Formatage',
+            removeFormat: 'Effacer le formatage',
             fontColor: 'Couleur du texte',
             hiliteColor: 'Couleur en arrière plan',
             indent: 'Indenter',
@@ -57,13 +57,13 @@
             math: 'Math',
             image: 'Image',
             video: 'Video',
-            audio: 'l\'audio',
+            audio: 'Audio',
             fullScreen: 'Plein écran',
             showBlocks: 'Voir les blocs',
             codeView: 'Voir le code',
             undo: 'Annuler',
             redo: 'Rétablir',
-            preview: 'Previsualiser',
+            preview: 'Prévisualiser',
             print: 'Imprimer',
             tag_p: 'Paragraphe',
             tag_div: 'Normal (DIV)',
@@ -90,7 +90,7 @@
                 title: 'Math',
                 inputLabel: 'Notation mathématique',
                 fontSizeLabel: 'Taille',
-                previewLabel: 'Previsualiser'
+                previewLabel: 'Prévisualiser'
             },
             imageBox: {
                 title: 'Insérer une image',
@@ -99,12 +99,12 @@
                 altText: 'Texte Alternatif'
             },
             videoBox: {
-                title: 'Insérer une Vidéo',
+                title: 'Insérer une vidéo',
                 file: 'Sélectionner le fichier',
                 url: 'URL d’intégration du média, YouTube/Vimeo'
             },
             audioBox: {
-                title: 'Insertar une l\'audio',
+                title: 'Insérer un fichier audio',
                 file: 'Sélectionner le fichier',
                 url: 'Adresse URL du fichier'
             },
@@ -123,7 +123,7 @@
             center: 'Centré',
             width: 'Largeur',
             height: 'Hauteur',
-            size: 'La taille',
+            size: 'Taille',
             ratio: 'Rapport'
         },
         controller: {
@@ -159,7 +159,7 @@
             bordered: 'Ligne de démarcation',
             neon: 'Néon',
             translucent: 'Translucide',
-            shadow: 'L\'ombre',
+            shadow: 'Ombre',
             code: 'Code'
         }
     };
