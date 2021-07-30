@@ -7600,7 +7600,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onResizeEditor: null,
 
         /**
-         * @description Called after the "setToolbarButtons" invokation.
+         * @description Called after the "setToolbarButtons" invocation.
          * Can be used to tweak buttons properties (useful for custom buttons)
          * @param {Array} buttonList Button list 
          * @param {Object} core Core object

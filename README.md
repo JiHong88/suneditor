@@ -1295,7 +1295,7 @@ editor.onResizeEditor = function (height, prevHeight, core) {
     console.log(`height: ${height}, prevHeight: ${prevHeight}`)
 }
 
-// Called after the "setToolbarButtons" invokation
+// Called after the "setToolbarButtons" invocation
 // Can be used to tweak buttons properties (useful for custom buttons)
 /**
  * buttonList: buttonList array 

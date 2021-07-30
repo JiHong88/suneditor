@@ -901,7 +901,7 @@ export default class SunEditor {
     onResizeEditor: (height: number, prevHeight: number, core: Core) => {};
 
     /**
-     * @description Called after the "setToolbarButtons" invokation.
+     * @description Called after the "setToolbarButtons" invocation.
      * Can be used to tweak buttons properties (useful for custom buttons)
      * @param buttonList Button list 
      * @param core Core object
