@@ -552,6 +552,21 @@ const util = {
     },
 
     /**
+     * @description Check if an array contains an element 
+     * @param {Array|HTMLCollection|NodeList} array element array
+     * @param {Node} element The element to check for
+     * @returns {Boolean}
+     */
+    arrayIncludes: function(array, element) {
+        for (let i = 0; i < array.length; i++) {
+            if (array[i] === element) {
+                return true;
+            }
+        }
+        return false;
+    },
+
+    /**
      * @description Get the index of the argument value in the element array
      * @param {Array|HTMLCollection|NodeList} array element array
      * @param {Node} element The element to find index

@@ -4042,7 +4042,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     return;
                 } 
                 
-                if (this.isReadOnly) return;
+                if (this.isReadOnly && util.arrayIncludes(this.resizingDisabledButtons, target)) return;
                 if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
                     this.callPlugin(command, this.submenuOn.bind(this, target), target);
                     return;
