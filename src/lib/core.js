@@ -7600,6 +7600,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onResizeEditor: null,
 
         /**
+         * @description Called after the "setToolbarButtons" invocation.
+         * Can be used to tweak buttons properties (useful for custom buttons)
+         * @param {Array} buttonList Button list 
+         * @param {Object} core Core object
+         */
+        onSetToolbarButtons: null,
+
+        /**
          * @description Reset the buttons on the toolbar. (Editor is not reloaded)
          * You cannot set a new plugin for the button.
          * @param {Array} buttonList Button list 
@@ -7627,17 +7635,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             pluginCallButtons = newToolbar.pluginCallButtons;
             let plugin, button, oldButton;
             for (let key in pluginCallButtons) {
-                if (!util.hasOwn(pluginCallButtons, key)) continue;
-                plugin = plugins[key];
-                button = pluginCallButtons[key];
-                if (plugin.active && button) {
-                    oldButton = oldCallButtons[key];
-                    core.callPlugin(key, null, oldButton || button);
-                    if (oldButton) {
-                        button.parentElement.replaceChild(oldButton, button);
-                        pluginCallButtons[key] = oldButton;
+                if (util.hasOwn(pluginCallButtons, key)) {
+                    plugin = plugins[key];
+                    button = pluginCallButtons[key];
+                    if (plugin.active && button) {
+                        oldButton = oldCallButtons[key];
+                        core.callPlugin(key, null, oldButton || button);
+                        if (oldButton) {
+                            button.parentElement.replaceChild(oldButton, button);
+                            pluginCallButtons[key] = oldButton;
+                        }
                     }
                 }
+                
+                if (context[key]) context[key].targetButton = pluginCallButtons[key];
             }
 
             if (core.hasFocus) event._applyTagEffects();
@@ -7645,6 +7656,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (core._variable.isCodeView) util.addClass(core._styleCommandMap.codeView, 'active');
             if (core._variable.isFullScreen) util.addClass(core._styleCommandMap.fullScreen, 'active');
             if (util.hasClass(context.element.wysiwyg, 'se-show-block')) util.addClass(core._styleCommandMap.showBlocks, 'active');
+
+            if (typeof functions.onSetToolbarButtons === 'function') functions.onSetToolbarButtons(buttonList, core);
         },
 
         /**
