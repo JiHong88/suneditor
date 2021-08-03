@@ -419,7 +419,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * Used primarily to save and recover button states after the toolbar re-creation
          * Updates each "_cachingButtons()" invokation  
          */
-         allCommandButtons: null,
+        allCommandButtons: null,
 
         /**
          * @description Style button related to edit area
