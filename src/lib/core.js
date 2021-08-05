@@ -417,7 +417,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Contains pairs of all "data-commands" and "elements" setted in toolbar over time
          * Used primarily to save and recover button states after the toolbar re-creation
-         * Updates each "_cachingButtons()" invokation  
+         * Updates each "_cachingButtons()" invocation  
          */
         allCommandButtons: null,
 
@@ -485,7 +485,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!this.allCommandButtons) this.allCommandButtons = {};
 
             const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]');
-            for (let i = 0, element, command; i < currentButtons.length; i++){
+            for (let i = 0, element, command; i < currentButtons.length; i++) {
                 element = currentButtons[i];
                 command = element.getAttribute('data-command');
 

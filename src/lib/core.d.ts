@@ -183,7 +183,7 @@ interface Core {
     /**
      * @description Contains pairs of all "data-commands" and "elements" setted in toolbar over time
      * Used primarily to save and recover button states after the toolbar re-creation
-     * Updates each "_cachingButtons()" invokation  
+     * Updates each "_cachingButtons()" invocation  
      */
     allCommandButtons: Record<string, Element>;
 
