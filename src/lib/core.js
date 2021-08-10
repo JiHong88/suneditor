@@ -7606,10 +7606,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         setToolbarButtons: function (buttonList) {
             core.submenuOff();
             core.containerOff();
+            core.moreLayerOff();
             
             const newToolbar = _Constructor._createToolBar(_d, buttonList, core.plugins, options);
             _responsiveButtons = newToolbar.responsiveButtons;
-            core._moreLayerActiveButton = null;
             event._setResponsiveToolbar();
 
             context.element.toolbar.replaceChild(newToolbar._buttonTray, context.element._buttonTray);
