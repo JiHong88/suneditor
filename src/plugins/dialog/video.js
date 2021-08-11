@@ -219,8 +219,6 @@ export default {
     },
 
     _setTagAttrs: function (element) {
-        element.setAttribute('controls', true);
-
         const attrs = this.options.videoTagAttrs;
         if (!attrs) return;
 
