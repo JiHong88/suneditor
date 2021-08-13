@@ -562,9 +562,10 @@ interface Core {
     /**
      * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
      * @param html WYSIWYG element (context.element.wysiwyg) or HTML string.
+     * @param comp If true, does not line break and indentation of tags.
      * @returns 
      */
-    convertHTMLForCodeView(html: Element | string): string;
+    convertHTMLForCodeView(html: Element | string, comp?: boolean): string;
 
     /**
      * @description Add an event to document.

@@ -4355,7 +4355,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _setEditorDataToCodeView: function () {
-            const codeContents = this.convertHTMLForCodeView(context.element.wysiwyg);
+            const codeContents = this.convertHTMLForCodeView(context.element.wysiwyg, false);
             let codeValue = '';
 
             if (options.fullPage) {
@@ -4608,7 +4608,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 // history stack
                 this.history.push(false);
             } else {
-                const value = this.convertHTMLForCodeView(convertValue);
+                const value = this.convertHTMLForCodeView(convertValue, false);
                 this._setCodeView(value);
             }
         },
@@ -4629,7 +4629,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Object}
          */
         getContents: function (onlyContents) {
-            const contents = context.element.wysiwyg.innerHTML;
+            const contents = this.convertHTMLForCodeView(context.element.wysiwyg, true);
             const renderHTML = util.createElement('DIV');
             renderHTML.innerHTML = contents;
 
@@ -4864,31 +4864,33 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         /**
          * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
          * @param {Element|String} html WYSIWYG element (context.element.wysiwyg) or HTML string.
+         * @param {Boolean} comp If true, does not line break and indentation of tags.
          * @returns {String}
          */
-        convertHTMLForCodeView: function (html) {
+        convertHTMLForCodeView: function (html, comp) {
             let returnHTML = '';
             const wRegExp = _w.RegExp;
             const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
             const wDoc = typeof html === 'string' ? _d.createRange().createContextualFragment(html) : html;
             const isFormat = function (current) { return this.isFormatElement(current) || this.isComponent(current); }.bind(util);
+            const br = comp ? '' : '\n';
 
-            let indentSize = this._variable.codeIndent * 1;
+            let indentSize = comp ? 0 : this._variable.codeIndent * 1;
             indentSize = indentSize > 0 ? new _w.Array(indentSize + 1).join(' ') : '';
 
             (function recursionFunc (element, indent, lineBR) {
                 const children = element.childNodes;
-                const elementRegTest = brReg.test(element.nodeName);
+                const elementRegTest = comp || brReg.test(element.nodeName);
                 const elementIndent = (elementRegTest ? indent : '');
 
                 for (let i = 0, len = children.length, node, br, nodeRegTest, tag, tagIndent; i < len; i++) {
                     node = children[i];
                     nodeRegTest = brReg.test(node.nodeName);
-                    br = nodeRegTest ? '\n' : '';
-                    lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? '\n' : '';
+                    br = nodeRegTest ? br : '';
+                    lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? br : '';
 
                     if (node.nodeType === 8) {
-                        returnHTML += '\n<!-- ' + node.textContent.trim() + ' -->' + br;
+                        returnHTML += br + '<!--' + node.textContent + '-->' + br;
                         continue;
                     }
                     if (node.nodeType === 3) {
@@ -4896,7 +4898,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         continue;
                     }
                     if (node.childNodes.length === 0) {
-                        returnHTML += (/^HR$/i.test(node.nodeName) ? '\n' : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + node.outerHTML + br;
+                        returnHTML += (/^HR$/i.test(node.nodeName) ? br : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + node.outerHTML + br;
                         continue;
                     }
 
@@ -4907,12 +4909,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         tagIndent = elementIndent || nodeRegTest ? indent : '';
                         returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
                         recursionFunc(node, indent + indentSize, '');
-                        returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? '\n' : '' || /^(TH|TD)$/i.test(node.nodeName) ? '\n' : '');
+                        returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? br : '' || /^(TH|TD)$/i.test(node.nodeName) ? br : '');
                     }
                 }
-            }(wDoc, '', '\n'));
+            }(wDoc, '', br));
 
-            return returnHTML.trim() + '\n';
+            return returnHTML.trim() + br;
         },
 
         /**
@@ -7955,7 +7957,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     wysiwyg.appendChild(children[i]);
                 }
             } else {
-                core._setCodeView(core._getCodeView() + '\n' + core.convertHTMLForCodeView(convertValue));
+                core._setCodeView(core._getCodeView() + '\n' + core.convertHTMLForCodeView(convertValue, false));
             }
 
             // history stack
