@@ -1086,7 +1086,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!selection) return null;
             let range = null;
             let selectionNode = null;
-
             if (selection.rangeCount > 0) {
                 range = selection.getRangeAt(0);
             } else {
@@ -1099,9 +1098,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (util.isWysiwygDiv(range.commonAncestorContainer)) selectionNode = range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
                 else selectionNode = range.commonAncestorContainer;
             } else {
-                selectionNode = selection.extentNode || selection.anchorNode;
+                selectionNode = selection.anchorNode;
             }
-
             this._variable._selectionNode = selectionNode;
         },
 
@@ -1314,8 +1312,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (startIdx === null) startIdx = 0;
             if (endIdx === null) endIdx = lineNodes.length - 1;
-
-            return lineNodes.slice(startIdx, endIdx + 1);
+            return lineNodes.slice(startIdx, endIdx);
         },
 
         /**
@@ -4149,6 +4146,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
                 default : // 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'..
                     command = this._defaultCommand[command.toLowerCase()] || command;
+                    
                     if (!this.commandMap[command]) this.commandMap[command] = target;
 
                     const nodesMap = this._variable.currentNodesMap;
@@ -5548,6 +5546,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         _applyTagEffects: function () {
             let selectionNode = core.getSelectionNode();
+            console.log("_applyTagEffects",{selectionNode})
             if (selectionNode === core.effectNode) return;
             core.effectNode = selectionNode;
 
@@ -5701,6 +5700,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         onClick_wysiwyg: function (e) {
             const targetElement = e.target;
+            console.log({targetElement})
 
             if (core.isReadOnly) {
                 e.preventDefault();
