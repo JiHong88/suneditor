@@ -269,7 +269,7 @@ declare interface util {
      * @param {Node} element The element to find index
      * @returns {Boolean}
      */
-     arrayIncludes(array: any[] | HTMLCollection | NodeList, element: Node): boolean;
+    arrayIncludes(array: any[] | HTMLCollection | NodeList, element: Node): boolean;
 
     /**
      * @description Get the index of the argument value in the element array
