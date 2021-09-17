@@ -1174,15 +1174,32 @@ const util = {
     },
 
     /**
+     * @description Checks if element can't be easily enabled
+     * @param {Element} element Element to check for
+     */
+    isImportantDisabled: function (element) {
+        return element.hasAttribute('data-important-disabled');
+    },
+
+    /**
      * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
      * core.codeViewDisabledButtons (An array of buttons whose class name is not "se-code-view-enabled")
      * core.resizingDisabledButtons (An array of buttons whose class name is not "se-resizing-enabled")
      * @param {Boolean} disabled Disabled value
      * @param {Array|HTMLCollection|NodeList} buttonList Button array
+     * @param {Boolean} important If priveleged mode should be used (Necessary to switch importantDisabled buttons)
      */
-    setDisabledButtons: function (disabled, buttonList) {
+    setDisabledButtons: function (disabled, buttonList, important) {
         for (let i = 0, len = buttonList.length; i < len; i++) {
-            buttonList[i].disabled = disabled;
+            let button = buttonList[i];
+            if (important || !this.isImportantDisabled(button)) button.disabled = disabled;
+            if (important) {
+                if (disabled) { 
+                    button.setAttribute('data-important-disabled', '');
+                } else {
+                    button.removeAttribute('data-important-disabled');
+                }
+            }
         }
     },
 

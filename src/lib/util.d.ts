@@ -535,13 +535,20 @@ declare interface util {
     toggleClass(element: Element, className: string): boolean | undefined;
 
     /**
+     * @description Checks if element can't be easily enabled
+     * @param {Element} element Element to check for
+     */
+    isImportantDisabled(element: Element): boolean;
+
+    /**
      * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
      * core.codeViewDisabledButtons (An array of buttons whose class name is not "se-code-view-enabled")
      * core.resizingDisabledButtons (An array of buttons whose class name is not "se-resizing-enabled")
      * @param disabled Disabled value
      * @param buttonList Button array
+     * @param important If priveleged mode should be used (Necessary to switch importantDisabled buttons)
      */
-    setDisabledButtons(disabled: boolean, buttonList: Element[] | HTMLCollection | NodeList): void;
+    setDisabledButtons(disabled: boolean, buttonList: Element[] | HTMLCollection | NodeList, important: Boolean): void;
 
     /**
      * @description Delete argumenu value element
