@@ -4241,7 +4241,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             util.setDisabledButtons(!isCodeView, this.codeViewDisabledButtons);
 
             if (isCodeView) {
-                this._setCodeDataToEditor();
+                if (!util.isNonEditable(context.element.wysiwygFrame)) this._setCodeDataToEditor();
                 context.element.wysiwygFrame.scrollTop = 0;
                 context.element.code.style.display = 'none';
                 context.element.wysiwygFrame.style.display = 'block';
@@ -4267,8 +4267,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 util.removeClass(this._styleCommandMap.codeView, 'active');
 
                 // history stack
-                this.history.push(false);
-                this.history._resetCachingButton();
+                if (!util.isNonEditable(context.element.wysiwygFrame)) {
+                    this.history.push(false);
+                    this.history._resetCachingButton();
+                }
             } else {
                 this._setEditorDataToCodeView();
                 this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
