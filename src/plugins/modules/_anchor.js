@@ -121,12 +121,12 @@ export default {
     on: function (contextAnchor, update) {
         if (!update) {
             this.plugins.anchor.init.call(this, contextAnchor);
-            contextAnchor.anchorText.value = this.getSelection().toString();
+            contextAnchor.anchorText.value = this.getSelection().toString().trim();
         } else if (contextAnchor.linkAnchor) {
             this.context.dialog.updateModal = true;
             const href = contextAnchor.linkAnchor.href;
             contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = /\#.+$/.test(href) ? href.substr(href.lastIndexOf('#')) : href;
-            contextAnchor.anchorText.value = contextAnchor.linkAnchor.textContent.trim() || contextAnchor.linkAnchor.getAttribute('alt');
+            contextAnchor.anchorText.value = contextAnchor.linkAnchor.textContent || contextAnchor.linkAnchor.getAttribute('alt');
             contextAnchor.newWindowCheck.checked = (/_blank/i.test(contextAnchor.linkAnchor.target) ? true : false);
             contextAnchor.downloadCheck.checked = contextAnchor.linkAnchor.download;
         }
