@@ -1473,9 +1473,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (formatEl && util.onlyZeroWidthSpace(formatEl)) util.removeItem(formatEl);
             }
 
-            this.setRange(element, 0, element, 0);
-
             if (!notSelect) {
+                this.setRange(element, 0, element, 0);
+                
                 const fileComponentInfo = this.getFileComponent(element);
                 if (fileComponentInfo) {
                     this.selectComponent(fileComponentInfo.target, fileComponentInfo.pluginName);
@@ -4095,6 +4095,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 case 'paste':
                     break;
                 case 'selectAll':
+                    this.containerOff();
                     const wysiwyg = context.element.wysiwyg;
                     let first = util.getChildElement(wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false) || wysiwyg.firstChild;
                     let last = util.getChildElement(wysiwyg.lastChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true) || wysiwyg.lastChild;
@@ -4331,7 +4332,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
                 }
 
-                this._wd.head.innerHTML = parseDocument.head.innerHTML;
+                let headers = parseDocument.head.innerHTML;
+                if (!parseDocument.head.querySelector('link[rel="stylesheet"]') || (this.options.height === 'auto' && !parseDocument.head.querySelector('style'))) {
+                    headers += util._setIframeCssTags(this.options);
+                }
+
+                this._wd.head.innerHTML = headers;
                 this._wd.body.innerHTML = this.convertContentsForEditor(parseDocument.body.innerHTML);
 
                 const attrs = parseDocument.body.attributes;
@@ -4731,6 +4737,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (tAttr) v = m.match(tAttr);
             else v = m.match(this._attributesWhitelistRegExp);
 
+            // anchor
             if (!lowLevelCheck || /<a\b/i.test(t)) {
                 const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
                 if (sv) {
@@ -4739,12 +4746,36 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
+            // span
             if ((!lowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
                 const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (sv) {
                     if (!v) v = [];
                     v.push(sv[0]);
                 }
+            }
+
+            // img
+            if (!lowLevelCheck || /<img/i.test(t)) {
+                let w = '', h = '';
+                const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
+                if (!v) v = [];
+                if (sv) {
+                    w = sv[0].match(/width:(.+);/);
+                    w = util.getNumber(w ? w[1] : '', -1) || '';
+                    h = sv[0].match(/height:(.+);/);
+                    h = util.getNumber(h ? h[1] : '', -1) || '';
+                } 
+                
+                if (!w || !h) {
+                    const avw = m.match(/width\s*=\s*((?:"|')[^"']*(?:"|'))/);
+                    const avh = m.match(/height\s*=\s*((?:"|')[^"']*(?:"|'))/);
+                    if (avw || avh) {
+                        w = !w ? util.getNumber(avw ? avw[1] : '') || '' : w;
+                        h = !h ? util.getNumber(avh ? avh[1] : '') || '' : h;
+                    }
+                }
+                v.push('data-origin="' + (w + ',' + h) + '"');
             }
 
             if (v) {
@@ -4873,24 +4904,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
             const wDoc = typeof html === 'string' ? _d.createRange().createContextualFragment(html) : html;
             const isFormat = function (current) { return this.isFormatElement(current) || this.isComponent(current); }.bind(util);
-            const br = comp ? '' : '\n';
+            const brChar = comp ? '' : '\n';
 
             let indentSize = comp ? 0 : this._variable.codeIndent * 1;
             indentSize = indentSize > 0 ? new _w.Array(indentSize + 1).join(' ') : '';
 
-            (function recursionFunc (element, indent, lineBR) {
+            (function recursionFunc (element, indent) {
                 const children = element.childNodes;
-                const elementRegTest = comp || brReg.test(element.nodeName);
+                const elementRegTest = brReg.test(element.nodeName);
                 const elementIndent = (elementRegTest ? indent : '');
 
-                for (let i = 0, len = children.length, node, br, nodeRegTest, tag, tagIndent; i < len; i++) {
+                for (let i = 0, len = children.length, node, br, lineBR, nodeRegTest, tag, tagIndent; i < len; i++) {
                     node = children[i];
                     nodeRegTest = brReg.test(node.nodeName);
-                    br = nodeRegTest ? br : '';
-                    lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? br : '';
+                    br = nodeRegTest ? brChar : '';
+                    lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? brChar : '';
 
                     if (node.nodeType === 8) {
-                        returnHTML += br + '<!--' + node.textContent + '-->' + br;
+                        returnHTML += '\n<!-- ' + node.textContent.trim() + ' -->' + br;
                         continue;
                     }
                     if (node.nodeType === 3) {
@@ -4898,7 +4929,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         continue;
                     }
                     if (node.childNodes.length === 0) {
-                        returnHTML += (/^HR$/i.test(node.nodeName) ? br : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + node.outerHTML + br;
+                        returnHTML += (/^HR$/i.test(node.nodeName) ? brChar : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + node.outerHTML + br;
                         continue;
                     }
 
@@ -4909,12 +4940,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         tagIndent = elementIndent || nodeRegTest ? indent : '';
                         returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
                         recursionFunc(node, indent + indentSize, '');
-                        returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? br : '' || /^(TH|TD)$/i.test(node.nodeName) ? br : '');
+                        returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? brChar : '' || /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
                     }
                 }
-            }(wDoc, '', br));
+            }(wDoc, ''));
 
-            return returnHTML.trim() + br;
+            return returnHTML.trim() + brChar;
         },
 
         /**
@@ -5348,7 +5379,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let focusNode, offset, format;
 
             const fileComponent = util.getParentElement(commonCon, util.isComponent);
-            if (fileComponent && !util.isTable(fileComponent)) return;
+            if (fileComponent && !util.isTable(fileComponent)) {
+                return;
+            } else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-se-embed') === 'true') {
+                let el = commonCon.nextElementSibling;
+                if (!util.isFormatElement(el)) el = this.appendFormatTag(commonCon, options.defaultTag);
+                this.setRange(el.firstChild, 0, el.firstChild, 0);
+                return;
+            }
+
             if ((util.isRangeFormatElement(startCon) || util.isWysiwygDiv(startCon)) && (util.isComponent(startCon.children[range.startOffset]) || util.isComponent(startCon.children[range.startOffset - 1]))) return;
             if (util.getParentElement(commonCon, util.isNotCheckingNode)) return null;
 

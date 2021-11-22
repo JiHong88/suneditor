@@ -416,8 +416,8 @@ export default {
         options.toolbarContainer = typeof options.toolbarContainer === 'string' ? document.querySelector(options.toolbarContainer) : options.toolbarContainer;
         options.stickyToolbar = (/balloon/i.test(options.mode) || !!options.toolbarContainer) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);
         options.fullScreenOffset = options.fullScreenOffset === undefined ? 0 : (/^\d+/.test(options.fullScreenOffset) ? util.getNumber(options.fullScreenOffset, 0) : 0);
-        options.iframe = options.fullPage || options.iframe;
         options.fullPage = !!options.fullPage;
+        options.iframe = options.fullPage || !!options.iframe;
         options.iframeAttributes = options.iframeAttributes || {};
         options.iframeCSSFileName = options.iframe ? typeof options.iframeCSSFileName === 'string' ? [options.iframeCSSFileName] : (options.iframeCSSFileName || ['suneditor']) : null;
         options.previewTemplate = typeof options.previewTemplate === 'string' ? options.previewTemplate : null;

@@ -98,7 +98,7 @@
         checkInfo: function (pluginName, tagNames, uploadEventHandler, modifyHandler, resizing) {
             let tags = [];
             for (let i = 0, len = tagNames.length; i < len; i++) {
-                tags = tags.concat([].slice.call(this.context.element.wysiwyg.getElementsByTagName(tagNames[i])));
+                tags = tags.concat([].slice.call(this.context.element.wysiwyg.querySelectorAll(tagNames[i] + ':not([data-se-embed="true"])')));
             }
 
             const fileManagerPlugin = this.plugins.fileManager;

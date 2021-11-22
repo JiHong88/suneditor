@@ -20,6 +20,27 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import CodeMirror from 'codemirror';
 
+console.log("pluginf???", plugins);
+plugins.fontSize.pickup = function (e){
+    console.log("font----------size", this)
+    if (!/^BUTTON$/i.test(e.target.tagName)) return false;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const value = "20px";
+
+    if (value) {
+        const newNode = this.util.createElement('SPAN');
+        newNode.style.fontSize = value;
+        this.nodeChange(newNode, ['font-size'], null, null);
+    } else {
+        this.nodeChange(null, ['font-size'], ['span'], true);
+    }
+
+    this.submenuOff();
+}
+
 
 // import 'katex/dist/katex.min.css';
 import Katex from 'katex';
@@ -537,13 +558,15 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     attributesWhitelist: {'details': 'open'},  // html5 <details open="">..</details>
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     buttonList: complexEditor,
+    // fullPage: true,
+    defaultStyle: "font-weight: bold;"
     // buttonList: [['custom_container']]
 });
 
 // ss.setContents("")
 // ss.setContents('fsafsa')
 ss.onload = function (core) {
-    console.log('onload', core.context.video._infoList);
+    console.log('_editorStyles', core.options.defaultStyle);
     // core.focus();
 };
 ss.onScroll = function (e) {
@@ -657,16 +680,16 @@ function ResizeImage (files, uploadHandler) {
     reader.readAsDataURL(uploadFile);
 }
 
-ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
-    // ResizeImage(files, uploadHandler)
+// ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
+//     // ResizeImage(files, uploadHandler)
     
-    console.log("infoinfoinfo", info);
-    info.alt = "test-123";
-    const response = { // Same format as "videoUploadUrl" response
-        "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
-    };
-    uploadHandler(response);
-}
+//     console.log("infoinfoinfo", info);
+//     info.alt = "test-123";
+//     const response = { // Same format as "videoUploadUrl" response
+//         "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
+//     };
+//     uploadHandler(response);
+// }
 
 // ss.onImageUpload = function (targetElement, index, state, info, core) {
 //     console.log('imageInfo-----', info);
@@ -846,81 +869,57 @@ const editor = suneditor.init({
 });
 
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
-    lang: lang.ko,
-    // mode: 'inline',
-    // value: `<p>111</p>
-
-    // <p>222</p>
-    
-    // <p>333</p>
-    
-    // <hr class="__se__solid">
-    
-    // <p>444</p>
-    
-    // <p>555</p>
-    
-    // <p>666<br>
-    // </p>
-    // `,
-    previewTemplate: `
-    <h1>Preview Template</h1>
-    {{ contents }}
-    <div style="background: #ccc;">Footer</div>`,
-    // toolbarWidth: 150,
-    attributesWhitelist: {'all': 'style'},
-    plugins: plugins,
-    fontSize: fs,
-    // maxHeight: '400px',
-    katex: Katex,
-    height: '700px',
-    defaultStyle: 'height: 500px; font-size:10px;',
-    imageGalleryUrl: 'http://localhost:3000/editor/gallery',
-    // height: 400,
-    fontSizeUnit: 'pt',
-    imageResizing: true,
-    // imageWidth: '400',
-    buttonList: complexEditor,
-    icons: {
-        underline: '',
-        strike: '',
-        caption: ''
-    },
-    templates: [
-        {
-            name: 'template1',
-            html: '<p>fdkjslfjdslkf</p>'
-        },
-        {
-            name: 'templeeeeeeeeeeeeeate2',
-            html: '<p><strong>11111</strong></p>'
-        },
-        {
-            name: 'template3',
-            html: '<p><u>22222</u></p>'
-        }
+    buttonList: [
+        ['undo', 'redo'],
+        ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
+        ['bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
+        ['removeFormat'],
+        ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save'],
+        ['-right', ':r-More Rich-default.more_plus', 'horizontalRule', 'list', 'table'],
+        ['-right', 'image', 'video', 'audio', 'link'],
+        // (min-width: 992)
+        ['%1100', [
+            ['undo', 'redo'],
+            ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
+            ['bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
+            ['removeFormat'],
+            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
+            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
+        ]],
+        ['%870', [
+            ['undo', 'redo'],
+            ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
+            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
+            ['removeFormat'],
+            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
+            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
+        ]],
+        ['%660', [
+            ['undo', 'redo'],
+            [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
+            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
+            ['removeFormat'],
+            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
+            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
+        ]],
+        ['%335', [
+            ['undo', 'redo'],
+            [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
+            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat'],
+            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
+            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
+        ]],
     ],
-    callBackSave: function (contents) {
-        alert(contents)
-    },
-    formats: ['h1', 'p', 'blockquote', {
-        tag: 'div',
-        class: '__se__format__aaa',
-        name: 'custom div',
-        command: 'replace'
-    }],
-    // iframe: true,
-    // fullPage: true,
-    // mode: 'balloon',
-    codeMirror: CodeMirror,
-    // codeMirror: {
-    //     src: CodeMirror,
-    //     options: {
-    //         mode: 'xml'
-    //     }
-    // },
-    // placeholder: 'Start typing something.3..'
-    // imageUploadSizeLimit: 30000
+    plugins: plugins,
+    minHeight : 300,
+    charCounter: true,
+    font: [
+        'Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact',
+        'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'
+    ],
+    iframe: true,
+    fullPage: true,
+    imageMultipleFile: true
 });
 
 s2.onResizeEditor = (height, prevHeight, core) => {
@@ -1103,9 +1102,10 @@ window.setImageList = function () {
     imageTable.innerHTML = list;
 }
 
-s2.onload = function (core, isUpdate) {
-    console.log('2222onload222', isUpdate)
+s2.onload = (core, isUpdate) => {
 }
+
+s2.onBlur = () => {console.log("ff?!?!?!?!?")}
 
 s2.onImageUpload = function (targetElement, index, state, imageInfo, remainingFilesCount) {
     console.log('imageInfo', imageInfo);
