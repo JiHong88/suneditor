@@ -28,8 +28,6 @@
         _checkMediaComponent: function (tag) {
             if (/IMG/i.test(tag)) {
                 return !/FIGURE/i.test(tag.parentElement.nodeName) || !/FIGURE/i.test(tag.parentElement.parentElement.nodeName);
-            } else if (/VIDEO/i.test(tag)) {
-                return !/FIGURE/i.test(tag.parentElement.nodeName);
             }
             return true;
         },
