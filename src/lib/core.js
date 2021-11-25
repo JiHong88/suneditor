@@ -36,7 +36,7 @@ import Toolbar from "./classes/toolbar";
 import ClassesInterface from "../interface/_classes";
 
 /**
- * @description SunEditor constuctor function.
+ * @description SunEditor constructor function.
  * @param {Object} context
  * @param {Object} pluginCallButtons
  * @param {Object} plugins 
@@ -148,7 +148,7 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this.container = null;
 
     /**
-     * @description current subment name
+     * @description current submenu name
      * @private
      */
     this._submenuName = "";
@@ -973,7 +973,7 @@ Core.prototype = {
             }
 
             if (/container/.test(display) && (this._menuTray[command] === null || target !== this.containerActiveButton)) {
-                this.containerOn(target)
+                this.containerOn(target);
                 return;
             }
 
@@ -1312,7 +1312,7 @@ Core.prototype = {
             _var.innerHeight_fullScreen = (this._w.innerHeight - toolbar.offsetHeight);
             editorArea.style.height = (_var.innerHeight_fullScreen - this.options.fullScreenOffset) + 'px';
 
-            if (this._styleCommandMap.fullScreen) domUtils.changeElement(this._styleCommandMap.fullScreen.firstElementChild, icons.reduction);
+            if (this._styleCommandMap.fullScreen) domUtils.changeElement(this._styleCommandMap.fullScreen.firstElementChild, this.icons.reduction);
 
             if (this.options.iframe && this.options.height === 'auto') {
                 editorArea.style.overflow = 'auto';
@@ -1349,7 +1349,7 @@ Core.prototype = {
             if (!!this.options.toolbarContainer) domUtils.removeClass(toolbar, 'se-toolbar-balloon');
 
             this.toolbar._resetSticky();
-            if (this._styleCommandMap.fullScreen) domUtils.changeElement(this._styleCommandMap.fullScreen.firstElementChild, icons.expansion);
+            if (this._styleCommandMap.fullScreen) domUtils.changeElement(this._styleCommandMap.fullScreen.firstElementChild, this.icons.expansion);
 
             this.context.element.topArea.style.marginTop = '';
             domUtils.removeClass(this._styleCommandMap.fullScreen, 'active');
@@ -1469,7 +1469,7 @@ Core.prototype = {
                 '<head>' +
                 '<meta charset="utf-8" />' +
                 '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-                '<title>' + lang.toolbar.preview + '</title>' +
+                '<title>' + this.lang.toolbar.preview + '</title>' +
                 linkHTML +
                 '</head>' +
                 '<body class="' + (this.options._printClass !== null ? this.options._printClass : this.options._editableClass) + '" style="margin:10px auto !important; height:auto !important; outline:1px dashed #ccc;">' + contentsHTML + '</body>' +
@@ -1779,14 +1779,14 @@ Core.prototype = {
         }
 
         if (cons.plugins) {
-            this.plugins = plugins = cons.plugins;
+            this.plugins = cons.plugins;
         }
 
         // reset context
         if (el._menuTray.children.length === 0) this._menuTray = {};
         this.toolbar._responsiveButtons = cons.toolbar.responsiveButtons;
         this.options = mergeOptions; //@todo option, lang.. dont't reset
-        this.lang = lang = this.options.lang;
+        this.lang = this.options.lang;
 
         if (this.options.iframe) {
             el.wysiwygFrame.addEventListener('load', function () {
@@ -2393,7 +2393,7 @@ Core.prototype = {
      * @private
      */
     _setOptionsInit: function (el, _initHTML) {
-        this.context = context = Context(el.originElement, this._getConstructed(el)); //@todo context don't reset
+        this.context = Context(el.originElement, this._getConstructed(el)); //@todo context don't reset
         this._componentsInfoReset = true;
         this._editorInit(true, _initHTML);
     },
@@ -2459,7 +2459,7 @@ Core.prototype = {
     },
 
     Constructor: Core
-}
+};
 
 /**
  * @description Object for managing submenu elements
