@@ -5075,9 +5075,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (activePlugins.indexOf(key) > -1) {
                     plugins[key].active.call(this, null);
                 } else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
-                    if (!this.isReadOnly) commandMap.OUTDENT.setAttribute('disabled', true);
+                    if (!util.isImportantDisabled(commandMap.OUTDENT)) commandMap.OUTDENT.setAttribute('disabled', true);
                 } else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
-                    if (!this.isReadOnly) commandMap.INDENT.removeAttribute('disabled');
+                    if (!util.isImportantDisabled(commandMap.INDENT)) commandMap.INDENT.removeAttribute('disabled');
                 } else {
                     util.removeClass(commandMap[key], 'active');
                 }
@@ -5583,9 +5583,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
                 }
 
-                if (!core.isReadOnly && util.isFormatElement(element)) {
+                if (util.isFormatElement(element)) {
                     /* Outdent */
-                    if (commandMapNodes.indexOf('OUTDENT') === -1 && commandMap.OUTDENT) {
+                    if (commandMapNodes.indexOf('OUTDENT') === -1 && commandMap.OUTDENT && !util.isImportantDisabled(commandMap.OUTDENT)) {
                         if (util.isListCell(element) || (element.style[marginDir] && util.getNumber(element.style[marginDir], 0) > 0)) {
                             commandMapNodes.push('OUTDENT');
                             commandMap.OUTDENT.removeAttribute('disabled');
@@ -5593,7 +5593,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     /* Indent */
-                    if (commandMapNodes.indexOf('INDENT') === -1 && commandMap.INDENT) {
+                    if (commandMapNodes.indexOf('INDENT') === -1 && commandMap.INDENT && !util.isImportantDisabled(commandMap.INDENT)) {
                         commandMapNodes.push('INDENT');
                         if (util.isListCell(element) && !element.previousElementSibling) {
                             commandMap.INDENT.setAttribute('disabled', true);
@@ -7961,7 +7961,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.code.removeAttribute("readOnly");
             }
 
-            util.setDisabledButtons(!!value, core.resizingDisabledButtons);
+            util.setDisabledButtons(!!value, core.resizingDisabledButtons, true);
             if (options.codeMirrorEditor) options.codeMirrorEditor.setOption('readOnly', !!value);
         },
 
