@@ -1002,7 +1002,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             selection.addRange(range);
-            this._editorRange();
+            this._rangeInfo(range, this.getSelection());
             if (options.iframe) this.nativeFocus();
 
             return range;
@@ -1096,7 +1096,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const selection = this.getSelection();
             if (!selection) return null;
             let range = null;
-            let selectionNode = null;
 
             if (selection.rangeCount > 0) {
                 range = selection.getRangeAt(0);
@@ -1104,6 +1103,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 range = this._createDefaultRange();
             }
 
+            if (util.isFormatElement(range.endContainer) && range.endOffset === 0) {
+                range = this.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.length);
+            }
+
+            this._rangeInfo(range, selection);
+        },
+
+        _rangeInfo: function (range, selection) {
+            let selectionNode = null;
             this._variable._range = range;
 
             if (range.collapsed) {
@@ -2734,7 +2742,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 for (let i = endLength - 1, newRange; i > 0; i--) {
                     newNode = appendNode.cloneNode(false);
                     newRange = this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, end.container);
-                    if (newRange.endContainer) {
+                    if (newRange.endContainer && newRange.ancestor.contains(newRange.endContainer)) {
                         end.ancestor = null;
                         end.container = newRange.endContainer;
                     }
