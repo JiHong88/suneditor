@@ -33,13 +33,13 @@ export interface SunEditorOptions {
      */
     addTagsWhitelist?: string;
     /**
-     * Whitelist of tags when pasting.
-     */
-    pasteTagsWhitelist?: string;
-    /**
      * Blacklist of the editor default tags.
      */
     tagsBlacklist?: string;
+    /**
+     * Whitelist of tags when pasting.
+     */
+    pasteTagsWhitelist?: string;
     /**
      * Blacklist of tags when pasting.
      */
@@ -47,7 +47,11 @@ export interface SunEditorOptions {
     /**
      * Add attributes whitelist of tags that should be kept undeleted from the editor.
      */
-    attributesWhitelist?: Record<string, string>;
+    attributesWhitelist?: Record<string, string | '*'>;
+    /**
+     * Add attribute blacklist of tags that should be deleted in editor.
+     */
+    attributesBlacklist?: Record<string, string | '*'>;
     /**
      * Layout
      * ======

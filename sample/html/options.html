@@ -93,6 +93,12 @@
             <span>&nbsp;&nbsp;all: 'style',</span><br>
             <span>&nbsp;&nbsp;input: 'checked'</span><br>
             <span>}</span>
+            <br><br>
+            <label><input type="checkbox" id="attributesBlacklist">&nbsp;&nbsp;attributesBlacklist</label><br>
+            <span>{</span><br>
+            <span>&nbsp;&nbsp;all: 'data-test',</span><br>
+            <span>&nbsp;&nbsp;input: 'name'</span><br>
+            <span>}</span>
             <br>
             
             <h4 style="color: #b94a48;">--Layout</h4>
@@ -579,6 +585,10 @@ function sun_create () {
         attributesWhitelist: !document.getElementById('attributesWhitelist').checked ? undefined : {
             'all': 'style',
             'input': 'checked'
+        },
+        attributesBlacklist: !document.getElementById('attributesBlacklist').checked ? undefined : {
+            'all': 'data-test',
+            'input': 'name'
         },
         mode: modeSelect.options[modeSelect.selectedIndex].value,
         rtl: document.getElementById('rtl').checked,

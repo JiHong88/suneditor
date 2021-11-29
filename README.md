@@ -397,11 +397,11 @@ historyStackDelayTime : When recording the history stack, this is the delay time
 // _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
-// _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
-pasteTagsWhitelist    : Whitelist of tags when pasting.                     default: _editorTagsWhitelist {String}
-                        ex) 'p|h1|h2|h3'
 tagsBlacklist         : Blacklist of the editor default tags.               default: null {String}
                         ex) 'h1|h2'
+// _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist - tagsBlacklist
+pasteTagsWhitelist    : Whitelist of tags when pasting.                     default: _editorTagsWhitelist {String}
+                        ex) 'p|h1|h2|h3'
 pasteTagsBlacklist    : Blacklist of tags when pasting.                     default: null {String}
                         ex) 'h1|h2'
 attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}
@@ -411,6 +411,13 @@ attributesWhitelist   : Add attributes whitelist of tags that should be kept und
                         ex) {
                             'all': 'style|data-.+', // Apply to all tags
                             'input': 'checked|name' // Apply to input tag
+                            '???': '*' // "*" === all attributes
+                        }
+attributesBlacklist   : Add attribute blacklist of tags that should be deleted in editor.   default: null {Object}
+                        ex) {
+                            'all': 'id', // Apply to all tags
+                            'input': 'style' // Apply to input tag
+                            '???': '*' // "*" === all attributes
                         }
 // Layout-------------------------------------------------------------------------------------------------------
 mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {String}

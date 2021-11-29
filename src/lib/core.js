@@ -262,10 +262,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _attributesWhitelistRegExp: null,
 
         /**
+         * @description Attributes blacklist used by the cleanHTML method
+         * @private
+         */
+        _attributesBlacklistRegExp: null,
+
+        /**
          * @description Attributes of tags whitelist used by the cleanHTML method
          * @private
          */
         _attributesTagsWhitelist: null,
+
+        /**
+         * @description Attributes of tags blacklist used by the cleanHTML method
+         * @private
+         */
+        _attributesTagsBlacklist: null,
 
         /**
          * @description binded controllersOff method
@@ -4733,8 +4745,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
 
             let v = null;
-            const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z0-9\-]+/)[0].toLowerCase()];
-            if (tAttr) v = m.match(tAttr);
+            const tagName = t.match(/(?!<)[a-zA-Z0-9\-]+/)[0].toLowerCase();
+
+            // blacklist
+            const bAttr = this._attributesTagsBlacklist[tagName];
+            if (bAttr) m = m.replace(bAttr, '');
+            else m = m.replace(this._attributesBlacklistRegExp, '');
+
+            // whitelist
+            const wAttr = this._attributesTagsWhitelist[tagName];
+            if (wAttr) v = m.match(wAttr);
             else v = m.match(this._attributesWhitelistRegExp);
 
             // anchor
@@ -4756,7 +4776,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             // img
-            if (!lowLevelCheck || /<img/i.test(t)) {
+            if (/<img/i.test(t)) {
                 let w = '', h = '';
                 const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (!v) v = [];
@@ -5177,23 +5197,44 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|<!--|-->'));
             this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(options.pasteTagsWhitelist);
 
+            // whitelist
             const regEndStr = '\\s*=\\s*(\")[^\"]*\\1';
-            const _attr = options.attributesWhitelist;
-            const tagsAttr = {};
+            const getAttrs = function (str, str2) { return str === '*' ? '[a-z-]+' : (str + '|' + str2); };
+            
+            const _wAttr = options.attributesWhitelist;
+            let tagsAttr = {};
             let allAttr = '';
-            if (!!_attr) {
-                for (let k in _attr) {
-                    if (!util.hasOwn(_attr, k) || /^on[a-z]+$/i.test(_attr[k])) continue;
+            if (!!_wAttr) {
+                for (let k in _wAttr) {
+                    if (!util.hasOwn(_wAttr, k) || /^on[a-z]+$/i.test(_wAttr[k])) continue;
                     if (k === 'all') {
-                        allAttr = _attr[k] + '|';
+                        allAttr = getAttrs(_wAttr[k], defaultAttr);
                     } else {
-                        tagsAttr[k] = new wRegExp('(?:' + _attr[k] + '|' + defaultAttr + ')' + regEndStr, 'ig');
+                        tagsAttr[k] = new wRegExp('\\s(?:' + getAttrs(_wAttr[k], '') + ')' + regEndStr, 'ig');
+                    }
+                }
+            }
+            
+            this._attributesWhitelistRegExp = new wRegExp('\\s(?:' + (allAttr || defaultAttr) + ')' + regEndStr, 'ig');
+            this._attributesTagsWhitelist = tagsAttr;
+
+            // blacklist
+            const _bAttr = options.attributesBlacklist;
+            tagsAttr = {};
+            allAttr = '';
+            if (!!_bAttr) {
+                for (let k in _bAttr) {
+                    if (!util.hasOwn(_bAttr, k)) continue;
+                    if (k === 'all') {
+                        allAttr = getAttrs(_bAttr[k], '');
+                    } else {
+                        tagsAttr[k] = new wRegExp('\\s(?:' + getAttrs(_bAttr[k], '') + ')' + regEndStr, 'ig');
                     }
                 }
             }
 
-            this._attributesWhitelistRegExp = new wRegExp('(?:' + allAttr + defaultAttr + ')' + regEndStr, 'ig');
-            this._attributesTagsWhitelist = tagsAttr;
+            this._attributesBlacklistRegExp = new wRegExp('\\s(?:' + (allAttr || '^') + ')' + regEndStr, 'ig');
+            this._attributesTagsBlacklist = tagsAttr;
 
             // set modes
             this._isInline = /inline/i.test(options.mode);

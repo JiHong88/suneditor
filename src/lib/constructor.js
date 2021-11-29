@@ -407,6 +407,7 @@ export default {
         options._editorTagsWhitelist = this._setWhitelist(options._defaultTagsWhitelist + (typeof options.addTagsWhitelist === 'string' && options.addTagsWhitelist.length > 0 ? '|' + options.addTagsWhitelist : ''), options.tagsBlacklist);
         options.pasteTagsWhitelist = this._setWhitelist(typeof options.pasteTagsWhitelist === 'string' ? options.pasteTagsWhitelist : options._editorTagsWhitelist, options.pasteTagsBlacklist);
         options.attributesWhitelist = (!options.attributesWhitelist || typeof options.attributesWhitelist !== 'object') ? null : options.attributesWhitelist;
+        options.attributesBlacklist = (!options.attributesBlacklist || typeof options.attributesBlacklist !== 'object') ? null : options.attributesBlacklist;
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
         options.rtl = !!options.rtl;

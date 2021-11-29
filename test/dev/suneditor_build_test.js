@@ -555,7 +555,11 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     ],
     // maxCharCount: 670,
     addTagsWhitelist: 'details|summary',
-    attributesWhitelist: {'details': 'open'},  // html5 <details open="">..</details>
+    attributesWhitelist: {'all': '*'},  // html5 <details open="">..</details>
+    attributesBlacklist: {
+        all: 'data-a',
+        span: 'name'
+    },
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     buttonList: complexEditor,
     // fullPage: true,
