@@ -923,7 +923,7 @@ export default class SunEditor {
      * @param buttonList Button list 
      * @param core Core object
      */
-     onSetToolbarButtons: (buttonList: any[], core: Core) => void;
+    onSetToolbarButtons: (buttonList: any[], core: Core) => void;
 
     /**
      * @description Reset the buttons on the toolbar. (Editor is not reloaded)

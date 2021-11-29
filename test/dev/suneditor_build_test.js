@@ -538,6 +538,10 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // buttonList: [['custom_container']]
 });
 
+ss.onSetToolbarButtons = function(buttonList, core) {
+    console.log("bbbbb-", buttonList);
+}
+
 // ss.setContents("")
 // ss.setContents('fsafsa')
 ss.onload = function (core) {
