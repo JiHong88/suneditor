@@ -7645,6 +7645,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onResizeEditor: null,
 
         /**
+         * @description Called after the "setToolbarButtons" invocation.
+         * Can be used to tweak buttons properties (useful for custom buttons)
+         * @param {Array} buttonList Button list 
+         * @param {Object} core Core object
+         */
+        onSetToolbarButtons: null,
+
+        /**
          * @description Reset the buttons on the toolbar. (Editor is not reloaded)
          * You cannot set a new plugin for the button.
          * @param {Array} buttonList Button list 

@@ -918,6 +918,14 @@ export default class SunEditor {
     onResizeEditor: (height: number, prevHeight: number, core: Core) => {};
 
     /**
+     * @description Called after the "setToolbarButtons" invocation.
+     * Can be used to tweak buttons properties (useful for custom buttons)
+     * @param buttonList Button list 
+     * @param core Core object
+     */
+     onSetToolbarButtons: (buttonList: any[], core: Core) => void;
+
+    /**
      * @description Reset the buttons on the toolbar. (Editor is not reloaded)
      * You cannot set a new plugin for the button.
      * @param buttonList Button list 
