@@ -438,6 +438,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Contains pairs of all "data-commands" and "elements" setted in toolbar over time
+         * Used primarily to save and recover button states after the toolbar re-creation
+         * Updates each "_cachingButtons()" invocation  
+         */
+        allCommandButtons: null,
+
+        /**
          * @description Style button related to edit area
          * @property {Element} fullScreen fullScreen button element
          * @property {Element} showBlocks showBlocks button element
@@ -492,6 +499,40 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             _fullScreenAttrs: {sticky: false, balloon: false, inline: false},
             _lineBreakComp: null,
             _lineBreakDir: ''
+        },
+
+        /**
+         * @description Save the current buttons states to "allCommandButtons" object
+         */
+        saveButtonStates: function () {
+            if (!this.allCommandButtons) this.allCommandButtons = {};
+
+            const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]');
+            for (let i = 0, element, command; i < currentButtons.length; i++) {
+                element = currentButtons[i];
+                command = element.getAttribute('data-command');
+
+                this.allCommandButtons[command] = element;
+            }
+        },
+
+        /**
+         * @description Recover the current buttons states from "allCommandButtons" object
+         */
+        recoverButtonStates: function () {
+            if (this.allCommandButtons) {
+                const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]'); 
+                for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
+                    button = currentButtons[i]; 
+                    command = button.getAttribute('data-command');
+
+                    oldButton = this.allCommandButtons[command];
+                    if (oldButton) {
+                        button.parentElement.replaceChild(oldButton, button);
+                        if (this.context.tool[command]) this.context.tool[command] = oldButton;
+                    }
+                }   
+            }
         },
 
         /**
@@ -582,7 +623,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
-         * @description Enabled submenu
+         * @description Enable submenu
          * @param {Element} element Submenu's button element to call
          */
         submenuOn: function (element) {
@@ -625,14 +666,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         moreLayerOff: function() {
             if (this._moreLayerActiveButton) {
-                (context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'))).style.display = 'none';
+                const layer = context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
+                layer.style.display = 'none';
                 util.removeClass(this._moreLayerActiveButton, 'on');
                 this._moreLayerActiveButton = null;
             }
         },
 
         /**
-         * @description Enabled container
+         * @description Enable container
          * @param {Element} element Container's button element to call
          */
         containerOn: function (element) {
@@ -4042,19 +4084,27 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         actionCall: function (command, display, target) {
             // call plugins
             if (display) {
-                if (/more/i.test(display) && target !== this._moreLayerActiveButton) {
-                    const layer = context.element.toolbar.querySelector('.' + command);
-                    if (layer) {
-                        if (this._moreLayerActiveButton) {
-                            (context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'))).style.display = 'none';
-                            util.removeClass(this._moreLayerActiveButton, 'on');
+                if (/more/i.test(display)) {
+                    if (target !== this._moreLayerActiveButton) {
+                        const layer = context.element.toolbar.querySelector('.' + command);
+                        if (layer) {
+                            if (this._moreLayerActiveButton) this.moreLayerOff();
+
+                            this._moreLayerActiveButton = target;
+                            layer.style.display = 'block';
+
+                            event._showToolbarBalloon();
+                            event._showToolbarInline();
                         }
                         util.addClass(target, 'on');
-                        this._moreLayerActiveButton = target;
-                        layer.style.display = 'block';
+                    } else {
+                        const layer = context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
+                        if (layer) {
+                            this.moreLayerOff();
 
-                        event._showToolbarBalloon();
-                        event._showToolbarInline();
+                            event._showToolbarBalloon();
+                            event._showToolbarInline();
+                        }        
                     }
                     return;
                 }
@@ -4064,7 +4114,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     return;
                 } 
                 
-                if (this.isReadOnly) return;
+                if (this.isReadOnly && util.arrayIncludes(this.resizingDisabledButtons, target)) return;
                 if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
                     this.callPlugin(command, this.submenuOn.bind(this, target), target);
                     return;
@@ -4081,17 +4131,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 this.commandHandler(target, command);
             }
 
-            if (/more/i.test(display)) {
-                const layer = context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
-                if (layer) {
-                    util.removeClass(this._moreLayerActiveButton, 'on');
-                    this._moreLayerActiveButton = null;
-                    layer.style.display = 'none';
-
-                    event._showToolbarBalloon();
-                    event._showToolbarInline();
-                }
-            } else if (/submenu/.test(display)) {
+            if (/submenu/.test(display)) {
                 this.submenuOff();
             } else if (!/command/.test(display)) {
                 this.submenuOff();
@@ -4273,7 +4313,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             util.setDisabledButtons(!isCodeView, this.codeViewDisabledButtons);
 
             if (isCodeView) {
-                this._setCodeDataToEditor();
+                if (!util.isNonEditable(context.element.wysiwygFrame)) this._setCodeDataToEditor();
                 context.element.wysiwygFrame.scrollTop = 0;
                 context.element.code.style.display = 'none';
                 context.element.wysiwygFrame.style.display = 'block';
@@ -4299,8 +4339,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 util.removeClass(this._styleCommandMap.codeView, 'active');
 
                 // history stack
-                this.history.push(false);
-                this.history._resetCachingButton();
+                if (!util.isNonEditable(context.element.wysiwygFrame)) {
+                    this.history.push(false);
+                    this.history._resetCachingButton();
+                }
             } else {
                 this._setEditorDataToCodeView();
                 this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
@@ -4409,6 +4451,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const code = context.element.code;
             const _var = this._variable;
             this.controllersOff();
+            
+            const wasToolbarHidden = (toolbar.style.display === 'none' || (this._isInline && !this._inlineToolbarAttr.isShow));
 
             if (!_var.isFullScreen) {
                 _var.isFullScreen = true;
@@ -4496,6 +4540,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.topArea.style.marginTop = '';
                 util.removeClass(this._styleCommandMap.fullScreen, 'active');
             }
+
+            if (wasToolbarHidden) functions.toolbar.hide();
 
             // user event
             if (typeof functions.toggleFullScreen === 'function') functions.toggleFullScreen(this._variable.isFullScreen, this);
@@ -5153,9 +5199,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (activePlugins.indexOf(key) > -1) {
                     plugins[key].active.call(this, null);
                 } else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
-                    if (!this.isReadOnly) commandMap.OUTDENT.setAttribute('disabled', true);
+                    if (!util.isImportantDisabled(commandMap.OUTDENT)) commandMap.OUTDENT.setAttribute('disabled', true);
                 } else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
-                    if (!this.isReadOnly) commandMap.INDENT.removeAttribute('disabled');
+                    if (!util.isImportantDisabled(commandMap.INDENT)) commandMap.INDENT.removeAttribute('disabled');
                 } else {
                     util.removeClass(commandMap[key], 'active');
                 }
@@ -5328,8 +5374,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _cachingButtons: function () {
-            this.codeViewDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"])');
+            this.codeViewDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"]):not([data-display="MORE"])');
             this.resizingDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-resizing-enabled"]):not([data-display="MORE"])');
+
+            this.saveButtonStates();
 
             const tool = context.tool;
             this.commandMap = {
@@ -5691,9 +5739,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
                 }
 
-                if (!core.isReadOnly && util.isFormatElement(element)) {
+                if (util.isFormatElement(element)) {
                     /* Outdent */
-                    if (commandMapNodes.indexOf('OUTDENT') === -1 && commandMap.OUTDENT) {
+                    if (commandMapNodes.indexOf('OUTDENT') === -1 && commandMap.OUTDENT && !util.isImportantDisabled(commandMap.OUTDENT)) {
                         if (util.isListCell(element) || (element.style[marginDir] && util.getNumber(element.style[marginDir], 0) > 0)) {
                             commandMapNodes.push('OUTDENT');
                             commandMap.OUTDENT.removeAttribute('disabled');
@@ -5701,7 +5749,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     /* Indent */
-                    if (commandMapNodes.indexOf('INDENT') === -1 && commandMap.INDENT) {
+                    if (commandMapNodes.indexOf('INDENT') === -1 && commandMap.INDENT && !util.isImportantDisabled(commandMap.INDENT)) {
                         commandMapNodes.push('INDENT');
                         if (util.isListCell(element) && !element.previousElementSibling) {
                             commandMap.INDENT.setAttribute('disabled', true);
@@ -7710,6 +7758,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onResizeEditor: null,
 
         /**
+         * @description Called after the "setToolbarButtons" invocation.
+         * Can be used to tweak buttons properties (useful for custom buttons)
+         * @param {Array} buttonList Button list 
+         * @param {Object} core Core object
+         */
+        onSetToolbarButtons: null,
+
+        /**
          * @description Reset the buttons on the toolbar. (Editor is not reloaded)
          * You cannot set a new plugin for the button.
          * @param {Array} buttonList Button list 
@@ -7717,10 +7773,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         setToolbarButtons: function (buttonList) {
             core.submenuOff();
             core.containerOff();
+            core.moreLayerOff();
             
             const newToolbar = _Constructor._createToolBar(_d, buttonList, core.plugins, options);
             _responsiveButtons = newToolbar.responsiveButtons;
-            core._moreLayerActiveButton = null;
             event._setResponsiveToolbar();
 
             context.element.toolbar.replaceChild(newToolbar._buttonTray, context.element._buttonTray);
@@ -7729,32 +7785,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             context.element = newContext.element;
             context.tool = newContext.tool;
             if (options.iframe) context.element.wysiwyg = core._wd.body;
+
+            core.recoverButtonStates();
+
             core._cachingButtons();
             core.history._resetCachingButton();
 
-            core.activePlugins = [];
-            const oldCallButtons = pluginCallButtons;
-            pluginCallButtons = newToolbar.pluginCallButtons;
-            let plugin, button, oldButton;
-            for (let key in pluginCallButtons) {
-                if (!util.hasOwn(pluginCallButtons, key)) continue;
-                plugin = plugins[key];
-                button = pluginCallButtons[key];
-                if (plugin.active && button) {
-                    oldButton = oldCallButtons[key];
-                    core.callPlugin(key, null, oldButton || button);
-                    if (oldButton) {
-                        button.parentElement.replaceChild(oldButton, button);
-                        pluginCallButtons[key] = oldButton;
-                    }
-                }
-            }
-
             if (core.hasFocus) event._applyTagEffects();
-
-            if (core._variable.isCodeView) util.addClass(core._styleCommandMap.codeView, 'active');
-            if (core._variable.isFullScreen) util.addClass(core._styleCommandMap.fullScreen, 'active');
-            if (util.hasClass(context.element.wysiwyg, 'se-show-block')) util.addClass(core._styleCommandMap.showBlocks, 'active');
+            if (core.isReadOnly) util.setDisabledButtons(true, core.resizingDisabledButtons);
+            if (typeof functions.onSetToolbarButtons === 'function') functions.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'), core);
         },
 
         /**
@@ -8059,9 +8098,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         readOnly: function (value) {
             core.isReadOnly = value;
             
+            util.setDisabledButtons(!!value, core.resizingDisabledButtons);
+
             if (value) {
                 /** off menus */
                 core.controllersOff();
+                if (core.submenuActiveButton && core.submenuActiveButton.disabled) core.submenuOff();
+                if (core._moreLayerActiveButton && core._moreLayerActiveButton.disabled) core.moreLayerOff();
+                if (core.containerActiveButton && core.containerActiveButton.disabled) core.containerOff();
                 if (core.modalForm) core.plugins.dialog.close.call(core);
 
                 context.element.code.setAttribute("readOnly", "true");
@@ -8069,24 +8113,37 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.code.removeAttribute("readOnly");
             }
 
-            util.setDisabledButtons(!!value, core.resizingDisabledButtons);
             if (options.codeMirrorEditor) options.codeMirrorEditor.setOption('readOnly', !!value);
         },
 
         /**
          * @description Disable the suneditor
          */
-        disabled: function () {
-            this.toolbar.disabled();
-            this.wysiwyg.disabled();
+        disable: function () {
+            this.toolbar.disable();
+            this.wysiwyg.disable();
+        },
+
+        /**
+         * @description Provided for backward compatibility and will be removed in 3.0.0 version
+         */
+         disabled: function () {
+            this.disable();
         },
 
         /**
          * @description Enable the suneditor
          */
-        enabled: function () {
-            this.toolbar.enabled();
-            this.wysiwyg.enabled();
+        enable: function () {
+            this.toolbar.enable();
+            this.wysiwyg.enable();
+        },
+
+        /**
+         * @description Provided for backward compatibility and will be removed in 3.0.0 version
+         */
+         enabled: function () {
+            this.enable();
         },
 
         /**
@@ -8143,7 +8200,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             /**
              * @description Disable the toolbar
              */
-            disabled: function () {
+            disable: function () {
                 /** off menus */
                 core.submenuOff();
                 core.moreLayerOff();
@@ -8153,10 +8210,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             },
 
             /**
+             * @description Provided for backward compatibility and will be removed in 3.0.0 version
+             */
+            disabled: function () {
+                this.disable();
+            },
+
+            /**
              * @description Enable the toolbar
              */
-            enabled: function () {
+            enable: function () {
                 context.tool.cover.style.display = 'none';
+            },
+
+            /**
+             * @description Provided for backward compatibility and will be removed in 3.0.0 version
+             */
+             enabled: function () {
+                this.enable();
             },
 
             /**
@@ -8191,7 +8262,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             /**
              * @description Disable the wysiwyg area
              */
-            disabled: function () {
+            disable: function () {
                /** off menus */
                 core.controllersOff();
                 if (core.modalForm) core.plugins.dialog.close.call(core);
@@ -8209,7 +8280,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             /**
              * @description Enable the wysiwyg area
              */
-            enabled: function () {
+            enable: function () {
                 context.element.wysiwyg.setAttribute('contenteditable', true);
                 core.isDisabled = false;
 

@@ -181,6 +181,23 @@ interface Core {
     commandMap: Record<string, Element>;
 
     /**
+     * @description Contains pairs of all "data-commands" and "elements" setted in toolbar over time
+     * Used primarily to save and recover button states after the toolbar re-creation
+     * Updates each "_cachingButtons()" invocation  
+     */
+    allCommandButtons: Record<string, Element>;
+
+    /**
+     * @description Save the current buttons states to "allCommandButtons" object
+     */
+    saveButtonStates(): void;
+
+    /**
+     * @description Recover the current buttons states from "allCommandButtons" object
+     */
+    recoverButtonStates(): void;
+
+    /**
      * @description If the plugin is not added, add the plugin and call the 'add' function.
      * If the plugin is added call callBack function.
      * @param pluginName The name of the plugin to call
@@ -210,7 +227,7 @@ interface Core {
     initMenuTarget(pluginName: string, target: Element | null, menu: Element): void;
 
     /**
-     * @description Enabled submenu
+     * @description Enable submenu
      * @param element Submenu's button element to call
      */
     submenuOn(element: Element): void;
@@ -226,7 +243,7 @@ interface Core {
     moreLayerOff(): void;
 
     /**
-     * @description Enabled container
+     * @description Enable container
      * @param element Container's button element to call
      */
     containerOn(element: Element): void;
@@ -604,12 +621,12 @@ interface Toolbar {
     /**
      * @description Disable the toolbar
      */
-    disabled(): void;
+    disable(): void;
 
     /**
      * @description Enable the toolbar
      */
-    enabled(): void;
+    enable(): void;
 
     /**
      * @description Show the toolbar
@@ -626,12 +643,12 @@ interface Wysiwyg {
     /**
      * @description Disable the wysiwyg area
      */
-    disabled(): void;
+    disable(): void;
 
     /**
      * @description Enable the wysiwyg area
      */
-    enabled(): void;
+    enable(): void;
 }
 
 type EventFn = (e: Event, core: Core) => void;
@@ -902,6 +919,14 @@ export default class SunEditor {
     onResizeEditor: (height: number, prevHeight: number, core: Core) => {};
 
     /**
+     * @description Called after the "setToolbarButtons" invocation.
+     * Can be used to tweak buttons properties (useful for custom buttons)
+     * @param buttonList Button list 
+     * @param core Core object
+     */
+    onSetToolbarButtons: (buttonList: any[], core: Core) => void;
+
+    /**
      * @description Reset the buttons on the toolbar. (Editor is not reloaded)
      * You cannot set a new plugin for the button.
      * @param buttonList Button list 
@@ -1031,12 +1056,12 @@ export default class SunEditor {
     /**
      * @description Disable the suneditor
      */
-    disabled(): void;
+    disable(): void;
 
     /**
      * @description Enable the suneditor
      */
-    enabled(): void;
+    enable(): void;
 
     /**
      * @description Show the suneditor

@@ -1052,10 +1052,10 @@ editor.appendContents('append contents');
 editor.readOnly(true || false)
 
 // Disable the suneditor
-editor.disabled();
+editor.disable();
 
-// Enabled the suneditor
-editor.enabled();
+// Enable the suneditor
+editor.enable();
 
 // Hide the suneditor
 editor.hide();
@@ -1067,16 +1067,16 @@ editor.show();
 editor.destroy();
 
 // Toolbar methods
-// Disable the suneditor
-editor.toolbar.disabled();
+// Disable the toolbar
+editor.toolbar.disable();
 
-// Enabled the suneditor
-editor.toolbar.enabled();
+// Enable the toolbar
+editor.toolbar.enable();
 
-// Hide the suneditor
+// Hide the toolbar
 editor.toolbar.hide();
 
-// Show the suneditor
+// Show the toolbar
 editor.toolbar.show();
 
 // Event functions -------------------------------------------------------------------------------------
@@ -1316,6 +1316,16 @@ editor.onAudioUploadError = function (errorMessage, result, core) {
 // height, prevHeight are number
 editor.onResizeEditor = function (height, prevHeight, core) {
     console.log(`height: ${height}, prevHeight: ${prevHeight}`)
+}
+
+// Called after the "setToolbarButtons" invocation
+// Can be used to tweak buttons properties (useful for custom buttons)
+/**
+ * buttonList: buttonList array 
+ * core: Core object
+ */
+editor.onSetToolbarButtons = function (buttonList, core) {
+    console.log(`buttonList: ${buttonList}`)
 }
 
 // It replaces the default callback function of the image upload

@@ -258,7 +258,7 @@ let ssss = suneditor.create(("sample1"), {
     // lang: langToUse
 });
 
-// ssss.disabled();
+// ssss.disable();
 
 // ssss.setContents(`<p><br /></p><div class="se-component se-image-container __se__float-none"><img src="http://suneditor.com/docs/cat.jpg" alt="" style="" /></div><p><br /></p>`)
 
@@ -567,6 +567,10 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // buttonList: [['custom_container']]
 });
 
+ss.onSetToolbarButtons = function(buttonList, core) {
+    console.log("bbbbb-", buttonList);
+}
+
 // ss.setContents("")
 // ss.setContents('fsafsa')
 ss.onload = function (core) {
@@ -819,12 +823,12 @@ window.sun_appendContents = function (content) {
     ss.readOnly(!ss.core.isReadOnly);
 }
 
-window.sun_disabled = function () {
-    ss.disabled();
+window.sun_disable = function () {
+    ss.disable();
 }
 
-window.sun_enabled = function () {
-    ss.enabled();
+window.sun_enable = function () {
+    ss.enable();
 }
 
 window.sun_show = function () {

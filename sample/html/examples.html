@@ -190,13 +190,13 @@
         <button type="button" class="btn btn-md btn-warning" onclick="sun_setContents('set contents')">setContents</button>
         <button type="button" class="btn btn-md btn-warning" onclick="sun_appendContents('append contents')">AppendContents</button>
         <button type="button" class="btn btn-md btn-primary" onclick="sun_readonly()">ReadOnly</button>
-        <button type="button" class="btn btn-md btn-primary" onclick="sun_disabled()">Disabled</button>
-        <button type="button" class="btn btn-md btn-primary" onclick="sun_enabled()">Enabled</button>
+        <button type="button" class="btn btn-md btn-primary" onclick="sun_disable()">Disable</button>
+        <button type="button" class="btn btn-md btn-primary" onclick="sun_enable()">Enable</button>
         <button type="button" class="btn btn-md btn-primary" onclick="sun_hide()">Hide</button>
         <button type="button" class="btn btn-md btn-primary" onclick="sun_show()">Show</button>
         <div></div>
-        <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_disabled()">Disabled toolbar</button>
-        <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_enabled()">Enabled toolbar</button>
+        <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_disable()">Disable toolbar</button>
+        <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_enable()">Enable toolbar</button>
         <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_hide()">Hide toolbar</button>
         <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_show()">Show toolbar</button>
 
@@ -887,12 +887,12 @@
         suneditor.readOnly(!suneditor.core.isReadOnly);
     }
 
-    function sun_disabled() {
-        suneditor.disabled();
+    function sun_disable() {
+        suneditor.disable();
     }
 
-    function sun_enabled() {
-        suneditor.enabled();
+    function sun_enable() {
+        suneditor.enable();
     }
 
     function sun_show() {
@@ -903,12 +903,12 @@
         suneditor.hide();
     }
 
-    function sun_toolbar_disabled() {
-        suneditor.toolbar.disabled();
+    function sun_toolbar_disable() {
+        suneditor.toolbar.disable();
     }
 
-    function sun_toolbar_enabled() {
-        suneditor.toolbar.enabled();
+    function sun_toolbar_enable() {
+        suneditor.toolbar.enable();
     }
 
     function sun_toolbar_show() {
