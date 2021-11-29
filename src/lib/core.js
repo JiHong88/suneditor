@@ -643,7 +643,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         moreLayerOff: function() {
             if (this._moreLayerActiveButton) {
-                (context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'))).style.display = 'none';
+                const layer = context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
+                layer.style.display = 'none';
                 util.removeClass(this._moreLayerActiveButton, 'on');
                 this._moreLayerActiveButton = null;
             }
@@ -4052,19 +4053,27 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         actionCall: function (command, display, target) {
             // call plugins
             if (display) {
-                if (/more/i.test(display) && target !== this._moreLayerActiveButton) {
-                    const layer = context.element.toolbar.querySelector('.' + command);
-                    if (layer) {
-                        if (this._moreLayerActiveButton) {
-                            (context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'))).style.display = 'none';
-                            util.removeClass(this._moreLayerActiveButton, 'on');
+                if (/more/i.test(display)) {
+                    if (target !== this._moreLayerActiveButton) {
+                        const layer = context.element.toolbar.querySelector('.' + command);
+                        if (layer) {
+                            if (this._moreLayerActiveButton) this.moreLayerOff();
+
+                            this._moreLayerActiveButton = target;
+                            layer.style.display = 'block';
+
+                            event._showToolbarBalloon();
+                            event._showToolbarInline();
                         }
                         util.addClass(target, 'on');
-                        this._moreLayerActiveButton = target;
-                        layer.style.display = 'block';
+                    } else {
+                        const layer = context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
+                        if (layer) {
+                            this.moreLayerOff();
 
-                        event._showToolbarBalloon();
-                        event._showToolbarInline();
+                            event._showToolbarBalloon();
+                            event._showToolbarInline();
+                        }        
                     }
                     return;
                 }
@@ -4074,7 +4083,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     return;
                 } 
                 
-                if (this.isReadOnly) return;
+                if (this.isReadOnly && util.arrayIncludes(this.resizingDisabledButtons, target)) return;
                 if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
                     this.callPlugin(command, this.submenuOn.bind(this, target), target);
                     return;
@@ -4091,17 +4100,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 this.commandHandler(target, command);
             }
 
-            if (/more/i.test(display)) {
-                const layer = context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
-                if (layer) {
-                    util.removeClass(this._moreLayerActiveButton, 'on');
-                    this._moreLayerActiveButton = null;
-                    layer.style.display = 'none';
-
-                    event._showToolbarBalloon();
-                    event._showToolbarInline();
-                }
-            } else if (/submenu/.test(display)) {
+            if (/submenu/.test(display)) {
                 this.submenuOff();
             } else if (!/command/.test(display)) {
                 this.submenuOff();
@@ -7660,10 +7659,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         setToolbarButtons: function (buttonList) {
             core.submenuOff();
             core.containerOff();
+            core.moreLayerOff();
             
             const newToolbar = _Constructor._createToolBar(_d, buttonList, core.plugins, options);
             _responsiveButtons = newToolbar.responsiveButtons;
-            core._moreLayerActiveButton = null;
             event._setResponsiveToolbar();
 
             context.element.toolbar.replaceChild(newToolbar._buttonTray, context.element._buttonTray);
@@ -7679,6 +7678,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.history._resetCachingButton();
 
             if (core.hasFocus) event._applyTagEffects();
+            if (core.isReadOnly) util.setDisabledButtons(true, core.resizingDisabledButtons);
             if (typeof functions.onSetToolbarButtons === 'function') functions.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'), core);
         },
 
@@ -7984,9 +7984,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         readOnly: function (value) {
             core.isReadOnly = value;
             
+            util.setDisabledButtons(!!value, core.resizingDisabledButtons);
+
             if (value) {
                 /** off menus */
                 core.controllersOff();
+                if (core.submenuActiveButton && core.submenuActiveButton.disabled) core.submenuOff();
+                if (core._moreLayerActiveButton && core._moreLayerActiveButton.disabled) core.moreLayerOff();
+                if (core.containerActiveButton && core.containerActiveButton.disabled) core.containerOff();
                 if (core.modalForm) core.plugins.dialog.close.call(core);
 
                 context.element.code.setAttribute("readOnly", "true");
@@ -7994,7 +7999,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.code.removeAttribute("readOnly");
             }
 
-            util.setDisabledButtons(!!value, core.resizingDisabledButtons, true);
             if (options.codeMirrorEditor) options.codeMirrorEditor.setOption('readOnly', !!value);
         },
 
