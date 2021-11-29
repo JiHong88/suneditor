@@ -181,6 +181,23 @@ interface Core {
     commandMap: Record<string, Element>;
 
     /**
+     * @description Contains pairs of all "data-commands" and "elements" setted in toolbar over time
+     * Used primarily to save and recover button states after the toolbar re-creation
+     * Updates each "_cachingButtons()" invocation  
+     */
+    allCommandButtons: Record<string, Element>;
+
+    /**
+     * @description Save the current buttons states to "allCommandButtons" object
+     */
+    saveButtonStates(): void;
+
+    /**
+     * @description Recover the current buttons states from "allCommandButtons" object
+     */
+    recoverButtonStates(): void;
+
+    /**
      * @description If the plugin is not added, add the plugin and call the 'add' function.
      * If the plugin is added call callBack function.
      * @param pluginName The name of the plugin to call

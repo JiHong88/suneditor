@@ -415,6 +415,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         commandMap: null,
 
         /**
+         * @description Contains pairs of all "data-commands" and "elements" setted in toolbar over time
+         * Used primarily to save and recover button states after the toolbar re-creation
+         * Updates each "_cachingButtons()" invocation  
+         */
+        allCommandButtons: null,
+
+        /**
          * @description Style button related to edit area
          * @property {Element} fullScreen fullScreen button element
          * @property {Element} showBlocks showBlocks button element
@@ -469,6 +476,40 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             _fullScreenAttrs: {sticky: false, balloon: false, inline: false},
             _lineBreakComp: null,
             _lineBreakDir: ''
+        },
+
+        /**
+         * @description Save the current buttons states to "allCommandButtons" object
+         */
+        saveButtonStates: function () {
+            if (!this.allCommandButtons) this.allCommandButtons = {};
+
+            const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]');
+            for (let i = 0, element, command; i < currentButtons.length; i++) {
+                element = currentButtons[i];
+                command = element.getAttribute('data-command');
+
+                this.allCommandButtons[command] = element;
+            }
+        },
+
+        /**
+         * @description Recover the current buttons states from "allCommandButtons" object
+         */
+        recoverButtonStates: function () {
+            if (this.allCommandButtons) {
+                const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]'); 
+                for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
+                    button = currentButtons[i]; 
+                    command = button.getAttribute('data-command');
+
+                    oldButton = this.allCommandButtons[command];
+                    if (oldButton) {
+                        button.parentElement.replaceChild(oldButton, button);
+                        if (this.context.tool[command]) this.context.tool[command] = oldButton;
+                    }
+                }   
+            }
         },
 
         /**
@@ -5228,8 +5269,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _cachingButtons: function () {
-            this.codeViewDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"])');
+            this.codeViewDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"]):not([data-display="MORE"])');
             this.resizingDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-resizing-enabled"]):not([data-display="MORE"])');
+
+            this.saveButtonStates();
 
             const tool = context.tool;
             this.commandMap = {
@@ -7621,32 +7664,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             context.element = newContext.element;
             context.tool = newContext.tool;
             if (options.iframe) context.element.wysiwyg = core._wd.body;
+
+            core.recoverButtonStates();
+
             core._cachingButtons();
             core.history._resetCachingButton();
 
-            core.activePlugins = [];
-            const oldCallButtons = pluginCallButtons;
-            pluginCallButtons = newToolbar.pluginCallButtons;
-            let plugin, button, oldButton;
-            for (let key in pluginCallButtons) {
-                if (!util.hasOwn(pluginCallButtons, key)) continue;
-                plugin = plugins[key];
-                button = pluginCallButtons[key];
-                if (plugin.active && button) {
-                    oldButton = oldCallButtons[key];
-                    core.callPlugin(key, null, oldButton || button);
-                    if (oldButton) {
-                        button.parentElement.replaceChild(oldButton, button);
-                        pluginCallButtons[key] = oldButton;
-                    }
-                }
-            }
-
             if (core.hasFocus) event._applyTagEffects();
-
-            if (core._variable.isCodeView) util.addClass(core._styleCommandMap.codeView, 'active');
-            if (core._variable.isFullScreen) util.addClass(core._styleCommandMap.fullScreen, 'active');
-            if (util.hasClass(context.element.wysiwyg, 'se-show-block')) util.addClass(core._styleCommandMap.showBlocks, 'active');
         },
 
         /**
