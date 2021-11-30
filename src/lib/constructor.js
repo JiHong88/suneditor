@@ -612,6 +612,9 @@ export default {
             redo: ['_se_command_redo', lang.toolbar.redo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmd + '+<span class="se-shortcut-key">Y</span> / ' + cmd + addShift + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'redo', '', icons.redo],
             preview: ['se-resizing-enabled', lang.toolbar.preview, 'preview', '', icons.preview],
             print: ['se-resizing-enabled', lang.toolbar.print, 'print', '', icons.print],
+            dir: ['_se_command_dir', lang.toolbar[options.rtl ? 'dir_l' : 'dir_r'], 'dir', '',  icons[options.rtl ? 'dir_l' : 'dir_r']],
+            dir_l: ['_se_command_dir_l', lang.toolbar.dir_l, 'dir_l', '',  icons.dir_l],
+            dir_r: ['_se_command_dir_r', lang.toolbar.dir_r, 'dir_r', '',  icons.dir_r],
             save: ['_se_command_save se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmd + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save],
             /** plugins - command */
             blockquote: ['', lang.toolbar.tag_blockquote, 'blockquote', 'command', icons.blockquote],
@@ -782,6 +785,13 @@ export default {
                         if (/^\-/.test(button)) {
                             align = button.substr(1);
                             moduleElement.div.style.float = align;
+                            continue;
+                        }
+
+                        // rtl fix
+                        if (/^\#/.test(button)) {
+                            const option = button.substr(1);
+                            if (option === 'fix') moduleElement.ul.className += ' se-menu-dir-fix';
                             continue;
                         }
                         

@@ -542,6 +542,12 @@ interface Core {
     preview(): void;
 
     /**
+     * @description Set direction to "rtl" or "ltr".
+     * @param dir "rtl" or "ltr"
+     */
+    setDir(dir: 'rtl' | 'ltr'): void;
+
+    /**
      * @description Sets the HTML string
      * @param html HTML string
      */

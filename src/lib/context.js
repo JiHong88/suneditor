@@ -56,7 +56,10 @@ const _Context = function (element, cons, options) {
             indent: cons._toolBar.querySelector('._se_command_indent'),
             fullScreen: cons._toolBar.querySelector('._se_command_fullScreen'),
             showBlocks: cons._toolBar.querySelector('._se_command_showBlocks'),
-            codeView: cons._toolBar.querySelector('._se_command_codeView')
+            codeView: cons._toolBar.querySelector('._se_command_codeView'),
+            dir: cons._toolBar.querySelector('._se_command_dir'),
+            dir_l: cons._toolBar.querySelector('._se_command_dir_l'),
+            dir_r: cons._toolBar.querySelector('._se_command_dir_r')
         },
         options: options,
         option: options

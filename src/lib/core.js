@@ -1164,6 +1164,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._rangeInfo(range, selection);
         },
 
+        /**
+         * @description Set "range" and "selection" info.
+         * @param {Object} range range object.
+         * @param {Object} selection selection object.
+         */
         _rangeInfo: function (range, selection) {
             let selectionNode = null;
             this._variable._range = range;
@@ -1339,7 +1344,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (util.isWysiwygDiv(range.startContainer)) {
                 const children = context.element.wysiwyg.children;
                 if (children.length === 0) return [];
-
                 this.setRange(children[0], 0, children[children.length - 1], children[children.length - 1].textContent.trim().length);
                 range = this.getRange();
             }
@@ -4207,6 +4211,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 case 'showBlocks':
                     this.toggleDisplayBlocks();
                     break;
+                case 'dir':
+                    this.setDir(options.rtl ? 'ltr' : 'rtl');
+                    break;
+                case 'dir_l':
+                    this.setDir('ltr');
+                    break;
+                case 'dir_r':
+                    this.setDir('rtl');
+                    break;
                 case 'save':
                     if (typeof options.callBackSave === 'function') {
                         options.callBackSave(this.getContents(false), this._variable.isChanged);
@@ -4662,6 +4675,52 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     '<body class="' + (options._printClass !== null ? options._printClass : options._editableClass) + '" style="margin:10px auto !important; height:auto !important; outline:1px dashed #ccc;">' + contentsHTML + '</body>' +
                     '</html>'
                 );
+            }
+        },
+
+        /**
+         * @description Set direction to "rtl" or "ltr".
+         * @param {String} dir "rtl" or "ltr"
+         */
+        setDir: function (dir) {
+            const rtl = dir === 'rtl';
+            options.rtl = rtl;
+
+            const el = context.element;
+            if (rtl) {
+                util.addClass(el.topArea, 'se-rtl');
+                util.addClass(el.wysiwygFrame, 'se-rtl');
+            } else {
+                util.removeClass(el.topArea, 'se-rtl');
+                util.removeClass(el.wysiwygFrame, 'se-rtl');
+            }
+
+            const lineNodes = util.getListChildren(el.wysiwyg, function (current) {
+                return util.isFormatElement(current) && (current.style.marginRight || current.style.marginLeft);
+            });
+
+            for (let i = 0, len = lineNodes.length, n, l, r; i < len; i++) {
+                n = lineNodes[i];
+                r = n.style.marginRight;
+                l = n.style.marginLeft;
+                n.style.marginRight = l;
+                n.style.marginLeft = r;
+            }
+
+            const tool = context.tool;
+            if (tool.dir) {
+                util.changeTxt(tool.dir.querySelector('.se-tooltip-text'), lang.toolbar[options.rtl ? 'dir_l' : 'dir_r']);
+                util.changeElement(tool.dir.firstElementChild, icons[options.rtl ? 'dir_l' : 'dir_r']);
+            }
+
+            if (tool.dir_l) {
+                if (rtl) util.removeClass(tool.dir_l, 'active');
+                else util.addClass(tool.dir_l, 'active');
+            }
+
+            if (tool.dir_r) {
+                if (rtl) util.addClass(tool.dir_r, 'active');
+                else util.removeClass(tool.dir_r, 'active');
             }
         },
 
@@ -5367,6 +5426,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
             
             this._initWysiwygArea(reload, _initHTML);
+            this.setDir(options.rtl ? 'rtl' : 'ltr');
         },
 
         /**

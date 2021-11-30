@@ -161,7 +161,8 @@ suneditor.create('sample', {
         /** ['imageGallery'] */ // You must add the "imageGalleryUrl".
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
-        ['save', 'template']
+        ['save', 'template'],
+        /** ['dir', 'dir_l', 'dir_r'] */ // "dir": Text direction, "dir_l": Right to Left, "dir_r": Left to Right
     ]
 })
 
@@ -206,7 +207,8 @@ const initEditor = suneditor.init({
     plugins: plugins,
     height: 200,
     buttonList: [
-        ['undo', 'redo',
+        [
+        'undo', 'redo',
         'font', 'fontSize', 'formatBlock',
         'paragraphStyle', 'blockquote',
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
@@ -217,7 +219,9 @@ const initEditor = suneditor.init({
         'table', 'link', 'image', 'video', 'audio', /** 'math', */ // You must add the 'katex' library at options to use the 'math' plugin.
         /** 'imageGallery', */ // You must add the "imageGalleryUrl".
         'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print', 'save', 'template']
+        'preview', 'print', 'save', 'template',
+        /** 'dir', 'dir_l', 'dir_r' */ // "dir": Text direction, "dir_l": Right to Left, "dir_r": Left to Right
+        ]
     ]
 });
 
@@ -863,6 +867,7 @@ buttonList      : Defines button list to array {Array}
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
                     // ['save', 'template'],
+                    // ['dir', 'dir_l', 'dir_r'],
                     // '/', Line break
                   ]
 
@@ -872,11 +877,18 @@ buttonList      : Defines button list to array {Array}
                     ['undo', 'redo', 'bold', 'underline', 'fontColor', 'table', 'link', 'image', 'video']
                   ]
 
-------------------ex) Alignment of button groups:------------------------------------------------------------------
+------------------ex) Alignment of button group:-------------------------------------------------------------------
                   // Set "-[align]" to the first item in the group. (default: left)
                   [
                     ['bold', 'underline', 'italic', 'strike'],
                     ['-right', 'undo', 'redo']
+                  ]
+
+------------------ex) Options in the button group(#):--------------------------------------------------------------
+                  // Set "#fix" - Fixed the order of buttons within a group in the "rtl" mode.
+                  [
+                    ['bold'],
+                    ['#fix', 'rtl_l', 'rtl_r']
                   ]
 
 ----------------- ex) More button: --------------------------------------------------------------------------------
@@ -919,6 +931,7 @@ buttonList      : Defines button list to array {Array}
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
                     ['save', 'template'],
+                    ['#fix', 'dir_l', 'dir_r'],
                     // (min-width:992px)
                     ['%992', [
                         ['undo', 'redo'],
@@ -928,6 +941,7 @@ buttonList      : Defines button list to array {Array}
                         ['removeFormat'],
                         ['outdent', 'indent'],
                         ['align', 'horizontalRule', 'list', 'lineHeight'],
+                        ['-left', '#fix', 'dir_l', 'dir_r'],
                         ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template'],
                         ['-right', ':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
                     ]],
@@ -938,6 +952,7 @@ buttonList      : Defines button list to array {Array}
                         [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle', 'removeFormat'],
                         [':e-More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'horizontalRule', 'list', 'lineHeight'],
                         [':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
+                        ['-right', 'dir'],
                         ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template']
                     ]]
                   ]
