@@ -748,8 +748,13 @@ export default {
         // link
         const anchor = this.plugins.anchor.createAnchor.call(this, contextImage.anchorCtx, true);
         if (anchor) {
-            contextImage._linkElement = contextImage._linkElement === anchor ? anchor.cloneNode(false) : anchor;
-            cover.insertBefore(this.plugins.image.onRender_link.call(this, imageEl, contextImage._linkElement), contextImage._caption);
+            if (contextImage._linkElement !== anchor) {
+                contextImage._linkElement = anchor.cloneNode(false);
+                cover.insertBefore(this.plugins.image.onRender_link.call(this, imageEl, contextImage._linkElement), contextImage._caption);
+                this.util.removeItem(anchor);
+            } else {
+                contextImage._linkElement.setAttribute('data-image-link', 'image');
+            }
         } else if (contextImage._linkElement !== null) {
             const imageElement = imageEl;
             imageElement.setAttribute('data-image-link', '');
@@ -757,7 +762,7 @@ export default {
                 const newEl = imageElement.cloneNode(true);
                 cover.removeChild(contextImage._linkElement);
                 cover.insertBefore(newEl, contextImage._caption);
-                imageEl = newEl;
+                contextImage._element = imageEl = newEl;
             }
         }
 
