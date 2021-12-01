@@ -75,6 +75,8 @@
             paragraphStyle: 'Paragrāfa stils',
             textStyle: 'Teksta stils',
             imageGallery: 'Attēlu galerija',
+            dir_ltr: 'No kreisās uz labo',
+            dir_rtl: 'No labās uz kreiso',
             mention: 'Pieminēt'
         },
         dialogBox: {

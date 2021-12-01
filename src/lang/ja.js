@@ -75,6 +75,8 @@
             paragraphStyle: '段落スタイル',
             textStyle: 'テキストスタイル',
             imageGallery: 'イメージギャラリー',
+            dir_ltr: '左から右へ',
+            dir_rtl: '右から左に',
             mention: '言及する'
         },
         dialogBox: {

@@ -75,6 +75,8 @@
             paragraphStyle: 'Стиль абзаца',
             textStyle: 'Стиль текста',
             imageGallery: 'Галерея',
+            dir_ltr: 'Слева направо',
+            dir_rtl: 'Справа налево',
             mention: 'Упоминание'
         },
         dialogBox: {

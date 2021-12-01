@@ -75,6 +75,8 @@
             paragraphStyle: 'Paragraph style',
             textStyle: 'Text style',
             imageGallery: 'Image gallery',
+            dir_ltr: 'Left to right',
+            dir_rtl: 'Right to left',
             mention: 'Mention'
         },
         dialogBox: {

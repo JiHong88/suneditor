@@ -77,7 +77,8 @@ const fs = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72, 8, 9, 
     ];
 
 const complexEditor = [
-    ['undo', 'redo'],
+    ['undo', 'redo', 'dir'],
+    ['dir_ltr', 'dir_rtl'],
         ['font', 'fontSize', 'formatBlock'],
         ['paragraphStyle', 'blockquote'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
