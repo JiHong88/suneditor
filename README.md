@@ -162,7 +162,7 @@ suneditor.create('sample', {
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
         ['save', 'template'],
-        /** ['dir', 'dir_l', 'dir_r'] */ // "dir": Text direction, "dir_l": Right to Left, "dir_r": Left to Right
+        /** ['dir', 'dir_ltr', 'dir_rtl'] */ // "dir": Toggle text direction, "dir_ltr": Right to Left, "dir_rtl": Left to Right
     ]
 })
 
@@ -220,7 +220,7 @@ const initEditor = suneditor.init({
         /** 'imageGallery', */ // You must add the "imageGalleryUrl".
         'fullScreen', 'showBlocks', 'codeView',
         'preview', 'print', 'save', 'template',
-        /** 'dir', 'dir_l', 'dir_r' */ // "dir": Text direction, "dir_l": Right to Left, "dir_r": Left to Right
+        /** 'dir', 'dir_ltr', 'dir_rtl' */ // "dir": Toggle text direction, "dir_ltr": Right to Left, "dir_rtl": Left to Right
         ]
     ]
 });
@@ -867,7 +867,7 @@ buttonList      : Defines button list to array {Array}
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
                     // ['save', 'template'],
-                    // ['dir', 'dir_l', 'dir_r'],
+                    // ['dir', 'dir_ltr', 'dir_rtl'],
                     // '/', Line break
                   ]
 
@@ -880,15 +880,16 @@ buttonList      : Defines button list to array {Array}
 ------------------ex) Alignment of button group:-------------------------------------------------------------------
                   // Set "-[align]" to the first item in the group. (default: left)
                   [
-                    ['bold', 'underline', 'italic', 'strike'],
-                    ['-right', 'undo', 'redo']
+                    ['-left', 'undo', 'redo']
+                    ['-right', 'bold', 'underline', 'italic', 'strike'],
                   ]
 
 ------------------ex) Options in the button group(#):--------------------------------------------------------------
                   // Set "#fix" - Fixed the order of buttons within a group in the "rtl" mode.
                   [
                     ['bold'],
-                    ['#fix', 'rtl_l', 'rtl_r']
+                    ['preview', 'print'],
+                    ['-left', '#fix', 'rtl_l', 'rtl_r']
                   ]
 
 ----------------- ex) More button: --------------------------------------------------------------------------------
@@ -931,7 +932,7 @@ buttonList      : Defines button list to array {Array}
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
                     ['save', 'template'],
-                    ['#fix', 'dir_l', 'dir_r'],
+                    ['-left', '#fix', 'dir_ltr', 'dir_rtl'],
                     // (min-width:992px)
                     ['%992', [
                         ['undo', 'redo'],
@@ -941,7 +942,7 @@ buttonList      : Defines button list to array {Array}
                         ['removeFormat'],
                         ['outdent', 'indent'],
                         ['align', 'horizontalRule', 'list', 'lineHeight'],
-                        ['-left', '#fix', 'dir_l', 'dir_r'],
+                        ['-right', 'dir'],
                         ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template'],
                         ['-right', ':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
                     ]],

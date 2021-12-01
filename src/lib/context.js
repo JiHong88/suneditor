@@ -58,8 +58,8 @@ const _Context = function (element, cons, options) {
             showBlocks: cons._toolBar.querySelector('._se_command_showBlocks'),
             codeView: cons._toolBar.querySelector('._se_command_codeView'),
             dir: cons._toolBar.querySelector('._se_command_dir'),
-            dir_l: cons._toolBar.querySelector('._se_command_dir_l'),
-            dir_r: cons._toolBar.querySelector('._se_command_dir_r')
+            dir_ltr: cons._toolBar.querySelector('._se_command_dir_ltr'),
+            dir_rtl: cons._toolBar.querySelector('._se_command_dir_rtl')
         },
         options: options,
         option: options

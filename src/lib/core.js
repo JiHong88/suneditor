@@ -4214,10 +4214,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 case 'dir':
                     this.setDir(options.rtl ? 'ltr' : 'rtl');
                     break;
-                case 'dir_l':
+                case 'dir_ltr':
                     this.setDir('ltr');
                     break;
-                case 'dir_r':
+                case 'dir_rtl':
                     this.setDir('rtl');
                     break;
                 case 'save':
@@ -4709,18 +4709,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const tool = context.tool;
             if (tool.dir) {
-                util.changeTxt(tool.dir.querySelector('.se-tooltip-text'), lang.toolbar[options.rtl ? 'dir_l' : 'dir_r']);
-                util.changeElement(tool.dir.firstElementChild, icons[options.rtl ? 'dir_l' : 'dir_r']);
+                util.changeTxt(tool.dir.querySelector('.se-tooltip-text'), lang.toolbar[options.rtl ? 'dir_ltr' : 'dir_rtl']);
+                util.changeElement(tool.dir.firstElementChild, icons[options.rtl ? 'dir_ltr' : 'dir_rtl']);
             }
 
-            if (tool.dir_l) {
-                if (rtl) util.removeClass(tool.dir_l, 'active');
-                else util.addClass(tool.dir_l, 'active');
+            if (tool.dir_ltr) {
+                if (rtl) util.removeClass(tool.dir_ltr, 'active');
+                else util.addClass(tool.dir_ltr, 'active');
             }
 
-            if (tool.dir_r) {
-                if (rtl) util.addClass(tool.dir_r, 'active');
-                else util.removeClass(tool.dir_r, 'active');
+            if (tool.dir_rtl) {
+                if (rtl) util.addClass(tool.dir_rtl, 'active');
+                else util.removeClass(tool.dir_rtl, 'active');
             }
         },
 
