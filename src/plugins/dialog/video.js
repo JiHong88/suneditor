@@ -373,7 +373,7 @@ export default {
                 videoPlugin.submitAction.call(this, this.context.video.videoInputFile.files);
             } else if (contextVideo.videoUrlFile && contextVideo._linkValue.length > 0) {
                 this.showLoading();
-                videoPlugin.setup_url.call(this);
+                videoPlugin.setup_url.call(this, contextVideo._linkValue);
             }
         } catch (error) {
             this.closeLoading();
@@ -504,12 +504,11 @@ export default {
         this.closeLoading();
     },
 
-    setup_url: function () {
+    setup_url: function (url) {
         try {
             const contextVideo = this.context.video;
-            let url = contextVideo._linkValue;
-
-            if (url.length === 0) return false;
+            if (!url) url = contextVideo._linkValue;
+            if (!url) return false;
 
             /** iframe source */
             if (/^<iframe.*\/iframe>$/.test(url)) {

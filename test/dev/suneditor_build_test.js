@@ -708,6 +708,13 @@ ss.showInline = function (toolbar, context) {
 
 },
 
+ss.showController = (currentControllerName, controllerArray, core) => {
+    console.log("controllerArray",controllerArray);
+    if (currentControllerName === "image") {
+        controllerArray[1].querySelector('[data-command="update"]').style.display = 'none'
+    }
+}
+
 // ss.showController = function (name, controllers, core) {
 //     let c = null;
 //     console.log('target', core.currentControllerTarget);
@@ -765,10 +772,13 @@ window.sun_noticeOpen = function () {
 }
 
 window.sun_noticeClose = function () {
-    ss.core.setContents(window.abc);
+    // ss.core.setContents(window.abc);
     // ss.noticeClose();
     // ss.setContents('<div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" data-size="," data-align="none" data-percentage="auto,auto" data-index="0" data-file-name="Tabby" data-file-size="0" origin-size="640,404" data-origin="," style=""></figure></div>')
     // ss.setContents('<span class="__se__katex katex" data-exp="\\\\tilde{a}" data-font-size="1em" style="font-size: 1em;" contenteditable="false"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>a</mi><mo>~</mo></mover></mrow><annotation encoding="application/x-tex">\\tilde{a}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6678599999999999em;vertical-align:0em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6678599999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">a</span></span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">~</span></span></span></span></span></span></span></span></span></span>​​')
+    // ss.core.plugins.image.onRender_imgUrl.call(ss.core, 'http://suneditor.com/docs/cat.jpg');
+    // ss.core.plugins.video.setup_url.call(ss.core, 'http://suneditor.com/docs/cat.jpg');
+    ss.core.plugins.audio.setupUrl.call(ss.core, 'http://suneditor.com/docs/cat.jpg');
 }
 
 window.sun_save = function () {

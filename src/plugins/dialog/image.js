@@ -376,7 +376,7 @@ export default {
                 imagePlugin.submitAction.call(this, this.context.image.imgInputFile.files);
             } else if (contextImage.imgUrlFile && contextImage._v_src._linkValue.length > 0) {
                 this.showLoading();
-                imagePlugin.onRender_imgUrl.call(this);
+                imagePlugin.onRender_imgUrl.call(this, contextImage._v_src._linkValue);
             }
         } catch (error) {
             this.closeLoading();
@@ -558,14 +558,15 @@ export default {
         }
     },
 
-    onRender_imgUrl: function () {
+    onRender_imgUrl: function (url) {
+        if (!url) url = this.context.image._v_src._linkValue;
+        if (!url) return false;
         const contextImage = this.context.image;
-        if (contextImage._v_src._linkValue.length === 0) return false;
 
         try {
-            const file = {name: contextImage._v_src._linkValue.split('/').pop(), size: 0};
-            if (this.context.dialog.updateModal) this.plugins.image.update_src.call(this, contextImage._v_src._linkValue, contextImage._element, file);
-            else this.plugins.image.create_image.call(this, contextImage._v_src._linkValue, this.plugins.anchor.createAnchor.call(this, contextImage.anchorCtx, true), contextImage.inputX.value, contextImage.inputY.value, contextImage._align, file, contextImage._altText);
+            const file = {name: url.split('/').pop(), size: 0};
+            if (this.context.dialog.updateModal) this.plugins.image.update_src.call(this, url, contextImage._element, file);
+            else this.plugins.image.create_image.call(this, url, this.plugins.anchor.createAnchor.call(this, contextImage.anchorCtx, true), contextImage.inputX.value, contextImage.inputY.value, contextImage._align, file, contextImage._altText);
         } catch (e) {
             throw Error('[SUNEDITOR.image.URLRendering.fail] cause : "' + e.message + '"');
         } finally {
