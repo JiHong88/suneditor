@@ -464,6 +464,10 @@ export interface SunEditorOptions {
      * =====
      */
     /**
+     * Default checked value of the "Open in new window" checkbox.
+     */
+    linkTargetNewWindow?: boolean;
+    /**
      * Protocol for the links (if link has been added without any protocol this one will be used).
      */
     linkProtocol?: string;

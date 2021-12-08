@@ -122,7 +122,7 @@ export default {
         if (!update) {
             this.plugins.anchor.init.call(this, contextAnchor);
             contextAnchor.anchorText.value = this.getSelection().toString().trim();
-            contextAnchor.newWindowCheck.checked = this.options.anchor;
+            contextAnchor.newWindowCheck.checked = this.options.linkTargetNewWindow;
         } else if (contextAnchor.linkAnchor) {
             this.context.dialog.updateModal = true;
             const href = contextAnchor.linkAnchor.href;

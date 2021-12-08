@@ -404,6 +404,8 @@
 
             <br>
             <h4 style="color: #b94a48;">--Link</h4>
+            <label><input type="checkbox" id="linkTargetNewWindow">&nbsp;&nbsp;linkTargetNewWindow</label>
+            <br><br>
             <label><input type="checkbox" id="linkProtocol">&nbsp;&nbsp;linkProtocol</label>
             <input type="text" id="linkProtocol_value" placeholder="https://" style="width: 200px">
             <br><br>
@@ -687,6 +689,7 @@ function sun_create () {
         tableCellControllerPosition: document.getElementById('tableCellControllerPosition').checked ? document.getElementById('tableCellControllerPosition_value').value : undefined,
         hrItems: document.getElementById('hrItems').checked ? [ {name: "Outset", style: "border-style: outset;"} ] : undefined,
         tabDisable: document.getElementById('tabDisable').checked,
+        linkTargetNewWindow: document.getElementById('linkTargetNewWindow').checked ? true : undefined,
         linkProtocol: document.getElementById('linkProtocol').checked ? document.getElementById('linkProtocol_value').value : undefined,
         linkRel: document.getElementById('linkRel').checked ? ['author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'] : undefined,
         linkRelDefault: document.getElementById('linkRelDefault').checked ? {default: 'nofollow', check_new_window: 'noreferrer noopener', check_bookmark: 'bookmark'} : undefined,

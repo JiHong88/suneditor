@@ -519,6 +519,7 @@ export default {
         /** Table */
         options.tableCellControllerPosition = typeof options.tableCellControllerPosition === 'string' ? options.tableCellControllerPosition.toLowerCase() : 'cell';
         /** Link */
+        options.linkTargetNewWindow = !!options.linkTargetNewWindow;
         options.linkProtocol = typeof options.linkProtocol === 'string' ? options.linkProtocol : null;
         options.linkRel = Array.isArray(options.linkRel) ? options.linkRel : [];
         options.linkRelDefault = options.linkRelDefault || {};

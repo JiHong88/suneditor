@@ -777,6 +777,7 @@ videoAccept      : Define the "accept" attribute of the input.  default: "*" {St
 tableCellControllerPosition : Define position to the table cell controller('cell', 'top'). default: 'cell' {String}
 
 // Link-----------------------------------------------------------------------------------------------------------
+linkTargetNewWindow : Default checked value of the "Open in new window" checkbox.   default: false {Boolean}
 linkProtocol    : Default protocol for the links. ('link', 'image', 'video', 'audio')
                   This applies to all plugins that enter the internet url.   default: null {String}
 linkRel         : Defines "rel" attribute list of anchor tag.   default: [] {Array}

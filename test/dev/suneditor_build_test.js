@@ -419,6 +419,8 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // <p>​<strong><span style="color: rgb(255, 94, 0);">SunEditor</span></strong>&nbsp;<em><span style="background-color: rgb(250, 237, 125);">distributed under</span></em>&nbsp;the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a>&nbsp;license.<br>
     // </p>
     // `,
+    value: "ss",
+    linkTargetNewWindow: true,
     imageAlignShow: false,
     plugins: {...{custom_container}, ...plugins},
     katex: Katex,
@@ -481,7 +483,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     //     italic: 'u'
     // },
     tableCellControllerPosition: 'top',
-    lang: lang.fr,
+    // lang: lang.fr,
     // value: '',
     // imageAccept: "*",
     // videoAccept: "*",
