@@ -174,7 +174,8 @@ export default {
         this.editLink = this.context.link._linkAnchor = this.context.anchor.caller.link.linkAnchor = selectionATag;
         const linkBtn = this.context.link.linkController;
         const link = linkBtn.querySelector('a');
-
+        
+        link.target = this.editLink.getAttribute('target');
         link.href = selectionATag.href;
         link.title = selectionATag.textContent;
         link.textContent = selectionATag.textContent;
