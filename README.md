@@ -670,7 +670,6 @@ imageGalleryUrl     : The url of the image gallery, if you use the image gallery
                       You can also use it by adding "imageGallery" to the button list.   default: null {String}
                       ex) "/editor/getGallery"
                       response format: {
-                            "errorMessage": "insert error message",
                             "result": [
                                 {
                                     "src": "/download/editorImg/test_image.jpg", // @Require
@@ -678,7 +677,9 @@ imageGalleryUrl     : The url of the image gallery, if you use the image gallery
                                     "alt": "Alt text", // @Option - default: src.split('/').pop()
                                     "tag": "Tag name" // @Option
                                 }
-                            ]
+                            ],
+                            "nullMessage": "Text string or HTML string", // It is displayed when "result" is empty.
+                            "errorMessage": "Insert error message", // It is displayed when an error occurs. 
                         }
                       You can redefine the "plugins.imageGallery.drawItems" method.
 imageGalleryHeader: Http Header when get image gallery.         default: null {Object}
