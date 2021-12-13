@@ -496,6 +496,11 @@ popupDisplay    : Size of background area when activating dialog window ('full'|
 resizingBar     : Show the bottom resizing bar.
                   If 'height' value is 'auto', it will not be resized. default: true {Boolean}
 showPathLabel   : Displays the current node structure to resizingBar.  default: true {Boolean}
+resizeEnable  : Enable/disable resize function of bottom resizing bar.   default: true {Boolean}
+resizingBarContainer: A custom HTML selector placing the resizing bar inside.
+                      The class name of the element must be 'sun-editor'.
+                      Element or querySelector argument.     default: null {Element|String}
+                      ex) document.querySelector('#id') || '#id'
 
 // Character count-----------------------------------------------------------------------------------------------
 charCounter     : Shows the number of characters in the editor.     

@@ -7520,7 +7520,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             /** resizingBar */
             if (context.element.resizingBar) {
-                if (/\d+/.test(options.height)) {
+                if (/\d+/.test(options.height) && options.resizeEnable) {
                     context.element.resizingBar.addEventListener('mousedown', event.onMouseDown_resizingBar, false);
                 } else {
                     util.addClass(context.element.resizingBar, 'se-resizing-none');

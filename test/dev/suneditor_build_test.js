@@ -560,6 +560,8 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // tagsBlacklist: 'style',
     // pasteTagsBlacklist: 'div',
     // tagsBlacklist: 'section|aside',
+    // resizeEnable: false,
+    resizingBarContainer: "#rb",
     attributesWhitelist: {'all': '*'},  // html5 <details open="">..</details>
     // attributesBlacklist: {
     //     all: 'data-a',

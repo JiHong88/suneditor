@@ -156,6 +156,16 @@ export interface SunEditorOptions {
      */
     showPathLabel?: boolean;
     /**
+     * Enable/disable resize function of bottom resizing bar.
+     */
+    resizeEnable?: boolean;
+    /**
+     * A custom HTML selector placing the resizing bar inside.
+     The class name of the element must be 'sun-editor'.
+     Element or querySelector argument.
+     */
+    resizingBarContainer?: HTMLElement | string;
+    /**
      * Character count
      * ===============
      */

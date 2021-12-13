@@ -87,6 +87,17 @@ export default {
         if (toolbarContainer) {
             toolbarContainer.appendChild(tool_bar.element);
         }
+
+        // resizingbar
+        if (resizing_bar) {
+            // resizingbar container
+            const resizingBarContainer = options.resizingBarContainer;
+            if (resizingBarContainer) {
+                resizingBarContainer.appendChild(resizing_bar);
+            } else {
+                relative.appendChild(resizing_bar);
+            }
+        }
     
         /** append html */
         editor_div.appendChild(textarea);
@@ -99,7 +110,6 @@ export default {
         relative.appendChild(line_breaker);
         relative.appendChild(line_breaker_t);
         relative.appendChild(line_breaker_b);
-        if (resizing_bar) relative.appendChild(resizing_bar);
         top_div.appendChild(relative);
 
         textarea = this._checkCodeMirror(options, textarea);
@@ -445,6 +455,8 @@ export default {
         /** Bottom resizing bar */
         options.resizingBar = options.resizingBar === undefined ? (/inline|balloon/i.test(options.mode) ? false : true) : options.resizingBar;
         options.showPathLabel = !options.resizingBar ? false : typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
+        options.resizeEnable = options.resizeEnable === undefined ? true : !!options.resizeEnable;
+        options.resizingBarContainer = typeof options.resizingBarContainer === 'string' ? document.querySelector(options.resizingBarContainer) : options.resizingBarContainer;
         /** Character count */
         options.charCounter = options.maxCharCount > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
         options.charCounterType = typeof options.charCounterType === 'string' ? options.charCounterType : 'char';
