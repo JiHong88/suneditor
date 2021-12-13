@@ -143,10 +143,22 @@ interface Core {
     editorTagsWhitelistRegExp: RegExp;
 
     /**
+     * @description Editor tags blacklist (RegExp object)
+     * util.createTagsBlacklist(options.tagsBlacklist)
+     */
+    editorTagsBlacklistRegExp: RegExp;
+
+    /**
      * @description Tag whitelist when pasting (RegExp object)
      * util.createTagsWhitelist(options.pasteTagsWhitelist)
      */
     pasteTagsWhitelistRegExp: RegExp;
+
+    /**
+     * @description Tag blacklist when pasting (RegExp object)
+     * util.createTagsBlacklist(options.pasteTagsBlacklist)
+     */
+    pasteTagsBlacklistRegExp: RegExp;
 
     /**
      * @description Boolean value of whether the editor has focus
@@ -571,9 +583,11 @@ interface Core {
      * @param html HTML string
      * @param whitelist Regular expression of allowed tags.
      * RegExp object is create by util.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
+     * @param blacklist Regular expression of disallowed tags.
+     * RegExp object is create by util.createTagsBlacklist method. (core.pasteTagsBlacklistRegExp)
      * @returns
      */
-    cleanHTML(html: string, whitelist?: string | RegExp): string;
+    cleanHTML(html: string, whitelist?: string | RegExp, blacklist?: string | RegExp): string;
 
     /**
      * @description Converts contents into a format that can be placed in an editor

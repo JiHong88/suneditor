@@ -403,9 +403,14 @@ export default {
         options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
         /** Whitelist */
         const whitelist = 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
+        // tags
+        options.tagsBlacklist = options.tagsBlacklist || '';
         options._defaultTagsWhitelist = typeof options._defaultTagsWhitelist === 'string' ? options._defaultTagsWhitelist : whitelist;
-        options._editorTagsWhitelist = this._setWhitelist(options._defaultTagsWhitelist + (typeof options.addTagsWhitelist === 'string' && options.addTagsWhitelist.length > 0 ? '|' + options.addTagsWhitelist : ''), options.tagsBlacklist);
-        options.pasteTagsWhitelist = this._setWhitelist(typeof options.pasteTagsWhitelist === 'string' ? options.pasteTagsWhitelist : options._editorTagsWhitelist, options.pasteTagsBlacklist);
+        options._editorTagsWhitelist = options.addTagsWhitelist === '*' ? '*' : this._setWhitelist(options._defaultTagsWhitelist + (typeof options.addTagsWhitelist === 'string' && options.addTagsWhitelist.length > 0 ? '|' + options.addTagsWhitelist : ''), options.tagsBlacklist);
+        // paste tags
+        options.pasteTagsBlacklist = options.tagsBlacklist + (options.tagsBlacklist && options.pasteTagsBlacklist ? ('|' + options.pasteTagsBlacklist) : (options.pasteTagsBlacklist || ''));
+        options.pasteTagsWhitelist = options.pasteTagsWhitelist === '*' ? '*' : this._setWhitelist(typeof options.pasteTagsWhitelist === 'string' ? options.pasteTagsWhitelist : options._editorTagsWhitelist, options.pasteTagsBlacklist);
+        // tag attributes
         options.attributesWhitelist = (!options.attributesWhitelist || typeof options.attributesWhitelist !== 'object') ? null : options.attributesWhitelist;
         options.attributesBlacklist = (!options.attributesBlacklist || typeof options.attributesBlacklist !== 'object') ? null : options.attributesBlacklist;
         /** Layout */

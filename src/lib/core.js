@@ -223,6 +223,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _htmlCheckWhitelistRegExp: null,
 
         /**
+         * @description Tag blacklist RegExp object used in "_consistencyCheckOfHTML" method
+         * @private
+         */
+         _htmlCheckBlacklistRegExp: null,
+
+        /**
          * @description RegExp when using check disallowd tags. (b, i, ins, strike, s)
          * @private
          */
@@ -235,10 +241,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         editorTagsWhitelistRegExp: null,
 
         /**
+         * @description Editor tags blacklist (RegExp object)
+         * util.createTagsBlacklist(options.tagsBlacklist)
+         */
+        editorTagsBlacklistRegExp: null,
+
+        /**
          * @description Tag whitelist when pasting (RegExp object)
          * util.createTagsWhitelist(options.pasteTagsWhitelist)
          */
         pasteTagsWhitelistRegExp: null,
+
+        /**
+         * @description Tag blacklist when pasting (RegExp object)
+         * util.createTagsBlacklist(options.pasteTagsBlacklist)
+         */
+        pasteTagsBlacklistRegExp: null,
 
         /**
          * @description Boolean value of whether the editor has focus
@@ -944,14 +962,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Focus to wysiwyg area using "native focus function"
          */
         nativeFocus: function () {
+            this.__focus();
+            this._editorRange();
+        },
+
+        /**
+         * @description Focus method
+         * @private
+         */
+        __focus: function () {
             const caption = util.getParentElement(this.getSelectionNode(), 'figcaption');
             if (caption) {
                 caption.focus();
             } else {
                 context.element.wysiwyg.focus();
             }
-
-            this._editorRange();
         },
 
         /**
@@ -1057,7 +1082,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             selection.addRange(range);
             this._rangeInfo(range, this.getSelection());
-            if (options.iframe) this.nativeFocus();
+            if (options.iframe) this.__focus();
 
             return range;
         },
@@ -4843,7 +4868,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 .replace(/\n/g, '')
                 .replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '')
                 .replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '')
-                .replace(this.editorTagsWhitelistRegExp, '');
+                .replace(this.editorTagsWhitelistRegExp, '')
+                .replace(this.editorTagsBlacklistRegExp, '');
         },
 
         /**
@@ -4926,14 +4952,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {String} html HTML string
          * @param {String|RegExp|null} whitelist Regular expression of allowed tags.
          * RegExp object is create by util.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
+         * @param {String|RegExp|null} blacklist Regular expression of disallowed tags.
+         * RegExp object is create by util.createTagsBlacklist method. (core.pasteTagsBlacklistRegExp)
          * @returns {String}
          */
-        cleanHTML: function (html, whitelist) {
+        cleanHTML: function (html, whitelist, blacklist) {
             html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
 
             const dom = _d.createRange().createContextualFragment(html);
             try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, true);
+                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, true);
             } catch (error) {
                 console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
             }
@@ -4969,7 +4997,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
-            return this._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, ''));
+            if (!cleanHTML) {
+                cleanHTML = html;
+            } else {
+                if (whitelist) cleanHTML = cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, '');
+                if (blacklist) cleanHTML = cleanHTML.replace(typeof blacklist === 'string' ? util.createTagsBlacklist(blacklist) : blacklist, '');
+            }
+
+            return this._tagConvertor(cleanHTML);
         },
 
         /**
@@ -4982,7 +5017,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const dom = _d.createRange().createContextualFragment(contents);
 
             try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, false);
+                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, false);
             } catch (error) {
                 console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
             }
@@ -5304,16 +5339,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._disallowedTextTagsRegExp = disallowTextTags.length === 0 ? null : new wRegExp('(<\\/?)(' + disallowTextTags.join('|') + ')\\b\\s*([^>^<]+)?\\s*(?=>)', 'gi');
 
             // set whitelist
+            const getRegList = function (str, str2) { return !str ? '^' : (str === '*' ? '[a-z-]+' : (!str2 ? str : (str + '|' + str2))); };
+            // tags
             const defaultAttr = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
-            this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1;
-            this._htmlCheckWhitelistRegExp = new wRegExp('^(' + options._editorTagsWhitelist.replace('|//', '') + ')$', 'i');
-            this.editorTagsWhitelistRegExp = util.createTagsWhitelist(options._editorTagsWhitelist.replace('|//', '|<!--|-->'));
-            this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(options.pasteTagsWhitelist);
-
-            // whitelist
+            this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1 || options._editorTagsWhitelist === '*';
+            // html check
+            this._htmlCheckWhitelistRegExp = new wRegExp('^(' + getRegList(options._editorTagsWhitelist.replace('|//', ''), '') + ')$', 'i');
+            this._htmlCheckBlacklistRegExp = new wRegExp('^(' + (options.tagsBlacklist || '^') + ')$', 'i');
+            // tags
+            this.editorTagsWhitelistRegExp = util.createTagsWhitelist(getRegList(options._editorTagsWhitelist.replace('|//', '|<!--|-->'), ''));
+            this.editorTagsBlacklistRegExp = util.createTagsBlacklist(options.tagsBlacklist.replace('|//', '|<!--|-->'));
+            // paste tags
+            this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(getRegList(options.pasteTagsWhitelist, ''));
+            this.pasteTagsBlacklistRegExp = util.createTagsBlacklist(options.pasteTagsBlacklist);
+            // attributes
             const regEndStr = '\\s*=\\s*(\")[^\"]*\\1';
-            const getAttrs = function (str, str2) { return str === '*' ? '[a-z-]+' : (str + '|' + str2); };
-            
             const _wAttr = options.attributesWhitelist;
             let tagsAttr = {};
             let allAttr = '';
@@ -5321,9 +5361,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 for (let k in _wAttr) {
                     if (!util.hasOwn(_wAttr, k) || /^on[a-z]+$/i.test(_wAttr[k])) continue;
                     if (k === 'all') {
-                        allAttr = getAttrs(_wAttr[k], defaultAttr);
+                        allAttr = getRegList(_wAttr[k], defaultAttr);
                     } else {
-                        tagsAttr[k] = new wRegExp('\\s(?:' + getAttrs(_wAttr[k], '') + ')' + regEndStr, 'ig');
+                        tagsAttr[k] = new wRegExp('\\s(?:' + getRegList(_wAttr[k], '') + ')' + regEndStr, 'ig');
                     }
                 }
             }
@@ -5339,9 +5379,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 for (let k in _bAttr) {
                     if (!util.hasOwn(_bAttr, k)) continue;
                     if (k === 'all') {
-                        allAttr = getAttrs(_bAttr[k], '');
+                        allAttr = getRegList(_bAttr[k], '');
                     } else {
-                        tagsAttr[k] = new wRegExp('\\s(?:' + getAttrs(_bAttr[k], '') + ')' + regEndStr, 'ig');
+                        tagsAttr[k] = new wRegExp('\\s(?:' + getRegList(_bAttr[k], '') + ')' + regEndStr, 'ig');
                     }
                 }
             }
@@ -7329,7 +7369,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 } else {
                     cleanData = (plainText === cleanData ? plainText : cleanData).replace(/\n/g, '<br>');
                 }
-                cleanData = core.cleanHTML(cleanData, core.pasteTagsWhitelistRegExp);
+                cleanData = core.cleanHTML(cleanData, core.pasteTagsWhitelistRegExp, core.pasteTagsBlacklistRegExp);
             } else {
                 cleanData = util._HTMLConvertor(plainText).replace(/\n/g, '<br>');
             }
@@ -8064,7 +8104,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         insertHTML: function (html, notCleaningData, checkCharCount, rangeSelection) {
             if (typeof html === 'string') {
-                if (!notCleaningData) html = core.cleanHTML(html, null);
+                if (!notCleaningData) html = core.cleanHTML(html, null, null);
                 try {
                     const dom = _d.createRange().createContextualFragment(html);
                     const domTree = dom.childNodes;

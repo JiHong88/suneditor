@@ -31,7 +31,7 @@ export interface SunEditorOptions {
     /**
      * Add tags to the default tags whitelist of editor.
      */
-    addTagsWhitelist?: string;
+    addTagsWhitelist?: string | '*';
     /**
      * Blacklist of the editor default tags.
      */
@@ -39,7 +39,7 @@ export interface SunEditorOptions {
     /**
      * Whitelist of tags when pasting.
      */
-    pasteTagsWhitelist?: string;
+    pasteTagsWhitelist?: string | '*';
     /**
      * Blacklist of tags when pasting.
      */

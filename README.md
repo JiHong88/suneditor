@@ -396,16 +396,18 @@ value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {String}
 historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {Number}
 
-// Whitelist------------------------------------------------------------------------------------------------
+// Whitelist, Blacklist -----------------------------------------------------------------------------------------
 // (You can use regular expression syntax.)
 // _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
+                        ex) '*' // This means all tags are allowed. (Not available on "blacklist")
 tagsBlacklist         : Blacklist of the editor default tags.               default: null {String}
                         ex) 'h1|h2'
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist - tagsBlacklist
 pasteTagsWhitelist    : Whitelist of tags when pasting.                     default: _editorTagsWhitelist {String}
                         ex) 'p|h1|h2|h3'
+                        ex) '*' // This means all tags are allowed. (Not available on "blacklist")
 pasteTagsBlacklist    : Blacklist of tags when pasting.                     default: null {String}
                         ex) 'h1|h2'
 attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}

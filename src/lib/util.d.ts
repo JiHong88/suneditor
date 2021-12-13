@@ -639,6 +639,14 @@ declare interface util {
      * @returns
      */
     createTagsWhitelist(list: string): RegExp;
+
+    /**
+     * @description Create blacklist RegExp object.
+     * Return RegExp format: new RegExp("<\\/?\\b(?:" + list + ")\\b[^>^<]*+>", "gi")
+     * @param list Tags list ("br|p|div|pre...")
+     * @returns
+     */
+    createTagsBlacklist(list: string): RegExp;
 }
 
 export default util;

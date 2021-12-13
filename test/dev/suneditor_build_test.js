@@ -432,7 +432,6 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     fullScreenOffset: '10px',
     charCounterType: "byte-html",
     mediaAutoSelect: false,
-    addTagsWhitelist: 'x-foo',
     formats: [
         'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
         {
@@ -503,7 +502,6 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // },
     // height: 'auto',
     iframeCSSFileName: '.+',
-    // addTagsWhitelist: 'i|label',
     popupDisplay: 'full',
     charCounter: true,
     charCounterType: 'byte-html',
@@ -557,12 +555,16 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         }
     ],
     // maxCharCount: 670,
-    addTagsWhitelist: 'details|summary',
+    // addTagsWhitelist: 'section|footer|details|summary|metadata|path|svg',
+    addTagsWhitelist: '*',
+    // tagsBlacklist: 'style',
+    // pasteTagsBlacklist: 'div',
+    // tagsBlacklist: 'section|aside',
     attributesWhitelist: {'all': '*'},  // html5 <details open="">..</details>
-    attributesBlacklist: {
-        all: 'data-a',
-        span: 'name'
-    },
+    // attributesBlacklist: {
+    //     all: 'data-a',
+    //     span: 'name'
+    // },
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     buttonList: complexEditor,
     // fullPage: true,
