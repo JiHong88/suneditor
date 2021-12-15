@@ -467,6 +467,11 @@ export interface SunEditorOptions {
      * Defines default "rel" attribute list of anchor tag.
      */
     linkRelDefault?: {default?: string; check_new_window?: string; check_bookmark?: string;};
+
+    /**
+     * It prevents the automatic prefixing of the host URL to the value of the link when `true`.
+     */
+    linkNoPrefix?: boolean;
     /**
      * Key actions
      * =====

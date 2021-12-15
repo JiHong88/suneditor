@@ -789,6 +789,7 @@ linkRelDefault  : Defines default "rel" attributes of anchor tag.   default: {} 
                     linkRelDefault: {
                         check_new_window: 'only:noreferrer noopener'
                     }
+linkNoPrefix   : It prevents the automatic prefixing of the host URL to the value of the link when `true`.
 
 // Key actions----------------------------------------------------------------------------------------------------
 tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {Boolean}
