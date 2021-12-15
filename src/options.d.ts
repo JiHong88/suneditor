@@ -230,9 +230,13 @@ export interface SunEditorOptions {
      */
     fontSize?: number[];
     /**
-     *
+     * The font size unit
      */
     fontSizeUnit?: string;
+    /**
+     * A list of drop-down options for the 'align' plugin.
+     */
+    alignItems?: ('left' | 'center' | 'right' | 'justify')[];
     /**
      * Change default formatBlock array
      */

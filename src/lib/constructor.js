@@ -243,8 +243,14 @@ export default {
         const placeholder_span = initElements.placeholder;
         let code = initElements.codeView;
 
-        if (el.resizingBar) relative.removeChild(el.resizingBar);
-        if (bottomBar.resizingBar) relative.appendChild(bottomBar.resizingBar);
+        if (el.resizingBar) util.removeItem(el.resizingBar);
+        if (bottomBar.resizingBar) {
+            if (mergeOptions.resizingBarContainer && mergeOptions.resizingBarContainer !== originOptions.resizingBarContainer) {
+                mergeOptions.resizingBarContainer.appendChild(bottomBar.resizingBar);
+            } else {
+                relative.appendChild(bottomBar.resizingBar);
+            }
+        }
 
         editorArea.innerHTML = '';
         editorArea.appendChild(code);
@@ -411,7 +417,7 @@ export default {
         };
         options.value = typeof options.value === 'string' ? options.value : null;
         options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
-        /** Whitelist */
+        /** Whitelist, Blacklist */
         const whitelist = 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
         // tags
         options.tagsBlacklist = options.tagsBlacklist || '';
@@ -481,6 +487,7 @@ export default {
         options.paragraphStyles = !options.paragraphStyles ? null : options.paragraphStyles;
         options.textStyles = !options.textStyles ? null : options.textStyles;
         options.fontSizeUnit = typeof options.fontSizeUnit === 'string' ? (options.fontSizeUnit.trim() || 'px') : 'px';
+        options.alignItems = typeof options.alignItems === 'object' ? options.alignItems : (options.rtl ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify']);
         /** Image */
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageHeightShow = options.imageHeightShow === undefined ? true : !!options.imageHeightShow;

@@ -544,6 +544,7 @@ fontSize        : Change default font-size array.                   default: [..
                     8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
                   ]
 fontSizeUnit    : The font size unit.                               default: 'px' {String}
+alignItems      : A list of drop-down options for the 'align' plugin.   default: rtl === true ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'] {Array}
 formats         : Change default formatBlock array.                 default: [...] {Array}
                   Default value: [
                     'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'

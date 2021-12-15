@@ -419,6 +419,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // <p>​<strong><span style="color: rgb(255, 94, 0);">SunEditor</span></strong>&nbsp;<em><span style="background-color: rgb(250, 237, 125);">distributed under</span></em>&nbsp;the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a>&nbsp;license.<br>
     // </p>
     // `,
+    alignItems: ['left', 'right', 'center'],
     value: "ss",
     linkTargetNewWindow: true,
     imageAlignShow: false,
@@ -570,7 +571,8 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     buttonList: complexEditor,
     // fullPage: true,
-    defaultStyle: "font-weight: bold;"
+    defaultStyle: "font-weight: bold;",
+    // rtl: true,
     // buttonList: [['custom_container']]
 });
 
@@ -733,16 +735,24 @@ ss.showController = (currentControllerName, controllerArray, core) => {
 //         }
 //     }
 // }
-window.aaa = '';
+window.aaa = false;
 window.sun_noticeOpen = function () {
+    ss.setOptions({
+        resizingBarContainer: null,
+    })
+    
+    // ss.core.setDir(!window.aaa ? 'rtl' : 'ltr');
+    
+    // window.aaa = !window.aaa
+    // ss.core.setDir("rtl")
     // ss.noticeOpen('test notice');
     // ss.setContents('<html><head>aaa</head><body><div>abc</div></body></html>')
     // const { core } = ss;
     // core.commandHandler(core._styleCommandMap.fullScreen, 'fullScreen')
     // ss.core.commandHandler(null, 'selectAll');
     // ss.core.removeNode()
-    window.abc = ss.core.getContents();
-    console.log(window.abc);
+    // window.abc = ss.core.getContents();
+    // console.log(window.abc);
     // \vec{P}.\vec{Q}=PQ
 //     ss.setContents(`
 //     <p>If&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{P}.\\vec{Q}=PQ" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>P</mi><mo>⃗</mo></mover><mi mathvariant="normal">.</mi><mover accent="true"><mi>Q</mi><mo>⃗</mo></mover><mo>=</mo><mi>P</mi><mi>Q</mi></mrow><annotation encoding="application/x-tex">\\vec{P}.\\vec{Q}=PQ</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1607699999999999em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5

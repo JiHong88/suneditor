@@ -39,6 +39,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _d: _d,
         _w: _w,
         _parser: new _w.DOMParser(),
+        _prevRtl: options.rtl,
 
         /**
          * @description Document object of the iframe if created as an iframe || _d
@@ -4709,7 +4710,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         setDir: function (dir) {
             const rtl = dir === 'rtl';
-            options.rtl = rtl;
+            const changeDir = this._prevRtl !== rtl;
+            this._prevRtl = options.rtl = rtl;
+
+            if (changeDir) {
+                // align buttons
+                if (this.plugins.align) {
+                    this.plugins.align.exchangeDir.call(this);
+                }
+                // indent buttons
+                if (context.tool.indent) util.changeElement(context.tool.indent.firstElementChild, icons.indent);
+                if (context.tool.outdent) util.changeElement(context.tool.outdent.firstElementChild, icons.outdent);
+            }
 
             const el = context.element;
             if (rtl) {
@@ -4721,15 +4733,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             const lineNodes = util.getListChildren(el.wysiwyg, function (current) {
-                return util.isFormatElement(current) && (current.style.marginRight || current.style.marginLeft);
+                return util.isFormatElement(current) && (current.style.marginRight || current.style.marginLeft || current.style.textAlign);
             });
 
             for (let i = 0, len = lineNodes.length, n, l, r; i < len; i++) {
                 n = lineNodes[i];
+                // indent margin
                 r = n.style.marginRight;
                 l = n.style.marginLeft;
-                n.style.marginRight = l;
-                n.style.marginLeft = r;
+                if (r || l) {
+                    n.style.marginRight = l;
+                    n.style.marginLeft = r;
+                }
+                // text align
+                r = n.style.textAlign;
+                if (r === 'left') n.style.textAlign = 'right';
+                else if (r === 'right') n.style.textAlign = 'left';
             }
 
             const tool = context.tool;
@@ -7929,7 +7948,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const _initHTML = el.wysiwyg.innerHTML;
 
             // set option
-            const cons = _Constructor._setOptions(mergeOptions, context, options);        
+            const cons = _Constructor._setOptions(mergeOptions, context, options);
 
             if (cons.callButtons) {
                 pluginCallButtons = cons.callButtons;
