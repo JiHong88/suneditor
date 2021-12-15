@@ -124,7 +124,7 @@ export default {
             contextAnchor.anchorText.value = this.getSelection().toString();
         } else if (contextAnchor.linkAnchor) {
             this.context.dialog.updateModal = true;
-            const href = contextAnchor.linkAnchor.href;
+            const href = this.options.linkNoPrefix ? contextAnchor.linkAnchor.href.replace(contextAnchor.linkAnchor.origin + '/', '') : contextAnchor.linkAnchor.href;
             contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = /\#.+$/.test(href) ? href.substr(href.lastIndexOf('#')) : href;
             contextAnchor.anchorText.value = contextAnchor.linkAnchor.textContent.trim() || contextAnchor.linkAnchor.getAttribute('alt');
             contextAnchor.newWindowCheck.checked = (/_blank/i.test(contextAnchor.linkAnchor.target) ? true : false);
