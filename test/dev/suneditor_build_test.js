@@ -419,6 +419,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // <p>​<strong><span style="color: rgb(255, 94, 0);">SunEditor</span></strong>&nbsp;<em><span style="background-color: rgb(250, 237, 125);">distributed under</span></em>&nbsp;the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a>&nbsp;license.<br>
     // </p>
     // `,
+    lineAttrReset: '*',
     alignItems: ['left', 'right', 'center'],
     value: "ss",
     linkTargetNewWindow: true,
@@ -946,6 +947,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
         ]],
     ],
     plugins: plugins,
+    // value: 'abc',
     minHeight : 300,
     charCounter: true,
     font: [
@@ -954,7 +956,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     ],
     iframe: true,
     fullPage: true,
-    imageMultipleFile: true
+    imageMultipleFile: true,
 });
 
 s2.onResizeEditor = (height, prevHeight, core) => {

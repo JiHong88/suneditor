@@ -428,6 +428,10 @@ attributesBlacklist   : Add attribute blacklist of tags that should be deleted i
 // Layout-------------------------------------------------------------------------------------------------------
 mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {String}
 rtl             : If true, the editor is set to RTL(Right To Left) mode.   default: false {Boolean}
+lineAttrReset   : Deletes other attributes except for the property set at the time of line break.
+                  If there is no value, no all attribute is deleted.    default: '' {String}
+                  ex) 'class|style': Attributes other than "class" and "style" are deleted at line break.
+                      '*': All attributes are deleted at line break.
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
                   'inline' or 'balloon' mode.     default: 'auto' {Number|String}
 toolbarContainer: A custom HTML selector placing the toolbar inside.

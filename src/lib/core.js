@@ -1511,7 +1511,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Element}
          */
         appendFormatTag: function (element, formatNode) {
-            if (!element.parentNode) return null;
+            if (!element || !element.parentNode) return null;
 
             const currentFormatEl = util.getFormatElement(this.getSelectionNode(), null);
             let oFormat = null;
@@ -6789,6 +6789,44 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                             temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
                             core.setRange(temp, 0, temp, 0);
+                            break;
+                        } else if (options.lineAttrReset && formatEl) {
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            let newEl;
+                            if (!range.collapsed) {
+                                const isMultiLine = util.getFormatElement(range.startContainer, null) !== util.getFormatElement(range.endContainer, null);
+                                const r = core.removeNode();
+                                if (isMultiLine) {
+                                    newEl = util.getFormatElement(r.container, null);
+
+                                    if (!r.prevContainer) {
+                                        const newFormat = formatEl.cloneNode(false);
+                                        newFormat.innerHTML = '<br>';
+                                        newEl.parentNode.insertBefore(newFormat, newEl);
+                                    } else if (newEl !== formatEl && newEl.nextElementSibling === formatEl) {
+                                        newEl = formatEl;
+                                    }
+                                } else {
+                                    newEl = util.splitElement(r.container, r.offset, 0);
+                                }
+                            } else {
+                                newEl = util.splitElement(range.endContainer, range.endOffset, 0);
+                            }
+
+                            const resetAttr = options.lineAttrReset === '*' ? null : options.lineAttrReset;
+                            const attrs = newEl.attributes;
+                            let i = 0;
+                            while (attrs[i]) {
+                                if (resetAttr && resetAttr.test(attrs[i].name)) {
+                                    i++;
+                                    continue;
+                                }
+                                newEl.removeAttribute(attrs[i].name);
+                            }
+                            core.setRange(newEl.firstChild, 0, newEl.firstChild, 0);
+
                             break;
                         }
 

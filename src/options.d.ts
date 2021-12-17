@@ -65,6 +65,13 @@ export interface SunEditorOptions {
      */
     rtl?: boolean;
     /**
+     * Deletes other attributes except for the property set at the time of line break.
+     * If there is no value, no all attribute is deleted.
+     * @example 'class|style': Attributes other than "class" and "style" are deleted at line break.
+     * '*': All attributes are deleted at line break.
+     */
+    lineAttrReset?: string;
+    /**
      * Button List
      */
     buttonList?: ButtonListItem[];
@@ -318,7 +325,7 @@ export interface SunEditorOptions {
     imageMultipleFile?: boolean;
     /**
      * Define the "accept" attribute of the input.
-     * ex) "*" or ".jpg, .png .."
+     * @example "*" or ".jpg, .png .."
      */
     imageAccept?: string;               
     /**
@@ -497,9 +504,11 @@ export interface SunEditorOptions {
      * HR
      * =====
      */
-    // Defines the hr items.
-    // "class" or "style" must be specified. 
-    // EX) [{name: "solid", class: "__se__xxx", style: "border-style: outset;"}]
+    /**
+     * Defines the hr items.
+     * "class" or "style" must be specified.
+     * @example [{name: "solid", class: "__se__xxx", style: "border-style: outset;"}]
+     */
     hrItems?: { name: string; class?: string; style?: string }[];
     /**
      * Key actions
