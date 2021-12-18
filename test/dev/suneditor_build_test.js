@@ -421,7 +421,13 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // `,
     lineAttrReset: '*',
     alignItems: ['left', 'right', 'center'],
-    value: "ss",
+    value: `<p>ss&nbsp; fdf fdsfa fds</p>
+
+    <p>a fdsa fdsa fdas</p>
+    
+    <p>&nbsp;dsa fdsa fdsa fdsa<br>
+    </p>
+    `,
     linkTargetNewWindow: true,
     imageAlignShow: false,
     plugins: {...{custom_container}, ...plugins},
@@ -491,7 +497,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // audioAccept: ".mp3",
     display: 'block',
     width: '100%',
-    height: '500px',
+    height: 'auto',
     // audioTagAttrs: {
     //     controlslist: "nodownload",
     // },

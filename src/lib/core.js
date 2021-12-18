@@ -4387,7 +4387,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 this._variable._codeOriginCssText = this._variable._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
                 this._variable._wysiwygOriginCssText = this._variable._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 
-                if (options.height === 'auto' && !options.codeMirrorEditor) context.element.code.style.height = context.element.code.scrollHeight > 0 ? (context.element.code.scrollHeight + 'px') : 'auto';
+                if (this._variable.isFullScreen) context.element.code.style.height = '100%';
+                else if (options.height === 'auto' && !options.codeMirrorEditor) context.element.code.style.height = context.element.code.scrollHeight > 0 ? (context.element.code.scrollHeight + 'px') : 'auto';
+                
                 if (options.codeMirrorEditor) options.codeMirrorEditor.refresh();
                 
                 this._variable.isCodeView = true;
@@ -4555,6 +4557,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 editorArea.style.cssText = _var._editorAreaOriginCssText;
                 topArea.style.cssText = _var._originCssText;
                 _d.body.style.overflow = _var._bodyOverflow;
+
+                if (options.height === 'auto' && !options.codeMirrorEditor) event._codeViewAutoHeight();
 
                 if (!!options.toolbarContainer) options.toolbarContainer.appendChild(toolbar);
 
@@ -7248,6 +7252,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         _codeViewAutoHeight: function () {
+            if (core._variable.isFullScreen) return;
             context.element.code.style.height = context.element.code.scrollHeight + 'px';
         },
 
