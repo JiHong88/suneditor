@@ -49,7 +49,7 @@ export default {
      */
     drawItems: function (item) {
         const srcName = item.src.split('/').pop();
-        return  '<div class="se-file-item-img"><img src="' + item.src + '" alt="' + (item.alt || srcName) + '" data-command="pick">' +
+        return  '<div class="se-file-item-img"><img src="' + (item.thumbnail || item.src) + '" alt="' + (item.alt || srcName) + '" data-command="pick" data-value="' + (item.src || item.thumbnail) + '">' +
                     '<div class="se-file-img-name se-file-name-back"></div>' +
                     '<div class="se-file-img-name __se__img_name">' + (item.name || srcName) + '</div>' +
                 '</div>';
@@ -58,7 +58,7 @@ export default {
     setImage: function (target) {
         this.callPlugin('image', function () {
             const file = {name: target.parentNode.querySelector('.__se__img_name').textContent, size: 0};
-            this.plugins.image.create_image.call(this, target.src, null, this.context.image._origin_w, this.context.image._origin_h, 'none', file, target.alt);
+            this.plugins.image.create_image.call(this, target.getAttribute('data-value'), null, this.context.image._origin_w, this.context.image._origin_h, 'none', file, target.alt);
         }.bind(this), null);
     }
 };

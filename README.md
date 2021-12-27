@@ -685,6 +685,7 @@ imageGalleryUrl     : The url of the image gallery, if you use the image gallery
                             "result": [
                                 {
                                     "src": "/download/editorImg/test_image.jpg", // @Require
+                                    "thumbnail": "/download/editorImg/test_thumbnail.jpg", // @Option - Thumbnail image to be displayed in the image gallery.
                                     "name": "Test image", // @Option - default: src.split('/').pop()
                                     "alt": "Alt text", // @Option - default: src.split('/').pop()
                                     "tag": "Tag name" // @Option
