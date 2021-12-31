@@ -1260,19 +1260,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (util.isFormatElement(startCon)) {
                 if (!startCon.childNodes[startOff]) {
-                    startCon = startCon.lastChild;
+                    startCon = startCon.lastChild || startCon;
                     startOff = startCon.textContent.length;
                 } else {
-                    startCon = startCon.childNodes[startOff];
+                    startCon = startCon.childNodes[startOff] || startCon;
                     startOff = 0;
                 }
                 while (startCon && startCon.nodeType === 1 && startCon.firstChild) {
-                    startCon = startCon.firstChild;
+                    startCon = startCon.firstChild || startCon;
                     startOff = 0;
                 }
             }
             if (util.isFormatElement(endCon)) {
-                endCon = endCon.childNodes[endOff] || endCon.lastChild;
+                endCon = endCon.childNodes[endOff] || endCon.lastChild || endCon;
                 while (endCon && endCon.nodeType === 1 && endCon.lastChild) {
                     endCon = endCon.lastChild;
                 }
@@ -1706,8 +1706,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const startOff = range.startOffset;
             const endOff = range.endOffset;
             const formatRange = range.startContainer === commonCon && util.isFormatElement(commonCon);
-            const startCon = formatRange ? (commonCon.childNodes[startOff] || commonCon.childNodes[0]) : range.startContainer;
-            const endCon = formatRange ? (commonCon.childNodes[endOff] || commonCon.childNodes[commonCon.childNodes.length - 1]) : range.endContainer;
+            const startCon = formatRange ? (commonCon.childNodes[startOff] || commonCon.childNodes[0] || range.startContainer) : range.startContainer;
+            const endCon = formatRange ? (commonCon.childNodes[endOff] || commonCon.childNodes[commonCon.childNodes.length - 1] || range.endContainer) : range.endContainer;
             let parentNode, originAfter = null;
 
             if (!afterNode) {
