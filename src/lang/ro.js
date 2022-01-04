@@ -75,6 +75,8 @@
             paragraphStyle: 'Stil paragraf',
             textStyle: 'Stil text',
             imageGallery: 'Galerie de imagini',
+            dir_ltr: 'De la stânga la dreapta',
+            dir_rtl: 'De la dreapta la stanga',
             mention: 'Mentiune'
         },
         dialogBox: {

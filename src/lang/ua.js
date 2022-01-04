@@ -75,6 +75,8 @@
             paragraphStyle: "Стиль абзацу",
             textStyle: "Стиль тексту",
             imageGallery: "Галерея",
+            dir_ltr: 'Зліва направо',
+            dir_rtl: 'Справа наліво',
             mention: "Згадати"
         },
         dialogBox: {

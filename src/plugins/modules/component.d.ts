@@ -22,4 +22,4 @@ declare interface component extends Module {
     create_caption(): string;
 }
 
-export default resizing;
+export default component;

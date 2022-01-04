@@ -75,6 +75,8 @@
             paragraphStyle: 'Absatzstil',
             textStyle: 'Textstil',
             imageGallery: 'Bildergalerie',
+            dir_ltr: 'Links nach rechts',
+            dir_rtl: 'Rechts nach links',
             mention: 'Erwähnen'
         },
         dialogBox: {

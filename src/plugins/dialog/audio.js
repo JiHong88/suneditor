@@ -454,10 +454,8 @@ export default {
         this.plugins.audio._setTagAttrs.call(this, element);
         
         // find component element
-        const existElement = this.util.getParentElement(element, this.util.isMediaComponent) || 
-            this.util.getParentElement(element, function (current) {
-                return this.isWysiwygDiv(current.parentNode);
-            }.bind(this.util));
+        const existElement = (this.util.isRangeFormatElement(element.parentNode) || this.util.isWysiwygDiv(element.parentNode)) ? 
+            element : this.util.getFormatElement(element) || element;
 
         // clone element
         const prevElement = element;
@@ -466,7 +464,9 @@ export default {
         const container = this.plugins.component.set_container.call(this, cover, 'se-audio-container');
 
         try {
-            if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
+            if (this.util.isListCell(existElement) || this.util.isFormatElement(existElement)) {
+                prevElement.parentNode.replaceChild(container, prevElement);
+            } else if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(prevElement);
                 // clean format tag

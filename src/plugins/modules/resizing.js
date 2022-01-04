@@ -437,11 +437,16 @@
             }
     
             // align icon
-            const alignList = contextResizing.alignMenuList;
-            this.util.changeElement(contextResizing.alignButton.firstElementChild, contextResizing.alignIcons[align]);
-            for (let i = 0, len = alignList.length; i < len; i++) {
-                if (alignList[i].getAttribute('data-value') === align) this.util.addClass(alignList[i], 'on');
-                else this.util.removeClass(alignList[i], 'on');
+            if (contextPlugin._alignHide) {
+                contextResizing.alignButton.style.display = 'none';
+            } else {
+                contextResizing.alignButton.style.display = '';
+                const alignList = contextResizing.alignMenuList;
+                this.util.changeElement(contextResizing.alignButton.firstElementChild, contextResizing.alignIcons[align]);
+                for (let i = 0, len = alignList.length; i < len; i++) {
+                    if (alignList[i].getAttribute('data-value') === align) this.util.addClass(alignList[i], 'on');
+                    else this.util.removeClass(alignList[i], 'on');
+                }
             }
     
             // percentage active

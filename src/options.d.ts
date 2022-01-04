@@ -31,15 +31,15 @@ export interface SunEditorOptions {
     /**
      * Add tags to the default tags whitelist of editor.
      */
-    addTagsWhitelist?: string;
-    /**
-     * Whitelist of tags when pasting.
-     */
-    pasteTagsWhitelist?: string;
+    addTagsWhitelist?: string | '*';
     /**
      * Blacklist of the editor default tags.
      */
     tagsBlacklist?: string;
+    /**
+     * Whitelist of tags when pasting.
+     */
+    pasteTagsWhitelist?: string | '*';
     /**
      * Blacklist of tags when pasting.
      */
@@ -47,7 +47,11 @@ export interface SunEditorOptions {
     /**
      * Add attributes whitelist of tags that should be kept undeleted from the editor.
      */
-    attributesWhitelist?: Record<string, string>;
+    attributesWhitelist?: Record<string, string | '*'>;
+    /**
+     * Add attribute blacklist of tags that should be deleted in editor.
+     */
+    attributesBlacklist?: Record<string, string | '*'>;
     /**
      * Layout
      * ======
@@ -60,6 +64,13 @@ export interface SunEditorOptions {
      * If true, the editor is set to RTL(Right To Left) mode.
      */
     rtl?: boolean;
+    /**
+     * Deletes other attributes except for the property set at the time of line break.
+     * If there is no value, no all attribute is deleted.
+     * @example 'class|style': Attributes other than "class" and "style" are deleted at line break.
+     * '*': All attributes are deleted at line break.
+     */
+    lineAttrReset?: string;
     /**
      * Button List
      */
@@ -91,6 +102,10 @@ export interface SunEditorOptions {
      * Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration
      */
     fullPage?: boolean;
+    /**
+     * Attributes of the iframe.
+     */
+    iframeAttributes?: Record<string, string>;
     /**
      * Name of the CSS file(s) to apply inside the iframe.
      */
@@ -147,6 +162,16 @@ export interface SunEditorOptions {
      * Displays the current node structure to resizingBar
      */
     showPathLabel?: boolean;
+    /**
+     * Enable/disable resize function of bottom resizing bar.
+     */
+    resizeEnable?: boolean;
+    /**
+     * A custom HTML selector placing the resizing bar inside.
+     The class name of the element must be 'sun-editor'.
+     Element or querySelector argument.
+     */
+    resizingBarContainer?: HTMLElement | string;
     /**
      * Character count
      * ===============
@@ -212,9 +237,13 @@ export interface SunEditorOptions {
      */
     fontSize?: number[];
     /**
-     *
+     * The font size unit
      */
     fontSizeUnit?: string;
+    /**
+     * A list of drop-down options for the 'align' plugin.
+     */
+    alignItems?: ('left' | 'center' | 'right' | 'justify')[];
     /**
      * Change default formatBlock array
      */
@@ -296,7 +325,7 @@ export interface SunEditorOptions {
     imageMultipleFile?: boolean;
     /**
      * Define the "accept" attribute of the input.
-     * ex) "*" or ".jpg, .png .."
+     * @example "*" or ".jpg, .png .."
      */
     imageAccept?: string;               
     /**
@@ -456,6 +485,10 @@ export interface SunEditorOptions {
      * =====
      */
     /**
+     * Default checked value of the "Open in new window" checkbox.
+     */
+    linkTargetNewWindow?: boolean;
+    /**
      * Protocol for the links (if link has been added without any protocol this one will be used).
      */
     linkProtocol?: string;
@@ -471,6 +504,16 @@ export interface SunEditorOptions {
      * If true, disables the automatic prefixing of the host URL to the value of the link. default: false {Boolean}
      */
     linkNoPrefix?: boolean;
+    /*
+     * HR
+     * =====
+     */
+    /**
+     * Defines the hr items.
+     * "class" or "style" must be specified.
+     * @example [{name: "solid", class: "__se__xxx", style: "border-style: outset;"}]
+     */
+    hrItems?: { name: string; class?: string; style?: string }[];
     /**
      * Key actions
      * =====

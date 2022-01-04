@@ -15,9 +15,10 @@ export default {
         const context = core.context;
         context.align = {
             targetButton: targetElement,
+            _itemMenu: null,
             _alignList: null,
             currentAlign: '',
-            defaultDir: core.options.rtl ? 'right' : 'left', 
+            defaultDir: core.options.rtl ? 'right' : 'left',
             icons: {
                 justify: icons.align_justify,
                 left: icons.align_left,
@@ -28,7 +29,7 @@ export default {
 
         /** set submenu */
         let listDiv = this.setSubmenu(core);
-        let listUl = listDiv.querySelector('ul');
+        let listUl = context.align._itemMenu = listDiv.querySelector('ul');
 
         /** add event listeners */
         listUl.addEventListener('click', this.pickup.bind(core));
@@ -45,36 +46,24 @@ export default {
         const lang = core.lang;
         const icons = core.icons;
         const listDiv = core.util.createElement('DIV');
-        const leftDir = core.context.align.defaultDir === 'left';
+        const alignItems = core.options.alignItems;
 
-        const leftMenu = '<li>' +
-            '<button type="button" class="se-btn-list se-btn-align" data-command="justifyleft" data-value="left" title="' + lang.toolbar.alignLeft + '">' +
-                '<span class="se-list-icon">' + icons.align_left + '</span>' + lang.toolbar.alignLeft +
-            '</button>' +
-        '</li>';
-
-        const rightMenu = '<li>' +
-            '<button type="button" class="se-btn-list se-btn-align" data-command="justifyright" data-value="right" title="' + lang.toolbar.alignRight + '">' +
-                '<span class="se-list-icon">' + icons.align_right +'</span>' + lang.toolbar.alignRight +
-            '</button>' +
-        '</li>';
+        let html = '';
+        for (let i = 0, item, text; i < alignItems.length; i++) {
+            item = alignItems[i];
+            text = lang.toolbar['align' + item.charAt(0).toUpperCase() + item.slice(1)];
+            html += '<li>' +
+                '<button type="button" class="se-btn-list se-btn-align" data-value="' + item + '" title="' + text + '">' +
+                    '<span class="se-list-icon">' + icons['align_' + item] + '</span>' + text +
+                '</button>' +
+            '</li>';
+        }
 
         listDiv.className = 'se-submenu se-list-layer se-list-align';
         listDiv.innerHTML = '' +
             '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
-                    (leftDir ? leftMenu : rightMenu) +
-                    '<li>' +
-                        '<button type="button" class="se-btn-list se-btn-align" data-command="justifycenter" data-value="center" title="' + lang.toolbar.alignCenter + '">' +
-                            '<span class="se-list-icon">' + icons.align_center + '</span>' + lang.toolbar.alignCenter +
-                        '</button>' +
-                    '</li>' +
-                    (leftDir? rightMenu : leftMenu) +
-                    '<li>' +
-                        '<button type="button" class="se-btn-list se-btn-align" data-command="justifyfull" data-value="justify" title="' + lang.toolbar.alignJustify + '">' +
-                            '<span class="se-list-icon">' + icons.align_justify + '</span>' + lang.toolbar.alignJustify +
-                        '</button>' +
-                    '</li>' +
+                    html +
                 '</ul>' +
             '</div>';
 
@@ -122,6 +111,22 @@ export default {
             }
 
             alignContext.currentAlign = currentAlign;
+        }
+    },
+
+    exchangeDir: function () {
+        const dir = this.options.rtl ? 'right' : 'left';
+        if (!this.context.align || this.context.align.defaultDir === dir) return;
+
+        this.context.align.defaultDir = dir;
+        let menu = this.context.align._itemMenu;
+        let leftBtn = menu.querySelector('[data-value="left"]');
+        let rightBtn = menu.querySelector('[data-value="right"]');
+        if (leftBtn && rightBtn) {
+            const lp = leftBtn.parentElement;
+            const rp = rightBtn.parentElement;
+            lp.appendChild(rightBtn);
+            rp.appendChild(leftBtn);
         }
     },
 

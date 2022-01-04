@@ -20,6 +20,27 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import CodeMirror from 'codemirror';
 
+console.log("pluginf???", plugins);
+plugins.fontSize.pickup = function (e){
+    console.log("font----------size", this)
+    if (!/^BUTTON$/i.test(e.target.tagName)) return false;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const value = "20px";
+
+    if (value) {
+        const newNode = this.util.createElement('SPAN');
+        newNode.style.fontSize = value;
+        this.nodeChange(newNode, ['font-size'], null, null);
+    } else {
+        this.nodeChange(null, ['font-size'], ['span'], true);
+    }
+
+    this.submenuOff();
+}
+
 
 // import 'katex/dist/katex.min.css';
 import Katex from 'katex';
@@ -56,7 +77,8 @@ const fs = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72, 8, 9, 
     ];
 
 const complexEditor = [
-    ['undo', 'redo'],
+    ['undo', 'redo', 'dir'],
+    ['dir_ltr', 'dir_rtl'],
         ['font', 'fontSize', 'formatBlock'],
         ['paragraphStyle', 'blockquote'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -381,7 +403,8 @@ s1.onKeyDown = function (e, core) {
 }
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
-    // value: "<p>This is just an example</p>",
+    // value: `Let $\Omega$ be the underlying randomness space. In this case, the variables $X^-$ and $X^+$ collapse to $U$. To see why, pick an arbitrary $\omega \in \Omega$:
+    // \begin{align*}X^-(\Omega) = \sup\left\{y\in [0,1]: F(y)<U(\omega)\right\} = \sup\left\{y\in [0,1]: P(U\leq y)<U(\omega)\right\} = \sup\left\{y\in [0,1]: y<U(\omega)\right\} = U(\omega).\end{align*}`,
     // value: `
     // <h1>header111</h1>
     // <p>fdafds</p>
@@ -396,6 +419,17 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // <p>​<strong><span style="color: rgb(255, 94, 0);">SunEditor</span></strong>&nbsp;<em><span style="background-color: rgb(250, 237, 125);">distributed under</span></em>&nbsp;the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a>&nbsp;license.<br>
     // </p>
     // `,
+    lineAttrReset: '*',
+    alignItems: ['left', 'right', 'center'],
+    value: `<p>ss&nbsp; fdf fdsfa fds</p>
+
+    <p>a fdsa fdsa fdas</p>
+    
+    <p>&nbsp;dsa fdsa fdsa fdsa<br>
+    </p>
+    `,
+    linkTargetNewWindow: true,
+    imageAlignShow: false,
     plugins: {...{custom_container}, ...plugins},
     katex: Katex,
     codeMirror: CodeMirror,
@@ -406,7 +440,6 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     fullScreenOffset: '10px',
     charCounterType: "byte-html",
     mediaAutoSelect: false,
-    addTagsWhitelist: 'x-foo',
     formats: [
         'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
         {
@@ -457,14 +490,14 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     //     italic: 'u'
     // },
     tableCellControllerPosition: 'top',
-    lang: lang.fr,
+    // lang: lang.fr,
     // value: '',
     // imageAccept: "*",
     // videoAccept: "*",
     // audioAccept: ".mp3",
     display: 'block',
     width: '100%',
-    height: '500px',
+    height: 'auto',
     // audioTagAttrs: {
     //     controlslist: "nodownload",
     // },
@@ -477,7 +510,6 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // },
     // height: 'auto',
     iframeCSSFileName: '.+',
-    // addTagsWhitelist: 'i|label',
     popupDisplay: 'full',
     charCounter: true,
     charCounterType: 'byte-html',
@@ -531,10 +563,23 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
         }
     ],
     // maxCharCount: 670,
-    addTagsWhitelist: 'details|summary',
-    attributesWhitelist: {'details': 'open'},  // html5 <details open="">..</details>
+    // addTagsWhitelist: 'section|footer|details|summary|metadata|path|svg',
+    addTagsWhitelist: '*',
+    // tagsBlacklist: 'style',
+    // pasteTagsBlacklist: 'div',
+    // tagsBlacklist: 'section|aside',
+    // resizeEnable: false,
+    resizingBarContainer: "#rb",
+    attributesWhitelist: {'all': '*'},  // html5 <details open="">..</details>
+    // attributesBlacklist: {
+    //     all: 'data-a',
+    //     span: 'name'
+    // },
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     buttonList: complexEditor,
+    // fullPage: true,
+    defaultStyle: "font-weight: bold;",
+    // rtl: true,
     // buttonList: [['custom_container']]
 });
 
@@ -545,7 +590,7 @@ ss.onSetToolbarButtons = function(buttonList, core) {
 // ss.setContents("")
 // ss.setContents('fsafsa')
 ss.onload = function (core) {
-    console.log('onload', core.context.video._infoList);
+    console.log('_editorStyles', core.options.defaultStyle);
     // core.focus();
 };
 ss.onScroll = function (e) {
@@ -662,6 +707,8 @@ function ResizeImage (files, uploadHandler) {
 // ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
 //     // ResizeImage(files, uploadHandler)
     
+//     console.log("infoinfoinfo", info);
+//     info.alt = "test-123";
 //     const response = { // Same format as "videoUploadUrl" response
 //         "result": [ { "url": "http://suneditor.com/docs/cat.jpg", "name": "test", "size": "0" }, ]
 //     };
@@ -676,6 +723,13 @@ ss.showInline = function (toolbar, context) {
 
 },
 
+ss.showController = (currentControllerName, controllerArray, core) => {
+    console.log("controllerArray",controllerArray);
+    if (currentControllerName === "image") {
+        controllerArray[1].querySelector('[data-command="update"]').style.display = 'none'
+    }
+}
+
 // ss.showController = function (name, controllers, core) {
 //     let c = null;
 //     console.log('target', core.currentControllerTarget);
@@ -688,42 +742,52 @@ ss.showInline = function (toolbar, context) {
 //         }
 //     }
 // }
-window.aaa = '';
+window.aaa = false;
 window.sun_noticeOpen = function () {
+    ss.setOptions({
+        resizingBarContainer: null,
+    })
+    
+    // ss.core.setDir(!window.aaa ? 'rtl' : 'ltr');
+    
+    // window.aaa = !window.aaa
+    // ss.core.setDir("rtl")
     // ss.noticeOpen('test notice');
     // ss.setContents('<html><head>aaa</head><body><div>abc</div></body></html>')
     // const { core } = ss;
     // core.commandHandler(core._styleCommandMap.fullScreen, 'fullScreen')
-    ss.core.commandHandler(null, 'selectAll');
-    ss.core.removeNode()
+    // ss.core.commandHandler(null, 'selectAll');
+    // ss.core.removeNode()
+    // window.abc = ss.core.getContents();
+    // console.log(window.abc);
     // \vec{P}.\vec{Q}=PQ
-    ss.setContents(`
-    <p>If&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{P}.\\vec{Q}=PQ" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>P</mi><mo>⃗</mo></mover><mi mathvariant="normal">.</mi><mover accent="true"><mi>Q</mi><mo>⃗</mo></mover><mo>=</mo><mi>P</mi><mi>Q</mi></mrow><annotation encoding="application/x-tex">\\vec{P}.\\vec{Q}=PQ</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1607699999999999em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
-3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
-10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
--1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
--7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
-H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span></span></span></span><span class="mord">.</span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">Q</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
-3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
-10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
--1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
--7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
-H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault">Q</span></span></span></span>​, then angle between&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{P}" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>P</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\\vec{P}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9663299999999999em;vertical-align:0em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
-3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
-10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
--1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
--7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
-H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span></span></span></span></span></span></span>​&nbsp;and&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{Q}" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>Q</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\\vec{Q}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1607699999999999em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">Q</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
-3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
-10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
--1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
--7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
-H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
-c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span></span></span></span>​&nbsp;is</p>
-    `)
+//     ss.setContents(`
+//     <p>If&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{P}.\\vec{Q}=PQ" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>P</mi><mo>⃗</mo></mover><mi mathvariant="normal">.</mi><mover accent="true"><mi>Q</mi><mo>⃗</mo></mover><mo>=</mo><mi>P</mi><mi>Q</mi></mrow><annotation encoding="application/x-tex">\\vec{P}.\\vec{Q}=PQ</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1607699999999999em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+// 3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+// 10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+// -1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+// -7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+// H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+// c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span></span></span></span><span class="mord">.</span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">Q</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+// 3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+// 10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+// -1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+// -7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+// H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+// c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault">Q</span></span></span></span>​, then angle between&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{P}" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>P</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\\vec{P}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9663299999999999em;vertical-align:0em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+// 3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+// 10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+// -1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+// -7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+// H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+// c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span></span></span></span></span></span></span>​&nbsp;and&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{Q}" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>Q</mi><mo>⃗</mo></mover></mrow><annotation encoding="application/x-tex">\\vec{Q}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1607699999999999em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">Q</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
+// 3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
+// 10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
+// -1.333 1.333-3.167 3.5-5.5 6.5s-4 4.833-5 5.5c-1 .667-2.5 1.333-4.5 2s-4.333 1
+// -7 1c-4.667 0-9.167-1.833-13.5-5.5S337 184 337 178c0-12.667 15.667-32.333 47-59
+// H213l-171-1c-8.667-6-13-12.333-13-19 0-4.667 4.333-11.333 13-20h359
+// c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span></span></span></span>​&nbsp;is</p>
+//     `)
     // ss.core.focus();
     // ss.core.setIframeContents({
     //     head: '<style>* {color: red;}</style>'
@@ -731,10 +795,13 @@ c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span><span class="
 }
 
 window.sun_noticeClose = function () {
+    // ss.core.setContents(window.abc);
     // ss.noticeClose();
-    ss.setContents("")
     // ss.setContents('<div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" data-size="," data-align="none" data-percentage="auto,auto" data-index="0" data-file-name="Tabby" data-file-size="0" origin-size="640,404" data-origin="," style=""></figure></div>')
     // ss.setContents('<span class="__se__katex katex" data-exp="\\\\tilde{a}" data-font-size="1em" style="font-size: 1em;" contenteditable="false"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>a</mi><mo>~</mo></mover></mrow><annotation encoding="application/x-tex">\\tilde{a}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6678599999999999em;vertical-align:0em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6678599999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">a</span></span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">~</span></span></span></span></span></span></span></span></span></span>​​')
+    // ss.core.plugins.image.onRender_imgUrl.call(ss.core, 'http://suneditor.com/docs/cat.jpg');
+    // ss.core.plugins.video.setup_url.call(ss.core, 'http://suneditor.com/docs/cat.jpg');
+    ss.core.plugins.audio.setupUrl.call(ss.core, 'http://suneditor.com/docs/cat.jpg');
 }
 
 window.sun_save = function () {
@@ -752,7 +819,8 @@ window.sun_getImagesInfo = function () {
 }
 
 window.sun_insertHTML = function (html) {
-    ss.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" /><p>fdafds</p>', true, true, false);
+    // ss.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" /><p>fdafds</p>', true, true, false);
+    ss.setContents("");
     ss.setOptions({
         mathFontSize: [
             {text: '1', value: '1em'},
@@ -843,81 +911,58 @@ const editor = suneditor.init({
 });
 
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
-    lang: lang.ko,
-    // mode: 'inline',
-    // value: `<p>111</p>
-
-    // <p>222</p>
-    
-    // <p>333</p>
-    
-    // <hr class="__se__solid">
-    
-    // <p>444</p>
-    
-    // <p>555</p>
-    
-    // <p>666<br>
-    // </p>
-    // `,
-    previewTemplate: `
-    <h1>Preview Template</h1>
-    {{ contents }}
-    <div style="background: #ccc;">Footer</div>`,
-    // toolbarWidth: 150,
-    attributesWhitelist: {'all': 'style'},
-    plugins: plugins,
-    fontSize: fs,
-    // maxHeight: '400px',
-    katex: Katex,
-    height: '700px',
-    defaultStyle: 'height: 500px; font-size:10px;',
-    imageGalleryUrl: 'http://localhost:3000/editor/gallery',
-    // height: 400,
-    fontSizeUnit: 'pt',
-    imageResizing: true,
-    // imageWidth: '400',
-    buttonList: complexEditor,
-    icons: {
-        underline: '',
-        strike: '',
-        caption: ''
-    },
-    templates: [
-        {
-            name: 'template1',
-            html: '<p>fdkjslfjdslkf</p>'
-        },
-        {
-            name: 'templeeeeeeeeeeeeeate2',
-            html: '<p><strong>11111</strong></p>'
-        },
-        {
-            name: 'template3',
-            html: '<p><u>22222</u></p>'
-        }
+    buttonList: [
+        ['undo', 'redo'],
+        ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
+        ['bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
+        ['removeFormat'],
+        ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save'],
+        ['-right', ':r-More Rich-default.more_plus', 'horizontalRule', 'list', 'table'],
+        ['-right', 'image', 'video', 'audio', 'link'],
+        // (min-width: 992)
+        ['%1100', [
+            ['undo', 'redo'],
+            ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
+            ['bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
+            ['removeFormat'],
+            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
+            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
+        ]],
+        ['%870', [
+            ['undo', 'redo'],
+            ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
+            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
+            ['removeFormat'],
+            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
+            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
+        ]],
+        ['%660', [
+            ['undo', 'redo'],
+            [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
+            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
+            ['removeFormat'],
+            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
+            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
+        ]],
+        ['%335', [
+            ['undo', 'redo'],
+            [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
+            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat'],
+            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
+            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
+        ]],
     ],
-    callBackSave: function (contents) {
-        alert(contents)
-    },
-    formats: ['h1', 'p', 'blockquote', {
-        tag: 'div',
-        class: '__se__format__aaa',
-        name: 'custom div',
-        command: 'replace'
-    }],
-    // iframe: true,
-    // fullPage: true,
-    // mode: 'balloon',
-    codeMirror: CodeMirror,
-    // codeMirror: {
-    //     src: CodeMirror,
-    //     options: {
-    //         mode: 'xml'
-    //     }
-    // },
-    // placeholder: 'Start typing something.3..'
-    // imageUploadSizeLimit: 30000
+    plugins: plugins,
+    // value: 'abc',
+    minHeight : 300,
+    charCounter: true,
+    font: [
+        'Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact',
+        'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'
+    ],
+    iframe: true,
+    fullPage: true,
+    imageMultipleFile: true,
 });
 
 s2.onResizeEditor = (height, prevHeight, core) => {
@@ -1100,9 +1145,10 @@ window.setImageList = function () {
     imageTable.innerHTML = list;
 }
 
-s2.onload = function (core, isUpdate) {
-    console.log('2222onload222', isUpdate)
+s2.onload = (core, isUpdate) => {
 }
+
+s2.onBlur = () => {console.log("ff?!?!?!?!?")}
 
 s2.onImageUpload = function (targetElement, index, state, imageInfo, remainingFilesCount) {
     console.log('imageInfo', imageInfo);

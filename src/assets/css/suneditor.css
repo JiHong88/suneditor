@@ -138,7 +138,7 @@
 /** --- toolbar ---------------------------------------------------------- */
 .sun-editor .se-toolbar {display:block; position:relative; height:auto; width:100%; overflow:visible; padding:0; margin:0; background-color:#fafafa; outline:1px solid #dadada; z-index:5;}
 .sun-editor .se-toolbar-cover {position:absolute; display:none; font-size:36px; width:100%; height:100%; top:0; left:0; background-color:#fefefe; opacity:.5; filter:alpha(opacity=50); cursor:not-allowed; z-index:4;}
-.sun-editor .se-toolbar-separator-vertical {display:inline-block; height:0px; width:0px; margin:1px; vertical-align:top;}
+.sun-editor .se-toolbar-separator-vertical {display:inline-block; height:0px; width:0px; margin:0px; vertical-align:top;}
 /* inline toolbar */
 .sun-editor .se-toolbar.se-toolbar-inline {display:none; position:absolute; box-shadow:0 3px 9px rgba(0,0,0,.5); -webkit-box-shadow:0 3px 9px rgba(0,0,0,.5);}
 /* balloon toolbar */
@@ -150,7 +150,7 @@
 /** --- tool bar --- module --- button, module, group ----------------------------------------------------------  */
 /* module */
 .sun-editor .se-btn-module {display:inline-block;}
-.sun-editor .se-btn-module-border {border:1px solid #dadada; border-radius:4px;}
+.sun-editor .se-btn-module-border {border:1px solid #dadada; border-radius:4px; margin-left:1px; margin-right:1px;}
 .sun-editor .se-btn-module-enter {display:block; width:100%; height:1px; margin-bottom:5px; background-color:transparent;}
 /* ---more - layer */
 .sun-editor .se-toolbar-more-layer {margin:0 -3px; background-color:#fafafa;}
@@ -167,7 +167,6 @@
 /* tool bar select button (font, fontSize, formatBlock) */
 .sun-editor .se-btn-select {width:auto; display:flex; padding:4px 6px;}
 .sun-editor .se-btn-select .txt {flex:auto; text-align:left;}
-.sun-editor.se-rtl .se-btn-select svg {margin:auto 1px;}
 .sun-editor .se-btn-select.se-btn-tool-font {width:100px;}
 .sun-editor .se-btn-select.se-btn-tool-format {width:82px;}
 .sun-editor .se-btn-select.se-btn-tool-size {width:78px;}
@@ -207,6 +206,7 @@
 .sun-editor .se-list-layer.se-list-font-family .default {border-bottom:1px solid #CCC;}
 /* submenu layer - hr */
 .sun-editor .se-list-layer.se-list-line {width:125px;}
+.sun-editor .se-list-layer.se-list-line hr {border-width: 1px 0 0; height: 1px;}
 /* submenu layer - align */
 .sun-editor .se-list-layer.se-list-align .se-list-inner {left:9px; width:125px;}
 /** submenu layer - format block, paragraph style, text style */
@@ -464,6 +464,7 @@
 /** --- RTL ---------------------------------------------------------- */
 /* tray */
 .sun-editor.se-rtl .se-btn-tray {direction:rtl;}
+.sun-editor.se-rtl .se-btn-select svg {margin:auto 1px;}
 
 /* button--- */
 /* button - select text */
@@ -472,8 +473,8 @@
 .sun-editor.se-rtl .se-btn-list {text-align:right;}
 .sun-editor.se-rtl .se-btn-list > .se-list-icon {margin:-1px 0 0 10px;}
 /* button - se-menu-list - li */
-.sun-editor.se-rtl .se-menu-list {float:right;}
-.sun-editor.se-rtl .se-menu-list li {float:right;}
+.sun-editor.se-rtl .se-menu-list:not(.se-menu-dir-fix) {float:right;}
+.sun-editor.se-rtl .se-menu-list:not(.se-menu-dir-fix) li {float:right;}
 
 /* menu list--- */
 .sun-editor.se-rtl .se-list-layer * {direction:rtl;}
@@ -522,6 +523,24 @@
 .sun-editor.se-rtl .se-controller .se-btn-group {direction:rtl;}
 .sun-editor.se-rtl .se-resizing-container .se-resize-display {direction:rtl;}
 /** --- RTL ---------------------------------------------------------- */
+
+/** button module float --------------------------------------------- */
+.sun-editor .se-btn-module-border.module-float-left {float:left;}
+.sun-editor .se-btn-module-border.module-float-right {float:right;}
+
+
+/** ---------------------------------------------------------- menu items style ---------------------------------------------------------- */
+/** hr menu items */
+.sun-editor hr.__se__solid {
+    border-style: solid none none;
+}
+.sun-editor hr.__se__dotted {
+    border-style: dotted none none;
+}
+.sun-editor hr.__se__dashed {
+    border-style: dashed none none;
+}
+/** ---------------------------------------------------------- menu items style ---------------------------------------------------------- */
 
 
 /** animation */

@@ -31,26 +31,22 @@ export default {
     setSubmenu: function (core) {
         const lang = core.lang;
         const listDiv = core.util.createElement('DIV');
-
+        const items = core.options.hrItems || [{name: lang.toolbar.hr_solid, class: '__se__solid'}, {name: lang.toolbar.hr_dashed, class: '__se__dashed'}, {name: lang.toolbar.hr_dotted, class: '__se__dotted'}];
+        
+        let list = '';
+        for (let i = 0, len = items.length; i < len; i++) {
+            list += '<li>' +
+                '<button type="button" class="se-btn-list btn_line" data-command="horizontalRule" data-value="' + items[i].class + '" title="' + items[i].name + '">' +
+                    '<hr' + (items[i].class ? ' class="' + items[i].class + '"' : '') + (items[i].style ? ' style="' + items[i].style + '"' : '') + '/>' +
+                '</button>' +
+            '</li>';
+        }
+        
         listDiv.className = 'se-submenu se-list-layer se-list-line';
         listDiv.innerHTML = '' +
             '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
-                    '<li>' +
-                        '<button type="button" class="se-btn-list btn_line" data-command="horizontalRule" data-value="solid" title="' + lang.toolbar.hr_solid + '">' +
-                            '<hr style="border-width: 1px 0 0; border-style: solid none none; border-color: black; border-image: initial; height: 1px;" />' +
-                        '</button>' +
-                    '</li>' +
-                    '<li>' +
-                        '<button type="button" class="se-btn-list btn_line" data-command="horizontalRule" data-value="dotted" title="' + lang.toolbar.hr_dotted + '">' +
-                            '<hr style="border-width: 1px 0 0; border-style: dotted none none; border-color: black; border-image: initial; height: 1px;" />' +
-                        '</button>' +
-                    '</li>' +
-                    '<li>' +
-                        '<button type="button" class="se-btn-list btn_line" data-command="horizontalRule" data-value="dashed" title="' + lang.toolbar.hr_dashed + '">' +
-                            '<hr style="border-width: 1px 0 0; border-style: dashed none none; border-color: black; border-image: initial; height: 1px;" />' +
-                        '</button>' +
-                    '</li>' +
+                    list +
                 '</ul>' +
             '</div>';
 
@@ -74,11 +70,9 @@ export default {
         return false;
     },
 
-    appendHr: function (className) {
-        const oHr = this.util.createElement('HR');
-        oHr.className = className;
+    appendHr: function (hrTemp) {
         this.focus();
-        return this.insertComponent(oHr, false, true, false);
+        return this.insertComponent(hrTemp.cloneNode(false), false, true, false);
     },
 
     horizontalRulePick: function (e) {
@@ -86,16 +80,16 @@ export default {
         e.stopPropagation();
 
         let target = e.target;
-        let value = null;
+        let command = target.getAttribute('data-command');
         
-        while (!value && !/UL/i.test(target.tagName)) {
-            value = target.getAttribute('data-value');
+        while (!command && !/UL/i.test(target.tagName)) {
             target = target.parentNode;
+            command = target.getAttribute('data-command');
         }
 
-        if (!value) return;
+        if (!command) return;
 
-        const oNode = this.plugins.horizontalRule.appendHr.call(this, '__se__' + value);
+        const oNode = this.plugins.horizontalRule.appendHr.call(this, target.firstElementChild);
         if (oNode) {
             this.setRange(oNode, 0, oNode, 0);
             this.submenuOff();

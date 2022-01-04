@@ -75,6 +75,8 @@
             paragraphStyle: 'Styl akapitu',
             textStyle: 'Styl tekstu',
             imageGallery: 'Galeria obrazów',
+            dir_ltr: 'Od lewej do prawej',
+            dir_rtl: 'Od prawej do lewej',
             mention: 'Wzmianka'
         },
         dialogBox: {
