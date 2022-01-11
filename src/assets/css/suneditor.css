@@ -151,7 +151,7 @@
 /* module */
 .sun-editor .se-btn-module {display:inline-block;}
 .sun-editor .se-btn-module-border {border:1px solid #dadada; border-radius:4px; margin-left:1px; margin-right:1px;}
-.sun-editor .se-btn-module-enter {display:block; width:100%; height:1px; margin-bottom:5px; background-color:transparent;}
+.sun-editor .se-btn-module-enter {display:block; width:100%; height:0px; margin:0; padding:0; background-color:transparent;}
 /* ---more - layer */
 .sun-editor .se-toolbar-more-layer {margin:0 -3px; background-color:#fafafa;}
 .sun-editor .se-toolbar-more-layer .se-more-layer {display:none;  border-top:1px solid #dadada;}
