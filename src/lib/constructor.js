@@ -89,15 +89,8 @@ export default {
         }
 
         // resizingbar
-        if (resizing_bar) {
-            // resizingbar container
-            const resizingBarContainer = options.resizingBarContainer;
-            if (resizingBarContainer) {
-                resizingBarContainer.appendChild(resizing_bar);
-            } else {
-                relative.appendChild(resizing_bar);
-            }
-        }
+        const resizingBarContainer = options.resizingBarContainer;
+        if (resizing_bar && resizingBarContainer) resizingBarContainer.appendChild(resizing_bar);
     
         /** append html */
         editor_div.appendChild(textarea);
@@ -110,6 +103,7 @@ export default {
         relative.appendChild(line_breaker);
         relative.appendChild(line_breaker_t);
         relative.appendChild(line_breaker_b);
+        if (resizing_bar && !resizingBarContainer) relative.appendChild(resizing_bar);
         top_div.appendChild(relative);
 
         textarea = this._checkCodeMirror(options, textarea);
