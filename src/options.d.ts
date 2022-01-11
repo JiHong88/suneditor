@@ -277,6 +277,10 @@ export interface SunEditorOptions {
      */
     imageHeightShow?: boolean;
     /**
+     * Choose whether the image align radio buttons are visible.
+     */
+    imageAlignShow?: boolean;
+    /**
      * The default width size of the image frame
      */
     imageWidth?: string;
@@ -352,6 +356,10 @@ export interface SunEditorOptions {
      * Choose whether the video height input is visible.
      */
     videoHeightShow?: boolean;
+    /**
+     * Choose whether the video align radio buttons are visible.
+     */
+    videoAlignShow?: boolean;
     /**
      * Choose whether the video ratio options is visible.
      */
