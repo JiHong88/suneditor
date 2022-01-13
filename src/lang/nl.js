@@ -75,6 +75,8 @@
             paragraphStyle: 'Alineastijl',
             textStyle: 'Tekststijl',
             imageGallery: 'Galerij',
+            dir_ltr: 'Van links naar rechts',
+            dir_rtl: 'Rechts naar links',
             mention: 'Vermelding'
         },
         dialogBox: {

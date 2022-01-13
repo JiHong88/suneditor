@@ -143,10 +143,22 @@ interface Core {
     editorTagsWhitelistRegExp: RegExp;
 
     /**
+     * @description Editor tags blacklist (RegExp object)
+     * util.createTagsBlacklist(options.tagsBlacklist)
+     */
+    editorTagsBlacklistRegExp: RegExp;
+
+    /**
      * @description Tag whitelist when pasting (RegExp object)
      * util.createTagsWhitelist(options.pasteTagsWhitelist)
      */
     pasteTagsWhitelistRegExp: RegExp;
+
+    /**
+     * @description Tag blacklist when pasting (RegExp object)
+     * util.createTagsBlacklist(options.pasteTagsBlacklist)
+     */
+    pasteTagsBlacklistRegExp: RegExp;
 
     /**
      * @description Boolean value of whether the editor has focus
@@ -181,6 +193,23 @@ interface Core {
     commandMap: Record<string, Element>;
 
     /**
+     * @description Contains pairs of all "data-commands" and "elements" setted in toolbar over time
+     * Used primarily to save and recover button states after the toolbar re-creation
+     * Updates each "_cachingButtons()" invocation  
+     */
+    allCommandButtons: Record<string, Element>;
+
+    /**
+     * @description Save the current buttons states to "allCommandButtons" object
+     */
+    saveButtonStates(): void;
+
+    /**
+     * @description Recover the current buttons states from "allCommandButtons" object
+     */
+    recoverButtonStates(): void;
+
+    /**
      * @description If the plugin is not added, add the plugin and call the 'add' function.
      * If the plugin is added call callBack function.
      * @param pluginName The name of the plugin to call
@@ -210,7 +239,7 @@ interface Core {
     initMenuTarget(pluginName: string, target: Element | null, menu: Element): void;
 
     /**
-     * @description Enabled submenu
+     * @description Enable submenu
      * @param element Submenu's button element to call
      */
     submenuOn(element: Element): void;
@@ -221,7 +250,12 @@ interface Core {
     submenuOff(): void;
 
     /**
-     * @description Enabled container
+     * @description Disable more layer
+     */
+    moreLayerOff(): void;
+
+    /**
+     * @description Enable container
      * @param element Container's button element to call
      */
     containerOn(element: Element): void;
@@ -507,7 +541,7 @@ interface Core {
      * @description Changes to full screen or default screen
      * @param element full screen button
      */
-    toggleFullScreen(element: Element): void;
+    toggleFullScreen(element: Element | null): void;
 
     /**
      * @description Prints the current contents of the editor.
@@ -518,6 +552,12 @@ interface Core {
      * @description Open the preview window.
      */
     preview(): void;
+
+    /**
+     * @description Set direction to "rtl" or "ltr".
+     * @param dir "rtl" or "ltr"
+     */
+    setDir(dir: 'rtl' | 'ltr'): void;
 
     /**
      * @description Sets the HTML string
@@ -543,9 +583,11 @@ interface Core {
      * @param html HTML string
      * @param whitelist Regular expression of allowed tags.
      * RegExp object is create by util.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
+     * @param blacklist Regular expression of disallowed tags.
+     * RegExp object is create by util.createTagsBlacklist method. (core.pasteTagsBlacklistRegExp)
      * @returns
      */
-    cleanHTML(html: string, whitelist?: string | RegExp): string;
+    cleanHTML(html: string, whitelist?: string | RegExp, blacklist?: string | RegExp): string;
 
     /**
      * @description Converts contents into a format that can be placed in an editor
@@ -557,9 +599,10 @@ interface Core {
     /**
      * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
      * @param html WYSIWYG element (context.element.wysiwyg) or HTML string.
+     * @param comp If true, does not line break and indentation of tags.
      * @returns 
      */
-    convertHTMLForCodeView(html: Element | string): string;
+    convertHTMLForCodeView(html: Element | string, comp?: boolean): string;
 
     /**
      * @description Add an event to document.
@@ -598,12 +641,12 @@ interface Toolbar {
     /**
      * @description Disable the toolbar
      */
-    disabled(): void;
+    disable(): void;
 
     /**
      * @description Enable the toolbar
      */
-    enabled(): void;
+    enable(): void;
 
     /**
      * @description Show the toolbar
@@ -614,6 +657,18 @@ interface Toolbar {
      * @description Hide the toolbar
      */
     hide(): void;
+}
+
+interface Wysiwyg {
+    /**
+     * @description Disable the wysiwyg area
+     */
+    disable(): void;
+
+    /**
+     * @description Enable the wysiwyg area
+     */
+    enable(): void;
 }
 
 type EventFn = (e: Event, core: Core) => void;
@@ -645,8 +700,15 @@ export default class SunEditor {
     onBlur: (e: FocusEvent, core: Core) => void;
     onDrop: (e: Event, cleanData: string, maxCharCount: number, core: Core) => boolean | string;
     onPaste: (e: Event, cleanData: string, maxCharCount: number, core: Core) => boolean | string;
-    onCopy: (e: Event, clipboardData: any, core: Core) => void;
-    onCut: (e: Event, clipboardData: any, core: Core) => void;
+    onCopy: (e: Event, clipboardData: any, core: Core) => boolean;
+    onCut: (e: Event, clipboardData: any, core: Core) => boolean;
+
+    /**
+     * @description Called just after the save was executed.
+     * @param contents Editor content
+     * @param core Core object
+     */
+    onSave: (contents: string, core: Core) => void;
 
     /**
      * @description Called just before the inline toolbar is positioned and displayed on the screen.
@@ -877,6 +939,14 @@ export default class SunEditor {
     onResizeEditor: (height: number, prevHeight: number, core: Core) => {};
 
     /**
+     * @description Called after the "setToolbarButtons" invocation.
+     * Can be used to tweak buttons properties (useful for custom buttons)
+     * @param buttonList Button list 
+     * @param core Core object
+     */
+    onSetToolbarButtons: (buttonList: any[], core: Core) => void;
+
+    /**
      * @description Reset the buttons on the toolbar. (Editor is not reloaded)
      * You cannot set a new plugin for the button.
      * @param buttonList Button list 
@@ -1006,12 +1076,12 @@ export default class SunEditor {
     /**
      * @description Disable the suneditor
      */
-    disabled(): void;
+    disable(): void;
 
     /**
      * @description Enable the suneditor
      */
-    enabled(): void;
+    enable(): void;
 
     /**
      * @description Show the suneditor
@@ -1032,4 +1102,9 @@ export default class SunEditor {
      * @description Toolbar methods
      */
     toolbar: Toolbar;
+
+    /**
+     * @description Wysiwyg methods
+     */
+    wysiwyg: Wysiwyg;
 }

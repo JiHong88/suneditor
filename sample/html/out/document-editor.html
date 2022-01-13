@@ -538,11 +538,29 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="editorTagsBlacklistRegExp"><span class="type-signature"></span>editorTagsBlacklistRegExp<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Editor tags blacklist (RegExp object)<br>
+                <a href="./document-util.html#createTagsBlacklist">util.createTagsBlacklist</a>(<span style="color:#d73a49;">options.tagsBlacklist</span>)<br>
+            </div>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="pasteTagsWhitelistRegExp"><span class="type-signature"></span>pasteTagsWhitelistRegExp<span
                     class="type-signature"></span></h4>
             <div class="description">
                 Tag whitelist when pasting (RegExp object)<br>
                 <a href="./document-util.html#createTagsWhitelist">util.createTagsWhitelist</a>(<span style="color:#d73a49;">options.pasteTagsWhitelist</span>)
+            </div>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="pasteTagsBlacklistRegExp"><span class="type-signature"></span>pasteTagsBlacklistRegExp<span
+                    class="type-signature"></span></h4>
+            <div class="description">
+                Tag blacklist when pasting (RegExp object)<br>
+                <a href="./document-util.html#createTagsBlacklist">util.createTagsBlacklist</a>(<span style="color:#d73a49;">options.pasteTagsBlacklist</span>)
             </div>
             <dl class="details"></dl>
 
@@ -671,6 +689,16 @@
                 </tr>
                 </tbody>
             </table>
+            <dl class="details"></dl>
+
+
+            <h4 class="name" id="allCommandButtons"><span class="type-signature"></span>allCommandButtons<span
+                class="type-signature"></span></h4>
+            <div class="description">
+                Contains pairs of all "data-commands" and "elements" setted in toolbar over time.<br>
+                Used primarily to save and recover button states after the toolbar re-creation.<br>
+                Updates each "_cachingButtons()" invocation.
+            </div>
             <dl class="details"></dl>
 
 
@@ -882,7 +910,7 @@
             <h4 class="name" id="submenuOn"><span class="type-signature"></span>submenuOn<span class="signature">(element)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
-                Enabled submenu
+                Enable submenu
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -917,7 +945,7 @@
             <h4 class="name" id="containerOn"><span class="type-signature"></span>containerOn<span class="signature">(element)</span><span
                     class="type-signature"></span></h4>
             <div class="description">
-                Enabled container
+                Enable container
             </div>
             <h5>Parameters:</h5>
             <table class="params">
@@ -1911,6 +1939,33 @@
             </div>
             <dl class="details"></dl>
 
+            
+            <h4 class="name" id="commandHandler"><span class="type-signature"></span>setDir<span
+                    class="signature">(dir)</span><span class="type-signature"></span></h4>
+            <div class="description">
+                Set direction to "rtl" or "ltr".
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>String</code></td>
+                    <td class="type">
+                        <span class="param-type">dir</span>
+                    </td>
+                    <td class="description last">"rtl" or "ltr"</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
 
             <h4 class="name" id="setContents"><span class="type-signature"></span>setContents<span 
                 class="signature">(html)</span><span class="type-signature"></span></h4>
@@ -2001,7 +2056,7 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="cleanHTML"><span class="type-signature"></span>cleanHTML<span class="signature">(html, whitelist)</span><span
+            <h4 class="name" id="cleanHTML"><span class="type-signature"></span>cleanHTML<span class="signature">(html, whitelist, blacklist)</span><span
                     class="type-signature"> &rarr; {String}</span></h4>
             <div class="description">
                 Gets the clean HTML code for editor
@@ -2031,6 +2086,16 @@
                     <td class="description last">
                         Regular expression of allowed tags.<br>
                         RegExp object is create by <a href="#createTagsWhitelist">util.createTagsWhitelist</a> method. (<a href="./document-editor.html#pasteTagsWhitelistRegExp">core.pasteTagsWhitelistRegExp</a>)
+                    </td>
+                </tr>
+                <tr>
+                    <td class="name"><code>blacklist</code></td>
+                    <td class="type">
+                        <span class="param-type">String|RegExp|null</span>
+                    </td>
+                    <td class="description last">
+                        Regular expression of disallowed tags.<br>
+                        RegExp object is create by <a href="#createTagsBlacklist">util.createTagsBlacklist</a> method. (<a href="./document-editor.html#pasteTagsBlacklistRegExp">core.pasteTagsBlacklistRegExp</a>)
                     </td>
                 </tr>
                 </tbody>
@@ -2211,7 +2276,7 @@
             <dl class="details"></dl>
 
 
-            <h4 class="name" id="convertHTMLForCodeView"><span class="type-signature"></span>convertHTMLForCodeView<span class="signature">(html)</span><span
+            <h4 class="name" id="convertHTMLForCodeView"><span class="type-signature"></span>convertHTMLForCodeView<span class="signature">(html, comp)</span><span
                     class="type-signature"> &rarr; {String}</span></h4>
             <div class="description">
                 Converts wysiwyg area element into a format that can be placed in an editor of code view mode
@@ -2232,6 +2297,13 @@
                         <span class="param-type">Element|String</span>
                     </td>
                     <td class="description last">WYSIWYG element (context.element.wysiwyg) or HTML string</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>comp</code></td>
+                    <td class="type">
+                        <span class="param-type">Boolean</span>
+                    </td>
+                    <td class="description last">If true, does not line break and indentation of tags.</td>
                 </tr>
                 </tbody>
             </table>
@@ -2273,7 +2345,9 @@
         <li><a href="document-editor.html#codeViewDisabledButtons">codeViewDisabledButtons</a></li>
         <li><a href="document-editor.html#resizingDisabledButtons">resizingDisabledButtons</a></li>
         <li><a href="document-editor.html#editorTagsWhitelistRegExp">editorTagsWhitelistRegExp</a></li>
+        <li><a href="document-editor.html#editorTagsBlacklistRegExp">editorTagsBlacklistRegExp</a></li>
         <li><a href="document-editor.html#pasteTagsWhitelistRegExp">pasteTagsWhitelistRegExp</a></li>
+        <li><a href="document-editor.html#pasteTagsBlacklistRegExp">pasteTagsBlacklistRegExp</a></li>
         <li><a href="document-editor.html#hasFocus">hasFocus</a></li>
         <li><a href="document-editor.html#activePlugins">activePlugins</a></li>
         <li><a href="document-editor.html#managedTagsInfo">managedTagsInfo</a></li>

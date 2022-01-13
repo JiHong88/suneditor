@@ -264,6 +264,14 @@ declare interface util {
     getArrayItem(array: any[] | HTMLCollection | NodeList, validation: Function | null, multi: boolean): any[] | Node | null;
     
     /**
+     * @description Check if an array contains an element 
+     * @param {Array|HTMLCollection|NodeList} array element array
+     * @param {Node} element The element to find index
+     * @returns {Boolean}
+     */
+    arrayIncludes(array: any[] | HTMLCollection | NodeList, element: Node): boolean;
+
+    /**
      * @description Get the index of the argument value in the element array
      * @param array element array
      * @param element The element to find index
@@ -535,13 +543,20 @@ declare interface util {
     toggleClass(element: Element, className: string): boolean | undefined;
 
     /**
+     * @description Checks if element can't be easily enabled
+     * @param {Element} element Element to check for
+     */
+    isImportantDisabled(element: Element): boolean;
+
+    /**
      * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
      * core.codeViewDisabledButtons (An array of buttons whose class name is not "se-code-view-enabled")
      * core.resizingDisabledButtons (An array of buttons whose class name is not "se-resizing-enabled")
      * @param disabled Disabled value
      * @param buttonList Button array
+     * @param important If priveleged mode should be used (Necessary to switch importantDisabled buttons)
      */
-    setDisabledButtons(disabled: boolean, buttonList: Element[] | HTMLCollection | NodeList): void;
+    setDisabledButtons(disabled: boolean, buttonList: Element[] | HTMLCollection | NodeList, important: Boolean): void;
 
     /**
      * @description Delete argumenu value element
@@ -624,6 +639,14 @@ declare interface util {
      * @returns
      */
     createTagsWhitelist(list: string): RegExp;
+
+    /**
+     * @description Create blacklist RegExp object.
+     * Return RegExp format: new RegExp("<\\/?\\b(?:" + list + ")\\b[^>^<]*+>", "gi")
+     * @param list Tags list ("br|p|div|pre...")
+     * @returns
+     */
+    createTagsBlacklist(list: string): RegExp;
 }
 
 export default util;

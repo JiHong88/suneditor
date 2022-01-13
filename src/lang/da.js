@@ -78,6 +78,8 @@
             paragraphStyle: 'Afsnitstil',
             textStyle: 'Tekststil',
             imageGallery: 'Billedgalleri',
+            dir_ltr: 'Venstre til højre',
+            dir_rtl: 'Højre til venstre',
             mention: 'Nævne'
         },
         dialogBox: {

@@ -76,6 +76,8 @@
             paragraphStyle: 'Estilo do parágrafo',
             textStyle: 'Estilo do texto',
             imageGallery: 'Galeria de imagens',
+            dir_ltr: 'Da esquerda para direita',
+            dir_rtl: 'Direita para esquerda',
             mention: 'Menção'
         },
         dialogBox: {

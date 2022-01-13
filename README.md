@@ -40,9 +40,10 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 - [Custom plugins](#custom-plugins)
 - [Document](#document)
 - [Other libraries using SunEditor](#other-libraries-using-sunEditor)
+    - [suneditor-react](#lib-suneditor-react)
+    - [angular-suneditor](#lib-angular-suneditor)
     - [Plugin for Pluxml](#lib-pluxml)
     - [AEM-SunEditor](#lib-pluxml)
-    - [SunEditor-React](#lib-suneditor-react)
 - [License](#license)
 
 
@@ -160,7 +161,8 @@ suneditor.create('sample', {
         /** ['imageGallery'] */ // You must add the "imageGalleryUrl".
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
-        ['save', 'template']
+        ['save', 'template'],
+        /** ['dir', 'dir_ltr', 'dir_rtl'] */ // "dir": Toggle text direction, "dir_ltr": Right to Left, "dir_rtl": Left to Right
     ]
 })
 
@@ -205,7 +207,8 @@ const initEditor = suneditor.init({
     plugins: plugins,
     height: 200,
     buttonList: [
-        ['undo', 'redo',
+        [
+        'undo', 'redo',
         'font', 'fontSize', 'formatBlock',
         'paragraphStyle', 'blockquote',
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
@@ -216,7 +219,9 @@ const initEditor = suneditor.init({
         'table', 'link', 'image', 'video', 'audio', /** 'math', */ // You must add the 'katex' library at options to use the 'math' plugin.
         /** 'imageGallery', */ // You must add the "imageGalleryUrl".
         'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print', 'save', 'template']
+        'preview', 'print', 'save', 'template',
+        /** 'dir', 'dir_ltr', 'dir_rtl' */ // "dir": Toggle text direction, "dir_ltr": Right to Left, "dir_rtl": Left to Right
+        ]
     ]
 });
 
@@ -391,16 +396,18 @@ value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {String}
 historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {Number}
 
-// Whitelist--------------------------------------å---------------------------------------------------------
+// Whitelist, Blacklist -----------------------------------------------------------------------------------------
 // (You can use regular expression syntax.)
 // _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary'
 addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {String}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
-// _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist
-pasteTagsWhitelist    : Whitelist of tags when pasting.                     default: _editorTagsWhitelist {String}
-                        ex) 'p|h1|h2|h3'
+                        ex) '*' // This means all tags are allowed. (Not available on "blacklist")
 tagsBlacklist         : Blacklist of the editor default tags.               default: null {String}
                         ex) 'h1|h2'
+// _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist - tagsBlacklist
+pasteTagsWhitelist    : Whitelist of tags when pasting.                     default: _editorTagsWhitelist {String}
+                        ex) 'p|h1|h2|h3'
+                        ex) '*' // This means all tags are allowed. (Not available on "blacklist")
 pasteTagsBlacklist    : Blacklist of tags when pasting.                     default: null {String}
                         ex) 'h1|h2'
 attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}
@@ -410,10 +417,21 @@ attributesWhitelist   : Add attributes whitelist of tags that should be kept und
                         ex) {
                             'all': 'style|data-.+', // Apply to all tags
                             'input': 'checked|name' // Apply to input tag
+                            '???': '*' // "*" === all attributes
+                        }
+attributesBlacklist   : Add attribute blacklist of tags that should be deleted in editor.   default: null {Object}
+                        ex) {
+                            'all': 'id', // Apply to all tags
+                            'input': 'style' // Apply to input tag
+                            '???': '*' // "*" === all attributes
                         }
 // Layout-------------------------------------------------------------------------------------------------------
 mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {String}
 rtl             : If true, the editor is set to RTL(Right To Left) mode.   default: false {Boolean}
+lineAttrReset   : Deletes other attributes except for the property set at the time of line break.
+                  If there is no value, no all attribute is deleted.    default: '' {String}
+                  ex) 'class|style': Attributes other than "class" and "style" are deleted at line break.
+                      '*': All attributes are deleted at line break.
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
                   'inline' or 'balloon' mode.     default: 'auto' {Number|String}
 toolbarContainer: A custom HTML selector placing the toolbar inside.
@@ -427,6 +445,8 @@ fullScreenOffset: Top offset value of "full Screen".
                   Set to 0, '0px', '50px'...     default: 0 {Number|String}
 iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {Boolean}
 fullPage        : Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.  default: false {Boolean}
+iframeAttributes  : Attributes of the iframe.                       default: null {Object}
+                    ex) {'scrolling': 'no'}
 iframeCSSFileName : Name or Array of the CSS file to apply inside the iframe.
                     You can also use regular expressions.
                     Applied by searching by filename in the link tag of document,
@@ -480,6 +500,11 @@ popupDisplay    : Size of background area when activating dialog window ('full'|
 resizingBar     : Show the bottom resizing bar.
                   If 'height' value is 'auto', it will not be resized. default: true {Boolean}
 showPathLabel   : Displays the current node structure to resizingBar.  default: true {Boolean}
+resizeEnable  : Enable/disable resize function of bottom resizing bar.   default: true {Boolean}
+resizingBarContainer: A custom HTML selector placing the resizing bar inside.
+                      The class name of the element must be 'sun-editor'.
+                      Element or querySelector argument.     default: null {Element|String}
+                      ex) document.querySelector('#id') || '#id'
 
 // Character count-----------------------------------------------------------------------------------------------
 charCounter     : Shows the number of characters in the editor.     
@@ -523,6 +548,7 @@ fontSize        : Change default font-size array.                   default: [..
                     8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
                   ]
 fontSizeUnit    : The font size unit.                               default: 'px' {String}
+alignItems      : A list of drop-down options for the 'align' plugin.   default: rtl === true ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'] {Array}
 formats         : Change default formatBlock array.                 default: [...] {Array}
                   Default value: [
                     'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
@@ -617,6 +643,7 @@ textStyles      : You can apply custom style or class to selected text.
 // Image---------------------------------------------------------------------------------------------------------
 imageResizing   : Can resize the image.                               default: true {Boolean}
 imageHeightShow : Choose whether the image height input is visible.   default: true {Boolean}
+imageAlignShow  : Choose whether the image align radio buttons are visible.       default: true {Boolean}
 imageWidth      : The default width size of the image frame.          default: 'auto' {String}
 imageHeight     : The default height size of the image frame.         default: 'auto' {String}
 imageSizeOnlyPercentage : If true, image size can only be scaled by percentage.   default: false {Boolean}
@@ -655,15 +682,17 @@ imageGalleryUrl     : The url of the image gallery, if you use the image gallery
                       You can also use it by adding "imageGallery" to the button list.   default: null {String}
                       ex) "/editor/getGallery"
                       response format: {
-                            "errorMessage": "insert error message",
                             "result": [
                                 {
                                     "src": "/download/editorImg/test_image.jpg", // @Require
+                                    "thumbnail": "/download/editorImg/test_thumbnail.jpg", // @Option - Thumbnail image to be displayed in the image gallery.
                                     "name": "Test image", // @Option - default: src.split('/').pop()
                                     "alt": "Alt text", // @Option - default: src.split('/').pop()
                                     "tag": "Tag name" // @Option
                                 }
-                            ]
+                            ],
+                            "nullMessage": "Text string or HTML string", // It is displayed when "result" is empty.
+                            "errorMessage": "Insert error message", // It is displayed when an error occurs. 
                         }
                       You can redefine the "plugins.imageGallery.drawItems" method.
 imageGalleryHeader: Http Header when get image gallery.         default: null {Object}
@@ -671,6 +700,7 @@ imageGalleryHeader: Http Header when get image gallery.         default: null {O
 // Video----------------------------------------------------------------------------------------------------------
 videoResizing   : Can resize the video (iframe, video).                         default: true {Boolean}
 videoHeightShow : Choose whether the video height input is visible.    default: true {Boolean}
+videoAlignShow  : Choose whether the video align radio buttons are visible.       default: true {Boolean}
 videoRatioShow  : Choose whether the video ratio options is visible.   default: true {Boolean}
 videoWidth      : The default width size of the video frame.           default: '100%' {String}
 videoHeight     : The default height size of the video frame.          default: '56.25%' {String}
@@ -761,6 +791,7 @@ videoAccept      : Define the "accept" attribute of the input.  default: "*" {St
 tableCellControllerPosition : Define position to the table cell controller('cell', 'top'). default: 'cell' {String}
 
 // Link-----------------------------------------------------------------------------------------------------------
+linkTargetNewWindow : Default checked value of the "Open in new window" checkbox.   default: false {Boolean}
 linkProtocol    : Default protocol for the links. ('link', 'image', 'video', 'audio')
                   This applies to all plugins that enter the internet url.   default: null {String}
 linkRel         : Defines "rel" attribute list of anchor tag.   default: [] {Array}
@@ -789,6 +820,18 @@ linkRelDefault  : Defines default "rel" attributes of anchor tag.   default: {} 
                     linkRelDefault: {
                         check_new_window: 'only:noreferrer noopener'
                     }
+linkNoPrefix   : If true, disables the automatic prefixing of the host URL to the value of the link. default: false {Boolean}
+
+// HR----------------------------------------------------------------------------------------------------
+hrItems         : Defines the hr items.
+                  "class" or "style" must be specified.
+                  default: [
+                      {name: lang.toolbar.hr_solid, class: '__se__solid'},
+                      {name: lang.toolbar.hr_dashed, class: '__se__dashed'},
+                      {name: lang.toolbar.hr_dotted, class: '__se__dotted'}
+                  ]
+                  ex) [ {name: "Outset", style: "border-style: outset;"} ]
+
 
 // Key actions----------------------------------------------------------------------------------------------------
 tabDisable      : If true, disables the interaction of the editor and tab key.  default: false {Boolean}
@@ -840,6 +883,7 @@ buttonList      : Defines button list to array {Array}
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
                     // ['save', 'template'],
+                    // ['dir', 'dir_ltr', 'dir_rtl'],
                     // '/', Line break
                   ]
 
@@ -849,11 +893,19 @@ buttonList      : Defines button list to array {Array}
                     ['undo', 'redo', 'bold', 'underline', 'fontColor', 'table', 'link', 'image', 'video']
                   ]
 
-------------------ex) Alignment of button groups:------------------------------------------------------------------
+------------------ex) Alignment of button group:-------------------------------------------------------------------
                   // Set "-[align]" to the first item in the group. (default: left)
                   [
-                    ['bold', 'underline', 'italic', 'strike'],
-                    ['-right', 'undo', 'redo']
+                    ['-left', 'undo', 'redo']
+                    ['-right', 'bold', 'underline', 'italic', 'strike'],
+                  ]
+
+------------------ex) Options in the button group(#):--------------------------------------------------------------
+                  // Set "#fix" - Fixed the order of buttons within a group in the "rtl" mode.
+                  [
+                    ['bold'],
+                    ['preview', 'print'],
+                    ['-left', '#fix', 'rtl_l', 'rtl_r']
                   ]
 
 ----------------- ex) More button: --------------------------------------------------------------------------------
@@ -896,6 +948,7 @@ buttonList      : Defines button list to array {Array}
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
                     ['save', 'template'],
+                    ['-left', '#fix', 'dir_ltr', 'dir_rtl'],
                     // (min-width:992px)
                     ['%992', [
                         ['undo', 'redo'],
@@ -905,6 +958,7 @@ buttonList      : Defines button list to array {Array}
                         ['removeFormat'],
                         ['outdent', 'indent'],
                         ['align', 'horizontalRule', 'list', 'lineHeight'],
+                        ['-right', 'dir'],
                         ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template'],
                         ['-right', ':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
                     ]],
@@ -915,6 +969,7 @@ buttonList      : Defines button list to array {Array}
                         [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle', 'removeFormat'],
                         [':e-More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'horizontalRule', 'list', 'lineHeight'],
                         [':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
+                        ['-right', 'dir'],
                         ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template']
                     ]]
                   ]
@@ -1029,10 +1084,10 @@ editor.appendContents('append contents');
 editor.readOnly(true || false)
 
 // Disable the suneditor
-editor.disabled();
+editor.disable();
 
-// Enabled the suneditor
-editor.enabled();
+// Enable the suneditor
+editor.enable();
 
 // Hide the suneditor
 editor.hide();
@@ -1044,16 +1099,16 @@ editor.show();
 editor.destroy();
 
 // Toolbar methods
-// Disable the suneditor
-editor.toolbar.disabled();
+// Disable the toolbar
+editor.toolbar.disable();
 
-// Enabled the suneditor
-editor.toolbar.enabled();
+// Enable the toolbar
+editor.toolbar.enable();
 
-// Hide the suneditor
+// Hide the toolbar
 editor.toolbar.hide();
 
-// Show the suneditor
+// Show the toolbar
 editor.toolbar.show();
 
 // Event functions -------------------------------------------------------------------------------------
@@ -1098,6 +1153,10 @@ editor.onload = function (core, reload) {
  * core: Core object
  */
 editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e) }
+
+// Copy event.
+// Called before the editor's default event action.
+// If it returns false, it stops without executing the rest of the action.
 /**
  * copy event
  * e: Event object
@@ -1105,6 +1164,10 @@ editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPa
  * core: Core object
  */
 editor.onCopy = function (e, clipboardData, core) { console.log('onCopy', e) }
+
+// Cut event.
+// Called before the editor's default event action.
+// If it returns false, it stops without executing the rest of the action.
 /**
  * cut event
  * e: Event object
@@ -1123,6 +1186,14 @@ editor.onCut = function (e, clipboardData, core) { console.log('onCut', e) }
  * core: Core object
  */
 editor.onDrop = function (e, cleanData, maxCharCount, core) { console.log('onDrop', e) }
+
+// Save event
+// Called just after the save was executed.
+/**
+ * contents Editor content
+ * core: Core object
+ */   
+editor.onSave = function (contents, core) {console.log(contents) };
 
 // Called before the image is uploaded
 // If true is returned, the internal upload process runs normally.
@@ -1277,6 +1348,16 @@ editor.onAudioUploadError = function (errorMessage, result, core) {
 // height, prevHeight are number
 editor.onResizeEditor = function (height, prevHeight, core) {
     console.log(`height: ${height}, prevHeight: ${prevHeight}`)
+}
+
+// Called after the "setToolbarButtons" invocation
+// Can be used to tweak buttons properties (useful for custom buttons)
+/**
+ * buttonList: buttonList array 
+ * core: Core object
+ */
+editor.onSetToolbarButtons = function (buttonList, core) {
+    console.log(`buttonList: ${buttonList}`)
 }
 
 // It replaces the default callback function of the image upload
@@ -1473,11 +1554,13 @@ editor.showController = function (name, controllers, core) {
 [Document](http://suneditor.com/sample/html/document.html)
 
 ## Other libraries using SunEditor
+<a id="lib-suneditor-react"></a>[suneditor-react](https://github.com/mkhstar/suneditor-react) ([@mkhstar](https://github.com/mkhstar)) - Pure React Component for SunEditor.
+
+<a id="lib-angular-suneditor"></a>[angular-suneditor](https://github.com/BauViso/angular-suneditor) ([@BauViso](https://github.com/BauViso)) - Angular module for the SunEditor WYSIWYG Editor.
+
 <a id="lib-pluxml"></a>[Plugin for Pluxml](https://forum.pluxml.org/discussion/comment/59339) ([@sudwebdesign](https://github.com/sudwebdesign)) - Plugin for Pluxml.
 
 <a id="lib-aem-suneditor"></a>[AEM-SunEditor](https://blogs.perficientdigital.com/2019/08/13/suneditor-an-alternative-to-the-aem-rte) ([@ahmed-musallam](https://github.com/ahmed-musallam/AEM-SunEditor)) - Enables using SunEditor in AEM dialogs as an RTE replacement.
-
-<a id="lib-suneditor-react"></a>[SunEditor-React](https://github.com/mkhstar/suneditor-react) ([@mkhstar](https://github.com/mkhstar)) - Pure React Component for SunEditor.
     
 ## License
 Suneditor may be freely distributed under the MIT license.

@@ -994,6 +994,40 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="arrayIncludes"><span class="type-signature"></span>arrayIncludes<span
+                class="signature">(array, element)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+            <div class="description">
+                Check if an array contains an element
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>array</code></td>
+                    <td class="type">
+                        <span class="param-type">Array</span>
+                    </td>
+                    <td class="description last">element array</td>
+                </tr>
+                <tr>
+                    <td class="name"><code>element</code></td>
+                    <td class="type">
+                        <span class="param-type">Element</span>
+                    </td>
+                    <td class="description last">Element to check for</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="getArrayIndex"><span class="type-signature"></span>getArrayIndex<span
                     class="signature">(array, element)</span><span class="type-signature"> &rarr; {Number}</span></h4>
             <div class="description">
@@ -2494,6 +2528,34 @@
         </table>
         <dl class="details"></dl>
 
+
+        <h4 class="name" id="createTagsBlacklist"><span class="type-signature"></span>createTagsBlacklist<span class="signature">(list)</span><span
+                class="type-signature"> &rarr; {RegExp}</span></h4>
+        <div class="description">
+            Create blacklist RegExp object.<br>
+            Return RegExp format: new RegExp("&lt;\\/?\\b(?:" + list + ")\\b[^>^&lt;]*+&gt;", "gi")
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>list</code></td>
+                <td class="type">
+                    <span class="param-type">String</span>
+                </td>
+                <td class="description last">Tags list ("br|p|div|pre...")</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
         </article>
     </section>
 </div>
@@ -2542,6 +2604,7 @@
         <li><a href="document-util.html#copyTagAttributes">copyTagAttributes</a></li>
         <li><a href="document-util.html#copyFormatAttributes">copyFormatAttributes</a></li>
         <li><a href="document-util.html#getArrayItem">getArrayItem</a></li>
+        <li><a href="document-util.html#arrayIncludes">arrayIncludes</a></li>
         <li><a href="document-util.html#getArrayIndex">getArrayIndex</a></li>
         <li><a href="document-util.html#nextIdx">nextIdx</a></li>
         <li><a href="document-util.html#prevIdx">prevIdx</a></li>
@@ -2586,6 +2649,7 @@
         <li><a href="document-util.html#htmlRemoveWhiteSpace">htmlRemoveWhiteSpace</a></li>
         <li><a href="document-util.html#sortByDepth">sortByDepth</a></li>
         <li><a href="document-util.html#createTagsWhitelist">createTagsWhitelist</a></li>
+        <li><a href="document-util.html#createTagsBlacklist">createTagsBlacklist</a></li>
     </ul>
 </nav>
 

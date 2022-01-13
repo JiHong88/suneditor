@@ -190,19 +190,19 @@
         <button type="button" class="btn btn-md btn-warning" onclick="sun_setContents('set contents')">setContents</button>
         <button type="button" class="btn btn-md btn-warning" onclick="sun_appendContents('append contents')">AppendContents</button>
         <button type="button" class="btn btn-md btn-primary" onclick="sun_readonly()">ReadOnly</button>
-        <button type="button" class="btn btn-md btn-primary" onclick="sun_disabled()">Disabled</button>
-        <button type="button" class="btn btn-md btn-primary" onclick="sun_enabled()">Enabled</button>
+        <button type="button" class="btn btn-md btn-primary" onclick="sun_disable()">Disable</button>
+        <button type="button" class="btn btn-md btn-primary" onclick="sun_enable()">Enable</button>
         <button type="button" class="btn btn-md btn-primary" onclick="sun_hide()">Hide</button>
         <button type="button" class="btn btn-md btn-primary" onclick="sun_show()">Show</button>
         <div></div>
-        <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_disabled()">Disabled toolbar</button>
-        <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_enabled()">Enabled toolbar</button>
+        <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_disable()">Disable toolbar</button>
+        <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_enable()">Enable toolbar</button>
         <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_hide()">Hide toolbar</button>
         <button type="button" class="btn btn-md btn-info" onclick="sun_toolbar_show()">Show toolbar</button>
 
 
         <!-- image resize -->
-        <a id="image" href="#image"><h4 class="sub-title">Toolbar : Responsive and more buttons</h4></a>
+        <a id="image_resize" href="#image_resize"><h4 class="sub-title">Toolbar : Responsive and more buttons</h4></a>
         <p style="height:0px; float:right; margin-top:-30px;"><span id="responsive_Toolbar_size" style="font-weight:bold; color:#ffe4c4;">1200px</span></p>
         <textarea id="responsive_Toolbar" style="display: none;"><p>Resize the browser window.</p></textarea>
         <p></p>
@@ -268,7 +268,7 @@
 
 
         <!-- image resize -->
-        <a id="image" href="#image"><h4 class="sub-title">Image file resize</h4></a>
+        <a id="image_file" href="#image_file"><h4 class="sub-title">Image file resize</h4></a>
         <p></p>
         <textarea id="imageResize" style="display: none;"></textarea>
         <p></p>
@@ -345,7 +345,7 @@
 <span class="pl-kos">}</span></pre></div>
 
         <!-- image management editor-->
-        <a id="image" href="#image"><h4 class="sub-title">Image management</h4></a>
+        <a id="image_manager" href="#image_manager"><h4 class="sub-title">Image management</h4></a>
         <p></p>
         <textarea id="imageManagement" style="display: none;">
             <p>cat</p>
@@ -887,12 +887,12 @@
         suneditor.readOnly(!suneditor.core.isReadOnly);
     }
 
-    function sun_disabled() {
-        suneditor.disabled();
+    function sun_disable() {
+        suneditor.disable();
     }
 
-    function sun_enabled() {
-        suneditor.enabled();
+    function sun_enable() {
+        suneditor.enable();
     }
 
     function sun_show() {
@@ -903,12 +903,12 @@
         suneditor.hide();
     }
 
-    function sun_toolbar_disabled() {
-        suneditor.toolbar.disabled();
+    function sun_toolbar_disable() {
+        suneditor.toolbar.disable();
     }
 
-    function sun_toolbar_enabled() {
-        suneditor.toolbar.enabled();
+    function sun_toolbar_enable() {
+        suneditor.toolbar.enable();
     }
 
     function sun_toolbar_show() {

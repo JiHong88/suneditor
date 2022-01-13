@@ -52,7 +52,9 @@ export interface Lang {
     paragraphStyle: string;
     textStyle: string;
     imageGallery: string;
-    mention: string
+    dir_ltr: string;
+    dir_rtl: string;
+    mention: string;
   };
   dialogBox: {
     linkBox: {

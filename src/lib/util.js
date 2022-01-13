@@ -552,6 +552,21 @@ const util = {
     },
 
     /**
+     * @description Check if an array contains an element 
+     * @param {Array|HTMLCollection|NodeList} array element array
+     * @param {Node} element The element to check for
+     * @returns {Boolean}
+     */
+    arrayIncludes: function(array, element) {
+        for (let i = 0; i < array.length; i++) {
+            if (array[i] === element) {
+                return true;
+            }
+        }
+        return false;
+    },
+
+    /**
      * @description Get the index of the argument value in the element array
      * @param {Array|HTMLCollection|NodeList} array element array
      * @param {Node} element The element to find index
@@ -1174,15 +1189,32 @@ const util = {
     },
 
     /**
+     * @description Checks if element can't be easily enabled
+     * @param {Element} element Element to check for
+     */
+    isImportantDisabled: function (element) {
+        return element.hasAttribute('data-important-disabled');
+    },
+
+    /**
      * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
      * core.codeViewDisabledButtons (An array of buttons whose class name is not "se-code-view-enabled")
      * core.resizingDisabledButtons (An array of buttons whose class name is not "se-resizing-enabled")
      * @param {Boolean} disabled Disabled value
      * @param {Array|HTMLCollection|NodeList} buttonList Button array
+     * @param {Boolean} important If priveleged mode should be used (Necessary to switch importantDisabled buttons)
      */
-    setDisabledButtons: function (disabled, buttonList) {
+    setDisabledButtons: function (disabled, buttonList, important) {
         for (let i = 0, len = buttonList.length; i < len; i++) {
-            buttonList[i].disabled = disabled;
+            let button = buttonList[i];
+            if (important || !this.isImportantDisabled(button)) button.disabled = disabled;
+            if (important) {
+                if (disabled) { 
+                    button.setAttribute('data-important-disabled', '');
+                } else {
+                    button.removeAttribute('data-important-disabled');
+                }
+            }
         }
     },
 
@@ -1594,7 +1626,7 @@ const util = {
      */
     htmlRemoveWhiteSpace: function (html) {
         if (!html) return '';
-        return html.trim().replace(/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)[^>^<]+>\s+(?=<)/ig, function (m) { return m.trim(); });
+        return html.trim().replace(/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)[^>^<]+>\s+(?=<)/ig, function (m) { return m.replace(/\n/g, '').replace(/\s+/, ' '); });
     },
 
     /**
@@ -1671,17 +1703,28 @@ const util = {
      * @returns {RegExp}
      */
     createTagsWhitelist: function (list) {
-        return new RegExp('<\\/?\\b(?!\\b' + list.replace(/\|/g, '\\b|\\b') + '\\b)[^>]*>', 'gi');
+        return new RegExp('<\\/?\\b(?!\\b' + (list || '').replace(/\|/g, '\\b|\\b') + '\\b)[^>]*>', 'gi');
+    },
+
+    /**
+     * @description Create blacklist RegExp object.
+     * Return RegExp format: new RegExp("<\\/?\\b(?:" + list + ")\\b[^>^<]*+>", "gi")
+     * @param {String} list Tags list ("br|p|div|pre...")
+     * @returns {RegExp}
+     */
+    createTagsBlacklist: function (list) {
+        return new RegExp('<\\/?\\b(?:\\b' + (list || '^').replace(/\|/g, '\\b|\\b') + '\\b)[^>]*>', 'gi');
     },
 
     /**
      * @description Fix tags that do not fit the editor format.
      * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
      * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist (core._htmlCheckWhitelistRegExp)
+     * @param {RegExp} htmlCheckBlacklistRegExp Editor tags blacklist (core._htmlCheckBlacklistRegExp)
      * @param {Boolean} lowLevelCheck Row level check
      * @private
      */
-    _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, lowLevelCheck) {
+    _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, lowLevelCheck) {
         /**
          * It is can use ".children(util.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
          * So check the node type and exclude the text no (current.nodeType !== 1)
@@ -1693,14 +1736,14 @@ const util = {
             if (current.nodeType !== 1) return false;
 
             // white list
-            if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && this.isNotCheckingNode(current)) {
+            if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && this.isNotCheckingNode(current))) {
                 removeTags.push(current);
                 return false;
             }
 
             const nrtag = !this.getParentElement(current, this.isNotCheckingNode);
             // empty tags
-            if ((!this.isTable(current) && !this.isListCell(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && nrtag) {
+            if ((!this.isTable(current) && !this.isListCell(current) && !this.isAnchor(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && nrtag) {
                 emptyTags.push(current);
                 return false;
             }
@@ -1762,17 +1805,23 @@ const util = {
 
         for (let i = 0, len = wrongList.length, t, tp, children, p; i < len; i++) {
             t = wrongList[i];
-
-            tp = this.createElement('LI');
-            children = t.childNodes;
-            while (children[0]) {
-                tp.appendChild(children[0]);
-            }
-            
             p = t.parentNode;
             if (!p) continue;
-            p.insertBefore(tp, t);
-            this.removeItem(t);
+
+            tp = this.createElement('LI');
+
+            if (this.isFormatElement(t)) {
+                children = t.childNodes;
+                while (children[0]) {
+                    tp.appendChild(children[0]);
+                }
+                p.insertBefore(tp, t);
+                this.removeItem(t);
+            } else {
+                t = t.nextSibling;
+                tp.appendChild(wrongList[i]);
+                p.insertBefore(tp, t);
+            }
         }
 
         for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {

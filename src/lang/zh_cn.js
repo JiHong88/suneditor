@@ -75,6 +75,8 @@
             paragraphStyle: '段落样式',
             textStyle: '文字样式',
             imageGallery: '图片库',
+            dir_ltr: '左到右',
+            dir_rtl: '右到左',
             mention: '提到'
         },
         dialogBox: {

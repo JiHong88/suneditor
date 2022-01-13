@@ -75,6 +75,8 @@
             paragraphStyle: '문단 스타일',
             textStyle: '글자 스타일',
             imageGallery: '이미지 갤러리',
+            dir_ltr: '왼쪽에서 오른쪽',
+            dir_rtl: '오른쪽에서 왼쪽',
             mention: '멘션'
         },
         dialogBox: {
