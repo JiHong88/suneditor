@@ -144,6 +144,14 @@ class domUtils {
 	getArrayItem(array: any[] | HTMLCollection | NodeList, validation: Function | null, multi: boolean): any[] | Node | null;
 
 	/**
+	 * @description Check if an array contains an element
+	 * @param {Array|HTMLCollection|NodeList} array element array
+	 * @param {Node} element The element to check for
+	 * @returns {Boolean}
+	 */
+	arrayIncludes(array: any[], element: Node): boolean;
+
+	/**
 	 * @description Get the index of the argument value in the element array
 	 * @param array element array
 	 * @param element The element to find index

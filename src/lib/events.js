@@ -49,6 +49,12 @@ Events.prototype = {
 	onPaste: null,
 
 	/**
+	 * @description Called just after the save was executed.
+	 * @param {String} contents Editor content
+	 */
+	onSave: null,
+
+	/**
 	 * @description Called just before the inline toolbar is positioned and displayed on the screen.
 	 * @param {Element} toolbar Toolbar Element
 	 * @param {Object} context The editor's context object
@@ -70,14 +76,14 @@ Events.prototype = {
 	 * @param {boolean} isCodeView Whether the current code view mode
 	 * @param {Object} core Core object
 	 */
-	toggleCodeView: null,
+	setCodeView: null,
 
 	/**
 	 * @description An event when toggling full screen.
 	 * @param {boolean} isFullScreen Whether the current full screen mode
 	 * @param {Object} core Core object
 	 */
-	toggleFullScreen: null,
+	setFullScreen: null,
 
 	/**
 	 * @description It replaces the default callback function of the image upload
@@ -252,6 +258,14 @@ Events.prototype = {
 	 * @description Called when the editor is resized using the bottom bar
 	 */
 	onResizeEditor: null,
+
+	/**
+	 * @description Called after the "setToolbarButtons" invocation.
+	 * Can be used to tweak buttons properties (useful for custom buttons)
+	 * @param {Array} buttonList Button list 
+	 * @param {Object} core Core object
+	 */
+	onSetToolbarButtons: null,
 
 	constructor: Events
 };

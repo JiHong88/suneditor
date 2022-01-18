@@ -5,8 +5,17 @@
 "use strict";
 
 import EditorInterface from "../interface/editor";
-import { domUtils, unicode, numbers, env, converter } from "../helpers";
-import { _w, _d } from "../helpers/global";
+import {
+	domUtils,
+	unicode,
+	numbers,
+	env,
+	converter
+} from "../helpers";
+import {
+	_w,
+	_d
+} from "../helpers/global";
 
 function EventManager(editor) {
 	EditorInterface.call(this, editor);
@@ -106,9 +115,9 @@ EventManager.prototype = {
 				}
 			}
 
-			if (!this.status.isReadOnly && this.format.isLine(element)) {
+			if (this.format.isLine(element)) {
 				/* Outdent */
-				if (commandMapNodes.indexOf("OUTDENT") === -1 && commandMap.OUTDENT) {
+				if (commandMapNodes.indexOf("OUTDENT") === -1 && commandMap.OUTDENT && !domUtils.isImportantDisabled(commandMap.OUTDENT)) {
 					if (domUtils.isListCell(element) || (element.style[marginDir] && numbers.getNumber(element.style[marginDir], 0) > 0)) {
 						commandMapNodes.push("OUTDENT");
 						commandMap.OUTDENT.removeAttribute("disabled");
@@ -116,7 +125,7 @@ EventManager.prototype = {
 				}
 
 				/* Indent */
-				if (commandMapNodes.indexOf("INDENT") === -1 && commandMap.INDENT) {
+				if (commandMapNodes.indexOf("INDENT") === -1 && commandMap.INDENT && !domUtils.isImportantDisabled(commandMap.INDENT)) {
 					commandMapNodes.push("INDENT");
 					if (domUtils.isListCell(element) && !element.previousElementSibling) {
 						commandMap.INDENT.setAttribute("disabled", true);
@@ -159,9 +168,9 @@ EventManager.prototype = {
 			if (activePlugins.indexOf(key) > -1) {
 				this.plugins[key].active(null);
 			} else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
-				if (!this.status.isReadOnly) commandMap.OUTDENT.setAttribute('disabled', true);
+				if (!domUtils.isImportantDisabled(commandMap.OUTDENT)) commandMap.OUTDENT.setAttribute('disabled', true);
 			} else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
-				if (!this.status.isReadOnly) commandMap.INDENT.removeAttribute('disabled');
+				if (!domUtils.isImportantDisabled(commandMap.INDENT)) commandMap.INDENT.removeAttribute('disabled');
 			} else {
 				domUtils.removeClass(commandMap[key], 'active');
 			}
@@ -246,11 +255,17 @@ EventManager.prototype = {
 		const ancestor = range.commonAncestorContainer;
 		if (((sIsCell && !sCell.previousElementSibling && !sCell.parentElement.previousElementSibling) || (eIsCell && !eCell.nextElementSibling && !eCell.parentElement.nextElementSibling)) && sCell !== eCell) {
 			if (!sIsCell) {
-				domUtils.remove(domUtils.getParentElement(eCell, function(current) {return ancestor === current.parentNode;}));
+				domUtils.remove(domUtils.getParentElement(eCell, function (current) {
+					return ancestor === current.parentNode;
+				}));
 			} else if (!eIsCell) {
-				domUtils.remove(domUtils.getParentElement(sCell, function(current) {return ancestor === current.parentNode;}));
+				domUtils.remove(domUtils.getParentElement(sCell, function (current) {
+					return ancestor === current.parentNode;
+				}));
 			} else {
-				domUtils.remove(domUtils.getParentElement(sCell, function(current) {return ancestor === current.parentNode;}));
+				domUtils.remove(domUtils.getParentElement(sCell, function (current) {
+					return ancestor === current.parentNode;
+				}));
 				this.editor.nativeFocus();
 				return true;
 			}
@@ -280,7 +295,15 @@ EventManager.prototype = {
 		let focusNode, offset, format;
 
 		const fileComponent = domUtils.getParentElement(commonCon, this.component.is);
-		if (fileComponent && !domUtils.isTable(fileComponent)) return;
+		if (fileComponent && !domUtils.isTable(fileComponent)) {
+			return;
+		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-se-embed') === 'true') {
+			let el = commonCon.nextElementSibling;
+			if (!this.format.isLine(el)) el = this.format.appendLine(commonCon, options.defaultTag);
+			this.selection.setRange(el.firstChild, 0, el.firstChild, 0);
+			return;
+		}
+
 		if ((this.format.isBlock(startCon) || domUtils.isWysiwygFrame(startCon)) && (this.component.is(startCon.children[range.startOffset]) || this.component.is(startCon.children[range.startOffset - 1]))) return;
 		if (domUtils.getParentElement(commonCon, this.format._isNotCheckingNode)) return null;
 
@@ -408,7 +431,7 @@ EventManager.prototype = {
 			} else {
 				cleanData = (plainText === cleanData ? plainText : cleanData).replace(/\n/g, "<br>");
 			}
-			cleanData = this.editor.cleanHTML(cleanData, this.editor.pasteTagsWhitelistRegExp);
+			cleanData = this.editor.cleanHTML(cleanData, this.editor.pasteTagsWhitelistRegExp, this.editor.pasteTagsBlacklistRegExp);
 		} else {
 			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, "<br>");
 		}
@@ -495,7 +518,7 @@ EventManager.prototype = {
 
 		/** code view area auto line */
 		if (this.options.height === "auto" && !this.options.codeMirrorEditor) {
-			const cvAuthHeight = CodeViewAutoHeight.bind(this);
+			const cvAuthHeight = this.editor._codeViewAutoHeight.bind(this.editor);
 			this.addEvent(this.context.element.code, "keydown", cvAuthHeight, false);
 			this.addEvent(this.context.element.code, "keyup", cvAuthHeight, false);
 			this.addEvent(this.context.element.code, "paste", cvAuthHeight, false);
@@ -503,7 +526,7 @@ EventManager.prototype = {
 
 		/** resizingBar */
 		if (this.context.element.resizingBar) {
-			if (/\d+/.test(this.options.height)) {
+			if (/\d+/.test(this.options.height) && this.options.resizeEnable) {
 				this.addEvent(this.context.element.resizingBar, "mousedown", OnMouseDown_resizingBar.bind(this), false);
 			} else {
 				domUtils.addClass(this.context.element.resizingBar, "se-resizing-none");
@@ -582,6 +605,7 @@ function OnClick_toolbar(e) {
 
 function OnMouseDown_wysiwyg(e) {
 	if (this.status.isReadOnly || domUtils.isNonEditable(this.context.element.wysiwyg)) return;
+	this.selection._init();
 
 	// user event
 	if (typeof this.events.onMouseDown === "function" && this.events.onMouseDown(e) === false) return;
@@ -606,7 +630,7 @@ function OnClick_wysiwyg(e) {
 
 	if (this.status.isReadOnly) {
 		e.preventDefault();
-		if (domUtils.isAnchor(targetElement)){
+		if (domUtils.isAnchor(targetElement)) {
 			_w.open(targetElement.href, targetElement.target);
 		}
 		return false;
@@ -1212,6 +1236,44 @@ function OnKeyDown_wysiwyg(e) {
 					temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
 					this.selection.setRange(temp, 0, temp, 0);
 					break;
+				} else if (this.options.lineAttrReset && formatEl) {
+					e.preventDefault();
+					e.stopPropagation();
+
+					let newEl;
+					if (!range.collapsed) {
+						const isMultiLine = domUtils.getFormatElement(range.startContainer, null) !== domUtils.getFormatElement(range.endContainer, null);
+						const r = this.selection.removeNode();
+						if (isMultiLine) {
+							newEl = domUtils.getFormatElement(r.container, null);
+
+							if (!r.prevContainer) {
+								const newFormat = formatEl.cloneNode(false);
+								newFormat.innerHTML = '<br>';
+								newEl.parentNode.insertBefore(newFormat, newEl);
+							} else if (newEl !== formatEl && newEl.nextElementSibling === formatEl) {
+								newEl = formatEl;
+							}
+						} else {
+							newEl = this.node.split(r.container, r.offset, 0);
+						}
+					} else {
+						newEl = this.node.split(range.endContainer, range.endOffset, 0);
+					}
+
+					const resetAttr = options.lineAttrReset === '*' ? null : options.lineAttrReset;
+					const attrs = newEl.attributes;
+					let i = 0;
+					while (attrs[i]) {
+						if (resetAttr && resetAttr.test(attrs[i].name)) {
+							i++;
+							continue;
+						}
+						newEl.removeAttribute(attrs[i].name);
+					}
+					this.selection.setRange(newEl.firstChild, 0, newEl.firstChild, 0);
+
+					break;
 				}
 
 				if (brLine) {
@@ -1648,10 +1710,6 @@ function DisplayLineBreak(dir, e) {
 	this.selection.setRange(focusEl, 1, focusEl, 1);
 	// history stack
 	this.history.push(false);
-}
-
-function CodeViewAutoHeight() {
-	this.context.element.code.style.height = this.context.element.code.scrollHeight + "px";
 }
 
 function OnResize_window() {

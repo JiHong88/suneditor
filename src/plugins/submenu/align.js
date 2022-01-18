@@ -12,7 +12,7 @@ import {
     domUtils
 } from "../../helpers";
 
-function align(editor, targetElement) {
+function Align(editor, targetElement) {
     EditorInterface.call(this, editor);
     this.name = "align";
     this.display = "submenu";
@@ -42,7 +42,7 @@ function align(editor, targetElement) {
     listDiv = null, listUl = null;
 }
 
-align.prototype = {
+Align.prototype = {
     /**
      * @Override core
      */
@@ -104,7 +104,7 @@ align.prototype = {
         }
     },
 
-    constructor: align
+    constructor: Align
 }
 
 function action(e) {
@@ -155,4 +155,4 @@ function createHTML(editor, leftDir) {
     }, '<div class="se-list-inner">' + '<ul class="se-list-basic">' + html + '</ul>' + '</div>');
 }
 
-export default align;
+export default Align;

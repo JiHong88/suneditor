@@ -49,10 +49,10 @@ Component.prototype = {
 			this.selection.insertNode(element, this.format.isBlock(formatEl) ? null : formatEl, false);
 			if (formatEl && unicode.onlyZeroWidthSpace(formatEl)) domUtils.remove(formatEl);
 		}
-
-		this.selection.setRange(element, 0, element, 0);
-
+		
 		if (!notSelect) {
+			this.selection.setRange(element, 0, element, 0);
+			
 			const fileComponentInfo = this.get(element);
 			if (fileComponentInfo) {
 				this.select(fileComponentInfo.target, fileComponentInfo.pluginName);

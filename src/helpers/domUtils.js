@@ -447,6 +447,21 @@ export function getArrayItem(array, validation, multi) {
 }
 
 /**
+ * @description Check if an array contains an element 
+ * @param {Array|HTMLCollection|NodeList} array element array
+ * @param {Node} element The element to check for
+ * @returns {Boolean}
+ */
+function arrayIncludes(array, element) {
+	for (let i = 0; i < array.length; i++) {
+		if (array[i] === element) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
  * @description Get the index of the argument value in the element array
  * @param {Array|HTMLCollection|NodeList} array element array
  * @param {Node} element The element to find index
@@ -602,11 +617,20 @@ export function setStyle(element, styleName, value) {
  * core.codeViewDisabledButtons (An array of buttons whose class name is not "se-code-view-enabled")
  * core.resizingDisabledButtons (An array of buttons whose class name is not "se-resizing-enabled")
  * @param {boolean} disabled Disabled value
- * @param {Array|HTMLCollection|NodeList} domList Button array
+ * @param {Array|HTMLCollection|NodeList} buttonList Button array
+ * @param {Boolean} important If priveleged mode should be used (Necessary to switch importantDisabled buttons)
  */
-export function setDisabled(disabled, domList) {
-	for (let i = 0, len = domList.length; i < len; i++) {
-		domList[i].disabled = disabled;
+export function setDisabled(disabled, buttonList, important) {
+	for (let i = 0, len = buttonList.length; i < len; i++) {
+		let button = buttonList[i];
+		if (important || !isImportantDisabled(button)) button.disabled = disabled;
+		if (important) {
+			if (disabled) {
+				button.setAttribute('data-important-disabled', '');
+			} else {
+				button.removeAttribute('data-important-disabled');
+			}
+		}
 	}
 }
 
@@ -793,6 +817,14 @@ export function isUneditable(element) {
 	return element && this.hasClass(element, "__se__uneditable");
 }
 
+/**
+ * @description Checks if element can't be easily enabled
+ * @param {Element} element Element to check for
+ */
+export function isImportantDisabled(element) {
+	return element.hasAttribute('data-important-disabled');
+}
+
 const domUtils = {
 	createElement: createElement,
 	createTextNode: createTextNode,
@@ -810,6 +842,7 @@ const domUtils = {
 	getEdgeChild: getEdgeChild,
 	getEdgeChildNodes: getEdgeChildNodes,
 	getArrayItem: getArrayItem,
+	arrayIncludes: arrayIncludes,
 	getArrayIndex: getArrayIndex,
 	nextIndex: nextIndex,
 	prevIndex: prevIndex,
@@ -835,7 +868,8 @@ const domUtils = {
 	isAnchor: isAnchor,
 	isMedia: isMedia,
 	isEmptyLine: isEmptyLine,
-	isUneditable: isUneditable
+	isUneditable: isUneditable,
+	isImportantDisabled: isImportantDisabled
 };
 
 export default domUtils;

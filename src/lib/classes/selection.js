@@ -18,6 +18,25 @@ const Selection = function (editor) {
 
 Selection.prototype = {
 	/**
+	 * @description Set "range" and "selection" info.
+	 * @param {Object} range range object.
+	 * @param {Object} selection selection object.
+	 */
+	_rangeInfo: function (range, selection) {
+		let selectionNode = null;
+		this.status._range = range;
+
+		if (range.collapsed) {
+			if (domUtils.isWysiwygFrame(range.commonAncestorContainer)) selectionNode = range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
+			else selectionNode = range.commonAncestorContainer;
+		} else {
+			selectionNode = selection.extentNode || selection.anchorNode;
+		}
+
+		this.status._selectionNode = selectionNode;
+	},
+
+	/**
 	 * @description Return the range object of editor's first child node
 	 * @returns {Object}
 	 * @private
@@ -47,7 +66,6 @@ Selection.prototype = {
 		const selection = this.get();
 		if (!selection) return null;
 		let range = null;
-		let selectionNode = null;
 
 		if (selection.rangeCount > 0) {
 			range = selection.getRangeAt(0);
@@ -55,18 +73,24 @@ Selection.prototype = {
 			range = this._createDefaultRange();
 		}
 
-		this.status._range = range;
-
-		if (range.collapsed) {
-			if (domUtils.isWysiwygFrame(range.commonAncestorContainer))
-				selectionNode =
-				range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
-			else selectionNode = range.commonAncestorContainer;
-		} else {
-			selectionNode = selection.extentNode || selection.anchorNode;
+		if (domUtils.isFormatElement(range.endContainer) && range.endOffset === 0) {
+			range = this.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.length);
 		}
 
-		this.status._selectionNode = selectionNode;
+		this._rangeInfo(range, selection);
+	},
+
+	/**
+	 * @description Focus method
+	 * @private
+	 */
+	__focus: function () {
+		const caption = domUtils.getParentElement(this.getNode(), 'figcaption');
+		if (caption) {
+			caption.focus();
+		} else {
+			this.context.element.wysiwyg.focus();
+		}
 	},
 
 	/**
@@ -134,8 +158,8 @@ Selection.prototype = {
 		}
 
 		selection.addRange(range);
-		this._init();
-		if (this.options.iframe) this.editor.nativeFocus();
+		this._rangeInfo(range, this.get());
+		if (options.iframe) this.__focus();
 
 		return range;
 	},
@@ -369,9 +393,9 @@ Selection.prototype = {
 		const startOff = range.startOffset;
 		const endOff = range.endOffset;
 		const formatRange = range.startContainer === commonCon && this.format.isLine(commonCon);
-		const startCon = formatRange ? commonCon.childNodes[startOff] || commonCon.childNodes[0] : range.startContainer;
+		const startCon = formatRange ? commonCon.childNodes[startOff] || commonCon.childNodes[0] || range.startContainer : range.startContainer;
 		const endCon = formatRange ?
-			commonCon.childNodes[endOff] || commonCon.childNodes[commonCon.childNodes.length - 1] :
+			commonCon.childNodes[endOff] || commonCon.childNodes[commonCon.childNodes.length - 1] || range.endContainer :
 			range.endContainer;
 		let parentNode,
 			originAfter = null;
@@ -602,7 +626,7 @@ Selection.prototype = {
 	 */
 	insertHTML: function (html, notCleaningData, checkCharCount, rangeSelection) {
 		if (typeof html === 'string') {
-			if (!notCleaningData) html = core.cleanHTML(html, null);
+			if (!notCleaningData) html = core.cleanHTML(html, null, null);
 			try {
 				const dom = _d.createRange().createContextualFragment(html);
 				const domTree = dom.childNodes;
@@ -863,19 +887,19 @@ Selection.prototype = {
 
 		if (this.format.isLine(startCon)) {
 			if (!startCon.childNodes[startOff]) {
-				startCon = startCon.lastChild;
+				startCon = startCon.lastChild || startCon;
 				startOff = startCon.textContent.length;
 			} else {
-				startCon = startCon.childNodes[startOff];
+				startCon = startCon.childNodes[startOff] || startCon;
 				startOff = 0;
 			}
 			while (startCon && startCon.nodeType === 1 && startCon.firstChild) {
-				startCon = startCon.firstChild;
+				startCon = startCon.firstChild || startCon;
 				startOff = 0;
 			}
 		}
 		if (this.format.isLine(endCon)) {
-			endCon = endCon.childNodes[endOff] || endCon.lastChild;
+			endCon = endCon.childNodes[endOff] || endCon.lastChild || endCon;
 			while (endCon && endCon.nodeType === 1 && endCon.lastChild) {
 				endCon = endCon.lastChild;
 			}

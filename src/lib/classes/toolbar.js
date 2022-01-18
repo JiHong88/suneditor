@@ -33,6 +33,10 @@ Toolbar.prototype = {
 	 * @description Disable the toolbar
 	 */
 	disable: function () {
+		/** off menus */
+		this.editor.submenuOff();
+		this.editor.moreLayerOff();
+		this.editor.containerOff();
 		this.context.buttons.cover.style.display = "block";
 	},
 
@@ -78,44 +82,27 @@ Toolbar.prototype = {
 	setButtons: function (buttonList) {
 		this.editor.submenuOff();
 		this.editor.containerOff();
+		this.editor.moreLayerOff();
 
-		const newToolbar = Constructor._createToolBar(_d, buttonList, this.plugins, options);
-		this._responsiveButtons = newToolbar.responsiveButtons;
-		this.editor._moreLayerActiveButton = null;
+		const newToolbar = Constructor._createToolBar(this._d, buttonList, this.plugins, this.options);
+		_responsiveButtons = newToolbar.responsiveButtons;
 		this._setResponsive();
 
 		this.context.element.toolbar.replaceChild(newToolbar._buttonTray, this.context.element._buttonTray);
-		const newContext = Context(context.element.originElement, this.editor._getConstructed(this.context.element), options);
+		const newContext = Context(this.context.element.originElement, this.editor._getConstructed(this.context.element), this.options);
 
 		this.context.element = newContext.element;
-		this.context.buttons = newContext.buttons;
-		if (options.iframe) this.context.element.wysiwyg = this._wd.body;
+		this.context.tool = newContext.tool;
+		if (this.options.iframe) this.context.element.wysiwyg = this._wd.body;
+
+		this.editor.recoverButtonStates();
+
 		this.editor._cachingButtons();
 		this.history._resetCachingButton();
 
-		this.editor.activePlugins = [];
-		const oldCallButtons = pluginCallButtons;
-		pluginCallButtons = newToolbar.pluginCallButtons;
-		let plugin, button, oldButton;
-		for (let key in pluginCallButtons) {
-			if (!pluginCallButtons.hasOwnProperty(key)) continue;
-			plugin = plugins[key];
-			button = pluginCallButtons[key];
-			if (plugin.active && button) {
-				oldButton = oldCallButtons[key];
-				this.editor.callPlugin(key, null, oldButton || button);
-				if (oldButton) {
-					button.parentElement.replaceChild(oldButton, button);
-					pluginCallButtons[key] = oldButton;
-				}
-			}
-		}
-
-		if (this.status.hasFocus) this.editor.eventManager.applyTagEffect();
-
-		if (this.status.isCodeView) domUtils.addClass(this.editor._styleCommandMap.codeView, "active");
-		if (this.status.isFullScreen) domUtils.addClass(this.editor._styleCommandMap.fullScreen, "active");
-		if (domUtils.hasClass(this.context.element.wysiwyg, "se-show-block")) domUtils.addClass(this.editor._styleCommandMap.showBlocks, "active");
+		if (core.hasFocus) this.eventMenager.applyTagEffect();
+		if (core.isReadOnly) domUtils.setDisabled(true, this.editor.resizingDisabledButtons);
+		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'), core);
 	},
 
 	_resetSticky: function () {

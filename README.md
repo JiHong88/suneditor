@@ -1392,7 +1392,7 @@ editor.audioUploadHandler = function (xmlHttp, info, core) {
  * isCodeView: Whether the current code view mode
  * core: Core object
  */
-editor.toggleCodeView = function (isCodeView, core) {
+editor.setCodeView = function (isCodeView, core) {
     console.log('isCodeView', isCodeView);
 }
 
@@ -1401,7 +1401,7 @@ editor.toggleCodeView = function (isCodeView, core) {
  * isFullScreen: Whether the current full screen mode
  * core: Core object
  */
-editor.toggleFullScreen = function (isFullScreen, core) {
+editor.setFullScreen = function (isFullScreen, core) {
     console.log('isFullScreen', isFullScreen);
 }
 

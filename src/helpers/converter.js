@@ -44,7 +44,17 @@ export function entityToHTML(contents) {
  * @returns {RegExp}
  */
 export function createTagsWhitelist(list) {
-	return new RegExp("<\\/?\\b(?!\\b" + list.replace(/\|/g, "\\b|\\b") + "\\b)[^>]*>", "gi");
+	return new RegExp('<\\/?\\b(?!\\b' + (list || '').replace(/\|/g, '\\b|\\b') + '\\b)[^>]*>', 'gi');
+}
+
+/**
+ * @description Create blacklist RegExp object.
+ * Return RegExp format: new RegExp("<\\/?\\b(?:" + list + ")\\b[^>^<]*+>", "gi")
+ * @param {String} list Tags list ("br|p|div|pre...")
+ * @returns {RegExp}
+ */
+export function createTagsBlacklist(list) {
+	return new RegExp('<\\/?\\b(?:\\b' + (list || '^').replace(/\|/g, '\\b|\\b') + '\\b)[^>]*>', 'gi');
 }
 
 export function _setDefaultOptionStyle(options, defaultStyle) {

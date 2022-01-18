@@ -188,7 +188,7 @@ Format.prototype = {
 	 * @returns {Element}
 	 */
 	appendLine: function (element, lineNode) {
-		if (!element.parentNode) return null;
+		if (!element || !element.parentNode) return null;
 
 		const currentFormatEl = domUtils.getFormatElement(this.selection.getNode(), null);
 		let oFormat = null;
@@ -1409,7 +1409,7 @@ Format.prototype = {
 					_removeCheck,
 					end.container
 				);
-				if (newRange.endContainer) {
+				if (newRange.endContainer && newRange.ancestor.contains(newRange.endContainer)) {
 					end.ancestor = null;
 					end.container = newRange.endContainer;
 				}
@@ -3225,7 +3225,7 @@ Format.prototype = {
 		return {
 			ancestor: pNode,
 			container: container,
-			offset: offset
+			offset: container.nodeType === 1 && offset === 1 ? container.childNodes.length : offset
 		};
 	},
 
