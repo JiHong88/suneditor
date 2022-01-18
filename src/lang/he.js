@@ -75,6 +75,8 @@
             paragraphStyle: 'סגנון פסקה',
             textStyle: 'סגנון גופן',
             imageGallery: 'גלרית תמונות',
+            dir_ltr: 'משמאל לימין',
+            dir_rtl: 'מימין לשמאל',
             mention: 'הזכר'
         },
         dialogBox: {

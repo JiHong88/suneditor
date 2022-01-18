@@ -51,6 +51,7 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
 
     this._responsiveButtons = _responsiveButtons;
     this._parser = new _w.DOMParser();
+    this._prevRtl = options.rtl;
 
     /**
      * @description Document object of the iframe if created as an iframe || _d
@@ -114,7 +115,7 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     /**
      * @description Computed style of the wysiwyg area (window.getComputedStyle(context.element.wysiwyg))
      */
-    this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
+    this.wwComputedStyle = null;
 
     /**
      * @description Plugin buttons
@@ -219,10 +220,10 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this._htmlCheckWhitelistRegExp = null;
 
     /**
-     * @description RegExp when using check disallowd tags. (b, i, ins, strike, s)
+     * @description Tag blacklist RegExp object used in "_consistencyCheckOfHTML" method
      * @private
      */
-    this._disallowedTextTagsRegExp = null;
+    this._htmlCheckBlacklistRegExp = null;
 
     /**
      * @description Editor tags whitelist (RegExp object)
@@ -231,10 +232,28 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this.editorTagsWhitelistRegExp = null;
 
     /**
+     * @description Editor tags blacklist (RegExp object)
+     * helpers.converter.createTagsBlacklist(options.tagsBlacklist)
+     */
+    this.editorTagsBlacklistRegExp = null;
+
+    /**
      * @description Tag whitelist when pasting (RegExp object)
      * helpers.converter.createTagsWhitelist(options.pasteTagsWhitelist)
      */
     this.pasteTagsWhitelistRegExp = null;
+
+    /**
+     * @description Tag blacklist when pasting (RegExp object)
+     * helpers.converter.createTagsBlacklist(options.pasteTagsBlacklist)
+     */
+    this.pasteTagsBlacklistRegExp = null;
+
+    /**
+     * @description RegExp when using check disallowd tags. (b, i, ins, strike, s)
+     * @private
+     */
+    this._disallowedTextTagsRegExp = null;
 
     /**
      * @description Is inline mode?
@@ -261,10 +280,22 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this._attributesWhitelistRegExp = null;
 
     /**
+     * @description Attributes blacklist used by the cleanHTML method
+     * @private
+     */
+    this._attributesBlacklistRegExp = null;
+
+    /**
      * @description Attributes of tags whitelist used by the cleanHTML method
      * @private
      */
     this._attributesTagsWhitelist = null;
+
+    /**
+     * @description Attributes of tags blacklist used by the cleanHTML method
+     * @private
+     */
+    this._attributesTagsBlacklist = null;
 
     /**
      * @description binded controllersOff method
@@ -386,6 +417,24 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this._styleCommandMap = null;
 
     /**
+     * @description CSS properties related to style tags 
+     * @private
+     */
+    this._commandMapStyles = {
+        STRONG: ["font-weight"],
+        U: ["text-decoration"],
+        EM: ["font-style"],
+        DEL: ["text-decoration"]
+    };
+
+    /**
+     * @description Contains pairs of all "data-commands" and "elements" setted in toolbar over time
+     * Used primarily to save and recover button states after the toolbar re-creation
+     * Updates each "_cachingButtons()" invocation  
+     */
+    this.allCommandButtons = null;
+
+    /**
      * @description Map of default command
      * @private
      */
@@ -481,6 +530,40 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
 
 Core.prototype = {
     /**
+     * @description Save the current buttons states to "allCommandButtons" object
+     */
+    saveButtonStates: function () {
+        if (!this.allCommandButtons) this.allCommandButtons = {};
+
+        const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]');
+        for (let i = 0, element, command; i < currentButtons.length; i++) {
+            element = currentButtons[i];
+            command = element.getAttribute('data-command');
+
+            this.allCommandButtons[command] = element;
+        }
+    },
+
+    /**
+     * @description Recover the current buttons states from "allCommandButtons" object
+     */
+    recoverButtonStates: function () {
+        if (this.allCommandButtons) {
+            const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]');
+            for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
+                button = currentButtons[i];
+                command = button.getAttribute('data-command');
+
+                oldButton = this.allCommandButtons[command];
+                if (oldButton) {
+                    button.parentElement.replaceChild(oldButton, button);
+                    if (this.context.tool[command]) this.context.tool[command] = oldButton;
+                }
+            }
+        }
+    },
+
+    /**
      * @description If the plugin is not added, add the plugin and call the 'add' function.
      * If the plugin is added call callBack function.
      * @param {string} pluginName The name of the plugin to call
@@ -542,7 +625,7 @@ Core.prototype = {
     },
 
     /**
-     * @description Enabled submenu
+     * @description Enable submenu
      * @param {Element} element Submenu's button element to call
      */
     submenuOn: function (element) {
@@ -691,6 +774,18 @@ Core.prototype = {
         }
 
         menu.style.visibility = '';
+    },
+
+    /**
+     * @description Disable more layer
+     */
+    moreLayerOff: function () {
+        if (this._moreLayerActiveButton) {
+            const layer = this.context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
+            layer.style.display = 'none';
+            domUtils.removeClass(this._moreLayerActiveButton, 'on');
+            this._moreLayerActiveButton = null;
+        }
     },
 
     /**
@@ -854,13 +949,7 @@ Core.prototype = {
      * @description Focus to wysiwyg area using "native focus function"
      */
     nativeFocus: function () {
-        const caption = domUtils.getParentElement(this.selection.getNode(), "figcaption");
-        if (caption) {
-            caption.focus();
-        } else {
-            this.context.element.wysiwyg.focus();
-        }
-
+        this.selection.__focus();
         this.selection._init();
     },
 
@@ -955,56 +1044,54 @@ Core.prototype = {
     actionCall: function (command, display, target) {
         // call plugins
         if (display) {
-            if (/more/i.test(display) && target !== this._moreLayerActiveButton) {
-                const layer = this.context.element.toolbar.querySelector('.' + command);
-                if (layer) {
-                    if (this._moreLayerActiveButton) {
-                        (this.context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'))).style.display = 'none';
-                        domUtils.removeClass(this._moreLayerActiveButton, 'on');
+            if (/more/i.test(display)) {
+                if (target !== this._moreLayerActiveButton) {
+                    const layer = this.context.element.toolbar.querySelector('.' + command);
+                    if (layer) {
+                        if (this._moreLayerActiveButton) this.moreLayerOff();
+
+                        this._moreLayerActiveButton = target;
+                        layer.style.display = 'block';
+
+                        this.toolbar._showBalloon();
+                        this.toolbar._showInline();
                     }
                     domUtils.addClass(target, 'on');
-                    this._moreLayerActiveButton = target;
-                    layer.style.display = 'block';
+                } else {
+                    const layer = this.context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
+                    if (layer) {
+                        this.moreLayerOff();
 
-                    this.toolbar._showBalloon();
-                    this.toolbar._showInline();
+                        this.toolbar._showBalloon();
+                        this.toolbar._showInline();
+                    }
                 }
                 return;
             }
 
             if (/container/.test(display) && (this._menuTray[command] === null || target !== this.containerActiveButton)) {
-                this.containerOn(target);
+                this.callPlugin(command, this.containerOn.bind(this, target), target);
                 return;
             }
 
-            if (this.status.isReadOnly) return;
+            if (this.isReadOnly && domUtils.arrayIncludes(this.resizingDisabledButtons, target)) return;
             if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
-                this.submenuOn(target);
+                this.callPlugin(command, this.submenuOn.bind(this, target), target);
                 return;
             } else if (/dialog/.test(display)) {
-                this.plugins[command].open();
+                this.callPlugin(command, this.plugins[command].open.bind(this), target);
                 return;
             } else if (/command/.test(display)) {
-                this.plugins[command].action();
+                this.callPlugin(command, this.plugins[command].action.bind(this), target);
             } else if (/fileBrowser/.test(display)) {
-                this.plugins[command].open();
+                this.callPlugin(command, this.plugins[command].open.bind(this, null), target);
             }
         } // default command
         else if (command) {
-            this.commandHandler(command, target);
+            this.commandHandler(target, command);
         }
 
-        if (/more/i.test(display)) {
-            const layer = this.context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
-            if (layer) {
-                domUtils.removeClass(this._moreLayerActiveButton, 'on');
-                this._moreLayerActiveButton = null;
-                layer.style.display = 'none';
-
-                this.toolbar._showBalloon();
-                this.toolbar._showInline();
-            }
-        } else if (/submenu/.test(display)) {
+        if (/submenu/.test(display)) {
             this.submenuOff();
         } else if (!/command/.test(display)) {
             this.submenuOff();
@@ -1029,6 +1116,7 @@ Core.prototype = {
             case 'paste':
                 break;
             case 'selectAll':
+                this.containerOff();
                 const wysiwyg = this.context.element.wysiwyg;
                 let first = domUtils.getEdgeChild(wysiwyg.firstChild, function (current) {
                     return current.childNodes.length === 0 || current.nodeType === 3;
@@ -1082,6 +1170,15 @@ Core.prototype = {
             case 'showBlocks':
                 this.setDisplayBlocks(!domUtils.hasClass(wysiwyg, 'se-show-block'));
                 break;
+            case 'dir':
+                this.setDir(options.rtl ? 'ltr' : 'rtl');
+                break;
+            case 'dir_ltr':
+                this.setDir('ltr');
+                break;
+            case 'dir_rtl':
+                this.setDir('rtl');
+                break;
             case 'save':
                 if (typeof this.options.callBackSave === 'function') {
                     this.options.callBackSave(this.getContents(false), this.status.isChanged);
@@ -1108,7 +1205,7 @@ Core.prototype = {
                     removeNode = 'SUB';
                 }
 
-                this.format.applyStyleNode(cmd, null, [removeNode], false);
+                this.format.applyStyleNode(cmd, this._commandMapStyles[command] || null, [removeNode], false);
                 this.focus();
         }
     },
@@ -1136,7 +1233,7 @@ Core.prototype = {
         domUtils.setDisabled(!value, this.codeViewDisabledButtons);
 
         if (!value) {
-            this._setCodeDataToEditor();
+            if (!domUtils.isNonEditable(this.context.element.wysiwygFrame)) this._setCodeDataToEditor();
             this.context.element.wysiwygFrame.scrollTop = 0;
             this.context.element.code.style.display = 'none';
             this.context.element.wysiwygFrame.style.display = 'block';
@@ -1162,14 +1259,18 @@ Core.prototype = {
             domUtils.removeClass(this._styleCommandMap.codeView, 'active');
 
             // history stack
-            this.history.push(false);
-            this.history._resetCachingButton();
+            if (!domUtils.isNonEditable(this.context.element.wysiwygFrame)) {
+                this.history.push(false);
+                this.history._resetCachingButton();
+            }
         } else {
             this._setEditorDataToCodeView();
             this.status._codeOriginCssText = this.status._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
             this.status._wysiwygOriginCssText = this.status._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 
-            if (this.options.height === 'auto' && !this.options.codeMirrorEditor) this.context.element.code.style.height = this.context.element.code.scrollHeight > 0 ? (this.context.element.code.scrollHeight + 'px') : 'auto';
+            if (this.status.isFullScreen) this.context.element.code.style.height = '100%';
+            else if (options.height === 'auto' && !options.codeMirrorEditor) this.context.element.code.style.height = this.context.element.code.scrollHeight > 0 ? (this.context.element.code.scrollHeight + 'px') : 'auto';
+
             if (this.options.codeMirrorEditor) this.options.codeMirrorEditor.refresh();
 
             this.status.isCodeView = true;
@@ -1194,7 +1295,7 @@ Core.prototype = {
         if (this.status.isReadOnly) domUtils.setDisabled(true, this.resizingDisabledButtons);
 
         // user event
-        if (typeof this.events.toggleCodeView === 'function') this.events.toggleCodeView(this.status.isCodeView);
+        if (typeof this.events.setCodeView === 'function') this.events.setCodeView(this.status.isCodeView);
     },
 
     /**
@@ -1215,7 +1316,12 @@ Core.prototype = {
                 }
             }
 
-            this._wd.head.innerHTML = parseDocument.head.innerHTML;
+            let headers = parseDocument.head.innerHTML;
+            if (!parseDocument.head.querySelector('link[rel="stylesheet"]') || (this.options.height === 'auto' && !parseDocument.head.querySelector('style'))) {
+                headers += converter._setIframeCssTags(this.options);
+            }
+
+            this._wd.head.innerHTML = headers;
             this._wd.body.innerHTML = this.convertContentsForEditor(parseDocument.body.innerHTML);
 
             const attrs = parseDocument.body.attributes;
@@ -1239,7 +1345,7 @@ Core.prototype = {
      * @private
      */
     _setEditorDataToCodeView: function () {
-        const codeContents = this.convertHTMLForCodeView(this.context.element.wysiwyg);
+        const codeContents = this.convertHTMLForCodeView(this.context.element.wysiwyg, false);
         let codeValue = '';
 
         if (this.options.fullPage) {
@@ -1257,6 +1363,7 @@ Core.prototype = {
 
     /**
      * @description Changes to full screen or default screen
+     * @param {Element} element full screen button
      * @param {boolean} value true/false
      */
     setFullScreen: function (value) {
@@ -1266,7 +1373,9 @@ Core.prototype = {
         const wysiwygFrame = this.context.element.wysiwygFrame;
         const code = this.context.element.code;
         const _var = this.status;
+
         this.controllersOff();
+        const wasToolbarHidden = (toolbar.style.display === 'none' || (this._isInline && !this._inlineToolbarAttr.isShow));
 
         if (value) {
             _var.isFullScreen = true;
@@ -1312,15 +1421,17 @@ Core.prototype = {
             _var.innerHeight_fullScreen = (this._w.innerHeight - toolbar.offsetHeight);
             editorArea.style.height = (_var.innerHeight_fullScreen - this.options.fullScreenOffset) + 'px';
 
-            if (this._styleCommandMap.fullScreen) domUtils.changeElement(this._styleCommandMap.fullScreen.firstElementChild, this.icons.reduction);
-
             if (this.options.iframe && this.options.height === 'auto') {
                 editorArea.style.overflow = 'auto';
                 this._iframeAutoHeight();
             }
 
             this.context.element.topArea.style.marginTop = this.options.fullScreenOffset + 'px';
-            domUtils.addClass(this._styleCommandMap.fullScreen, 'active');
+
+            if (this._styleCommandMap.fullScreen) {
+                domUtils.changeElement(this._styleCommandMap.fullScreen.firstElementChild, this.icons.reduction);
+                domUtils.addClass(this._styleCommandMap.fullScreen, 'active');
+            }
         } else {
             _var.isFullScreen = false;
 
@@ -1330,6 +1441,8 @@ Core.prototype = {
             editorArea.style.cssText = _var._editorAreaOriginCssText;
             topArea.style.cssText = _var._originCssText;
             this._d.body.style.overflow = _var._bodyOverflow;
+
+            if (options.height === 'auto' && !options.codeMirrorEditor) this._codeViewAutoHeight();
 
             if (!!this.options.toolbarContainer) this.options.toolbarContainer.appendChild(toolbar);
 
@@ -1349,14 +1462,18 @@ Core.prototype = {
             if (!!this.options.toolbarContainer) domUtils.removeClass(toolbar, 'se-toolbar-balloon');
 
             this.toolbar._resetSticky();
-            if (this._styleCommandMap.fullScreen) domUtils.changeElement(this._styleCommandMap.fullScreen.firstElementChild, this.icons.expansion);
-
             this.context.element.topArea.style.marginTop = '';
-            domUtils.removeClass(this._styleCommandMap.fullScreen, 'active');
+
+            if (this._styleCommandMap.fullScreen) {
+                domUtils.changeElement(this._styleCommandMap.fullScreen.firstElementChild, this.icons.expansion);
+                domUtils.removeClass(this._styleCommandMap.fullScreen, 'active');
+            }
         }
 
+        if (wasToolbarHidden) functions.toolbar.hide();
+
         // user event
-        if (typeof this.events.toggleFullScreen === 'function') this.events.toggleFullScreen(this.status.isFullScreen);
+        if (typeof this.events.setFullScreen === 'function') this.events.setFullScreen(this.status.isFullScreen);
     },
 
     /**
@@ -1479,6 +1596,71 @@ Core.prototype = {
     },
 
     /**
+     * @description Set direction to "rtl" or "ltr".
+     * @param {String} dir "rtl" or "ltr"
+     */
+    setDir: function (dir) {
+        const rtl = dir === 'rtl';
+        const changeDir = this._prevRtl !== rtl;
+        const el = this.context.element;
+        const tool = this.context.tool;
+        this._prevRtl = this.options.rtl = rtl;
+
+        if (changeDir) {
+            // align buttons
+            if (this.plugins.align) {
+                this.plugins.align.exchangeDir.call(this);
+            }
+            // indent buttons
+            if (tool.indent) domUtils.changeElement(tool.indent.firstElementChild, icons.indent);
+            if (tool.outdent) domUtils.changeElement(tool.outdent.firstElementChild, icons.outdent);
+        }
+
+        if (rtl) {
+            domUtils.addClass(el.topArea, 'se-rtl');
+            domUtils.addClass(el.wysiwygFrame, 'se-rtl');
+        } else {
+            domUtils.removeClass(el.topArea, 'se-rtl');
+            domUtils.removeClass(el.wysiwygFrame, 'se-rtl');
+        }
+
+        const lineNodes = domUtils.getListChildren(el.wysiwyg, function (current) {
+            return this.format.isLine(current) && (current.style.marginRight || current.style.marginLeft || current.style.textAlign);
+        }.bind(this));
+
+        for (let i = 0, len = lineNodes.length, n, l, r; i < len; i++) {
+            n = lineNodes[i];
+            // indent margin
+            r = n.style.marginRight;
+            l = n.style.marginLeft;
+            if (r || l) {
+                n.style.marginRight = l;
+                n.style.marginLeft = r;
+            }
+            // text align
+            r = n.style.textAlign;
+            if (r === 'left') n.style.textAlign = 'right';
+            else if (r === 'right') n.style.textAlign = 'left';
+        }
+
+
+        if (tool.dir) {
+            domUtils.changeTxt(tool.dir.querySelector('.se-tooltip-text'), this.lang.toolbar[options.rtl ? 'dir_ltr' : 'dir_rtl']);
+            domUtils.changeElement(tool.dir.firstElementChild, icons[this.options.rtl ? 'dir_ltr' : 'dir_rtl']);
+        }
+
+        if (tool.dir_ltr) {
+            if (rtl) domUtils.removeClass(tool.dir_ltr, 'active');
+            else domUtils.addClass(tool.dir_ltr, 'active');
+        }
+
+        if (tool.dir_rtl) {
+            if (rtl) domUtils.addClass(tool.dir_rtl, 'active');
+            else domUtils.removeClass(tool.dir_rtl, 'active');
+        }
+    },
+
+    /**
      * @description Sets the HTML string
      * @param {String|undefined} html HTML string
      */
@@ -1493,7 +1675,7 @@ Core.prototype = {
             // history stack
             this.history.push(false);
         } else {
-            const value = this.convertHTMLForCodeView(convertValue);
+            const value = this.convertHTMLForCodeView(convertValue, false);
             this._setCodeView(value);
         }
     },
@@ -1514,7 +1696,7 @@ Core.prototype = {
      * @returns {Object}
      */
     getContents: function (onlyContents) {
-        const renderHTML = domUtils.createElement('DIV', null, this.context.element.wysiwyg.innerHTML);
+        const renderHTML = domUtils.createElement('DIV', null, this.convertHTMLForCodeView(this.context.element.wysiwyg, true));
         const figcaptions = domUtils.getListChildren(renderHTML, function (current) {
             return /FIGCAPTION/i.test(current.nodeName);
         });
@@ -1584,18 +1766,154 @@ Core.prototype = {
     },
 
     /**
+     * @description Delete disallowed tags
+     * @param {string} html HTML string
+     * @returns {string}
+     * @private
+     */
+    _deleteDisallowedTags: function (html) {
+        return html
+            .replace(/\n/g, '')
+            .replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '')
+            .replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '')
+            .replace(this.editorTagsWhitelistRegExp, '')
+            .replace(this.editorTagsBlacklistRegExp, '');
+    },
+
+    /**
+     * @description Fix tags that do not fit the editor format.
+     * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
+     * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist (core._htmlCheckWhitelistRegExp)
+     * @param {RegExp} htmlCheckBlacklistRegExp Editor tags blacklist (core._htmlCheckBlacklistRegExp)
+     * @param {Boolean} lowLevelCheck Row level check
+     * @private
+     */
+    _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, lowLevelCheck) {
+        /**
+         * It is can use ".children(domUtils.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
+         * So check the node type and exclude the text no (current.nodeType !== 1)
+         */
+        const removeTags = [],
+            emptyTags = [],
+            wrongList = [],
+            withoutFormatCells = [];
+
+        // wrong position
+        const wrongTags = domUtils.getListChildNodes(documentFragment, function (current) {
+            if (current.nodeType !== 1) return false;
+
+            // white list
+            if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && this.format.isNotCheckingNode(current))) {
+                removeTags.push(current);
+                return false;
+            }
+
+            const nrtag = !domUtils.getParentElement(current, this.isNotCheckingNode);
+            // empty tags
+            if ((!domUtils.isTable(current) && !domUtils.isListCell(current) && !domUtils.isAnchor(current)) && (this.format.isLine(current) || this.format.isBlock(current) || this.format.isTextStyleNode(current)) && current.childNodes.length === 0 && nrtag) {
+                emptyTags.push(current);
+                return false;
+            }
+
+            // wrong list
+            if (domUtils.isList(current.parentNode) && !domUtils.isList(current) && !domUtils.isListCell(current)) {
+                wrongList.push(current);
+                return false;
+            }
+
+            // table cells
+            if (domUtils.isTableCell(current)) {
+                const fel = current.firstElementChild;
+                if (!this.format.isLine(fel) && !this.format.isBlock(fel) && !this.component.is(fel)) {
+                    withoutFormatCells.push(current);
+                    return false;
+                }
+            }
+
+            const result = current.parentNode !== documentFragment && nrtag &&
+                ((domUtils.isListCell(current) && !domUtils.isList(current.parentNode)) ||
+                    (lowLevelCheck && (this.format.isLine(current) || this.component.is(current)) && !this.format.isBlock(current.parentNode) && !domUtils.getParentElement(current, this.component.is)));
+
+            return result;
+        }.bind(this));
+
+        for (let i = 0, len = removeTags.length; i < len; i++) {
+            this.removeItem(removeTags[i]);
+        }
+
+        const checkTags = [];
+        for (let i = 0, len = wrongTags.length, t, p; i < len; i++) {
+            t = wrongTags[i];
+            p = t.parentNode;
+            if (!p || !p.parentNode) continue;
+
+            if (this.getParentElement(t, this.isListCell)) {
+                const cellChildren = t.childNodes;
+                for (let j = cellChildren.length - 1; len >= 0; j--) {
+                    p.insertBefore(t, cellChildren[j]);
+                }
+                checkTags.push(t);
+            } else {
+                p.parentNode.insertBefore(t, p);
+                checkTags.push(p);
+            }
+        }
+
+        for (let i = 0, len = checkTags.length, t; i < len; i++) {
+            t = checkTags[i];
+            if (this.onlyZeroWidthSpace(t.textContent.trim())) {
+                this.removeItem(t);
+            }
+        }
+
+        for (let i = 0, len = emptyTags.length; i < len; i++) {
+            this.removeItem(emptyTags[i]);
+        }
+
+        for (let i = 0, len = wrongList.length, t, tp, children, p; i < len; i++) {
+            t = wrongList[i];
+            p = t.parentNode;
+            if (!p) continue;
+
+            tp = this.createElement('LI');
+
+            if (this.isFormatElement(t)) {
+                children = t.childNodes;
+                while (children[0]) {
+                    tp.appendChild(children[0]);
+                }
+                p.insertBefore(tp, t);
+                this.removeItem(t);
+            } else {
+                t = t.nextSibling;
+                tp.appendChild(wrongList[i]);
+                p.insertBefore(tp, t);
+            }
+        }
+
+        for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {
+            t = withoutFormatCells[i];
+            f = this.createElement('DIV');
+            f.innerHTML = (t.textContent.trim().length === 0 && t.children.length === 0) ? '<br>' : t.innerHTML;
+            t.innerHTML = f.outerHTML;
+        }
+    },
+
+    /**
      * @description Gets the clean HTML code for editor
      * @param {string} html HTML string
      * @param {String|RegExp|null} whitelist Regular expression of allowed tags.
      * RegExp object is create by converter.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
+     * @param {String|RegExp|null} blacklist Regular expression of disallowed tags.
+     * RegExp object is create by util.createTagsBlacklist method. (core.pasteTagsBlacklistRegExp)
      * @returns {string}
      */
-    cleanHTML: function (html, whitelist) {
-        html = DeleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(this.editorTagsWhitelistRegExp, '').replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanTags.bind(this, true));
+    cleanHTML: function (html, whitelist, blacklist) {
+        html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanTags.bind(this, true));
 
         const dom = this._d.createRange().createContextualFragment(html, true);
         try {
-            this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
+            this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, true);
         } catch (error) {
             console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
         }
@@ -1631,7 +1949,15 @@ Core.prototype = {
         }
 
         cleanHTML = this.node.removeWhiteSpace(cleanHTML);
-        return this._tagConvertor(!cleanHTML ? html : !whitelist ? cleanHTML : cleanHTML.replace(typeof whitelist === 'string' ? converter.createTagsWhitelist(whitelist) : whitelist, ''));
+
+        if (!cleanHTML) {
+            cleanHTML = html;
+        } else {
+            if (whitelist) cleanHTML = cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, '');
+            if (blacklist) cleanHTML = cleanHTML.replace(typeof blacklist === 'string' ? util.createTagsBlacklist(blacklist) : blacklist, '');
+        }
+
+        return this._tagConvertor(cleanHTML);
     },
 
     /**
@@ -1640,11 +1966,11 @@ Core.prototype = {
      * @returns {string}
      */
     convertContentsForEditor: function (contents) {
-        contents = DeleteDisallowedTags(this._parser.parseFromString(contents, 'text/html').body.innerHTML).replace(this.editorTagsWhitelistRegExp, '').replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanTags.bind(this, false));
+        contents = this._deleteDisallowedTags(this._parser.parseFromString(contents, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanTags.bind(this, false));
         const dom = this._d.createRange().createContextualFragment(contents, false);
 
         try {
-            this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp);
+            this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, false);
         } catch (error) {
             console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
         }
@@ -1665,8 +1991,20 @@ Core.prototype = {
 
         const domTree = dom.childNodes;
         let cleanHTML = '';
-        for (let i = 0, len = domTree.length; i < len; i++) {
-            cleanHTML += this._makeLine(domTree[i], true);
+        for (let i = 0, t, p; i < domTree.length; i++) {
+            t = domTree[i];
+            if (!this.format.isLine(t) && !this.component.is(t) && !domUtils.isMedia(t)) {
+                if (!p) p = domUtils.createElement(options.defaultTag);
+                p.appendChild(t);
+                i--;
+                if (domTree[i + 1] && !this.format.isLine(domTree[i + 1])) {
+                    continue;
+                } else {
+                    t = p;
+                    p = null;
+                }
+            }
+            cleanHTML += this._makeLine(t, true);
         }
 
         if (cleanHTML.length === 0) return '<' + this.options.defaultTag + '><br></' + this.options.defaultTag + '>';
@@ -1678,57 +2016,59 @@ Core.prototype = {
     /**
      * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
      * @param {Element|String} html WYSIWYG element (context.element.wysiwyg) or HTML string.
-     * @returns {string}
+     * @param {Boolean} comp If true, does not line break and indentation of tags.
+     * @returns {String}
      */
-    convertHTMLForCodeView: function (html) {
-        let returnHTML = '';
+    convertHTMLForCodeView: function (html, comp) {
+        let returnHTML = "";
         const wRegExp = this._w.RegExp;
-        const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
-        const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
+        const brReg = new wRegExp("^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$", "i");
+        const wDoc = typeof html === "string:" ? this._d.createRange().createContextualFragment(html) : html;
         const isFormat = function (current) {
             return this.format.isLine(current) || this.component.is(current);
         }.bind(this);
+        const brChar = comp ? "" : "\n";
 
-        let indentSize = this.status.codeIndentSize * 1;
-        indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(' ') : '';
+        let indentSize = comp ? 0 : this.status.codeIndent * 1;
+        indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(" ") : "";
 
-        (function recursionFunc(element, indent, lineBR) {
+        (function recursionFunc(element, indent) {
             const children = element.childNodes;
             const elementRegTest = brReg.test(element.nodeName);
-            const elementIndent = (elementRegTest ? indent : '');
+            const elementIndent = (elementRegTest ? indent : "");
 
-            for (let i = 0, len = children.length, node, br, nodeRegTest, tag, tagIndent; i < len; i++) {
+            for (let i = 0, len = children.length, node, br, lineBR, nodeRegTest, tag, tagIndent; i < len; i++) {
                 node = children[i];
                 nodeRegTest = brReg.test(node.nodeName);
-                br = nodeRegTest ? '\n' : '';
-                lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? '\n' : '';
+                br = nodeRegTest ? brChar : '';
+                lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? brChar : "";
 
                 if (node.nodeType === 8) {
-                    returnHTML += '\n<!-- ' + node.textContent.trim() + ' -->' + br;
+                    returnHTML += "\n<!-- " + node.textContent.trim() + " -->" + br;
                     continue;
                 }
                 if (node.nodeType === 3) {
-                    if (!domUtils.isList(node.parentElement)) returnHTML += converter.htmlToEntity((/^\n+$/.test(node.data) ? '' : node.data));
+                    if (!util.isList(node.parentElement)) returnHTML += converter.htmlToEntity(/^\n+$/.test(node.data) ? "" : node.data);
                     continue;
                 }
                 if (node.childNodes.length === 0) {
-                    returnHTML += (/^HR$/i.test(node.nodeName) ? '\n' : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + node.outerHTML + br;
+                    returnHTML += (/^HR$/i.test(node.nodeName) ? brChar : "") + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? "" : elementIndent) + node.outerHTML + br;
                     continue;
                 }
 
                 if (!node.outerHTML) { // IE
-                    returnHTML += new this._w.XMLSerializer().serializeToString(node);
+                    returnHTML += new _w.XMLSerializer().serializeToString(node);
                 } else {
                     tag = node.nodeName.toLowerCase();
-                    tagIndent = elementIndent || nodeRegTest ? indent : '';
-                    returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
-                    recursionFunc(node, indent + indentSize, '');
-                    returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? '\n' : '' || /^(TH|TD)$/i.test(node.nodeName) ? '\n' : '');
+                    tagIndent = elementIndent || nodeRegTest ? indent : "";
+                    returnHTML += (lineBR || (elementRegTest ? "" : br)) + tagIndent + node.outerHTML.match(wRegExp("<" + tag + "[^>]*>", "i"))[0] + br;
+                    recursionFunc(node, indent + indentSize, "");
+                    returnHTML += (/\n$/.test(returnHTML) ? tagIndent : "") + "</" + tag + ">" + (lineBR || br || elementRegTest ? brChar : "" || /^(TH|TD)$/i.test(node.nodeName) ? brChar : "");
                 }
             }
-        }(wDoc, '', '\n'));
+        }(wDoc, ""));
 
-        return returnHTML.trim() + '\n';
+        return returnHTML.trim() + brChar;
     },
 
     /**
@@ -1832,10 +2172,15 @@ Core.prototype = {
     },
 
     /**
-     * @description Copying the contents of the editor to the original textarea
+     * @description Copying the contents of the editor to the original textarea and execute onSave callback.
      */
     save: function () {
         this.context.element.originElement.value = this.getContents(false);
+        // user event
+        if (typeof this.events.onSave === 'function') {
+            this.events.onSave(content, core);
+            return;
+        }
     },
 
     /**
@@ -1878,7 +2223,7 @@ Core.prototype = {
                 wysiwyg.appendChild(children[i]);
             }
         } else {
-            this._setCodeView(this._getCodeView() + '\n' + this.convertHTMLForCodeView(convertValue));
+            this._setCodeView(this._getCodeView() + '\n' + this.convertHTMLForCodeView(convertValue, false));
         }
 
         // history stack
@@ -1891,14 +2236,21 @@ Core.prototype = {
      */
     readOnly: function (value) {
         this.status.isReadOnly = value;
+        domUtils.setDisabled(!!value, this.resizingDisabledButtons);
 
         if (value) {
+            /** off menus */
+            this.controllersOff();
+            if (this.submenuActiveButton && this.submenuActiveButton.disabled) this.submenuOff();
+            if (this._moreLayerActiveButton && this._moreLayerActiveButton.disabled) this.moreLayerOff();
+            if (this.containerActiveButton && this.containerActiveButton.disabled) this.containerOff();
+            if (this.modalForm) this.plugins.dialog.close.call(this);
+
             this.context.element.code.setAttribute("readOnly", "true");
         } else {
             this.context.element.code.removeAttribute("readOnly");
         }
 
-        domUtils.setDisabled(!!value, this.resizingDisabledButtons);
         if (this.options.codeMirrorEditor) this.options.codeMirrorEditor.setOption('readOnly', !!value);
     },
 
@@ -1906,9 +2258,12 @@ Core.prototype = {
      * @description Disable the suneditor
      */
     disable: function () {
-        this.context.buttons.cover.style.display = 'block';
+        this.toolbar.disable();
+        this.controllersOff();
+        if (this.modalForm) this.plugins.dialog.close.call(this);
+
         this.context.element.wysiwyg.setAttribute('contenteditable', false);
-        this.status.isDisabled = true;
+        this.isDisabled = true;
 
         if (this.options.codeMirrorEditor) {
             this.options.codeMirrorEditor.setOption('readOnly', true);
@@ -1921,9 +2276,9 @@ Core.prototype = {
      * @description Enable the suneditor
      */
     enable: function () {
-        this.context.buttons.cover.style.display = 'none';
+        this.toolbar.enable();
         this.context.element.wysiwyg.setAttribute('contenteditable', true);
-        this.status.isDisabled = false;
+        this.isDisabled = false;
 
         if (this.options.codeMirrorEditor) {
             this.options.codeMirrorEditor.setOption('readOnly', false);
@@ -1983,118 +2338,6 @@ Core.prototype = {
     },
 
     /**
-     * @description Fix tags that do not fit the editor format.
-     * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
-     * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist (core._htmlCheckWhitelistRegExp)
-     * @param {boolean} lowLevelCheck Row level check
-     * @private
-     */
-    _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, lowLevelCheck) {
-        /**
-         * It is can use ".children(domUtils.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
-         * So check the node type and exclude the text no (current.nodeType !== 1)
-         */
-        const removeTags = [],
-            emptyTags = [],
-            wrongList = [],
-            withoutFormatCells = [];
-
-        // wrong position
-        const wrongTags = domUtils.getListChildNodes(documentFragment, function (current) {
-            if (current.nodeType !== 1) return false;
-
-            // white list
-            if (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && this.format._isNotCheckingNode(current)) {
-                removeTags.push(current);
-                return false;
-            }
-
-            const nrtag = !domUtils.getParentElement(current, this.format._isNotCheckingNode);
-            // empty tags
-            if ((!domUtils.isTable(current) && !domUtils.isListCell(current)) && (this.format.isLine(current) || this.format.isBlock(current) || this.format.isTextStyleNode(current)) && current.childNodes.length === 0 && nrtag) {
-                emptyTags.push(current);
-                return false;
-            }
-
-            // wrong list
-            if (domUtils.isList(current.parentNode) && !domUtils.isList(current) && !domUtils.isListCell(current)) {
-                wrongList.push(current);
-                return false;
-            }
-
-            // table cells
-            if (domUtils.isTableCell(current)) {
-                const fel = current.firstElementChild;
-                if (!this.format.isLine(fel) && !this.format.isBlock(fel) && !this.component.is(fel)) {
-                    withoutFormatCells.push(current);
-                    return false;
-                }
-            }
-
-            const result = current.parentNode !== documentFragment && nrtag &&
-                ((domUtils.isListCell(current) && !domUtils.isList(current.parentNode)) ||
-                    (lowLevelCheck && (this.format.isLine(current) || this.component.is(current)) && !this.format.isBlock(current.parentNode) && !domUtils.getParentElement(current, this.component.is)));
-
-            return result;
-        }.bind(this));
-
-        for (let i = 0, len = removeTags.length; i < len; i++) {
-            domUtils.remove(removeTags[i]);
-        }
-
-        const checkTags = [];
-        for (let i = 0, len = wrongTags.length, t, p; i < len; i++) {
-            t = wrongTags[i];
-            p = t.parentNode;
-            if (!p || !p.parentNode) continue;
-
-            if (domUtils.getParentElement(t, domUtils.isListCell)) {
-                const cellChildren = t.childNodes;
-                for (let j = cellChildren.length - 1; len >= 0; j--) {
-                    p.insertBefore(t, cellChildren[j]);
-                }
-                checkTags.push(t);
-            } else {
-                p.parentNode.insertBefore(t, p);
-                checkTags.push(p);
-            }
-        }
-
-        for (let i = 0, len = checkTags.length, t; i < len; i++) {
-            t = checkTags[i];
-            if (unicode.onlyZeroWidthSpace(t.textContent.trim())) {
-                domUtils.remove(t);
-            }
-        }
-
-        for (let i = 0, len = emptyTags.length; i < len; i++) {
-            domUtils.remove(emptyTags[i]);
-        }
-
-        for (let i = 0, len = wrongList.length, t, tp, children, p; i < len; i++) {
-            t = wrongList[i];
-
-            tp = domUtils.createElement('LI');
-            children = t.childNodes;
-            while (children[0]) {
-                tp.appendChild(children[0]);
-            }
-
-            p = t.parentNode;
-            if (!p) continue;
-            p.insertBefore(tp, t);
-            domUtils.remove(t);
-        }
-
-        for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {
-            t = withoutFormatCells[i];
-            f = domUtils.createElement('DIV');
-            f.innerHTML = (t.textContent.trim().length === 0 && t.children.length === 0) ? '<br>' : t.innerHTML;
-            t.innerHTML = f.outerHTML;
-        }
-    },
-
-    /**
      * @description Check the components such as image and video and modify them according to the format.
      * @private
      */
@@ -2142,17 +2385,19 @@ Core.prototype = {
      * @private
      */
     _init: function (reload, _initHTML) {
-        const wRegExp = this._w.RegExp;
-        this._ww = this.options.iframe ? this.context.element.wysiwygFrame.contentWindow : this._w;
-        this._wd = this._d;
+        const wRegExp = _w.RegExp;
+        this._ww = options.iframe ? context.element.wysiwygFrame.contentWindow : _w;
+        this._wd = _d;
+        this._charTypeHTML = options.charCounterType === 'byte-html';
+        this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
 
-        if (!this.options.iframe && typeof this._w.ShadowRoot === 'function') {
-            let child = this.context.element.wysiwygFrame;
+        if (!options.iframe && typeof _w.ShadowRoot === 'function') {
+            let child = context.element.wysiwygFrame;
             while (child) {
                 if (child.shadowRoot) {
                     this._shadowRoot = child.shadowRoot;
                     break;
-                } else if (child instanceof this._w.ShadowRoot) {
+                } else if (child instanceof _w.ShadowRoot) {
                     this._shadowRoot = child;
                     break;
                 }
@@ -2162,8 +2407,8 @@ Core.prototype = {
         }
 
         // set disallow text nodes
-        const disallowTextTags = this._w.Object.keys(this.options._textTagsMap);
-        const allowTextTags = !this.options.addTagsWhitelist ? [] : this.options.addTagsWhitelist.split('|').filter(function (v) {
+        const disallowTextTags = _w.Object.keys(options._textTagsMap);
+        const allowTextTags = !options.addTagsWhitelist ? [] : options.addTagsWhitelist.split('|').filter(function (v) {
             return /b|i|ins|s|strike/i.test(v);
         });
         for (let i = 0; i < allowTextTags.length; i++) {
@@ -2172,42 +2417,122 @@ Core.prototype = {
         this._disallowedTextTagsRegExp = disallowTextTags.length === 0 ? null : new wRegExp('(<\\/?)(' + disallowTextTags.join('|') + ')\\b\\s*([^>^<]+)?\\s*(?=>)', 'gi');
 
         // set whitelist
+        const getRegList = function (str, str2) {
+            return !str ? '^' : (str === '*' ? '[a-z-]+' : (!str2 ? str : (str + '|' + str2)));
+        };
+        // tags
         const defaultAttr = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
-        this._allowHTMLComments = this.options._editorTagsWhitelist.indexOf('//') > -1;
-        this._htmlCheckWhitelistRegExp = new wRegExp('^(' + this.options._editorTagsWhitelist.replace('|//', '') + ')$', 'i');
-        this.editorTagsWhitelistRegExp = converter.createTagsWhitelist(this.options._editorTagsWhitelist.replace('|//', '|<!--|-->'));
-        this.pasteTagsWhitelistRegExp = converter.createTagsWhitelist(this.options.pasteTagsWhitelist);
-
+        this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1 || options._editorTagsWhitelist === '*';
+        // html check
+        this._htmlCheckWhitelistRegExp = new wRegExp('^(' + getRegList(options._editorTagsWhitelist.replace('|//', ''), '') + ')$', 'i');
+        this._htmlCheckBlacklistRegExp = new wRegExp('^(' + (options.tagsBlacklist || '^') + ')$', 'i');
+        // tags
+        this.editorTagsWhitelistRegExp = util.createTagsWhitelist(getRegList(options._editorTagsWhitelist.replace('|//', '|<!--|-->'), ''));
+        this.editorTagsBlacklistRegExp = util.createTagsBlacklist(options.tagsBlacklist.replace('|//', '|<!--|-->'));
+        // paste tags
+        this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(getRegList(options.pasteTagsWhitelist, ''));
+        this.pasteTagsBlacklistRegExp = util.createTagsBlacklist(options.pasteTagsBlacklist);
+        // attributes
         const regEndStr = '\\s*=\\s*(\")[^\"]*\\1';
-        const _attr = this.options.attributesWhitelist;
-        const tagsAttr = {};
+        const _wAttr = options.attributesWhitelist;
+        let tagsAttr = {};
         let allAttr = '';
-        if (!!_attr) {
-            for (let k in _attr) {
-                if (!_attr.hasOwnProperty(k) || /^on[a-z]+$/i.test(_attr[k])) continue;
+        if (!!_wAttr) {
+            for (let k in _wAttr) {
+                if (!util.hasOwn(_wAttr, k) || /^on[a-z]+$/i.test(_wAttr[k])) continue;
                 if (k === 'all') {
-                    allAttr = _attr[k] + '|';
+                    allAttr = getRegList(_wAttr[k], defaultAttr);
                 } else {
-                    tagsAttr[k] = new wRegExp('(?:' + _attr[k] + '|' + defaultAttr + ')' + regEndStr, 'ig');
+                    tagsAttr[k] = new wRegExp('\\s(?:' + getRegList(_wAttr[k], '') + ')' + regEndStr, 'ig');
                 }
             }
         }
 
-        this._attributesWhitelistRegExp = new wRegExp('(?:' + allAttr + defaultAttr + ')' + regEndStr, 'ig');
+        this._attributesWhitelistRegExp = new wRegExp('\\s(?:' + (allAttr || defaultAttr) + ')' + regEndStr, 'ig');
         this._attributesTagsWhitelist = tagsAttr;
 
+        // blacklist
+        const _bAttr = options.attributesBlacklist;
+        tagsAttr = {};
+        allAttr = '';
+        if (!!_bAttr) {
+            for (let k in _bAttr) {
+                if (!util.hasOwn(_bAttr, k)) continue;
+                if (k === 'all') {
+                    allAttr = getRegList(_bAttr[k], '');
+                } else {
+                    tagsAttr[k] = new wRegExp('\\s(?:' + getRegList(_bAttr[k], '') + ')' + regEndStr, 'ig');
+                }
+            }
+        }
+
+        this._attributesBlacklistRegExp = new wRegExp('\\s(?:' + (allAttr || '^') + ')' + regEndStr, 'ig');
+        this._attributesTagsBlacklist = tagsAttr;
+
         // set modes
-        this._isInline = /inline/i.test(this.options.mode);
-        this._isBalloon = /balloon|balloon-always/i.test(this.options.mode);
-        this._isBalloonAlways = /balloon-always/i.test(this.options.mode);
+        this._isInline = /inline/i.test(options.mode);
+        this._isBalloon = /balloon|balloon-always/i.test(options.mode);
+        this._isBalloonAlways = /balloon-always/i.test(options.mode);
 
         // caching buttons
         this._cachingButtons();
 
+        // file components
+        this._fileInfoPluginsCheck = [];
+        this._fileInfoPluginsReset = [];
+
+        // text components
+        this.managedTagsInfo = {
+            query: '',
+            map: {}
+        };
+        const managedClass = [];
+
+        // Command and file plugins registration
+        this.activePlugins = [];
+        this._fileManager.tags = [];
+        this._fileManager.pluginMap = {};
+
+        let filePluginRegExp = [];
+        let plugin, button;
+        for (let key in plugins) {
+            if (!util.hasOwn(plugins, key)) continue;
+            plugin = plugins[key];
+            button = pluginCallButtons[key];
+            if (plugin.active && button) {
+                this.callPlugin(key, null, button);
+            }
+            if (typeof plugin.checkFileInfo === 'function' && typeof plugin.resetFileInfo === 'function') {
+                this.callPlugin(key, null, button);
+                this._fileInfoPluginsCheck.push(plugin.checkFileInfo.bind(this));
+                this._fileInfoPluginsReset.push(plugin.resetFileInfo.bind(this));
+            }
+            if (_w.Array.isArray(plugin.fileTags)) {
+                const fileTags = plugin.fileTags;
+                this.callPlugin(key, null, button);
+                this._fileManager.tags = this._fileManager.tags.concat(fileTags);
+                filePluginRegExp.push(key);
+                for (let tag = 0, tLen = fileTags.length; tag < tLen; tag++) {
+                    this._fileManager.pluginMap[fileTags[tag].toLowerCase()] = key;
+                }
+            }
+            if (plugin.managedTags) {
+                const info = plugin.managedTags();
+                managedClass.push('.' + info.className);
+                this.managedTagsInfo.map[info.className] = info.method.bind(this);
+            }
+        }
+
+        this.managedTagsInfo.query = managedClass.toString();
+        this._fileManager.queryString = this._fileManager.tags.join(',');
+        this._fileManager.regExp = new wRegExp('^(' + this._fileManager.tags.join('|') + ')$', 'i');
+        this._fileManager.pluginRegExp = new wRegExp('^(' + (filePluginRegExp.length === 0 ? 'undefined' : filePluginRegExp.join('|')) + ')$', 'i');
+
         // cache editor's element
-        this.status._originCssText = this.context.element.topArea.style.cssText;
-        this._placeholder = this.context.element.placeholder;
-        this._lineBreaker = this.context.element.lineBreaker;
+        this._variable._originCssText = context.element.topArea.style.cssText;
+        this._placeholder = context.element.placeholder;
+        this._lineBreaker = context.element.lineBreaker;
+        this._lineBreakerButton = this._lineBreaker.querySelector('button');
 
         // Excute history function
         this.history = history(this, this._onChange_historyStack.bind(this));
@@ -2235,64 +2560,19 @@ Core.prototype = {
         this.eventManager = new EventManager(this);
         this.notice = new Notice(this);
 
-        // files, plugins init
-        // file components
-        this._fileInfoPluginsCheck = [];
-        this._fileInfoPluginsReset = [];
-
-        // text components
-        this.managedTagsInfo = {
-            query: '',
-            map: {}
-        };
-        const managedClass = [];
-
-        // Command and file plugins registration
-        this.activePlugins = [];
-        this._fileManager.tags = [];
-        this._fileManager.pluginMap = {};
-
-        const plugins = this.plugins;
-        let filePluginRegExp = [];
-        let plugin;
-        for (let key in plugins) {
-            if (!plugins.hasOwnProperty(key)) continue;
-            plugin = plugins[key];
-            this.callPlugin(key, null, this.pluginCallButtons[key]);
-
-            if (typeof plugin.checkFileInfo === 'function' && typeof plugin.resetFileInfo === 'function') {
-                this._fileInfoPluginsCheck.push(plugin.checkFileInfo.bind(this));
-                this._fileInfoPluginsReset.push(plugin.resetFileInfo.bind(this));
-            }
-            if (this._w.Array.isArray(plugin.fileTags)) {
-                const fileTags = plugin.fileTags;
-                this._fileManager.tags = this._fileManager.tags.concat(fileTags);
-                filePluginRegExp.push(key);
-                for (let tag = 0, tLen = fileTags.length; tag < tLen; tag++) {
-                    this._fileManager.pluginMap[fileTags[tag].toLowerCase()] = key;
-                }
-            }
-            if (plugin.managedTags) {
-                const info = plugin.managedTags();
-                managedClass.push('.' + info.className);
-                this.managedTagsInfo.map[info.className] = info.method.bind(this);
-            }
-        }
-
-        this.managedTagsInfo.query = managedClass.toString();
-        this._fileManager.queryString = this._fileManager.tags.join(',');
-        this._fileManager.regExp = new wRegExp('^(' + this._fileManager.tags.join('|') + ')$', 'i');
-        this._fileManager.pluginRegExp = new wRegExp('^(' + (filePluginRegExp.length === 0 ? 'undefined' : filePluginRegExp.join('|')) + ')$', 'i');
+        // register notice module
+        this.addModule([_notice]);
 
         // Init, validate
-        if (this.options.iframe) {
-            this._wd = this.context.element.wysiwygFrame.contentDocument;
-            this.context.element.wysiwyg = this._wd.body;
-            if (this.options._editorStyles.editor) this.context.element.wysiwyg.style.cssText = this.options._editorStyles.editor;
-            if (this.options.height === 'auto') this._iframeAuto = this._wd.body;
+        if (options.iframe) {
+            this._wd = context.element.wysiwygFrame.contentDocument;
+            context.element.wysiwyg = this._wd.body;
+            if (options._editorStyles.editor) context.element.wysiwyg.style.cssText = options._editorStyles.editor;
+            if (options.height === 'auto') this._iframeAuto = this._wd.body;
         }
 
         this._initWysiwygArea(reload, _initHTML);
+        this.setDir(options.rtl ? 'rtl' : 'ltr');
     },
 
     /**
@@ -2300,8 +2580,10 @@ Core.prototype = {
      * @private
      */
     _cachingButtons: function () {
-        this.codeViewDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"])');
+        this.codeViewDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"]):not([data-display="MORE"])');
         this.resizingDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-resizing-enabled"]):not([data-display="MORE"])');
+
+        this.saveButtonStates();
 
         const buttons = this.context.buttons;
         this.commandMap = {
@@ -2364,6 +2646,11 @@ Core.prototype = {
                 this.context.element.wysiwygFrame.style.height = this._iframeAuto.offsetHeight + 'px';
             }.bind(this));
         }
+    },
+
+    _codeViewAutoHeight: function () {
+        if (this.status.isFullScreen) return;
+        this.context.element.code.style.height = this.context.element.code.scrollHeight + "px";
     },
 
     /**
@@ -2478,19 +2765,6 @@ function DisallowedTags(element) {
 }
 
 /**
- * @description Delete disallowed tags
- * @param {string} html HTML string
- * @returns {string}
- * @private
- */
-function DeleteDisallowedTags(html) {
-    return html
-        .replace(/\n/g, '')
-        .replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '')
-        .replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '');
-}
-
-/**
  * @description Tag and tag attribute check RegExp function. (used by "cleanHTML" and "convertContentsForEditor")
  * @param {boolean} lowLevelCheck Low level check
  * @param {string} m RegExp value
@@ -2502,24 +2776,58 @@ function CleanTags(lowLevelCheck, m, t) {
     if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
 
     let v = null;
-    const tAttr = this._attributesTagsWhitelist[t.match(/(?!<)[a-zA-Z0-9\-]+/)[0].toLowerCase()];
-    if (tAttr) v = m.match(tAttr);
+    const tagName = t.match(/(?!<)[a-zA-Z0-9\-]+/)[0].toLowerCase();
+
+    // blacklist
+    const bAttr = this._attributesTagsBlacklist[tagName];
+    if (bAttr) m = m.replace(bAttr, '');
+    else m = m.replace(this._attributesBlacklistRegExp, '');
+
+    // whitelist
+    const wAttr = this._attributesTagsWhitelist[tagName];
+    if (wAttr) v = m.match(wAttr);
     else v = m.match(this._attributesWhitelistRegExp);
 
+    // anchor
     if (!lowLevelCheck || /<a\b/i.test(t)) {
-        const sv = m.match(/id\s*=\s*(?:"|')[^"']*(?:"|')/);
+        const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
         if (sv) {
             if (!v) v = [];
             v.push(sv[0]);
         }
     }
 
+    // span
     if ((!lowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
         const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
         if (sv) {
             if (!v) v = [];
             v.push(sv[0]);
         }
+    }
+
+    // img
+    if (/<img/i.test(t)) {
+        let w = '',
+            h = '';
+        const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
+        if (!v) v = [];
+        if (sv) {
+            w = sv[0].match(/width:(.+);/);
+            w = numbers.getNumber(w ? w[1] : '', -1) || '';
+            h = sv[0].match(/height:(.+);/);
+            h = numbers.getNumber(h ? h[1] : '', -1) || '';
+        }
+
+        if (!w || !h) {
+            const avw = m.match(/width\s*=\s*((?:"|')[^"']*(?:"|'))/);
+            const avh = m.match(/height\s*=\s*((?:"|')[^"']*(?:"|'))/);
+            if (avw || avh) {
+                w = !w ? numbers.getNumber(avw ? avw[1] : '') || '' : w;
+                h = !h ? numbers.getNumber(avh ? avh[1] : '') || '' : h;
+            }
+        }
+        v.push('data-origin="' + (w + ',' + h) + '"');
     }
 
     if (v) {

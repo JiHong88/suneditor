@@ -245,7 +245,7 @@
         </script>
     </div>
     <div style="position: relative;">
-            <div style="max-width: 960px; margin: 60px auto 0 auto; height: 1200px; position: relative;">
+            <div style="margin: 60px auto 0 auto; height: 1200px; position: relative;">
                 <textarea id="editor" style="width: 1080px; height: 200px;">
                     <p>aaa111</p>
                     <p>1112222</p>
@@ -292,7 +292,8 @@
                 <button type="button" class="btn btn-md btn-success" onclick="sun_create1()">Create</button>
                 <br>
         
-                <textarea id="editor1" style="width: 1080px; height: 200px;">
+                <div class="sun-editor" id="rb"></div>
+                <textarea id="editor1" style="width: 100%; height: 200px;">
                     <div class="se-component se-image-container __se__float-right" contenteditable="false"><figure style="margin: auto;"><img src="http://suneditor.com/docs/cat.jpg" data-align="right" alt="Sunset image" data-rotate="" data-proportion="false" data-rotatex="" data-rotatey="" origin-size="640,426" data-origin="640,426" style="transform: rotate(0deg);" data-index="0" data-file-name="cat.jpg" data-file-size="0" data-size="," data-percentage="auto,auto"><figcaption contenteditable="true" style="margin-top: 0px;"><p>Insert description</p></figcaption></figure></div>
                     <p>Here is an example of math -&gt; <span class="katex" contenteditable="false" data-exp="\displaystyle\sum_{i=1}^{k+1}i" data-font-size="1.5em" style="font-size: 1.5em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></munderover><mi>i</mi></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle\sum_{i=1}^{k+1}i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:3.1137820000000005em;vertical-align:-1.277669em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8361130000000003em;"><span style="top:-1.872331em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.050005em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.300005em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.277669em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">i</span></span></span></span> 123</p>
                     <p>​<span class="__se__katex katex" data-exp="\sum$lt;f\\0dsf" data-font-size="1em" style="font-size: 1em;" contenteditable="false"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∑</mo><mo>&gt;</mo><mi>f</mi><mi>d</mi><mi>s</mi><mi>f</mi></mrow><annotation encoding="application/x-tex">\sum&gt;fdsf</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.00001em;vertical-align:-0.25001em;"></span><span class="mop op-symbol small-op" style="position:relative;top:-0.0000050000000000050004em;">∑</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mord mathdefault">d</span><span class="mord mathdefault">s</span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span></span></span></span>df<br></p>
@@ -324,8 +325,8 @@
                 <button type="button" class="btn btn-md btn-success" onclick="sun_insertHTML('<img src=\'http://suneditor.com/sample/img/sunset.jpg\' style=\'width:115px; height:64px;\'>')">insertHTML</button>
                 <button type="button" class="btn btn-md btn-success" onclick="sun_setContents('set contents')">setContents</button>
                 <button type="button" class="btn btn-md btn-success" onclick="sun_appendContents('append contents')">AppendContents</button>
-                <button type="button" class="btn btn-md btn-success" onclick="sun_disabled()">Disabled</button>
-                <button type="button" class="btn btn-md btn-success" onclick="sun_enabled()">Enabled</button>
+                <button type="button" class="btn btn-md btn-success" onclick="sun_disable()">Disable</button>
+                <button type="button" class="btn btn-md btn-success" onclick="sun_enable()">Enable</button>
                 <button type="button" class="btn btn-md btn-success" onclick="sun_hide()">Hide</button>
                 <button type="button" class="btn btn-md btn-success" onclick="sun_show()">Show</button>
                 <button type="button" class="btn btn-md btn-success" onclick="sun_destroy()">Destroy</button>

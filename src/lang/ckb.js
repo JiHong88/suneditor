@@ -75,6 +75,8 @@
             paragraphStyle: 'ستایلی په‌ره‌گراف',
             textStyle: 'ستایلی نوسین',
             imageGallery: 'گاله‌ری وێنه‌كان',
+            dir_ltr: 'من اليسار إلى اليمين',
+            dir_rtl: 'من اليمين الى اليسار',
             mention: 'تنويه ب'
         },
         dialogBox: {

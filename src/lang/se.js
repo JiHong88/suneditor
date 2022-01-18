@@ -78,6 +78,8 @@
             paragraphStyle: 'Stil på stycke',
             textStyle: 'Textstil',
             imageGallery: 'Bildgalleri',
+            dir_ltr: 'Vänster till höger',
+            dir_rtl: 'Höger till vänster',
             mention: 'Namn'
         },
         dialogBox: {

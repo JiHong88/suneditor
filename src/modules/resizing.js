@@ -437,11 +437,16 @@
             }
     
             // align icon
-            const alignList = contextResizing.alignMenuList;
-            this.util.changeElement(contextResizing.alignButton.firstElementChild, contextResizing.alignIcons[align]);
-            for (let i = 0, len = alignList.length; i < len; i++) {
-                if (alignList[i].getAttribute('data-value') === align) this.util.addClass(alignList[i], 'on');
-                else this.util.removeClass(alignList[i], 'on');
+            if (contextPlugin._alignHide) {
+                contextResizing.alignButton.style.display = 'none';
+            } else {
+                contextResizing.alignButton.style.display = '';
+                const alignList = contextResizing.alignMenuList;
+                this.util.changeElement(contextResizing.alignButton.firstElementChild, contextResizing.alignIcons[align]);
+                for (let i = 0, len = alignList.length; i < len; i++) {
+                    if (alignList[i].getAttribute('data-value') === align) this.util.addClass(alignList[i], 'on');
+                    else this.util.removeClass(alignList[i], 'on');
+                }
             }
     
             // percentage active
@@ -478,7 +483,7 @@
             }
 
             this.setControllerPosition(contextResizing.resizeButton, resizeContainer, 'bottom', addOffset);
-            this.controllersOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabled.bind(null, false, this.resizingDisabledButtons), targetElement, plugin);
+            this.controllersOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabled.bind(this.util, false, this.resizingDisabledButtons), targetElement, plugin);
             this.util.setDisabled(true, this.resizingDisabledButtons);
     
             contextResizing._resize_w = w;

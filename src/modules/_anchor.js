@@ -121,12 +121,13 @@ export default {
     on: function (contextAnchor, update) {
         if (!update) {
             this.plugins.anchor.init.call(this, contextAnchor);
-            contextAnchor.anchorText.value = this.selection.get().toString();
+            contextAnchor.anchorText.value = this.selection.get().toString().trim();
+            contextAnchor.newWindowCheck.checked = this.options.linkTargetNewWindow;
         } else if (contextAnchor.linkAnchor) {
             this.context.dialog.updateModal = true;
-            const href = contextAnchor.linkAnchor.href;
+            const href = this.options.linkNoPrefix ? contextAnchor.linkAnchor.href.replace(contextAnchor.linkAnchor.origin + '/', '') : contextAnchor.linkAnchor.href;
             contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = /\#.+$/.test(href) ? href.substr(href.lastIndexOf('#')) : href;
-            contextAnchor.anchorText.value = contextAnchor.linkAnchor.textContent.trim() || contextAnchor.linkAnchor.getAttribute('alt');
+            contextAnchor.anchorText.value = contextAnchor.linkAnchor.textContent || contextAnchor.linkAnchor.getAttribute('alt');
             contextAnchor.newWindowCheck.checked = (/_blank/i.test(contextAnchor.linkAnchor.target) ? true : false);
             contextAnchor.downloadCheck.checked = contextAnchor.linkAnchor.download;
         }
@@ -293,9 +294,10 @@ export default {
     setLinkPreview: function (context, value) {
         const preview = context.preview;
         const protocol = this.options.linkProtocol;
+        const noPrefix = this.options.linkNoPrefix;
         const reservedProtocol  = /^(mailto\:|tel\:|sms\:|https*\:\/\/|#)/.test(value);
         const sameProtocol = !protocol ? false : this._w.RegExp('^' + value.substr(0, protocol.length)).test(protocol);
-        context.linkValue = preview.textContent = !value ? '' : (protocol && !reservedProtocol && !sameProtocol) ? protocol + value : reservedProtocol ? value : /^www\./.test(value) ? 'http://' + value : this.context.anchor.host + (/^\//.test(value) ? '' : '/') + value;
+        context.linkValue = preview.textContent = !value ? '' : noPrefix ? value : (protocol && !reservedProtocol && !sameProtocol) ? protocol + value : reservedProtocol ? value : /^www\./.test(value) ? 'http://' + value : this.context.anchor.host + (/^\//.test(value) ? '' : '/') + value;
 
         if (value.indexOf('#') === 0) {
             context.bookmark.style.display = 'block';

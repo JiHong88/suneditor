@@ -229,7 +229,12 @@
                 this.plugins.fileBrowser._xmlHttp = null;
                 if (xmlHttp.status === 200) {
                     try {
-                        this.plugins.fileBrowser._drawListItem.call(this, JSON.parse(xmlHttp.responseText).result, true);
+                        const res = JSON.parse(xmlHttp.responseText);
+                        if (res.result.length > 0) {
+                            this.plugins.fileBrowser._drawListItem.call(this, res.result, true);
+                        } else if (res.nullMessage) {
+                            this.context.fileBrowser.list.innerHTML = res.nullMessage;
+                        }
                     } catch (e) {
                         throw Error('[SUNEDITOR.fileBrowser.drawList.fail] cause : "' + e.message + '"');
                     } finally {

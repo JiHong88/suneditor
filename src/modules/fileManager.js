@@ -28,8 +28,6 @@
         _checkMediaComponent: function (tag) {
             if (/IMG/i.test(tag)) {
                 return !/FIGURE/i.test(tag.parentElement.nodeName) || !/FIGURE/i.test(tag.parentElement.parentElement.nodeName);
-            } else if (/VIDEO/i.test(tag)) {
-                return !/FIGURE/i.test(tag.parentElement.nodeName);
             }
             return true;
         },
@@ -98,7 +96,7 @@
         checkInfo: function (pluginName, tagNames, uploadEventHandler, modifyHandler, resizing) {
             let tags = [];
             for (let i = 0, len = tagNames.length; i < len; i++) {
-                tags = tags.concat([].slice.call(this.context.element.wysiwyg.getElementsByTagName(tagNames[i])));
+                tags = tags.concat([].slice.call(this.context.element.wysiwyg.querySelectorAll(tagNames[i] + ':not([data-se-embed="true"])')));
             }
 
             const fileManagerPlugin = this.plugins.fileManager;

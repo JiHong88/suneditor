@@ -18,16 +18,10 @@ function align(editor, targetElement) {
     this.display = "submenu";
     this.targetElement = targetElement;
 
-    // create HTML
-    let listDiv = createHTML(editor, !editor.options.rtl);
-    let listUl = listDiv.querySelector('ul');
-
-    // append target button menu
-    editor.initMenuTarget(this.name, targetElement, listDiv);
-
     // members
     this.currentAlign = "";
     this.defaultDir = editor.options.rtl ? "right" : "left";
+    this._itemMenu = null;
     this.icons = {
         justify: editor.icons.align_justify,
         left: editor.icons.align_left,
@@ -36,12 +30,38 @@ function align(editor, targetElement) {
     };
     this._alignList = listUl.querySelectorAll('li button');
 
+    // create HTML
+    let listDiv = createHTML(editor, !editor.options.rtl);
+    let listUl = this._itemMenu = listDiv.querySelector('ul');
+
+    // append target button menu
+    editor.initMenuTarget(this.name, targetElement, listDiv);
+
     // event registration 
     listUl.addEventListener('click', action.bind(this));
     listDiv = null, listUl = null;
 }
 
 align.prototype = {
+    /**
+     * @Override core
+     */
+    exchangeDir: function () {
+        const dir = this.options.rtl ? 'right' : 'left';
+        if (this.defaultDir === dir) return;
+
+        this.defaultDir = dir;
+        let menu = this._itemMenu;
+        let leftBtn = menu.querySelector('[data-value="left"]');
+        let rightBtn = menu.querySelector('[data-value="right"]');
+        if (leftBtn && rightBtn) {
+            const lp = leftBtn.parentElement;
+            const rp = rightBtn.parentElement;
+            lp.appendChild(rightBtn);
+            rp.appendChild(leftBtn);
+        }
+    },
+
     /**
      * @Override core
      */
@@ -117,40 +137,22 @@ function action(e) {
 function createHTML(editor, leftDir) {
     const lang = editor.lang;
     const icons = editor.icons;
+    const alignItems = core.options.alignItems;
 
-    const leftMenu = '<li>' +
-        '<button type="button" class="se-btn-list se-btn-align" data-command="justifyleft" data-value="left" title="' + lang.toolbar.alignLeft + '">' +
-        '<span class="se-list-icon">' + icons.align_left + '</span>' + lang.toolbar.alignLeft +
-        '</button>' +
+    let html = '';
+    for (let i = 0, item, text; i < alignItems.length; i++) {
+        item = alignItems[i];
+        text = lang.toolbar['align' + item.charAt(0).toUpperCase() + item.slice(1)];
+        html += '<li>' +
+            '<button type="button" class="se-btn-list se-btn-align" data-value="' + item + '" title="' + text + '">' +
+                '<span class="se-list-icon">' + icons['align_' + item] + '</span>' + text +
+            '</button>' +
         '</li>';
-
-    const rightMenu = '<li>' +
-        '<button type="button" class="se-btn-list se-btn-align" data-command="justifyright" data-value="right" title="' + lang.toolbar.alignRight + '">' +
-        '<span class="se-list-icon">' + icons.align_right + '</span>' + lang.toolbar.alignRight +
-        '</button>' +
-        '</li>';
-
-    const html = '' +
-        '<div class="se-list-inner">' +
-        '<ul class="se-list-basic">' +
-        (leftDir ? leftMenu : rightMenu) +
-        '<li>' +
-        '<button type="button" class="se-btn-list se-btn-align" data-command="justifycenter" data-value="center" title="' + lang.toolbar.alignCenter + '">' +
-        '<span class="se-list-icon">' + icons.align_center + '</span>' + lang.toolbar.alignCenter +
-        '</button>' +
-        '</li>' +
-        (leftDir ? rightMenu : leftMenu) +
-        '<li>' +
-        '<button type="button" class="se-btn-list se-btn-align" data-command="justifyfull" data-value="justify" title="' + lang.toolbar.alignJustify + '">' +
-        '<span class="se-list-icon">' + icons.align_justify + '</span>' + lang.toolbar.alignJustify +
-        '</button>' +
-        '</li>' +
-        '</ul>' +
-        '</div>';
+    }
 
     return domUtils.createElement("div", {
         class: "se-submenu se-list-layer se-list-align"
-    }, html);
+    }, '<div class="se-list-inner">' + '<ul class="se-list-basic">' + html + '</ul>' + '</div>');
 }
 
 export default align;

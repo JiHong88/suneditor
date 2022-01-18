@@ -21,7 +21,6 @@ export type commands = "selectAll" | "codeView" | "fullScreen" | "indent" | "out
 export type status = {};
 
 export interface Core {
-
 	/**
 	 * @description Functions object
 	 */
@@ -139,10 +138,22 @@ export interface Core {
 	editorTagsWhitelistRegExp: RegExp;
 
 	/**
+	 * @description Editor tags blacklist (RegExp object)
+	 * util.createTagsBlacklist(options.tagsBlacklist)
+	 */
+	editorTagsBlacklistRegExp: RegExp;
+
+	/**
 	 * @description Tag whitelist when pasting (RegExp object)
 	 * util.createTagsWhitelist(options.pasteTagsWhitelist)
 	 */
 	pasteTagsWhitelistRegExp: RegExp;
+
+	/**
+	 * @description Tag blacklist when pasting (RegExp object)
+	 * util.createTagsBlacklist(options.pasteTagsBlacklist)
+	 */
+	pasteTagsBlacklistRegExp: RegExp;
 
 	/**
 	 * @description Plugins array with "active" method.
@@ -172,6 +183,23 @@ export interface Core {
 	commandMap: Record<string, Element>;
 
 	/**
+	 * @description Contains pairs of all "data-commands" and "elements" setted in toolbar over time
+	 * Used primarily to save and recover button states after the toolbar re-creation
+	 * Updates each "_cachingButtons()" invocation
+	 */
+	allCommandButtons: Record<string, Element>;
+
+	/**
+	 * @description Save the current buttons states to "allCommandButtons" object
+	 */
+	saveButtonStates(): void;
+
+	/**
+	 * @description Recover the current buttons states from "allCommandButtons" object
+	 */
+	recoverButtonStates(): void;
+
+	/**
 	 * @description If the plugin is not added, add the plugin and call the 'add' function.
 	 * If the plugin is added call callBack function.
 	 * @param pluginName The name of the plugin to call
@@ -196,7 +224,7 @@ export interface Core {
 	initMenuTarget(pluginName: string, target: Element | null, menu: Element): void;
 
 	/**
-	 * @description Enabled submenu
+	 * @description Enable submenu
 	 * @param element Submenu's button element to call
 	 */
 	submenuOn(element: Element): void;
@@ -207,7 +235,12 @@ export interface Core {
 	submenuOff(): void;
 
 	/**
-	 * @description Enabled container
+	 * @description Disable more layer
+	 */
+	moreLayerOff(): void;
+
+	/**
+	 * @description Enable container
 	 * @param element Container's button element to call
 	 */
 	containerOn(element: Element): void;
@@ -294,20 +327,20 @@ export interface Core {
 	/**
 	 * @description Execute command of command button(All Buttons except submenu and dialog)
 	 * (undo, redo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print, copy, cut, paste)
-     * @param command Property of command button (data-value)
+	 * @param command Property of command button (data-value)
 	 * @param target The element of command button
 	 */
 	commandHandler(command: commands, target: Element | null): void;
 
 	/**
 	 * @description Add or remove the class name of "body" so that the code block is visible
-     * @param value true/false
+	 * @param value true/false
 	 */
 	setDisplayBlocks(value: boolean): void;
 
 	/**
 	 * @description Changes to code view or wysiwyg view
-     * @param value true/false
+	 * @param value true/false
 	 */
 	setCodeView(value: boolean): void;
 
@@ -315,7 +348,7 @@ export interface Core {
 	 * @description Changes to full screen or default screen
 	 * @param value true/false
 	 */
-     setFullScreen(value: boolean): void;
+	setFullScreen(value: boolean | null): void;
 
 	/**
 	 * @description Prints the current contents of the editor.
@@ -326,6 +359,12 @@ export interface Core {
 	 * @description Open the preview window.
 	 */
 	preview(): void;
+
+	/**
+	 * @description Set direction to "rtl" or "ltr".
+	 * @param dir "rtl" or "ltr"
+	 */
+	setDir(dir: "rtl" | "ltr"): void;
 
 	/**
 	 * @description Sets the HTML string
@@ -351,9 +390,11 @@ export interface Core {
 	 * @param html HTML string
 	 * @param whitelist Regular expression of allowed tags.
 	 * RegExp object is create by util.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
+	 * @param blacklist Regular expression of disallowed tags.
+	 * RegExp object is create by util.createTagsBlacklist method. (core.pasteTagsBlacklistRegExp)
 	 * @returns
 	 */
-	cleanHTML(html: string, whitelist?: string | RegExp): string;
+	cleanHTML(html: string, whitelist?: string | RegExp, blacklist?: string | RegExp): string;
 
 	/**
 	 * @description Converts contents into a format that can be placed in an editor
@@ -365,9 +406,10 @@ export interface Core {
 	/**
 	 * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
 	 * @param html WYSIWYG element (context.element.wysiwyg) or HTML string.
+	 * @param comp If true, does not line break and indentation of tags.
 	 * @returns
 	 */
-	convertHTMLForCodeView(html: Element | string): string;
+	convertHTMLForCodeView(html: Element | string, comp?: boolean): string;
 }
 
 export interface Toolbar {
@@ -390,6 +432,18 @@ export interface Toolbar {
 	 * @description Hide the toolbar
 	 */
 	hide(): void;
+}
+
+interface Wysiwyg {
+	/**
+	 * @description Disable the wysiwyg area
+	 */
+	disable(): void;
+
+	/**
+	 * @description Enable the wysiwyg area
+	 */
+	enable(): void;
 }
 
 type EventFn = (e: Event, core: Core) => void;
@@ -419,7 +473,7 @@ export default class SunEditor {
 	setDefaultStyle(style: string): void;
 
 	/**
-	 * @description Copying the contents of the editor to the original textarea
+	 * @description Copying the contents of the editor to the original textarea and execute onSave callback.
 	 */
 	save(): void;
 

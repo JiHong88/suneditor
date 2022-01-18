@@ -53,6 +53,7 @@ export default {
             _resizing: options.imageResizing,
             _resizeDotHide: !options.imageHeightShow,
             _rotation: options.imageRotation,
+            _alignHide: !options.imageAlignShow,
             _onlyPercentage: options.imageSizeOnlyPercentage,
             _ratio: false,
             _ratioX: 1,
@@ -203,7 +204,7 @@ export default {
                     core.context.anchor.forms.innerHTML +
                 '</div>' +
                 '<div class="se-dialog-footer">' +
-                    '<div>' +
+                    '<div' + (option.imageAlignShow ? '' : ' style="display: none"') + '>' +
                         '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
                         '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
                         '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
@@ -375,7 +376,7 @@ export default {
                 imagePlugin.submitAction.call(this, this.context.image.imgInputFile.files);
             } else if (contextImage.imgUrlFile && contextImage._v_src._linkValue.length > 0) {
                 this.openLoading();
-                imagePlugin.onRender_imgUrl.call(this);
+                imagePlugin.onRender_imgUrl.call(this, contextImage._v_src._linkValue);
             }
         } catch (error) {
             this.closeLoading();
@@ -427,6 +428,7 @@ export default {
             inputHeight: contextImage.inputY.value,
             align: contextImage._align,
             isUpdate: this.context.dialog.updateModal,
+            alt: contextImage._altText,
             element: contextImage._element
         };
 
@@ -479,7 +481,7 @@ export default {
             }
             this.plugins.fileManager.upload.call(this, imageUploadUrl, this.options.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.events.onImageUploadError);
         } else { // base64
-            this.plugins.image.setup_reader.call(this, files, info.anchor, info.inputWidth, info.inputHeight, info.align, filesLen, info.isUpdate);
+            this.plugins.image.setup_reader.call(this, files, info.anchor, info.inputWidth, info.inputHeight, info.align, info.alt, filesLen, info.isUpdate);
         }
     },
 
@@ -505,14 +507,14 @@ export default {
                 this.plugins.image.update_src.call(this, fileList[i].url, info.element, file);
                 break;
             } else {
-                this.plugins.image.create_image.call(this, fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file);
+                this.plugins.image.create_image.call(this, fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt);
             }
         }
         
         this.closeLoading();
     },
 
-    setup_reader: function (files, anchor, width, height, align, filesLen, isUpdate) {
+    setup_reader: function (files, anchor, width, height, align, alt, filesLen, isUpdate) {
         try {
             this.context.image.base64RenderIndex = filesLen;
             const wFileReader = this._w.FileReader;
@@ -528,7 +530,7 @@ export default {
                     filesStack[index] = { result: reader.result, file: file };
 
                     if (--this.context.image.base64RenderIndex === 0) {
-                        this.plugins.image.onRender_imgBase64.call(this, update, filesStack, updateElement, anchor, width, height, align);
+                        this.plugins.image.onRender_imgBase64.call(this, update, filesStack, updateElement, anchor, width, height, align, alt);
                         this.closeLoading();
                     }
                 }.bind(this, reader, isUpdate, this.context.image._element, file, i);
@@ -541,7 +543,7 @@ export default {
         }
     },
 
-    onRender_imgBase64: function (update, filesStack, updateElement, anchor, width, height, align) {
+    onRender_imgBase64: function (update, filesStack, updateElement, anchor, width, height, align, alt) {
         const updateMethod = this.plugins.image.update_src;
         const createMethod = this.plugins.image.create_image;
         
@@ -551,19 +553,20 @@ export default {
                 this.context.image._element.setAttribute('data-file-size', filesStack[i].file.size);
                 updateMethod.call(this, filesStack[i].result, updateElement, filesStack[i].file);
             } else {
-                createMethod.call(this, filesStack[i].result, anchor, width, height, align, filesStack[i].file);
+                createMethod.call(this, filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt);
             }
         }
     },
 
-    onRender_imgUrl: function () {
+    onRender_imgUrl: function (url) {
+        if (!url) url = this.context.image._v_src._linkValue;
+        if (!url) return false;
         const contextImage = this.context.image;
-        if (contextImage._v_src._linkValue.length === 0) return false;
 
         try {
-            const file = {name: contextImage._v_src._linkValue.split('/').pop(), size: 0};
-            if (this.context.dialog.updateModal) this.plugins.image.update_src.call(this, contextImage._v_src._linkValue, contextImage._element, file);
-            else this.plugins.image.create_image.call(this, contextImage._v_src._linkValue, this.plugins.anchor.createAnchor.call(this, contextImage.anchorCtx, true), contextImage.inputX.value, contextImage.inputY.value, contextImage._align, file);
+            const file = {name: url.split('/').pop(), size: 0};
+            if (this.context.dialog.updateModal) this.plugins.image.update_src.call(this, url, contextImage._element, file);
+            else this.plugins.image.create_image.call(this, url, this.plugins.anchor.createAnchor.call(this, contextImage.anchorCtx, true), contextImage.inputX.value, contextImage.inputY.value, contextImage._align, file, contextImage._altText);
         } catch (e) {
             throw Error('[SUNEDITOR.image.URLRendering.fail] cause : "' + e.message + '"');
         } finally {
@@ -637,14 +640,14 @@ export default {
         this.plugins.fileManager.resetInfo.call(this, 'image', this.events.onImageUpload);
     },
 
-    create_image: function (src, anchor, width, height, align, file) {
+    create_image: function (src, anchor, width, height, align, file, alt) {
         const imagePlugin = this.plugins.image;
         const contextImage = this.context.image;
         this.context.resizing._resize_plugin = 'image';
 
         let oImg = this.util.createElement('IMG');
         oImg.src = src;
-        oImg.alt = contextImage._altText;
+        oImg.alt = alt;
         oImg.setAttribute('data-rotate', '0');
         anchor = imagePlugin.onRender_link.call(this, oImg, anchor);
 
@@ -746,8 +749,13 @@ export default {
         // link
         const anchor = this.plugins.anchor.createAnchor.call(this, contextImage.anchorCtx, true);
         if (anchor) {
-            contextImage._linkElement = contextImage._linkElement === anchor ? anchor.cloneNode(false) : anchor;
-            cover.insertBefore(this.plugins.image.onRender_link.call(this, imageEl, contextImage._linkElement), contextImage._caption);
+            if (contextImage._linkElement !== anchor) {
+                contextImage._linkElement = anchor.cloneNode(false);
+                cover.insertBefore(this.plugins.image.onRender_link.call(this, imageEl, contextImage._linkElement), contextImage._caption);
+                this.util.removeItem(anchor);
+            } else {
+                contextImage._linkElement.setAttribute('data-image-link', 'image');
+            }
         } else if (contextImage._linkElement !== null) {
             const imageElement = imageEl;
             imageElement.setAttribute('data-image-link', '');
@@ -755,7 +763,7 @@ export default {
                 const newEl = imageElement.cloneNode(true);
                 cover.removeChild(contextImage._linkElement);
                 cover.insertBefore(newEl, contextImage._caption);
-                imageEl = newEl;
+                contextImage._element = imageEl = newEl;
             }
         }
 
@@ -764,7 +772,9 @@ export default {
                 contextImage._element : 
                 /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.format.getLine(contextImage._element) || contextImage._element;
                 
-            if (this.format.isLine(existElement) && existElement.childNodes.length > 0) {
+            if (this.util.isListCell(existElement) || this.format.isLine(existElement)) {
+                contextImage._element.parentNode.replaceChild(container, contextImage._element);
+            } else if (this.format.isLine(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.remove(contextImage._element);
                 // clean format tag
@@ -875,7 +885,7 @@ export default {
             contextImage._v_src._linkValue = contextImage.previewSrc.textContent = contextImage.imgUrlFile.value = contextImage._element.src;
         }
         contextImage._altText = contextImage.altText.value = contextImage._element.alt;
-        contextImage.modal.querySelector('input[name="suneditor_image_radio"][value="' + contextImage._align + '"]').checked = true;
+        (contextImage.modal.querySelector('input[name="suneditor_image_radio"][value="' + contextImage._align + '"]') || contextImage.modal.querySelector('input[name="suneditor_image_radio"][value="none"]')).checked = true;
         contextImage._align = contextImage.modal.querySelector('input[name="suneditor_image_radio"]:checked').value;
         contextImage._captionChecked = contextImage.captionCheckEl.checked = !!contextImage._caption;
         

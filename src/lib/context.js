@@ -55,8 +55,13 @@ const _Context = function (element, cons) {
             indent: cons._toolBar.querySelector('._se_command_indent'),
             fullScreen: cons._toolBar.querySelector('._se_command_fullScreen'),
             showBlocks: cons._toolBar.querySelector('._se_command_showBlocks'),
-            codeView: cons._toolBar.querySelector('._se_command_codeView')
-        }
+            codeView: cons._toolBar.querySelector('._se_command_codeView'),
+            dir: cons._toolBar.querySelector('._se_command_dir'),
+            dir_ltr: cons._toolBar.querySelector('._se_command_dir_ltr'),
+            dir_rtl: cons._toolBar.querySelector('._se_command_dir_rtl')
+        },
+        options: options,
+        option: options
     };
 };
 

@@ -51,6 +51,7 @@ export default {
             _resizing: options.videoResizing,
             _resizeDotHide: !options.videoHeightShow,
             _rotation: options.videoRotation,
+            _alignHide: !options.videoAlignShow,
             _onlyPercentage: options.videoSizeOnlyPercentage,
             _ratio: false,
             _ratioX: 1,
@@ -175,7 +176,7 @@ export default {
             html += '' +
                 '</div>' +
                 '<div class="se-dialog-footer">' +
-                    '<div>' +
+                    '<div' + (option.videoAlignShow ? '' : ' style="display: none"') + '>' +
                         '<label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
                         '<label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
                         '<label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
@@ -372,7 +373,7 @@ export default {
                 videoPlugin.submitAction.call(this, this.context.video.videoInputFile.files);
             } else if (contextVideo.videoUrlFile && contextVideo._linkValue.length > 0) {
                 this.openLoading();
-                videoPlugin.setup_url.call(this);
+                videoPlugin.setup_url.call(this, contextVideo._linkValue);
             }
         } catch (error) {
             this.closeLoading();
@@ -503,12 +504,11 @@ export default {
         this.closeLoading();
     },
 
-    setup_url: function () {
+    setup_url: function (url) {
         try {
             const contextVideo = this.context.video;
-            let url = contextVideo._linkValue;
-
-            if (url.length === 0) return false;
+            if (!url) url = contextVideo._linkValue;
+            if (!url) return false;
 
             /** iframe source */
             if (/^<iframe.*\/iframe>$/.test(url)) {
@@ -540,7 +540,7 @@ export default {
                 url = 'https://player.vimeo.com/video/' + url.slice(url.lastIndexOf('/') + 1);
             }
 
-            this.plugins.video.create_video.call(this, this.plugins.video.createIframeTag.call(this), url, contextVideo.inputX.value, contextVideo.inputY.value, contextVideo._align, null, this.context.dialog.updateModal);
+            this.plugins.video.create_video.call(this, this.plugins.video[(!/youtu\.?be/.test(url) && !/vimeo\.com/.test(url) ? "createVideoTag" : "createIframeTag")].call(this), url, contextVideo.inputX.value, contextVideo.inputY.value, contextVideo._align, null, this.context.dialog.updateModal);
         } catch (error) {
             throw Error('[SUNEDITOR.video.upload.fail] cause : "' + error.message + '"');
         } finally {
@@ -645,10 +645,8 @@ export default {
         if (/^video$/i.test(oFrame.nodeName)) this.plugins.video._setTagAttrs.call(this, oFrame);
         else this.plugins.video._setIframeAttrs.call(this, oFrame);
         
-        const existElement = this.util.getParentElement(oFrame, this.component.is) || 
-            this.util.getParentElement(oFrame, function (current) {
-                return this.isWysiwygFrame(current.parentNode);
-            }.bind(this.util));
+        const existElement = (this.util.isRangeFormatElement(oFrame.parentNode) || this.util.isWysiwygDiv(oFrame.parentNode)) ? 
+            oFrame : this.util.getFormatElement(oFrame) || oFrame;
 
         const prevFrame = oFrame;
         contextVideo._element = oFrame = oFrame.cloneNode(true);
@@ -673,7 +671,9 @@ export default {
             if (format) contextVideo._align = format.style.textAlign || format.style.float;
             this.plugins.video.setAlign.call(this, null, oFrame, cover, container);
 
-            if (this.format.isLine(existElement) && existElement.childNodes.length > 0) {
+            if (this.util.isListCell(existElement) || this.util.isFormatElement(existElement)) {
+                prevFrame.parentNode.replaceChild(container, prevFrame);
+            } else if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.remove(prevFrame);
                 // clean format tag
@@ -732,7 +732,7 @@ export default {
         const contextVideo = this.context.video;
 
         if (contextVideo.videoUrlFile) contextVideo._linkValue = contextVideo.preview.textContent = contextVideo.videoUrlFile.value = (contextVideo._element.src || (contextVideo._element.querySelector('source') || '').src || '');
-        contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="' + contextVideo._align + '"]').checked = true;
+        (contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="' + contextVideo._align + '"]') || contextVideo.modal.querySelector('input[name="suneditor_video_radio"][value="none"]')).checked = true;
 
         if (contextVideo._resizing) {
             this.plugins.resizing._module_setModifyInputSize.call(this, contextVideo, this.plugins.video);
