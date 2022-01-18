@@ -388,7 +388,7 @@ Format.prototype = {
 			}
 		}
 
-		this.editor.effectNode = null;
+		this.__core.effectNode = null;
 		this.node.mergeSameTags(block, null, false);
 		this.node.mergeNestedTags(
 			block,
@@ -1450,7 +1450,7 @@ Format.prototype = {
 		}
 
 		// set range
-		this.editor.controllersOff();
+		this.__core.controllersOff();
 		this.selection.setRange(start.container, start.offset, end.container, end.offset);
 
 		// history stack
@@ -3293,9 +3293,9 @@ Format.prototype = {
 			const elStyle = el.style;
 
 			// bold, italic
-			if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.editor._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
+			if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.__core._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
 			else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
-			if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.editor._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
+			if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.__core._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
 			else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
 
 			// styles

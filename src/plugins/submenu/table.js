@@ -1422,7 +1422,7 @@ export default {
                 this.controllersOff();
 
                 if (emptyDiv !== this.context.element.wysiwyg) this.util.removeAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
-                this.editor.focus();
+                this.__core.focus();
         }
 
         // history stack

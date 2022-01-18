@@ -127,8 +127,8 @@ function action(e) {
         domUtils.setStyle(selectedFormsts[i], 'textAlign', (value === defaultDir ? '' : value));
     }
 
-    this.editor.submenuOff();
-    this.editor.focus();
+    this.__core.submenuOff();
+    this.__core.focus();
 
     // history stack
     this.history.push(false);

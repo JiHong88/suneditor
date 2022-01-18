@@ -89,7 +89,7 @@ Shortcuts.prototype = {
 
 		if (!command) return false;
 
-		this.editor.commandHandler(command, this.editor.commandMap[command]);
+		this.__core.commandHandler(command, this.__core.commandMap[command]);
 		return true;
 	},
 

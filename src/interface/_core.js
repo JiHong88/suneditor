@@ -1,5 +1,5 @@
 function CoreInterface(core) {
-	this.editor = core;
+	this.__core = core;
 	this._w = core._w;
 	this._d = core._d;
 	this._ww = core._ww;

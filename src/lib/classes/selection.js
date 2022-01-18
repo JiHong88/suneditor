@@ -147,7 +147,7 @@ Selection.prototype = {
 			range.setEnd(endCon, endOff);
 		} catch (error) {
 			console.warn("[SUNEDITOR.core.focus.error] " + error);
-			this.editor.nativeFocus();
+			this.__core.nativeFocus();
 			return;
 		}
 
@@ -171,7 +171,7 @@ Selection.prototype = {
 		this.status._range = null;
 		this.status._selectionNode = null;
 		if (this.status.hasFocus) this.get().removeAllRanges();
-		this.editor.eventManager._setKeyEffect([]);
+		this.__core.eventManager._setKeyEffect([]);
 	},
 
 	/**
@@ -347,7 +347,7 @@ Selection.prototype = {
 		return (
 			(domUtils.isWysiwygFrame(range.startContainer) && domUtils.isWysiwygFrame(range.endContainer)) ||
 			/FIGURE/i.test(comm.nodeName) ||
-			this.editor._fileManager.regExp.test(comm.nodeName) ||
+			this.__core._fileManager.regExp.test(comm.nodeName) ||
 			this.component.is(comm)
 		);
 	},
@@ -362,7 +362,7 @@ Selection.prototype = {
 	 * @returns {Object|Node|null}
 	 */
 	insertNode: function (oNode, afterNode, checkCharCount) {
-		if (this.editor.isReadOnly || (checkCharCount && !this.editor.char.check(oNode))) {
+		if (this.__core.isReadOnly || (checkCharCount && !this.__core.char.check(oNode))) {
 			return null;
 		}
 
@@ -660,7 +660,7 @@ Selection.prototype = {
 			} catch (error) {
 				if (this.status.isDisabled || this.status.isReadOnly) return;
 				console.warn('[SUNEDITOR.selection.insertHTML.fail] ' + error);
-				this.editor.execCommand('insertHTML', false, html);
+				this.__core.execCommand('insertHTML', false, html);
 			}
 		} else {
 			if (this.component.is(html)) {

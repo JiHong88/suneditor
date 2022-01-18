@@ -82,16 +82,16 @@ EventManager.prototype = {
 	 */
 	applyTagEffect: function () {
 		let selectionNode = this.selection.getNode();
-		if (selectionNode === this.editor.effectNode) return;
-		this.editor.effectNode = selectionNode;
+		if (selectionNode === this.__core.effectNode) return;
+		this.__core.effectNode = selectionNode;
 
 		const marginDir = this.options.rtl ? "marginRight" : "marginLeft";
-		const commandMap = this.editor.commandMap;
+		const commandMap = this.__core.commandMap;
 		const classOnCheck = this._onButtonsCheck;
 		const commandMapNodes = [];
 		const currentNodes = [];
 
-		const activePlugins = this.editor.activePlugins;
+		const activePlugins = this.__core.activePlugins;
 		const cLen = activePlugins.length;
 		let nodeName = "";
 
@@ -160,8 +160,8 @@ EventManager.prototype = {
 	 * @private
 	 */
 	_setKeyEffect: function (ignoredList) {
-		const commandMap = this.editor.commandMap;
-		const activePlugins = this.editor.activePlugins;
+		const commandMap = this.__core.commandMap;
+		const activePlugins = this.__core.activePlugins;
 
 		for (let key in commandMap) {
 			if (ignoredList.indexOf(key) > -1 || !commandMap.hasOwnProperty(key)) continue;
@@ -195,12 +195,12 @@ EventManager.prototype = {
 	_toggleToolbarBalloon: function () {
 		this.selection._init();
 		const range = this.selection.getRange();
-		if (this.editor._bindControllersOff || (!this.editor._isBalloonAlways && range.collapsed)) this._hideToolbar();
+		if (this.__core._bindControllersOff || (!this.__core._isBalloonAlways && range.collapsed)) this._hideToolbar();
 		else this.toolbar._showBalloon(range);
 	},
 
 	_hideToolbar: function () {
-		if (!this.editor._notHideToolbar && !this.status.isFullScreen) {
+		if (!this.__core._notHideToolbar && !this.status.isFullScreen) {
 			this.toolbar.hide();
 		}
 	},
@@ -266,7 +266,7 @@ EventManager.prototype = {
 				domUtils.remove(domUtils.getParentElement(sCell, function (current) {
 					return ancestor === current.parentNode;
 				}));
-				this.editor.nativeFocus();
+				this.__core.nativeFocus();
 				return true;
 			}
 		}
@@ -286,7 +286,7 @@ EventManager.prototype = {
 	 * @private
 	 */
 	_setDefaultLine: function (formatName) {
-		if (this.editor._fileManager.pluginRegExp.test(this.editor.currentControllerName)) return;
+		if (this.__core._fileManager.pluginRegExp.test(this.__core.currentControllerName)) return;
 
 		const range = this.selection.getRange();
 		const commonCon = range.commonAncestorContainer;
@@ -339,7 +339,7 @@ EventManager.prototype = {
 			return;
 		}
 
-		this.editor.execCommand("formatBlock", false, formatName || this.options.defaultTag);
+		this.__core.execCommand("formatBlock", false, formatName || this.options.defaultTag);
 		focusNode = domUtils.getEdgeChildNodes(commonCon, commonCon);
 		focusNode = focusNode ? focusNode.ec : commonCon;
 
@@ -358,8 +358,8 @@ EventManager.prototype = {
 			focusNode = zeroWidth;
 		}
 
-		this.editor.effectNode = null;
-		this.editor.nativeFocus();
+		this.__core.effectNode = null;
+		this.__core.nativeFocus();
 	},
 
 	_setClipboardComponent: function (e, info, clipboardData) {
@@ -431,7 +431,7 @@ EventManager.prototype = {
 			} else {
 				cleanData = (plainText === cleanData ? plainText : cleanData).replace(/\n/g, "<br>");
 			}
-			cleanData = this.editor.cleanHTML(cleanData, this.editor.pasteTagsWhitelistRegExp, this.editor.pasteTagsBlacklistRegExp);
+			cleanData = this.__core.cleanHTML(cleanData, this.__core.pasteTagsWhitelistRegExp, this.__core.pasteTagsBlacklistRegExp);
 		} else {
 			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, "<br>");
 		}
@@ -455,7 +455,7 @@ EventManager.prototype = {
 		if (files.length > 0 && !MSData) {
 			if (/^image/.test(files[0].type) && this.plugins.image) {
 				this.plugins.image.submitAction(files);
-				this.editor.focus();
+				this.__core.focus();
 			}
 			return false;
 		}
@@ -518,7 +518,7 @@ EventManager.prototype = {
 
 		/** code view area auto line */
 		if (this.options.height === "auto" && !this.options.codeMirrorEditor) {
-			const cvAuthHeight = this.editor._codeViewAutoHeight.bind(this.editor);
+			const cvAuthHeight = this.__core._codeViewAutoHeight.bind(this.editor);
 			this.addEvent(this.context.element.code, "keydown", cvAuthHeight, false);
 			this.addEvent(this.context.element.code, "keyup", cvAuthHeight, false);
 			this.addEvent(this.context.element.code, "paste", cvAuthHeight, false);
@@ -554,17 +554,17 @@ EventManager.prototype = {
 
 function ToolbarButtonsHandler(e) {
 	let target = e.target;
-	if (this.editor._bindControllersOff) e.stopPropagation();
+	if (this.__core._bindControllersOff) e.stopPropagation();
 
 	if (/^(input|textarea|select|option)$/i.test(target.nodeName)) {
-		this.editor._antiBlur = false;
+		this.__core._antiBlur = false;
 	} else {
 		e.preventDefault();
 	}
 
 	if (domUtils.getParentElement(target, ".se-submenu")) {
 		e.stopPropagation();
-		this.editor._notHideToolbar = true;
+		this.__core._notHideToolbar = true;
 	} else {
 		let command = target.getAttribute("data-command");
 		let className = target.className;
@@ -575,7 +575,7 @@ function ToolbarButtonsHandler(e) {
 			className = target.className;
 		}
 
-		if (command === this.editor._submenuName || command === this.editor._containerName) {
+		if (command === this.__core._submenuName || command === this.__core._containerName) {
 			e.stopPropagation();
 		}
 	}
@@ -586,7 +586,7 @@ function OnClick_toolbar(e) {
 	let display = target.getAttribute("data-display");
 	let command = target.getAttribute("data-command");
 	let className = target.className;
-	this.editor.controllersOff();
+	this.__core.controllersOff();
 
 	while (target.parentNode && !command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
 		target = target.parentNode;
@@ -597,10 +597,10 @@ function OnClick_toolbar(e) {
 
 	if (!command && !display) return;
 	if (target.disabled) return;
-	if (!this.status.isReadOnly && !this.status.hasFocus) this.editor.nativeFocus();
+	if (!this.status.isReadOnly && !this.status.hasFocus) this.__core.nativeFocus();
 	if (!this.status.isReadOnly && !this.status.isCodeView) this.selection._init();
 
-	this.editor.actionCall(command, display, target);
+	this.__core.actionCall(command, display, target);
 }
 
 function OnMouseDown_wysiwyg(e) {
@@ -618,7 +618,7 @@ function OnMouseDown_wysiwyg(e) {
 		}
 	}
 
-	if (this.editor._isBalloon) {
+	if (this.__core._isBalloon) {
 		this._hideToolbar();
 	}
 
@@ -654,7 +654,7 @@ function OnClick_wysiwyg(e) {
 		figcaption.setAttribute("contenteditable", true);
 		figcaption.focus();
 
-		if (this.editor._isInline && !this.toolbar._inlineToolbarAttr.isShow) {
+		if (this.__core._isInline && !this.toolbar._inlineToolbarAttr.isShow) {
 			this.toolbar._showInline();
 
 			const hideToolbar = function () {
@@ -680,10 +680,10 @@ function OnClick_wysiwyg(e) {
 				const prevLi = selectionNode.nextElementSibling;
 				const oLi = domUtils.createElement("LI", null, selectionNode);
 				rangeEl.insertBefore(oLi, prevLi);
-				this.editor.focus();
+				this.__core.focus();
 			} else if (!domUtils.isWysiwygFrame(selectionNode) && !this.component.is(selectionNode) && (!domUtils.isTable(selectionNode) || domUtils.isTableCell(selectionNode)) && this._setDefaultLine(this.format.isBlock(rangeEl) ? "DIV" : this.options.defaultTag) !== null) {
 				e.preventDefault();
-				this.editor.focus();
+				this.__core.focus();
 			} else {
 				this.applyTagEffect();
 			}
@@ -692,7 +692,7 @@ function OnClick_wysiwyg(e) {
 		this.applyTagEffect();
 	}
 
-	if (this.editor._isBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this));
+	if (this.__core._isBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this));
 }
 
 function OnInput_wysiwyg(e) {
@@ -731,9 +731,9 @@ function OnKeyDown_wysiwyg(e) {
 		return false;
 	}
 
-	this.editor.submenuOff();
+	this.__core.submenuOff();
 
-	if (this.editor._isBalloon) {
+	if (this.__core._isBalloon) {
 		this._hideToolbar();
 	}
 
@@ -754,7 +754,7 @@ function OnKeyDown_wysiwyg(e) {
 	let selectionNode = this.selection.getNode();
 	const range = this.selection.getRange();
 	const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
-	const fileComponentName = this.editor._fileManager.pluginRegExp.test(this.editor.currentControllerName) ? this.editor.currentControllerName : "";
+	const fileComponentName = this.__core._fileManager.pluginRegExp.test(this.__core.currentControllerName) ? this.__core.currentControllerName : "";
 	let formatEl = this.format.getLine(selectionNode, null) || selectionNode;
 	let rangeEl = this.format.getBlock(formatEl, null);
 
@@ -803,7 +803,7 @@ function OnKeyDown_wysiwyg(e) {
 						formatEl.parentElement.replaceChild(domUtils.createElement(this.options.defaultTag, null, "<br>"), formatEl);
 					}
 
-					this.editor.nativeFocus();
+					this.__core.nativeFocus();
 					return false;
 				}
 			}
@@ -938,7 +938,7 @@ function OnKeyDown_wysiwyg(e) {
 						e.preventDefault();
 						e.stopPropagation();
 						if (formatEl.textContent.length === 0) domUtils.remove(formatEl);
-						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.editor.blur();
+						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.__core.blur();
 					} else if (this.component.is(prev)) {
 						e.preventDefault();
 						e.stopPropagation();
@@ -999,7 +999,7 @@ function OnKeyDown_wysiwyg(e) {
 					const fileComponentInfo = this.component.get(nextEl);
 					if (fileComponentInfo) {
 						e.stopPropagation();
-						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.editor.blur();
+						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.__core.blur();
 					} else if (this.component.is(nextEl)) {
 						e.stopPropagation();
 						domUtils.remove(nextEl);
@@ -1116,7 +1116,7 @@ function OnKeyDown_wysiwyg(e) {
 					let moveCell = cells[idx];
 					if (!moveCell) break;
 					moveCell = moveCell.firstElementChild || moveCell;
-					this.editor.setRange(moveCell, 0, moveCell, 0);
+					this.__core.setRange(moveCell, 0, moveCell, 0);
 					break;
 				}
 
@@ -1407,7 +1407,7 @@ function OnKeyDown_wysiwyg(e) {
 				}
 
 				container.parentNode.insertBefore(newEl, container);
-				if (this.component.select(compContext._element, fileComponentName) === false) this.editor.blur();
+				if (this.component.select(compContext._element, fileComponentName) === false) this.__core.blur();
 			}
 
 			break;
@@ -1415,7 +1415,7 @@ function OnKeyDown_wysiwyg(e) {
 			if (fileComponentName) {
 				e.preventDefault();
 				e.stopPropagation();
-				this.editor.controllersOff();
+				this.__core.controllersOff();
 				return false;
 			}
 			break;
@@ -1466,8 +1466,8 @@ function OnKeyUp_wysiwyg(e) {
 	const range = this.selection.getRange();
 	let selectionNode = this.selection.getNode();
 
-	if (this.editor._isBalloon && ((this.editor._isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
-		if (this.editor._isBalloonAlways) {
+	if (this.__core._isBalloon && ((this.__core._isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
+		if (this.__core._isBalloonAlways) {
 			if (keyCode !== 27) this._showToolbarBalloonDelay();
 		} else {
 			this.toolbar._showBalloon();
@@ -1539,7 +1539,7 @@ function OnCopy_wysiwyg(e) {
 		return false;
 	}
 
-	const info = this.editor.currentFileComponentInfo;
+	const info = this.__core.currentFileComponentInfo;
 	if (info && !env.isIE) {
 		this._setClipboardComponent(e, info, clipboardData);
 		domUtils.addClass(info.component, "se-component-copy");
@@ -1575,11 +1575,11 @@ function OnCut_wysiwyg(e) {
 		return false;
 	}
 
-	const info = this.editor.currentFileComponentInfo;
+	const info = this.__core.currentFileComponentInfo;
 	if (info && !env.isIE) {
 		this._setClipboardComponent(e, info, clipboardData);
 		domUtils.remove(info.component);
-		this.editor.controllersOff();
+		this.__core.controllersOff();
 	}
 
 	_w.setTimeout(function () {
@@ -1589,15 +1589,15 @@ function OnCut_wysiwyg(e) {
 }
 
 function OnScroll_wysiwyg(e) {
-	this.editor.controllersOff();
-	if (this.editor._isBalloon) this._hideToolbar();
+	this.__core.controllersOff();
+	if (this.__core._isBalloon) this._hideToolbar();
 
 	// user event
 	if (typeof this.events.onScroll === "function") this.events.onScroll(e);
 }
 
 function OnFocus_wysiwyg(e) {
-	if (this.editor._antiBlur) return;
+	if (this.__core._antiBlur) return;
 	this.status.hasFocus = true;
 
 	this.applyTagEffect();
@@ -1608,10 +1608,10 @@ function OnFocus_wysiwyg(e) {
 }
 
 function OnBlur_wysiwyg(e) {
-	if (this.editor._antiBlur || this.status.isCodeView) return;
+	if (this.__core._antiBlur || this.status.isCodeView) return;
 	this.status.hasFocus = false;
-	this.editor.controllersOff();
-	if (this.editor._isInline || this.editor._isBalloon) this._hideToolbar();
+	this.__core.controllersOff();
+	if (this.__core._isInline || this.__core._isBalloon) this._hideToolbar();
 
 	this._setKeyEffect([]);
 
@@ -1627,9 +1627,9 @@ function OnMouseMove_wysiwyg(e) {
 	if (this.status.isDisabled || this.status.isReadOnly) return false;
 
 	const component = domUtils.getParentElement(e.target, this.component.is);
-	const lineBreakerStyle = this.editor._lineBreaker.style;
+	const lineBreakerStyle = this.__core._lineBreaker.style;
 
-	if (component && !this.editor.currentControllerName) {
+	if (component && !this.__core.currentControllerName) {
 		const ctxEl = this.context.element;
 		let scrollTop = 0;
 		let el = ctxEl.wysiwyg;
@@ -1672,8 +1672,8 @@ function OnMouseMove_wysiwyg(e) {
 function OnMouseDown_resizingBar(e) {
 	e.stopPropagation();
 
-	this.editor.submenuOff();
-	this.editor.controllersOff();
+	this.__core.submenuOff();
+	this.__core.controllersOff();
 
 	const prevHeight = numbers.getNumber(this.context.element.wysiwygFrame.style.height, 0);
 	this.status.resizeClientY = e.clientY;
@@ -1703,7 +1703,7 @@ function DisplayLineBreak(dir, e) {
 	if (this.options.charCounterType === "byte-html" && !this.char.check(format.outerHTML)) return;
 
 	component.parentNode.insertBefore(format, dir === "t" ? component : component.nextSibling);
-	this.editor._lineBreaker.style.display = "none";
+	this.__core._lineBreaker.style.display = "none";
 	this.status._lineBreakComp = null;
 
 	const focusEl = isList ? format : format.firstChild;
@@ -1713,12 +1713,12 @@ function DisplayLineBreak(dir, e) {
 }
 
 function OnResize_window() {
-	this.editor.controllersOff();
+	this.__core.controllersOff();
 
 	const responsiveSize = this.toolbar._responsiveButtonSize;
 	if (responsiveSize) {
 		let w = 0;
-		if ((this.editor._isBalloon || this.editor._isInline) && this.options.toolbarWidth === "auto") {
+		if ((this.__core._isBalloon || this.__core._isInline) && this.options.toolbarWidth === "auto") {
 			w = this.context.element.topArea.offsetWidth;
 		} else {
 			w = this.context.element.toolbar.offsetWidth;
@@ -1744,8 +1744,8 @@ function OnResize_window() {
 		this.context.fileBrowser.body.style.maxHeight = _w.innerHeight - this.context.fileBrowser.header.offsetHeight - 50 + "px";
 	}
 
-	if (this.editor.submenuActiveButton && this.editor.submenu) {
-		this.editor._setMenuPosition(this.editor.submenuActiveButton, this.editor.submenu);
+	if (this.__core.submenuActiveButton && this.__core.submenu) {
+		this.__core._setMenuPosition(this.__core.submenuActiveButton, this.__core.submenu);
 	}
 
 	if (this.status.isFullScreen) {
@@ -1754,12 +1754,12 @@ function OnResize_window() {
 		return;
 	}
 
-	if (this.status.isCodeView && this.editor._isInline) {
+	if (this.status.isCodeView && this.__core._isInline) {
 		this.toolbar._showInline();
 		return;
 	}
 
-	this.editor._iframeAutoHeight();
+	this.__core._iframeAutoHeight();
 
 	if (this.toolbar._sticky) {
 		this.context.element.toolbar.style.width = this.context.element.topArea.offsetWidth - 2 + "px";

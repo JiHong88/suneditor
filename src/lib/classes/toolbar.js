@@ -34,9 +34,9 @@ Toolbar.prototype = {
 	 */
 	disable: function () {
 		/** off menus */
-		this.editor.submenuOff();
-		this.editor.moreLayerOff();
-		this.editor.containerOff();
+		this.__core.submenuOff();
+		this.__core.moreLayerOff();
+		this.__core.containerOff();
 		this.context.buttons.cover.style.display = "block";
 	},
 
@@ -51,9 +51,9 @@ Toolbar.prototype = {
 	 * @description Show the toolbar
 	 */
 	show: function () {
-		if (this.editor._isInline) {
+		if (this.__core._isInline) {
 			this._showInline();
-		} else if (this.editor._isBalloon) {
+		} else if (this.__core._isBalloon) {
 			this._showBalloon();
 		} else {
 			this.context.element.toolbar.style.display = "";
@@ -65,7 +65,7 @@ Toolbar.prototype = {
 	 * @description Hide the toolbar
 	 */
 	hide: function () {
-		if (this.editor._isInline) {
+		if (this.__core._isInline) {
 			this.context.element.toolbar.style.display = "none";
 			this._inlineToolbarAttr.isShow = false;
 		} else {
@@ -80,28 +80,28 @@ Toolbar.prototype = {
 	 * @param {Array} buttonList Button list
 	 */
 	setButtons: function (buttonList) {
-		this.editor.submenuOff();
-		this.editor.containerOff();
-		this.editor.moreLayerOff();
+		this.__core.submenuOff();
+		this.__core.containerOff();
+		this.__core.moreLayerOff();
 
 		const newToolbar = Constructor._createToolBar(this._d, buttonList, this.plugins, this.options);
 		_responsiveButtons = newToolbar.responsiveButtons;
 		this._setResponsive();
 
 		this.context.element.toolbar.replaceChild(newToolbar._buttonTray, this.context.element._buttonTray);
-		const newContext = Context(this.context.element.originElement, this.editor._getConstructed(this.context.element), this.options);
+		const newContext = Context(this.context.element.originElement, this.__core._getConstructed(this.context.element), this.options);
 
 		this.context.element = newContext.element;
 		this.context.tool = newContext.tool;
 		if (this.options.iframe) this.context.element.wysiwyg = this._wd.body;
 
-		this.editor.recoverButtonStates();
+		this.__core.recoverButtonStates();
 
-		this.editor._cachingButtons();
+		this.__core._cachingButtons();
 		this.history._resetCachingButton();
 
 		if (core.hasFocus) this.eventMenager.applyTagEffect();
-		if (core.isReadOnly) domUtils.setDisabled(true, this.editor.resizingDisabledButtons);
+		if (core.isReadOnly) domUtils.setDisabled(true, this.__core.resizingDisabledButtons);
 		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'), core);
 	},
 
@@ -111,8 +111,8 @@ Toolbar.prototype = {
 		const element = this.context.element;
 		const editorHeight = element.editorArea.offsetHeight;
 		const y = (_w.scrollY || _d.documentElement.scrollTop) + this.options.stickyToolbar;
-		const editorTop = this.offset.getGlobal(this.options.toolbarContainer).top - (this.editor._isInline ? element.toolbar.offsetHeight : 0);
-		const inlineOffset = this.editor._isInline && y - editorTop > 0 ? y - editorTop - this.context.element.toolbar.offsetHeight : 0;
+		const editorTop = this.offset.getGlobal(this.options.toolbarContainer).top - (this.__core._isInline ? element.toolbar.offsetHeight : 0);
+		const inlineOffset = this.__core._isInline && y - editorTop > 0 ? y - editorTop - this.context.element.toolbar.offsetHeight : 0;
 
 		if (y < editorTop) {
 			this._offSticky();
@@ -127,13 +127,13 @@ Toolbar.prototype = {
 	_onSticky: function (inlineOffset) {
 		const element = this.context.element;
 
-		if (!this.editor._isInline && !this.options.toolbarContainer) {
+		if (!this.__core._isInline && !this.options.toolbarContainer) {
 			element._stickyDummy.style.height = element.toolbar.offsetHeight + "px";
 			element._stickyDummy.style.display = "block";
 		}
 
 		element.toolbar.style.top = this.options.stickyToolbar + inlineOffset + "px";
-		element.toolbar.style.width = this.editor._isInline ? this._inlineToolbarAttr.width : element.toolbar.offsetWidth + "px";
+		element.toolbar.style.width = this.__core._isInline ? this._inlineToolbarAttr.width : element.toolbar.offsetWidth + "px";
 		domUtils.addClass(element.toolbar, "se-toolbar-sticky");
 		this._sticky = true;
 	},
@@ -142,8 +142,8 @@ Toolbar.prototype = {
 		const element = this.context.element;
 
 		element._stickyDummy.style.display = "none";
-		element.toolbar.style.top = this.editor._isInline ? this._inlineToolbarAttr.top : "";
-		element.toolbar.style.width = this.editor._isInline ? this._inlineToolbarAttr.width : "";
+		element.toolbar.style.top = this.__core._isInline ? this._inlineToolbarAttr.top : "";
+		element.toolbar.style.width = this.__core._isInline ? this._inlineToolbarAttr.width : "";
 		element.editorArea.style.marginTop = "";
 
 		domUtils.removeClass(element.toolbar, "se-toolbar-sticky");
@@ -176,7 +176,7 @@ Toolbar.prototype = {
 	},
 
 	_showBalloon: function (rangeObj) {
-		if (!this.editor._isBalloon) return;
+		if (!this.__core._isBalloon) return;
 
 		const range = rangeObj || this.selection.getRange();
 		const toolbar = this.context.element.toolbar;
@@ -184,7 +184,7 @@ Toolbar.prototype = {
 		const selection = this.selection.get();
 
 		let isDirTop;
-		if (this.editor._isBalloonAlways && range.collapsed) {
+		if (this.__core._isBalloonAlways && range.collapsed) {
 			isDirTop = true;
 		} else if (selection.focusNode === selection.anchorNode) {
 			isDirTop = selection.focusOffset < selection.anchorOffset;
@@ -319,7 +319,7 @@ Toolbar.prototype = {
 	},
 
 	_showInline: function () {
-		if (!this.editor._isInline) return;
+		if (!this.__core._isInline) return;
 
 		const toolbar = this.context.element.toolbar;
 		if (this.options.toolbarContainer) toolbar.style.position = "relative";

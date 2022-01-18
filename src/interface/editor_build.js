@@ -3,8 +3,8 @@
 import Editor from './editor';
 
 if (typeof noGlobal === typeof undefined) {
-    if (!window.SUNEDITOR_MODULES) {
-        Object.defineProperty(window, 'SUNEDITOR_MODULES', {
+    if (!window.SUNEDITOR_INTERFACE) {
+        Object.defineProperty(window, 'SUNEDITOR_INTERFACE', {
             enumerable: true,
             writable: false,
             configurable: false,
@@ -12,7 +12,7 @@ if (typeof noGlobal === typeof undefined) {
         });
     }
 
-    Object.defineProperty(window.SUNEDITOR_MODULES, 'interface', {
+    Object.defineProperty(window.SUNEDITOR_INTERFACE, 'interface', {
         enumerable: true,
         writable: false,
         configurable: false,

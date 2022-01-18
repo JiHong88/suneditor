@@ -22,7 +22,7 @@ const Notice = function (editor) {
 	this.modal.appendChild(notice_button);
 
 	/** add event */
-	this.editor.eventManager.addEvent(notice_button, "click", OnClick_cancel.bind(this));
+	this.__core.eventManager.addEvent(notice_button, "click", OnClick_cancel.bind(this));
 
 	/** append html */
 	this.context.element.editorArea.appendChild(this.modal);

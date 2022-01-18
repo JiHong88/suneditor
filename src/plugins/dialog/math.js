@@ -266,7 +266,7 @@ export default {
             /** delete */
             this.util.remove(this.context.math._mathExp);
             this.context.math._mathExp = null;
-            this.editor.focus();
+            this.__core.focus();
 
             // history stack
             this.history.push(false);

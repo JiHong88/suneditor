@@ -203,7 +203,7 @@ export default {
             /** delete */
             this.util.remove(this.context.link._linkAnchor);
             this.context.anchor.caller.link.linkAnchor = null;
-            this.editor.focus();
+            this.__core.focus();
 
             // history stack
             this.history.push(false);
