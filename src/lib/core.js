@@ -1,12 +1,3 @@
-/*
- * wysiwyg web editor
- *
- * suneditor.js
- * Copyright 2017 JiHong Lee.
- * MIT license.
- */
-'use strict';
-
 import Helpers, {
     global,
     env,

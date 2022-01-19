@@ -2,7 +2,6 @@
  * @fileoverview Event class
  * @author JiHong Lee.
  */
-"use strict";
 
 import EditorInterface from "../interface/editor";
 

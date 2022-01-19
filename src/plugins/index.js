@@ -1,5 +1,3 @@
-'use strict';
-
 // command
 import blockquote from './command/blockquote';
 

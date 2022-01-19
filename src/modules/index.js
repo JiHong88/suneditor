@@ -1,5 +1,3 @@
-'use strict';
-
 import dialog from './dialog';
 import component from './component';
 import fileManager from './fileManager';

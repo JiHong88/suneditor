@@ -5,7 +5,6 @@
  * Copyright 2018 JiHong Lee.
  * MIT license.
  */
-'use strict';
 
 export default {
     name: 'colorPicker',

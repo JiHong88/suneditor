@@ -2,7 +2,6 @@
  * @fileoverview history stack closure
  * @author JiHong Lee.
  */
-"use strict";
 
 import { _w } from "../helpers/global";
 import { getNodeFromPath, getNodePath } from "../helpers/domUtils";

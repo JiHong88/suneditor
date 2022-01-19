@@ -5,7 +5,6 @@
  * Copyright 2020 JiHong Lee.
  * MIT license.
  */
-'use strict';
 
 export default {
    // rtl icon

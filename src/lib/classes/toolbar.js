@@ -2,7 +2,6 @@
  * @fileoverview Toolbar class
  * @author JiHong Lee.
  */
-"use strict";
 
 import CoreInterface from "../../interface/_core";
 import Context from "../context";

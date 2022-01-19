@@ -1,3 +1,8 @@
+import {
+	_d,
+	_w
+} from "./global";
+
 /**
  * @description Convert HTML string to HTML Entity
  * @param {string} contents
@@ -109,7 +114,7 @@ export function _setIframeDocument(frame, options) {
 
 export function _setIframeCssTags(options) {
 	const linkNames = options.iframeCSSFileName;
-	const wRegExp = window.RegExp;
+	const wRegExp = _w.RegExp;
 	let tagString = "";
 
 	for (let f = 0, len = linkNames.length, path; f < len; f++) {
@@ -119,7 +124,7 @@ export function _setIframeCssTags(options) {
 			path.push(linkNames[f]);
 		} else {
 			const CSSFileName = new wRegExp("(^|.*[\\/])" + linkNames[f] + "(\\..+)?\\.css(?:\\?.*|;.*)?$", "i");
-			for (let c = document.getElementsByTagName("link"), i = 0, len = c.length, styleTag; i < len; i++) {
+			for (let c = _d.getElementsByTagName("link"), i = 0, len = c.length, styleTag; i < len; i++) {
 				styleTag = c[i].href.match(CSSFileName);
 				if (styleTag) path.push(styleTag[0]);
 			}

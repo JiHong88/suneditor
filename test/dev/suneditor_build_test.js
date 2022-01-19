@@ -1,7 +1,7 @@
 'use strict';
 
-import '../../src/assets/css/suneditor.css';
-import '../../src/assets/css/suneditor-contents.css';
+import '../../src/assets/suneditor.css';
+import '../../src/assets/suneditor-contents.css';
 
 import suneditor from '../../src/suneditor';
 // import lang from '../../src/lang';

@@ -8,8 +8,6 @@
  *
  * MIT license.
  */
-'use strict';
-
 (function (global, factory) {
     if (typeof module === 'object' && typeof module.exports === 'object') {
         module.exports = global.document ?

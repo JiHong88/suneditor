@@ -2,7 +2,6 @@
  * @fileoverview Char class
  * @author JiHong Lee.
  */
-"use strict";
 
 import CoreInterface from "../../interface/_core";
 import env from "../../helpers/env";

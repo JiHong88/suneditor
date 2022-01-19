@@ -65,8 +65,8 @@ $ bower install suneditor --save
 #### CDN
 ``` html
 <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
-<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/css/suneditor.css" rel="stylesheet"> -->
-<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/css/suneditor-contents.css" rel="stylesheet"> -->
+<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/suneditor.css" rel="stylesheet"> -->
+<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/suneditor-contents.css" rel="stylesheet"> -->
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
 <!-- languages (Basic Language: English/en) -->
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/ko.js"></script>
@@ -97,7 +97,7 @@ const editor = SUNEDITOR.create((document.getElementById('sample') || 'sample'),
 ### 3. Contents display
 ```java
 When you display a document created by suneditor
-You need to include "src/assets/css/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
+You need to include "src/assets/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
 Then add "sun-editor-editable" to the class name of the Tag element that displays the content.
 If you are using RTL mode, you also need to add "se-rtl".
 In "suneditor-contents.css", you can define the style of all the tags created in suneditor.
@@ -116,8 +116,8 @@ In "suneditor-contents.css", you can define the style of all the tags created in
 ### 1. Load only what you want
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
-// import 'suneditor/assets/css/suneditor.css'
-// import 'suneditor/assets/css/suneditor-contents.css'
+// import 'suneditor/assets/suneditor.css'
+// import 'suneditor/assets/suneditor-contents.css'
 import suneditor from 'suneditor'
 
 // How to import plugins

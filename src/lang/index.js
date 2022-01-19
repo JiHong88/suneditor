@@ -1,5 +1,3 @@
-'use strict';
-
 import ckb from './ckb';
 import da from './da';
 import de from './de';
