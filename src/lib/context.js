@@ -11,10 +11,11 @@
  * @description Elements and variables you should have
  * @param {Element} element textarea element
  * @param {object} cons Toolbar element you created
+ * * @param {JSON|Object} options Inserted options
  * @returns {Object} {Elements, variables of the editor, option}
  * @private
  */
-const _Context = function (element, cons) {
+const _Context = function (element, cons, options) {
     return {
         element: {
             originElement: element,
@@ -60,8 +61,7 @@ const _Context = function (element, cons) {
             dir_ltr: cons._toolBar.querySelector('._se_command_dir_ltr'),
             dir_rtl: cons._toolBar.querySelector('._se_command_dir_rtl')
         },
-        options: options,
-        option: options
+        options: options
     };
 };
 

@@ -29,7 +29,7 @@
          * @param {string} className Class name of container (fixed: se-component)
          * @returns {Element} Created container element
          */
-        set_container: function (cover, className) {
+        setContainer: function (cover, className) {
             const container = this.util.createElement('DIV');
             container.className = 'se-component ' + className;
             container.setAttribute('contenteditable', false);
@@ -42,7 +42,7 @@
          * @description Cover the target element with a FIGURE element.
          * @param {Element} element Target element
          */
-        set_cover: function (element) {
+        setCover: function (element) {
             const cover = this.util.createElement('FIGURE');
             cover.appendChild(element);
     

@@ -4,7 +4,7 @@ class numbers {
 	 * @param text Text string or number
 	 * @returns
 	 */
-	isNumber(text: string | number): boolean;
+	is(text: string | number): boolean;
 
 	/**
 	 * @description Get a number.
@@ -12,7 +12,7 @@ class numbers {
 	 * @param maxDec Maximum number of decimal places (-1 : Infinity)
 	 * @returns
 	 */
-	getNumber(text: string | number, maxDec: number): number;
+	get(text: string | number, maxDec: number): number;
 
 	/**
 	 * @description It compares the start and end indexes of "a" and "b" and returns the number of overlapping indexes in the range.

@@ -67,6 +67,6 @@ export default {
             throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed._top.id + '")');
         }
 
-        return new core(_Context(element, cons.constructed), cons.pluginCallButtons, cons.plugins, cons.options.lang, options, cons._responsiveButtons);
+        return new core(_Context(element, cons.constructed, options), cons.pluginCallButtons, cons.plugins, cons.options.lang, options, cons._responsiveButtons);
     }
 };

@@ -5,7 +5,7 @@ import { _w } from "./global";
  * @param {String|Number} text Text string or number
  * @returns {boolean}
  */
-export function isNumber(text) {
+export function is(text) {
     return !!text && /^-?\d+(\.\d+)?$/.test(text + "");
 }
 
@@ -15,7 +15,7 @@ export function isNumber(text) {
  * @param {number} maxDec Maximum number of decimal places (-1 : Infinity)
  * @returns {number}
  */
-export function getNumber(text, maxDec) {
+export function get(text, maxDec) {
     if (!text) return 0;
 
     let number = (text + "").match(/-?\d+(\.\d+)?/);
@@ -46,8 +46,8 @@ export function getOverlapRangeAtIndex(aStart, aEnd, bStart, bEnd) {
 }
 
 const numbers = {
-    isNumber: isNumber,
-    getNumber: getNumber,
+    is: is,
+    get: get,
     getOverlapRangeAtIndex: getOverlapRangeAtIndex
 }
 

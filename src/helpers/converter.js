@@ -102,14 +102,14 @@ export function _setIframeDocument(frame, options) {
 		"" +
 		'<meta charset="utf-8" />' +
 		'<meta name="viewport" content="width=device-width, initial-scale=1">' +
-		__setIframeCssTags(options);
+		_setIframeCssTags(options);
 	frame.contentDocument.body.className = options._editableClass;
 	frame.contentDocument.body.setAttribute("contenteditable", true);
 }
 
-function __setIframeCssTags(options) {
+export function _setIframeCssTags(options) {
 	const linkNames = options.iframeCSSFileName;
-	const wRegExp = this._w.RegExp;
+	const wRegExp = window.RegExp;
 	let tagString = "";
 
 	for (let f = 0, len = linkNames.length, path; f < len; f++) {
@@ -145,8 +145,10 @@ const converter = {
 	htmlToEntity: htmlToEntity,
 	entityToHTML: entityToHTML,
 	createTagsWhitelist: createTagsWhitelist,
+	createTagsBlacklist: createTagsBlacklist,
 	_setDefaultOptionStyle: _setDefaultOptionStyle,
-	_setIframeDocument: _setIframeDocument
+	_setIframeDocument: _setIframeDocument,
+	_setIframeCssTags: _setIframeCssTags
 };
 
 export default converter;

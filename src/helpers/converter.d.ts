@@ -6,11 +6,11 @@ class converter {
 	 */
 	htmlToEntity(contents: string): string;
 
-	 /**
-		* @description Convert HTML Entity to HTML string
-		* @param contents HTML or Text string
-		* @returns
-		*/
+	/**
+	 * @description Convert HTML Entity to HTML string
+	 * @param contents HTML or Text string
+	 * @returns
+	 */
 	entityToHTML(contents: string): string;
 
 	/**
@@ -19,7 +19,15 @@ class converter {
 	 * @param list Tags list ("br|p|div|pre...")
 	 * @returns
 	 */
-	 createTagsWhitelist(list: string): RegExp;
+	createTagsWhitelist(list: string): RegExp;
+
+	/**
+	 * @description Create blacklist RegExp object.
+	 * Return RegExp format: new RegExp("<\\/?\\b(?:" + list + ")\\b[^>^<]*+>", "gi")
+	 * @param list Tags list ("br|p|div|pre...")
+	 * @returns
+	 */
+	createTagsBlacklist(list: string): RegExp;
 }
 
 export default converter;

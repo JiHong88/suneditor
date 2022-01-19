@@ -4,170 +4,29 @@ import '../../src/assets/css/suneditor.css';
 import '../../src/assets/css/suneditor-contents.css';
 
 import suneditor from '../../src/suneditor';
-import lang from '../../src/lang';
+// import lang from '../../src/lang';
 
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import CodeMirror from 'codemirror';
 
-console.log("pluginf???", plugins);
-plugins.fontSize.pickup = function (e){
-    console.log("font----------size", this)
-    if (!/^BUTTON$/i.test(e.target.tagName)) return false;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    const value = "20px";
-
-    if (value) {
-        const newNode = this.util.createElement('SPAN');
-        newNode.style.fontSize = value;
-        this.nodeChange(newNode, ['font-size'], null, null);
-    } else {
-        this.nodeChange(null, ['font-size'], ['span'], true);
-    }
-
-    this.submenuOff();
-}
 
 
 // import 'katex/dist/katex.min.css';
 import Katex from 'katex';
 
-Array.prototype._move = function(from, to)
-{
-    this.splice(to, 0, this.splice(from, 1)[0]);
-};
-
-import align from '../../src/plugins/submenu/align'
 
 
-const complexEditor = [
-    ['undo', 'redo', 'dir'],
-    ['dir_ltr', 'dir_rtl'],
-        ['font', 'fontSize', 'formatBlock'],
-        ['paragraphStyle', 'blockquote'],
-        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        ['fontColor', 'hiliteColor', 'textStyle'],
-        ['removeFormat'],
-        '/',
-        ['outdent', 'indent'],
-        ['align', 'horizontalRule', 'list', 'lineHeight'],
-        ['table', 'link', 'image', 'video', 'audio', 'math'],
-        ['imageGallery'],
-        ['fullScreen', 'showBlocks', 'codeView'],
-        ['preview', 'print'],
-        ['save', 'template'],
-        // (min-width: 1565)
-        ['%1565', [
-            ['undo', 'redo'],
-            ['font', 'fontSize', 'formatBlock'],
-            ['paragraphStyle', 'blockquote'],
-            ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-            ['fontColor', 'hiliteColor', 'textStyle'],
-            ['removeFormat'],
-            ['outdent', 'indent'],
-            ['align', 'horizontalRule', 'list', 'lineHeight'],
-            ['table', 'link', 'image', 'video', 'audio', 'math'],
-            ['imageGallery'],
-            ['fullScreen', 'showBlocks', 'codeView'],
-            ['-right', ':i-More Misc-default.more_vertical', 'preview', 'print', 'save', 'template']
-        ]],
-        // (min-width: 1455)
-        ['%1455', [
-            ['undo', 'redo'],
-            ['font', 'fontSize', 'formatBlock'],
-            ['paragraphStyle', 'blockquote'],
-            ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-            ['fontColor', 'hiliteColor', 'textStyle'],
-            ['removeFormat'],
-            ['outdent', 'indent'],
-            ['align', 'horizontalRule', 'list', 'lineHeight'],
-            ['table', 'link', 'image', 'video', 'audio', 'math'],
-            ['imageGallery'],
-            ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template']
-        ]],
-        // (min-width: 1326)
-        ['%1326', [
-            ['undo', 'redo'],
-            ['font', 'fontSize', 'formatBlock'],
-            ['paragraphStyle', 'blockquote'],
-            ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-            ['fontColor', 'hiliteColor', 'textStyle'],
-            ['removeFormat'],
-            ['outdent', 'indent'],
-            ['align', 'horizontalRule', 'list', 'lineHeight'],
-            ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template'],
-            ['-right', ':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
-        ]],
-        // (min-width: 1123)
-        ['%1123', [
-            ['undo', 'redo'],
-            [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-            ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-            ['fontColor', 'hiliteColor', 'textStyle'],
-            ['removeFormat'],
-            ['outdent', 'indent'],
-            ['align', 'horizontalRule', 'list', 'lineHeight'],
-            ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template'],
-            ['-right', ':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
-        ]],
-        // (min-width: 817)
-        ['%817', [
-            ['undo', 'redo'],
-            [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-            ['bold', 'underline', 'italic', 'strike'],
-            [':t-More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle'],
-            ['removeFormat'],
-            ['outdent', 'indent'],
-            ['align', 'horizontalRule', 'list', 'lineHeight'],
-            ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template'],
-            ['-right', ':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
-        ]],
-        // (min-width: 673)
-        ['%673', [
-            ['undo', 'redo'],
-            [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle'],
-            ['removeFormat'],
-            ['outdent', 'indent'],
-            ['align', 'horizontalRule', 'list', 'lineHeight'],
-            [':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
-            ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template']
-        ]],
-        // (min-width: 525)
-        ['%525', [
-            ['undo', 'redo'],
-            [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle'],
-            ['removeFormat'],
-            ['outdent', 'indent'],
-            [':e-More Line-default.more_horizontal', 'align', 'horizontalRule', 'list', 'lineHeight'],
-            [':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
-            ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template']
-        ]],
-        // (min-width: 420)
-        ['%420', [
-            ['undo', 'redo'],
-            [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle', 'removeFormat'],
-            [':e-More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'horizontalRule', 'list', 'lineHeight'],
-            [':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
-            ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template']
-        ]]
-]
+const complexEditor = null;
 
 // shadowroot test
 const shadow = document.querySelector('#app').attachShadow({ mode: 'open' })
 const appEl = document.createElement('textarea')
 const appStyle = document.createElement('style')
-appStyle.textContent = u.getPageStyle(document);
 
 shadow.appendChild(appStyle);
 shadow.appendChild(appEl);
 suneditor.create(appEl, {
-    plugins: plugins,
     mode: "balloon",
     katex: Katex,
     width: '400px',
@@ -176,55 +35,13 @@ suneditor.create(appEl, {
 })
 
 let ssss = suneditor.create(("sample1"), {
-    plugins: plugins, //[sunEditorNpsButtonBgColor, sunEditorNpsButtonFontColor, sunEditorNpsButtonFontSize],
     // font: [
     //     'Arial', 'Impact', 'Georgia', 'tahoma', 'Verdana'
     // ],
     toolbarContainer: document.getElementById('test_tool2'),
     tabDisable: true,
     mode: "balloon",
-    fontSize: fs,
     linkProtocol: 'https://',
-    buttonList: [
-        ['align', 'fullScreen'],
-        ['-right', 'link'],
-        ['-right', 'table'],
-        ['-right', ':more1-More Text-default.more_text', 'font', 'fontSize', 'formatBlock'],
-        [':more2-More Text-default.more_paragraph', 'fontColor', 'bold', 'underline', 'italic'],
-        [':more3-More Text-default.more_plus', 'undo', 'redo', 'image'],
-        // [{
-        //         name: 'npsButtonBgColor',
-        //         dataCommand: 'npsButtonBgColor',
-        //         buttonClass: '',
-        //         title: translator.get("invitations.npsBgColorButtonInfoText"),
-        //         dataDisplay: 'submenu',
-        //         innerHTML: NPS_BG_COLOR_ICON
-        //     },
-        //     {
-        //         name: 'npsButtonFontColor',
-        //         dataCommand: 'npsButtonFontColor',
-        //         buttonClass: '',
-        //         title: translator.get("invitations.npsFontColorButtonInfoText"),
-        //         dataDisplay: 'submenu',
-        //         innerHTML: NPS_FONT_COLOR_ICON
-        //     },
-        //     {
-        //         name: 'npsButtonFontSize',
-        //         dataCommand: 'npsButtonFontSize',
-        //         buttonClass: '',
-        //         title: translator.get("invitations.npsFontSizeButtonInfoText"),
-        //         dataDisplay: 'submenu',
-        //         innerHTML: NPS_FONT_SIZE_ICON
-        //     }
-        // ],
-        ['%510', [
-            ['align', 'fullScreen'],
-            [':moreText-More Text-default.more_paragraph', 'undo', 'redo', 'image'],
-            [':command2-title2-text.Insert', 'codeView', 'preview', 'font', 'fontSize', 'formatBlock'],
-            ['outdent', 'indent'],
-        ]]
-    ],
-    // lang: langToUse
 });
 
 // ssss.disable();
@@ -233,10 +50,8 @@ let ssss = suneditor.create(("sample1"), {
 
 
 suneditor.create('scrolleditor', {
-    plugins: plugins,
     // mode: 'balloon-always',
     katex: Katex,
-    fontSize: fs,
     // attributesWhitelist: 'style',
     buttonList: [
         ['font', 'fontSize', 'formatBlock'],
@@ -244,7 +59,6 @@ suneditor.create('scrolleditor', {
 })
 
 let s1 = suneditor.create('editor', {
-    plugins: plugins,
     mode: "balloon-always",
     value: '',
     resizingBar: false,
@@ -252,106 +66,17 @@ let s1 = suneditor.create('editor', {
     display: "inline",  
     tabDisable: false,
     placeholder: "Enter the question image here",
-    buttonList: [["table","removeFormat"]],
 })
 
-// s1.core._charCount = function (nextCharCount, blink) {
-//     const charCounter = this.context.element.charCounter;
-//     if (!charCounter) return true;
-//     if (!nextCharCount || nextCharCount < 0) nextCharCount = 0;
-
-//     const maxCharCount = this.context.options.maxCharCount;
-//     const wysiwyg = this.context.element.wysiwyg;
-
-//     ///// -- get empty list ////
-//     const emptyListCount = this.util.getListChildren(wysiwyg, function (current) {
-//         return this.isListCell(current) && current.childNodes.length === 1 && this.isBreak(current.firstChild)
-//     }.bind(this.util)).length;
-//     //// ------------------ ////
-
-//     this._w.setTimeout(function () {
-//         charCounter.textContent = wysiwyg.textContent.length + emptyListCount; // add empty list
-//     });
-
-//     if (maxCharCount > 0) {
-//         let over = false;
-//         const count = wysiwyg.textContent.length + emptyListCount; // add empty list
-        
-//         if (count > maxCharCount) {
-//             this._editorRange();
-//             const range = this.getRange();
-//             const endOff = range.endOffset - 1;
-//             const text = this.getSelectionNode().textContent;
-
-//             this.getSelectionNode().textContent = text.slice(0, range.endOffset - 1) + text.slice(range.endOffset, text.length);
-//             this.setRange(range.endContainer, endOff, range.endContainer, endOff);
-//             over = true;
-//         } else if ((count + nextCharCount) > maxCharCount) {
-//             over = true;
-//         }
-
-//         if (over) {
-//             if (blink && !this.util.hasClass(charCounter, 'se-blink')) {
-//                 this.util.addClass(charCounter, 'se-blink');
-//                 this._w.setTimeout(function () {
-//                     this.removeClass(charCounter, 'se-blink');
-//                 }.bind(this.util), 600);
-//             }
-
-//             return false;
-//         }
-//     }
-
-//     return true;
-// }.bind(s1.core)
-
-window.cm = CodeMirror
-
-// let s1 = window.s1 = suneditor.create(document.getElementById('editor'), {
-//     plugins: [lineHeight],
-//     buttonList: [
-//         [
-//             'lineHeight'
-//         ]
-//     ],
-//     height: 'auto',
-//     width: '500px',
-//     // mode: 'balloon',
-//     stickyToolbar: '0',
-//     videoResizing: false,
-//     imageWidth: 150,
-//     placeholder: 'Start typing something...'
-//     // fullPage: true,
-    
-// });
 
 window.sun_destroy1 = function () {
     s1.destroy()
 
-    // s1.setDefaultStyle('height: auto; font-family: cursive; font-size: 10px; width:300px;');
-
-    // s1.setContents('<!DOCTYPE html>'+
-    // '<html lang="en">'+
-    // '<head>'+
-    //     '<meta charset="UTF-8">'+
-    //     '<meta name="viewport" content="width=device-width, initial-scale=1">'+
-    //     '<meta name="author" content="https://github.com/JiHong88" />'+
-    //     '<meta name="description" content="Pure javascript wysiwyg web editor" /> <!-- meta comment -->'+
-    // '<style>'+
-    // '/* css comment goes here */'+
-    // '</style>'+
-    // '</head>'+
-    // '<body>'+
-    // '<!-- html comment goes here -->'+
-
-    // '</body>'+
-    // '</html>')
 }
 
 window.sun_create1 = function () {
     // s1.destroy();
     s1 = suneditor.create('editor', {
-        plugins: [align, plugins.link],
         buttonList: [['align', 'link', 'bold', 'underline', 'italic', 'strike', 'removeFormat', 'codeView']],
         width: '100%',
         height: 'auto'
@@ -371,22 +96,7 @@ s1.onKeyDown = function (e, core) {
 }
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
-    // value: `Let $\Omega$ be the underlying randomness space. In this case, the variables $X^-$ and $X^+$ collapse to $U$. To see why, pick an arbitrary $\omega \in \Omega$:
-    // \begin{align*}X^-(\Omega) = \sup\left\{y\in [0,1]: F(y)<U(\omega)\right\} = \sup\left\{y\in [0,1]: P(U\leq y)<U(\omega)\right\} = \sup\left\{y\in [0,1]: y<U(\omega)\right\} = U(\omega).\end{align*}`,
-    // value: `
-    // <h1>header111</h1>
-    // <p>fdafds</p>
-    // <h2>header22222</h2>
-    // <p>fdafds13fsoiph</p>
-    // <h3>header--33333</h3>
-    // <p>fd23584jkfsoiph</p>
-    // <p>fdaf5555oiph</p>
-    // <p>102389kjfsaph</p>
-    // `,
-    // value: `
-    // <p>​<strong><span style="color: rgb(255, 94, 0);">SunEditor</span></strong>&nbsp;<em><span style="background-color: rgb(250, 237, 125);">distributed under</span></em>&nbsp;the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a>&nbsp;license.<br>
-    // </p>
-    // `,
+    
     lineAttrReset: '*',
     alignItems: ['left', 'right', 'center'],
     value: `<p>ss&nbsp; fdf fdsfa fds</p>
@@ -398,7 +108,6 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     `,
     linkTargetNewWindow: true,
     imageAlignShow: false,
-    plugins: {...{custom_container}, ...plugins},
     katex: Katex,
     codeMirror: CodeMirror,
     // value: '<html bgcolor="e4e4e4"><p><meta content="text/html; charset=utf-8"http-equiv="Content-Type"><title>Postman</title><p><body bgcolor="e4e4e4"style="margin:0;padding:0"><p><table cellpadding="0"cellspacing="0"width="100%"bgcolor="e4e4e4"><tr><td><p><table cellpadding="20"cellspacing="0"align="center"id="top-message"width="600"><tr><td><table cellpadding="10"cellspacing="0"align="center"id="header"><tr><td bgcolor="434343"width="570"><table cellpadding="0"cellspacing="0"align="center"id="content-1"><tr><td width="100"valign="top"><table cellpadding="5"cellspacing="0"><tr><td bgcolor="434343"><img src="https://www.guidovisser.com/bell-small.png"></table><td width="370"><h1 style="font-family:Arial,Helvetica Neue,Helvetica,sans-serif;font-size:30px;padding-top:25px;color:#fff">Awesome HTML Email Template</h1><td width="100"valign="top"colspan="3"><table cellpadding="5"cellspacing="0"><tr><td bgcolor="434343"><img src="https://www.guidovisser.com/pixel.png"></table></table><!-- content 1 --><tr><td bgcolor="ffffff"width="570"style="font-family:Arial,Helvetica Neue,Helvetica,sans-serif">TEST TEXT<tr><td bgcolor="434343"width="570"><p><table cellpadding="10"cellspacing="0"width="100%"><tr><td bgcolor="434343"><tr><td style="color:#fff;font-family:Arial,Helvetica Neue,Helvetica,sans-serif"align="center"cellspacing="10"><!-- <a href="https://guidovisser.com" style="background-color: #D2694B; color: #ffffff; height:25px; text-decoration: none;">Go to Test Testing</a> --><!-- <a href="$(SELFRESLINK)" style="background-color: #D2694B;color: #ffffff; text-decoration: none;">Go to Henk Henken</a> --><!--[if mso]><v:roundrect xmlns_v="urn:schemas-microsoft-com:vml"xmlns_w="urn:schemas-microsoft-com:office:word"href="https://guidovisser.com"style="height:36px;v-text-anchor:middle;width:200px"arcsize="5%"strokecolor="#D2694B"fillcolor="#D2694B"><w:anchorlock><center style="color:#fff;font-family:Helvetica,Arial,sans-serif">I am a button →</center></v:roundrect><![endif]--> <a href="https://guidovisser.com"style="background-color:#d2694b;border:1px solid #d2694b;border-radius:3px;color:#fff;display:inline-block;font-family:sans-serif;line-height:44px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;mso-hide:all">Go to Test</a><td style="color:#fff;font-family:Arial,Helvetica Neue,Helvetica,sans-serif"align="center"cellpadding="10"><!--[if mso]><v:roundrect xmlns_v="urn:schemas-microsoft-com:vml"xmlns_w="urn:schemas-microsoft-com:office:word"href="$(SELFRESLINK)"style="height:36px;v-text-anchor:middle;width:200px"arcsize="5%"strokecolor="#D2694B"fillcolor="#D2694B"><w:anchorlock><center style="color:#fff;font-family:Helvetica,Arial,sans-serif">I am a button →</center></v:roundrect><![endif]--> <a href="https://guidovisser.com"style="background-color:#d2694b;border:1px solid #d2694b;border-radius:3px;color:#fff;display:inline-block;font-family:sans-serif;line-height:44px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;mso-hide:all">Go to test 2</a></table><tr><td bgcolor="434343"width="570"style="color:#fff"><p><table cellpadding="5"cellspacing="0"><tr><td bgcolor="434343"><img src="https://www.guidovisser.com/bell-small.png"><td style="font-family:Arial,Helvetica Neue,Helvetica,sans-serif;color:#fff;font-size:12px;padding-top:22px"valign="top"><p><p>Test footer<p>If you need support, contact: <a href="mailto:notexistingaddress@guidovisser.com?subject=Contact Support"style="color:#fff;text-decoration:underline">notexistingaddress@guidovisser.com</a><p>This email is automatically generated, replying has no use.</table></p><!-- header --><!-- header --><!-- top message --><p><!-- wrapper --><p><p>',
@@ -458,7 +167,6 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     //     italic: 'u'
     // },
     tableCellControllerPosition: 'top',
-    // lang: lang.fr,
     // value: '',
     // imageAccept: "*",
     // videoAccept: "*",
@@ -725,9 +433,6 @@ window.sun_noticeClose = function () {
     // ss.noticeClose();
     // ss.setContents('<div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" data-size="," data-align="none" data-percentage="auto,auto" data-index="0" data-file-name="Tabby" data-file-size="0" origin-size="640,404" data-origin="," style=""></figure></div>')
     // ss.setContents('<span class="__se__katex katex" data-exp="\\\\tilde{a}" data-font-size="1em" style="font-size: 1em;" contenteditable="false"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>a</mi><mo>~</mo></mover></mrow><annotation encoding="application/x-tex">\\tilde{a}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6678599999999999em;vertical-align:0em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6678599999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">a</span></span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">~</span></span></span></span></span></span></span></span></span></span>​​')
-    // ss.core.plugins.image.onRender_imgUrl.call(ss.core, 'http://suneditor.com/docs/cat.jpg');
-    // ss.core.plugins.video.setup_url.call(ss.core, 'http://suneditor.com/docs/cat.jpg');
-    ss.core.plugins.audio.setupUrl.call(ss.core, 'http://suneditor.com/docs/cat.jpg');
 }
 
 window.sun_save = function () {
@@ -808,77 +513,16 @@ window.sun_destroy = function () {
 }
 
 window.sun_create = function () {
-    // ss = suneditor.create('editor1', {
-    //     plugins: plugins,
-    //     height: 148
-    // });
     console.log("langlang")
-    ss.setOptions({
-        lang: lang.ko
-    })
-
-    // ss.core.commandHandler(null, 'selectAll');
-    // ss.core.removeNode();
 }
 
 
 const editor = suneditor.init({
-    plugins: [
-        plugins.hiliteColor,
-        plugins.align,
-        plugins.horizontalRule,
-        plugins.list,
-        plugins.table,
-        plugins.link,
-        custom_plugin_submenu
-    ],
     width: '100%',
     // iframe: true,
 });
 
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
-    buttonList: [
-        ['undo', 'redo'],
-        ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
-        ['bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
-        ['removeFormat'],
-        ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save'],
-        ['-right', ':r-More Rich-default.more_plus', 'horizontalRule', 'list', 'table'],
-        ['-right', 'image', 'video', 'audio', 'link'],
-        // (min-width: 992)
-        ['%1100', [
-            ['undo', 'redo'],
-            ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
-            ['bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
-            ['removeFormat'],
-            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
-            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
-        ]],
-        ['%870', [
-            ['undo', 'redo'],
-            ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
-            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
-            ['removeFormat'],
-            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
-            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
-        ]],
-        ['%660', [
-            ['undo', 'redo'],
-            [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
-            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
-            ['removeFormat'],
-            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
-            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
-        ]],
-        ['%335', [
-            ['undo', 'redo'],
-            [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
-            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat'],
-            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
-            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
-        ]],
-    ],
-    plugins: plugins,
     // value: 'abc',
     minHeight : 300,
     charCounter: true,
@@ -897,55 +541,17 @@ s2.onResizeEditor = (height, prevHeight, core) => {
     console.log("core", core)
 }
 
-// plugins.mention.getItems = async term => 
-//   [
-//     {name: 'auser1'},
-//     {name: 'buser2'},
-//     {name: 'cuser2'},
-//   ].filter(u => u.name.includes(term));
-
-// plugins.mention.getValue = ({ name }) => `@${name}`;
-// plugins.mention.getId = ({ name }) => name;
-// plugins.mention.renderItem = ({name}) => `<span>${name}</span>`;
-
-// s2.core.callPlugin('mention');
-// s2.onKeyDown = e => {
-//   if (e.key === '@') {
-//     s2.core.context.mention.open();
-//     e.preventDefault();
-//     e.stopPropagation();
-//   }
-// }
 
 const newOption = {
     mode: 'balloon',
     iframe: false,
-    plugins: plugins,
     // defaultStyle: 'height: 200px;',
-    fontSize: fs,
     height: 150,
     textSizeUnit: 'pt',
-    buttonList: [
-        ['undo', 'redo'],
-        ['font', 'fontSize', 'formatBlock'],
-        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        ['removeFormat'],
-        ['fontColor', 'hiliteColor'],
-        ['outdent', 'indent'],
-        ['align', 'horizontalRule', 'list', 'table'],
-        ['link', 'image', 'video'],
-        ['fullScreen', 'showBlocks', 'codeView'],
-        ['preview', 'print'],
-        ['save'],
-    ],
-    colorList: [
-        ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown'],
-        ['SlateGray', 'BurlyWood', 'DeepPink', 'FireBrick', 'Gold', 'SeaGreen']
-    ],
+    
     placeholder: 'Placeholder...'
 }
 const newOption2 = {
-    plugins: [plugins.align],
     mode: 'classic',
     toolbarContainer: document.getElementById('test_tool'),
     maxHeight: '400px',
@@ -959,12 +565,6 @@ const newOption2 = {
 const newOption3 = {
     mode: 'inline',
     minHeight: '300px',
-    colorList: [
-        ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown']
-    ],
-    buttonList: [
-        ['fontColor', 'hiliteColor']
-    ]
 }
 
 let imageList = [];
@@ -1120,15 +720,15 @@ window.sun_setOptions2 = function () {
     //     placeholder: 'fdsfda',
     //     buttonList: []
     // });
-    s2.core.commandHandler(null, 'copy');
+    s2.core.commandHandler('copy');
 }
 
 window.sun_setOptions3 = function () {
     // s2.setOptions(newOption2);
-    s2.core.commandHandler(null, 'cut');
+    s2.core.commandHandler('cut');
 }
 window.sun_setOptions4 = function () {
-    s2.core.commandHandler(null, 'paste');
+    s2.core.commandHandler('paste');
     // s2.setOptions(newOption3);
 }
 
@@ -1147,11 +747,7 @@ window.sun_create2 = function () {
 }
 
 let s3 = editor.create(document.getElementsByName('editor3')[0], {
-    buttonList: [
-        [plugins.formatBlock, 'align', 'horizontalRule', 'list', 'table', 'codeView', plugins.image, plugins.video, plugins.link, plugins.link, plugins.fontColor, plugins.hiliteColor, plugins.fontSize],
-    ],
     mode: 'balloon-always',
-    lang: ko,
     width: '100%',
     height: '500px',
     stickyToolbar: false,
@@ -1189,18 +785,7 @@ window.sun_create4 = function() {
     })
     win.document.write('<textarea name="editor4" id="editor4" style="width: 1080px; height: 200px;"></textarea>');
     s4 = suneditor.create(win.document.querySelector('#editor4'), {
-        plugins: plugins,
-        buttonList: [
-            ['undo', 'redo','removeFormat',
-            'font', 'fontSize', 'formatBlock',
-            'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
-            'fontColor', 'hiliteColor',
-            'outdent', 'indent',
-            'align', 'horizontalRule', 'list', 'table',
-            'link', 'image', 'video',
-            'fullScreen', 'showBlocks', 'codeView',
-            'preview', 'print', 'save']
-        ],
+        
         width: '100%',
         stickyToolbar: 0,
         imageWidth: 300,

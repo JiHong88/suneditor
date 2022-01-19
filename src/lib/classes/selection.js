@@ -73,7 +73,7 @@ Selection.prototype = {
 			range = this._createDefaultRange();
 		}
 
-		if (domUtils.isFormatElement(range.endContainer) && range.endOffset === 0) {
+		if (this.format.isLine(range.endContainer) && range.endOffset === 0) {
 			range = this.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.length);
 		}
 
@@ -159,7 +159,7 @@ Selection.prototype = {
 
 		selection.addRange(range);
 		this._rangeInfo(range, this.get());
-		if (options.iframe) this.__focus();
+		if (this.options.iframe) this.__focus();
 
 		return range;
 	},

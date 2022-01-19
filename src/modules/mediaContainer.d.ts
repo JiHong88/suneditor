@@ -1,4 +1,4 @@
-import { Module } from '../Module';
+import { Module } from "../Module";
 
 declare interface component extends Module {
     /**
@@ -7,13 +7,13 @@ declare interface component extends Module {
      * @param className Class name of container (fixed: se-component)
      * @returns Created container element
      */
-    set_container(cover: Element, className: string): Element;
+    setContainer(cover: Element, className: string): Element;
 
     /**
      * @description Cover the target element with a FIGURE element.
      * @param element Target element
      */
-    set_cover(element: Element): void;
+    setCover(element: Element): void;
 
     /**
      * @description Return HTML string of caption(FIGCAPTION) element

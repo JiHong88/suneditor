@@ -475,7 +475,7 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
         indentSize: 25,
         tabSize: 4,
         codeIndentSize: 2,
-        minResizingSize: numbers.getNumber((context.element.wysiwygFrame.style.minHeight || "65"), 0),
+        minResizingSize: numbers.get((context.element.wysiwygFrame.style.minHeight || "65"), 0),
         currentNodes: [],
         currentNodesMap: [],
         _range: null,
@@ -504,9 +504,10 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
 
     // init
     if (options.iframe) {
+        const inst = this;
         contextEl.wysiwygFrame.addEventListener("load", function () {
             converter._setIframeDocument(this, options);
-            this._editorInit(false, options.value);
+            inst._editorInit(false, options.value);
             options.value = null;
         });
     }
@@ -1088,7 +1089,7 @@ Core.prototype = {
             }
         } // default command
         else if (command) {
-            this.commandHandler(target, command);
+            this.commandHandler(command, target);
         }
 
         if (/submenu/.test(display)) {
@@ -1158,7 +1159,7 @@ Core.prototype = {
                 this.history.redo();
                 break;
             case 'removeFormat':
-                this.selection.removeStyleNode();
+                this.format.removeStyleNode();
                 this.focus();
                 break;
             case 'print':
@@ -1168,7 +1169,7 @@ Core.prototype = {
                 this.preview();
                 break;
             case 'showBlocks':
-                this.setDisplayBlocks(!domUtils.hasClass(wysiwyg, 'se-show-block'));
+                this.setDisplayBlocks(!domUtils.hasClass(this.context.element.wysiwyg, 'se-show-block'));
                 break;
             case 'dir':
                 this.setDir(options.rtl ? 'ltr' : 'rtl');
@@ -1230,7 +1231,7 @@ Core.prototype = {
      */
     setCodeView: function (value) {
         this.controllersOff();
-        domUtils.setDisabled(!value, this.codeViewDisabledButtons);
+        domUtils.setDisabled(value, this.codeViewDisabledButtons);
 
         if (!value) {
             if (!domUtils.isNonEditable(this.context.element.wysiwygFrame)) this._setCodeDataToEditor();
@@ -1269,7 +1270,7 @@ Core.prototype = {
             this.status._wysiwygOriginCssText = this.status._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 
             if (this.status.isFullScreen) this.context.element.code.style.height = '100%';
-            else if (options.height === 'auto' && !options.codeMirrorEditor) this.context.element.code.style.height = this.context.element.code.scrollHeight > 0 ? (this.context.element.code.scrollHeight + 'px') : 'auto';
+            else if (this.options.height === 'auto' && !this.options.codeMirrorEditor) this.context.element.code.style.height = this.context.element.code.scrollHeight > 0 ? (this.context.element.code.scrollHeight + 'px') : 'auto';
 
             if (this.options.codeMirrorEditor) this.options.codeMirrorEditor.refresh();
 
@@ -1442,7 +1443,7 @@ Core.prototype = {
             topArea.style.cssText = _var._originCssText;
             this._d.body.style.overflow = _var._bodyOverflow;
 
-            if (options.height === 'auto' && !options.codeMirrorEditor) this._codeViewAutoHeight();
+            if (this.options.height === 'auto' && !this.options.codeMirrorEditor) this._codeViewAutoHeight();
 
             if (!!this.options.toolbarContainer) this.options.toolbarContainer.appendChild(toolbar);
 
@@ -1603,7 +1604,7 @@ Core.prototype = {
         const rtl = dir === 'rtl';
         const changeDir = this._prevRtl !== rtl;
         const el = this.context.element;
-        const tool = this.context.tool;
+        const buttons = this.context.buttons;
         this._prevRtl = this.options.rtl = rtl;
 
         if (changeDir) {
@@ -1612,8 +1613,8 @@ Core.prototype = {
                 this.plugins.align.exchangeDir.call(this);
             }
             // indent buttons
-            if (tool.indent) domUtils.changeElement(tool.indent.firstElementChild, icons.indent);
-            if (tool.outdent) domUtils.changeElement(tool.outdent.firstElementChild, icons.outdent);
+            if (buttons.indent) domUtils.changeElement(buttons.indent.firstElementChild, icons.indent);
+            if (buttons.outdent) domUtils.changeElement(buttons.outdent.firstElementChild, icons.outdent);
         }
 
         if (rtl) {
@@ -1644,19 +1645,19 @@ Core.prototype = {
         }
 
 
-        if (tool.dir) {
-            domUtils.changeTxt(tool.dir.querySelector('.se-tooltip-text'), this.lang.toolbar[options.rtl ? 'dir_ltr' : 'dir_rtl']);
-            domUtils.changeElement(tool.dir.firstElementChild, icons[this.options.rtl ? 'dir_ltr' : 'dir_rtl']);
+        if (buttons.dir) {
+            domUtils.changeTxt(buttons.dir.querySelector('.se-tooltip-text'), this.lang.toolbar[options.rtl ? 'dir_ltr' : 'dir_rtl']);
+            domUtils.changeElement(buttons.dir.firstElementChild, icons[this.options.rtl ? 'dir_ltr' : 'dir_rtl']);
         }
 
-        if (tool.dir_ltr) {
-            if (rtl) domUtils.removeClass(tool.dir_ltr, 'active');
-            else domUtils.addClass(tool.dir_ltr, 'active');
+        if (buttons.dir_ltr) {
+            if (rtl) domUtils.removeClass(buttons.dir_ltr, 'active');
+            else domUtils.addClass(buttons.dir_ltr, 'active');
         }
 
-        if (tool.dir_rtl) {
-            if (rtl) domUtils.addClass(tool.dir_rtl, 'active');
-            else domUtils.removeClass(tool.dir_rtl, 'active');
+        if (buttons.dir_rtl) {
+            if (rtl) domUtils.addClass(buttons.dir_rtl, 'active');
+            else domUtils.removeClass(buttons.dir_rtl, 'active');
         }
     },
 
@@ -1903,9 +1904,9 @@ Core.prototype = {
      * @description Gets the clean HTML code for editor
      * @param {string} html HTML string
      * @param {String|RegExp|null} whitelist Regular expression of allowed tags.
-     * RegExp object is create by converter.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
+     * RegExp object is create by helper.converter.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
      * @param {String|RegExp|null} blacklist Regular expression of disallowed tags.
-     * RegExp object is create by util.createTagsBlacklist method. (core.pasteTagsBlacklistRegExp)
+     * RegExp object is create by helper.converter.createTagsBlacklist method. (core.pasteTagsBlacklistRegExp)
      * @returns {string}
      */
     cleanHTML: function (html, whitelist, blacklist) {
@@ -1953,8 +1954,8 @@ Core.prototype = {
         if (!cleanHTML) {
             cleanHTML = html;
         } else {
-            if (whitelist) cleanHTML = cleanHTML.replace(typeof whitelist === 'string' ? util.createTagsWhitelist(whitelist) : whitelist, '');
-            if (blacklist) cleanHTML = cleanHTML.replace(typeof blacklist === 'string' ? util.createTagsBlacklist(blacklist) : blacklist, '');
+            if (whitelist) cleanHTML = cleanHTML.replace(typeof whitelist === 'string' ? converter.createTagsWhitelist(whitelist) : whitelist, '');
+            if (blacklist) cleanHTML = cleanHTML.replace(typeof blacklist === 'string' ? converter.createTagsBlacklist(blacklist) : blacklist, '');
         }
 
         return this._tagConvertor(cleanHTML);
@@ -1994,7 +1995,7 @@ Core.prototype = {
         for (let i = 0, t, p; i < domTree.length; i++) {
             t = domTree[i];
             if (!this.format.isLine(t) && !this.component.is(t) && !domUtils.isMedia(t)) {
-                if (!p) p = domUtils.createElement(options.defaultTag);
+                if (!p) p = domUtils.createElement(this.options.defaultTag);
                 p.appendChild(t);
                 i--;
                 if (domTree[i + 1] && !this.format.isLine(domTree[i + 1])) {
@@ -2048,7 +2049,7 @@ Core.prototype = {
                     continue;
                 }
                 if (node.nodeType === 3) {
-                    if (!util.isList(node.parentElement)) returnHTML += converter.htmlToEntity(/^\n+$/.test(node.data) ? "" : node.data);
+                    if (!domUtils.isList(node.parentElement)) returnHTML += converter.htmlToEntity(/^\n+$/.test(node.data) ? "" : node.data);
                     continue;
                 }
                 if (node.childNodes.length === 0) {
@@ -2385,9 +2386,14 @@ Core.prototype = {
      * @private
      */
     _init: function (reload, _initHTML) {
-        const wRegExp = _w.RegExp;
+        const _w = this._w;
+        const options = this.options;
+        const context = this.context;
+        const plugins = this.plugins;
+        const wRegExp = this._w.RegExp;
+        
         this._ww = options.iframe ? context.element.wysiwygFrame.contentWindow : _w;
-        this._wd = _d;
+        this._wd = this._d;
         this._charTypeHTML = options.charCounterType === 'byte-html';
         this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
 
@@ -2427,11 +2433,11 @@ Core.prototype = {
         this._htmlCheckWhitelistRegExp = new wRegExp('^(' + getRegList(options._editorTagsWhitelist.replace('|//', ''), '') + ')$', 'i');
         this._htmlCheckBlacklistRegExp = new wRegExp('^(' + (options.tagsBlacklist || '^') + ')$', 'i');
         // tags
-        this.editorTagsWhitelistRegExp = util.createTagsWhitelist(getRegList(options._editorTagsWhitelist.replace('|//', '|<!--|-->'), ''));
-        this.editorTagsBlacklistRegExp = util.createTagsBlacklist(options.tagsBlacklist.replace('|//', '|<!--|-->'));
+        this.editorTagsWhitelistRegExp = converter.createTagsWhitelist(getRegList(options._editorTagsWhitelist.replace('|//', '|<!--|-->'), ''));
+        this.editorTagsBlacklistRegExp = converter.createTagsBlacklist(options.tagsBlacklist.replace('|//', '|<!--|-->'));
         // paste tags
-        this.pasteTagsWhitelistRegExp = util.createTagsWhitelist(getRegList(options.pasteTagsWhitelist, ''));
-        this.pasteTagsBlacklistRegExp = util.createTagsBlacklist(options.pasteTagsBlacklist);
+        this.pasteTagsWhitelistRegExp = converter.createTagsWhitelist(getRegList(options.pasteTagsWhitelist, ''));
+        this.pasteTagsBlacklistRegExp = converter.createTagsBlacklist(options.pasteTagsBlacklist);
         // attributes
         const regEndStr = '\\s*=\\s*(\")[^\"]*\\1';
         const _wAttr = options.attributesWhitelist;
@@ -2439,7 +2445,7 @@ Core.prototype = {
         let allAttr = '';
         if (!!_wAttr) {
             for (let k in _wAttr) {
-                if (!util.hasOwn(_wAttr, k) || /^on[a-z]+$/i.test(_wAttr[k])) continue;
+                if (!_wAttr.hasOwnProperty(k) || /^on[a-z]+$/i.test(_wAttr[k])) continue;
                 if (k === 'all') {
                     allAttr = getRegList(_wAttr[k], defaultAttr);
                 } else {
@@ -2457,7 +2463,7 @@ Core.prototype = {
         allAttr = '';
         if (!!_bAttr) {
             for (let k in _bAttr) {
-                if (!util.hasOwn(_bAttr, k)) continue;
+                if (!_bAttr.hasOwnProperty(k)) continue;
                 if (k === 'all') {
                     allAttr = getRegList(_bAttr[k], '');
                 } else {
@@ -2496,7 +2502,7 @@ Core.prototype = {
         let filePluginRegExp = [];
         let plugin, button;
         for (let key in plugins) {
-            if (!util.hasOwn(plugins, key)) continue;
+            if (!plugins.hasOwnProperty(key)) continue;
             plugin = plugins[key];
             button = pluginCallButtons[key];
             if (plugin.active && button) {
@@ -2529,7 +2535,7 @@ Core.prototype = {
         this._fileManager.pluginRegExp = new wRegExp('^(' + (filePluginRegExp.length === 0 ? 'undefined' : filePluginRegExp.join('|')) + ')$', 'i');
 
         // cache editor's element
-        this._variable._originCssText = context.element.topArea.style.cssText;
+        this.status._originCssText = context.element.topArea.style.cssText;
         this._placeholder = context.element.placeholder;
         this._lineBreaker = context.element.lineBreaker;
         this._lineBreakerButton = this._lineBreaker.querySelector('button');
@@ -2559,9 +2565,6 @@ Core.prototype = {
         this.events = new Events(this);
         this.eventManager = new EventManager(this);
         this.notice = new Notice(this);
-
-        // register notice module
-        this.addModule([_notice]);
 
         // Init, validate
         if (options.iframe) {
@@ -2680,7 +2683,7 @@ Core.prototype = {
      * @private
      */
     _setOptionsInit: function (el, _initHTML) {
-        this.context = Context(el.originElement, this._getConstructed(el)); //@todo context don't reset
+        this.context = Context(el.originElement, this._getConstructed(el), this.options); //@todo context don't reset
         this._componentsInfoReset = true;
         this._editorInit(true, _initHTML);
     },
@@ -2814,17 +2817,17 @@ function CleanTags(lowLevelCheck, m, t) {
         if (!v) v = [];
         if (sv) {
             w = sv[0].match(/width:(.+);/);
-            w = numbers.getNumber(w ? w[1] : '', -1) || '';
+            w = numbers.get(w ? w[1] : '', -1) || '';
             h = sv[0].match(/height:(.+);/);
-            h = numbers.getNumber(h ? h[1] : '', -1) || '';
+            h = numbers.get(h ? h[1] : '', -1) || '';
         }
 
         if (!w || !h) {
             const avw = m.match(/width\s*=\s*((?:"|')[^"']*(?:"|'))/);
             const avh = m.match(/height\s*=\s*((?:"|')[^"']*(?:"|'))/);
             if (avw || avh) {
-                w = !w ? numbers.getNumber(avw ? avw[1] : '') || '' : w;
-                h = !h ? numbers.getNumber(avh ? avh[1] : '') || '' : h;
+                w = !w ? numbers.get(avw ? avw[1] : '') || '' : w;
+                h = !h ? numbers.get(avh ? avh[1] : '') || '' : h;
             }
         }
         v.push('data-origin="' + (w + ',' + h) + '"');

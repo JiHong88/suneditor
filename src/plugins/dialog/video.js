@@ -8,7 +8,7 @@
 'use strict';
 
 import dialog from '../modules/dialog';
-import component from '../modules/component';
+import mediaContainer from '../modules/mediaContainer';
 import resizing from '../modules/resizing';
 import fileManager from '../modules/fileManager';
 
@@ -16,7 +16,7 @@ export default {
     name: 'video',
     display: 'dialog',
     add: function (core) {
-        core.addModule([dialog, component, resizing, fileManager]);
+        core.addModule([dialog, mediaContainer, resizing, fileManager]);
 
         const options = core.options;
         const context = core.context;
@@ -32,7 +32,7 @@ export default {
             _videoRatio: (options.videoRatio * 100) + '%',
             _defaultRatio: (options.videoRatio * 100) + '%',
             _linkValue: '',
-            // @require @Override component
+            // @require @Override mediaContainer
             _element: null,
             _cover: null,
             _container: null,
@@ -585,8 +585,8 @@ export default {
             init = true;
             oFrame.src = src;
             contextVideo._element = oFrame;
-            cover = this.plugins.component.set_cover.call(this, oFrame);
-            container = this.plugins.component.set_container.call(this, cover, 'se-video-container');
+            cover = this.plugins.mediaContainer.setCover.call(this, oFrame);
+            container = this.plugins.mediaContainer.setContainer.call(this, cover, 'se-video-container');
         }
 
         /** rendering */
@@ -650,8 +650,8 @@ export default {
 
         const prevFrame = oFrame;
         contextVideo._element = oFrame = oFrame.cloneNode(true);
-        const cover = contextVideo._cover = this.plugins.component.set_cover.call(this, oFrame);
-        const container = contextVideo._container = this.plugins.component.set_container.call(this, cover, 'se-video-container');
+        const cover = contextVideo._cover = this.plugins.mediaContainer.setCover.call(this, oFrame);
+        const container = contextVideo._container = this.plugins.mediaContainer.setContainer.call(this, cover, 'se-video-container');
 
         try {
             const figcaption = existElement.querySelector('figcaption');

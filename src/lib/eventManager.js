@@ -118,7 +118,7 @@ EventManager.prototype = {
 			if (this.format.isLine(element)) {
 				/* Outdent */
 				if (commandMapNodes.indexOf("OUTDENT") === -1 && commandMap.OUTDENT && !domUtils.isImportantDisabled(commandMap.OUTDENT)) {
-					if (domUtils.isListCell(element) || (element.style[marginDir] && numbers.getNumber(element.style[marginDir], 0) > 0)) {
+					if (domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0)) {
 						commandMapNodes.push("OUTDENT");
 						commandMap.OUTDENT.removeAttribute("disabled");
 					}
@@ -1675,7 +1675,7 @@ function OnMouseDown_resizingBar(e) {
 	this.__core.submenuOff();
 	this.__core.controllersOff();
 
-	const prevHeight = numbers.getNumber(this.context.element.wysiwygFrame.style.height, 0);
+	const prevHeight = numbers.get(this.context.element.wysiwygFrame.style.height, 0);
 	this.status.resizeClientY = e.clientY;
 	this.context.element.resizeBackground.style.display = "block";
 
@@ -1683,7 +1683,7 @@ function OnMouseDown_resizingBar(e) {
 		this.context.element.resizeBackground.style.display = "none";
 		_d.removeEventListener("mousemove", event._resize_editor);
 		_d.removeEventListener("mouseup", closureFunc);
-		if (typeof this.events.onResizeEditor === "function") this.events.onResizeEditor(numbers.getNumber(this.context.element.wysiwygFrame.style.height, 0), prevHeight);
+		if (typeof this.events.onResizeEditor === "function") this.events.onResizeEditor(numbers.get(this.context.element.wysiwygFrame.style.height, 0), prevHeight);
 	}
 
 	_d.addEventListener("mousemove", event._resize_editor);

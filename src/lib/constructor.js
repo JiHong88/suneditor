@@ -413,10 +413,10 @@ export default {
         options.lineAttrReset = typeof options.lineAttrReset === 'string' && options.lineAttrReset ? options.lineAttrReset === '*' ? '*' : new RegExp('^(' + options.lineAttrReset + ')$', 'i') : null;
         options._editableClass = 'sun-editor-editable' + (options.rtl ? ' se-rtl' : '');
         options._printClass = typeof options._printClass === 'string' ? options._printClass : null;
-        options.toolbarWidth = options.toolbarWidth ? (numbers.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
+        options.toolbarWidth = options.toolbarWidth ? (numbers.is(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
         options.toolbarContainer = typeof options.toolbarContainer === 'string' ? document.querySelector(options.toolbarContainer) : options.toolbarContainer;
-        options.stickyToolbar = (/balloon/i.test(options.mode) || !!options.toolbarContainer) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? numbers.getNumber(options.stickyToolbar, 0) : -1);
-        options.fullScreenOffset = options.fullScreenOffset === undefined ? 0 : (/^\d+/.test(options.fullScreenOffset) ? numbers.getNumber(options.fullScreenOffset, 0) : 0);
+        options.stickyToolbar = (/balloon/i.test(options.mode) || !!options.toolbarContainer) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? numbers.get(options.stickyToolbar, 0) : -1);
+        options.fullScreenOffset = options.fullScreenOffset === undefined ? 0 : (/^\d+/.test(options.fullScreenOffset) ? numbers.get(options.fullScreenOffset, 0) : 0);
         options.fullPage = !!options.fullPage;
         options.iframe = options.fullPage || !!options.iframe;
         options.iframeAttributes = options.iframeAttributes || {};
@@ -461,15 +461,15 @@ export default {
         options.charCounter = options.maxCharCount > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
         options.charCounterType = typeof options.charCounterType === 'string' ? options.charCounterType : 'char';
         options.charCounterLabel = typeof options.charCounterLabel === 'string' ? options.charCounterLabel.trim() : null;
-        options.maxCharCount = numbers.isNumber(options.maxCharCount) && options.maxCharCount > -1 ? options.maxCharCount * 1 : null;
+        options.maxCharCount = numbers.is(options.maxCharCount) && options.maxCharCount > -1 ? options.maxCharCount * 1 : null;
         /** Width size */
-        options.width = options.width ? (numbers.isNumber(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
-        options.minWidth = (numbers.isNumber(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
-        options.maxWidth = (numbers.isNumber(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
+        options.width = options.width ? (numbers.is(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
+        options.minWidth = (numbers.is(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
+        options.maxWidth = (numbers.is(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
         /** Height size */
-        options.height = options.height ? (numbers.isNumber(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
-        options.minHeight = (numbers.isNumber(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
-        options.maxHeight = (numbers.isNumber(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
+        options.height = options.height ? (numbers.is(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
+        options.minHeight = (numbers.is(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
+        options.maxHeight = (numbers.is(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
         /** Editing area default style */
         options.defaultStyle = typeof options.defaultStyle === 'string' ? options.defaultStyle : '';
         /** Defining menu items */
@@ -486,8 +486,8 @@ export default {
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
         options.imageHeightShow = options.imageHeightShow === undefined ? true : !!options.imageHeightShow;
         options.imageAlignShow = options.imageAlignShow === undefined ? true : !!options.imageAlignShow;
-        options.imageWidth = !options.imageWidth ? 'auto' : numbers.isNumber(options.imageWidth) ? options.imageWidth + 'px' : options.imageWidth;
-        options.imageHeight = !options.imageHeight ? 'auto' : numbers.isNumber(options.imageHeight) ? options.imageHeight + 'px' : options.imageHeight;
+        options.imageWidth = !options.imageWidth ? 'auto' : numbers.is(options.imageWidth) ? options.imageWidth + 'px' : options.imageWidth;
+        options.imageHeight = !options.imageHeight ? 'auto' : numbers.is(options.imageHeight) ? options.imageHeight + 'px' : options.imageHeight;
         options.imageSizeOnlyPercentage = !!options.imageSizeOnlyPercentage;
         options._imageSizeUnit = options.imageSizeOnlyPercentage ? '%' : 'px';
         options.imageRotation = options.imageRotation !== undefined ? options.imageRotation : !(options.imageSizeOnlyPercentage || !options.imageHeightShow);
@@ -495,7 +495,7 @@ export default {
         options.imageUrlInput = (options.imageUrlInput === undefined || !options.imageFileInput) ? true : options.imageUrlInput;
         options.imageUploadHeader = options.imageUploadHeader || null;
         options.imageUploadUrl = typeof options.imageUploadUrl === 'string' ? options.imageUploadUrl : null;
-        options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? numbers.getNumber(options.imageUploadSizeLimit, 0) : null;
+        options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? numbers.get(options.imageUploadSizeLimit, 0) : null;
         options.imageMultipleFile = !!options.imageMultipleFile;
         options.imageAccept = (typeof options.imageAccept !== 'string' || options.imageAccept.trim() === "*") ? 'image/*' : options.imageAccept.trim() || 'image/*';
         /** Image - image gallery */
@@ -506,31 +506,31 @@ export default {
         options.videoHeightShow = options.videoHeightShow === undefined ? true : !!options.videoHeightShow;
         options.videoAlignShow = options.videoAlignShow === undefined ? true : !!options.videoAlignShow;
         options.videoRatioShow = options.videoRatioShow === undefined ? true : !!options.videoRatioShow;
-        options.videoWidth = !options.videoWidth || !numbers.getNumber(options.videoWidth, 0) ? '' : numbers.isNumber(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth;
-        options.videoHeight = !options.videoHeight || !numbers.getNumber(options.videoHeight, 0) ? '' : numbers.isNumber(options.videoHeight) ? options.videoHeight + 'px' : options.videoHeight;
+        options.videoWidth = !options.videoWidth || !numbers.get(options.videoWidth, 0) ? '' : numbers.is(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth;
+        options.videoHeight = !options.videoHeight || !numbers.get(options.videoHeight, 0) ? '' : numbers.is(options.videoHeight) ? options.videoHeight + 'px' : options.videoHeight;
         options.videoSizeOnlyPercentage = !!options.videoSizeOnlyPercentage;
         options._videoSizeUnit = options.videoSizeOnlyPercentage ? '%' : 'px';
         options.videoRotation = options.videoRotation !== undefined ? options.videoRotation : !(options.videoSizeOnlyPercentage || !options.videoHeightShow);
-        options.videoRatio = (numbers.getNumber(options.videoRatio, 4) || 0.5625);
+        options.videoRatio = (numbers.get(options.videoRatio, 4) || 0.5625);
         options.videoRatioList = !options.videoRatioList ? null : options.videoRatioList;
         options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
         options.videoFileInput = !!options.videoFileInput;
         options.videoUrlInput = (options.videoUrlInput === undefined || !options.videoFileInput) ? true : options.videoUrlInput;
         options.videoUploadHeader = options.videoUploadHeader || null;
         options.videoUploadUrl = typeof options.videoUploadUrl === 'string' ? options.videoUploadUrl : null;
-        options.videoUploadSizeLimit = /\d+/.test(options.videoUploadSizeLimit) ? numbers.getNumber(options.videoUploadSizeLimit, 0) : null;
+        options.videoUploadSizeLimit = /\d+/.test(options.videoUploadSizeLimit) ? numbers.get(options.videoUploadSizeLimit, 0) : null;
         options.videoMultipleFile = !!options.videoMultipleFile;
         options.videoTagAttrs = options.videoTagAttrs || null;
         options.videoIframeAttrs = options.videoIframeAttrs || null;
         options.videoAccept = (typeof options.videoAccept !== 'string' || options.videoAccept.trim() === "*") ? 'video/*' : options.videoAccept.trim() || 'video/*';
         /** Audio */
-        options.audioWidth = !options.audioWidth ? '' : numbers.isNumber(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth;
-        options.audioHeight = !options.audioHeight ? '' : numbers.isNumber(options.audioHeight) ? options.audioHeight + 'px' : options.audioHeight;
+        options.audioWidth = !options.audioWidth ? '' : numbers.is(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth;
+        options.audioHeight = !options.audioHeight ? '' : numbers.is(options.audioHeight) ? options.audioHeight + 'px' : options.audioHeight;
         options.audioFileInput = !!options.audioFileInput;
         options.audioUrlInput = (options.audioUrlInput === undefined || !options.audioFileInput) ? true : options.audioUrlInput;
         options.audioUploadHeader = options.audioUploadHeader || null;
         options.audioUploadUrl = typeof options.audioUploadUrl === 'string' ? options.audioUploadUrl : null;
-        options.audioUploadSizeLimit = /\d+/.test(options.audioUploadSizeLimit) ? numbers.getNumber(options.audioUploadSizeLimit, 0) : null;
+        options.audioUploadSizeLimit = /\d+/.test(options.audioUploadSizeLimit) ? numbers.get(options.audioUploadSizeLimit, 0) : null;
         options.audioMultipleFile = !!options.audioMultipleFile;
         options.audioTagAttrs = options.audioTagAttrs || null;
         options.audioAccept = (typeof options.audioAccept !== 'string' || options.audioAccept.trim() === "*") ? 'audio/*' : options.audioAccept.trim() || 'audio/*';

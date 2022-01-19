@@ -1008,7 +1008,7 @@ Format.prototype = {
 		const cells = SetLineMargin(
 			lines,
 			this.status.indentSize,
-			options.rtl ? "marginRight" : "marginLeft"
+			this.options.rtl ? "marginRight" : "marginLeft"
 		);
 
 		// list cells
@@ -1017,7 +1017,7 @@ Format.prototype = {
 		}
 
 		this.effectNode = null;
-		this.setRange(sc, so, ec, eo);
+		this.selection.setRange(sc, so, ec, eo);
 
 		// history stack
 		this.history.push(false);
@@ -1038,7 +1038,7 @@ Format.prototype = {
 		const cells = SetLineMargin(
 			lines,
 			this.status.indentSize * -1,
-			options.rtl ? "marginRight" : "marginLeft"
+			this.options.rtl ? "marginRight" : "marginLeft"
 		);
 
 		// list cells
@@ -1047,7 +1047,7 @@ Format.prototype = {
 		}
 
 		this.effectNode = null;
-		this.setRange(sc, so, ec, eo);
+		this.selection.setRange(sc, so, ec, eo);
 
 		// history stack
 		this.history.push(false);
@@ -2810,6 +2810,7 @@ Format.prototype = {
 
 		// add tag
 		_removeCheck.v = false;
+		const inst = this;
 		const pNode = element.cloneNode(false);
 		const nNodeArray = [newInnerNode];
 		let noneChange = true;
@@ -3348,7 +3349,7 @@ function SetLineMargin(lines, size, dir) {
 	for (let i = 0, len = lines.length, f, margin; i < len; i++) {
 		f = lines[i];
 		if (!domUtils.isListCell(f)) {
-			margin = /\d+/.test(f.style[dir]) ? numbers.getNumber(f.style[dir], 0) : 0;
+			margin = /\d+/.test(f.style[dir]) ? numbers.get(f.style[dir], 0) : 0;
 			margin += size;
 			domUtils.setStyle(f, dir, margin <= 0 ? "" : margin + "px");
 		} else {

@@ -9,7 +9,7 @@
 
 import dialog from '../modules/dialog';
 import anchor from '../modules/_anchor';
-import component from '../modules/component';
+import mediaContainer from '../modules/mediaContainer';
 import resizing from '../modules/resizing';
 import fileManager from '../modules/fileManager';
 
@@ -17,7 +17,7 @@ export default {
     name: 'image',
     display: 'dialog',
     add: function (core) {
-        core.addModule([dialog, anchor, component, resizing, fileManager]);
+        core.addModule([dialog, anchor, mediaContainer, resizing, fileManager]);
         
         const options = core.options;
         const context = core.context;
@@ -34,7 +34,7 @@ export default {
             _v_src: {_linkValue: ''},
             svgDefaultSize: '30%',
             base64RenderIndex: 0,
-            // @require @Override component
+            // @require @Override mediaContainer
             _element: null,
             _cover: null,
             _container: null,
@@ -259,7 +259,7 @@ export default {
 
     /**
      * @Override core, fileManager, resizing
-     * @description It is called from core.component.select
+     * @description It is called from core.mediaContainer.select
      * @param {Element} element Target element
      */
     select: function (element) {
@@ -655,12 +655,12 @@ export default {
             oImg.setAttribute('data-proportion', contextImage._proportionChecked);
         }
 
-        const cover = this.plugins.component.set_cover.call(this, anchor);
-        const container = this.plugins.component.set_container.call(this, cover, 'se-image-container');
+        const cover = this.plugins.mediaContainer.setCover.call(this, anchor);
+        const container = this.plugins.mediaContainer.setContainer.call(this, cover, 'se-image-container');
 
         // caption
         if (contextImage._captionChecked) {
-            contextImage._caption = this.plugins.component.create_caption.call(this);
+            contextImage._caption = this.plugins.mediaContainer.create_caption.call(this);
             contextImage._caption.setAttribute('contenteditable', false);
             cover.appendChild(contextImage._caption);
         }
@@ -701,14 +701,14 @@ export default {
         if (cover === null) {
             isNewContainer = true;
             imageEl = contextImage._element.cloneNode(true);
-            cover = this.plugins.component.set_cover.call(this, imageEl);
+            cover = this.plugins.mediaContainer.setCover.call(this, imageEl);
         }
 
         if (container === null) {
             cover = cover.cloneNode(true);
             imageEl = cover.querySelector('img');
             isNewContainer = true;
-            container = this.plugins.component.set_container.call(this, cover, 'se-image-container');
+            container = this.plugins.mediaContainer.setContainer.call(this, cover, 'se-image-container');
         } else if (isNewContainer) {
             container.innerHTML = '';
             container.appendChild(cover);
@@ -734,7 +734,7 @@ export default {
         let modifiedCaption = false;
         if (contextImage._captionChecked) {
             if (!contextImage._caption) {
-                contextImage._caption = this.plugins.component.create_caption.call(this);
+                contextImage._caption = this.plugins.mediaContainer.create_caption.call(this);
                 cover.appendChild(contextImage._caption);
                 modifiedCaption = true;
             }

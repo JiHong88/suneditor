@@ -8,14 +8,14 @@
 'use strict';
 
 import dialog from '../modules/dialog';
-import component from '../modules/component';
+import mediaContainer from '../modules/mediaContainer';
 import fileManager from '../modules/fileManager';
 
 export default {
     name: 'audio',
     display: 'dialog',
     add: function (core) {
-        core.addModule([dialog, component, fileManager]);
+        core.addModule([dialog, mediaContainer, fileManager]);
 
         const context = core.context;
         const contextAudio = context.audio = {
@@ -27,7 +27,7 @@ export default {
             _origin_w: core.options.audioWidth,
             _origin_h: core.options.audioHeight,
             _linkValue: '',
-            // @require @Override component
+            // @require @Override mediaContainer
             _element: null,
             _cover: null,
             _container: null,
@@ -423,8 +423,8 @@ export default {
         // create new tag
         if (!isUpdate) {
             element.src = src;
-            const cover = this.plugins.component.set_cover.call(this, element);
-            const container = this.plugins.component.set_container.call(this, cover, '');
+            const cover = this.plugins.mediaContainer.setCover.call(this, element);
+            const container = this.plugins.mediaContainer.setContainer.call(this, cover, '');
             if (!this.component.insert(container, false, true, !this.options.mediaAutoSelect)) {
                 this.__core.focus();
                 return;
@@ -460,8 +460,8 @@ export default {
         // clone element
         const prevElement = element;
         contextAudio._element = element = element.cloneNode(false);
-        const cover = this.plugins.component.set_cover.call(this, element);
-        const container = this.plugins.component.set_container.call(this, cover, 'se-audio-container');
+        const cover = this.plugins.mediaContainer.setCover.call(this, element);
+        const container = this.plugins.mediaContainer.setContainer.call(this, cover, 'se-audio-container');
 
         try {
             if (this.util.isListCell(existElement) || this.util.isFormatElement(existElement)) {

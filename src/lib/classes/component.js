@@ -1,5 +1,5 @@
 /**
- * @fileoverview Event class
+ * @fileoverview Component class
  * @author JiHong Lee.
  */
 "use strict";

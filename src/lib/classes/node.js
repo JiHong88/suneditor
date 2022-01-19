@@ -7,7 +7,8 @@
 import CoreInterface from "../../interface/_core";
 import {
 	domUtils,
-	unicode
+	unicode,
+	env
 } from "../../helpers";
 
 const Node = function (editor) {
@@ -334,7 +335,7 @@ Node.prototype = {
 				current !== element &&
 				unicode.onlyZeroWidthSpace(current.textContent) &&
 				(!current.firstChild || !domUtils.isBreak(current.firstChild)) &&
-				!current.querySelector(_allowedEmptyNodeList)
+				!current.querySelector(env._allowedEmptyNodeList)
 			) {
 				if (current.parentNode) {
 					current.parentNode.removeChild(current);
