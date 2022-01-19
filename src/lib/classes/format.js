@@ -660,7 +660,7 @@ Format.prototype = {
 			};
 		}
 
-		this.effectNode = null;
+		this.__core.effectNode = null;
 		if (notHistoryPush) return edge;
 
 		if (!remove && edge) {
@@ -915,7 +915,7 @@ Format.prototype = {
 			}
 		}
 
-		this.effectNode = null;
+		this.__core.effectNode = null;
 		return originRange;
 	},
 
@@ -1015,7 +1015,7 @@ Format.prototype = {
 			this.format._applyNestedList(cells, true);
 		}
 
-		this.effectNode = null;
+		this.__core.effectNode = null;
 		this.selection.setRange(sc, so, ec, eo);
 
 		// history stack
@@ -1045,7 +1045,7 @@ Format.prototype = {
 			this.format._applyNestedList(cells, false);
 		}
 
-		this.effectNode = null;
+		this.__core.effectNode = null;
 		this.selection.setRange(sc, so, ec, eo);
 
 		// history stack

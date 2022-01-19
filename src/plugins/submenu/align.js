@@ -12,11 +12,14 @@ import {
     domUtils
 } from "../../helpers";
 
-function Align(editor, targetElement) {
+function align(editor, targetElement) {
     EditorInterface.call(this, editor);
-    this.name = "align";
     this.display = "submenu";
     this.targetElement = targetElement;
+
+    // create HTML
+    let listDiv = createHTML(editor, !editor.options.rtl);
+    let listUl = this._itemMenu = listDiv.querySelector('ul');
 
     // members
     this.currentAlign = "";
@@ -30,10 +33,6 @@ function Align(editor, targetElement) {
     };
     this._alignList = listUl.querySelectorAll('li button');
 
-    // create HTML
-    let listDiv = createHTML(editor, !editor.options.rtl);
-    let listUl = this._itemMenu = listDiv.querySelector('ul');
-
     // append target button menu
     editor.initMenuTarget(this.name, targetElement, listDiv);
 
@@ -42,26 +41,7 @@ function Align(editor, targetElement) {
     listDiv = null, listUl = null;
 }
 
-Align.prototype = {
-    /**
-     * @Override core
-     */
-    exchangeDir: function () {
-        const dir = this.options.rtl ? 'right' : 'left';
-        if (this.defaultDir === dir) return;
-
-        this.defaultDir = dir;
-        let menu = this._itemMenu;
-        let leftBtn = menu.querySelector('[data-value="left"]');
-        let rightBtn = menu.querySelector('[data-value="right"]');
-        if (leftBtn && rightBtn) {
-            const lp = leftBtn.parentElement;
-            const rp = rightBtn.parentElement;
-            lp.appendChild(rightBtn);
-            rp.appendChild(leftBtn);
-        }
-    },
-
+align.prototype = {
     /**
      * @Override core
      */
@@ -104,7 +84,26 @@ Align.prototype = {
         }
     },
 
-    constructor: Align
+    /**
+     * @Override core
+     */
+    exchangeDir: function () {
+        const dir = this.options.rtl ? 'right' : 'left';
+        if (this.defaultDir === dir) return;
+
+        this.defaultDir = dir;
+        let menu = this._itemMenu;
+        let leftBtn = menu.querySelector('[data-value="left"]');
+        let rightBtn = menu.querySelector('[data-value="right"]');
+        if (leftBtn && rightBtn) {
+            const lp = leftBtn.parentElement;
+            const rp = rightBtn.parentElement;
+            lp.appendChild(rightBtn);
+            rp.appendChild(leftBtn);
+        }
+    },
+
+    constructor: align
 }
 
 function action(e) {
@@ -134,10 +133,10 @@ function action(e) {
     this.history.push(false);
 }
 
-function createHTML(editor, leftDir) {
-    const lang = editor.lang;
-    const icons = editor.icons;
-    const alignItems = core.options.alignItems;
+function createHTML(__core) {
+    const lang = __core.lang;
+    const icons = __core.icons;
+    const alignItems = __core.options.alignItems;
 
     let html = '';
     for (let i = 0, item, text; i < alignItems.length; i++) {
@@ -145,9 +144,9 @@ function createHTML(editor, leftDir) {
         text = lang.toolbar['align' + item.charAt(0).toUpperCase() + item.slice(1)];
         html += '<li>' +
             '<button type="button" class="se-btn-list se-btn-align" data-value="' + item + '" title="' + text + '">' +
-                '<span class="se-list-icon">' + icons['align_' + item] + '</span>' + text +
+            '<span class="se-list-icon">' + icons['align_' + item] + '</span>' + text +
             '</button>' +
-        '</li>';
+            '</li>';
     }
 
     return domUtils.createElement("div", {
@@ -155,4 +154,4 @@ function createHTML(editor, leftDir) {
     }, '<div class="se-list-inner">' + '<ul class="se-list-basic">' + html + '</ul>' + '</div>');
 }
 
-export default Align;
+export default align;

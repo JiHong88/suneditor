@@ -16,17 +16,17 @@ import {
 	_d
 } from "../helpers/global";
 
-function EventManager(editor) {
-	EditorInterface.call(this, editor);
+function EventManager(__core) {
+	EditorInterface.call(this, __core);
 	this._events = [];
-	this._onButtonsCheck = new _w.RegExp("^(" + _w.Object.keys(editor.options._textTagsMap).join("|") + ")$", "i");
+	this._onButtonsCheck = new _w.RegExp("^(" + _w.Object.keys(__core.options._textTagsMap).join("|") + ")$", "i");
 	this._onShortcutKey = false;
 	this._IEisComposing = false; // In IE, there is no "e.isComposing" in the key-up event.
 	this._directionKeyCode = new _w.RegExp("^(8|13|3[2-9]|40|46)$");
 	this._nonTextKeyCode = new _w.RegExp("^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$");
 	this._historyIgnoreKeyCode = new _w.RegExp("^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$");
 	this._frontZeroWidthReg = new _w.RegExp(unicode.zeroWidthSpace + "+", "");
-	this._lineBreakerButton = editor._lineBreaker.querySelector('button');
+	this._lineBreakerButton = __core._lineBreaker.querySelector('button');
 	this._balloonDelay = null;
 }
 

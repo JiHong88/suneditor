@@ -74,7 +74,7 @@ Component.prototype = {
 	 * @returns {Object|null}
 	 */
 	get: function (element) {
-		if (!element) return null;
+		if (!this.__core._fileManager.queryString || !element) return null;
 
 		let target;
 		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {

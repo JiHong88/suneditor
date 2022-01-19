@@ -1062,21 +1062,21 @@ Core.prototype = {
             }
 
             if (/container/.test(display) && (this._menuTray[command] === null || target !== this.containerActiveButton)) {
-                this.callPlugin(command, this.containerOn.bind(this, target), target);
+                this.containerOn(target);
                 return;
             }
 
             if (this.isReadOnly && domUtils.arrayIncludes(this.resizingDisabledButtons, target)) return;
             if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
-                this.callPlugin(command, this.submenuOn.bind(this, target), target);
+                this.submenuOn(target);
                 return;
             } else if (/dialog/.test(display)) {
-                this.callPlugin(command, this.plugins[command].open.bind(this), target);
+                this.plugins[command].open();
                 return;
             } else if (/command/.test(display)) {
-                this.callPlugin(command, this.plugins[command].action.bind(this), target);
+                this.plugins[command].action();
             } else if (/fileBrowser/.test(display)) {
-                this.callPlugin(command, this.plugins[command].open.bind(this, null), target);
+                this.plugins[command].open(null);
             }
         } // default command
         else if (command) {
@@ -2378,11 +2378,11 @@ Core.prototype = {
      */
     _init: function (reload, _initHTML) {
         const _w = this._w;
+        const wRegExp = _w.RegExp;
         const options = this.options;
         const context = this.context;
         const plugins = this.plugins;
-        const wRegExp = this._w.RegExp;
-        
+
         this._ww = options.iframe ? context.element.wysiwygFrame.contentWindow : _w;
         this._wd = this._d;
         this._charTypeHTML = options.charCounterType === 'byte-html';
@@ -2471,66 +2471,6 @@ Core.prototype = {
         this._isBalloon = /balloon|balloon-always/i.test(options.mode);
         this._isBalloonAlways = /balloon-always/i.test(options.mode);
 
-        // caching buttons
-        this._cachingButtons();
-
-        // file components
-        this._fileInfoPluginsCheck = [];
-        this._fileInfoPluginsReset = [];
-
-        // text components
-        this.managedTagsInfo = {
-            query: '',
-            map: {}
-        };
-        const managedClass = [];
-
-        // Command and file plugins registration
-        this.activePlugins = [];
-        this._fileManager.tags = [];
-        this._fileManager.pluginMap = {};
-
-        let filePluginRegExp = [];
-        let plugin, button;
-        for (let key in plugins) {
-            if (!plugins.hasOwnProperty(key)) continue;
-            plugin = plugins[key];
-            button = pluginCallButtons[key];
-            if (plugin.active && button) {
-                this.callPlugin(key, null, button);
-            }
-            if (typeof plugin.checkFileInfo === 'function' && typeof plugin.resetFileInfo === 'function') {
-                this.callPlugin(key, null, button);
-                this._fileInfoPluginsCheck.push(plugin.checkFileInfo.bind(this));
-                this._fileInfoPluginsReset.push(plugin.resetFileInfo.bind(this));
-            }
-            if (_w.Array.isArray(plugin.fileTags)) {
-                const fileTags = plugin.fileTags;
-                this.callPlugin(key, null, button);
-                this._fileManager.tags = this._fileManager.tags.concat(fileTags);
-                filePluginRegExp.push(key);
-                for (let tag = 0, tLen = fileTags.length; tag < tLen; tag++) {
-                    this._fileManager.pluginMap[fileTags[tag].toLowerCase()] = key;
-                }
-            }
-            if (plugin.managedTags) {
-                const info = plugin.managedTags();
-                managedClass.push('.' + info.className);
-                this.managedTagsInfo.map[info.className] = info.method.bind(this);
-            }
-        }
-
-        this.managedTagsInfo.query = managedClass.toString();
-        this._fileManager.queryString = this._fileManager.tags.join(',');
-        this._fileManager.regExp = new wRegExp('^(' + this._fileManager.tags.join('|') + ')$', 'i');
-        this._fileManager.pluginRegExp = new wRegExp('^(' + (filePluginRegExp.length === 0 ? 'undefined' : filePluginRegExp.join('|')) + ')$', 'i');
-
-        // cache editor's element
-        this.status._originCssText = context.element.topArea.style.cssText;
-        this._placeholder = context.element.placeholder;
-        this._lineBreaker = context.element.lineBreaker;
-        this._lineBreakerButton = this._lineBreaker.querySelector('button');
-
         // Excute history function
         this.history = history(this, this._onChange_historyStack.bind(this));
 
@@ -2552,8 +2492,70 @@ Core.prototype = {
         ClassesInterface.call(this.selection, this);
         ClassesInterface.call(this.char, this);
 
-        // common functions
+        // events callback
         this.events = new Events(this);
+
+        // caching buttons
+        this._cachingButtons();
+
+        // file components
+        this._fileInfoPluginsCheck = [];
+        this._fileInfoPluginsReset = [];
+
+        // text components
+        this.managedTagsInfo = {
+            query: '',
+            map: {}
+        };
+        const managedClass = [];
+
+        // Command and file plugins registration
+        this.activePlugins = [];
+        this._fileManager.tags = [];
+        this._fileManager.pluginMap = {};
+
+        // plugins install
+        let filePluginRegExp = [];
+        let plugin, button;
+        for (let key in plugins) {
+            if (!plugins.hasOwnProperty(key)) continue;
+            plugin = plugins[key];
+            button = this.pluginCallButtons[key];
+            this.callPlugin(key, null, button);
+
+            if (typeof plugin.checkFileInfo === 'function' && typeof plugin.resetFileInfo === 'function') {
+                this._fileInfoPluginsCheck.push(plugin.checkFileInfo.bind(this));
+                this._fileInfoPluginsReset.push(plugin.resetFileInfo.bind(this));
+            }
+
+            if (_w.Array.isArray(plugin.fileTags)) {
+                const fileTags = plugin.fileTags;
+                this._fileManager.tags = this._fileManager.tags.concat(fileTags);
+                filePluginRegExp.push(key);
+                for (let tag = 0, tLen = fileTags.length; tag < tLen; tag++) {
+                    this._fileManager.pluginMap[fileTags[tag].toLowerCase()] = key;
+                }
+            }
+
+            if (plugin.managedTags) {
+                const info = plugin.managedTags();
+                managedClass.push('.' + info.className);
+                this.managedTagsInfo.map[info.className] = info.method.bind(this);
+            }
+        }
+
+        this.managedTagsInfo.query = managedClass.toString();
+        this._fileManager.queryString = this._fileManager.tags.join(',');
+        this._fileManager.regExp = new wRegExp('^(' + (this._fileManager.tags.join('|') || '^') + ')$', 'i');
+        this._fileManager.pluginRegExp = new wRegExp('^(' + (filePluginRegExp.length === 0 ? '^' : filePluginRegExp.join('|')) + ')$', 'i');
+
+        // cache editor's element
+        this.status._originCssText = context.element.topArea.style.cssText;
+        this._placeholder = context.element.placeholder;
+        this._lineBreaker = context.element.lineBreaker;
+        this._lineBreakerButton = this._lineBreaker.querySelector('button');
+
+        // event manager, notice
         this.eventManager = new EventManager(this);
         this.notice = new Notice(this);
 

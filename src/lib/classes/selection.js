@@ -17,25 +17,6 @@ const Selection = function (editor) {
 
 Selection.prototype = {
 	/**
-	 * @description Set "range" and "selection" info.
-	 * @param {Object} range range object.
-	 * @param {Object} selection selection object.
-	 */
-	_rangeInfo: function (range, selection) {
-		let selectionNode = null;
-		this.status._range = range;
-
-		if (range.collapsed) {
-			if (domUtils.isWysiwygFrame(range.commonAncestorContainer)) selectionNode = range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
-			else selectionNode = range.commonAncestorContainer;
-		} else {
-			selectionNode = selection.extentNode || selection.anchorNode;
-		}
-
-		this.status._selectionNode = selectionNode;
-	},
-
-	/**
 	 * @description Return the range object of editor's first child node
 	 * @returns {Object}
 	 * @private
@@ -58,11 +39,31 @@ Selection.prototype = {
 	},
 
 	/**
+	 * @description Set "range" and "selection" info.
+	 * @param {Object} range range object.
+	 * @param {Object} selection selection object.
+	 */
+	_rangeInfo: function (range, selection) {
+		let selectionNode = null;
+		this.status._range = range;
+
+		if (range.collapsed) {
+			if (domUtils.isWysiwygFrame(range.commonAncestorContainer)) selectionNode = range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
+			else selectionNode = range.commonAncestorContainer;
+		} else {
+			selectionNode = selection.extentNode || selection.anchorNode;
+		}
+
+		this.status._selectionNode = selectionNode;
+	},
+
+	/**
 	 * @description Saving the range object and the currently selected node of editor
 	 * @private
 	 */
 	_init: function () {
 		const selection = this.get();
+		console.log(selection)
 		if (!selection) return null;
 		let range = null;
 
@@ -90,6 +91,16 @@ Selection.prototype = {
 		} else {
 			this.context.element.wysiwyg.focus();
 		}
+	},
+
+	/**
+	 * @description Get window selection obejct
+	 * @returns {Object}
+	 */
+	get: function () {
+		return this._shadowRoot && this._shadowRoot.getSelection ?
+			this._shadowRoot.getSelection() :
+			this._ww.getSelection();
 	},
 
 	/**
@@ -192,16 +203,6 @@ Selection.prototype = {
 			range = this.status._range;
 		}
 		return range;
-	},
-
-	/**
-	 * @description Get window selection obejct
-	 * @returns {Object}
-	 */
-	get: function () {
-		return this._shadowRoot && this._shadowRoot.getSelection ?
-			this._shadowRoot.getSelection() :
-			this._ww.getSelection();
 	},
 
 	/**
@@ -624,10 +625,12 @@ Selection.prototype = {
 	 * @param {boolean} rangeSelection If true, range select the inserted node.
 	 */
 	insertHTML: function (html, notCleaningData, checkCharCount, rangeSelection) {
+		const __core = this.__core;
+
 		if (typeof html === 'string') {
-			if (!notCleaningData) html = core.cleanHTML(html, null, null);
+			if (!notCleaningData) html = __core.cleanHTML(html, null, null);
 			try {
-				const dom = _d.createRange().createContextualFragment(html);
+				const dom = this._d.createRange().createContextualFragment(html);
 				const domTree = dom.childNodes;
 
 				if (checkCharCount) {
@@ -646,7 +649,7 @@ Selection.prototype = {
 						domUtils.remove(c);
 						continue;
 					}
-					t = core.insertNode(c, a, false);
+					t = __core.insertNode(c, a, false);
 					a = t.container || t;
 					if (!firstCon) firstCon = t;
 					prev = c;
@@ -654,30 +657,30 @@ Selection.prototype = {
 
 				if (prev.nodeType === 3 && a.nodeType === 1) a = prev;
 				const offset = a.nodeType === 3 ? (t.endOffset || a.textContent.length) : a.childNodes.length;
-				if (rangeSelection) core.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
-				else core.setRange(a, offset, a, offset);
+				if (rangeSelection) __core.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
+				else __core.setRange(a, offset, a, offset);
 			} catch (error) {
 				if (this.status.isDisabled || this.status.isReadOnly) return;
 				console.warn('[SUNEDITOR.selection.insertHTML.fail] ' + error);
-				this.__core.execCommand('insertHTML', false, html);
+				__core.execCommand('insertHTML', false, html);
 			}
 		} else {
 			if (this.component.is(html)) {
-				core.component.insert(html, false, checkCharCount, false);
+				__core.component.insert(html, false, checkCharCount, false);
 			} else {
 				let afterNode = null;
 				if (this.format.isLine(html) || domUtils.isMedia(html)) {
-					afterNode = this.format.getLine(core.selection.getNode(), null);
+					afterNode = this.format.getLine(__core.selection.getNode(), null);
 				}
-				core.insertNode(html, afterNode, checkCharCount);
+				__core.insertNode(html, afterNode, checkCharCount);
 			}
 		}
 
-		core.effectNode = null;
-		core.focus();
+		__core.effectNode = null;
+		__core.focus();
 
 		// history stack
-		core.history.push(false);
+		__core.history.push(false);
 	},
 
 	/**
