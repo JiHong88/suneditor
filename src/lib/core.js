@@ -5465,8 +5465,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             this.managedTagsInfo.query = managedClass.toString();
             this._fileManager.queryString = this._fileManager.tags.join(',');
-            this._fileManager.regExp = new wRegExp('^(' +  this._fileManager.tags.join('|') + ')$', 'i');
-            this._fileManager.pluginRegExp = new wRegExp('^(' +  (filePluginRegExp.length === 0 ? 'undefined' : filePluginRegExp.join('|')) + ')$', 'i');
+            this._fileManager.regExp = new wRegExp('^(' +  (this._fileManager.tags.join('|') || '^') + ')$', 'i');
+            this._fileManager.pluginRegExp = new wRegExp('^(' +  (filePluginRegExp.length === 0 ? '^' : filePluginRegExp.join('|')) + ')$', 'i');
             
             // cache editor's element
             this._variable._originCssText = context.element.topArea.style.cssText;
