@@ -300,7 +300,7 @@ const util = {
      * @returns {Boolean}
      */
     isNonEditable: function (element) {
-        return element && element.nodeType === 1 && element.getAttribute('contenteditable') === 'false';
+        return element && element.nodeType === 1 && (element.getAttribute("contenteditable") === 'false' || !element.getAttribute("contenteditable"));
     },
 
     /**
