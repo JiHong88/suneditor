@@ -26,7 +26,7 @@ Component.prototype = {
 		}
 
 		const r = this.selection.removeNode();
-		this.selection.getRange_addLine(this.selection.getRange(), r.container);
+		this.selection.getRangeAndAddLine(this.selection.getRange(), r.container);
 		let oNode = null;
 		let selectionNode = this.selection.getNode();
 		let formatEl = this.format.getLine(selectionNode, null);

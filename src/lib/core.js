@@ -499,7 +499,6 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
         contextEl.wysiwygFrame.addEventListener("load", function () {
             converter._setIframeDocument(this, options);
             inst._editorInit(false, options.value);
-            options.value = null;
         });
     }
 
@@ -516,7 +515,6 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     // init
     if (!options.iframe) {
         this._editorInit(false, options.value);
-        options.value = null;
     }
 }
 

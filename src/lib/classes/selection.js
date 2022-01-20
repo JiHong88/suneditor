@@ -63,7 +63,7 @@ Selection.prototype = {
 	 */
 	_init: function () {
 		const selection = this.get();
-		console.log(selection)
+
 		if (!selection) return null;
 		let range = null;
 
@@ -191,7 +191,7 @@ Selection.prototype = {
 	 * @param {Element|null} container If there is "container" argument, it creates a line in front of the container.
 	 * @returns {Object} range
 	 */
-	getRange_addLine: function (range, container) {
+	getRangeAndAddLine: function (range, container) {
 		if (this.isNone(range)) {
 			const wysiwyg = this.context.element.wysiwyg;
 			const op = domUtils.createElement(this.options.defaultTag, null, "<br>");
@@ -230,7 +230,7 @@ Selection.prototype = {
 	},
 
 	/**
-	 * @description Returns a "line" array from the currently selected range.
+	 * @description Returns a "line" array from selected range.
 	 * @param {Function|null} validation The validation function. (Replaces the default validation format.isLine(current))
 	 * @returns {Array}
 	 */
@@ -301,7 +301,7 @@ Selection.prototype = {
 	},
 
 	/**
-	 * @description Get lines and components from the selected area. (P, DIV, H[1-6], OL, UL, TABLE..)
+	 * @description Get lines and components from the selected range. (P, DIV, H[1-6], OL, UL, TABLE..)
 	 * If some of the component are included in the selection, get the entire that component.
 	 * @param {boolean} removeDuplicate If true, if there is a parent and child tag among the selected elements, the child tag is excluded.
 	 * @returns {Array}
@@ -388,7 +388,7 @@ Selection.prototype = {
 			}
 		}
 
-		const range = !afterNode && !isFormats ? this.selection.getRange_addLine(this.selection.getRange(), null) : this.selection.getRange();
+		const range = !afterNode && !isFormats ? this.selection.getRangeAndAddLine(this.selection.getRange(), null) : this.selection.getRange();
 		const commonCon = range.commonAncestorContainer;
 		const startOff = range.startOffset;
 		const endOff = range.endOffset;
@@ -618,7 +618,7 @@ Selection.prototype = {
 	},
 
 	/**
-	 * @description Inserts an (HTML element / HTML string / plain string) at the current cursor position
+	 * @description Insert an (HTML element / HTML string / plain string) at selection range.
 	 * @param {Element|String} html HTML Element or HTML string or plain string
 	 * @param {boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
 	 * @param {boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
@@ -684,7 +684,7 @@ Selection.prototype = {
 	},
 
 	/**
-	 * @description Delete the currently selected nodes and reset selection range
+	 * @description Delete the selected range.
 	 * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
 	 * @returns {Object}
 	 */

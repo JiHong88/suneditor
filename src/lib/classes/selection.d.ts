@@ -28,7 +28,7 @@ class Selection extends EditorInterface {
 	 * @param range core.getRange()
 	 * @param container If there is "container" argument, it creates a line in front of the container.
 	 */
-	getRange_addLine(range: Range, container?: Element): Range;
+	getRangeAndAddLine(range: Range, container?: Element): Range;
 
 	/**
 	 * @description Get window selection obejct
@@ -43,14 +43,14 @@ class Selection extends EditorInterface {
 	getNode(): Node;
 
 	/**
-	 * @description Returns a "line" array from the currently selected range.
+	 * @description Returns a "line" array from selected range.
 	 * @param validation The validation function. (Replaces the default validation format.isLine(current))
 	 * @returns
 	 */
 	getLines(validation?: Function): Node[];
 
 	/**
-	 * @description Get lines and components from the selected area. (P, DIV, H[1-6], OL, UL, TABLE..)
+	 * @description Get lines and components from the selected range. (P, DIV, H[1-6], OL, UL, TABLE..)
 	 * If some of the component are included in the selection, get the entire that component.
 	 * @param removeDuplicate If true, if there is a parent and child tag among the selected elements, the child tag is excluded.
 	 * @returns
@@ -75,7 +75,7 @@ class Selection extends EditorInterface {
 	insertNode(oNode: Node, afterNode?: Node, checkCharCount?: boolean): { startOffset: Node; endOffset: number } | Node | null;
 
 	/**
-	 * @description Inserts an HTML element or HTML string or plain string at the current cursor position
+	 * @description Insert an (HTML element / HTML string / plain string) at selection range.
 	 * @param html HTML Element or HTML string or plain string
 	 * @param notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
 	 * @param checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
@@ -84,7 +84,7 @@ class Selection extends EditorInterface {
 	insertHTML(html: Element | string, notCleaningData?: boolean, checkCharCount?: boolean, rangeSelection?: boolean): void;
 
 	/**
-	 * @description Delete the currently selected nodes and reset selection range
+	 * @description Delete the selected range.
 	 * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
 	 * @returns
 	 */

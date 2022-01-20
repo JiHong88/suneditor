@@ -84,9 +84,6 @@ align.prototype = {
         }
     },
 
-    /**
-     * @Override core
-     */
     exchangeDir: function () {
         const dir = this.options.rtl ? 'right' : 'left';
         if (this.defaultDir === dir) return;

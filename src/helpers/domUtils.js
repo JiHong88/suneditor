@@ -727,7 +727,7 @@ export function isWysiwygFrame(element) {
  * @returns {boolean}
  */
 export function isNonEditable(element) {
-	return element && element.nodeType === 1 && element.getAttribute("contenteditable") === "false";
+	return element && element.nodeType === 1 && (element.getAttribute("contenteditable") === "false" || !element.getAttribute("contenteditable"));
 }
 
 /**

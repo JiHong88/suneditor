@@ -240,7 +240,7 @@ Format.prototype = {
 	 * @param {Element} block Element of wrap the arguments (BLOCKQUOTE...)
 	 */
 	applyBlock: function (block) {
-		this.selection.getRange_addLine(this.selection.getRange(), null);
+		this.selection.getRangeAndAddLine(this.selection.getRange(), null);
 		const rangeLines = this.selection.getLinesAndComponents(false);
 		if (!rangeLines || rangeLines.length === 0) return;
 
@@ -690,7 +690,7 @@ Format.prototype = {
 
 		if (selectedFormats.length === 0) {
 			if (selectedCells) return;
-			range = this.selection.getRange_addLine(range, null);
+			range = this.selection.getRangeAndAddLine(range, null);
 			selectedFormats = this.selection.getLinesAndComponents(false);
 			if (selectedFormats.length === 0) return;
 		}
@@ -1074,7 +1074,7 @@ Format.prototype = {
 	 */
 	applyStyleNode: function (styleNode, styleArray, removeNodeArray, strictRemove) {
 		this.selection._resetRangeToTextNode();
-		let range = this.selection.getRange_addLine(this.selection.getRange(), null);
+		let range = this.selection.getRangeAndAddLine(this.selection.getRange(), null);
 		styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
 		removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
 
@@ -1653,7 +1653,7 @@ Format.prototype = {
 		let selectedFormsts = this.selection.getLinesAndComponents(false);
 
 		if (selectedFormsts.length === 0) {
-			range = this.selection.getRange_addLine(range, null);
+			range = this.selection.getRangeAndAddLine(range, null);
 			selectedFormsts = this.selection.getLinesAndComponents(false);
 			if (selectedFormsts.length === 0) return;
 		}
