@@ -4829,6 +4829,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Gets the current contents with containing parent div(div.sun-editor-editable).
+         * <div class="sun-editor-editable">{contents}</div>
+         * @param {Boolean} onlyContents Return only the contents of the body without headers when the "fullPage" option is true
+         * @returns {Object}
+         */
+        getFullContents: function (onlyContents) {
+            return '<div class="sun-editor-editable' + options.rtl ? ' se-rtl' : '' + '">' + this.getContents(onlyContents) + '</div>';
+        },
+
+        /**
          * @description Returns HTML string according to tag type and configuration.
          * Use only "cleanHTML"
          * @param {Node} node Node

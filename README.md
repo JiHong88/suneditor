@@ -1023,6 +1023,9 @@ editor.getContext();
 // Gets the contents of the suneditor
 // onlyContents {Boolean}: Return only the contents of the body without headers when the "fullPage" option is true
 editor.getContents(onlyContents: Boolean);
+// Gets the current contents with containing parent div(div.sun-editor-editable).
+//  <div class="sun-editor-editable">{contents}</div>
+editor.getFullContents(onlyContents: Boolean);
 
 // Gets only the text of the suneditor contents
 editor.getText();
