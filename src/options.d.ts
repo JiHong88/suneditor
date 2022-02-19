@@ -221,8 +221,19 @@ export interface SunEditorOptions {
      */
     maxHeight?: string;
     /** 
-     * Editing area default style 
+     * Editing area
+     * ===================
     */
+    /**
+     * Add a "class" to the editing area[.sun-editor-editable]
+     */
+    className?: string;
+    /**
+     * You can define the style of the editing area[.sun-editor-editable].
+     * It affects the entire editing area.
+     * ('z-index', 'position' and 'width' properties apply to the top div.)
+     * @example 'font-family: cursive; font-size: 10px;'
+     */
     defaultStyle?: string;
     /**
      * Defining menu items

@@ -306,15 +306,17 @@ export default {
             }
             wysiwygDiv.className += ' ' + options._editableClass;
             wysiwygDiv.style.cssText = options._editorStyles.frame + options._editorStyles.editor;
+            wysiwygDiv.className += options.className;
         } else {
             wysiwygDiv.allowFullscreen = true;
             wysiwygDiv.frameBorder = 0;
             wysiwygDiv.style.cssText = options._editorStyles.frame;
+            wysiwygDiv.className += options.className;
         }
 
         // textarea for code view
         const textarea = document.createElement('TEXTAREA');
-        textarea.className = 'se-wrapper-inner se-wrapper-code';
+        textarea.className = 'se-wrapper-inner se-wrapper-code' + options.className;
         textarea.style.cssText = options._editorStyles.frame;
         textarea.style.display = 'none';
         if (options.height === 'auto') textarea.style.overflow = 'hidden';
@@ -471,7 +473,8 @@ export default {
         options.height = options.height ? (util.isNumber(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
         options.minHeight = (util.isNumber(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (util.isNumber(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
-        /** Editing area default style */
+        /** Editing area */
+        options.className = (typeof options.className === 'string' && options.className.length > 0) ? ' ' + options.className : '';
         options.defaultStyle = typeof options.defaultStyle === 'string' ? options.defaultStyle : '';
         /** Defining menu items */
         options.font = !options.font ? null : options.font;

@@ -913,6 +913,7 @@ const editor = suneditor.init({
 
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     buttonList: [
+        ['dir_ltr', 'dir_rtl'],
         ['undo', 'redo'],
         ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
         ['bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
@@ -922,6 +923,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
         ['-right', 'image', 'video', 'audio', 'link'],
         // (min-width: 992)
         ['%1100', [
+            ['dir_ltr', 'dir_rtl'],
             ['undo', 'redo'],
             ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
             ['bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
@@ -930,6 +932,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
             ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
         ]],
         ['%870', [
+            ['dir_ltr', 'dir_rtl'],
             ['undo', 'redo'],
             ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
             [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
@@ -938,6 +941,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
             ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
         ]],
         ['%660', [
+            ['dir_ltr', 'dir_rtl'],
             ['undo', 'redo'],
             [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
             [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
@@ -946,6 +950,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
             ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
         ]],
         ['%335', [
+            ['dir_ltr', 'dir_rtl'],
             ['undo', 'redo'],
             [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
             [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat'],
@@ -961,9 +966,21 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
         'Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact',
         'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'
     ],
-    iframe: true,
-    fullPage: true,
+    linkNoPrefix: true,
+    formats: [
+        'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',{
+          tag: 'div', // Tag name
+          name: 'Custom div' || null, // default: tag name
+          command: 'replace' || 'range' || 'free', // default: "replace"
+          class: '__se__format__replace_xxx' || '__se__format__range_xxx' || '__se__format__free_xxx' || '__se__format__free__closure_xxx'
+          // Class names must always begin with "__se__format__(replace, range, free)_"
+        }
+        // "blockquote": range format, "pre": free format, "Other tags": replace format
+      ],
+    // iframe: true,
+    // fullPage: true,
     imageMultipleFile: true,
+    addTagsWhitelist: "fdl|lst|lstfdl|header"
 });
 
 s2.onResizeEditor = (height, prevHeight, core) => {
@@ -991,6 +1008,28 @@ s2.onResizeEditor = (height, prevHeight, core) => {
 //     e.stopPropagation();
 //   }
 // }
+
+s2.core.plugins.fontSize.pickup = function (e) {
+    console.log("fdsafafdasa---")
+    if (!/^BUTTON$/i.test(e.target.tagName)) return false;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const value = thisObj.editorGetFontSizeFromValue(e.target.getAttribute('data-value'));
+
+    if (value) {
+        const newNode = this.util.createElement('SPAN');
+        newNode.style.fontSize = value;
+        this.nodeChange(newNode, ['font-size'], null, null);
+    } else {
+        this.nodeChange(null, ['font-size'], ['span'], true);
+    }
+
+    this.submenuOff();
+}.bind(s2.core)
+
+
 
 const newOption = {
     mode: 'balloon',
