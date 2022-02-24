@@ -1056,12 +1056,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (startOff > startCon.textContent.length) startOff = startCon.textContent.length;
             if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
             if (util.isFormatElement(startCon)) {
-                startCon = startCon.childNodes[startOff] || startCon;
-                startOff = 0;
+                startCon = startCon.childNodes[startOff] || startCon.childNodes[startOff - 1] || startCon;
+                startOff = startOff > 0 ? startCon.nodeType === 1 ? 1 : startCon.textContent ? startCon.textContent.length : 0 : 0;
             }
             if (util.isFormatElement(endCon)) {
-                endCon = endCon.childNodes[endOff] || endCon;
-                endOff = startOff > 1 ? startOff : 0;
+                endCon = endCon.childNodes[endOff] || endCon.childNodes[endOff - 1] || endCon;
+                endOff = endOff > 0 ? endCon.nodeType === 1 ? 1 : endCon.textContent ? endCon.textContent.length : 0 : 0;
             }
             
             const range = this._wd.createRange();
