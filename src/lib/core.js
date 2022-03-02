@@ -5831,7 +5831,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
             }
 
-            if (!command) return false;
+            if (!command) return keyStr === 'B'; // chromium - bold disabled
 
             core.commandHandler(core.commandMap[command], command);
             return true;
