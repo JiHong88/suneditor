@@ -25,6 +25,10 @@ export interface SunEditorOptions {
      */
     value?: string;
     /**
+     * When recording the history stack, this is the delay time (miliseconds) since the last input. default: 400
+     */
+    historyStackDelayTime?: number;
+    /**
      * Whitelist
      * ======
      */
