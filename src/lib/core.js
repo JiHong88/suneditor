@@ -8204,6 +8204,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Boolean} rangeSelection If true, range select the inserted node.
          */
         insertHTML: function (html, notCleaningData, checkCharCount, rangeSelection) {
+            if (!context.element.wysiwygFrame.contains(core.getSelection().focusNode)) core.focus();
+            
             if (typeof html === 'string') {
                 if (!notCleaningData) html = core.cleanHTML(html, null, null);
                 try {
