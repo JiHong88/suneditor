@@ -1671,7 +1671,7 @@
 
             
             <h4 class="name" id="onResizeEditor"><span class="type-signature"></span>onResizeEditor<span
-                    class="signature">(errorMessage, result, core)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+                    class="signature">(errorMessage, result, core, resizeObserverEntry)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
             <div class="description">
                 Called when the audio upload failed
             </div>
@@ -1704,6 +1704,13 @@
                         <span class="param-type">Object</span>
                     </td>
                     <td class="description last"><a href="document-editor.html">Core Object</a></td>
+                </tr>
+                <tr>
+                    <td class="name"><code>resizeObserverEntry</code></td>
+                    <td class="type">
+                        <span class="param-type">Object | null</span>
+                    </td>
+                    <td class="description last"><a href="https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry">ResizeObserverEntry Object</a><br>"resizeObserverEntry" is not provided in IE Browser.</td>
                 </tr>
                 </tbody>
             </table>

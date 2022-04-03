@@ -434,7 +434,6 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     plugins: {...{custom_container}, ...plugins},
     katex: Katex,
     codeMirror: CodeMirror,
-    // value: '<html bgcolor="e4e4e4"><p><meta content="text/html; charset=utf-8"http-equiv="Content-Type"><title>Postman</title><p><body bgcolor="e4e4e4"style="margin:0;padding:0"><p><table cellpadding="0"cellspacing="0"width="100%"bgcolor="e4e4e4"><tr><td><p><table cellpadding="20"cellspacing="0"align="center"id="top-message"width="600"><tr><td><table cellpadding="10"cellspacing="0"align="center"id="header"><tr><td bgcolor="434343"width="570"><table cellpadding="0"cellspacing="0"align="center"id="content-1"><tr><td width="100"valign="top"><table cellpadding="5"cellspacing="0"><tr><td bgcolor="434343"><img src="https://www.guidovisser.com/bell-small.png"></table><td width="370"><h1 style="font-family:Arial,Helvetica Neue,Helvetica,sans-serif;font-size:30px;padding-top:25px;color:#fff">Awesome HTML Email Template</h1><td width="100"valign="top"colspan="3"><table cellpadding="5"cellspacing="0"><tr><td bgcolor="434343"><img src="https://www.guidovisser.com/pixel.png"></table></table><!-- content 1 --><tr><td bgcolor="ffffff"width="570"style="font-family:Arial,Helvetica Neue,Helvetica,sans-serif">TEST TEXT<tr><td bgcolor="434343"width="570"><p><table cellpadding="10"cellspacing="0"width="100%"><tr><td bgcolor="434343"><tr><td style="color:#fff;font-family:Arial,Helvetica Neue,Helvetica,sans-serif"align="center"cellspacing="10"><!-- <a href="https://guidovisser.com" style="background-color: #D2694B; color: #ffffff; height:25px; text-decoration: none;">Go to Test Testing</a> --><!-- <a href="$(SELFRESLINK)" style="background-color: #D2694B;color: #ffffff; text-decoration: none;">Go to Henk Henken</a> --><!--[if mso]><v:roundrect xmlns_v="urn:schemas-microsoft-com:vml"xmlns_w="urn:schemas-microsoft-com:office:word"href="https://guidovisser.com"style="height:36px;v-text-anchor:middle;width:200px"arcsize="5%"strokecolor="#D2694B"fillcolor="#D2694B"><w:anchorlock><center style="color:#fff;font-family:Helvetica,Arial,sans-serif">I am a button →</center></v:roundrect><![endif]--> <a href="https://guidovisser.com"style="background-color:#d2694b;border:1px solid #d2694b;border-radius:3px;color:#fff;display:inline-block;font-family:sans-serif;line-height:44px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;mso-hide:all">Go to Test</a><td style="color:#fff;font-family:Arial,Helvetica Neue,Helvetica,sans-serif"align="center"cellpadding="10"><!--[if mso]><v:roundrect xmlns_v="urn:schemas-microsoft-com:vml"xmlns_w="urn:schemas-microsoft-com:office:word"href="$(SELFRESLINK)"style="height:36px;v-text-anchor:middle;width:200px"arcsize="5%"strokecolor="#D2694B"fillcolor="#D2694B"><w:anchorlock><center style="color:#fff;font-family:Helvetica,Arial,sans-serif">I am a button →</center></v:roundrect><![endif]--> <a href="https://guidovisser.com"style="background-color:#d2694b;border:1px solid #d2694b;border-radius:3px;color:#fff;display:inline-block;font-family:sans-serif;line-height:44px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;mso-hide:all">Go to test 2</a></table><tr><td bgcolor="434343"width="570"style="color:#fff"><p><table cellpadding="5"cellspacing="0"><tr><td bgcolor="434343"><img src="https://www.guidovisser.com/bell-small.png"><td style="font-family:Arial,Helvetica Neue,Helvetica,sans-serif;color:#fff;font-size:12px;padding-top:22px"valign="top"><p><p>Test footer<p>If you need support, contact: <a href="mailto:notexistingaddress@guidovisser.com?subject=Contact Support"style="color:#fff;text-decoration:underline">notexistingaddress@guidovisser.com</a><p>This email is automatically generated, replying has no use.</table></p><!-- header --><!-- header --><!-- top message --><p><!-- wrapper --><p><p>',
     stickyToolbar: 50,
     _printClass: '',
     linkProtocol: 'http://',
@@ -498,7 +497,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // audioAccept: ".mp3",
     display: 'block',
     width: '100%',
-    height: 'auto',
+    // height: 'auto',
     // audioTagAttrs: {
     //     controlslist: "nodownload",
     // },
@@ -570,7 +569,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // pasteTagsBlacklist: 'div',
     // tagsBlacklist: 'section|aside',
     // resizeEnable: false,
-    resizingBarContainer: "#rb",
+    // resizingBarContainer: "#rb",
     attributesWhitelist: {'all': '*'},  // html5 <details open="">..</details>
     // attributesBlacklist: {
     //     all: 'data-a',
@@ -583,6 +582,10 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // rtl: true,
     // buttonList: [['custom_container']]
 });
+
+ss.onResizeEditor = (h, ph, core, entry) => {
+    console.log("---h"+h, entry);
+}
 
 ss.onSetToolbarButtons = function(buttonList, core) {
     console.log("bbbbb-", buttonList);
@@ -745,9 +748,9 @@ ss.showController = (currentControllerName, controllerArray, core) => {
 // }
 window.aaa = false;
 window.sun_noticeOpen = function () {
-    ss.setOptions({
-        resizingBarContainer: null,
-    })
+    // ss.setOptions({
+    //     resizingBarContainer: null,
+    // })
     
     // ss.core.setDir(!window.aaa ? 'rtl' : 'ltr');
     

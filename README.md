@@ -1350,8 +1350,9 @@ editor.onAudioUploadError = function (errorMessage, result, core) {
 
 // Called when the editor is resized using the bottom bar
 // height, prevHeight are number
-editor.onResizeEditor = function (height, prevHeight, core) {
-    console.log(`height: ${height}, prevHeight: ${prevHeight}`)
+editor.onResizeEditor = function (height, prevHeight, core, resizeObserverEntry) {
+    console.log(`height: ${height}, prevHeight: ${prevHeight}`, resizeObserverEntry)
+    // "resizeObserverEntry" is not provided in IE Browser. 
 }
 
 // Called after the "setToolbarButtons" invocation

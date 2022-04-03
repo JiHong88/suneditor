@@ -40,6 +40,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _w: _w,
         _parser: new _w.DOMParser(),
         _prevRtl: options.rtl,
+        _editorHeight: 0,
 
         /**
          * @description Document object of the iframe if created as an iframe || _d
@@ -5347,6 +5348,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._wd = _d;
             this._charTypeHTML = options.charCounterType === 'byte-html';
             this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
+            this._editorHeight = context.element.wysiwygFrame.offsetHeight;
 
             if (!options.iframe && typeof _w.ShadowRoot === 'function') {
                 let child = context.element.wysiwygFrame;
@@ -5569,7 +5571,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         _iframeAutoHeight: function () {
             if (this._iframeAuto) {
-                _w.setTimeout(function () { context.element.wysiwygFrame.style.height = core._iframeAuto.offsetHeight + 'px'; });
+                _w.setTimeout(function () { 
+                    const h = core._iframeAuto.offsetHeight;
+                    context.element.wysiwygFrame.style.height = h + 'px';
+                    if (util.isIE) core.__callResizeFunction(h, null);
+                });
+            } else if (util.isIE) {
+                core.__callResizeFunction(context.element.wysiwygFrame.offsetHeight, null);
+            }
+        },
+
+        __callResizeFunction(h, resizeObserverEntry) {
+            h = h === -1 ? resizeObserverEntry.borderBoxSize[0].blockSize : h;
+            if (this._editorHeight !== h) {
+                if (typeof functions.onResizeEditor === 'function') functions.onResizeEditor(h, this._editorHeight, core, resizeObserverEntry);
+                this._editorHeight = h;
             }
         },
 
@@ -5713,6 +5729,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._resourcesStateChange();
 
             _w.setTimeout(function () {
+                // observer
+                if (event._resizeObserver) event._resizeObserver.observe(context.element.wysiwygFrame);
                 // user event
                 if (typeof functions.onload === 'function') functions.onload(core, reload);
             });
@@ -7087,7 +7105,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onFocus_wysiwyg: function (e) {
             if (core._antiBlur) return;
             core.hasFocus = true;
-            event._applyTagEffects();
+            _w.setTimeout(event._applyTagEffects);
             
             if (core._isInline) event._showToolbarInline();
 
@@ -7117,7 +7135,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.submenuOff();
             core.controllersOff();
 
-            const prevHeight = util.getNumber(context.element.wysiwygFrame.style.height, 0);
             core._variable.resizeClientY = e.clientY;
             context.element.resizeBackground.style.display = 'block';
 
@@ -7125,7 +7142,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.resizeBackground.style.display = 'none';
                 _d.removeEventListener('mousemove', event._resize_editor);
                 _d.removeEventListener('mouseup', closureFunc);
-                if (typeof functions.onResizeEditor === 'function') functions.onResizeEditor(util.getNumber(context.element.wysiwygFrame.style.height, 0), prevHeight, core);
             }
 
             _d.addEventListener('mousemove', event._resize_editor);
@@ -7134,8 +7150,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         _resize_editor: function (e) {
             const resizeInterval = context.element.editorArea.offsetHeight + (e.clientY - core._variable.resizeClientY);
-            context.element.wysiwygFrame.style.height = context.element.code.style.height = (resizeInterval < core._variable.minResizingSize ? core._variable.minResizingSize : resizeInterval) + 'px';
+            const h = (resizeInterval < core._variable.minResizingSize ? core._variable.minResizingSize : resizeInterval);
+            context.element.wysiwygFrame.style.height = context.element.code.style.height = h + 'px';
             core._variable.resizeClientY = e.clientY;
+            if (util.isIE) core.__callResizeFunction(h, null);
         },
 
         onResize_window: function () {
@@ -7550,8 +7568,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.history.push(false);
         },
 
+        _resizeObserver: null,
         _addEvent: function () {
             const eventWysiwyg = options.iframe ? core._ww : context.element.wysiwyg;
+            if (!util.isIE) {
+                this._resizeObserver = new _w.ResizeObserver(function(entries) {
+                    core.__callResizeFunction(-1, entries[0]);
+                });
+            }
 
             /** toolbar event */
             context.element.toolbar.addEventListener('mousedown', event._buttonsEventHandler, false);
@@ -7637,7 +7661,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             event._lineBreakerBind = null;
             
             eventWysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
-            
             eventWysiwyg.removeEventListener('focus', event.onFocus_wysiwyg);
             eventWysiwyg.removeEventListener('blur', event.onBlur_wysiwyg);
 
@@ -7649,6 +7672,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.resizingBar.removeEventListener('mousedown', event.onMouseDown_resizingBar);
             }
             
+            if (event._resizeObserver) {
+                event._resizeObserver.unobserve(context.element.wysiwygFrame);
+                event._resizeObserver = null;
+            }
+
             _w.removeEventListener('resize', event.onResize_window);
             _w.removeEventListener('scroll', event.onScroll_window);
         },
