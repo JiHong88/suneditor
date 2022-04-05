@@ -5250,6 +5250,36 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Reset buttons of the responsive toolbar.
+         */
+        resetResponsiveToolbar: function () {
+            core.controllersOff();
+
+            const responsiveSize = event._responsiveButtonSize;
+            if (responsiveSize) {
+                let w = 0;
+                if ((core._isBalloon || core._isInline) && options.toolbarWidth === 'auto') {
+                    w = context.element.topArea.offsetWidth;
+                } else {
+                    w = context.element.toolbar.offsetWidth;
+                }
+
+                let responsiveWidth = 'default';
+                for (let i = 1, len = responsiveSize.length; i < len; i++) {
+                    if (w < responsiveSize[i]) {
+                        responsiveWidth = responsiveSize[i] + '';
+                        break;
+                    }
+                }
+
+                if (event._responsiveCurrentSize !== responsiveWidth) {
+                    event._responsiveCurrentSize = responsiveWidth;
+                    functions.setToolbarButtons(event._responsiveButtons[responsiveWidth]);
+                }
+            }
+        },
+
+        /**
          * @description Set the char count to charCounter element textContent.
          * @private
          */
@@ -5731,6 +5761,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             _w.setTimeout(function () {
                 // observer
                 if (event._resizeObserver) event._resizeObserver.observe(context.element.wysiwygFrame);
+                if (event._toolbarObserver) event._toolbarObserver.observe(context.element._toolbarShadow);
                 // user event
                 if (typeof functions.onload === 'function') functions.onload(core, reload);
             });
@@ -5747,6 +5778,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 _top: contextEl.topArea,
                 _relative: contextEl.relative,
                 _toolBar: contextEl.toolbar,
+                _toolbarShadow: contextEl._toolbarShadow,
                 _menuTray: contextEl._menuTray,
                 _editorArea: contextEl.editorArea,
                 _wysiwygArea: contextEl.wysiwygFrame,
@@ -7157,30 +7189,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onResize_window: function () {
-            core.controllersOff();
-
-            const responsiveSize = event._responsiveButtonSize;
-            if (responsiveSize) {
-                let w = 0;
-                if ((core._isBalloon || core._isInline) && options.toolbarWidth === 'auto') {
-                    w = context.element.topArea.offsetWidth;
-                } else {
-                    w = context.element.toolbar.offsetWidth;
-                }
-
-                let responsiveWidth = 'default';
-                for (let i = 1, len = responsiveSize.length; i < len; i++) {
-                    if (w < responsiveSize[i]) {
-                        responsiveWidth = responsiveSize[i] + '';
-                        break;
-                    }
-                }
-
-                if (event._responsiveCurrentSize !== responsiveWidth) {
-                    event._responsiveCurrentSize = responsiveWidth;
-                    functions.setToolbarButtons(event._responsiveButtons[responsiveWidth]);
-                }
-            }
+            if (util.isIE) core.resetResponsiveToolbar();
 
             if (context.element.toolbar.offsetWidth === 0) return;
 
@@ -7569,6 +7578,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         _resizeObserver: null,
+        _toolbarObserver: null,
         _addEvent: function () {
             const eventWysiwyg = options.iframe ? core._ww : context.element.wysiwyg;
             if (!util.isIE) {
@@ -7624,11 +7634,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
             
-            /** window event */
+            /** set response toolbar */
             event._setResponsiveToolbar();
-            _w.removeEventListener('resize', event.onResize_window);
-            _w.removeEventListener('scroll', event.onScroll_window);
 
+            /** responsive toolbar observer */
+            if (!util.isIE) this._toolbarObserver = new _w.ResizeObserver(core.resetResponsiveToolbar);
+            
+            /** window event */
             _w.addEventListener('resize', event.onResize_window, false);
             if (options.stickyToolbar > -1) {
                 _w.addEventListener('scroll', event.onScroll_window, false);
@@ -7675,6 +7687,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (event._resizeObserver) {
                 event._resizeObserver.unobserve(context.element.wysiwygFrame);
                 event._resizeObserver = null;
+            }
+
+            if (event._toolbarObserver) {
+                event._toolbarObserver.unobserve(context.element._toolbarShadow);
+                event._toolbarObserver = null;
             }
 
             _w.removeEventListener('resize', event.onResize_window);

@@ -37,6 +37,8 @@ export default {
     
         // toolbar
         const tool_bar = this._createToolBar(doc, options.buttonList, options.plugins, options);
+        const toolbarShadow = tool_bar.element.cloneNode(false);
+        toolbarShadow.className += ' se-toolbar-shadow';
         tool_bar.element.style.visibility = 'hidden';
         if (tool_bar.pluginCallButtons.math) this._checkKatexMath(options.katex);
         const arrow = doc.createElement('DIV');
@@ -86,6 +88,7 @@ export default {
         const toolbarContainer = options.toolbarContainer;
         if (toolbarContainer) {
             toolbarContainer.appendChild(tool_bar.element);
+            toolbarContainer.appendChild(toolbarShadow);
         }
 
         // resizingbar
@@ -95,7 +98,10 @@ export default {
         /** append html */
         editor_div.appendChild(textarea);
         if (placeholder_span) editor_div.appendChild(placeholder_span);
-        if (!toolbarContainer) relative.appendChild(tool_bar.element);
+        if (!toolbarContainer) {
+            relative.appendChild(tool_bar.element);
+            relative.appendChild(toolbarShadow);
+        }
         relative.appendChild(sticky_dummy);
         relative.appendChild(editor_div);
         relative.appendChild(resize_back);
@@ -113,6 +119,7 @@ export default {
                 _top: top_div,
                 _relative: relative,
                 _toolBar: tool_bar.element,
+                _toolbarShadow: toolbarShadow,
                 _menuTray: tool_bar._menuTray,
                 _editorArea: editor_div,
                 _wysiwygArea: wysiwyg_div,
