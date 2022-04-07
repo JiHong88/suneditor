@@ -5945,7 +5945,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
 
                 /** default active buttons [strong, ins, em, del, sub, sup] */
-                if (classOnCheck.test(nodeName)) {
+                if (classOnCheck && classOnCheck.test(nodeName)) {
                     commandMapNodes.push(nodeName);
                     util.addClass(commandMap[nodeName], 'active');
                 }

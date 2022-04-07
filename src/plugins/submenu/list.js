@@ -234,6 +234,14 @@ export default {
 
                 newCell = util.createElement('LI');
                 util.copyFormatAttributes(newCell, fTag);
+
+                if (i ===  0 && originRange.sc === fTag) {
+                    originRange.sc = newCell;
+                }
+                if (i === len - 1 && originRange.ec === fTag) {
+                    originRange.ec = newCell;
+                }
+
                 if (util.isComponent(fTag)) {
                     const isHR = /^HR$/i.test(fTag.nodeName);
                     if (!isHR) newCell.innerHTML = '<br>';
