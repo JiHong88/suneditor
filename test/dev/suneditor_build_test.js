@@ -424,7 +424,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     lineAttrReset: '*',
     alignItems: ['left', 'right', 'center'],
     value: `<p>ss&nbsp; fdf fdsfa fds</p>
-
+    <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a>
     <p>a fdsa fdsa fdas</p>
     
     <p>&nbsp;dsa fdsa fdsa fdsa<br>
@@ -435,7 +435,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     plugins: {...{custom_container}, ...plugins},
     katex: Katex,
     codeMirror: CodeMirror,
-    stickyToolbar: 50,
+    // stickyToolbar: 50,
     _printClass: '',
     linkProtocol: 'http://',
     fullScreenOffset: '10px',
@@ -520,7 +520,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     audioMultipleFile: true,
     // imageUploadUrl: 'http://localhost:3000/editor/upload',
     // videoUploadUrl: 'http://localhost:3000/editor/upload',
-    // audioUploadUrl: 'http://localhost:3000/editor/upload',
+    audioUploadUrl: 'http://localhost:3000/editor/upload',
     icons: {
         expansion: "<span>A</span>",
         reduction: "<span>Z</span>"
