@@ -6855,7 +6855,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
                             core.setRange(temp, 0, temp, 0);
                             break;
-                        } else if (options.lineAttrReset && formatEl) {
+                        } else if (options.lineAttrReset && formatEl && !util.isListCell(formatEl)) {
                             e.preventDefault();
                             e.stopPropagation();
 
