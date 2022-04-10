@@ -93,6 +93,29 @@ const util = {
     },
 
     /**
+     * @description Object.values
+     * @param {Object} obj Object parameter.
+     * @returns {Array}
+     */
+    getValues: function (obj) {
+        return !obj ? [] : this._w.Object.keys(obj).map(function (i) {
+            return obj[i];
+        });
+    },
+
+    /**
+     * @description Convert the CamelCase To the KebabCase.
+     * @param {String|Array} param [Camel string]
+     */
+    camelToKebabCase: function (param) {
+        if (typeof param === 'string') {
+            return param.replace(/[A-Z]/g, function (letter) { return "-" + letter.toLowerCase(); });
+        } else {
+            return param.map(function(str) { return util.camelToKebabCase(str); });
+        }
+    },
+
+    /**
      * @description Create Element node
      * @param {String} elementName Element name
      * @returns {Element}
@@ -300,7 +323,7 @@ const util = {
      * @returns {Boolean}
      */
     isNonEditable: function (element) {
-        return element && element.nodeType === 1 && (element.getAttribute("contenteditable") === 'false' || !element.getAttribute("contenteditable"));
+        return element && element.nodeType === 1 && element.getAttribute('contenteditable') === 'false';
     },
 
     /**

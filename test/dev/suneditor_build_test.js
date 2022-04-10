@@ -21,25 +21,25 @@ import 'codemirror/mode/htmlmixed/htmlmixed';
 import CodeMirror from 'codemirror';
 
 console.log("pluginf???", plugins);
-plugins.fontSize.pickup = function (e){
-    console.log("font----------size", this)
-    if (!/^BUTTON$/i.test(e.target.tagName)) return false;
+// plugins.fontSize.pickup = function (e){
+//     console.log("font----------size", this)
+//     if (!/^BUTTON$/i.test(e.target.tagName)) return false;
 
-    e.preventDefault();
-    e.stopPropagation();
+//     e.preventDefault();
+//     e.stopPropagation();
 
-    const value = "20px";
+//     const value = "20px";
 
-    if (value) {
-        const newNode = this.util.createElement('SPAN');
-        newNode.style.fontSize = value;
-        this.nodeChange(newNode, ['font-size'], null, null);
-    } else {
-        this.nodeChange(null, ['font-size'], ['span'], true);
-    }
+//     if (value) {
+//         const newNode = this.util.createElement('SPAN');
+//         newNode.style.fontSize = value;
+//         this.nodeChange(newNode, ['font-size'], null, null);
+//     } else {
+//         this.nodeChange(null, ['font-size'], ['span'], true);
+//     }
 
-    this.submenuOff();
-}
+//     this.submenuOff();
+// }
 
 
 // import 'katex/dist/katex.min.css';
@@ -579,7 +579,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
     buttonList: complexEditor,
     // fullPage: true,
-    defaultStyle: "font-weight: bold;",
+    // defaultStyle: "font-weight: bold;",
     // rtl: true,
     // buttonList: [['custom_container']]
 });

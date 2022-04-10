@@ -574,6 +574,8 @@ export default {
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print']
         ];
+        /** Private options */
+        options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily'];
 
         /** RTL - buttons */
         if (options.rtl) {

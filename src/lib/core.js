@@ -41,6 +41,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _parser: new _w.DOMParser(),
         _prevRtl: options.rtl,
         _editorHeight: 0,
+        _listCamel: options.__listCommonStyle,
+        _listKebab: util.camelToKebabCase(options.__listCommonStyle),
 
         /**
          * @description Document object of the iframe if created as an iframe || _d
@@ -2807,6 +2809,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // one line
             if (oneLine) {
+                this._resetCommonListCell(lineNodes[0], styleArray);
                 const newRange = this._nodeChange_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode);
                 start.container = newRange.startContainer;
                 start.offset = newRange.startOffset;
@@ -2819,12 +2822,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             } else { // multi line 
                 // end
                 if (endLength > 0) {
+                    this._resetCommonListCell(lineNodes[endLength], styleArray);
                     newNode = appendNode.cloneNode(false);
                     end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
                 }
 
                 // mid
                 for (let i = endLength - 1, newRange; i > 0; i--) {
+                    this._resetCommonListCell(lineNodes[i], styleArray);
                     newNode = appendNode.cloneNode(false);
                     newRange = this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, end.container);
                     if (newRange.endContainer && newRange.ancestor.contains(newRange.endContainer)) {
@@ -2835,6 +2840,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
 
                 // start
+                this._resetCommonListCell(lineNodes[0], styleArray);
                 newNode = appendNode.cloneNode(false);
                 start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, end.container);
 
@@ -2863,35 +2869,98 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.history.push(false);
         },
 
+        _resetCommonListCell: function (el, styleArray) {
+            if (!util.isListCell(el)) return;
+
+            const children = util.getArrayItem((el).childNodes, function (current) { return !util.isBreak(current); }, true);
+            const elStyles = el.style;
+            
+            const ec = [], ek = [], elKeys = util.getValues(elStyles);
+            for (let i = 0, len = this._listKebab.length; i < len; i++) {
+                if (elKeys.indexOf(this._listKebab[i]) > -1 && styleArray.indexOf(this._listKebab[i]) > -1) {
+                    ec.push(this._listCamel[i]);
+                    ek.push(this._listKebab[i]);
+                }
+            }
+
+            if (!ec.length) return;
+
+            // reset cell style---
+            const refer = util.createElement('SPAN');
+            for (let i = 0, len = ec.length; i < len; i++) {
+                refer.style[ec[i]] = elStyles[ek[i]];
+                elStyles.removeProperty(ek[i]);
+            }
+
+            let sel = refer.cloneNode(false);
+            let r = null;
+            for (let i = 0, len = children.length, c, s; i < len; i++) {
+                c = children[i];
+                s = util.getValues(c.style);
+                if (s.length === 0 || (ec.some(function (k) {return s.indexOf(k) === -1;}) && s.some(function(k) {ec.indexOf(k) > -1;}))) {
+                    r = c.nextSibling;
+                    sel.appendChild(c);
+                } else if (sel.childNodes.length > 0) {
+                    el.insertBefore(sel, r);
+                    sel = refer.cloneNode(false);
+                    r = null;
+                }
+            }
+            
+            if (sel.childNodes.length > 0) el.insertBefore(sel, r);
+            if (!elStyles.length) el.removeAttribute('style');
+        },
+
         /**
          * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
          * @param {Element} el List cell element. <li>
          * @param {Element|null} child Variable for recursive call. ("null" on the first call)
+         * @param {Array|null} styleArray Style array
          * @private
          */
         _setCommonListStyle: function (el, child) {
             if (!util.isListCell(el)) return;
-            if (!child) el.removeAttribute('style');
             
             const children = util.getArrayItem((child || el).childNodes, function (current) { return !util.isBreak(current); }, true);
-            if (children[0] && children.length === 1){
-                child = children[0];
-                if (!child || child.nodeType !== 1) return;
+            child = children[0];
+            
+            if (!child || children.length > 1 || child.nodeType !== 1) return;
+            
+            // set cell style---
+            const commonStyleElements = [];
+            const childStyle = child.style;
+            const elStyle = el.style;
 
-                const childStyle = child.style;
-                const elStyle = el.style;
+            // bold, italic
+            if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
+            else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
+            if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
+            else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
 
-                // bold, italic
-                if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
-                else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
-                if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
-                else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
+            // styles
+            const cKeys = util.getValues(childStyle);
+            for (let i = 0, len = this._listCamel.length, k; i < len; i++) {
+                if (cKeys.indexOf(this._listKebab[i]) > -1) {
+                    elStyle[this._listCamel[i]] = childStyle[this._listCamel[i]];
+                    childStyle.removeProperty(this._listKebab[i]);
+                }
+            }
+            
+            // remove child
+            if (!childStyle.length) commonStyleElements.push(child);
 
-                // styles
-                if (childStyle.color) elStyle.color = childStyle.color; // color
-                if (childStyle.fontSize) elStyle.fontSize = childStyle.fontSize; // size
+            this._setCommonListStyle(el, child);
 
-                this._setCommonListStyle(el, child);
+            // common style
+            for (let i = 0, len = commonStyleElements.length, n, ch, p; i < len; i++) {
+                n = commonStyleElements[i];
+                ch = n.childNodes;
+                p = n.parentNode;
+                n = n.nextSibling;
+                while (ch.length > 0) {
+                    p.insertBefore(ch[0], n);
+                }
+                util.removeItem(commonStyleElements[i]);
             }
         },
 
@@ -2984,6 +3053,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         util.copyTagAttributes(parentCon, newInnerNode);
         
                         return {
+                            ancestor: element,
                             startContainer: startCon,
                             startOffset: startOff,
                             endContainer: endCon,
@@ -6065,7 +6135,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
-            if (util.isNonEditable(figcaption)) {
+            if (figcaption && (util.isNonEditable(figcaption) || !figcaption.getAttribute("contenteditable"))) {
                 e.preventDefault();
                 figcaption.setAttribute('contenteditable', true);
                 figcaption.focus();
