@@ -423,12 +423,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // `,
     lineAttrReset: '*',
     alignItems: ['left', 'right', 'center'],
-    value: `<p>ss&nbsp; fdf fdsfa fds</p>
-    <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a>
-    <p>a fdsa fdsa fdas</p>
-    
-    <p>&nbsp;dsa fdsa fdsa fdsa<br>
-    </p>
+    value: `<ol><li style="font-size: 18px; color: rgb(0, 85, 255);">dsdasdasss<span style="color: rgb(0, 0, 0);">​</span>dsad</li></ol>
     `,
     linkTargetNewWindow: true,
     imageAlignShow: false,

@@ -2588,8 +2588,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let endCon = range.endContainer;
             let endOff = range.endOffset;
 
-            if ((isRemoveFormat && range.collapsed && util.isFormatElement(startCon.parentNode) && util.isFormatElement(endCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && util.isNonEditable(startCon))) {
-                return;
+            if ((isRemoveFormat && range.collapsed && util.isFormatElement(startCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && util.isNonEditable(startCon))) {
+                const format = startCon.parentNode;
+                if (!util.isListCell(format) || !util.getValues(format.style).some(function(k) { return this._listKebab.indexOf(k) > -1; }.bind(this))) return;
             }
 
             if (range.collapsed && !isRemoveFormat) {
@@ -2871,6 +2872,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         _resetCommonListCell: function (el, styleArray) {
             if (!util.isListCell(el)) return;
+            if (!styleArray) styleArray = this._listKebab;
 
             const children = util.getArrayItem((el).childNodes, function (current) { return !util.isBreak(current); }, true);
             const elStyles = el.style;
