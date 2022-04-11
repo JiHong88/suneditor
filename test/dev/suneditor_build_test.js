@@ -421,6 +421,9 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // <p>​<strong><span style="color: rgb(255, 94, 0);">SunEditor</span></strong>&nbsp;<em><span style="background-color: rgb(250, 237, 125);">distributed under</span></em>&nbsp;the <a href="https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt" target="_blank">MIT</a>&nbsp;license.<br>
     // </p>
     // `,
+    // __defaultFontSize: "31pt",
+    fontSize: [10,12,14,15,16],
+    fontSizeUnit: 'pt',
     lineAttrReset: '*',
     alignItems: ['left', 'right', 'center'],
     value: `<ol><li style="font-size: 18px; color: rgb(0, 85, 255);">dsdasdasss<span style="color: rgb(0, 0, 0);">​</span>dsad</li></ol>

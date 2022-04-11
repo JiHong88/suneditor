@@ -576,6 +576,7 @@ export default {
         ];
         /** Private options */
         options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily'];
+        // options.__defaultFontSize;
 
         /** RTL - buttons */
         if (options.rtl) {
