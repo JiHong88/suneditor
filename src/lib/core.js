@@ -4711,8 +4711,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             _w.setTimeout(function () {
                 try {
                     iframe.focus();
-                    // IE or Edge
-                    if (util.isIE_Edge || !!_d.documentMode || !!_w.StyleMedia) {
+                    // IE or Edge, Chromium
+                    if (util.isIE_Edge || util.isChromium || !!_d.documentMode || !!_w.StyleMedia) {
                         try {
                             iframe.contentWindow.document.execCommand('print', false, null);
                         } catch (e) {
