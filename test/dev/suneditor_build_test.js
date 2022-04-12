@@ -422,9 +422,21 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // </p>
     // `,
     // __defaultFontSize: "31pt",
+    paragraphStyles: [
+        "spaced",
+        "neon",
+        {
+          name: "Box",
+          class: "__se__customClass1",
+        },
+        {
+          name: "ph2",
+          class: "seCustomClass2",
+        },
+      ],
     fontSize: [10,12,14,15,16],
     fontSizeUnit: 'pt',
-    lineAttrReset: '*',
+    // lineAttrReset: '*',
     alignItems: ['left', 'right', 'center'],
     value: `<ol><li style="font-size: 18px; color: rgb(0, 85, 255);">dsdasdasss<span style="color: rgb(0, 0, 0);">​</span>dsad</li></ol>
     `,

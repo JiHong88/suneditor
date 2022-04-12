@@ -6949,7 +6949,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                     newEl = util.splitElement(r.container, r.offset, 0);
                                 }
                             } else {
-                                newEl = util.splitElement(range.endContainer, range.endOffset, 0);
+                                if (util.onlyZeroWidthSpace(formatEl)) newEl = core.appendFormatTag(formatEl, formatEl.cloneNode(false));
+                                else newEl = util.splitElement(range.endContainer, range.endOffset, 0);
                             }
 
                             const resetAttr = options.lineAttrReset === '*' ? null : options.lineAttrReset;
