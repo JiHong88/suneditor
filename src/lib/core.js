@@ -8402,8 +8402,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (core.modalForm) core.plugins.dialog.close.call(core);
 
                 context.element.code.setAttribute("readOnly", "true");
+                util.addClass(context.element.wysiwygFrame, 'se-read-only');
             } else {
                 context.element.code.removeAttribute("readOnly");
+                util.removeClass(context.element.wysiwygFrame, 'se-read-only');
             }
 
             if (options.codeMirrorEditor) options.codeMirrorEditor.setOption('readOnly', !!value);

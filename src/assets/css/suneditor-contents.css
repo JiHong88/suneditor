@@ -374,7 +374,7 @@
     max-width: 100%;
 }
 /*  image, video - select index  */
-.sun-editor-editable[contenteditable="true"] figure::after {
+.sun-editor-editable[contenteditable="true"]:not(.se-read-only) figure::after {
     position: absolute;
     content: '';
     z-index: 1;
