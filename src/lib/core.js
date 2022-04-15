@@ -8244,7 +8244,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const wysiwyg = context.element.wysiwyg;
                 const children = temp.children;
                 for (let i = 0, len = children.length; i < len; i++) {
-                    wysiwyg.appendChild(children[i]);
+                    if (children[i]) {
+                        wysiwyg.appendChild(children[i]);         
+                    }
                 }
             } else {
                 core._setCodeView(core._getCodeView() + '\n' + core.convertHTMLForCodeView(convertValue, false));
