@@ -5553,7 +5553,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (!util.hasOwn(plugins, key)) continue;
                 plugin = plugins[key];
                 button = pluginCallButtons[key];
-                if (plugin.active && button) {
+                if ((plugin.active || plugin.action) && button) {
                     this.callPlugin(key, null, button);
                 }
                 if (typeof plugin.checkFileInfo === 'function' && typeof plugin.resetFileInfo === 'function') {

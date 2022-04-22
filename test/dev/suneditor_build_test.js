@@ -926,75 +926,32 @@ const editor = suneditor.init({
 });
 
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
-    buttonList: [
-        ['dir_ltr', 'dir_rtl'],
-        ['undo', 'redo'],
-        ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
-        ['bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
-        ['removeFormat'],
-        ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save'],
-        ['-right', ':r-More Rich-default.more_plus', 'horizontalRule', 'list', 'table'],
-        ['-right', 'image', 'video', 'audio', 'link'],
-        // (min-width: 992)
-        ['%1100', [
-            ['dir_ltr', 'dir_rtl'],
-            ['undo', 'redo'],
-            ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
-            ['bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
-            ['removeFormat'],
-            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
-            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
-        ]],
-        ['%870', [
-            ['dir_ltr', 'dir_rtl'],
-            ['undo', 'redo'],
-            ['font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
-            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
-            ['removeFormat'],
-            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
-            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
-        ]],
-        ['%660', [
-            ['dir_ltr', 'dir_rtl'],
-            ['undo', 'redo'],
-            [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
-            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor'],
-            ['removeFormat'],
-            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
-            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
-        ]],
-        ['%335', [
-            ['dir_ltr', 'dir_rtl'],
-            ['undo', 'redo'],
-            [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'align', 'lineHeight'],
-            [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'fontColor', 'hiliteColor', 'removeFormat'],
-            ['-right', ':i-More Misc-default.more_vertical', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'fullScreen'],
-            ['-right', ':r-More Rich-default.more_plus', 'image', 'video', 'audio', 'link', 'horizontalRule', 'list', 'table'],
-        ]],
-    ],
+    // mode: "inline",
+    buttonList:complexEditor,
     plugins: plugins,
+    katex: Katex,
     // value: 'abc',
     minHeight : 300,
-    charCounter: true,
-    font: [
-        'Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact',
-        'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'
-    ],
-    linkNoPrefix: true,
-    formats: [
-        'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',{
-          tag: 'div', // Tag name
-          name: 'Custom div' || null, // default: tag name
-          command: 'replace' || 'range' || 'free', // default: "replace"
-          class: '__se__format__replace_xxx' || '__se__format__range_xxx' || '__se__format__free_xxx' || '__se__format__free__closure_xxx'
-          // Class names must always begin with "__se__format__(replace, range, free)_"
-        }
-        // "blockquote": range format, "pre": free format, "Other tags": replace format
-      ],
-    // iframe: true,
-    // fullPage: true,
-    imageMultipleFile: true,
-    addTagsWhitelist: "fdl|lst|lstfdl|header"
+    // charCounter: true,
+    // font: [
+    //     'Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact',
+    //     'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'
+    // ],
+    // linkNoPrefix: true,
+    // formats: [
+    //     'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',{
+    //       tag: 'div', // Tag name
+    //       name: 'Custom div' || null, // default: tag name
+    //       command: 'replace' || 'range' || 'free', // default: "replace"
+    //       class: '__se__format__replace_xxx' || '__se__format__range_xxx' || '__se__format__free_xxx' || '__se__format__free__closure_xxx'
+    //       // Class names must always begin with "__se__format__(replace, range, free)_"
+    //     }
+    //     // "blockquote": range format, "pre": free format, "Other tags": replace format
+    //   ],
+    // // iframe: true,
+    // // fullPage: true,
+    // imageMultipleFile: true,
+    // addTagsWhitelist: "fdl|lst|lstfdl|header"
 });
 
 s2.onResizeEditor = (height, prevHeight, core) => {
