@@ -1879,7 +1879,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         this.setRange(oNode, newRange.startOffset, oNode, newRange.endOffset);
     
                         return newRange;
-                    } else if (!util.isBreak(oNode) && util.isFormatElement(parentNode)) {
+                    } else if (!util.isBreak(oNode) && !util.isListCell(oNode) && util.isFormatElement(parentNode)) {
                         let zeroWidth = null;
                         if (!oNode.previousSibling || util.isBreak(oNode.previousSibling)) {
                             zeroWidth = util.createTextNode(util.zeroWidthSpace);
@@ -7575,9 +7575,37 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             if (cleanData) {
+                if (util.isListCell(util.getFormatElement(core.getSelectionNode(), null))) {
+                    const dom = (_d.createRange().createContextualFragment(cleanData));
+                    if (dom.childNodes[0].nodeType === 1) {
+                        cleanData = event._convertListCell(dom);
+                    }
+                }
                 functions.insertHTML(cleanData, true, false);
                 return false;
             }
+        },
+
+        _convertListCell: function (dom) {
+            const domTree = dom.childNodes;
+            let html = '';
+
+            for (let i = 0, len = domTree.length, node; i < len; i++) {
+                node = domTree[i];
+                if (node.nodeType === 1) {
+                    if (util.isFormatElement(node)) {
+                        html += '<li>' +(node.innerHTML.trim() || '<br>') + '</li>';
+                    } else if (util.isRangeFormatElement(node) && !util.isTable(node)) {
+                        html += event._convertListCell(node);
+                    } else {
+                        html += '<li>' + node.outerHTML + '</li>';
+                    }
+                } else {
+                    html += '<li>' + (node.textContent || '<br>') + '</li>';
+                }
+            }
+
+            return html;
         },
 
         onMouseMove_wysiwyg: function (e) {

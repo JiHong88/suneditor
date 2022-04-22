@@ -438,7 +438,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     fontSizeUnit: 'pt',
     // lineAttrReset: '*',
     alignItems: ['left', 'right', 'center'],
-    value: `<ol><li style="font-size: 18px; color: rgb(0, 85, 255);">dsdasdasss<span style="color: rgb(0, 0, 0);">​</span>dsad</li></ol>
+    value: `<ol><li>dsdasdasssaa</li><li>u8743789</li></ol>
     `,
     linkTargetNewWindow: true,
     imageAlignShow: false,

@@ -1758,7 +1758,10 @@ const util = {
 
         // wrong position
         const wrongTags = this.getListChildNodes(documentFragment, function (current) {
-            if (current.nodeType !== 1) return false;
+            if (current.nodeType !== 1) {
+                if (this.isList(current.parentNode)) removeTags.push(current);
+                return false;
+            }
 
             // white list
             if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && this.isNotCheckingNode(current))) {
