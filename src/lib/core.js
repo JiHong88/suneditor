@@ -5143,9 +5143,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
             
             const domTree = dom.childNodes;
-            let cleanHTML = '';
-            for (let i = 0, t, p; i < domTree.length; i++) {
+            let cleanHTML = '', p = null;
+            for (let i = 0, t; i < domTree.length; i++) {
                 t = domTree[i];
+
                 if (!util.isFormatElement(t) && !util.isComponent(t) && !util.isMedia(t)) {
                     if (!p) p = util.createElement(options.defaultTag);
                     p.appendChild(t);
@@ -5157,8 +5158,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         p = null;
                     }
                 }
+
+                if (p) {
+                    cleanHTML += this._makeLine(p, true);
+                    p = null;
+                }
                 cleanHTML += this._makeLine(t, true);
             }
+            if (p) cleanHTML += this._makeLine(p, true);
 
             if (cleanHTML.length === 0) return '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
 

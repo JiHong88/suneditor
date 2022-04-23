@@ -575,13 +575,14 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     ],
     // maxCharCount: 670,
     // addTagsWhitelist: 'section|footer|details|summary|metadata|path|svg',
-    addTagsWhitelist: '*',
+    // addTagsWhitelist: '*',
     // tagsBlacklist: 'style',
     // pasteTagsBlacklist: 'div',
     // tagsBlacklist: 'section|aside',
     // resizeEnable: false,
     // resizingBarContainer: "#rb",
     attributesWhitelist: {'all': '*'},  // html5 <details open="">..</details>
+    addTagsWhitelist: 'fld|sort|sortType|lst|lstfld|headers',
     // attributesBlacklist: {
     //     all: 'data-a',
     //     span: 'name'
@@ -994,7 +995,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     // iframe: true,
     // fullPage: true,
     imageMultipleFile: true,
-    addTagsWhitelist: "fdl|lst|lstfdl|header"
+    addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header"
 });
 
 s2.onResizeEditor = (height, prevHeight, core) => {
