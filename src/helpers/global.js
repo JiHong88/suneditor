@@ -2,6 +2,33 @@ export const _w = window;
 export const _d = document;
 
 /**
+ * @description Object.values
+ * @param {Object} obj Object parameter.
+ * @returns {Array}
+ */
+export function getValues(obj) {
+	return !obj ? [] : this._w.Object.keys(obj).map(function (i) {
+		return obj[i];
+	});
+}
+
+/**
+ * @description Convert the CamelCase To the KebabCase.
+ * @param {String|Array} param [Camel string]
+ */
+export function camelToKebabCase(param) {
+	if (typeof param === "string") {
+		return param.replace(/[A-Z]/g, function (letter) {
+			return "-" + letter.toLowerCase();
+		});
+	} else {
+		return param.map(function (str) {
+			return util.camelToKebabCase(str);
+		});
+	}
+}
+
+/**
  * @description Gets XMLHttpRequest object
  * @returns {XMLHttpRequest|ActiveXObject}
  */
@@ -117,6 +144,8 @@ export function getIncludePath(nameArray, extension) {
 const global = {
 	_w: _w,
 	_d: _d,
+	getValues: getValues,
+	camelToKebabCase: camelToKebabCase,
 	getXMLHttpRequest: getXMLHttpRequest,
 	getPageStyle: getPageStyle,
 	getIncludePath: getIncludePath

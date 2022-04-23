@@ -1,5 +1,5 @@
 class env {
-  /**
+	/**
 	 * Checks if User Agent is IE
 	 * @returns
 	 */
@@ -28,6 +28,12 @@ class env {
 	 * @returns
 	 */
 	isGecko(): boolean;
+
+	/**
+	 * Checks if User Agent is Chromium browser.
+	 * @returns
+	 */
+	isChromium(): boolean;
 
 	/**
 	 * Checks if User Agent is Safari.

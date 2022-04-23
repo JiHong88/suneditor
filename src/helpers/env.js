@@ -41,11 +41,19 @@ export function isGecko() {
 }
 
 /**
+ * Checks if User Agent is Chromium browser.
+ * @returns {boolean} Whether User Agent is Chromium browser.
+ */
+export function isChromium() {
+	return !!userAgent.match(/gecko\/\d+/);
+}
+
+/**
  * Checks if User Agent is Safari.
  * @returns {boolean} Whether User Agent is Safari or not.
  */
 export function isSafari() {
-	return userAgent.indexOf(" applewebkit/") > -1 && userAgent.indexOf("chrome") === -1;
+	return userAgent.indexOf("applewebkit/") > -1 && userAgent.indexOf("chrome") === -1;
 }
 
 /**
@@ -63,6 +71,7 @@ const env = {
 	isEdge: isEdge(),
 	isBlink: isBlink(),
 	isGecko: isGecko(),
+	isChromium: isChromium(),
 	isSafari: isSafari(),
 	isOSX_IOS: isOSX_IOS(),
 	isAndroid: isAndroid(),

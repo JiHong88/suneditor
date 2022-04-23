@@ -1703,6 +1703,11 @@ Core.prototype = {
         }
     },
 
+    //@todo getContents와 합침
+    getFullContents: function () {
+
+    },
+
     /**
      * @description Returns HTML string according to tag type and configuration.
      * Use only "cleanHTML"
