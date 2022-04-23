@@ -12,7 +12,9 @@ export default {
     display: 'submenu',
     add: function (core, targetElement) {
         const context = core.context;
-        context.template = {};
+        context.template = {
+            selectedIndex: -1
+        };
 
         /** set submenu */
         let templateDiv = this.setSubmenu(core);
@@ -55,7 +57,8 @@ export default {
         e.preventDefault();
         e.stopPropagation();
 
-        const temp = this.options.templates[e.target.getAttribute('data-value')];
+        this.context.template.selectedIndex = e.target.getAttribute('data-value') * 1;
+        const temp = this.options.templates[this.context.template.selectedIndex];
 
         if (temp.html) {
             this.setContents(temp.html);

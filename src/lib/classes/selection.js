@@ -142,12 +142,12 @@ Selection.prototype = {
 		if (startOff > startCon.textContent.length) startOff = startCon.textContent.length;
 		if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
 		if (this.format.isLine(startCon)) {
-			startCon = startCon.childNodes[startOff] || startCon;
-			startOff = 0;
+			startCon = startCon.childNodes[startOff] || startCon.childNodes[startOff - 1] || startCon;
+			startOff = startOff > 0 ? startCon.nodeType === 1 ? 1 : startCon.textContent ? startCon.textContent.length : 0 : 0;
 		}
 		if (this.format.isLine(endCon)) {
-			endCon = endCon.childNodes[endOff] || endCon;
-			endOff = startOff > 1 ? startOff : 0;
+			endCon = endCon.childNodes[endOff] || endCon.childNodes[endOff - 1] || endCon;
+			endOff = endOff > 0 ? endCon.nodeType === 1 ? 1 : endCon.textContent ? endCon.textContent.length : 0 : 0;
 		}
 
 		const range = this._wd.createRange();
@@ -589,7 +589,7 @@ Selection.prototype = {
 					this.setRange(oNode, newRange.startOffset, oNode, newRange.endOffset);
 
 					return newRange;
-				} else if (!domUtils.isBreak(oNode) && this.format.isLine(parentNode)) {
+				} else if (!domUtils.isBreak(oNode) && !domUtils.isListCell(oNode) && this.format.isLine(parentNode)) {
 					let zeroWidth = null;
 					if (!oNode.previousSibling || domUtils.isBreak(oNode.previousSibling)) {
 						zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
@@ -626,6 +626,7 @@ Selection.prototype = {
 	 */
 	insertHTML: function (html, notCleaningData, checkCharCount, rangeSelection) {
 		const __core = this.__core;
+		if (!this.context.element.wysiwygFrame.contains(__core.getSelection().focusNode)) __core.focus();
 
 		if (typeof html === 'string') {
 			if (!notCleaningData) html = __core.cleanHTML(html, null, null);

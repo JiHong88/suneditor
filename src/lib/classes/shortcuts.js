@@ -86,7 +86,7 @@ Shortcuts.prototype = {
 				break;
 		}
 
-		if (!command) return false;
+		if (!command) return keyStr === 'B'; // chromium - bold disabled
 
 		this.__core.commandHandler(command, this.__core.commandMap[command]);
 		return true;

@@ -28,7 +28,9 @@ export default {
         const relative = domUtils.createElement('DIV', {class: "se-container"});
 
         // toolbar
-        const tool_bar = this._createToolBar(options.buttonList, options.plugins, options);
+        const tool_bar = this._createToolBar(doc, options.buttonList, options.plugins, options);
+        const toolbarShadow = tool_bar.element.cloneNode(false);
+        toolbarShadow.className += ' se-toolbar-shadow';
         tool_bar.element.style.visibility = 'hidden';
         if (tool_bar.pluginCallButtons.math) this._checkKatexMath(options.katex);
         const arrow = domUtils.createElement('DIV', {class: "se-arrow"});
@@ -68,6 +70,7 @@ export default {
         const toolbarContainer = options.toolbarContainer;
         if (toolbarContainer) {
             toolbarContainer.appendChild(tool_bar.element);
+            toolbarContainer.appendChild(toolbarShadow);
         }
 
         // resizingbar
@@ -77,7 +80,10 @@ export default {
         /** append html */
         editor_div.appendChild(textarea);
         if (placeholder_span) editor_div.appendChild(placeholder_span);
-        if (!toolbarContainer) relative.appendChild(tool_bar.element);
+        if (!toolbarContainer) {
+            relative.appendChild(tool_bar.element);
+            relative.appendChild(toolbarShadow);
+        }
         relative.appendChild(sticky_dummy);
         relative.appendChild(editor_div);
         relative.appendChild(resize_back);
@@ -95,6 +101,7 @@ export default {
                 _top: top_div,
                 _relative: relative,
                 _toolBar: tool_bar.element,
+                _toolbarShadow: toolbarShadow,
                 _menuTray: tool_bar._menuTray,
                 _editorArea: editor_div,
                 _wysiwygArea: wysiwyg_div,
@@ -286,10 +293,12 @@ export default {
             }
             wysiwygDiv.className += ' ' + options._editableClass;
             wysiwygDiv.style.cssText = options._editorStyles.frame + options._editorStyles.editor;
+            wysiwygDiv.className += options.className;
         } else {
             wysiwygDiv.allowFullscreen = true;
             wysiwygDiv.frameBorder = 0;
             wysiwygDiv.style.cssText = options._editorStyles.frame;
+            wysiwygDiv.className += options.className;
         }
 
         // textarea for code view
@@ -457,11 +466,12 @@ export default {
         options.width = options.width ? (numbers.is(options.width) ? options.width + 'px' : options.width) : (element.clientWidth ? element.clientWidth + 'px' : '100%');
         options.minWidth = (numbers.is(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
         options.maxWidth = (numbers.is(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
-        /** Height size */
+        /** Editing area default style */
         options.height = options.height ? (numbers.is(options.height) ? options.height + 'px' : options.height) : (element.clientHeight ? element.clientHeight + 'px' : 'auto');
         options.minHeight = (numbers.is(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
         options.maxHeight = (numbers.is(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
-        /** Editing area default style */
+        /** Editing area */
+        options.className = (typeof options.className === 'string' && options.className.length > 0) ? ' ' + options.className : '';
         options.defaultStyle = typeof options.defaultStyle === 'string' ? options.defaultStyle : '';
         /** Defining menu items */
         options.font = !options.font ? null : options.font;
@@ -554,6 +564,9 @@ export default {
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print']
         ];
+        /** Private options */
+        options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily'];
+        // options.__defaultFontSize;
 
         /** RTL - buttons */
         if (options.rtl) {
@@ -613,8 +626,8 @@ export default {
             subscript: ['_se_command_subscript', lang.toolbar.subscript, 'SUB', '', icons.subscript],
             superscript: ['_se_command_superscript', lang.toolbar.superscript, 'SUP', '', icons.superscript],
             removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', icons.erase],
-            indent: ['_se_command_indent', lang.toolbar.indent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmd + '+<span class="se-shortcut-key">' + indentKey[0] + '</span>') + '</span>', 'indent', '', icons.outdent],
-            outdent: ['_se_command_outdent', lang.toolbar.outdent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmd + '+<span class="se-shortcut-key">' + indentKey[1] + '</span>') + '</span>', 'outdent', '', icons.indent],
+            indent: ['_se_command_indent', lang.toolbar.indent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmd + '+<span class="se-shortcut-key">' + indentKey[0] + '</span>') + '</span>', 'indent', '', icons.indent],
+            outdent: ['_se_command_outdent', lang.toolbar.outdent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmd + '+<span class="se-shortcut-key">' + indentKey[1] + '</span>') + '</span>', 'outdent', '', icons.outdent],
             fullScreen: ['se-code-view-enabled se-resizing-enabled _se_command_fullScreen', lang.toolbar.fullScreen, 'fullScreen', '', icons.expansion],
             showBlocks: ['_se_command_showBlocks', lang.toolbar.showBlocks, 'showBlocks', '', icons.show_blocks],
             codeView: ['se-code-view-enabled se-resizing-enabled _se_command_codeView', lang.toolbar.codeView, 'codeView', '', icons.code_view],

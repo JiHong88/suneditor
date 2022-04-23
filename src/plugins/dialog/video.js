@@ -817,12 +817,13 @@ export default {
 
         if (!onlyH) w = this.util.getNumber(w, 0);
         if (!onlyW) h = this.util.isNumber(h) ? h + contextVideo.sizeUnit : !h ? '' : h;
+        w ? w + contextVideo.sizeUnit : '';
 
-        if (!onlyH) contextVideo._element.style.width = w ? w + contextVideo.sizeUnit : '';
+        if (!onlyH) contextVideo._element.style.width = w;
         if (!onlyW) contextVideo._cover.style.paddingBottom = contextVideo._cover.style.height = h;
 
         if (!onlyH && !/%$/.test(w)) {
-            contextVideo._cover.style.width = '';
+            contextVideo._cover.style.width = w;
             contextVideo._container.style.width = '';
         }
 

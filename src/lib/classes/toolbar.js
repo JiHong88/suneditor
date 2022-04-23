@@ -104,6 +104,36 @@ Toolbar.prototype = {
 		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'), core);
 	},
 
+	/**
+	 * @description Reset buttons of the responsive toolbar.
+	 */
+	resetResponsiveToolbar: function () {
+		this.__core.containerOff();
+
+		const responsiveSize = this._responsiveButtonSize;
+		if (responsiveSize) {
+			let w = 0;
+			if ((this.__core._isBalloon || this.__core._isInline) && this.options.toolbarWidth === 'auto') {
+				w = this.context.element.topArea.offsetWidth;
+			} else {
+				w = this.context.element.toolbar.offsetWidth;
+			}
+
+			let responsiveWidth = 'default';
+			for (let i = 1, len = responsiveSize.length; i < len; i++) {
+				if (w < responsiveSize[i]) {
+					responsiveWidth = responsiveSize[i] + '';
+					break;
+				}
+			}
+
+			if (this._responsiveCurrentSize !== responsiveWidth) {
+				this._responsiveCurrentSize = responsiveWidth;
+				this.setButtons(this._responsiveButtons[responsiveWidth]);
+			}
+		}
+	},
+
 	_resetSticky: function () {
 		if (this.status.isFullScreen || this.context.element.toolbar.offsetWidth === 0 || this.options.stickyToolbar < 0) return;
 

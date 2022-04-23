@@ -246,10 +246,10 @@ class Events extends EditorInterface {
 	 * @description Called when the audio upload failed
 	 * @param height Height after resized (px)
 	 * @param prevHeight Prev height before resized (px)
-	 * @param core Core object
+	 * @param resizeObserverEntry ResizeObserverEntry object (This is not provided in IE Browser.)
 	 * @returns
 	 */
-	onResizeEditor: (height: number, prevHeight: number) => {};
+	onResizeEditor: (height: number, prevHeight: number, core: Core, resizeObserverEntry: ResizeObserverEntry | null) => {};
 
 	/**
 	 * @description Called after the "setToolbarButtons" invocation.

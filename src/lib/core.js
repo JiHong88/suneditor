@@ -43,6 +43,7 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this._responsiveButtons = _responsiveButtons;
     this._parser = new _w.DOMParser();
     this._prevRtl = options.rtl;
+    this._editorHeight = 0;
 
     /**
      * @description Document object of the iframe if created as an iframe || _d
@@ -1515,8 +1516,8 @@ Core.prototype = {
         this._w.setTimeout(function () {
             try {
                 iframe.focus();
-                // IE or Edge
-                if (env.isIE || env.isEdge || !!this._d.documentMode || !!this._w.StyleMedia) {
+                // IE or Edge, Chromium
+                if (env.isIE || env.isEdge || env.isChromium || !!this._d.documentMode || !!this._w.StyleMedia) {
                     try {
                         iframe.contentWindow.document.execCommand('print', false, null);
                     } catch (e) {
@@ -1703,9 +1704,15 @@ Core.prototype = {
         }
     },
 
-    //@todo getContents와 합침
-    getFullContents: function () {
-
+    /**
+     * @todo getContents와 병합
+     * @description Gets the current contents with containing parent div(div.sun-editor-editable).
+     * <div class="sun-editor-editable">{contents}</div>
+     * @param {Boolean} onlyContents Return only the contents of the body without headers when the "fullPage" option is true
+     * @returns {Object}
+     */
+    getFullContents: function (onlyContents) {
+        return '<div class="sun-editor-editable' + this.options.rtl ? ' se-rtl' : '' + '">' + this.getContents(onlyContents) + '</div>';
     },
 
     /**
@@ -1795,7 +1802,10 @@ Core.prototype = {
 
         // wrong position
         const wrongTags = domUtils.getListChildNodes(documentFragment, function (current) {
-            if (current.nodeType !== 1) return false;
+            if (current.nodeType !== 1) {
+                if (domUtils.isList(current.parentNode)) removeTags.push(current);
+                return false;
+            }
 
             // white list
             if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && this.format.isNotCheckingNode(current))) {
@@ -1985,22 +1995,30 @@ Core.prototype = {
         }
 
         const domTree = dom.childNodes;
-        let cleanHTML = '';
-        for (let i = 0, t, p; i < domTree.length; i++) {
+        let cleanHTML = '',
+            p = null;
+        for (let i = 0, t; i < domTree.length; i++) {
             t = domTree[i];
-            if (!this.format.isLine(t) && !this.component.is(t) && !domUtils.isMedia(t)) {
-                if (!p) p = domUtils.createElement(this.options.defaultTag);
+
+            if (!util.isFormatElement(t) && !util.isComponent(t) && !util.isMedia(t)) {
+                if (!p) p = util.createElement(options.defaultTag);
                 p.appendChild(t);
                 i--;
-                if (domTree[i + 1] && !this.format.isLine(domTree[i + 1])) {
+                if (domTree[i + 1] && !util.isFormatElement(domTree[i + 1])) {
                     continue;
                 } else {
                     t = p;
                     p = null;
                 }
             }
+
+            if (p) {
+                cleanHTML += this._makeLine(p, true);
+                p = null;
+            }
             cleanHTML += this._makeLine(t, true);
         }
+        if (p) cleanHTML += this._makeLine(p, true);
 
         if (cleanHTML.length === 0) return '<' + this.options.defaultTag + '><br></' + this.options.defaultTag + '>';
 
@@ -2215,7 +2233,9 @@ Core.prototype = {
             const wysiwyg = this.context.element.wysiwyg;
             const children = temp.children;
             for (let i = 0, len = children.length; i < len; i++) {
-                wysiwyg.appendChild(children[i]);
+                if (children[i]) {
+                    wysiwyg.appendChild(children[i]);         
+                }
             }
         } else {
             this._setCodeView(this._getCodeView() + '\n' + this.convertHTMLForCodeView(convertValue, false));
@@ -2242,8 +2262,10 @@ Core.prototype = {
             if (this.modalForm) this.plugins.dialog.close.call(this);
 
             this.context.element.code.setAttribute("readOnly", "true");
+            domUtils.addClass(this.context.element.wysiwygFrame, 'se-read-only');
         } else {
             this.context.element.code.removeAttribute("readOnly");
+            domUtils.removeClass(this.context.element.wysiwygFrame, 'se-read-only');
         }
 
         if (this.options.codeMirrorEditor) this.options.codeMirrorEditor.setOption('readOnly', !!value);
@@ -2390,6 +2412,7 @@ Core.prototype = {
         this._wd = this._d;
         this._charTypeHTML = options.charCounterType === 'byte-html';
         this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
+        this._editorHeight = context.element.wysiwygFrame.offsetHeight;
 
         if (!options.iframe && typeof _w.ShadowRoot === 'function') {
             let child = context.element.wysiwygFrame;
@@ -2645,6 +2668,24 @@ Core.prototype = {
                 this.context.element.wysiwygFrame.style.height = this._iframeAuto.offsetHeight + 'px';
             }.bind(this));
         }
+
+        if (this._iframeAuto) {
+            this._w.setTimeout(function () {
+                const h = this._iframeAuto.offsetHeight;
+                this.context.element.wysiwygFrame.style.height = h + 'px';
+                if (env.isIE) this.__callResizeFunction(h, null);
+            }.bind(this));
+        } else if (env.isIE) {
+            this.__callResizeFunction(this.context.element.wysiwygFrame.offsetHeight, null);
+        }
+    },
+
+    __callResizeFunction(h, resizeObserverEntry) {
+        h = h === -1 ? resizeObserverEntry.borderBoxSize[0].blockSize : h;
+        if (this._editorHeight !== h) {
+            if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, this._editorHeight, core, resizeObserverEntry);
+            this._editorHeight = h;
+        }
     },
 
     _codeViewAutoHeight: function () {
@@ -2709,6 +2750,9 @@ Core.prototype = {
         this._resourcesStateChange();
 
         this._w.setTimeout(function () {
+            // observer
+            if (this.eventManager._resizeObserver) this.eventManager._resizeObserver.observe(this.context.element.wysiwygFrame);
+            if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(this.context.element._toolbarShadow);
             // user event
             if (typeof this.events.onload === 'function') this.events.onload(reload);
         }.bind(this));
@@ -2725,6 +2769,7 @@ Core.prototype = {
             _top: contextEl.topArea,
             _relative: contextEl.relative,
             _toolBar: contextEl.toolbar,
+            _toolbarShadow: contextEl._toolbarShadow,
             _menuTray: contextEl._menuTray,
             _editorArea: contextEl.editorArea,
             _wysiwygArea: contextEl.wysiwygFrame,

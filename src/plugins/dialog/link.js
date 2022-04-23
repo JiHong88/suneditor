@@ -118,6 +118,7 @@ export default {
 
         try {
             const oA = this.plugins.anchor.createAnchor.call(this, this.context.anchor.caller.link, false);
+            if (oA === null) return;
     
             if (!this.context.dialog.updateModal) {
                 const selectedFormats = this.selection.getLines();

@@ -4,11 +4,13 @@
  */
 
 import CoreInterface from "../../interface/_core";
-import { domUtils, unicode, numbers } from "../../helpers";
+import { domUtils, unicode, numbers, global } from "../../helpers";
 import { _w } from "../../helpers/global";
 
 const Format = function (editor) {
 	CoreInterface.call(this, editor);
+	this._listCamel = editor.options.__listCommonStyle;
+    this._listKebab  = global.camelToKebabCase(editor.options.__listCommonStyle);
 };
 
 Format.prototype = {
@@ -1092,6 +1094,8 @@ Format.prototype = {
 				this.isLine(endCon.parentNode)) ||
 			(startCon === endCon && startCon.nodeType === 1 && domUtils.isNonEditable(startCon))
 		) {
+			const format = startCon.parentNode;
+			if (!domUtils.isListCell(format) || !global.getValues(format.style).some(function(k) { return this._listKebab.indexOf(k) > -1; }.bind(this))) return;
 			return;
 		}
 
@@ -1354,6 +1358,7 @@ Format.prototype = {
 
 		// one line
 		if (oneLine) {
+			this._resetCommonListCell(lineNodes[0], styleArray);
 			const newRange = this._setNode_oneLine(
 				lineNodes[0],
 				newNode,
@@ -1381,6 +1386,7 @@ Format.prototype = {
 			// multi line
 			// end
 			if (endLength > 0) {
+				this._resetCommonListCell(lineNodes[endLength], styleArray);
 				newNode = styleNode.cloneNode(false);
 				end = this._setNode_endLine(
 					lineNodes[endLength],
@@ -1398,6 +1404,7 @@ Format.prototype = {
 
 			// mid
 			for (let i = endLength - 1, newRange; i > 0; i--) {
+				this._resetCommonListCell(lineNodes[i], styleArray);
 				newNode = styleNode.cloneNode(false);
 				newRange = this._setNode_middleLine(
 					lineNodes[i],
@@ -1416,6 +1423,7 @@ Format.prototype = {
 			}
 
 			// start
+			this._resetCommonListCell(lineNodes[0], styleArray);
 			newNode = styleNode.cloneNode(false);
 			start = this._setNode_startLine(
 				lineNodes[0],
@@ -1920,6 +1928,55 @@ Format.prototype = {
 	},
 
 	/**
+	 * @description Watch the applied text nodes and adjust the common styles of the list.
+	 * @param {Element} el "LI" element
+	 * @param {Array|null} styleArray Refer style array
+	 * @private
+	 */
+	_resetCommonListCell: function (el, styleArray) {
+		if (!domUtils.isListCell(el)) return;
+		if (!styleArray) styleArray = this._listKebab;
+
+		const children = domUtils.getArrayItem((el).childNodes, function (current) { return !util.isBreak(current); }, true);
+		const elStyles = el.style;
+
+		const ec = [], ek = [], elKeys = global.getValues(elStyles);
+		for (let i = 0, len = this._listKebab.length; i < len; i++) {
+			if (elKeys.indexOf(this._listKebab[i]) > -1 && styleArray.indexOf(this._listKebab[i]) > -1) {
+				ec.push(this._listCamel[i]);
+				ek.push(this._listKebab[i]);
+			}
+		}
+
+		if (!ec.length) return;
+
+		// reset cell style---
+		const refer = domUtils.createElement('SPAN');
+		for (let i = 0, len = ec.length; i < len; i++) {
+			refer.style[ec[i]] = elStyles[ek[i]];
+			elStyles.removeProperty(ek[i]);
+		}
+
+		let sel = refer.cloneNode(false);
+		let r = null;
+		for (let i = 0, len = children.length, c, s; i < len; i++) {
+			c = children[i];
+			s = util.getValues(c.style);
+			if (s.length === 0 || (ec.some(function (k) {return s.indexOf(k) === -1;}) && s.some(function(k) {ec.indexOf(k) > -1;}))) {
+				r = c.nextSibling;
+				sel.appendChild(c);
+			} else if (sel.childNodes.length > 0) {
+				el.insertBefore(sel, r);
+				sel = refer.cloneNode(false);
+				r = null;
+			}
+		}
+
+		if (sel.childNodes.length > 0) el.insertBefore(sel, r);
+		if (!elStyles.length) el.removeAttribute('style');
+	},
+
+	/**
 	 * @description wraps text nodes of line selected text.
 	 * @param {Element} element The node of the line that contains the selected text node.
 	 * @param {Element} newInnerNode The dom that will wrap the selected text area
@@ -1990,6 +2047,7 @@ Format.prototype = {
 					domUtils.copyTagAttributes(parentCon, newInnerNode);
 
 					return {
+						ancestor: element,
 						startContainer: startCon,
 						startOffset: startOff,
 						endContainer: endCon,
@@ -3275,7 +3333,6 @@ Format.prototype = {
 	 */
 	_sn_setCommonListStyle: function (el, child) {
 		if (!domUtils.isListCell(el)) return;
-		if (!child) el.removeAttribute("style");
 
 		const children = domUtils.getArrayItem(
 			(child || el).childNodes,
@@ -3284,25 +3341,44 @@ Format.prototype = {
 			},
 			true
 		);
+		
+		if (!child || children.length > 1 || child.nodeType !== 1) return;
+            
+		// set cell style---
+		const commonStyleElements = [];
+		const childStyle = child.style;
+		const elStyle = el.style;
 
-		if (children[0] && children.length === 1) {
-			child = children[0];
-			if (!child || child.nodeType !== 1) return;
+		// bold, italic
+		if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.__core._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
+		else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
+		if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.__core._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
+		else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
 
-			const childStyle = child.style;
-			const elStyle = el.style;
+		// styles
+		const cKeys = global.getValues(childStyle);
+		for (let i = 0, len = this._listCamel.length; i < len; i++) {
+			if (cKeys.indexOf(this._listKebab[i]) > -1) {
+				elStyle[this._listCamel[i]] = childStyle[this._listCamel[i]];
+				childStyle.removeProperty(this._listKebab[i]);
+			}
+		}
+		
+		// remove child
+		if (!childStyle.length) commonStyleElements.push(child);
 
-			// bold, italic
-			if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.__core._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
-			else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
-			if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.__core._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
-			else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
+		this._sn_setCommonListStyle(el, child);
 
-			// styles
-			if (childStyle.color) elStyle.color = childStyle.color; // color
-			if (childStyle.fontSize) elStyle.fontSize = childStyle.fontSize; // size
-
-			this._sn_setCommonListStyle(el, child);
+		// common style
+		for (let i = 0, len = commonStyleElements.length, n, ch, p; i < len; i++) {
+			n = commonStyleElements[i];
+			ch = n.childNodes;
+			p = n.parentNode;
+			n = n.nextSibling;
+			while (ch.length > 0) {
+				p.insertBefore(ch[0], n);
+			}
+			domUtils.removeItem(commonStyleElements[i]);
 		}
 	},
 
