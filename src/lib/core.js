@@ -2941,7 +2941,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // styles
             const cKeys = util.getValues(childStyle);
-            for (let i = 0, len = this._listCamel.length, k; i < len; i++) {
+            for (let i = 0, len = this._listCamel.length; i < len; i++) {
                 if (cKeys.indexOf(this._listKebab[i]) > -1) {
                     elStyle[this._listCamel[i]] = childStyle[this._listCamel[i]];
                     childStyle.removeProperty(this._listKebab[i]);
