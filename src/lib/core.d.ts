@@ -934,9 +934,10 @@ export default class SunEditor {
      * @param height Height after resized (px)
      * @param prevHeight Prev height before resized (px)
      * @param core Core object
+     * @param resizeObserverEntry ResizeObserverEntry object (This is not provided in IE Browser.)
      * @returns
      */
-    onResizeEditor: (height: number, prevHeight: number, core: Core) => {};
+    onResizeEditor: (height: number, prevHeight: number, core: Core, resizeObserverEntry: ResizeObserverEntry | null) => {};
 
     /**
      * @description Called after the "setToolbarButtons" invocation.

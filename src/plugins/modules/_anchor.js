@@ -119,23 +119,30 @@ export default {
     },
 
     on: function (contextAnchor, update) {
+        const anchorPlugin = this.plugins.anchor;
+
         if (!update) {
-            this.plugins.anchor.init.call(this, contextAnchor);
+            anchorPlugin.init.call(this, contextAnchor);
             contextAnchor.anchorText.value = this.getSelection().toString().trim();
             contextAnchor.newWindowCheck.checked = this.options.linkTargetNewWindow;
         } else if (contextAnchor.linkAnchor) {
             this.context.dialog.updateModal = true;
             const href = this.options.linkNoPrefix ? contextAnchor.linkAnchor.href.replace(contextAnchor.linkAnchor.origin + '/', '') : contextAnchor.linkAnchor.href;
-            contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = /\#.+$/.test(href) ? href.substr(href.lastIndexOf('#')) : href;
+            contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = anchorPlugin.selfPathBookmark.call(this, href) ? href.substr(href.lastIndexOf('#')) : href;
             contextAnchor.anchorText.value = contextAnchor.linkAnchor.textContent || contextAnchor.linkAnchor.getAttribute('alt');
             contextAnchor.newWindowCheck.checked = (/_blank/i.test(contextAnchor.linkAnchor.target) ? true : false);
             contextAnchor.downloadCheck.checked = contextAnchor.linkAnchor.download;
         }
 
         this.context.anchor.callerContext = contextAnchor;
-        this.plugins.anchor.setRel.call(this, contextAnchor, (update && contextAnchor.linkAnchor) ? contextAnchor.linkAnchor.rel : contextAnchor.defaultRel);
-        this.plugins.anchor.setLinkPreview.call(this, contextAnchor, contextAnchor.linkValue);
+        anchorPlugin.setRel.call(this, contextAnchor, (update && contextAnchor.linkAnchor) ? contextAnchor.linkAnchor.rel : contextAnchor.defaultRel);
+        anchorPlugin.setLinkPreview.call(this, contextAnchor, contextAnchor.linkValue);
         this.plugins.selectMenu.on.call(this, contextAnchor.callerName, this.plugins.anchor.setHeaderBookmark);
+    },
+
+    selfPathBookmark: function(path) {
+        const href = this._w.location.href.replace(/\/$/, '');
+        return path.indexOf('#') === 0 || (path.indexOf(href) === 0 && path.indexOf('#') === (href.indexOf("#") === -1 ? href.length : href.substr(0, href.indexOf("#")).length));
     },
 
     _closeRelMenu: null,
@@ -278,13 +285,13 @@ export default {
         const value = e.target.value.trim();
         this.plugins.anchor.setLinkPreview.call(this, contextAnchor, value);
 
-        if (/^#/.test(value)) this.plugins.anchor.createHeaderList.call(this, contextAnchor, this.context.selectMenu.callerContext, value);
+        if (this.plugins.anchor.selfPathBookmark.call(this, value)) this.plugins.anchor.createHeaderList.call(this, contextAnchor, this.context.selectMenu.callerContext, value);
         else this.plugins.selectMenu.close.call(this, this.context.selectMenu.callerContext);
     },
 
     onFocusUrlInput: function (contextAnchor, contextLink) {
         const value = contextAnchor.urlInput.value;
-        if (/^#/.test(value)) this.plugins.anchor.createHeaderList.call(this, contextAnchor, contextLink, value);
+        if (this.plugins.anchor.selfPathBookmark.call(this, value)) this.plugins.anchor.createHeaderList.call(this, contextAnchor, contextLink, value);
     },
 
     onBlurUrlInput: function (contextList) {
@@ -297,9 +304,9 @@ export default {
         const noPrefix = this.options.linkNoPrefix;
         const reservedProtocol  = /^(mailto\:|tel\:|sms\:|https*\:\/\/|#)/.test(value);
         const sameProtocol = !protocol ? false : this._w.RegExp('^' + value.substr(0, protocol.length)).test(protocol);
-        context.linkValue = preview.textContent = !value ? '' : noPrefix ? value : (protocol && !reservedProtocol && !sameProtocol) ? protocol + value : reservedProtocol ? value : /^www\./.test(value) ? 'http://' + value : this.context.anchor.host + (/^\//.test(value) ? '' : '/') + value;
+        value = context.linkValue = preview.textContent = !value ? '' : noPrefix ? value : (protocol && !reservedProtocol && !sameProtocol) ? protocol + value : reservedProtocol ? value : /^www\./.test(value) ? 'http://' + value : this.context.anchor.host + (/^\//.test(value) ? '' : '/') + value;
 
-        if (value.indexOf('#') === 0) {
+        if (this.plugins.anchor.selfPathBookmark.call(this, value)) {
             context.bookmark.style.display = 'block';
             this.util.addClass(context.bookmarkButton, 'active');
         } else {
@@ -307,7 +314,7 @@ export default {
             this.util.removeClass(context.bookmarkButton, 'active');
         }
 
-        if (value.indexOf('#') === -1 && context.downloadCheck.checked) {
+        if (!this.plugins.anchor.selfPathBookmark.call(this, value) && context.downloadCheck.checked) {
             context.download.style.display = 'block';
         } else {
             context.download.style.display = 'none';
@@ -323,7 +330,7 @@ export default {
 
     updateAnchor: function (anchor, url, alt, contextAnchor, notText) {
         // download
-        if (!/^\#/.test(url) && contextAnchor.downloadCheck.checked) {
+        if (!this.plugins.anchor.selfPathBookmark.call(this, url) && contextAnchor.downloadCheck.checked) {
             anchor.setAttribute('download', alt || url);
         } else {
             anchor.removeAttribute('download');
@@ -356,7 +363,7 @@ export default {
         const anchorText = anchor.value.length === 0 ? url : anchor.value;
 
         const oA = contextAnchor.linkAnchor || this.util.createElement('A');
-        this.plugins.anchor.updateAnchor(oA, url, anchorText, contextAnchor, notText);
+        this.plugins.anchor.updateAnchor.call(this, oA, url, anchorText, contextAnchor, notText);
 
         contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = contextAnchor.anchorText.value = '';
 
@@ -365,7 +372,7 @@ export default {
 
     onClick_bookmarkButton: function (contextAnchor) {
         let url = contextAnchor.urlInput.value;
-        if (/^\#/.test(url)) {
+        if (this.plugins.anchor.selfPathBookmark.call(this, url)) {
             url = url.substr(1);
             contextAnchor.bookmark.style.display = 'none';
             this.util.removeClass(contextAnchor.bookmarkButton, 'active');

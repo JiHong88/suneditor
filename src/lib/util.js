@@ -16,6 +16,7 @@ const util = {
     isIE: null,
     isIE_Edge: null,
     isOSX_IOS: null,
+    isChromium: null,
     _propertiesInit: function () {
         if (this._d) return;
         this._d =  document;
@@ -23,6 +24,7 @@ const util = {
         this.isIE = navigator.userAgent.indexOf('Trident') > -1;
         this.isIE_Edge = (navigator.userAgent.indexOf('Trident') > -1) || (navigator.appVersion.indexOf('Edge') > -1);
         this.isOSX_IOS = /(Mac|iPhone|iPod|iPad)/.test(navigator.platform);
+        this.isChromium = !!window.chrome;
     },
 
     _allowedEmptyNodeList: '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas',
@@ -61,6 +63,7 @@ const util = {
      * @returns {Boolean}
      */
     onlyZeroWidthSpace: function (text) {
+        if (!text) return false;
         if (typeof text !== 'string') text = text.textContent;
         return text === '' || this.onlyZeroWidthRegExp.test(text);
     },
@@ -89,6 +92,29 @@ const util = {
         /** fail */
         else {
             return null;
+        }
+    },
+
+    /**
+     * @description Object.values
+     * @param {Object} obj Object parameter.
+     * @returns {Array}
+     */
+    getValues: function (obj) {
+        return !obj ? [] : this._w.Object.keys(obj).map(function (i) {
+            return obj[i];
+        });
+    },
+
+    /**
+     * @description Convert the CamelCase To the KebabCase.
+     * @param {String|Array} param [Camel string]
+     */
+    camelToKebabCase: function (param) {
+        if (typeof param === 'string') {
+            return param.replace(/[A-Z]/g, function (letter) { return "-" + letter.toLowerCase(); });
+        } else {
+            return param.map(function(str) { return util.camelToKebabCase(str); });
         }
     },
 
@@ -1733,7 +1759,10 @@ const util = {
 
         // wrong position
         const wrongTags = this.getListChildNodes(documentFragment, function (current) {
-            if (current.nodeType !== 1) return false;
+            if (current.nodeType !== 1) {
+                if (this.isList(current.parentNode)) removeTags.push(current);
+                return false;
+            }
 
             // white list
             if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && this.isNotCheckingNode(current))) {

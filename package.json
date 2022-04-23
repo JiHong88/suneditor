@@ -1,6 +1,6 @@
 {
   "name": "suneditor",
-  "version": "2.42.0",
+  "version": "2.43.0",
   "description": "Pure JavaScript based WYSIWYG web editor",
   "author": "JiHong.Lee",
   "license": "MIT",
@@ -9,7 +9,7 @@
     "./src/assets/css/*.css"
   ],
   "scripts": {
-    "dev": "webpack-dev-server --open --config webpack.dev.js",
+    "dev": "webpack-dev-server --config webpack.dev.js",
     "start": "npm run dev",
     "build": "webpack --config webpack.prod.js",
     "lint": "jshint src",
@@ -40,8 +40,8 @@
     "html-webpack-plugin": "^3.2.0",
     "jasmine": "^2.99.0",
     "jasmine-core": "^2.99.1",
-    "jshint": "^2.12.0",
-    "karma": "^4.4.1",
+    "jshint": "^2.13.4",
+    "karma": "^6.3.19",
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^1.1.2",
     "katex": "^0.11.1",
