@@ -531,8 +531,9 @@ minHeight       : The min-height size of the editor.
 maxHeight       : The max-height size of the editor.
                   Used when 'height' value is 'auto'.               default: null {Number|String}
 
-// Editing area default style------------------------------------------------------------------------------------
-defaultStyle    : You can define the style of the edit area. (className: 'sun-editor-editable')
+// Editing area -------------------------------------------------------------------------------------------------
+className       : Add a "class" to the editing area[.sun-editor-editable].    default: '' {String}
+defaultStyle    : You can define the style of the editing area[.sun-editor-editable].
                   It affects the entire editing area.               default: '' {String}
                   ('z-index', 'position' and 'width' properties apply to the top div.)
                   ex) 'font-family: cursive; font-size: 10px;'
@@ -1023,6 +1024,9 @@ editor.getContext();
 // Gets the contents of the suneditor
 // onlyContents {Boolean}: Return only the contents of the body without headers when the "fullPage" option is true
 editor.getContents(onlyContents: Boolean);
+// Gets the current contents with containing parent div(div.sun-editor-editable).
+//  <div class="sun-editor-editable">{contents}</div>
+editor.getFullContents(onlyContents: Boolean);
 
 // Gets only the text of the suneditor contents
 editor.getText();
@@ -1346,8 +1350,9 @@ editor.onAudioUploadError = function (errorMessage, result, core) {
 
 // Called when the editor is resized using the bottom bar
 // height, prevHeight are number
-editor.onResizeEditor = function (height, prevHeight, core) {
-    console.log(`height: ${height}, prevHeight: ${prevHeight}`)
+editor.onResizeEditor = function (height, prevHeight, core, resizeObserverEntry) {
+    console.log(`height: ${height}, prevHeight: ${prevHeight}`, resizeObserverEntry)
+    // "resizeObserverEntry" is not provided in IE Browser. 
 }
 
 // Called after the "setToolbarButtons" invocation

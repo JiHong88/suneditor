@@ -65,11 +65,7 @@ export default {
         const icon = button.firstElementChild;
         const util = this.util;
 
-        if (!element) {
-            button.removeAttribute('data-focus');
-            util.changeElement(icon, this.context.list.icons.number);
-            util.removeClass(button, 'active');
-        } else if (util.isList(element)) {
+        if (util.isList(element)) {
             const nodeName = element.nodeName;
             button.setAttribute('data-focus', nodeName);
             util.addClass(button, 'active');
@@ -80,6 +76,10 @@ export default {
             }
             
             return true;
+        } else {
+            button.removeAttribute('data-focus');
+            util.changeElement(icon, this.context.list.icons.number);
+            util.removeClass(button, 'active');
         }
 
         return false;
@@ -234,6 +234,14 @@ export default {
 
                 newCell = util.createElement('LI');
                 util.copyFormatAttributes(newCell, fTag);
+
+                if (i ===  0 && originRange.sc === fTag) {
+                    originRange.sc = newCell;
+                }
+                if (i === len - 1 && originRange.ec === fTag) {
+                    originRange.ec = newCell;
+                }
+
                 if (util.isComponent(fTag)) {
                     const isHR = /^HR$/i.test(fTag.nodeName);
                     if (!isHR) newCell.innerHTML = '<br>';

@@ -241,7 +241,10 @@
             <input type="text" id="maxHeight_value" placeholder="Number, ..style">
 
             <br>
-            <h4 style="color: #b94a48;">--Editing area default style</h4>
+            <h4 style="color: #b94a48;">--Editing area</h4>
+            <label><input type="checkbox" id="className">&nbsp;&nbsp;className</label>
+            <input type="text" id="className_value" placeholder="String" style="width:320px">
+            <br><br>
             <label><input type="checkbox" id="defaultStyle">&nbsp;&nbsp;defaultStyle</label>
             <input type="text" id="defaultStyle_value" placeholder="String (font-family: cursive; font-size: 10px;)" style="width:320px">
 
@@ -441,6 +444,8 @@
             <span>&nbsp;check_new_window: 'noreferrer noopener',</span>
             <span>&nbsp;check_bookmark: 'bookmark'</span>
             <span>}</span>
+            <br><br>
+            <label><input type="checkbox" id="linkNoPrefix">&nbsp;&nbsp;linkNoPrefix</label>
 
             <br>
             <h4 style="color: #b94a48;">--HR</h4>
@@ -635,6 +640,7 @@ function sun_create () {
         height: document.getElementById('height').checked ? document.getElementById('height_value').value : undefined,
         minHeight: document.getElementById('minHeight').checked ? document.getElementById('minHeight_value').value : undefined,
         maxHeight: document.getElementById('maxHeight').checked ? document.getElementById('maxHeight_value').value : undefined,
+        className: document.getElementById('className').checked ? document.getElementById('className_value').value : undefined,
         defaultStyle: document.getElementById('defaultStyle').checked ? document.getElementById('defaultStyle_value').value : undefined,
         font: !document.getElementById('font').checked ? undefined : [
             'Arial',
@@ -706,6 +712,7 @@ function sun_create () {
         linkProtocol: document.getElementById('linkProtocol').checked ? document.getElementById('linkProtocol_value').value : undefined,
         linkRel: document.getElementById('linkRel').checked ? ['author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'] : undefined,
         linkRelDefault: document.getElementById('linkRelDefault').checked ? {default: 'nofollow', check_new_window: 'noreferrer noopener', check_bookmark: 'bookmark'} : undefined,
+        linkNoPrefix: document.getElementById('linkNoPrefix').checked ? true : undefined,
         shortcutsDisable: document.getElementById('shortcutsDisable').checked ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent'] : undefined,
         shortcutsHint: document.getElementById('shortcutsHint').checked ? undefined : false,
         callBackSave: document.getElementById('callBackSave').checked ? function (contents) { alert(contents) } : undefined,

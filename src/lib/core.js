@@ -40,6 +40,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _w: _w,
         _parser: new _w.DOMParser(),
         _prevRtl: options.rtl,
+        _editorHeight: 0,
+        _listCamel: options.__listCommonStyle,
+        _listKebab: util.camelToKebabCase(options.__listCommonStyle),
 
         /**
          * @description Document object of the iframe if created as an iframe || _d
@@ -1056,12 +1059,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (startOff > startCon.textContent.length) startOff = startCon.textContent.length;
             if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
             if (util.isFormatElement(startCon)) {
-                startCon = startCon.childNodes[startOff] || startCon;
-                startOff = 0;
+                startCon = startCon.childNodes[startOff] || startCon.childNodes[startOff - 1] || startCon;
+                startOff = startOff > 0 ? startCon.nodeType === 1 ? 1 : startCon.textContent ? startCon.textContent.length : 0 : 0;
             }
             if (util.isFormatElement(endCon)) {
-                endCon = endCon.childNodes[endOff] || endCon;
-                endOff = startOff > 1 ? startOff : 0;
+                endCon = endCon.childNodes[endOff] || endCon.childNodes[endOff - 1] || endCon;
+                endOff = endOff > 0 ? endCon.nodeType === 1 ? 1 : endCon.textContent ? endCon.textContent.length : 0 : 0;
             }
             
             const range = this._wd.createRange();
@@ -1876,7 +1879,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         this.setRange(oNode, newRange.startOffset, oNode, newRange.endOffset);
     
                         return newRange;
-                    } else if (!util.isBreak(oNode) && util.isFormatElement(parentNode)) {
+                    } else if (!util.isBreak(oNode) && !util.isListCell(oNode) && util.isFormatElement(parentNode)) {
                         let zeroWidth = null;
                         if (!oNode.previousSibling || util.isBreak(oNode.previousSibling)) {
                             zeroWidth = util.createTextNode(util.zeroWidthSpace);
@@ -2585,8 +2588,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let endCon = range.endContainer;
             let endOff = range.endOffset;
 
-            if ((isRemoveFormat && range.collapsed && util.isFormatElement(startCon.parentNode) && util.isFormatElement(endCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && util.isNonEditable(startCon))) {
-                return;
+            if ((isRemoveFormat && range.collapsed && util.isFormatElement(startCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && util.isNonEditable(startCon))) {
+                const format = startCon.parentNode;
+                if (!util.isListCell(format) || !util.getValues(format.style).some(function(k) { return this._listKebab.indexOf(k) > -1; }.bind(this))) return;
             }
 
             if (range.collapsed && !isRemoveFormat) {
@@ -2806,6 +2810,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // one line
             if (oneLine) {
+                this._resetCommonListCell(lineNodes[0], styleArray);
                 const newRange = this._nodeChange_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode);
                 start.container = newRange.startContainer;
                 start.offset = newRange.startOffset;
@@ -2818,12 +2823,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             } else { // multi line 
                 // end
                 if (endLength > 0) {
+                    this._resetCommonListCell(lineNodes[endLength], styleArray);
                     newNode = appendNode.cloneNode(false);
                     end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
                 }
 
                 // mid
                 for (let i = endLength - 1, newRange; i > 0; i--) {
+                    this._resetCommonListCell(lineNodes[i], styleArray);
                     newNode = appendNode.cloneNode(false);
                     newRange = this._nodeChange_middleLine(lineNodes[i], newNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, end.container);
                     if (newRange.endContainer && newRange.ancestor.contains(newRange.endContainer)) {
@@ -2834,6 +2841,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
 
                 // start
+                this._resetCommonListCell(lineNodes[0], styleArray);
                 newNode = appendNode.cloneNode(false);
                 start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, end.container);
 
@@ -2862,35 +2870,99 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.history.push(false);
         },
 
+        _resetCommonListCell: function (el, styleArray) {
+            if (!util.isListCell(el)) return;
+            if (!styleArray) styleArray = this._listKebab;
+
+            const children = util.getArrayItem((el).childNodes, function (current) { return !util.isBreak(current); }, true);
+            const elStyles = el.style;
+            
+            const ec = [], ek = [], elKeys = util.getValues(elStyles);
+            for (let i = 0, len = this._listKebab.length; i < len; i++) {
+                if (elKeys.indexOf(this._listKebab[i]) > -1 && styleArray.indexOf(this._listKebab[i]) > -1) {
+                    ec.push(this._listCamel[i]);
+                    ek.push(this._listKebab[i]);
+                }
+            }
+
+            if (!ec.length) return;
+
+            // reset cell style---
+            const refer = util.createElement('SPAN');
+            for (let i = 0, len = ec.length; i < len; i++) {
+                refer.style[ec[i]] = elStyles[ek[i]];
+                elStyles.removeProperty(ek[i]);
+            }
+
+            let sel = refer.cloneNode(false);
+            let r = null;
+            for (let i = 0, len = children.length, c, s; i < len; i++) {
+                c = children[i];
+                s = util.getValues(c.style);
+                if (s.length === 0 || (ec.some(function (k) {return s.indexOf(k) === -1;}) && s.some(function(k) {ec.indexOf(k) > -1;}))) {
+                    r = c.nextSibling;
+                    sel.appendChild(c);
+                } else if (sel.childNodes.length > 0) {
+                    el.insertBefore(sel, r);
+                    sel = refer.cloneNode(false);
+                    r = null;
+                }
+            }
+            
+            if (sel.childNodes.length > 0) el.insertBefore(sel, r);
+            if (!elStyles.length) el.removeAttribute('style');
+        },
+
         /**
          * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
          * @param {Element} el List cell element. <li>
          * @param {Element|null} child Variable for recursive call. ("null" on the first call)
+         * @param {Array|null} styleArray Style array
          * @private
          */
         _setCommonListStyle: function (el, child) {
             if (!util.isListCell(el)) return;
-            if (!child) el.removeAttribute('style');
             
             const children = util.getArrayItem((child || el).childNodes, function (current) { return !util.isBreak(current); }, true);
-            if (children[0] && children.length === 1){
-                child = children[0];
-                if (!child || child.nodeType !== 1) return;
+            child = children[0];
+            
+            if (!child || children.length > 1 || child.nodeType !== 1) return;
+            
+            // set cell style---
+            const commonStyleElements = [];
+            const childStyle = child.style;
+            const elStyle = el.style;
 
-                const childStyle = child.style;
-                const elStyle = el.style;
+            // bold, italic
+            if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
+            else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
+            if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
+            else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
 
-                // bold, italic
-                if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
-                else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
-                if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
-                else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
+            // styles
+            const cKeys = util.getValues(childStyle);
+            for (let i = 0, len = this._listCamel.length; i < len; i++) {
+                if (cKeys.indexOf(this._listKebab[i]) > -1) {
+                    elStyle[this._listCamel[i]] = childStyle[this._listCamel[i]];
+                    childStyle.removeProperty(this._listKebab[i]);
+                }
+            }
+            
+            // remove child
+            if (!childStyle.length) commonStyleElements.push(child);
 
-                // styles
-                if (childStyle.color) elStyle.color = childStyle.color; // color
-                if (childStyle.fontSize) elStyle.fontSize = childStyle.fontSize; // size
+            this._setCommonListStyle(el, child);
 
-                this._setCommonListStyle(el, child);
+            // common style
+            for (let i = 0, len = commonStyleElements.length, n, ch, p; i < len; i++) {
+                n = commonStyleElements[i];
+                ch = n.childNodes;
+                p = n.parentNode;
+                n = n.nextSibling;
+                while (ch.length > 0) {
+                    p.insertBefore(ch[0], n);
+                }
+                util.removeItem(commonStyleElements[i]);
             }
         },
 
@@ -2983,6 +3055,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         util.copyTagAttributes(parentCon, newInnerNode);
         
                         return {
+                            ancestor: element,
                             startContainer: startCon,
                             startOffset: startOff,
                             endContainer: endCon,
@@ -4638,8 +4711,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             _w.setTimeout(function () {
                 try {
                     iframe.focus();
-                    // IE or Edge
-                    if (util.isIE_Edge || !!_d.documentMode || !!_w.StyleMedia) {
+                    // IE or Edge, Chromium
+                    if (util.isIE_Edge || util.isChromium || !!_d.documentMode || !!_w.StyleMedia) {
                         try {
                             iframe.contentWindow.document.execCommand('print', false, null);
                         } catch (e) {
@@ -4826,6 +4899,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             } else {
                 return renderHTML.innerHTML;
             }
+        },
+
+        /**
+         * @description Gets the current contents with containing parent div(div.sun-editor-editable).
+         * <div class="sun-editor-editable">{contents}</div>
+         * @param {Boolean} onlyContents Return only the contents of the body without headers when the "fullPage" option is true
+         * @returns {Object}
+         */
+        getFullContents: function (onlyContents) {
+            return '<div class="sun-editor-editable' + options.rtl ? ' se-rtl' : '' + '">' + this.getContents(onlyContents) + '</div>';
         },
 
         /**
@@ -5060,9 +5143,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
             
             const domTree = dom.childNodes;
-            let cleanHTML = '';
-            for (let i = 0, t, p; i < domTree.length; i++) {
+            let cleanHTML = '', p = null;
+            for (let i = 0, t; i < domTree.length; i++) {
                 t = domTree[i];
+
                 if (!util.isFormatElement(t) && !util.isComponent(t) && !util.isMedia(t)) {
                     if (!p) p = util.createElement(options.defaultTag);
                     p.appendChild(t);
@@ -5074,8 +5158,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         p = null;
                     }
                 }
+
+                if (p) {
+                    cleanHTML += this._makeLine(p, true);
+                    p = null;
+                }
                 cleanHTML += this._makeLine(t, true);
             }
+            if (p) cleanHTML += this._makeLine(p, true);
 
             if (cleanHTML.length === 0) return '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
 
@@ -5239,6 +5329,36 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Reset buttons of the responsive toolbar.
+         */
+        resetResponsiveToolbar: function () {
+            core.controllersOff();
+
+            const responsiveSize = event._responsiveButtonSize;
+            if (responsiveSize) {
+                let w = 0;
+                if ((core._isBalloon || core._isInline) && options.toolbarWidth === 'auto') {
+                    w = context.element.topArea.offsetWidth;
+                } else {
+                    w = context.element.toolbar.offsetWidth;
+                }
+
+                let responsiveWidth = 'default';
+                for (let i = 1, len = responsiveSize.length; i < len; i++) {
+                    if (w < responsiveSize[i]) {
+                        responsiveWidth = responsiveSize[i] + '';
+                        break;
+                    }
+                }
+
+                if (event._responsiveCurrentSize !== responsiveWidth) {
+                    event._responsiveCurrentSize = responsiveWidth;
+                    functions.setToolbarButtons(event._responsiveButtons[responsiveWidth]);
+                }
+            }
+        },
+
+        /**
          * @description Set the char count to charCounter element textContent.
          * @private
          */
@@ -5337,6 +5457,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._wd = _d;
             this._charTypeHTML = options.charCounterType === 'byte-html';
             this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
+            this._editorHeight = context.element.wysiwygFrame.offsetHeight;
 
             if (!options.iframe && typeof _w.ShadowRoot === 'function') {
                 let child = context.element.wysiwygFrame;
@@ -5439,7 +5560,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (!util.hasOwn(plugins, key)) continue;
                 plugin = plugins[key];
                 button = pluginCallButtons[key];
-                if (plugin.active && button) {
+                if ((plugin.active || plugin.action) && button) {
                     this.callPlugin(key, null, button);
                 }
                 if (typeof plugin.checkFileInfo === 'function' && typeof plugin.resetFileInfo === 'function') {
@@ -5465,8 +5586,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             this.managedTagsInfo.query = managedClass.toString();
             this._fileManager.queryString = this._fileManager.tags.join(',');
-            this._fileManager.regExp = new wRegExp('^(' +  this._fileManager.tags.join('|') + ')$', 'i');
-            this._fileManager.pluginRegExp = new wRegExp('^(' +  (filePluginRegExp.length === 0 ? 'undefined' : filePluginRegExp.join('|')) + ')$', 'i');
+            this._fileManager.regExp = new wRegExp('^(' +  (this._fileManager.tags.join('|') || '^') + ')$', 'i');
+            this._fileManager.pluginRegExp = new wRegExp('^(' +  (filePluginRegExp.length === 0 ? '^' : filePluginRegExp.join('|')) + ')$', 'i');
             
             // cache editor's element
             this._variable._originCssText = context.element.topArea.style.cssText;
@@ -5559,7 +5680,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         _iframeAutoHeight: function () {
             if (this._iframeAuto) {
-                _w.setTimeout(function () { context.element.wysiwygFrame.style.height = core._iframeAuto.offsetHeight + 'px'; });
+                _w.setTimeout(function () { 
+                    const h = core._iframeAuto.offsetHeight;
+                    context.element.wysiwygFrame.style.height = h + 'px';
+                    if (util.isIE) core.__callResizeFunction(h, null);
+                });
+            } else if (util.isIE) {
+                core.__callResizeFunction(context.element.wysiwygFrame.offsetHeight, null);
+            }
+        },
+
+        __callResizeFunction(h, resizeObserverEntry) {
+            h = h === -1 ? resizeObserverEntry.borderBoxSize[0].blockSize : h;
+            if (this._editorHeight !== h) {
+                if (typeof functions.onResizeEditor === 'function') functions.onResizeEditor(h, this._editorHeight, core, resizeObserverEntry);
+                this._editorHeight = h;
             }
         },
 
@@ -5703,6 +5838,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._resourcesStateChange();
 
             _w.setTimeout(function () {
+                // observer
+                if (event._resizeObserver) event._resizeObserver.observe(context.element.wysiwygFrame);
+                if (event._toolbarObserver) event._toolbarObserver.observe(context.element._toolbarShadow);
                 // user event
                 if (typeof functions.onload === 'function') functions.onload(core, reload);
             });
@@ -5719,6 +5857,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 _top: contextEl.topArea,
                 _relative: contextEl.relative,
                 _toolBar: contextEl.toolbar,
+                _toolbarShadow: contextEl._toolbarShadow,
                 _menuTray: contextEl._menuTray,
                 _editorArea: contextEl.editorArea,
                 _wysiwygArea: contextEl.wysiwygFrame,
@@ -5821,7 +5960,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
             }
 
-            if (!command) return false;
+            if (!command) return keyStr === 'B'; // chromium - bold disabled
 
             core.commandHandler(core.commandMap[command], command);
             return true;
@@ -5885,7 +6024,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
 
                 /** default active buttons [strong, ins, em, del, sub, sup] */
-                if (classOnCheck.test(nodeName)) {
+                if (classOnCheck && classOnCheck.test(nodeName)) {
                     commandMapNodes.push(nodeName);
                     util.addClass(commandMap[nodeName], 'active');
                 }
@@ -6005,7 +6144,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
-            if (util.isNonEditable(figcaption)) {
+            if (figcaption && (util.isNonEditable(figcaption) || !figcaption.getAttribute("contenteditable"))) {
                 e.preventDefault();
                 figcaption.setAttribute('contenteditable', true);
                 figcaption.focus();
@@ -6795,7 +6934,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
                             core.setRange(temp, 0, temp, 0);
                             break;
-                        } else if (options.lineAttrReset && formatEl) {
+                        } else if (options.lineAttrReset && formatEl && !util.isListCell(formatEl)) {
                             e.preventDefault();
                             e.stopPropagation();
 
@@ -6817,7 +6956,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                     newEl = util.splitElement(r.container, r.offset, 0);
                                 }
                             } else {
-                                newEl = util.splitElement(range.endContainer, range.endOffset, 0);
+                                if (util.onlyZeroWidthSpace(formatEl)) newEl = core.appendFormatTag(formatEl, formatEl.cloneNode(false));
+                                else newEl = util.splitElement(range.endContainer, range.endOffset, 0);
                             }
 
                             const resetAttr = options.lineAttrReset === '*' ? null : options.lineAttrReset;
@@ -7077,7 +7217,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onFocus_wysiwyg: function (e) {
             if (core._antiBlur) return;
             core.hasFocus = true;
-            event._applyTagEffects();
+            _w.setTimeout(event._applyTagEffects);
             
             if (core._isInline) event._showToolbarInline();
 
@@ -7107,7 +7247,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.submenuOff();
             core.controllersOff();
 
-            const prevHeight = util.getNumber(context.element.wysiwygFrame.style.height, 0);
             core._variable.resizeClientY = e.clientY;
             context.element.resizeBackground.style.display = 'block';
 
@@ -7115,7 +7254,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.resizeBackground.style.display = 'none';
                 _d.removeEventListener('mousemove', event._resize_editor);
                 _d.removeEventListener('mouseup', closureFunc);
-                if (typeof functions.onResizeEditor === 'function') functions.onResizeEditor(util.getNumber(context.element.wysiwygFrame.style.height, 0), prevHeight, core);
             }
 
             _d.addEventListener('mousemove', event._resize_editor);
@@ -7124,35 +7262,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         _resize_editor: function (e) {
             const resizeInterval = context.element.editorArea.offsetHeight + (e.clientY - core._variable.resizeClientY);
-            context.element.wysiwygFrame.style.height = context.element.code.style.height = (resizeInterval < core._variable.minResizingSize ? core._variable.minResizingSize : resizeInterval) + 'px';
+            const h = (resizeInterval < core._variable.minResizingSize ? core._variable.minResizingSize : resizeInterval);
+            context.element.wysiwygFrame.style.height = context.element.code.style.height = h + 'px';
             core._variable.resizeClientY = e.clientY;
+            if (util.isIE) core.__callResizeFunction(h, null);
         },
 
         onResize_window: function () {
-            core.controllersOff();
-
-            const responsiveSize = event._responsiveButtonSize;
-            if (responsiveSize) {
-                let w = 0;
-                if ((core._isBalloon || core._isInline) && options.toolbarWidth === 'auto') {
-                    w = context.element.topArea.offsetWidth;
-                } else {
-                    w = context.element.toolbar.offsetWidth;
-                }
-
-                let responsiveWidth = 'default';
-                for (let i = 1, len = responsiveSize.length; i < len; i++) {
-                    if (w < responsiveSize[i]) {
-                        responsiveWidth = responsiveSize[i] + '';
-                        break;
-                    }
-                }
-
-                if (event._responsiveCurrentSize !== responsiveWidth) {
-                    event._responsiveCurrentSize = responsiveWidth;
-                    functions.setToolbarButtons(event._responsiveButtons[responsiveWidth]);
-                }
-            }
+            if (util.isIE) core.resetResponsiveToolbar();
 
             if (context.element.toolbar.offsetWidth === 0) return;
 
@@ -7465,9 +7582,37 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             if (cleanData) {
+                if (util.isListCell(util.getFormatElement(core.getSelectionNode(), null))) {
+                    const dom = (_d.createRange().createContextualFragment(cleanData));
+                    if (dom.childNodes[0].nodeType === 1) {
+                        cleanData = event._convertListCell(dom);
+                    }
+                }
                 functions.insertHTML(cleanData, true, false);
                 return false;
             }
+        },
+
+        _convertListCell: function (dom) {
+            const domTree = dom.childNodes;
+            let html = '';
+
+            for (let i = 0, len = domTree.length, node; i < len; i++) {
+                node = domTree[i];
+                if (node.nodeType === 1) {
+                    if (util.isFormatElement(node)) {
+                        html += '<li>' +(node.innerHTML.trim() || '<br>') + '</li>';
+                    } else if (util.isRangeFormatElement(node) && !util.isTable(node)) {
+                        html += event._convertListCell(node);
+                    } else {
+                        html += '<li>' + node.outerHTML + '</li>';
+                    }
+                } else {
+                    html += '<li>' + (node.textContent || '<br>') + '</li>';
+                }
+            }
+
+            return html;
         },
 
         onMouseMove_wysiwyg: function (e) {
@@ -7540,8 +7685,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.history.push(false);
         },
 
+        _resizeObserver: null,
+        _toolbarObserver: null,
         _addEvent: function () {
             const eventWysiwyg = options.iframe ? core._ww : context.element.wysiwyg;
+            if (!util.isIE) {
+                this._resizeObserver = new _w.ResizeObserver(function(entries) {
+                    core.__callResizeFunction(-1, entries[0]);
+                });
+            }
 
             /** toolbar event */
             context.element.toolbar.addEventListener('mousedown', event._buttonsEventHandler, false);
@@ -7590,11 +7742,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
             
-            /** window event */
+            /** set response toolbar */
             event._setResponsiveToolbar();
-            _w.removeEventListener('resize', event.onResize_window);
-            _w.removeEventListener('scroll', event.onScroll_window);
 
+            /** responsive toolbar observer */
+            if (!util.isIE) this._toolbarObserver = new _w.ResizeObserver(core.resetResponsiveToolbar);
+            
+            /** window event */
             _w.addEventListener('resize', event.onResize_window, false);
             if (options.stickyToolbar > -1) {
                 _w.addEventListener('scroll', event.onScroll_window, false);
@@ -7627,7 +7781,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             event._lineBreakerBind = null;
             
             eventWysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
-            
             eventWysiwyg.removeEventListener('focus', event.onFocus_wysiwyg);
             eventWysiwyg.removeEventListener('blur', event.onBlur_wysiwyg);
 
@@ -7639,6 +7792,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.resizingBar.removeEventListener('mousedown', event.onMouseDown_resizingBar);
             }
             
+            if (event._resizeObserver) {
+                event._resizeObserver.unobserve(context.element.wysiwygFrame);
+                event._resizeObserver = null;
+            }
+
+            if (event._toolbarObserver) {
+                event._toolbarObserver.unobserve(context.element._toolbarShadow);
+                event._toolbarObserver = null;
+            }
+
             _w.removeEventListener('resize', event.onResize_window);
             _w.removeEventListener('scroll', event.onScroll_window);
         },
@@ -8166,6 +8329,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @param {Boolean} rangeSelection If true, range select the inserted node.
          */
         insertHTML: function (html, notCleaningData, checkCharCount, rangeSelection) {
+            if (!context.element.wysiwygFrame.contains(core.getSelection().focusNode)) core.focus();
+            
             if (typeof html === 'string') {
                 if (!notCleaningData) html = core.cleanHTML(html, null, null);
                 try {
@@ -8274,8 +8439,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (core.modalForm) core.plugins.dialog.close.call(core);
 
                 context.element.code.setAttribute("readOnly", "true");
+                util.addClass(context.element.wysiwygFrame, 'se-read-only');
             } else {
                 context.element.code.removeAttribute("readOnly");
+                util.removeClass(context.element.wysiwygFrame, 'se-read-only');
             }
 
             if (options.codeMirrorEditor) options.codeMirrorEditor.setOption('readOnly', !!value);
