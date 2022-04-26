@@ -1,5 +1,5 @@
-import { SunEditorOptions } from './../options.d';
-import { Plugin } from '../plugins/Plugin';
+import { SunEditorOptions } from '../src/options';
+import { Plugin } from '../src/plugins/Plugin';
 
 declare interface EditorElement {
     originElement: Element;

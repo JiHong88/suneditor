@@ -1,5 +1,5 @@
 import CoreInterface from "./_core.d";
-import ClassesInterface from "./_classes";
+import ClassesInterface from "../src/interface/_classes";
 
 class Editor implements CoreInterface, ClassesInterface {}
 

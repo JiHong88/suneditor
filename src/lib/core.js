@@ -2036,7 +2036,7 @@ Core.prototype = {
         let returnHTML = "";
         const wRegExp = this._w.RegExp;
         const brReg = new wRegExp("^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$", "i");
-        const wDoc = typeof html === "string:" ? this._d.createRange().createContextualFragment(html) : html;
+        const wDoc = typeof html === "string" ? this._d.createRange().createContextualFragment(html) : html;
         const isFormat = function (current) {
             return this.format.isLine(current) || this.component.is(current);
         }.bind(this);

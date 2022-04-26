@@ -1,5 +1,5 @@
 import { SunEditorOptions } from './options.d';
-import SunEditor from './lib/core';
+import SunEditor from '../src/lib/core';
 
 declare namespace _default {
     export function init(init_options: SunEditorOptions): { create: typeof create; };

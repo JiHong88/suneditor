@@ -1,9 +1,9 @@
 import { History } from "./history.d";
-import { Plugin } from "./../plugins/Plugin.d";
-import { Lang } from "./../lang/Lang.d";
-import { SunEditorOptions } from "./../options.d";
-import { Context } from "./context";
-import { Module } from "../plugins/Module";
+import { Plugin } from "../src/plugins/Plugin";
+import { Lang } from "./Lang";
+import { SunEditorOptions } from "../src/options";
+import { Context } from "../src/lib/context";
+import { Module } from "../src/plugins/Module";
 import _Notice from "./notice.d";
 
 export type Controllers = Array<string | Function | Element>;

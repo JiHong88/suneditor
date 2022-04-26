@@ -1,4 +1,4 @@
-import EditorInterface from "../../interface/editor";
+import EditorInterface from "../src/interface/editor";
 
 class Char extends EditorInterface {
 	/**
