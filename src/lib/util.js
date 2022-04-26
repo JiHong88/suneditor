@@ -63,7 +63,7 @@ const util = {
      * @returns {Boolean}
      */
     onlyZeroWidthSpace: function (text) {
-        if (!text) return false;
+        if (text === null || text === undefined) return false;
         if (typeof text !== 'string') text = text.textContent;
         return text === '' || this.onlyZeroWidthRegExp.test(text);
     },
