@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from '../SubmenuPlugin';
+import { DropdownPlugin } from '../DropdownPlugin';
 
-declare const font: SubmenuPlugin;
+declare const font: DropdownPlugin;
 
 export default font;

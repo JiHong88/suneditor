@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from '../SubmenuPlugin';
+import { DropdownPlugin } from '../DropdownPlugin';
 
-declare const paragraphStyle: SubmenuPlugin;
+declare const paragraphStyle: DropdownPlugin;
 
 export default paragraphStyle;

@@ -2,21 +2,21 @@
 import { CommandPlugin } from "./CommandPlugin";
 import blockquote from "./command/blockquote";
 
-// submenu
-import { SubmenuPlugin } from "./SubmenuPlugin";
-import align from "./submenu/align";
-import font from "./submenu/font";
-import fontSize from "./submenu/fontSize";
-import fontColor from "./submenu/fontColor";
-import hiliteColor from "./submenu/hiliteColor";
-import horizontalRule from "./submenu/horizontalRule";
-import list from "./submenu/list";
-import table from "./submenu/table";
-import formatBlock from "./submenu/formatBlock";
-import lineHeight from "./submenu/lineHeight";
-import template from "./submenu/template";
-import paragraphStyle from "./submenu/paragraphStyle";
-import textStyle from "./submenu/textStyle";
+// dropdown
+import { DropdownPlugin } from "./DropdownPlugin";
+import align from "./dropdown/align";
+import font from "./dropdown/font";
+import fontSize from "./dropdown/fontSize";
+import fontColor from "./dropdown/fontColor";
+import hiliteColor from "./dropdown/hiliteColor";
+import horizontalRule from "./dropdown/horizontalRule";
+import list from "./dropdown/list";
+import table from "./dropdown/table";
+import formatBlock from "./dropdown/formatBlock";
+import lineHeight from "./dropdown/lineHeight";
+import template from "./dropdown/template";
+import paragraphStyle from "./dropdown/paragraphStyle";
+import textStyle from "./dropdown/textStyle";
 
 // dialog
 import { DialogPlugin } from "./DialogPlugin";
@@ -32,19 +32,19 @@ import imageGallery from "./fileBrowser/imageGallery";
 
 declare const _default: {
   blockquote: CommandPlugin;
-  align: SubmenuPlugin;
-  font: SubmenuPlugin;
-  fontSize: SubmenuPlugin;
-  fontColor: SubmenuPlugin;
-  hiliteColor: SubmenuPlugin;
-  horizontalRule: SubmenuPlugin;
-  list: SubmenuPlugin;
-  table: SubmenuPlugin;
-  formatBlock: SubmenuPlugin;
-  lineHeight: SubmenuPlugin;
-  template: SubmenuPlugin;
-  paragraphStyle: SubmenuPlugin;
-  textStyle: SubmenuPlugin;
+  align: DropdownPlugin;
+  font: DropdownPlugin;
+  fontSize: DropdownPlugin;
+  fontColor: DropdownPlugin;
+  hiliteColor: DropdownPlugin;
+  horizontalRule: DropdownPlugin;
+  list: DropdownPlugin;
+  table: DropdownPlugin;
+  formatBlock: DropdownPlugin;
+  lineHeight: DropdownPlugin;
+  template: DropdownPlugin;
+  paragraphStyle: DropdownPlugin;
+  textStyle: DropdownPlugin;
   link: DialogPlugin;
   image: DialogPlugin;
   video: DialogPlugin;

@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from '../SubmenuPlugin';
+import { DropdownPlugin } from '../DropdownPlugin';
 
-declare const hiliteColor: SubmenuPlugin;
+declare const hiliteColor: DropdownPlugin;
 
 export default hiliteColor;

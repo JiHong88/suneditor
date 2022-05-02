@@ -4,9 +4,9 @@
  */
 
 import CoreInterface from "../../interface/_core";
-import { domUtils, unicode } from "../../helpers";
+import { domUtils, unicode } from "../../helper";
 
-function Component(editor) {
+const Component = function (editor) {
 	CoreInterface.call(this, editor);
 }
 
@@ -42,7 +42,7 @@ Component.prototype = {
 						return this.format.isBlock(current);
 					}.bind(this)
 				);
-				oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getElementDepth(depthFormat) + 1);
+				oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
 				if (oNode) formatEl = oNode.previousSibling;
 			}
 			this.selection.insertNode(element, this.format.isBlock(formatEl) ? null : formatEl, false);

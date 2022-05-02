@@ -8,13 +8,13 @@ import Context from "../context";
 import {
 	domUtils,
 	unicode
-} from "../../helpers";
+} from "../../helper";
 import {
 	_w,
 	_d
-} from "../../helpers/global";
+} from "../../helper/global";
 
-function Toolbar(editor) {
+const Toolbar = function (editor) {
 	CoreInterface.call(this, editor);
 	this._responsiveCurrentSize = "default";
 	this._responsiveButtons = editor._responsiveButtons;
@@ -33,7 +33,7 @@ Toolbar.prototype = {
 	 */
 	disable: function () {
 		/** off menus */
-		this.__core.submenuOff();
+		this.__core.dropdownOff();
 		this.__core.moreLayerOff();
 		this.__core.containerOff();
 		this.context.buttons.cover.style.display = "block";
@@ -79,7 +79,7 @@ Toolbar.prototype = {
 	 * @param {Array} buttonList Button list
 	 */
 	setButtons: function (buttonList) {
-		this.__core.submenuOff();
+		this.__core.dropdownOff();
 		this.__core.containerOff();
 		this.__core.moreLayerOff();
 

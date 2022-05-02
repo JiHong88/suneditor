@@ -1,16 +1,16 @@
-import Helpers, {
+import Helper, {
     global,
     env,
     converter,
     unicode,
     domUtils,
     numbers
-} from "../helpers";
+} from "../helper";
 import Constructor from "./constructor";
 import Context from "./context";
 import history from "./history";
 import Events from "./events";
-import EventManager from "./eventManager";
+import EventManager from "./base/eventManager";
 import Notice from "./notice";
 
 // classes
@@ -100,9 +100,9 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this.context = context;
 
     /**
-     * @description Helpers object
+     * @description Helper object
      */
-    this.helpers = Helpers;
+    this.helper = Helper;
 
     /**
      * @description Computed style of the wysiwyg area (window.getComputedStyle(context.element.wysiwyg))
@@ -120,7 +120,7 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this.initPlugins = {};
 
     /**
-     * @description Save rendered submenus and containers
+     * @description Save rendered dropdown and containers
      * @private
      */
     this._menuTray = {};
@@ -131,9 +131,9 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this.effectNode = null;
 
     /**
-     * @description submenu element
+     * @description dropdown element
      */
-    this.submenu = null;
+    this.dropdown = null;
 
     /**
      * @description container element
@@ -141,16 +141,16 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this.container = null;
 
     /**
-     * @description current submenu name
+     * @description current dropdown name
      * @private
      */
-    this._submenuName = "";
+    this._dropdownName = "";
 
     /**
-     * @description binded submenuOff method
+     * @description binded dropdownOff method
      * @private
      */
-    this._bindedSubmenuOff = null;
+    this._bindedDropdownOff = null;
 
     /**
      * @description binded containerOff method
@@ -159,9 +159,9 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this._bindedContainerOff = null;
 
     /**
-     * @description active button element in submenu
+     * @description active button element in dropdown
      */
-    this.submenuActiveButton = null;
+    this.dropdownActiveButton = null;
 
     /**
      * @description active button element in container
@@ -169,7 +169,7 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this.containerActiveButton = null;
 
     /**
-     * @description The elements array to be processed unvisible when the controllersOff function is executed (resizing, link modified button, table controller)
+     * @description The elements array to be processed unvisible when the controllerOff function is executed (resizing, link modified button, table controller)
      */
     this.controllerArray = [];
 
@@ -199,7 +199,7 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this.resizingDisabledButtons = [];
 
     /**
-     * @description active more layer element in submenu
+     * @description active more layer element in dropdown
      * @private
      */
     this._moreLayerActiveButton = null;
@@ -219,25 +219,25 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
 
     /**
      * @description Editor tags whitelist (RegExp object)
-     * helpers.converter.createTagsWhitelist(options._editorTagsWhitelist)
+     * helper.converter.createTagsWhitelist(options._editorTagsWhitelist)
      */
     this.editorTagsWhitelistRegExp = null;
 
     /**
      * @description Editor tags blacklist (RegExp object)
-     * helpers.converter.createTagsBlacklist(options.tagsBlacklist)
+     * helper.converter.createTagsBlacklist(options.tagsBlacklist)
      */
     this.editorTagsBlacklistRegExp = null;
 
     /**
      * @description Tag whitelist when pasting (RegExp object)
-     * helpers.converter.createTagsWhitelist(options.pasteTagsWhitelist)
+     * helper.converter.createTagsWhitelist(options.pasteTagsWhitelist)
      */
     this.pasteTagsWhitelistRegExp = null;
 
     /**
      * @description Tag blacklist when pasting (RegExp object)
-     * helpers.converter.createTagsBlacklist(options.pasteTagsBlacklist)
+     * helper.converter.createTagsBlacklist(options.pasteTagsBlacklist)
      */
     this.pasteTagsBlacklistRegExp = null;
 
@@ -290,13 +290,13 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this._attributesTagsBlacklist = null;
 
     /**
-     * @description binded controllersOff method
+     * @description binded controllerOff method
      * @private
      */
     this._bindControllersOff = null;
 
     /**
-     * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to submenu
+     * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
      * @private
      */
     this._notHideToolbar = false;
@@ -569,8 +569,6 @@ Core.prototype = {
         } else if (!this.initPlugins[pluginName]) {
             this.plugins[pluginName] = new this.plugins[pluginName](this, target);
             this.initPlugins[pluginName] = true;
-        } else if (typeof TargetPlugins[pluginName] === "object" && !!target) {
-            this.initMenuTarget(pluginName, target, TargetPlugins[pluginName]);
         }
 
         if (this.plugins[pluginName].active && !this.commandMap[pluginName] && !!target) {
@@ -599,336 +597,10 @@ Core.prototype = {
     },
 
     /**
-     * @description Method for managing submenu element.
-     * You must add the "submenu" element using the this method at custom plugin.
-     * @param {string} pluginName Plugin name
-     * @param {Element|null} target Target button
-     * @param {Element} menu Submenu element
-     */
-    initMenuTarget: function (pluginName, target, menu) {
-        if (!target) {
-            TargetPlugins[pluginName] = menu;
-        } else {
-            this.context.element._menuTray.appendChild(menu);
-            TargetPlugins[pluginName] = true;
-            this._menuTray[target.getAttribute("data-command")] = menu;
-        }
-    },
-
-    /**
-     * @description Enable submenu
-     * @param {Element} element Submenu's button element to call
-     */
-    submenuOn: function (element) {
-        if (this._bindedSubmenuOff) this._bindedSubmenuOff();
-        if (this._bindControllersOff) this.controllersOff();
-
-        const submenuName = this._submenuName = element.getAttribute('data-command');
-        const menu = this.submenu = this._menuTray[submenuName];
-        this.submenuActiveButton = element;
-        this._setMenuPosition(element, menu);
-
-        this._bindedSubmenuOff = this.submenuOff.bind(this);
-        this.eventManager.addGlobalEvent('mousedown', this._bindedSubmenuOff, false);
-
-        if (this.plugins[submenuName].on) this.plugins[submenuName].on();
-        this._antiBlur = true;
-    },
-
-    /**
-     * @description Disable submenu
-     */
-    submenuOff: function () {
-        this.eventManager.removeGlobalEvent('mousedown', this._bindedSubmenuOff);
-        this._bindedSubmenuOff = null;
-
-        if (this.submenu) {
-            this._submenuName = '';
-            this.submenu.style.display = 'none';
-            this.submenu = null;
-            domUtils.removeClass(this.submenuActiveButton, 'on');
-            this.submenuActiveButton = null;
-            this._notHideToolbar = false;
-        }
-
-        this._antiBlur = false;
-    },
-
-    /**
-     * @description Enabled container
-     * @param {Element} element Container's button element to call
-     */
-    containerOn: function (element) {
-        if (this._bindedContainerOff) this._bindedContainerOff();
-
-        const containerName = this._containerName = element.getAttribute('data-command');
-        const menu = this.container = this._menuTray[containerName];
-        this.containerActiveButton = element;
-        this._setMenuPosition(element, menu);
-
-        this._bindedContainerOff = this.containerOff.bind(this);
-        this.eventManager.addGlobalEvent('mousedown', this._bindedContainerOff, false);
-
-        if (this.plugins[containerName].on) this.plugins[containerName].on();
-        this._antiBlur = true;
-    },
-
-    /**
-     * @description Disable container
-     */
-    containerOff: function () {
-        this.eventManager.removeGlobalEvent('mousedown', this._bindedContainerOff);
-        this._bindedContainerOff = null;
-
-        if (this.container) {
-            this._containerName = '';
-            this.container.style.display = 'none';
-            this.container = null;
-            domUtils.removeClass(this.containerActiveButton, 'on');
-            this.containerActiveButton = null;
-            this._notHideToolbar = false;
-        }
-
-        this._antiBlur = false;
-    },
-
-    /**
-     * @description Set the menu position. (submenu, container)
-     * @param {*} element Button element
-     * @param {*} menu Menu element
-     * @private
-     */
-    _setMenuPosition: function (element, menu) {
-        menu.style.visibility = 'hidden';
-        menu.style.display = 'block';
-        menu.style.height = '';
-        domUtils.addClass(element, 'on');
-
-        const toolbar = this.context.element.toolbar;
-        const toolbarW = toolbar.offsetWidth;
-        const toolbarOffset = this.offset.getGlobal(this.context.element.toolbar);
-        const menuW = menu.offsetWidth;
-        const l = element.parentElement.offsetLeft + 3;
-
-        // rtl
-        if (this.options.rtl) {
-            const elementW = element.offsetWidth;
-            const rtlW = menuW > elementW ? menuW - elementW : 0;
-            const rtlL = rtlW > 0 ? 0 : elementW - menuW;
-            menu.style.left = (l - rtlW + rtlL) + 'px';
-            if (toolbarOffset.left > this.offset.getGlobal(menu).left) {
-                menu.style.left = '0px';
-            }
-        } else {
-            const overLeft = toolbarW <= menuW ? 0 : toolbarW - (l + menuW);
-            if (overLeft < 0) menu.style.left = (l + overLeft) + 'px';
-            else menu.style.left = l + 'px';
-        }
-
-        // get element top
-        let t = 0;
-        let offsetEl = element;
-        while (offsetEl && offsetEl !== toolbar) {
-            t += offsetEl.offsetTop;
-            offsetEl = offsetEl.offsetParent;
-        }
-
-        const bt = t;
-        if (this._isBalloon) {
-            t += toolbar.offsetTop + element.offsetHeight;
-        } else {
-            t -= element.offsetHeight;
-        }
-
-        // set menu position
-        const toolbarTop = toolbarOffset.top;
-        const menuHeight = menu.offsetHeight;
-        const scrollTop = this.offset.getGlobalScroll().top;
-
-        const menuHeight_bottom = this._w.innerHeight - (toolbarTop - scrollTop + bt + element.parentElement.offsetHeight);
-        if (menuHeight_bottom < menuHeight) {
-            let menuTop = -1 * (menuHeight - bt + 3);
-            const insTop = toolbarTop - scrollTop + menuTop;
-            const menuHeight_top = menuHeight + (insTop < 0 ? insTop : 0);
-
-            if (menuHeight_top > menuHeight_bottom) {
-                menu.style.height = menuHeight_top + 'px';
-                menuTop = -1 * (menuHeight_top - bt + 3);
-            } else {
-                menu.style.height = menuHeight_bottom + 'px';
-                menuTop = bt + element.parentElement.offsetHeight;
-            }
-
-            menu.style.top = menuTop + 'px';
-        } else {
-            menu.style.top = (bt + element.parentElement.offsetHeight) + 'px';
-        }
-
-        menu.style.visibility = '';
-    },
-
-    /**
-     * @description Disable more layer
-     */
-    moreLayerOff: function () {
-        if (this._moreLayerActiveButton) {
-            const layer = this.context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
-            layer.style.display = 'none';
-            domUtils.removeClass(this._moreLayerActiveButton, 'on');
-            this._moreLayerActiveButton = null;
-        }
-    },
-
-    /**
-     * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
-     * @param {*} arguments controller elements, function..
-     */
-    controllersOn: function () {
-        if (this._bindControllersOff) this._bindControllersOff();
-        this.controllerArray = [];
-
-        for (let i = 0, arg; i < arguments.length; i++) {
-            arg = arguments[i];
-            if (!arg) continue;
-
-            if (typeof arg === 'string') {
-                this.currentControllerName = arg;
-                continue;
-            }
-            if (typeof arg === 'function') {
-                this.controllerArray.push(arg);
-                continue;
-            }
-            if (!domUtils.hasClass(arg, 'se-controller')) {
-                this.currentControllerTarget = arg;
-                this.currentFileComponentInfo = this.component.get(arg);
-                continue;
-            }
-            if (arg.style) {
-                arg.style.display = 'block';
-                if (this._shadowRoot && this._shadowRootControllerEventTarget.indexOf(arg) === -1) {
-                    arg.addEventListener('mousedown', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    });
-                    this._shadowRootControllerEventTarget.push(arg);
-                }
-            }
-            this.controllerArray.push(arg);
-        }
-
-        this._bindControllersOff = this.controllersOff.bind(this);
-        this.eventManager.addGlobalEvent('mousedown', this._bindControllersOff, false);
-        this.eventManager.addGlobalEvent('keydown', this._bindControllersOff, false);
-        this._antiBlur = true;
-
-        if (typeof this.events.showController === 'function') this.events.showController(this.currentControllerName, this.controllerArray);
-    },
-
-    /**
-     * @description Hide controller at editor area (link button, image resize button..)
-     * @param {KeyboardEvent|MouseEvent|null} e Event object when called from mousedown and keydown events registered in "core.controllersOn"
-     */
-    controllersOff: function (e) {
-        this._lineBreaker.style.display = 'none';
-        const len = this.controllerArray.length;
-
-        if (e && e.target && len > 0) {
-            for (let i = 0; i < len; i++) {
-                if (typeof this.controllerArray[i].contains === 'function' && this.controllerArray[i].contains(e.target)) return;
-            }
-        }
-
-        if (this._fileManager.pluginRegExp.test(this.currentControllerName) && e && e.type === 'keydown' && e.keyCode !== 27) return;
-        this.context.element.lineBreaker_t.style.display = this.context.element.lineBreaker_b.style.display = 'none';
-        this.status._lineBreakComp = null;
-
-        this.currentControllerName = '';
-        this.currentControllerTarget = null;
-        this.currentFileComponentInfo = null;
-        this.effectNode = null;
-        if (!this._bindControllersOff) return;
-
-        this.eventManager.removeGlobalEvent('mousedown', this._bindControllersOff);
-        this.eventManager.removeGlobalEvent('keydown', this._bindControllersOff);
-        this._bindControllersOff = null;
-
-        if (len > 0) {
-            for (let i = 0; i < len; i++) {
-                if (typeof this.controllerArray[i] === 'function') this.controllerArray[i]();
-                else this.controllerArray[i].style.display = 'none';
-            }
-
-            this.controllerArray = [];
-        }
-
-        this._antiBlur = false;
-    },
-
-    /**
-     * @description Specify the position of the controller.
-     * @param {Element} controller Controller element.
-     * @param {Element} referEl Element that is the basis of the controller's position.
-     * @param {string} position Type of position ("top" | "bottom")
-     * When using the "top" position, there should not be an arrow on the controller.
-     * When using the "bottom" position there should be an arrow on the controller.
-     * @param {Object} addOffset These are the left and top values that need to be added specially. 
-     * This argument is required. - {left: 0, top: 0}
-     * Please enter the value based on ltr mode.
-     * Calculated automatically in rtl mode.
-     */
-    setControllerPosition: function (controller, referEl, position, addOffset) {
-        if (this.options.rtl) addOffset.left *= -1;
-
-        const offset = this.offset.get(referEl);
-        controller.style.visibility = 'hidden';
-        controller.style.display = 'block';
-
-        // Height value of the arrow element is 11px
-        const topMargin = position === 'top' ? -(controller.offsetHeight + 2) : (referEl.offsetHeight + 12);
-        controller.style.top = (offset.top + topMargin + addOffset.top) + 'px';
-
-        const l = offset.left - this.context.element.wysiwygFrame.scrollLeft + addOffset.left;
-        const controllerW = controller.offsetWidth;
-        const referElW = referEl.offsetWidth;
-
-        const allow = domUtils.hasClass(controller.firstElementChild, 'se-arrow') ? controller.firstElementChild : null;
-
-        // rtl (Width value of the arrow element is 22px)
-        if (this.options.rtl) {
-            const rtlW = (controllerW > referElW) ? controllerW - referElW : 0;
-            const rtlL = rtlW > 0 ? 0 : referElW - controllerW;
-            controller.style.left = (l - rtlW + rtlL) + 'px';
-
-            if (rtlW > 0) {
-                if (allow) allow.style.left = ((controllerW - 14 < 10 + rtlW) ? (controllerW - 14) : (10 + rtlW)) + 'px';
-            }
-
-            const overSize = this.context.element.wysiwygFrame.offsetLeft - controller.offsetLeft;
-            if (overSize > 0) {
-                controller.style.left = '0px';
-                if (allow) allow.style.left = overSize + 'px';
-            }
-        } else {
-            controller.style.left = l + 'px';
-
-            const overSize = this.context.element.wysiwygFrame.offsetWidth - (controller.offsetLeft + controllerW);
-            if (overSize < 0) {
-                controller.style.left = (controller.offsetLeft + overSize) + 'px';
-                if (allow) allow.style.left = (20 - overSize) + 'px';
-            } else {
-                if (allow) allow.style.left = '20px';
-            }
-        }
-
-        controller.style.visibility = '';
-    },
-
-    /**
      * @description javascript execCommand
      * @param {string} command javascript execCommand function property
      * @param {Boolean|undefined} showDefaultUI javascript execCommand function property
-     * @param {String|undefined} value javascript execCommand function property
+     * @param {string|undefined} value javascript execCommand function property
      */
     execCommand: function (command, showDefaultUI, value) {
         this._wd.execCommand(command, showDefaultUI, (command === 'formatBlock' ? '<' + value + '>' : value));
@@ -1029,7 +701,7 @@ Core.prototype = {
     /**
      * @description Run plugin calls and basic commands.
      * @param {string} command Command string
-     * @param {string} display Display type string ('command', 'submenu', 'dialog', 'container')
+     * @param {string} display Display type string ('command', 'dropdown', 'dialog', 'container')
      * @param {Element} target The element of command button
      */
     actionCall: function (command, display, target) {
@@ -1052,7 +724,6 @@ Core.prototype = {
                     const layer = this.context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
                     if (layer) {
                         this.moreLayerOff();
-
                         this.toolbar._showBalloon();
                         this.toolbar._showInline();
                     }
@@ -1060,14 +731,14 @@ Core.prototype = {
                 return;
             }
 
-            if (/container/.test(display) && (this._menuTray[command] === null || target !== this.containerActiveButton)) {
+            if (/container/.test(display) && (this.menu._menuTrayMap[command] === null || target !== this.containerActiveButton)) {
                 this.containerOn(target);
                 return;
             }
 
             if (this.isReadOnly && domUtils.arrayIncludes(this.resizingDisabledButtons, target)) return;
-            if (/submenu/.test(display) && (this._menuTray[command] === null || target !== this.submenuActiveButton)) {
-                this.submenuOn(target);
+            if (/dropdown/.test(display) && (this.menu._menuTrayMap[command] === null || target !== this.dropdownActiveButton)) {
+                this.dropdownOn(target);
                 return;
             } else if (/dialog/.test(display)) {
                 this.plugins[command].open();
@@ -1082,16 +753,16 @@ Core.prototype = {
             this.commandHandler(command, target);
         }
 
-        if (/submenu/.test(display)) {
-            this.submenuOff();
+        if (/dropdown/.test(display)) {
+            this.dropdownOff();
         } else if (!/command/.test(display)) {
-            this.submenuOff();
+            this.dropdownOff();
             this.containerOff();
         }
     },
 
     /**
-     * @description Execute command of command button(All Buttons except submenu and dialog)
+     * @description Execute command of command button(All Buttons except dropdown and dialog)
      * (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
      * @param {string} command Property of command button (data-value)
      * @param {Element|null} target The element of command button
@@ -1220,7 +891,7 @@ Core.prototype = {
      * @description Changes to code view or wysiwyg view
      */
     setCodeView: function (value) {
-        this.controllersOff();
+        this.controllerOff();
         domUtils.setDisabled(value, this.codeViewDisabledButtons);
 
         if (!value) {
@@ -1365,7 +1036,7 @@ Core.prototype = {
         const code = this.context.element.code;
         const _var = this.status;
 
-        this.controllersOff();
+        this.controllerOff();
         const wasToolbarHidden = (toolbar.style.display === 'none' || (this._isInline && !this._inlineToolbarAttr.isShow));
 
         if (value) {
@@ -1540,9 +1211,9 @@ Core.prototype = {
      * @description Open the preview window.
      */
     preview: function () {
-        this.submenuOff();
+        this.dropdownOff();
         this.containerOff();
-        this.controllersOff();
+        this.controllerOff();
 
         const contentsHTML = this.options.previewTemplate ? this.options.previewTemplate.replace(/\{\{\s*contents\s*\}\}/i, this.getContents(true)) : this.getContents(true);
         const windowObject = this._w.open('', '_blank');
@@ -1588,7 +1259,7 @@ Core.prototype = {
 
     /**
      * @description Set direction to "rtl" or "ltr".
-     * @param {String} dir "rtl" or "ltr"
+     * @param {string} dir "rtl" or "ltr"
      */
     setDir: function (dir) {
         const rtl = dir === 'rtl';
@@ -1653,7 +1324,7 @@ Core.prototype = {
 
     /**
      * @description Sets the HTML string
-     * @param {String|undefined} html HTML string
+     * @param {string|undefined} html HTML string
      */
     setContents: function (html) {
         this.removeRange();
@@ -1907,9 +1578,9 @@ Core.prototype = {
     /**
      * @description Gets the clean HTML code for editor
      * @param {string} html HTML string
-     * @param {String|RegExp|null} whitelist Regular expression of allowed tags.
+     * @param {string|RegExp|null} whitelist Regular expression of allowed tags.
      * RegExp object is create by helper.converter.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
-     * @param {String|RegExp|null} blacklist Regular expression of disallowed tags.
+     * @param {string|RegExp|null} blacklist Regular expression of disallowed tags.
      * RegExp object is create by helper.converter.createTagsBlacklist method. (core.pasteTagsBlacklistRegExp)
      * @returns {string}
      */
@@ -2030,7 +1701,7 @@ Core.prototype = {
      * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
      * @param {Element|String} html WYSIWYG element (context.element.wysiwyg) or HTML string.
      * @param {Boolean} comp If true, does not line break and indentation of tags.
-     * @returns {String}
+     * @returns {string}
      */
     convertHTMLForCodeView: function (html, comp) {
         let returnHTML = "";
@@ -2136,7 +1807,7 @@ Core.prototype = {
         }
 
         // reset context
-        if (el._menuTray.children.length === 0) this._menuTray = {};
+        if (el._menuTray.children.length === 0) this.menu._menuTrayMap = {};
         this.toolbar._responsiveButtons = cons.toolbar.responsiveButtons;
         this.options = mergeOptions; //@todo option, lang.. dont't reset
         this.lang = this.options.lang;
@@ -2255,8 +1926,8 @@ Core.prototype = {
 
         if (value) {
             /** off menus */
-            this.controllersOff();
-            if (this.submenuActiveButton && this.submenuActiveButton.disabled) this.submenuOff();
+            this.controllerOff();
+            if (this.dropdownActiveButton && this.dropdownActiveButton.disabled) this.dropdownOff();
             if (this._moreLayerActiveButton && this._moreLayerActiveButton.disabled) this.moreLayerOff();
             if (this.containerActiveButton && this.containerActiveButton.disabled) this.containerOff();
             if (this.modalForm) this.plugins.dialog.close.call(this);
@@ -2276,7 +1947,7 @@ Core.prototype = {
      */
     disable: function () {
         this.toolbar.disable();
-        this.controllersOff();
+        this.controllerOff();
         if (this.modalForm) this.plugins.dialog.close.call(this);
 
         this.context.element.wysiwyg.setAttribute('contenteditable', false);
@@ -2324,9 +1995,9 @@ Core.prototype = {
      */
     destroy: function () {
         /** off menus */
-        this.submenuOff();
+        this.dropdownOff();
         this.containerOff();
-        this.controllersOff();
+        this.controllerOff();
         if (this.notice) this.notice.close();
         if (this.modalForm) this.plugins.dialog.close();
 
@@ -2791,12 +2462,6 @@ Core.prototype = {
 
     Constructor: Core
 };
-
-/**
- * @description Object for managing submenu elements
- * @private
- */
-const TargetPlugins = {};
 
 /**
  * @description Check disallowed tags

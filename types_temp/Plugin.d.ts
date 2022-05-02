@@ -5,7 +5,7 @@ export interface Plugin {
     name: string;
 
     /**
-     * @description Plugin type ('container', 'command', 'submenu', 'dialog')
+     * @description Plugin type ('container', 'command', 'dropdown', 'dialog')
      */
     display: string;
 

@@ -1,3 +1,8 @@
+/**
+ * @description Add all inner classes to the editor;
+ * @param {any} editor Editor object
+ * @private
+ */
 function ClassesInterface(editor) {
     // class
 	this.char = editor.char;

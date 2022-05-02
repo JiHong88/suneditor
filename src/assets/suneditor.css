@@ -176,41 +176,41 @@
 .sun-editor .se-btn-tray {position:relative; width:100%; height:auto; padding:4px 3px 0 3px; margin:0;}
 .sun-editor .se-menu-tray {position:absolute; top:0px; left:0px; width:100%; height:0px;}
 
-/** --- submenu layer ---------------------------------------------------------- */
-.sun-editor .se-submenu {overflow-x:hidden; overflow-y:auto;}
+/** --- dropdown layer ---------------------------------------------------------- */
+.sun-editor .se-dropdown {overflow-x:hidden; overflow-y:auto;}
 .sun-editor .se-menu-container {overflow-x:unset; overflow-y:unset;}
 .sun-editor .se-list-layer {display:none; position:absolute; top:0px; left:0px; height:auto; z-index:5; border:1px solid #bababa; border-radius:4px; padding:6px 0; background-color:#fff; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
 .sun-editor .se-list-layer .se-list-inner {padding:0; margin:0; overflow-x:initial; overflow-y:initial; overflow:visible;}
 .sun-editor .se-list-layer button {margin:0; width:100%;}
 .sun-editor .se-list-inner ul {width:100%; padding:0;}
 .sun-editor .se-list-inner li > button {min-width:100%; width:max-content;}
-/* submenu layer - basic list */
+/* dropdown layer - basic list */
 .sun-editor .se-list-inner .se-list-basic li {width:100%;}
 .sun-editor .se-list-inner .se-list-basic li button.active {background-color:#80bdff; border:1px solid #3f9dff; border-left:0; border-right:0;}
 .sun-editor .se-list-inner .se-list-basic li button.active:hover {background-color:#3f9dff; border:1px solid #4592ff; border-left:0; border-right:0;}
 .sun-editor .se-list-inner .se-list-basic li button.active:active {background-color:#4592ff; border:1px solid #407dd1; border-left:0; border-right:0; -webkit-box-shadow:inset 0 3px 5px #407dd1; box-shadow:inset 0 3px 5px #407dd1;}
-/* submenu layer - checked list */
+/* dropdown layer - checked list */
 .sun-editor .se-list-inner .se-list-checked li button > .se-svg {float:left; padding:6px 6px 0 0;}
 .sun-editor .se-list-inner .se-list-checked li button > .se-svg > svg {display:none;}
 .sun-editor .se-list-inner .se-list-checked li button.se-checked {color:#4592ff;}
 .sun-editor .se-list-inner .se-list-checked li button.se-checked > .se-svg > svg {display:block;}
-/* submenu layer - list button */
+/* dropdown layer - list button */
 .sun-editor .se-btn-list {width:100%; height:auto; min-height:32px; padding:0 14px; cursor:pointer; font-size:12px; line-height:normal; text-indent:0; text-decoration:none; text-align:left;}
 .sun-editor .se-btn-list.default_value {background-color:#f3f3f3; border-top:1px dotted #b1b1b1; border-bottom:1px dotted #b1b1b1;}
 .sun-editor .se-btn-list:hover, .sun-editor .se-btn-list:focus {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
 .sun-editor .se-btn-list:active {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
-/** --- submenu layer - se-list-inner > exception */
-/* submenu layer - font size */
+/** --- dropdown layer - se-list-inner > exception */
+/* dropdown layer - font size */
 .sun-editor .se-list-layer.se-list-font-size {min-width:140px; max-height:300px;}
-/* submenu layer - font family */
+/* dropdown layer - font family */
 .sun-editor .se-list-layer.se-list-font-family {min-width:156px;}
 .sun-editor .se-list-layer.se-list-font-family .default {border-bottom:1px solid #CCC;}
-/* submenu layer - hr */
+/* dropdown layer - hr */
 .sun-editor .se-list-layer.se-list-line {width:125px;}
 .sun-editor .se-list-layer.se-list-line hr {border-width: 1px 0 0; height: 1px;}
-/* submenu layer - align */
+/* dropdown layer - align */
 .sun-editor .se-list-layer.se-list-align .se-list-inner {left:9px; width:125px;}
-/** submenu layer - format block, paragraph style, text style */
+/** dropdown layer - format block, paragraph style, text style */
 .sun-editor .se-list-layer.se-list-format {min-width:156px;}
 .sun-editor .se-list-layer.se-list-format li {padding:0; width:100%;}
 .sun-editor .se-list-layer.se-list-format ul .se-btn-list {line-height:100%;}
@@ -226,7 +226,7 @@
 .sun-editor .se-list-layer.se-list-format ul h6 {font-size:0.67em; font-weight:bold; color:#333;}
 .sun-editor .se-list-layer.se-list-format ul blockquote {font-size:13px; color:#999; height:22px; margin:0; background-color:transparent; line-height:1.5; border-style:solid; border-color:#b1b1b1; padding:0 0 0 7px; border-left-width:5px;}
 .sun-editor .se-list-layer.se-list-format ul pre {font-size:13px; color:#666; padding:4px 11px; margin:0; background-color:#f9f9f9; border:1px solid #e1e1e1; border-radius:4px;}
-/* submenu layer --- table selector */
+/* dropdown layer --- table selector */
 .sun-editor .se-selector-table {display:none; position:absolute; top:34px; left:1px; z-index:5; padding:5px 0; float:left; margin:2px 0 0; font-size:14px; text-align:left; list-style:none; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; border:1px solid #ccc; border-radius:4px; -webkit-box-shadow:0 6px 12px rgba(0, 0, 0, .175); box-shadow:0 6px 12px rgba(0, 0, 0, .175);}
 .sun-editor .se-selector-table .se-table-size {font-size:18px; padding:0 5px;}
 .sun-editor .se-selector-table .se-table-size-picker {position:absolute !important; z-index:3; font-size:18px; width:10em; height:10em; cursor:pointer;}
@@ -234,7 +234,7 @@
 .sun-editor .se-selector-table .se-table-size-unhighlighted {position:relative !important; z-index:1; font-size:18px; width:10em; height:10em; background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIj4+Pjp6ekKlAqjAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKhmnaJzPAAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat;}
 .sun-editor .se-selector-table .se-table-size-display {padding-left:5px;}
 .sun-editor .se-list-layer.se-table-split {top:36px;}
-/* submenu layer --- color selector button */
+/* dropdown layer --- color selector button */
 .sun-editor .se-list-layer .se-selector-color {display:flex; width:max-content; max-width:270px; height:auto; padding:0; margin:auto;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet {width:100%; height:100%; padding:0;}
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet li {display:flex; float:left; position:relative; margin:0;}
@@ -246,7 +246,7 @@
 /** --- form group - input -------------------------------------------------------------- */
 .sun-editor .se-form-group {display:flex; width:100%; min-height:40px; height:auto; padding:4px;}
 .sun-editor .se-form-group input {flex:auto; display:inline-block; width:auto; height:33px; font-size:12px; margin:1px 0 1px 0; padding:0; border-radius:0.25rem; border:1px solid #ccc;}
-.sun-editor .se-form-group button, .sun-editor .se-submenu-form-group button {float:right; width:34px; height:34px; margin:0 2px !important;}
+.sun-editor .se-form-group button, .sun-editor .se-dropdown-form-group button {float:right; width:34px; height:34px; margin:0 2px !important;}
 .sun-editor .se-form-group button.se-btn, .sun-editor .se-form-group button.se-btn {border:1px solid #ccc;}
 .sun-editor .se-form-group > div {position:relative;}
 .sun-editor .se-form-group label {display:inline-block; max-width:100%; margin-bottom:5px; font-weight:bold;}
@@ -255,10 +255,10 @@
 .sun-editor .se-form-group-label {width:100%; height:auto; padding:0px 4px;}
 .sun-editor .se-form-group-label label {font-size:13px; font-weight:bold;}
 
-/** form group - submenu - color input */
-.sun-editor .se-submenu .se-form-group input {width:auto; height:33px; color:#555;}
-.sun-editor .se-submenu .se-form-group .se-color-input {width:72px; text-transform:uppercase; border:none; border-bottom:2px solid #b1b1b1; outline:none;}
-.sun-editor .se-submenu .se-form-group .se-color-input:focus {border-bottom:3px solid #b1b1b1;}
+/** form group - dropdown - color input */
+.sun-editor .se-dropdown .se-form-group input {width:auto; height:33px; color:#555;}
+.sun-editor .se-dropdown .se-form-group .se-color-input {width:72px; text-transform:uppercase; border:none; border-bottom:2px solid #b1b1b1; outline:none;}
+.sun-editor .se-dropdown .se-form-group .se-color-input:focus {border-bottom:3px solid #b1b1b1;}
 
 /** --- editor area */
 .sun-editor .se-wrapper {position:relative !important; width:100%; height:auto; overflow:hidden; z-index:1;}
@@ -484,7 +484,7 @@
 /* menu list - color picker */
 .sun-editor.se-rtl .se-list-layer .se-selector-color .se-color-pallet li {float:right;}
 
-/* submenu layer - checked list */
+/* dropdown layer - checked list */
 .sun-editor.se-rtl .se-list-inner .se-list-checked li button > .se-svg {float:right; padding:6px 0 0 6px;}
 
 /* placeholder */

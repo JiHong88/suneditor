@@ -19,7 +19,7 @@ import CoreInterface from "../../interface/_core";
  * 221: "]"
  * @param {*} editor 
  */
-function Shortcuts(editor) {
+const Shortcuts = function (editor) {
 	CoreInterface.call(this, editor);
 }
 

@@ -3,18 +3,18 @@
  * @author JiHong Lee.
  */
 
-import EditorInterface from "../interface/editor";
+import EditorInterface from "../../interface/editor";
 import {
 	domUtils,
 	unicode,
 	numbers,
 	env,
 	converter
-} from "../helpers";
+} from "../../helper";
 import {
 	_w,
 	_d
-} from "../helpers/global";
+} from "../../helper/global";
 
 function EventManager(__core) {
 	EditorInterface.call(this, __core);
@@ -285,7 +285,7 @@ EventManager.prototype = {
 
 	/**
 	 * @description If there is no default format, add a line and move "selection".
-	 * @param {String|null} formatName Format tag name (default: 'P')
+	 * @param {string|null} formatName Format tag name (default: 'P')
 	 * @private
 	 */
 	_setDefaultLine: function (formatName) {
@@ -593,7 +593,7 @@ function ToolbarButtonsHandler(e) {
 		e.preventDefault();
 	}
 
-	if (domUtils.getParentElement(target, ".se-submenu")) {
+	if (domUtils.getParentElement(target, ".se-dropdown")) {
 		e.stopPropagation();
 		this.__core._notHideToolbar = true;
 	} else {
@@ -606,7 +606,7 @@ function ToolbarButtonsHandler(e) {
 			className = target.className;
 		}
 
-		if (command === this.__core._submenuName || command === this.__core._containerName) {
+		if (command === this.__core._dropdownName || command === this.__core._containerName) {
 			e.stopPropagation();
 		}
 	}
@@ -617,7 +617,7 @@ function OnClick_toolbar(e) {
 	let display = target.getAttribute("data-display");
 	let command = target.getAttribute("data-command");
 	let className = target.className;
-	this.__core.controllersOff();
+	this.__core.controllerOff();
 
 	while (target.parentNode && !command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
 		target = target.parentNode;
@@ -762,7 +762,7 @@ function OnKeyDown_wysiwyg(e) {
 		return false;
 	}
 
-	this.__core.submenuOff();
+	this.__core.dropdownOff();
 
 	if (this.__core._isBalloon) {
 		this._hideToolbar();
@@ -1389,7 +1389,7 @@ function OnKeyDown_wysiwyg(e) {
 
 					if (domUtils.isListCell(rangeEl.parentNode)) {
 						rangeEl = formatEl.parentNode.parentNode.parentNode;
-						newEl = this.node.split(formatEl, null, domUtils.getElementDepth(formatEl) - 2);
+						newEl = this.node.split(formatEl, null, domUtils.getNodeDepth(formatEl) - 2);
 						if (!newEl) {
 							const newListCell = domUtils.createElement("LI", null, "<br>");
 							rangeEl.insertBefore(newListCell, newEl);
@@ -1447,7 +1447,7 @@ function OnKeyDown_wysiwyg(e) {
 			if (fileComponentName) {
 				e.preventDefault();
 				e.stopPropagation();
-				this.__core.controllersOff();
+				this.__core.controllerOff();
 				return false;
 			}
 			break;
@@ -1611,7 +1611,7 @@ function OnCut_wysiwyg(e) {
 	if (info && !env.isIE) {
 		this._setClipboardComponent(e, info, clipboardData);
 		domUtils.remove(info.component);
-		this.__core.controllersOff();
+		this.__core.controllerOff();
 	}
 
 	_w.setTimeout(function () {
@@ -1621,7 +1621,7 @@ function OnCut_wysiwyg(e) {
 }
 
 function OnScroll_wysiwyg(e) {
-	this.__core.controllersOff();
+	this.__core.controllerOff();
 	if (this.__core._isBalloon) this._hideToolbar();
 
 	// user event
@@ -1642,7 +1642,7 @@ function OnFocus_wysiwyg(e) {
 function OnBlur_wysiwyg(e) {
 	if (this.__core._antiBlur || this.status.isCodeView) return;
 	this.status.hasFocus = false;
-	this.__core.controllersOff();
+	this.__core.controllerOff();
 	if (this.__core._isInline || this.__core._isBalloon) this._hideToolbar();
 
 	this._setKeyEffect([]);
@@ -1704,8 +1704,8 @@ function OnMouseMove_wysiwyg(e) {
 function OnMouseDown_resizingBar(e) {
 	e.stopPropagation();
 
-	this.__core.submenuOff();
-	this.__core.controllersOff();
+	this.__core.dropdownOff();
+	this.__core.controllerOff();
 
 	this.status.resizeClientY = e.clientY;
 	this.context.element.resizeBackground.style.display = "block";
@@ -1743,7 +1743,7 @@ function DisplayLineBreak(dir, e) {
 }
 
 function OnResize_window() {
-	this.__core.controllersOff();
+	this.__core.controllerOff();
 
 	if (env.isIE) this.toolbar.resetResponsiveToolbar();
 
@@ -1753,8 +1753,8 @@ function OnResize_window() {
 		this.context.fileBrowser.body.style.maxHeight = _w.innerHeight - this.context.fileBrowser.header.offsetHeight - 50 + "px";
 	}
 
-	if (this.__core.submenuActiveButton && this.__core.submenu) {
-		this.__core._setMenuPosition(this.__core.submenuActiveButton, this.__core.submenu);
+	if (this.__core.dropdownActiveButton && this.__core.dropdown) {
+		this.__core._setMenuPosition(this.__core.dropdownActiveButton, this.__core.dropdown);
 	}
 
 	if (this.status.isFullScreen) {

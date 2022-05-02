@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from '../SubmenuPlugin';
+import { DropdownPlugin } from '../DropdownPlugin';
 
-declare const lineHeight: SubmenuPlugin;
+declare const lineHeight: DropdownPlugin;
 
 export default lineHeight;

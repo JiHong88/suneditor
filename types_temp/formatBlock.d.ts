@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from '../SubmenuPlugin';
+import { DropdownPlugin } from '../DropdownPlugin';
 
-declare const formatBlock: SubmenuPlugin;
+declare const formatBlock: DropdownPlugin;
 
 export default formatBlock;

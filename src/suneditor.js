@@ -26,7 +26,7 @@ export default {
 
     /**
      * @description Create the suneditor
-     * @param {String|Element} idOrElement textarea Id or textarea element
+     * @param {string|Element} idOrElement textarea Id or textarea element
      * @param {JSON|Object} options user options
      * @returns {Object}
      */

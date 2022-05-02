@@ -8,7 +8,7 @@ import {
 	domUtils,
 	unicode,
 	env
-} from "../../helpers";
+} from "../../helper";
 
 const Node = function (editor) {
 	CoreInterface.call(this, editor);
@@ -41,14 +41,14 @@ Node.prototype = {
 			}
 		} else if (baseNode.nodeType === 1) {
 			if (!baseNode.previousSibling) {
-				if (domUtils.getElementDepth(baseNode) === depth) next = false;
+				if (domUtils.getNodeDepth(baseNode) === depth) next = false;
 			} else {
 				baseNode = baseNode.previousSibling;
 			}
 		}
 
 		let depthEl = baseNode;
-		while (domUtils.getElementDepth(depthEl) > depth) {
+		while (domUtils.getNodeDepth(depthEl) > depth) {
 			index = domUtils.getPositionIndex(depthEl) + 1;
 			depthEl = depthEl.parentNode;
 

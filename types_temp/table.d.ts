@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from '../SubmenuPlugin';
+import { DropdownPlugin } from '../DropdownPlugin';
 
-declare const table: SubmenuPlugin;
+declare const table: DropdownPlugin;
 
 export default table;

@@ -9,15 +9,15 @@
 
 export default {
     name: 'paragraphStyle',
-    display: 'submenu',
+    display: 'dropdown',
     add: function (core, targetElement) {
         const context = core.context;
         context.paragraphStyle = {
             _classList: null
         };
 
-        /** set submenu */
-        let listDiv = this.setSubmenu(core);
+        /** set dropdown */
+        let listDiv = this.setDropdown(core);
 
         /** add event listeners */
         listDiv.querySelector('ul').addEventListener('click', this.pickUp.bind(core));
@@ -25,16 +25,16 @@ export default {
         context.paragraphStyle._classList = listDiv.querySelectorAll('li button');
 
         /** append target button menu */
-        core.initMenuTarget(this.name, targetElement, listDiv);
+        core.menu.initTarget(targetElement, listDiv);
 
         /** empty memory */
         listDiv = null;
     },
 
-    setSubmenu: function (core) {
+    setDropdown: function (core) {
         const option = core.options;
         const listDiv = core.util.createElement('DIV');
-        listDiv.className = 'se-submenu se-list-layer se-list-format';
+        listDiv.className = 'se-dropdown se-list-layer se-list-format';
 
         const menuLang = core.lang.menu;
         const defaultList = {
@@ -83,7 +83,7 @@ export default {
     },
 
      /**
-     * @Override submenu
+     * @Override dropdown
      */
     on: function () {
         const paragraphContext = this.context.paragraphStyle;
@@ -127,7 +127,7 @@ export default {
             toggleClass(selectedFormsts[i], value);
         }
 
-        this.submenuOff();
+        this.dropdownOff();
 
         // history stack
         this.history.push(false);

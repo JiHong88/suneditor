@@ -3,8 +3,8 @@ export const _d = document;
 
 /**
  * @description Object.values
- * @param {Object} obj Object parameter.
- * @returns {Array}
+ * @param {Object.<any>} obj Object parameter.
+ * @returns {Array.<any>}
  */
 export function getValues(obj) {
 	return !obj ? [] : this._w.Object.keys(obj).map(function (i) {
@@ -14,7 +14,7 @@ export function getValues(obj) {
 
 /**
  * @description Convert the CamelCase To the KebabCase.
- * @param {String|Array} param [Camel string]
+ * @param {string|Array.<string>} param [Camel string]
  */
 export function camelToKebabCase(param) {
 	if (typeof param === "string") {
@@ -84,7 +84,7 @@ export function getPageStyle(doc) {
  * @deprecated
  * @description Get the the tag path of the arguments value
  * If not found, return the first found value
- * @param {Array} nameArray File name array
+ * @param {Array.<string>} nameArray File name array
  * @param {string} extension js, css
  * @returns {string}
  */

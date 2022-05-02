@@ -9,7 +9,7 @@
 
 export default {
     name: 'fontSize',
-    display: 'submenu',
+    display: 'dropdown',
     add: function (core, targetElement) {
         const context = core.context;
         context.fontSize = {
@@ -18,8 +18,8 @@ export default {
             currentSize: ''
         };
 
-        /** set submenu */
-        let listDiv = this.setSubmenu(core);
+        /** set dropdown */
+        let listDiv = this.setDropdown(core);
         let listUl = listDiv.querySelector('ul');
 
         /** add event listeners */
@@ -27,18 +27,18 @@ export default {
         context.fontSize._sizeList = listUl.querySelectorAll('li button');
 
         /** append target button menu */
-        core.initMenuTarget(this.name, targetElement, listDiv);
+        core.menu.initTarget(targetElement, listDiv);
 
         /** empty memory */
         listDiv = null, listUl = null;
     },
 
-    setSubmenu: function (core) {
+    setDropdown: function (core) {
         const option = core.options;
         const lang = core.lang;
         const listDiv = core.util.createElement('DIV');
 
-        listDiv.className = 'se-submenu se-list-layer se-list-font-size';
+        listDiv.className = 'se-dropdown se-list-layer se-list-font-size';
 
         const sizeList = !option.fontSize ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : option.fontSize;
 
@@ -71,7 +71,7 @@ export default {
     },
 
      /**
-     * @Override submenu
+     * @Override dropdown
      */
     on: function () {
         const fontSizeContext = this.context.fontSize;
@@ -107,6 +107,6 @@ export default {
             this.format.applyStyleNode(null, ['font-size'], ['span'], true);
         }
 
-        this.submenuOff();
+        this.dropdownOff();
     }
 };

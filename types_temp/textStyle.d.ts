@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from '../SubmenuPlugin';
+import { DropdownPlugin } from '../DropdownPlugin';
 
-declare const textStyle: SubmenuPlugin;
+declare const textStyle: DropdownPlugin;
 
 export default textStyle;

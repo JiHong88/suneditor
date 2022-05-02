@@ -13,7 +13,7 @@ import CodeMirror from 'codemirror';
 // import 'katex/dist/katex.min.css';
 import Katex from 'katex';
 
-import align from "../../src/plugins/submenu/align";
+import align from "../../src/plugins/dropdown/align";
 
 suneditor.create(document.getElementById('editor2'), {
     // value: 'abc',

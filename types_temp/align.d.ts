@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from '../SubmenuPlugin';
+import { DropdownPlugin } from '../DropdownPlugin';
 
-declare const align: SubmenuPlugin;
+declare const align: DropdownPlugin;
 
 export default align;

@@ -49,7 +49,7 @@ Events.prototype = {
 
 	/**
 	 * @description Called just after the save was executed.
-	 * @param {String} contents Editor content
+	 * @param {string} contents Editor content
 	 */
 	onSave: null,
 

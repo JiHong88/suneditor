@@ -4,15 +4,15 @@
  */
 
 import CoreInterface from "../../interface/_core";
-import env from "../../helpers/env";
+import env from "../../helper/env";
 import {
 	_w
-} from "../../helpers/global";
+} from "../../helper/global";
 import {
 	addClass,
 	removeClass,
 	hasClass
-} from "../../helpers/domUtils";
+} from "../../helper/domUtils";
 
 const Char = function (editor) {
 	CoreInterface.call(this, editor);
@@ -38,7 +38,7 @@ Char.prototype = {
 	/**
 	 * @description Get the [content]'s number of characters or binary data size. (options.charCounterType)
 	 * If [content] is undefined, get the current editor's number of characters or binary data size.
-	 * @param {String|undefined} content Content to count. (defalut: this.context.element.wysiwyg)
+	 * @param {string|undefined} content Content to count. (defalut: this.context.element.wysiwyg)
 	 * @returns {number}
 	 */
 	getLength: function (content) {

@@ -213,7 +213,7 @@ export default {
     active: function (element) {
         if (!element) {
             if (this.controllerArray.indexOf(this.context.math.mathController) > -1) {
-                this.controllersOff();
+                this.controllerOff();
             }
         } else if (element.getAttribute('data-exp')) {
             if (this.controllerArray.indexOf(this.context.math.mathController) < 0) {
@@ -248,7 +248,7 @@ export default {
         const mathBtn = this.context.math.mathController;
 
         this.setControllerPosition(mathBtn, mathTag, 'bottom', {left: 0, top: 0});
-        this.controllersOn(mathBtn, mathTag, 'math');
+        this.controllerOn(mathBtn, mathTag, 'math');
     },
 
     onClick_mathController: function (e) {
@@ -272,7 +272,7 @@ export default {
             this.history.push(false);
         }
 
-        this.controllersOff();
+        this.controllerOff();
     },
 
     init: function () {

@@ -3,8 +3,8 @@
  * @author JiHong Lee.
  */
 
-import { _w } from "../helpers/global";
-import { getNodeFromPath, getNodePath } from "../helpers/domUtils";
+import { _w } from "../helper/global";
+import { getNodeFromPath, getNodePath } from "../helper/domUtils";
 
 export default function (editor, change) {
 	const delayTime = editor.options.historyStackDelayTime;
@@ -39,7 +39,7 @@ export default function (editor, change) {
 			}
 		}
 
-		editor.controllersOff();
+		editor.controllerOff();
 		editor._checkComponents();
 		editor.char.display();
 		editor._resourcesStateChange();

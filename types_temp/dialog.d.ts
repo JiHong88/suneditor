@@ -13,7 +13,7 @@ declare interface dialog extends Module {
     open(kind: string, update: boolean): void;
 
     /**
-     * @description Called after the submenu has been rendered
+     * @description Called after the dropdown has been rendered
      */
     on?: () => void;
 

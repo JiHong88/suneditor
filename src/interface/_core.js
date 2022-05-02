@@ -1,3 +1,8 @@
+/**
+ * @description Add default properties to the editor core;
+ * @param {any} core Editor's core
+ * @private
+ */
 function CoreInterface(core) {
 	this.__core = core;
 	this._w = core._w;
@@ -12,7 +17,7 @@ function CoreInterface(core) {
 	this.context = core.context;
 	this.history = core.history;
 	this.lang = core.lang;
-	this.helpers = core.helpers;
+	this.helper = core.helper;
 }
 
 export default CoreInterface;

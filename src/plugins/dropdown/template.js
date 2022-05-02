@@ -9,27 +9,27 @@
 
 export default {
     name: 'template',
-    display: 'submenu',
+    display: 'dropdown',
     add: function (core, targetElement) {
         const context = core.context;
         context.template = {
             selectedIndex: -1
         };
 
-        /** set submenu */
-        let templateDiv = this.setSubmenu(core);
+        /** set dropdown */
+        let templateDiv = this.setDropdown(core);
 
         /** add event listeners */
         templateDiv.querySelector('ul').addEventListener('click', this.pickup.bind(core));
 
         /** append target button menu */
-        core.initMenuTarget(this.name, targetElement, templateDiv);
+        core.menu.initTarget(targetElement, templateDiv);
 
         /** empty memory */
         templateDiv = null;
     },
 
-    setSubmenu: function (core) {
+    setDropdown: function (core) {
         const templateList = core.options.templates;
         if (!templateList || templateList.length === 0) {
             throw Error('[SUNEDITOR.plugins.template.fail] To use the "template" plugin, please define the "templates" option.');
@@ -38,7 +38,7 @@ export default {
         const listDiv = core.util.createElement('DIV');
         listDiv.className = 'se-list-layer';
 
-        let list = '<div class="se-submenu se-list-inner">' +
+        let list = '<div class="se-dropdown se-list-inner">' +
                 '<ul class="se-list-basic">';
         for (let i = 0, len = templateList.length, t; i < len; i++) {
             t = templateList[i];
@@ -63,10 +63,10 @@ export default {
         if (temp.html) {
             this.setContents(temp.html);
         } else {
-            this.submenuOff();
+            this.dropdownOff();
             throw Error('[SUNEDITOR.template.fail] cause : "templates[i].html not found"');
         }
         
-        this.submenuOff();
+        this.dropdownOff();
     }
 };

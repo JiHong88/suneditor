@@ -9,15 +9,15 @@
 
 export default {
     name: 'textStyle',
-    display: 'submenu',
+    display: 'dropdown',
     add: function (core, targetElement) {
         const context = core.context;
         context.textStyle = {
             _styleList: null
         };
 
-        /** set submenu */
-        let listDiv = this.setSubmenu(core);
+        /** set dropdown */
+        let listDiv = this.setDropdown(core);
         let listUl = listDiv.querySelector('ul');
 
         /** add event listeners */
@@ -26,16 +26,16 @@ export default {
         context.textStyle._styleList = listDiv.querySelectorAll('li button');
 
         /** append target button menu */
-        core.initMenuTarget(this.name, targetElement, listDiv);
+        core.menu.initTarget(targetElement, listDiv);
 
         /** empty memory */
         listDiv = null, listUl = null;
     },
 
-    setSubmenu: function (core) {
+    setDropdown: function (core) {
         const option = core.options;
         const listDiv = core.util.createElement('DIV');
-        listDiv.className = 'se-submenu se-list-layer se-list-format';
+        listDiv.className = 'se-dropdown se-list-layer se-list-format';
 
         const defaultList = {
             code: {
@@ -97,7 +97,7 @@ export default {
     },
 
      /**
-     * @Override submenu
+     * @Override dropdown
      */
     on: function () {
         const util = this.util;
@@ -162,6 +162,6 @@ export default {
         const removeNodes = newNode ? null : [tag.nodeName];
         this.format.applyStyleNode(newNode, checkStyles, removeNodes, true);
 
-        this.submenuOff();
+        this.dropdownOff();
     }
 };

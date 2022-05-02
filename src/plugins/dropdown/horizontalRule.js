@@ -9,26 +9,26 @@
 
 export default {
     name: 'horizontalRule',
-    display: 'submenu',
+    display: 'dropdown',
     add: function (core, targetElement) {
         core.context.horizontalRule = {
             currentHR: null,
         };
 
-        /** set submenu */
-        let listDiv = this.setSubmenu(core);
+        /** set dropdown */
+        let listDiv = this.setDropdown(core);
 
         /** add event listeners */
         listDiv.querySelector('ul').addEventListener('click', this.horizontalRulePick.bind(core));
 
         /** append target button menu */
-        core.initMenuTarget(this.name, targetElement, listDiv);
+        core.menu.initTarget(targetElement, listDiv);
 
         /** empty memory */
         listDiv = null;
     },
 
-    setSubmenu: function (core) {
+    setDropdown: function (core) {
         const lang = core.lang;
         const listDiv = core.util.createElement('DIV');
         const items = core.options.hrItems || [{name: lang.toolbar.hr_solid, class: '__se__solid'}, {name: lang.toolbar.hr_dashed, class: '__se__dashed'}, {name: lang.toolbar.hr_dotted, class: '__se__dotted'}];
@@ -42,7 +42,7 @@ export default {
             '</li>';
         }
         
-        listDiv.className = 'se-submenu se-list-layer se-list-line';
+        listDiv.className = 'se-dropdown se-list-layer se-list-line';
         listDiv.innerHTML = '' +
             '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
@@ -56,13 +56,13 @@ export default {
     active: function (element) {
         if (!element) {
             if (this.util.hasClass(this.context.horizontalRule.currentHR, 'on')) {
-                this.controllersOff();
+                this.controllerOff();
             }
         } else if (/HR/i.test(element.nodeName)) {
             this.context.horizontalRule.currentHR = element;
             if (!this.util.hasClass(element, 'on')) {
                 this.util.addClass(element, 'on');
-                this.controllersOn('hr', this.util.removeClass.bind(this.util, element, 'on'));
+                this.controllerOn('hr', this.util.removeClass.bind(this.util, element, 'on'));
             }
             return true;
         }
@@ -92,7 +92,7 @@ export default {
         const oNode = this.plugins.horizontalRule.appendHr.call(this, target.firstElementChild);
         if (oNode) {
             this.setRange(oNode, 0, oNode, 0);
-            this.submenuOff();
+            this.dropdownOff();
         }
     }
 };

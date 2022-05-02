@@ -8,7 +8,7 @@ export interface DialogPlugin extends Plugin {
     open: () => void;
 
     /**
-     * @description Called after the submenu has been rendered
+     * @description Called after the dropdown has been rendered
      */
     on?: () => void;
 

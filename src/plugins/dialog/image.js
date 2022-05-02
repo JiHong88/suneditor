@@ -278,7 +278,7 @@ export default {
         const emptyDiv = imageContainer.parentNode;
         this.util.remove(imageContainer);
         this.plugins.image.init.call(this);
-        this.controllersOff();
+        this.controllerOff();
 
         if (emptyDiv !== this.context.element.wysiwyg) this.util.removeAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
 

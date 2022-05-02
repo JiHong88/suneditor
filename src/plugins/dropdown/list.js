@@ -9,7 +9,7 @@
 
 export default {
     name: 'list',
-    display: 'submenu',
+    display: 'dropdown',
     add: function (core, targetElement) {
         const context = core.context;
         context.list = {
@@ -22,8 +22,8 @@ export default {
             }
         };
 
-        /** set submenu */
-        let listDiv = this.setSubmenu(core);
+        /** set dropdown */
+        let listDiv = this.setDropdown(core);
         let listUl = listDiv.querySelector('ul');
 
         /** add event listeners */
@@ -31,17 +31,17 @@ export default {
         context.list._list = listUl.querySelectorAll('li button');
 
         /** append target button menu */
-        core.initMenuTarget(this.name, targetElement, listDiv);
+        core.menu.initTarget(targetElement, listDiv);
 
         /** empty memory */
         listDiv = null, listUl = null;
     },
 
-    setSubmenu: function (core) {
+    setDropdown: function (core) {
         const lang = core.lang;
         const listDiv = core.util.createElement('DIV');
 
-        listDiv.className = 'se-submenu se-list-layer';
+        listDiv.className = 'se-dropdown se-list-layer';
         listDiv.innerHTML = '' +
             '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
@@ -86,7 +86,7 @@ export default {
     },
 
      /**
-     * @Override submenu
+     * @Override dropdown
      */
     on: function () {
         const listContext = this.context.list;
@@ -118,7 +118,7 @@ export default {
         }
         
         const util = this.util;
-        util.sortByDepth(selectedFormats, true);
+        util.sortNodeByDepth(selectedFormats, true);
 
         // merge
         let firstSel = selectedFormats[0];
@@ -265,7 +265,7 @@ export default {
 
                 util.removeItem(fTag);
                 if (mergeTop && topNumber === null) topNumber = list.children.length - 1;
-                if (next && (util.getRangeFormatElement(nextParent, passComponent) !== util.getRangeFormatElement(originParent, passComponent) || (util.isList(nextParent) && util.isList(originParent) && util.getElementDepth(nextParent) !== util.getElementDepth(originParent)))) {
+                if (next && (util.getRangeFormatElement(nextParent, passComponent) !== util.getRangeFormatElement(originParent, passComponent) || (util.isList(nextParent) && util.isList(originParent) && util.getNodeDepth(nextParent) !== util.getNodeDepth(originParent)))) {
                     list = util.createElement(command);
                 }
 
@@ -447,7 +447,7 @@ export default {
         const range = this.format.applyList(command, null, false);
         if (range) this.setRange(range.sc, range.so, range.ec, range.eo);
 
-        this.submenuOff();
+        this.dropdownOff();
 
         // history stack
         this.history.push(false);

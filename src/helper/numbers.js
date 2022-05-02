@@ -2,7 +2,7 @@ import { _w } from "./global";
 
 /**
  * @description Checks for numeric (with decimal point).
- * @param {String|Number} text Text string or number
+ * @param {string|number} text Text string or number
  * @returns {boolean}
  */
 export function is(text) {
@@ -11,14 +11,14 @@ export function is(text) {
 
 /**
  * @description Get a number.
- * @param {String|Number} text Text string or number
+ * @param {string|number} value Text string or number
  * @param {number} maxDec Maximum number of decimal places (-1 : Infinity)
  * @returns {number}
  */
-export function get(text, maxDec) {
-    if (!text) return 0;
+export function get(value, maxDec) {
+    if (!value) return 0;
 
-    let number = (text + "").match(/-?\d+(\.\d+)?/);
+    let number = (value + "").match(/-?\d+(\.\d+)?/);
     if (!number || !number[0]) return 0;
 
     number = number[0];

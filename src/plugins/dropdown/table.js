@@ -9,7 +9,7 @@
 
 export default {
     name: 'table',
-    display: 'submenu',
+    display: 'dropdown',
     add: function (core, targetElement) {
         const context = core.context;
         let contextTable = context.table = {
@@ -43,8 +43,8 @@ export default {
             }
         };
 
-        /** set submenu */
-        let listDiv = this.setSubmenu(core);
+        /** set dropdown */
+        let listDiv = this.setDropdown(core);
         let tablePicker = listDiv.querySelector('.se-controller-table-picker');
 
         contextTable.tableHighlight = listDiv.querySelector('.se-table-size-highlighted');
@@ -76,7 +76,7 @@ export default {
         tableController.addEventListener('click', this.onClick_tableController.bind(core));
 
         /** append target button menu */
-        core.initMenuTarget(this.name, targetElement, listDiv);
+        core.menu.initTarget(targetElement, listDiv);
 
         /** append controller */
         context.element.relative.appendChild(resizeDiv);
@@ -86,9 +86,9 @@ export default {
         listDiv = null, tablePicker = null, resizeDiv = null, tableController = null, contextTable = null;
     },
 
-    setSubmenu: function (core) {
+    setDropdown: function (core) {
         const listDiv = core.util.createElement('DIV');
-        listDiv.className = 'se-submenu se-selector-table';
+        listDiv.className = 'se-dropdown se-selector-table';
         listDiv.innerHTML = '' +
             '<div class="se-table-size">' +
                 '<div class="se-table-size-picker se-controller-table-picker"></div>' +
@@ -265,7 +265,7 @@ export default {
         unHighlight.height = '10em';
 
         this.util.changeTxt(this.context.table.tableDisplay, '1 x 1');
-        this.submenuOff();
+        this.dropdownOff();
     },
 
     init: function () {
@@ -315,7 +315,7 @@ export default {
         const contextTable = this.context.table;
 
         if (!this.selection.get().isCollapsed && !tablePlugin._selectedCell) {
-            this.controllersOff();
+            this.controllerOff();
             this.util.removeClass(tdElement, 'se-table-selected-cell');
             return;
         }
@@ -328,7 +328,7 @@ export default {
         tablePlugin.setPositionControllerTop.call(this, tableElement);
         tablePlugin.setPositionControllerDiv.call(this, tdElement, tablePlugin._shift);
         
-        if (!tablePlugin._shift) this.controllersOn(contextTable.resizeDiv, contextTable.tableController, tablePlugin.init.bind(this), tdElement, 'table');
+        if (!tablePlugin._shift) this.controllerOn(contextTable.resizeDiv, contextTable.tableController, tablePlugin.init.bind(this), tdElement, 'table');
     },
 
     setPositionControllerTop: function (tableElement) {
@@ -630,7 +630,7 @@ export default {
         if (!remove) {
             this.plugins.table.setPositionControllerDiv.call(this, positionResetElement || contextTable._tdElement, true);
         } else {
-            this.controllersOff();
+            this.controllerOff();
         }
     },
 
@@ -776,7 +776,7 @@ export default {
                 rowSpanCell.cell.rowSpan = util.getOverlapRangeAtIndex(removeFirst, removeEnd, rowSpanCell.i, rowSpanCell.rs);
             }
 
-            this.controllersOff();
+            this.controllerOff();
         } else {
             this.plugins.table.setPositionControllerDiv.call(this, positionResetElement || contextTable._tdElement, true);
         }
@@ -1036,7 +1036,7 @@ export default {
         mergeCell.colSpan = cs;
         mergeCell.rowSpan = rs;
 
-        this.controllersOff();
+        this.controllerOff();
         tablePlugin.setActiveButton.call(this, true, false);
         tablePlugin.call_controller_tableEdit.call(this, mergeCell);
 
@@ -1061,7 +1061,7 @@ export default {
         util.toggleClass(headerButton, 'active');
 
         if (/TH/i.test(this.context.table._tdElement.nodeName)) {
-            this.controllersOff();
+            this.controllerOff();
         } else {
             this.plugins.table.setPositionControllerDiv.call(this, this.context.table._tdElement, false);
         }
@@ -1332,7 +1332,7 @@ export default {
         const tablePlugin = this.plugins.table;
 
         tablePlugin._removeEvents.call(this);
-        this.controllersOff();
+        this.controllerOff();
 
         tablePlugin._shift = shift;
         tablePlugin._fixedCell = tdElement;
@@ -1353,8 +1353,8 @@ export default {
             this._wd.addEventListener('mousemove', tablePlugin._bindOnSelect, false);
         } else {
             tablePlugin._bindOffShift = function () {
-                this.controllersOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this), tdElement, 'table');
-                if (!tablePlugin._ref) this.controllersOff();
+                this.controllerOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this), tdElement, 'table');
+                if (!tablePlugin._ref) this.controllerOff();
             }.bind(this);
 
             this._wd.addEventListener('keyup', tablePlugin._bindOffShift, false);
@@ -1419,7 +1419,7 @@ export default {
             case 'remove':
                 const emptyDiv = contextTable._element.parentNode;
                 this.util.remove(contextTable._element);
-                this.controllersOff();
+                this.controllerOff();
 
                 if (emptyDiv !== this.context.element.wysiwyg) this.util.removeAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
                 this.__core.focus();

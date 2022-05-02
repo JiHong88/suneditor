@@ -80,14 +80,14 @@ class domUtils {
 	 * @param element The element to check
 	 * @returns
 	 */
-	getElementDepth(element: Node): number;
+	getNodeDepth(element: Node): number;
 
 	/**
 	 * @description Sort a element array by depth of element.
 	 * @param array Array object
 	 * @param des true: descending order / false: ascending order
 	 */
-	sortByDepth(array: Node[], des: boolean): void;
+	sortNodeByDepth(array: Node[], des: boolean): void;
 
 	/**
 	 * @description Compares two elements to find a common ancestor, and returns the order of the two elements.

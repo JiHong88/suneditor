@@ -4,8 +4,8 @@ import {
     domUtils,
     numbers,
     converter
-} from '../helpers';
-import env from '../helpers/env';
+} from '../helper';
+import env from '../helper/env';
 
 export default {
     /**
@@ -641,20 +641,20 @@ export default {
             save: ['_se_command_save se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmd + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save],
             /** plugins - command */
             blockquote: ['', lang.toolbar.tag_blockquote, 'blockquote', 'command', icons.blockquote],
-            /** plugins - submenu */
-            font: ['se-btn-select se-btn-tool-font', lang.toolbar.font, 'font', 'submenu', '<span class="txt">' + lang.toolbar.font + '</span>' + icons.arrow_down],
-            formatBlock: ['se-btn-select se-btn-tool-format', lang.toolbar.formats, 'formatBlock', 'submenu', '<span class="txt">' + lang.toolbar.formats + '</span>' + icons.arrow_down],
-            fontSize: ['se-btn-select se-btn-tool-size', lang.toolbar.fontSize, 'fontSize', 'submenu', '<span class="txt">' + lang.toolbar.fontSize + '</span>' + icons.arrow_down],
-            fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'submenu', icons.font_color],
-            hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'submenu', icons.highlight_color],
-            align: ['se-btn-align', lang.toolbar.align, 'align', 'submenu', (options.rtl ? icons.align_right : icons.align_left)],
-            list: ['', lang.toolbar.list, 'list', 'submenu', icons.list_number],
-            horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'submenu', icons.horizontal_rule],
-            table: ['', lang.toolbar.table, 'table', 'submenu', icons.table],
-            lineHeight: ['', lang.toolbar.lineHeight, 'lineHeight', 'submenu', icons.line_height],
-            template: ['', lang.toolbar.template, 'template', 'submenu', icons.template],
-            paragraphStyle: ['', lang.toolbar.paragraphStyle, 'paragraphStyle', 'submenu', icons.paragraph_style],
-            textStyle: ['', lang.toolbar.textStyle, 'textStyle', 'submenu', icons.text_style],
+            /** plugins - dropdown */
+            font: ['se-btn-select se-btn-tool-font', lang.toolbar.font, 'font', 'dropdown', '<span class="txt">' + lang.toolbar.font + '</span>' + icons.arrow_down],
+            formatBlock: ['se-btn-select se-btn-tool-format', lang.toolbar.formats, 'formatBlock', 'dropdown', '<span class="txt">' + lang.toolbar.formats + '</span>' + icons.arrow_down],
+            fontSize: ['se-btn-select se-btn-tool-size', lang.toolbar.fontSize, 'fontSize', 'dropdown', '<span class="txt">' + lang.toolbar.fontSize + '</span>' + icons.arrow_down],
+            fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'dropdown', icons.font_color],
+            hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'dropdown', icons.highlight_color],
+            align: ['se-btn-align', lang.toolbar.align, 'align', 'dropdown', (options.rtl ? icons.align_right : icons.align_left)],
+            list: ['', lang.toolbar.list, 'list', 'dropdown', icons.list_number],
+            horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'dropdown', icons.horizontal_rule],
+            table: ['', lang.toolbar.table, 'table', 'dropdown', icons.table],
+            lineHeight: ['', lang.toolbar.lineHeight, 'lineHeight', 'dropdown', icons.line_height],
+            template: ['', lang.toolbar.template, 'template', 'dropdown', icons.template],
+            paragraphStyle: ['', lang.toolbar.paragraphStyle, 'paragraphStyle', 'dropdown', icons.paragraph_style],
+            textStyle: ['', lang.toolbar.textStyle, 'textStyle', 'dropdown', icons.text_style],
             /** plugins - dialog */
             link: ['', lang.toolbar.link, 'link', 'dialog', icons.link],
             image: ['', lang.toolbar.image, 'image', 'dialog', icons.image],
@@ -686,7 +686,7 @@ export default {
      * @param {string} buttonClass className in button
      * @param {string} title Title in button
      * @param {string} dataCommand The data-command property of the button
-     * @param {string} dataDisplay The data-display property of the button ('dialog', 'submenu', 'command')
+     * @param {string} dataDisplay The data-display property of the button ('dialog', 'dropdown', 'command')
      * @param {string} innerHTML Html in button
      * @param {string} _disabled Button disabled
      * @param {Object} _icons Icons

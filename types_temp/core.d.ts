@@ -82,9 +82,9 @@ export interface Core {
 	effectNode: Node;
 
 	/**
-	 * @description submenu element
+	 * @description dropdown element
 	 */
-	submenu: Element;
+	dropdown: Element;
 
 	/**
 	 * @description container element
@@ -92,9 +92,9 @@ export interface Core {
 	container: Element;
 
 	/**
-	 * @description active button element in submenu
+	 * @description active button element in dropdown
 	 */
-	submenuActiveButton: Element;
+	dropdownActiveButton: Element;
 
 	/**
 	 * @description active button element in container
@@ -102,7 +102,7 @@ export interface Core {
 	containerActiveButton: Element;
 
 	/**
-	 * @description The elements array to be processed unvisible when the controllersOff function is executed (resizing, link modified button, table controller)
+	 * @description The elements array to be processed unvisible when the controllerOff function is executed (resizing, link modified button, table controller)
 	 */
 	controllerArray: Controllers;
 
@@ -215,24 +215,24 @@ export interface Core {
 	addModule(moduleArray: Module[]): void;
 
 	/**
-	 * @description Method for managing submenu element.
-	 * You must add the "submenu" element using the this method at custom plugin.
+	 * @description Method for managing dropdown element.
+	 * You must add the "dropdown" element using the this method at custom plugin.
 	 * @param pluginName Plugin name
 	 * @param target Target button
-	 * @param menu Submenu element
+	 * @param menu Dropdown element
 	 */
 	initMenuTarget(pluginName: string, target: Element | null, menu: Element): void;
 
 	/**
-	 * @description Enable submenu
-	 * @param element Submenu's button element to call
+	 * @description Enable dropdown
+	 * @param element Dropdown's button element to call
 	 */
-	submenuOn(element: Element): void;
+	dropdownOn(element: Element): void;
 
 	/**
-	 * @description Disable submenu
+	 * @description Disable dropdown
 	 */
-	submenuOff(): void;
+	dropdownOff(): void;
 
 	/**
 	 * @description Disable more layer
@@ -254,13 +254,13 @@ export interface Core {
 	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
 	 * @param arguments controller elements, function.
 	 */
-	controllersOn(...arguments: Controllers): void;
+	controllerOn(...arguments: Controllers): void;
 
 	/**
 	 * @description Hide controller at editor area (link button, image resize button..)
-	 * @param e Event object when called from mousedown and keydown events registered in "core.controllersOn"
+	 * @param e Event object when called from mousedown and keydown events registered in "core.controllerOn"
 	 */
-	controllersOff(e?: KeyboardEvent | MouseEvent): void;
+	controllerOff(e?: KeyboardEvent | MouseEvent): void;
 
 	/**
 	 * @description Specify the position of the controller.
@@ -319,13 +319,13 @@ export interface Core {
 	/**
 	 * @description Run plugin calls and basic commands.
 	 * @param command Command string
-	 * @param display Display type string ('command', 'submenu', 'dialog', 'container')
+	 * @param display Display type string ('command', 'dropdown', 'dialog', 'container')
 	 * @param target The element of command button
 	 */
-	actionCall(command: string, display: "command" | "submenu" | "dialog" | "container", target: Element): void;
+	actionCall(command: string, display: "command" | "dropdown" | "dialog" | "container", target: Element): void;
 
 	/**
-	 * @description Execute command of command button(All Buttons except submenu and dialog)
+	 * @description Execute command of command button(All Buttons except dropdown and dialog)
 	 * (undo, redo, bold, underline, italic, strikethrough, subscript, superscript, removeFormat, indent, outdent, fullscreen, showBlocks, codeview, preview, print, copy, cut, paste)
 	 * @param command Property of command button (data-value)
 	 * @param target The element of command button

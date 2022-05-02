@@ -9,7 +9,7 @@
 
 export default {
     name: 'font',
-    display: 'submenu',
+    display: 'dropdown',
     add: function (core, targetElement) {
         const context = core.context;
         context.font = {
@@ -19,8 +19,8 @@ export default {
             currentFont: ''
         };
 
-        /** set submenu */
-        let listDiv = this.setSubmenu(core);
+        /** set dropdown */
+        let listDiv = this.setDropdown(core);
 
         /** add event listeners */
         listDiv.querySelector('.se-list-inner').addEventListener('click', this.pickup.bind(core));
@@ -28,18 +28,18 @@ export default {
         context.font._fontList = listDiv.querySelectorAll('ul li button');
 
         /** append target button menu */
-        core.initMenuTarget(this.name, targetElement, listDiv);
+        core.menu.initTarget(targetElement, listDiv);
 
         /** empty memory */
         listDiv = null;
     },
 
-    setSubmenu: function (core) {
+    setDropdown: function (core) {
         const option = core.options;
         const lang = core.lang;
         const listDiv = core.util.createElement('DIV');
 
-        listDiv.className = 'se-submenu se-list-layer se-list-font-family';
+        listDiv.className = 'se-dropdown se-list-layer se-list-font-family';
 
         let font, text, i, len;
         let fontList = !option.font ?
@@ -90,7 +90,7 @@ export default {
     },
 
      /**
-     * @Override submenu
+     * @Override dropdown
      */
     on: function () {
         const fontContext = this.context.font;
@@ -126,6 +126,6 @@ export default {
             this.format.applyStyleNode(null, ['font-family'], ['span'], true);
         }
         
-        this.submenuOff();
+        this.dropdownOff();
     }
 };

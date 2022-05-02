@@ -11,7 +11,7 @@ import colorPicker from '../modules/_colorPicker';
 
 export default {
     name: 'hiliteColor',
-    display: 'submenu',
+    display: 'dropdown',
     add: function (core, targetElement) {
         core.addModule([colorPicker]);
 
@@ -22,8 +22,8 @@ export default {
             colorList: null
         };
 
-        /** set submenu */
-        let listDiv = this.setSubmenu(core);
+        /** set dropdown */
+        let listDiv = this.setDropdown(core);
         context.hiliteColor.colorInput = listDiv.querySelector('._se_color_picker_input');
 
         /** add event listeners */
@@ -35,24 +35,24 @@ export default {
         context.hiliteColor.colorList = listDiv.querySelectorAll('li button');
 
         /** append target button menu */
-        core.initMenuTarget(this.name, targetElement, listDiv);
+        core.menu.initTarget(targetElement, listDiv);
 
         /** empty memory */
         listDiv = null;
     },
 
-    setSubmenu: function (core) {
+    setDropdown: function (core) {
         const colorArea = core.context.colorPicker.colorListHTML;
         const listDiv = core.util.createElement('DIV');
 
-        listDiv.className = 'se-submenu se-list-layer';
+        listDiv.className = 'se-dropdown se-list-layer';
         listDiv.innerHTML = colorArea;
 
         return listDiv;
     },
 
      /**
-     * @Override submenu
+     * @Override dropdown
      */
     on: function () {
         const contextPicker = this.context.colorPicker;
@@ -87,7 +87,7 @@ export default {
 
     remove: function () {
         this.format.applyStyleNode(null, ['background-color'], ['span'], true);
-        this.submenuOff();
+        this.dropdownOff();
     },
 
     applyColor: function (color) {
@@ -97,6 +97,6 @@ export default {
         newNode.style.backgroundColor = color;
         this.format.applyStyleNode(newNode, ['background-color'], null, null);
         
-        this.submenuOff();
+        this.dropdownOff();
     }
 };

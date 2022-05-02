@@ -9,7 +9,7 @@
 
 export default {
     name: 'formatBlock',
-    display: 'submenu',
+    display: 'dropdown',
     add: function (core, targetElement) {
         const context = core.context;
         context.formatBlock = {
@@ -19,25 +19,25 @@ export default {
             currentFormat: ''
         };
 
-        /** set submenu */
-        let listDiv = this.setSubmenu(core);
+        /** set dropdown */
+        let listDiv = this.setDropdown(core);
 
         /** add event listeners */
         listDiv.querySelector('ul').addEventListener('click', this.pickUp.bind(core));
         context.formatBlock._formatList = listDiv.querySelectorAll('li button');
 
         /** append target button menu */
-        core.initMenuTarget(this.name, targetElement, listDiv);
+        core.menu.initTarget(targetElement, listDiv);
 
         /** empty memory */
         listDiv = null;
     },
 
-    setSubmenu: function (core) {
+    setDropdown: function (core) {
         const option = core.options;
         const lang_toolbar = core.lang.toolbar;
         const listDiv = core.util.createElement('DIV');
-        listDiv.className = 'se-submenu se-list-layer se-list-format';
+        listDiv.className = 'se-dropdown se-list-layer se-list-format';
 
         const defaultFormats = ['p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
         const formatList = !option.formats || option.formats.length === 0 ? defaultFormats : option.formats;
@@ -107,7 +107,7 @@ export default {
     },
 
      /**
-     * @Override submenu
+     * @Override dropdown
      */
     on: function () {
         const formatContext = this.context.formatBlock;
@@ -160,6 +160,6 @@ export default {
             }
         }
 
-        this.submenuOff();
+        this.dropdownOff();
     }
 };

@@ -7,7 +7,7 @@ import CoreInterface from "../../interface/_core";
 import {
 	domUtils,
 	unicode
-} from "../../helpers";
+} from "../../helper";
 
 const Selection = function (editor) {
 	CoreInterface.call(this, editor);
@@ -382,7 +382,7 @@ Selection.prototype = {
 				afterNode = this.node.split(
 					r.container,
 					r.offset,
-					!depthFormat ? 0 : domUtils.getElementDepth(depthFormat) + 1
+					!depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1
 				);
 				if (afterNode) afterNode = afterNode.previousSibling;
 			}

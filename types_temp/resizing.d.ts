@@ -96,7 +96,7 @@ declare interface resizing extends Module {
     call_controller_resize(targetElement: Element, plugin: string): Record<string, number>;
 
     /**
-     * @description Open align submenu of module
+     * @description Open align dropdown of module
      */
     openAlignMenu(): void;
 

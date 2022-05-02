@@ -1,5 +1,6 @@
 # SunEditor
-Pure javscript based WYSIWYG web editor, with no dependencies
+Vanilla javscript based WYSIWYG web editor, with no dependencies.
+"SunEditor" assumes compatibility up to IE11 and other all browser without polyfill.
 
 #### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
 
@@ -51,7 +52,7 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 
 | <img src="http://suneditor.com/docs/chrome-64.png" alt="Chrome" width="16px" height="16px" /> Chrome | <img src="http://suneditor.com/docs/mozilla-64.png" alt="Firefox" width="16px" height="16px" /> Firefox | <img src="http://suneditor.com/docs/opera-64.png" alt="Opera" width="16px" height="16px" /> Opera | <img src="http://suneditor.com/docs/safari-64.png" alt="Safari" width="16px" height="16px" /> Safari | <img src="http://suneditor.com/docs/edge-64.png" alt="Edge" width="16px" height="16px" /> Edge | <img src="http://suneditor.com/docs/explorer-64.png" alt="Explorer" width="16px" height="16px" /> Internet Explorer |
 |:---:|:---:|:---:|:---:|:---:|:---:|
-| Yes | Yes | Yes | Yes | Yes | 11+ |
+| Yes | Yes | Yes | Yes | Yes | 11 |
 
 ## Install
 #### Npm
@@ -122,7 +123,7 @@ import suneditor from 'suneditor'
 
 // How to import plugins
 import image from 'suneditor/src/plugins/dialog/link'
-import list from 'suneditor/src/plugins/submenu/list'
+import list from 'suneditor/src/plugins/dropdown/list'
 import {font, video} from 'suneditor/src/plugins'
 
 // How to import language files (default: en)
@@ -356,7 +357,7 @@ let newMentions = editor.core.getMentions();
 plugins: [
     /** command */
     blockquote,
-    /** Submenu */
+    /** Dropdown */
     align,
     font,
     fontColor,
@@ -402,13 +403,13 @@ historyStackDelayTime : When recording the history stack, this is the delay time
 addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {string}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
                         ex) '*' // This means all tags are allowed. (Not available on "blacklist")
-tagsBlacklist         : Blacklist of the editor default tags.               default: null {String}
+tagsBlacklist         : Blacklist of the editor default tags.               default: null {string}
                         ex) 'h1|h2'
 // _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist - tagsBlacklist
-pasteTagsWhitelist    : Whitelist of tags when pasting.                     default: _editorTagsWhitelist {String}
+pasteTagsWhitelist    : Whitelist of tags when pasting.                     default: _editorTagsWhitelist {string}
                         ex) 'p|h1|h2|h3'
                         ex) '*' // This means all tags are allowed. (Not available on "blacklist")
-pasteTagsBlacklist    : Blacklist of tags when pasting.                     default: null {String}
+pasteTagsBlacklist    : Blacklist of tags when pasting.                     default: null {string}
                         ex) 'h1|h2'
 attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}
                         // -- Fixed whitelist --
@@ -426,10 +427,10 @@ attributesBlacklist   : Add attribute blacklist of tags that should be deleted i
                             '???': '*' // "*" === all attributes
                         }
 // Layout-------------------------------------------------------------------------------------------------------
-mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {String}
+mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {string}
 rtl             : If true, the editor is set to RTL(Right To Left) mode.   default: false {Boolean}
 lineAttrReset   : Deletes other attributes except for the property set at the time of line break.
-                  If there is no value, no all attribute is deleted.    default: '' {String}
+                  If there is no value, no all attribute is deleted.    default: '' {string}
                   ex) 'class|style': Attributes other than "class" and "style" are deleted at line break.
                       '*': All attributes are deleted at line break.
 toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
@@ -532,9 +533,9 @@ maxHeight       : The max-height size of the editor.
                   Used when 'height' value is 'auto'.               default: null {Number|String}
 
 // Editing area -------------------------------------------------------------------------------------------------
-className       : Add a "class" to the editing area[.sun-editor-editable].    default: '' {String}
+className       : Add a "class" to the editing area[.sun-editor-editable].    default: '' {string}
 defaultStyle    : You can define the style of the editing area[.sun-editor-editable].
-                  It affects the entire editing area.               default: '' {String}
+                  It affects the entire editing area.               default: '' {string}
                   ('z-index', 'position' and 'width' properties apply to the top div.)
                   ex) 'font-family: cursive; font-size: 10px;'
 
@@ -548,7 +549,7 @@ fontSize        : Change default font-size array.                   default: [..
                   Default value: [
                     8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
                   ]
-fontSizeUnit    : The font size unit.                               default: 'px' {String}
+fontSizeUnit    : The font size unit.                               default: 'px' {string}
 alignItems      : A list of drop-down options for the 'align' plugin.   default: rtl === true ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'] {Array}
 formats         : Change default formatBlock array.                 default: [...] {Array}
                   Default value: [
@@ -645,8 +646,8 @@ textStyles      : You can apply custom style or class to selected text.
 imageResizing   : Can resize the image.                               default: true {Boolean}
 imageHeightShow : Choose whether the image height input is visible.   default: true {Boolean}
 imageAlignShow  : Choose whether the image align radio buttons are visible.       default: true {Boolean}
-imageWidth      : The default width size of the image frame.          default: 'auto' {String}
-imageHeight     : The default height size of the image frame.         default: 'auto' {String}
+imageWidth      : The default width size of the image frame.          default: 'auto' {string}
+imageHeight     : The default height size of the image frame.         default: 'auto' {string}
 imageSizeOnlyPercentage : If true, image size can only be scaled by percentage.   default: false {Boolean}
 imageRotation   : Choose whether to image rotation buttons display.
                   When "imageSizeOnlyPercentage" is "true" or  or "imageHeightShow" is "false" the default value is false.                       
@@ -703,8 +704,8 @@ videoResizing   : Can resize the video (iframe, video).                         
 videoHeightShow : Choose whether the video height input is visible.    default: true {Boolean}
 videoAlignShow  : Choose whether the video align radio buttons are visible.       default: true {Boolean}
 videoRatioShow  : Choose whether the video ratio options is visible.   default: true {Boolean}
-videoWidth      : The default width size of the video frame.           default: '100%' {String}
-videoHeight     : The default height size of the video frame.          default: '56.25%' {String}
+videoWidth      : The default width size of the video frame.           default: '100%' {string}
+videoHeight     : The default height size of the video frame.          default: '56.25%' {string}
 videoSizeOnlyPercentage : If true, video size can only be scaled by percentage.   default: false {Boolean}
 videoRotation   : Choose whether to video rotation buttons display.
                   When "videoSizeOnlyPercentage" is "true" or "videoHeightShow" is "false" the default value is false.
@@ -1467,7 +1468,7 @@ editor.showController = function (name, controllers, core) {
         </tr>
         <tr>
             <td align="left">align</td>
-            <td align="left" rowspan="13"><strong>submenu</strong></td>
+            <td align="left" rowspan="13"><strong>dropdown</strong></td>
         </tr>
         <tr>
             <td align="left">font</td>

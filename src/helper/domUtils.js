@@ -13,8 +13,8 @@ import {
 /**
  * @description Create Element node
  * @param {string} elementName Element name
- * @param {Object|null|undefined} attributes The attributes of the tag. {style: "font-size:12px;..", class: "el_class",..}
- * @param {string|Element|null|undefined} inner A innerHTML or inner element.
+ * @param {Object.<string, string>|null|undefined} attributes The attributes of the tag. {style: "font-size:12px;..", class: "el_class",..}
+ * @param {string|Node|null|undefined} inner A innerHTML string or inner node.
  * @returns {Element}
  */
 export function createElement(elementName, attributes, inner) {
@@ -40,7 +40,7 @@ export function createElement(elementName, attributes, inner) {
 /**
  * @description Create text node
  * @param {string} text text contents
- * @returns {Node}
+ * @returns {Text}
  */
 export function createTextNode(text) {
 	return _d.createTextNode(text || "");
@@ -60,7 +60,7 @@ export function getIframeDocument(iframe) {
 /**
  * @description Get attributes of argument element to string ('class="---" name="---" ')
  * @param {Element} element Element object
- * @param {Array|null} exceptAttrs Array of attribute names to exclude from the result
+ * @param {Array.<string>|null} exceptAttrs Array of attribute names to exclude from the result
  * @returns {string}
  */
 export function getAttributesToString(element, exceptAttrs) {
@@ -95,10 +95,10 @@ export function getPositionIndex(node) {
  * ex) <p><span>aa</span><span>bb</span></p> : getNodePath(node: "bb", parentNode: "<P>") -> [1, 0]
  * @param {Node} node The Node to find position path
  * @param {Node|null} parentNode Parent node. If null, wysiwyg div area
- * @param {Object|null} _newOffsets If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.
+ * @param {{s: number, e: number}|null} _newOffsets If you send an object of the form "{s: 0, e: 0}", the text nodes that are attached together are merged into one, centered on the "node" argument.
  * "_newOffsets.s" stores the length of the combined characters after "node" and "_newOffsets.e" stores the length of the combined characters before "node".
  * Do not use unless absolutely necessary.
- * @returns {Array}
+ * @returns {Array.<number>}
  */
 export function getNodePath(node, parentNode, _newOffsets) {
 	const path = [];
@@ -148,7 +148,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 
 /**
  * @description Returns the node in the location of the path array obtained from "helper.dom.getNodePath".
- * @param {Array} offsets Position array, array obtained from "helper.dom.getNodePath"
+ * @param {Arra.<number>} offsets Position array, array obtained from "helper.dom.getNodePath"
  * @param {Node} parentNode Base parent element
  * @returns {Node}
  */
@@ -173,7 +173,7 @@ export function getNodeFromPath(offsets, parentNode) {
  * @description Get all "children" of the argument value element (Without text nodes)
  * @param {Element} element element to get child node
  * @param {Function|null} validation Conditional function
- * @returns {Array}
+ * @returns {Array.<Element>}
  */
 export function getListChildren(element, validation) {
 	const children = [];
@@ -204,7 +204,7 @@ export function getListChildren(element, validation) {
  * @description Get all "childNodes" of the argument value element (Include text nodes)
  * @param {Node} element element to get child node
  * @param {Function|null} validation Conditional function
- * @returns {Array}
+ * @returns {Array.<Node>}
  */
 export function getListChildNodes(element, validation) {
 	const children = [];
@@ -233,37 +233,37 @@ export function getListChildNodes(element, validation) {
  * @description Returns the number of parents nodes.
  * "0" when the parent node is the WYSIWYG area.
  * "-1" when the element argument is the WYSIWYG area.
- * @param {Node} element The element to check
+ * @param {Node} node The element to check
  * @returns {number}
  */
-export function getElementDepth(element) {
-	if (!element || isWysiwygFrame(element)) return -1;
+export function getNodeDepth(node) {
+	if (!node || isWysiwygFrame(node)) return -1;
 
 	let depth = 0;
-	element = element.parentNode;
+	node = node.parentNode;
 
-	while (element && !isWysiwygFrame(element)) {
+	while (node && !isWysiwygFrame(node)) {
 		depth += 1;
-		element = element.parentNode;
+		node = node.parentNode;
 	}
 
 	return depth;
 }
 
 /**
- * @description Sort a element array by depth of element.
- * @param {Array} array Array object
+ * @description Sort a node array by depth of element.
+ * @param {Array.<Node>} array Node array
  * @param {boolean} des true: descending order / false: ascending order
  */
-export function sortByDepth(array, des) {
+export function sortNodeByDepth(array, des) {
 	const t = !des ? -1 : 1;
 	const f = t * -1;
 
 	array.sort(
 		function (a, b) {
 			if (!isListCell(a) || !isListCell(b)) return 0;
-			a = getElementDepth(a);
-			b = getElementDepth(b);
+			a = getNodeDepth(a);
+			b = getNodeDepth(b);
 			return a > b ? t : a < b ? f : 0;
 		}
 	);
@@ -273,7 +273,7 @@ export function sortByDepth(array, des) {
  * @description Compares two elements to find a common ancestor, and returns the order of the two elements.
  * @param {Node} a Node to compare.
  * @param {Node} b Node to compare.
- * @returns {Object} { ancesstor, a, b, result: (a > b ? 1 : a < b ? -1 : 0) };
+ * @returns {{ancesstor: Node, a: Node, b: Node, ressult: number}} { ancesstor, a, b, result: (a > b ? 1 : a < b ? -1 : 0) };
  */
 export function compareElements(a, b) {
 	let aNode = a,
@@ -307,7 +307,7 @@ export function compareElements(a, b) {
  * A tag that satisfies the query condition is imported.
  * Returns null if not found.
  * @param {Node} element Reference element
- * @param {String|Function} query Query String (nodeName, .className, #ID, :name) or validation function.
+ * @param {string|Function} query Query String (nodeName, .className, #ID, :name) or validation function.
  * Not use it like jquery.
  * Only one condition can be entered at a time.
  * @returns {Element|null}
@@ -353,14 +353,14 @@ export function getParentElement(element, query) {
  * @description Get the child element of the argument value.
  * A tag that satisfies the query condition is imported.
  * Returns null if not found.
- * @param {Node} element Reference element
- * @param {String|Function} query Query String (nodeName, .className, #ID, :name) or validation function.
+ * @param {Node} node Reference element
+ * @param {string|Function} query Query String (nodeName, .className, #ID, :name) or validation function.
  * @param {boolean} last If true returns the last node among the found child nodes. (default: first node)
  * Not use it like jquery.
  * Only one condition can be entered at a time.
  * @returns {Element|null}
  */
-export function getEdgeChild(element, query, last) {
+export function getEdgeChild(node, query, last) {
 	let check;
 
 	if (typeof query === "function") {
@@ -387,7 +387,7 @@ export function getEdgeChild(element, query, last) {
 		};
 	}
 
-	const childList = getListChildNodes(element, function (current) {
+	const childList = getListChildNodes(node, function (current) {
 		return check(current);
 	});
 
@@ -401,7 +401,7 @@ export function getEdgeChild(element, query, last) {
  * { sc: "first", ec: "last" }
  * @param {Node} first First element
  * @param {Node|null} last Last element
- * @returns {Object}
+ * @returns {{sc: Node, ec: Node}}
  */
 export function getEdgeChildNodes(first, last) {
 	if (!first) return;
@@ -419,11 +419,11 @@ export function getEdgeChildNodes(first, last) {
 
 /**
  * @description Get the item from the array that matches the condition.
- * @param {Array|HTMLCollection|NodeList} array Array to get item
+ * @param {Array.<Node>|HTMLCollection|NodeList} array Array to get item
  * @param {Function|null} validation Conditional function
  * @param {boolean} multi If true, returns all items that meet the criteria otherwise, returns an empty array.
  * If false, returns only one item that meet the criteria otherwise return null.
- * @returns {Array|Node|null}
+ * @returns {Array.<Node>|null}
  */
 export function getArrayItem(array, validation, multi) {
 	if (!array || array.length === 0) return null;
@@ -448,13 +448,13 @@ export function getArrayItem(array, validation, multi) {
 
 /**
  * @description Check if an array contains an element 
- * @param {Array|HTMLCollection|NodeList} array element array
- * @param {Node} element The element to check for
- * @returns {Boolean}
+ * @param {Array.<Node>|HTMLCollection|NodeList} array element array
+ * @param {Node} node The node to check for
+ * @returns {boolean}
  */
-function arrayIncludes(array, element) {
+export function arrayIncludes(array, node) {
 	for (let i = 0; i < array.length; i++) {
-		if (array[i] === element) {
+		if (array[i] === node) {
 			return true;
 		}
 	}
@@ -464,13 +464,13 @@ function arrayIncludes(array, element) {
 /**
  * @description Get the index of the argument value in the element array
  * @param {Array|HTMLCollection|NodeList} array element array
- * @param {Node} element The element to find index
+ * @param {Node} node The element to find index
  * @returns {number}
  */
-export function getArrayIndex(array, element) {
+export function getArrayIndex(array, node) {
 	let idx = -1;
 	for (let i = 0, len = array.length; i < len; i++) {
-		if (array[i] === element) {
+		if (array[i] === node) {
 			idx = i;
 			break;
 		}
@@ -481,7 +481,7 @@ export function getArrayIndex(array, element) {
 
 /**
  * @description Get the next index of the argument value in the element array
- * @param {Array|HTMLCollection|NodeList} array element array
+ * @param {Array.<Node>|HTMLCollection|NodeList} array element array
  * @param {Node} item The element to find index
  * @returns {number}
  */
@@ -493,7 +493,7 @@ export function nextIndex(array, item) {
 
 /**
  * @description Get the previous index of the argument value in the element array
- * @param {Array|HTMLCollection|NodeList} array Element array
+ * @param {Array.<Node>|HTMLCollection|NodeList} array Element array
  * @param {Node} item The element to find index
  * @returns {number}
  */
@@ -571,7 +571,7 @@ export function remove(item) {
 /**
  * @description Replace element
  * @param {Element} element Target element
- * @param {String|Element} newElement String or element of the new element to apply
+ * @param {string|Element} newElement String or element of the new element to apply
  */
 export function changeElement(element, newElement) {
 	if (typeof newElement === "string") {
@@ -590,19 +590,19 @@ export function changeElement(element, newElement) {
 
 /**
  * @description Set the text content value of the argument value element
- * @param {Node} element Element to replace text content
+ * @param {Node} node Element to replace text content
  * @param {string} txt Text to be applied
  */
-export function changeTxt(element, txt) {
-	if (!element || !txt) return;
-	element.textContent = txt;
+export function changeTxt(node, txt) {
+	if (!node || !txt) return;
+	node.textContent = txt;
 }
 
 /**
  * @description Set style, if all styles are deleted, the style properties are deleted.
  * @param {Element} element Element to set style
  * @param {string} styleName Style attribute name (marginLeft, textAlign...)
- * @param {String|Number} value Style value
+ * @param {string|number} value Style value
  */
 export function setStyle(element, styleName, value) {
 	element.style[styleName] = value;
@@ -617,8 +617,8 @@ export function setStyle(element, styleName, value) {
  * core.codeViewDisabledButtons (An array of buttons whose class name is not "se-code-view-enabled")
  * core.resizingDisabledButtons (An array of buttons whose class name is not "se-resizing-enabled")
  * @param {boolean} disabled Disabled value
- * @param {Array|HTMLCollection|NodeList} buttonList Button array
- * @param {Boolean} important If priveleged mode should be used (Necessary to switch importantDisabled buttons)
+ * @param {Array.<Element>|HTMLCollection|NodeList} buttonList Button array
+ * @param {boolean} important If priveleged mode should be used (Necessary to switch importantDisabled buttons)
  */
 export function setDisabled(disabled, buttonList, important) {
 	for (let i = 0, len = buttonList.length; i < len; i++) {
@@ -676,9 +676,9 @@ export function removeClass(element, className) {
 
 /**
  * @description Argument value If there is no class name, insert it and delete the class name if it exists
- * @param {Element} element Elements to replace class name
+ * @param {Element} element Element to replace class name
  * @param {string} className Class name to be change
- * @returns {Boolean|undefined}
+ * @returns {boolean|undefined}
  */
 export function toggleClass(element, className) {
 	if (!element) return;
@@ -701,7 +701,7 @@ export function toggleClass(element, className) {
  * @description Determine if this offset is the edge offset of container
  * @param {Node} container The node of the selection object. (range.startContainer..)
  * @param {number} offset The offset of the selection object. (core.getRange().startOffset...)
- * @param {String|undefined} dir Select check point - Both edge, Front edge or End edge. ("front": Front edge, "end": End edge, undefined: Both edge)
+ * @param {string|undefined} dir Select check point - Both edge, Front edge or End edge. ("front": Front edge, "end": End edge, undefined: Both edge)
  * @returns {boolean}
  */
 export function isEdgePoint(container, offset, dir) {
@@ -732,7 +732,7 @@ export function isNonEditable(element) {
 
 /**
  * @description Check the node is a list (ol, ul)
- * @param {Node|String} node The element or element name to check
+ * @param {Node|string} node The element or element name to check
  * @returns {boolean}
  */
 export function isList(node) {
@@ -741,7 +741,7 @@ export function isList(node) {
 
 /**
  * @description Check the node is a list cell (li)
- * @param {Node|String} node The element or element name to check
+ * @param {Node|string} node The element or element name to check
  * @returns {boolean}
  */
 export function isListCell(node) {
@@ -750,7 +750,7 @@ export function isListCell(node) {
 
 /**
  * @description Check the node is a table (table, thead, tbody, tr, th, td)
- * @param {Node|String} node The element or element name to check
+ * @param {Node|string} node The element or element name to check
  * @returns {boolean}
  */
 export function isTable(node) {
@@ -759,7 +759,7 @@ export function isTable(node) {
 
 /**
  * @description Check the node is a table cell (td, th)
- * @param {Node|String} node The element or element name to check
+ * @param {Node|string} node The element or element name to check
  * @returns {boolean}
  */
 export function isTableCell(node) {
@@ -768,7 +768,7 @@ export function isTableCell(node) {
 
 /**
  * @description Check the node is a break node (BR)
- * @param {Node|String} node The element or element name to check
+ * @param {Node|string} node The element or element name to check
  * @returns {boolean}
  */
 export function isBreak(node) {
@@ -777,7 +777,7 @@ export function isBreak(node) {
 
 /**
  * @description Check the node is a anchor node (A)
- * @param {Node|String} node The element or element name to check
+ * @param {Node|string} node The element or element name to check
  * @returns {boolean}
  */
 export function isAnchor(node) {
@@ -786,7 +786,7 @@ export function isAnchor(node) {
 
 /**
  * @description Check the node is a media node (img, iframe, audio, video, canvas)
- * @param {Node|String} node The element or element name to check
+ * @param {Node|string} node The element or element name to check
  * @returns {boolean}
  */
 export function isMedia(node) {
@@ -835,8 +835,8 @@ const domUtils = {
 	getNodeFromPath: getNodeFromPath,
 	getListChildren: getListChildren,
 	getListChildNodes: getListChildNodes,
-	getElementDepth: getElementDepth,
-	sortByDepth: sortByDepth,
+	getNodeDepth: getNodeDepth,
+	sortNodeByDepth: sortNodeByDepth,
 	compareElements: compareElements,
 	getParentElement: getParentElement,
 	getEdgeChild: getEdgeChild,

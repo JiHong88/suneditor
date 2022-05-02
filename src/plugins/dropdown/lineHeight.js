@@ -9,7 +9,7 @@
 
 export default {
     name: 'lineHeight',
-    display: 'submenu',
+    display: 'dropdown',
     add: function (core, targetElement) {
         const context = core.context;
         context.lineHeight = {
@@ -17,8 +17,8 @@ export default {
             currentSize: -1
         };
 
-        /** set submenu */
-        let listDiv = this.setSubmenu(core);
+        /** set dropdown */
+        let listDiv = this.setDropdown(core);
         let listUl = listDiv.querySelector('ul');
 
         /** add event listeners */
@@ -27,18 +27,18 @@ export default {
         context.lineHeight._sizeList = listUl.querySelectorAll('li button');
 
         /** append target button menu */
-        core.initMenuTarget(this.name, targetElement, listDiv);
+        core.menu.initTarget(targetElement, listDiv);
 
         /** empty memory */
         listDiv = null, listUl = null;
     },
 
-    setSubmenu: function (core) {
+    setDropdown: function (core) {
         const option = core.options;
         const lang = core.lang;
         const listDiv = core.util.createElement('DIV');
 
-        listDiv.className = 'se-submenu se-list-layer';
+        listDiv.className = 'se-dropdown se-list-layer';
 
         const sizeList = !option.lineHeights ? [
             {text: '1', value: 1},
@@ -62,7 +62,7 @@ export default {
     },
 
      /**
-     * @Override submenu
+     * @Override dropdown
      */
     on: function () {
         const lineHeightContext = this.context.lineHeight;
@@ -96,7 +96,7 @@ export default {
             formats[i].style.lineHeight = value;
         }
 
-        this.submenuOff();
+        this.dropdownOff();
 
         // history stack
         this.history.push(false);

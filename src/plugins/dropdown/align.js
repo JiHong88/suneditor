@@ -10,11 +10,11 @@
 import EditorInterface from "../../interface/editor";
 import {
     domUtils
-} from "../../helpers";
+} from "../../helper";
 
-function align(editor, targetElement) {
+const align = function (editor, targetElement) {
     EditorInterface.call(this, editor);
-    this.display = "submenu";
+    this.display = "dropdown";
     this.targetElement = targetElement;
 
     // create HTML
@@ -34,7 +34,7 @@ function align(editor, targetElement) {
     this._alignList = listUl.querySelectorAll('li button');
 
     // append target button menu
-    editor.initMenuTarget(this.name, targetElement, listDiv);
+    editor.menu.initTarget(targetElement, listDiv);
 
     // event registration 
     listUl.addEventListener('click', action.bind(this));
@@ -65,7 +65,7 @@ align.prototype = {
     },
 
     /**
-     * @Override submenu
+     * @Override dropdown
      */
     on: function () {
         const alignList = this._alignList;
@@ -123,7 +123,7 @@ function action(e) {
         domUtils.setStyle(selectedFormsts[i], 'textAlign', (value === defaultDir ? '' : value));
     }
 
-    this.__core.submenuOff();
+    this.__core.dropdownOff();
     this.__core.focus();
 
     // history stack
@@ -147,7 +147,7 @@ function createHTML(__core) {
     }
 
     return domUtils.createElement("div", {
-        class: "se-submenu se-list-layer se-list-align"
+        class: "se-dropdown se-list-layer se-list-align"
     }, '<div class="se-list-inner">' + '<ul class="se-list-basic">' + html + '</ul>' + '</div>');
 }
 

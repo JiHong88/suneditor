@@ -8,7 +8,7 @@ import {
 	getParentElement,
 	isWysiwygFrame,
 	hasClass
-} from "../../helpers/domUtils";
+} from "../../helper/domUtils";
 
 const Offset = function (editor) {
 	CoreInterface.call(this, editor);

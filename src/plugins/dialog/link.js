@@ -152,7 +152,7 @@ export default {
     active: function (element) {
         if (!element) {
             if (this.controllerArray.indexOf(this.context.link.linkController) > -1) {
-                this.controllersOff();
+                this.controllerOff();
             }
         } else if (this.util.isAnchor(element) && element.getAttribute('data-image-link') === null) {
             if (this.controllerArray.indexOf(this.context.link.linkController) < 0) {
@@ -182,7 +182,7 @@ export default {
 
         this.util.addClass(selectionATag, 'on');
         this.setControllerPosition(linkBtn, selectionATag, 'bottom', {left: 0, top: 0});
-        this.controllersOn(linkBtn, selectionATag, 'link', this.util.removeClass.bind(this.util, this.context.link._linkAnchor, 'on'));
+        this.controllerOn(linkBtn, selectionATag, 'link', this.util.removeClass.bind(this.util, this.context.link._linkAnchor, 'on'));
     },
 
     onClick_linkController: function (e) {
@@ -210,7 +210,7 @@ export default {
             this.history.push(false);
         }
 
-        this.controllersOff();
+        this.controllerOff();
     },
 
     /**

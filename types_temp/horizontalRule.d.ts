@@ -1,5 +1,5 @@
-import { SubmenuPlugin } from '../SubmenuPlugin';
+import { DropdownPlugin } from '../DropdownPlugin';
 
-declare const horizontalRule: SubmenuPlugin;
+declare const horizontalRule: DropdownPlugin;
 
 export default horizontalRule;

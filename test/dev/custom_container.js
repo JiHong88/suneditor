@@ -20,24 +20,24 @@ export default {
         const context = core.context;
         context.customContainer = {};
 
-        // Generate submenu HTML
+        // Generate dropdown HTML
         // Always bind "core" when calling a plugin function
-        let listDiv = this.setSubmenu(core);
+        let listDiv = this.setDropdown(core);
 
         // You must bind "core" object when registering an event.
         /** add event listeners */
         listDiv.querySelector('.__se_container').addEventListener('click', this.onClick.bind(core));
 
         // @Required
-        // You must add the "submenu" element using the "core.initMenuTarget" method.
+        // You must add the "dropdown" element using the "menu.initTarget" method.
         /** append target button menu */
-        core.initMenuTarget(this.name, targetElement, listDiv);
+        core.menu.initTarget(this.name, targetElement, listDiv);
     },
 
-    setSubmenu: function (core) {
+    setDropdown: function (core) {
         const listDiv = core.util.createElement('DIV');
 
-        listDiv.className = 'se-menu-container se-submenu se-list-layer';
+        listDiv.className = 'se-menu-container se-dropdown se-list-layer';
         listDiv.innerHTML = '' +
             '<div class="se-list-inner">' +
                 '<ul>' +

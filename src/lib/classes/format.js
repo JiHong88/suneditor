@@ -4,12 +4,12 @@
  */
 
 import CoreInterface from "../../interface/_core";
-import { domUtils, unicode, numbers, global } from "../../helpers";
-import { _w } from "../../helpers/global";
+import { domUtils, unicode, numbers, global } from "../../helper";
+import { _w } from "../../helper/global";
 
 const Format = function (editor) {
 	CoreInterface.call(this, editor);
-	this._listCamel = editor.options.__listCommonStyle;
+	this._listCamel = editor.options.__listsCommonStyle;
     this._listKebab  = global.camelToKebabCase(editor.options.__listCommonStyle);
 };
 
@@ -185,7 +185,7 @@ Format.prototype = {
 	 * If the "lineNode" argument value is present, the tag of that argument value is inserted,
 	 * If not, the currently selected format tag is inserted.
 	 * @param {Element} element Insert as siblings of that element
-	 * @param {String|Element|null} lineNode Node name or node obejct to be inserted
+	 * @param {string|Element|null} lineNode Node name or node obejct to be inserted
 	 * @returns {Element}
 	 */
 	appendLine: function (element, lineNode) {
@@ -296,13 +296,13 @@ Format.prototype = {
 			pElement = standTag.parentNode;
 		}
 
-		let parentDepth = domUtils.getElementDepth(standTag);
+		let parentDepth = domUtils.getNodeDepth(standTag);
 		let listParent = null;
 		const lineArr = [];
 		const removeItems = function (parent, origin, before) {
 			let cc = null;
 			if (parent !== origin && !domUtils.isTable(origin)) {
-				if (origin && domUtils.getElementDepth(parent) === domUtils.getElementDepth(origin)) return before;
+				if (origin && domUtils.getNodeDepth(parent) === domUtils.getNodeDepth(origin)) return before;
 				cc = this.node.removeAllParents(origin, null, parent);
 			}
 
@@ -316,7 +316,7 @@ Format.prototype = {
 			originParent = line.parentNode;
 			if (!originParent || block.contains(originParent)) continue;
 
-			depth = domUtils.getElementDepth(line);
+			depth = domUtils.getNodeDepth(line);
 
 			if (domUtils.isList(originParent)) {
 				if (listParent === null) {
@@ -401,7 +401,7 @@ Format.prototype = {
 		// Nested list
 		if (
 			beforeTag &&
-			domUtils.getElementDepth(beforeTag) > 0 &&
+			domUtils.getNodeDepth(beforeTag) > 0 &&
 			(domUtils.isList(beforeTag.parentNode) || domUtils.isList(beforeTag.parentNode.parentNode))
 		) {
 			const depthFormat = domUtils.getParentElement(
@@ -413,7 +413,7 @@ Format.prototype = {
 			const splitRange = this.node.split(
 				beforeTag,
 				null,
-				!depthFormat ? 0 : domUtils.getElementDepth(depthFormat) + 1
+				!depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1
 			);
 			splitRange.parentNode.insertBefore(block, splitRange);
 		} else {
@@ -552,7 +552,7 @@ Format.prototype = {
 				if (!newList && domUtils.isListCell(insNode)) {
 					if (
 						next &&
-						domUtils.getElementDepth(insNode) !== domUtils.getElementDepth(next) &&
+						domUtils.getNodeDepth(insNode) !== domUtils.getNodeDepth(next) &&
 						(domUtils.isListCell(parent) || domUtils.getArrayItem(insNode.children, domUtils.isList, false))
 					) {
 						const insNext = insNode.nextElementSibling;
@@ -698,7 +698,7 @@ Format.prototype = {
 		}
 
 		const util = this.util;
-		domUtils.sortByDepth(selectedFormats, true);
+		domUtils.sortNodeByDepth(selectedFormats, true);
 
 		// merge
 		let firstSel = selectedFormats[0];
@@ -897,7 +897,7 @@ Format.prototype = {
 						this.getBlock(originParent, passComponent) ||
 						(domUtils.isList(nextParent) &&
 							domUtils.isList(originParent) &&
-							domUtils.getElementDepth(nextParent) !== domUtils.getElementDepth(originParent)))
+							domUtils.getNodeDepth(nextParent) !== domUtils.getNodeDepth(originParent)))
 				) {
 					list = domUtils.createElement(listTag, {style: "list-style-type: " + listStyle});
 				}
@@ -1457,7 +1457,7 @@ Format.prototype = {
 		}
 
 		// set range
-		this.__core.controllersOff();
+		this.__core.controllerOff();
 		this.selection.setRange(start.container, start.offset, end.container, end.offset);
 
 		// history stack
@@ -1895,14 +1895,14 @@ Format.prototype = {
 
 		let rChildren;
 		if (!all) {
-			const depth = domUtils.getElementDepth(baseNode) + 2;
+			const depth = domUtils.getNodeDepth(baseNode) + 2;
 			rChildren = domUtils.getListChildren(
 				baseNode,
 				function (current) {
 					return (
 						domUtils.isListCell(current) &&
 						!current.previousElementSibling &&
-						domUtils.getElementDepth(current) === depth
+						domUtils.getNodeDepth(current) === depth
 					);
 				}
 			);

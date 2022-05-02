@@ -23,7 +23,7 @@ export default {
             _colorList: []
         };
 
-        /** set submenu */
+        /** set dropdown */
         context.colorPicker.colorListHTML = this.createColorList(core, this._makeColorList);
     },
 
@@ -104,7 +104,7 @@ export default {
     /**
      * @description Displays or resets the currently selected color at color list.
      * @param {Node} node Current Selected node
-     * @param {String|null} color Color value
+     * @param {string|null} color Color value
      */
     init: function (node, color) {
         const colorPicker = this.plugins.colorPicker;
