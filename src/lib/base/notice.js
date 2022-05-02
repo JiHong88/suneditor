@@ -1,7 +1,7 @@
-import EditorInterface from "../interface/editor";
+import EditorInterface from "../../interface/editor";
 import {
 	domUtils
-} from "../helper";
+} from "../../helper";
 
 const Notice = function (editor) {
 	EditorInterface.call(this, editor);

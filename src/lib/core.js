@@ -8,10 +8,10 @@ import Helper, {
 } from "../helper";
 import Constructor from "./constructor";
 import Context from "./context";
-import history from "./history";
-import Events from "./events";
+import history from "./base/history";
+import Events from "./base/events";
 import EventManager from "./base/eventManager";
-import Notice from "./notice";
+import Notice from "./base/notice";
 
 // classes
 import Char from "./classes/char";
@@ -22,6 +22,7 @@ import Offset from "./classes/offset";
 import Selection from "./classes/selection";
 import Shortcuts from "./classes/shortcuts";
 import Toolbar from "./classes/toolbar";
+import Menu from "./classes/menu";
 
 // classes interface
 import ClassesInterface from "../interface/_classes";
@@ -131,37 +132,15 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this.effectNode = null;
 
     /**
-     * @description dropdown element
-     */
-    this.dropdown = null;
-
-    /**
      * @description container element
      */
     this.container = null;
-
-    /**
-     * @description current dropdown name
-     * @private
-     */
-    this._dropdownName = "";
-
-    /**
-     * @description binded dropdownOff method
-     * @private
-     */
-    this._bindedDropdownOff = null;
 
     /**
      * @description binded containerOff method
      * @private
      */
     this._bindedContainerOff = null;
-
-    /**
-     * @description active button element in dropdown
-     */
-    this.dropdownActiveButton = null;
 
     /**
      * @description active button element in container
@@ -288,12 +267,6 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
      * @private
      */
     this._attributesTagsBlacklist = null;
-
-    /**
-     * @description binded controllerOff method
-     * @private
-     */
-    this._bindControllersOff = null;
 
     /**
      * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
@@ -737,7 +710,7 @@ Core.prototype = {
             }
 
             if (this.isReadOnly && domUtils.arrayIncludes(this.resizingDisabledButtons, target)) return;
-            if (/dropdown/.test(display) && (this.menu._menuTrayMap[command] === null || target !== this.dropdownActiveButton)) {
+            if (/dropdown/.test(display) && (this.menu._menuTrayMap[command] === null || target !== this.menu.dropdownActiveButton)) {
                 this.dropdownOn(target);
                 return;
             } else if (/dialog/.test(display)) {
@@ -1671,11 +1644,11 @@ Core.prototype = {
         for (let i = 0, t; i < domTree.length; i++) {
             t = domTree[i];
 
-            if (!util.isFormatElement(t) && !util.isComponent(t) && !util.isMedia(t)) {
-                if (!p) p = util.createElement(options.defaultTag);
+            if (!this.format.isLine(t) && !this.component.is(t) && !domUtils.isMedia(t)) {
+                if (!p) p = domUtils.createElement(this.options.defaultTag);
                 p.appendChild(t);
                 i--;
-                if (domTree[i + 1] && !util.isFormatElement(domTree[i + 1])) {
+                if (domTree[i + 1] && !this.format.isLine(domTree[i + 1])) {
                     continue;
                 } else {
                     t = p;
@@ -1927,7 +1900,7 @@ Core.prototype = {
         if (value) {
             /** off menus */
             this.controllerOff();
-            if (this.dropdownActiveButton && this.dropdownActiveButton.disabled) this.dropdownOff();
+            if (this.menu.dropdownActiveButton && this.menu.dropdownActiveButton.disabled) this.dropdownOff();
             if (this._moreLayerActiveButton && this._moreLayerActiveButton.disabled) this.moreLayerOff();
             if (this.containerActiveButton && this.containerActiveButton.disabled) this.containerOff();
             if (this.modalForm) this.plugins.dialog.close.call(this);
@@ -2180,6 +2153,7 @@ Core.prototype = {
         this.shortcuts = new Shortcuts(this);
         this.selection = new Selection(this);
         this.char = new Char(this);
+        this.menu = new Menu(this);
         ClassesInterface.call(this.offset, this);
         ClassesInterface.call(this.component, this);
         ClassesInterface.call(this.format, this);
@@ -2188,6 +2162,7 @@ Core.prototype = {
         ClassesInterface.call(this.shortcuts, this);
         ClassesInterface.call(this.selection, this);
         ClassesInterface.call(this.char, this);
+        ClassesInterface.call(this.menu, this);
 
         // events callback
         this.events = new Events(this);

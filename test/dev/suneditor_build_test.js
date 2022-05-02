@@ -13,11 +13,11 @@ import CodeMirror from 'codemirror';
 // import 'katex/dist/katex.min.css';
 import Katex from 'katex';
 
-import align from "../../src/plugins/dropdown/align";
+// import align from "../../src/plugins/dropdown/align";
 
-suneditor.create(document.getElementById('editor2'), {
+window.e = suneditor.create(document.getElementById('editor2'), {
     // value: 'abc',
-    plugins: [align],
+    // plugins: [align],
     width: "100%",
     minHeight : 300,
     charCounter: true,

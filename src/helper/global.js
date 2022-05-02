@@ -23,7 +23,7 @@ export function camelToKebabCase(param) {
 		});
 	} else {
 		return param.map(function (str) {
-			return util.camelToKebabCase(str);
+			return camelToKebabCase(str);
 		});
 	}
 }

@@ -196,7 +196,7 @@ EventManager.prototype = {
 	_toggleToolbarBalloon: function () {
 		this.selection._init();
 		const range = this.selection.getRange();
-		if (this.__core._bindControllersOff || (!this.__core._isBalloonAlways && range.collapsed)) this._hideToolbar();
+		if (this.menu._bindControllersOff || (!this.__core._isBalloonAlways && range.collapsed)) this._hideToolbar();
 		else this.toolbar._showBalloon(range);
 	},
 
@@ -485,7 +485,7 @@ EventManager.prototype = {
 		if (!env.isIE) {
 			this._resizeObserver = new this._w.ResizeObserver(function(entries) {
 				this.__core.__callResizeFunction(-1, entries[0]);
-			});
+			}.bind(this));
 		}
 
 		/** toolbar event */
@@ -552,7 +552,7 @@ EventManager.prototype = {
 		this.toolbar._setResponsive();
 
 		/** responsive toolbar observer */
-		if (!util.isIE) this._toolbarObserver = new this._w.ResizeObserver(this.toolbar.resetResponsiveToolbar.bind(this.toolbar));
+		if (!env.isIE) this._toolbarObserver = new _w.ResizeObserver(this.toolbar.resetResponsiveToolbar.bind(this.toolbar));
 
 		/** window event */
 		this.addEvent(_w, "resize", OnResize_window.bind(this), false);
@@ -585,7 +585,7 @@ EventManager.prototype = {
 
 function ToolbarButtonsHandler(e) {
 	let target = e.target;
-	if (this.__core._bindControllersOff) e.stopPropagation();
+	if (this.menu._bindControllersOff) e.stopPropagation();
 
 	if (/^(input|textarea|select|option)$/i.test(target.nodeName)) {
 		this.__core._antiBlur = false;
@@ -606,7 +606,7 @@ function ToolbarButtonsHandler(e) {
 			className = target.className;
 		}
 
-		if (command === this.__core._dropdownName || command === this.__core._containerName) {
+		if (command === this.menu._dropdownName || command === this.__core._containerName) {
 			e.stopPropagation();
 		}
 	}
@@ -1753,8 +1753,8 @@ function OnResize_window() {
 		this.context.fileBrowser.body.style.maxHeight = _w.innerHeight - this.context.fileBrowser.header.offsetHeight - 50 + "px";
 	}
 
-	if (this.__core.dropdownActiveButton && this.__core.dropdown) {
-		this.__core._setMenuPosition(this.__core.dropdownActiveButton, this.__core.dropdown);
+	if (this.menu.dropdownActiveButton && this.menu.dropdownMenu) {
+		this.__core._setMenuPosition(this.menu.dropdownActiveButton, this.menu.dropdownMenu);
 	}
 
 	if (this.status.isFullScreen) {

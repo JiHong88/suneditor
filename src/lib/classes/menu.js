@@ -4,19 +4,16 @@
  */
 
 import CoreInterface from "../../interface/_core";
-import env from "../../helper/env";
-import {
-    _w
-} from "../../helper/global";
-import {
-    addClass,
-    removeClass,
-    hasClass
-} from "../../helper/domUtils";
+import { domUtils } from "../../helper";
 
 const Menu = function (editor) {
     CoreInterface.call(this, editor);
     this._menuTrayMap = {};
+    this._dropdownName = "";
+    this._bindedDropdownOff = null;
+    this._bindControllersOff = null;
+    this.dropdownMenu = null;
+    this.dropdownActiveButton = null;
 };
 
 Menu.prototype = {
@@ -42,12 +39,12 @@ Menu.prototype = {
         if (this._bindControllersOff) this.controllerOff();
 
         const dropdownName = this._dropdownName = element.getAttribute('data-command');
-        const menu = this.dropdown = this._menuTrayMap[dropdownName];
+        const menu = this.dropdownMenu = this._menuTrayMap[dropdownName];
         this.dropdownActiveButton = element;
         this._setMenuPosition(element, menu);
 
         this._bindedDropdownOff = this.dropdownOff.bind(this);
-        this.eventManager.addGlobalEvent('mousedown', this._bindedDropdownOff, false);
+        this.__core.eventManager.addGlobalEvent('mousedown', this._bindedDropdownOff, false);
 
         if (this.plugins[dropdownName].on) this.plugins[dropdownName].on();
         this._antiBlur = true;
@@ -57,13 +54,13 @@ Menu.prototype = {
      * @description Disable dropdown
      */
     dropdownOff: function () {
-        this.eventManager.removeGlobalEvent('mousedown', this._bindedDropdownOff);
+        this.__core.__core.eventManager.removeGlobalEvent('mousedown', this._bindedDropdownOff);
         this._bindedDropdownOff = null;
 
-        if (this.dropdown) {
+        if (this.dropdownMenu) {
             this._dropdownName = '';
             this.dropdown.style.display = 'none';
-            this.dropdown = null;
+            this.dropdownMenu = null;
             domUtils.removeClass(this.dropdownActiveButton, 'on');
             this.dropdownActiveButton = null;
             this._notHideToolbar = false;
@@ -85,7 +82,7 @@ Menu.prototype = {
         this._setMenuPosition(element, menu);
 
         this._bindedContainerOff = this.containerOff.bind(this);
-        this.eventManager.addGlobalEvent('mousedown', this._bindedContainerOff, false);
+        this.__core.eventManager.addGlobalEvent('mousedown', this._bindedContainerOff, false);
 
         if (this.plugins[containerName].on) this.plugins[containerName].on();
         this._antiBlur = true;
@@ -95,7 +92,7 @@ Menu.prototype = {
      * @description Disable container
      */
     containerOff: function () {
-        this.eventManager.removeGlobalEvent('mousedown', this._bindedContainerOff);
+        this.__core.eventManager.removeGlobalEvent('mousedown', this._bindedContainerOff);
         this._bindedContainerOff = null;
 
         if (this.container) {
@@ -240,8 +237,8 @@ Menu.prototype = {
         }
 
         this._bindControllersOff = this.controllerOff.bind(this);
-        this.eventManager.addGlobalEvent('mousedown', this._bindControllersOff, false);
-        this.eventManager.addGlobalEvent('keydown', this._bindControllersOff, false);
+        this.__core.eventManager.addGlobalEvent('mousedown', this._bindControllersOff, false);
+        this.__core.eventManager.addGlobalEvent('keydown', this._bindControllersOff, false);
         this._antiBlur = true;
 
         if (typeof this.events.showController === 'function') this.events.showController(this.currentControllerName, this.controllerArray);
@@ -271,8 +268,8 @@ Menu.prototype = {
         this.effectNode = null;
         if (!this._bindControllersOff) return;
 
-        this.eventManager.removeGlobalEvent('mousedown', this._bindControllersOff);
-        this.eventManager.removeGlobalEvent('keydown', this._bindControllersOff);
+        this.__core.eventManager.removeGlobalEvent('mousedown', this._bindControllersOff);
+        this.__core.eventManager.removeGlobalEvent('keydown', this._bindControllersOff);
         this._bindControllersOff = null;
 
         if (len > 0) {

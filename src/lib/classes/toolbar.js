@@ -33,9 +33,9 @@ Toolbar.prototype = {
 	 */
 	disable: function () {
 		/** off menus */
-		this.__core.dropdownOff();
-		this.__core.moreLayerOff();
-		this.__core.containerOff();
+		this.menu.dropdownOff();
+		this.menu.moreLayerOff();
+		this.menu.containerOff();
 		this.context.buttons.cover.style.display = "block";
 	},
 
@@ -79,9 +79,9 @@ Toolbar.prototype = {
 	 * @param {Array} buttonList Button list
 	 */
 	setButtons: function (buttonList) {
-		this.__core.dropdownOff();
-		this.__core.containerOff();
-		this.__core.moreLayerOff();
+		this.menu.dropdownOff();
+		this.menu.containerOff();
+		this.menu.moreLayerOff();
 
 		const newToolbar = Constructor._createToolBar(this._d, buttonList, this.plugins, this.options);
 		_responsiveButtons = newToolbar.responsiveButtons;
@@ -108,7 +108,7 @@ Toolbar.prototype = {
 	 * @description Reset buttons of the responsive toolbar.
 	 */
 	resetResponsiveToolbar: function () {
-		this.__core.containerOff();
+		this.menu.containerOff();
 
 		const responsiveSize = this._responsiveButtonSize;
 		if (responsiveSize) {

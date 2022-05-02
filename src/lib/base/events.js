@@ -3,7 +3,7 @@
  * @author JiHong Lee.
  */
 
-import EditorInterface from "../interface/editor";
+import EditorInterface from "../../interface/editor";
 
 const Events = function (editor) {
 	EditorInterface.call(this, editor);

@@ -13,6 +13,7 @@ function ClassesInterface(editor) {
     this.selection = editor.selection;
     this.shortcuts = editor.shortcuts;
     this.toolbar = editor.toolbar;
+    this.menu = editor.menu;
     // common functions
     this.notice = editor.notice;
     this.events = editor.events;

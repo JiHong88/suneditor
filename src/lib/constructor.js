@@ -3,9 +3,10 @@ import _defaultLang from '../lang/en';
 import {
     domUtils,
     numbers,
-    converter
+    converter,
+    env
 } from '../helper';
-import env from '../helper/env';
+import { _d } from '../helper/global';
 
 export default {
     /**
@@ -28,7 +29,7 @@ export default {
         const relative = domUtils.createElement('DIV', {class: "se-container"});
 
         // toolbar
-        const tool_bar = this._createToolBar(doc, options.buttonList, options.plugins, options);
+        const tool_bar = this._createToolBar(options.buttonList, options.plugins, options);
         const toolbarShadow = tool_bar.element.cloneNode(false);
         toolbarShadow.className += ' se-toolbar-shadow';
         tool_bar.element.style.visibility = 'hidden';
@@ -414,7 +415,7 @@ export default {
         options._editableClass = 'sun-editor-editable' + (options.rtl ? ' se-rtl' : '');
         options._printClass = typeof options._printClass === 'string' ? options._printClass : null;
         options.toolbarWidth = options.toolbarWidth ? (numbers.is(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
-        options.toolbarContainer = typeof options.toolbarContainer === 'string' ? document.querySelector(options.toolbarContainer) : options.toolbarContainer;
+        options.toolbarContainer = typeof options.toolbarContainer === 'string' ? _d.querySelector(options.toolbarContainer) : options.toolbarContainer;
         options.stickyToolbar = (/balloon/i.test(options.mode) || !!options.toolbarContainer) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? numbers.get(options.stickyToolbar, 0) : -1);
         options.fullScreenOffset = options.fullScreenOffset === undefined ? 0 : (/^\d+/.test(options.fullScreenOffset) ? numbers.get(options.fullScreenOffset, 0) : 0);
         options.fullPage = !!options.fullPage;
@@ -456,7 +457,7 @@ export default {
         options.resizingBar = options.resizingBar === undefined ? (/inline|balloon/i.test(options.mode) ? false : true) : options.resizingBar;
         options.showPathLabel = !options.resizingBar ? false : typeof options.showPathLabel === 'boolean' ? options.showPathLabel : true;
         options.resizeEnable = options.resizeEnable === undefined ? true : !!options.resizeEnable;
-        options.resizingBarContainer = typeof options.resizingBarContainer === 'string' ? document.querySelector(options.resizingBarContainer) : options.resizingBarContainer;
+        options.resizingBarContainer = typeof options.resizingBarContainer === 'string' ? _d.querySelector(options.resizingBarContainer) : options.resizingBarContainer;
         /** Character count */
         options.charCounter = options.maxCharCount > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
         options.charCounterType = typeof options.charCounterType === 'string' ? options.charCounterType : 'char';
@@ -860,8 +861,7 @@ export default {
             }
             /** line break  */
             else if (/^\/$/.test(buttonGroup)) {
-                const enterDiv = doc.createElement('DIV');
-                enterDiv.className = 'se-btn-module-enter';
+                const enterDiv = domUtils.createElement('DIV', {class: 'se-btn-module-enter'});
                 _buttonTray.appendChild(enterDiv);
                 vertical = false;
             }
