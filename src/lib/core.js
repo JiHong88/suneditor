@@ -1383,7 +1383,7 @@ Core.prototype = {
      * @returns {Object}
      */
     getFullContents: function (onlyContents) {
-        return '<div class="sun-editor-editable' + this.options.rtl ? ' se-rtl' : '' + '">' + this.getContents(onlyContents) + '</div>';
+        return '<div class="sun-editor-editable' + (this.options.rtl ? ' se-rtl' : '') + '">' + this.getContents(onlyContents) + '</div>';
     },
 
     /**
@@ -2351,7 +2351,7 @@ Core.prototype = {
         }
     },
 
-    __callResizeFunction(h, resizeObserverEntry) {
+    __callResizeFunction: function (h, resizeObserverEntry) {
         h = h === -1 ? resizeObserverEntry.borderBoxSize[0].blockSize : h;
         if (this._editorHeight !== h) {
             if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, this._editorHeight, core, resizeObserverEntry);
