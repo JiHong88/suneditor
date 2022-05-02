@@ -97,7 +97,7 @@ const util = {
 
     /**
      * @description Object.values
-     * @param {Object} obj Object parameter.
+     * @param {Object|null} obj Object parameter.
      * @returns {Array}
      */
     getValues: function (obj) {
@@ -109,6 +109,7 @@ const util = {
     /**
      * @description Convert the CamelCase To the KebabCase.
      * @param {String|Array} param [Camel string]
+     * @returns {String|Array}
      */
     camelToKebabCase: function (param) {
         if (typeof param === 'string') {

@@ -2870,6 +2870,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.history.push(false);
         },
 
+        /**
+         * @description Reset common style of list cell
+         * @param {Element} el List cell element. <li>
+         * @param {Array|null} styleArray Style array
+         * @private
+         */
         _resetCommonListCell: function (el, styleArray) {
             if (!util.isListCell(el)) return;
             if (!styleArray) styleArray = this._listKebab;
@@ -2917,7 +2923,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description If certain styles are applied to all child nodes of the list cell, the style of the list cell is also changed. (bold, color, size)
          * @param {Element} el List cell element. <li>
          * @param {Element|null} child Variable for recursive call. ("null" on the first call)
-         * @param {Array|null} styleArray Style array
          * @private
          */
         _setCommonListStyle: function (el, child) {
@@ -4905,10 +4910,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @description Gets the current contents with containing parent div(div.sun-editor-editable).
          * <div class="sun-editor-editable">{contents}</div>
          * @param {Boolean} onlyContents Return only the contents of the body without headers when the "fullPage" option is true
-         * @returns {Object}
+         * @returns {String}
          */
         getFullContents: function (onlyContents) {
-            return '<div class="sun-editor-editable' + options.rtl ? ' se-rtl' : '' + '">' + this.getContents(onlyContents) + '</div>';
+            return '<div class="sun-editor-editable' + (options.rtl ? ' se-rtl' : '') + '">' + this.getContents(onlyContents) + '</div>';
         },
 
         /**
@@ -5690,7 +5695,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
         },
 
-        __callResizeFunction(h, resizeObserverEntry) {
+        __callResizeFunction: function (h, resizeObserverEntry) {
             h = h === -1 ? resizeObserverEntry.borderBoxSize[0].blockSize : h;
             if (this._editorHeight !== h) {
                 if (typeof functions.onResizeEditor === 'function') functions.onResizeEditor(h, this._editorHeight, core, resizeObserverEntry);

@@ -30,6 +30,19 @@ declare interface util {
     getXMLHttpRequest(): XMLHttpRequest | ActiveXObject;
 
     /**
+     * @description Object.values
+     * @param obj Object parameter.
+     * @returns
+     */
+    getValues(obj?: any): any[];
+
+    /**
+     * @description Convert the CamelCase To the KebabCase.
+     * @param {String|Array} param [Camel string]
+     */
+    camelToKebabCase(param: string | string[]): string | string[],
+
+    /**
      * @description Create Element node
      * @param elementName Element name
      * @returns

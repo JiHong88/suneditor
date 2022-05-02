@@ -579,6 +579,14 @@ interface Core {
     getContents(onlyContents: boolean): string;
 
     /**
+     * @description Gets the current contents with containing parent div(div.sun-editor-editable).
+     * <div class="sun-editor-editable">{contents}</div>
+     * @param onlyContents Return only the contents of the body without headers when the "fullPage" option is true
+     * @returns
+     */
+    getFullContents(onlyContents: boolean): string;
+
+    /**
      * @description Gets the clean HTML code for editor
      * @param html HTML string
      * @param whitelist Regular expression of allowed tags.
