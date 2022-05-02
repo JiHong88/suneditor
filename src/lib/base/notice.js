@@ -4,8 +4,6 @@ import {
 } from "../../helper";
 
 const Notice = function (editor) {
-	EditorInterface.call(this, editor);
-
 	this.modal = domUtils.createElement("DIV", {
 		class: "se-notice"
 	}, null);
@@ -22,10 +20,10 @@ const Notice = function (editor) {
 	this.modal.appendChild(notice_button);
 
 	/** add event */
-	this.__core.eventManager.addEvent(notice_button, "click", OnClick_cancel.bind(this));
+	editor.eventManager.addEvent(notice_button, "click", OnClick_cancel.bind(this));
 
 	/** append html */
-	this.context.element.editorArea.appendChild(this.modal);
+	editor.context.element.editorArea.appendChild(this.modal);
 
 	notice_button = null;
 };

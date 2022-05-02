@@ -1,5 +1,5 @@
 import _icons from '../assets/defaultIcons';
-import _defaultLang from '../lang/en';
+import _defaultLang from '../langs/en';
 import {
     domUtils,
     numbers,

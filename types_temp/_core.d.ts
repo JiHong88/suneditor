@@ -1,5 +1,5 @@
 import { Core, status } from "../lib/core.d";
-import { Lang } from "../lang/Lang.d";
+import { Lang } from "../langs/Lang.d";
 import { Plugin } from "../plugins/Plugin.d";
 import { SunEditorOptions } from "../options.d";
 import { Context } from "../lib/context.d";

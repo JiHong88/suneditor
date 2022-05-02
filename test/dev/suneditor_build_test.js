@@ -4,7 +4,7 @@ import '../../src/assets/suneditor.css';
 import '../../src/assets/suneditor-contents.css';
 
 import suneditor from '../../src/suneditor';
-// import lang from '../../src/lang';
+// import lang from '../../src/langs';
 
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/htmlmixed/htmlmixed';

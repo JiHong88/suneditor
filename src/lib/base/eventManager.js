@@ -483,7 +483,7 @@ EventManager.prototype = {
 	_addEvent: function () {
 		const eventWysiwyg = this.options.iframe ? this._ww : this.context.element.wysiwyg;
 		if (!env.isIE) {
-			this._resizeObserver = new this._w.ResizeObserver(function(entries) {
+			this._resizeObserver = new _w.ResizeObserver(function(entries) {
 				this.__core.__callResizeFunction(-1, entries[0]);
 			}.bind(this));
 		}
@@ -1631,7 +1631,7 @@ function OnScroll_wysiwyg(e) {
 function OnFocus_wysiwyg(e) {
 	if (this.__core._antiBlur) return;
 	this.status.hasFocus = true;
-	this._w.setTimeout(this.applyTagEffect.bind(this));
+	_w.setTimeout(this.applyTagEffect.bind(this));
 
 	if (this.__core._isInline) this.toolbar._showInline();
 

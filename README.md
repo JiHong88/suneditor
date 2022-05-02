@@ -70,7 +70,7 @@ $ bower install suneditor --save
 <!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/suneditor-contents.css" rel="stylesheet"> -->
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
 <!-- languages (Basic Language: English/en) -->
-<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/lang/ko.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/langs/ko.js"></script>
 ```
 [jsdelivr/suneditor](https://www.jsdelivr.com/package/npm/suneditor)
 
@@ -127,9 +127,9 @@ import list from 'suneditor/src/plugins/dropdown/list'
 import {font, video} from 'suneditor/src/plugins'
 
 // How to import language files (default: en)
-import lang from 'suneditor/src/lang'
-import {ko} from 'suneditor/src/lang'
-import de from 'suneditor/src/lang/de'
+import lang from 'suneditor/src/langs'
+import {ko} from 'suneditor/src/langs'
+import de from 'suneditor/src/langs/de'
 
 suneditor.create('sample', {
     plugins: [font, video, image, list],

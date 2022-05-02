@@ -6,7 +6,7 @@
 import EditorInterface from "../../interface/editor";
 
 const Events = function (editor) {
-	EditorInterface.call(this, editor);
+	
 };
 
 Events.prototype = {
@@ -265,8 +265,6 @@ Events.prototype = {
 	 * @param {Object} core Core object
 	 */
 	onSetToolbarButtons: null,
-
-	constructor: Events
 };
 
 export default Events;
