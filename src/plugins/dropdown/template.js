@@ -61,7 +61,7 @@ export default {
         const temp = this.options.templates[this.context.template.selectedIndex];
 
         if (temp.html) {
-            this.setContents(temp.html);
+            this.setContent(temp.html);
         } else {
             this.dropdownOff();
             throw Error('[SUNEDITOR.template.fail] cause : "templates[i].html not found"');

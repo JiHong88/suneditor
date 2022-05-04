@@ -1,7 +1,7 @@
 'use strict';
 
 import '../../src/assets/suneditor.css';
-import '../../src/assets/suneditor-contents.css';
+import '../../src/assets/suneditor-content.css';
 
 import suneditor from '../../src/suneditor';
 // import lang from '../../src/langs';
@@ -68,7 +68,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 
 // // ssss.disable();
 
-// // ssss.setContents(`<p><br /></p><div class="se-component se-image-container __se__float-none"><img src="http://suneditor.com/docs/cat.jpg" alt="" style="" /></div><p><br /></p>`)
+// // ssss.setContent(`<p><br /></p><div class="se-component se-image-container __se__float-none"><img src="http://suneditor.com/docs/cat.jpg" alt="" style="" /></div><p><br /></p>`)
 
 
 // suneditor.create('scrolleditor', {
@@ -172,8 +172,8 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //         check_new_window: 'only: noreferrer noopener',
 //         check_bookmark: 'bookmark'
 //     },
-//     callBackSave: function (contents){
-//         console.log('save', contents)
+//     callBackSave: function (content){
+//         console.log('save', content)
 //     },
 //     // attributesWhitelist: {
 //     //     all: "style|bgcolor|border|cellpadding|colspan|cellspacing|align",
@@ -243,8 +243,8 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     console.log("bbbbb-", buttonList);
 // }
 
-// // ss.setContents("")
-// // ss.setContents('fsafsa')
+// // ss.setContent("")
+// // ss.setContent('fsafsa')
 // ss.onload = function (core) {
 //     console.log('_editorStyles', core.options.defaultStyle);
 //     // core.focus();
@@ -309,7 +309,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     console.log('before----info-', info)
 //     return true
 // }
-// ss.onChange = function (contents, core) {
+// ss.onChange = function (content, core) {
 //     console.log('change', core.context.video._infoList)
 // }
 
@@ -379,10 +379,10 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 
 // },
 
-// ss.showController = (currentControllerName, controllerArray, core) => {
-//     console.log("controllerArray",controllerArray);
+// ss.showController = (currentControllerName, currentControllerItems, core) => {
+//     console.log("currentControllerItems",currentControllerItems);
 //     if (currentControllerName === "image") {
-//         controllerArray[1].querySelector('[data-command="update"]').style.display = 'none'
+//         currentControllerItems[1].querySelector('[data-command="update"]').style.display = 'none'
 //     }
 // }
 
@@ -409,15 +409,15 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     // window.aaa = !window.aaa
 //     // ss.core.setDir("rtl")
 //     // ss.noticeOpen('test notice');
-//     // ss.setContents('<html><head>aaa</head><body><div>abc</div></body></html>')
+//     // ss.setContent('<html><head>aaa</head><body><div>abc</div></body></html>')
 //     // const { core } = ss;
 //     // core.commandHandler(core._styleCommandMap.fullScreen, 'fullScreen')
 //     // ss.core.commandHandler(null, 'selectAll');
 //     // ss.core.removeNode()
-//     // window.abc = ss.core.getContents();
+//     // window.abc = ss.core.getContent();
 //     // console.log(window.abc);
 //     // \vec{P}.\vec{Q}=PQ
-// //     ss.setContents(`
+// //     ss.setContent(`
 // //     <p>If&nbsp;<span class="__se__katex katex" contenteditable="false" data-exp="\\vec{P}.\\vec{Q}=PQ" data-font-size="1em" style="font-size: 1em;"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>P</mi><mo>⃗</mo></mover><mi mathvariant="normal">.</mi><mover accent="true"><mi>Q</mi><mo>⃗</mo></mover><mo>=</mo><mi>P</mi><mi>Q</mi></mrow><annotation encoding="application/x-tex">\\vec{P}.\\vec{Q}=PQ</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1607699999999999em;vertical-align:-0.19444em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9663299999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span><span style="top:-3.25233em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.15216em;"><span class="overlay" style="height:0.714em;width:0.471em;"><svg width="0.471em" height="0.714em" style="width:0.471em" viewBox="0 0 471 714" preserveAspectRatio="xMinYMin"><path d="M377 20c0-5.333 1.833-10 5.5-14S391 0 397 0c4.667 0 8.667 1.667 12 5
 // // 3.333 2.667 6.667 9 10 19 6.667 24.667 20.333 43.667 41 57 7.333 4.667 11
 // // 10.667 11 18 0 6-1 10-3 12s-6.667 5-14 9c-28.667 14.667-53.667 35.667-75 63
@@ -445,21 +445,21 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 // // c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span></span></span></span>​&nbsp;is</p>
 // //     `)
 //     // ss.core.focus();
-//     // ss.core.setIframeContents({
+//     // ss.core.setIframeContent({
 //     //     head: '<style>* {color: red;}</style>'
 //     // })
 // }
 
 // window.sun_noticeClose = function () {
-//     // ss.core.setContents(window.abc);
+//     // ss.core.setContent(window.abc);
 //     // ss.noticeClose();
-//     // ss.setContents('<div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" data-size="," data-align="none" data-percentage="auto,auto" data-index="0" data-file-name="Tabby" data-file-size="0" origin-size="640,404" data-origin="," style=""></figure></div>')
-//     // ss.setContents('<span class="__se__katex katex" data-exp="\\\\tilde{a}" data-font-size="1em" style="font-size: 1em;" contenteditable="false"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>a</mi><mo>~</mo></mover></mrow><annotation encoding="application/x-tex">\\tilde{a}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6678599999999999em;vertical-align:0em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6678599999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">a</span></span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">~</span></span></span></span></span></span></span></span></span></span>​​')
+//     // ss.setContent('<div class="se-component se-image-container __se__float-none" contenteditable="false"><figure style="margin: 0px;"><img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-rotate="" data-proportion="true" data-rotatex="" data-rotatey="" data-size="," data-align="none" data-percentage="auto,auto" data-index="0" data-file-name="Tabby" data-file-size="0" origin-size="640,404" data-origin="," style=""></figure></div>')
+//     // ss.setContent('<span class="__se__katex katex" data-exp="\\\\tilde{a}" data-font-size="1em" style="font-size: 1em;" contenteditable="false"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>a</mi><mo>~</mo></mover></mrow><annotation encoding="application/x-tex">\\tilde{a}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6678599999999999em;vertical-align:0em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6678599999999999em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">a</span></span></span><span style="top:-3.35em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">~</span></span></span></span></span></span></span></span></span></span>​​')
 // }
 
 // window.sun_save = function () {
-//     console.log(ss.getContents())
-//     window.aaa = ss.getContents()
+//     console.log(ss.getContent())
+//     window.aaa = ss.getContent()
 // }
 
 // window.sun_getContext = function () {
@@ -473,7 +473,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 
 // window.sun_insertHTML = function (html) {
 //     // ss.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" /><p>fdafds</p>', true, true, false);
-//     ss.setContents("");
+//     ss.setContent("");
 //     ss.setOptions({
 //         mathFontSize: [
 //             {text: '1', value: '1em'},
@@ -482,8 +482,8 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     })
 // }
 
-// window.sun_getContents = function () {
-//     // alert(ss.getContents());
+// window.sun_getContent = function () {
+//     // alert(ss.getContent());
 
 //     console.log(ss.getText());
 
@@ -498,15 +498,15 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     // console.log(ss.core.context.element.wysiwyg.textContent)
 // }
 
-// window.sun_setContents = function (content) {
-//     ss.setContents('<style>div{color: red;}</style><p><br></p><img src="https://picsum.photos/200/300"><img src="https://picsum.photos/200/300"><p><br></p>');
+// window.sun_setContent = function (content) {
+//     ss.setContent('<style>div{color: red;}</style><p><br></p><img src="https://picsum.photos/200/300"><img src="https://picsum.photos/200/300"><p><br></p>');
 //     ss.core.history.reset(true);
 //     ss.core.focusEdge(null);
 //     // ss.core.context.tool.save.disabled = true;
 // }
 
-// window.sun_appendContents = function (content) {
-//     // ss.appendContents(content);
+// window.sun_appendContent = function (content) {
+//     // ss.appendContent(content);
 //     ss.readOnly(!ss.core.isReadOnly);
 // }
 
@@ -826,7 +826,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //         maxCharCount: 280,
 //         height: '500px',
 //         placeholder: 'Start typing something..5.'
-//         // callBackSave: (contents) => {
+//         // callBackSave: (content) => {
 //         //     console.log('callback')
 //         // }
 //     });

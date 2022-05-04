@@ -94,17 +94,17 @@ export interface Core {
 	/**
 	 * @description active button element in dropdown
 	 */
-	dropdownActiveButton: Element;
+	currentDropdownActiveButton: Element;
 
 	/**
 	 * @description active button element in container
 	 */
-	containerActiveButton: Element;
+	currentContainerActiveButton: Element;
 
 	/**
 	 * @description The elements array to be processed unvisible when the controllerOff function is executed (resizing, link modified button, table controller)
 	 */
-	controllerArray: Controllers;
+	currentControllerItems: Controllers;
 
 	/**
 	 * @description The name of the plugin that called the currently active controller
@@ -206,7 +206,7 @@ export interface Core {
 	 * @param callBackFunction Function to be executed immediately after module call
 	 * @param target Plugin target button (This is not necessary if you have a button list when creating the editor)
 	 */
-	callPlugin(pluginName: string, callBackFunction: Function, target?: Element): void;
+	registerPlugin(pluginName: string, callBackFunction: Function, target?: Element): void;
 
 	/**
 	 * @description If the module is not added, add the module and call the 'add' function
@@ -322,7 +322,7 @@ export interface Core {
 	 * @param display Display type string ('command', 'dropdown', 'dialog', 'container')
 	 * @param target The element of command button
 	 */
-	actionCall(command: string, display: "command" | "dropdown" | "dialog" | "container", target: Element): void;
+	 runPlugin(command: string, display: "command" | "dropdown" | "dialog" | "container", target: Element): void;
 
 	/**
 	 * @description Execute command of command button(All Buttons except dropdown and dialog)
@@ -336,7 +336,7 @@ export interface Core {
 	 * @description Add or remove the class name of "body" so that the code block is visible
 	 * @param value true/false
 	 */
-	setDisplayBlocks(value: boolean): void;
+	showBlocks(value: boolean): void;
 
 	/**
 	 * @description Changes to code view or wysiwyg view
@@ -351,7 +351,7 @@ export interface Core {
 	setFullScreen(value: boolean | null): void;
 
 	/**
-	 * @description Prints the current contents of the editor.
+	 * @description Prints the current content of the editor.
 	 */
 	print(): void;
 
@@ -370,20 +370,20 @@ export interface Core {
 	 * @description Sets the HTML string
 	 * @param html HTML string
 	 */
-	setContents(html: string): void;
+	setContent(html: string): void;
 
 	/**
-	 * @description Sets the contents of the iframe's head tag and body tag when using the "iframe" or "fullPage" option.
+	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "fullPage" option.
 	 * @param ctx { head: HTML string, body: HTML string}
 	 */
-	setIframeContents(ctx: { head?: string; body?: string }): void;
+	setIframeContent(ctx: { head?: string; body?: string }): void;
 
 	/**
-	 * @description Gets the current contents
-	 * @param onlyContents Return only the contents of the body without headers when the "fullPage" option is true
+	 * @description Gets the current content
+	 * @param onlyContent Return only the content of the body without headers when the "fullPage" option is true
 	 * @returns
 	 */
-	getContents(onlyContents: boolean): string;
+	getContent(onlyContent: boolean): string;
 
 	/**
 	 * @description Gets the clean HTML code for editor
@@ -397,11 +397,11 @@ export interface Core {
 	cleanHTML(html: string, whitelist?: string | RegExp, blacklist?: string | RegExp): string;
 
 	/**
-	 * @description Converts contents into a format that can be placed in an editor
-	 * @param contents contents
+	 * @description Converts content into a format that can be placed in an editor
+	 * @param content content
 	 * @returns
 	 */
-	convertContentsForEditor(contents: string): string;
+	convertContentForEditor(content: string): string;
 
 	/**
 	 * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
@@ -473,19 +473,19 @@ export default class SunEditor {
 	setDefaultStyle(style: string): void;
 
 	/**
-	 * @description Copying the contents of the editor to the original textarea and execute onSave callback.
+	 * @description Copying the content of the editor to the original textarea and execute onSave callback.
 	 */
 	save(): void;
 
 	/**
-	 * @description Gets the contents of the suneditor
-	 * @param onlyContents - Return only the contents of the body without headers when the "fullPage" option is true
+	 * @description Gets the content of the suneditor
+	 * @param onlyContent - Return only the content of the body without headers when the "fullPage" option is true
 	 * @returns
 	 */
-	getContents(onlyContents: boolean): string;
+	getContent(onlyContent: boolean): string;
 
 	/**
-	 * @description Gets only the text of the suneditor contents
+	 * @description Gets only the text of the suneditor content
 	 * @returns
 	 */
 	getText(): string;
@@ -515,16 +515,16 @@ export default class SunEditor {
 	getFilesInfo(pluginName: string): fileInfo[];
 
 	/**
-	 * @description Change the contents of the suneditor
-	 * @param contents Contents to Input
+	 * @description Change the content of the suneditor
+	 * @param content Content to Input
 	 */
-	setContents(contents: string): void;
+	setContent(content: string): void;
 
 	/**
-	 * @description Add contents to the suneditor
-	 * @param contents Contents to Input
+	 * @description Add content to the suneditor
+	 * @param content Content to Input
 	 */
-	appendContents(contents: string): void;
+	appendContent(content: string): void;
 
 	/**
 	 * @description Switch to or off "ReadOnly" mode.

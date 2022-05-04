@@ -21,7 +21,7 @@ Vanilla javscript based WYSIWYG web editor, with no dependencies.
 
 ![WYSIWYG HTML Editor](http://suneditor.com/docs/screen-main-w.png?v=2700)
 
-## Table of contents
+## Table of content
 - [Browser Support](#browser-support)
 - [Install](#install)
 - [Getting Started](#getting-started)
@@ -67,7 +67,7 @@ $ bower install suneditor --save
 ``` html
 <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
 <!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/suneditor.css" rel="stylesheet"> -->
-<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/suneditor-contents.css" rel="stylesheet"> -->
+<!-- <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/assets/suneditor-content.css" rel="stylesheet"> -->
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
 <!-- languages (Basic Language: English/en) -->
 <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/src/langs/ko.js"></script>
@@ -95,13 +95,13 @@ const editor = SUNEDITOR.create((document.getElementById('sample') || 'sample'),
 });
 ```
 
-### 3. Contents display
+### 3. Content display
 ```java
 When you display a document created by suneditor
-You need to include "src/assets/suneditor-contents.css" or "dist/css/suneditor.min.css" file.
+You need to include "src/assets/suneditor-content.css" or "dist/css/suneditor.min.css" file.
 Then add "sun-editor-editable" to the class name of the Tag element that displays the content.
 If you are using RTL mode, you also need to add "se-rtl".
-In "suneditor-contents.css", you can define the style of all the tags created in suneditor.
+In "suneditor-content.css", you can define the style of all the tags created in suneditor.
 ```
 
 ## When inserting custom tags in the editor
@@ -118,7 +118,7 @@ In "suneditor-contents.css", you can define the style of all the tags created in
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 // import 'suneditor/assets/suneditor.css'
-// import 'suneditor/assets/suneditor-contents.css'
+// import 'suneditor/assets/suneditor-content.css'
 import suneditor from 'suneditor'
 
 // How to import plugins
@@ -338,7 +338,7 @@ let editor = suneditor.create('sample', {
 })
 
 // if you would like to have this triggered when pressing @
-editor.core.callPlugin('mention');
+editor.core.registerPlugin('mention');
 editor.onKeyDown = e => {
   if (e.key === '@') {
     editor.core.context.mention.open();
@@ -454,11 +454,11 @@ iframeCSSFileName : Name or Array of the CSS file to apply inside the iframe.
                     or put the URL value (".css" can be omitted).   default: 'suneditor' {Array|String}
                     ex) '.+' or ['suneditor', 'http://suneditor.com/sample/css/sample.css', '.+\\.min\\.css']
 previewTemplate : A template of the "preview".
-                  The {{contents}} part in the HTML string is replaced with the contents of the editor. default: null {string}
-                  ex) "<div style='width:auto; max-width:1080px; margin:auto;'><h1>Preview Template</h1> {{contents}} <div>_Footer_</div></div>"
+                  The {{content}} part in the HTML string is replaced with the content of the editor. default: null {string}
+                  ex) "<div style='width:auto; max-width:1080px; margin:auto;'><h1>Preview Template</h1> {{content}} <div>_Footer_</div></div>"
 printTemplate   : A template of the "print".
-                  The {{contents}} part in the HTML string is replaced with the contents of the editor. default: null {string}
-                  ex) "<div style='width:auto; max-width:1080px; margin:auto;'><h1>Print Template</h1> {{contents}} <div>_Footer_</div></div>"
+                  The {{content}} part in the HTML string is replaced with the content of the editor. default: null {string}
+                  ex) "<div style='width:auto; max-width:1080px; margin:auto;'><h1>Print Template</h1> {{content}} <div>_Footer_</div></div>"
 codeMirror      : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
                   Use version 5.x.x // https://github.com/codemirror/CodeMirror
                   ex) codeMirror: CodeMirror // Default option
@@ -843,7 +843,7 @@ shortcutsHint   : If false, hide the shortcuts hint.    default: true {boolean}
 
 // Defining save button-------------------------------------------------------------------------------------------
 callBackSave    : Callback functions that is called when the Save button is clicked. 
-                  Arguments - (contents, isChanged).                            default: editorInstance.save {Function}
+                  Arguments - (content, isChanged).                            default: editorInstance.save {Function}
 
 // Templates Array------------------------------------------------------------------------------------------------
 templates       : If you use a template plugin, add it.
@@ -1000,17 +1000,17 @@ editor.setOptions({
 // It can also be defined with the "setOptions" method, but the "setDefaultStyle" method does not render the editor again.
 editor.setDefaultStyle('font-family: cursive; font-size: 10px;');
 
-// Copies the contents of the suneditor into a [textarea]
+// Copies the content of the suneditor into a [textarea]
 editor.save();
 
-// Gets the contents of the suneditor
-// onlyContents {boolean}: Return only the contents of the body without headers when the "fullPage" option is true
-editor.getContents(onlyContents: Boolean);
-// Gets the current contents with containing parent div(div.sun-editor-editable).
-//  <div class="sun-editor-editable">{contents}</div>
-editor.getFullContents(onlyContents: Boolean);
+// Gets the content of the suneditor
+// onlyContent {boolean}: Return only the content of the body without headers when the "fullPage" option is true
+editor.getContent(onlyContent: Boolean);
+// Gets the current content with containing parent div(div.sun-editor-editable).
+//  <div class="sun-editor-editable">{content}</div>
+editor.getFullContent(onlyContent: Boolean);
 
-// Gets only the text of the suneditor contents
+// Gets only the text of the suneditor content
 editor.getText();
 
 // Gets uploaded files(plugin using fileManager) information list.
@@ -1040,8 +1040,8 @@ editor.insertImage(FileList);
  */
 editor.insertHTML('<img src="http://suneditor.com/sample/img/sunset.jpg">', true, true);
 
-// Change the contents of the suneditor
-editor.setContents('set contents');
+// Change the content of the suneditor
+editor.setContent('set content');
 
 // Get the editor's number of characters or binary data size.
 // You can use the "charCounterType" option format.
@@ -1049,7 +1049,7 @@ editor.setContents('set contents');
 editor.getCharCount((null || 'char' || 'byte' || 'byte-html'));
 
 // Add content to the suneditor
-editor.appendContents('append contents');
+editor.appendContent('append content');
 
 // Switch to or off "ReadOnly" mode.
 editor.readOnly(true || false)
@@ -1103,8 +1103,8 @@ editor.onFocus = function (e, core) { console.log('onFocus', e) }
 editor.onBlur = function (e, core) { console.log('onBlur', e) }
 
 // onchange event
-// contents: core.getContents(), Core object
-editor.onChange = function (contents, core) { console.log('onChange', contents) }
+// content: core.getContent(), Core object
+editor.onChange = function (content, core) { console.log('onChange', content) }
 
 // onload event
 // When reloaded with the "setOptions" method, the value of the "reload" argument is true.
@@ -1161,10 +1161,10 @@ editor.onDrop = function (e, cleanData, maxCharCount, core) { console.log('onDro
 // Save event
 // Called just after the save was executed.
 /**
- * contents Editor content
+ * content Editor content
  * core: Core object
  */   
-editor.onSave = function (contents, core) {console.log(contents) };
+editor.onSave = function (content, core) {console.log(content) };
 
 // Called before the image is uploaded
 // If true is returned, the internal upload process runs normally.

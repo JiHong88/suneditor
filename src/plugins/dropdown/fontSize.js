@@ -102,9 +102,9 @@ export default {
         if (value) {
             const newNode = this.util.createElement('SPAN');
             newNode.style.fontSize = value;
-            this.format.applyStyleNode(newNode, ['font-size'], null, null);
+            this.format.applyTextStyle(newNode, ['font-size'], null, null);
         } else {
-            this.format.applyStyleNode(null, ['font-size'], ['span'], true);
+            this.format.applyTextStyle(null, ['font-size'], ['span'], true);
         }
 
         this.dropdownOff();

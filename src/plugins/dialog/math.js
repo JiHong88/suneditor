@@ -211,11 +211,11 @@ export default {
 
     active: function (element) {
         if (!element) {
-            if (this.controllerArray.indexOf(this.context.math.mathController) > -1) {
+            if (this.menu.hasController(this.context.math.mathController)) {
                 this.controllerOff();
             }
         } else if (element.getAttribute('data-exp')) {
-            if (this.controllerArray.indexOf(this.context.math.mathController) < 0) {
+            if (!this.menu.hasController(this.context.math.mathController)) {
                 this.setRange(element, 0, element, 1);
                 this.plugins.math.call_controller.call(this, element);
             }
@@ -265,7 +265,7 @@ export default {
             /** delete */
             this.util.remove(this.context.math._mathExp);
             this.context.math._mathExp = null;
-            this.__core.focus();
+            this.core.focus();
 
             // history stack
             this.history.push(false);

@@ -16,9 +16,9 @@ export default function (editor, change) {
 	let stackIndex = 0;
 	let stack = [];
 
-	function setContentsFromStack() {
+	function setContentFromStack() {
 		const item = stack[stackIndex];
-		elements.wysiwyg.innerHTML = item.contents;
+		elements.wysiwyg.innerHTML = item.content;
 
 		editor.selection.setRange(getNodeFromPath(item.s.path, elements.wysiwyg), item.s.offset, getNodeFromPath(item.e.path, elements.wysiwyg), item.e.offset);
 		editor.focus();
@@ -50,8 +50,8 @@ export default function (editor, change) {
 
 	function pushStack() {
 		editor._checkComponents();
-		const current = editor.getContents(true);
-		if (!current || (!!stack[stackIndex] && current === stack[stackIndex].contents)) return;
+		const current = editor.getContent(true);
+		if (!current || (!!stack[stackIndex] && current === stack[stackIndex].content)) return;
 
 		stackIndex++;
 		const range = editor.status._range;
@@ -63,13 +63,13 @@ export default function (editor, change) {
 
 		if (!range) {
 			stack[stackIndex] = {
-				contents: current,
+				content: current,
 				s: { path: [0, 0], offset: [0, 0] },
 				e: { path: 0, offset: 0 }
 			};
 		} else {
 			stack[stackIndex] = {
-				contents: current,
+				content: current,
 				s: {
 					path: getNodePath(range.startContainer, null, null),
 					offset: range.startOffset
@@ -126,7 +126,7 @@ export default function (editor, change) {
 		undo: function () {
 			if (stackIndex > 0) {
 				stackIndex--;
-				setContentsFromStack();
+				setContentFromStack();
 			}
 		},
 
@@ -136,7 +136,7 @@ export default function (editor, change) {
 		redo: function () {
 			if (stack.length - 1 > stackIndex) {
 				stackIndex++;
-				setContentsFromStack();
+				setContentFromStack();
 			}
 		},
 
@@ -147,7 +147,7 @@ export default function (editor, change) {
 		 */
 		go: function (index) {
 			stackIndex = index < 0 ? stack.length - 1 : index;
-			setContentsFromStack();
+			setContentFromStack();
 		},
 
 		/**
@@ -172,7 +172,7 @@ export default function (editor, change) {
 
 			// pushStack
 			stack[stackIndex] = {
-				contents: editor.getContents(true),
+				content: editor.getContent(true),
 				s: {
 					path: [0, 0],
 					offset: 0

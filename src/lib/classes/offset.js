@@ -80,7 +80,7 @@ Offset.prototype = {
 			el = el.parentElement;
 		}
 
-		el = this._shadowRoot ? this._shadowRoot.host : null;
+		el = this.shadowRoot ? this.shadowRoot.host : null;
 		while (el) {
 			t += el.scrollTop;
 			l += el.scrollLeft;

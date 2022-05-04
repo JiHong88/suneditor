@@ -9,7 +9,7 @@ class Events extends EditorInterface {
 	onInput: EventFn;
 	onKeyDown: EventFn;
 	onKeyUp: EventFn;
-	onChange: (contents: string) => void;
+	onChange: (content: string) => void;
 	onBlur: (e: FocusEvent) => void;
 	onDrop: (e: Event, cleanData: string, maxCharCount: number) => boolean | string;
 	onPaste: (e: Event, cleanData: string, maxCharCount: number) => boolean | string;
@@ -18,10 +18,10 @@ class Events extends EditorInterface {
 
 	/**
 	 * @description Called just after the save was executed.
-	 * @param contents Editor content
+	 * @param content Editor content
 	 * @param core Core object
 	 */
-	onSave: (contents: string, core: Core) => void;
+	onSave: (content: string, core: Core) => void;
 
 	/**
 	 * @description Called just before the inline toolbar is positioned and displayed on the screen.

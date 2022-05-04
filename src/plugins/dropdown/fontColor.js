@@ -85,7 +85,7 @@ export default {
     },
 
     remove: function () {
-        this.format.applyStyleNode(null, ['color'], ['span'], true);
+        this.format.applyTextStyle(null, ['color'], ['span'], true);
         this.dropdownOff();
     },
 
@@ -94,7 +94,7 @@ export default {
 
         const newNode = this.util.createElement('SPAN');
         newNode.style.color = color;
-        this.format.applyStyleNode(newNode, ['color'], null, null);
+        this.format.applyTextStyle(newNode, ['color'], null, null);
 
         this.dropdownOff();
     }

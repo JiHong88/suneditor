@@ -21,7 +21,7 @@ Component.prototype = {
 	 * @returns {Element}
 	 */
 	insert: function (element, notHistoryPush, checkCharCount, notSelect) {
-		if (this.__core.isReadOnly || (checkCharCount && !this.char.check(element))) {
+		if (this.core.isReadOnly || (checkCharCount && !this.char.check(element))) {
 			return null;
 		}
 
@@ -74,13 +74,13 @@ Component.prototype = {
 	 * @returns {Object|null}
 	 */
 	get: function (element) {
-		if (!this.__core._fileManager.queryString || !element) return null;
+		if (!this.core._fileManager.queryString || !element) return null;
 
 		let target;
 		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
-			if (this.__core._fileManager.queryString) target = element.querySelector(this.__core._fileManager.queryString);
+			if (this.core._fileManager.queryString) target = element.querySelector(this.core._fileManager.queryString);
 		}
-		if (!target && element.nodeName && this.__core._fileManager.regExp.test(element.nodeName)) {
+		if (!target && element.nodeName && this.core._fileManager.regExp.test(element.nodeName)) {
 			target = element;
 		}
 		if (!target) {
@@ -90,7 +90,7 @@ Component.prototype = {
 		return {
 			target: target,
 			component: domUtils.getParentElement(target, this.is),
-			pluginName: this.__core._fileManager.pluginMap[target.nodeName.toLowerCase()] || ""
+			pluginName: this.core._fileManager.pluginMap[target.nodeName.toLowerCase()] || ""
 		};
 	},
 
@@ -101,12 +101,13 @@ Component.prototype = {
 	 */
 	select: function (element, pluginName) {
 		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is)) || domUtils.isUneditable(element)) return false;
-		if (!this.status.hasFocus) this.__core.focus();
+		if (!this.status.hasFocus) this.core.focus();
+
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;
 		_w.setTimeout(
 			function () {
-				if (typeof plugin.select === "function") this.__core.callPlugin(pluginName, plugin.select.bind(this, element), null);
+				if (typeof plugin.select === "function") plugin.select(element)
 				this._setComponentLineBreaker(element);
 			}.bind(this)
 		);
@@ -128,7 +129,7 @@ Component.prototype = {
 	 */
 	_setComponentLineBreaker: function (element) {
 		// line breaker
-		this.__core._lineBreaker.style.display = "none";
+		this.core._lineBreaker.style.display = "none";
 		const contextEl = this.context.element;
 		const container = domUtils.getParentElement(element, this.is);
 		const t_style = contextEl.lineBreaker_t.style;

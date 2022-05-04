@@ -109,6 +109,6 @@ export default {
         if (!command) return;
 
         const plugin = this.plugins[command];
-        this.actionCall(command, (plugin ? plugin.display : ''), target);
+        this.runPlugin(command, (plugin ? plugin.display : ''), target);
     }
 };

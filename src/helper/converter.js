@@ -5,11 +5,11 @@ import {
 
 /**
  * @description Convert HTML string to HTML Entity
- * @param {string} contents
- * @returns {string} Contents string
+ * @param {string} content
+ * @returns {string} Content string
  * @private
  */
-export function htmlToEntity(contents) {
+export function htmlToEntity(content) {
 	const ec = {
 		"&": "&amp;",
 		"\u00A0": "&nbsp;",
@@ -18,17 +18,17 @@ export function htmlToEntity(contents) {
 		"<": "&lt;",
 		">": "&gt;"
 	};
-	return contents.replace(/&|\u00A0|'|"|<|>/g, function (m) {
+	return content.replace(/&|\u00A0|'|"|<|>/g, function (m) {
 		return typeof ec[m] === "string" ? ec[m] : m;
 	});
 }
 
 /**
  * @description Convert HTML Entity to HTML string
- * @param {string} contents Contents string
+ * @param {string} content Content string
  * @returns {string}
  */
-export function entityToHTML(contents) {
+export function entityToHTML(content) {
 	const ec = {
 		"&amp;": "&",
 		"&nbsp;": "\u00A0",
@@ -37,7 +37,7 @@ export function entityToHTML(contents) {
 		"&lt;": "<",
 		"&gt;": ">"
 	};
-	return contents.replace(/\&amp;|\&nbsp;|\&apos;|\&quot;|\$lt;|\$gt;/g, function (m) {
+	return content.replace(/\&amp;|\&nbsp;|\&apos;|\&quot;|\$lt;|\$gt;/g, function (m) {
 		return typeof ec[m] === "string" ? ec[m] : m;
 	});
 }

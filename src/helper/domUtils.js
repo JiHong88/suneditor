@@ -39,7 +39,7 @@ export function createElement(elementName, attributes, inner) {
 
 /**
  * @description Create text node
- * @param {string} text text contents
+ * @param {string} text text content
  * @returns {Text}
  */
 export function createTextNode(text) {

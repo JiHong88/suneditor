@@ -151,11 +151,11 @@ export default {
      */
     active: function (element) {
         if (!element) {
-            if (this.controllerArray.indexOf(this.context.link.linkController) > -1) {
+            if (this.menu.hasController(this.context.link.linkController)) {
                 this.controllerOff();
             }
         } else if (this.util.isAnchor(element) && element.getAttribute('data-image-link') === null) {
-            if (this.controllerArray.indexOf(this.context.link.linkController) < 0) {
+            if (!this.menu.hasController(this.context.link.linkController)) {
                 this.plugins.link.call_controller.call(this, element);
             }
             return true;
@@ -199,12 +199,12 @@ export default {
             const sc = this.util.getEdgeChild(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
             const ec = this.util.getEdgeChild(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
             this.setRange(sc, 0, ec, ec.textContent.length);
-            this.format.applyStyleNode(null, null, ['A'], false);
+            this.format.applyTextStyle(null, null, ['A'], false);
         } else {
             /** delete */
             this.util.remove(this.context.link._linkAnchor);
             this.context.anchor.caller.link.linkAnchor = null;
-            this.__core.focus();
+            this.core.focus();
 
             // history stack
             this.history.push(false);

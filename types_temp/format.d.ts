@@ -78,7 +78,7 @@ class Format extends EditorInterface {
 	 * @description "selectedCells" array are detached from the list element.
 	 * The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
 	 * @param selectedCells Array of format elements (LI, P...) to remove.
-	 * @param remove If true, It does not just remove the list, it deletes the contents.
+	 * @param remove If true, It does not just remove the list, it deletes the content.
 	 * @returns {sc: <LI>, ec: <LI>}.
 	 */
 	removeList(selectedCells: Element[], remove: boolean): { sc: Element; ec: Element };
@@ -115,12 +115,12 @@ class Format extends EditorInterface {
 	 * @param removeNodeArray An array of node names to remove types from, remove all formats when "styleNode" is null and there is an empty array or null value. (['span'], ['strong', 'em'] ...])
 	 * @param strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
 	 */
-	applyStyleNode(styleNode?: Element, styleArray?: string[], removeNodeArray?: string[], strictRemove?: boolean): void;
+	applyTextStyle(styleNode?: Element, styleArray?: string[], removeNodeArray?: string[], strictRemove?: boolean): void;
 
 	/**
 	 * @description Remove format of the currently selected text
 	 */
-	removeStyleNode(): void;
+	removeTextStyle(): void;
 
 	/**
 	 * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore "__se__format__" class

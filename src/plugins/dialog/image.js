@@ -238,7 +238,7 @@ export default {
     },
 
     _openGallery: function () {
-        this.callPlugin('imageGallery', this.plugins.imageGallery.open.bind(this, this.plugins.image._setUrlInput.bind(this.context.image)), null);
+        this.plugins.imageGallery.open(this.plugins.image._setUrlInput.bind(this.context.image))
     },
 
     _setUrlInput: function (target) {

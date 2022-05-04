@@ -426,7 +426,7 @@ export default {
             const cover = this.plugins.mediaContainer.setCover.call(this, element);
             const container = this.plugins.mediaContainer.setContainer.call(this, cover, '');
             if (!this.component.insert(container, false, true, !this.options.mediaAutoSelect)) {
-                this.__core.focus();
+                this.core.focus();
                 return;
             }
             if (!this.options.mediaAutoSelect) {

@@ -1,7 +1,7 @@
 "use strict";
 
 import "./assets/suneditor.css";
-import "./assets/suneditor-contents.css";
+import "./assets/suneditor-content.css";
 
 import plugins from "./plugins";
 import suneditor from "./suneditor";

@@ -4,12 +4,12 @@
  * @private
  */
 function CoreInterface(core) {
-	this.__core = core;
+	this.core = core;
 	this._w = core._w;
 	this._d = core._d;
 	this._ww = core._ww;
 	this._wd = core._wd;
-	this._shadowRoot = core._shadowRoot;
+	this.shadowRoot = core.shadowRoot;
 	this.plugins = core.plugins;
 	this.icons = core.icons;
 	this.status = core.status;

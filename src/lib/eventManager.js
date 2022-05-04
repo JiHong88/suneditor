@@ -3,30 +3,30 @@
  * @author JiHong Lee.
  */
 
-import EditorInterface from "../../interface/editor";
+import EditorInterface from "../interface/editor";
 import {
 	domUtils,
 	unicode,
 	numbers,
 	env,
 	converter
-} from "../../helper";
+} from "../helper";
 import {
 	_w,
 	_d
-} from "../../helper/global";
+} from "../helper/global";
 
-function EventManager(__core) {
-	EditorInterface.call(this, __core);
+function EventManager(core) {
+	EditorInterface.call(this, core);
 	this._events = [];
-	this._onButtonsCheck = new _w.RegExp("^(" + _w.Object.keys(__core.options._textTagsMap).join("|") + ")$", "i");
+	this._onButtonsCheck = new _w.RegExp("^(" + _w.Object.keys(core.options._textTagsMap).join("|") + ")$", "i");
 	this._onShortcutKey = false;
 	this._IEisComposing = false; // In IE, there is no "e.isComposing" in the key-up event.
 	this._directionKeyCode = new _w.RegExp("^(8|13|3[2-9]|40|46)$");
 	this._nonTextKeyCode = new _w.RegExp("^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$");
 	this._historyIgnoreKeyCode = new _w.RegExp("^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$");
 	this._frontZeroWidthReg = new _w.RegExp(unicode.zeroWidthSpace + "+", "");
-	this._lineBreakerButton = __core._lineBreaker.querySelector('button');
+	this._lineBreakerButton = core._lineBreaker.querySelector('button');
 	this._balloonDelay = null;
 	this._resizeObserver = null;
     this._toolbarObserver = null;
@@ -83,16 +83,16 @@ EventManager.prototype = {
 	 */
 	applyTagEffect: function () {
 		let selectionNode = this.selection.getNode();
-		if (selectionNode === this.__core.effectNode) return;
-		this.__core.effectNode = selectionNode;
+		if (selectionNode === this.core.effectNode) return;
+		this.core.effectNode = selectionNode;
 
 		const marginDir = this.options.rtl ? "marginRight" : "marginLeft";
-		const commandMap = this.__core.commandMap;
+		const commandMap = this.core.commandMap;
 		const classOnCheck = this._onButtonsCheck;
 		const commandMapNodes = [];
 		const currentNodes = [];
 
-		const activePlugins = this.__core.activePlugins;
+		const activePlugins = this.core.activePlugins;
 		const cLen = activePlugins.length;
 		let nodeName = "";
 
@@ -161,8 +161,8 @@ EventManager.prototype = {
 	 * @private
 	 */
 	_setKeyEffect: function (ignoredList) {
-		const commandMap = this.__core.commandMap;
-		const activePlugins = this.__core.activePlugins;
+		const commandMap = this.core.commandMap;
+		const activePlugins = this.core.activePlugins;
 
 		for (let key in commandMap) {
 			if (ignoredList.indexOf(key) > -1 || !commandMap.hasOwnProperty(key)) continue;
@@ -196,12 +196,12 @@ EventManager.prototype = {
 	_toggleToolbarBalloon: function () {
 		this.selection._init();
 		const range = this.selection.getRange();
-		if (this.menu._bindControllersOff || (!this.__core._isBalloonAlways && range.collapsed)) this._hideToolbar();
+		if (this.menu._bindControllersOff || (!this.core._isBalloonAlways && range.collapsed)) this._hideToolbar();
 		else this.toolbar._showBalloon(range);
 	},
 
 	_hideToolbar: function () {
-		if (!this.__core._notHideToolbar && !this.status.isFullScreen) {
+		if (!this.core._notHideToolbar && !this.status.isFullScreen) {
 			this.toolbar.hide();
 		}
 	},
@@ -241,7 +241,7 @@ EventManager.prototype = {
 		const h = (resizeInterval < this.status.minResizingSize ? this.status.minResizingSize : resizeInterval);
 		this.context.element.wysiwygFrame.style.height = this.context.element.code.style.height = h + 'px';
 		this.status.resizeClientY = e.clientY;
-		if (env.isIE) this.__core.__callResizeFunction(h, null);
+		if (env.isIE) this.core.__callResizeFunction(h, null);
 	},
 
 	// FireFox - table delete, Chrome - image, video, audio
@@ -269,7 +269,7 @@ EventManager.prototype = {
 				domUtils.remove(domUtils.getParentElement(sCell, function (current) {
 					return ancestor === current.parentNode;
 				}));
-				this.__core.nativeFocus();
+				this.core.nativeFocus();
 				return true;
 			}
 		}
@@ -289,7 +289,7 @@ EventManager.prototype = {
 	 * @private
 	 */
 	_setDefaultLine: function (formatName) {
-		if (this.__core._fileManager.pluginRegExp.test(this.__core.currentControllerName)) return;
+		if (this.core._fileManager.pluginRegExp.test(this.menu.currentControllerName)) return;
 
 		const range = this.selection.getRange();
 		const commonCon = range.commonAncestorContainer;
@@ -342,7 +342,7 @@ EventManager.prototype = {
 			return;
 		}
 
-		this.__core.execCommand("formatBlock", false, formatName || this.options.defaultTag);
+		this.core.execCommand("formatBlock", false, formatName || this.options.defaultTag);
 		focusNode = domUtils.getEdgeChildNodes(commonCon, commonCon);
 		focusNode = focusNode ? focusNode.ec : commonCon;
 
@@ -361,8 +361,8 @@ EventManager.prototype = {
 			focusNode = zeroWidth;
 		}
 
-		this.__core.effectNode = null;
-		this.__core.nativeFocus();
+		this.core.effectNode = null;
+		this.core.nativeFocus();
 	},
 
 	_setClipboardComponent: function (e, info, clipboardData) {
@@ -434,7 +434,7 @@ EventManager.prototype = {
 			} else {
 				cleanData = (plainText === cleanData ? plainText : cleanData).replace(/\n/g, "<br>");
 			}
-			cleanData = this.__core.cleanHTML(cleanData, this.__core.pasteTagsWhitelistRegExp, this.__core.pasteTagsBlacklistRegExp);
+			cleanData = this.core.cleanHTML(cleanData, this.core.pasteTagsWhitelistRegExp, this.core.pasteTagsBlacklistRegExp);
 		} else {
 			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, "<br>");
 		}
@@ -458,7 +458,7 @@ EventManager.prototype = {
 		if (files.length > 0 && !MSData) {
 			if (/^image/.test(files[0].type) && this.plugins.image) {
 				this.plugins.image.submitAction(files);
-				this.__core.focus();
+				this.core.focus();
 			}
 			return false;
 		}
@@ -484,7 +484,7 @@ EventManager.prototype = {
 		const eventWysiwyg = this.options.iframe ? this._ww : this.context.element.wysiwyg;
 		if (!env.isIE) {
 			this._resizeObserver = new _w.ResizeObserver(function(entries) {
-				this.__core.__callResizeFunction(-1, entries[0]);
+				this.core.__callResizeFunction(-1, entries[0]);
 			}.bind(this));
 		}
 
@@ -533,7 +533,7 @@ EventManager.prototype = {
 
 		/** code view area auto line */
 		if (this.options.height === "auto" && !this.options.codeMirrorEditor) {
-			const cvAuthHeight = this.__core._codeViewAutoHeight.bind(this.editor);
+			const cvAuthHeight = this.core._codeViewAutoHeight.bind(this.editor);
 			this.addEvent(this.context.element.code, "keydown", cvAuthHeight, false);
 			this.addEvent(this.context.element.code, "keyup", cvAuthHeight, false);
 			this.addEvent(this.context.element.code, "paste", cvAuthHeight, false);
@@ -588,14 +588,14 @@ function ToolbarButtonsHandler(e) {
 	if (this.menu._bindControllersOff) e.stopPropagation();
 
 	if (/^(input|textarea|select|option)$/i.test(target.nodeName)) {
-		this.__core._antiBlur = false;
+		this.core._antiBlur = false;
 	} else {
 		e.preventDefault();
 	}
 
 	if (domUtils.getParentElement(target, ".se-dropdown")) {
 		e.stopPropagation();
-		this.__core._notHideToolbar = true;
+		this.core._notHideToolbar = true;
 	} else {
 		let command = target.getAttribute("data-command");
 		let className = target.className;
@@ -606,7 +606,7 @@ function ToolbarButtonsHandler(e) {
 			className = target.className;
 		}
 
-		if (command === this.menu._dropdownName || command === this.__core._containerName) {
+		if (command === this.menu.currentDropdownName || command === this.core._containerName) {
 			e.stopPropagation();
 		}
 	}
@@ -617,7 +617,7 @@ function OnClick_toolbar(e) {
 	let display = target.getAttribute("data-display");
 	let command = target.getAttribute("data-command");
 	let className = target.className;
-	this.__core.controllerOff();
+	this.core.controllerOff();
 
 	while (target.parentNode && !command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
 		target = target.parentNode;
@@ -628,10 +628,10 @@ function OnClick_toolbar(e) {
 
 	if (!command && !display) return;
 	if (target.disabled) return;
-	if (!this.status.isReadOnly && !this.status.hasFocus) this.__core.nativeFocus();
+	if (!this.status.isReadOnly && !this.status.hasFocus) this.core.nativeFocus();
 	if (!this.status.isReadOnly && !this.status.isCodeView) this.selection._init();
 
-	this.__core.actionCall(command, display, target);
+	this.core.runPlugin(command, display, target);
 }
 
 function OnMouseDown_wysiwyg(e) {
@@ -649,7 +649,7 @@ function OnMouseDown_wysiwyg(e) {
 		}
 	}
 
-	if (this.__core._isBalloon) {
+	if (this.core._isBalloon) {
 		this._hideToolbar();
 	}
 
@@ -685,7 +685,7 @@ function OnClick_wysiwyg(e) {
 		figcaption.setAttribute("contenteditable", true);
 		figcaption.focus();
 
-		if (this.__core._isInline && !this.toolbar._inlineToolbarAttr.isShow) {
+		if (this.core._isInline && !this.toolbar._inlineToolbarAttr.isShow) {
 			this.toolbar._showInline();
 
 			const hideToolbar = function () {
@@ -711,10 +711,10 @@ function OnClick_wysiwyg(e) {
 				const prevLi = selectionNode.nextElementSibling;
 				const oLi = domUtils.createElement("LI", null, selectionNode);
 				rangeEl.insertBefore(oLi, prevLi);
-				this.__core.focus();
+				this.core.focus();
 			} else if (!domUtils.isWysiwygFrame(selectionNode) && !this.component.is(selectionNode) && (!domUtils.isTable(selectionNode) || domUtils.isTableCell(selectionNode)) && this._setDefaultLine(this.format.isBlock(rangeEl) ? "DIV" : this.options.defaultTag) !== null) {
 				e.preventDefault();
-				this.__core.focus();
+				this.core.focus();
 			} else {
 				this.applyTagEffect();
 			}
@@ -723,7 +723,7 @@ function OnClick_wysiwyg(e) {
 		this.applyTagEffect();
 	}
 
-	if (this.__core._isBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this));
+	if (this.core._isBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this));
 }
 
 function OnInput_wysiwyg(e) {
@@ -762,9 +762,9 @@ function OnKeyDown_wysiwyg(e) {
 		return false;
 	}
 
-	this.__core.dropdownOff();
+	this.core.dropdownOff();
 
-	if (this.__core._isBalloon) {
+	if (this.core._isBalloon) {
 		this._hideToolbar();
 	}
 
@@ -785,7 +785,7 @@ function OnKeyDown_wysiwyg(e) {
 	let selectionNode = this.selection.getNode();
 	const range = this.selection.getRange();
 	const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
-	const fileComponentName = this.__core._fileManager.pluginRegExp.test(this.__core.currentControllerName) ? this.__core.currentControllerName : "";
+	const fileComponentName = this.core._fileManager.pluginRegExp.test(this.menu.currentControllerName) ? this.menu.currentControllerName : "";
 	let formatEl = this.format.getLine(selectionNode, null) || selectionNode;
 	let rangeEl = this.format.getBlock(formatEl, null);
 
@@ -834,7 +834,7 @@ function OnKeyDown_wysiwyg(e) {
 						formatEl.parentElement.replaceChild(domUtils.createElement(this.options.defaultTag, null, "<br>"), formatEl);
 					}
 
-					this.__core.nativeFocus();
+					this.core.nativeFocus();
 					return false;
 				}
 			}
@@ -969,7 +969,7 @@ function OnKeyDown_wysiwyg(e) {
 						e.preventDefault();
 						e.stopPropagation();
 						if (formatEl.textContent.length === 0) domUtils.remove(formatEl);
-						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.__core.blur();
+						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.core.blur();
 					} else if (this.component.is(prev)) {
 						e.preventDefault();
 						e.stopPropagation();
@@ -1030,7 +1030,7 @@ function OnKeyDown_wysiwyg(e) {
 					const fileComponentInfo = this.component.get(nextEl);
 					if (fileComponentInfo) {
 						e.stopPropagation();
-						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.__core.blur();
+						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.core.blur();
 					} else if (this.component.is(nextEl)) {
 						e.stopPropagation();
 						domUtils.remove(nextEl);
@@ -1147,7 +1147,7 @@ function OnKeyDown_wysiwyg(e) {
 					let moveCell = cells[idx];
 					if (!moveCell) break;
 					moveCell = moveCell.firstElementChild || moveCell;
-					this.__core.setRange(moveCell, 0, moveCell, 0);
+					this.core.setRange(moveCell, 0, moveCell, 0);
 					break;
 				}
 
@@ -1439,7 +1439,7 @@ function OnKeyDown_wysiwyg(e) {
 				}
 
 				container.parentNode.insertBefore(newEl, container);
-				if (this.component.select(compContext._element, fileComponentName) === false) this.__core.blur();
+				if (this.component.select(compContext._element, fileComponentName) === false) this.core.blur();
 			}
 
 			break;
@@ -1447,7 +1447,7 @@ function OnKeyDown_wysiwyg(e) {
 			if (fileComponentName) {
 				e.preventDefault();
 				e.stopPropagation();
-				this.__core.controllerOff();
+				this.core.controllerOff();
 				return false;
 			}
 			break;
@@ -1498,8 +1498,8 @@ function OnKeyUp_wysiwyg(e) {
 	const range = this.selection.getRange();
 	let selectionNode = this.selection.getNode();
 
-	if (this.__core._isBalloon && ((this.__core._isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
-		if (this.__core._isBalloonAlways) {
+	if (this.core._isBalloon && ((this.core._isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
+		if (this.core._isBalloonAlways) {
 			if (keyCode !== 27) this._showToolbarBalloonDelay();
 		} else {
 			this.toolbar._showBalloon();
@@ -1571,7 +1571,7 @@ function OnCopy_wysiwyg(e) {
 		return false;
 	}
 
-	const info = this.__core.currentFileComponentInfo;
+	const info = this.core.currentFileComponentInfo;
 	if (info && !env.isIE) {
 		this._setClipboardComponent(e, info, clipboardData);
 		domUtils.addClass(info.component, "se-component-copy");
@@ -1607,11 +1607,11 @@ function OnCut_wysiwyg(e) {
 		return false;
 	}
 
-	const info = this.__core.currentFileComponentInfo;
+	const info = this.core.currentFileComponentInfo;
 	if (info && !env.isIE) {
 		this._setClipboardComponent(e, info, clipboardData);
 		domUtils.remove(info.component);
-		this.__core.controllerOff();
+		this.core.controllerOff();
 	}
 
 	_w.setTimeout(function () {
@@ -1621,29 +1621,29 @@ function OnCut_wysiwyg(e) {
 }
 
 function OnScroll_wysiwyg(e) {
-	this.__core.controllerOff();
-	if (this.__core._isBalloon) this._hideToolbar();
+	this.core.controllerOff();
+	if (this.core._isBalloon) this._hideToolbar();
 
 	// user event
 	if (typeof this.events.onScroll === "function") this.events.onScroll(e);
 }
 
 function OnFocus_wysiwyg(e) {
-	if (this.__core._antiBlur) return;
+	if (this.core._antiBlur) return;
 	this.status.hasFocus = true;
 	_w.setTimeout(this.applyTagEffect.bind(this));
 
-	if (this.__core._isInline) this.toolbar._showInline();
+	if (this.core._isInline) this.toolbar._showInline();
 
 	// user event
 	if (typeof this.events.onFocus === "function") this.events.onFocus(e);
 }
 
 function OnBlur_wysiwyg(e) {
-	if (this.__core._antiBlur || this.status.isCodeView) return;
+	if (this.core._antiBlur || this.status.isCodeView) return;
 	this.status.hasFocus = false;
-	this.__core.controllerOff();
-	if (this.__core._isInline || this.__core._isBalloon) this._hideToolbar();
+	this.core.controllerOff();
+	if (this.core._isInline || this.core._isBalloon) this._hideToolbar();
 
 	this._setKeyEffect([]);
 
@@ -1659,9 +1659,9 @@ function OnMouseMove_wysiwyg(e) {
 	if (this.status.isDisabled || this.status.isReadOnly) return false;
 
 	const component = domUtils.getParentElement(e.target, this.component.is);
-	const lineBreakerStyle = this.__core._lineBreaker.style;
+	const lineBreakerStyle = this.core._lineBreaker.style;
 
-	if (component && !this.__core.currentControllerName) {
+	if (component && !this.menu.currentControllerName) {
 		const ctxEl = this.context.element;
 		let scrollTop = 0;
 		let el = ctxEl.wysiwyg;
@@ -1704,8 +1704,8 @@ function OnMouseMove_wysiwyg(e) {
 function OnMouseDown_resizingBar(e) {
 	e.stopPropagation();
 
-	this.__core.dropdownOff();
-	this.__core.controllerOff();
+	this.core.dropdownOff();
+	this.core.controllerOff();
 
 	this.status.resizeClientY = e.clientY;
 	this.context.element.resizeBackground.style.display = "block";
@@ -1733,7 +1733,7 @@ function DisplayLineBreak(dir, e) {
 	if (this.options.charCounterType === "byte-html" && !this.char.check(format.outerHTML)) return;
 
 	component.parentNode.insertBefore(format, dir === "t" ? component : component.nextSibling);
-	this.__core._lineBreaker.style.display = "none";
+	this.core._lineBreaker.style.display = "none";
 	this.status._lineBreakComp = null;
 
 	const focusEl = isList ? format : format.firstChild;
@@ -1743,7 +1743,7 @@ function DisplayLineBreak(dir, e) {
 }
 
 function OnResize_window() {
-	this.__core.controllerOff();
+	this.core.controllerOff();
 
 	if (env.isIE) this.toolbar.resetResponsiveToolbar();
 
@@ -1753,8 +1753,8 @@ function OnResize_window() {
 		this.context.fileBrowser.body.style.maxHeight = _w.innerHeight - this.context.fileBrowser.header.offsetHeight - 50 + "px";
 	}
 
-	if (this.menu.dropdownActiveButton && this.menu.dropdownMenu) {
-		this.__core._setMenuPosition(this.menu.dropdownActiveButton, this.menu.dropdownMenu);
+	if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {
+		this.core._setMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
 	}
 
 	if (this.status.isFullScreen) {
@@ -1763,12 +1763,12 @@ function OnResize_window() {
 		return;
 	}
 
-	if (this.status.isCodeView && this.__core._isInline) {
+	if (this.status.isCodeView && this.core._isInline) {
 		this.toolbar._showInline();
 		return;
 	}
 
-	this.__core._iframeAutoHeight();
+	this.core._iframeAutoHeight();
 
 	if (this.toolbar._sticky) {
 		this.context.element.toolbar.style.width = this.context.element.topArea.offsetWidth - 2 + "px";

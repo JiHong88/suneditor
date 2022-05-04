@@ -32,7 +32,7 @@ class CoreInterface {
 	/**
 	 * @description Closest ShadowRoot to editor if found
 	 */
-	_shadowRoot: Document;
+	shadowRoot: Document;
 
 	/**
 	 * @description Loaded plugins

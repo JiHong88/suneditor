@@ -389,7 +389,7 @@ Format.prototype = {
 			}
 		}
 
-		this.__core.effectNode = null;
+		this.core.effectNode = null;
 		this.node.mergeSameTags(block, null, false);
 		this.node.mergeNestedTags(
 			block,
@@ -662,7 +662,7 @@ Format.prototype = {
 			};
 		}
 
-		this.__core.effectNode = null;
+		this.core.effectNode = null;
 		if (notHistoryPush) return edge;
 
 		if (!remove && edge) {
@@ -917,7 +917,7 @@ Format.prototype = {
 			}
 		}
 
-		this.__core.effectNode = null;
+		this.core.effectNode = null;
 		return originRange;
 	},
 
@@ -925,7 +925,7 @@ Format.prototype = {
 	 * @description "selectedCells" array are detached from the list element.
 	 * The return value is applied when the first and last lines of "selectedFormats" are "LI" respectively.
 	 * @param {Array} selectedCells Array of format elements (LI, P...) to remove.
-	 * @param {boolean} remove If true, It does not just remove the list, it deletes the contents.
+	 * @param {boolean} remove If true, It does not just remove the list, it deletes the content.
 	 * @returns {Object} {sc: <LI>, ec: <LI>}.
 	 */
 	removeList: function (selectedCells, remove) {
@@ -1017,7 +1017,7 @@ Format.prototype = {
 			this.format._applyNestedList(cells, true);
 		}
 
-		this.__core.effectNode = null;
+		this.core.effectNode = null;
 		this.selection.setRange(sc, so, ec, eo);
 
 		// history stack
@@ -1047,7 +1047,7 @@ Format.prototype = {
 			this.format._applyNestedList(cells, false);
 		}
 
-		this.__core.effectNode = null;
+		this.core.effectNode = null;
 		this.selection.setRange(sc, so, ec, eo);
 
 		// history stack
@@ -1074,7 +1074,7 @@ Format.prototype = {
 	 * @param {Array|null} removeNodeArray An array of node names to remove types from, remove all formats when "styleNode" is null and there is an empty array or null value. (['span'], ['strong', 'em'] ...])
 	 * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
 	 */
-	applyStyleNode: function (styleNode, styleArray, removeNodeArray, strictRemove) {
+	applyTextStyle: function (styleNode, styleArray, removeNodeArray, strictRemove) {
 		this.selection._resetRangeToTextNode();
 		let range = this.selection.getRangeAndAddLine(this.selection.getRange(), null);
 		styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
@@ -1457,7 +1457,7 @@ Format.prototype = {
 		}
 
 		// set range
-		this.__core.controllerOff();
+		this.core.controllerOff();
 		this.selection.setRange(start.container, start.offset, end.container, end.offset);
 
 		// history stack
@@ -1467,8 +1467,8 @@ Format.prototype = {
 	/**
 	 * @description Remove format of the currently selected text.
 	 */
-	removeStyleNode: function () {
-		this.applyStyleNode(null, null, null, null);
+	removeTextStyle: function () {
+		this.applyTextStyle(null, null, null, null);
 	},
 
 	/**
@@ -3350,9 +3350,9 @@ Format.prototype = {
 		const elStyle = el.style;
 
 		// bold, italic
-		if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.__core._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
+		if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.core._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
 		else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
-		if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.__core._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
+		if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.core._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
 		else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
 
 		// styles

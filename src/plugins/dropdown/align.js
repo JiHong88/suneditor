@@ -123,17 +123,17 @@ function action(e) {
         domUtils.setStyle(selectedFormsts[i], 'textAlign', (value === defaultDir ? '' : value));
     }
 
-    this.__core.dropdownOff();
-    this.__core.focus();
+    this.core.dropdownOff();
+    this.core.focus();
 
     // history stack
     this.history.push(false);
 }
 
-function createHTML(__core) {
-    const lang = __core.lang;
-    const icons = __core.icons;
-    const alignItems = __core.options.alignItems;
+function createHTML(core) {
+    const lang = core.lang;
+    const icons = core.icons;
+    const alignItems = core.options.alignItems;
 
     let html = '';
     for (let i = 0, item, text; i < alignItems.length; i++) {

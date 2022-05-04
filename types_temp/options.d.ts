@@ -116,14 +116,14 @@ export interface SunEditorOptions {
     iframeCSSFileName?: string | string[];
     /**
      * A template of the "preview".
-     * The {{contents}} part in the HTML string is replaced with the contents of the editor.
-     * @example "<h1>Preview Template</h1> {{contents}} <div>_Footer_</div>"
+     * The {{content}} part in the HTML string is replaced with the content of the editor.
+     * @example "<h1>Preview Template</h1> {{content}} <div>_Footer_</div>"
      */
     previewTemplate?: string;
     /**
      * A template of the "print".
-     * The {{contents}} part in the HTML string is replaced with the contents of the editor.
-     * @example "<h1>Print Template</h1> {{contents}} <div>_Footer_</div>"
+     * The {{content}} part in the HTML string is replaced with the content of the editor.
+     * @example "<h1>Print Template</h1> {{content}} <div>_Footer_</div>"
      */
     printTemplate?: string;
     /**
@@ -554,7 +554,7 @@ export interface SunEditorOptions {
     /**
      * Callback functions that is called when the Save button is clicked
      */
-    callBackSave?: (contents: string, isChanged: boolean) => void;
+    callBackSave?: (content: string, isChanged: boolean) => void;
     /**
      * Templates Array
      * ===============

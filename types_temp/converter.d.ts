@@ -1,17 +1,17 @@
 class converter {
 	/**
 	 * @description Convert HTML string to HTML Entity
-	 * @param contents HTML or Text string
+	 * @param content HTML or Text string
 	 * @returns
 	 */
-	htmlToEntity(contents: string): string;
+	htmlToEntity(content: string): string;
 
 	/**
 	 * @description Convert HTML Entity to HTML string
-	 * @param contents HTML or Text string
+	 * @param content HTML or Text string
 	 * @returns
 	 */
-	entityToHTML(contents: string): string;
+	entityToHTML(content: string): string;
 
 	/**
 	 * @description Create whitelist RegExp object.

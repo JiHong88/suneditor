@@ -10,7 +10,7 @@ class domUtils {
 
 	/**
 	 * @description Create text node
-	 * @param text text contents
+	 * @param text text content
 	 * @returns
 	 */
 	createTextNode(text: string): Node;

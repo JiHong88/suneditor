@@ -121,9 +121,9 @@ export default {
         if (value) {
             const newNode = this.util.createElement('SPAN');
             newNode.style.fontFamily = value;
-            this.format.applyStyleNode(newNode, ['font-family'], null, null);
+            this.format.applyTextStyle(newNode, ['font-family'], null, null);
         } else {
-            this.format.applyStyleNode(null, ['font-family'], ['span'], true);
+            this.format.applyTextStyle(null, ['font-family'], ['span'], true);
         }
         
         this.dropdownOff();

@@ -98,8 +98,8 @@ Selection.prototype = {
 	 * @returns {Object}
 	 */
 	get: function () {
-		return this._shadowRoot && this._shadowRoot.getSelection ?
-			this._shadowRoot.getSelection() :
+		return this.shadowRoot && this.shadowRoot.getSelection ?
+			this.shadowRoot.getSelection() :
 			this._ww.getSelection();
 	},
 
@@ -157,7 +157,7 @@ Selection.prototype = {
 			range.setEnd(endCon, endOff);
 		} catch (error) {
 			console.warn("[SUNEDITOR.core.focus.error] " + error);
-			this.__core.nativeFocus();
+			this.core.nativeFocus();
 			return;
 		}
 
@@ -181,7 +181,7 @@ Selection.prototype = {
 		this.status._range = null;
 		this.status._selectionNode = null;
 		if (this.status.hasFocus) this.get().removeAllRanges();
-		this.__core.eventManager._setKeyEffect([]);
+		this.core.eventManager._setKeyEffect([]);
 	},
 
 	/**
@@ -347,7 +347,7 @@ Selection.prototype = {
 		return (
 			(domUtils.isWysiwygFrame(range.startContainer) && domUtils.isWysiwygFrame(range.endContainer)) ||
 			/FIGURE/i.test(comm.nodeName) ||
-			this.__core._fileManager.regExp.test(comm.nodeName) ||
+			this.core._fileManager.regExp.test(comm.nodeName) ||
 			this.component.is(comm)
 		);
 	},
@@ -362,7 +362,7 @@ Selection.prototype = {
 	 * @returns {Object|Node|null}
 	 */
 	insertNode: function (oNode, afterNode, checkCharCount) {
-		if (this.__core.isReadOnly || (checkCharCount && !this.__core.char.check(oNode))) {
+		if (this.core.isReadOnly || (checkCharCount && !this.core.char.check(oNode))) {
 			return null;
 		}
 
@@ -625,11 +625,11 @@ Selection.prototype = {
 	 * @param {boolean} rangeSelection If true, range select the inserted node.
 	 */
 	insertHTML: function (html, notCleaningData, checkCharCount, rangeSelection) {
-		const __core = this.__core;
-		if (!this.context.element.wysiwygFrame.contains(__core.getSelection().focusNode)) __core.focus();
+		const core = this.core;
+		if (!this.context.element.wysiwygFrame.contains(core.getSelection().focusNode)) core.focus();
 
 		if (typeof html === 'string') {
-			if (!notCleaningData) html = __core.cleanHTML(html, null, null);
+			if (!notCleaningData) html = core.cleanHTML(html, null, null);
 			try {
 				const dom = this._d.createRange().createContextualFragment(html);
 				const domTree = dom.childNodes;
@@ -650,7 +650,7 @@ Selection.prototype = {
 						domUtils.remove(c);
 						continue;
 					}
-					t = __core.insertNode(c, a, false);
+					t = core.insertNode(c, a, false);
 					a = t.container || t;
 					if (!firstCon) firstCon = t;
 					prev = c;
@@ -658,30 +658,30 @@ Selection.prototype = {
 
 				if (prev.nodeType === 3 && a.nodeType === 1) a = prev;
 				const offset = a.nodeType === 3 ? (t.endOffset || a.textContent.length) : a.childNodes.length;
-				if (rangeSelection) __core.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
-				else __core.setRange(a, offset, a, offset);
+				if (rangeSelection) core.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
+				else core.setRange(a, offset, a, offset);
 			} catch (error) {
 				if (this.status.isDisabled || this.status.isReadOnly) return;
 				console.warn('[SUNEDITOR.selection.insertHTML.fail] ' + error);
-				__core.execCommand('insertHTML', false, html);
+				core.execCommand('insertHTML', false, html);
 			}
 		} else {
 			if (this.component.is(html)) {
-				__core.component.insert(html, false, checkCharCount, false);
+				core.component.insert(html, false, checkCharCount, false);
 			} else {
 				let afterNode = null;
 				if (this.format.isLine(html) || domUtils.isMedia(html)) {
-					afterNode = this.format.getLine(__core.selection.getNode(), null);
+					afterNode = this.format.getLine(core.selection.getNode(), null);
 				}
-				__core.insertNode(html, afterNode, checkCharCount);
+				core.insertNode(html, afterNode, checkCharCount);
 			}
 		}
 
-		__core.effectNode = null;
-		__core.focus();
+		core.effectNode = null;
+		core.focus();
 
 		// history stack
-		__core.history.push(false);
+		core.history.push(false);
 	},
 
 	/**

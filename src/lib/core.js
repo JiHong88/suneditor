@@ -8,9 +8,11 @@ import Helper, {
 } from "../helper";
 import Constructor from "./constructor";
 import Context from "./context";
+import EventManager from "./eventManager";
+
+// base
 import history from "./base/history";
 import Events from "./base/events";
-import EventManager from "./base/eventManager";
 import Notice from "./base/notice";
 
 // classes
@@ -28,6 +30,92 @@ import Menu from "./classes/menu";
 import ClassesInterface from "../interface/_classes";
 
 /**
+ * @description Check disallowed tags
+ * @param {Node} element Element to check
+ * @returns {boolean}
+ * @private
+ */
+function DisallowedTags(element) {
+    return /^(meta|script|link|style|[a-z]+\:[a-z]+)$/i.test(element.nodeName);
+}
+
+/**
+ * @description Tag and tag attribute check RegExp function. (used by "cleanHTML" and "convertContentForEditor")
+ * @param {boolean} lowLevelCheck Low level check
+ * @param {string} m RegExp value
+ * @param {string} t RegExp value
+ * @returns {string}
+ * @private
+ */
+function CleanTags(lowLevelCheck, m, t) {
+    if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
+
+    let v = null;
+    const tagName = t.match(/(?!<)[a-zA-Z0-9\-]+/)[0].toLowerCase();
+
+    // blacklist
+    const bAttr = this._attributesTagsBlacklist[tagName];
+    if (bAttr) m = m.replace(bAttr, '');
+    else m = m.replace(this._attributesBlacklistRegExp, '');
+
+    // whitelist
+    const wAttr = this._attributesTagsWhitelist[tagName];
+    if (wAttr) v = m.match(wAttr);
+    else v = m.match(this._attributesWhitelistRegExp);
+
+    // anchor
+    if (!lowLevelCheck || /<a\b/i.test(t)) {
+        const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
+        if (sv) {
+            if (!v) v = [];
+            v.push(sv[0]);
+        }
+    }
+
+    // span
+    if ((!lowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
+        const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
+        if (sv) {
+            if (!v) v = [];
+            v.push(sv[0]);
+        }
+    }
+
+    // img
+    if (/<img/i.test(t)) {
+        let w = '',
+            h = '';
+        const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
+        if (!v) v = [];
+        if (sv) {
+            w = sv[0].match(/width:(.+);/);
+            w = numbers.get(w ? w[1] : '', -1) || '';
+            h = sv[0].match(/height:(.+);/);
+            h = numbers.get(h ? h[1] : '', -1) || '';
+        }
+
+        if (!w || !h) {
+            const avw = m.match(/width\s*=\s*((?:"|')[^"']*(?:"|'))/);
+            const avh = m.match(/height\s*=\s*((?:"|')[^"']*(?:"|'))/);
+            if (avw || avh) {
+                w = !w ? numbers.get(avw ? avw[1] : '') || '' : w;
+                h = !h ? numbers.get(avh ? avh[1] : '') || '' : h;
+            }
+        }
+        v.push('data-origin="' + (w + ',' + h) + '"');
+    }
+
+    if (v) {
+        for (let i = 0, len = v.length; i < len; i++) {
+            if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
+            t += ' ' + (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i]) ? '' : v[i]);
+        }
+    }
+
+    return t;
+}
+
+/**
  * @description SunEditor constructor function.
  * @param {Object} context
  * @param {Object} pluginCallButtons
@@ -37,56 +125,66 @@ import ClassesInterface from "../interface/_classes";
  * @param {Object} _responsiveButtons
  * @returns {Object} functions Object
  */
-function Core(context, pluginCallButtons, plugins, lang, options, _responsiveButtons) {
-    const _d = this._d = context.element.originElement.ownerDocument || global._d;
-    const _w = this._w = _d.defaultView || global._w;
+const Core = function (context, pluginCallButtons, plugins, lang, options, _responsiveButtons) {
+    const _d = context.element.originElement.ownerDocument || global._d;
+    const _w = _d.defaultView || global._w;
 
-    this._responsiveButtons = _responsiveButtons;
-    this._parser = new _w.DOMParser();
-    this._prevRtl = options.rtl;
-    this._editorHeight = 0;
+    /**
+     * @description Document object
+     * @type {Document}
+     */
+    this._d = _d;
+
+    /**
+     * @description Window object
+     * @type {Window}
+     */
+    this._w = _w;
 
     /**
      * @description Document object of the iframe if created as an iframe || _d
-     * @private
+     * @type {Document}
      */
     this._wd = null;
 
     /**
      * @description Window object of the iframe if created as an iframe || _w
-     * @private
+     * @type {Window}
      */
     this._ww = null;
 
     /**
      * @description Closest ShadowRoot to editor if found
-     * @private
+     * @type {ShadowRoot}
      */
-    this._shadowRoot = null;
-
-    /**
-     * @description Block controller mousedown events in "shadowRoot" environment
-     * @private
-     */
-    this._shadowRootControllerEventTarget = null;
+    this.shadowRoot = null;
 
     /**
      * @description Editor options
+     * @type {Object.<string, any>}
      */
     this.options = options;
 
     /**
      * @description Loaded plugins
+     * @type {Object.<string, any>}
      */
     this.plugins = plugins || {};
 
     /**
+     * @description Elements and user options parameters of the suneditor
+     */
+    this.context = context;
+
+    /**
      * @description Default icons object
+     * @type {Object.<string, string>}
      */
     this.icons = options.icons;
 
     /**
      * @description loaded language
+     * @type {Object.<string, any>}
      */
     this.lang = lang;
 
@@ -96,12 +194,7 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this.history = null;
 
     /**
-     * @description Elements and user options parameters of the suneditor
-     */
-    this.context = context;
-
-    /**
-     * @description Helper object
+     * @description Helper util
      */
     this.helper = Helper;
 
@@ -111,56 +204,14 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this.wwComputedStyle = null;
 
     /**
-     * @description Plugin buttons
-     */
-    this.pluginCallButtons = pluginCallButtons;
-
-    /**
      * @description Whether the plugin is initialized
      */
     this.initPlugins = {};
 
     /**
-     * @description Save rendered dropdown and containers
-     * @private
-     */
-    this._menuTray = {};
-
-    /**
      * @description The selection node (selection.getNode()) to which the effect was last applied
      */
     this.effectNode = null;
-
-    /**
-     * @description container element
-     */
-    this.container = null;
-
-    /**
-     * @description binded containerOff method
-     * @private
-     */
-    this._bindedContainerOff = null;
-
-    /**
-     * @description active button element in container
-     */
-    this.containerActiveButton = null;
-
-    /**
-     * @description The elements array to be processed unvisible when the controllerOff function is executed (resizing, link modified button, table controller)
-     */
-    this.controllerArray = [];
-
-    /**
-     * @description The name of the plugin that called the currently active controller
-     */
-    this.currentControllerName = "";
-
-    /**
-     * @description The target element of current controller
-     */
-    this.currentControllerTarget = null;
 
     /**
      * @description The file component object of current selected file tag (component.get)
@@ -178,10 +229,16 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
     this.resizingDisabledButtons = [];
 
     /**
-     * @description active more layer element in dropdown
+     * @description Plugin buttons
      * @private
      */
-    this._moreLayerActiveButton = null;
+    this._pluginCallButtons = pluginCallButtons;
+
+    /**
+     * @description Block controller mousedown events in "shadowRoot" environment
+     * @private
+     */
+    this._shadowRootControllerEventTarget = null;
 
     /**
      * @description Tag whitelist RegExp object used in "_consistencyCheckOfHTML" method
@@ -225,6 +282,11 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
      * @private
      */
     this._disallowedTextTagsRegExp = null;
+
+    this._responsiveButtons = _responsiveButtons;
+    this._parser = new _w.DOMParser();
+    this._prevRtl = options.rtl;
+    this._editorHeight = 0;
 
     /**
      * @description Is inline mode?
@@ -494,51 +556,16 @@ function Core(context, pluginCallButtons, plugins, lang, options, _responsiveBut
 
 Core.prototype = {
     /**
-     * @description Save the current buttons states to "allCommandButtons" object
-     */
-    saveButtonStates: function () {
-        if (!this.allCommandButtons) this.allCommandButtons = {};
-
-        const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]');
-        for (let i = 0, element, command; i < currentButtons.length; i++) {
-            element = currentButtons[i];
-            command = element.getAttribute('data-command');
-
-            this.allCommandButtons[command] = element;
-        }
-    },
-
-    /**
-     * @description Recover the current buttons states from "allCommandButtons" object
-     */
-    recoverButtonStates: function () {
-        if (this.allCommandButtons) {
-            const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]');
-            for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
-                button = currentButtons[i];
-                command = button.getAttribute('data-command');
-
-                oldButton = this.allCommandButtons[command];
-                if (oldButton) {
-                    button.parentElement.replaceChild(oldButton, button);
-                    if (this.context.tool[command]) this.context.tool[command] = oldButton;
-                }
-            }
-        }
-    },
-
-    /**
      * @description If the plugin is not added, add the plugin and call the 'add' function.
      * If the plugin is added call callBack function.
      * @param {string} pluginName The name of the plugin to call
-     * @param {function} callBackFunction Function to be executed immediately after module call
      * @param {Element|null} target Plugin target button (This is not necessary if you have a button list when creating the editor)
      */
-    callPlugin: function (pluginName, callBackFunction, target) {
-        target = target || this.pluginCallButtons[pluginName];
+    registerPlugin: function (pluginName, target) {
+        target = target || this._pluginCallButtons[pluginName];
 
         if (!this.plugins[pluginName]) {
-            throw Error('[SUNEDITOR.core.callPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
+            throw Error('[SUNEDITOR.core.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
         } else if (!this.initPlugins[pluginName]) {
             this.plugins[pluginName] = new this.plugins[pluginName](this, target);
             this.initPlugins[pluginName] = true;
@@ -548,11 +575,10 @@ Core.prototype = {
             this.commandMap[pluginName] = target;
             this.activePlugins.push(pluginName);
         }
-
-        if (typeof callBackFunction === "function") callBackFunction();
     },
 
     /**
+     * @todo
      * @description If the module is not added, add the module and call the "add" function
      * @param {Array} moduleArray module object's Array [dialog, resizing]
      */
@@ -677,40 +703,32 @@ Core.prototype = {
      * @param {string} display Display type string ('command', 'dropdown', 'dialog', 'container')
      * @param {Element} target The element of command button
      */
-    actionCall: function (command, display, target) {
-        // call plugins
+    runPlugin: function (command, display, target) {
         if (display) {
             if (/more/i.test(display)) {
-                if (target !== this._moreLayerActiveButton) {
+                if (target !== this.menu.currentMoreLayerActiveButton) {
                     const layer = this.context.element.toolbar.querySelector('.' + command);
                     if (layer) {
-                        if (this._moreLayerActiveButton) this.moreLayerOff();
-
-                        this._moreLayerActiveButton = target;
-                        layer.style.display = 'block';
-
+                        this.menu._moreLayerOn(target, layer);
                         this.toolbar._showBalloon();
                         this.toolbar._showInline();
                     }
                     domUtils.addClass(target, 'on');
-                } else {
-                    const layer = this.context.element.toolbar.querySelector('.' + this._moreLayerActiveButton.getAttribute('data-command'));
-                    if (layer) {
-                        this.moreLayerOff();
-                        this.toolbar._showBalloon();
-                        this.toolbar._showInline();
-                    }
+                } else if (this.menu.currentMoreLayerActiveButton) {
+                    this.menu._moreLayerOff();
+                    this.toolbar._showBalloon();
+                    this.toolbar._showInline();
                 }
                 return;
             }
 
-            if (/container/.test(display) && (this.menu._menuTrayMap[command] === null || target !== this.containerActiveButton)) {
+            if (/container/.test(display) && (this.menu._menuTrayMap[command] === null || target !== this.menu.currentContainerActiveButton)) {
                 this.containerOn(target);
                 return;
             }
 
             if (this.isReadOnly && domUtils.arrayIncludes(this.resizingDisabledButtons, target)) return;
-            if (/dropdown/.test(display) && (this.menu._menuTrayMap[command] === null || target !== this.menu.dropdownActiveButton)) {
+            if (/dropdown/.test(display) && (this.menu._menuTrayMap[command] === null || target !== this.menu.currentDropdownActiveButton)) {
                 this.dropdownOn(target);
                 return;
             } else if (/dialog/.test(display)) {
@@ -721,8 +739,7 @@ Core.prototype = {
             } else if (/fileBrowser/.test(display)) {
                 this.plugins[command].open(null);
             }
-        } // default command
-        else if (command) {
+        } else if (command) {
             this.commandHandler(command, target);
         }
 
@@ -793,7 +810,7 @@ Core.prototype = {
                 this.history.redo();
                 break;
             case 'removeFormat':
-                this.format.removeStyleNode();
+                this.format.removeTextStyle();
                 this.focus();
                 break;
             case 'print':
@@ -803,7 +820,7 @@ Core.prototype = {
                 this.preview();
                 break;
             case 'showBlocks':
-                this.setDisplayBlocks(!domUtils.hasClass(this.context.element.wysiwyg, 'se-show-block'));
+                this.showBlocks(!domUtils.hasClass(this.context.element.wysiwyg, 'se-show-block'));
                 break;
             case 'dir':
                 this.setDir(options.rtl ? 'ltr' : 'rtl');
@@ -816,7 +833,7 @@ Core.prototype = {
                 break;
             case 'save':
                 if (typeof this.options.callBackSave === 'function') {
-                    this.options.callBackSave(this.getContents(false), this.status.isChanged);
+                    this.options.callBackSave(this.getContent(false), this.status.isChanged);
                 } else if (this.status.isChanged && typeof this.events.save === 'function') {
                     this.events.save();
                 } else {
@@ -840,7 +857,7 @@ Core.prototype = {
                     removeNode = 'SUB';
                 }
 
-                this.format.applyStyleNode(cmd, this._commandMapStyles[command] || null, [removeNode], false);
+                this.format.applyTextStyle(cmd, this._commandMapStyles[command] || null, [removeNode], false);
                 this.focus();
         }
     },
@@ -849,7 +866,7 @@ Core.prototype = {
      * @description Add or remove the class name of "body" so that the code block is visible
      * @param {boolean} value true/false
      */
-    setDisplayBlocks: function (value) {
+    showBlocks: function (value) {
         if (value) {
             domUtils.addClass(this.context.element.wysiwyg, 'se-show-block');
             domUtils.addClass(this._styleCommandMap.showBlocks, 'active');
@@ -957,7 +974,7 @@ Core.prototype = {
             }
 
             this._wd.head.innerHTML = headers;
-            this._wd.body.innerHTML = this.convertContentsForEditor(parseDocument.body.innerHTML);
+            this._wd.body.innerHTML = this.convertContentForEditor(parseDocument.body.innerHTML);
 
             const attrs = parseDocument.body.attributes;
             for (let i = 0, len = attrs.length; i < len; i++) {
@@ -971,7 +988,7 @@ Core.prototype = {
                 }
             }
         } else {
-            this.context.element.wysiwyg.innerHTML = code_html.length > 0 ? this.convertContentsForEditor(code_html) : '<' + this.options.defaultTag + '><br></' + this.options.defaultTag + '>';
+            this.context.element.wysiwyg.innerHTML = code_html.length > 0 ? this.convertContentForEditor(code_html) : '<' + this.options.defaultTag + '><br></' + this.options.defaultTag + '>';
         }
     },
 
@@ -980,14 +997,14 @@ Core.prototype = {
      * @private
      */
     _setEditorDataToCodeView: function () {
-        const codeContents = this.convertHTMLForCodeView(this.context.element.wysiwyg, false);
+        const codeContent = this.convertHTMLForCodeView(this.context.element.wysiwyg, false);
         let codeValue = '';
 
         if (this.options.fullPage) {
             const attrs = domUtils.getAttributesToString(this._wd.body, null);
-            codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContents + '</body>\n</html>';
+            codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContent + '</body>\n</html>';
         } else {
-            codeValue = codeContents;
+            codeValue = codeContent;
         }
 
         this.context.element.code.style.display = 'block';
@@ -1112,7 +1129,7 @@ Core.prototype = {
     },
 
     /**
-     * @description Prints the current contents of the editor.
+     * @description Prints the current content of the editor.
      */
     print: function () {
         const iframe = domUtils.createElement('IFRAME', {
@@ -1120,7 +1137,7 @@ Core.prototype = {
         });
         this._d.body.appendChild(iframe);
 
-        const contentsHTML = this.options.printTemplate ? this.options.printTemplate.replace(/\{\{\s*contents\s*\}\}/i, this.getContents(true)) : this.getContents(true);
+        const contentHTML = this.options.printTemplate ? this.options.printTemplate.replace(/\{\{\s*content\s*\}\}/i, this.getContent(true)) : this.getContent(true);
         const printDocument = domUtils.getIframeDocument(iframe);
         const wDoc = this._wd;
 
@@ -1132,7 +1149,7 @@ Core.prototype = {
                 '<head>' +
                 wDoc.head.innerHTML +
                 '</head>' +
-                '<body ' + arrts + '>' + contentsHTML + '</body>' +
+                '<body ' + arrts + '>' + contentHTML + '</body>' +
                 '</html>'
             );
         } else {
@@ -1151,7 +1168,7 @@ Core.prototype = {
                 '<head>' +
                 linkHTML +
                 '</head>' +
-                '<body class="' + (this.options._printClass !== null ? this.options._printClass : this.options._editableClass) + '">' + contentsHTML + '</body>' +
+                '<body class="' + (this.options._printClass !== null ? this.options._printClass : this.options._editableClass) + '">' + contentHTML + '</body>' +
                 '</html>'
             );
         }
@@ -1188,7 +1205,7 @@ Core.prototype = {
         this.containerOff();
         this.controllerOff();
 
-        const contentsHTML = this.options.previewTemplate ? this.options.previewTemplate.replace(/\{\{\s*contents\s*\}\}/i, this.getContents(true)) : this.getContents(true);
+        const contentHTML = this.options.previewTemplate ? this.options.previewTemplate.replace(/\{\{\s*content\s*\}\}/i, this.getContent(true)) : this.getContent(true);
         const windowObject = this._w.open('', '_blank');
         windowObject.mimeType = 'text/html';
         const wDoc = this._wd;
@@ -1202,7 +1219,7 @@ Core.prototype = {
                 wDoc.head.innerHTML +
                 '<style>body {overflow:auto !important; margin: 10px auto !important; height:auto !important; outline:1px dashed #ccc;}</style>' +
                 '</head>' +
-                '<body ' + arrts + '>' + contentsHTML + '</body>' +
+                '<body ' + arrts + '>' + contentHTML + '</body>' +
                 '</html>'
             );
         } else {
@@ -1224,7 +1241,7 @@ Core.prototype = {
                 '<title>' + this.lang.toolbar.preview + '</title>' +
                 linkHTML +
                 '</head>' +
-                '<body class="' + (this.options._printClass !== null ? this.options._printClass : this.options._editableClass) + '" style="margin:10px auto !important; height:auto !important; outline:1px dashed #ccc;">' + contentsHTML + '</body>' +
+                '<body class="' + (this.options._printClass !== null ? this.options._printClass : this.options._editableClass) + '" style="margin:10px auto !important; height:auto !important; outline:1px dashed #ccc;">' + contentHTML + '</body>' +
                 '</html>'
             );
         }
@@ -1299,10 +1316,10 @@ Core.prototype = {
      * @description Sets the HTML string
      * @param {string|undefined} html HTML string
      */
-    setContents: function (html) {
+    setContent: function (html) {
         this.removeRange();
 
-        const convertValue = (html === null || html === undefined) ? '' : this.convertContentsForEditor(html);
+        const convertValue = (html === null || html === undefined) ? '' : this.convertContentForEditor(html);
         this._resetComponents();
 
         if (!this.status.isCodeView) {
@@ -1316,21 +1333,21 @@ Core.prototype = {
     },
 
     /**
-     * @description Sets the contents of the iframe's head tag and body tag when using the "iframe" or "fullPage" option.
+     * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "fullPage" option.
      * @param {Object} ctx { head: HTML string, body: HTML string}
      */
-    setIframeContents: function (ctx) {
+    setIframeContent: function (ctx) {
         if (!this.options.iframe) return false;
         if (ctx.head) this._wd.head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
-        if (ctx.body) this._wd.body.innerHTML = this.convertContentsForEditor(ctx.body);
+        if (ctx.body) this._wd.body.innerHTML = this.convertContentForEditor(ctx.body);
     },
 
     /**
-     * @description Gets the current contents
-     * @param {boolean} onlyContents Return only the contents of the body without headers when the "fullPage" option is true
+     * @description Gets the current content
+     * @param {boolean} includeFullPage Return only the content of the body without headers when the "fullPage" option is true
      * @returns {Object}
      */
-    getContents: function (onlyContents) {
+    getContent: function (full, includeFullPage) {
         const renderHTML = domUtils.createElement('DIV', null, this.convertHTMLForCodeView(this.context.element.wysiwyg, true));
         const figcaptions = domUtils.getListChildren(renderHTML, function (current) {
             return /FIGCAPTION/i.test(current.nodeName);
@@ -1340,7 +1357,7 @@ Core.prototype = {
             figcaptions[i].removeAttribute('contenteditable');
         }
 
-        if (this.options.fullPage && !onlyContents) {
+        if (this.options.fullPage && !includeFullPage) {
             const attrs = domUtils.getAttributesToString(this._wd.body, ['contenteditable']);
             return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + '<body ' + attrs + '>' + renderHTML.innerHTML + '</body></html>';
         } else {
@@ -1349,16 +1366,467 @@ Core.prototype = {
     },
 
     /**
-     * @todo getContents와 병합
-     * @description Gets the current contents with containing parent div(div.sun-editor-editable).
-     * <div class="sun-editor-editable">{contents}</div>
-     * @param {Boolean} onlyContents Return only the contents of the body without headers when the "fullPage" option is true
+     * @todo getContent와 병합
+     * @description Gets the current content with containing parent div(div.sun-editor-editable).
+     * <div class="sun-editor-editable">{content}</div>
+     * @param {Boolean} onlyContent Return only the content of the body without headers when the "fullPage" option is true
      * @returns {Object}
      */
-    getFullContents: function (onlyContents) {
-        return '<div class="sun-editor-editable' + (this.options.rtl ? ' se-rtl' : '') + '">' + this.getContents(onlyContents) + '</div>';
+    getFullContent: function (onlyContent) {
+        return '<div class="sun-editor-editable' + (this.options.rtl ? ' se-rtl' : '') + '">' + this.getContent(onlyContent) + '</div>';
     },
 
+    /**
+     * @description Gets the clean HTML code for editor
+     * @param {string} html HTML string
+     * @param {string|RegExp|null} whitelist Regular expression of allowed tags.
+     * RegExp object is create by helper.converter.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
+     * @param {string|RegExp|null} blacklist Regular expression of disallowed tags.
+     * RegExp object is create by helper.converter.createTagsBlacklist method. (core.pasteTagsBlacklistRegExp)
+     * @returns {string}
+     */
+    cleanHTML: function (html, whitelist, blacklist) {
+        html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanTags.bind(this, true));
+
+        const dom = this._d.createRange().createContextualFragment(html, true);
+        try {
+            this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, true);
+        } catch (error) {
+            console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
+        }
+
+        if (this.managedTagsInfo && this.managedTagsInfo.query) {
+            const textCompList = dom.querySelectorAll(this.managedTagsInfo.query);
+            for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
+                classList = [].slice.call(textCompList[i].classList);
+                for (let c = 0, cLen = classList.length; c < cLen; c++) {
+                    initMethod = this.managedTagsInfo.map[classList[c]];
+                    if (initMethod) {
+                        initMethod(textCompList[i]);
+                        break;
+                    }
+                }
+            }
+        }
+
+        const domTree = dom.childNodes;
+        let cleanHTML = '';
+        let requireFormat = false;
+
+        for (let i = 0, len = domTree.length, t; i < len; i++) {
+            t = domTree[i];
+            if (t.nodeType === 1 && !this.format.isTextStyleNode(t) && !domUtils.isBreak(t) && !DisallowedTags(t)) {
+                requireFormat = true;
+                break;
+            }
+        }
+
+        for (let i = 0, len = domTree.length; i < len; i++) {
+            cleanHTML += this._makeLine(domTree[i], requireFormat);
+        }
+
+        cleanHTML = this.node.removeWhiteSpace(cleanHTML);
+
+        if (!cleanHTML) {
+            cleanHTML = html;
+        } else {
+            if (whitelist) cleanHTML = cleanHTML.replace(typeof whitelist === 'string' ? converter.createTagsWhitelist(whitelist) : whitelist, '');
+            if (blacklist) cleanHTML = cleanHTML.replace(typeof blacklist === 'string' ? converter.createTagsBlacklist(blacklist) : blacklist, '');
+        }
+
+        return this._tagConvertor(cleanHTML);
+    },
+
+    /**
+     * @description Converts content into a format that can be placed in an editor
+     * @param {string} content content
+     * @returns {string}
+     */
+    convertContentForEditor: function (content) {
+        content = this._deleteDisallowedTags(this._parser.parseFromString(content, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanTags.bind(this, false));
+        const dom = this._d.createRange().createContextualFragment(content, false);
+
+        try {
+            this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, false);
+        } catch (error) {
+            console.warn('[SUNEDITOR.convertContentForEditor.consistencyCheck.fail] ' + error);
+        }
+
+        if (this.managedTagsInfo && this.managedTagsInfo.query) {
+            const textCompList = dom.querySelectorAll(this.managedTagsInfo.query);
+            for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
+                classList = [].slice.call(textCompList[i].classList);
+                for (let c = 0, cLen = classList.length; c < cLen; c++) {
+                    initMethod = this.managedTagsInfo.map[classList[c]];
+                    if (initMethod) {
+                        initMethod(textCompList[i]);
+                        break;
+                    }
+                }
+            }
+        }
+
+        const domTree = dom.childNodes;
+        let cleanHTML = '',
+            p = null;
+        for (let i = 0, t; i < domTree.length; i++) {
+            t = domTree[i];
+
+            if (!this.format.isLine(t) && !this.component.is(t) && !domUtils.isMedia(t)) {
+                if (!p) p = domUtils.createElement(this.options.defaultTag);
+                p.appendChild(t);
+                i--;
+                if (domTree[i + 1] && !this.format.isLine(domTree[i + 1])) {
+                    continue;
+                } else {
+                    t = p;
+                    p = null;
+                }
+            }
+
+            if (p) {
+                cleanHTML += this._makeLine(p, true);
+                p = null;
+            }
+            cleanHTML += this._makeLine(t, true);
+        }
+        if (p) cleanHTML += this._makeLine(p, true);
+
+        if (cleanHTML.length === 0) return '<' + this.options.defaultTag + '><br></' + this.options.defaultTag + '>';
+
+        cleanHTML = this.node.removeWhiteSpace(cleanHTML);
+        return this._tagConvertor(cleanHTML);
+    },
+
+    /**
+     * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
+     * @param {Element|String} html WYSIWYG element (context.element.wysiwyg) or HTML string.
+     * @param {Boolean} comp If true, does not line break and indentation of tags.
+     * @returns {string}
+     */
+    convertHTMLForCodeView: function (html, comp) {
+        let returnHTML = "";
+        const wRegExp = this._w.RegExp;
+        const brReg = new wRegExp("^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$", "i");
+        const wDoc = typeof html === "string" ? this._d.createRange().createContextualFragment(html) : html;
+        const isFormat = function (current) {
+            return this.format.isLine(current) || this.component.is(current);
+        }.bind(this);
+        const brChar = comp ? "" : "\n";
+
+        let indentSize = comp ? 0 : this.status.codeIndent * 1;
+        indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(" ") : "";
+
+        (function recursionFunc(element, indent) {
+            const children = element.childNodes;
+            const elementRegTest = brReg.test(element.nodeName);
+            const elementIndent = (elementRegTest ? indent : "");
+
+            for (let i = 0, len = children.length, node, br, lineBR, nodeRegTest, tag, tagIndent; i < len; i++) {
+                node = children[i];
+                nodeRegTest = brReg.test(node.nodeName);
+                br = nodeRegTest ? brChar : '';
+                lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? brChar : "";
+
+                if (node.nodeType === 8) {
+                    returnHTML += "\n<!-- " + node.textContent.trim() + " -->" + br;
+                    continue;
+                }
+                if (node.nodeType === 3) {
+                    if (!domUtils.isList(node.parentElement)) returnHTML += converter.htmlToEntity(/^\n+$/.test(node.data) ? "" : node.data);
+                    continue;
+                }
+                if (node.childNodes.length === 0) {
+                    returnHTML += (/^HR$/i.test(node.nodeName) ? brChar : "") + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? "" : elementIndent) + node.outerHTML + br;
+                    continue;
+                }
+
+                if (!node.outerHTML) { // IE
+                    returnHTML += new _w.XMLSerializer().serializeToString(node);
+                } else {
+                    tag = node.nodeName.toLowerCase();
+                    tagIndent = elementIndent || nodeRegTest ? indent : "";
+                    returnHTML += (lineBR || (elementRegTest ? "" : br)) + tagIndent + node.outerHTML.match(wRegExp("<" + tag + "[^>]*>", "i"))[0] + br;
+                    recursionFunc(node, indent + indentSize, "");
+                    returnHTML += (/\n$/.test(returnHTML) ? tagIndent : "") + "</" + tag + ">" + (lineBR || br || elementRegTest ? brChar : "" || /^(TH|TD)$/i.test(node.nodeName) ? brChar : "");
+                }
+            }
+        }(wDoc, ""));
+
+        return returnHTML.trim() + brChar;
+    },
+
+    /**
+     * @description Add or reset option property (Editor is reloaded)
+     * @param {Object} _options Options
+     */
+    setOptions: function (_options) {
+        this.eventManager._removeAllEvents();
+        this._resetComponents();
+
+        domUtils.removeClass(this._styleCommandMap.showBlocks, 'active');
+        domUtils.removeClass(this._styleCommandMap.codeView, 'active');
+        this.status.isCodeView = false;
+        this._iframeAuto = null;
+
+        this.plugins = _options.plugins || this.plugins; //@todo plugins don't reset
+        const mergeOptions = [this.options, _options].reduce(function (init, option) {
+            for (let key in option) {
+                if (!option.hasOwnProperty(key)) continue;
+                if (key === 'plugins' && option[key] && init[key]) {
+                    let i = init[key],
+                        o = option[key];
+                    i = i.length ? i : this._w.Object.keys(i).map(function (name) {
+                        return i[name];
+                    });
+                    o = o.length ? o : this._w.Object.keys(o).map(function (name) {
+                        return o[name];
+                    });
+                    init[key] = (o.filter(function (val) {
+                        return i.indexOf(val) === -1;
+                    })).concat(i);
+                } else {
+                    init[key] = option[key];
+                }
+            }
+            return init;
+        }, {});
+
+        const el = this.context.element;
+        const _initHTML = el.wysiwyg.innerHTML;
+
+        // set option
+        const cons = Constructor._setOptions(mergeOptions, this.context, this.options);
+
+        if (cons.callButtons) {
+            this._pluginCallButtons = cons.callButtons;
+            this.initPlugins = {};
+        }
+
+        if (cons.plugins) {
+            this.plugins = cons.plugins;
+        }
+
+        // reset context
+        if (el._menuTray.children.length === 0) this.menu._menuTrayMap = {};
+        this.toolbar._responsiveButtons = cons.toolbar.responsiveButtons;
+        this.options = mergeOptions; //@todo option, lang.. dont't reset
+        this.lang = this.options.lang;
+
+        if (this.options.iframe) {
+            el.wysiwygFrame.addEventListener('load', function () {
+                converter._setIframeDocument(this, this.options);
+                this._setOptionsInit(el, _initHTML);
+            });
+        }
+
+        el.editorArea.appendChild(el.wysiwygFrame);
+
+        if (!this.options.iframe) {
+            this._setOptionsInit(el, _initHTML);
+        }
+    },
+
+    /**
+     * @description Set "options.defaultStyle" style.
+     * Define the style of the edit area
+     * It can also be defined with the "setOptions" method, but the "setDefaultStyle" method does not render the editor again.
+     * @param {string} style Style string
+     */
+    setDefaultStyle: function (style) {
+        const newStyles = this.options._editorStyles = converter._setDefaultOptionStyle(this.options, style);
+        const el = this.context.element;
+
+        // top area
+        el.topArea.style.cssText = newStyles.top;
+        // code view
+        el.code.style.cssText = this.options._editorStyles.frame;
+        el.code.style.display = 'none';
+        if (this.options.height === 'auto') {
+            el.code.style.overflow = 'hidden';
+        } else {
+            el.code.style.overflow = '';
+        }
+        // wysiwyg frame
+        if (!this.options.iframe) {
+            el.wysiwygFrame.style.cssText = newStyles.frame + newStyles.editor;
+        } else {
+            el.wysiwygFrame.style.cssText = newStyles.frame;
+            el.wysiwyg.style.cssText = newStyles.editor;
+        }
+    },
+
+    /**
+     * @description Copying the content of the editor to the original textarea and execute onSave callback.
+     */
+    save: function () {
+        this.context.element.originElement.value = this.getContent(false);
+        // user event
+        if (typeof this.events.onSave === 'function') {
+            this.events.onSave(content, core);
+            return;
+        }
+    },
+
+    /**
+     * @description Gets only the text of the suneditor content
+     * @returns {string}
+     */
+    getText: function () {
+        return this.context.element.wysiwyg.textContent;
+    },
+
+    /**
+     * @description Gets uploaded files(plugin using fileManager) information list.
+     * image: [img], video: [video, iframe], audio: [audio]
+     * - index: data index
+     * - name: file name
+     * - size: file size
+     * - select: select function
+     * - delete: delete function
+     * - element: target element
+     * - src: src attribute of tag
+     * @param {string} pluginName Plugin name (image, video, audio)
+     * @returns {Array}
+     */
+    getFilesInfo: function (pluginName) {
+        return this.context[pluginName] ? this.context[pluginName]._infoList : [];
+    },
+
+    /**
+     * @description Add content to the suneditor
+     * @param {string} content Content to Input
+     */
+    appendContent: function (content) {
+        const convertValue = this.convertContentForEditor(content);
+
+        if (!this.status.isCodeView) {
+            const temp = domUtils.createElement('DIV', null, convertValue);
+            const wysiwyg = this.context.element.wysiwyg;
+            const children = temp.children;
+            for (let i = 0, len = children.length; i < len; i++) {
+                if (children[i]) {
+                    wysiwyg.appendChild(children[i]);
+                }
+            }
+        } else {
+            this._setCodeView(this._getCodeView() + '\n' + this.convertHTMLForCodeView(convertValue, false));
+        }
+
+        // history stack
+        this.history.push(false);
+    },
+
+    /**
+     * @description Switch to or off "ReadOnly" mode.
+     * @param {boolean} value "readOnly" boolean value.
+     */
+    readOnly: function (value) {
+        this.status.isReadOnly = value;
+        domUtils.setDisabled(!!value, this.resizingDisabledButtons);
+
+        if (value) {
+            /** off menus */
+            this.controllerOff();
+            if (this.menu.currentDropdownActiveButton && this.menu.currentDropdownActiveButton.disabled) this.dropdownOff();
+            if (this.menu.currentMoreLayerActiveButton && this.menu.currentMoreLayerActiveButton.disabled) this.moreLayerOff();
+            if (this.menu.currentContainerActiveButton && this.menu.currentContainerActiveButton.disabled) this.containerOff();
+            if (this.modalForm) this.plugins.dialog.close.call(this);
+
+            this.context.element.code.setAttribute("readOnly", "true");
+            domUtils.addClass(this.context.element.wysiwygFrame, 'se-read-only');
+        } else {
+            this.context.element.code.removeAttribute("readOnly");
+            domUtils.removeClass(this.context.element.wysiwygFrame, 'se-read-only');
+        }
+
+        if (this.options.codeMirrorEditor) this.options.codeMirrorEditor.setOption('readOnly', !!value);
+    },
+
+    /**
+     * @description Disable the suneditor
+     */
+    disable: function () {
+        this.toolbar.disable();
+        this.controllerOff();
+        if (this.modalForm) this.plugins.dialog.close.call(this);
+
+        this.context.element.wysiwyg.setAttribute('contenteditable', false);
+        this.isDisabled = true;
+
+        if (this.options.codeMirrorEditor) {
+            this.options.codeMirrorEditor.setOption('readOnly', true);
+        } else {
+            this.context.element.code.setAttribute('disabled', 'disabled');
+        }
+    },
+
+    /**
+     * @description Enable the suneditor
+     */
+    enable: function () {
+        this.toolbar.enable();
+        this.context.element.wysiwyg.setAttribute('contenteditable', true);
+        this.isDisabled = false;
+
+        if (this.options.codeMirrorEditor) {
+            this.options.codeMirrorEditor.setOption('readOnly', false);
+        } else {
+            this.context.element.code.removeAttribute('disabled');
+        }
+    },
+
+    /**
+     * @description Show the suneditor
+     */
+    show: function () {
+        const topAreaStyle = this.context.element.topArea.style;
+        if (topAreaStyle.display === 'none') topAreaStyle.display = this.options.display;
+    },
+
+    /**
+     * @description Hide the suneditor
+     */
+    hide: function () {
+        this.context.element.topArea.style.display = 'none';
+    },
+
+    /**
+     * @description Destroy the suneditor
+     */
+    destroy: function () {
+        /** off menus */
+        this.dropdownOff();
+        this.containerOff();
+        this.controllerOff();
+        if (this.notice) this.notice.close();
+        if (this.modalForm) this.plugins.dialog.close();
+
+        /** remove history */
+        this.history._destroy();
+
+        /** remove event listeners */
+        this.eventManager._removeAllEvents();
+
+        /** remove element */
+        domUtils.remove(this.context.element.toolbar);
+        domUtils.remove(this.context.element.topArea);
+
+        /** remove object reference */
+        for (let k in this.context) {
+            if (this.context.hasOwnProperty(k)) delete this.context[k];
+        }
+        for (let k in this._pluginCallButtons) {
+            if (this._pluginCallButtons.hasOwnProperty(k)) delete this._pluginCallButtons[k];
+        }
+
+        /** remove user object */
+        for (let k in this) {
+            if (this.hasOwnProperty(k)) delete this[k];
+        }
+    },
+
+    // ----- private methods -----
     /**
      * @description Returns HTML string according to tag type and configuration.
      * Use only "cleanHTML"
@@ -1549,456 +2017,6 @@ Core.prototype = {
     },
 
     /**
-     * @description Gets the clean HTML code for editor
-     * @param {string} html HTML string
-     * @param {string|RegExp|null} whitelist Regular expression of allowed tags.
-     * RegExp object is create by helper.converter.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
-     * @param {string|RegExp|null} blacklist Regular expression of disallowed tags.
-     * RegExp object is create by helper.converter.createTagsBlacklist method. (core.pasteTagsBlacklistRegExp)
-     * @returns {string}
-     */
-    cleanHTML: function (html, whitelist, blacklist) {
-        html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanTags.bind(this, true));
-
-        const dom = this._d.createRange().createContextualFragment(html, true);
-        try {
-            this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, true);
-        } catch (error) {
-            console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
-        }
-
-        if (this.managedTagsInfo && this.managedTagsInfo.query) {
-            const textCompList = dom.querySelectorAll(this.managedTagsInfo.query);
-            for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
-                classList = [].slice.call(textCompList[i].classList);
-                for (let c = 0, cLen = classList.length; c < cLen; c++) {
-                    initMethod = this.managedTagsInfo.map[classList[c]];
-                    if (initMethod) {
-                        initMethod(textCompList[i]);
-                        break;
-                    }
-                }
-            }
-        }
-
-        const domTree = dom.childNodes;
-        let cleanHTML = '';
-        let requireFormat = false;
-
-        for (let i = 0, len = domTree.length, t; i < len; i++) {
-            t = domTree[i];
-            if (t.nodeType === 1 && !this.format.isTextStyleNode(t) && !domUtils.isBreak(t) && !DisallowedTags(t)) {
-                requireFormat = true;
-                break;
-            }
-        }
-
-        for (let i = 0, len = domTree.length; i < len; i++) {
-            cleanHTML += this._makeLine(domTree[i], requireFormat);
-        }
-
-        cleanHTML = this.node.removeWhiteSpace(cleanHTML);
-
-        if (!cleanHTML) {
-            cleanHTML = html;
-        } else {
-            if (whitelist) cleanHTML = cleanHTML.replace(typeof whitelist === 'string' ? converter.createTagsWhitelist(whitelist) : whitelist, '');
-            if (blacklist) cleanHTML = cleanHTML.replace(typeof blacklist === 'string' ? converter.createTagsBlacklist(blacklist) : blacklist, '');
-        }
-
-        return this._tagConvertor(cleanHTML);
-    },
-
-    /**
-     * @description Converts contents into a format that can be placed in an editor
-     * @param {string} contents contents
-     * @returns {string}
-     */
-    convertContentsForEditor: function (contents) {
-        contents = this._deleteDisallowedTags(this._parser.parseFromString(contents, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanTags.bind(this, false));
-        const dom = this._d.createRange().createContextualFragment(contents, false);
-
-        try {
-            this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, false);
-        } catch (error) {
-            console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
-        }
-
-        if (this.managedTagsInfo && this.managedTagsInfo.query) {
-            const textCompList = dom.querySelectorAll(this.managedTagsInfo.query);
-            for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
-                classList = [].slice.call(textCompList[i].classList);
-                for (let c = 0, cLen = classList.length; c < cLen; c++) {
-                    initMethod = this.managedTagsInfo.map[classList[c]];
-                    if (initMethod) {
-                        initMethod(textCompList[i]);
-                        break;
-                    }
-                }
-            }
-        }
-
-        const domTree = dom.childNodes;
-        let cleanHTML = '',
-            p = null;
-        for (let i = 0, t; i < domTree.length; i++) {
-            t = domTree[i];
-
-            if (!this.format.isLine(t) && !this.component.is(t) && !domUtils.isMedia(t)) {
-                if (!p) p = domUtils.createElement(this.options.defaultTag);
-                p.appendChild(t);
-                i--;
-                if (domTree[i + 1] && !this.format.isLine(domTree[i + 1])) {
-                    continue;
-                } else {
-                    t = p;
-                    p = null;
-                }
-            }
-
-            if (p) {
-                cleanHTML += this._makeLine(p, true);
-                p = null;
-            }
-            cleanHTML += this._makeLine(t, true);
-        }
-        if (p) cleanHTML += this._makeLine(p, true);
-
-        if (cleanHTML.length === 0) return '<' + this.options.defaultTag + '><br></' + this.options.defaultTag + '>';
-
-        cleanHTML = this.node.removeWhiteSpace(cleanHTML);
-        return this._tagConvertor(cleanHTML);
-    },
-
-    /**
-     * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
-     * @param {Element|String} html WYSIWYG element (context.element.wysiwyg) or HTML string.
-     * @param {Boolean} comp If true, does not line break and indentation of tags.
-     * @returns {string}
-     */
-    convertHTMLForCodeView: function (html, comp) {
-        let returnHTML = "";
-        const wRegExp = this._w.RegExp;
-        const brReg = new wRegExp("^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$", "i");
-        const wDoc = typeof html === "string" ? this._d.createRange().createContextualFragment(html) : html;
-        const isFormat = function (current) {
-            return this.format.isLine(current) || this.component.is(current);
-        }.bind(this);
-        const brChar = comp ? "" : "\n";
-
-        let indentSize = comp ? 0 : this.status.codeIndent * 1;
-        indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(" ") : "";
-
-        (function recursionFunc(element, indent) {
-            const children = element.childNodes;
-            const elementRegTest = brReg.test(element.nodeName);
-            const elementIndent = (elementRegTest ? indent : "");
-
-            for (let i = 0, len = children.length, node, br, lineBR, nodeRegTest, tag, tagIndent; i < len; i++) {
-                node = children[i];
-                nodeRegTest = brReg.test(node.nodeName);
-                br = nodeRegTest ? brChar : '';
-                lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? brChar : "";
-
-                if (node.nodeType === 8) {
-                    returnHTML += "\n<!-- " + node.textContent.trim() + " -->" + br;
-                    continue;
-                }
-                if (node.nodeType === 3) {
-                    if (!domUtils.isList(node.parentElement)) returnHTML += converter.htmlToEntity(/^\n+$/.test(node.data) ? "" : node.data);
-                    continue;
-                }
-                if (node.childNodes.length === 0) {
-                    returnHTML += (/^HR$/i.test(node.nodeName) ? brChar : "") + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? "" : elementIndent) + node.outerHTML + br;
-                    continue;
-                }
-
-                if (!node.outerHTML) { // IE
-                    returnHTML += new _w.XMLSerializer().serializeToString(node);
-                } else {
-                    tag = node.nodeName.toLowerCase();
-                    tagIndent = elementIndent || nodeRegTest ? indent : "";
-                    returnHTML += (lineBR || (elementRegTest ? "" : br)) + tagIndent + node.outerHTML.match(wRegExp("<" + tag + "[^>]*>", "i"))[0] + br;
-                    recursionFunc(node, indent + indentSize, "");
-                    returnHTML += (/\n$/.test(returnHTML) ? tagIndent : "") + "</" + tag + ">" + (lineBR || br || elementRegTest ? brChar : "" || /^(TH|TD)$/i.test(node.nodeName) ? brChar : "");
-                }
-            }
-        }(wDoc, ""));
-
-        return returnHTML.trim() + brChar;
-    },
-
-    /**
-     * @description Add or reset option property (Editor is reloaded)
-     * @param {Object} _options Options
-     */
-    setOptions: function (_options) {
-        this.eventManager._removeAllEvents();
-        this._resetComponents();
-
-        domUtils.removeClass(this._styleCommandMap.showBlocks, 'active');
-        domUtils.removeClass(this._styleCommandMap.codeView, 'active');
-        this.status.isCodeView = false;
-        this._iframeAuto = null;
-
-        this.plugins = _options.plugins || this.plugins; //@todo plugins don't reset
-        const mergeOptions = [this.options, _options].reduce(function (init, option) {
-            for (let key in option) {
-                if (!option.hasOwnProperty(key)) continue;
-                if (key === 'plugins' && option[key] && init[key]) {
-                    let i = init[key],
-                        o = option[key];
-                    i = i.length ? i : this._w.Object.keys(i).map(function (name) {
-                        return i[name];
-                    });
-                    o = o.length ? o : this._w.Object.keys(o).map(function (name) {
-                        return o[name];
-                    });
-                    init[key] = (o.filter(function (val) {
-                        return i.indexOf(val) === -1;
-                    })).concat(i);
-                } else {
-                    init[key] = option[key];
-                }
-            }
-            return init;
-        }, {});
-
-        const el = this.context.element;
-        const _initHTML = el.wysiwyg.innerHTML;
-
-        // set option
-        const cons = Constructor._setOptions(mergeOptions, this.context, this.options);
-
-        if (cons.callButtons) {
-            this.pluginCallButtons = cons.callButtons;
-            this.initPlugins = {};
-        }
-
-        if (cons.plugins) {
-            this.plugins = cons.plugins;
-        }
-
-        // reset context
-        if (el._menuTray.children.length === 0) this.menu._menuTrayMap = {};
-        this.toolbar._responsiveButtons = cons.toolbar.responsiveButtons;
-        this.options = mergeOptions; //@todo option, lang.. dont't reset
-        this.lang = this.options.lang;
-
-        if (this.options.iframe) {
-            el.wysiwygFrame.addEventListener('load', function () {
-                converter._setIframeDocument(this, this.options);
-                this._setOptionsInit(el, _initHTML);
-            });
-        }
-
-        el.editorArea.appendChild(el.wysiwygFrame);
-
-        if (!this.options.iframe) {
-            this._setOptionsInit(el, _initHTML);
-        }
-    },
-
-    /**
-     * @description Set "options.defaultStyle" style.
-     * Define the style of the edit area
-     * It can also be defined with the "setOptions" method, but the "setDefaultStyle" method does not render the editor again.
-     * @param {string} style Style string
-     */
-    setDefaultStyle: function (style) {
-        const newStyles = this.options._editorStyles = converter._setDefaultOptionStyle(this.options, style);
-        const el = this.context.element;
-
-        // top area
-        el.topArea.style.cssText = newStyles.top;
-        // code view
-        el.code.style.cssText = this.options._editorStyles.frame;
-        el.code.style.display = 'none';
-        if (this.options.height === 'auto') {
-            el.code.style.overflow = 'hidden';
-        } else {
-            el.code.style.overflow = '';
-        }
-        // wysiwyg frame
-        if (!this.options.iframe) {
-            el.wysiwygFrame.style.cssText = newStyles.frame + newStyles.editor;
-        } else {
-            el.wysiwygFrame.style.cssText = newStyles.frame;
-            el.wysiwyg.style.cssText = newStyles.editor;
-        }
-    },
-
-    /**
-     * @description Copying the contents of the editor to the original textarea and execute onSave callback.
-     */
-    save: function () {
-        this.context.element.originElement.value = this.getContents(false);
-        // user event
-        if (typeof this.events.onSave === 'function') {
-            this.events.onSave(content, core);
-            return;
-        }
-    },
-
-    /**
-     * @description Gets only the text of the suneditor contents
-     * @returns {string}
-     */
-    getText: function () {
-        return this.context.element.wysiwyg.textContent;
-    },
-
-    /**
-     * @description Gets uploaded files(plugin using fileManager) information list.
-     * image: [img], video: [video, iframe], audio: [audio]
-     * - index: data index
-     * - name: file name
-     * - size: file size
-     * - select: select function
-     * - delete: delete function
-     * - element: target element
-     * - src: src attribute of tag
-     * @param {string} pluginName Plugin name (image, video, audio)
-     * @returns {Array}
-     */
-    getFilesInfo: function (pluginName) {
-        return this.context[pluginName] ? this.context[pluginName]._infoList : [];
-    },
-
-    /**
-     * @description Add contents to the suneditor
-     * @param {string} contents Contents to Input
-     */
-    appendContents: function (contents) {
-        const convertValue = this.convertContentsForEditor(contents);
-
-        if (!this.status.isCodeView) {
-            const temp = domUtils.createElement('DIV', null, convertValue);
-            const wysiwyg = this.context.element.wysiwyg;
-            const children = temp.children;
-            for (let i = 0, len = children.length; i < len; i++) {
-                if (children[i]) {
-                    wysiwyg.appendChild(children[i]);         
-                }
-            }
-        } else {
-            this._setCodeView(this._getCodeView() + '\n' + this.convertHTMLForCodeView(convertValue, false));
-        }
-
-        // history stack
-        this.history.push(false);
-    },
-
-    /**
-     * @description Switch to or off "ReadOnly" mode.
-     * @param {boolean} value "readOnly" boolean value.
-     */
-    readOnly: function (value) {
-        this.status.isReadOnly = value;
-        domUtils.setDisabled(!!value, this.resizingDisabledButtons);
-
-        if (value) {
-            /** off menus */
-            this.controllerOff();
-            if (this.menu.dropdownActiveButton && this.menu.dropdownActiveButton.disabled) this.dropdownOff();
-            if (this._moreLayerActiveButton && this._moreLayerActiveButton.disabled) this.moreLayerOff();
-            if (this.containerActiveButton && this.containerActiveButton.disabled) this.containerOff();
-            if (this.modalForm) this.plugins.dialog.close.call(this);
-
-            this.context.element.code.setAttribute("readOnly", "true");
-            domUtils.addClass(this.context.element.wysiwygFrame, 'se-read-only');
-        } else {
-            this.context.element.code.removeAttribute("readOnly");
-            domUtils.removeClass(this.context.element.wysiwygFrame, 'se-read-only');
-        }
-
-        if (this.options.codeMirrorEditor) this.options.codeMirrorEditor.setOption('readOnly', !!value);
-    },
-
-    /**
-     * @description Disable the suneditor
-     */
-    disable: function () {
-        this.toolbar.disable();
-        this.controllerOff();
-        if (this.modalForm) this.plugins.dialog.close.call(this);
-
-        this.context.element.wysiwyg.setAttribute('contenteditable', false);
-        this.isDisabled = true;
-
-        if (this.options.codeMirrorEditor) {
-            this.options.codeMirrorEditor.setOption('readOnly', true);
-        } else {
-            this.context.element.code.setAttribute('disabled', 'disabled');
-        }
-    },
-
-    /**
-     * @description Enable the suneditor
-     */
-    enable: function () {
-        this.toolbar.enable();
-        this.context.element.wysiwyg.setAttribute('contenteditable', true);
-        this.isDisabled = false;
-
-        if (this.options.codeMirrorEditor) {
-            this.options.codeMirrorEditor.setOption('readOnly', false);
-        } else {
-            this.context.element.code.removeAttribute('disabled');
-        }
-    },
-
-    /**
-     * @description Show the suneditor
-     */
-    show: function () {
-        const topAreaStyle = this.context.element.topArea.style;
-        if (topAreaStyle.display === 'none') topAreaStyle.display = this.options.display;
-    },
-
-    /**
-     * @description Hide the suneditor
-     */
-    hide: function () {
-        this.context.element.topArea.style.display = 'none';
-    },
-
-    /**
-     * @description Destroy the suneditor
-     */
-    destroy: function () {
-        /** off menus */
-        this.dropdownOff();
-        this.containerOff();
-        this.controllerOff();
-        if (this.notice) this.notice.close();
-        if (this.modalForm) this.plugins.dialog.close();
-
-        /** remove history */
-        this.history._destroy();
-
-        /** remove event listeners */
-        this.eventManager._removeAllEvents();
-
-        /** remove element */
-        domUtils.remove(this.context.element.toolbar);
-        domUtils.remove(this.context.element.topArea);
-
-        /** remove object reference */
-        for (let k in this.context) {
-            if (this.context.hasOwnProperty(k)) delete this.context[k];
-        }
-        for (let k in this.pluginCallButtons) {
-            if (this.pluginCallButtons.hasOwnProperty(k)) delete this.pluginCallButtons[k];
-        }
-
-        /** remove user object */
-        for (let k in this) {
-            if (this.hasOwnProperty(k)) delete this[k];
-        }
-    },
-
-    /**
      * @description Check the components such as image and video and modify them according to the format.
      * @private
      */
@@ -2062,15 +2080,15 @@ Core.prototype = {
             let child = context.element.wysiwygFrame;
             while (child) {
                 if (child.shadowRoot) {
-                    this._shadowRoot = child.shadowRoot;
+                    this.shadowRoot = child.shadowRoot;
                     break;
                 } else if (child instanceof _w.ShadowRoot) {
-                    this._shadowRoot = child;
+                    this.shadowRoot = child;
                     break;
                 }
                 child = child.parentNode;
             }
-            if (this._shadowRoot) this._shadowRootControllerEventTarget = [];
+            if (this.shadowRoot) this._shadowRootControllerEventTarget = [];
         }
 
         // set disallow text nodes
@@ -2141,8 +2159,10 @@ Core.prototype = {
         this._isBalloon = /balloon|balloon-always/i.test(options.mode);
         this._isBalloonAlways = /balloon-always/i.test(options.mode);
 
-        // Excute history function
+        // base
+        this.events = Events();
         this.history = history(this, this._onChange_historyStack.bind(this));
+        this.notice = new Notice(this);
 
         // classes install
         this.offset = new Offset(this);
@@ -2163,9 +2183,6 @@ Core.prototype = {
         ClassesInterface.call(this.selection, this);
         ClassesInterface.call(this.char, this);
         ClassesInterface.call(this.menu, this);
-
-        // events callback
-        this.events = new Events(this);
 
         // caching buttons
         this._cachingButtons();
@@ -2192,8 +2209,8 @@ Core.prototype = {
         for (let key in plugins) {
             if (!plugins.hasOwnProperty(key)) continue;
             plugin = plugins[key];
-            button = this.pluginCallButtons[key];
-            this.callPlugin(key, null, button);
+            button = this._pluginCallButtons[key];
+            this.registerPlugin(key, button);
 
             if (typeof plugin.checkFileInfo === 'function' && typeof plugin.resetFileInfo === 'function') {
                 this._fileInfoPluginsCheck.push(plugin.checkFileInfo.bind(this));
@@ -2227,9 +2244,8 @@ Core.prototype = {
         this._lineBreaker = context.element.lineBreaker;
         this._lineBreakerButton = this._lineBreaker.querySelector('button');
 
-        // event manager, notice
+        // event manager
         this.eventManager = new EventManager(this);
-        this.notice = new Notice(this);
 
         // Init, validate
         if (options.iframe) {
@@ -2251,7 +2267,7 @@ Core.prototype = {
         this.codeViewDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"]):not([data-display="MORE"])');
         this.resizingDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-resizing-enabled"]):not([data-display="MORE"])');
 
-        this.saveButtonStates();
+        this._saveButtonStates();
 
         const buttons = this.context.buttons;
         this.commandMap = {
@@ -2273,13 +2289,29 @@ Core.prototype = {
     },
 
     /**
+     * @description Save the current buttons states to "allCommandButtons" object
+     * @private
+     */
+    _saveButtonStates: function () {
+        if (!this.allCommandButtons) this.allCommandButtons = {};
+
+        const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]');
+        for (let i = 0, element, command; i < currentButtons.length; i++) {
+            element = currentButtons[i];
+            command = element.getAttribute('data-command');
+
+            this.allCommandButtons[command] = element;
+        }
+    },
+
+    /**
      * @description Initializ wysiwyg area (Only called from core._init)
      * @param {boolean} reload Is relooad?
      * @param {string} _initHTML initial html string
      * @private
      */
     _initWysiwygArea: function (reload, _initHTML) {
-        this.context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentsForEditor(typeof _initHTML === 'string' ? _initHTML : this.context.element.originElement.value);
+        this.context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentForEditor(typeof _initHTML === 'string' ? _initHTML : this.context.element.originElement.value);
     },
 
     /**
@@ -2300,7 +2332,7 @@ Core.prototype = {
         this.status.isChanged = true;
         if (this.context.buttons.save) this.context.buttons.save.removeAttribute('disabled');
         // user event
-        if (this.events.onChange) this.events.onChange(this.getContents(true));
+        if (this.events.onChange) this.events.onChange(this.getContent(true));
         if (this.context.element.toolbar.style.display === 'block') this.toolbar._showBalloon();
     },
 
@@ -2437,91 +2469,5 @@ Core.prototype = {
 
     Constructor: Core
 };
-
-/**
- * @description Check disallowed tags
- * @param {Node} element Element to check
- * @returns {boolean}
- * @private
- */
-function DisallowedTags(element) {
-    return /^(meta|script|link|style|[a-z]+\:[a-z]+)$/i.test(element.nodeName);
-}
-
-/**
- * @description Tag and tag attribute check RegExp function. (used by "cleanHTML" and "convertContentsForEditor")
- * @param {boolean} lowLevelCheck Low level check
- * @param {string} m RegExp value
- * @param {string} t RegExp value
- * @returns {string}
- * @private
- */
-function CleanTags(lowLevelCheck, m, t) {
-    if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
-
-    let v = null;
-    const tagName = t.match(/(?!<)[a-zA-Z0-9\-]+/)[0].toLowerCase();
-
-    // blacklist
-    const bAttr = this._attributesTagsBlacklist[tagName];
-    if (bAttr) m = m.replace(bAttr, '');
-    else m = m.replace(this._attributesBlacklistRegExp, '');
-
-    // whitelist
-    const wAttr = this._attributesTagsWhitelist[tagName];
-    if (wAttr) v = m.match(wAttr);
-    else v = m.match(this._attributesWhitelistRegExp);
-
-    // anchor
-    if (!lowLevelCheck || /<a\b/i.test(t)) {
-        const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
-        if (sv) {
-            if (!v) v = [];
-            v.push(sv[0]);
-        }
-    }
-
-    // span
-    if ((!lowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
-        const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
-        if (sv) {
-            if (!v) v = [];
-            v.push(sv[0]);
-        }
-    }
-
-    // img
-    if (/<img/i.test(t)) {
-        let w = '',
-            h = '';
-        const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
-        if (!v) v = [];
-        if (sv) {
-            w = sv[0].match(/width:(.+);/);
-            w = numbers.get(w ? w[1] : '', -1) || '';
-            h = sv[0].match(/height:(.+);/);
-            h = numbers.get(h ? h[1] : '', -1) || '';
-        }
-
-        if (!w || !h) {
-            const avw = m.match(/width\s*=\s*((?:"|')[^"']*(?:"|'))/);
-            const avh = m.match(/height\s*=\s*((?:"|')[^"']*(?:"|'))/);
-            if (avw || avh) {
-                w = !w ? numbers.get(avw ? avw[1] : '') || '' : w;
-                h = !h ? numbers.get(avh ? avh[1] : '') || '' : h;
-            }
-        }
-        v.push('data-origin="' + (w + ',' + h) + '"');
-    }
-
-    if (v) {
-        for (let i = 0, len = v.length; i < len; i++) {
-            if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
-            t += ' ' + (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i]) ? '' : v[i]);
-        }
-    }
-
-    return t;
-}
 
 export default Core;
