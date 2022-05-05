@@ -697,7 +697,6 @@ Format.prototype = {
 			if (selectedFormats.length === 0) return;
 		}
 
-		const util = this.util;
 		domUtils.sortNodeByDepth(selectedFormats, true);
 
 		// merge
@@ -992,6 +991,117 @@ Format.prototype = {
 			sc: first,
 			ec: last
 		};
+	},
+
+	/**
+	 * @description The method to insert a element and return. (used elements : table, hr, image, video)
+	 * If "element" is "HR", insert and return the new line.
+	 * @param {Element} element Element to be inserted
+	 * @param {boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (domUtils.getEdgeChildNodes)
+	 * @param {boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+	 * @param {boolean} notSelect If true, Do not automatically select the inserted component.
+	 * @returns {Element}
+	 */
+	 insert: function (element, notHistoryPush, checkCharCount, notSelect) {
+		if (this.core.isReadOnly || (checkCharCount && !this.char.check(element))) {
+			return null;
+		}
+
+		const r = this.selection.removeNode();
+		this.selection.getRangeAndAddLine(this.selection.getRange(), r.container);
+		let oNode = null;
+		let selectionNode = this.selection.getNode();
+		let formatEl = this.format.getLine(selectionNode, null);
+
+		if (domUtils.isListCell(formatEl)) {
+			this.selection.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling, false);
+			if (!element.nextSibling) element.parentNode.appendChild(domUtils.createElement("BR"));
+		} else {
+			if (this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
+				const depthFormat = domUtils.getParentElement(
+					r.container,
+					function (current) {
+						return this.format.isBlock(current);
+					}.bind(this)
+				);
+				oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
+				if (oNode) formatEl = oNode.previousSibling;
+			}
+			this.selection.insertNode(element, this.format.isBlock(formatEl) ? null : formatEl, false);
+			if (formatEl && unicode.onlyZeroWidthSpace(formatEl)) domUtils.remove(formatEl);
+		}
+		
+		if (!notSelect) {
+			this.selection.setRange(element, 0, element, 0);
+			
+			const fileComponentInfo = this.get(element);
+			if (fileComponentInfo) {
+				this.select(fileComponentInfo.target, fileComponentInfo.pluginName);
+			} else if (oNode) {
+				oNode = domUtils.getEdgeChildNodes(oNode, null).sc || oNode;
+				this.selection.setRange(oNode, 0, oNode, 0);
+			}
+		}
+
+		// history stack
+		if (!notHistoryPush) this.history.push(1);
+
+		return oNode || element;
+	},
+
+	/**
+	 * @description Gets the file component and that plugin name
+	 * return: {target, component, pluginName} | null
+	 * @param {Element} element Target element (figure tag, component div, file tag)
+	 * @returns {Object|null}
+	 */
+	get: function (element) {
+		if (!this.core._fileManager.queryString || !element) return null;
+
+		let target;
+		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
+			if (this.core._fileManager.queryString) target = element.querySelector(this.core._fileManager.queryString);
+		}
+		if (!target && element.nodeName && this.core._fileManager.regExp.test(element.nodeName)) {
+			target = element;
+		}
+		if (!target) {
+			target = element;
+		}
+
+		return {
+			target: target,
+			component: domUtils.getParentElement(target, this.is),
+			pluginName: this.core._fileManager.pluginMap[target.nodeName.toLowerCase()] || ""
+		};
+	},
+
+	/**
+	 * @description The component(image, video) is selected and the resizing module is called.
+	 * @param {Element} element Element tag (img, iframe, video)
+	 * @param {string} pluginName Plugin name (image, video)
+	 */
+	select: function (element, pluginName) {
+		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is)) || domUtils.isUneditable(element)) return false;
+		if (!this.status.hasFocus) this.core.focus();
+
+		const plugin = this.plugins[pluginName];
+		if (!plugin) return;
+		_w.setTimeout(
+			function () {
+				if (typeof plugin.select === "function") plugin.select(element)
+				this._setComponentLineBreaker(element);
+			}.bind(this)
+		);
+	},
+
+	/**
+	 * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
+	 * @param {Node} element The node to check
+	 * @returns {boolean}
+	 */
+	is: function (element) {
+		return element && (/se-component/.test(element.className) || /^(TABLE|HR)$/.test(element.nodeName));
 	},
 
 	/**
@@ -1937,7 +2047,7 @@ Format.prototype = {
 		if (!domUtils.isListCell(el)) return;
 		if (!styleArray) styleArray = this._listKebab;
 
-		const children = domUtils.getArrayItem((el).childNodes, function (current) { return !util.isBreak(current); }, true);
+		const children = domUtils.getArrayItem((el).childNodes, function (current) { return !domUtils.isBreak(current); }, true);
 		const elStyles = el.style;
 
 		const ec = [], ek = [], elKeys = global.getValues(elStyles);
@@ -1961,7 +2071,7 @@ Format.prototype = {
 		let r = null;
 		for (let i = 0, len = children.length, c, s; i < len; i++) {
 			c = children[i];
-			s = util.getValues(c.style);
+			s = global.getValues(c.style);
 			if (s.length === 0 || (ec.some(function (k) {return s.indexOf(k) === -1;}) && s.some(function(k) {ec.indexOf(k) > -1;}))) {
 				r = c.nextSibling;
 				sel.appendChild(c);

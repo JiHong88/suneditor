@@ -57,10 +57,10 @@ Char.prototype = {
 		if (!text || !text.toString) return 0;
 		text = text.toString();
 
-		const encoder = this._w.encodeURIComponent;
+		const encoder = _w.encodeURIComponent;
 		let cr, cl;
 		if (env.isIE || env.isEdge) {
-			cl = this._w.unescape(encoder(text)).length;
+			cl = _w.unescape(encoder(text)).length;
 			cr = 0;
 
 			if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
@@ -69,7 +69,7 @@ Char.prototype = {
 
 			return cl + cr;
 		} else {
-			cl = new this._w.TextEncoder("utf-8").encode(text).length;
+			cl = new _w.TextEncoder("utf-8").encode(text).length;
 			cr = 0;
 
 			if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
@@ -85,7 +85,7 @@ Char.prototype = {
 	 */
 	display: function () {
 		if (this.context.element.charCounter) {
-			this._w.setTimeout(
+			_w.setTimeout(
 				function () {
 					this.context.element.charCounter.textContent = this.getLength();
 				}.bind(this)

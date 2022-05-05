@@ -13,7 +13,6 @@ import EventManager from "./eventManager";
 // base
 import history from "./base/history";
 import Events from "./base/events";
-import Notice from "./base/notice";
 
 // classes
 import Char from "./classes/char";
@@ -25,9 +24,11 @@ import Selection from "./classes/selection";
 import Shortcuts from "./classes/shortcuts";
 import Toolbar from "./classes/toolbar";
 import Menu from "./classes/menu";
+import Notice from "./classes/notice";
 
 // classes interface
 import ClassesInterface from "../interface/_classes";
+import EditorInterface from "../interface/editor";
 
 const _parser = new _w.DOMParser();
 
@@ -156,12 +157,6 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
     this._ww = null;
 
     /**
-     * @description Closest ShadowRoot to editor if found
-     * @type {ShadowRoot}
-     */
-    this.shadowRoot = null;
-
-    /**
      * @description Editor options
      * @type {Object.<string, any>}
      */
@@ -201,10 +196,50 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
     this.helper = Helper;
 
     /**
+     * @description Closest ShadowRoot to editor if found
+     * @type {ShadowRoot}
+     */
+    this.shadowRoot = null;
+
+    /**
      * @description Computed style of the wysiwyg area (window.getComputedStyle(context.element.wysiwyg))
      */
     this.wwComputedStyle = null;
 
+    /**
+     * @description Variables used internally in editor operation
+     * @property {boolean} hasFocus Boolean value of whether the editor has focus
+     * @property {boolean} isDisabled Boolean value of whether the editor is disabled
+     * @property {boolean} isReadOnly Boolean value of whether the editor is readOnly
+     * @property {boolean} isCodeView State of code view
+     * @property {boolean} isFullScreen State of full screen
+     * @property {number} tabSize Indent size of tab (4)
+     * @property {number} indentSize Indent size (25)px
+     * @property {number} codeIndentSize Indent size of Code view mode (2)
+     * @property {Array} currentNodes  An element array of the current cursor's node structure
+     * @property {Array} currentNodesMap  An element name array of the current cursor's node structure
+     */
+    this.status = {
+        hasFocus: false,
+        isDisabled: false,
+        isReadOnly: false,
+        isChanged: false,
+        isCodeView: false,
+        isFullScreen: false,
+        indentSize: 25,
+        tabSize: 4,
+        codeIndentSize: 2,
+        currentNodes: [],
+        currentNodesMap: [],
+        _range: null,
+        _selectionNode: null,
+        _minHeight: numbers.get((context.element.wysiwygFrame.style.minHeight || "65"), 0),
+        _resizeClientY: 0,
+        _lineBreakComp: null,
+        _lineBreakDir: ""
+    };
+
+    // ----- Properties not shared with coreInterface -----
     /**
      * @description Whether the plugin is initialized
      */
@@ -222,53 +257,6 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
     this.effectNode = null;
 
     /**
-     * @description Variables used internally in editor operation
-     * @property {boolean} hasFocus Boolean value of whether the editor has focus
-     * @property {boolean} isDisabled Boolean value of whether the editor is disabled
-     * @property {boolean} isReadOnly Boolean value of whether the editor is readOnly
-     * @property {boolean} isCodeView State of code view
-     * @property {boolean} isFullScreen State of full screen
-     * @property {number} innerHeight_fullScreen InnerHeight in editor when in full screen
-     * @property {number} resizeClientY Remember the vertical size of the editor before resizing the editor (Used when calculating during resize operation)
-     * @property {number} tabSize Indent size of tab (4)
-     * @property {number} indentSize Indent size (25)px
-     * @property {number} codeIndentSize Indent size of Code view mode (2)
-     * @property {number} minResizingSize Minimum size of editing area when resized {number} (.se-wrapper-inner {min-height: 65px;} || 65)
-     * @property {Array} currentNodes  An array of the current cursor's node structure
-     * @private
-     */
-    this.status = {
-        hasFocus: false,
-        isDisabled: false,
-        isReadOnly: false,
-        isChanged: false,
-        isCodeView: false,
-        isFullScreen: false,
-        innerHeight_fullScreen: 0,
-        resizeClientY: 0,
-        indentSize: 25,
-        tabSize: 4,
-        codeIndentSize: 2,
-        minResizingSize: numbers.get((context.element.wysiwygFrame.style.minHeight || "65"), 0),
-        currentNodes: [],
-        currentNodesMap: [],
-        _range: null,
-        _selectionNode: null,
-        _originCssText: context.element.topArea.style.cssText,
-        _bodyOverflow: "",
-        _editorAreaOriginCssText: "",
-        _wysiwygOriginCssText: "",
-        _codeOriginCssText: "",
-        _fullScreenAttrs: {
-            sticky: false,
-            balloon: false,
-            inline: false
-        },
-        _lineBreakComp: null,
-        _lineBreakDir: ""
-    };
-
-    /**
      * @description The file component object of current selected file tag (component.get)
      */
     this.currentFileComponentInfo = null;
@@ -283,6 +271,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
      */
     this.resizingDisabledButtons = [];
 
+    // ----- private properties -----
     /**
      * @description Plugin buttons
      * @private
@@ -526,6 +515,21 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
         strike: options.textTags.strike,
         subscript: options.textTags.sub,
         superscript: options.textTags.sup
+    };
+
+    /**
+     * @description FullScreen and codeView relative status
+     */
+    this._editorTransformStatus = {
+        editorOriginCssText: context.element.topArea.style.cssText,
+        bodyOverflow: "",
+        editorAreaOriginCssText: "",
+        wysiwygOriginCssText: "",
+        codeOriginCssText: "",
+        fullScreenInnerHeight: 0,
+        fullScreenSticky: false,
+        fullScreenBalloon: false,
+        fullScreenInline: false
     };
 
     /************ Core init ************/
@@ -898,8 +902,8 @@ Core.prototype = {
             this.context.element.code.style.display = 'none';
             this.context.element.wysiwygFrame.style.display = 'block';
 
-            this.status._codeOriginCssText = this.status._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
-            this.status._wysiwygOriginCssText = this.status._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
+            this.status.codeOriginCssText = this.status.codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
+            this.status.wysiwygOriginCssText = this.status.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
 
             if (this.options.height === 'auto' && !this.options.codeMirrorEditor) this.context.element.code.style.height = '0px';
 
@@ -925,8 +929,8 @@ Core.prototype = {
             }
         } else {
             this._setEditorDataToCodeView();
-            this.status._codeOriginCssText = this.status._codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
-            this.status._wysiwygOriginCssText = this.status._wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
+            this.status.codeOriginCssText = this.status.codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
+            this.status.wysiwygOriginCssText = this.status.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 
             if (this.status.isFullScreen) this.context.element.code.style.height = '100%';
             else if (this.options.height === 'auto' && !this.options.codeMirrorEditor) this.context.element.code.style.height = this.context.element.code.scrollHeight > 0 ? (this.context.element.code.scrollHeight + 'px') : 'auto';
@@ -1032,7 +1036,7 @@ Core.prototype = {
         const editorArea = this.context.element.editorArea;
         const wysiwygFrame = this.context.element.wysiwygFrame;
         const code = this.context.element.code;
-        const _var = this.status;
+        const _var = this._editorTransformStatus;
 
         this.controllerOff();
         const wasToolbarHidden = (toolbar.style.display === 'none' || (this._isInline && !this._inlineToolbarAttr.isShow));
@@ -1040,8 +1044,8 @@ Core.prototype = {
         if (value) {
             _var.isFullScreen = true;
 
-            _var._fullScreenAttrs.inline = this._isInline;
-            _var._fullScreenAttrs.balloon = this._isBalloon;
+            _var.fullScreenInline = this._isInline;
+            _var.fullScreenBalloon = this._isBalloon;
 
             if (this._isInline || this._isBalloon) {
                 this._isInline = false;
@@ -1059,17 +1063,17 @@ Core.prototype = {
             topArea.style.zIndex = '2147483647';
 
             if (this.context.element._stickyDummy.style.display !== ('none' && '')) {
-                _var._fullScreenAttrs.sticky = true;
+                _var.fullScreenSticky = true;
                 this.context.element._stickyDummy.style.display = 'none';
                 domUtils.removeClass(toolbar, 'se-toolbar-sticky');
             }
 
-            _var._bodyOverflow = this._d.body.style.overflow;
+            _var.bodyOverflow = this._d.body.style.overflow;
             this._d.body.style.overflow = 'hidden';
 
-            _var._editorAreaOriginCssText = editorArea.style.cssText;
-            _var._wysiwygOriginCssText = wysiwygFrame.style.cssText;
-            _var._codeOriginCssText = code.style.cssText;
+            _var.editorAreaOriginCssText = editorArea.style.cssText;
+            _var.wysiwygOriginCssText = wysiwygFrame.style.cssText;
+            _var.codeOriginCssText = code.style.cssText;
 
             editorArea.style.cssText = toolbar.style.cssText = '';
             wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
@@ -1078,8 +1082,8 @@ Core.prototype = {
             toolbar.style.position = 'relative';
             toolbar.style.display = 'block';
 
-            _var.innerHeight_fullScreen = (this._w.innerHeight - toolbar.offsetHeight);
-            editorArea.style.height = (_var.innerHeight_fullScreen - this.options.fullScreenOffset) + 'px';
+            _var.fullScreenInnerHeight = (this._w.innerHeight - toolbar.offsetHeight);
+            editorArea.style.height = (_var.fullScreenInnerHeight - this.options.fullScreenOffset) + 'px';
 
             if (this.options.iframe && this.options.height === 'auto') {
                 editorArea.style.overflow = 'auto';
@@ -1095,12 +1099,12 @@ Core.prototype = {
         } else {
             _var.isFullScreen = false;
 
-            wysiwygFrame.style.cssText = _var._wysiwygOriginCssText;
-            code.style.cssText = _var._codeOriginCssText;
+            wysiwygFrame.style.cssText = _var.wysiwygOriginCssText;
+            code.style.cssText = _var.codeOriginCssText;
             toolbar.style.cssText = '';
-            editorArea.style.cssText = _var._editorAreaOriginCssText;
-            topArea.style.cssText = _var._originCssText;
-            this._d.body.style.overflow = _var._bodyOverflow;
+            editorArea.style.cssText = _var.editorAreaOriginCssText;
+            topArea.style.cssText = _var.editorOriginCssText;
+            this._d.body.style.overflow = _var.bodyOverflow;
 
             if (this.options.height === 'auto' && !this.options.codeMirrorEditor) this._codeViewAutoHeight();
 
@@ -1110,14 +1114,14 @@ Core.prototype = {
                 domUtils.removeClass(toolbar, 'se-toolbar-sticky');
             }
 
-            if (_var._fullScreenAttrs.sticky && !this.options.toolbarContainer) {
-                _var._fullScreenAttrs.sticky = false;
+            if (_var.fullScreenSticky && !this.options.toolbarContainer) {
+                _var.fullScreenSticky = false;
                 this.context.element._stickyDummy.style.display = 'block';
                 domUtils.addClass(toolbar, "se-toolbar-sticky");
             }
 
-            this._isInline = _var._fullScreenAttrs.inline;
-            this._isBalloon = _var._fullScreenAttrs.balloon;
+            this._isInline = _var.fullScreenInline;
+            this._isBalloon = _var.fullScreenBalloon;
             this.toolbar._showInline();
             if (!!this.options.toolbarContainer) domUtils.removeClass(toolbar, 'se-toolbar-balloon');
 
@@ -2167,24 +2171,27 @@ Core.prototype = {
         // base
         this.events = Events();
         this.history = history(this, this._onChange_historyStack.bind(this));
-        this.notice = new Notice(this);
+        this.eventManager = new EventManager(this);
 
-        // classes install
+        // classes
         this.offset = new Offset(this);
+        this.notice = new Notice(this);
+        this.shortcuts = new Shortcuts(this);
+        // classes that refer to other classes
         this.component = new Component(this);
         this.format = new Format(this);
         this.node = new Node(this);
         this.toolbar = new Toolbar(this);
-        this.shortcuts = new Shortcuts(this);
         this.selection = new Selection(this);
         this.char = new Char(this);
         this.menu = new Menu(this);
-        ClassesInterface.call(this.offset, this);
+        
+        // register interface
+        EditorInterface.call(this.eventManager, this);
         ClassesInterface.call(this.component, this);
         ClassesInterface.call(this.format, this);
         ClassesInterface.call(this.node, this);
         ClassesInterface.call(this.toolbar, this);
-        ClassesInterface.call(this.shortcuts, this);
         ClassesInterface.call(this.selection, this);
         ClassesInterface.call(this.char, this);
         ClassesInterface.call(this.menu, this);
@@ -2244,13 +2251,10 @@ Core.prototype = {
         this._fileManager.pluginRegExp = new wRegExp('^(' + (filePluginRegExp.length === 0 ? '^' : filePluginRegExp.join('|')) + ')$', 'i');
 
         // cache editor's element
-        this.status._originCssText = context.element.topArea.style.cssText;
+        this.status.editorOriginCssText = context.element.topArea.style.cssText;
         this._placeholder = context.element.placeholder;
         this._lineBreaker = context.element.lineBreaker;
         this._lineBreakerButton = this._lineBreaker.querySelector('button');
-
-        // event manager
-        this.eventManager = new EventManager(this);
 
         // Init, validate
         if (options.iframe) {

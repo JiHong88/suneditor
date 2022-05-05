@@ -15,8 +15,8 @@ function ClassesInterface(editor) {
     this.toolbar = editor.toolbar;
     this.menu = editor.menu;
     // common functions
-    this.notice = editor.notice;
     this.events = editor.events;
+    this.notice = editor.notice;
 }
 
 export default ClassesInterface;

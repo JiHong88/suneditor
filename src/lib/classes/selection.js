@@ -181,7 +181,7 @@ Selection.prototype = {
 		this.status._range = null;
 		this.status._selectionNode = null;
 		if (this.status.hasFocus) this.get().removeAllRanges();
-		this.core.eventManager._setKeyEffect([]);
+		this.eventManager._setKeyEffect([]);
 	},
 
 	/**

@@ -3,7 +3,6 @@
  * @author JiHong Lee.
  */
 
-import EditorInterface from "../interface/editor";
 import {
 	domUtils,
 	unicode,
@@ -16,8 +15,7 @@ import {
 	_d
 } from "../helper/global";
 
-function EventManager(core) {
-	EditorInterface.call(this, core);
+const EventManager = function (core) {
 	this._events = [];
 	this._onButtonsCheck = new _w.RegExp("^(" + _w.Object.keys(core.options._styleNodeMap).join("|") + ")$", "i");
 	this._onShortcutKey = false;
@@ -237,10 +235,10 @@ EventManager.prototype = {
 	},
 
 	_resize_editor: function (e) {
-		const resizeInterval = this.context.element.editorArea.offsetHeight + (e.clientY - this.status.resizeClientY);
-		const h = (resizeInterval < this.status.minResizingSize ? this.status.minResizingSize : resizeInterval);
+		const resizeInterval = this.context.element.editorArea.offsetHeight + (e.clientY - this.status._resizeClientY);
+		const h = (resizeInterval < this.status._minHeight ? this.status._minHeight : resizeInterval);
 		this.context.element.wysiwygFrame.style.height = this.context.element.code.style.height = h + 'px';
-		this.status.resizeClientY = e.clientY;
+		this.status._resizeClientY = e.clientY;
 		if (env.isIE) this.core.__callResizeFunction(h, null);
 	},
 
@@ -1707,7 +1705,7 @@ function OnMouseDown_resizingBar(e) {
 	this.core.dropdownOff();
 	this.core.controllerOff();
 
-	this.status.resizeClientY = e.clientY;
+	this.status._resizeClientY = e.clientY;
 	this.context.element.resizeBackground.style.display = "block";
 
 	function closureFunc() {
@@ -1758,8 +1756,8 @@ function OnResize_window() {
 	}
 
 	if (this.status.isFullScreen) {
-		this.status.innerHeight_fullScreen += _w.innerHeight - this.context.element.toolbar.offsetHeight - this.status.innerHeight_fullScreen;
-		this.context.element.editorArea.style.height = this.status.innerHeight_fullScreen + "px";
+		this._editorTransformStatus.fullScreenInnerHeight += _w.innerHeight - this.context.element.toolbar.offsetHeight - this._editorTransformStatus.fullScreenInnerHeight;
+		this.context.element.editorArea.style.height = this._editorTransformStatus.fullScreenInnerHeight + "px";
 		return;
 	}
 

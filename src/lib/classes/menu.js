@@ -57,7 +57,7 @@ Menu.prototype = {
         this._setMenuPosition(button, menu);
 
         this._bindedDropdownOff = this.dropdownOff.bind(this);
-        this.core.eventManager.addGlobalEvent('mousedown', this._bindedDropdownOff, false);
+        this.eventmanager.addGlobalEvent('mousedown', this._bindedDropdownOff, false);
 
         if (this.plugins[dropdownName].on) this.plugins[dropdownName].on();
         this._antiBlur = true;
@@ -67,7 +67,7 @@ Menu.prototype = {
      * @description Disable dropdown
      */
     dropdownOff: function () {
-        this.core.core.eventManager.removeGlobalEvent('mousedown', this._bindedDropdownOff);
+        this.eventmanager.removeGlobalEvent('mousedown', this._bindedDropdownOff);
         this._bindedDropdownOff = null;
 
         if (this.currentDropdown) {
@@ -95,7 +95,7 @@ Menu.prototype = {
         this._setMenuPosition(button, menu);
 
         this._bindedContainerOff = this.containerOff.bind(this);
-        this.core.eventManager.addGlobalEvent('mousedown', this._bindedContainerOff, false);
+        this.eventmanager.addGlobalEvent('mousedown', this._bindedContainerOff, false);
 
         if (this.plugins[containerName].on) this.plugins[containerName].on();
         this._antiBlur = true;
@@ -105,7 +105,7 @@ Menu.prototype = {
      * @description Disable container
      */
     containerOff: function () {
-        this.core.eventManager.removeGlobalEvent('mousedown', this._bindedContainerOff);
+        this.eventmanager.removeGlobalEvent('mousedown', this._bindedContainerOff);
         this._bindedContainerOff = null;
 
         if (this.currentContainer) {
@@ -163,8 +163,8 @@ Menu.prototype = {
         }
 
         this._bindControllersOff = this.controllerOff.bind(this);
-        this.core.eventManager.addGlobalEvent('mousedown', this._bindControllersOff, false);
-        this.core.eventManager.addGlobalEvent('keydown', this._bindControllersOff, false);
+        this.eventmanager.addGlobalEvent('mousedown', this._bindControllersOff, false);
+        this.eventmanager.addGlobalEvent('keydown', this._bindControllersOff, false);
         this._antiBlur = true;
 
         if (typeof this.events.showController === 'function') this.events.showController(this.currentControllerName, this.currentControllerItems);
@@ -194,8 +194,8 @@ Menu.prototype = {
         this.effectNode = null;
         if (!this._bindControllersOff) return;
 
-        this.core.eventManager.removeGlobalEvent('mousedown', this._bindControllersOff);
-        this.core.eventManager.removeGlobalEvent('keydown', this._bindControllersOff);
+        this.eventmanager.removeGlobalEvent('mousedown', this._bindControllersOff);
+        this.eventmanager.removeGlobalEvent('keydown', this._bindControllersOff);
         this._bindControllersOff = null;
 
         if (len > 0) {

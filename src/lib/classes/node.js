@@ -9,6 +9,9 @@ import {
 	unicode,
 	env
 } from "../../helper";
+import {
+	_w
+} from "../../helper/global";
 
 const Node = function (editor) {
 	CoreInterface.call(this, editor);
@@ -104,8 +107,8 @@ Node.prototype = {
 		let offsets = null;
 
 		if (nodePathLen) {
-			offsets = this._w.Array.apply(null, new this._w.Array(nodePathLen)).map(
-				this._w.Number.prototype.valueOf,
+			offsets = _w.Array.apply(null, new _w.Array(nodePathLen)).map(
+				_w.Number.prototype.valueOf,
 				0
 			);
 		}
@@ -254,7 +257,7 @@ Node.prototype = {
 		if (typeof validation === "string") {
 			validation = function (current) {
 				return this.test(current.tagName);
-			}.bind(new this._w.RegExp("^(" + (validation ? validation : ".+") + ")$", "i"));
+			}.bind(new _w.RegExp("^(" + (validation ? validation : ".+") + ")$", "i"));
 		} else if (typeof validation !== "function") {
 			validation = function () {
 				return true;

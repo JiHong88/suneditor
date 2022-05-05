@@ -5,19 +5,21 @@
  */
 function CoreInterface(core) {
 	this.core = core;
+	this.eventManager = this.eventManager;
 	this._w = core._w;
 	this._d = core._d;
 	this._ww = core._ww;
 	this._wd = core._wd;
-	this.plugins = core.plugins;
-	this.status = core.status;
-	this.context = core.context;
 	this.options = core.options;
-	this.history = core.history;
-	this.lang = core.lang;
+	this.plugins = core.plugins;
+	this.context = core.context;
 	this.icons = core.icons;
+	this.lang = core.lang;
+	this.history = core.history;
 	this.helper = core.helper;
 	this.shadowRoot = core.shadowRoot;
+	this.wwComputedStyle = core.wwComputedStyle;
+	this.status = core.status;
 }
 
 export default CoreInterface;
