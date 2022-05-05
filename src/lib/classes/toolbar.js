@@ -110,7 +110,7 @@ Toolbar.prototype = {
 	 */
 	_recoverButtonStates: function () {
 		if (this.allCommandButtons) {
-			const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]');
+			const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]');
 			for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
 				button = currentButtons[i];
 				command = button.getAttribute('data-command');

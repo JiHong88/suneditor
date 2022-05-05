@@ -256,26 +256,30 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
     /**
      * @description Editor tags whitelist (RegExp object)
      * helper.converter.createTagsWhitelist(options._editorTagsWhitelist)
+     * @private
      */
-    this.editorTagsWhitelistRegExp = null;
+    this._editorTagsWhitelistRegExp = null;
 
     /**
      * @description Editor tags blacklist (RegExp object)
      * helper.converter.createTagsBlacklist(options.tagsBlacklist)
+     * @private
      */
-    this.editorTagsBlacklistRegExp = null;
+    this._editorTagsBlacklistRegExp = null;
 
     /**
      * @description Tag whitelist when pasting (RegExp object)
      * helper.converter.createTagsWhitelist(options.pasteTagsWhitelist)
+     * @private
      */
-    this.pasteTagsWhitelistRegExp = null;
+    this._pasteTagsWhitelistRegExp = null;
 
     /**
      * @description Tag blacklist when pasting (RegExp object)
      * helper.converter.createTagsBlacklist(options.pasteTagsBlacklist)
+     * @private
      */
-    this.pasteTagsBlacklistRegExp = null;
+    this._pasteTagsBlacklistRegExp = null;
 
     /**
      * @description RegExp when using check disallowd tags. (b, i, ins, strike, s)
@@ -700,12 +704,12 @@ Core.prototype = {
     /**
      * @description Run plugin calls and basic commands.
      * @param {string} command Command string
-     * @param {string} display Display type string ('command', 'dropdown', 'dialog', 'container')
+     * @param {string} type Display type string ('command', 'dropdown', 'dialog', 'container')
      * @param {Element} target The element of command button
      */
-    runPlugin: function (command, display, target) {
-        if (display) {
-            if (/more/i.test(display)) {
+    runPlugin: function (command, type, target) {
+        if (type) {
+            if (/more/i.test(type)) {
                 if (target !== this.menu.currentMoreLayerActiveButton) {
                     const layer = this.context.element.toolbar.querySelector('.' + command);
                     if (layer) {
@@ -722,30 +726,30 @@ Core.prototype = {
                 return;
             }
 
-            if (/container/.test(display) && (this.menu._menuTrayMap[command] === null || target !== this.menu.currentContainerActiveButton)) {
+            if (/container/.test(type) && (this.menu._menuTrayMap[command] === null || target !== this.menu.currentContainerActiveButton)) {
                 this.containerOn(target);
                 return;
             }
 
             if (this.isReadOnly && domUtils.arrayIncludes(this.resizingDisabledButtons, target)) return;
-            if (/dropdown/.test(display) && (this.menu._menuTrayMap[command] === null || target !== this.menu.currentDropdownActiveButton)) {
+            if (/dropdown/.test(type) && (this.menu._menuTrayMap[command] === null || target !== this.menu.currentDropdownActiveButton)) {
                 this.dropdownOn(target);
                 return;
-            } else if (/dialog/.test(display)) {
+            } else if (/dialog/.test(type)) {
                 this.plugins[command].open();
                 return;
-            } else if (/command/.test(display)) {
+            } else if (/command/.test(type)) {
                 this.plugins[command].action();
-            } else if (/fileBrowser/.test(display)) {
+            } else if (/fileBrowser/.test(type)) {
                 this.plugins[command].open(null);
             }
         } else if (command) {
             this.commandHandler(command, target);
         }
 
-        if (/dropdown/.test(display)) {
+        if (/dropdown/.test(type)) {
             this.dropdownOff();
-        } else if (!/command/.test(display)) {
+        } else if (!/command/.test(type)) {
             this.dropdownOff();
             this.containerOff();
         }
@@ -766,6 +770,7 @@ Core.prototype = {
                 this.execCommand(command);
                 break;
             case 'paste':
+                // @todo
                 break;
             case 'selectAll':
                 this.containerOff();
@@ -1380,9 +1385,9 @@ Core.prototype = {
      * @description Gets the clean HTML code for editor
      * @param {string} html HTML string
      * @param {string|RegExp|null} whitelist Regular expression of allowed tags.
-     * RegExp object is create by helper.converter.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
+     * RegExp object is create by helper.converter.createTagsWhitelist method. (core._pasteTagsWhitelistRegExp)
      * @param {string|RegExp|null} blacklist Regular expression of disallowed tags.
-     * RegExp object is create by helper.converter.createTagsBlacklist method. (core.pasteTagsBlacklistRegExp)
+     * RegExp object is create by helper.converter.createTagsBlacklist method. (core._pasteTagsBlacklistRegExp)
      * @returns {string}
      */
     cleanHTML: function (html, whitelist, blacklist) {
@@ -1890,8 +1895,8 @@ Core.prototype = {
             .replace(/\n/g, '')
             .replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '')
             .replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '')
-            .replace(this.editorTagsWhitelistRegExp, '')
-            .replace(this.editorTagsBlacklistRegExp, '');
+            .replace(this._editorTagsWhitelistRegExp, '')
+            .replace(this._editorTagsBlacklistRegExp, '');
     },
 
     /**
@@ -2112,11 +2117,11 @@ Core.prototype = {
         this._htmlCheckWhitelistRegExp = new wRegExp('^(' + getRegList(options._editorTagsWhitelist.replace('|//', ''), '') + ')$', 'i');
         this._htmlCheckBlacklistRegExp = new wRegExp('^(' + (options.tagsBlacklist || '^') + ')$', 'i');
         // tags
-        this.editorTagsWhitelistRegExp = converter.createTagsWhitelist(getRegList(options._editorTagsWhitelist.replace('|//', '|<!--|-->'), ''));
-        this.editorTagsBlacklistRegExp = converter.createTagsBlacklist(options.tagsBlacklist.replace('|//', '|<!--|-->'));
+        this._editorTagsWhitelistRegExp = converter.createTagsWhitelist(getRegList(options._editorTagsWhitelist.replace('|//', '|<!--|-->'), ''));
+        this._editorTagsBlacklistRegExp = converter.createTagsBlacklist(options.tagsBlacklist.replace('|//', '|<!--|-->'));
         // paste tags
-        this.pasteTagsWhitelistRegExp = converter.createTagsWhitelist(getRegList(options.pasteTagsWhitelist, ''));
-        this.pasteTagsBlacklistRegExp = converter.createTagsBlacklist(options.pasteTagsBlacklist);
+        this._pasteTagsWhitelistRegExp = converter.createTagsWhitelist(getRegList(options.pasteTagsWhitelist, ''));
+        this._pasteTagsBlacklistRegExp = converter.createTagsBlacklist(options.pasteTagsBlacklist);
         // attributes
         const regEndStr = '\\s*=\\s*(\")[^\"]*\\1';
         const _wAttr = options.attributesWhitelist;
@@ -2264,8 +2269,8 @@ Core.prototype = {
      * @private
      */
     _cachingButtons: function () {
-        this.codeViewDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"]):not([data-display="MORE"])');
-        this.resizingDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-resizing-enabled"]):not([data-display="MORE"])');
+        this.codeViewDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])');
+        this.resizingDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
 
         this._saveButtonStates();
 
@@ -2295,7 +2300,7 @@ Core.prototype = {
     _saveButtonStates: function () {
         if (!this.allCommandButtons) this.allCommandButtons = {};
 
-        const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]');
+        const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]');
         for (let i = 0, element, command; i < currentButtons.length; i++) {
             element = currentButtons[i];
             command = element.getAttribute('data-command');

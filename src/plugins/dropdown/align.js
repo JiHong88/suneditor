@@ -14,7 +14,6 @@ import {
 
 const align = function (editor, targetElement) {
     EditorInterface.call(this, editor);
-    this.display = "dropdown";
     this.targetElement = targetElement;
 
     // create HTML

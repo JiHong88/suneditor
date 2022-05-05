@@ -135,25 +135,25 @@ export interface Core {
 	 * @description Editor tags whitelist (RegExp object)
 	 * util.createTagsWhitelist(options._editorTagsWhitelist)
 	 */
-	editorTagsWhitelistRegExp: RegExp;
+	_editorTagsWhitelistRegExp: RegExp;
 
 	/**
 	 * @description Editor tags blacklist (RegExp object)
 	 * util.createTagsBlacklist(options.tagsBlacklist)
 	 */
-	editorTagsBlacklistRegExp: RegExp;
+	_editorTagsBlacklistRegExp: RegExp;
 
 	/**
 	 * @description Tag whitelist when pasting (RegExp object)
 	 * util.createTagsWhitelist(options.pasteTagsWhitelist)
 	 */
-	pasteTagsWhitelistRegExp: RegExp;
+	_pasteTagsWhitelistRegExp: RegExp;
 
 	/**
 	 * @description Tag blacklist when pasting (RegExp object)
 	 * util.createTagsBlacklist(options.pasteTagsBlacklist)
 	 */
-	pasteTagsBlacklistRegExp: RegExp;
+	_pasteTagsBlacklistRegExp: RegExp;
 
 	/**
 	 * @description Plugins array with "active" method.
@@ -389,9 +389,9 @@ export interface Core {
 	 * @description Gets the clean HTML code for editor
 	 * @param html HTML string
 	 * @param whitelist Regular expression of allowed tags.
-	 * RegExp object is create by util.createTagsWhitelist method. (core.pasteTagsWhitelistRegExp)
+	 * RegExp object is create by util.createTagsWhitelist method. (core._pasteTagsWhitelistRegExp)
 	 * @param blacklist Regular expression of disallowed tags.
-	 * RegExp object is create by util.createTagsBlacklist method. (core.pasteTagsBlacklistRegExp)
+	 * RegExp object is create by util.createTagsBlacklist method. (core._pasteTagsBlacklistRegExp)
 	 * @returns
 	 */
 	cleanHTML(html: string, whitelist?: string | RegExp, blacklist?: string | RegExp): string;

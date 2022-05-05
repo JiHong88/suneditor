@@ -21,7 +21,7 @@ function insertAt(parent, child, index) {
 
 export default {
   name: "mention",
-  display: "dialog",
+  type: "dialog",
 
   renderItem: function(item) {
     return `<span>${item}</span>`;

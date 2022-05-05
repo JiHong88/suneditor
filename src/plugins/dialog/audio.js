@@ -13,7 +13,7 @@ import fileManager from '../modules/fileManager';
 
 export default {
     name: 'audio',
-    display: 'dialog',
+    type: 'dialog',
     add: function (core) {
         core.addModule([dialog, mediaContainer, fileManager]);
 

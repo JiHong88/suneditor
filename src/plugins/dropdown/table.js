@@ -9,7 +9,7 @@
 
 export default {
     name: 'table',
-    display: 'dropdown',
+    type: 'dropdown',
     add: function (core, targetElement) {
         const context = core.context;
         let contextTable = context.table = {

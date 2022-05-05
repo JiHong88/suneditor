@@ -294,7 +294,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 // //         html += node.outerHTML || node.textContent;
 // //     }
 
-// //     return core.cleanHTML(html, core.pasteTagsWhitelistRegExp);
+// //     return core.cleanHTML(html, core._pasteTagsWhitelistRegExp);
 // // }
 // ss.onAudioUpload = function (targetElement, index, state, videoInfo) {
 //     // console.log('targetElement:${targetElement}, index:${index}, state:${state}')

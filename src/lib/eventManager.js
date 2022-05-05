@@ -434,7 +434,7 @@ EventManager.prototype = {
 			} else {
 				cleanData = (plainText === cleanData ? plainText : cleanData).replace(/\n/g, "<br>");
 			}
-			cleanData = this.core.cleanHTML(cleanData, this.core.pasteTagsWhitelistRegExp, this.core.pasteTagsBlacklistRegExp);
+			cleanData = this.core.cleanHTML(cleanData, this.core._pasteTagsWhitelistRegExp, this.core._pasteTagsBlacklistRegExp);
 		} else {
 			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, "<br>");
 		}
@@ -614,7 +614,7 @@ function ToolbarButtonsHandler(e) {
 
 function OnClick_toolbar(e) {
 	let target = e.target;
-	let display = target.getAttribute("data-display");
+	let type = target.getAttribute("data-type");
 	let command = target.getAttribute("data-command");
 	let className = target.className;
 	this.core.controllerOff();
@@ -622,16 +622,16 @@ function OnClick_toolbar(e) {
 	while (target.parentNode && !command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
 		target = target.parentNode;
 		command = target.getAttribute("data-command");
-		display = target.getAttribute("data-display");
+		type = target.getAttribute("data-type");
 		className = target.className;
 	}
 
-	if (!command && !display) return;
+	if (!command && !type) return;
 	if (target.disabled) return;
 	if (!this.status.isReadOnly && !this.status.hasFocus) this.core.nativeFocus();
 	if (!this.status.isReadOnly && !this.status.isCodeView) this.selection._init();
 
-	this.core.runPlugin(command, display, target);
+	this.core.runPlugin(command, type, target);
 }
 
 function OnMouseDown_wysiwyg(e) {

@@ -11,7 +11,7 @@ import colorPicker from '../modules/_colorPicker';
 
 export default {
     name: 'hiliteColor',
-    display: 'dropdown',
+    type: 'dropdown',
     add: function (core, targetElement) {
         core.addModule([colorPicker]);
 

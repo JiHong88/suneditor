@@ -9,7 +9,7 @@
 
 export default {
     name: 'blockquote',
-    display: 'command',
+    type: 'command',
     add: function (core, targetElement) {
         const context = core.context;
         context.blockquote = {

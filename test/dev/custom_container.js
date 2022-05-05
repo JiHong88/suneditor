@@ -6,8 +6,8 @@ export default {
     name: 'custom_container',
 
     // @Required
-    // data display
-    display: 'container',
+    // plugin type
+    type: 'container',
 
     // @Required
     // add function - It is called only once when the plugin is first run.
@@ -109,6 +109,6 @@ export default {
         if (!command) return;
 
         const plugin = this.plugins[command];
-        this.runPlugin(command, (plugin ? plugin.display : ''), target);
+        this.runPlugin(command, (plugin ? plugin.type : ''), target);
     }
 };

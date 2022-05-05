@@ -4,7 +4,7 @@ import dialog from '../modules/dialog';
 
 export default {
     name: 'math',
-    display: 'dialog',
+    type: 'dialog',
     add: function (core) {
         core.addModule([dialog]);
 

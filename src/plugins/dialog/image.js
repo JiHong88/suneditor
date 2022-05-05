@@ -15,7 +15,7 @@ import fileManager from '../modules/fileManager';
 
 export default {
     name: 'image',
-    display: 'dialog',
+    type: 'dialog',
     add: function (core) {
         core.addModule([dialog, anchor, mediaContainer, resizing, fileManager]);
         

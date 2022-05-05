@@ -687,20 +687,20 @@ export default {
      * @param {string} buttonClass className in button
      * @param {string} title Title in button
      * @param {string} dataCommand The data-command property of the button
-     * @param {string} dataDisplay The data-display property of the button ('dialog', 'dropdown', 'command')
+     * @param {string} dataType The data-type property of the button ('dialog', 'dropdown', 'command',  'container')
      * @param {string} innerHTML Html in button
      * @param {string} _disabled Button disabled
      * @param {Object} _icons Icons
      * @returns {Object}
      * @private
      */
-    _createButton: function (buttonClass, title, dataCommand, dataDisplay, innerHTML, _disabled, _icons) {
+    _createButton: function (buttonClass, title, dataCommand, dataType, innerHTML, _disabled, _icons) {
         const oLi = domUtils.createElement('LI');
         const oButton = domUtils.createElement('BUTTON', {
             type: "button",
             class: "se-btn" + (buttonClass ? " " + buttonClass : "") + " se-tooltip",
             "data-command": dataCommand,
-            "data-display": dataDisplay,
+            "data-type": dataType,
             tabindex: "-1"
         });
 
@@ -794,7 +794,7 @@ export default {
                             plugins[pluginName] = button;
                         } else {
                             pluginName = button.name;
-                            module = [button.buttonClass, button.title, button.name, button.dataDisplay, button.innerHTML, button._disabled];
+                            module = [button.buttonClass, button.title, button.name, button.type, button.innerHTML, button._disabled];
                         }
                     } else {
                         // align
@@ -819,9 +819,7 @@ export default {
                             const title = matched[2].trim();
                             const innerHTML = matched[3].trim();
                             module = ['se-btn-more', title, moreCommand, 'MORE', innerHTML];
-                        }
-                        // buttons
-                        else {
+                        } else { // buttons
                             module = defaultButtonList[button];
                         }
 
@@ -829,7 +827,7 @@ export default {
                         if (!module) {
                             const custom = plugins[pluginName];
                             if (!custom) throw Error('[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [' + pluginName + ']');
-                            module = [custom.buttonClass, custom.title, custom.name, custom.display, custom.innerHTML, custom._disabled];
+                            module = [custom.buttonClass, custom.title, custom.name, custom.type, custom.innerHTML, custom._disabled];
                         }
                     }
 

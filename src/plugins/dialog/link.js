@@ -12,7 +12,7 @@ import anchor from '../modules/_anchor';
 
 export default {
     name: 'link',
-    display: 'dialog',
+    type: 'dialog',
     add: function (core) {
         core.addModule([dialog, anchor]);
 

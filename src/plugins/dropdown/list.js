@@ -9,7 +9,7 @@
 
 export default {
     name: 'list',
-    display: 'dropdown',
+    type: 'dropdown',
     add: function (core, targetElement) {
         const context = core.context;
         context.list = {

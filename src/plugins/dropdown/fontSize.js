@@ -9,7 +9,7 @@
 
 export default {
     name: 'fontSize',
-    display: 'dropdown',
+    type: 'dropdown',
     add: function (core, targetElement) {
         const context = core.context;
         context.fontSize = {

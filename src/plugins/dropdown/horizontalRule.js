@@ -9,7 +9,7 @@
 
 export default {
     name: 'horizontalRule',
-    display: 'dropdown',
+    type: 'dropdown',
     add: function (core, targetElement) {
         core.context.horizontalRule = {
             currentHR: null,

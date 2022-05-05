@@ -9,7 +9,7 @@
 
 export default {
     name: 'paragraphStyle',
-    display: 'dropdown',
+    type: 'dropdown',
     add: function (core, targetElement) {
         const context = core.context;
         context.paragraphStyle = {
