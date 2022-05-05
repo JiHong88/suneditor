@@ -139,7 +139,7 @@ export default {
 
     _renderer: function (exp) {
         const katex = this.options.katex;
-        return katex.src.renderToString(exp, katex.options);
+        return katex.src.renderToString(exp, {throwOnError: true, displayMode: true});
     },
 
     _renderMathExp: function (contextMath, e) {
