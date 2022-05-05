@@ -74,7 +74,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 // suneditor.create('scrolleditor', {
 //     // mode: 'balloon-always',
 //     katex: Katex,
-//     // attributesWhitelist: 'style',
+//     // attributeWhitelist: 'style',
 //     buttonList: [
 //         ['font', 'fontSize', 'formatBlock'],
 //     ],
@@ -175,7 +175,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     callBackSave: function (content){
 //         console.log('save', content)
 //     },
-//     // attributesWhitelist: {
+//     // attributeWhitelist: {
 //     //     all: "style|bgcolor|border|cellpadding|colspan|cellspacing|align",
 //     //     input: "checked"
 //     // },
@@ -226,8 +226,8 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     // tagsBlacklist: 'section|aside',
 //     // resizeEnable: false,
 //     resizingBarContainer: "#rb",
-//     attributesWhitelist: {'all': '*'},  // html5 <details open="">..</details>
-//     // attributesBlacklist: {
+//     attributeWhitelist: {'all': '*'},  // html5 <details open="">..</details>
+//     // attributeBlacklist: {
 //     //     all: 'data-a',
 //     //     span: 'name'
 //     // },

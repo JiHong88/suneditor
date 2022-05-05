@@ -9,15 +9,15 @@ function CoreInterface(core) {
 	this._d = core._d;
 	this._ww = core._ww;
 	this._wd = core._wd;
-	this.shadowRoot = core.shadowRoot;
 	this.plugins = core.plugins;
-	this.icons = core.icons;
 	this.status = core.status;
-	this.options = core.options;
 	this.context = core.context;
+	this.options = core.options;
 	this.history = core.history;
 	this.lang = core.lang;
+	this.icons = core.icons;
 	this.helper = core.helper;
+	this.shadowRoot = core.shadowRoot;
 }
 
 export default CoreInterface;

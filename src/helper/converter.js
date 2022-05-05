@@ -48,7 +48,7 @@ export function entityToHTML(content) {
  * @param {string} list Tags list ("br|p|div|pre...")
  * @returns {RegExp}
  */
-export function createTagsWhitelist(list) {
+export function createElementWhitelist(list) {
 	return new RegExp('<\\/?\\b(?!\\b' + (list || '').replace(/\|/g, '\\b|\\b') + '\\b)[^>]*>', 'gi');
 }
 
@@ -58,7 +58,7 @@ export function createTagsWhitelist(list) {
  * @param {string} list Tags list ("br|p|div|pre...")
  * @returns {RegExp}
  */
-export function createTagsBlacklist(list) {
+export function createElementBlacklist(list) {
 	return new RegExp('<\\/?\\b(?:\\b' + (list || '^').replace(/\|/g, '\\b|\\b') + '\\b)[^>]*>', 'gi');
 }
 
@@ -167,8 +167,8 @@ export function _setIframeCssTags(options) {
 const converter = {
 	htmlToEntity: htmlToEntity,
 	entityToHTML: entityToHTML,
-	createTagsWhitelist: createTagsWhitelist,
-	createTagsBlacklist: createTagsBlacklist,
+	createElementWhitelist: createElementWhitelist,
+	createElementBlacklist: createElementBlacklist,
 	_setDefaultOptionStyle: _setDefaultOptionStyle,
 	_setIframeDocument: _setIframeDocument,
 	_setIframeCssTags: _setIframeCssTags

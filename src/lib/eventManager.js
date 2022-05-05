@@ -19,7 +19,7 @@ import {
 function EventManager(core) {
 	EditorInterface.call(this, core);
 	this._events = [];
-	this._onButtonsCheck = new _w.RegExp("^(" + _w.Object.keys(core.options._textTagsMap).join("|") + ")$", "i");
+	this._onButtonsCheck = new _w.RegExp("^(" + _w.Object.keys(core.options._styleNodeMap).join("|") + ")$", "i");
 	this._onShortcutKey = false;
 	this._IEisComposing = false; // In IE, there is no "e.isComposing" in the key-up event.
 	this._directionKeyCode = new _w.RegExp("^(8|13|3[2-9]|40|46)$");
@@ -87,7 +87,7 @@ EventManager.prototype = {
 		this.core.effectNode = selectionNode;
 
 		const marginDir = this.options.rtl ? "marginRight" : "marginLeft";
-		const commandMap = this.core.commandMap;
+		const commandMap = this.core._commandMap;
 		const classOnCheck = this._onButtonsCheck;
 		const commandMapNodes = [];
 		const currentNodes = [];
@@ -161,7 +161,7 @@ EventManager.prototype = {
 	 * @private
 	 */
 	_setKeyEffect: function (ignoredList) {
-		const commandMap = this.core.commandMap;
+		const commandMap = this.core._commandMap;
 		const activePlugins = this.core.activePlugins;
 
 		for (let key in commandMap) {
@@ -434,7 +434,7 @@ EventManager.prototype = {
 			} else {
 				cleanData = (plainText === cleanData ? plainText : cleanData).replace(/\n/g, "<br>");
 			}
-			cleanData = this.core.cleanHTML(cleanData, this.core._pasteTagsWhitelistRegExp, this.core._pasteTagsBlacklistRegExp);
+			cleanData = this.core.cleanHTML(cleanData, null, null);
 		} else {
 			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, "<br>");
 		}

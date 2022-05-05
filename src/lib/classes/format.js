@@ -3350,9 +3350,9 @@ Format.prototype = {
 		const elStyle = el.style;
 
 		// bold, italic
-		if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.core._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
+		if (this.options._styleNodeMap[child.nodeName.toLowerCase()] === this.core._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
 		else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
-		if (this.options._textTagsMap[child.nodeName.toLowerCase()] === this.core._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
+		if (this.options._styleNodeMap[child.nodeName.toLowerCase()] === this.core._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
 		else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
 
 		// styles

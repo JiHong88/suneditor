@@ -19,7 +19,7 @@ class converter {
 	 * @param list Tags list ("br|p|div|pre...")
 	 * @returns
 	 */
-	createTagsWhitelist(list: string): RegExp;
+	createElementWhitelist(list: string): RegExp;
 
 	/**
 	 * @description Create blacklist RegExp object.
@@ -27,7 +27,7 @@ class converter {
 	 * @param list Tags list ("br|p|div|pre...")
 	 * @returns
 	 */
-	createTagsBlacklist(list: string): RegExp;
+	createElementBlacklist(list: string): RegExp;
 }
 
 export default converter;

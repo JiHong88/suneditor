@@ -133,27 +133,15 @@ export interface Core {
 
 	/**
 	 * @description Editor tags whitelist (RegExp object)
-	 * util.createTagsWhitelist(options._editorTagsWhitelist)
+	 * util.createElementWhitelist(options._editorElementWhitelist)
 	 */
-	_editorTagsWhitelistRegExp: RegExp;
+	_elementWhitelistRegExp: RegExp;
 
 	/**
 	 * @description Editor tags blacklist (RegExp object)
-	 * util.createTagsBlacklist(options.tagsBlacklist)
+	 * util.createElementBlacklist(options.elementBlacklist)
 	 */
-	_editorTagsBlacklistRegExp: RegExp;
-
-	/**
-	 * @description Tag whitelist when pasting (RegExp object)
-	 * util.createTagsWhitelist(options.pasteTagsWhitelist)
-	 */
-	_pasteTagsWhitelistRegExp: RegExp;
-
-	/**
-	 * @description Tag blacklist when pasting (RegExp object)
-	 * util.createTagsBlacklist(options.pasteTagsBlacklist)
-	 */
-	_pasteTagsBlacklistRegExp: RegExp;
+	_elementBlacklistRegExp: RegExp;
 
 	/**
 	 * @description Plugins array with "active" method.
@@ -210,7 +198,7 @@ export interface Core {
 
 	/**
 	 * @description If the module is not added, add the module and call the 'add' function
-	 * @param moduleArray module object's Array [dialog, resizing]
+	 * @param moduleArray module object's Array
 	 */
 	addModule(moduleArray: Module[]): void;
 
@@ -389,9 +377,9 @@ export interface Core {
 	 * @description Gets the clean HTML code for editor
 	 * @param html HTML string
 	 * @param whitelist Regular expression of allowed tags.
-	 * RegExp object is create by util.createTagsWhitelist method. (core._pasteTagsWhitelistRegExp)
+	 * RegExp object is create by util.createElementWhitelist method.
 	 * @param blacklist Regular expression of disallowed tags.
-	 * RegExp object is create by util.createTagsBlacklist method. (core._pasteTagsBlacklistRegExp)
+	 * RegExp object is create by util.createElementBlacklist method.
 	 * @returns
 	 */
 	cleanHTML(html: string, whitelist?: string | RegExp, blacklist?: string | RegExp): string;

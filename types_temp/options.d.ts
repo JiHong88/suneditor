@@ -35,27 +35,19 @@ export interface SunEditorOptions {
     /**
      * Add tags to the default tags whitelist of editor.
      */
-    addTagsWhitelist?: string | '*';
+     elementWhitelist?: string | '*';
     /**
      * Blacklist of the editor default tags.
      */
-    tagsBlacklist?: string;
-    /**
-     * Whitelist of tags when pasting.
-     */
-    pasteTagsWhitelist?: string | '*';
-    /**
-     * Blacklist of tags when pasting.
-     */
-    pasteTagsBlacklist?: string;
+     elementBlacklist?: string;
     /**
      * Add attributes whitelist of tags that should be kept undeleted from the editor.
      */
-    attributesWhitelist?: Record<string, string | '*'>;
+    attributeWhitelist?: Record<string, string | '*'>;
     /**
      * Add attribute blacklist of tags that should be deleted in editor.
      */
-    attributesBlacklist?: Record<string, string | '*'>;
+    attributeBlacklist?: Record<string, string | '*'>;
     /**
      * Layout
      * ======

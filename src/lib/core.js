@@ -29,6 +29,8 @@ import Menu from "./classes/menu";
 // classes interface
 import ClassesInterface from "../interface/_classes";
 
+const _parser = new _w.DOMParser();
+
 /**
  * @description Check disallowed tags
  * @param {Node} element Element to check
@@ -54,14 +56,14 @@ function CleanTags(lowLevelCheck, m, t) {
     const tagName = t.match(/(?!<)[a-zA-Z0-9\-]+/)[0].toLowerCase();
 
     // blacklist
-    const bAttr = this._attributesTagsBlacklist[tagName];
+    const bAttr = this._attributeBlacklist[tagName];
     if (bAttr) m = m.replace(bAttr, '');
-    else m = m.replace(this._attributesBlacklistRegExp, '');
+    else m = m.replace(this._attributeBlacklistRegExp, '');
 
     // whitelist
-    const wAttr = this._attributesTagsWhitelist[tagName];
+    const wAttr = this._attributeWhitelist[tagName];
     if (wAttr) v = m.match(wAttr);
-    else v = m.match(this._attributesWhitelistRegExp);
+    else v = m.match(this._attributeWhitelistRegExp);
 
     // anchor
     if (!lowLevelCheck || /<a\b/i.test(t)) {
@@ -209,274 +211,15 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
     this.initPlugins = {};
 
     /**
-     * @description The selection node (selection.getNode()) to which the effect was last applied
-     */
-    this.effectNode = null;
-
-    /**
-     * @description The file component object of current selected file tag (component.get)
-     */
-    this.currentFileComponentInfo = null;
-
-    /**
-     * @description An array of buttons whose class name is not "se-code-view-enabled"
-     */
-    this.codeViewDisabledButtons = [];
-
-    /**
-     * @description An array of buttons whose class name is not "se-resizing-enabled"
-     */
-    this.resizingDisabledButtons = [];
-
-    /**
-     * @description Plugin buttons
-     * @private
-     */
-    this._pluginCallButtons = pluginCallButtons;
-
-    /**
-     * @description Block controller mousedown events in "shadowRoot" environment
-     * @private
-     */
-    this._shadowRootControllerEventTarget = null;
-
-    /**
-     * @description Tag whitelist RegExp object used in "_consistencyCheckOfHTML" method
-     * ^(options._editorTagsWhitelist)$
-     * @private
-     */
-    this._htmlCheckWhitelistRegExp = null;
-
-    /**
-     * @description Tag blacklist RegExp object used in "_consistencyCheckOfHTML" method
-     * @private
-     */
-    this._htmlCheckBlacklistRegExp = null;
-
-    /**
-     * @description Editor tags whitelist (RegExp object)
-     * helper.converter.createTagsWhitelist(options._editorTagsWhitelist)
-     * @private
-     */
-    this._editorTagsWhitelistRegExp = null;
-
-    /**
-     * @description Editor tags blacklist (RegExp object)
-     * helper.converter.createTagsBlacklist(options.tagsBlacklist)
-     * @private
-     */
-    this._editorTagsBlacklistRegExp = null;
-
-    /**
-     * @description Tag whitelist when pasting (RegExp object)
-     * helper.converter.createTagsWhitelist(options.pasteTagsWhitelist)
-     * @private
-     */
-    this._pasteTagsWhitelistRegExp = null;
-
-    /**
-     * @description Tag blacklist when pasting (RegExp object)
-     * helper.converter.createTagsBlacklist(options.pasteTagsBlacklist)
-     * @private
-     */
-    this._pasteTagsBlacklistRegExp = null;
-
-    /**
-     * @description RegExp when using check disallowd tags. (b, i, ins, strike, s)
-     * @private
-     */
-    this._disallowedTextTagsRegExp = null;
-
-    this._responsiveButtons = _responsiveButtons;
-    this._parser = new _w.DOMParser();
-    this._prevRtl = options.rtl;
-    this._editorHeight = 0;
-
-    /**
-     * @description Is inline mode?
-     * @private
-     */
-    this._isInline = null;
-
-    /**
-     * @description Is balloon|balloon-always mode?
-     * @private
-     */
-    this._isBalloon = null;
-
-    /**
-     * @description Is balloon-always mode?
-     * @private
-     */
-    this._isBalloonAlways = null;
-
-    /**
-     * @description Attributes whitelist used by the cleanHTML method
-     * @private
-     */
-    this._attributesWhitelistRegExp = null;
-
-    /**
-     * @description Attributes blacklist used by the cleanHTML method
-     * @private
-     */
-    this._attributesBlacklistRegExp = null;
-
-    /**
-     * @description Attributes of tags whitelist used by the cleanHTML method
-     * @private
-     */
-    this._attributesTagsWhitelist = null;
-
-    /**
-     * @description Attributes of tags blacklist used by the cleanHTML method
-     * @private
-     */
-    this._attributesTagsBlacklist = null;
-
-    /**
-     * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
-     * @private
-     */
-    this._notHideToolbar = false;
-
-    /**
-     * @description Variables for controlling focus and blur events
-     * @private
-     */
-    this._antiBlur = false;
-
-    /**
-     * @description Component line breaker element
-     * @private
-     */
-    this._lineBreaker = null;
-
-    /**
-     * @description If true, (initialize, reset) all indexes of image, video information
-     * @private
-     */
-    this._componentsInfoInit = true;
-    this._componentsInfoReset = false;
-
-    /**
      * @description Plugins array with "active" method.
      * "activePlugins" runs the "add" method when creating the editor.
      */
     this.activePlugins = null;
 
     /**
-     * @description Information of tags that should maintain HTML structure, style, class name, etc. (In use by "math" plugin)
-     * When inserting "html" such as paste, it is executed on the "html" to be inserted. (core.cleanHTML)
-     * Basic Editor Actions:
-     * 1. All classes not starting with "__se__" or "se-" in the editor are removed.
-     * 2. The style of all tags except the "span" tag is removed from the editor.
-     * "managedTagsInfo" structure ex:
-     * managedTagsInfo: {
-     *   query: ".__se__xxx, se-xxx"
-     *   map: {
-     *     "__se__xxx": method.bind(core),
-     *     "se-xxx": method.bind(core),
-     *   }
-     * }
-     * @example
-     * Define in the following return format in the "managedTagInfo" function of the plugin.
-     * managedTagInfo() => {
-     *  return {
-     *    className: "string", // Class name to identify the tag. ("__se__xxx", "se-xxx")
-     *    // Change the html of the "element". ("element" is the element found with "className".)
-     *    // "method" is executed by binding "core".
-     *    method: function (element) {
-     *      // this === core
-     *      element.innerHTML = // (rendered html);
-     *    }
-     *  }
-     * }
+     * @description The selection node (selection.getNode()) to which the effect was last applied
      */
-    this.managedTagsInfo = null;
-
-    /**
-     * @description Array of "checkFileInfo" functions with the core bound
-     * (Plugins with "checkFileInfo" and "resetFileInfo" methods)
-     * "fileInfoPlugins" runs the "add" method when creating the editor.
-     * "checkFileInfo" method is always call just before the "change" event.
-     * @private
-     */
-    this._fileInfoPluginsCheck = null;
-
-    /**
-     * @description Array of "resetFileInfo" functions with the core bound
-     * (Plugins with "checkFileInfo" and "resetFileInfo" methods)
-     * "checkFileInfo" method is always call just before the "editorInstance.setOptions" method.
-     * @private
-     */
-    this._fileInfoPluginsReset = null;
-
-    /**
-     * @description Variables for file component management
-     * @private
-     */
-    this._fileManager = {
-        tags: null,
-        regExp: null,
-        queryString: null,
-        pluginRegExp: null,
-        pluginMap: null
-    };
-
-    /**
-     * @description Elements that need to change text or className for each selection change
-     * After creating the editor, "activePlugins" are added.
-     * @property {Element} STRONG bold button
-     * @property {Element} U underline button
-     * @property {Element} EM italic button
-     * @property {Element} DEL strike button
-     * @property {Element} SUB subscript button
-     * @property {Element} SUP superscript button
-     * @property {Element} OUTDENT outdent button
-     * @property {Element} INDENT indent button
-     */
-    this.commandMap = null;
-
-    /**
-     * @description Style button related to edit area
-     * @property {Element} fullScreen fullScreen button element
-     * @property {Element} showBlocks showBlocks button element
-     * @property {Element} codeView codeView button element
-     * @private
-     */
-    this._styleCommandMap = null;
-
-    /**
-     * @description CSS properties related to style tags 
-     * @private
-     */
-    this._commandMapStyles = {
-        STRONG: ["font-weight"],
-        U: ["text-decoration"],
-        EM: ["font-style"],
-        DEL: ["text-decoration"]
-    };
-
-    /**
-     * @description Contains pairs of all "data-commands" and "elements" setted in toolbar over time
-     * Used primarily to save and recover button states after the toolbar re-creation
-     * Updates each "_cachingButtons()" invocation  
-     */
-    this.allCommandButtons = null;
-
-    /**
-     * @description Map of default command
-     * @private
-     */
-    this._defaultCommand = {
-        bold: options.textTags.bold,
-        underline: options.textTags.underline,
-        italic: options.textTags.italic,
-        strike: options.textTags.strike,
-        subscript: options.textTags.sub,
-        superscript: options.textTags.sup
-    };
+    this.effectNode = null;
 
     /**
      * @description Variables used internally in editor operation
@@ -523,6 +266,266 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
         },
         _lineBreakComp: null,
         _lineBreakDir: ""
+    };
+
+    /**
+     * @description The file component object of current selected file tag (component.get)
+     */
+    this.currentFileComponentInfo = null;
+
+    /**
+     * @description An array of buttons whose class name is not "se-code-view-enabled"
+     */
+    this.codeViewDisabledButtons = [];
+
+    /**
+     * @description An array of buttons whose class name is not "se-resizing-enabled"
+     */
+    this.resizingDisabledButtons = [];
+
+    /**
+     * @description Plugin buttons
+     * @private
+     */
+    this._pluginCallButtons = pluginCallButtons;
+
+    /**
+     * @description Block controller mousedown events in "shadowRoot" environment
+     * @private
+     */
+    this._shadowRootControllerEventTarget = null;
+
+    /**
+     * @description Tag whitelist RegExp object used in "_consistencyCheckOfHTML" method
+     * ^(options._editorElementWhitelist)$
+     * @private
+     */
+    this._htmlCheckWhitelistRegExp = null;
+
+    /**
+     * @description Tag blacklist RegExp object used in "_consistencyCheckOfHTML" method
+     * @private
+     */
+    this._htmlCheckBlacklistRegExp = null;
+
+    /**
+     * @description Editor tags whitelist (RegExp object)
+     * helper.converter.createElementWhitelist(options._editorElementWhitelist)
+     * @private
+     */
+    this._elementWhitelistRegExp = null;
+
+    /**
+     * @description Editor tags blacklist (RegExp object)
+     * helper.converter.createElementBlacklist(options.elementBlacklist)
+     * @private
+     */
+    this._elementBlacklistRegExp = null;
+
+    /**
+     * @description RegExp when using check disallowd tags. (b, i, ins, strike, s)
+     * @private
+     */
+    this._disallowedStyleNodesRegExp = null;
+
+    /**
+     * @description Button List in Responsive Toolbar.
+     * @private
+     */
+    this._responsiveButtons = _responsiveButtons;
+
+    /**
+     * @description Property related to rtl and ltr conversions.
+     * @private
+     */
+    this._prevRtl = options.rtl;
+
+    /**
+     * @description Property related to editor resizing.
+     * @private
+     */
+    this._editorHeight = 0;
+
+    /**
+     * @description Is inline mode?
+     * @private
+     */
+    this._isInline = null;
+
+    /**
+     * @description Is balloon|balloon-always mode?
+     * @private
+     */
+    this._isBalloon = null;
+
+    /**
+     * @description Is balloon-always mode?
+     * @private
+     */
+    this._isBalloonAlways = null;
+
+    /**
+     * @description Attributes whitelist used by the cleanHTML method
+     * @private
+     */
+    this._attributeWhitelistRegExp = null;
+
+    /**
+     * @description Attributes blacklist used by the cleanHTML method
+     * @private
+     */
+    this._attributeBlacklistRegExp = null;
+
+    /**
+     * @description Attributes of tags whitelist used by the cleanHTML method
+     * @private
+     */
+    this._attributeWhitelist = null;
+
+    /**
+     * @description Attributes of tags blacklist used by the cleanHTML method
+     * @private
+     */
+    this._attributeBlacklist = null;
+
+    /**
+     * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
+     * @private
+     */
+    this._notHideToolbar = false;
+
+    /**
+     * @description Variables for controlling focus and blur events
+     * @private
+     */
+    this._antiBlur = false;
+
+    /**
+     * @description Component line breaker element
+     * @private
+     */
+    this._lineBreaker = null;
+
+    /**
+     * @description If true, (initialize, reset) all indexes of image, video information
+     * @private
+     */
+    this._componentsInfoInit = true;
+    this._componentsInfoReset = false;
+
+    /**
+     * @description Information of tags that should maintain HTML structure, style, class name, etc. (In use by "math" plugin)
+     * When inserting "html" such as paste, it is executed on the "html" to be inserted. (core.cleanHTML)
+     * Basic Editor Actions:
+     * 1. All classes not starting with "__se__" or "se-" in the editor are removed.
+     * 2. The style of all tags except the "span" tag is removed from the editor.
+     * "_managedElementInfo" structure ex:
+     * _managedElementInfo: {
+     *   query: ".__se__xxx, se-xxx"
+     *   map: {
+     *     "__se__xxx": method.bind(core),
+     *     "se-xxx": method.bind(core),
+     *   }
+     * }
+     * @example
+     * Define in the following return format in the "_managedElementInfo" function of the plugin.
+     * _managedElementInfo() => {
+     *  return {
+     *    className: "string", // Class name to identify the tag. ("__se__xxx", "se-xxx")
+     *    // Change the html of the "element". ("element" is the element found with "className".)
+     *    // "method" is executed by binding "core".
+     *    method: function (element) {
+     *      // this === core
+     *      element.innerHTML = // (rendered html);
+     *    }
+     *  }
+     * }
+     * @private
+     */
+    this._managedElementInfo = null;
+
+    /**
+     * @description Array of "checkFileInfo" functions with the core bound
+     * (Plugins with "checkFileInfo" and "resetFileInfo" methods)
+     * "fileInfoPlugins" runs the "add" method when creating the editor.
+     * "checkFileInfo" method is always call just before the "change" event.
+     * @private
+     */
+    this._fileInfoPluginsCheck = null;
+
+    /**
+     * @description Array of "resetFileInfo" functions with the core bound
+     * (Plugins with "checkFileInfo" and "resetFileInfo" methods)
+     * "checkFileInfo" method is always call just before the "editorInstance.setOptions" method.
+     * @private
+     */
+    this._fileInfoPluginsReset = null;
+
+    /**
+     * @description Variables for file component management
+     * @private
+     */
+    this._fileManager = {
+        tags: null,
+        regExp: null,
+        queryString: null,
+        pluginRegExp: null,
+        pluginMap: null
+    };
+
+    /**
+     * @description Elements that need to change text or className for each selection change
+     * After creating the editor, "activePlugins" are added.
+     * @property {Element} STRONG bold button
+     * @property {Element} U underline button
+     * @property {Element} EM italic button
+     * @property {Element} DEL strike button
+     * @property {Element} SUB subscript button
+     * @property {Element} SUP superscript button
+     * @property {Element} OUTDENT outdent button
+     * @property {Element} INDENT indent button
+     * @private
+     */
+    this._commandMap = null;
+
+    /**
+     * @description Style button related to edit area
+     * @property {Element} fullScreen fullScreen button element
+     * @property {Element} showBlocks showBlocks button element
+     * @property {Element} codeView codeView button element
+     * @private
+     */
+    this._styleCommandMap = null;
+
+    /**
+     * @description CSS properties related to style tags 
+     * @private
+     */
+    this._commandMapStyles = {
+        STRONG: ["font-weight"],
+        U: ["text-decoration"],
+        EM: ["font-style"],
+        DEL: ["text-decoration"]
+    };
+
+    /**
+     * @description Contains pairs of all "data-commands" and "elements" setted in toolbar over time
+     * Used primarily to save and recover button states after the toolbar re-creation
+     * Updates each "_cachingButtons()" invocation  
+     */
+    this.allCommandButtons = null;
+
+    /**
+     * @description Map of default command
+     * @private
+     */
+    this._defaultCommand = {
+        bold: options.textTags.bold,
+        underline: options.textTags.underline,
+        italic: options.textTags.italic,
+        strike: options.textTags.strike,
+        subscript: options.textTags.sub,
+        superscript: options.textTags.sup
     };
 
     /************ Core init ************/
@@ -575,8 +578,8 @@ Core.prototype = {
             this.initPlugins[pluginName] = true;
         }
 
-        if (this.plugins[pluginName].active && !this.commandMap[pluginName] && !!target) {
-            this.commandMap[pluginName] = target;
+        if (this.plugins[pluginName].active && !this._commandMap[pluginName] && !!target) {
+            this._commandMap[pluginName] = target;
             this.activePlugins.push(pluginName);
         }
     },
@@ -584,7 +587,7 @@ Core.prototype = {
     /**
      * @todo
      * @description If the module is not added, add the module and call the "add" function
-     * @param {Array} moduleArray module object's Array [dialog, resizing]
+     * @param {Array} moduleArray module object's Array
      */
     addModule: function (moduleArray) {
         for (let i = 0, len = moduleArray.length, moduleName; i < len; i++) {
@@ -850,7 +853,7 @@ Core.prototype = {
                 break;
             default: // 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'..
                 command = this._defaultCommand[command.toLowerCase()] || command;
-                if (!this.commandMap[command]) this.commandMap[command] = target;
+                if (!this._commandMap[command]) this._commandMap[command] = target;
 
                 const nodesMap = this.status.currentNodesMap;
                 const cmd = nodesMap.indexOf(command) > -1 ? null : domUtils.createElement(command);
@@ -963,7 +966,7 @@ Core.prototype = {
         const code_html = this._getCodeView();
 
         if (this.options.fullPage) {
-            const parseDocument = this._parser.parseFromString(code_html, 'text/html');
+            const parseDocument = _parser.parseFromString(code_html, 'text/html');
             const headChildren = parseDocument.head.children;
 
             for (let i = 0, len = headChildren.length; i < len; i++) {
@@ -1385,13 +1388,13 @@ Core.prototype = {
      * @description Gets the clean HTML code for editor
      * @param {string} html HTML string
      * @param {string|RegExp|null} whitelist Regular expression of allowed tags.
-     * RegExp object is create by helper.converter.createTagsWhitelist method. (core._pasteTagsWhitelistRegExp)
+     * RegExp object is create by helper.converter.createElementWhitelist method.
      * @param {string|RegExp|null} blacklist Regular expression of disallowed tags.
-     * RegExp object is create by helper.converter.createTagsBlacklist method. (core._pasteTagsBlacklistRegExp)
+     * RegExp object is create by helper.converter.createElementBlacklist method.
      * @returns {string}
      */
     cleanHTML: function (html, whitelist, blacklist) {
-        html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanTags.bind(this, true));
+        html = this._deleteDisallowedTags(_parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanTags.bind(this, true));
 
         const dom = this._d.createRange().createContextualFragment(html, true);
         try {
@@ -1400,12 +1403,12 @@ Core.prototype = {
             console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
         }
 
-        if (this.managedTagsInfo && this.managedTagsInfo.query) {
-            const textCompList = dom.querySelectorAll(this.managedTagsInfo.query);
+        if (this._managedElementInfo && this._managedElementInfo.query) {
+            const textCompList = dom.querySelectorAll(this._managedElementInfo.query);
             for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
                 classList = [].slice.call(textCompList[i].classList);
                 for (let c = 0, cLen = classList.length; c < cLen; c++) {
-                    initMethod = this.managedTagsInfo.map[classList[c]];
+                    initMethod = this._managedElementInfo.map[classList[c]];
                     if (initMethod) {
                         initMethod(textCompList[i]);
                         break;
@@ -1435,8 +1438,8 @@ Core.prototype = {
         if (!cleanHTML) {
             cleanHTML = html;
         } else {
-            if (whitelist) cleanHTML = cleanHTML.replace(typeof whitelist === 'string' ? converter.createTagsWhitelist(whitelist) : whitelist, '');
-            if (blacklist) cleanHTML = cleanHTML.replace(typeof blacklist === 'string' ? converter.createTagsBlacklist(blacklist) : blacklist, '');
+            if (whitelist) cleanHTML = cleanHTML.replace(typeof whitelist === 'string' ? converter.createElementWhitelist(whitelist) : whitelist, '');
+            if (blacklist) cleanHTML = cleanHTML.replace(typeof blacklist === 'string' ? converter.createElementBlacklist(blacklist) : blacklist, '');
         }
 
         return this._tagConvertor(cleanHTML);
@@ -1448,7 +1451,7 @@ Core.prototype = {
      * @returns {string}
      */
     convertContentForEditor: function (content) {
-        content = this._deleteDisallowedTags(this._parser.parseFromString(content, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanTags.bind(this, false));
+        content = this._deleteDisallowedTags(_parser.parseFromString(content, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanTags.bind(this, false));
         const dom = this._d.createRange().createContextualFragment(content, false);
 
         try {
@@ -1457,12 +1460,12 @@ Core.prototype = {
             console.warn('[SUNEDITOR.convertContentForEditor.consistencyCheck.fail] ' + error);
         }
 
-        if (this.managedTagsInfo && this.managedTagsInfo.query) {
-            const textCompList = dom.querySelectorAll(this.managedTagsInfo.query);
+        if (this._managedElementInfo && this._managedElementInfo.query) {
+            const textCompList = dom.querySelectorAll(this._managedElementInfo.query);
             for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
                 classList = [].slice.call(textCompList[i].classList);
                 for (let c = 0, cLen = classList.length; c < cLen; c++) {
-                    initMethod = this.managedTagsInfo.map[classList[c]];
+                    initMethod = this._managedElementInfo.map[classList[c]];
                     if (initMethod) {
                         initMethod(textCompList[i]);
                         break;
@@ -1862,7 +1865,7 @@ Core.prototype = {
             return html;
         }
         // comments
-        if (node.nodeType === 8 && this._allowHTMLComments) {
+        if (node.nodeType === 8 && this._allowHTMLComment) {
             return '<!--' + node.textContent.trim() + '-->';
         }
 
@@ -1876,10 +1879,10 @@ Core.prototype = {
      * @private
      */
     _tagConvertor: function (text) {
-        if (!this._disallowedTextTagsRegExp) return text;
+        if (!this._disallowedStyleNodesRegExp) return text;
 
-        const ec = this.options._textTagsMap;
-        return text.replace(this._disallowedTextTagsRegExp, function (m, t, n, p) {
+        const ec = this.options._styleNodeMap;
+        return text.replace(this._disallowedStyleNodesRegExp, function (m, t, n, p) {
             return t + (typeof ec[n] === 'string' ? ec[n] : n) + (p ? ' ' + p : '');
         });
     },
@@ -1895,8 +1898,8 @@ Core.prototype = {
             .replace(/\n/g, '')
             .replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '')
             .replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '')
-            .replace(this._editorTagsWhitelistRegExp, '')
-            .replace(this._editorTagsBlacklistRegExp, '');
+            .replace(this._elementWhitelistRegExp, '')
+            .replace(this._elementBlacklistRegExp, '');
     },
 
     /**
@@ -2097,14 +2100,14 @@ Core.prototype = {
         }
 
         // set disallow text nodes
-        const disallowTextTags = _w.Object.keys(options._textTagsMap);
-        const allowTextTags = !options.addTagsWhitelist ? [] : options.addTagsWhitelist.split('|').filter(function (v) {
+        const disallowStyleNodes = _w.Object.keys(options._styleNodeMap);
+        const allowStyleNodes = !options.elementWhitelist ? [] : options.elementWhitelist.split('|').filter(function (v) {
             return /b|i|ins|s|strike/i.test(v);
         });
-        for (let i = 0; i < allowTextTags.length; i++) {
-            disallowTextTags.splice(disallowTextTags.indexOf(allowTextTags[i].toLowerCase()), 1);
+        for (let i = 0; i < allowStyleNodes.length; i++) {
+            disallowStyleNodes.splice(disallowStyleNodes.indexOf(allowStyleNodes[i].toLowerCase()), 1);
         }
-        this._disallowedTextTagsRegExp = disallowTextTags.length === 0 ? null : new wRegExp('(<\\/?)(' + disallowTextTags.join('|') + ')\\b\\s*([^>^<]+)?\\s*(?=>)', 'gi');
+        this._disallowedStyleNodesRegExp = disallowStyleNodes.length === 0 ? null : new wRegExp('(<\\/?)(' + disallowStyleNodes.join('|') + ')\\b\\s*([^>^<]+)?\\s*(?=>)', 'gi');
 
         // set whitelist
         const getRegList = function (str, str2) {
@@ -2112,19 +2115,16 @@ Core.prototype = {
         };
         // tags
         const defaultAttr = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
-        this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1 || options._editorTagsWhitelist === '*';
+        this._allowHTMLComment = options._editorElementWhitelist.indexOf('//') > -1 || options._editorElementWhitelist === '*';
         // html check
-        this._htmlCheckWhitelistRegExp = new wRegExp('^(' + getRegList(options._editorTagsWhitelist.replace('|//', ''), '') + ')$', 'i');
-        this._htmlCheckBlacklistRegExp = new wRegExp('^(' + (options.tagsBlacklist || '^') + ')$', 'i');
+        this._htmlCheckWhitelistRegExp = new wRegExp('^(' + getRegList(options._editorElementWhitelist.replace('|//', ''), '') + ')$', 'i');
+        this._htmlCheckBlacklistRegExp = new wRegExp('^(' + (options.elementBlacklist || '^') + ')$', 'i');
         // tags
-        this._editorTagsWhitelistRegExp = converter.createTagsWhitelist(getRegList(options._editorTagsWhitelist.replace('|//', '|<!--|-->'), ''));
-        this._editorTagsBlacklistRegExp = converter.createTagsBlacklist(options.tagsBlacklist.replace('|//', '|<!--|-->'));
-        // paste tags
-        this._pasteTagsWhitelistRegExp = converter.createTagsWhitelist(getRegList(options.pasteTagsWhitelist, ''));
-        this._pasteTagsBlacklistRegExp = converter.createTagsBlacklist(options.pasteTagsBlacklist);
+        this._elementWhitelistRegExp = converter.createElementWhitelist(getRegList(options._editorElementWhitelist.replace('|//', '|<!--|-->'), ''));
+        this._elementBlacklistRegExp = converter.createElementBlacklist(options.elementBlacklist.replace('|//', '|<!--|-->'));
         // attributes
         const regEndStr = '\\s*=\\s*(\")[^\"]*\\1';
-        const _wAttr = options.attributesWhitelist;
+        const _wAttr = options.attributeWhitelist;
         let tagsAttr = {};
         let allAttr = '';
         if (!!_wAttr) {
@@ -2138,11 +2138,11 @@ Core.prototype = {
             }
         }
 
-        this._attributesWhitelistRegExp = new wRegExp('\\s(?:' + (allAttr || defaultAttr) + ')' + regEndStr, 'ig');
-        this._attributesTagsWhitelist = tagsAttr;
+        this._attributeWhitelistRegExp = new wRegExp('\\s(?:' + (allAttr || defaultAttr) + ')' + regEndStr, 'ig');
+        this._attributeWhitelist = tagsAttr;
 
         // blacklist
-        const _bAttr = options.attributesBlacklist;
+        const _bAttr = options.attributeBlacklist;
         tagsAttr = {};
         allAttr = '';
         if (!!_bAttr) {
@@ -2156,8 +2156,8 @@ Core.prototype = {
             }
         }
 
-        this._attributesBlacklistRegExp = new wRegExp('\\s(?:' + (allAttr || '^') + ')' + regEndStr, 'ig');
-        this._attributesTagsBlacklist = tagsAttr;
+        this._attributeBlacklistRegExp = new wRegExp('\\s(?:' + (allAttr || '^') + ')' + regEndStr, 'ig');
+        this._attributeBlacklist = tagsAttr;
 
         // set modes
         this._isInline = /inline/i.test(options.mode);
@@ -2197,7 +2197,7 @@ Core.prototype = {
         this._fileInfoPluginsReset = [];
 
         // text components
-        this.managedTagsInfo = {
+        this._managedElementInfo = {
             query: '',
             map: {}
         };
@@ -2234,11 +2234,11 @@ Core.prototype = {
             if (plugin.managedTags) {
                 const info = plugin.managedTags();
                 managedClass.push('.' + info.className);
-                this.managedTagsInfo.map[info.className] = info.method.bind(this);
+                this._managedElementInfo.map[info.className] = info.method.bind(this);
             }
         }
 
-        this.managedTagsInfo.query = managedClass.toString();
+        this._managedElementInfo.query = managedClass.toString();
         this._fileManager.queryString = this._fileManager.tags.join(',');
         this._fileManager.regExp = new wRegExp('^(' + (this._fileManager.tags.join('|') || '^') + ')$', 'i');
         this._fileManager.pluginRegExp = new wRegExp('^(' + (filePluginRegExp.length === 0 ? '^' : filePluginRegExp.join('|')) + ')$', 'i');
@@ -2275,16 +2275,16 @@ Core.prototype = {
         this._saveButtonStates();
 
         const buttons = this.context.buttons;
-        this.commandMap = {
+        this._commandMap = {
             SUB: buttons.subscript,
             SUP: buttons.superscript,
             OUTDENT: buttons.outdent,
             INDENT: buttons.indent
         };
-        this.commandMap[this.options.textTags.bold.toUpperCase()] = buttons.bold;
-        this.commandMap[this.options.textTags.underline.toUpperCase()] = buttons.underline;
-        this.commandMap[this.options.textTags.italic.toUpperCase()] = buttons.italic;
-        this.commandMap[this.options.textTags.strike.toUpperCase()] = buttons.strike;
+        this._commandMap[this.options.textTags.bold.toUpperCase()] = buttons.bold;
+        this._commandMap[this.options.textTags.underline.toUpperCase()] = buttons.underline;
+        this._commandMap[this.options.textTags.italic.toUpperCase()] = buttons.italic;
+        this._commandMap[this.options.textTags.strike.toUpperCase()] = buttons.strike;
 
         this._styleCommandMap = {
             fullScreen: buttons.fullScreen,

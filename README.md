@@ -1,6 +1,6 @@
 # SunEditor
-Vanilla javscript based WYSIWYG web editor, with no dependencies.
-"SunEditor" assumes compatibility up to IE11 and other all browser without polyfill.
+Vanilla javscript based WYSIWYG web editor.
+SunEditor supports IE11 and all modern browsers with no dependencies.
 
 #### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
 
@@ -399,19 +399,13 @@ historyStackDelayTime : When recording the history stack, this is the delay time
 
 // Whitelist, Blacklist -----------------------------------------------------------------------------------------
 // (You can use regular expression syntax.)
-// _defaultTagsWhitelist : 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary'
-addTagsWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {string}
+// _defaultElementWhitelist : 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary'
+elementWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {string}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
                         ex) '*' // This means all tags are allowed. (Not available on "blacklist")
-tagsBlacklist         : Blacklist of the editor default tags.               default: null {string}
+elementBlacklist         : Blacklist of the editor default tags.               default: null {string}
                         ex) 'h1|h2'
-// _editorTagsWhitelist  : _defaultTagsWhitelist + addTagsWhitelist - tagsBlacklist
-pasteTagsWhitelist    : Whitelist of tags when pasting.                     default: _editorTagsWhitelist {string}
-                        ex) 'p|h1|h2|h3'
-                        ex) '*' // This means all tags are allowed. (Not available on "blacklist")
-pasteTagsBlacklist    : Blacklist of tags when pasting.                     default: null {string}
-                        ex) 'h1|h2'
-attributesWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}
+attributeWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}
                         // -- Fixed whitelist --
                         // Native attributes: 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls'
                         // Editor attributes: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size'
@@ -420,7 +414,7 @@ attributesWhitelist   : Add attributes whitelist of tags that should be kept und
                             'input': 'checked|name' // Apply to input tag
                             '???': '*' // "*" === all attributes
                         }
-attributesBlacklist   : Add attribute blacklist of tags that should be deleted in editor.   default: null {Object}
+attributeBlacklist   : Add attribute blacklist of tags that should be deleted in editor.   default: null {Object}
                         ex) {
                             'all': 'id', // Apply to all tags
                             'input': 'style' // Apply to input tag

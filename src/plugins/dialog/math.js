@@ -124,7 +124,7 @@ export default {
     },
 
     /**
-     * @Override core - managedTagsInfo
+     * @Override core - _managedElementInfo
      */
     managedTags: function () {
         return {

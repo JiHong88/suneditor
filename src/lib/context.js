@@ -6,7 +6,7 @@
  * @returns {Object} {Elements, variables of the editor, option}
  * @private
  */
-const _Context = function (element, cons, options) {
+const Context = function (element, cons, options) {
     return {
         element: {
             originElement: element,
@@ -57,4 +57,4 @@ const _Context = function (element, cons, options) {
     };
 };
 
-export default _Context;
+export default Context;
