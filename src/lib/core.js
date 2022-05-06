@@ -4284,7 +4284,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         wysiwyg.appendChild(format);
                         last = br;
                     }
-                    this.setRange(first, 0, last, last.textContent.length);
+                    event._showToolbarBalloon(this.setRange(first, 0, last, last.textContent.length));
                     break;
                 case 'codeView':
                     this.toggleCodeView();
