@@ -800,7 +800,7 @@ Core.prototype = {
                     last = domUtils.createElement('BR');
                     wysiwyg.appendChild(domUtils.createElement(this.options.defaultTag, null, last));
                 }
-                this.selection.setRange(first, 0, last, last.textContent.length);
+                this.toolbar._showBalloon(this.selection.setRange(first, 0, last, last.textContent.length));
                 break;
             case 'codeView':
                 this.setCodeView(!this.status.isCodeView);
@@ -1039,7 +1039,7 @@ Core.prototype = {
         const _var = this._transformStatus;
 
         this.menu.controllerOff();
-        const wasToolbarHidden = (toolbar.style.display === 'none' || (this._isInline && !this._inlineToolbarAttr.isShow));
+        const wasToolbarHidden = (toolbar.style.display === 'none' || (this._isInline && !this.toolbar._inlineToolbarAttr.isShow));
 
         if (value) {
             this.status.isFullScreen = true;

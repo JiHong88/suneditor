@@ -321,10 +321,10 @@ Toolbar.prototype = {
 		toolbar.style.visibility = "";
 	},
 
-	_setBalloonOffset: function (isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin) {
+	_setBalloonOffset: function (isDirTop, rects, toolbarEl, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin) {
 		const padding = 1;
-		const toolbarWidth = toolbar.offsetWidth;
-		const toolbarHeight = rects.noText && !isDirTop ? 0 : toolbar.offsetHeight;
+		const toolbarWidth = toolbarEl.offsetWidth;
+		const toolbarHeight = rects.noText && !isDirTop ? 0 : toolbarEl.offsetHeight;
 
 		const absoluteLeft = (isDirTop ? rects.left : rects.right) - editorLeft - toolbarWidth / 2 + scrollLeft;
 		const overRight = absoluteLeft + toolbarWidth - editorWidth;
@@ -333,7 +333,7 @@ Toolbar.prototype = {
 		let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
 
 		let resetTop = false;
-		const space = t + (isDirTop ? this.offset.getGlobal(context.element.topArea).top : toolbar.offsetHeight - this.context.element.wysiwyg.offsetHeight);
+		const space = t + (isDirTop ? this.offset.getGlobal(this.context.element.topArea).top : toolbarEl.offsetHeight - this.context.element.wysiwyg.offsetHeight);
 		if (!isDirTop && space > 0 && this._getPageBottomSpace() < space) {
 			isDirTop = true;
 			resetTop = true;
@@ -344,8 +344,8 @@ Toolbar.prototype = {
 
 		if (resetTop) t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
 
-		toolbar.style.left = _w.Math.floor(l) + "px";
-		toolbar.style.top = _w.Math.floor(t) + "px";
+		toolbarEl.style.left = _w.Math.floor(l) + "px";
+		toolbarEl.style.top = _w.Math.floor(t) + "px";
 
 		if (isDirTop) {
 			domUtils.removeClass(this.context.element._arrow, "se-arrow-up");
@@ -358,7 +358,7 @@ Toolbar.prototype = {
 		}
 
 		const arrow_left = _w.Math.floor(toolbarWidth / 2 + (absoluteLeft - l));
-		this.context.element._arrow.style.left = (arrow_left + arrowMargin > toolbar.offsetWidth ? toolbar.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + "px";
+		this.context.element._arrow.style.left = (arrow_left + arrowMargin > toolbarEl.offsetWidth ? toolbarEl.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + "px";
 	},
 
 	_getPageBottomSpace: function () {

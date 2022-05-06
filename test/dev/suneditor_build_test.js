@@ -18,6 +18,7 @@ import Katex from 'katex';
 window.e = suneditor.create(document.getElementById('editor2'), {
     // value: 'abc',
     // plugins: [align],
+    mode: "inline",
     width: "100%",
     minHeight : 300,
     charCounter: true,
