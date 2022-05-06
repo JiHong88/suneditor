@@ -213,7 +213,7 @@ export default {
         const emptyDiv = container.parentNode;
         this.util.remove(container);
         this.plugins.audio.init.call(this);
-        this.controllerOff();
+        this.menu.controllerOff();
 
         if (emptyDiv !== this.context.element.wysiwyg) this.util.removeAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
 
@@ -489,8 +489,8 @@ export default {
     onModifyMode: function (selectionTag) {
         const contextAudio = this.context.audio;
         
-        this.setControllerPosition(contextAudio.controller, selectionTag, 'bottom', {left: 0, top: 0});
-        this.controllerOn(contextAudio.controller, selectionTag, this.plugins.audio.onControllerOff.bind(this, selectionTag), 'audio');
+        this.menu.setControllerPosition(contextAudio.controller, selectionTag, 'bottom', {left: 0, top: 0});
+        this.menu.controllerOn(contextAudio.controller, selectionTag, this.plugins.audio.onControllerOff.bind(this, selectionTag), 'audio');
 
         this.util.addClass(selectionTag, 'active');
         contextAudio._element = selectionTag;
@@ -524,7 +524,7 @@ export default {
             this.plugins.audio.destroy.call(this, this.context.audio._element);
         }
 
-        this.controllerOff();
+        this.menu.controllerOff();
     },
 
     onControllerOff: function (selectionTag) {

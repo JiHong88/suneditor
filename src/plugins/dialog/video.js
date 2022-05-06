@@ -282,7 +282,7 @@ export default {
         const emptyDiv = container.parentNode;
         this.util.remove(container);
         this.plugins.video.init.call(this);
-        this.controllerOff();
+        this.menu.controllerOff();
 
         if (emptyDiv !== this.context.element.wysiwyg) this.util.removeAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
 

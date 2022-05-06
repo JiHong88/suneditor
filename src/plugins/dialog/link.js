@@ -152,7 +152,7 @@ export default {
     active: function (element) {
         if (!element) {
             if (this.menu.hasController(this.context.link.linkController)) {
-                this.controllerOff();
+                this.menu.controllerOff();
             }
         } else if (this.util.isAnchor(element) && element.getAttribute('data-image-link') === null) {
             if (!this.menu.hasController(this.context.link.linkController)) {
@@ -181,8 +181,8 @@ export default {
         link.textContent = selectionATag.textContent;
 
         this.util.addClass(selectionATag, 'on');
-        this.setControllerPosition(linkBtn, selectionATag, 'bottom', {left: 0, top: 0});
-        this.controllerOn(linkBtn, selectionATag, 'link', this.util.removeClass.bind(this.util, this.context.link._linkAnchor, 'on'));
+        this.menu.setControllerPosition(linkBtn, selectionATag, 'bottom', {left: 0, top: 0});
+        this.menu.controllerOn(linkBtn, selectionATag, 'link', this.util.removeClass.bind(this.util, this.context.link._linkAnchor, 'on'));
     },
 
     onClick_linkController: function (e) {
@@ -210,7 +210,7 @@ export default {
             this.history.push(false);
         }
 
-        this.controllerOff();
+        this.menu.controllerOff();
     },
 
     /**

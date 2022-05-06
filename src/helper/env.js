@@ -45,7 +45,7 @@ export function isGecko() {
  * @returns {boolean} Whether User Agent is Chromium browser.
  */
 export function isChromium() {
-	return !!userAgent.match(/gecko\/\d+/);
+	return !!window.chrome;
 }
 
 /**

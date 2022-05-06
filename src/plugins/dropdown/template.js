@@ -63,10 +63,10 @@ export default {
         if (temp.html) {
             this.setContent(temp.html);
         } else {
-            this.dropdownOff();
+            this.menu.dropdownOff();
             throw Error('[SUNEDITOR.template.fail] cause : "templates[i].html not found"');
         }
         
-        this.dropdownOff();
+        this.menu.dropdownOff();
     }
 };

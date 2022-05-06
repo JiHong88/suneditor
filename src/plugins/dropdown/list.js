@@ -447,7 +447,7 @@ export default {
         const range = this.format.applyList(command, null, false);
         if (range) this.setRange(range.sc, range.so, range.ec, range.eo);
 
-        this.dropdownOff();
+        this.menu.dropdownOff();
 
         // history stack
         this.history.push(false);

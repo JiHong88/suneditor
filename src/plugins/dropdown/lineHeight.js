@@ -96,7 +96,7 @@ export default {
             formats[i].style.lineHeight = value;
         }
 
-        this.dropdownOff();
+        this.menu.dropdownOff();
 
         // history stack
         this.history.push(false);

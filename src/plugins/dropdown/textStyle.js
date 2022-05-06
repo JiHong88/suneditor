@@ -162,6 +162,6 @@ export default {
         const removeNodes = newNode ? null : [tag.nodeName];
         this.format.applyTextStyle(newNode, checkStyles, removeNodes, true);
 
-        this.dropdownOff();
+        this.menu.dropdownOff();
     }
 };

@@ -160,6 +160,6 @@ export default {
             }
         }
 
-        this.dropdownOff();
+        this.menu.dropdownOff();
     }
 };

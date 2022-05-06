@@ -107,6 +107,6 @@ export default {
             this.format.applyTextStyle(null, ['font-size'], ['span'], true);
         }
 
-        this.dropdownOff();
+        this.menu.dropdownOff();
     }
 };

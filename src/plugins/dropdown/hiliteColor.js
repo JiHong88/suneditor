@@ -87,7 +87,7 @@ export default {
 
     remove: function () {
         this.format.applyTextStyle(null, ['background-color'], ['span'], true);
-        this.dropdownOff();
+        this.menu.dropdownOff();
     },
 
     applyColor: function (color) {
@@ -97,6 +97,6 @@ export default {
         newNode.style.backgroundColor = color;
         this.format.applyTextStyle(newNode, ['background-color'], null, null);
         
-        this.dropdownOff();
+        this.menu.dropdownOff();
     }
 };

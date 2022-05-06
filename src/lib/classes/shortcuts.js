@@ -21,6 +21,17 @@ import CoreInterface from "../../interface/_core";
  */
 const Shortcuts = function (editor) {
 	CoreInterface.call(this, editor);
+	this._keyCodeShortcut = {
+		65: 'A',
+		66: 'B',
+		83: 'S',
+		85: 'U',
+		73: 'I',
+		89: 'Y',
+		90: 'Z',
+		219: '[',
+		221: ']'
+	};
 }
 
 Shortcuts.prototype = {
@@ -32,6 +43,7 @@ Shortcuts.prototype = {
 	 */
 	command: function (keyCode, shift) {
 		let command = null;
+		const keyStr = this._keyCodeShortcut[keyCode];
 		const options = this.options;
 
 		switch (keyCode) {

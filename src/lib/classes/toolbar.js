@@ -3,7 +3,6 @@
  * @author JiHong Lee.
  */
 
-import CoreInterface from "../../interface/_core";
 import Context from "../context";
 import {
 	domUtils,
@@ -15,7 +14,6 @@ import {
 } from "../../helper/global";
 
 const Toolbar = function (editor) {
-	CoreInterface.call(this, editor);
 	this._responsiveCurrentSize = "default";
 	this._responsiveButtons = editor._responsiveButtons;
 	this._responsiveButtonSize = null;

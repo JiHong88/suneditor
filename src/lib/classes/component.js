@@ -3,11 +3,9 @@
  * @author JiHong Lee.
  */
 
-import CoreInterface from "../../interface/_core";
 import { domUtils, unicode } from "../../helper";
 
 const Component = function (editor) {
-	CoreInterface.call(this, editor);
 }
 
 Component.prototype = {

@@ -3,14 +3,12 @@
  * @author JiHong Lee.
  */
 
-import CoreInterface from "../../interface/_core";
 import {
 	domUtils,
 	unicode
 } from "../../helper";
 
 const Selection = function (editor) {
-	CoreInterface.call(this, editor);
 	this.range = null;
 	this.selectionNode = null;
 };

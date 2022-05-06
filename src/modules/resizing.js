@@ -482,8 +482,8 @@
                 addOffset.top -= this.context.element.wysiwygFrame.parentElement.offsetTop;
             }
 
-            this.setControllerPosition(contextResizing.resizeButton, resizeContainer, 'bottom', addOffset);
-            this.controllerOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabled.bind(this.util, false, this.resizingDisabledButtons), targetElement, plugin);
+            this.menu.setControllerPosition(contextResizing.resizeButton, resizeContainer, 'bottom', addOffset);
+            this.menu.controllerOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabled.bind(this.util, false, this.resizingDisabledButtons), targetElement, plugin);
             this.util.setDisabled(true, this.resizingDisabledButtons);
     
             contextResizing._resize_w = w;
@@ -620,7 +620,7 @@
                             this.setRange(captionText, 0, captionText, captionText.textContent.length);
                         }
     
-                        this.controllerOff();
+                        this.menu.controllerOff();
                     } else {
                         this.component.select(contextEl, pluginName);
                         currentModule.openModify.call(this, true);
@@ -633,7 +633,7 @@
                     break;
                 case 'update':
                     currentModule.openModify.call(this);
-                    this.controllerOff();
+                    this.menu.controllerOff();
                     break;
                 case 'delete':
                     currentModule.destroy.call(this);
@@ -784,7 +784,7 @@
                 this.eventManager.removeGlobalEvent('keydown', closureFunc_bind);
                 
                 if (e.type === 'keydown') {
-                    this.controllerOff();
+                    this.menu.controllerOff();
                     this.context.element.resizeBackground.style.display = 'none';
                     this.plugins[this.context.resizing._resize_plugin].init.call(this);
                 } else {
@@ -850,7 +850,7 @@
          */
         cancel_controller_resize: function (direction) {
             const isVertical = this.context.resizing._rotateVertical;
-            this.controllerOff();
+            this.menu.controllerOff();
             this.context.element.resizeBackground.style.display = 'none';
     
             let w = this._w.Math.round(isVertical ? this.context.resizing._resize_h : this.context.resizing._resize_w);

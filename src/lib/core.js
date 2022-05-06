@@ -26,11 +26,10 @@ import Toolbar from "./classes/toolbar";
 import Menu from "./classes/menu";
 import Notice from "./classes/notice";
 
-// classes interface
-import ClassesInterface from "../interface/_classes";
+// interface
 import EditorInterface from "../interface/editor";
 
-const _parser = new _w.DOMParser();
+const _parser = new global._w.DOMParser();
 
 /**
  * @description Check disallowed tags
@@ -520,7 +519,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
     /**
      * @description FullScreen and codeView relative status
      */
-    this._editorTransformStatus = {
+    this._transformStatus = {
         editorOriginCssText: context.element.topArea.style.cssText,
         bodyOverflow: "",
         editorAreaOriginCssText: "",
@@ -734,13 +733,13 @@ Core.prototype = {
             }
 
             if (/container/.test(type) && (this.menu._menuTrayMap[command] === null || target !== this.menu.currentContainerActiveButton)) {
-                this.containerOn(target);
+                this.menu.containerOn(target);
                 return;
             }
 
             if (this.isReadOnly && domUtils.arrayIncludes(this.resizingDisabledButtons, target)) return;
             if (/dropdown/.test(type) && (this.menu._menuTrayMap[command] === null || target !== this.menu.currentDropdownActiveButton)) {
-                this.dropdownOn(target);
+                this.menu.dropdownOn(target);
                 return;
             } else if (/dialog/.test(type)) {
                 this.plugins[command].open();
@@ -755,10 +754,10 @@ Core.prototype = {
         }
 
         if (/dropdown/.test(type)) {
-            this.dropdownOff();
+            this.menu.dropdownOff();
         } else if (!/command/.test(type)) {
-            this.dropdownOff();
-            this.containerOff();
+            this.menu.dropdownOff();
+            this.menu.containerOff();
         }
     },
 
@@ -780,7 +779,7 @@ Core.prototype = {
                 // @todo
                 break;
             case 'selectAll':
-                this.containerOff();
+                this.menu.containerOff();
                 const wysiwyg = this.context.element.wysiwyg;
                 let first = domUtils.getEdgeChild(wysiwyg.firstChild, function (current) {
                     return current.childNodes.length === 0 || current.nodeType === 3;
@@ -893,8 +892,9 @@ Core.prototype = {
      * @description Changes to code view or wysiwyg view
      */
     setCodeView: function (value) {
-        this.controllerOff();
+        this.menu.controllerOff();
         domUtils.setDisabled(value, this.codeViewDisabledButtons);
+        const _var = this._transformStatus;
 
         if (!value) {
             if (!domUtils.isNonEditable(this.context.element.wysiwygFrame)) this._setCodeDataToEditor();
@@ -902,8 +902,8 @@ Core.prototype = {
             this.context.element.code.style.display = 'none';
             this.context.element.wysiwygFrame.style.display = 'block';
 
-            this.status.codeOriginCssText = this.status.codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
-            this.status.wysiwygOriginCssText = this.status.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
+            _var.codeOriginCssText = _var.codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
+            _var.wysiwygOriginCssText = _var.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
 
             if (this.options.height === 'auto' && !this.options.codeMirrorEditor) this.context.element.code.style.height = '0px';
 
@@ -929,8 +929,8 @@ Core.prototype = {
             }
         } else {
             this._setEditorDataToCodeView();
-            this.status.codeOriginCssText = this.status.codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
-            this.status.wysiwygOriginCssText = this.status.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
+            _var.codeOriginCssText = _var.codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
+            _var.wysiwygOriginCssText = _var.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 
             if (this.status.isFullScreen) this.context.element.code.style.height = '100%';
             else if (this.options.height === 'auto' && !this.options.codeMirrorEditor) this.context.element.code.style.height = this.context.element.code.scrollHeight > 0 ? (this.context.element.code.scrollHeight + 'px') : 'auto';
@@ -1036,13 +1036,13 @@ Core.prototype = {
         const editorArea = this.context.element.editorArea;
         const wysiwygFrame = this.context.element.wysiwygFrame;
         const code = this.context.element.code;
-        const _var = this._editorTransformStatus;
+        const _var = this._transformStatus;
 
-        this.controllerOff();
+        this.menu.controllerOff();
         const wasToolbarHidden = (toolbar.style.display === 'none' || (this._isInline && !this._inlineToolbarAttr.isShow));
 
         if (value) {
-            _var.isFullScreen = true;
+            this.status.isFullScreen = true;
 
             _var.fullScreenInline = this._isInline;
             _var.fullScreenBalloon = this._isBalloon;
@@ -1097,7 +1097,7 @@ Core.prototype = {
                 domUtils.addClass(this._styleCommandMap.fullScreen, 'active');
             }
         } else {
-            _var.isFullScreen = false;
+            this.status.isFullScreen = false;
 
             wysiwygFrame.style.cssText = _var.wysiwygOriginCssText;
             code.style.cssText = _var.codeOriginCssText;
@@ -1213,9 +1213,9 @@ Core.prototype = {
      * @description Open the preview window.
      */
     preview: function () {
-        this.dropdownOff();
-        this.containerOff();
-        this.controllerOff();
+        this.menu.dropdownOff();
+        this.menu.containerOff();
+        this.menu.controllerOff();
 
         const contentHTML = this.options.previewTemplate ? this.options.previewTemplate.replace(/\{\{\s*content\s*\}\}/i, this.getContent(true)) : this.getContent(true);
         const windowObject = this._w.open('', '_blank');
@@ -1739,10 +1739,10 @@ Core.prototype = {
 
         if (value) {
             /** off menus */
-            this.controllerOff();
-            if (this.menu.currentDropdownActiveButton && this.menu.currentDropdownActiveButton.disabled) this.dropdownOff();
-            if (this.menu.currentMoreLayerActiveButton && this.menu.currentMoreLayerActiveButton.disabled) this.moreLayerOff();
-            if (this.menu.currentContainerActiveButton && this.menu.currentContainerActiveButton.disabled) this.containerOff();
+            this.menu.controllerOff();
+            if (this.menu.currentDropdownActiveButton && this.menu.currentDropdownActiveButton.disabled) this.menu.dropdownOff();
+            if (this.menu.currentMoreLayerActiveButton && this.menu.currentMoreLayerActiveButton.disabled) this.menu.moreLayerOff();
+            if (this.menu.currentContainerActiveButton && this.menu.currentContainerActiveButton.disabled) this.menu.containerOff();
             if (this.modalForm) this.plugins.dialog.close.call(this);
 
             this.context.element.code.setAttribute("readOnly", "true");
@@ -1760,7 +1760,7 @@ Core.prototype = {
      */
     disable: function () {
         this.toolbar.disable();
-        this.controllerOff();
+        this.menu.controllerOff();
         if (this.modalForm) this.plugins.dialog.close.call(this);
 
         this.context.element.wysiwyg.setAttribute('contenteditable', false);
@@ -1808,9 +1808,9 @@ Core.prototype = {
      */
     destroy: function () {
         /** off menus */
-        this.dropdownOff();
-        this.containerOff();
-        this.controllerOff();
+        this.menu.dropdownOff();
+        this.menu.containerOff();
+        this.menu.controllerOff();
         if (this.notice) this.notice.close();
         if (this.modalForm) this.plugins.dialog.close();
 
@@ -2168,6 +2168,23 @@ Core.prototype = {
         this._isBalloon = /balloon|balloon-always/i.test(options.mode);
         this._isBalloonAlways = /balloon-always/i.test(options.mode);
 
+        // caching buttons
+        this._cachingButtons();
+
+        // cache editor's element
+        this._transformStatus.editorOriginCssText = context.element.topArea.style.cssText;
+        this._placeholder = context.element.placeholder;
+        this._lineBreaker = context.element.lineBreaker;
+        this._lineBreakerButton = this._lineBreaker.querySelector('button');
+
+        // Init, validate
+        if (options.iframe) {
+            this._wd = context.element.wysiwygFrame.contentDocument;
+            context.element.wysiwyg = this._wd.body;
+            if (options._editorStyles.editor) context.element.wysiwyg.style.cssText = options._editorStyles.editor;
+            if (options.height === 'auto') this._iframeAuto = this._wd.body;
+        }
+
         // base
         this.events = Events();
         this.history = history(this, this._onChange_historyStack.bind(this));
@@ -2188,16 +2205,13 @@ Core.prototype = {
         
         // register interface
         EditorInterface.call(this.eventManager, this);
-        ClassesInterface.call(this.component, this);
-        ClassesInterface.call(this.format, this);
-        ClassesInterface.call(this.node, this);
-        ClassesInterface.call(this.toolbar, this);
-        ClassesInterface.call(this.selection, this);
-        ClassesInterface.call(this.char, this);
-        ClassesInterface.call(this.menu, this);
-
-        // caching buttons
-        this._cachingButtons();
+        EditorInterface.call(this.component, this);
+        EditorInterface.call(this.format, this);
+        EditorInterface.call(this.node, this);
+        EditorInterface.call(this.toolbar, this);
+        EditorInterface.call(this.selection, this);
+        EditorInterface.call(this.char, this);
+        EditorInterface.call(this.menu, this);
 
         // file components
         this._fileInfoPluginsCheck = [];
@@ -2208,14 +2222,14 @@ Core.prototype = {
             query: '',
             map: {}
         };
-        const managedClass = [];
 
+        // plugins install
         // Command and file plugins registration
         this.activePlugins = [];
         this._fileManager.tags = [];
         this._fileManager.pluginMap = {};
-
-        // plugins install
+        
+        const managedClass = [];
         let filePluginRegExp = [];
         let plugin, button;
         for (let key in plugins) {
@@ -2250,20 +2264,7 @@ Core.prototype = {
         this._fileManager.regExp = new wRegExp('^(' + (this._fileManager.tags.join('|') || '^') + ')$', 'i');
         this._fileManager.pluginRegExp = new wRegExp('^(' + (filePluginRegExp.length === 0 ? '^' : filePluginRegExp.join('|')) + ')$', 'i');
 
-        // cache editor's element
-        this.status.editorOriginCssText = context.element.topArea.style.cssText;
-        this._placeholder = context.element.placeholder;
-        this._lineBreaker = context.element.lineBreaker;
-        this._lineBreakerButton = this._lineBreaker.querySelector('button');
-
-        // Init, validate
-        if (options.iframe) {
-            this._wd = context.element.wysiwygFrame.contentDocument;
-            context.element.wysiwyg = this._wd.body;
-            if (options._editorStyles.editor) context.element.wysiwyg.style.cssText = options._editorStyles.editor;
-            if (options.height === 'auto') this._iframeAuto = this._wd.body;
-        }
-
+        // init content
         this._initWysiwygArea(reload, _initHTML);
         this.setDir(options.rtl ? 'rtl' : 'ltr');
     },

@@ -127,7 +127,7 @@ export default {
             toggleClass(selectedFormsts[i], value);
         }
 
-        this.dropdownOff();
+        this.menu.dropdownOff();
 
         // history stack
         this.history.push(false);

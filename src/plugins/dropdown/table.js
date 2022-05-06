@@ -265,7 +265,7 @@ export default {
         unHighlight.height = '10em';
 
         this.util.changeTxt(this.context.table.tableDisplay, '1 x 1');
-        this.dropdownOff();
+        this.menu.dropdownOff();
     },
 
     init: function () {
@@ -315,7 +315,7 @@ export default {
         const contextTable = this.context.table;
 
         if (!this.selection.get().isCollapsed && !tablePlugin._selectedCell) {
-            this.controllerOff();
+            this.menu.controllerOff();
             this.util.removeClass(tdElement, 'se-table-selected-cell');
             return;
         }
@@ -328,11 +328,11 @@ export default {
         tablePlugin.setPositionControllerTop.call(this, tableElement);
         tablePlugin.setPositionControllerDiv.call(this, tdElement, tablePlugin._shift);
         
-        if (!tablePlugin._shift) this.controllerOn(contextTable.resizeDiv, contextTable.tableController, tablePlugin.init.bind(this), tdElement, 'table');
+        if (!tablePlugin._shift) this.menu.controllerOn(contextTable.resizeDiv, contextTable.tableController, tablePlugin.init.bind(this), tdElement, 'table');
     },
 
     setPositionControllerTop: function (tableElement) {
-        this.setControllerPosition(this.context.table.tableController, tableElement, 'top', {left: 0, top: 0});
+        this.menu.setControllerPosition(this.context.table.tableController, tableElement, 'top', {left: 0, top: 0});
     },
 
     setPositionControllerDiv: function (tdElement, reset) {
@@ -342,9 +342,9 @@ export default {
         this.plugins.table.setCellInfo.call(this, tdElement, reset);
         
         if (contextTable.cellControllerTop) {
-            this.setControllerPosition(resizeDiv, contextTable._element, 'top', {left: contextTable.tableController.offsetWidth, top: 0});
+            this.menu.setControllerPosition(resizeDiv, contextTable._element, 'top', {left: contextTable.tableController.offsetWidth, top: 0});
         } else {
-            this.setControllerPosition(resizeDiv, tdElement, 'bottom', {left: 0, top: 0});
+            this.menu.setControllerPosition(resizeDiv, tdElement, 'bottom', {left: 0, top: 0});
         }
     },
 
@@ -630,7 +630,7 @@ export default {
         if (!remove) {
             this.plugins.table.setPositionControllerDiv.call(this, positionResetElement || contextTable._tdElement, true);
         } else {
-            this.controllerOff();
+            this.menu.controllerOff();
         }
     },
 
@@ -776,7 +776,7 @@ export default {
                 rowSpanCell.cell.rowSpan = util.getOverlapRangeAtIndex(removeFirst, removeEnd, rowSpanCell.i, rowSpanCell.rs);
             }
 
-            this.controllerOff();
+            this.menu.controllerOff();
         } else {
             this.plugins.table.setPositionControllerDiv.call(this, positionResetElement || contextTable._tdElement, true);
         }
@@ -1036,7 +1036,7 @@ export default {
         mergeCell.colSpan = cs;
         mergeCell.rowSpan = rs;
 
-        this.controllerOff();
+        this.menu.controllerOff();
         tablePlugin.setActiveButton.call(this, true, false);
         tablePlugin.call_controller_tableEdit.call(this, mergeCell);
 
@@ -1061,7 +1061,7 @@ export default {
         util.toggleClass(headerButton, 'active');
 
         if (/TH/i.test(this.context.table._tdElement.nodeName)) {
-            this.controllerOff();
+            this.menu.controllerOff();
         } else {
             this.plugins.table.setPositionControllerDiv.call(this, this.context.table._tdElement, false);
         }
@@ -1332,7 +1332,7 @@ export default {
         const tablePlugin = this.plugins.table;
 
         tablePlugin._removeEvents.call(this);
-        this.controllerOff();
+        this.menu.controllerOff();
 
         tablePlugin._shift = shift;
         tablePlugin._fixedCell = tdElement;
@@ -1353,8 +1353,8 @@ export default {
             this._wd.addEventListener('mousemove', tablePlugin._bindOnSelect, false);
         } else {
             tablePlugin._bindOffShift = function () {
-                this.controllerOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this), tdElement, 'table');
-                if (!tablePlugin._ref) this.controllerOff();
+                this.menu.controllerOn(this.context.table.resizeDiv, this.context.table.tableController, this.plugins.table.init.bind(this), tdElement, 'table');
+                if (!tablePlugin._ref) this.menu.controllerOff();
             }.bind(this);
 
             this._wd.addEventListener('keyup', tablePlugin._bindOffShift, false);
@@ -1419,7 +1419,7 @@ export default {
             case 'remove':
                 const emptyDiv = contextTable._element.parentNode;
                 this.util.remove(contextTable._element);
-                this.controllerOff();
+                this.menu.controllerOff();
 
                 if (emptyDiv !== this.context.element.wysiwyg) this.util.removeAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
                 this.core.focus();

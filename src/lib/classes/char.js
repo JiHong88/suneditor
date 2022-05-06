@@ -3,7 +3,6 @@
  * @author JiHong Lee.
  */
 
-import CoreInterface from "../../interface/_core";
 import env from "../../helper/env";
 import {
 	_w
@@ -15,7 +14,10 @@ import {
 } from "../../helper/domUtils";
 
 const Char = function (editor) {
-	CoreInterface.call(this, editor);
+	this.maxCharCount = editor.options.maxCharCount;
+	this._encoder = _w.encodeURIComponent;
+	this._unescape = _w.unescape;
+	this._textEncoder = _w.TextEncoder;
 };
 
 Char.prototype = {
@@ -25,9 +27,9 @@ Char.prototype = {
 	 * @returns {boolean}
 	 */
 	check: function (html) {
-		if (this.options.maxCharCount) {
+		if (this.maxCharCount) {
 			const length = this.getLength(typeof html === "string" ? html : this.options.charCounterType === "byte-html" && html.nodeType === 1 ? html.outerHTML : html.textContent);
-			if (length > 0 && length + this.getLength() > this.options.maxCharCount) {
+			if (length > 0 && length + this.getLength() > this.maxCharCount) {
 				CounterBlink(this.context.element.charWrapper);
 				return false;
 			}
@@ -57,10 +59,10 @@ Char.prototype = {
 		if (!text || !text.toString) return 0;
 		text = text.toString();
 
-		const encoder = _w.encodeURIComponent;
+		const encoder = this._encoder;
 		let cr, cl;
 		if (env.isIE || env.isEdge) {
-			cl = _w.unescape(encoder(text)).length;
+			cl = this._unescape(encoder(text)).length;
 			cr = 0;
 
 			if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
@@ -69,7 +71,7 @@ Char.prototype = {
 
 			return cl + cr;
 		} else {
-			cl = new _w.TextEncoder("utf-8").encode(text).length;
+			cl = new this._textEncoder("utf-8").encode(text).length;
 			cr = 0;
 
 			if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
@@ -101,29 +103,28 @@ Char.prototype = {
 	 * @returns {boolean}
 	 */
 	test: function (inputText) {
-		const maxCharCount = this.options.maxCharCount;
 		let nextCharCount = 0;
 		if (!!inputText) nextCharCount = this.getLength(inputText);
 
 		this.display();
 
-		if (maxCharCount > 0) {
+		if (this.maxCharCount > 0) {
 			let over = false;
 			const count = this.getLength();
 
-			if (count > maxCharCount) {
+			if (count > this.maxCharCount) {
 				over = true;
 				if (nextCharCount > 0) {
 					this.selection._init();
 					const range = this.selection.getRange();
 					const endOff = range.endOffset - 1;
 					const text = this.selection.getNode().textContent;
-					const slicePosition = range.endOffset - (count - maxCharCount);
+					const slicePosition = range.endOffset - (count - this.maxCharCount);
 
 					this.selection.getNode().textContent = text.slice(0, slicePosition < 0 ? 0 : slicePosition) + text.slice(range.endOffset, text.length);
 					this.selection.setRange(range.endContainer, endOff, range.endContainer, endOff);
 				}
-			} else if (count + nextCharCount > maxCharCount) {
+			} else if (count + nextCharCount > this.maxCharCount) {
 				over = true;
 			}
 

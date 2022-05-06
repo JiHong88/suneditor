@@ -122,7 +122,7 @@ function action(e) {
         domUtils.setStyle(selectedFormsts[i], 'textAlign', (value === defaultDir ? '' : value));
     }
 
-    this.core.dropdownOff();
+    this.menu.dropdownOff();
     this.core.focus();
 
     // history stack

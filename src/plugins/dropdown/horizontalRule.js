@@ -56,13 +56,13 @@ export default {
     active: function (element) {
         if (!element) {
             if (this.util.hasClass(this.context.horizontalRule.currentHR, 'on')) {
-                this.controllerOff();
+                this.menu.controllerOff();
             }
         } else if (/HR/i.test(element.nodeName)) {
             this.context.horizontalRule.currentHR = element;
             if (!this.util.hasClass(element, 'on')) {
                 this.util.addClass(element, 'on');
-                this.controllerOn('hr', this.util.removeClass.bind(this.util, element, 'on'));
+                this.menu.controllerOn('hr', this.util.removeClass.bind(this.util, element, 'on'));
             }
             return true;
         }
@@ -92,7 +92,7 @@ export default {
         const oNode = this.plugins.horizontalRule.appendHr.call(this, target.firstElementChild);
         if (oNode) {
             this.setRange(oNode, 0, oNode, 0);
-            this.dropdownOff();
+            this.menu.dropdownOff();
         }
     }
 };

@@ -3,12 +3,10 @@
  * @author JiHong Lee.
  */
 
-import CoreInterface from "../../interface/_core";
 import { domUtils, unicode, numbers, global } from "../../helper";
 import { _w } from "../../helper/global";
 
 const Format = function (editor) {
-	CoreInterface.call(this, editor);
 	this._listCamel = editor.options.__listsCommonStyle;
     this._listKebab  = global.camelToKebabCase(editor.options.__listCommonStyle);
 };
@@ -1567,7 +1565,7 @@ Format.prototype = {
 		}
 
 		// set range
-		this.core.controllerOff();
+		this.menu.controllerOff();
 		this.selection.setRange(start.container, start.offset, end.container, end.offset);
 
 		// history stack

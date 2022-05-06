@@ -3,7 +3,6 @@
  * @author JiHong Lee.
  */
 
-import CoreInterface from "../../interface/_core";
 import {
 	domUtils,
 	unicode,
@@ -14,7 +13,6 @@ import {
 } from "../../helper/global";
 
 const Node = function (editor) {
-	CoreInterface.call(this, editor);
 };
 
 Node.prototype = {

@@ -5,7 +5,7 @@
  */
 function CoreInterface(core) {
 	this.core = core;
-	this.eventManager = this.eventManager;
+	this.eventManager = core.eventManager;
 	this._w = core._w;
 	this._d = core._d;
 	this._ww = core._ww;

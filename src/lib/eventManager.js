@@ -15,16 +15,16 @@ import {
 	_d
 } from "../helper/global";
 
-const EventManager = function (core) {
+const EventManager = function (editor) {
 	this._events = [];
-	this._onButtonsCheck = new _w.RegExp("^(" + _w.Object.keys(core.options._styleNodeMap).join("|") + ")$", "i");
+	this._onButtonsCheck = new _w.RegExp("^(" + _w.Object.keys(editor.options._styleNodeMap).join("|") + ")$", "i");
 	this._onShortcutKey = false;
 	this._IEisComposing = false; // In IE, there is no "e.isComposing" in the key-up event.
 	this._directionKeyCode = new _w.RegExp("^(8|13|3[2-9]|40|46)$");
 	this._nonTextKeyCode = new _w.RegExp("^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$");
 	this._historyIgnoreKeyCode = new _w.RegExp("^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$");
 	this._frontZeroWidthReg = new _w.RegExp(unicode.zeroWidthSpace + "+", "");
-	this._lineBreakerButton = core._lineBreaker.querySelector('button');
+	this._lineBreakerButton = editor._lineBreaker.querySelector('button');
 	this._balloonDelay = null;
 	this._resizeObserver = null;
     this._toolbarObserver = null;
@@ -615,7 +615,7 @@ function OnClick_toolbar(e) {
 	let type = target.getAttribute("data-type");
 	let command = target.getAttribute("data-command");
 	let className = target.className;
-	this.core.controllerOff();
+	this.menu.controllerOff();
 
 	while (target.parentNode && !command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
 		target = target.parentNode;
@@ -760,7 +760,7 @@ function OnKeyDown_wysiwyg(e) {
 		return false;
 	}
 
-	this.core.dropdownOff();
+	this.menu.dropdownOff();
 
 	if (this.core._isBalloon) {
 		this._hideToolbar();
@@ -1445,7 +1445,7 @@ function OnKeyDown_wysiwyg(e) {
 			if (fileComponentName) {
 				e.preventDefault();
 				e.stopPropagation();
-				this.core.controllerOff();
+				this.menu.controllerOff();
 				return false;
 			}
 			break;
@@ -1609,7 +1609,7 @@ function OnCut_wysiwyg(e) {
 	if (info && !env.isIE) {
 		this._setClipboardComponent(e, info, clipboardData);
 		domUtils.remove(info.component);
-		this.core.controllerOff();
+		this.menu.controllerOff();
 	}
 
 	_w.setTimeout(function () {
@@ -1619,7 +1619,7 @@ function OnCut_wysiwyg(e) {
 }
 
 function OnScroll_wysiwyg(e) {
-	this.core.controllerOff();
+	this.menu.controllerOff();
 	if (this.core._isBalloon) this._hideToolbar();
 
 	// user event
@@ -1640,7 +1640,7 @@ function OnFocus_wysiwyg(e) {
 function OnBlur_wysiwyg(e) {
 	if (this.core._antiBlur || this.status.isCodeView) return;
 	this.status.hasFocus = false;
-	this.core.controllerOff();
+	this.menu.controllerOff();
 	if (this.core._isInline || this.core._isBalloon) this._hideToolbar();
 
 	this._setKeyEffect([]);
@@ -1702,8 +1702,8 @@ function OnMouseMove_wysiwyg(e) {
 function OnMouseDown_resizingBar(e) {
 	e.stopPropagation();
 
-	this.core.dropdownOff();
-	this.core.controllerOff();
+	this.menu.dropdownOff();
+	this.menu.controllerOff();
 
 	this.status._resizeClientY = e.clientY;
 	this.context.element.resizeBackground.style.display = "block";
@@ -1741,7 +1741,7 @@ function DisplayLineBreak(dir, e) {
 }
 
 function OnResize_window() {
-	this.core.controllerOff();
+	this.menu.controllerOff();
 
 	if (env.isIE) this.toolbar.resetResponsiveToolbar();
 
@@ -1752,12 +1752,12 @@ function OnResize_window() {
 	}
 
 	if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {
-		this.core._setMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
+		this.menu._setMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
 	}
 
 	if (this.status.isFullScreen) {
-		this._editorTransformStatus.fullScreenInnerHeight += _w.innerHeight - this.context.element.toolbar.offsetHeight - this._editorTransformStatus.fullScreenInnerHeight;
-		this.context.element.editorArea.style.height = this._editorTransformStatus.fullScreenInnerHeight + "px";
+		this._transformStatus.fullScreenInnerHeight += _w.innerHeight - this.context.element.toolbar.offsetHeight - this._transformStatus.fullScreenInnerHeight;
+		this.context.element.editorArea.style.height = this._transformStatus.fullScreenInnerHeight + "px";
 		return;
 	}
 

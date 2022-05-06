@@ -3,13 +3,11 @@
  * @author JiHong Lee.
  */
 
-import CoreInterface from "../../interface/_core";
 import {
     domUtils
 } from "../../helper";
 
 const Menu = function (editor) {
-    CoreInterface.call(this, editor);
     this._menuTrayMap = {};
     // dropdown
     this.currentDropdown = null;
@@ -57,7 +55,7 @@ Menu.prototype = {
         this._setMenuPosition(button, menu);
 
         this._bindedDropdownOff = this.dropdownOff.bind(this);
-        this.eventmanager.addGlobalEvent('mousedown', this._bindedDropdownOff, false);
+        this.eventManager.addGlobalEvent('mousedown', this._bindedDropdownOff, false);
 
         if (this.plugins[dropdownName].on) this.plugins[dropdownName].on();
         this._antiBlur = true;
@@ -67,7 +65,7 @@ Menu.prototype = {
      * @description Disable dropdown
      */
     dropdownOff: function () {
-        this.eventmanager.removeGlobalEvent('mousedown', this._bindedDropdownOff);
+        this.eventManager.removeGlobalEvent('mousedown', this._bindedDropdownOff);
         this._bindedDropdownOff = null;
 
         if (this.currentDropdown) {
@@ -95,7 +93,7 @@ Menu.prototype = {
         this._setMenuPosition(button, menu);
 
         this._bindedContainerOff = this.containerOff.bind(this);
-        this.eventmanager.addGlobalEvent('mousedown', this._bindedContainerOff, false);
+        this.eventManager.addGlobalEvent('mousedown', this._bindedContainerOff, false);
 
         if (this.plugins[containerName].on) this.plugins[containerName].on();
         this._antiBlur = true;
@@ -105,7 +103,7 @@ Menu.prototype = {
      * @description Disable container
      */
     containerOff: function () {
-        this.eventmanager.removeGlobalEvent('mousedown', this._bindedContainerOff);
+        this.eventManager.removeGlobalEvent('mousedown', this._bindedContainerOff);
         this._bindedContainerOff = null;
 
         if (this.currentContainer) {
@@ -163,8 +161,8 @@ Menu.prototype = {
         }
 
         this._bindControllersOff = this.controllerOff.bind(this);
-        this.eventmanager.addGlobalEvent('mousedown', this._bindControllersOff, false);
-        this.eventmanager.addGlobalEvent('keydown', this._bindControllersOff, false);
+        this.eventManager.addGlobalEvent('mousedown', this._bindControllersOff, false);
+        this.eventManager.addGlobalEvent('keydown', this._bindControllersOff, false);
         this._antiBlur = true;
 
         if (typeof this.events.showController === 'function') this.events.showController(this.currentControllerName, this.currentControllerItems);
@@ -172,10 +170,10 @@ Menu.prototype = {
 
     /**
      * @description Hide controller at editor area (link button, image resize button..)
-     * @param {KeyboardEvent|MouseEvent|null} e Event object when called from mousedown and keydown events registered in "core.controllerOn"
+     * @param {KeyboardEvent|MouseEvent|null} e Event object when called from mousedown and keydown events registered in "controllerOn"
      */
     controllerOff: function (e) {
-        this._lineBreaker.style.display = 'none';
+        this.core._lineBreaker.style.display = 'none';
         const len = this.currentControllerItems.length;
 
         if (e && e.target && len > 0) {
@@ -184,7 +182,7 @@ Menu.prototype = {
             }
         }
 
-        if (this._fileManager.pluginRegExp.test(this.currentControllerName) && e && e.type === 'keydown' && e.keyCode !== 27) return;
+        if (this.core._fileManager.pluginRegExp.test(this.currentControllerName) && e && e.type === 'keydown' && e.keyCode !== 27) return;
         this.context.element.lineBreaker_t.style.display = this.context.element.lineBreaker_b.style.display = 'none';
         this.status._lineBreakComp = null;
 
@@ -194,8 +192,8 @@ Menu.prototype = {
         this.effectNode = null;
         if (!this._bindControllersOff) return;
 
-        this.eventmanager.removeGlobalEvent('mousedown', this._bindControllersOff);
-        this.eventmanager.removeGlobalEvent('keydown', this._bindControllersOff);
+        this.eventManager.removeGlobalEvent('mousedown', this._bindControllersOff);
+        this.eventManager.removeGlobalEvent('keydown', this._bindControllersOff);
         this._bindControllersOff = null;
 
         if (len > 0) {

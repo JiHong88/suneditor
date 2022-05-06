@@ -13,7 +13,7 @@ const Notice = function (editor) {
 			"aria-label": "Close",
 			title: editor.lang.dialogBox.close
 		},
-		this.icons.cancel);
+		editor.icons.cancel);
 
 	this.modal.appendChild(this.message);
 	this.modal.appendChild(notice_button);
