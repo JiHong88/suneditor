@@ -5,20 +5,6 @@
 
 import CoreInterface from "../../interface/_core";
 
-/**
- * @description 
- * default:
- * 65: "A",
- * 66: "B",
- * 83: "S",
- * 85: "U",
- * 73: "I",
- * 89: "Y",
- * 90: "Z",
- * 219: "[",
- * 221: "]"
- * @param {*} editor 
- */
 const Shortcuts = function (editor) {
 	CoreInterface.call(this, editor);
 	this._keyCodeShortcut = {

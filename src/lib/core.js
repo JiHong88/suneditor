@@ -2185,14 +2185,14 @@ Core.prototype = {
         this.history = history(this, this._onChange_historyStack.bind(this));
         this.eventManager = new EventManager(this);
 
-        // classes
+        // util classes
         this.offset = new Offset(this);
         this.notice = new Notice(this);
         this.shortcuts = new Shortcuts(this);
-        // classes that refer to other classes
+        this.node = new Node(this);
+        // main classes
         this.component = new Component(this);
         this.format = new Format(this);
-        this.node = new Node(this);
         this.toolbar = new Toolbar(this);
         this.selection = new Selection(this);
         this.char = new Char(this);
@@ -2202,7 +2202,6 @@ Core.prototype = {
         EditorInterface.call(this.eventManager, this);
         EditorInterface.call(this.component, this);
         EditorInterface.call(this.format, this);
-        EditorInterface.call(this.node, this);
         EditorInterface.call(this.toolbar, this);
         EditorInterface.call(this.selection, this);
         EditorInterface.call(this.char, this);
