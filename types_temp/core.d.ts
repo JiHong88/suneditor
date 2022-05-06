@@ -364,7 +364,7 @@ export interface Core {
 	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "fullPage" option.
 	 * @param ctx { head: HTML string, body: HTML string}
 	 */
-	setIframeContent(ctx: { head?: string; body?: string }): void;
+	setFullPageContent(ctx: { head?: string; body?: string }): void;
 
 	/**
 	 * @description Gets the current content

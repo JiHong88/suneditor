@@ -445,7 +445,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 // // c-16-25.333-24-45-24-59z"></path></svg></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.19444em;"><span></span></span></span></span></span></span></span></span>​&nbsp;is</p>
 // //     `)
 //     // ss.core.focus();
-//     // ss.core.setIframeContent({
+//     // ss.core.setFullPageContent({
 //     //     head: '<style>* {color: red;}</style>'
 //     // })
 // }

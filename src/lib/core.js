@@ -1348,7 +1348,7 @@ Core.prototype = {
      * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "fullPage" option.
      * @param {Object} ctx { head: HTML string, body: HTML string}
      */
-    setIframeContent: function (ctx) {
+    setFullPageContent: function (ctx) {
         if (!this.options.iframe) return false;
         if (ctx.head) this._wd.head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
         if (ctx.body) this._wd.body.innerHTML = this.convertContentForEditor(ctx.body);
@@ -1356,10 +1356,12 @@ Core.prototype = {
 
     /**
      * @description Gets the current content
+     * @param {boolean} withFrame Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
+     * Ignored for options.fullPage is true.
      * @param {boolean} includeFullPage Return only the content of the body without headers when the "fullPage" option is true
      * @returns {Object}
      */
-    getContent: function (full, includeFullPage) {
+    getContent: function (withFrame, includeFullPage) {
         const renderHTML = domUtils.createElement('DIV', null, this.convertHTMLForCodeView(this.context.element.wysiwyg, true));
         const figcaptions = domUtils.getListChildren(renderHTML, function (current) {
             return /FIGCAPTION/i.test(current.nodeName);
@@ -1369,23 +1371,16 @@ Core.prototype = {
             figcaptions[i].removeAttribute('contenteditable');
         }
 
-        if (this.options.fullPage && !includeFullPage) {
-            const attrs = domUtils.getAttributesToString(this._wd.body, ['contenteditable']);
-            return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + '<body ' + attrs + '>' + renderHTML.innerHTML + '</body></html>';
+        if (this.options.fullPage) {
+            if (includeFullPage) {
+                const attrs = domUtils.getAttributesToString(this._wd.body, ['contenteditable']);
+                return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + '<body ' + attrs + '>' + renderHTML.innerHTML + '</body></html>';
+            } else {
+                return renderHTML.innerHTML;
+            }
         } else {
-            return renderHTML.innerHTML;
+            return withFrame ? ('<div class="sun-editor-editable' + (this.options.rtl ? ' se-rtl' : '') + '">' + renderHTML.innerHTML + '</div>') : renderHTML.innerHTML;
         }
-    },
-
-    /**
-     * @todo getContent와 병합
-     * @description Gets the current content with containing parent div(div.sun-editor-editable).
-     * <div class="sun-editor-editable">{content}</div>
-     * @param {Boolean} onlyContent Return only the content of the body without headers when the "fullPage" option is true
-     * @returns {Object}
-     */
-    getFullContent: function (onlyContent) {
-        return '<div class="sun-editor-editable' + (this.options.rtl ? ' se-rtl' : '') + '">' + this.getContent(onlyContent) + '</div>';
     },
 
     /**
