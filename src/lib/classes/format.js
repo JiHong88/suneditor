@@ -3,8 +3,8 @@
  * @author JiHong Lee.
  */
 
-import { domUtils, unicode, numbers, global } from "../../helper";
-import { _w } from "../../helper/global";
+import { domUtils, unicode, numbers, global } from '../../helper';
+import { _w } from '../../helper/global';
 
 const Format = function (editor) {
 	this._listCamel = editor.options.__listsCommonStyle;
@@ -31,7 +31,7 @@ Format.prototype = {
 
 			if (
 				(node.nodeName.toLowerCase() !== value.toLowerCase() ||
-					(node.className.match(/(\s|^)__se__format__[^\s]+/) || [""])[0].trim() !== className) &&
+					(node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) &&
 				!this.component.is(node)
 			) {
 				newFormat = element.cloneNode(false);
@@ -102,7 +102,7 @@ Format.prototype = {
 			if (f === (!lines[i + 1] ? null : lines[i + 1].parentNode)) continue;
 
 			isComp = this.component.is(f);
-			html = isComp ? "" : f.innerHTML.replace(/(?!>)\s+(?=<)|\n/g, " ");
+			html = isComp ? '' : f.innerHTML.replace(/(?!>)\s+(?=<)|\n/g, ' ');
 			before = domUtils.getParentElement(f, function (current) {
 				return current.parentNode === parentNode;
 			});
@@ -118,7 +118,7 @@ Format.prototype = {
 
 				next = freeElement.nextSibling;
 				if (next && freeElement.nodeName === next.nodeName && domUtils.isSameAttributes(freeElement, next)) {
-					freeElement.innerHTML += "<BR>" + next.innerHTML;
+					freeElement.innerHTML += '<BR>' + next.innerHTML;
 					domUtils.remove(next);
 				}
 
@@ -127,19 +127,19 @@ Format.prototype = {
 			}
 
 			inner = freeElement.innerHTML;
-			freeElement.innerHTML = (first || !html || !inner || /<br>$/i.test(html) ? html : html + "<BR>") + inner;
+			freeElement.innerHTML = (first || !html || !inner || /<br>$/i.test(html) ? html : html + '<BR>') + inner;
 
 			if (i === 0) {
 				parentNode.insertBefore(freeElement, f);
 				next = f.nextSibling;
 				if (next && freeElement.nodeName === next.nodeName && domUtils.isSameAttributes(freeElement, next)) {
-					freeElement.innerHTML += "<BR>" + next.innerHTML;
+					freeElement.innerHTML += '<BR>' + next.innerHTML;
 					domUtils.remove(next);
 				}
 
 				const prev = freeElement.previousSibling;
 				if (prev && freeElement.nodeName === prev.nodeName && domUtils.isSameAttributes(freeElement, prev)) {
-					prev.innerHTML += "<BR>" + freeElement.innerHTML;
+					prev.innerHTML += '<BR>' + freeElement.innerHTML;
 					domUtils.remove(freeElement);
 				}
 			}
@@ -195,7 +195,7 @@ Format.prototype = {
 			oFormat = domUtils.createElement('BR');
 		} else {
 			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : (this.isLine(currentFormatEl) && !this.isBlock(currentFormatEl) && !this.isBrLine(currentFormatEl)) ? currentFormatEl.nodeName : options.defaultTag;
-			oFormat = domUtils.createElement(oFormatName, null, "<br>");
+			oFormat = domUtils.createElement(oFormatName, null, '<br>');
 			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && this.isLine(currentFormatEl))) {
 				domUtils.copyTagAttributes(oFormat, lineNode || currentFormatEl);
 			}
@@ -565,9 +565,9 @@ Format.prototype = {
 							remove ?
 							inner.nodeName :
 							domUtils.isList(rangeElement.parentNode) || domUtils.isListCell(rangeElement.parentNode) ?
-							"LI" :
+							'LI' :
 							domUtils.isTableCell(rangeElement.parentNode) ?
-							"DIV" :
+							'DIV' :
 							options.defaultTag
 						);
 						const isCell = domUtils.isListCell(insNode);
@@ -682,8 +682,8 @@ Format.prototype = {
 	 * @param {boolean} nested If true, indenting existing list cells.
 	 */
 	applyList: function (type, selectedCells, nested) {
-		const listTag = type.split(":")[0] === "bullet" ? "OL" : "UL";
-		const listStyle = type.split(":")[1] || "";
+		const listTag = type.split(':')[0] === 'bullet' ? 'OL' : 'UL';
+		const listStyle = type.split(':')[1] || '';
 
 		let range = this.selection.getRange();
 		let selectedFormats = !selectedCells ? this.selection.getLinesAndComponents(false) : selectedCells;
@@ -760,7 +760,7 @@ Format.prototype = {
 			}.bind(this);
 
 			if (!cancel) {
-				tempList = domUtils.createElement(listTag, {style: "list-style-type: " + listStyle});
+				tempList = domUtils.createElement(listTag, {style: 'list-style-type: ' + listStyle});
 			}
 
 			for (let i = 0, len = selectedFormats.length, r, o; i < len; i++) {
@@ -771,7 +771,7 @@ Format.prototype = {
 					r = o;
 					rangeArr = {
 						r: r,
-						f: [domUtils.getParentElement(selectedFormats[i], "LI")]
+						f: [domUtils.getParentElement(selectedFormats[i], 'LI')]
 					};
 				} else {
 					if (r !== o) {
@@ -783,16 +783,16 @@ Format.prototype = {
 
 						o = selectedFormats[i].parentNode;
 						if (!cancel) {
-							tempList = domUtils.createElement(listTag, {style: "list-style-type: " + listStyle});
+							tempList = domUtils.createElement(listTag, {style: 'list-style-type: ' + listStyle});
 						}
 
 						r = o;
 						rangeArr = {
 							r: r,
-							f: [domUtils.getParentElement(selectedFormats[i], "LI")]
+							f: [domUtils.getParentElement(selectedFormats[i], 'LI')]
 						};
 					} else {
-						rangeArr.f.push(domUtils.getParentElement(selectedFormats[i], "LI"));
+						rangeArr.f.push(domUtils.getParentElement(selectedFormats[i], 'LI'));
 					}
 				}
 
@@ -819,7 +819,7 @@ Format.prototype = {
 			const mergeTop = topEl && topEl.tagName === listTag;
 			const mergeBottom = bottomEl && bottomEl.tagName === listTag;
 
-			let list = mergeTop ? topEl : domUtils.createElement(listTag, {style: "list-style-type: " + listStyle});
+			let list = mergeTop ? topEl : domUtils.createElement(listTag, {style: 'list-style-type: ' + listStyle});
 			let firstList = null;
 			let lastList = null;
 			let topNumber = null;
@@ -860,13 +860,13 @@ Format.prototype = {
 					originParent.nextSibling :
 					fTag.nextSibling;
 
-				newCell = domUtils.createElement("LI");
+				newCell = domUtils.createElement('LI');
 				this.copyAttributes(newCell, fTag);
 				if (this.component.is(fTag)) {
 					const isHR = /^HR$/i.test(fTag.nodeName);
-					if (!isHR) newCell.innerHTML = "<br>";
+					if (!isHR) newCell.innerHTML = '<br>';
 					newCell.innerHTML += fTag.outerHTML;
-					if (isHR) newCell.innerHTML += "<br>";
+					if (isHR) newCell.innerHTML += '<br>';
 				} else {
 					const fChildren = fTag.childNodes;
 					while (fChildren[0]) {
@@ -896,7 +896,7 @@ Format.prototype = {
 							domUtils.isList(originParent) &&
 							domUtils.getNodeDepth(nextParent) !== domUtils.getNodeDepth(originParent)))
 				) {
-					list = domUtils.createElement(listTag, {style: "list-style-type: " + listStyle});
+					list = domUtils.createElement(listTag, {style: 'list-style-type: ' + listStyle});
 				}
 
 				if (rangeTag && rangeTag.children.length === 0) domUtils.remove(rangeTag);
@@ -943,7 +943,7 @@ Format.prototype = {
 				r = o;
 				rangeArr = {
 					r: r,
-					f: [domUtils.getParentElement(selectedCells[i], "LI")]
+					f: [domUtils.getParentElement(selectedCells[i], 'LI')]
 				};
 				if (i === 0) listFirst = true;
 			} else if (r && isList) {
@@ -966,14 +966,14 @@ Format.prototype = {
 						r = o;
 						rangeArr = {
 							r: r,
-							f: [domUtils.getParentElement(selectedCells[i], "LI")]
+							f: [domUtils.getParentElement(selectedCells[i], 'LI')]
 						};
 						if (lastIndex) listLast = true;
 					} else {
 						r = null;
 					}
 				} else {
-					rangeArr.f.push(domUtils.getParentElement(selectedCells[i], "LI"));
+					rangeArr.f.push(domUtils.getParentElement(selectedCells[i], 'LI'));
 					if (lastIndex) listLast = true;
 				}
 			}
@@ -1013,7 +1013,7 @@ Format.prototype = {
 
 		if (domUtils.isListCell(formatEl)) {
 			this.selection.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling, false);
-			if (!element.nextSibling) element.parentNode.appendChild(domUtils.createElement("BR"));
+			if (!element.nextSibling) element.parentNode.appendChild(domUtils.createElement('BR'));
 		} else {
 			if (this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
 				const depthFormat = domUtils.getParentElement(
@@ -1070,7 +1070,7 @@ Format.prototype = {
 		return {
 			target: target,
 			component: domUtils.getParentElement(target, this.is),
-			pluginName: this.core._fileManager.pluginMap[target.nodeName.toLowerCase()] || ""
+			pluginName: this.core._fileManager.pluginMap[target.nodeName.toLowerCase()] || ''
 		};
 	},
 
@@ -1087,7 +1087,7 @@ Format.prototype = {
 		if (!plugin) return;
 		_w.setTimeout(
 			function () {
-				if (typeof plugin.select === "function") plugin.select(element)
+				if (typeof plugin.select === 'function') plugin.select(element)
 				this._setComponentLineBreaker(element);
 			}.bind(this)
 		);
@@ -1104,7 +1104,7 @@ Format.prototype = {
 
 	/**
 	 * @description Indent more the selected lines.
-	 * margin size - "status.indentSize"px
+	 * margin size - 'status.indentSize'px
 	 */
 	indent: function () {
 		const range = this.selection.getRange();
@@ -1117,7 +1117,7 @@ Format.prototype = {
 		const cells = SetLineMargin(
 			lines,
 			this.status.indentSize,
-			this.options.rtl ? "marginRight" : "marginLeft"
+			this.options.rtl ? 'marginRight' : 'marginLeft'
 		);
 
 		// list cells
@@ -1147,7 +1147,7 @@ Format.prototype = {
 		const cells = SetLineMargin(
 			lines,
 			this.status.indentSize * -1,
-			this.options.rtl ? "marginRight" : "marginLeft"
+			this.options.rtl ? 'marginRight' : 'marginLeft'
 		);
 
 		// list cells
@@ -1242,7 +1242,7 @@ Format.prototype = {
 		}
 
 		if (isRemoveNode) {
-			styleNode = domUtils.createElement("DIV");
+			styleNode = domUtils.createElement('DIV');
 		}
 
 		const wRegExp = this._w.RegExp;
@@ -1261,7 +1261,7 @@ Format.prototype = {
 
 			const ckeckClasses = styleNode.classList;
 			for (let i = 0, len = ckeckClasses.length; i < len; i++) {
-				checkAttrs.push("." + ckeckClasses[i]);
+				checkAttrs.push('.' + ckeckClasses[i]);
 			}
 
 			if (checkAttrs.length > 0) {
@@ -1270,7 +1270,7 @@ Format.prototype = {
 						if (sNode.nodeType === 1) {
 							const s = checkAttrs[i];
 							const classReg = /^\./.test(s) ?
-								new wRegExp("\\s*" + s.replace(/^\./, "") + "(\\s+|$)", "ig") :
+								new wRegExp('\\s*' + s.replace(/^\./, '') + '(\\s+|$)', 'ig') :
 								false;
 
 							const styleCheck = isRemoveNode ?
@@ -1297,38 +1297,38 @@ Format.prototype = {
 		let start = {},
 			end = {};
 		let newNode,
-			styleRegExp = "",
-			classRegExp = "",
-			removeNodeRegExp = "";
+			styleRegExp = '',
+			classRegExp = '',
+			removeNodeRegExp = '';
 
 		if (styleArray) {
 			for (let i = 0, len = styleArray.length, s; i < len; i++) {
 				s = styleArray[i];
 				if (/^\./.test(s)) {
-					classRegExp += (classRegExp ? "|" : "\\s*(?:") + s.replace(/^\./, "");
+					classRegExp += (classRegExp ? '|' : '\\s*(?:') + s.replace(/^\./, '');
 				} else {
-					styleRegExp += (styleRegExp ? "|" : "(?:;|^|\\s)(?:") + s;
+					styleRegExp += (styleRegExp ? '|' : '(?:;|^|\\s)(?:') + s;
 				}
 			}
 
 			if (styleRegExp) {
-				styleRegExp += ")\\s*:[^;]*\\s*(?:;|$)";
-				styleRegExp = new wRegExp(styleRegExp, "ig");
+				styleRegExp += ')\\s*:[^;]*\\s*(?:;|$)';
+				styleRegExp = new wRegExp(styleRegExp, 'ig');
 			}
 
 			if (classRegExp) {
-				classRegExp += ")(?=\\s+|$)";
-				classRegExp = new wRegExp(classRegExp, "ig");
+				classRegExp += ')(?=\\s+|$)';
+				classRegExp = new wRegExp(classRegExp, 'ig');
 			}
 		}
 
 		if (removeNodeArray) {
-			removeNodeRegExp = "^(?:" + removeNodeArray[0];
+			removeNodeRegExp = '^(?:' + removeNodeArray[0];
 			for (let i = 1; i < removeNodeArray.length; i++) {
-				removeNodeRegExp += "|" + removeNodeArray[i];
+				removeNodeRegExp += '|' + removeNodeArray[i];
 			}
-			removeNodeRegExp += ")$";
-			removeNodeRegExp = new wRegExp(removeNodeRegExp, "i");
+			removeNodeRegExp += ')$';
+			removeNodeRegExp = new wRegExp(removeNodeRegExp, 'i');
 		}
 
 		/** validation check function*/
@@ -1356,17 +1356,17 @@ Format.prototype = {
 
 			// style regexp
 			const originStyle = vNode.style.cssText;
-			let style = "";
+			let style = '';
 			if (styleRegExp && originStyle.length > 0) {
-				style = originStyle.replace(styleRegExp, "").trim();
+				style = originStyle.replace(styleRegExp, '').trim();
 				if (style !== originStyle) _removeCheck.v = true;
 			}
 
 			// class check
 			const originClasses = vNode.className;
-			let classes = "";
+			let classes = '';
 			if (classRegExp && originClasses.length > 0) {
-				classes = originClasses.replace(classRegExp, "").trim();
+				classes = originClasses.replace(classRegExp, '').trim();
 				if (classes !== originClasses) _removeCheck.v = true;
 			}
 
@@ -1394,12 +1394,12 @@ Format.prototype = {
 			) {
 				if (styleRegExp && originStyle.length > 0) vNode.style.cssText = style;
 				if (!vNode.style.cssText) {
-					vNode.removeAttribute("style");
+					vNode.removeAttribute('style');
 				}
 
 				if (classRegExp && originClasses.length > 0) vNode.className = classes.trim();
 				if (!vNode.className.trim()) {
-					vNode.removeAttribute("class");
+					vNode.removeAttribute('class');
 				}
 
 				if (!vNode.style.cssText && !vNode.className && (vNode.nodeName === newNodeName || tagRemove)) {
@@ -1586,7 +1586,7 @@ Format.prototype = {
 	 */
 	copyAttributes: function (originEl, copyEl) {
 		copyEl = copyEl.cloneNode(false);
-		copyEl.className = copyEl.className.replace(/(\s|^)__se__format__[^\s]+/g, "");
+		copyEl.className = copyEl.className.replace(/(\s|^)__se__format__[^\s]+/g, '');
 		this.copyTagAttributes(originEl, copyEl);
 	},
 
@@ -1639,7 +1639,7 @@ Format.prototype = {
 			element &&
 			element.nodeType === 1 &&
 			(/^(P|DIV|H[1-6]|PRE|LI|TH|TD|DETAILS)$/i.test(element.nodeName) ||
-				domUtils.hasClass(element, "(\\s|^)__se__format__line_.+(\\s|$)|(\\s|^)__se__format__br_line_.+(\\s|$)")) &&
+				domUtils.hasClass(element, '(\\s|^)__se__format__line_.+(\\s|$)|(\\s|^)__se__format__br_line_.+(\\s|$)')) &&
 			!this.component.is(element) &&
 			!domUtils.isWysiwygFrame(element)
 		);
@@ -1657,7 +1657,7 @@ Format.prototype = {
 		return (
 			element &&
 			element.nodeType === 1 &&
-			(/^PRE$/i.test(element.nodeName) || domUtils.hasClass(element, "(\\s|^)__se__format__br_line_.+(\\s|$)")) &&
+			(/^PRE$/i.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line_.+(\\s|$)')) &&
 			!this.component.is(element) &&
 			!domUtils.isWysiwygFrame(element)
 		);
@@ -1676,7 +1676,7 @@ Format.prototype = {
 		return (
 			element &&
 			element.nodeType === 1 &&
-			domUtils.hasClass(element, "(\\s|^)__se__format__br_line__closure_.+(\\s|$)")
+			domUtils.hasClass(element, '(\\s|^)__se__format__br_line__closure_.+(\\s|$)')
 		);
 	},
 
@@ -1691,7 +1691,7 @@ Format.prototype = {
 			element &&
 			element.nodeType === 1 &&
 			(/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD|DETAILS)$/i.test(element.nodeName) ||
-				domUtils.hasClass(element, "(\\s|^)__se__format__block_.+(\\s|$)"))
+				domUtils.hasClass(element, '(\\s|^)__se__format__block_.+(\\s|$)'))
 		);
 	},
 
@@ -1709,7 +1709,7 @@ Format.prototype = {
 			element &&
 			element.nodeType === 1 &&
 			(/^(TH|TD)$/i.test(element.nodeName) ||
-				domUtils.hasClass(element, "(\\s|^)__se__format__block_closure_.+(\\s|$)"))
+				domUtils.hasClass(element, '(\\s|^)__se__format__block_closure_.+(\\s|$)'))
 		);
 	},
 
@@ -1723,7 +1723,7 @@ Format.prototype = {
 		return (
 			element &&
 			element.nodeType !== 3 &&
-			/^(a|label|code|summary)$/i.test(typeof element === "string" ? element : element.nodeName)
+			/^(a|label|code|summary)$/i.test(typeof element === 'string' ? element : element.nodeName)
 		);
 	},
 
@@ -1749,7 +1749,7 @@ Format.prototype = {
 			element.nodeType !== 3 &&
 			(this.component.is(element) ||
 				/^(br|input|select|canvas|img|iframe|audio|video)$/i.test(
-					typeof element === "string" ? element : element.nodeName
+					typeof element === 'string' ? element : element.nodeName
 				))
 		);
 	},
@@ -1933,8 +1933,8 @@ Format.prototype = {
 				}
 			}
 			range = this.applyList(
-				(originList.nodeName.toUpperCase() === "OL" ? "bullet" : "numbered") +
-				":" +
+				(originList.nodeName.toUpperCase() === 'OL' ? 'bullet' : 'numbered') +
+				':' +
 				originList.style.listStyleType,
 				selectedCells,
 				true
@@ -2183,8 +2183,8 @@ Format.prototype = {
 		const wRegExp = _w.RegExp;
 
 		function checkCss(vNode) {
-			const regExp = new wRegExp("(?:;|^|\\s)(?:" + cssText + "null)\\s*:[^;]*\\s*(?:;|$)", "ig");
-			let style = "";
+			const regExp = new wRegExp('(?:;|^|\\s)(?:' + cssText + 'null)\\s*:[^;]*\\s*(?:;|$)', 'ig');
+			let style = '';
 
 			if (regExp && vNode.style.cssText.length > 0) {
 				style = regExp.test(vNode.style.cssText);
@@ -2207,11 +2207,11 @@ Format.prototype = {
 					let line = pNode;
 					anchorNode = _getMaintainedNode(child);
 					const prevNode = domUtils.createTextNode(
-						startContainer.nodeType === 1 ? "" : startContainer.substringData(0, startOffset)
+						startContainer.nodeType === 1 ? '' : startContainer.substringData(0, startOffset)
 					);
 					const textNode = domUtils.createTextNode(
 						startContainer.nodeType === 1 ?
-						"" :
+						'' :
 						startContainer.substringData(
 							startOffset,
 							isSameNode ?
@@ -2250,12 +2250,12 @@ Format.prototype = {
 
 					newNode = child;
 					pCurrent = [];
-					cssText = "";
+					cssText = '';
 					while (newNode !== line && newNode !== el && newNode !== null) {
 						vNode = _isMaintainedNode(newNode) ? null : validation(newNode);
 						if (vNode && newNode.nodeType === 1 && checkCss(newNode)) {
 							pCurrent.push(vNode);
-							cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(":")) + "|";
+							cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
 						}
 						newNode = newNode.parentNode;
 					}
@@ -2290,11 +2290,11 @@ Format.prototype = {
 					anchorNode = _getMaintainedNode(child);
 					const afterNode = domUtils.createTextNode(
 						endContainer.nodeType === 1 ?
-						"" :
+						'' :
 						endContainer.substringData(endOffset, endContainer.length - endOffset)
 					);
 					const textNode = domUtils.createTextNode(
-						isSameNode || endContainer.nodeType === 1 ? "" : endContainer.substringData(0, endOffset)
+						isSameNode || endContainer.nodeType === 1 ? '' : endContainer.substringData(0, endOffset)
 					);
 
 					if (anchorNode) {
@@ -2307,14 +2307,14 @@ Format.prototype = {
 
 					if (!unicode.onlyZeroWidthSpace(afterNode)) {
 						newNode = child;
-						cssText = "";
+						cssText = '';
 						pCurrent = [];
 						const anchors = [];
 						while (newNode !== pNode && newNode !== el && newNode !== null) {
 							if (newNode.nodeType === 1 && checkCss(newNode)) {
 								if (_isMaintainedNode(newNode)) anchors.push(newNode.cloneNode(false));
 								else pCurrent.push(newNode.cloneNode(false));
-								cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(":")) + "|";
+								cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
 							}
 							newNode = newNode.parentNode;
 						}
@@ -2340,12 +2340,12 @@ Format.prototype = {
 
 					newNode = child;
 					pCurrent = [];
-					cssText = "";
+					cssText = '';
 					while (newNode !== pNode && newNode !== el && newNode !== null) {
 						vNode = _isMaintainedNode(newNode) ? null : validation(newNode);
 						if (vNode && newNode.nodeType === 1 && checkCss(newNode)) {
 							pCurrent.push(vNode);
-							cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(":")) + "|";
+							cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
 						}
 						newNode = newNode.parentNode;
 					}
@@ -2400,7 +2400,7 @@ Format.prototype = {
 
 					newNode = child;
 					pCurrent = [];
-					cssText = "";
+					cssText = '';
 					const anchors = [];
 					while (newNode.parentNode !== null && newNode !== el && newNode !== newInnerNode) {
 						vNode = endPass ? newNode.cloneNode(false) : validation(newNode);
@@ -2410,7 +2410,7 @@ Format.prototype = {
 							} else {
 								pCurrent.push(vNode);
 							}
-							cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(":")) + "|";
+							cssText += newNode.style.cssText.substr(0, newNode.style.cssText.indexOf(':')) + '|';
 						}
 						newNode = newNode.parentNode;
 					}
@@ -2762,10 +2762,10 @@ Format.prototype = {
 					let line = pNode;
 					anchorNode = _getMaintainedNode(child);
 					const prevNode = domUtils.createTextNode(
-						container.nodeType === 1 ? "" : container.substringData(0, offset)
+						container.nodeType === 1 ? '' : container.substringData(0, offset)
 					);
 					const textNode = domUtils.createTextNode(
-						container.nodeType === 1 ? "" : container.substringData(offset, container.length - offset)
+						container.nodeType === 1 ? '' : container.substringData(offset, container.length - offset)
 					);
 
 					if (anchorNode) {
@@ -3223,10 +3223,10 @@ Format.prototype = {
 				if (!passNode && child === container) {
 					anchorNode = _getMaintainedNode(child);
 					const afterNode = domUtils.createTextNode(
-						container.nodeType === 1 ? "" : container.substringData(offset, container.length - offset)
+						container.nodeType === 1 ? '' : container.substringData(offset, container.length - offset)
 					);
 					const textNode = domUtils.createTextNode(
-						container.nodeType === 1 ? "" : container.substringData(0, offset)
+						container.nodeType === 1 ? '' : container.substringData(0, offset)
 					);
 
 					if (anchorNode) {
@@ -3534,7 +3534,7 @@ function SetLineMargin(lines, size, dir) {
 		if (!domUtils.isListCell(f)) {
 			margin = /\d+/.test(f.style[dir]) ? numbers.get(f.style[dir], 0) : 0;
 			margin += size;
-			domUtils.setStyle(f, dir, margin <= 0 ? "" : margin + "px");
+			domUtils.setStyle(f, dir, margin <= 0 ? '' : margin + 'px');
 		} else {
 			if (size < 0 || f.previousElementSibling) {
 				cells.push(f);

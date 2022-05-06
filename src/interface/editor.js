@@ -1,5 +1,5 @@
-import CoreInterface from "./_core";
-import ClassesInterface from "./_classes";
+import CoreInterface from './_core';
+import ClassesInterface from './_classes';
 
 /**
  * @interface

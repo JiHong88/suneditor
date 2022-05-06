@@ -1,19 +1,19 @@
 import {
 	_allowedEmptyNodeList
-} from "./env";
+} from './env';
 import {
 	_d,
 	_w
-} from "./global";
+} from './global';
 import {
 	onlyZeroWidthSpace,
 	zeroWidthRegExp
-} from "./unicode";
+} from './unicode';
 
 /**
  * @description Create Element node
  * @param {string} elementName Element name
- * @param {Object.<string, string>|null|undefined} attributes The attributes of the tag. {style: "font-size:12px;..", class: "el_class",..}
+ * @param {Object.<string, string>|null|undefined} attributes The attributes of the tag. {style: 'font-size:12px;..', class: 'el_class',..}
  * @param {string|Node|null|undefined} inner A innerHTML string or inner node.
  * @returns {Element}
  */
@@ -27,9 +27,9 @@ export function createElement(elementName, attributes, inner) {
 	}
 
 	if (!!inner) {
-		if (typeof inner === "string") {
+		if (typeof inner === 'string') {
 			el.innerHTML = inner;
-		} else if (typeof inner === "object") {
+		} else if (typeof inner === 'object') {
 			el.appendChild(inner);
 		}
 	}
@@ -232,7 +232,7 @@ export function getListChildNodes(element, validation) {
 /**
  * @description Returns the number of parents nodes.
  * "0" when the parent node is the WYSIWYG area.
- * "-1" when the element argument is the WYSIWYG area.
+ * '-1' when the element argument is the WYSIWYG area.
  * @param {Node} node The element to check
  * @returns {number}
  */
@@ -315,25 +315,25 @@ export function compareElements(a, b) {
 export function getParentElement(element, query) {
 	let check;
 
-	if (typeof query === "function") {
+	if (typeof query === 'function') {
 		check = query;
 	} else {
 		let attr;
 		if (/^\./.test(query)) {
-			attr = "className";
-			query = query.split(".")[1];
+			attr = 'className';
+			query = query.split('.')[1];
 		} else if (/^#/.test(query)) {
-			attr = "id";
-			query = "^" + query.split("#")[1] + "$";
+			attr = 'id';
+			query = '^' + query.split('#')[1] + '$';
 		} else if (/^:/.test(query)) {
-			attr = "name";
-			query = "^" + query.split(":")[1] + "$";
+			attr = 'name';
+			query = '^' + query.split(':')[1] + '$';
 		} else {
-			attr = "nodeName";
-			query = "^" + query + "$";
+			attr = 'nodeName';
+			query = '^' + query + '$';
 		}
 
-		const regExp = new _w.RegExp(query, "i");
+		const regExp = new _w.RegExp(query, 'i');
 		check = function (el) {
 			return regExp.test(el[attr]);
 		};
@@ -363,22 +363,22 @@ export function getParentElement(element, query) {
 export function getEdgeChild(node, query, last) {
 	let check;
 
-	if (typeof query === "function") {
+	if (typeof query === 'function') {
 		check = query;
 	} else {
 		let attr;
 		if (/^\./.test(query)) {
-			attr = "className";
-			query = query.split(".")[1];
+			attr = 'className';
+			query = query.split('.')[1];
 		} else if (/^#/.test(query)) {
-			attr = "id";
-			query = "^" + query.split("#")[1] + "$";
+			attr = 'id';
+			query = '^' + query.split('#')[1] + '$';
 		} else if (/^:/.test(query)) {
-			attr = "name";
-			query = "^" + query.split(":")[1] + "$";
+			attr = 'name';
+			query = '^' + query.split(':')[1] + '$';
 		} else {
-			attr = "nodeName";
-			query = "^" + (query === "text" ? "#" + query : query) + "$";
+			attr = 'nodeName';
+			query = '^' + (query === 'text' ? '#' + query : query) + '$';
 		}
 
 		const regExp = new _w.RegExp(query, "i");
@@ -518,8 +518,8 @@ export function copyTagAttributes(originEl, copyEl) {
 		this.addClass(originEl, classes[i]);
 	}
 
-	if (!originEl.style.cssText) originEl.removeAttribute("style");
-	if (!originEl.className.trim()) originEl.removeAttribute("class");
+	if (!originEl.style.cssText) originEl.removeAttribute('style');
+	if (!originEl.className.trim()) originEl.removeAttribute('class');
 }
 
 /**
@@ -547,7 +547,7 @@ export function isSameAttributes(a, b) {
 	let compClass = 0;
 
 	for (let i = 0, len = class_a.length; i < len; i++) {
-		if (reg("(s|^)" + class_a[i] + "(s|$)").test(class_b.value)) compClass++;
+		if (reg('(s|^)' + class_a[i] + '(s|$)').test(class_b.value)) compClass++;
 	}
 
 	return (
@@ -564,7 +564,7 @@ export function isSameAttributes(a, b) {
  */
 export function remove(item) {
 	if (!item) return;
-	if (typeof item.remove === "function") item.remove();
+	if (typeof item.remove === 'function') item.remove();
 	else if (item.parentNode) item.parentNode.removeChild(item);
 }
 
@@ -574,11 +574,11 @@ export function remove(item) {
  * @param {string|Element} newElement String or element of the new element to apply
  */
 export function changeElement(element, newElement) {
-	if (typeof newElement === "string") {
+	if (typeof newElement === 'string') {
 		if (element.outerHTML) {
 			element.outerHTML = newElement;
 		} else {
-			const doc = this.createElement("DIV");
+			const doc = this.createElement('DIV');
 			doc.innerHTML = newElement;
 			newElement = doc.firstChild;
 			element.parentNode.replaceChild(newElement, element);
@@ -608,7 +608,7 @@ export function setStyle(element, styleName, value) {
 	element.style[styleName] = value;
 
 	if (!value && !element.style.cssText) {
-		element.removeAttribute("style");
+		element.removeAttribute('style');
 	}
 }
 
@@ -654,10 +654,10 @@ export function hasClass(element, className) {
 export function addClass(element, className) {
 	if (!element) return;
 
-	const check = new _w.RegExp("(\\s|^)" + className + "(\\s|$)");
+	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
 	if (check.test(element.className)) return;
 
-	element.className += (element.className.length > 0 ? " " : "") + className;
+	element.className += (element.className.length > 0 ? ' ' : "") + className;
 }
 
 /**
@@ -668,10 +668,10 @@ export function addClass(element, className) {
 export function removeClass(element, className) {
 	if (!element) return;
 
-	const check = new _w.RegExp("(\\s|^)" + className + "(\\s|$)");
-	element.className = element.className.replace(check, " ").trim();
+	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
+	element.className = element.className.replace(check, ' ').trim();
 
-	if (!element.className.trim()) element.removeAttribute("class");
+	if (!element.className.trim()) element.removeAttribute('class');
 }
 
 /**
@@ -684,15 +684,15 @@ export function toggleClass(element, className) {
 	if (!element) return;
 	let result = false;
 
-	const check = new _w.RegExp("(\\s|^)" + className + "(\\s|$)");
+	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
 	if (check.test(element.className)) {
-		element.className = element.className.replace(check, " ").trim();
+		element.className = element.className.replace(check, ' ').trim();
 	} else {
-		element.className += " " + className;
+		element.className += ' ' + className;
 		result = true;
 	}
 
-	if (!element.className.trim()) element.removeAttribute("class");
+	if (!element.className.trim()) element.removeAttribute('class');
 
 	return result;
 }
@@ -717,7 +717,7 @@ export function isWysiwygFrame(element) {
 	return (
 		element &&
 		element.nodeType === 1 &&
-		(hasClass(element, "se-wrapper-wysiwyg") || /^BODY$/i.test(element.nodeName))
+		(hasClass(element, 'se-wrapper-wysiwyg') || /^BODY$/i.test(element.nodeName))
 	);
 }
 
@@ -727,7 +727,7 @@ export function isWysiwygFrame(element) {
  * @returns {boolean}
  */
 export function isNonEditable(element) {
-	return element && element.nodeType === 1 && (element.getAttribute("contenteditable") === "false" || !element.getAttribute("contenteditable"));
+	return element && element.nodeType === 1 && (element.getAttribute('contenteditable') === 'false' || !element.getAttribute('contenteditable'));
 }
 
 /**
@@ -736,7 +736,7 @@ export function isNonEditable(element) {
  * @returns {boolean}
  */
 export function isList(node) {
-	return node && /^(OL|UL)$/i.test(typeof node === "string" ? node : node.nodeName);
+	return node && /^(OL|UL)$/i.test(typeof node === 'string' ? node : node.nodeName);
 }
 
 /**
@@ -745,7 +745,7 @@ export function isList(node) {
  * @returns {boolean}
  */
 export function isListCell(node) {
-	return node && /^LI$/i.test(typeof node === "string" ? node : node.nodeName);
+	return node && /^LI$/i.test(typeof node === 'string' ? node : node.nodeName);
 }
 
 /**
@@ -754,7 +754,7 @@ export function isListCell(node) {
  * @returns {boolean}
  */
 export function isTable(node) {
-	return node && /^(TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(typeof node === "string" ? node : node.nodeName);
+	return node && /^(TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(typeof node === 'string' ? node : node.nodeName);
 }
 
 /**
@@ -763,7 +763,7 @@ export function isTable(node) {
  * @returns {boolean}
  */
 export function isTableCell(node) {
-	return node && /^(TD|TH)$/i.test(typeof node === "string" ? node : node.nodeName);
+	return node && /^(TD|TH)$/i.test(typeof node === 'string' ? node : node.nodeName);
 }
 
 /**
@@ -772,7 +772,7 @@ export function isTableCell(node) {
  * @returns {boolean}
  */
 export function isBreak(node) {
-	return node && /^BR$/i.test(typeof node === "string" ? node : node.nodeName);
+	return node && /^BR$/i.test(typeof node === 'string' ? node : node.nodeName);
 }
 
 /**
@@ -781,7 +781,7 @@ export function isBreak(node) {
  * @returns {boolean}
  */
 export function isAnchor(node) {
-	return node && /^A$/i.test(typeof node === "string" ? node : node.nodeName);
+	return node && /^A$/i.test(typeof node === 'string' ? node : node.nodeName);
 }
 
 /**
@@ -790,7 +790,7 @@ export function isAnchor(node) {
  * @returns {boolean}
  */
 export function isMedia(node) {
-	return node && /^(IMG|IFRAME|AUDIO|VIDEO|CANVAS)$/i.test(typeof node === "string" ? node : node.nodeName);
+	return node && /^(IMG|IFRAME|AUDIO|VIDEO|CANVAS)$/i.test(typeof node === 'string' ? node : node.nodeName);
 }
 
 /**
@@ -802,7 +802,7 @@ export function isEmptyLine(element) {
 	return (
 		!element ||
 		!element.parentNode ||
-		(!element.querySelector("IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE") &&
+		(!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') &&
 			onlyZeroWidthSpace(element.textContent))
 	);
 }
@@ -814,7 +814,7 @@ export function isEmptyLine(element) {
  * @returns {boolean}
  */
 export function isUneditable(element) {
-	return element && this.hasClass(element, "__se__uneditable");
+	return element && this.hasClass(element, '__se__uneditable');
 }
 
 /**

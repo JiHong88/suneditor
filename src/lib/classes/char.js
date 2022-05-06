@@ -3,15 +3,15 @@
  * @author JiHong Lee.
  */
 
-import env from "../../helper/env";
+import env from '../../helper/env';
 import {
 	_w
-} from "../../helper/global";
+} from '../../helper/global';
 import {
 	addClass,
 	removeClass,
 	hasClass
-} from "../../helper/domUtils";
+} from '../../helper/domUtils';
 
 const Char = function (editor) {
 	this.maxCharCount = editor.options.maxCharCount;
@@ -28,7 +28,7 @@ Char.prototype = {
 	 */
 	check: function (html) {
 		if (this.maxCharCount) {
-			const length = this.getLength(typeof html === "string" ? html : this.options.charCounterType === "byte-html" && html.nodeType === 1 ? html.outerHTML : html.textContent);
+			const length = this.getLength(typeof html === 'string' ? html : this.options.charCounterType === 'byte-html' && html.nodeType === 1 ? html.outerHTML : html.textContent);
 			if (length > 0 && length + this.getLength() > this.maxCharCount) {
 				CounterBlink(this.context.element.charWrapper);
 				return false;
@@ -44,8 +44,8 @@ Char.prototype = {
 	 * @returns {number}
 	 */
 	getLength: function (content) {
-		if (typeof content !== "string") {
-			content = this.options.charCounterType === "byte-html" ? this.context.element.wysiwyg.innerHTML : this.context.element.wysiwyg.textContent;
+		if (typeof content !== 'string') {
+			content = this.options.charCounterType === 'byte-html' ? this.context.element.wysiwyg.innerHTML : this.context.element.wysiwyg.textContent;
 		}
 		return /byte/.test(this.options.charCounterType) ? this.getByteLength(content) : content.length;
 	},
@@ -71,7 +71,7 @@ Char.prototype = {
 
 			return cl + cr;
 		} else {
-			cl = new this._textEncoder("utf-8").encode(text).length;
+			cl = new this._textEncoder('utf-8').encode(text).length;
 			cr = 0;
 
 			if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
@@ -146,10 +146,10 @@ Char.prototype = {
  * @private
  */
 function CounterBlink(charWrapper) {
-	if (charWrapper && !hasClass(charWrapper, "se-blink")) {
-		addClass(charWrapper, "se-blink");
+	if (charWrapper && !hasClass(charWrapper, 'se-blink')) {
+		addClass(charWrapper, 'se-blink');
 		_w.setTimeout(function () {
-			removeClass(charWrapper, "se-blink");
+			removeClass(charWrapper, 'se-blink');
 		}, 600);
 	}
 }

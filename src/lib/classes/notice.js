@@ -1,16 +1,16 @@
 import {
 	domUtils
-} from "../../helper";
+} from '../../helper';
 
 const Notice = function (editor) {
-	this.modal = domUtils.createElement("DIV", {
-		class: "se-notice"
+	this.modal = domUtils.createElement('DIV', {
+		class: 'se-notice'
 	}, null);
 
-	this.message = domUtils.createElement("SPAN");
-	let notice_button = domUtils.createElement("BUTTON", {
-			class: "close",
-			"aria-label": "Close",
+	this.message = domUtils.createElement('SPAN');
+	let notice_button = domUtils.createElement('BUTTON', {
+			class: 'close',
+			'aria-label': 'Close',
 			title: editor.lang.dialogBox.close
 		},
 		editor.icons.cancel);
@@ -19,7 +19,7 @@ const Notice = function (editor) {
 	this.modal.appendChild(notice_button);
 
 	/** add event */
-	editor.eventManager.addEvent(notice_button, "click", OnClick_cancel.bind(this));
+	editor.eventManager.addEvent(notice_button, 'click', OnClick_cancel.bind(this));
 
 	/** append html */
 	editor.context.element.editorArea.appendChild(this.modal);
@@ -34,14 +34,14 @@ Notice.prototype = {
 	 */
 	open: function (text) {
 		this.message.textContent = text;
-		this.modal.style.display = "block";
+		this.modal.style.display = 'block';
 	},
 
 	/**
 	 * @description  Close the notice panel
 	 */
 	close: function () {
-		this.modal.style.display = "none";
+		this.modal.style.display = 'none';
 	},
 
 	constructor: Notice

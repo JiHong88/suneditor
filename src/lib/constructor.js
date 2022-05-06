@@ -26,7 +26,7 @@ export default {
         if (element.id) top_div.id = 'suneditor_' + element.id;
 
         // relative div
-        const relative = domUtils.createElement('DIV', {class: "se-container"});
+        const relative = domUtils.createElement('DIV', {class: 'se-container'});
 
         // toolbar
         const tool_bar = this._createToolBar(options.buttonList, options.plugins, options);
@@ -34,13 +34,13 @@ export default {
         toolbarShadow.className += ' se-toolbar-shadow';
         tool_bar.element.style.visibility = 'hidden';
         if (tool_bar.pluginCallButtons.math) this._checkKatexMath(options.katex);
-        const arrow = domUtils.createElement('DIV', {class: "se-arrow"});
+        const arrow = domUtils.createElement('DIV', {class: 'se-arrow'});
 
         // sticky toolbar dummy
-        const sticky_dummy = domUtils.createElement('DIV', {class: "se-toolbar-sticky-dummy"});
+        const sticky_dummy = domUtils.createElement('DIV', {class: 'se-toolbar-sticky-dummy'});
 
         // inner editor div
-        const editor_div = domUtils.createElement('DIV', {class: "se-wrapper"});
+        const editor_div = domUtils.createElement('DIV', {class: 'se-wrapper'});
 
         /** --- init elements and create bottom bar --- */
         const initElements = this._initElements(options, top_div, tool_bar.element, arrow);
@@ -57,15 +57,15 @@ export default {
         const char_counter = bottomBar.charCounter;
 
         // loading box
-        const loading_box = domUtils.createElement('DIV', {class: "se-loading-box sun-editor-common"}, '<div class="se-loading-effect"></div>');
+        const loading_box = domUtils.createElement('DIV', {class: 'se-loading-box sun-editor-common'}, '<div class="se-loading-effect"></div>');
         // enter line
-        const line_breaker = domUtils.createElement('DIV', {class: "se-line-breaker"}, '<button class="se-btn">' + options.icons.line_break + '</button>');
-        const line_breaker_t = domUtils.createElement('DIV', {class: "se-line-breaker-component"}, '<button class="se-btn">' + options.icons.line_break + '</button>');
+        const line_breaker = domUtils.createElement('DIV', {class: 'se-line-breaker'}, '<button class="se-btn">' + options.icons.line_break + '</button>');
+        const line_breaker_t = domUtils.createElement('DIV', {class: 'se-line-breaker-component'}, '<button class="se-btn">' + options.icons.line_break + '</button>');
         const line_breaker_b = line_breaker_t.cloneNode(true);
         line_breaker_t.innerHTML = line_breaker_b.innerHTML = options.icons.line_break;
 
         // resize operation background
-        const resize_back = domUtils.createElement('DIV', {class: "se-resizing-back"});
+        const resize_back = domUtils.createElement('DIV', {class: 'se-resizing-back'});
 
         // toolbar container
         const toolbarContainer = options.toolbarContainer;
@@ -202,7 +202,7 @@ export default {
 
         const tool_bar = this._createToolBar((isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList), mergeOptions.plugins, mergeOptions);
         if (tool_bar.pluginCallButtons.math) this._checkKatexMath(mergeOptions.katex);
-        const arrow = domUtils.createElement('DIV', {class: "se-arrow"});
+        const arrow = domUtils.createElement('DIV', {class: 'se-arrow'});
 
         if (isNewToolbar) {
             tool_bar.element.style.visibility = 'hidden';
@@ -284,7 +284,7 @@ export default {
 
         /** editor */
         // wysiwyg div or iframe
-        const wysiwygDiv = domUtils.createElement(!options.iframe ? 'DIV' : 'IFRAME', {class: "se-wrapper-inner se-wrapper-wysiwyg"});
+        const wysiwygDiv = domUtils.createElement(!options.iframe ? 'DIV' : 'IFRAME', {class: 'se-wrapper-inner se-wrapper-wysiwyg'});
 
         if (!options.iframe) {
             wysiwygDiv.setAttribute('contenteditable', true);
@@ -304,7 +304,7 @@ export default {
 
         // textarea for code view
         const textarea = domUtils.createElement('TEXTAREA', {
-            class: "se-wrapper-inner se-wrapper-code",
+            class: 'se-wrapper-inner se-wrapper-code',
             style: options._editorStyles.frame
         });
         textarea.style.display = 'none';
@@ -316,23 +316,23 @@ export default {
         let charWrapper = null;
         let charCounter = null;
         if (options.resizingBar) {
-            resizingBar = domUtils.createElement('DIV', {class: "se-resizing-bar sun-editor-common"});
+            resizingBar = domUtils.createElement('DIV', {class: 'se-resizing-bar sun-editor-common'});
 
             /** navigation */
-            navigation = domUtils.createElement('DIV', {class: "se-navigation sun-editor-commo"});
+            navigation = domUtils.createElement('DIV', {class: 'se-navigation sun-editor-commo'});
             resizingBar.appendChild(navigation);
 
             /** char counter */
             if (options.charCounter) {
-                charWrapper = domUtils.createElement('DIV', {class: "se-char-counter-wrapper"});
+                charWrapper = domUtils.createElement('DIV', {class: 'se-char-counter-wrapper'});
 
                 if (options.charCounterLabel) {
-                    const charLabel = domUtils.createElement('SPAN', {class: "se-char-label"});
+                    const charLabel = domUtils.createElement('SPAN', {class: 'se-char-label'});
                     charLabel.textContent = options.charCounterLabel;
                     charWrapper.appendChild(charLabel);
                 }
 
-                charCounter = domUtils.createElement('SPAN', {class: "se-char-counter"});
+                charCounter = domUtils.createElement('SPAN', {class: 'se-char-counter'});
                 charCounter.textContent = '0';
                 charWrapper.appendChild(charCounter);
 
@@ -348,7 +348,7 @@ export default {
 
         let placeholder = null;
         if (options.placeholder) {
-            placeholder = domUtils.createElement('SPAN', {class: "se-placeholder"});
+            placeholder = domUtils.createElement('SPAN', {class: 'se-placeholder'});
             placeholder.innerText = options.placeholder;
         }
 
@@ -497,7 +497,7 @@ export default {
         options.imageUploadUrl = typeof options.imageUploadUrl === 'string' ? options.imageUploadUrl : null;
         options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? numbers.get(options.imageUploadSizeLimit, 0) : null;
         options.imageMultipleFile = !!options.imageMultipleFile;
-        options.imageAccept = (typeof options.imageAccept !== 'string' || options.imageAccept.trim() === "*") ? 'image/*' : options.imageAccept.trim() || 'image/*';
+        options.imageAccept = (typeof options.imageAccept !== 'string' || options.imageAccept.trim() === '*') ? 'image/*' : options.imageAccept.trim() || 'image/*';
         /** Image - image gallery */
         options.imageGalleryUrl = typeof options.imageGalleryUrl === 'string' ? options.imageGalleryUrl : null;
         options.imageGalleryHeader = options.imageGalleryHeader || null;
@@ -522,7 +522,7 @@ export default {
         options.videoMultipleFile = !!options.videoMultipleFile;
         options.videoTagAttrs = options.videoTagAttrs || null;
         options.videoIframeAttrs = options.videoIframeAttrs || null;
-        options.videoAccept = (typeof options.videoAccept !== 'string' || options.videoAccept.trim() === "*") ? 'video/*' : options.videoAccept.trim() || 'video/*';
+        options.videoAccept = (typeof options.videoAccept !== 'string' || options.videoAccept.trim() === '*') ? 'video/*' : options.videoAccept.trim() || 'video/*';
         /** Audio */
         options.audioWidth = !options.audioWidth ? '' : numbers.is(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth;
         options.audioHeight = !options.audioHeight ? '' : numbers.is(options.audioHeight) ? options.audioHeight + 'px' : options.audioHeight;
@@ -533,7 +533,7 @@ export default {
         options.audioUploadSizeLimit = /\d+/.test(options.audioUploadSizeLimit) ? numbers.get(options.audioUploadSizeLimit, 0) : null;
         options.audioMultipleFile = !!options.audioMultipleFile;
         options.audioTagAttrs = options.audioTagAttrs || null;
-        options.audioAccept = (typeof options.audioAccept !== 'string' || options.audioAccept.trim() === "*") ? 'audio/*' : options.audioAccept.trim() || 'audio/*';
+        options.audioAccept = (typeof options.audioAccept !== 'string' || options.audioAccept.trim() === '*') ? 'audio/*' : options.audioAccept.trim() || 'audio/*';
         /** Table */
         options.tableCellControllerPosition = typeof options.tableCellControllerPosition === 'string' ? options.tableCellControllerPosition.toLowerCase() : 'cell';
         /** Link */
@@ -695,11 +695,11 @@ export default {
     _createButton: function (buttonClass, title, dataCommand, dataType, innerHTML, _disabled, _icons) {
         const oLi = domUtils.createElement('LI');
         const oButton = domUtils.createElement('BUTTON', {
-            type: "button",
-            class: "se-btn" + (buttonClass ? " " + buttonClass : "") + " se-tooltip",
-            "data-command": dataCommand,
-            "data-type": dataType,
-            tabindex: "-1"
+            type: 'button',
+            class: 'se-btn' + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip',
+            'data-command': dataCommand,
+            'data-type': dataType,
+            tabindex: '-1'
         });
 
         if (!innerHTML) innerHTML = '<span class="se-icon-text">!</span>';
@@ -733,9 +733,9 @@ export default {
      * @private
      */
     _createToolBar: function (buttonList, _plugins, options) {
-        const _buttonTray = domUtils.createElement('DIV', {class: "se-btn-tray"});
-        const separator_vertical = domUtils.createElement('DIV', {class: "se-toolbar-separator-vertical"});
-        const tool_bar = domUtils.createElement('DIV', {class: "se-toolbar sun-editor-common"}, _buttonTray);
+        const _buttonTray = domUtils.createElement('DIV', {class: 'se-btn-tray'});
+        const separator_vertical = domUtils.createElement('DIV', {class: 'se-toolbar-separator-vertical'});
+        const tool_bar = domUtils.createElement('DIV', {class: 'se-toolbar sun-editor-common'}, _buttonTray);
 
         /** create button list */
         buttonList = JSON.parse(JSON.stringify(buttonList));
@@ -761,7 +761,7 @@ export default {
         let pluginName = '';
         let vertical = false;
         const moreLayer = domUtils.createElement('DIV', {
-            class: "se-toolbar-more-layer"
+            class: 'se-toolbar-more-layer'
         });
 
         buttonGroupLoop:
@@ -882,11 +882,11 @@ export default {
         if (moreLayer.children.length > 0) _buttonTray.appendChild(moreLayer);
 
         // menu tray
-        const _menuTray = domUtils.createElement('DIV', {class: "se-menu-tray"});
+        const _menuTray = domUtils.createElement('DIV', {class: 'se-menu-tray'});
         tool_bar.appendChild(_menuTray);
 
         // cover
-        const tool_cover = domUtils.createElement('DIV', {class: "se-toolbar-cover"});
+        const tool_cover = domUtils.createElement('DIV', {class: 'se-toolbar-cover'});
         tool_bar.appendChild(tool_cover);
 
         return {

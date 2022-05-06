@@ -141,7 +141,7 @@ export default {
 
     selfPathBookmark: function(path) {
         const href = this._w.location.href.replace(/\/$/, '');
-        return path.indexOf('#') === 0 || (path.indexOf(href) === 0 && path.indexOf('#') === (href.indexOf("#") === -1 ? href.length : href.substr(0, href.indexOf("#")).length));
+        return path.indexOf('#') === 0 || (path.indexOf(href) === 0 && path.indexOf('#') === (href.indexOf('#') === -1 ? href.length : href.substr(0, href.indexOf('#')).length));
     },
 
     _closeRelMenu: null,
@@ -324,7 +324,7 @@ export default {
         if (!anchor) return;
         contextAnchor.linkAnchor = anchor;
         contextAnchor.linkValue = anchor.href;
-        contextAnchor.currentRel = anchor.rel.split(" ");
+        contextAnchor.currentRel = anchor.rel.split(' ');
     },
 
     updateAnchor: function (anchor, url, alt, contextAnchor, notText) {

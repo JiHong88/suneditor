@@ -147,9 +147,9 @@
         setController_button: function (core) {
             const lang = core.lang;
             const icons = core.icons;
-            const resize_button = core.util.createElement("DIV");
+            const resize_button = core.util.createElement('DIV');
     
-            resize_button.className = "se-controller se-controller-resizing";
+            resize_button.className = 'se-controller se-controller-resizing';
             resize_button.innerHTML = '' +
                 '<div class="se-arrow se-arrow-up"></div>' +
                 '<div class="se-btn-group _se_resizing_btn_group">' +

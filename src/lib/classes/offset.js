@@ -3,12 +3,12 @@
  * @author JiHong Lee.
  */
 
-import CoreInterface from "../../interface/_core";
+import CoreInterface from '../../interface/_core';
 import {
 	getParentElement,
 	isWysiwygFrame,
 	hasClass
-} from "../../helper/domUtils";
+} from '../../helper/domUtils';
 
 const Offset = function (editor) {
 	CoreInterface.call(this, editor);
@@ -26,7 +26,7 @@ Offset.prototype = {
 		let offsetElement = node.nodeType === 3 ? node.parentElement : node;
 		const wysiwyg = getParentElement(node, isWysiwygFrame.bind(this));
 
-		while (offsetElement && !hasClass(offsetElement, "se-container") && offsetElement !== wysiwyg) {
+		while (offsetElement && !hasClass(offsetElement, 'se-container') && offsetElement !== wysiwyg) {
 			offsetLeft += offsetElement.offsetLeft;
 			offsetTop += offsetElement.offsetTop;
 			offsetElement = offsetElement.offsetParent;

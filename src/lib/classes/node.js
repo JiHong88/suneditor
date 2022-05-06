@@ -3,15 +3,15 @@
  * @author JiHong Lee.
  */
 
-import CoreInterface from "../../interface/_core";
+import CoreInterface from '../../interface/_core';
 import {
 	domUtils,
 	unicode,
 	env
-} from "../../helper";
+} from '../../helper';
 import {
 	_w
-} from "../../helper/global";
+} from '../../helper/global';
 
 const Node = function (editor) {
 	CoreInterface.call(this, editor);
@@ -75,7 +75,7 @@ Node.prototype = {
 		}
 
 		if (depthEl.childNodes.length <= 1 && (!depthEl.firstChild || depthEl.firstChild.textContent.length === 0))
-			depthEl.innerHTML = "<br>";
+			depthEl.innerHTML = '<br>';
 
 		const pElement = depthEl.parentNode;
 		if (next) depthEl = depthEl.nextSibling;
@@ -254,11 +254,11 @@ Node.prototype = {
 	 * @param {Function|String|null} validation Validation function / String("tag1|tag2..") / If null, all tags are applicable.
 	 */
 	mergeNestedTags: function (element, validation) {
-		if (typeof validation === "string") {
+		if (typeof validation === 'string') {
 			validation = function (current) {
 				return this.test(current.tagName);
-			}.bind(new _w.RegExp("^(" + (validation ? validation : ".+") + ")$", "i"));
-		} else if (typeof validation !== "function") {
+			}.bind(new _w.RegExp('^(' + (validation ? validation : '.+') + ')$', 'i'));
+		} else if (typeof validation !== 'function') {
 			validation = function () {
 				return true;
 			};
@@ -354,7 +354,7 @@ Node.prototype = {
 			return 0;
 		})(element);
 
-		if (element.childNodes.length === 0) element.innerHTML = "<br>";
+		if (element.childNodes.length === 0) element.innerHTML = '<br>';
 	},
 
 	/**
@@ -363,7 +363,7 @@ Node.prototype = {
 	 * @returns {string}
 	 */
 	removeWhiteSpace: function (html) {
-		if (!html) return "";
+		if (!html) return '';
 		return html.trim().replace(/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)[^>^<]+>\s+(?=<)/ig, function (m) {
 			return m.replace(/\n/g, '').replace(/\s+/, ' ');
 		});

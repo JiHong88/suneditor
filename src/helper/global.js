@@ -17,9 +17,9 @@ export function getValues(obj) {
  * @param {string|Array.<string>} param [Camel string]
  */
 export function camelToKebabCase(param) {
-	if (typeof param === "string") {
+	if (typeof param === 'string') {
 		return param.replace(/[A-Z]/g, function (letter) {
-			return "-" + letter.toLowerCase();
+			return '-' + letter.toLowerCase();
 		});
 	} else {
 		return param.map(function (str) {
@@ -36,10 +36,10 @@ export function getXMLHttpRequest() {
 	/** IE */
 	if (_w.ActiveXObject) {
 		try {
-			return new ActiveXObject("Msxml2.XMLHTTP");
+			return new ActiveXObject('Msxml2.XMLHTTP');
 		} catch (e) {
 			try {
-				return new ActiveXObject("Microsoft.XMLHTTP");
+				return new ActiveXObject('Microsoft.XMLHTTP');
 			} catch (e1) {
 				return null;
 			}
@@ -60,7 +60,7 @@ export function getXMLHttpRequest() {
  * @returns {string} Styles string
  */
 export function getPageStyle(doc) {
-	let cssText = "";
+	let cssText = '';
 	const sheets = (doc || _d).styleSheets;
 
 	for (let i = 0, len = sheets.length, rules; i < len; i++) {
@@ -89,21 +89,21 @@ export function getPageStyle(doc) {
  * @returns {string}
  */
 export function getIncludePath(nameArray, extension) {
-	let path = "";
+	let path = '';
 	const pathList = [];
-	const tagName = extension === "js" ? "script" : "link";
-	const src = extension === "js" ? "src" : "href";
+	const tagName = extension === 'js' ? 'script' : 'link';
+	const src = extension === 'js' ? 'src' : 'href';
 
-	let fileName = "(?:";
+	let fileName = '(?:';
 	for (let i = 0, len = nameArray.length; i < len; i++) {
-		fileName += nameArray[i] + (i < len - 1 ? "|" : ")");
+		fileName += nameArray[i] + (i < len - 1 ? '|' : ')');
 	}
 
 	const regExp = new _w.RegExp(
-		"(^|.*[\\/])" + fileName + "(\\.[^\\/]+)?." + extension + "(?:\\?.*|;.*)?$",
-		"i"
+		'(^|.*[\\/])' + fileName + '(\\.[^\\/]+)?.' + extension + '(?:\\?.*|;.*)?$',
+		'i'
 	);
-	const extRegExp = new _w.RegExp(".+\\." + extension + "(?:\\?.*|;.*)?$", "i");
+	const extRegExp = new _w.RegExp('.+\\.' + extension + '(?:\\?.*|;.*)?$', 'i');
 
 	for (let c = _d.getElementsByTagName(tagName), i = 0; i < c.length; i++) {
 		if (extRegExp.test(c[i][src])) {
@@ -119,23 +119,23 @@ export function getIncludePath(nameArray, extension) {
 		}
 	}
 
-	if (path === "") path = pathList.length > 0 ? pathList[0][src] : "";
+	if (path === '') path = pathList.length > 0 ? pathList[0][src] : '';
 
 	-
-	1 === path.indexOf(":/") &&
-		"//" !== path.slice(0, 2) &&
+	1 === path.indexOf(':/') &&
+		'//' !== path.slice(0, 2) &&
 		(path =
-			0 === path.indexOf("/") ?
+			0 === path.indexOf('/') ?
 			location.href.match(/^.*?:\/\/[^\/]*/)[0] + path :
 			location.href.match(/^[^\?]*\/(?:)/)[0] + path);
 
 	if (!path)
 		throw (
-			"[SUNEDITOR.util.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (name: +" +
+			'[SUNEDITOR.util.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (name: +' +
 			name +
-			", extension: " +
+			', extension: ' +
 			extension +
-			")"
+			')'
 		);
 
 	return path;

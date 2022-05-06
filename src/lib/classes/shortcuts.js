@@ -3,7 +3,7 @@
  * @author JiHong Lee.
  */
 
-import CoreInterface from "../../interface/_core";
+import CoreInterface from '../../interface/_core';
 
 const Shortcuts = function (editor) {
 	CoreInterface.call(this, editor);
@@ -34,52 +34,52 @@ Shortcuts.prototype = {
 
 		switch (keyCode) {
 			case 65: // A
-				command = "selectAll";
+				command = 'selectAll';
 				break;
 			case 66: // B
-				if (options.shortcutsDisable.indexOf("bold") === -1) {
-					command = "bold";
+				if (options.shortcutsDisable.indexOf('bold') === -1) {
+					command = 'bold';
 				}
 				break;
 			case 83: // S
-				if (shift && options.shortcutsDisable.indexOf("strike") === -1) {
-					command = "strike";
-				} else if (!shift && options.shortcutsDisable.indexOf("save") === -1) {
-					command = "save";
+				if (shift && options.shortcutsDisable.indexOf('strike') === -1) {
+					command = 'strike';
+				} else if (!shift && options.shortcutsDisable.indexOf('save') === -1) {
+					command = 'save';
 				}
 				break;
 			case 85: // U
-				if (options.shortcutsDisable.indexOf("underline") === -1) {
-					command = "underline";
+				if (options.shortcutsDisable.indexOf('underline') === -1) {
+					command = 'underline';
 				}
 				break;
 			case 73: // I
-				if (options.shortcutsDisable.indexOf("italic") === -1) {
-					command = "italic";
+				if (options.shortcutsDisable.indexOf('italic') === -1) {
+					command = 'italic';
 				}
 				break;
 			case 90: // Z
-				if (options.shortcutsDisable.indexOf("undo") === -1) {
+				if (options.shortcutsDisable.indexOf('undo') === -1) {
 					if (shift) {
-						command = "redo";
+						command = 'redo';
 					} else {
-						command = "undo";
+						command = 'undo';
 					}
 				}
 				break;
 			case 89: // Y
-				if (options.shortcutsDisable.indexOf("undo") === -1) {
-					command = "redo";
+				if (options.shortcutsDisable.indexOf('undo') === -1) {
+					command = 'redo';
 				}
 				break;
 			case 219: // [
-				if (options.shortcutsDisable.indexOf("indent") === -1) {
-					command = options.rtl ? "indent" : "outdent";
+				if (options.shortcutsDisable.indexOf('indent') === -1) {
+					command = options.rtl ? 'indent' : 'outdent';
 				}
 				break;
 			case 221: // ]
-				if (options.shortcutsDisable.indexOf("indent") === -1) {
-					command = options.rtl ? "outdent" : "indent";
+				if (options.shortcutsDisable.indexOf('indent') === -1) {
+					command = options.rtl ? 'outdent' : 'indent';
 				}
 				break;
 		}

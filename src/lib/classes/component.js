@@ -3,7 +3,7 @@
  * @author JiHong Lee.
  */
 
-import { domUtils, unicode } from "../../helper";
+import { domUtils, unicode } from '../../helper';
 
 const Component = function (editor) {
 }
@@ -31,7 +31,7 @@ Component.prototype = {
 
 		if (domUtils.isListCell(formatEl)) {
 			this.selection.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling, false);
-			if (!element.nextSibling) element.parentNode.appendChild(domUtils.createElement("BR"));
+			if (!element.nextSibling) element.parentNode.appendChild(domUtils.createElement('BR'));
 		} else {
 			if (this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
 				const depthFormat = domUtils.getParentElement(
@@ -88,7 +88,7 @@ Component.prototype = {
 		return {
 			target: target,
 			component: domUtils.getParentElement(target, this.is),
-			pluginName: this.core._fileManager.pluginMap[target.nodeName.toLowerCase()] || ""
+			pluginName: this.core._fileManager.pluginMap[target.nodeName.toLowerCase()] || ''
 		};
 	},
 
@@ -105,7 +105,7 @@ Component.prototype = {
 		if (!plugin) return;
 		_w.setTimeout(
 			function () {
-				if (typeof plugin.select === "function") plugin.select(element)
+				if (typeof plugin.select === 'function') plugin.select(element)
 				this._setComponentLineBreaker(element);
 			}.bind(this)
 		);
@@ -127,12 +127,12 @@ Component.prototype = {
 	 */
 	_setComponentLineBreaker: function (element) {
 		// line breaker
-		this.core._lineBreaker.style.display = "none";
+		this.core._lineBreaker.style.display = 'none';
 		const contextEl = this.context.element;
 		const container = domUtils.getParentElement(element, this.is);
 		const t_style = contextEl.lineBreaker_t.style;
 		const b_style = contextEl.lineBreaker_b.style;
-		const target = this.context.resizing.resizeContainer.style.display === "block" ? this.context.resizing.resizeContainer : element;
+		const target = this.context.resizing.resizeContainer.style.display === 'block' ? this.context.resizing.resizeContainer : element;
 
 		const isList = domUtils.isListCell(container.parentNode);
 		let componentTop, wScroll, w;
@@ -143,11 +143,11 @@ Component.prototype = {
 			componentTop = this.offset.get(element).top + wScroll;
 			w = target.offsetWidth / 2 / 2;
 
-			t_style.top = componentTop - wScroll - 12 + "px";
-			t_style.left = this.offset.get(target).left + w + "px";
-			t_style.display = "block";
+			t_style.top = componentTop - wScroll - 12 + 'px';
+			t_style.left = this.offset.get(target).left + w + 'px';
+			t_style.display = 'block';
 		} else {
-			t_style.display = "none";
+			t_style.display = 'none';
 		}
 		// bottom
 		if (isList ? !container.nextSibling : !this.format.isLine(container.nextElementSibling)) {
@@ -158,11 +158,11 @@ Component.prototype = {
 				w = target.offsetWidth / 2 / 2;
 			}
 
-			b_style.top = componentTop + target.offsetHeight - wScroll - 12 + "px";
-			b_style.left = this.offset.get(target).left + target.offsetWidth - w - 24 + "px";
-			b_style.display = "block";
+			b_style.top = componentTop + target.offsetHeight - wScroll - 12 + 'px';
+			b_style.left = this.offset.get(target).left + target.offsetWidth - w - 24 + 'px';
+			b_style.display = 'block';
 		} else {
-			b_style.display = "none";
+			b_style.display = 'none';
 		}
 	},
 

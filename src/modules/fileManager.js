@@ -224,8 +224,8 @@
                 }
     
                 info.src = element.src;
-                info.name = element.getAttribute("data-file-name");
-                info.size = element.getAttribute("data-file-size") * 1;
+                info.name = element.getAttribute('data-file-name');
+                info.size = element.getAttribute('data-file-size') * 1;
             }
     
             // method bind

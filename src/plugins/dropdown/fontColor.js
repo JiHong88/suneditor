@@ -59,7 +59,7 @@ export default {
 
         contextPicker._colorInput = contextFontColor.colorInput;
         const color = this.wwComputedStyle.color;
-        contextPicker._defaultColor = color ? this.plugins.colorPicker.isHexColor(color) ? color : this.plugins.colorPicker.rgb2hex(color) : "#333333";
+        contextPicker._defaultColor = color ? this.plugins.colorPicker.isHexColor(color) ? color : this.plugins.colorPicker.rgb2hex(color) : '#333333';
         contextPicker._styleProperty = 'color';
         contextPicker._colorList = contextFontColor.colorList;
         

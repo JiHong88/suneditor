@@ -5,9 +5,9 @@
  * Copyright 2017 JiHong Lee.
  * MIT license.
  */
-"use strict";
+'use strict';
 
-import dialog from "../modules/dialog";
+import dialog from '../modules/dialog';
 
 
 function insertAt(parent, child, index) {
@@ -20,8 +20,8 @@ function insertAt(parent, child, index) {
 }
 
 export default {
-  name: "mention",
-  type: "dialog",
+  name: 'mention',
+  type: 'dialog',
 
   renderItem: function(item) {
     return `<span>${item}</span>`;
@@ -29,7 +29,7 @@ export default {
 
   getItems: function(term) {
     return Promise.resolve(
-      ["overwite", "the", "mention", "plugin", "getItems", "method"].filter(
+      ['overwite', 'the', 'mention', 'plugin', 'getItems', 'method'].filter(
         (w) => w.includes(term.toLowerCase())
       )
     );
@@ -55,11 +55,11 @@ export default {
         items.forEach((item, idx) => {
           const id = mention.getId(item);
           if (!mention._itemElements[id]) {
-            const el = this.util.createElement("LI");
-            el.setAttribute("data-mention", id);
+            const el = this.util.createElement('LI');
+            el.setAttribute('data-mention', id);
             this.util.addClass(el, 'se-mention-item');
             el.innerHTML = mention.renderItem(item);
-            el.addEventListener("click", () => {
+            el.addEventListener('click', () => {
               mention._addMention(item);
             });
             insertAt(mention._list, el, idx);
@@ -70,22 +70,22 @@ export default {
     }
 
     promise.then(() => {
-      const current = mention._list.querySelectorAll(".se-mention-item")[
+      const current = mention._list.querySelectorAll('.se-mention-item')[
         mention.focussed
       ];
-      if (current && !this.util.hasClass(current, "se-mention-active")) {
-        const prev = mention._list.querySelector(".se-mention-active");
-        if (prev) this.util.removeClass(prev, "se-mention-active");
-        this.util.addClass(current, "se-mention-active");
+      if (current && !this.util.hasClass(current, 'se-mention-active')) {
+        const prev = mention._list.querySelector('.se-mention-active');
+        if (prev) this.util.removeClass(prev, 'se-mention-active');
+        this.util.addClass(current, 'se-mention-active');
       }
     });
   },
 
   setDialog: function(core) {
-    const mention_dialog = core.util.createElement("DIV");
+    const mention_dialog = core.util.createElement('DIV');
     const lang = core.lang;
-    mention_dialog.className = "se-dialog-content";
-    mention_dialog.style.display = "none";
+    mention_dialog.className = 'se-dialog-content';
+    mention_dialog.style.display = 'none';
     const html = `
       <form class="se-dialog-form">
         <div class="se-dialog-header">
@@ -114,18 +114,18 @@ export default {
   },
 
   getLinkHref(/*mention*/) {
-    return "";
+    return '';
   },
 
   open: function() {
     const { mention } = this.context;
     this.plugins.dialog.open.call(
       this,
-      "mention",
-      "mention" === this.currentControllerName
+      'mention',
+      'mention' === this.currentControllerName
     );
     mention._search.focus();
-    mention.renderList("");
+    mention.renderList('');
   },
 
   on: function(update) {
@@ -135,24 +135,24 @@ export default {
 
   init: function() {
     const { mention } = this.context;
-    mention._search.value = "";
+    mention._search.value = '';
     mention.focussed = 0;
     mention._items = [];
     mention._itemElements = {};
-    mention._list.innerHTML = "";
+    mention._list.innerHTML = '';
     delete mention.term;
   },
 
   onKeyPress: function(e) {
     const { mention } = this.context;
     switch (e.key) {
-      case "ArrowDown":
+      case 'ArrowDown':
         mention.focussed += 1;
         e.preventDefault();
         e.stopPropagation();
         break;
 
-      case "ArrowUp":
+      case 'ArrowUp':
         if (mention.focussed > 0) {
           mention.focussed -= 1;
         }
@@ -160,7 +160,7 @@ export default {
         e.stopPropagation();
         break;
 
-      case "Enter":
+      case 'Enter':
         mention._addMention();
         e.preventDefault();
         e.stopPropagation();
@@ -196,14 +196,14 @@ export default {
       ) {
         mention.mentions.push(new_mention);
       }
-      const el = this.util.createElement("A");
+      const el = this.util.createElement('A');
       el.href = mention.getLinkHref(new_mention);
-      el.target = "_blank";
+      el.target = '_blank';
       el.innerHTML = mention.getValue(new_mention);
-      el.setAttribute("data-mention", mention.getId(new_mention));
+      el.setAttribute('data-mention', mention.getId(new_mention));
       this.insertNode(el, null, false);
-      const spacer = this.util.createElement("SPAN");
-      spacer.innerHTML = " ";
+      const spacer = this.util.createElement('SPAN');
+      spacer.innerHTML = ' ';
       this.insertNode(spacer, el, false);
     }
     this.plugins.dialog.close.call(this);
@@ -214,10 +214,10 @@ export default {
     const _dialog = this.setDialog(core);
     core.getMentions = this.getMentions(core);
 
-    const _search = _dialog.querySelector(".se-mention-search");
-    _search.addEventListener("keyup", this.onKeyUp.bind(core));
-    _search.addEventListener("keydown", this.onKeyPress.bind(core));
-    const _list = _dialog.querySelector(".se-mention-list");
+    const _search = _dialog.querySelector('.se-mention-search');
+    _search.addEventListener('keyup', this.onKeyUp.bind(core));
+    _search.addEventListener('keydown', this.onKeyPress.bind(core));
+    const _list = _dialog.querySelector('.se-mention-list');
 
     core.context.mention = {
       _addMention: this._addMention.bind(core),

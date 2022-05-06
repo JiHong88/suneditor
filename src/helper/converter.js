@@ -1,7 +1,7 @@
 import {
 	_d,
 	_w
-} from "./global";
+} from './global';
 
 /**
  * @description Convert HTML string to HTML Entity
@@ -11,15 +11,15 @@ import {
  */
 export function htmlToEntity(content) {
 	const ec = {
-		"&": "&amp;",
-		"\u00A0": "&nbsp;",
-		"'": "&apos;",
-		'"': "&quot;",
-		"<": "&lt;",
-		">": "&gt;"
+		'&': '&amp;',
+		'\u00A0': '&nbsp;',
+		'\'': '&apos;',
+		'"': '&quot;',
+		'<': '&lt;',
+		'>': '&gt;'
 	};
 	return content.replace(/&|\u00A0|'|"|<|>/g, function (m) {
-		return typeof ec[m] === "string" ? ec[m] : m;
+		return typeof ec[m] === 'string' ? ec[m] : m;
 	});
 }
 
@@ -30,15 +30,15 @@ export function htmlToEntity(content) {
  */
 export function entityToHTML(content) {
 	const ec = {
-		"&amp;": "&",
-		"&nbsp;": "\u00A0",
-		"&apos;": "'",
-		"&quot;": '"',
-		"&lt;": "<",
-		"&gt;": ">"
+		'&amp;': '&',
+		'&nbsp;': '\u00A0',
+		'&apos;': '\'',
+		'&quot;': '"',
+		'&lt;': '<',
+		'&gt;': '>'
 	};
 	return content.replace(/\&amp;|\&nbsp;|\&apos;|\&quot;|\$lt;|\$gt;/g, function (m) {
-		return typeof ec[m] === "string" ? ec[m] : m;
+		return typeof ec[m] === 'string' ? ec[m] : m;
 	});
 }
 
@@ -70,35 +70,35 @@ export function createElementBlacklist(list) {
  * @private
  */
 export function _setDefaultOptionStyle(options, defaultStyle) {
-	let optionStyle = "";
-	if (options.height) optionStyle += "height:" + options.height + ";";
-	if (options.minHeight) optionStyle += "min-height:" + options.minHeight + ";";
-	if (options.maxHeight) optionStyle += "max-height:" + options.maxHeight + ";";
-	if (options.position) optionStyle += "position:" + options.position + ";";
-	if (options.width) optionStyle += "width:" + options.width + ";";
-	if (options.minWidth) optionStyle += "min-width:" + options.minWidth + ";";
-	if (options.maxWidth) optionStyle += "max-width:" + options.maxWidth + ";";
+	let optionStyle = '';
+	if (options.height) optionStyle += 'height:' + options.height + ';';
+	if (options.minHeight) optionStyle += 'min-height:' + options.minHeight + ';';
+	if (options.maxHeight) optionStyle += 'max-height:' + options.maxHeight + ';';
+	if (options.position) optionStyle += 'position:' + options.position + ';';
+	if (options.width) optionStyle += 'width:' + options.width + ';';
+	if (options.minWidth) optionStyle += 'min-width:' + options.minWidth + ';';
+	if (options.maxWidth) optionStyle += 'max-width:' + options.maxWidth + ';';
 
-	let top = "",
-		frame = "",
-		editor = "";
+	let top = '',
+		frame = '',
+		editor = '';
 	defaultStyle = optionStyle + defaultStyle;
-	const styleArr = defaultStyle.split(";");
+	const styleArr = defaultStyle.split(';');
 	for (let i = 0, len = styleArr.length, s; i < len; i++) {
 		s = styleArr[i].trim();
 		if (!s) continue;
 		if (/^(min-|max-)?width\s*:/.test(s) || /^(z-index|position)\s*:/.test(s)) {
-			top += s + ";";
+			top += s + ';';
 			continue;
 		}
 		if (/^(min-|max-)?height\s*:/.test(s)) {
-			if (/^height/.test(s) && s.split(":")[1].trim() === "auto") {
-				options.height = "auto";
+			if (/^height/.test(s) && s.split(':')[1].trim() === 'auto') {
+				options.height = 'auto';
 			}
-			frame += s + ";";
+			frame += s + ';';
 			continue;
 		}
-		editor += s + ";";
+		editor += s + ';';
 	}
 
 	return {
@@ -115,14 +115,13 @@ export function _setDefaultOptionStyle(options, defaultStyle) {
  * @private
  */
 export function _setIframeDocument(frame, options) {
-	frame.setAttribute("scrolling", "auto");
+	frame.setAttribute('scrolling', 'auto');
 	frame.contentDocument.head.innerHTML =
-		"" +
 		'<meta charset="utf-8" />' +
 		'<meta name="viewport" content="width=device-width, initial-scale=1">' +
 		_setIframeCssTags(options);
 	frame.contentDocument.body.className = options._editableClass;
-	frame.contentDocument.body.setAttribute("contenteditable", true);
+	frame.contentDocument.body.setAttribute('contenteditable', true);
 }
 
 /**
@@ -133,7 +132,7 @@ export function _setIframeDocument(frame, options) {
 export function _setIframeCssTags(options) {
 	const linkNames = options.iframeCSSFileName;
 	const wRegExp = _w.RegExp;
-	let tagString = "";
+	let tagString = '';
 
 	for (let f = 0, len = linkNames.length, path; f < len; f++) {
 		path = [];
@@ -141,8 +140,8 @@ export function _setIframeCssTags(options) {
 		if (/(^https?:\/\/)|(^data:text\/css,)/.test(linkNames[f])) {
 			path.push(linkNames[f]);
 		} else {
-			const CSSFileName = new wRegExp("(^|.*[\\/])" + linkNames[f] + "(\\..+)?\\.css(?:\\?.*|;.*)?$", "i");
-			for (let c = _d.getElementsByTagName("link"), i = 0, len = c.length, styleTag; i < len; i++) {
+			const CSSFileName = new wRegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?\\.css(?:\\?.*|;.*)?$', 'i');
+			for (let c = _d.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
 				styleTag = c[i].href.match(CSSFileName);
 				if (styleTag) path.push(styleTag[0]);
 			}
@@ -158,9 +157,9 @@ export function _setIframeCssTags(options) {
 
 	return (
 		tagString +
-		(options.height === "auto" ?
-			"<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>" :
-			"")
+		(options.height === 'auto' ?
+			'<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>' :
+			'')
 	);
 }
 

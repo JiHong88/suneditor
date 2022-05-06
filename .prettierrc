@@ -11,7 +11,7 @@
   "quoteProps": "as-needed",
   "requirePragma": false,
   "semi": true,
-  "singleQuote": false,
+  "singleQuote": true,
   "tabWidth": 4,
   "trailingComma": "none",
   "useTabs": true,

@@ -60,7 +60,7 @@ export default {
 
         contextPicker._colorInput = contextHiliteColor.colorInput;
         const color = this.wwComputedStyle.backgroundColor;
-        contextPicker._defaultColor = color ? this.plugins.colorPicker.isHexColor(color) ? color : this.plugins.colorPicker.rgb2hex(color) : "#ffffff";
+        contextPicker._defaultColor = color ? this.plugins.colorPicker.isHexColor(color) ? color : this.plugins.colorPicker.rgb2hex(color) : '#ffffff';
         contextPicker._styleProperty = 'backgroundColor';
         contextPicker._colorList = contextHiliteColor.colorList;
         

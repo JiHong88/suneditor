@@ -3,8 +3,8 @@
  * @author JiHong Lee.
  */
 
-import { _w } from "../../helper/global";
-import { getNodeFromPath, getNodePath } from "../../helper/domUtils";
+import { _w } from '../../helper/global';
+import { getNodeFromPath, getNodePath } from '../../helper/domUtils';
 
 export default function (editor, change) {
 	const delayTime = editor.options.historyStackDelayTime;
@@ -24,18 +24,18 @@ export default function (editor, change) {
 		editor.focus();
 
 		if (stack.length <= 1) {
-			if (undo) undo.setAttribute("disabled", true);
-			if (redo) redo.setAttribute("disabled", true);
+			if (undo) undo.setAttribute('disabled', true);
+			if (redo) redo.setAttribute('disabled', true);
 		} else {
 			if (stackIndex === 0) {
-				if (undo) undo.setAttribute("disabled", true);
-				if (redo) redo.removeAttribute("disabled");
+				if (undo) undo.setAttribute('disabled', true);
+				if (redo) redo.removeAttribute('disabled');
 			} else if (stackIndex === stack.length - 1) {
-				if (undo) undo.removeAttribute("disabled");
-				if (redo) redo.setAttribute("disabled", true);
+				if (undo) undo.removeAttribute('disabled');
+				if (redo) redo.setAttribute('disabled', true);
 			} else {
-				if (undo) undo.removeAttribute("disabled");
-				if (redo) redo.removeAttribute("disabled");
+				if (undo) undo.removeAttribute('disabled');
+				if (redo) redo.removeAttribute('disabled');
 			}
 		}
 
@@ -58,7 +58,7 @@ export default function (editor, change) {
 
 		if (stack.length > stackIndex) {
 			stack = stack.slice(0, stackIndex);
-			if (redo) redo.setAttribute("disabled", true);
+			if (redo) redo.setAttribute('disabled', true);
 		}
 
 		if (!range) {
@@ -81,7 +81,7 @@ export default function (editor, change) {
 			};
 		}
 
-		if (stackIndex === 1 && undo) undo.removeAttribute("disabled");
+		if (stackIndex === 1 && undo) undo.removeAttribute('disabled');
 
 		editor.char.display();
 		// onChange
@@ -103,7 +103,7 @@ export default function (editor, change) {
 		 */
 		push: function (delay) {
 			_w.setTimeout(editor._resourcesStateChange.bind(editor));
-			const time = typeof delay === "number" ? (delay > 0 ? delay : 0) : !delay ? 0 : delayTime;
+			const time = typeof delay === 'number' ? (delay > 0 ? delay : 0) : !delay ? 0 : delayTime;
 
 			if (!time || pushDelay) {
 				_w.clearTimeout(pushDelay);
@@ -162,10 +162,10 @@ export default function (editor, change) {
 		 * @description Reset the history object
 		 */
 		reset: function (ignoreChangeEvent) {
-			if (undo) undo.setAttribute("disabled", true);
-			if (redo) redo.setAttribute("disabled", true);
+			if (undo) undo.setAttribute('disabled', true);
+			if (redo) redo.setAttribute('disabled', true);
 			editor.status.isChanged = false;
-			if (editor.context.buttons.save) editor.context.buttons.save.setAttribute("disabled", true);
+			if (editor.context.buttons.save) editor.context.buttons.save.setAttribute('disabled', true);
 
 			stack.splice(0);
 			stackIndex = 0;
@@ -196,12 +196,12 @@ export default function (editor, change) {
 			redo = editor.context.buttons.redo;
 
 			if (stackIndex === 0) {
-				if (undo) undo.setAttribute("disabled", true);
-				if (redo && stackIndex === stack.length - 1) redo.setAttribute("disabled", true);
+				if (undo) undo.setAttribute('disabled', true);
+				if (redo && stackIndex === stack.length - 1) redo.setAttribute('disabled', true);
 				editor.status.isChanged = false;
-				if (editor.context.buttons.save) editor.context.buttons.save.setAttribute("disabled", true);
+				if (editor.context.buttons.save) editor.context.buttons.save.setAttribute('disabled', true);
 			} else if (stackIndex === stack.length - 1) {
-				if (redo) redo.setAttribute("disabled", true);
+				if (redo) redo.setAttribute('disabled', true);
 			}
 		},
 

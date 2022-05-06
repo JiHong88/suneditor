@@ -5,18 +5,18 @@
 
 import {
     domUtils
-} from "../../helper";
+} from '../../helper';
 
 const Menu = function (editor) {
     this._menuTrayMap = {};
     // dropdown
     this.currentDropdown = null;
     this.currentDropdownActiveButton = null;
-    this.currentDropdownName = "";
+    this.currentDropdownName = '';
     this._bindedDropdownOff = null;
     // controller
     this.currentControllerItems = [];
-    this.currentControllerName = ""; // @todo
+    this.currentControllerName = ''; // @todo
     this.currentControllerTarget = null;
     this._bindControllersOff = null;
     // container
@@ -37,7 +37,7 @@ Menu.prototype = {
     initTarget: function (target, menu) {
         if (target) {
             this.context.element._menuTray.appendChild(menu);
-            this._menuTrayMap[target.getAttribute("data-command")] = menu;
+            this._menuTrayMap[target.getAttribute('data-command')] = menu;
         }
     },
 

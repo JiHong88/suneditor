@@ -6,7 +6,7 @@
 import {
 	domUtils,
 	unicode
-} from "../../helper";
+} from '../../helper';
 
 const Selection = function (editor) {
 	this.range = null;
@@ -26,7 +26,7 @@ Selection.prototype = {
 
 		let focusEl = wysiwyg.firstElementChild;
 		if (!focusEl) {
-			focusEl = domUtils.createElement(this.options.defaultTag, null, "<br>");
+			focusEl = domUtils.createElement(this.options.defaultTag, null, '<br>');
 			wysiwyg.appendChild(focusEl);
 		}
 
@@ -154,7 +154,7 @@ Selection.prototype = {
 			range.setStart(startCon, startOff);
 			range.setEnd(endCon, endOff);
 		} catch (error) {
-			console.warn("[SUNEDITOR.core.focus.error] " + error);
+			console.warn('[SUNEDITOR.core.focus.error] ' + error);
 			this.core.nativeFocus();
 			return;
 		}
@@ -192,7 +192,7 @@ Selection.prototype = {
 	getRangeAndAddLine: function (range, container) {
 		if (this.isNone(range)) {
 			const wysiwyg = this.context.element.wysiwyg;
-			const op = domUtils.createElement(this.options.defaultTag, null, "<br>");
+			const op = domUtils.createElement(this.options.defaultTag, null, '<br>');
 			wysiwyg.insertBefore(
 				op,
 				container && container !== wysiwyg ? container.nextElementSibling : wysiwyg.firstElementChild
@@ -445,7 +445,7 @@ Selection.prototype = {
 
 					parentNode.removeChild(removeNode);
 					if (parentNode.childNodes.length === 0 && isFormats) {
-						parentNode.innerHTML = "<br>";
+						parentNode.innerHTML = '<br>';
 					}
 				} else {
 					const removedTag = this.removeNode();
@@ -453,9 +453,9 @@ Selection.prototype = {
 					const prevContainer = removedTag.prevContainer;
 					if (container && container.childNodes.length === 0 && isFormats) {
 						if (this.format.isLine(container)) {
-							container.innerHTML = "<br>";
+							container.innerHTML = '<br>';
 						} else if (this.format.isBlock(container)) {
-							container.innerHTML = "<" + this.options.defaultTag + "><br></" + this.options.defaultTag + ">";
+							container.innerHTML = '<' + this.options.defaultTag + '><br></' + this.options.defaultTag + '>';
 						}
 					}
 
@@ -564,9 +564,9 @@ Selection.prototype = {
 					const previous = oNode.previousSibling;
 					const next = oNode.nextSibling;
 					const previousText = !previous || previous.nodeType === 1 || unicode.onlyZeroWidthSpace(previous) ?
-						"" :
+						'' :
 						previous.textContent;
-					const nextText = !next || next.nodeType === 1 || unicode.onlyZeroWidthSpace(next) ? "" : next.textContent;
+					const nextText = !next || next.nodeType === 1 || unicode.onlyZeroWidthSpace(next) ? '' : next.textContent;
 
 					if (previous && previousText.length > 0) {
 						oNode.textContent = previousText + oNode.textContent;
@@ -922,7 +922,7 @@ Selection.prototype = {
 				let format = this.format.getLine(tempCon, null);
 				if (format === this.format.getBlock(format, null)) {
 					format = domUtils.createElement(
-						domUtils.getParentElement(tempCon, domUtils.isTableCell) ? "DIV" : this.options.defaultTag
+						domUtils.getParentElement(tempCon, domUtils.isTableCell) ? 'DIV' : this.options.defaultTag
 					);
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
@@ -966,7 +966,7 @@ Selection.prototype = {
 
 				let format = this.format.getLine(tempCon, null);
 				if (format === this.format.getBlock(format, null)) {
-					format = domUtils.createElement(domUtils.isTableCell(format) ? "DIV" : this.options.defaultTag);
+					format = domUtils.createElement(domUtils.isTableCell(format) ? 'DIV' : this.options.defaultTag);
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
 				}
@@ -1019,7 +1019,7 @@ Selection.prototype = {
 			}
 
 			if (oNode.childNodes.length === 0) domUtils.remove(oNode);
-			oNode = domUtils.createElement("BR");
+			oNode = domUtils.createElement('BR');
 			parentNode.insertBefore(oNode, lastONode.nextSibling);
 		}
 

@@ -7,10 +7,10 @@
  */
 'use strict';
 
-import EditorInterface from "../../interface/editor";
+import EditorInterface from '../../interface/editor';
 import {
     domUtils
-} from "../../helper";
+} from '../../helper';
 
 const align = function (editor, targetElement) {
     EditorInterface.call(this, editor);
@@ -21,8 +21,8 @@ const align = function (editor, targetElement) {
     let listUl = this._itemMenu = listDiv.querySelector('ul');
 
     // members
-    this.currentAlign = "";
-    this.defaultDir = editor.options.rtl ? "right" : "left";
+    this.currentAlign = '';
+    this.defaultDir = editor.options.rtl ? 'right' : 'left';
     this._itemMenu = null;
     this.icons = {
         justify: editor.icons.align_justify,

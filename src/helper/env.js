@@ -5,7 +5,7 @@ const userAgent = navigator.userAgent.toLowerCase();
  * @returns {boolean} Whether User Agent is IE or not.
  */
 export function isIE() {
-	return userAgent.indexOf("trident") > -1;
+	return userAgent.indexOf('trident') > -1;
 }
 
 /**
@@ -13,7 +13,7 @@ export function isIE() {
  * @returns {boolean} Whether User Agent is Edge or not.
  */
 export function isEdge() {
-	return navigator.appVersion.indexOf("Edge") > -1;
+	return navigator.appVersion.indexOf('Edge') > -1;
 }
 
 /**
@@ -29,7 +29,7 @@ export function isOSX_IOS() {
  * @returns {boolean} Whether User Agent is Blink engine or not.
  */
 export function isBlink() {
-	return userAgent.indexOf("chrome/") > -1 && userAgent.indexOf("edge/") < 0;
+	return userAgent.indexOf('chrome/') > -1 && userAgent.indexOf('edge/') < 0;
 }
 
 /**
@@ -53,7 +53,7 @@ export function isChromium() {
  * @returns {boolean} Whether User Agent is Safari or not.
  */
 export function isSafari() {
-	return userAgent.indexOf("applewebkit/") > -1 && userAgent.indexOf("chrome") === -1;
+	return userAgent.indexOf('applewebkit/') > -1 && userAgent.indexOf('chrome') === -1;
 }
 
 /**
@@ -61,7 +61,7 @@ export function isSafari() {
  * @returns {boolean} Whether User Agent is Android or not.
  */
 export function isAndroid() {
-	return userAgent.indexOf("android") > -1;
+	return userAgent.indexOf('android') > -1;
 }
 
 export const _allowedEmptyNodeList = '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details';

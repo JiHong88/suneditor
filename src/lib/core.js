@@ -5,29 +5,29 @@ import Helper, {
     unicode,
     domUtils,
     numbers
-} from "../helper";
-import Constructor from "./constructor";
-import Context from "./context";
-import EventManager from "./eventManager";
+} from '../helper';
+import Constructor from './constructor';
+import Context from './context';
+import EventManager from './eventManager';
 
 // base
-import history from "./base/history";
-import Events from "./base/events";
+import history from './base/history';
+import Events from './base/events';
 
 // classes
-import Char from "./classes/char";
-import Component from "./classes/component";
-import Format from "./classes/format";
-import Node from "./classes/node";
-import Offset from "./classes/offset";
-import Selection from "./classes/selection";
-import Shortcuts from "./classes/shortcuts";
-import Toolbar from "./classes/toolbar";
-import Menu from "./classes/menu";
-import Notice from "./classes/notice";
+import Char from './classes/char';
+import Component from './classes/component';
+import Format from './classes/format';
+import Node from './classes/node';
+import Offset from './classes/offset';
+import Selection from './classes/selection';
+import Shortcuts from './classes/shortcuts';
+import Toolbar from './classes/toolbar';
+import Menu from './classes/menu';
+import Notice from './classes/notice';
 
 // interface
-import EditorInterface from "../interface/editor";
+import EditorInterface from '../interface/editor';
 
 const _parser = new global._w.DOMParser();
 
@@ -232,10 +232,10 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
         currentNodesMap: [],
         _range: null,
         _selectionNode: null,
-        _minHeight: numbers.get((context.element.wysiwygFrame.style.minHeight || "65"), 0),
+        _minHeight: numbers.get((context.element.wysiwygFrame.style.minHeight || '65'), 0),
         _resizeClientY: 0,
         _lineBreakComp: null,
-        _lineBreakDir: ""
+        _lineBreakDir: ''
     };
 
     // ----- Properties not shared with coreInterface -----
@@ -490,10 +490,10 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
      * @private
      */
     this._commandMapStyles = {
-        STRONG: ["font-weight"],
-        U: ["text-decoration"],
-        EM: ["font-style"],
-        DEL: ["text-decoration"]
+        STRONG: ['font-weight'],
+        U: ['text-decoration'],
+        EM: ['font-style'],
+        DEL: ['text-decoration']
     };
 
     /**
@@ -521,10 +521,10 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
      */
     this._transformStatus = {
         editorOriginCssText: context.element.topArea.style.cssText,
-        bodyOverflow: "",
-        editorAreaOriginCssText: "",
-        wysiwygOriginCssText: "",
-        codeOriginCssText: "",
+        bodyOverflow: '',
+        editorAreaOriginCssText: '',
+        wysiwygOriginCssText: '',
+        codeOriginCssText: '',
         fullScreenInnerHeight: 0,
         fullScreenSticky: false,
         fullScreenBalloon: false,
@@ -536,20 +536,20 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
     let contextEl = context.element;
     let originEl = contextEl.originElement;
     let topEl = contextEl.topArea;
-    originEl.style.display = "none";
-    topEl.style.display = "block";
+    originEl.style.display = 'none';
+    topEl.style.display = 'block';
 
     // init
     if (options.iframe) {
         const inst = this;
-        contextEl.wysiwygFrame.addEventListener("load", function () {
+        contextEl.wysiwygFrame.addEventListener('load', function () {
             converter._setIframeDocument(this, options);
             inst._editorInit(false, options.value);
         });
     }
 
     // insert editor element
-    if (typeof originEl.nextElementSibling === "object") {
+    if (typeof originEl.nextElementSibling === 'object') {
         originEl.parentNode.insertBefore(topEl, originEl.nextElementSibling);
     } else {
         originEl.parentNode.appendChild(topEl);
@@ -589,7 +589,7 @@ Core.prototype = {
 
     /**
      * @todo
-     * @description If the module is not added, add the module and call the "add" function
+     * @description If the module is not added, add the module and call the 'add' function
      * @param {Array} moduleArray module object's Array
      */
     addModule: function (moduleArray) {
@@ -600,7 +600,7 @@ Core.prototype = {
             }
             if (!this.initPlugins[moduleName]) {
                 this.initPlugins[moduleName] = true;
-                if (typeof this.plugins[moduleName].add === "function") this.plugins[moduleName].add(this);
+                if (typeof this.plugins[moduleName].add === 'function') this.plugins[moduleName].add(this);
             }
         }
     },
@@ -629,7 +629,7 @@ Core.prototype = {
      * @description Focus to wysiwyg area
      */
     focus: function () {
-        if (this.context.element.wysiwygFrame.style.display === "none") return;
+        if (this.context.element.wysiwygFrame.style.display === 'none') return;
 
         if (this.options.iframe) {
             this.nativeFocus();
@@ -639,7 +639,7 @@ Core.prototype = {
                 if (range.startContainer === range.endContainer && domUtils.isWysiwygFrame(range.startContainer)) {
                     const currentNode = range.commonAncestorContainer.children[range.startOffset];
                     if (!this.format.isLine(currentNode) && !this.component.is(currentNode)) {
-                        const br = domUtils.createElement("BR");
+                        const br = domUtils.createElement('BR');
                         const format = domUtils.createElement(this.options.defaultTag, null, br);
                         this.context.element.wysiwyg.insertBefore(format, currentNode);
                         this.selection.setRange(br, 0, br, 0);
@@ -1117,7 +1117,7 @@ Core.prototype = {
             if (_var.fullScreenSticky && !this.options.toolbarContainer) {
                 _var.fullScreenSticky = false;
                 this.context.element._stickyDummy.style.display = 'block';
-                domUtils.addClass(toolbar, "se-toolbar-sticky");
+                domUtils.addClass(toolbar, 'se-toolbar-sticky');
             }
 
             this._isInline = _var.fullScreenInline;
@@ -1145,7 +1145,7 @@ Core.prototype = {
      */
     print: function () {
         const iframe = domUtils.createElement('IFRAME', {
-            style: "display: none;"
+            style: 'display: none;'
         });
         this._d.body.appendChild(iframe);
 
@@ -1512,39 +1512,39 @@ Core.prototype = {
      * @returns {string}
      */
     convertHTMLForCodeView: function (html, comp) {
-        let returnHTML = "";
+        let returnHTML = '';
         const wRegExp = this._w.RegExp;
-        const brReg = new wRegExp("^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$", "i");
-        const wDoc = typeof html === "string" ? this._d.createRange().createContextualFragment(html) : html;
+        const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', "i");
+        const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
         const isFormat = function (current) {
             return this.format.isLine(current) || this.component.is(current);
         }.bind(this);
-        const brChar = comp ? "" : "\n";
+        const brChar = comp ? '' : '\n';
 
         let indentSize = comp ? 0 : this.status.codeIndent * 1;
-        indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(" ") : "";
+        indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(' ') : '';
 
         (function recursionFunc(element, indent) {
             const children = element.childNodes;
             const elementRegTest = brReg.test(element.nodeName);
-            const elementIndent = (elementRegTest ? indent : "");
+            const elementIndent = (elementRegTest ? indent : '');
 
             for (let i = 0, len = children.length, node, br, lineBR, nodeRegTest, tag, tagIndent; i < len; i++) {
                 node = children[i];
                 nodeRegTest = brReg.test(node.nodeName);
                 br = nodeRegTest ? brChar : '';
-                lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? brChar : "";
+                lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? brChar : '';
 
                 if (node.nodeType === 8) {
-                    returnHTML += "\n<!-- " + node.textContent.trim() + " -->" + br;
+                    returnHTML += '\n<!-- ' + node.textContent.trim() + ' -->' + br;
                     continue;
                 }
                 if (node.nodeType === 3) {
-                    if (!domUtils.isList(node.parentElement)) returnHTML += converter.htmlToEntity(/^\n+$/.test(node.data) ? "" : node.data);
+                    if (!domUtils.isList(node.parentElement)) returnHTML += converter.htmlToEntity(/^\n+$/.test(node.data) ? '' : node.data);
                     continue;
                 }
                 if (node.childNodes.length === 0) {
-                    returnHTML += (/^HR$/i.test(node.nodeName) ? brChar : "") + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? "" : elementIndent) + node.outerHTML + br;
+                    returnHTML += (/^HR$/i.test(node.nodeName) ? brChar : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + node.outerHTML + br;
                     continue;
                 }
 
@@ -1552,13 +1552,13 @@ Core.prototype = {
                     returnHTML += new _w.XMLSerializer().serializeToString(node);
                 } else {
                     tag = node.nodeName.toLowerCase();
-                    tagIndent = elementIndent || nodeRegTest ? indent : "";
-                    returnHTML += (lineBR || (elementRegTest ? "" : br)) + tagIndent + node.outerHTML.match(wRegExp("<" + tag + "[^>]*>", "i"))[0] + br;
-                    recursionFunc(node, indent + indentSize, "");
-                    returnHTML += (/\n$/.test(returnHTML) ? tagIndent : "") + "</" + tag + ">" + (lineBR || br || elementRegTest ? brChar : "" || /^(TH|TD)$/i.test(node.nodeName) ? brChar : "");
+                    tagIndent = elementIndent || nodeRegTest ? indent : '';
+                    returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
+                    recursionFunc(node, indent + indentSize, '');
+                    returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? brChar : '' || /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
                 }
             }
-        }(wDoc, ""));
+        }(wDoc, ''));
 
         return returnHTML.trim() + brChar;
     },
@@ -1740,10 +1740,10 @@ Core.prototype = {
             if (this.menu.currentContainerActiveButton && this.menu.currentContainerActiveButton.disabled) this.menu.containerOff();
             if (this.modalForm) this.plugins.dialog.close.call(this);
 
-            this.context.element.code.setAttribute("readOnly", "true");
+            this.context.element.code.setAttribute('readOnly', 'true');
             domUtils.addClass(this.context.element.wysiwygFrame, 'se-read-only');
         } else {
-            this.context.element.code.removeAttribute("readOnly");
+            this.context.element.code.removeAttribute('readOnly');
             domUtils.removeClass(this.context.element.wysiwygFrame, 'se-read-only');
         }
 
@@ -2372,7 +2372,7 @@ Core.prototype = {
 
     _codeViewAutoHeight: function () {
         if (this.status.isFullScreen) return;
-        this.context.element.code.style.height = this.context.element.code.scrollHeight + "px";
+        this.context.element.code.style.height = this.context.element.code.scrollHeight + 'px';
     },
 
     /**

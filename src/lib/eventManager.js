@@ -9,21 +9,21 @@ import {
 	numbers,
 	env,
 	converter
-} from "../helper";
+} from '../helper';
 import {
 	_w,
 	_d
-} from "../helper/global";
+} from '../helper/global';
 
 const EventManager = function (editor) {
 	this._events = [];
-	this._onButtonsCheck = new _w.RegExp("^(" + _w.Object.keys(editor.options._styleNodeMap).join("|") + ")$", "i");
+	this._onButtonsCheck = new _w.RegExp('^(' + _w.Object.keys(editor.options._styleNodeMap).join('|') + ')$', 'i');
 	this._onShortcutKey = false;
-	this._IEisComposing = false; // In IE, there is no "e.isComposing" in the key-up event.
-	this._directionKeyCode = new _w.RegExp("^(8|13|3[2-9]|40|46)$");
-	this._nonTextKeyCode = new _w.RegExp("^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$");
-	this._historyIgnoreKeyCode = new _w.RegExp("^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$");
-	this._frontZeroWidthReg = new _w.RegExp(unicode.zeroWidthSpace + "+", "");
+	this._IEisComposing = false; // In IE, there is no 'e.isComposing' in the key-up event.
+	this._directionKeyCode = new _w.RegExp('^(8|13|3[2-9]|40|46)$');
+	this._nonTextKeyCode = new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$');
+	this._historyIgnoreKeyCode = new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$');
+	this._frontZeroWidthReg = new _w.RegExp(unicode.zeroWidthSpace + '+', '');
 	this._lineBreakerButton = editor._lineBreaker.querySelector('button');
 	this._balloonDelay = null;
 	this._resizeObserver = null;
@@ -33,7 +33,7 @@ const EventManager = function (editor) {
 EventManager.prototype = {
 	/**
 	 * @description Register for an event.
-	 * Only events registered with this method are unregistered or re-registered when methods such as "setOptions", "destroy" are called. 
+	 * Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called. 
 	 * @param {Element} target Target element
 	 * @param {string} type Event type
 	 * @param {Function} handler Event handler
@@ -77,14 +77,14 @@ EventManager.prototype = {
 
 	/**
 	 * @description Activates the corresponding button with the tags information of the current cursor position, 
-	 * such as "bold", "underline", etc., and executes the "active" method of the plugins.  
+	 * such as 'bold', 'underline', etc., and executes the 'active' method of the plugins.  
 	 */
 	applyTagEffect: function () {
 		let selectionNode = this.selection.getNode();
 		if (selectionNode === this.core.effectNode) return;
 		this.core.effectNode = selectionNode;
 
-		const marginDir = this.options.rtl ? "marginRight" : "marginLeft";
+		const marginDir = this.options.rtl ? 'marginRight' : 'marginLeft';
 		const commandMap = this.core._commandMap;
 		const classOnCheck = this._onButtonsCheck;
 		const commandMapNodes = [];
@@ -92,7 +92,7 @@ EventManager.prototype = {
 
 		const activePlugins = this.core.activePlugins;
 		const cLen = activePlugins.length;
-		let nodeName = "";
+		let nodeName = '';
 
 		while (selectionNode.firstChild) {
 			selectionNode = selectionNode.firstChild;
@@ -116,20 +116,20 @@ EventManager.prototype = {
 
 			if (this.format.isLine(element)) {
 				/* Outdent */
-				if (commandMapNodes.indexOf("OUTDENT") === -1 && commandMap.OUTDENT && !domUtils.isImportantDisabled(commandMap.OUTDENT)) {
+				if (commandMapNodes.indexOf('OUTDENT') === -1 && commandMap.OUTDENT && !domUtils.isImportantDisabled(commandMap.OUTDENT)) {
 					if (domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0)) {
-						commandMapNodes.push("OUTDENT");
-						commandMap.OUTDENT.removeAttribute("disabled");
+						commandMapNodes.push('OUTDENT');
+						commandMap.OUTDENT.removeAttribute('disabled');
 					}
 				}
 
 				/* Indent */
-				if (commandMapNodes.indexOf("INDENT") === -1 && commandMap.INDENT && !domUtils.isImportantDisabled(commandMap.INDENT)) {
-					commandMapNodes.push("INDENT");
+				if (commandMapNodes.indexOf('INDENT') === -1 && commandMap.INDENT && !domUtils.isImportantDisabled(commandMap.INDENT)) {
+					commandMapNodes.push('INDENT');
 					if (domUtils.isListCell(element) && !element.previousElementSibling) {
-						commandMap.INDENT.setAttribute("disabled", true);
+						commandMap.INDENT.setAttribute('disabled', true);
 					} else {
-						commandMap.INDENT.removeAttribute("disabled");
+						commandMap.INDENT.removeAttribute('disabled');
 					}
 				}
 
@@ -139,7 +139,7 @@ EventManager.prototype = {
 			/** default active buttons [strong, ins, em, del, sub, sup] */
 			if (classOnCheck && classOnCheck.test(nodeName)) {
 				commandMapNodes.push(nodeName);
-				domUtils.addClass(commandMap[nodeName], "active");
+				domUtils.addClass(commandMap[nodeName], 'active');
 			}
 		}
 
@@ -150,7 +150,7 @@ EventManager.prototype = {
 		this.status.currentNodesMap = commandMapNodes;
 
 		/**  Displays the current node structure to resizingBar */
-		if (this.options.showPathLabel) this.context.element.navigation.textContent = this.status.currentNodes.join(" > ");
+		if (this.options.showPathLabel) this.context.element.navigation.textContent = this.status.currentNodes.join(' > ');
 	},
 
 	/**
@@ -207,16 +207,16 @@ EventManager.prototype = {
 	_isUneditableNode: function (range, isFront) {
 		const container = isFront ? range.startContainer : range.endContainer;
 		const offset = isFront ? range.startOffset : range.endOffset;
-		const siblingKey = isFront ? "previousSibling" : "nextSibling";
+		const siblingKey = isFront ? 'previousSibling' : 'nextSibling';
 		const isElement = container.nodeType === 1;
 		let siblingNode;
 
 		if (isElement) {
 			siblingNode = this._isUneditableNode_getSibling(container.childNodes[offset], siblingKey, container);
-			return siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute("contenteditable") === "false";
+			return siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false';
 		} else {
 			siblingNode = this._isUneditableNode_getSibling(container, siblingKey, container);
-			return domUtils.isEdgePoint(container, offset, isFront ? "front" : "end") && siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute("contenteditable") === "false";
+			return domUtils.isEdgePoint(container, offset, isFront ? 'front' : 'end') && siblingNode && siblingNode.nodeType === 1 && siblingNode.getAttribute('contenteditable') === 'false';
 		}
 	},
 
@@ -227,7 +227,7 @@ EventManager.prototype = {
 		if (!siblingNode) {
 			siblingNode = this.format.getLine(container);
 			siblingNode = siblingNode ? siblingNode[siblingKey] : null;
-			if (siblingNode && !this.component.is(siblingNode)) siblingNode = siblingKey === "previousSibling" ? siblingNode.firstElementChild : siblingNode.lastElementChild;
+			if (siblingNode && !this.component.is(siblingNode)) siblingNode = siblingKey === 'previousSibling' ? siblingNode.firstElementChild : siblingNode.lastElementChild;
 			else return null;
 		}
 
@@ -273,8 +273,8 @@ EventManager.prototype = {
 		}
 
 		// component
-		const sComp = sc.nodeType === 1 ? domUtils.getParentElement(sc, ".se-component") : null;
-		const eComp = ec.nodeType === 1 ? domUtils.getParentElement(ec, ".se-component") : null;
+		const sComp = sc.nodeType === 1 ? domUtils.getParentElement(sc, '.se-component') : null;
+		const eComp = ec.nodeType === 1 ? domUtils.getParentElement(ec, '.se-component') : null;
 		if (sComp) domUtils.remove(sComp);
 		if (eComp) domUtils.remove(eComp);
 
@@ -282,7 +282,7 @@ EventManager.prototype = {
 	},
 
 	/**
-	 * @description If there is no default format, add a line and move "selection".
+	 * @description If there is no default format, add a line and move 'selection'.
 	 * @param {string|null} formatName Format tag name (default: 'P')
 	 * @private
 	 */
@@ -340,7 +340,7 @@ EventManager.prototype = {
 			return;
 		}
 
-		this.core.execCommand("formatBlock", false, formatName || this.options.defaultTag);
+		this.core.execCommand('formatBlock', false, formatName || this.options.defaultTag);
 		focusNode = domUtils.getEdgeChildNodes(commonCon, commonCon);
 		focusNode = focusNode ? focusNode.ec : commonCon;
 
@@ -366,7 +366,7 @@ EventManager.prototype = {
 	_setClipboardComponent: function (e, info, clipboardData) {
 		e.preventDefault();
 		e.stopPropagation();
-		clipboardData.setData("text/html", info.component.outerHTML);
+		clipboardData.setData('text/html', info.component.outerHTML);
 	},
 
 	_setDropLocationSelection: function (e) {
@@ -384,10 +384,10 @@ EventManager.prototype = {
 	_dataTransferAction: function (type, e, data) {
 		let plainText, cleanData;
 		if (env.isIE) {
-			plainText = data.getData("Text");
+			plainText = data.getData('Text');
 
 			const range = this.selection.getRange();
-			const tempDiv = domUtils.createElement("DIV");
+			const tempDiv = domUtils.createElement('DIV');
 			const tempRange = {
 				sc: range.startContainer,
 				so: range.startOffset,
@@ -395,8 +395,8 @@ EventManager.prototype = {
 				eo: range.endOffset
 			};
 
-			tempDiv.setAttribute("contenteditable", true);
-			tempDiv.style.cssText = "position:absolute; top:0; left:0; width:1px; height:1px; overflow:hidden;";
+			tempDiv.setAttribute('contenteditable', true);
+			tempDiv.style.cssText = 'position:absolute; top:0; left:0; width:1px; height:1px; overflow:hidden;';
 
 			this.context.element.relative.appendChild(tempDiv);
 			tempDiv.focus();
@@ -410,8 +410,8 @@ EventManager.prototype = {
 
 			return true;
 		} else {
-			plainText = data.getData("text/plain");
-			cleanData = data.getData("text/html");
+			plainText = data.getData('text/plain');
+			cleanData = data.getData('text/html');
 			if (this._setClipboardData(type, e, plainText, cleanData, data) === false) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -427,28 +427,28 @@ EventManager.prototype = {
 
 		if (!onlyText) {
 			if (MSData) {
-				cleanData = cleanData.replace(/\n/g, " ");
-				plainText = plainText.replace(/\n/g, " ");
+				cleanData = cleanData.replace(/\n/g, ' ');
+				plainText = plainText.replace(/\n/g, ' ');
 			} else {
-				cleanData = (plainText === cleanData ? plainText : cleanData).replace(/\n/g, "<br>");
+				cleanData = (plainText === cleanData ? plainText : cleanData).replace(/\n/g, '<br>');
 			}
 			cleanData = this.core.cleanHTML(cleanData, null, null);
 		} else {
-			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, "<br>");
+			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, '<br>');
 		}
 
-		const maxCharCount = this.char.test(this.options.charCounterType === "byte-html" ? cleanData : plainText);
+		const maxCharCount = this.char.test(this.options.charCounterType === 'byte-html' ? cleanData : plainText);
 		// user event - paste
-		if (type === "paste" && typeof this.events.onPaste === "function") {
+		if (type === 'paste' && typeof this.events.onPaste === 'function') {
 			const value = this.events.onPaste(e, cleanData, maxCharCount);
 			if (!value) return false;
-			if (typeof value === "string") cleanData = value;
+			if (typeof value === 'string') cleanData = value;
 		}
 		// user event - drop
-		if (type === "drop" && typeof this.events.onDrop === "function") {
+		if (type === 'drop' && typeof this.events.onDrop === 'function') {
 			const value = this.events.onDrop(e, cleanData, maxCharCount);
 			if (!value) return false;
-			if (typeof value === "string") cleanData = value;
+			if (typeof value === 'string') cleanData = value;
 		}
 
 		// files
@@ -488,61 +488,61 @@ EventManager.prototype = {
 
 		/** toolbar event */
 		const toolbarHandler = ToolbarButtonsHandler.bind(this);
-		this.addEvent(this.context.element.toolbar, "mousedown", toolbarHandler, false);
-		this.addEvent(this.context.element._menuTray, "mousedown", toolbarHandler, false);
-		this.addEvent(this.context.element.toolbar, "click", OnClick_toolbar.bind(this), false);
+		this.addEvent(this.context.element.toolbar, 'mousedown', toolbarHandler, false);
+		this.addEvent(this.context.element._menuTray, 'mousedown', toolbarHandler, false);
+		this.addEvent(this.context.element.toolbar, 'click', OnClick_toolbar.bind(this), false);
 
 		/** editor area */
 		const wwMouseDown = OnMouseDown_wysiwyg.bind(this);
-		this.addEvent(eventWysiwyg, "mousedown", wwMouseDown, false);
-		this.addEvent(eventWysiwyg, "click", OnClick_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, env.isIE ? "textinput" : "input", OnInput_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, "keydown", OnKeyDown_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, "keyup", OnKeyUp_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, "paste", OnPaste_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, "copy", OnCopy_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, "cut", OnCut_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, "drop", OnDrop_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, "scroll", OnScroll_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, "focus", OnFocus_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, "blur", OnBlur_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, 'mousedown', wwMouseDown, false);
+		this.addEvent(eventWysiwyg, 'click', OnClick_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, env.isIE ? 'textinput' : 'input', OnInput_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, 'keydown', OnKeyDown_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, 'keyup', OnKeyUp_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, 'paste', OnPaste_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, 'copy', OnCopy_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, 'cut', OnCut_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, 'blur', OnBlur_wysiwyg.bind(this), false);
 
 		/** line breaker */
-		this.addEvent(eventWysiwyg, "mousemove", OnMouseMove_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, 'mousemove', OnMouseMove_wysiwyg.bind(this), false);
 		this.addEvent(
 			this._lineBreakerButton,
-			"mousedown",
+			'mousedown',
 			function (e) {
 				e.preventDefault();
 			},
 			false
 		);
-		this.addEvent(this._lineBreakerButton, "click", DisplayLineBreak.bind(this, ""), false);
-		this.addEvent(this.context.element.lineBreaker_t, "mousedown", DisplayLineBreak.bind(this, "t"), false);
-		this.addEvent(this.context.element.lineBreaker_b, "mousedown", DisplayLineBreak.bind(this, "b"), false);
+		this.addEvent(this._lineBreakerButton, 'click', DisplayLineBreak.bind(this, ''), false);
+		this.addEvent(this.context.element.lineBreaker_t, 'mousedown', DisplayLineBreak.bind(this, 't'), false);
+		this.addEvent(this.context.element.lineBreaker_b, 'mousedown', DisplayLineBreak.bind(this, 'b'), false);
 
 		/** Events are registered only when there is a table plugin.  */
 		if (this.plugins.table) {
-			this.addEvent(eventWysiwyg, "touchstart", wwMouseDown, {
+			this.addEvent(eventWysiwyg, 'touchstart', wwMouseDown, {
 				passive: true,
 				useCapture: false
 			});
 		}
 
 		/** code view area auto line */
-		if (this.options.height === "auto" && !this.options.codeMirrorEditor) {
+		if (this.options.height === 'auto' && !this.options.codeMirrorEditor) {
 			const cvAuthHeight = this.core._codeViewAutoHeight.bind(this.editor);
-			this.addEvent(this.context.element.code, "keydown", cvAuthHeight, false);
-			this.addEvent(this.context.element.code, "keyup", cvAuthHeight, false);
-			this.addEvent(this.context.element.code, "paste", cvAuthHeight, false);
+			this.addEvent(this.context.element.code, 'keydown', cvAuthHeight, false);
+			this.addEvent(this.context.element.code, 'keyup', cvAuthHeight, false);
+			this.addEvent(this.context.element.code, 'paste', cvAuthHeight, false);
 		}
 
 		/** resizingBar */
 		if (this.context.element.resizingBar) {
 			if (/\d+/.test(this.options.height) && this.options.resizeEnable) {
-				this.addEvent(this.context.element.resizingBar, "mousedown", OnMouseDown_resizingBar.bind(this), false);
+				this.addEvent(this.context.element.resizingBar, 'mousedown', OnMouseDown_resizingBar.bind(this), false);
 			} else {
-				domUtils.addClass(this.context.element.resizingBar, "se-resizing-none");
+				domUtils.addClass(this.context.element.resizingBar, 'se-resizing-none');
 			}
 		}
 
@@ -553,9 +553,9 @@ EventManager.prototype = {
 		if (!env.isIE) this._toolbarObserver = new _w.ResizeObserver(this.toolbar.resetResponsiveToolbar.bind(this.toolbar));
 
 		/** window event */
-		this.addEvent(_w, "resize", OnResize_window.bind(this), false);
+		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
 		if (this.options.stickyToolbar > -1) {
-			this.addEvent(_w, "scroll", this.toolbar._resetSticky.bind(this.toolbar), false);
+			this.addEvent(_w, 'scroll', this.toolbar._resetSticky.bind(this.toolbar), false);
 		}
 	},
 
@@ -591,16 +591,16 @@ function ToolbarButtonsHandler(e) {
 		e.preventDefault();
 	}
 
-	if (domUtils.getParentElement(target, ".se-dropdown")) {
+	if (domUtils.getParentElement(target, '.se-dropdown')) {
 		e.stopPropagation();
 		this.core._notHideToolbar = true;
 	} else {
-		let command = target.getAttribute("data-command");
+		let command = target.getAttribute('data-command');
 		let className = target.className;
 
 		while (!command && !/se-menu-list/.test(className) && !/sun-editor-common/.test(className)) {
 			target = target.parentNode;
-			command = target.getAttribute("data-command");
+			command = target.getAttribute('data-command');
 			className = target.className;
 		}
 
@@ -612,15 +612,15 @@ function ToolbarButtonsHandler(e) {
 
 function OnClick_toolbar(e) {
 	let target = e.target;
-	let type = target.getAttribute("data-type");
-	let command = target.getAttribute("data-command");
+	let type = target.getAttribute('data-type');
+	let command = target.getAttribute('data-command');
 	let className = target.className;
 	this.menu.controllerOff();
 
 	while (target.parentNode && !command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
 		target = target.parentNode;
-		command = target.getAttribute("data-command");
-		type = target.getAttribute("data-type");
+		command = target.getAttribute('data-command');
+		type = target.getAttribute('data-type');
 		className = target.className;
 	}
 
@@ -637,7 +637,7 @@ function OnMouseDown_wysiwyg(e) {
 	this.selection._init();
 
 	// user event
-	if (typeof this.events.onMouseDown === "function" && this.events.onMouseDown(e) === false) return;
+	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown(e) === false) return;
 
 	const tableCell = domUtils.getParentElement(e.target, domUtils.isTableCell);
 	if (tableCell) {
@@ -668,7 +668,7 @@ function OnClick_wysiwyg(e) {
 	if (domUtils.isNonEditable(this.context.element.wysiwyg)) return;
 
 	// user event
-	if (typeof this.events.onClick === "function" && this.events.onClick(e) === false) return;
+	if (typeof this.events.onClick === 'function' && this.events.onClick(e) === false) return;
 
 	const fileComponentInfo = this.component.get(targetElement);
 	if (fileComponentInfo) {
@@ -677,10 +677,10 @@ function OnClick_wysiwyg(e) {
 		return;
 	}
 
-	const figcaption = domUtils.getParentElement(targetElement, "FIGCAPTION");
-	if (figcaption && (domUtils.isNonEditable(figcaption) || !figcaption.getAttribute("contenteditable"))) {
+	const figcaption = domUtils.getParentElement(targetElement, 'FIGCAPTION');
+	if (figcaption && (domUtils.isNonEditable(figcaption) || !figcaption.getAttribute('contenteditable'))) {
 		e.preventDefault();
-		figcaption.setAttribute("contenteditable", true);
+		figcaption.setAttribute('contenteditable', true);
 		figcaption.focus();
 
 		if (this.core._isInline && !this.toolbar._inlineToolbarAttr.isShow) {
@@ -688,10 +688,10 @@ function OnClick_wysiwyg(e) {
 
 			const hideToolbar = function () {
 				this._hideToolbar();
-				figcaption.removeEventListener("blur", hideToolbar);
+				figcaption.removeEventListener('blur', hideToolbar);
 			};
 
-			figcaption.addEventListener("blur", hideToolbar);
+			figcaption.addEventListener('blur', hideToolbar);
 		}
 	}
 
@@ -707,10 +707,10 @@ function OnClick_wysiwyg(e) {
 			if (domUtils.isList(rangeEl)) {
 				e.preventDefault();
 				const prevLi = selectionNode.nextElementSibling;
-				const oLi = domUtils.createElement("LI", null, selectionNode);
+				const oLi = domUtils.createElement('LI', null, selectionNode);
 				rangeEl.insertBefore(oLi, prevLi);
 				this.core.focus();
-			} else if (!domUtils.isWysiwygFrame(selectionNode) && !this.component.is(selectionNode) && (!domUtils.isTable(selectionNode) || domUtils.isTableCell(selectionNode)) && this._setDefaultLine(this.format.isBlock(rangeEl) ? "DIV" : this.options.defaultTag) !== null) {
+			} else if (!domUtils.isWysiwygFrame(selectionNode) && !this.component.is(selectionNode) && (!domUtils.isTable(selectionNode) || domUtils.isTableCell(selectionNode)) && this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.defaultTag) !== null) {
 				e.preventDefault();
 				this.core.focus();
 			} else {
@@ -735,9 +735,9 @@ function OnInput_wysiwyg(e) {
 	this.selection._init();
 
 	// user event
-	if (typeof this.events.onInput === "function" && this.events.onInput(e) === false) return;
+	if (typeof this.events.onInput === 'function' && this.events.onInput(e) === false) return;
 
-	const data = (e.data === null ? "" : e.data === undefined ? " " : e.data) || "";
+	const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';
 	if (!this.char.test(data)) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -767,7 +767,7 @@ function OnKeyDown_wysiwyg(e) {
 	}
 
 	// user event
-	if (typeof this.events.onKeyDown === "function" && this.events.onKeyDown(e) === false) return;
+	if (typeof this.events.onKeyDown === 'function' && this.events.onKeyDown(e) === false) return;
 
 	/** Shortcuts */
 	if (ctrl && this.shortcuts.command(keyCode, shift)) {
@@ -783,7 +783,7 @@ function OnKeyDown_wysiwyg(e) {
 	let selectionNode = this.selection.getNode();
 	const range = this.selection.getRange();
 	const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
-	const fileComponentName = this.core._fileManager.pluginRegExp.test(this.menu.currentControllerName) ? this.menu.currentControllerName : "";
+	const fileComponentName = this.core._fileManager.pluginRegExp.test(this.menu.currentControllerName) ? this.menu.currentControllerName : '';
 	let formatEl = this.format.getLine(selectionNode, null) || selectionNode;
 	let rangeEl = this.format.getBlock(formatEl, null);
 
@@ -823,13 +823,13 @@ function OnKeyDown_wysiwyg(e) {
 					e.stopPropagation();
 
 					if (formatEl.nodeName.toUpperCase() === this.options.defaultTag.toUpperCase()) {
-						formatEl.innerHTML = "<br>";
+						formatEl.innerHTML = '<br>';
 						const attrs = formatEl.attributes;
 						while (attrs[0]) {
 							formatEl.removeAttribute(attrs[0].name);
 						}
 					} else {
-						formatEl.parentElement.replaceChild(domUtils.createElement(this.options.defaultTag, null, "<br>"), formatEl);
+						formatEl.parentElement.replaceChild(domUtils.createElement(this.options.defaultTag, null, '<br>'), formatEl);
 					}
 
 					this.core.nativeFocus();
@@ -847,7 +847,7 @@ function OnKeyDown_wysiwyg(e) {
 					const next = selectionNode.parentNode.nextSibling;
 					if (!prev) {
 						if (!next) {
-							prev = domUtils.createElement("BR");
+							prev = domUtils.createElement('BR');
 							formatEl.appendChild(prev);
 						} else {
 							prev = next;
@@ -855,15 +855,15 @@ function OnKeyDown_wysiwyg(e) {
 						}
 					}
 
-					selectionNode.textContent = "";
+					selectionNode.textContent = '';
 					this.node.removeAllParents(selectionNode, null, formatEl);
-					offset = typeof offset === "number" ? offset : prev.nodeType === 3 ? prev.textContent.length : 1;
+					offset = typeof offset === 'number' ? offset : prev.nodeType === 3 ? prev.textContent.length : 1;
 					this.selection.setRange(prev, offset, prev, offset);
 					break;
 				}
 			}
 
-			// tag[contenteditable="false"]
+			// tag[contenteditable='false']
 			if (this._isUneditableNode(range, true)) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -999,7 +999,7 @@ function OnKeyDown_wysiwyg(e) {
 				break;
 			}
 
-			// tag[contenteditable="false"]
+			// tag[contenteditable='false']
 			if (this._isUneditableNode(range, false)) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -1135,7 +1135,7 @@ function OnKeyDown_wysiwyg(e) {
 				// table
 				const tableCell = domUtils.getParentElement(selectionNode, domUtils.isTableCell);
 				if (tableCell && isEdge) {
-					const table = domUtils.getParentElement(tableCell, "table");
+					const table = domUtils.getParentElement(tableCell, 'table');
 					const cells = domUtils.getListChildren(table, domUtils.isTableCell);
 					let idx = shift ? domUtils.prevIndex(cells, tableCell) : domUtils.nextIndex(cells, tableCell);
 
@@ -1156,7 +1156,7 @@ function OnKeyDown_wysiwyg(e) {
 			// Lines tab(4)
 			if (lines.length > 0) {
 				if (!shift) {
-					const tabText = domUtils.createTextNode(new _w.Array(this.status.tabSize + 1).join("\u00A0"));
+					const tabText = domUtils.createTextNode(new _w.Array(this.status.tabSize + 1).join('\u00A0'));
 					if (lines.length === 1) {
 						const textRange = this.selection.insertNode(tabText, null, true);
 						if (!textRange) return false;
@@ -1181,8 +1181,8 @@ function OnKeyDown_wysiwyg(e) {
 							}
 						}
 
-						const firstChild = domUtils.getEdgeChild(lines[0], "text", false);
-						const endChild = domUtils.getEdgeChild(lines[len], "text", true);
+						const firstChild = domUtils.getEdgeChild(lines[0], 'text', false);
+						const endChild = domUtils.getEdgeChild(lines[len], 'text', true);
 						if (!fc && firstChild) {
 							r.sc = firstChild;
 							r.so = 0;
@@ -1204,15 +1204,15 @@ function OnKeyDown_wysiwyg(e) {
 							if (/^\s{1,4}$/.test(child.textContent)) {
 								domUtils.remove(child);
 							} else if (/^\s{1,4}/.test(child.textContent)) {
-								child.textContent = child.textContent.replace(/^\s{1,4}/, "");
+								child.textContent = child.textContent.replace(/^\s{1,4}/, '');
 							}
 
 							break;
 						}
 					}
 
-					const firstChild = domUtils.getEdgeChild(lines[0], "text", false);
-					const endChild = domUtils.getEdgeChild(lines[len], "text", true);
+					const firstChild = domUtils.getEdgeChild(lines[0], 'text', false);
+					const endChild = domUtils.getEdgeChild(lines[len], 'text', true);
 					if (!fc && firstChild) {
 						r.sc = firstChild;
 						r.so = 0;
@@ -1232,12 +1232,12 @@ function OnKeyDown_wysiwyg(e) {
 		case 13 /** enter key */ :
 			const brLine = this.format.getBrLine(selectionNode, null);
 
-			if (this.options.charCounterType === "byte-html") {
-				let enterHTML = "";
+			if (this.options.charCounterType === 'byte-html') {
+				let enterHTML = '';
 				if ((!shift && brLine) || shift) {
-					enterHTML = "<br>";
+					enterHTML = '<br>';
 				} else {
-					enterHTML = "<" + formatEl.nodeName + "><br></" + formatEl.nodeName + ">";
+					enterHTML = '<' + formatEl.nodeName + '><br></' + formatEl.nodeName + '>';
 				}
 
 				if (!this.char.check(enterHTML)) {
@@ -1247,7 +1247,7 @@ function OnKeyDown_wysiwyg(e) {
 			}
 
 			if (!shift) {
-				const formatInners = this.format.isEdgeLine(range.endContainer, range.endOffset, "end");
+				const formatInners = this.format.isEdgeLine(range.endContainer, range.endOffset, 'end');
 				if ((formatInners && /^H[1-6]$/i.test(formatEl.nodeName)) || /^HR$/i.test(formatEl.nodeName)) {
 					e.preventDefault();
 					let temp = null;
@@ -1336,7 +1336,7 @@ function OnKeyDown_wysiwyg(e) {
 					}
 
 					if (selectionFormat) {
-						this.selection.insertHTML(range.collapsed && domUtils.isBreak(range.startContainer.childNodes[range.startOffset - 1]) ? "<br>" : "<br><br>", true, false);
+						this.selection.insertHTML(range.collapsed && domUtils.isBreak(range.startContainer.childNodes[range.startOffset - 1]) ? '<br>' : '<br><br>', true, false);
 
 						let focusNode = wSelection.focusNode;
 						const wOffset = wSelection.focusOffset;
@@ -1347,7 +1347,7 @@ function OnKeyDown_wysiwyg(e) {
 						this.selection.setRange(focusNode, 1, focusNode, 1);
 					} else {
 						const focusNext = wSelection.focusNode.nextSibling;
-						const br = domUtils.createElement("BR");
+						const br = domUtils.createElement('BR');
 						this.selection.insertNode(br, null, false);
 
 						const brPrev = br.previousSibling,
@@ -1371,8 +1371,8 @@ function OnKeyDown_wysiwyg(e) {
 				const range = this.selection.getRange();
 				if (domUtils.isEdgePoint(range.endContainer, range.endOffset) && domUtils.isList(selectionNode.nextSibling)) {
 					e.preventDefault();
-					const br = domUtils.createElement("BR");
-					const newEl = domUtils.createElement("LI", null, br);
+					const br = domUtils.createElement('BR');
+					const newEl = domUtils.createElement('LI', null, br);
 
 					formatEl.parentNode.insertBefore(newEl, formatEl.nextElementSibling);
 					newEl.appendChild(selectionNode.nextSibling);
@@ -1389,15 +1389,15 @@ function OnKeyDown_wysiwyg(e) {
 						rangeEl = formatEl.parentNode.parentNode.parentNode;
 						newEl = this.node.split(formatEl, null, domUtils.getNodeDepth(formatEl) - 2);
 						if (!newEl) {
-							const newListCell = domUtils.createElement("LI", null, "<br>");
+							const newListCell = domUtils.createElement('LI', null, '<br>');
 							rangeEl.insertBefore(newListCell, newEl);
 							newEl = newListCell;
 						}
 					} else {
 						const newFormat = domUtils.isTableCell(rangeEl.parentNode) ?
-							"DIV" :
+							'DIV' :
 							domUtils.isList(rangeEl.parentNode) ?
-							"LI" :
+							'LI' :
 							this.format.isLine(rangeEl.nextElementSibling) && !this.format.isBlock(rangeEl.nextElementSibling) ?
 							rangeEl.nextElementSibling.nodeName :
 							this.format.isLine(rangeEl.previousElementSibling) && !this.format.isBlock(rangeEl.previousElementSibling) ?
@@ -1409,14 +1409,14 @@ function OnKeyDown_wysiwyg(e) {
 						edge.cc.insertBefore(newEl, edge.ec);
 					}
 
-					newEl.innerHTML = "<br>";
+					newEl.innerHTML = '<br>';
 					this.node.removeAllParents(formatEl, null, null);
 					this.selection.setRange(newEl, 1, newEl, 1);
 					break;
 				}
 			}
 
-			if (rangeEl && domUtils.getParentElement(rangeEl, "FIGCAPTION") && domUtils.getParentElement(rangeEl, domUtils.isList)) {
+			if (rangeEl && domUtils.getParentElement(rangeEl, 'FIGCAPTION') && domUtils.getParentElement(rangeEl, domUtils.isList)) {
 				e.preventDefault();
 				formatEl = this.format.appendLine(formatEl, null);
 				this.selection.setRange(formatEl, 0, formatEl, 0);
@@ -1431,9 +1431,9 @@ function OnKeyDown_wysiwyg(e) {
 
 				let newEl = null;
 				if (domUtils.isListCell(container.parentNode)) {
-					newEl = domUtils.createElement("BR");
+					newEl = domUtils.createElement('BR');
 				} else {
-					newEl = domUtils.createElement((this.format.isLine(sibling) && !this.format.isBlock(sibling)) ? sibling.nodeName : this.options.defaultTag, null, "<br>");
+					newEl = domUtils.createElement((this.format.isLine(sibling) && !this.format.isBlock(sibling)) ? sibling.nodeName : this.options.defaultTag, null, '<br>');
 				}
 
 				container.parentNode.insertBefore(newEl, container);
@@ -1465,7 +1465,7 @@ function OnKeyDown_wysiwyg(e) {
 	} else if (shift && (env.isOSX_IOS ? alt : ctrl) && keyCode === 32) {
 		e.preventDefault();
 		e.stopPropagation();
-		const nbsp = this.selection.insertNode(domUtils.createTextNode("\u00a0"));
+		const nbsp = this.selection.insertNode(domUtils.createTextNode('\u00a0'));
 		if (nbsp && nbsp.container) {
 			this.selection.setRange(nbsp.container, nbsp.endOffset, nbsp.container, nbsp.endOffset);
 			return;
@@ -1506,13 +1506,13 @@ function OnKeyUp_wysiwyg(e) {
 	}
 
 	/** when format tag deleted */
-	if (keyCode === 8 && domUtils.isWysiwygFrame(selectionNode) && selectionNode.textContent === "" && selectionNode.children.length === 0) {
+	if (keyCode === 8 && domUtils.isWysiwygFrame(selectionNode) && selectionNode.textContent === '' && selectionNode.children.length === 0) {
 		e.preventDefault();
 		e.stopPropagation();
 
-		selectionNode.innerHTML = "";
+		selectionNode.innerHTML = '';
 
-		const oFormatTag = domUtils.createElement(this.format.isLine(this.status.currentNodes[0]) ? this.status.currentNodes[0] : this.options.defaultTag, null, "<br>");
+		const oFormatTag = domUtils.createElement(this.format.isLine(this.status.currentNodes[0]) ? this.status.currentNodes[0] : this.options.defaultTag, null, '<br>');
 		selectionNode.appendChild(oFormatTag);
 		this.selection.setRange(oFormatTag, 0, oFormatTag, 0);
 		this.applyTagEffect();
@@ -1535,17 +1535,17 @@ function OnKeyUp_wysiwyg(e) {
 	if (textKey && selectionNode.nodeType === 3 && unicode.zeroWidthRegExp.test(selectionNode.textContent) && !(e.isComposing !== undefined ? e.isComposing : this._IEisComposing)) {
 		let so = range.startOffset,
 			eo = range.endOffset;
-		const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(this._frontZeroWidthReg) || "").length;
+		const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(this._frontZeroWidthReg) || '').length;
 		so = range.startOffset - frontZeroWidthCnt;
 		eo = range.endOffset - frontZeroWidthCnt;
-		selectionNode.textContent = selectionNode.textContent.replace(unicode.zeroWidthRegExp, "");
+		selectionNode.textContent = selectionNode.textContent.replace(unicode.zeroWidthRegExp, '');
 		this.selection.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
 	}
 
-	this.char.test("");
+	this.char.test('');
 
 	// user event
-	if (typeof this.events.onKeyUp === "function" && this.events.onKeyUp(e) === false) return;
+	if (typeof this.events.onKeyUp === 'function' && this.events.onKeyUp(e) === false) return;
 
 	// history stack
 	if (!ctrl && !alt && !this._historyIgnoreKeyCode.test(keyCode)) {
@@ -1556,14 +1556,14 @@ function OnKeyUp_wysiwyg(e) {
 function OnPaste_wysiwyg(e) {
 	const clipboardData = env.isIE ? _w.clipboardData : e.clipboardData;
 	if (!clipboardData) return true;
-	return this._dataTransferAction("paste", e, clipboardData);
+	return this._dataTransferAction('paste', e, clipboardData);
 }
 
 function OnCopy_wysiwyg(e) {
 	const clipboardData = env.isIE ? _w.clipboardData : e.clipboardData;
 
 	// user event
-	if (typeof this.events.onCopy === "function" && !this.events.onCopy(e, clipboardData)) {
+	if (typeof this.events.onCopy === 'function' && !this.events.onCopy(e, clipboardData)) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -1572,10 +1572,10 @@ function OnCopy_wysiwyg(e) {
 	const info = this.core.currentFileComponentInfo;
 	if (info && !env.isIE) {
 		this._setClipboardComponent(e, info, clipboardData);
-		domUtils.addClass(info.component, "se-component-copy");
+		domUtils.addClass(info.component, 'se-component-copy');
 		// copy effect
 		_w.setTimeout(function () {
-			domUtils.removeClass(info.component, "se-component-copy");
+			domUtils.removeClass(info.component, 'se-component-copy');
 		}, 150);
 	}
 }
@@ -1592,14 +1592,14 @@ function OnDrop_wysiwyg(e) {
 
 	this.selection.removeNode();
 	this._setDropLocationSelection(e);
-	return this._dataTransferAction("drop", e, dataTransfer);
+	return this._dataTransferAction('drop', e, dataTransfer);
 }
 
 function OnCut_wysiwyg(e) {
 	const clipboardData = env.isIE ? _w.clipboardData : e.clipboardData;
 
 	// user event
-	if (typeof this.events.onCut === "function" && !this.events.onCut(e, clipboardData)) {
+	if (typeof this.events.onCut === 'function' && !this.events.onCut(e, clipboardData)) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -1623,7 +1623,7 @@ function OnScroll_wysiwyg(e) {
 	if (this.core._isBalloon) this._hideToolbar();
 
 	// user event
-	if (typeof this.events.onScroll === "function") this.events.onScroll(e);
+	if (typeof this.events.onScroll === 'function') this.events.onScroll(e);
 }
 
 function OnFocus_wysiwyg(e) {
@@ -1634,7 +1634,7 @@ function OnFocus_wysiwyg(e) {
 	if (this.core._isInline) this.toolbar._showInline();
 
 	// user event
-	if (typeof this.events.onFocus === "function") this.events.onFocus(e);
+	if (typeof this.events.onFocus === 'function') this.events.onFocus(e);
 }
 
 function OnBlur_wysiwyg(e) {
@@ -1647,10 +1647,10 @@ function OnBlur_wysiwyg(e) {
 
 	this.status.currentNodes = [];
 	this.status.currentNodesMap = [];
-	if (this.options.showPathLabel) this.context.element.navigation.textContent = "";
+	if (this.options.showPathLabel) this.context.element.navigation.textContent = '';
 
 	// user event
-	if (typeof this.events.onBlur === "function") this.events.onBlur(e);
+	if (typeof this.events.onBlur === 'function') this.events.onBlur(e);
 }
 
 function OnMouseMove_wysiwyg(e) {
@@ -1675,27 +1675,27 @@ function OnMouseMove_wysiwyg(e) {
 		const c = componentTop + (this.options.iframe ? scrollTop : offsets.top);
 
 		const isList = domUtils.isListCell(component.parentNode);
-		let dir = "",
-			top = "";
+		let dir = '',
+			top = '';
 		if ((isList ? !component.previousSibling : !this.format.isLine(component.previousElementSibling)) && y < c + 20) {
 			top = componentTop;
-			dir = "t";
+			dir = 't';
 		} else if ((isList ? !component.nextSibling : !this.format.isLine(component.nextElementSibling)) && y > c + component.offsetHeight - 20) {
 			top = componentTop + component.offsetHeight;
-			dir = "b";
+			dir = 'b';
 		} else {
-			lineBreakerStyle.display = "none";
+			lineBreakerStyle.display = 'none';
 			return;
 		}
 
 		this.status._lineBreakComp = component;
 		this.status._lineBreakDir = dir;
-		lineBreakerStyle.top = top - wScroll + "px";
-		this._lineBreakerButton.style.left = this.offset.get(component).left + component.offsetWidth / 2 - 15 + "px";
-		lineBreakerStyle.display = "block";
+		lineBreakerStyle.top = top - wScroll + 'px';
+		this._lineBreakerButton.style.left = this.offset.get(component).left + component.offsetWidth / 2 - 15 + 'px';
+		lineBreakerStyle.display = 'block';
 	} // off line breaker
-	else if (lineBreakerStyle.display !== "none") {
-		lineBreakerStyle.display = "none";
+	else if (lineBreakerStyle.display !== 'none') {
+		lineBreakerStyle.display = 'none';
 	}
 }
 
@@ -1706,16 +1706,16 @@ function OnMouseDown_resizingBar(e) {
 	this.menu.controllerOff();
 
 	this.status._resizeClientY = e.clientY;
-	this.context.element.resizeBackground.style.display = "block";
+	this.context.element.resizeBackground.style.display = 'block';
 
 	function closureFunc() {
-		this.context.element.resizeBackground.style.display = "none";
-		_d.removeEventListener("mousemove", this._resize_editor.bind(this));
-		_d.removeEventListener("mouseup", closureFunc);
+		this.context.element.resizeBackground.style.display = 'none';
+		_d.removeEventListener('mousemove', this._resize_editor.bind(this));
+		_d.removeEventListener('mouseup', closureFunc);
 	}
 
-	_d.addEventListener("mousemove", this._resize_editor.bind(this));
-	_d.addEventListener("mouseup", closureFunc);
+	_d.addEventListener('mousemove', this._resize_editor.bind(this));
+	_d.addEventListener('mouseup', closureFunc);
 }
 
 function DisplayLineBreak(dir, e) {
@@ -1725,13 +1725,13 @@ function DisplayLineBreak(dir, e) {
 	const component = this.status._lineBreakComp;
 	const isList = domUtils.isListCell(component.parentNode);
 
-	const format = domUtils.createElement(isList ? "BR" : domUtils.isTableCell(component.parentNode) ? "DIV" : this.options.defaultTag);
-	if (!isList) format.innerHTML = "<br>";
+	const format = domUtils.createElement(isList ? 'BR' : domUtils.isTableCell(component.parentNode) ? 'DIV' : this.options.defaultTag);
+	if (!isList) format.innerHTML = '<br>';
 
-	if (this.options.charCounterType === "byte-html" && !this.char.check(format.outerHTML)) return;
+	if (this.options.charCounterType === 'byte-html' && !this.char.check(format.outerHTML)) return;
 
-	component.parentNode.insertBefore(format, dir === "t" ? component : component.nextSibling);
-	this.core._lineBreaker.style.display = "none";
+	component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
+	this.core._lineBreaker.style.display = 'none';
 	this.status._lineBreakComp = null;
 
 	const focusEl = isList ? format : format.firstChild;
@@ -1747,8 +1747,8 @@ function OnResize_window() {
 
 	if (this.context.element.toolbar.offsetWidth === 0) return;
 
-	if (this.context.fileBrowser && this.context.fileBrowser.area.style.display === "block") {
-		this.context.fileBrowser.body.style.maxHeight = _w.innerHeight - this.context.fileBrowser.header.offsetHeight - 50 + "px";
+	if (this.context.fileBrowser && this.context.fileBrowser.area.style.display === 'block') {
+		this.context.fileBrowser.body.style.maxHeight = _w.innerHeight - this.context.fileBrowser.header.offsetHeight - 50 + 'px';
 	}
 
 	if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {
@@ -1757,7 +1757,7 @@ function OnResize_window() {
 
 	if (this.status.isFullScreen) {
 		this._transformStatus.fullScreenInnerHeight += _w.innerHeight - this.context.element.toolbar.offsetHeight - this._transformStatus.fullScreenInnerHeight;
-		this.context.element.editorArea.style.height = this._transformStatus.fullScreenInnerHeight + "px";
+		this.context.element.editorArea.style.height = this._transformStatus.fullScreenInnerHeight + 'px';
 		return;
 	}
 
@@ -1769,7 +1769,7 @@ function OnResize_window() {
 	this.core._iframeAutoHeight();
 
 	if (this.toolbar._sticky) {
-		this.context.element.toolbar.style.width = this.context.element.topArea.offsetWidth - 2 + "px";
+		this.context.element.toolbar.style.width = this.context.element.topArea.offsetWidth - 2 + 'px';
 		this.toolbar._resetSticky();
 	}
 }

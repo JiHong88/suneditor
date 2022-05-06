@@ -1,4 +1,4 @@
-import { _w } from "./global";
+import { _w } from './global';
 
 /**
  * @description Checks for numeric (with decimal point).
@@ -6,7 +6,7 @@ import { _w } from "./global";
  * @returns {boolean}
  */
 export function is(text) {
-    return !!text && /^-?\d+(\.\d+)?$/.test(text + "");
+    return !!text && /^-?\d+(\.\d+)?$/.test(text + '');
 }
 
 /**
@@ -18,7 +18,7 @@ export function is(text) {
 export function get(value, maxDec) {
     if (!value) return 0;
 
-    let number = (value + "").match(/-?\d+(\.\d+)?/);
+    let number = (value + '').match(/-?\d+(\.\d+)?/);
     if (!number || !number[0]) return 0;
 
     number = number[0];
@@ -30,12 +30,12 @@ export function get(value, maxDec) {
 }
 
 /**
- * @description It compares the start and end indexes of "a" and "b" and returns the number of overlapping indexes in the range.
- * ex) 1, 5, 4, 6 => "2" (4,5)
- * @param {number} aStart Start index of "a"
- * @param {number} aEnd End index of "a"
- * @param {number} bStart Start index of "b"
- * @param {number} bEnd Start index of "b"
+ * @description It compares the start and end indexes of 'a' and 'b' and returns the number of overlapping indexes in the range.
+ * ex) 1, 5, 4, 6 => '2' (4,5)
+ * @param {number} aStart Start index of 'a'
+ * @param {number} aEnd End index of 'a'
+ * @param {number} bStart Start index of 'b'
+ * @param {number} bEnd Start index of 'b'
  * @returns {number}
  */
 export function getOverlapRangeAtIndex(aStart, aEnd, bStart, bEnd) {
