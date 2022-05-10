@@ -1,19 +1,29 @@
-import {
-	domUtils
-} from '../../helper';
+/**
+ * @fileoverview Menu class
+ * @author Yi JiHong.
+ */
+
+import { domUtils } from '../../helper';
 
 const Notice = function (editor) {
-	this.modal = domUtils.createElement('DIV', {
-		class: 'se-notice'
-	}, null);
+	this.modal = domUtils.createElement(
+		'DIV',
+		{
+			class: 'se-notice'
+		},
+		null
+	);
 
 	this.message = domUtils.createElement('SPAN');
-	let notice_button = domUtils.createElement('BUTTON', {
+	let notice_button = domUtils.createElement(
+		'BUTTON',
+		{
 			class: 'close',
 			'aria-label': 'Close',
 			title: editor.lang.dialogBox.close
 		},
-		editor.icons.cancel);
+		editor.icons.cancel
+	);
 
 	this.modal.appendChild(this.message);
 	this.modal.appendChild(notice_button);

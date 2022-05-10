@@ -67,11 +67,6 @@ export interface Core {
 	plugins: Record<string, Plugin>;
 
 	/**
-	 * @description Whether the plugin is initialized
-	 */
-	initPlugins: Record<string, boolean>;
-
-	/**
 	 * @description loaded language
 	 */
 	lang: Lang;
@@ -361,14 +356,14 @@ export interface Core {
 	setContent(html: string): void;
 
 	/**
-	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "fullPage" option.
+	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
 	 * @param ctx { head: HTML string, body: HTML string}
 	 */
 	setFullPageContent(ctx: { head?: string; body?: string }): void;
 
 	/**
 	 * @description Gets the current content
-	 * @param onlyContent Return only the content of the body without headers when the "fullPage" option is true
+	 * @param onlyContent Return only the content of the body without headers when the "iframe_fullPage" option is true
 	 * @returns
 	 */
 	getContent(onlyContent: boolean): string;
@@ -453,12 +448,12 @@ export default class SunEditor {
 	setOptions(options: SunEditorOptions): void;
 
 	/**
-	 * @description Set "options.defaultStyle" style.
+	 * @description Set "options.editorCSSText" style.
 	 * Define the style of the edit area
-	 * It can also be defined with the "setOptions" method, but the "setDefaultStyle" method does not render the editor again.
+	 * It can also be defined with the "setOptions" method, but the "setEditorCSSText" method does not render the editor again.
 	 * @param style Style string
 	 */
-	setDefaultStyle(style: string): void;
+	setEditorCSSText(style: string): void;
 
 	/**
 	 * @description Copying the content of the editor to the original textarea and execute onSave callback.
@@ -467,7 +462,7 @@ export default class SunEditor {
 
 	/**
 	 * @description Gets the content of the suneditor
-	 * @param onlyContent - Return only the content of the body without headers when the "fullPage" option is true
+	 * @param onlyContent - Return only the content of the body without headers when the "iframe_fullPage" option is true
 	 * @returns
 	 */
 	getContent(onlyContent: boolean): string;
@@ -480,12 +475,12 @@ export default class SunEditor {
 
 	/**
 	 * @description Get the editor's number of characters or binary data size.
-	 * You can use the "charCounterType" option format.
-	 * @param charCounterType options - charCounterType ('char', 'byte', 'byte-html')
-	 * If argument is no value, the currently set "charCounterType" option is used.
+	 * You can use the "charCounter_type" option format.
+	 * @param charCounter_type options - charCounter_type ('char', 'byte', 'byte-html')
+	 * If argument is no value, the currently set "charCounter_type" option is used.
 	 * @returns
 	 */
-	getCharCount(charCounterType?: string): number;
+	getCharCount(charCounter_type?: string): number;
 
 	/**
 	 * @description Gets uploaded files(plugin using fileManager) information list.

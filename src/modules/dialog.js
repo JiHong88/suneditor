@@ -2,7 +2,7 @@
  * wysiwyg web editor
  *
  * suneditor.js
- * Copyright 2017 JiHong Lee.
+ * Copyright 2017 Yi JiHong.
  * MIT license.
  */
 'use strict';
@@ -109,7 +109,7 @@
 
             this.context.dialog.updateModal = update;
 
-            if (this.options.popupDisplay === 'full') {
+            if (this.options.popupType === 'full') {
                 this.context.dialog.modalArea.style.position = 'fixed';
             } else {
                 this.context.dialog.modalArea.style.position = 'absolute';

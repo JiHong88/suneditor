@@ -1,20 +1,16 @@
 /**
  * @fileoverview Char class
- * @author JiHong Lee.
+ * @author Yi JiHong.
  */
 
 import env from '../../helper/env';
-import {
-	_w
-} from '../../helper/global';
-import {
-	addClass,
-	removeClass,
-	hasClass
-} from '../../helper/domUtils';
+import { _w } from '../../helper/global';
+import { addClass, removeClass, hasClass } from '../../helper/domUtils';
+import CoreInterface from '../../class/_core';
 
 const Char = function (editor) {
-	this.maxCharCount = editor.options.maxCharCount;
+	CoreInterface.call(this, editor);
+	this.maxCharCount = editor.options.charCounter_max;
 	this._encoder = _w.encodeURIComponent;
 	this._unescape = _w.unescape;
 	this._textEncoder = _w.TextEncoder;
@@ -22,13 +18,13 @@ const Char = function (editor) {
 
 Char.prototype = {
 	/**
-	 * @description Returns false if char count is greater than "options.maxCharCount" when "html" is added to the current editor.
+	 * @description Returns false if char count is greater than "options.charCounter_max" when "html" is added to the current editor.
 	 * @param {Node|String} html Element node or String.
 	 * @returns {boolean}
 	 */
 	check: function (html) {
 		if (this.maxCharCount) {
-			const length = this.getLength(typeof html === 'string' ? html : this.options.charCounterType === 'byte-html' && html.nodeType === 1 ? html.outerHTML : html.textContent);
+			const length = this.getLength(typeof html === 'string' ? html : this.options.charCounter_type === 'byte-html' && html.nodeType === 1 ? html.outerHTML : html.textContent);
 			if (length > 0 && length + this.getLength() > this.maxCharCount) {
 				CounterBlink(this.context.element.charWrapper);
 				return false;
@@ -38,16 +34,16 @@ Char.prototype = {
 	},
 
 	/**
-	 * @description Get the [content]'s number of characters or binary data size. (options.charCounterType)
+	 * @description Get the [content]'s number of characters or binary data size. (options.charCounter_type)
 	 * If [content] is undefined, get the current editor's number of characters or binary data size.
 	 * @param {string|undefined} content Content to count. (defalut: this.context.element.wysiwyg)
 	 * @returns {number}
 	 */
 	getLength: function (content) {
 		if (typeof content !== 'string') {
-			content = this.options.charCounterType === 'byte-html' ? this.context.element.wysiwyg.innerHTML : this.context.element.wysiwyg.textContent;
+			content = this.options.charCounter_type === 'byte-html' ? this.context.element.wysiwyg.innerHTML : this.context.element.wysiwyg.textContent;
 		}
-		return /byte/.test(this.options.charCounterType) ? this.getByteLength(content) : content.length;
+		return /byte/.test(this.options.charCounter_type) ? this.getByteLength(content) : content.length;
 	},
 
 	/**
@@ -96,8 +92,8 @@ Char.prototype = {
 	},
 
 	/**
-	 * @description Returns false if char count is greater than "options.maxCharCount" when "inputText" is added to the current editor.
-	 * If the current number of characters is greater than "maxCharCount", the excess characters are removed.
+	 * @description Returns false if char count is greater than "options.charCounter_max" when "inputText" is added to the current editor.
+	 * If the current number of characters is greater than "charCounter_max", the excess characters are removed.
 	 * And call the char.display()
 	 * @param {string} inputText Text added.
 	 * @returns {boolean}

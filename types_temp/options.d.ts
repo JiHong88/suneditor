@@ -14,7 +14,7 @@ export interface SunEditorOptions {
     /**
      * Specifies default tag name of the editor. (default: "p")
      */
-    defaultTag?: string;
+    defaultLineTag?: string;
     /**
      * You can change the tag of the default text button.   default: { bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL', sub: 'SUB', sup: 'SUP' }
      */
@@ -57,9 +57,9 @@ export interface SunEditorOptions {
      */
     mode?: 'classic' | 'inline' | 'balloon' | 'balloon-always';
     /**
-     * If true, the editor is set to RTL(Right To Left) mode.
+     * If true, the editor is set to direction mode ("ltr", "rtl").
      */
-    rtl?: boolean;
+    textDirection?: 'ltr' | 'rtl';
     /**
      * Deletes other attributes except for the property set at the time of line break.
      * If there is no value, no all attribute is deleted.
@@ -75,17 +75,17 @@ export interface SunEditorOptions {
      * The width of the toolbar.
      Applies only when the editor mode is 'inline' or 'balloon' mode.
      */
-    toolbarWidth?: string;
+    toolbar_width?: string;
     /**
      * A custom HTML selector placing the toolbar inside.
      The class name of the element must be 'sun-editor'.
      Element or querySelector argument.
      */
-    toolbarContainer?: HTMLElement | string;
+    toolbar_container?: HTMLElement | string;
     /**
      * Top offset value of "sticky toolbar".
      */
-    stickyToolbar?: number | string;
+    toolbar_sticky?: number | string;
     /**
      * Top offset value of "full Screen".
      */
@@ -97,15 +97,15 @@ export interface SunEditorOptions {
     /**
      * Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration
      */
-    fullPage?: boolean;
+    iframe_fullPage?: boolean;
     /**
      * Attributes of the iframe.
      */
-    iframeAttributes?: Record<string, string>;
+    iframe_attributes?: Record<string, string>;
     /**
      * Name of the CSS file(s) to apply inside the iframe.
      */
-    iframeCSSFileName?: string | string[];
+    iframe_cssFileName?: string | string[];
     /**
      * A template of the "preview".
      * The {{content}} part in the HTML string is replaced with the content of the editor.
@@ -145,7 +145,7 @@ export interface SunEditorOptions {
     /**
      * Size of background area when activating dialog window ('full'||'local')
      */
-    popupDisplay?: 'full' | 'local';
+    popupType?: 'full' | 'local';
     /**
      * Bottom resizing bar
      * ===================
@@ -153,21 +153,21 @@ export interface SunEditorOptions {
     /**
      * Show the bottom resizing bar
      */
-    resizingBar?: boolean;
+    statusbar?: boolean;
     /**
-     * Displays the current node structure to resizingBar
+     * Displays the current node structure to statusbar
      */
-    showPathLabel?: boolean;
+    statusbar_showPathLabel?: boolean;
     /**
      * Enable/disable resize function of bottom resizing bar.
      */
-    resizeEnable?: boolean;
+    statusbar_resizeEnable?: boolean;
     /**
      * A custom HTML selector placing the resizing bar inside.
      The class name of the element must be 'sun-editor'.
      Element or querySelector argument.
      */
-    resizingBarContainer?: HTMLElement | string;
+    statusbar_container?: HTMLElement | string;
     /**
      * Character count
      * ===============
@@ -179,15 +179,15 @@ export interface SunEditorOptions {
     /**
      * Defines the calculation method of the "charCounter" option
      */
-    charCounterType?: 'char' | 'byte' | 'byte-html';
+    charCounter_type?: 'char' | 'byte' | 'byte-html';
     /**
      * Text to be displayed in the "charCounter" area of the bottom bar.
      */
-    charCounterLabel?: string;
+    charCounter_label?: string;
     /**
      * The maximum number of characters allowed to be inserted into the editor
      */
-    maxCharCount?: number;
+    charCounter_max?: number;
     /**
      * Size
      * ====
@@ -227,10 +227,10 @@ export interface SunEditorOptions {
     /**
      * You can define the style of the editing area[.sun-editor-editable].
      * It affects the entire editing area.
-     * ('z-index', 'position' and 'width' properties apply to the top div.)
+     * ('z-index', 'position', 'display', 'width' properties apply to the top div.)
      * @example 'font-family: cursive; font-size: 10px;'
      */
-    defaultStyle?: string;
+    editorCSSText?: string;
     /**
      * Defining menu items
      * ===================

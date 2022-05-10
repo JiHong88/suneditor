@@ -1,9 +1,9 @@
 /**
  * @fileoverview Shortcuts class
- * @author JiHong Lee.
+ * @author Yi JiHong.
  */
 
-import CoreInterface from '../../interface/_core';
+import CoreInterface from '../../class/_core';
 
 const Shortcuts = function (editor) {
 	CoreInterface.call(this, editor);
@@ -18,7 +18,7 @@ const Shortcuts = function (editor) {
 		219: '[',
 		221: ']'
 	};
-}
+};
 
 Shortcuts.prototype = {
 	/**
@@ -74,12 +74,12 @@ Shortcuts.prototype = {
 				break;
 			case 219: // [
 				if (options.shortcutsDisable.indexOf('indent') === -1) {
-					command = options.rtl ? 'indent' : 'outdent';
+					command = options._rtl ? 'indent' : 'outdent';
 				}
 				break;
 			case 221: // ]
 				if (options.shortcutsDisable.indexOf('indent') === -1) {
-					command = options.rtl ? 'outdent' : 'indent';
+					command = options._rtl ? 'outdent' : 'indent';
 				}
 				break;
 		}

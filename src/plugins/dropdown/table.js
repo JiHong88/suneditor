@@ -2,7 +2,7 @@
  * wysiwyg web editor
  *
  * suneditor.js
- * Copyright 2017 JiHong Lee.
+ * Copyright 2017 Yi JiHong.
  * MIT license.
  */
 'use strict';
@@ -20,7 +20,7 @@ export default {
             _tableXY: [],
             _maxWidth: true,
             _fixedColumn: false,
-            _rtl: core.options.rtl,
+            _rtl: core.options._rtl,
             cellControllerTop: core.options.tableCellControllerPosition === 'top',
             resizeText: null,
             headerButton: null,
@@ -50,7 +50,7 @@ export default {
         contextTable.tableHighlight = listDiv.querySelector('.se-table-size-highlighted');
         contextTable.tableUnHighlight = listDiv.querySelector('.se-table-size-unhighlighted');
         contextTable.tableDisplay = listDiv.querySelector('.se-table-size-display');
-        if (core.options.rtl) contextTable.tableHighlight.style.left = (10 * 18 - 13) + 'px';
+        if (core.options._rtl) contextTable.tableHighlight.style.left = (10 * 18 - 13) + 'px';
 
         /** set table controller */
         let tableController = this.setController_table(core);

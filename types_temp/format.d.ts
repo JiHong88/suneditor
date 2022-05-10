@@ -1,6 +1,6 @@
-import EditorInterface from "../../interface/editor";
+import EditorClass from "../../interface/editor";
 
-class Format extends EditorInterface {
+class Format extends EditorClass {
 	/**
 	 * @description Replace the line tag of the current selection.
 	 * @param element Line element (P, DIV..)
@@ -19,15 +19,15 @@ class Format extends EditorInterface {
 	 * @description Replace the br-line tag of the current selection.
 	 * @param element Line element (P, DIV..)
 	 */
-	setBrLine(element: Element);
+	setBrBlock(element: Element);
 
 	/**
-	 * @description If a parent node that contains an argument node finds a free format node (format.isBrLine), it returns that node.
+	 * @description If a parent node that contains an argument node finds a free format node (format.isBrBlock), it returns that node.
 	 * @param element Reference node.
 	 * @param validation Additional validation function.
 	 * @returns
 	 */
-	getBrLine(node: Node, validation?: Function | null): Element | null;
+	getBrBlock(node: Node, validation?: Function | null): Element | null;
 
 	/**
 	 * @description Append format element to sibling node of argument element.
@@ -162,7 +162,7 @@ class Format extends EditorInterface {
 	 * @param element The node to check
 	 * @returns
 	 */
-	isBrLine(element: Node): boolean;
+	isBrBlock(element: Node): boolean;
 
 	/**
 	 * @description It is judged whether it is the closure free format element. (class="__se__format__br_line__closure_xxx")
@@ -173,7 +173,7 @@ class Format extends EditorInterface {
 	 * @param element The node to check
 	 * @returns
 	 */
-	isClosureBrLine(element: Node): boolean;
+	isClosureBrBlock(element: Node): boolean;
 
 	/**
 	 * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__block_xxx")

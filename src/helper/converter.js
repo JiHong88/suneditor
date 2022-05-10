@@ -65,16 +65,15 @@ export function createElementBlacklist(list) {
 /**
  * @description Converts options-related styles and returns them for each frame.
  * @param {Object.<string, any>} options Options
- * @param {string} defaultStyle Style string
+ * @param {string} editorCSSText Style string
  * @returns {{top: string, frame: string, editor: string}}
  * @private
  */
-export function _setDefaultOptionStyle(options, defaultStyle) {
+export function _setDefaultOptionStyle(options, editorCSSText) {
 	let optionStyle = '';
 	if (options.height) optionStyle += 'height:' + options.height + ';';
 	if (options.minHeight) optionStyle += 'min-height:' + options.minHeight + ';';
 	if (options.maxHeight) optionStyle += 'max-height:' + options.maxHeight + ';';
-	if (options.position) optionStyle += 'position:' + options.position + ';';
 	if (options.width) optionStyle += 'width:' + options.width + ';';
 	if (options.minWidth) optionStyle += 'min-width:' + options.minWidth + ';';
 	if (options.maxWidth) optionStyle += 'max-width:' + options.maxWidth + ';';
@@ -82,12 +81,12 @@ export function _setDefaultOptionStyle(options, defaultStyle) {
 	let top = '',
 		frame = '',
 		editor = '';
-	defaultStyle = optionStyle + defaultStyle;
-	const styleArr = defaultStyle.split(';');
+	editorCSSText = optionStyle + editorCSSText;
+	const styleArr = editorCSSText.split(';');
 	for (let i = 0, len = styleArr.length, s; i < len; i++) {
 		s = styleArr[i].trim();
 		if (!s) continue;
-		if (/^(min-|max-)?width\s*:/.test(s) || /^(z-index|position)\s*:/.test(s)) {
+		if (/^(min-|max-)?width\s*:/.test(s) || /^(z-index|position|display)\s*:/.test(s)) {
 			top += s + ';';
 			continue;
 		}
@@ -130,7 +129,7 @@ export function _setIframeDocument(frame, options) {
  * @returns {string} "<style>...</style>"
  */
 export function _setIframeCssTags(options) {
-	const linkNames = options.iframeCSSFileName;
+	const linkNames = options.iframe_cssFileName;
 	const wRegExp = _w.RegExp;
 	let tagString = '';
 
@@ -148,7 +147,7 @@ export function _setIframeCssTags(options) {
 		}
 
 		if (!path || path.length === 0)
-			throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframeCSSFileName" before creating editor instances.';
+			throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframe_cssFileName" before creating editor instances.';
 
 		for (let i = 0, len = path.length; i < len; i++) {
 			tagString += '<link href="' + path[i] + '" rel="stylesheet">';

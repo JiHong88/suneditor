@@ -1,6 +1,6 @@
-import EditorInterface from "../../interface/editor";
+import EditorClass from "../../interface/editor";
 
-class Shortcuts extends EditorInterface {
+class Shortcuts extends EditorClass {
   /**
 	 * @description If there is a shortcut function, run it.
 	 * @param keyCode event.keyCode

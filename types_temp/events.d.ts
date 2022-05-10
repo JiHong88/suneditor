@@ -1,6 +1,6 @@
-import EditorInterface from "../interface/editor";
+import EditorClass from "../interface/editor";
 
-class Events extends EditorInterface {
+class Events extends EditorClass {
 	onload: (reload: boolean) => void;
 	onScroll: EventFn;
 	onFocus: EventFn;

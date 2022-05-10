@@ -2,27 +2,27 @@
  * wysiwyg web editor
  *
  * suneditor.js
- * Copyright 2017 JiHong Lee.
+ * Copyright 2017 Yi JiHong.
  * MIT license.
  */
 'use strict';
 
-import EditorInterface from '../../interface/editor';
+import EditorClass from '../../class/editor';
 import {
     domUtils
 } from '../../helper';
 
 const align = function (editor, targetElement) {
-    EditorInterface.call(this, editor);
+    EditorClass.call(this, editor);
     this.targetElement = targetElement;
 
     // create HTML
-    let listDiv = createHTML(editor, !editor.options.rtl);
+    let listDiv = createHTML(editor, !editor.options._rtl);
     let listUl = this._itemMenu = listDiv.querySelector('ul');
 
     // members
     this.currentAlign = '';
-    this.defaultDir = editor.options.rtl ? 'right' : 'left';
+    this.defaultDir = editor.options._rtl ? 'right' : 'left';
     this._itemMenu = null;
     this.icons = {
         justify: editor.icons.align_justify,
@@ -84,7 +84,7 @@ align.prototype = {
     },
 
     exchangeDir: function () {
-        const dir = this.options.rtl ? 'right' : 'left';
+        const dir = this.options._rtl ? 'right' : 'left';
         if (this.defaultDir === dir) return;
 
         this.defaultDir = dir;

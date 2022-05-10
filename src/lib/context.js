@@ -16,7 +16,7 @@ const Context = function (element, cons, options) {
             _toolbarShadow: cons._toolbarShadow,
             _buttonTray: cons._toolBar.querySelector('.se-btn-tray'),
             _menuTray: cons._menuTray,
-            resizingBar: cons._resizingBar,
+            statusbar: cons._statusbar,
             navigation: cons._navigation,
             charWrapper: cons._charWrapper,
             charCounter: cons._charCounter,

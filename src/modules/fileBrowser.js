@@ -2,7 +2,7 @@
  * wysiwyg web editor
  *
  * suneditor.js
- * Copyright 2017 JiHong Lee.
+ * Copyright 2017 Yi JiHong.
  * MIT license.
  */
 'use strict';
@@ -153,7 +153,7 @@
                 fileBrowserContext.list.className = 'se-file-browser-list ' + listClassName;
             }
 
-            if (this.options.popupDisplay === 'full') {
+            if (this.options.popupType === 'full') {
                 fileBrowserContext.area.style.position = 'fixed';
             } else {
                 fileBrowserContext.area.style.position = 'absolute';

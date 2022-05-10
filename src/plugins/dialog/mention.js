@@ -2,7 +2,7 @@
  * wysiwyg web editor
  *
  * suneditor.js
- * Copyright 2017 JiHong Lee.
+ * Copyright 2017 Yi JiHong.
  * MIT license.
  */
 'use strict';
@@ -201,10 +201,10 @@ export default {
       el.target = '_blank';
       el.innerHTML = mention.getValue(new_mention);
       el.setAttribute('data-mention', mention.getId(new_mention));
-      this.insertNode(el, null, false);
+      this.html.insertNode(el, null, false);
       const spacer = this.util.createElement('SPAN');
       spacer.innerHTML = ' ';
-      this.insertNode(spacer, el, false);
+      this.html.insertNode(spacer, el, false);
     }
     this.plugins.dialog.close.call(this);
   },

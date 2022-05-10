@@ -1,19 +1,15 @@
 /**
  * @fileoverview Toolbar class
- * @author JiHong Lee.
+ * @author Yi JiHong.
  */
 
 import Context from '../context';
-import {
-	domUtils,
-	unicode
-} from '../../helper';
-import {
-	_w,
-	_d
-} from '../../helper/global';
+import { domUtils, unicode } from '../../helper';
+import { _w, _d } from '../../helper/global';
+import CoreInterface from '../../class/_core';
 
 const Toolbar = function (editor) {
+	CoreInterface.call(this, editor);
 	this._responsiveCurrentSize = 'default';
 	this._responsiveButtons = editor._responsiveButtons;
 	this._responsiveButtonSize = null;
@@ -23,7 +19,7 @@ const Toolbar = function (editor) {
 		width: '',
 		isShow: false
 	};
-}
+};
 
 Toolbar.prototype = {
 	/**
@@ -131,7 +127,7 @@ Toolbar.prototype = {
 		const responsiveSize = this._responsiveButtonSize;
 		if (responsiveSize) {
 			let w = 0;
-			if ((this.core._isBalloon || this.core._isInline) && this.options.toolbarWidth === 'auto') {
+			if ((this.core._isBalloon || this.core._isInline) && this.options.toolbar_width === 'auto') {
 				w = this.context.element.topArea.offsetWidth;
 			} else {
 				w = this.context.element.toolbar.offsetWidth;
@@ -153,19 +149,19 @@ Toolbar.prototype = {
 	},
 
 	_resetSticky: function () {
-		if (this.status.isFullScreen || this.context.element.toolbar.offsetWidth === 0 || this.options.stickyToolbar < 0) return;
+		if (this.status.isFullScreen || this.context.element.toolbar.offsetWidth === 0 || this.options.toolbar_sticky < 0) return;
 
 		const element = this.context.element;
 		const editorHeight = element.editorArea.offsetHeight;
-		const y = (_w.scrollY || _d.documentElement.scrollTop) + this.options.stickyToolbar;
-		const editorTop = this.offset.getGlobal(this.options.toolbarContainer).top - (this.core._isInline ? element.toolbar.offsetHeight : 0);
+		const y = (_w.scrollY || _d.documentElement.scrollTop) + this.options.toolbar_sticky;
+		const editorTop = this.offset.getGlobal(this.options.toolbar_container).top - (this.core._isInline ? element.toolbar.offsetHeight : 0);
 		const inlineOffset = this.core._isInline && y - editorTop > 0 ? y - editorTop - this.context.element.toolbar.offsetHeight : 0;
 
 		if (y < editorTop) {
 			this._offSticky();
 		} else if (y + this.status._minHeight >= editorHeight + editorTop) {
 			if (!this._sticky) this._onSticky(inlineOffset);
-			element.toolbar.style.top = inlineOffset + editorHeight + editorTop + this.options.stickyToolbar - y - this.status._minHeight + 'px';
+			element.toolbar.style.top = inlineOffset + editorHeight + editorTop + this.options.toolbar_sticky - y - this.status._minHeight + 'px';
 		} else if (y >= editorTop) {
 			this._onSticky(inlineOffset);
 		}
@@ -174,12 +170,12 @@ Toolbar.prototype = {
 	_onSticky: function (inlineOffset) {
 		const element = this.context.element;
 
-		if (!this.core._isInline && !this.options.toolbarContainer) {
+		if (!this.core._isInline && !this.options.toolbar_container) {
 			element._stickyDummy.style.height = element.toolbar.offsetHeight + 'px';
 			element._stickyDummy.style.display = 'block';
 		}
 
-		element.toolbar.style.top = this.options.stickyToolbar + inlineOffset + 'px';
+		element.toolbar.style.top = this.options.toolbar_sticky + inlineOffset + 'px';
 		element.toolbar.style.width = this.core._isInline ? this._inlineToolbarAttr.width : element.toolbar.offsetWidth + 'px';
 		domUtils.addClass(element.toolbar, 'se-toolbar-sticky');
 		this._sticky = true;
@@ -260,7 +256,7 @@ Toolbar.prototype = {
 			const node = this.selection.getNode();
 			if (this.format.isLine(node)) {
 				const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
-				this.selection.insertNode(zeroWidth, null, false);
+				this.html.insertNode(zeroWidth, null, false);
 				this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 				this.selection._init();
 				rects = this.selection.getRange().getClientRects();
@@ -301,10 +297,10 @@ Toolbar.prototype = {
 			this._setBalloonOffset(isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
 		}
 
-		if (this.options.toolbarContainer) {
+		if (this.options.toolbar_container) {
 			const editorParent = topArea.parentElement;
 
-			let container = this.options.toolbarContainer;
+			let container = this.options.toolbar_container;
 			let left = container.offsetLeft;
 			let top = container.offsetTop;
 
@@ -369,13 +365,13 @@ Toolbar.prototype = {
 		if (!this.core._isInline) return;
 
 		const toolbar = this.context.element.toolbar;
-		if (this.options.toolbarContainer) toolbar.style.position = 'relative';
+		if (this.options.toolbar_container) toolbar.style.position = 'relative';
 		else toolbar.style.position = 'absolute';
 
 		toolbar.style.visibility = 'hidden';
 		toolbar.style.display = 'block';
-		this._inlineToolbarAttr.width = toolbar.style.width = this.options.toolbarWidth;
-		this._inlineToolbarAttr.top = toolbar.style.top = (this.options.toolbarContainer ? 0 : -1 - toolbar.offsetHeight) + 'px';
+		this._inlineToolbarAttr.width = toolbar.style.width = this.options.toolbar_width;
+		this._inlineToolbarAttr.top = toolbar.style.top = (this.options.toolbar_container ? 0 : -1 - toolbar.offsetHeight) + 'px';
 
 		if (typeof this.events.showInline === 'function') this.events.showInline(toolbar, context);
 

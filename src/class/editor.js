@@ -6,9 +6,9 @@ import ClassesInterface from './_classes';
  * @description Initializes and adds inner classes and default properties of the editor.
  * @param {any} editor Editor object
  */
-function EditorInterface(editor) {
+function EditorClass(editor) {
     CoreInterface.call(this, editor);
     ClassesInterface.call(this, editor);
 }
 
-export default EditorInterface;
+export default EditorClass;

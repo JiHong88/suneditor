@@ -17,7 +17,7 @@
     "javascript",
     "vanillajs"
   ],
-  "author": "JiHong.Lee",
+  "author": "Yi JiHong",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/JiHong88/SunEditor/issues"
@@ -33,6 +33,6 @@
     "bower_components"
   ],
   "authors": [
-    "JiHong.Lee"
+    "Yi JiHong"
   ]
 }

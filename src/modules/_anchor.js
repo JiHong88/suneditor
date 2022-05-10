@@ -2,7 +2,7 @@
  * wysiwyg web editor
  *
  * suneditor.js
- * Copyright 2017 JiHong Lee.
+ * Copyright 2017 Yi JiHong.
  * MIT license.
  */
 
@@ -154,7 +154,7 @@ export default {
             this.util.addClass(target, 'active');
             relList.style.visibility = 'hidden';
             relList.style.display = 'block';
-            if (!this.options.rtl) relList.style.left = (target.offsetLeft + target.offsetWidth + 1) + 'px';
+            if (!this.options._rtl) relList.style.left = (target.offsetLeft + target.offsetWidth + 1) + 'px';
             else relList.style.left = (target.offsetLeft - relList.offsetWidth - 1) + 'px';
             relList.style.top = (target.offsetTop + (target.offsetHeight / 2) - (relList.offsetHeight / 2)) + 'px';
             relList.style.visibility = '';

@@ -2,7 +2,7 @@
  * wysiwyg web editor
  *
  * suneditor.js
- * Copyright 20197 JiHong Lee.
+ * Copyright 20197 Yi JiHong.
  * MIT license.
  */
 'use strict';

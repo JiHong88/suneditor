@@ -2,7 +2,7 @@
  * wysiwyg web editor
  *
  * suneditor.js
- * Copyright 2017 JiHong Lee.
+ * Copyright 2017 Yi JiHong.
  * MIT license.
  */
 'use strict';
@@ -61,9 +61,9 @@ export default {
             p = paragraphStyles[i];
 
             if (typeof p === 'string') {
-                const defaultStyle = defaultList[p.toLowerCase()];
-                if (!defaultStyle) continue;
-                p = defaultStyle;
+                const editorCSSText = defaultList[p.toLowerCase()];
+                if (!editorCSSText) continue;
+                p = editorCSSText;
             }
 
             name = p.name;

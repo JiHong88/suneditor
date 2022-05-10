@@ -1,14 +1,14 @@
-import EditorInterface from "../src/interface/editor";
+import EditorClass from "../src/interface/editor";
 
-class Char extends EditorInterface {
+class Char extends EditorClass {
 	/**
-	 * @description Returns false if char count is greater than "options.maxCharCount" when "html" is added to the current editor.
+	 * @description Returns false if char count is greater than "options.charCounter_max" when "html" is added to the current editor.
 	 * @param element Element node or String.
 	 */
 	check(html: Node | string): boolean;
 
 	/**
-	 * @description Get the [content]'s number of characters or binary data size. (options.charCounterType)
+	 * @description Get the [content]'s number of characters or binary data size. (options.charCounter_type)
 	 * If [content] is undefined, get the current editor's number of characters or binary data size.
 	 * @param content Content to count. (defalut: this.context.element.wysiwyg)
 	 */
@@ -27,8 +27,8 @@ class Char extends EditorInterface {
 	display(): void;
 
 	/**
-	 * @description Returns false if char count is greater than "options.maxCharCount" when "inputText" is added to the current editor.
-	 * If the current number of characters is greater than "maxCharCount", the excess characters are removed.
+	 * @description Returns false if char count is greater than "options.charCounter_max" when "inputText" is added to the current editor.
+	 * If the current number of characters is greater than "charCounter_max", the excess characters are removed.
 	 * And call the char.display()
 	 * @param inputText Text added.
 	 * @returns

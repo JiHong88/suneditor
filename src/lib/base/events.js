@@ -1,6 +1,6 @@
 /**
- * @fileoverview Event class
- * @author JiHong Lee.
+ * @fileoverview Event object constructor
+ * @author Yi JiHong.
  */
 
 export default function () {
@@ -256,9 +256,9 @@ export default function () {
 		/**
 		 * @description Called after the "setToolbarButtons" invocation.
 		 * Can be used to tweak buttons properties (useful for custom buttons)
-		 * @param {Array} buttonList Button list 
+		 * @param {Array} buttonList Button list
 		 * @param {Object} core Core object
 		 */
-		onSetToolbarButtons: null,
+		onSetToolbarButtons: null
 	};
-};
+}

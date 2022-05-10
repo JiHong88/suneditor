@@ -1,9 +1,9 @@
 /**
  * @fileoverview Offset class
- * @author JiHong Lee.
+ * @author Yi JiHong.
  */
 
-import CoreInterface from '../../interface/_core';
+import CoreInterface from '../../class/_core';
 import {
 	getParentElement,
 	isWysiwygFrame,

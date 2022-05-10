@@ -6,7 +6,7 @@ declare interface EditorElement {
     topArea: Element;
     relative: Element;
     toolbar: Element;
-    resizingBar: Element;
+    statusbar: Element;
     navigation: Element;
     charWrapper: Element;
     charCounter: Element;

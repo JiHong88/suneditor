@@ -2,11 +2,11 @@
  * wysiwyg web editor
  *
  * suneditor.js
- * Copyright 2017 JiHong Lee.
+ * Copyright 2017 Yi JiHong.
  * MIT license.
  */
 import core from './lib/core';
-import _Constructor from './lib/constructor';
+import Constructor from './lib/constructor';
 import Context from './lib/context';
 
 export default {
@@ -59,7 +59,7 @@ export default {
             throw Error('[SUNEDITOR.create.fail] suneditor requires textarea\'s element or id value');
         }
 
-        const cons = _Constructor.init(element, options);
+        const cons = Constructor(element, options);
 
         if (cons.constructed._top.id && document.getElementById(cons.constructed._top.id)) {
             throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed._top.id + '")');

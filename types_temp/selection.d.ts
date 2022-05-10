@@ -1,6 +1,6 @@
-import EditorInterface from "../../interface/editor";
+import EditorClass from "../../interface/editor";
 
-class Selection extends EditorInterface {
+class Selection extends EditorClass {
 	/**
 	 * @description Get current editor's range object
 	 * @returns
@@ -78,7 +78,7 @@ class Selection extends EditorInterface {
 	 * @description Insert an (HTML element / HTML string / plain string) at selection range.
 	 * @param html HTML Element or HTML string or plain string
 	 * @param notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
-	 * @param checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+	 * @param checkCharCount If true, if "options.charCounter_max" is exceeded when "element" is added, null is returned without addition.
 	 * @param rangeSelection If true, range select the inserted node.
 	 */
 	insertHTML(html: Element | string, notCleaningData?: boolean, checkCharCount?: boolean, rangeSelection?: boolean): void;

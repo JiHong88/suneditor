@@ -387,7 +387,7 @@ plugins: [
 
 // Values
 lang            : language object.   default : en {Object}
-defaultTag      : Specifies default tag name of the editor.     default: 'p' {string}
+defaultLineTag      : Specifies default tag name of the editor.     default: 'p' {string}
 textTags        : You can change the tag of the default text button.   default: { bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL' }
                   ex) {
                       bold: 'b',
@@ -427,22 +427,22 @@ lineAttrReset   : Deletes other attributes except for the property set at the ti
                   If there is no value, no all attribute is deleted.    default: '' {string}
                   ex) 'class|style': Attributes other than "class" and "style" are deleted at line break.
                       '*': All attributes are deleted at line break.
-toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
+toolbar_width    : The width of the toolbar. Applies only when the editor mode is 
                   'inline' or 'balloon' mode.     default: 'auto' {Number|String}
-toolbarContainer: A custom HTML selector placing the toolbar inside.
+toolbar_container: A custom HTML selector placing the toolbar inside.
                   The class name of the element must be 'sun-editor'.
                   Element or querySelector argument.     default: null {Element|String}
                   ex) document.querySelector('#id') || '#id'
-stickyToolbar   : Top offset value of "sticky toolbar".
+toolbar_sticky   : Top offset value of "sticky toolbar".
                   Set to 0, '0px', '50px'...
                   If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
 fullScreenOffset: Top offset value of "full Screen".
                   Set to 0, '0px', '50px'...     default: 0 {Number|String}
 iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {Boolean}
-fullPage        : Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.  default: false {Boolean}
-iframeAttributes  : Attributes of the iframe.                       default: null {Object}
+iframe_fullPage        : Allows the usage of HTML, HEAD, BODY tags and DOCTYPE declaration.  default: false {Boolean}
+iframe_attributes  : Attributes of the iframe.                       default: null {Object}
                     ex) {'scrolling': 'no'}
-iframeCSSFileName : Name or Array of the CSS file to apply inside the iframe.
+iframe_cssFileName : Name or Array of the CSS file to apply inside the iframe.
                     You can also use regular expressions.
                     Applied by searching by filename in the link tag of document,
                     or put the URL value (".css" can be omitted).   default: 'suneditor' {Array|String}
@@ -487,30 +487,28 @@ mathFontSize    : Math plugin font size list.                       default: [{.
                   ]
 
 // Display-------------------------------------------------------------------------------------------------------
-position        : The position property of suneditor.               default: null {string}
-display         : The display property of suneditor.                default: 'block' {string}
-popupDisplay    : Size of background area when activating dialog window ('full'||'local') default: 'full' {string}
+popupType    : Size of background area when activating dialog window ('full'||'local') default: 'full' {string}
 
-// Bottom resizing bar-------------------------------------------------------------------------------------------
-resizingBar     : Show the bottom resizing bar.
+// Statusbar-------------------------------------------------------------------------------------------
+statusbar     : Show the bottom resizing bar.
                   If 'height' value is 'auto', it will not be resized. default: true {Boolean}
-showPathLabel   : Displays the current node structure to resizingBar.  default: true {Boolean}
-resizeEnable  : Enable/disable resize function of bottom resizing bar.   default: true {Boolean}
-resizingBarContainer: A custom HTML selector placing the resizing bar inside.
+statusbar_showPathLabel   : Displays the current node structure to statusbar.  default: true {Boolean}
+statusbar_resizeEnable  : Enable/disable resize function of bottom resizing bar.   default: true {Boolean}
+statusbar_container: A custom HTML selector placing the resizing bar inside.
                       The class name of the element must be 'sun-editor'.
                       Element or querySelector argument.     default: null {Element|String}
                       ex) document.querySelector('#id') || '#id'
 
 // Character count-----------------------------------------------------------------------------------------------
 charCounter     : Shows the number of characters in the editor.     
-                  If the maxCharCount option has a value, it becomes true. default: false {boolean}
-charCounterType : Defines the calculation method of the "charCounter" option.
+                  If the charCounter_max option has a value, it becomes true. default: false {boolean}
+charCounter_type : Defines the calculation method of the "charCounter" option.
                   'char': Characters length.
                   'byte': Binary data size of characters.
                   'byte-html': Binary data size of the full HTML string.   default: 'char' {string}
-charCounterLabel: Text to be displayed in the "charCounter" area of the bottom bar.
-                  Screen ex) 'charCounterLabel : 20/200'.           default: null {string}
-maxCharCount    : The maximum number of characters allowed to be inserted into the editor. default: null {number}
+charCounter_label: Text to be displayed in the "charCounter" area of the bottom bar.
+                  Screen ex) 'charCounter_label : 20/200'.           default: null {string}
+charCounter_max    : The maximum number of characters allowed to be inserted into the editor. default: null {number}
 
 // Width size----------------------------------------------------------------------------------------------------
 width           : The width size of the editor.                     default: clientWidth||'100%' {Number|String}
@@ -528,9 +526,9 @@ maxHeight       : The max-height size of the editor.
 
 // Editing area -------------------------------------------------------------------------------------------------
 className       : Add a "class" to the editing area[.sun-editor-editable].    default: '' {string}
-defaultStyle    : You can define the style of the editing area[.sun-editor-editable].
+editorCSSText    : You can define the style of the editing area[.sun-editor-editable].
                   It affects the entire editing area.               default: '' {string}
-                  ('z-index', 'position' and 'width' properties apply to the top div.)
+                  ('z-index', 'position', 'display', 'width' properties apply to the top div.)
                   ex) 'font-family: cursive; font-size: 10px;'
 
 // Defining menu items-------------------------------------------------------------------------------------------
@@ -548,7 +546,7 @@ alignItems      : A list of drop-down options for the 'align' plugin.   default:
 formats         : Change default formatBlock array.                 default: [...] {Array}
                   Default value: [
                     'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
-                    // "blockquote": block, "pre": brLine, "Other tags": line
+                    // "blockquote": block, "pre": brBlock, "Other tags": line
                   ],
                   Custom: [{
                     tag: 'div', // Tag name
@@ -989,16 +987,16 @@ editor.setOptions({
     ]
 });
 
-// Set "options.defaultStyle" style.
+// Set "options.editorCSSText" style.
 // Define the style of the edit area
-// It can also be defined with the "setOptions" method, but the "setDefaultStyle" method does not render the editor again.
-editor.setDefaultStyle('font-family: cursive; font-size: 10px;');
+// It can also be defined with the "setOptions" method, but the "setEditorCSSText" method does not render the editor again.
+editor.setEditorCSSText('font-family: cursive; font-size: 10px;');
 
 // Copies the content of the suneditor into a [textarea]
 editor.save();
 
 // Gets the content of the suneditor
-// onlyContent {boolean}: Return only the content of the body without headers when the "fullPage" option is true
+// onlyContent {boolean}: Return only the content of the body without headers when the "iframe_fullPage" option is true
 editor.getContent(onlyContent: Boolean);
 // Gets the current content with containing parent div(div.sun-editor-editable).
 //  <div class="sun-editor-editable">{content}</div>
@@ -1027,19 +1025,14 @@ editor.getFilesInfo(pluginName);
 // document.getElementById('example_files_input').files
 editor.insertImage(FileList);
 
-// Inserts an HTML element or HTML string or plain string at the current cursor position
-/**
- * @param {boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
- * @param {boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
- */
-editor.insertHTML('<img src="http://suneditor.com/sample/img/sunset.jpg">', true, true);
+
 
 // Change the content of the suneditor
 editor.setContent('set content');
 
 // Get the editor's number of characters or binary data size.
-// You can use the "charCounterType" option format.
-// If argument is no value, the currently set "charCounterType" option is used.
+// You can use the "charCounter_type" option format.
+// If argument is no value, the currently set "charCounter_type" option is used.
 editor.getCharCount((null || 'char' || 'byte' || 'byte-html'));
 
 // Add content to the suneditor
@@ -1114,7 +1107,7 @@ editor.onload = function (core, reload) {
  * paste event
  * e: Event object
  * cleanData: HTML string modified for editor format
- * maxCharCount: maxChartCount option (true if max character is exceeded)
+ * maxCharCount: charCounter_max option (true if max character is exceeded)
  * core: Core object
  */
 editor.onPaste = function (e, cleanData, maxCharCount, core) { console.log('onPaste', e) }
@@ -1147,7 +1140,7 @@ editor.onCut = function (e, clipboardData, core) { console.log('onCut', e) }
 /**
  * e: Event object
  * cleanData: HTML string modified for editor format
- * maxCharCount: maxChartCount option (true if max character is exceeded)
+ * maxCharCount: charCounter_max option (true if max character is exceeded)
  * core: Core object
  */
 editor.onDrop = function (e, cleanData, maxCharCount, core) { console.log('onDrop', e) }

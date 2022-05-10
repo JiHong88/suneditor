@@ -1,17 +1,11 @@
 /**
  * @fileoverview Event class
- * @author JiHong Lee.
+ * @author Yi JiHong.
  */
 
-import CoreInterface from '../../interface/_core';
-import {
-	domUtils,
-	unicode,
-	env
-} from '../../helper';
-import {
-	_w
-} from '../../helper/global';
+import CoreInterface from '../../class/_core';
+import { domUtils, unicode, env } from '../../helper';
+import { _w } from '../../helper/global';
 
 const Node = function (editor) {
 	CoreInterface.call(this, editor);
@@ -74,8 +68,7 @@ Node.prototype = {
 			}
 		}
 
-		if (depthEl.childNodes.length <= 1 && (!depthEl.firstChild || depthEl.firstChild.textContent.length === 0))
-			depthEl.innerHTML = '<br>';
+		if (depthEl.childNodes.length <= 1 && (!depthEl.firstChild || depthEl.firstChild.textContent.length === 0)) depthEl.innerHTML = '<br>';
 
 		const pElement = depthEl.parentNode;
 		if (next) depthEl = depthEl.nextSibling;
@@ -107,10 +100,7 @@ Node.prototype = {
 		let offsets = null;
 
 		if (nodePathLen) {
-			offsets = _w.Array.apply(null, new _w.Array(nodePathLen)).map(
-				_w.Number.prototype.valueOf,
-				0
-			);
+			offsets = _w.Array.apply(null, new _w.Array(nodePathLen)).map(_w.Number.prototype.valueOf, 0);
 		}
 
 		(function recursionFunc(current, depth, depthIndex) {
@@ -120,13 +110,7 @@ Node.prototype = {
 				child = children[i];
 				next = children[i + 1];
 				if (!child) break;
-				if (
-					(onlyText && inst.format._isIgnoreNodeChange(child)) ||
-					(!onlyText &&
-						(domUtils.isTable(child) ||
-							domUtils.isListCell(child) ||
-							(inst.format.isLine(child) && !inst.format.isBrLine(child))))
-				) {
+				if ((onlyText && inst.format._isIgnoreNodeChange(child)) || (!onlyText && (domUtils.isTable(child) || domUtils.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrBlock(child))))) {
 					if (domUtils.isTable(child) || domUtils.isListCell(child)) {
 						recursionFunc(child, depth + 1, i);
 					}
@@ -186,13 +170,7 @@ Node.prototype = {
 							tempL = tempL.previousSibling;
 						}
 
-						if (
-							childLength > 0 &&
-							l.nodeType === 3 &&
-							r.nodeType === 3 &&
-							(l.textContent.length > 0 || r.textContent.length > 0)
-						)
-							childLength--;
+						if (childLength > 0 && l.nodeType === 3 && r.nodeType === 3 && (l.textContent.length > 0 || r.textContent.length > 0)) childLength--;
 
 						if (nodePathLen) {
 							let path = null;
@@ -333,12 +311,7 @@ Node.prototype = {
 
 		(function recursionFunc(current) {
 			if (inst.format._notTextNode(current) || current === notRemoveNode || domUtils.isNonEditable(current)) return 0;
-			if (
-				current !== element &&
-				unicode.onlyZeroWidthSpace(current.textContent) &&
-				(!current.firstChild || !domUtils.isBreak(current.firstChild)) &&
-				!current.querySelector(env._allowedEmptyNodeList)
-			) {
+			if (current !== element && unicode.onlyZeroWidthSpace(current.textContent) && (!current.firstChild || !domUtils.isBreak(current.firstChild)) && !current.querySelector(env._allowedEmptyNodeList)) {
 				if (current.parentNode) {
 					current.parentNode.removeChild(current);
 					return -1;
@@ -364,7 +337,7 @@ Node.prototype = {
 	 */
 	removeWhiteSpace: function (html) {
 		if (!html) return '';
-		return html.trim().replace(/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)[^>^<]+>\s+(?=<)/ig, function (m) {
+		return html.trim().replace(/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)[^>^<]+>\s+(?=<)/gi, function (m) {
 			return m.replace(/\n/g, '').replace(/\s+/, ' ');
 		});
 	},

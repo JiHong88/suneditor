@@ -1,6 +1,6 @@
 /**
  * @fileoverview history stack closure
- * @author JiHong Lee.
+ * @author Yi JiHong.
  */
 
 import { _w } from '../../helper/global';

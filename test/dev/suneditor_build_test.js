@@ -18,6 +18,8 @@ import Katex from 'katex';
 window.e = suneditor.create(document.getElementById('editor2'), {
     // value: 'abc',
     // plugins: [align],
+    charCounter: true,
+    statusbar: true,
     mode: "inline",
     width: "100%",
     minHeight : 300,
@@ -26,8 +28,8 @@ window.e = suneditor.create(document.getElementById('editor2'), {
         'Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact',
         'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'
     ],
-    iframe: true,
-    fullPage: true,
+    // iframe: true,
+    // iframe_fullPage: true,
     imageMultipleFile: true,
     buttonList: [
         ['undo', 'redo'],
@@ -61,7 +63,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     // font: [
 //     //     'Arial', 'Impact', 'Georgia', 'tahoma', 'Verdana'
 //     // ],
-//     toolbarContainer: document.getElementById('test_tool2'),
+//     toolbar_container: document.getElementById('test_tool2'),
 //     tabDisable: true,
 //     mode: "balloon",
 //     linkProtocol: 'https://',
@@ -84,8 +86,8 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 // let s1 = suneditor.create('editor', {
 //     mode: "balloon-always",
 //     value: '',
-//     resizingBar: false,
-//     showPathLabel: false,
+//     statusbar: false,
+//     statusbar_showPathLabel: false,
 //     display: "inline",  
 //     tabDisable: false,
 //     placeholder: "Enter the question image here",
@@ -134,11 +136,11 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     katex: Katex,
 //     codeMirror: CodeMirror,
 //     // value: '<html bgcolor="e4e4e4"><p><meta content="text/html; charset=utf-8"http-equiv="Content-Type"><title>Postman</title><p><body bgcolor="e4e4e4"style="margin:0;padding:0"><p><table cellpadding="0"cellspacing="0"width="100%"bgcolor="e4e4e4"><tr><td><p><table cellpadding="20"cellspacing="0"align="center"id="top-message"width="600"><tr><td><table cellpadding="10"cellspacing="0"align="center"id="header"><tr><td bgcolor="434343"width="570"><table cellpadding="0"cellspacing="0"align="center"id="content-1"><tr><td width="100"valign="top"><table cellpadding="5"cellspacing="0"><tr><td bgcolor="434343"><img src="https://www.guidovisser.com/bell-small.png"></table><td width="370"><h1 style="font-family:Arial,Helvetica Neue,Helvetica,sans-serif;font-size:30px;padding-top:25px;color:#fff">Awesome HTML Email Template</h1><td width="100"valign="top"colspan="3"><table cellpadding="5"cellspacing="0"><tr><td bgcolor="434343"><img src="https://www.guidovisser.com/pixel.png"></table></table><!-- content 1 --><tr><td bgcolor="ffffff"width="570"style="font-family:Arial,Helvetica Neue,Helvetica,sans-serif">TEST TEXT<tr><td bgcolor="434343"width="570"><p><table cellpadding="10"cellspacing="0"width="100%"><tr><td bgcolor="434343"><tr><td style="color:#fff;font-family:Arial,Helvetica Neue,Helvetica,sans-serif"align="center"cellspacing="10"><!-- <a href="https://guidovisser.com" style="background-color: #D2694B; color: #ffffff; height:25px; text-decoration: none;">Go to Test Testing</a> --><!-- <a href="$(SELFRESLINK)" style="background-color: #D2694B;color: #ffffff; text-decoration: none;">Go to Henk Henken</a> --><!--[if mso]><v:roundrect xmlns_v="urn:schemas-microsoft-com:vml"xmlns_w="urn:schemas-microsoft-com:office:word"href="https://guidovisser.com"style="height:36px;v-text-anchor:middle;width:200px"arcsize="5%"strokecolor="#D2694B"fillcolor="#D2694B"><w:anchorlock><center style="color:#fff;font-family:Helvetica,Arial,sans-serif">I am a button →</center></v:roundrect><![endif]--> <a href="https://guidovisser.com"style="background-color:#d2694b;border:1px solid #d2694b;border-radius:3px;color:#fff;display:inline-block;font-family:sans-serif;line-height:44px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;mso-hide:all">Go to Test</a><td style="color:#fff;font-family:Arial,Helvetica Neue,Helvetica,sans-serif"align="center"cellpadding="10"><!--[if mso]><v:roundrect xmlns_v="urn:schemas-microsoft-com:vml"xmlns_w="urn:schemas-microsoft-com:office:word"href="$(SELFRESLINK)"style="height:36px;v-text-anchor:middle;width:200px"arcsize="5%"strokecolor="#D2694B"fillcolor="#D2694B"><w:anchorlock><center style="color:#fff;font-family:Helvetica,Arial,sans-serif">I am a button →</center></v:roundrect><![endif]--> <a href="https://guidovisser.com"style="background-color:#d2694b;border:1px solid #d2694b;border-radius:3px;color:#fff;display:inline-block;font-family:sans-serif;line-height:44px;text-align:center;text-decoration:none;width:200px;-webkit-text-size-adjust:none;mso-hide:all">Go to test 2</a></table><tr><td bgcolor="434343"width="570"style="color:#fff"><p><table cellpadding="5"cellspacing="0"><tr><td bgcolor="434343"><img src="https://www.guidovisser.com/bell-small.png"><td style="font-family:Arial,Helvetica Neue,Helvetica,sans-serif;color:#fff;font-size:12px;padding-top:22px"valign="top"><p><p>Test footer<p>If you need support, contact: <a href="mailto:notexistingaddress@guidovisser.com?subject=Contact Support"style="color:#fff;text-decoration:underline">notexistingaddress@guidovisser.com</a><p>This email is automatically generated, replying has no use.</table></p><!-- header --><!-- header --><!-- top message --><p><!-- wrapper --><p><p>',
-//     stickyToolbar: 50,
+//     toolbar_sticky: 50,
 //     _printClass: '',
 //     linkProtocol: 'http://',
 //     fullScreenOffset: '10px',
-//     charCounterType: "byte-html",
+//     charCounter_type: "byte-html",
 //     mediaAutoSelect: false,
 //     formats: [
 //         'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
@@ -151,7 +153,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     ],
 //     // mode: 'balloon',
 //     // rtl: true,
-//     // fullPage: true,
+//     // iframe_fullPage: true,
 //     // pasteTagsWhitelist: 'p|a|strong|em|h3|h4|h5|ul|ol|li|blockquote|table|thead|tbody|tfoot|tr|td|sup|sub',
 //     linkRel: [
 //         'alternate',
@@ -182,7 +184,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     // },
 //     // addTagsWhitelist: "table|thead|tbody|tr|td|title|html|body|meta",
 //     // iframe: true,
-//     // defaultTag: 'div',
+//     // defaultLineTag: 'div',
 //     // textTags: {
 //     //     strike:'s',
 //     //     bold: 'b',
@@ -208,11 +210,11 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     //     style: "border: 2px solid red;" 
 //     // },
 //     // height: 'auto',
-//     iframeCSSFileName: '.+',
-//     popupDisplay: 'full',
+//     iframe_cssFileName: '.+',
+//     popupType: 'full',
 //     charCounter: true,
-//     charCounterType: 'byte-html',
-//     charCounterLabel: 'Characters :',
+//     charCounter_type: 'byte-html',
+//     charCounter_label: 'Characters :',
 //     icons: {
 //         expansion: "<span>A</span>",
 //         reduction: "<span>Z</span>"
@@ -225,8 +227,8 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     // tagsBlacklist: 'style',
 //     // pasteTagsBlacklist: 'div',
 //     // tagsBlacklist: 'section|aside',
-//     // resizeEnable: false,
-//     resizingBarContainer: "#rb",
+//     // statusbar_resizeEnable: false,
+//     statusbar_container: "#rb",
 //     attributeWhitelist: {'all': '*'},  // html5 <details open="">..</details>
 //     // attributeBlacklist: {
 //     //     all: 'data-a',
@@ -234,8 +236,8 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     // },
 //     imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
 //     buttonList: complexEditor,
-//     // fullPage: true,
-//     defaultStyle: "font-weight: bold;",
+//     // iframe_fullPage: true,
+//     editorCSSText: "font-weight: bold;",
 //     // rtl: true,
 //     // buttonList: [['custom_container']]
 // });
@@ -247,7 +249,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 // // ss.setContent("")
 // // ss.setContent('fsafsa')
 // ss.onload = function (core) {
-//     console.log('_editorStyles', core.options.defaultStyle);
+//     console.log('_editorStyles', core.options.editorCSSText);
 //     // core.focus();
 // };
 // ss.onScroll = function (e) {
@@ -402,7 +404,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 // window.aaa = false;
 // window.sun_noticeOpen = function () {
 //     ss.setOptions({
-//         resizingBarContainer: null,
+//         statusbar_container: null,
 //     })
     
 //     // ss.core.setDir(!window.aaa ? 'rtl' : 'ltr');
@@ -414,7 +416,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     // const { core } = ss;
 //     // core.commandHandler(core._styleCommandMap.fullScreen, 'fullScreen')
 //     // ss.core.commandHandler(null, 'selectAll');
-//     // ss.core.removeNode()
+//     // ss.core.remove()
 //     // window.abc = ss.core.getContent();
 //     // console.log(window.abc);
 //     // \vec{P}.\vec{Q}=PQ
@@ -473,7 +475,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 // }
 
 // window.sun_insertHTML = function (html) {
-//     // ss.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" /><p>fdafds</p>', true, true, false);
+//     // ss.insert('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" /><p>fdafds</p>', true, true, false);
 //     ss.setContent("");
 //     ss.setOptions({
 //         mathFontSize: [
@@ -555,7 +557,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //         'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'
 //     ],
 //     iframe: true,
-//     fullPage: true,
+//     iframe_fullPage: true,
 //     imageMultipleFile: true,
 //     buttonList: [
 //         ['undo', 'redo'],
@@ -578,7 +580,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 // const newOption = {
 //     mode: 'balloon',
 //     iframe: false,
-//     // defaultStyle: 'height: 200px;',
+//     // editorCSSText: 'height: 200px;',
 //     height: 150,
 //     textSizeUnit: 'pt',
     
@@ -586,7 +588,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 // }
 // const newOption2 = {
 //     mode: 'classic',
-//     toolbarContainer: document.getElementById('test_tool'),
+//     toolbar_container: document.getElementById('test_tool'),
 //     maxHeight: '400px',
 //     height: 150,
 //     imageWidth: '100%',
@@ -783,12 +785,12 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     mode: 'balloon-always',
 //     width: '100%',
 //     height: '500px',
-//     stickyToolbar: false,
-//     popupDisplay: 'local',
+//     toolbar_sticky: false,
+//     popupType: 'local',
 //     // iframe: true,
 //     // maxCharCount: 300,
-//     // resizingBar: false
-//     // showPathLabel:false
+//     // statusbar: false
+//     // statusbar_showPathLabel:false
 //     charCounter: true,
 //     // formats: ['h1', 'h4', 'pre', 'p', 'blockquote', {
 //     //     tag: 'div',
@@ -820,7 +822,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     s4 = suneditor.create(win.document.querySelector('#editor4'), {
         
 //         width: '100%',
-//         stickyToolbar: 0,
+//         toolbar_sticky: 0,
 //         imageWidth: 300,
 //         mode: 'classic',
 //         // toolbarWidth: 800,

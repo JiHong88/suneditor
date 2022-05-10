@@ -1,12 +1,14 @@
 /**
  * @fileoverview Component class
- * @author JiHong Lee.
+ * @author Yi JiHong.
  */
 
 import { domUtils, unicode } from '../../helper';
+import CoreInterface from '../../class/_core';
 
 const Component = function (editor) {
-}
+	CoreInterface.call(this, editor);
+};
 
 Component.prototype = {
 	/**
@@ -14,7 +16,7 @@ Component.prototype = {
 	 * If "element" is "HR", insert and return the new line.
 	 * @param {Element} element Element to be inserted
 	 * @param {boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (util.getEdgeChildNodes)
-	 * @param {boolean} checkCharCount If true, if "options.maxCharCount" is exceeded when "element" is added, null is returned without addition.
+	 * @param {boolean} checkCharCount If true, if "options.charCounter_max" is exceeded when "element" is added, null is returned without addition.
 	 * @param {boolean} notSelect If true, Do not automatically select the inserted component.
 	 * @returns {Element}
 	 */
@@ -23,14 +25,14 @@ Component.prototype = {
 			return null;
 		}
 
-		const r = this.selection.removeNode();
+		const r = this.html.remove();
 		this.selection.getRangeAndAddLine(this.selection.getRange(), r.container);
 		let oNode = null;
 		let selectionNode = this.selection.getNode();
 		let formatEl = this.format.getLine(selectionNode, null);
 
 		if (domUtils.isListCell(formatEl)) {
-			this.selection.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling, false);
+			this.html.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling, false);
 			if (!element.nextSibling) element.parentNode.appendChild(domUtils.createElement('BR'));
 		} else {
 			if (this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
@@ -43,13 +45,13 @@ Component.prototype = {
 				oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
 				if (oNode) formatEl = oNode.previousSibling;
 			}
-			this.selection.insertNode(element, this.format.isBlock(formatEl) ? null : formatEl, false);
+			this.html.insertNode(element, this.format.isBlock(formatEl) ? null : formatEl, false);
 			if (formatEl && unicode.onlyZeroWidthSpace(formatEl)) domUtils.remove(formatEl);
 		}
-		
+
 		if (!notSelect) {
 			this.selection.setRange(element, 0, element, 0);
-			
+
 			const fileComponentInfo = this.get(element);
 			if (fileComponentInfo) {
 				this.select(fileComponentInfo.target, fileComponentInfo.pluginName);
@@ -105,7 +107,7 @@ Component.prototype = {
 		if (!plugin) return;
 		_w.setTimeout(
 			function () {
-				if (typeof plugin.select === 'function') plugin.select(element)
+				if (typeof plugin.select === 'function') plugin.select(element);
 				this._setComponentLineBreaker(element);
 			}.bind(this)
 		);

@@ -2,7 +2,7 @@
  * wysiwyg web editor
  *
  * suneditor.js
- * Copyright 2017 JiHong Lee.
+ * Copyright 2017 Yi JiHong.
  * MIT license.
  */
 'use strict';
@@ -154,7 +154,7 @@ export default {
             this.format.applyBlock(rangeElement);
         } else {
             if (command === 'br-line') {
-                this.format.setBrLine();
+                this.format.setBrBlock();
             } else { // line
                 this.format.setLine();
             }

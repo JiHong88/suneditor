@@ -1,5 +1,5 @@
 {
-    "esversion": 6,
+    "esversion": 5,
     "browser": true,
     "asi": false,
     "eqnull": true,
@@ -15,6 +15,7 @@
     "strict": "global",
     "validthis": true,
     "node": true,
+    "quotmark": false,
     "globals": {
         "ActiveXObject": true,
         "window": true

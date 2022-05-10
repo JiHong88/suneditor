@@ -1,6 +1,6 @@
-import EditorInterface from "../../interface/editor";
+import EditorClass from "../../interface/editor";
 
-class Node extends EditorInterface {
+class Node extends EditorClass {
 	/**
 	 * @description Split all tags based on "baseNode"
 	 * Returns the last element of the splited tag.
