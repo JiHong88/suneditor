@@ -42,8 +42,9 @@ Pure javscript based WYSIWYG web editor, with no dependencies
 - [Other libraries using SunEditor](#other-libraries-using-sunEditor)
     - [suneditor-react](#lib-suneditor-react)
     - [angular-suneditor](#lib-angular-suneditor)
+    - [Using SunEditor with Livewire & Alpine.JS](#lib-livewire-alpine)
     - [Plugin for Pluxml](#lib-pluxml)
-    - [AEM-SunEditor](#lib-pluxml)
+    - [AEM-SunEditor](#lib-aem-suneditor)
 - [License](#license)
 
 
@@ -1562,6 +1563,8 @@ editor.showController = function (name, controllers, core) {
 <a id="lib-suneditor-react"></a>[suneditor-react](https://github.com/mkhstar/suneditor-react) ([@mkhstar](https://github.com/mkhstar)) - Pure React Component for SunEditor.
 
 <a id="lib-angular-suneditor"></a>[angular-suneditor](https://github.com/BauViso/angular-suneditor) ([@BauViso](https://github.com/BauViso)) - Angular module for the SunEditor WYSIWYG Editor.
+
+<a id="lib-livewire-alpine"></a>[Livewire & Alpine.JS](https://github.com/JiHong88/SunEditor/issues/789#issuecomment-1121317703) ([@kaju74](https://github.com/kaju74)) - Using SunEditor with Livewire & Alpine.JS
 
 <a id="lib-pluxml"></a>[Plugin for Pluxml](https://forum.pluxml.org/discussion/comment/59339) ([@sudwebdesign](https://github.com/sudwebdesign)) - Plugin for Pluxml.
 
