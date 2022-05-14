@@ -575,7 +575,7 @@ export default {
             ['preview', 'print']
         ];
         /** Private options */
-        options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'font-weight', 'font-style'];
+        options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle'];
         // options.__defaultFontSize;
 
         /** RTL - buttons */
