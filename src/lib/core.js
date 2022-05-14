@@ -476,19 +476,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _styleCommandMap: null,
 
         /**
-         * @description Map of default command
-         * @private
-         */
-        _defaultCommand: {
-            bold: options.textTags.bold,
-            underline: options.textTags.underline,
-            italic: options.textTags.italic,
-            strike: options.textTags.strike,
-            subscript: options.textTags.sub,
-            superscript: options.textTags.sup
-        },
-
-        /**
          * @description Variables used internally in editor operation
          * @property {Boolean} isCodeView State of code view
          * @property {Boolean} isFullScreen State of full screen
@@ -2934,40 +2921,39 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!child || children.length > 1 || child.nodeType !== 1) return;
             
             // set cell style---
-            const commonStyleElements = [];
             const childStyle = child.style;
             const elStyle = el.style;
+            const nodeName = child.nodeName.toLowerCase();
+            let appliedEl = false;
 
             // bold, italic
-            if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
-            else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
-            if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
-            else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
+            if (options._textTagsMap[nodeName] === options._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold';
+            if (options._textTagsMap[nodeName] === options._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic';
 
             // styles
             const cKeys = util.getValues(childStyle);
-            for (let i = 0, len = this._listCamel.length; i < len; i++) {
-                if (cKeys.indexOf(this._listKebab[i]) > -1) {
-                    elStyle[this._listCamel[i]] = childStyle[this._listCamel[i]];
-                    childStyle.removeProperty(this._listKebab[i]);
+            if (cKeys.length > 0) {
+                for (let i = 0, len = this._listCamel.length; i < len; i++) {
+                    if (cKeys.indexOf(this._listKebab[i]) > -1) {
+                        elStyle[this._listCamel[i]] = childStyle[this._listCamel[i]];
+                        childStyle.removeProperty(this._listKebab[i]);
+                        appliedEl = true;
+                    }
                 }
             }
-            
-            // remove child
-            if (!childStyle.length) commonStyleElements.push(child);
 
             this._setCommonListStyle(el, child);
+            if (!appliedEl) return;
 
             // common style
-            for (let i = 0, len = commonStyleElements.length, n, ch, p; i < len; i++) {
-                n = commonStyleElements[i];
-                ch = n.childNodes;
-                p = n.parentNode;
-                n = n.nextSibling;
+            if (!childStyle.length) {
+                const ch = child.childNodes;
+                const p = child.parentNode;
+                const n = child.nextSibling;
                 while (ch.length > 0) {
                     p.insertBefore(ch[0], n);
                 }
-                util.removeItem(commonStyleElements[i]);
+                util.removeItem(child);
             }
         },
 
@@ -4337,7 +4323,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (context.tool.save) context.tool.save.setAttribute('disabled', true);
                     break;
                 default : // 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'..
-                    command = this._defaultCommand[command.toLowerCase()] || command;
+                    command = options._defaultCommand[command.toLowerCase()] || command;
                     if (!this.commandMap[command]) this.commandMap[command] = target;
 
                     const nodesMap = this._variable.currentNodesMap;
@@ -5630,8 +5616,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const tool = context.tool;
             this.commandMap = {
-                SUB: tool.subscript,
-                SUP: tool.superscript,
                 OUTDENT: tool.outdent,
                 INDENT: tool.indent
             };
@@ -5639,6 +5623,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.commandMap[options.textTags.underline.toUpperCase()] = tool.underline;
             this.commandMap[options.textTags.italic.toUpperCase()] = tool.italic;
             this.commandMap[options.textTags.strike.toUpperCase()] = tool.strike;
+            this.commandMap[options.textTags.sub.toUpperCase()] = tool.subscript;
+            this.commandMap[options.textTags.sup.toUpperCase()] = tool.superscript;
             
             this._styleCommandMap = {
                 fullScreen: tool.fullScreen,
