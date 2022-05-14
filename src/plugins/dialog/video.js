@@ -616,7 +616,7 @@ export default {
         if (!isUpdate) {
             changed = this.component.insert(container, false, true, !this.options.mediaAutoSelect);
             if (!this.options.mediaAutoSelect) {
-                const line = this.format.appendLine(container, null);
+                const line = this.format.addLine(container, null);
                 if (line) this.setRange(line, 0, line, 0);
             }
         } else if (contextVideo._resizing && this.context.resizing._rotateVertical && changeSize) {

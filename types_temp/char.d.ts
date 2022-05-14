@@ -1,6 +1,6 @@
-import EditorClass from "../src/interface/editor";
+import EditorInterface from "../src/interface/editor";
 
-class Char extends EditorClass {
+class Char extends EditorInterface {
 	/**
 	 * @description Returns false if char count is greater than "options.charCounter_max" when "html" is added to the current editor.
 	 * @param element Element node or String.

@@ -1,4 +1,4 @@
-class ClassesInterface {
+class ModuleInterface {
 	char: any;
 	component: any;
 	events: any;
@@ -10,4 +10,4 @@ class ClassesInterface {
 	toolbar: any;
 }
 
-export default ClassesInterface;
+export default ModuleInterface;

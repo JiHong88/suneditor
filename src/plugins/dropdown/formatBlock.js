@@ -154,7 +154,7 @@ export default {
             this.format.applyBlock(rangeElement);
         } else {
             if (command === 'br-line') {
-                this.format.setBrBlock();
+                this.format.setBrLine();
             } else { // line
                 this.format.setLine();
             }

@@ -4,11 +4,7 @@
  */
 
 import CoreInterface from '../../class/_core';
-import {
-	getParentElement,
-	isWysiwygFrame,
-	hasClass
-} from '../../helper/domUtils';
+import { getParentElement, isWysiwygFrame, hasClass } from '../../helper/domUtils';
 
 const Offset = function (editor) {
 	CoreInterface.call(this, editor);
@@ -16,7 +12,7 @@ const Offset = function (editor) {
 
 Offset.prototype = {
 	/**
-	 * @description Returns the position of the argument, relative to inside the editor. 
+	 * @description Returns the position of the argument, relative to inside the editor.
 	 * @param {Node} node Target node
 	 * @returns {Object} {left, top}
 	 */

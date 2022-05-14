@@ -4,12 +4,12 @@
  * @private
  */
 function CoreInterface(core) {
-	this.core = core;
-	this.eventManager = core.eventManager;
+	this.editor = core;
 	this._w = core._w;
 	this._d = core._d;
 	this._ww = core._ww;
 	this._wd = core._wd;
+	this.eventManager = core.eventManager;
 	this.options = core.options;
 	this.plugins = core.plugins;
 	this.context = core.context;
@@ -17,9 +17,10 @@ function CoreInterface(core) {
 	this.lang = core.lang;
 	this.history = core.history;
 	this.helper = core.helper;
+	this.status = core.status;
+	this.events = core.events;
 	this.shadowRoot = core.shadowRoot;
 	this.wwComputedStyle = core.wwComputedStyle;
-	this.status = core.status;
 }
 
 export default CoreInterface;

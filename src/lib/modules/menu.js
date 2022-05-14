@@ -3,8 +3,8 @@
  * @author Yi JiHong.
  */
 
-import { domUtils } from '../../helper';
 import CoreInterface from '../../class/_core';
+import { domUtils } from '../../helper';
 
 const Menu = function (editor) {
 	CoreInterface.call(this, editor);
@@ -58,7 +58,7 @@ Menu.prototype = {
 		this.eventManager.addGlobalEvent('mousedown', this._bindedDropdownOff, false);
 
 		if (this.plugins[dropdownName].on) this.plugins[dropdownName].on();
-		this._antiBlur = true;
+		this.editor._antiBlur = true;
 	},
 
 	/**
@@ -77,7 +77,7 @@ Menu.prototype = {
 			this._notHideToolbar = false;
 		}
 
-		this._antiBlur = false;
+		this.editor._antiBlur = false;
 	},
 
 	/**
@@ -96,7 +96,7 @@ Menu.prototype = {
 		this.eventManager.addGlobalEvent('mousedown', this._bindedContainerOff, false);
 
 		if (this.plugins[containerName].on) this.plugins[containerName].on();
-		this._antiBlur = true;
+		this.editor._antiBlur = true;
 	},
 
 	/**
@@ -115,7 +115,7 @@ Menu.prototype = {
 			this._notHideToolbar = false;
 		}
 
-		this._antiBlur = false;
+		this.editor._antiBlur = false;
 	},
 
 	hasController: function (el) {
@@ -163,7 +163,7 @@ Menu.prototype = {
 		this._bindControllersOff = this.controllerOff.bind(this);
 		this.eventManager.addGlobalEvent('mousedown', this._bindControllersOff, false);
 		this.eventManager.addGlobalEvent('keydown', this._bindControllersOff, false);
-		this._antiBlur = true;
+		this.editor._antiBlur = true;
 
 		if (typeof this.events.showController === 'function') this.events.showController(this.currentControllerName, this.currentControllerItems);
 	},
@@ -173,7 +173,7 @@ Menu.prototype = {
 	 * @param {KeyboardEvent|MouseEvent|null} e Event object when called from mousedown and keydown events registered in "controllerOn"
 	 */
 	controllerOff: function (e) {
-		this.core._lineBreaker.style.display = 'none';
+		this.editor._lineBreaker.style.display = 'none';
 		const len = this.currentControllerItems.length;
 
 		if (e && e.target && len > 0) {
@@ -182,7 +182,7 @@ Menu.prototype = {
 			}
 		}
 
-		if (this.core._fileManager.pluginRegExp.test(this.currentControllerName) && e && e.type === 'keydown' && e.keyCode !== 27) return;
+		if (this.editor._fileManager.pluginRegExp.test(this.currentControllerName) && e && e.type === 'keydown' && e.keyCode !== 27) return;
 		this.context.element.lineBreaker_t.style.display = this.context.element.lineBreaker_b.style.display = 'none';
 		this.status._lineBreakComp = null;
 
@@ -205,7 +205,7 @@ Menu.prototype = {
 			this.currentControllerItems = [];
 		}
 
-		this._antiBlur = false;
+		this.editor._antiBlur = false;
 	},
 
 	/**

@@ -107,7 +107,7 @@ In "suneditor-content.css", you can define the style of all the tags created in 
 ## When inserting custom tags in the editor
 ```text
 - Empty tags without meaning or tags that do not fit the editor's format are modified or deleted.
-    Tags with the class name "se-component" or "__se__tag" of the top-level tag will not be deleted.
+    Tags with the class name "se-component" or "__se__block" of the top-level tag will not be deleted.
         "se-component" is the component type of the editor.
         Class name for wrapper tags such as images and videos.
 ```
@@ -1035,8 +1035,8 @@ editor.setContent('set content');
 // If argument is no value, the currently set "charCounter_type" option is used.
 editor.getCharCount((null || 'char' || 'byte' || 'byte-html'));
 
-// Add content to the suneditor
-editor.appendContent('append content');
+// Add content to the end of content.
+editor.addContent('append content');
 
 // Switch to or off "ReadOnly" mode.
 editor.readOnly(true || false)
@@ -1385,7 +1385,7 @@ editor.audioUploadHandler = function (xmlHttp, info, core) {
  * isCodeView: Whether the current code view mode
  * core: Core object
  */
-editor.setCodeView = function (isCodeView, core) {
+editor.onToggleCodeView = function (isCodeView, core) {
     console.log('isCodeView', isCodeView);
 }
 
@@ -1394,7 +1394,7 @@ editor.setCodeView = function (isCodeView, core) {
  * isFullScreen: Whether the current full screen mode
  * core: Core object
  */
-editor.setFullScreen = function (isFullScreen, core) {
+editor.onToggleFullScreen = function (isFullScreen, core) {
     console.log('isFullScreen', isFullScreen);
 }
 

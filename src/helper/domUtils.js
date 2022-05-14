@@ -562,7 +562,7 @@ export function isSameAttributes(a, b) {
  * @description Delete argumenu value element
  * @param {Node} item Node to be remove
  */
-export function remove(item) {
+export function removeItem(item) {
 	if (!item) return;
 	if (typeof item.remove === 'function') item.remove();
 	else if (item.parentNode) item.parentNode.removeChild(item);
@@ -727,7 +727,7 @@ export function isWysiwygFrame(element) {
  * @returns {boolean}
  */
 export function isNonEditable(element) {
-	return element && element.nodeType === 1 && (element.getAttribute('contenteditable') === 'false' || !element.getAttribute('contenteditable'));
+	return element && element.nodeType === 1 && element.getAttribute('contenteditable') === 'false';
 }
 
 /**
@@ -848,7 +848,7 @@ const domUtils = {
 	prevIndex: prevIndex,
 	copyTagAttributes: copyTagAttributes,
 	isSameAttributes: isSameAttributes,
-	remove: remove,
+	removeItem: removeItem,
 	changeElement: changeElement,
 	changeTxt: changeTxt,
 	setStyle: setStyle,

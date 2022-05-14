@@ -121,7 +121,7 @@ export default {
             if (oA === null) return;
     
             if (!this.context.dialog.updateModal) {
-                const selectedFormats = this.selection.getLines();
+                const selectedFormats = this.format.getLines();
                 if (selectedFormats.length > 1) {
                     const oFormat = this.util.createElement(selectedFormats[0].nodeName);
                     oFormat.appendChild(oA);
@@ -204,7 +204,7 @@ export default {
             /** delete */
             this.util.remove(this.context.link._linkAnchor);
             this.context.anchor.caller.link.linkAnchor = null;
-            this.core.focus();
+            this.editor.focus();
 
             // history stack
             this.history.push(false);

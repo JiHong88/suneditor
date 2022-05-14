@@ -1,6 +1,6 @@
-import EditorClass from "../interface/editor";
+import EditorInterface from "../interface/editor";
 
-class Events extends EditorClass {
+class Events extends EditorInterface {
 	onload: (reload: boolean) => void;
 	onScroll: EventFn;
 	onFocus: EventFn;
@@ -83,14 +83,14 @@ class Events extends EditorClass {
 	 * @param isCodeView Whether the current code view mode
 	 * @param core Core object
 	 */
-	setCodeView: (isCodeView: boolean) => void;
+	onToggleCodeView: (isCodeView: boolean) => void;
 
 	/**
 	 * @description An event when toggling full screen.
 	 * @param isFullScreen Whether the current full screen mode
 	 * @param core Core object
 	 */
-	setFullScreen: (isFullScreen: boolean) => void;
+	 onToggleFullScreen: (isFullScreen: boolean) => void;
 
 	/**
 	 * @description Called before the image is uploaded

@@ -3,10 +3,10 @@
  * @author Yi JiHong.
  */
 
+import CoreInterface from '../../class/_core';
 import env from '../../helper/env';
 import { _w } from '../../helper/global';
 import { addClass, removeClass, hasClass } from '../../helper/domUtils';
-import CoreInterface from '../../class/_core';
 
 const Char = function (editor) {
 	CoreInterface.call(this, editor);
@@ -83,7 +83,7 @@ Char.prototype = {
 	 */
 	display: function () {
 		if (this.context.element.charCounter) {
-			_w.setTimeout(
+			this._w.setTimeout(
 				function () {
 					this.context.element.charCounter.textContent = this.getLength();
 				}.bind(this)
@@ -144,7 +144,7 @@ Char.prototype = {
 function CounterBlink(charWrapper) {
 	if (charWrapper && !hasClass(charWrapper, 'se-blink')) {
 		addClass(charWrapper, 'se-blink');
-		_w.setTimeout(function () {
+		this._w.setTimeout(function () {
 			removeClass(charWrapper, 'se-blink');
 		}, 600);
 	}

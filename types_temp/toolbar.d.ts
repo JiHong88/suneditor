@@ -1,6 +1,6 @@
-import EditorClass from "../../interface/editor";
+import EditorInterface from "../../interface/editor";
 
-class Toolbar extends EditorClass {
+class Toolbar extends EditorInterface {
 	/**
 	 * @description Disable the toolbar
 	 */

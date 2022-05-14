@@ -1,114 +1,27 @@
 import Helper, { global, env, converter, unicode, domUtils, numbers } from '../helper';
 import { ResetOptions } from './constructor';
 import Context from './context';
-import EventManager from './base/eventManager';
+
+// interface
+import ModuleInterface from '../class/_module';
 
 // base
 import history from './base/history';
 import Events from './base/events';
+import EventManager from './base/eventManager';
 
-// classes
+// modules
 import Char from './modules/char';
 import Component from './modules/component';
 import Format from './modules/format';
+import HTML from './modules/html';
+import Menu from './modules/menu';
 import Node from './modules/node';
+import Notice from './modules/notice';
 import Offset from './modules/offset';
 import Selection from './modules/selection';
 import Shortcuts from './modules/shortcuts';
 import Toolbar from './modules/toolbar';
-import Menu from './modules/menu';
-import Notice from './modules/notice';
-
-// interface
-import ClassInterface from '../class/_classes';
-
-const _parser = new global._w.DOMParser();
-
-/**
- * @description Check disallowed tags
- * @param {Node} element Element to check
- * @returns {boolean}
- * @private
- */
-function DisallowedElements(element) {
-	return /^(meta|script|link|style|[a-z]+\:[a-z]+)$/i.test(element.nodeName);
-}
-
-/**
- * @description Tag and tag attribute check RegExp function. (used by "cleanHTML" and "convertContentForEditor")
- * @param {boolean} lowLevelCheck Low level check
- * @param {string} m RegExp value
- * @param {string} t RegExp value
- * @returns {string}
- * @private
- */
-function CleanElements(lowLevelCheck, m, t) {
-	if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
-
-	let v = null;
-	const tagName = t.match(/(?!<)[a-zA-Z0-9\-]+/)[0].toLowerCase();
-
-	// blacklist
-	const bAttr = this._attributeBlacklist[tagName];
-	if (bAttr) m = m.replace(bAttr, '');
-	else m = m.replace(this._attributeBlacklistRegExp, '');
-
-	// whitelist
-	const wAttr = this._attributeWhitelist[tagName];
-	if (wAttr) v = m.match(wAttr);
-	else v = m.match(this._attributeWhitelistRegExp);
-
-	// anchor
-	if (!lowLevelCheck || /<a\b/i.test(t)) {
-		const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
-		if (sv) {
-			if (!v) v = [];
-			v.push(sv[0]);
-		}
-	}
-
-	// span
-	if ((!lowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
-		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
-		if (sv) {
-			if (!v) v = [];
-			v.push(sv[0]);
-		}
-	}
-
-	// img
-	if (/<img/i.test(t)) {
-		let w = '',
-			h = '';
-		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
-		if (!v) v = [];
-		if (sv) {
-			w = sv[0].match(/width:(.+);/);
-			w = numbers.get(w ? w[1] : '', -1) || '';
-			h = sv[0].match(/height:(.+);/);
-			h = numbers.get(h ? h[1] : '', -1) || '';
-		}
-
-		if (!w || !h) {
-			const avw = m.match(/width\s*=\s*((?:"|')[^"']*(?:"|'))/);
-			const avh = m.match(/height\s*=\s*((?:"|')[^"']*(?:"|'))/);
-			if (avw || avh) {
-				w = !w ? numbers.get(avw ? avw[1] : '') || '' : w;
-				h = !h ? numbers.get(avh ? avh[1] : '') || '' : h;
-			}
-		}
-		v.push('data-origin="' + (w + ',' + h) + '"');
-	}
-
-	if (v) {
-		for (let i = 0, len = v.length; i < len; i++) {
-			if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
-			t += ' ' + (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i]) ? '' : v[i]);
-		}
-	}
-
-	return t;
-}
 
 /**
  * @description SunEditor constructor function.
@@ -205,6 +118,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	 * @property {boolean} isReadOnly Boolean value of whether the editor is readOnly
 	 * @property {boolean} isCodeView State of code view
 	 * @property {boolean} isFullScreen State of full screen
+	 * @property {boolean} isShowBlocks State of show blocks
 	 * @property {number} tabSize Indent size of tab (4)
 	 * @property {number} indentSize Indent size (25)px
 	 * @property {number} codeIndentSize Indent size of Code view mode (2)
@@ -218,6 +132,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 		isChanged: false,
 		isCodeView: false,
 		isFullScreen: false,
+		isShowBlocks: false,
 		indentSize: 25,
 		tabSize: 4,
 		codeIndentSize: 2,
@@ -277,39 +192,6 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	this._shadowRootControllerEventTarget = null;
 
 	/**
-	 * @description Tag whitelist RegExp object used in "_consistencyCheckOfHTML" method
-	 * ^(options._editorElementWhitelist)$
-	 * @private
-	 */
-	this._htmlCheckWhitelistRegExp = null;
-
-	/**
-	 * @description Tag blacklist RegExp object used in "_consistencyCheckOfHTML" method
-	 * @private
-	 */
-	this._htmlCheckBlacklistRegExp = null;
-
-	/**
-	 * @description Editor tags whitelist (RegExp object)
-	 * helper.converter.createElementWhitelist(options._editorElementWhitelist)
-	 * @private
-	 */
-	this._elementWhitelistRegExp = null;
-
-	/**
-	 * @description Editor tags blacklist (RegExp object)
-	 * helper.converter.createElementBlacklist(options.elementBlacklist)
-	 * @private
-	 */
-	this._elementBlacklistRegExp = null;
-
-	/**
-	 * @description RegExp when using check disallowd tags. (b, i, ins, strike, s)
-	 * @private
-	 */
-	this._disallowedStyleNodesRegExp = null;
-
-	/**
 	 * @description Button List in Responsive Toolbar.
 	 * @private
 	 */
@@ -346,30 +228,6 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	this._isBalloonAlways = null;
 
 	/**
-	 * @description Attributes whitelist used by the cleanHTML method
-	 * @private
-	 */
-	this._attributeWhitelistRegExp = null;
-
-	/**
-	 * @description Attributes blacklist used by the cleanHTML method
-	 * @private
-	 */
-	this._attributeBlacklistRegExp = null;
-
-	/**
-	 * @description Attributes of tags whitelist used by the cleanHTML method
-	 * @private
-	 */
-	this._attributeWhitelist = null;
-
-	/**
-	 * @description Attributes of tags blacklist used by the cleanHTML method
-	 * @private
-	 */
-	this._attributeBlacklist = null;
-
-	/**
 	 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
 	 * @private
 	 */
@@ -396,7 +254,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 
 	/**
 	 * @description Information of tags that should maintain HTML structure, style, class name, etc. (In use by "math" plugin)
-	 * When inserting "html" such as paste, it is executed on the "html" to be inserted. (core.cleanHTML)
+	 * When inserting "html" such as paste, it is executed on the "html" to be inserted. (html.clean)
 	 * Basic Editor Actions:
 	 * 1. All classes not starting with "__se__" or "se-" in the editor are removed.
 	 * 2. The style of all tags except the "span" tag is removed from the editor.
@@ -524,6 +382,11 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 		fullScreenInline: false
 	};
 
+	/**
+	 * @description Parser
+	 */
+	this._parser = new global._w.DOMParser();
+
 	// ----- Core init -----
 	// Create to sibling node
 	const contextEl = context.element;
@@ -555,27 +418,6 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 
 Core.prototype = {
 	/**
-	 * @description If the plugin is not added, add the plugin and call the 'add' function.
-	 * If the plugin is added call callBack function.
-	 * @param {string} pluginName The name of the plugin to call
-	 * @param {Element|null} target Plugin target button (This is not necessary if you have a button list when creating the editor)
-	 */
-	registerPlugin: function (pluginName, target) {
-		target = target || this._pluginCallButtons[pluginName];
-
-		if (!this.plugins[pluginName]) {
-			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
-		} else {
-			this.plugins[pluginName] = new this.plugins[pluginName](this, target);
-		}
-
-		if (this.plugins[pluginName].active && !this._commandMap[pluginName] && !!target) {
-			this._commandMap[pluginName] = target;
-			this.activePlugins.push(pluginName);
-		}
-	},
-
-	/**
 	 * @todo
 	 * @description If the module is not added, add the module and call the 'add' function
 	 * @param {Array} moduleArray module object's Array
@@ -594,105 +436,24 @@ Core.prototype = {
 	},
 
 	/**
-	 * @description javascript execCommand
-	 * @param {string} command javascript execCommand function property
-	 * @param {Boolean|undefined} showDefaultUI javascript execCommand function property
-	 * @param {string|undefined} value javascript execCommand function property
+	 * @description If the plugin is not added, add the plugin and call the 'add' function.
+	 * If the plugin is added call callBack function.
+	 * @param {string} pluginName The name of the plugin to call
+	 * @param {Element|null} target Plugin target button (This is not necessary if you have a button list when creating the editor)
 	 */
-	execCommand: function (command, showDefaultUI, value) {
-		this._wd.execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
-		// history stack
-		this.history.push(true);
-	},
+	registerPlugin: function (pluginName, target) {
+		target = target || this._pluginCallButtons[pluginName];
 
-	/**
-	 * @description Focus to wysiwyg area using "native focus function"
-	 */
-	nativeFocus: function () {
-		this.selection.__focus();
-		this.selection._init();
-	},
-
-	/**
-	 * @description Focus to wysiwyg area
-	 */
-	focus: function () {
-		if (this.context.element.wysiwygFrame.style.display === 'none') return;
-
-		if (this.options.iframe) {
-			this.nativeFocus();
+		if (!this.plugins[pluginName]) {
+			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
 		} else {
-			try {
-				const range = this.selection.getRange();
-				if (range.startContainer === range.endContainer && domUtils.isWysiwygFrame(range.startContainer)) {
-					const currentNode = range.commonAncestorContainer.children[range.startOffset];
-					if (!this.format.isLine(currentNode) && !this.component.is(currentNode)) {
-						const br = domUtils.createElement('BR');
-						const format = domUtils.createElement(this.options.defaultLineTag, null, br);
-						this.context.element.wysiwyg.insertBefore(format, currentNode);
-						this.selection.setRange(br, 0, br, 0);
-						return;
-					}
-				}
-				this.selection.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
-			} catch (e) {
-				this.nativeFocus();
-			}
+			this.plugins[pluginName] = new this.plugins[pluginName](this, target);
 		}
 
-		this.eventManager.applyTagEffect();
-		if (this._isBalloon) this.eventManager._toggleToolbarBalloon();
-	},
-
-	/**
-	 * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
-	 * If "focusEdge" is null, then selected last element
-	 * @param {Element|null} focusEl Focus element
-	 */
-	focusEdge: function (focusEl) {
-		if (!focusEl) focusEl = this.context.element.wysiwyg.lastElementChild;
-
-		const fileComponentInfo = this.component.get(focusEl);
-		if (fileComponentInfo) {
-			this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
-		} else if (focusEl) {
-			focusEl = domUtils.getEdgeChild(
-				focusEl,
-				function (current) {
-					return current.childNodes.length === 0 || current.nodeType === 3;
-				},
-				true
-			);
-			if (!focusEl) this.nativeFocus();
-			else this.selection.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
-		} else {
-			this.focus();
+		if (this.plugins[pluginName].active && !this._commandMap[pluginName] && !!target) {
+			this._commandMap[pluginName] = target;
+			this.activePlugins.push(pluginName);
 		}
-	},
-
-	/**
-	 * @description Focusout to wysiwyg area (.blur())
-	 */
-	blur: function () {
-		if (this.options.iframe) {
-			this.context.element.wysiwygFrame.blur();
-		} else {
-			this.context.element.wysiwyg.blur();
-		}
-	},
-
-	/**
-	 * @description Show loading box
-	 */
-	openLoading: function () {
-		this.context.element.loading.style.display = 'block';
-	},
-
-	/**
-	 * @description Close loading box
-	 */
-	closeLoading: function () {
-		this.context.element.loading.style.display = 'none';
 	},
 
 	/**
@@ -801,10 +562,10 @@ Core.prototype = {
 				this.toolbar._showBalloon(this.selection.setRange(first, 0, last, last.textContent.length));
 				break;
 			case 'codeView':
-				this.setCodeView(!this.status.isCodeView);
+				this.codeView(!this.status.isCodeView);
 				break;
 			case 'fullScreen':
-				this.setFullScreen(!this.status.isFullScreen);
+				this.fullScreen(!this.status.isFullScreen);
 				break;
 			case 'indent':
 				this.format.indent();
@@ -829,7 +590,7 @@ Core.prototype = {
 				this.preview();
 				break;
 			case 'showBlocks':
-				this.showBlocks(!domUtils.hasClass(this.context.element.wysiwyg, 'se-show-block'));
+				this.showBlocks(!this.status.isShowBlocks);
 				break;
 			case 'dir':
 				this.setDir(options.textDirection);
@@ -873,24 +634,372 @@ Core.prototype = {
 	},
 
 	/**
-	 * @description Add or remove the class name of "body" so that the code block is visible
-	 * @param {boolean} value true/false
+	 * @description javascript execCommand
+	 * @param {string} command javascript execCommand function property
+	 * @param {Boolean|undefined} showDefaultUI javascript execCommand function property
+	 * @param {string|undefined} value javascript execCommand function property
 	 */
-	showBlocks: function (value) {
-		if (value) {
-			domUtils.addClass(this.context.element.wysiwyg, 'se-show-block');
-			domUtils.addClass(this._styleCommandMap.showBlocks, 'active');
+	execCommand: function (command, showDefaultUI, value) {
+		this._wd.execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
+		// history stack
+		this.history.push(true);
+	},
+
+	/**
+	 * @description Focus to wysiwyg area
+	 */
+	focus: function () {
+		if (this.context.element.wysiwygFrame.style.display === 'none') return;
+
+		if (this.options.iframe) {
+			this._nativeFocus();
 		} else {
-			domUtils.removeClass(this.context.element.wysiwyg, 'se-show-block');
-			domUtils.removeClass(this._styleCommandMap.showBlocks, 'active');
+			try {
+				const range = this.selection.getRange();
+				if (range.startContainer === range.endContainer && domUtils.isWysiwygFrame(range.startContainer)) {
+					const currentNode = range.commonAncestorContainer.children[range.startOffset];
+					if (!this.format.isLine(currentNode) && !this.component.is(currentNode)) {
+						const br = domUtils.createElement('BR');
+						const format = domUtils.createElement(this.options.defaultLineTag, null, br);
+						this.context.element.wysiwyg.insertBefore(format, currentNode);
+						this.selection.setRange(br, 0, br, 0);
+						return;
+					}
+				}
+				this.selection.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+			} catch (e) {
+				this._nativeFocus();
+			}
 		}
-		this._resourcesStateChange();
+
+		this.eventManager.applyTagEffect();
+		if (this._isBalloon) this.eventManager._toggleToolbarBalloon();
+	},
+
+	/**
+	 * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
+	 * If "focusEdge" is null, then selected last element
+	 * @param {Element|null} focusEl Focus element
+	 */
+	focusEdge: function (focusEl) {
+		if (!focusEl) focusEl = this.context.element.wysiwyg.lastElementChild;
+
+		const fileComponentInfo = this.component.get(focusEl);
+		if (fileComponentInfo) {
+			this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
+		} else if (focusEl) {
+			focusEl = domUtils.getEdgeChild(
+				focusEl,
+				function (current) {
+					return current.childNodes.length === 0 || current.nodeType === 3;
+				},
+				true
+			);
+			if (!focusEl) this._nativeFocus();
+			else this.selection.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
+		} else {
+			this.focus();
+		}
+	},
+
+	/**
+	 * @description Focusout to wysiwyg area (.blur())
+	 */
+	blur: function () {
+		if (this.options.iframe) {
+			this.context.element.wysiwygFrame.blur();
+		} else {
+			this.context.element.wysiwyg.blur();
+		}
+	},
+
+	/**
+	 * @description Sets the HTML string
+	 * @param {string|undefined} html HTML string
+	 */
+	setContent: function (html) {
+		this.removeRange();
+
+		const convertValue = html === null || html === undefined ? '' : this.html.clean(html, true, null, null);
+		this._resetComponents();
+
+		if (!this.status.isCodeView) {
+			this.context.element.wysiwyg.innerHTML = convertValue;
+			// history stack
+			this.history.push(false);
+		} else {
+			const value = this._convertHTMLForCodeView(convertValue, false);
+			this._setCodeView(value);
+		}
+	},
+
+	/**
+	 * @description Add content to the end of content.
+	 * @param {string} content Content to Input
+	 */
+	addContent: function (content) {
+		const convertValue = this.html.clean(content, true, null, null);
+
+		if (!this.status.isCodeView) {
+			const temp = domUtils.createElement('DIV', null, convertValue);
+			const wysiwyg = this.context.element.wysiwyg;
+			const children = temp.children;
+			for (let i = 0, len = children.length; i < len; i++) {
+				if (children[i]) {
+					wysiwyg.appendChild(children[i]);
+				}
+			}
+		} else {
+			this._setCodeView(this._getCodeView() + '\n' + this._convertHTMLForCodeView(convertValue, false));
+		}
+
+		// history stack
+		this.history.push(false);
+	},
+
+	/**
+	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
+	 * @param {Object} ctx { head: HTML string, body: HTML string}
+	 */
+	setFullPageContent: function (ctx) {
+		if (!this.options.iframe) return false;
+		if (ctx.head) this._wd.head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
+		if (ctx.body) this._wd.body.innerHTML = this.html.clean(ctx.body, true, null, null);
+	},
+
+	/**
+	 * @description Gets the current content
+	 * @param {boolean} withFrame Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
+	 * Ignored for options.iframe_fullPage is true.
+	 * @param {boolean} includeFullPage Return only the content of the body without headers when the "iframe_fullPage" option is true
+	 * @returns {Object}
+	 */
+	getContent: function (withFrame, includeFullPage) {
+		const renderHTML = domUtils.createElement('DIV', null, this._convertHTMLForCodeView(this.context.element.wysiwyg, true));
+		const figcaptions = domUtils.getListChildren(renderHTML, function (current) {
+			return /FIGCAPTION/i.test(current.nodeName);
+		});
+
+		for (let i = 0, len = figcaptions.length; i < len; i++) {
+			figcaptions[i].removeAttribute('contenteditable');
+		}
+
+		if (this.options.iframe_fullPage) {
+			if (includeFullPage) {
+				const attrs = domUtils.getAttributesToString(this._wd.body, ['contenteditable']);
+				return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + '<body ' + attrs + '>' + renderHTML.innerHTML + '</body></html>';
+			} else {
+				return renderHTML.innerHTML;
+			}
+		} else {
+			return withFrame ? '<div class="sun-editor-editable' + (this.options._rtl ? ' se-rtl' : '') + '">' + renderHTML.innerHTML + '</div>' : renderHTML.innerHTML;
+		}
+	},
+
+	/**
+	 * @description Gets only the text of the suneditor content
+	 * @returns {string}
+	 */
+	getText: function () {
+		return this.context.element.wysiwyg.textContent;
+	},
+
+	/**
+	 * @description Gets uploaded files(plugin using fileManager) information list.
+	 * image: [img], video: [video, iframe], audio: [audio]
+	 * - index: data index
+	 * - name: file name
+	 * - size: file size
+	 * - select: select function
+	 * - delete: delete function
+	 * - element: target element
+	 * - src: src attribute of tag
+	 * @param {string} pluginName Plugin name (image, video, audio)
+	 * @returns {Array}
+	 */
+	getFilesInfo: function (pluginName) {
+		return this.context[pluginName] ? this.context[pluginName]._infoList : [];
+	},
+
+	/**
+	 * @description Add or reset option property (Editor is reloaded)
+	 * @param {Object} _options Options
+	 */
+	setOptions: function (_options) {
+		this.eventManager._removeAllEvents();
+		this._resetComponents();
+
+		domUtils.removeClass(this._styleCommandMap.showBlocks, 'active');
+		domUtils.removeClass(this._styleCommandMap.codeView, 'active');
+		this.status.isCodeView = false;
+		this._iframeAuto = null;
+
+		this.plugins = _options.plugins || this.plugins; //@todo plugins don't reset
+		const mergeOptions = [this.options, _options].reduce(function (init, option) {
+			for (let key in option) {
+				if (!option.hasOwnProperty(key)) continue;
+				if (key === 'plugins' && option[key] && init[key]) {
+					let i = init[key],
+						o = option[key];
+					i = i.length
+						? i
+						: this._w.Object.keys(i).map(function (name) {
+								return i[name];
+						  });
+					o = o.length
+						? o
+						: this._w.Object.keys(o).map(function (name) {
+								return o[name];
+						  });
+					init[key] = o
+						.filter(function (val) {
+							return i.indexOf(val) === -1;
+						})
+						.concat(i);
+				} else {
+					init[key] = option[key];
+				}
+			}
+			return init;
+		}, {});
+
+		const el = this.context.element;
+		const _initHTML = el.wysiwyg.innerHTML;
+
+		// set option
+		const cons = ResetOptions(mergeOptions, this.context, this.options);
+
+		if (cons.callButtons) {
+			this._pluginCallButtons = cons.callButtons;
+			this.initPlugins = {};
+		}
+
+		if (cons.plugins) {
+			this.plugins = cons.plugins;
+		}
+
+		// reset context
+		if (el._menuTray.children.length === 0) this.menu._menuTrayMap = {};
+		this._responsiveButtons = this.toolbar._responsiveButtons = cons.toolbar.responsiveButtons;
+		this.options = mergeOptions; //@todo option, lang.. dont't reset
+		this.lang = this.options.lang;
+
+		if (this.options.iframe) {
+			el.wysiwygFrame.addEventListener('load', function () {
+				converter._setIframeDocument(this, this.options);
+				this._setOptionsInit(el, _initHTML);
+			});
+		}
+
+		el.editorArea.appendChild(el.wysiwygFrame);
+
+		if (!this.options.iframe) {
+			this._setOptionsInit(el, _initHTML);
+		}
+	},
+
+	/**
+	 * @description Set "options.editorCSSText" style.
+	 * Define the style of the edit area
+	 * It can also be defined with the "setOptions" method, but the "setEditorCSSText" method does not render the editor again.
+	 * @param {string} style Style string
+	 */
+	setEditorCSSText: function (style) {
+		const newStyles = (this.options._editorStyles = converter._setDefaultOptionStyle(this.options, style));
+		const el = this.context.element;
+
+		// top area
+		el.topArea.style.cssText = newStyles.top;
+		// code view
+		el.code.style.cssText = this.options._editorStyles.frame;
+		el.code.style.display = 'none';
+		if (this.options.height === 'auto') {
+			el.code.style.overflow = 'hidden';
+		} else {
+			el.code.style.overflow = '';
+		}
+		// wysiwyg frame
+		if (!this.options.iframe) {
+			el.wysiwygFrame.style.cssText = newStyles.frame + newStyles.editor;
+		} else {
+			el.wysiwygFrame.style.cssText = newStyles.frame;
+			el.wysiwyg.style.cssText = newStyles.editor;
+		}
+	},
+
+	/**
+	 * @description Set direction to "rtl" or "ltr".
+	 * @param {string} dir "rtl" or "ltr"
+	 */
+	setDir: function (dir) {
+		const rtl = dir === 'rtl';
+		const changeDir = this._prevRtl !== rtl;
+		const el = this.context.element;
+		const buttons = this.context.buttons;
+		this._prevRtl = this.options._rtl = rtl;
+
+		if (changeDir) {
+			// align buttons
+			if (this.plugins.align) {
+				this.plugins.align.exchangeDir.call(this);
+			}
+			// indent buttons
+			if (buttons.indent) domUtils.changeElement(buttons.indent.firstElementChild, icons.indent);
+			if (buttons.outdent) domUtils.changeElement(buttons.outdent.firstElementChild, icons.outdent);
+		}
+
+		if (rtl) {
+			domUtils.addClass(el.topArea, 'se-rtl');
+			domUtils.addClass(el.wysiwygFrame, 'se-rtl');
+		} else {
+			domUtils.removeClass(el.topArea, 'se-rtl');
+			domUtils.removeClass(el.wysiwygFrame, 'se-rtl');
+		}
+
+		const lineNodes = domUtils.getListChildren(
+			el.wysiwyg,
+			function (current) {
+				return this.format.isLine(current) && (current.style.marginRight || current.style.marginLeft || current.style.textAlign);
+			}.bind(this)
+		);
+
+		for (let i = 0, len = lineNodes.length, n, l, r; i < len; i++) {
+			n = lineNodes[i];
+			// indent margin
+			r = n.style.marginRight;
+			l = n.style.marginLeft;
+			if (r || l) {
+				n.style.marginRight = l;
+				n.style.marginLeft = r;
+			}
+			// text align
+			r = n.style.textAlign;
+			if (r === 'left') n.style.textAlign = 'right';
+			else if (r === 'right') n.style.textAlign = 'left';
+		}
+
+		if (buttons.dir) {
+			domUtils.changeTxt(buttons.dir.querySelector('.se-tooltip-text'), this.lang.toolbar[options._rtl ? 'dir_ltr' : 'dir_rtl']);
+			domUtils.changeElement(buttons.dir.firstElementChild, icons[this.options._rtl ? 'dir_ltr' : 'dir_rtl']);
+		}
+
+		if (buttons.dir_ltr) {
+			if (rtl) domUtils.removeClass(buttons.dir_ltr, 'active');
+			else domUtils.addClass(buttons.dir_ltr, 'active');
+		}
+
+		if (buttons.dir_rtl) {
+			if (rtl) domUtils.addClass(buttons.dir_rtl, 'active');
+			else domUtils.removeClass(buttons.dir_rtl, 'active');
+		}
 	},
 
 	/**
 	 * @description Changes to code view or wysiwyg view
+	 * @param {boolean|undefined} value true/false, If undefined toggle the codeView mode.
 	 */
-	setCodeView: function (value) {
+	codeView: function (value) {
+		if (value === undefined) value = !this.status.isCodeView;
 		this.menu.controllerOff();
 		domUtils.setDisabled(value, this.codeViewDisabledButtons);
 		const _var = this._transformStatus;
@@ -918,7 +1027,7 @@ Core.prototype = {
 				}
 			}
 
-			this.nativeFocus();
+			this._nativeFocus();
 			domUtils.removeClass(this._styleCommandMap.codeView, 'active');
 
 			// history stack
@@ -958,78 +1067,15 @@ Core.prototype = {
 		if (this.status.isReadOnly) domUtils.setDisabled(true, this.resizingDisabledButtons);
 
 		// user event
-		if (typeof this.events.setCodeView === 'function') this.events.setCodeView(this.status.isCodeView);
-	},
-
-	/**
-	 * @description Convert the data of the code view and put it in the WYSIWYG area.
-	 * @private
-	 */
-	_setCodeDataToEditor: function () {
-		const code_html = this._getCodeView();
-
-		if (this.options.iframe_fullPage) {
-			const parseDocument = _parser.parseFromString(code_html, 'text/html');
-			const headChildren = parseDocument.head.children;
-
-			for (let i = 0, len = headChildren.length; i < len; i++) {
-				if (/^script$/i.test(headChildren[i].tagName)) {
-					parseDocument.head.removeChild(headChildren[i]);
-					i--, len--;
-				}
-			}
-
-			let headers = parseDocument.head.innerHTML;
-			if (!parseDocument.head.querySelector('link[rel="stylesheet"]') || (this.options.height === 'auto' && !parseDocument.head.querySelector('style'))) {
-				headers += converter._setIframeCssTags(this.options);
-			}
-
-			this._wd.head.innerHTML = headers;
-			this._wd.body.innerHTML = this.convertContentForEditor(parseDocument.body.innerHTML);
-
-			const attrs = parseDocument.body.attributes;
-			for (let i = 0, len = attrs.length; i < len; i++) {
-				if (attrs[i].name === 'contenteditable') continue;
-				this._wd.body.setAttribute(attrs[i].name, attrs[i].value);
-			}
-			if (!domUtils.hasClass(this._wd.body, 'sun-editor-editable')) {
-				const editableClasses = this.options._editableClass.split(' ');
-				for (let i = 0; i < editableClasses.length; i++) {
-					domUtils.addClass(this._wd.body, this.options._editableClass[i]);
-				}
-			}
-		} else {
-			this.context.element.wysiwyg.innerHTML = code_html.length > 0 ? this.convertContentForEditor(code_html) : '<' + this.options.defaultLineTag + '><br></' + this.options.defaultLineTag + '>';
-		}
-	},
-
-	/**
-	 * @description Convert the data of the WYSIWYG area and put it in the code view area.
-	 * @private
-	 */
-	_setEditorDataToCodeView: function () {
-		const codeContent = this.convertHTMLForCodeView(this.context.element.wysiwyg, false);
-		let codeValue = '';
-
-		if (this.options.iframe_fullPage) {
-			const attrs = domUtils.getAttributesToString(this._wd.body, null);
-			codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContent + '</body>\n</html>';
-		} else {
-			codeValue = codeContent;
-		}
-
-		this.context.element.code.style.display = 'block';
-		this.context.element.wysiwygFrame.style.display = 'none';
-
-		this._setCodeView(codeValue);
+		if (typeof this.events.onToggleCodeView === 'function') this.events.onToggleCodeView(this.status.isCodeView);
 	},
 
 	/**
 	 * @description Changes to full screen or default screen
-	 * @param {Element} element full screen button
-	 * @param {boolean} value true/false
+	 * @param {boolean|undefined} value true/false, If undefined toggle the codeView mode.
 	 */
-	setFullScreen: function (value) {
+	fullScreen: function (value) {
+		if (value === undefined) value = !this.status.isCodeView;
 		const topArea = this.context.element.topArea;
 		const toolbar = this.context.element.toolbar;
 		const editorArea = this.context.element.editorArea;
@@ -1136,7 +1182,24 @@ Core.prototype = {
 		if (wasToolbarHidden) functions.toolbar.hide();
 
 		// user event
-		if (typeof this.events.setFullScreen === 'function') this.events.setFullScreen(this.status.isFullScreen);
+		if (typeof this.events.onToggleFullScreen === 'function') this.events.onToggleFullScreen(this.status.isFullScreen);
+	},
+
+	/**
+	 * @description Add or remove the class name of "body" so that the code block is visible
+	 * @param {boolean|undefined} value true/false, If undefined toggle the codeView mode.
+	 */
+	showBlocks: function (value) {
+		if (value === undefined) value = !this.status.isShowBlocks;
+
+		if (value) {
+			domUtils.addClass(this.context.element.wysiwyg, 'se-show-block');
+			domUtils.addClass(this._styleCommandMap.showBlocks, 'active');
+		} else {
+			domUtils.removeClass(this.context.element.wysiwyg, 'se-show-block');
+			domUtils.removeClass(this._styleCommandMap.showBlocks, 'active');
+		}
+		this._resourcesStateChange();
 	},
 
 	/**
@@ -1190,7 +1253,7 @@ Core.prototype = {
 					throw Error('[SUNEDITOR.print.fail] error: ' + error);
 				} finally {
 					this.closeLoading();
-					domUtils.remove(iframe);
+					domUtils.removeItem(iframe);
 				}
 			}.bind(this),
 			1000
@@ -1249,419 +1312,6 @@ Core.prototype = {
 	},
 
 	/**
-	 * @description Set direction to "rtl" or "ltr".
-	 * @param {string} dir "rtl" or "ltr"
-	 */
-	setDir: function (dir) {
-		const rtl = dir === 'rtl';
-		const changeDir = this._prevRtl !== rtl;
-		const el = this.context.element;
-		const buttons = this.context.buttons;
-		this._prevRtl = this.options._rtl = rtl;
-
-		if (changeDir) {
-			// align buttons
-			if (this.plugins.align) {
-				this.plugins.align.exchangeDir.call(this);
-			}
-			// indent buttons
-			if (buttons.indent) domUtils.changeElement(buttons.indent.firstElementChild, icons.indent);
-			if (buttons.outdent) domUtils.changeElement(buttons.outdent.firstElementChild, icons.outdent);
-		}
-
-		if (rtl) {
-			domUtils.addClass(el.topArea, 'se-rtl');
-			domUtils.addClass(el.wysiwygFrame, 'se-rtl');
-		} else {
-			domUtils.removeClass(el.topArea, 'se-rtl');
-			domUtils.removeClass(el.wysiwygFrame, 'se-rtl');
-		}
-
-		const lineNodes = domUtils.getListChildren(
-			el.wysiwyg,
-			function (current) {
-				return this.format.isLine(current) && (current.style.marginRight || current.style.marginLeft || current.style.textAlign);
-			}.bind(this)
-		);
-
-		for (let i = 0, len = lineNodes.length, n, l, r; i < len; i++) {
-			n = lineNodes[i];
-			// indent margin
-			r = n.style.marginRight;
-			l = n.style.marginLeft;
-			if (r || l) {
-				n.style.marginRight = l;
-				n.style.marginLeft = r;
-			}
-			// text align
-			r = n.style.textAlign;
-			if (r === 'left') n.style.textAlign = 'right';
-			else if (r === 'right') n.style.textAlign = 'left';
-		}
-
-		if (buttons.dir) {
-			domUtils.changeTxt(buttons.dir.querySelector('.se-tooltip-text'), this.lang.toolbar[options._rtl ? 'dir_ltr' : 'dir_rtl']);
-			domUtils.changeElement(buttons.dir.firstElementChild, icons[this.options._rtl ? 'dir_ltr' : 'dir_rtl']);
-		}
-
-		if (buttons.dir_ltr) {
-			if (rtl) domUtils.removeClass(buttons.dir_ltr, 'active');
-			else domUtils.addClass(buttons.dir_ltr, 'active');
-		}
-
-		if (buttons.dir_rtl) {
-			if (rtl) domUtils.addClass(buttons.dir_rtl, 'active');
-			else domUtils.removeClass(buttons.dir_rtl, 'active');
-		}
-	},
-
-	/**
-	 * @description Sets the HTML string
-	 * @param {string|undefined} html HTML string
-	 */
-	setContent: function (html) {
-		this.removeRange();
-
-		const convertValue = html === null || html === undefined ? '' : this.convertContentForEditor(html);
-		this._resetComponents();
-
-		if (!this.status.isCodeView) {
-			this.context.element.wysiwyg.innerHTML = convertValue;
-			// history stack
-			this.history.push(false);
-		} else {
-			const value = this.convertHTMLForCodeView(convertValue, false);
-			this._setCodeView(value);
-		}
-	},
-
-	/**
-	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
-	 * @param {Object} ctx { head: HTML string, body: HTML string}
-	 */
-	setFullPageContent: function (ctx) {
-		if (!this.options.iframe) return false;
-		if (ctx.head) this._wd.head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
-		if (ctx.body) this._wd.body.innerHTML = this.convertContentForEditor(ctx.body);
-	},
-
-	/**
-	 * @description Gets the current content
-	 * @param {boolean} withFrame Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
-	 * Ignored for options.iframe_fullPage is true.
-	 * @param {boolean} includeFullPage Return only the content of the body without headers when the "iframe_fullPage" option is true
-	 * @returns {Object}
-	 */
-	getContent: function (withFrame, includeFullPage) {
-		const renderHTML = domUtils.createElement('DIV', null, this.convertHTMLForCodeView(this.context.element.wysiwyg, true));
-		const figcaptions = domUtils.getListChildren(renderHTML, function (current) {
-			return /FIGCAPTION/i.test(current.nodeName);
-		});
-
-		for (let i = 0, len = figcaptions.length; i < len; i++) {
-			figcaptions[i].removeAttribute('contenteditable');
-		}
-
-		if (this.options.iframe_fullPage) {
-			if (includeFullPage) {
-				const attrs = domUtils.getAttributesToString(this._wd.body, ['contenteditable']);
-				return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + '<body ' + attrs + '>' + renderHTML.innerHTML + '</body></html>';
-			} else {
-				return renderHTML.innerHTML;
-			}
-		} else {
-			return withFrame ? '<div class="sun-editor-editable' + (this.options._rtl ? ' se-rtl' : '') + '">' + renderHTML.innerHTML + '</div>' : renderHTML.innerHTML;
-		}
-	},
-
-	/**
-	 * @description Gets the clean HTML code for editor
-	 * @param {string} html HTML string
-	 * @param {string|RegExp|null} whitelist Regular expression of allowed tags.
-	 * RegExp object is create by helper.converter.createElementWhitelist method.
-	 * @param {string|RegExp|null} blacklist Regular expression of disallowed tags.
-	 * RegExp object is create by helper.converter.createElementBlacklist method.
-	 * @returns {string}
-	 */
-	cleanHTML: function (html, whitelist, blacklist) {
-		html = this._deleteDisallowedTags(_parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, true));
-
-		const dom = this._d.createRange().createContextualFragment(html, true);
-		try {
-			this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, true);
-		} catch (error) {
-			console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
-		}
-
-		if (this._managedElementInfo && this._managedElementInfo.query) {
-			const textCompList = dom.querySelectorAll(this._managedElementInfo.query);
-			for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
-				classList = [].slice.call(textCompList[i].classList);
-				for (let c = 0, cLen = classList.length; c < cLen; c++) {
-					initMethod = this._managedElementInfo.map[classList[c]];
-					if (initMethod) {
-						initMethod(textCompList[i]);
-						break;
-					}
-				}
-			}
-		}
-
-		const domTree = dom.childNodes;
-		let cleanData = '';
-		let requireFormat = false;
-
-		for (let i = 0, len = domTree.length, t; i < len; i++) {
-			t = domTree[i];
-			if (t.nodeType === 1 && !this.format.isTextStyleNode(t) && !domUtils.isBreak(t) && !DisallowedElements(t)) {
-				requireFormat = true;
-				break;
-			}
-		}
-
-		for (let i = 0, len = domTree.length; i < len; i++) {
-			cleanData += this._makeLine(domTree[i], requireFormat);
-		}
-
-		cleanData = this.node.removeWhiteSpace(cleanData);
-
-		if (!cleanData) {
-			cleanData = html;
-		} else {
-			if (whitelist) cleanData = cleanData.replace(typeof whitelist === 'string' ? converter.createElementWhitelist(whitelist) : whitelist, '');
-			if (blacklist) cleanData = cleanData.replace(typeof blacklist === 'string' ? converter.createElementBlacklist(blacklist) : blacklist, '');
-		}
-
-		return this._tagConvertor(cleanData);
-	},
-
-	/**
-	 * @description Converts content into a format that can be placed in an editor
-	 * @param {string} content content
-	 * @returns {string}
-	 */
-	convertContentForEditor: function (content) {
-		content = this._deleteDisallowedTags(_parser.parseFromString(content, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, false));
-		const dom = this._d.createRange().createContextualFragment(content, false);
-
-		try {
-			this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, false);
-		} catch (error) {
-			console.warn('[SUNEDITOR.convertContentForEditor.consistencyCheck.fail] ' + error);
-		}
-
-		if (this._managedElementInfo && this._managedElementInfo.query) {
-			const textCompList = dom.querySelectorAll(this._managedElementInfo.query);
-			for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
-				classList = [].slice.call(textCompList[i].classList);
-				for (let c = 0, cLen = classList.length; c < cLen; c++) {
-					initMethod = this._managedElementInfo.map[classList[c]];
-					if (initMethod) {
-						initMethod(textCompList[i]);
-						break;
-					}
-				}
-			}
-		}
-
-		const domTree = dom.childNodes;
-		let cleanData = '',
-			p = null;
-		for (let i = 0, t; i < domTree.length; i++) {
-			t = domTree[i];
-
-			if (!this.format.isLine(t) && !this.component.is(t) && !domUtils.isMedia(t)) {
-				if (!p) p = domUtils.createElement(this.options.defaultLineTag);
-				p.appendChild(t);
-				i--;
-				if (domTree[i + 1] && !this.format.isLine(domTree[i + 1])) {
-					continue;
-				} else {
-					t = p;
-					p = null;
-				}
-			}
-
-			if (p) {
-				cleanData += this._makeLine(p, true);
-				p = null;
-			}
-			cleanData += this._makeLine(t, true);
-		}
-		if (p) cleanData += this._makeLine(p, true);
-
-		if (cleanData.length === 0) return '<' + this.options.defaultLineTag + '><br></' + this.options.defaultLineTag + '>';
-
-		cleanData = this.node.removeWhiteSpace(cleanData);
-		return this._tagConvertor(cleanData);
-	},
-
-	/**
-	 * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
-	 * @param {Element|String} html WYSIWYG element (context.element.wysiwyg) or HTML string.
-	 * @param {Boolean} comp If true, does not line break and indentation of tags.
-	 * @returns {string}
-	 */
-	convertHTMLForCodeView: function (html, comp) {
-		let returnHTML = '';
-		const wRegExp = this._w.RegExp;
-		const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
-		const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
-		const isFormat = function (current) {
-			return this.format.isLine(current) || this.component.is(current);
-		}.bind(this);
-		const brChar = comp ? '' : '\n';
-
-		let indentSize = comp ? 0 : this.status.codeIndent * 1;
-		indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(' ') : '';
-
-		(function recursionFunc(element, indent) {
-			const children = element.childNodes;
-			const elementRegTest = brReg.test(element.nodeName);
-			const elementIndent = elementRegTest ? indent : '';
-
-			for (let i = 0, len = children.length, node, br, lineBR, nodeRegTest, tag, tagIndent; i < len; i++) {
-				node = children[i];
-				nodeRegTest = brReg.test(node.nodeName);
-				br = nodeRegTest ? brChar : '';
-				lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? brChar : '';
-
-				if (node.nodeType === 8) {
-					returnHTML += '\n<!-- ' + node.textContent.trim() + ' -->' + br;
-					continue;
-				}
-				if (node.nodeType === 3) {
-					if (!domUtils.isList(node.parentElement)) returnHTML += converter.htmlToEntity(/^\n+$/.test(node.data) ? '' : node.data);
-					continue;
-				}
-				if (node.childNodes.length === 0) {
-					returnHTML += (/^HR$/i.test(node.nodeName) ? brChar : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + node.outerHTML + br;
-					continue;
-				}
-
-				if (!node.outerHTML) {
-					// IE
-					returnHTML += new _w.XMLSerializer().serializeToString(node);
-				} else {
-					tag = node.nodeName.toLowerCase();
-					tagIndent = elementIndent || nodeRegTest ? indent : '';
-					returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
-					recursionFunc(node, indent + indentSize, '');
-					returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? brChar : '' || /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
-				}
-			}
-		})(wDoc, '');
-
-		return returnHTML.trim() + brChar;
-	},
-
-	/**
-	 * @description Add or reset option property (Editor is reloaded)
-	 * @param {Object} _options Options
-	 */
-	setOptions: function (_options) {
-		this.eventManager._removeAllEvents();
-		this._resetComponents();
-
-		domUtils.removeClass(this._styleCommandMap.showBlocks, 'active');
-		domUtils.removeClass(this._styleCommandMap.codeView, 'active');
-		this.status.isCodeView = false;
-		this._iframeAuto = null;
-
-		this.plugins = _options.plugins || this.plugins; //@todo plugins don't reset
-		const mergeOptions = [this.options, _options].reduce(function (init, option) {
-			for (let key in option) {
-				if (!option.hasOwnProperty(key)) continue;
-				if (key === 'plugins' && option[key] && init[key]) {
-					let i = init[key],
-						o = option[key];
-					i = i.length
-						? i
-						: this._w.Object.keys(i).map(function (name) {
-								return i[name];
-						  });
-					o = o.length
-						? o
-						: this._w.Object.keys(o).map(function (name) {
-								return o[name];
-						  });
-					init[key] = o
-						.filter(function (val) {
-							return i.indexOf(val) === -1;
-						})
-						.concat(i);
-				} else {
-					init[key] = option[key];
-				}
-			}
-			return init;
-		}, {});
-
-		const el = this.context.element;
-		const _initHTML = el.wysiwyg.innerHTML;
-
-		// set option
-		const cons = ResetOptions(mergeOptions, this.context, this.options);
-
-		if (cons.callButtons) {
-			this._pluginCallButtons = cons.callButtons;
-			this.initPlugins = {};
-		}
-
-		if (cons.plugins) {
-			this.plugins = cons.plugins;
-		}
-
-		// reset context
-		if (el._menuTray.children.length === 0) this.menu._menuTrayMap = {};
-		this.toolbar._responsiveButtons = cons.toolbar.responsiveButtons;
-		this.options = mergeOptions; //@todo option, lang.. dont't reset
-		this.lang = this.options.lang;
-
-		if (this.options.iframe) {
-			el.wysiwygFrame.addEventListener('load', function () {
-				converter._setIframeDocument(this, this.options);
-				this._setOptionsInit(el, _initHTML);
-			});
-		}
-
-		el.editorArea.appendChild(el.wysiwygFrame);
-
-		if (!this.options.iframe) {
-			this._setOptionsInit(el, _initHTML);
-		}
-	},
-
-	/**
-	 * @description Set "options.editorCSSText" style.
-	 * Define the style of the edit area
-	 * It can also be defined with the "setOptions" method, but the "setEditorCSSText" method does not render the editor again.
-	 * @param {string} style Style string
-	 */
-	setEditorCSSText: function (style) {
-		const newStyles = (this.options._editorStyles = converter._setDefaultOptionStyle(this.options, style));
-		const el = this.context.element;
-
-		// top area
-		el.topArea.style.cssText = newStyles.top;
-		// code view
-		el.code.style.cssText = this.options._editorStyles.frame;
-		el.code.style.display = 'none';
-		if (this.options.height === 'auto') {
-			el.code.style.overflow = 'hidden';
-		} else {
-			el.code.style.overflow = '';
-		}
-		// wysiwyg frame
-		if (!this.options.iframe) {
-			el.wysiwygFrame.style.cssText = newStyles.frame + newStyles.editor;
-		} else {
-			el.wysiwygFrame.style.cssText = newStyles.frame;
-			el.wysiwyg.style.cssText = newStyles.editor;
-		}
-	},
-
-	/**
 	 * @description Copying the content of the editor to the original textarea and execute onSave callback.
 	 */
 	save: function () {
@@ -1671,55 +1321,6 @@ Core.prototype = {
 			this.events.onSave(content, core);
 			return;
 		}
-	},
-
-	/**
-	 * @description Gets only the text of the suneditor content
-	 * @returns {string}
-	 */
-	getText: function () {
-		return this.context.element.wysiwyg.textContent;
-	},
-
-	/**
-	 * @description Gets uploaded files(plugin using fileManager) information list.
-	 * image: [img], video: [video, iframe], audio: [audio]
-	 * - index: data index
-	 * - name: file name
-	 * - size: file size
-	 * - select: select function
-	 * - delete: delete function
-	 * - element: target element
-	 * - src: src attribute of tag
-	 * @param {string} pluginName Plugin name (image, video, audio)
-	 * @returns {Array}
-	 */
-	getFilesInfo: function (pluginName) {
-		return this.context[pluginName] ? this.context[pluginName]._infoList : [];
-	},
-
-	/**
-	 * @description Add content to the suneditor
-	 * @param {string} content Content to Input
-	 */
-	appendContent: function (content) {
-		const convertValue = this.convertContentForEditor(content);
-
-		if (!this.status.isCodeView) {
-			const temp = domUtils.createElement('DIV', null, convertValue);
-			const wysiwyg = this.context.element.wysiwyg;
-			const children = temp.children;
-			for (let i = 0, len = children.length; i < len; i++) {
-				if (children[i]) {
-					wysiwyg.appendChild(children[i]);
-				}
-			}
-		} else {
-			this._setCodeView(this._getCodeView() + '\n' + this.convertHTMLForCodeView(convertValue, false));
-		}
-
-		// history stack
-		this.history.push(false);
 	},
 
 	/**
@@ -1807,8 +1408,8 @@ Core.prototype = {
 		this.eventManager._removeAllEvents();
 
 		/** remove element */
-		domUtils.remove(this.context.element.toolbar);
-		domUtils.remove(this.context.element.topArea);
+		domUtils.removeItem(this.context.element.toolbar);
+		domUtils.removeItem(this.context.element.topArea);
 
 		/** remove object reference */
 		for (let k in this.context) {
@@ -1821,200 +1422,151 @@ Core.prototype = {
 		}
 	},
 
-	// ----- private methods -----
 	/**
-	 * @description Returns HTML string according to tag type and configuration.
-	 * Use only "cleanHTML"
-	 * @param {Node} node Node
-	 * @param {boolean} requireFormat If true, text nodes that do not have a format node is wrapped with the format tag.
-	 * @private
+	 * @description Show loading box
 	 */
-	_makeLine: function (node, requireFormat) {
-		const defaultLineTag = this.options.defaultLineTag;
-		// element
-		if (node.nodeType === 1) {
-			if (DisallowedElements(node)) return '';
-			if (!requireFormat || this.format.isLine(node) || this.format.isBlock(node) || this.component.is(node) || domUtils.isMedia(node) || (domUtils.isAnchor(node) && domUtils.isMedia(node.firstElementChild))) {
-				return node.outerHTML;
-			} else {
-				return '<' + defaultLineTag + '>' + node.outerHTML + '</' + defaultLineTag + '>';
-			}
-		}
-		// text
-		if (node.nodeType === 3) {
-			if (!requireFormat) return converter.htmlToEntity(node.textContent);
-			const textArray = node.textContent.split(/\n/g);
-			let html = '';
-			for (let i = 0, tLen = textArray.length, text; i < tLen; i++) {
-				text = textArray[i].trim();
-				if (text.length > 0) html += '<' + defaultLineTag + '>' + converter.htmlToEntity(text) + '</' + defaultLineTag + '>';
-			}
-			return html;
-		}
-		// comments
-		if (node.nodeType === 8 && this._allowHTMLComment) {
-			return '<!--' + node.textContent.trim() + '-->';
-		}
-
-		return '';
+	openLoading: function () {
+		this.context.element.loading.style.display = 'block';
 	},
 
 	/**
-	 * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
-	 * @param {string} text
-	 * @returns {string} HTML string
-	 * @private
+	 * @description Close loading box
 	 */
-	_tagConvertor: function (text) {
-		if (!this._disallowedStyleNodesRegExp) return text;
-
-		const ec = this.options._styleNodeMap;
-		return text.replace(this._disallowedStyleNodesRegExp, function (m, t, n, p) {
-			return t + (typeof ec[n] === 'string' ? ec[n] : n) + (p ? ' ' + p : '');
-		});
+	closeLoading: function () {
+		this.context.element.loading.style.display = 'none';
 	},
 
 	/**
-	 * @description Delete disallowed tags
-	 * @param {string} html HTML string
+	 * @description Focus to wysiwyg area using "native focus function"
+	 */
+	_nativeFocus: function () {
+		this.selection.__focus();
+		this.selection._init();
+	},
+
+	/**
+	 * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
+	 * @param {Element|String} html WYSIWYG element (context.element.wysiwyg) or HTML string.
+	 * @param {Boolean} comp If true, does not line break and indentation of tags.
 	 * @returns {string}
-	 * @private
 	 */
-	_deleteDisallowedTags: function (html) {
-		return html
-			.replace(/\n/g, '')
-			.replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '')
-			.replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '')
-			.replace(this._elementWhitelistRegExp, '')
-			.replace(this._elementBlacklistRegExp, '');
+	_convertHTMLForCodeView: function (html, comp) {
+		let returnHTML = '';
+		const wRegExp = this._w.RegExp;
+		const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
+		const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
+		const isFormat = function (current) {
+			return this.format.isLine(current) || this.component.is(current);
+		}.bind(this);
+		const brChar = comp ? '' : '\n';
+
+		let indentSize = comp ? 0 : this.status.codeIndent * 1;
+		indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(' ') : '';
+
+		(function recursionFunc(element, indent) {
+			const children = element.childNodes;
+			const elementRegTest = brReg.test(element.nodeName);
+			const elementIndent = elementRegTest ? indent : '';
+
+			for (let i = 0, len = children.length, node, br, lineBR, nodeRegTest, tag, tagIndent; i < len; i++) {
+				node = children[i];
+				nodeRegTest = brReg.test(node.nodeName);
+				br = nodeRegTest ? brChar : '';
+				lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? brChar : '';
+
+				if (node.nodeType === 8) {
+					returnHTML += '\n<!-- ' + node.textContent.trim() + ' -->' + br;
+					continue;
+				}
+				if (node.nodeType === 3) {
+					if (!domUtils.isList(node.parentElement)) returnHTML += converter.htmlToEntity(/^\n+$/.test(node.data) ? '' : node.data);
+					continue;
+				}
+				if (node.childNodes.length === 0) {
+					returnHTML += (/^HR$/i.test(node.nodeName) ? brChar : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + node.outerHTML + br;
+					continue;
+				}
+
+				if (!node.outerHTML) {
+					// IE
+					returnHTML += new _w.XMLSerializer().serializeToString(node);
+				} else {
+					tag = node.nodeName.toLowerCase();
+					tagIndent = elementIndent || nodeRegTest ? indent : '';
+					returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
+					recursionFunc(node, indent + indentSize, '');
+					returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? brChar : '' || /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
+				}
+			}
+		})(wDoc, '');
+
+		return returnHTML.trim() + brChar;
 	},
 
 	/**
-	 * @description Fix tags that do not fit the editor format.
-	 * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
-	 * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist (core._htmlCheckWhitelistRegExp)
-	 * @param {RegExp} htmlCheckBlacklistRegExp Editor tags blacklist (core._htmlCheckBlacklistRegExp)
-	 * @param {Boolean} lowLevelCheck Row level check
+	 * @description Convert the data of the code view and put it in the WYSIWYG area.
 	 * @private
 	 */
-	_consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, lowLevelCheck) {
-		/**
-		 * It is can use ".children(domUtils.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
-		 * So check the node type and exclude the text no (current.nodeType !== 1)
-		 */
-		const removeTags = [],
-			emptyTags = [],
-			wrongList = [],
-			withoutFormatCells = [];
+	_setCodeDataToEditor: function () {
+		const code_html = this._getCodeView();
 
-		// wrong position
-		const wrongTags = domUtils.getListChildNodes(
-			documentFragment,
-			function (current) {
-				if (current.nodeType !== 1) {
-					if (domUtils.isList(current.parentNode)) removeTags.push(current);
-					return false;
+		if (this.options.iframe_fullPage) {
+			const parseDocument = this._parser.parseFromString(code_html, 'text/html');
+			const headChildren = parseDocument.head.children;
+
+			for (let i = 0, len = headChildren.length; i < len; i++) {
+				if (/^script$/i.test(headChildren[i].tagName)) {
+					parseDocument.head.removeChild(headChildren[i]);
+					i--, len--;
 				}
-
-				// white list
-				if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && this.format.isNotCheckingNode(current))) {
-					removeTags.push(current);
-					return false;
-				}
-
-				const nrtag = !domUtils.getParentElement(current, this.isNotCheckingNode);
-				// empty tags
-				if (!domUtils.isTable(current) && !domUtils.isListCell(current) && !domUtils.isAnchor(current) && (this.format.isLine(current) || this.format.isBlock(current) || this.format.isTextStyleNode(current)) && current.childNodes.length === 0 && nrtag) {
-					emptyTags.push(current);
-					return false;
-				}
-
-				// wrong list
-				if (domUtils.isList(current.parentNode) && !domUtils.isList(current) && !domUtils.isListCell(current)) {
-					wrongList.push(current);
-					return false;
-				}
-
-				// table cells
-				if (domUtils.isTableCell(current)) {
-					const fel = current.firstElementChild;
-					if (!this.format.isLine(fel) && !this.format.isBlock(fel) && !this.component.is(fel)) {
-						withoutFormatCells.push(current);
-						return false;
-					}
-				}
-
-				const result =
-					current.parentNode !== documentFragment &&
-					nrtag &&
-					((domUtils.isListCell(current) && !domUtils.isList(current.parentNode)) || (lowLevelCheck && (this.format.isLine(current) || this.component.is(current)) && !this.format.isBlock(current.parentNode) && !domUtils.getParentElement(current, this.component.is)));
-
-				return result;
-			}.bind(this)
-		);
-
-		for (let i = 0, len = removeTags.length; i < len; i++) {
-			this.removeItem(removeTags[i]);
-		}
-
-		const checkTags = [];
-		for (let i = 0, len = wrongTags.length, t, p; i < len; i++) {
-			t = wrongTags[i];
-			p = t.parentNode;
-			if (!p || !p.parentNode) continue;
-
-			if (this.getParentElement(t, this.isListCell)) {
-				const cellChildren = t.childNodes;
-				for (let j = cellChildren.length - 1; len >= 0; j--) {
-					p.insertBefore(t, cellChildren[j]);
-				}
-				checkTags.push(t);
-			} else {
-				p.parentNode.insertBefore(t, p);
-				checkTags.push(p);
 			}
-		}
 
-		for (let i = 0, len = checkTags.length, t; i < len; i++) {
-			t = checkTags[i];
-			if (this.onlyZeroWidthSpace(t.textContent.trim())) {
-				this.removeItem(t);
+			let headers = parseDocument.head.innerHTML;
+			if (!parseDocument.head.querySelector('link[rel="stylesheet"]') || (this.options.height === 'auto' && !parseDocument.head.querySelector('style'))) {
+				headers += converter._setIframeCssTags(this.options);
 			}
-		}
 
-		for (let i = 0, len = emptyTags.length; i < len; i++) {
-			this.removeItem(emptyTags[i]);
-		}
+			this._wd.head.innerHTML = headers;
+			this._wd.body.innerHTML = this.html.clean(parseDocument.body.innerHTML, true, null, null);
 
-		for (let i = 0, len = wrongList.length, t, tp, children, p; i < len; i++) {
-			t = wrongList[i];
-			p = t.parentNode;
-			if (!p) continue;
-
-			tp = this.createElement('LI');
-
-			if (this.isFormatElement(t)) {
-				children = t.childNodes;
-				while (children[0]) {
-					tp.appendChild(children[0]);
+			const attrs = parseDocument.body.attributes;
+			for (let i = 0, len = attrs.length; i < len; i++) {
+				if (attrs[i].name === 'contenteditable') continue;
+				this._wd.body.setAttribute(attrs[i].name, attrs[i].value);
+			}
+			if (!domUtils.hasClass(this._wd.body, 'sun-editor-editable')) {
+				const editableClasses = this.options._editableClass.split(' ');
+				for (let i = 0; i < editableClasses.length; i++) {
+					domUtils.addClass(this._wd.body, this.options._editableClass[i]);
 				}
-				p.insertBefore(tp, t);
-				this.removeItem(t);
-			} else {
-				t = t.nextSibling;
-				tp.appendChild(wrongList[i]);
-				p.insertBefore(tp, t);
 			}
-		}
-
-		for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {
-			t = withoutFormatCells[i];
-			f = this.createElement('DIV');
-			f.innerHTML = t.textContent.trim().length === 0 && t.children.length === 0 ? '<br>' : t.innerHTML;
-			t.innerHTML = f.outerHTML;
+		} else {
+			this.context.element.wysiwyg.innerHTML = code_html.length > 0 ? this.html.clean(code_html, true, null, null) : '<' + this.options.defaultLineTag + '><br></' + this.options.defaultLineTag + '>';
 		}
 	},
 
+	/**
+	 * @description Convert the data of the WYSIWYG area and put it in the code view area.
+	 * @private
+	 */
+	_setEditorDataToCodeView: function () {
+		const codeContent = this._convertHTMLForCodeView(this.context.element.wysiwyg, false);
+		let codeValue = '';
+
+		if (this.options.iframe_fullPage) {
+			const attrs = domUtils.getAttributesToString(this._wd.body, null);
+			codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContent + '</body>\n</html>';
+		} else {
+			codeValue = codeContent;
+		}
+
+		this.context.element.code.style.display = 'block';
+		this.context.element.wysiwygFrame.style.display = 'none';
+
+		this._setCodeView(codeValue);
+	},
+
+	// ----- private methods -----
 	/**
 	 * @description Check the components such as image and video and modify them according to the format.
 	 * @private
@@ -2090,68 +1642,6 @@ Core.prototype = {
 			if (this.shadowRoot) this._shadowRootControllerEventTarget = [];
 		}
 
-		// set disallow text nodes
-		const disallowStyleNodes = _w.Object.keys(options._styleNodeMap);
-		const allowStyleNodes = !options.elementWhitelist
-			? []
-			: options.elementWhitelist.split('|').filter(function (v) {
-					return /b|i|ins|s|strike/i.test(v);
-			  });
-		for (let i = 0; i < allowStyleNodes.length; i++) {
-			disallowStyleNodes.splice(disallowStyleNodes.indexOf(allowStyleNodes[i].toLowerCase()), 1);
-		}
-		this._disallowedStyleNodesRegExp = disallowStyleNodes.length === 0 ? null : new wRegExp('(<\\/?)(' + disallowStyleNodes.join('|') + ')\\b\\s*([^>^<]+)?\\s*(?=>)', 'gi');
-
-		// set whitelist
-		const getRegList = function (str, str2) {
-			return !str ? '^' : str === '*' ? '[a-z-]+' : !str2 ? str : str + '|' + str2;
-		};
-		// tags
-		const defaultAttr = options._defaultAttributeWhitelist;
-		this._allowHTMLComment = options._editorElementWhitelist.indexOf('//') > -1 || options._editorElementWhitelist === '*';
-		// html check
-		this._htmlCheckWhitelistRegExp = new wRegExp('^(' + getRegList(options._editorElementWhitelist.replace('|//', ''), '') + ')$', 'i');
-		this._htmlCheckBlacklistRegExp = new wRegExp('^(' + (options.elementBlacklist || '^') + ')$', 'i');
-		// tags
-		this._elementWhitelistRegExp = converter.createElementWhitelist(getRegList(options._editorElementWhitelist.replace('|//', '|<!--|-->'), ''));
-		this._elementBlacklistRegExp = converter.createElementBlacklist(options.elementBlacklist.replace('|//', '|<!--|-->'));
-		// attributes
-		const regEndStr = '\\s*=\\s*(")[^"]*\\1';
-		const _wAttr = options.attributeWhitelist;
-		let tagsAttr = {};
-		let allAttr = '';
-		if (!!_wAttr) {
-			for (let k in _wAttr) {
-				if (!_wAttr.hasOwnProperty(k) || /^on[a-z]+$/i.test(_wAttr[k])) continue;
-				if (k === 'all') {
-					allAttr = getRegList(_wAttr[k], defaultAttr);
-				} else {
-					tagsAttr[k] = new wRegExp('\\s(?:' + getRegList(_wAttr[k], '') + ')' + regEndStr, 'ig');
-				}
-			}
-		}
-
-		this._attributeWhitelistRegExp = new wRegExp('\\s(?:' + (allAttr || defaultAttr) + ')' + regEndStr, 'ig');
-		this._attributeWhitelist = tagsAttr;
-
-		// blacklist
-		const _bAttr = options.attributeBlacklist;
-		tagsAttr = {};
-		allAttr = '';
-		if (!!_bAttr) {
-			for (let k in _bAttr) {
-				if (!_bAttr.hasOwnProperty(k)) continue;
-				if (k === 'all') {
-					allAttr = getRegList(_bAttr[k], '');
-				} else {
-					tagsAttr[k] = new wRegExp('\\s(?:' + getRegList(_bAttr[k], '') + ')' + regEndStr, 'ig');
-				}
-			}
-		}
-
-		this._attributeBlacklistRegExp = new wRegExp('\\s(?:' + (allAttr || '^') + ')' + regEndStr, 'ig');
-		this._attributeBlacklist = tagsAttr;
-
 		// set modes
 		this._isInline = /inline/i.test(options.mode);
 		this._isBalloon = /balloon|balloon-always/i.test(options.mode);
@@ -2164,7 +1654,6 @@ Core.prototype = {
 		this._transformStatus.editorOriginCssText = context.element.topArea.style.cssText;
 		this._placeholder = context.element.placeholder;
 		this._lineBreaker = context.element.lineBreaker;
-		this._lineBreakerButton = this._lineBreaker.querySelector('button');
 
 		// Init, validate
 		if (options.iframe) {
@@ -2185,6 +1674,7 @@ Core.prototype = {
 		this.shortcuts = new Shortcuts(this);
 		// main classes
 		this.node = new Node(this);
+		this.html = new HTML(this);
 		this.component = new Component(this);
 		this.format = new Format(this);
 		this.toolbar = new Toolbar(this);
@@ -2192,15 +1682,16 @@ Core.prototype = {
 		this.char = new Char(this);
 		this.menu = new Menu(this);
 
-		// register classes
-		ClassInterface.call(this.eventManager, this);
-		ClassInterface.call(this.node, this);
-		ClassInterface.call(this.component, this);
-		ClassInterface.call(this.format, this);
-		ClassInterface.call(this.toolbar, this);
-		ClassInterface.call(this.selection, this);
-		ClassInterface.call(this.char, this);
-		ClassInterface.call(this.menu, this);
+		// register modules
+		ModuleInterface.call(this.eventManager, this);
+		ModuleInterface.call(this.node, this);
+		ModuleInterface.call(this.html, this);
+		ModuleInterface.call(this.component, this);
+		ModuleInterface.call(this.format, this);
+		ModuleInterface.call(this.toolbar, this);
+		ModuleInterface.call(this.selection, this);
+		ModuleInterface.call(this.char, this);
+		ModuleInterface.call(this.menu, this);
 
 		// file components
 		this._fileInfoPluginsCheck = [];
@@ -2310,7 +1801,7 @@ Core.prototype = {
 	 * @private
 	 */
 	_initWysiwygArea: function (reload, _initHTML) {
-		this.context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentForEditor(typeof _initHTML === 'string' ? _initHTML : this.context.element.originElement.value);
+		this.context.element.wysiwyg.innerHTML = reload ? _initHTML : this.html.clean(typeof _initHTML === 'string' ? _initHTML : this.context.element.originElement.value, true, null, null);
 	},
 
 	/**

@@ -90,7 +90,7 @@ export default {
         e.stopPropagation();
 
         const value = e.target.getAttribute('data-value') || '';
-        const formats = this.selection.getLines();
+        const formats = this.format.getLines();
 
         for (let i = 0, len = formats.length; i < len; i++) {
             formats[i].style.lineHeight = value;

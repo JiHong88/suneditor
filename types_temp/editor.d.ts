@@ -1,7 +1,7 @@
 import CoreInterface from "./_core.d";
-import ClassesInterface from "../src/class/_classes";
+import ModuleInterface from "../src/class/_module";
 
-class Editor implements CoreInterface, ClassesInterface {}
+class Editor implements CoreInterface, ModuleInterface {}
 
 export default Editor;
 s

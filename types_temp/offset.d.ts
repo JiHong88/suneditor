@@ -1,6 +1,6 @@
-import EditorClass from "../../interface/editor";
+import EditorInterface from "../../interface/editor";
 
-class Offset extends EditorClass {
+class Offset extends EditorInterface {
 	/**
 	 * @description Returns the position of the argument, relative to inside the editor.
 	 * @param node Target node

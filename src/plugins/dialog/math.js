@@ -167,7 +167,7 @@ export default {
             katexEl.style.fontSize = contextMath.fontSizeElement.value;
 
             if (!this.context.dialog.updateModal) {
-                const selectedFormats = this.selection.getLines();
+                const selectedFormats = this.format.getLines();
 
                 if (selectedFormats.length > 1) {
                     const oFormat = this.util.createElement(selectedFormats[0].nodeName);
@@ -265,7 +265,7 @@ export default {
             /** delete */
             this.util.remove(this.context.math._mathExp);
             this.context.math._mathExp = null;
-            this.core.focus();
+            this.editor.focus();
 
             // history stack
             this.history.push(false);

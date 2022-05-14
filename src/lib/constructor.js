@@ -167,7 +167,7 @@ export function ResetOptions(mergeOptions, context, originOptions) {
 	const placeholder_span = initElements.placeholder;
 	let code = initElements.codeView;
 
-	if (el.statusbar) util.removeItem(el.statusbar);
+	if (el.statusbar) domUtils.removeItem(el.statusbar);
 	if (bottomBar.statusbar) {
 		if (mergeOptions.statusbar_container && mergeOptions.statusbar_container !== originOptions.statusbar_container) {
 			mergeOptions.statusbar_container.appendChild(bottomBar.statusbar);
@@ -431,7 +431,7 @@ function _initOptions(element, options) {
 
 	/** Private options */
 	options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily'];
-	
+
 	/** _init options */
 	// options.__defaultFontSize;
 }

@@ -3,8 +3,8 @@
  * @author Yi JiHong.
  */
 
-import { domUtils, unicode } from '../../helper';
 import CoreInterface from '../../class/_core';
+import { domUtils, unicode } from '../../helper';
 
 const Selection = function (editor) {
 	CoreInterface.call(this, editor);
@@ -149,7 +149,7 @@ Selection.prototype = {
 			range.setEnd(endCon, endOff);
 		} catch (error) {
 			console.warn('[SUNEDITOR.selection.focus.error] ' + error);
-			this.core.nativeFocus();
+			this.editor._nativeFocus();
 			return;
 		}
 
@@ -219,114 +219,13 @@ Selection.prototype = {
 	},
 
 	/**
-	 * @description Returns a "line" array from selected range.
-	 * @param {Function|null} validation The validation function. (Replaces the default validation format.isLine(current))
-	 * @returns {Array}
-	 */
-	getLines: function (validation) {
-		if (!this._resetRangeToTextNode()) return [];
-		let range = this.selection.getRange();
-
-		if (domUtils.isWysiwygFrame(range.startContainer)) {
-			const children = this.context.element.wysiwyg.children;
-			if (children.length === 0) return [];
-
-			this.setRange(children[0], 0, children[children.length - 1], children[children.length - 1].textContent.trim().length);
-			range = this.selection.getRange();
-		}
-
-		const startCon = range.startContainer;
-		const endCon = range.endContainer;
-		const commonCon = range.commonAncestorContainer;
-
-		// get line nodes
-		const lineNodes = domUtils.getListChildren(
-			commonCon,
-			function (current) {
-				return validation ? validation(current) : this.format.isLine(current);
-			}.bind(this)
-		);
-
-		if (!domUtils.isWysiwygFrame(commonCon) && !this.format.isBlock(commonCon)) lineNodes.unshift(this.format.getLine(commonCon, null));
-		if (startCon === endCon || lineNodes.length === 1) return lineNodes;
-
-		let startLine = this.format.getLine(startCon, null);
-		let endLine = this.format.getLine(endCon, null);
-		let startIdx = null;
-		let endIdx = null;
-
-		const onlyTable = function (current) {
-			return domUtils.isTable(current) ? /^TABLE$/i.test(current.nodeName) : true;
-		};
-
-		let startRangeEl = this.format.getBlock(startLine, onlyTable);
-		let endRangeEl = this.format.getBlock(endLine, onlyTable);
-		if (domUtils.isTable(startRangeEl) && domUtils.isListCell(startRangeEl.parentNode)) startRangeEl = startRangeEl.parentNode;
-		if (domUtils.isTable(endRangeEl) && domUtils.isListCell(endRangeEl.parentNode)) endRangeEl = endRangeEl.parentNode;
-
-		const sameRange = startRangeEl === endRangeEl;
-		for (let i = 0, len = lineNodes.length, line; i < len; i++) {
-			line = lineNodes[i];
-
-			if (startLine === line || (!sameRange && line === startRangeEl)) {
-				startIdx = i;
-				continue;
-			}
-
-			if (endLine === line || (!sameRange && line === endRangeEl)) {
-				endIdx = i;
-				break;
-			}
-		}
-
-		if (startIdx === null) startIdx = 0;
-		if (endIdx === null) endIdx = lineNodes.length - 1;
-
-		return lineNodes.slice(startIdx, endIdx + 1);
-	},
-
-	/**
-	 * @description Get lines and components from the selected range. (P, DIV, H[1-6], OL, UL, TABLE..)
-	 * If some of the component are included in the selection, get the entire that component.
-	 * @param {boolean} removeDuplicate If true, if there is a parent and child tag among the selected elements, the child tag is excluded.
-	 * @returns {Array}
-	 */
-	getLinesAndComponents: function (removeDuplicate) {
-		const commonCon = this.selection.getRange().commonAncestorContainer;
-		const myComponent = domUtils.getParentElement(commonCon, this.component.is);
-		const selectedLines = domUtils.isTable(commonCon)
-			? this.format.getLines(null)
-			: this.format.getLines(
-					function (current) {
-						const component = domUtils.getParentElement(current, this.component.is);
-						return (this.format.isLine(current) && (!component || component === myComponent)) || (this.component.is(current) && !this.format.getLine(current));
-					}.bind(this)
-			  );
-
-		if (removeDuplicate) {
-			for (let i = 0, len = selectedLines.length; i < len; i++) {
-				for (let j = i - 1; j >= 0; j--) {
-					if (selectedLines[j].contains(selectedLines[i])) {
-						selectedLines.splice(i, 1);
-						i--;
-						len--;
-						break;
-					}
-				}
-			}
-		}
-
-		return selectedLines;
-	},
-
-	/**
 	 * @description Returns true if there is no valid selection.
 	 * @param {Object} range selection.getRange()
 	 * @returns {boolean}
 	 */
 	_isNone: function (range) {
 		const comm = range.commonAncestorContainer;
-		return (domUtils.isWysiwygFrame(range.startContainer) && domUtils.isWysiwygFrame(range.endContainer)) || /FIGURE/i.test(comm.nodeName) || this.core._fileManager.regExp.test(comm.nodeName) || this.component.is(comm);
+		return (domUtils.isWysiwygFrame(range.startContainer) && domUtils.isWysiwygFrame(range.endContainer)) || /FIGURE/i.test(comm.nodeName) || this.editor._fileManager.regExp.test(comm.nodeName) || this.component.is(comm);
 	},
 
 	/**
@@ -430,7 +329,7 @@ Selection.prototype = {
 				tempCon = emptyText;
 				tempOffset = 1;
 				if (onlyBreak && !tempCon.previousSibling) {
-					domUtils.remove(endCon);
+					domUtils.removeItem(endCon);
 				}
 			}
 		}

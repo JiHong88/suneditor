@@ -3,8 +3,8 @@
  * @author Yi JiHong.
  */
 
-import { domUtils, unicode } from '../../helper';
 import CoreInterface from '../../class/_core';
+import { domUtils, unicode } from '../../helper';
 
 const Component = function (editor) {
 	CoreInterface.call(this, editor);
@@ -21,7 +21,7 @@ Component.prototype = {
 	 * @returns {Element}
 	 */
 	insert: function (element, notHistoryPush, checkCharCount, notSelect) {
-		if (this.core.isReadOnly || (checkCharCount && !this.char.check(element))) {
+		if (this.editor.isReadOnly || (checkCharCount && !this.char.check(element))) {
 			return null;
 		}
 
@@ -46,7 +46,7 @@ Component.prototype = {
 				if (oNode) formatEl = oNode.previousSibling;
 			}
 			this.html.insertNode(element, this.format.isBlock(formatEl) ? null : formatEl, false);
-			if (formatEl && unicode.onlyZeroWidthSpace(formatEl)) domUtils.remove(formatEl);
+			if (formatEl && unicode.onlyZeroWidthSpace(formatEl)) domUtils.removeItem(formatEl);
 		}
 
 		if (!notSelect) {
@@ -74,13 +74,13 @@ Component.prototype = {
 	 * @returns {Object|null}
 	 */
 	get: function (element) {
-		if (!this.core._fileManager.queryString || !element) return null;
+		if (!this.editor._fileManager.queryString || !element) return null;
 
 		let target;
 		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
-			if (this.core._fileManager.queryString) target = element.querySelector(this.core._fileManager.queryString);
+			if (this.editor._fileManager.queryString) target = element.querySelector(this.editor._fileManager.queryString);
 		}
-		if (!target && element.nodeName && this.core._fileManager.regExp.test(element.nodeName)) {
+		if (!target && element.nodeName && this.editor._fileManager.regExp.test(element.nodeName)) {
 			target = element;
 		}
 		if (!target) {
@@ -90,7 +90,7 @@ Component.prototype = {
 		return {
 			target: target,
 			component: domUtils.getParentElement(target, this.is),
-			pluginName: this.core._fileManager.pluginMap[target.nodeName.toLowerCase()] || ''
+			pluginName: this.editor._fileManager.pluginMap[target.nodeName.toLowerCase()] || ''
 		};
 	},
 
@@ -101,7 +101,7 @@ Component.prototype = {
 	 */
 	select: function (element, pluginName) {
 		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is)) || domUtils.isUneditable(element)) return false;
-		if (!this.status.hasFocus) this.core.focus();
+		if (!this.status.hasFocus) this.editor.focus();
 
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;
@@ -129,7 +129,7 @@ Component.prototype = {
 	 */
 	_setComponentLineBreaker: function (element) {
 		// line breaker
-		this.core._lineBreaker.style.display = 'none';
+		this.editor._lineBreaker.style.display = 'none';
 		const contextEl = this.context.element;
 		const container = domUtils.getParentElement(element, this.is);
 		const t_style = contextEl.lineBreaker_t.style;

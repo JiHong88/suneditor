@@ -1,6 +1,6 @@
-import EditorClass from "../../interface/editor";
+import EditorInterface from "../../interface/editor";
 
-class Selection extends EditorClass {
+class Selection extends EditorInterface {
 	/**
 	 * @description Get current editor's range object
 	 * @returns

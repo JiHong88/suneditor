@@ -1,14 +1,14 @@
 import CoreInterface from './_core';
-import ClassesInterface from './_classes';
+import ModuleInterface from './_module';
 
 /**
  * @interface
  * @description Initializes and adds inner classes and default properties of the editor.
  * @param {any} editor Editor object
  */
-function EditorClass(editor) {
-    CoreInterface.call(this, editor);
-    ClassesInterface.call(this, editor);
+function EditorInterface(editor) {
+	CoreInterface.call(this, editor);
+	ModuleInterface.call(this, editor);
 }
 
-export default EditorClass;
+export default EditorInterface;

@@ -1173,7 +1173,7 @@ export default {
     },
 
     _onCellMultiSelect: function (e) {
-        this._antiBlur = true;
+        this.editor._antiBlur = true;
         const tablePlugin = this.plugins.table;
         const target = this.util.getParentElement(e.target, this.util.isTableCell);
 
@@ -1422,7 +1422,7 @@ export default {
                 this.menu.controllerOff();
 
                 if (emptyDiv !== this.context.element.wysiwyg) this.util.removeAllParents(emptyDiv, function (current) { return current.childNodes.length === 0; }, null);
-                this.core.focus();
+                this.editor.focus();
         }
 
         // history stack

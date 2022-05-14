@@ -5,7 +5,6 @@
 
 import CoreInterface from '../../class/_core';
 import { domUtils, unicode, env } from '../../helper';
-import { _w } from '../../helper/global';
 
 const Node = function (editor) {
 	CoreInterface.call(this, editor);
@@ -56,7 +55,7 @@ Node.prototype = {
 			if (temp) {
 				if (domUtils.isListCell(newEl) && domUtils.isList(temp) && temp.firstElementChild) {
 					newEl.innerHTML = temp.firstElementChild.innerHTML;
-					domUtils.remove(temp.firstElementChild);
+					domUtils.removeItem(temp.firstElementChild);
 					if (temp.children.length > 0) newEl.appendChild(temp);
 				} else {
 					newEl.appendChild(temp);
@@ -80,7 +79,7 @@ Node.prototype = {
 		if (newEl.childNodes.length > 0) pElement.insertBefore(newEl, depthEl);
 		else newEl = depthEl;
 
-		if (bp.childNodes.length === 0) domUtils.remove(bp);
+		if (bp.childNodes.length === 0) domUtils.removeItem(bp);
 
 		return newEl;
 	},
@@ -100,7 +99,7 @@ Node.prototype = {
 		let offsets = null;
 
 		if (nodePathLen) {
-			offsets = _w.Array.apply(null, new _w.Array(nodePathLen)).map(_w.Number.prototype.valueOf, 0);
+			offsets = this._w.Array.apply(null, new this._w.Array(nodePathLen)).map(this._w.Number.prototype.valueOf, 0);
 		}
 
 		(function recursionFunc(current, depth, depthIndex) {
@@ -110,7 +109,7 @@ Node.prototype = {
 				child = children[i];
 				next = children[i + 1];
 				if (!child) break;
-				if ((onlyText && inst.format._isIgnoreNodeChange(child)) || (!onlyText && (domUtils.isTable(child) || domUtils.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrBlock(child))))) {
+				if ((onlyText && inst.format._isIgnoreNodeChange(child)) || (!onlyText && (domUtils.isTable(child) || domUtils.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrLine(child))))) {
 					if (domUtils.isTable(child) || domUtils.isListCell(child)) {
 						recursionFunc(child, depth + 1, i);
 					}
@@ -144,7 +143,7 @@ Node.prototype = {
 					// merge tag
 					domUtils.copyTagAttributes(child, current);
 					current.parentNode.insertBefore(child, current);
-					domUtils.remove(current);
+					domUtils.removeItem(current);
 				}
 				if (!next) {
 					if (child.nodeType === 1) recursionFunc(child, depth + 1, i);
@@ -215,7 +214,7 @@ Node.prototype = {
 						child.innerHTML += next.innerHTML;
 					}
 
-					domUtils.remove(next);
+					domUtils.removeItem(next);
 					i--;
 				} else if (child.nodeType === 1) {
 					recursionFunc(child, depth + 1, i);
@@ -235,7 +234,7 @@ Node.prototype = {
 		if (typeof validation === 'string') {
 			validation = function (current) {
 				return this.test(current.tagName);
-			}.bind(new _w.RegExp('^(' + (validation ? validation : '.+') + ')$', 'i'));
+			}.bind(new this._w.RegExp('^(' + (validation ? validation : '.+') + ')$', 'i'));
 		} else if (typeof validation !== 'function') {
 			validation = function () {
 				return true;
@@ -286,7 +285,7 @@ Node.prototype = {
 						sc: element.previousElementSibling,
 						ec: element.nextElementSibling
 					};
-					domUtils.remove(element);
+					domUtils.removeItem(element);
 					recursionFunc(parent);
 				}
 			}

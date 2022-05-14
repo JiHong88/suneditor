@@ -149,7 +149,7 @@
             if (typeof this.plugins[kind].init === 'function') this.plugins[kind].init.call(this);
             this.context.dialog.kind = '';
             this.modalForm = null;
-            this.core.focus();
+            this.editor.focus();
         }
     };
 

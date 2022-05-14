@@ -1,6 +1,6 @@
-import EditorClass from "../../interface/editor";
+import EditorInterface from "../../interface/editor";
 
-class Format extends EditorClass {
+class Format extends EditorInterface {
 	/**
 	 * @description Replace the line tag of the current selection.
 	 * @param element Line element (P, DIV..)
@@ -19,15 +19,15 @@ class Format extends EditorClass {
 	 * @description Replace the br-line tag of the current selection.
 	 * @param element Line element (P, DIV..)
 	 */
-	setBrBlock(element: Element);
+	setBrLine(element: Element);
 
 	/**
-	 * @description If a parent node that contains an argument node finds a free format node (format.isBrBlock), it returns that node.
+	 * @description If a parent node that contains an argument node finds a free format node (format.isBrLine), it returns that node.
 	 * @param element Reference node.
 	 * @param validation Additional validation function.
 	 * @returns
 	 */
-	getBrBlock(node: Node, validation?: Function | null): Element | null;
+	getBrLine(node: Node, validation?: Function | null): Element | null;
 
 	/**
 	 * @description Append format element to sibling node of argument element.
@@ -37,7 +37,7 @@ class Format extends EditorClass {
 	 * @param formatNode Node name or node obejct to be inserted
 	 * @returns
 	 */
-	appendLine(element: Element, formatNode?: string | Element): Element;
+	addLine(element: Element, formatNode?: string | Element): Element;
 
 	/**
 	 * @description If a parent node that contains an argument node finds a format node (editor.format.isBlock), it returns that node.
@@ -162,7 +162,7 @@ class Format extends EditorClass {
 	 * @param element The node to check
 	 * @returns
 	 */
-	isBrBlock(element: Node): boolean;
+	isBrLine(element: Node): boolean;
 
 	/**
 	 * @description It is judged whether it is the closure free format element. (class="__se__format__br_line__closure_xxx")
@@ -173,7 +173,7 @@ class Format extends EditorClass {
 	 * @param element The node to check
 	 * @returns
 	 */
-	isClosureBrBlock(element: Node): boolean;
+	isClosureBrLine(element: Node): boolean;
 
 	/**
 	 * @description It is judged whether it is the range format element. (BLOCKQUOTE, OL, UL, FIGCAPTION, TABLE, THEAD, TBODY, TR, TH, TD | class="__se__format__block_xxx")

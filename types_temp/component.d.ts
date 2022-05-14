@@ -1,6 +1,6 @@
-import EditorClass from "../../interface/editor";
+import EditorInterface from "../../interface/editor";
 
-class Component extends EditorClass {
+class Component extends EditorInterface {
 	/**
 	 * @description The method to insert a element and return. (used elements : table, hr, image, video)
 	 * If "element" is "HR", insert and return the new line.

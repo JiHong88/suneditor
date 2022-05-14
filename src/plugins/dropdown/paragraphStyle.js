@@ -114,10 +114,10 @@ export default {
 
         if (!value) return;
 
-        let selectedFormsts = this.selection.getLines();
+        let selectedFormsts = this.format.getLines();
         if (selectedFormsts.length === 0) {
             this.selection.getRangeAndAddLine(this.selection.getRange(), null);
-            selectedFormsts = this.selection.getLines();
+            selectedFormsts = this.format.getLines();
             if (selectedFormsts.length === 0) return;
         }
 

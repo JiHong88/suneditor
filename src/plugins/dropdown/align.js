@@ -7,13 +7,13 @@
  */
 'use strict';
 
-import EditorClass from '../../class/editor';
+import EditorInterface from '../../class/editor';
 import {
     domUtils
 } from '../../helper';
 
 const align = function (editor, targetElement) {
-    EditorClass.call(this, editor);
+    EditorInterface.call(this, editor);
     this.targetElement = targetElement;
 
     // create HTML
@@ -117,13 +117,13 @@ function action(e) {
     if (!value) return;
 
     const defaultDir = this.defaultDir;
-    const selectedFormsts = this.selection.getLines();
+    const selectedFormsts = this.format.getLines();
     for (let i = 0, len = selectedFormsts.length; i < len; i++) {
         domUtils.setStyle(selectedFormsts[i], 'textAlign', (value === defaultDir ? '' : value));
     }
 
     this.menu.dropdownOff();
-    this.core.focus();
+    this.editor.focus();
 
     // history stack
     this.history.push(false);

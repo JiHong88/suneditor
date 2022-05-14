@@ -426,11 +426,11 @@ export default {
             const cover = this.plugins.mediaContainer.setCover.call(this, element);
             const container = this.plugins.mediaContainer.setContainer.call(this, cover, '');
             if (!this.component.insert(container, false, true, !this.options.mediaAutoSelect)) {
-                this.core.focus();
+                this.editor.focus();
                 return;
             }
             if (!this.options.mediaAutoSelect) {
-                const line = this.format.appendLine(container, null);
+                const line = this.format.addLine(container, null);
                 if (line) this.setRange(line, 0, line, 0);
             }
         } // update

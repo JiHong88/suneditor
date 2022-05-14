@@ -71,7 +71,7 @@ export default {
     },
 
     appendHr: function (hrTemp) {
-        this.core.focus();
+        this.editor.focus();
         return this.component.insert(hrTemp.cloneNode(false), false, true, false);
     },
 

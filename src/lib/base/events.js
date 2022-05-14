@@ -70,14 +70,14 @@ export default function () {
 		 * @param {boolean} isCodeView Whether the current code view mode
 		 * @param {Object} core Core object
 		 */
-		setCodeView: null,
+		onToggleCodeView: null,
 
 		/**
 		 * @description An event when toggling full screen.
 		 * @param {boolean} isFullScreen Whether the current full screen mode
 		 * @param {Object} core Core object
 		 */
-		setFullScreen: null,
+		 onToggleFullScreen: null,
 
 		/**
 		 * @description It replaces the default callback function of the image upload

@@ -686,7 +686,7 @@ export default {
         if (this.options.mediaAutoSelect) {
             this.component.select(oImg, 'image');
         } else {
-            const line = this.format.appendLine(container, null);
+            const line = this.format.addLine(container, null);
             if (line) this.setRange(line, 0, line, 0);
         }
     },

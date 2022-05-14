@@ -1,10 +1,10 @@
-import { History } from "./history.d";
-import { Plugin } from "../src/plugins/Plugin";
-import { Lang } from "./Lang";
-import { SunEditorOptions } from "../src/options";
-import { Context } from "../src/lib/context";
-import { Module } from "../src/plugins/Module";
-import _Notice from "./notice.d";
+import { History } from './history.d';
+import { Plugin } from '../src/plugins/Plugin';
+import { Lang } from './Lang';
+import { SunEditorOptions } from '../src/options';
+import { Context } from '../src/lib/context';
+import { Module } from '../src/plugins/Module';
+import _Notice from './notice.d';
 
 export type Controllers = Array<string | Function | Element>;
 export type fileInfo = {
@@ -17,7 +17,7 @@ export type fileInfo = {
 	src: string;
 };
 export type seledtedFileInfo = { target: Element; component: Element; pluginName: string };
-export type commands = "selectAll" | "codeView" | "fullScreen" | "indent" | "outdent" | "undo" | "redo" | "removeFormat" | "print" | "preview" | "showBlocks" | "save" | "bold" | "underline" | "italic" | "strike" | "subscript" | "superscript" | "copy" | "cut" | "paste";
+export type commands = 'selectAll' | 'codeView' | 'fullScreen' | 'indent' | 'outdent' | 'undo' | 'redo' | 'removeFormat' | 'print' | 'preview' | 'showBlocks' | 'save' | 'bold' | 'underline' | 'italic' | 'strike' | 'subscript' | 'superscript' | 'copy' | 'cut' | 'paste';
 export type status = {};
 
 export interface Core {
@@ -257,7 +257,7 @@ export interface Core {
 	 * Please enter the value based on ltr mode.
 	 * Calculated automatically in rtl mode.
 	 */
-	setControllerPosition(controller: Element, referEl: Element, position: "top" | "bottom", addOffset: { left: number; top: number }): void;
+	setControllerPosition(controller: Element, referEl: Element, position: 'top' | 'bottom', addOffset: { left: number; top: number }): void;
 
 	/**
 	 * @description javascript execCommand
@@ -270,7 +270,7 @@ export interface Core {
 	/**
 	 * @description Focus to wysiwyg area using "native focus function"
 	 */
-	nativeFocus(): void;
+	_nativeFocus(): void;
 
 	/**
 	 * @description Focus to wysiwyg area
@@ -305,7 +305,7 @@ export interface Core {
 	 * @param display Display type string ('command', 'dropdown', 'dialog', 'container')
 	 * @param target The element of command button
 	 */
-	 runPlugin(command: string, display: "command" | "dropdown" | "dialog" | "container", target: Element): void;
+	runPlugin(command: string, display: 'command' | 'dropdown' | 'dialog' | 'container', target: Element): void;
 
 	/**
 	 * @description Execute command of command button(All Buttons except dropdown and dialog)
@@ -317,21 +317,21 @@ export interface Core {
 
 	/**
 	 * @description Add or remove the class name of "body" so that the code block is visible
-	 * @param value true/false
+	 * @param value true/false, If undefined toggle the codeView mode.
 	 */
-	showBlocks(value: boolean): void;
+	showBlocks(value: boolean | undefined): void;
 
 	/**
 	 * @description Changes to code view or wysiwyg view
-	 * @param value true/false
+	 * @param value true/false, If undefined toggle the codeView mode.
 	 */
-	setCodeView(value: boolean): void;
+	codeView(value: boolean | undefined): void;
 
 	/**
 	 * @description Changes to full screen or default screen
-	 * @param value true/false
+	 * @param value true/false, If undefined toggle the codeView mode.
 	 */
-	setFullScreen(value: boolean | null): void;
+	fullScreen(value: boolean | undefined): void;
 
 	/**
 	 * @description Prints the current content of the editor.
@@ -347,7 +347,7 @@ export interface Core {
 	 * @description Set direction to "rtl" or "ltr".
 	 * @param dir "rtl" or "ltr"
 	 */
-	setDir(dir: "rtl" | "ltr"): void;
+	setDir(dir: 'rtl' | 'ltr'): void;
 
 	/**
 	 * @description Sets the HTML string
@@ -392,7 +392,7 @@ export interface Core {
 	 * @param comp If true, does not line break and indentation of tags.
 	 * @returns
 	 */
-	convertHTMLForCodeView(html: Element | string, comp?: boolean): string;
+	_convertHTMLForCodeView(html: Element | string, comp?: boolean): string;
 }
 
 export interface Toolbar {
@@ -504,10 +504,10 @@ export default class SunEditor {
 	setContent(content: string): void;
 
 	/**
-	 * @description Add content to the suneditor
+	 * @description Add content to the end of content.
 	 * @param content Content to Input
 	 */
-	appendContent(content: string): void;
+	addContent(content: string): void;
 
 	/**
 	 * @description Switch to or off "ReadOnly" mode.

@@ -508,8 +508,8 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     // ss.core.context.tool.save.disabled = true;
 // }
 
-// window.sun_appendContent = function (content) {
-//     // ss.appendContent(content);
+// window.sun_addContent = function (content) {
+//     // ss.addContent(content);
 //     ss.readOnly(!ss.core.isReadOnly);
 // }
 

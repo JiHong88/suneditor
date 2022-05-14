@@ -3,17 +3,215 @@
  * @author Yi JiHong.
  */
 
-import env from '../../helper/env';
-import { _w } from '../../helper/global';
-import { addClass, removeClass, hasClass } from '../../helper/domUtils';
 import CoreInterface from '../../class/_core';
+import { domUtils, converter, numbers } from '../../helper';
+import { _w } from '../../helper/global';
 
 const HTML = function (editor) {
 	CoreInterface.call(this, editor);
+
+	this._allowHTMLComment = null;
+	this._disallowedStyleNodesRegExp = null;
+	this._htmlCheckWhitelistRegExp = null;
+	this._htmlCheckBlacklistRegExp = null;
+	this._elementWhitelistRegExp = null;
+	this._elementBlacklistRegExp = null;
+	this._attributeWhitelist = null;
+	this._attributeWhitelistRegExp = null;
+	this._attributeBlacklist = null;
+	this._attributeBlacklistRegExp = null;
+
+	// set disallow text nodes
+	const options = editor.options;
+	const disallowStyleNodes = _w.Object.keys(options._styleNodeMap);
+	const allowStyleNodes = !options.elementWhitelist
+		? []
+		: options.elementWhitelist.split('|').filter(function (v) {
+				return /b|i|ins|s|strike/i.test(v);
+		  });
+	for (let i = 0; i < allowStyleNodes.length; i++) {
+		disallowStyleNodes.splice(disallowStyleNodes.indexOf(allowStyleNodes[i].toLowerCase()), 1);
+	}
+	this._disallowedStyleNodesRegExp = disallowStyleNodes.length === 0 ? null : new _w.RegExp('(<\\/?)(' + disallowStyleNodes.join('|') + ')\\b\\s*([^>^<]+)?\\s*(?=>)', 'gi');
+
+	// whitelist
+	// tags
+	const defaultAttr = options._defaultAttributeWhitelist;
+	this._allowHTMLComment = options._editorElementWhitelist.indexOf('//') > -1 || options._editorElementWhitelist === '*';
+	// html check
+	this._htmlCheckWhitelistRegExp = new _w.RegExp('^(' + GetRegList(options._editorElementWhitelist.replace('|//', ''), '') + ')$', 'i');
+	this._htmlCheckBlacklistRegExp = new _w.RegExp('^(' + (options.elementBlacklist || '^') + ')$', 'i');
+	// tags
+	this._elementWhitelistRegExp = converter.createElementWhitelist(GetRegList(options._editorElementWhitelist.replace('|//', '|<!--|-->'), ''));
+	this._elementBlacklistRegExp = converter.createElementBlacklist(options.elementBlacklist.replace('|//', '|<!--|-->'));
+	// attributes
+	const regEndStr = '\\s*=\\s*(")[^"]*\\1';
+	const _wAttr = options.attributeWhitelist;
+	let tagsAttr = {};
+	let allAttr = '';
+	if (!!_wAttr) {
+		for (let k in _wAttr) {
+			if (!_wAttr.hasOwnProperty(k) || /^on[a-z]+$/i.test(_wAttr[k])) continue;
+			if (k === 'all') {
+				allAttr = GetRegList(_wAttr[k], defaultAttr);
+			} else {
+				tagsAttr[k] = new _w.RegExp('\\s(?:' + GetRegList(_wAttr[k], '') + ')' + regEndStr, 'ig');
+			}
+		}
+	}
+
+	this._attributeWhitelistRegExp = new _w.RegExp('\\s(?:' + (allAttr || defaultAttr) + ')' + regEndStr, 'ig');
+	this._attributeWhitelist = tagsAttr;
+
+	// blacklist
+	const _bAttr = options.attributeBlacklist;
+	tagsAttr = {};
+	allAttr = '';
+	if (!!_bAttr) {
+		for (let k in _bAttr) {
+			if (!_bAttr.hasOwnProperty(k)) continue;
+			if (k === 'all') {
+				allAttr = GetRegList(_bAttr[k], '');
+			} else {
+				tagsAttr[k] = new _w.RegExp('\\s(?:' + GetRegList(_bAttr[k], '') + ')' + regEndStr, 'ig');
+			}
+		}
+	}
+
+	this._attributeBlacklistRegExp = new _w.RegExp('\\s(?:' + (allAttr || '^') + ')' + regEndStr, 'ig');
+	this._attributeBlacklist = tagsAttr;
 };
 
 HTML.prototype = {
-    /**
+	/**
+	 * @description Gets the clean HTML code for editor
+	 * @param {string} html HTML string
+	 * @param {boolean} requireFormat If true, text nodes that do not have a format node is wrapped with the format tag.
+	 * @param {string|RegExp|null} whitelist Regular expression of allowed tags.
+	 * RegExp object is create by helper.converter.createElementWhitelist method.
+	 * @param {string|RegExp|null} blacklist Regular expression of disallowed tags.
+	 * RegExp object is create by helper.converter.createElementBlacklist method.
+	 * @returns {string}
+	 */
+	clean: function (html, requireFormat, whitelist, blacklist) {
+		html = DeleteDisallowedTags(this.editor._parser.parseFromString(html, 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, true));
+		const dom = this._d.createRange().createContextualFragment(html, true);
+
+		try {
+			this._consistencyCheckOfHTML.call(this, dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, true);
+		} catch (error) {
+			console.warn('[SUNEDITOR.html.clean.fail] ' + error);
+		}
+
+		if (this._managedElementInfo && this._managedElementInfo.query) {
+			const textCompList = dom.querySelectorAll(this._managedElementInfo.query);
+			for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
+				classList = [].slice.call(textCompList[i].classList);
+				for (let c = 0, cLen = classList.length; c < cLen; c++) {
+					initMethod = this._managedElementInfo.map[classList[c]];
+					if (initMethod) {
+						initMethod(textCompList[i]);
+						break;
+					}
+				}
+			}
+		}
+
+		const domTree = dom.childNodes;
+		if (!requireFormat) {
+			for (let i = 0, len = domTree.length, t; i < len; i++) {
+				t = domTree[i];
+				if (t.nodeType === 1 && !this.format.isTextStyleNode(t) && !domUtils.isBreak(t) && !DisallowedElements(t)) {
+					requireFormat = true;
+					break;
+				}
+			}
+		}
+
+		let cleanData = '';
+		for (let i = 0, len = domTree.length; i < len; i++) {
+			cleanData += this._makeLine(domTree[i], requireFormat);
+		}
+
+		cleanData = this.node.removeWhiteSpace(cleanData);
+
+		if (!cleanData) {
+			cleanData = html;
+		} else {
+			if (whitelist) cleanData = cleanData.replace(typeof whitelist === 'string' ? converter.createElementWhitelist(whitelist) : whitelist, '');
+			if (blacklist) cleanData = cleanData.replace(typeof blacklist === 'string' ? converter.createElementBlacklist(blacklist) : blacklist, '');
+		}
+
+		return this._tagConvertor(cleanData);
+	},
+
+	/**
+	 * @description Insert an (HTML element / HTML string / plain string) at selection range.
+	 * @param {Element|String} html HTML Element or HTML string or plain string
+	 * @param {boolean} notCleaningData If true, inserts the HTML string without refining it with html.clean.
+	 * @param {boolean} checkCharCount If true, if "options.charCounter_max" is exceeded when "element" is added, null is returned without addition.
+	 * @param {boolean} rangeSelection If true, range select the inserted node.
+	 */
+	insert: function (html, notCleaningData, checkCharCount, rangeSelection) {
+		if (!this.context.element.wysiwygFrame.contains(this.selection.get().focusNode)) this.editor.focus();
+
+		if (typeof html === 'string') {
+			if (!notCleaningData) html = this.clean(html, false, null, null);
+			try {
+				const dom = this._d.createRange().createContextualFragment(html);
+				const domTree = dom.childNodes;
+
+				if (checkCharCount) {
+					const type = this.options.charCounter_type === 'byte-html' ? 'outerHTML' : 'textContent';
+					let checkHTML = '';
+					for (let i = 0, len = domTree.length; i < len; i++) {
+						checkHTML += domTree[i][type];
+					}
+					if (!this.char.check(checkHTML)) return;
+				}
+
+				let c, a, t, prev, firstCon;
+				while ((c = domTree[0])) {
+					if (prev && prev.nodeType === 3 && a && a.nodeType === 1 && domUtils.isBreak(c)) {
+						prev = c;
+						domUtils.removeItem(c);
+						continue;
+					}
+					t = this.insertNode(c, a, false);
+					a = t.container || t;
+					if (!firstCon) firstCon = t;
+					prev = c;
+				}
+
+				if (prev.nodeType === 3 && a.nodeType === 1) a = prev;
+				const offset = a.nodeType === 3 ? t.endOffset || a.textContent.length : a.childNodes.length;
+				if (rangeSelection) this.selection.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
+				else this.selection.setRange(a, offset, a, offset);
+			} catch (error) {
+				if (this.status.isDisabled || this.status.isReadOnly) return;
+				console.warn('[SUNEDITOR.html.insert.fail] ' + error);
+				this.editor.execCommand('insertHTML', false, html);
+			}
+		} else {
+			if (this.component.is(html)) {
+				this.component.insert(html, false, checkCharCount, false);
+			} else {
+				let afterNode = null;
+				if (this.format.isLine(html) || domUtils.isMedia(html)) {
+					afterNode = this.format.getLine(this.selection.getNode(), null);
+				}
+				this.insertNode(html, afterNode, checkCharCount);
+			}
+		}
+
+		this.editor.effectNode = null;
+		this.editor.focus();
+
+		// history stack
+		this.history.push(false);
+	},
+
+	/**
 	 * @description Delete selected node and insert argument value node and return.
 	 * If the "afterNode" exists, it is inserted after the "afterNode"
 	 * Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
@@ -23,11 +221,11 @@ HTML.prototype = {
 	 * @returns {Object|Node|null}
 	 */
 	insertNode: function (oNode, afterNode, checkCharCount) {
-		if (this.core.isReadOnly || (checkCharCount && !this.char.check(oNode))) {
+		if (this.editor.isReadOnly || (checkCharCount && !this.char.check(oNode))) {
 			return null;
 		}
 
-		const brBlock = this.format.getBrBlock(this.selection.getNode(), null);
+		const brBlock = this.format.getBrLine(this.selection.getNode(), null);
 		const isFormats = (!brBlock && (this.format.isLine(oNode) || this.format.isBlock(oNode))) || this.component.is(oNode);
 
 		if (!afterNode && (isFormats || this.component.is(oNode) || domUtils.isMedia(oNode))) {
@@ -164,7 +362,7 @@ HTML.prototype = {
 					afterNode = rangeCon ? null : container.nextSibling;
 				}
 
-				if (oldParent.childNodes.length === 0 && parentNode !== oldParent) domUtils.remove(oldParent);
+				if (oldParent.childNodes.length === 0 && parentNode !== oldParent) domUtils.removeItem(oldParent);
 			}
 
 			if (isFormats && !brBlock && !this.format.isBlock(parentNode) && !domUtils.isListCell(parentNode) && !domUtils.isWysiwygFrame(parentNode)) {
@@ -183,7 +381,7 @@ HTML.prototype = {
 			if ((this.format.isLine(oNode) || this.component.is(oNode)) && startCon === endCon) {
 				const cItem = this.format.getLine(commonCon, null);
 				if (cItem && cItem.nodeType === 1 && domUtils.isEmptyLine(cItem)) {
-					domUtils.remove(cItem);
+					domUtils.removeItem(cItem);
 				}
 			}
 
@@ -201,12 +399,12 @@ HTML.prototype = {
 
 					if (previous && previousText.length > 0) {
 						oNode.textContent = previousText + oNode.textContent;
-						domUtils.remove(previous);
+						domUtils.removeItem(previous);
 					}
 
 					if (next && next.length > 0) {
 						oNode.textContent += nextText;
-						domUtils.remove(next);
+						domUtils.removeItem(next);
 					}
 
 					const newRange = {
@@ -247,78 +445,12 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @description Insert an (HTML element / HTML string / plain string) at selection range.
-	 * @param {Element|String} html HTML Element or HTML string or plain string
-	 * @param {boolean} notCleaningData If true, inserts the HTML string without refining it with core.cleanHTML.
-	 * @param {boolean} checkCharCount If true, if "options.charCounter_max" is exceeded when "element" is added, null is returned without addition.
-	 * @param {boolean} rangeSelection If true, range select the inserted node.
-	 */
-	insert: function (html, notCleaningData, checkCharCount, rangeSelection) {
-		if (!this.context.element.wysiwygFrame.contains(this.selection.get().focusNode)) this.core.focus();
-
-		if (typeof html === 'string') {
-			if (!notCleaningData) html = this.core.cleanHTML(html, null, null);
-			try {
-				const dom = this._d.createRange().createContextualFragment(html);
-				const domTree = dom.childNodes;
-
-				if (checkCharCount) {
-					const type = this.options.charCounter_type === 'byte-html' ? 'outerHTML' : 'textContent';
-					let checkHTML = '';
-					for (let i = 0, len = domTree.length; i < len; i++) {
-						checkHTML += domTree[i][type];
-					}
-					if (!this.char.check(checkHTML)) return;
-				}
-
-				let c, a, t, prev, firstCon;
-				while ((c = domTree[0])) {
-					if (prev && prev.nodeType === 3 && a && a.nodeType === 1 && domUtils.isBreak(c)) {
-						prev = c;
-						domUtils.remove(c);
-						continue;
-					}
-					t = this.insertNode(c, a, false);
-					a = t.container || t;
-					if (!firstCon) firstCon = t;
-					prev = c;
-				}
-
-				if (prev.nodeType === 3 && a.nodeType === 1) a = prev;
-				const offset = a.nodeType === 3 ? t.endOffset || a.textContent.length : a.childNodes.length;
-				if (rangeSelection) this.selection.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
-				else this.selection.setRange(a, offset, a, offset);
-			} catch (error) {
-				if (this.status.isDisabled || this.status.isReadOnly) return;
-				console.warn('[SUNEDITOR.html.insert.fail] ' + error);
-				this.core.execCommand('insertHTML', false, html);
-			}
-		} else {
-			if (this.component.is(html)) {
-				this.component.insert(html, false, checkCharCount, false);
-			} else {
-				let afterNode = null;
-				if (this.format.isLine(html) || domUtils.isMedia(html)) {
-					afterNode = this.format.getLine(this.selection.getNode(), null);
-				}
-				this.insertNode(html, afterNode, checkCharCount);
-			}
-		}
-
-		this.core.effectNode = null;
-		this.core.focus();
-
-		// history stack
-		this.history.push(false);
-	},
-
-	/**
 	 * @description Delete the selected range.
 	 * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
 	 * @returns {Object}
 	 */
 	remove: function () {
-		this._resetRangeToTextNode();
+		this.seletion._resetRangeToTextNode();
 
 		const range = this.selection.getRange();
 		let container,
@@ -386,7 +518,7 @@ HTML.prototype = {
 
 		const remove = function (item) {
 			const format = this.format.getLine(item, null);
-			domUtils.remove(item);
+			domUtils.removeItem(item);
 
 			if (domUtils.isListCell(format)) {
 				const list = domUtils.getArrayItem(format.children, domUtils.isList, false);
@@ -481,12 +613,12 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @description Recursive function  when used to place a node in "BrBlock" in "html.insertNode"
+	 * @description Recursive function  when used to place a node in "BrLine" in "html.insertNode"
 	 * @param {Node} oNode Node to be inserted
 	 * @returns {Node} "oNode"
 	 * @private
 	 */
-	 _setIntoFreeFormat: function (oNode) {
+	_setIntoFreeFormat: function (oNode) {
 		const parentNode = oNode.parentNode;
 		let oNodeChildren, lastONode;
 
@@ -506,7 +638,7 @@ HTML.prototype = {
 				parentNode.insertBefore(lastONode, oNode);
 			}
 
-			if (oNode.childNodes.length === 0) domUtils.remove(oNode);
+			if (oNode.childNodes.length === 0) domUtils.removeItem(oNode);
 			oNode = domUtils.createElement('BR');
 			parentNode.insertBefore(oNode, lastONode.nextSibling);
 		}
@@ -514,7 +646,299 @@ HTML.prototype = {
 		return oNode;
 	},
 
+	/**
+	 * @description Returns HTML string according to tag type and configuration.
+	 * @param {Node} node Node
+	 * @param {boolean} requireFormat If true, text nodes that do not have a format node is wrapped with the format tag.
+	 * @private
+	 */
+	_makeLine: function (node, requireFormat) {
+		const defaultLineTag = this.options.defaultLineTag;
+		// element
+		if (node.nodeType === 1) {
+			if (DisallowedElements(node)) return '';
+			if (!requireFormat || this.format.isLine(node) || this.format.isBlock(node) || this.component.is(node) || domUtils.isMedia(node) || (domUtils.isAnchor(node) && domUtils.isMedia(node.firstElementChild))) {
+				return node.outerHTML;
+			} else {
+				return '<' + defaultLineTag + '>' + node.outerHTML + '</' + defaultLineTag + '>';
+			}
+		}
+		// text
+		if (node.nodeType === 3) {
+			if (!requireFormat) return converter.htmlToEntity(node.textContent);
+			const textArray = node.textContent.split(/\n/g);
+			let html = '';
+			for (let i = 0, tLen = textArray.length, text; i < tLen; i++) {
+				text = textArray[i].trim();
+				if (text.length > 0) html += '<' + defaultLineTag + '>' + converter.htmlToEntity(text) + '</' + defaultLineTag + '>';
+			}
+			return html;
+		}
+		// comments
+		if (node.nodeType === 8 && this._allowHTMLComment) {
+			return '<!--' + node.textContent.trim() + '-->';
+		}
+
+		return '';
+	},
+
+	/**
+	 * @description It is judged whether it is the not checking node. (class="katex", "__se__block")
+	 * @param {Node} element The node to check
+	 * @returns {boolean}
+	 * @private
+	 */
+	_isNotCheckingNode: function (element) {
+		return element && /katex|__se__block/.test(element.className);
+	},
+
+	/**
+	 * @description Fix tags that do not fit the editor format.
+	 * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
+	 * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist
+	 * @param {RegExp} htmlCheckBlacklistRegExp Editor tags blacklist
+	 * @param {Boolean} lowLevelCheck Row level check
+	 * @private
+	 */
+	_consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, lowLevelCheck) {
+		/**
+		 * It is can use ".children(domUtils.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
+		 * So check the node type and exclude the text no (current.nodeType !== 1)
+		 */
+		const removeTags = [],
+			emptyTags = [],
+			wrongList = [],
+			withoutFormatCells = [];
+
+		// wrong position
+		const wrongTags = domUtils.getListChildNodes(
+			documentFragment,
+			function (current) {
+				if (current.nodeType !== 1) {
+					if (domUtils.isList(current.parentNode)) removeTags.push(current);
+					return false;
+				}
+
+				// white list
+				if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && this._isNotCheckingNode(current))) {
+					removeTags.push(current);
+					return false;
+				}
+
+				const nrtag = !domUtils.getParentElement(current, this._isNotCheckingNode);
+				// empty tags
+				if (!domUtils.isTable(current) && !domUtils.isListCell(current) && !domUtils.isAnchor(current) && (this.format.isLine(current) || this.format.isBlock(current) || this.format.isTextStyleNode(current)) && current.childNodes.length === 0 && nrtag) {
+					emptyTags.push(current);
+					return false;
+				}
+
+				// wrong list
+				if (domUtils.isList(current.parentNode) && !domUtils.isList(current) && !domUtils.isListCell(current)) {
+					wrongList.push(current);
+					return false;
+				}
+
+				// table cells
+				if (domUtils.isTableCell(current)) {
+					const fel = current.firstElementChild;
+					if (!this.format.isLine(fel) && !this.format.isBlock(fel) && !this.component.is(fel)) {
+						withoutFormatCells.push(current);
+						return false;
+					}
+				}
+
+				const result =
+					current.parentNode !== documentFragment &&
+					nrtag &&
+					((domUtils.isListCell(current) && !domUtils.isList(current.parentNode)) || (lowLevelCheck && (this.format.isLine(current) || this.component.is(current)) && !this.format.isBlock(current.parentNode) && !domUtils.getParentElement(current, this.component.is)));
+
+				return result;
+			}.bind(this)
+		);
+
+		for (let i = 0, len = removeTags.length; i < len; i++) {
+			domUtils.removeItem(removeTags[i]);
+		}
+
+		const checkTags = [];
+		for (let i = 0, len = wrongTags.length, t, p; i < len; i++) {
+			t = wrongTags[i];
+			p = t.parentNode;
+			if (!p || !p.parentNode) continue;
+
+			if (domUtils.getParentElement(t, domUtils.isListCell)) {
+				const cellChildren = t.childNodes;
+				for (let j = cellChildren.length - 1; len >= 0; j--) {
+					p.insertBefore(t, cellChildren[j]);
+				}
+				checkTags.push(t);
+			} else {
+				p.parentNode.insertBefore(t, p);
+				checkTags.push(p);
+			}
+		}
+
+		for (let i = 0, len = checkTags.length, t; i < len; i++) {
+			t = checkTags[i];
+			if (domUtils.onlyZeroWidthSpace(t.textContent.trim())) {
+				domUtils.removeItem(t);
+			}
+		}
+
+		for (let i = 0, len = emptyTags.length; i < len; i++) {
+			domUtils.removeItem(emptyTags[i]);
+		}
+
+		for (let i = 0, len = wrongList.length, t, tp, children, p; i < len; i++) {
+			t = wrongList[i];
+			p = t.parentNode;
+			if (!p) continue;
+
+			tp = domUtils.createElement('LI');
+
+			if (this.format.isLine(t)) {
+				children = t.childNodes;
+				while (children[0]) {
+					tp.appendChild(children[0]);
+				}
+				p.insertBefore(tp, t);
+				domUtils.removeItem(t);
+			} else {
+				t = t.nextSibling;
+				tp.appendChild(wrongList[i]);
+				p.insertBefore(tp, t);
+			}
+		}
+
+		for (let i = 0, len = withoutFormatCells.length, t, f; i < len; i++) {
+			t = withoutFormatCells[i];
+			f = domUtils.createElement('DIV');
+			f.innerHTML = t.textContent.trim().length === 0 && t.children.length === 0 ? '<br>' : t.innerHTML;
+			t.innerHTML = f.outerHTML;
+		}
+	},
+
+	/**
+	 * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
+	 * @param {string} text
+	 * @returns {string} HTML string
+	 * @private
+	 */
+	_tagConvertor: function (text) {
+		if (!this._disallowedStyleNodesRegExp) return text;
+
+		const ec = this.options._styleNodeMap;
+		return text.replace(this._disallowedStyleNodesRegExp, function (m, t, n, p) {
+			return t + (typeof ec[n] === 'string' ? ec[n] : n) + (p ? ' ' + p : '');
+		});
+	},
+
 	constructor: HTML
 };
+
+/**
+ *
+ * @param {Element} element Rmove the disallowed tag.
+ * @returns {boolean}
+ * @private
+ */
+function DisallowedElements(element) {
+	return /^(meta|script|link|style|[a-z]+\:[a-z]+)$/i.test(element.nodeName);
+}
+
+/**
+ * @description Delete disallowed tags
+ * @param {string} html HTML string
+ * @returns {string}
+ * @private
+ */
+function DeleteDisallowedTags(html, whitelistRegExp, blacklistRegExp) {
+	return html
+		.replace(/\n/g, '')
+		.replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '')
+		.replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '')
+		.replace(whitelistRegExp, '')
+		.replace(blacklistRegExp, '');
+}
+
+/**
+ * @description Tag and tag attribute check RegExp function.
+ * @param {boolean} lowLevelCheck Low level check
+ * @param {string} m RegExp value
+ * @param {string} t RegExp value
+ * @returns {string}
+ * @private
+ */
+function CleanElements(lowLevelCheck, m, t) {
+	if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
+
+	let v = null;
+	const tagName = t.match(/(?!<)[a-zA-Z0-9\-]+/)[0].toLowerCase();
+
+	// blacklist
+	const bAttr = this._attributeBlacklist[tagName];
+	if (bAttr) m = m.replace(bAttr, '');
+	else m = m.replace(this._attributeBlacklistRegExp, '');
+
+	// whitelist
+	const wAttr = this._attributeWhitelist[tagName];
+	if (wAttr) v = m.match(wAttr);
+	else v = m.match(this._attributeWhitelistRegExp);
+
+	// anchor
+	if (!lowLevelCheck || /<a\b/i.test(t)) {
+		const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
+		if (sv) {
+			if (!v) v = [];
+			v.push(sv[0]);
+		}
+	}
+
+	// span
+	if ((!lowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
+		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
+		if (sv) {
+			if (!v) v = [];
+			v.push(sv[0]);
+		}
+	}
+
+	// img
+	if (/<img/i.test(t)) {
+		let w = '',
+			h = '';
+		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
+		if (!v) v = [];
+		if (sv) {
+			w = sv[0].match(/width:(.+);/);
+			w = numbers.get(w ? w[1] : '', -1) || '';
+			h = sv[0].match(/height:(.+);/);
+			h = numbers.get(h ? h[1] : '', -1) || '';
+		}
+
+		if (!w || !h) {
+			const avw = m.match(/width\s*=\s*((?:"|')[^"']*(?:"|'))/);
+			const avh = m.match(/height\s*=\s*((?:"|')[^"']*(?:"|'))/);
+			if (avw || avh) {
+				w = !w ? numbers.get(avw ? avw[1] : '') || '' : w;
+				h = !h ? numbers.get(avh ? avh[1] : '') || '' : h;
+			}
+		}
+		v.push('data-origin="' + (w + ',' + h) + '"');
+	}
+
+	if (v) {
+		for (let i = 0, len = v.length; i < len; i++) {
+			if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
+			t += ' ' + (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i]) ? '' : v[i]);
+		}
+	}
+
+	return t;
+}
+
+function GetRegList(str, str2) {
+	return !str ? '^' : str === '*' ? '[a-z-]+' : !str2 ? str : str + '|' + str2;
+}
 
 export default HTML;

@@ -187,7 +187,7 @@ class domUtils {
 	 * @description Delete argumenu value element
 	 * @param item Node to be remove
 	 */
-	remove(item: Node): void;
+	removeItem(item: Node): void;
 
 	/**
 	 * @description Replace icon
