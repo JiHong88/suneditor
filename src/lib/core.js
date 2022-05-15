@@ -1645,7 +1645,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return null;
             }
 
-            const freeFormat = util.getFreeFormatElement(this.getSelectionNode(), null);
+            const line = util.getFormatElement(this.getSelectionNode(), null);
+            const listCell = util.isListCell(line);
+            const freeFormat = util.isFreeFormatElement(line);
             const isFormats = (!freeFormat && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) || util.isComponent(oNode);
 
             if (!afterNode && (isFormats || util.isComponent(oNode) || util.isMedia(oNode))) {
@@ -1790,7 +1792,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     oNode = fNode;
                 }
 
-                parentNode.insertBefore(oNode, parentNode === afterNode ? parentNode.lastChild : afterNode);
+                // insert--
+                let emptyListCell = false;
+                if (listCell && util.isListCell(oNode)) {
+                    afterNode = line.nextElementSibling;
+                    parentNode = line.parentNode;
+                    emptyListCell = util.onlyZeroWidthSpace(line.textContent);
+                } else {
+                    afterNode = parentNode === afterNode ? parentNode.lastChild : afterNode;
+                }
+
+                parentNode.insertBefore(oNode, afterNode);
+                if (emptyListCell) util.removeItem(line);
             } catch (e) {
                 parentNode.appendChild(oNode);
             } finally {
@@ -7571,7 +7584,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             for (let i = 0, len = domTree.length, node; i < len; i++) {
                 node = domTree[i];
                 if (node.nodeType === 1) {
-                    if (util.isFormatElement(node)) {
+                    if (util.isListCell(node)) {
+                        html += node.outerHTML;
+                    } else if (util.isFormatElement(node)) {
                         html += '<li>' +(node.innerHTML.trim() || '<br>') + '</li>';
                     } else if (util.isRangeFormatElement(node) && !util.isTable(node)) {
                         html += event._convertListCell(node);
