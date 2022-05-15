@@ -2763,20 +2763,26 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // one line
             if (oneLine) {
-                this._resetCommonListCell(lineNodes[0], styleArray);
+                if (this._resetCommonListCell(lineNodes[0], styleArray)) range = this.setRange(startCon, startOff, endCon, endOff);
+
                 const newRange = this._nodeChange_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode);
                 start.container = newRange.startContainer;
                 start.offset = newRange.startOffset;
                 end.container = newRange.endContainer;
                 end.offset = newRange.endOffset;
+                
                 if (start.container === end.container && util.onlyZeroWidthSpace(start.container)) {
                     start.offset = end.offset = 1;
                 }
                 this._setCommonListStyle(newRange.ancestor, null);
             } else { // multi line 
+                let appliedCommonList = false;
+                if (endLength > 0 && this._resetCommonListCell(lineNodes[endLength], styleArray)) appliedCommonList = true;
+                if (this._resetCommonListCell(lineNodes[0], styleArray)) appliedCommonList = true;
+                if (appliedCommonList) this.setRange(startCon, startOff, endCon, endOff);
+
                 // end
                 if (endLength > 0) {
-                    this._resetCommonListCell(lineNodes[endLength], styleArray);
                     newNode = appendNode.cloneNode(false);
                     end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
                 }
@@ -2794,7 +2800,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
 
                 // start
-                this._resetCommonListCell(lineNodes[0], styleArray);
                 newNode = appendNode.cloneNode(false);
                 start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, end.container);
 
@@ -2854,9 +2859,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             let sel = refer.cloneNode(false);
-            let r = null;
+            let r = null, appliedEl = false;
             for (let i = 0, len = children.length, c, s; i < len; i++) {
                 c = children[i];
+                if (options._textTagsMap[c.nodeName.toLowerCase()]) continue;
+
                 s = util.getValues(c.style);
                 if (s.length === 0 || (ec.some(function (k) {return s.indexOf(k) === -1;}) && s.some(function(k) {ec.indexOf(k) > -1;}))) {
                     r = c.nextSibling;
@@ -2865,11 +2872,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     el.insertBefore(sel, r);
                     sel = refer.cloneNode(false);
                     r = null;
+                    appliedEl = true;
                 }
             }
             
-            if (sel.childNodes.length > 0) el.insertBefore(sel, r);
-            if (!elStyles.length) el.removeAttribute('style');
+            if (sel.childNodes.length > 0) {
+                el.insertBefore(sel, r);
+                appliedEl = true;
+            }
+            if (!elStyles.length) {
+                el.removeAttribute('style');
+            }
+
+            return appliedEl;
         },
 
         /**
