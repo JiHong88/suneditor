@@ -225,6 +225,8 @@ HTML.prototype = {
 			return null;
 		}
 
+		const line = this.format.getLine(this.selection.getNode(), null);
+		const isListCell = domUtils.isListCell(line);
 		const brBlock = this.format.getBrLine(this.selection.getNode(), null);
 		const isFormats = (!brBlock && (this.format.isLine(oNode) || this.format.isBlock(oNode))) || this.component.is(oNode);
 
@@ -374,7 +376,18 @@ HTML.prototype = {
 				oNode = domUtils.createElement(this.options.defaultLineTag, null, oNode);
 			}
 
-			parentNode.insertBefore(oNode, parentNode === afterNode ? parentNode.lastChild : afterNode);
+			// insert--
+			let emptyListCell = false;
+			if (isListCell && domUtils.isListCell(oNode)) {
+				afterNode = line.nextElementSibling;
+				parentNode = line.parentNode;
+				emptyListCell = domUtils.onlyZeroWidthSpace(line.textContent);
+			} else {
+				afterNode = parentNode === afterNode ? parentNode.lastChild : afterNode;
+			}
+
+			parentNode.insertBefore(oNode, afterNode);
+			if (emptyListCell) domUtils.removeItem(line);
 		} catch (e) {
 			parentNode.appendChild(oNode);
 		} finally {

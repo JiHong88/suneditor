@@ -8,7 +8,7 @@ import { domUtils, unicode, numbers, global } from '../../helper';
 
 const Format = function (editor) {
 	CoreInterface.call(this, editor);
-	this._listCamel = editor.options.__listsCommonStyle;
+	this._listCamel = editor.options.__listCommonStyle;
 	this._listKebab = global.camelToKebabCase(editor.options.__listCommonStyle);
 };
 
@@ -1347,21 +1347,27 @@ Format.prototype = {
 
 		// one line
 		if (oneLine) {
-			this._sn_resetCommonListCell(lineNodes[0], styleArray);
+			if (this._sn_resetCommonListCell(lineNodes[0], styleArray)) range = this.selection.setRange(startCon, startOff, endCon, endOff);
+
 			const newRange = this._setNode_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode);
 			start.container = newRange.startContainer;
 			start.offset = newRange.startOffset;
 			end.container = newRange.endContainer;
 			end.offset = newRange.endOffset;
+
 			if (start.container === end.container && unicode.onlyZeroWidthSpace(start.container)) {
 				start.offset = end.offset = 1;
 			}
 			this._sn_setCommonListStyle(newRange.ancestor, null);
 		} else {
 			// multi line
+			let appliedCommonList = false;
+			if (endLength > 0 && this._sn_resetCommonListCell(lineNodes[endLength], styleArray)) appliedCommonList = true;
+			if (this._sn_resetCommonListCell(lineNodes[0], styleArray)) appliedCommonList = true;
+			if (appliedCommonList) this.selection.setRange(startCon, startOff, endCon, endOff);
+
 			// end
 			if (endLength > 0) {
-				this._sn_resetCommonListCell(lineNodes[endLength], styleArray);
 				newNode = styleNode.cloneNode(false);
 				end = this._setNode_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
 			}
@@ -1379,7 +1385,6 @@ Format.prototype = {
 			}
 
 			// start
-			this._sn_resetCommonListCell(lineNodes[0], styleArray);
 			newNode = styleNode.cloneNode(false);
 			start = this._setNode_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, end.container);
 
@@ -3125,46 +3130,44 @@ Format.prototype = {
 			},
 			true
 		);
+		child = children[0];
 
 		if (!child || children.length > 1 || child.nodeType !== 1) return;
 
 		// set cell style---
-		const commonStyleElements = [];
 		const childStyle = child.style;
 		const elStyle = el.style;
+		const nodeName = child.nodeName.toLowerCase();
+		let appliedEl = false;
 
 		// bold, italic
-		if (this.options._styleNodeMap[child.nodeName.toLowerCase()] === this.editor._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold';
-		// bold
-		else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
-		if (this.options._styleNodeMap[child.nodeName.toLowerCase()] === this.editor._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic';
-		// italic
-		else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
+		if (this.options._styleNodeMap[nodeName] === this.options._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold';
+		if (this.options._styleNodeMap[nodeName] === this.options._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic';
 
 		// styles
 		const cKeys = global.getValues(childStyle);
-		for (let i = 0, len = this._listCamel.length; i < len; i++) {
-			if (cKeys.indexOf(this._listKebab[i]) > -1) {
-				elStyle[this._listCamel[i]] = childStyle[this._listCamel[i]];
-				childStyle.removeProperty(this._listKebab[i]);
+		if (cKeys.length > 0) {
+			for (let i = 0, len = this._listCamel.length; i < len; i++) {
+				if (cKeys.indexOf(this._listKebab[i]) > -1) {
+					elStyle[this._listCamel[i]] = childStyle[this._listCamel[i]];
+					childStyle.removeProperty(this._listKebab[i]);
+					appliedEl = true;
+				}
 			}
 		}
 
-		// remove child
-		if (!childStyle.length) commonStyleElements.push(child);
-
 		this._sn_setCommonListStyle(el, child);
+		if (!appliedEl) return;
 
 		// common style
-		for (let i = 0, len = commonStyleElements.length, n, ch, p; i < len; i++) {
-			n = commonStyleElements[i];
-			ch = n.childNodes;
-			p = n.parentNode;
-			n = n.nextSibling;
+		if (!childStyle.length) {
+			const ch = child.childNodes;
+			const p = child.parentNode;
+			const n = child.nextSibling;
 			while (ch.length > 0) {
 				p.insertBefore(ch[0], n);
 			}
-			domUtils.removeItem(commonStyleElements[i]);
+			domUtils.removeItem(child);
 		}
 	},
 
@@ -3207,9 +3210,12 @@ Format.prototype = {
 		}
 
 		let sel = refer.cloneNode(false);
-		let r = null;
+		let r = null,
+			appliedEl = false;
 		for (let i = 0, len = children.length, c, s; i < len; i++) {
 			c = children[i];
+			if (this.options._styleNodeMap[c.nodeName.toLowerCase()]) continue;
+
 			s = global.getValues(c.style);
 			if (
 				s.length === 0 ||
@@ -3226,11 +3232,19 @@ Format.prototype = {
 				el.insertBefore(sel, r);
 				sel = refer.cloneNode(false);
 				r = null;
+				appliedEl = true;
 			}
 		}
 
-		if (sel.childNodes.length > 0) el.insertBefore(sel, r);
-		if (!elStyles.length) el.removeAttribute('style');
+		if (sel.childNodes.length > 0) {
+			el.insertBefore(sel, r);
+			appliedEl = true;
+		}
+		if (!elStyles.length) {
+			el.removeAttribute('style');
+		}
+
+		return appliedEl;
 	},
 
 	constructor: Format

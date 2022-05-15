@@ -88,34 +88,13 @@ Toolbar.prototype = {
 		this.context.tool = newContext.tool;
 		if (this.options.iframe) this.context.element.wysiwyg = this._wd.body;
 
-		this._recoverButtonStates();
-
 		this.editor._cachingButtons();
 		this.history._resetCachingButton();
 
+		this.editor.effectNode = null;
 		if (core.hasFocus) this.eventMenager.applyTagEffect();
 		if (core.isReadOnly) domUtils.setDisabled(true, this.editor.resizingDisabledButtons);
 		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'), core);
-	},
-
-	/**
-	 * @description Recover the current buttons states from "allCommandButtons" object
-	 * @private
-	 */
-	_recoverButtonStates: function () {
-		if (this.allCommandButtons) {
-			const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]');
-			for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
-				button = currentButtons[i];
-				command = button.getAttribute('data-command');
-
-				oldButton = this.allCommandButtons[command];
-				if (oldButton) {
-					button.parentElement.replaceChild(oldButton, button);
-					if (this.context.tool[command]) this.context.tool[command] = oldButton;
-				}
-			}
-		}
 	},
 
 	/**

@@ -131,7 +131,7 @@ export function getIncludePath(nameArray, extension) {
 
 	if (!path)
 		throw (
-			'[SUNEDITOR.util.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (name: +' +
+			'[SUNEDITOR.helper.global.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (name: +' +
 			name +
 			', extension: ' +
 			extension +

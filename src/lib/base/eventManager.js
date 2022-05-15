@@ -467,7 +467,7 @@ EventManager.prototype = {
 		}
 
 		if (cleanData) {
-			if (domUtils.isListCell(util.getFormatElement(this.selection.get(), null))) {
+			if (domUtils.isListCell(this.format.getLine(this.selection.get(), null))) {
 				const dom = _d.createRange().createContextualFragment(cleanData);
 				if (dom.childNodes[0].nodeType === 1) {
 					cleanData = ConvertListCell(dom);
@@ -1647,6 +1647,7 @@ function OnFocus_wysiwyg(e) {
 function OnBlur_wysiwyg(e) {
 	if (this.editor._antiBlur || this.status.isCodeView) return;
 	this.status.hasFocus = false;
+	this.editor.effectNode = null;
 	this.menu.controllerOff();
 	if (this.editor._isInline || this.editor._isBalloon) this._hideToolbar();
 
@@ -1788,9 +1789,11 @@ function ConvertListCell(dom) {
 	for (let i = 0, len = domTree.length, node; i < len; i++) {
 		node = domTree[i];
 		if (node.nodeType === 1) {
-			if (util.isFormatElement(node)) {
+			if (domUtils.isListCell(node)) {
+				html += node.outerHTML;
+			} else if (domUtils.isLine(node)) {
 				html += '<li>' + (node.innerHTML.trim() || '<br>') + '</li>';
-			} else if (util.isRangeFormatElement(node) && !util.isTable(node)) {
+			} else if (domUtils.isBlock(node) && !domUtils.isTable(node)) {
 				html += ConvertListCell(node);
 			} else {
 				html += '<li>' + node.outerHTML + '</li>';

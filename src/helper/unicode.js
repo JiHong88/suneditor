@@ -24,7 +24,7 @@ export const zeroWidthRegExp = new _w.RegExp(String.fromCharCode(zwsp), 'g');
 export const onlyZeroWidthRegExp = new _w.RegExp('^' + String.fromCharCode(zwsp) + '+$');
 
 /**
- * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (util.zeroWidthSpace)
+ * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (unicode.zeroWidthSpace)
  * @param {string|Node} text String value or Node
  * @returns {boolean}
  */

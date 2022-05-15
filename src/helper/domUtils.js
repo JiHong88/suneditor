@@ -122,7 +122,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 						el.textContent = tempText + el.textContent;
 						temp = previous;
 						previous = previous.previousSibling;
-						this.remove(temp);
+						removeItem(temp);
 					}
 
 					let next = el.nextSibling;
@@ -132,7 +132,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 						el.textContent += tempText;
 						temp = next;
 						next = next.nextSibling;
-						this.remove(temp);
+						removeItem(temp);
 					}
 				}
 

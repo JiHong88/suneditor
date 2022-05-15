@@ -348,26 +348,6 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	};
 
 	/**
-	 * @description Contains pairs of all "data-commands" and "elements" setted in toolbar over time
-	 * Used primarily to save and recover button states after the toolbar re-creation
-	 * Updates each "_cachingButtons()" invocation
-	 */
-	this.allCommandButtons = null;
-
-	/**
-	 * @description Map of default command
-	 * @private
-	 */
-	this._defaultCommand = {
-		bold: options.textTags.bold,
-		underline: options.textTags.underline,
-		italic: options.textTags.italic,
-		strike: options.textTags.strike,
-		subscript: options.textTags.sub,
-		superscript: options.textTags.sup
-	};
-
-	/**
 	 * @description FullScreen and codeView relative status
 	 */
 	this._transformStatus = {
@@ -615,7 +595,7 @@ Core.prototype = {
 				break;
 			default:
 				// 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'..
-				command = this._defaultCommand[command.toLowerCase()] || command;
+				command = this.options._defaultCommand[command.toLowerCase()] || command;
 				if (!this._commandMap[command]) this._commandMap[command] = target;
 
 				const nodesMap = this.status.currentNodesMap;
@@ -1757,41 +1737,24 @@ Core.prototype = {
 		this.codeViewDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])');
 		this.resizingDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
 
-		this._saveButtonStates();
-
 		const buttons = this.context.buttons;
+		const textTags = this.options.textTags;
 		this._commandMap = {
-			SUB: buttons.subscript,
-			SUP: buttons.superscript,
 			OUTDENT: buttons.outdent,
 			INDENT: buttons.indent
 		};
-		this._commandMap[this.options.textTags.bold.toUpperCase()] = buttons.bold;
-		this._commandMap[this.options.textTags.underline.toUpperCase()] = buttons.underline;
-		this._commandMap[this.options.textTags.italic.toUpperCase()] = buttons.italic;
-		this._commandMap[this.options.textTags.strike.toUpperCase()] = buttons.strike;
+		this._commandMap[textTags.bold.toUpperCase()] = buttons.bold;
+		this._commandMap[textTags.underline.toUpperCase()] = buttons.underline;
+		this._commandMap[textTags.italic.toUpperCase()] = buttons.italic;
+		this._commandMap[textTags.strike.toUpperCase()] = buttons.strike;
+		this._commandMap[textTags.sub.toUpperCase()] = buttons.subscript;
+		this._commandMap[textTags.sup.toUpperCase()] = buttons.superscript;
 
 		this._styleCommandMap = {
 			fullScreen: buttons.fullScreen,
 			showBlocks: buttons.showBlocks,
 			codeView: buttons.codeView
 		};
-	},
-
-	/**
-	 * @description Save the current buttons states to "allCommandButtons" object
-	 * @private
-	 */
-	_saveButtonStates: function () {
-		if (!this.allCommandButtons) this.allCommandButtons = {};
-
-		const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]');
-		for (let i = 0, element, command; i < currentButtons.length; i++) {
-			element = currentButtons[i];
-			command = element.getAttribute('data-command');
-
-			this.allCommandButtons[command] = element;
-		}
 	},
 
 	/**

@@ -209,6 +209,8 @@ function _initOptions(element, options) {
 	/** base */
 	options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
 	options.lang = options.lang || _defaultLang;
+	options.value = typeof options.value === 'string' ? options.value : null;
+	// text style tags
 	const textTags = (options.textTags = [{ bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL', sub: 'SUB', sup: 'SUP' }, options.textTags || {}].reduce(function (_default, _new) {
 		for (let key in _new) {
 			_default[key] = _new[key];
@@ -228,9 +230,16 @@ function _initOptions(element, options) {
 		sub: textTags.sub.toLowerCase(),
 		sup: textTags.sup.toLowerCase()
 	};
-	options.value = typeof options.value === 'string' ? options.value : null;
-	options.textDirection = options.textDirection !== 'string' ? 'ltr' : options.textDirection;
+	options._defaultCommand = {
+		bold: options.textTags.bold,
+		underline: options.textTags.underline,
+		italic: options.textTags.italic,
+		strike: options.textTags.strike,
+		subscript: options.textTags.sub,
+		superscript: options.textTags.sup
+	};
 	// text direction
+	options.textDirection = options.textDirection !== 'string' ? 'ltr' : options.textDirection;
 	options._rtl = options.textDirection === 'rtl';
 	if (options._rtl) options.buttonList = options.buttonList.reverse();
 	// icons
@@ -431,8 +440,6 @@ function _initOptions(element, options) {
 
 	/** Private options */
 	options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle'];
-
-	/** _init options */
 	// options.__defaultFontSize;
 }
 
@@ -850,7 +857,7 @@ function _createToolBar(buttonList, _plugins, options) {
 				// more button
 				if (moreButton) {
 					more = true;
-					moreContainer = util.createElement('DIV');
+					moreContainer = domUtils.createElement('DIV');
 					moreContainer.className = 'se-more-layer ' + moreCommand;
 					moreContainer.innerHTML = '<div class="se-more-form"><ul class="se-menu-list"' + (align ? ' style="float: ' + align + ';"' : '') + '></ul></div>';
 					moreLayer.appendChild(moreContainer);
