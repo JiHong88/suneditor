@@ -5,7 +5,7 @@
  * Copyright 2017 Yi JiHong.
  * MIT license.
  */
-import core from './lib/core';
+import Core from './lib/core';
 import Constructor from './lib/constructor';
 import Context from './lib/context';
 
@@ -65,6 +65,6 @@ export default {
             throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed._top.id + '")');
         }
 
-        return new core(Context(element, cons.constructed, options), cons.pluginCallButtons, cons.plugins, cons.options.lang, options, cons._responsiveButtons);
+        return new Core(Context(element, cons.constructed, options), cons.pluginCallButtons, cons.plugins, cons.options.lang, options, cons._responsiveButtons);
     }
 };

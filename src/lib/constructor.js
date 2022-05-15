@@ -430,7 +430,7 @@ function _initOptions(element, options) {
 		: null;
 
 	/** Private options */
-	options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily'];
+	options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle'];
 
 	/** _init options */
 	// options.__defaultFontSize;
