@@ -460,13 +460,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
-         * @description Contains pairs of all "data-commands" and "elements" setted in toolbar over time
-         * Used primarily to save and recover button states after the toolbar re-creation
-         * Updates each "_cachingButtons()" invocation  
-         */
-        allCommandButtons: null,
-
-        /**
          * @description Style button related to edit area
          * @property {Element} fullScreen fullScreen button element
          * @property {Element} showBlocks showBlocks button element
