@@ -398,6 +398,9 @@ export default {
     _initOptions: function (element, options) {
         /** Values */
         options.lang = options.lang || _defaultLang;
+        options.value = typeof options.value === 'string' ? options.value : null;
+        options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
+        // tag style
         options.defaultTag = typeof options.defaultTag === 'string' && options.defaultTag.length > 0 ? options.defaultTag : 'p';
         const textTags = options.textTags = [{bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL', sub: 'SUB', sup: 'SUP'}, (options.textTags || {})].reduce(function (_default, _new) {
             for (let key in _new) {
@@ -418,8 +421,14 @@ export default {
             'sub': textTags.sub.toLowerCase(),
             'sup': textTags.sup.toLowerCase()
         };
-        options.value = typeof options.value === 'string' ? options.value : null;
-        options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
+        options._defaultCommand = {
+            bold: options.textTags.bold,
+            underline: options.textTags.underline,
+            italic: options.textTags.italic,
+            strike: options.textTags.strike,
+            subscript: options.textTags.sub,
+            superscript: options.textTags.sup
+        };
         /** Whitelist, Blacklist */
         const whitelist = 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
         // tags
@@ -574,9 +583,6 @@ export default {
             ['fullScreen', 'showBlocks', 'codeView'],
             ['preview', 'print']
         ];
-        /** Private options */
-        options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily'];
-        // options.__defaultFontSize;
 
         /** RTL - buttons */
         if (options.rtl) {
@@ -598,6 +604,10 @@ export default {
             }
             return _default;
         }, {});
+
+        /** Private options */
+        // options.__defaultFontSize;
+        options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle'];
 
         /** _init options */
         options._editorStyles = util._setDefaultOptionStyle(options, options.defaultStyle);

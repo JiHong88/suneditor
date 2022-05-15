@@ -476,19 +476,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _styleCommandMap: null,
 
         /**
-         * @description Map of default command
-         * @private
-         */
-        _defaultCommand: {
-            bold: options.textTags.bold,
-            underline: options.textTags.underline,
-            italic: options.textTags.italic,
-            strike: options.textTags.strike,
-            subscript: options.textTags.sub,
-            superscript: options.textTags.sup
-        },
-
-        /**
          * @description Variables used internally in editor operation
          * @property {Boolean} isCodeView State of code view
          * @property {Boolean} isFullScreen State of full screen
@@ -521,40 +508,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             _fullScreenAttrs: {sticky: false, balloon: false, inline: false},
             _lineBreakComp: null,
             _lineBreakDir: ''
-        },
-
-        /**
-         * @description Save the current buttons states to "allCommandButtons" object
-         */
-        saveButtonStates: function () {
-            if (!this.allCommandButtons) this.allCommandButtons = {};
-
-            const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]');
-            for (let i = 0, element, command; i < currentButtons.length; i++) {
-                element = currentButtons[i];
-                command = element.getAttribute('data-command');
-
-                this.allCommandButtons[command] = element;
-            }
-        },
-
-        /**
-         * @description Recover the current buttons states from "allCommandButtons" object
-         */
-        recoverButtonStates: function () {
-            if (this.allCommandButtons) {
-                const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]'); 
-                for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
-                    button = currentButtons[i]; 
-                    command = button.getAttribute('data-command');
-
-                    oldButton = this.allCommandButtons[command];
-                    if (oldButton) {
-                        button.parentElement.replaceChild(oldButton, button);
-                        if (this.context.tool[command]) this.context.tool[command] = oldButton;
-                    }
-                }   
-            }
         },
 
         /**
@@ -2810,20 +2763,26 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // one line
             if (oneLine) {
-                this._resetCommonListCell(lineNodes[0], styleArray);
+                if (this._resetCommonListCell(lineNodes[0], styleArray)) range = this.setRange(startCon, startOff, endCon, endOff);
+
                 const newRange = this._nodeChange_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode);
                 start.container = newRange.startContainer;
                 start.offset = newRange.startOffset;
                 end.container = newRange.endContainer;
                 end.offset = newRange.endOffset;
+                
                 if (start.container === end.container && util.onlyZeroWidthSpace(start.container)) {
                     start.offset = end.offset = 1;
                 }
                 this._setCommonListStyle(newRange.ancestor, null);
             } else { // multi line 
+                let appliedCommonList = false;
+                if (endLength > 0 && this._resetCommonListCell(lineNodes[endLength], styleArray)) appliedCommonList = true;
+                if (this._resetCommonListCell(lineNodes[0], styleArray)) appliedCommonList = true;
+                if (appliedCommonList) this.setRange(startCon, startOff, endCon, endOff);
+
                 // end
                 if (endLength > 0) {
-                    this._resetCommonListCell(lineNodes[endLength], styleArray);
                     newNode = appendNode.cloneNode(false);
                     end = this._nodeChange_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
                 }
@@ -2841,7 +2800,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
 
                 // start
-                this._resetCommonListCell(lineNodes[0], styleArray);
                 newNode = appendNode.cloneNode(false);
                 start = this._nodeChange_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, end.container);
 
@@ -2901,9 +2859,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             let sel = refer.cloneNode(false);
-            let r = null;
+            let r = null, appliedEl = false;
             for (let i = 0, len = children.length, c, s; i < len; i++) {
                 c = children[i];
+                if (options._textTagsMap[c.nodeName.toLowerCase()]) continue;
+
                 s = util.getValues(c.style);
                 if (s.length === 0 || (ec.some(function (k) {return s.indexOf(k) === -1;}) && s.some(function(k) {ec.indexOf(k) > -1;}))) {
                     r = c.nextSibling;
@@ -2912,11 +2872,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     el.insertBefore(sel, r);
                     sel = refer.cloneNode(false);
                     r = null;
+                    appliedEl = true;
                 }
             }
             
-            if (sel.childNodes.length > 0) el.insertBefore(sel, r);
-            if (!elStyles.length) el.removeAttribute('style');
+            if (sel.childNodes.length > 0) {
+                el.insertBefore(sel, r);
+                appliedEl = true;
+            }
+            if (!elStyles.length) {
+                el.removeAttribute('style');
+            }
+
+            return appliedEl;
         },
 
         /**
@@ -2934,40 +2902,39 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!child || children.length > 1 || child.nodeType !== 1) return;
             
             // set cell style---
-            const commonStyleElements = [];
             const childStyle = child.style;
             const elStyle = el.style;
+            const nodeName = child.nodeName.toLowerCase();
+            let appliedEl = false;
 
             // bold, italic
-            if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold'; // bold
-            else if (childStyle.fontWeight) elStyle.fontWeight = childStyle.fontWeight;
-            if (options._textTagsMap[child.nodeName.toLowerCase()] === this._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic'; // italic
-            else if (childStyle.fontStyle) elStyle.fontStyle = childStyle.fontStyle;
+            if (options._textTagsMap[nodeName] === options._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold';
+            if (options._textTagsMap[nodeName] === options._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic';
 
             // styles
             const cKeys = util.getValues(childStyle);
-            for (let i = 0, len = this._listCamel.length; i < len; i++) {
-                if (cKeys.indexOf(this._listKebab[i]) > -1) {
-                    elStyle[this._listCamel[i]] = childStyle[this._listCamel[i]];
-                    childStyle.removeProperty(this._listKebab[i]);
+            if (cKeys.length > 0) {
+                for (let i = 0, len = this._listCamel.length; i < len; i++) {
+                    if (cKeys.indexOf(this._listKebab[i]) > -1) {
+                        elStyle[this._listCamel[i]] = childStyle[this._listCamel[i]];
+                        childStyle.removeProperty(this._listKebab[i]);
+                        appliedEl = true;
+                    }
                 }
             }
-            
-            // remove child
-            if (!childStyle.length) commonStyleElements.push(child);
 
             this._setCommonListStyle(el, child);
+            if (!appliedEl) return;
 
             // common style
-            for (let i = 0, len = commonStyleElements.length, n, ch, p; i < len; i++) {
-                n = commonStyleElements[i];
-                ch = n.childNodes;
-                p = n.parentNode;
-                n = n.nextSibling;
+            if (!childStyle.length) {
+                const ch = child.childNodes;
+                const p = child.parentNode;
+                const n = child.nextSibling;
                 while (ch.length > 0) {
                     p.insertBefore(ch[0], n);
                 }
-                util.removeItem(commonStyleElements[i]);
+                util.removeItem(child);
             }
         },
 
@@ -4337,7 +4304,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (context.tool.save) context.tool.save.setAttribute('disabled', true);
                     break;
                 default : // 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'..
-                    command = this._defaultCommand[command.toLowerCase()] || command;
+                    command = options._defaultCommand[command.toLowerCase()] || command;
                     if (!this.commandMap[command]) this.commandMap[command] = target;
 
                     const nodesMap = this._variable.currentNodesMap;
@@ -5152,7 +5119,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             for (let i = 0, t; i < domTree.length; i++) {
                 t = domTree[i];
 
-                if (!util.isFormatElement(t) && !util.isComponent(t) && !util.isMedia(t)) {
+                if (!util.isFormatElement(t) && !util.isRangeFormatElement(t) && !util.isComponent(t) && !util.isMedia(t)) {
                     if (!p) p = util.createElement(options.defaultTag);
                     p.appendChild(t);
                     i--;
@@ -5626,12 +5593,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.codeViewDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"]):not([data-display="MORE"])');
             this.resizingDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-resizing-enabled"]):not([data-display="MORE"])');
 
-            this.saveButtonStates();
-
             const tool = context.tool;
             this.commandMap = {
-                SUB: tool.subscript,
-                SUP: tool.superscript,
                 OUTDENT: tool.outdent,
                 INDENT: tool.indent
             };
@@ -5639,6 +5602,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.commandMap[options.textTags.underline.toUpperCase()] = tool.underline;
             this.commandMap[options.textTags.italic.toUpperCase()] = tool.italic;
             this.commandMap[options.textTags.strike.toUpperCase()] = tool.strike;
+            this.commandMap[options.textTags.sub.toUpperCase()] = tool.subscript;
+            this.commandMap[options.textTags.sup.toUpperCase()] = tool.superscript;
             
             this._styleCommandMap = {
                 fullScreen: tool.fullScreen,
@@ -5978,7 +5943,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const marginDir = options.rtl ? 'marginRight' : 'marginLeft';
             const commandMap = core.commandMap;
-            const classOnCheck = this._onButtonsCheck;
+            const classOnCheck = event._onButtonsCheck;
             const commandMapNodes = [];
             const currentNodes = [];
 
@@ -7233,6 +7198,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onBlur_wysiwyg: function (e) {
             if (core._antiBlur || core._variable.isCodeView) return;
             core.hasFocus = false;
+            core.effectNode = null;
             core.controllersOff();
             if (core._isInline || core._isBalloon) event._hideToolbar();
 
@@ -8117,11 +8083,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             context.tool = newContext.tool;
             if (options.iframe) context.element.wysiwyg = core._wd.body;
 
-            core.recoverButtonStates();
-
             core._cachingButtons();
             core.history._resetCachingButton();
 
+            core.effectNode = null;
             if (core.hasFocus) event._applyTagEffects();
             if (core.isReadOnly) util.setDisabledButtons(true, core.resizingDisabledButtons);
             if (typeof functions.onSetToolbarButtons === 'function') functions.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'), core);

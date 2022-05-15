@@ -200,16 +200,6 @@ interface Core {
     allCommandButtons: Record<string, Element>;
 
     /**
-     * @description Save the current buttons states to "allCommandButtons" object
-     */
-    saveButtonStates(): void;
-
-    /**
-     * @description Recover the current buttons states from "allCommandButtons" object
-     */
-    recoverButtonStates(): void;
-
-    /**
      * @description If the plugin is not added, add the plugin and call the 'add' function.
      * If the plugin is added call callBack function.
      * @param pluginName The name of the plugin to call
