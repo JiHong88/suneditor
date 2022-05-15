@@ -511,40 +511,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
-         * @description Save the current buttons states to "allCommandButtons" object
-         */
-        saveButtonStates: function () {
-            if (!this.allCommandButtons) this.allCommandButtons = {};
-
-            const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]');
-            for (let i = 0, element, command; i < currentButtons.length; i++) {
-                element = currentButtons[i];
-                command = element.getAttribute('data-command');
-
-                this.allCommandButtons[command] = element;
-            }
-        },
-
-        /**
-         * @description Recover the current buttons states from "allCommandButtons" object
-         */
-        recoverButtonStates: function () {
-            if (this.allCommandButtons) {
-                const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]'); 
-                for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
-                    button = currentButtons[i]; 
-                    command = button.getAttribute('data-command');
-
-                    oldButton = this.allCommandButtons[command];
-                    if (oldButton) {
-                        button.parentElement.replaceChild(oldButton, button);
-                        if (this.context.tool[command]) this.context.tool[command] = oldButton;
-                    }
-                }   
-            }
-        },
-
-        /**
          * @description If the plugin is not added, add the plugin and call the 'add' function.
          * If the plugin is added call callBack function.
          * @param {String} pluginName The name of the plugin to call
@@ -5612,8 +5578,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.codeViewDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"]):not([data-display="MORE"])');
             this.resizingDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-resizing-enabled"]):not([data-display="MORE"])');
 
-            this.saveButtonStates();
-
             const tool = context.tool;
             this.commandMap = {
                 OUTDENT: tool.outdent,
@@ -5964,7 +5928,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const marginDir = options.rtl ? 'marginRight' : 'marginLeft';
             const commandMap = core.commandMap;
-            const classOnCheck = this._onButtonsCheck;
+            const classOnCheck = event._onButtonsCheck;
             const commandMapNodes = [];
             const currentNodes = [];
 
@@ -7219,6 +7183,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onBlur_wysiwyg: function (e) {
             if (core._antiBlur || core._variable.isCodeView) return;
             core.hasFocus = false;
+            core.effectNode = null;
             core.controllersOff();
             if (core._isInline || core._isBalloon) event._hideToolbar();
 
@@ -8103,11 +8068,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             context.tool = newContext.tool;
             if (options.iframe) context.element.wysiwyg = core._wd.body;
 
-            core.recoverButtonStates();
-
             core._cachingButtons();
             core.history._resetCachingButton();
 
+            core.effectNode = null;
             if (core.hasFocus) event._applyTagEffects();
             if (core.isReadOnly) util.setDisabledButtons(true, core.resizingDisabledButtons);
             if (typeof functions.onSetToolbarButtons === 'function') functions.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'), core);
