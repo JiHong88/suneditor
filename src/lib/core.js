@@ -1641,7 +1641,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let range = this.getRange();
             const line = util.isListCell(range.commonAncestorContainer) ? range.commonAncestorContainer : util.getFormatElement(this.getSelectionNode(), null);
             const insertListCell = util.isListCell(line) && (util.isListCell(oNode) || util.isList(oNode));
-            const splitListCell = insertListCell && true;//!this.isEdgePoint(range.endContainer, range.endOffset);
             
             let parentNode, originAfter, tempAfterNode, tempParentNode = null;
             const freeFormat = util.isFreeFormatElement(line);
@@ -1652,13 +1651,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 tempParentNode = util.isList(oNode) ? line : (tempAfterNode || line).parentNode;
             }
 
-            if (!afterNode && (insertListCell ? splitListCell : true) && (isFormats || util.isComponent(oNode) || util.isMedia(oNode))) {
+            if (!afterNode && (insertListCell ? insertListCell : true) && (isFormats || util.isComponent(oNode) || util.isMedia(oNode))) {
                 const r = this.removeNode();
                 if (r.container.nodeType === 3 || util.isBreak(r.container)) {
                     const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
                     afterNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
                     if (afterNode) {
-                        if (splitListCell) {
+                        if (insertListCell) {
                             if (line.contains(r.container)) {
                                 const newLI = line.cloneNode(false);
                                 newLI.appendChild(afterNode);
