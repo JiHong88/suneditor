@@ -1638,165 +1638,206 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return null;
             }
 
-            const line = util.getFormatElement(this.getSelectionNode(), null);
-            const listCell = util.isListCell(line);
+            let range = this.getRange();
+            const line = util.isListCell(range.commonAncestorContainer) ? range.commonAncestorContainer : util.getFormatElement(this.getSelectionNode(), null);
+            const insertListCell = util.isListCell(line) && (util.isListCell(oNode) || util.isList(oNode));
+            const splitListCell = insertListCell && true;//!this.isEdgePoint(range.endContainer, range.endOffset);
+            
+            let parentNode, originAfter, tempAfterNode, tempParentNode = null;
             const freeFormat = util.isFreeFormatElement(line);
             const isFormats = (!freeFormat && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) || util.isComponent(oNode);
 
-            if (!afterNode && (isFormats || util.isComponent(oNode) || util.isMedia(oNode))) {
+            if (insertListCell) {
+                tempAfterNode = afterNode || util.isList(oNode) ? line.lastChild : line.nextElementSibling;
+                tempParentNode = util.isList(oNode) ? line : (tempAfterNode || line).parentNode;
+            }
+
+            if (!afterNode && (insertListCell ? splitListCell : true) && (isFormats || util.isComponent(oNode) || util.isMedia(oNode))) {
                 const r = this.removeNode();
                 if (r.container.nodeType === 3 || util.isBreak(r.container)) {
                     const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
                     afterNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
-                    if (afterNode) afterNode = afterNode.previousSibling;
+                    if (afterNode) {
+                        if (splitListCell) {
+                            if (line.contains(r.container)) {
+                                const newLI = line.cloneNode(false);
+                                newLI.appendChild(afterNode);
+                                tempParentNode.insertBefore(newLI, line.nextElementSibling);
+                                tempAfterNode = afterNode = newLI;
+                                if (util.isList(line.lastElementChild)) {
+                                    newLI.appendChild(line.lastElementChild);
+                                }
+                            }
+                        } else {
+                            afterNode = afterNode.previousSibling;
+                        }
+                    }
                 }
             }
 
-            const range = (!afterNode && !isFormats) ? this.getRange_addLine(this.getRange(), null) : this.getRange();
+            range = (!afterNode && !isFormats) ? this.getRange_addLine(this.getRange(), null) : this.getRange();
             const commonCon = range.commonAncestorContainer;
             const startOff = range.startOffset;
             const endOff = range.endOffset;
             const formatRange = range.startContainer === commonCon && util.isFormatElement(commonCon);
             const startCon = formatRange ? (commonCon.childNodes[startOff] || commonCon.childNodes[0] || range.startContainer) : range.startContainer;
             const endCon = formatRange ? (commonCon.childNodes[endOff] || commonCon.childNodes[commonCon.childNodes.length - 1] || range.endContainer) : range.endContainer;
-            let parentNode, originAfter = null;
 
-            if (!afterNode) {
-                parentNode = startCon;
-                if (startCon.nodeType === 3) {
-                    parentNode = startCon.parentNode;
-                }
-
-                /** No Select range node */
-                if (range.collapsed) {
-                    if (commonCon.nodeType === 3) {
-                        if (commonCon.textContent.length > endOff) afterNode = commonCon.splitText(endOff);
-                        else afterNode = commonCon.nextSibling;
-                    } else {
-                        if (!util.isBreak(parentNode)) {
-                            let c = parentNode.childNodes[startOff];
-                            const focusNode = (c && c.nodeType === 3 && util.onlyZeroWidthSpace(c) && util.isBreak(c.nextSibling)) ? c.nextSibling : c;
-                            if (focusNode) {
-                                if (!focusNode.nextSibling) {
-                                    parentNode.removeChild(focusNode);
-                                    afterNode = null;
+            if (!insertListCell) {
+                if (!afterNode) {
+                    parentNode = startCon;
+                    if (startCon.nodeType === 3) {
+                        parentNode = startCon.parentNode;
+                    }
+    
+                    /** No Select range node */
+                    if (range.collapsed) {
+                        if (commonCon.nodeType === 3) {
+                            if (commonCon.textContent.length > endOff) afterNode = commonCon.splitText(endOff);
+                            else afterNode = commonCon.nextSibling;
+                        } else {
+                            if (!util.isBreak(parentNode)) {
+                                let c = parentNode.childNodes[startOff];
+                                const focusNode = (c && c.nodeType === 3 && util.onlyZeroWidthSpace(c) && util.isBreak(c.nextSibling)) ? c.nextSibling : c;
+                                if (focusNode) {
+                                    if (!focusNode.nextSibling) {
+                                        parentNode.removeChild(focusNode);
+                                        afterNode = null;
+                                    } else {
+                                        afterNode = (util.isBreak(focusNode) && !util.isBreak(oNode)) ? focusNode : focusNode.nextSibling;
+                                    }
                                 } else {
-                                    afterNode = (util.isBreak(focusNode) && !util.isBreak(oNode)) ? focusNode : focusNode.nextSibling;
+                                    afterNode = null;
                                 }
                             } else {
-                                afterNode = null;
-                            }
-                        } else {
-                            afterNode = parentNode;
-                            parentNode = parentNode.parentNode;
-                        }
-                    }
-                } else { /** Select range nodes */
-                    const isSameContainer = startCon === endCon;
-
-                    if (isSameContainer) {
-                        if (this.isEdgePoint(endCon, endOff)) afterNode = endCon.nextSibling;
-                        else afterNode = endCon.splitText(endOff);
-
-                        let removeNode = startCon;
-                        if (!this.isEdgePoint(startCon, startOff)) removeNode = startCon.splitText(startOff);
-
-                        parentNode.removeChild(removeNode);
-                        if (parentNode.childNodes.length === 0 && isFormats) {
-                            parentNode.innerHTML = '<br>';
-                        }
-                    }
-                    else {
-                        const removedTag = this.removeNode();
-                        const container = removedTag.container;
-                        const prevContainer = removedTag.prevContainer;
-                        if (container && container.childNodes.length === 0 && isFormats) {
-                            if (util.isFormatElement(container)) {
-                                container.innerHTML = '<br>';
-                            } else if (util.isRangeFormatElement(container)) {
-                                container.innerHTML = '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
+                                afterNode = parentNode;
+                                parentNode = parentNode.parentNode;
                             }
                         }
-
-                        if (!isFormats && prevContainer) {
-                            parentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
-                            if (parentNode.contains(container)) {
-                                let sameParent = true;
-                                afterNode = container;
-                                while (afterNode.parentNode !== parentNode) {
-                                    afterNode = afterNode.parentNode;
-                                    sameParent = false;
+                    } else { /** Select range nodes */
+                        const isSameContainer = startCon === endCon;
+    
+                        if (isSameContainer) {
+                            if (this.isEdgePoint(endCon, endOff)) afterNode = endCon.nextSibling;
+                            else afterNode = endCon.splitText(endOff);
+    
+                            let removeNode = startCon;
+                            if (!this.isEdgePoint(startCon, startOff)) removeNode = startCon.splitText(startOff);
+    
+                            parentNode.removeChild(removeNode);
+                            if (parentNode.childNodes.length === 0 && isFormats) {
+                                parentNode.innerHTML = '<br>';
+                            }
+                        }
+                        else {
+                            const removedTag = this.removeNode();
+                            const container = removedTag.container;
+                            const prevContainer = removedTag.prevContainer;
+                            if (container && container.childNodes.length === 0 && isFormats) {
+                                if (util.isFormatElement(container)) {
+                                    container.innerHTML = '<br>';
+                                } else if (util.isRangeFormatElement(container)) {
+                                    container.innerHTML = '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
                                 }
-                                if (sameParent && container === prevContainer) afterNode = afterNode.nextSibling;
-                            } else {
-                                afterNode = null;
                             }
-                        } else {
-                            afterNode = isFormats ? endCon : container === prevContainer ? container.nextSibling : container;
-                            parentNode = (!afterNode || !afterNode.parentNode) ? commonCon : afterNode.parentNode;
-                        }
-
-                        while (afterNode && !util.isFormatElement(afterNode) && afterNode.parentNode !== commonCon) {
-                            afterNode = afterNode.parentNode;
+    
+                            if (!isFormats && prevContainer) {
+                                parentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
+                                if (parentNode.contains(container)) {
+                                    let sameParent = true;
+                                    afterNode = container;
+                                    while (afterNode.parentNode !== parentNode) {
+                                        afterNode = afterNode.parentNode;
+                                        sameParent = false;
+                                    }
+                                    if (sameParent && container === prevContainer) afterNode = afterNode.nextSibling;
+                                } else {
+                                    afterNode = null;
+                                }
+                            } else {
+                                afterNode = isFormats ? endCon : container === prevContainer ? container.nextSibling : container;
+                                parentNode = (!afterNode || !afterNode.parentNode) ? commonCon : afterNode.parentNode;
+                            }
+    
+                            while (afterNode && !util.isFormatElement(afterNode) && afterNode.parentNode !== commonCon) {
+                                afterNode = afterNode.parentNode;
+                            }
                         }
                     }
+                } else { // has afterNode
+                    parentNode = afterNode.parentNode;
+                    afterNode = afterNode.nextSibling;
+                    originAfter = true;
                 }
             }
-            // has afterNode
-            else {
-                parentNode = afterNode.parentNode;
-                afterNode = afterNode.nextSibling;
-                originAfter = true;
-            }
 
-            // --- insert node ---
             try {
-                if (util.isWysiwygDiv(afterNode) || parentNode === context.element.wysiwyg.parentNode) {
-                    parentNode = context.element.wysiwyg;
-                    afterNode = null;
-                }
-
-                if (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode) || (!util.isListCell(parentNode) && util.isComponent(oNode))) {
-                    const oldParent = parentNode;
-                    if (util.isList(afterNode)) {
-                        parentNode = afterNode;
+                // set node
+                if (!insertListCell) {
+                    if (util.isWysiwygDiv(afterNode) || parentNode === context.element.wysiwyg.parentNode) {
+                        parentNode = context.element.wysiwyg;
                         afterNode = null;
-                    } else if (util.isListCell(afterNode)) {
-                        parentNode = afterNode.previousElementSibling || afterNode;
-                    } else if (!originAfter && !afterNode) {
-                        const r = this.removeNode();
-                        const container = r.container.nodeType === 3 ? (util.isListCell(util.getFormatElement(r.container, null)) ? r.container : (util.getFormatElement(r.container, null) || r.container.parentNode)) : r.container;
-                        const rangeCon = util.isWysiwygDiv(container) || util.isRangeFormatElement(container);
-                        parentNode = rangeCon ? container : container.parentNode;
-                        afterNode = rangeCon ? null : container.nextSibling;
                     }
-
-                    if (oldParent.childNodes.length === 0 && parentNode !== oldParent) util.removeItem(oldParent);
-                }
-
-                if (isFormats && !freeFormat && !util.isRangeFormatElement(parentNode) && !util.isListCell(parentNode) && !util.isWysiwygDiv(parentNode)) {
-                    afterNode = parentNode.nextElementSibling;
-                    parentNode = parentNode.parentNode;
-                }
-
-                if (util.isWysiwygDiv(parentNode) && (oNode.nodeType === 3 || util.isBreak(oNode))) {
-                    const fNode = util.createElement(options.defaultTag);
-                    fNode.appendChild(oNode);
-                    oNode = fNode;
+    
+                    if (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode) || (!util.isListCell(parentNode) && util.isComponent(oNode))) {
+                        const oldParent = parentNode;
+                        if (util.isList(afterNode)) {
+                            parentNode = afterNode;
+                            afterNode = null;
+                        } else if (util.isListCell(afterNode)) {
+                            parentNode = afterNode.previousElementSibling || afterNode;
+                        } else if (!originAfter && !afterNode) {
+                            const r = this.removeNode();
+                            const container = r.container.nodeType === 3 ? (util.isListCell(util.getFormatElement(r.container, null)) ? r.container : (util.getFormatElement(r.container, null) || r.container.parentNode)) : r.container;
+                            const rangeCon = util.isWysiwygDiv(container) || util.isRangeFormatElement(container);
+                            parentNode = rangeCon ? container : container.parentNode;
+                            afterNode = rangeCon ? null : container.nextSibling;
+                        }
+    
+                        if (oldParent.childNodes.length === 0 && parentNode !== oldParent) util.removeItem(oldParent);
+                    }
+    
+                    if (isFormats && !freeFormat && !util.isRangeFormatElement(parentNode) && !util.isListCell(parentNode) && !util.isWysiwygDiv(parentNode)) {
+                        afterNode = parentNode.nextElementSibling;
+                        parentNode = parentNode.parentNode;
+                    }
+    
+                    if (util.isWysiwygDiv(parentNode) && (oNode.nodeType === 3 || util.isBreak(oNode))) {
+                        const fNode = util.createElement(options.defaultTag);
+                        fNode.appendChild(oNode);
+                        oNode = fNode;
+                    }
                 }
 
                 // insert--
                 let emptyListCell = false;
-                if (listCell && util.isListCell(oNode)) {
-                    afterNode = line.nextElementSibling;
-                    parentNode = line.parentNode;
+                if (insertListCell) {
+                    afterNode = tempAfterNode;
+                    parentNode = tempParentNode;
                     emptyListCell = util.onlyZeroWidthSpace(line.textContent);
                 } else {
                     afterNode = parentNode === afterNode ? parentNode.lastChild : afterNode;
                 }
 
                 parentNode.insertBefore(oNode, afterNode);
-                if (emptyListCell) util.removeItem(line);
+
+                if (insertListCell) {
+                    if (emptyListCell) {
+                        util.removeItem(line);
+                        oNode = oNode.lastChild;
+                    } else {
+                        const chUl = util.getArrayItem(line.children, util.isList);
+                        if (chUl) {
+                            if (oNode !== chUl) {
+                                oNode.appendChild(chUl);
+                                oNode = chUl.previousSibling;
+                            } else {
+                                parentNode.appendChild(oNode);
+                                oNode = parentNode;
+                            }
+                        }
+                    }
+                }
             } catch (e) {
                 parentNode.appendChild(oNode);
             } finally {
@@ -1965,28 +2006,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 startIndex = endIndex = 0;
             }
 
-            function remove (item) {
-                const format = util.getFormatElement(item, null);
-                util.removeItem(item);
-
-                if(util.isListCell(format)) {
-                    const list = util.getArrayItem(format.children, util.isList, false);
-                    if (list) {
-                        const child = list.firstElementChild;
-                        const children = child.childNodes;
-                        while (children[0]) {
-                            format.insertBefore(children[0], list);
-                        }
-                        util.removeItemAllParents(child, null, null);
-                    }
-                }
-            }
-
             for (let i = startIndex; i <= endIndex; i++) {
                 const item = childNodes[i];
 
                 if (item.length === 0 || (item.nodeType === 3 && item.data === undefined)) {
-                    remove(item);
+                    this._nodeRemoveListItem(item);
                     continue;
                 }
 
@@ -2006,7 +2030,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (beforeNode.length > 0) {
                         startCon.data = beforeNode.data;
                     } else {
-                        remove(startCon);
+                        this._nodeRemoveListItem(startCon);
                     }
 
                     if (item === endCon) break;
@@ -2024,16 +2048,23 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (afterNode.length > 0) {
                         endCon.data = afterNode.data;
                     } else {
-                        remove(endCon);
+                        this._nodeRemoveListItem(endCon);
                     }
 
                     continue;
                 }
 
-                remove(item);
+                this._nodeRemoveListItem(item);
             }
 
-            container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : (range.endContainer || range.startContainer);
+            const endUl = util.getParentElement(endCon, 'ul');
+            const startLi = util.getParentElement(startCon, 'li');
+            if (endUl && startLi && startLi.contains(endUl)) {
+                container = endUl.previousSibling;
+                offset = container.textContent.length;
+            } else {
+                container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : (range.endContainer || range.startContainer);
+            }
             
             if (!util.isWysiwygDiv(container) && container.childNodes.length === 0) {
                 const rc = util.removeItemAllParents(container, function (current) {
@@ -2055,6 +2086,25 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 offset: offset,
                 prevContainer: startCon && startCon.parentNode ? startCon : null
             };
+        },
+
+        _nodeRemoveListItem: function (item) {
+            const format = util.getFormatElement(item, null);
+            util.removeItem(item);
+
+            if(!util.isListCell(format)) return;
+            
+            const list = util.getArrayItem(format.children, util.isList, false);
+            if (list) {
+                const child = list.firstElementChild;
+                const children = child.childNodes;
+                while (children[0]) {
+                    format.insertBefore(children[0], list);
+                }
+                util.removeItemAllParents(child, null, null);
+            } else if (util.isListCell(format.parentElement.parentElement)) {
+                util.removeItemAllParents(format, null, null);
+            }
         },
 
         /**
@@ -7561,9 +7611,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (cleanData) {
                 if (util.isListCell(util.getFormatElement(core.getSelectionNode(), null))) {
                     const dom = (_d.createRange().createContextualFragment(cleanData));
-                    if (dom.childNodes[0].nodeType === 1) {
-                        cleanData = event._convertListCell(dom);
-                    }
+                    cleanData = event._convertListCell(dom);
                 }
                 functions.insertHTML(cleanData, true, false);
                 return false;
@@ -7577,7 +7625,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             for (let i = 0, len = domTree.length, node; i < len; i++) {
                 node = domTree[i];
                 if (node.nodeType === 1) {
-                    if (util.isListCell(node)) {
+                    if (util.isListCell(node) || util.isList(node)) {
                         html += node.outerHTML;
                     } else if (util.isFormatElement(node)) {
                         html += '<li>' +(node.innerHTML.trim() || '<br>') + '</li>';
