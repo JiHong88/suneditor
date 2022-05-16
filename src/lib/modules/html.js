@@ -3,7 +3,7 @@
  * @author Yi JiHong.
  */
 
-import CoreInterface from '../../class/_core';
+import CoreInterface from '../../interface/_core';
 import { domUtils, converter, numbers } from '../../helper';
 import { _w } from '../../helper/global';
 
@@ -463,7 +463,7 @@ HTML.prototype = {
 	 * @returns {Object}
 	 */
 	remove: function () {
-		this.seletion._resetRangeToTextNode();
+		this.selection._resetRangeToTextNode();
 
 		const range = this.selection.getRange();
 		let container,
@@ -614,7 +614,7 @@ HTML.prototype = {
 		}
 
 		// set range
-		this.setRange(container, offset, container, offset);
+		this.selection.setRange(container, offset, container, offset);
 		// history stack
 		this.history.push(true);
 

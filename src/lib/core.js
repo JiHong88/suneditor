@@ -3,7 +3,7 @@ import { ResetOptions } from './constructor';
 import Context from './context';
 
 // interface
-import ModuleInterface from '../class/_module';
+import ModuleInterface from '../interface/_module';
 
 // base
 import history from './base/history';
@@ -1665,11 +1665,11 @@ Core.prototype = {
 		// register modules
 		ModuleInterface.call(this.eventManager, this);
 		ModuleInterface.call(this.node, this);
+		ModuleInterface.call(this.selection, this);
 		ModuleInterface.call(this.html, this);
 		ModuleInterface.call(this.component, this);
 		ModuleInterface.call(this.format, this);
 		ModuleInterface.call(this.toolbar, this);
-		ModuleInterface.call(this.selection, this);
 		ModuleInterface.call(this.char, this);
 		ModuleInterface.call(this.menu, this);
 

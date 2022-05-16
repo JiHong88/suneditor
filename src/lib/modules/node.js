@@ -3,7 +3,7 @@
  * @author Yi JiHong.
  */
 
-import CoreInterface from '../../class/_core';
+import CoreInterface from '../../interface/_core';
 import { domUtils, unicode, env } from '../../helper';
 
 const Node = function (editor) {

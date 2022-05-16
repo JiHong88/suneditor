@@ -6,7 +6,7 @@
 import Context from '../context';
 import { domUtils, unicode } from '../../helper';
 import { _w, _d } from '../../helper/global';
-import CoreInterface from '../../class/_core';
+import CoreInterface from '../../interface/_core';
 
 const Toolbar = function (editor) {
 	CoreInterface.call(this, editor);

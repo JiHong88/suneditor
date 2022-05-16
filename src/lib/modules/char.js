@@ -3,7 +3,7 @@
  * @author Yi JiHong.
  */
 
-import CoreInterface from '../../class/_core';
+import CoreInterface from '../../interface/_core';
 import env from '../../helper/env';
 import { _w } from '../../helper/global';
 import { addClass, removeClass, hasClass } from '../../helper/domUtils';

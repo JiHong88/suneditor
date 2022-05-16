@@ -9,13 +9,13 @@ function ModuleInterface(editor) {
 	this.component = editor.component;
 	this.format = editor.format;
 	this.html = editor.html;
+	this.menu = editor.menu;
 	this.node = editor.node;
 	this.notice = editor.notice;
 	this.offset = editor.offset;
 	this.selection = editor.selection;
 	this.shortcuts = editor.shortcuts;
 	this.toolbar = editor.toolbar;
-	this.menu = editor.menu;
 }
 
 export default ModuleInterface;

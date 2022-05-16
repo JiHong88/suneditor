@@ -3,7 +3,7 @@
  * @author Yi JiHong.
  */
 
-import CoreInterface from '../../class/_core';
+import CoreInterface from '../../interface/_core';
 import { domUtils, unicode } from '../../helper';
 
 const Selection = function (editor) {
@@ -13,83 +13,6 @@ const Selection = function (editor) {
 };
 
 Selection.prototype = {
-	/**
-	 * @description Return the range object of editor's first child node
-	 * @returns {Object}
-	 * @private
-	 */
-	_createDefaultRange: function () {
-		const wysiwyg = this.context.element.wysiwyg;
-		wysiwyg.focus();
-		const range = this._wd.createRange();
-
-		let focusEl = wysiwyg.firstElementChild;
-		if (!focusEl) {
-			focusEl = domUtils.createElement(this.options.defaultLineTag, null, '<br>');
-			wysiwyg.appendChild(focusEl);
-		}
-
-		range.setStart(focusEl, 0);
-		range.setEnd(focusEl, 0);
-
-		return range;
-	},
-
-	/**
-	 * @description Set "range" and "selection" info.
-	 * @param {Object} range range object.
-	 * @param {Object} selection selection object.
-	 */
-	_rangeInfo: function (range, selection) {
-		let selectionNode = null;
-		this.status._range = range;
-
-		if (range.collapsed) {
-			if (domUtils.isWysiwygFrame(range.commonAncestorContainer)) selectionNode = range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
-			else selectionNode = range.commonAncestorContainer;
-		} else {
-			selectionNode = selection.extentNode || selection.anchorNode;
-		}
-
-		this.status._selectionNode = selectionNode;
-	},
-
-	/**
-	 * @description Saving the range object and the currently selected node of editor
-	 * @private
-	 */
-	_init: function () {
-		const selection = this.get();
-
-		if (!selection) return null;
-		let range = null;
-
-		if (selection.rangeCount > 0) {
-			range = selection.getRangeAt(0);
-		} else {
-			range = this._createDefaultRange();
-		}
-
-		if (this.format.isLine(range.endContainer) && range.endOffset === 0) {
-			range = this.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.length);
-		}
-
-		this._rangeInfo(range, selection);
-	},
-
-	/**
-	 * @description Focus method
-	 * @private
-	 */
-	__focus: function () {
-		const caption = domUtils.getParentElement(this.getNode(), 'figcaption');
-		if (caption) {
-			caption.focus();
-		} else {
-			this.context.element.wysiwyg.focus();
-		}
-	},
-
 	/**
 	 * @description Get window selection obejct
 	 * @returns {Object}
@@ -229,12 +152,89 @@ Selection.prototype = {
 	},
 
 	/**
+	 * @description Return the range object of editor's first child node
+	 * @returns {Object}
+	 * @private
+	 */
+	_createDefaultRange: function () {
+		const wysiwyg = this.context.element.wysiwyg;
+		wysiwyg.focus();
+		const range = this._wd.createRange();
+
+		let focusEl = wysiwyg.firstElementChild;
+		if (!focusEl) {
+			focusEl = domUtils.createElement(this.options.defaultLineTag, null, '<br>');
+			wysiwyg.appendChild(focusEl);
+		}
+
+		range.setStart(focusEl, 0);
+		range.setEnd(focusEl, 0);
+
+		return range;
+	},
+
+	/**
+	 * @description Set "range" and "selection" info.
+	 * @param {Object} range range object.
+	 * @param {Object} selection selection object.
+	 */
+	_rangeInfo: function (range, selection) {
+		let selectionNode = null;
+		this.status._range = range;
+
+		if (range.collapsed) {
+			if (domUtils.isWysiwygFrame(range.commonAncestorContainer)) selectionNode = range.commonAncestorContainer.children[range.startOffset] || range.commonAncestorContainer;
+			else selectionNode = range.commonAncestorContainer;
+		} else {
+			selectionNode = selection.extentNode || selection.anchorNode;
+		}
+
+		this.status._selectionNode = selectionNode;
+	},
+
+	/**
+	 * @description Saving the range object and the currently selected node of editor
+	 * @private
+	 */
+	_init: function () {
+		const selection = this.get();
+
+		if (!selection) return null;
+		let range = null;
+
+		if (selection.rangeCount > 0) {
+			range = selection.getRangeAt(0);
+		} else {
+			range = this._createDefaultRange();
+		}
+
+		if (this.format.isLine(range.endContainer) && range.endOffset === 0) {
+			range = this.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.length);
+		}
+
+		this._rangeInfo(range, selection);
+	},
+
+	/**
+	 * @description Focus method
+	 * @private
+	 */
+	__focus: function () {
+		const caption = domUtils.getParentElement(this.getNode(), 'figcaption');
+		if (caption) {
+			caption.focus();
+		} else {
+			this.context.element.wysiwyg.focus();
+		}
+	},
+
+	/**
 	 * @description Reset range object to text node selected status.
 	 * @returns {boolean} Returns false if there is no valid selection.
 	 * @private
 	 */
 	_resetRangeToTextNode: function () {
-		const range = this.selection.getRange();
+		const range = this.getRange();
 		if (this._isNone(range)) return false;
 
 		let startCon = range.startContainer;

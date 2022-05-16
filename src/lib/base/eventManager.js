@@ -3,9 +3,9 @@
  * @author Yi JiHong.
  */
 
+import CoreInterface from '../../interface/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
 import { _w, _d } from '../../helper/global';
-import CoreInterface from '../../class/_core';
 
 const EventManager = function (editor) {
 	CoreInterface.call(this, editor);

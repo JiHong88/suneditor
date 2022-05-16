@@ -3,7 +3,7 @@
  * @author Yi JiHong.
  */
 
-import CoreInterface from '../../class/_core';
+import CoreInterface from '../../interface/_core';
 import { getParentElement, isWysiwygFrame, hasClass } from '../../helper/domUtils';
 
 const Offset = function (editor) {
