@@ -1640,7 +1640,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             let range = this.getRange();
             const line = util.isListCell(range.commonAncestorContainer) ? range.commonAncestorContainer : util.getFormatElement(this.getSelectionNode(), null);
-            const insertListCell = util.isListCell(line) && (util.isListCell(oNode) || util.isList(oNode));
+            let insertListCell = util.isListCell(line) && (util.isListCell(oNode) || util.isList(oNode));
             
             let parentNode, originAfter, tempAfterNode, tempParentNode = null;
             const freeFormat = util.isFreeFormatElement(line);
@@ -1816,6 +1816,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     emptyListCell = util.onlyZeroWidthSpace(line.textContent);
                 } else {
                     afterNode = parentNode === afterNode ? parentNode.lastChild : afterNode;
+                }
+
+                if (util.isListCell(oNode) && !util.isList(parentNode)) {
+                    if (util.isListCell(parentNode)) {
+                        parentNode = parentNode.parentNode;
+                    } else {
+                        const ul = util.createElement('UL');
+                        parentNode.insertBefore(ul, afterNode);
+                        parentNode = ul;
+                    }
+                    afterNode = null;
+                    insertListCell = true;
                 }
 
                 parentNode.insertBefore(oNode, afterNode);
