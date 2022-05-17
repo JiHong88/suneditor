@@ -1651,20 +1651,31 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 tempParentNode = util.isList(oNode) ? line : (tempAfterNode || line).parentNode;
             }
 
-            if (!afterNode && (insertListCell ? insertListCell : true) && (isFormats || util.isComponent(oNode) || util.isMedia(oNode))) {
+            if (!afterNode && insertListCell && (isFormats || util.isComponent(oNode) || util.isMedia(oNode))) {
+                const isEdge = this.isEdgePoint(range.endContainer, range.endOffset);
                 const r = this.removeNode();
-                if (r.container.nodeType === 3 || util.isBreak(r.container)) {
+                if (r.container.nodeType === 3 || util.isBreak(r.container) || insertListCell) {
                     const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
                     afterNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
                     if (afterNode) {
                         if (insertListCell) {
                             if (line.contains(r.container)) {
-                                const newLI = line.cloneNode(false);
-                                newLI.appendChild(afterNode);
-                                tempParentNode.insertBefore(newLI, line.nextElementSibling);
-                                tempAfterNode = afterNode = newLI;
-                                if (util.isList(line.lastElementChild)) {
-                                    newLI.appendChild(line.lastElementChild);
+                                const subList = util.isList(line.lastElementChild);
+                                let newCell = null;
+                                if (!isEdge) {
+                                    newCell = line.cloneNode(false);
+                                    newCell.appendChild(afterNode.textContent.trim() ? afterNode : util.createTextNode(util.zeroWidthSpace));
+                                }
+                                if (subList) {
+                                    if (!newCell) {
+                                        newCell = line.cloneNode(false);
+                                        newCell.appendChild(util.createTextNode(util.zeroWidthSpace));
+                                    }
+                                    newCell.appendChild(line.lastElementChild);
+                                }
+                                if (newCell) {
+                                    tempParentNode.insertBefore(newCell, line.nextElementSibling);
+                                    tempAfterNode = afterNode = newCell;
                                 }
                             }
                         } else {
@@ -1813,20 +1824,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (insertListCell) {
                     afterNode = tempAfterNode;
                     parentNode = tempParentNode;
-                    emptyListCell = util.onlyZeroWidthSpace(line.textContent);
+                    emptyListCell = util.onlyZeroWidthSpace(line.textContent.trim());
                 } else {
                     afterNode = parentNode === afterNode ? parentNode.lastChild : afterNode;
                 }
 
                 if (util.isListCell(oNode) && !util.isList(parentNode)) {
                     if (util.isListCell(parentNode)) {
+                        afterNode = parentNode.nextElementSibling;
                         parentNode = parentNode.parentNode;
                     } else {
-                        const ul = util.createElement('UL');
+                        const ul = util.createElement('ol');
                         parentNode.insertBefore(ul, afterNode);
                         parentNode = ul;
+                        afterNode = null;
                     }
-                    afterNode = null;
                     insertListCell = true;
                 }
 
@@ -1837,11 +1849,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         util.removeItem(line);
                         oNode = oNode.lastChild;
                     } else {
-                        const chUl = util.getArrayItem(line.children, util.isList);
-                        if (chUl) {
-                            if (oNode !== chUl) {
-                                oNode.appendChild(chUl);
-                                oNode = chUl.previousSibling;
+                        const chList = util.getArrayItem(line.children, util.isList);
+                        if (chList) {
+                            if (oNode !== chList) {
+                                oNode.appendChild(chList);
+                                oNode = chList.previousSibling;
                             } else {
                                 parentNode.appendChild(oNode);
                                 oNode = parentNode;
@@ -2083,7 +2095,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     const text = current.textContent;
                     return text.length === 0 || /^(\n|\u200B)+$/.test(text);
                 }.bind(util), null);
-                
                 if (rc) container = rc.sc || rc.ec || context.element.wysiwyg;
             }
 
@@ -2105,16 +2116,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if(!util.isListCell(format)) return;
             
-            const list = util.getArrayItem(format.children, util.isList, false);
-            if (list) {
-                const child = list.firstElementChild;
-                const children = child.childNodes;
-                while (children[0]) {
-                    format.insertBefore(children[0], list);
-                }
-                util.removeItemAllParents(child, null, null);
-            } else if (util.isListCell(format.parentElement.parentElement)) {
-                util.removeItemAllParents(format, null, null);
+            util.removeItemAllParents(format, null, null);
+
+            if (format && util.isList(format.firstChild)) {
+                format.insertBefore(util.createTextNode(util.zeroWidthSpace), format.firstChild);
             }
         },
 
@@ -7622,15 +7627,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (cleanData) {
                 if (util.isListCell(util.getFormatElement(core.getSelectionNode(), null))) {
                     const dom = (_d.createRange().createContextualFragment(cleanData));
-                    cleanData = event._convertListCell(dom);
+                    const domTree = dom.childNodes;
+                    if (domTree.length > 1 && domTree[0].nodeType === 1) cleanData = event._convertListCell(domTree);
                 }
                 functions.insertHTML(cleanData, true, false);
                 return false;
             }
         },
 
-        _convertListCell: function (dom) {
-            const domTree = dom.childNodes;
+        _convertListCell: function (domTree) {
             let html = '';
 
             for (let i = 0, len = domTree.length, node; i < len; i++) {
