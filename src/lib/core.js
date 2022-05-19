@@ -1639,7 +1639,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             let range = this.getRange();
-            const line = util.isListCell(range.commonAncestorContainer) ? range.commonAncestorContainer : util.getFormatElement(this.getSelectionNode(), null);
+            let line = util.isListCell(range.commonAncestorContainer) ? range.commonAncestorContainer : util.getFormatElement(this.getSelectionNode(), null);
             let insertListCell = util.isListCell(line) && (util.isListCell(oNode) || util.isList(oNode));
             
             let parentNode, originAfter, tempAfterNode, tempParentNode = null;
@@ -1651,15 +1651,36 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 tempParentNode = util.isList(oNode) ? line : (tempAfterNode || line).parentNode;
             }
 
-            if (!afterNode && insertListCell && (isFormats || util.isComponent(oNode) || util.isMedia(oNode))) {
-                const isEdge = this.isEdgePoint(range.endContainer, range.endOffset);
+            if (!afterNode && (isFormats || util.isComponent(oNode) || util.isMedia(oNode))) {
+                const isEdge = this.isEdgePoint(range.endContainer, range.endOffset, 'end');
                 const r = this.removeNode();
-                if (r.container.nodeType === 3 || util.isBreak(r.container) || insertListCell) {
-                    const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
-                    afterNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
+                const container = r.container;
+                const prevContainer = r.prevContainer;
+
+                if (insertListCell && prevContainer) {
+                    tempParentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
+                    if (tempParentNode.contains(container)) {
+                        let sameParent = true;
+                        tempAfterNode = container;
+                        while (tempAfterNode.parentNode !== tempParentNode) {
+                            tempAfterNode = tempAfterNode.parentNode;
+                            sameParent = false;
+                        }
+                        if (sameParent && container === prevContainer) tempAfterNode = tempAfterNode.nextSibling;
+                    } else {
+                        tempAfterNode = null;
+                    }
+                } else if (insertListCell && util.isListCell(container) && !line.parentElement) {
+                    line = util.createElement('LI');
+                    tempParentNode.appendChild(line);
+                    container.appendChild(tempParentNode);
+                    tempAfterNode = null;
+                } else if (container.nodeType === 3 || util.isBreak(container) || insertListCell) {
+                    const depthFormat = util.getParentElement(container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
+                    afterNode = util.splitElement(container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
                     if (afterNode) {
                         if (insertListCell) {
-                            if (line.contains(r.container)) {
+                            if (line.contains(container)) {
                                 const subList = util.isList(line.lastElementChild);
                                 let newCell = null;
                                 if (!isEdge) {
@@ -1743,6 +1764,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             const removedTag = this.removeNode();
                             const container = removedTag.container;
                             const prevContainer = removedTag.prevContainer;
+
                             if (container && container.childNodes.length === 0 && isFormats) {
                                 if (util.isFormatElement(container)) {
                                     container.innerHTML = '<br>';
@@ -1751,7 +1773,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 }
                             }
     
-                            if (!isFormats && prevContainer) {
+                            if (util.isListCell(container) && oNode.nodeType === 3) {
+                                parentNode = container;
+                                afterNode = null;
+                            } else if (!isFormats && prevContainer) {
                                 parentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
                                 if (parentNode.contains(container)) {
                                     let sameParent = true;
@@ -1820,11 +1845,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
 
                 // insert--
-                let emptyListCell = false;
                 if (insertListCell) {
                     afterNode = tempAfterNode;
                     parentNode = tempParentNode;
-                    emptyListCell = util.onlyZeroWidthSpace(line.textContent.trim());
                 } else {
                     afterNode = parentNode === afterNode ? parentNode.lastChild : afterNode;
                 }
@@ -1845,7 +1868,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 parentNode.insertBefore(oNode, afterNode);
 
                 if (insertListCell) {
-                    if (emptyListCell) {
+                    if (util.onlyZeroWidthSpace(line.textContent.trim())) {
                         util.removeItem(line);
                         oNode = oNode.lastChild;
                     } else {
@@ -1857,6 +1880,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             } else {
                                 parentNode.appendChild(oNode);
                                 oNode = parentNode;
+                            }
+
+                            if (util.onlyZeroWidthSpace(line.textContent.trim())) {
+                                util.removeItem(line);
                             }
                         }
                     }
@@ -2090,11 +2117,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
             
             if (!util.isWysiwygDiv(container) && container.childNodes.length === 0) {
-                const rc = util.removeItemAllParents(container, function (current) {
-                    if (this.isComponent(current)) return false;
-                    const text = current.textContent;
-                    return text.length === 0 || /^(\n|\u200B)+$/.test(text);
-                }.bind(util), null);
+                const rc = util.removeItemAllParents(container, null, null);
                 if (rc) container = rc.sc || rc.ec || context.element.wysiwyg;
             }
 
