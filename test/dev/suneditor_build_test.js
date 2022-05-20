@@ -928,6 +928,7 @@ const editor = suneditor.init({
 
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     // rtl: true,
+    shortcutsDisable: ['bold', 'underline', 'italic'],
     // mode: "inline",
     value: `<ol>
     <li>11111</li>

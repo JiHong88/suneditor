@@ -6063,7 +6063,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
             }
 
-            if (!command) return keyStr === 'B'; // chromium - bold disabled
+            if (!command) return !!keyStr;
 
             core.commandHandler(core.commandMap[command], command);
             return true;
