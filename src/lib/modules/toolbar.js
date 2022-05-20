@@ -88,6 +88,7 @@ Toolbar.prototype = {
 		this.context.tool = newContext.tool;
 		if (this.options.iframe) this.context.element.wysiwyg = this._wd.body;
 
+		this.editor._recoverButtonStates();
 		this.editor._cachingButtons();
 		this.history._resetCachingButton();
 

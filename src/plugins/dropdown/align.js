@@ -139,7 +139,7 @@ function createHTML(core) {
         item = alignItems[i];
         text = lang.toolbar['align' + item.charAt(0).toUpperCase() + item.slice(1)];
         html += '<li>' +
-            '<button type="button" class="se-btn-list se-btn-align" data-value="' + item + '" title="' + text + '">' +
+            '<button type="button" class="se-btn-list se-btn-align" data-value="' + item + '" title="' + text + '" aria-label="' + text + '">' +
             '<span class="se-list-icon">' + icons['align_' + item] + '</span>' + text +
             '</button>' +
             '</li>';

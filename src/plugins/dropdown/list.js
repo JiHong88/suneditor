@@ -45,10 +45,10 @@ export default {
         listDiv.innerHTML = '' +
             '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
-                    '<li><button type="button" class="se-btn-list se-tooltip" data-command="bullet" title="' + lang.toolbar.orderList + '">' +
+                    '<li><button type="button" class="se-btn-list se-tooltip" data-command="bullet" title="' + lang.toolbar.orderList + '" aria-label="' + lang.toolbar.orderList + '">' +
                         core.icons.list_number +
                     '</button></li>' +
-                    '<li><button type="button" class="se-btn-list se-tooltip" data-command="numbered" title="' + lang.toolbar.unorderList + '">' +
+                    '<li><button type="button" class="se-btn-list se-tooltip" data-command="numbered" title="' + lang.toolbar.unorderList + '" aria-label="' + lang.toolbar.unorderList + '">' +
                         core.icons.list_bullets +
                     '</button></li>' +
                 '</ul>' +

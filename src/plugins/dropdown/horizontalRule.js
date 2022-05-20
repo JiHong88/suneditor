@@ -36,7 +36,7 @@ export default {
         let list = '';
         for (let i = 0, len = items.length; i < len; i++) {
             list += '<li>' +
-                '<button type="button" class="se-btn-list btn_line" data-command="horizontalRule" data-value="' + items[i].class + '" title="' + items[i].name + '">' +
+                '<button type="button" class="se-btn-list btn_line" data-command="horizontalRule" data-value="' + items[i].class + '" title="' + items[i].name + '" aria-label="' + items[i].name + '">' +
                     '<hr' + (items[i].class ? ' class="' + items[i].class + '"' : '') + (items[i].style ? ' style="' + items[i].style + '"' : '') + '/>' +
                 '</button>' +
             '</li>';

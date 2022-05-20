@@ -89,7 +89,7 @@ export default {
     const html = `
       <form class="se-dialog-form">
         <div class="se-dialog-header">
-          <button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="${lang.dialogBox.close}">
+          <button type="button" data-command="close" class="se-btn se-dialog-close" title="${lang.dialogBox.close}" aria-label="${lang.dialogBox.close}">
             ${core.icons.cancel}
           </button>
           <span class="se-modal-title">${lang.dialogBox.mentionBox.title}</span>

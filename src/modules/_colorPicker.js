@@ -67,10 +67,10 @@ export default {
             list += '' +
             '<form class="se-form-group">' +
                 '<input type="text" maxlength="9" class="_se_color_picker_input se-color-input"/>' +
-                '<button type="submit" class="se-btn-primary _se_color_picker_submit" title="' + lang.dialogBox.submitButton + '">' +
+                '<button type="submit" class="se-btn-primary _se_color_picker_submit" title="' + lang.dialogBox.submitButton + '" aria-label="' + lang.dialogBox.submitButton + '">' +
                     core.icons.checked +
                 '</button>' +
-                '<button type="button" class="se-btn _se_color_picker_remove" title="' + lang.toolbar.removeFormat + '">' +
+                '<button type="button" class="se-btn _se_color_picker_remove" title="' + lang.toolbar.removeFormat + '" aria-label="' + lang.toolbar.removeFormat + '">' +
                     core.icons.erase +
                 '</button>' +
             '</form>' +
@@ -92,7 +92,7 @@ export default {
             color = colorList[i];
             if (typeof color === 'string') {
                 list += '<li>' +
-                            '<button type="button" data-value="' + color + '" title="' + color + '" style="background-color:' + color + ';"></button>' +
+                            '<button type="button" data-value="' + color + '" title="' + color + '" aria-label="' + color + '" style="background-color:' + color + ';"></button>' +
                         '</li>';
             }
         }

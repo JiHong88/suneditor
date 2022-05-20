@@ -87,7 +87,7 @@
 
             return '<div class="se-file-browser-content">' +
                     '<div class="se-file-browser-header">' +
-                        '<button type="button" data-command="close" class="se-btn se-file-browser-close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+                        '<button type="button" data-command="close" class="se-btn se-file-browser-close" class="close" title="' + lang.dialogBox.close + '" aria-label="' + lang.dialogBox.close + '">' +
                         core.icons.cancel +
                         '</button>' +
                         '<span class="se-file-browser-title"></span>' +
@@ -281,7 +281,7 @@
                         tag = tags[t];
                         if (tag && _tags.indexOf(tag) === -1) {
                             _tags.push(tag);
-                            tagsHTML += '<a title="' + tag + '">' + tag + '</a>';
+                            tagsHTML += '<a title="' + tag + '" aria-label="' + tag + '">' + tag + '</a>';
                         }
                     }
                 }

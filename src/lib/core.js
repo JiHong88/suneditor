@@ -148,6 +148,11 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 
 	// ----- Properties not shared with coreInterface -----
 	/**
+	 * @description Command button map
+	 */
+	this.allCommandButtons = {};
+
+	/**
 	 * @description Whether the plugin is initialized
 	 */
 	this.initPlugins = {};
@@ -1730,6 +1735,38 @@ Core.prototype = {
 	},
 
 	/**
+	 * @description Save the current buttons states to "allCommandButtons" object
+	 * @private
+	 */
+	_saveButtonStates() {
+		const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]');
+		for (let i = 0, element, command; i < currentButtons.length; i++) {
+			element = currentButtons[i];
+			command = element.getAttribute('data-command');
+
+			this.allCommandButtons[command] = element;
+		}
+	},
+
+	/**
+	 * @description Recover the current buttons states from "allCommandButtons" object
+	 * @private
+	 */
+	_recoverButtonStates() {
+		const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]');
+		for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
+			button = currentButtons[i];
+			command = button.getAttribute('data-command');
+
+			oldButton = this.allCommandButtons[command];
+			if (oldButton) {
+				button.parentElement.replaceChild(oldButton, button);
+				if (this.context.buttons[command]) this.context.buttons[command] = oldButton;
+			}
+		}
+	},
+
+	/**
 	 * @description Caching basic buttons to use
 	 * @private
 	 */
@@ -1737,6 +1774,8 @@ Core.prototype = {
 		this.codeViewDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])');
 		this.resizingDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
 
+		this._saveButtonStates();
+		
 		const buttons = this.context.buttons;
 		const textTags = this.options.textTags;
 		this._commandMap = {

@@ -73,7 +73,7 @@ export default {
         let html = '' +
             '<form method="post" enctype="multipart/form-data">' +
                 '<div class="se-dialog-header">' +
-                    '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+                    '<button type="button" data-command="close" class="se-btn se-dialog-close" title="' + lang.dialogBox.close + '" aria-label="' + lang.dialogBox.close + '">' +
                         core.icons.cancel +
                     '</button>' +
                     '<span class="se-modal-title">' + lang.dialogBox.audioBox.title + '</span>' +
@@ -86,7 +86,7 @@ export default {
                             '<label>' + lang.dialogBox.audioBox.file + '</label>' +
                             '<div class="se-dialog-form-files">' +
                                 '<input class="se-input-form _se_audio_files" type="file" accept="' + option.audioAccept + '"' + (option.audioMultipleFile ? ' multiple="multiple"' : '') + '/>' +
-                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '">' + core.icons.cancel + '</button>' +
+                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '" aria-label="' + lang.controller.remove + '">' + core.icons.cancel + '</button>' +
                             '</div>' +
                         '</div>';
                 }
@@ -103,7 +103,7 @@ export default {
                 html += '' +
                 '</div>' +
                 '<div class="se-dialog-footer">' +
-                    '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+                    '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '" aria-label="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
                 '</div>' +
             '</form>';
 

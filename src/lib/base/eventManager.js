@@ -469,9 +469,8 @@ EventManager.prototype = {
 		if (cleanData) {
 			if (domUtils.isListCell(this.format.getLine(this.selection.get(), null))) {
 				const dom = _d.createRange().createContextualFragment(cleanData);
-				if (dom.childNodes[0].nodeType === 1) {
-					cleanData = ConvertListCell(dom);
-				}
+				const domTree = dom.childNodes;
+				if (domTree.length > 1 && domTree[0].nodeType === 1) cleanData = ConvertListCell(domTree);
 			}
 
 			this.html.insert(cleanData, true, false);
@@ -1782,14 +1781,13 @@ function OnResize_window() {
 	}
 }
 
-function ConvertListCell(dom) {
-	const domTree = dom.childNodes;
+function ConvertListCell(domTree) {
 	let html = '';
 
 	for (let i = 0, len = domTree.length, node; i < len; i++) {
 		node = domTree[i];
 		if (node.nodeType === 1) {
-			if (domUtils.isListCell(node)) {
+			if (domUtils.isListCell(node) || domUtils.isList(node)) {
 				html += node.outerHTML;
 			} else if (domUtils.isLine(node)) {
 				html += '<li>' + (node.innerHTML.trim() || '<br>') + '</li>';

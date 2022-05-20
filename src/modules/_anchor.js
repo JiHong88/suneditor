@@ -34,7 +34,7 @@ export default {
                 '<label>' + lang.dialogBox.linkBox.url + '</label>' +
                 '<div class="se-dialog-form-files">' +
                     '<input class="se-input-form se-input-url" type="text" placeholder="' + (core.options.protocol || '') + '" />' +
-                    '<button type="button" class="se-btn se-dialog-files-edge-button _se_bookmark_button" title="' + lang.dialogBox.linkBox.bookmark + '">' + icons.bookmark + '</button>' +
+                    '<button type="button" class="se-btn se-dialog-files-edge-button _se_bookmark_button" title="' + lang.dialogBox.linkBox.bookmark + '" aria-label="' + lang.dialogBox.linkBox.bookmark + '">' + icons.bookmark + '</button>' +
                     core.plugins.selectMenu.setForm() +
                 '</div>' +
                 '<div class="se-anchor-preview-form">' +
@@ -57,7 +57,7 @@ export default {
                             '<ul class="se-list-basic se-list-checked">';
                 for (let i = 0, len = relList.length, rel; i < len; i++) {
                     rel = relList[i];
-                    html += '<li><button type="button" class="se-btn-list' + (defaultRel.indexOf(rel) > -1 ? ' se-checked' : '') + '" data-command="' + rel + '" title="' + rel + '"><span class="se-svg">' + icons.checked + '</span>' + rel + '</button></li>';
+                    html += '<li><button type="button" class="se-btn-list' + (defaultRel.indexOf(rel) > -1 ? ' se-checked' : '') + '" data-command="' + rel + '" title="' + rel + '" aria-label="' + rel + '"><span class="se-svg">' + icons.checked + '</span>' + rel + '</button></li>';
                 }
                 html += '</ul></div></div></div>';
             }

@@ -62,7 +62,7 @@ export default {
             }
 
             list += '<li>' +
-                '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + tagName + '" data-class="' + className + '" title="' + name + '">' +
+                '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + tagName + '" data-class="' + className + '" title="' + name + '" aria-label="' + name + '">' +
                     '<' + tagName + attrs + '>' + name + '</' + tagName + '>' +
                 '</button></li>';
         }

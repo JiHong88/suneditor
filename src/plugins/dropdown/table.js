@@ -176,9 +176,9 @@ export default {
                 '<div class="se-btn-group-sub sun-editor-common se-list-layer se-table-split">' +
                     '<div class="se-list-inner">' +
                         '<ul class="se-list-basic">' +
-                            '<li class="se-btn-list" data-command="split" data-value="vertical" style="line-height:32px;" title="' + lang.controller.VerticalSplit + '">' + 
+                            '<li class="se-btn-list" data-command="split" data-value="vertical" style="line-height:32px;" title="' + lang.controller.VerticalSplit + '" aria-label="' + lang.controller.VerticalSplit + '">' + 
                                 lang.controller.VerticalSplit + '</li>' +
-                            '<li class="se-btn-list" data-command="split" data-value="horizontal" style="line-height:32px;" title="' + lang.controller.HorizontalSplit + '">' + 
+                            '<li class="se-btn-list" data-command="split" data-value="horizontal" style="line-height:32px;" title="' + lang.controller.HorizontalSplit + '" aria-label="' + lang.controller.HorizontalSplit + '">' + 
                                 lang.controller.HorizontalSplit + '</li>' +
                         '</ul>' +
                     '</div>' +
