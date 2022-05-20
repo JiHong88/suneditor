@@ -71,7 +71,7 @@ export default {
             _class = p._class;
 
             list += '<li>' +
-                '<button type="button" class="se-btn-list' + (_class ? ' ' + _class: '') + '" data-value="' + p.class + '" title="' + name + '">' +
+                '<button type="button" class="se-btn-list' + (_class ? ' ' + _class: '') + '" data-value="' + p.class + '" title="' + name + '" aria-label="' + name + '">' +
                     '<div' + attrs + '>' + name + '</div>' +
                 '</button></li>';
         }

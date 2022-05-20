@@ -85,7 +85,7 @@ export default {
             value = value.replace(/,$/, '');
 
             list += '<li>' +
-                '<button type="button" class="se-btn-list' + (_class ? ' ' + _class: '') + '" data-command="' + tag + '" data-value="' + value + '" title="' + name + '">' +
+                '<button type="button" class="se-btn-list' + (_class ? ' ' + _class: '') + '" data-command="' + tag + '" data-value="' + value + '" title="' + name + '" aria-label="' + name + '">' +
                     '<' + tag + attrs + '>' + name +  '</' + tag + '>' +
                 '</button></li>';
         }

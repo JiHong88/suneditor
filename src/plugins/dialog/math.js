@@ -56,7 +56,7 @@ export default {
         let html = '' +
         '<form>' +
             '<div class="se-dialog-header">' +
-                '<button type="button" data-command="close" class="se-btn se-dialog-close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+                '<button type="button" data-command="close" class="se-btn se-dialog-close" title="' + lang.dialogBox.close + '" aria-label="' + lang.dialogBox.close + '">' +
                     core.icons.cancel +
                 '</button>' +
                 '<span class="se-modal-title">' + lang.dialogBox.mathBox.title + '</span>' +
@@ -82,7 +82,7 @@ export default {
                 '</div>' +
             '</div>' +
             '<div class="se-dialog-footer">' +
-                '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+                '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '" aria-label="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
             '</div>' +
         '</form>';
 

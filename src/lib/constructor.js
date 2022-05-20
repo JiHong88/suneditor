@@ -721,11 +721,13 @@ export default {
     _createButton: function (buttonClass, title, dataCommand, dataDisplay, innerHTML, _disabled, _icons) {
         const oLi = util.createElement('LI');
         const oButton = util.createElement('BUTTON');
+        const label = (title || dataCommand);
 
         oButton.setAttribute('type', 'button');
         oButton.setAttribute('class', 'se-btn' + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip');
         oButton.setAttribute('data-command', dataCommand);
         oButton.setAttribute('data-display', dataDisplay);
+        oButton.setAttribute('aria-label', label.replace(/<span .+<\/span>/, ''));
         oButton.setAttribute('tabindex', '-1');
         
         if (!innerHTML) innerHTML = '<span class="se-icon-text">!</span>';
@@ -737,7 +739,7 @@ export default {
             oButton.className += ' se-btn-more-text';
         }
 
-        innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (title || dataCommand) + '</span></span>';
+        innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + label + '</span></span>';
 
         if (_disabled) oButton.setAttribute('disabled', true);
         
