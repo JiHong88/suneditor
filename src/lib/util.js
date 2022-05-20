@@ -1380,6 +1380,7 @@ const util = {
      * @returns {Element}
      */
     splitElement: function (baseNode, offset, depth) {
+        if (this.isWysiwygDiv(baseNode)) return baseNode;
         const bp = baseNode.parentNode;
         let index = 0, newEl, children, temp;
         let next = true;

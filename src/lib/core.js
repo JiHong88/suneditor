@@ -460,13 +460,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
-         * @description Contains pairs of all "data-commands" and "elements" setted in toolbar over time
-         * Used primarily to save and recover button states after the toolbar re-creation
-         * Updates each "_cachingButtons()" invocation  
-         */
-        allCommandButtons: null,
-
-        /**
          * @description Style button related to edit area
          * @property {Element} fullScreen fullScreen button element
          * @property {Element} showBlocks showBlocks button element
@@ -508,6 +501,42 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             _fullScreenAttrs: {sticky: false, balloon: false, inline: false},
             _lineBreakComp: null,
             _lineBreakDir: ''
+        },
+
+        /**
+         * @description Save the current buttons states to "allCommandButtons" object
+         * @private
+         */
+         _saveButtonStates: function () {
+            if (!this.allCommandButtons) this.allCommandButtons = {};
+
+            const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]');
+            for (let i = 0, element, command; i < currentButtons.length; i++) {
+                element = currentButtons[i];
+                command = element.getAttribute('data-command');
+
+                this.allCommandButtons[command] = element;
+            }
+        },
+
+        /**
+         * @description Recover the current buttons states from "allCommandButtons" object
+         * @private
+         */
+        _recoverButtonStates: function () {
+            if (this.allCommandButtons) {
+                const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]'); 
+                for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
+                    button = currentButtons[i]; 
+                    command = button.getAttribute('data-command');
+
+                    oldButton = this.allCommandButtons[command];
+                    if (oldButton) {
+                        button.parentElement.replaceChild(oldButton, button);
+                        if (this.context.tool[command]) this.context.tool[command] = oldButton;
+                    }
+                }   
+            }
         },
 
         /**
@@ -1645,165 +1674,261 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 return null;
             }
 
-            const line = util.getFormatElement(this.getSelectionNode(), null);
-            const listCell = util.isListCell(line);
+            let range = this.getRange();
+            let line = util.isListCell(range.commonAncestorContainer) ? range.commonAncestorContainer : util.getFormatElement(this.getSelectionNode(), null);
+            let insertListCell = util.isListCell(line) && (util.isListCell(oNode) || util.isList(oNode));
+            
+            let parentNode, originAfter, tempAfterNode, tempParentNode = null;
             const freeFormat = util.isFreeFormatElement(line);
             const isFormats = (!freeFormat && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) || util.isComponent(oNode);
 
+            if (insertListCell) {
+                tempAfterNode = afterNode || util.isList(oNode) ? line.lastChild : line.nextElementSibling;
+                tempParentNode = util.isList(oNode) ? line : (tempAfterNode || line).parentNode;
+            }
+
             if (!afterNode && (isFormats || util.isComponent(oNode) || util.isMedia(oNode))) {
+                const isEdge = this.isEdgePoint(range.endContainer, range.endOffset, 'end');
                 const r = this.removeNode();
-                if (r.container.nodeType === 3 || util.isBreak(r.container)) {
-                    const depthFormat = util.getParentElement(r.container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
-                    afterNode = util.splitElement(r.container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
-                    if (afterNode) afterNode = afterNode.previousSibling;
+                const container = r.container;
+                const prevContainer = r.prevContainer;
+
+                if (insertListCell && prevContainer) {
+                    tempParentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
+                    if (tempParentNode.contains(container)) {
+                        let sameParent = true;
+                        tempAfterNode = container;
+                        while (tempAfterNode.parentNode && tempAfterNode.parentNode !== tempParentNode) {
+                            tempAfterNode = tempAfterNode.parentNode;
+                            sameParent = false;
+                        }
+                        if (sameParent && container === prevContainer) tempAfterNode = tempAfterNode.nextSibling;
+                    } else {
+                        tempAfterNode = null;
+                    }
+                } else if (insertListCell && util.isListCell(container) && !line.parentElement) {
+                    line = util.createElement('LI');
+                    tempParentNode.appendChild(line);
+                    container.appendChild(tempParentNode);
+                    tempAfterNode = null;
+                } else if (container.nodeType === 3 || util.isBreak(container) || insertListCell) {
+                    const depthFormat = util.getParentElement(container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
+                    afterNode = util.splitElement(container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
+                    if (afterNode) {
+                        if (insertListCell) {
+                            if (line.contains(container)) {
+                                const subList = util.isList(line.lastElementChild);
+                                let newCell = null;
+                                if (!isEdge) {
+                                    newCell = line.cloneNode(false);
+                                    newCell.appendChild(afterNode.textContent.trim() ? afterNode : util.createTextNode(util.zeroWidthSpace));
+                                }
+                                if (subList) {
+                                    if (!newCell) {
+                                        newCell = line.cloneNode(false);
+                                        newCell.appendChild(util.createTextNode(util.zeroWidthSpace));
+                                    }
+                                    newCell.appendChild(line.lastElementChild);
+                                }
+                                if (newCell) {
+                                    tempParentNode.insertBefore(newCell, line.nextElementSibling);
+                                    tempAfterNode = afterNode = newCell;
+                                }
+                            }
+                        } else {
+                            afterNode = afterNode.previousSibling;
+                        }
+                    }
                 }
             }
 
-            const range = (!afterNode && !isFormats) ? this.getRange_addLine(this.getRange(), null) : this.getRange();
+            range = (!afterNode && !isFormats) ? this.getRange_addLine(this.getRange(), null) : this.getRange();
             const commonCon = range.commonAncestorContainer;
             const startOff = range.startOffset;
             const endOff = range.endOffset;
             const formatRange = range.startContainer === commonCon && util.isFormatElement(commonCon);
             const startCon = formatRange ? (commonCon.childNodes[startOff] || commonCon.childNodes[0] || range.startContainer) : range.startContainer;
             const endCon = formatRange ? (commonCon.childNodes[endOff] || commonCon.childNodes[commonCon.childNodes.length - 1] || range.endContainer) : range.endContainer;
-            let parentNode, originAfter = null;
 
-            if (!afterNode) {
-                parentNode = startCon;
-                if (startCon.nodeType === 3) {
-                    parentNode = startCon.parentNode;
-                }
-
-                /** No Select range node */
-                if (range.collapsed) {
-                    if (commonCon.nodeType === 3) {
-                        if (commonCon.textContent.length > endOff) afterNode = commonCon.splitText(endOff);
-                        else afterNode = commonCon.nextSibling;
-                    } else {
-                        if (!util.isBreak(parentNode)) {
-                            let c = parentNode.childNodes[startOff];
-                            const focusNode = (c && c.nodeType === 3 && util.onlyZeroWidthSpace(c) && util.isBreak(c.nextSibling)) ? c.nextSibling : c;
-                            if (focusNode) {
-                                if (!focusNode.nextSibling) {
-                                    parentNode.removeChild(focusNode);
-                                    afterNode = null;
+            if (!insertListCell) {
+                if (!afterNode) {
+                    parentNode = startCon;
+                    if (startCon.nodeType === 3) {
+                        parentNode = startCon.parentNode;
+                    }
+    
+                    /** No Select range node */
+                    if (range.collapsed) {
+                        if (commonCon.nodeType === 3) {
+                            if (commonCon.textContent.length > endOff) afterNode = commonCon.splitText(endOff);
+                            else afterNode = commonCon.nextSibling;
+                        } else {
+                            if (!util.isBreak(parentNode)) {
+                                let c = parentNode.childNodes[startOff];
+                                const focusNode = (c && c.nodeType === 3 && util.onlyZeroWidthSpace(c) && util.isBreak(c.nextSibling)) ? c.nextSibling : c;
+                                if (focusNode) {
+                                    if (!focusNode.nextSibling) {
+                                        parentNode.removeChild(focusNode);
+                                        afterNode = null;
+                                    } else {
+                                        afterNode = (util.isBreak(focusNode) && !util.isBreak(oNode)) ? focusNode : focusNode.nextSibling;
+                                    }
                                 } else {
-                                    afterNode = (util.isBreak(focusNode) && !util.isBreak(oNode)) ? focusNode : focusNode.nextSibling;
+                                    afterNode = null;
                                 }
                             } else {
-                                afterNode = null;
-                            }
-                        } else {
-                            afterNode = parentNode;
-                            parentNode = parentNode.parentNode;
-                        }
-                    }
-                } else { /** Select range nodes */
-                    const isSameContainer = startCon === endCon;
-
-                    if (isSameContainer) {
-                        if (this.isEdgePoint(endCon, endOff)) afterNode = endCon.nextSibling;
-                        else afterNode = endCon.splitText(endOff);
-
-                        let removeNode = startCon;
-                        if (!this.isEdgePoint(startCon, startOff)) removeNode = startCon.splitText(startOff);
-
-                        parentNode.removeChild(removeNode);
-                        if (parentNode.childNodes.length === 0 && isFormats) {
-                            parentNode.innerHTML = '<br>';
-                        }
-                    }
-                    else {
-                        const removedTag = this.removeNode();
-                        const container = removedTag.container;
-                        const prevContainer = removedTag.prevContainer;
-                        if (container && container.childNodes.length === 0 && isFormats) {
-                            if (util.isFormatElement(container)) {
-                                container.innerHTML = '<br>';
-                            } else if (util.isRangeFormatElement(container)) {
-                                container.innerHTML = '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
+                                afterNode = parentNode;
+                                parentNode = parentNode.parentNode;
                             }
                         }
+                    } else { /** Select range nodes */
+                        const isSameContainer = startCon === endCon;
+    
+                        if (isSameContainer) {
+                            if (this.isEdgePoint(endCon, endOff)) afterNode = endCon.nextSibling;
+                            else afterNode = endCon.splitText(endOff);
+    
+                            let removeNode = startCon;
+                            if (!this.isEdgePoint(startCon, startOff)) removeNode = startCon.splitText(startOff);
+    
+                            parentNode.removeChild(removeNode);
+                            if (parentNode.childNodes.length === 0 && isFormats) {
+                                parentNode.innerHTML = '<br>';
+                            }
+                        }
+                        else {
+                            const removedTag = this.removeNode();
+                            const container = removedTag.container;
+                            const prevContainer = removedTag.prevContainer;
 
-                        if (!isFormats && prevContainer) {
-                            parentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
-                            if (parentNode.contains(container)) {
-                                let sameParent = true;
-                                afterNode = container;
-                                while (afterNode.parentNode !== parentNode) {
-                                    afterNode = afterNode.parentNode;
-                                    sameParent = false;
+                            if (container && container.childNodes.length === 0 && isFormats) {
+                                if (util.isFormatElement(container)) {
+                                    container.innerHTML = '<br>';
+                                } else if (util.isRangeFormatElement(container)) {
+                                    container.innerHTML = '<' + options.defaultTag + '><br></' + options.defaultTag + '>';
                                 }
-                                if (sameParent && container === prevContainer) afterNode = afterNode.nextSibling;
-                            } else {
-                                afterNode = null;
                             }
-                        } else {
-                            afterNode = isFormats ? endCon : container === prevContainer ? container.nextSibling : container;
-                            parentNode = (!afterNode || !afterNode.parentNode) ? commonCon : afterNode.parentNode;
-                        }
-
-                        while (afterNode && !util.isFormatElement(afterNode) && afterNode.parentNode !== commonCon) {
-                            afterNode = afterNode.parentNode;
+    
+                            if (util.isListCell(container) && oNode.nodeType === 3) {
+                                parentNode = container;
+                                afterNode = null;
+                            } else if (!isFormats && prevContainer) {
+                                parentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
+                                if (parentNode.contains(container)) {
+                                    let sameParent = true;
+                                    afterNode = container;
+                                    while (afterNode.parentNode && afterNode.parentNode !== parentNode) {
+                                        afterNode = afterNode.parentNode;
+                                        sameParent = false;
+                                    }
+                                    if (sameParent && container === prevContainer) afterNode = afterNode.nextSibling;
+                                } else {
+                                    afterNode = null;
+                                }
+                            } else {
+                                afterNode = isFormats ? endCon : container === prevContainer ? container.nextSibling : container;
+                                parentNode = (!afterNode || !afterNode.parentNode) ? commonCon : afterNode.parentNode;
+                            }
+    
+                            while (afterNode && !util.isFormatElement(afterNode) && afterNode.parentNode !== commonCon) {
+                                afterNode = afterNode.parentNode;
+                            }
                         }
                     }
+                } else { // has afterNode
+                    parentNode = afterNode.parentNode;
+                    afterNode = afterNode.nextSibling;
+                    originAfter = true;
                 }
             }
-            // has afterNode
-            else {
-                parentNode = afterNode.parentNode;
-                afterNode = afterNode.nextSibling;
-                originAfter = true;
-            }
 
-            // --- insert node ---
             try {
-                if (util.isWysiwygDiv(afterNode) || parentNode === context.element.wysiwyg.parentNode) {
-                    parentNode = context.element.wysiwyg;
-                    afterNode = null;
-                }
-
-                if (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode) || (!util.isListCell(parentNode) && util.isComponent(oNode))) {
-                    const oldParent = parentNode;
-                    if (util.isList(afterNode)) {
-                        parentNode = afterNode;
+                // set node
+                if (!insertListCell) {
+                    if (util.isWysiwygDiv(afterNode) || parentNode === context.element.wysiwyg.parentNode) {
+                        parentNode = context.element.wysiwyg;
                         afterNode = null;
-                    } else if (util.isListCell(afterNode)) {
-                        parentNode = afterNode.previousElementSibling || afterNode;
-                    } else if (!originAfter && !afterNode) {
-                        const r = this.removeNode();
-                        const container = r.container.nodeType === 3 ? (util.isListCell(util.getFormatElement(r.container, null)) ? r.container : (util.getFormatElement(r.container, null) || r.container.parentNode)) : r.container;
-                        const rangeCon = util.isWysiwygDiv(container) || util.isRangeFormatElement(container);
-                        parentNode = rangeCon ? container : container.parentNode;
-                        afterNode = rangeCon ? null : container.nextSibling;
                     }
-
-                    if (oldParent.childNodes.length === 0 && parentNode !== oldParent) util.removeItem(oldParent);
-                }
-
-                if (isFormats && !freeFormat && !util.isRangeFormatElement(parentNode) && !util.isListCell(parentNode) && !util.isWysiwygDiv(parentNode)) {
-                    afterNode = parentNode.nextElementSibling;
-                    parentNode = parentNode.parentNode;
-                }
-
-                if (util.isWysiwygDiv(parentNode) && (oNode.nodeType === 3 || util.isBreak(oNode))) {
-                    const fNode = util.createElement(options.defaultTag);
-                    fNode.appendChild(oNode);
-                    oNode = fNode;
+    
+                    if (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode) || (!util.isListCell(parentNode) && util.isComponent(oNode))) {
+                        const oldParent = parentNode;
+                        if (util.isList(afterNode)) {
+                            parentNode = afterNode;
+                            afterNode = null;
+                        } else if (util.isListCell(afterNode)) {
+                            parentNode = afterNode.previousElementSibling || afterNode;
+                        } else if (!originAfter && !afterNode) {
+                            const r = this.removeNode();
+                            const container = r.container.nodeType === 3 ? (util.isListCell(util.getFormatElement(r.container, null)) ? r.container : (util.getFormatElement(r.container, null) || r.container.parentNode)) : r.container;
+                            const rangeCon = util.isWysiwygDiv(container) || util.isRangeFormatElement(container);
+                            parentNode = rangeCon ? container : container.parentNode;
+                            afterNode = rangeCon ? null : container.nextSibling;
+                        }
+    
+                        if (oldParent.childNodes.length === 0 && parentNode !== oldParent) util.removeItem(oldParent);
+                    }
+    
+                    if (isFormats && !freeFormat && !util.isRangeFormatElement(parentNode) && !util.isListCell(parentNode) && !util.isWysiwygDiv(parentNode)) {
+                        afterNode = parentNode.nextElementSibling;
+                        parentNode = parentNode.parentNode;
+                    }
+    
+                    if (util.isWysiwygDiv(parentNode) && (oNode.nodeType === 3 || util.isBreak(oNode))) {
+                        const fNode = util.createElement(options.defaultTag);
+                        fNode.appendChild(oNode);
+                        oNode = fNode;
+                    }
                 }
 
                 // insert--
-                let emptyListCell = false;
-                if (listCell && util.isListCell(oNode)) {
-                    afterNode = line.nextElementSibling;
-                    parentNode = line.parentNode;
-                    emptyListCell = util.onlyZeroWidthSpace(line.textContent);
+                if (insertListCell) {
+                    if (!tempParentNode.parentNode) {
+                        parentNode = context.element.wysiwyg;
+                        afterNode = null;
+                    } else {
+                        parentNode = tempParentNode;
+                        afterNode = tempAfterNode;
+                    }
                 } else {
                     afterNode = parentNode === afterNode ? parentNode.lastChild : afterNode;
                 }
 
+                if (util.isListCell(oNode) && !util.isList(parentNode)) {
+                    if (util.isListCell(parentNode)) {
+                        afterNode = parentNode.nextElementSibling;
+                        parentNode = parentNode.parentNode;
+                    } else {
+                        const ul = util.createElement('ol');
+                        parentNode.insertBefore(ul, afterNode);
+                        parentNode = ul;
+                        afterNode = null;
+                    }
+                    insertListCell = true;
+                }
+
                 parentNode.insertBefore(oNode, afterNode);
-                if (emptyListCell) util.removeItem(line);
+
+                if (insertListCell) {
+                    if (util.onlyZeroWidthSpace(line.textContent.trim())) {
+                        util.removeItem(line);
+                        oNode = oNode.lastChild;
+                    } else {
+                        const chList = util.getArrayItem(line.children, util.isList);
+                        if (chList) {
+                            if (oNode !== chList) {
+                                oNode.appendChild(chList);
+                                oNode = chList.previousSibling;
+                            } else {
+                                parentNode.appendChild(oNode);
+                                oNode = parentNode;
+                            }
+
+                            if (util.onlyZeroWidthSpace(line.textContent.trim())) {
+                                util.removeItem(line);
+                            }
+                        }
+                    }
+                }
             } catch (e) {
                 parentNode.appendChild(oNode);
             } finally {
@@ -1972,28 +2097,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 startIndex = endIndex = 0;
             }
 
-            function remove (item) {
-                const format = util.getFormatElement(item, null);
-                util.removeItem(item);
-
-                if(util.isListCell(format)) {
-                    const list = util.getArrayItem(format.children, util.isList, false);
-                    if (list) {
-                        const child = list.firstElementChild;
-                        const children = child.childNodes;
-                        while (children[0]) {
-                            format.insertBefore(children[0], list);
-                        }
-                        util.removeItemAllParents(child, null, null);
-                    }
-                }
-            }
-
             for (let i = startIndex; i <= endIndex; i++) {
                 const item = childNodes[i];
 
                 if (item.length === 0 || (item.nodeType === 3 && item.data === undefined)) {
-                    remove(item);
+                    this._nodeRemoveListItem(item);
                     continue;
                 }
 
@@ -2013,7 +2121,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (beforeNode.length > 0) {
                         startCon.data = beforeNode.data;
                     } else {
-                        remove(startCon);
+                        this._nodeRemoveListItem(startCon);
                     }
 
                     if (item === endCon) break;
@@ -2031,24 +2139,26 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (afterNode.length > 0) {
                         endCon.data = afterNode.data;
                     } else {
-                        remove(endCon);
+                        this._nodeRemoveListItem(endCon);
                     }
 
                     continue;
                 }
 
-                remove(item);
+                this._nodeRemoveListItem(item);
             }
 
-            container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : (range.endContainer || range.startContainer);
+            const endUl = util.getParentElement(endCon, 'ul');
+            const startLi = util.getParentElement(startCon, 'li');
+            if (endUl && startLi && startLi.contains(endUl)) {
+                container = endUl.previousSibling;
+                offset = container.textContent.length;
+            } else {
+                container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : (range.endContainer || range.startContainer);
+            }
             
             if (!util.isWysiwygDiv(container) && container.childNodes.length === 0) {
-                const rc = util.removeItemAllParents(container, function (current) {
-                    if (this.isComponent(current)) return false;
-                    const text = current.textContent;
-                    return text.length === 0 || /^(\n|\u200B)+$/.test(text);
-                }.bind(util), null);
-                
+                const rc = util.removeItemAllParents(container, null, null);
                 if (rc) container = rc.sc || rc.ec || context.element.wysiwyg;
             }
 
@@ -2062,6 +2172,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 offset: offset,
                 prevContainer: startCon && startCon.parentNode ? startCon : null
             };
+        },
+
+        _nodeRemoveListItem: function (item) {
+            const format = util.getFormatElement(item, null);
+            util.removeItem(item);
+
+            if(!util.isListCell(format)) return;
+            
+            util.removeItemAllParents(format, null, null);
+
+            if (format && util.isList(format.firstChild)) {
+                format.insertBefore(util.createTextNode(util.zeroWidthSpace), format.firstChild);
+            }
         },
 
         /**
@@ -5606,6 +5729,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.codeViewDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"]):not([data-display="MORE"])');
             this.resizingDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-resizing-enabled"]):not([data-display="MORE"])');
 
+            this._saveButtonStates();
+
             const tool = context.tool;
             this.commandMap = {
                 OUTDENT: tool.outdent,
@@ -5943,7 +6068,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
             }
 
-            if (!command) return keyStr === 'B'; // chromium - bold disabled
+            if (!command) return !!keyStr;
 
             core.commandHandler(core.commandMap[command], command);
             return true;
@@ -7568,23 +7693,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (cleanData) {
                 if (util.isListCell(util.getFormatElement(core.getSelectionNode(), null))) {
                     const dom = (_d.createRange().createContextualFragment(cleanData));
-                    if (dom.childNodes[0].nodeType === 1) {
-                        cleanData = event._convertListCell(dom);
-                    }
+                    const domTree = dom.childNodes;
+                    if (domTree.length > 1 && domTree[0].nodeType === 1) cleanData = event._convertListCell(domTree);
                 }
                 functions.insertHTML(cleanData, true, false);
                 return false;
             }
         },
 
-        _convertListCell: function (dom) {
-            const domTree = dom.childNodes;
+        _convertListCell: function (domTree) {
             let html = '';
 
             for (let i = 0, len = domTree.length, node; i < len; i++) {
                 node = domTree[i];
                 if (node.nodeType === 1) {
-                    if (util.isListCell(node)) {
+                    if (util.isListCell(node) || util.isList(node)) {
                         html += node.outerHTML;
                     } else if (util.isFormatElement(node)) {
                         html += '<li>' +(node.innerHTML.trim() || '<br>') + '</li>';
@@ -8098,6 +8221,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             context.tool = newContext.tool;
             if (options.iframe) context.element.wysiwyg = core._wd.body;
 
+            core._recoverButtonStates();
             core._cachingButtons();
             core.history._resetCachingButton();
 

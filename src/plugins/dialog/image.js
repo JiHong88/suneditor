@@ -126,7 +126,7 @@ export default {
 
         let html = '' +
             '<div class="se-dialog-header">' +
-                '<button type="button" data-command="close" class="se-btn se-dialog-close" class="close" aria-label="Close" title="' + lang.dialogBox.close + '">' +
+                '<button type="button" data-command="close" class="se-btn se-dialog-close" class="close" title="' + lang.dialogBox.close + '" aria-label="' + lang.dialogBox.close + '">' +
                     core.icons.cancel +
                 '</button>' +
                 '<span class="se-modal-title">' + lang.dialogBox.imageBox.title + '</span>' +
@@ -145,7 +145,7 @@ export default {
                                 '<label>' + lang.dialogBox.imageBox.file + '</label>' +
                                 '<div class="se-dialog-form-files">' +
                                     '<input class="se-input-form _se_image_file" type="file" accept="' + option.imageAccept + '"' + (option.imageMultipleFile ? ' multiple="multiple"' : '') + '/>' +
-                                    '<button type="button" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '">' + core.icons.cancel + '</button>' +
+                                    '<button type="button" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '" aria-label="' + lang.controller.remove + '">' + core.icons.cancel + '</button>' +
                                 '</div>' +
                             '</div>' ;
                     }
@@ -156,7 +156,7 @@ export default {
                                 '<label>' + lang.dialogBox.imageBox.url + '</label>' +
                                 '<div class="se-dialog-form-files">' +
                                     '<input class="se-input-form se-input-url _se_image_url" type="text" />' +
-                                    ((option.imageGalleryUrl && core.plugins.imageGallery) ? '<button type="button" class="se-btn se-dialog-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '">' + core.icons.image_gallery + '</button>' : '') +
+                                    ((option.imageGalleryUrl && core.plugins.imageGallery) ? '<button type="button" class="se-btn se-dialog-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '" aria-label="' + lang.toolbar.imageGallery + '">' + core.icons.image_gallery + '</button>' : '') +
                                 '</div>' +
                                 '<pre class="se-link-preview"></pre>' +
                             '</div>';
@@ -190,7 +190,7 @@ export default {
                             '<label class="se-dialog-size-x"' + heightDisplay + '>' + (onlyPercentage ? '%' : 'x') + '</label>' +
                             '<input type="text" class="se-input-control _se_image_size_y" placeholder="auto"' + onlyPercentDisplay + (onlyPercentage ? ' max="100"' : '') + heightDisplay + '/>' +
                             '<label' + onlyPercentDisplay + heightDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                            '<button type="button" title="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;">' + core.icons.revert + '</button>' +
+                            '<button type="button" title="' + lang.dialogBox.revertButton + '" aria-label="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;">' + core.icons.revert + '</button>' +
                         '</div>' ;
             }
 
@@ -210,7 +210,7 @@ export default {
                         '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
                         '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="right">' + lang.dialogBox.right + '</label>' +
                     '</div>' +
-                    '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+                    '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '" aria-label="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
                 '</div>' +
             '</form>';
 

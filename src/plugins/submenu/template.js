@@ -42,7 +42,7 @@ export default {
                 '<ul class="se-list-basic">';
         for (let i = 0, len = templateList.length, t; i < len; i++) {
             t = templateList[i];
-            list += '<li><button type="button" class="se-btn-list" data-value="' + i + '" title="' + t.name + '">' + t.name + '</button></li>';
+            list += '<li><button type="button" class="se-btn-list" data-value="' + i + '" title="' + t.name + '" aria-label="' + t.name + '">' + t.name + '</button></li>';
         }
         list += '</ul></div>';
 

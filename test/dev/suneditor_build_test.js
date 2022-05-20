@@ -927,7 +927,39 @@ const editor = suneditor.init({
 });
 
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
+    // rtl: true,
+    shortcutsDisable: ['bold', 'underline', 'italic'],
     // mode: "inline",
+    value: `<ol>
+    <li>11111</li>
+    <li>2222</li>
+    <li>3333
+      <ol>
+        <li>44444</li>
+      </ol>
+    </li>
+  </ol>
+  
+  <p><br>
+  </p>
+  
+  <ol>
+    <li>aaaa</li>
+    <li>bbbb</li>
+    <li>cccc
+      <ol>
+        <li>ddddd<br>
+        </li>
+      </ol>
+    </li>
+  </ol>
+  
+  <p>
+    <br>
+      <br>
+    </br>
+  </p>
+  `,
     buttonList:complexEditor,
     plugins: plugins,
     katex: Katex,
