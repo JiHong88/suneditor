@@ -20,6 +20,7 @@ Node.prototype = {
 	 * @returns {Element}
 	 */
 	split: function (baseNode, offset, depth) {
+		if (domUtils.isWysiwygFrame(baseNode)) return baseNode;
 		const bp = baseNode.parentNode;
 		let index = 0,
 			newEl,

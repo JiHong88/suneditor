@@ -252,7 +252,7 @@ HTML.prototype = {
 				if (tempParentNode.contains(container)) {
 					let sameParent = true;
 					tempAfterNode = container;
-					while (tempAfterNode.parentNode !== tempParentNode) {
+					while (tempAfterNode.parentNode && tempAfterNode.parentNode !== tempParentNode) {
 						tempAfterNode = tempAfterNode.parentNode;
 						sameParent = false;
 					}
@@ -376,7 +376,7 @@ HTML.prototype = {
 							if (parentNode.contains(container)) {
 								let sameParent = true;
 								afterNode = container;
-								while (afterNode.parentNode !== parentNode) {
+								while (afterNode.parentNode && afterNode.parentNode !== parentNode) {
 									afterNode = afterNode.parentNode;
 									sameParent = false;
 								}
@@ -441,8 +441,13 @@ HTML.prototype = {
 
 			// insert--
 			if (insertListCell) {
-				afterNode = tempAfterNode;
-				parentNode = tempParentNode;
+				if (!tempParentNode.parentNode) {
+					parentNode = context.element.wysiwyg;
+					afterNode = null;
+				} else {
+					parentNode = tempParentNode;
+					afterNode = tempAfterNode;
+				}
 			} else {
 				afterNode = parentNode === afterNode ? parentNode.lastChild : afterNode;
 			}
