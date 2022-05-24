@@ -18,7 +18,7 @@ const font = function (editor, target) {
 	this.icon = '<span class="txt">' + this.lang.toolbar.font + '</span>' + this.icons.arrow_down;
 
 	// create HTML
-	const menu = createHTML(editor);
+	const menu = CreateHTML(editor);
 	const commandArea = menu.querySelector('.se-list-inner');
 
 	// members
@@ -29,7 +29,7 @@ const font = function (editor, target) {
 
 	// init
 	this.menu.initTarget(target, menu);
-	this.eventManager.addEvent(commandArea, 'click', onClickMenu.bind(this));
+	this.eventManager.addEvent(commandArea, 'click', OnClickMenu.bind(this));
 };
 
 font.type = 'dropdown';
@@ -82,8 +82,7 @@ font.prototype = {
 	 */
 	action: function (value) {
 		if (value) {
-			const newNode = domUtils.createElement('SPAN');
-			newNode.style.fontFamily = value;
+			const newNode = domUtils.createElement('SPAN', { style: 'font-family: ' + value + ';' });
 			this.format.applyTextStyle(newNode, ['font-family'], null, null);
 		} else {
 			this.format.applyTextStyle(null, ['font-family'], ['span'], true);
@@ -103,7 +102,7 @@ font.prototype = {
 	constructor: font
 };
 
-function onClickMenu(e) {
+function OnClickMenu(e) {
 	if (!/^BUTTON$/i.test(e.target.tagName)) return false;
 
 	e.preventDefault();
@@ -112,7 +111,7 @@ function onClickMenu(e) {
 	this.action(e.target.getAttribute('data-value'));
 }
 
-function createHTML(editor) {
+function CreateHTML(editor) {
 	const option = editor.options;
 	const lang = editor.lang;
 	const listDiv = domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-font-family' });

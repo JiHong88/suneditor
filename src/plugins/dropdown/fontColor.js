@@ -7,95 +7,68 @@
  */
 'use strict';
 
-import colorPicker from '../modules/_colorPicker';
+import EditorInterface from '../../interface/editor';
+import colorPicker from '../../classes/colorPicker';
+import { domUtils } from '../../helper';
 
-export default {
-    name: 'fontColor',
-    type: 'dropdown',
-    add: function (core, targetElement) {
-        core.addModule([colorPicker]);
+const fontColor = function (editor, target) {
+	EditorInterface.call(this, editor);
+	// plugin basic properties
+	this.target = target;
+	this.title = this.lang.toolbar.fontColor;
+	this.icon = this.icons.font_color;
 
-        const context = core.context;
-        context.fontColor = {
-            previewEl: null,
-            colorInput: null,
-            colorList: null
-        };
+	// members
+	this.colorPicker = new colorPicker(this, 'color', '#333333', this.options.colorList_font);
 
-        /** set dropdown */
-        let listDiv = this.setDropdown(core);
-        context.fontColor.colorInput = listDiv.querySelector('._se_color_picker_input');
+	// create HTML
+	const menu = CreateHTML(this.colorPicker.target);
 
-        /** add event listeners */
-        context.fontColor.colorInput.addEventListener('keyup', this.onChangeInput.bind(core));
-        listDiv.querySelector('._se_color_picker_submit').addEventListener('click', this.submit.bind(core));
-        listDiv.querySelector('._se_color_picker_remove').addEventListener('click', this.remove.bind(core));
-        listDiv.addEventListener('click', this.pickup.bind(core));
-        context.fontColor.colorList = listDiv.querySelectorAll('li button');
-
-        /** append target button menu */
-        core.menu.initTarget(targetElement, listDiv);
-
-        /** empty memory */
-        listDiv = null;
-    },
-
-    setDropdown: function (core) {
-        const colorArea = core.context.colorPicker.colorListHTML;
-        const listDiv = core.util.createElement('DIV');
-
-        listDiv.className = 'se-dropdown se-list-layer';
-        listDiv.innerHTML = colorArea;
-
-        return listDiv;
-    },
-
-     /**
-     * @Override dropdown
-     */
-    on: function () {
-        const contextPicker = this.context.colorPicker;
-        const contextFontColor = this.context.fontColor;
-
-        contextPicker._colorInput = contextFontColor.colorInput;
-        const color = this.wwComputedStyle.color;
-        contextPicker._defaultColor = color ? this.plugins.colorPicker.isHexColor(color) ? color : this.plugins.colorPicker.rgb2hex(color) : '#333333';
-        contextPicker._styleProperty = 'color';
-        contextPicker._colorList = contextFontColor.colorList;
-        
-        this.plugins.colorPicker.init.call(this, this.selection.getNode(), null);
-    },
-
-     /**
-     * @Override _colorPicker
-     */
-    onChangeInput: function (e) {
-        this.plugins.colorPicker.setCurrentColor.call(this, e.target.value);
-    },
-
-    submit: function () {
-        this.plugins.fontColor.applyColor.call(this, this.context.colorPicker._currentColor);
-    },
-
-    pickup: function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        this.plugins.fontColor.applyColor.call(this, e.target.getAttribute('data-value'));
-    },
-
-    remove: function () {
-        this.format.applyTextStyle(null, ['color'], ['span'], true);
-        this.menu.dropdownOff();
-    },
-
-    applyColor: function (color) {
-        if (!color) return;
-
-        const newNode = this.util.createElement('SPAN');
-        newNode.style.color = color;
-        this.format.applyTextStyle(newNode, ['color'], null, null);
-
-        this.menu.dropdownOff();
-    }
+	// itit
+	this.menu.initTarget(target, menu);
+	this.eventManager.addEvent(menu, 'click', OnClickMenu.bind(this));
 };
+
+fontColor.type = 'dropdown';
+fontColor.className = '';
+fontColor.prototype = {
+	/**
+	 * @override dropdown
+	 */
+	on: function () {
+		this.colorPicker.init(this.selection.getNode());
+	},
+
+    /**
+     * @override core
+     * @param {string} value color
+     */
+	action: function (value) {
+		if (value) {
+			const newNode = domUtils.createElement('SPAN', { style: 'color: ' + value + ';' });
+			this.format.applyTextStyle(newNode, ['color'], null, null);
+		} else {
+			this.format.applyTextStyle(null, ['color'], ['span'], true);
+		}
+
+		this.menu.dropdownOff();
+	},
+
+	constructor: fontColor
+};
+
+function OnClickMenu(e) {
+	e.preventDefault();
+	e.stopPropagation();
+
+    const color = e.target.getAttribute('data-value');
+    if (!color) return;
+    
+	this.action(color);
+}
+
+function CreateHTML(colorList) {
+	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, colorList);
+}
+
+export default fontColor;

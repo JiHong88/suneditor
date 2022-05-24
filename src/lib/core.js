@@ -153,11 +153,6 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	this.allCommandButtons = {};
 
 	/**
-	 * @description Whether the plugin is initialized
-	 */
-	this.initPlugins = {};
-
-	/**
 	 * @description Plugins array with "active" method.
 	 * "activePlugins" runs the "add" method when creating the editor.
 	 */
@@ -402,24 +397,6 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 };
 
 Core.prototype = {
-	/**
-	 * @todo
-	 * @description If the module is not added, add the module and call the 'add' function
-	 * @param {Array} moduleArray module object's Array
-	 */
-	addModule: function (moduleArray) {
-		for (let i = 0, len = moduleArray.length, moduleName; i < len; i++) {
-			moduleName = moduleArray[i].name;
-			if (!this.plugins[moduleName]) {
-				this.plugins[moduleName] = moduleArray[i];
-			}
-			if (!this.initPlugins[moduleName]) {
-				this.initPlugins[moduleName] = true;
-				if (typeof this.plugins[moduleName].add === 'function') this.plugins[moduleName].add(this);
-			}
-		}
-	},
-
 	/**
 	 * @description If the plugin is not added, add the plugin and call the 'add' function.
 	 * If the plugin is added call callBack function.
@@ -858,7 +835,6 @@ Core.prototype = {
 
 		if (cons.callButtons) {
 			this._pluginCallButtons = cons.callButtons;
-			this.initPlugins = {};
 		}
 
 		if (cons.plugins) {

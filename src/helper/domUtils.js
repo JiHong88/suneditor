@@ -515,7 +515,7 @@ export function copyTagAttributes(originEl, copyEl) {
 
 	const classes = copyEl.classList;
 	for (let i = 0, len = classes.length; i < len; i++) {
-		this.addClass(originEl, classes[i]);
+		addClass(originEl, classes[i]);
 	}
 
 	if (!originEl.style.cssText) originEl.removeAttribute('style');
@@ -578,7 +578,7 @@ export function changeElement(element, newElement) {
 		if (element.outerHTML) {
 			element.outerHTML = newElement;
 		} else {
-			const doc = this.createElement('DIV');
+			const doc = createElement('DIV');
 			doc.innerHTML = newElement;
 			newElement = doc.firstChild;
 			element.parentNode.replaceChild(newElement, element);
@@ -814,7 +814,7 @@ export function isEmptyLine(element) {
  * @returns {boolean}
  */
 export function isUneditable(element) {
-	return element && this.hasClass(element, '__se__uneditable');
+	return element && hasClass(element, '__se__uneditable');
 }
 
 /**

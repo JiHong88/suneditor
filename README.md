@@ -530,7 +530,7 @@ formats         : Change default formatBlock array.                 default: [..
                     class: '__se__format__line_xxx' || '__se__format__br_line_xxx' || '__se__format__block_xxx' || '__se__format__br_line_closure_xxx' || '__se__format__block_closure_xxx'
                     // Class names must always begin with "__se__format__(line, br_line, block)_"
                   }]
-colorList       : Change default color array of color picker.       default: [..[..]..] {Array}
+colorList_font    : Change default color array of color picker.       default: [..[..]..] {Array}
                   Default value: [
                     '#ff0000', '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000',
                     '#ffd8d8', '#fae0d4', '#faf4c0', '#e4f7ba', '#d4f4fa', '#d9e5ff', '#e8d9ff', '#ffd9fa', '#f1f1f1',

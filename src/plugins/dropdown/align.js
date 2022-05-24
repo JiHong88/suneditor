@@ -18,7 +18,7 @@ const align = function (editor, target) {
 	this.icon = this.options._rtl ? this.icons.align_right : this.icons.align_left;
 
 	// create HTML
-	const menu = createHTML(editor, !editor.options._rtl);
+	const menu = CreateHTML(editor, !editor.options._rtl);
 	const commandArea = (this._itemMenu = menu.querySelector('ul'));
 
 	// members
@@ -34,7 +34,7 @@ const align = function (editor, target) {
 
 	// init
 	this.menu.initTarget(target, menu);
-	this.eventManager.addEvent(commandArea, 'click', onClickMenu.bind(this));
+	this.eventManager.addEvent(commandArea, 'click', OnClickMenu.bind(this));
 };
 
 align.type = 'dropdown';
@@ -129,7 +129,7 @@ align.prototype = {
 	constructor: align
 };
 
-function onClickMenu(e) {
+function OnClickMenu(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
@@ -144,7 +144,7 @@ function onClickMenu(e) {
 	this.action(value);
 }
 
-function createHTML(core) {
+function CreateHTML(core) {
 	const lang = core.lang;
 	const icons = core.icons;
 	const alignItems = core.options.alignItems;

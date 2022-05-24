@@ -332,7 +332,7 @@ function _initOptions(element, options) {
 	options.font = !options.font ? null : options.font;
 	options.fontSize = !options.fontSize ? null : options.fontSize;
 	options.formats = !options.formats ? null : options.formats;
-	options.colorList = !options.colorList ? null : options.colorList;
+	options.colorList_font = !options.colorList_font ? null : options.colorList_font;
 	options.lineHeights = !options.lineHeights ? null : options.lineHeights;
 	options.paragraphStyles = !options.paragraphStyles ? null : options.paragraphStyles;
 	options.textStyles = !options.textStyles ? null : options.textStyles;
@@ -661,7 +661,6 @@ function _defaultButtons(options) {
 		/** plugins - dropdown */
 		formatBlock: ['se-btn-select se-btn-tool-format', lang.toolbar.formats, 'formatBlock', 'dropdown', '<span class="txt">' + lang.toolbar.formats + '</span>' + icons.arrow_down],
 		fontSize: ['se-btn-select se-btn-tool-size', lang.toolbar.fontSize, 'fontSize', 'dropdown', '<span class="txt">' + lang.toolbar.fontSize + '</span>' + icons.arrow_down],
-		fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'dropdown', icons.font_color],
 		hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'dropdown', icons.highlight_color],
 		list: ['', lang.toolbar.list, 'list', 'dropdown', icons.list_number],
 		horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'dropdown', icons.horizontal_rule],
