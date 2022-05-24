@@ -70,7 +70,7 @@ Menu.prototype = {
 
 		if (this.currentDropdown) {
 			this.currentDropdownName = '';
-			this.dropdown.style.display = 'none';
+			this.currentDropdown.style.display = 'none';
 			this.currentDropdown = null;
 			domUtils.removeClass(this.currentDropdownActiveButton, 'on');
 			this.currentDropdownActiveButton = null;

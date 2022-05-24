@@ -658,15 +658,11 @@ function _defaultButtons(options) {
 		dir_ltr: ['', lang.toolbar.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
 		dir_rtl: ['', lang.toolbar.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
 		save: ['se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmd + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save],
-		/** plugins - command */
-		blockquote: ['', lang.toolbar.tag_blockquote, 'blockquote', 'command', icons.blockquote],
 		/** plugins - dropdown */
-		font: ['se-btn-select se-btn-tool-font', lang.toolbar.font, 'font', 'dropdown', '<span class="txt">' + lang.toolbar.font + '</span>' + icons.arrow_down],
 		formatBlock: ['se-btn-select se-btn-tool-format', lang.toolbar.formats, 'formatBlock', 'dropdown', '<span class="txt">' + lang.toolbar.formats + '</span>' + icons.arrow_down],
 		fontSize: ['se-btn-select se-btn-tool-size', lang.toolbar.fontSize, 'fontSize', 'dropdown', '<span class="txt">' + lang.toolbar.fontSize + '</span>' + icons.arrow_down],
 		fontColor: ['', lang.toolbar.fontColor, 'fontColor', 'dropdown', icons.font_color],
 		hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'dropdown', icons.highlight_color],
-		align: ['se-btn-align', lang.toolbar.align, 'align', 'dropdown', options._rtl ? icons.align_right : icons.align_left],
 		list: ['', lang.toolbar.list, 'list', 'dropdown', icons.list_number],
 		horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'dropdown', icons.horizontal_rule],
 		table: ['', lang.toolbar.table, 'table', 'dropdown', icons.table],
@@ -701,7 +697,7 @@ function _createModuleGroup() {
 
 /**
  * @description Create a button element
- * @param {string} buttonClass className in button
+ * @param {string} className className in button
  * @param {string} title Title in button
  * @param {string} dataCommand The data-command property of the button
  * @param {string} dataType The data-type property of the button ('dialog', 'dropdown', 'command',  'container')
@@ -710,19 +706,18 @@ function _createModuleGroup() {
  * @param {Object} _icons Icons
  * @returns {Object}
  */
-function _createButton(buttonClass, title, dataCommand, dataType, innerHTML, _disabled, _icons) {
+function _createButton(className, title, dataCommand, dataType, innerHTML, _disabled, _icons) {
 	const oLi = domUtils.createElement('LI');
-	const label = (title || dataCommand);
+	const label = (title || '');
 	const oButton = domUtils.createElement('BUTTON', {
 		type: 'button',
-		class: 'se-btn' + (buttonClass ? ' ' + buttonClass : '') + ' se-tooltip',
+		class: 'se-btn' + (className ? ' ' + className : '') + ' se-tooltip',
 		'data-command': dataCommand,
 		'data-type': dataType,
 		'aria-label': label.replace(/<span .+<\/span>/, ''),
 		tabindex: '-1'
 	});
 
-	if (!innerHTML) innerHTML = '<span class="se-icon-text">!</span>';
 	if (/^default\./i.test(innerHTML)) {
 		innerHTML = _icons[innerHTML.replace(/^default\./i, '')];
 	}
@@ -731,7 +726,7 @@ function _createButton(buttonClass, title, dataCommand, dataType, innerHTML, _di
 		oButton.className += ' se-btn-more-text';
 	}
 
-	innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + label + '</span></span>';
+	if (label) innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + label + '</span></span>';
 
 	if (_disabled) oButton.setAttribute('disabled', true);
 
@@ -742,6 +737,14 @@ function _createButton(buttonClass, title, dataCommand, dataType, innerHTML, _di
 		li: oLi,
 		button: oButton
 	};
+}
+
+export function UpdateButton(element, plugin) {
+	if (!element) return;
+	element.innerHTML = (plugin.icon || '<span class="se-icon-text">!</span>') + '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + plugin.title + '</span></span>';
+	element.setAttribute('aria-label', plugin.title);
+	if (plugin.type) element.setAttribute('data-type', plugin.type);
+	if (plugin.className) element.className += ' ' + plugin.className;
 }
 
 /**
@@ -805,15 +808,10 @@ function _createToolBar(buttonList, _plugins, options) {
 					continue buttonGroupLoop;
 				}
 
-				if (typeof button === 'object') {
-					if (typeof button.add === 'function') {
-						pluginName = button.name;
-						module = defaultButtonList[pluginName];
-						plugins[pluginName] = button;
-					} else {
-						pluginName = button.name;
-						module = [button.buttonClass, button.title, button.name, button.type, button.innerHTML, button._disabled];
-					}
+				if (typeof plugins[button] === 'function') {
+					const plugin = plugins[button];
+					pluginName = button;
+					module = [plugin.className, plugin.title, pluginName, plugin.type, plugin.innerHTML, plugin._disabled];
 				} else {
 					// align
 					if (/^\-/.test(button)) {
@@ -846,7 +844,7 @@ function _createToolBar(buttonList, _plugins, options) {
 					if (!module) {
 						const custom = plugins[pluginName];
 						if (!custom) throw Error('[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [' + pluginName + ']');
-						module = [custom.buttonClass, custom.title, custom.name, custom.type, custom.innerHTML, custom._disabled];
+						module = [custom.className, custom.title, custom.name, custom.type, custom.innerHTML, custom._disabled];
 					}
 				}
 

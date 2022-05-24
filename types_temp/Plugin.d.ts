@@ -38,5 +38,5 @@ export interface Plugin {
      * @description The class of the button. - default: "se-btn"
      * Do not recommend using it unless it is a special situation.
      */
-    buttonClass?: string
+    className?: string
 }

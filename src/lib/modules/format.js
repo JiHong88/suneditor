@@ -623,9 +623,9 @@ Format.prototype = {
 
 		if (!remove && edge) {
 			if (!selectedFormats) {
-				this.setRange(edge.sc, 0, edge.sc, 0);
+				this.selection.setRange(edge.sc, 0, edge.sc, 0);
 			} else {
-				this.setRange(edge.sc, so, edge.ec, eo);
+				this.selection.setRange(edge.sc, so, edge.ec, eo);
 			}
 		}
 

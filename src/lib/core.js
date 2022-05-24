@@ -1,5 +1,5 @@
 import Helper, { global, env, converter, unicode, domUtils, numbers } from '../helper';
-import { ResetOptions } from './constructor';
+import { ResetOptions, UpdateButton } from './constructor';
 import Context from './context';
 
 // interface
@@ -430,9 +430,11 @@ Core.prototype = {
 		target = target || this._pluginCallButtons[pluginName];
 
 		if (!this.plugins[pluginName]) {
-			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName:"' + pluginName + '")');
+			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "' + pluginName + '")');
 		} else {
-			this.plugins[pluginName] = new this.plugins[pluginName](this, target);
+			const plugin = this.plugins[pluginName] = new this.plugins[pluginName](this, target);
+			UpdateButton(target, plugin);
+			if (typeof plugin.init === 'function') plugin.init();
 		}
 
 		if (this.plugins[pluginName].active && !this._commandMap[pluginName] && !!target) {
@@ -924,13 +926,13 @@ Core.prototype = {
 		this._prevRtl = this.options._rtl = rtl;
 
 		if (changeDir) {
-			// align buttons
-			if (this.plugins.align) {
-				this.plugins.align.exchangeDir.call(this);
+			const plugins = this.plugins;
+			for (let k in plugins) {
+				if (typeof plugins[k].setDir === 'function') plugins[k].setDir(dir);
 			}
 			// indent buttons
-			if (buttons.indent) domUtils.changeElement(buttons.indent.firstElementChild, icons.indent);
-			if (buttons.outdent) domUtils.changeElement(buttons.outdent.firstElementChild, icons.outdent);
+			if (buttons.indent) domUtils.changeElement(buttons.indent.firstElementChild, this.icons.indent);
+			if (buttons.outdent) domUtils.changeElement(buttons.outdent.firstElementChild, this.icons.outdent);
 		}
 
 		if (rtl) {

@@ -29,7 +29,6 @@ SunEditor supports IE11 and all modern browsers with no dependencies.
 - [Use import statement](#use-import-statement)
     - [Load only what you want](#1-load-only-what-you-want)
     - [Load all plugins](#2-load-all-plugins)
-    - [Plugins can be used directly in the button list](#3-plugins-can-be-used-directly-in-the-button-list)
 - [Init function](#init-function)
 - [Use CodeMirror](#use-codemirror)
 - [Use KaTeX (math plugin)](#use-katex-math-plugin)
@@ -166,31 +165,6 @@ suneditor.create('sample', {
         ['save', 'template'],
         /** ['dir', 'dir_ltr', 'dir_rtl'] */ // "dir": Toggle text direction, "dir_ltr": Right to Left, "dir_rtl": Left to Right
     ]
-})
-
-// You can also load what you want
-suneditor.create('sample', {
-    plugins: [plugins.font],
-    // Plugins can be used directly in the button list
-    buttonList: [
-        ['font', plugins.image]
-    ]
-})
-```
-
-### 3. Plugins can be used directly in the button list
-```javascript
-import 'suneditor/dist/css/suneditor.min.css'
-import suneditor from 'suneditor'
-import {align, font, fontSize, fontColor, hiliteColor, 
-        horizontalRule, image, template} from 'suneditor/src/plugins'
-
-suneditor.create('sample', {
-    buttonList: [
-        ['undo', 'redo', 'removeFormat'],
-        [align, font, fontSize, fontColor, hiliteColor],
-        [horizontalRule, image, template]
-    ],
 })
 ```
 

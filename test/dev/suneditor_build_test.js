@@ -13,14 +13,16 @@ import CodeMirror from 'codemirror';
 // import 'katex/dist/katex.min.css';
 import Katex from 'katex';
 
-// import align from "../../src/plugins/dropdown/align";
+import align from "../../src/plugins/dropdown/align";
+import font from "../../src/plugins/dropdown/font";
+import blockquote from "../../src/plugins/command/blockquote";
 
 window.e = suneditor.create(document.getElementById('editor2'), {
     // value: 'abc',
-    // plugins: [align],
+    plugins: [align, blockquote, font],
     charCounter: true,
     statusbar: true,
-    mode: "inline",
+    // mode: "inline",
     width: "100%",
     minHeight : 300,
     charCounter: true,
@@ -38,7 +40,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
         ['outdent', 'indent'],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
-        ['align']
+        ['align', 'blockquote', 'font']
     ]
 });
 
