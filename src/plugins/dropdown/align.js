@@ -93,9 +93,8 @@ align.prototype = {
 		if (this.defaultDir === _dir) return;
 
 		this.defaultDir = _dir;
-		let menu = this._itemMenu;
-		let leftBtn = menu.querySelector('[data-value="left"]');
-		let rightBtn = menu.querySelector('[data-value="right"]');
+		const leftBtn = this._itemMenu.querySelector('[data-value="left"]');
+		const rightBtn = this._itemMenu.querySelector('[data-value="right"]');
 		if (leftBtn && rightBtn) {
 			const lp = leftBtn.parentElement;
 			const rp = rightBtn.parentElement;
