@@ -35,7 +35,7 @@
             superscript: '上标',
             removeFormat: '清除格式',
             fontColor: '字体颜色',
-            hiliteColor: '背景颜色',
+            backgroundColor: '背景颜色',
             indent: '增加缩进',
             outdent: '减少缩进',
             align: '对齐方式',

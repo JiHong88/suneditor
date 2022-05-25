@@ -35,7 +35,7 @@
             superscript: 'Верхний индекс',
             removeFormat: 'Очистить форматирование',
             fontColor: 'Цвет текста',
-            hiliteColor: 'Цвет фона',
+            backgroundColor: 'Цвет фона',
             indent: 'Увеличить отступ',
             outdent: 'Уменьшить отступ',
             align: 'Выравнивание',

@@ -35,7 +35,7 @@
             superscript: 'Hochgestellt',
             removeFormat: 'Format entfernen',
             fontColor: 'Schriftfarbe',
-            hiliteColor: 'Farbe für Hervorhebungen',
+            backgroundColor: 'Farbe für Hervorhebungen',
             indent: 'Einzug vergrößern',
             outdent: 'Einzug verkleinern',
             align: 'Ausrichtung',

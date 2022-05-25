@@ -455,7 +455,7 @@ export default {
         
         // find component element
         const existElement = (this.util.isRangeFormatElement(element.parentNode) || this.util.isWysiwygDiv(element.parentNode)) ? 
-            element : this.util.getFormatElement(element) || element;
+            element : this.format.getLine(element) || element;
 
         // clone element
         const prevElement = element;

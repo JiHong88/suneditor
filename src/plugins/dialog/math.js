@@ -201,6 +201,7 @@ export default {
                 this.history.push(false);
             }
         } catch (e) {
+            console.warn('[SUNEDITOR.plugins.math.warn] ' + e);
             this.plugins.dialog.close.call(this);
         } finally {
             this.closeLoading();

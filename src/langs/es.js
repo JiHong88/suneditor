@@ -35,7 +35,7 @@
 			superscript: 'Superíndice',
 			removeFormat: 'Eliminar formato',
 			fontColor: 'Color de fuente',
-			hiliteColor: 'Color de resaltado',
+			backgroundColor: 'Color de resaltado',
 			indent: 'Más tabulación',
 			outdent: 'Menos tabulación',
 			align: 'Alinear',

@@ -10,16 +10,24 @@
 import { domUtils } from '../helper';
 import CoreInterface from '../interface/_core';
 
+/**
+ * @description Create a color picker element and register for related events. (this.target)
+ * When calling the color selection, "submit", and "remove" buttons, the "action" method of the instance is called with the "color" value as an argument.
+ * @param {Object} instance The "this" object of the calling function.
+ * @param {string} style style property ("color", "backgroundColor"..)
+ * @param {string} defaultColor default color
+ * @param {Array.<string>} colorList color list
+ */
 const colorPicker = function (instance, style, defaultColor, colorList) {
 	CoreInterface.call(this, instance.editor);
 	// members
 	this.instance = instance;
-	this.target = CreateHTML(instance.editor, colorList); //colorListHTML
-	this.inputElement = this.target.querySelector('._se_color_picker_input'); //  _colorInput
-	this.defaultColor = defaultColor; // _defaultColor
-	this.styleProperty = style; // _styleProperty
-	this.currentColor = ''; // _currentColor
-	this.colorList = this.target.querySelectorAll('li button') || []; // _colorList
+	this.target = CreateHTML(instance.editor, colorList);
+	this.inputElement = this.target.querySelector('._se_color_picker_input');
+	this.defaultColor = defaultColor;
+	this.styleProperty = style;
+	this.currentColor = '';
+	this.colorList = this.target.querySelectorAll('li button') || [];
 
 	// init
 	this.eventManager.addEvent(this.inputElement, 'input', OnChangeInput.bind(this));
@@ -34,7 +42,7 @@ colorPicker.prototype = {
 	 * @param {string|null} color Color value
 	 */
 	init: function (node) {
-		const computedColor = this.wwComputedStyle.color;
+		const computedColor = this.wwComputedStyle[this.styleProperty];
 		const defaultColor = computedColor ? (this.isHexColor(computedColor) ? computedColor : this.rgb2hex(computedColor)) : this.defaultColor;
 
 		let fillColor = this._getColorInNode(node) || defaultColor;
@@ -223,7 +231,7 @@ function CreateHTML(editor, colorList) {
 	list +=
 		'<form class="se-form-group">' +
 		'<input type="text" maxlength="9" class="_se_color_picker_input se-color-input"/>' +
-		'<button type="submit" class="se-btn-primary _se_color_picker_submit" title="' +
+		'<button type="submit" class="se-btn _se_color_picker_submit" title="' +
 		lang.dialogBox.submitButton +
 		'" aria-label="' +
 		lang.dialogBox.submitButton +

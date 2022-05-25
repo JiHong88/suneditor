@@ -153,7 +153,7 @@ suneditor.create('sample', {
         ['font', 'fontSize', 'formatBlock'],
         ['paragraphStyle', 'blockquote'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        ['fontColor', 'hiliteColor', 'textStyle'],
+        ['fontColor', 'backgroundColor', 'textStyle'],
         ['removeFormat'],
         '/', // Line break
         ['outdent', 'indent'],
@@ -188,7 +188,7 @@ const initEditor = suneditor.init({
         'font', 'fontSize', 'formatBlock',
         'paragraphStyle', 'blockquote',
         'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript',
-        'fontColor', 'hiliteColor', 'textStyle',
+        'fontColor', 'backgroundColor', 'textStyle',
         'removeFormat',
         'outdent', 'indent',
         'align', 'horizontalRule', 'list', 'lineHeight',
@@ -338,7 +338,7 @@ plugins: [
     fontColor,
     fontSize,
     formatBlock,
-    hiliteColor,
+    backgroundColor,
     horizontalRule,
     lineHeight,
     list,
@@ -526,11 +526,11 @@ formats         : Change default formatBlock array.                 default: [..
                   Custom: [{
                     tag: 'div', // Tag name
                     name: 'Custom div' || null, // default: tag name
-                    command: 'line' || 'br-line' || 'range-block', // default: "replace"
+                    command: 'line' || 'br-line' || 'block', // default: "replace"
                     class: '__se__format__line_xxx' || '__se__format__br_line_xxx' || '__se__format__block_xxx' || '__se__format__br_line_closure_xxx' || '__se__format__block_closure_xxx'
                     // Class names must always begin with "__se__format__(line, br_line, block)_"
                   }]
-colorList_font    : Change default color array of color picker.       default: [..[..]..] {Array}
+colorList_font, colorList_background    : Change default color array of color picker.       default: [..[..]..] {Array}
                   Default value: [
                     '#ff0000', '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000',
                     '#ffd8d8', '#fae0d4', '#faf4c0', '#e4f7ba', '#d4f4fa', '#d9e5ff', '#e8d9ff', '#ffd9fa', '#f1f1f1',
@@ -843,7 +843,7 @@ buttonList      : Defines button list to array {Array}
                     // ['font', 'fontSize', 'formatBlock'],
                     // ['paragraphStyle', 'blockquote'],
                     ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-                    // ['fontColor', 'hiliteColor', 'textStyle'],
+                    // ['fontColor', 'backgroundColor', 'textStyle'],
                     ['removeFormat'],
                     ['outdent', 'indent'],
                     // ['align', 'horizontalRule', 'list', 'lineHeight'],
@@ -908,7 +908,7 @@ buttonList      : Defines button list to array {Array}
                     ['font', 'fontSize', 'formatBlock'],
                     ['paragraphStyle', 'blockquote'],
                     ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-                    ['fontColor', 'hiliteColor', 'textStyle'],
+                    ['fontColor', 'backgroundColor', 'textStyle'],
                     ['removeFormat'],
                     ['outdent', 'indent'],
                     ['align', 'horizontalRule', 'list', 'lineHeight'],
@@ -923,7 +923,7 @@ buttonList      : Defines button list to array {Array}
                         ['undo', 'redo'],
                         [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
                         ['bold', 'underline', 'italic', 'strike'],
-                        [':t-More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle'],
+                        [':t-More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
                         ['removeFormat'],
                         ['outdent', 'indent'],
                         ['align', 'horizontalRule', 'list', 'lineHeight'],
@@ -935,7 +935,7 @@ buttonList      : Defines button list to array {Array}
                     ['%768', [
                         ['undo', 'redo'],
                         [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-                        [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'hiliteColor', 'textStyle', 'removeFormat'],
+                        [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'removeFormat'],
                         [':e-More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'horizontalRule', 'list', 'lineHeight'],
                         [':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
                         ['-right', 'dir'],
@@ -955,7 +955,7 @@ const editor = suneditor.create('example');
 editor.setOptions({
     minHeight: '300px',
     buttonList: [
-        ['fontColor', 'hiliteColor']
+        ['fontColor', 'backgroundColor']
     ],
     colorList: [
         ['#ccc', '#dedede', 'OrangeRed', 'Orange', 'RoyalBlue', 'SaddleBrown']
@@ -1445,7 +1445,7 @@ editor.showController = function (name, controllers, core) {
             <td align="left">formatBlock</td>
         </tr>
         <tr>
-            <td align="left">hiliteColor</td>
+            <td align="left">backgroundColor</td>
         </tr>
         <tr>
             <td align="left">horizontalRule</td>

@@ -38,7 +38,7 @@
             superscript: 'Hævet skrift',
             removeFormat: 'Fjern formatering',
             fontColor: 'Skriftfarve',
-            hiliteColor: 'Baggrundsfarve',
+            backgroundColor: 'Baggrundsfarve',
             indent: 'Ryk ind',
             outdent: 'Ryk ud',
             align: 'Justering',

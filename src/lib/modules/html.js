@@ -22,7 +22,7 @@ const HTML = function (editor) {
 	this._attributeBlacklistRegExp = null;
 
 	// set disallow text nodes
-	const options = editor.options;
+	const options = this.options;
 	const disallowStyleNodes = _w.Object.keys(options._styleNodeMap);
 	const allowStyleNodes = !options.elementWhitelist
 		? []
@@ -189,7 +189,7 @@ HTML.prototype = {
 				else this.selection.setRange(a, offset, a, offset);
 			} catch (error) {
 				if (this.status.isDisabled || this.status.isReadOnly) return;
-				console.warn('[SUNEDITOR.html.insert.fail] ' + error);
+				console.warn('[SUNEDITOR.html.insert.warn] ' + error);
 				this.editor.execCommand('insertHTML', false, html);
 			}
 		} else {
@@ -241,7 +241,7 @@ HTML.prototype = {
 			tempParentNode = domUtils.isList(oNode) ? line : (tempAfterNode || line).parentNode;
 		}
 
-		if (!afterNode && (isFormats || util.isComponent(oNode) || util.isMedia(oNode))) {
+		if (!afterNode && (isFormats || this.component.is(oNode) || domUtils.isMedia(oNode))) {
 			const isEdge = domUtils.isEdgePoint(range.endContainer, range.endOffset, 'end');
 			const r = this.remove();
 			const container = r.container;
@@ -265,8 +265,8 @@ HTML.prototype = {
 				tempParentNode.appendChild(line);
 				container.appendChild(tempParentNode);
 				tempAfterNode = null;
-			} else if (container.nodeType === 3 || util.isBreak(container) || insertListCell) {
-				const depthFormat = util.getParentElement(
+			} else if (container.nodeType === 3 || domUtils.isBreak(container) || insertListCell) {
+				const depthFormat = domUtils.getParentElement(
 					container,
 					function (current) {
 						return this.format.isBlock(current) || domUtils.isListCell(current);
@@ -280,7 +280,7 @@ HTML.prototype = {
 							let newCell = null;
 							if (!isEdge) {
 								newCell = line.cloneNode(false);
-								newCell.appendChild(afterNode.textContent.trim() ? afterNode : domUtils.createTextNode(util.zeroWidthSpace));
+								newCell.appendChild(afterNode.textContent.trim() ? afterNode : domUtils.createTextNode(unicode.zeroWidthSpace));
 							}
 							if (subList) {
 								if (!newCell) {
@@ -322,9 +322,9 @@ HTML.prototype = {
 						if (commonCon.textContent.length > endOff) afterNode = commonCon.splitText(endOff);
 						else afterNode = commonCon.nextSibling;
 					} else {
-						if (!util.isBreak(parentNode)) {
+						if (!domUtils.isBreak(parentNode)) {
 							let c = parentNode.childNodes[startOff];
-							const focusNode = c && c.nodeType === 3 && domUtils.onlyZeroWidthSpace(c) && domUtils.isBreak(c.nextSibling) ? c.nextSibling : c;
+							const focusNode = c && c.nodeType === 3 && unicode.onlyZeroWidthSpace(c) && domUtils.isBreak(c.nextSibling) ? c.nextSibling : c;
 							if (focusNode) {
 								if (!focusNode.nextSibling) {
 									parentNode.removeChild(focusNode);
@@ -405,8 +405,8 @@ HTML.prototype = {
 		try {
 			// set node
 			if (!insertListCell) {
-				if (domUtils.isWysiwygFrame(afterNode) || parentNode === context.element.wysiwyg.parentNode) {
-					parentNode = context.element.wysiwyg;
+				if (domUtils.isWysiwygFrame(afterNode) || parentNode === this.context.element.wysiwyg.parentNode) {
+					parentNode = this.context.element.wysiwyg;
 					afterNode = null;
 				}
 
@@ -428,13 +428,13 @@ HTML.prototype = {
 					if (oldParent.childNodes.length === 0 && parentNode !== oldParent) domUtils.removeItem(oldParent);
 				}
 
-				if (isFormats && !freeFormat && !util.isRangeFormatElement(parentNode) && !domUtils.isListCell(parentNode) && !domUtils.isWysiwygFrame(parentNode)) {
+				if (isFormats && !freeFormat && !this.format.isBlock(parentNode) && !domUtils.isListCell(parentNode) && !domUtils.isWysiwygFrame(parentNode)) {
 					afterNode = parentNode.nextElementSibling;
 					parentNode = parentNode.parentNode;
 				}
 
 				if (domUtils.isWysiwygFrame(parentNode) && (oNode.nodeType === 3 || domUtils.isBreak(oNode))) {
-					const fNode = domUtils.createElement(options.defaultTag, null, oNode);
+					const fNode = domUtils.createElement(this.options.defaultTag, null, oNode);
 					oNode = fNode;
 				}
 			}
@@ -442,7 +442,7 @@ HTML.prototype = {
 			// insert--
 			if (insertListCell) {
 				if (!tempParentNode.parentNode) {
-					parentNode = context.element.wysiwyg;
+					parentNode = this.context.element.wysiwyg;
 					afterNode = null;
 				} else {
 					parentNode = tempParentNode;
@@ -468,11 +468,11 @@ HTML.prototype = {
 			parentNode.insertBefore(oNode, afterNode);
 
 			if (insertListCell) {
-				if (domUtils.onlyZeroWidthSpace(line.textContent.trim())) {
+				if (unicode.onlyZeroWidthSpace(line.textContent.trim())) {
 					domUtils.removeItem(line);
 					oNode = oNode.lastChild;
 				} else {
-					const chList = domUtils.getArrayItem(line.children, util.isList);
+					const chList = domUtils.getArrayItem(line.children, domUtils.isList);
 					if (chList) {
 						if (oNode !== chList) {
 							oNode.appendChild(chList);
@@ -482,13 +482,14 @@ HTML.prototype = {
 							oNode = parentNode;
 						}
 
-						if (domUtils.onlyZeroWidthSpace(line.textContent.trim())) {
+						if (unicode.onlyZeroWidthSpace(line.textContent.trim())) {
 							domUtils.removeItem(line);
 						}
 					}
 				}
 			}
 		} catch (e) {
+			console.warn("[SUNEDITOR.html.insertNode.warn]", e);
 			parentNode.appendChild(oNode);
 		} finally {
 			if ((this.format.isLine(oNode) || this.component.is(oNode)) && startCon === endCon) {
@@ -507,8 +508,8 @@ HTML.prototype = {
 				if (oNode.nodeType === 3) {
 					const previous = oNode.previousSibling;
 					const next = oNode.nextSibling;
-					const previousText = !previous || previous.nodeType === 1 || domUtils.onlyZeroWidthSpace(previous) ? '' : previous.textContent;
-					const nextText = !next || next.nodeType === 1 || domUtils.onlyZeroWidthSpace(next) ? '' : next.textContent;
+					const previousText = !previous || previous.nodeType === 1 || unicode.onlyZeroWidthSpace(previous) ? '' : previous.textContent;
+					const nextText = !next || next.nodeType === 1 || unicode.onlyZeroWidthSpace(next) ? '' : next.textContent;
 
 					if (previous && previousText.length > 0) {
 						oNode.textContent = previousText + oNode.textContent;
@@ -526,7 +527,7 @@ HTML.prototype = {
 						endOffset: oNode.textContent.length - nextText.length
 					};
 
-					this.selection.set(oNode, newRange.startOffset, oNode, newRange.endOffset);
+					this.selection.setRange(oNode, newRange.startOffset, oNode, newRange.endOffset);
 
 					return newRange;
 				} else if (!domUtils.isBreak(oNode) && !domUtils.isListCell(oNode) && this.format.isLine(parentNode)) {
@@ -887,7 +888,7 @@ HTML.prototype = {
 
 		for (let i = 0, len = checkTags.length, t; i < len; i++) {
 			t = checkTags[i];
-			if (domUtils.onlyZeroWidthSpace(t.textContent.trim())) {
+			if (unicode.onlyZeroWidthSpace(t.textContent.trim())) {
 				domUtils.removeItem(t);
 			}
 		}

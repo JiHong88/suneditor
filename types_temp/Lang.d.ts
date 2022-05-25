@@ -14,7 +14,7 @@ export interface Lang {
     superscript: string;
     removeFormat: string;
     fontColor: string;
-    hiliteColor: string;
+    backgroundColor: string;
     indent: string;
     outdent: string;
     align: string;

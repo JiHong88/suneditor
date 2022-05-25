@@ -12,13 +12,11 @@ export const converter = Converter;
 export const domUtils = DomUtils;
 export const numbers = Numbers;
 
-const helper = {
+export default {
 	global: global,
 	env: env,
 	unicode: unicode,
 	converter: converter,
 	domUtils: domUtils,
-	numbers: numbers,
+	numbers: numbers
 };
-
-export default helper;

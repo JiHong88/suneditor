@@ -35,7 +35,7 @@
             superscript: '위 첨자',
             removeFormat: '형식 제거',
             fontColor: '글자색',
-            hiliteColor: '배경색',
+            backgroundColor: '배경색',
             indent: '들여쓰기',
             outdent: '내어쓰기',
             align: '정렬',

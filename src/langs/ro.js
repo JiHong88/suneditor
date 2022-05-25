@@ -35,7 +35,7 @@
             superscript: 'Superscript',
             removeFormat: 'Șterge formatare',
             fontColor: 'Culoare font',
-            hiliteColor: 'Culoare de evidențiere',
+            backgroundColor: 'Culoare de evidențiere',
             indent: 'Indentează',
             outdent: 'Fără indentare',
             align: 'Aliniere',

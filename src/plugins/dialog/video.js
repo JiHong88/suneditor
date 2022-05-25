@@ -646,7 +646,7 @@ export default {
         else this.plugins.video._setIframeAttrs.call(this, oFrame);
         
         const existElement = (this.util.isRangeFormatElement(oFrame.parentNode) || this.util.isWysiwygDiv(oFrame.parentNode)) ? 
-            oFrame : this.util.getFormatElement(oFrame) || oFrame;
+            oFrame : this.format.getLine(oFrame) || oFrame;
 
         const prevFrame = oFrame;
         contextVideo._element = oFrame = oFrame.cloneNode(true);

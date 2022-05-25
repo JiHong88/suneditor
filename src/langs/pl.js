@@ -35,7 +35,7 @@
             superscript: 'Indeks górny',
             removeFormat: 'Wyczyść formatowanie',
             fontColor: 'Kolor tekstu',
-            hiliteColor: 'Kolor tła tekstu',
+            backgroundColor: 'Kolor tła tekstu',
             indent: 'Zwiększ wcięcie',
             outdent: 'Zmniejsz wcięcie',
             align: 'Wyrównaj',

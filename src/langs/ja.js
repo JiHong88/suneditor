@@ -35,7 +35,7 @@
             superscript: '上付き',
             removeFormat: '形式を削除',
             fontColor: '文字色',
-            hiliteColor: '文字の背景色',
+            backgroundColor: '文字の背景色',
             indent: 'インデント',
             outdent: 'インデント',
             align: 'ソート',

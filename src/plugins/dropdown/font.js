@@ -114,7 +114,6 @@ function OnClickMenu(e) {
 function CreateHTML(editor) {
 	const option = editor.options;
 	const lang = editor.lang;
-	const listDiv = domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-font-family' });
 	const fontList = !option.font ? ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'] : option.font;
 
 	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '" aria-label="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
@@ -124,9 +123,8 @@ function CreateHTML(editor) {
 		list += '<li><button type="button" class="se-btn-list" data-value="' + font + '" data-txt="' + text + '" title="' + text + '" aria-label="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
 	}
 	list += '</ul></div>';
-	listDiv.innerHTML = list;
 
-	return listDiv;
+	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-font-family' }, list);
 }
 
 export default font;

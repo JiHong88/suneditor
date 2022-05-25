@@ -35,7 +35,7 @@
             superscript: 'Superscript',
             removeFormat: 'Opmaak verwijderen',
             fontColor: 'Tekstkleur',
-            hiliteColor: 'Tekst markeren',
+            backgroundColor: 'Tekst markeren',
             indent: 'Inspringen',
             outdent: 'Inspringen ongedaan maken',
             align: 'Uitlijnen',

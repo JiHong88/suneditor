@@ -38,7 +38,7 @@
             superscript: 'Höjd skrift',
             removeFormat: 'Ta bort formattering',
             fontColor: 'Textfärg',
-            hiliteColor: 'Bakgrundsfärg',
+            backgroundColor: 'Bakgrundsfärg',
             indent: 'Minska indrag',
             outdent: 'Öka indrag',
             align: 'Justering',

@@ -36,7 +36,7 @@
             superscript: 'Sobrescrito',
             removeFormat: 'Remover Formatação',
             fontColor: 'Cor da Fonte',
-            hiliteColor: 'Cor de destaque',
+            backgroundColor: 'Cor de destaque',
             indent: 'Recuo',
             outdent: 'Avançar',
             align: 'Alinhar',

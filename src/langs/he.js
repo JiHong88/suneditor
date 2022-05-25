@@ -35,7 +35,7 @@
             superscript: 'תחתי',
             removeFormat: 'הסר עיצוב',
             fontColor: 'צבע גופן',
-            hiliteColor: 'צבע קו תחתון',
+            backgroundColor: 'צבע קו תחתון',
             indent: 'הגדל כניסה',
             outdent: 'הקטן כניסה',
             align: 'יישור',

@@ -17,10 +17,13 @@ import blockquote from "../../src/plugins/command/blockquote";
 import align from "../../src/plugins/dropdown/align";
 import font from "../../src/plugins/dropdown/font";
 import fontColor from "../../src/plugins/dropdown/fontColor";
+import backgroundColor from "../../src/plugins/dropdown/backgroundColor";
+import fontSize from "../../src/plugins/dropdown/fontSize";
+import formatBlock from "../../src/plugins/dropdown/formatBlock";
 
 window.e = suneditor.create(document.getElementById('editor2'), {
     // value: 'abc',
-    plugins: [align, blockquote, font, fontColor],
+    plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock],
     charCounter: true,
     statusbar: true,
     // mode: "inline",
@@ -41,7 +44,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
         ['outdent', 'indent'],
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
-        ['align', 'blockquote', 'font', 'fontColor']
+        ['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock']
     ]
 });
 

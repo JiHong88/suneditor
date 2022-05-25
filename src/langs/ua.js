@@ -35,7 +35,7 @@
             superscript: 'Верхній індекс',
             removeFormat: 'Очистити форматування',
             fontColor: 'Колір тексту',
-            hiliteColor: 'Колір виділення',
+            backgroundColor: 'Колір виділення',
             indent: 'Збільшити відступ',
             outdent: 'Зменшити відступ',
             align: 'Вирівнювання',

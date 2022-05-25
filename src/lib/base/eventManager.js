@@ -1273,10 +1273,10 @@ function OnKeyDown_wysiwyg(e) {
 
 					let newEl;
 					if (!range.collapsed) {
-						const isMultiLine = domUtils.getFormatElement(range.startContainer, null) !== domUtils.getFormatElement(range.endContainer, null);
+						const isMultiLine = this.format.getLine(range.startContainer, null) !== this.format.getLine(range.endContainer, null);
 						const r = this.html.remove();
 						if (isMultiLine) {
-							newEl = domUtils.getFormatElement(r.container, null);
+							newEl = this.format.getLine(r.container, null);
 
 							if (!r.prevContainer) {
 								const newFormat = formatEl.cloneNode(false);
@@ -1289,7 +1289,7 @@ function OnKeyDown_wysiwyg(e) {
 							newEl = this.node.split(r.container, r.offset, 0);
 						}
 					} else {
-						if (domUtils.onlyZeroWidthSpace(formatEl)) newEl = this.format.addLine(formatEl, formatEl.cloneNode(false));
+						if (unicode.onlyZeroWidthSpace(formatEl)) newEl = this.format.addLine(formatEl, formatEl.cloneNode(false));
 						else newEl = this.node.split(range.endContainer, range.endOffset, 0);
 					}
 
@@ -1336,7 +1336,7 @@ function OnKeyDown_wysiwyg(e) {
 						if (selectionFormat) domUtils.removeItem(children[offset - 1]);
 						else domUtils.removeItem(selectionNode);
 						const newEl = this.format.addLine(brBlock, this.format.isLine(brBlock.nextElementSibling) && !this.format.isBlock(brBlock.nextElementSibling) ? brBlock.nextElementSibling : null);
-						this.format.copyAttributes(newEl, brBlock);
+						domUtils.copyFormatAttributes(newEl, brBlock);
 						this.selection.setRange(newEl, 1, newEl, 1);
 						break;
 					}

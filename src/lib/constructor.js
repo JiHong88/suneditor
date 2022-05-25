@@ -333,6 +333,7 @@ function _initOptions(element, options) {
 	options.fontSize = !options.fontSize ? null : options.fontSize;
 	options.formats = !options.formats ? null : options.formats;
 	options.colorList_font = !options.colorList_font ? null : options.colorList_font;
+	options.colorList_background = !options.colorList_background ? null : options.colorList_background;
 	options.lineHeights = !options.lineHeights ? null : options.lineHeights;
 	options.paragraphStyles = !options.paragraphStyles ? null : options.paragraphStyles;
 	options.textStyles = !options.textStyles ? null : options.textStyles;
@@ -659,9 +660,6 @@ function _defaultButtons(options) {
 		dir_rtl: ['', lang.toolbar.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
 		save: ['se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmd + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save],
 		/** plugins - dropdown */
-		formatBlock: ['se-btn-select se-btn-tool-format', lang.toolbar.formats, 'formatBlock', 'dropdown', '<span class="txt">' + lang.toolbar.formats + '</span>' + icons.arrow_down],
-		fontSize: ['se-btn-select se-btn-tool-size', lang.toolbar.fontSize, 'fontSize', 'dropdown', '<span class="txt">' + lang.toolbar.fontSize + '</span>' + icons.arrow_down],
-		hiliteColor: ['', lang.toolbar.hiliteColor, 'hiliteColor', 'dropdown', icons.highlight_color],
 		list: ['', lang.toolbar.list, 'list', 'dropdown', icons.list_number],
 		horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'dropdown', icons.horizontal_rule],
 		table: ['', lang.toolbar.table, 'table', 'dropdown', icons.table],

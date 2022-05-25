@@ -35,7 +35,7 @@
             superscript: 'Pedice',
             removeFormat: 'Rimuovi formattazione',
             fontColor: 'Colore testo',
-            hiliteColor: 'Colore sottolineatura',
+            backgroundColor: 'Colore sottolineatura',
             indent: 'Aumenta rientro',
             outdent: 'Riduci rientro',
             align: 'Allinea',

@@ -35,7 +35,7 @@
             superscript: 'Augšraksts',
             removeFormat: 'Noņemt formātu',
             fontColor: 'Fonta krāsa',
-            hiliteColor: 'Teksta iezīmēšanas krāsa',
+            backgroundColor: 'Teksta iezīmēšanas krāsa',
             indent: 'Palielināt atkāpi',
             outdent: 'Samazināt atkāpi',
             align: 'Izlīdzināt',

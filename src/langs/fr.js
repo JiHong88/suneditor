@@ -35,7 +35,7 @@
             superscript: 'Exposant',
             removeFormat: 'Effacer le formatage',
             fontColor: 'Couleur du texte',
-            hiliteColor: 'Couleur en arrière plan',
+            backgroundColor: 'Couleur en arrière plan',
             indent: 'Indenter',
             outdent: 'Désindenter',
             align: 'Alignement',

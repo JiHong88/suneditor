@@ -123,13 +123,6 @@ class Format extends EditorInterface {
 	removeTextStyle(): void;
 
 	/**
-	 * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore "__se__format__" class
-	 * @param originEl Origin element
-	 * @param copyEl Element to copy
-	 */
-	copyAttributes(originEl: Element, copyEl: Element): void;
-
-	/**
 	 * @description Check if the container and offset values are the edges of the "line"
 	 * @param container The container property of the selection object.
 	 * @param offset The offset property of the selection object.

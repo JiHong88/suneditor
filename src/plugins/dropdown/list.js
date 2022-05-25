@@ -128,7 +128,7 @@ export default {
 
         const originRange = {
             sc: range.startContainer,
-            so: (range.startContainer === range.endContainer && util.onlyZeroWidthSpace(range.startContainer) && range.startOffset === 0 && range.endOffset === 1) ? range.endOffset : range.startOffset,
+            so: (range.startContainer === range.endContainer && unicode.onlyZeroWidthSpace(range.startContainer) && range.startOffset === 0 && range.endOffset === 1) ? range.endOffset : range.startOffset,
             ec: range.endContainer,
             eo: range.endOffset
         };
@@ -233,7 +233,7 @@ export default {
                 siblingTag = isCell && !util.isWysiwygDiv(originParent) ? (!next || util.isListCell(parentTag)) ? originParent : originParent.nextSibling : fTag.nextSibling;
 
                 newCell = util.createElement('LI');
-                util.copyFormatAttributes(newCell, fTag);
+                domUtils.copyFormatAttributes(newCell, fTag);
 
                 if (i ===  0 && originRange.sc === fTag) {
                     originRange.sc = newCell;

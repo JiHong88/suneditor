@@ -175,6 +175,13 @@ class domUtils {
 	copyTagAttributes(originEl: Element, copyEl: Element): void;
 
 	/**
+	 * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore "__se__format__" class
+	 * @param originEl Origin element
+	 * @param copyEl Element to copy
+	 */
+	copyFormatAttributes(originEl: Element, copyEl: Element): void;
+
+	/**
 	 * @description Compares the style and class for equal values.
 	 * Returns true if both are text nodes.
 	 * @param a Node to compare
@@ -265,7 +272,7 @@ class domUtils {
 	 * @param dir Select check point - Both edge, Front edge or End edge. ("front": Front edge, "end": End edge, undefined: Both edge)
 	 * @returns
 	 */
-	isEdgePoint(container: Node, offset: number, dir?: "front" | "end"): boolean;
+	isEdgePoint(container: Node, offset: number, dir?: 'front' | 'end'): boolean;
 
 	/**
 	 * @description It is judged whether it is the edit region top div element or iframe's body tag.

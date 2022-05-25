@@ -1,14 +1,6 @@
-import {
-	_allowedEmptyNodeList
-} from './env';
-import {
-	_d,
-	_w
-} from './global';
-import {
-	onlyZeroWidthSpace,
-	zeroWidthRegExp
-} from './unicode';
+import { _allowedEmptyNodeList } from './env';
+import { _d, _w } from './global';
+import { onlyZeroWidthSpace, zeroWidthRegExp } from './unicode';
 
 /**
  * @description Create Element node
@@ -43,7 +35,7 @@ export function createElement(elementName, attributes, inner) {
  * @returns {Text}
  */
 export function createTextNode(text) {
-	return _d.createTextNode(text || "");
+	return _d.createTextNode(text || '');
 }
 
 /**
@@ -64,10 +56,10 @@ export function getIframeDocument(iframe) {
  * @returns {string}
  */
 export function getAttributesToString(element, exceptAttrs) {
-	if (!element.attributes) return "";
+	if (!element.attributes) return '';
 
 	const attrs = element.attributes;
-	let attrString = "";
+	let attrString = '';
 
 	for (let i = 0, len = attrs.length; i < len; i++) {
 		if (exceptAttrs && exceptAttrs.indexOf(attrs[i].name) > -1) continue;
@@ -117,7 +109,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 
 					let previous = el.previousSibling;
 					while (previous && previous.nodeType === 3) {
-						tempText = previous.textContent.replace(zeroWidthRegExp, "");
+						tempText = previous.textContent.replace(zeroWidthRegExp, '');
 						_newOffsets.s += tempText.length;
 						el.textContent = tempText + el.textContent;
 						temp = previous;
@@ -127,7 +119,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 
 					let next = el.nextSibling;
 					while (next && next.nodeType === 3) {
-						tempText = next.textContent.replace(zeroWidthRegExp, "");
+						tempText = next.textContent.replace(zeroWidthRegExp, '');
 						_newOffsets.e += tempText.length;
 						el.textContent += tempText;
 						temp = next;
@@ -148,7 +140,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 
 /**
  * @description Returns the node in the location of the path array obtained from "helper.dom.getNodePath".
- * @param {Arra.<number>} offsets Position array, array obtained from "helper.dom.getNodePath"
+ * @param {Array.<number>} offsets Position array, array obtained from "helper.dom.getNodePath"
  * @param {Node} parentNode Base parent element
  * @returns {Node}
  */
@@ -259,14 +251,12 @@ export function sortNodeByDepth(array, des) {
 	const t = !des ? -1 : 1;
 	const f = t * -1;
 
-	array.sort(
-		function (a, b) {
-			if (!isListCell(a) || !isListCell(b)) return 0;
-			a = getNodeDepth(a);
-			b = getNodeDepth(b);
-			return a > b ? t : a < b ? f : 0;
-		}
-	);
+	array.sort(function (a, b) {
+		if (!isListCell(a) || !isListCell(b)) return 0;
+		a = getNodeDepth(a);
+		b = getNodeDepth(b);
+		return a > b ? t : a < b ? f : 0;
+	});
 }
 
 /**
@@ -283,12 +273,13 @@ export function compareElements(a, b) {
 		bNode = bNode.parentNode;
 	}
 
-	if (!aNode || !bNode) return {
-		ancestor: null,
-		a: a,
-		b: b,
-		result: 0
-	};
+	if (!aNode || !bNode)
+		return {
+			ancestor: null,
+			a: a,
+			b: b,
+			result: 0
+		};
 
 	const children = aNode.parentNode.childNodes;
 	const aIndex = getArrayIndex(children, aNode);
@@ -381,7 +372,7 @@ export function getEdgeChild(node, query, last) {
 			query = '^' + (query === 'text' ? '#' + query : query) + '$';
 		}
 
-		const regExp = new _w.RegExp(query, "i");
+		const regExp = new _w.RegExp(query, 'i');
 		check = function (el) {
 			return regExp.test(el[attr]);
 		};
@@ -407,8 +398,7 @@ export function getEdgeChildNodes(first, last) {
 	if (!first) return;
 	if (!last) last = first;
 
-	while (first && first.nodeType === 1 && first.childNodes.length > 0 && !isBreak(first))
-		first = first.firstChild;
+	while (first && first.nodeType === 1 && first.childNodes.length > 0 && !isBreak(first)) first = first.firstChild;
 	while (last && last.nodeType === 1 && last.childNodes.length > 0 && !isBreak(last)) last = last.lastChild;
 
 	return {
@@ -447,7 +437,7 @@ export function getArrayItem(array, validation, multi) {
 }
 
 /**
- * @description Check if an array contains an element 
+ * @description Check if an array contains an element
  * @param {Array.<Node>|HTMLCollection|NodeList} array element array
  * @param {Node} node The node to check for
  * @returns {boolean}
@@ -523,6 +513,17 @@ export function copyTagAttributes(originEl, copyEl) {
 }
 
 /**
+ * @description Copy and apply attributes of format tag that should be maintained. (style, class) Ignore "__se__format__" class
+ * @param {Element} originEl Origin element
+ * @param {Element} copyEl Element to copy
+ */
+export function copyFormatAttributes(originEl, copyEl) {
+	copyEl = copyEl.cloneNode(false);
+	copyEl.className = copyEl.className.replace(/(\s|^)__se__format__[^\s]+/g, '');
+	copyTagAttributes(originEl, copyEl);
+}
+
+/**
  * @description Compares the style and class for equal values.
  * Returns true if both are text nodes.
  * @param {Node} a Node to compare
@@ -550,12 +551,7 @@ export function isSameAttributes(a, b) {
 		if (reg('(s|^)' + class_a[i] + '(s|$)').test(class_b.value)) compClass++;
 	}
 
-	return (
-		compStyle === style_b.length &&
-		compStyle === style_a.length &&
-		compClass === class_b.length &&
-		compClass === class_a.length
-	);
+	return compStyle === style_b.length && compStyle === style_a.length && compClass === class_b.length && compClass === class_a.length;
 }
 
 /**
@@ -657,7 +653,7 @@ export function addClass(element, className) {
 	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
 	if (check.test(element.className)) return;
 
-	element.className += (element.className.length > 0 ? ' ' : "") + className;
+	element.className += (element.className.length > 0 ? ' ' : '') + className;
 }
 
 /**
@@ -714,11 +710,7 @@ export function isEdgePoint(container, offset, dir) {
  * @returns {boolean}
  */
 export function isWysiwygFrame(element) {
-	return (
-		element &&
-		element.nodeType === 1 &&
-		(hasClass(element, 'se-wrapper-wysiwyg') || /^BODY$/i.test(element.nodeName))
-	);
+	return element && element.nodeType === 1 && (hasClass(element, 'se-wrapper-wysiwyg') || /^BODY$/i.test(element.nodeName));
 }
 
 /**
@@ -799,12 +791,7 @@ export function isMedia(node) {
  * @returns {boolean}
  */
 export function isEmptyLine(element) {
-	return (
-		!element ||
-		!element.parentNode ||
-		(!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') &&
-			onlyZeroWidthSpace(element.textContent))
-	);
+	return !element || !element.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && onlyZeroWidthSpace(element.textContent));
 }
 
 /**
@@ -847,6 +834,7 @@ const domUtils = {
 	nextIndex: nextIndex,
 	prevIndex: prevIndex,
 	copyTagAttributes: copyTagAttributes,
+	copyFormatAttributes: copyFormatAttributes,
 	isSameAttributes: isSameAttributes,
 	removeItem: removeItem,
 	changeElement: changeElement,

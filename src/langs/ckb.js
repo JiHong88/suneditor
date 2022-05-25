@@ -35,7 +35,7 @@
             superscript: 'سەرنووس',
             removeFormat: 'لابردنی فۆرمات',
             fontColor: 'ره‌نگی فۆنت',
-            hiliteColor: 'ره‌نگی دیاركراو',
+            backgroundColor: 'ره‌نگی دیاركراو',
             indent: 'بۆشایی بەجێهێشتن',
             outdent: 'لابردنی بۆشایی',
             align: 'ئاراسته‌',

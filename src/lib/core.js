@@ -632,6 +632,7 @@ Core.prototype = {
 				}
 				this.selection.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
 			} catch (e) {
+				console.warn('[SUNEDITOR.focus.warn] ' + e);
 				this._nativeFocus();
 			}
 		}
@@ -1206,6 +1207,7 @@ Core.prototype = {
 						try {
 							iframe.contentWindow.document.execCommand('print', false, null);
 						} catch (e) {
+							console.warn('[SUNEDITOR.print.warn] ' + e);
 							iframe.contentWindow.print();
 						}
 					} else {

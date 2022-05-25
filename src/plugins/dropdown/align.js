@@ -106,8 +106,8 @@ align.prototype = {
 
 	/**
 	 * @override core
-	 * @param {"left"|"right"|"center"|"justify"} value 
-	 * @returns 
+	 * @param {"left"|"right"|"center"|"justify"} value
+	 * @returns
 	 */
 	action: function (value) {
 		if (!value) return;
