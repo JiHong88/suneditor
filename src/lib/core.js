@@ -41,6 +41,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _parser: new _w.DOMParser(),
         _prevRtl: options.rtl,
         _editorHeight: 0,
+        _editorHeightPadding: 0,
         _listCamel: options.__listCommonStyle,
         _listKebab: util.camelToKebabCase(options.__listCommonStyle),
 
@@ -5566,6 +5567,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._charTypeHTML = options.charCounterType === 'byte-html';
             this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
             this._editorHeight = context.element.wysiwygFrame.offsetHeight;
+            this._editorHeightPadding = util.getNumber(this.wwComputedStyle.getPropertyValue('padding-top')) + util.getNumber(this.wwComputedStyle.getPropertyValue('padding-bottom'));
 
             if (!options.iframe && typeof _w.ShadowRoot === 'function') {
                 let child = context.element.wysiwygFrame;
@@ -5799,7 +5801,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         __callResizeFunction: function (h, resizeObserverEntry) {
-            h = h === -1 ? resizeObserverEntry.borderBoxSize[0].blockSize : h;
+            h = h === -1 ? (resizeObserverEntry.borderBoxSize ? resizeObserverEntry.borderBoxSize[0].blockSize : (resizeObserverEntry.contentRect.height + this._editorHeightPadding)) : h;
             if (this._editorHeight !== h) {
                 if (typeof functions.onResizeEditor === 'function') functions.onResizeEditor(h, this._editorHeight, core, resizeObserverEntry);
                 this._editorHeight = h;

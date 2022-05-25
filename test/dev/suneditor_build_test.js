@@ -965,6 +965,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     katex: Katex,
     // value: 'abc',
     minHeight : 300,
+    height: "auto",
     charCounter: true,
     font: [
         'Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact',
@@ -986,6 +987,17 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     imageMultipleFile: true,
     addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header"
 });
+
+s2.onClick = (event, core) => {
+    const element = event.target
+    if(core.util.hasClass(element, "metaData")){
+        const a = core.util.createTextNode(core.util.zeroWidthSpace);
+        const a1 = core.util.createTextNode(core.util.zeroWidthSpace);
+        element.parentNode.insertBefore(a, element);
+        element.parentNode.insertBefore(a1, element.nextSibling);
+        core.setRange(a, 0, a1, 1);
+    }
+}
 
 s2.onResizeEditor = (height, prevHeight, core) => {
     console.log("heig", height)
