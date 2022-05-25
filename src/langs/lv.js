@@ -46,7 +46,7 @@
             list: 'Saraksts',
             orderList: 'Numerācija',
             unorderList: 'Aizzimes',
-            horizontalRule: 'Horizontāla līnija',
+            horizontalLine: 'Horizontāla līnija',
             hr_solid: 'Ciets',
             hr_dotted: 'Punktiņš',
             hr_dashed: 'Braša',

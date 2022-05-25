@@ -7,7 +7,7 @@ import font from './dropdown/font';
 import fontSize from './dropdown/fontSize';
 import fontColor from './dropdown/fontColor';
 import backgroundColor from './dropdown/backgroundColor';
-import horizontalRule from './dropdown/horizontalRule';
+import horizontalLine from './dropdown/horizontalLine';
 import list from './dropdown/list';
 import table from './dropdown/table';
 import formatBlock from './dropdown/formatBlock';
@@ -26,5 +26,5 @@ import math from './dialog/math';
 // file browser
 import imageGallery from './fileBrowser/imageGallery';
 
-export { blockquote, align, font, fontSize, fontColor, backgroundColor, horizontalRule, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };
-export default { blockquote, align, font, fontSize, fontColor, backgroundColor, horizontalRule, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };
+export { blockquote, align, font, fontSize, fontColor, backgroundColor, horizontalLine, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };
+export default { blockquote, align, font, fontSize, fontColor, backgroundColor, horizontalLine, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };

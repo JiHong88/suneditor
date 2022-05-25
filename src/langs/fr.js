@@ -46,7 +46,7 @@
             list: 'Liste',
             orderList: 'Ordonnée',
             unorderList: 'Non-ordonnée',
-            horizontalRule: 'Ligne horizontale',
+            horizontalLine: 'Ligne horizontale',
             hr_solid: 'Solide',
             hr_dotted: 'Points',
             hr_dashed: 'Tirets',

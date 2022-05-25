@@ -157,7 +157,7 @@ suneditor.create('sample', {
         ['removeFormat'],
         '/', // Line break
         ['outdent', 'indent'],
-        ['align', 'horizontalRule', 'list', 'lineHeight'],
+        ['align', 'horizontalLine', 'list', 'lineHeight'],
         ['table', 'link', 'image', 'video', 'audio' /** ,'math' */], // You must add the 'katex' library at options to use the 'math' plugin.
         /** ['imageGallery'] */ // You must add the "imageGalleryUrl".
         ['fullScreen', 'showBlocks', 'codeView'],
@@ -191,7 +191,7 @@ const initEditor = suneditor.init({
         'fontColor', 'backgroundColor', 'textStyle',
         'removeFormat',
         'outdent', 'indent',
-        'align', 'horizontalRule', 'list', 'lineHeight',
+        'align', 'horizontalLine', 'list', 'lineHeight',
         'table', 'link', 'image', 'video', 'audio', /** 'math', */ // You must add the 'katex' library at options to use the 'math' plugin.
         /** 'imageGallery', */ // You must add the "imageGalleryUrl".
         'fullScreen', 'showBlocks', 'codeView',
@@ -339,7 +339,7 @@ plugins: [
     fontSize,
     formatBlock,
     backgroundColor,
-    horizontalRule,
+    horizontalLine,
     lineHeight,
     list,
     paragraphStyle,
@@ -846,7 +846,7 @@ buttonList      : Defines button list to array {Array}
                     // ['fontColor', 'backgroundColor', 'textStyle'],
                     ['removeFormat'],
                     ['outdent', 'indent'],
-                    // ['align', 'horizontalRule', 'list', 'lineHeight'],
+                    // ['align', 'horizontalLine', 'list', 'lineHeight'],
                     // ['table', 'link', 'image', 'video', 'math'], // You must add the 'katex' library at options to use the 'math' plugin.
                     // ['imageGallery'], // You must add the "imageGalleryUrl".
                     ['fullScreen', 'showBlocks', 'codeView'],
@@ -911,7 +911,7 @@ buttonList      : Defines button list to array {Array}
                     ['fontColor', 'backgroundColor', 'textStyle'],
                     ['removeFormat'],
                     ['outdent', 'indent'],
-                    ['align', 'horizontalRule', 'list', 'lineHeight'],
+                    ['align', 'horizontalLine', 'list', 'lineHeight'],
                     ['table', 'link', 'image', 'video', 'audio', 'math'],
                     ['imageGallery'],
                     ['fullScreen', 'showBlocks', 'codeView'],
@@ -926,7 +926,7 @@ buttonList      : Defines button list to array {Array}
                         [':t-More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
                         ['removeFormat'],
                         ['outdent', 'indent'],
-                        ['align', 'horizontalRule', 'list', 'lineHeight'],
+                        ['align', 'horizontalLine', 'list', 'lineHeight'],
                         ['-right', 'dir'],
                         ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template'],
                         ['-right', ':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
@@ -936,7 +936,7 @@ buttonList      : Defines button list to array {Array}
                         ['undo', 'redo'],
                         [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
                         [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'removeFormat'],
-                        [':e-More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'horizontalRule', 'list', 'lineHeight'],
+                        [':e-More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'horizontalLine', 'list', 'lineHeight'],
                         [':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
                         ['-right', 'dir'],
                         ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template']
@@ -1448,7 +1448,7 @@ editor.showController = function (name, controllers, core) {
             <td align="left">backgroundColor</td>
         </tr>
         <tr>
-            <td align="left">horizontalRule</td>
+            <td align="left">horizontalLine</td>
         </tr>
         <tr>
             <td align="left">lineHeight</td>

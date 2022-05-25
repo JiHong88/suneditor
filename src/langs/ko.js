@@ -46,7 +46,7 @@
             list: '리스트',
             orderList: '숫자형 리스트',
             unorderList: '원형 리스트',
-            horizontalRule: '가로 줄 삽입',
+            horizontalLine: '가로 줄 삽입',
             hr_solid: '실선',
             hr_dotted: '점선',
             hr_dashed: '대시',

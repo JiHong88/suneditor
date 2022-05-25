@@ -1,5 +1,5 @@
 import { DropdownPlugin } from '../DropdownPlugin';
 
-declare const horizontalRule: DropdownPlugin;
+declare const horizontalLine: DropdownPlugin;
 
-export default horizontalRule;
+export default horizontalLine;

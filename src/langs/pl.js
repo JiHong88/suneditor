@@ -46,7 +46,7 @@
             list: 'Lista',
             orderList: 'Lista numerowana',
             unorderList: 'Lista wypunktowana',
-            horizontalRule: 'Pozioma linia',
+            horizontalLine: 'Pozioma linia',
             hr_solid: 'Ciągła',
             hr_dotted: 'Kropkowana',
             hr_dashed: 'Przerywana',

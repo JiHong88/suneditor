@@ -25,7 +25,7 @@ export interface Lang {
     list: string;
     orderList: string;
     unorderList: string;
-    horizontalRule: string;
+    horizontalLine: string;
     hr_solid: string;
     hr_dotted: string;
     hr_dashed: string;

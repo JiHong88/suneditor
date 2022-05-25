@@ -46,7 +46,7 @@
             list: 'Elenco',
             orderList: 'Elenco numerato',
             unorderList: 'Elenco puntato',
-            horizontalRule: 'Linea orizzontale',
+            horizontalLine: 'Linea orizzontale',
             hr_solid: 'Linea continua',
             hr_dotted: 'Puntini',
             hr_dashed: 'Trattini',

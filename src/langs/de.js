@@ -46,7 +46,7 @@
             list: 'Liste',
             orderList: 'Nummerierte Liste',
             unorderList: 'Aufzählung',
-            horizontalRule: 'Horizontale Linie',
+            horizontalLine: 'Horizontale Linie',
             hr_solid: 'Strich',
             hr_dotted: 'Gepunktet',
             hr_dashed: 'Gestrichelt',

@@ -8,8 +8,8 @@ import { domUtils, unicode, numbers, global } from '../../helper';
 
 const Format = function (editor) {
 	CoreInterface.call(this, editor);
-	this._listCamel = editor.options.__listCommonStyle;
-	this._listKebab = global.camelToKebabCase(editor.options.__listCommonStyle);
+	this._listCamel = this.options.__listCommonStyle;
+	this._listKebab = global.camelToKebabCase(this.options.__listCommonStyle);
 };
 
 Format.prototype = {
@@ -186,7 +186,7 @@ Format.prototype = {
 		if (this.isBrLine(currentFormatEl || element.parentNode)) {
 			oFormat = domUtils.createElement('BR');
 		} else {
-			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isLine(currentFormatEl) && !this.isBlock(currentFormatEl) && !this.isBrLine(currentFormatEl) ? currentFormatEl.nodeName : options.defaultLineTag;
+			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isLine(currentFormatEl) && !this.isBlock(currentFormatEl) && !this.isBrLine(currentFormatEl) ? currentFormatEl.nodeName : this.options.defaultLineTag;
 			oFormat = domUtils.createElement(oFormatName, null, '<br>');
 			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && this.isLine(currentFormatEl))) {
 				domUtils.copyTagAttributes(oFormat, lineNode || currentFormatEl);
@@ -527,7 +527,7 @@ Format.prototype = {
 						}
 					} else {
 						const inner = insNode;
-						insNode = domUtils.createElement(remove ? inner.nodeName : domUtils.isList(rangeElement.parentNode) || domUtils.isListCell(rangeElement.parentNode) ? 'LI' : domUtils.isTableCell(rangeElement.parentNode) ? 'DIV' : options.defaultLineTag);
+						insNode = domUtils.createElement(remove ? inner.nodeName : domUtils.isList(rangeElement.parentNode) || domUtils.isListCell(rangeElement.parentNode) ? 'LI' : domUtils.isTableCell(rangeElement.parentNode) ? 'DIV' : this.options.defaultLineTag);
 						const isCell = domUtils.isListCell(insNode);
 						const innerChildren = inner.childNodes;
 						while (innerChildren[0]) {

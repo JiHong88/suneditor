@@ -5,15 +5,14 @@
 
 import CoreInterface from '../../interface/_core';
 import env from '../../helper/env';
-import { _w } from '../../helper/global';
 import { addClass, removeClass, hasClass } from '../../helper/domUtils';
 
 const Char = function (editor) {
 	CoreInterface.call(this, editor);
-	this.maxCharCount = editor.options.charCounter_max;
-	this._encoder = _w.encodeURIComponent;
-	this._unescape = _w.unescape;
-	this._textEncoder = _w.TextEncoder;
+	this.maxCharCount = this.options.charCounter_max;
+	this._encoder = this._w.encodeURIComponent;
+	this._unescape = this._w.unescape;
+	this._textEncoder = this._w.TextEncoder;
 };
 
 Char.prototype = {

@@ -46,7 +46,7 @@
             list: 'Lijst',
             orderList: 'Geordende lijst',
             unorderList: 'Ongeordende lijst',
-            horizontalRule: 'Horizontale regel',
+            horizontalLine: 'Horizontale regel',
             hr_solid: 'Standaard',
             hr_dotted: 'Gestippeld',
             hr_dashed: 'Gestreept',

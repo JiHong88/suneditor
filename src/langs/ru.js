@@ -46,7 +46,7 @@
             list: 'Списки',
             orderList: 'Нумерованный',
             unorderList: 'Маркированный',
-            horizontalRule: 'Горизонтальная линия',
+            horizontalLine: 'Горизонтальная линия',
             hr_solid: 'Сплошная',
             hr_dotted: 'Пунктир',
             hr_dashed: 'Штриховая',

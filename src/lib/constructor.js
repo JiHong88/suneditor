@@ -660,10 +660,7 @@ function _defaultButtons(options) {
 		dir_rtl: ['', lang.toolbar.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
 		save: ['se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmd + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save],
 		/** plugins - dropdown */
-		list: ['', lang.toolbar.list, 'list', 'dropdown', icons.list_number],
-		horizontalRule: ['btn_line', lang.toolbar.horizontalRule, 'horizontalRule', 'dropdown', icons.horizontal_rule],
 		table: ['', lang.toolbar.table, 'table', 'dropdown', icons.table],
-		lineHeight: ['', lang.toolbar.lineHeight, 'lineHeight', 'dropdown', icons.line_height],
 		template: ['', lang.toolbar.template, 'template', 'dropdown', icons.template],
 		paragraphStyle: ['', lang.toolbar.paragraphStyle, 'paragraphStyle', 'dropdown', icons.paragraph_style],
 		textStyle: ['', lang.toolbar.textStyle, 'textStyle', 'dropdown', icons.text_style],

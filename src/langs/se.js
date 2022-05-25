@@ -49,7 +49,7 @@
             list: 'Listor',
             orderList: 'Numrerad lista',
             unorderList: 'Oordnad lista',
-            horizontalRule: 'Horisontell linje',
+            horizontalLine: 'Horisontell linje',
             hr_solid: 'Solid',
             hr_dotted: 'Punkter',
             hr_dashed: 'Prickad',

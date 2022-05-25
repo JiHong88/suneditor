@@ -5,7 +5,6 @@
 
 import Context from '../context';
 import { domUtils, unicode } from '../../helper';
-import { _w, _d } from '../../helper/global';
 import CoreInterface from '../../interface/_core';
 
 const Toolbar = function (editor) {
@@ -133,7 +132,7 @@ Toolbar.prototype = {
 
 		const element = this.context.element;
 		const editorHeight = element.editorArea.offsetHeight;
-		const y = (_w.scrollY || _d.documentElement.scrollTop) + this.options.toolbar_sticky;
+		const y = (this._w.scrollY || this._d.documentElement.scrollTop) + this.options.toolbar_sticky;
 		const editorTop = this.offset.getGlobal(this.options.toolbar_container).top - (this.editor._isInline ? element.toolbar.offsetHeight : 0);
 		const inlineOffset = this.editor._isInline && y - editorTop > 0 ? y - editorTop - this.context.element.toolbar.offsetHeight : 0;
 
@@ -259,7 +258,7 @@ Toolbar.prototype = {
 			isDirTop = true;
 		}
 
-		const arrowMargin = _w.Math.round(this.context.element._arrow.offsetWidth / 2);
+		const arrowMargin = this._w.Math.round(this.context.element._arrow.offsetWidth / 2);
 		const toolbarWidth = toolbar.offsetWidth;
 		const toolbarHeight = toolbar.offsetHeight;
 		const iframeRects = /iframe/i.test(this.context.element.wysiwygFrame.nodeName) ? this.context.element.wysiwygFrame.getClientRects()[0] : null;
@@ -313,15 +312,15 @@ Toolbar.prototype = {
 		if (!isDirTop && space > 0 && this._getPageBottomSpace() < space) {
 			isDirTop = true;
 			resetTop = true;
-		} else if (isDirTop && _d.documentElement.offsetTop > space) {
+		} else if (isDirTop && this._d.documentElement.offsetTop > space) {
 			isDirTop = false;
 			resetTop = true;
 		}
 
 		if (resetTop) t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
 
-		toolbarEl.style.left = _w.Math.floor(l) + 'px';
-		toolbarEl.style.top = _w.Math.floor(t) + 'px';
+		toolbarEl.style.left = this._w.Math.floor(l) + 'px';
+		toolbarEl.style.top = this._w.Math.floor(t) + 'px';
 
 		if (isDirTop) {
 			domUtils.removeClass(this.context.element._arrow, 'se-arrow-up');
@@ -333,12 +332,12 @@ Toolbar.prototype = {
 			this.context.element._arrow.style.top = -arrowMargin + 'px';
 		}
 
-		const arrow_left = _w.Math.floor(toolbarWidth / 2 + (absoluteLeft - l));
+		const arrow_left = this._w.Math.floor(toolbarWidth / 2 + (absoluteLeft - l));
 		this.context.element._arrow.style.left = (arrow_left + arrowMargin > toolbarEl.offsetWidth ? toolbarEl.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
 	},
 
 	_getPageBottomSpace: function () {
-		return _d.documentElement.scrollHeight - (this.offset.getGlobal(this.context.element.topArea).top + this.context.element.topArea.offsetHeight);
+		return this._d.documentElement.scrollHeight - (this.offset.getGlobal(this.context.element.topArea).top + this.context.element.topArea.offsetHeight);
 	},
 
 	_showInline: function () {

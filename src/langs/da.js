@@ -49,7 +49,7 @@
             list: 'Lister',
             orderList: 'Nummereret liste',
             unorderList: 'Uordnet liste',
-            horizontalRule: 'Horisontal linie',
+            horizontalLine: 'Horisontal linie',
             hr_solid: 'Almindelig',
             hr_dotted: 'Punkteret',
             hr_dashed: 'Streget',

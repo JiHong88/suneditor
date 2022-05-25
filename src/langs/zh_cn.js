@@ -46,7 +46,7 @@
             list: '列表',
             orderList: '有序列表',
             unorderList: '无序列表',
-            horizontalRule: '水平线',
+            horizontalLine: '水平线',
             hr_solid: '实线',
             hr_dotted: '点线',
             hr_dashed: '虚线',

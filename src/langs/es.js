@@ -46,7 +46,7 @@
 			list: 'Lista',
 			orderList: 'Lista ordenada',
 			unorderList: 'Lista desordenada',
-			horizontalRule: 'Horizontal line',
+			horizontalLine: 'Horizontal line',
 			hr_solid: 'Línea horizontal solida',
 			hr_dotted: 'Línea horizontal punteada',
 			hr_dashed: 'Línea horizontal discontinua',

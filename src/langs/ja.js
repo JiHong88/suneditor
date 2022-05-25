@@ -46,7 +46,7 @@
             list: 'リスト',
             orderList: '数値ブリット',
             unorderList: '円形ブリット',
-            horizontalRule: '水平線を挿入',
+            horizontalLine: '水平線を挿入',
             hr_solid: '実線',
             hr_dotted: '点線',
             hr_dashed: 'ダッシュ',

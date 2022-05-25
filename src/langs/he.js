@@ -46,7 +46,7 @@
             list: 'רשימה',
             orderList: 'מספור',
             unorderList: 'תבליטים',
-            horizontalRule: 'קו אופקי',
+            horizontalLine: 'קו אופקי',
             hr_solid: 'קו',
             hr_dotted: 'נקודות',
             hr_dashed: 'מקפים',

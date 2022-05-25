@@ -46,7 +46,7 @@
             list: 'لیست',
             orderList: 'لیستی ریزكراو',
             unorderList: 'لیستی ریزنه‌كراو',
-            horizontalRule: 'هێڵی ئاسۆیی',
+            horizontalLine: 'هێڵی ئاسۆیی',
             hr_solid: 'پته‌و',
             hr_dotted: 'نوكته‌ نوكته‌',
             hr_dashed: 'داش داش',

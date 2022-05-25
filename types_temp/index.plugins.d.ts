@@ -9,7 +9,7 @@ import font from "./dropdown/font";
 import fontSize from "./dropdown/fontSize";
 import fontColor from "./dropdown/fontColor";
 import backgroundColor from "./dropdown/backgroundColor";
-import horizontalRule from "./dropdown/horizontalRule";
+import horizontalLine from "./dropdown/horizontalLine";
 import list from "./dropdown/list";
 import table from "./dropdown/table";
 import formatBlock from "./dropdown/formatBlock";
@@ -37,7 +37,7 @@ declare const _default: {
   fontSize: DropdownPlugin;
   fontColor: DropdownPlugin;
   backgroundColor: DropdownPlugin;
-  horizontalRule: DropdownPlugin;
+  horizontalLine: DropdownPlugin;
   list: DropdownPlugin;
   table: DropdownPlugin;
   formatBlock: DropdownPlugin;
@@ -60,7 +60,7 @@ export {
   fontSize,
   fontColor,
   backgroundColor,
-  horizontalRule,
+  horizontalLine,
   list,
   table,
   formatBlock,

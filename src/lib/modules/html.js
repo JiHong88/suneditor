@@ -5,7 +5,6 @@
 
 import CoreInterface from '../../interface/_core';
 import { domUtils, converter, numbers, unicode } from '../../helper';
-import { _w } from '../../helper/global';
 
 const HTML = function (editor) {
 	CoreInterface.call(this, editor);
@@ -23,6 +22,7 @@ const HTML = function (editor) {
 
 	// set disallow text nodes
 	const options = this.options;
+	const _w = this._w;
 	const disallowStyleNodes = _w.Object.keys(options._styleNodeMap);
 	const allowStyleNodes = !options.elementWhitelist
 		? []

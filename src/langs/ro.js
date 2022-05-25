@@ -46,7 +46,7 @@
             list: 'Listă',
             orderList: 'Listă ordonată',
             unorderList: 'Listă neordonată',
-            horizontalRule: 'Linie orizontală',
+            horizontalLine: 'Linie orizontală',
             hr_solid: 'Solid',
             hr_dotted: 'Punctat',
             hr_dashed: 'Punctate',

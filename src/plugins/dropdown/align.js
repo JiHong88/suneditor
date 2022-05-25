@@ -30,7 +30,7 @@ const align = function (editor, target) {
 		right: editor.icons.align_right,
 		center: editor.icons.align_center
 	};
-	this._alignList = commandArea.querySelectorAll('li button');
+	this.alignList = commandArea.querySelectorAll('li button');
 
 	// init
 	this.menu.initTarget(target, menu);
@@ -68,7 +68,7 @@ align.prototype = {
 	 * @override dropdown
 	 */
 	on: function () {
-		const alignList = this._alignList;
+		const alignList = this.alignList;
 		const currentAlign = this.target.getAttribute('data-focus') || this.defaultDir;
 
 		if (currentAlign !== this.currentAlign) {
