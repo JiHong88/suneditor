@@ -280,7 +280,7 @@ export default {
         let focusEl = (container.previousElementSibling || container.nextElementSibling);
 
         const emptyDiv = container.parentNode;
-        this.util.remove(container);
+        this.util.removeItem(container);
         this.plugins.video.init.call(this);
         this.menu.controllerOff();
 
@@ -659,7 +659,7 @@ export default {
             if (!!figcaption) {
                 caption = this.util.createElement('DIV');
                 caption.innerHTML = figcaption.innerHTML;
-                this.util.remove(figcaption);
+                this.util.removeItem(figcaption);
             }
 
             // size
@@ -675,7 +675,7 @@ export default {
                 prevFrame.parentNode.replaceChild(container, prevFrame);
             } else if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
-                this.util.remove(prevFrame);
+                this.util.removeItem(prevFrame);
                 // clean format tag
                 this.util.removeEmptyNode(existElement, null);
                 if (existElement.children.length === 0) existElement.innerHTML = this.util.removeWhiteSpace(existElement.innerHTML);

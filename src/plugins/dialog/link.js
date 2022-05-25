@@ -202,7 +202,7 @@ export default {
             this.format.applyTextStyle(null, null, ['A'], false);
         } else {
             /** delete */
-            this.util.remove(this.context.link._linkAnchor);
+            this.util.removeItem(this.context.link._linkAnchor);
             this.context.anchor.caller.link.linkAnchor = null;
             this.editor.focus();
 

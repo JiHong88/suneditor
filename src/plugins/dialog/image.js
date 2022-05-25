@@ -276,7 +276,7 @@ export default {
         let focusEl = (imageContainer.previousElementSibling || imageContainer.nextElementSibling);
         
         const emptyDiv = imageContainer.parentNode;
-        this.util.remove(imageContainer);
+        this.util.removeItem(imageContainer);
         this.plugins.image.init.call(this);
         this.menu.controllerOff();
 
@@ -740,7 +740,7 @@ export default {
             }
         } else {
             if (contextImage._caption) {
-                this.util.remove(contextImage._caption);
+                this.util.removeItem(contextImage._caption);
                 contextImage._caption = null;
                 modifiedCaption = true;
             }
@@ -776,7 +776,7 @@ export default {
                 contextImage._element.parentNode.replaceChild(container, contextImage._element);
             } else if (this.format.isLine(existElement) && existElement.childNodes.length > 0) {
                 existElement.parentNode.insertBefore(container, existElement);
-                this.util.remove(contextImage._element);
+                this.util.removeItem(contextImage._element);
                 // clean format tag
                 this.util.removeEmptyNode(existElement, null);
                 if (existElement.children.length === 0) existElement.innerHTML = this.util.removeWhiteSpace(existElement.innerHTML);
@@ -784,7 +784,7 @@ export default {
                 if (this.format.isLine(existElement.parentNode)) {
                     const formats = existElement.parentNode;
                     formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
-                    this.util.remove(existElement);
+                    this.util.removeItem(existElement);
                 } else {
                     existElement.parentNode.replaceChild(container, existElement);
                 }
