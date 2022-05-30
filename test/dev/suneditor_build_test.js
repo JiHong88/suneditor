@@ -581,7 +581,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // tagsBlacklist: 'section|aside',
     // resizeEnable: false,
     // resizingBarContainer: "#rb",
-    attributesWhitelist: {'all': '*'},  // html5 <details open="">..</details>
+    // attributesWhitelist: {'all': '*'},  // html5 <details open="">..</details>
     addTagsWhitelist: 'fld|sort|sortType|lst|lstfld|headers',
     // attributesBlacklist: {
     //     all: 'data-a',
@@ -915,6 +915,7 @@ window.sun_create = function () {
 const editor = suneditor.init({
     plugins: [
         plugins.hiliteColor,
+        // plugins.fontColor,
         plugins.align,
         plugins.horizontalRule,
         plugins.list,
@@ -930,35 +931,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     // rtl: true,
     shortcutsDisable: ['bold', 'underline', 'italic'],
     // mode: "inline",
-    value: `<ol>
-    <li>11111</li>
-    <li>2222</li>
-    <li>3333
-      <ol>
-        <li>44444</li>
-      </ol>
-    </li>
-  </ol>
-  
-  <p><br>
-  </p>
-  
-  <ol>
-    <li>aaaa</li>
-    <li>bbbb</li>
-    <li>cccc
-      <ol>
-        <li>ddddd<br>
-        </li>
-      </ol>
-    </li>
-  </ol>
-  
-  <p>
-    <br>
-      <br>
-    </br>
-  </p>
+    value: `aa
   `,
     buttonList:complexEditor,
     plugins: plugins,
@@ -988,14 +961,22 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header"
 });
 
+// s2.onPaste =  (e, cleanData, core) => {
+//     console.log("cle", cleanData);
+//     console.log("cleeee", e);
+// }
+
 s2.onClick = (event, core) => {
     const element = event.target
     if(core.util.hasClass(element, "metaData")){
-        const a = core.util.createTextNode(core.util.zeroWidthSpace);
-        const a1 = core.util.createTextNode(core.util.zeroWidthSpace);
-        element.parentNode.insertBefore(a, element);
-        element.parentNode.insertBefore(a1, element.nextSibling);
-        core.setRange(a, 0, a1, 1);
+        core.setRange(element, 0, element, 1);
+    }
+}
+
+s2.onKeyDown = (event, core) => {
+    const range = core.getRange();
+    if(core.util.hasClass(range.commonAncestorContainer, "metaData")){
+        core.util.removeItem(range.commonAncestorContainer);
     }
 }
 
@@ -1025,25 +1006,25 @@ s2.onResizeEditor = (height, prevHeight, core) => {
 //   }
 // }
 
-s2.core.plugins.fontSize.pickup = function (e) {
-    console.log("fdsafafdasa---")
-    if (!/^BUTTON$/i.test(e.target.tagName)) return false;
+// s2.core.plugins.fontSize.pickup = function (e) {
+//     console.log("fdsafafdasa---")
+//     if (!/^BUTTON$/i.test(e.target.tagName)) return false;
 
-    e.preventDefault();
-    e.stopPropagation();
+//     e.preventDefault();
+//     e.stopPropagation();
 
-    const value = thisObj.editorGetFontSizeFromValue(e.target.getAttribute('data-value'));
+//     const value = thisObj.editorGetFontSizeFromValue(e.target.getAttribute('data-value'));
 
-    if (value) {
-        const newNode = this.util.createElement('SPAN');
-        newNode.style.fontSize = value;
-        this.nodeChange(newNode, ['font-size'], null, null);
-    } else {
-        this.nodeChange(null, ['font-size'], ['span'], true);
-    }
+//     if (value) {
+//         const newNode = this.util.createElement('SPAN');
+//         newNode.style.fontSize = value;
+//         this.nodeChange(newNode, ['font-size'], null, null);
+//     } else {
+//         this.nodeChange(null, ['font-size'], ['span'], true);
+//     }
 
-    this.submenuOff();
-}.bind(s2.core)
+//     this.submenuOff();
+// }.bind(s2.core)
 
 
 

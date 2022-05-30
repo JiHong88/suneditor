@@ -396,6 +396,16 @@ export default {
      * @private
      */
     _initOptions: function (element, options) {
+        const plugins = {};
+        if (options.plugins) {
+            const _plugins = options.plugins;
+            const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function(name) { return _plugins[name]; });
+            for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
+                p = pluginsValues[i].default || pluginsValues[i];
+                plugins[p.name] = p;
+            }
+        }
+        options.plugins = plugins;
         /** Values */
         options.lang = options.lang || _defaultLang;
         options.value = typeof options.value === 'string' ? options.value : null;
@@ -493,7 +503,7 @@ export default {
         options.className = (typeof options.className === 'string' && options.className.length > 0) ? ' ' + options.className : '';
         options.defaultStyle = typeof options.defaultStyle === 'string' ? options.defaultStyle : '';
         /** Defining menu items */
-        options.font = !options.font ? null : options.font;
+        options.font = !options.font ? ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'] : options.font;
         options.fontSize = !options.fontSize ? null : options.fontSize;
         options.formats = !options.formats ? null : options.formats;
         options.colorList = !options.colorList ? null : options.colorList;
@@ -756,12 +766,12 @@ export default {
      * @description Create editor HTML
      * @param {Array} doc document object
      * @param {Array} buttonList option.buttonList
-     * @param {Array|Object|null} _plugins Plugins
+     * @param {Object|null} plugins Plugins
      * @param {Array} options options
      * @returns {Object} { element: (Element) Toolbar element, plugins: (Array|null) Plugins Array, pluginCallButtons: (Object), responsiveButtons: (Array) }
      * @private
      */
-    _createToolBar: function (doc, buttonList, _plugins, options) {
+    _createToolBar: function (doc, buttonList, plugins, options) {
         const separator_vertical = doc.createElement('DIV');
         separator_vertical.className = 'se-toolbar-separator-vertical';
 
@@ -778,14 +788,6 @@ export default {
         const defaultButtonList = this._defaultButtons(options);
         const pluginCallButtons = {};
         const responsiveButtons = [];
-        const plugins = {};
-        if (_plugins) {
-            const pluginsValues = _plugins.length ? _plugins : Object.keys(_plugins).map(function(name) { return _plugins[name]; });
-            for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
-                p = pluginsValues[i].default || pluginsValues[i];
-                plugins[p.name] = p;
-            }
-        }
 
         let module = null;
         let button = null;

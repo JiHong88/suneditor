@@ -164,6 +164,33 @@
             <dl class="details"></dl>
 
 
+            <h4 class="name" id="kebabToCamelCase"><span class="type-signature"></span>kebabToCamelCase<span
+                class="signature">(param)</span><span class="type-signature"> &rarr; {String|Array}</span></h4>
+            <div class="description">
+                Convert the KebabCase To the CamelCase.
+            </div>
+            <h5>Parameters:</h5>
+            <table class="params">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th class="last">Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="name"><code>param</code></td>
+                    <td class="type">
+                        <span class="param-type">String|Array</span>
+                    </td>
+                    <td class="description last">[KebabCase string]</td>
+                </tr>
+                </tbody>
+            </table>
+            <dl class="details"></dl>
+
+
             <h4 class="name" id="createElement"><span class="type-signature"></span>createElement<span
                 class="signature">(elementName)</span><span class="type-signature"> &rarr; {Element}</span></h4>
             <div class="description">
@@ -1326,7 +1353,7 @@
         <dl class="details"></dl>
 
 
-        <h4 class="name" id="isList"><span class="type-signature"></span>isEmptyLine<span class="signature">(element)</span><span
+        <h4 class="name" id="isEmptyLine"><span class="type-signature"></span>isEmptyLine<span class="signature">(element)</span><span
                 class="type-signature"> &rarr; {Boolean}</span></h4>
         <div class="description">
             Check the line element(<a href="#isFormatElement">util.isFormatElement</a>) is empty
@@ -1347,6 +1374,33 @@
                     <span class="param-type">Element</span>
                 </td>
                 <td class="description last">Format element node</td>
+            </tr>
+            </tbody>
+        </table>
+        <dl class="details"></dl>
+
+
+        <h4 class="name" id="isSpanWithoutAttr"><span class="type-signature"></span>isSpanWithoutAttr<span class="signature">(element)</span><span
+                class="type-signature"> &rarr; {Boolean}</span></h4>
+        <div class="description">
+            Check the span's attributes are empty.
+        </div>
+        <h5>Parameters:</h5>
+        <table class="params">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th class="last">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="name"><code>element</code></td>
+                <td class="type">
+                    <span class="param-type">Element|null</span>
+                </td>
+                <td class="description last">Element node</td>
             </tr>
             </tbody>
         </table>
@@ -2631,6 +2685,7 @@
         <li><a href="document-util.html#getXMLHttpRequest">getXMLHttpRequest</a></li>
         <li><a href="document-util.html#getValues">getValues</a></li>
         <li><a href="document-util.html#camelToKebabCase">camelToKebabCase</a></li>
+        <li><a href="document-util.html#kebabToCamelCase">kebabToCamelCase</a></li>
         <li><a href="document-util.html#createElement">createElement</a></li>
         <li><a href="document-util.html#createTextNode">createTextNode</a></li>
         <li><a href="document-util.html#HTMLEncoder">HTMLEncoder</a></li>
@@ -2669,6 +2724,7 @@
         <li><a href="document-util.html#getNodeFromPath">getNodeFromPath</a></li>
         <li><a href="document-util.html#isSameAttributes">isSameAttributes</a></li>
         <li><a href="document-util.html#isEmptyLine">isEmptyLine</a></li>
+        <li><a href="document-util.html#isSpanWithoutAttr">isSpanWithoutAttr</a></li>
         <li><a href="document-util.html#isList">isList</a></li>
         <li><a href="document-util.html#isListCell">isListCell</a></li>
         <li><a href="document-util.html#isTable">isTable</a></li>

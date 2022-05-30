@@ -43,6 +43,12 @@ declare interface util {
     camelToKebabCase(param: string | string[]): string | string[],
 
     /**
+     * @description Convert the KebabCase To the CamelCase.
+     * @param {String|Array} param [KebabCase string]
+     */
+    kebabToCamelCase(param: string | string[]): string | string[],
+
+    /**
      * @description Create Element node
      * @param elementName Element name
      * @returns
@@ -350,6 +356,13 @@ declare interface util {
      * @returns {Boolean}
      */
     isEmptyLine(element: Element): boolean;
+
+    /**
+     * @description Check the span's attributes are empty.
+     * @param {Element} element Element node
+     * @returns {Boolean}
+     */
+    isSpanWithoutAttr(element: Element|null): boolean;
 
     /**
      * @description Check the node is a list (ol, ul)

@@ -1501,7 +1501,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const currentFormatEl = util.getFormatElement(this.getSelectionNode(), null);
             let oFormat = null;
-            if (util.isFreeFormatElement(currentFormatEl || element.parentNode)) {
+            if (!util.isFormatElement(element) && util.isFreeFormatElement(currentFormatEl || element.parentNode)) {
                 oFormat = util.createElement('BR');
             } else {
                 const oFormatName = formatNode ? (typeof formatNode === 'string' ? formatNode : formatNode.nodeName) : (util.isFormatElement(currentFormatEl) && !util.isRangeFormatElement(currentFormatEl) && !util.isFreeFormatElement(currentFormatEl)) ? currentFormatEl.nodeName : options.defaultTag;
@@ -5032,10 +5032,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // element
             if (node.nodeType === 1) {
                 if (util._disallowedTags(node)) return '';
+
+                const ch = util.getListChildNodes(node, function(current) { return util.isSpanWithoutAttr(current); }) || [];
+                for (let i = ch.length - 1; i >= 0; i--) {
+                    ch[i].outerHTML = ch[i].innerHTML;
+                }
+
                 if (!requireFormat || (util.isFormatElement(node) || util.isRangeFormatElement(node) || util.isComponent(node) || util.isMedia(node) || (util.isAnchor(node) && util.isMedia(node.firstElementChild)))) {
-                    return node.outerHTML;
+                    return util.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML;
                 } else {
-                    return '<' + defaultTag + '>' + node.outerHTML + '</' + defaultTag + '>';
+                    return '<' + defaultTag + '>' + (util.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML) + '</' + defaultTag + '>';
                 }
             }
             // text
@@ -5125,7 +5131,36 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (sv) {
                     if (!v) v = [];
-                    v.push(sv[0]);
+                    const style = sv[0].replace(/&quot;/g, '').match(/\s*(font-family|font-size|color|background-color)\s*:[^;]+(?!;)*/ig);
+                    if (style) {
+                        const allowedStyle = [];
+                        for (let i = 0, len = style.length, r; i < len; i++) {
+                            r = style[i].match(/(.+)(:)([^:]+$)/);
+                            if (r && !/inherit|initial/i.test(r[3])) {
+                                const k = util.kebabToCamelCase(r[1].trim());
+                                const v = this.wwComputedStyle[k].replace(/"/g, '');
+                                switch (k) {
+                                    case 'fontFamily':
+                                        if (options.plugins.font ? options.font.indexOf(v) === -1 : true) continue;
+                                        break;
+                                    case 'fontSize':
+                                        if (!options.plugins.fontSize) continue;
+                                        break;
+                                    case 'color':
+                                        if (!options.plugins.fontColor) continue;
+                                        break;
+                                    case 'backgroundColor':
+                                        if (!options.plugins.hiliteColor) continue;
+                                        break;
+                                }
+                                
+                                if (v !== r[3].trim()) {
+                                    allowedStyle.push(r[0]);
+                                }
+                            }
+                        }
+                        if (allowedStyle.length > 0) v.push('style="' + allowedStyle.join(';') + '"');
+                    }
                 }
             }
 
@@ -5154,12 +5189,41 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (v) {
                 for (let i = 0, len = v.length; i < len; i++) {
-                    if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
-                    t += ' ' + (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i]) ? '' : v[i]);
+                    if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i].trim())) continue;
+                    t += ' ' + (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i].trim()) ? '' : v[i]);
                 }
             }
 
             return t;
+        },
+
+        /**
+         * @description Determines if formatting is required and returns a domTree
+         * @param {Element} dom documentFragment
+         * @returns {Element}
+         * @private
+         */
+        _editFormat: function (dom) {
+            let value = '', f;
+            const tempTree = dom.childNodes;
+            for (let i = 0, len = tempTree.length, n; i < len; i++) {
+                n = tempTree[i];
+                if (!util.isFormatElement(n) && !util.isRangeFormatElement(n) && !util.isComponent(n) && !/meta/i.test(n.nodeName)) {
+                    if (!f) f = util.createElement(options.defaultTag);
+                    f.appendChild(n);
+                    i--; len--;
+                } else {
+                    if (f) {
+                        value += f.outerHTML;
+                        f = null;
+                    }
+                    value += n.outerHTML;
+                }
+            }
+
+            if (f) value += f.outerHTML;
+
+            return _d.createRange().createContextualFragment(value);
         },
 
         /**
@@ -5195,7 +5259,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            const domTree = dom.childNodes;
+            let domTree = dom.childNodes;
             let cleanHTML = '';
             let requireFormat = false;
 
@@ -5205,6 +5269,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     requireFormat = true;
                     break;
                 }
+            }
+
+            if(requireFormat) {
+                domTree = this._editFormat(dom).childNodes;
             }
 
             for (let i = 0, len = domTree.length; i < len; i++) {
@@ -7694,7 +7762,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (cleanData) {
                 if (util.isListCell(util.getFormatElement(core.getSelectionNode(), null))) {
-                    const dom = (_d.createRange().createContextualFragment(cleanData));
+                    const dom = _d.createRange().createContextualFragment(cleanData);
                     const domTree = dom.childNodes;
                     if (domTree.length > 1 && domTree[0].nodeType === 1) cleanData = event._convertListCell(domTree);
                 }
