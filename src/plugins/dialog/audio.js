@@ -454,7 +454,7 @@ export default {
         this.plugins.audio._setTagAttrs.call(this, element);
         
         // find component element
-        const existElement = (this.util.isRangeFormatElement(element.parentNode) || this.util.isWysiwygDiv(element.parentNode)) ? 
+        let existElement = (this.util.isRangeFormatElement(element.parentNode) || this.util.isWysiwygDiv(element.parentNode)) ? 
             element : this.util.getFormatElement(element) || element;
 
         // clone element
@@ -464,12 +464,16 @@ export default {
         const container = this.plugins.component.set_container.call(this, cover, 'se-audio-container');
 
         try {
-            if (this.util.isListCell(existElement) || this.util.isFormatElement(existElement)) {
-                prevElement.parentNode.replaceChild(container, prevElement);
-            } else if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
+            if (this.util.isListCell(existElement)) {
+                const refer = this.util.getParentElement(prevElement, function (current) { return current.parentNode === existElement; });
+                existElement.insertBefore(container, refer);
+                this.util.removeItem(prevElement);
+                this.util.removeEmptyNode(refer, null);
+            } else if (this.util.isFormatElement(existElement)) {
+                const refer = this.util.getParentElement(prevElement, function (current) { return current.parentNode === existElement; });
+                existElement = this.util.splitElement(existElement, refer);
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(prevElement);
-                // clean format tag
                 this.util.removeEmptyNode(existElement, null);
                 if (existElement.children.length === 0) existElement.innerHTML = this.util.htmlRemoveWhiteSpace(existElement.innerHTML);
             } else {
