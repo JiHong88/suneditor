@@ -1692,7 +1692,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const isEdge = this.isEdgePoint(range.endContainer, range.endOffset, 'end');
                 const r = this.removeNode();
                 const container = r.container;
-                const prevContainer = r.prevContainer;
+                const prevContainer = container === r.prevContainer ? null : r.prevContainer;
 
                 if (insertListCell && prevContainer) {
                     tempParentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
@@ -1732,7 +1732,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                     newCell.appendChild(line.lastElementChild);
                                 }
                                 if (newCell) {
-                                    tempParentNode.insertBefore(newCell, line.nextElementSibling);
+                                    line.parentNode.insertBefore(newCell, line.nextElementSibling);
                                     tempAfterNode = afterNode = newCell;
                                 }
                             }
@@ -7761,37 +7761,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             if (cleanData) {
-                if (util.isListCell(util.getFormatElement(core.getSelectionNode(), null))) {
-                    const dom = _d.createRange().createContextualFragment(cleanData);
-                    const domTree = dom.childNodes;
-                    if (domTree.length > 1 && domTree[0].nodeType === 1) cleanData = event._convertListCell(domTree);
-                }
                 functions.insertHTML(cleanData, true, false);
                 return false;
             }
-        },
-
-        _convertListCell: function (domTree) {
-            let html = '';
-
-            for (let i = 0, len = domTree.length, node; i < len; i++) {
-                node = domTree[i];
-                if (node.nodeType === 1) {
-                    if (util.isListCell(node) || util.isList(node)) {
-                        html += node.outerHTML;
-                    } else if (util.isFormatElement(node)) {
-                        html += '<li>' +(node.innerHTML.trim() || '<br>') + '</li>';
-                    } else if (util.isRangeFormatElement(node) && !util.isTable(node)) {
-                        html += event._convertListCell(node);
-                    } else {
-                        html += '<li>' + node.outerHTML + '</li>';
-                    }
-                } else {
-                    html += '<li>' + (node.textContent || '<br>') + '</li>';
-                }
-            }
-
-            return html;
         },
 
         onMouseMove_wysiwyg: function (e) {
@@ -8500,6 +8472,31 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.focus();
         },
 
+        _convertListCell: function (domTree) {
+            let html = '';
+
+            for (let i = 0, len = domTree.length, node; i < len; i++) {
+                node = domTree[i];
+                if (node.nodeType === 1) {
+                    if (util.isList(node)) {
+                        html += node.innerHTML;
+                    } else if (util.isListCell(node)) {
+                        html += node.outerHTML;
+                    } else if (util.isFormatElement(node)) {
+                        html += '<li>' +(node.innerHTML.trim() || '<br>') + '</li>';
+                    } else if (util.isRangeFormatElement(node) && !util.isTable(node)) {
+                        html += event._convertListCell(node);
+                    } else {
+                        html += '<li>' + node.outerHTML + '</li>';
+                    }
+                } else {
+                    html += '<li>' + (node.textContent || '<br>') + '</li>';
+                }
+            }
+
+            return html;
+        },
+
         /**
          * @description Inserts an HTML element or HTML string or plain string at the current cursor position
          * @param {Element|String} html HTML Element or HTML string or plain string
@@ -8509,10 +8506,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         insertHTML: function (html, notCleaningData, checkCharCount, rangeSelection) {
             if (!context.element.wysiwygFrame.contains(core.getSelection().focusNode)) core.focus();
-            
+
             if (typeof html === 'string') {
                 if (!notCleaningData) html = core.cleanHTML(html, null, null);
                 try {
+                    if (util.isListCell(util.getFormatElement(core.getSelectionNode(), null))) {
+                        const dom = _d.createRange().createContextualFragment(html);
+                        const domTree = dom.childNodes;
+                        if (domTree.length > 0 && domTree[0].nodeType === 1) html = this._convertListCell(domTree);
+                    }
+
                     const dom = _d.createRange().createContextualFragment(html);
                     const domTree = dom.childNodes;
 

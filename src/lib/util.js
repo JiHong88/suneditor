@@ -1397,7 +1397,7 @@ const util = {
      * @description Split all tags based on "baseNode"
      * Returns the last element of the splited tag.
      * @param {Node} baseNode Element or text node on which to base
-     * @param {Number|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
+     * @param {Number|Node|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
      * @param {Number} depth The nesting depth of the element being split. (default: 0)
      * @returns {Element}
      */

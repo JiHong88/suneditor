@@ -931,7 +931,35 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     // rtl: true,
     shortcutsDisable: ['bold', 'underline', 'italic'],
     // mode: "inline",
-    value: `aa
+    value: `<ol>
+    <li>11111</li>
+    <li>2222</li>
+    <li>3333
+      <ol>
+        <li>44444</li>
+      </ol>
+    </li>
+  </ol>
+  
+  <p><br>
+  </p>
+  
+  <ol>
+    <li>aaaa</li>
+    <li>bbbb</li>
+    <li>cccc
+      <ol>
+        <li>ddddd<br>
+        </li>
+      </ol>
+    </li>
+  </ol>
+  
+  <p>
+    <br>
+      <br>
+    </br>
+  </p>
   `,
     buttonList:complexEditor,
     plugins: plugins,
@@ -961,10 +989,15 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header"
 });
 
-// s2.onPaste =  (e, cleanData, core) => {
-//     console.log("cle", cleanData);
-//     console.log("cleeee", e);
-// }
+s2.onPaste =  (e, cleanData, maxCharCount, core) => {
+    const dom = core._d.createRange().createContextualFragment(cleanData);
+    const chilren = dom.childNodes;
+    let html = '';
+    chilren.forEach(v=> {
+        html += core.util.isComponent(v) ? '' : (v.outerHTML || v.textContent);
+    })
+    return html;
+}
 
 s2.onClick = (event, core) => {
     const element = event.target
