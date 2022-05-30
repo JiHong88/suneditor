@@ -5139,9 +5139,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             if (r && !/inherit|initial/i.test(r[3])) {
                                 const k = util.kebabToCamelCase(r[1].trim());
                                 const v = this.wwComputedStyle[k].replace(/"/g, '');
+                                const c = r[3].trim();
                                 switch (k) {
                                     case 'fontFamily':
-                                        if (options.plugins.font ? options.font.indexOf(v) === -1 : true) continue;
+                                        if (options.plugins.font ? options.font.indexOf(c) === -1 : true) continue;
                                         break;
                                     case 'fontSize':
                                         if (!options.plugins.fontSize) continue;
@@ -5154,7 +5155,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                         break;
                                 }
                                 
-                                if (v !== r[3].trim()) {
+                                if (v !== c) {
                                     allowedStyle.push(r[0]);
                                 }
                             }
@@ -5226,6 +5227,45 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             return _d.createRange().createContextualFragment(value);
         },
 
+        _convertListCell: function (domTree) {
+            let html = '';
+
+            for (let i = 0, len = domTree.length, node; i < len; i++) {
+                node = domTree[i];
+                if (node.nodeType === 1) {
+                    if (util.isList(node)) {
+                        html += node.innerHTML;
+                    } else if (util.isListCell(node)) {
+                        html += node.outerHTML;
+                    } else if (util.isFormatElement(node)) {
+                        html += '<li>' +(node.innerHTML.trim() || '<br>') + '</li>';
+                    } else if (util.isRangeFormatElement(node) && !util.isTable(node)) {
+                        html += event._convertListCell(node);
+                    } else {
+                        html += '<li>' + node.outerHTML + '</li>';
+                    }
+                } else {
+                    html += '<li>' + (node.textContent || '<br>') + '</li>';
+                }
+            }
+
+            return html;
+        },
+
+        _isFormatData: function (domTree) {
+            let requireFormat = false;
+
+            for (let i = 0, len = domTree.length, t; i < len; i++) {
+                t = domTree[i];
+                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !util._disallowedTags(t)) {
+                    requireFormat = true;
+                    break;
+                }
+            }
+
+            return requireFormat;
+        },
+
         /**
          * @description Gets the clean HTML code for editor
          * @param {String} html HTML string
@@ -5261,15 +5301,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             let domTree = dom.childNodes;
             let cleanHTML = '';
-            let requireFormat = false;
-
-            for (let i = 0, len = domTree.length, t; i < len; i++) {
-                t = domTree[i];
-                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !util._disallowedTags(t)) {
-                    requireFormat = true;
-                    break;
-                }
-            }
+            const requireFormat = this._isFormatData(domTree);
 
             if(requireFormat) {
                 domTree = this._editFormat(dom).childNodes;
@@ -8472,31 +8504,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core.focus();
         },
 
-        _convertListCell: function (domTree) {
-            let html = '';
-
-            for (let i = 0, len = domTree.length, node; i < len; i++) {
-                node = domTree[i];
-                if (node.nodeType === 1) {
-                    if (util.isList(node)) {
-                        html += node.innerHTML;
-                    } else if (util.isListCell(node)) {
-                        html += node.outerHTML;
-                    } else if (util.isFormatElement(node)) {
-                        html += '<li>' +(node.innerHTML.trim() || '<br>') + '</li>';
-                    } else if (util.isRangeFormatElement(node) && !util.isTable(node)) {
-                        html += event._convertListCell(node);
-                    } else {
-                        html += '<li>' + node.outerHTML + '</li>';
-                    }
-                } else {
-                    html += '<li>' + (node.textContent || '<br>') + '</li>';
-                }
-            }
-
-            return html;
-        },
-
         /**
          * @description Inserts an HTML element or HTML string or plain string at the current cursor position
          * @param {Element|String} html HTML Element or HTML string or plain string
@@ -8513,7 +8520,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (util.isListCell(util.getFormatElement(core.getSelectionNode(), null))) {
                         const dom = _d.createRange().createContextualFragment(html);
                         const domTree = dom.childNodes;
-                        if (domTree.length > 0 && domTree[0].nodeType === 1) html = this._convertListCell(domTree);
+                        if (core._isFormatData(domTree)) html = core._convertListCell(domTree);
                     }
 
                     const dom = _d.createRange().createContextualFragment(html);
