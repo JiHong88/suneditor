@@ -581,7 +581,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // tagsBlacklist: 'section|aside',
     // resizeEnable: false,
     // resizingBarContainer: "#rb",
-    attributesWhitelist: {'all': '*'},  // html5 <details open="">..</details>
+    // attributesWhitelist: {'all': '*'},  // html5 <details open="">..</details>
     addTagsWhitelist: 'fld|sort|sortType|lst|lstfld|headers',
     // attributesBlacklist: {
     //     all: 'data-a',
@@ -915,6 +915,7 @@ window.sun_create = function () {
 const editor = suneditor.init({
     plugins: [
         plugins.hiliteColor,
+        // plugins.fontColor,
         plugins.align,
         plugins.horizontalRule,
         plugins.list,
@@ -965,6 +966,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     katex: Katex,
     // value: 'abc',
     minHeight : 300,
+    height: "auto",
     charCounter: true,
     font: [
         'Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact',
@@ -986,6 +988,30 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     imageMultipleFile: true,
     addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header"
 });
+
+s2.onPaste =  (e, cleanData, maxCharCount, core) => {
+    const dom = core._d.createRange().createContextualFragment(cleanData);
+    const chilren = dom.childNodes;
+    let html = '';
+    chilren.forEach(v=> {
+        html += core.util.isComponent(v) ? '' : (v.outerHTML || v.textContent);
+    })
+    return html;
+}
+
+s2.onClick = (event, core) => {
+    const element = event.target
+    if(core.util.hasClass(element, "metaData")){
+        core.setRange(element, 0, element, 1);
+    }
+}
+
+s2.onKeyDown = (event, core) => {
+    const range = core.getRange();
+    if(core.util.hasClass(range.commonAncestorContainer, "metaData")){
+        core.util.removeItem(range.commonAncestorContainer);
+    }
+}
 
 s2.onResizeEditor = (height, prevHeight, core) => {
     console.log("heig", height)
@@ -1013,25 +1039,25 @@ s2.onResizeEditor = (height, prevHeight, core) => {
 //   }
 // }
 
-s2.core.plugins.fontSize.pickup = function (e) {
-    console.log("fdsafafdasa---")
-    if (!/^BUTTON$/i.test(e.target.tagName)) return false;
+// s2.core.plugins.fontSize.pickup = function (e) {
+//     console.log("fdsafafdasa---")
+//     if (!/^BUTTON$/i.test(e.target.tagName)) return false;
 
-    e.preventDefault();
-    e.stopPropagation();
+//     e.preventDefault();
+//     e.stopPropagation();
 
-    const value = thisObj.editorGetFontSizeFromValue(e.target.getAttribute('data-value'));
+//     const value = thisObj.editorGetFontSizeFromValue(e.target.getAttribute('data-value'));
 
-    if (value) {
-        const newNode = this.util.createElement('SPAN');
-        newNode.style.fontSize = value;
-        this.nodeChange(newNode, ['font-size'], null, null);
-    } else {
-        this.nodeChange(null, ['font-size'], ['span'], true);
-    }
+//     if (value) {
+//         const newNode = this.util.createElement('SPAN');
+//         newNode.style.fontSize = value;
+//         this.nodeChange(newNode, ['font-size'], null, null);
+//     } else {
+//         this.nodeChange(null, ['font-size'], ['span'], true);
+//     }
 
-    this.submenuOff();
-}.bind(s2.core)
+//     this.submenuOff();
+// }.bind(s2.core)
 
 
 

@@ -120,6 +120,19 @@ const util = {
     },
 
     /**
+     * @description Convert the KebabCase To the CamelCase.
+     * @param {String|Array} param [KebabCase string]
+     * @returns {String|Array}
+     */
+    kebabToCamelCase: function (param) {
+        if (typeof param === 'string') {
+            return param.replace(/-[a-zA-Z]/g, function (letter) { return letter.replace('-', '').toUpperCase(); });
+        } else {
+            return param.map(function(str) { return util.camelToKebabCase(str); });
+        }
+    },
+
+    /**
      * @description Create Element node
      * @param {String} elementName Element name
      * @returns {Element}
@@ -764,6 +777,15 @@ const util = {
     },
 
     /**
+     * @description Check the span's attributes are empty.
+     * @param {Element|null} element Element node
+     * @returns {Boolean}
+     */
+    isSpanWithoutAttr: function (element) {
+        return !!element && element.nodeType === 1 && /^SPAN$/i.test(element.nodeName) && !element.className && !element.style.cssText;
+    },
+
+    /**
      * @description Check the node is a list (ol, ul)
      * @param {Node|String} node The element or element name to check
      * @returns {Boolean}
@@ -1375,12 +1397,33 @@ const util = {
      * @description Split all tags based on "baseNode"
      * Returns the last element of the splited tag.
      * @param {Node} baseNode Element or text node on which to base
-     * @param {Number|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
+     * @param {Number|Node|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
      * @param {Number} depth The nesting depth of the element being split. (default: 0)
      * @returns {Element}
      */
     splitElement: function (baseNode, offset, depth) {
         if (this.isWysiwygDiv(baseNode)) return baseNode;
+
+        if (!!offset && !this.isNumber(offset)) {
+            const children =  baseNode.childNodes;
+            let index = this.getPositionIndex(offset);
+            const prev = baseNode.cloneNode(false);
+            const next = baseNode.cloneNode(false);
+            for (let i = 0, len = children.length; i < len; i++) {
+                if (i < index) prev.appendChild(children[i]);
+                else if (i > index) next.appendChild(children[i]);
+                else continue;
+                i--;
+                len--;
+                index--;
+            }
+
+            if (prev.childNodes.length > 0) baseNode.parentNode.insertBefore(prev, baseNode);
+            if (next.childNodes.length > 0) baseNode.parentNode.insertBefore(next, baseNode.nextElementSibling);
+
+            return baseNode;
+        }
+
         const bp = baseNode.parentNode;
         let index = 0, newEl, children, temp;
         let next = true;

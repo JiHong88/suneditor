@@ -768,16 +768,20 @@ export default {
         }
 
         if (isNewContainer) {
-            const existElement = (this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode)) ? 
+            let existElement = (this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode)) ? 
                 contextImage._element : 
                 /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
                 
-            if (this.util.isListCell(existElement) || this.util.isFormatElement(existElement)) {
-                contextImage._element.parentNode.replaceChild(container, contextImage._element);
-            } else if (this.util.isFormatElement(existElement) && existElement.childNodes.length > 0) {
+            if (this.util.isListCell(existElement)) {
+                const refer = this.util.getParentElement(contextImage._element, function (current) { return current.parentNode === existElement; });
+                existElement.insertBefore(container, refer);
+                this.util.removeItem(contextImage._element);
+                this.util.removeEmptyNode(refer, null);
+            } else if (this.util.isFormatElement(existElement)) {
+                const refer = this.util.getParentElement(contextImage._element, function (current) { return current.parentNode === existElement; });
+                existElement = this.util.splitElement(existElement, refer);
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(contextImage._element);
-                // clean format tag
                 this.util.removeEmptyNode(existElement, null);
                 if (existElement.children.length === 0) existElement.innerHTML = this.util.htmlRemoveWhiteSpace(existElement.innerHTML);
             } else {

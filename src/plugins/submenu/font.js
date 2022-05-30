@@ -35,24 +35,13 @@ export default {
     },
 
     setSubmenu: function (core) {
-        const option = core.options;
         const lang = core.lang;
         const listDiv = core.util.createElement('DIV');
 
         listDiv.className = 'se-submenu se-list-layer se-list-font-family';
 
         let font, text, i, len;
-        let fontList = !option.font ?
-            [
-                'Arial',
-                'Comic Sans MS',
-                'Courier New',
-                'Impact',
-                'Georgia',
-                'tahoma',
-                'Trebuchet MS',
-                'Verdana'
-            ] : option.font;
+        let fontList = core.options.font;
 
         let list = '<div class="se-list-inner">' +
                 '<ul class="se-list-basic">' +
