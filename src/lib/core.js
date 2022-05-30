@@ -1692,7 +1692,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const isEdge = this.isEdgePoint(range.endContainer, range.endOffset, 'end');
                 const r = this.removeNode();
                 const container = r.container;
-                const prevContainer = container === r.prevContainer ? null : r.prevContainer;
+                const prevContainer = (container === r.prevContainer && range.collapsed) ? null : r.prevContainer;
 
                 if (insertListCell && prevContainer) {
                     tempParentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
