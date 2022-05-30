@@ -5240,7 +5240,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     } else if (util.isFormatElement(node)) {
                         html += '<li>' +(node.innerHTML.trim() || '<br>') + '</li>';
                     } else if (util.isRangeFormatElement(node) && !util.isTable(node)) {
-                        html += event._convertListCell(node);
+                        html += this._convertListCell(node);
                     } else {
                         html += '<li>' + node.outerHTML + '</li>';
                     }
