@@ -183,7 +183,7 @@ Format.prototype = {
 
 		const currentFormatEl = this.getLine(this.selection.getNode(), null);
 		let oFormat = null;
-		if (this.isBrLine(currentFormatEl || element.parentNode)) {
+		if (!this.isBrLine(element) && this.isBrLine(currentFormatEl || element.parentNode)) {
 			oFormat = domUtils.createElement('BR');
 		} else {
 			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isLine(currentFormatEl) && !this.isBlock(currentFormatEl) && !this.isBrLine(currentFormatEl) ? currentFormatEl.nodeName : this.options.defaultLineTag;

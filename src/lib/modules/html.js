@@ -4,7 +4,7 @@
  */
 
 import CoreInterface from '../../interface/_core';
-import { domUtils, converter, numbers, unicode } from '../../helper';
+import { domUtils, converter, numbers, unicode, global } from '../../helper';
 
 const HTML = function (editor) {
 	CoreInterface.call(this, editor);
@@ -117,18 +117,14 @@ HTML.prototype = {
 			}
 		}
 
-		const domTree = dom.childNodes;
-		if (!requireFormat) {
-			for (let i = 0, len = domTree.length, t; i < len; i++) {
-				t = domTree[i];
-				if (t.nodeType === 1 && !this.format.isTextStyleNode(t) && !domUtils.isBreak(t) && !DisallowedElements(t)) {
-					requireFormat = true;
-					break;
-				}
-			}
+		let domTree = dom.childNodes;
+		let cleanData = '';
+		const requireFormat = this._isFormatData(domTree);
+
+		if(requireFormat) {
+			domTree = this._editFormat(dom).childNodes;
 		}
 
-		let cleanData = '';
 		for (let i = 0, len = domTree.length; i < len; i++) {
 			cleanData += this._makeLine(domTree[i], requireFormat);
 		}
@@ -158,6 +154,12 @@ HTML.prototype = {
 		if (typeof html === 'string') {
 			if (!notCleaningData) html = this.clean(html, false, null, null);
 			try {
+				if (domUtils.isListCell(this.format.getLine(this.selection.getNode(), null))) {
+					const dom = this._d.createRange().createContextualFragment(html);
+					const domTree = dom.childNodes;
+					if (this._isFormatData(domTree)) html = this._convertListCell(domTree);
+				}
+
 				const dom = this._d.createRange().createContextualFragment(html);
 				const domTree = dom.childNodes;
 
@@ -245,7 +247,7 @@ HTML.prototype = {
 			const isEdge = domUtils.isEdgePoint(range.endContainer, range.endOffset, 'end');
 			const r = this.remove();
 			const container = r.container;
-			const prevContainer = r.prevContainer;
+			const prevContainer = container === r.prevContainer && range.collapsed ? null : r.prevContainer;
 
 			if (insertListCell && prevContainer) {
 				tempParentNode = prevContainer.nodeType === 3 ? prevContainer.parentNode : prevContainer;
@@ -290,7 +292,7 @@ HTML.prototype = {
 								newCell.appendChild(line.lastElementChild);
 							}
 							if (newCell) {
-								tempParentNode.insertBefore(newCell, line.nextElementSibling);
+								line.parentNode.insertBefore(newCell, line.nextElementSibling);
 								tempAfterNode = afterNode = newCell;
 							}
 						}
@@ -489,7 +491,7 @@ HTML.prototype = {
 				}
 			}
 		} catch (e) {
-			console.warn("[SUNEDITOR.html.insertNode.warn]", e);
+			console.warn('[SUNEDITOR.html.insertNode.warn]', e);
 			parentNode.appendChild(oNode);
 		} finally {
 			if ((this.format.isLine(oNode) || this.component.is(oNode)) && startCon === endCon) {
@@ -765,10 +767,16 @@ HTML.prototype = {
 		// element
 		if (node.nodeType === 1) {
 			if (DisallowedElements(node)) return '';
+
+			const ch = domUtils.getListChildNodes(node, domUtils.isSpanWithoutAttr) || [];
+			for (let i = ch.length - 1; i >= 0; i--) {
+				ch[i].outerHTML = ch[i].innerHTML;
+			}
+
 			if (!requireFormat || this.format.isLine(node) || this.format.isBlock(node) || this.component.is(node) || domUtils.isMedia(node) || (domUtils.isAnchor(node) && domUtils.isMedia(node.firstElementChild))) {
-				return node.outerHTML;
+				return domUtils.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML;
 			} else {
-				return '<' + defaultLineTag + '>' + node.outerHTML + '</' + defaultLineTag + '>';
+				return '<' + defaultTag + '>' + (domUtils.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML) + '</' + defaultTag + '>';
 			}
 		}
 		// text
@@ -941,6 +949,76 @@ HTML.prototype = {
 		});
 	},
 
+	/**
+	 * @description Determines if formatting is required and returns a domTree
+	 * @param {Element} dom documentFragment
+	 * @returns {Element}
+	 * @private
+	 */
+	_editFormat: function (dom) {
+		let value = '',
+			f;
+		const tempTree = dom.childNodes;
+		for (let i = 0, len = tempTree.length, n; i < len; i++) {
+			n = tempTree[i];
+			if (!this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !/meta/i.test(n.nodeName)) {
+				if (!f) f = domUtils.createElement(options.defaultTag);
+				f.appendChild(n);
+				i--;
+				len--;
+			} else {
+				if (f) {
+					value += f.outerHTML;
+					f = null;
+				}
+				value += n.outerHTML;
+			}
+		}
+
+		if (f) value += f.outerHTML;
+
+		return this._d.createRange().createContextualFragment(value);
+	},
+
+	_convertListCell: function (domTree) {
+		let html = '';
+
+		for (let i = 0, len = domTree.length, node; i < len; i++) {
+			node = domTree[i];
+			if (node.nodeType === 1) {
+				if (domUtils.isList(node)) {
+					html += node.innerHTML;
+				} else if (domUtils.isListCell(node)) {
+					html += node.outerHTML;
+				} else if (this.format.isLine(node)) {
+					html += '<li>' + (node.innerHTML.trim() || '<br>') + '</li>';
+				} else if (this.format.isBlock(node) && !domUtils.isTable(node)) {
+					html += this._convertListCell(node);
+				} else {
+					html += '<li>' + node.outerHTML + '</li>';
+				}
+			} else {
+				html += '<li>' + (node.textContent || '<br>') + '</li>';
+			}
+		}
+
+		return html;
+	},
+
+	_isFormatData: function (domTree) {
+		let requireFormat = false;
+
+		for (let i = 0, len = domTree.length, t; i < len; i++) {
+			t = domTree[i];
+			if (t.nodeType === 1 && !this.format.isTextStyleNode(t) && !domUtils.isBreak(t) && !DisallowedElements(t)) {
+				requireFormat = true;
+				break;
+			}
+		}
+
+		return requireFormat;
+	},
+
 	constructor: HTML
 };
 
@@ -1007,7 +1085,37 @@ function CleanElements(lowLevelCheck, m, t) {
 		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
 		if (sv) {
 			if (!v) v = [];
-			v.push(sv[0]);
+			const style = sv[0].replace(/&quot;/g, '').match(/\s*(font-family|font-size|color|background-color)\s*:[^;]+(?!;)*/gi);
+			if (style) {
+				const allowedStyle = [];
+				for (let i = 0, len = style.length, r; i < len; i++) {
+					r = style[i].match(/(.+)(:)([^:]+$)/);
+					if (r && !/inherit|initial/i.test(r[3])) {
+						const k = global.kebabToCamelCase(r[1].trim());
+						const v = this.wwComputedStyle[k].replace(/"/g, '');
+						const c = r[3].trim();
+						switch (k) {
+							case 'fontFamily':
+								if (this.options.plugins.font ? this.options.font.indexOf(c) === -1 : true) continue;
+								break;
+							case 'fontSize':
+								if (!this.options.plugins.fontSize) continue;
+								break;
+							case 'color':
+								if (!this.options.plugins.fontColor) continue;
+								break;
+							case 'backgroundColor':
+								if (!this.options.plugins.hiliteColor) continue;
+								break;
+						}
+
+						if (v !== c) {
+							allowedStyle.push(r[0]);
+						}
+					}
+				}
+				if (allowedStyle.length > 0) v.push('style="' + allowedStyle.join(';') + '"');
+			}
 		}
 	}
 
@@ -1037,8 +1145,8 @@ function CleanElements(lowLevelCheck, m, t) {
 
 	if (v) {
 		for (let i = 0, len = v.length; i < len; i++) {
-			if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i])) continue;
-			t += ' ' + (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i]) ? '' : v[i]);
+			if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i].trim())) continue;
+			t += ' ' + (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i].trim()) ? '' : v[i]);
 		}
 	}
 

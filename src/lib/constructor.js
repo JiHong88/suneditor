@@ -206,6 +206,21 @@ export function ResetOptions(mergeOptions, context, originOptions) {
  * @param {Object} options Options object
  */
 function _initOptions(element, options) {
+	const plugins = {};
+	if (options.plugins) {
+		const _plugins = options.plugins;
+		const pluginsValues = _plugins.length
+			? _plugins
+			: Object.keys(_plugins).map(function (name) {
+					return _plugins[name];
+			  });
+		for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
+			p = pluginsValues[i].default || pluginsValues[i];
+			plugins[p.name] = p;
+		}
+	}
+	options.plugins = plugins;
+
 	/** base */
 	options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
 	options.lang = options.lang || _defaultLang;
@@ -329,7 +344,7 @@ function _initOptions(element, options) {
 
 	/** Defining menu items */
 	options.hrItems = !options.hrItems ? null : options.hrItems;
-	options.font = !options.font ? null : options.font;
+	options.font = !options.font ? ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'] : options.font;
 	options.fontSize = !options.fontSize ? null : options.fontSize;
 	options.formats = !options.formats ? null : options.formats;
 	options.colorList_font = !options.colorList_font ? null : options.colorList_font;
@@ -702,7 +717,7 @@ function _createModuleGroup() {
  */
 function _createButton(className, title, dataCommand, dataType, innerHTML, _disabled, _icons) {
 	const oLi = domUtils.createElement('LI');
-	const label = (title || '');
+	const label = title || '';
 	const oButton = domUtils.createElement('BUTTON', {
 		type: 'button',
 		class: 'se-btn' + (className ? ' ' + className : '') + ' se-tooltip',
@@ -744,11 +759,11 @@ export function UpdateButton(element, plugin) {
 /**
  * @description Create editor HTML
  * @param {Array} buttonList option.buttonList
- * @param {Array|Object|null} _plugins Plugins
+ * @param {Object|null} plugins Plugins
  * @param {Array} options options
  * @returns {Object} { element: (Element) Toolbar element, plugins: (Array|null) Plugins Array, pluginCallButtons: (Object), responsiveButtons: (Array) }
  */
-function _createToolBar(buttonList, _plugins, options) {
+function _createToolBar(buttonList, plugins, options) {
 	const _buttonTray = domUtils.createElement('DIV', { class: 'se-btn-tray' });
 	const separator_vertical = domUtils.createElement('DIV', { class: 'se-toolbar-separator-vertical' });
 	const tool_bar = domUtils.createElement('DIV', { class: 'se-toolbar sun-editor-common' }, _buttonTray);
@@ -759,18 +774,6 @@ function _createToolBar(buttonList, _plugins, options) {
 	const defaultButtonList = _defaultButtons(options);
 	const pluginCallButtons = {};
 	const responsiveButtons = [];
-	const plugins = {};
-	if (_plugins) {
-		const pluginsValues = _plugins.length
-			? _plugins
-			: Object.keys(_plugins).map(function (name) {
-					return _plugins[name];
-			  });
-		for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
-			p = pluginsValues[i].default || pluginsValues[i];
-			plugins[p.name] = p;
-		}
-	}
 
 	let module = null;
 	let button = null;

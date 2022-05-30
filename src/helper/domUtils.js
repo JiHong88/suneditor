@@ -795,6 +795,15 @@ export function isEmptyLine(element) {
 }
 
 /**
+ * @description Check the span's attributes are empty.
+ * @param {Element|null} element Element node
+ * @returns {Boolean}
+ */
+export function isSpanWithoutAttr(element) {
+	return !!element && element.nodeType === 1 && /^SPAN$/i.test(element.nodeName) && !element.className && !element.style.cssText;
+}
+
+/**
  * @description Checks for "__se__uneditable" in the class list.
  * Components with class "__se__uneditable" cannot be modified.
  * @param {Element} element The element to check
@@ -856,6 +865,7 @@ const domUtils = {
 	isAnchor: isAnchor,
 	isMedia: isMedia,
 	isEmptyLine: isEmptyLine,
+	isSpanWithoutAttr: isSpanWithoutAttr,
 	isUneditable: isUneditable,
 	isImportantDisabled: isImportantDisabled
 };

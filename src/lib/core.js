@@ -208,6 +208,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	 * @private
 	 */
 	this._editorHeight = 0;
+	this._editorHeightPadding = 0;
 
 	/**
 	 * @description Is inline mode?
@@ -1591,6 +1592,7 @@ Core.prototype = {
 		this._charTypeHTML = options.charCounter_type === 'byte-html';
 		this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
 		this._editorHeight = context.element.wysiwygFrame.offsetHeight;
+		this._editorHeightPadding = numbers.getNumber(this.wwComputedStyle.getPropertyValue('padding-top')) + numbers.getNumber(this.wwComputedStyle.getPropertyValue('padding-bottom'));
 
 		if (!options.iframe && typeof _w.ShadowRoot === 'function') {
 			let child = context.element.wysiwygFrame;
@@ -1835,7 +1837,7 @@ Core.prototype = {
 	},
 
 	__callResizeFunction: function (h, resizeObserverEntry) {
-		h = h === -1 ? resizeObserverEntry.borderBoxSize[0].blockSize : h;
+		h = h === -1 ? (resizeObserverEntry.borderBoxSize ? resizeObserverEntry.borderBoxSize[0].blockSize : (resizeObserverEntry.contentRect.height + this._editorHeightPadding)) : h;
 		if (this._editorHeight !== h) {
 			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, this._editorHeight, core, resizeObserverEntry);
 			this._editorHeight = h;

@@ -4,7 +4,7 @@
  */
 
 import CoreInterface from '../../interface/_core';
-import { domUtils, unicode, env } from '../../helper';
+import { domUtils, unicode, env, numbers } from '../../helper';
 
 const Node = function (editor) {
 	CoreInterface.call(this, editor);
@@ -15,12 +15,33 @@ Node.prototype = {
 	 * @description Split all tags based on "baseNode"
 	 * Returns the last element of the splited tag.
 	 * @param {Node} baseNode Element or text node on which to base
-	 * @param {Number|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
+	 * @param {Number|Node|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
 	 * @param {number} depth The nesting depth of the element being split. (default: 0)
 	 * @returns {Element}
 	 */
 	split: function (baseNode, offset, depth) {
 		if (domUtils.isWysiwygFrame(baseNode)) return baseNode;
+
+		if (!!offset && !numbers.isNumber(offset)) {
+			const children =  baseNode.childNodes;
+			let index = domUtils.getPositionIndex(offset);
+			const prev = baseNode.cloneNode(false);
+			const next = baseNode.cloneNode(false);
+			for (let i = 0, len = children.length; i < len; i++) {
+				if (i < index) prev.appendChild(children[i]);
+				else if (i > index) next.appendChild(children[i]);
+				else continue;
+				i--;
+				len--;
+				index--;
+			}
+
+			if (prev.childNodes.length > 0) baseNode.parentNode.insertBefore(prev, baseNode);
+			if (next.childNodes.length > 0) baseNode.parentNode.insertBefore(next, baseNode.nextElementSibling);
+
+			return baseNode;
+		}
+
 		const bp = baseNode.parentNode;
 		let index = 0,
 			newEl,

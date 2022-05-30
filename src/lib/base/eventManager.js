@@ -468,12 +468,6 @@ EventManager.prototype = {
 		}
 
 		if (cleanData) {
-			if (domUtils.isListCell(this.format.getLine(this.selection.get(), null))) {
-				const dom = _d.createRange().createContextualFragment(cleanData);
-				const domTree = dom.childNodes;
-				if (domTree.length > 1 && domTree[0].nodeType === 1) cleanData = ConvertListCell(domTree);
-			}
-
 			this.html.insert(cleanData, true, false);
 			return false;
 		}
@@ -1780,29 +1774,6 @@ function OnResize_window() {
 		this.context.element.toolbar.style.width = this.context.element.topArea.offsetWidth - 2 + 'px';
 		this.toolbar._resetSticky();
 	}
-}
-
-function ConvertListCell(domTree) {
-	let html = '';
-
-	for (let i = 0, len = domTree.length, node; i < len; i++) {
-		node = domTree[i];
-		if (node.nodeType === 1) {
-			if (domUtils.isListCell(node) || domUtils.isList(node)) {
-				html += node.outerHTML;
-			} else if (domUtils.isLine(node)) {
-				html += '<li>' + (node.innerHTML.trim() || '<br>') + '</li>';
-			} else if (domUtils.isBlock(node) && !domUtils.isTable(node)) {
-				html += ConvertListCell(node);
-			} else {
-				html += '<li>' + node.outerHTML + '</li>';
-			}
-		} else {
-			html += '<li>' + (node.textContent || '<br>') + '</li>';
-		}
-	}
-
-	return html;
 }
 
 export default EventManager;

@@ -7,9 +7,11 @@ export const _d = document;
  * @returns {Array.<any>}
  */
 export function getValues(obj) {
-	return !obj ? [] : this._w.Object.keys(obj).map(function (i) {
-		return obj[i];
-	});
+	return !obj
+		? []
+		: this._w.Object.keys(obj).map(function (i) {
+				return obj[i];
+		  });
 }
 
 /**
@@ -24,6 +26,23 @@ export function camelToKebabCase(param) {
 	} else {
 		return param.map(function (str) {
 			return camelToKebabCase(str);
+		});
+	}
+}
+
+/**
+ * @description Convert the KebabCase To the CamelCase.
+ * @param {String|Array} param [KebabCase string]
+ * @returns {String|Array}
+ */
+export function kebabToCamelCase(param) {
+	if (typeof param === 'string') {
+		return param.replace(/-[a-zA-Z]/g, function (letter) {
+			return letter.replace('-', '').toUpperCase();
+		});
+	} else {
+		return param.map(function (str) {
+			return util.camelToKebabCase(str);
 		});
 	}
 }
@@ -99,10 +118,7 @@ export function getIncludePath(nameArray, extension) {
 		fileName += nameArray[i] + (i < len - 1 ? '|' : ')');
 	}
 
-	const regExp = new _w.RegExp(
-		'(^|.*[\\/])' + fileName + '(\\.[^\\/]+)?.' + extension + '(?:\\?.*|;.*)?$',
-		'i'
-	);
+	const regExp = new _w.RegExp('(^|.*[\\/])' + fileName + '(\\.[^\\/]+)?.' + extension + '(?:\\?.*|;.*)?$', 'i');
 	const extRegExp = new _w.RegExp('.+\\.' + extension + '(?:\\?.*|;.*)?$', 'i');
 
 	for (let c = _d.getElementsByTagName(tagName), i = 0; i < c.length; i++) {
@@ -121,22 +137,9 @@ export function getIncludePath(nameArray, extension) {
 
 	if (path === '') path = pathList.length > 0 ? pathList[0][src] : '';
 
-	-
-	1 === path.indexOf(':/') &&
-		'//' !== path.slice(0, 2) &&
-		(path =
-			0 === path.indexOf('/') ?
-			location.href.match(/^.*?:\/\/[^\/]*/)[0] + path :
-			location.href.match(/^[^\?]*\/(?:)/)[0] + path);
+	-1 === path.indexOf(':/') && '//' !== path.slice(0, 2) && (path = 0 === path.indexOf('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
 
-	if (!path)
-		throw (
-			'[SUNEDITOR.helper.global.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (name: +' +
-			name +
-			', extension: ' +
-			extension +
-			')'
-		);
+	if (!path) throw '[SUNEDITOR.helper.global.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (name: +' + name + ', extension: ' + extension + ')';
 
 	return path;
 }
@@ -146,6 +149,7 @@ const global = {
 	_d: _d,
 	getValues: getValues,
 	camelToKebabCase: camelToKebabCase,
+	kebabToCamelCase: kebabToCamelCase,
 	getXMLHttpRequest: getXMLHttpRequest,
 	getPageStyle: getPageStyle,
 	getIncludePath: getIncludePath
