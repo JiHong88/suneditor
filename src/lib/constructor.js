@@ -307,7 +307,7 @@ function _initOptions(element, options) {
 	options.iframe_cssFileName = options.iframe ? (typeof options.iframe_cssFileName === 'string' ? [options.iframe_cssFileName] : options.iframe_cssFileName || ['suneditor']) : null;
 
 	/** Styles */
-	options.popupType = options.popupType || 'full';
+	options.dialoglType = options.dialoglType || 'full';
 	options.editorCSSText = typeof options.editorCSSText === 'string' ? options.editorCSSText : '';
 	options.width = options.width ? (numbers.is(options.width) ? options.width + 'px' : options.width) : element.clientWidth ? element.clientWidth + 'px' : '100%';
 	options.minWidth = (numbers.is(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';

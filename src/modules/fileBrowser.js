@@ -153,7 +153,7 @@
                 fileBrowserContext.list.className = 'se-file-browser-list ' + listClassName;
             }
 
-            if (this.options.popupType === 'full') {
+            if (this.options.dialoglType === 'full') {
                 fileBrowserContext.area.style.position = 'fixed';
             } else {
                 fileBrowserContext.area.style.position = 'absolute';

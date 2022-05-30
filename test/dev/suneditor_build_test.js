@@ -221,7 +221,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     // },
 //     // height: 'auto',
 //     iframe_cssFileName: '.+',
-//     popupType: 'full',
+//     dialoglType: 'full',
 //     charCounter: true,
 //     charCounter_type: 'byte-html',
 //     charCounter_label: 'Characters :',
@@ -796,7 +796,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     width: '100%',
 //     height: '500px',
 //     toolbar_sticky: false,
-//     popupType: 'local',
+//     dialoglType: 'local',
 //     // iframe: true,
 //     // maxCharCount: 300,
 //     // statusbar: false

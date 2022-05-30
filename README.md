@@ -462,7 +462,7 @@ mathFontSize    : Math plugin font size list.                       default: [{.
                   ]
 
 // Display-------------------------------------------------------------------------------------------------------
-popupType    : Size of background area when activating dialog window ('full'||'local') default: 'full' {string}
+dialoglType    : Size of background area when activating dialog window ('full'||'local') default: 'full' {string}
 
 // Statusbar-------------------------------------------------------------------------------------------
 statusbar     : Show the bottom resizing bar.

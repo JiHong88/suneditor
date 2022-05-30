@@ -1,0 +1,137 @@
+$main: #8DBE4A;
+$main-lighter: #A1D25E;
+$main-clear: #F5F8F3;
+$buttonWhite: #FFFFFF;
+$sunEditorStyleSelected: #454645;
+
+.sun-editor {
+	position: relative;
+	border-radius: 10px 10px 0 0 !important;
+	border: none !important;
+	padding: 1px 1px 0 1px;
+}
+
+.sun-editor-custom {
+	margin: 24px;
+}
+
+.sun-editor .se-btn-module-border {
+	border-radius: 6px !important;
+}
+
+.se-btn-tray .se-btn-module:last-child {
+	position: absolute;
+	right: 4px;
+}
+
+div.se-resizing-bar.sun-editor-common {
+	display: none !important;
+}
+
+.sun-editor .se-btn-tray button {
+	color: $buttonWhite !important;
+}
+
+.sun-editor .se-controller-resizing {
+	background-color: $main-lighter !important;
+}
+
+.se-btn:enabled.active {
+	color: $sunEditorStyleSelected !important;
+}
+
+.se-btn-module {
+	background-color: $main-lighter;
+
+	&:active {
+		background-color: $main-lighter;
+	}
+}
+
+.sun-editor .se-btn-module-border {
+	margin: 0 2.5px !important;
+}
+
+.se-btn-tray {
+	background-color: $main;
+}
+
+.sun-editor .se-toolbar {
+	border-radius: 10px 10px 10px 10px !important;
+}
+
+.sun-editor .se-btn-module-border {
+	border: none !important;
+}
+
+.sun-editor .se-btn:enabled:focus,
+.sun-editor .se-btn:enabled:hover {
+	background-color: inherit !important;
+}
+
+.sun-editor .se-btn-tray {
+	padding: 5px 2.5px 0 !important;
+	border-radius: 10px 10px 0 0;
+}
+
+.sun-editor .se-toolbar {
+	outline: none !important;
+}
+
+.file-input {
+	&__aria {
+		display: flex;
+		justify-content: flex-end;
+		align-items: flex-end;
+		flex-direction: column;
+
+		background-color: white;
+		padding: 8px;
+
+		border-radius: 0 0 10px 10px;
+	}
+
+	&__input {
+		right: 30px;
+		display: inline-block;
+		background-color: $main-clear;
+		color: $main;
+		border-radius: 6px;
+		padding: 0.7rem;
+		font-family: sans-serif;
+		cursor: pointer;
+		margin-top: 1rem;
+
+		width: 160px;
+		height: 40px;
+		text-align: center;
+	}
+
+	&__item-aria {
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+
+		padding: 15px 0;
+
+		&__info-block {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		&__info-block span {
+			margin-left: 10px;
+		}
+	}
+
+	&__remove {
+		border: none;
+		background-color: inherit;
+		color: $main;
+		font-weight: 400;
+		font-size: 16px;
+		line-height: 20px;
+		text-decoration: underline;
+	}
+}

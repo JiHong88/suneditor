@@ -86,6 +86,7 @@ list.prototype = {
 	/**
 	 * @override core
 	 * @param {"bullet"|"numbered"} command List type
+	 * @param {string} type List style type
 	 */
 	action: function (command, type) {
 		const range = this.format.applyList(command + ':' + type, null, false);

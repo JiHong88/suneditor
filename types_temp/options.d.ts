@@ -145,7 +145,7 @@ export interface SunEditorOptions {
     /**
      * Size of background area when activating dialog window ('full'||'local')
      */
-    popupType?: 'full' | 'local';
+    dialoglType?: 'full' | 'local';
     /**
      * Bottom resizing bar
      * ===================

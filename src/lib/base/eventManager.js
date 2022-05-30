@@ -7,16 +7,17 @@ import CoreInterface from '../../interface/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
 import { _w, _d } from '../../helper/global';
 
+const DIRECTION_KEYCODE = new _w.RegExp('^(8|13|3[2-9]|40|46)$');
+const NON_TEXT_KEYCODE = new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$');
+const HISTORY_IGNORE_KEYCODE = new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$');
+const FRONT_ZEROWIDTH = new _w.RegExp(unicode.zeroWidthSpace + '+', '');
+
 const EventManager = function (editor) {
 	CoreInterface.call(this, editor);
 	this._events = [];
 	this._onButtonsCheck = new _w.RegExp('^(' + _w.Object.keys(editor.options._styleNodeMap).join('|') + ')$', 'i');
 	this._onShortcutKey = false;
 	this._IEisComposing = false; // In IE, there is no 'e.isComposing' in the key-up event.
-	this._directionKeyCode = new _w.RegExp('^(8|13|3[2-9]|40|46)$');
-	this._nonTextKeyCode = new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$');
-	this._historyIgnoreKeyCode = new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$');
-	this._frontZeroWidthReg = new _w.RegExp(unicode.zeroWidthSpace + '+', '');
 	this._lineBreakerButton = editor._lineBreaker.querySelector('button');
 	this._balloonDelay = null;
 	this._resizeObserver = null;
@@ -757,7 +758,7 @@ function OnKeyDown_wysiwyg(e) {
 	const alt = e.altKey;
 	this._IEisComposing = keyCode === 229;
 
-	if (!ctrl && this.status.isReadOnly && !this._directionKeyCode.test(keyCode)) {
+	if (!ctrl && this.status.isReadOnly && !DIRECTION_KEYCODE.test(keyCode)) {
 		e.preventDefault();
 		return false;
 	}
@@ -1478,7 +1479,7 @@ function OnKeyDown_wysiwyg(e) {
 		}
 	}
 
-	const textKey = !ctrl && !alt && !selectRange && !this._nonTextKeyCode.test(keyCode);
+	const textKey = !ctrl && !alt && !selectRange && !NON_TEXT_KEYCODE.test(keyCode);
 	if (textKey && range.collapsed && range.startContainer === range.endContainer && domUtils.isBreak(range.commonAncestorContainer)) {
 		const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
 		this.html.insertNode(zeroWidth, null, false);
@@ -1495,7 +1496,7 @@ function OnKeyUp_wysiwyg(e) {
 	const alt = e.altKey;
 
 	if (this.status.isReadOnly) {
-		if (!ctrl && this._directionKeyCode.test(keyCode)) this.applyTagEffect();
+		if (!ctrl && DIRECTION_KEYCODE.test(keyCode)) this.applyTagEffect();
 		return;
 	}
 
@@ -1533,15 +1534,15 @@ function OnKeyUp_wysiwyg(e) {
 		selectionNode = this.selection.getNode();
 	}
 
-	if (this._directionKeyCode.test(keyCode)) {
+	if (DIRECTION_KEYCODE.test(keyCode)) {
 		this.applyTagEffect();
 	}
 
-	const textKey = !ctrl && !alt && !this._nonTextKeyCode.test(keyCode);
+	const textKey = !ctrl && !alt && !NON_TEXT_KEYCODE.test(keyCode);
 	if (textKey && selectionNode.nodeType === 3 && unicode.zeroWidthRegExp.test(selectionNode.textContent) && !(e.isComposing !== undefined ? e.isComposing : this._IEisComposing)) {
 		let so = range.startOffset,
 			eo = range.endOffset;
-		const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(this._frontZeroWidthReg) || '').length;
+		const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(FRONT_ZEROWIDTH) || '').length;
 		so = range.startOffset - frontZeroWidthCnt;
 		eo = range.endOffset - frontZeroWidthCnt;
 		selectionNode.textContent = selectionNode.textContent.replace(unicode.zeroWidthRegExp, '');
@@ -1554,7 +1555,7 @@ function OnKeyUp_wysiwyg(e) {
 	if (typeof this.events.onKeyUp === 'function' && this.events.onKeyUp(e) === false) return;
 
 	// history stack
-	if (!ctrl && !alt && !this._historyIgnoreKeyCode.test(keyCode)) {
+	if (!ctrl && !alt && !HISTORY_IGNORE_KEYCODE.test(keyCode)) {
 		this.history.push(true);
 	}
 }
@@ -1578,8 +1579,8 @@ function OnCopy_wysiwyg(e) {
 	const info = this.editor.currentFileComponentInfo;
 	if (info && !env.isIE) {
 		this._setClipboardComponent(e, info, clipboardData);
-		domUtils.addClass(info.component, 'se-component-copy');
 		// copy effect
+		domUtils.addClass(info.component, 'se-component-copy');
 		_w.setTimeout(function () {
 			domUtils.removeClass(info.component, 'se-component-copy');
 		}, 150);
