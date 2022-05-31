@@ -677,9 +677,6 @@ function _defaultButtons(options) {
 		save: ['se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmd + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save],
 		/** plugins - dropdown */
 		table: ['', lang.toolbar.table, 'table', 'dropdown', icons.table],
-		template: ['', lang.toolbar.template, 'template', 'dropdown', icons.template],
-		paragraphStyle: ['', lang.toolbar.paragraphStyle, 'paragraphStyle', 'dropdown', icons.paragraph_style],
-		textStyle: ['', lang.toolbar.textStyle, 'textStyle', 'dropdown', icons.text_style],
 		/** plugins - dialog */
 		link: ['', lang.toolbar.link, 'link', 'dialog', icons.link],
 		image: ['', lang.toolbar.image, 'image', 'dialog', icons.image],

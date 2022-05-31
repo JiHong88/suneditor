@@ -493,6 +493,7 @@ Core.prototype = {
 				// @todo
 				break;
 			case 'selectAll':
+				this.menu.controllerOff();
 				this.menu.containerOff();
 				const wysiwyg = this.context.element.wysiwyg;
 				let first =
@@ -684,7 +685,7 @@ Core.prototype = {
 	 * @param {string|undefined} html HTML string
 	 */
 	setContent: function (html) {
-		this.removeRange();
+		this.selection.removeRange();
 
 		const convertValue = html === null || html === undefined ? '' : this.html.clean(html, true, null, null);
 		this._resetComponents();

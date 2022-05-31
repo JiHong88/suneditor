@@ -23,10 +23,15 @@ import formatBlock from "../../src/plugins/dropdown/formatBlock";
 import horizontalLine from "../../src/plugins/dropdown/horizontalLine";
 import lineHeight from "../../src/plugins/dropdown/lineHeight";
 import list from "../../src/plugins/dropdown/list";
+import paragraphStyle from "../../src/plugins/dropdown/paragraphStyle";
+import template from "../../src/plugins/dropdown/template";
+import textStyle from "../../src/plugins/dropdown/textStyle";
 
 window.e = suneditor.create(document.getElementById('editor2'), {
     // value: 'abc',
-    plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock, horizontalLine, lineHeight, list],
+    plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock, horizontalLine, lineHeight, list,
+        paragraphStyle, template, textStyle
+    ],
     charCounter: true,
     statusbar: true,
     // mode: "inline",
@@ -37,6 +42,16 @@ window.e = suneditor.create(document.getElementById('editor2'), {
         'Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact',
         'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'
     ],
+    templates: [
+        {
+            name: 'Template-1',
+            html: '<p>HTML source1</p>'
+        },
+        {
+            name: 'Template-2',
+            html: '<p>HTML source2</p>'
+        }
+      ],
     // iframe: true,
     // iframe_fullPage: true,
     imageMultipleFile: true,
@@ -48,7 +63,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
         ['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'horizontalLine'],
-        ['lineHeight', 'list']
+        ['lineHeight', 'list', 'paragraphStyle', 'template', 'textStyle']
     ]
 });
 
