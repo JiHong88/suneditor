@@ -1,6 +1,7 @@
 // command
 import { CommandPlugin } from "./CommandPlugin";
 import blockquote from "./command/blockquote";
+import formatPainter from "./command/formatPainter";
 
 // submenu
 import { SubmenuPlugin } from "./SubmenuPlugin";
@@ -32,6 +33,7 @@ import imageGallery from "./fileBrowser/imageGallery";
 
 declare const _default: {
   blockquote: CommandPlugin;
+  formatPainter: CommandPlugin;
   align: SubmenuPlugin;
   font: SubmenuPlugin;
   fontSize: SubmenuPlugin;
@@ -55,6 +57,7 @@ declare const _default: {
 
 export {
   blockquote,
+  formatPainter,
   align,
   font,
   fontSize,
