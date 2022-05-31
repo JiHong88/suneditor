@@ -17,7 +17,7 @@ const Constructor = function (element, options) {
 	if (typeof options !== 'object') options = {};
 
 	/** --- init options --- */
-	_initOptions(element, options);
+	InitOptions(element, options);
 
 	// suneditor div
 	const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (options._rtl ? ' se-rtl' : '') });
@@ -133,7 +133,7 @@ const Constructor = function (element, options) {
  * @returns {Object}
  */
 export function ResetOptions(mergeOptions, context, originOptions) {
-	_initOptions(context.element.originElement, mergeOptions);
+	InitOptions(context.element.originElement, mergeOptions);
 
 	const el = context.element;
 	const relative = el.relative;
@@ -205,7 +205,7 @@ export function ResetOptions(mergeOptions, context, originOptions) {
  * @param {Element} element Options object
  * @param {Object} options Options object
  */
-function _initOptions(element, options) {
+function InitOptions(element, options) {
 	const plugins = {};
 	if (options.plugins) {
 		const _plugins = options.plugins;
@@ -232,6 +232,7 @@ function _initOptions(element, options) {
 		}
 		return _default;
 	}, {}));
+	options._spanStylesRegExp = new _w.RegExp('\s*(font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')\s*:[^;]+(?!;)*', 'gi');
 	options._styleNodeMap = {
 		strong: textTags.bold.toLowerCase(),
 		b: textTags.bold.toLowerCase(),

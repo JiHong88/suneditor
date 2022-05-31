@@ -1592,7 +1592,7 @@ Core.prototype = {
 		this._charTypeHTML = options.charCounter_type === 'byte-html';
 		this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
 		this._editorHeight = context.element.wysiwygFrame.offsetHeight;
-		this._editorHeightPadding = numbers.getNumber(this.wwComputedStyle.getPropertyValue('padding-top')) + numbers.getNumber(this.wwComputedStyle.getPropertyValue('padding-bottom'));
+		this._editorHeightPadding = numbers.get(this.wwComputedStyle.getPropertyValue('padding-top')) + numbers.get(this.wwComputedStyle.getPropertyValue('padding-bottom'));
 
 		if (!options.iframe && typeof _w.ShadowRoot === 'function') {
 			let child = context.element.wysiwygFrame;
@@ -1708,8 +1708,8 @@ Core.prototype = {
 
 		this._managedElementInfo.query = managedClass.toString();
 		this._fileManager.queryString = this._fileManager.tags.join(',');
-		this._fileManager.regExp = new wRegExp('^(' + (this._fileManager.tags.join('|') || '^') + ')$', 'i');
-		this._fileManager.pluginRegExp = new wRegExp('^(' + (filePluginRegExp.length === 0 ? '^' : filePluginRegExp.join('|')) + ')$', 'i');
+		this._fileManager.regExp = new wRegExp('^(' + (this._fileManager.tags.join('|') || '\\^') + ')$', 'i');
+		this._fileManager.pluginRegExp = new wRegExp('^(' + (filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')) + ')$', 'i');
 
 		// init content
 		this._initWysiwygArea(reload, _initHTML);

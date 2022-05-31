@@ -22,7 +22,7 @@ Node.prototype = {
 	split: function (baseNode, offset, depth) {
 		if (domUtils.isWysiwygFrame(baseNode)) return baseNode;
 
-		if (!!offset && !numbers.isNumber(offset)) {
+		if (!!offset && !numbers.is(offset)) {
 			const children =  baseNode.childNodes;
 			let index = domUtils.getPositionIndex(offset);
 			const prev = baseNode.cloneNode(false);

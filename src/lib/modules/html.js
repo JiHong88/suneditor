@@ -119,11 +119,9 @@ HTML.prototype = {
 
 		let domTree = dom.childNodes;
 		let cleanData = '';
-		const requireFormat = this._isFormatData(domTree);
-
-		if(requireFormat) {
-			domTree = this._editFormat(dom).childNodes;
-		}
+		
+		if(!requireFormat) requireFormat = this._isFormatData(domTree);
+		if (requireFormat) domTree = this._editFormat(dom).childNodes;
 
 		for (let i = 0, len = domTree.length; i < len; i++) {
 			cleanData += this._makeLine(domTree[i], requireFormat);
@@ -366,7 +364,7 @@ HTML.prototype = {
 							if (this.format.isLine(container)) {
 								container.innerHTML = '<br>';
 							} else if (this.format.isBlock(container)) {
-								container.innerHTML = '<' + this.options.defaultTag + '><br></' + this.options.defaultTag + '>';
+								container.innerHTML = '<' + this.options.defaultLineTag + '><br></' + this.options.defaultLineTag + '>';
 							}
 						}
 
@@ -436,7 +434,7 @@ HTML.prototype = {
 				}
 
 				if (domUtils.isWysiwygFrame(parentNode) && (oNode.nodeType === 3 || domUtils.isBreak(oNode))) {
-					const fNode = domUtils.createElement(this.options.defaultTag, null, oNode);
+					const fNode = domUtils.createElement(this.options.defaultLineTag, null, oNode);
 					oNode = fNode;
 				}
 			}
@@ -776,7 +774,7 @@ HTML.prototype = {
 			if (!requireFormat || this.format.isLine(node) || this.format.isBlock(node) || this.component.is(node) || domUtils.isMedia(node) || (domUtils.isAnchor(node) && domUtils.isMedia(node.firstElementChild))) {
 				return domUtils.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML;
 			} else {
-				return '<' + defaultTag + '>' + (domUtils.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML) + '</' + defaultTag + '>';
+				return '<' + defaultLineTag + '>' + (domUtils.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML) + '</' + defaultLineTag + '>';
 			}
 		}
 		// text
@@ -962,7 +960,7 @@ HTML.prototype = {
 		for (let i = 0, len = tempTree.length, n; i < len; i++) {
 			n = tempTree[i];
 			if (!this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !/meta/i.test(n.nodeName)) {
-				if (!f) f = domUtils.createElement(options.defaultTag);
+				if (!f) f = domUtils.createElement(this.options.defaultLineTag);
 				f.appendChild(n);
 				i--;
 				len--;
@@ -1085,7 +1083,7 @@ function CleanElements(lowLevelCheck, m, t) {
 		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
 		if (sv) {
 			if (!v) v = [];
-			const style = sv[0].replace(/&quot;/g, '').match(/\s*(font-family|font-size|color|background-color)\s*:[^;]+(?!;)*/gi);
+			const style = sv[0].replace(/&quot;/g, '').match(this.options._spanStylesRegExp);
 			if (style) {
 				const allowedStyle = [];
 				for (let i = 0, len = style.length, r; i < len; i++) {
