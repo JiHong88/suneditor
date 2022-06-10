@@ -4,7 +4,7 @@ import { domUtils, numbers, converter, env } from '../helper';
 import { _d, _w } from '../helper/global';
 
 const DEFAULT_ELEMENT_WHITELIST = 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
-const DEFAULT_ATTRIBUTE_WHITELIST = 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
+const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls';
 const DEFAULT_BUTTON_LIST = [['undo', 'redo'], ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'], ['removeFormat'], ['outdent', 'indent'], ['fullScreen', 'showBlocks', 'codeView'], ['preview', 'print']];
 
 /**
@@ -233,6 +233,7 @@ function InitOptions(element, options) {
 		return _default;
 	}, {}));
 	options._spanStylesRegExp = new _w.RegExp('\s*(font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')\s*:[^;]+(?!;)*', 'gi');
+	options._formatStylesRegExp = new _w.RegExp('\s*(text-align|margin-left|margin-right' + (options.formatStyles ? '|' + options.formatStyles : '') + ')\s*:[^;]+(?!;)*', 'gi');
 	options._styleNodeMap = {
 		strong: textTags.bold.toLowerCase(),
 		b: textTags.bold.toLowerCase(),
@@ -303,6 +304,7 @@ function InitOptions(element, options) {
 	options.toolbar_width = options.toolbar_width ? (numbers.is(options.toolbar_width) ? options.toolbar_width + 'px' : options.toolbar_width) : 'auto';
 	options.toolbar_container = typeof options.toolbar_container === 'string' ? _d.querySelector(options.toolbar_container) : options.toolbar_container;
 	options.toolbar_sticky = /balloon/i.test(options.mode) || !!options.toolbar_container ? -1 : options.toolbar_sticky === undefined ? 0 : /^\d+/.test(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1;
+	options.toolbar_hide = !!options.toolbar_hide;
 
 	/** Status bar */
 	options.statusbar = options.statusbar === undefined ? true : options.statusbar;
@@ -899,6 +901,8 @@ function _createToolBar(buttonList, plugins, options) {
 	// cover
 	const tool_cover = domUtils.createElement('DIV', { class: 'se-toolbar-cover' });
 	tool_bar.appendChild(tool_cover);
+
+	if (options.toolbar_hide) tool_bar.style.display = 'none';
 
 	return {
 		element: tool_bar,

@@ -164,7 +164,7 @@ export default {
 
         const w = this.context.audio._origin_w;
         const h = this.context.audio._origin_h;
-        oAudio.setAttribute('origin-size', w + ',' + h);
+        oAudio.setAttribute('data-origin-size', w + ',' + h);
         oAudio.style.cssText = (w ? ('width:' + w + '; ') : '') + (h ? ('height:' + h + ';') : '');
 
         return oAudio;

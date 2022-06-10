@@ -237,8 +237,8 @@
             }.bind(this, element);
     
             if (resizing) {
-                if (!element.getAttribute('origin-size') && element.naturalWidth) {
-                    element.setAttribute('origin-size', element.naturalWidth + ',' + element.naturalHeight);
+                if (!element.getAttribute('data-origin-size') && element.naturalWidth) {
+                    element.setAttribute('data-origin-size', element.naturalWidth + ',' + element.naturalHeight);
                 }
     
                 if (!element.getAttribute('data-origin')) {

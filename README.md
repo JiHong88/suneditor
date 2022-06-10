@@ -383,7 +383,7 @@ elementBlacklist         : Blacklist of the editor default tags.               d
 attributeWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}
                         // -- Fixed whitelist --
                         // Native attributes: 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls'
-                        // Editor attributes: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size'
+                        // Editor attributes: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|data-origin-size|data-exp|data-font-size'
                         ex) {
                             'all': 'style|data-.+', // Apply to all tags
                             'input': 'checked|name' // Apply to input tag
@@ -411,6 +411,7 @@ toolbar_container: A custom HTML selector placing the toolbar inside.
 toolbar_sticky   : Top offset value of "sticky toolbar".
                   Set to 0, '0px', '50px'...
                   If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
+hideToolbar     : The toolbar is rendered hidden.                   default: false {Boolean}
 fullScreenOffset: Top offset value of "full Screen".
                   Set to 0, '0px', '50px'...     default: 0 {Number|String}
 iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {Boolean}

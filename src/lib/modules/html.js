@@ -17,8 +17,13 @@ const HTML = function (editor) {
 	this._elementBlacklistRegExp = null;
 	this._attributeWhitelist = null;
 	this._attributeWhitelistRegExp = null;
+	this._attributeWhitelistRegExp_all_data = null;
 	this._attributeBlacklist = null;
 	this._attributeBlacklistRegExp = null;
+	this._cleanStyleRegExp = {
+		span: editor.options._spanStylesRegExp,
+		format: editor.options._formatStylesRegExp
+	};
 
 	// set disallow text nodes
 	const options = this.options;
@@ -37,11 +42,12 @@ const HTML = function (editor) {
 	// whitelist
 	// tags
 	const defaultAttr = options._defaultAttributeWhitelist;
+	const dataAttr = 'data-origin-size|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|data-exp|data-font-size';
 	this._allowHTMLComment = options._editorElementWhitelist.indexOf('//') > -1 || options._editorElementWhitelist === '*';
 	// html check
 	this._htmlCheckWhitelistRegExp = new _w.RegExp('^(' + GetRegList(options._editorElementWhitelist.replace('|//', ''), '') + ')$', 'i');
 	this._htmlCheckBlacklistRegExp = new _w.RegExp('^(' + (options.elementBlacklist || '^') + ')$', 'i');
-	// tags
+	// elements
 	this._elementWhitelistRegExp = converter.createElementWhitelist(GetRegList(options._editorElementWhitelist.replace('|//', '|<!--|-->'), ''));
 	this._elementBlacklistRegExp = converter.createElementBlacklist(options.elementBlacklist.replace('|//', '|<!--|-->'));
 	// attributes
@@ -60,7 +66,8 @@ const HTML = function (editor) {
 		}
 	}
 
-	this._attributeWhitelistRegExp = new _w.RegExp('\\s(?:' + (allAttr || defaultAttr) + ')' + regEndStr, 'ig');
+	this._attributeWhitelistRegExp = new _w.RegExp('\\s(?:' + (allAttr || defaultAttr + '|' + dataAttr) + ')' + regEndStr, 'ig');
+	this._attributeWhitelistRegExp_all_data = new _w.RegExp('\\s(?:' + ((allAttr || defaultAttr) + '|data-[a-z0-9\\-]+') + ')' + regEndStr, 'ig');
 	this._attributeWhitelist = tagsAttr;
 
 	// blacklist
@@ -1017,6 +1024,46 @@ HTML.prototype = {
 		return requireFormat;
 	},
 
+	_cleanStyle: function (m, v, tagName) {
+		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
+		if (sv) {
+			if (!v) v = [];
+			const style = sv[0].replace(/&quot;/g, '').match(this._cleanStyleRegExp[tagName]);
+			if (style) {
+				const allowedStyle = [];
+				for (let i = 0, len = style.length, r; i < len; i++) {
+					r = style[i].match(/(.+)(:)([^:]+$)/);
+					if (r && !/inherit|initial/i.test(r[3])) {
+						const k = global.kebabToCamelCase(r[1].trim());
+						const v = this.wwComputedStyle[k].replace(/"/g, '');
+						const c = r[3].trim();
+						switch (k) {
+							case 'fontFamily':
+								if (!this.options.plugins.font || this.options.font.indexOf(c) === -1) continue;
+								break;
+							case 'fontSize':
+								if (!this.options.plugins.fontSize) continue;
+								break;
+							case 'color':
+								if (!this.options.plugins.fontColor) continue;
+								break;
+							case 'backgroundColor':
+								if (!this.options.plugins.hiliteColor) continue;
+								break;
+						}
+
+						if (v !== c) {
+							allowedStyle.push(r[0]);
+						}
+					}
+				}
+				if (allowedStyle.length > 0) v.push('style="' + allowedStyle.join(';') + '"');
+			}
+		}
+
+		return v;
+	},
+
 	constructor: HTML
 };
 
@@ -1061,64 +1108,38 @@ function CleanElements(lowLevelCheck, m, t) {
 
 	// blacklist
 	const bAttr = this._attributeBlacklist[tagName];
+	m = m.replace(/\s(?:on[a-z]+)\s*=\s*(")[^"]*\1/ig, '');
 	if (bAttr) m = m.replace(bAttr, '');
 	else m = m.replace(this._attributeBlacklistRegExp, '');
 
 	// whitelist
 	const wAttr = this._attributeWhitelist[tagName];
 	if (wAttr) v = m.match(wAttr);
-	else v = m.match(this._attributeWhitelistRegExp);
+	else v = m.match(lowLevelCheck ? this._attributeWhitelistRegExp : this._attributeWhitelistRegExp_all_data);
 
-	// anchor
-	if (!lowLevelCheck || /<a\b/i.test(t)) {
-		const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
-		if (sv) {
-			if (!v) v = [];
-			v.push(sv[0]);
-		}
-	}
-
-	// span
-	if ((!lowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
-		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
-		if (sv) {
-			if (!v) v = [];
-			const style = sv[0].replace(/&quot;/g, '').match(this.options._spanStylesRegExp);
-			if (style) {
-				const allowedStyle = [];
-				for (let i = 0, len = style.length, r; i < len; i++) {
-					r = style[i].match(/(.+)(:)([^:]+$)/);
-					if (r && !/inherit|initial/i.test(r[3])) {
-						const k = global.kebabToCamelCase(r[1].trim());
-						const v = this.wwComputedStyle[k].replace(/"/g, '');
-						const c = r[3].trim();
-						switch (k) {
-							case 'fontFamily':
-								if (this.options.plugins.font ? this.options.font.indexOf(c) === -1 : true) continue;
-								break;
-							case 'fontSize':
-								if (!this.options.plugins.fontSize) continue;
-								break;
-							case 'color':
-								if (!this.options.plugins.fontColor) continue;
-								break;
-							case 'backgroundColor':
-								if (!this.options.plugins.hiliteColor) continue;
-								break;
-						}
-
-						if (v !== c) {
-							allowedStyle.push(r[0]);
-						}
-					}
-				}
-				if (allowedStyle.length > 0) v.push('style="' + allowedStyle.join(';') + '"');
+	// attribute
+	if (lowLevelCheck) {
+		if (tagName === 'a') {
+			const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
+			if (sv) {
+				if (!v) v = [];
+				v.push(sv[0]);
+			}
+		} else if (!v || !/style=/i.test(v.toString())) {
+			if (tagName === 'span') {
+				v = this._cleanStyle(m, v, 'span');
+			} else if (/^(P|DIV|H[1-6]|PRE)$/i.test(tagName)) {
+				v = this._cleanStyle(m, v, 'format');
 			}
 		}
+	} else {
+		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
+		if (sv && !v) v = [sv[0]];
+		else if (sv && !v.some(function (v) { return /^style/.test(v.trim()); })) v.push(sv[0]);
 	}
 
 	// img
-	if (/<img/i.test(t)) {
+	if (tagName === 'img') {
 		let w = '',
 			h = '';
 		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);

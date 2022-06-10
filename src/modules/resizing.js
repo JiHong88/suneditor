@@ -489,7 +489,7 @@
             contextResizing._resize_w = w;
             contextResizing._resize_h = h;
     
-            const originSize = (targetElement.getAttribute('origin-size') || '').split(',');
+            const originSize = (targetElement.getAttribute('data-origin-size') || '').split(',');
             contextResizing._origin_w = originSize[0] || targetElement.naturalWidth;
             contextResizing._origin_h = originSize[1] || targetElement.naturalHeight;
     
