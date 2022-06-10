@@ -283,6 +283,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _attributesWhitelistRegExp: null,
+        _attributesWhitelistRegExp_all_data: null,
 
         /**
          * @description Attributes blacklist used by the cleanHTML method
@@ -468,6 +469,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _styleCommandMap: null,
+
+        /**
+         * @private
+         */
+        _cleanStyleRegExp: {
+            span: new _w.RegExp('\s*(font-family|font-size|color|background-color)\s*:[^;]+(?!;)*', 'ig'),
+            format: new _w.RegExp('\s*(text-align|margin-left|margin-right)\s*:[^;]+(?!;)*', 'ig')
+        },
 
         /**
          * @description Variables used internally in editor operation
@@ -5093,6 +5102,46 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 .replace(this.editorTagsBlacklistRegExp, '');
         },
 
+        _cleanStyle: function (m, v, tagName) {
+            const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
+            if (sv) {
+                if (!v) v = [];
+                const style = sv[0].replace(/&quot;/g, '').match(this._cleanStyleRegExp[tagName]);
+                if (style) {
+                    const allowedStyle = [];
+                    for (let i = 0, len = style.length, r; i < len; i++) {
+                        r = style[i].match(/(.+)(:)([^:]+$)/);
+                        if (r && !/inherit|initial/i.test(r[3])) {
+                            const k = util.kebabToCamelCase(r[1].trim());
+                            const v = this.wwComputedStyle[k].replace(/"/g, '');
+                            const c = r[3].trim();
+                            switch (k) {
+                                case 'fontFamily':
+                                    if (!options.plugins.font || options.font.indexOf(c) === -1) continue;
+                                    break;
+                                case 'fontSize':
+                                    if (!options.plugins.fontSize) continue;
+                                    break;
+                                case 'color':
+                                    if (!options.plugins.fontColor) continue;
+                                    break;
+                                case 'backgroundColor':
+                                    if (!options.plugins.hiliteColor) continue;
+                                    break;
+                            }
+                            
+                            if (v !== c) {
+                                allowedStyle.push(r[0]);
+                            }
+                        }
+                    }
+                    if (allowedStyle.length > 0) v.push('style="' + allowedStyle.join(';') + '"');
+                }
+            }
+
+            return v;
+        },
+
         /**
          * @description Tag and tag attribute check RegExp function. (used by "cleanHTML" and "convertContentsForEditor")
          * @param {Boolean} lowLevelCheck Row level check
@@ -5109,64 +5158,38 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // blacklist
             const bAttr = this._attributesTagsBlacklist[tagName];
+            m = m.replace(/\s(?:on[a-z]+)\s*=\s*(")[^"]*\1/ig, '');
             if (bAttr) m = m.replace(bAttr, '');
             else m = m.replace(this._attributesBlacklistRegExp, '');
 
             // whitelist
             const wAttr = this._attributesTagsWhitelist[tagName];
             if (wAttr) v = m.match(wAttr);
-            else v = m.match(this._attributesWhitelistRegExp);
+            else v = m.match(lowLevelCheck ? this._attributesWhitelistRegExp : this._attributesWhitelistRegExp_all_data);
 
-            // anchor
-            if (!lowLevelCheck || /<a\b/i.test(t)) {
-                const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
-                if (sv) {
-                    if (!v) v = [];
-                    v.push(sv[0]);
-                }
-            }
-
-            // span
-            if ((!lowLevelCheck || /<span/i.test(t)) && (!v || !/style=/i.test(v.toString()))) {
-                const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
-                if (sv) {
-                    if (!v) v = [];
-                    const style = sv[0].replace(/&quot;/g, '').match(/\s*(font-family|font-size|color|background-color)\s*:[^;]+(?!;)*/ig);
-                    if (style) {
-                        const allowedStyle = [];
-                        for (let i = 0, len = style.length, r; i < len; i++) {
-                            r = style[i].match(/(.+)(:)([^:]+$)/);
-                            if (r && !/inherit|initial/i.test(r[3])) {
-                                const k = util.kebabToCamelCase(r[1].trim());
-                                const v = this.wwComputedStyle[k].replace(/"/g, '');
-                                const c = r[3].trim();
-                                switch (k) {
-                                    case 'fontFamily':
-                                        if (options.plugins.font ? options.font.indexOf(c) === -1 : true) continue;
-                                        break;
-                                    case 'fontSize':
-                                        if (!options.plugins.fontSize) continue;
-                                        break;
-                                    case 'color':
-                                        if (!options.plugins.fontColor) continue;
-                                        break;
-                                    case 'backgroundColor':
-                                        if (!options.plugins.hiliteColor) continue;
-                                        break;
-                                }
-                                
-                                if (v !== c) {
-                                    allowedStyle.push(r[0]);
-                                }
-                            }
-                        }
-                        if (allowedStyle.length > 0) v.push('style="' + allowedStyle.join(';') + '"');
+            // attribute
+            if (lowLevelCheck) {
+                if (tagName === 'a') {
+                    const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
+                    if (sv) {
+                        if (!v) v = [];
+                        v.push(sv[0]);
+                    }
+                } else if (!v || !/style=/i.test(v.toString())) {
+                    if (tagName === 'span') {
+                        v = this._cleanStyle(m, v, 'span');
+                    } else if (/^(P|DIV|H[1-6]|PRE)$/i.test(tagName)) {
+                        v = this._cleanStyle(m, v, 'format');
                     }
                 }
+            } else {
+                const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
+                if (sv && !v) v = [sv[0]];
+                else if (sv && !v.some(function (v) { return /^style/.test(v.trim()); })) v.push(sv[0]);
             }
 
             // img
-            if (/<img/i.test(t)) {
+            if (tagName === 'img') {
                 let w = '', h = '';
                 const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (!v) v = [];
@@ -5695,7 +5718,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // set whitelist
             const getRegList = function (str, str2) { return !str ? '^' : (str === '*' ? '[a-z-]+' : (!str2 ? str : (str + '|' + str2))); };
             // tags
-            const defaultAttr = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls|data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|origin-size|data-exp|data-font-size';
+            const defaultAttr = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls|origin-size';
+            const dataAttr = 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|data-exp|data-font-size';
             this._allowHTMLComments = options._editorTagsWhitelist.indexOf('//') > -1 || options._editorTagsWhitelist === '*';
             // html check
             this._htmlCheckWhitelistRegExp = new wRegExp('^(' + getRegList(options._editorTagsWhitelist.replace('|//', ''), '') + ')$', 'i');
@@ -5722,7 +5746,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
             
-            this._attributesWhitelistRegExp = new wRegExp('\\s(?:' + (allAttr || defaultAttr) + ')' + regEndStr, 'ig');
+            this._attributesWhitelistRegExp = new wRegExp('\\s(?:' + (allAttr || defaultAttr + '|' + dataAttr) + ')' + regEndStr, 'ig');
+            this._attributesWhitelistRegExp_all_data = new wRegExp('\\s(?:' + ((allAttr || defaultAttr) + '|data-[a-z0-9\\-]+') + ')' + regEndStr, 'ig');
             this._attributesTagsWhitelist = tagsAttr;
 
             // blacklist
