@@ -404,7 +404,7 @@ s1.onKeyDown = function (e, core) {
 }
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
-    mode: "inline",
+    // mode: "inline",
     // value: `Let $\Omega$ be the underlying randomness space. In this case, the variables $X^-$ and $X^+$ collapse to $U$. To see why, pick an arbitrary $\omega \in \Omega$:
     // \begin{align*}X^-(\Omega) = \sup\left\{y\in [0,1]: F(y)<U(\omega)\right\} = \sup\left\{y\in [0,1]: P(U\leq y)<U(\omega)\right\} = \sup\left\{y\in [0,1]: y<U(\omega)\right\} = U(\omega).\end{align*}`,
     // value: `
@@ -438,8 +438,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     fontSizeUnit: 'pt',
     // lineAttrReset: '*',
     alignItems: ['left', 'right', 'center'],
-    value: `<ol><li>dsdasdasssaa</li><li>u8743789</li></ol>
-    `,
+    value: `<p style="text-align: center; color: red;" onerror="a">center</p>`,
     linkTargetNewWindow: true,
     imageAlignShow: false,
     plugins: {...{custom_container}, ...plugins},
