@@ -1142,7 +1142,7 @@ function OnKeyDown_wysiwyg(e) {
 					let moveCell = cells[idx];
 					if (!moveCell) break;
 					moveCell = moveCell.firstElementChild || moveCell;
-					this.editor.setRange(moveCell, 0, moveCell, 0);
+					this.selection.setRange(moveCell, 0, moveCell, 0);
 					break;
 				}
 

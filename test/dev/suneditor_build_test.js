@@ -26,11 +26,12 @@ import list from "../../src/plugins/dropdown/list";
 import paragraphStyle from "../../src/plugins/dropdown/paragraphStyle";
 import template from "../../src/plugins/dropdown/template";
 import textStyle from "../../src/plugins/dropdown/textStyle";
+import table from "../../src/plugins/dropdown/table";
 
 window.e = suneditor.create(document.getElementById('editor2'), {
     // value: 'abc',
     plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock, horizontalLine, lineHeight, list,
-        paragraphStyle, template, textStyle
+        paragraphStyle, template, textStyle, table
     ],
     charCounter: true,
     statusbar: true,
@@ -63,7 +64,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
         ['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'horizontalLine'],
-        ['lineHeight', 'list', 'paragraphStyle', 'template', 'textStyle']
+        ['lineHeight', 'list', 'paragraphStyle', 'template', 'textStyle', 'table']
     ]
 });
 

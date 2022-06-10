@@ -675,8 +675,6 @@ function _defaultButtons(options) {
 		dir_ltr: ['', lang.toolbar.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
 		dir_rtl: ['', lang.toolbar.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
 		save: ['se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmd + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save],
-		/** plugins - dropdown */
-		table: ['', lang.toolbar.table, 'table', 'dropdown', icons.table],
 		/** plugins - dialog */
 		link: ['', lang.toolbar.link, 'link', 'dialog', icons.link],
 		image: ['', lang.toolbar.image, 'image', 'dialog', icons.image],
