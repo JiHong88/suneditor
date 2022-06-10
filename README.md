@@ -442,6 +442,7 @@ toolbarContainer: A custom HTML selector placing the toolbar inside.
 stickyToolbar   : Top offset value of "sticky toolbar".
                   Set to 0, '0px', '50px'...
                   If set to -1 or false or null to turn off.        default: 0 {Number|String|Boolean}
+hideToolbar     : The toolbar is rendered hidden.                   default: false {Boolean}
 fullScreenOffset: Top offset value of "full Screen".
                   Set to 0, '0px', '50px'...     default: 0 {Number|String}
 iframe          : Content will be placed in an iframe and isolated from the rest of the page.  default: false {Boolean}
