@@ -460,6 +460,7 @@ export default {
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
         options.toolbarContainer = typeof options.toolbarContainer === 'string' ? document.querySelector(options.toolbarContainer) : options.toolbarContainer;
         options.stickyToolbar = (/balloon/i.test(options.mode) || !!options.toolbarContainer) ? -1 : options.stickyToolbar === undefined ? 0 : (/^\d+/.test(options.stickyToolbar) ? util.getNumber(options.stickyToolbar, 0) : -1);
+        options.hideToolbar = !!options.hideToolbar;
         options.fullScreenOffset = options.fullScreenOffset === undefined ? 0 : (/^\d+/.test(options.fullScreenOffset) ? util.getNumber(options.fullScreenOffset, 0) : 0);
         options.fullPage = !!options.fullPage;
         options.iframe = options.fullPage || !!options.iframe;
@@ -927,6 +928,8 @@ export default {
         const tool_cover = doc.createElement('DIV');
         tool_cover.className = 'se-toolbar-cover';
         tool_bar.appendChild(tool_cover);
+
+        if (options.hideToolbar) tool_bar.style.display = 'none';
 
         return {
             'element': tool_bar,

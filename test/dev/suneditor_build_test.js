@@ -422,6 +422,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // </p>
     // `,
     // __defaultFontSize: "31pt",
+    hideToolbar: true,
     paragraphStyles: [
         "spaced",
         "neon",
