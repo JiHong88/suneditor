@@ -70,6 +70,8 @@ const table = function (editor, target) {
 	this._selectedCell = null;
 	this._selectedTable = null;
 	this._ref = null;
+	this._initBind = null;
+	this._closeSplitMenu = null;
 
 	// add controller element
 	this.context.element.relative.appendChild(controller_cell);
@@ -86,36 +88,82 @@ const table = function (editor, target) {
 table.type = 'dropdown';
 table.className = '';
 table.prototype = {
-	controllerAction: function (tdElement) {
-		if (!this.selection.get().isCollapsed && !this._selectedCell) {
-			this.menu.controllerOff();
-			domUtils.removeClass(tdElement, 'se-table-selected-cell');
-			return;
+	/**
+	 * @override core
+	 * @param {Element} element New table element
+	 */
+	action: function (element) {
+		if (this.component.insert(element, false, true, false)) {
+			const firstTd = element.querySelector('td div');
+			this.selection.setRange(firstTd, 0, firstTd, 0);
+			this._resetTablePicker();
+		}
+	},
+
+	/**
+	 * @override core
+	 * @param {any} event Event object
+	 */
+	onPluginSelect: function (event) {
+		const tableCell = domUtils.getParentElement(event.target, domUtils.isTableCell);
+		if (!tableCell || !(tableCell !== this._fixedCell && !this._shift)) return;
+		this.selectCells(tableCell, false);
+	},
+
+	/**
+	 * @override core
+	 * @param {any} event Event object
+	 * @param {Element} line Current line element
+	 */
+	onPluginKeyDown: function (event, line) {
+		if (!event.shiftKey || event.keyCode !== 16) return;
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		if (this._shift || this._ref) return;
+		const cell = domUtils.getParentElement(line, domUtils.isTableCell);
+		if (cell) {
+			this.selectCells(cell, true);
+			return false;
+		}
+	},
+
+	selectCells: function (tdElement, shift) {
+		console.log('selct', this)
+		if (!this._shift && !this._ref) this._removeEvents();
+		this.menu.controllerOff();
+
+		this._shift = shift;
+		this._fixedCell = tdElement;
+		this._fixedCellName = tdElement.nodeName;
+		this._selectedTable = domUtils.getParentElement(tdElement, 'TABLE');
+
+		const selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
+		for (let i = 0, len = selectedCells.length; i < len; i++) {
+			domUtils.removeClass(selectedCells[i], 'se-table-selected-cell');
 		}
 
-		const tableElement = this._element || this._selectedTable || domUtils.getParentElement(tdElement, 'TABLE');
-		this._maxWidth = domUtils.hasClass(tableElement, 'se-table-size-100') || tableElement.style.width === '100%' || (!tableElement.style.width && !domUtils.hasClass(tableElement, 'se-table-size-auto'));
-		this._fixedColumn = domUtils.hasClass(tableElement, 'se-table-layout-fixed') || tableElement.style.tableLayout === 'fixed';
-		this.setTableStyle(this._maxWidth ? 'width|column' : 'width');
+		domUtils.addClass(tdElement, 'se-table-selected-cell');
 
-		this.setPositionControllerTop(tableElement);
-		this.setPositionControllerDiv(tdElement, this._shift);
+		this._bindOnSelect = this._onCellMultiSelect.bind(this);
+		this._bindOffSelect = this._offCellMultiSelect.bind(this);
 
-		if (!this._shift) this.menu.controllerOn(this.resizeDiv, this.tableController, this.reset.bind(this), tdElement, 'table');
-	},
-
-	setPositionControllerTop: function (tableElement) {
-		this.menu.setControllerPosition(this.tableController, tableElement, 'top', { left: 0, top: 0 });
-	},
-
-	setPositionControllerDiv: function (tdElement, reset) {
-		this.setCellInfo(tdElement, reset);
-
-		if (this.cellControllerTop) {
-			this.menu.setControllerPosition(this.resizeDiv, this._element, 'top', { left: this.tableController.offsetWidth, top: 0 });
+		if (!shift) {
+			this.eventManager.addGlobalEvent('mousemove', this._bindOnSelect, false);
 		} else {
-			this.menu.setControllerPosition(this.resizeDiv, tdElement, 'bottom', { left: 0, top: 0 });
+			this._bindOffShift = function () {
+				this.menu.controllerOn(this.resizeDiv, this.tableController, this.reset.bind(this), tdElement, 'table');
+				if (!this._ref) this.menu.controllerOff();
+			}.bind(this);
+
+			this.eventManager.addGlobalEvent('keyup', this._bindOffShift, false);
+			this.eventManager.addGlobalEvent('mousedown', this._bindOnSelect, false);
 		}
+
+		this.eventManager.addGlobalEvent('mouseup', this._bindOffSelect, false);
+		this._initBind = this.reset.bind(this);
+		this.eventManager.addGlobalEvent('touchmove', this._initBind, false);
 	},
 
 	setCellInfo: function (tdElement, reset) {
@@ -551,7 +599,6 @@ table.prototype = {
 		}
 	},
 
-	_closeSplitMenu: null,
 	openSplitMenu: function () {
 		domUtils.addClass(this.splitButton, 'on');
 		this.splitMenu.style.display = 'inline-table';
@@ -805,8 +852,8 @@ table.prototype = {
 		mergeCell.rowSpan = rs;
 
 		this.menu.controllerOff();
-		this.setActiveButton.call(this, true, false);
-		this.controllerAction.call(this, mergeCell);
+		this.setActiveButton(true, false);
+		this.controllerAction(mergeCell);
 
 		domUtils.addClass(mergeCell, 'se-table-selected-cell');
 		this.editor.focusEdge(mergeCell);
@@ -830,7 +877,7 @@ table.prototype = {
 		if (/TH/i.test(this._tdElement.nodeName)) {
 			this.menu.controllerOff();
 		} else {
-			this.setPositionControllerDiv.call(this, this._tdElement, false);
+			this.setPositionControllerDiv(this._tdElement, false);
 		}
 	},
 
@@ -890,6 +937,38 @@ table.prototype = {
 		}
 	},
 
+	controllerAction: function (tdElement) {
+		if (!this.selection.get().isCollapsed && !this._selectedCell) {
+			this.menu.controllerOff();
+			domUtils.removeClass(tdElement, 'se-table-selected-cell');
+			return;
+		}
+
+		const tableElement = this._element || this._selectedTable || domUtils.getParentElement(tdElement, 'TABLE');
+		this._maxWidth = domUtils.hasClass(tableElement, 'se-table-size-100') || tableElement.style.width === '100%' || (!tableElement.style.width && !domUtils.hasClass(tableElement, 'se-table-size-auto'));
+		this._fixedColumn = domUtils.hasClass(tableElement, 'se-table-layout-fixed') || tableElement.style.tableLayout === 'fixed';
+		this.setTableStyle(this._maxWidth ? 'width|column' : 'width');
+
+		this.setPositionControllerTop(tableElement);
+		this.setPositionControllerDiv(tdElement, this._shift);
+
+		if (!this._shift) this.menu.controllerOn(this.resizeDiv, this.tableController, this.reset.bind(this), tdElement, 'table');
+	},
+
+	setPositionControllerTop: function (tableElement) {
+		this.menu.setControllerPosition(this.tableController, tableElement, 'top', { left: 0, top: 0 });
+	},
+
+	setPositionControllerDiv: function (tdElement, reset) {
+		this.setCellInfo(tdElement, reset);
+
+		if (this.cellControllerTop) {
+			this.menu.setControllerPosition(this.resizeDiv, this._element, 'top', { left: this.tableController.offsetWidth, top: 0 });
+		} else {
+			this.menu.setControllerPosition(this.resizeDiv, tdElement, 'bottom', { left: 0, top: 0 });
+		}
+	},
+
 	_toggleEditor: function (enabled) {
 		this.context.element.wysiwyg.setAttribute('contenteditable', enabled);
 		if (enabled) domUtils.removeClass(this.context.element.wysiwyg, 'se-disabled');
@@ -900,8 +979,8 @@ table.prototype = {
 		e.stopPropagation();
 
 		if (!this._shift) {
-			this._removeEvents.call(this);
-			this._toggleEditor.call(this, true);
+			this._removeEvents();
+			this._toggleEditor(true);
 		} else if (this._initBind) {
 			this._wd.removeEventListener('touchmove', this._initBind);
 			this._initBind = null;
@@ -909,8 +988,8 @@ table.prototype = {
 
 		if (!this._fixedCell || !this._selectedTable) return;
 
-		this.setActiveButton.call(this, this._fixedCell, this._selectedCell);
-		this.controllerAction.call(this, this._selectedCell || this._fixedCell);
+		this.setActiveButton(this._fixedCell, this._selectedCell);
+		this.controllerAction(this._selectedCell || this._fixedCell);
 
 		this._selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
 		if (this._selectedCell && this._fixedCell) this.editor.focusEdge(this._selectedCell);
@@ -927,11 +1006,11 @@ table.prototype = {
 		const target = domUtils.getParentElement(e.target, domUtils.isTableCell);
 
 		if (this._shift) {
-			if (target === this._fixedCell) this._toggleEditor.call(this, true);
-			else this._toggleEditor.call(this, false);
+			if (target === this._fixedCell) this._toggleEditor(true);
+			else this._toggleEditor(false);
 		} else if (!this._ref) {
 			if (target === this._fixedCell) return;
-			else this._toggleEditor.call(this, false);
+			else this._toggleEditor(false);
 		}
 
 		if (!target || target === this._selectedCell || this._fixedCellName !== target.nodeName || this._selectedTable !== domUtils.getParentElement(target, 'TABLE')) {
@@ -939,7 +1018,7 @@ table.prototype = {
 		}
 
 		this._selectedCell = target;
-		this._setMultiCells.call(this, this._fixedCell, target);
+		this._setMultiCells(this._fixedCell, target);
 	},
 
 	_setMultiCells: function (startCell, endCell) {
@@ -1072,57 +1151,8 @@ table.prototype = {
 		}
 	},
 
-	_initBind: null,
-	onTableCellMultiSelect: function (tdElement, shift) {
-		this._removeEvents.call(this);
-		this.menu.controllerOff();
-
-		this._shift = shift;
-		this._fixedCell = tdElement;
-		this._fixedCellName = tdElement.nodeName;
-		this._selectedTable = domUtils.getParentElement(tdElement, 'TABLE');
-
-		const selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
-		for (let i = 0, len = selectedCells.length; i < len; i++) {
-			domUtils.removeClass(selectedCells[i], 'se-table-selected-cell');
-		}
-
-		domUtils.addClass(tdElement, 'se-table-selected-cell');
-
-		this._bindOnSelect = this._onCellMultiSelect.bind(this);
-		this._bindOffSelect = this._offCellMultiSelect.bind(this);
-
-		if (!shift) {
-			this._wd.addEventListener('mousemove', this._bindOnSelect, false);
-		} else {
-			this._bindOffShift = function () {
-				this.menu.controllerOn(this.resizeDiv, this.tableController, this.reset.bind(this), tdElement, 'table');
-				if (!this._ref) this.menu.controllerOff();
-			}.bind(this);
-
-			this._wd.addEventListener('keyup', this._bindOffShift, false);
-			this._wd.addEventListener('mousedown', this._bindOnSelect, false);
-		}
-
-		this._wd.addEventListener('mouseup', this._bindOffSelect, false);
-		this._initBind = this.reset.bind(this);
-		this._wd.addEventListener('touchmove', this._initBind, false);
-	},
-
-	/**
-	 * @override core
-	 * @param {Element} element New table element
-	 */
-	action: function (element) {
-		if (this.component.insert(element, false, true, false)) {
-			const firstTd = element.querySelector('td div');
-			this.selection.setRange(firstTd, 0, firstTd, 0);
-			this._resetTablePicker();
-		}
-	},
-
 	reset: function () {
-		this._removeEvents.call(this);
+		this._removeEvents();
 
 		if (this._selectedTable) {
 			const selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
@@ -1131,7 +1161,7 @@ table.prototype = {
 			}
 		}
 
-		this._toggleEditor.call(this, true);
+		this._toggleEditor(true);
 
 		this._element = null;
 		this._tdElement = null;
@@ -1239,31 +1269,31 @@ function OnClickController(e) {
 	switch (command) {
 		case 'insert':
 		case 'delete':
-			this.editTable.call(this, value, option);
+			this.editTable(value, option);
 			break;
 		case 'header':
-			this.toggleHeader.call(this);
+			this.toggleHeader();
 			break;
 		case 'onsplit':
-			this.openSplitMenu.call(this);
+			this.openSplitMenu();
 			break;
 		case 'split':
-			this.splitCells.call(this, value);
+			this.splitCells(value);
 			break;
 		case 'merge':
-			this.mergeCells.call(this);
+			this.mergeCells();
 			break;
 		case 'resize':
 			this._maxWidth = !this._maxWidth;
-			this.setTableStyle.call(this, 'width');
-			this.setPositionControllerTop.call(this, this._element);
-			this.setPositionControllerDiv.call(this, this._tdElement, this._shift);
+			this.setTableStyle('width');
+			this.setPositionControllerTop(this._element);
+			this.setPositionControllerDiv(this._tdElement, this._shift);
 			break;
 		case 'layout':
 			this._fixedColumn = !this._fixedColumn;
-			this.setTableStyle.call(this, 'column');
-			this.setPositionControllerTop.call(this, this._element);
-			this.setPositionControllerDiv.call(this, this._tdElement, this._shift);
+			this.setTableStyle('column');
+			this.setPositionControllerTop(this._element);
+			this.setPositionControllerDiv(this._tdElement, this._shift);
 			break;
 		case 'remove':
 			const emptyDiv = this._element.parentNode;

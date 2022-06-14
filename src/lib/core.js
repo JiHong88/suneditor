@@ -186,6 +186,13 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	this._pluginCallButtons = pluginCallButtons;
 
 	/**
+	 * @description Plugin call
+	 * @private
+	 */
+	this._onSelectPlugins = [];
+	this._onKeyDownPlugins = [];
+
+	/**
 	 * @description Block controller mousedown events in "shadowRoot" environment
 	 * @private
 	 */
@@ -1670,21 +1677,22 @@ Core.prototype = {
 			query: '',
 			map: {}
 		};
-
+		
 		// plugins install
 		// Command and file plugins registration
 		this.activePlugins = [];
+		this._onSelectPlugins = [];
+		this._onKeyDownPlugins = [];
 		this._fileManager.tags = [];
 		this._fileManager.pluginMap = {};
 
 		const managedClass = [];
 		let filePluginRegExp = [];
-		let plugin, button;
+		let plugin;
 		for (let key in plugins) {
 			if (!plugins.hasOwnProperty(key)) continue;
-			plugin = plugins[key];
-			button = this._pluginCallButtons[key];
-			this.registerPlugin(key, button);
+			this.registerPlugin(key, this._pluginCallButtons[key]);
+			plugin = this.plugins[key];
 
 			if (typeof plugin.checkFileInfo === 'function' && typeof plugin.resetFileInfo === 'function') {
 				this._fileInfoPluginsCheck.push(plugin.checkFileInfo.bind(this));
@@ -1698,6 +1706,14 @@ Core.prototype = {
 				for (let tag = 0, tLen = fileTags.length; tag < tLen; tag++) {
 					this._fileManager.pluginMap[fileTags[tag].toLowerCase()] = key;
 				}
+			}
+
+			if (typeof plugin.onPluginSelect === 'function') {
+				this._onSelectPlugins.push(plugin.onPluginSelect.bind(plugin));
+			}
+
+			if (typeof plugin.onPluginKeyDown === 'function') {
+				this._onKeyDownPlugins.push(plugin.onPluginKeyDown.bind(plugin));
 			}
 
 			if (plugin.managedTags) {

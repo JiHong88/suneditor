@@ -22,6 +22,8 @@ const EventManager = function (editor) {
 	this._balloonDelay = null;
 	this._resizeObserver = null;
 	this._toolbarObserver = null;
+	this._onSelectPlugins = editor._onSelectPlugins;
+	this._onKeyDownPlugins = editor._onKeyDownPlugins;
 };
 
 EventManager.prototype = {
@@ -50,9 +52,10 @@ EventManager.prototype = {
 	 * @param {boolean} useCapture Use event capture
 	 */
 	addGlobalEvent: function (type, listener, useCapture) {
-		_d.addEventListener(type, listener, useCapture);
 		if (this.options.iframe) {
 			this._wd.addEventListener(type, listener);
+		} else {
+			_d.addEventListener(type, listener, useCapture);
 		}
 	},
 
@@ -63,9 +66,10 @@ EventManager.prototype = {
 	 * @param {Function} listener Event listener
 	 */
 	removeGlobalEvent: function (type, listener) {
-		_d.removeEventListener(type, listener);
 		if (this.options.iframe) {
 			this._wd.removeEventListener(type, listener);
+		} else {
+			_d.removeEventListener(type, listener);
 		}
 	},
 
@@ -636,12 +640,9 @@ function OnMouseDown_wysiwyg(e) {
 	// user event
 	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown(e) === false) return;
 
-	const tableCell = domUtils.getParentElement(e.target, domUtils.isTableCell);
-	if (tableCell) {
-		const tablePlugin = this.plugins.table;
-		if (tablePlugin && tableCell !== tablePlugin._fixedCell && !tablePlugin._shift) {
-			tablePlugin.onTableCellMultiSelect(tableCell, false);
-		}
+	const eventPlugins = this.editor._onSelectPlugins;
+	for (let i = 0; i < eventPlugins.length; i++) {
+		if (eventPlugins[i](e) === false) return;
 	}
 
 	if (this.editor._isBalloon) {
@@ -1452,18 +1453,12 @@ function OnKeyDown_wysiwyg(e) {
 			break;
 	}
 
-	if (shift && keyCode === 16) {
-		e.preventDefault();
-		e.stopPropagation();
-		const tablePlugin = this.plugins.table;
-		if (tablePlugin && !tablePlugin._shift && !tablePlugin._ref) {
-			const cell = domUtils.getParentElement(formatEl, domUtils.isTableCell);
-			if (cell) {
-				tablePlugin.onTableCellMultiSelect(cell, true);
-				return;
-			}
-		}
-	} else if (shift && (env.isOSX_IOS ? alt : ctrl) && keyCode === 32) {
+	const eventPlugins = this.editor._onKeyDownPlugins;
+	for (let i = 0; i < eventPlugins.length; i++) {
+		if (eventPlugins[i](e, formatEl) === false) return;
+	}
+	
+	if (shift && (env.isOSX_IOS ? alt : ctrl) && keyCode === 32) {
 		e.preventDefault();
 		e.stopPropagation();
 		const nbsp = this.html.insertNode(domUtils.createTextNode('\u00a0'));
