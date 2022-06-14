@@ -7359,8 +7359,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            const textKey = !ctrl && !alt && !selectRange && !event._nonTextKeyCode.test(keyCode);
-            if (textKey && range.collapsed && range.startContainer === range.endContainer && util.isBreak(range.commonAncestorContainer)) {
+            if (util.isIE && !ctrl && !alt && !selectRange && !event._nonTextKeyCode.test(keyCode) && util.isBreak(range.commonAncestorContainer)) {
                 const zeroWidth = util.createTextNode(util.zeroWidthSpace);
                 core.insertNode(zeroWidth, null, false);
                 core.setRange(zeroWidth, 1, zeroWidth, 1);
