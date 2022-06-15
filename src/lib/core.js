@@ -5299,7 +5299,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist, blacklist) {
-            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
+            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true)).replace(/^.+\x3C!--StartFragment--\>|\x3C!--EndFragment-->.+$/g, '');
 
             const dom = _d.createRange().createContextualFragment(html);
             try {
@@ -5379,7 +5379,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             for (let i = 0, t; i < domTree.length; i++) {
                 t = domTree[i];
 
-                if (!util.isFormatElement(t) && !util.isRangeFormatElement(t) && !util.isComponent(t) && !util.isMedia(t)) {
+                if (!util.isFormatElement(t) && !util.isRangeFormatElement(t) && !util.isComponent(t) && !util.isMedia(t) && t.nodeType !== 8) {
                     if (!p) p = util.createElement(options.defaultTag);
                     p.appendChild(t);
                     i--;
