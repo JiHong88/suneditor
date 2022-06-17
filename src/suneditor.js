@@ -61,10 +61,10 @@ export default {
 
         const cons = Constructor(element, options);
 
-        if (cons.constructed._top.id && document.getElementById(cons.constructed._top.id)) {
-            throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed._top.id + '")');
+        if (cons.constructed.top.id && document.getElementById(cons.constructed.top.id)) {
+            throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed.top.id + '")');
         }
 
-        return new Core(Context(element, cons.constructed, options), cons.pluginCallButtons, cons.plugins, cons.options.lang, options, cons._responsiveButtons);
+        return new Core(Context(element, cons.constructed.top, cons.constructed.wwFrame, cons.constructed.codeFrame, options), cons.pluginCallButtons, cons.plugins, cons.options.lang, options, cons._responsiveButtons);
     }
 };

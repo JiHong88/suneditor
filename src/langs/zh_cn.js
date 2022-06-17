@@ -77,7 +77,7 @@
             dir_rtl: '右到左',
             mention: '提到'
         },
-        dialogBox: {
+        modalBox: {
             linkBox: {
                 title: '插入超链接',
                 url: '网址',

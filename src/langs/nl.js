@@ -77,7 +77,7 @@
             dir_rtl: 'Rechts naar links',
             mention: 'Vermelding'
         },
-        dialogBox: {
+        modalBox: {
             linkBox: {
                 title: 'Link invoegen',
                 url: 'URL',

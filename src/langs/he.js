@@ -77,7 +77,7 @@
             dir_rtl: 'מימין לשמאל',
             mention: 'הזכר'
         },
-        dialogBox: {
+        modalBox: {
             linkBox: {
                 title: 'הכנס קשור',
                 url: 'כתובת קשור',

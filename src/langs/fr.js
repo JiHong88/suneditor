@@ -77,7 +77,7 @@
             dir_rtl: 'De droite à gauche',
             mention: 'Mention'
         },
-        dialogBox: {
+        modalBox: {
             linkBox: {
                 title: 'Insérer un lien',
                 url: 'Adresse URL du lien',

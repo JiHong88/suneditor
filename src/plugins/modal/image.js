@@ -7,7 +7,7 @@
  */
 'use strict';
 
-import dialog from '../modules/dialog';
+import modal from '../modules/modal';
 import anchor from '../modules/_anchor';
 import mediaContainer from '../modules/mediaContainer';
 import resizing from '../modules/resizing';
@@ -15,9 +15,9 @@ import fileManager from '../modules/fileManager';
 
 export default {
     name: 'image',
-    type: 'dialog',
+    type: 'modal',
     add: function (core) {
-        core.addModule([dialog, anchor, mediaContainer, resizing, fileManager]);
+        core.addModule([modal, anchor, mediaContainer, resizing, fileManager]);
         
         const options = core.options;
         const context = core.context;
@@ -25,7 +25,7 @@ export default {
             _infoList: [], // @Override fileManager
             _infoIndex: 0, // @Override fileManager
             _uploadFileLength: 0, // @Override fileManager
-            focusElement: null, // @Override dialog // This element has focus when the dialog is opened.
+            focusElement: null, // @Override modal // This element has focus when the modal is opened.
             sizeUnit: options._imageSizeUnit,
             _linkElement: '',
             _altText: '',
@@ -64,33 +64,33 @@ export default {
             captionCheckEl: null
         };
 
-        /** image dialog */
-        let image_dialog = this.setDialog(core);
-        contextImage.modal = image_dialog;
-        contextImage.imgInputFile = image_dialog.querySelector('._se_image_file');
-        contextImage.imgUrlFile = image_dialog.querySelector('._se_image_url');
+        /** image modal */
+        let image_modal = this.setModal(core);
+        contextImage.modal = image_modal;
+        contextImage.imgInputFile = image_modal.querySelector('._se_image_file');
+        contextImage.imgUrlFile = image_modal.querySelector('._se_image_url');
         contextImage.focusElement = contextImage.imgInputFile || contextImage.imgUrlFile;
-        contextImage.altText = image_dialog.querySelector('._se_image_alt');
-        contextImage.captionCheckEl = image_dialog.querySelector('._se_image_check_caption');
-        contextImage.previewSrc = image_dialog.querySelector('._se_tab_content_image .se-link-preview');
+        contextImage.altText = image_modal.querySelector('._se_image_alt');
+        contextImage.captionCheckEl = image_modal.querySelector('._se_image_check_caption');
+        contextImage.previewSrc = image_modal.querySelector('._se_tab_content_image .se-link-preview');
 
         /** add event listeners */
-        image_dialog.querySelector('.se-dialog-tabs').addEventListener('click', this.openTab.bind(core));
-        image_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core));
-        if (contextImage.imgInputFile) image_dialog.querySelector('.se-file-remove').addEventListener('click', this._removeSelectedFiles.bind(contextImage.imgInputFile, contextImage.imgUrlFile, contextImage.previewSrc));
+        image_modal.querySelector('.se-modal-tabs').addEventListener('click', this.openTab.bind(core));
+        image_modal.querySelector('form').addEventListener('submit', this.submit.bind(core));
+        if (contextImage.imgInputFile) image_modal.querySelector('.se-file-remove').addEventListener('click', this._removeSelectedFiles.bind(contextImage.imgInputFile, contextImage.imgUrlFile, contextImage.previewSrc));
         if (contextImage.imgUrlFile) contextImage.imgUrlFile.addEventListener('input', this._onLinkPreview.bind(contextImage.previewSrc, contextImage._v_src, options.linkProtocol));
         if (contextImage.imgInputFile && contextImage.imgUrlFile) contextImage.imgInputFile.addEventListener('change', this._fileInputChange.bind(contextImage));
 
-        const imageGalleryButton = image_dialog.querySelector('.__se__gallery');
+        const imageGalleryButton = image_modal.querySelector('.__se__gallery');
         if (imageGalleryButton) imageGalleryButton.addEventListener('click', this._openGallery.bind(core));
         
         contextImage.proportion = {};
         contextImage.inputX = {};
         contextImage.inputY = {};
         if (options.imageResizing) {
-            contextImage.proportion = image_dialog.querySelector('._se_image_check_proportion');
-            contextImage.inputX = image_dialog.querySelector('._se_image_size_x');
-            contextImage.inputY = image_dialog.querySelector('._se_image_size_y');
+            contextImage.proportion = image_modal.querySelector('._se_image_check_proportion');
+            contextImage.inputX = image_modal.querySelector('._se_image_size_x');
+            contextImage.inputY = image_modal.querySelector('._se_image_size_y');
             contextImage.inputX.value = options.imageWidth;
             contextImage.inputY.value = options.imageHeight;
             
@@ -101,122 +101,122 @@ export default {
             contextImage.inputY.addEventListener('change', this.setRatio.bind(core));
             contextImage.proportion.addEventListener('change', this.setRatio.bind(core));
             
-            image_dialog.querySelector('.se-dialog-btn-revert').addEventListener('click', this.sizeRevert.bind(core));
+            image_modal.querySelector('.se-modal-btn-revert').addEventListener('click', this.sizeRevert.bind(core));
         }
 
         /** append html */
-        context.dialog.modal.appendChild(image_dialog);
+        context.modal.modal.appendChild(image_modal);
 
         /** link event */
-        core.plugins.anchor.initEvent.call(core, 'image', image_dialog.querySelector('._se_tab_content_url'));
+        core.plugins.anchor.initEvent.call(core, 'image', image_modal.querySelector('._se_tab_content_url'));
         contextImage.anchorCtx = core.context.anchor.caller.image;
 
         /** empty memory */
-        image_dialog = null;
+        image_modal = null;
     },
 
-    /** dialog */
-    setDialog: function (core) {
+    /** modal */
+    setModal: function (core) {
         const option = core.options;
         const lang = core.lang;
-        const dialog = core.util.createElement('DIV');
+        const modal = core.util.createElement('DIV');
 
-        dialog.className = 'se-dialog-content se-dialog-image';
-        dialog.style.display = 'none';
+        modal.className = 'se-modal-content se-modal-image';
+        modal.style.display = 'none';
 
         let html = '' +
-            '<div class="se-dialog-header">' +
-                '<button type="button" data-command="close" class="se-btn se-dialog-close" class="close" title="' + lang.dialogBox.close + '" aria-label="' + lang.dialogBox.close + '">' +
+            '<div class="se-modal-header">' +
+                '<button type="button" data-command="close" class="se-btn se-modal-close" class="close" title="' + lang.modalBox.close + '" aria-label="' + lang.modalBox.close + '">' +
                     core.icons.cancel +
                 '</button>' +
-                '<span class="se-modal-title">' + lang.dialogBox.imageBox.title + '</span>' +
+                '<span class="se-modal-title">' + lang.modalBox.imageBox.title + '</span>' +
             '</div>' +
-            '<div class="se-dialog-tabs">' +
+            '<div class="se-modal-tabs">' +
                 '<button type="button" class="_se_tab_link active" data-tab-link="image">' + lang.toolbar.image + '</button>' +
                 '<button type="button" class="_se_tab_link" data-tab-link="url">' + lang.toolbar.link + '</button>' +
             '</div>' +
             '<form method="post" enctype="multipart/form-data">' +
                 '<div class="_se_tab_content _se_tab_content_image">' +
-                    '<div class="se-dialog-body"><div style="border-bottom: 1px dashed #ccc;">';
+                    '<div class="se-modal-body"><div style="border-bottom: 1px dashed #ccc;">';
                     
                     if (option.imageFileInput) {
                         html += '' +
-                            '<div class="se-dialog-form">' +
-                                '<label>' + lang.dialogBox.imageBox.file + '</label>' +
-                                '<div class="se-dialog-form-files">' +
+                            '<div class="se-modal-form">' +
+                                '<label>' + lang.modalBox.imageBox.file + '</label>' +
+                                '<div class="se-modal-form-files">' +
                                     '<input class="se-input-form _se_image_file" type="file" accept="' + option.imageAccept + '"' + (option.imageMultipleFile ? ' multiple="multiple"' : '') + '/>' +
-                                    '<button type="button" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '" aria-label="' + lang.controller.remove + '">' + core.icons.cancel + '</button>' +
+                                    '<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="' + lang.controller.remove + '" aria-label="' + lang.controller.remove + '">' + core.icons.cancel + '</button>' +
                                 '</div>' +
                             '</div>' ;
                     }
         
                     if (option.imageUrlInput) {
                         html += '' +
-                            '<div class="se-dialog-form">' +
-                                '<label>' + lang.dialogBox.imageBox.url + '</label>' +
-                                '<div class="se-dialog-form-files">' +
+                            '<div class="se-modal-form">' +
+                                '<label>' + lang.modalBox.imageBox.url + '</label>' +
+                                '<div class="se-modal-form-files">' +
                                     '<input class="se-input-form se-input-url _se_image_url" type="text" />' +
-                                    ((option.imageGalleryUrl && core.plugins.imageGallery) ? '<button type="button" class="se-btn se-dialog-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '" aria-label="' + lang.toolbar.imageGallery + '">' + core.icons.image_gallery + '</button>' : '') +
+                                    ((option.imageGalleryUrl && core.plugins.imageGallery) ? '<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '" aria-label="' + lang.toolbar.imageGallery + '">' + core.icons.image_gallery + '</button>' : '') +
                                 '</div>' +
                                 '<pre class="se-link-preview"></pre>' +
                             '</div>';
                     }
         
                     html += '</div>' +
-                        '<div class="se-dialog-form">' +
-                            '<label>' + lang.dialogBox.imageBox.altText + '</label><input class="se-input-form _se_image_alt" type="text" />' +
+                        '<div class="se-modal-form">' +
+                            '<label>' + lang.modalBox.imageBox.altText + '</label><input class="se-input-form _se_image_alt" type="text" />' +
                         '</div>';
 
             if (option.imageResizing) {
                 const onlyPercentage = option.imageSizeOnlyPercentage;
                 const onlyPercentDisplay = onlyPercentage ? ' style="display: none !important;"' : '';
                 const heightDisplay = !option.imageHeightShow ? ' style="display: none !important;"' : '';
-                html += '<div class="se-dialog-form">';
+                html += '<div class="se-modal-form">';
                         if (onlyPercentage || !option.imageHeightShow) {
                             html += '' +
-                            '<div class="se-dialog-size-text">' +
-                                '<label class="size-w">' + lang.dialogBox.size + '</label>' +
+                            '<div class="se-modal-size-text">' +
+                                '<label class="size-w">' + lang.modalBox.size + '</label>' +
                             '</div>';
                         } else {
                             html += '' +
-                            '<div class="se-dialog-size-text">' +
-                                '<label class="size-w">' + lang.dialogBox.width + '</label>' +
-                                '<label class="se-dialog-size-x">&nbsp;</label>' +
-                                '<label class="size-h">' + lang.dialogBox.height + '</label>' +
+                            '<div class="se-modal-size-text">' +
+                                '<label class="size-w">' + lang.modalBox.width + '</label>' +
+                                '<label class="se-modal-size-x">&nbsp;</label>' +
+                                '<label class="size-h">' + lang.modalBox.height + '</label>' +
                             '</div>';
                         }
                         html += '' +
                             '<input class="se-input-control _se_image_size_x" placeholder="auto"' + (onlyPercentage ? ' type="number" min="1"' : 'type="text"') + (onlyPercentage ? ' max="100"' : '') + ' />' +
-                            '<label class="se-dialog-size-x"' + heightDisplay + '>' + (onlyPercentage ? '%' : 'x') + '</label>' +
+                            '<label class="se-modal-size-x"' + heightDisplay + '>' + (onlyPercentage ? '%' : 'x') + '</label>' +
                             '<input type="text" class="se-input-control _se_image_size_y" placeholder="auto"' + onlyPercentDisplay + (onlyPercentage ? ' max="100"' : '') + heightDisplay + '/>' +
-                            '<label' + onlyPercentDisplay + heightDisplay + '><input type="checkbox" class="se-dialog-btn-check _se_image_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
-                            '<button type="button" title="' + lang.dialogBox.revertButton + '" aria-label="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;">' + core.icons.revert + '</button>' +
+                            '<label' + onlyPercentDisplay + heightDisplay + '><input type="checkbox" class="se-modal-btn-check _se_image_check_proportion" checked/>&nbsp;' + lang.modalBox.proportion + '</label>' +
+                            '<button type="button" title="' + lang.modalBox.revertButton + '" aria-label="' + lang.modalBox.revertButton + '" class="se-btn se-modal-btn-revert" style="float: right;">' + core.icons.revert + '</button>' +
                         '</div>' ;
             }
 
             html += '' +
-                        '<div class="se-dialog-form se-dialog-form-footer">' +
-                            '<label><input type="checkbox" class="se-dialog-btn-check _se_image_check_caption" />&nbsp;' + lang.dialogBox.caption + '</label>' +
+                        '<div class="se-modal-form se-modal-form-footer">' +
+                            '<label><input type="checkbox" class="se-modal-btn-check _se_image_check_caption" />&nbsp;' + lang.modalBox.caption + '</label>' +
                         '</div>' +
                     '</div>' +
                 '</div>' +
                 '<div class="_se_tab_content _se_tab_content_url" style="display: none">' +
                     core.context.anchor.forms.innerHTML +
                 '</div>' +
-                '<div class="se-dialog-footer">' +
+                '<div class="se-modal-footer">' +
                     '<div' + (option.imageAlignShow ? '' : ' style="display: none"') + '>' +
-                        '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
-                        '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
-                        '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
-                        '<label><input type="radio" name="suneditor_image_radio" class="se-dialog-btn-radio" value="right">' + lang.dialogBox.right + '</label>' +
+                        '<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="none" checked>' + lang.modalBox.basic + '</label>' +
+                        '<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="left">' + lang.modalBox.left + '</label>' +
+                        '<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="center">' + lang.modalBox.center + '</label>' +
+                        '<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="right">' + lang.modalBox.right + '</label>' +
                     '</div>' +
-                    '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '" aria-label="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+                    '<button type="submit" class="se-btn-primary" title="' + lang.modalBox.submitButton + '" aria-label="' + lang.modalBox.submitButton + '"><span>' + lang.modalBox.submitButton + '</span></button>' +
                 '</div>' +
             '</form>';
 
-        dialog.innerHTML = html;
+        modal.innerHTML = html;
 
-        return dialog;
+        return modal;
     },
 
     _fileInputChange: function () {
@@ -293,7 +293,7 @@ export default {
     },
 
     /**
-     * @Required @Override dialog
+     * @Required @Override modal
      */
     on: function (update) {
         const contextImage = this.context.image;
@@ -309,10 +309,10 @@ export default {
     },
 
     /**
-     * @Required @Override dialog
+     * @Required @Override modal
      */
     open: function () {
-        this.plugins.dialog.open.call(this, 'image', 'image' === this.currentControllerName);
+        this.plugins.modal.open.call(this, 'image', 'image' === this.currentControllerName);
     },
 
     openTab: function (e) {
@@ -367,7 +367,7 @@ export default {
         if (contextImage._resizing) contextImage._proportionChecked = contextImage.proportion.checked;
 
         try {
-            if (this.context.dialog.updateModal) {
+            if (this.context.modal.updateModal) {
                 imagePlugin.update_image.call(this, false, true, false);
             }
             
@@ -382,7 +382,7 @@ export default {
             this.closeLoading();
             throw Error('[SUNEDITOR.image.submit.fail] cause : "' + error.message + '"');
         } finally {
-            this.plugins.dialog.close.call(this);
+            this.plugins.modal.close.call(this);
         }
 
         return false;
@@ -427,7 +427,7 @@ export default {
             inputWidth: contextImage.inputX.value,
             inputHeight: contextImage.inputY.value,
             align: contextImage._align,
-            isUpdate: this.context.dialog.updateModal,
+            isUpdate: this.context.modal.updateModal,
             alt: contextImage._altText,
             element: contextImage._element
         };
@@ -471,7 +471,7 @@ export default {
         }
 
         const imageUploadUrl = this.options.imageUploadUrl;
-        const filesLen = this.context.dialog.updateModal ? 1 : files.length;
+        const filesLen = this.context.modal.updateModal ? 1 : files.length;
 
         // server upload
         if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
@@ -565,7 +565,7 @@ export default {
 
         try {
             const file = {name: url.split('/').pop(), size: 0};
-            if (this.context.dialog.updateModal) this.plugins.image.update_src.call(this, url, contextImage._element, file);
+            if (this.context.modal.updateModal) this.plugins.image.update_src.call(this, url, contextImage._element, file);
             else this.plugins.image.create_image.call(this, url, this.plugins.anchor.createAnchor.call(this, contextImage.anchorCtx, true), contextImage.inputX.value, contextImage.inputY.value, contextImage._align, file, contextImage._altText);
         } catch (e) {
             throw Error('[SUNEDITOR.image.URLRendering.fail] cause : "' + e.message + '"');
@@ -897,7 +897,7 @@ export default {
             this.plugins.resizing._module_setModifyInputSize.call(this, contextImage, this.plugins.image);
         }
 
-        if (!notOpen) this.plugins.dialog.open.call(this, 'image', true);
+        if (!notOpen) this.plugins.modal.open.call(this, 'image', true);
     },
 
     /**
@@ -1075,7 +1075,7 @@ export default {
     },
 
     /**
-     * @Override dialog
+     * @Override modal
      */
     init: function () {
         const contextImage = this.context.image;

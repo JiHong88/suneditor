@@ -87,7 +87,7 @@
 
             return '<div class="se-file-browser-content">' +
                     '<div class="se-file-browser-header">' +
-                        '<button type="button" data-command="close" class="se-btn se-file-browser-close" class="close" title="' + lang.dialogBox.close + '" aria-label="' + lang.dialogBox.close + '">' +
+                        '<button type="button" data-command="close" class="se-btn se-file-browser-close" class="close" title="' + lang.modalBox.close + '" aria-label="' + lang.modalBox.close + '">' +
                         core.icons.cancel +
                         '</button>' +
                         '<span class="se-file-browser-title"></span>' +
@@ -153,7 +153,7 @@
                 fileBrowserContext.list.className = 'se-file-browser-list ' + listClassName;
             }
 
-            if (this.options.dialoglType === 'full') {
+            if (this.options.modallType === 'full') {
                 fileBrowserContext.area.style.position = 'fixed';
             } else {
                 fileBrowserContext.area.style.position = 'absolute';

@@ -77,7 +77,7 @@
             dir_rtl: 'Right to left',
             mention: 'Mention'
         },
-        dialogBox: {
+        modalBox: {
             linkBox: {
                 title: 'Insert Link',
                 url: 'URL to link',

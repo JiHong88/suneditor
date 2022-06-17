@@ -32,15 +32,15 @@ EventManager.prototype = {
 	 * Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
 	 * @param {Element} target Target element
 	 * @param {string} type Event type
-	 * @param {Function} handler Event handler
+	 * @param {Function} listener Event handler
 	 * @param {boolean|undefined} useCapture Event useCapture option
 	 */
-	addEvent: function (target, type, handler, useCapture) {
-		target.addEventListener(type, handler, useCapture);
+	addEvent: function (target, type, listener, useCapture) {
+		target.addEventListener(type, listener, useCapture);
 		this._events.push({
 			target: target,
 			type: type,
-			handler: handler
+			handler: listener
 		});
 	},
 
@@ -816,7 +816,7 @@ function OnKeyDown_wysiwyg(e) {
 					return false;
 				}
 				// maintain default format
-				if (domUtils.isWysiwygFrame(formatEl.parentNode) && formatEl.childNodes.length <= 1 && (!formatEl.firstChild || unicode.onlyZeroWidthSpace(formatEl.textContent))) {
+				if (domUtils.isWysiwygFrame(formatEl.parentNode) && formatEl.childNodes.length <= 1 && (!formatEl.firstChild || domUtils.isZeroWith(formatEl.textContent))) {
 					e.preventDefault();
 					e.stopPropagation();
 
@@ -935,7 +935,7 @@ function OnKeyDown_wysiwyg(e) {
 					let comm = commonCon;
 					while (comm && comm !== rangeEl && !domUtils.isWysiwygFrame(comm)) {
 						if (comm.previousSibling) {
-							if (comm.previousSibling.nodeType === 1 || !unicode.onlyZeroWidthSpace(comm.previousSibling.textContent.trim())) {
+							if (comm.previousSibling.nodeType === 1 || !domUtils.isZeroWith(comm.previousSibling.textContent.trim())) {
 								detach = false;
 								break;
 							}
@@ -1005,13 +1005,13 @@ function OnKeyDown_wysiwyg(e) {
 			}
 
 			// component
-			if ((this.format.isLine(selectionNode) || selectionNode.nextSibling === null || (unicode.onlyZeroWidthSpace(selectionNode.nextSibling) && selectionNode.nextSibling.nextSibling === null)) && range.startOffset === selectionNode.textContent.length) {
+			if ((this.format.isLine(selectionNode) || selectionNode.nextSibling === null || (domUtils.isZeroWith(selectionNode.nextSibling) && selectionNode.nextSibling.nextSibling === null)) && range.startOffset === selectionNode.textContent.length) {
 				const nextEl = formatEl.nextElementSibling;
 				if (!nextEl) break;
 				if (this.component.is(nextEl)) {
 					e.preventDefault();
 
-					if (unicode.onlyZeroWidthSpace(formatEl)) {
+					if (domUtils.isZeroWith(formatEl)) {
 						domUtils.removeItem(formatEl);
 						// table component
 						if (domUtils.isTable(nextEl)) {
@@ -1197,7 +1197,7 @@ function OnKeyDown_wysiwyg(e) {
 						for (let c = 0, cLen = line.length, child; c < cLen; c++) {
 							child = line[c];
 							if (!child) break;
-							if (unicode.onlyZeroWidthSpace(child)) continue;
+							if (domUtils.isZeroWith(child)) continue;
 
 							if (/^\s{1,4}$/.test(child.textContent)) {
 								domUtils.removeItem(child);
@@ -1285,7 +1285,7 @@ function OnKeyDown_wysiwyg(e) {
 							newEl = this.node.split(r.container, r.offset, 0);
 						}
 					} else {
-						if (unicode.onlyZeroWidthSpace(formatEl)) newEl = this.format.addLine(formatEl, formatEl.cloneNode(false));
+						if (domUtils.isZeroWith(formatEl)) newEl = this.format.addLine(formatEl, formatEl.cloneNode(false));
 						else newEl = this.node.split(range.endContainer, range.endOffset, 0);
 					}
 
@@ -1320,14 +1320,14 @@ function OnKeyDown_wysiwyg(e) {
 							range.collapsed &&
 							children.length - 1 <= offset + 1 &&
 							domUtils.isBreak(children[offset]) &&
-							(!children[offset + 1] || ((!children[offset + 2] || unicode.onlyZeroWidthSpace(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && unicode.onlyZeroWidthSpace(children[offset + 1].textContent))) &&
+							(!children[offset + 1] || ((!children[offset + 2] || domUtils.isZeroWith(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && domUtils.isZeroWith(children[offset + 1].textContent))) &&
 							offset > 0 &&
 							domUtils.isBreak(children[offset - 1])) ||
 							(!selectionFormat &&
-								unicode.onlyZeroWidthSpace(selectionNode.textContent) &&
+								domUtils.isZeroWith(selectionNode.textContent) &&
 								domUtils.isBreak(prev) &&
-								(domUtils.isBreak(prev.previousSibling) || !unicode.onlyZeroWidthSpace(prev.previousSibling.textContent)) &&
-								(!next || (!domUtils.isBreak(next) && unicode.onlyZeroWidthSpace(next.textContent)))))
+								(domUtils.isBreak(prev.previousSibling) || !domUtils.isZeroWith(prev.previousSibling.textContent)) &&
+								(!next || (!domUtils.isBreak(next) && domUtils.isZeroWith(next.textContent)))))
 					) {
 						if (selectionFormat) domUtils.removeItem(children[offset - 1]);
 						else domUtils.removeItem(selectionNode);
@@ -1354,7 +1354,7 @@ function OnKeyDown_wysiwyg(e) {
 
 						const brPrev = br.previousSibling,
 							brNext = br.nextSibling;
-						if (!domUtils.isBreak(focusNext) && !domUtils.isBreak(brPrev) && (!brNext || unicode.onlyZeroWidthSpace(brNext))) {
+						if (!domUtils.isBreak(focusNext) && !domUtils.isBreak(brPrev) && (!brNext || domUtils.isZeroWith(brNext))) {
 							br.parentNode.insertBefore(br.cloneNode(false), br);
 							this.selection.setRange(br, 1, br, 1);
 						} else {
@@ -1383,7 +1383,7 @@ function OnKeyDown_wysiwyg(e) {
 					break;
 				}
 
-				if ((range.commonAncestorContainer.nodeType === 3 ? !range.commonAncestorContainer.nextElementSibling : true) && unicode.onlyZeroWidthSpace(formatEl.innerText.trim())) {
+				if ((range.commonAncestorContainer.nodeType === 3 ? !range.commonAncestorContainer.nextElementSibling : true) && domUtils.isZeroWith(formatEl.innerText.trim())) {
 					e.preventDefault();
 					let newEl = null;
 

@@ -77,7 +77,7 @@
             dir_rtl: 'No labās uz kreiso',
             mention: 'Pieminēt'
         },
-        dialogBox: {
+        modalBox: {
             linkBox: {
                 title: 'Ievietot saiti',
                 url: 'Saites URL',

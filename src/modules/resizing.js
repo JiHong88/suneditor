@@ -196,30 +196,30 @@
                             '<ul class="se-list-basic">' +
                                 '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="basic">' +
                                     icons.align_justify +
-                                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.basic + '</span></span>' +
+                                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.modalBox.basic + '</span></span>' +
                                 '</button></li>' +
                                 '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="left">' +
                                     icons.align_left +
-                                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.left + '</span></span>' +
+                                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.modalBox.left + '</span></span>' +
                                 '</button></li>' +
                                 '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="center">' +
                                     icons.align_center +
-                                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.center + '</span></span>' +
+                                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.modalBox.center + '</span></span>' +
                                 '</button></li>' +
                                 '<li><button type="button" class="se-btn-list se-tooltip" data-command="align" data-value="right">' +
                                     icons.align_right +
-                                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.right + '</span></span>' +
+                                    '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.modalBox.right + '</span></span>' +
                                 '</button></li>' +
                             '</ul>' +
                         '</div>' +
                     '</div>' +
                     '<button type="button" data-command="caption" class="se-btn se-tooltip _se_resizing_caption_button">' +
                         icons.caption +
-                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.caption + '</span></span>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.modalBox.caption + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="revert" class="se-btn se-tooltip">' +
                         icons.revert +
-                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.dialogBox.revertButton + '</span></span>' +
+                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.modalBox.revertButton + '</span></span>' +
                     '</button>' +
                     '<button type="button" data-command="update" class="se-btn se-tooltip">' +
                         icons.modify +
@@ -421,7 +421,7 @@
             const cover = this.util.getParentElement(targetElement, 'FIGURE');
             const displayX = this.plugins.resizing._module_getSizeX.call(this, contextPlugin, targetElement, cover, container) || 'auto';
             const displayY = contextPlugin._onlyPercentage && plugin === 'image' ? '' : ', ' + (this.plugins.resizing._module_getSizeY.call(this, contextPlugin, targetElement, cover, container) || 'auto');
-            this.util.changeTxt(contextResizing.resizeDisplay, this.lang.dialogBox[align] + ' (' + displayX + displayY + ')');
+            this.util.changeTxt(contextResizing.resizeDisplay, this.lang.modalBox[align] + ' (' + displayX + displayY + ')');
     
             // resizing display
             contextResizing.resizeButtonGroup.style.display = contextPlugin._resizing ? '' : 'none';

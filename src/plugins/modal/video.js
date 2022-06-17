@@ -7,16 +7,16 @@
  */
 'use strict';
 
-import dialog from '../modules/dialog';
+import modal from '../modules/modal';
 import mediaContainer from '../modules/mediaContainer';
 import resizing from '../modules/resizing';
 import fileManager from '../modules/fileManager';
 
 export default {
     name: 'video',
-    type: 'dialog',
+    type: 'modal',
     add: function (core) {
-        core.addModule([dialog, mediaContainer, resizing, fileManager]);
+        core.addModule([modal, mediaContainer, resizing, fileManager]);
 
         const options = core.options;
         const context = core.context;
@@ -24,7 +24,7 @@ export default {
             _infoList: [], // @Override fileManager
             _infoIndex: 0, // @Override fileManager
             _uploadFileLength: 0, // @Override fileManager
-            focusElement: null, // @Override dialog // This element has focus when the dialog is opened.
+            focusElement: null, // @Override modal // This element has focus when the modal is opened.
             sizeUnit: options._videoSizeUnit,
             _align: 'none',
             _floatClassRegExp: '__se__float\\-[a-z]+',
@@ -59,17 +59,17 @@ export default {
             _captionShow: false
         };
 
-        /** video dialog */
-        let video_dialog = this.setDialog(core);
-        contextVideo.modal = video_dialog;
-        contextVideo.videoInputFile = video_dialog.querySelector('._se_video_file');
-        contextVideo.videoUrlFile = video_dialog.querySelector('.se-input-url');
+        /** video modal */
+        let video_modal = this.setModal(core);
+        contextVideo.modal = video_modal;
+        contextVideo.videoInputFile = video_modal.querySelector('._se_video_file');
+        contextVideo.videoUrlFile = video_modal.querySelector('.se-input-url');
         contextVideo.focusElement = contextVideo.videoUrlFile || contextVideo.videoInputFile;
-        contextVideo.preview = video_dialog.querySelector('.se-link-preview');
+        contextVideo.preview = video_modal.querySelector('.se-link-preview');
 
         /** add event listeners */
-        video_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core));
-        if (contextVideo.videoInputFile) video_dialog.querySelector('.se-dialog-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(contextVideo.videoInputFile, contextVideo.videoUrlFile, contextVideo.preview));
+        video_modal.querySelector('form').addEventListener('submit', this.submit.bind(core));
+        if (contextVideo.videoInputFile) video_modal.querySelector('.se-modal-files-edge-button').addEventListener('click', this._removeSelectedFiles.bind(contextVideo.videoInputFile, contextVideo.videoUrlFile, contextVideo.preview));
         if (contextVideo.videoInputFile && contextVideo.videoUrlFile) contextVideo.videoInputFile.addEventListener('change', this._fileInputChange.bind(contextVideo));
         if (contextVideo.videoUrlFile) contextVideo.videoUrlFile.addEventListener('input', this._onLinkPreview.bind(contextVideo.preview, contextVideo, options.linkProtocol));
 
@@ -78,10 +78,10 @@ export default {
         contextVideo.inputX = {};
         contextVideo.inputY = {};
         if (options.videoResizing) {
-            contextVideo.proportion = video_dialog.querySelector('._se_video_check_proportion');
-            contextVideo.videoRatioOption = video_dialog.querySelector('.se-video-ratio');
-            contextVideo.inputX = video_dialog.querySelector('._se_video_size_x');
-            contextVideo.inputY = video_dialog.querySelector('._se_video_size_y');
+            contextVideo.proportion = video_modal.querySelector('._se_video_check_proportion');
+            contextVideo.videoRatioOption = video_modal.querySelector('.se-video-ratio');
+            contextVideo.inputX = video_modal.querySelector('._se_video_size_x');
+            contextVideo.inputY = video_modal.querySelector('._se_video_size_y');
             contextVideo.inputX.value = options.videoWidth;
             contextVideo.inputY.value = options.videoHeight;
 
@@ -93,49 +93,49 @@ export default {
             contextVideo.proportion.addEventListener('change', this.setRatio.bind(core));
             contextVideo.videoRatioOption.addEventListener('change', this.setVideoRatio.bind(core));
 
-            video_dialog.querySelector('.se-dialog-btn-revert').addEventListener('click', this.sizeRevert.bind(core));
+            video_modal.querySelector('.se-modal-btn-revert').addEventListener('click', this.sizeRevert.bind(core));
         }
 
         /** append html */
-        context.dialog.modal.appendChild(video_dialog);
+        context.modal.modal.appendChild(video_modal);
 
         /** empty memory */
-        video_dialog = null;
+        video_modal = null;
     },
 
-    /** dialog */
-    setDialog: function (core) {
+    /** modal */
+    setModal: function (core) {
         const option = core.options;
         const lang = core.lang;
-        const dialog = core.util.createElement('DIV');
+        const modal = core.util.createElement('DIV');
 
-        dialog.className = 'se-dialog-content';
-        dialog.style.display = 'none';
+        modal.className = 'se-modal-content';
+        modal.style.display = 'none';
         let html = '' +
             '<form method="post" enctype="multipart/form-data">' +
-                '<div class="se-dialog-header">' +
-                    '<button type="button" data-command="close" class="se-btn se-dialog-close" title="' + lang.dialogBox.close + '" aria-label="' + lang.dialogBox.close + '">' +
+                '<div class="se-modal-header">' +
+                    '<button type="button" data-command="close" class="se-btn se-modal-close" title="' + lang.modalBox.close + '" aria-label="' + lang.modalBox.close + '">' +
                         core.icons.cancel +
                     '</button>' +
-                    '<span class="se-modal-title">' + lang.dialogBox.videoBox.title + '</span>' +
+                    '<span class="se-modal-title">' + lang.modalBox.videoBox.title + '</span>' +
                 '</div>' +
-                '<div class="se-dialog-body">';
+                '<div class="se-modal-body">';
 
                 if (option.videoFileInput) {
                     html += '' +
-                        '<div class="se-dialog-form">' +
-                            '<label>' + lang.dialogBox.videoBox.file + '</label>' +
-                            '<div class="se-dialog-form-files">' +
+                        '<div class="se-modal-form">' +
+                            '<label>' + lang.modalBox.videoBox.file + '</label>' +
+                            '<div class="se-modal-form-files">' +
                                 '<input class="se-input-form _se_video_file" type="file" accept="' + option.videoAccept + '"' + (option.videoMultipleFile ? ' multiple="multiple"' : '') + '/>' +
-                                '<button type="button" data-command="filesRemove" class="se-btn se-dialog-files-edge-button se-file-remove" title="' + lang.controller.remove + '" aria-label="' + lang.controller.remove + '">' + core.icons.cancel + '</button>' +
+                                '<button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="' + lang.controller.remove + '" aria-label="' + lang.controller.remove + '">' + core.icons.cancel + '</button>' +
                             '</div>' +
                         '</div>' ;
                 }
     
                 if (option.videoUrlInput) {
                     html += '' +
-                        '<div class="se-dialog-form">' +
-                            '<label>' + lang.dialogBox.videoBox.url + '</label>' +
+                        '<div class="se-modal-form">' +
+                            '<label>' + lang.modalBox.videoBox.url + '</label>' +
                             '<input class="se-input-form se-input-url" type="text" />' +
                             '<pre class="se-link-preview"></pre>' +
                         '</div>';
@@ -150,45 +150,45 @@ export default {
                 const ratioDisplay = !option.videoRatioShow ? ' style="display: none !important;"' : '';
                 const onlyWidthDisplay = !onlyPercentage && !option.videoHeightShow && !option.videoRatioShow ? ' style="display: none !important;"' : '';
                 html += '' +
-                    '<div class="se-dialog-form">' +
-                        '<div class="se-dialog-size-text">' +
-                            '<label class="size-w">' + lang.dialogBox.width + '</label>' +
-                            '<label class="se-dialog-size-x">&nbsp;</label>' +
-                            '<label class="size-h"' + heightDisplay + '>' + lang.dialogBox.height + '</label>' +
-                            '<label class="size-h"' + ratioDisplay + '>(' + lang.dialogBox.ratio + ')</label>' +
+                    '<div class="se-modal-form">' +
+                        '<div class="se-modal-size-text">' +
+                            '<label class="size-w">' + lang.modalBox.width + '</label>' +
+                            '<label class="se-modal-size-x">&nbsp;</label>' +
+                            '<label class="size-h"' + heightDisplay + '>' + lang.modalBox.height + '</label>' +
+                            '<label class="size-h"' + ratioDisplay + '>(' + lang.modalBox.ratio + ')</label>' +
                         '</div>' +
                         '<input class="se-input-control _se_video_size_x" placeholder="100%"' + (onlyPercentage ? ' type="number" min="1"' : 'type="text"') + (onlyPercentage ? ' max="100"' : '') + '/>' +
-                        '<label class="se-dialog-size-x"' + onlyWidthDisplay + '>' + (onlyPercentage ? '%' : 'x') + '</label>' +
+                        '<label class="se-modal-size-x"' + onlyWidthDisplay + '>' + (onlyPercentage ? '%' : 'x') + '</label>' +
                         '<input class="se-input-control _se_video_size_y" placeholder="' + (option.videoRatio * 100) + '%"' + (onlyPercentage ? ' type="number" min="1"' : 'type="text"') + (onlyPercentage ? ' max="100"' : '') + heightDisplay + '/>' +
-                        '<select class="se-input-select se-video-ratio" title="' + lang.dialogBox.ratio + '" aria-label="' + lang.dialogBox.ratio + '"' + ratioDisplay + '>';
+                        '<select class="se-input-select se-video-ratio" title="' + lang.modalBox.ratio + '" aria-label="' + lang.modalBox.ratio + '"' + ratioDisplay + '>';
                             if (!heightDisplay) html += '<option value=""> - </option>';
                             for (let i = 0, len = ratioList.length; i < len; i++) {
                                 html += '<option value="' + ratioList[i].value + '"' + (ratio.toString() === ratioList[i].value.toString() ? ' selected' : '') + '>' + ratioList[i].name + '</option>';
                             }
                         html += '</select>' +
-                        '<button type="button" title="' + lang.dialogBox.revertButton + '" aria-label="' + lang.dialogBox.revertButton + '" class="se-btn se-dialog-btn-revert" style="float: right;">' + core.icons.revert + '</button>' +
+                        '<button type="button" title="' + lang.modalBox.revertButton + '" aria-label="' + lang.modalBox.revertButton + '" class="se-btn se-modal-btn-revert" style="float: right;">' + core.icons.revert + '</button>' +
                     '</div>' +
-                    '<div class="se-dialog-form se-dialog-form-footer"' + onlyPercentDisplay + onlyWidthDisplay + '>' +
-                        '<label><input type="checkbox" class="se-dialog-btn-check _se_video_check_proportion" checked/>&nbsp;' + lang.dialogBox.proportion + '</label>' +
+                    '<div class="se-modal-form se-modal-form-footer"' + onlyPercentDisplay + onlyWidthDisplay + '>' +
+                        '<label><input type="checkbox" class="se-modal-btn-check _se_video_check_proportion" checked/>&nbsp;' + lang.modalBox.proportion + '</label>' +
                     '</div>';
             }
 
             html += '' +
                 '</div>' +
-                '<div class="se-dialog-footer">' +
+                '<div class="se-modal-footer">' +
                     '<div' + (option.videoAlignShow ? '' : ' style="display: none"') + '>' +
-                        '<label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="none" checked>' + lang.dialogBox.basic + '</label>' +
-                        '<label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="left">' + lang.dialogBox.left + '</label>' +
-                        '<label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="center">' + lang.dialogBox.center + '</label>' +
-                        '<label><input type="radio" name="suneditor_video_radio" class="se-dialog-btn-radio" value="right">' + lang.dialogBox.right + '</label>' +
+                        '<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="none" checked>' + lang.modalBox.basic + '</label>' +
+                        '<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="left">' + lang.modalBox.left + '</label>' +
+                        '<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="center">' + lang.modalBox.center + '</label>' +
+                        '<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="right">' + lang.modalBox.right + '</label>' +
                     '</div>' +
-                    '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '" aria-label="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+                    '<button type="submit" class="se-btn-primary" title="' + lang.modalBox.submitButton + '" aria-label="' + lang.modalBox.submitButton + '"><span>' + lang.modalBox.submitButton + '</span></button>' +
                 '</div>' +
             '</form>';
 
-        dialog.innerHTML = html;
+        modal.innerHTML = html;
 
-        return dialog;
+        return modal;
     },
 
     _fileInputChange: function () {
@@ -297,7 +297,7 @@ export default {
     },
 
     /**
-     * @Required @Override dialog
+     * @Required @Override modal
      */
     on: function (update) {
         const contextVideo = this.context.video;
@@ -317,10 +317,10 @@ export default {
     },
 
     /**
-     * @Required @Override dialog
+     * @Required @Override modal
      */
     open: function () {
-        this.plugins.dialog.open.call(this, 'video', 'video' === this.currentControllerName);
+        this.plugins.modal.open.call(this, 'video', 'video' === this.currentControllerName);
     },
     
     setVideoRatio: function (e) {
@@ -379,7 +379,7 @@ export default {
             this.closeLoading();
             throw Error('[SUNEDITOR.video.submit.fail] cause : "' + error.message + '"');
         } finally {
-            this.plugins.dialog.close.call(this);
+            this.plugins.modal.close.call(this);
         }
 
         return false;
@@ -422,7 +422,7 @@ export default {
             inputWidth: contextVideo.inputX.value,
             inputHeight: contextVideo.inputY.value,
             align: contextVideo._align,
-            isUpdate: this.context.dialog.updateModal,
+            isUpdate: this.context.modal.updateModal,
             element: contextVideo._element
         };
 
@@ -465,7 +465,7 @@ export default {
         }
 
         const videoUploadUrl = this.options.videoUploadUrl;
-        const filesLen = this.context.dialog.updateModal ? 1 : files.length;
+        const filesLen = this.context.modal.updateModal ? 1 : files.length;
 
         // server upload
         if (typeof videoUploadUrl === 'string' && videoUploadUrl.length > 0) {
@@ -540,7 +540,7 @@ export default {
                 url = 'https://player.vimeo.com/video/' + url.slice(url.lastIndexOf('/') + 1);
             }
 
-            this.plugins.video.create_video.call(this, this.plugins.video[(!/youtu\.?be/.test(url) && !/vimeo\.com/.test(url) ? "createVideoTag" : "createIframeTag")].call(this), url, contextVideo.inputX.value, contextVideo.inputY.value, contextVideo._align, null, this.context.dialog.updateModal);
+            this.plugins.video.create_video.call(this, this.plugins.video[(!/youtu\.?be/.test(url) && !/vimeo\.com/.test(url) ? "createVideoTag" : "createIframeTag")].call(this), url, contextVideo.inputX.value, contextVideo.inputY.value, contextVideo._align, null, this.context.modal.updateModal);
         } catch (error) {
             throw Error('[SUNEDITOR.video.upload.fail] cause : "' + error.message + '"');
         } finally {
@@ -746,7 +746,7 @@ export default {
             if (!ratioSelected) contextVideo.inputY.value = contextVideo._onlyPercentage ? this.util.getNumber(y, 2) : y;
         }
 
-        if (!notOpen) this.plugins.dialog.open.call(this, 'video', true);
+        if (!notOpen) this.plugins.modal.open.call(this, 'video', true);
     },
     
     setVideoRatioSelect: function (value) {
@@ -955,7 +955,7 @@ export default {
     },
 
     /**
-     * @Override dialog
+     * @Override modal
      */
     init: function () {
         const contextVideo = this.context.video;

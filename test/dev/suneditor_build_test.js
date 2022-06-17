@@ -27,15 +27,17 @@ import paragraphStyle from "../../src/plugins/dropdown/paragraphStyle";
 import template from "../../src/plugins/dropdown/template";
 import textStyle from "../../src/plugins/dropdown/textStyle";
 import table from "../../src/plugins/dropdown/table";
+import math from "../../src/plugins/modal/math";
 
 window.e = suneditor.create(document.getElementById('editor2'), {
     // value: 'abc',
     plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock, horizontalLine, lineHeight, list,
-        paragraphStyle, template, textStyle, table
+        paragraphStyle, template, textStyle, table, math
     ],
     charCounter: true,
     statusbar: true,
     // mode: "inline",
+    katex: Katex,
     width: "100%",
     minHeight : 300,
     charCounter: true,
@@ -64,7 +66,8 @@ window.e = suneditor.create(document.getElementById('editor2'), {
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
         ['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'horizontalLine'],
-        ['lineHeight', 'list', 'paragraphStyle', 'template', 'textStyle', 'table']
+        ['lineHeight', 'list', 'paragraphStyle', 'template', 'textStyle', 'table'],
+        ['math']
     ]
 });
 
@@ -237,7 +240,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     // },
 //     // height: 'auto',
 //     iframe_cssFileName: '.+',
-//     dialoglType: 'full',
+//     modallType: 'full',
 //     charCounter: true,
 //     charCounter_type: 'byte-html',
 //     charCounter_label: 'Characters :',
@@ -812,7 +815,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     width: '100%',
 //     height: '500px',
 //     toolbar_sticky: false,
-//     dialoglType: 'local',
+//     modallType: 'local',
 //     // iframe: true,
 //     // maxCharCount: 300,
 //     // statusbar: false

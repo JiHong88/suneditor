@@ -1,6 +1,17 @@
 import { _allowedEmptyNodeList } from './env';
 import { _d, _w } from './global';
-import { onlyZeroWidthSpace, zeroWidthRegExp } from './unicode';
+import { onlyZeroWidthRegExp, zeroWidthRegExp } from './unicode';
+
+/**
+ * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (unicode.zeroWidthSpace)
+ * @param {string|Node} text String value or Node
+ * @returns {boolean}
+ */
+export function isZeroWith(text) {
+	if (text === null || text === undefined) return false;
+	if (typeof text !== 'string') text = text.textContent;
+	return text === '' || onlyZeroWidthRegExp.test(text);
+}
 
 /**
  * @description Create Element node
@@ -791,7 +802,7 @@ export function isMedia(node) {
  * @returns {boolean}
  */
 export function isEmptyLine(element) {
-	return !element || !element.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && onlyZeroWidthSpace(element.textContent));
+	return !element || !element.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && isZeroWith(element.textContent));
 }
 
 /**
@@ -822,6 +833,7 @@ export function isImportantDisabled(element) {
 }
 
 const domUtils = {
+	isZeroWith: isZeroWith,
 	createElement: createElement,
 	createTextNode: createTextNode,
 	getIframeDocument: getIframeDocument,

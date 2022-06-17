@@ -7,7 +7,7 @@
  */
 'use strict';
 
-import dialog from '../modules/dialog';
+import modal from '../modules/modal';
 
 
 function insertAt(parent, child, index) {
@@ -21,7 +21,7 @@ function insertAt(parent, child, index) {
 
 export default {
   name: 'mention',
-  type: 'dialog',
+  type: 'modal',
 
   renderItem: function(item) {
     return `<span>${item}</span>`;
@@ -81,28 +81,28 @@ export default {
     });
   },
 
-  setDialog: function(core) {
-    const mention_dialog = core.util.createElement('DIV');
+  setModal: function(core) {
+    const mention_modal = core.util.createElement('DIV');
     const lang = core.lang;
-    mention_dialog.className = 'se-dialog-content';
-    mention_dialog.style.display = 'none';
+    mention_modal.className = 'se-modal-content';
+    mention_modal.style.display = 'none';
     const html = `
-      <form class="se-dialog-form">
-        <div class="se-dialog-header">
-          <button type="button" data-command="close" class="se-btn se-dialog-close" title="${lang.dialogBox.close}" aria-label="${lang.dialogBox.close}">
+      <form class="se-modal-form">
+        <div class="se-modal-header">
+          <button type="button" data-command="close" class="se-btn se-modal-close" title="${lang.modalBox.close}" aria-label="${lang.modalBox.close}">
             ${core.icons.cancel}
           </button>
-          <span class="se-modal-title">${lang.dialogBox.mentionBox.title}</span>
+          <span class="se-modal-title">${lang.modalBox.mentionBox.title}</span>
         </div>
-        <div class="se-dialog-body">
-          <input class="se-input-form se-mention-search" type="text" placeholder="${lang.dialogBox.browser.search}" />
+        <div class="se-modal-body">
+          <input class="se-input-form se-mention-search" type="text" placeholder="${lang.modalBox.browser.search}" />
           <ul class="se-mention-list">
           </ul>
         </div>
       </form>
     `;
-    mention_dialog.innerHTML = html;
-    return mention_dialog;
+    mention_modal.innerHTML = html;
+    return mention_modal;
   },
 
   getId(mention) {
@@ -119,7 +119,7 @@ export default {
 
   open: function() {
     const { mention } = this.context;
-    this.plugins.dialog.open.call(
+    this.plugins.modal.open.call(
       this,
       'mention',
       'mention' === this.currentControllerName
@@ -206,18 +206,18 @@ export default {
       spacer.innerHTML = ' ';
       this.html.insertNode(spacer, el, false);
     }
-    this.plugins.dialog.close.call(this);
+    this.plugins.modal.close.call(this);
   },
   add: function(core) {
-    core.addModule([dialog]);
+    core.addModule([modal]);
     this.title = core.lang.toolbar.mention;
-    const _dialog = this.setDialog(core);
+    const _modal = this.setModal(core);
     core.getMentions = this.getMentions(core);
 
-    const _search = _dialog.querySelector('.se-mention-search');
+    const _search = _modal.querySelector('.se-mention-search');
     _search.addEventListener('keyup', this.onKeyUp.bind(core));
     _search.addEventListener('keydown', this.onKeyPress.bind(core));
-    const _list = _dialog.querySelector('.se-mention-list');
+    const _list = _modal.querySelector('.se-mention-list');
 
     core.context.mention = {
       _addMention: this._addMention.bind(core),
@@ -231,12 +231,12 @@ export default {
       getLinkHref: this.getLinkHref.bind(core),
       getValue: this.getValue.bind(core),
       mentions: [],
-      modal: _dialog,
+      modal: _modal,
       open: this.open.bind(core),
       renderItem: this.renderItem,
       renderList: this.renderList.bind(core),
     };
-    core.context.dialog.modal.appendChild(_dialog);
+    core.context.modal.modal.appendChild(_modal);
   },
   action: function() {},
 };

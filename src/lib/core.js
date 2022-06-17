@@ -266,8 +266,8 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	 * Basic Editor Actions:
 	 * 1. All classes not starting with "__se__" or "se-" in the editor are removed.
 	 * 2. The style of all tags except the "span" tag is removed from the editor.
-	 * "_managedElementInfo" structure ex:
-	 * _managedElementInfo: {
+	 * "_MELInfo" structure ex:
+	 * _MELInfo: {
 	 *   query: ".__se__xxx, se-xxx"
 	 *   map: {
 	 *     "__se__xxx": method.bind(core),
@@ -275,8 +275,8 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	 *   }
 	 * }
 	 * @example
-	 * Define in the following return format in the "_managedElementInfo" function of the plugin.
-	 * _managedElementInfo() => {
+	 * Define in the following return format in the "_MELInfo" function of the plugin.
+	 * _MELInfo() => {
 	 *  return {
 	 *    className: "string", // Class name to identify the tag. ("__se__xxx", "se-xxx")
 	 *    // Change the html of the "element". ("element" is the element found with "className".)
@@ -289,7 +289,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	 * }
 	 * @private
 	 */
-	this._managedElementInfo = null;
+	this._MELInfo = null;
 
 	/**
 	 * @description Array of "checkFileInfo" functions with the core bound
@@ -417,7 +417,7 @@ Core.prototype = {
 		if (!this.plugins[pluginName]) {
 			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "' + pluginName + '")');
 		} else {
-			const plugin = this.plugins[pluginName] = new this.plugins[pluginName](this, target);
+			const plugin = (this.plugins[pluginName] = new this.plugins[pluginName](this, target));
 			UpdateButton(target, plugin);
 			if (typeof plugin.init === 'function') plugin.init();
 		}
@@ -431,7 +431,7 @@ Core.prototype = {
 	/**
 	 * @description Run plugin calls and basic commands.
 	 * @param {string} command Command string
-	 * @param {string} type Display type string ('command', 'dropdown', 'dialog', 'container')
+	 * @param {string} type Display type string ('command', 'dropdown', 'modal', 'container')
 	 * @param {Element} target The element of command button
 	 */
 	runPlugin: function (command, type, target) {
@@ -462,7 +462,7 @@ Core.prototype = {
 			if (/dropdown/.test(type) && (this.menu._menuTrayMap[command] === null || target !== this.menu.currentDropdownActiveButton)) {
 				this.menu.dropdownOn(target);
 				return;
-			} else if (/dialog/.test(type)) {
+			} else if (/modal/.test(type)) {
 				this.plugins[command].open();
 				return;
 			} else if (/command/.test(type)) {
@@ -483,7 +483,7 @@ Core.prototype = {
 	},
 
 	/**
-	 * @description Execute command of command button(All Buttons except dropdown and dialog)
+	 * @description Execute command of command button(All Buttons except dropdown and modal)
 	 * (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
 	 * @param {string} command Property of command button (data-value)
 	 * @param {Element|null} target The element of command button
@@ -1311,7 +1311,7 @@ Core.prototype = {
 			if (this.menu.currentDropdownActiveButton && this.menu.currentDropdownActiveButton.disabled) this.menu.dropdownOff();
 			if (this.menu.currentMoreLayerActiveButton && this.menu.currentMoreLayerActiveButton.disabled) this.menu.moreLayerOff();
 			if (this.menu.currentContainerActiveButton && this.menu.currentContainerActiveButton.disabled) this.menu.containerOff();
-			if (this.modalForm) this.plugins.dialog.close.call(this);
+			if (this.modalForm) this.plugins.modal.close.call(this);
 
 			this.context.element.code.setAttribute('readOnly', 'true');
 			domUtils.addClass(this.context.element.wysiwygFrame, 'se-read-only');
@@ -1329,7 +1329,7 @@ Core.prototype = {
 	disable: function () {
 		this.toolbar.disable();
 		this.menu.controllerOff();
-		if (this.modalForm) this.plugins.dialog.close.call(this);
+		if (this.modalForm) this.plugins.modal.close.call(this);
 
 		this.context.element.wysiwyg.setAttribute('contenteditable', false);
 		this.isDisabled = true;
@@ -1673,11 +1673,11 @@ Core.prototype = {
 		this._fileInfoPluginsReset = [];
 
 		// text components
-		this._managedElementInfo = {
+		this._MELInfo = {
 			query: '',
 			map: {}
 		};
-		
+
 		// plugins install
 		// Command and file plugins registration
 		this.activePlugins = [];
@@ -1716,14 +1716,14 @@ Core.prototype = {
 				this._onKeyDownPlugins.push(plugin.onPluginKeyDown.bind(plugin));
 			}
 
-			if (plugin.managedTags) {
-				const info = plugin.managedTags();
+			if (plugin.managedElement) {
+				const info = plugin.managedElement();
 				managedClass.push('.' + info.className);
-				this._managedElementInfo.map[info.className] = info.method.bind(this);
+				this._MELInfo.map[info.className] = info.method;
 			}
 		}
 
-		this._managedElementInfo.query = managedClass.toString();
+		this._MELInfo.query = managedClass.toString();
 		this._fileManager.queryString = this._fileManager.tags.join(',');
 		this._fileManager.regExp = new wRegExp('^(' + (this._fileManager.tags.join('|') || '\\^') + ')$', 'i');
 		this._fileManager.pluginRegExp = new wRegExp('^(' + (filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')) + ')$', 'i');
@@ -1774,7 +1774,7 @@ Core.prototype = {
 		this.resizingDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
 
 		this._saveButtonStates();
-		
+
 		const buttons = this.context.buttons;
 		const textTags = this.options.textTags;
 		this._commandMap = {
@@ -1854,7 +1854,7 @@ Core.prototype = {
 	},
 
 	__callResizeFunction: function (h, resizeObserverEntry) {
-		h = h === -1 ? (resizeObserverEntry.borderBoxSize ? resizeObserverEntry.borderBoxSize[0].blockSize : (resizeObserverEntry.contentRect.height + this._editorHeightPadding)) : h;
+		h = h === -1 ? (resizeObserverEntry.borderBoxSize ? resizeObserverEntry.borderBoxSize[0].blockSize : resizeObserverEntry.contentRect.height + this._editorHeightPadding) : h;
 		if (this._editorHeight !== h) {
 			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, this._editorHeight, core, resizeObserverEntry);
 			this._editorHeight = h;
@@ -1878,7 +1878,7 @@ Core.prototype = {
 			}
 
 			const wysiwyg = this.context.element.wysiwyg;
-			if (!unicode.onlyZeroWidthSpace(wysiwyg.textContent) || wysiwyg.querySelector(domUtils._allowedEmptyNodeList) || (wysiwyg.innerText.match(/\n/g) || '').length > 1) {
+			if (!domUtils.isZeroWith(wysiwyg.textContent) || wysiwyg.querySelector(domUtils._allowedEmptyNodeList) || (wysiwyg.innerText.match(/\n/g) || '').length > 1) {
 				this._placeholder.style.display = 'none';
 			} else {
 				this._placeholder.style.display = 'block';
@@ -1893,7 +1893,7 @@ Core.prototype = {
 	 * @private
 	 */
 	_setOptionsInit: function (el, _initHTML) {
-		this.context = Context(el.originElement, this._getConstructed(el), this.options); //@todo context don't reset
+		this.context = Context(el.originElement, el.top, el.wysiwygFrame, el.code, this.options); //@todo context don't reset
 		this._componentsInfoReset = true;
 		this._editorInit(true, _initHTML);
 	},
@@ -1931,37 +1931,6 @@ Core.prototype = {
 				if (typeof this.events.onload === 'function') this.events.onload(reload);
 			}.bind(this)
 		);
-	},
-
-	/**
-	 * @description Create and return an object to cache the new context.
-	 * @param {Element} contextEl context.element
-	 * @returns {Object}
-	 * @private
-	 */
-	_getConstructed: function (contextEl) {
-		return {
-			_top: contextEl.topArea,
-			_relative: contextEl.relative,
-			_toolBar: contextEl.toolbar,
-			_toolbarShadow: contextEl._toolbarShadow,
-			_menuTray: contextEl._menuTray,
-			_editorArea: contextEl.editorArea,
-			_wysiwygArea: contextEl.wysiwygFrame,
-			_codeArea: contextEl.code,
-			_placeholder: contextEl.placeholder,
-			_statusbar: contextEl.statusbar,
-			_navigation: contextEl.navigation,
-			_charCounter: contextEl.charCounter,
-			_charWrapper: contextEl.charWrapper,
-			_loading: contextEl.loading,
-			_lineBreaker: contextEl.lineBreaker,
-			_lineBreaker_t: contextEl.lineBreaker_t,
-			_lineBreaker_b: contextEl.lineBreaker_b,
-			_resizeBack: contextEl.resizeBackground,
-			_stickyDummy: contextEl._stickyDummy,
-			_arrow: contextEl._arrow
-		};
 	},
 
 	Constructor: Core

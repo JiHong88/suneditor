@@ -20,7 +20,7 @@ const Notice = function (editor) {
 		{
 			class: 'close',
 			'aria-label': 'Close',
-			title: editor.lang.dialogBox.close
+			title: editor.lang.modalBox.close
 		},
 		editor.icons.cancel
 	);

@@ -8,7 +8,7 @@
 'use strict';
 
 import EditorInterface from '../../interface/editor';
-import { domUtils, numbers, unicode } from '../../helper';
+import { domUtils, numbers } from '../../helper';
 
 const table = function (editor, target) {
 	EditorInterface.call(this, editor);
@@ -20,8 +20,8 @@ const table = function (editor, target) {
 	// create HTML
 	const menu = CreateHTML(editor);
 	const commandArea = menu.querySelector('.se-controller-table-picker');
-	const controller_table = CreateHTML_tableController(editor);
-	const controller_cell = CreateHTML_cellController(editor, this.cellControllerTop);
+	const controller_table = CreateHTML_controller_table(editor);
+	const controller_cell = CreateHTML_controller_cell(editor, this.cellControllerTop);
 
 	// members
 	this.maxText = this.lang.controller.maxSize;
@@ -73,7 +73,7 @@ const table = function (editor, target) {
 	this._initBind = null;
 	this._closeSplitMenu = null;
 
-	// add controller element
+	// add elements
 	this.context.element.relative.appendChild(controller_cell);
 	this.context.element.relative.appendChild(controller_table);
 
@@ -805,7 +805,7 @@ table.prototype = {
 
 			ch = cell.children;
 			for (let c = 0, cLen = ch.length; c < cLen; c++) {
-				if (this.format.isLine(ch[c]) && unicode.onlyZeroWidthSpace(ch[c].textContent)) {
+				if (this.format.isLine(ch[c]) && domUtils.isZeroWith(ch[c].textContent)) {
 					domUtils.removeItem(ch[c]);
 				}
 			}
@@ -1336,7 +1336,7 @@ function CreateHTML() {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-selector-table' }, html);
 }
 
-function CreateHTML_tableController(editor) {
+function CreateHTML_controller_table(editor) {
 	const lang = editor.lang;
 	const icons = editor.icons;
 	const html =
@@ -1372,7 +1372,7 @@ function CreateHTML_tableController(editor) {
 	return domUtils.createElement('DIV', { class: 'se-controller se-controller-table' }, html);
 }
 
-function CreateHTML_cellController(editor, cellControllerTop) {
+function CreateHTML_controller_cell(editor, cellControllerTop) {
 	const lang = editor.lang;
 	const icons = editor.icons;
 	const html =

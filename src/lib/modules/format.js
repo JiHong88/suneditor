@@ -433,7 +433,7 @@ Format.prototype = {
 		let moveComplete = false;
 
 		function appendNode(parent, insNode, sibling, originNode) {
-			if (unicode.onlyZeroWidthSpace(insNode)) insNode.innerHTML = unicode.zeroWidthSpace;
+			if (domUtils.isZeroWith(insNode)) insNode.innerHTML = unicode.zeroWidthSpace;
 
 			if (insNode.nodeType === 3) {
 				parent.insertBefore(insNode, sibling);
@@ -663,7 +663,7 @@ Format.prototype = {
 
 		const originRange = {
 			sc: range.startContainer,
-			so: range.startContainer === range.endContainer && unicode.onlyZeroWidthSpace(range.startContainer) && range.startOffset === 0 && range.endOffset === 1 ? range.endOffset : range.startOffset,
+			so: range.startContainer === range.endContainer && domUtils.isZeroWith(range.startContainer) && range.startOffset === 0 && range.endOffset === 1 ? range.endOffset : range.startOffset,
 			ec: range.endContainer,
 			eo: range.endOffset
 		};
@@ -1244,7 +1244,7 @@ Format.prototype = {
 			end.container = newRange.endContainer;
 			end.offset = newRange.endOffset;
 
-			if (start.container === end.container && unicode.onlyZeroWidthSpace(start.container)) {
+			if (start.container === end.container && domUtils.isZeroWith(start.container)) {
 				start.offset = end.offset = 1;
 			}
 			this._sn_setCommonListStyle(newRange.ancestor, null);
@@ -1795,13 +1795,13 @@ Format.prototype = {
 		}
 
 		if (!isRemoveNode && parentCon === endCon.parentNode && parentCon.nodeName === newInnerNode.nodeName) {
-			if (unicode.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff)) && unicode.onlyZeroWidthSpace(endCon.textContent.slice(endOff))) {
+			if (domUtils.isZeroWith(startCon.textContent.slice(0, startOff)) && domUtils.isZeroWith(endCon.textContent.slice(endOff))) {
 				const children = parentCon.childNodes;
 				let sameTag = true;
 
 				for (let i = 0, len = children.length, c, s, e, z; i < len; i++) {
 					c = children[i];
-					z = !unicode.onlyZeroWidthSpace(c);
+					z = !domUtils.isZeroWith(c);
 					if (c === startCon) {
 						s = true;
 						continue;
@@ -1892,7 +1892,7 @@ Format.prototype = {
 						anchorNode = anchorNode.cloneNode(false);
 					}
 
-					if (!unicode.onlyZeroWidthSpace(prevNode)) {
+					if (!domUtils.isZeroWith(prevNode)) {
 						ancestor.appendChild(prevNode);
 					}
 
@@ -1951,7 +1951,7 @@ Format.prototype = {
 						nNodeArray.push(newInnerNode);
 					}
 
-					if (!unicode.onlyZeroWidthSpace(afterNode)) {
+					if (!domUtils.isZeroWith(afterNode)) {
 						newNode = child;
 						cssText = '';
 						pCurrent = [];
@@ -2070,7 +2070,7 @@ Format.prototype = {
 						appendNode = newNode;
 					}
 
-					if (_isMaintainedNode(newInnerNode.parentNode) && !_isMaintainedNode(childNode) && !unicode.onlyZeroWidthSpace(newInnerNode)) {
+					if (_isMaintainedNode(newInnerNode.parentNode) && !_isMaintainedNode(childNode) && !domUtils.isZeroWith(newInnerNode)) {
 						newInnerNode = newInnerNode.cloneNode(false);
 						pNode.appendChild(newInnerNode);
 						nNodeArray.push(newInnerNode);
@@ -2245,11 +2245,11 @@ Format.prototype = {
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.nextSibling && unicode.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff))) {
+		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.nextSibling && domUtils.isZeroWith(startCon.textContent.slice(0, startOff))) {
 			let sameTag = true;
 			let s = startCon.previousSibling;
 			while (s) {
-				if (!unicode.onlyZeroWidthSpace(s)) {
+				if (!domUtils.isZeroWith(s)) {
 					sameTag = false;
 					break;
 				}
@@ -2395,7 +2395,7 @@ Format.prototype = {
 						anchorNode = anchorNode.cloneNode(false);
 					}
 
-					if (!unicode.onlyZeroWidthSpace(prevNode)) {
+					if (!domUtils.isZeroWith(prevNode)) {
 						ancestor.appendChild(prevNode);
 					}
 
@@ -2491,7 +2491,7 @@ Format.prototype = {
 		} else {
 			this.node.removeEmptyNode(pNode, newInnerNode);
 
-			if (unicode.onlyZeroWidthSpace(pNode.textContent)) {
+			if (domUtils.isZeroWith(pNode.textContent)) {
 				container = pNode.firstChild;
 				offset = 0;
 			}
@@ -2678,11 +2678,11 @@ Format.prototype = {
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.previousSibling && unicode.onlyZeroWidthSpace(endCon.textContent.slice(endOff))) {
+		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.previousSibling && domUtils.isZeroWith(endCon.textContent.slice(endOff))) {
 			let sameTag = true;
 			let e = endCon.nextSibling;
 			while (e) {
-				if (!unicode.onlyZeroWidthSpace(e)) {
+				if (!domUtils.isZeroWith(e)) {
 					sameTag = false;
 					break;
 				}
@@ -2827,7 +2827,7 @@ Format.prototype = {
 						nNodeArray.push(newInnerNode);
 					}
 
-					if (!unicode.onlyZeroWidthSpace(afterNode)) {
+					if (!domUtils.isZeroWith(afterNode)) {
 						ancestor.insertBefore(afterNode, ancestor.firstChild);
 					}
 
@@ -2938,10 +2938,10 @@ Format.prototype = {
 
 			this.node.removeEmptyNode(pNode, newInnerNode);
 
-			if (unicode.onlyZeroWidthSpace(pNode.textContent)) {
+			if (domUtils.isZeroWith(pNode.textContent)) {
 				container = pNode.firstChild;
 				offset = container.textContent.length;
-			} else if (unicode.onlyZeroWidthSpace(container)) {
+			} else if (domUtils.isZeroWith(container)) {
 				container = newInnerNode;
 				offset = 1;
 			}

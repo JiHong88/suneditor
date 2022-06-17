@@ -80,7 +80,7 @@
             dir_rtl: 'Højre til venstre',
             mention: 'Nævne'
         },
-        dialogBox: {
+        modalBox: {
             linkBox: {
                 title: 'Indsæt link',
                 url: 'URL til link',

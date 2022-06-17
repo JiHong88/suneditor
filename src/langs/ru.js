@@ -77,7 +77,7 @@
             dir_rtl: 'Справа налево',
             mention: 'Упоминание'
         },
-        dialogBox: {
+        modalBox: {
             linkBox: {
                 title: 'Вставить ссылку',
                 url: 'Ссылка',

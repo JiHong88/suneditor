@@ -58,8 +58,8 @@ const Constructor = function (element, options) {
 	const loading_box = domUtils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>');
 	// enter line
 	const line_breaker = domUtils.createElement('DIV', { class: 'se-line-breaker' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
-	const line_breaker_t = domUtils.createElement('DIV', { class: 'se-line-breaker-component' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
-	const line_breaker_b = line_breaker_t.cloneNode(true);
+	const line_breaker_t = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
+	const line_breaker_b = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
 	line_breaker_t.innerHTML = line_breaker_b.innerHTML = options.icons.line_break;
 
 	// resize operation background
@@ -95,28 +95,19 @@ const Constructor = function (element, options) {
 
 	textarea = _checkCodeMirror(options, textarea);
 
+	// modal
+	const modal = domUtils.createElement('DIV', {class: 'se-modal sun-editor-common'});
+	const modal_back = domUtils.createElement('DIV', {class: 'se-modal-back', style: 'display: none;'});
+	const modal_inner = domUtils.createElement('DIV', {class: 'se-modal-inner', style: 'display: none;'});
+	modal.appendChild(modal_back);
+	modal.appendChild(modal_inner);
+	relative.appendChild(modal);
+
 	return {
 		constructed: {
-			_top: top_div,
-			_relative: relative,
-			_toolBar: tool_bar.element,
-			_toolbarShadow: toolbarShadow,
-			_menuTray: tool_bar._menuTray,
-			_editorArea: editor_div,
-			_wysiwygArea: wysiwyg_div,
-			_codeArea: textarea,
-			_placeholder: placeholder_span,
-			_statusbar: status_bar,
-			_navigation: navigation,
-			_charWrapper: char_wrapper,
-			_charCounter: char_counter,
-			_loading: loading_box,
-			_lineBreaker: line_breaker,
-			_lineBreaker_t: line_breaker_t,
-			_lineBreaker_b: line_breaker_b,
-			_resizeBack: resize_back,
-			_stickyDummy: sticky_dummy,
-			_arrow: arrow
+			top: top_div,
+			wwFrame: wysiwyg_div,
+			codeFrame: textarea
 		},
 		options: options,
 		plugins: tool_bar.plugins,
@@ -325,7 +316,7 @@ function InitOptions(element, options) {
 	options.iframe_cssFileName = options.iframe ? (typeof options.iframe_cssFileName === 'string' ? [options.iframe_cssFileName] : options.iframe_cssFileName || ['suneditor']) : null;
 
 	/** Styles */
-	options.dialoglType = options.dialoglType || 'full';
+	options.modallType = options.modallType || 'full';
 	options.editorCSSText = typeof options.editorCSSText === 'string' ? options.editorCSSText : '';
 	options.width = options.width ? (numbers.is(options.width) ? options.width + 'px' : options.width) : element.clientWidth ? element.clientWidth + 'px' : '100%';
 	options.minWidth = (numbers.is(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
@@ -516,10 +507,10 @@ function _initElements(options, topDiv, toolBar, toolBarArrow) {
 	let charWrapper = null;
 	let charCounter = null;
 	if (options.statusbar) {
-		statusbar = domUtils.createElement('DIV', { class: 'se-resizing-bar sun-editor-common' });
+		statusbar = domUtils.createElement('DIV', { class: 'se-status-bar sun-editor-common' });
 
 		/** navigation */
-		navigation = domUtils.createElement('DIV', { class: 'se-navigation sun-editor-commo' });
+		navigation = domUtils.createElement('DIV', { class: 'se-navigation sun-editor-common' });
 		statusbar.appendChild(navigation);
 
 		/** char counter */
@@ -677,12 +668,11 @@ function _defaultButtons(options) {
 		dir_ltr: ['', lang.toolbar.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
 		dir_rtl: ['', lang.toolbar.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
 		save: ['se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmd + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save],
-		/** plugins - dialog */
-		link: ['', lang.toolbar.link, 'link', 'dialog', icons.link],
-		image: ['', lang.toolbar.image, 'image', 'dialog', icons.image],
-		video: ['', lang.toolbar.video, 'video', 'dialog', icons.video],
-		audio: ['', lang.toolbar.audio, 'audio', 'dialog', icons.audio],
-		math: ['', lang.toolbar.math, 'math', 'dialog', icons.math],
+		/** plugins - modal */
+		link: ['', lang.toolbar.link, 'link', 'modal', icons.link],
+		image: ['', lang.toolbar.image, 'image', 'modal', icons.image],
+		video: ['', lang.toolbar.video, 'video', 'modal', icons.video],
+		audio: ['', lang.toolbar.audio, 'audio', 'modal', icons.audio],
 		/** plugins - fileBrowser */
 		imageGallery: ['', lang.toolbar.imageGallery, 'imageGallery', 'fileBrowser', icons.image_gallery]
 	};
@@ -707,7 +697,7 @@ function _createModuleGroup() {
  * @param {string} className className in button
  * @param {string} title Title in button
  * @param {string} dataCommand The data-command property of the button
- * @param {string} dataType The data-type property of the button ('dialog', 'dropdown', 'command',  'container')
+ * @param {string} dataType The data-type property of the button ('modal', 'dropdown', 'command',  'container')
  * @param {string} innerHTML Html in button
  * @param {string} _disabled Button disabled
  * @param {Object} _icons Icons

@@ -56,7 +56,7 @@
         create_caption: function () {
             const caption = this.util.createElement('FIGCAPTION');
             caption.setAttribute('contenteditable', true);
-            caption.innerHTML = '<div>' + this.lang.dialogBox.caption + '</div>';
+            caption.innerHTML = '<div>' + this.lang.modalBox.caption + '</div>';
             return caption;
         }
     };

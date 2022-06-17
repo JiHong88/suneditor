@@ -4,7 +4,7 @@
  */
 
 import CoreInterface from '../../interface/_core';
-import { domUtils, unicode } from '../../helper';
+import { domUtils } from '../../helper';
 
 const Component = function (editor) {
 	CoreInterface.call(this, editor);
@@ -46,7 +46,7 @@ Component.prototype = {
 				if (oNode) formatEl = oNode.previousSibling;
 			}
 			this.html.insertNode(element, this.format.isBlock(formatEl) ? null : formatEl, false);
-			if (formatEl && unicode.onlyZeroWidthSpace(formatEl)) domUtils.removeItem(formatEl);
+			if (formatEl && domUtils.isZeroWith(formatEl)) domUtils.removeItem(formatEl);
 		}
 
 		if (!notSelect) {

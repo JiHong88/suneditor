@@ -16,12 +16,12 @@ import template from './dropdown/template';
 import paragraphStyle from './dropdown/paragraphStyle';
 import textStyle from './dropdown/textStyle';
 
-// dialog
-import link from './dialog/link';
-import image from './dialog/image';
-import video from './dialog/video';
-import audio from './dialog/audio';
-import math from './dialog/math';
+// modal
+import link from './modal/link';
+import image from './modal/image';
+import video from './modal/video';
+import audio from './modal/audio';
+import math from './modal/math';
 
 // file browser
 import imageGallery from './fileBrowser/imageGallery';

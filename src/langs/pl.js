@@ -77,7 +77,7 @@
             dir_rtl: 'Od prawej do lewej',
             mention: 'Wzmianka'
         },
-        dialogBox: {
+        modalBox: {
             linkBox: {
                 title: 'Wstaw odnośnik',
                 url: 'Adres URL',

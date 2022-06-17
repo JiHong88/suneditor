@@ -77,7 +77,7 @@
             dir_rtl: 'من اليمين الى اليسار',
             mention: 'تنويه ب'
         },
-        dialogBox: {
+        modalBox: {
             linkBox: {
                 title: 'به‌سته‌ر دابنێ',
                 url: 'به‌سته‌ر',

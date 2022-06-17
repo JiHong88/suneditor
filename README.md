@@ -122,7 +122,7 @@ import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
 
 // How to import plugins
-import image from 'suneditor/src/plugins/dialog/link'
+import image from 'suneditor/src/plugins/modal/link'
 import list from 'suneditor/src/plugins/dropdown/list'
 import {font, video} from 'suneditor/src/plugins'
 
@@ -346,7 +346,7 @@ plugins: [
     table,
     template,
     textStyle,
-    /** Dialog */
+    /** Modal */
     image,
     link,
     video,
@@ -463,7 +463,7 @@ mathFontSize    : Math plugin font size list.                       default: [{.
                   ]
 
 // Display-------------------------------------------------------------------------------------------------------
-dialoglType    : Size of background area when activating dialog window ('full'||'local') default: 'full' {string}
+modallType    : Size of background area when activating modal window ('full'||'local') default: 'full' {string}
 
 // Statusbar-------------------------------------------------------------------------------------------
 statusbar     : Show the bottom resizing bar.
@@ -1415,7 +1415,7 @@ editor.showController = function (name, controllers, core) {
         </tr>
         <tr>
             <td align="left">image</td>
-            <td align="left" rowspan="5"><strong>dialog</strong></td>
+            <td align="left" rowspan="5"><strong>modal</strong></td>
         </tr>
         <tr>
             <td align="left">link</td>
@@ -1497,7 +1497,7 @@ editor.showController = function (name, controllers, core) {
 
 <a id="lib-pluxml"></a>[Plugin for Pluxml](https://forum.pluxml.org/discussion/comment/59339) ([@sudwebdesign](https://github.com/sudwebdesign)) - Plugin for Pluxml.
 
-<a id="lib-aem-suneditor"></a>[AEM-SunEditor](https://blogs.perficientdigital.com/2019/08/13/suneditor-an-alternative-to-the-aem-rte) ([@ahmed-musallam](https://github.com/ahmed-musallam/AEM-SunEditor)) - Enables using SunEditor in AEM dialogs as an RTE replacement.
+<a id="lib-aem-suneditor"></a>[AEM-SunEditor](https://blogs.perficientdigital.com/2019/08/13/suneditor-an-alternative-to-the-aem-rte) ([@ahmed-musallam](https://github.com/ahmed-musallam/AEM-SunEditor)) - Enables using SunEditor in AEM modals as an RTE replacement.
     
 ## License
 Suneditor may be freely distributed under the MIT license.

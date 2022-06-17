@@ -77,7 +77,7 @@
             dir_rtl: '右から左に',
             mention: '言及する'
         },
-        dialogBox: {
+        modalBox: {
             linkBox: {
                 title: 'リンクの挿入',
                 url: 'インターネットアドレス',

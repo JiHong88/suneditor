@@ -1,57 +1,64 @@
 /**
  * @description Elements and variables you should have
  * @param {Element} element textarea element
- * @param {object} cons Toolbar element you created
+ * @param {Element} top Editor top div
+ * @param {Element} wwFrame Editor wysiwyg frame
+ * @param {Element} codeFrame Editor code view frame
  * * @param {JSON|Object} options Inserted options
  * @returns {Object} {Elements, variables of the editor, option}
  * @private
  */
-const Context = function (element, cons, options) {
+const Context = function (element, top, wwFrame, codeFrame, options) {
 	return {
 		element: {
 			originElement: element,
-			topArea: cons._top,
-			relative: cons._relative,
-			toolbar: cons._toolBar,
-			_toolbarShadow: cons._toolbarShadow,
-			_buttonTray: cons._toolBar.querySelector('.se-btn-tray'),
-			_menuTray: cons._menuTray,
-			statusbar: cons._statusbar,
-			navigation: cons._navigation,
-			charWrapper: cons._charWrapper,
-			charCounter: cons._charCounter,
-			editorArea: cons._editorArea,
-			wysiwygFrame: cons._wysiwygArea,
-			wysiwyg: cons._wysiwygArea, // if (options.iframe) cons._wysiwygArea.contentDocument.body
-			code: cons._codeArea,
-			placeholder: cons._placeholder,
-			loading: cons._loading,
-			lineBreaker: cons._lineBreaker,
-			lineBreaker_t: cons._lineBreaker_t,
-			lineBreaker_b: cons._lineBreaker_b,
-			resizeBackground: cons._resizeBack,
-			_stickyDummy: cons._stickyDummy,
-			_arrow: cons._arrow
+			topArea: top,
+			relative: top.querySelector('.se-container'),
+			toolbar: top.querySelector('.se-toolbar'),
+			_toolbarShadow: top.querySelector('.se-toolbar-shadow'),
+			_buttonTray: top.querySelector('.se-toolbar .se-btn-tray'),
+			_menuTray: top.querySelector('.se-toolbar .se-menu-tray'),
+			statusbar: top.querySelector('.se-status-bar'),
+			navigation: top.querySelector('.se-status-bar .se-navigation'),
+			charWrapper: top.querySelector('.se-status-bar .se-char-counter-wrapper'),
+			charCounter: top.querySelector('.se-char-counter-wrapper .se-char-counter'),
+			editorArea: top.querySelector('.se-wrapper'),
+			wysiwygFrame: wwFrame,
+			wysiwyg: wwFrame, // if (options.iframe) cons._wysiwygArea.contentDocument.body
+			code: codeFrame,
+			placeholder: top.querySelector('.se-placeholder'),
+			loading: top.querySelector('.se-loading-box'),
+			lineBreaker: top.querySelector('.se-line-breaker'),
+			lineBreaker_t: top.querySelector('.se-line-breaker-component-t'),
+			lineBreaker_b: top.querySelector('.se-line-breaker-component-b'),
+			resizeBackground: top.querySelector('.se-resizing-back'),
+			_stickyDummy: top.querySelector('.se-toolbar-sticky-dummy'),
+			_arrow: top.querySelector('.se-toolbar .se-arrow'),
+			_modal: {
+				area: top.querySelector('.se-modal'),
+				back: top.querySelector('.se-modal-back'),
+				inner: top.querySelector('.se-modal-inner'),
+			}
 		},
 		buttons: {
-			cover: cons._toolBar.querySelector('.se-toolbar-cover'),
-            bold: cons._toolBar.querySelector('[data-command="bold"]'),
-            underline: cons._toolBar.querySelector('[data-command="underline"]'),
-            italic: cons._toolBar.querySelector('[data-command="italic"]'),
-            strike: cons._toolBar.querySelector('[data-command="strike"]'),
-            sub: cons._toolBar.querySelector('[data-command="SUB"]'),
-            sup: cons._toolBar.querySelector('[data-command="SUP"]'),
-            undo: cons._toolBar.querySelector('[data-command="undo"]'),
-            redo: cons._toolBar.querySelector('[data-command="redo"]'),
-            save: cons._toolBar.querySelector('[data-command="save"]'),
-            outdent: cons._toolBar.querySelector('[data-command="outdent"]'),
-            indent: cons._toolBar.querySelector('[data-command="indent"]'),
-            fullScreen: cons._toolBar.querySelector('[data-command="fullScreen"]'),
-            showBlocks: cons._toolBar.querySelector('[data-command="showBlocks"]'),
-            codeView: cons._toolBar.querySelector('[data-command="codeView"]'),
-            dir: cons._toolBar.querySelector('[data-command="dir"]'),
-            dir_ltr: cons._toolBar.querySelector('[data-command="dir_ltr"]'),
-            dir_rtl: cons._toolBar.querySelector('[data-command="dir_rtl"]')
+			cover: top.querySelector('.se-toolbar .se-toolbar-cover'),
+            bold: top.querySelector('.se-toolbar [data-command="bold"]'),
+            underline: top.querySelector('.se-toolbar [data-command="underline"]'),
+            italic: top.querySelector('.se-toolbar [data-command="italic"]'),
+            strike: top.querySelector('.se-toolbar [data-command="strike"]'),
+            sub: top.querySelector('.se-toolbar [data-command="SUB"]'),
+            sup: top.querySelector('.se-toolbar [data-command="SUP"]'),
+            undo: top.querySelector('.se-toolbar [data-command="undo"]'),
+            redo: top.querySelector('.se-toolbar [data-command="redo"]'),
+            save: top.querySelector('.se-toolbar [data-command="save"]'),
+            outdent: top.querySelector('.se-toolbar [data-command="outdent"]'),
+            indent: top.querySelector('.se-toolbar [data-command="indent"]'),
+            fullScreen: top.querySelector('.se-toolbar [data-command="fullScreen"]'),
+            showBlocks: top.querySelector('.se-toolbar [data-command="showBlocks"]'),
+            codeView: top.querySelector('.se-toolbar [data-command="codeView"]'),
+            dir: top.querySelector('.se-toolbar [data-command="dir"]'),
+            dir_ltr: top.querySelector('.se-toolbar [data-command="dir_ltr"]'),
+            dir_rtl: top.querySelector('.se-toolbar [data-command="dir_rtl"]')
 		},
 		options: options
 	};

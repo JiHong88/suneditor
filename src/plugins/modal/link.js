@@ -7,71 +7,71 @@
  */
 'use strict';
 
-import dialog from '../modules/dialog';
+import modal from '../modules/modal';
 import anchor from '../modules/_anchor';
 
 export default {
     name: 'link',
-    type: 'dialog',
+    type: 'modal',
     add: function (core) {
-        core.addModule([dialog, anchor]);
+        core.addModule([modal, anchor]);
 
         const context = core.context;
         const contextLink = context.link = {
-            focusElement: null, // @Override dialog // This element has focus when the dialog is opened.
+            focusElement: null, // @Override modal // This element has focus when the modal is opened.
             _linkAnchor: null,
             anchorCtx: null
         };
 
-        /** link dialog */
-        let link_dialog = this.setDialog(core);
-        contextLink.modal = link_dialog;
+        /** link modal */
+        let link_modal = this.setModal(core);
+        contextLink.modal = link_modal;
         
         /** link controller */
         let link_controller = this.setController_LinkButton(core);
         contextLink.linkController = link_controller;
 
-        link_dialog.querySelector('form').addEventListener('submit', this.submit.bind(core));
+        link_modal.querySelector('form').addEventListener('submit', this.submit.bind(core));
         link_controller.addEventListener('click', this.onClick_linkController.bind(core));
 
         /** append html */
-        context.dialog.modal.appendChild(link_dialog);
+        context.modal.modal.appendChild(link_modal);
 
         /** append controller */
         context.element.relative.appendChild(link_controller);
 
         /** link event */
-        core.plugins.anchor.initEvent.call(core, 'link', link_dialog);
+        core.plugins.anchor.initEvent.call(core, 'link', link_modal);
         contextLink.focusElement = context.anchor.caller.link.urlInput;
 
         /** empty memory */
-        link_dialog = null, link_controller = null;
+        link_modal = null, link_controller = null;
     },
 
-    /** dialog */
-    setDialog: function (core) {
+    /** modal */
+    setModal: function (core) {
         const lang = core.lang;
-        const dialog = core.util.createElement('DIV');
+        const modal = core.util.createElement('DIV');
         const icons = core.icons;
 
-        dialog.className = 'se-dialog-content';
-        dialog.style.display = 'none';
+        modal.className = 'se-modal-content';
+        modal.style.display = 'none';
         let html = '' +
             '<form>' +
-                '<div class="se-dialog-header">' +
-                    '<button type="button" data-command="close" class="se-btn se-dialog-close" title="' + lang.dialogBox.close + '" aria-label="' + lang.dialogBox.close + '">' +
+                '<div class="se-modal-header">' +
+                    '<button type="button" data-command="close" class="se-btn se-modal-close" title="' + lang.modalBox.close + '" aria-label="' + lang.modalBox.close + '">' +
                         icons.cancel +
                     '</button>' +
-                    '<span class="se-modal-title">' + lang.dialogBox.linkBox.title + '</span>' +
+                    '<span class="se-modal-title">' + lang.modalBox.linkBox.title + '</span>' +
                 '</div>' +
                 core.context.anchor.forms.innerHTML +
-                '<div class="se-dialog-footer">' +
-                    '<button type="submit" class="se-btn-primary" title="' + lang.dialogBox.submitButton + '" aria-label="' + lang.dialogBox.submitButton + '"><span>' + lang.dialogBox.submitButton + '</span></button>' +
+                '<div class="se-modal-footer">' +
+                    '<button type="submit" class="se-btn-primary" title="' + lang.modalBox.submitButton + '" aria-label="' + lang.modalBox.submitButton + '"><span>' + lang.modalBox.submitButton + '</span></button>' +
                 '</div>' +
             '</form>';
 
-        dialog.innerHTML = html;
-        return dialog;
+        modal.innerHTML = html;
+        return modal;
     },
 
     /** modify controller button */
@@ -104,10 +104,10 @@ export default {
     },
 
     /**
-     * @Override dialog
+     * @Override modal
      */
     open: function () {
-        this.plugins.dialog.open.call(this, 'link', 'link' === this.currentControllerName);
+        this.plugins.modal.open.call(this, 'link', 'link' === this.currentControllerName);
     },
 
     submit: function (e) {
@@ -120,7 +120,7 @@ export default {
             const oA = this.plugins.anchor.createAnchor.call(this, this.context.anchor.caller.link, false);
             if (oA === null) return;
     
-            if (!this.context.dialog.updateModal) {
+            if (!this.context.modal.updateModal) {
                 const selectedFormats = this.format.getLines();
                 if (selectedFormats.length > 1) {
                     const oFormat = this.util.createElement(selectedFormats[0].nodeName);
@@ -137,7 +137,7 @@ export default {
                 this.setRange(textNode, 0, textNode, textNode.textContent.length);
             }
         } finally {
-            this.plugins.dialog.close.call(this);
+            this.plugins.modal.close.call(this);
             this.closeLoading();
             // history stack
             this.history.push(false);
@@ -165,7 +165,7 @@ export default {
     },
 
     /**
-     * @Override dialog
+     * @Override modal
      */
     on: function (update) {
         this.plugins.anchor.on.call(this, this.context.anchor.caller.link, update);
@@ -194,7 +194,7 @@ export default {
         e.preventDefault();
 
         if (/update/.test(command)) {
-            this.plugins.dialog.open.call(this, 'link', true);
+            this.plugins.modal.open.call(this, 'link', true);
         } else if (/unlink/.test(command)) {
             const sc = this.util.getEdgeChild(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
             const ec = this.util.getEdgeChild(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
@@ -214,7 +214,7 @@ export default {
     },
 
     /**
-     * @Override dialog
+     * @Override modal
      */
     init: function () {
         this.context.link.linkController.style.display = 'none';

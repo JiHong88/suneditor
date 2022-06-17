@@ -77,7 +77,7 @@
             dir_rtl: '오른쪽에서 왼쪽',
             mention: '멘션'
         },
-        dialogBox: {
+        modalBox: {
             linkBox: {
                 title: '링크 삽입',
                 url: '인터넷 주소',

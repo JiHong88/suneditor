@@ -81,7 +81,7 @@ Toolbar.prototype = {
 		this._setResponsive();
 
 		this.context.element.toolbar.replaceChild(newToolbar._buttonTray, this.context.element._buttonTray);
-		const newContext = Context(this.context.element.originElement, this.editor._getConstructed(this.context.element), this.options);
+		const newContext = Context(this.context.element.originElement, this.context.element.topArea, this.options);
 
 		this.context.element = newContext.element;
 		this.context.tool = newContext.tool;

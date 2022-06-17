@@ -15,26 +15,26 @@ export default {
         
         core.context.anchor = {
             caller: {},
-            forms: this.setDialogForm(core),
+            forms: this.setModalForm(core),
             host: (core._w.location.origin + core._w.location.pathname).replace(/\/$/, ''),
             callerContext: null
         };
     },
 
-    /** dialog */
-    setDialogForm: function (core) {
+    /** modal */
+    setModalForm: function (core) {
         const lang = core.lang;
         const relList = core.options.linkRel;
         const defaultRel = (core.options.linkRelDefault.default || '').split(' ');
         const icons = core.icons;
         const forms = core.util.createElement('DIV');
 
-        let html = '<div class="se-dialog-body">' +
-            '<div class="se-dialog-form">' +
-                '<label>' + lang.dialogBox.linkBox.url + '</label>' +
-                '<div class="se-dialog-form-files">' +
+        let html = '<div class="se-modal-body">' +
+            '<div class="se-modal-form">' +
+                '<label>' + lang.modalBox.linkBox.url + '</label>' +
+                '<div class="se-modal-form-files">' +
                     '<input class="se-input-form se-input-url" type="text" placeholder="' + (core.options.protocol || '') + '" />' +
-                    '<button type="button" class="se-btn se-dialog-files-edge-button _se_bookmark_button" title="' + lang.dialogBox.linkBox.bookmark + '" aria-label="' + lang.dialogBox.linkBox.bookmark + '">' + icons.bookmark + '</button>' +
+                    '<button type="button" class="se-btn se-modal-files-edge-button _se_bookmark_button" title="' + lang.modalBox.linkBox.bookmark + '" aria-label="' + lang.modalBox.linkBox.bookmark + '">' + icons.bookmark + '</button>' +
                     core.plugins.selectMenu.setForm() +
                 '</div>' +
                 '<div class="se-anchor-preview-form">' +
@@ -43,12 +43,12 @@ export default {
                     '<pre class="se-link-preview"></pre>' +
                 '</div>' +
             '</div>' +
-            '<div class="se-dialog-form">' +
-                '<label>' + lang.dialogBox.linkBox.text + '</label><input class="se-input-form _se_anchor_text" type="text" />' +
+            '<div class="se-modal-form">' +
+                '<label>' + lang.modalBox.linkBox.text + '</label><input class="se-input-form _se_anchor_text" type="text" />' +
             '</div>' +
-            '<div class="se-dialog-form-footer">' +
-                '<label><input type="checkbox" class="se-dialog-btn-check _se_anchor_check" />&nbsp;' + lang.dialogBox.linkBox.newWindowCheck + '</label>' +
-                '<label><input type="checkbox" class="se-dialog-btn-check _se_anchor_download" />&nbsp;' + lang.dialogBox.linkBox.downloadLinkCheck + '</label>';
+            '<div class="se-modal-form-footer">' +
+                '<label><input type="checkbox" class="se-modal-btn-check _se_anchor_check" />&nbsp;' + lang.modalBox.linkBox.newWindowCheck + '</label>' +
+                '<label><input type="checkbox" class="se-modal-btn-check _se_anchor_download" />&nbsp;' + lang.modalBox.linkBox.downloadLinkCheck + '</label>';
             if (relList.length > 0) {
                 html += '<div class="se-anchor-rel"><button type="button" class="se-btn se-btn-select se-anchor-rel-btn">&lt;rel&gt;</button>' +
                     '<div class="se-anchor-rel-wrapper"><pre class="se-link-preview se-anchor-rel-preview"></pre></div>' +
@@ -125,7 +125,7 @@ export default {
             contextAnchor.anchorText.value = this.selection.get().toString().trim();
             contextAnchor.newWindowCheck.checked = this.options.linkTargetNewWindow;
         } else if (contextAnchor.linkAnchor) {
-            this.context.dialog.updateModal = true;
+            this.context.modal.updateModal = true;
             const href = this.options.linkNoPrefix ? contextAnchor.linkAnchor.href.replace(contextAnchor.linkAnchor.origin + '/', '') : contextAnchor.linkAnchor.href;
             contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = anchorPlugin.selfPathBookmark.call(this, href) ? href.substr(href.lastIndexOf('#')) : href;
             contextAnchor.anchorText.value = contextAnchor.linkAnchor.textContent || contextAnchor.linkAnchor.getAttribute('alt');

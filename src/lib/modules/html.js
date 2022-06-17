@@ -110,12 +110,12 @@ HTML.prototype = {
 			console.warn('[SUNEDITOR.html.clean.fail] ' + error);
 		}
 
-		if (this._managedElementInfo && this._managedElementInfo.query) {
-			const textCompList = dom.querySelectorAll(this._managedElementInfo.query);
+		if (this.editor._MELInfo && this.editor._MELInfo.query) {
+			const textCompList = dom.querySelectorAll(this.editor._MELInfo.query);
 			for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
 				classList = [].slice.call(textCompList[i].classList);
 				for (let c = 0, cLen = classList.length; c < cLen; c++) {
-					initMethod = this._managedElementInfo.map[classList[c]];
+					initMethod = this.editor._MELInfo.map[classList[c]];
 					if (initMethod) {
 						initMethod(textCompList[i]);
 						break;
@@ -331,7 +331,7 @@ HTML.prototype = {
 					} else {
 						if (!domUtils.isBreak(parentNode)) {
 							let c = parentNode.childNodes[startOff];
-							const focusNode = c && c.nodeType === 3 && unicode.onlyZeroWidthSpace(c) && domUtils.isBreak(c.nextSibling) ? c.nextSibling : c;
+							const focusNode = c && c.nodeType === 3 && domUtils.isZeroWith(c) && domUtils.isBreak(c.nextSibling) ? c.nextSibling : c;
 							if (focusNode) {
 								if (!focusNode.nextSibling) {
 									parentNode.removeChild(focusNode);
@@ -475,7 +475,7 @@ HTML.prototype = {
 			parentNode.insertBefore(oNode, afterNode);
 
 			if (insertListCell) {
-				if (unicode.onlyZeroWidthSpace(line.textContent.trim())) {
+				if (domUtils.isZeroWith(line.textContent.trim())) {
 					domUtils.removeItem(line);
 					oNode = oNode.lastChild;
 				} else {
@@ -489,7 +489,7 @@ HTML.prototype = {
 							oNode = parentNode;
 						}
 
-						if (unicode.onlyZeroWidthSpace(line.textContent.trim())) {
+						if (domUtils.isZeroWith(line.textContent.trim())) {
 							domUtils.removeItem(line);
 						}
 					}
@@ -515,8 +515,8 @@ HTML.prototype = {
 				if (oNode.nodeType === 3) {
 					const previous = oNode.previousSibling;
 					const next = oNode.nextSibling;
-					const previousText = !previous || previous.nodeType === 1 || unicode.onlyZeroWidthSpace(previous) ? '' : previous.textContent;
-					const nextText = !next || next.nodeType === 1 || unicode.onlyZeroWidthSpace(next) ? '' : next.textContent;
+					const previousText = !previous || previous.nodeType === 1 || domUtils.isZeroWith(previous) ? '' : previous.textContent;
+					const nextText = !next || next.nodeType === 1 || domUtils.isZeroWith(next) ? '' : next.textContent;
 
 					if (previous && previousText.length > 0) {
 						oNode.textContent = previousText + oNode.textContent;
@@ -626,7 +626,7 @@ HTML.prototype = {
 				startCon = endCon = commonCon;
 			} else {
 				startCon = endCon = childNodes[0];
-				if (domUtils.isBreak(startCon) || unicode.onlyZeroWidthSpace(startCon)) {
+				if (domUtils.isBreak(startCon) || domUtils.isZeroWith(startCon)) {
 					return {
 						container: domUtils.isMedia(commonCon) ? commonCon : startCon,
 						offset: 0
@@ -901,7 +901,7 @@ HTML.prototype = {
 
 		for (let i = 0, len = checkTags.length, t; i < len; i++) {
 			t = checkTags[i];
-			if (unicode.onlyZeroWidthSpace(t.textContent.trim())) {
+			if (domUtils.isZeroWith(t.textContent.trim())) {
 				domUtils.removeItem(t);
 			}
 		}

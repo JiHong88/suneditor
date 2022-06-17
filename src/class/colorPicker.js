@@ -232,9 +232,9 @@ function CreateHTML(editor, colorList) {
 		'<form class="se-form-group">' +
 		'<input type="text" maxlength="9" class="_se_color_picker_input se-color-input"/>' +
 		'<button type="submit" class="se-btn _se_color_picker_submit" title="' +
-		lang.dialogBox.submitButton +
+		lang.modalBox.submitButton +
 		'" aria-label="' +
-		lang.dialogBox.submitButton +
+		lang.modalBox.submitButton +
 		'">' +
 		editor.icons.checked +
 		'</button>' +

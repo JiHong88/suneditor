@@ -77,7 +77,7 @@
             dir_rtl: 'De la dreapta la stanga',
             mention: 'Mentiune'
         },
-        dialogBox: {
+        modalBox: {
             linkBox: {
                 title: 'Inserează Link',
                 url: 'Adresă link',

@@ -8,7 +8,7 @@
 'use strict';
 
 import EditorInterface from '../../interface/editor';
-import colorPicker from '../../classes/colorPicker';
+import colorPicker from '../../class/colorPicker';
 import { domUtils } from '../../helper';
 
 const fontColor = function (editor, target) {
