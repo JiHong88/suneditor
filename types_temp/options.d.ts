@@ -87,6 +87,10 @@ export interface SunEditorOptions {
      */
     toolbar_sticky?: number | string;
     /**
+     * The toolbar is rendered hidden.
+     */
+    hideToolbar?: boolean;
+    /**
      * Top offset value of "full Screen".
      */
     fullScreenOffset?: number | string;
