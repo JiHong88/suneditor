@@ -5299,7 +5299,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist, blacklist) {
-            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
+            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true)).replace(/^.+\x3C!--StartFragment--\>|\x3C!--EndFragment-->.+$/g, '');
 
             const dom = _d.createRange().createContextualFragment(html);
             try {
@@ -5379,7 +5379,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             for (let i = 0, t; i < domTree.length; i++) {
                 t = domTree[i];
 
-                if (!util.isFormatElement(t) && !util.isRangeFormatElement(t) && !util.isComponent(t) && !util.isMedia(t)) {
+                if (!util.isFormatElement(t) && !util.isRangeFormatElement(t) && !util.isComponent(t) && !util.isMedia(t) && t.nodeType !== 8) {
                     if (!p) p = util.createElement(options.defaultTag);
                     p.appendChild(t);
                     i--;
@@ -6333,7 +6333,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         onMouseDown_wysiwyg: function (e) {
             if (core.isReadOnly || util.isNonEditable(context.element.wysiwyg)) return;
-            core._editorRange();
 
             // user event
             if (typeof functions.onMouseDown === 'function' && functions.onMouseDown(e, core) === false) return;
@@ -7359,8 +7358,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            const textKey = !ctrl && !alt && !selectRange && !event._nonTextKeyCode.test(keyCode);
-            if (textKey && range.collapsed && range.startContainer === range.endContainer && util.isBreak(range.commonAncestorContainer)) {
+            if (util.isIE && !ctrl && !alt && !selectRange && !event._nonTextKeyCode.test(keyCode) && util.isBreak(range.commonAncestorContainer)) {
                 const zeroWidth = util.createTextNode(util.zeroWidthSpace);
                 core.insertNode(zeroWidth, null, false);
                 core.setRange(zeroWidth, 1, zeroWidth, 1);
