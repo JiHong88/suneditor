@@ -118,11 +118,6 @@ function CreateHTML(editor) {
 			class: '__se__t-code',
 			tag: 'code'
 		},
-		translucent: {
-			name: editor.lang.menu.translucent,
-			style: 'opacity: 0.5;',
-			tag: 'span'
-		},
 		shadow: {
 			name: editor.lang.menu.shadow,
 			class: '__se__t-shadow',
@@ -144,18 +139,11 @@ function CreateHTML(editor) {
 
 		name = t.name;
 		tag = t.tag || 'span';
-		_class = t._class;
+		_class = t.class;
 
-		if (t.style) {
-			attrs += ' style="' + t.style + '"';
-			value += t.style.replace(/:[^;]+(;|$)\s*/g, ',');
-			command.push('style');
-		}
-		if (t.class) {
-			attrs += ' class="' + t.class + '"';
-			value += '.' + t.class.trim().replace(/\s+/g, ',.');
-			command.push('class');
-		}
+		attrs += ' class="' + t.class + '"';
+		value += '.' + t.class.trim().replace(/\s+/g, ',.');
+		command.push('class');
 
 		value = value.replace(/,$/, '');
 

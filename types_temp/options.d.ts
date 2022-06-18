@@ -585,5 +585,5 @@ export type FormatTagName = 'p' | 'div' | 'blockquote' | 'pre' | 'h1' | 'h2' | '
 export type TemplatesItem = { name: string; html: string };
 export type LineHeightsItem = { text: string; value: number };
 export type ParagraphStyles = (string | { name: string; class: string; _class?: string })[];
-export type TextStyles = (string | { name: string; style: string; tag: string; _class?: string })[];
+export type TextStyles = (string | { name: string; tag: string; class: string })[];
 export type ButtonListItem = any;
