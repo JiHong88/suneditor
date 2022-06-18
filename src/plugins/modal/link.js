@@ -10,6 +10,10 @@
 import modal from '../modules/modal';
 import anchor from '../modules/_anchor';
 
+const link = function (editor, target) {
+    // link: ['', lang.toolbar.link, 'link', 'modal', icons.link],
+}
+
 export default {
     name: 'link',
     type: 'modal',

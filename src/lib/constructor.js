@@ -669,7 +669,6 @@ function _defaultButtons(options) {
 		dir_rtl: ['', lang.toolbar.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
 		save: ['se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmd + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save],
 		/** plugins - modal */
-		link: ['', lang.toolbar.link, 'link', 'modal', icons.link],
 		image: ['', lang.toolbar.image, 'image', 'modal', icons.image],
 		video: ['', lang.toolbar.video, 'video', 'modal', icons.video],
 		audio: ['', lang.toolbar.audio, 'audio', 'modal', icons.audio],
