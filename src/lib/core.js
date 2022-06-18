@@ -5123,10 +5123,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                     if (!options.plugins.fontSize) continue;
                                     break;
                                 case 'color':
-                                    if (!options.plugins.fontColor) continue;
+                                    if (!options.plugins.fontColor || /rgba\(([0-9]+\s*,\s*){3}0\)/i.test(c)) continue;
                                     break;
                                 case 'backgroundColor':
-                                    if (!options.plugins.hiliteColor) continue;
+                                    if (!options.plugins.hiliteColor || /rgba\(([0-9]+\s*,\s*){3}0\)/i.test(c)) continue;
                                     break;
                             }
                             
