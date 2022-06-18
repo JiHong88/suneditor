@@ -7,221 +7,234 @@
  */
 'use strict';
 
-import modal from '../modules/modal';
-import anchor from '../modules/_anchor';
+import EditorInterface from '../../interface/editor';
+import Modal from '../../class/modal';
+import AnchorModalEditor from '../../class/anchorModalEditor';
+import { domUtils } from '../../helper';
 
 const link = function (editor, target) {
-    // link: ['', lang.toolbar.link, 'link', 'modal', icons.link],
+	// plugin bisic properties
+	EditorInterface.call(this, editor);
+	this.target = target;
+	this.title = this.lang.toolbar.link;
+	this.icon = this.icons.link;
+
+	// create HTML
+	const modalEl = CreateHTML_modal(editor);
+	const controllerEl = CreateHTML_controller(editor);
+
+	// members
+	this.anchor = new AnchorModalEditor(this, modalEl);
+	this.modal = new Modal(this, modalEl);
+	this.linkController = controllerEl;
+	this.isUpdateState = false;
+
+	// add controller
+	this.context.element.relative.appendChild(controllerEl);
+
+	// init
+	this.eventManager.addEvent(modalEl.querySelector('form'), 'submit', OnSubmit.bind(this));
+	this.eventManager.addEvent(controllerEl, 'click', OnClickController.bind(this));
+};
+
+link.type = 'modal';
+link.className = '';
+link.prototype = {
+	/**
+	 * @override core
+	 */
+	active: function (element) {
+		if (!element) {
+			if (this.menu.hasController(this.linkController)) {
+				this.menu.controllerOff();
+			}
+		} else if (domUtils.isAnchor(element) && element.getAttribute('data-image-link') === null) {
+			if (!this.menu.hasController(this.linkController)) {
+				this.callController(element);
+			}
+			return true;
+		}
+
+		return false;
+	},
+
+	/**
+	 * @Override modal
+	 */
+	open: function () {
+		this.modal.open();
+	},
+
+	/**
+	 * @Override modal
+	 * @param {boolean} isUpdate open state is update
+	 */
+	on: function (isUpdate) {
+		this.isUpdateState = isUpdate;
+		this.anchor.on(isUpdate);
+	},
+
+	/**
+	 * @Override modal
+	 */
+	init: function () {
+		this.linkController.style.display = 'none';
+		this.anchor.init();
+	},
+
+	callController: function (selectedEl) {
+		this.editLink = this.anchor.linkAnchor = selectedEl;
+		const linkController = this.linkController;
+		const link = linkController.querySelector('a');
+
+		link.href = selectedEl.href;
+		link.title = selectedEl.textContent;
+		link.textContent = selectedEl.textContent;
+
+		domUtils.addClass(selectedEl, 'on');
+		this.menu.setControllerPosition(linkController, selectedEl, 'bottom', { left: 0, top: 0 });
+		this.menu.controllerOn(linkController, selectedEl, 'link', domUtils.removeClass.bind(null, this.anchor.linkAnchor, 'on'));
+	},
+
+	constructor: link
+};
+
+function OnSubmit(e) {
+	this.editor.openLoading();
+
+	e.preventDefault();
+	e.stopPropagation();
+
+	try {
+		const oA = this.anchor.create(false);
+		if (oA === null) return;
+
+		if (!this.isUpdateState) {
+			const selectedFormats = this.format.getLines();
+			if (selectedFormats.length > 1) {
+				if (!this.html.insertNode(domUtils.createElement(selectedFormats[0].nodeName, null, oA), null, true)) return;
+			} else {
+				if (!this.html.insertNode(oA, null, true)) return;
+			}
+
+			this.selection.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
+		} else {
+			// set range
+			const textNode = this.anchor.linkAnchor.childNodes[0];
+			this.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
+		}
+	} finally {
+		this.modal.close();
+		this.editor.closeLoading();
+		// history stack
+		this.history.push(false);
+	}
+
+	return false;
 }
 
-export default {
-    name: 'link',
-    type: 'modal',
-    add: function (core) {
-        core.addModule([modal, anchor]);
+function OnClickController(e) {
+	e.stopPropagation();
 
-        const context = core.context;
-        const contextLink = context.link = {
-            focusElement: null, // @Override modal // This element has focus when the modal is opened.
-            _linkAnchor: null,
-            anchorCtx: null
-        };
+	const command = e.target.getAttribute('data-command') || e.target.parentNode.getAttribute('data-command');
+	if (!command) return;
 
-        /** link modal */
-        let link_modal = this.setModal(core);
-        contextLink.modal = link_modal;
-        
-        /** link controller */
-        let link_controller = this.setController_LinkButton(core);
-        contextLink.linkController = link_controller;
+	e.preventDefault();
 
-        link_modal.querySelector('form').addEventListener('submit', this.submit.bind(core));
-        link_controller.addEventListener('click', this.onClick_linkController.bind(core));
+	if (/update/.test(command)) {
+		this.modal.open();
+	} else if (/unlink/.test(command)) {
+		const sc = domUtils.getEdgeChild(
+			this.anchor.linkAnchor,
+			function (current) {
+				return current.childNodes.length === 0 || current.nodeType === 3;
+			},
+			false
+		);
+		const ec = domUtils.getEdgeChild(
+			this.anchor.linkAnchor,
+			function (current) {
+				return current.childNodes.length === 0 || current.nodeType === 3;
+			},
+			true
+		);
+		this.selection.setRange(sc, 0, ec, ec.textContent.length);
+		this.format.applyTextStyle(null, null, ['A'], false);
+	} else {
+		/** delete */
+		domUtils.removeItem(this.anchor.linkAnchor);
+		this.anchor.linkAnchor = null;
+		this.editor.focus();
 
-        /** append html */
-        context.modal.modal.appendChild(link_modal);
+		// history stack
+		this.history.push(false);
+	}
 
-        /** append controller */
-        context.element.relative.appendChild(link_controller);
+	this.menu.controllerOff();
+}
 
-        /** link event */
-        core.plugins.anchor.initEvent.call(core, 'link', link_modal);
-        contextLink.focusElement = context.anchor.caller.link.urlInput;
+function CreateHTML_modal(editor) {
+	const lang = editor.lang;
+	const icons = editor.icons;
+	const html =
+		'' +
+		'<form>' +
+		'<div class="se-modal-header">' +
+		'<button type="button" data-command="close" class="se-btn se-modal-close" title="' +
+		lang.modalBox.close +
+		'" aria-label="' +
+		lang.modalBox.close +
+		'">' +
+		icons.cancel +
+		'</button>' +
+		'<span class="se-modal-title">' +
+		lang.modalBox.linkBox.title +
+		'</span>' +
+		'</div>' +
+		'<div class="se-anchor-editor"></div>' +
+		'<div class="se-modal-footer">' +
+		'<button type="submit" class="se-btn-primary" title="' +
+		lang.modalBox.submitButton +
+		'" aria-label="' +
+		lang.modalBox.submitButton +
+		'"><span>' +
+		lang.modalBox.submitButton +
+		'</span></button>' +
+		'</div>' +
+		'</form>';
 
-        /** empty memory */
-        link_modal = null, link_controller = null;
-    },
+	return domUtils.createElement('DIV', { class: 'se-modal-content', style: 'display: none;' }, html);
+}
 
-    /** modal */
-    setModal: function (core) {
-        const lang = core.lang;
-        const modal = core.util.createElement('DIV');
-        const icons = core.icons;
+function CreateHTML_controller(editor) {
+	const lang = editor.lang;
+	const icons = editor.icons;
+	const html =
+		'<div class="se-arrow se-arrow-up"></div>' +
+		'<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
+		'<div class="se-btn-group">' +
+		'<button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">' +
+		icons.edit +
+		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
+		lang.controller.edit +
+		'</span></span>' +
+		'</button>' +
+		'<button type="button" data-command="unlink" tabindex="-1" class="se-btn se-tooltip">' +
+		icons.unlink +
+		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
+		lang.controller.unlink +
+		'</span></span>' +
+		'</button>' +
+		'<button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">' +
+		icons.delete +
+		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
+		lang.controller.remove +
+		'</span></span>' +
+		'</button>' +
+		'</div>' +
+		'</div>';
 
-        modal.className = 'se-modal-content';
-        modal.style.display = 'none';
-        let html = '' +
-            '<form>' +
-                '<div class="se-modal-header">' +
-                    '<button type="button" data-command="close" class="se-btn se-modal-close" title="' + lang.modalBox.close + '" aria-label="' + lang.modalBox.close + '">' +
-                        icons.cancel +
-                    '</button>' +
-                    '<span class="se-modal-title">' + lang.modalBox.linkBox.title + '</span>' +
-                '</div>' +
-                core.context.anchor.forms.innerHTML +
-                '<div class="se-modal-footer">' +
-                    '<button type="submit" class="se-btn-primary" title="' + lang.modalBox.submitButton + '" aria-label="' + lang.modalBox.submitButton + '"><span>' + lang.modalBox.submitButton + '</span></button>' +
-                '</div>' +
-            '</form>';
+	return domUtils.createElement('DIV', { class: 'se-controller se-controller-link' }, html);
+}
 
-        modal.innerHTML = html;
-        return modal;
-    },
-
-    /** modify controller button */
-    setController_LinkButton: function (core) {
-        const lang = core.lang;
-        const icons = core.icons;
-        const link_btn = core.util.createElement('DIV');
-
-        link_btn.className = 'se-controller se-controller-link';
-        link_btn.innerHTML = '' +
-            '<div class="se-arrow se-arrow-up"></div>' +
-            '<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
-                '<div class="se-btn-group">' +
-                    '<button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">' +
-                        icons.edit +
-                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.edit + '</span></span>' +
-                    '</button>' +
-                    '<button type="button" data-command="unlink" tabindex="-1" class="se-btn se-tooltip">' +
-                        icons.unlink +
-                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.unlink + '</span></span>' +
-                    '</button>' +
-                    '<button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">' +
-                        icons.delete +
-                        '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + lang.controller.remove + '</span></span>' +
-                    '</button>' +
-                '</div>' +
-            '</div>';
-
-        return link_btn;
-    },
-
-    /**
-     * @Override modal
-     */
-    open: function () {
-        this.plugins.modal.open.call(this, 'link', 'link' === this.currentControllerName);
-    },
-
-    submit: function (e) {
-        this.openLoading();
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        try {
-            const oA = this.plugins.anchor.createAnchor.call(this, this.context.anchor.caller.link, false);
-            if (oA === null) return;
-    
-            if (!this.context.modal.updateModal) {
-                const selectedFormats = this.format.getLines();
-                if (selectedFormats.length > 1) {
-                    const oFormat = this.util.createElement(selectedFormats[0].nodeName);
-                    oFormat.appendChild(oA);
-                    if (!this.html.insertNode(oFormat, null, true)) return;
-                } else {
-                    if (!this.html.insertNode(oA, null, true)) return;
-                }
-    
-                this.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
-            } else {
-                // set range
-                const textNode = this.context.link._linkAnchor.childNodes[0];
-                this.setRange(textNode, 0, textNode, textNode.textContent.length);
-            }
-        } finally {
-            this.plugins.modal.close.call(this);
-            this.closeLoading();
-            // history stack
-            this.history.push(false);
-        }
-
-        return false;
-    },
-
-    /**
-     * @Override core
-     */
-    active: function (element) {
-        if (!element) {
-            if (this.menu.hasController(this.context.link.linkController)) {
-                this.menu.controllerOff();
-            }
-        } else if (this.util.isAnchor(element) && element.getAttribute('data-image-link') === null) {
-            if (!this.menu.hasController(this.context.link.linkController)) {
-                this.plugins.link.call_controller.call(this, element);
-            }
-            return true;
-        }
-
-        return false;
-    },
-
-    /**
-     * @Override modal
-     */
-    on: function (update) {
-        this.plugins.anchor.on.call(this, this.context.anchor.caller.link, update);
-    },
-
-    call_controller: function (selectionATag) {
-        this.editLink = this.context.link._linkAnchor = this.context.anchor.caller.link.linkAnchor = selectionATag;
-        const linkBtn = this.context.link.linkController;
-        const link = linkBtn.querySelector('a');
-
-        link.href = selectionATag.href;
-        link.title = selectionATag.textContent;
-        link.textContent = selectionATag.textContent;
-
-        this.util.addClass(selectionATag, 'on');
-        this.menu.setControllerPosition(linkBtn, selectionATag, 'bottom', {left: 0, top: 0});
-        this.menu.controllerOn(linkBtn, selectionATag, 'link', this.util.removeClass.bind(this.util, this.context.link._linkAnchor, 'on'));
-    },
-
-    onClick_linkController: function (e) {
-        e.stopPropagation();
-
-        const command = e.target.getAttribute('data-command') || e.target.parentNode.getAttribute('data-command');
-        if (!command) return;
-
-        e.preventDefault();
-
-        if (/update/.test(command)) {
-            this.plugins.modal.open.call(this, 'link', true);
-        } else if (/unlink/.test(command)) {
-            const sc = this.util.getEdgeChild(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
-            const ec = this.util.getEdgeChild(this.context.link._linkAnchor, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true);
-            this.setRange(sc, 0, ec, ec.textContent.length);
-            this.format.applyTextStyle(null, null, ['A'], false);
-        } else {
-            /** delete */
-            this.util.removeItem(this.context.link._linkAnchor);
-            this.context.anchor.caller.link.linkAnchor = null;
-            this.editor.focus();
-
-            // history stack
-            this.history.push(false);
-        }
-
-        this.menu.controllerOff();
-    },
-
-    /**
-     * @Override modal
-     */
-    init: function () {
-        this.context.link.linkController.style.display = 'none';
-        this.plugins.anchor.init.call(this, this.context.anchor.caller.link);
-    }
-};
+export default link;

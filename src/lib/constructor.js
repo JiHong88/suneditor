@@ -48,11 +48,8 @@ const Constructor = function (element, options) {
 	const placeholder_span = initElements.placeholder;
 	let textarea = initElements.codeView;
 
-	// resizing bar
+	// status bar
 	const status_bar = bottomBar.statusbar;
-	const navigation = bottomBar.navigation;
-	const char_wrapper = bottomBar.charWrapper;
-	const char_counter = bottomBar.charCounter;
 
 	// loading box
 	const loading_box = domUtils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>');
@@ -153,17 +150,17 @@ export function ResetOptions(mergeOptions, context, originOptions) {
 
 	const initElements = _initElements(mergeOptions, el.topArea, isNewToolbar ? tool_bar.element : el.toolbar, arrow);
 
-	const bottomBar = initElements.bottomBar;
+	const statusBar = initElements.bottomBar;
 	const wysiwygFrame = initElements.wysiwygFrame;
 	const placeholder_span = initElements.placeholder;
 	let code = initElements.codeView;
 
 	if (el.statusbar) domUtils.removeItem(el.statusbar);
-	if (bottomBar.statusbar) {
+	if (statusBar.statusbar) {
 		if (mergeOptions.statusbar_container && mergeOptions.statusbar_container !== originOptions.statusbar_container) {
-			mergeOptions.statusbar_container.appendChild(bottomBar.statusbar);
+			mergeOptions.statusbar_container.appendChild(statusBar.statusbar);
 		} else {
-			relative.appendChild(bottomBar.statusbar);
+			relative.appendChild(statusBar.statusbar);
 		}
 	}
 
@@ -173,10 +170,10 @@ export function ResetOptions(mergeOptions, context, originOptions) {
 
 	code = _checkCodeMirror(mergeOptions, code);
 
-	el.statusbar = bottomBar.statusbar;
-	el.navigation = bottomBar.navigation;
-	el.charWrapper = bottomBar.charWrapper;
-	el.charCounter = bottomBar.charCounter;
+	el.statusbar = statusBar.statusbar;
+	el.navigation = statusBar.navigation;
+	el.charWrapper = statusBar.charWrapper;
+	el.charCounter = statusBar.charCounter;
 	el.wysiwygFrame = wysiwygFrame;
 	el.code = code;
 	el.placeholder = placeholder_span;
@@ -640,34 +637,33 @@ function _setWhitelist(whitelist, blacklist) {
 function _defaultButtons(options) {
 	const icons = options.icons;
 	const lang = options.lang;
-	const cmd = env.isOSX_IOS ? '⌘' : 'CTRL';
-	const addShift = env.isOSX_IOS ? '⇧' : '+SHIFT';
+	const cmdIcon = env.cmdIcon;
+	const shiftIcon = env.shiftIcon;
 	const shortcutsDisable = !options.shortcutsHint ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent', 'save'] : options.shortcutsDisable;
 	const indentKey = options._rtl ? ['[', ']'] : [']', '['];
 	const indentIcon = options.rtl ? [icons.outdent, icons.indent] : [icons.indent, icons.outdent];
 
 	return {
-		/** default command */
-		bold: ['', lang.toolbar.bold + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('bold') > -1 ? '' : cmd + '+<span class="se-shortcut-key">B</span>') + '</span>', 'bold', '', icons.bold],
-		underline: ['', lang.toolbar.underline + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('underline') > -1 ? '' : cmd + '+<span class="se-shortcut-key">U</span>') + '</span>', 'underline', '', icons.underline],
-		italic: ['', lang.toolbar.italic + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('italic') > -1 ? '' : cmd + '+<span class="se-shortcut-key">I</span>') + '</span>', 'italic', '', icons.italic],
-		strike: ['', lang.toolbar.strike + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('strike') > -1 ? '' : cmd + addShift + '+<span class="se-shortcut-key">S</span>') + '</span>', 'strike', '', icons.strike],
+		bold: ['', lang.toolbar.bold + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('bold') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">B</span>') + '</span>', 'bold', '', icons.bold],
+		underline: ['', lang.toolbar.underline + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('underline') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">U</span>') + '</span>', 'underline', '', icons.underline],
+		italic: ['', lang.toolbar.italic + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('italic') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">I</span>') + '</span>', 'italic', '', icons.italic],
+		strike: ['', lang.toolbar.strike + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('strike') > -1 ? '' : cmdIcon + shiftIcon + '+<span class="se-shortcut-key">S</span>') + '</span>', 'strike', '', icons.strike],
 		subscript: ['', lang.toolbar.subscript, 'SUB', '', icons.subscript],
 		superscript: ['', lang.toolbar.superscript, 'SUP', '', icons.superscript],
 		removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', icons.erase],
-		indent: ['', lang.toolbar.indent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmd + '+<span class="se-shortcut-key">' + indentKey[0] + '</span>') + '</span>', 'indent', '', indentIcon[0]],
-		outdent: ['', lang.toolbar.outdent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmd + '+<span class="se-shortcut-key">' + indentKey[1] + '</span>') + '</span>', 'outdent', '', indentIcon[1]],
+		indent: ['', lang.toolbar.indent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">' + indentKey[0] + '</span>') + '</span>', 'indent', '', indentIcon[0]],
+		outdent: ['', lang.toolbar.outdent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">' + indentKey[1] + '</span>') + '</span>', 'outdent', '', indentIcon[1]],
 		fullScreen: ['se-code-view-enabled se-resizing-enabled', lang.toolbar.fullScreen, 'fullScreen', '', icons.expansion],
 		showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '', icons.show_blocks],
 		codeView: ['se-code-view-enabled se-resizing-enabled', lang.toolbar.codeView, 'codeView', '', icons.code_view],
-		undo: ['', lang.toolbar.undo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmd + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'undo', '', icons.undo],
-		redo: ['', lang.toolbar.redo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmd + '+<span class="se-shortcut-key">Y</span> / ' + cmd + addShift + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'redo', '', icons.redo],
+		undo: ['', lang.toolbar.undo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'undo', '', icons.undo],
+		redo: ['', lang.toolbar.redo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">Y</span> / ' + cmdIcon + shiftIcon + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'redo', '', icons.redo],
 		preview: ['se-resizing-enabled', lang.toolbar.preview, 'preview', '', icons.preview],
 		print: ['se-resizing-enabled', lang.toolbar.print, 'print', '', icons.print],
 		dir: ['', lang.toolbar[options._rtl ? 'dir_ltr' : 'dir_rtl'], 'dir', '', icons[options._rtl ? 'dir_ltr' : 'dir_rtl']],
 		dir_ltr: ['', lang.toolbar.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
 		dir_rtl: ['', lang.toolbar.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
-		save: ['se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmd + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save],
+		save: ['se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save],
 		/** plugins - modal */
 		image: ['', lang.toolbar.image, 'image', 'modal', icons.image],
 		video: ['', lang.toolbar.video, 'video', 'modal', icons.video],

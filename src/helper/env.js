@@ -1,7 +1,7 @@
 const userAgent = navigator.userAgent.toLowerCase();
 
 /**
- * Checks if User Agent is IE
+ * @description Checks if User Agent is IE
  * @returns {boolean} Whether User Agent is IE or not.
  */
 export function isIE() {
@@ -9,7 +9,7 @@ export function isIE() {
 }
 
 /**
- * Checks if User Agent is Edge
+ * @description Checks if User Agent is Edge
  * @returns {boolean} Whether User Agent is Edge or not.
  */
 export function isEdge() {
@@ -17,7 +17,7 @@ export function isEdge() {
 }
 
 /**
- * Checks if platform is OSX or IOS
+ * @description Checks if platform is OSX or IOS
  * @returns {boolean} Whether platform is (OSX || IOS) or not.
  */
 export function isOSX_IOS() {
@@ -25,7 +25,7 @@ export function isOSX_IOS() {
 }
 
 /**
- * Checks if User Agent Blink engine.
+ * @description Checks if User Agent Blink engine.
  * @returns {boolean} Whether User Agent is Blink engine or not.
  */
 export function isBlink() {
@@ -33,7 +33,7 @@ export function isBlink() {
 }
 
 /**
- * Checks if User Agent is Firefox (Gecko).
+ * @description Checks if User Agent is Firefox (Gecko).
  * @returns {boolean} Whether User Agent is Firefox or not.
  */
 export function isGecko() {
@@ -41,7 +41,7 @@ export function isGecko() {
 }
 
 /**
- * Checks if User Agent is Chromium browser.
+ * @description Checks if User Agent is Chromium browser.
  * @returns {boolean} Whether User Agent is Chromium browser.
  */
 export function isChromium() {
@@ -49,7 +49,7 @@ export function isChromium() {
 }
 
 /**
- * Checks if User Agent is Safari.
+ * @description Checks if User Agent is Safari.
  * @returns {boolean} Whether User Agent is Safari or not.
  */
 export function isSafari() {
@@ -57,12 +57,22 @@ export function isSafari() {
 }
 
 /**
- * Checks if User Agent is Android mobile device.
+ * @description Checks if User Agent is Android mobile device.
  * @returns {boolean} Whether User Agent is Android or not.
  */
 export function isAndroid() {
 	return userAgent.indexOf('android') > -1;
 }
+
+/**
+ * @description Command(Mac) or CTRL(Window) icon.
+ */
+export const cmdIcon = isOSX_IOS ? '⌘' : 'CTRL';
+
+/**
+ * @description SHIFT(Mac, Window) icon.
+ */
+export const shiftIcon = isOSX_IOS ? '⇧' : '+SHIFT';
 
 export const _allowedEmptyNodeList = '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details';
 
@@ -75,6 +85,8 @@ const env = {
 	isSafari: isSafari(),
 	isOSX_IOS: isOSX_IOS(),
 	isAndroid: isAndroid(),
+	cmdIcon: cmdIcon,
+	shiftIcon: shiftIcon,
 	_allowedEmptyNodeList: _allowedEmptyNodeList
 };
 

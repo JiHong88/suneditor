@@ -5,8 +5,8 @@ import Modal from '../../class/modal';
 import { domUtils, env, converter, unicode } from '../../helper';
 
 const math = function (editor, target) {
-	EditorInterface.call(this, editor);
 	// plugin bisic properties
+	EditorInterface.call(this, editor);
 	this.target = target;
 	this.title = this.lang.toolbar.math;
 	this.icon = this.icons.math;
@@ -16,6 +16,7 @@ const math = function (editor, target) {
 	const controllerEl = CreateHTML_controller(editor);
 
 	// members
+	this.modal = new Modal(this, modalEl);
 	this.mathController = controllerEl;
 	this.focusElement = modalEl.querySelector('.se-math-exp');
 	this.previewElement = modalEl.querySelector('.se-math-preview');
@@ -27,7 +28,6 @@ const math = function (editor, target) {
 	this.context.element.relative.appendChild(controllerEl);
 
 	// init
-	this.modal = new Modal(this, modalEl);
 	this.previewElement.style.fontSize = this.defaultFontSize;
 	this.eventManager.addEvent(this.focusElement, env.isIE ? 'textinput' : 'input', RenderMathExp.bind(this));
 	this.eventManager.addEvent(modalEl.querySelector('form'), 'submit', OnSubmit.bind(this));
@@ -85,7 +85,7 @@ math.prototype = {
 	},
 
 	/**
-	 * @override modal - call when modal open
+	 * @override modal
 	 * @param {boolean} isUpdate open state is update
 	 */
 	on: function (isUpdate) {
@@ -103,7 +103,7 @@ math.prototype = {
 	},
 
 	/**
-	 * @override modal - call when modal close
+	 * @override modal
 	 */
 	init: function () {
 		this.mathController.style.display = 'none';
@@ -202,7 +202,7 @@ function OnClickController(e) {
 
 	if (/update/.test(command)) {
 		this.focusElement.value = converter.entityToHTML(this._mathExp.getAttribute('data-exp'));
-		this.modal.open(true);
+		this.modal.open();
 	} else {
 		/** delete */
 		domUtils.removeItem(this._mathExp);

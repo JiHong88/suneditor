@@ -11,8 +11,8 @@ import EditorInterface from '../../interface/editor';
 import { domUtils } from '../../helper';
 
 const horizontalLine = function (editor, target) {
-	EditorInterface.call(this, editor);
 	// plugin bisic properties
+	EditorInterface.call(this, editor);
 	this.target = target;
 	this.title = this.lang.toolbar.horizontalLine;
 	this.icon = this.icons.horizontal_line;

@@ -45,9 +45,10 @@ modal.prototype = {
 
 		this._bindClose = function (e) {
 			if (!/27/.test(e.keyCode)) return;
+			e.stopPropagation();
 			this.close();
 		}.bind(this);
-		this.eventManager.addGlobalEvent('keydown', this._bindClose);
+		this.eventManager.addGlobalEvent('keydown', this._bindClose, false);
 
 		if (this._closeSignal) {
 			this._onClickEvent = OnClick_dialog.bind(this);

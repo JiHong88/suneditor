@@ -28,11 +28,12 @@ import template from "../../src/plugins/dropdown/template";
 import textStyle from "../../src/plugins/dropdown/textStyle";
 import table from "../../src/plugins/dropdown/table";
 import math from "../../src/plugins/modal/math";
+import link from "../../src/plugins/modal/link";
 
 window.e = suneditor.create(document.getElementById('editor2'), {
     // value: 'abc',
     plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock, horizontalLine, lineHeight, list,
-        paragraphStyle, template, textStyle, table, math
+        paragraphStyle, template, textStyle, table, math, link
     ],
     charCounter: true,
     statusbar: true,
@@ -57,6 +58,23 @@ window.e = suneditor.create(document.getElementById('editor2'), {
       ],
     // iframe: true,
     // iframe_fullPage: true,
+    linkRel: [
+        'author',
+        'external',
+        'help',
+        'license',
+        'next',
+        'follow',
+        'nofollow',
+        'noreferrer',
+        'noopener',
+        'prev',
+        'search',
+        'tag'
+    ],
+    linkRelDefault: 'noreferrer noopener',
+    linkTargetNewWindow: true,
+    linkProtocol: 'https',
     imageMultipleFile: true,
     buttonList: [
         ['undo', 'redo'],
@@ -67,7 +85,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
         ['preview', 'print'],
         ['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'horizontalLine'],
         ['lineHeight', 'list', 'paragraphStyle', 'template', 'textStyle', 'table'],
-        ['math']
+        ['math', 'link']
     ]
 });
 

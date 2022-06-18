@@ -49,11 +49,11 @@ EventManager.prototype = {
 	 * When created as an Iframe, the same event is added to the document in the Iframe.
 	 * @param {string} type Event type
 	 * @param {Function} listener Event listener
-	 * @param {boolean} useCapture Use event capture
+	 * @param {boolean|undefined} useCapture Use event capture
 	 */
 	addGlobalEvent: function (type, listener, useCapture) {
 		if (this.options.iframe) {
-			this._wd.addEventListener(type, listener);
+			this._wd.addEventListener(type, listener, useCapture);
 		} else {
 			_d.addEventListener(type, listener, useCapture);
 		}
