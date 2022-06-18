@@ -1468,8 +1468,7 @@ function OnKeyDown_wysiwyg(e) {
 		}
 	}
 
-	const textKey = !ctrl && !alt && !selectRange && !NON_TEXT_KEYCODE.test(keyCode);
-	if (textKey && range.collapsed && range.startContainer === range.endContainer && domUtils.isBreak(range.commonAncestorContainer)) {
+	if (env.isIE && !ctrl && !alt && !selectRange && !NON_TEXT_KEYCODE.test(keyCode) && domUtils.isBreak(range.commonAncestorContainer)) {
 		const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
 		this.html.insertNode(zeroWidth, null, false);
 		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);

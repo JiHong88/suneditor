@@ -101,7 +101,7 @@ HTML.prototype = {
 	 * @returns {string}
 	 */
 	clean: function (html, requireFormat, whitelist, blacklist) {
-		html = DeleteDisallowedTags(this.editor._parser.parseFromString(html, 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, true));
+		html = DeleteDisallowedTags(this.editor._parser.parseFromString(html, 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, true)).replace(/^.+\x3C!--StartFragment--\>|\x3C!--EndFragment-->.+$/g, '');
 		const dom = this._d.createRange().createContextualFragment(html, true);
 
 		try {
