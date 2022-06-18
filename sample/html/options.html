@@ -146,6 +146,8 @@
             <label><input type="checkbox" id="stickyToolbar">&nbsp;&nbsp;stickyToolbar</label>
             <input type="text" id="stickyToolbar_value" placeholder="Number, ...px">
             <br><br>
+            <label><input type="checkbox" id="hideToolbar">&nbsp;&nbsp;hideToolbar</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <br><br>
             <label><input type="checkbox" id="fullScreenOffset">&nbsp;&nbsp;fullScreenOffset</label>
             <input type="text" id="fullScreenOffset_value" placeholder="Number, ...px">
             <br><br>
@@ -614,6 +616,7 @@ function sun_create () {
         toolbarWidth: document.getElementById('toolbarWidth').checked ? document.getElementById('toolbarWidth_value').value : undefined,
         toolbarContainer: document.getElementById('toolbarContainer').checked ? '#custom_toolbar' : undefined,
         stickyToolbar: document.getElementById('stickyToolbar').checked ? document.getElementById('stickyToolbar_value').value : undefined,
+        hideToolbar: document.getElementById('hideToolbar').checked ? true : undefined,
         fullScreenOffset: document.getElementById('fullScreenOffset').checked ? document.getElementById('fullScreenOffset_value').value : undefined,
         iframe: document.getElementById('iframe').checked ? true : undefined,
         fullPage: document.getElementById('fullPage').checked? true : undefined,
