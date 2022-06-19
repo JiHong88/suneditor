@@ -40,7 +40,8 @@ EventManager.prototype = {
 		this._events.push({
 			target: target,
 			type: type,
-			handler: listener
+			handler: listener,
+			useCapture: useCapture
 		});
 	},
 
@@ -55,7 +56,7 @@ EventManager.prototype = {
 		if (this.options.iframe) {
 			this._wd.addEventListener(type, listener, useCapture);
 		} else {
-			_d.addEventListener(type, listener, useCapture);
+			this._d.addEventListener(type, listener, useCapture);
 		}
 	},
 
@@ -64,12 +65,13 @@ EventManager.prototype = {
 	 * When created as an Iframe, the event of the document inside the Iframe is also removed.
 	 * @param {string} type Event type
 	 * @param {Function} listener Event listener
+	 * @param {boolean|undefined} useCapture Use event capture
 	 */
-	removeGlobalEvent: function (type, listener) {
+	removeGlobalEvent: function (type, listener, useCapture) {
 		if (this.options.iframe) {
-			this._wd.removeEventListener(type, listener);
+			this._wd.removeEventListener(type, listener, useCapture);
 		} else {
-			_d.removeEventListener(type, listener);
+			this._d.removeEventListener(type, listener, useCapture);
 		}
 	},
 
@@ -563,7 +565,7 @@ EventManager.prototype = {
 	_removeAllEvents: function () {
 		for (let i = 0, len = this._events.length, e; i < len; i++) {
 			e = this._events[i];
-			e.target.removeEventListener(e.type, e.handler);
+			e.target.removeEventListener(e.type, e.handler, e.useCapture);
 		}
 
 		this._events = [];
@@ -627,8 +629,6 @@ function OnClick_toolbar(e) {
 
 	if (!command && !type) return;
 	if (target.disabled) return;
-	if (!this.status.isReadOnly && !this.status.hasFocus) this.editor._nativeFocus();
-	if (!this.status.isReadOnly && !this.status.isCodeView) this.selection._init();
 
 	this.editor.runPlugin(command, type, target);
 }

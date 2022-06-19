@@ -17,7 +17,7 @@ const selectMenu = function (inst, checkType) {
 	this._refer = null;
 	this._selectMethod = null;
 	this._bindClose_key = null;
-	this._bindClose_click = null;
+	this._bindClose_mousedown = null;
 	this.__events = [];
 	this.__bindEventHandler = [OnMousedown_list, OnMouseMove_list.bind(this), OnClick_list.bind(this), OnKeyDown_refer.bind(this)];
 };
@@ -41,22 +41,9 @@ selectMenu.prototype = {
 		referElement.parentNode.insertBefore(this.form, referElement);
 	},
 
-	open: function (position, activeItems) {
-		this.__removeEvents();
-		this.__removeGlobalEvent();
+	open: function (position) {
 		this.__addEvents();
 		this.__addGlobalEvent();
-
-		if (activeItems) {
-			for (let i = 0, len = this.menus.length; i < len; i++) {
-				if (activeItems.indexOf(this.menus[i])) {
-					domUtils.addClass(this.menus[i], 'active');
-				} else {
-					domUtils.removeClass(this.menus[i], 'active');
-				}
-			}
-		}
-
 		this._setPosition(position || 'bottom');
 	},
 
@@ -67,6 +54,13 @@ selectMenu.prototype = {
 
 	getItem: function (index) {
 		return this.items[index];
+	},
+
+	_init: function () {
+		this.__removeEvents();
+		this.__removeGlobalEvent();
+		this.index = -1;
+		this.item = null;
 	},
 
 	_moveItem: function (num) {
@@ -84,13 +78,6 @@ selectMenu.prototype = {
 		}
 
 		this.item = this.items[selectIndex];
-	},
-
-	_init: function () {
-		this.__removeEvents();
-		this.__removeGlobalEvent();
-		this.index = -1;
-		this.item = null;
 	},
 
 	_setPosition: function (position) {
@@ -116,6 +103,7 @@ selectMenu.prototype = {
 	},
 
 	__addEvents: function () {
+        this.__removeEvents();
 		this.__events = this.__bindEventHandler;
 		this.form.addEventListener('mousedown', this.__events[0]);
 		this.form.addEventListener('mousemove', this.__events[1]);
@@ -133,21 +121,22 @@ selectMenu.prototype = {
 	},
 
 	__addGlobalEvent: function () {
+        this.__removeGlobalEvent();
 		this._bindClose_key = CloseListener_key.bind(this);
+		this._bindClose_mousedown = CloseListener_mousedown.bind(this);
 		this.eventManager.addGlobalEvent('keydown', this._bindClose_key, true);
-		this._bindClose_click = CloseListener_click.bind(this);
-		this.eventManager.addGlobalEvent('mousedown', this._bindClose_click, false);
+		this.eventManager.addGlobalEvent('mousedown', this._bindClose_mousedown);
 	},
 
 	__removeGlobalEvent: function () {
 		if (this._bindClose_key) {
-			this.eventManager.removeGlobalEvent('keydown', this._bindClose_key);
+			this.eventManager.removeGlobalEvent('keydown', this._bindClose_key, true);
 			this._bindClose_key = null;
 		}
 
-		if (this._bindClose_click) {
-			this.eventManager.removeGlobalEvent('click', this._bindClose_click);
-			this._bindClose_click = null;
+		if (this._bindClose_mousedown) {
+			this.eventManager.removeGlobalEvent('mousedown', this._bindClose_mousedown);
+			this._bindClose_mousedown = null;
 		}
 	},
 
@@ -204,11 +193,12 @@ function OnClick_list(e) {
 
 function CloseListener_key(e) {
 	if (!/27/.test(e.keyCode)) return;
-	e.stopPropagation();
 	this.close();
+	e.stopPropagation();
 }
 
-function CloseListener_click(e) {
+function CloseListener_mousedown(e) {
+    console.log("cccclickkkkkk")
 	if (!domUtils.getParentElement(e.target, this.form)) {
 		this.close();
 	}
