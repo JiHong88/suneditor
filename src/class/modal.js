@@ -43,11 +43,7 @@ modal.prototype = {
 			this._bindClose = null;
 		}
 
-		this._bindClose = function (e) {
-			if (!/27/.test(e.keyCode)) return;
-			e.stopPropagation();
-			this.close();
-		}.bind(this);
+		this._bindClose = CloseListener.bind(this);
 		this.eventManager.addGlobalEvent('keydown', this._bindClose, false);
 
 		if (this._closeSignal) {
@@ -101,6 +97,12 @@ function OnClick_dialog(e) {
 	if (/close/.test(e.target.getAttribute('data-command')) || e.target === this.modalElement.inner) {
 		this.close();
 	}
+}
+
+function CloseListener(e) {
+	if (!/27/.test(e.keyCode)) return;
+	e.stopPropagation();
+	this.close();
 }
 
 export default modal;

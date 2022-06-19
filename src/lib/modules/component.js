@@ -36,12 +36,7 @@ Component.prototype = {
 			if (!element.nextSibling) element.parentNode.appendChild(domUtils.createElement('BR'));
 		} else {
 			if (this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
-				const depthFormat = domUtils.getParentElement(
-					r.container,
-					function (current) {
-						return this.format.isBlock(current);
-					}.bind(this)
-				);
+				const depthFormat = domUtils.getParentElement(r.container, this.format.isBlock.bind(this.format));
 				oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
 				if (oNode) formatEl = oNode.previousSibling;
 			}

@@ -13,10 +13,7 @@ const anchorModalEditor = function (inst, modalForm) {
 
 	// members
 	this.modalForm = modalForm;
-	this.selectMenu_bookmark = new SelectMenu(this, forms.querySelector('.__se__bookmark'));
-	this.selectMenu_rel = new SelectMenu(this, forms.querySelector('.__se__rel'));
 	this.host = (this._w.location.origin + this._w.location.pathname).replace(/\/$/, '');
-	this._closeRelMenu = null;
 	this.urlInput = forms.querySelector('.se-input-url');
 	this.anchorText = forms.querySelector('._se_anchor_text');
 	this.newWindowCheck = forms.querySelector('._se_anchor_check');
@@ -31,24 +28,33 @@ const anchorModalEditor = function (inst, modalForm) {
 	this.linkAnchor = null;
 	this.linkValue = '';
 	this._change = false;
+	this._isRel = this.options.linkRel.length > 0;
 	// members - rel
-	if (this.options.linkRel.length > 0) {
+	if (this._isRel) {
 		this.relButton = forms.querySelector('.se-anchor-rel-btn');
-		this.relList = forms.querySelector('.se-list-layer');
 		this.relPreview = forms.querySelector('.se-anchor-rel-preview');
-		this.eventManager.addEvent(this.relButton, 'click', OnClick_relButton.bind(this));
-		this.eventManager.addEvent(this.relList, 'click', OnClick_relList.bind(this));
+		const relList = this.options.linkRel;
+		const defaultRel = (this.linkDefaultRel.default || '').split(' ');
+		const list = [];
+		for (let i = 0, len = relList.length, rel; i < len; i++) {
+			rel = relList[i];
+			list.push(domUtils.createElement('BUTTON', { type: 'button', class: 'se-btn-list' + (defaultRel.indexOf(rel) > -1 ? ' se-checked' : ''), 'data-command': rel, title: rel, 'aria-label': rel }, '<span class="se-svg">' + this.icons.checked + '</span>' + rel));
+		}
+		this.selectMenu_rel = new SelectMenu(this, true);
+		this.selectMenu_rel.on(this.relButton, SetRelItem.bind(this));
+		this.selectMenu_rel.create(list);
+		this.eventManager.addEvent(this.relButton, 'click', OnClick_relbutton.bind(this));
 	}
 
 	// init
 	modalForm.querySelector('.se-anchor-editor').appendChild(forms);
+	this.selectMenu_bookmark = new SelectMenu(this, false);
+	this.selectMenu_bookmark.on(this.urlInput, SetHeaderBookmark.bind(this));
 	this.eventManager.addEvent(this.newWindowCheck, 'change', OnChange_newWindowCheck.bind(this));
 	this.eventManager.addEvent(this.downloadCheck, 'change', OnChange_downloadCheck.bind(this));
 	this.eventManager.addEvent(this.anchorText, 'input', OnChange_anchorText.bind(this));
 	this.eventManager.addEvent(this.urlInput, 'input', OnChange_urlInput.bind(this));
-	this.eventManager.addEvent(this.urlInput, 'keydown', OnKeyDown_urlInput.bind(this));
 	this.eventManager.addEvent(this.urlInput, 'focus', OnFocus_urlInput.bind(this));
-	this.eventManager.addEvent(this.urlInput, 'blur', OnBlur_urlInput.bind(this));
 	this.eventManager.addEvent(this.bookmarkButton, 'click', OnClick_bookmarkButton.bind(this));
 };
 
@@ -68,7 +74,6 @@ anchorModalEditor.prototype = {
 
 		this._setRel(isUpdate && this.linkAnchor ? this.linkAnchor.rel : this.defaultRel);
 		this._setLinkPreview(this.linkValue);
-		this.selectMenu_bookmark.on(this._setHeaderBookmark.bind(this));
 	},
 
 	create: function (notText) {
@@ -82,6 +87,18 @@ anchorModalEditor.prototype = {
 		this.linkValue = this.preview.textContent = this.urlInput.value = this.anchorText.value = '';
 
 		return oA;
+	},
+
+	init: function () {
+		this.linkAnchor = null;
+		this.linkValue = this.preview.textContent = this.urlInput.value = '';
+		this.anchorText.value = '';
+		this.newWindowCheck.checked = false;
+		this.downloadCheck.checked = false;
+		this._change = false;
+		this._setRel(this.defaultRel);
+		this.selectMenu_bookmark.close();
+		if (this.selectMenu_rel) this.selectMenu_rel.close();
 	},
 
 	_updateAnchor: function (anchor, url, alt, notText) {
@@ -111,56 +128,14 @@ anchorModalEditor.prototype = {
 		}
 	},
 
-	init: function () {
-		this.linkAnchor = null;
-		this.linkValue = this.preview.textContent = this.urlInput.value = '';
-		this.anchorText.value = '';
-		this.newWindowCheck.checked = false;
-		this.downloadCheck.checked = false;
-		this._change = false;
-		this._setRel(this.defaultRel);
-		if (this.relList) {
-			this._toggleRelList(false);
-		}
-		this.selectMenu_bookmark.init();
-	},
-
 	_selfPathBookmark: function (path) {
 		const href = this._w.location.href.replace(/\/$/, '');
 		return path.indexOf('#') === 0 || (path.indexOf(href) === 0 && path.indexOf('#') === (href.indexOf('#') === -1 ? href.length : href.substr(0, href.indexOf('#')).length));
 	},
 
-	_toggleRelList: function (show) {
-		if (!show) {
-			if (this._closeRelMenu) this._closeRelMenu();
-		} else {
-			const target = this.relButton;
-			const relList = this.relList;
-			domUtils.addClass(target, 'active');
-			relList.style.visibility = 'hidden';
-			relList.style.display = 'block';
-			if (!this.options._rtl) relList.style.left = target.offsetLeft + target.offsetWidth + 1 + 'px';
-			else relList.style.left = target.offsetLeft - relList.offsetWidth - 1 + 'px';
-			relList.style.top = target.offsetTop + target.offsetHeight / 2 - relList.offsetHeight / 2 + 'px';
-			relList.style.visibility = '';
-
-			this._closeRelMenu = function (e) {
-				if (e && (this.relButton.contains(e.target) || this.relList.contains(e.target))) return;
-				domUtils.removeClass(this.relButton, 'active');
-				this.relList.style.display = 'none';
-				this.modalForm.removeEventListener('click', this._closeRelMenu);
-				this._closeRelMenu = null;
-			}.bind(this);
-
-			this.modalForm.addEventListener('click', this._closeRelMenu);
-		}
-	},
-
 	_setRel: function (relAttr) {
 		const rels = (this.currentRel = !relAttr ? [] : relAttr.split(' '));
-		if (!this.relList) return;
-
-		const checkedRel = this.relList.querySelectorAll('button');
+		const checkedRel = this.selectMenu_rel.form.querySelectorAll('button');
 		for (let i = 0, len = checkedRel.length, cmd; i < len; i++) {
 			cmd = checkedRel[i].getAttribute('data-command');
 			if (rels.indexOf(cmd) > -1) {
@@ -181,38 +156,18 @@ anchorModalEditor.prototype = {
 
 		const valueRegExp = new this._w.RegExp('^' + urlValue.replace(/^#/, ''), 'i');
 		const list = [];
-		let html = '';
-		for (let i = 0, len = headers.length, h; i < len; i++) {
-			h = headers[i];
-			if (!valueRegExp.test(h.textContent)) continue;
-			list.push(h);
-			html += '<li class="se-select-item" data-index="' + i + '">' + h.textContent + '</li>';
+		for (let i = 0, len = headers.length, v; i < len; i++) {
+			v = headers[i];
+			if (!valueRegExp.test(v.textContent)) continue;
+			list.push(v);
 		}
 
 		if (list.length === 0) {
 			this.selectMenu_bookmark.close();
 		} else {
-			this.selectMenu_bookmark.create(list, html);
-			this.selectMenu_bookmark.open(this._setMenuListPosition.bind(this));
+			this.selectMenu_bookmark.create(list, 'textContent');
+			this.selectMenu_bookmark.open();
 		}
-	},
-
-	_setMenuListPosition: function (list) {
-		list.style.top = this.urlInput.offsetHeight + 1 + 'px';
-	},
-
-	_setHeaderBookmark: function (header) {
-		const id = header.id || 'h_' + this._w.Math.random().toString().replace(/.+\./, '');
-		header.id = id;
-		this.urlInput.value = '#' + id;
-
-		if (!this.anchorText.value.trim() || !this._change) {
-			this.anchorText.value = header.textContent;
-		}
-
-		this._setLinkPreview(this.urlInput.value);
-		this.selectMenu_bookmark.close();
-		this.urlInput.focus();
 	},
 
 	_setLinkPreview: function (value) {
@@ -269,48 +224,34 @@ anchorModalEditor.prototype = {
 	constructor: anchorModalEditor
 };
 
-function OnClick_relButton(e) {
-	this._toggleRelList(!domUtils.hasClass(e.target, 'active'));
+function OnClick_relbutton() {
+	this.selectMenu_rel.open('left');
 }
 
-function OnClick_relList(e) {
-	const target = e.target;
-	const cmd = target.getAttribute('data-command');
+function SetHeaderBookmark(item) {
+	const id = item.id || 'h_' + this._w.Math.random().toString().replace(/.+\./, '');
+	item.id = id;
+	this.urlInput.value = '#' + id;
+
+	if (!this.anchorText.value.trim() || !this._change) {
+		this.anchorText.value = item.textContent;
+	}
+
+	this._setLinkPreview(this.urlInput.value);
+	this.selectMenu_bookmark.close();
+	this.urlInput.focus();
+}
+
+function SetRelItem(item) {
+	const cmd = item.getAttribute('data-command');
 	if (!cmd) return;
 
 	const current = this.currentRel;
-	const checked = domUtils.toggleClass(target, 'se-checked');
 	const index = current.indexOf(cmd);
-	if (checked) {
-		if (index === -1) current.push(cmd);
-	} else {
-		if (index > -1) current.splice(index, 1);
-	}
+	if (index === -1) current.push(cmd);
+	else current.splice(index, 1);
 
 	this.relPreview.title = this.relPreview.textContent = current.join(' ');
-}
-
-function OnKeyDown_urlInput(e) {
-	const keyCode = e.keyCode;
-	switch (keyCode) {
-		case 38: // up
-			e.preventDefault();
-			e.stopPropagation();
-			this.selectMenu_bookmark.moveItem(-1);
-			break;
-		case 40: // down
-			e.preventDefault();
-			e.stopPropagation();
-			this.selectMenu_bookmark.moveItem(1);
-			break;
-		case 13: // enter
-			if (this.selectMenu_bookmark.index > -1) {
-				e.preventDefault();
-				e.stopPropagation();
-				this._setHeaderBookmark(this.selectMenu_bookmark.getItem(null));
-			}
-			break;
-	}
 }
 
 function OnChange_anchorText(e) {
@@ -320,7 +261,6 @@ function OnChange_anchorText(e) {
 function OnChange_urlInput(e) {
 	const value = e.target.value.trim();
 	this._setLinkPreview(value);
-
 	if (this._selfPathBookmark(value)) this._createHeaderList(value);
 	else this.selectMenu_bookmark.close();
 }
@@ -330,17 +270,12 @@ function OnFocus_urlInput() {
 	if (this._selfPathBookmark(value)) this._createHeaderList(value);
 }
 
-function OnBlur_urlInput() {
-	this.selectMenu_bookmark.close();
-}
-
 function OnClick_bookmarkButton() {
 	let url = this.urlInput.value;
 	if (this._selfPathBookmark(url)) {
 		url = url.substr(1);
 		this.bookmark.style.display = 'none';
 		domUtils.removeClass(this.bookmarkButton, 'active');
-		this.selectMenu_bookmark.close();
 	} else {
 		url = '#' + url;
 		this.bookmark.style.display = 'block';
@@ -383,10 +318,7 @@ function OnChange_downloadCheck(e) {
 
 function CreatetModalForm(editor) {
 	const lang = editor.lang;
-	const relList = editor.options.linkRel;
-	const defaultRel = (editor.options.linkRelDefault.default || '').split(' ');
 	const icons = editor.icons;
-
 	let html =
 		'<div class="se-modal-body">' +
 		'<div class="se-modal-form">' +
@@ -404,7 +336,6 @@ function CreatetModalForm(editor) {
 		'">' +
 		icons.bookmark +
 		'</button>' +
-		'<div class="se-select-menu __se__bookmark"></div>' +
 		'</div>' +
 		'<div class="se-anchor-preview-form">' +
 		'<span class="se-svg se-anchor-preview-icon _se_anchor_bookmark_icon">' +
@@ -428,18 +359,8 @@ function CreatetModalForm(editor) {
 		'<label><input type="checkbox" class="se-modal-btn-check _se_anchor_download" />&nbsp;' +
 		lang.modalBox.linkBox.downloadLinkCheck +
 		'</label>';
-	if (relList.length > 0) {
-		html +=
-			'<div class="se-anchor-rel"><button type="button" class="se-btn se-btn-select se-anchor-rel-btn">&lt;rel&gt;</button>' +
-			'<div class="se-anchor-rel-wrapper"><pre class="se-link-preview se-anchor-rel-preview"></pre></div>' +
-			'<div class="se-list-layer se-select-menu __se__rel">' +
-			'<div class="se-list-inner">' +
-			'<ul class="se-list-basic se-list-checked">';
-		for (let i = 0, len = relList.length, rel; i < len; i++) {
-			rel = relList[i];
-			html += '<li><button type="button" class="se-btn-list' + (defaultRel.indexOf(rel) > -1 ? ' se-checked' : '') + '" data-command="' + rel + '" title="' + rel + '" aria-label="' + rel + '"><span class="se-svg">' + icons.checked + '</span>' + rel + '</button></li>';
-		}
-		html += '</ul></div></div></div>';
+	if (editor.options.linkRel.length > 0) {
+		html += '<div class="se-anchor-rel"><button type="button" class="se-btn se-btn-select se-anchor-rel-btn">&lt;rel&gt;</button>' + '<div class="se-anchor-rel-wrapper"><pre class="se-link-preview se-anchor-rel-preview"></pre></div>' + '</div></div>';
 	}
 
 	html += '</div></div>';

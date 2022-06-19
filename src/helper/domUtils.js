@@ -309,7 +309,7 @@ export function compareElements(a, b) {
  * A tag that satisfies the query condition is imported.
  * Returns null if not found.
  * @param {Node} element Reference element
- * @param {string|Function} query Query String (nodeName, .className, #ID, :name) or validation function.
+ * @param {string|Function|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * Not use it like jquery.
  * Only one condition can be entered at a time.
  * @returns {Element|null}
@@ -319,6 +319,10 @@ export function getParentElement(element, query) {
 
 	if (typeof query === 'function') {
 		check = query;
+	} else if (typeof query === 'object') {
+		check = function (current) {
+			return current === query;
+		};
 	} else {
 		let attr;
 		if (/^\./.test(query)) {
@@ -356,7 +360,7 @@ export function getParentElement(element, query) {
  * A tag that satisfies the query condition is imported.
  * Returns null if not found.
  * @param {Node} node Reference element
- * @param {string|Function} query Query String (nodeName, .className, #ID, :name) or validation function.
+ * @param {string|Function|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
  * @param {boolean} last If true returns the last node among the found child nodes. (default: first node)
  * Not use it like jquery.
  * Only one condition can be entered at a time.
@@ -367,6 +371,10 @@ export function getEdgeChild(node, query, last) {
 
 	if (typeof query === 'function') {
 		check = query;
+	} else if (typeof query === 'object') {
+		check = function (current) {
+			return current === query;
+		};
 	} else {
 		let attr;
 		if (/^\./.test(query)) {
