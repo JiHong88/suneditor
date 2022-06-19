@@ -6325,8 +6325,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (!command && !display) return;
             if (target.disabled) return;
-            if (!core.isReadOnly && !core.hasFocus) core.nativeFocus();
-            if (!core.isReadOnly && !core._variable.isCodeView) core._editorRange();
 
             core.actionCall(command, display, target);
         },
