@@ -1453,7 +1453,7 @@ function OnKeyDown_wysiwyg(e) {
 			}
 
 			break;
-		case 27:
+		case 27 /** esc key */:
 			if (fileComponentName) {
 				e.preventDefault();
 				e.stopPropagation();

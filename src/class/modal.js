@@ -17,6 +17,7 @@ const modal = function (inst, element) {
 	this.modalForm = element;
 	this.modalElement = this.context.element._modal;
 	this.focusElement = element.querySelector('[data-focus]');
+	this._closeListener = CloseListener.bind(this);
 	this._bindClose = null;
 	this._onClickEvent = null;
 	this._closeSignal = false;
@@ -38,13 +39,8 @@ modal.prototype = {
 	 * @description Open a modal plugin
 	 */
 	open: function () {
-		if (this._bindClose) {
-			this.eventManager.removeGlobalEvent('keydown', this._bindClose);
-			this._bindClose = null;
-		}
-
-		this._bindClose = CloseListener.bind(this);
-		this.eventManager.addGlobalEvent('keydown', this._bindClose);
+		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent('keydown', this._bindClose);
+		this._bindClose = this.eventManager.addGlobalEvent('keydown', this._closeListener);
 
 		if (this._closeSignal) {
 			this._onClickEvent = OnClick_dialog.bind(this);
@@ -73,10 +69,7 @@ modal.prototype = {
 	 * The plugin's "init" method is called.
 	 */
 	close: function () {
-		if (this._bindClose) {
-			this.eventManager.removeGlobalEvent('keydown', this._bindClose);
-			this._bindClose = null;
-		}
+		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent('keydown', this._bindClose);
 		if (this._onClickEvent) {
 			this.modalElement.inner.removeEventListener('click', this._onClickEvent);
 			this._onClickEvent = null;
