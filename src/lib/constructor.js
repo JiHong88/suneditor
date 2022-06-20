@@ -667,7 +667,6 @@ function _defaultButtons(options) {
 		/** plugins - modal */
 		image: ['', lang.toolbar.image, 'image', 'modal', icons.image],
 		video: ['', lang.toolbar.video, 'video', 'modal', icons.video],
-		audio: ['', lang.toolbar.audio, 'audio', 'modal', icons.audio],
 		/** plugins - fileBrowser */
 		imageGallery: ['', lang.toolbar.imageGallery, 'imageGallery', 'fileBrowser', icons.image_gallery]
 	};

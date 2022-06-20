@@ -24,6 +24,8 @@ const table = function (editor, target) {
 	const controller_cell = CreateHTML_controller_cell(editor, this.cellControllerTop);
 
 	// members
+	this.controller_table = controller_table;
+	this.controller_cell = controller_cell;
 	this.maxText = this.lang.controller.maxSize;
 	this.minText = this.lang.controller.minSize;
 	this.cellControllerTop = editor.options.tableCellControllerPosition === 'top';
@@ -31,12 +33,10 @@ const table = function (editor, target) {
 	this.tableUnHighlight = menu.querySelector('.se-table-size-unhighlighted');
 	this.tableDisplay = menu.querySelector('.se-table-size-display');
 	if (this._rtl) this.tableHighlight.style.left = 10 * 18 - 13 + 'px';
-	this.tableController = controller_table;
 	this.resizeButton = controller_table.querySelector('._se_table_resize');
 	this.resizeText = controller_table.querySelector('._se_table_resize > span > span');
 	this.columnFixedButton = controller_table.querySelector('._se_table_fixed_column');
 	this.headerButton = controller_table.querySelector('._se_table_header');
-	this.resizeDiv = controller_cell;
 	this.splitMenu = controller_cell.querySelector('.se-btn-group-sub');
 	this.mergeButton = controller_cell.querySelector('._se_table_merge_button');
 	this.splitButton = controller_cell.querySelector('._se_table_split_button');
@@ -153,7 +153,7 @@ table.prototype = {
 			this.eventManager.addGlobalEvent('mousemove', this._bindOnSelect, false);
 		} else {
 			this._bindOffShift = function () {
-				this.menu.controllerOn(this.resizeDiv, this.tableController, this.reset.bind(this), tdElement, 'table');
+				this.menu.controllerOn(this.controller_cell, this.controller_table, this.reset.bind(this), tdElement, 'table');
 				if (!this._ref) this.menu.controllerOff();
 			}.bind(this);
 
@@ -952,20 +952,20 @@ table.prototype = {
 		this.setPositionControllerTop(tableElement);
 		this.setPositionControllerDiv(tdElement, this._shift);
 
-		if (!this._shift) this.menu.controllerOn(this.resizeDiv, this.tableController, this.reset.bind(this), tdElement, 'table');
+		if (!this._shift) this.menu.controllerOn(this.controller_cell, this.controller_table, this.reset.bind(this), tdElement, 'table');
 	},
 
 	setPositionControllerTop: function (tableElement) {
-		this.menu.setControllerPosition(this.tableController, tableElement, 'top', { left: 0, top: 0 });
+		this.menu.setControllerPosition(this.controller_table, tableElement, 'top', { left: 0, top: 0 });
 	},
 
 	setPositionControllerDiv: function (tdElement, reset) {
 		this.setCellInfo(tdElement, reset);
 
 		if (this.cellControllerTop) {
-			this.menu.setControllerPosition(this.resizeDiv, this._element, 'top', { left: this.tableController.offsetWidth, top: 0 });
+			this.menu.setControllerPosition(this.controller_cell, this._element, 'top', { left: this.controller_table.offsetWidth, top: 0 });
 		} else {
-			this.menu.setControllerPosition(this.resizeDiv, tdElement, 'bottom', { left: 0, top: 0 });
+			this.menu.setControllerPosition(this.controller_cell, tdElement, 'bottom', { left: 0, top: 0 });
 		}
 	},
 

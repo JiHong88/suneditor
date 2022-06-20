@@ -17,7 +17,7 @@ const math = function (editor, target) {
 
 	// members
 	this.modal = new Modal(this, modalEl);
-	this.mathController = controllerEl;
+	this.controller = controllerEl;
 	this.focusElement = modalEl.querySelector('.se-math-exp');
 	this.previewElement = modalEl.querySelector('.se-math-preview');
 	this.fontSizeElement = modalEl.querySelector('.se-math-size');
@@ -49,11 +49,11 @@ math.prototype = {
 	 */
 	active: function (element) {
 		if (!element) {
-			if (this.menu.hasController(this.mathController)) {
+			if (this.menu.hasController(this.controller)) {
 				this.menu.controllerOff();
 			}
 		} else if (element.getAttribute('data-exp')) {
-			if (!this.menu.hasController(this.mathController)) {
+			if (!this.menu.hasController(this.controller)) {
 				this.selection.setRange(element, 0, element, 1);
 				this._callController(element);
 			}
@@ -106,7 +106,7 @@ math.prototype = {
 	 * @override modal
 	 */
 	init: function () {
-		this.mathController.style.display = 'none';
+		this.controller.style.display = 'none';
 		this._mathExp = null;
 		this.focusElement.value = '';
 		this.previewElement.innerHTML = '';
@@ -119,8 +119,8 @@ math.prototype = {
 
 	_callController: function (mathTag) {
 		this._mathExp = mathTag;
-		this.menu.setControllerPosition(this.mathController, mathTag, 'bottom', { left: 0, top: 0 });
-		this.menu.controllerOn(this.mathController, mathTag, 'math');
+		this.menu.setControllerPosition(this.controller, mathTag, 'bottom', { left: 0, top: 0 });
+		this.menu.controllerOn(this.controller, mathTag, 'math');
 	},
 
 	constructor: math
@@ -274,7 +274,7 @@ function CreateHTML_modal(editor, math) {
 		'</form>';
 
 	math.defaultFontSize = defaultFontSize;
-	return domUtils.createElement('DIV', { class: 'se-modal-content', style: 'display: none;' }, html);
+	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
 function CreateHTML_controller(core) {

@@ -655,12 +655,12 @@ export default {
             oImg.setAttribute('data-proportion', contextImage._proportionChecked);
         }
 
-        const cover = this.plugins.mediaContainer.setCover.call(this, anchor);
-        const container = this.plugins.mediaContainer.setContainer.call(this, cover, 'se-image-container');
+        const cover = this.plugins.mediaContainer.createMediaCover.call(this, anchor);
+        const container = this.plugins.mediaContainer.createMediaContainer.call(this, cover, 'se-image-container');
 
         // caption
         if (contextImage._captionChecked) {
-            contextImage._caption = this.plugins.mediaContainer.create_caption.call(this);
+            contextImage._caption = this.plugins.mediaContainer.createMediaCaption.call(this);
             contextImage._caption.setAttribute('contenteditable', false);
             cover.appendChild(contextImage._caption);
         }
@@ -701,14 +701,14 @@ export default {
         if (cover === null) {
             isNewContainer = true;
             imageEl = contextImage._element.cloneNode(true);
-            cover = this.plugins.mediaContainer.setCover.call(this, imageEl);
+            cover = this.plugins.mediaContainer.createMediaCover.call(this, imageEl);
         }
 
         if (container === null) {
             cover = cover.cloneNode(true);
             imageEl = cover.querySelector('img');
             isNewContainer = true;
-            container = this.plugins.mediaContainer.setContainer.call(this, cover, 'se-image-container');
+            container = this.plugins.mediaContainer.createMediaContainer.call(this, cover, 'se-image-container');
         } else if (isNewContainer) {
             container.innerHTML = '';
             container.appendChild(cover);
@@ -734,7 +734,7 @@ export default {
         let modifiedCaption = false;
         if (contextImage._captionChecked) {
             if (!contextImage._caption) {
-                contextImage._caption = this.plugins.mediaContainer.create_caption.call(this);
+                contextImage._caption = this.plugins.mediaContainer.createMediaCaption.call(this);
                 cover.appendChild(contextImage._caption);
                 modifiedCaption = true;
             }

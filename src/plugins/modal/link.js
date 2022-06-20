@@ -26,7 +26,7 @@ const link = function (editor, target) {
 	// members
 	this.anchor = new AnchorModalEditor(this, modalEl);
 	this.modal = new Modal(this, modalEl);
-	this.linkController = controllerEl;
+	this.controller = controllerEl;
 	this.isUpdateState = false;
 
 	// add controller
@@ -45,11 +45,11 @@ link.prototype = {
 	 */
 	active: function (element) {
 		if (!element) {
-			if (this.menu.hasController(this.linkController)) {
+			if (this.menu.hasController(this.controller)) {
 				this.menu.controllerOff();
 			}
 		} else if (domUtils.isAnchor(element) && element.getAttribute('data-image-link') === null) {
-			if (!this.menu.hasController(this.linkController)) {
+			if (!this.menu.hasController(this.controller)) {
 				this.callController(element);
 			}
 			return true;
@@ -78,22 +78,22 @@ link.prototype = {
 	 * @Override modal
 	 */
 	init: function () {
-		this.linkController.style.display = 'none';
+		this.controller.style.display = 'none';
 		this.anchor.init();
 	},
 
 	callController: function (selectedEl) {
 		this.editLink = this.anchor.linkAnchor = selectedEl;
-		const linkController = this.linkController;
-		const link = linkController.querySelector('a');
+		const controller = this.controller;
+		const link = controller.querySelector('a');
 
 		link.href = selectedEl.href;
 		link.title = selectedEl.textContent;
 		link.textContent = selectedEl.textContent;
 
 		domUtils.addClass(selectedEl, 'on');
-		this.menu.setControllerPosition(linkController, selectedEl, 'bottom', { left: 0, top: 0 });
-		this.menu.controllerOn(linkController, selectedEl, 'link', domUtils.removeClass.bind(null, this.anchor.linkAnchor, 'on'));
+		this.menu.setControllerPosition(controller, selectedEl, 'bottom', { left: 0, top: 0 });
+		this.menu.controllerOn(controller, selectedEl, 'link', domUtils.removeClass.bind(null, this.anchor.linkAnchor, 'on'));
 	},
 
 	constructor: link
@@ -203,7 +203,7 @@ function CreateHTML_modal(editor) {
 		'</div>' +
 		'</form>';
 
-	return domUtils.createElement('DIV', { class: 'se-modal-content', style: 'display: none;' }, html);
+	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
 function CreateHTML_controller(editor) {

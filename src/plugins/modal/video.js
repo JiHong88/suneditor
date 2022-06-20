@@ -585,8 +585,8 @@ export default {
             init = true;
             oFrame.src = src;
             contextVideo._element = oFrame;
-            cover = this.plugins.mediaContainer.setCover.call(this, oFrame);
-            container = this.plugins.mediaContainer.setContainer.call(this, cover, 'se-video-container');
+            cover = this.plugins.mediaContainer.createMediaCover.call(this, oFrame);
+            container = this.plugins.mediaContainer.createMediaContainer.call(this, cover, 'se-video-container');
         }
 
         /** rendering */
@@ -650,8 +650,8 @@ export default {
 
         const prevFrame = oFrame;
         contextVideo._element = oFrame = oFrame.cloneNode(true);
-        const cover = contextVideo._cover = this.plugins.mediaContainer.setCover.call(this, oFrame);
-        const container = contextVideo._container = this.plugins.mediaContainer.setContainer.call(this, cover, 'se-video-container');
+        const cover = contextVideo._cover = this.plugins.mediaContainer.createMediaCover.call(this, oFrame);
+        const container = contextVideo._container = this.plugins.mediaContainer.createMediaContainer.call(this, cover, 'se-video-container');
 
         try {
             const figcaption = existElement.querySelector('figcaption');

@@ -7,19 +7,19 @@ declare interface component extends Module {
      * @param className Class name of container (fixed: se-component)
      * @returns Created container element
      */
-    setContainer(cover: Element, className: string): Element;
+    createMediaContainer(cover: Element, className: string): Element;
 
     /**
      * @description Cover the target element with a FIGURE element.
      * @param element Target element
      */
-    setCover(element: Element): void;
+    createMediaCover(element: Element): void;
 
     /**
      * @description Return HTML string of caption(FIGCAPTION) element
      * @returns
      */
-    create_caption(): string;
+    createMediaCaption(): string;
 }
 
 export default component;
