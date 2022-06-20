@@ -30,10 +30,11 @@ EventManager.prototype = {
 	/**
 	 * @description Register for an event.
 	 * Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
-	 * @param {Element} target Target element
+	 * @param {Element|object} target Target element
 	 * @param {string} type Event type
 	 * @param {Function} listener Event handler
 	 * @param {boolean|undefined} useCapture Event useCapture option
+	 * @return {target, type, listener, useCapture}
 	 */
 	addEvent: function (target, type, listener, useCapture) {
 		target.addEventListener(type, listener, useCapture);
@@ -51,6 +52,7 @@ EventManager.prototype = {
 	 * @param {string} type Event type
 	 * @param {Function} listener Event listener
 	 * @param {boolean|undefined} useCapture Use event capture
+	 * @return {type, listener, useCapture}
 	 */
 	addGlobalEvent: function (type, listener, useCapture) {
 		if (this.options.iframe) {
@@ -58,16 +60,24 @@ EventManager.prototype = {
 		} else {
 			this._d.addEventListener(type, listener, useCapture);
 		}
+
+		return { type: type, listener: listener, useCapture: useCapture };
 	},
 
 	/**
 	 * @description Remove events from document.
 	 * When created as an Iframe, the event of the document inside the Iframe is also removed.
-	 * @param {string} type Event type
+	 * @param {string|object} type Event type
 	 * @param {Function} listener Event listener
 	 * @param {boolean|undefined} useCapture Use event capture
 	 */
 	removeGlobalEvent: function (type, listener, useCapture) {
+		if (typeof type === 'object') {
+			listener = type.listener;
+			useCapture = type.useCapture;
+			type = type.type;
+		}
+
 		if (this.options.iframe) {
 			this._wd.removeEventListener(type, listener, useCapture);
 		} else {
@@ -1457,7 +1467,7 @@ function OnKeyDown_wysiwyg(e) {
 	for (let i = 0; i < eventPlugins.length; i++) {
 		if (eventPlugins[i](e, formatEl) === false) return;
 	}
-	
+
 	if (shift && (env.isOSX_IOS ? alt : ctrl) && keyCode === 32) {
 		e.preventDefault();
 		e.stopPropagation();

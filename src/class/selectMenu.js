@@ -18,8 +18,11 @@ const selectMenu = function (inst, checkType) {
 	this._selectMethod = null;
 	this._bindClose_key = null;
 	this._bindClose_mousedown = null;
+	this._bindClose_click = null;
+	this._closeSignal = false;
 	this.__events = [];
-	this.__bindEventHandler = [OnMousedown_list, OnMouseMove_list.bind(this), OnClick_list.bind(this), OnKeyDown_refer.bind(this)];
+	this.__eventHandlers = [OnMousedown_list, OnMouseMove_list.bind(this), OnClick_list.bind(this), OnKeyDown_refer.bind(this)];
+	this.__globalEventHandlers = [CloseListener_key.bind(this), CloseListener_mousedown.bind(this), CloseListener_click.bind(this)];
 };
 
 selectMenu.prototype = {
@@ -103,8 +106,8 @@ selectMenu.prototype = {
 	},
 
 	__addEvents: function () {
-        this.__removeEvents();
-		this.__events = this.__bindEventHandler;
+		this.__removeEvents();
+		this.__events = this.__eventHandlers;
 		this.form.addEventListener('mousedown', this.__events[0]);
 		this.form.addEventListener('mousemove', this.__events[1]);
 		this.form.addEventListener('click', this.__events[2]);
@@ -121,23 +124,15 @@ selectMenu.prototype = {
 	},
 
 	__addGlobalEvent: function () {
-        this.__removeGlobalEvent();
-		this._bindClose_key = CloseListener_key.bind(this);
-		this._bindClose_mousedown = CloseListener_mousedown.bind(this);
-		this.eventManager.addGlobalEvent('keydown', this._bindClose_key, true);
-		this.eventManager.addGlobalEvent('mousedown', this._bindClose_mousedown);
+		this.__removeGlobalEvent();
+		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers[0], true);
+		this._bindClose_mousedown = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers[1], true);
 	},
 
 	__removeGlobalEvent: function () {
-		if (this._bindClose_key) {
-			this.eventManager.removeGlobalEvent('keydown', this._bindClose_key, true);
-			this._bindClose_key = null;
-		}
-
-		if (this._bindClose_mousedown) {
-			this.eventManager.removeGlobalEvent('mousedown', this._bindClose_mousedown);
-			this._bindClose_mousedown = null;
-		}
+		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);
+		if (this._bindClose_mousedown) this._bindClose_mousedown = this.eventManager.removeGlobalEvent(this._bindClose_mousedown);
+		if (this._bindClose_click) this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
 	},
 
 	constructor: selectMenu
@@ -156,7 +151,7 @@ function OnKeyDown_refer(e) {
 			e.stopPropagation();
 			this._moveItem(1);
 			break;
-		case 13: // enter
+		case 13: case 32: // enter, space
 			if (this.index > -1) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -198,9 +193,20 @@ function CloseListener_key(e) {
 }
 
 function CloseListener_mousedown(e) {
-    console.log("cccclickkkkkk")
-	if (!domUtils.getParentElement(e.target, this.form)) {
+	if (domUtils.getParentElement(e.target, this.form)) return;
+	if (e.target !== this._refer) {
 		this.close();
+		e.stopPropagation();
+	} else if (this.checkType) {
+		this._bindClose_click = this.eventManager.addGlobalEvent('click', this.__globalEventHandlers[2], true);
+	}
+}
+
+function CloseListener_click(e) {
+	this.eventManager.removeGlobalEvent(this._bindClose_click);
+	if (e.target === this._refer) {
+		this.close();
+		e.stopPropagation();
 	}
 }
 

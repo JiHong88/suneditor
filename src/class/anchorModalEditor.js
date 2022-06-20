@@ -38,7 +38,7 @@ const anchorModalEditor = function (inst, modalForm) {
 		const list = [];
 		for (let i = 0, len = relList.length, rel; i < len; i++) {
 			rel = relList[i];
-			list.push(domUtils.createElement('BUTTON', { type: 'button', class: 'se-btn-list' + (defaultRel.indexOf(rel) > -1 ? ' se-checked' : ''), 'data-command': rel, title: rel, 'aria-label': rel }, '<span class="se-svg">' + this.icons.checked + '</span>' + rel));
+			list.push(domUtils.createElement('BUTTON', { type: 'button', class: 'se-btn-list' + (defaultRel.indexOf(rel) > -1 ? ' se-checked' : ''), 'data-command': rel, title: rel, 'aria-label': rel }, rel + '<span class="se-svg">' + this.icons.checked + '</span>'));
 		}
 		this.selectMenu_rel = new SelectMenu(this, true);
 		this.selectMenu_rel.on(this.relButton, SetRelItem.bind(this));
@@ -97,8 +97,6 @@ anchorModalEditor.prototype = {
 		this.downloadCheck.checked = false;
 		this._change = false;
 		this._setRel(this.defaultRel);
-		this.selectMenu_bookmark.close();
-		if (this.selectMenu_rel) this.selectMenu_rel.close();
 	},
 
 	_updateAnchor: function (anchor, url, alt, notText) {
