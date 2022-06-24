@@ -606,7 +606,7 @@ export default {
 
         let changed = true;
         if (!isUpdate) {
-            changed = this.component.insert(container, false, true, !this.options.mediaAutoSelect);
+            changed = this.component.insert(container, false, false, !this.options.mediaAutoSelect);
             if (!this.options.mediaAutoSelect) {
                 const line = this.format.addLine(container, null);
                 if (line) this.setRange(line, 0, line, 0);

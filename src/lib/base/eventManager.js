@@ -484,7 +484,7 @@ EventManager.prototype = {
 		}
 
 		if (cleanData) {
-			this.html.insert(cleanData, true, false);
+			this.html.insert(cleanData, false, true, true);
 			return false;
 		}
 	},
@@ -1172,7 +1172,7 @@ function OnKeyDown_wysiwyg(e) {
 				if (!shift) {
 					const tabText = domUtils.createTextNode(new _w.Array(this.status.tabSize + 1).join('\u00A0'));
 					if (lines.length === 1) {
-						const textRange = this.html.insertNode(tabText, null, true);
+						const textRange = this.html.insertNode(tabText, null, false);
 						if (!textRange) return false;
 						if (!fc) {
 							r.sc = tabText;
@@ -1354,7 +1354,7 @@ function OnKeyDown_wysiwyg(e) {
 					}
 
 					if (selectionFormat) {
-						this.html.insert(range.collapsed && domUtils.isBreak(range.startContainer.childNodes[range.startOffset - 1]) ? '<br>' : '<br><br>', true, false);
+						this.html.insert((range.collapsed && domUtils.isBreak(range.startContainer.childNodes[range.startOffset - 1]) ? '<br>' : '<br><br>'), false, true, true);
 
 						let focusNode = wSelection.focusNode;
 						const wOffset = wSelection.focusOffset;
@@ -1366,7 +1366,7 @@ function OnKeyDown_wysiwyg(e) {
 					} else {
 						const focusNext = wSelection.focusNode.nextSibling;
 						const br = domUtils.createElement('BR');
-						this.html.insertNode(br, null, false);
+						this.html.insertNode(br, null, true);
 
 						const brPrev = br.previousSibling,
 							brNext = br.nextSibling;
@@ -1469,7 +1469,7 @@ function OnKeyDown_wysiwyg(e) {
 	if (shift && (env.isOSX_IOS ? alt : ctrl) && keyCode === 32) {
 		e.preventDefault();
 		e.stopPropagation();
-		const nbsp = this.html.insertNode(domUtils.createTextNode('\u00a0'));
+		const nbsp = this.html.insertNode(domUtils.createTextNode('\u00a0'), null, true);
 		if (nbsp && nbsp.container) {
 			this.selection.setRange(nbsp.container, nbsp.endOffset, nbsp.container, nbsp.endOffset);
 			return;
@@ -1478,7 +1478,7 @@ function OnKeyDown_wysiwyg(e) {
 
 	if (env.isIE && !ctrl && !alt && !selectRange && !NON_TEXT_KEYCODE.test(keyCode) && domUtils.isBreak(range.commonAncestorContainer)) {
 		const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
-		this.html.insertNode(zeroWidth, null, false);
+		this.html.insertNode(zeroWidth, null, true);
 		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 	}
 }

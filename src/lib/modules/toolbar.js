@@ -235,7 +235,7 @@ Toolbar.prototype = {
 			const node = this.selection.getNode();
 			if (this.format.isLine(node)) {
 				const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
-				this.html.insertNode(zeroWidth, null, false);
+				this.html.insertNode(zeroWidth, null, true);
 				this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 				this.selection._init();
 				rects = this.selection.getRange().getClientRects();

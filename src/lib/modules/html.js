@@ -148,16 +148,17 @@ HTML.prototype = {
 
 	/**
 	 * @description Insert an (HTML element / HTML string / plain string) at selection range.
+	 * If "options.charCounter_max" is exceeded when "html" is added, null is returned without addition.
 	 * @param {Element|String} html HTML Element or HTML string or plain string
-	 * @param {boolean} notCleaningData If true, inserts the HTML string without refining it with html.clean.
-	 * @param {boolean} checkCharCount If true, if "options.charCounter_max" is exceeded when "element" is added, null is returned without addition.
 	 * @param {boolean} rangeSelection If true, range select the inserted node.
+	 * @param {boolean} notCheckCharCount If true, it will be inserted even if "options.charCounter_max" is exceeded.
+	 * @param {boolean} notCleanData If true, inserts the HTML string without refining it with html.clean.
 	 */
-	insert: function (html, notCleaningData, checkCharCount, rangeSelection) {
+	insert: function (html, rangeSelection, notCheckCharCount, notCleanData) {
 		if (!this.context.element.wysiwygFrame.contains(this.selection.get().focusNode)) this.editor.focus();
 
 		if (typeof html === 'string') {
-			if (!notCleaningData) html = this.clean(html, false, null, null);
+			if (!notCleanData) html = this.clean(html, false, null, null);
 			try {
 				if (domUtils.isListCell(this.format.getLine(this.selection.getNode(), null))) {
 					const dom = this._d.createRange().createContextualFragment(html);
@@ -168,7 +169,7 @@ HTML.prototype = {
 				const dom = this._d.createRange().createContextualFragment(html);
 				const domTree = dom.childNodes;
 
-				if (checkCharCount) {
+				if (!notCheckCharCount) {
 					const type = this.options.charCounter_type === 'byte-html' ? 'outerHTML' : 'textContent';
 					let checkHTML = '';
 					for (let i = 0, len = domTree.length; i < len; i++) {
@@ -184,7 +185,7 @@ HTML.prototype = {
 						domUtils.removeItem(c);
 						continue;
 					}
-					t = this.insertNode(c, a, false);
+					t = this.insertNode(c, a, true);
 					a = t.container || t;
 					if (!firstCon) firstCon = t;
 					prev = c;
@@ -201,13 +202,13 @@ HTML.prototype = {
 			}
 		} else {
 			if (this.component.is(html)) {
-				this.component.insert(html, false, checkCharCount, false);
+				this.component.insert(html, false, notCheckCharCount, false);
 			} else {
 				let afterNode = null;
 				if (this.format.isLine(html) || domUtils.isMedia(html)) {
 					afterNode = this.format.getLine(this.selection.getNode(), null);
 				}
-				this.insertNode(html, afterNode, checkCharCount);
+				this.insertNode(html, afterNode, notCheckCharCount);
 			}
 		}
 
@@ -224,11 +225,11 @@ HTML.prototype = {
 	 * Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
 	 * @param {Node} oNode Node to be inserted
 	 * @param {Node|null} afterNode If the node exists, it is inserted after the node
-	 * @param {boolean} checkCharCount If true, if "options.charCounter_max" is exceeded when "element" is added, null is returned without addition.
+	 * @param {boolean|null} notCheckCharCount If true, it will be inserted even if "options.charCounter_max" is exceeded.
 	 * @returns {Object|Node|null}
 	 */
-	insertNode: function (oNode, afterNode, checkCharCount) {
-		if (this.editor.isReadOnly || (checkCharCount && !this.char.check(oNode, null))) {
+	insertNode: function (oNode, afterNode, notCheckCharCount) {
+		if (this.editor.isReadOnly || (!notCheckCharCount && !this.char.check(oNode, null))) {
 			return null;
 		}
 

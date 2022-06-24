@@ -373,7 +373,7 @@ var a = {
 			element.src = src;
 			const cover = this.plugins.mediaContainer.createMediaCover.call(this, element);
 			const container = this.plugins.mediaContainer.createMediaContainer.call(this, cover, '');
-			if (!this.component.insert(container, false, true, !this.options.mediaAutoSelect)) {
+			if (!this.component.insert(container, false, false, !this.options.mediaAutoSelect)) {
 				this.editor.focus();
 				return;
 			}

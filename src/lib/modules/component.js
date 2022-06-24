@@ -16,12 +16,12 @@ Component.prototype = {
 	 * If "element" is "HR", insert and return the new line.
 	 * @param {Element} element Element to be inserted
 	 * @param {boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (domUtils.getEdgeChildNodes)
-	 * @param {boolean} checkCharCount If true, if "options.charCounter_max" is exceeded when "element" is added, null is returned without addition.
+	 * @param {boolean} notCheckCharCount If true, it will be inserted even if "options.charCounter_max" is exceeded.
 	 * @param {boolean} notSelect If true, Do not automatically select the inserted component.
 	 * @returns {Element}
 	 */
-	insert: function (element, notHistoryPush, checkCharCount, notSelect) {
-		if (this.editor.isReadOnly || (checkCharCount && !this.char.check(element))) {
+	insert: function (element, notHistoryPush, notCheckCharCount, notSelect) {
+		if (this.editor.isReadOnly || (!notCheckCharCount && !this.char.check(element))) {
 			return null;
 		}
 
@@ -32,7 +32,7 @@ Component.prototype = {
 		let formatEl = this.format.getLine(selectionNode, null);
 
 		if (domUtils.isListCell(formatEl)) {
-			this.html.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling, false);
+			this.html.insertNode(element, selectionNode === formatEl ? null : r.container.nextSibling, true);
 			if (!element.nextSibling) element.parentNode.appendChild(domUtils.createElement('BR'));
 		} else {
 			if (this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
@@ -40,7 +40,7 @@ Component.prototype = {
 				oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
 				if (oNode) formatEl = oNode.previousSibling;
 			}
-			this.html.insertNode(element, this.format.isBlock(formatEl) ? null : formatEl, false);
+			this.html.insertNode(element, this.format.isBlock(formatEl) ? null : formatEl, true);
 			if (formatEl && domUtils.isZeroWith(formatEl)) domUtils.removeItem(formatEl);
 		}
 

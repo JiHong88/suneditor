@@ -121,9 +121,9 @@ math.prototype = {
 
 				if (selectedFormats.length > 1) {
 					const oFormat = domUtils.createElement(selectedFormats[0].nodeName, null, katexEl);
-					if (!this.html.insertNode(oFormat, null, true)) return false;
+					if (!this.html.insertNode(oFormat, null, false)) return false;
 				} else {
-					if (!this.html.insertNode(katexEl, null, true)) return false;
+					if (!this.html.insertNode(katexEl, null, false)) return false;
 				}
 
 				const empty = domUtils.createTextNode(unicode.zeroWidthSpace);

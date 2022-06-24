@@ -46,7 +46,7 @@ horizontalLine.prototype = {
 	 */
 	action: function (referNode) {
 		this.editor.focus();
-		const oNode = this.component.insert(referNode.cloneNode(false), false, true, false);
+		const oNode = this.component.insert(referNode.cloneNode(false), false, false, false);
 		if (oNode) {
 			this.selection.setRange(oNode, 0, oNode, 0);
 			this.menu.dropdownOff();

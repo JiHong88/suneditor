@@ -85,7 +85,7 @@ table.prototype = {
 	 * @param {Element} element New table element
 	 */
 	action: function (element) {
-		if (this.component.insert(element, false, true, false)) {
+		if (this.component.insert(element, false, false, false)) {
 			const firstTd = element.querySelector('td div');
 			this.selection.setRange(firstTd, 0, firstTd, 0);
 			this._resetTablePicker();

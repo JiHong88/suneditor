@@ -81,9 +81,9 @@ link.prototype = {
 			if (!this.isUpdateState) {
 				const selectedFormats = this.format.getLines();
 				if (selectedFormats.length > 1) {
-					if (!this.html.insertNode(domUtils.createElement(selectedFormats[0].nodeName, null, oA), null, true)) return;
+					if (!this.html.insertNode(domUtils.createElement(selectedFormats[0].nodeName, null, oA), null, false)) return;
 				} else {
-					if (!this.html.insertNode(oA, null, true)) return;
+					if (!this.html.insertNode(oA, null, false)) return;
 				}
 
 				this.selection.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
