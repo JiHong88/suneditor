@@ -35,7 +35,6 @@ const table = function (editor, target) {
 	this.mergeButton = controller_cell.querySelector('._se_table_merge_button');
 	this.splitButton = controller_cell.querySelector('._se_table_split_button');
 	this.insertRowAboveButton = controller_cell.querySelector('._se_table_insert_row_a');
-	this.insertRowBelowButton = controller_cell.querySelector('._se_table_insert_row_b');
 	// members - private
 	this._element = null;
 	this._tdElement = null;
@@ -375,7 +374,12 @@ table.prototype = {
 				if (option === 'up') {
 					return;
 				} else if (!tableAttr.nextElementSibling || !/^TBODY$/i.test(tableAttr.nextElementSibling.nodeName)) {
-					table.innerHTML += '<tbody><tr>' + CreateCells('td', this._logical_cellCnt, false) + '</tr></tbody>';
+					if (!option) {
+						domUtils.removeItem(this._element);
+						this._closeController();
+					} else {
+						table.innerHTML += '<tbody><tr>' + CreateCells('td', this._logical_cellCnt, false) + '</tr></tbody>';
+					}
 					return;
 				}
 			}
@@ -1016,10 +1020,8 @@ table.prototype = {
 	setActiveButton: function (fixedCell, selectedCell) {
 		if (/^TH$/i.test(fixedCell.nodeName)) {
 			this.insertRowAboveButton.setAttribute('disabled', true);
-			this.insertRowBelowButton.setAttribute('disabled', true);
 		} else {
 			this.insertRowAboveButton.removeAttribute('disabled');
-			this.insertRowBelowButton.removeAttribute('disabled');
 		}
 
 		if (!selectedCell || fixedCell === selectedCell) {
