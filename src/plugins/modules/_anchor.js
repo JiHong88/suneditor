@@ -127,7 +127,7 @@ export default {
             contextAnchor.newWindowCheck.checked = this.options.linkTargetNewWindow;
         } else if (contextAnchor.linkAnchor) {
             this.context.dialog.updateModal = true;
-            const href = this.options.linkNoPrefix ? contextAnchor.linkAnchor.href.replace(contextAnchor.linkAnchor.origin + '/', '') : contextAnchor.linkAnchor.href;
+            const href = contextAnchor.linkAnchor.getAttribute('href');
             contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = anchorPlugin.selfPathBookmark.call(this, href) ? href.substr(href.lastIndexOf('#')) : href;
             contextAnchor.anchorText.value = contextAnchor.linkAnchor.textContent || contextAnchor.linkAnchor.getAttribute('alt');
             contextAnchor.newWindowCheck.checked = (/_blank/i.test(contextAnchor.linkAnchor.target) ? true : false);
