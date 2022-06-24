@@ -5102,11 +5102,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 .replace(this.editorTagsBlacklistRegExp, '');
         },
 
-        _cleanStyle: function (m, v, tagName) {
+        _cleanStyle: function (m, v, name) {
             const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
             if (sv) {
                 if (!v) v = [];
-                const style = sv[0].replace(/&quot;/g, '').match(this._cleanStyleRegExp[tagName]);
+                const style = sv[0].replace(/&quot;/g, '').match(this._cleanStyleRegExp[name]);
                 if (style) {
                     const allowedStyle = [];
                     for (let i = 0, len = style.length, r; i < len; i++) {
@@ -5845,7 +5845,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
             
             this._initWysiwygArea(reload, _initHTML);
-            this.setDir(options.rtl ? 'rtl' : 'ltr');
         },
 
         /**
@@ -6325,8 +6324,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (!command && !display) return;
             if (target.disabled) return;
-            if (!core.isReadOnly && !core.hasFocus) core.nativeFocus();
-            if (!core.isReadOnly && !core._variable.isCodeView) core._editorRange();
 
             core.actionCall(command, display, target);
         },
