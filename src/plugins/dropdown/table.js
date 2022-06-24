@@ -230,14 +230,7 @@ table.prototype = {
 	 */
 	reset: function () {
 		this._removeEvents();
-
-		if (this._selectedTable) {
-			const selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
-			for (let i = 0, len = selectedCells.length; i < len; i++) {
-				domUtils.removeClass(selectedCells[i], 'se-table-selected-cell');
-			}
-		}
-
+		this._deleteStyleSelectedCells();
 		this._toggleEditor(true);
 
 		this._element = null;
@@ -274,10 +267,7 @@ table.prototype = {
 		this._fixedCellName = tdElement.nodeName;
 		this._selectedTable = domUtils.getParentElement(tdElement, 'TABLE');
 
-		const selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
-		for (let i = 0, len = selectedCells.length; i < len; i++) {
-			domUtils.removeClass(selectedCells[i], 'se-table-selected-cell');
-		}
+		this._deleteStyleSelectedCells();
 
 		domUtils.addClass(tdElement, 'se-table-selected-cell');
 
@@ -1079,8 +1069,7 @@ table.prototype = {
 
 	setController: function (tdElement) {
 		if (!this.selection.get().isCollapsed && !this._selectedCell) {
-			this._closeController();
-			domUtils.removeClass(tdElement, 'se-table-selected-cell');
+			this._deleteStyleSelectedCells();
 			return;
 		}
 
@@ -1099,6 +1088,15 @@ table.prototype = {
 	setCellControllerPosition: function (tdElement, reset) {
 		this.setCellInfo(tdElement, reset);
 		this.controller_cell.resetPosition(tdElement);
+	},
+
+	_deleteStyleSelectedCells: function () {
+		if (this._selectedTable) {
+			const selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
+			for (let i = 0, len = selectedCells.length; i < len; i++) {
+				domUtils.removeClass(selectedCells[i], 'se-table-selected-cell');
+			}
+		}
 	},
 
 	_toggleEditor: function (enabled) {
@@ -1155,10 +1153,7 @@ table.prototype = {
 
 	_setMultiCells: function (startCell, endCell) {
 		const rows = this._selectedTable.rows;
-		const selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
-		for (let i = 0, len = selectedCells.length; i < len; i++) {
-			domUtils.removeClass(selectedCells[i], 'se-table-selected-cell');
-		}
+		this._deleteStyleSelectedCells();
 
 		if (startCell === endCell) {
 			domUtils.addClass(startCell, 'se-table-selected-cell');
