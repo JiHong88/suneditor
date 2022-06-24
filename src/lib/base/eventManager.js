@@ -22,7 +22,7 @@ const EventManager = function (editor) {
 	this._balloonDelay = null;
 	this._resizeObserver = null;
 	this._toolbarObserver = null;
-	this._onSelectPlugins = editor._onSelectPlugins;
+	this._onMousedownPlugins = editor._onMousedownPlugins;
 	this._onKeyDownPlugins = editor._onKeyDownPlugins;
 };
 
@@ -656,7 +656,7 @@ function OnMouseDown_wysiwyg(e) {
 	// user event
 	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown(e) === false) return;
 
-	const eventPlugins = this.editor._onSelectPlugins;
+	const eventPlugins = this.editor._onMousedownPlugins;
 	for (let i = 0; i < eventPlugins.length; i++) {
 		if (eventPlugins[i](e) === false) return;
 	}
@@ -800,6 +800,11 @@ function OnKeyDown_wysiwyg(e) {
 	const fileComponentName = this.editor._fileManager.pluginRegExp.test(this.editor.currentControllerName) ? this.editor.currentControllerName : '';
 	let formatEl = this.format.getLine(selectionNode, null) || selectionNode;
 	let rangeEl = this.format.getBlock(formatEl, null);
+
+	const eventPlugins = this.editor._onKeyDownPlugins;
+	for (let i = 0; i < eventPlugins.length; i++) {
+		if (eventPlugins[i](e, range, formatEl) === false) return;
+	}
 
 	switch (keyCode) {
 		case 8 /** backspace key */:
@@ -1145,26 +1150,6 @@ function OnKeyDown_wysiwyg(e) {
 			// Nested list
 			if (cells.length > 0 && isEdge) {
 				r = this.format._applyNestedList(cells, shift);
-			} else {
-				// table
-				const tableCell = domUtils.getParentElement(selectionNode, domUtils.isTableCell);
-				if (tableCell && isEdge) {
-					const table = domUtils.getParentElement(tableCell, 'table');
-					const cells = domUtils.getListChildren(table, domUtils.isTableCell);
-					let idx = shift ? domUtils.prevIndex(cells, tableCell) : domUtils.nextIndex(cells, tableCell);
-
-					if (idx === cells.length && !shift) idx = 0;
-					if (idx === -1 && shift) idx = cells.length - 1;
-
-					let moveCell = cells[idx];
-					if (!moveCell) break;
-					moveCell = moveCell.firstElementChild || moveCell;
-					this.selection.setRange(moveCell, 0, moveCell, 0);
-					break;
-				}
-
-				lines = lines.concat(cells);
-				fc = lc = null;
 			}
 
 			// Lines tab(4)
@@ -1459,11 +1444,6 @@ function OnKeyDown_wysiwyg(e) {
 			}
 
 			break;
-	}
-
-	const eventPlugins = this.editor._onKeyDownPlugins;
-	for (let i = 0; i < eventPlugins.length; i++) {
-		if (eventPlugins[i](e, formatEl) === false) return;
 	}
 
 	if (shift && (env.isOSX_IOS ? alt : ctrl) && keyCode === 32) {

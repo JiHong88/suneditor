@@ -189,7 +189,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	 * @description Plugin call
 	 * @private
 	 */
-	this._onSelectPlugins = [];
+	this._onMousedownPlugins = [];
 	this._onKeyDownPlugins = [];
 
 	/**
@@ -1681,7 +1681,7 @@ Core.prototype = {
 		// plugins install
 		// Command and file plugins registration
 		this.activePlugins = [];
-		this._onSelectPlugins = [];
+		this._onMousedownPlugins = [];
 		this._onKeyDownPlugins = [];
 		this._fileManager.tags = [];
 		this._fileManager.pluginMap = {};
@@ -1709,7 +1709,7 @@ Core.prototype = {
 			}
 
 			if (typeof plugin.onPluginMousedown === 'function') {
-				this._onSelectPlugins.push(plugin.onPluginMousedown.bind(plugin));
+				this._onMousedownPlugins.push(plugin.onPluginMousedown.bind(plugin));
 			}
 
 			if (typeof plugin.onPluginKeyDown === 'function') {

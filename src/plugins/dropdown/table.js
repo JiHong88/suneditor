@@ -104,9 +104,48 @@ table.prototype = {
 	/**
 	 * @override core
 	 * @param {any} event Event object
+	 * @param {any} range range object
 	 * @param {Element} line Current line element
 	 */
-	onPluginKeyDown: function (event, line) {
+	onPluginKeyDown: function (event, range, line) {
+		// table
+		if (event.keyCode === 9) {
+			const tableCell = domUtils.getParentElement(line, domUtils.isTableCell);
+			if (tableCell && range.collapsed && domUtils.isEdgePoint(range.startContainer, range.startOffset)) {
+				const shift = event.shiftKey;
+				const table = domUtils.getParentElement(tableCell, 'table');
+				const cells = domUtils.getListChildren(table, domUtils.isTableCell);
+				let idx = shift ? domUtils.prevIndex(cells, tableCell) : domUtils.nextIndex(cells, tableCell);
+
+				if (idx === cells.length && !shift) {
+					if (!domUtils.getParentElement(tableCell, 'thead')) {
+						const rows = table.rows;
+						const newRow = this.insertBodyRow(table, rows.length, rows[rows.length - 1].cells.length);
+						const firstTd = newRow.querySelector('td div');
+						this.selection.setRange(firstTd, 0, firstTd, 0);
+					}
+
+					event.preventDefault();
+					event.stopPropagation();
+
+					return false;
+				}
+
+				if (idx === -1 && shift) return;
+
+				let moveCell = cells[idx];
+				if (!moveCell) return;
+
+				moveCell = moveCell.firstElementChild || moveCell;
+				this.selection.setRange(moveCell, 0, moveCell, 0);
+
+				event.preventDefault();
+				event.stopPropagation();
+
+				return false;
+			}
+		}
+
 		if (!event.shiftKey || event.keyCode !== 16) return;
 
 		event.preventDefault();
@@ -543,8 +582,7 @@ table.prototype = {
 
 			this._element.deleteRow(rowIndex);
 		} else {
-			const newRow = this._element.insertRow(rowIndex);
-			newRow.innerHTML = CreateCells('td', cellCnt, false);
+			this.insertBodyRow(this._element, rowIndex, cellCnt);
 		}
 
 		if (!remove) {
@@ -699,6 +737,12 @@ table.prototype = {
 		} else {
 			this.setCellControllerPosition(positionResetElement || this._tdElement, true);
 		}
+	},
+
+	insertBodyRow: function (table, rowIndex, cellCnt) {
+		const newRow = table.insertRow(rowIndex);
+		newRow.innerHTML = CreateCells('td', cellCnt, false);
+		return newRow;
 	},
 
 	openSplitMenu: function () {
