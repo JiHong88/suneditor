@@ -1,10 +1,10 @@
 // 'use strict';
 
 import EditorInterface from '../interface/editor';
-import SelectMenu from './selectMenu';
+import SelectMenu from './SelectMenu';
 import { domUtils } from '../helper';
 
-const anchorModalEditor = function (inst, modalForm) {
+const AnchorModalEditor = function (inst, modalForm) {
 	// plugin bisic properties
 	EditorInterface.call(this, inst.editor);
 
@@ -25,7 +25,7 @@ const anchorModalEditor = function (inst, modalForm) {
 	this.linkDefaultRel = this.options.linkRelDefault;
 	this.defaultRel = this.options.linkRelDefault.default || '';
 	this.currentRel = [];
-	this.linkAnchor = null;
+	this.currentTarget = null;
 	this.linkValue = '';
 	this._change = false;
 	this._isRel = this.options.linkRel.length > 0;
@@ -58,21 +58,25 @@ const anchorModalEditor = function (inst, modalForm) {
 	this.eventManager.addEvent(this.bookmarkButton, 'click', OnClick_bookmarkButton.bind(this));
 };
 
-anchorModalEditor.prototype = {
+AnchorModalEditor.prototype = {
+	set: function (element) {
+		this.currentTarget = element;
+	},
+
 	on: function (isUpdate) {
 		if (!isUpdate) {
 			this.init();
 			this.anchorText.value = this.selection.get().toString().trim();
 			this.newWindowCheck.checked = this.options.linkTargetNewWindow;
-		} else if (this.linkAnchor) {
-			const href = this.options.linkNoPrefix ? this.linkAnchor.href.replace(this.linkAnchor.origin + '/', '') : this.linkAnchor.href;
+		} else if (this.currentTarget) {
+			const href = this.options.linkNoPrefix ? this.currentTarget.href.replace(this.currentTarget.origin + '/', '') : this.currentTarget.href;
 			this.linkValue = this.preview.textContent = this.urlInput.value = this._selfPathBookmark(href) ? href.substr(href.lastIndexOf('#')) : href;
-			this.anchorText.value = this.linkAnchor.textContent || this.linkAnchor.getAttribute('alt');
-			this.newWindowCheck.checked = /_blank/i.test(this.linkAnchor.target) ? true : false;
-			this.downloadCheck.checked = this.linkAnchor.download;
+			this.anchorText.value = this.currentTarget.textContent || this.currentTarget.getAttribute('alt');
+			this.newWindowCheck.checked = /_blank/i.test(this.currentTarget.target) ? true : false;
+			this.downloadCheck.checked = this.currentTarget.download;
 		}
 
-		this._setRel(isUpdate && this.linkAnchor ? this.linkAnchor.rel : this.defaultRel);
+		this._setRel(isUpdate && this.currentTarget ? this.currentTarget.rel : this.defaultRel);
 		this._setLinkPreview(this.linkValue);
 	},
 
@@ -82,7 +86,7 @@ anchorModalEditor.prototype = {
 		const url = this.linkValue;
 		const anchorText = this.anchorText.value.length === 0 ? url : this.anchorText.value;
 
-		const oA = this.linkAnchor || domUtils.createElement('A');
+		const oA = this.currentTarget || domUtils.createElement('A');
 		this._updateAnchor(oA, url, anchorText, notText);
 		this.linkValue = this.preview.textContent = this.urlInput.value = this.anchorText.value = '';
 
@@ -90,7 +94,7 @@ anchorModalEditor.prototype = {
 	},
 
 	init: function () {
-		this.linkAnchor = null;
+		this.currentTarget = null;
 		this.linkValue = this.preview.textContent = this.urlInput.value = '';
 		this.anchorText.value = '';
 		this.newWindowCheck.checked = false;
@@ -219,7 +223,7 @@ anchorModalEditor.prototype = {
 		return rels;
 	},
 
-	constructor: anchorModalEditor
+	constructor: AnchorModalEditor
 };
 
 function OnClick_relbutton() {
@@ -366,4 +370,4 @@ function CreatetModalForm(editor) {
 	return domUtils.createElement('DIV', null, html);
 }
 
-export default anchorModalEditor;
+export default AnchorModalEditor;

@@ -9,6 +9,7 @@
 
 import EditorInterface from '../../interface/editor';
 import { domUtils, numbers } from '../../helper';
+import Controller from '../../class/controller';
 
 const table = function (editor, target) {
 	// plugin bisic properties
@@ -24,11 +25,11 @@ const table = function (editor, target) {
 	const controller_cell = CreateHTML_controller_cell(editor, this.cellControllerTop);
 
 	// members
-	this.controller_table = controller_table;
-	this.controller_cell = controller_cell;
+	this.cellControllerTop = this.options.tableCellControllerPosition === 'top';
+	this.controller_table = new Controller(this, controller_table, 'top');
+	this.controller_cell = new Controller(this, controller_cell, this.cellControllerTop ? 'top' : 'bottom');
 	this.maxText = this.lang.controller.maxSize;
 	this.minText = this.lang.controller.minSize;
-	this.cellControllerTop = editor.options.tableCellControllerPosition === 'top';
 	this.tableHighlight = menu.querySelector('.se-table-size-highlighted');
 	this.tableUnHighlight = menu.querySelector('.se-table-size-unhighlighted');
 	this.tableDisplay = menu.querySelector('.se-table-size-display');
@@ -81,8 +82,6 @@ const table = function (editor, target) {
 	this.menu.initTarget(target, menu);
 	this.eventManager.addEvent(commandArea, 'mousemove', OnMouseMoveTablePicker.bind(this));
 	this.eventManager.addEvent(commandArea, 'click', OnClickTablePicker.bind(this));
-	this.eventManager.addEvent(controller_table, 'click', OnClickController.bind(this));
-	this.eventManager.addEvent(controller_cell, 'click', OnClickController.bind(this));
 };
 
 table.type = 'dropdown';
@@ -104,7 +103,7 @@ table.prototype = {
 	 * @override core
 	 * @param {any} event Event object
 	 */
-	onPluginSelect: function (event) {
+	onPluginMousedown: function (event) {
 		const tableCell = domUtils.getParentElement(event.target, domUtils.isTableCell);
 		if (!tableCell || !(tableCell !== this._fixedCell && !this._shift)) return;
 		this.selectCells(tableCell, false);
@@ -129,10 +128,116 @@ table.prototype = {
 		}
 	},
 
+	/**
+	 * @override controller
+	 * @param {Element} target Target button element
+	 * @returns
+	 */
+	controllerAction: function (target) {
+		if (target.getAttribute('disabled')) return;
+
+		const command = target.getAttribute('data-command');
+		const value = target.getAttribute('data-value');
+		const option = target.getAttribute('data-option');
+
+		if (typeof this._closeSplitMenu === 'function') {
+			this._closeSplitMenu();
+			if (command === 'onsplit') return;
+		}
+
+		switch (command) {
+			case 'insert':
+			case 'delete':
+				this.editTable(value, option);
+				break;
+			case 'header':
+				this.toggleHeader();
+				break;
+			case 'onsplit':
+				this.openSplitMenu();
+				break;
+			case 'split':
+				this.splitCells(value);
+				break;
+			case 'merge':
+				this.mergeCells();
+				break;
+			case 'resize':
+				this._maxWidth = !this._maxWidth;
+				this.setTableStyle('width');
+				this.controller_table.resetPosition();
+				this.setCellControllerPosition(this._tdElement, this._shift);
+				break;
+			case 'layout':
+				this._fixedColumn = !this._fixedColumn;
+				this.setTableStyle('column');
+				this.controller_table.resetPosition();
+				this.setCellControllerPosition(this._tdElement, this._shift);
+				break;
+			case 'remove':
+				const emptyDiv = this._element.parentNode;
+				domUtils.removeItem(this._element);
+				this._closeController();
+
+				if (emptyDiv !== this.context.element.wysiwyg)
+					domUtils.removeAllParents(
+						emptyDiv,
+						function (current) {
+							return current.childNodes.length === 0;
+						},
+						null
+					);
+				this.editor.focus();
+		}
+
+		// history stack
+		this.history.push(false);
+	},
+
+	/**
+	 * @override controller
+	 */
+	reset: function () {
+		this._removeEvents();
+
+		if (this._selectedTable) {
+			const selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
+			for (let i = 0, len = selectedCells.length; i < len; i++) {
+				domUtils.removeClass(selectedCells[i], 'se-table-selected-cell');
+			}
+		}
+
+		this._toggleEditor(true);
+
+		this._element = null;
+		this._tdElement = null;
+		this._trElement = null;
+		this._trElements = null;
+		this._tableXY = [];
+		this._maxWidth = true;
+		this._fixedColumn = false;
+		this._physical_cellCnt = 0;
+		this._logical_cellCnt = 0;
+		this._rowCnt = 0;
+		this._rowIndex = 0;
+		this._physical_cellIndex = 0;
+		this._logical_cellIndex = 0;
+		this._current_colSpan = 0;
+		this._current_rowSpan = 0;
+
+		this._shift = false;
+		this._selectedCells = null;
+		this._selectedTable = null;
+		this._ref = null;
+
+		this._fixedCell = null;
+		this._selectedCell = null;
+		this._fixedCellName = null;
+	},
+
 	selectCells: function (tdElement, shift) {
-		console.log('selct', this)
 		if (!this._shift && !this._ref) this._removeEvents();
-		this.menu.controllerOff();
+		this._closeController();
 
 		this._shift = shift;
 		this._fixedCell = tdElement;
@@ -153,8 +258,9 @@ table.prototype = {
 			this.eventManager.addGlobalEvent('mousemove', this._bindOnSelect, false);
 		} else {
 			this._bindOffShift = function () {
-				this.menu.controllerOn(this.controller_cell, this.controller_table, this.reset.bind(this), tdElement, 'table');
-				if (!this._ref) this.menu.controllerOff();
+				this.controller_table.open(this._selectedTable);
+				this.controller_cell.open(tdElement);
+				if (!this._ref) this._closeController();
 			}.bind(this);
 
 			this.eventManager.addGlobalEvent('keyup', this._bindOffShift, false);
@@ -178,6 +284,7 @@ table.prototype = {
 		if (reset || this._physical_cellCnt === 0) {
 			if (this._tdElement !== tdElement) {
 				this._tdElement = tdElement;
+				console.log('reset aaaaa', tdElement.parentNode);
 				this._trElement = tdElement.parentNode;
 			}
 
@@ -446,9 +553,9 @@ table.prototype = {
 		}
 
 		if (!remove) {
-			this.setPositionControllerDiv(positionResetElement || this._tdElement, true);
+			this.setCellControllerPosition(positionResetElement || this._tdElement, true);
 		} else {
-			this.menu.controllerOff();
+			this._closeController();
 		}
 	},
 
@@ -593,9 +700,9 @@ table.prototype = {
 				rowSpanCell.cell.rowSpan = numbers.getOverlapRangeAtIndex(removeFirst, removeEnd, rowSpanCell.i, rowSpanCell.rs);
 			}
 
-			this.menu.controllerOff();
+			this._closeController();
 		} else {
-			this.setPositionControllerDiv(positionResetElement || this._tdElement, true);
+			this.setCellControllerPosition(positionResetElement || this._tdElement, true);
 		}
 	},
 
@@ -784,7 +891,7 @@ table.prototype = {
 		}
 
 		this.editor.focusEdge(currentCell);
-		this.setPositionControllerDiv(currentCell, true);
+		this.setCellControllerPosition(currentCell, true);
 	},
 
 	mergeCells: function () {
@@ -851,7 +958,7 @@ table.prototype = {
 		mergeCell.colSpan = cs;
 		mergeCell.rowSpan = rs;
 
-		this.menu.controllerOff();
+		this._closeController();
 		this.setActiveButton(true, false);
 		this.controllerAction(mergeCell);
 
@@ -875,19 +982,15 @@ table.prototype = {
 		domUtils.toggleClass(headerButton, 'active');
 
 		if (/TH/i.test(this._tdElement.nodeName)) {
-			this.menu.controllerOff();
+			this._closeController();
 		} else {
-			this.setPositionControllerDiv(this._tdElement, false);
+			this.setCellControllerPosition(this._tdElement, false);
 		}
 	},
 
 	setTableStyle: function (styles) {
-		let icon, span, sizeIcon, text;
-
 		if (styles.indexOf('width') > -1) {
-			icon = this.resizeButton.firstElementChild;
-			span = this.resizeText;
-
+			let sizeIcon, text;
 			if (!this._maxWidth) {
 				sizeIcon = this.icons.expansion;
 				text = this.maxText;
@@ -902,8 +1005,8 @@ table.prototype = {
 				domUtils.addClass(this._element, 'se-table-size-100');
 			}
 
-			domUtils.changeElement(icon, sizeIcon);
-			domUtils.changeTxt(span, text);
+			domUtils.changeElement(this.resizeButton.firstElementChild, sizeIcon);
+			domUtils.changeTxt(this.resizeText, text);
 		}
 
 		if (styles.indexOf('column') > -1) {
@@ -939,7 +1042,7 @@ table.prototype = {
 
 	controllerAction: function (tdElement) {
 		if (!this.selection.get().isCollapsed && !this._selectedCell) {
-			this.menu.controllerOff();
+			this._closeController();
 			domUtils.removeClass(tdElement, 'se-table-selected-cell');
 			return;
 		}
@@ -949,24 +1052,16 @@ table.prototype = {
 		this._fixedColumn = domUtils.hasClass(tableElement, 'se-table-layout-fixed') || tableElement.style.tableLayout === 'fixed';
 		this.setTableStyle(this._maxWidth ? 'width|column' : 'width');
 
-		this.setPositionControllerTop(tableElement);
-		this.setPositionControllerDiv(tdElement, this._shift);
-
-		if (!this._shift) this.menu.controllerOn(this.controller_cell, this.controller_table, this.reset.bind(this), tdElement, 'table');
-	},
-
-	setPositionControllerTop: function (tableElement) {
-		this.menu.setControllerPosition(this.controller_table, tableElement, 'top', { left: 0, top: 0 });
-	},
-
-	setPositionControllerDiv: function (tdElement, reset) {
-		this.setCellInfo(tdElement, reset);
-
-		if (this.cellControllerTop) {
-			this.menu.setControllerPosition(this.controller_cell, this._element, 'top', { left: this.controller_table.offsetWidth, top: 0 });
-		} else {
-			this.menu.setControllerPosition(this.controller_cell, tdElement, 'bottom', { left: 0, top: 0 });
+		if (!this._shift) {
+			this.setCellInfo(tdElement, this._shift);
+			this.controller_table.open(tableElement);
+			this.controller_cell.open(tdElement);
 		}
+	},
+
+	setCellControllerPosition: function (tdElement, reset) {
+		this.setCellInfo(tdElement, reset);
+		this.controller_cell.resetPosition(tdElement);
 	},
 
 	_toggleEditor: function (enabled) {
@@ -1151,44 +1246,6 @@ table.prototype = {
 		}
 	},
 
-	reset: function () {
-		this._removeEvents();
-
-		if (this._selectedTable) {
-			const selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
-			for (let i = 0, len = selectedCells.length; i < len; i++) {
-				domUtils.removeClass(selectedCells[i], 'se-table-selected-cell');
-			}
-		}
-
-		this._toggleEditor(true);
-
-		this._element = null;
-		this._tdElement = null;
-		this._trElement = null;
-		this._trElements = null;
-		this._tableXY = [];
-		this._maxWidth = true;
-		this._fixedColumn = false;
-		this._physical_cellCnt = 0;
-		this._logical_cellCnt = 0;
-		this._rowCnt = 0;
-		this._rowIndex = 0;
-		this._physical_cellIndex = 0;
-		this._logical_cellIndex = 0;
-		this._current_colSpan = 0;
-		this._current_rowSpan = 0;
-
-		this._shift = false;
-		this._selectedCells = null;
-		this._selectedTable = null;
-		this._ref = null;
-
-		this._fixedCell = null;
-		this._selectedCell = null;
-		this._fixedCellName = null;
-	},
-
 	_resetTablePicker: function () {
 		if (!this.tableHighlight) return;
 
@@ -1202,6 +1259,11 @@ table.prototype = {
 
 		domUtils.changeTxt(this.tableDisplay, '1 x 1');
 		this.menu.dropdownOff();
+	},
+
+	_closeController: function () {
+		this.controller_table.close();
+		this.controller_cell.close();
 	},
 
 	constructor: table
@@ -1245,74 +1307,6 @@ function OnClickTablePicker() {
 	oTable.innerHTML = tableHTML;
 
 	this.action(oTable);
-}
-
-function OnClickController(e) {
-	e.stopPropagation();
-	const target = e.target.getAttribute('data-command') ? e.target : e.target.parentNode;
-
-	if (target.getAttribute('disabled')) return;
-
-	const command = target.getAttribute('data-command');
-	const value = target.getAttribute('data-value');
-	const option = target.getAttribute('data-option');
-
-	if (typeof this._closeSplitMenu === 'function') {
-		this._closeSplitMenu();
-		if (command === 'onsplit') return;
-	}
-
-	if (!command) return;
-
-	e.preventDefault();
-
-	switch (command) {
-		case 'insert':
-		case 'delete':
-			this.editTable(value, option);
-			break;
-		case 'header':
-			this.toggleHeader();
-			break;
-		case 'onsplit':
-			this.openSplitMenu();
-			break;
-		case 'split':
-			this.splitCells(value);
-			break;
-		case 'merge':
-			this.mergeCells();
-			break;
-		case 'resize':
-			this._maxWidth = !this._maxWidth;
-			this.setTableStyle('width');
-			this.setPositionControllerTop(this._element);
-			this.setPositionControllerDiv(this._tdElement, this._shift);
-			break;
-		case 'layout':
-			this._fixedColumn = !this._fixedColumn;
-			this.setTableStyle('column');
-			this.setPositionControllerTop(this._element);
-			this.setPositionControllerDiv(this._tdElement, this._shift);
-			break;
-		case 'remove':
-			const emptyDiv = this._element.parentNode;
-			domUtils.removeItem(this._element);
-			this.menu.controllerOff();
-
-			if (emptyDiv !== this.context.element.wysiwyg)
-				domUtils.removeAllParents(
-					emptyDiv,
-					function (current) {
-						return current.childNodes.length === 0;
-					},
-					null
-				);
-			this.editor.focus();
-	}
-
-	// history stack
-	this.history.push(false);
 }
 
 function CreateCells(nodeName, cnt, returnElement) {

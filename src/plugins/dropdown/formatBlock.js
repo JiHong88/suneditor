@@ -230,26 +230,10 @@ function OnClickMenu(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
-	let target = e.target;
-	let command = null,
-		value = null,
-		tag = null,
-		className = '';
+	const target = domUtils.getCommandTarget(e.target);
+	if (!target) return;
 
-	while (!command && !/UL/i.test(target.tagName)) {
-		command = target.getAttribute('data-command');
-		value = target.getAttribute('data-value');
-		className = target.getAttribute('data-class');
-		if (command) {
-			tag = target.firstChild;
-			break;
-		}
-		target = target.parentNode;
-	}
-
-	if (!command) return;
-
-	this.action(command, value, tag, className);
+	this.action(target.getAttribute('data-command'), target.getAttribute('data-value'), target.firstChild, target.getAttribute('data-class'));
 }
 
 function CreateHTML(editor) {

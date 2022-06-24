@@ -193,10 +193,11 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	this._onKeyDownPlugins = [];
 
 	/**
-	 * @description Block controller mousedown events in "shadowRoot" environment
+	 * @description Controller relative
 	 * @private
 	 */
-	this._shadowRootControllerEventTarget = null;
+	this.openControllers = [];
+	this.currentControllerName = '';
 
 	/**
 	 * @description Button List in Responsive Toolbar.
@@ -500,7 +501,7 @@ Core.prototype = {
 				// @todo
 				break;
 			case 'selectAll':
-				this.menu.controllerOff();
+				this._offCurrentController();
 				this.menu.containerOff();
 				const wysiwyg = this.context.element.wysiwyg;
 				let first =
@@ -973,7 +974,7 @@ Core.prototype = {
 	 */
 	codeView: function (value) {
 		if (value === undefined) value = !this.status.isCodeView;
-		this.menu.controllerOff();
+		this._offCurrentController();
 		domUtils.setDisabled(value, this.codeViewDisabledButtons);
 		const _var = this._transformStatus;
 
@@ -1056,7 +1057,7 @@ Core.prototype = {
 		const code = this.context.element.code;
 		const _var = this._transformStatus;
 
-		this.menu.controllerOff();
+		this._offCurrentController();
 		const wasToolbarHidden = toolbar.style.display === 'none' || (this._isInline && !this.toolbar._inlineToolbarAttr.isShow);
 
 		if (value) {
@@ -1240,7 +1241,7 @@ Core.prototype = {
 	preview: function () {
 		this.menu.dropdownOff();
 		this.menu.containerOff();
-		this.menu.controllerOff();
+		this._offCurrentController();
 
 		const contentHTML = this.options.previewTemplate ? this.options.previewTemplate.replace(/\{\{\s*content\s*\}\}/i, this.getContent(true)) : this.getContent(true);
 		const windowObject = this._w.open('', '_blank');
@@ -1306,8 +1307,7 @@ Core.prototype = {
 		domUtils.setDisabled(!!value, this.resizingDisabledButtons);
 
 		if (value) {
-			/** off menus */
-			this.menu.controllerOff();
+			this._offCurrentController();
 			if (this.menu.currentDropdownActiveButton && this.menu.currentDropdownActiveButton.disabled) this.menu.dropdownOff();
 			if (this.menu.currentMoreLayerActiveButton && this.menu.currentMoreLayerActiveButton.disabled) this.menu.moreLayerOff();
 			if (this.menu.currentContainerActiveButton && this.menu.currentContainerActiveButton.disabled) this.menu.containerOff();
@@ -1328,7 +1328,7 @@ Core.prototype = {
 	 */
 	disable: function () {
 		this.toolbar.disable();
-		this.menu.controllerOff();
+		this._offCurrentController();
 		if (this.modalForm) this.plugins.modal.close.call(this);
 
 		this.context.element.wysiwyg.setAttribute('contenteditable', false);
@@ -1601,6 +1601,7 @@ Core.prototype = {
 		this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
 		this._editorHeight = context.element.wysiwygFrame.offsetHeight;
 		this._editorHeightPadding = numbers.get(this.wwComputedStyle.getPropertyValue('padding-top')) + numbers.get(this.wwComputedStyle.getPropertyValue('padding-bottom'));
+		this.openControllers = [];
 
 		if (!options.iframe && typeof _w.ShadowRoot === 'function') {
 			let child = context.element.wysiwygFrame;
@@ -1614,7 +1615,6 @@ Core.prototype = {
 				}
 				child = child.parentNode;
 			}
-			if (this.shadowRoot) this._shadowRootControllerEventTarget = [];
 		}
 
 		// set modes
@@ -1708,8 +1708,8 @@ Core.prototype = {
 				}
 			}
 
-			if (typeof plugin.onPluginSelect === 'function') {
-				this._onSelectPlugins.push(plugin.onPluginSelect.bind(plugin));
+			if (typeof plugin.onPluginMousedown === 'function') {
+				this._onSelectPlugins.push(plugin.onPluginMousedown.bind(plugin));
 			}
 
 			if (typeof plugin.onPluginKeyDown === 'function') {
@@ -1931,6 +1931,13 @@ Core.prototype = {
 				if (typeof this.events.onload === 'function') this.events.onload(reload);
 			}.bind(this)
 		);
+	},
+
+	_offCurrentController: function () {
+		const cont = this.openControllers;
+		for (let i = 0; i < cont.length; i++) {
+			cont[i].inst.close();
+		}
 	},
 
 	Constructor: Core

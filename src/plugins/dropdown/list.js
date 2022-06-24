@@ -105,18 +105,10 @@ function OnClickMenu(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
-	let target = e.target;
-	let command, value;
+	const target = domUtils.getCommandTarget(e.target);
+	if (!target) return;
 
-	while (!command && !/^UL$/i.test(target.tagName)) {
-		command = target.getAttribute('data-command');
-		value = target.getAttribute('data-value');
-		target = target.parentNode;
-	}
-
-	if (!command) return;
-
-	this.action(command, value || '');
+	this.action(target.getAttribute('data-command'), target.getAttribute('data-value') || '');
 }
 
 function CreateHTML(editor) {

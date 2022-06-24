@@ -620,7 +620,7 @@
                             this.setRange(captionText, 0, captionText, captionText.textContent.length);
                         }
     
-                        this.menu.controllerOff();
+                        this.editor._offCurrentController();
                     } else {
                         this.component.select(contextEl, pluginName);
                         currentModule.openModify.call(this, true);
@@ -633,7 +633,7 @@
                     break;
                 case 'update':
                     currentModule.openModify.call(this);
-                    this.menu.controllerOff();
+                    this.editor._offCurrentController();
                     break;
                 case 'delete':
                     currentModule.destroy.call(this);
@@ -784,7 +784,7 @@
                 this.eventManager.removeGlobalEvent('keydown', closureFunc_bind);
                 
                 if (e.type === 'keydown') {
-                    this.menu.controllerOff();
+                    this.editor._offCurrentController();
                     this.context.element.resizeBackground.style.display = 'none';
                     this.plugins[this.context.resizing._resize_plugin].init.call(this);
                 } else {
@@ -850,7 +850,7 @@
          */
         cancel_controller_resize: function (direction) {
             const isVertical = this.context.resizing._rotateVertical;
-            this.menu.controllerOff();
+            this.editor._offCurrentController();
             this.context.element.resizeBackground.style.display = 'none';
     
             let w = this._w.Math.round(isVertical ? this.context.resizing._resize_h : this.context.resizing._resize_w);

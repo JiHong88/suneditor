@@ -154,7 +154,6 @@ var a = {
 		const emptyDiv = container.parentNode;
 		this.util.removeItem(container);
 		this.plugins.audio.init.call(this);
-		this.menu.controllerOff();
 
 		if (emptyDiv !== this.context.element.wysiwyg)
 			this.util.removeAllParents(
@@ -483,7 +482,6 @@ var a = {
 			this.plugins.audio.destroy.call(this, this.context.audio._element);
 		}
 
-		this.menu.controllerOff();
 	},
 
 	onControllerOff: function (selectionTag) {

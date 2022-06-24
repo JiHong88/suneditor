@@ -356,6 +356,20 @@ export function getParentElement(element, query) {
 }
 
 /**
+ * @description Gets the element with "data-command" attribute among the parent elements.
+ * @param {Element} target Target element
+ * @returns {Element|null}
+ */
+export function getCommandTarget(target) {
+	let command = null;
+	while (!command && !/^(UL|DIV)$/i.test(target.tagName)) {
+		if (target.getAttribute('data-command')) return target;
+		target = target.parentNode;
+	}
+	return null;
+}
+
+/**
  * @description Get the child element of the argument value.
  * A tag that satisfies the query condition is imported.
  * Returns null if not found.
@@ -855,6 +869,7 @@ const domUtils = {
 	sortNodeByDepth: sortNodeByDepth,
 	compareElements: compareElements,
 	getParentElement: getParentElement,
+	getCommandTarget: getCommandTarget,
 	getEdgeChild: getEdgeChild,
 	getEdgeChildNodes: getEdgeChildNodes,
 	getArrayItem: getArrayItem,

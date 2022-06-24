@@ -92,22 +92,10 @@ function OnClickMenu(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
-	let target = e.target;
-	let command = null,
-		tag = null;
+	const target = domUtils.getCommandTarget(e.target);
+	if (!target) return;
 
-	while (!command && !/UL/i.test(target.tagName)) {
-		command = target.getAttribute('data-command');
-		if (command) {
-			tag = target.firstChild;
-			break;
-		}
-		target = target.parentNode;
-	}
-
-	if (!command) return;
-
-	this.action(tag, target);
+	this.action(target.firstChild, target);
 }
 
 function CreateHTML(editor) {

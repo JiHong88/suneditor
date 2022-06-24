@@ -1,7 +1,8 @@
-import anchorModalEditor from './anchorModalEditor';
-import colorPicker from './colorPicker';
-import modal from './modal';
-import selectMenu from './selectMenu';
+import AnchorModalEditor from './AnchorModalEditor';
+import ColorPicker from './ColorPicker';
+import Controller from './Controller';
+import Modal from './Modal';
+import SelectMenu from './SelectMenu';
 
-export { anchorModalEditor, colorPicker, modal, selectMenu };
-export default { anchorModalEditor, colorPicker, modal, selectMenu };
+export { AnchorModalEditor, ColorPicker, Controller, Modal, SelectMenu };
+export default { AnchorModalEditor, ColorPicker, Controller, Modal, SelectMenu };

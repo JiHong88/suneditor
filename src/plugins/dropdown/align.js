@@ -73,7 +73,7 @@ align.prototype = {
 
 		if (currentAlign !== this.currentAlign) {
 			for (let i = 0, len = alignList.length; i < len; i++) {
-				if (currentAlign === alignList[i].getAttribute('data-value')) {
+				if (currentAlign === alignList[i].getAttribute('data-command')) {
 					domUtils.addClass(alignList[i], 'active');
 				} else {
 					domUtils.removeClass(alignList[i], 'active');
@@ -93,8 +93,8 @@ align.prototype = {
 		if (this.defaultDir === _dir) return;
 
 		this.defaultDir = _dir;
-		const leftBtn = this._itemMenu.querySelector('[data-value="left"]');
-		const rightBtn = this._itemMenu.querySelector('[data-value="right"]');
+		const leftBtn = this._itemMenu.querySelector('[data-command="left"]');
+		const rightBtn = this._itemMenu.querySelector('[data-command="right"]');
 		if (leftBtn && rightBtn) {
 			const lp = leftBtn.parentElement;
 			const rp = rightBtn.parentElement;
@@ -132,15 +132,10 @@ function OnClickMenu(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
-	let target = e.target;
-	let value = null;
+	const target = domUtils.getCommandTarget(e.target);
+	if (!target) return;
 
-	while (!value && !/UL/i.test(target.tagName)) {
-		value = target.getAttribute('data-value');
-		target = target.parentNode;
-	}
-
-	this.action(value);
+	this.action(target.getAttribute('data-command'));
 }
 
 function CreateHTML(core) {
@@ -152,7 +147,7 @@ function CreateHTML(core) {
 	for (let i = 0, item, text; i < alignItems.length; i++) {
 		item = alignItems[i];
 		text = lang.toolbar['align' + item.charAt(0).toUpperCase() + item.slice(1)];
-		html += '<li>' + '<button type="button" class="se-btn-list" data-value="' + item + '" title="' + text + '" aria-label="' + text + '">' + '<span class="se-list-icon">' + icons['align_' + item] + '</span>' + text + '</button>' + '</li>';
+		html += '<li>' + '<button type="button" class="se-btn-list" data-command="' + item + '" title="' + text + '" aria-label="' + text + '">' + '<span class="se-list-icon">' + icons['align_' + item] + '</span>' + text + '</button>' + '</li>';
 	}
 
 	return domUtils.createElement(

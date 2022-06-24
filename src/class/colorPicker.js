@@ -18,7 +18,7 @@ import CoreInterface from '../interface/_core';
  * @param {string} defaultColor default color
  * @param {Array.<string>} colorList color list
  */
-const colorPicker = function (instance, style, defaultColor, colorList) {
+const ColorPicker = function (instance, style, defaultColor, colorList) {
 	CoreInterface.call(this, instance.editor);
 	// members
 	this.instance = instance;
@@ -35,7 +35,7 @@ const colorPicker = function (instance, style, defaultColor, colorList) {
 	this.eventManager.addEvent(this.target.querySelector('._se_color_picker_remove'), 'click', Remove.bind(this));
 };
 
-colorPicker.prototype = {
+ColorPicker.prototype = {
 	/**
 	 * @description Displays or resets the currently selected color at color list.
 	 * @param {Node} node Current Selected node
@@ -137,7 +137,7 @@ colorPicker.prototype = {
 		return colors.length >= 3 ? '#' + ((1 << 24) + (colors[0] << 16) + (colors[1] << 8) + colors[2]).toString(16).substr(1) : false;
 	},
 
-	constructor: colorPicker
+	constructor: ColorPicker
 };
 
 function Submit() {
@@ -265,4 +265,4 @@ function _makeColor(colorList) {
 	return list;
 }
 
-export default colorPicker;
+export default ColorPicker;

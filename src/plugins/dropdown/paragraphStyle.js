@@ -79,18 +79,10 @@ function OnClickMenu(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
-	let target = e.target;
-	let value = null;
+	const target = domUtils.getCommandTarget(e.target);
+	if (!target) return;
 
-	while (!/^UL$/i.test(target.tagName)) {
-		value = target.getAttribute('data-value');
-		if (value) break;
-		target = target.parentNode;
-	}
-
-	if (!value) return;
-
-	this.action(value, target);
+	this.action(target.getAttribute('data-value'), target);
 }
 
 function CreateHTML(editor) {

@@ -303,7 +303,7 @@ EventManager.prototype = {
 	 * @private
 	 */
 	_setDefaultLine: function (formatName) {
-		if (this.editor._fileManager.pluginRegExp.test(this.menu.currentControllerName)) return;
+		if (this.editor._fileManager.pluginRegExp.test(this.editor.currentControllerName)) return;
 
 		const range = this.selection.getRange();
 		const commonCon = range.commonAncestorContainer;
@@ -591,6 +591,13 @@ EventManager.prototype = {
 		}
 	},
 
+	_offController: function () {
+		const conInst = this.editor.openControllerInst;
+		for (let i = 0, len = conInst; i < len; i++) {
+			conInst.close();
+		}
+	},
+
 	constructor: EventManager
 };
 
@@ -628,7 +635,6 @@ function OnClick_toolbar(e) {
 	let type = target.getAttribute('data-type');
 	let command = target.getAttribute('data-command');
 	let className = target.className;
-	this.menu.controllerOff();
 
 	while (target.parentNode && !command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
 		target = target.parentNode;
@@ -791,7 +797,7 @@ function OnKeyDown_wysiwyg(e) {
 	let selectionNode = this.selection.getNode();
 	const range = this.selection.getRange();
 	const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
-	const fileComponentName = this.editor._fileManager.pluginRegExp.test(this.menu.currentControllerName) ? this.menu.currentControllerName : '';
+	const fileComponentName = this.editor._fileManager.pluginRegExp.test(this.editor.currentControllerName) ? this.editor.currentControllerName : '';
 	let formatEl = this.format.getLine(selectionNode, null) || selectionNode;
 	let rangeEl = this.format.getBlock(formatEl, null);
 
@@ -1453,14 +1459,6 @@ function OnKeyDown_wysiwyg(e) {
 			}
 
 			break;
-		case 27 /** esc key */:
-			if (fileComponentName) {
-				e.preventDefault();
-				e.stopPropagation();
-				this.menu.controllerOff();
-				return false;
-			}
-			break;
 	}
 
 	const eventPlugins = this.editor._onKeyDownPlugins;
@@ -1614,7 +1612,7 @@ function OnCut_wysiwyg(e) {
 	if (info && !env.isIE) {
 		this._setClipboardComponent(e, info, clipboardData);
 		domUtils.removeItem(info.component);
-		this.menu.controllerOff();
+		this._offController();
 	}
 
 	_w.setTimeout(function () {
@@ -1624,7 +1622,7 @@ function OnCut_wysiwyg(e) {
 }
 
 function OnScroll_wysiwyg(e) {
-	this.menu.controllerOff();
+	this._offController();
 	if (this.editor._isBalloon) this._hideToolbar();
 
 	// user event
@@ -1646,7 +1644,7 @@ function OnBlur_wysiwyg(e) {
 	if (this.editor._antiBlur || this.status.isCodeView) return;
 	this.status.hasFocus = false;
 	this.editor.effectNode = null;
-	this.menu.controllerOff();
+	this._offController();
 	if (this.editor._isInline || this.editor._isBalloon) this._hideToolbar();
 
 	this._setKeyEffect([]);
@@ -1665,7 +1663,7 @@ function OnMouseMove_wysiwyg(e) {
 	const component = domUtils.getParentElement(e.target, this.component.is);
 	const lineBreakerStyle = this.editor._lineBreaker.style;
 
-	if (component && !this.menu.currentControllerName) {
+	if (component && !this.editor.currentControllerName) {
 		const ctxEl = this.context.element;
 		let scrollTop = 0;
 		let el = ctxEl.wysiwyg;
@@ -1708,9 +1706,6 @@ function OnMouseMove_wysiwyg(e) {
 function OnMouseDown_statusbar(e) {
 	e.stopPropagation();
 
-	this.menu.dropdownOff();
-	this.menu.controllerOff();
-
 	this.status._resizeClientY = e.clientY;
 	this.context.element.resizeBackground.style.display = 'block';
 
@@ -1747,7 +1742,7 @@ function DisplayLineBreak(dir, e) {
 }
 
 function OnResize_window() {
-	this.menu.controllerOff();
+	this._offController();
 
 	if (env.isIE) this.toolbar.resetResponsiveToolbar();
 

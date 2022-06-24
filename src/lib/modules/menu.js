@@ -14,11 +14,6 @@ const Menu = function (editor) {
 	this.currentDropdownActiveButton = null;
 	this.currentDropdownName = '';
 	this._bindedDropdownOff = null;
-	// controller
-	this.currentControllerItems = [];
-	this.currentControllerName = ''; // @todo
-	this.currentControllerTarget = null;
-	this._bindControllersOff = null;
 	// container
 	this.currentContainer = null;
 	this.currentContainerActiveButton = null;
@@ -47,7 +42,6 @@ Menu.prototype = {
 	 */
 	dropdownOn: function (button) {
 		if (this._bindedDropdownOff) this._bindedDropdownOff();
-		if (this._bindControllersOff) this.controllerOff();
 
 		const dropdownName = (this.currentDropdownName = button.getAttribute('data-command'));
 		const menu = (this.currentDropdown = this._menuTrayMap[dropdownName]);
@@ -116,155 +110,6 @@ Menu.prototype = {
 		}
 
 		this.editor._antiBlur = false;
-	},
-
-	hasController: function (el) {
-		return this.currentControllerItems.indexOf(el) > -1;
-	},
-
-	/**
-	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
-	 * @param {any} arguments controller elements, function..
-	 */
-	controllerOn: function () {
-		if (this._bindControllersOff) this._bindControllersOff();
-		this.currentControllerItems = [];
-
-		for (let i = 0, arg; i < arguments.length; i++) {
-			arg = arguments[i];
-			if (!arg) continue;
-
-			if (typeof arg === 'string') {
-				this.currentControllerName = arg;
-				continue;
-			}
-			if (typeof arg === 'function') {
-				this.currentControllerItems.push(arg);
-				continue;
-			}
-			if (!domUtils.hasClass(arg, 'se-controller')) {
-				this.currentControllerTarget = arg;
-				this.currentFileComponentInfo = this.component.get(arg);
-				continue;
-			}
-			if (arg.style) {
-				arg.style.display = 'block';
-				if (this.shadowRoot && this._shadowRootControllerEventTarget.indexOf(arg) === -1) {
-					arg.addEventListener('mousedown', function (e) {
-						e.preventDefault();
-						e.stopPropagation();
-					});
-					this._shadowRootControllerEventTarget.push(arg);
-				}
-			}
-			this.currentControllerItems.push(arg);
-		}
-
-		this._bindControllersOff = this.controllerOff.bind(this);
-		this.eventManager.addGlobalEvent('mousedown', this._bindControllersOff, false);
-		this.eventManager.addGlobalEvent('keydown', this._bindControllersOff, false);
-		this.editor._antiBlur = true;
-
-		if (typeof this.events.showController === 'function') this.events.showController(this.currentControllerName, this.currentControllerItems);
-	},
-
-	/**
-	 * @description Hide controller at editor area (link button, image resize button..)
-	 * @param {KeyboardEvent|MouseEvent|null} e Event object when called from mousedown and keydown events registered in "controllerOn"
-	 */
-	controllerOff: function (e) {
-		this.editor._lineBreaker.style.display = 'none';
-		const len = this.currentControllerItems.length;
-
-		if (e && e.target && len > 0) {
-			for (let i = 0; i < len; i++) {
-				if (typeof this.currentControllerItems[i].contains === 'function' && this.currentControllerItems[i].contains(e.target)) return;
-			}
-		}
-
-		if (this.editor._fileManager.pluginRegExp.test(this.currentControllerName) && e && e.type === 'keydown' && e.keyCode !== 27) return;
-		this.context.element.lineBreaker_t.style.display = this.context.element.lineBreaker_b.style.display = 'none';
-		this.status._lineBreakComp = null;
-
-		this.currentControllerName = '';
-		this.currentControllerTarget = null;
-		this.currentFileComponentInfo = null;
-		this.effectNode = null;
-		if (!this._bindControllersOff) return;
-
-		this.eventManager.removeGlobalEvent('mousedown', this._bindControllersOff);
-		this.eventManager.removeGlobalEvent('keydown', this._bindControllersOff);
-		this._bindControllersOff = null;
-
-		if (len > 0) {
-			for (let i = 0; i < len; i++) {
-				if (typeof this.currentControllerItems[i] === 'function') this.currentControllerItems[i]();
-				else this.currentControllerItems[i].style.display = 'none';
-			}
-
-			this.currentControllerItems = [];
-		}
-
-		this.editor._antiBlur = false;
-	},
-
-	/**
-	 * @description Specify the position of the controller.
-	 * @param {Element} controller Controller element.
-	 * @param {Element} referEl Element that is the basis of the controller's position.
-	 * @param {string} position Type of position ("top" | "bottom")
-	 * When using the "top" position, there should not be an arrow on the controller.
-	 * When using the "bottom" position there should be an arrow on the controller.
-	 * @param {Object} addOffset These are the left and top values that need to be added specially.
-	 * This argument is required. - {left: 0, top: 0}
-	 * Please enter the value based on ltr mode.
-	 * Calculated automatically in rtl mode.
-	 */
-	setControllerPosition: function (controller, referEl, position, addOffset) {
-		if (this.options._rtl) addOffset.left *= -1;
-
-		const offset = this.offset.get(referEl);
-		controller.style.visibility = 'hidden';
-		controller.style.display = 'block';
-
-		// Height value of the arrow element is 11px
-		const topMargin = position === 'top' ? -(controller.offsetHeight + 2) : referEl.offsetHeight + 12;
-		controller.style.top = offset.top + topMargin + addOffset.top + 'px';
-
-		const l = offset.left - this.context.element.wysiwygFrame.scrollLeft + addOffset.left;
-		const controllerW = controller.offsetWidth;
-		const referElW = referEl.offsetWidth;
-
-		const allow = domUtils.hasClass(controller.firstElementChild, 'se-arrow') ? controller.firstElementChild : null;
-
-		// rtl (Width value of the arrow element is 22px)
-		if (this.options._rtl) {
-			const rtlW = controllerW > referElW ? controllerW - referElW : 0;
-			const rtlL = rtlW > 0 ? 0 : referElW - controllerW;
-			controller.style.left = l - rtlW + rtlL + 'px';
-
-			if (rtlW > 0) {
-				if (allow) allow.style.left = (controllerW - 14 < 10 + rtlW ? controllerW - 14 : 10 + rtlW) + 'px';
-			}
-
-			const overSize = this.context.element.wysiwygFrame.offsetLeft - controller.offsetLeft;
-			if (overSize > 0) {
-				controller.style.left = '0px';
-				if (allow) allow.style.left = overSize + 'px';
-			}
-		} else {
-			controller.style.left = l + 'px';
-
-			const overSize = this.context.element.wysiwygFrame.offsetWidth - (controller.offsetLeft + controllerW);
-			if (overSize < 0) {
-				controller.style.left = controller.offsetLeft + overSize + 'px';
-				if (allow) allow.style.left = 20 - overSize + 'px';
-			} else {
-				if (allow) allow.style.left = '20px';
-			}
-		}
-
-		controller.style.visibility = '';
 	},
 
 	/**

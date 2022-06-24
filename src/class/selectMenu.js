@@ -3,7 +3,7 @@
 import CoreInterface from '../interface/_core';
 import { domUtils } from '../helper';
 
-const selectMenu = function (inst, checkType) {
+const SelectMenu = function (inst, checkType) {
 	// plugin bisic properties
 	CoreInterface.call(this, inst.editor);
 
@@ -25,7 +25,7 @@ const selectMenu = function (inst, checkType) {
 	this.__globalEventHandlers = [CloseListener_key.bind(this), CloseListener_mousedown.bind(this), CloseListener_click.bind(this)];
 };
 
-selectMenu.prototype = {
+SelectMenu.prototype = {
 	create: function (items, key) {
 		let html = '';
 		for (let i = 0, len = items.length; i < len; i++) {
@@ -135,7 +135,7 @@ selectMenu.prototype = {
 		if (this._bindClose_click) this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
 	},
 
-	constructor: selectMenu
+	constructor: SelectMenu
 };
 
 function OnKeyDown_refer(e) {
@@ -193,7 +193,7 @@ function CloseListener_key(e) {
 }
 
 function CloseListener_mousedown(e) {
-	if (domUtils.getParentElement(e.target, this.form)) return;
+	if (this.form.contains(e.target)) return;
 	if (e.target !== this._refer) {
 		this.close();
 		e.stopPropagation();
@@ -210,4 +210,4 @@ function CloseListener_click(e) {
 	}
 }
 
-export default selectMenu;
+export default SelectMenu;

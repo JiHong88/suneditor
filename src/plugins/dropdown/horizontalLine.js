@@ -35,17 +35,13 @@ horizontalLine.prototype = {
 	 * @override core
 	 */
 	active: function (element) {
-		if (!element) {
-			if (domUtils.hasClass(this.currentHR, 'on')) {
-				this.menu.controllerOff();
-			}
-		} else if (/HR/i.test(element.nodeName)) {
+		if (element && /HR/i.test(element.nodeName)) {
+			domUtils.addClass(element, 'on');
 			this.currentHR = element;
-			if (!domUtils.hasClass(element, 'on')) {
-				domUtils.addClass(element, 'on');
-				this.menu.controllerOn('hr', domUtils.removeClass.bind(domUtils, element, 'on'));
-			}
 			return true;
+		} else {
+			domUtils.removeClass(this.currentHR, 'on');
+			this.currentHR = null;
 		}
 
 		return false;
@@ -58,10 +54,10 @@ horizontalLine.prototype = {
 	action: function (referNode) {
 		this.editor.focus();
 		const oNode = this.component.insert(referNode.cloneNode(false), false, true, false);
-
 		if (oNode) {
 			this.selection.setRange(oNode, 0, oNode, 0);
 			this.menu.dropdownOff();
+			if (this.currentHR) domUtils.removeItem(this.currentHR);
 		}
 	},
 
@@ -72,15 +68,8 @@ function OnClickMenu(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
-	let target = e.target;
-	let command = target.getAttribute('data-command');
-
-	while (!command && !/UL/i.test(target.tagName)) {
-		target = target.parentNode;
-		command = target.getAttribute('data-command');
-	}
-
-	if (!command) return;
+	const target = domUtils.getCommandTarget(e.target);
+	if (!target) return;
 
 	this.action(target.firstElementChild);
 }

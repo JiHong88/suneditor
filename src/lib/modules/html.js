@@ -1024,11 +1024,11 @@ HTML.prototype = {
 		return requireFormat;
 	},
 
-	_cleanStyle: function (m, v, tagName) {
+	_cleanStyle: function (m, v, name) {
 		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
 		if (sv) {
 			if (!v) v = [];
-			const style = sv[0].replace(/&quot;/g, '').match(this._cleanStyleRegExp[tagName]);
+			const style = sv[0].replace(/&quot;/g, '').match(this._cleanStyleRegExp[name]);
 			if (style) {
 				const allowedStyle = [];
 				for (let i = 0, len = style.length, r; i < len; i++) {
