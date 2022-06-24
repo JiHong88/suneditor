@@ -1730,7 +1730,6 @@ Core.prototype = {
 
 		// init content
 		this._initWysiwygArea(reload, _initHTML);
-		this.setDir(options.textDirection);
 	},
 
 	/**

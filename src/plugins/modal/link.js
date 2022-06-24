@@ -8,8 +8,7 @@
 'use strict';
 
 import EditorInterface from '../../interface/editor';
-import { Modal, Controller } from '../../class';
-import AnchorModalEditor from '../../class/AnchorModalEditor';
+import { Modal, Controller, AnchorModalEditor } from '../../class';
 import { domUtils } from '../../helper';
 
 const link = function (editor, target) {
