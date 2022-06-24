@@ -1046,10 +1046,10 @@ HTML.prototype = {
 								if (!this.options.plugins.fontSize) continue;
 								break;
 							case 'color':
-								if (!this.options.plugins.fontColor || /rgba\(([0-9]+\s*,\s*){3}0\)/i.test(c)) continue;
+								if (!this.options.plugins.fontColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
 								break;
 							case 'backgroundColor':
-								if (!this.options.plugins.backgroundColor || /rgba\(([0-9]+\s*,\s*){3}0\)/i.test(c)) continue;
+								if (!this.options.plugins.backgroundColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
 								break;
 						}
 

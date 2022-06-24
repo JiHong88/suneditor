@@ -69,7 +69,7 @@ AnchorModalEditor.prototype = {
 			this.anchorText.value = this.selection.get().toString().trim();
 			this.newWindowCheck.checked = this.options.linkTargetNewWindow;
 		} else if (this.currentTarget) {
-			const href = this.options.linkNoPrefix ? this.currentTarget.href.replace(this.currentTarget.origin + '/', '') : this.currentTarget.href;
+			const href = this.currentTarget.getAttribute('href');
 			this.linkValue = this.preview.textContent = this.urlInput.value = this._selfPathBookmark(href) ? href.substr(href.lastIndexOf('#')) : href;
 			this.anchorText.value = this.currentTarget.textContent || this.currentTarget.getAttribute('alt');
 			this.newWindowCheck.checked = /_blank/i.test(this.currentTarget.target) ? true : false;
