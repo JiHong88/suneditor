@@ -406,6 +406,7 @@ s1.onKeyDown = function (e, core) {
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     rtl: true,
     value: `<p style="text-align: right">Hello</p>`,
+    // linkNoPrefix: true,
     // value: `<p style="text-align: center; color: red;" onerror="a">center</p>`,
     // mode: "inline",
     // value: `Let $\Omega$ be the underlying randomness space. In this case, the variables $X^-$ and $X^+$ collapse to $U$. To see why, pick an arbitrary $\omega \in \Omega$:
