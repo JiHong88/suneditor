@@ -1,12 +1,10 @@
 'use strict';
 
 import EditorInterface from '../../interface/editor';
-import Modal from '../../class/modal';
-
-import modal from '../modules/modal';
-import mediaContainer from '../modules/mediaContainer';
-import fileManager from '../modules/fileManager';
+import { Modal, Controller, FileManager } from '../../class';
 import { domUtils } from '../../helper';
+
+import fileManager from '../modules/fileManager';
 
 const audio = function (editor, target) {
 	// plugin bisic properties
@@ -19,21 +17,22 @@ const audio = function (editor, target) {
 	const modalEl = CreateHTML_modal(editor);
 	const controllerEl = CreateHTML_controller(editor);
 
-    // members
-    this.modal = new Modal(this, modalEl);
-    this.controller = controllerEl;
-    this._infoList = []; // @Override fileManager
-    this._infoIndex = 0; // @Override fileManager
-    this._uploadFileLength = 0; // @Override fileManager
-    this.focusElement = null; // @Override modal // This element has focus when the modal is opened.
-    this.targetSelect = null;
-    this._origin_w = this.options.audioWidth;
-    this._origin_h = this.options.audioHeight;
-    this._linkValue = '';
-    // @require @Override mediaContainer
-    this._element = null;
-    this._cover = null;
-    this._container = null;
+	// members
+	this.modal = new Modal(this, modalEl);
+	this.controller = new Controller(this, controllerEl);
+	this.fileManager = new FileManager(this);
+	this._infoList = []; // @Override fileManager
+	this._infoIndex = 0; // @Override fileManager
+	this._uploadFileLength = 0; // @Override fileManager
+	this.focusElement = null; // @Override modal // This element has focus when the modal is opened.
+
+	this._origin_w = this.options.audioWidth;
+	this._origin_h = this.options.audioHeight;
+	this._linkValue = '';
+	// @require @Override mediaContainer
+	this._element = null;
+	this._cover = null;
+	this._container = null;
 };
 
 audio.type = 'modal';
@@ -45,9 +44,7 @@ audio.prototype = {
 var a = {
 	add: function (core) {
 		const context = core.context;
-		const contextAudio = (context.audio = {
-			
-		});
+		const contextAudio = (context.audio = {});
 
 		/** modal */
 		let modalEl = this.setModal(core);
@@ -481,7 +478,6 @@ var a = {
 			/** delete */
 			this.plugins.audio.destroy.call(this, this.context.audio._element);
 		}
-
 	},
 
 	onControllerOff: function (selectionTag) {

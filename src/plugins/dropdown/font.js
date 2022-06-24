@@ -1,10 +1,3 @@
-/*
- * wysiwyg web editor
- *
- * suneditor.js
- * Copyright 2017 Yi JiHong.
- * MIT license.
- */
 'use strict';
 
 import domUtils from '../../helper/domUtils';

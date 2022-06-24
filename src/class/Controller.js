@@ -1,10 +1,3 @@
-/*
- * wysiwyg web editor
- *
- * suneditor.js
- * Copyright 2017 Yi JiHong.
- * MIT license.
- */
 'use strict';
 
 import EditorInterface from '../interface/editor';
@@ -26,6 +19,7 @@ const Controller = function (inst, element, position) {
 	this.inst = inst;
 	this.form = element;
 	this.currentTarget = null;
+	this.currentPositionTarget = null;
 	this.position = position || 'bottom';
 	this.__globalEventHandlers = [CloseListener_key.bind(this), CloseListener_mousedown.bind(this)];
 	this._bindClose_key = null;
@@ -42,11 +36,12 @@ Controller.prototype = {
 	/**
 	 * @description Open a modal plugin
 	 */
-	open: function (target) {
+	open: function (target, positionTarget) {
 		this.currentTarget = target;
+		this.currentPositionTarget = positionTarget || target;
 		this.editor.currentControllerName = this.kind;
 		this.__addGlobalEvent();
-		this._setControllerPosition(this.form, target);
+		this._setControllerPosition(this.form, this.currentPositionTarget);
 		this._controllerOn(this.form, target);
 	},
 
@@ -65,7 +60,7 @@ Controller.prototype = {
 	 * @param {Element|undefined} target
 	 */
 	resetPosition: function (target) {
-		this._setControllerPosition(this.form, target || this.currentTarget);
+		this._setControllerPosition(this.form, target || this.currentPositionTarget);
 	},
 
 	/**
@@ -113,8 +108,10 @@ Controller.prototype = {
 	_setControllerPosition: function (controller, referEl) {
 		const addOffset = { left: 0, top: 0 };
 		if (this.editor.openControllers.length > 0) {
-			const cont = this.editor.openControllers[this.editor.openControllers.length - 1];
-			if (cont.position === this.position) addOffset.left = cont.form.offsetWidth;
+			const openCont = this.editor.openControllers;
+			for (let i = 0; i < openCont.length; i++) {
+				if (openCont[i].form !== this.form && openCont[i].position === this.position) addOffset.left += openCont[i].form.offsetWidth;
+			}
 		}
 
 		if (this.options._rtl) addOffset.left *= -1;
@@ -195,13 +192,13 @@ function Action(e) {
 
 function CloseListener_key(e) {
 	this.editor._lineBreaker.style.display = 'none';
-	if (this.form.contains(e.target)) return;
+	if (this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) return;
 	if (this.editor._fileManager.pluginRegExp.test(this.kind) && e.keyCode !== 27) return;
 	this.close();
 }
 
 function CloseListener_mousedown(e) {
-	if (this.form.contains(e.target)) return;
+	if (this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) return;
 	this.close();
 }
 

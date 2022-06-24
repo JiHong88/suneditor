@@ -1,10 +1,3 @@
-/*
- * wysiwyg web editor
- *
- * suneditor.js
- * Copyright 20197 Yi JiHong.
- * MIT license.
- */
 'use strict';
 
 import EditorInterface from '../../interface/editor';

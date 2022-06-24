@@ -1,11 +1,3 @@
-/*
- * wysiwyg web editor
- *
- * suneditor.js
- * Copyright 2017 Yi JiHong.
- * Brazilian Portuguese translation by lpeil github
- * MIT license.
- */
 (function (global, factory) {
     if (typeof module === 'object' && typeof module.exports === 'object') {
         module.exports = global.document ?

@@ -1,5 +1,6 @@
 // command
 import blockquote from './command/blockquote';
+import mention from './command/mention';
 
 // dropdown
 import align from './dropdown/align';
@@ -26,5 +27,5 @@ import math from './modal/math';
 // file browser
 import imageGallery from './fileBrowser/imageGallery';
 
-export { blockquote, align, font, fontSize, fontColor, backgroundColor, horizontalLine, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };
-export default { blockquote, align, font, fontSize, fontColor, backgroundColor, horizontalLine, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };
+export { blockquote, mention, align, font, fontSize, fontColor, backgroundColor, horizontalLine, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };
+export default { blockquote, mention, align, font, fontSize, fontColor, backgroundColor, horizontalLine, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };

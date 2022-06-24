@@ -36,6 +36,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
         paragraphStyle, template, textStyle, table, math, link
     ],
     charCounter: true,
+    // tableCellControllerPosition: 'top',
     statusbar: true,
     // mode: "inline",
     katex: Katex,

@@ -1,10 +1,3 @@
-/*
- * wysiwyg web editor
- *
- * suneditor.js
- * Copyright 2017 Yi JiHong.
- * MIT license.
- */
 import Core from './lib/core';
 import Constructor from './lib/constructor';
 import Context from './lib/context';

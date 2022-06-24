@@ -1,11 +1,3 @@
-/*
- * wysiwyg web editor
- *
- * suneditor.js
- * Copyright 2020 Yi JiHong.
- * MIT license.
- */
-
 export default {
    // rtl icon
    rtl: {

@@ -1,10 +1,3 @@
-/*
- * wysiwyg web editor
- *
- * suneditor.js
- * Copyright 2017 Yi JiHong.
- * MIT license.
- */
 'use strict';
 
 import EditorInterface from '../../interface/editor';
@@ -19,13 +12,13 @@ const table = function (editor, target) {
 	this.icon = this.icons.table;
 
 	// create HTML
+	this.cellControllerTop = this.options.tableCellControllerPosition === 'top';
 	const menu = CreateHTML(editor);
 	const commandArea = menu.querySelector('.se-controller-table-picker');
 	const controller_table = CreateHTML_controller_table(editor);
 	const controller_cell = CreateHTML_controller_cell(editor, this.cellControllerTop);
 
 	// members
-	this.cellControllerTop = this.options.tableCellControllerPosition === 'top';
 	this.controller_table = new Controller(this, controller_table, 'top');
 	this.controller_cell = new Controller(this, controller_cell, this.cellControllerTop ? 'top' : 'bottom');
 	this.maxText = this.lang.controller.maxSize;
@@ -237,7 +230,6 @@ table.prototype = {
 
 	selectCells: function (tdElement, shift) {
 		if (!this._shift && !this._ref) this._removeEvents();
-		this._closeController();
 
 		this._shift = shift;
 		this._fixedCell = tdElement;
@@ -259,7 +251,7 @@ table.prototype = {
 		} else {
 			this._bindOffShift = function () {
 				this.controller_table.open(this._selectedTable);
-				this.controller_cell.open(tdElement);
+				this.controller_cell.open(tdElement, this.cellControllerTop ? this._selectedTable : null);
 				if (!this._ref) this._closeController();
 			}.bind(this);
 
@@ -284,7 +276,6 @@ table.prototype = {
 		if (reset || this._physical_cellCnt === 0) {
 			if (this._tdElement !== tdElement) {
 				this._tdElement = tdElement;
-				console.log('reset aaaaa', tdElement.parentNode);
 				this._trElement = tdElement.parentNode;
 			}
 
@@ -960,7 +951,7 @@ table.prototype = {
 
 		this._closeController();
 		this.setActiveButton(true, false);
-		this.controllerAction(mergeCell);
+		this.setController(mergeCell);
 
 		domUtils.addClass(mergeCell, 'se-table-selected-cell');
 		this.editor.focusEdge(mergeCell);
@@ -1040,7 +1031,7 @@ table.prototype = {
 		}
 	},
 
-	controllerAction: function (tdElement) {
+	setController: function (tdElement) {
 		if (!this.selection.get().isCollapsed && !this._selectedCell) {
 			this._closeController();
 			domUtils.removeClass(tdElement, 'se-table-selected-cell');
@@ -1055,7 +1046,7 @@ table.prototype = {
 		if (!this._shift) {
 			this.setCellInfo(tdElement, this._shift);
 			this.controller_table.open(tableElement);
-			this.controller_cell.open(tdElement);
+			this.controller_cell.open(tdElement, this.cellControllerTop ? tableElement : null);
 		}
 	},
 
@@ -1084,7 +1075,7 @@ table.prototype = {
 		if (!this._fixedCell || !this._selectedTable) return;
 
 		this.setActiveButton(this._fixedCell, this._selectedCell);
-		this.controllerAction(this._selectedCell || this._fixedCell);
+		this.setController(this._selectedCell || this._fixedCell);
 
 		this._selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
 		if (this._selectedCell && this._fixedCell) this.editor.focusEdge(this._selectedCell);

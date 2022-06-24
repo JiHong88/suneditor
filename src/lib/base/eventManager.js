@@ -592,9 +592,9 @@ EventManager.prototype = {
 	},
 
 	_offController: function () {
-		const conInst = this.editor.openControllerInst;
-		for (let i = 0, len = conInst; i < len; i++) {
-			conInst.close();
+		const openCont = this.editor.openControllers;
+		for (let i = 0; i < openCont.length; i++) {
+			openCont[i].inst.close();
 		}
 	},
 
