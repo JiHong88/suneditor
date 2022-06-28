@@ -64,15 +64,19 @@ Offset.prototype = {
 
 	/**
 	 * @description Gets the current editor-relative scroll offset.
-	 * @returns {Object} {top, left}
+	 * @returns {Object} {top, left, width, height}
 	 */
 	getGlobalScroll: function () {
 		let t = 0,
-			l = 0;
+			l = 0,
+			h = 0,
+			w = 0;
 		let el = this.context.element.topArea;
 		while (el) {
 			t += el.scrollTop;
 			l += el.scrollLeft;
+			h += el.scrollHeight;
+			w += el.scrollWidth;
 			el = el.parentElement;
 		}
 
@@ -80,12 +84,16 @@ Offset.prototype = {
 		while (el) {
 			t += el.scrollTop;
 			l += el.scrollLeft;
+			h += el.scrollHeight;
+			w += el.scrollWidth;
 			el = el.parentElement;
 		}
 
 		return {
 			top: t,
-			left: l
+			left: l,
+			width: w,
+			height: h
 		};
 	},
 

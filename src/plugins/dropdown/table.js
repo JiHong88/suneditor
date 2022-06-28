@@ -53,9 +53,6 @@ const table = function (editor, target) {
 	this._current_colSpan = 0;
 	this._current_rowSpan = 0;
 	// member - multi selecte
-	this._bindOnSelect = null;
-	this._bindOffSelect = null;
-	this._bindOffShift = null;
 	this._selectedCells = null;
 	this._shift = false;
 	this._fixedCell = null;
@@ -63,12 +60,22 @@ const table = function (editor, target) {
 	this._selectedCell = null;
 	this._selectedTable = null;
 	this._ref = null;
-	this._initBind = null;
-	this._closeSplitMenu = null;
+	this._closeSplitMenu = null
+	// member - global events
+	this._bindClose_move = null;
+	this._bindClose_key = null;
+	this._bindClose_down = null;
+	this._bindClose_up = null;
+	this._bindClose_touch = null;
+	this.__globalEvents = {
+		on: OnCellMultiSelect.bind(this),
+		off: OffCellMultiSelect.bind(this),
+		shiftOff: OffCellShift.bind(this),
+		touchOff: OffCellTouch.bind(this)
+	}
 
-	// add elements
-	this.context.element.relative.appendChild(controller_cell);
-	this.context.element.relative.appendChild(controller_table);
+	// this.context.element.relative.appendChild(controller_cell);
+	// this.context.element.relative.appendChild(controller_table);
 
 	// init
 	this.menu.initTarget(target, menu);
@@ -229,7 +236,7 @@ table.prototype = {
 	 * @override controller
 	 */
 	reset: function () {
-		this._removeEvents();
+		this.__removeGlobalEvents();
 		this._deleteStyleSelectedCells();
 		this._toggleEditor(true);
 
@@ -260,7 +267,7 @@ table.prototype = {
 	},
 
 	selectCells: function (tdElement, shift) {
-		if (!this._shift && !this._ref) this._removeEvents();
+		if (!this._shift && !this._ref) this.__removeGlobalEvents();
 
 		this._shift = shift;
 		this._fixedCell = tdElement;
@@ -268,28 +275,17 @@ table.prototype = {
 		this._selectedTable = domUtils.getParentElement(tdElement, 'TABLE');
 
 		this._deleteStyleSelectedCells();
-
 		domUtils.addClass(tdElement, 'se-table-selected-cell');
 
-		this._bindOnSelect = this._onCellMultiSelect.bind(this);
-		this._bindOffSelect = this._offCellMultiSelect.bind(this);
-
 		if (!shift) {
-			this.eventManager.addGlobalEvent('mousemove', this._bindOnSelect, false);
+			this._bindClose_move = this.eventManager.addGlobalEvent('mousemove', this.__globalEvents.on, false);
 		} else {
-			this._bindOffShift = function () {
-				this.controller_table.open(this._selectedTable);
-				this.controller_cell.open(tdElement, this.cellControllerTop ? this._selectedTable : null);
-				if (!this._ref) this._closeController();
-			}.bind(this);
-
-			this.eventManager.addGlobalEvent('keyup', this._bindOffShift, false);
-			this.eventManager.addGlobalEvent('mousedown', this._bindOnSelect, false);
+			this._bindClose_key = this.eventManager.addGlobalEvent('keyup', this.__globalEvents.shiftOff, false);
+			this._bindClose_down = this.eventManager.addGlobalEvent('mousedown', this.__globalEvents.on, false);
 		}
 
-		this.eventManager.addGlobalEvent('mouseup', this._bindOffSelect, false);
-		this._initBind = this.reset.bind(this);
-		this.eventManager.addGlobalEvent('touchmove', this._initBind, false);
+		this._bindClose_up = this.eventManager.addGlobalEvent('mouseup', this.__globalEvents.off, false);
+		this._bindClose_touch = this.eventManager.addGlobalEvent('touchmove', this.__globalEvents.touchOff, false);
 	},
 
 	setCellInfo: function (tdElement, reset) {
@@ -1078,11 +1074,9 @@ table.prototype = {
 		this._fixedColumn = domUtils.hasClass(tableElement, 'se-table-layout-fixed') || tableElement.style.tableLayout === 'fixed';
 		this.setTableStyle(this._maxWidth ? 'width|column' : 'width');
 
-		if (!this._shift) {
-			this.setCellInfo(tdElement, this._shift);
-			this.controller_table.open(tableElement);
-			this.controller_cell.open(tdElement, this.cellControllerTop ? tableElement : null);
-		}
+		this.setCellInfo(tdElement, this._shift);
+		this.controller_table.open(tableElement);
+		this.controller_cell.open(tdElement, this.cellControllerTop ? tableElement : null);
 	},
 
 	setCellControllerPosition: function (tdElement, reset) {
@@ -1103,52 +1097,6 @@ table.prototype = {
 		this.context.element.wysiwyg.setAttribute('contenteditable', enabled);
 		if (enabled) domUtils.removeClass(this.context.element.wysiwyg, 'se-disabled');
 		else domUtils.addClass(this.context.element.wysiwyg, 'se-disabled');
-	},
-
-	_offCellMultiSelect: function (e) {
-		e.stopPropagation();
-
-		if (!this._shift) {
-			this._removeEvents();
-			this._toggleEditor(true);
-		} else if (this._initBind) {
-			this._wd.removeEventListener('touchmove', this._initBind);
-			this._initBind = null;
-		}
-
-		if (!this._fixedCell || !this._selectedTable) return;
-
-		this.setActiveButton(this._fixedCell, this._selectedCell);
-		this.setController(this._selectedCell || this._fixedCell);
-
-		this._selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
-		if (this._selectedCell && this._fixedCell) this.editor.focusEdge(this._selectedCell);
-
-		if (!this._shift) {
-			this._fixedCell = null;
-			this._selectedCell = null;
-			this._fixedCellName = null;
-		}
-	},
-
-	_onCellMultiSelect: function (e) {
-		this.editor._antiBlur = true;
-		const target = domUtils.getParentElement(e.target, domUtils.isTableCell);
-
-		if (this._shift) {
-			if (target === this._fixedCell) this._toggleEditor(true);
-			else this._toggleEditor(false);
-		} else if (!this._ref) {
-			if (target === this._fixedCell) return;
-			else this._toggleEditor(false);
-		}
-
-		if (!target || target === this._selectedCell || this._fixedCellName !== target.nodeName || this._selectedTable !== domUtils.getParentElement(target, 'TABLE')) {
-			return;
-		}
-
-		this._selectedCell = target;
-		this._setMultiCells(this._fixedCell, target);
 	},
 
 	_setMultiCells: function (startCell, endCell) {
@@ -1255,29 +1203,6 @@ table.prototype = {
 		}
 	},
 
-	_removeEvents: function () {
-		if (this._initBind) {
-			this._wd.removeEventListener('touchmove', this._initBind);
-			this._initBind = null;
-		}
-
-		if (this._bindOnSelect) {
-			this._wd.removeEventListener('mousedown', this._bindOnSelect);
-			this._wd.removeEventListener('mousemove', this._bindOnSelect);
-			this._bindOnSelect = null;
-		}
-
-		if (this._bindOffSelect) {
-			this._wd.removeEventListener('mouseup', this._bindOffSelect);
-			this._bindOffSelect = null;
-		}
-
-		if (this._bindOffShift) {
-			this._wd.removeEventListener('keyup', this._bindOffShift);
-			this._bindOffShift = null;
-		}
-	},
-
 	_resetTablePicker: function () {
 		if (!this.tableHighlight) return;
 
@@ -1296,6 +1221,14 @@ table.prototype = {
 	_closeController: function () {
 		this.controller_table.close();
 		this.controller_cell.close();
+	},
+
+	__removeGlobalEvents: function () {
+		if (this._bindClose_touch) this._bindClose_touch = this.eventManager.removeGlobalEvent(this._bindClose_touch);
+		if (this._bindClose_move) this._bindClose_move = this.eventManager.removeGlobalEvent(this._bindClose_move);
+		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);
+		if (this._bindClose_down) this._bindClose_down = this.eventManager.removeGlobalEvent(this._bindClose_down);
+		if (this._bindClose_up) this._bindClose_up = this.eventManager.removeGlobalEvent(this._bindClose_up);
 	},
 
 	constructor: table
@@ -1354,6 +1287,59 @@ function CreateCells(nodeName, cnt, returnElement) {
 	} else {
 		return domUtils.createElement(nodeName, null, '<div><br></div>');
 	}
+}
+
+function OnCellMultiSelect (e) {
+	this.editor._antiBlur = true;
+	const target = domUtils.getParentElement(e.target, domUtils.isTableCell);
+
+	if (this._shift) {
+		if (target === this._fixedCell) this._toggleEditor(true);
+		else this._toggleEditor(false);
+	} else if (!this._ref) {
+		if (target === this._fixedCell) return;
+		else this._toggleEditor(false);
+	}
+
+	if (!target || target === this._selectedCell || this._fixedCellName !== target.nodeName || this._selectedTable !== domUtils.getParentElement(target, 'TABLE')) {
+		return;
+	}
+
+	this._selectedCell = target;
+	this._setMultiCells(this._fixedCell, target);
+}
+
+function OffCellMultiSelect (e) {
+	e.stopPropagation();
+
+	if (!this._shift) {
+		this.__removeGlobalEvents();
+		this._toggleEditor(true);
+	} else if (this._bindClose_touch) {
+		this._bindClose_touch = this.eventManager.removeGlobalEvent(this._bindClose_touch);
+	}
+
+	if (!this._fixedCell || !this._selectedTable) return;
+
+	this.setActiveButton(this._fixedCell, this._selectedCell);
+	this.setController(this._selectedCell || this._fixedCell);
+
+	this._selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
+	if (this._selectedCell && this._fixedCell) this.editor.focusEdge(this._selectedCell);
+
+	if (!this._shift) {
+		this._fixedCell = null;
+		this._selectedCell = null;
+		this._fixedCellName = null;
+	}
+}
+
+function OffCellShift(e) {
+	if (!this._ref) this._closeController();
+}
+
+function OffCellTouch(e) {
+	this.reset();
 }
 
 // init element

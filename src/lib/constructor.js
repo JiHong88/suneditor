@@ -641,7 +641,7 @@ function _defaultButtons(options) {
 	const shiftIcon = env.shiftIcon;
 	const shortcutsDisable = !options.shortcutsHint ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent', 'save'] : options.shortcutsDisable;
 	const indentKey = options._rtl ? ['[', ']'] : [']', '['];
-	const indentIcon = options.rtl ? [icons.outdent, icons.indent] : [icons.indent, icons.outdent];
+	const indentIcon = options._rtl ? [icons.outdent, icons.indent] : [icons.indent, icons.outdent];
 
 	return {
 		bold: ['', lang.toolbar.bold + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('bold') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">B</span>') + '</span>', 'bold', '', icons.bold],

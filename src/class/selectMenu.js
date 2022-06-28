@@ -3,7 +3,7 @@
 import CoreInterface from '../interface/_core';
 import { domUtils } from '../helper';
 
-const SelectMenu = function (inst, checkType) {
+const SelectMenu = function (inst, checkType, position) {
 	// plugin bisic properties
 	CoreInterface.call(this, inst.editor);
 
@@ -14,6 +14,7 @@ const SelectMenu = function (inst, checkType) {
 	this.index = -1;
 	this.item = null;
 	this.checkType = !!checkType;
+	this.position = position || 'bottom';
 	this._refer = null;
 	this._selectMethod = null;
 	this._bindClose_key = null;
@@ -44,14 +45,21 @@ SelectMenu.prototype = {
 		referElement.parentNode.insertBefore(this.form, referElement);
 	},
 
+	/**
+	 * @description Select menu open
+	 * @param {"left"|"right"|"top"|"bottom"} position Menu position. (default:Constructor(inst, checkType, "position") | "bottom")
+	 */
 	open: function (position) {
 		this.__addEvents();
 		this.__addGlobalEvent();
-		this._setPosition(position || 'bottom');
+		this._setPosition(position || this.position);
 	},
 
 	close: function () {
-		if (this.form) this.form.style.display = 'none';
+		if (this.form) {
+			this.form.style.display = 'none';
+			this.form.style.height = '';
+		}
 		this._init();
 	},
 
@@ -83,20 +91,71 @@ SelectMenu.prototype = {
 		this.item = this.items[selectIndex];
 	},
 
+	/**
+	 * @description Menu open
+	 * @param {"left"|"right"|"top"|"bottom"} position Menu position
+	 * @private
+	 */
 	_setPosition: function (position) {
 		const form = this.form;
 		const target = this._refer;
 		form.style.visibility = 'hidden';
 		form.style.display = 'block';
 
-		if (position === 'bottom') {
-			form.style.top = target.offsetHeight + 1 + 'px';
-		} else if (position === 'left') {
-			if (!this.options._rtl) form.style.left = target.offsetLeft + target.offsetWidth + 1 + 'px';
-			else form.style.left = target.offsetLeft - form.offsetWidth - 1 + 'px';
-			form.style.top = target.offsetTop + target.offsetHeight / 2 - form.offsetHeight / 2 + 'px';
+		let l = 0,
+			t = 0;
+		const relative = this.context.element.relative;
+		const relativeOffset = this.editor.offset.getGlobal(relative);
+
+		if (position === 'left') {
+			const formW = form.offsetWidth;
+			l = target.offsetLeft - formW - 1;
+			const targetW = target.offsetWidth;
+			const w = formW > targetW ? formW - targetW : 0;
+			l = l - w + (w > 0 ? 0 : targetW - formW) + 'px';
+			if (relativeOffset.left > this.editor.offset.getGlobal(form).left) l = 0;
+			position = 'middle';
+		} else if (position === 'right') {
+			const formW = form.offsetWidth;
+			l = target.offsetLeft + target.offsetWidth + 1;
+			const relativeW = relative.offsetWidth;
+			const overLeft = relativeW <= formW ? 0 : relativeW - (l + formW);
+			if (overLeft < 0) l += overLeft;
+			position = 'middle';
 		}
 
+		// set top position
+		const targetOffsetTop = this.editor.offset.getGlobal(target).top;
+		const targetHeight = target.offsetHeight;
+		const wbottom = this._w.innerHeight - (targetOffsetTop + targetHeight);
+		if (position === 'middle') {
+			let h = form.offsetHeight;
+			t = target.offsetTop + targetHeight / 2 - h / 2;
+			const targetTop = targetOffsetTop - targetHeight / 2;
+			const formHeight = form.offsetHeight / 2;
+			if (targetTop < formHeight) {
+				h -= targetTop + 2;
+				t -= targetTop + 2;
+			}
+			if (wbottom < formHeight) {
+				h -= wbottom;
+				t += wbottom;
+			}
+			form.style.height = h + 'px';
+		} else if (position === 'top') {
+			if (targetOffsetTop < form.offsetHeight) {
+				form.style.height = targetOffsetTop - 2 + 'px';
+			}
+			t = -form.offsetHeight;
+		} else {
+			if (wbottom < form.offsetHeight) {
+				form.style.height = wbottom + 'px';
+			}
+			t = target.parentElement.offsetHeight;
+		}
+
+		form.style.left = l + 'px';
+		form.style.top = t + 'px';
 		form.style.visibility = '';
 	},
 
@@ -151,7 +210,8 @@ function OnKeyDown_refer(e) {
 			e.stopPropagation();
 			this._moveItem(1);
 			break;
-		case 13: case 32: // enter, space
+		case 13:
+		case 32: // enter, space
 			if (this.index > -1) {
 				e.preventDefault();
 				e.stopPropagation();

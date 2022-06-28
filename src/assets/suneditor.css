@@ -136,7 +136,7 @@
 .sun-editor .se-line-breaker-component:hover {opacity:0.9;}
 
 /** --- toolbar ---------------------------------------------------------- */
-.sun-editor .se-toolbar {display:block; position:relative; height:auto; width:100%; overflow:visible; padding:0; margin:0; background-color:#fafafa; outline:1px solid #dadada; z-index:5;}
+.sun-editor .se-toolbar {display:block; position:relative; height:auto; width:100%; overflow:visible; padding:0; margin:0; background-color:#fafafa; outline:1px solid #dadada; z-index:7;}
 .sun-editor .se-toolbar-shadow {display:block !important; height:0px !important; padding:0 !important; margin:0 !important; background-color:transparent !important;  outline:none !important; border: none !important; z-index:0 !important;}
 .sun-editor .se-toolbar-cover {position:absolute; display:none; font-size:36px; width:100%; height:100%; top:0; left:0; background-color:#fefefe; opacity:.5; filter:alpha(opacity=50); cursor:not-allowed; z-index:4;}
 .sun-editor .se-toolbar-separator-vertical {display:inline-block; height:0px; width:0px; margin:0px; vertical-align:top;}
@@ -405,10 +405,10 @@
 .sun-editor .se-controller-link .link-content a {display:inline-block; color:#4592ff; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}
 
 /* --- select list ---------------------------------------------------------- */
-.sun-editor .se-select-menu {position:absolute; top:0px; left:0px; display:none; width:auto; max-width:100%; background-color:#fff; padding:0; margin:0; border:1px solid #bababa; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
+.sun-editor .se-select-menu {position:absolute; top:0px; left:0px; display:none; width:auto; height:auto; overflow-y:auto; background-color:#fff; padding:0; margin:0; border:1px solid #bababa; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
 .sun-editor .se-select-menu .se-select-item {line-height:28px; min-height:28px; font-size:13px; padding:0 5px; margin:2px 0; cursor:pointer;}
 .sun-editor .se-select-menu.__se_select-menu-mouse-move .se-select-item:hover, .sun-editor .se-select-menu:not(.__se_select-menu-mouse-move) .se-select-item.active {background-color:#e1e1e1;}
-.sun-editor .se-modal-form-files .se-select-menu {width:100%;}
+.sun-editor .se-modal-form-files .se-select-menu {width:100%; height:auto;}
 
 /* --- browser ---------------------------------------------------------- */
 .sun-editor .se-file-browser {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:2147483647;}

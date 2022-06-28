@@ -36,11 +36,11 @@ const AnchorModalEditor = function (inst, modalForm) {
 		const relList = this.options.linkRel;
 		const defaultRel = (this.linkDefaultRel.default || '').split(' ');
 		const list = [];
-		for (let i = 0, len = relList.length, rel; i < len; i++) {
-			rel = relList[i];
+		for (let i = 0, len = 50, rel; i < len; i++) {
+			rel = relList[0];
 			list.push(domUtils.createElement('BUTTON', { type: 'button', class: 'se-btn-list' + (defaultRel.indexOf(rel) > -1 ? ' se-checked' : ''), 'data-command': rel, title: rel, 'aria-label': rel }, rel + '<span class="se-svg">' + this.icons.checked + '</span>'));
 		}
-		this.selectMenu_rel = new SelectMenu(this, true);
+		this.selectMenu_rel = new SelectMenu(this, true, this.options._rtl ? 'left' : 'right');
 		this.selectMenu_rel.on(this.relButton, SetRelItem.bind(this));
 		this.selectMenu_rel.create(list);
 		this.eventManager.addEvent(this.relButton, 'click', OnClick_relbutton.bind(this));
@@ -48,7 +48,7 @@ const AnchorModalEditor = function (inst, modalForm) {
 
 	// init
 	modalForm.querySelector('.se-anchor-editor').appendChild(forms);
-	this.selectMenu_bookmark = new SelectMenu(this, false);
+	this.selectMenu_bookmark = new SelectMenu(this, false, 'bottom');
 	this.selectMenu_bookmark.on(this.urlInput, SetHeaderBookmark.bind(this));
 	this.eventManager.addEvent(this.newWindowCheck, 'change', OnChange_newWindowCheck.bind(this));
 	this.eventManager.addEvent(this.downloadCheck, 'change', OnChange_downloadCheck.bind(this));
@@ -227,7 +227,7 @@ AnchorModalEditor.prototype = {
 };
 
 function OnClick_relbutton() {
-	this.selectMenu_rel.open('left');
+	this.selectMenu_rel.open();
 }
 
 function SetHeaderBookmark(item) {
