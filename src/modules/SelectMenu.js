@@ -15,7 +15,7 @@ const SelectMenu = function (inst, checkType, position, subPosition) {
 	this.item = null;
 	this.checkType = !!checkType;
 	this.position = position || 'bottom';
-	this.subPosition = subPosition || 'middle';
+	this.subPosition = subPosition || /left|right/i.test(this.position) ? 'middle' : 'right';
 	this._refer = null;
 	this._selectMethod = null;
 	this._bindClose_key = null;
@@ -101,33 +101,30 @@ SelectMenu.prototype = {
 	 * @private
 	 */
 	_setPosition: function (position, subPosition) {
+		let afterP = position;
+		subPosition = subPosition || this.subPosition;
+		const originP = position;
 		const form = this.form;
 		const target = this._refer;
 		form.style.visibility = 'hidden';
 		form.style.display = 'block';
 
+		const formW = form.offsetWidth;
+		const targetL = target.offsetLeft;
 		let side = false;
 		let l = 0,
 			t = 0;
-		const relative = this.context.element.relative;
-		const relativeOffset = this.editor.offset.getGlobal(relative);
 
 		if (position === 'left') {
-			const formW = form.offsetWidth;
-			l = target.offsetLeft - formW - 1;
+			l = targetL - formW - 1;
 			const targetW = target.offsetWidth;
 			const w = formW > targetW ? formW - targetW : 0;
 			l = l - w + (w > 0 ? 0 : targetW - formW) + 'px';
-			if (relativeOffset.left > this.editor.offset.getGlobal(form).left) l = 0;
-			position = subPosition || this.subPosition;
+			position = subPosition;
 			side = true;
 		} else if (position === 'right') {
-			const formW = form.offsetWidth;
-			l = target.offsetLeft + target.offsetWidth + 1;
-			const relativeW = relative.offsetWidth;
-			const overLeft = relativeW <= formW ? 0 : relativeW - (l + formW);
-			if (overLeft < 0) l += overLeft;
-			position = subPosition || this.subPosition;
+			l = targetL + target.offsetWidth + 1;
+			position = subPosition;
 			side = true;
 		}
 
@@ -160,16 +157,31 @@ SelectMenu.prototype = {
 				t -= formT - 4;
 			}
 			form.style.height = h + 'px';
+			afterP = originP;
 		} else if (position === 'top') {
 			if (targetGlobalTop < form.offsetHeight - sideAddH) {
 				form.style.height = targetGlobalTop - 4 + sideAddH + 'px';
 			}
 			t = targetOffsetTop - form.offsetHeight + sideAddH;
+			l = targetL;
+			afterP = subPosition;
 		} else {
 			if (wbottom < form.offsetHeight + sideAddH) {
 				form.style.height = wbottom - 4 + sideAddH + 'px';
 			}
 			t = targetOffsetTop + (side ? 0 : target.parentElement.offsetHeight);
+			l = targetL;
+			afterP = subPosition;
+		}
+
+		form.style.left = l + 'px';
+		const cl = this.editor.offset.getGlobal(form).left;
+		if (afterP === 'left') {
+			const overLeft = cl - formW;
+			if (overLeft < 0) l += overLeft;
+		} else {
+			const overLeft = this._w.innerWidth - (cl + formW);
+			if (overLeft < 0) l += overLeft - 4;
 		}
 
 		form.style.left = l + 'px';
@@ -275,7 +287,7 @@ function CloseListener_mousedown(e) {
 	if (e.target !== this._refer) {
 		this.close();
 		e.stopPropagation();
-	} else if (this.checkType) {
+	} else if (!/input|textarea/i.test(e.target.tagName)) {
 		this._bindClose_click = this.eventManager.addGlobalEvent('click', this.__globalEventHandlers[2], true);
 	}
 }

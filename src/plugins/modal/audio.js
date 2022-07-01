@@ -1,7 +1,7 @@
 'use strict';
 
 import EditorInterface from '../../interface/editor';
-import { Modal, Controller, FileManager } from '../../class';
+import { Modal, Controller, FileManager } from '../../modules';
 import { domUtils } from '../../helper';
 
 import fileManager from '../modules/fileManager';

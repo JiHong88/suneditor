@@ -1,7 +1,7 @@
 'use strict';
 
 import EditorInterface from '../../interface/editor';
-import colorPicker from '../../class/colorPicker';
+import colorPicker from '../../modules/colorPicker';
 import { domUtils } from '../../helper';
 
 const backgroundColor = function (editor, target) {

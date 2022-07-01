@@ -1,7 +1,7 @@
 'use strict';
 
 import EditorInterface from '../../interface/editor';
-import { Modal, Controller } from '../../class';
+import { Modal, Controller } from '../../modules';
 import { domUtils, env, converter, unicode } from '../../helper';
 
 const math = function (editor, target) {

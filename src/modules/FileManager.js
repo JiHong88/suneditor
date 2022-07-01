@@ -1,6 +1,19 @@
 'use strict';
 
-const fileManager = {
+import CoreInterface from '../interface/_core';
+const fileManager = function (inst) {
+	CoreInterface.call(this, inst.editor);
+
+	// members
+	this.inst = inst;
+	this._xmlHttp = null;
+}
+
+fileManager.prototype = {
+	constructor: fileManager
+}
+
+const a = {
 	name: 'fileManager',
 	_xmlHttp: null,
 

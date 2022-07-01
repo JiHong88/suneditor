@@ -2,7 +2,7 @@
 
 import EditorInterface from '../../interface/editor';
 import { domUtils, numbers } from '../../helper';
-import Controller from '../../modules/controller';
+import { Controller, SelectMenu } from '../../modules';
 
 const table = function (editor, target) {
 	// plugin bisic properties
@@ -17,10 +17,15 @@ const table = function (editor, target) {
 	const commandArea = menu.querySelector('.se-controller-table-picker');
 	const controller_table = CreateHTML_controller_table(editor);
 	const controller_cell = CreateHTML_controller_cell(editor, this.cellControllerTop);
+	const splitMenu = CreateSplitMenu(this.lang);
 
 	// members
 	this.controller_table = new Controller(this, controller_table, 'top');
 	this.controller_cell = new Controller(this, controller_cell, this.cellControllerTop ? 'top' : 'bottom');
+	this.splitButton = controller_cell.querySelector('._se_table_split_button');
+	this.selectMenu_split = new SelectMenu(this, false, 'bottom');
+	this.selectMenu_split.on(this.splitButton, this.splitCells.bind(this));
+	this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
 	this.maxText = this.lang.controller.maxSize;
 	this.minText = this.lang.controller.minSize;
 	this.tableHighlight = menu.querySelector('.se-table-size-highlighted');
@@ -31,9 +36,7 @@ const table = function (editor, target) {
 	this.resizeText = controller_table.querySelector('._se_table_resize > span > span');
 	this.columnFixedButton = controller_table.querySelector('._se_table_fixed_column');
 	this.headerButton = controller_table.querySelector('._se_table_header');
-	this.splitMenu = controller_cell.querySelector('.se-btn-group-sub');
 	this.mergeButton = controller_cell.querySelector('._se_table_merge_button');
-	this.splitButton = controller_cell.querySelector('._se_table_split_button');
 	this.insertRowAboveButton = controller_cell.querySelector('._se_table_insert_row_a');
 	// members - private
 	this._element = null;
@@ -60,7 +63,6 @@ const table = function (editor, target) {
 	this._selectedCell = null;
 	this._selectedTable = null;
 	this._ref = null;
-	this._closeSplitMenu = null
 	// member - global events
 	this._bindClose_move = null;
 	this._bindClose_key = null;
@@ -72,7 +74,7 @@ const table = function (editor, target) {
 		off: OffCellMultiSelect.bind(this),
 		shiftOff: OffCellShift.bind(this),
 		touchOff: OffCellTouch.bind(this)
-	}
+	};
 
 	// this.context.element.relative.appendChild(controller_cell);
 	// this.context.element.relative.appendChild(controller_table);
@@ -178,11 +180,6 @@ table.prototype = {
 		const value = target.getAttribute('data-value');
 		const option = target.getAttribute('data-option');
 
-		if (typeof this._closeSplitMenu === 'function') {
-			this._closeSplitMenu();
-			if (command === 'onsplit') return;
-		}
-
 		switch (command) {
 			case 'insert':
 			case 'delete':
@@ -192,10 +189,7 @@ table.prototype = {
 				this.toggleHeader();
 				break;
 			case 'onsplit':
-				this.openSplitMenu();
-				break;
-			case 'split':
-				this.splitCells(value);
+				this.selectMenu_split.open();
 				break;
 			case 'merge':
 				this.mergeCells();
@@ -731,20 +725,6 @@ table.prototype = {
 		return newRow;
 	},
 
-	openSplitMenu: function () {
-		domUtils.addClass(this.splitButton, 'on');
-		this.splitMenu.style.display = 'inline-table';
-
-		this._closeSplitMenu = function () {
-			domUtils.removeClass(this.splitButton, 'on');
-			this.splitMenu.style.display = 'none';
-			this.eventManager.removeGlobalEvent('click', this._closeSplitMenu);
-			this._closeSplitMenu = null;
-		}.bind(this);
-
-		this.eventManager.addGlobalEvent('click', this._closeSplitMenu);
-	},
-
 	splitCells: function (direction) {
 		const vertical = direction === 'vertical';
 		const currentCell = this._tdElement;
@@ -917,6 +897,7 @@ table.prototype = {
 
 		this.editor.focusEdge(currentCell);
 		this.setCellControllerPosition(currentCell, true);
+		this.selectMenu_split.close();
 	},
 
 	mergeCells: function () {
@@ -1289,7 +1270,7 @@ function CreateCells(nodeName, cnt, returnElement) {
 	}
 }
 
-function OnCellMultiSelect (e) {
+function OnCellMultiSelect(e) {
 	this.editor._antiBlur = true;
 	const target = domUtils.getParentElement(e.target, domUtils.isTableCell);
 
@@ -1309,7 +1290,7 @@ function OnCellMultiSelect (e) {
 	this._setMultiCells(this._fixedCell, target);
 }
 
-function OffCellMultiSelect (e) {
+function OffCellMultiSelect(e) {
 	e.stopPropagation();
 
 	if (!this._shift) {
@@ -1343,6 +1324,31 @@ function OffCellTouch(e) {
 }
 
 // init element
+function CreateSplitMenu(lang) {
+	const items = ['vertical', 'horizontal'];
+
+	const menus = domUtils.createElement(
+		'DIV',
+		null,
+		'<div title="' +
+			lang.controller.VerticalSplit +
+			'" aria-label="' +
+			lang.controller.VerticalSplit +
+			'">' +
+			lang.controller.VerticalSplit +
+			'</div>' +
+			'<div title="' +
+			lang.controller.HorizontalSplit +
+			'" aria-label="' +
+			lang.controller.HorizontalSplit +
+			'">' +
+			lang.controller.HorizontalSplit +
+			'</div>'
+	);
+
+	return { items: ['vertical', 'horizontal'], menus: menus.querySelectorAll('div') };
+}
+
 function CreateHTML() {
 	const html = '' + '<div class="se-table-size">' + '<div class="se-table-size-picker se-controller-table-picker"></div>' + '<div class="se-table-size-highlighted"></div>' + '<div class="se-table-size-unhighlighted"></div>' + '</div>' + '<div class="se-table-size-display">1 x 1</div>';
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-selector-table' }, html);
@@ -1440,26 +1446,6 @@ function CreateHTML_controller_cell(editor, cellControllerTop) {
 		lang.controller.splitCells +
 		'</span></span>' +
 		'</button>' +
-		'<div class="se-btn-group-sub sun-editor-common se-list-layer se-table-split">' +
-		'<div class="se-list-inner">' +
-		'<ul class="se-list-basic">' +
-		'<li class="se-btn-list" data-command="split" data-value="vertical" style="line-height:32px;" title="' +
-		lang.controller.VerticalSplit +
-		'" aria-label="' +
-		lang.controller.VerticalSplit +
-		'">' +
-		lang.controller.VerticalSplit +
-		'</li>' +
-		'<li class="se-btn-list" data-command="split" data-value="horizontal" style="line-height:32px;" title="' +
-		lang.controller.HorizontalSplit +
-		'" aria-label="' +
-		lang.controller.HorizontalSplit +
-		'">' +
-		lang.controller.HorizontalSplit +
-		'</li>' +
-		'</ul>' +
-		'</div>' +
-		'</div>' +
 		'</div>';
 
 	return domUtils.createElement('DIV', { class: 'se-controller se-controller-table-cell' }, html);
