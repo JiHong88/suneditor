@@ -38,10 +38,11 @@ SelectMenu.prototype = {
 		this.menus = this.form.querySelectorAll('li');
 	},
 
-	on: function (referElement, selectMethod) {
+	on: function (referElement, selectMethod, attr) {
+		if (!attr) attr = {};
 		this._refer = referElement;
 		this._selectMethod = selectMethod;
-		this.form = domUtils.createElement('DIV', { class: 'se-select-menu se-list-inner' });
+		this.form = domUtils.createElement('DIV', { class: 'se-select-menu se-list-inner ' + attr.class || '', style: attr.style || '' });
 		referElement.parentNode.insertBefore(this.form, referElement);
 	},
 
@@ -125,31 +126,41 @@ SelectMenu.prototype = {
 		}
 
 		// set top position
-		const targetOffsetTop = this.editor.offset.getGlobal(target).top;
+		const targetOffsetTop = target.offsetTop;
+		const targetGlobalTop = this.editor.offset.getGlobal(target).top;
 		const targetHeight = target.offsetHeight;
-		const wbottom = this._w.innerHeight - (targetOffsetTop + targetHeight);
+		const wbottom = this._w.innerHeight - (targetGlobalTop + targetHeight);
 		if (position === 'middle') {
 			let h = form.offsetHeight;
-			t = target.offsetTop + targetHeight / 2 - h / 2;
-			const targetTop = targetOffsetTop - targetHeight / 2;
-			const formHeight = form.offsetHeight / 2;
-			if (targetTop < formHeight) {
-				h -= targetTop + 2;
-				t -= targetTop + 2;
+			const th = targetHeight / 2;
+			t = targetOffsetTop - h / 2 + th;
+			// over top
+			if (targetGlobalTop < h / 2) {
+				t += h / 2 - targetGlobalTop - th + 4;
+				form.style.top = t + 'px';
 			}
-			if (wbottom < formHeight) {
-				h -= wbottom;
-				t += wbottom;
+			// over bottom
+			let formT = this.editor.offset.getGlobal(form).top;
+			const modH = (h - (targetGlobalTop - formT)) - wbottom - targetHeight;
+			if (modH > 0) {
+				t -= modH + 4;
+				form.style.top = t + 'px';
+			}
+			// over height
+			formT = this.editor.offset.getGlobal(form).top;
+			if (formT < 0) {
+				h += formT - 4;
+				t -= formT - 4;
 			}
 			form.style.height = h + 'px';
 		} else if (position === 'top') {
 			if (targetOffsetTop < form.offsetHeight) {
-				form.style.height = targetOffsetTop - 2 + 'px';
+				form.style.height = (targetOffsetTop - 4) + 'px';
 			}
 			t = -form.offsetHeight;
 		} else {
 			if (wbottom < form.offsetHeight) {
-				form.style.height = wbottom + 'px';
+				form.style.height = (wbottom - 4) + 'px';
 			}
 			t = target.parentElement.offsetHeight;
 		}
@@ -237,7 +248,7 @@ function OnClick_list(e) {
 	let target = e.target;
 	let index = null;
 
-	while (!index && !/UL/i.test(target.tagName)) {
+	while (!index && !/UL/i.test(target.tagName) && !domUtils.hasClass(target, 'se-container')) {
 		index = target.getAttribute('data-index');
 		target = target.parentNode;
 	}

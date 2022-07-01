@@ -39,20 +39,20 @@ Offset.prototype = {
 
 	/**
 	 * @description Returns the position of the argument, relative to global document. {left:0, top:0, scroll: 0}
-	 * @param {Element} container Target element
+	 * @param {Element} element Target element
 	 * @returns {Object} {left, top, scroll}
 	 */
-	getGlobal: function (container) {
-		if (!container) container = this.context.element.topArea;
+	getGlobal: function (element) {
+		if (!element) element = this.context.element.topArea;
 		let t = 0,
 			l = 0,
 			s = 0;
 
-		while (container) {
-			t += container.offsetTop;
-			l += container.offsetLeft;
-			s += container.scrollTop;
-			container = container.offsetParent;
+		while (element) {
+			t += element.offsetTop;
+			l += element.offsetLeft;
+			s += element.scrollTop;
+			element = element.offsetParent;
 		}
 
 		return {
