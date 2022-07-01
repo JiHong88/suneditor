@@ -3,7 +3,7 @@
 import CoreInterface from '../interface/_core';
 import { domUtils } from '../helper';
 
-const SelectMenu = function (inst, checkType, position) {
+const SelectMenu = function (inst, checkType, position, subPosition) {
 	// plugin bisic properties
 	CoreInterface.call(this, inst.editor);
 
@@ -15,6 +15,7 @@ const SelectMenu = function (inst, checkType, position) {
 	this.item = null;
 	this.checkType = !!checkType;
 	this.position = position || 'bottom';
+	this.subPosition = subPosition || 'middle';
 	this._refer = null;
 	this._selectMethod = null;
 	this._bindClose_key = null;
@@ -27,10 +28,11 @@ const SelectMenu = function (inst, checkType, position) {
 };
 
 SelectMenu.prototype = {
-	create: function (items, key) {
+	create: function (items, menus) {
+		menus = menus || items;
 		let html = '';
-		for (let i = 0, len = items.length; i < len; i++) {
-			html += '<li class="se-select-item" data-index="' + i + '">' + (key ? items[i][key] : typeof items[i] === 'string' ? items[i] : items[i].outerHTML) + '</li>';
+		for (let i = 0, len = menus.length; i < len; i++) {
+			html += '<li class="se-select-item" data-index="' + i + '">' + (typeof menus[i] === 'string' ? menus[i] : menus[i].outerHTML) + '</li>';
 		}
 
 		this.items = items;
@@ -50,10 +52,10 @@ SelectMenu.prototype = {
 	 * @description Select menu open
 	 * @param {"left"|"right"|"top"|"bottom"} position Menu position. (default:Constructor(inst, checkType, "position") | "bottom")
 	 */
-	open: function (position) {
+	open: function (position, subPosition) {
 		this.__addEvents();
 		this.__addGlobalEvent();
-		this._setPosition(position || this.position);
+		this._setPosition(position || this.position, subPosition || this.subPosition);
 	},
 
 	close: function () {
@@ -117,7 +119,7 @@ SelectMenu.prototype = {
 			const w = formW > targetW ? formW - targetW : 0;
 			l = l - w + (w > 0 ? 0 : targetW - formW) + 'px';
 			if (relativeOffset.left > this.editor.offset.getGlobal(form).left) l = 0;
-			position = subPosition || 'middle';
+			position = subPosition || this.subPosition;
 			side = true;
 		} else if (position === 'right') {
 			const formW = form.offsetWidth;
@@ -125,7 +127,7 @@ SelectMenu.prototype = {
 			const relativeW = relative.offsetWidth;
 			const overLeft = relativeW <= formW ? 0 : relativeW - (l + formW);
 			if (overLeft < 0) l += overLeft;
-			position = subPosition || 'middle';
+			position = subPosition || this.subPosition;
 			side = true;
 		}
 
@@ -146,7 +148,7 @@ SelectMenu.prototype = {
 			}
 			// over bottom
 			let formT = this.editor.offset.getGlobal(form).top;
-			const modH = (h - (targetGlobalTop - formT)) - wbottom - targetHeight;
+			const modH = h - (targetGlobalTop - formT) - wbottom - targetHeight;
 			if (modH > 0) {
 				t -= modH + 4;
 				form.style.top = t + 'px';
@@ -160,12 +162,12 @@ SelectMenu.prototype = {
 			form.style.height = h + 'px';
 		} else if (position === 'top') {
 			if (targetGlobalTop < form.offsetHeight - sideAddH) {
-				form.style.height = (targetGlobalTop - 4 + sideAddH) + 'px';
+				form.style.height = targetGlobalTop - 4 + sideAddH + 'px';
 			}
 			t = targetOffsetTop - form.offsetHeight + sideAddH;
 		} else {
 			if (wbottom < form.offsetHeight + sideAddH) {
-				form.style.height = (wbottom - 4 + sideAddH) + 'px';
+				form.style.height = wbottom - 4 + sideAddH + 'px';
 			}
 			t = targetOffsetTop + (side ? 0 : target.parentElement.offsetHeight);
 		}
