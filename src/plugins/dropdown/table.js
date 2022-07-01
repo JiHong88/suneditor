@@ -2,7 +2,7 @@
 
 import EditorInterface from '../../interface/editor';
 import { domUtils, numbers } from '../../helper';
-import Controller from '../../class/controller';
+import Controller from '../../modules/controller';
 
 const table = function (editor, target) {
 	// plugin bisic properties

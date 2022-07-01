@@ -11,17 +11,17 @@ import Events from './base/events';
 import EventManager from './base/eventManager';
 
 // modules
-import Char from './modules/char';
-import Component from './modules/component';
-import Format from './modules/format';
-import HTML from './modules/html';
-import Menu from './modules/menu';
-import Node from './modules/node';
-import Notice from './modules/notice';
-import Offset from './modules/offset';
-import Selection from './modules/selection';
-import Shortcuts from './modules/shortcuts';
-import Toolbar from './modules/toolbar';
+import Char from './class/char';
+import Component from './class/component';
+import Format from './class/format';
+import HTML from './class/html';
+import Menu from './class/menu';
+import Node from './class/node';
+import Notice from './class/notice';
+import Offset from './class/offset';
+import Selection from './class/selection';
+import Shortcuts from './class/shortcuts';
+import Toolbar from './class/toolbar';
 
 /**
  * @description SunEditor constructor function.
