@@ -117,9 +117,6 @@ SelectMenu.prototype = {
 
 		if (position === 'left') {
 			l = targetL - formW - 1;
-			const targetW = target.offsetWidth;
-			const w = formW > targetW ? formW - targetW : 0;
-			l = l - w + (w > 0 ? 0 : targetW - formW) + 'px';
 			position = subPosition;
 			side = true;
 		} else if (position === 'right') {

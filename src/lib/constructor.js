@@ -244,7 +244,7 @@ function InitOptions(element, options) {
 		superscript: options.textTags.sup
 	};
 	// text direction
-	options.textDirection = options.textDirection !== 'string' ? 'ltr' : options.textDirection;
+	options.textDirection = typeof options.textDirection !== 'string' ? 'ltr' : options.textDirection;
 	options._rtl = options.textDirection === 'rtl';
 	if (options._rtl) options.buttonList = options.buttonList.reverse();
 	// icons
