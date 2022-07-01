@@ -95,14 +95,16 @@ SelectMenu.prototype = {
 	/**
 	 * @description Menu open
 	 * @param {"left"|"right"|"top"|"bottom"} position Menu position
+	 * @param {"middle"|"top"|"bottom"} subPosition Top position when "Menu position" is "left" or "right".
 	 * @private
 	 */
-	_setPosition: function (position) {
+	_setPosition: function (position, subPosition) {
 		const form = this.form;
 		const target = this._refer;
 		form.style.visibility = 'hidden';
 		form.style.display = 'block';
 
+		let side = false;
 		let l = 0,
 			t = 0;
 		const relative = this.context.element.relative;
@@ -115,14 +117,16 @@ SelectMenu.prototype = {
 			const w = formW > targetW ? formW - targetW : 0;
 			l = l - w + (w > 0 ? 0 : targetW - formW) + 'px';
 			if (relativeOffset.left > this.editor.offset.getGlobal(form).left) l = 0;
-			position = 'middle';
+			position = subPosition || 'middle';
+			side = true;
 		} else if (position === 'right') {
 			const formW = form.offsetWidth;
 			l = target.offsetLeft + target.offsetWidth + 1;
 			const relativeW = relative.offsetWidth;
 			const overLeft = relativeW <= formW ? 0 : relativeW - (l + formW);
 			if (overLeft < 0) l += overLeft;
-			position = 'middle';
+			position = subPosition || 'middle';
+			side = true;
 		}
 
 		// set top position
@@ -130,6 +134,7 @@ SelectMenu.prototype = {
 		const targetGlobalTop = this.editor.offset.getGlobal(target).top;
 		const targetHeight = target.offsetHeight;
 		const wbottom = this._w.innerHeight - (targetGlobalTop + targetHeight);
+		const sideAddH = side ? targetHeight : 0;
 		if (position === 'middle') {
 			let h = form.offsetHeight;
 			const th = targetHeight / 2;
@@ -154,15 +159,15 @@ SelectMenu.prototype = {
 			}
 			form.style.height = h + 'px';
 		} else if (position === 'top') {
-			if (targetOffsetTop < form.offsetHeight) {
-				form.style.height = (targetOffsetTop - 4) + 'px';
+			if (targetGlobalTop < form.offsetHeight - sideAddH) {
+				form.style.height = (targetGlobalTop - 4 + sideAddH) + 'px';
 			}
-			t = -form.offsetHeight;
+			t = targetOffsetTop - form.offsetHeight + sideAddH;
 		} else {
-			if (wbottom < form.offsetHeight) {
-				form.style.height = (wbottom - 4) + 'px';
+			if (wbottom < form.offsetHeight + sideAddH) {
+				form.style.height = (wbottom - 4 + sideAddH) + 'px';
 			}
-			t = target.parentElement.offsetHeight;
+			t = targetOffsetTop + (side ? 0 : target.parentElement.offsetHeight);
 		}
 
 		form.style.left = l + 'px';

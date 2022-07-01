@@ -347,7 +347,7 @@
 .sun-editor .se-modal .se-modal-inner .se-anchor-preview-form .se-svg.se-anchor-preview-icon {flex:unset; display:none; line-height:1.5; color:#4592ff;}
 .sun-editor .se-modal .se-modal-inner .se-anchor-preview-form .se-link-preview {flex:auto; margin:0; }
 /* modal - modal - anchor module - rel select */
-.sun-editor .se-modal .se-modal-inner .se-anchor-rel {height:34px;}
+.sun-editor .se-modal .se-modal-inner .se-anchor-rel {position:relative; height:34px;}
 .sun-editor .se-modal .se-modal-inner .se-anchor-rel-btn {width:46px; color:#3f9dff;}
 .sun-editor .se-modal .se-modal-inner .se-anchor-rel-wrapper {display:flex; line-height:1.5; padding:6px 6px 0 3px;}
 .sun-editor .se-modal .se-modal-inner .se-anchor-rel-preview {text-align:left;}

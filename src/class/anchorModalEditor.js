@@ -36,8 +36,8 @@ const AnchorModalEditor = function (inst, modalForm) {
 		const relList = this.options.linkRel;
 		const defaultRel = (this.linkDefaultRel.default || '').split(' ');
 		const list = [];
-		for (let i = 0, len = 50, rel; i < len; i++) {
-			rel = relList[0];
+		for (let i = 0, len = relList.length, rel; i < len; i++) {
+			rel = relList[i];
 			list.push(domUtils.createElement('BUTTON', { type: 'button', class: 'se-btn-list' + (defaultRel.indexOf(rel) > -1 ? ' se-checked' : ''), 'data-command': rel, title: rel, 'aria-label': rel }, rel + '<span class="se-svg">' + this.icons.checked + '</span>'));
 		}
 		this.selectMenu_rel = new SelectMenu(this, true, this.options._rtl ? 'left' : 'right');
