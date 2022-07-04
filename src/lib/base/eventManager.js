@@ -24,6 +24,8 @@ const EventManager = function (editor) {
 	this._toolbarObserver = null;
 	this._onMousedownPlugins = editor._onMousedownPlugins;
 	this._onKeyDownPlugins = editor._onKeyDownPlugins;
+	this.__resize_editor = null;
+	this.__close_move = null;
 };
 
 EventManager.prototype = {
@@ -242,14 +244,6 @@ EventManager.prototype = {
 		}
 
 		return siblingNode;
-	},
-
-	_resize_editor: function (e) {
-		const resizeInterval = this.context.element.editorArea.offsetHeight + (e.clientY - this.status._resizeClientY);
-		const h = resizeInterval < this.status._minHeight ? this.status._minHeight : resizeInterval;
-		this.context.element.wysiwygFrame.style.height = this.context.element.code.style.height = h + 'px';
-		this.status._resizeClientY = e.clientY;
-		if (env.isIE) this.editor.__callResizeFunction(h, null);
 	},
 
 	// FireFox - table delete, Chrome - image, video, audio
@@ -1339,7 +1333,7 @@ function OnKeyDown_wysiwyg(e) {
 					}
 
 					if (selectionFormat) {
-						this.html.insert((range.collapsed && domUtils.isBreak(range.startContainer.childNodes[range.startOffset - 1]) ? '<br>' : '<br><br>'), false, true, true);
+						this.html.insert(range.collapsed && domUtils.isBreak(range.startContainer.childNodes[range.startOffset - 1]) ? '<br>' : '<br><br>', false, true, true);
 
 						let focusNode = wSelection.focusNode;
 						const wOffset = wSelection.focusOffset;
@@ -1685,18 +1679,26 @@ function OnMouseMove_wysiwyg(e) {
 
 function OnMouseDown_statusbar(e) {
 	e.stopPropagation();
-
 	this.status._resizeClientY = e.clientY;
 	this.context.element.resizeBackground.style.display = 'block';
+	this.context.element.resizeBackground.style.cursor = 'ns-resize';
+	this.__resize_editor = this.addGlobalEvent('mousemove', __resizeEditor.bind(this));
+	this.__close_move = this.addGlobalEvent('mouseup', __closeMove.bind(this));
+}
 
-	function closureFunc() {
-		this.context.element.resizeBackground.style.display = 'none';
-		_d.removeEventListener('mousemove', this._resize_editor.bind(this));
-		_d.removeEventListener('mouseup', closureFunc);
-	}
+function __resizeEditor(e) {
+	const resizeInterval = this.context.element.editorArea.offsetHeight + (e.clientY - this.status._resizeClientY);
+	const h = resizeInterval < this.status._minHeight ? this.status._minHeight : resizeInterval;
+	this.context.element.wysiwygFrame.style.height = this.context.element.code.style.height = h + 'px';
+	this.status._resizeClientY = e.clientY;
+	if (env.isIE) this.editor.__callResizeFunction(h, null);
+}
 
-	_d.addEventListener('mousemove', this._resize_editor.bind(this));
-	_d.addEventListener('mouseup', closureFunc);
+function __closeMove() {
+	this.context.element.resizeBackground.style.display = 'none';
+	this.context.element.resizeBackground.style.cursor = 'auto';
+	if (this.__resize_editor) this.__resize_editor = this.removeGlobalEvent(this.__resize_editor);
+	if (this.__close_move) this.__close_move = this.removeGlobalEvent(this.__close_move);
 }
 
 function DisplayLineBreak(dir, e) {

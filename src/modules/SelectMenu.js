@@ -3,19 +3,26 @@
 import CoreInterface from '../interface/_core';
 import { domUtils } from '../helper';
 
-const SelectMenu = function (inst, checkType, position, subPosition) {
+/**
+ *
+ * @param {*} inst
+ * @param {boolean} checkList
+ * @param {string} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
+ */
+const SelectMenu = function (inst, checkList, position) {
 	// plugin bisic properties
 	CoreInterface.call(this, inst.editor);
 
 	// members
+	const positionItems = position.split('-');
 	this.form = null;
 	this.items = [];
 	this.menus = [];
 	this.index = -1;
 	this.item = null;
-	this.checkType = !!checkType;
-	this.position = position || 'bottom';
-	this.subPosition = subPosition || /left|right/i.test(this.position) ? 'middle' : 'right';
+	this.checkList = !!checkList;
+	this.position = positionItems[0];
+	this.subPosition = positionItems[1];
 	this._refer = null;
 	this._selectMethod = null;
 	this._bindClose_key = null;
@@ -50,20 +57,21 @@ SelectMenu.prototype = {
 
 	/**
 	 * @description Select menu open
-	 * @param {"left"|"right"|"top"|"bottom"} position Menu position. (default:Constructor(inst, checkType, "position") | "bottom")
+	 * @param {"string"} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
 	 */
-	open: function (position, subPosition) {
+	open: function (position) {
 		this.__addEvents();
 		this.__addGlobalEvent();
-		this._setPosition(position || this.position, subPosition || this.subPosition);
+		const positionItems = position ? position.split('-') : [];
+		this._setPosition(positionItems[0] || this.position, positionItems[1] || this.subPosition);
 	},
 
 	close: function () {
+		this._init();
 		if (this.form) {
 			this.form.style.display = 'none';
 			this.form.style.height = '';
 		}
-		this._init();
 	},
 
 	getItem: function (index) {
@@ -96,13 +104,11 @@ SelectMenu.prototype = {
 
 	/**
 	 * @description Menu open
-	 * @param {"left"|"right"|"top"|"bottom"} position Menu position
-	 * @param {"middle"|"top"|"bottom"} subPosition Top position when "Menu position" is "left" or "right".
+	 * @param {["left"|"right"] | ["top"|"bottom"]} position Menu position
+	 * @param {["middle"|"top"|"bottom"] | ["center"|"left"|"right"]} subPosition Sub position
 	 * @private
 	 */
 	_setPosition: function (position, subPosition) {
-		let afterP = position;
-		subPosition = subPosition || this.subPosition;
 		const originP = position;
 		const form = this.form;
 		const target = this._refer;
@@ -110,6 +116,7 @@ SelectMenu.prototype = {
 		form.style.display = 'block';
 
 		const formW = form.offsetWidth;
+		const targetW = target.offsetWidth;
 		const targetL = target.offsetLeft;
 		let side = false;
 		let l = 0,
@@ -120,65 +127,97 @@ SelectMenu.prototype = {
 			position = subPosition;
 			side = true;
 		} else if (position === 'right') {
-			l = targetL + target.offsetWidth + 1;
+			l = targetL + targetW + 1;
 			position = subPosition;
 			side = true;
 		}
 
 		// set top position
+		const globalTarget = this.editor.offset.getGlobal(target);
 		const targetOffsetTop = target.offsetTop;
-		const targetGlobalTop = this.editor.offset.getGlobal(target).top;
+		const targetGlobalTop = globalTarget.top;
 		const targetHeight = target.offsetHeight;
 		const wbottom = this._w.innerHeight - (targetGlobalTop + targetHeight);
 		const sideAddH = side ? targetHeight : 0;
-		if (position === 'middle') {
-			let h = form.offsetHeight;
-			const th = targetHeight / 2;
-			t = targetOffsetTop - h / 2 + th;
-			// over top
-			if (targetGlobalTop < h / 2) {
-				t += h / 2 - targetGlobalTop - th + 4;
-				form.style.top = t + 'px';
+		switch (position) {
+			case 'middle':
+				let h = form.offsetHeight;
+				const th = targetHeight / 2;
+				t = targetOffsetTop - h / 2 + th;
+				// over top
+				if (targetGlobalTop < h / 2) {
+					t += h / 2 - targetGlobalTop - th + 4;
+					form.style.top = t + 'px';
+				}
+				// over bottom
+				let formT = this.editor.offset.getGlobal(form).top;
+				const modH = h - (targetGlobalTop - formT) - wbottom - targetHeight;
+				if (modH > 0) {
+					t -= modH + 4;
+					form.style.top = t + 'px';
+				}
+				// over height
+				formT = this.editor.offset.getGlobal(form).top;
+				if (formT < 0) {
+					h += formT - 4;
+					t -= formT - 4;
+				}
+				form.style.height = h + 'px';
+				break;
+			case 'top':
+				if (targetGlobalTop < form.offsetHeight - sideAddH) {
+					form.style.height = targetGlobalTop - 4 + sideAddH + 'px';
+				}
+				t = targetOffsetTop - form.offsetHeight + sideAddH;
+				break;
+			case 'bottom':
+				if (wbottom < form.offsetHeight + sideAddH) {
+					form.style.height = wbottom - 4 + sideAddH + 'px';
+				}
+				t = targetOffsetTop + (side ? 0 : targetHeight);
+				break;
+		}
+
+		if (!side) {
+			switch (subPosition) {
+				case 'center':
+					l = targetL + targetW / 2 - formW / 2;
+					break;
+				case 'left':
+					l = targetL;
+					break;
+				case 'right':
+					l = targetL - (formW - targetW);
+					break;
 			}
-			// over bottom
-			let formT = this.editor.offset.getGlobal(form).top;
-			const modH = h - (targetGlobalTop - formT) - wbottom - targetHeight;
-			if (modH > 0) {
-				t -= modH + 4;
-				form.style.top = t + 'px';
-			}
-			// over height
-			formT = this.editor.offset.getGlobal(form).top;
-			if (formT < 0) {
-				h += formT - 4;
-				t -= formT - 4;
-			}
-			form.style.height = h + 'px';
-			afterP = originP;
-		} else if (position === 'top') {
-			if (targetGlobalTop < form.offsetHeight - sideAddH) {
-				form.style.height = targetGlobalTop - 4 + sideAddH + 'px';
-			}
-			t = targetOffsetTop - form.offsetHeight + sideAddH;
-			l = targetL;
-			afterP = subPosition;
-		} else {
-			if (wbottom < form.offsetHeight + sideAddH) {
-				form.style.height = wbottom - 4 + sideAddH + 'px';
-			}
-			t = targetOffsetTop + (side ? 0 : target.parentElement.offsetHeight);
-			l = targetL;
-			afterP = subPosition;
 		}
 
 		form.style.left = l + 'px';
-		const cl = this.editor.offset.getGlobal(form).left;
-		if (afterP === 'left') {
-			const overLeft = cl - formW;
-			if (overLeft < 0) l += overLeft;
-		} else {
-			const overLeft = this._w.innerWidth - (cl + formW);
-			if (overLeft < 0) l += overLeft - 4;
+		let fl = this.editor.offset.getGlobal(form).left;
+		let over = 0;
+		switch (side + '-' + (side ? originP : subPosition)) {
+			case 'true-left':
+				over = globalTarget.left + fl;
+				if (over < 0) l = l = targetL + targetW + 1;
+				break;
+			case 'true-right':
+				over = this._w.innerWidth - (fl + formW);
+				if (over < 0) l = targetL - formW - 1;
+				break;
+			case 'false-center':
+				over = this._w.innerWidth - (fl + formW);
+				if (over < 0) l += over - 4;
+				form.style.left = l + 'px';
+				fl = this.editor.offset.getGlobal(form).left;
+				if (fl < 0) l -= fl - 4;
+				break;
+			case 'false-left':
+				over = this._w.innerWidth - (globalTarget.left + formW);
+				if (over < 0) l += over - 4;
+				break;
+			case 'false-right':
+				if (fl < 0) l -= fl - 4;
+				break;
 		}
 
 		form.style.left = l + 'px';
@@ -187,7 +226,7 @@ SelectMenu.prototype = {
 	},
 
 	_select: function (index) {
-		if (this.checkType) domUtils.toggleClass(this.menus[index], 'se-checked');
+		if (this.checkList) domUtils.toggleClass(this.menus[index], 'se-checked');
 		this._selectMethod(this.getItem(index));
 	},
 
@@ -283,17 +322,15 @@ function CloseListener_mousedown(e) {
 	if (this.form.contains(e.target)) return;
 	if (e.target !== this._refer) {
 		this.close();
-		e.stopPropagation();
 	} else if (!/input|textarea/i.test(e.target.tagName)) {
 		this._bindClose_click = this.eventManager.addGlobalEvent('click', this.__globalEventHandlers[2], true);
 	}
 }
 
 function CloseListener_click(e) {
-	this.eventManager.removeGlobalEvent(this._bindClose_click);
+	this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
 	if (e.target === this._refer) {
 		this.close();
-		e.stopPropagation();
 	}
 }
 

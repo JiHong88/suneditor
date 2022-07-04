@@ -22,8 +22,8 @@ const table = function (editor, target) {
 	// members
 	this.controller_table = new Controller(this, controller_table, 'top');
 	this.controller_cell = new Controller(this, controller_cell, this.cellControllerTop ? 'top' : 'bottom');
-	this.splitButton = controller_cell.querySelector('._se_table_split_button');
-	this.selectMenu_split = new SelectMenu(this, false, 'bottom');
+	this.splitButton = controller_cell.querySelector('[data-command="onsplit"]');
+	this.selectMenu_split = new SelectMenu(this, false, 'bottom-center');
 	this.selectMenu_split.on(this.splitButton, this.splitCells.bind(this));
 	this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
 	this.maxText = this.lang.controller.maxSize;
@@ -1440,7 +1440,7 @@ function CreateHTML_controller_cell(editor, cellControllerTop) {
 		lang.controller.deleteColumn +
 		'</span></span>' +
 		'</button>' +
-		'<button type="button" data-command="onsplit" class="_se_table_split_button se-btn se-tooltip">' +
+		'<button type="button" data-command="onsplit" class="se-btn se-tooltip">' +
 		icons.split_cell +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
 		lang.controller.splitCells +

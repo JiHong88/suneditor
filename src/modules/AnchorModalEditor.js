@@ -40,7 +40,7 @@ const AnchorModalEditor = function (inst, modalForm) {
 			rel = relList[i];
 			list.push(domUtils.createElement('BUTTON', { type: 'button', class: 'se-btn-list' + (defaultRel.indexOf(rel) > -1 ? ' se-checked' : ''), 'data-command': rel, title: rel, 'aria-label': rel }, rel + '<span class="se-svg">' + this.icons.checked + '</span>'));
 		}
-		this.selectMenu_rel = new SelectMenu(this, true, 'right', 'middle');
+		this.selectMenu_rel = new SelectMenu(this, true, 'right-middle');
 		this.selectMenu_rel.on(this.relButton, SetRelItem.bind(this));
 		this.selectMenu_rel.create(list);
 		this.eventManager.addEvent(this.relButton, 'click', OnClick_relbutton.bind(this));
@@ -48,7 +48,7 @@ const AnchorModalEditor = function (inst, modalForm) {
 
 	// init
 	modalForm.querySelector('.se-anchor-editor').appendChild(forms);
-	this.selectMenu_bookmark = new SelectMenu(this, false, 'bottom');
+	this.selectMenu_bookmark = new SelectMenu(this, false, 'bottom-left');
 	this.selectMenu_bookmark.on(this.urlInput, SetHeaderBookmark.bind(this));
 	this.eventManager.addEvent(this.newWindowCheck, 'change', OnChange_newWindowCheck.bind(this));
 	this.eventManager.addEvent(this.downloadCheck, 'change', OnChange_downloadCheck.bind(this));
@@ -163,14 +163,14 @@ AnchorModalEditor.prototype = {
 			v = headers[i];
 			if (!valueRegExp.test(v.textContent)) continue;
 			list.push(v);
-			menus.push('<div style="' + (v.style.cssText) + '">' + v.textContent + '</div>')
+			menus.push('<div style="' + v.style.cssText + '">' + v.textContent + '</div>');
 		}
 
 		if (list.length === 0) {
 			this.selectMenu_bookmark.close();
 		} else {
 			this.selectMenu_bookmark.create(list, menus);
-			this.selectMenu_bookmark.open();
+			this.selectMenu_bookmark.open(this.options._rtl ? 'bottom-right' : '');
 		}
 	},
 
@@ -229,7 +229,7 @@ AnchorModalEditor.prototype = {
 };
 
 function OnClick_relbutton() {
-	this.selectMenu_rel.open(this.options._rtl ? 'left' : 'right');
+	this.selectMenu_rel.open(this.options._rtl ? 'left-middle' : '');
 }
 
 function SetHeaderBookmark(item) {

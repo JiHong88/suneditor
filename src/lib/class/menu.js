@@ -59,7 +59,7 @@ Menu.prototype = {
 	 * @description Disable dropdown
 	 */
 	dropdownOff: function () {
-		this.eventManager.removeGlobalEvent('mousedown', this._bindedDropdownOff);
+		this.eventManager.removeGlobalEvent('mousedown', this._bindedDropdownOff, false);
 		this._bindedDropdownOff = null;
 
 		if (this.currentDropdown) {
@@ -97,7 +97,7 @@ Menu.prototype = {
 	 * @description Disable container
 	 */
 	containerOff: function () {
-		this.eventManager.removeGlobalEvent('mousedown', this._bindedContainerOff);
+		this.eventManager.removeGlobalEvent('mousedown', this._bindedContainerOff, false);
 		this._bindedContainerOff = null;
 
 		if (this.currentContainer) {
