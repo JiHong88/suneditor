@@ -733,9 +733,19 @@ function ResizeImage (files, uploadHandler) {
 //     uploadHandler(response);
 // }
 
-// ss.onImageUpload = function (targetElement, index, state, info, core) {
-//     console.log('imageInfo-----', info);
-// }
+ss.onImageUpload = function (targetElement, index, state, info, uploadedFileLength, core) {
+    console.log('imageInfo-----', info);
+    if (!targetElement) return;
+    const component = core.getFileComponent(targetElement).component;
+    const p = core.util.createElement('p');
+    p.innerHTML = '<br>';
+    if (!component.nextElementSibling) {
+        core.context.element.wysiwyg.appendChild(p.cloneNode(true))
+    }
+    if (!component.previousElementSibling) {
+        core.context.element.wysiwyg.insertBefore(p.cloneNode(true), component);
+    }
+}
 
 ss.showInline = function (toolbar, context) {
 
