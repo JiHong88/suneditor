@@ -163,8 +163,14 @@ math.prototype = {
 	},
 
 	_renderer: function (exp) {
-		const katex = this.options.katex;
-		return katex.src.renderToString(exp, { throwOnError: true, displayMode: true });
+		let result = '';
+        try {
+            result = this.options.katex.src.renderToString(exp, {throwOnError: true, displayMode: true});
+        } catch(error) {
+            result = '<span class="se-math-katex-error">' + error + '</span>';
+            console.warn('[SUNEDITOR.math.Katex.error] ', error);
+        }
+        return result;
 	},
 
 	constructor: math
