@@ -7583,7 +7583,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             element.toolbar.style.top = (options.stickyToolbar + inlineOffset) + 'px';
-            element.toolbar.style.width = core._isInline ? core._inlineToolbarAttr.width : element.toolbar.offsetWidth + 'px';
+            element.toolbar.style.width = core._isInline ? core._inlineToolbarAttr.width : element.editorArea.offsetWidth + 'px';
             util.addClass(element.toolbar, 'se-toolbar-sticky');
             core._sticky = true;
         },
