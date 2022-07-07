@@ -5925,7 +5925,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         __callResizeFunction: function (h, resizeObserverEntry) {
-            h = h === -1 ? (resizeObserverEntry.borderBoxSize ? resizeObserverEntry.borderBoxSize[0].blockSize : (resizeObserverEntry.contentRect.height + this._editorHeightPadding)) : h;
+            h = h === -1 ? (resizeObserverEntry.borderBoxSize ? resizeObserverEntry.borderBoxSize.blockSize : (resizeObserverEntry.contentRect.height + this._editorHeightPadding)) : h;
             if (this._editorHeight !== h) {
                 if (typeof functions.onResizeEditor === 'function') functions.onResizeEditor(h, this._editorHeight, core, resizeObserverEntry);
                 this._editorHeight = h;
