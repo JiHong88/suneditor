@@ -28,7 +28,7 @@ formatBlock.type = 'dropdown';
 formatBlock.className = 'se-btn-select se-btn-tool-format';
 formatBlock.prototype = {
 	/**
-	 * @Override core
+	 * @override core
 	 */
 	active: function (element) {
 		let formatTitle = this.lang.toolbar.formats;
@@ -60,7 +60,7 @@ formatBlock.prototype = {
 	},
 
 	/**
-	 * @Override dropdown
+	 * @override dropdown
 	 */
 	on: function () {
 		const formatList = this.formatList;

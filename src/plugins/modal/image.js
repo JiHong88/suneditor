@@ -15,10 +15,10 @@ export default {
         const options = core.options;
         const context = core.context;
         const contextImage = context.image = {
-            _infoList: [], // @Override fileManager
-            _infoIndex: 0, // @Override fileManager
-            _uploadFileLength: 0, // @Override fileManager
-            focusElement: null, // @Override modal // This element has focus when the modal is opened.
+            _infoList: [], // @override fileManager
+            _infoIndex: 0, // @override fileManager
+            _uploadFileLength: 0, // @override fileManager
+            focusElement: null, // @override modal // This element has focus when the modal is opened.
             sizeUnit: options._imageSizeUnit,
             _linkElement: '',
             _altText: '',
@@ -27,11 +27,11 @@ export default {
             _v_src: {_linkValue: ''},
             svgDefaultSize: '30%',
             base64RenderIndex: 0,
-            // @require @Override mediaContainer
+            // @require @override mediaContainer
             _element: null,
             _cover: null,
             _container: null,
-            // @Override resizing properties
+            // @override resizing properties
             inputX: null,
             inputY: null,
             _element_w: 1,
@@ -246,12 +246,12 @@ export default {
     },
 
     /**
-     * @Override @Required fileManager
+     * @override @Required fileManager
      */
     fileTags: ['img'],
 
     /**
-     * @Override core, fileManager, resizing
+     * @override core, fileManager, resizing
      * @description It is called from core.mediaContainer.select
      * @param {Element} element Target element
      */
@@ -260,7 +260,7 @@ export default {
     },
 
     /**
-     * @Override fileManager, resizing
+     * @override fileManager, resizing
      */
     destroy: function (element) {
         const imageEl = element || this.context.image._element;
@@ -285,7 +285,7 @@ export default {
     },
 
     /**
-     * @Required @Override modal
+     * @Required @override modal
      */
     on: function (update) {
         const contextImage = this.context.image;
@@ -301,7 +301,7 @@ export default {
     },
 
     /**
-     * @Required @Override modal
+     * @Required @override modal
      */
     open: function () {
         this.plugins.modal.open.call(this, 'image', 'image' === this.currentControllerName);
@@ -578,7 +578,7 @@ export default {
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      * @param {string} xy 'x': width, 'y': height
      * @param {KeyboardEvent} e Event object
      */
@@ -592,14 +592,14 @@ export default {
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     setRatio: function () {
         this.plugins.resizing._module_setRatio.call(this, this.context.image);
     },
 
     /**
-     * @Override fileManager
+     * @override fileManager
      */
     checkFileInfo: function () {
         const imagePlugin = this.plugins.image;
@@ -626,7 +626,7 @@ export default {
     },
 
     /**
-     * @Override fileManager
+     * @override fileManager
      */
     resetFileInfo: function () {
         this.plugins.fileManager.resetInfo.call(this, 'image', this.events.onImageUpload);
@@ -835,7 +835,7 @@ export default {
     },
 
     /**
-     * @Required @Override fileManager, resizing
+     * @Required @override fileManager, resizing
      */
     onModifyMode: function (element, size) {
         if (!element) return;
@@ -873,7 +873,7 @@ export default {
     },
 
     /**
-     * @Required @Override fileManager, resizing
+     * @Required @override fileManager, resizing
      */
     openModify: function (notOpen) {
         const contextImage = this.context.image;
@@ -893,7 +893,7 @@ export default {
     },
 
     /**
-     * @Override fileManager
+     * @override fileManager
      */
     applySize: function (w, h) {
         const contextImage = this.context.image;
@@ -914,14 +914,14 @@ export default {
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     sizeRevert: function () {
         this.plugins.resizing._module_sizeRevert.call(this, this.context.image);
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     setSize: function (w, h, notResetPercentage, direction) {
         const contextImage = this.context.image;
@@ -944,7 +944,7 @@ export default {
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     setAutoSize: function () {
         const contextImage = this.context.image;
@@ -966,7 +966,7 @@ export default {
     },
     
     /**
-     * @Override resizing
+     * @override resizing
      */
     setOriginSize: function () {
         const contextImage = this.context.image;
@@ -992,7 +992,7 @@ export default {
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     setPercentSize: function (w, h) {
         const contextImage = this.context.image;
@@ -1017,7 +1017,7 @@ export default {
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     cancelPercentAttr: function () {
         const contextImage = this.context.image;
@@ -1034,7 +1034,7 @@ export default {
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     setAlign: function (align, element, cover, container) {
         const contextImage = this.context.image;
@@ -1067,7 +1067,7 @@ export default {
     },
 
     /**
-     * @Override modal
+     * @override modal
      */
     init: function () {
         const contextImage = this.context.image;

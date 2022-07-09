@@ -100,7 +100,7 @@ Component.prototype = {
 
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;
-		_w.setTimeout(
+		this._w.setTimeout(
 			function () {
 				if (typeof plugin.select === 'function') plugin.select(element);
 				this._setComponentLineBreaker(element);
@@ -122,9 +122,7 @@ Component.prototype = {
 	 * @param {Element} element Target element
 	 */
 	createMediaCover: function (element) {
-		const cover = this.util.createElement('FIGURE');
-		cover.appendChild(element);
-		return cover;
+		return domUtils.createElement('FIGURE', null, element);
 	},
 
 	/**
@@ -134,11 +132,7 @@ Component.prototype = {
 	 * @returns {Element} Created container element
 	 */
 	createMediaContainer: function (cover, className) {
-		const container = this.util.createElement('DIV');
-		container.className = 'se-component ' + className;
-		container.setAttribute('contenteditable', false);
-		container.appendChild(cover);
-		return container;
+		return domUtils.createElement('DIV', { class: 'se-component ' + className, contenteditable: false }, cover);
 	},
 
 	/**
@@ -146,10 +140,7 @@ Component.prototype = {
 	 * @returns {string}
 	 */
 	createMediaCaption: function () {
-		const caption = this.util.createElement('FIGCAPTION');
-		caption.setAttribute('contenteditable', true);
-		caption.innerHTML = '<div>' + this.lang.modalBox.caption + '</div>';
-		return caption;
+		return domUtils.createElement('FIGCAPTION', { contenteditable: true }, '<div>' + this.lang.modalBox.caption + '</div>');
 	},
 
 	/**

@@ -29,12 +29,13 @@ import textStyle from "../../src/plugins/dropdown/textStyle";
 import table from "../../src/plugins/dropdown/table";
 import math from "../../src/plugins/modal/math";
 import link from "../../src/plugins/modal/link";
+import audio from "../../src/plugins/modal/audio";
 
 window.e = suneditor.create(document.getElementById('editor2'), {
     // value: '<h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2>',
     // textDirection: 'rtl',
     plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock, horizontalLine, lineHeight, list,
-        paragraphStyle, template, textStyle, table, math, link
+        paragraphStyle, template, textStyle, table, math, link, audio
     ],
     charCounter: true,
     // tableCellControllerPosition: 'top',
@@ -76,7 +77,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
     ],
     linkRelDefault: 'noreferrer noopener',
     linkTargetNewWindow: true,
-    linkProtocol: 'https',
+    linkProtocol: 'https://',
     imageMultipleFile: true,
     buttonList: [
         ['undo', 'redo'],
@@ -87,7 +88,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
         ['preview', 'print'],
         ['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'horizontalLine'],
         ['lineHeight', 'list', 'paragraphStyle', 'template', 'textStyle', 'table'],
-        ['math', 'link']
+        ['math', 'link', 'audio']
     ]
 });
 

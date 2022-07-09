@@ -30,7 +30,7 @@ list.type = 'dropdown';
 list.className = '';
 list.prototype = {
 	/**
-	 * @Override core
+	 * @override core
 	 */
 	active: function (element) {
 		const icon = this.target.firstElementChild;

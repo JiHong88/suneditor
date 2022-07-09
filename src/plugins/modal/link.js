@@ -47,14 +47,14 @@ link.prototype = {
 	},
 
 	/**
-	 * @Override modal
+	 * @override type = "modal"
 	 */
 	open: function () {
 		this.modal.open();
 	},
 
 	/**
-	 * @Override modal
+	 * @override modal
 	 * @param {boolean} isUpdate open state is update
 	 */
 	on: function (isUpdate) {
@@ -63,7 +63,7 @@ link.prototype = {
 	},
 
 	/**
-	 * @Override modal
+	 * @override modal
 	 */
 	init: function () {
 		this.controller.close();
@@ -71,32 +71,28 @@ link.prototype = {
 	},
 
 	/**
-	 * @Override modal
+	 * @override modal
 	 */
 	modalAction: function () {
-		try {
-			const oA = this.anchor.create(false);
-			if (oA === null) return;
+		const oA = this.anchor.create(false);
+		if (oA === null) return;
 
-			if (!this.isUpdateState) {
-				const selectedFormats = this.format.getLines();
-				if (selectedFormats.length > 1) {
-					if (!this.html.insertNode(domUtils.createElement(selectedFormats[0].nodeName, null, oA), null, false)) return;
-				} else {
-					if (!this.html.insertNode(oA, null, false)) return;
-				}
-
-				this.selection.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
+		if (!this.isUpdateState) {
+			const selectedFormats = this.format.getLines();
+			if (selectedFormats.length > 1) {
+				if (!this.html.insertNode(domUtils.createElement(selectedFormats[0].nodeName, null, oA), null, false)) return;
 			} else {
-				// set range
-				const textNode = this.controller.currentTarget.childNodes[0];
-				this.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
+				if (!this.html.insertNode(oA, null, false)) return;
 			}
 
-			return true;
-		} catch {
-			return false;
+			this.selection.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
+		} else {
+			// set range
+			const textNode = this.controller.currentTarget.childNodes[0];
+			this.selection.setRange(textNode, 0, textNode, textNode.textContent.length);
 		}
+
+		return true;
 	},
 
 	/**

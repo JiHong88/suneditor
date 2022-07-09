@@ -27,7 +27,7 @@ fontSize.type = 'dropdown';
 fontSize.className = 'se-btn-select se-btn-tool-size';
 fontSize.prototype = {
 	/**
-	 * @Override core
+	 * @override core
 	 */
 	active: function (element) {
 		if (!element) {
@@ -41,7 +41,7 @@ fontSize.prototype = {
 	},
 
 	/**
-	 * @Override dropdown
+	 * @override dropdown
 	 */
 	on: function () {
 		const sizeList = this.sizeList;

@@ -1,7 +1,7 @@
 'use strict';
 
 import EditorInterface from '../../interface/editor';
-import colorPicker from '../../modules/colorPicker';
+import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 
 const fontColor = function (editor, target) {
@@ -12,7 +12,7 @@ const fontColor = function (editor, target) {
 	this.icon = this.icons.font_color;
 
 	// members
-	this.colorPicker = new colorPicker(this, 'color', '#333333', this.options.colorList_font);
+	this.colorPicker = new ColorPicker(this, 'color', '#333333', this.options.colorList_font);
 
 	// create HTML
 	const menu = CreateHTML(this.colorPicker.target);

@@ -18,14 +18,14 @@ const math = function (editor, target) {
 	// members
 	this.modal = new Modal(this, modalEl);
 	this.controller = new Controller(this, controllerEl, 'bottom');
-	this.focusElement = modalEl.querySelector('.se-math-exp');
+	this.textArea = modalEl.querySelector('.se-math-exp');
 	this.previewElement = modalEl.querySelector('.se-math-preview');
 	this.fontSizeElement = modalEl.querySelector('.se-math-size');
 	this.isUpdateState = false;
 
 	// init
 	this.previewElement.style.fontSize = this.defaultFontSize;
-	this.eventManager.addEvent(this.focusElement, env.isIE ? 'textinput' : 'input', RenderMathExp.bind(this));
+	this.eventManager.addEvent(this.textArea, env.isIE ? 'textinput' : 'input', RenderMathExp.bind(this));
 	this.eventManager.addEvent(
 		this.fontSizeElement,
 		'change',
@@ -66,7 +66,7 @@ math.prototype = {
 	},
 
 	/**
-	 * @override modal
+	 * @override type = "modal"
 	 */
 	open: function () {
 		this.modal.open();
@@ -83,7 +83,7 @@ math.prototype = {
 		} else if (this.controller.currentTarget) {
 			const exp = converter.entityToHTML(this.controller.currentTarget.getAttribute('data-exp'));
 			const fontSize = this.controller.currentTarget.getAttribute('data-font-size') || '1em';
-			this.focusElement.value = exp;
+			this.textArea.value = exp;
 			this.fontSizeElement.value = fontSize;
 			this.previewElement.innerHTML = this._renderer(exp);
 			this.previewElement.style.fontSize = fontSize;
@@ -93,52 +93,48 @@ math.prototype = {
 	/**
 	 * @override modal
 	 */
-	init: function () {
-		this.controller.close();
-		this.focusElement.value = '';
-		this.previewElement.innerHTML = '';
+	modalAction: function () {
+		if (this.textArea.value.trim().length === 0) return false;
+
+		const mathExp = this.textArea.value;
+		const katexEl = this.previewElement.querySelector('.katex');
+
+		if (!katexEl) return false;
+		katexEl.className = '__se__katex ' + katexEl.className;
+		katexEl.setAttribute('contenteditable', false);
+		katexEl.setAttribute('data-exp', converter.htmlToEntity(mathExp));
+		katexEl.setAttribute('data-font-size', this.fontSizeElement.value);
+		katexEl.style.fontSize = this.fontSizeElement.value;
+
+		if (!this.isUpdateState) {
+			const selectedFormats = this.format.getLines();
+
+			if (selectedFormats.length > 1) {
+				const oFormat = domUtils.createElement(selectedFormats[0].nodeName, null, katexEl);
+				if (!this.html.insertNode(oFormat, null, false)) return false;
+			} else {
+				if (!this.html.insertNode(katexEl, null, false)) return false;
+			}
+
+			const empty = domUtils.createTextNode(unicode.zeroWidthSpace);
+			katexEl.parentNode.insertBefore(empty, katexEl.nextSibling);
+			this.selection.setRange(katexEl, 0, katexEl, 1);
+		} else {
+			const containerEl = domUtils.getParentElement(this.controller.currentTarget, '.katex');
+			containerEl.parentNode.replaceChild(katexEl, containerEl);
+			this.selection.setRange(katexEl, 0, katexEl, 1);
+		}
+
+		return true;
 	},
 
 	/**
-	 * @Override modal
+	 * @override modal
 	 */
-	modalAction: function (e) {
-		try {
-			if (this.focusElement.value.trim().length === 0) return false;
-
-			const mathExp = this.focusElement.value;
-			const katexEl = this.previewElement.querySelector('.katex');
-
-			if (!katexEl) return false;
-			katexEl.className = '__se__katex ' + katexEl.className;
-			katexEl.setAttribute('contenteditable', false);
-			katexEl.setAttribute('data-exp', converter.htmlToEntity(mathExp));
-			katexEl.setAttribute('data-font-size', this.fontSizeElement.value);
-			katexEl.style.fontSize = this.fontSizeElement.value;
-
-			if (!this.isUpdateState) {
-				const selectedFormats = this.format.getLines();
-
-				if (selectedFormats.length > 1) {
-					const oFormat = domUtils.createElement(selectedFormats[0].nodeName, null, katexEl);
-					if (!this.html.insertNode(oFormat, null, false)) return false;
-				} else {
-					if (!this.html.insertNode(katexEl, null, false)) return false;
-				}
-
-				const empty = domUtils.createTextNode(unicode.zeroWidthSpace);
-				katexEl.parentNode.insertBefore(empty, katexEl.nextSibling);
-				this.selection.setRange(katexEl, 0, katexEl, 1);
-			} else {
-				const containerEl = domUtils.getParentElement(this.controller.currentTarget, '.katex');
-				containerEl.parentNode.replaceChild(katexEl, containerEl);
-				this.selection.setRange(katexEl, 0, katexEl, 1);
-			}
-
-			return true;
-		} catch (e) {
-			return false;
-		}
+	init: function () {
+		this.controller.close();
+		this.textArea.value = '';
+		this.previewElement.innerHTML = '';
 	},
 
 	/**
@@ -164,13 +160,13 @@ math.prototype = {
 
 	_renderer: function (exp) {
 		let result = '';
-        try {
-            result = this.options.katex.src.renderToString(exp, {throwOnError: true, displayMode: true});
-        } catch(error) {
-            result = '<span class="se-math-katex-error">' + error + '</span>';
-            console.warn('[SUNEDITOR.math.Katex.error] ', error);
-        }
-        return result;
+		try {
+			result = this.options.katex.src.renderToString(exp, { throwOnError: true, displayMode: true });
+		} catch (error) {
+			result = '<span class="se-math-katex-error">' + error.message + '</span>';
+			console.warn('[SUNEDITOR.math.Katex.error] ', error.message);
+		}
+		return result;
 	},
 
 	constructor: math

@@ -1,7 +1,7 @@
 'use strict';
 
 import EditorInterface from '../../interface/editor';
-import colorPicker from '../../modules/colorPicker';
+import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 
 const backgroundColor = function (editor, target) {
@@ -12,7 +12,7 @@ const backgroundColor = function (editor, target) {
 	this.icon = this.icons.background_color;
 
 	// members
-	this.colorPicker = new colorPicker(this, 'backgroundColor', '#ffffff', this.options.colorList_background);
+	this.colorPicker = new ColorPicker(this, 'backgroundColor', '#ffffff', this.options.colorList_background);
 
 	// create HTML
 	const menu = CreateHTML(this.colorPicker.target);

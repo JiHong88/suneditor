@@ -25,7 +25,7 @@ textStyle.type = 'dropdown';
 textStyle.className = '';
 textStyle.prototype = {
 	/**
-	 * @Override dropdown
+	 * @override dropdown
 	 */
 	on: function () {
 		const styleButtonList = this.styleList;

@@ -25,7 +25,7 @@ paragraphStyle.type = 'dropdown';
 paragraphStyle.className = '';
 paragraphStyle.prototype = {
 	/**
-	 * @Override dropdown
+	 * @override dropdown
 	 */
 	on: function () {
 		const paragraphList = this.classList;

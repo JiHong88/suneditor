@@ -107,7 +107,7 @@ HTML.prototype = {
 		try {
 			this._consistencyCheckOfHTML.call(this, dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, true);
 		} catch (error) {
-			console.warn('[SUNEDITOR.html.clean.fail] ' + error);
+			console.warn('[SUNEDITOR.html.clean.fail] ' + error.message);
 		}
 
 		if (this.editor._MELInfo && this.editor._MELInfo.query) {
@@ -197,7 +197,7 @@ HTML.prototype = {
 				else this.selection.setRange(a, offset, a, offset);
 			} catch (error) {
 				if (this.status.isDisabled || this.status.isReadOnly) return;
-				console.warn('[SUNEDITOR.html.insert.warn] ' + error);
+				console.warn('[SUNEDITOR.html.insert.warn] ' + error.message);
 				this.editor.execCommand('insertHTML', false, html);
 			}
 		} else {

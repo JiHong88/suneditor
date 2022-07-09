@@ -12,6 +12,7 @@ const Modal = function (inst, element) {
 	this.modalForm = element;
 	this.modalElement = this.context.element._modal;
 	this.focusElement = element.querySelector('[data-focus]');
+	this.isUpdate = false;
 	this._closeListener = [CloseListener.bind(this), OnClick_dialog.bind(this)];
 	this._bindClose = null;
 	this._onClickEvent = null;
@@ -46,7 +47,8 @@ Modal.prototype = {
 			this.modalElement.area.style.position = 'absolute';
 		}
 
-		if (typeof this.inst.on === 'function') this.inst.on(this.kind === this.editor.currentControllerName);
+		this.isUpdate = this.kind === this.editor.currentControllerName;
+		if (typeof this.inst.on === 'function') this.inst.on(this.isUpdate);
 
 		this.modalElement.area.style.display = 'block';
 		this.modalElement.back.style.display = 'block';
@@ -93,8 +95,8 @@ function Action (e) {
 			// history stack
 			this.history.push(false);
 		}
-	} catch (e) {
-		console.warn('[SUNEDITOR.plugins.' + this.kind + '.warn] ' + e);
+	} catch (error) {
+		console.warn('[SUNEDITOR.Modal[' + this.kind + '].warn] ' + error.message);
 		this.close();
 	} finally {
 		this.editor.closeLoading();

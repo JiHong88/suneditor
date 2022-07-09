@@ -13,18 +13,18 @@ export default {
 
         const context = core.context;
         context.imageGallery = {
-            title: core.lang.toolbar.imageGallery, // @Required @Override fileBrowser - File browser window title.
-            url: core.options.imageGalleryUrl, // @Required @Override fileBrowser - File server url.
-            header: core.options.imageGalleryHeader, // @Required @Override fileBrowser - File server http header.
-            listClass: 'se-image-list', // @Required @Override fileBrowser - Class name of list div.
-            itemTemplateHandler: this.drawItems, // @Required @Override fileBrowser - Function that defines the HTML of an file item.
-            selectorHandler: this.setImage.bind(core), // @Required @Override fileBrowser - Function that action when item click.
-            columnSize: 4 // @Option @Override fileBrowser - Number of "div.se-file-item-column" to be created (default: 4)
+            title: core.lang.toolbar.imageGallery, // @Required @override fileBrowser - File browser window title.
+            url: core.options.imageGalleryUrl, // @Required @override fileBrowser - File server url.
+            header: core.options.imageGalleryHeader, // @Required @override fileBrowser - File server http header.
+            listClass: 'se-image-list', // @Required @override fileBrowser - Class name of list div.
+            itemTemplateHandler: this.drawItems, // @Required @override fileBrowser - Function that defines the HTML of an file item.
+            selectorHandler: this.setImage.bind(core), // @Required @override fileBrowser - Function that action when item click.
+            columnSize: 4 // @Option @override fileBrowser - Number of "div.se-file-item-column" to be created (default: 4)
         };
     },
     
     /**
-     * @Required @Override fileBrowser
+     * @Required @override fileBrowser
      * @description Open a file browser.
      * @param {Function|null} selectorHandler When the function comes as an argument value, it substitutes "context.selectorHandler".
      */
@@ -33,7 +33,7 @@ export default {
     },
 
     /**
-     * @Required @Override fileBrowser
+     * @Required @override fileBrowser
      * @description Define the HTML of the item to be put in "div.se-file-item-column".
      * Format: [
      *      { src: "image src", name: "name(@option)", alt: "image alt(@option)", tag: "tag name(@option)" }

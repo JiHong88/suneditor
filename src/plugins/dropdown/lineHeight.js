@@ -26,7 +26,7 @@ lineHeight.type = 'dropdown';
 lineHeight.className = '';
 lineHeight.prototype = {
 	/**
-	 * @Override dropdown
+	 * @override dropdown
 	 */
 	on: function () {
 		const format = this.format.getLine(this.selection.getNode());

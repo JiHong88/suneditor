@@ -6,19 +6,19 @@ import CoreInterface from '../interface/_core';
 /**
  * @description Create a color picker element and register for related events. (this.target)
  * When calling the color selection, "submit", and "remove" buttons, the "action" method of the instance is called with the "color" value as an argument.
- * @param {Object} instance The "this" object of the calling function.
- * @param {string} style style property ("color", "backgroundColor"..)
+ * @param {Object} inst The "this" object of the calling function.
+ * @param {string} styles style property ("color", "backgroundColor"..)
  * @param {string} defaultColor default color
  * @param {Array.<string>} colorList color list
  */
-const ColorPicker = function (instance, style, defaultColor, colorList) {
-	CoreInterface.call(this, instance.editor);
+const ColorPicker = function (inst, styles, defaultColor, colorList) {
+	CoreInterface.call(this, inst.editor);
 	// members
-	this.instance = instance;
-	this.target = CreateHTML(instance.editor, colorList);
+	this.inst = inst;
+	this.target = CreateHTML(inst.editor, colorList);
 	this.inputElement = this.target.querySelector('._se_color_picker_input');
 	this.defaultColor = defaultColor;
-	this.styleProperty = style;
+	this.styleProperties = styles;
 	this.currentColor = '';
 	this.colorList = this.target.querySelectorAll('li button') || [];
 
@@ -35,7 +35,7 @@ ColorPicker.prototype = {
 	 * @param {string|null} color Color value
 	 */
 	init: function (node) {
-		const computedColor = this.wwComputedStyle[this.styleProperty];
+		const computedColor = this.wwComputedStyle[this.styleProperties];
 		const defaultColor = computedColor ? (this.isHexColor(computedColor) ? computedColor : this.rgb2hex(computedColor)) : this.defaultColor;
 
 		let fillColor = this._getColorInNode(node) || defaultColor;
@@ -100,10 +100,10 @@ ColorPicker.prototype = {
 	 */
 	_getColorInNode: function (node) {
 		let findColor = '';
-		const styleProperty = this.styleProperty;
+		const sp = this.styleProperties;
 
 		while (node && !domUtils.isWysiwygFrame(node) && findColor.length === 0) {
-			if (node.nodeType === 1 && node.style[styleProperty]) findColor = node.style[styleProperty];
+			if (node.nodeType === 1 && node.style[sp]) findColor = node.style[sp];
 			node = node.parentNode;
 		}
 
@@ -134,11 +134,11 @@ ColorPicker.prototype = {
 };
 
 function Submit() {
-	this.instance.action(this.currentColor);
+	this.inst.action(this.currentColor);
 }
 
 function Remove() {
-	this.instance.action(null);
+	this.inst.action(null);
 }
 
 function OnChangeInput(e) {

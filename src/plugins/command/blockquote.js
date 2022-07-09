@@ -18,7 +18,7 @@ blockquote.type = 'command';
 blockquote.className = '';
 blockquote.prototype = {
 	/**
-	 * @Override core
+	 * @override core
 	 */
 	active: function (element) {
 		if (!element) {
@@ -32,7 +32,7 @@ blockquote.prototype = {
 	},
 
 	/**
-	 * @Override core
+	 * @override core
 	 */
 	action: function () {
 		const currentBlockquote = domUtils.getParentElement(this.selection.getNode(), 'blockquote');

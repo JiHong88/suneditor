@@ -1225,7 +1225,7 @@ Core.prototype = {
 						iframe.contentWindow.print();
 					}
 				} catch (error) {
-					throw Error('[SUNEDITOR.print.fail] error: ' + error);
+					throw Error('[SUNEDITOR.print.fail] error: ' + error.message);
 				} finally {
 					this.closeLoading();
 					domUtils.removeItem(iframe);
@@ -1694,19 +1694,21 @@ Core.prototype = {
 			this.registerPlugin(key, this._pluginCallButtons[key]);
 			plugin = this.plugins[key];
 
-			if (typeof plugin.checkFileInfo === 'function' && typeof plugin.resetFileInfo === 'function') {
-				this._fileInfoPluginsCheck.push(plugin.checkFileInfo.bind(this));
-				this._fileInfoPluginsReset.push(plugin.resetFileInfo.bind(this));
-			}
-
-			if (_w.Array.isArray(plugin.fileTags)) {
-				const fileTags = plugin.fileTags;
-				this._fileManager.tags = this._fileManager.tags.concat(fileTags);
-				filePluginRegExp.push(key);
-				for (let tag = 0, tLen = fileTags.length; tag < tLen; tag++) {
-					this._fileManager.pluginMap[fileTags[tag].toLowerCase()] = key;
+			// Filemanager
+			if (typeof plugin.__fileManagement === 'object') {
+				const fm = plugin.__fileManagement;
+				this._fileInfoPluginsCheck.push(fm._checkInfo.bind(fm));
+				this._fileInfoPluginsReset.push(fm._resetInfo.bind(fm));
+				if (_w.Array.isArray(fm.tagNames)) {
+					const tagNames = fm.tagNames;
+					this._fileManager.tags = this._fileManager.tags.concat(tagNames);
+					filePluginRegExp.push(key);
+					for (let tag = 0, tLen = tagNames.length; tag < tLen; tag++) {
+						this._fileManager.pluginMap[tagNames[tag].toLowerCase()] = key;
+					}
 				}
 			}
+			
 
 			if (typeof plugin.onPluginMousedown === 'function') {
 				this._onMousedownPlugins.push(plugin.onPluginMousedown.bind(plugin));

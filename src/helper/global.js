@@ -55,17 +55,17 @@ export function getXMLHttpRequest() {
 	/** IE */
 	if (_w.ActiveXObject) {
 		try {
-			return new ActiveXObject('Msxml2.XMLHTTP');
+			return new _w.ActiveXObject('Msxml2.XMLHTTP');
 		} catch (e) {
 			try {
-				return new ActiveXObject('Microsoft.XMLHTTP');
+				return new _w.ActiveXObject('Microsoft.XMLHTTP');
 			} catch (e1) {
 				return null;
 			}
 		}
 	} else if (_w.XMLHttpRequest) {
 		/** netscape */
-		return new XMLHttpRequest();
+		return new _w.XMLHttpRequest();
 	} else {
 		/** fail */
 		return null;

@@ -14,10 +14,10 @@ export default {
         const options = core.options;
         const context = core.context;
         const contextVideo = context.video = {
-            _infoList: [], // @Override fileManager
-            _infoIndex: 0, // @Override fileManager
-            _uploadFileLength: 0, // @Override fileManager
-            focusElement: null, // @Override modal // This element has focus when the modal is opened.
+            _infoList: [], // @override fileManager
+            _infoIndex: 0, // @override fileManager
+            _uploadFileLength: 0, // @override fileManager
+            focusElement: null, // @override modal // This element has focus when the modal is opened.
             sizeUnit: options._videoSizeUnit,
             _align: 'none',
             _floatClassRegExp: '__se__float\\-[a-z]+',
@@ -25,11 +25,11 @@ export default {
             _videoRatio: (options.videoRatio * 100) + '%',
             _defaultRatio: (options.videoRatio * 100) + '%',
             _linkValue: '',
-            // @require @Override mediaContainer
+            // @require @override mediaContainer
             _element: null,
             _cover: null,
             _container: null,
-            // @Override resizing properties
+            // @override resizing properties
             inputX: null,
             inputY: null,
             _element_w: 1,
@@ -250,12 +250,12 @@ export default {
     },
 
     /**
-     * @Override @Required fileManager
+     * @override @Required fileManager
      */
     fileTags: ['iframe', 'video'],
 
     /**
-     * @Override core, resizing, fileManager
+     * @override core, resizing, fileManager
      * @description It is called from core.component.select
      * @param {Element} element Target element
      */
@@ -264,7 +264,7 @@ export default {
     },
 
     /**
-     * @Override fileManager, resizing
+     * @override fileManager, resizing
      */
     destroy: function (element) {
         const frame = element || this.context.video._element;
@@ -289,7 +289,7 @@ export default {
     },
 
     /**
-     * @Required @Override modal
+     * @Required @override modal
      */
     on: function (update) {
         const contextVideo = this.context.video;
@@ -309,7 +309,7 @@ export default {
     },
 
     /**
-     * @Required @Override modal
+     * @Required @override modal
      */
     open: function () {
         this.plugins.modal.open.call(this, 'video', 'video' === this.currentControllerName);
@@ -325,7 +325,7 @@ export default {
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      * @param {string} xy 'x': width, 'y': height
      * @param {KeyboardEvent} e Event object
      */
@@ -344,7 +344,7 @@ export default {
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     setRatio: function () {
         this.plugins.resizing._module_setRatio.call(this, this.context.video);
@@ -689,7 +689,7 @@ export default {
     },
 
     /**
-     * @Required @Override fileManager, resizing
+     * @Required @override fileManager, resizing
      */
     onModifyMode: function (element, size) {
         const contextVideo = this.context.video;
@@ -722,7 +722,7 @@ export default {
     },
 
     /**
-     * @Required @Override fileManager, resizing
+     * @Required @override fileManager, resizing
      */
     openModify: function (notOpen) {
         const contextVideo = this.context.video;
@@ -762,21 +762,21 @@ export default {
     },
 
     /**
-     * @Override fileManager
+     * @override fileManager
      */
     checkFileInfo: function () {
         this.plugins.fileManager.checkInfo.call(this, 'video', ['iframe', 'video'], this.events.onVideoUpload, this.plugins.video._update_videoCover.bind(this), true);
     },
 
     /**
-     * @Override fileManager
+     * @override fileManager
      */
     resetFileInfo: function () {
         this.plugins.fileManager.resetInfo.call(this, 'video', this.events.onVideoUpload);
     },
 
     /**
-     * @Override fileManager
+     * @override fileManager
      */
     applySize: function (w, h) {
         const contextVideo = this.context.video;
@@ -797,14 +797,14 @@ export default {
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     sizeRevert: function () {
         this.plugins.resizing._module_sizeRevert.call(this, this.context.video);
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     setSize: function (w, h, notResetPercentage, direction) {
         const contextVideo = this.context.video;
@@ -836,14 +836,14 @@ export default {
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     setAutoSize: function () {
         this.plugins.video.setPercentSize.call(this, 100, this.context.video._defaultRatio);
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     setOriginSize: function (dataSize) {
         const contextVideo = this.context.video;
@@ -870,7 +870,7 @@ export default {
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     setPercentSize: function (w, h) {
         const contextVideo = this.context.video;
@@ -893,7 +893,7 @@ export default {
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     cancelPercentAttr: function () {
         const contextVideo = this.context.video;
@@ -911,7 +911,7 @@ export default {
     },
 
     /**
-     * @Override resizing
+     * @override resizing
      */
     setAlign: function (align, element, cover, container) {
         const contextVideo = this.context.video;
@@ -947,7 +947,7 @@ export default {
     },
 
     /**
-     * @Override modal
+     * @override modal
      */
     init: function () {
         const contextVideo = this.context.video;

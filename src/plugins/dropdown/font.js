@@ -29,7 +29,7 @@ font.type = 'dropdown';
 font.className = 'se-btn-select se-btn-tool-font';
 font.prototype = {
 	/**
-	 * @Override core
+	 * @override core
 	 */
 	active: function (element) {
 		const target = this.targetText;
@@ -50,7 +50,7 @@ font.prototype = {
 	},
 
 	/**
-	 * @Override dropdown
+	 * @override dropdown
 	 */
 	on: function () {
 		const fontList = this.fontList;
