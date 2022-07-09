@@ -92,6 +92,7 @@ audio.prototype = {
 			this.preview.style.textDecoration = '';
 		}
 		this._element = null;
+		this.controller.close();
 	},
 
 	/**
@@ -99,7 +100,7 @@ audio.prototype = {
 	 * @param {Element} target Target button element
 	 * @returns
 	 */
-	controllerAction: function (e) {
+	controllerAction: function (target) {
 		if (/update/.test(target.getAttribute('data-command'))) {
 			if (this.audioUrlFile) this.urlValue = this.preview.textContent = this.audioUrlFile.value = this._element.src;
 			this.open();
@@ -148,7 +149,7 @@ audio.prototype = {
 		domUtils.removeItem(container);
 		this.init();
 
-		if (emptyDiv !== this.context.element.wysiwyg)
+		if (emptyDiv !== this.context.element.wysiwyg) {
 			domUtils.removeAllParents(
 				emptyDiv,
 				function (current) {
@@ -156,9 +157,10 @@ audio.prototype = {
 				},
 				null
 			);
+		}
 
 		// focus
-		this.focusEdge(focusEl);
+		this.editor.focusEdge(focusEl);
 
 		// history stack
 		this.history.push(false);
@@ -463,7 +465,7 @@ function CreateHTML_controller(editor) {
 		'</div>' +
 		'</div>';
 
-	return domUtils.createElement('DIV', { class: 'se-controlle' }, html);
+	return domUtils.createElement('DIV', { class: 'se-controller' }, html);
 }
 
 export default audio;

@@ -144,7 +144,6 @@ math.prototype = {
 	 */
 	controllerAction: function (target) {
 		const command = target.getAttribute('data-command');
-
 		if (/update/.test(command)) {
 			this.modal.open();
 		} else {

@@ -22,7 +22,6 @@ const FileManager = function (inst, params) {
 	this.infoList = [];
 	this.infoIndex = 0;
 	this.uploadFileLength = 0;
-	this.xmlHttp = null;
 };
 
 FileManager.prototype = {
@@ -30,7 +29,7 @@ FileManager.prototype = {
 	 * @description Upload the file to the server.
 	 * @param {string} uploadUrl Upload server url
 	 * @param {Object|null} uploadHeader Request header
-	 * @param {FormData|Files} data FormData in body or Files array
+	 * @param {Files|{FormData, size}} data FormData in body or Files array
 	 * @param {Function|null} callBack Success call back function
 	 * @param {Function|null} errorCallBack Error call back function
 	 * @example this.plugins.fileManager.upload.call(this, imageUploadUrl, this.options.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.events.onImageUploadError);
@@ -38,19 +37,20 @@ FileManager.prototype = {
 	upload: function (uploadUrl, uploadHeader, data, callBack, errorCallBack) {
 		this.editor.openLoading();
 
+		let formData = null;
 		// create formData
 		if (data.length) {
-			const formData = new this._w.FormData();
+			formData = new this._w.FormData();
 			for (let i = 0, len = data.length; i < len; i++) {
 				formData.append('file-' + i, data[i]);
 			}
-			data = formData;
 			this.uploadFileLength = data.length;
 		} else {
-			this.uploadFileLength = data; //@todo formData
+			formData = data.formData;
+			this.uploadFileLength = data.size;
 		}
 
-		const xmlHttp = (this.xmlHttp = global.getXMLHttpRequest());
+		const xmlHttp = global.getXMLHttpRequest();
 		xmlHttp.onreadystatechange = CallBackUpload.bind(this, xmlHttp, callBack, errorCallBack);
 		xmlHttp.open('post', uploadUrl, true);
 		if (uploadHeader !== null && typeof uploadHeader === 'object' && this._w.Object.keys(uploadHeader).length > 0) {
@@ -59,7 +59,7 @@ FileManager.prototype = {
 			}
 		}
 
-		xmlHttp.send(data);
+		xmlHttp.send(formData);
 	},
 
 	/**
