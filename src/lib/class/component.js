@@ -149,6 +149,7 @@ Component.prototype = {
 	 * @private
 	 */
 	_setComponentLineBreaker: function (element) {
+		return
 		// line breaker
 		this.editor._lineBreaker.style.display = 'none';
 		const contextEl = this.context.element;

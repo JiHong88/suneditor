@@ -6,7 +6,7 @@ import { domUtils, global } from '../helper';
 /**
  *
  * @param {*} inst
- * @param {{ tagNames: array, uploadEventHandler: Function, checkHandler: Function, isActiveSizeModule: boolean | null }} params
+ * @param {{ tagNames: array, eventHandler: Function, checkHandler: Function, isActiveSizeModule: boolean | null }} params
  */
 const FileManager = function (inst, params) {
 	CoreInterface.call(this, inst.editor);
@@ -17,7 +17,7 @@ const FileManager = function (inst, params) {
 	this.inst = inst;
 	this.tagNames = params.tagNames;
 	this.isActiveSizeModule = params.isActiveSizeModule;
-	this.uploadEventHandler = params.uploadEventHandler;
+	this.eventHandler = params.eventHandler;
 	this.checkHandler = params.checkHandler;
 	this.infoList = [];
 	this.infoIndex = 0;
@@ -158,7 +158,7 @@ FileManager.prototype = {
 		// 	this.context.resizing._resize_plugin = _resize_plugin;
 		// }
 
-		if (typeof this.uploadEventHandler === 'function') this.uploadEventHandler(element, dataIndex, state, info, --this.uploadFileLength < 0 ? 0 : this.uploadFileLength);
+		if (typeof this.eventHandler === 'function') this.eventHandler(element, dataIndex, state, info, --this.uploadFileLength < 0 ? 0 : this.uploadFileLength);
 	},
 
 	/**
@@ -175,7 +175,7 @@ FileManager.prototype = {
 			// reset
 			if (this._componentsInfoReset) {
 				for (let i = 0, len = tags.length; i < len; i++) {
-					this.setInfo(this.kind, tags[i], this.uploadEventHandler, null, this.isActiveSizeModule);
+					this.setInfo(tags[i], null);
 				}
 				return;
 			} else {
@@ -209,11 +209,13 @@ FileManager.prototype = {
 			tag = tags[i];
 			if (!domUtils.getParentElement(tag, this.component.is) || !_checkImageComponent(tag)) {
 				currentTags.push(this.infoIndex);
-				this.checkHandler(tag);
+				tag = this.checkHandler(tag);
+				if (!tag) console.warn('[SUNEDITOR.FileManager[' + this.kind + '].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).')
+				else this.setInfo(tag, null);
 			} else if (!tag.getAttribute('data-index') || infoIndex.indexOf(tag.getAttribute('data-index') * 1) < 0) {
 				currentTags.push(this.infoIndex);
 				tag.removeAttribute('data-index');
-				this.setInfo(this.kind, tag, this.uploadEventHandler, null, this.isActiveSizeModule);
+				this.setInfo(tag, null);
 			} else {
 				currentTags.push(tag.getAttribute('data-index') * 1);
 			}
@@ -224,7 +226,7 @@ FileManager.prototype = {
 			if (currentTags.indexOf(dataIndex) > -1) continue;
 
 			this.infoList.splice(i, 1);
-			if (typeof uploadEventHandler === 'function') uploadEventHandler.call(this.events, null, dataIndex, 'delete', null, 0);
+			if (typeof this.eventHandler === 'function') this.eventHandler(null, dataIndex, 'delete', null, 0);
 			i--;
 		}
 
@@ -234,13 +236,12 @@ FileManager.prototype = {
 	/**
 	 * @description Reset info object and "infoList = []", "infoIndex = 0"
 	 * @param {string} this.kind Plugin name
-	 * @param {Function|null} uploadEventHandler Event handler to process updated file info (created in setInfo)
 	 * @private
 	 */
-	_resetInfo: function (uploadEventHandler) {
-		if (typeof uploadEventHandler === 'function') {
+	_resetInfo: function () {
+		if (typeof this.eventHandler === 'function') {
 			for (let i = 0, len = this.infoList.length; i < len; i++) {
-				uploadEventHandler.call(this.events, null, this.infoList[i].index, 'delete', null, 0);
+				this.eventHandler.call(this.events, null, this.infoList[i].index, 'delete', null, 0);
 			}
 		}
 
@@ -258,7 +259,7 @@ FileManager.prototype = {
 			for (let i = 0, len = this.infoList.length; i < len; i++) {
 				if (index === this.infoList[i].index) {
 					this.infoList.splice(i, 1);
-					if (typeof this.uploadEventHandler === 'function') this.uploadEventHandler.call(this.events, null, index, 'delete', null, 0);
+					if (typeof this.eventHandler === 'function') this.eventHandler(null, index, 'delete', null, 0);
 					return;
 				}
 			}

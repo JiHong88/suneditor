@@ -81,7 +81,7 @@ Controller.prototype = {
 		this.editor.openControllers.push({ position: this.position, form: form, target: target, inst: this });
 		this.editor._antiBlur = true;
 
-		if (typeof this.events.showController === 'function') this.events.showController(this.kind, this.editor.openControllers);
+		if (typeof this.events.onShowController === 'function') this.events.onShowController(this.kind, this.editor.openControllers);
 	},
 
 	/**

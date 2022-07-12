@@ -1,4 +1,4 @@
-import EditorInterface from "../interface/editor";
+import EditorInterface from '../interface/editor';
 
 class Events extends EditorInterface {
 	onload: (reload: boolean) => void;
@@ -26,10 +26,8 @@ class Events extends EditorInterface {
 	/**
 	 * @description Called just before the inline toolbar is positioned and displayed on the screen.
 	 * @param toolbar Toolbar Element
-	 * @param context The editor's context object
-	 * @param core Core object
 	 */
-	showInline: (toolbar: Element, context: Context) => void;
+	onShowInline: (toolbar: Element) => void;
 
 	/**
 	 * @description Called just after the controller is positioned and displayed on the screen.
@@ -38,7 +36,7 @@ class Events extends EditorInterface {
 	 * @param controllers Array of Controller elements
 	 * @param core Core object
 	 */
-	showController: (name: String, controllers: Controllers) => void;
+	onShowController: (name: String, controllers: Controllers) => void;
 
 	/**
 	 * @description It replaces the default callback function of the image upload
@@ -90,7 +88,7 @@ class Events extends EditorInterface {
 	 * @param isFullScreen Whether the current full screen mode
 	 * @param core Core object
 	 */
-	 onToggleFullScreen: (isFullScreen: boolean) => void;
+	onToggleFullScreen: (isFullScreen: boolean) => void;
 
 	/**
 	 * @description Called before the image is uploaded
@@ -177,7 +175,7 @@ class Events extends EditorInterface {
 	 * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
 	 * @param core Core object
 	 */
-	onImageUpload: (targetElement: HTMLImageElement, index: number, state: "create" | "update" | "delete", info: fileInfo, remainingFilesCount: number) => void;
+	onImageUpload: (targetElement: HTMLImageElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number) => void;
 
 	/**
 	 * @description Called when the video(iframe, video) is uploaded, updated, deleted
@@ -195,7 +193,7 @@ class Events extends EditorInterface {
 	 * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
 	 * @param core Core object
 	 */
-	onVideoUpload: (targetElement: HTMLIFrameElement | HTMLVideoElement, index: number, state: "create" | "update" | "delete", info: fileInfo, remainingFilesCount: number) => void;
+	onVideoUpload: (targetElement: HTMLIFrameElement | HTMLVideoElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number) => void;
 
 	/**
 	 * @description Called when the audio is uploaded, updated, deleted
@@ -213,7 +211,7 @@ class Events extends EditorInterface {
 	 * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
 	 * @param core Core object
 	 */
-	onAudioUpload: (targetElement: HTMLAudioElement, index: number, state: "create" | "update" | "delete", info: fileInfo, remainingFilesCount: number) => void;
+	onAudioUpload: (targetElement: HTMLAudioElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number) => void;
 
 	/**
 	 * @description Called when the image is upload failed

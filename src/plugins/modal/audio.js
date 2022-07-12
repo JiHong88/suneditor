@@ -18,7 +18,7 @@ const audio = function (editor, target) {
 	// members
 	this.modal = new Modal(this, modalEl);
 	this.controller = new Controller(this, controllerEl, 'bottom');
-	this.fileManager = new FileManager(this, { tagNames: ['audio'], uploadEventHandler: this.events.onAudioUpload, checkHandler: CheckContainer.bind(this), isActiveSizeModule: null });
+	this.fileManager = new FileManager(this, { tagNames: ['audio'], eventHandler: this.events.onAudioUpload, checkHandler: CheckContainer.bind(this), isActiveSizeModule: null });
 	this.audioInputFile = modalEl.querySelector('._se_audio_files');
 	this.audioUrlFile = modalEl.querySelector('.se-input-url');
 	this.preview = modalEl.querySelector('.se-link-preview');
@@ -387,8 +387,9 @@ function CheckContainer(element) {
 		console.warn('[SUNEDITOR.audio.error] Maybe the audio tag is nested.', error);
 	}
 
-	this.fileManager.setInfo(element, null);
 	this.init();
+	
+	return element;
 }
 
 function CreateHTML_modal(editor) {

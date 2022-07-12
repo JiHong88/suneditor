@@ -1378,7 +1378,7 @@ editor.showInline = function (toolbar, context, core) {
  * controllers: Array of Controller elements
  * core: Core object
 */
-editor.showController = function (name, controllers, core) {
+editor.onShowController = function (name, controllers, core) {
     console.log('plugin name', name);
     console.log('controller elements', controllers);
 }

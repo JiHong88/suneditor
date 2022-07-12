@@ -352,7 +352,7 @@ Toolbar.prototype = {
 		this._inlineToolbarAttr.width = toolbar.style.width = this.options.toolbar_width;
 		this._inlineToolbarAttr.top = toolbar.style.top = (this.options.toolbar_container ? 0 : -1 - toolbar.offsetHeight) + 'px';
 
-		if (typeof this.events.showInline === 'function') this.events.showInline(toolbar, context);
+		if (typeof this.events.onShowInline === 'function') this.events.onShowInline(toolbar);
 
 		this._resetSticky();
 		this._inlineToolbarAttr.isShow = true;

@@ -7,7 +7,6 @@ import ModuleInterface from '../interface/_module';
 
 // base
 import history from './base/history';
-import Events from './base/events';
 import EventManager from './base/eventManager';
 
 // modules
@@ -1639,7 +1638,7 @@ Core.prototype = {
 		}
 
 		// base
-		this.events = Events();
+		this.events = this.options.events;
 		this.history = history(this, this._onChange_historyStack.bind(this));
 		this.eventManager = new EventManager(this);
 

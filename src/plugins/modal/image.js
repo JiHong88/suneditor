@@ -668,7 +668,7 @@ export default {
         imagePlugin.setAlign.call(this, align, oImg, cover, container);
 
         oImg.onload = imagePlugin._image_create_onload.bind(this, oImg, contextImage.svgDefaultSize, container);
-        if (this.component.insert(container, true, false, true)) this.plugins.fileManager.setInfo.call(this, 'image', oImg, this.events.onImageUpload, file, true);
+        if (this.component.insert(container, true, false, true)) this.plugins.fileManager.setInfo.call(oImg, file);
         this.context.resizing._resize_plugin = '';
     },
 
@@ -817,7 +817,7 @@ export default {
 
         // set imagesInfo
         if (init) {
-            this.plugins.fileManager.setInfo.call(this, 'image', imageEl, this.events.onImageUpload, null, true);
+            this.plugins.fileManager.setInfo.call(imageEl, null);
         }
 
         if (openController) {

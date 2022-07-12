@@ -617,7 +617,7 @@ export default {
 
         if (changed) {
             if (init) {
-                this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.events.onVideoUpload, file, true);
+                this.plugins.fileManager.setInfo.call(oFrame, file);
             }
             if (isUpdate) {
                 this.component.select(oFrame, 'video');
@@ -684,7 +684,7 @@ export default {
             console.warn('[SUNEDITOR.video.error] Maybe the video tag is nested.', error);
         }
 
-        this.plugins.fileManager.setInfo.call(this, 'video', oFrame, this.events.onVideoUpload, null, true);
+        this.plugins.fileManager.setInfo.call(oFrame, null);
         this.plugins.video.init.call(this);
     },
 

@@ -89,8 +89,17 @@ window.e = suneditor.create(document.getElementById('editor2'), {
         ['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'horizontalLine'],
         ['lineHeight', 'list', 'paragraphStyle', 'template', 'textStyle', 'table'],
         ['math', 'link', 'audio']
-    ]
+    ],
+    events: {
+        onAudioUpload: (a, b, c, d, e) => {
+            window.d = d;
+        }
+    }
 });
+
+// window.e.events.onAudioUpload = () => {
+//     console.log("arg", arguments)
+// }
 
 // const complexEditor = null;
 
