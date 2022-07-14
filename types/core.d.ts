@@ -1,10 +1,10 @@
-import { History } from './history.d';
+import { History } from './history';
 import { Plugin } from '../src/plugins/Plugin';
 import { Lang } from './Lang';
 import { SunEditorOptions } from '../src/options';
 import { Context } from '../src/lib/context';
 import { Module } from '../src/plugins/Module';
-import _Notice from './notice.d';
+import _Notice from './notice';
 
 export type Controllers = Array<string | Function | Element>;
 export type fileInfo = {

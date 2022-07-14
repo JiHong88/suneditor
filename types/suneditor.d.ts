@@ -1,4 +1,4 @@
-import { SunEditorOptions } from './options.d';
+import { SunEditorOptions } from './options';
 import SunEditor from '../src/lib/core';
 
 declare namespace _default {

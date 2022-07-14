@@ -15,9 +15,11 @@ const math = function (editor, target) {
 	const modalEl = CreateHTML_modal(editor, this);
 	const controllerEl = CreateHTML_controller(editor);
 
-	// members
+	// modules
 	this.modal = new Modal(this, modalEl);
 	this.controller = new Controller(this, controllerEl, 'bottom');
+	
+	// members
 	this.textArea = modalEl.querySelector('.se-math-exp');
 	this.previewElement = modalEl.querySelector('.se-math-preview');
 	this.fontSizeElement = modalEl.querySelector('.se-math-size');
@@ -92,6 +94,7 @@ math.prototype = {
 
 	/**
 	 * @override modal
+	 * @returns {boolean | undefined}
 	 */
 	modalAction: function () {
 		if (this.textArea.value.trim().length === 0) return false;

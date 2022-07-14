@@ -15,20 +15,19 @@ const audio = function (editor, target) {
 	const modalEl = CreateHTML_modal(editor);
 	const controllerEl = CreateHTML_controller(editor);
 
-	// members
+	// modules
 	this.modal = new Modal(this, modalEl);
 	this.controller = new Controller(this, controllerEl, 'bottom');
-	this.fileManager = new FileManager(this, { tagNames: ['audio'], eventHandler: this.events.onAudioUpload, checkHandler: CheckContainer.bind(this), isActiveSizeModule: null });
+	this.fileManager = new FileManager(this, { tagNames: ['audio'], eventHandler: this.events.onAudioUpload, checkHandler: FileCheckHandler.bind(this), isActiveSizeModule: null });
+
+	// members
 	this.audioInputFile = modalEl.querySelector('._se_audio_files');
 	this.audioUrlFile = modalEl.querySelector('.se-input-url');
 	this.preview = modalEl.querySelector('.se-link-preview');
 	this._origin_w = this.options.audioWidth;
 	this._origin_h = this.options.audioHeight;
 	this.urlValue = '';
-	// @require @override mediaContainer
 	this._element = null;
-	this._cover = null;
-	this._container = null;
 
 	// init
 	if (this.audioInputFile) {
@@ -70,14 +69,14 @@ audio.prototype = {
 
 	/**
 	 * @override modal
+	 * @returns {boolean | undefined}
 	 */
 	modalAction: function () {
 		if (this.audioInputFile && this.audioInputFile.files.length > 0) {
-			this._submitFile(this.audioInputFile.files);
+			return this._submitFile(this.audioInputFile.files);
 		} else if (this.audioUrlFile && this.urlValue.length > 0) {
-			this._submitURL(this.urlValue);
+			return this._submitURL(this.urlValue);
 		}
-
 		return true;
 	},
 
@@ -131,10 +130,7 @@ audio.prototype = {
 	ready: function (selectedElement) {
 		domUtils.addClass(selectedElement, 'active');
 		this.controller.open(selectedElement);
-
 		this._element = selectedElement;
-		this._cover = domUtils.getParentElement(selectedElement, 'FIGURE');
-		this._container = domUtils.getParentElement(selectedElement, this.component.is);
 	},
 
 	/**
@@ -167,7 +163,7 @@ audio.prototype = {
 	},
 
 	_submitFile: function (fileList) {
-		if (fileList.length === 0) return;
+		if (fileList.length === 0) return false;
 
 		let fileSize = 0;
 		let files = [];
@@ -179,20 +175,12 @@ audio.prototype = {
 		}
 
 		const limitSize = this.options.audioUploadSizeLimit;
-		if (limitSize > 0) {
-			let infoSize = 0;
-			const infoList = this.fileManager.infoList;
-			for (let i = 0, len = infoList.length; i < len; i++) {
-				infoSize += infoList[i].size * 1;
+		if (limitSize > 0 && fileSize + this.fileManager.getSize() > limitSize) {
+			const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable total audios: ' + limitSize / 1000 + 'KB';
+			if (typeof this.events.onAudioUploadError !== 'function' || this.events.onAudioUploadError(err, { limitSize: limitSize, currentSize: this.fileManager.getSize(), uploadSize: fileSize })) {
+				this.notice.open(err);
 			}
-
-			if (fileSize + infoSize > limitSize) {
-				const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable total audios: ' + limitSize / 1000 + 'KB';
-				if (typeof this.events.onAudioUploadError !== 'function' || this.events.onAudioUploadError(err, { limitSize: limitSize, currentSize: infoSize, uploadSize: fileSize })) {
-					this.notice.open(err);
-				}
-				return;
-			}
+			return false;
 		}
 
 		const info = {
@@ -213,7 +201,8 @@ audio.prototype = {
 				}.bind(this)
 			);
 
-			if (!result) return;
+			if (typeof result === 'undefined') return;
+			if (!result) return false;
 			if (typeof result === 'object' && result.length > 0) files = result;
 		}
 
@@ -235,8 +224,9 @@ audio.prototype = {
 	},
 
 	_submitURL: function (src) {
-		if (src.length === 0) return;
+		if (src.length === 0) return false;
 		this._createComp(this._createAudioTag(), src, null, this.modal.updateModal);
+		return true;
 	},
 
 	_createComp: function (element, src, file, isUpdate) {
@@ -289,14 +279,10 @@ audio.prototype = {
 	},
 
 	_serverUpload: function (info, files) {
-		if (!files) {
-			this.closeLoading();
-			return;
-		}
-
+		if (!files) return;
 		if (typeof files === 'string') {
 			this._error(files, null);
-			return;
+			return true;
 		}
 
 		const uploadFiles = this.modal.isUpdate ? [files[0]] : files;
@@ -312,6 +298,47 @@ audio.prototype = {
 
 	constructor: audio
 };
+
+function FileCheckHandler(element) {
+	this._setTagAttrs(element);
+
+	// find component element
+	let existElement = this.format.isBlock(element.parentNode) || domUtils.isWysiwygFrame(element.parentNode) ? element : this.format.getLine(element) || element;
+
+	// clone element
+	const prevElement = element;
+	this._element = element = element.cloneNode(false);
+	const cover = this.component.createMediaCover(element);
+	const container = this.component.createMediaContainer(cover, 'se-audio-container');
+
+	try {
+		if (domUtils.isListCell(existElement)) {
+			const refer = domUtils.getParentElement(prevElement, function (current) {
+				return current.parentNode === existElement;
+			});
+			existElement.insertBefore(container, refer);
+			domUtils.removeItem(prevElement);
+			domUtils.removeEmptyNode(refer, null);
+		} else if (this.format.isLine(existElement)) {
+			const refer = domUtils.getParentElement(prevElement, function (current) {
+				return current.parentNode === existElement;
+			});
+			existElement = this.node.split(existElement, refer);
+			existElement.parentNode.insertBefore(container, existElement);
+			domUtils.removeItem(prevElement);
+			domUtils.removeEmptyNode(existElement, null);
+			if (existElement.children.length === 0) existElement.innerHTML = this.node.removeWhiteSpace(existElement.innerHTML);
+		} else {
+			existElement.parentNode.replaceChild(container, existElement);
+		}
+	} catch (error) {
+		console.warn('[SUNEDITOR.audio.error] Maybe the audio tag is nested.', error);
+	}
+
+	this.init();
+
+	return element;
+}
 
 function UploadCallBack(info, xmlHttp) {
 	if (typeof this.events.audioUploadHandler === 'function') {
@@ -349,47 +376,6 @@ function FileInputChange() {
 		this.audioUrlFile.setAttribute('disabled', true);
 		this.preview.style.textDecoration = 'line-through';
 	}
-}
-
-function CheckContainer(element) {
-	this._setTagAttrs(element);
-
-	// find component element
-	let existElement = this.format.isBlock(element.parentNode) || domUtils.isWysiwygFrame(element.parentNode) ? element : this.format.getLine(element) || element;
-
-	// clone element
-	const prevElement = element;
-	this._element = element = element.cloneNode(false);
-	const cover = this.component.createMediaCover(element);
-	const container = this.component.createMediaContainer(cover, 'se-audio-container');
-
-	try {
-		if (domUtils.isListCell(existElement)) {
-			const refer = domUtils.getParentElement(prevElement, function (current) {
-				return current.parentNode === existElement;
-			});
-			existElement.insertBefore(container, refer);
-			domUtils.removeItem(prevElement);
-			domUtils.removeEmptyNode(refer, null);
-		} else if (this.format.isLine(existElement)) {
-			const refer = domUtils.getParentElement(prevElement, function (current) {
-				return current.parentNode === existElement;
-			});
-			existElement = this.node.split(existElement, refer);
-			existElement.parentNode.insertBefore(container, existElement);
-			domUtils.removeItem(prevElement);
-			domUtils.removeEmptyNode(existElement, null);
-			if (existElement.children.length === 0) existElement.innerHTML = this.node.removeWhiteSpace(existElement.innerHTML);
-		} else {
-			existElement.parentNode.replaceChild(container, existElement);
-		}
-	} catch (error) {
-		console.warn('[SUNEDITOR.audio.error] Maybe the audio tag is nested.', error);
-	}
-
-	this.init();
-	
-	return element;
 }
 
 function CreateHTML_modal(editor) {

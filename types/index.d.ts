@@ -1,9 +1,9 @@
-import Global from "./global.d";
-import Env from "./env.d";
-import Unicode from "./unicode.d";
-import Converter from "./converter.d";
-import DomUtils from "./domUtils.d";
-import Numbers from "./numbers.d";
+import Global from "./global";
+import Env from "./env";
+import Unicode from "./unicode";
+import Converter from "./converter";
+import DomUtils from "./domUtils";
+import Numbers from "./numbers";
 
 export const global = Global;
 export const env = Env;

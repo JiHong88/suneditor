@@ -15,10 +15,12 @@ const link = function (editor, target) {
 	const modalEl = CreateHTML_modal(editor);
 	const controllerEl = CreateHTML_controller(editor);
 
-	// members
+	// modules
 	this.anchor = new AnchorModalEditor(this, modalEl);
 	this.modal = new Modal(this, modalEl);
 	this.controller = new Controller(this, controllerEl, 'bottom');
+
+	// members
 	this.isUpdateState = false;
 };
 
@@ -64,25 +66,18 @@ link.prototype = {
 
 	/**
 	 * @override modal
-	 */
-	init: function () {
-		this.controller.close();
-		this.anchor.init();
-	},
-
-	/**
-	 * @override modal
+	 * @returns {boolean | undefined}
 	 */
 	modalAction: function () {
 		const oA = this.anchor.create(false);
-		if (oA === null) return;
+		if (oA === null) return false;
 
 		if (!this.isUpdateState) {
 			const selectedFormats = this.format.getLines();
 			if (selectedFormats.length > 1) {
-				if (!this.html.insertNode(domUtils.createElement(selectedFormats[0].nodeName, null, oA), null, false)) return;
+				if (!this.html.insertNode(domUtils.createElement(selectedFormats[0].nodeName, null, oA), null, false)) return true;
 			} else {
-				if (!this.html.insertNode(oA, null, false)) return;
+				if (!this.html.insertNode(oA, null, false)) return true;
 			}
 
 			this.selection.setRange(oA.childNodes[0], 0, oA.childNodes[0], oA.textContent.length);
@@ -93,6 +88,14 @@ link.prototype = {
 		}
 
 		return true;
+	},
+
+	/**
+	 * @override modal
+	 */
+	init: function () {
+		this.controller.close();
+		this.anchor.init();
 	},
 
 	/**

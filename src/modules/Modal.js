@@ -9,17 +9,17 @@ const Modal = function (inst, element) {
 	// members
 	this.inst = inst;
 	this.kind = inst.constructor.name;
-	this.modalForm = element;
-	this.modalElement = this.context.element._modal;
+	this.form = element;
 	this.focusElement = element.querySelector('[data-focus]');
 	this.isUpdate = false;
+	this._modalElement = this.context.element._modal;
 	this._closeListener = [CloseListener.bind(this), OnClick_dialog.bind(this)];
 	this._bindClose = null;
 	this._onClickEvent = null;
 	this._closeSignal = false;
 
 	// add element
-	this.modalElement.inner.appendChild(element);
+	this._modalElement.inner.appendChild(element);
 
 	// init
 	this.eventManager.addEvent(element.querySelector('form'), 'submit', Action.bind(this));
@@ -36,24 +36,24 @@ Modal.prototype = {
 	 * @description Open a modal plugin
 	 */
 	open: function () {
-		if (this._closeSignal) this.modalElement.inner.addEventListener('click', this._closeListener[1]);
+		if (this._closeSignal) this._modalElement.inner.addEventListener('click', this._closeListener[1]);
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 		this._bindClose = this.eventManager.addGlobalEvent('keydown', this._closeListener[0]);
 
 		// open
 		if (this.options.modallType === 'full') {
-			this.modalElement.area.style.position = 'fixed';
+			this._modalElement.area.style.position = 'fixed';
 		} else {
-			this.modalElement.area.style.position = 'absolute';
+			this._modalElement.area.style.position = 'absolute';
 		}
 
 		this.isUpdate = this.kind === this.editor.currentControllerName;
 		if (typeof this.inst.on === 'function') this.inst.on(this.isUpdate);
 
-		this.modalElement.area.style.display = 'block';
-		this.modalElement.back.style.display = 'block';
-		this.modalElement.inner.style.display = 'block';
-		this.modalForm.style.display = 'block';
+		this._modalElement.area.style.display = 'block';
+		this._modalElement.back.style.display = 'block';
+		this._modalElement.inner.style.display = 'block';
+		this.form.style.display = 'block';
 
 		if (this.focusElement) this.focusElement.focus();
 	},
@@ -63,13 +63,12 @@ Modal.prototype = {
 	 * The plugin's "init" method is called.
 	 */
 	close: function () {
-		if (this._closeSignal) this.modalElement.inner.removeEventListener('click', this._closeListener[1]);
+		if (this._closeSignal) this._modalElement.inner.removeEventListener('click', this._closeListener[1]);
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
-
 		// close
-		this.modalForm.style.display = 'none';
-		this.modalElement.back.style.display = 'none';
-		this.modalElement.area.style.display = 'none';
+		this.form.style.display = 'none';
+		this._modalElement.back.style.display = 'none';
+		this._modalElement.area.style.display = 'none';
 		if (typeof this.inst.init === 'function') this.inst.init();
 		this.editor.focus();
 	},
@@ -83,30 +82,32 @@ Modal.CreateHTML = function () {
 	return domUtils.createElement('DIV', { class: '' }, html);
 };
 
-function Action (e) {
+function Action(e) {
 	this.editor.openLoading();
 
 	e.preventDefault();
 	e.stopPropagation();
 
 	try {
-		if (this.inst.modalAction()) {
+		const result = this.inst.modalAction();
+		if (result === false) {
+			this.editor.closeLoading();
+		} else if (result === undefined) {
 			this.close();
-			// history stack
-			this.history.push(false);
+		}else {
+			this.close();
+			this.editor.closeLoading();
 		}
+		
 	} catch (error) {
-		console.warn('[SUNEDITOR.Modal[' + this.kind + '].warn] ' + error.message);
 		this.close();
-	} finally {
 		this.editor.closeLoading();
+		throw Error('[SUNEDITOR.Modal[' + this.kind + '].warn] ' + error.message);
 	}
-
-	return false;
 }
 
 function OnClick_dialog(e) {
-	if (/close/.test(e.target.getAttribute('data-command')) || e.target === this.modalElement.inner) {
+	if (/close/.test(e.target.getAttribute('data-command')) || e.target === this._modalElement.inner) {
 		this.close();
 	}
 }

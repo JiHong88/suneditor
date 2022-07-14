@@ -162,6 +162,18 @@ FileManager.prototype = {
 	},
 
 	/**
+	 * @description Gets the sum of the sizes of the currently saved files.
+	 * @returns {number} Size
+	 */
+	getSize: function () {
+		let size = 0;
+		for (let i = 0, len = this.infoList.length; i < len; i++) {
+			size += this.infoList[i].size * 1;
+		}
+		return size;
+	},
+
+	/**
 	 * @description Checke the file's information and modify the tag that does not fit the format.
 	 * @private
 	 */
@@ -210,7 +222,7 @@ FileManager.prototype = {
 			if (!domUtils.getParentElement(tag, this.component.is) || !_checkImageComponent(tag)) {
 				currentTags.push(this.infoIndex);
 				tag = this.checkHandler(tag);
-				if (!tag) console.warn('[SUNEDITOR.FileManager[' + this.kind + '].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).')
+				if (!tag) console.warn('[SUNEDITOR.FileManager[' + this.kind + '].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).');
 				else this.setInfo(tag, null);
 			} else if (!tag.getAttribute('data-index') || infoIndex.indexOf(tag.getAttribute('data-index') * 1) < 0) {
 				currentTags.push(this.infoIndex);

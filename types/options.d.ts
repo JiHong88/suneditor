@@ -1,4 +1,4 @@
-import { Lang } from '../types_temp/Lang';
+import { Lang } from './Lang';
 import { Plugin } from './plugins/Plugin';
 
 export interface SunEditorOptions {
