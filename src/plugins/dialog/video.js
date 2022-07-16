@@ -540,7 +540,7 @@ export default {
                 url = 'https://player.vimeo.com/video/' + url.slice(url.lastIndexOf('/') + 1);
             }
 
-            this.plugins.video.create_video.call(this, this.plugins.video[(!/youtu\.?be/.test(url) && !/vimeo\.com/.test(url) ? "createVideoTag" : "createIframeTag")].call(this), url, contextVideo.inputX.value, contextVideo.inputY.value, contextVideo._align, null, this.context.dialog.updateModal);
+            this.plugins.video.create_video.call(this, this.plugins.video[(!/embed|iframe|player|\/e\/|\.php|\.html?/.test(url) && !/vimeo\.com/.test(url) ? "createVideoTag" : "createIframeTag")].call(this), url, contextVideo.inputX.value, contextVideo.inputY.value, contextVideo._align, null, this.context.dialog.updateModal);
         } catch (error) {
             throw Error('[SUNEDITOR.video.upload.fail] cause : "' + error.message + '"');
         } finally {
