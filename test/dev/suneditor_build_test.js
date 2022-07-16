@@ -405,7 +405,8 @@ s1.onKeyDown = function (e, core) {
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     rtl: true,
-    value: `<p style="text-align: right">Hello</p>`,
+    height: "auto",
+    // value: `<p style="text-align: right">Hello</p>`,
     // linkNoPrefix: true,
     // value: `<p style="text-align: center; color: red;" onerror="a">center</p>`,
     // mode: "inline",
@@ -443,7 +444,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // lineAttrReset: '*',
     alignItems: ['left', 'right', 'center'],
     linkTargetNewWindow: true,
-    imageAlignShow: false,
+    // imageAlignShow: false,
     plugins: {...{custom_container}, ...plugins},
     katex: Katex,
     codeMirror: CodeMirror,
@@ -754,7 +755,7 @@ ss.showInline = function (toolbar, context) {
 ss.showController = (currentControllerName, controllerArray, core) => {
     console.log("controllerArray",controllerArray);
     if (currentControllerName === "image") {
-        controllerArray[1].querySelector('[data-command="update"]').style.display = 'none'
+        // controllerArray[1].querySelector('[data-command="update"]').style.display = 'none'
     }
 }
 

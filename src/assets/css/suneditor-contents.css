@@ -32,6 +32,10 @@
     direction: rtl;
 }
 
+.sun-editor-editable .se-component > figure {
+    direction: initial;
+}
+
 /** controllers on tag */
 .sun-editor-editable td, .sun-editor-editable th, 
 .sun-editor-editable figure, .sun-editor-editable figcaption, .sun-editor-editable img, 
