@@ -1,6 +1,6 @@
 'use strict';
 
-import { Modal, Figure, FileManager, AnchorModalEditor } from '../../modules';
+import { Modal, Figure, FileManager, ModalAnchorEditor } from '../../modules';
 import modal from '../modules/modal';
 import mediaContainer from '../modules/mediaContainer';
 import resizing from '../modules/resizing';

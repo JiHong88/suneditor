@@ -4,7 +4,7 @@ import EditorInterface from '../interface/editor';
 import SelectMenu from './SelectMenu';
 import { domUtils } from '../helper';
 
-const AnchorModalEditor = function (inst, modalForm) {
+const ModalAnchorEditor = function (inst, modalForm) {
 	// plugin bisic properties
 	EditorInterface.call(this, inst.editor);
 
@@ -58,7 +58,7 @@ const AnchorModalEditor = function (inst, modalForm) {
 	this.eventManager.addEvent(this.bookmarkButton, 'click', OnClick_bookmarkButton.bind(this));
 };
 
-AnchorModalEditor.prototype = {
+ModalAnchorEditor.prototype = {
 	set: function (element) {
 		this.currentTarget = element;
 	},
@@ -225,7 +225,7 @@ AnchorModalEditor.prototype = {
 		return rels;
 	},
 
-	constructor: AnchorModalEditor
+	constructor: ModalAnchorEditor
 };
 
 function OnClick_relbutton() {
@@ -372,4 +372,4 @@ function CreatetModalForm(editor) {
 	return domUtils.createElement('DIV', null, html);
 }
 
-export default AnchorModalEditor;
+export default ModalAnchorEditor;

@@ -77,8 +77,9 @@ window.e = suneditor.create(document.getElementById('editor2'), {
     linkTargetNewWindow: true,
     linkProtocol: 'https://',
     imageMultipleFile: true,
+    imageResizing: false,
     plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock, horizontalLine, lineHeight, list,
-        paragraphStyle, template, textStyle, table, math, link, audio
+        paragraphStyle, template, textStyle, table, math, link, audio, image
     ],
     buttonList: [
         ['undo', 'redo'],
@@ -89,7 +90,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
         ['preview', 'print'],
         ['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'horizontalLine'],
         ['lineHeight', 'list', 'paragraphStyle', 'template', 'textStyle', 'table'],
-        ['math', 'link', 'audio']
+        ['math', 'link', 'audio', 'image']
     ],
     events: {
         onAudioUpload: (a, b, c, d, e) => {

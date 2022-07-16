@@ -1,7 +1,7 @@
 'use strict';
 
 import EditorInterface from '../../interface/editor';
-import { Modal, Controller, AnchorModalEditor } from '../../modules';
+import { Modal, Controller, ModalAnchorEditor } from '../../modules';
 import { domUtils } from '../../helper';
 
 const link = function (editor, target) {
@@ -16,7 +16,7 @@ const link = function (editor, target) {
 	const controllerEl = CreateHTML_controller(editor);
 
 	// modules
-	this.anchor = new AnchorModalEditor(this, modalEl);
+	this.anchor = new ModalAnchorEditor(this, modalEl);
 	this.modal = new Modal(this, modalEl);
 	this.controller = new Controller(this, controllerEl, 'bottom');
 

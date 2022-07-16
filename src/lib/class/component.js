@@ -5,6 +5,7 @@
 
 import CoreInterface from '../../interface/_core';
 import { domUtils } from '../../helper';
+import Figure from '../../modules/Figure';
 
 const Component = function (editor) {
 	CoreInterface.call(this, editor);
@@ -114,7 +115,7 @@ Component.prototype = {
 	 * @returns {boolean}
 	 */
 	is: function (element) {
-		return element && (/se-component/.test(element.className) || /^(TABLE|HR)$/.test(element.nodeName));
+		return Figure.__isComponent(element);
 	},
 
 	/**

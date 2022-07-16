@@ -7,14 +7,9 @@ const Figure = function (inst, params) {
 	CoreInterface.call(this, inst.editor);
 
 	// members
-	inst.__fileManagement = this;
 	this.kind = inst.constructor;
 	this.inst = inst;
 };
-
-Figure.createMediaCove;
-Figure.createMediaContainer;
-Figure.createMediaCaption;
 
 /**
  * @description Create a container for the resizing component and insert the element.
@@ -46,13 +41,29 @@ Figure.CreateCaption = function (cover) {
 Figure.GetContainer = function (element) {
 	const cover = domUtils.getParentElement(element, 'FIGURE');
 	return {
-		container: domUtils.getParentElement(element, ComponentIs),
+		container: domUtils.getParentElement(element, Figure.__isComponent),
 		cover: cover,
 		caption: cover ? domUtils.getEdgeChild(cover, 'FIGCAPTION') : null
 	};
 };
 
+/**
+ * @description It is judged whether it is the component[img, iframe, video, audio, table] cover(class="se-component") and table, hr
+ * @param {Node} element Target element
+ * @returns {boolean}
+ * @private
+ */
+Figure.__isComponent = function (element) {
+	return element && (/se-component/.test(element.className) || /^(TABLE|HR)$/.test(element.nodeName));
+};
+
 Figure.prototype = {
+    setSize: {
+        ratio: function () {
+            
+        }
+    },
+
 	constructor: Figure
 };
 
@@ -164,7 +175,6 @@ const resizing = {
 		resize_container.className = 'se-controller se-resizing-container';
 		resize_container.style.display = 'none';
 		resize_container.innerHTML =
-			'' +
 			'<div class="se-modal-resize"></div>' +
 			'<div class="se-resize-dot">' +
 			'<span class="tl"></span>' +
@@ -188,7 +198,6 @@ const resizing = {
 
 		resize_button.className = 'se-controller se-controller-resizing';
 		resize_button.innerHTML =
-			'' +
 			'<div class="se-arrow se-arrow-up"></div>' +
 			'<div class="se-btn-group _se_resizing_btn_group">' +
 			'<button type="button" data-command="percent" data-value="1" class="se-tooltip _se_percentage">' +
@@ -948,14 +957,5 @@ const resizing = {
 		this.component.select(this.context[pluginName]._element, pluginName);
 	}
 };
-
-/**
- * @description Copy this.component.is"
- * @param {Element} element
- * @returns
- */
-function ComponentIs(element) {
-	return element && (/se-component/.test(element.className) || /^(TABLE|HR)$/.test(element.nodeName));
-}
 
 export default Figure;

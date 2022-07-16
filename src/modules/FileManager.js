@@ -140,7 +140,7 @@ FileManager.prototype = {
 		// 	}
 
 		// 	if (!element.getAttribute('data-origin')) {
-		// 		const container = domUtils.getParentElement(element, this.component.is);
+		// 		const container = domUtils.getParentElement(element, this.editor.component.is);
 		// 		const cover = domUtils.getParentElement(element, 'FIGURE');
 
 		// 		const w = this.plugins.resizing._module_getSizeX.call(this, context, element, cover, container);
@@ -219,7 +219,7 @@ FileManager.prototype = {
 
 		for (let i = 0, len = tags.length, tag; i < len; i++) {
 			tag = tags[i];
-			if (!domUtils.getParentElement(tag, this.component.is) || !_checkImageComponent(tag)) {
+			if (!domUtils.getParentElement(tag, this.editor.component.is) || !_checkImageComponent(tag)) {
 				currentTags.push(this.infoIndex);
 				tag = this.checkHandler(tag);
 				if (!tag) console.warn('[SUNEDITOR.FileManager[' + this.kind + '].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).');

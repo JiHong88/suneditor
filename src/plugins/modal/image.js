@@ -1,7 +1,7 @@
 'use strict';
 
 import EditorInterface from '../../interface/editor';
-import { Modal, Figure, FileManager, AnchorModalEditor } from '../../modules';
+import { Modal, Figure, FileManager, ModalAnchorEditor } from '../../modules';
 import { domUtils, numbers } from '../../helper';
 
 const image = function (editor, target) {
@@ -16,7 +16,7 @@ const image = function (editor, target) {
 	const modalEl = CreateHTML_modal(editor);
 
 	// modules
-	this.anchor = new AnchorModalEditor(this, modalEl);
+	this.anchor = new ModalAnchorEditor(this, modalEl);
 	this.modal = new Modal(this, modalEl);
 	this.fileManager = new FileManager(this, { tagNames: ['img'], eventHandler: this.events.onImageUpload, checkHandler: FileCheckHandler.bind(this), isActiveSizeModule: null });
 	this.figure = new Figure(this);
@@ -124,12 +124,12 @@ image.prototype = {
 		this._align = this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
 		this._captionChecked = this.captionCheckEl.checked;
 		if (this._resizing) this._proportionChecked = this.proportion.checked;
-		
+
 		if (this.modal.isUpdate) {
 			this._update(false, true, false);
 			return true;
 		}
-		
+
 		let result;
 		if (this.imgInputFile && this.imgInputFile.files.length > 0) {
 			result = this._submitFile(this.imgInputFile.files);
@@ -183,7 +183,7 @@ image.prototype = {
 	 */
 	ready: function (element) {
 		if (!element) return;
-		const size = false;//@todo this.plugins.resizing.call_controller_resize.call(this, element, 'image');
+		const size = false; //@todo this.plugins.resizing.call_controller_resize.call(this, element, 'image');
 		this.anchor.set(/^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null);
 
 		this._linkElement = this.anchor.currentTarget;
@@ -218,7 +218,7 @@ image.prototype = {
 		this.altText.value = this._element.alt;
 
 		if (this.imgUrlFile) this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = this._element.src;
-		
+
 		(this.modal.form.querySelector('input[name="suneditor_image_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]')).checked = true;
 		this._align = this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
 		this._captionChecked = this.captionCheckEl.checked = !!this._caption;
@@ -388,12 +388,7 @@ image.prototype = {
 		}
 
 		if (isNewContainer) {
-			let existElement =
-				this.format.isBlock(this._element.parentNode) || domUtils.isWysiwygFrame(this._element.parentNode)
-					? this._element
-					: /^A$/i.test(this._element.parentNode.nodeName)
-					? this._element.parentNode
-					: this.format.getLine(this._element) || this._element;
+			let existElement = this.format.isBlock(this._element.parentNode) || domUtils.isWysiwygFrame(this._element.parentNode) ? this._element : /^A$/i.test(this._element.parentNode.nodeName) ? this._element.parentNode : this.format.getLine(this._element) || this._element;
 
 			if (domUtils.isListCell(existElement)) {
 				const refer = domUtils.getParentElement(this._element, function (current) {
@@ -600,7 +595,7 @@ image.prototype = {
 	},
 
 	_createComp: function (src, anchor, width, height, align, file, alt) {
-		this.context.resizing._resize_plugin = 'image';
+		// this.context.resizing._resize_plugin = 'image';
 
 		let oImg = domUtils.createElement('IMG');
 		oImg.src = src;
@@ -634,7 +629,7 @@ image.prototype = {
 
 		oImg.onload = OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
 		if (this.component.insert(container, true, false, true)) this.fileManager.setInfo(oImg, file);
-		this.context.resizing._resize_plugin = '';
+		// this.context.resizing._resize_plugin = '';
 	},
 
 	_setAnchor: function (imgTag, anchor) {
@@ -659,6 +654,125 @@ image.prototype = {
 };
 
 var a = {
+	/**
+	 * @override resizing, @inst
+	 */
+	setSize: function (w, h, notResetPercentage, direction) {
+		const contextImage = this.context.image;
+		const onlyW = /^(rw|lw)$/.test(direction);
+		const onlyH = /^(th|bh)$/.test(direction);
+
+		if (!onlyH) {
+			contextImage._element.style.width = numbers.is(w) ? w + contextImage.sizeUnit : w;
+			this.plugins.image.cancelPercentAttr.call(this);
+		}
+		if (!onlyW) {
+			contextImage._element.style.height = numbers.is(h) ? h + contextImage.sizeUnit : /%$/.test(h) ? '' : h;
+		}
+
+		if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
+		if (!notResetPercentage) contextImage._element.removeAttribute('data-percentage');
+
+		// save current size
+		this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
+	},
+
+	/**
+	 * @override resizing @inst
+	 */
+	setAutoSize: function () {
+		const contextImage = this.context.image;
+
+		this.plugins.resizing.resetTransform.call(this, contextImage._element);
+		this.plugins.image.cancelPercentAttr.call(this);
+
+		contextImage._element.style.maxWidth = '';
+		contextImage._element.style.width = '';
+		contextImage._element.style.height = '';
+		contextImage._cover.style.width = '';
+		contextImage._cover.style.height = '';
+
+		this.plugins.image.setAlign.call(this, null, null, null, null);
+		contextImage._element.setAttribute('data-percentage', 'auto,auto');
+
+		// save current size
+		this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
+	},
+
+	/**
+	 * @override resizing @inst
+	 */
+	setPercentSize: function (w, h) {
+		const contextImage = this.context.image;
+		h = !!h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + contextImage.sizeUnit : h || '';
+		const heightPercentage = /%$/.test(h);
+
+		contextImage._container.style.width = numbers.is(w) ? w + '%' : w;
+		contextImage._container.style.height = '';
+		contextImage._cover.style.width = '100%';
+		contextImage._cover.style.height = !heightPercentage ? '' : h;
+		contextImage._element.style.width = '100%';
+		contextImage._element.style.height = heightPercentage ? '' : h;
+		contextImage._element.style.maxWidth = '';
+
+		if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
+
+		contextImage._element.setAttribute('data-percentage', w + ',' + h);
+		this.plugins.resizing.setCaptionPosition.call(this, contextImage._element);
+
+		// save current size
+		this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
+	},
+
+	/**
+	 * @override resizing @inst
+	 */
+	cancelPercentAttr: function () {
+		const contextImage = this.context.image;
+
+		contextImage._cover.style.width = '';
+		contextImage._cover.style.height = '';
+		contextImage._container.style.width = '';
+		contextImage._container.style.height = '';
+
+		domUtils.removeClass(contextImage._container, this.context.image._floatClassRegExp);
+		domUtils.addClass(contextImage._container, '__se__float-' + contextImage._align);
+
+		if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
+	},
+
+	/**
+	 * @override resizing @inst
+	 */
+	setAlign: function (align, element, cover, container) {
+		const contextImage = this.context.image;
+
+		if (!align) align = contextImage._align;
+		if (!element) element = contextImage._element;
+		if (!cover) cover = contextImage._cover;
+		if (!container) container = contextImage._container;
+
+		if (align && align !== 'none') {
+			cover.style.margin = 'auto';
+		} else {
+			cover.style.margin = '0';
+		}
+
+		if (/%$/.test(element.style.width) && align === 'center') {
+			container.style.minWidth = '100%';
+			cover.style.width = container.style.width;
+		} else {
+			container.style.minWidth = '';
+			cover.style.width = this.context.resizing._rotateVertical ? element.style.height || element.offsetHeight : !element.style.width || element.style.width === 'auto' ? '' : element.style.width || '100%';
+		}
+
+		if (!domUtils.hasClass(container, '__se__float-' + align)) {
+			domUtils.removeClass(container, contextImage._floatClassRegExp);
+			domUtils.addClass(container, '__se__float-' + align);
+		}
+
+		element.setAttribute('data-align', align);
+	},
 
 	///////////
 	/**
@@ -692,51 +806,6 @@ var a = {
 	/**
 	 * @override resizing
 	 */
-	setSize: function (w, h, notResetPercentage, direction) {
-		const contextImage = this.context.image;
-		const onlyW = /^(rw|lw)$/.test(direction);
-		const onlyH = /^(th|bh)$/.test(direction);
-
-		if (!onlyH) {
-			contextImage._element.style.width = numbers.is(w) ? w + contextImage.sizeUnit : w;
-			this.plugins.image.cancelPercentAttr.call(this);
-		}
-		if (!onlyW) {
-			contextImage._element.style.height = numbers.is(h) ? h + contextImage.sizeUnit : /%$/.test(h) ? '' : h;
-		}
-
-		if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
-		if (!notResetPercentage) contextImage._element.removeAttribute('data-percentage');
-
-		// save current size
-		this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
-	},
-
-	/**
-	 * @override resizing
-	 */
-	setAutoSize: function () {
-		const contextImage = this.context.image;
-
-		this.plugins.resizing.resetTransform.call(this, contextImage._element);
-		this.plugins.image.cancelPercentAttr.call(this);
-
-		contextImage._element.style.maxWidth = '';
-		contextImage._element.style.width = '';
-		contextImage._element.style.height = '';
-		contextImage._cover.style.width = '';
-		contextImage._cover.style.height = '';
-
-		this.plugins.image.setAlign.call(this, null, null, null, null);
-		contextImage._element.setAttribute('data-percentage', 'auto,auto');
-
-		// save current size
-		this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
-	},
-
-	/**
-	 * @override resizing
-	 */
 	setOriginSize: function () {
 		const contextImage = this.context.image;
 		contextImage._element.removeAttribute('data-percentage');
@@ -758,81 +827,6 @@ var a = {
 			// save current size
 			this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
 		}
-	},
-
-	/**
-	 * @override resizing
-	 */
-	setPercentSize: function (w, h) {
-		const contextImage = this.context.image;
-		h = !!h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + contextImage.sizeUnit : h || '';
-		const heightPercentage = /%$/.test(h);
-
-		contextImage._container.style.width = numbers.is(w) ? w + '%' : w;
-		contextImage._container.style.height = '';
-		contextImage._cover.style.width = '100%';
-		contextImage._cover.style.height = !heightPercentage ? '' : h;
-		contextImage._element.style.width = '100%';
-		contextImage._element.style.height = heightPercentage ? '' : h;
-		contextImage._element.style.maxWidth = '';
-
-		if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
-
-		contextImage._element.setAttribute('data-percentage', w + ',' + h);
-		this.plugins.resizing.setCaptionPosition.call(this, contextImage._element);
-
-		// save current size
-		this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
-	},
-
-	/**
-	 * @override resizing
-	 */
-	cancelPercentAttr: function () {
-		const contextImage = this.context.image;
-
-		contextImage._cover.style.width = '';
-		contextImage._cover.style.height = '';
-		contextImage._container.style.width = '';
-		contextImage._container.style.height = '';
-
-		domUtils.removeClass(contextImage._container, this.context.image._floatClassRegExp);
-		domUtils.addClass(contextImage._container, '__se__float-' + contextImage._align);
-
-		if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
-	},
-
-	/**
-	 * @override resizing
-	 */
-	setAlign: function (align, element, cover, container) {
-		const contextImage = this.context.image;
-
-		if (!align) align = contextImage._align;
-		if (!element) element = contextImage._element;
-		if (!cover) cover = contextImage._cover;
-		if (!container) container = contextImage._container;
-
-		if (align && align !== 'none') {
-			cover.style.margin = 'auto';
-		} else {
-			cover.style.margin = '0';
-		}
-
-		if (/%$/.test(element.style.width) && align === 'center') {
-			container.style.minWidth = '100%';
-			cover.style.width = container.style.width;
-		} else {
-			container.style.minWidth = '';
-			cover.style.width = this.context.resizing._rotateVertical ? element.style.height || element.offsetHeight : !element.style.width || element.style.width === 'auto' ? '' : element.style.width || '100%';
-		}
-
-		if (!domUtils.hasClass(container, '__se__float-' + align)) {
-			domUtils.removeClass(container, contextImage._floatClassRegExp);
-			domUtils.addClass(container, '__se__float-' + align);
-		}
-
-		element.setAttribute('data-align', align);
 	}
 };
 
