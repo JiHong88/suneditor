@@ -1,7 +1,7 @@
 'use strict';
 
 import EditorInterface from '../../interface/editor';
-import { Modal, Controller, FileManager } from '../../modules';
+import { Modal, Controller, FileManager, Figure } from '../../modules';
 import { domUtils } from '../../helper';
 
 const audio = function (editor, target) {
@@ -138,7 +138,8 @@ audio.prototype = {
 	 */
 	destroy: function (element) {
 		element = element || this._element;
-		const container = domUtils.getParentElement(element, this.component.is) || element;
+		const figure = Figure.GetContainer(element);
+		const container = figure.container || element;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 
 		const emptyDiv = container.parentNode;
@@ -225,7 +226,7 @@ audio.prototype = {
 
 	_submitURL: function (src) {
 		if (src.length === 0) return false;
-		this._createComp(this._createAudioTag(), src, null, this.modal.updateModal);
+		this._createComp(this._createAudioTag(), src, null, this.modal.isUpdate);
 		return true;
 	},
 
@@ -233,14 +234,13 @@ audio.prototype = {
 		// create new tag
 		if (!isUpdate) {
 			element.src = src;
-			const cover = this.component.createMediaCover(element);
-			const container = this.component.createMediaContainer(cover, '');
-			if (!this.component.insert(container, false, false, !this.options.mediaAutoSelect)) {
+			const figure = Figure.CreateContainer(element);
+			if (!this.component.insert(figure.container, false, false, !this.options.mediaAutoSelect)) {
 				this.editor.focus();
 				return;
 			}
 			if (!this.options.mediaAutoSelect) {
-				const line = this.format.addLine(container, null);
+				const line = this.format.addLine(figure.container, null);
 				if (line) this.selection.setRange(line, 0, line, 0);
 			}
 		} else {
@@ -308,15 +308,14 @@ function FileCheckHandler(element) {
 	// clone element
 	const prevElement = element;
 	this._element = element = element.cloneNode(false);
-	const cover = this.component.createMediaCover(element);
-	const container = this.component.createMediaContainer(cover, 'se-audio-container');
+	const figure = Figure.CreateContainer(element);
 
 	try {
 		if (domUtils.isListCell(existElement)) {
 			const refer = domUtils.getParentElement(prevElement, function (current) {
 				return current.parentNode === existElement;
 			});
-			existElement.insertBefore(container, refer);
+			existElement.insertBefore(figure.container, refer);
 			domUtils.removeItem(prevElement);
 			domUtils.removeEmptyNode(refer, null);
 		} else if (this.format.isLine(existElement)) {
@@ -324,12 +323,12 @@ function FileCheckHandler(element) {
 				return current.parentNode === existElement;
 			});
 			existElement = this.node.split(existElement, refer);
-			existElement.parentNode.insertBefore(container, existElement);
+			existElement.parentNode.insertBefore(figure.container, existElement);
 			domUtils.removeItem(prevElement);
 			domUtils.removeEmptyNode(existElement, null);
 			if (existElement.children.length === 0) existElement.innerHTML = this.node.removeWhiteSpace(existElement.innerHTML);
 		} else {
-			existElement.parentNode.replaceChild(container, existElement);
+			existElement.parentNode.replaceChild(figure.container, existElement);
 		}
 	} catch (error) {
 		console.warn('[SUNEDITOR.audio.error] Maybe the audio tag is nested.', error);

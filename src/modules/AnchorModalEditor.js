@@ -255,7 +255,7 @@ function SetRelItem(item) {
 	if (index === -1) current.push(cmd);
 	else current.splice(index, 1);
 
-	this.relPreview.title = this.relPreview.textContent = current.join(' ');
+	this.relPreview.title = this.relPreview.textContent = current.join(', ');
 }
 
 function OnChange_anchorText(e) {

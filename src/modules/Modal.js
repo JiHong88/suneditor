@@ -82,6 +82,13 @@ Modal.CreateHTML = function () {
 	return domUtils.createElement('DIV', { class: '' }, html);
 };
 
+/**
+ * The loading bar is executed before "modalAction" is executed.
+ * When true is returned, the loading bar and modal window are closed.
+ * If false is returned, only the loading bar is closed.
+ * If undefined is returned, only the modal window is closed.
+ * When an exception occurs, the modal window and loading bar are closed.
+ */
 function Action(e) {
 	this.editor.openLoading();
 

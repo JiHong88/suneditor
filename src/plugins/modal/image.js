@@ -29,11 +29,13 @@ const image = function (editor, target) {
 	this.captionCheckEl = modalEl.querySelector('._se_image_check_caption');
 	this.previewSrc = modalEl.querySelector('._se_tab_content_image .se-link-preview');
 	this.sizeUnit = options._imageSizeUnit;
-	this._linkElement = '';
-	this._altText = '';
+	this.proportion = {};
+	this.inputX = {};
+	this.inputY = {};
+	this._linkElement = null;
+	this._linkValue = '';
 	this._align = 'none';
 	this._floatClassRegExp = '__se__float\\-[a-z]+';
-	this._v_src = { _linkValue: '' };
 	this._svgDefaultSize = '30%';
 	this._base64RenderIndex = 0;
 	this._element = null;
@@ -61,10 +63,6 @@ const image = function (editor, target) {
 	this._captionShow = true;
 	this._captionChecked = false;
 	this._caption = null;
-	this.captionCheckEl = null;
-	this.proportion = {};
-	this.inputX = {};
-	this.inputY = {};
 
 	// init
 	modalEl.querySelector('.se-modal-tabs').addEventListener('click', this._openTab.bind(this));
@@ -120,9 +118,9 @@ image.prototype = {
 
 	/**
 	 * @override modal
+	 * @returns {boolean | undefined}
 	 */
 	modalAction: function () {
-		this._altText = this.altText.value;
 		this._align = this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
 		this._captionChecked = this.captionCheckEl.checked;
 		if (this._resizing) this._proportionChecked = this.proportion.checked;
@@ -135,8 +133,8 @@ image.prototype = {
 		let result;
 		if (this.imgInputFile && this.imgInputFile.files.length > 0) {
 			result = this._submitFile(this.imgInputFile.files);
-		} else if (this.imgUrlFile && this._v_src._linkValue.length > 0) {
-			result = this._submitURL(this._v_src._linkValue);
+		} else if (this.imgUrlFile && this._linkValue.length > 0) {
+			result = this._submitURL(this._linkValue);
 		}
 
 		return result;
@@ -147,7 +145,7 @@ image.prototype = {
 	 */
 	init: function () {
 		if (this.imgInputFile) this.imgInputFile.value = '';
-		if (this.imgUrlFile) this._v_src._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = '';
+		if (this.imgUrlFile) this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = '';
 		if (this.imgInputFile && this.imgUrlFile) {
 			this.imgUrlFile.removeAttribute('disabled');
 			this.previewSrc.style.textDecoration = '';
@@ -172,7 +170,7 @@ image.prototype = {
 	},
 
 	/**
-	 * @override core, fileManager, resizing
+	 * @override fileManager, figure
 	 * @description It is called from core.mediaContainer.select
 	 * @param {Element} element Target element
 	 */
@@ -190,9 +188,10 @@ image.prototype = {
 
 		this._linkElement = this.anchor.currentTarget;
 		this._element = element;
-		this._cover = domUtils.getParentElement(element, 'FIGURE');
-		this._container = domUtils.getParentElement(element, this.component.is);
-		this._caption = domUtils.getEdgeChild(this._cover, 'FIGCAPTION');
+		const figure = Figure.GetContainer(element);
+		this._cover = figure.cover;
+		this._container = figure.container;
+		this._caption = figure.caption;
 		this._align = element.style.float || element.getAttribute('data-align') || 'none';
 		element.style.float = '';
 
@@ -216,6 +215,17 @@ image.prototype = {
 
 		this._origin_w = w || element.style.width || element.width || '';
 		this._origin_h = h || element.style.height || element.height || '';
+		this.altText.value = this._element.alt;
+
+		if (this.imgUrlFile) this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = this._element.src;
+		
+		(this.modal.form.querySelector('input[name="suneditor_image_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]')).checked = true;
+		this._align = this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
+		this._captionChecked = this.captionCheckEl.checked = !!this._caption;
+
+		if (this._resizing) {
+			this.plugins.resizing._module_setModifyInputSize.call(this, this, this.plugins.image);
+		}
 	},
 
 	/**
@@ -275,7 +285,7 @@ image.prototype = {
 			inputHeight: this.inputY.value,
 			align: this._align,
 			isUpdate: this.modal.isUpdate,
-			alt: this._altText
+			alt: this.altText.value
 		};
 
 		if (typeof this.events.onImageUploadBefore === 'function') {
@@ -300,18 +310,18 @@ image.prototype = {
 	},
 
 	_submitURL: function (url) {
-		if (!url) url = this.context.image._v_src._linkValue;
+		if (!url) url = this._linkValue;
 		if (!url) return false;
 
 		try {
 			const file = { name: url.split('/').pop(), size: 0 };
-			if (this.context.modal.isUpdate) this._updateSrc(url, this._element, file);
-			else this._createComp(url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this._altText);
+			if (this.modal.isUpdate) this._updateSrc(url, this._element, file);
+			else this._createComp(url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
 		} catch (error) {
 			console.warn('[SUNEDITOR.image.URLRendering.fail] ' + error.message);
 			return true;
 		}
-		
+
 		return true;
 	},
 
@@ -321,23 +331,12 @@ image.prototype = {
 		let container = this._container;
 		let isNewContainer = false;
 
-		if (cover === null) {
+		if (cover === null || container === null) {
 			isNewContainer = true;
-			imageEl = this._element.cloneNode(true);
-			cover = this.component.createMediaCover.call(this, imageEl);
-		}
-
-		if (container === null) {
-			cover = cover.cloneNode(true);
-			imageEl = cover.querySelector('img');
-			isNewContainer = true;
-			container = this.component.createMediaContainer.call(this, cover, 'se-image-container');
-		} else if (isNewContainer) {
-			container.innerHTML = '';
-			container.appendChild(cover);
-			this._cover = cover;
-			this._element = imageEl;
-			isNewContainer = false;
+			this._element = imageEl = this._element.cloneNode(true);
+			const figure = Figure.CreateContainer(imageEl, 'se-image-container');
+			this._cover = cover = figure.cover;
+			container = figure.container;
 		}
 
 		// check size
@@ -351,14 +350,13 @@ image.prototype = {
 		}
 
 		// alt
-		imageEl.alt = this._altText;
+		imageEl.alt = this.altText.value;
 
 		// caption
 		let modifiedCaption = false;
 		if (this._captionChecked) {
 			if (!this._caption) {
-				this._caption = this.component.createMediaCaption.call(this);
-				cover.appendChild(this._caption);
+				this._caption = this.component.createMediaCaption.call(cover);
 				modifiedCaption = true;
 			}
 		} else {
@@ -380,10 +378,9 @@ image.prototype = {
 				this._linkElement.setAttribute('data-image-link', 'image');
 			}
 		} else if (this._linkElement !== null) {
-			const imageElement = imageEl;
-			imageElement.setAttribute('data-image-link', '');
+			imageEl.setAttribute('data-image-link', '');
 			if (cover.contains(this._linkElement)) {
-				const newEl = imageElement.cloneNode(true);
+				const newEl = imageEl.cloneNode(true);
 				cover.removeChild(this._linkElement);
 				cover.insertBefore(newEl, this._caption);
 				this._element = imageEl = newEl;
@@ -435,9 +432,9 @@ image.prototype = {
 		if (modifiedCaption || (!this._onlyPercentage && changeSize)) {
 			if (!init && (/\d+/.test(imageEl.style.height) || (this.context.resizing._rotateVertical && this._captionChecked))) {
 				if (/%$/.test(this.inputX.value) || /%$/.test(this.inputY.value)) {
-					this.plugins.resizing.resetTransform.call(this, imageEl);
+					//@todo this.plugins.resizing.resetTransform.call(this, imageEl);
 				} else {
-					this.plugins.resizing.setTransformSize.call(this, imageEl, numbers.get(this.inputX.value, 0), numbers.get(this.inputY.value, 0));
+					//@todo this.plugins.resizing.setTransformSize.call(this, imageEl, numbers.get(this.inputX.value, 0), numbers.get(this.inputY.value, 0));
 				}
 			}
 		}
@@ -455,7 +452,7 @@ image.prototype = {
 
 		// set imagesInfo
 		if (init) {
-			this.plugins.fileManager.setInfo.call(imageEl, null);
+			this.fileManager.setInfo(imageEl, null);
 		}
 
 		if (openController) {
@@ -615,14 +612,14 @@ image.prototype = {
 			oImg.setAttribute('data-proportion', this._proportionChecked);
 		}
 
-		const cover = this.component.createMediaCover.call(this, anchor);
-		const container = this.component.createMediaContainer.call(this, cover, 'se-image-container');
+		const figure = Figure.CreateContainer(anchor, 'se-image-container');
+		const cover = figure.cover;
+		const container = figure.container;
 
 		// caption
 		if (this._captionChecked) {
-			this._caption = this.component.createMediaCaption.call(this);
+			this._caption = this.component.createMediaCaption.call(cover);
 			this._caption.setAttribute('contenteditable', false);
-			cover.appendChild(this._caption);
 		}
 
 		this._element = oImg;
@@ -636,7 +633,7 @@ image.prototype = {
 		this.setAlign.call(this, align, oImg, cover, container);
 
 		oImg.onload = OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
-		if (this.component.insert(container, true, false, true)) this.plugins.fileManager.setInfo.call(oImg, file);
+		if (this.component.insert(container, true, false, true)) this.fileManager.setInfo(oImg, file);
 		this.context.resizing._resize_plugin = '';
 	},
 
@@ -662,25 +659,6 @@ image.prototype = {
 };
 
 var a = {
-	/**
-	 * @Required @override fileManager, resizing
-	 */
-	openModify: function (notOpen) {
-		const contextImage = this.context.image;
-		if (contextImage.imgUrlFile) {
-			contextImage._v_src._linkValue = contextImage.previewSrc.textContent = contextImage.imgUrlFile.value = contextImage._element.src;
-		}
-		contextImage._altText = contextImage.altText.value = contextImage._element.alt;
-		(contextImage.modal.form.querySelector('input[name="suneditor_image_radio"][value="' + contextImage._align + '"]') || contextImage.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]')).checked = true;
-		contextImage._align = contextImage.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
-		contextImage._captionChecked = contextImage.captionCheckEl.checked = !!contextImage._caption;
-
-		if (contextImage._resizing) {
-			this.plugins.resizing._module_setModifyInputSize.call(this, contextImage, this.plugins.image);
-		}
-
-		if (!notOpen) this.plugins.modal.open.call(this, 'image', true);
-	},
 
 	///////////
 	/**
@@ -859,8 +837,7 @@ var a = {
 };
 
 function FileCheckHandler(element) {
-	this.ready.call(this, element, null);
-	this.openModify.call(this, true);
+	this.ready(element);
 	// get size
 	this.inputX.value = this._origin_w;
 	this.inputY.value = this._origin_h;
@@ -897,7 +874,7 @@ function RemoveSelectedFiles() {
 
 function OnLinkPreview(e) {
 	const value = e.target.value.trim();
-	this._v_src._linkValue = this.textContent = !value ? '' : this.options.linkProtocol && value.indexOf('://') === -1 && value.indexOf('#') !== 0 ? this.options.linkProtocol + value : value.indexOf('://') === -1 ? '/' + value : value;
+	this._linkValue = this.textContent = !value ? '' : this.options.linkProtocol && value.indexOf('://') === -1 && value.indexOf('#') !== 0 ? this.options.linkProtocol + value : value.indexOf('://') === -1 ? '/' + value : value;
 }
 
 function OnfileInputChange() {
@@ -916,7 +893,7 @@ function OpenGallery() {
 
 function _setUrlInput(target) {
 	this.altText.value = target.alt;
-	this._v_src._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = target.src;
+	this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = target.src;
 	this.imgUrlFile.focus();
 }
 

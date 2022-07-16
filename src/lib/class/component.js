@@ -118,38 +118,12 @@ Component.prototype = {
 	},
 
 	/**
-	 * @description Cover the target element with a FIGURE element.
-	 * @param {Element} element Target element
-	 */
-	createMediaCover: function (element) {
-		return domUtils.createElement('FIGURE', null, element);
-	},
-
-	/**
-	 * @description Create a container for the resizing component and insert the element.
-	 * @param {Element} cover Cover element (FIGURE)
-	 * @param {string} className Class name of container (fixed: se-component)
-	 * @returns {Element} Created container element
-	 */
-	createMediaContainer: function (cover, className) {
-		return domUtils.createElement('DIV', { class: 'se-component ' + className, contenteditable: false }, cover);
-	},
-
-	/**
-	 * @description Return HTML string of caption(FIGCAPTION) element
-	 * @returns {string}
-	 */
-	createMediaCaption: function () {
-		return domUtils.createElement('FIGCAPTION', { contenteditable: true }, '<div>' + this.lang.modalBox.caption + '</div>');
-	},
-
-	/**
 	 * @description Set line breaker of component
 	 * @param {Element} element Element tag (img, iframe, video)
 	 * @private
 	 */
 	_setComponentLineBreaker: function (element) {
-		return
+		return;
 		// line breaker
 		this.editor._lineBreaker.style.display = 'none';
 		const contextEl = this.context.element;

@@ -1,5 +1,6 @@
 'use strict';
 
+import { Modal, Figure, FileManager, AnchorModalEditor } from '../../modules';
 import modal from '../modules/modal';
 import mediaContainer from '../modules/mediaContainer';
 import resizing from '../modules/resizing';
@@ -577,8 +578,9 @@ export default {
             init = true;
             oFrame.src = src;
             contextVideo._element = oFrame;
-            cover = this.plugins.mediaContainer.createMediaCover.call(this, oFrame);
-            container = this.plugins.mediaContainer.createMediaContainer.call(this, cover, 'se-video-container');
+            const figure = Figure.CreateContainer(oFrame, 'se-video-container');
+            cover = figure.cover;
+            container = figure.container;
         }
 
         /** rendering */
@@ -642,8 +644,9 @@ export default {
 
         const prevFrame = oFrame;
         contextVideo._element = oFrame = oFrame.cloneNode(true);
-        const cover = contextVideo._cover = this.plugins.mediaContainer.createMediaCover.call(this, oFrame);
-        const container = contextVideo._container = this.plugins.mediaContainer.createMediaContainer.call(this, cover, 'se-video-container');
+        const figure = Figure.CreateContainer(oFrame, 'se-video-container');
+        const cover = contextVideo._cover = figure.cover;
+        const container = contextVideo._container = figure.container;
 
         try {
             const figcaption = existElement.querySelector('figcaption');
@@ -694,8 +697,9 @@ export default {
     onModifyMode: function (element, size) {
         const contextVideo = this.context.video;
         contextVideo._element = element;
-        contextVideo._cover = this.util.getParentElement(element, 'FIGURE');
-        contextVideo._container = this.util.getParentElement(element, this.component.is);
+        const figure = Figure.GetContainer(element);
+        contextVideo._cover = figure.cover;
+        contextVideo._container = figure.container;
         contextVideo._align = element.style.float || element.getAttribute('data-align') || 'none';
         element.style.float = '';
 

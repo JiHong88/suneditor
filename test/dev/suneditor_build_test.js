@@ -30,13 +30,11 @@ import table from "../../src/plugins/dropdown/table";
 import math from "../../src/plugins/modal/math";
 import link from "../../src/plugins/modal/link";
 import audio from "../../src/plugins/modal/audio";
+import image from "../../src/plugins/modal/image";
 
 window.e = suneditor.create(document.getElementById('editor2'), {
     // value: '<h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2>',
     // textDirection: 'rtl',
-    plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock, horizontalLine, lineHeight, list,
-        paragraphStyle, template, textStyle, table, math, link, audio
-    ],
     charCounter: true,
     // tableCellControllerPosition: 'top',
     statusbar: true,
@@ -79,6 +77,9 @@ window.e = suneditor.create(document.getElementById('editor2'), {
     linkTargetNewWindow: true,
     linkProtocol: 'https://',
     imageMultipleFile: true,
+    plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock, horizontalLine, lineHeight, list,
+        paragraphStyle, template, textStyle, table, math, link, audio
+    ],
     buttonList: [
         ['undo', 'redo'],
         ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
