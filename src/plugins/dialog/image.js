@@ -957,6 +957,7 @@ export default {
     setAutoSize: function () {
         const contextImage = this.context.image;
 
+        if (contextImage._caption) contextImage._caption.style.marginTop = '';
         this.plugins.resizing.resetTransform.call(this, contextImage._element);
         this.plugins.image.cancelPercentAttr.call(this);
 
