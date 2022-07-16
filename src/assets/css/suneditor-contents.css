@@ -43,20 +43,6 @@
     position: relative;
 }
 
-/* float */
-.sun-editor-editable .__se__float-left {
-    float: left;
-}
-.sun-editor-editable .__se__float-right {
-    float: right;
-}
-.sun-editor-editable .__se__float-center {
-    float: center;
-}
-.sun-editor-editable .__se__float-none {
-    float: none;
-}
-
 /** span */
 .sun-editor-editable span {
     display: inline;
@@ -366,6 +352,22 @@
 /** component copy effect */
 .sun-editor-editable[contenteditable=true] .se-component.se-component-copy {
     -webkit-box-shadow:0 0 0 0.2rem #80bdff; box-shadow:0 0 0 0.2rem #3f9dff; transition:border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+/* float */
+.sun-editor-editable .__se__float-left {
+    float: left;
+    margin-right: 4px;
+}
+.sun-editor-editable .__se__float-right {
+    float: right;
+    margin-left: 4px;
+}
+.sun-editor-editable .__se__float-center {
+    float: center;
+}
+.sun-editor-editable .__se__float-none {
+    float: none;
 }
 
 /** image, video .. */
