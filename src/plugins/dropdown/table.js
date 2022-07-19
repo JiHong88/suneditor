@@ -24,7 +24,7 @@ const table = function (editor, target) {
 	this.controller_cell = new Controller(this, controller_cell, this.cellControllerTop ? 'top' : 'bottom');
 	this.splitButton = controller_cell.querySelector('[data-command="onsplit"]');
 	this.selectMenu_split = new SelectMenu(this, false, 'bottom-center');
-	this.selectMenu_split.on(this.splitButton, this.splitCells.bind(this));
+	this.selectMenu_split.on(this.splitButton, OnSplitCells.bind(this));
 	this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
 	this.maxText = this.lang.controller.maxSize;
 	this.minText = this.lang.controller.minSize;
@@ -725,181 +725,6 @@ table.prototype = {
 		return newRow;
 	},
 
-	splitCells: function (direction) {
-		const vertical = direction === 'vertical';
-		const currentCell = this._tdElement;
-		const rows = this._trElements;
-		const currentRow = this._trElement;
-		const index = this._logical_cellIndex;
-		const rowIndex = this._rowIndex;
-		const newCell = CreateCells(currentCell.nodeName, 0, true);
-
-		// vertical
-		if (vertical) {
-			const currentColSpan = currentCell.colSpan;
-			newCell.rowSpan = currentCell.rowSpan;
-
-			// colspan > 1
-			if (currentColSpan > 1) {
-				newCell.colSpan = this._w.Math.floor(currentColSpan / 2);
-				currentCell.colSpan = currentColSpan - newCell.colSpan;
-				currentRow.insertBefore(newCell, currentCell.nextElementSibling);
-			} else {
-				// colspan - 1
-				let rowSpanArr = [];
-				let spanIndex = [];
-
-				for (let i = 0, len = this._rowCnt, cells, colSpan; i < len; i++) {
-					cells = rows[i].cells;
-					colSpan = 0;
-					for (let c = 0, cLen = cells.length, cell, cs, rs, logcalIndex; c < cLen; c++) {
-						cell = cells[c];
-						cs = cell.colSpan - 1;
-						rs = cell.rowSpan - 1;
-						logcalIndex = c + colSpan;
-
-						if (spanIndex.length > 0) {
-							for (let r = 0, arr; r < spanIndex.length; r++) {
-								arr = spanIndex[r];
-								if (arr.row > i) continue;
-								if (logcalIndex >= arr.index) {
-									colSpan += arr.cs;
-									logcalIndex += arr.cs;
-									arr.rs -= 1;
-									arr.row = i + 1;
-									if (arr.rs < 1) {
-										spanIndex.splice(r, 1);
-										r--;
-									}
-								} else if (c === cLen - 1) {
-									arr.rs -= 1;
-									arr.row = i + 1;
-									if (arr.rs < 1) {
-										spanIndex.splice(r, 1);
-										r--;
-									}
-								}
-							}
-						}
-
-						if (logcalIndex <= index && rs > 0) {
-							rowSpanArr.push({
-								index: logcalIndex,
-								cs: cs + 1,
-								rs: rs,
-								row: -1
-							});
-						}
-
-						if (cell !== currentCell && logcalIndex <= index && logcalIndex + cs >= index + currentColSpan - 1) {
-							cell.colSpan += 1;
-							break;
-						}
-
-						if (logcalIndex > index) break;
-
-						colSpan += cs;
-					}
-
-					spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {
-						return a.index - b.index;
-					});
-					rowSpanArr = [];
-				}
-
-				currentRow.insertBefore(newCell, currentCell.nextElementSibling);
-			}
-		} else {
-			// horizontal
-			const currentRowSpan = currentCell.rowSpan;
-			newCell.colSpan = currentCell.colSpan;
-
-			// rowspan > 1
-			if (currentRowSpan > 1) {
-				newCell.rowSpan = this._w.Math.floor(currentRowSpan / 2);
-				const newRowSpan = currentRowSpan - newCell.rowSpan;
-
-				const rowSpanArr = [];
-				const nextRowIndex = domUtils.getArrayIndex(rows, currentRow) + newRowSpan;
-
-				for (let i = 0, cells, colSpan; i < nextRowIndex; i++) {
-					cells = rows[i].cells;
-					colSpan = 0;
-					for (let c = 0, cLen = cells.length, cell, cs, logcalIndex; c < cLen; c++) {
-						logcalIndex = c + colSpan;
-						if (logcalIndex >= index) break;
-
-						cell = cells[c];
-						cs = cell.rowSpan - 1;
-						if (cs > 0 && cs + i >= nextRowIndex && logcalIndex < index) {
-							rowSpanArr.push({
-								index: logcalIndex,
-								cs: cell.colSpan
-							});
-						}
-						colSpan += cell.colSpan - 1;
-					}
-				}
-
-				const nextRow = rows[nextRowIndex];
-				const nextCells = nextRow.cells;
-				let rs = rowSpanArr.shift();
-
-				for (let c = 0, cLen = nextCells.length, colSpan = 0, cell, cs, logcalIndex, insertIndex; c < cLen; c++) {
-					logcalIndex = c + colSpan;
-					cell = nextCells[c];
-					cs = cell.colSpan - 1;
-					insertIndex = logcalIndex + cs + 1;
-
-					if (rs && insertIndex >= rs.index) {
-						colSpan += rs.cs;
-						insertIndex += rs.cs;
-						rs = rowSpanArr.shift();
-					}
-
-					if (insertIndex >= index || c === cLen - 1) {
-						nextRow.insertBefore(newCell, cell.nextElementSibling);
-						break;
-					}
-
-					colSpan += cs;
-				}
-
-				currentCell.rowSpan = newRowSpan;
-			} else {
-				// rowspan - 1
-				newCell.rowSpan = currentCell.rowSpan;
-				const newRow = domUtils.createElement('TR');
-				newRow.appendChild(newCell);
-
-				for (let i = 0, cells; i < rowIndex; i++) {
-					cells = rows[i].cells;
-					if (cells.length === 0) return;
-
-					for (let c = 0, cLen = cells.length; c < cLen; c++) {
-						if (i + cells[c].rowSpan - 1 >= rowIndex) {
-							cells[c].rowSpan += 1;
-						}
-					}
-				}
-
-				const physicalIndex = this._physical_cellIndex;
-				const cells = currentRow.cells;
-
-				for (let c = 0, cLen = cells.length; c < cLen; c++) {
-					if (c === physicalIndex) continue;
-					cells[c].rowSpan += 1;
-				}
-
-				currentRow.parentNode.insertBefore(newRow, currentRow.nextElementSibling);
-			}
-		}
-
-		this.editor.focusEdge(currentCell);
-		this.setCellControllerPosition(currentCell, true);
-		this.selectMenu_split.close();
-	},
-
 	mergeCells: function () {
 		const ref = this._ref;
 		const selectedCells = this._selectedCells;
@@ -1215,6 +1040,181 @@ table.prototype = {
 	constructor: table
 };
 
+function OnSplitCells(direction) {
+	const vertical = direction === 'vertical';
+	const currentCell = this._tdElement;
+	const rows = this._trElements;
+	const currentRow = this._trElement;
+	const index = this._logical_cellIndex;
+	const rowIndex = this._rowIndex;
+	const newCell = CreateCells(currentCell.nodeName, 0, true);
+
+	// vertical
+	if (vertical) {
+		const currentColSpan = currentCell.colSpan;
+		newCell.rowSpan = currentCell.rowSpan;
+
+		// colspan > 1
+		if (currentColSpan > 1) {
+			newCell.colSpan = this._w.Math.floor(currentColSpan / 2);
+			currentCell.colSpan = currentColSpan - newCell.colSpan;
+			currentRow.insertBefore(newCell, currentCell.nextElementSibling);
+		} else {
+			// colspan - 1
+			let rowSpanArr = [];
+			let spanIndex = [];
+
+			for (let i = 0, len = this._rowCnt, cells, colSpan; i < len; i++) {
+				cells = rows[i].cells;
+				colSpan = 0;
+				for (let c = 0, cLen = cells.length, cell, cs, rs, logcalIndex; c < cLen; c++) {
+					cell = cells[c];
+					cs = cell.colSpan - 1;
+					rs = cell.rowSpan - 1;
+					logcalIndex = c + colSpan;
+
+					if (spanIndex.length > 0) {
+						for (let r = 0, arr; r < spanIndex.length; r++) {
+							arr = spanIndex[r];
+							if (arr.row > i) continue;
+							if (logcalIndex >= arr.index) {
+								colSpan += arr.cs;
+								logcalIndex += arr.cs;
+								arr.rs -= 1;
+								arr.row = i + 1;
+								if (arr.rs < 1) {
+									spanIndex.splice(r, 1);
+									r--;
+								}
+							} else if (c === cLen - 1) {
+								arr.rs -= 1;
+								arr.row = i + 1;
+								if (arr.rs < 1) {
+									spanIndex.splice(r, 1);
+									r--;
+								}
+							}
+						}
+					}
+
+					if (logcalIndex <= index && rs > 0) {
+						rowSpanArr.push({
+							index: logcalIndex,
+							cs: cs + 1,
+							rs: rs,
+							row: -1
+						});
+					}
+
+					if (cell !== currentCell && logcalIndex <= index && logcalIndex + cs >= index + currentColSpan - 1) {
+						cell.colSpan += 1;
+						break;
+					}
+
+					if (logcalIndex > index) break;
+
+					colSpan += cs;
+				}
+
+				spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {
+					return a.index - b.index;
+				});
+				rowSpanArr = [];
+			}
+
+			currentRow.insertBefore(newCell, currentCell.nextElementSibling);
+		}
+	} else {
+		// horizontal
+		const currentRowSpan = currentCell.rowSpan;
+		newCell.colSpan = currentCell.colSpan;
+
+		// rowspan > 1
+		if (currentRowSpan > 1) {
+			newCell.rowSpan = this._w.Math.floor(currentRowSpan / 2);
+			const newRowSpan = currentRowSpan - newCell.rowSpan;
+
+			const rowSpanArr = [];
+			const nextRowIndex = domUtils.getArrayIndex(rows, currentRow) + newRowSpan;
+
+			for (let i = 0, cells, colSpan; i < nextRowIndex; i++) {
+				cells = rows[i].cells;
+				colSpan = 0;
+				for (let c = 0, cLen = cells.length, cell, cs, logcalIndex; c < cLen; c++) {
+					logcalIndex = c + colSpan;
+					if (logcalIndex >= index) break;
+
+					cell = cells[c];
+					cs = cell.rowSpan - 1;
+					if (cs > 0 && cs + i >= nextRowIndex && logcalIndex < index) {
+						rowSpanArr.push({
+							index: logcalIndex,
+							cs: cell.colSpan
+						});
+					}
+					colSpan += cell.colSpan - 1;
+				}
+			}
+
+			const nextRow = rows[nextRowIndex];
+			const nextCells = nextRow.cells;
+			let rs = rowSpanArr.shift();
+
+			for (let c = 0, cLen = nextCells.length, colSpan = 0, cell, cs, logcalIndex, insertIndex; c < cLen; c++) {
+				logcalIndex = c + colSpan;
+				cell = nextCells[c];
+				cs = cell.colSpan - 1;
+				insertIndex = logcalIndex + cs + 1;
+
+				if (rs && insertIndex >= rs.index) {
+					colSpan += rs.cs;
+					insertIndex += rs.cs;
+					rs = rowSpanArr.shift();
+				}
+
+				if (insertIndex >= index || c === cLen - 1) {
+					nextRow.insertBefore(newCell, cell.nextElementSibling);
+					break;
+				}
+
+				colSpan += cs;
+			}
+
+			currentCell.rowSpan = newRowSpan;
+		} else {
+			// rowspan - 1
+			newCell.rowSpan = currentCell.rowSpan;
+			const newRow = domUtils.createElement('TR');
+			newRow.appendChild(newCell);
+
+			for (let i = 0, cells; i < rowIndex; i++) {
+				cells = rows[i].cells;
+				if (cells.length === 0) return;
+
+				for (let c = 0, cLen = cells.length; c < cLen; c++) {
+					if (i + cells[c].rowSpan - 1 >= rowIndex) {
+						cells[c].rowSpan += 1;
+					}
+				}
+			}
+
+			const physicalIndex = this._physical_cellIndex;
+			const cells = currentRow.cells;
+
+			for (let c = 0, cLen = cells.length; c < cLen; c++) {
+				if (c === physicalIndex) continue;
+				cells[c].rowSpan += 1;
+			}
+
+			currentRow.parentNode.insertBefore(newRow, currentRow.nextElementSibling);
+		}
+	}
+
+	this.editor.focusEdge(currentCell);
+	this.setCellControllerPosition(currentCell, true);
+	this.selectMenu_split.close();
+}
+
 function OnMouseMoveTablePicker(e) {
 	e.stopPropagation();
 
@@ -1325,8 +1325,6 @@ function OffCellTouch(e) {
 
 // init element
 function CreateSplitMenu(lang) {
-	const items = ['vertical', 'horizontal'];
-
 	const menus = domUtils.createElement(
 		'DIV',
 		null,

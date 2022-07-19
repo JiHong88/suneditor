@@ -31,6 +31,12 @@ const Modal = function (inst, element) {
 	}
 };
 
+Modal.CreateBasic = function () {
+	let html = '';
+
+	return domUtils.createElement('DIV', { class: '' }, html);
+};
+
 Modal.prototype = {
 	/**
 	 * @description Open a modal plugin
@@ -76,12 +82,6 @@ Modal.prototype = {
 	constructor: Modal
 };
 
-Modal.CreateHTML = function () {
-	let html = '';
-
-	return domUtils.createElement('DIV', { class: '' }, html);
-};
-
 /**
  * The loading bar is executed before "modalAction" is executed.
  * When true is returned, the loading bar and modal window are closed.
@@ -101,11 +101,10 @@ function Action(e) {
 			this.editor.closeLoading();
 		} else if (result === undefined) {
 			this.close();
-		}else {
+		} else {
 			this.close();
 			this.editor.closeLoading();
 		}
-		
 	} catch (error) {
 		this.close();
 		this.editor.closeLoading();

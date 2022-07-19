@@ -127,10 +127,10 @@ audio.prototype = {
 	/**
 	 * @override fileManager
 	 */
-	ready: function (selectedElement) {
-		domUtils.addClass(selectedElement, 'active');
-		this.controller.open(selectedElement);
-		this._element = selectedElement;
+	ready: function (target) {
+		domUtils.addClass(target, 'active');
+		this.controller.open(target);
+		this._element = target;
 	},
 
 	/**

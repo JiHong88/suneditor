@@ -32,20 +32,23 @@ EventManager.prototype = {
 	/**
 	 * @description Register for an event.
 	 * Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
-	 * @param {Element|object} target Target element
+	 * @param {Element|Element[]} target Target element
 	 * @param {string} type Event type
 	 * @param {Function} listener Event handler
 	 * @param {boolean|undefined} useCapture Event useCapture option
 	 * @return {target, type, listener, useCapture}
 	 */
 	addEvent: function (target, type, listener, useCapture) {
-		target.addEventListener(type, listener, useCapture);
-		this._events.push({
-			target: target,
-			type: type,
-			handler: listener,
-			useCapture: useCapture
-		});
+		if (!target.length) target = [target];
+		for (let i = 0, len = target.length; i < len; i++) {
+			target[i].addEventListener(type, listener, useCapture);
+			this._events.push({
+				target: target[i],
+				type: type,
+				handler: listener,
+				useCapture: useCapture
+			});
+		}
 	},
 
 	/**
