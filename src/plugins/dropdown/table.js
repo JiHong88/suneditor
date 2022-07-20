@@ -789,11 +789,9 @@ table.prototype = {
 		mergeCell.colSpan = cs;
 		mergeCell.rowSpan = rs;
 
-		this._closeController();
 		this.setActiveButton(true, false);
 		this.setController(mergeCell);
 
-		domUtils.addClass(mergeCell, 'se-table-selected-cell');
 		this.editor.focusEdge(mergeCell);
 	},
 
