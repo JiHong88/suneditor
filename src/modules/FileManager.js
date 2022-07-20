@@ -6,7 +6,7 @@ import { domUtils, global } from '../helper';
 /**
  *
  * @param {*} inst
- * @param {{ tagNames: array, eventHandler: Function, checkHandler: Function, isActiveSizeModule: boolean | null }} params
+ * @param {{ tagNames: array, eventHandler: Function, checkHandler: Function, figure: Figure instance | null }} params
  */
 const FileManager = function (inst, params) {
 	CoreInterface.call(this, inst.editor);
@@ -16,9 +16,9 @@ const FileManager = function (inst, params) {
 	this.kind = inst.constructor;
 	this.inst = inst;
 	this.tagNames = params.tagNames;
-	this.isActiveSizeModule = params.isActiveSizeModule;
 	this.eventHandler = params.eventHandler;
 	this.checkHandler = params.checkHandler;
+	this.figure = params.figure;
 	this.infoList = [];
 	this.infoIndex = 0;
 	this.uploadFileLength = 0;
@@ -68,9 +68,6 @@ FileManager.prototype = {
 	 * @param {Object|null} file
 	 */
 	setInfo: function (element, file) {
-		const _resize_plugin = this.isActiveSizeModule ? this.context.resizing._resize_plugin : '';
-		if (this.isActiveSizeModule) this.context.resizing._resize_plugin = this.kind;
-
 		let dataIndex = element.getAttribute('data-index');
 		let info = null;
 		let state = '';
@@ -133,30 +130,29 @@ FileManager.prototype = {
 			this._w.setTimeout(this.inst.select.bind(this.inst, element));
 		}.bind(this, element);
 
-		// const context = this.context[this.kind];
-		// if (this.isActiveSizeModule) {
-		// 	if (!element.getAttribute('data-origin-size') && element.naturalWidth) {
-		// 		element.setAttribute('data-origin-size', element.naturalWidth + ',' + element.naturalHeight);
-		// 	}
+		if (this.figure) {
+			// @todo
+			// const context = this.context[this.kind];
+			// if (!element.getAttribute('data-origin-size') && element.naturalWidth) {
+			// 	element.setAttribute('data-origin-size', element.naturalWidth + ',' + element.naturalHeight);
+			// }
 
-		// 	if (!element.getAttribute('data-origin')) {
-		// 		const container = domUtils.getParentElement(element, this.editor.component.is);
-		// 		const cover = domUtils.getParentElement(element, 'FIGURE');
+			// if (!element.getAttribute('data-origin')) {
+			// 	const container = domUtils.getParentElement(element, this.editor.component.is);
+			// 	const cover = domUtils.getParentElement(element, 'FIGURE');
 
-		// 		const w = this.plugins.resizing._module_getSizeX.call(this, context, element, cover, container);
-		// 		const h = this.plugins.resizing._module_getSizeY.call(this, context, element, cover, container);
-		// 		element.setAttribute('data-origin', w + ',' + h);
-		// 		element.setAttribute('data-size', w + ',' + h);
-		// 	}
+			// 	const w = this.plugins.resizing._module_getSizeX.call(this, context, element, cover, container);
+			// 	const h = this.plugins.resizing._module_getSizeY.call(this, context, element, cover, container);
+			// 	element.setAttribute('data-origin', w + ',' + h);
+			// 	element.setAttribute('data-size', w + ',' + h);
+			// }
 
-		// 	if (!element.style.width) {
-		// 		const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
-		// 		this.inst.ready.call(this, element, null);
-		// 		this.inst.applySize.call(this, size[0], size[1]);
-		// 	}
-
-		// 	this.context.resizing._resize_plugin = _resize_plugin;
-		// }
+			// if (!element.style.width) {
+			// 	const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
+			// 	this.inst.ready.call(this, element, null);
+			// 	this.inst.applySize.call(this, size[0], size[1]);
+			// }
+		}
 
 		if (typeof this.eventHandler === 'function') this.eventHandler(element, dataIndex, state, info, --this.uploadFileLength < 0 ? 0 : this.uploadFileLength);
 	},
@@ -209,8 +205,6 @@ FileManager.prototype = {
 		}
 
 		// check
-		const _resize_plugin = this.isActiveSizeModule ? this.context.resizing._resize_plugin : '';
-		if (this.isActiveSizeModule) this.context.resizing._resize_plugin = this.kind;
 		const currentTags = [];
 		const infoIndex = [];
 		for (let i = 0, len = this.infoList.length; i < len; i++) {
@@ -241,8 +235,6 @@ FileManager.prototype = {
 			if (typeof this.eventHandler === 'function') this.eventHandler(null, dataIndex, 'delete', null, 0);
 			i--;
 		}
-
-		if (this.isActiveSizeModule) this.context.resizing._resize_plugin = _resize_plugin;
 	},
 
 	/**

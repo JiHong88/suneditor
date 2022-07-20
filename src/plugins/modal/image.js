@@ -18,8 +18,11 @@ const image = function (editor, target) {
 	// modules
 	this.anchor = new ModalAnchorEditor(this, modalEl);
 	this.modal = new Modal(this, modalEl);
-	this.fileManager = new FileManager(this, { tagNames: ['img'], eventHandler: this.events.onImageUpload, checkHandler: FileCheckHandler.bind(this), isActiveSizeModule: null });
-	this.figure = new Figure(this);
+	this.fileManager = new FileManager(this, { tagNames: ['img'], eventHandler: this.events.onImageUpload, checkHandler: FileCheckHandler.bind(this), figure: null });
+	this.figure = new Figure(this, true, [
+		['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
+		['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']
+	]);
 
 	// members
 	this.imgInputFile = modalEl.querySelector('._se_image_file');
@@ -170,7 +173,7 @@ image.prototype = {
 	},
 
 	/**
-	 * @override fileManager, figure
+	 * @override fileManager
 	 * @description It is called from core.mediaContainer.select
 	 * @param {Element} element Target element
 	 */
@@ -183,11 +186,12 @@ image.prototype = {
 	 */
 	ready: function (element) {
 		if (!element) return;
-		const size = false; //@todo this.plugins.resizing.call_controller_resize.call(this, element, 'image');
+		const size = this.figure.open(element);
 		this.anchor.set(/^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null);
 
 		this._linkElement = this.anchor.currentTarget;
 		this._element = element;
+
 		const figure = Figure.GetContainer(element);
 		this._cover = figure.cover;
 		this._container = figure.container;
@@ -224,19 +228,19 @@ image.prototype = {
 		this._captionChecked = this.captionCheckEl.checked = !!this._caption;
 
 		if (this._resizing) {
-			this.plugins.resizing._module_setModifyInputSize.call(this, this, this.plugins.image);
+			this.plugins.resizing._module_setModifyInputSize.call(this);
 		}
 	},
 
 	/**
-	 * @override fileManager, figure
+	 * @override fileManager
 	 */
 	destroy: function (element) {
 		const imageEl = element || this._element;
 		const imageContainer = domUtils.getParentElement(imageEl, this.component.is) || imageEl;
 		const focusEl = imageContainer.previousElementSibling || imageContainer.nextElementSibling;
-
 		const emptyDiv = imageContainer.parentNode;
+
 		domUtils.removeItem(imageContainer);
 		this.init();
 
@@ -255,6 +259,43 @@ image.prototype = {
 
 		// history stack
 		this.history.push(false);
+	},
+
+	/**
+	 * @override figure
+	 * @param {Element} target Target element
+	 * @param {string} command Command
+	 * @param {{w: number, h: number}|number|("none|"left"|"center"|"right")} value Command value
+	 */
+	figureAction: function (target, command, value) {
+		switch (command) {
+			case 'edit':
+				this.ready(target);
+				this.open();
+				break;
+			case 'remove':
+				this.destroy();
+				break;
+			case 'align':
+				this.figure.setAlign(target, value);
+				break;
+			case 'resize':
+				// value = {w, h}
+				break;
+			case 'resize_percent':
+				// value = 100
+				break;
+			case 'auto':
+				break;
+			case 'revert':
+				break;
+			case 'rotate':
+				break;
+			case 'mirror':
+				break;
+			case 'caption':
+				break;
+		}
 	},
 
 	_submitFile: function (fileList) {
@@ -425,7 +466,7 @@ image.prototype = {
 
 		// transform
 		if (modifiedCaption || (!this._onlyPercentage && changeSize)) {
-			if (!init && (/\d+/.test(imageEl.style.height) || (this.context.resizing._rotateVertical && this._captionChecked))) {
+			if (!init && (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this._captionChecked))) {
 				if (/%$/.test(this.inputX.value) || /%$/.test(this.inputY.value)) {
 					//@todo this.plugins.resizing.resetTransform.call(this, imageEl);
 				} else {
@@ -443,7 +484,7 @@ image.prototype = {
 		}
 
 		// align
-		this.plugins.image.setAlign.call(this, null, imageEl, null, null);
+		this.figure.setAlign(imageEl, this._align);
 
 		// set imagesInfo
 		if (init) {
@@ -503,12 +544,12 @@ image.prototype = {
 		if (!h) h = this.inputY.value || this.options.imageHeight;
 
 		if ((this._onlyPercentage && !!w) || /%$/.test(w)) {
-			this.plugins.image.setPercentSize.call(this, w, h);
+			this.setPercentSize.call(this, w, h);
 			return true;
 		} else if ((!w || w === 'auto') && (!h || h === 'auto')) {
-			this.plugins.image.setAutoSize.call(this);
+			this.setAutoSize.call(this);
 		} else {
-			this.plugins.image.setSize.call(this, w, h, false);
+			this.setSize.call(this, w, h, false);
 		}
 
 		return false;
@@ -625,7 +666,7 @@ image.prototype = {
 		this._applySize(width, height);
 
 		// align
-		this.setAlign.call(this, align, oImg, cover, container);
+		this.figure.setAlign(oImg, align);
 
 		oImg.onload = OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
 		if (this.component.insert(container, true, false, true)) this.fileManager.setInfo(oImg, file);
@@ -658,120 +699,81 @@ var a = {
 	 * @override resizing, @inst
 	 */
 	setSize: function (w, h, notResetPercentage, direction) {
-		const contextImage = this.context.image;
 		const onlyW = /^(rw|lw)$/.test(direction);
 		const onlyH = /^(th|bh)$/.test(direction);
 
 		if (!onlyH) {
-			contextImage._element.style.width = numbers.is(w) ? w + contextImage.sizeUnit : w;
-			this.plugins.image.cancelPercentAttr.call(this);
+			this._element.style.width = numbers.is(w) ? w + this.sizeUnit : w;
+			this.cancelPercentAttr.call(this);
 		}
 		if (!onlyW) {
-			contextImage._element.style.height = numbers.is(h) ? h + contextImage.sizeUnit : /%$/.test(h) ? '' : h;
+			this._element.style.height = numbers.is(h) ? h + this.sizeUnit : /%$/.test(h) ? '' : h;
 		}
 
-		if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
-		if (!notResetPercentage) contextImage._element.removeAttribute('data-percentage');
+		if (this._align === 'center') this.figure.setAlign(this._element, this._align);
+		if (!notResetPercentage) this._element.removeAttribute('data-percentage');
 
 		// save current size
-		this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
+		// this.plugins.resizing._module_saveCurrentSize.call(this, this);@todo
 	},
 
 	/**
 	 * @override resizing @inst
 	 */
 	setAutoSize: function () {
-		const contextImage = this.context.image;
+		// this.plugins.resizing.resetTransform.call(this, this._element);@todo
+		this.cancelPercentAttr.call(this);
 
-		this.plugins.resizing.resetTransform.call(this, contextImage._element);
-		this.plugins.image.cancelPercentAttr.call(this);
+		this._element.style.maxWidth = '';
+		this._element.style.width = '';
+		this._element.style.height = '';
+		this._cover.style.width = '';
+		this._cover.style.height = '';
 
-		contextImage._element.style.maxWidth = '';
-		contextImage._element.style.width = '';
-		contextImage._element.style.height = '';
-		contextImage._cover.style.width = '';
-		contextImage._cover.style.height = '';
-
-		this.plugins.image.setAlign.call(this, null, null, null, null);
-		contextImage._element.setAttribute('data-percentage', 'auto,auto');
+		this.figure.setAlign(this._element, this._align);
+		this._element.setAttribute('data-percentage', 'auto,auto');
 
 		// save current size
-		this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
+		// this.plugins.resizing._module_saveCurrentSize.call(this, this);@todo
 	},
 
 	/**
 	 * @override resizing @inst
 	 */
 	setPercentSize: function (w, h) {
-		const contextImage = this.context.image;
-		h = !!h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + contextImage.sizeUnit : h || '';
+		h = !!h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || '';
 		const heightPercentage = /%$/.test(h);
 
-		contextImage._container.style.width = numbers.is(w) ? w + '%' : w;
-		contextImage._container.style.height = '';
-		contextImage._cover.style.width = '100%';
-		contextImage._cover.style.height = !heightPercentage ? '' : h;
-		contextImage._element.style.width = '100%';
-		contextImage._element.style.height = heightPercentage ? '' : h;
-		contextImage._element.style.maxWidth = '';
+		this._container.style.width = numbers.is(w) ? w + '%' : w;
+		this._container.style.height = '';
+		this._cover.style.width = '100%';
+		this._cover.style.height = !heightPercentage ? '' : h;
+		this._element.style.width = '100%';
+		this._element.style.height = heightPercentage ? '' : h;
+		this._element.style.maxWidth = '';
 
-		if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
+		if (this._align === 'center') this.figure.setAlign(this._element, this._align);
 
-		contextImage._element.setAttribute('data-percentage', w + ',' + h);
-		this.plugins.resizing.setCaptionPosition.call(this, contextImage._element);
+		this._element.setAttribute('data-percentage', w + ',' + h);
+		// this.plugins.resizing.setCaptionPosition.call(this, this._element);@todo
 
 		// save current size
-		this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
+		// this.plugins.resizing._module_saveCurrentSize.call(this, this);@todo
 	},
 
 	/**
 	 * @override resizing @inst
 	 */
 	cancelPercentAttr: function () {
-		const contextImage = this.context.image;
+		this._cover.style.width = '';
+		this._cover.style.height = '';
+		this._container.style.width = '';
+		this._container.style.height = '';
 
-		contextImage._cover.style.width = '';
-		contextImage._cover.style.height = '';
-		contextImage._container.style.width = '';
-		contextImage._container.style.height = '';
+		domUtils.removeClass(this._container, this._floatClassRegExp);
+		domUtils.addClass(this._container, '__se__float-' + this._align);
 
-		domUtils.removeClass(contextImage._container, this.context.image._floatClassRegExp);
-		domUtils.addClass(contextImage._container, '__se__float-' + contextImage._align);
-
-		if (contextImage._align === 'center') this.plugins.image.setAlign.call(this, null, null, null, null);
-	},
-
-	/**
-	 * @override resizing @inst
-	 */
-	setAlign: function (align, element, cover, container) {
-		const contextImage = this.context.image;
-
-		if (!align) align = contextImage._align;
-		if (!element) element = contextImage._element;
-		if (!cover) cover = contextImage._cover;
-		if (!container) container = contextImage._container;
-
-		if (align && align !== 'none') {
-			cover.style.margin = 'auto';
-		} else {
-			cover.style.margin = '0';
-		}
-
-		if (/%$/.test(element.style.width) && align === 'center') {
-			container.style.minWidth = '100%';
-			cover.style.width = container.style.width;
-		} else {
-			container.style.minWidth = '';
-			cover.style.width = this.context.resizing._rotateVertical ? element.style.height || element.offsetHeight : !element.style.width || element.style.width === 'auto' ? '' : element.style.width || '100%';
-		}
-
-		if (!domUtils.hasClass(container, '__se__float-' + align)) {
-			domUtils.removeClass(container, contextImage._floatClassRegExp);
-			domUtils.addClass(container, '__se__float-' + align);
-		}
-
-		element.setAttribute('data-align', align);
+		if (this._align === 'center') this.figure.setAlign(this._element, this._align);
 	},
 
 	///////////
@@ -811,7 +813,7 @@ var a = {
 		contextImage._element.removeAttribute('data-percentage');
 
 		this.plugins.resizing.resetTransform.call(this, contextImage._element);
-		this.plugins.image.cancelPercentAttr.call(this);
+		this.cancelPercentAttr.call(this);
 
 		const originSize = (contextImage._element.getAttribute('data-origin') || '').split(',');
 		const w = originSize[0];
@@ -819,9 +821,9 @@ var a = {
 
 		if (originSize) {
 			if (contextImage._onlyPercentage || (/%$/.test(w) && (/%$/.test(h) || !/\d/.test(h)))) {
-				this.plugins.image.setPercentSize.call(this, w, h);
+				this.setPercentSize.call(this, w, h);
 			} else {
-				this.plugins.image.setSize.call(this, w, h);
+				this.setSize.call(this, w, h);
 			}
 
 			// save current size
@@ -882,7 +884,7 @@ function OnfileInputChange() {
 }
 
 function OpenGallery() {
-	this.plugins.imageGallery.open(_setUrlInput.bind(this));
+	thisGallery.open(_setUrlInput.bind(this));
 }
 
 function _setUrlInput(target) {
@@ -1022,7 +1024,7 @@ function CreateHTML_modal(editor) {
 		'</div>' +
 		'</div>' +
 		'</div>' +
-		'<div class="se-anchor-editor _se_tab_content" style="display: none"></div>' +
+		'<div class="se-anchor-editor _se_tab_content _se_tab_content_url" style="display: none"></div>' +
 		'<div class="se-modal-footer">' +
 		'<div' +
 		(option.imageAlignShow ? '' : ' style="display: none"') +
