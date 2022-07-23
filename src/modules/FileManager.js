@@ -13,7 +13,7 @@ const FileManager = function (inst, params) {
 
 	// members
 	inst.__fileManagement = this;
-	this.kind = inst.constructor;
+	this.kind = inst.constructor.name;
 	this.inst = inst;
 	this.tagNames = params.tagNames;
 	this.eventHandler = params.eventHandler;
@@ -130,28 +130,23 @@ FileManager.prototype = {
 			this._w.setTimeout(this.inst.select.bind(this.inst, element));
 		}.bind(this, element);
 
+		// figure
 		if (this.figure) {
-			// @todo
-			// const context = this.context[this.kind];
-			// if (!element.getAttribute('data-origin-size') && element.naturalWidth) {
-			// 	element.setAttribute('data-origin-size', element.naturalWidth + ',' + element.naturalHeight);
-			// }
+			if (!element.getAttribute('data-origin-size') && element.naturalWidth) {
+				element.setAttribute('data-origin-size', element.naturalWidth + ',' + element.naturalHeight);
+			}
 
-			// if (!element.getAttribute('data-origin')) {
-			// 	const container = domUtils.getParentElement(element, this.editor.component.is);
-			// 	const cover = domUtils.getParentElement(element, 'FIGURE');
+			if (!element.getAttribute('data-origin')) {
+				const size = this.figure.getSize(element);;
+				element.setAttribute('data-origin', size.w + ',' + size.h);
+				element.setAttribute('data-size', size.w + ',' + size.h);
+			}
 
-			// 	const w = this.plugins.resizing._module_getSizeX.call(this, context, element, cover, container);
-			// 	const h = this.plugins.resizing._module_getSizeY.call(this, context, element, cover, container);
-			// 	element.setAttribute('data-origin', w + ',' + h);
-			// 	element.setAttribute('data-size', w + ',' + h);
-			// }
-
-			// if (!element.style.width) {
-			// 	const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
-			// 	this.inst.ready.call(this, element, null);
-			// 	this.inst.applySize.call(this, size[0], size[1]);
-			// }
+			if (!element.style.width) {
+				const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
+				this.inst.ready.call(this, element, null);
+				this.inst.applySize.call(this, size[0], size[1]);
+			}
 		}
 
 		if (typeof this.eventHandler === 'function') this.eventHandler(element, dataIndex, state, info, --this.uploadFileLength < 0 ? 0 : this.uploadFileLength);

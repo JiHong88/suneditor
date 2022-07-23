@@ -93,9 +93,9 @@ const Constructor = function (element, options) {
 	textarea = _checkCodeMirror(options, textarea);
 
 	// modal
-	const modal = domUtils.createElement('DIV', {class: 'se-modal sun-editor-common'});
-	const modal_back = domUtils.createElement('DIV', {class: 'se-modal-back', style: 'display: none;'});
-	const modal_inner = domUtils.createElement('DIV', {class: 'se-modal-inner', style: 'display: none;'});
+	const modal = domUtils.createElement('DIV', { class: 'se-modal sun-editor-common' });
+	const modal_back = domUtils.createElement('DIV', { class: 'se-modal-back', style: 'display: none;' });
+	const modal_inner = domUtils.createElement('DIV', { class: 'se-modal-inner', style: 'display: none;' });
 	modal.appendChild(modal_back);
 	modal.appendChild(modal_inner);
 	relative.appendChild(modal);
@@ -220,8 +220,8 @@ function InitOptions(element, options) {
 		}
 		return _default;
 	}, {}));
-	options._spanStylesRegExp = new _w.RegExp('\s*(font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')\s*:[^;]+(?!;)*', 'gi');
-	options._formatStylesRegExp = new _w.RegExp('\s*(text-align|margin-left|margin-right' + (options.formatStyles ? '|' + options.formatStyles : '') + ')\s*:[^;]+(?!;)*', 'gi');
+	options._spanStylesRegExp = new _w.RegExp('s*(font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')s*:[^;]+(?!;)*', 'gi');
+	options._formatStylesRegExp = new _w.RegExp('s*(text-align|margin-left|margin-right' + (options.formatStyles ? '|' + options.formatStyles : '') + ')s*:[^;]+(?!;)*', 'gi');
 	options._styleNodeMap = {
 		strong: textTags.bold.toLowerCase(),
 		b: textTags.bold.toLowerCase(),
@@ -369,13 +369,23 @@ function InitOptions(element, options) {
 
 	/** Image */
 	options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
-	options.imageHeightShow = options.imageHeightShow === undefined ? true : !!options.imageHeightShow;
-	options.imageAlignShow = options.imageAlignShow === undefined ? true : !!options.imageAlignShow;
 	options.imageWidth = !options.imageWidth ? 'auto' : numbers.is(options.imageWidth) ? options.imageWidth + 'px' : options.imageWidth;
 	options.imageHeight = !options.imageHeight ? 'auto' : numbers.is(options.imageHeight) ? options.imageHeight + 'px' : options.imageHeight;
+	options.imageControls =
+		options.imageControls || !options.imageResizing
+			? [['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']]
+			: [
+					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
+					['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']
+			  ];
+
+	// @todo
+	options.imageHeightShow = options.imageHeightShow === undefined ? true : !!options.imageHeightShow;
+	options.imageAlignShow = options.imageAlignShow === undefined ? true : !!options.imageAlignShow;
 	options.imageSizeOnlyPercentage = !!options.imageSizeOnlyPercentage;
 	options._imageSizeUnit = options.imageSizeOnlyPercentage ? '%' : 'px';
 	options.imageRotation = options.imageRotation !== undefined ? options.imageRotation : !(options.imageSizeOnlyPercentage || !options.imageHeightShow);
+
 	options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
 	options.imageUrlInput = options.imageUrlInput === undefined || !options.imageFileInput ? true : options.imageUrlInput;
 	options.imageUploadHeader = options.imageUploadHeader || null;
@@ -388,17 +398,22 @@ function InitOptions(element, options) {
 	options.imageGalleryHeader = options.imageGalleryHeader || null;
 	/** Video */
 	options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
-	options.videoHeightShow = options.videoHeightShow === undefined ? true : !!options.videoHeightShow;
-	options.videoAlignShow = options.videoAlignShow === undefined ? true : !!options.videoAlignShow;
-	options.videoRatioShow = options.videoRatioShow === undefined ? true : !!options.videoRatioShow;
 	options.videoWidth = !options.videoWidth || !numbers.get(options.videoWidth, 0) ? '' : numbers.is(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth;
 	options.videoHeight = !options.videoHeight || !numbers.get(options.videoHeight, 0) ? '' : numbers.is(options.videoHeight) ? options.videoHeight + 'px' : options.videoHeight;
+
+	// @todo
+	options.videoRatioShow = options.videoRatioShow === undefined ? true : !!options.videoRatioShow;
+	options.videoRatio = numbers.get(options.videoRatio, 4) || 0.5625;
+	options.videoRatioList = !options.videoRatioList ? null : options.videoRatioList;
+
+	// @todo
+	options.videoHeightShow = options.videoHeightShow === undefined ? true : !!options.videoHeightShow;
+	options.videoAlignShow = options.videoAlignShow === undefined ? true : !!options.videoAlignShow;
 	options.videoSizeOnlyPercentage = !!options.videoSizeOnlyPercentage;
 	options._videoSizeUnit = options.videoSizeOnlyPercentage ? '%' : 'px';
 	options.videoRotation = options.videoRotation !== undefined ? options.videoRotation : !(options.videoSizeOnlyPercentage || !options.videoHeightShow);
-	options.videoRatio = numbers.get(options.videoRatio, 4) || 0.5625;
-	options.videoRatioList = !options.videoRatioList ? null : options.videoRatioList;
 	options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
+
 	options.videoFileInput = !!options.videoFileInput;
 	options.videoUrlInput = options.videoUrlInput === undefined || !options.videoFileInput ? true : options.videoUrlInput;
 	options.videoUploadHeader = options.videoUploadHeader || null;

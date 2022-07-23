@@ -41,6 +41,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
     // mode: "inline",
     katex: Katex,
     width: "100%",
+    height: 'auto',
     minHeight : 300,
     charCounter: true,
     font: [
@@ -78,6 +79,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
     linkProtocol: 'https://',
     imageMultipleFile: true,
     imageResizing: false,
+    iframe: true,
     plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock, horizontalLine, lineHeight, list,
         paragraphStyle, template, textStyle, table, math, link, audio, image
     ],

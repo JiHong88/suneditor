@@ -12,6 +12,8 @@ const ModalAnchorEditor = function (inst, modalForm) {
 	const forms = CreatetModalForm(inst.editor);
 
 	// members
+	this.kink = inst.constructor.name;
+	this.inst = inst;
 	this.modalForm = modalForm;
 	this.host = (this._w.location.origin + this._w.location.pathname).replace(/\/$/, '');
 	this.urlInput = forms.querySelector('.se-input-url');

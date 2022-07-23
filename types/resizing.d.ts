@@ -30,27 +30,14 @@ import { Module } from '../Module';
     _captionChecked: false,
     captionCheckEl: null
 */
-declare interface resizing extends Module {
+declare interface Figure extends Module {
     /**
-     * @description Gets the width size
-     * @param contextPlugin context object of plugin (core.context[plugin])
-     * @param element Target element [default: "this.plugin[plugin]._element"]
-     * @param cover Cover element (FIGURE) [default: "this.plugin[plugin]._cover"]
-     * @param container Container element (DIV.se-component) [default: "this.plugin[plugin]._container"]
+     * @description Gets the Figure size
+     * @param target Target element
      * @returns
      */
-    _module_getSizeX(contextPlugin: Object, element: Element, cover: Element, container: Element): string;
+    getSize(target: Element): { w:string, h:string };
     
-    /**
-     * @description Gets the height size
-     * @param contextPlugin context object of plugin (core.context[plugin])
-     * @param element Target element [default: "this.plugin[plugin]._element"]
-     * @param cover Cover element (FIGURE) [default: "this.plugin[plugin]._cover"]
-     * @param container Container element (DIV.se-component) [default: "this.plugin[plugin]._container"]
-     * @returns
-     */
-    _module_getSizeY(contextPlugin: Object, element: Element, cover: Element, container: Element): string;
-
     /**
      * @description Called at the "openModify" to put the size of the current target into the size input element.
      * @param contextPlugin context object of plugin (core.context[plugin])
@@ -151,4 +138,4 @@ declare interface resizing extends Module {
     cancel_controller_resize(direction: string): void;
 }
 
-export default resizing;
+export default Figure;

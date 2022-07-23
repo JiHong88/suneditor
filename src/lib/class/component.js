@@ -80,7 +80,7 @@ Component.prototype = {
 			target = element;
 		}
 		if (!target) {
-			target = element;
+			return null;
 		}
 
 		return {

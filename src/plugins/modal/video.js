@@ -587,7 +587,8 @@ export default {
         contextVideo._cover = cover;
         contextVideo._container = container;
 
-        const inputUpdate = (this.plugins.resizing._module_getSizeX.call(this, contextVideo) !== (width || contextVideo._defaultSizeX)) || (this.plugins.resizing._module_getSizeY.call(this, contextVideo) !== (height || contextVideo._videoRatio));
+        const size = this.plugins.resizing.getSize(oFrame);
+        const inputUpdate = (size.w !== (width || contextVideo._defaultSizeX)) || (size.h !== (height || contextVideo._videoRatio));
         const changeSize = !isUpdate || inputUpdate;
 
         if (contextVideo._resizing) {
@@ -737,7 +738,7 @@ export default {
         if (contextVideo._resizing) {
             this.plugins.resizing._module_setModifyInputSize.call(this, contextVideo, this.plugins.video);
             
-            const y = contextVideo._videoRatio = this.plugins.resizing._module_getSizeY.call(this, contextVideo);
+            const y = contextVideo._videoRatio = this.plugins.resizing.getsize(this._element);
             const ratioSelected = this.plugins.video.setVideoRatioSelect.call(this, y);
             if (!ratioSelected) contextVideo.inputY.value = contextVideo._onlyPercentage ? this.util.getNumber(y, 2) : y;
         }

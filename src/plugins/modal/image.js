@@ -14,15 +14,24 @@ const image = function (editor, target) {
 	// create HTML
 	const options = this.options;
 	const modalEl = CreateHTML_modal(editor);
+	const imageControls = options.imageControls;
+
+	// image controls
+	let showAlign = false;
+	for (let i = 0; i < imageControls.length; i++) {
+		if (!imageControls[i]) break;
+		for (let j = 0; j < imageControls[i].length; j++) {
+			this._rotation = /rotate/.test(imageControls[i][j]);
+			showAlign = /align/.test(imageControls[i][j]);
+		}
+	}
+	if (!showAlign) modalEl.querySelector('._se_image_align').style.display = 'none';
 
 	// modules
 	this.anchor = new ModalAnchorEditor(this, modalEl);
 	this.modal = new Modal(this, modalEl);
 	this.fileManager = new FileManager(this, { tagNames: ['img'], eventHandler: this.events.onImageUpload, checkHandler: FileCheckHandler.bind(this), figure: null });
-	this.figure = new Figure(this, true, [
-		['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
-		['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']
-	]);
+	this.figure = new Figure(this, true, imageControls);
 
 	// members
 	this.imgInputFile = modalEl.querySelector('._se_image_file');
@@ -44,28 +53,22 @@ const image = function (editor, target) {
 	this._element = null;
 	this._cover = null;
 	this._container = null;
+	this._resizing = options.imageResizing;
 
 	// @override resizing properties
-	this._element_w = 1;
-	this._element_h = 1;
-	this._element_l = 0;
-	this._element_t = 0;
+	
 	this._defaultSizeX = 'auto';
 	this._defaultSizeY = 'auto';
 	this._origin_w = options.imageWidth === 'auto' ? '' : options.imageWidth;
 	this._origin_h = options.imageHeight === 'auto' ? '' : options.imageHeight;
-	this._resizing = options.imageResizing;
 	this._resizeDotHide = !options.imageHeightShow;
-	this._rotation = options.imageRotation;
-	this._alignHide = !options.imageAlignShow;
 	this._onlyPercentage = options.imageSizeOnlyPercentage;
 	this._proportionChecked = true;
-	this._ratio = false;
-	this._ratioX = 1;
-	this._ratioY = 1;
-	this._captionShow = true;
+	
 	this._captionChecked = false;
 	this._caption = null;
+
+	
 
 	// init
 	modalEl.querySelector('.se-modal-tabs').addEventListener('click', this._openTab.bind(this));
@@ -164,9 +167,6 @@ image.prototype = {
 			this.inputX.value = this.options.imageWidth === this._defaultSizeX ? '' : this.options.imageWidth;
 			this.inputY.value = this.options.imageHeight === this._defaultSizeY ? '' : this.options.imageHeight;
 			this.proportion.checked = true;
-			this._ratio = false;
-			this._ratioX = 1;
-			this._ratioY = 1;
 		}
 
 		this.anchor.init();
@@ -186,39 +186,20 @@ image.prototype = {
 	 */
 	ready: function (element) {
 		if (!element) return;
-		const size = this.figure.open(element);
-		this.anchor.set(/^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null);
 
+		const figureInfo = this.figure.open(element);
+		this.anchor.set(/^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null);
+		
 		this._linkElement = this.anchor.currentTarget;
 		this._element = element;
-
-		const figure = Figure.GetContainer(element);
-		this._cover = figure.cover;
-		this._container = figure.container;
-		this._caption = figure.caption;
+		this._cover = figureInfo.cover;
+		this._container = figureInfo.container;
+		this._caption = figureInfo.caption;
 		this._align = element.style.float || element.getAttribute('data-align') || 'none';
 		element.style.float = '';
 
-		if (size) {
-			this._element_w = size.w;
-			this._element_h = size.h;
-			this._element_t = size.t;
-			this._element_l = size.l;
-		}
-
-		let userSize = element.getAttribute('data-size') || element.getAttribute('data-origin');
-		let w, h;
-		if (userSize) {
-			userSize = userSize.split(',');
-			w = userSize[0];
-			h = userSize[1];
-		} else if (size) {
-			w = size.w;
-			h = size.h;
-		}
-
-		this._origin_w = w || element.style.width || element.width || '';
-		this._origin_h = h || element.style.height || element.height || '';
+		this._origin_w = figureInfo.w || element.style.width || element.width || '';
+		this._origin_h = figureInfo.h || element.style.height || element.height || '';
 		this.altText.value = this._element.alt;
 
 		if (this.imgUrlFile) this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = this._element.src;
@@ -265,7 +246,7 @@ image.prototype = {
 	 * @override figure
 	 * @param {Element} target Target element
 	 * @param {string} command Command
-	 * @param {{w: number, h: number}|number|("none|"left"|"center"|"right")} value Command value
+	 * @param {{w: number, h: number}|number|("none|"left"|"center"|"right")|boolean} value Command value
 	 */
 	figureAction: function (target, command, value) {
 		switch (command) {
@@ -294,6 +275,7 @@ image.prototype = {
 			case 'mirror':
 				break;
 			case 'caption':
+				this._captionChecked = value;
 				break;
 		}
 	},
@@ -374,10 +356,10 @@ image.prototype = {
 
 		if (cover === null || container === null) {
 			isNewContainer = true;
-			this._element = imageEl = this._element.cloneNode(true);
-			const figure = Figure.CreateContainer(imageEl, 'se-image-container');
-			this._cover = cover = figure.cover;
-			container = figure.container;
+			imageEl = this._element.cloneNode(true);
+			const figureInfo = Figure.CreateContainer(imageEl, 'se-image-container');
+			cover = figureInfo.cover;
+			container = figureInfo.container;
 		}
 
 		// check size
@@ -424,27 +406,27 @@ image.prototype = {
 				const newEl = imageEl.cloneNode(true);
 				cover.removeChild(this._linkElement);
 				cover.insertBefore(newEl, this._caption);
-				this._element = imageEl = newEl;
+				imageEl = newEl;
 			}
 		}
 
 		if (isNewContainer) {
-			let existElement = this.format.isBlock(this._element.parentNode) || domUtils.isWysiwygFrame(this._element.parentNode) ? this._element : /^A$/i.test(this._element.parentNode.nodeName) ? this._element.parentNode : this.format.getLine(this._element) || this._element;
+			let existElement = this.format.isBlock(imageEl.parentNode) || domUtils.isWysiwygFrame(imageEl.parentNode) ? imageEl : /^A$/i.test(imageEl.parentNode.nodeName) ? imageEl.parentNode : this.format.getLine(imageEl) || imageEl;
 
 			if (domUtils.isListCell(existElement)) {
-				const refer = domUtils.getParentElement(this._element, function (current) {
+				const refer = domUtils.getParentElement(imageEl, function (current) {
 					return current.parentNode === existElement;
 				});
 				existElement.insertBefore(container, refer);
-				domUtils.removeItem(this._element);
+				domUtils.removeItem(imageEl);
 				this.node.removeEmptyNode(refer, null);
 			} else if (domUtils.isFormatElement(existElement)) {
-				const refer = domUtils.getParentElement(this._element, function (current) {
+				const refer = domUtils.getParentElement(imageEl, function (current) {
 					return current.parentNode === existElement;
 				});
 				existElement = this.node.split(existElement, refer);
 				existElement.parentNode.insertBefore(container, existElement);
-				domUtils.removeItem(this._element);
+				domUtils.removeItem(imageEl);
 				this.node.removeEmptyNode(existElement, null);
 				if (existElement.children.length === 0) existElement.innerHTML = this.node.removeWhiteSpace(existElement.innerHTML);
 			} else {
@@ -648,9 +630,9 @@ image.prototype = {
 			oImg.setAttribute('data-proportion', this._proportionChecked);
 		}
 
-		const figure = Figure.CreateContainer(anchor, 'se-image-container');
-		const cover = figure.cover;
-		const container = figure.container;
+		const figureInfo = Figure.CreateContainer(anchor, 'se-image-container');
+		const cover = figureInfo.cover;
+		const container = figureInfo.container;
 
 		// caption
 		if (this._captionChecked) {
@@ -721,7 +703,7 @@ var a = {
 	 * @override resizing @inst
 	 */
 	setAutoSize: function () {
-		// this.plugins.resizing.resetTransform.call(this, this._element);@todo
+		this.plugins.resizing.resetTransform.call(this, this._element);
 		this.cancelPercentAttr.call(this);
 
 		this._element.style.maxWidth = '';
@@ -904,7 +886,7 @@ function OnloadImg(oImg, _svgDefaultSize, container) {
 	}
 }
 
-function CreateHTML_modal(editor) {
+function CreateHTML_modal(editor, align) {
 	const option = editor.options;
 	const lang = editor.lang;
 	let html =
@@ -1026,9 +1008,7 @@ function CreateHTML_modal(editor) {
 		'</div>' +
 		'<div class="se-anchor-editor _se_tab_content _se_tab_content_url" style="display: none"></div>' +
 		'<div class="se-modal-footer">' +
-		'<div' +
-		(option.imageAlignShow ? '' : ' style="display: none"') +
-		'>' +
+		'<div class="_se_image_align">' +
 		'<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="none" checked>' +
 		lang.modalBox.basic +
 		'</label>' +

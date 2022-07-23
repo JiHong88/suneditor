@@ -32,23 +32,20 @@ EventManager.prototype = {
 	/**
 	 * @description Register for an event.
 	 * Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
-	 * @param {Element|Element[]} target Target element
+	 * @param {Element} target Target element
 	 * @param {string} type Event type
 	 * @param {Function} listener Event handler
 	 * @param {boolean|undefined} useCapture Event useCapture option
 	 * @return {target, type, listener, useCapture}
 	 */
 	addEvent: function (target, type, listener, useCapture) {
-		if (!target.length) target = [target];
-		for (let i = 0, len = target.length; i < len; i++) {
-			target[i].addEventListener(type, listener, useCapture);
-			this._events.push({
-				target: target[i],
-				type: type,
-				handler: listener,
-				useCapture: useCapture
-			});
-		}
+		target.addEventListener(type, listener, useCapture);
+		this._events.push({
+			target: target,
+			type: type,
+			handler: listener,
+			useCapture: useCapture
+		});
 	},
 
 	/**
@@ -487,7 +484,7 @@ EventManager.prototype = {
 	},
 
 	_addEvent: function () {
-		const eventWysiwyg = this.options.iframe ? this._ww : this.context.element.wysiwyg;
+		const eventWysiwyg = (this.context.element.eventWysiwyg = this.options.iframe ? this._ww : this.context.element.wysiwyg);
 		if (!env.isIE) {
 			this._resizeObserver = new _w.ResizeObserver(
 				function (entries) {
@@ -513,7 +510,7 @@ EventManager.prototype = {
 		this.addEvent(eventWysiwyg, 'copy', OnCopy_wysiwyg.bind(this), false);
 		this.addEvent(eventWysiwyg, 'cut', OnCut_wysiwyg.bind(this), false);
 		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, eventWysiwyg), false);
 		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this), false);
 		this.addEvent(eventWysiwyg, 'blur', OnBlur_wysiwyg.bind(this), false);
 
@@ -595,6 +592,14 @@ EventManager.prototype = {
 		}
 	},
 
+	_moveController: function (eventWysiwyg) {
+		const openCont = this.editor.openControllers;
+		for (let i = 0; i < openCont.length; i++) {
+			openCont[i].form.style.top = openCont[i]._offset.top - eventWysiwyg.scrollY + 'px';
+			openCont[i].form.style.left = openCont[i]._offset.left - eventWysiwyg.scrollX + 'px';
+		}
+	},
+
 	constructor: EventManager
 };
 
@@ -648,7 +653,6 @@ function OnClick_toolbar(e) {
 
 function OnMouseDown_wysiwyg(e) {
 	if (this.status.isReadOnly || domUtils.isNonEditable(this.context.element.wysiwyg)) return;
-	this.selection._init();
 
 	// user event
 	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown(e) === false) return;
@@ -1598,8 +1602,8 @@ function OnCut_wysiwyg(e) {
 	});
 }
 
-function OnScroll_wysiwyg(e) {
-	this._offController();
+function OnScroll_wysiwyg(eventWysiwyg, e) {
+	this._moveController(eventWysiwyg);
 	if (this.editor._isBalloon) this._hideToolbar();
 
 	// user event

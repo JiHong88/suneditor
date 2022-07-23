@@ -90,10 +90,10 @@ Modal.prototype = {
  * When an exception occurs, the modal window and loading bar are closed.
  */
 function Action(e) {
-	this.editor.openLoading();
-
 	e.preventDefault();
 	e.stopPropagation();
+	
+	this.editor.openLoading();
 
 	try {
 		const result = this.inst.modalAction();

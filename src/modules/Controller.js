@@ -78,7 +78,7 @@ Controller.prototype = {
 			});
 		}
 
-		this.editor.openControllers.push({ position: this.position, form: form, target: target, inst: this });
+		this.editor.openControllers.push({ position: this.position, form: form, target: target, inst: this, _offset: { left: form.offsetLeft + this.context.element.eventWysiwyg.scrollX, top: form.offsetTop + this.context.element.eventWysiwyg.scrollY } });
 		this.editor._antiBlur = true;
 
 		if (typeof this.events.onShowController === 'function') this.events.onShowController(this.kind, this.editor.openControllers);
@@ -114,7 +114,16 @@ Controller.prototype = {
 			}
 		}
 
-		if (this.options._rtl) addOffset.left *= -1;
+		const globalOffset = { left: 0, top: 0 };
+		if (this.options.iframe && this._w.getComputedStyle(referEl).position === 'absolute') {
+			globalOffset.left -= this.context.element.wysiwygFrame.parentElement.offsetLeft;
+			globalOffset.top -= this.context.element.wysiwygFrame.parentElement.offsetTop;
+		}
+
+		if (this.options._rtl) {
+			addOffset.left *= -1;
+			globalOffset.left *= -1;
+		}
 
 		const offset = this.offset.get(referEl);
 		controller.style.visibility = 'hidden';
@@ -122,9 +131,9 @@ Controller.prototype = {
 
 		// Height value of the arrow element is 11px
 		const topMargin = this.position === 'top' ? -(controller.offsetHeight + 2) : referEl.offsetHeight + 12;
-		controller.style.top = offset.top + topMargin + addOffset.top + 'px';
+		controller.style.top = offset.top + topMargin + addOffset.top + globalOffset.top + 'px';
 
-		const l = offset.left - this.context.element.wysiwygFrame.scrollLeft + addOffset.left;
+		const l = offset.left - this.context.element.wysiwygFrame.scrollLeft + addOffset.left + globalOffset.left;
 		const controllerW = controller.offsetWidth;
 		const referElW = referEl.offsetWidth;
 
