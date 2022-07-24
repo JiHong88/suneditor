@@ -30,8 +30,8 @@ const image = function (editor, target) {
 	// modules
 	this.anchor = new ModalAnchorEditor(this, modalEl);
 	this.modal = new Modal(this, modalEl);
-	this.fileManager = new FileManager(this, { tagNames: ['img'], eventHandler: this.events.onImageUpload, checkHandler: FileCheckHandler.bind(this), figure: null });
-	this.figure = new Figure(this, true, imageControls);
+	this.figure = new Figure(this, imageControls, { isMedia: false, sizeUnit: options._imageSizeUnit });
+	this.fileManager = new FileManager(this, { tagNames: ['img'], eventHandler: this.events.onImageUpload, checkHandler: FileCheckHandler.bind(this), figure: this.figure });
 
 	// members
 	this.imgInputFile = modalEl.querySelector('._se_image_file');
@@ -56,7 +56,7 @@ const image = function (editor, target) {
 	this._resizing = options.imageResizing;
 
 	// @override resizing properties
-	
+
 	this._defaultSizeX = 'auto';
 	this._defaultSizeY = 'auto';
 	this._origin_w = options.imageWidth === 'auto' ? '' : options.imageWidth;
@@ -64,11 +64,9 @@ const image = function (editor, target) {
 	this._resizeDotHide = !options.imageHeightShow;
 	this._onlyPercentage = options.imageSizeOnlyPercentage;
 	this._proportionChecked = true;
-	
+
 	this._captionChecked = false;
 	this._caption = null;
-
-	
 
 	// init
 	modalEl.querySelector('.se-modal-tabs').addEventListener('click', this._openTab.bind(this));
@@ -189,13 +187,13 @@ image.prototype = {
 
 		const figureInfo = this.figure.open(element);
 		this.anchor.set(/^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null);
-		
+
 		this._linkElement = this.anchor.currentTarget;
 		this._element = element;
 		this._cover = figureInfo.cover;
 		this._container = figureInfo.container;
 		this._caption = figureInfo.caption;
-		this._align = element.style.float || element.getAttribute('data-align') || 'none';
+		this._align = figureInfo.align;
 		element.style.float = '';
 
 		this._origin_w = figureInfo.w || element.style.width || element.width || '';
@@ -257,14 +255,9 @@ image.prototype = {
 			case 'remove':
 				this.destroy();
 				break;
-			case 'align':
-				this.figure.setAlign(target, value);
-				break;
 			case 'resize':
-				// value = {w, h}
 				break;
 			case 'resize_percent':
-				// value = 100
 				break;
 			case 'auto':
 				break;
@@ -450,9 +443,9 @@ image.prototype = {
 		if (modifiedCaption || (!this._onlyPercentage && changeSize)) {
 			if (!init && (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this._captionChecked))) {
 				if (/%$/.test(this.inputX.value) || /%$/.test(this.inputY.value)) {
-					//@todo this.plugins.resizing.resetTransform.call(this, imageEl);
+					//@todo this.plugins.resizing.deleteTransform.call(this, imageEl);
 				} else {
-					//@todo this.plugins.resizing.setTransformSize.call(this, imageEl, numbers.get(this.inputX.value, 0), numbers.get(this.inputY.value, 0));
+					//@todo this.plugins.resizing.setTransform.call(this, imageEl, numbers.get(this.inputX.value, 0), numbers.get(this.inputY.value, 0));
 				}
 			}
 		}
@@ -526,10 +519,10 @@ image.prototype = {
 		if (!h) h = this.inputY.value || this.options.imageHeight;
 
 		if ((this._onlyPercentage && !!w) || /%$/.test(w)) {
-			this.setPercentSize.call(this, w, h);
+			this.setPercent.call(this, w, h);
 			return true;
 		} else if ((!w || w === 'auto') && (!h || h === 'auto')) {
-			this.setAutoSize.call(this);
+			this.figure.setAutoSize();
 		} else {
 			this.setSize.call(this, w, h, false);
 		}
@@ -677,86 +670,6 @@ image.prototype = {
 };
 
 var a = {
-	/**
-	 * @override resizing, @inst
-	 */
-	setSize: function (w, h, notResetPercentage, direction) {
-		const onlyW = /^(rw|lw)$/.test(direction);
-		const onlyH = /^(th|bh)$/.test(direction);
-
-		if (!onlyH) {
-			this._element.style.width = numbers.is(w) ? w + this.sizeUnit : w;
-			this.cancelPercentAttr.call(this);
-		}
-		if (!onlyW) {
-			this._element.style.height = numbers.is(h) ? h + this.sizeUnit : /%$/.test(h) ? '' : h;
-		}
-
-		if (this._align === 'center') this.figure.setAlign(this._element, this._align);
-		if (!notResetPercentage) this._element.removeAttribute('data-percentage');
-
-		// save current size
-		// this.plugins.resizing._module_saveCurrentSize.call(this, this);@todo
-	},
-
-	/**
-	 * @override resizing @inst
-	 */
-	setAutoSize: function () {
-		this.plugins.resizing.resetTransform.call(this, this._element);
-		this.cancelPercentAttr.call(this);
-
-		this._element.style.maxWidth = '';
-		this._element.style.width = '';
-		this._element.style.height = '';
-		this._cover.style.width = '';
-		this._cover.style.height = '';
-
-		this.figure.setAlign(this._element, this._align);
-		this._element.setAttribute('data-percentage', 'auto,auto');
-
-		// save current size
-		// this.plugins.resizing._module_saveCurrentSize.call(this, this);@todo
-	},
-
-	/**
-	 * @override resizing @inst
-	 */
-	setPercentSize: function (w, h) {
-		h = !!h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || '';
-		const heightPercentage = /%$/.test(h);
-
-		this._container.style.width = numbers.is(w) ? w + '%' : w;
-		this._container.style.height = '';
-		this._cover.style.width = '100%';
-		this._cover.style.height = !heightPercentage ? '' : h;
-		this._element.style.width = '100%';
-		this._element.style.height = heightPercentage ? '' : h;
-		this._element.style.maxWidth = '';
-
-		if (this._align === 'center') this.figure.setAlign(this._element, this._align);
-
-		this._element.setAttribute('data-percentage', w + ',' + h);
-		// this.plugins.resizing.setCaptionPosition.call(this, this._element);@todo
-
-		// save current size
-		// this.plugins.resizing._module_saveCurrentSize.call(this, this);@todo
-	},
-
-	/**
-	 * @override resizing @inst
-	 */
-	cancelPercentAttr: function () {
-		this._cover.style.width = '';
-		this._cover.style.height = '';
-		this._container.style.width = '';
-		this._container.style.height = '';
-
-		domUtils.removeClass(this._container, this._floatClassRegExp);
-		domUtils.addClass(this._container, '__se__float-' + this._align);
-
-		if (this._align === 'center') this.figure.setAlign(this._element, this._align);
-	},
 
 	///////////
 	/**
@@ -794,8 +707,8 @@ var a = {
 		const contextImage = this.context.image;
 		contextImage._element.removeAttribute('data-percentage');
 
-		this.plugins.resizing.resetTransform.call(this, contextImage._element);
-		this.cancelPercentAttr.call(this);
+		this.plugins.resizing.deleteTransform.call(this, contextImage._element);
+		this.deletePercent.call(this);
 
 		const originSize = (contextImage._element.getAttribute('data-origin') || '').split(',');
 		const w = originSize[0];
@@ -803,7 +716,7 @@ var a = {
 
 		if (originSize) {
 			if (contextImage._onlyPercentage || (/%$/.test(w) && (/%$/.test(h) || !/\d/.test(h)))) {
-				this.setPercentSize.call(this, w, h);
+				this.setPercent.call(this, w, h);
 			} else {
 				this.setSize.call(this, w, h);
 			}

@@ -97,7 +97,6 @@ Component.prototype = {
 	 */
 	select: function (element, pluginName) {
 		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is)) || domUtils.isUneditable(element)) return false;
-		if (!this.status.hasFocus) this.editor.focus();
 
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;

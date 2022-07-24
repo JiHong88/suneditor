@@ -615,7 +615,7 @@ export default {
                 if (line) this.setRange(line, 0, line, 0);
             }
         } else if (contextVideo._resizing && this.context.resizing._rotateVertical && changeSize) {
-            this.plugins.resizing.setTransformSize.call(this, oFrame, null, null);
+            this.plugins.resizing.setTransform.call(this, oFrame, null, null);
         }
 
         if (changed) {
@@ -790,7 +790,7 @@ export default {
         if (!h) h = contextVideo.inputY.value || this.options.videoHeight;
         
         if (contextVideo._onlyPercentage || /%$/.test(w) || !w) {
-            this.plugins.video.setPercentSize.call(this, (w || '100%'), (h || (/%$/.test(contextVideo._videoRatio) ? contextVideo._videoRatio : contextVideo._defaultRatio)));
+            this.plugins.video.setPercent.call(this, (w || '100%'), (h || (/%$/.test(contextVideo._videoRatio) ? contextVideo._videoRatio : contextVideo._defaultRatio)));
             return true;
         } else if ((!w || w === 'auto') && (!h || h === 'auto')) {
             this.plugins.video.setAutoSize.call(this);
@@ -844,7 +844,7 @@ export default {
      * @override resizing
      */
     setAutoSize: function () {
-        this.plugins.video.setPercentSize.call(this, 100, this.context.video._defaultRatio);
+        this.plugins.video.setPercent.call(this, 100, this.context.video._defaultRatio);
     },
 
     /**
@@ -854,8 +854,8 @@ export default {
         const contextVideo = this.context.video;
         contextVideo._element.removeAttribute('data-percentage');
 
-        this.plugins.resizing.resetTransform.call(this, contextVideo._element);
-        this.plugins.video.cancelPercentAttr.call(this);
+        this.plugins.resizing.deleteTransform.call(this, contextVideo._element);
+        this.plugins.video.deletePercent.call(this);
 
         const originSize = ((dataSize ? contextVideo._element.getAttribute('data-size') : '') || contextVideo._element.getAttribute('data-origin') || '').split(',');
         
@@ -864,7 +864,7 @@ export default {
             const h = originSize[1];
 
             if (contextVideo._onlyPercentage || (/%$/.test(w) && (/%$/.test(h) || !/\d/.test(h)))) {
-                this.plugins.video.setPercentSize.call(this, w, h);
+                this.plugins.video.setPercent.call(this, w, h);
             } else {
                 this.plugins.video.setSize.call(this, w, h);
             }
@@ -877,7 +877,7 @@ export default {
     /**
      * @override resizing
      */
-    setPercentSize: function (w, h) {
+    setPercent: function (w, h) {
         const contextVideo = this.context.video;
         h = !!h && !/%$/.test(h) && !this.util.getNumber(h, 0) ? this.util.isNumber(h) ? h + '%' : h : this.util.isNumber(h) ? h + contextVideo.sizeUnit : (h || contextVideo._defaultRatio);
 
@@ -900,7 +900,7 @@ export default {
     /**
      * @override resizing
      */
-    cancelPercentAttr: function () {
+    deletePercent: function () {
         const contextVideo = this.context.video;
         
         contextVideo._cover.style.width = '';

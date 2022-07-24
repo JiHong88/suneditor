@@ -4,18 +4,19 @@ import EditorInterface from '../interface/editor';
 import { Controller, SelectMenu } from '../modules';
 import { domUtils, numbers } from '../helper';
 
-const Figure = function (inst, controls) {
+const Figure = function (inst, controls, params) {
 	EditorInterface.call(this, inst.editor);
 
 	// create HTML
 	const resizeDot = (this.resizeContainer = CreateHTML_resizeDot());
 	this.context.element.relative.appendChild(resizeDot);
 	const controllerEl = CreateHTML_controller(inst.editor, controls || []);
+	const alignButton = controllerEl.querySelector('[data-command="onalign"]');
 
 	// modules
 	this.controller = new Controller(this, controllerEl, 'bottom');
 	this.selectMenu_align = new SelectMenu(this, false, 'bottom-center');
-	this.selectMenu_align.on(controllerEl.querySelector('[data-command="onalign"]'), SetMenuAlign.bind(this));
+	this.selectMenu_align.on(alignButton, SetMenuAlign.bind(this), { class: 'se-resizing-align-list' });
 	this.selectMenu_align.create(CreateAlign(this));
 	this.resizeDiv = resizeDot.querySelector('.se-modal-resize');
 	this.resizeDisplay = resizeDot.querySelector('.se-resize-display');
@@ -24,6 +25,8 @@ const Figure = function (inst, controls) {
 	// members
 	this.kind = inst.constructor.name;
 	this.inst = inst;
+	this.isMedia = !!params.isMedia;
+	this.sizeUnit = params.sizeUnit || 'px';
 	this.isVertical = false;
 	this.percentageButtons = controllerEl.querySelectorAll('[data-command="resize_percent"]');
 	this.captionButton = controllerEl.querySelector('[data-command="caption"]');
@@ -31,6 +34,7 @@ const Figure = function (inst, controls) {
 	this._cover = null;
 	this._container = null;
 	this._caption = null;
+	this._align = 'none';
 	this._element_w = 1;
 	this._element_h = 1;
 	this._element_l = 0;
@@ -41,8 +45,10 @@ const Figure = function (inst, controls) {
 	this._ratioY = 1;
 	this.__containerGlobalEvent = null;
 	this.__offContainer = OffFigureContainer.bind(this);
+	this.__fileManagerInfo = false;
 
 	// init
+	this.eventManager.addEvent(alignButton, 'click', OnClick_alignButton.bind(this));
 	const resizeEvent = OnMouseDown_resizingDot.bind(this);
 	for (let i = 0, len = this.resizeHandles.length; i < len; i++) {
 		this.eventManager.addEvent(this.resizeHandles[i], 'mousedown', resizeEvent);
@@ -101,6 +107,7 @@ Figure.prototype = {
 		this._cover = figureInfo.cover;
 		this._caption = figureInfo.caption;
 		this._element = target;
+		this._align = target.style.float || target.getAttribute('data-align') || 'none';
 		this.isVertical = /^(90|270)$/.test(Math.abs(target.getAttribute('data-rotate')).toString());
 
 		const offset = this.offset.get(target);
@@ -108,6 +115,18 @@ Figure.prototype = {
 		const h = this.isVertical ? target.offsetWidth : target.offsetHeight;
 		const t = offset.top;
 		const l = offset.left - this.context.element.wysiwygFrame.scrollLeft;
+		const targetInfo = {
+			container: figureInfo.container,
+			cover: figureInfo.cover,
+			caption: figureInfo.caption,
+			align: this._align,
+			w: w,
+			h: h,
+			t: t,
+			l: l
+		};
+
+		if (this.__fileManagerInfo) return targetInfo;
 
 		this.resizeContainer.style.top = t + 'px';
 		this.resizeContainer.style.left = l + 'px';
@@ -120,10 +139,8 @@ Figure.prototype = {
 
 		this.editor.openControllers.push({ position: 'none', form: this.resizeContainer, target: target, inst: this, _offset: { left: l + this.context.element.eventWysiwyg.scrollX, top: t + this.context.element.eventWysiwyg.scrollY } });
 
-		// text
 		const size = this.getSize(target);
-		const align = target.getAttribute('data-align') || 'none';
-		domUtils.changeTxt(this.resizeDisplay, this.lang.modalBox[align === 'none' ? 'basic' : align] + ' (' + (size.w || 'auto') + (size.h || 'auto') + ')');
+		domUtils.changeTxt(this.resizeDisplay, this.lang.modalBox[this._align === 'none' ? 'basic' : this._align] + ' (' + (size.w || 'auto') + ', ' + (size.h || 'auto') + ')');
 
 		// @todo
 		// const contextPlugin = this.context[plugin];
@@ -168,15 +185,7 @@ Figure.prototype = {
 		this._element_l = l;
 		this._element_t = t;
 
-		return {
-			container: figureInfo.container,
-			cover: figureInfo.cover,
-			caption: figureInfo.caption,
-			w: w,
-			h: h,
-			t: t,
-			l: l
-		};
+		return targetInfo;
 	},
 
 	/**
@@ -198,6 +207,145 @@ Figure.prototype = {
 			w: !/%$/.test(target.style.width) ? target.style.width : ((figure.container && numbers.get(figure.container.style.width, 2)) || 100) + '%',
 			h: numbers.get(figure.cover.style.paddingBottom, 0) > 0 && !this.isVertical ? figure.cover.style.height : !/%$/.test(target.style.height) || !/%$/.test(target.style.width) ? target.style.height : ((figure.container && numbers.get(figure.container.style.height, 2)) || 100) + '%'
 		};
+	},
+
+	setSize: function (w, h, notResetPercentage, direction) {
+		const onlyW = /^(rw|lw)$/.test(direction);
+		const onlyH = /^(th|bh)$/.test(direction);
+
+		if (!onlyH) {
+			this._element.style.width = numbers.is(w) ? w + this.sizeUnit : w;
+			this.deletePercent();
+		}
+		if (!onlyW) {
+			this._element.style.height = numbers.is(h) ? h + this.sizeUnit : /%$/.test(h) ? '' : h;
+		}
+
+		if (this._align === 'center') this.setAlign(this._element, this._align);
+		if (!notResetPercentage) this._element.removeAttribute('data-percentage');
+
+		// save current size
+		this._module_saveCurrentSize();
+	},
+
+	/**
+	 * @description Set "auto" size
+	 */
+	setAutoSize: function () {
+		this.deleteTransform();
+		this.deletePercent();
+
+		this._element.style.maxWidth = '';
+		this._element.style.width = '';
+		this._element.style.height = '';
+		this._cover.style.width = '';
+		this._cover.style.height = '';
+
+		this.setAlign(this._element, this._align);
+		this._element.setAttribute('data-percentage', 'auto,auto');
+
+		// save current size
+		this._module_saveCurrentSize();
+	},
+
+	setPercent: function (w, h) {
+		h = !!h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || '';
+		const heightPercentage = /%$/.test(h);
+
+		this._container.style.width = numbers.is(w) ? w + '%' : w;
+		this._container.style.height = '';
+		this._cover.style.width = '100%';
+		this._cover.style.height = !heightPercentage ? '' : h;
+		this._element.style.width = '100%';
+		this._element.style.height = heightPercentage ? '' : h;
+		this._element.style.maxWidth = '';
+
+		if (this._align === 'center') this.setAlign(this._element, this._align);
+
+		this._element.setAttribute('data-percentage', w + ',' + h);
+		this._setCaptionPosition(this._element);
+
+		// save current size
+		this._module_saveCurrentSize();
+	},
+
+	deletePercent: function () {
+		this._cover.style.width = '';
+		this._cover.style.height = '';
+		this._container.style.width = '';
+		this._container.style.height = '';
+
+		domUtils.removeClass(this._container, this._floatClassRegExp);
+		domUtils.addClass(this._container, '__se__float-' + this._align);
+
+		if (this._align === 'center') this.setAlign(this._element, this._align);
+	},
+
+	/**
+	 * @description Initialize the transform style (rotation) of the element.
+	 * @param {Element|null} element Target element
+	 */
+	deleteTransform: function (element) {
+		if (!element) element = this._element;
+		const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
+		this.isVertical = false;
+
+		element.style.maxWidth = '';
+		element.style.transform = '';
+		element.style.transformOrigin = '';
+		element.setAttribute('data-rotate', '');
+		element.setAttribute('data-rotateX', '');
+		element.setAttribute('data-rotateY', '');
+
+		this.setSize(size[0] ? size[0] : 'auto', size[1] ? size[1] : '', true);
+	},
+
+	/**
+	 * @description Set the transform style (rotation) of the element.
+	 * @param {Element} element Target element
+	 * @param {Number|null} width Element's width size
+	 * @param {Number|null} height Element's height size
+	 */
+	setTransform: function (element, width, height) {
+		let percentage = element.getAttribute('data-percentage');
+		const isVertical = this.isVertical;
+		const deg = element.getAttribute('data-rotate') * 1;
+		let transOrigin = '';
+
+		if (percentage && !isVertical) {
+			percentage = percentage.split(',');
+			if (percentage[0] === 'auto' && percentage[1] === 'auto') {
+				this.setAutoSize();
+			} else {
+				this.setPercent(percentage[0], percentage[1]);
+			}
+		} else {
+			const figureInfo = Figure.GetContainer(element);
+			const offsetW = width || element.offsetWidth;
+			const offsetH = height || element.offsetHeight;
+			const w = (isVertical ? offsetH : offsetW) + 'px';
+			const h = (isVertical ? offsetW : offsetH) + 'px';
+
+			this.deletePercent();
+			this.setSize(offsetW + 'px', offsetH + 'px', true);
+
+			figureInfo.cover.style.width = w;
+			figureInfo.cover.style.height = figureInfo.caption ? '' : h;
+
+			if (isVertical) {
+				let transW = offsetW / 2 + 'px ' + offsetW / 2 + 'px 0';
+				let transH = offsetH / 2 + 'px ' + offsetH / 2 + 'px 0';
+				transOrigin = deg === 90 || deg === -270 ? transH : transW;
+			}
+		}
+
+		element.style.transformOrigin = transOrigin;
+		this._setRotate(element, deg.toString(), element.getAttribute('data-rotateX') || '', element.getAttribute('data-rotateY') || '');
+
+		if (isVertical) element.style.maxWidth = 'none';
+		else element.style.maxWidth = '';
+
+		this._setCaptionPosition(element);
 	},
 
 	/**
@@ -235,62 +383,114 @@ Figure.prototype = {
 	},
 
 	/**
+	 * @description Save the size data (element.setAttribute("data-size"))
+	 * Used at the "setSize" method
+	 * @param {Object} contextPlugin context object of plugin (core.context[plugin])
+	 */
+	_module_saveCurrentSize: function () {
+		const size = this.getSize(this._element);
+		this._element.setAttribute('data-size', size.x + ',' + size.y);
+		// if (!!contextPlugin._videoRatio) contextPlugin._videoRatio = size.y; @todo
+	},
+
+	/**
+	 * @description The position of the caption is set automatically.
+	 * @param {Element} element Target element (not caption element)
+	 * @private
+	 */
+	_setCaptionPosition: function (element) {
+		const figcaption = domUtils.getEdgeChild(domUtils.getParentElement(element, 'FIGURE'), 'FIGCAPTION');
+		if (figcaption) {
+			figcaption.style.marginTop = (this.isVertical ? element.offsetWidth - element.offsetHeight : 0) + 'px';
+		}
+	},
+
+	_setRotate: function (element, r, x, y) {
+		let width = (element.offsetWidth - element.offsetHeight) * (/-/.test(r) ? 1 : -1);
+		let translate = '';
+
+		if (/[1-9]/.test(r) && (x || y)) {
+			translate = x ? 'Y' : 'X';
+
+			switch (r) {
+				case '90':
+					translate = x && y ? 'X' : y ? translate : '';
+					break;
+				case '270':
+					width *= -1;
+					translate = x && y ? 'Y' : x ? translate : '';
+					break;
+				case '-90':
+					translate = x && y ? 'Y' : x ? translate : '';
+					break;
+				case '-270':
+					width *= -1;
+					translate = x && y ? 'X' : y ? translate : '';
+					break;
+				default:
+					translate = '';
+			}
+		}
+
+		if (r % 180 === 0) {
+			element.style.maxWidth = '';
+		}
+
+		element.style.transform = 'rotate(' + r + 'deg)' + (x ? ' rotateX(' + x + 'deg)' : '') + (y ? ' rotateY(' + y + 'deg)' : '') + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
+	},
+
+	/**
 	 * @override controller
 	 * @param {Element} target Target button element
 	 * @returns
 	 */
 	controllerAction: function (target) {
 		const command = target.getAttribute('data-command');
-		this.inst.figureAction(target, command, target.getAttribute('data-value'));
-		if (!/edit|remove/.test(command)) this.component.select(this._element);
+		const value = target.getAttribute('data-value');
+		const element = this._element;
 
 		switch (command) {
 			case 'auto':
-				this.plugins.resizing.resetTransform.call(this, contextEl);
-				currentModule.setAutoSize.call(this);
-				this.component.select(this._element);
+				this.deleteTransform();
+				this.setAutoSize();
 				break;
 			case 'resize_percent':
-				let percentY = this.getSize(target);
-				if (this.context.resizing.isVertical) {
-					const percentage = contextEl.getAttribute('data-percentage');
+				let percentY = this.getSize(element);
+				if (this.isVertical) {
+					const percentage = element.getAttribute('data-percentage');
 					if (percentage) percentY = percentage.split(',')[1];
 				}
 
-				this.plugins.resizing.resetTransform.call(this, contextEl);
-				currentModule.setPercentSize.call(this, value * 100, numbers.get(percentY, 0) === null || !/%$/.test(percentY) ? '' : percentY);
-				this.component.select(this._element);
+				this.deleteTransform();
+				this.setPercent(value * 100, numbers.get(percentY, 0) === null || !/%$/.test(percentY) ? '' : percentY);
 				break;
 			case 'mirror':
-				const r = contextEl.getAttribute('data-rotate') || '0';
-				let x = contextEl.getAttribute('data-rotateX') || '';
-				let y = contextEl.getAttribute('data-rotateY') || '';
+				const r = element.getAttribute('data-rotate') || '0';
+				let x = element.getAttribute('data-rotateX') || '';
+				let y = element.getAttribute('data-rotateY') || '';
 
-				if ((value === 'h' && !this.context.resizing.isVertical) || (value === 'v' && this.context.resizing.isVertical)) {
+				if ((value === 'h' && !this.isVertical) || (value === 'v' && this.isVertical)) {
 					y = y ? '' : '180';
 				} else {
 					x = x ? '' : '180';
 				}
 
-				contextEl.setAttribute('data-rotateX', x);
-				contextEl.setAttribute('data-rotateY', y);
+				element.setAttribute('data-rotateX', x);
+				element.setAttribute('data-rotateY', y);
 
-				this.plugins.resizing._setTransForm(contextEl, r, x, y);
+				this._setRotate(element, r, x, y);
 				break;
 			case 'rotate':
-				const contextResizing = this.context.resizing;
-				const slope = contextEl.getAttribute('data-rotate') * 1 + value * 1;
+				const slope = element.getAttribute('data-rotate') * 1 + value * 1;
 				const deg = this._w.Math.abs(slope) >= 360 ? 0 : slope;
 
-				contextEl.setAttribute('data-rotate', deg);
-				contextResizing.isVertical = /^(90|270)$/.test(this._w.Math.abs(deg).toString());
-				this.plugins.resizing.setTransformSize.call(this, contextEl, null, null);
+				element.setAttribute('data-rotate', deg);
+				this.isVertical = /^(90|270)$/.test(this._w.Math.abs(deg).toString());
 
-				this.component.select(this._element);
+				this.setTransform(element, null, null);
 				break;
 			case 'align':
 				currentModule.setAlign.call(this, value, null, null, null);
-				this.component.select(this._element);
 				break;
 			case 'caption':
 				currentModule.update_image.call(this, false, false, false);
@@ -307,16 +507,18 @@ Figure.prototype = {
 
 					this.editor._offCurrentController();
 				} else {
-					this.component.select(this._element);
+					this.component.select(element, this.kind);
 					currentModule.openModify.call(this, true);
 				}
 
 				break;
 			case 'revert':
 				currentModule.setOriginSize.call(this);
-				this.component.select(this._element);
 				break;
 		}
+
+		if (!/^edit|remove$/.test(command)) this.inst.figureAction(element, command, value);
+		if (!/^edit|remove|caption$/.test(command)) this.component.select(element, this.kind);
 
 		// history stack
 		this.history.push(false);
@@ -467,6 +669,7 @@ const resizing = {
 	/**
 	 * @description Revert size of element to origin size (plugin._origin_w, plugin._origin_h)
 	 * @param {Object} contextPlugin context object of plugin (core.context[plugin])
+	 * @private
 	 */
 	_module_sizeRevert: function (contextPlugin) {
 		if (contextPlugin._onlyPercentage) {
@@ -474,129 +677,6 @@ const resizing = {
 		} else {
 			contextPlugin.inputX.value = contextPlugin._origin_w;
 			contextPlugin.inputY.value = contextPlugin._origin_h;
-		}
-	},
-
-	/**
-	 * @description Save the size data (element.setAttribute("data-size"))
-	 * Used at the "setSize" method
-	 * @param {Object} contextPlugin context object of plugin (core.context[plugin])
-	 */
-	_module_saveCurrentSize: function (contextPlugin) {
-		const size = this.getSize(this._element);
-		contextPlugin._element.setAttribute('data-size', size.x + ',' + size.y);
-		if (!!contextPlugin._videoRatio) contextPlugin._videoRatio = size.y;
-	},
-
-	/**
-	 * @description Initialize the transform style (rotation) of the element.
-	 * @param {Element} element Target element
-	 */
-	resetTransform: function (element) {
-		const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
-		this.context.resizing.isVertical = false;
-
-		element.style.maxWidth = '';
-		element.style.transform = '';
-		element.style.transformOrigin = '';
-		element.setAttribute('data-rotate', '');
-		element.setAttribute('data-rotateX', '');
-		element.setAttribute('data-rotateY', '');
-
-		this.plugins[this.context.resizing._resize_plugin].setSize.call(this, size[0] ? size[0] : 'auto', size[1] ? size[1] : '', true);
-	},
-
-	/**
-	 * @description Set the transform style (rotation) of the element.
-	 * @param {Element} element Target element
-	 * @param {Number|null} width Element's width size
-	 * @param {Number|null} height Element's height size
-	 */
-	setTransformSize: function (element, width, height) {
-		let percentage = element.getAttribute('data-percentage');
-		const isVertical = this.context.resizing.isVertical;
-		const deg = element.getAttribute('data-rotate') * 1;
-		let transOrigin = '';
-
-		if (percentage && !isVertical) {
-			percentage = percentage.split(',');
-			if (percentage[0] === 'auto' && percentage[1] === 'auto') {
-				this.plugins[this.context.resizing._resize_plugin].setAutoSize.call(this);
-			} else {
-				this.plugins[this.context.resizing._resize_plugin].setPercentSize.call(this, percentage[0], percentage[1]);
-			}
-		} else {
-			const cover = domUtils.getParentElement(element, 'FIGURE');
-
-			const offsetW = width || element.offsetWidth;
-			const offsetH = height || element.offsetHeight;
-			const w = (isVertical ? offsetH : offsetW) + 'px';
-			const h = (isVertical ? offsetW : offsetH) + 'px';
-
-			this.plugins[this.context.resizing._resize_plugin].cancelPercentAttr.call(this);
-			this.plugins[this.context.resizing._resize_plugin].setSize.call(this, offsetW + 'px', offsetH + 'px', true);
-
-			cover.style.width = w;
-			cover.style.height = !!this.context[this.context.resizing._resize_plugin]._caption ? '' : h;
-
-			if (isVertical) {
-				let transW = offsetW / 2 + 'px ' + offsetW / 2 + 'px 0';
-				let transH = offsetH / 2 + 'px ' + offsetH / 2 + 'px 0';
-				transOrigin = deg === 90 || deg === -270 ? transH : transW;
-			}
-		}
-
-		element.style.transformOrigin = transOrigin;
-		this.plugins.resizing._setTransForm(element, deg.toString(), element.getAttribute('data-rotateX') || '', element.getAttribute('data-rotateY') || '');
-
-		if (isVertical) element.style.maxWidth = 'none';
-		else element.style.maxWidth = '';
-
-		this.plugins.resizing.setCaptionPosition.call(this, element);
-	},
-
-	_setTransForm: function (element, r, x, y) {
-		let width = (element.offsetWidth - element.offsetHeight) * (/-/.test(r) ? 1 : -1);
-		let translate = '';
-
-		if (/[1-9]/.test(r) && (x || y)) {
-			translate = x ? 'Y' : 'X';
-
-			switch (r) {
-				case '90':
-					translate = x && y ? 'X' : y ? translate : '';
-					break;
-				case '270':
-					width *= -1;
-					translate = x && y ? 'Y' : x ? translate : '';
-					break;
-				case '-90':
-					translate = x && y ? 'Y' : x ? translate : '';
-					break;
-				case '-270':
-					width *= -1;
-					translate = x && y ? 'X' : y ? translate : '';
-					break;
-				default:
-					translate = '';
-			}
-		}
-
-		if (r % 180 === 0) {
-			element.style.maxWidth = '';
-		}
-
-		element.style.transform = 'rotate(' + r + 'deg)' + (x ? ' rotateX(' + x + 'deg)' : '') + (y ? ' rotateY(' + y + 'deg)' : '') + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
-	},
-
-	/**
-	 * @description The position of the caption is set automatically.
-	 * @param {Element} element Target element (not caption element)
-	 */
-	setCaptionPosition: function (element) {
-		const figcaption = domUtils.getEdgeChild(domUtils.getParentElement(element, 'FIGURE'), 'FIGCAPTION');
-		if (figcaption) {
-			figcaption.style.marginTop = (this.context.resizing.isVertical ? element.offsetWidth - element.offsetHeight : 0) + 'px';
 		}
 	},
 
@@ -665,15 +745,15 @@ const resizing = {
 
 		const pluginName = this.context.resizing._resize_plugin;
 		this.plugins[pluginName].setSize.call(this, w, h, false, direction);
-		if (isVertical) this.plugins.resizing.setTransformSize.call(this, this.context[this.context.resizing._resize_plugin]._element, w, h);
+		if (isVertical) this.plugins.resizing.setTransform.call(this, this.context[this.context.resizing._resize_plugin]._element, w, h);
 
-		this.component.select(this.context[pluginName]._element, pluginName);
+		this.component.select(this.context[pluginName]._element, this.kind);
 	}
 };
 
 function SetMenuAlign(item) {
 	this.setAlign(this._element, item.getAttribute('data-command'));
-	this.component.select(this._element);
+	this.component.select(this._element, this.kind);
 }
 
 function OnMouseDown_resizingDot(e) {
@@ -730,6 +810,10 @@ function OffFigureContainer() {
 	this.__containerGlobalEvent = this.eventManager.removeGlobalEvent(this.__containerGlobalEvent);
 	domUtils.setDisabled(false, this.editor.resizingDisabledButtons);
 	this.resizeContainer.style.display = 'none';
+}
+
+function OnClick_alignButton() {
+	this.selectMenu_align.open();
 }
 
 function CreateHTML_resizeDot() {

@@ -45,7 +45,7 @@ SelectMenu.prototype = {
 		}
 
 		this.items = items;
-		this.form.innerHTML = '<ul class="se-list-basic se-list-checked"">' + html + '</ul>';
+		this.form.firstElementChild.innerHTML = '<ul class="se-list-basic se-list-checked">' + html + '</ul>';
 		this.menus = this.form.querySelectorAll('li');
 	},
 
@@ -53,7 +53,7 @@ SelectMenu.prototype = {
 		if (!attr) attr = {};
 		this._refer = referElement;
 		this._selectMethod = selectMethod;
-		this.form = domUtils.createElement('DIV', { class: 'se-select-menu se-list-inner ' + attr.class || '', style: attr.style || '' });
+		this.form = domUtils.createElement('DIV', { class: 'se-select-menu ' + (attr.class || ''), style: attr.style || '' }, '<div class="se-list-inner"></div>');
 		referElement.parentNode.insertBefore(this.form, referElement);
 	},
 
@@ -70,10 +70,7 @@ SelectMenu.prototype = {
 
 	close: function () {
 		this._init();
-		if (this.form) {
-			this.form.style.display = 'none';
-			this.form.style.height = '';
-		}
+		if (this.form) this.form.style.cssText = '';
 	},
 
 	getItem: function (index) {

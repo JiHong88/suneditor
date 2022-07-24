@@ -137,15 +137,21 @@ FileManager.prototype = {
 			}
 
 			if (!element.getAttribute('data-origin')) {
-				const size = this.figure.getSize(element);;
+				const size = this.figure.getSize(element);
 				element.setAttribute('data-origin', size.w + ',' + size.h);
 				element.setAttribute('data-size', size.w + ',' + size.h);
 			}
 
 			if (!element.style.width) {
 				const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
-				this.inst.ready.call(this, element, null);
-				this.inst.applySize.call(this, size[0], size[1]);
+				try {
+					this.figure.__fileManagerInfo = true;
+					this.inst.ready(element, null);
+					this.inst._applySize(size[0], size[1]); //@todo
+					this.inst.init();
+				} finally {
+					this.figure.__fileManagerInfo = false;
+				}
 			}
 		}
 
