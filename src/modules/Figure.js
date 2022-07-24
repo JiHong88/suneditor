@@ -11,13 +11,14 @@ const Figure = function (inst, controls, params) {
 	const resizeDot = (this.resizeContainer = CreateHTML_resizeDot());
 	this.context.element.relative.appendChild(resizeDot);
 	const controllerEl = CreateHTML_controller(inst.editor, controls || []);
-	const alignButton = controllerEl.querySelector('[data-command="onalign"]');
+	const alignMenus = CreateAlign(this);
+	this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
 
 	// modules
 	this.controller = new Controller(this, controllerEl, 'bottom');
 	this.selectMenu_align = new SelectMenu(this, false, 'bottom-center');
-	this.selectMenu_align.on(alignButton, SetMenuAlign.bind(this), { class: 'se-resizing-align-list' });
-	this.selectMenu_align.create(CreateAlign(this));
+	this.selectMenu_align.on(this.alignButton, SetMenuAlign.bind(this), { class: 'se-resizing-align-list' });
+	this.selectMenu_align.create(alignMenus.items, alignMenus.html);
 	this.resizeDiv = resizeDot.querySelector('.se-modal-resize');
 	this.resizeDisplay = resizeDot.querySelector('.se-resize-display');
 	this.resizeHandles = resizeDot.querySelectorAll('.se-resize-dot > span');
@@ -43,12 +44,17 @@ const Figure = function (inst, controls, params) {
 	this._ratio = false;
 	this._ratioX = 1;
 	this._ratioY = 1;
-	this.__containerGlobalEvent = null;
+	this._alignIcons = {
+		none: this.icons.align_justify,
+		left: this.icons.align_left,
+		right: this.icons.align_right,
+		center: this.icons.align_center
+	};
 	this.__offContainer = OffFigureContainer.bind(this);
 	this.__fileManagerInfo = false;
 
 	// init
-	this.eventManager.addEvent(alignButton, 'click', OnClick_alignButton.bind(this));
+	this.eventManager.addEvent(this.alignButton, 'click', OnClick_alignButton.bind(this));
 	const resizeEvent = OnMouseDown_resizingDot.bind(this);
 	for (let i = 0, len = this.resizeHandles.length; i < len; i++) {
 		this.eventManager.addEvent(this.resizeHandles[i], 'mousedown', resizeEvent);
@@ -71,8 +77,8 @@ Figure.CreateContainer = function (element, className) {
  * @param {Element} cover Cover element(FIGURE). "CreateContainer().cover"
  * @returns {Element} caption element
  */
-Figure.CreateCaption = function (cover) {
-	const caption = domUtils.createElement('FIGCAPTION', { contenteditable: true }, '<div>' + this.lang.modalBox.caption + '</div>');
+Figure.CreateCaption = function (cover, text) {
+	const caption = domUtils.createElement('FIGCAPTION', { contenteditable: true }, '<div>' + text + '</div>');
 	cover.appendChild(caption);
 	return caption;
 };
@@ -102,6 +108,7 @@ Figure.__isComponent = function (element) {
 
 Figure.prototype = {
 	open: function (target) {
+		this.editor._offCurrentController();
 		const figureInfo = Figure.GetContainer(target);
 		this._container = figureInfo.container;
 		this._cover = figureInfo.cover;
@@ -170,11 +177,10 @@ Figure.prototype = {
 		}
 
 		this.resizeContainer.style.display = 'block';
-		this.controller.open(this.resizeContainer);
+		this.controller.open(this.resizeContainer, null, this.__offContainer);
 		domUtils.setDisabled(true, this.editor.resizingDisabledButtons);
 		this.editor._antiBlur = true;
 		this.editor.blur();
-		this.__containerGlobalEvent = this.eventManager.addGlobalEvent('mousedown', this.__offContainer, false);
 
 		// set members
 		const originSize = (target.getAttribute('data-origin-size') || '').split(',');
@@ -184,6 +190,9 @@ Figure.prototype = {
 		this._element_h = this._resize_h = h;
 		this._element_l = l;
 		this._element_t = t;
+
+		// align button
+		this._setAlignIcon();
 
 		return targetInfo;
 	},
@@ -380,6 +389,12 @@ Figure.prototype = {
 		}
 
 		target.setAttribute('data-align', align);
+		this._setAlignIcon();
+	},
+
+	_setAlignIcon: function () {
+		if (!this.alignButton) return;
+		domUtils.changeElement(this.alignButton.firstElementChild, this._alignIcons[this._align]);
 	},
 
 	/**
@@ -448,6 +463,7 @@ Figure.prototype = {
 		const command = target.getAttribute('data-command');
 		const value = target.getAttribute('data-value');
 		const element = this._element;
+		if (command === 'onalign') return;
 
 		switch (command) {
 			case 'auto':
@@ -489,27 +505,32 @@ Figure.prototype = {
 
 				this.setTransform(element, null, null);
 				break;
-			case 'align':
-				currentModule.setAlign.call(this, value, null, null, null);
-				break;
 			case 'caption':
-				currentModule.update_image.call(this, false, false, false);
-				if (caption) {
-					const captionText = domUtils.getEdgeChild(currentContext._caption, function (current) {
+				if (!this._caption) {
+					const caption = Figure.CreateCaption(this._cover, this.lang.modalBox.caption);
+					const captionText = domUtils.getEdgeChild(caption, function (current) {
 						return current.nodeType === 3;
 					});
 
 					if (!captionText) {
-						currentContext._caption.focus();
+						caption.focus();
 					} else {
-						this.setRange(captionText, 0, captionText, captionText.textContent.length);
+						this.selection.setRange(captionText, 0, captionText, captionText.textContent.length);
 					}
 
 					this.editor._offCurrentController();
 				} else {
+					domUtils.removeItem(this._caption);
 					this.component.select(element, this.kind);
-					currentModule.openModify.call(this, true);
 				}
+
+				// if (!init && (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this._captionChecked))) {
+				// 	if (/%$/.test(this.inputX.value) || /%$/.test(this.inputY.value)) {
+				// 		//@todo this.plugins.resizing.deleteTransform.call(this, imageEl);
+				// 	} else {
+				// 		//@todo this.plugins.resizing.setTransform.call(this, imageEl, numbers.get(this.inputX.value, 0), numbers.get(this.inputY.value, 0));
+				// 	}
+				// }
 
 				break;
 			case 'revert':
@@ -562,13 +583,7 @@ const resizing = {
 			isVertical: false,
 			_resize_direction: '',
 			_move_path: null,
-			_isChange: false,
-			alignIcons: {
-				basic: icons.align_justify,
-				left: icons.align_left,
-				right: icons.align_right,
-				center: icons.align_center
-			}
+			_isChange: false
 		};
 
 		/** resize controller, button */
@@ -752,7 +767,8 @@ const resizing = {
 };
 
 function SetMenuAlign(item) {
-	this.setAlign(this._element, item.getAttribute('data-command'));
+	this.setAlign(this._element, item);
+	this.selectMenu_align.close();
 	this.component.select(this._element, this.kind);
 }
 
@@ -798,22 +814,24 @@ function CreateAlign(editor) {
 	const icons = [editor.icons.align_justify, editor.icons.align_left, editor.icons.align_center, editor.icons.align_right];
 	const langs = [editor.lang.modalBox.basic, editor.lang.modalBox.left, editor.lang.modalBox.center, editor.lang.modalBox.right];
 	const commands = ['none', 'left', 'center', 'right'];
-	const v = [];
+	const html = [];
+	const items = [];
 	for (let i = 0; i < commands.length; i++) {
-		v.push('<button type="button" class="se-btn-list se-tooltip" data-command="' + commands[i] + '">' + icons[i] + '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + langs[i] + '</span></span>' + '</button>');
+		html.push('<button type="button" class="se-btn-list se-tooltip" data-command="' + commands[i] + '">' + icons[i] + '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + langs[i] + '</span></span>' + '</button>');
+		items.push(commands[i]);
 	}
 
-	return v;
+	return { html: html, items: items };
 }
 
 function OffFigureContainer() {
-	this.__containerGlobalEvent = this.eventManager.removeGlobalEvent(this.__containerGlobalEvent);
+	this.editor._antiBlur = false;
 	domUtils.setDisabled(false, this.editor.resizingDisabledButtons);
 	this.resizeContainer.style.display = 'none';
 }
 
 function OnClick_alignButton() {
-	this.selectMenu_align.open();
+	this.selectMenu_align.open('', '[data-command="' + this._align + '"]');
 }
 
 function CreateHTML_resizeDot() {

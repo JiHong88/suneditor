@@ -502,23 +502,24 @@ Core.prototype = {
 			case 'selectAll':
 				this._offCurrentController();
 				this.menu.containerOff();
-				const wysiwyg = this.context.element.wysiwyg;
+				const figcaption = domUtils.getParentElement(this.selection.getNode(), 'FIGCAPTION');
+				const selectArea = figcaption || this.context.element.wysiwyg;
 				let first =
 					domUtils.getEdgeChild(
-						wysiwyg.firstChild,
+						selectArea.firstChild,
 						function (current) {
 							return current.childNodes.length === 0 || current.nodeType === 3;
 						},
 						false
-					) || wysiwyg.firstChild;
+					) || selectArea.firstChild;
 				let last =
 					domUtils.getEdgeChild(
-						wysiwyg.lastChild,
+						selectArea.lastChild,
 						function (current) {
 							return current.childNodes.length === 0 || current.nodeType === 3;
 						},
 						true
-					) || wysiwyg.lastChild;
+					) || selectArea.lastChild;
 				if (!first || !last) return;
 				if (domUtils.isMedia(first)) {
 					const info = this.component.get(first);
@@ -530,7 +531,7 @@ Core.prototype = {
 				}
 				if (domUtils.isMedia(last)) {
 					last = domUtils.createElement('BR');
-					wysiwyg.appendChild(domUtils.createElement(this.options.defaultLineTag, null, last));
+					selectArea.appendChild(domUtils.createElement(this.options.defaultLineTag, null, last));
 				}
 				this.toolbar._showBalloon(this.selection.setRange(first, 0, last, last.textContent.length));
 				break;
@@ -1707,7 +1708,6 @@ Core.prototype = {
 					}
 				}
 			}
-			
 
 			if (typeof plugin.onPluginMousedown === 'function') {
 				this._onMousedownPlugins.push(plugin.onPluginMousedown.bind(plugin));
@@ -1936,8 +1936,10 @@ Core.prototype = {
 	_offCurrentController: function () {
 		const cont = this.openControllers;
 		for (let i = 0; i < cont.length; i++) {
-			cont[i].inst.close();
+			if (typeof cont[i].inst.close === 'function') cont[i].inst.close();
+			else if (cont[i].form) cont[i].form.style.display = 'none';
 		}
+		this.openControllers = [];
 	},
 
 	Constructor: Core

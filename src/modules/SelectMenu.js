@@ -59,13 +59,14 @@ SelectMenu.prototype = {
 
 	/**
 	 * @description Select menu open
-	 * @param {"string"} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
+	 * @param {string} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
+	 * @param {string|null|undefined} onItemQuerySelector The querySelector string of the menu to be activated
 	 */
-	open: function (position) {
+	open: function (position, onItemQuerySelector) {
 		this.__addEvents();
 		this.__addGlobalEvent();
 		const positionItems = position ? position.split('-') : [];
-		this._setPosition(positionItems[0] || this.position, positionItems[1] || this.subPosition);
+		this._setPosition(positionItems[0] || this.position, positionItems[1] || this.subPosition, onItemQuerySelector);
 	},
 
 	close: function () {
@@ -82,6 +83,10 @@ SelectMenu.prototype = {
 		this.__removeGlobalEvent();
 		this.index = -1;
 		this.item = null;
+		if (this._onItem) {
+			domUtils.removeClass(this._onItem, 'se-select-on');
+			this._onItem = null;
+		}
 	},
 
 	_moveItem: function (num) {
@@ -107,7 +112,7 @@ SelectMenu.prototype = {
 	 * @param {["middle"|"top"|"bottom"] | ["center"|"left"|"right"]} subPosition Sub position
 	 * @private
 	 */
-	_setPosition: function (position, subPosition) {
+	_setPosition: function (position, subPosition, onItemQuerySelector) {
 		const originP = position;
 		const form = this.form;
 		const target = this._refer;
@@ -217,6 +222,14 @@ SelectMenu.prototype = {
 			case 'false-right':
 				if (fl < 0) l -= fl - 4;
 				break;
+		}
+
+		if (onItemQuerySelector) {
+			const item = form.firstElementChild.querySelector(onItemQuerySelector);
+			if (item) {
+				this._onItem = item;
+				domUtils.addClass(item, 'se-select-on');
+			}
 		}
 
 		form.style.left = l + 'px';

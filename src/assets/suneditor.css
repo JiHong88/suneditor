@@ -411,8 +411,9 @@
 /* --- select menu ---------------------------------------------------------- */
 .sun-editor .se-select-menu {position:absolute; min-width:auto; top:0px; left:0px; z-index:2147483647; display:none; width:auto; height:auto; overflow-y:auto; overflow-x:hidden; background-color:#fff; border-radius:4px; padding:2px 0; margin:0; border:1px solid #bababa; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); outline:0 none;}
 .sun-editor .se-select-menu ul {padding:0; margin:0; word-break:break-all; width:auto; max-width:100%; min-width:-moz-max-content; min-width:-webkit-max-content; min-width:-o-max-content; min-width:-ms-max-content;}
-.sun-editor .se-select-menu .se-select-item {line-height:28px; min-height:28px; font-size:12px; padding:0 14px;; margin:2px 0; cursor:pointer;}
+.sun-editor .se-select-menu .se-select-item {list-style:none; line-height:28px; min-height:28px; font-size:12px; padding:0 14px;; margin:2px 0; cursor:pointer;}
 .sun-editor .se-select-menu .se-select-item button {padding:0; margin:0;}
+.sun-editor .se-select-menu .se-select-item *.se-select-on {color:#4592ff;}
 .sun-editor .se-select-menu.__se_select-menu-mouse-move .se-select-item:hover, .sun-editor .se-select-menu:not(.__se_select-menu-mouse-move) .se-select-item.active {background-color:#e1e1e1;}
 .sun-editor .se-select-menu.__se_select-menu-mouse-move .se-select-item:active {background-color:#c1c1c1; border-color:#b1b1b1; -webkit-box-shadow:inset 0 3px 5px #b1b1b1; box-shadow:inset 0 3px 5px #b1b1b1;}
 .sun-editor .se-modal-form-files .se-select-menu {width:100%; height:auto;}

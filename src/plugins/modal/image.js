@@ -130,7 +130,11 @@ image.prototype = {
 		if (this._resizing) this._proportionChecked = this.proportion.checked;
 
 		if (this.modal.isUpdate) {
-			this._update(false, true, false);
+			this._update();
+			this.component.select(imageEl, 'image');
+			// history stack
+			this.history.push(false);
+
 			return true;
 		}
 
@@ -171,7 +175,7 @@ image.prototype = {
 	},
 
 	/**
-	 * @override fileManager
+	 * @override fileManager, figure
 	 * @description It is called from core.mediaContainer.select
 	 * @param {Element} element Target element
 	 */
@@ -332,7 +336,7 @@ image.prototype = {
 		try {
 			const file = { name: url.split('/').pop(), size: 0 };
 			if (this.modal.isUpdate) this._updateSrc(url, this._element, file);
-			else this._createComp(url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
+			else this._create(url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
 		} catch (error) {
 			console.warn('[SUNEDITOR.image.URLRendering.fail] ' + error.message);
 			return true;
@@ -341,7 +345,7 @@ image.prototype = {
 		return true;
 	},
 
-	_update: function (init, openController, notHistoryPush) {
+	_update: function (init) {
 		let imageEl = this._element;
 		let cover = this._cover;
 		let container = this._container;
@@ -372,7 +376,7 @@ image.prototype = {
 		let modifiedCaption = false;
 		if (this._captionChecked) {
 			if (!this._caption) {
-				this._caption = this.component.createMediaCaption.call(cover);
+				this._caption = Figure.CreateCaption(cover, this.lang.modalBox.caption);
 				modifiedCaption = true;
 			}
 		} else {
@@ -460,18 +464,6 @@ image.prototype = {
 
 		// align
 		this.figure.setAlign(imageEl, this._align);
-
-		// set imagesInfo
-		if (init) {
-			this.fileManager.setInfo(imageEl, null);
-		}
-
-		if (openController) {
-			this.component.select(imageEl, 'image');
-		}
-
-		// history stack
-		if (!notHistoryPush) this.history.push(false);
 	},
 
 	_openTab: function (e) {
@@ -545,7 +537,7 @@ image.prototype = {
 				this._updateSrc(fileList[i].url, info.element, file);
 				break;
 			} else {
-				this._createComp(fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt);
+				this._create(fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt);
 			}
 		}
 
@@ -605,14 +597,12 @@ image.prototype = {
 				this._element.setAttribute('data-file-size', filesStack[i].file.size);
 				this._updateSrc(filesStack[i].result, updateElement, filesStack[i].file);
 			} else {
-				this._createComp(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt);
+				this._create(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt);
 			}
 		}
 	},
 
-	_createComp: function (src, anchor, width, height, align, file, alt) {
-		// this.context.resizing._resize_plugin = 'image';
-
+	_create: function (src, anchor, width, height, align, file, alt) {
 		let oImg = domUtils.createElement('IMG');
 		oImg.src = src;
 		oImg.alt = alt;
@@ -629,7 +619,7 @@ image.prototype = {
 
 		// caption
 		if (this._captionChecked) {
-			this._caption = this.component.createMediaCaption.call(cover);
+			this._caption = this._caption = Figure.CreateCaption(cover, this.lang.modalBox.caption);
 			this._caption.setAttribute('contenteditable', false);
 		}
 
@@ -645,7 +635,6 @@ image.prototype = {
 
 		oImg.onload = OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
 		if (this.component.insert(container, true, false, true)) this.fileManager.setInfo(oImg, file);
-		// this.context.resizing._resize_plugin = '';
 	},
 
 	_setAnchor: function (imgTag, anchor) {
@@ -670,7 +659,6 @@ image.prototype = {
 };
 
 var a = {
-
 	///////////
 	/**
 	 * @override resizing
@@ -736,7 +724,8 @@ function FileCheckHandler(element) {
 	const line = this.format.getLine(element);
 	if (line) this._align = line.style.textAlign || line.style.float;
 
-	this._update(true, false, true);
+	this._update();
+	this.fileManager.setInfo(element, null);
 	this.init();
 
 	return element;

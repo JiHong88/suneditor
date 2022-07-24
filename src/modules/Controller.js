@@ -21,6 +21,7 @@ const Controller = function (inst, element, position) {
 	this.currentTarget = null;
 	this.currentPositionTarget = null;
 	this.position = position || 'bottom';
+	this._initMethod = null;
 	this.__globalEventHandlers = [CloseListener_key.bind(this), CloseListener_mousedown.bind(this)];
 	this._bindClose_key = null;
 	this._bindClose_mousedown = null;
@@ -36,9 +37,10 @@ Controller.prototype = {
 	/**
 	 * @description Open a modal plugin
 	 */
-	open: function (target, positionTarget) {
+	open: function (target, positionTarget, initMethod) {
 		this.currentTarget = target;
 		this.currentPositionTarget = positionTarget || target;
+		this._initMethod = initMethod;
 		this.editor.currentControllerName = this.kind;
 		this.__addGlobalEvent();
 		this._setControllerPosition(this.form, this.currentPositionTarget);
@@ -53,6 +55,7 @@ Controller.prototype = {
 		this.editor.currentControllerName = null;
 		this.__removeGlobalEvent();
 		this._controllerOff();
+		if (typeof this._initMethod === 'function') this._initMethod();
 	},
 
 	/**
