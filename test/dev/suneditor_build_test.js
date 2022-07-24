@@ -58,7 +58,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
             html: '<p>HTML source2</p>'
         }
       ],
-    // iframe: true,
+    iframe: true,
     // iframe_fullPage: true,
     linkRel: [
         'author',

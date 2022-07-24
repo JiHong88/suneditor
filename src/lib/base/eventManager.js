@@ -58,11 +58,9 @@ EventManager.prototype = {
 	 */
 	addGlobalEvent: function (type, listener, useCapture) {
 		if (this.options.iframe) {
-			this._wd.addEventListener(type, listener, useCapture);
-		} else {
-			this._d.addEventListener(type, listener, useCapture);
+			this._ww.addEventListener(type, listener, useCapture);
 		}
-
+		this._w.addEventListener(type, listener, useCapture);
 		return { type: type, listener: listener, useCapture: useCapture };
 	},
 
@@ -79,12 +77,10 @@ EventManager.prototype = {
 			useCapture = type.useCapture;
 			type = type.type;
 		}
-
 		if (this.options.iframe) {
-			this._wd.removeEventListener(type, listener, useCapture);
-		} else {
-			this._d.removeEventListener(type, listener, useCapture);
+			this._ww.removeEventListener(type, listener, useCapture);
 		}
+		this._w.removeEventListener(type, listener, useCapture);
 	},
 
 	/**
