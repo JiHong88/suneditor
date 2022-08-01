@@ -42,6 +42,7 @@ Modal.prototype = {
 	 * @description Open a modal plugin
 	 */
 	open: function () {
+		this.editor._fixCurrentController(true);
 		if (this._closeSignal) this._modalElement.inner.addEventListener('click', this._closeListener[1]);
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 		this._bindClose = this.eventManager.addGlobalEvent('keydown', this._closeListener[0]);
@@ -69,13 +70,14 @@ Modal.prototype = {
 	 * The plugin's "init" method is called.
 	 */
 	close: function () {
+		this.editor._fixCurrentController(false);
 		if (this._closeSignal) this._modalElement.inner.removeEventListener('click', this._closeListener[1]);
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 		// close
 		this.form.style.display = 'none';
 		this._modalElement.back.style.display = 'none';
 		this._modalElement.area.style.display = 'none';
-		if (typeof this.inst.init === 'function') this.inst.init();
+		if (typeof this.inst.init === 'function' && !this.isUpdate) this.inst.init();
 		this.editor.focus();
 	},
 

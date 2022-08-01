@@ -261,7 +261,7 @@ audio.prototype = {
 	_createAudioTag: function () {
 		const w = this._origin_w;
 		const h = this._origin_h;
-		const oAudio = domUtils.createElement('AUDIO', { 'data-origin-size': w + ',' + h, style: (w ? 'width:' + w + '; ' : '') + (h ? 'height:' + h + ';' : '') });
+		const oAudio = domUtils.createElement('AUDIO', { style: (w ? 'width:' + w + '; ' : '') + (h ? 'height:' + h + ';' : '') });
 		this._setTagAttrs(oAudio);
 		return oAudio;
 	},
@@ -333,8 +333,6 @@ function FileCheckHandler(element) {
 	} catch (error) {
 		console.warn('[SUNEDITOR.audio.error] Maybe the audio tag is nested.', error);
 	}
-
-	this.init();
 
 	return element;
 }

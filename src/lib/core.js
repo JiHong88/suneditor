@@ -1933,13 +1933,30 @@ Core.prototype = {
 		);
 	},
 
-	_offCurrentController: function () {
+	/**
+	 * @description Off current controller
+	 * @private
+	 */
+	 _offCurrentController: function () {
 		const cont = this.openControllers;
+		const fixedCont = [];
 		for (let i = 0; i < cont.length; i++) {
+			if (cont[i].fixed) {
+				fixedCont.push(cont[i]);
+				continue;
+			}
 			if (typeof cont[i].inst.close === 'function') cont[i].inst.close();
 			else if (cont[i].form) cont[i].form.style.display = 'none';
 		}
-		this.openControllers = [];
+		this.openControllers = fixedCont;
+	},
+
+	_fixCurrentController: function (fixed) {
+		const cont = this.openControllers;
+		for (let i = 0; i < cont.length; i++) {
+			cont[i].fixed = fixed;
+			cont[i].form.style.display = fixed ? 'none' : 'block';
+		}
 	},
 
 	Constructor: Core

@@ -581,13 +581,6 @@ EventManager.prototype = {
 		}
 	},
 
-	_offController: function () {
-		const openCont = this.editor.openControllers;
-		for (let i = 0; i < openCont.length; i++) {
-			openCont[i].inst.close();
-		}
-	},
-
 	_moveController: function (eventWysiwyg) {
 		const openCont = this.editor.openControllers;
 		for (let i = 0; i < openCont.length; i++) {
@@ -1548,16 +1541,6 @@ function OnCopy_wysiwyg(e) {
 		e.stopPropagation();
 		return false;
 	}
-
-	const info = this.editor.currentFileComponentInfo;
-	if (info && !env.isIE) {
-		this._setClipboardComponent(e, info, clipboardData);
-		// copy effect
-		domUtils.addClass(info.component, 'se-component-copy');
-		_w.setTimeout(function () {
-			domUtils.removeClass(info.component, 'se-component-copy');
-		}, 150);
-	}
 }
 
 function OnDrop_wysiwyg(e) {
@@ -1589,7 +1572,7 @@ function OnCut_wysiwyg(e) {
 	if (info && !env.isIE) {
 		this._setClipboardComponent(e, info, clipboardData);
 		domUtils.removeItem(info.component);
-		this._offController();
+		this.editor._offCurrentController();
 	}
 
 	_w.setTimeout(function () {
@@ -1619,9 +1602,10 @@ function OnFocus_wysiwyg(e) {
 
 function OnBlur_wysiwyg(e) {
 	if (this.editor._antiBlur || this.status.isCodeView) return;
+
 	this.status.hasFocus = false;
 	this.editor.effectNode = null;
-	this._offController();
+	this.editor._offCurrentController();
 	if (this.editor._isInline || this.editor._isBalloon) this._hideToolbar();
 
 	this._setKeyEffect([]);
@@ -1727,7 +1711,7 @@ function DisplayLineBreak(dir, e) {
 }
 
 function OnResize_window() {
-	this._offController();
+	this.editor._offCurrentController();
 
 	if (env.isIE) this.toolbar.resetResponsiveToolbar();
 

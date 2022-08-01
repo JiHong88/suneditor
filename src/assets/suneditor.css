@@ -273,13 +273,13 @@
 /** --- placeholder */
 .sun-editor .se-wrapper .se-placeholder {position:absolute; display:none; white-space:nowrap; text-overflow:ellipsis; z-index:1; color:#b1b1b1; font-size:13px; line-height:1.5; top:0; left:0; right:0; overflow:hidden; margin-top:0px; padding-top:16px; padding-left:16px; margin-left:0px; padding-right:16px; margin-right:0px; pointer-events:none; backface-visibility:hidden; -webkit-backface-visibility:hidden; -moz-backface-visibility:hidden;}
 
-/** --- resizing bar */
+/** --- status bar */
 .sun-editor .se-status-bar {display:flex; width:auto; height:auto; min-height:16px; border-top:1px solid #dadada; padding:0 4px; background-color:#fafafa; cursor:ns-resize;}
 .sun-editor .se-status-bar.se-resizing-none {cursor:default;}
 .sun-editor .se-resizing-back {position:absolute; display:none; cursor:default; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
-/** resizing bar - nabigation */
+/** status bar - nabigation */
 .sun-editor .se-status-bar .se-navigation {flex:auto; position:relative; width:auto; height:auto; color:#666; margin:0; padding:0; font-size:10px; line-height:1.5; background:transparent;}
-/** resizing bar - charCounter */
+/** status bar - charCounter */
 .sun-editor .se-status-bar .se-char-counter-wrapper {flex:none; position:relative; display:block; width:auto; height:auto; margin:0; padding:0; color:#999; font-size:13px; background:transparent;}
 .sun-editor .se-status-bar .se-char-counter-wrapper.se-blink {color:#b94a48; animation:blinker 0.2s linear infinite;}
 .sun-editor .se-status-bar .se-char-counter-wrapper .se-char-label {margin-right:4px;}
@@ -386,18 +386,18 @@
 
 /* controller - resizing(image, iframe) */
 .sun-editor .se-controller-resizing {padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
-.sun-editor .se-resizing-container {position:absolute; display:none; outline:2px solid #3f9dff; background-color:transparent; pointer-events:none; backface-visibility:hidden; -webkit-backface-visibility:hidden; -moz-backface-visibility:hidden;}
-.sun-editor .se-resizing-container .se-modal-resize {position:absolute; display:inline-block; background-color:transparent; opacity:0;}
-.sun-editor .se-resizing-container .se-resize-dot {position:absolute; top:0px; left:0px; width:100%; height:100%}
-.sun-editor .se-resizing-container .se-resize-dot > span {position:absolute; width:7px; height:7px; background-color:#3f9dff; border:1px solid #4592ff;}
-.sun-editor .se-resizing-container .se-resize-dot > span.tl {top:-5px; left:-5px; cursor:nw-resize;}
-.sun-editor .se-resizing-container .se-resize-dot > span.tr {top:-5px; right:-5px; cursor:ne-resize;}
-.sun-editor .se-resizing-container .se-resize-dot > span.bl {bottom:-5px; left:-5px; cursor:sw-resize;}
-.sun-editor .se-resizing-container .se-resize-dot > span.br {right:-5px; bottom:-5px; cursor:se-resize;}
-.sun-editor .se-resizing-container .se-resize-dot > span.lw {left:-7px; bottom:50%; cursor:w-resize;}
-.sun-editor .se-resizing-container .se-resize-dot > span.th {left:50%; top:-7px; cursor:n-resize;}
-.sun-editor .se-resizing-container .se-resize-dot > span.rw {right:-7px; bottom:50%; cursor:e-resize;}
-.sun-editor .se-resizing-container .se-resize-dot > span.bh {right:50%; bottom:-7px; cursor:s-resize;}
+.sun-editor .se-resizing-container {position:absolute; display:none; outline:none; border:0; padding:0; background-color:transparent; backface-visibility:hidden; -webkit-backface-visibility:hidden; -moz-backface-visibility:hidden;}
+.sun-editor .se-resizing-container .se-resize-dot {position:absolute; display:inline-block; outline:3px solid #80bdff; border:0; padding:0;}
+.sun-editor .se-resizing-container.se-resize-ing .se-resize-dot {outline:3px solid #4592ff;}
+.sun-editor .se-resizing-container .se-resize-dot > span {position:absolute; width:8px; height:8px; background-color:#4592ff; border:1px solid #4592ff;}
+.sun-editor .se-resizing-container .se-resize-dot > span.tl {top:-6px; left:-6px; cursor:nw-resize;}
+.sun-editor .se-resizing-container .se-resize-dot > span.tr {top:-6px; right:-6px; cursor:ne-resize;}
+.sun-editor .se-resizing-container .se-resize-dot > span.bl {bottom:-6px; left:-6px; cursor:sw-resize;}
+.sun-editor .se-resizing-container .se-resize-dot > span.br {right:-6px; bottom:-6px; cursor:se-resize;}
+.sun-editor .se-resizing-container .se-resize-dot > span.lw {left:-8px; bottom:50%; cursor:w-resize;}
+.sun-editor .se-resizing-container .se-resize-dot > span.th {left:50%; top:-8px; cursor:n-resize;}
+.sun-editor .se-resizing-container .se-resize-dot > span.rw {right:-8px; bottom:50%; cursor:e-resize;}
+.sun-editor .se-resizing-container .se-resize-dot > span.bh {right:50%; bottom:-8px; cursor:s-resize;}
 .sun-editor .se-resizing-container .se-resize-display {position:absolute; right:0; bottom:0; padding:5px; margin:5px; font-size:12px; color:#fff; background-color:#333; border-radius:4px;}
 /* controller - table */
 .sun-editor .se-controller-table {width:auto; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}

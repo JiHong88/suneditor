@@ -45,7 +45,6 @@ math.prototype = {
 	 */
 	active: function (element) {
 		if (element && element.getAttribute('data-exp')) {
-			this.selection.setRange(element, 0, element, 1);
 			this.controller.open(element);
 			return true;
 		}

@@ -1,7 +1,9 @@
 'use strict';
 
 import EditorInterface from '../interface/editor';
-import { domUtils } from '../helper';
+import { domUtils, global } from '../helper';
+
+const NON_TEXT_KEYCODE = new global._w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$');
 
 /**
  *
@@ -11,11 +13,11 @@ import { domUtils } from '../helper';
  * When using the "top" position, there should not be an arrow on the controller.
  * When using the "bottom" position there should be an arrow on the controller.
  */
-const Controller = function (inst, element, position) {
+const Controller = function (inst, element, position, _name) {
 	EditorInterface.call(this, inst.editor);
 
 	// members
-	this.kind = inst.constructor.name;
+	this.kind = _name || inst.constructor.name;
 	this.inst = inst;
 	this.form = element;
 	this.currentTarget = null;
@@ -82,8 +84,6 @@ Controller.prototype = {
 		}
 
 		this.editor.openControllers.push({ position: this.position, form: form, target: target, inst: this, _offset: { left: form.offsetLeft + this.context.element.eventWysiwyg.scrollX, top: form.offsetTop + this.context.element.eventWysiwyg.scrollY } });
-		this.editor._antiBlur = true;
-
 		if (typeof this.events.onShowController === 'function') this.events.onShowController(this.kind, this.editor.openControllers);
 	},
 
@@ -98,8 +98,6 @@ Controller.prototype = {
 		this.editor.currentFileComponentInfo = null;
 		this.editor.effectNode = null;
 		this.editor.openControllers = [];
-		this.editor._antiBlur = false;
-
 		if (typeof this.inst.reset === 'function') this.inst.reset();
 	},
 
@@ -183,6 +181,16 @@ Controller.prototype = {
 		if (this._bindClose_mousedown) this._bindClose_mousedown = this.eventManager.removeGlobalEvent(this._bindClose_mousedown);
 	},
 
+	_checkFixed: function () {
+		const cont = this.editor.openControllers;
+		for (let i = 0; i < cont.length; i++) {
+			if (cont[i].inst === this && cont[i].fixed) {
+				return true;
+			}
+		}
+		return false;
+	},
+
 	constructor: Controller
 };
 
@@ -203,13 +211,20 @@ function Action(e) {
 }
 
 function CloseListener_key(e) {
+	if (this._checkFixed()) return;
+	const keyCode = e.keyCode;
+	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
+	if (ctrl || NON_TEXT_KEYCODE.test(keyCode)) return;
+
 	this.editor._lineBreaker.style.display = 'none';
 	if (this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) return;
-	if (this.editor._fileManager.pluginRegExp.test(this.kind) && e.keyCode !== 27) return;
+	if (this.editor._fileManager.pluginRegExp.test(this.kind) && keyCode !== 27) return;
+
 	this.close();
 }
 
 function CloseListener_mousedown(e) {
+	if (this._checkFixed()) return;
 	if (this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) return;
 	this.close();
 }

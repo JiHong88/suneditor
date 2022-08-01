@@ -25,7 +25,7 @@ export function createElement(elementName, attributes, inner) {
 
 	if (attributes) {
 		for (let key in attributes) {
-			if (attributes[key]) el.setAttribute(key, attributes[key]);
+			if (attributes[key] !== undefined && attributes[key] !== null) el.setAttribute(key, attributes[key]);
 		}
 	}
 

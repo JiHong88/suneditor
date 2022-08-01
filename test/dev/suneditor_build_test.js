@@ -78,7 +78,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
     linkTargetNewWindow: true,
     linkProtocol: 'https://',
     imageMultipleFile: true,
-    imageResizing: false,
+    imageResizing: true,
     plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock, horizontalLine, lineHeight, list,
         paragraphStyle, template, textStyle, table, math, link, audio, image
     ],

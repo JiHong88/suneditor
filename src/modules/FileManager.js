@@ -1,7 +1,7 @@
 'use strict';
 
 import CoreInterface from '../interface/_core';
-import { domUtils, global } from '../helper';
+import { domUtils, numbers, global } from '../helper';
 
 /**
  *
@@ -132,23 +132,23 @@ FileManager.prototype = {
 
 		// figure
 		if (this.figure) {
-			if (!element.getAttribute('data-origin-size') && element.naturalWidth) {
-				element.setAttribute('data-origin-size', element.naturalWidth + ',' + element.naturalHeight);
-			}
-
 			if (!element.getAttribute('data-origin')) {
 				const size = this.figure.getSize(element);
-				element.setAttribute('data-origin', size.w + ',' + size.h);
-				element.setAttribute('data-size', size.w + ',' + size.h);
+				const w = element.naturalWidth || size.w;
+				const h = element.naturalHeight || size.h;
+				element.setAttribute('data-origin', w + ',' + h);
+				element.setAttribute('data-size', w + ',' + h);
 			}
 
 			if (!element.style.width) {
-				const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
 				try {
+					const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
 					this.figure.__fileManagerInfo = true;
 					this.inst.ready(element, null);
-					this.inst._applySize(size[0], size[1]); //@todo
+					this.figure.setSize(numbers.get(size[0]) ? size[0] : 'auto', numbers.get(size[1]) ? size[1] : 'auto');
 					this.inst.init();
+				} catch (error) {
+					console.warn('[SUNEDITOR.FileManager[' + this.kind + '].setInfo.error] ' + error.message);
 				} finally {
 					this.figure.__fileManagerInfo = false;
 				}
@@ -214,11 +214,22 @@ FileManager.prototype = {
 
 		for (let i = 0, len = tags.length, tag; i < len; i++) {
 			tag = tags[i];
-			if (!domUtils.getParentElement(tag, this.editor.component.is) || !_checkImageComponent(tag)) {
+			if (!domUtils.getParentElement(tag, this.editor.component.is)) {
 				currentTags.push(this.infoIndex);
-				tag = this.checkHandler(tag);
-				if (!tag) console.warn('[SUNEDITOR.FileManager[' + this.kind + '].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).');
-				else this.setInfo(tag, null);
+				try {
+					this.figure.__fileManagerInfo = true;
+					tag = this.checkHandler(tag);
+					if (!tag) {
+						console.warn('[SUNEDITOR.FileManager[' + this.kind + '].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).');
+					} else {
+						this.setInfo(tag, null);
+						this.inst.init();
+					}
+				} catch (error) {
+					console.warn('[SUNEDITOR.FileManager[' + this.kind + '].checkHandler.error] ' + error.message);
+				} finally {
+					this.figure.__fileManagerInfo = false;
+				}
 			} else if (!tag.getAttribute('data-index') || infoIndex.indexOf(tag.getAttribute('data-index') * 1) < 0) {
 				currentTags.push(this.infoIndex);
 				tag.removeAttribute('data-index');
@@ -295,13 +306,6 @@ function CallBackUpload(xmlHttp, callBack, errorCallBack) {
 			}
 		}
 	}
-}
-
-function _checkImageComponent(tag) {
-	if (/IMG/i.test(tag)) {
-		return !/FIGURE/i.test(tag.parentElement.nodeName) || !/FIGURE/i.test(tag.parentElement.parentElement.nodeName);
-	}
-	return true;
 }
 
 export default FileManager;

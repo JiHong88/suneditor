@@ -53,20 +53,14 @@ const image = function (editor, target) {
 	this._element = null;
 	this._cover = null;
 	this._container = null;
-	this._resizing = options.imageResizing;
-
-	// @override resizing properties
-
-	this._defaultSizeX = 'auto';
-	this._defaultSizeY = 'auto';
+	this._caption = null;
+	this._ratio = { w: 1, h: 1 };
 	this._origin_w = options.imageWidth === 'auto' ? '' : options.imageWidth;
 	this._origin_h = options.imageHeight === 'auto' ? '' : options.imageHeight;
+	this._resizing = options.imageResizing;
+	// @override resizing properties
 	this._resizeDotHide = !options.imageHeightShow;
 	this._onlyPercentage = options.imageSizeOnlyPercentage;
-	this._proportionChecked = true;
-
-	this._captionChecked = false;
-	this._caption = null;
 
 	// init
 	modalEl.querySelector('.se-modal-tabs').addEventListener('click', this._openTab.bind(this));
@@ -84,14 +78,13 @@ const image = function (editor, target) {
 		this.inputX.value = options.imageWidth;
 		this.inputY.value = options.imageHeight;
 
-		this.inputX.addEventListener('keyup', this.setInputSize.bind(core, 'x'));
-		this.inputY.addEventListener('keyup', this.setInputSize.bind(core, 'y'));
-
-		this.inputX.addEventListener('change', this.setRatio.bind(core));
-		this.inputY.addEventListener('change', this.setRatio.bind(core));
-		this.proportion.addEventListener('change', this.setRatio.bind(core));
-
-		modalEl.querySelector('.se-modal-btn-revert').addEventListener('click', this.sizeRevert.bind(core));
+		const ratioChange = OnChangeRatio.bind(this);
+		this.eventManager.addEvent(this.inputX, 'keyup', OnInputSize.bind(this, 'x'));
+		this.eventManager.addEvent(this.inputY, 'keyup', OnInputSize.bind(this, 'y'));
+		this.eventManager.addEvent(this.inputX, 'change', ratioChange);
+		this.eventManager.addEvent(this.inputY, 'change', ratioChange);
+		this.eventManager.addEvent(this.proportion, 'change', ratioChange);
+		this.eventManager.addEvent(modalEl.querySelector('.se-modal-btn-revert'), 'click', OnClickRevert.bind(this));
 	}
 };
 
@@ -111,8 +104,8 @@ image.prototype = {
 	 */
 	on: function (isUpdate) {
 		if (!isUpdate) {
-			this.inputX.value = this._origin_w = this.options.imageWidth === this._defaultSizeX ? '' : this.options.imageWidth;
-			this.inputY.value = this._origin_h = this.options.imageHeight === this._defaultSizeY ? '' : this.options.imageHeight;
+			this.inputX.value = this._origin_w = this.options.imageWidth === 'auto' ? '' : this.options.imageWidth;
+			this.inputY.value = this._origin_h = this.options.imageHeight === 'auto' ? '' : this.options.imageHeight;
 			if (this.imgInputFile && this.options.imageMultipleFile) this.imgInputFile.setAttribute('multiple', 'multiple');
 		} else {
 			if (this.imgInputFile && this.options.imageMultipleFile) this.imgInputFile.removeAttribute('multiple');
@@ -126,12 +119,11 @@ image.prototype = {
 	 */
 	modalAction: function () {
 		this._align = this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
-		this._captionChecked = this.captionCheckEl.checked;
-		if (this._resizing) this._proportionChecked = this.proportion.checked;
 
 		if (this.modal.isUpdate) {
-			this._update();
-			this.component.select(imageEl, 'image');
+			this._update(this.inputX.value, this.inputY.value);
+			this.component.select(this._element, 'image');
+
 			// history stack
 			this.history.push(false);
 
@@ -163,11 +155,12 @@ image.prototype = {
 		this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]').checked = true;
 		this.captionCheckEl.checked = false;
 		this._element = null;
+		this._ratio = { w: 1, h: 1 };
 		this._openTab('init');
 
 		if (this._resizing) {
-			this.inputX.value = this.options.imageWidth === this._defaultSizeX ? '' : this.options.imageWidth;
-			this.inputY.value = this.options.imageHeight === this._defaultSizeY ? '' : this.options.imageHeight;
+			this.inputX.value = this.options.imageWidth === 'auto' ? '' : this.options.imageWidth;
+			this.inputY.value = this.options.imageHeight === 'auto' ? '' : this.options.imageHeight;
 			this.proportion.checked = true;
 		}
 
@@ -184,7 +177,7 @@ image.prototype = {
 	},
 
 	/**
-	 * @override fileManager
+	 * @override fileManager, figure
 	 */
 	ready: function (element) {
 		if (!element) return;
@@ -200,19 +193,35 @@ image.prototype = {
 		this._align = figureInfo.align;
 		element.style.float = '';
 
-		this._origin_w = figureInfo.w || element.style.width || element.width || '';
-		this._origin_h = figureInfo.h || element.style.height || element.height || '';
+		this._origin_w = figureInfo.originWidth || figureInfo.w || '';
+		this._origin_h = figureInfo.originHeight || figureInfo.h || '';
 		this.altText.value = this._element.alt;
 
 		if (this.imgUrlFile) this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = this._element.src;
 
 		(this.modal.form.querySelector('input[name="suneditor_image_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]')).checked = true;
 		this._align = this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
-		this._captionChecked = this.captionCheckEl.checked = !!this._caption;
+		this.captionCheckEl.checked = !!this._caption;
 
-		if (this._resizing) {
-			this.plugins.resizing._module_setModifyInputSize.call(this);
+		if (!this._resizing) return;
+
+		const percentageRotation = this._onlyPercentage && this.figure.isVertical;
+		let w = percentageRotation ? '' : figureInfo.w;
+		if (this._onlyPercentage) {
+			w = numbers.get(w, 2);
+			if (w > 100) w = 100;
 		}
+		this.inputX.value = w === 'auto' ? '' : w;
+
+		if (!this._onlyPercentage) {
+			const h = percentageRotation ? '' : figureInfo.h;
+			this.inputY.value = h === 'auto' ? '' : h;
+		}
+
+		this.proportion.checked = element.getAttribute('data-proportion') !== 'false';
+		this.inputX.disabled = percentageRotation ? true : false;
+		this.inputY.disabled = percentageRotation ? true : false;
+		this.proportion.disabled = percentageRotation ? true : false;
 	},
 
 	/**
@@ -242,39 +251,6 @@ image.prototype = {
 
 		// history stack
 		this.history.push(false);
-	},
-
-	/**
-	 * @override figure
-	 * @param {Element} target Target element
-	 * @param {string} command Command
-	 * @param {{w: number, h: number}|number|("none|"left"|"center"|"right")|boolean} value Command value
-	 */
-	figureAction: function (target, command, value) {
-		switch (command) {
-			case 'edit':
-				this.ready(target);
-				this.open();
-				break;
-			case 'remove':
-				this.destroy();
-				break;
-			case 'resize':
-				break;
-			case 'resize_percent':
-				break;
-			case 'auto':
-				break;
-			case 'revert':
-				break;
-			case 'rotate':
-				break;
-			case 'mirror':
-				break;
-			case 'caption':
-				this._captionChecked = value;
-				break;
-		}
 	},
 
 	_submitFile: function (fileList) {
@@ -345,7 +321,10 @@ image.prototype = {
 		return true;
 	},
 
-	_update: function (init) {
+	_update: function (width, height) {
+		if (!width) width = this.inputX.value || this._origin_w || 'auto';
+		if (!height) height = this.inputY.value || this._origin_h || 'auto';
+
 		let imageEl = this._element;
 		let cover = this._cover;
 		let container = this._container;
@@ -361,8 +340,8 @@ image.prototype = {
 
 		// check size
 		let changeSize;
-		const x = numbers.is(this.inputX.value) ? this.inputX.value + this.sizeUnit : this.inputX.value;
-		const y = numbers.is(this.inputY.value) ? this.inputY.value + this.sizeUnit : this.inputY.value;
+		const x = numbers.is(width) ? width + this.sizeUnit : width;
+		const y = numbers.is(height) ? height + this.sizeUnit : height;
 		if (/%$/.test(imageEl.style.width)) {
 			changeSize = x !== container.style.width || y !== container.style.height;
 		} else {
@@ -374,7 +353,7 @@ image.prototype = {
 
 		// caption
 		let modifiedCaption = false;
-		if (this._captionChecked) {
+		if (this.captionCheckEl.checked) {
 			if (!this._caption) {
 				this._caption = Figure.CreateCaption(cover, this.lang.modalBox.caption);
 				modifiedCaption = true;
@@ -408,6 +387,7 @@ image.prototype = {
 		}
 
 		if (isNewContainer) {
+			imageEl = this._element;
 			let existElement = this.format.isBlock(imageEl.parentNode) || domUtils.isWysiwygFrame(imageEl.parentNode) ? imageEl : /^A$/i.test(imageEl.parentNode.nodeName) ? imageEl.parentNode : this.format.getLine(imageEl) || imageEl;
 
 			if (domUtils.isListCell(existElement)) {
@@ -417,7 +397,7 @@ image.prototype = {
 				existElement.insertBefore(container, refer);
 				domUtils.removeItem(imageEl);
 				this.node.removeEmptyNode(refer, null);
-			} else if (domUtils.isFormatElement(existElement)) {
+			} else if (this.format.isLine(existElement)) {
 				const refer = domUtils.getParentElement(imageEl, function (current) {
 					return current.parentNode === existElement;
 				});
@@ -436,29 +416,27 @@ image.prototype = {
 				}
 			}
 
-			imageEl = container.querySelector('img');
-
-			this._element = imageEl;
+			this._element = imageEl = container.querySelector('img');
 			this._cover = cover;
 			this._container = container;
 		}
 
 		// transform
 		if (modifiedCaption || (!this._onlyPercentage && changeSize)) {
-			if (!init && (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this._captionChecked))) {
-				if (/%$/.test(this.inputX.value) || /%$/.test(this.inputY.value)) {
+			if (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this.captionCheckEl.checked)) {
+				if (/%$/.test(width) || /%$/.test(height)) {
 					//@todo this.plugins.resizing.deleteTransform.call(this, imageEl);
 				} else {
-					//@todo this.plugins.resizing.setTransform.call(this, imageEl, numbers.get(this.inputX.value, 0), numbers.get(this.inputY.value, 0));
+					//@todo this.plugins.resizing.setTransform.call(this, imageEl, numbers.get(width, 0), numbers.get(height, 0));
 				}
 			}
 		}
 
 		// size
 		if (this._resizing) {
-			imageEl.setAttribute('data-proportion', this._proportionChecked);
+			imageEl.setAttribute('data-proportion', !!this.proportion.checked);
 			if (changeSize) {
-				this._applySize(null, null);
+				this.applySize(null, null);
 			}
 		}
 
@@ -506,20 +484,10 @@ image.prototype = {
 		return false;
 	},
 
-	_applySize: function (w, h) {
+	applySize: function (w, h) {
 		if (!w) w = this.inputX.value || this.options.imageWidth;
 		if (!h) h = this.inputY.value || this.options.imageHeight;
-
-		if ((this._onlyPercentage && !!w) || /%$/.test(w)) {
-			this.setPercent.call(this, w, h);
-			return true;
-		} else if ((!w || w === 'auto') && (!h || h === 'auto')) {
-			this.figure.setAutoSize();
-		} else {
-			this.setSize.call(this, w, h, false);
-		}
-
-		return false;
+		this.figure.setSize(this, w, h, false);
 	},
 
 	_updateSrc: function (src, element, file) {
@@ -610,7 +578,7 @@ image.prototype = {
 		anchor = this._setAnchor(oImg, anchor);
 
 		if (this._resizing) {
-			oImg.setAttribute('data-proportion', this._proportionChecked);
+			oImg.setAttribute('data-proportion', !!this.proportion.checked);
 		}
 
 		const figureInfo = Figure.CreateContainer(anchor, 'se-image-container');
@@ -618,7 +586,7 @@ image.prototype = {
 		const container = figureInfo.container;
 
 		// caption
-		if (this._captionChecked) {
+		if (this.captionCheckEl.checked) {
 			this._caption = this._caption = Figure.CreateCaption(cover, this.lang.modalBox.caption);
 			this._caption.setAttribute('contenteditable', false);
 		}
@@ -628,7 +596,7 @@ image.prototype = {
 		this._container = container;
 
 		// set size
-		this._applySize(width, height);
+		this.applySize(width, height);
 
 		// align
 		this.figure.setAlign(oImg, align);
@@ -658,75 +626,12 @@ image.prototype = {
 	constructor: image
 };
 
-var a = {
-	///////////
-	/**
-	 * @override resizing
-	 * @param {string} xy 'x': width, 'y': height
-	 * @param {KeyboardEvent} e Event object
-	 */
-	setInputSize: function (xy, e) {
-		if (e && e.keyCode === 32) {
-			e.preventDefault();
-			return;
-		}
-
-		this.plugins.resizing._module_setInputSize.call(this, this.context.image, xy);
-	},
-
-	/**
-	 * @override resizing
-	 */
-	setRatio: function () {
-		this.plugins.resizing._module_setRatio.call(this, this.context.image);
-	},
-
-	/**
-	 * @override resizing
-	 */
-	sizeRevert: function () {
-		this.plugins.resizing._module_sizeRevert.call(this, this.context.image);
-	},
-
-	/**
-	 * @override resizing
-	 */
-	setOriginSize: function () {
-		const contextImage = this.context.image;
-		contextImage._element.removeAttribute('data-percentage');
-
-		this.plugins.resizing.deleteTransform.call(this, contextImage._element);
-		this.deletePercent.call(this);
-
-		const originSize = (contextImage._element.getAttribute('data-origin') || '').split(',');
-		const w = originSize[0];
-		const h = originSize[1];
-
-		if (originSize) {
-			if (contextImage._onlyPercentage || (/%$/.test(w) && (/%$/.test(h) || !/\d/.test(h)))) {
-				this.setPercent.call(this, w, h);
-			} else {
-				this.setSize.call(this, w, h);
-			}
-
-			// save current size
-			this.plugins.resizing._module_saveCurrentSize.call(this, contextImage);
-		}
-	}
-};
-
 function FileCheckHandler(element) {
 	this.ready(element);
-	// get size
-	this.inputX.value = this._origin_w;
-	this.inputY.value = this._origin_h;
-	// get align
 	const line = this.format.getLine(element);
 	if (line) this._align = line.style.textAlign || line.style.float;
 
-	this._update();
-	this.fileManager.setInfo(element, null);
-	this.init();
+	this._update(this._origin_w, this._origin_h);
 
 	return element;
 }
@@ -749,6 +654,37 @@ function RemoveSelectedFiles() {
 	if (this.imgUrlFile) {
 		this.imgUrlFile.removeAttribute('disabled');
 		this.previewSrc.style.textDecoration = '';
+	}
+}
+
+function OnInputSize(xy, e) {
+	if (e.keyCode === 32) {
+		e.preventDefault();
+		return;
+	}
+
+	if (xy === 'x' && this._onlyPercentage && e.target.value > 100) {
+		e.target.value = 100;
+	} else if (this.proportion.checked) {
+		const ratioSize = Figure.CalcRatio(this.inputX.value, this.inputY.value, this.sizeUnit, this._ratio);
+		if (xy === 'x') {
+			this.inputY.value = ratioSize.h;
+		} else {
+			this.inputX.value = ratioSize.w;
+		}
+	}
+}
+
+function OnChangeRatio() {
+	this._ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : { w: 1, h: 1 };
+}
+
+function OnClickRevert() {
+	if (this._onlyPercentage) {
+		this.inputX.value = this._origin_w > 100 ? 100 : this._origin_w;
+	} else {
+		this.inputX.value = this._origin_w;
+		this.inputY.value = this._origin_h;
 	}
 }
 
@@ -779,7 +715,7 @@ function _setUrlInput(target) {
 
 function OnloadImg(oImg, _svgDefaultSize, container) {
 	// svg exception handling
-	if (oImg.offsetWidth === 0) this._applySize(_svgDefaultSize, '');
+	if (oImg.offsetWidth === 0) this.applySize(_svgDefaultSize, '');
 	if (this.options.mediaAutoSelect) {
 		this.component.select(oImg, 'image');
 	} else {
