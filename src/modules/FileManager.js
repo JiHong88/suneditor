@@ -137,7 +137,7 @@ FileManager.prototype = {
 				const w = element.naturalWidth || size.w;
 				const h = element.naturalHeight || size.h;
 				element.setAttribute('data-origin', w + ',' + h);
-				element.setAttribute('data-size', w + ',' + h);
+				if (!element.getAttribute('data-size')) element.setAttribute('data-size', w + ',' + h);
 			}
 
 			if (!element.style.width) {
@@ -301,7 +301,7 @@ function CallBackUpload(xmlHttp, callBack, errorCallBack) {
 			const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
 			if (typeof errorCallBack !== 'function' || errorCallBack.call(this.events, '', res)) {
 				const err = '[SUNEDITOR.FileManager[' + this.kind + '].upload.serverException] status: ' + xmlHttp.status + ', response: ' + (res.errorMessage || xmlHttp.responseText);
-				this.notice.open(err);
+				this.editor.notice.open(err);
 				throw Error(err);
 			}
 		}

@@ -39,6 +39,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
     // tableCellControllerPosition: 'top',
     statusbar: true,
     // mode: "inline",
+    // imageUploadUrl: 'http://localhost:3000/editor/upload',
     katex: Katex,
     width: "100%",
     height: '500px',

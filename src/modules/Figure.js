@@ -125,8 +125,8 @@ Figure.GetRatio = function (w, h, defaultSizeUnit) {
 	let rw = 1,
 		rh = 1;
 	if (/\d+/.test(w) && /\d+/.test(h)) {
-		const xUnit = w.replace(/\d+|\./g, '') || defaultSizeUnit || 'px';
-		const yUnit = h.replace(/\d+|\./g, '') || defaultSizeUnit || 'px';
+		const xUnit = (!numbers.is(w) && w.replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
+		const yUnit = (!numbers.is(h) && h.replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
 		if (xUnit === yUnit) {
 			const w_number = numbers.get(w, 0);
 			const h_number = numbers.get(h, 0);
@@ -136,8 +136,8 @@ Figure.GetRatio = function (w, h, defaultSizeUnit) {
 	}
 
 	return {
-		w: rw,
-		h: rh
+		w: rh,
+		h: rw
 	};
 };
 
@@ -151,12 +151,14 @@ Figure.GetRatio = function (w, h, defaultSizeUnit) {
  */
 Figure.CalcRatio = function (w, h, defaultSizeUnit, ratio) {
 	if (/\d+/.test(w) && /\d+/.test(h)) {
-		const xUnit = w.replace(/\d+|\./g, '') || defaultSizeUnit || 'px';
-		const yUnit = h.replace(/\d+|\./g, '') || defaultSizeUnit || 'px';
+		const xUnit = (!numbers.is(w) && w.replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
+		const yUnit = (!numbers.is(h) && h.replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
 		if (xUnit === yUnit) {
 			const dec = xUnit === '%' ? 2 : 0;
-			h = numbers.get(ratio.h * numbers.get(w, dec), dec) + yUnit;
-			w = numbers.get(ratio.w * numbers.get(h, dec), dec) + xUnit;
+			const ow = w;
+			const oh = h;
+			h = numbers.get(ratio.h * numbers.get(ow, dec), dec) + yUnit;
+			w = numbers.get(ratio.w * numbers.get(oh, dec), dec) + xUnit;
 		}
 	}
 
@@ -177,7 +179,7 @@ Figure.__isComponent = function (element) {
 };
 
 Figure.prototype = {
-	open: function (target) {
+	open: function (target, nonResizing, __fileManagerInfo) {
 		const figureInfo = Figure.GetContainer(target);
 		this._container = figureInfo.container;
 		this._cover = figureInfo.cover;
@@ -192,22 +194,28 @@ Figure.prototype = {
 		const t = offset.top;
 		const l = offset.left - this.context.element.wysiwygFrame.scrollLeft;
 
+		const ratio = Figure.GetRatio(w, h, this.sizeUnit);
 		const originSize = (target.getAttribute('data-origin') || '').split(',');
+		const dataSize = (target.getAttribute('data-size') || '').split(',');
 		const targetInfo = {
 			container: figureInfo.container,
 			cover: figureInfo.cover,
 			caption: figureInfo.caption,
 			align: this.align,
+			ratio: ratio,
 			w: w,
 			h: h,
 			t: t,
 			l: l,
+			width: dataSize[0] || 'auto',
+			height: dataSize[1] || 'auto',
 			originWidth: originSize[0] || target.naturalWidth || target.offsetWidth,
 			originHeight: originSize[1] || target.naturalHeight || target.offsetHeight
 		};
 
-		if (this.__fileManagerInfo) return targetInfo;
+		if (__fileManagerInfo || this.__fileManagerInfo) return targetInfo;
 
+		this.editor._figureContainer = this.resizeDot;
 		this.resizeDot.style.top = t + 'px';
 		this.resizeDot.style.left = l + 'px';
 		this.resizeDot.style.width = w + 'px';
@@ -221,13 +229,7 @@ Figure.prototype = {
 
 		const size = this.getSize(target);
 		domUtils.changeTxt(this.resizeDisplay, this.lang.modalBox[this.align === 'none' ? 'basic' : this.align] + ' (' + (size.w || 'auto') + ', ' + (size.h || 'auto') + ')');
-
-		// @todo
-		// const contextPlugin = this.context[plugin];
-		// const resizeDotShow = contextPlugin._resizing && !contextPlugin._resizeDotHide && !contextPlugin._onlyPercentage ? 'flex' : 'none';
-		// for (let i = 0, len = this.resizeHandles.length; i < len; i++) {
-		// 	this.resizeHandles[i].style.display = resizeDotShow;
-		// }
+		this._displayResizeHandles(!nonResizing);
 
 		// percentage active
 		const value = /%$/.test(target.style.width) && /%$/.test(figureInfo.container.style.width) ? numbers.get(figureInfo.container.style.width, 0) / 100 + '' : '';
@@ -268,7 +270,7 @@ Figure.prototype = {
 	},
 
 	setSize: function (w, h) {
-		if ((this._onlyPercentage && !!w) || /%$/.test(w)) {
+		if (/%$/.test(w)) {
 			this._setPercentSize(w, h);
 		} else if ((!w || w === 'auto') && (!h || h === 'auto')) {
 			this._setAutoSize();
@@ -331,36 +333,6 @@ Figure.prototype = {
 
 		target.setAttribute('data-align', align);
 		this._setAlignIcon();
-	},
-
-	/**
-	 * @description It is called in "setInputSize" (input tag keyupEvent),
-	 * checks the value entered in the input tag,
-	 * calculates the ratio, and sets the calculated value in the input tag of the opposite size.
-	 * @param {Object} contextPlugin context object of plugin (core.context[plugin])
-	 * @param {string} xy 'x': width, 'y': height
-	 */
-	calcSize: function (contextPlugin, xy) {
-		if (contextPlugin._onlyPercentage) {
-			if (xy === 'x' && contextPlugin.inputX.value > 100) contextPlugin.inputX.value = 100;
-			return;
-		}
-
-		// @todo
-		if (contextPlugin.proportion.checked && contextPlugin._ratio && /\d/.test(contextPlugin.inputX.value) && /\d/.test(contextPlugin.inputY.value)) {
-			const xUnit = contextPlugin.inputX.value.replace(/\d+|\./g, '') || contextPlugin.sizeUnit;
-			const yUnit = contextPlugin.inputY.value.replace(/\d+|\./g, '') || contextPlugin.sizeUnit;
-
-			if (xUnit !== yUnit) return;
-
-			const dec = xUnit === '%' ? 2 : 0;
-
-			if (xy === 'x') {
-				contextPlugin.inputY.value = numbers.get(contextPlugin._ratioY * numbers.get(contextPlugin.inputX.value, dec), dec) + yUnit;
-			} else {
-				contextPlugin.inputX.value = numbers.get(contextPlugin._ratioX * numbers.get(contextPlugin.inputY.value, dec), dec) + xUnit;
-			}
-		}
 	},
 
 	/**
@@ -438,7 +410,7 @@ Figure.prototype = {
 					if (/%$/.test(element.style.width) || /auto/.test(element.style.height)) {
 						this.deleteTransform();
 					} else {
-						this.setTransform(element, numbers.get(element.style.width, 0), numbers.get(element.style.height, 0));
+						this.setTransform(element, element.style.width, element.style.height);
 					}
 				}
 				break;
@@ -490,6 +462,8 @@ Figure.prototype = {
 	 * @param {Number|null} height Element's height size
 	 */
 	setTransform: function (element, width, height) {
+		width = numbers.get(width, 0);
+		height = numbers.get(height, 0);
 		let percentage = element.getAttribute('data-percentage');
 		const isVertical = this.isVertical;
 		const deg = element.getAttribute('data-rotate') * 1;
@@ -529,6 +503,40 @@ Figure.prototype = {
 		else element.style.maxWidth = '';
 
 		this._setCaptionPosition(element);
+	},
+
+	_setRotate: function (element, r, x, y) {
+		let width = (element.offsetWidth - element.offsetHeight) * (/-/.test(r) ? 1 : -1);
+		let translate = '';
+
+		if (/[1-9]/.test(r) && (x || y)) {
+			translate = x ? 'Y' : 'X';
+
+			switch (r) {
+				case '90':
+					translate = x && y ? 'X' : y ? translate : '';
+					break;
+				case '270':
+					width *= -1;
+					translate = x && y ? 'Y' : x ? translate : '';
+					break;
+				case '-90':
+					translate = x && y ? 'Y' : x ? translate : '';
+					break;
+				case '-270':
+					width *= -1;
+					translate = x && y ? 'X' : y ? translate : '';
+					break;
+				default:
+					translate = '';
+			}
+		}
+
+		if (r % 180 === 0) {
+			element.style.maxWidth = '';
+		}
+
+		element.style.transform = 'rotate(' + r + 'deg)' + (x ? ' rotateX(' + x + 'deg)' : '') + (y ? ' rotateY(' + y + 'deg)' : '') + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
 	},
 
 	_applySize: function (w, h, notResetPercentage, direction) {
@@ -611,7 +619,7 @@ Figure.prototype = {
 		const h = originSize[1];
 
 		if (originSize) {
-			if (this._onlyPercentage || (/%$/.test(w) && (/%$/.test(h) || !/\d/.test(h)))) {
+			if (/%$/.test(w) && (/%$/.test(h) || !/\d/.test(h))) {
 				this._setPercentSize(w, h);
 			} else {
 				this._applySize(w, h);
@@ -629,7 +637,7 @@ Figure.prototype = {
 
 	_saveCurrentSize: function () {
 		const size = this.getSize(this._element);
-		this._element.setAttribute('data-size', numbers.get(size.w) + ',' + numbers.get(size.h));
+		this._element.setAttribute('data-size', (numbers.get(size.w) || 'auto') + ',' + (numbers.get(size.h) || 'auto'));
 		// if (!!contextPlugin._videoRatio) contextPlugin._videoRatio = size.y; @todo
 	},
 
@@ -647,41 +655,8 @@ Figure.prototype = {
 		}
 	},
 
-	_setRotate: function (element, r, x, y) {
-		let width = (element.offsetWidth - element.offsetHeight) * (/-/.test(r) ? 1 : -1);
-		let translate = '';
-
-		if (/[1-9]/.test(r) && (x || y)) {
-			translate = x ? 'Y' : 'X';
-
-			switch (r) {
-				case '90':
-					translate = x && y ? 'X' : y ? translate : '';
-					break;
-				case '270':
-					width *= -1;
-					translate = x && y ? 'Y' : x ? translate : '';
-					break;
-				case '-90':
-					translate = x && y ? 'Y' : x ? translate : '';
-					break;
-				case '-270':
-					width *= -1;
-					translate = x && y ? 'X' : y ? translate : '';
-					break;
-				default:
-					translate = '';
-			}
-		}
-
-		if (r % 180 === 0) {
-			element.style.maxWidth = '';
-		}
-
-		element.style.transform = 'rotate(' + r + 'deg)' + (x ? ' rotateX(' + x + 'deg)' : '') + (y ? ' rotateY(' + y + 'deg)' : '') + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
-	},
-
 	_displayResizeHandles: function (display) {
+		display = !display ? 'none' : 'flex';
 		this.controller.form.style.display = display;
 
 		for (let i = 0, len = this.resizeHandles.length; i < len; i++) {
@@ -755,7 +730,7 @@ function OnResizeContainer(e) {
 
 	this.__onContainerEvent = this.eventManager.addGlobalEvent('mousemove', this.__containerResizing);
 	this.__offContainerEvent = this.eventManager.addGlobalEvent('mouseup', this.__containerResizingOff);
-	this._displayResizeHandles('none');
+	this._displayResizeHandles(false);
 }
 
 function ContainerResizing(e) {
@@ -795,7 +770,7 @@ function ContainerResizingOff() {
 	this.eventManager.removeGlobalEvent(this.__onContainerEvent);
 	this.eventManager.removeGlobalEvent(this.__offContainerEvent);
 
-	this._displayResizeHandles('block');
+	this._displayResizeHandles(true);
 	this.editor._offCurrentController();
 	this.context.element.resizeBackground.style.display = 'none';
 	this.context.element.resizeBackground.style.cursor = 'default';
@@ -845,6 +820,7 @@ function OffFigureContainer() {
 	this.editor._antiBlur = false;
 	domUtils.setDisabled(false, this.editor.resizingDisabledButtons);
 	this.resizeDot.style.display = 'none';
+	this.editor._figureContainer = null;
 	this.inst.init();
 }
 

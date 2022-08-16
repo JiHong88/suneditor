@@ -220,8 +220,6 @@ audio.prototype = {
 			file = { name: fileList[i].name, size: fileList[i].size };
 			this._createComp(oAudio, fileList[i].url, file, info.isUpdate);
 		}
-
-		this.closeLoading();
 	},
 
 	_submitURL: function (src) {

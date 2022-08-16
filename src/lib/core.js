@@ -356,6 +356,12 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	};
 
 	/**
+	 * @description Current Figure container.
+	 * @private
+	 */
+	this._figureContainer = null;
+
+	/**
 	 * @description FullScreen and codeView relative status
 	 */
 	this._transformStatus = {

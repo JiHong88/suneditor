@@ -123,14 +123,14 @@ Component.prototype = {
 	 * @private
 	 */
 	_setComponentLineBreaker: function (element) {
-		return;
-		// line breaker
+		this.status._lineBreakComp = null;
 		this.editor._lineBreaker.style.display = 'none';
+		
 		const contextEl = this.context.element;
 		const container = domUtils.getParentElement(element, this.is);
 		const t_style = contextEl.lineBreaker_t.style;
 		const b_style = contextEl.lineBreaker_b.style;
-		const target = this.context.resizing.resizeContainer.style.display === 'block' ? this.context.resizing.resizeContainer : element;
+		const target = this.editor._figureContainer && this.editor._figureContainer.style.display === 'block' ? this.editor._figureContainer : element;
 
 		const isList = domUtils.isListCell(container.parentNode);
 		let componentTop, wScroll, w;

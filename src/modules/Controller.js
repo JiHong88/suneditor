@@ -94,7 +94,6 @@ Controller.prototype = {
 	_controllerOff: function () {
 		this.form.style.display = 'none';
 		this.context.element.lineBreaker_t.style.display = this.context.element.lineBreaker_b.style.display = 'none';
-		this.status._lineBreakComp = null;
 		this.editor.currentFileComponentInfo = null;
 		this.editor.effectNode = null;
 		this.editor.openControllers = [];

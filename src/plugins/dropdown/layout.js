@@ -3,12 +3,12 @@
 import EditorInterface from '../../interface/editor';
 import { domUtils } from '../../helper';
 
-const template = function (editor, target) {
+const layout = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
-	this.title = this.lang.toolbar.template;
-	this.icon = this.icons.template;
+	this.title = this.lang.toolbar.layout;
+	this.icon = this.icons.layout;
 
 	// create HTML
 	const menu = CreateHTML(editor);
@@ -21,27 +21,27 @@ const template = function (editor, target) {
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
-template.type = 'dropdown';
-template.className = '';
-template.prototype = {
+layout.type = 'dropdown';
+layout.className = '';
+layout.prototype = {
 	/**
 	 * @override core
-	 * @param {number} index template menu index
+	 * @param {number} index layout menu index
 	 */
 	action: function (index) {
-		const temp = this.options.templates[(this.selectedIndex = index)];
+		const temp = this.options.layouts[(this.selectedIndex = index)];
 
 		if (temp.html) {
-			this.html.insert(temp.html);
+			this.editor.setContent(temp.html);
 		} else {
 			this.menu.dropdownOff();
-			throw Error('[SUNEDITOR.template.fail] cause : "templates[i].html not found"');
+			throw Error('[SUNEDITOR.layout.fail] cause : "layouts[i].html not found"');
 		}
 
 		this.menu.dropdownOff();
 	},
 
-	constructor: template
+	constructor: layout
 };
 
 function OnClickMenu(e) {
@@ -54,14 +54,14 @@ function OnClickMenu(e) {
 }
 
 function CreateHTML(editor) {
-	const templateList = editor.options.templates;
-	if (!templateList || templateList.length === 0) {
-		throw Error('[SUNEDITOR.plugins.template.fail] To use the "template" plugin, please define the "templates" option.');
+	const layoutList = editor.options.layouts;
+	if (!layoutList || layoutList.length === 0) {
+		throw Error('[SUNEDITOR.plugins.layout.fail] To use the "layout" plugin, please define the "layouts" option.');
 	}
 
 	let list = '<div class="se-dropdown se-list-inner">' + '<ul class="se-list-basic">';
-	for (let i = 0, len = templateList.length, t; i < len; i++) {
-		t = templateList[i];
+	for (let i = 0, len = layoutList.length, t; i < len; i++) {
+		t = layoutList[i];
 		list += '<li><button type="button" class="se-btn-list" data-value="' + i + '" title="' + t.name + '" aria-label="' + t.name + '">' + t.name + '</button></li>';
 	}
 	list += '</ul></div>';
@@ -69,4 +69,4 @@ function CreateHTML(editor) {
 	return domUtils.createElement('DIV', { class: 'se-list-layer' }, list);
 }
 
-export default template;
+export default layout;

@@ -25,7 +25,7 @@ const image = function (editor, target) {
 			showAlign = /align/.test(imageControls[i][j]);
 		}
 	}
-	if (!showAlign) modalEl.querySelector('._se_image_align').style.display = 'none';
+	if (showAlign) modalEl.querySelector('._se_image_align').style.display = 'none';
 
 	// modules
 	this.anchor = new ModalAnchorEditor(this, modalEl);
@@ -58,9 +58,9 @@ const image = function (editor, target) {
 	this._origin_w = options.imageWidth === 'auto' ? '' : options.imageWidth;
 	this._origin_h = options.imageHeight === 'auto' ? '' : options.imageHeight;
 	this._resizing = options.imageResizing;
-	// @override resizing properties
 	this._resizeDotHide = !options.imageHeightShow;
 	this._onlyPercentage = options.imageSizeOnlyPercentage;
+	this._nonResizing = !this._resizing || this._resizeDotHide || this._onlyPercentage;
 
 	// init
 	modalEl.querySelector('.se-modal-tabs').addEventListener('click', this._openTab.bind(this));
@@ -122,12 +122,6 @@ image.prototype = {
 
 		if (this.modal.isUpdate) {
 			this._update(this.inputX.value, this.inputY.value);
-			this.component.select(this._element, 'image');
-
-			// history stack
-			this.history.push(false);
-
-			return true;
 		}
 
 		let result;
@@ -181,8 +175,7 @@ image.prototype = {
 	 */
 	ready: function (element) {
 		if (!element) return;
-
-		const figureInfo = this.figure.open(element);
+		const figureInfo = this.figure.open(element, this._nonResizing);
 		this.anchor.set(/^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null);
 
 		this._linkElement = this.anchor.currentTarget;
@@ -206,7 +199,7 @@ image.prototype = {
 		if (!this._resizing) return;
 
 		const percentageRotation = this._onlyPercentage && this.figure.isVertical;
-		let w = percentageRotation ? '' : figureInfo.w;
+		let w = percentageRotation ? '' : figureInfo.width;
 		if (this._onlyPercentage) {
 			w = numbers.get(w, 2);
 			if (w > 100) w = 100;
@@ -214,7 +207,7 @@ image.prototype = {
 		this.inputX.value = w === 'auto' ? '' : w;
 
 		if (!this._onlyPercentage) {
-			const h = percentageRotation ? '' : figureInfo.h;
+			const h = percentageRotation ? '' : figureInfo.height;
 			this.inputY.value = h === 'auto' ? '' : h;
 		}
 
@@ -222,6 +215,8 @@ image.prototype = {
 		this.inputX.disabled = percentageRotation ? true : false;
 		this.inputY.disabled = percentageRotation ? true : false;
 		this.proportion.disabled = percentageRotation ? true : false;
+
+		this._ratio = this.proportion.checked ? figureInfo.ratio : { w: 1, h: 1 };
 	},
 
 	/**
@@ -421,22 +416,22 @@ image.prototype = {
 			this._container = container;
 		}
 
-		// transform
-		if (modifiedCaption || (!this._onlyPercentage && changeSize)) {
-			if (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this.captionCheckEl.checked)) {
-				if (/%$/.test(width) || /%$/.test(height)) {
-					//@todo this.plugins.resizing.deleteTransform.call(this, imageEl);
-				} else {
-					//@todo this.plugins.resizing.setTransform.call(this, imageEl, numbers.get(width, 0), numbers.get(height, 0));
-				}
-			}
-		}
-
 		// size
 		if (this._resizing) {
 			imageEl.setAttribute('data-proportion', !!this.proportion.checked);
 			if (changeSize) {
 				this.applySize(null, null);
+			}
+		}
+
+		// transform
+		if (modifiedCaption || (!this._onlyPercentage && changeSize)) {
+			if (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this.captionCheckEl.checked)) {
+				if (/%$/.test(width) || /%$/.test(height)) {
+					this.figure.deleteTransform(imageEl);
+				} else {
+					this.figure.setTransform(imageEl, width, height);
+				}
 			}
 		}
 
@@ -487,12 +482,17 @@ image.prototype = {
 	applySize: function (w, h) {
 		if (!w) w = this.inputX.value || this.options.imageWidth;
 		if (!h) h = this.inputY.value || this.options.imageHeight;
-		this.figure.setSize(this, w, h, false);
+		if (this._onlyPercentage) {
+			if (!w) w = '100%';
+			else if (/%$/.test(w)) w += '%';
+		}
+		this.figure.setSize(w, h, false);
 	},
 
 	_updateSrc: function (src, element, file) {
 		element.src = src;
 		this._w.setTimeout(this.fileManager.setInfo.bind(this.fileManager, element, file));
+		this.init();
 		this.component.select(element, 'image');
 	},
 
@@ -508,8 +508,6 @@ image.prototype = {
 				this._create(fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt);
 			}
 		}
-
-		this.closeLoading();
 	},
 
 	_serverUpload: function (info, files) {
@@ -524,7 +522,7 @@ image.prototype = {
 		if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
 			this.fileManager.upload(imageUploadUrl, this.options.imageUploadHeader, files, UploadCallBack.bind(this, info), this.events.onImageUploadError);
 		} else {
-			this._setBase64(this, files, info.anchor, info.inputWidth, info.inputHeight, info.align, info.alt, info.isUpdate);
+			this._setBase64(files, info.anchor, info.inputWidth, info.inputHeight, info.align, info.alt, info.isUpdate);
 		}
 	},
 
@@ -594,6 +592,7 @@ image.prototype = {
 		this._element = oImg;
 		this._cover = cover;
 		this._container = container;
+		this.figure.open(oImg, this._nonResizing, true);
 
 		// set size
 		this.applySize(width, height);
@@ -717,6 +716,7 @@ function OnloadImg(oImg, _svgDefaultSize, container) {
 	// svg exception handling
 	if (oImg.offsetWidth === 0) this.applySize(_svgDefaultSize, '');
 	if (this.options.mediaAutoSelect) {
+		this.init();
 		this.component.select(oImg, 'image');
 	} else {
 		const line = this.format.addLine(container, null);
@@ -754,7 +754,6 @@ function CreateHTML_modal(editor, align) {
 
 	if (option.imageFileInput) {
 		html +=
-			'' +
 			'<div class="se-modal-form">' +
 			'<label>' +
 			lang.modalBox.imageBox.file +
@@ -778,7 +777,6 @@ function CreateHTML_modal(editor, align) {
 
 	if (option.imageUrlInput) {
 		html +=
-			'' +
 			'<div class="se-modal-form">' +
 			'<label>' +
 			lang.modalBox.imageBox.url +
@@ -799,12 +797,11 @@ function CreateHTML_modal(editor, align) {
 		const heightDisplay = !option.imageHeightShow ? ' style="display: none !important;"' : '';
 		html += '<div class="se-modal-form">';
 		if (onlyPercentage || !option.imageHeightShow) {
-			html += '' + '<div class="se-modal-size-text">' + '<label class="size-w">' + lang.modalBox.size + '</label>' + '</div>';
+			html += '<div class="se-modal-size-text">' + '<label class="size-w">' + lang.modalBox.size + '</label>' + '</div>';
 		} else {
-			html += '' + '<div class="se-modal-size-text">' + '<label class="size-w">' + lang.modalBox.width + '</label>' + '<label class="se-modal-size-x">&nbsp;</label>' + '<label class="size-h">' + lang.modalBox.height + '</label>' + '</div>';
+			html += '<div class="se-modal-size-text">' + '<label class="size-w">' + lang.modalBox.width + '</label>' + '<label class="se-modal-size-x">&nbsp;</label>' + '<label class="size-h">' + lang.modalBox.height + '</label>' + '</div>';
 		}
 		html +=
-			'' +
 			'<input class="se-input-control _se_image_size_x" placeholder="auto"' +
 			(onlyPercentage ? ' type="number" min="1"' : 'type="text"') +
 			(onlyPercentage ? ' max="100"' : '') +
@@ -836,7 +833,6 @@ function CreateHTML_modal(editor, align) {
 	}
 
 	html +=
-		'' +
 		'<div class="se-modal-form se-modal-form-footer">' +
 		'<label><input type="checkbox" class="se-modal-btn-check _se_image_check_caption" />&nbsp;' +
 		lang.modalBox.caption +

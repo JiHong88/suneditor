@@ -355,6 +355,7 @@
     display: flex;
     padding: 1px;
     margin: 0 0 10px;
+    background-color: inherit;
 }
 .sun-editor-editable[contenteditable=true] .se-component {
     outline: 1px dashed #e1e1e1;
