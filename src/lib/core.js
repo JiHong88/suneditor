@@ -4889,7 +4889,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     '<!DOCTYPE html><html>' +
                     '<head>' +
                     '<meta charset="utf-8" />' +
-                    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+                    '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' +
                     '<title>' + lang.toolbar.preview + '</title>' +
                     linkHTML +
                     '</head>' +

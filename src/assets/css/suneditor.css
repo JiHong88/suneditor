@@ -501,6 +501,7 @@
 
 /* dialog--- */
 .sun-editor.se-rtl .se-dialog * {direction:rtl;}
+.sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-form .se-video-ratio {margin-left:0; margin-right:4px;}
 /* dialog - header */
 .sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-header .se-dialog-close {float:left;}
 .sun-editor.se-rtl .se-dialog .se-dialog-inner .se-dialog-header .se-modal-title {float:right;}
