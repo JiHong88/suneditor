@@ -584,8 +584,8 @@ EventManager.prototype = {
 	_moveController: function (eventWysiwyg) {
 		const openCont = this.editor.openControllers;
 		for (let i = 0; i < openCont.length; i++) {
-			openCont[i].form.style.top = openCont[i]._offset.top - eventWysiwyg.scrollY + 'px';
-			openCont[i].form.style.left = openCont[i]._offset.left - eventWysiwyg.scrollX + 'px';
+			openCont[i].form.style.top = openCont[i]._offset.top - (eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0) + 'px';
+			openCont[i].form.style.left = openCont[i]._offset.left - (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) + 'px';
 		}
 	},
 

@@ -12,7 +12,7 @@ const Offset = function (editor) {
 
 Offset.prototype = {
 	/**
-	 * @description Returns the position of the argument, relative to inside the editor.
+	 * @description Returns the position of the argument, "context.element.editorArea" to inside the editor.Returns the position of the element in "context.element.editorArea".
 	 * @param {Node} node Target node
 	 * @returns {Object} {left, top}
 	 */
@@ -22,7 +22,7 @@ Offset.prototype = {
 		let offsetElement = node.nodeType === 3 ? node.parentElement : node;
 		const wysiwyg = getParentElement(node, isWysiwygFrame.bind(this));
 
-		while (offsetElement && !hasClass(offsetElement, 'se-container') && offsetElement !== wysiwyg) {
+		while (offsetElement && !hasClass(offsetElement, 'se-wrapper') && offsetElement !== wysiwyg) {
 			offsetLeft += offsetElement.offsetLeft;
 			offsetTop += offsetElement.offsetTop;
 			offsetElement = offsetElement.offsetParent;

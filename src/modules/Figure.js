@@ -21,7 +21,7 @@ const Figure = function (inst, controls, params) {
 	// create HTML
 	const resizeDot = (this.resizeDot = CreateHTML_resizeDot());
 	this.resizeBorder = resizeDot.querySelector('.se-resize-dot');
-	this.context.element.relative.appendChild(resizeDot);
+	this.context.element.editorArea.appendChild(resizeDot);
 	const controllerEl = CreateHTML_controller(inst.editor, controls || []);
 	const alignMenus = CreateAlign(this);
 	this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
@@ -225,7 +225,13 @@ Figure.prototype = {
 		this.resizeBorder.style.width = w + 'px';
 		this.resizeBorder.style.height = h + 'px';
 
-		this.editor.openControllers.push({ position: 'none', form: this.resizeDot, target: target, inst: this, _offset: { left: l + this.context.element.eventWysiwyg.scrollX, top: t + this.context.element.eventWysiwyg.scrollY } });
+		this.editor.openControllers.push({
+			position: 'none',
+			form: this.resizeDot,
+			target: target,
+			inst: this,
+			_offset: { left: l + (this.context.element.eventWysiwyg.scrollX || this.context.element.eventWysiwyg.scrollLeft || 0), top: t + (this.context.element.eventWysiwyg.scrollY || this.context.element.eventWysiwyg.scrollTop || 0) }
+		});
 
 		const size = this.getSize(target);
 		domUtils.changeTxt(this.resizeDisplay, this.lang.modalBox[this.align === 'none' ? 'basic' : this.align] + ' (' + (size.w || 'auto') + ', ' + (size.h || 'auto') + ')');

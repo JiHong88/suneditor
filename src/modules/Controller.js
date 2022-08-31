@@ -29,7 +29,7 @@ const Controller = function (inst, element, position, _name) {
 	this._bindClose_mousedown = null;
 
 	// add element
-	this.context.element.relative.appendChild(element);
+	this.context.element.editorArea.appendChild(element);
 
 	// init
 	this.eventManager.addEvent(element, 'click', Action.bind(this));
@@ -83,7 +83,13 @@ Controller.prototype = {
 			});
 		}
 
-		this.editor.openControllers.push({ position: this.position, form: form, target: target, inst: this, _offset: { left: form.offsetLeft + this.context.element.eventWysiwyg.scrollX, top: form.offsetTop + this.context.element.eventWysiwyg.scrollY } });
+		this.editor.openControllers.push({
+			position: this.position,
+			form: form,
+			target: target,
+			inst: this,
+			_offset: { left: form.offsetLeft + (this.context.element.eventWysiwyg.scrollX || this.context.element.eventWysiwyg.scrollLeft || 0), top: form.offsetTop + (this.context.element.eventWysiwyg.scrollY || this.context.element.eventWysiwyg.scrollTop || 0) }
+		});
 		if (typeof this.events.onShowController === 'function') this.events.onShowController(this.kind, this.editor.openControllers);
 	},
 
