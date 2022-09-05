@@ -197,6 +197,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	 */
 	this.openControllers = [];
 	this.currentControllerName = '';
+	this.currentControllerTarget = null;
 
 	/**
 	 * @description Button List in Responsive Toolbar.
@@ -506,7 +507,7 @@ Core.prototype = {
 				// @todo
 				break;
 			case 'selectAll':
-				this._offCurrentController();
+				this.offCurrentController();
 				this.menu.containerOff();
 				const figcaption = domUtils.getParentElement(this.selection.getNode(), 'FIGCAPTION');
 				const selectArea = figcaption || this.context.element.wysiwyg;
@@ -531,7 +532,7 @@ Core.prototype = {
 					const info = this.component.get(first);
 					const br = domUtils.createElement('BR');
 					const format = domUtils.createElement(this.options.defaultLineTag, null, br);
-					first = info ? info.component : first;
+					first = info ? info.container : first;
 					first.parentNode.insertBefore(format, first);
 					first = br;
 				}
@@ -692,6 +693,23 @@ Core.prototype = {
 		} else {
 			this.context.element.wysiwyg.blur();
 		}
+	},
+
+	/**
+	 * @description Off current controllers
+	 */
+	offCurrentController: function () {
+		const cont = this.openControllers;
+		const fixedCont = [];
+		for (let i = 0; i < cont.length; i++) {
+			if (cont[i].fixed) {
+				fixedCont.push(cont[i]);
+				continue;
+			}
+			if (typeof cont[i].inst.close === 'function') cont[i].inst.close();
+			else if (cont[i].form) cont[i].form.style.display = 'none';
+		}
+		this.openControllers = fixedCont;
 	},
 
 	/**
@@ -980,7 +998,7 @@ Core.prototype = {
 	 */
 	codeView: function (value) {
 		if (value === undefined) value = !this.status.isCodeView;
-		this._offCurrentController();
+		this.offCurrentController();
 		domUtils.setDisabled(value, this.codeViewDisabledButtons);
 		const _var = this._transformStatus;
 
@@ -1063,7 +1081,7 @@ Core.prototype = {
 		const code = this.context.element.code;
 		const _var = this._transformStatus;
 
-		this._offCurrentController();
+		this.offCurrentController();
 		const wasToolbarHidden = toolbar.style.display === 'none' || (this._isInline && !this.toolbar._inlineToolbarAttr.isShow);
 
 		if (value) {
@@ -1247,7 +1265,7 @@ Core.prototype = {
 	preview: function () {
 		this.menu.dropdownOff();
 		this.menu.containerOff();
-		this._offCurrentController();
+		this.offCurrentController();
 
 		const contentHTML = this.options.previewTemplate ? this.options.previewTemplate.replace(/\{\{\s*content\s*\}\}/i, this.getContent(true)) : this.getContent(true);
 		const windowObject = this._w.open('', '_blank');
@@ -1276,7 +1294,7 @@ Core.prototype = {
 					'<!DOCTYPE html><html>' +
 					'<head>' +
 					'<meta charset="utf-8" />' +
-					'<meta name="viewport" content="width=device-width, initial-scale=1">' +
+					'<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' +
 					'<title>' +
 					this.lang.toolbar.preview +
 					'</title>' +
@@ -1313,7 +1331,7 @@ Core.prototype = {
 		domUtils.setDisabled(!!value, this.resizingDisabledButtons);
 
 		if (value) {
-			this._offCurrentController();
+			this.offCurrentController();
 			if (this.menu.currentDropdownActiveButton && this.menu.currentDropdownActiveButton.disabled) this.menu.dropdownOff();
 			if (this.menu.currentMoreLayerActiveButton && this.menu.currentMoreLayerActiveButton.disabled) this.menu.moreLayerOff();
 			if (this.menu.currentContainerActiveButton && this.menu.currentContainerActiveButton.disabled) this.menu.containerOff();
@@ -1334,7 +1352,7 @@ Core.prototype = {
 	 */
 	disable: function () {
 		this.toolbar.disable();
-		this._offCurrentController();
+		this.offCurrentController();
 		if (this.modalForm) this.plugins.modal.close.call(this);
 
 		this.context.element.wysiwyg.setAttribute('contenteditable', false);
@@ -1937,24 +1955,6 @@ Core.prototype = {
 				if (typeof this.events.onload === 'function') this.events.onload(reload);
 			}.bind(this)
 		);
-	},
-
-	/**
-	 * @description Off current controller
-	 * @private
-	 */
-	 _offCurrentController: function () {
-		const cont = this.openControllers;
-		const fixedCont = [];
-		for (let i = 0; i < cont.length; i++) {
-			if (cont[i].fixed) {
-				fixedCont.push(cont[i]);
-				continue;
-			}
-			if (typeof cont[i].inst.close === 'function') cont[i].inst.close();
-			else if (cont[i].form) cont[i].form.style.display = 'none';
-		}
-		this.openControllers = fixedCont;
 	},
 
 	_fixCurrentController: function (fixed) {

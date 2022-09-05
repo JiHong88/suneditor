@@ -85,7 +85,7 @@ Component.prototype = {
 
 		return {
 			target: target,
-			component: domUtils.getParentElement(target, this.is),
+			container: domUtils.getParentElement(target, this.is),
 			pluginName: this.editor._fileManager.pluginMap[target.nodeName.toLowerCase()] || ''
 		};
 	},
@@ -97,6 +97,7 @@ Component.prototype = {
 	 */
 	select: function (element, pluginName) {
 		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is)) || domUtils.isUneditable(element)) return false;
+		if (!this.editor.hasFocus) this.editor.focus();
 
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;

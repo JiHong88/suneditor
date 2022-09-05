@@ -677,8 +677,11 @@ function OnClick_wysiwyg(e) {
 	const fileComponentInfo = this.component.get(targetElement);
 	if (fileComponentInfo) {
 		e.preventDefault();
+		this.editor.currentControllerTarget = fileComponentInfo.target;
 		this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
 		return;
+	} else {
+		this.editor.currentControllerTarget = null;
 	}
 
 	const figcaption = domUtils.getParentElement(targetElement, 'FIGCAPTION');
@@ -803,6 +806,7 @@ function OnKeyDown_wysiwyg(e) {
 					e.preventDefault();
 					e.stopPropagation();
 					this.plugins[fileComponentName].destroy();
+					this.editor.offCurrentController();
 					break;
 				}
 			}
@@ -999,6 +1003,7 @@ function OnKeyDown_wysiwyg(e) {
 				e.preventDefault();
 				e.stopPropagation();
 				this.plugins[fileComponentName].destroy();
+				this.editor.offCurrentController();
 				break;
 			}
 
@@ -1418,8 +1423,9 @@ function OnKeyDown_wysiwyg(e) {
 			if (fileComponentName) {
 				e.preventDefault();
 				e.stopPropagation();
-				const compContext = context[fileComponentName];
-				const container = compContext._container;
+
+				const compContext = this.component.get(this.editor.currentControllerTarget);
+				const container = compContext.container;
 				const sibling = container.previousElementSibling || container.nextElementSibling;
 
 				let newEl = null;
@@ -1430,7 +1436,7 @@ function OnKeyDown_wysiwyg(e) {
 				}
 
 				container.parentNode.insertBefore(newEl, container);
-				if (this.component.select(compContext._element, fileComponentName) === false) this.editor.blur();
+				if (this.component.select(compContext.target, fileComponentName) === false) this.editor.blur();
 			}
 
 			break;
@@ -1572,7 +1578,7 @@ function OnCut_wysiwyg(e) {
 	if (info && !env.isIE) {
 		this._setClipboardComponent(e, info, clipboardData);
 		domUtils.removeItem(info.component);
-		this.editor._offCurrentController();
+		this.editor.offCurrentController();
 	}
 
 	_w.setTimeout(function () {
@@ -1605,7 +1611,7 @@ function OnBlur_wysiwyg(e) {
 
 	this.status.hasFocus = false;
 	this.editor.effectNode = null;
-	this.editor._offCurrentController();
+	this.editor.offCurrentController();
 	if (this.editor._isInline || this.editor._isBalloon) this._hideToolbar();
 
 	this._setKeyEffect([]);
@@ -1711,7 +1717,7 @@ function DisplayLineBreak(dir, e) {
 }
 
 function OnResize_window() {
-	this.editor._offCurrentController();
+	this.editor.offCurrentController();
 
 	if (env.isIE) this.toolbar.resetResponsiveToolbar();
 

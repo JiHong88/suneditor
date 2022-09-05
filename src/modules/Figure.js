@@ -260,9 +260,6 @@ Figure.prototype = {
 		this.controller.open(this.resizeDot, null, this.__offContainer);
 		domUtils.setDisabled(true, this.editor.resizingDisabledButtons);
 
-		this.editor._antiBlur = true;
-		this.editor.blur();
-
 		// set members
 		this._element_w = this._resize_w = w;
 		this._element_h = this._resize_h = h;
@@ -405,7 +402,7 @@ Figure.prototype = {
 						this.selection.setRange(captionText, 0, captionText, captionText.textContent.length);
 					}
 
-					this.editor._offCurrentController();
+					this.controller.close();
 				} else {
 					domUtils.removeItem(this._caption);
 					this.component.select(element, this.kind);
@@ -777,7 +774,7 @@ function ContainerResizingOff() {
 	this.eventManager.removeGlobalEvent(this.__offContainerEvent);
 
 	this._displayResizeHandles(true);
-	this.editor._offCurrentController();
+	this.editor.offCurrentController();
 	this.context.element.resizeBackground.style.display = 'none';
 	this.context.element.resizeBackground.style.cursor = 'default';
 
@@ -823,7 +820,6 @@ function CreateAlign(editor) {
 }
 
 function OffFigureContainer() {
-	this.editor._antiBlur = false;
 	domUtils.setDisabled(false, this.editor.resizingDisabledButtons);
 	this.resizeDot.style.display = 'none';
 	this.editor._figureContainer = null;

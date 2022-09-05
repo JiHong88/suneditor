@@ -1295,7 +1295,7 @@ Format.prototype = {
 		}
 
 		// set range
-		this.editor._offCurrentController();
+		this.editor.offCurrentController();
 		this.selection.setRange(start.container, start.offset, end.container, end.offset);
 
 		// history stack
