@@ -410,6 +410,7 @@ export default {
         options.lang = options.lang || _defaultLang;
         options.value = typeof options.value === 'string' ? options.value : null;
         options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
+        options.frameAttrbutes = options.frameAttrbutes || {};
         // tag style
         options.defaultTag = typeof options.defaultTag === 'string' && options.defaultTag.length > 0 ? options.defaultTag : 'p';
         const textTags = options.textTags = [{bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL', sub: 'SUB', sup: 'SUP'}, (options.textTags || {})].reduce(function (_default, _new) {

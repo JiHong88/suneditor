@@ -6063,6 +6063,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // toolbar visibility
             context.element.toolbar.style.visibility = '';
+            // wisywig attributes
+            const attr = options.frameAttrbutes;
+            for (let k in attr) {
+                context.element.wysiwyg.setAttribute(k, attr[k]);
+            }
 
             this._checkComponents();
             this._componentsInfoInit = false;

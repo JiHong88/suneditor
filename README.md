@@ -384,6 +384,9 @@ plugins: [
     imageGallery
 ]
 : Plugins array.     default: null {Array}
+// * Custom options and default options are all treated the same. 
+// * When using a custom plugin and a default plugin together, register as follows.
+// * {custom_plugin, ...plugins}
 
 // Values
 lang            : language object.   default : en {Object}
@@ -396,6 +399,10 @@ textTags        : You can change the tag of the default text button.   default: 
 value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {String}
 historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {Number}
+frameAttrbutes  : Specifies the properties of the editing area DIV.     default: {} {Object}
+                  ex)  {
+                    "spellcheck": false
+                  }
 
 // Whitelist, Blacklist -----------------------------------------------------------------------------------------
 // (You can use regular expression syntax.)
