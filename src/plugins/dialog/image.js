@@ -933,8 +933,8 @@ export default {
      */
     setSize: function (w, h, notResetPercentage, direction) {
         const contextImage = this.context.image;
-        const onlyW = /^(rw|lw)$/.test(direction);
-        const onlyH = /^(th|bh)$/.test(direction);
+        const onlyW = /^(rw|lw)$/.test(direction) && /\d+/.test(contextImage._element.style.height);
+        const onlyH = /^(th|bh)$/.test(direction) && /\d+/.test(contextImage._element.style.width);
 
         if (!onlyH) {
             contextImage._element.style.width = this.util.isNumber(w) ? w + contextImage.sizeUnit : w;
