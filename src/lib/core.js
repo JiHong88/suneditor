@@ -6074,12 +6074,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._componentsInfoReset = false;
 
             this.history.reset(true);
-            this._resourcesStateChange();
-
+            
             _w.setTimeout(function () {
                 // observer
                 if (event._resizeObserver) event._resizeObserver.observe(context.element.wysiwygFrame);
                 if (event._toolbarObserver) event._toolbarObserver.observe(context.element._toolbarShadow);
+                // resource state
+                core._resourcesStateChange();
                 // user event
                 if (typeof functions.onload === 'function') functions.onload(core, reload);
             });
@@ -6622,15 +6623,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             core._editorRange();
 
-            // user event
-            if (typeof functions.onInput === 'function' && functions.onInput(e, core) === false) return;
-
             const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';       
             if (!core._charCount(data)) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
             }
+
+            // user event
+            if (typeof functions.onInput === 'function' && functions.onInput(e, core) === false) return;
 
             // history stack
             core.history.push(true);
