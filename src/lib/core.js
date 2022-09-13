@@ -474,8 +474,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _cleanStyleRegExp: {
-            span: new _w.RegExp('\s*(font-family|font-size|color|background-color)\s*:[^;]+(?!;)*', 'ig'),
-            format: new _w.RegExp('\s*(text-align|margin-left|margin-right)\s*:[^;]+(?!;)*', 'ig')
+            span: new _w.RegExp('\\s*(font-family|font-size|color|background-color)\\s*:[^;]+(?!;)*', 'ig'),
+            format: new _w.RegExp('\\s*(text-align|margin-left|margin-right)\\s*:[^;]+(?!;)*', 'ig'),
+            fontSizeUnit: new _w.RegExp('\\d+' + options.fontSizeUnit + '$', 'i'),
         },
 
         /**
@@ -5102,6 +5103,32 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 .replace(this.editorTagsBlacklistRegExp, '');
         },
 
+        _convertFontSize: function (to, size) {
+            const value = size.match(/(\d+(?:\.\d+)?)(.+)/);
+            const sizeNum = value[1] * 1;
+            const from = value[2];
+            let pxSize = sizeNum;
+            
+            if (/em/.test(from)) {
+                pxSize = this.round(sizeNum / 0.0625);
+            } else if (from === 'pt') {
+                pxSize = this.round(sizeNum * 1.333);
+            } else if (from === '%') {
+                pxSize = sizeNum / 100;
+            }
+
+            switch (to) {
+                case 'em':
+                case 'rem':
+                case '%':
+                    return (pxSize * 0.0625).toFixed(2) + to;
+                case 'pt':
+                    return this._w.Math.floor(pxSize / 1.333); + to;
+                default: // px
+                    return pxSize + to;
+            }
+        },
+
         _cleanStyle: function (m, v, name) {
             const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
             if (sv) {
@@ -5121,6 +5148,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                     break;
                                 case 'fontSize':
                                     if (!options.plugins.fontSize) continue;
+                                    if (!this._cleanStyleRegExp.fontSizeUnit.test(r[0])) {
+                                        r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), this._convertFontSize.bind(this._w.Math, options.fontSizeUnit))
+                                    }
                                     break;
                                 case 'color':
                                     if (!options.plugins.fontColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
