@@ -8106,12 +8106,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         onChange: null,
 
-         /**
+        /**
          * @description Event functions
          * @param {String} contents Current contents
          * @param {Object} core Core object
          */
-          onSave: null,
+        onSave: null,
 
         /**
          * @description Event functions (drop, paste)
@@ -8480,6 +8480,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Copying the contents of the editor to the original textarea and execute onSave callback
+         * * not working during enabled codeView mode
          */
         save: function () {
             const contents = core.getContents(false);
@@ -8497,6 +8498,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Gets the contents of the suneditor
+         * * not working during enabled codeView mode
          * @param {Boolean} onlyContents - Return only the contents of the body without headers when the "fullPage" option is true
          * @returns {String}
          */
@@ -8506,6 +8508,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Gets only the text of the suneditor contents
+         * * not working during enabled codeView mode
          * @returns {String}
          */
         getText: function () {
