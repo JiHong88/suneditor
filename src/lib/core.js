@@ -1778,7 +1778,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 let c = parentNode.childNodes[startOff];
                                 const focusNode = (c && c.nodeType === 3 && util.onlyZeroWidthSpace(c) && util.isBreak(c.nextSibling)) ? c.nextSibling : c;
                                 if (focusNode) {
-                                    if (!focusNode.nextSibling) {
+                                    if (!focusNode.nextSibling && util.isBreak(focusNode)) {
                                         parentNode.removeChild(focusNode);
                                         afterNode = null;
                                     } else {
@@ -1794,7 +1794,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         }
                     } else { /** Select range nodes */
                         const isSameContainer = startCon === endCon;
-    
                         if (isSameContainer) {
                             if (this.isEdgePoint(endCon, endOff)) afterNode = endCon.nextSibling;
                             else afterNode = endCon.splitText(endOff);
@@ -2056,6 +2055,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 startCon = commonCon.children[startOff];
                 endCon = commonCon.children[endOff];
                 startOff = endOff = 0;
+            }
+
+            if (startCon === endCon && range.collapsed) {
+                if (startCon.textContent && util.onlyZeroWidthSpace(startCon.textContent.substr(startOff))) {
+                    return {
+                        container: startCon,
+                        offset: offset,
+                        prevContainer: startCon && startCon.parentNode ? startCon : null
+                    }
+                }
             }
 
             let beforeNode = null;

@@ -1004,15 +1004,15 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header"
 });
 
-s2.onPaste =  (e, cleanData, maxCharCount, core) => {
-    const dom = core._d.createRange().createContextualFragment(cleanData);
-    const chilren = dom.childNodes;
-    let html = '';
-    chilren.forEach(v=> {
-        html += core.util.isComponent(v) ? '' : (v.outerHTML || v.textContent);
-    })
-    return html;
-}
+// s2.onPaste =  (e, cleanData, maxCharCount, core) => {
+//     const dom = core._d.createRange().createContextualFragment(cleanData);
+//     const chilren = dom.childNodes;
+//     let html = '';
+//     chilren.forEach(v=> {
+//         html += core.util.isComponent(v) ? '' : (v.outerHTML || v.textContent);
+//     })
+//     return html;
+// }
 
 s2.onClick = (event, core) => {
     const element = event.target
