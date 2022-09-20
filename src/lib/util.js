@@ -1805,7 +1805,7 @@ const util = {
         // wrong position
         const wrongTags = this.getListChildNodes(documentFragment, function (current) {
             if (current.nodeType !== 1) {
-                if (this.isList(current.parentNode)) removeTags.push(current);
+                if (this.isList(current.parentElement)) removeTags.push(current);
                 return false;
             }
 
