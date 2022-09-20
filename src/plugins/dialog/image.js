@@ -649,7 +649,7 @@ export default {
         oImg.src = src;
         oImg.alt = alt;
         oImg.setAttribute('data-rotate', '0');
-        anchor = imagePlugin.onRender_link.call(this, oImg, anchor);
+        anchor = imagePlugin.onRender_link.call(this, oImg, anchor ?  anchor.cloneNode(false) : null);
 
         if (contextImage._resizing) {
             oImg.setAttribute('data-proportion', contextImage._proportionChecked);
