@@ -5338,7 +5338,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist, blacklist) {
-            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true)).replace(/^.+\x3C!--StartFragment--\>|\x3C!--EndFragment-->.+$/g, '');
+            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
 
             const dom = _d.createRange().createContextualFragment(html);
             try {
@@ -7819,6 +7819,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const onlyText = !cleanData;
 
             if (!onlyText) {
+                cleanData = cleanData.replace(/^<html>\r\n<body>\r\n\x3C!--StartFragment--\>|\x3C!--EndFragment-->\r\n<\/body\>\r\n<\/html>$/g, '');
                 if (MSData) {
                     cleanData = cleanData.replace(/\n/g, ' ');
                     plainText = plainText.replace(/\n/g, ' ');
