@@ -2063,7 +2063,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         container: startCon,
                         offset: offset,
                         prevContainer: startCon && startCon.parentNode ? startCon : null
-                    }
+                    };
                 }
             }
 
@@ -5132,7 +5132,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 case '%':
                     return (pxSize * 0.0625).toFixed(2) + to;
                 case 'pt':
-                    return this._w.Math.floor(pxSize / 1.333); + to;
+                    return this._w.Math.floor(pxSize / 1.333) + to;
                 default: // px
                     return pxSize + to;
             }
@@ -5158,7 +5158,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 case 'fontSize':
                                     if (!options.plugins.fontSize) continue;
                                     if (!this._cleanStyleRegExp.fontSizeUnit.test(r[0])) {
-                                        r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), this._convertFontSize.bind(this._w.Math, options.fontSizeUnit))
+                                        r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), this._convertFontSize.bind(this._w.Math, options.fontSizeUnit));
                                     }
                                     break;
                                 case 'color':
