@@ -384,6 +384,9 @@ plugins: [
     imageGallery
 ]
 : Plugins array.     default: null {Array}
+// * Custom options and default options are all treated the same. 
+// * When using a custom plugin and a default plugin together, register as follows.
+// * {custom_plugin, ...plugins}
 
 // Values
 lang            : language object.   default : en {Object}
@@ -396,6 +399,10 @@ textTags        : You can change the tag of the default text button.   default: 
 value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {String}
 historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {Number}
+frameAttrbutes  : Specifies the properties of the editing area DIV.     default: {} {Object}
+                  ex)  {
+                    "spellcheck": false
+                  }
 
 // Whitelist, Blacklist -----------------------------------------------------------------------------------------
 // (You can use regular expression syntax.)
@@ -1018,12 +1025,14 @@ editor.noticeOpen('test notice');
 editor.noticeClose();
 
 // Copies the contents of the suneditor into a [textarea]
+// * not working during enabled codeView mode
 editor.save();
 
 // Gets the suneditor's context object. Contains settings, plugins, and cached element objects
 editor.getContext();
 
 // Gets the contents of the suneditor
+// * not working during enabled codeView mode
 // onlyContents {Boolean}: Return only the contents of the body without headers when the "fullPage" option is true
 editor.getContents(onlyContents: Boolean);
 // Gets the current contents with containing parent div(div.sun-editor-editable).
@@ -1031,6 +1040,7 @@ editor.getContents(onlyContents: Boolean);
 editor.getFullContents(onlyContents: Boolean);
 
 // Gets only the text of the suneditor contents
+// * not working during enabled codeView mode
 editor.getText();
 
 // Gets a list of images uploaded to the editor

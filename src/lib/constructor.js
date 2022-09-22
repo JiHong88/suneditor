@@ -410,6 +410,7 @@ export default {
         options.lang = options.lang || _defaultLang;
         options.value = typeof options.value === 'string' ? options.value : null;
         options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
+        options.frameAttrbutes = options.frameAttrbutes || {};
         // tag style
         options.defaultTag = typeof options.defaultTag === 'string' && options.defaultTag.length > 0 ? options.defaultTag : 'p';
         const textTags = options.textTags = [{bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL', sub: 'SUB', sup: 'SUP'}, (options.textTags || {})].reduce(function (_default, _new) {
@@ -511,7 +512,7 @@ export default {
         options.lineHeights = !options.lineHeights ? null : options.lineHeights;
         options.paragraphStyles = !options.paragraphStyles ? null : options.paragraphStyles;
         options.textStyles = !options.textStyles ? null : options.textStyles;
-        options.fontSizeUnit = typeof options.fontSizeUnit === 'string' ? (options.fontSizeUnit.trim() || 'px') : 'px';
+        options.fontSizeUnit = typeof options.fontSizeUnit === 'string' ? (options.fontSizeUnit.trim().toLowerCase() || 'px') : 'px';
         options.alignItems = typeof options.alignItems === 'object' ? options.alignItems : (options.rtl ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify']);
         /** Image */
         options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;

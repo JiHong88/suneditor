@@ -2,6 +2,8 @@
 
 import dialog from '../modules/dialog';
 
+const KATEX_WEBSITE = "https://katex.org/docs/supported.html";
+
 export default {
     name: 'math',
     display: 'dialog',
@@ -63,7 +65,7 @@ export default {
             '</div>' +
             '<div class="se-dialog-body">' +
                 '<div class="se-dialog-form">' +
-                    '<label>' + lang.dialogBox.mathBox.inputLabel + ' (<a href="https://katex.org/docs/supported.html" target="_blank">KaTeX</a>)</label>' +
+                    '<label>' + lang.dialogBox.mathBox.inputLabel + ' (<a href="' + KATEX_WEBSITE + '" target="_blank">KaTeX</a>)</label>' +
                     '<textarea class="se-input-form se-math-exp" type="text"></textarea>' +
                 '</div>' +
                 '<div class="se-dialog-form">' +
@@ -140,9 +142,11 @@ export default {
     _renderer: function (exp) {
         let result = '';
         try {
+            this.util.removeClass(this.context.math.focusElement, 'se-error');
             result = this.options.katex.src.renderToString(exp, {throwOnError: true, displayMode: true});
         } catch(error) {
-            result = '<span class="se-math-katex-error">' + error + '</span>';
+            this.util.addClass(this.context.math.focusElement, 'se-error');
+            result = '<span class="se-math-katex-error">Katex syntax error. (Refer <a href="' + KATEX_WEBSITE + '" target="_blank">KaTeX</a>)</span>';
             console.warn('[SUNEDITOR.math.Katex.error] ', error);
         }
         return result;

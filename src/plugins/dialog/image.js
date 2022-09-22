@@ -649,7 +649,7 @@ export default {
         oImg.src = src;
         oImg.alt = alt;
         oImg.setAttribute('data-rotate', '0');
-        anchor = imagePlugin.onRender_link.call(this, oImg, anchor);
+        anchor = imagePlugin.onRender_link.call(this, oImg, anchor ?  anchor.cloneNode(false) : null);
 
         if (contextImage._resizing) {
             oImg.setAttribute('data-proportion', contextImage._proportionChecked);
@@ -933,8 +933,8 @@ export default {
      */
     setSize: function (w, h, notResetPercentage, direction) {
         const contextImage = this.context.image;
-        const onlyW = /^(rw|lw)$/.test(direction);
-        const onlyH = /^(th|bh)$/.test(direction);
+        const onlyW = /^(rw|lw)$/.test(direction) && /\d+/.test(contextImage._element.style.height);
+        const onlyH = /^(th|bh)$/.test(direction) && /\d+/.test(contextImage._element.style.width);
 
         if (!onlyH) {
             contextImage._element.style.width = this.util.isNumber(w) ? w + contextImage.sizeUnit : w;
@@ -957,6 +957,7 @@ export default {
     setAutoSize: function () {
         const contextImage = this.context.image;
 
+        if (contextImage._caption) contextImage._caption.style.marginTop = '';
         this.plugins.resizing.resetTransform.call(this, contextImage._element);
         this.plugins.image.cancelPercentAttr.call(this);
 

@@ -20,7 +20,7 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import CodeMirror from 'codemirror';
 
-console.log("pluginf???", plugins);
+// console.log("pluginf???", plugins);
 // plugins.fontSize.pickup = function (e){
 //     console.log("font----------size", this)
 //     if (!/^BUTTON$/i.test(e.target.tagName)) return false;
@@ -405,6 +405,7 @@ s1.onKeyDown = function (e, core) {
 
 let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     rtl: true,
+    height: "auto",
     value: `<p style="text-align: right">Hello</p>`,
     // linkNoPrefix: true,
     // value: `<p style="text-align: center; color: red;" onerror="a">center</p>`,
@@ -443,8 +444,8 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     // lineAttrReset: '*',
     alignItems: ['left', 'right', 'center'],
     linkTargetNewWindow: true,
-    imageAlignShow: false,
-    plugins: {...{custom_container}, ...plugins},
+    // imageAlignShow: false,
+    plugins: {custom_container, ...plugins},
     katex: Katex,
     codeMirror: CodeMirror,
     // stickyToolbar: 50,
@@ -598,31 +599,31 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
 });
 
 ss.onResizeEditor = (h, ph, core, entry) => {
-    console.log("---h"+h, entry);
+    // console.log("---h"+h, entry);
 }
 
 ss.onSetToolbarButtons = function(buttonList, core) {
-    console.log("bbbbb-", buttonList);
+    // console.log("bbbbb-", buttonList);
 }
 
 // ss.setContents("")
 // ss.setContents('fsafsa')
-ss.onload = function (core) {
-    console.log('_editorStyles', core.options.defaultStyle);
-    // core.focus();
-};
-ss.onScroll = function (e) {
-    // console.log('onScroll', e);
-};
-ss.onClick = function (e) {
-    // console.log('onClick', e);
-};
-ss.onFocus = function (e, core) {
-    console.log('onFocus', e);
-};
-ss.onBlur = function (e, core) {
-    console.log('onBlur', e);
-};
+// ss.onload = function (core) {
+//     console.log('_editorStyles', core.options.defaultStyle);
+//     // core.focus();
+// };
+// ss.onScroll = function (e) {
+//     // console.log('onScroll', e);
+// };
+// ss.onClick = function (e) {
+//     // console.log('onClick', e);
+// };
+// ss.onFocus = function (e, core) {
+//     console.log('onFocus', e);
+// };
+// ss.onBlur = function (e, core) {
+//     console.log('onBlur', e);
+// };
 // ss.onKeyDown = function (e) {
 //     const { key, shiftKey } = e;
 //     const keyCode = e.which || e.keyCode;
@@ -632,13 +633,13 @@ ss.onBlur = function (e, core) {
 //       return false;
 //     }
 // };
-ss.onKeyUp = function (e) {
-    // console.log('onKeyUp', e);
-};
-ss.onDrop = function (e) {
-    // console.log('onDrop', e);
-    return true;
-};
+// ss.onKeyUp = function (e) {
+//     // console.log('onKeyUp', e);
+// };
+// ss.onDrop = function (e) {
+//     // console.log('onDrop', e);
+//     return true;
+// };
 // ss.onPaste = function (e, cleanData, maxCharCount, core) {
 //     // replace () > span.katex
 //     cleanData = cleanData.replaceAll("(", '<span class="temp-katex">').replaceAll(")", "</span>");
@@ -658,22 +659,22 @@ ss.onDrop = function (e) {
 
 //     return core.cleanHTML(html, core.pasteTagsWhitelistRegExp);
 // }
-ss.onAudioUpload = function (targetElement, index, state, videoInfo) {
-    // console.log('targetElement:${targetElement}, index:${index}, state:${state}')
-    console.log('videoInfo-----', videoInfo)
-}
+// ss.onAudioUpload = function (targetElement, index, state, videoInfo) {
+//     // console.log('targetElement:${targetElement}, index:${index}, state:${state}')
+//     console.log('videoInfo-----', videoInfo)
+// }
 // ss.onVideoUploadError = function (messge, result, core) {
 //     console.log('video error-----', messge)
 //     return true
 // }
-ss.onAudioUploadBefore = function (files, info, core) {
-    console.log('before-----', files)
-    console.log('before----info-', info)
-    return true
-}
-ss.onChange = function (contents, core) {
-    console.log('change', core.context.video._infoList)
-}
+// ss.onAudioUploadBefore = function (files, info, core) {
+//     console.log('before-----', files)
+//     console.log('before----info-', info)
+//     return true
+// }
+// ss.onChange = function (contents, core) {
+//     console.log('change', core.context.video._infoList)
+// }
 
 // ss.imageUploadHandler = function (response, core) {
 //     console.log('rrrr', response)
@@ -751,12 +752,12 @@ ss.showInline = function (toolbar, context) {
 
 },
 
-ss.showController = (currentControllerName, controllerArray, core) => {
-    console.log("controllerArray",controllerArray);
-    if (currentControllerName === "image") {
-        controllerArray[1].querySelector('[data-command="update"]').style.display = 'none'
-    }
-}
+// ss.showController = (currentControllerName, controllerArray, core) => {
+//     console.log("controllerArray",controllerArray);
+//     if (currentControllerName === "image") {
+//         // controllerArray[1].querySelector('[data-command="update"]').style.display = 'none'
+//     }
+// }
 
 // ss.showController = function (name, controllers, core) {
 //     let c = null;
@@ -832,19 +833,19 @@ window.sun_noticeClose = function () {
     ss.core.plugins.audio.setupUrl.call(ss.core, 'http://suneditor.com/docs/cat.jpg');
 }
 
-window.sun_save = function () {
-    console.log(ss.getContents())
-    window.aaa = ss.getContents()
-}
+// window.sun_save = function () {
+//     console.log(ss.getContents())
+//     window.aaa = ss.getContents()
+// }
 
-window.sun_getContext = function () {
-    console.log(ss.getContext());
-}
+// window.sun_getContext = function () {
+//     console.log(ss.getContext());
+// }
 
-window.sun_getImagesInfo = function () {
-    console.log(ss.getImagesInfo());
-    ss.getImagesInfo().list[0].select();
-}
+// window.sun_getImagesInfo = function () {
+//     console.log(ss.getImagesInfo());
+//     ss.getImagesInfo().list[0].select();
+// }
 
 window.sun_insertHTML = function (html) {
     // ss.insertHTML('<img style="height:100px; width:100px;" src="http://suneditor.com/docs/cat.jpg" /><p>fdafds</p>', true, true, false);
@@ -860,7 +861,7 @@ window.sun_insertHTML = function (html) {
 window.sun_getContents = function () {
     // alert(ss.getContents());
 
-    console.log(ss.getText());
+    // console.log(ss.getText());
 
     // ss.core.commandHandler(null, 'selectAll')
     // let t = '';
@@ -914,7 +915,7 @@ window.sun_create = function () {
     //     plugins: plugins,
     //     height: 148
     // });
-    console.log("langlang")
+    // console.log("langlang")
     ss.setOptions({
         lang: lang.ko
     })
@@ -941,7 +942,9 @@ const editor = suneditor.init({
 
 let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     // rtl: true,
+    defaultStyle: 'color: red;',
     shortcutsDisable: ['bold', 'underline', 'italic'],
+    fontSizeUnit: 'rem',
     // mode: "inline",
     value: `<ol>
     <li>11111</li>
@@ -1001,15 +1004,15 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header"
 });
 
-s2.onPaste =  (e, cleanData, maxCharCount, core) => {
-    const dom = core._d.createRange().createContextualFragment(cleanData);
-    const chilren = dom.childNodes;
-    let html = '';
-    chilren.forEach(v=> {
-        html += core.util.isComponent(v) ? '' : (v.outerHTML || v.textContent);
-    })
-    return html;
-}
+// s2.onPaste =  (e, cleanData, maxCharCount, core) => {
+//     const dom = core._d.createRange().createContextualFragment(cleanData);
+//     const chilren = dom.childNodes;
+//     let html = '';
+//     chilren.forEach(v=> {
+//         html += core.util.isComponent(v) ? '' : (v.outerHTML || v.textContent);
+//     })
+//     return html;
+// }
 
 s2.onClick = (event, core) => {
     const element = event.target
@@ -1026,9 +1029,9 @@ s2.onKeyDown = (event, core) => {
 }
 
 s2.onResizeEditor = (height, prevHeight, core) => {
-    console.log("heig", height)
-    console.log("prevHeight", prevHeight)
-    console.log("core", core)
+    // console.log("heig", height)
+    // console.log("prevHeight", prevHeight)
+    // console.log("core", core)
 }
 
 // plugins.mention.getItems = async term => 
@@ -1230,46 +1233,46 @@ window.setImageList = function () {
 s2.onload = (core, isUpdate) => {
 }
 
-s2.onBlur = () => {console.log("ff?!?!?!?!?")}
+// s2.onBlur = () => {console.log("ff?!?!?!?!?")}
 
-s2.onImageUpload = function (targetElement, index, state, imageInfo, remainingFilesCount) {
-    console.log('imageInfo', imageInfo);
+// s2.onImageUpload = function (targetElement, index, state, imageInfo, remainingFilesCount) {
+//     console.log('imageInfo', imageInfo);
 
-    if (state === 'delete') {
-        imageList.splice(findIndex(imageList, index), 1)
-    } else {
-        if (state === 'create') {
-            const image = s2.getImagesInfo()[findIndex(s2.getImagesInfo(), index)]
-            imageList.push(image)
-        } else { // update
+//     if (state === 'delete') {
+//         imageList.splice(findIndex(imageList, index), 1)
+//     } else {
+//         if (state === 'create') {
+//             const image = s2.getImagesInfo()[findIndex(s2.getImagesInfo(), index)]
+//             imageList.push(image)
+//         } else { // update
             
-        }
-    }
+//         }
+//     }
 
-    if (remainingFilesCount === 0) {
-        console.log('imageList', imageList)
-        setImageList(imageList)
-    }
-}
+//     if (remainingFilesCount === 0) {
+//         console.log('imageList', imageList)
+//         setImageList(imageList)
+//     }
+// }
 
-s2.onVideoUpload = function (targetElement, index, state, videoInfo, remainingFilesCount) {
-    console.log('videoInfo', videoInfo);
+// s2.onVideoUpload = function (targetElement, index, state, videoInfo, remainingFilesCount) {
+//     console.log('videoInfo', videoInfo);
 
-    if (state === 'delete') {
-        videoList.splice(findIndex(videoList, index), 1)
-    } else {
-        if (state === 'create') {
-            videoList.push(videoInfo)
-        } else { // update
-            //
-        }
-    }
+//     if (state === 'delete') {
+//         videoList.splice(findIndex(videoList, index), 1)
+//     } else {
+//         if (state === 'create') {
+//             videoList.push(videoInfo)
+//         } else { // update
+//             //
+//         }
+//     }
 
-    if (remainingFilesCount === 0) {
-        console.log('videoList', videoList)
-        setVideoList(videoList)
-    }
-}
+//     if (remainingFilesCount === 0) {
+//         console.log('videoList', videoList)
+//         setVideoList(videoList)
+//     }
+// }
 
 window.sun_setOptions2 = function () {
     // s2.setOptions({

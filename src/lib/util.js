@@ -1805,7 +1805,7 @@ const util = {
         // wrong position
         const wrongTags = this.getListChildNodes(documentFragment, function (current) {
             if (current.nodeType !== 1) {
-                if (this.isList(current.parentNode)) removeTags.push(current);
+                if (this.isList(current.parentElement)) removeTags.push(current);
                 return false;
             }
 
@@ -1947,7 +1947,7 @@ const util = {
         frame.setAttribute('scrolling', 'auto');
         frame.contentDocument.head.innerHTML = '' +
             '<meta charset="utf-8" />' +
-            '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+            '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' +
             this._setIframeCssTags(options);
         frame.contentDocument.body.className = options._editableClass;
         frame.contentDocument.body.setAttribute('contenteditable', true);

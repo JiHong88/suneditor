@@ -474,8 +474,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _cleanStyleRegExp: {
-            span: new _w.RegExp('\s*(font-family|font-size|color|background-color)\s*:[^;]+(?!;)*', 'ig'),
-            format: new _w.RegExp('\s*(text-align|margin-left|margin-right)\s*:[^;]+(?!;)*', 'ig')
+            span: new _w.RegExp('\\s*(font-family|font-size|color|background-color)\\s*:[^;]+(?!;)*', 'ig'),
+            format: new _w.RegExp('\\s*(text-align|margin-left|margin-right)\\s*:[^;]+(?!;)*', 'ig'),
+            fontSizeUnit: new _w.RegExp('\\d+' + options.fontSizeUnit + '$', 'i'),
         },
 
         /**
@@ -1777,7 +1778,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 let c = parentNode.childNodes[startOff];
                                 const focusNode = (c && c.nodeType === 3 && util.onlyZeroWidthSpace(c) && util.isBreak(c.nextSibling)) ? c.nextSibling : c;
                                 if (focusNode) {
-                                    if (!focusNode.nextSibling) {
+                                    if (!focusNode.nextSibling && util.isBreak(focusNode)) {
                                         parentNode.removeChild(focusNode);
                                         afterNode = null;
                                     } else {
@@ -1793,7 +1794,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         }
                     } else { /** Select range nodes */
                         const isSameContainer = startCon === endCon;
-    
                         if (isSameContainer) {
                             if (this.isEdgePoint(endCon, endOff)) afterNode = endCon.nextSibling;
                             else afterNode = endCon.splitText(endOff);
@@ -2055,6 +2055,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 startCon = commonCon.children[startOff];
                 endCon = commonCon.children[endOff];
                 startOff = endOff = 0;
+            }
+
+            if (startCon === endCon && range.collapsed) {
+                if (startCon.textContent && util.onlyZeroWidthSpace(startCon.textContent.substr(startOff))) {
+                    return {
+                        container: startCon,
+                        offset: offset,
+                        prevContainer: startCon && startCon.parentNode ? startCon : null
+                    };
+                }
             }
 
             let beforeNode = null;
@@ -4721,7 +4731,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 _var._codeOriginCssText = code.style.cssText;
 
                 editorArea.style.cssText = toolbar.style.cssText = '';
-                wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
+                wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + options.defaultStyle;
                 code.style.cssText = (code.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
                 toolbar.style.width = wysiwygFrame.style.height = code.style.height = '100%';
                 toolbar.style.position = 'relative';
@@ -4889,7 +4899,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     '<!DOCTYPE html><html>' +
                     '<head>' +
                     '<meta charset="utf-8" />' +
-                    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+                    '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' +
                     '<title>' + lang.toolbar.preview + '</title>' +
                     linkHTML +
                     '</head>' +
@@ -5102,6 +5112,32 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 .replace(this.editorTagsBlacklistRegExp, '');
         },
 
+        _convertFontSize: function (to, size) {
+            const value = size.match(/(\d+(?:\.\d+)?)(.+)/);
+            const sizeNum = value[1] * 1;
+            const from = value[2];
+            let pxSize = sizeNum;
+            
+            if (/em/.test(from)) {
+                pxSize = this.round(sizeNum / 0.0625);
+            } else if (from === 'pt') {
+                pxSize = this.round(sizeNum * 1.333);
+            } else if (from === '%') {
+                pxSize = sizeNum / 100;
+            }
+
+            switch (to) {
+                case 'em':
+                case 'rem':
+                case '%':
+                    return (pxSize * 0.0625).toFixed(2) + to;
+                case 'pt':
+                    return this._w.Math.floor(pxSize / 1.333) + to;
+                default: // px
+                    return pxSize + to;
+            }
+        },
+
         _cleanStyle: function (m, v, name) {
             const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
             if (sv) {
@@ -5121,6 +5157,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                     break;
                                 case 'fontSize':
                                     if (!options.plugins.fontSize) continue;
+                                    if (!this._cleanStyleRegExp.fontSizeUnit.test(r[0])) {
+                                        r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), this._convertFontSize.bind(this._w.Math, options.fontSizeUnit));
+                                    }
                                     break;
                                 case 'color':
                                     if (!options.plugins.fontColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
@@ -5299,7 +5338,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist, blacklist) {
-            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true)).replace(/^.+\x3C!--StartFragment--\>|\x3C!--EndFragment-->.+$/g, '');
+            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
 
             const dom = _d.createRange().createContextualFragment(html);
             try {
@@ -5925,7 +5964,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         __callResizeFunction: function (h, resizeObserverEntry) {
-            h = h === -1 ? (resizeObserverEntry.borderBoxSize ? resizeObserverEntry.borderBoxSize[0].blockSize : (resizeObserverEntry.contentRect.height + this._editorHeightPadding)) : h;
+            h = h === -1 ? (resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0] ? resizeObserverEntry.borderBoxSize[0].blockSize : (resizeObserverEntry.contentRect.height + this._editorHeightPadding)) : h;
             if (this._editorHeight !== h) {
                 if (typeof functions.onResizeEditor === 'function') functions.onResizeEditor(h, this._editorHeight, core, resizeObserverEntry);
                 this._editorHeight = h;
@@ -6063,18 +6102,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // toolbar visibility
             context.element.toolbar.style.visibility = '';
+            // wisywig attributes
+            const attr = options.frameAttrbutes;
+            for (let k in attr) {
+                context.element.wysiwyg.setAttribute(k, attr[k]);
+            }
 
             this._checkComponents();
             this._componentsInfoInit = false;
             this._componentsInfoReset = false;
 
             this.history.reset(true);
-            this._resourcesStateChange();
-
+            
             _w.setTimeout(function () {
                 // observer
                 if (event._resizeObserver) event._resizeObserver.observe(context.element.wysiwygFrame);
                 if (event._toolbarObserver) event._toolbarObserver.observe(context.element._toolbarShadow);
+                // resource state
+                core._resourcesStateChange();
                 // user event
                 if (typeof functions.onload === 'function') functions.onload(core, reload);
             });
@@ -6617,15 +6662,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             core._editorRange();
 
-            // user event
-            if (typeof functions.onInput === 'function' && functions.onInput(e, core) === false) return;
-
             const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';       
             if (!core._charCount(data)) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
             }
+
+            // user event
+            if (typeof functions.onInput === 'function' && functions.onInput(e, core) === false) return;
 
             // history stack
             core.history.push(true);
@@ -7774,6 +7819,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const onlyText = !cleanData;
 
             if (!onlyText) {
+                cleanData = cleanData.replace(/^<html>\r\n<body>\r\n\x3C!--StartFragment--\>|\x3C!--EndFragment-->\r\n<\/body\>\r\n<\/html>$/g, '');
                 if (MSData) {
                     cleanData = cleanData.replace(/\n/g, ' ');
                     plainText = plainText.replace(/\n/g, ' ');
@@ -8061,12 +8107,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         onChange: null,
 
-         /**
+        /**
          * @description Event functions
          * @param {String} contents Current contents
          * @param {Object} core Core object
          */
-          onSave: null,
+        onSave: null,
 
         /**
          * @description Event functions (drop, paste)
@@ -8435,6 +8481,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Copying the contents of the editor to the original textarea and execute onSave callback
+         * * not working during enabled codeView mode
          */
         save: function () {
             const contents = core.getContents(false);
@@ -8452,6 +8499,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Gets the contents of the suneditor
+         * * not working during enabled codeView mode
          * @param {Boolean} onlyContents - Return only the contents of the body without headers when the "fullPage" option is true
          * @returns {String}
          */
@@ -8461,6 +8509,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Gets only the text of the suneditor contents
+         * * not working during enabled codeView mode
          * @returns {String}
          */
         getText: function () {
