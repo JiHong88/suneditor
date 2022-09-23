@@ -1671,6 +1671,34 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
         },
 
+        _checkDuplicateSpan: function (oNode, parentNode) {
+            if (!/^span$/i.test(oNode.nodeName)) return oNode;
+            
+            const oStyles = (oNode.style.cssText.match(/[^;]+;/g) || []).map(function(v){ return v.trim(); });
+            if (oStyles.length === 0) return oNode;
+
+            (function recursionFunc(ancestor) {
+                if (util.isWysiwygDiv(ancestor)) return;
+
+                if (/^span$/i.test(ancestor.nodeName)) {
+                    (ancestor.style.cssText.match(/[^;]+;/g) || []).forEach(function(v){
+                        let i;
+                        if ((i = oStyles.indexOf(v.trim())) > -1) {
+                            oStyles.splice(i, 1);
+                        }
+                    });
+                }
+
+                recursionFunc(ancestor.parentElement);
+            })(parentNode);
+
+            if(!(oNode.style.cssText = oStyles.join(' '))) {
+                oNode.removeAttribute('style');
+            }
+
+            return oNode;
+        },
+
         /**
          * @description Delete selected node and insert argument value node and return.
          * If the "afterNode" exists, it is inserted after the "afterNode"
@@ -1916,6 +1944,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     insertListCell = true;
                 }
 
+                oNode = this._checkDuplicateSpan(oNode, parentNode);
                 parentNode.insertBefore(oNode, afterNode);
 
                 if (insertListCell) {
@@ -1939,8 +1968,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         }
                     }
                 }
-            } catch (e) {
+            } catch (error) {
                 parentNode.appendChild(oNode);
+                console.warn('[SUNEDITOR.insertNode.warn] ' + error);
             } finally {
                 if ((util.isFormatElement(oNode) || util.isComponent(oNode)) && startCon === endCon) {
                     const cItem = util.getFormatElement(commonCon, null);
@@ -1951,6 +1981,18 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 if (freeFormat && (util.isFormatElement(oNode) || util.isRangeFormatElement(oNode))) {
                     oNode = this._setIntoFreeFormat(oNode);
+                }
+
+                if (/^span$/i.test(oNode.nodeName) && !oNode.attributes.length) {
+                    const ch = oNode.childNodes;
+                    const parent = oNode.parentNode;
+                    let c = null;
+                    while (ch[0]) {
+                        c = ch[0];
+                        parent.insertBefore(c, oNode);
+                    }
+                    util.removeItem(oNode);
+                    oNode = c;
                 }
 
                 if (!util.isComponent(oNode)) {
@@ -7819,7 +7861,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const onlyText = !cleanData;
 
             if (!onlyText) {
-                cleanData = cleanData.replace(/^<html>\r\n<body>\r\n\x3C!--StartFragment--\>|\x3C!--EndFragment-->\r\n<\/body\>\r\n<\/html>$/g, '');
+                cleanData = cleanData.replace(/^<html>\r?\n?<body>\r?\n?\x3C!--StartFragment--\>|\x3C!--EndFragment-->\r?\n?<\/body\>\r?\n?<\/html>$/g, '');
                 if (MSData) {
                     cleanData = cleanData.replace(/\n/g, ' ');
                     plainText = plainText.replace(/\n/g, ' ');
