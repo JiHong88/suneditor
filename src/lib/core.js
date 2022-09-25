@@ -474,8 +474,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _cleanStyleRegExp: {
-            span: new _w.RegExp('\\s*(font-family|font-size|color|background-color)\\s*:[^;]+(?!;)*', 'ig'),
-            format: new _w.RegExp('\\s*(text-align|margin-left|margin-right)\\s*:[^;]+(?!;)*', 'ig'),
+            span: new _w.RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color)\\s*:[^;]+(?!;)*', 'ig'),
+            format: new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right)\\s*:[^;]+(?!;)*', 'ig'),
             fontSizeUnit: new _w.RegExp('\\d+' + options.fontSizeUnit + '$', 'i'),
         },
 
@@ -1671,6 +1671,51 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
         },
 
+        _checkDuplicateNode: function (oNode, parentNode) {
+            (function recursionFunc(current) {
+                core._dupleCheck(current, parentNode);
+                const childNodes = current.childNodes;
+                for (let i = 0, len = childNodes.length; i < len; i++) {
+                    recursionFunc(childNodes[i]);
+                }
+            })(oNode);
+        },
+
+        _dupleCheck: function (oNode, parentNode) {
+            if (!util.isTextStyleElement(oNode)) return;
+            
+            const oStyles = (oNode.style.cssText.match(/[^;]+;/g) || []).map(function(v){ return v.trim(); });
+            const nodeName = oNode.nodeName;
+            if (/^span$/i.test(nodeName) && oStyles.length === 0) return oNode;
+
+            let duple = false;
+            (function recursionFunc(ancestor) {
+                if (util.isWysiwygDiv(ancestor) || !util.isTextStyleElement(ancestor)) return;
+
+                if (ancestor.nodeName === nodeName) {
+                    duple = true;
+                    (ancestor.style.cssText.match(/[^;]+;/g) || []).forEach(function(v){
+                        let i;
+                        if ((i = oStyles.indexOf(v.trim())) > -1) {
+                            oStyles.splice(i, 1);
+                        }
+                    });
+                    ancestor.classList.forEach(function(v){
+                        oNode.classList.remove(v);
+                    });
+                }
+
+                recursionFunc(ancestor.parentElement);
+            })(parentNode);
+
+            if (duple) {
+                if (!(oNode.style.cssText = oStyles.join(' '))) oNode.removeAttribute('style');
+                if (!oNode.attributes.length) oNode.setAttribute('data-se-duple', 'true');
+            }
+
+            return oNode;
+        },
+
         /**
          * @description Delete selected node and insert argument value node and return.
          * If the "afterNode" exists, it is inserted after the "afterNode"
@@ -1916,6 +1961,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     insertListCell = true;
                 }
 
+                this._checkDuplicateNode(oNode, parentNode);
                 parentNode.insertBefore(oNode, afterNode);
 
                 if (insertListCell) {
@@ -1939,9 +1985,27 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         }
                     }
                 }
-            } catch (e) {
+            } catch (error) {
                 parentNode.appendChild(oNode);
+                console.warn('[SUNEDITOR.insertNode.warn] ' + error);
             } finally {
+                const dupleNodes = parentNode.querySelectorAll('[data-se-duple]');
+                if (dupleNodes.length > 0) {
+                    for (let i = 0, len = dupleNodes.length, d, c, ch, parent; i < len; i++) {
+                        d = dupleNodes[i];
+                        ch = d.childNodes;
+                        parent = d.parentNode;
+
+                        while (ch[0]) {
+                            c = ch[0];
+                            parent.insertBefore(c, d);
+                        }
+
+                        if (d === oNode) oNode = c;
+                        util.removeItem(d);
+                    }
+                }
+
                 if ((util.isFormatElement(oNode) || util.isComponent(oNode)) && startCon === endCon) {
                     const cItem = util.getFormatElement(commonCon, null);
                     if (cItem && cItem.nodeType === 1 && util.isEmptyLine(cItem)) {
@@ -7819,7 +7883,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const onlyText = !cleanData;
 
             if (!onlyText) {
-                cleanData = cleanData.replace(/^<html>\r\n<body>\r\n\x3C!--StartFragment--\>|\x3C!--EndFragment-->\r\n<\/body\>\r\n<\/html>$/g, '');
+                cleanData = cleanData.replace(/^<html>\r?\n?<body>\r?\n?\x3C!--StartFragment--\>|\x3C!--EndFragment-->\r?\n?<\/body\>\r?\n?<\/html>$/g, '');
                 if (MSData) {
                     cleanData = cleanData.replace(/\n/g, ' ');
                     plainText = plainText.replace(/\n/g, ' ');
