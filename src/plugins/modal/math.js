@@ -167,7 +167,7 @@ math.prototype = {
 			domUtils.removeClass(this.textArea, 'se-error');
 			result = this.options.katex.src.renderToString(exp, { throwOnError: true, displayMode: true });
 		} catch (error) {
-			this.util.addClass(this.textArea, 'se-error');
+			domUtils.addClass(this.textArea, 'se-error');
             result = '<span class="se-math-katex-error">Katex syntax error. (Refer <a href="' + KATEX_WEBSITE + '" target="_blank">KaTeX</a>)</span>';
 			console.warn('[SUNEDITOR.math.Katex.error] ', error.message);
 		}

@@ -22,7 +22,8 @@ const HTML = function (editor) {
 	this._attributeBlacklistRegExp = null;
 	this._cleanStyleRegExp = {
 		span: editor.options._spanStylesRegExp,
-		format: editor.options._formatStylesRegExp
+		format: editor.options._formatStylesRegExp,
+		fontSizeUnit: new this._w.RegExp('\\d+' + this.options.fontSizeUnit + '$', 'i')
 	};
 
 	// set disallow text nodes
@@ -1061,7 +1062,7 @@ HTML.prototype = {
 			if (style) {
 				const allowedStyle = [];
 				for (let i = 0, len = style.length, r; i < len; i++) {
-					r = style[i].match(/(.+)(:)([^:]+$)/);
+					r = style[i].match(/([a-zA-Z0-9-]+)(:)([^:]+$)/);
 					if (r && !/inherit|initial/i.test(r[3])) {
 						const k = global.kebabToCamelCase(r[1].trim());
 						const v = this.wwComputedStyle[k].replace(/"/g, '');
