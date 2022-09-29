@@ -220,8 +220,8 @@ function InitOptions(element, options) {
 		}
 		return _default;
 	}, {}));
-	options._spanStylesRegExp = new _w.RegExp('s*(font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')s*:[^;]+(?!;)*', 'gi');
-	options._formatStylesRegExp = new _w.RegExp('s*(text-align|margin-left|margin-right' + (options.formatStyles ? '|' + options.formatStyles : '') + ')s*:[^;]+(?!;)*', 'gi');
+	options._spanStylesRegExp = new _w.RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi');
+	options._formatStylesRegExp = new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right' + (options.formatStyles ? '|' + options.formatStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi');
 	options._styleNodeMap = {
 		strong: textTags.bold.toLowerCase(),
 		b: textTags.bold.toLowerCase(),

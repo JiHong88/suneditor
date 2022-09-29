@@ -101,7 +101,7 @@ HTML.prototype = {
 	 * @returns {string}
 	 */
 	clean: function (html, requireFormat, whitelist, blacklist) {
-		html = DeleteDisallowedTags(this.editor._parser.parseFromString(html, 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, true)).replace(/^.+\x3C!--StartFragment--\>|\x3C!--EndFragment-->.+$/g, '');
+		html = DeleteDisallowedTags(this.editor._parser.parseFromString(html, 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, true));
 		const dom = this._d.createRange().createContextualFragment(html, true);
 
 		try {
@@ -126,8 +126,8 @@ HTML.prototype = {
 
 		let domTree = dom.childNodes;
 		let cleanData = '';
-		
-		if(!requireFormat) requireFormat = this._isFormatData(domTree);
+
+		if (!requireFormat) requireFormat = this._isFormatData(domTree);
 		if (requireFormat) domTree = this._editFormat(dom).childNodes;
 
 		for (let i = 0, len = domTree.length; i < len; i++) {
@@ -473,6 +473,7 @@ HTML.prototype = {
 				insertListCell = true;
 			}
 
+			this._checkDuplicateNode(oNode, parentNode);
 			parentNode.insertBefore(oNode, afterNode);
 
 			if (insertListCell) {
@@ -496,10 +497,27 @@ HTML.prototype = {
 					}
 				}
 			}
-		} catch (e) {
-			console.warn('[SUNEDITOR.html.insertNode.warn]', e);
+		} catch (error) {
 			parentNode.appendChild(oNode);
+			console.warn('[SUNEDITOR.html.insertNode.warn]', error);
 		} finally {
+			const dupleNodes = parentNode.querySelectorAll('[data-se-duple]');
+			if (dupleNodes.length > 0) {
+				for (let i = 0, len = dupleNodes.length, d, c, ch, parent; i < len; i++) {
+					d = dupleNodes[i];
+					ch = d.childNodes;
+					parent = d.parentNode;
+
+					while (ch[0]) {
+						c = ch[0];
+						parent.insertBefore(c, d);
+					}
+
+					if (d === oNode) oNode = c;
+					domUtils.removeItem(d);
+				}
+			}
+
 			if ((this.format.isLine(oNode) || this.component.is(oNode)) && startCon === endCon) {
 				const cItem = this.format.getLine(commonCon, null);
 				if (cItem && cItem.nodeType === 1 && domUtils.isEmptyLine(cItem)) {
@@ -1065,6 +1083,55 @@ HTML.prototype = {
 		return v;
 	},
 
+	_checkDuplicateNode: function (oNode, parentNode) {
+		const inst = this;
+		(function recursionFunc(current) {
+			inst._dupleCheck(current, parentNode);
+			const childNodes = current.childNodes;
+			for (let i = 0, len = childNodes.length; i < len; i++) {
+				recursionFunc(childNodes[i]);
+			}
+		})(oNode);
+	},
+
+	_dupleCheck: function (oNode, parentNode) {
+		if (!this.format.isTextStyleNode(oNode)) return;
+
+		const oStyles = (oNode.style.cssText.match(/[^;]+;/g) || []).map(function (v) {
+			return v.trim();
+		});
+		const nodeName = oNode.nodeName;
+		if (/^span$/i.test(nodeName) && oStyles.length === 0) return oNode;
+
+		const inst = this.format;
+		let duple = false;
+		(function recursionFunc(ancestor) {
+			if (domUtils.isWysiwygFrame(ancestor) || !inst.isTextStyleNode(ancestor)) return;
+
+			if (ancestor.nodeName === nodeName) {
+				duple = true;
+				(ancestor.style.cssText.match(/[^;]+;/g) || []).forEach(function (v) {
+					let i;
+					if ((i = oStyles.indexOf(v.trim())) > -1) {
+						oStyles.splice(i, 1);
+					}
+				});
+				ancestor.classList.forEach(function (v) {
+					oNode.classList.remove(v);
+				});
+			}
+
+			recursionFunc(ancestor.parentElement);
+		})(parentNode);
+
+		if (duple) {
+			if (!(oNode.style.cssText = oStyles.join(' '))) oNode.removeAttribute('style');
+			if (!oNode.attributes.length) oNode.setAttribute('data-se-duple', 'true');
+		}
+
+		return oNode;
+	},
+
 	constructor: HTML
 };
 
@@ -1109,7 +1176,7 @@ function CleanElements(lowLevelCheck, m, t) {
 
 	// blacklist
 	const bAttr = this._attributeBlacklist[tagName];
-	m = m.replace(/\s(?:on[a-z]+)\s*=\s*(")[^"]*\1/ig, '');
+	m = m.replace(/\s(?:on[a-z]+)\s*=\s*(")[^"]*\1/gi, '');
 	if (bAttr) m = m.replace(bAttr, '');
 	else m = m.replace(this._attributeBlacklistRegExp, '');
 
@@ -1136,7 +1203,13 @@ function CleanElements(lowLevelCheck, m, t) {
 	} else {
 		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
 		if (sv && !v) v = [sv[0]];
-		else if (sv && !v.some(function (v) { return /^style/.test(v.trim()); })) v.push(sv[0]);
+		else if (
+			sv &&
+			!v.some(function (v) {
+				return /^style/.test(v.trim());
+			})
+		)
+			v.push(sv[0]);
 	}
 
 	// img

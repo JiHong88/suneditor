@@ -371,6 +371,10 @@ textTags        : You can change the tag of the default text button.   default: 
 value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {string}
 historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {number}
+frameAttrbutes  : Specifies the properties of the editing area DIV.     default: {} {Object}
+                  ex)  {
+                    "spellcheck": false
+                  }
 
 // Whitelist, Blacklist -----------------------------------------------------------------------------------------
 // (You can use regular expression syntax.)
@@ -955,16 +959,19 @@ editor.setOptions({
 editor.setEditorCSSText('font-family: cursive; font-size: 10px;');
 
 // Copies the content of the suneditor into a [textarea]
+// * not working during enabled codeView mode
 editor.save();
 
 // Gets the content of the suneditor
 // onlyContent {boolean}: Return only the content of the body without headers when the "iframe_fullPage" option is true
+// * not working during enabled codeView mode
 editor.getContent(onlyContent: Boolean);
 // Gets the current content with containing parent div(div.sun-editor-editable).
 //  <div class="sun-editor-editable">{content}</div>
 editor.getFullContent(onlyContent: Boolean);
 
 // Gets only the text of the suneditor content
+// * not working during enabled codeView mode
 editor.getText();
 
 // Gets uploaded files(plugin using fileManager) information list.

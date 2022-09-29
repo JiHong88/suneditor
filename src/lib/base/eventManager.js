@@ -434,6 +434,7 @@ EventManager.prototype = {
 		const onlyText = !cleanData;
 
 		if (!onlyText) {
+			cleanData = cleanData.replace(/^<html>\r?\n?<body>\r?\n?\x3C!--StartFragment--\>|\x3C!--EndFragment-->\r?\n?<\/body\>\r?\n?<\/html>$/g, '');
 			if (MSData) {
 				cleanData = cleanData.replace(/\n/g, ' ');
 				plainText = plainText.replace(/\n/g, ' ');
