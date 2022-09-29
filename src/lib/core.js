@@ -1119,7 +1119,7 @@ Core.prototype = {
 			_var.codeOriginCssText = code.style.cssText;
 
 			editorArea.style.cssText = toolbar.style.cssText = '';
-			wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
+			wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + options.defaultStyle;
 			code.style.cssText = (code.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
 			toolbar.style.width = wysiwygFrame.style.height = code.style.height = '100%';
 			toolbar.style.position = 'relative';
@@ -1290,8 +1290,7 @@ Core.prototype = {
 			}
 
 			windowObject.document.write(
-				'' +
-					'<!DOCTYPE html><html>' +
+				'<!DOCTYPE html><html>' +
 					'<head>' +
 					'<meta charset="utf-8" />' +
 					'<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' +
@@ -1878,7 +1877,7 @@ Core.prototype = {
 	},
 
 	__callResizeFunction: function (h, resizeObserverEntry) {
-		h = h === -1 ? (resizeObserverEntry.borderBoxSize ? resizeObserverEntry.borderBoxSize[0].blockSize : resizeObserverEntry.contentRect.height + this._editorHeightPadding) : h;
+		h = h === -1 ? (resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0] ? resizeObserverEntry.borderBoxSize[0].blockSize : (resizeObserverEntry.contentRect.height + this._editorHeightPadding)) : h;
 		if (this._editorHeight !== h) {
 			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, this._editorHeight, core, resizeObserverEntry);
 			this._editorHeight = h;
@@ -1938,19 +1937,25 @@ Core.prototype = {
 
 		// toolbar visibility
 		this.context.element.toolbar.style.visibility = '';
+		// wisywig attributes
+		const attr = options.frameAttrbutes;
+		for (let k in attr) {
+			this.context.element.wysiwyg.setAttribute(k, attr[k]);
+		}
 
 		this._checkComponents();
 		this._componentsInfoInit = false;
 		this._componentsInfoReset = false;
 
 		this.history.reset(true);
-		this._resourcesStateChange();
 
 		this._w.setTimeout(
 			function () {
 				// observer
 				if (this.eventManager._resizeObserver) this.eventManager._resizeObserver.observe(this.context.element.wysiwygFrame);
 				if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(this.context.element._toolbarShadow);
+				// resource state
+				this._resourcesStateChange();
 				// user event
 				if (typeof this.events.onload === 'function') this.events.onload(reload);
 			}.bind(this)

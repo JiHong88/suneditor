@@ -505,6 +505,7 @@
 
 /* modal--- */
 .sun-editor.se-rtl .se-modal * {direction:rtl;}
+.sun-editor.se-rtl .se-modal .se-modal-inner .se-modal-form .se-video-ratio {margin-left:0; margin-right:4px;}
 /* modal - header */
 .sun-editor.se-rtl .se-modal .se-modal-inner .se-modal-header .se-modal-close {float:left;}
 .sun-editor.se-rtl .se-modal .se-modal-inner .se-modal-header .se-modal-title {float:right;}

@@ -742,15 +742,15 @@ function OnInput_wysiwyg(e) {
 
 	this.selection._init();
 
-	// user event
-	if (typeof this.events.onInput === 'function' && this.events.onInput(e) === false) return;
-
 	const data = (e.data === null ? '' : e.data === undefined ? ' ' : e.data) || '';
 	if (!this.char.test(data)) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
 	}
+
+	// user event
+	if (typeof this.events.onInput === 'function' && this.events.onInput(e) === false) return;
 
 	// history stack
 	this.history.push(true);

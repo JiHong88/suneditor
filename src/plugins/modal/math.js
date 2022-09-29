@@ -4,6 +4,8 @@ import EditorInterface from '../../interface/editor';
 import { Modal, Controller } from '../../modules';
 import { domUtils, env, converter, unicode } from '../../helper';
 
+const KATEX_WEBSITE = "https://katex.org/docs/supported.html";
+
 const math = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
@@ -162,9 +164,11 @@ math.prototype = {
 	_renderer: function (exp) {
 		let result = '';
 		try {
+			domUtils.removeClass(this.textArea, 'se-error');
 			result = this.options.katex.src.renderToString(exp, { throwOnError: true, displayMode: true });
 		} catch (error) {
-			result = '<span class="se-math-katex-error">' + error.message + '</span>';
+			this.util.addClass(this.textArea, 'se-error');
+            result = '<span class="se-math-katex-error">Katex syntax error. (Refer <a href="' + KATEX_WEBSITE + '" target="_blank">KaTeX</a>)</span>';
 			console.warn('[SUNEDITOR.math.Katex.error] ', error.message);
 		}
 		return result;
@@ -200,7 +204,7 @@ function CreateHTML_modal(editor, math) {
 		'<div class="se-modal-form">' +
 		'<label>' +
 		lang.modalBox.mathBox.inputLabel +
-		' (<a href="https://katex.org/docs/supported.html" target="_blank">KaTeX</a>)</label>' +
+		' (<a href="' + KATEX_WEBSITE + '" target="_blank">KaTeX</a>)</label>' +
 		'<textarea class="se-input-form se-math-exp" type="text" data-focus></textarea>' +
 		'</div>' +
 		'<div class="se-modal-form">' +

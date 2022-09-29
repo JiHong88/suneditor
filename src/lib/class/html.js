@@ -334,7 +334,7 @@ HTML.prototype = {
 							let c = parentNode.childNodes[startOff];
 							const focusNode = c && c.nodeType === 3 && domUtils.isZeroWith(c) && domUtils.isBreak(c.nextSibling) ? c.nextSibling : c;
 							if (focusNode) {
-								if (!focusNode.nextSibling) {
+								if (!focusNode.nextSibling && domUtils.isBreak(focusNode)) {
 									parentNode.removeChild(focusNode);
 									afterNode = null;
 								} else {
@@ -606,6 +606,16 @@ HTML.prototype = {
 			startOff = endOff = 0;
 		}
 
+		if (startCon === endCon && range.collapsed) {
+			if (startCon.textContent && domUtils.isZeroWith(startCon.textContent.substr(startOff))) {
+				return {
+					container: startCon,
+					offset: offset,
+					prevContainer: startCon && startCon.parentNode ? startCon : null
+				};
+			}
+		}
+
 		let beforeNode = null;
 		let afterNode = null;
 
@@ -855,7 +865,7 @@ HTML.prototype = {
 			documentFragment,
 			function (current) {
 				if (current.nodeType !== 1) {
-					if (domUtils.isList(current.parentNode)) removeTags.push(current);
+					if (domUtils.isList(current.parentElement)) removeTags.push(current);
 					return false;
 				}
 
@@ -1062,6 +1072,9 @@ HTML.prototype = {
 								break;
 							case 'fontSize':
 								if (!this.options.plugins.fontSize) continue;
+								if (!this._cleanStyleRegExp.fontSizeUnit.test(r[0])) {
+									r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), ConvertFontSize.bind(this._w.Math, this.options.fontSizeUnit));
+								}
 								break;
 							case 'color':
 								if (!this.options.plugins.fontColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
@@ -1248,6 +1261,33 @@ function CleanElements(lowLevelCheck, m, t) {
 
 function GetRegList(str, str2) {
 	return !str ? '^' : str === '*' ? '[a-z-]+' : !str2 ? str : str + '|' + str2;
+}
+
+function ConvertFontSize(to, size) {
+	const value = size.match(/(\d+(?:\.\d+)?)(.+)/);
+	const sizeNum = value[1] * 1;
+	const from = value[2];
+	let pxSize = sizeNum;
+
+	if (/em/.test(from)) {
+		pxSize = this.round(sizeNum / 0.0625);
+	} else if (from === 'pt') {
+		pxSize = this.round(sizeNum * 1.333);
+	} else if (from === '%') {
+		pxSize = sizeNum / 100;
+	}
+
+	switch (to) {
+		case 'em':
+		case 'rem':
+		case '%':
+			return (pxSize * 0.0625).toFixed(2) + to;
+		case 'pt':
+			return this.floor(pxSize / 1.333) + to;
+		default:
+			// px
+			return pxSize + to;
+	}
 }
 
 export default HTML;

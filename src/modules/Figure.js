@@ -543,8 +543,8 @@ Figure.prototype = {
 	},
 
 	_applySize: function (w, h, notResetPercentage, direction) {
-		const onlyW = /^(rw|lw)$/.test(direction);
-		const onlyH = /^(th|bh)$/.test(direction);
+		const onlyW = /^(rw|lw)$/.test(direction) && /\d+/.test(this._element.style.height);;
+		const onlyH = /^(th|bh)$/.test(direction) && /\d+/.test(this._element.style.width);
 
 		if (!onlyH) {
 			this._element.style.width = numbers.is(w) ? w + this.sizeUnit : w;
@@ -562,6 +562,7 @@ Figure.prototype = {
 	},
 
 	_setAutoSize: function () {
+		if (this._caption) this._caption.style.marginTop = '';
 		this.deleteTransform();
 		this._deletePercentSize();
 

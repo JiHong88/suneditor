@@ -274,6 +274,7 @@ function InitOptions(element, options) {
 	options.defaultLineTag = typeof options.defaultLineTag === 'string' && options.defaultLineTag.length > 0 ? options.defaultLineTag : 'p';
 	options.lineAttrReset = typeof options.lineAttrReset === 'string' && options.lineAttrReset ? (options.lineAttrReset === '*' ? '*' : new _w.RegExp('^(' + options.lineAttrReset + ')$', 'i')) : null;
 	options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
+	options.frameAttrbutes = options.frameAttrbutes || {};
 	options._editableClass = 'sun-editor-editable' + (options._rtl ? ' se-rtl' : '');
 	options._printClass = typeof options._printClass === 'string' ? options._printClass : null;
 
@@ -343,7 +344,7 @@ function InitOptions(element, options) {
 	options.lineHeights = !options.lineHeights ? null : options.lineHeights;
 	options.paragraphStyles = !options.paragraphStyles ? null : options.paragraphStyles;
 	options.textStyles = !options.textStyles ? null : options.textStyles;
-	options.fontSizeUnit = typeof options.fontSizeUnit === 'string' ? options.fontSizeUnit.trim() || 'px' : 'px';
+	options.fontSizeUnit = typeof options.fontSizeUnit === 'string' ? options.fontSizeUnit.trim().toLowerCase() || 'px' : 'px';
 	options.alignItems = typeof options.alignItems === 'object' ? options.alignItems : options._rtl ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'];
 	options.templates = !options.templates ? null : options.templates;
 	options.mathFontSize = !!options.mathFontSize

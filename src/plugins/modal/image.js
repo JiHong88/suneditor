@@ -573,7 +573,7 @@ image.prototype = {
 		oImg.src = src;
 		oImg.alt = alt;
 		oImg.setAttribute('data-rotate', '0');
-		anchor = this._setAnchor(oImg, anchor);
+		anchor = this._setAnchor(oImg, anchor ? anchor.cloneNode(false) : null);
 
 		if (this._resizing) {
 			oImg.setAttribute('data-proportion', !!this.proportion.checked);
