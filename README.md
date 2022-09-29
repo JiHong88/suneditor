@@ -359,6 +359,9 @@ plugins: [
     imageGallery
 ]
 : Plugins array.     default: null {Array}
+// * Custom options and default options are all treated the same. 
+// * When using a custom plugin and a default plugin together, register as follows.
+// * {custom_plugin, ...plugins}
 
 // Values
 lang            : language object.   default : en {Object}
