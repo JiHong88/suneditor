@@ -90,6 +90,8 @@ Controller.prototype = {
 			inst: this,
 			_offset: { left: form.offsetLeft + (this.context.element.eventWysiwyg.scrollX || this.context.element.eventWysiwyg.scrollLeft || 0), top: form.offsetTop + (this.context.element.eventWysiwyg.scrollY || this.context.element.eventWysiwyg.scrollTop || 0) }
 		});
+
+		this.editor._antiBlur = true;
 		if (typeof this.events.onShowController === 'function') this.events.onShowController(this.kind, this.editor.openControllers);
 	},
 
@@ -103,6 +105,7 @@ Controller.prototype = {
 		this.editor.currentFileComponentInfo = null;
 		this.editor.effectNode = null;
 		this.editor.openControllers = [];
+		this.editor._antiBlur = false;
 		if (typeof this.inst.reset === 'function') this.inst.reset();
 	},
 
@@ -199,6 +202,7 @@ Controller.prototype = {
 	constructor: Controller
 };
 
+// @todo
 Controller.CreateHTML = function () {
 	let html = '';
 

@@ -6,7 +6,23 @@ import mediaContainer from '../modules/mediaContainer';
 import resizing from '../modules/resizing';
 import fileManager from '../modules/fileManager';
 
-export default {
+const video = function (editor, target) {
+	// plugin bisic properties
+	EditorInterface.call(this, editor);
+	this.target = target;
+	this.title = this.lang.toolbar.image;
+	this.icon = this.icons.image;
+};
+
+image.type = 'modal';
+image.className = '';
+image.prototype = {
+    constructor: video
+}
+
+export default video;
+
+var a = {
     name: 'video',
     type: 'modal',
     add: function (core) {

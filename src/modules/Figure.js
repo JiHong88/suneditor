@@ -676,38 +676,6 @@ Figure.prototype = {
 	constructor: Figure
 };
 
-const resizing = {
-	/**
-	 * @description Called at the "openModify" to put the size of the current target into the size input element.
-	 * @param {Object} contextPlugin context object of plugin (core.context[plugin])
-	 * @param {Object} pluginObj Plugin object
-	 */
-	_module_setModifyInputSize: function (contextPlugin, pluginObj) {
-		const percentageRotation = contextPlugin._onlyPercentage && this.context.resizing.isVertical;
-		contextPlugin.proportion.checked = contextPlugin._proportionChecked = contextPlugin._element.getAttribute('data-proportion') !== 'false';
-
-		const size = this.getSize(this._element);
-		let x = percentageRotation ? '' : size.w;
-		if (x === contextPlugin._defaultSizeX) x = '';
-		if (contextPlugin._onlyPercentage) x = numbers.get(x, 2);
-		contextPlugin.inputX.value = x;
-		pluginObj.setInputSize.call(this, 'x');
-
-		if (!contextPlugin._onlyPercentage) {
-			let y = percentageRotation ? '' : size.h;
-			if (y === contextPlugin._defaultSizeY) y = '';
-			if (contextPlugin._onlyPercentage) y = numbers.get(y, 2);
-			contextPlugin.inputY.value = y;
-		}
-
-		contextPlugin.inputX.disabled = percentageRotation ? true : false;
-		contextPlugin.inputY.disabled = percentageRotation ? true : false;
-		contextPlugin.proportion.disabled = percentageRotation ? true : false;
-
-		pluginObj.setRatio.call(this);
-	}
-};
-
 function OnCopy(e) {
 	const info = this.editor.currentFileComponentInfo;
 	if (info && !env.isIE) {
