@@ -14,23 +14,23 @@ const image = function (editor, target) {
 	// create HTML
 	const options = this.options;
 	const modalEl = CreateHTML_modal(editor);
-	const imageControls = options.imageControls;
+	const figureControls = options.imageControls;
 
-	// image controls
+	// controls
 	let showAlign = false;
-	for (let i = 0; i < imageControls.length; i++) {
-		if (!imageControls[i]) break;
-		for (let j = 0; j < imageControls[i].length; j++) {
-			this._rotation = /rotate/.test(imageControls[i][j]);
-			showAlign = /align/.test(imageControls[i][j]);
+	for (let i = 0; i < figureControls.length; i++) {
+		if (!figureControls[i]) break;
+		for (let j = 0; j < figureControls[i].length; j++) {
+			this._rotation = /rotate/.test(figureControls[i][j]);
+			showAlign = /align/.test(figureControls[i][j]);
 		}
 	}
-	if (showAlign) modalEl.querySelector('._se_image_align').style.display = 'none';
+	if (showAlign) modalEl.querySelector('._se_figure_align').style.display = 'none';
 
 	// modules
 	this.anchor = new ModalAnchorEditor(this, modalEl);
 	this.modal = new Modal(this, modalEl);
-	this.figure = new Figure(this, imageControls, { isMedia: false, sizeUnit: options._imageSizeUnit });
+	this.figure = new Figure(this, figureControls, { sizeUnit: options._imageSizeUnit });
 	this.fileManager = new FileManager(this, { tagNames: ['img'], eventHandler: this.events.onImageUpload, checkHandler: FileCheckHandler.bind(this), figure: this.figure });
 
 	// members
@@ -47,7 +47,6 @@ const image = function (editor, target) {
 	this._linkElement = null;
 	this._linkValue = '';
 	this._align = 'none';
-	this._floatClassRegExp = '__se__float\\-[a-z]+';
 	this._svgDefaultSize = '30%';
 	this._base64RenderIndex = 0;
 	this._element = null;
@@ -58,9 +57,8 @@ const image = function (editor, target) {
 	this._origin_w = options.imageWidth === 'auto' ? '' : options.imageWidth;
 	this._origin_h = options.imageHeight === 'auto' ? '' : options.imageHeight;
 	this._resizing = options.imageResizing;
-	this._resizeDotHide = !options.imageHeightShow;
 	this._onlyPercentage = options.imageSizeOnlyPercentage;
-	this._nonResizing = !this._resizing || this._resizeDotHide || this._onlyPercentage;
+	this._nonResizing = !this._resizing || !options.imageHeightShow || this._onlyPercentage;
 
 	// init
 	modalEl.querySelector('.se-modal-tabs').addEventListener('click', this._openTab.bind(this));
@@ -110,6 +108,7 @@ image.prototype = {
 		} else {
 			if (this.imgInputFile && this.options.imageMultipleFile) this.imgInputFile.removeAttribute('multiple');
 		}
+
 		this.anchor.on(isUpdate);
 	},
 
@@ -163,11 +162,11 @@ image.prototype = {
 
 	/**
 	 * @override fileManager, figure
-	 * @description It is called from core.mediaContainer.select
+	 * @description Called when a container is selected.
 	 * @param {Element} element Target element
 	 */
 	select: function (element) {
-		this.ready(element);
+		this.figure.open(element, this._nonResizing);
 	},
 
 	/**
@@ -193,7 +192,6 @@ image.prototype = {
 		if (this.imgUrlFile) this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = this._element.src;
 
 		(this.modal.form.querySelector('input[name="suneditor_image_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]')).checked = true;
-		this._align = this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
 		this.captionCheckEl.checked = !!this._caption;
 
 		if (!this._resizing) return;
@@ -223,12 +221,12 @@ image.prototype = {
 	 * @override fileManager
 	 */
 	destroy: function (element) {
-		const imageEl = element || this._element;
-		const imageContainer = domUtils.getParentElement(imageEl, this.component.is) || imageEl;
-		const focusEl = imageContainer.previousElementSibling || imageContainer.nextElementSibling;
-		const emptyDiv = imageContainer.parentNode;
+		const targetEl = element || this._element;
+		const container = domUtils.getParentElement(targetEl, this.component.is) || targetEl;
+		const focusEl = container.previousElementSibling || container.nextElementSibling;
+		const emptyDiv = container.parentNode;
 
-		domUtils.removeItem(imageContainer);
+		domUtils.removeItem(container);
 		this.init();
 
 		if (emptyDiv !== this.context.element.wysiwyg) {
@@ -304,14 +302,9 @@ image.prototype = {
 		if (!url) url = this._linkValue;
 		if (!url) return false;
 
-		try {
-			const file = { name: url.split('/').pop(), size: 0 };
-			if (this.modal.isUpdate) this._updateSrc(url, this._element, file);
-			else this._create(url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
-		} catch (error) {
-			console.warn('[SUNEDITOR.image.URLRendering.fail] ' + error.message);
-			return true;
-		}
+		const file = { name: url.split('/').pop(), size: 0 };
+		if (this.modal.isUpdate) this._updateSrc(url, this._element, file);
+		else this._create(url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
 
 		return true;
 	},
@@ -486,7 +479,7 @@ image.prototype = {
 			if (!w) w = '100%';
 			else if (/%$/.test(w)) w += '%';
 		}
-		this.figure.setSize(w, h, false);
+		this.figure.setSize(w, h, null);
 	},
 
 	_updateSrc: function (src, element, file) {
@@ -689,7 +682,7 @@ function OnClickRevert() {
 
 function OnLinkPreview(e) {
 	const value = e.target.value.trim();
-	this._linkValue = this.textContent = !value ? '' : this.options.linkProtocol && value.indexOf('://') === -1 && value.indexOf('#') !== 0 ? this.options.linkProtocol + value : value.indexOf('://') === -1 ? '/' + value : value;
+	this._linkValue = this.previewSrc.textContent = !value ? '' : this.options.linkProtocol && value.indexOf('://') === -1 && value.indexOf('#') !== 0 ? this.options.linkProtocol + value : value.indexOf('://') === -1 ? '/' + value : value;
 }
 
 function OnfileInputChange() {
@@ -724,7 +717,7 @@ function OnloadImg(oImg, _svgDefaultSize, container) {
 	}
 }
 
-function CreateHTML_modal(editor, align) {
+function CreateHTML_modal(editor) {
 	const option = editor.options;
 	const lang = editor.lang;
 	let html =
@@ -842,7 +835,7 @@ function CreateHTML_modal(editor, align) {
 		'</div>' +
 		'<div class="se-anchor-editor _se_tab_content _se_tab_content_url" style="display: none"></div>' +
 		'<div class="se-modal-footer">' +
-		'<div class="_se_image_align">' +
+		'<div class="_se_figure_align">' +
 		'<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="none" checked>' +
 		lang.modalBox.basic +
 		'</label>' +

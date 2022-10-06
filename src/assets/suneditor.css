@@ -131,7 +131,7 @@
 .sun-editor .se-loading-box .se-loading-effect {position:absolute; display:block; top:50%; left:50%; height:44px; width:44px; border-top:2px solid #07d; border-right:2px solid transparent; border-radius:50%; animation:spinner .8s linear infinite; margin:-25px 0 0 -25px;}
 
 /** --- line breaker */
-.sun-editor .se-line-breaker {position:absolute; display:none; width:100%; height:1px; cursor:text; border-top:1px solid #3288ff; z-index:7;}
+.sun-editor .se-line-breaker {position:absolute; display:none; width:100%; height:1px; cursor:text; border-top:2px solid #3288ff; z-index:7;}
 .sun-editor .se-line-breaker > button.se-btn {position:relative; display:inline-block; width:30px; height:30px; top:-15px; float:none; left:-50%; background-color:#fff; border:1px solid #0c2240; opacity:0.6; cursor:pointer;}
 .sun-editor .se-line-breaker > button.se-btn:hover {opacity:0.9; background-color:#fff; border-color:#041b39;}
 /** --- line breaker --- component - top, bottom */

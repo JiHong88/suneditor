@@ -37,7 +37,6 @@ const Figure = function (inst, controls, params) {
 	// members
 	this.kind = inst.constructor.name;
 	this.inst = inst;
-	this.isMedia = !!params.isMedia;
 	this.sizeUnit = params.sizeUnit || 'px';
 	this.isVertical = false;
 	this.percentageButtons = controllerEl.querySelectorAll('[data-command="resize_percent"]');
@@ -128,16 +127,16 @@ Figure.GetRatio = function (w, h, defaultSizeUnit) {
 		const xUnit = (!numbers.is(w) && w.replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
 		const yUnit = (!numbers.is(h) && h.replace(/\d+|\./g, '')) || defaultSizeUnit || 'px';
 		if (xUnit === yUnit) {
-			const w_number = numbers.get(w, 0);
-			const h_number = numbers.get(h, 0);
+			const w_number = numbers.get(w, 4);
+			const h_number = numbers.get(h, 4);
 			rw = w_number / h_number;
 			rh = h_number / w_number;
 		}
 	}
 
 	return {
-		w: rh,
-		h: rw
+		w: numbers.get(rw, 4),
+		h: numbers.get(rh, 4)
 	};
 };
 
@@ -193,10 +192,9 @@ Figure.prototype = {
 		const h = (this.isVertical ? target.offsetWidth : target.offsetHeight) - 1;
 		const t = offset.top;
 		const l = offset.left - this.context.element.wysiwygFrame.scrollLeft;
-
-		const ratio = Figure.GetRatio(w, h, this.sizeUnit);
 		const originSize = (target.getAttribute('data-origin') || '').split(',');
 		const dataSize = (target.getAttribute('data-size') || '').split(',');
+		const ratio = Figure.GetRatio(dataSize[0] || numbers.get(target.style.width, 2) || w, dataSize[1] || numbers.get(target.style.height, 2) || h, this.sizeUnit);
 		const targetInfo = {
 			container: figureInfo.container,
 			cover: figureInfo.cover,
@@ -272,13 +270,14 @@ Figure.prototype = {
 		return targetInfo;
 	},
 
-	setSize: function (w, h) {
+	setSize: function (w, h, _autoRatio) {
 		if (/%$/.test(w)) {
-			this._setPercentSize(w, h);
+			this._setPercentSize(w, h || (_autoRatio ? (/%$/.test(_autoRatio.value) ? _autoRatio.value : _autoRatio.default) : h), _autoRatio);
 		} else if ((!w || w === 'auto') && (!h || h === 'auto')) {
-			this._setAutoSize();
+			if (_autoRatio) this._setPercentSize(100, _autoRatio.default || _autoRatio.value, _autoRatio);
+			else this._setAutoSize();
 		} else {
-			this._applySize(w, h, false);
+			this._applySize(w, h || (_autoRatio ? _autoRatio.value || _autoRatio.default : h), false);
 		}
 	},
 
@@ -421,6 +420,7 @@ Figure.prototype = {
 				this._setOriginSize();
 				break;
 			case 'edit':
+				this.inst.ready(element);
 				this.inst.open();
 				break;
 			case 'remove':
@@ -543,7 +543,7 @@ Figure.prototype = {
 	},
 
 	_applySize: function (w, h, notResetPercentage, direction) {
-		const onlyW = /^(rw|lw)$/.test(direction) && /\d+/.test(this._element.style.height);;
+		const onlyW = /^(rw|lw)$/.test(direction) && /\d+/.test(this._element.style.height);
 		const onlyH = /^(th|bh)$/.test(direction) && /\d+/.test(this._element.style.width);
 
 		if (!onlyH) {
@@ -579,8 +579,8 @@ Figure.prototype = {
 		this._saveCurrentSize();
 	},
 
-	_setPercentSize: function (w, h) {
-		h = !!h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || '';
+	_setPercentSize: function (w, h, _autoRatio) {
+		h = !!h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || (_autoRatio ? _autoRatio.default : '');
 		const heightPercentage = /%$/.test(h);
 
 		this._container.style.width = numbers.is(w) ? w + '%' : w;
@@ -588,9 +588,10 @@ Figure.prototype = {
 		this._cover.style.width = '100%';
 		this._cover.style.height = !heightPercentage ? '' : h;
 		this._element.style.width = '100%';
-		this._element.style.height = heightPercentage ? '' : h;
+		this._element.style.height = _autoRatio ? '100%' : heightPercentage ? '' : h;
 		this._element.style.maxWidth = '';
 
+		if (_autoRatio) this._cover.style.paddingBottom = h;
 		if (this.align === 'center') this.setAlign(this._element, this.align);
 
 		this._element.setAttribute('data-percentage', w + ',' + h);
@@ -641,7 +642,7 @@ Figure.prototype = {
 
 	_saveCurrentSize: function () {
 		const size = this.getSize(this._element);
-		this._element.setAttribute('data-size', (numbers.get(size.w) || 'auto') + ',' + (numbers.get(size.h) || 'auto'));
+		this._element.setAttribute('data-size', (size.w || 'auto') + ',' + (size.h || 'auto'));
 		// if (!!contextPlugin._videoRatio) contextPlugin._videoRatio = size.y; @todo
 	},
 

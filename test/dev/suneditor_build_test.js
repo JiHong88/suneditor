@@ -31,6 +31,7 @@ import math from "../../src/plugins/modal/math";
 import link from "../../src/plugins/modal/link";
 import audio from "../../src/plugins/modal/audio";
 import image from "../../src/plugins/modal/image";
+import video from "../../src/plugins/modal/video";
 
 window.e = suneditor.create(document.getElementById('editor2'), {
     // value: '<h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2>',
@@ -81,7 +82,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
     imageMultipleFile: true,
     imageResizing: true,
     plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock, horizontalLine, lineHeight, list,
-        paragraphStyle, template, textStyle, table, math, link, audio, image
+        paragraphStyle, template, textStyle, table, math, link, audio, image, video
     ],
     buttonList: [
         ['undo', 'redo'],
@@ -92,7 +93,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
         ['preview', 'print'],
         ['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'horizontalLine'],
         ['lineHeight', 'list', 'paragraphStyle', 'template', 'textStyle', 'table'],
-        ['math', 'link', 'audio', 'image']
+        ['math', 'link', 'audio', 'image', 'video']
     ],
     events: {
         onAudioUpload: (a, b, c, d, e) => {

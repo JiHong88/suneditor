@@ -84,9 +84,9 @@ const Constructor = function (element, options) {
 	relative.appendChild(editor_div);
 	relative.appendChild(resize_back);
 	relative.appendChild(loading_box);
-	relative.appendChild(line_breaker);
-	relative.appendChild(line_breaker_t);
-	relative.appendChild(line_breaker_b);
+	editor_div.appendChild(line_breaker);
+	editor_div.appendChild(line_breaker_t);
+	editor_div.appendChild(line_breaker_b);
 	if (status_bar && !statusbar_container) relative.appendChild(status_bar);
 	top_div.appendChild(relative);
 
@@ -386,7 +386,6 @@ function InitOptions(element, options) {
 	options.imageSizeOnlyPercentage = !!options.imageSizeOnlyPercentage;
 	options._imageSizeUnit = options.imageSizeOnlyPercentage ? '%' : 'px';
 	options.imageRotation = options.imageRotation !== undefined ? options.imageRotation : !(options.imageSizeOnlyPercentage || !options.imageHeightShow);
-
 	options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
 	options.imageUrlInput = options.imageUrlInput === undefined || !options.imageFileInput ? true : options.imageUrlInput;
 	options.imageUploadHeader = options.imageUploadHeader || null;
@@ -394,19 +393,27 @@ function InitOptions(element, options) {
 	options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? numbers.get(options.imageUploadSizeLimit, 0) : null;
 	options.imageMultipleFile = !!options.imageMultipleFile;
 	options.imageAccept = typeof options.imageAccept !== 'string' || options.imageAccept.trim() === '*' ? 'image/*' : options.imageAccept.trim() || 'image/*';
+
 	/** Image - image gallery */
 	options.imageGalleryUrl = typeof options.imageGalleryUrl === 'string' ? options.imageGalleryUrl : null;
 	options.imageGalleryHeader = options.imageGalleryHeader || null;
+
 	/** Video */
 	options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
 	options.videoWidth = !options.videoWidth || !numbers.get(options.videoWidth, 0) ? '' : numbers.is(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth;
 	options.videoHeight = !options.videoHeight || !numbers.get(options.videoHeight, 0) ? '' : numbers.is(options.videoHeight) ? options.videoHeight + 'px' : options.videoHeight;
+	options.videoControls =
+		options.videoControls || !options.videoResizing
+			? [['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']]
+			: [
+					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
+					['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']
+			  ];
 
 	// @todo
 	options.videoRatioShow = options.videoRatioShow === undefined ? true : !!options.videoRatioShow;
 	options.videoRatio = numbers.get(options.videoRatio, 4) || 0.5625;
 	options.videoRatioList = !options.videoRatioList ? null : options.videoRatioList;
-
 	// @todo
 	options.videoHeightShow = options.videoHeightShow === undefined ? true : !!options.videoHeightShow;
 	options.videoAlignShow = options.videoAlignShow === undefined ? true : !!options.videoAlignShow;
@@ -414,7 +421,6 @@ function InitOptions(element, options) {
 	options._videoSizeUnit = options.videoSizeOnlyPercentage ? '%' : 'px';
 	options.videoRotation = options.videoRotation !== undefined ? options.videoRotation : !(options.videoSizeOnlyPercentage || !options.videoHeightShow);
 	options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
-
 	options.videoFileInput = !!options.videoFileInput;
 	options.videoUrlInput = options.videoUrlInput === undefined || !options.videoFileInput ? true : options.videoUrlInput;
 	options.videoUploadHeader = options.videoUploadHeader || null;
@@ -424,6 +430,7 @@ function InitOptions(element, options) {
 	options.videoTagAttrs = options.videoTagAttrs || null;
 	options.videoIframeAttrs = options.videoIframeAttrs || null;
 	options.videoAccept = typeof options.videoAccept !== 'string' || options.videoAccept.trim() === '*' ? 'video/*' : options.videoAccept.trim() || 'video/*';
+
 	/** Audio */
 	options.audioWidth = !options.audioWidth ? '' : numbers.is(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth;
 	options.audioHeight = !options.audioHeight ? '' : numbers.is(options.audioHeight) ? options.audioHeight + 'px' : options.audioHeight;
@@ -435,8 +442,10 @@ function InitOptions(element, options) {
 	options.audioMultipleFile = !!options.audioMultipleFile;
 	options.audioTagAttrs = options.audioTagAttrs || null;
 	options.audioAccept = typeof options.audioAccept !== 'string' || options.audioAccept.trim() === '*' ? 'audio/*' : options.audioAccept.trim() || 'audio/*';
+
 	/** Table */
 	options.tableCellControllerPosition = typeof options.tableCellControllerPosition === 'string' ? options.tableCellControllerPosition.toLowerCase() : 'cell';
+
 	/** Link */
 	options.linkTargetNewWindow = !!options.linkTargetNewWindow;
 	options.linkProtocol = typeof options.linkProtocol === 'string' ? options.linkProtocol : null;
@@ -680,8 +689,6 @@ function _defaultButtons(options) {
 		dir_ltr: ['', lang.toolbar.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
 		dir_rtl: ['', lang.toolbar.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
 		save: ['se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save],
-		/** plugins - modal */
-		video: ['', lang.toolbar.video, 'video', 'modal', icons.video],
 		/** plugins - fileBrowser */
 		imageGallery: ['', lang.toolbar.imageGallery, 'imageGallery', 'fileBrowser', icons.image_gallery]
 	};

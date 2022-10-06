@@ -57,7 +57,6 @@ audio.prototype = {
 	 */
 	on: function (isUpdate) {
 		if (!isUpdate) {
-			this.init();
 			if (this.audioInputFile && this.options.audioMultipleFile) this.audioInputFile.setAttribute('multiple', 'multiple');
 		} else if (this._element) {
 			this.urlValue = this.preview.textContent = this.audioUrlFile.value = this._element.src;

@@ -86,10 +86,12 @@ Modal.prototype = {
 
 /**
  * The loading bar is executed before "modalAction" is executed.
- * When true is returned, the loading bar and modal window are closed.
- * If false is returned, only the loading bar is closed.
- * If undefined is returned, only the modal window is closed.
- * When an exception occurs, the modal window and loading bar are closed.
+ * return type -
+ * true : the loading bar and modal window are closed.
+ * false : only the loading bar is closed.
+ * undefined : only the modal window is closed.
+ * -
+ * exception occurs : the modal window and loading bar are closed.
  */
 function Action(e) {
 	e.preventDefault();

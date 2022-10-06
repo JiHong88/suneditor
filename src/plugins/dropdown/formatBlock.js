@@ -138,7 +138,7 @@ formatBlock.prototype = {
 					});
 
 					if (parentNode !== f.parentNode || isComp) {
-						if (domUtils.isFormatElement(parentNode)) {
+						if (this.format.isLine(parentNode)) {
 							parentNode.parentNode.insertBefore(freeElement, parentNode.nextSibling);
 							parentNode = parentNode.parentNode;
 						} else {

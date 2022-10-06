@@ -1645,15 +1645,16 @@ function OnMouseMove_wysiwyg(e) {
 		const componentTop = this.offset.get(component).top + wScroll;
 		const y = e.pageY + scrollTop + (this.options.iframe && !this.options.toolbar_container ? ctxEl.toolbar.offsetHeight : 0);
 		const c = componentTop + (this.options.iframe ? scrollTop : offsets.top);
+		const toolbarH = this.context.element.toolbar.offsetHeight;
 
 		const isList = domUtils.isListCell(component.parentNode);
 		let dir = '',
 			top = '';
-		if ((isList ? !component.previousSibling : !this.format.isLine(component.previousElementSibling)) && y < c + 20) {
-			top = componentTop;
+		if ((isList ? !component.previousSibling : !this.format.isLine(component.previousElementSibling)) && y < c + toolbarH + 20) {
+			top = componentTop - 1;
 			dir = 't';
-		} else if ((isList ? !component.nextSibling : !this.format.isLine(component.nextElementSibling)) && y > c + component.offsetHeight - 20) {
-			top = componentTop + component.offsetHeight;
+		} else if ((isList ? !component.nextSibling : !this.format.isLine(component.nextElementSibling)) && y > c + component.offsetHeight + toolbarH - 20) {
+			top = componentTop + component.offsetHeight - 1;
 			dir = 'b';
 		} else {
 			lineBreakerStyle.display = 'none';
