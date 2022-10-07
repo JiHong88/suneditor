@@ -4,7 +4,7 @@ import EditorInterface from '../../interface/editor';
 import { Modal, Controller } from '../../modules';
 import { domUtils, env, converter, unicode } from '../../helper';
 
-const KATEX_WEBSITE = "https://katex.org/docs/supported.html";
+const KATEX_WEBSITE = 'https://katex.org/docs/supported.html';
 
 const math = function (editor, target) {
 	// plugin bisic properties
@@ -20,12 +20,13 @@ const math = function (editor, target) {
 	// modules
 	this.modal = new Modal(this, modalEl);
 	this.controller = new Controller(this, controllerEl, 'bottom');
-	
+
 	// members
 	this.textArea = modalEl.querySelector('.se-math-exp');
 	this.previewElement = modalEl.querySelector('.se-math-preview');
 	this.fontSizeElement = modalEl.querySelector('.se-math-size');
 	this.isUpdateState = false;
+	this._element = null;
 
 	// init
 	this.previewElement.style.fontSize = this.defaultFontSize;
@@ -47,11 +48,21 @@ math.prototype = {
 	 */
 	active: function (element) {
 		if (element && element.getAttribute('data-exp')) {
+			this._element = element;
 			this.controller.open(element);
+			domUtils.addClass(element, 'se-focus');
 			return true;
+		} else {
+			this._element = null;
+			return false;
 		}
+	},
 
-		return false;
+	/**
+	 * @override controller
+	 */
+	reset: function () {
+		domUtils.removeClass(this._element, 'se-focus');
 	},
 
 	/**
@@ -168,7 +179,7 @@ math.prototype = {
 			result = this.options.katex.src.renderToString(exp, { throwOnError: true, displayMode: true });
 		} catch (error) {
 			domUtils.addClass(this.textArea, 'se-error');
-            result = '<span class="se-math-katex-error">Katex syntax error. (Refer <a href="' + KATEX_WEBSITE + '" target="_blank">KaTeX</a>)</span>';
+			result = '<span class="se-math-katex-error">Katex syntax error. (Refer <a href="' + KATEX_WEBSITE + '" target="_blank">KaTeX</a>)</span>';
 			console.warn('[SUNEDITOR.math.Katex.error] ', error.message);
 		}
 		return result;
@@ -204,7 +215,9 @@ function CreateHTML_modal(editor, math) {
 		'<div class="se-modal-form">' +
 		'<label>' +
 		lang.modalBox.mathBox.inputLabel +
-		' (<a href="' + KATEX_WEBSITE + '" target="_blank">KaTeX</a>)</label>' +
+		' (<a href="' +
+		KATEX_WEBSITE +
+		'" target="_blank">KaTeX</a>)</label>' +
 		'<textarea class="se-input-form se-math-exp" type="text" data-focus></textarea>' +
 		'</div>' +
 		'<div class="se-modal-form">' +

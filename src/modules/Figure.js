@@ -69,8 +69,10 @@ const Figure = function (inst, controls, params) {
 	this.__offContainer = OffFigureContainer.bind(this);
 	this.__containerResizing = ContainerResizing.bind(this);
 	this.__containerResizingOff = ContainerResizingOff.bind(this);
+	this.__containerResizingESC = ContainerResizingESC.bind(this);
 	this.__onContainerEvent = null;
 	this.__offContainerEvent = null;
+	this.__onResizeESCEvent = null;
 	this.__fileManagerInfo = false;
 
 	// init
@@ -88,7 +90,7 @@ const Figure = function (inst, controls, params) {
  * @returns {object} {container, cover, caption}
  */
 Figure.CreateContainer = function (element, className) {
-	domUtils.createElement('DIV', { class: 'se-component ' + className, contenteditable: false }, domUtils.createElement('FIGURE', null, element));
+	domUtils.createElement('DIV', { class: 'se-component' + (className ? ' ' + className : ''), contenteditable: false }, domUtils.createElement('FIGURE', null, element));
 	return Figure.GetContainer(element);
 };
 
@@ -287,7 +289,7 @@ Figure.prototype = {
 		if (/%$/.test(w)) {
 			this._setPercentSize(w, h);
 		} else if ((!w || w === 'auto') && (!h || h === 'auto')) {
-			if (this.autoRatio) this._setPercentSize(100, this.autoRatio.default || this.autoRatio.value);
+			if (this.autoRatio) this._setPercentSize(100, this.autoRatio.default || this.autoRatio.current);
 			else this._setAutoSize();
 		} else {
 			this._applySize(w, h, false, '');
@@ -557,7 +559,7 @@ Figure.prototype = {
 	_applySize: function (w, h, notResetPercentage, direction) {
 		const onlyW = /^(rw|lw)$/.test(direction) && /\d+/.test(this._element.style.height);
 		const onlyH = /^(th|bh)$/.test(direction) && /\d+/.test(this._element.style.width);
-		h = h || (this.autoRatio ? this.autoRatio.value || this.autoRatio.default : h);
+		h = h || (this.autoRatio ? this.autoRatio.current || this.autoRatio.default : h);
 
 		if (!/%$/.test(w) && !/%$/.test(h)) this._deletePercentSize();
 
@@ -599,7 +601,7 @@ Figure.prototype = {
 	},
 
 	_setPercentSize: function (w, h) {
-		if (!h) h = this.autoRatio ? (/%$/.test(this.autoRatio.value) ? this.autoRatio.value : this.autoRatio.default) : h;
+		if (!h) h = this.autoRatio ? (/%$/.test(this.autoRatio.current) ? this.autoRatio.current : this.autoRatio.default) : h;
 		h = !!h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || (this.autoRatio ? this.autoRatio.default : '');
 
 		const heightPercentage = /%$/.test(h);
@@ -690,9 +692,21 @@ Figure.prototype = {
 
 		if (display === 'none') {
 			domUtils.addClass(this.resizeDot, 'se-resize-ing');
+			this.__onResizeESCEvent = this.eventManager.addGlobalEvent('keydown', this.__containerResizingESC);
 		} else {
 			domUtils.removeClass(this.resizeDot, 'se-resize-ing');
 		}
+	},
+
+	_offResizeEvent: function () {
+		this.eventManager.removeGlobalEvent(this.__onContainerEvent);
+		this.eventManager.removeGlobalEvent(this.__offContainerEvent);
+		this.eventManager.removeGlobalEvent(this.__onResizeESCEvent);
+
+		this._displayResizeHandles(true);
+		this.editor.offCurrentController();
+		this.context.element.resizeBackground.style.display = 'none';
+		this.context.element.resizeBackground.style.cursor = 'default';
 	},
 
 	constructor: Figure
@@ -761,13 +775,7 @@ function ContainerResizing(e) {
 }
 
 function ContainerResizingOff() {
-	this.eventManager.removeGlobalEvent(this.__onContainerEvent);
-	this.eventManager.removeGlobalEvent(this.__offContainerEvent);
-
-	this._displayResizeHandles(true);
-	this.editor.offCurrentController();
-	this.context.element.resizeBackground.style.display = 'none';
-	this.context.element.resizeBackground.style.cursor = 'default';
+	this._offResizeEvent();
 
 	// set size
 	let w = this.isVertical ? this._resize_h : this._resize_w;
@@ -790,6 +798,12 @@ function ContainerResizingOff() {
 
 	// history stack
 	this.history.push(false);
+}
+
+function ContainerResizingESC(e) {
+	if (!/^27$/.test(e.keyCode)) return;
+	this._offResizeEvent();
+	this.component.select(this._element, this.kind);
 }
 
 function SetMenuAlign(item) {

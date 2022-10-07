@@ -1062,7 +1062,7 @@ HTML.prototype = {
 			if (style) {
 				const allowedStyle = [];
 				for (let i = 0, len = style.length, r; i < len; i++) {
-					r = style[i].match(/([a-zA-Z0-9-]+)(:)([^:]+$)/);
+					r = style[i].match(/([a-zA-Z0-9-]+)(:)([^"]+$)/);
 					if (r && !/inherit|initial/i.test(r[3])) {
 						const k = global.kebabToCamelCase(r[1].trim());
 						const v = this.wwComputedStyle[k].replace(/"/g, '');
@@ -1139,8 +1139,13 @@ HTML.prototype = {
 		})(parentNode);
 
 		if (duple) {
-			if (!(oNode.style.cssText = oStyles.join(' '))) oNode.removeAttribute('style');
-			if (!oNode.attributes.length) oNode.setAttribute('data-se-duple', 'true');
+			if (!(oNode.style.cssText = oStyles.join(' '))) {
+				oNode.setAttribute('style', '');
+				oNode.removeAttribute('style');
+			}
+			if (!oNode.attributes.length) {
+				oNode.setAttribute('data-se-duple', 'true');
+			}
 		}
 
 		return oNode;

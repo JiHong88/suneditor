@@ -31,7 +31,7 @@ const video = function (editor, target) {
     const videoRatio = options.videoRatio * 100 + '%';
 	const defaultRatio = options.videoRatio * 100 + '%';
 	this.modal = new Modal(this, modalEl);
-	this.figure = new Figure(this, figureControls, { sizeUnit: options._videoSizeUnit, autoRatio: { value: videoRatio, default: defaultRatio } });
+	this.figure = new Figure(this, figureControls, { sizeUnit: options._videoSizeUnit, autoRatio: { current: videoRatio, default: defaultRatio } });
 	this.fileManager = new FileManager(this, { tagNames: ['iframe', 'video'], eventHandler: this.events.onVideoUpload, checkHandler: FileCheckHandler.bind(this), figure: this.figure });
 
 	// members
@@ -178,8 +178,8 @@ video.prototype = {
 		this._align = figureInfo.align;
 		target.style.float = '';
 
-		this._origin_w = figureInfo.originWidth || figureInfo.w || '';
-		this._origin_h = figureInfo.originHeight || figureInfo.h || '';
+		this._origin_w = figureInfo.width || figureInfo.originWidth || figureInfo.w || '';
+		this._origin_h = figureInfo.height || figureInfo.originHeight || figureInfo.h || '';
 
 		let w = figureInfo.width || figureInfo.w || this._origin_w || '';
 		let h = figureInfo.height || figureInfo.h || this._origin_h || '';
@@ -610,7 +610,7 @@ function OnClickRevert() {
 
 function SetVideoRatio(e) {
 	const value = e.target.options[e.target.selectedIndex].value;
-	this._defaultSizeY = this.figure.autoRatio.value = this._videoRatio = !value ? this._defaultSizeY : value * 100 + '%';
+	this._defaultSizeY = this.figure.autoRatio.current = this._videoRatio = !value ? this._defaultSizeY : value * 100 + '%';
 	this.inputY.placeholder = !value ? '' : value * 100 + '%';
 	this.inputY.value = '';
 }

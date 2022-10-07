@@ -88,7 +88,7 @@
 /** --- arrow icon ---------------------------------------------------------- */
 .sun-editor .se-arrow, .sun-editor .se-arrow::after {position:absolute; display:block; width:0; height:0; border:11px solid transparent;}
 /* arrow up */
-.sun-editor .se-arrow.se-arrow-up {top:-11px; left:20px; margin-left:-11px; border-top-width:0; border-bottom-color:#dadada;}
+.sun-editor .se-arrow.se-arrow-up {top:-11px; left:20px; right:auto; margin-left:-11px; border-top-width:0; border-bottom-color:#dadada;}
 .sun-editor .se-arrow.se-arrow-up::after {top:1px; margin-left:-11px; content:" "; border-top-width:0; border-bottom-color:#fff;}
 .sun-editor .se-toolbar .se-arrow.se-arrow-up::after {border-bottom-color:#fafafa;}
 /* arrow down */
@@ -270,6 +270,7 @@
 .sun-editor .se-wrapper .se-wrapper-code {background-color:#191919; color:#fff; font-size:13px; word-break:break-all; padding:4px; margin:0; resize:none !important;}
 .sun-editor .se-wrapper .se-wrapper-wysiwyg {display:block;}
 .sun-editor .se-wrapper .se-wrapper-code-mirror {font-size:13px;}
+.sun-editor .sun-editor-editable .katex.se-focus {outline:1px solid #80bdff;}
 /** --- placeholder */
 .sun-editor .se-wrapper .se-placeholder {position:absolute; display:none; white-space:nowrap; text-overflow:ellipsis; z-index:1; color:#b1b1b1; font-size:13px; line-height:1.5; top:0; left:0; right:0; overflow:hidden; margin-top:0px; padding-top:16px; padding-left:16px; margin-left:0px; padding-right:16px; margin-right:0px; pointer-events:none; backface-visibility:hidden; -webkit-backface-visibility:hidden; -moz-backface-visibility:hidden;}
 
@@ -400,7 +401,8 @@
 .sun-editor .se-resizing-container .se-resize-dot > span.th {left:50%; top:-8px; cursor:n-resize;}
 .sun-editor .se-resizing-container .se-resize-dot > span.rw {right:-8px; bottom:50%; cursor:e-resize;}
 .sun-editor .se-resizing-container .se-resize-dot > span.bh {right:50%; bottom:-8px; cursor:s-resize;}
-.sun-editor .se-resizing-container .se-resize-display {position:absolute; pointer-events:none; left:0; right:auto; top:-32px; padding:5px; margin:2px; font-size:12px; color:#fff; background-color:#333; border-radius:4px;}
+.sun-editor .se-resizing-container .se-resize-display {position:absolute; pointer-events:none; right:0; left:auto; bottom:0; padding:5px; margin:2px; font-size:12px; color:#fff; background-color:#333; border-radius:4px; opacity:0.75;}
+.sun-editor .se-resizing-container.se-resize-ing .se-resize-display {opacity:1;}
 /* controller - table */
 .sun-editor .se-controller-table {width:auto; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-controller-table-cell {width:auto; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
@@ -534,7 +536,10 @@
 
 /** controller--- */
 .sun-editor.se-rtl .se-controller .se-btn-group {direction:rtl;}
-.sun-editor.se-rtl .se-resizing-container .se-resize-display {direction:rtl; left:auto; right:0;}
+.sun-editor.se-rtl .se-resizing-container .se-resize-display {direction:rtl; right:auto; left:0;}
+
+/** arrow--- */
+.sun-editor.se-rtl .se-arrow.se-arrow-up {right:20px; left:auto;}
 /** --- RTL ---------------------------------------------------------- */
 
 /** button module float --------------------------------------------- */
