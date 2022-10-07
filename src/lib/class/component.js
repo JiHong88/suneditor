@@ -126,23 +126,25 @@ Component.prototype = {
 	_setComponentLineBreaker: function (element) {
 		this.status._lineBreakComp = null;
 		this.editor._lineBreaker.style.display = 'none';
-		
+
 		const contextEl = this.context.element;
+		const yScroll = contextEl.wysiwyg.scrollY || contextEl.wysiwyg.scrollTop || 0;
+		const wScroll = contextEl.wysiwyg.scrollX || contextEl.wysiwyg.scrollLeft || 0;
 		const container = domUtils.getParentElement(element, this.is);
 		const t_style = contextEl.lineBreaker_t.style;
 		const b_style = contextEl.lineBreaker_b.style;
 		const target = this.editor._figureContainer && this.editor._figureContainer.style.display === 'block' ? this.editor._figureContainer : element;
 
 		const isList = domUtils.isListCell(container.parentNode);
-		let componentTop, wScroll, w;
+		let componentTop, w;
 		// top
 		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
 			this.status._lineBreakComp = container;
-			wScroll = contextEl.wysiwyg.scrollTop;
-			componentTop = this.offset.get(element).top + wScroll;
+			componentTop = this.offset.get(element).top + yScroll;
 			w = target.offsetWidth / 2 / 2;
 
-			t_style.top = componentTop - wScroll - 12 + 'px';
+			contextEl.lineBreaker_t.setAttribute('data-offset', componentTop - 12 + ',' + (this.offset.get(target).left + wScroll + w));
+			t_style.top = componentTop - yScroll - 12 + 'px';
 			t_style.left = this.offset.get(target).left + w + 'px';
 			t_style.display = 'block';
 		} else {
@@ -152,12 +154,12 @@ Component.prototype = {
 		if (isList ? !container.nextSibling : !this.format.isLine(container.nextElementSibling)) {
 			if (!componentTop) {
 				this.status._lineBreakComp = container;
-				wScroll = contextEl.wysiwyg.scrollTop;
-				componentTop = this.offset.get(element).top + wScroll;
+				componentTop = this.offset.get(element).top + yScroll;
 				w = target.offsetWidth / 2 / 2;
 			}
 
-			b_style.top = componentTop + target.offsetHeight - wScroll - 12 + 'px';
+			contextEl.lineBreaker_b.setAttribute('data-offset', componentTop + target.offsetHeight - 12 + ',' + (this.offset.get(target).left + wScroll + target.offsetWidth - w - 24));
+			b_style.top = componentTop + target.offsetHeight - yScroll - 12 + 'px';
 			b_style.left = this.offset.get(target).left + target.offsetWidth - w - 24 + 'px';
 			b_style.display = 'block';
 		} else {

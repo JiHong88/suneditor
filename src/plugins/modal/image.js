@@ -166,24 +166,24 @@ image.prototype = {
 	 * @param {Element} element Target element
 	 */
 	select: function (element) {
-		this.figure.open(element, this._nonResizing);
+		this.ready(element);
 	},
 
 	/**
 	 * @override fileManager, figure
 	 */
-	ready: function (element) {
-		if (!element) return;
-		const figureInfo = this.figure.open(element, this._nonResizing);
-		this.anchor.set(/^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null);
+	ready: function (target) {
+		if (!target) return;
+		const figureInfo = this.figure.open(target, this._nonResizing);
+		this.anchor.set(/^A$/i.test(target.parentNode.nodeName) ? target.parentNode : null);
 
 		this._linkElement = this.anchor.currentTarget;
-		this._element = element;
+		this._element = target;
 		this._cover = figureInfo.cover;
 		this._container = figureInfo.container;
 		this._caption = figureInfo.caption;
 		this._align = figureInfo.align;
-		element.style.float = '';
+		target.style.float = '';
 
 		this._origin_w = figureInfo.originWidth || figureInfo.w || '';
 		this._origin_h = figureInfo.originHeight || figureInfo.h || '';
@@ -209,7 +209,7 @@ image.prototype = {
 			this.inputY.value = h === 'auto' ? '' : h;
 		}
 
-		this.proportion.checked = element.getAttribute('data-proportion') !== 'false';
+		this.proportion.checked = target.getAttribute('data-proportion') !== 'false';
 		this.inputX.disabled = percentageRotation ? true : false;
 		this.inputY.disabled = percentageRotation ? true : false;
 		this.proportion.disabled = percentageRotation ? true : false;
@@ -310,8 +310,8 @@ image.prototype = {
 	},
 
 	_update: function (width, height) {
-		if (!width) width = this.inputX.value || this._origin_w || 'auto';
-		if (!height) height = this.inputY.value || this._origin_h || 'auto';
+		if (!width) width = this.inputX.value || 'auto';
+		if (!height) height = this.inputY.value || 'auto';
 
 		let imageEl = this._element;
 		let cover = this._cover;
@@ -413,14 +413,14 @@ image.prototype = {
 		if (this._resizing) {
 			imageEl.setAttribute('data-proportion', !!this.proportion.checked);
 			if (changeSize) {
-				this.applySize(null, null);
+				this.applySize(width, height);
 			}
 		}
 
 		// transform
 		if (modifiedCaption || (!this._onlyPercentage && changeSize)) {
 			if (/\d+/.test(imageEl.style.height) || (this.figure.isVertical && this.captionCheckEl.checked)) {
-				if (/%$/.test(width) || /%$/.test(height)) {
+				if (/auto|%$/.test(width) || /auto|%$/.test(height)) {
 					this.figure.deleteTransform(imageEl);
 				} else {
 					this.figure.setTransform(imageEl, width, height);

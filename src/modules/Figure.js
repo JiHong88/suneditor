@@ -38,6 +38,7 @@ const Figure = function (inst, controls, params) {
 	this.kind = inst.constructor.name;
 	this.inst = inst;
 	this.sizeUnit = params.sizeUnit || 'px';
+	this.autoRatio = params.autoRatio;
 	this.isVertical = false;
 	this.percentageButtons = controllerEl.querySelectorAll('[data-command="resize_percent"]');
 	this.captionButton = controllerEl.querySelector('[data-command="caption"]');
@@ -46,6 +47,8 @@ const Figure = function (inst, controls, params) {
 	this._container = null;
 	this._caption = null;
 	this.align = 'none';
+	this._width = 0;
+	this._height = 0;
 	this._element_w = 0;
 	this._element_h = 0;
 	this._element_l = 0;
@@ -178,6 +181,13 @@ Figure.__isComponent = function (element) {
 };
 
 Figure.prototype = {
+	/**
+	 * @override controller
+	 */
+	reset: function () {
+		domUtils.removeClass(this._cover, 'se-figure-selected');
+	},
+
 	open: function (target, nonResizing, __fileManagerInfo) {
 		const figureInfo = Figure.GetContainer(target);
 		this._container = figureInfo.container;
@@ -211,6 +221,8 @@ Figure.prototype = {
 			originHeight: originSize[1] || target.naturalHeight || target.offsetHeight
 		};
 
+		this._width = targetInfo.width;
+		this._height = targetInfo.height;
 		if (__fileManagerInfo || this.__fileManagerInfo) return targetInfo;
 
 		this.editor._figureContainer = this.resizeDot;
@@ -259,6 +271,7 @@ Figure.prototype = {
 		domUtils.setDisabled(true, this.editor.resizingDisabledButtons);
 
 		// set members
+		domUtils.addClass(this._cover, 'se-figure-selected');
 		this._element_w = this._resize_w = w;
 		this._element_h = this._resize_h = h;
 		this._element_l = l;
@@ -270,14 +283,14 @@ Figure.prototype = {
 		return targetInfo;
 	},
 
-	setSize: function (w, h, _autoRatio) {
+	setSize: function (w, h) {
 		if (/%$/.test(w)) {
-			this._setPercentSize(w, h || (_autoRatio ? (/%$/.test(_autoRatio.value) ? _autoRatio.value : _autoRatio.default) : h), _autoRatio);
+			this._setPercentSize(w, h);
 		} else if ((!w || w === 'auto') && (!h || h === 'auto')) {
-			if (_autoRatio) this._setPercentSize(100, _autoRatio.default || _autoRatio.value, _autoRatio);
+			if (this.autoRatio) this._setPercentSize(100, this.autoRatio.default || this.autoRatio.value);
 			else this._setAutoSize();
 		} else {
-			this._applySize(w, h || (_autoRatio ? _autoRatio.value || _autoRatio.default : h), false);
+			this._applySize(w, h, false, '');
 		}
 	},
 
@@ -420,7 +433,6 @@ Figure.prototype = {
 				this._setOriginSize();
 				break;
 			case 'edit':
-				this.inst.ready(element);
 				this.inst.open();
 				break;
 			case 'remove':
@@ -455,7 +467,7 @@ Figure.prototype = {
 		element.setAttribute('data-rotateY', '');
 
 		this._deleteCaptionPosition(element);
-		this._applySize(numbers.get(size[0]) || 'auto', numbers.get(size[1]) || '', true);
+		this._applySize(numbers.get(size[0]) || 'auto', numbers.get(size[1]) || '', true, '');
 	},
 
 	/**
@@ -487,7 +499,7 @@ Figure.prototype = {
 			const h = (isVertical ? offsetW : offsetH) + 'px';
 
 			this._deletePercentSize();
-			this._applySize(offsetW + 'px', offsetH + 'px', true);
+			this._applySize(offsetW + 'px', offsetH + 'px', true, '');
 
 			figureInfo.cover.style.width = w;
 			figureInfo.cover.style.height = figureInfo.caption ? '' : h;
@@ -545,13 +557,20 @@ Figure.prototype = {
 	_applySize: function (w, h, notResetPercentage, direction) {
 		const onlyW = /^(rw|lw)$/.test(direction) && /\d+/.test(this._element.style.height);
 		const onlyH = /^(th|bh)$/.test(direction) && /\d+/.test(this._element.style.width);
+		h = h || (this.autoRatio ? this.autoRatio.value || this.autoRatio.default : h);
+
+		if (!/%$/.test(w) && !/%$/.test(h)) this._deletePercentSize();
 
 		if (!onlyH) {
 			this._element.style.width = numbers.is(w) ? w + this.sizeUnit : w;
-			this._deletePercentSize();
 		}
 		if (!onlyW) {
-			this._element.style.height = numbers.is(h) ? h + this.sizeUnit : /%$/.test(h) ? '' : h;
+			h = numbers.is(h) ? h + this.sizeUnit : h;
+			this._element.style.height = this.autoRatio ? '100%' : h;
+			if (this.autoRatio) {
+				this._cover.style.paddingBottom = h;
+				this._cover.style.height = h;
+			}
 		}
 
 		if (this.align === 'center') this.setAlign(this._element, this.align);
@@ -579,19 +598,20 @@ Figure.prototype = {
 		this._saveCurrentSize();
 	},
 
-	_setPercentSize: function (w, h, _autoRatio) {
-		h = !!h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || (_autoRatio ? _autoRatio.default : '');
-		const heightPercentage = /%$/.test(h);
+	_setPercentSize: function (w, h) {
+		if (!h) h = this.autoRatio ? (/%$/.test(this.autoRatio.value) ? this.autoRatio.value : this.autoRatio.default) : h;
+		h = !!h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || (this.autoRatio ? this.autoRatio.default : '');
 
+		const heightPercentage = /%$/.test(h);
 		this._container.style.width = numbers.is(w) ? w + '%' : w;
 		this._container.style.height = '';
 		this._cover.style.width = '100%';
-		this._cover.style.height = !heightPercentage ? '' : h;
+		this._cover.style.height = h;
 		this._element.style.width = '100%';
-		this._element.style.height = _autoRatio ? '100%' : heightPercentage ? '' : h;
 		this._element.style.maxWidth = '';
+		this._element.style.height = this.autoRatio ? '100%' : heightPercentage ? '' : h;
 
-		if (_autoRatio) this._cover.style.paddingBottom = h;
+		if (this.autoRatio) this._cover.style.paddingBottom = h;
 		if (this.align === 'center') this.setAlign(this._element, this.align);
 
 		this._element.setAttribute('data-percentage', w + ',' + h);
@@ -627,7 +647,7 @@ Figure.prototype = {
 			if (/%$/.test(w) && (/%$/.test(h) || !/\d/.test(h))) {
 				this._setPercentSize(w, h);
 			} else {
-				this._applySize(w, h);
+				this._applySize(w, h, false, '');
 			}
 
 			// save current size
@@ -678,6 +698,7 @@ Figure.prototype = {
 	constructor: Figure
 };
 
+// @todo
 function OnCopy(e) {
 	const info = this.editor.currentFileComponentInfo;
 	if (info && !env.isIE) {
@@ -734,9 +755,9 @@ function ContainerResizing(e) {
 		resultH = h;
 	}
 
-	this._resize_w = resultW;
-	this._resize_h = resultH;
-	domUtils.changeTxt(this.resizeDisplay, this._w.Math.round(resultW) + ' x ' + this._w.Math.round(resultH));
+	this._resize_w = /h$/.test(direction) ? this._width : this._w.Math.round(resultW);
+	this._resize_h = /w$/.test(direction) ? this._height : this._w.Math.round(resultH);
+	domUtils.changeTxt(this.resizeDisplay, this._resize_w + ' x ' + this._resize_h);
 }
 
 function ContainerResizingOff() {
@@ -749,8 +770,10 @@ function ContainerResizingOff() {
 	this.context.element.resizeBackground.style.cursor = 'default';
 
 	// set size
-	let w = this._w.Math.round(this.isVertical ? this._resize_h : this._resize_w);
-	let h = this._w.Math.round(this.isVertical ? this._resize_w : this._resize_h);
+	let w = this.isVertical ? this._resize_h : this._resize_w;
+	let h = this.isVertical ? this._resize_w : this._resize_h;
+	w = this._w.Math.round(w) || w;
+	h = this._w.Math.round(h) || h;
 
 	if (!this.isVertical && !/%$/.test(w)) {
 		const limit = this.context.element.wysiwygFrame.clientWidth - this.__paddingSize * 2 - 2;

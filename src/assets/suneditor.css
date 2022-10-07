@@ -310,6 +310,7 @@
 .sun-editor .se-modal .se-modal-inner .se-modal-footer > div > label {margin:0 5px 0 0;}
 .sun-editor .se-modal .se-modal-inner .se-modal-btn-radio {margin-left:12px; margin-right:6px;}
 .sun-editor .se-modal .se-modal-inner .se-modal-btn-check {margin-left:12px; margin-right:4px;}
+.sun-editor .se-modal .se-modal-inner .se-modal-btn-check:disabled + span {color:#999;}
 .sun-editor .se-modal .se-modal-inner .se-modal-form-footer .se-modal-btn-check {margin-left:0; margin-right:4px;}
 .sun-editor .se-modal .se-modal-inner .se-modal-form-footer label:first-child {margin-right:16px; margin-left:0px;}
 /* modal - modal - form - files */
@@ -346,7 +347,7 @@
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview > .se-math-katex-error {color:#b94a48; -webkit-box-shadow:0 0 0 0.1rem #f2dede; box-shadow:0 0 0 0.1rem #f2dede;}
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-math-preview > .se-math-katex-error svg {width:auto; height:30px; color:#b94a48;}
 /* modal - modal - link preview */
-.sun-editor .se-modal .se-modal-inner .se-link-preview {display:block; height:auto; max-height:18px; font-size:13px; font-weight:normal; font-family:inherit; color:#666; background-color:transparent; overflow:hidden; text-overflow:ellipsis; word-break:break-all; white-space:pre;}
+.sun-editor .se-modal .se-modal-inner .se-link-preview {display:block; height:auto; max-height:18px; font-size:13px; padding-top:2px; font-weight:normal; font-family:inherit; color:#666; background-color:transparent; overflow:hidden; text-overflow:ellipsis; word-break:break-all; white-space:pre;}
 /* modal - modal - anchor module */
 .sun-editor .se-modal .se-modal-inner .se-anchor-preview-form {width:100%; display:flex; margin-top:4px;}
 .sun-editor .se-modal .se-modal-inner .se-anchor-preview-form .se-svg.se-anchor-preview-icon {flex:unset; display:none; line-height:1.5; color:#4592ff;}
@@ -364,6 +365,7 @@
 /** --- controller ---------------------------------------------------------- */
 .sun-editor .se-controller .se-arrow.se-arrow-up {border-bottom-color:rgba(0, 0, 0, .25);}
 .sun-editor .se-controller {position:absolute; display:none; overflow:visible; z-index:6; border:1px solid rgba(0, 0, 0, .25); border-radius:4px; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
+.sun-editor .sun-editor-editable .se-component figure.se-figure-selected::after {pointer-events:none;}
 
 /* controller - button group */
 .sun-editor .se-controller .se-btn-group {position:relative; display:flex; vertical-align:middle; padding:2px; top:0; left:0;}
@@ -386,10 +388,10 @@
 
 /* controller - resizing(image, iframe) */
 .sun-editor .se-controller-resizing {padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
-.sun-editor .se-resizing-container {position:absolute; display:none; outline:none; border:0; padding:0; background-color:transparent; backface-visibility:hidden; -webkit-backface-visibility:hidden; -moz-backface-visibility:hidden;}
+.sun-editor .se-resizing-container {position:absolute; display:none; outline:none; pointer-events:none; border:0; padding:0; background-color:transparent; backface-visibility:hidden; -webkit-backface-visibility:hidden; -moz-backface-visibility:hidden;}
 .sun-editor .se-resizing-container .se-resize-dot {position:absolute; display:inline-block; outline:3px solid #80bdff; border:0; padding:0;}
 .sun-editor .se-resizing-container.se-resize-ing .se-resize-dot {outline:3px solid #4592ff;}
-.sun-editor .se-resizing-container .se-resize-dot > span {position:absolute; width:8px; height:8px; background-color:#4592ff; border:1px solid #4592ff;}
+.sun-editor .se-resizing-container .se-resize-dot > span {position:absolute; pointer-events:auto; width:8px; height:8px; border-radius:1px; background-color:#4592ff; border:1px solid #4592ff;}
 .sun-editor .se-resizing-container .se-resize-dot > span.tl {top:-6px; left:-6px; cursor:nw-resize;}
 .sun-editor .se-resizing-container .se-resize-dot > span.tr {top:-6px; right:-6px; cursor:ne-resize;}
 .sun-editor .se-resizing-container .se-resize-dot > span.bl {bottom:-6px; left:-6px; cursor:sw-resize;}
@@ -398,7 +400,7 @@
 .sun-editor .se-resizing-container .se-resize-dot > span.th {left:50%; top:-8px; cursor:n-resize;}
 .sun-editor .se-resizing-container .se-resize-dot > span.rw {right:-8px; bottom:50%; cursor:e-resize;}
 .sun-editor .se-resizing-container .se-resize-dot > span.bh {right:50%; bottom:-8px; cursor:s-resize;}
-.sun-editor .se-resizing-container .se-resize-display {position:absolute; right:0; bottom:0; padding:5px; margin:5px; font-size:12px; color:#fff; background-color:#333; border-radius:4px;}
+.sun-editor .se-resizing-container .se-resize-display {position:absolute; pointer-events:none; left:0; right:auto; top:-32px; padding:5px; margin:2px; font-size:12px; color:#fff; background-color:#333; border-radius:4px;}
 /* controller - table */
 .sun-editor .se-controller-table {width:auto; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-controller-table-cell {width:auto; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
@@ -532,7 +534,7 @@
 
 /** controller--- */
 .sun-editor.se-rtl .se-controller .se-btn-group {direction:rtl;}
-.sun-editor.se-rtl .se-resizing-container .se-resize-display {direction:rtl;}
+.sun-editor.se-rtl .se-resizing-container .se-resize-display {direction:rtl; left:auto; right:0;}
 /** --- RTL ---------------------------------------------------------- */
 
 /** button module float --------------------------------------------- */

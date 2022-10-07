@@ -22,6 +22,8 @@ const EventManager = function (editor) {
 	this._balloonDelay = null;
 	this._resizeObserver = null;
 	this._toolbarObserver = null;
+	this._lineBreaker_t = this.context.element.lineBreaker_t;
+	this._lineBreaker_b = this.context.element.lineBreaker_b;
 	this._onMousedownPlugins = editor._onMousedownPlugins;
 	this._onKeyDownPlugins = editor._onKeyDownPlugins;
 	this.__resize_editor = null;
@@ -583,10 +585,27 @@ EventManager.prototype = {
 	},
 
 	_moveController: function (eventWysiwyg) {
+		const y = eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0;
+		const x = eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0;
+
+		const t_style = this._lineBreaker_t.style;
+		const t_offset = (this._lineBreaker_t.getAttribute('data-offset') || ',').split(',');
+		if (t_style.display !== 'none') {
+			t_style.top = numbers.get(t_offset[0], 0) - y + 'px';
+			t_style.left = numbers.get(t_offset[1], 0) - x + 'px';
+		}
+
+		const b_style = this._lineBreaker_b.style;
+		const b_offset = (this._lineBreaker_b.getAttribute('data-offset') || ',').split(',');
+		if (b_style.display !== 'none') {
+			b_style.top = numbers.get(b_offset[0], 0) - y + 'px';
+			b_style.left = numbers.get(b_offset[1], 0) - x + 'px';
+		}
+
 		const openCont = this.editor.openControllers;
 		for (let i = 0; i < openCont.length; i++) {
-			openCont[i].form.style.top = openCont[i]._offset.top - (eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0) + 'px';
-			openCont[i].form.style.left = openCont[i]._offset.left - (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) + 'px';
+			openCont[i].form.style.top = openCont[i]._offset.top - y + 'px';
+			openCont[i].form.style.left = openCont[i]._offset.left - x + 'px';
 		}
 	},
 
@@ -1714,6 +1733,7 @@ function DisplayLineBreak(dir, e) {
 
 	const focusEl = isList ? format : format.firstChild;
 	this.selection.setRange(focusEl, 1, focusEl, 1);
+
 	// history stack
 	this.history.push(false);
 }

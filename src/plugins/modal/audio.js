@@ -111,7 +111,9 @@ audio.prototype = {
 	 * @override controller
 	 */
 	reset: function () {
+		if (!this._element) return;
 		domUtils.removeClass(this._element, 'active');
+		domUtils.removeClass(this._element.parentElement, 'se-figure-selected');
 	},
 
 	/**
@@ -128,6 +130,7 @@ audio.prototype = {
 	 */
 	ready: function (target) {
 		domUtils.addClass(target, 'active');
+		domUtils.addClass(target.parentElement, 'se-figure-selected');
 		this.controller.open(target);
 		this._element = target;
 	},
