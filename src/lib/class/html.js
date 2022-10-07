@@ -1121,18 +1121,17 @@ HTML.prototype = {
 		let duple = false;
 		(function recursionFunc(ancestor) {
 			if (domUtils.isWysiwygFrame(ancestor) || !inst.isTextStyleNode(ancestor)) return;
-
 			if (ancestor.nodeName === nodeName) {
 				duple = true;
-				(ancestor.style.cssText.match(/[^;]+;/g) || []).forEach(function (v) {
-					let i;
-					if ((i = oStyles.indexOf(v.trim())) > -1) {
-						oStyles.splice(i, 1);
+				const styles = ancestor.style.cssText.match(/[^;]+;/g) || [];
+				for (let i = 0, len = styles.length, j; i < len; i++) {
+					if ((j = oStyles.indexOf(styles[i].trim())) > -1) {
+						oStyles.splice(j, 1);
 					}
-				});
-				ancestor.classList.forEach(function (v) {
-					oNode.classList.remove(v);
-				});
+				}
+				for (let i = 0, len = ancestor.classList.length; i < len; i++) {
+					oNode.classList.remove(ancestor.classList[i]);
+				}
 			}
 
 			recursionFunc(ancestor.parentElement);
