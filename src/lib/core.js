@@ -1691,26 +1691,30 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let duple = false;
             (function recursionFunc(ancestor) {
                 if (util.isWysiwygDiv(ancestor) || !util.isTextStyleElement(ancestor)) return;
-
                 if (ancestor.nodeName === nodeName) {
                     duple = true;
-                    (ancestor.style.cssText.match(/[^;]+;/g) || []).forEach(function(v){
-                        let i;
-                        if ((i = oStyles.indexOf(v.trim())) > -1) {
-                            oStyles.splice(i, 1);
+                    const styles = ancestor.style.cssText.match(/[^;]+;/g) || [];
+                    for (let i = 0, len = styles.length, j; i < len; i++) {
+                        if ((j = oStyles.indexOf(styles[i].trim())) > -1) {
+                            oStyles.splice(j, 1);
                         }
-                    });
-                    ancestor.classList.forEach(function(v){
-                        oNode.classList.remove(v);
-                    });
+                    }
+                    for (let i = 0, len = ancestor.classList.length; i < len; i++) {
+                        oNode.classList.remove(ancestor.classList[i]);
+                    }
                 }
 
                 recursionFunc(ancestor.parentElement);
             })(parentNode);
 
             if (duple) {
-                if (!(oNode.style.cssText = oStyles.join(' '))) oNode.removeAttribute('style');
-                if (!oNode.attributes.length) oNode.setAttribute('data-se-duple', 'true');
+                if (!(oNode.style.cssText = oStyles.join(' '))) {
+                    oNode.setAttribute('style', '');
+                    oNode.removeAttribute('style');
+                }
+                if (!oNode.attributes.length) {
+                    oNode.setAttribute('data-se-duple', 'true');
+                }
             }
 
             return oNode;
