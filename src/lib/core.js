@@ -1742,8 +1742,8 @@ Core.prototype = {
 				this._onKeyDownPlugins.push(plugin.onPluginKeyDown.bind(plugin));
 			}
 
-			if (plugin.managedElement) {
-				const info = plugin.managedElement();
+			if (plugin.preservedClass) {
+				const info = plugin.preservedClass();
 				managedClass.push('.' + info.className);
 				this._MELInfo.map[info.className] = info.method;
 			}

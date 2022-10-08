@@ -1,4 +1,4 @@
-import fileBrowser from '../modules/fileBrowser';
+import FileBrowser from '../modules/FileBrowser';
 
 export default {
     name: 'imageGallery',
@@ -7,7 +7,7 @@ export default {
      * @param {Object} core Core object 
      */
     add: function (core) {
-        core.addModule([fileBrowser]);
+        core.addModule([FileBrowser]);
 
         const context = core.context;
         context.imageGallery = {

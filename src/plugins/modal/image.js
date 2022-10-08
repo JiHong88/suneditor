@@ -121,14 +121,13 @@ image.prototype = {
 			this._update(this.inputX.value, this.inputY.value);
 		}
 
-		let result;
 		if (this.imgInputFile && this.imgInputFile.files.length > 0) {
-			result = this._submitFile(this.imgInputFile.files);
+			return this._submitFile(this.imgInputFile.files);
 		} else if (this.imgUrlFile && this._linkValue.length > 0) {
-			result = this._submitURL(this._linkValue);
+			return this._submitURL(this._linkValue);
 		}
 
-		return result;
+		return false;
 	},
 
 	/**

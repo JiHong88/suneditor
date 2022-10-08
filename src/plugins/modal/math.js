@@ -50,10 +50,9 @@ math.prototype = {
 			this.controller.open(element);
 			domUtils.addClass(element, 'se-focus');
 			return true;
-		} else {
-			this._element = null;
-			return false;
 		}
+
+		return false;
 	},
 
 	/**
@@ -61,12 +60,13 @@ math.prototype = {
 	 */
 	reset: function () {
 		domUtils.removeClass(this._element, 'se-focus');
+		this._element = null;
 	},
 
 	/**
 	 * @override core
 	 */
-	managedElement: function () {
+	preservedClass: function () {
 		return {
 			className: 'katex',
 			method: function (element) {

@@ -364,15 +364,15 @@
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-mention-search {margin-bottom: 10px;} */
 
 /** --- controller ---------------------------------------------------------- */
+.sun-editor .se-controller {position:absolute; display:none; overflow:visible; z-index:6; padding:2px 2px 0 2px; margin:0; border:1px solid rgba(0, 0, 0, .25); border-radius:4px; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
 .sun-editor .se-controller .se-arrow.se-arrow-up {border-bottom-color:rgba(0, 0, 0, .25);}
-.sun-editor .se-controller {position:absolute; display:none; overflow:visible; z-index:6; border:1px solid rgba(0, 0, 0, .25); border-radius:4px; text-align:start; text-decoration:none; text-shadow:none; text-transform:none; letter-spacing:normal; word-break:normal; word-spacing:normal; word-wrap:normal; white-space:normal; background-color:#fff; -webkit-background-clip:padding-box; background-clip:padding-box; -webkit-box-shadow:0 5px 10px rgba(0, 0, 0, .2); box-shadow:0 5px 10px rgba(0, 0, 0, .2); line-break:auto;}
 .sun-editor .sun-editor-editable .se-component figure.se-figure-selected::after {pointer-events:none;}
 
 /* controller - button group */
-.sun-editor .se-controller .se-btn-group {position:relative; display:flex; vertical-align:middle; padding:2px; top:0; left:0;}
+.sun-editor .se-controller .se-btn-group {position:relative; display:flex; padding:0 0 2px 0; margin:0; top:0; left:0;}
 .sun-editor .se-controller .se-btn-group .se-btn-group-sub {left:50%; min-width:auto; width:max-content; display:none;/* display: inline-table; */}
 .sun-editor .se-controller .se-btn-group .se-btn-group-sub button {margin:0; min-width:72px;}
-.sun-editor .se-controller .se-btn-group button {position:relative; min-height:34px; height:auto; border:none; border-radius:4px; margin:1px; padding:5px 10px; font-size:12px; line-height:1.5; display:inline-block; font-weight:normal; text-align:center; white-space:nowrap; vertical-align:middle; -ms-touch-action:manipulation; touch-action:manipulation;}
+.sun-editor .se-controller .se-btn-group button {position:relative; min-height:34px; height:auto; border:none; border-radius:4px; margin:1px; padding:5px 10px; font-size:12px; line-height:1.5; display:inline-block; font-weight:normal; text-align:center; white-space:nowrap; -ms-touch-action:manipulation; touch-action:manipulation;}
 .sun-editor .se-controller .se-btn-group button:hover:enabled, .sun-editor .se-controller .se-btn-group button:focus:enabled {background-color:#e1e1e1; border-color:#d1d1d1; outline:0 none;}
 .sun-editor .se-controller .se-btn-group button:active:enabled {background-color:#d1d1d1; border-color:#c1c1c1; -webkit-box-shadow:inset 0 3px 5px #c1c1c1; box-shadow:inset 0 3px 5px #c1c1c1;}
 .sun-editor .se-controller .se-btn-group button span {display:block; padding:0; margin:0;}
@@ -388,7 +388,7 @@
 .sun-editor .se-controller .se-form-group input {min-width:120px;}
 
 /* controller - resizing(image, iframe) */
-.sun-editor .se-controller-resizing {padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
+.sun-editor .se-controller-resizing {font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-resizing-container {position:absolute; display:none; outline:none; pointer-events:none; border:0; padding:0; background-color:transparent; backface-visibility:hidden; -webkit-backface-visibility:hidden; -moz-backface-visibility:hidden;}
 .sun-editor .se-resizing-container .se-resize-dot {position:absolute; display:inline-block; outline:3px solid #80bdff; border:0; padding:0;}
 .sun-editor .se-resizing-container.se-resize-ing .se-resize-dot {outline:3px solid #4592ff;}
@@ -404,10 +404,10 @@
 .sun-editor .se-resizing-container .se-resize-display {position:absolute; pointer-events:none; right:0; left:auto; bottom:0; padding:5px; margin:2px; font-size:12px; color:#fff; background-color:#333; border-radius:4px; opacity:0.75;}
 .sun-editor .se-resizing-container.se-resize-ing .se-resize-display {opacity:1;}
 /* controller - table */
-.sun-editor .se-controller-table {width:auto; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
+.sun-editor .se-controller-table {width:auto; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-controller-table-cell {width:auto; padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 /* controller - link */
-.sun-editor .se-controller-link {padding:0; font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
+.sun-editor .se-controller-link {font-size:14px; font-style:normal; font-weight:normal; line-height:1.42857143;}
 .sun-editor .se-controller-link::before, .sun-editor .se-controller-link::after {-webkit-box-sizing:border-box; -moz-box-sizing:border-box; box-sizing:border-box;}
 .sun-editor .se-controller-link .link-content {padding:0; margin:0;}
 .sun-editor .se-controller-link .link-content a {display:inline-block; color:#4592ff; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle; margin-left:5px;}

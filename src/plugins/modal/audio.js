@@ -74,7 +74,7 @@ audio.prototype = {
 		} else if (this.audioUrlFile && this.urlValue.length > 0) {
 			return this._submitURL(this.urlValue);
 		}
-		return true;
+		return false;
 	},
 
 	/**

@@ -26,7 +26,7 @@ const video = function (editor, target) {
 	if (showAlign) modalEl.querySelector('._se_figure_align').style.display = 'none';
 
 	// modules
-    const videoRatio = options.videoRatio * 100 + '%';
+	const videoRatio = options.videoRatio * 100 + '%';
 	const defaultRatio = options.videoRatio * 100 + '%';
 	this.modal = new Modal(this, modalEl);
 	this.figure = new Figure(this, figureControls, { sizeUnit: options._videoSizeUnit, autoRatio: { current: videoRatio, default: defaultRatio } });
@@ -119,14 +119,13 @@ video.prototype = {
 	modalAction: function () {
 		this._align = this.modal.form.querySelector('input[name="suneditor_video_radio"]:checked').value;
 
-		let result;
 		if (this.videoInputFile && this.videoInputFile.files.length > 0) {
-			result = this._submitFile(this.videoInputFile.files);
+			return this._submitFile(this.videoInputFile.files);
 		} else if (this.videoUrlFile && this._linkValue.length > 0) {
-			result = this._submitURL(this._linkValue);
+			return this._submitURL(this._linkValue);
 		}
 
-		return result;
+		return false;
 	},
 
 	/**
@@ -479,8 +478,9 @@ video.prototype = {
 				const line = this.format.addLine(container, null);
 				if (line) this.selection.setRange(line, 0, line, 0);
 			}
-		} else if (this._resizing && this.figure.isVertical && changeSize) {
-			this.figure.setTransform(oFrame, width, height);
+		} else if (this._resizing && changeSize) {
+			if (this.figure.isVertical) this.figure.setTransform(oFrame, width, height);
+			this.figure.open(oFrame, this._nonResizing);
 		}
 	},
 
@@ -754,7 +754,9 @@ function CreateHTML_modal(editor) {
 			onlyWidthDisplay +
 			'>' +
 			'<label><input type="checkbox" class="se-modal-btn-check _se_video_check_proportion" />&nbsp;' +
-			'<span>' + lang.modalBox.proportion + '</span>' +
+			'<span>' +
+			lang.modalBox.proportion +
+			'</span>' +
 			'</label>' +
 			'</div>';
 	}

@@ -2,17 +2,6 @@ import EditorInterface from '../interface/editor';
 import { Controller, SelectMenu } from '../modules';
 import { domUtils, numbers } from '../helper';
 
-const DIRECTION_CURSOR_MAP = {
-	tl: 'nw-resize',
-	tr: 'ne-resize',
-	bl: 'sw-resize',
-	br: 'se-resize',
-	lw: 'w-resize',
-	th: 'n-resize',
-	rw: 'e-resize',
-	bh: 's-resize'
-};
-
 const Figure = function (inst, controls, params) {
 	EditorInterface.call(this, inst.editor);
 
@@ -189,6 +178,7 @@ Figure.prototype = {
 	},
 
 	open: function (target, nonResizing, __fileManagerInfo) {
+		this.editor.offCurrentController();
 		const figureInfo = Figure.GetContainer(target);
 		this._container = figureInfo.container;
 		this._cover = figureInfo.cover;
@@ -723,6 +713,7 @@ Figure.prototype = {
 // 	}
 // }
 
+const DIRECTION_CURSOR_MAP = { tl: 'nw-resize', tr: 'ne-resize', bl: 'sw-resize', br: 'se-resize', lw: 'w-resize', th: 'n-resize', rw: 'e-resize', bh: 's-resize' };
 function OnResizeContainer(e) {
 	e.stopPropagation();
 	e.preventDefault();
@@ -836,114 +827,111 @@ function OnClick_alignButton() {
 }
 
 function CreateHTML_resizeDot() {
-	const html =
-		'<div class="se-resize-dot">' +
-		'<span class="tl"></span>' +
-		'<span class="tr"></span>' +
-		'<span class="bl"></span>' +
-		'<span class="br"></span>' +
-		'<span class="lw"></span>' +
-		'<span class="th"></span>' +
-		'<span class="rw"></span>' +
-		'<span class="bh"></span>' +
-		'<div class="se-resize-display"></div>' +
-		'</div>';
-
+	const html = '<div class="se-resize-dot"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span><span class="lw"></span><span class="th"></span><span class="rw"></span><span class="bh"></span><div class="se-resize-display"></div></div>';
 	return domUtils.createElement('DIV', { class: 'se-controller se-resizing-container', style: 'display: none;' }, html);
 }
 
+const CONTROLLER_BUTTONS_MAP = {
+	percent_100: {
+		c: 'resize_percent',
+		v: '1',
+		l: 'resize100',
+		text: '<span>100%</span>'
+	},
+	percent_75: {
+		c: 'resize_percent',
+		v: '0.75',
+		l: 'resize75',
+		text: '<span>75%</span>'
+	},
+	percent_50: {
+		c: 'resize_percent',
+		v: '0.5',
+		l: 'resize50',
+		text: '<span>50%</span>'
+	},
+	percent_25: {
+		c: 'resize_percent',
+		v: '0.25',
+		l: 'resize25',
+		text: '<span>25%</span>'
+	},
+	auto: {
+		c: 'auto',
+		v: '',
+		l: 'autoSize',
+		icon: 'auto_size'
+	},
+	rotate_l: {
+		c: 'rotate',
+		v: '-90',
+		l: 'rotateLeft',
+		icon: 'rotate_left'
+	},
+	rotate_r: {
+		c: 'rotate',
+		v: '90',
+		l: 'rotateRight',
+		icon: 'rotate_right'
+	},
+	mirror_h: {
+		c: 'mirror',
+		v: 'h',
+		l: 'mirrorHorizontal',
+		icon: 'mirror_horizontal'
+	},
+	mirror_v: {
+		c: 'mirror',
+		v: 'v',
+		l: 'mirrorVertical',
+		icon: 'mirror_vertical'
+	},
+	align: {
+		c: 'onalign',
+		v: '',
+		l: 'align',
+		icon: 'align_justify'
+	},
+	caption: {
+		c: 'caption',
+		v: '',
+		l: 'caption',
+		icon: 'caption'
+	},
+	revert: {
+		c: 'revert',
+		v: '',
+		l: 'revertButton',
+		icon: 'revert'
+	},
+	edit: {
+		c: 'edit',
+		v: '',
+		l: 'edit',
+		icon: 'modify'
+	},
+	remove: {
+		c: 'edit',
+		v: '',
+		l: 'remove',
+		icon: 'delete'
+	}
+};
 function CreateHTML_controller(editor, controls) {
 	const lang = editor.lang;
 	const icons = editor.icons;
-	
-	// let html = '<div class="se-arrow se-arrow-up"></div>' +
+	let html = '<div class="se-arrow se-arrow-up"></div>';
+	for (let i = 0, group; i < controls.length; i++) {
+		group = controls[i];
+		html += '<div class="se-btn-group">';
+		for (let j = 0, len = group.length, m; j < len; j++) {
+			m = CONTROLLER_BUTTONS_MAP[group[j]];
+			html += '<button type="button" data-command="' + m.c + '" data-value="' + m.v + '" class="se-tooltip">' + (icons[m.icon] || m.text || '!') + '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (lang.controller[m.l] || m.l) + '</span></span></button>';
+		}
+		html += '</div>';
+	}
 
-	const htmlll =
-		'<div class="se-arrow se-arrow-up"></div>' +
-		'<div class="se-btn-group">' +
-		'<button type="button" data-command="resize_percent" data-value="1" class="se-tooltip">' +
-		'<span>100%</span>' +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.resize100 +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="resize_percent" data-value="0.75" class="se-tooltip">' +
-		'<span>75%</span>' +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.resize75 +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="resize_percent" data-value="0.5" class="se-tooltip">' +
-		'<span>50%</span>' +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.resize50 +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="auto" class="se-btn se-tooltip">' +
-		icons.auto_size +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.autoSize +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="rotate" data-value="-90" class="se-btn se-tooltip">' +
-		icons.rotate_left +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.rotateLeft +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="rotate" data-value="90" class="se-btn se-tooltip">' +
-		icons.rotate_right +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.rotateRight +
-		'</span></span>' +
-		'</button>' +
-		'</div>' +
-		'<div class="se-btn-group" style="padding-top: 0;">' +
-		'<button type="button" data-command="mirror" data-value="h" class="se-btn se-tooltip">' +
-		icons.mirror_horizontal +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.mirrorHorizontal +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="mirror" data-value="v" class="se-btn se-tooltip">' +
-		icons.mirror_vertical +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.mirrorVertical +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="onalign" class="se-btn se-tooltip">' +
-		icons.align_justify +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.toolbar.align +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="caption" class="se-btn se-tooltip">' +
-		icons.caption +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.modalBox.caption +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="revert" class="se-btn se-tooltip">' +
-		icons.revert +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.modalBox.revertButton +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="edit" class="se-btn se-tooltip">' +
-		icons.modify +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.edit +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="remove" class="se-btn se-tooltip">' +
-		icons.delete +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.remove +
-		'</span></span>' +
-		'</button>' +
-		'</div>';
-
-	return domUtils.createElement('DIV', { class: 'se-controller se-controller-resizing' }, htmlll);
+	return domUtils.createElement('DIV', { class: 'se-controller se-controller-resizing' }, html);
 }
 
 export default Figure;
