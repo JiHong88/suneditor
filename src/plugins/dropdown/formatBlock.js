@@ -84,123 +84,13 @@ formatBlock.prototype = {
 	 * @param {"line"|"br-line"|"block"} command Format block command
 	 * @param {Element} tag Command element
 	 */
-	action: function (command, value, tag, className) {
-		// blockquote
+	action: function (command, tag) {
 		if (command === 'block') {
-			const rangeElement = tag.cloneNode(false);
-			this.format.applyBlock(rangeElement);
-		}
-		// free, replace
-		else {
-			let range = this.selection.getRange();
-			let selectedFormsts = this.format.getLinesAndComponents(false);
-
-			if (selectedFormsts.length === 0) {
-				range = this.selection.getRangeAndAddLine(range, null);
-				selectedFormsts = this.format.getLinesAndComponents(false);
-				if (selectedFormsts.length === 0) return;
-			}
-
-			const startOffset = range.startOffset;
-			const endOffset = range.endOffset;
-
-			let first = selectedFormsts[0];
-			let last = selectedFormsts[selectedFormsts.length - 1];
-			const firstPath = domUtils.getNodePath(range.startContainer, first, null, null);
-			const lastPath = domUtils.getNodePath(range.endContainer, last, null, null);
-
-			// remove selected list
-			const rlist = this.format.removeList(selectedFormsts, false);
-			if (rlist.sc) first = rlist.sc;
-			if (rlist.ec) last = rlist.ec;
-
-			// change format tag
-			this.selection.setRange(domUtils.getNodeFromPath(firstPath, first), startOffset, domUtils.getNodeFromPath(lastPath, last), endOffset);
-			const modifiedFormsts = this.format.getLinesAndComponents(false);
-
-			// free format
-			if (command === 'br-line') {
-				const len = modifiedFormsts.length - 1;
-				let parentNode = modifiedFormsts[len].parentNode;
-				let freeElement = tag.cloneNode(false);
-				const focusElement = freeElement;
-
-				for (let i = len, f, html, before, next, inner, isComp, first = true; i >= 0; i--) {
-					f = modifiedFormsts[i];
-					if (f === (!modifiedFormsts[i + 1] ? null : modifiedFormsts[i + 1].parentNode)) continue;
-
-					isComp = this.component.is(f);
-					html = isComp ? '' : f.innerHTML.replace(/(?!>)\s+(?=<)|\n/g, ' ');
-					before = domUtils.getParentElement(f, function (current) {
-						return current.parentNode === parentNode;
-					});
-
-					if (parentNode !== f.parentNode || isComp) {
-						if (this.format.isLine(parentNode)) {
-							parentNode.parentNode.insertBefore(freeElement, parentNode.nextSibling);
-							parentNode = parentNode.parentNode;
-						} else {
-							parentNode.insertBefore(freeElement, before ? before.nextSibling : null);
-							parentNode = f.parentNode;
-						}
-
-						next = freeElement.nextSibling;
-						if (next && freeElement.nodeName === next.nodeName && domUtils.isSameAttributes(freeElement, next)) {
-							freeElement.innerHTML += '<BR>' + next.innerHTML;
-							domUtils.removeItem(next);
-						}
-
-						freeElement = tag.cloneNode(false);
-						first = true;
-					}
-
-					inner = freeElement.innerHTML;
-					freeElement.innerHTML = (first || !html || !inner || /<br>$/i.test(html) ? html : html + '<BR>') + inner;
-
-					if (i === 0) {
-						parentNode.insertBefore(freeElement, f);
-						next = f.nextSibling;
-						if (next && freeElement.nodeName === next.nodeName && domUtils.isSameAttributes(freeElement, next)) {
-							freeElement.innerHTML += '<BR>' + next.innerHTML;
-							domUtils.removeItem(next);
-						}
-
-						const prev = freeElement.previousSibling;
-						if (prev && freeElement.nodeName === prev.nodeName && domUtils.isSameAttributes(freeElement, prev)) {
-							prev.innerHTML += '<BR>' + freeElement.innerHTML;
-							domUtils.removeItem(freeElement);
-						}
-					}
-
-					if (!isComp) domUtils.removeItem(f);
-					if (!!html) first = false;
-				}
-
-				this.selection.setRange(focusElement, 0, focusElement, 0);
-			}
-			// line
-			else {
-				for (let i = 0, len = modifiedFormsts.length, node, newFormat; i < len; i++) {
-					node = modifiedFormsts[i];
-
-					if ((node.nodeName.toLowerCase() !== value.toLowerCase() || (node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) && !this.component.is(node)) {
-						newFormat = tag.cloneNode(false);
-						domUtils.copyFormatAttributes(newFormat, node);
-						newFormat.innerHTML = node.innerHTML;
-
-						node.parentNode.replaceChild(newFormat, node);
-					}
-
-					if (i === 0) first = newFormat || node;
-					if (i === len - 1) last = newFormat || node;
-					newFormat = null;
-				}
-
-				this.selection.setRange(domUtils.getNodeFromPath(firstPath, first), startOffset, domUtils.getNodeFromPath(lastPath, last), endOffset);
-			}
-
-			// history stack
-			this.history.push(false);
+			this.format.applyBlock(tag);
+		} else if (command === 'br-line') {
+			this.format.setBrLine(tag);
+		} else {
+			this.format.setLine(tag);
 		}
 
 		this.menu.dropdownOff();
@@ -224,7 +114,7 @@ function OnClickMenu(e) {
 	const target = domUtils.getCommandTarget(e.target);
 	if (!target) return;
 
-	this.action(target.getAttribute('data-command'), target.getAttribute('data-value'), target.firstChild, target.getAttribute('data-class'));
+	this.action(target.getAttribute('data-command'), target.firstChild);
 }
 
 function CreateHTML(editor) {
@@ -252,7 +142,7 @@ function CreateHTML(editor) {
 			attrs = className ? ' class="' + className + '"' : '';
 		}
 
-		list += '<li>' + '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + tagName + '" data-class="' + className + '" title="' + name + '" aria-label="' + name + '">' + '<' + tagName + attrs + '>' + name + '</' + tagName + '>' + '</button></li>';
+		list += '<li>' + '<button type="button" class="se-btn-list" data-command="' + command + '" title="' + name + '" aria-label="' + name + '">' + '<' + tagName + attrs + '>' + name + '</' + tagName + '>' + '</button></li>';
 	}
 	list += '</ul></div>';
 

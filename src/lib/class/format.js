@@ -18,19 +18,21 @@ Format.prototype = {
 	 * @param {Element} element Line element (P, DIV..)
 	 */
 	setLine: function (element) {
-		if (!this.isBrLine(element)) {
+		if (!this.isLine(element)) {
 			throw new Error('[SUNEDITOR.format.setLine.fail] The "element" must satisfy "format.isLine()".');
 		}
 
 		const info = this._lineWork();
 		const lines = info.lines;
-		let firstNode = info.firstNode;
-		let lastNode = info.lastNode;
+		const className = element.className;
+		const value = element.nodeName;
+		let first = info.firstNode;
+		let last = info.lastNode;
 
 		for (let i = 0, len = lines.length, node, newFormat; i < len; i++) {
 			node = lines[i];
 
-			if ((node.nodeName.toLowerCase() !== value.toLowerCase() || (node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) && !this.component.is(node)) {
+			if ((node.nodeName !== value || (node.className.match(/(\s|^)__se__format__[^\s]+/) || [''])[0].trim() !== className) && !this.component.is(node)) {
 				newFormat = element.cloneNode(false);
 				domUtils.copyFormatAttributes(newFormat, node);
 				newFormat.innerHTML = node.innerHTML;
@@ -38,12 +40,12 @@ Format.prototype = {
 				node.parentNode.replaceChild(newFormat, node);
 			}
 
-			if (i === 0) firstNode = newFormat || node;
-			if (i === len - 1) lastNode = newFormat || node;
+			if (i === 0) first = newFormat || node;
+			if (i === len - 1) last = newFormat || node;
 			newFormat = null;
 		}
 
-		this.selection.setRange(domUtils.getNodeFromPath(info.firstPath, firstNode), startOffset, domUtils.getNodeFromPath(info.lastPath, lastNode), endOffset);
+		this.selection.setRange(domUtils.getNodeFromPath(info.firstPath, first), info.startOffset, domUtils.getNodeFromPath(info.lastPath, last), info.endOffset);
 
 		// history stack
 		this.history.push(false);
@@ -76,7 +78,7 @@ Format.prototype = {
 
 	/**
 	 * @description Replace the br-line tag of the current selection.
-	 * @param {Element} element Line element (P, DIV..)
+	 * @param {Element} element BR-Line element (PRE..)
 	 */
 	setBrLine: function (element) {
 		if (!this.isBrLine(element)) {
@@ -277,6 +279,7 @@ Format.prototype = {
 			pElement = standTag.parentNode;
 		}
 
+		block = block.cloneNode(false);
 		let parentDepth = domUtils.getNodeDepth(standTag);
 		let listParent = null;
 		const lineArr = [];
@@ -916,7 +919,7 @@ Format.prototype = {
 
 		// list cells
 		if (cells.length > 0) {
-			this.format._applyNestedList(cells, true);
+			this._applyNestedList(cells, true);
 		}
 
 		this.editor.effectNode = null;
@@ -942,7 +945,7 @@ Format.prototype = {
 
 		// list cells
 		if (cells.length > 0) {
-			this.format._applyNestedList(cells, false);
+			this._applyNestedList(cells, false);
 		}
 
 		this.editor.effectNode = null;
@@ -1532,6 +1535,11 @@ Format.prototype = {
 		return element && element.nodeType !== 3 && (domUtils.isNonEditable(element) || !this.isTextStyleNode(element));
 	},
 
+	/**
+	 * @description Get current selected lines and selected node info.
+	 * @returns { lines: Array.<Element>, firstNode: Node,  lastNode: Node, firstPath: Array.<number>, lastPath: Array.<number>, startOffset: number, endOffset: number }
+	 * @private
+	 */
 	_lineWork: function () {
 		let range = this.selection.getRange();
 		let selectedFormsts = this.getLinesAndComponents(false);
@@ -1563,7 +1571,9 @@ Format.prototype = {
 			firstNode: first,
 			lastNode: last,
 			firstPath: firstPath,
-			lastPath: lastPath
+			lastPath: lastPath,
+			startOffset: startOffset,
+			endOffset: endOffset
 		};
 	},
 
