@@ -1,8 +1,9 @@
 import _icons from '../assets/defaultIcons';
 import _defaultLang from '../langs/en';
 import { domUtils, numbers, converter, env } from '../helper';
-import { _d, _w } from '../helper/global';
 
+const _d = env._d;
+const _w = env._w;
 const DEFAULT_ELEMENT_WHITELIST = 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls';
 const DEFAULT_BUTTON_LIST = [['undo', 'redo'], ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'], ['removeFormat'], ['outdent', 'indent'], ['fullScreen', 'showBlocks', 'codeView'], ['preview', 'print']];
@@ -27,7 +28,7 @@ const Constructor = function (element, options) {
 	const relative = domUtils.createElement('DIV', { class: 'se-container' });
 
 	// toolbar
-	const tool_bar = _createToolBar(options.buttonList, options.plugins, options);
+	const tool_bar = CreateToolBar(options.buttonList, options.plugins, options);
 	const toolbarShadow = tool_bar.element.cloneNode(false);
 	toolbarShadow.className += ' se-toolbar-shadow';
 	tool_bar.element.style.visibility = 'hidden';
@@ -129,7 +130,7 @@ export function ResetOptions(mergeOptions, context, originOptions) {
 	const isNewToolbarContainer = mergeOptions.toolbar_container && mergeOptions.toolbar_container !== originOptions.toolbar_container;
 	const isNewToolbar = mergeOptions.lang !== originOptions.lang || mergeOptions.buttonList !== originOptions.buttonList || mergeOptions.mode !== originOptions.mode || isNewToolbarContainer;
 
-	const tool_bar = _createToolBar(isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList, mergeOptions.plugins, mergeOptions);
+	const tool_bar = CreateToolBar(isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList, mergeOptions.plugins, mergeOptions);
 	if (tool_bar.pluginCallButtons.math) _checkKatexMath(mergeOptions.katex);
 	const arrow = domUtils.createElement('DIV', { class: 'se-arrow' });
 
@@ -767,7 +768,7 @@ export function UpdateButton(element, plugin) {
  * @param {Array} options options
  * @returns {Object} { element: (Element) Toolbar element, plugins: (Array|null) Plugins Array, pluginCallButtons: (Object), responsiveButtons: (Array) }
  */
-function _createToolBar(buttonList, plugins, options) {
+export function CreateToolBar(buttonList, plugins, options) {
 	const _buttonTray = domUtils.createElement('DIV', { class: 'se-btn-tray' });
 	const separator_vertical = domUtils.createElement('DIV', { class: 'se-toolbar-separator-vertical' });
 	const tool_bar = domUtils.createElement('DIV', { class: 'se-toolbar sun-editor-common' }, _buttonTray);

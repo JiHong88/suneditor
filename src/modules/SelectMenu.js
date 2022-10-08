@@ -1,5 +1,3 @@
-'use strict';
-
 import CoreInterface from '../interface/_core';
 import { domUtils } from '../helper';
 

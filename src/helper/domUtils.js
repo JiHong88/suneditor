@@ -1,5 +1,4 @@
-import { _allowedEmptyNodeList } from './env';
-import { _d, _w } from './global';
+import { _d, _w } from './env';
 import { onlyZeroWidthRegExp, zeroWidthRegExp } from './unicode';
 
 /**

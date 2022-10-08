@@ -1,5 +1,3 @@
-'use strict';
-
 import { domUtils } from '../../helper';
 import EditorInterface from '../../interface/editor';
 

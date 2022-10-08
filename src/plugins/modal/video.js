@@ -1,5 +1,3 @@
-'use strict';
-
 import EditorInterface from '../../interface/editor';
 import { Modal, Figure, FileManager } from '../../modules';
 import { domUtils, numbers } from '../../helper';
@@ -263,9 +261,10 @@ video.prototype = {
 		}
 
 		const limitSize = this.options.videoUploadSizeLimit;
-		if (limitSize > 0 && fileSize + this.fileManager.getSize() > limitSize) {
+		const currentSize = this.fileManager.getSize();
+		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.video.submitFile.fail] Size of uploadable total videos: ' + limitSize / 1000 + 'KB';
-			if (typeof this.events.onVideoUploadError !== 'function' || this.events.onVideoUploadError(err, { limitSize: limitSize, currentSize: infoSize, uploadSize: fileSize })) {
+			if (typeof this.events.onVideoUploadError !== 'function' || this.events.onVideoUploadError(err, { limitSize: limitSize, currentSize: currentSize, uploadSize: fileSize })) {
 				this.notice.open(err);
 			}
 			return false;
@@ -495,12 +494,6 @@ video.prototype = {
 			if (!attrs.hasOwnProperty(key)) continue;
 			element.setAttribute(key, attrs[key]);
 		}
-	},
-
-	_createVideoTag: function () {
-		const videoTag = domUtils.createElement('VIDEO');
-		this._setTagAttrs(videoTag);
-		return videoTag;
 	},
 
 	_setIframeAttrs: function (element) {

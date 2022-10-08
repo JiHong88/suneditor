@@ -1,5 +1,3 @@
-'use strict';
-
 import './assets/suneditor.css';
 import './assets/suneditor-content.css';
 

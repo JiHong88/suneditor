@@ -1,5 +1,3 @@
-'use strict';
-
 import EditorInterface from '../../interface/editor';
 import { domUtils, numbers } from '../../helper';
 import { Controller, SelectMenu } from '../../modules';
@@ -1313,11 +1311,11 @@ function OffCellMultiSelect(e) {
 	}
 }
 
-function OffCellShift(e) {
+function OffCellShift() {
 	if (!this._ref) this._closeController();
 }
 
-function OffCellTouch(e) {
+function OffCellTouch() {
 	this.reset();
 }
 

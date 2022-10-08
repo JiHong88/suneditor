@@ -1,5 +1,3 @@
-'use strict';
-
 import EditorInterface from '../../interface/editor';
 import { Modal, Figure, FileManager, ModalAnchorEditor } from '../../modules';
 import { domUtils, numbers } from '../../helper';
@@ -259,9 +257,10 @@ image.prototype = {
 		}
 
 		const limitSize = this.options.imageUploadSizeLimit;
-		if (limitSize > 0 && fileSize + this.fileManager.getSize() > limitSize) {
+		const currentSize = this.fileManager.getSize();
+		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + limitSize / 1000 + 'KB';
-			if (typeof this.events.onImageUploadError !== 'function' || this.events.onImageUploadError(err, { limitSize: limitSize, currentSize: infoSize, uploadSize: fileSize })) {
+			if (typeof this.events.onImageUploadError !== 'function' || this.events.onImageUploadError(err, { limitSize: limitSize, currentSize: currentSize, uploadSize: fileSize })) {
 				this.notice.open(err);
 			}
 			return false;
@@ -696,7 +695,7 @@ function OnfileInputChange() {
 }
 
 function OpenGallery() {
-	thisGallery.open(_setUrlInput.bind(this));
+	this.gallery.open(_setUrlInput.bind(this));
 }
 
 function _setUrlInput(target) {

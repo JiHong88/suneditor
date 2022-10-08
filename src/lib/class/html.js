@@ -4,7 +4,7 @@
  */
 
 import CoreInterface from '../../interface/_core';
-import { domUtils, converter, numbers, unicode, global } from '../../helper';
+import { domUtils, converter, numbers, unicode, env } from '../../helper';
 
 const HTML = function (editor) {
 	CoreInterface.call(this, editor);
@@ -1064,7 +1064,7 @@ HTML.prototype = {
 				for (let i = 0, len = style.length, r; i < len; i++) {
 					r = style[i].match(/([a-zA-Z0-9-]+)(:)([^"]+$)/);
 					if (r && !/inherit|initial/i.test(r[3])) {
-						const k = global.kebabToCamelCase(r[1].trim());
+						const k = env.kebabToCamelCase(r[1].trim());
 						const v = this.wwComputedStyle[k].replace(/"/g, '');
 						const c = r[3].trim();
 						switch (k) {

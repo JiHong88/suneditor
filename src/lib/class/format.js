@@ -4,12 +4,12 @@
  */
 
 import CoreInterface from '../../interface/_core';
-import { domUtils, unicode, numbers, global } from '../../helper';
+import { domUtils, unicode, numbers, env } from '../../helper';
 
 const Format = function (editor) {
 	CoreInterface.call(this, editor);
 	this._listCamel = this.options.__listCommonStyle;
-	this._listKebab = global.camelToKebabCase(this.options.__listCommonStyle);
+	this._listKebab = env.camelToKebabCase(this.options.__listCommonStyle);
 };
 
 Format.prototype = {
@@ -989,7 +989,7 @@ Format.prototype = {
 			const format = startCon.parentNode;
 			if (
 				!domUtils.isListCell(format) ||
-				!global.getValues(format.style).some(
+				!env.getValues(format.style).some(
 					function (k) {
 						return this._listKebab.indexOf(k) > -1;
 					}.bind(this)
@@ -3034,7 +3034,7 @@ Format.prototype = {
 		if (this.options._styleNodeMap[nodeName] === this.options._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic';
 
 		// styles
-		const cKeys = global.getValues(childStyle);
+		const cKeys = env.getValues(childStyle);
 		if (cKeys.length > 0) {
 			for (let i = 0, len = this._listCamel.length; i < len; i++) {
 				if (cKeys.indexOf(this._listKebab[i]) > -1) {
@@ -3081,7 +3081,7 @@ Format.prototype = {
 
 		const ec = [],
 			ek = [],
-			elKeys = global.getValues(elStyles);
+			elKeys = env.getValues(elStyles);
 		for (let i = 0, len = this._listKebab.length; i < len; i++) {
 			if (elKeys.indexOf(this._listKebab[i]) > -1 && styleArray.indexOf(this._listKebab[i]) > -1) {
 				ec.push(this._listCamel[i]);
@@ -3105,7 +3105,7 @@ Format.prototype = {
 			c = children[i];
 			if (this.options._styleNodeMap[c.nodeName.toLowerCase()]) continue;
 
-			s = global.getValues(c.style);
+			s = env.getValues(c.style);
 			if (
 				s.length === 0 ||
 				(ec.some(function (k) {

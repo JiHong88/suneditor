@@ -1,4 +1,4 @@
-import { _w } from './global';
+import { _w } from './env';
 
 const zwsp = 8203;
 

@@ -1,4 +1,4 @@
-import Helper, { global, env, converter, unicode, domUtils, numbers } from '../helper';
+import Helper, { env, converter, domUtils, numbers } from '../helper';
 import { ResetOptions, UpdateButton } from './constructor';
 import Context from './context';
 
@@ -15,7 +15,7 @@ import Component from './class/component';
 import Format from './class/format';
 import HTML from './class/html';
 import Menu from './class/menu';
-import Node from './class/node';
+import Node_ from './class/node';
 import Notice from './class/notice';
 import Offset from './class/offset';
 import Selection from './class/selection';
@@ -33,8 +33,8 @@ import Toolbar from './class/toolbar';
  * @returns {Object} functions Object
  */
 const Core = function (context, pluginCallButtons, plugins, lang, options, _responsiveButtons) {
-	const _d = context.element.originElement.ownerDocument || global._d;
-	const _w = _d.defaultView || global._w;
+	const _d = context.element.originElement.ownerDocument || env._d;
+	const _w = _d.defaultView || env._w;
 
 	/**
 	 * @description Document object
@@ -380,7 +380,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	/**
 	 * @description Parser
 	 */
-	this._parser = new global._w.DOMParser();
+	this._parser = new env._w.DOMParser();
 
 	// ----- Core init -----
 	// Create to sibling node
@@ -574,7 +574,7 @@ Core.prototype = {
 				this.showBlocks(!this.status.isShowBlocks);
 				break;
 			case 'dir':
-				this.setDir(options.textDirection);
+				this.setDir(this.options.textDirection);
 				break;
 			case 'dir_ltr':
 				this.setDir('ltr');
@@ -977,8 +977,8 @@ Core.prototype = {
 		}
 
 		if (buttons.dir) {
-			domUtils.changeTxt(buttons.dir.querySelector('.se-tooltip-text'), this.lang.toolbar[options._rtl ? 'dir_ltr' : 'dir_rtl']);
-			domUtils.changeElement(buttons.dir.firstElementChild, icons[this.options._rtl ? 'dir_ltr' : 'dir_rtl']);
+			domUtils.changeTxt(buttons.dir.querySelector('.se-tooltip-text'), this.lang.toolbar[this.options._rtl ? 'dir_ltr' : 'dir_rtl']);
+			domUtils.changeElement(buttons.dir.firstElementChild, this.icons[this.options._rtl ? 'dir_ltr' : 'dir_rtl']);
 		}
 
 		if (buttons.dir_ltr) {
@@ -1177,7 +1177,7 @@ Core.prototype = {
 			}
 		}
 
-		if (wasToolbarHidden) functions.toolbar.hide();
+		if (wasToolbarHidden) this.toolbar.hide();
 
 		// user event
 		if (typeof this.events.onToggleFullScreen === 'function') this.events.onToggleFullScreen(this.status.isFullScreen);
@@ -1313,10 +1313,11 @@ Core.prototype = {
 	 * @description Copying the content of the editor to the original textarea and execute onSave callback.
 	 */
 	save: function () {
-		this.context.element.originElement.value = this.getContent(false);
+		const value = this.getContent(false);
+		this.context.element.originElement.value = value;
 		// user event
 		if (typeof this.events.onSave === 'function') {
-			this.events.onSave(content, core);
+			this.events.onSave(value);
 			return;
 		}
 	},
@@ -1449,7 +1450,8 @@ Core.prototype = {
 	 */
 	_convertHTMLForCodeView: function (html, comp) {
 		let returnHTML = '';
-		const wRegExp = this._w.RegExp;
+		const _w = this._w;
+		const wRegExp = _w.RegExp;
 		const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
 		const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
 		const isFormat = function (current) {
@@ -1458,7 +1460,7 @@ Core.prototype = {
 		const brChar = comp ? '' : '\n';
 
 		let indentSize = comp ? 0 : this.status.codeIndent * 1;
-		indentSize = indentSize > 0 ? new this._w.Array(indentSize + 1).join(' ') : '';
+		indentSize = indentSize > 0 ? new _w.Array(indentSize + 1).join(' ') : '';
 
 		(function recursionFunc(element, indent) {
 			const children = element.childNodes;
@@ -1671,7 +1673,7 @@ Core.prototype = {
 		this.notice = new Notice(this);
 		this.shortcuts = new Shortcuts(this);
 		// main classes
-		this.node = new Node(this);
+		this.node = new Node_(this);
 		this.html = new HTML(this);
 		this.component = new Component(this);
 		this.format = new Format(this);
@@ -1879,7 +1881,7 @@ Core.prototype = {
 	__callResizeFunction: function (h, resizeObserverEntry) {
 		h = h === -1 ? (resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0] ? resizeObserverEntry.borderBoxSize[0].blockSize : (resizeObserverEntry.contentRect.height + this._editorHeightPadding)) : h;
 		if (this._editorHeight !== h) {
-			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, this._editorHeight, core, resizeObserverEntry);
+			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, this._editorHeight, resizeObserverEntry);
 			this._editorHeight = h;
 		}
 	},

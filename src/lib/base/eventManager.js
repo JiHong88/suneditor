@@ -5,8 +5,8 @@
 
 import CoreInterface from '../../interface/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
-import { _w, _d } from '../../helper/global';
 
+const _w = env._w;
 const DIRECTION_KEYCODE = new _w.RegExp('^(8|13|3[2-9]|40|46)$');
 const NON_TEXT_KEYCODE = new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$');
 const HISTORY_IGNORE_KEYCODE = new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$');
@@ -308,7 +308,7 @@ EventManager.prototype = {
 			return;
 		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-se-embed') === 'true') {
 			let el = commonCon.nextElementSibling;
-			if (!this.format.isLine(el)) el = this.format.addLine(commonCon, options.defaultLineTag);
+			if (!this.format.isLine(el)) el = this.format.addLine(commonCon, this.options.defaultLineTag);
 			this.selection.setRange(el.firstChild, 0, el.firstChild, 0);
 			return;
 		}
@@ -1305,7 +1305,7 @@ function OnKeyDown_wysiwyg(e) {
 						else newEl = this.node.split(range.endContainer, range.endOffset, 0);
 					}
 
-					const resetAttr = options.lineAttrReset === '*' ? null : options.lineAttrReset;
+					const resetAttr = this.options.lineAttrReset === '*' ? null : this.options.lineAttrReset;
 					const attrs = newEl.attributes;
 					let i = 0;
 					while (attrs[i]) {

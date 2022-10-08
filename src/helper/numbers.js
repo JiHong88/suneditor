@@ -1,4 +1,4 @@
-import { _w } from './global';
+import { _w } from './env';
 
 /**
  * @description Checks for numeric (with decimal point).
@@ -49,6 +49,6 @@ const numbers = {
     is: is,
     get: get,
     getOverlapRangeAtIndex: getOverlapRangeAtIndex
-}
+};
 
 export default numbers;

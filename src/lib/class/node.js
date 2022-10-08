@@ -6,16 +6,16 @@
 import CoreInterface from '../../interface/_core';
 import { domUtils, unicode, env, numbers } from '../../helper';
 
-const Node = function (editor) {
+const Node_ = function (editor) {
 	CoreInterface.call(this, editor);
 };
 
-Node.prototype = {
+Node_.prototype = {
 	/**
 	 * @description Split all tags based on "baseNode"
 	 * Returns the last element of the splited tag.
-	 * @param {Node} baseNode Element or text node on which to base
-	 * @param {Number|Node|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
+	 * @param {Node_} baseNode Element or text node on which to base
+	 * @param {Number|Node_|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
 	 * @param {number} depth The nesting depth of the element being split. (default: 0)
 	 * @returns {Element}
 	 */
@@ -283,7 +283,7 @@ Node.prototype = {
 	/**
 	 * @description Delete itself and all parent nodes that match the condition.
 	 * Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
-	 * @param {Node} item Node to be remove
+	 * @param {Node_} item Node to be remove
 	 * @param {Function|null} validation Validation function. default(Deleted if it only have breakLine and blanks)
 	 * @param {Element|null} stopParent Stop when the parent node reaches stopParent
 	 * @returns {Object|null} {sc: previousSibling, ec: nextSibling}
@@ -319,7 +319,7 @@ Node.prototype = {
 	/**
 	 * @description Delete a empty child node of argument element
 	 * @param {Element} element Element node
-	 * @param {Node|null} notRemoveNode Do not remove node
+	 * @param {Node_|null} notRemoveNode Do not remove node
 	 */
 	removeEmptyNode: function (element, notRemoveNode) {
 		const inst = this;
@@ -363,7 +363,7 @@ Node.prototype = {
 		});
 	},
 
-	constructor: Node
+	constructor: Node_
 };
 
-export default Node;
+export default Node_;

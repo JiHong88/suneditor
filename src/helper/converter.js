@@ -1,7 +1,7 @@
 import {
 	_d,
 	_w
-} from './global';
+} from './env';
 
 /**
  * @description Convert HTML string to HTML Entity

@@ -1,5 +1,3 @@
-'use strict';
-
 import EditorInterface from '../../interface/editor';
 import { Modal, Controller, FileManager, Figure } from '../../modules';
 import { domUtils } from '../../helper';

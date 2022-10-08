@@ -1,5 +1,3 @@
-'use strict';
-
 import fileBrowser from '../modules/fileBrowser';
 
 export default {

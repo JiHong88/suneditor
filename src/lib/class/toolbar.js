@@ -6,6 +6,7 @@
 import Context from '../context';
 import { domUtils, unicode } from '../../helper';
 import CoreInterface from '../../interface/_core';
+import { CreateToolBar } from '../constructor';
 
 const Toolbar = function (editor) {
 	CoreInterface.call(this, editor);
@@ -76,8 +77,8 @@ Toolbar.prototype = {
 		this.menu.containerOff();
 		this.menu._moreLayerOff();
 
-		const newToolbar = Constructor._createToolBar(this._d, buttonList, this.plugins, this.options);
-		_responsiveButtons = newToolbar.responsiveButtons;
+		const newToolbar = CreateToolBar(this._d, buttonList, this.plugins, this.options);
+		this._responsiveButtons = newToolbar.responsiveButtons;
 		this._setResponsive();
 
 		this.context.element.toolbar.replaceChild(newToolbar._buttonTray, this.context.element._buttonTray);
@@ -92,9 +93,9 @@ Toolbar.prototype = {
 		this.history._resetCachingButton();
 
 		this.editor.effectNode = null;
-		if (core.hasFocus) this.eventMenager.applyTagEffect();
-		if (core.isReadOnly) domUtils.setDisabled(true, this.editor.resizingDisabledButtons);
-		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'), core);
+		if (this.status.hasFocus) this.eventMenager.applyTagEffect();
+		if (this.status.isReadOnly) domUtils.setDisabled(true, this.editor.resizingDisabledButtons);
+		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'));
 	},
 
 	/**

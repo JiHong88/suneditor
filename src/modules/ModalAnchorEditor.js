@@ -1,5 +1,3 @@
-// 'use strict';
-
 import EditorInterface from '../interface/editor';
 import SelectMenu from './SelectMenu';
 import { domUtils } from '../helper';

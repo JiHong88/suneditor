@@ -3,7 +3,7 @@
  * @author Yi JiHong.
  */
 
-import { _w } from '../../helper/global';
+import { _w } from '../../helper/env';
 import { getNodeFromPath, getNodePath } from '../../helper/domUtils';
 
 export default function (editor, change) {

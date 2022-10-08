@@ -1,7 +1,5 @@
-'use strict';
-
 import CoreInterface from '../interface/_core';
-import { domUtils, numbers, global } from '../helper';
+import { domUtils, numbers, env } from '../helper';
 
 /**
  *
@@ -50,7 +48,7 @@ FileManager.prototype = {
 			this.uploadFileLength = data.size;
 		}
 
-		const xmlHttp = global.getXMLHttpRequest();
+		const xmlHttp = env.getXMLHttpRequest();
 		xmlHttp.onreadystatechange = CallBackUpload.bind(this, xmlHttp, callBack, errorCallBack);
 		xmlHttp.open('post', uploadUrl, true);
 		if (uploadHeader !== null && typeof uploadHeader === 'object' && this._w.Object.keys(uploadHeader).length > 0) {

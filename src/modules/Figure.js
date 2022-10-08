@@ -1,5 +1,3 @@
-'use strict';
-
 import EditorInterface from '../interface/editor';
 import { Controller, SelectMenu } from '../modules';
 import { domUtils, numbers } from '../helper';
@@ -713,17 +711,17 @@ Figure.prototype = {
 };
 
 // @todo
-function OnCopy(e) {
-	const info = this.editor.currentFileComponentInfo;
-	if (info && !env.isIE) {
-		this._setClipboardComponent(e, info, clipboardData);
-		// copy effect
-		domUtils.addClass(info.component, 'se-component-copy');
-		_w.setTimeout(function () {
-			domUtils.removeClass(info.component, 'se-component-copy');
-		}, 150);
-	}
-}
+// function OnCopy(e) {
+// 	const info = this.editor.currentFileComponentInfo;
+// 	if (info && !env.isIE) {
+// 		this._setClipboardComponent(e, info, clipboardData);
+// 		// copy effect
+// 		domUtils.addClass(info.component, 'se-component-copy');
+// 		_w.setTimeout(function () {
+// 			domUtils.removeClass(info.component, 'se-component-copy');
+// 		}, 150);
+// 	}
+// }
 
 function OnResizeContainer(e) {
 	e.stopPropagation();
@@ -857,7 +855,10 @@ function CreateHTML_resizeDot() {
 function CreateHTML_controller(editor, controls) {
 	const lang = editor.lang;
 	const icons = editor.icons;
-	const html =
+	
+	// let html = '<div class="se-arrow se-arrow-up"></div>' +
+
+	const htmlll =
 		'<div class="se-arrow se-arrow-up"></div>' +
 		'<div class="se-btn-group">' +
 		'<button type="button" data-command="resize_percent" data-value="1" class="se-tooltip">' +
@@ -942,7 +943,7 @@ function CreateHTML_controller(editor, controls) {
 		'</button>' +
 		'</div>';
 
-	return domUtils.createElement('DIV', { class: 'se-controller se-controller-resizing' }, html);
+	return domUtils.createElement('DIV', { class: 'se-controller se-controller-resizing' }, htmlll);
 }
 
 export default Figure;

@@ -1,5 +1,3 @@
-'use strict';
-
 import EditorInterface from '../../interface/editor';
 import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
