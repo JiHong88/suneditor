@@ -12,9 +12,8 @@ module.exports = merge(common, {
 	entry: './src/suneditor_build',
 	output: {
 		filename: 'suneditor.min.js',
-		path: path.resolve(__dirname, 'dist')
+		path: path.resolve(__dirname, '../dist')
 	},
-
 	plugins: [
 		new webpack.SourceMapDevToolPlugin(),
 		new webpack.HashedModuleIdsPlugin(),
@@ -22,7 +21,7 @@ module.exports = merge(common, {
 		new CleanWebpackPlugin(['dist']),
 		new OptimizeCSSPlugin(),
 		new MiniCssExtractPlugin({
-			filename: 'css/suneditor.min.css'
+			filename: 'suneditor.min.css'
 		})
 	]
 });

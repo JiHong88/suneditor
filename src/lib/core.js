@@ -1275,9 +1275,7 @@ Core.prototype = {
 		if (this.options.iframe) {
 			const arrts = this.options._printClass !== null ? 'class="' + this.options._printClass + '"' : this.options.iframe_fullPage ? domUtils.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + this.options._editableClass + '"';
 
-			windowObject.document.write(
-				'' + '<!DOCTYPE html><html>' + '<head>' + wDoc.head.innerHTML + '<style>body {overflow:auto !important; margin: 10px auto !important; height:auto !important; outline:1px dashed #ccc;}</style>' + '</head>' + '<body ' + arrts + '>' + contentHTML + '</body>' + '</html>'
-			);
+			windowObject.document.write('' + '<!DOCTYPE html><html>' + '<head>' + wDoc.head.innerHTML + '<style>body {overflow:auto !important; margin: 10px auto !important; height:auto !important; outline:1px dashed #ccc;}</style>' + '</head>' + '<body ' + arrts + '>' + contentHTML + '</body>' + '</html>');
 		} else {
 			const links = this._d.head.getElementsByTagName('link');
 			const styles = this._d.head.getElementsByTagName('style');
@@ -1762,12 +1760,11 @@ Core.prototype = {
 	 * @description Save the current buttons states to "allCommandButtons" object
 	 * @private
 	 */
-	_saveButtonStates() {
+	_saveButtonStates: function () {
 		const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]');
 		for (let i = 0, element, command; i < currentButtons.length; i++) {
 			element = currentButtons[i];
 			command = element.getAttribute('data-command');
-
 			this.allCommandButtons[command] = element;
 		}
 	},
@@ -1776,7 +1773,7 @@ Core.prototype = {
 	 * @description Recover the current buttons states from "allCommandButtons" object
 	 * @private
 	 */
-	_recoverButtonStates() {
+	_recoverButtonStates: function () {
 		const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]');
 		for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
 			button = currentButtons[i];
@@ -1879,7 +1876,7 @@ Core.prototype = {
 	},
 
 	__callResizeFunction: function (h, resizeObserverEntry) {
-		h = h === -1 ? (resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0] ? resizeObserverEntry.borderBoxSize[0].blockSize : (resizeObserverEntry.contentRect.height + this._editorHeightPadding)) : h;
+		h = h === -1 ? (resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0] ? resizeObserverEntry.borderBoxSize[0].blockSize : resizeObserverEntry.contentRect.height + this._editorHeightPadding) : h;
 		if (this._editorHeight !== h) {
 			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, this._editorHeight, resizeObserverEntry);
 			this._editorHeight = h;

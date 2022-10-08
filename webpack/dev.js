@@ -13,17 +13,15 @@ module.exports = merge(common, {
 		filename: 'suneditor.[hash].js',
 		path: path.resolve(__dirname, 'dist')
 	},
-
 	devtool: 'cheap-module-eval-source-map',
 	devServer: {
 		contentBase: 'dist',
 		host: 'localhost',
 		port: 8080
 	},
-
 	plugins: [
 		new MiniCssExtractPlugin({
-			filename: 'css/suneditor.[hash].css'
+			filename: 'suneditor.[hash].css'
 		}),
 		new webpack.NamedModulesPlugin(),
 		new HtmlWebpackPlugin({

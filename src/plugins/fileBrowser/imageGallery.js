@@ -1,4 +1,4 @@
-import FileBrowser from '../modules/FileBrowser';
+import FileBrowser from '../../modules/FileBrowser';
 
 export default {
     name: 'imageGallery',
