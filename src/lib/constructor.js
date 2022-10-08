@@ -200,7 +200,7 @@ function InitOptions(element, options) {
 		const _plugins = options.plugins;
 		const pluginsValues = _plugins.length
 			? _plugins
-			: Object.keys(_plugins).map(function (name) {
+			: _w.Object.keys(_plugins).map(function (name) {
 					return _plugins[name];
 			  });
 		for (let i = 0, len = pluginsValues.length, p; i < len; i++) {

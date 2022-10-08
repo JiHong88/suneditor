@@ -380,7 +380,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	/**
 	 * @description Parser
 	 */
-	this._parser = new env._w.DOMParser();
+	this._parser = new _w.DOMParser();
 
 	// ----- Core init -----
 	// Create to sibling node
