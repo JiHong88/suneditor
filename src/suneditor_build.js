@@ -14,7 +14,7 @@ if (!window.SUNEDITOR) {
 		writable: false,
 		configurable: false,
 		value: {
-			editor: suneditor,
+			inst: suneditor,
 			helper: helper,
 			plugins: plugins,
 			modules: modules,

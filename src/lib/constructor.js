@@ -205,10 +205,11 @@ function InitOptions(element, options) {
 			  });
 		for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
 			p = pluginsValues[i].default || pluginsValues[i];
-			plugins[p.name] = p;
+			plugins[p.key] = p;
 		}
 	}
 	options.plugins = plugins;
+	options.events = options.events || {};
 
 	/** base */
 	options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
@@ -846,7 +847,7 @@ export function CreateToolBar(buttonList, plugins, options) {
 					if (!module) {
 						const custom = plugins[pluginName];
 						if (!custom) throw Error('[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [' + pluginName + ']');
-						module = [custom.className, custom.title, custom.name, custom.type, custom.innerHTML, custom._disabled];
+						module = [custom.className, custom.title, custom.key, custom.type, custom.innerHTML, custom._disabled];
 					}
 				}
 

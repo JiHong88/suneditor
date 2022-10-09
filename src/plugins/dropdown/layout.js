@@ -1,7 +1,7 @@
 import EditorInterface from '../../interface/editor';
 import { domUtils } from '../../helper';
 
-const layout = function (editor, target) {
+const Layout = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
@@ -19,9 +19,10 @@ const layout = function (editor, target) {
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
-layout.type = 'dropdown';
-layout.className = '';
-layout.prototype = {
+Layout.key = 'layout';
+Layout.type = 'dropdown';
+Layout.className = '';
+Layout.prototype = {
 	/**
 	 * @override core
 	 * @param {number} index layout menu index
@@ -39,7 +40,7 @@ layout.prototype = {
 		this.menu.dropdownOff();
 	},
 
-	constructor: layout
+	constructor: Layout
 };
 
 function OnClickMenu(e) {
@@ -54,11 +55,11 @@ function OnClickMenu(e) {
 function CreateHTML(editor) {
 	const layoutList = editor.options.layouts;
 	if (!layoutList || layoutList.length === 0) {
-		throw Error('[SUNEDITOR.plugins.layout.fail] To use the "layout" plugin, please define the "layouts" option.');
+		console.warn('[SUNEDITOR.plugins.layout.warn] To use the "layout" plugin, please define the "layouts" option.');
 	}
 
-	let list = '<div class="se-dropdown se-list-inner">' + '<ul class="se-list-basic">';
-	for (let i = 0, len = layoutList.length, t; i < len; i++) {
+	let list = '<div class="se-dropdown se-list-inner"><ul class="se-list-basic">';
+	for (let i = 0, len = (layoutList || []).length, t; i < len; i++) {
 		t = layoutList[i];
 		list += '<li><button type="button" class="se-btn-list" data-value="' + i + '" title="' + t.name + '" aria-label="' + t.name + '">' + t.name + '</button></li>';
 	}
@@ -67,4 +68,4 @@ function CreateHTML(editor) {
 	return domUtils.createElement('DIV', { class: 'se-list-layer' }, list);
 }
 
-export default layout;
+export default Layout;

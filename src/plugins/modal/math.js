@@ -4,7 +4,7 @@ import { domUtils, env, converter, unicode } from '../../helper';
 
 const KATEX_WEBSITE = 'https://katex.org/docs/supported.html';
 
-const math = function (editor, target) {
+const Math_ = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
@@ -38,9 +38,10 @@ const math = function (editor, target) {
 	);
 };
 
-math.type = 'modal';
-math.className = '';
-math.prototype = {
+Math_.key = 'math';
+Math_.type = 'modal';
+Math_.className = '';
+Math_.prototype = {
 	/**
 	 * @override core
 	 */
@@ -183,7 +184,7 @@ math.prototype = {
 		return result;
 	},
 
-	constructor: math
+	constructor: Math_
 };
 
 function RenderMathExp(e) {
@@ -277,4 +278,4 @@ function CreateHTML_controller(core) {
 	return domUtils.createElement('DIV', { class: 'se-controller se-controller-link' }, html);
 }
 
-export default math;
+export default Math_;

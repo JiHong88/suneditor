@@ -2,7 +2,7 @@ import EditorInterface from '../../interface/editor';
 import { domUtils, numbers } from '../../helper';
 import { Controller, SelectMenu } from '../../modules';
 
-const table = function (editor, target) {
+const Table = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
@@ -83,9 +83,10 @@ const table = function (editor, target) {
 	this.eventManager.addEvent(commandArea, 'click', OnClickTablePicker.bind(this));
 };
 
-table.type = 'dropdown';
-table.className = '';
-table.prototype = {
+Table.key = 'table';
+Table.type = 'dropdown';
+Table.className = '';
+Table.prototype = {
 	/**
 	 * @override core
 	 * @param {Element} element New table element
@@ -1033,7 +1034,7 @@ table.prototype = {
 		if (this._bindClose_up) this._bindClose_up = this.eventManager.removeGlobalEvent(this._bindClose_up);
 	},
 
-	constructor: table
+	constructor: Table
 };
 
 function OnSplitCells(direction) {
@@ -1445,4 +1446,4 @@ function CreateHTML_controller_cell(editor, cellControllerTop) {
 	return domUtils.createElement('DIV', { class: 'se-controller se-controller-table-cell' }, html);
 }
 
-export default table;
+export default Table;

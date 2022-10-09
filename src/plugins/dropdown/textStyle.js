@@ -1,7 +1,7 @@
 import EditorInterface from '../../interface/editor';
 import { domUtils } from '../../helper';
 
-const textStyle = function (editor, target) {
+const TextStyle = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
@@ -19,9 +19,10 @@ const textStyle = function (editor, target) {
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
-textStyle.type = 'dropdown';
-textStyle.className = '';
-textStyle.prototype = {
+TextStyle.key = 'textStyle';
+TextStyle.type = 'dropdown';
+TextStyle.className = '';
+TextStyle.prototype = {
 	/**
 	 * @override dropdown
 	 */
@@ -76,7 +77,7 @@ textStyle.prototype = {
 		this.menu.dropdownOff();
 	},
 
-	constructor: textStyle
+	constructor: TextStyle
 };
 
 function OnClickMenu(e) {
@@ -133,4 +134,4 @@ function CreateHTML(editor) {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
 }
 
-export default textStyle;
+export default TextStyle;

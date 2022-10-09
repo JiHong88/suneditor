@@ -15,7 +15,7 @@ const Controller = function (inst, element, position, _name) {
 	EditorInterface.call(this, inst.editor);
 
 	// members
-	this.kind = _name || inst.constructor.name;
+	this.kind = _name || inst.constructor.key;
 	this.inst = inst;
 	this.form = element;
 	this.currentTarget = null;

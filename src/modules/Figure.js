@@ -14,7 +14,7 @@ const Figure = function (inst, controls, params) {
 	this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
 
 	// modules
-	this.controller = new Controller(this, controllerEl, 'bottom', inst.constructor.name);
+	this.controller = new Controller(this, controllerEl, 'bottom', inst.constructor.key);
 	this.selectMenu_align = new SelectMenu(this, false, 'bottom-center');
 	this.selectMenu_align.on(this.alignButton, SetMenuAlign.bind(this), { class: 'se-resizing-align-list' });
 	this.selectMenu_align.create(alignMenus.items, alignMenus.html);
@@ -22,7 +22,7 @@ const Figure = function (inst, controls, params) {
 	this.resizeHandles = resizeDot.querySelectorAll('.se-resize-dot > span');
 
 	// members
-	this.kind = inst.constructor.name;
+	this.kind = inst.constructor.key;
 	this.inst = inst;
 	this.sizeUnit = params.sizeUnit || 'px';
 	this.autoRatio = params.autoRatio;

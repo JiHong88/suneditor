@@ -12,6 +12,7 @@ import horizontalLine from './dropdown/horizontalLine';
 import list from './dropdown/list';
 import table from './dropdown/table';
 import formatBlock from './dropdown/formatBlock';
+import layout from './dropdown/layout';
 import lineHeight from './dropdown/lineHeight';
 import template from './dropdown/template';
 import paragraphStyle from './dropdown/paragraphStyle';
@@ -27,5 +28,5 @@ import math from './modal/math';
 // file browser
 import imageGallery from './fileBrowser/imageGallery';
 
-export { blockquote, mention, align, font, fontSize, fontColor, backgroundColor, horizontalLine, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };
-export default { blockquote, mention, align, font, fontSize, fontColor, backgroundColor, horizontalLine, list, table, formatBlock, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };
+export { blockquote, mention, align, font, fontSize, fontColor, backgroundColor, horizontalLine, list, table, formatBlock, layout, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };
+export default { blockquote, mention, align, font, fontSize, fontColor, backgroundColor, horizontalLine, list, table, formatBlock, layout, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };

@@ -2,7 +2,7 @@ import EditorInterface from '../../interface/editor';
 import { Modal, Figure, FileManager } from '../../modules';
 import { domUtils, numbers } from '../../helper';
 
-const video = function (editor, target) {
+const Video = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
@@ -83,9 +83,10 @@ const video = function (editor, target) {
 	}
 };
 
-video.type = 'modal';
-video.className = '';
-video.prototype = {
+Video.key = 'video';
+Video.type = 'modal';
+Video.className = '';
+Video.prototype = {
 	/**
 	 * @override type = "modal"
 	 */
@@ -540,7 +541,7 @@ video.prototype = {
 		}
 	},
 
-	constructor: video
+	constructor: Video
 };
 
 function FileCheckHandler(element) {
@@ -792,4 +793,4 @@ function CreateHTML_modal(editor) {
 	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
-export default video;
+export default Video;

@@ -1,7 +1,7 @@
 import EditorInterface from '../../interface/editor';
 import { domUtils } from '../../helper';
 
-const paragraphStyle = function (editor, target) {
+const ParagraphStyle = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
@@ -19,9 +19,10 @@ const paragraphStyle = function (editor, target) {
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
-paragraphStyle.type = 'dropdown';
-paragraphStyle.className = '';
-paragraphStyle.prototype = {
+ParagraphStyle.key = 'paragraphStyle';
+ParagraphStyle.type = 'dropdown';
+ParagraphStyle.className = '';
+ParagraphStyle.prototype = {
 	/**
 	 * @override dropdown
 	 */
@@ -63,7 +64,7 @@ paragraphStyle.prototype = {
 		this.history.push(false);
 	},
 
-	constructor: paragraphStyle
+	constructor: ParagraphStyle
 };
 
 function OnClickMenu(e) {
@@ -119,4 +120,4 @@ function CreateHTML(editor) {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
 }
 
-export default paragraphStyle;
+export default ParagraphStyle;

@@ -11,7 +11,7 @@ const FileManager = function (inst, params) {
 
 	// members
 	inst.__fileManagement = this;
-	this.kind = inst.constructor.name;
+	this.kind = inst.constructor.key;
 	this.inst = inst;
 	this.tagNames = params.tagNames;
 	this.eventHandler = params.eventHandler;

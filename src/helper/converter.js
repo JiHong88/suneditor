@@ -1,7 +1,4 @@
-import {
-	_d,
-	_w
-} from './env';
+import { _d, _w } from './env';
 
 /**
  * @description Convert HTML string to HTML Entity
@@ -13,7 +10,7 @@ export function htmlToEntity(content) {
 	const ec = {
 		'&': '&amp;',
 		'\u00A0': '&nbsp;',
-		'\'': '&apos;',
+		"'": '&apos;',
 		'"': '&quot;',
 		'<': '&lt;',
 		'>': '&gt;'
@@ -32,7 +29,7 @@ export function entityToHTML(content) {
 	const ec = {
 		'&amp;': '&',
 		'&nbsp;': '\u00A0',
-		'&apos;': '\'',
+		'&apos;': "'",
 		'&quot;': '"',
 		'&lt;': '<',
 		'&gt;': '>'
@@ -115,10 +112,7 @@ export function _setDefaultOptionStyle(options, editorCSSText) {
  */
 export function _setIframeDocument(frame, options) {
 	frame.setAttribute('scrolling', 'auto');
-	frame.contentDocument.head.innerHTML =
-		'<meta charset="utf-8" />' +
-		'<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' +
-		_setIframeCssTags(options);
+	frame.contentDocument.head.innerHTML = '<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' + _setIframeCssTags(options);
 	frame.contentDocument.body.className = options._editableClass;
 	frame.contentDocument.body.setAttribute('contenteditable', true);
 }
@@ -146,20 +140,14 @@ export function _setIframeCssTags(options) {
 			}
 		}
 
-		if (!path || path.length === 0)
-			throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframe_cssFileName" before creating editor instances.';
+		if (!path || path.length === 0) throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframe_cssFileName" before creating editor instances.';
 
 		for (let i = 0, len = path.length; i < len; i++) {
 			tagString += '<link href="' + path[i] + '" rel="stylesheet">';
 		}
 	}
 
-	return (
-		tagString +
-		(options.height === 'auto' ?
-			'<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>' :
-			'')
-	);
+	return tagString + (options.height === 'auto' ? '<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>' : '');
 }
 
 const converter = {

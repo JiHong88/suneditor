@@ -1,7 +1,7 @@
 import EditorInterface from '../../interface/editor';
 import { domUtils } from '../../helper';
 
-const formatBlock = function (editor, target) {
+const FormatBlock = function (editor, target) {
 	EditorInterface.call(this, editor);
 	// plugin basic properties
 	this.target = target;
@@ -22,9 +22,10 @@ const formatBlock = function (editor, target) {
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
-formatBlock.type = 'dropdown';
-formatBlock.className = 'se-btn-select se-btn-tool-format';
-formatBlock.prototype = {
+FormatBlock.key = 'formatBlock';
+FormatBlock.type = 'dropdown';
+FormatBlock.className = 'se-btn-select se-btn-tool-format';
+FormatBlock.prototype = {
 	/**
 	 * @override core
 	 */
@@ -104,7 +105,7 @@ formatBlock.prototype = {
 		this.targetTooltip = this.target.parentNode.querySelector('.se-tooltip-text');
 	},
 
-	constructor: formatBlock
+	constructor: FormatBlock
 };
 
 function OnClickMenu(e) {
@@ -149,4 +150,4 @@ function CreateHTML(editor) {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
 }
 
-export default formatBlock;
+export default FormatBlock;

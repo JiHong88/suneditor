@@ -1,7 +1,7 @@
 import EditorInterface from '../../interface/editor';
 import { domUtils } from '../../helper';
 
-const align = function (editor, target) {
+const Align = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
@@ -28,9 +28,10 @@ const align = function (editor, target) {
 	this.eventManager.addEvent(commandArea, 'click', OnClickMenu.bind(this));
 };
 
-align.type = 'dropdown';
-align.className = '';
-align.prototype = {
+Align.key = 'align';
+Align.type = 'dropdown';
+Align.className = '';
+Align.prototype = {
 	/**
 	 * @override core
 	 * @param {Node} element Selection node.
@@ -116,7 +117,7 @@ align.prototype = {
 		this.history.push(false);
 	},
 
-	constructor: align
+	constructor: Align
 };
 
 function OnClickMenu(e) {
@@ -150,4 +151,4 @@ function CreateHTML(core) {
 	);
 }
 
-export default align;
+export default Align;

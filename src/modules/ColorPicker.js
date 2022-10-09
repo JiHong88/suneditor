@@ -12,7 +12,7 @@ import CoreInterface from '../interface/_core';
 const ColorPicker = function (inst, styles, defaultColor, colorList) {
 	CoreInterface.call(this, inst.editor);
 	// members
-	this.kind = inst.constructor.name;
+	this.kind = inst.constructor.key;
 	this.inst = inst;
 	this.target = CreateHTML(inst.editor, colorList);
 	this.inputElement = this.target.querySelector('._se_color_picker_input');

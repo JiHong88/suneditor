@@ -8,7 +8,7 @@ const userAgent = _w.navigator.userAgent.toLowerCase();
  * @param {Object.<any>} obj Object parameter.
  * @returns {Array.<any>}
  */
- export function getValues(obj) {
+export function getValues(obj) {
 	return !obj
 		? []
 		: this._w.Object.keys(obj).map(function (i) {

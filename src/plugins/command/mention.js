@@ -1,7 +1,7 @@
-import { domUtils } from '../../helper';
 import EditorInterface from '../../interface/editor';
+import { domUtils } from '../../helper';
 
-const mention = function (editor, target) {
+const Mention = function (editor, target) {
 	EditorInterface.call(this, editor);
 	// plugin basic properties
 	this.target = target;
@@ -11,10 +11,11 @@ const mention = function (editor, target) {
 	// members
 };
 
-mention.type = 'command';
-mention.className = '';
-mention.prototype = {
-	constructor: mention
+Mention.key = 'mention';
+Mention.type = 'command';
+Mention.className = '';
+Mention.prototype = {
+	constructor: Mention
 };
 
-export default mention;
+export default Mention;

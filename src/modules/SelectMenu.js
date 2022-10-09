@@ -12,7 +12,7 @@ const SelectMenu = function (inst, checkList, position) {
 	CoreInterface.call(this, inst.editor);
 
 	// members
-	this.kink = inst.constructor.name;
+	this.kink = inst.constructor.key;
 	this.inst = inst;
 	const positionItems = position.split('-');
 	this.form = null;

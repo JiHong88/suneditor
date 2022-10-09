@@ -2,7 +2,7 @@ import EditorInterface from '../../interface/editor';
 import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 
-const backgroundColor = function (editor, target) {
+const BackgroundColor = function (editor, target) {
 	EditorInterface.call(this, editor);
 	// plugin basic properties
 	this.target = target;
@@ -20,9 +20,10 @@ const backgroundColor = function (editor, target) {
 	this.eventManager.addEvent(menu, 'click', OnClickMenu.bind(this));
 };
 
-backgroundColor.type = 'dropdown';
-backgroundColor.className = '';
-backgroundColor.prototype = {
+BackgroundColor.key = 'backgroundColor';
+BackgroundColor.type = 'dropdown';
+BackgroundColor.className = '';
+BackgroundColor.prototype = {
 	/**
 	 * @override dropdown
 	 */
@@ -30,10 +31,10 @@ backgroundColor.prototype = {
 		this.colorPicker.init(this.selection.getNode());
 	},
 
-    /**
-     * @override core
-     * @param {string} value color
-     */
+	/**
+	 * @override core
+	 * @param {string} value color
+	 */
 	action: function (value) {
 		if (value) {
 			const newNode = domUtils.createElement('SPAN', { style: 'background-color: ' + value + ';' });
@@ -45,16 +46,16 @@ backgroundColor.prototype = {
 		this.menu.dropdownOff();
 	},
 
-	constructor: backgroundColor
+	constructor: BackgroundColor
 };
 
 function OnClickMenu(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
-    const color = e.target.getAttribute('data-value');
-    if (!color) return;
-    
+	const color = e.target.getAttribute('data-value');
+	if (!color) return;
+
 	this.action(color);
 }
 
@@ -62,4 +63,4 @@ function CreateHTML(colorList) {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, colorList);
 }
 
-export default backgroundColor;
+export default BackgroundColor;

@@ -1,7 +1,7 @@
 import EditorInterface from '../../interface/editor';
 import { domUtils } from '../../helper';
 
-const lineHeight = function (editor, target) {
+const LineHeight = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
@@ -20,9 +20,10 @@ const lineHeight = function (editor, target) {
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
-lineHeight.type = 'dropdown';
-lineHeight.className = '';
-lineHeight.prototype = {
+LineHeight.key = 'lineHeight';
+LineHeight.type = 'dropdown';
+LineHeight.className = '';
+LineHeight.prototype = {
 	/**
 	 * @override dropdown
 	 */
@@ -61,7 +62,7 @@ lineHeight.prototype = {
 		this.history.push(false);
 	},
 
-	constructor: lineHeight
+	constructor: LineHeight
 };
 
 function OnClickMenu(e) {
@@ -95,4 +96,4 @@ function CreateHTML(editor) {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, list);
 }
 
-export default lineHeight;
+export default LineHeight;

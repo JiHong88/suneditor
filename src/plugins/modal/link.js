@@ -2,7 +2,7 @@ import EditorInterface from '../../interface/editor';
 import { Modal, Controller, ModalAnchorEditor } from '../../modules';
 import { domUtils } from '../../helper';
 
-const link = function (editor, target) {
+const Link = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
@@ -22,9 +22,10 @@ const link = function (editor, target) {
 	this.isUpdateState = false;
 };
 
-link.type = 'modal';
-link.className = '';
-link.prototype = {
+Link.key = 'link';
+Link.type = 'modal';
+Link.className = '';
+Link.prototype = {
 	/**
 	 * @override core
 	 */
@@ -141,7 +142,7 @@ link.prototype = {
 		domUtils.removeClass(this.controller.currentTarget, 'on');
 	},
 
-	constructor: link
+	constructor: Link
 };
 
 function CreateHTML_modal(editor) {
@@ -207,4 +208,4 @@ function CreateHTML_controller(editor) {
 	return domUtils.createElement('DIV', { class: 'se-controller se-controller-link' }, html);
 }
 
-export default link;
+export default Link;

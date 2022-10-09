@@ -6,7 +6,7 @@ import { _w } from './env';
  * @returns {boolean}
  */
 export function is(text) {
-    return !!text && /^-?\d+(\.\d+)?$/.test(text + '');
+	return !!text && /^-?\d+(\.\d+)?$/.test(text + '');
 }
 
 /**
@@ -16,17 +16,13 @@ export function is(text) {
  * @returns {number}
  */
 export function get(value, maxDec) {
-    if (!value) return 0;
+	if (!value) return 0;
 
-    let number = (value + '').match(/-?\d+(\.\d+)?/);
-    if (!number || !number[0]) return 0;
+	let number = (value + '').match(/-?\d+(\.\d+)?/);
+	if (!number || !number[0]) return 0;
 
-    number = number[0];
-    return maxDec < 0 ?
-        number * 1 :
-        maxDec === 0 ?
-        _w.Math.round(number * 1) :
-        (number * 1).toFixed(maxDec) * 1;
+	number = number[0];
+	return maxDec < 0 ? number * 1 : maxDec === 0 ? _w.Math.round(number * 1) : (number * 1).toFixed(maxDec) * 1;
 }
 
 /**
@@ -39,16 +35,16 @@ export function get(value, maxDec) {
  * @returns {number}
  */
 export function getOverlapRangeAtIndex(aStart, aEnd, bStart, bEnd) {
-    if (aStart <= bEnd ? aEnd < bStart : aEnd > bStart) return 0;
+	if (aStart <= bEnd ? aEnd < bStart : aEnd > bStart) return 0;
 
-    const overlap = (aStart > bStart ? aStart : bStart) - (aEnd < bEnd ? aEnd : bEnd);
-    return (overlap < 0 ? overlap * -1 : overlap) + 1;
+	const overlap = (aStart > bStart ? aStart : bStart) - (aEnd < bEnd ? aEnd : bEnd);
+	return (overlap < 0 ? overlap * -1 : overlap) + 1;
 }
 
 const numbers = {
-    is: is,
-    get: get,
-    getOverlapRangeAtIndex: getOverlapRangeAtIndex
+	is: is,
+	get: get,
+	getOverlapRangeAtIndex: getOverlapRangeAtIndex
 };
 
 export default numbers;

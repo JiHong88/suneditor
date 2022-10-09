@@ -1,7 +1,7 @@
-import domUtils from '../../helper/domUtils';
 import EditorInterface from '../../interface/editor';
+import { domUtils } from '../../helper';
 
-const font = function (editor, target) {
+const Font = function (editor, target) {
 	EditorInterface.call(this, editor);
 	// plugin basic properties
 	this.target = target;
@@ -23,9 +23,10 @@ const font = function (editor, target) {
 	this.eventManager.addEvent(commandArea, 'click', OnClickMenu.bind(this));
 };
 
-font.type = 'dropdown';
-font.className = 'se-btn-select se-btn-tool-font';
-font.prototype = {
+Font.key = 'font';
+Font.type = 'dropdown';
+Font.className = 'se-btn-select se-btn-tool-font';
+Font.prototype = {
 	/**
 	 * @override core
 	 */
@@ -90,7 +91,7 @@ font.prototype = {
 		this.targetTooltip = this.target.parentNode.querySelector('.se-tooltip-text');
 	},
 
-	constructor: font
+	constructor: Font
 };
 
 function OnClickMenu(e) {
@@ -117,4 +118,4 @@ function CreateHTML(editor) {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-font-family' }, list);
 }
 
-export default font;
+export default Font;

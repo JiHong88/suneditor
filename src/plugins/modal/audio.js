@@ -2,7 +2,7 @@ import EditorInterface from '../../interface/editor';
 import { Modal, Controller, FileManager, Figure } from '../../modules';
 import { domUtils } from '../../helper';
 
-const audio = function (editor, target) {
+const Audio = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
@@ -39,9 +39,10 @@ const audio = function (editor, target) {
 	}
 };
 
-audio.type = 'modal';
-audio.className = '';
-audio.prototype = {
+Audio.key = 'audio';
+Audio.type = 'modal';
+Audio.className = '';
+Audio.prototype = {
 	/**
 	 * @override type = "modal"
 	 */
@@ -294,7 +295,7 @@ audio.prototype = {
 		}
 	},
 
-	constructor: audio
+	constructor: Audio
 };
 
 function FileCheckHandler(element) {
@@ -450,4 +451,4 @@ function CreateHTML_controller(editor) {
 	return domUtils.createElement('DIV', { class: 'se-controller' }, html);
 }
 
-export default audio;
+export default Audio;

@@ -1,7 +1,7 @@
 import EditorInterface from '../../interface/editor';
 import { domUtils } from '../../helper';
 
-const template = function (editor, target) {
+const Template = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
@@ -19,9 +19,10 @@ const template = function (editor, target) {
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
-template.type = 'dropdown';
-template.className = '';
-template.prototype = {
+Template.key = 'template';
+Template.type = 'dropdown';
+Template.className = '';
+Template.prototype = {
 	/**
 	 * @override core
 	 * @param {number} index template menu index
@@ -39,7 +40,7 @@ template.prototype = {
 		this.menu.dropdownOff();
 	},
 
-	constructor: template
+	constructor: Template
 };
 
 function OnClickMenu(e) {
@@ -54,11 +55,11 @@ function OnClickMenu(e) {
 function CreateHTML(editor) {
 	const templateList = editor.options.templates;
 	if (!templateList || templateList.length === 0) {
-		throw Error('[SUNEDITOR.plugins.template.fail] To use the "template" plugin, please define the "templates" option.');
+		console.warn('[SUNEDITOR.plugins.template.warn] To use the "template" plugin, please define the "templates" option.');
 	}
 
-	let list = '<div class="se-dropdown se-list-inner">' + '<ul class="se-list-basic">';
-	for (let i = 0, len = templateList.length, t; i < len; i++) {
+	let list = '<div class="se-dropdown se-list-inner"><ul class="se-list-basic">';
+	for (let i = 0, len = (templateList || []).length, t; i < len; i++) {
 		t = templateList[i];
 		list += '<li><button type="button" class="se-btn-list" data-value="' + i + '" title="' + t.name + '" aria-label="' + t.name + '">' + t.name + '</button></li>';
 	}
@@ -67,4 +68,4 @@ function CreateHTML(editor) {
 	return domUtils.createElement('DIV', { class: 'se-list-layer' }, list);
 }
 
-export default template;
+export default Template;

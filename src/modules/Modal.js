@@ -6,7 +6,7 @@ const Modal = function (inst, element) {
 
 	// members
 	this.inst = inst;
-	this.kind = inst.constructor.name;
+	this.kind = inst.constructor.key;
 	this.form = element;
 	this.focusElement = element.querySelector('[data-focus]');
 	this.isUpdate = false;
@@ -94,7 +94,7 @@ Modal.prototype = {
 function Action(e) {
 	e.preventDefault();
 	e.stopPropagation();
-	
+
 	this.editor.openLoading();
 
 	try {

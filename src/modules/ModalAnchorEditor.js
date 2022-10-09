@@ -10,7 +10,7 @@ const ModalAnchorEditor = function (inst, modalForm) {
 	const forms = CreatetModalForm(inst.editor);
 
 	// members
-	this.kink = inst.constructor.name;
+	this.kink = inst.constructor.key;
 	this.inst = inst;
 	this.modalForm = modalForm;
 	this.host = (this._w.location.origin + this._w.location.pathname).replace(/\/$/, '');
@@ -136,6 +136,8 @@ ModalAnchorEditor.prototype = {
 	},
 
 	_setRel: function (relAttr) {
+		if (!this._isRel) return;
+
 		const rels = (this.currentRel = !relAttr ? [] : relAttr.split(' '));
 		const checkedRel = this.selectMenu_rel.form.querySelectorAll('button');
 		for (let i = 0, len = checkedRel.length, cmd; i < len; i++) {

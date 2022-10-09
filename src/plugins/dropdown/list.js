@@ -1,7 +1,7 @@
 import EditorInterface from '../../interface/editor';
 import { domUtils } from '../../helper';
 
-const list = function (editor, target) {
+const List = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
@@ -24,9 +24,10 @@ const list = function (editor, target) {
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
-list.type = 'dropdown';
-list.className = '';
-list.prototype = {
+List.key = 'list';
+List.type = 'dropdown';
+List.className = '';
+List.prototype = {
 	/**
 	 * @override core
 	 */
@@ -89,7 +90,7 @@ list.prototype = {
 		this.history.push(false);
 	},
 
-	constructor: list
+	constructor: List
 };
 
 function OnClickMenu(e) {
@@ -127,4 +128,4 @@ function CreateHTML(editor) {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, html);
 }
 
-export default list;
+export default List;

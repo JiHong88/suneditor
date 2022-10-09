@@ -37,28 +37,28 @@ const Context = function (element, top, wwFrame, codeFrame, options) {
 			_modal: {
 				area: top.querySelector('.se-modal'),
 				back: top.querySelector('.se-modal-back'),
-				inner: top.querySelector('.se-modal-inner'),
+				inner: top.querySelector('.se-modal-inner')
 			}
 		},
 		buttons: {
 			cover: top.querySelector('.se-toolbar .se-toolbar-cover'),
-            bold: top.querySelector('.se-toolbar [data-command="bold"]'),
-            underline: top.querySelector('.se-toolbar [data-command="underline"]'),
-            italic: top.querySelector('.se-toolbar [data-command="italic"]'),
-            strike: top.querySelector('.se-toolbar [data-command="strike"]'),
-            sub: top.querySelector('.se-toolbar [data-command="SUB"]'),
-            sup: top.querySelector('.se-toolbar [data-command="SUP"]'),
-            undo: top.querySelector('.se-toolbar [data-command="undo"]'),
-            redo: top.querySelector('.se-toolbar [data-command="redo"]'),
-            save: top.querySelector('.se-toolbar [data-command="save"]'),
-            outdent: top.querySelector('.se-toolbar [data-command="outdent"]'),
-            indent: top.querySelector('.se-toolbar [data-command="indent"]'),
-            fullScreen: top.querySelector('.se-toolbar [data-command="fullScreen"]'),
-            showBlocks: top.querySelector('.se-toolbar [data-command="showBlocks"]'),
-            codeView: top.querySelector('.se-toolbar [data-command="codeView"]'),
-            dir: top.querySelector('.se-toolbar [data-command="dir"]'),
-            dir_ltr: top.querySelector('.se-toolbar [data-command="dir_ltr"]'),
-            dir_rtl: top.querySelector('.se-toolbar [data-command="dir_rtl"]')
+			bold: top.querySelector('.se-toolbar [data-command="bold"]'),
+			underline: top.querySelector('.se-toolbar [data-command="underline"]'),
+			italic: top.querySelector('.se-toolbar [data-command="italic"]'),
+			strike: top.querySelector('.se-toolbar [data-command="strike"]'),
+			sub: top.querySelector('.se-toolbar [data-command="SUB"]'),
+			sup: top.querySelector('.se-toolbar [data-command="SUP"]'),
+			undo: top.querySelector('.se-toolbar [data-command="undo"]'),
+			redo: top.querySelector('.se-toolbar [data-command="redo"]'),
+			save: top.querySelector('.se-toolbar [data-command="save"]'),
+			outdent: top.querySelector('.se-toolbar [data-command="outdent"]'),
+			indent: top.querySelector('.se-toolbar [data-command="indent"]'),
+			fullScreen: top.querySelector('.se-toolbar [data-command="fullScreen"]'),
+			showBlocks: top.querySelector('.se-toolbar [data-command="showBlocks"]'),
+			codeView: top.querySelector('.se-toolbar [data-command="codeView"]'),
+			dir: top.querySelector('.se-toolbar [data-command="dir"]'),
+			dir_ltr: top.querySelector('.se-toolbar [data-command="dir_ltr"]'),
+			dir_rtl: top.querySelector('.se-toolbar [data-command="dir_rtl"]')
 		},
 		options: options
 	};

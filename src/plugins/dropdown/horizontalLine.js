@@ -1,7 +1,7 @@
 import EditorInterface from '../../interface/editor';
 import { domUtils } from '../../helper';
 
-const horizontalLine = function (editor, target) {
+const HorizontalLine = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
@@ -19,9 +19,10 @@ const horizontalLine = function (editor, target) {
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
-horizontalLine.type = 'dropdown';
-horizontalLine.className = '';
-horizontalLine.prototype = {
+HorizontalLine.key = 'horizontalLine';
+HorizontalLine.type = 'dropdown';
+HorizontalLine.className = '';
+HorizontalLine.prototype = {
 	/**
 	 * @override core
 	 */
@@ -52,7 +53,7 @@ horizontalLine.prototype = {
 		}
 	},
 
-	constructor: horizontalLine
+	constructor: HorizontalLine
 };
 
 function OnClickMenu(e) {
@@ -95,4 +96,4 @@ function CreateHTML(editor) {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-line' }, '<div class="se-list-inner">' + '<ul class="se-list-basic">' + list + '</ul>' + '</div>');
 }
 
-export default horizontalLine;
+export default HorizontalLine;

@@ -1,7 +1,7 @@
 import EditorInterface from '../../interface/editor';
 import { domUtils } from '../../helper';
 
-const fontSize = function (editor, target) {
+const FontSize = function (editor, target) {
 	EditorInterface.call(this, editor);
 	// plugin basic properties
 	this.target = target;
@@ -21,9 +21,10 @@ const fontSize = function (editor, target) {
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
-fontSize.type = 'dropdown';
-fontSize.className = 'se-btn-select se-btn-tool-size';
-fontSize.prototype = {
+FontSize.key = 'fontSize';
+FontSize.type = 'dropdown';
+FontSize.className = 'se-btn-select se-btn-tool-size';
+FontSize.prototype = {
 	/**
 	 * @override core
 	 */
@@ -80,7 +81,7 @@ fontSize.prototype = {
 		this.targetText = this.target.querySelector('.txt');
 	},
 
-	constructor: fontSize
+	constructor: FontSize
 };
 
 function OnClickMenu(e) {
@@ -107,4 +108,4 @@ function CreateHTML(editor) {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-font-size' }, list);
 }
 
-export default fontSize;
+export default FontSize;

@@ -1,7 +1,7 @@
-import { domUtils } from '../../helper';
 import EditorInterface from '../../interface/editor';
+import { domUtils } from '../../helper';
 
-const blockquote = function (editor, target) {
+const Blockquote = function (editor, target) {
 	EditorInterface.call(this, editor);
 	// plugin basic properties
 	this.target = target;
@@ -12,9 +12,10 @@ const blockquote = function (editor, target) {
 	this.quoteTag = domUtils.createElement('BLOCKQUOTE');
 };
 
-blockquote.type = 'command';
-blockquote.className = '';
-blockquote.prototype = {
+Blockquote.key = 'blockquote';
+Blockquote.type = 'command';
+Blockquote.className = '';
+Blockquote.prototype = {
 	/**
 	 * @override core
 	 */
@@ -42,7 +43,7 @@ blockquote.prototype = {
 		}
 	},
 
-	constructor: blockquote
+	constructor: Blockquote
 };
 
-export default blockquote;
+export default Blockquote;
