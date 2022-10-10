@@ -455,12 +455,12 @@ function InitOptions(element, options) {
 	options.linkRelDefault = options.linkRelDefault || {};
 
 	/** External library */
-	// CodeMirror object
-	options.codeMirror = options.codeMirror
-		? options.codeMirror.src
-			? options.codeMirror
+	// CodeMirror5 object
+	options.codeMirror5 = options.codeMirror5
+		? options.codeMirror5.src
+			? options.codeMirror5
 			: {
-					src: options.codeMirror
+					src: options.codeMirror5
 			  }
 		: null;
 	// katex object (Math plugin)
@@ -586,7 +586,7 @@ function _initElements(options, topDiv, toolBar, toolBarArrow) {
  * @param {Element} textarea textarea element
  */
 function _checkCodeMirror(options, textarea) {
-	if (options.codeMirror) {
+	if (options.codeMirror5) {
 		const cmOptions = [
 			{
 				mode: 'htmlmixed',
@@ -594,7 +594,7 @@ function _checkCodeMirror(options, textarea) {
 				lineNumbers: true,
 				lineWrapping: true
 			},
-			options.codeMirror.options || {}
+			options.codeMirror5.options || {}
 		].reduce(function (init, option) {
 			for (let key in option) {
 				if (option.hasOwnProperty(key)) init[key] = option[key];
@@ -607,10 +607,10 @@ function _checkCodeMirror(options, textarea) {
 			cmOptions.height = 'auto';
 		}
 
-		const cm = options.codeMirror.src.fromTextArea(textarea, cmOptions);
+		const cm = options.codeMirror5.src.fromTextArea(textarea, cmOptions);
 		cm.display.wrapper.style.cssText = textarea.style.cssText;
 
-		options.codeMirrorEditor = cm;
+		options.codeMirror5Editor = cm;
 		textarea = cm.display.wrapper;
 		textarea.className += ' se-wrapper-code-mirror';
 	}

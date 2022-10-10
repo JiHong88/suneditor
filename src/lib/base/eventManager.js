@@ -536,7 +536,7 @@ EventManager.prototype = {
 		}
 
 		/** code view area auto line */
-		if (this.options.height === 'auto' && !this.options.codeMirrorEditor) {
+		if (this.options.height === 'auto' && !this.options.codeMirror5Editor) {
 			const cvAuthHeight = this.editor._codeViewAutoHeight.bind(this.editor);
 			this.addEvent(this.context.element.code, 'keydown', cvAuthHeight, false);
 			this.addEvent(this.context.element.code, 'keyup', cvAuthHeight, false);

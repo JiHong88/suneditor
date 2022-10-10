@@ -2,7 +2,7 @@ import EditorInterface from '../../interface/editor';
 import { Modal, Figure, FileManager, ModalAnchorEditor } from '../../modules';
 import { domUtils, numbers } from '../../helper';
 
-const Image = function (editor, target) {
+const Image_ = function (editor, target) {
 	// plugin bisic properties
 	EditorInterface.call(this, editor);
 	this.target = target;
@@ -84,10 +84,10 @@ const Image = function (editor, target) {
 	}
 };
 
-Image.key = 'image';
-Image.type = 'modal';
-Image.className = '';
-Image.prototype = {
+Image_.key = 'image';
+Image_.type = 'modal';
+Image_.className = '';
+Image_.prototype = {
 	/**
 	 * @override type = "modal"
 	 */
@@ -614,7 +614,7 @@ Image.prototype = {
 		}
 	},
 
-	constructor: Image
+	constructor: Image_
 };
 
 function FileCheckHandler(element) {
@@ -861,4 +861,4 @@ function CreateHTML_modal(editor) {
 	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
-export default Image;
+export default Image_;

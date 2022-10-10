@@ -6,7 +6,7 @@ import Context from './context';
 import ModuleInterface from '../interface/_module';
 
 // base
-import history from './base/history';
+import History from './base/history';
 import EventManager from './base/eventManager';
 
 // modules
@@ -1011,7 +1011,7 @@ Core.prototype = {
 			_var.codeOriginCssText = _var.codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 			_var.wysiwygOriginCssText = _var.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
 
-			if (this.options.height === 'auto' && !this.options.codeMirrorEditor) this.context.element.code.style.height = '0px';
+			if (this.options.height === 'auto' && !this.options.codeMirror5Editor) this.context.element.code.style.height = '0px';
 
 			this.status.isCodeView = false;
 
@@ -1038,10 +1038,13 @@ Core.prototype = {
 			_var.codeOriginCssText = _var.codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
 			_var.wysiwygOriginCssText = _var.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 
-			if (this.status.isFullScreen) this.context.element.code.style.height = '100%';
-			else if (this.options.height === 'auto' && !this.options.codeMirrorEditor) this.context.element.code.style.height = this.context.element.code.scrollHeight > 0 ? this.context.element.code.scrollHeight + 'px' : 'auto';
+			if (this.status.isFullScreen) {
+				this.context.element.code.style.height = '100%';
+			} else if (this.options.height === 'auto' && !this.options.codeMirror5Editor) {
+				this.context.element.code.style.height = this.context.element.code.scrollHeight > 0 ? this.context.element.code.scrollHeight + 'px' : 'auto';
+			}
 
-			if (this.options.codeMirrorEditor) this.options.codeMirrorEditor.refresh();
+			if (this.options.codeMirror5Editor) this.options.codeMirror5Editor.refresh();
 
 			this.status.isCodeView = true;
 
@@ -1149,7 +1152,7 @@ Core.prototype = {
 			topArea.style.cssText = _var.editorOriginCssText;
 			this._d.body.style.overflow = _var.bodyOverflow;
 
-			if (this.options.height === 'auto' && !this.options.codeMirrorEditor) this._codeViewAutoHeight();
+			if (this.options.height === 'auto' && !this.options.codeMirror5Editor) this._codeViewAutoHeight();
 
 			if (!!this.options.toolbar_container) this.options.toolbar_container.appendChild(toolbar);
 
@@ -1228,7 +1231,7 @@ Core.prototype = {
 				linkHTML += styles[i].outerHTML;
 			}
 
-			printDocument.write('' + '<!DOCTYPE html><html>' + '<head>' + linkHTML + '</head>' + '<body class="' + (this.options._printClass !== null ? this.options._printClass : this.options._editableClass) + '">' + contentHTML + '</body>' + '</html>');
+			printDocument.write('<!DOCTYPE html><html><head>' + linkHTML + '</head><body class="' + (this.options._printClass !== null ? this.options._printClass : this.options._editableClass) + '">' + contentHTML + '</body></html>');
 		}
 
 		this.openLoading();
@@ -1275,7 +1278,7 @@ Core.prototype = {
 		if (this.options.iframe) {
 			const arrts = this.options._printClass !== null ? 'class="' + this.options._printClass + '"' : this.options.iframe_fullPage ? domUtils.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + this.options._editableClass + '"';
 
-			windowObject.document.write('' + '<!DOCTYPE html><html>' + '<head>' + wDoc.head.innerHTML + '<style>body {overflow:auto !important; margin: 10px auto !important; height:auto !important; outline:1px dashed #ccc;}</style>' + '</head>' + '<body ' + arrts + '>' + contentHTML + '</body>' + '</html>');
+			windowObject.document.write('<!DOCTYPE html><html><head>' + wDoc.head.innerHTML + '<style>body {overflow:auto !important; margin: 10px auto !important; height:auto !important; outline:1px dashed #ccc;}</style></head><body ' + arrts + '>' + contentHTML + '</body></html>');
 		} else {
 			const links = this._d.head.getElementsByTagName('link');
 			const styles = this._d.head.getElementsByTagName('style');
@@ -1342,7 +1345,7 @@ Core.prototype = {
 			domUtils.removeClass(this.context.element.wysiwygFrame, 'se-read-only');
 		}
 
-		if (this.options.codeMirrorEditor) this.options.codeMirrorEditor.setOption('readOnly', !!value);
+		if (this.options.codeMirror5Editor) this.options.codeMirror5Editor.setOption('readOnly', !!value);
 	},
 
 	/**
@@ -1356,8 +1359,8 @@ Core.prototype = {
 		this.context.element.wysiwyg.setAttribute('contenteditable', false);
 		this.isDisabled = true;
 
-		if (this.options.codeMirrorEditor) {
-			this.options.codeMirrorEditor.setOption('readOnly', true);
+		if (this.options.codeMirror5Editor) {
+			this.options.codeMirror5Editor.setOption('readOnly', true);
 		} else {
 			this.context.element.code.setAttribute('disabled', 'disabled');
 		}
@@ -1371,8 +1374,8 @@ Core.prototype = {
 		this.context.element.wysiwyg.setAttribute('contenteditable', true);
 		this.isDisabled = false;
 
-		if (this.options.codeMirrorEditor) {
-			this.options.codeMirrorEditor.setOption('readOnly', false);
+		if (this.options.codeMirror5Editor) {
+			this.options.codeMirror5Editor.setOption('readOnly', false);
 		} else {
 			this.context.element.code.removeAttribute('disabled');
 		}
@@ -1590,8 +1593,8 @@ Core.prototype = {
 	 * @private
 	 */
 	_setCodeView: function (value) {
-		if (this.options.codeMirrorEditor) {
-			this.options.codeMirrorEditor.getDoc().setValue(value);
+		if (this.options.codeMirror5Editor) {
+			this.options.codeMirror5Editor.getDoc().setValue(value);
 		} else {
 			this.context.element.code.value = value;
 		}
@@ -1602,7 +1605,7 @@ Core.prototype = {
 	 * @private
 	 */
 	_getCodeView: function () {
-		return this.options.codeMirrorEditor ? this.options.codeMirrorEditor.getDoc().getValue() : this.context.element.code.value;
+		return this.options.codeMirror5Editor ? this.options.codeMirror5Editor.getDoc().getValue() : this.context.element.code.value;
 	},
 
 	/**
@@ -1663,7 +1666,7 @@ Core.prototype = {
 
 		// base
 		this.events = this.options.events;
-		this.history = history(this, this._onChange_historyStack.bind(this));
+		this.history = History(this, this._onChange_historyStack.bind(this));
 		this.eventManager = new EventManager(this);
 
 		// util classes

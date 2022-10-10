@@ -1,32 +1,51 @@
-const webpack = require('webpack');
-const path = require('path');
-const merge = require('webpack-merge')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-
-const common = require('./common')
+const { merge } = require('webpack-merge');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const common = require('./common');
 
 module.exports = merge(common, {
 	mode: 'development',
 	entry: './test/dev/suneditor_build_test',
 	output: {
-		filename: 'suneditor.[hash].js',
-		path: path.resolve(__dirname, 'dist')
+		filename: 'suneditor.[fullhash].js'
 	},
-	devtool: 'cheap-module-eval-source-map',
+	devtool: 'eval-source-map',
 	devServer: {
-		contentBase: 'dist',
+		compress: true,
 		host: 'localhost',
-		port: 8080
+		port: 8088
 	},
 	plugins: [
 		new MiniCssExtractPlugin({
-			filename: 'suneditor.[hash].css'
+			filename: 'suneditor.[fullhash].css'
 		}),
-		new webpack.NamedModulesPlugin(),
 		new HtmlWebpackPlugin({
 			template: './test/dev/suneditor_build_test.html',
 			inject: true
-		}),
-	]
+		})
+	],
+	optimization: {
+		chunkIds: 'named',
+		splitChunks: {
+			chunks: 'async',
+			minSize: 20000,
+			minRemainingSize: 0,
+			minChunks: 1,
+			maxAsyncRequests: 30,
+			maxInitialRequests: 30,
+			enforceSizeThreshold: 50000,
+			cacheGroups: {
+				defaultVendors: {
+					test: /[\\/]node_modules[\\/]/,
+					priority: -10,
+					reuseExistingChunk: true
+				},
+				default: {
+					minChunks: 2,
+					priority: -20,
+					reuseExistingChunk: true
+				}
+			}
+		}
+	}
 });

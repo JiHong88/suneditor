@@ -1,25 +1,24 @@
 const webpack = require('webpack');
 const path = require('path');
-const merge = require('webpack-merge')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
-
-const common = require('./common')
+const { merge } = require('webpack-merge');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const common = require('./common');
 
 module.exports = merge(common, {
 	mode: 'production',
-	entry: './src/suneditor_build',
+	entry: './webpack/_build_cdn',
 	output: {
 		filename: 'suneditor.min.js',
 		path: path.resolve(__dirname, '../dist')
 	},
 	plugins: [
-		new webpack.SourceMapDevToolPlugin(),
-		new webpack.HashedModuleIdsPlugin(),
+		// new webpack.SourceMapDevToolPlugin(),
+		new webpack.ids.HashedModuleIdsPlugin(),
 		new webpack.optimize.ModuleConcatenationPlugin(),
-		new CleanWebpackPlugin(['dist']),
-		new OptimizeCSSPlugin(),
+		new CleanWebpackPlugin(),
+		new CssMinimizerPlugin(),
 		new MiniCssExtractPlugin({
 			filename: 'suneditor.min.css'
 		})

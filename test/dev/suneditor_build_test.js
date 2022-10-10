@@ -1,105 +1,86 @@
-import '../../src/assets/suneditor.css';
-import '../../src/assets/suneditor-content.css';
+require('../../src/assets/suneditor.css');
+require('../../src/assets/suneditor-content.css');
+// require('katex/dist/katex.css');
 
 import suneditor from '../../src/suneditor';
-// import lang from '../../src/langs';
-
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/mode/htmlmixed/htmlmixed';
-import CodeMirror from 'codemirror';
-
-// import 'katex/dist/katex.min.css';
 import Katex from 'katex';
+// import 'codemirror/lib/codemirror.css';
+// import 'codemirror/mode/htmlmixed/htmlmixed';
+// import CodeMirror from 'codemirror';
 
-import blockquote from "../../src/plugins/command/blockquote";
-import align from "../../src/plugins/dropdown/align";
-import font from "../../src/plugins/dropdown/font";
-import fontColor from "../../src/plugins/dropdown/fontColor";
-import backgroundColor from "../../src/plugins/dropdown/backgroundColor";
-import fontSize from "../../src/plugins/dropdown/fontSize";
-import formatBlock from "../../src/plugins/dropdown/formatBlock";
-import horizontalLine from "../../src/plugins/dropdown/horizontalLine";
-import lineHeight from "../../src/plugins/dropdown/lineHeight";
-import list from "../../src/plugins/dropdown/list";
-import paragraphStyle from "../../src/plugins/dropdown/paragraphStyle";
-import template from "../../src/plugins/dropdown/template";
-import textStyle from "../../src/plugins/dropdown/textStyle";
-import table from "../../src/plugins/dropdown/table";
-import math from "../../src/plugins/modal/math";
-import link from "../../src/plugins/modal/link";
-import audio from "../../src/plugins/modal/audio";
-import image from "../../src/plugins/modal/image";
-import video from "../../src/plugins/modal/video";
+// import lang from '../../src/langs';
+import blockquote from '../../src/plugins/command/blockquote';
+import align from '../../src/plugins/dropdown/align';
+import font from '../../src/plugins/dropdown/font';
+import fontColor from '../../src/plugins/dropdown/fontColor';
+import backgroundColor from '../../src/plugins/dropdown/backgroundColor';
+import fontSize from '../../src/plugins/dropdown/fontSize';
+import formatBlock from '../../src/plugins/dropdown/formatBlock';
+import horizontalLine from '../../src/plugins/dropdown/horizontalLine';
+import lineHeight from '../../src/plugins/dropdown/lineHeight';
+import list from '../../src/plugins/dropdown/list';
+import paragraphStyle from '../../src/plugins/dropdown/paragraphStyle';
+import template from '../../src/plugins/dropdown/template';
+import textStyle from '../../src/plugins/dropdown/textStyle';
+import table from '../../src/plugins/dropdown/table';
+import math from '../../src/plugins/modal/math';
+import link from '../../src/plugins/modal/link';
+import audio from '../../src/plugins/modal/audio';
+import image from '../../src/plugins/modal/image';
+import video from '../../src/plugins/modal/video';
 
 window.e = suneditor.create(document.getElementById('editor2'), {
-    // value: '<h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2>',
-    // textDirection: 'rtl',
-    charCounter: true,
-    // tableCellControllerPosition: 'top',
-    statusbar: true,
-    // mode: "inline",
-    // imageUploadUrl: 'http://localhost:3000/editor/upload',
-    // videoUploadUrl: 'http://localhost:3000/editor/upload',
-    // audioUploadUrl: 'http://localhost:3000/editor/upload',
-    katex: Katex,
-    width: "100%",
-    height: '500px',
-    minHeight : 300,
-    charCounter: true,
-    font: [
-        'Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact',
-        'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'
-    ],
-    templates: [
-        {
-            name: 'Template-1',
-            html: '<p>HTML source1</p>'
-        },
-        {
-            name: 'Template-2',
-            html: '<p>HTML source2</p>'
-        }
-      ],
-    // iframe: true,
-    // iframe_fullPage: true,
-    linkRel: [
-        'author',
-        'external',
-        'help',
-        'license',
-        'next',
-        'follow',
-        'nofollow',
-        'noreferrer',
-        'noopener',
-        'prev',
-        'search',
-        'tag'
-    ],
-    linkRelDefault: 'noreferrer noopener',
-    linkTargetNewWindow: true,
-    linkProtocol: 'https://',
-    imageMultipleFile: true,
-    imageResizing: true,
-    plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock, horizontalLine, lineHeight, list,
-        paragraphStyle, template, textStyle, table, math, link, audio, image, video
-    ],
-    buttonList: [
-        ['undo', 'redo'],
-        ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-        ['removeFormat'],
-        ['outdent', 'indent'],
-        ['fullScreen', 'showBlocks', 'codeView'],
-        ['preview', 'print'],
-        ['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'horizontalLine'],
-        ['lineHeight', 'list', 'paragraphStyle', 'template', 'textStyle', 'table'],
-        ['math', 'link', 'audio', 'image', 'video']
-    ],
-    events: {
-        onAudioUpload: (a, b, c, d, e) => {
-            window.d = d;
-        }
-    }
+	// value: '<h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2>',
+	// textDirection: 'rtl',
+	charCounter: true,
+	// tableCellControllerPosition: 'top',
+	statusbar: true,
+	// codeMirror: CodeMirror,
+	// mode: "inline",
+	// imageUploadUrl: 'http://localhost:3000/editor/upload',
+	// videoUploadUrl: 'http://localhost:3000/editor/upload',
+	// audioUploadUrl: 'http://localhost:3000/editor/upload',
+	katex: Katex,
+	width: '100%',
+	height: '500px',
+	minHeight: 300,
+	charCounter: true,
+	font: ['Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'],
+	templates: [
+		{
+			name: 'Template-1',
+			html: '<p>HTML source1</p>'
+		},
+		{
+			name: 'Template-2',
+			html: '<p>HTML source2</p>'
+		}
+	],
+	// iframe: true,
+	// iframe_fullPage: true,
+	linkRel: ['author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],
+	linkRelDefault: 'noreferrer noopener',
+	linkTargetNewWindow: true,
+	linkProtocol: 'https://',
+	imageMultipleFile: true,
+	imageResizing: true,
+	plugins: [align, blockquote, font, fontColor, backgroundColor, fontSize, formatBlock, horizontalLine, lineHeight, list, paragraphStyle, template, textStyle, table, math, link, audio, image, video],
+	buttonList: [
+		['undo', 'redo'],
+		['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+		['removeFormat'],
+		['outdent', 'indent'],
+		['fullScreen', 'showBlocks', 'codeView'],
+		['preview', 'print'],
+		['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'horizontalLine'],
+		['lineHeight', 'list', 'paragraphStyle', 'template', 'textStyle', 'table'],
+		['math', 'link', 'audio', 'image', 'video']
+	],
+	events: {
+		onAudioUpload: (a, b, c, d, e) => {
+			window.d = d;
+		}
+	}
 });
 
 // window.e.events.onAudioUpload = () => {
@@ -137,7 +118,6 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 
 // // ssss.setContent(`<p><br /></p><div class="se-component se-image-container __se__float-none"><img src="http://suneditor.com/docs/cat.jpg" alt="" style="" /></div><p><br /></p>`)
 
-
 // suneditor.create('scrolleditor', {
 //     // mode: 'balloon-always',
 //     katex: Katex,
@@ -152,11 +132,10 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     value: '',
 //     statusbar: false,
 //     statusbar_showPathLabel: false,
-//     display: "inline",  
+//     display: "inline",
 //     tabDisable: false,
 //     placeholder: "Enter the question image here",
 // })
-
 
 // window.sun_destroy1 = function () {
 //     s1.destroy()
@@ -185,13 +164,13 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 // }
 
 // let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
-    
+
 //     lineAttrReset: '*',
 //     alignItems: ['left', 'right', 'center'],
 //     value: `<p>ss&nbsp; fdf fdsfa fds</p>
 
 //     <p>a fdsa fdsa fdas</p>
-    
+
 //     <p>&nbsp;dsa fdsa fdsa fdsa<br>
 //     </p>
 //     `,
@@ -271,7 +250,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     //     autoplay: true
 //     // },
 //     // videoIframeAttrs: {
-//     //     style: "border: 2px solid red;" 
+//     //     style: "border: 2px solid red;"
 //     // },
 //     // height: 'auto',
 //     iframe_cssFileName: '.+',
@@ -429,7 +408,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 
 // // ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
 // //     // ResizeImage(files, uploadHandler)
-    
+
 // //     console.log("infoinfoinfo", info);
 // //     info.alt = "test-123";
 // //     const response = { // Same format as "videoUploadUrl" response
@@ -470,9 +449,9 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     ss.setOptions({
 //         statusbar_container: null,
 //     })
-    
+
 //     // ss.core.setDir(!window.aaa ? 'rtl' : 'ltr');
-    
+
 //     // window.aaa = !window.aaa
 //     // ss.core.setDir("rtl")
 //     // ss.noticeOpen('test notice');
@@ -605,7 +584,6 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     console.log("langlang")
 // }
 
-
 // const editor = suneditor.init({
 //     width: '100%',
 //     // iframe: true,
@@ -640,14 +618,13 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     console.log("core", core)
 // }
 
-
 // const newOption = {
 //     mode: 'balloon',
 //     iframe: false,
 //     // editorCSSText: 'height: 200px;',
 //     height: 150,
 //     textSizeUnit: 'pt',
-    
+
 //     placeholder: 'Placeholder...'
 // }
 // const newOption2 = {
@@ -694,7 +671,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 
 //     for (let i = 0, video; i < videoList.length; i++) {
 //         video = videoList[i];
-            
+
 //         list += '<li>' +
 //                     '<button title="delete" onclick="selectVideo(\'delete\',' + video.index + ')">X</button>' +
 //                     '<a href="javascript:void(0)" onclick="selectVideo(\'select\',' + video.index + ')">' + video.src + '</a>' +
@@ -733,7 +710,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 
 // window.deleteCheckedImages = function () {
 //     const iamgesInfo = s2.getImagesInfo();
-    
+
 //     for (let i = 0; i < iamgesInfo.length; i++) {
 //         if (selectedImages.indexOf(iamgesInfo[i].index) > -1) {
 //             iamgesInfo[i].delete();
@@ -754,7 +731,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     for (let i = 0, image, fixSize; i < imageList.length; i++) {
 //         image = imageList[i];
 //         fixSize = (image.size / 1000).toFixed(1) * 1
-            
+
 //         list += '<li id="img_' + image.index + '">' +
 //                     '<div onclick="checkImage(' + image.index + ')">' +
 //                         '<div><img src="' + image.src + '"></div>' +
@@ -762,7 +739,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //                     '<a href="javascript:void(0)" onclick="setImage(\'select\',' + image.index + ')" class="image-size">' + fixSize + 'KB</a>' +
 //                     '<div class="image-check"><svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path></svg></div>' +
 //                 '</li>';
-        
+
 //         size += fixSize;
 //     }
 
@@ -785,7 +762,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //             const image = s2.getImagesInfo()[findIndex(s2.getImagesInfo(), index)]
 //             imageList.push(image)
 //         } else { // update
-            
+
 //         }
 //     }
 
@@ -835,7 +812,6 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     s2.insertImage(document.getElementById('sun_files').files);
 // }
 
-
 // window.sun_destroy2 = function () {
 //     s2.destroy();
 // }
@@ -884,7 +860,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     })
 //     win.document.write('<textarea name="editor4" id="editor4" style="width: 1080px; height: 200px;"></textarea>');
 //     s4 = suneditor.create(win.document.querySelector('#editor4'), {
-        
+
 //         width: '100%',
 //         toolbar_sticky: 0,
 //         imageWidth: 300,

@@ -18,10 +18,9 @@
   },
   "exclude": [
     "node_modules",
-    "sample",
     "test",
     "dist",
     "src",
-    "webpack.*.js"
+    "webpack"
   ]
 }

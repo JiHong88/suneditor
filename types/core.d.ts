@@ -1,3 +1,4 @@
+import type * as CSS from 'csstype';
 import { History } from './history';
 import { Plugin } from '../src/plugins/Plugin';
 import { Lang } from './Lang';

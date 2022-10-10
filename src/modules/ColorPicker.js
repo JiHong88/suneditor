@@ -15,7 +15,7 @@ const ColorPicker = function (inst, styles, defaultColor, colorList) {
 	this.kind = inst.constructor.key;
 	this.inst = inst;
 	this.target = CreateHTML(inst.editor, colorList);
-	this.inputElement = this.target.querySelector('._se_color_picker_input');
+	this.inputElement = this.target.querySelector('.se-color-input');
 	this.defaultColor = defaultColor;
 	this.styleProperties = styles;
 	this.currentColor = '';
@@ -222,7 +222,7 @@ function CreateHTML(editor, colorList) {
 	}
 	list +=
 		'<form class="se-form-group">' +
-		'<input type="text" maxlength="9" class="_se_color_picker_input se-color-input"/>' +
+		'<input type="text" maxlength="9" class="se-color-input"/>' +
 		'<button type="submit" class="se-btn _se_color_picker_submit" title="' +
 		lang.modalBox.submitButton +
 		'" aria-label="' +

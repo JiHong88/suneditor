@@ -236,9 +236,9 @@ import 'codemirror/mode/htmlmixed/htmlmixed'
 import 'codemirror/lib/codemirror.css'
 
 suneditor.create('sample', {
-    codeMirror: CodeMirror // window.CodeMirror,
+    codeMirror5: CodeMirror // window.CodeMirror,
     // Set options
-    // codeMirror: {
+    // codeMirror5: {
     //     src: CodeMirror,
     //     options: {...}
     // }
@@ -436,10 +436,10 @@ previewTemplate : A template of the "preview".
 printTemplate   : A template of the "print".
                   The {{content}} part in the HTML string is replaced with the content of the editor. default: null {string}
                   ex) "<div style='width:auto; max-width:1080px; margin:auto;'><h1>Print Template</h1> {{content}} <div>_Footer_</div></div>"
-codeMirror      : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
+codeMirror5     : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
                   Use version 5.x.x // https://github.com/codemirror/CodeMirror
-                  ex) codeMirror: CodeMirror // Default option
-                      codeMirror: { // Custom option
+                  ex) codeMirror5: CodeMirror // Default option
+                      codeMirror5: { // Custom option
                         src: CodeMirror,
                         options: {
                             /** default options **
