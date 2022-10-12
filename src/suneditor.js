@@ -2,6 +2,16 @@ import Core from './lib/core';
 import Constructor from './lib/constructor';
 import Context from './lib/context';
 
+import EditorInterface from './interface';
+import Plugins from './plugins';
+import Langs from './langs';
+import Modules from './modules';
+
+export const editorInterface = EditorInterface;
+export const plugins = Plugins;
+export const langs = Langs;
+export const modules = Modules;
+
 export default {
 	/**
 	 * @description Returns the create function with preset options.

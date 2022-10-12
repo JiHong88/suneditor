@@ -1,4 +1,4 @@
-import EditorInterface from '../../interface/editor';
+import EditorInterface from '../../interface';
 import { Modal, Figure, FileManager } from '../../modules';
 import { domUtils, numbers } from '../../helper';
 

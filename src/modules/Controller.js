@@ -1,4 +1,4 @@
-import EditorInterface from '../interface/editor';
+import EditorInterface from '../interface';
 import { domUtils, env } from '../helper';
 
 const NON_TEXT_KEYCODE = new env._w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$');

@@ -1,4 +1,4 @@
-import EditorInterface from '../../interface/editor';
+import EditorInterface from '../../interface';
 import { Modal, Controller, ModalAnchorEditor } from '../../modules';
 import { domUtils } from '../../helper';
 

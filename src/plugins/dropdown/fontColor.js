@@ -1,4 +1,4 @@
-import EditorInterface from '../../interface/editor';
+import EditorInterface from '../../interface';
 import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 

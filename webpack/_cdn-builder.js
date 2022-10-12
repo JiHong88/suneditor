@@ -5,7 +5,7 @@ import suneditor from '../src/suneditor';
 import helper from '../src/helper';
 import plugins from '../src/plugins';
 import modules from '../src/modules';
-import EditorInterface from '../src/interface/editor';
+import EditorInterface from '../src/interface';
 
 if (!window.SUNEDITOR) {
 	Object.defineProperty(window, 'SUNEDITOR', {

@@ -1,4 +1,4 @@
-import EditorInterface from '../../interface/editor';
+import EditorInterface from '../../interface';
 import { domUtils } from '../../helper';
 
 const HorizontalLine = function (editor, target) {
