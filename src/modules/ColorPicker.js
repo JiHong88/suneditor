@@ -249,7 +249,7 @@ function _makeColor(colorList) {
 	for (let i = 0, len = colorList.length, color; i < len; i++) {
 		color = colorList[i];
 		if (typeof color === 'string') {
-			list += '<li>' + '<button type="button" data-value="' + color + '" title="' + color + '" aria-label="' + color + '" style="background-color:' + color + ';"></button>' + '</li>';
+			list += '<li><button type="button" data-value="' + color + '" title="' + color + '" aria-label="' + color + '" style="background-color:' + color + ';"></button></li>';
 		}
 	}
 	list += '</ul>';

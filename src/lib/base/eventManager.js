@@ -621,6 +621,10 @@ function ToolbarButtonsHandler(e) {
 		this.editor._antiBlur = false;
 	}
 
+	if (!this.context.element.wysiwyg.contains(this.selection.getNode())) {
+		this.editor.focus();
+	}
+
 	if (domUtils.getParentElement(target, '.se-dropdown')) {
 		e.stopPropagation();
 		this.editor._notHideToolbar = true;
@@ -628,7 +632,7 @@ function ToolbarButtonsHandler(e) {
 		let command = target.getAttribute('data-command');
 		let className = target.className;
 
-		while (!command && !/se-menu-list/.test(className) && !/sun-editor-common/.test(className)) {
+		while (!command && !/(se-menu-list|sun-editor-common)/.test(className)) {
 			target = target.parentNode;
 			command = target.getAttribute('data-command');
 			className = target.className;

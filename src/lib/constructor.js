@@ -197,7 +197,7 @@ export function ResetOptions(mergeOptions, context, originOptions) {
 function InitOptions(element, options) {
 	const plugins = {};
 	if (options.plugins) {
-		const _plugins = options.plugins;
+		const _plugins = (options._init_plugins = options.plugins);
 		const pluginsValues = _plugins.length
 			? _plugins
 			: _w.Object.keys(_plugins).map(function (name) {
@@ -849,11 +849,11 @@ export function CreateToolBar(buttonList, plugins, options) {
 					// more button
 					if (/^\:/.test(button)) {
 						moreButton = true;
-						const matched = button.match(/^\:([^\-]+)\-([^\-]+)\-([^\-]+)/);
-						moreCommand = '__se__' + matched[1].trim();
-						const title = matched[2].trim();
-						const innerHTML = matched[3].trim();
-						module = ['se-btn-more', title, moreCommand, 'MORE', innerHTML];
+						const matched = button.match(/^\:([^\-]+)\-([^\-]+)/);
+						moreCommand = '__se__more_' + i;
+						const title = matched[1].trim();
+						const innerHTML = matched[2].trim();
+						module = ['se-btn-more', /^lang\./i.test(title) ? options.lang[title.replace(/^lang\./i, '')] : title, moreCommand, 'MORE', innerHTML];
 					} else {
 						// buttons
 						module = defaultButtonList[button];

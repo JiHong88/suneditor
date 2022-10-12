@@ -5,7 +5,7 @@
 /* red color #b94a48 , #f2dede , #eed3d7, #d9534f */
 
 /** --- suneditor main */
-.sun-editor {width:auto; height:auto; box-sizing:border-box; font-family:Helvetica Neue; border:1px solid #dadada; background-color:#FFF; color:#000; user-select:none; -o-user-select:none; -moz-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -ms-user-select:none;}
+.sun-editor {width:auto; height:auto; box-sizing:border-box; font-family:Helvetica Neue; border:1px solid #dadada; background-color:#FFF; color:#000;}
 .sun-editor * {box-sizing:border-box;  -webkit-user-drag:none; overflow:visible;}
 .sun-editor-common input, .sun-editor-common select, .sun-editor-common textarea, .sun-editor-common button {font-size:14px; line-height:1.5;}
 .sun-editor-common body, .sun-editor-common div, .sun-editor-common dl, .sun-editor-common dt, .sun-editor-common dd, .sun-editor-common ul, .sun-editor-common ol, .sun-editor-common li,
@@ -172,6 +172,7 @@
 /* tool bar select button (font, fontSize, formatBlock) */
 .sun-editor .se-btn-select {width:auto; display:flex; padding:4px 6px;}
 .sun-editor .se-btn-select .txt {flex:auto; text-align:left;}
+.sun-editor .se-btn-select.on .txt + svg {transform:rotate(-180deg);}
 .sun-editor .se-btn-select.se-btn-tool-font {width:100px;}
 .sun-editor .se-btn-select.se-btn-tool-format {width:82px;}
 .sun-editor .se-btn-select.se-btn-tool-size {width:78px;}
@@ -351,12 +352,12 @@
 .sun-editor .se-modal .se-modal-inner .se-link-preview {display:block; height:auto; max-height:18px; font-size:13px; padding-top:2px; font-weight:normal; font-family:inherit; color:#666; background-color:transparent; overflow:hidden; text-overflow:ellipsis; word-break:break-all; white-space:pre;}
 /* modal - modal - anchor module */
 .sun-editor .se-modal .se-modal-inner .se-anchor-preview-form {width:100%; display:flex; margin-top:4px;}
-.sun-editor .se-modal .se-modal-inner .se-anchor-preview-form .se-svg.se-anchor-preview-icon {flex:unset; display:none; line-height:1.5; color:#4592ff;}
+.sun-editor .se-modal .se-modal-inner .se-anchor-preview-form .se-svg.se-anchor-preview-icon {flex:unset; display:none; line-height:1; margin:2px; color:#4592ff;}
 .sun-editor .se-modal .se-modal-inner .se-anchor-preview-form .se-link-preview {flex:auto; margin:0; }
 /* modal - modal - anchor module - rel select */
 .sun-editor .se-modal .se-modal-inner .se-anchor-rel {position:relative; height:34px;}
 .sun-editor .se-modal .se-modal-inner .se-anchor-rel-btn {width:46px; color:#3f9dff;}
-.sun-editor .se-modal .se-modal-inner .se-anchor-rel-wrapper {display:flex; line-height:1.5; padding:6px 6px 0 3px;}
+.sun-editor .se-modal .se-modal-inner .se-anchor-rel-wrapper {display:flex; line-height:1; padding:6px 6px 0 3px;}
 .sun-editor .se-modal .se-modal-inner .se-anchor-rel-preview {text-align:left;}
 /* .sun-editor .se-modal .se-modal-inner .se-modal-form .se-mention-item {line-height:28px;min-height:25px;padding:0 5px;cursor:pointer;}
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-mention-item:hover {background-color:#e1e1e1}

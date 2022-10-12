@@ -9,7 +9,7 @@ module.exports = merge(common, {
 	output: {
 		filename: 'suneditor.[fullhash].js'
 	},
-	devtool: 'eval-cheap-module-source-map',
+	devtool: 'eval-source-map',
 	devServer: {
 		compress: true,
 		host: 'localhost',

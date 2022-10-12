@@ -62,6 +62,7 @@
             tag_blockquote: '인용문',
             tag_pre: '코드',
             template: '템플릿',
+            layout: '레이아웃',
             lineHeight: '줄 높이',
             paragraphStyle: '문단 스타일',
             textStyle: '글자 스타일',

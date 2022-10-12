@@ -31,7 +31,7 @@ ParagraphStyle.prototype = {
 		const currentFormat = this.format.getLine(this.selection.getNode());
 
 		for (let i = 0, len = paragraphList.length; i < len; i++) {
-			if (domUtils.hasClass(currentFormat, paragraphList[i].getAttribute('data-value'))) {
+			if (domUtils.hasClass(currentFormat, paragraphList[i].getAttribute('data-command'))) {
 				domUtils.addClass(paragraphList[i], 'active');
 			} else {
 				domUtils.removeClass(paragraphList[i], 'active');
@@ -74,7 +74,7 @@ function OnClickMenu(e) {
 	const target = domUtils.getCommandTarget(e.target);
 	if (!target) return;
 
-	this.action(target.getAttribute('data-value'), target);
+	this.action(target.getAttribute('data-command'), target);
 }
 
 function CreateHTML(editor) {
@@ -113,7 +113,7 @@ function CreateHTML(editor) {
 		attrs = p.class ? ' class="' + p.class + '"' : '';
 		_class = p._class;
 
-		list += '<li>' + '<button type="button" class="se-btn-list' + (_class ? ' ' + _class : '') + '" data-value="' + p.class + '" title="' + name + '" aria-label="' + name + '">' + '<div' + attrs + '>' + name + '</div>' + '</button></li>';
+		list += '<li>' + '<button type="button" class="se-btn-list' + (_class ? ' ' + _class : '') + '" data-command="' + p.class + '" title="' + name + '" aria-label="' + name + '">' + '<div' + attrs + '>' + name + '</div>' + '</button></li>';
 	}
 	list += '</ul></div>';
 

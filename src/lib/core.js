@@ -632,7 +632,7 @@ Core.prototype = {
 	focus: function () {
 		if (this.context.element.wysiwygFrame.style.display === 'none') return;
 
-		if (this.options.iframe) {
+		if (this.options.iframe || !this.context.element.wysiwyg.contains(this.selection.getNode())) {
 			this._nativeFocus();
 		} else {
 			try {

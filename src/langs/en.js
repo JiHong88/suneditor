@@ -62,6 +62,7 @@
             tag_blockquote: 'Quote',
             tag_pre: 'Code',
             template: 'Template',
+            layout: 'Layout',
             lineHeight: 'Line height',
             paragraphStyle: 'Paragraph style',
             textStyle: 'Text style',

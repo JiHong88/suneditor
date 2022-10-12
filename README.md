@@ -162,7 +162,7 @@ suneditor.create('sample', {
         /** ['imageGallery'] */ // You must add the "imageGalleryUrl".
         ['fullScreen', 'showBlocks', 'codeView'],
         ['preview', 'print'],
-        ['save', 'template'],
+        ['save', 'template', 'layout'],
         /** ['dir', 'dir_ltr', 'dir_rtl'] */ // "dir": Toggle text direction, "dir_ltr": Right to Left, "dir_rtl": Left to Right
     ]
 })
@@ -195,7 +195,7 @@ const initEditor = suneditor.init({
         'table', 'link', 'image', 'video', 'audio', /** 'math', */ // You must add the 'katex' library at options to use the 'math' plugin.
         /** 'imageGallery', */ // You must add the "imageGalleryUrl".
         'fullScreen', 'showBlocks', 'codeView',
-        'preview', 'print', 'save', 'template',
+        'preview', 'print', 'save', 'template', 'layout',
         /** 'dir', 'dir_ltr', 'dir_rtl' */ // "dir": Toggle text direction, "dir_ltr": Right to Left, "dir_rtl": Left to Right
         ]
     ]
@@ -844,7 +844,7 @@ buttonList      : Defines button list to array {Array}
                     // ['imageGallery'], // You must add the "imageGalleryUrl".
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
-                    // ['save', 'template'],
+                    // ['save', 'template', 'layout'],
                     // ['dir', 'dir_ltr', 'dir_rtl'],
                     // '/', Line break
                   ]
@@ -872,23 +872,24 @@ buttonList      : Defines button list to array {Array}
 
 ----------------- ex) More button: --------------------------------------------------------------------------------
                   // The more button is defined as a string starting with a colon.(":").
-                  // :Identifier - Title attribute - Button's innerHTML
+                  // :Title - Button's innerHTML
                   /**
-                   * "Identifier": The button's identifier. Please specify uniquely.
-                   * "Title attribute": Title attribute of the button to be displayed as a tooltip.
+                   * "Title": Title attribute of the button to be displayed as a tooltip.
+                   * * lang.[options.lang.key] -> Use the text of the "lang" option.
+                   * * xxx -> Text
                    * "Button's innerHTML": Define the button's "innerHTML".
-                   * default.xxx -> Use the attributes of "defaultIcons".
-                   * (more_text, more_paragraph, more_plus, more_horizontal, more_vertical)
-                   * text.xxx -> Use the text.
-                   * xxx -> HTML
+                   * * default.[defaultIcon] -> Use the attributes of "defaultIcons".
+                   * * * default.[more_text, more_paragraph, more_plus, more_horizontal, more_vertical]
+                   * * text.[xxx] -> Use the text.
+                   * * xxx -> HTML
                    */
                   [
                     ['undo', 'redo'],
-                    [':t-More Text-default.more_text', 'bold', 'underline', 'italic'],
-                    [':p-More Paragraph-default.more_paragraph', 'font', 'formatBlock', 'align', 'list'],
-                    [':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video'],
-                    [':v-View-text.View', 'fullScreen', 'codeView', 'print'],
-                    ['-right', ':o-More Others-<i class="xxx"></i>', 'save', 'template'], // Used with alignment
+                    [':lang.option_lang_text-default.more_text', 'bold', 'underline', 'italic'],
+                    [':More Paragraph-default.more_paragraph', 'font', 'formatBlock', 'align', 'list'],
+                    [':More Rich-default.more_plus', 'table', 'link', 'image', 'video'],
+                    [':View-text.View', 'fullScreen', 'codeView', 'print'],
+                    ['-right', ':More Others-<i class="xxx"></i>', 'save', 'template', 'layout'], // Used with alignment
                   ]
                   
 ----------------- ex) Responsive setting: -------------------------------------------------------------------------
@@ -909,30 +910,30 @@ buttonList      : Defines button list to array {Array}
                     ['imageGallery'],
                     ['fullScreen', 'showBlocks', 'codeView'],
                     ['preview', 'print'],
-                    ['save', 'template'],
+                    ['save', 'template', 'layout'],
                     ['-left', '#fix', 'dir_ltr', 'dir_rtl'],
                     // (min-width:992px)
                     ['%992', [
                         ['undo', 'redo'],
-                        [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
+                        [':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
                         ['bold', 'underline', 'italic', 'strike'],
-                        [':t-More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
+                        [':More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
                         ['removeFormat'],
                         ['outdent', 'indent'],
                         ['align', 'horizontalLine', 'list', 'lineHeight'],
                         ['-right', 'dir'],
-                        ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template'],
-                        ['-right', ':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
+                        ['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout'],
+                        ['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
                     ]],
                     // (min-width:768px)
                     ['%768', [
                         ['undo', 'redo'],
-                        [':p-More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
-                        [':t-More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'removeFormat'],
-                        [':e-More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'horizontalLine', 'list', 'lineHeight'],
-                        [':r-More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
+                        [':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
+                        [':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'removeFormat'],
+                        [':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'horizontalLine', 'list', 'lineHeight'],
+                        [':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
                         ['-right', 'dir'],
-                        ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template']
+                        ['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout']
                     ]]
                   ]
                   

@@ -11,8 +11,7 @@ import { CreateToolBar } from '../constructor';
 const Toolbar = function (editor) {
 	CoreInterface.call(this, editor);
 	this._responsiveCurrentSize = 'default';
-	this._responsiveButtons = editor._responsiveButtons;
-	this._rButtons = null;
+	this._rButtonArray = editor._responsiveButtons;
 	this._rButtonsize = null;
 	this._sticky = false;
 	this._inlineToolbarAttr = {
@@ -20,6 +19,8 @@ const Toolbar = function (editor) {
 		width: '',
 		isShow: false
 	};
+
+	this._setResponsive();
 };
 
 Toolbar.prototype = {
@@ -78,15 +79,13 @@ Toolbar.prototype = {
 		this.menu.containerOff();
 		this.menu._moreLayerOff();
 
-		const newToolbar = CreateToolBar(buttonList, this.plugins, this.options);
-		this._rButtons = newToolbar.responsiveButtons;
-		this._setResponsive();
-
+		const newToolbar = CreateToolBar(buttonList, this.options._init_plugins, this.options);
 		this.context.element.toolbar.replaceChild(newToolbar._buttonTray, this.context.element._buttonTray);
-		const newContext = Context(this.context.element.originElement, this.context.element.topArea, this.options);
+		const newContext = Context(this.context.element.originElement, this.context.element.topArea, this.context.element.wysiwygFrame, this.context.element.code, this.options);
 
 		this.context.element = newContext.element;
 		this.context.tool = newContext.tool;
+		this.context.element.eventWysiwyg = this.options.iframe ? this._ww : this.context.element.wysiwyg
 		if (this.options.iframe) this.context.element.wysiwyg = this._wd.body;
 
 		this.editor._recoverButtonStates();
@@ -94,7 +93,7 @@ Toolbar.prototype = {
 		this.history._resetCachingButton();
 
 		this.editor.effectNode = null;
-		if (this.status.hasFocus) this.eventMenager.applyTagEffect();
+		if (this.status.hasFocus) this.eventManager.applyTagEffect();
 		if (this.status.isReadOnly) domUtils.setDisabled(true, this.editor.controllerOnDisabledButtons);
 		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'));
 	},
@@ -124,7 +123,7 @@ Toolbar.prototype = {
 
 			if (this._responsiveCurrentSize !== responsiveWidth) {
 				this._responsiveCurrentSize = responsiveWidth;
-				this.setButtons(this._rButtons[responsiveWidth]);
+				this.setButtons(this._rButtonArray[responsiveWidth]);
 			}
 		}
 	},
@@ -175,15 +174,15 @@ Toolbar.prototype = {
 	},
 
 	_setResponsive: function () {
-		if (this._rButtons && this._rButtons.length === 0) {
-			this._rButtons = null;
+		if (this._rButtonArray && this._rButtonArray.length === 0) {
+			this._rButtonArray = null;
 			return;
 		}
 
 		this._responsiveCurrentSize = 'default';
 		const sizeArray = (this._rButtonsize = []);
-		const _responsiveButtons = this._responsiveButtons;
-		const buttonsObj = (this._rButtons = {
+		const _responsiveButtons = this.editor._responsiveButtons;
+		const buttonsObj = (this._rButtonArray = {
 			default: _responsiveButtons[0]
 		});
 		for (let i = 1, len = _responsiveButtons.length, size, buttonGroup; i < len; i++) {

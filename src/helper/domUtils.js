@@ -360,12 +360,14 @@ export function getParentElement(element, query) {
  * @returns {Element|null}
  */
 export function getCommandTarget(target) {
-	let command = null;
+	let command = target.getAttribute('data-command');
+
 	while (!command && !/^(UL|DIV)$/i.test(target.tagName)) {
-		if (target.getAttribute('data-command')) return target;
 		target = target.parentNode;
+		if (target.getAttribute('data-command')) return target;
 	}
-	return null;
+
+	return command ? target : null;
 }
 
 /**
