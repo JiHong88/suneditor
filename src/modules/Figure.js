@@ -258,7 +258,7 @@ Figure.prototype = {
 
 		this.resizeDot.style.display = 'block';
 		this.controller.open(this.resizeDot, null, this.__offContainer);
-		domUtils.setDisabled(true, this.editor.resizingDisabledButtons);
+		domUtils.setDisabled(true, this.editor.controllerOnDisabledButtons);
 
 		// set members
 		domUtils.addClass(this._cover, 'se-figure-selected');
@@ -816,7 +816,7 @@ function CreateAlign(editor) {
 }
 
 function OffFigureContainer() {
-	domUtils.setDisabled(false, this.editor.resizingDisabledButtons);
+	domUtils.setDisabled(false, this.editor.controllerOnDisabledButtons);
 	this.resizeDot.style.display = 'none';
 	this.editor._figureContainer = null;
 	this.inst.init();
@@ -926,7 +926,18 @@ function CreateHTML_controller(editor, controls) {
 		html += '<div class="se-btn-group">';
 		for (let j = 0, len = group.length, m; j < len; j++) {
 			m = CONTROLLER_BUTTONS_MAP[group[j]];
-			html += '<button type="button" data-command="' + m.c + '" data-value="' + m.v + '" class="se-tooltip">' + (icons[m.icon] || m.text || '!') + '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (lang.controller[m.l] || m.l) + '</span></span></button>';
+			html +=
+				'<button type="button" data-command="' +
+				m.c +
+				'" data-value="' +
+				m.v +
+				'" class="' +
+				(m.text ? 'se-btn-w-auto ' : '') +
+				'se-btn se-tooltip">' +
+				(icons[m.icon] || m.text || '!') +
+				'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
+				(lang.controller[m.l] || m.l) +
+				'</span></span></button>';
 		}
 		html += '</div>';
 	}

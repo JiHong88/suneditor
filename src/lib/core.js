@@ -175,7 +175,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	/**
 	 * @description An array of buttons whose class name is not "se-resizing-enabled"
 	 */
-	this.resizingDisabledButtons = [];
+	this.controllerOnDisabledButtons = [];
 
 	// ----- private properties -----
 	/**
@@ -465,7 +465,7 @@ Core.prototype = {
 				return;
 			}
 
-			if (this.isReadOnly && domUtils.arrayIncludes(this.resizingDisabledButtons, target)) return;
+			if (this.isReadOnly && domUtils.arrayIncludes(this.controllerOnDisabledButtons, target)) return;
 			if (/dropdown/.test(type) && (this.menu._menuTrayMap[command] === null || target !== this.menu.currentDropdownActiveButton)) {
 				this.menu.dropdownOn(target);
 				return;
@@ -998,6 +998,7 @@ Core.prototype = {
 	 */
 	codeView: function (value) {
 		if (value === undefined) value = !this.status.isCodeView;
+		this.status.isCodeView = value;
 		this.offCurrentController();
 		domUtils.setDisabled(value, this.codeViewDisabledButtons);
 		const _var = this._transformStatus;
@@ -1005,15 +1006,11 @@ Core.prototype = {
 		if (!value) {
 			if (!domUtils.isNonEditable(this.context.element.wysiwygFrame)) this._setCodeDataToEditor();
 			this.context.element.wysiwygFrame.scrollTop = 0;
-			this.context.element.code.style.display = 'none';
+			domUtils.addClass(this.context.element.code, 'se-display-none');
 			this.context.element.wysiwygFrame.style.display = 'block';
-
-			_var.codeOriginCssText = _var.codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 			_var.wysiwygOriginCssText = _var.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
 
-			if (this.options.height === 'auto' && !this.options.codeMirror5Editor) this.context.element.code.style.height = '0px';
-
-			this.status.isCodeView = false;
+			if (this.options.height === 'auto' && !this.options.hasCodeMirror) this.context.element.code.style.height = '0px';
 
 			if (!this.status.isFullScreen) {
 				this._notHideToolbar = false;
@@ -1035,18 +1032,18 @@ Core.prototype = {
 			}
 		} else {
 			this._setEditorDataToCodeView();
-			_var.codeOriginCssText = _var.codeOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
+			domUtils.removeClass(this.context.element.code, 'se-display-none');
 			_var.wysiwygOriginCssText = _var.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 
 			if (this.status.isFullScreen) {
 				this.context.element.code.style.height = '100%';
-			} else if (this.options.height === 'auto' && !this.options.codeMirror5Editor) {
+			} else if (this.options.height === 'auto' && !this.options.hasCodeMirror) {
 				this.context.element.code.style.height = this.context.element.code.scrollHeight > 0 ? this.context.element.code.scrollHeight + 'px' : 'auto';
 			}
 
-			if (this.options.codeMirror5Editor) this.options.codeMirror5Editor.refresh();
-
-			this.status.isCodeView = true;
+			if (this.options.hasCodeMirror) {
+				this._codeMirrorEditor('refresh', null);
+			}
 
 			if (!this.status.isFullScreen) {
 				this._notHideToolbar = true;
@@ -1065,7 +1062,7 @@ Core.prototype = {
 		}
 
 		this._checkPlaceholder();
-		if (this.status.isReadOnly) domUtils.setDisabled(true, this.resizingDisabledButtons);
+		if (this.status.isReadOnly) domUtils.setDisabled(true, this.controllerOnDisabledButtons);
 
 		// user event
 		if (typeof this.events.onToggleCodeView === 'function') this.events.onToggleCodeView(this.status.isCodeView);
@@ -1076,7 +1073,9 @@ Core.prototype = {
 	 * @param {boolean|undefined} value true/false, If undefined toggle the codeView mode.
 	 */
 	fullScreen: function (value) {
-		if (value === undefined) value = !this.status.isCodeView;
+		if (value === undefined) value = !this.status.isFullScreen;
+		this.status.isFullScreen = value;
+
 		const topArea = this.context.element.topArea;
 		const toolbar = this.context.element.toolbar;
 		const editorArea = this.context.element.editorArea;
@@ -1088,8 +1087,6 @@ Core.prototype = {
 		const wasToolbarHidden = toolbar.style.display === 'none' || (this._isInline && !this.toolbar._inlineToolbarAttr.isShow);
 
 		if (value) {
-			this.status.isFullScreen = true;
-
 			_var.fullScreenInline = this._isInline;
 			_var.fullScreenBalloon = this._isBalloon;
 
@@ -1143,8 +1140,6 @@ Core.prototype = {
 				domUtils.addClass(this._styleCommandMap.fullScreen, 'active');
 			}
 		} else {
-			this.status.isFullScreen = false;
-
 			wysiwygFrame.style.cssText = _var.wysiwygOriginCssText;
 			code.style.cssText = _var.codeOriginCssText;
 			toolbar.style.cssText = '';
@@ -1152,7 +1147,7 @@ Core.prototype = {
 			topArea.style.cssText = _var.editorOriginCssText;
 			this._d.body.style.overflow = _var.bodyOverflow;
 
-			if (this.options.height === 'auto' && !this.options.codeMirror5Editor) this._codeViewAutoHeight();
+			if (this.options.height === 'auto' && !this.options.hasCodeMirror) this._codeViewAutoHeight();
 
 			if (!!this.options.toolbar_container) this.options.toolbar_container.appendChild(toolbar);
 
@@ -1192,6 +1187,7 @@ Core.prototype = {
 	 */
 	showBlocks: function (value) {
 		if (value === undefined) value = !this.status.isShowBlocks;
+		this.status.isShowBlocks = value;
 
 		if (value) {
 			domUtils.addClass(this.context.element.wysiwyg, 'se-show-block');
@@ -1200,6 +1196,7 @@ Core.prototype = {
 			domUtils.removeClass(this.context.element.wysiwyg, 'se-show-block');
 			domUtils.removeClass(this._styleCommandMap.showBlocks, 'active');
 		}
+
 		this._resourcesStateChange();
 	},
 
@@ -1329,7 +1326,7 @@ Core.prototype = {
 	 */
 	readOnly: function (value) {
 		this.status.isReadOnly = value;
-		domUtils.setDisabled(!!value, this.resizingDisabledButtons);
+		domUtils.setDisabled(!!value, this.controllerOnDisabledButtons);
 
 		if (value) {
 			this.offCurrentController();
@@ -1345,7 +1342,9 @@ Core.prototype = {
 			domUtils.removeClass(this.context.element.wysiwygFrame, 'se-read-only');
 		}
 
-		if (this.options.codeMirror5Editor) this.options.codeMirror5Editor.setOption('readOnly', !!value);
+		if (this.options.hasCodeMirror) {
+			this._codeMirrorEditor('readonly', !!value);
+		}
 	},
 
 	/**
@@ -1359,8 +1358,8 @@ Core.prototype = {
 		this.context.element.wysiwyg.setAttribute('contenteditable', false);
 		this.isDisabled = true;
 
-		if (this.options.codeMirror5Editor) {
-			this.options.codeMirror5Editor.setOption('readOnly', true);
+		if (this.options.hasCodeMirror) {
+			this._codeMirrorEditor('readonly', true);
 		} else {
 			this.context.element.code.setAttribute('disabled', 'disabled');
 		}
@@ -1374,8 +1373,8 @@ Core.prototype = {
 		this.context.element.wysiwyg.setAttribute('contenteditable', true);
 		this.isDisabled = false;
 
-		if (this.options.codeMirror5Editor) {
-			this.options.codeMirror5Editor.setOption('readOnly', false);
+		if (this.options.hasCodeMirror) {
+			this._codeMirrorEditor('readonly', false);
 		} else {
 			this.context.element.code.removeAttribute('disabled');
 		}
@@ -1406,19 +1405,18 @@ Core.prototype = {
 		/** remove event listeners */
 		this.eventManager._removeAllEvents();
 
-		/** remove element */
-		domUtils.removeItem(this.context.element.toolbar);
-		domUtils.removeItem(this.context.element.topArea);
+		/** destory external library */
+		if (this.options.codeMirror6Editor) {
+			this.options.codeMirror6Editor.destroy();
+		}
 
 		/** remove object reference */
 		for (let k in this.context) {
-			if (this.context.hasOwnProperty(k)) delete this.context[k];
-		}
-
-		/** remove user object */
-		for (let k in this) {
 			if (this.hasOwnProperty(k)) delete this[k];
 		}
+
+		/** remove element */
+		domUtils.removeItem(this.context.element.topArea);
 	},
 
 	/**
@@ -1435,6 +1433,7 @@ Core.prototype = {
 		this.context.element.loading.style.display = 'none';
 	},
 
+	/** ----- private methods ----------------------------------------------------------------------------------------------------------------------------- */
 	/**
 	 * @description Focus to wysiwyg area using "native focus function"
 	 */
@@ -1566,7 +1565,6 @@ Core.prototype = {
 		this._setCodeView(codeValue);
 	},
 
-	// ----- private methods -----
 	/**
 	 * @description Check the components such as image and video and modify them according to the format.
 	 * @private
@@ -1593,8 +1591,8 @@ Core.prototype = {
 	 * @private
 	 */
 	_setCodeView: function (value) {
-		if (this.options.codeMirror5Editor) {
-			this.options.codeMirror5Editor.getDoc().setValue(value);
+		if (this.options.hasCodeMirror) {
+			this._codeMirrorEditor('set', value);
 		} else {
 			this.context.element.code.value = value;
 		}
@@ -1605,7 +1603,52 @@ Core.prototype = {
 	 * @private
 	 */
 	_getCodeView: function () {
-		return this.options.codeMirror5Editor ? this.options.codeMirror5Editor.getDoc().getValue() : this.context.element.code.value;
+		if (this.options.hasCodeMirror) {
+			return this._codeMirrorEditor('get', null);
+		} else {
+			return this.context.element.code.value;
+		}
+	},
+
+	/**
+	 * @description Run CodeMirror Editor
+	 * @param {"set"|"get"|"readonly"|"refresh"} key method key
+	 * @param {any} value params
+	 * @returns
+	 * @private
+	 */
+	_codeMirrorEditor: function (key, value) {
+		switch (key) {
+			case 'set':
+				if (this.options.codeMirror5Editor) {
+					this.options.codeMirror5Editor.getDoc().setValue(value);
+				} else if (this.options.codeMirror6Editor) {
+					this.options.codeMirror6Editor.dispatch({
+						changes: { from: 0, to: this.options.codeMirror6Editor.state.doc.length, insert: value }
+					});
+				}
+				break;
+			case 'get':
+				if (this.options.codeMirror5Editor) {
+					return this.options.codeMirror5Editor.getDoc().getValue();
+				} else if (this.options.codeMirror6Editor) {
+					return this.options.codeMirror6Editor.state.doc.toString();
+				}
+				break;
+			case 'readonly':
+				if (this.options.codeMirror5Editor) {
+					this.options.codeMirror5Editor.setOption('readOnly', value);
+				} else if (this.options.codeMirror6Editor) {
+					if (!value) this.options.codeMirror6Editor.contentDOM.setAttribute('contenteditable', true);
+					else this.options.codeMirror6Editor.contentDOM.removeAttribute('contenteditable');
+				}
+				break;
+			case 'refresh':
+				if (this.options.codeMirror5Editor) {
+					this.options.codeMirror5Editor.refresh();
+				}
+				break;
+		}
 	},
 
 	/**
@@ -1796,7 +1839,7 @@ Core.prototype = {
 	 */
 	_cachingButtons: function () {
 		this.codeViewDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])');
-		this.resizingDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
+		this.controllerOnDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
 
 		this._saveButtonStates();
 

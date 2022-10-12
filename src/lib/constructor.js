@@ -455,22 +455,23 @@ function InitOptions(element, options) {
 	options.linkRelDefault = options.linkRelDefault || {};
 
 	/** External library */
-	// CodeMirror5 object
-	options.codeMirror5 = options.codeMirror5
-		? options.codeMirror5.src
-			? options.codeMirror5
-			: {
-					src: options.codeMirror5
-			  }
-		: null;
-	// katex object (Math plugin)
-	options.katex = options.katex
-		? options.katex.src
-			? options.katex
-			: {
-					src: options.katex
-			  }
-		: null;
+	// CodeMirror
+	if (options.codeMirror) {
+		if (options.codeMirror.EditorView) {
+			options.codeMirror6Editor = true;
+		} else if (options.codeMirror.src) {
+			options.codeMirror5Editor = true;
+		} else {
+			console.warn('[SUNEDITOR.options.codeMirror.fail] The codeMirror option is set incorrectly.');
+			options.codeMirror = null;
+		}
+	}
+
+	// katex (Math plugin)
+	if (options.katex && !options.katex.src) {
+		console.warn('[SUNEDITOR.options.katex.fail] The katex option is set incorrectly.');
+		options.katex = null;
+	}
 
 	/** Private options */
 	options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle'];
@@ -519,10 +520,9 @@ function _initElements(options, topDiv, toolBar, toolBarArrow) {
 
 	// textarea for code view
 	const textarea = domUtils.createElement('TEXTAREA', {
-		class: 'se-wrapper-inner se-wrapper-code',
+		class: 'se-wrapper-inner se-wrapper-code se-display-none',
 		style: options._editorStyles.frame
 	});
-	textarea.style.display = 'none';
 	if (options.height === 'auto') textarea.style.overflow = 'hidden';
 
 	/** resize bar */
@@ -586,7 +586,21 @@ function _initElements(options, topDiv, toolBar, toolBarArrow) {
  * @param {Element} textarea textarea element
  */
 function _checkCodeMirror(options, textarea) {
-	if (options.codeMirror5) {
+	options.hasCodeMirror = false;
+
+	if (options.codeMirror6Editor) {
+		const codeStyles = textarea.style.cssText;
+		const cm = new options.codeMirror.EditorView({
+			parent: textarea.parentElement,
+			extensions: options.codeMirror.extensions,
+			state: options.codeMirror.state
+		});
+
+		options.codeMirror6Editor = cm;
+		textarea = cm.dom;
+		textarea.style.cssText = codeStyles;
+		options.hasCodeMirror = true;
+	} else if (options.codeMirror5Editor) {
 		const cmOptions = [
 			{
 				mode: 'htmlmixed',
@@ -594,7 +608,7 @@ function _checkCodeMirror(options, textarea) {
 				lineNumbers: true,
 				lineWrapping: true
 			},
-			options.codeMirror5.options || {}
+			options.codeMirror.options || {}
 		].reduce(function (init, option) {
 			for (let key in option) {
 				if (option.hasOwnProperty(key)) init[key] = option[key];
@@ -607,14 +621,15 @@ function _checkCodeMirror(options, textarea) {
 			cmOptions.height = 'auto';
 		}
 
-		const cm = options.codeMirror5.src.fromTextArea(textarea, cmOptions);
-		cm.display.wrapper.style.cssText = textarea.style.cssText;
-
+		const codeStyles = textarea.style.cssText;
+		const cm = options.codeMirror.src.fromTextArea(textarea, cmOptions);
 		options.codeMirror5Editor = cm;
 		textarea = cm.display.wrapper;
-		textarea.className += ' se-wrapper-code-mirror';
+		textarea.style.cssText = codeStyles;
+		options.hasCodeMirror = true;
 	}
 
+	textarea.className += ' se-wrapper-code-mirror se-display-none';
 	return textarea;
 }
 
@@ -623,7 +638,10 @@ function _checkCodeMirror(options, textarea) {
  * @param {Object} katex katex object
  */
 function _checkKatexMath(katex) {
-	if (!katex) throw Error('[SUNEDITOR.create.fail] To use the math button you need to add a "katex" object to the options.');
+	if (!katex) {
+		console.warn('[SUNEDITOR.create.fail] To use the math button you need to add a "katex" object to the options.');
+		return;
+	}
 
 	const katexOptions = [
 		{
@@ -690,9 +708,7 @@ function _defaultButtons(options) {
 		dir: ['', lang.toolbar[options._rtl ? 'dir_ltr' : 'dir_rtl'], 'dir', '', icons[options._rtl ? 'dir_ltr' : 'dir_rtl']],
 		dir_ltr: ['', lang.toolbar.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
 		dir_rtl: ['', lang.toolbar.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
-		save: ['se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save],
-		/** plugins - fileBrowser */
-		imageGallery: ['', lang.toolbar.imageGallery, 'imageGallery', 'fileBrowser', icons.image_gallery]
+		save: ['se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save]
 	};
 }
 
@@ -811,7 +827,7 @@ export function CreateToolBar(buttonList, plugins, options) {
 					continue buttonGroupLoop;
 				}
 
-				if (typeof plugins[button] === 'function') {
+				if (/object|function/.test(typeof plugins[button])) {
 					const plugin = plugins[button];
 					pluginName = button;
 					module = [plugin.className, plugin.title, pluginName, plugin.type, plugin.innerHTML, plugin._disabled];

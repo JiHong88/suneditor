@@ -23,7 +23,7 @@ const Video = function (editor, target) {
 			showAlign = /align/.test(figureControls[i][j]);
 		}
 	}
-	if (showAlign) modalEl.querySelector('._se_figure_align').style.display = 'none';
+	if (showAlign) modalEl.querySelector('.se-figure-align').style.display = 'none';
 
 	// modules
 	const videoRatio = options.videoRatio * 100 + '%';
@@ -766,7 +766,7 @@ function CreateHTML_modal(editor) {
 		'' +
 		'</div>' +
 		'<div class="se-modal-footer">' +
-		'<div class="_se_figure_align">' +
+		'<div class="se-figure-align">' +
 		'<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="none" checked>' +
 		lang.modalBox.basic +
 		'</label>' +

@@ -50,6 +50,7 @@ Math_.prototype = {
 			this._element = element;
 			this.controller.open(element);
 			domUtils.addClass(element, 'se-focus');
+			domUtils.setDisabled(true, this.editor.controllerOnDisabledButtons);
 			return true;
 		}
 
@@ -61,6 +62,7 @@ Math_.prototype = {
 	 */
 	reset: function () {
 		domUtils.removeClass(this._element, 'se-focus');
+		domUtils.setDisabled(false, this.editor.controllerOnDisabledButtons);
 		this._element = null;
 	},
 

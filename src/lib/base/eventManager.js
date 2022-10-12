@@ -28,6 +28,7 @@ const EventManager = function (editor) {
 	this._onKeyDownPlugins = editor._onKeyDownPlugins;
 	this.__resize_editor = null;
 	this.__close_move = null;
+	this.__geckoActiveEvent = null;
 };
 
 EventManager.prototype = {
@@ -536,7 +537,7 @@ EventManager.prototype = {
 		}
 
 		/** code view area auto line */
-		if (this.options.height === 'auto' && !this.options.codeMirror5Editor) {
+		if (this.options.height === 'auto' && !this.options.hasCodeMirror) {
 			const cvAuthHeight = this.editor._codeViewAutoHeight.bind(this.editor);
 			this.addEvent(this.context.element.code, 'keydown', cvAuthHeight, false);
 			this.addEvent(this.context.element.code, 'keyup', cvAuthHeight, false);
@@ -618,8 +619,6 @@ function ToolbarButtonsHandler(e) {
 
 	if (/^(input|textarea|select|option)$/i.test(target.nodeName)) {
 		this.editor._antiBlur = false;
-	} else {
-		e.preventDefault();
 	}
 
 	if (domUtils.getParentElement(target, '.se-dropdown')) {
@@ -633,6 +632,20 @@ function ToolbarButtonsHandler(e) {
 			target = target.parentNode;
 			command = target.getAttribute('data-command');
 			className = target.className;
+		}
+
+		if (!this.status.isCodeView) {
+			e.preventDefault();
+			if (env.isGecko && command) {
+				domUtils.addClass(target, '__se__active');
+				this.__geckoActiveEvent = this.addGlobalEvent(
+					'mouseup',
+					function (t) {
+						domUtils.removeClass(t, '__se__active');
+						this.__geckoActiveEvent = this.removeGlobalEvent(this.__geckoActiveEvent);
+					}.bind(this, target)
+				);
+			}
 		}
 
 		if (command === this.menu.currentDropdownName || command === this.editor._containerName) {

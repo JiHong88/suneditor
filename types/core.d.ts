@@ -125,7 +125,7 @@ export interface Core {
 	/**
 	 * @description An array of buttons whose class name is not "se-resizing-enabled"
 	 */
-	resizingDisabledButtons: Element[];
+	controllerOnDisabledButtons: Element[];
 
 	/**
 	 * @description Editor tags whitelist (RegExp object)

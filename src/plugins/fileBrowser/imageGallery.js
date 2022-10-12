@@ -68,7 +68,7 @@ const ImageGallery = function (editor, target) {
 	EditorInterface.call(this, editor);
 	this.target = target;
 	this.title = this.lang.toolbar.imageGallery;
-	this.icon = this.icons.imageGallery;
+	this.icon = this.icons.image_gallery;
 };
 
 ImageGallery.key = 'imageGallery';

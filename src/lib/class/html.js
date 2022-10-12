@@ -1062,7 +1062,7 @@ HTML.prototype = {
 			if (style) {
 				const allowedStyle = [];
 				for (let i = 0, len = style.length, r; i < len; i++) {
-					r = style[i].match(/([a-zA-Z0-9-]+)(:)([^"]+$)/);
+					r = style[i].match(/([a-zA-Z0-9-]+)(:)([^:]+$)/);
 					if (r && !/inherit|initial/i.test(r[3])) {
 						const k = env.kebabToCamelCase(r[1].trim());
 						const v = this.wwComputedStyle[k].replace(/"/g, '');

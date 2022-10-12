@@ -12,7 +12,8 @@ const Toolbar = function (editor) {
 	CoreInterface.call(this, editor);
 	this._responsiveCurrentSize = 'default';
 	this._responsiveButtons = editor._responsiveButtons;
-	this._responsiveButtonSize = null;
+	this._rButtons = null;
+	this._rButtonsize = null;
 	this._sticky = false;
 	this._inlineToolbarAttr = {
 		top: '',
@@ -77,8 +78,8 @@ Toolbar.prototype = {
 		this.menu.containerOff();
 		this.menu._moreLayerOff();
 
-		const newToolbar = CreateToolBar(this._d, buttonList, this.plugins, this.options);
-		this._responsiveButtons = newToolbar.responsiveButtons;
+		const newToolbar = CreateToolBar(buttonList, this.plugins, this.options);
+		this._rButtons = newToolbar.responsiveButtons;
 		this._setResponsive();
 
 		this.context.element.toolbar.replaceChild(newToolbar._buttonTray, this.context.element._buttonTray);
@@ -94,7 +95,7 @@ Toolbar.prototype = {
 
 		this.editor.effectNode = null;
 		if (this.status.hasFocus) this.eventMenager.applyTagEffect();
-		if (this.status.isReadOnly) domUtils.setDisabled(true, this.editor.resizingDisabledButtons);
+		if (this.status.isReadOnly) domUtils.setDisabled(true, this.editor.controllerOnDisabledButtons);
 		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'));
 	},
 
@@ -104,7 +105,7 @@ Toolbar.prototype = {
 	resetResponsiveToolbar: function () {
 		this.menu.containerOff();
 
-		const responsiveSize = this._responsiveButtonSize;
+		const responsiveSize = this._rButtonsize;
 		if (responsiveSize) {
 			let w = 0;
 			if ((this.editor._isBalloon || this.editor._isInline) && this.options.toolbar_width === 'auto') {
@@ -123,7 +124,7 @@ Toolbar.prototype = {
 
 			if (this._responsiveCurrentSize !== responsiveWidth) {
 				this._responsiveCurrentSize = responsiveWidth;
-				this.setButtons(this._responsiveButtons[responsiveWidth]);
+				this.setButtons(this._rButtons[responsiveWidth]);
 			}
 		}
 	},
@@ -174,18 +175,19 @@ Toolbar.prototype = {
 	},
 
 	_setResponsive: function () {
-		if (this._responsiveButtons && this._responsiveButtons.length === 0) {
-			this._responsiveButtons = null;
+		if (this._rButtons && this._rButtons.length === 0) {
+			this._rButtons = null;
 			return;
 		}
 
 		this._responsiveCurrentSize = 'default';
-		const sizeArray = (this._responsiveButtonSize = []);
-		const buttonsObj = (this._responsiveButtons = {
-			default: this._responsiveButtons[0]
+		const sizeArray = (this._rButtonsize = []);
+		const _responsiveButtons = this._responsiveButtons;
+		const buttonsObj = (this._rButtons = {
+			default: _responsiveButtons[0]
 		});
-		for (let i = 1, len = this._responsiveButtons.length, size, buttonGroup; i < len; i++) {
-			buttonGroup = this._responsiveButtons[i];
+		for (let i = 1, len = _responsiveButtons.length, size, buttonGroup; i < len; i++) {
+			buttonGroup = _responsiveButtons[i];
 			size = buttonGroup[0] * 1;
 			sizeArray.push(size);
 			buttonsObj[size] = buttonGroup[1];

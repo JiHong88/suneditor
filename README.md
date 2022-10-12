@@ -236,9 +236,9 @@ import 'codemirror/mode/htmlmixed/htmlmixed'
 import 'codemirror/lib/codemirror.css'
 
 suneditor.create('sample', {
-    codeMirror5: CodeMirror // window.CodeMirror,
+    codeMirror: CodeMirror // window.CodeMirror,
     // Set options
-    // codeMirror5: {
+    // codeMirror: {
     //     src: CodeMirror,
     //     options: {...}
     // }
@@ -436,9 +436,9 @@ previewTemplate : A template of the "preview".
 printTemplate   : A template of the "print".
                   The {{content}} part in the HTML string is replaced with the content of the editor. default: null {string}
                   ex) "<div style='width:auto; max-width:1080px; margin:auto;'><h1>Print Template</h1> {{content}} <div>_Footer_</div></div>"
-codeMirror5     : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
+codeMirror     : https://codemirror.net/try/
+codeMirror     : If you put the CodeMirror object as an option, you can do Codeview using CodeMirror. default: null {Object}
                   Use version 5.x.x // https://github.com/codemirror/CodeMirror
-                  ex) codeMirror5: CodeMirror // Default option
                       codeMirror5: { // Custom option
                         src: CodeMirror,
                         options: {
@@ -452,7 +452,6 @@ codeMirror5     : If you put the CodeMirror object as an option, you can do Code
                       }
 katex           : Required library for math plugins.               default: null {Object}
                   Use version 0.x.x // https://github.com/KaTeX/KaTeX
-                  ex) katex: katex // Default option
                       katex: { // Custom option
                         src: katex,
                         options: {

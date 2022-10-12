@@ -23,7 +23,7 @@ const Image_ = function (editor, target) {
 			showAlign = /align/.test(figureControls[i][j]);
 		}
 	}
-	if (showAlign) modalEl.querySelector('._se_figure_align').style.display = 'none';
+	if (showAlign) modalEl.querySelector('.se-figure-align').style.display = 'none';
 
 	// modules
 	this.anchor = new ModalAnchorEditor(this, modalEl);
@@ -834,7 +834,7 @@ function CreateHTML_modal(editor) {
 		'</div>' +
 		'<div class="se-anchor-editor _se_tab_content _se_tab_content_url" style="display: none"></div>' +
 		'<div class="se-modal-footer">' +
-		'<div class="_se_figure_align">' +
+		'<div class="se-figure-align">' +
 		'<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="none" checked>' +
 		lang.modalBox.basic +
 		'</label>' +
