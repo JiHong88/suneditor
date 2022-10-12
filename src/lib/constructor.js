@@ -4,9 +4,14 @@ import { domUtils, numbers, converter, env } from '../helper';
 
 const _d = env._d;
 const _w = env._w;
+const DEFAULT_BUTTON_LIST = [['undo', 'redo'], ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'], ['removeFormat'], ['outdent', 'indent'], ['fullScreen', 'showBlocks', 'codeView'], ['preview', 'print']];
 const DEFAULT_ELEMENT_WHITELIST = 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls';
-const DEFAULT_BUTTON_LIST = [['undo', 'redo'], ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'], ['removeFormat'], ['outdent', 'indent'], ['fullScreen', 'showBlocks', 'codeView'], ['preview', 'print']];
+const DEFAULT_FORMAT_LINE = 'P|DIV|H[1-6]|PRE|LI|TH|TD|DETAILS';
+const DEFAULT_FORMAT_BR_LINE = 'PRE';
+const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD|DETAILS';
+const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
+const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 
 /**
  * @description document create
@@ -273,7 +278,6 @@ function InitOptions(element, options) {
 	options.mediaAutoSelect = options.mediaAutoSelect === undefined ? true : !!options.mediaAutoSelect;
 	options.buttonList = !!options.buttonList ? options.buttonList : DEFAULT_BUTTON_LIST;
 	options.callBackSave = !options.callBackSave ? null : options.callBackSave;
-	options.defaultLineTag = typeof options.defaultLineTag === 'string' && options.defaultLineTag.length > 0 ? options.defaultLineTag : 'p';
 	options.lineAttrReset = typeof options.lineAttrReset === 'string' && options.lineAttrReset ? (options.lineAttrReset === '*' ? '*' : new _w.RegExp('^(' + options.lineAttrReset + ')$', 'i')) : null;
 	options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
 	options.frameAttrbutes = options.frameAttrbutes || {};
@@ -281,15 +285,25 @@ function InitOptions(element, options) {
 	options._printClass = typeof options._printClass === 'string' ? options._printClass : null;
 
 	/** whitelist, blacklist */
+	// default line
+	options.defaultLineTag = typeof options.defaultLineTag === 'string' && options.defaultLineTag.length > 0 ? options.defaultLineTag : 'p';
+	// __defaults
+	options.__defaultElementWhitelist = (typeof options.__defaultElementWhitelist === 'string' ? options.__defaultElementWhitelist : DEFAULT_ELEMENT_WHITELIST).toLowerCase();
+	options.__defaultAttributeWhitelist = (typeof options.__defaultAttributeWhitelist === 'string' ? options.__defaultAttributeWhitelist : DEFAULT_ATTRIBUTE_WHITELIST).toLowerCase();
 	// element
-	options._defaultElementWhitelist = typeof options._defaultElementWhitelist === 'string' ? options._defaultElementWhitelist : DEFAULT_ELEMENT_WHITELIST;
-	options._defaultAttributeWhitelist = typeof options._defaultAttributeWhitelist === 'string' ? options._defaultAttributeWhitelist : DEFAULT_ATTRIBUTE_WHITELIST;
-	options.elementWhitelist = options.elementWhitelist || '';
-	options.elementBlacklist = options.elementBlacklist || '';
-	options._editorElementWhitelist = options.elementWhitelist === '*' ? '*' : _setWhitelist(options._defaultElementWhitelist + (typeof options.elementWhitelist === 'string' && options.elementWhitelist.length > 0 ? '|' + options.elementWhitelist : ''), options.elementBlacklist);
+	options.elementWhitelist = (typeof options.elementWhitelist === 'string' ? options.elementWhitelist : '').toLowerCase();
+	options.elementBlacklist = _createBlacklist((typeof options.elementBlacklist === 'string' ? options.elementBlacklist : '').toLowerCase(), options.defaultLineTag);
 	// attribute
 	options.attributeWhitelist = !options.attributeWhitelist || typeof options.attributeWhitelist !== 'object' ? null : options.attributeWhitelist;
 	options.attributeBlacklist = !options.attributeBlacklist || typeof options.attributeBlacklist !== 'object' ? null : options.attributeBlacklist;
+	// format tag
+	options.formatLine = _createFormatInfo(options.formatLine, (options.__defaultFormatLine = typeof options.__defaultFormatLine === 'string' ? options.__defaultFormatLine : DEFAULT_FORMAT_LINE).toLowerCase(), options.elementBlacklist);
+	options.formatBrLine = _createFormatInfo(options.formatBrLine, (options.__defaultFormatBrLine = typeof options.__defaultFormatBrLine === 'string' ? options.__defaultFormatBrLine : DEFAULT_FORMAT_BR_LINE).toLowerCase(), options.elementBlacklist);
+	options.formatBlock = _createFormatInfo(options.formatBlock, (options.__defaultFormatBlock = typeof options.__defaultFormatBlock === 'string' ? options.__defaultFormatBlock : DEFAULT_FORMAT_BLOCK).toLowerCase(), options.elementBlacklist);
+	options.formatClosureBlock = _createFormatInfo(options.formatClosureBlock, (options.__defaultFormatClosureBlock = typeof options.__defaultFormatClosureBlock === 'string' ? options.__defaultFormatClosureBlock : DEFAULT_FORMAT_CLOSURE_BLOCK).toLowerCase(), options.elementBlacklist);
+	options.formatClosureBrLine = _createFormatInfo(options.formatClosureBrLine, (options.__defaultFormatClosureBrLine = typeof options.__defaultFormatClosureBrLine === 'string' ? options.__defaultFormatClosureBrLine : DEFAULT_FORMAT_CLOSURE_BR_LINE).toLowerCase(), options.elementBlacklist);
+	// --- create element whitelist (__defaultElementWhiteList + elementWhitelist + format[line, BrLine, Block, Closureblock, ClosureBrLine] - elementBlacklist)
+	options._editorElementWhitelist = options.elementWhitelist === '*' ? '*' : _createWhitelist(options);
 
 	/** Toolbar */
 	options.toolbar_width = options.toolbar_width ? (numbers.is(options.toolbar_width) ? options.toolbar_width + 'px' : options.toolbar_width) : 'auto';
@@ -659,19 +673,61 @@ function _checkKatexMath(katex) {
 }
 
 /**
- * @description create whitelist or blacklist.
- * @param {string} whitelist Whitelist
- * @param {string} blacklist Blacklist
- * @returns {string} Whitelist | Blacklist
+ * @description create blacklist
+ * @param {string} blacklist blacklist
+ * @param {string} defaultLineTag options.defaultLineTag
+ * @returns {string}
  */
-function _setWhitelist(whitelist, blacklist) {
-	if (typeof blacklist !== 'string') return whitelist;
-	blacklist = blacklist.split('|');
-	whitelist = whitelist.split('|');
-	for (let i = 0, len = blacklist.length, index; i < len; i++) {
-		index = whitelist.indexOf(blacklist[i]);
-		if (index > -1) whitelist.splice(index, 1);
-	}
+function _createBlacklist(blacklist, defaultLineTag) {
+	defaultLineTag = defaultLineTag.toLowerCase();
+	return blacklist
+		.split('|')
+		.filter(function (v) {
+			if (v !== defaultLineTag) {
+				return true;
+			} else {
+				console.warn('[SUNEDITOR.constructor.createBlacklist.warn] defaultLineTag("<' + defaultLineTag + '>") cannot be included in the blacklist and will be removed.')
+				return false;
+			}
+		})
+		.join('|');
+}
+
+/**
+ * @description create formats regexp object.
+ * @param {string} value value
+ * @param {string} defaultValue default value
+ * @param {string} blacklist blacklist
+ * @returns {{reg: RegExp, str: string}}
+ */
+function _createFormatInfo(value, defaultValue, blacklist) {
+	const str = (defaultValue + '|' + (typeof value === 'string' ? value.toLowerCase() : ''))
+		.replace(/^\||\|$/g, '')
+		.split('|')
+		.filter(function (v) {
+			return v && blacklist.indexOf(v) < 0;
+		})
+		.join('|');
+	return {
+		reg: new _w.RegExp('^(' + str + ')$', 'i'),
+		str: str
+	};
+}
+
+/**
+ * @description create whitelist or blacklist.
+ * @param {Object} options options
+ * @returns {string} whitelist
+ */
+function _createWhitelist(options) {
+	const blacklist = options.elementBlacklist.split('|');
+	const whitelist = (options.__defaultElementWhitelist + '|' + options.elementWhitelist + '|' + options.formatLine.str + '|' + options.formatBrLine.str + '|' + options.formatClosureBlock.str + '|' + options.formatClosureBrLine.str)
+		.replace(/(^\||\|$)/g, '')
+		.split('|')
+		.filter(function (v, i, a) {
+			return v && a.indexOf(v) === i && blacklist.indexOf(v) < 0;
+		});
+
 	return whitelist.join('|');
 }
 

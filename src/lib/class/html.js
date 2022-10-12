@@ -42,7 +42,7 @@ const HTML = function (editor) {
 
 	// whitelist
 	// tags
-	const defaultAttr = options._defaultAttributeWhitelist;
+	const defaultAttr = options.__defaultAttributeWhitelist;
 	const dataAttr = 'data-origin|data-origin-size|data-size|data-file-size|data-file-name|data-align|data-image-link|data-rotate|data-proportion|data-percentage|data-exp|data-font-size';
 	this._allowHTMLComment = options._editorElementWhitelist.indexOf('//') > -1 || options._editorElementWhitelist === '*';
 	// html check

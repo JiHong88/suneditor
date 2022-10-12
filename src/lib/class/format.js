@@ -10,6 +10,11 @@ const Format = function (editor) {
 	CoreInterface.call(this, editor);
 	this._listCamel = this.options.__listCommonStyle;
 	this._listKebab = env.camelToKebabCase(this.options.__listCommonStyle);
+	this._formatLineCheck = this.options.formatLine.reg;
+	this._formatBrLineCheck = this.options.formatBrLine.reg;
+	this._formatBlockCheck = this.options.formatBlock.reg;
+	this._formatClosureBlockCheck = this.options.formatClosureBlock.reg;
+	this._formatClosureBrLineCheck = this.options.formatClosureBrLine.reg;
 };
 
 Format.prototype = {
@@ -1353,7 +1358,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isLine: function (element) {
-		return element && element.nodeType === 1 && (/^(P|DIV|H[1-6]|PRE|LI|TH|TD|DETAILS)$/i.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__line_.+(\\s|$)|(\\s|^)__se__format__br_line_.+(\\s|$)')) && !this.component.is(element) && !domUtils.isWysiwygFrame(element);
+		return element && element.nodeType === 1 && (this._formatLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__line_.+(\\s|$)|(\\s|^)__se__format__br_line_.+(\\s|$)')) && !this.component.is(element) && !domUtils.isWysiwygFrame(element);
 	},
 
 	/**
@@ -1365,7 +1370,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isBrLine: function (element) {
-		return element && element.nodeType === 1 && (/^PRE$/i.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line_.+(\\s|$)')) && !this.component.is(element) && !domUtils.isWysiwygFrame(element);
+		return element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line_.+(\\s|$)')) && !this.component.is(element) && !domUtils.isWysiwygFrame(element);
 	},
 
 	/**
@@ -1375,7 +1380,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isBlock: function (element) {
-		return element && element.nodeType === 1 && (/^(BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD|DETAILS)$/i.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__block_.+(\\s|$)'));
+		return element && element.nodeType === 1 && (this._formatBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__block_.+(\\s|$)'));
 	},
 
 	/**
@@ -1388,7 +1393,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isClosureBlock: function (element) {
-		return element && element.nodeType === 1 && (/^(TH|TD)$/i.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__block_closure_.+(\\s|$)'));
+		return element && element.nodeType === 1 && (this._formatClosureBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__block_closure_.+(\\s|$)'));
 	},
 
 	/**
@@ -1401,7 +1406,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isClosureBrLine: function (element) {
-		return element && element.nodeType === 1 && domUtils.hasClass(element, '(\\s|^)__se__format__br_line__closure_.+(\\s|$)');
+		return element && element.nodeType === 1 && (this._formatClosureBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line__closure_.+(\\s|$)'));
 	},
 
 	/**

@@ -381,7 +381,7 @@ frameAttrbutes  : Specifies the properties of the editing area DIV.     default:
 
 // Whitelist, Blacklist -----------------------------------------------------------------------------------------
 // (You can use regular expression syntax.)
-// _defaultElementWhitelist : 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary'
+// __defaultElementWhitelist : 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary'
 elementWhitelist      : Add tags to the default tags whitelist of editor.   default: '' {string}
                         ex) 'mark|canvas|label|select|option|input|//' // "//" This means HTML comments.
                         ex) '*' // This means all tags are allowed. (Not available on "blacklist")
