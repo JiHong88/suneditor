@@ -1,5 +1,5 @@
 import Helper, { env, converter, domUtils, numbers } from '../helper';
-import { ResetOptions, UpdateButton } from './constructor';
+import Constructor, { ResetOptions, UpdateButton } from './constructor';
 import Context from './context';
 
 // interface
@@ -24,16 +24,14 @@ import Toolbar from './class/toolbar';
 
 /**
  * @description SunEditor constructor function.
- * @param {Object} context
- * @param {Object} pluginCallButtons
- * @param {Object} plugins
- * @param {Object} lang
- * @param {Object} options
- * @param {Object} _responsiveButtons
- * @returns {Object} functions Object
+ * @param {Array.Element} editorTargets Target textarea
+ * @param {Object} options options
+ * @returns {Object}
  */
-const Core = function (context, pluginCallButtons, plugins, lang, options, _responsiveButtons) {
-	const _d = context.element.originElement.ownerDocument || env._d;
+const Core = function (editorTargets, options) {
+	const product = Constructor(editorTargets, options);
+	const context = Context(editorTargets, product.constructed.top, product.constructed.wwFrame, product.constructed.codeFrame, options);
+	const _d = editorTargets.ownerDocument || env._d;
 	const _w = _d.defaultView || env._w;
 
 	/**
@@ -64,13 +62,13 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	 * @description Editor options
 	 * @type {Object.<string, any>}
 	 */
-	this.options = options;
+	this.options = context.options;
 
 	/**
-	 * @description Loaded plugins
+	 * @description Plugins
 	 * @type {Object.<string, any>}
 	 */
-	this.plugins = plugins || {};
+	this.plugins = product.plugins || {};
 
 	/**
 	 * @description Elements and user options parameters of the suneditor
@@ -87,7 +85,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	 * @description loaded language
 	 * @type {Object.<string, any>}
 	 */
-	this.lang = lang;
+	this.lang = options.lang;
 
 	/**
 	 * @description History object for undo, redo
@@ -182,7 +180,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	 * @description Plugin buttons
 	 * @private
 	 */
-	this._pluginCallButtons = pluginCallButtons;
+	this._pluginCallButtons = product.pluginCallButtons;
 
 	/**
 	 * @description Plugin call
@@ -203,7 +201,7 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 	 * @description Button List in Responsive Toolbar.
 	 * @private
 	 */
-	this._responsiveButtons = _responsiveButtons;
+	this._responsiveButtons = product._responsiveButtons;
 
 	/**
 	 * @description Property related to rtl and ltr conversions.
@@ -384,9 +382,9 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 
 	// ----- Core init -----
 	// Create to sibling node
-	const contextEl = context.element;
-	const originEl = contextEl.originElement;
-	const topEl = contextEl.topArea;
+	const ctxEl = context.element;
+	const originEl = ctxEl.originElement;
+	const topEl = ctxEl.topArea;
 	originEl.style.display = 'none';
 	topEl.style.display = 'block';
 
@@ -397,14 +395,14 @@ const Core = function (context, pluginCallButtons, plugins, lang, options, _resp
 		originEl.parentNode.appendChild(topEl);
 	}
 
-	contextEl.editorArea.appendChild(contextEl.wysiwygFrame);
+	ctxEl.editorArea.appendChild(ctxEl.wysiwygFrame);
 
 	// init
 	if (!options.iframe) {
 		this._editorInit(false, options.value);
 	} else {
 		const inst = this;
-		contextEl.wysiwygFrame.addEventListener('load', function () {
+		ctxEl.wysiwygFrame.addEventListener('load', function () {
 			converter._setIframeDocument(this, options);
 			inst._editorInit(false, options.value);
 		});
@@ -804,23 +802,6 @@ Core.prototype = {
 	},
 
 	/**
-	 * @description Gets uploaded files(plugin using fileManager) information list.
-	 * image: [img], video: [video, iframe], audio: [audio]
-	 * - index: data index
-	 * - name: file name
-	 * - size: file size
-	 * - select: select function
-	 * - delete: delete function
-	 * - element: target element
-	 * - src: src attribute of tag
-	 * @param {string} pluginName Plugin name (image, video, audio)
-	 * @returns {Array}
-	 */
-	getFilesInfo: function (pluginName) {
-		return this.context[pluginName] ? this.context[pluginName]._infoList : [];
-	},
-
-	/**
 	 * @description Add or reset option property (Editor is reloaded)
 	 * @param {Object} _options Options
 	 */
@@ -862,38 +843,31 @@ Core.prototype = {
 			return init;
 		}, {});
 
-		const el = this.context.element;
-		const _initHTML = el.wysiwyg.innerHTML;
-
 		// set option
-		const cons = ResetOptions(mergeOptions, this.context, this.options);
+		const ctxEl = this.context.element;
+		const initHTML = ctxEl.wysiwyg.innerHTML;
+		const product = ResetOptions(this.context, mergeOptions);
 
-		if (cons.callButtons) {
-			this._pluginCallButtons = cons.callButtons;
-		}
-
-		if (cons.plugins) {
-			this.plugins = cons.plugins;
-		}
-
-		// reset context
-		if (el._menuTray.children.length === 0) this.menu._menuTrayMap = {};
-		this._responsiveButtons = this.toolbar._responsiveButtons = cons.toolbar.responsiveButtons;
-		this.options = mergeOptions; //@todo option, lang.. dont't reset
-		this.lang = this.options.lang;
-
-		if (this.options.iframe) {
-			el.wysiwygFrame.addEventListener('load', function () {
-				converter._setIframeDocument(this, this.options);
-				this._setOptionsInit(el, _initHTML);
+		if (mergeOptions.iframe) {
+			ctxEl.wysiwygFrame.addEventListener('load', function () {
+				converter._setIframeDocument(this, mergeOptions);
+				this._setOptionsInit(ctxEl, product, mergeOptions, initHTML);
 			});
 		}
 
-		el.editorArea.appendChild(el.wysiwygFrame);
+		ctxEl.editorArea.appendChild(ctxEl.wysiwygFrame);
 
-		if (!this.options.iframe) {
-			this._setOptionsInit(el, _initHTML);
+		if (!mergeOptions.iframe) {
+			this._setOptionsInit(ctxEl, product, mergeOptions, initHTML);
 		}
+	},
+
+	getContext: function (key, value) {
+		
+	},
+
+	setContext: function (key, value) {
+
 	},
 
 	/**
@@ -904,24 +878,24 @@ Core.prototype = {
 	 */
 	setEditorCSSText: function (style) {
 		const newStyles = (this.options._editorStyles = converter._setDefaultOptionStyle(this.options, style));
-		const el = this.context.element;
+		const ctxEl = this.context.element;
 
 		// top area
-		el.topArea.style.cssText = newStyles.top;
+		ctxEl.topArea.style.cssText = newStyles.top;
 		// code view
-		el.code.style.cssText = this.options._editorStyles.frame;
-		el.code.style.display = 'none';
+		ctxEl.code.style.cssText = this.options._editorStyles.frame;
+		ctxEl.code.style.display = 'none';
 		if (this.options.height === 'auto') {
-			el.code.style.overflow = 'hidden';
+			ctxEl.code.style.overflow = 'hidden';
 		} else {
-			el.code.style.overflow = '';
+			ctxEl.code.style.overflow = '';
 		}
 		// wysiwyg frame
 		if (!this.options.iframe) {
-			el.wysiwygFrame.style.cssText = newStyles.frame + newStyles.editor;
+			ctxEl.wysiwygFrame.style.cssText = newStyles.frame + newStyles.editor;
 		} else {
-			el.wysiwygFrame.style.cssText = newStyles.frame;
-			el.wysiwyg.style.cssText = newStyles.editor;
+			ctxEl.wysiwygFrame.style.cssText = newStyles.frame;
+			ctxEl.wysiwyg.style.cssText = newStyles.editor;
 		}
 	},
 
@@ -932,7 +906,7 @@ Core.prototype = {
 	setDir: function (dir) {
 		const rtl = dir === 'rtl';
 		const changeDir = this._prevRtl !== rtl;
-		const el = this.context.element;
+		const ctxEl = this.context.element;
 		const buttons = this.context.buttons;
 		this._prevRtl = this.options._rtl = rtl;
 
@@ -947,15 +921,15 @@ Core.prototype = {
 		}
 
 		if (rtl) {
-			domUtils.addClass(el.topArea, 'se-rtl');
-			domUtils.addClass(el.wysiwygFrame, 'se-rtl');
+			domUtils.addClass(ctxEl.topArea, 'se-rtl');
+			domUtils.addClass(ctxEl.wysiwygFrame, 'se-rtl');
 		} else {
-			domUtils.removeClass(el.topArea, 'se-rtl');
-			domUtils.removeClass(el.wysiwygFrame, 'se-rtl');
+			domUtils.removeClass(ctxEl.topArea, 'se-rtl');
+			domUtils.removeClass(ctxEl.wysiwygFrame, 'se-rtl');
 		}
 
 		const lineNodes = domUtils.getListChildren(
-			el.wysiwyg,
+			ctxEl.wysiwyg,
 			function (current) {
 				return this.format.isLine(current) && (current.style.marginRight || current.style.marginLeft || current.style.textAlign);
 			}.bind(this)
@@ -1000,7 +974,7 @@ Core.prototype = {
 		if (value === undefined) value = !this.status.isCodeView;
 		this.status.isCodeView = value;
 		this.offCurrentController();
-		domUtils.setDisabled(value, this.codeViewDisabledButtons);
+		domUtils.setDisabled(this.codeViewDisabledButtons, value);
 		const _var = this._transformStatus;
 
 		if (!value) {
@@ -1062,7 +1036,7 @@ Core.prototype = {
 		}
 
 		this._checkPlaceholder();
-		if (this.status.isReadOnly) domUtils.setDisabled(true, this.controllerOnDisabledButtons);
+		if (this.status.isReadOnly) domUtils.setDisabled(this.controllerOnDisabledButtons, true);
 
 		// user event
 		if (typeof this.events.onToggleCodeView === 'function') this.events.onToggleCodeView(this.status.isCodeView);
@@ -1095,7 +1069,7 @@ Core.prototype = {
 				this._isBalloon = false;
 			}
 
-			if (!!this.options.toolbar_container) this.context.element.relative.insertBefore(toolbar, editorArea);
+			if (!!this.options.toolbar_container) this.context.element.container.insertBefore(toolbar, editorArea);
 
 			topArea.style.position = 'fixed';
 			topArea.style.top = '0';
@@ -1326,7 +1300,7 @@ Core.prototype = {
 	 */
 	readOnly: function (value) {
 		this.status.isReadOnly = value;
-		domUtils.setDisabled(!!value, this.controllerOnDisabledButtons);
+		domUtils.setDisabled(this.controllerOnDisabledButtons, !!value);
 
 		if (value) {
 			this.offCurrentController();
@@ -1955,15 +1929,25 @@ Core.prototype = {
 	},
 
 	/**
+	 * @todo plugin, lang, class사용 option 등 바뀌었을때 클래스 리로드 문제
 	 * @description Initialization after "setOptions"
 	 * @param {Object} el context.element
-	 * @param {string} _initHTML Initial html string
+	 * @param {string} initHTML Initial html string
 	 * @private
 	 */
-	_setOptionsInit: function (el, _initHTML) {
+	_setOptionsInit: function (el, product, newOptions, initHTML) {
+		if (product.callButtons) this._pluginCallButtons = product.callButtons;
+		if (product.plugins) this.plugins = product.plugins;
+		if (el._menuTray.children.length === 0) this.menu._menuTrayMap = {};
+
+		this.options = newOptions;
+		this.lang = this.options.lang;
+		this._responsiveButtons = product.toolbar.responsiveButtons;
+		// this.toolbar._setResponsive();
+
 		this.context = Context(el.originElement, el.top, el.wysiwygFrame, el.code, this.options); //@todo context don't reset
 		this._componentsInfoReset = true;
-		this._editorInit(true, _initHTML);
+		this._editorInit(true, initHTML);
 	},
 
 	/**

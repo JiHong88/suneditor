@@ -14,7 +14,7 @@ const Figure = function (inst, controls, params) {
 	this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
 
 	// modules
-	this.controller = new Controller(this, controllerEl, 'bottom', inst.constructor.key);
+	this.controller = new Controller(this, controllerEl, { position: 'bottom' }, inst.constructor.key);
 	this.selectMenu_align = new SelectMenu(this, false, 'bottom-center');
 	this.selectMenu_align.on(this.alignButton, SetMenuAlign.bind(this), { class: 'se-resizing-align-list' });
 	this.selectMenu_align.create(alignMenus.items, alignMenus.html);
@@ -258,7 +258,7 @@ Figure.prototype = {
 
 		this.resizeDot.style.display = 'block';
 		this.controller.open(this.resizeDot, null, this.__offContainer);
-		domUtils.setDisabled(true, this.editor.controllerOnDisabledButtons);
+		domUtils.setDisabled(this.editor.controllerOnDisabledButtons, true);
 
 		// set members
 		domUtils.addClass(this._cover, 'se-figure-selected');

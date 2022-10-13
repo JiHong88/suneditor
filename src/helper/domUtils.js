@@ -49,7 +49,7 @@ export function createTextNode(text) {
 }
 
 /**
- * @description Get the argument iframe's document object
+ * @description Get the argument iframe's document object if use the "iframe" or "fullPage" options
  * @param {Element} iframe Iframe element (context.element.wysiwygFrame)
  * @returns {Document}
  */
@@ -646,11 +646,11 @@ export function setStyle(element, styleName, value) {
  * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
  * core.codeViewDisabledButtons (An array of buttons whose class name is not "se-code-view-enabled")
  * core.controllerOnDisabledButtons (An array of buttons whose class name is not "se-resizing-enabled")
- * @param {boolean} disabled Disabled value
  * @param {Array.<Element>|HTMLCollection|NodeList} buttonList Button array
+ * @param {boolean} disabled Disabled value
  * @param {boolean} important If priveleged mode should be used (Necessary to switch importantDisabled buttons)
  */
-export function setDisabled(disabled, buttonList, important) {
+export function setDisabled(buttonList, disabled, important) {
 	for (let i = 0, len = buttonList.length; i < len; i++) {
 		let button = buttonList[i];
 		if (important || !isImportantDisabled(button)) button.disabled = disabled;

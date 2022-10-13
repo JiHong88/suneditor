@@ -1,6 +1,4 @@
 import Core from './lib/core';
-import Constructor from './lib/constructor';
-import Context from './lib/context';
 
 import EditorInterface from './interface';
 import Plugins from './plugins';
@@ -21,19 +19,19 @@ export default {
 	 */
 	init: function (init_options) {
 		return {
-			create: function (idOrElement, options) {
-				return this.create(idOrElement, options, init_options);
+			create: function (targets, options) {
+				return this.create(targets, options, init_options);
 			}.bind(this)
 		};
 	},
 
 	/**
 	 * @description Create the suneditor
-	 * @param {string|Element} idOrElement textarea Id or textarea element
+	 * @param {string|Element|Array.<string|Element>} target textarea Id or textarea element
 	 * @param {JSON|Object} options user options
 	 * @returns {Object}
 	 */
-	create: function (idOrElement, options, _init_options) {
+	create: function (target, options, _init_options) {
 		if (typeof options !== 'object') options = {};
 		if (_init_options) {
 			options = [_init_options, options].reduce(function (init, option) {
@@ -65,22 +63,18 @@ export default {
 			}, {});
 		}
 
-		const element = typeof idOrElement === 'string' ? document.getElementById(idOrElement) : idOrElement;
-
-		if (!element) {
-			if (typeof idOrElement === 'string') {
-				throw Error('[SUNEDITOR.create.fail] The element for that id was not found (ID:"' + idOrElement + '")');
+		const editorTargets = [];
+		target = typeof target !== 'string' && target.length > -1 ? target : [target];
+		for (let i = 0, len = target.length, t, e; i < len; i++) {
+			t = target[i];
+			e = typeof t === 'string' ? document.getElementById(t) : t;
+			if (!e) {
+				if (typeof t === 'string') throw Error('[SUNEDITOR.create.fail] The element for that id was not found (ID:"' + t + '")');
+				throw Error("[SUNEDITOR.create.fail] suneditor requires textarea's element or id value");
 			}
-
-			throw Error("[SUNEDITOR.create.fail] suneditor requires textarea's element or id value");
+			editorTargets.push(e);
 		}
 
-		const cons = Constructor(element, options);
-
-		if (cons.constructed.top.id && document.getElementById(cons.constructed.top.id)) {
-			throw Error('[SUNEDITOR.create.fail] The ID of the suneditor you are trying to create already exists (ID:"' + cons.constructed.top.id + '")');
-		}
-
-		return new Core(Context(element, cons.constructed.top, cons.constructed.wwFrame, cons.constructed.codeFrame, options), cons.pluginCallButtons, cons.plugins, cons.options.lang, options, cons._responsiveButtons);
+		return new Core(editorTargets[0], options);
 	}
 };

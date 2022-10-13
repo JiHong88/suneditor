@@ -41,7 +41,7 @@ require('codemirror5/mode/htmlmixed/htmlmixed');
 // import imageGallery from '../../src/plugins/fileBrowser/imageGallery';
 import plugins from '../../src/plugins';
 
-window.e = suneditor.create(document.getElementById('editor2'), {
+window.e = suneditor.create(['editor1'], {
 	// value: '<h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2>',
 	// textDirection: 'rtl',
 	elementBlacklist: 'p',
@@ -103,6 +103,9 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 	events: {
 		onBlur: function (a, b, c, d, e) {
 			console.log('blur', a);
+		},
+		onFocus: function () {
+			console.log('focus')
 		}
 	},
 	// buttonList: [
@@ -403,7 +406,6 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     // },
 //     // height: 'auto',
 //     iframe_cssFileName: '.+',
-//     modallType: 'full',
 //     charCounter: true,
 //     charCounter_type: 'byte-html',
 //     charCounter_label: 'Characters :',
@@ -975,7 +977,6 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 //     width: '100%',
 //     height: '500px',
 //     toolbar_sticky: false,
-//     modallType: 'local',
 //     // iframe: true,
 //     // maxCharCount: 300,
 //     // statusbar: false

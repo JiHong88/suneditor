@@ -16,7 +16,7 @@ const Link = function (editor, target) {
 	// modules
 	this.anchor = new ModalAnchorEditor(this, modalEl);
 	this.modal = new Modal(this, modalEl);
-	this.controller = new Controller(this, controllerEl, 'bottom');
+	this.controller = new Controller(this, controllerEl, { position: 'bottom' });
 
 	// members
 	this.isUpdateState = false;

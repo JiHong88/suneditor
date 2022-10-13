@@ -1,6 +1,6 @@
 /**
  * @description Elements and variables you should have
- * @param {Element} element textarea element
+ * @param {Element} editorTargets textarea element
  * @param {Element} top Editor top div
  * @param {Element} wwFrame Editor wysiwyg frame
  * @param {Element} codeFrame Editor code view frame
@@ -8,16 +8,14 @@
  * @returns {Object} {Elements, variables of the editor, option}
  * @private
  */
-const Context = function (element, top, wwFrame, codeFrame, options) {
+const Context = function (editorTargets, top, wwFrame, codeFrame, options) {
 	return {
+		mode: editorTargets.length > 1 ? 'multi' : 'single',
 		element: {
-			originElement: element,
+			originElement: editorTargets,
 			topArea: top,
-			relative: top.querySelector('.se-container'),
+			container: top.querySelector('.se-container'),
 			toolbar: top.querySelector('.se-toolbar'),
-			_toolbarShadow: top.querySelector('.se-toolbar-shadow'),
-			_buttonTray: top.querySelector('.se-toolbar .se-btn-tray'),
-			_menuTray: top.querySelector('.se-toolbar .se-menu-tray'),
 			statusbar: top.querySelector('.se-status-bar'),
 			navigation: top.querySelector('.se-status-bar .se-navigation'),
 			charWrapper: top.querySelector('.se-status-bar .se-char-counter-wrapper'),
@@ -32,13 +30,11 @@ const Context = function (element, top, wwFrame, codeFrame, options) {
 			lineBreaker_t: top.querySelector('.se-line-breaker-component-t'),
 			lineBreaker_b: top.querySelector('.se-line-breaker-component-b'),
 			resizeBackground: top.querySelector('.se-resizing-back'),
+			_toolbarShadow: top.querySelector('.se-toolbar-shadow'),
+			_buttonTray: top.querySelector('.se-toolbar .se-btn-tray'),
+			_menuTray: top.querySelector('.se-toolbar .se-menu-tray'),
 			_stickyDummy: top.querySelector('.se-toolbar-sticky-dummy'),
-			_arrow: top.querySelector('.se-toolbar .se-arrow'),
-			_modal: {
-				area: top.querySelector('.se-modal'),
-				back: top.querySelector('.se-modal-back'),
-				inner: top.querySelector('.se-modal-inner')
-			}
+			_arrow: top.querySelector('.se-toolbar .se-arrow')
 		},
 		buttons: {
 			cover: top.querySelector('.se-toolbar .se-toolbar-cover'),

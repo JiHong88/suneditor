@@ -8,7 +8,7 @@ import { getNodeFromPath, getNodePath } from '../../helper/domUtils';
 
 export default function (editor, change) {
 	const delayTime = editor.options.historyStackDelayTime;
-	let elements = editor.context.element;
+	let ctxEl = editor.context.element;
 	let undo = editor.context.buttons.undo;
 	let redo = editor.context.buttons.redo;
 
@@ -18,9 +18,9 @@ export default function (editor, change) {
 
 	function setContentFromStack() {
 		const item = stack[stackIndex];
-		elements.wysiwyg.innerHTML = item.content;
+		ctxEl.wysiwyg.innerHTML = item.content;
 
-		editor.selection.setRange(getNodeFromPath(item.s.path, elements.wysiwyg), item.s.offset, getNodeFromPath(item.e.path, elements.wysiwyg), item.e.offset);
+		editor.selection.setRange(getNodeFromPath(item.s.path, ctxEl.wysiwyg), item.s.offset, getNodeFromPath(item.e.path, ctxEl.wysiwyg), item.e.offset);
 		editor.focus();
 
 		if (stack.length <= 1) {
@@ -191,7 +191,7 @@ export default function (editor, change) {
 		 * @private
 		 */
 		_resetCachingButton: function () {
-			elements = editor.context.element;
+			ctxEl = editor.context.element;
 			undo = editor.context.buttons.undo;
 			redo = editor.context.buttons.redo;
 

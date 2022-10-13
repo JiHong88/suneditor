@@ -10,14 +10,16 @@ const Modal = function (inst, element) {
 	this.form = element;
 	this.focusElement = element.querySelector('[data-focus]');
 	this.isUpdate = false;
-	this._modalElement = this.context.element._modal;
+	this._modalArea = this.context.element.container.querySelector('.se-modal'),
+	this._modalBack = this.context.element.container.querySelector('.se-modal-back'),
+	this._modalInner = this.context.element.container.querySelector('.se-modal-inner')
 	this._closeListener = [CloseListener.bind(this), OnClick_dialog.bind(this)];
 	this._bindClose = null;
 	this._onClickEvent = null;
 	this._closeSignal = false;
 
 	// add element
-	this._modalElement.inner.appendChild(element);
+	this._modalInner.appendChild(element);
 
 	// init
 	this.eventManager.addEvent(element.querySelector('form'), 'submit', Action.bind(this));
@@ -41,16 +43,16 @@ Modal.prototype = {
 	 */
 	open: function () {
 		this.editor._fixCurrentController(true);
-		if (this._closeSignal) this._modalElement.inner.addEventListener('click', this._closeListener[1]);
+		if (this._closeSignal) this._modalInner.addEventListener('click', this._closeListener[1]);
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 		this._bindClose = this.eventManager.addGlobalEvent('keydown', this._closeListener[0]);
 		this.isUpdate = this.kind === this.editor.currentControllerName;
 		
 		if (typeof this.inst.on === 'function') this.inst.on(this.isUpdate);
 
-		this._modalElement.area.style.display = 'block';
-		this._modalElement.back.style.display = 'block';
-		this._modalElement.inner.style.display = 'block';
+		this._modalArea.style.display = 'block';
+		this._modalBack.style.display = 'block';
+		this._modalInner.style.display = 'block';
 		this.form.style.display = 'block';
 
 		if (this.focusElement) this.focusElement.focus();
@@ -62,12 +64,12 @@ Modal.prototype = {
 	 */
 	close: function () {
 		this.editor._fixCurrentController(false);
-		if (this._closeSignal) this._modalElement.inner.removeEventListener('click', this._closeListener[1]);
+		if (this._closeSignal) this._modalInner.removeEventListener('click', this._closeListener[1]);
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 		// close
 		this.form.style.display = 'none';
-		this._modalElement.back.style.display = 'none';
-		this._modalElement.area.style.display = 'none';
+		this._modalBack.style.display = 'none';
+		this._modalArea.style.display = 'none';
 		if (typeof this.inst.init === 'function' && !this.isUpdate) this.inst.init();
 		this.editor.focus();
 	},
@@ -108,7 +110,7 @@ function Action(e) {
 }
 
 function OnClick_dialog(e) {
-	if (/close/.test(e.target.getAttribute('data-command')) || e.target === this._modalElement.inner) {
+	if (/close/.test(e.target.getAttribute('data-command')) || e.target === this._modalInner) {
 		this.close();
 	}
 }

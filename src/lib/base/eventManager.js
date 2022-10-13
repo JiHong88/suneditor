@@ -407,7 +407,7 @@ EventManager.prototype = {
 			tempDiv.setAttribute('contenteditable', true);
 			tempDiv.style.cssText = 'position:absolute; top:0; left:0; width:1px; height:1px; overflow:hidden;';
 
-			this.context.element.relative.appendChild(tempDiv);
+			this.context.element.container.appendChild(tempDiv);
 			tempDiv.focus();
 
 			_w.setTimeout(

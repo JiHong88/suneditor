@@ -981,6 +981,8 @@ Format.prototype = {
 	 * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
 	 */
 	applyTextStyle: function (styleNode, styleArray, removeNodeArray, strictRemove) {
+		if (domUtils.getParentElement(this.selection.getNode(), domUtils.isNonEditable)) return;
+
 		this.selection._resetRangeToTextNode();
 		let range = this.selection.getRangeAndAddLine(this.selection.getRange(), null);
 		styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
@@ -1239,8 +1241,8 @@ Format.prototype = {
 				})(this, removeNodeArray));
 
 		const isSizeNode = isRemoveNode || this._sn_isSizeNode(newNode);
-		const _getMaintainedNode = this._sn_getMaintainedNode.bind(isRemoveAnchor, isSizeNode);
-		const _isMaintainedNode = this._sn_isMaintainedNode.bind(isRemoveAnchor, isSizeNode);
+		const _getMaintainedNode = this._sn_getMaintainedNode.bind(this, isRemoveAnchor, isSizeNode);
+		const _isMaintainedNode = this._sn_isMaintainedNode.bind(this, isRemoveAnchor, isSizeNode);
 
 		// one line
 		if (oneLine) {

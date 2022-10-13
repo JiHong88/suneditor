@@ -67,7 +67,7 @@
 			content.addEventListener('click', this._onClick_browser.bind(core));
 
 			/** append html */
-			context.element.relative.appendChild(browser_div);
+			context.element.container.appendChild(browser_div);
 
 			/** empty memory */
 			(browser_div = null), (back = null), (content = null);

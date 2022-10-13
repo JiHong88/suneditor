@@ -974,28 +974,6 @@ editor.getFullContent(onlyContent: Boolean);
 // * not working during enabled codeView mode
 editor.getText();
 
-// Gets uploaded files(plugin using fileManager) information list.
-// image: [img], video: [video, iframe], audio: [audio]
-/** 
- * {
- *  element: image element
- *  src: imgage src
- *  index: data index
- *  name: file name
- *  size: file size
- *  select: select function
- *  delete: delete function
- * }
- * pluginName: Plugin name (image, video, audio)
- **/
-editor.getFilesInfo(pluginName);
-
-// Upload images using image plugin
-// document.getElementById('example_files_input').files
-editor.insertImage(FileList);
-
-
-
 // Change the content of the suneditor
 editor.setContent('set content');
 

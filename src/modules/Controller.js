@@ -7,11 +7,11 @@ const NON_TEXT_KEYCODE = new env._w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|
  *
  * @param {*} inst
  * @param {*} element
- * @param {string} position Type of position ("top" | "bottom")
+ * @param {{position: "top" | "bottom", disabled?: boolean}} params params
  * When using the "top" position, there should not be an arrow on the controller.
  * When using the "bottom" position there should be an arrow on the controller.
  */
-const Controller = function (inst, element, position, _name) {
+const Controller = function (inst, element, params, _name) {
 	EditorInterface.call(this, inst.editor);
 
 	// members
@@ -20,11 +20,12 @@ const Controller = function (inst, element, position, _name) {
 	this.form = element;
 	this.currentTarget = null;
 	this.currentPositionTarget = null;
-	this.position = position || 'bottom';
+	this.position = params.position || 'bottom';
+	this.disabled = !!params.disabled;
 	this._initMethod = null;
-	this.__globalEventHandlers = [CloseListener_key.bind(this), CloseListener_mousedown.bind(this)];
+	this.__globalEventHandlers = [CloseListener_key.bind(this), CloseListener_click.bind(this)];
 	this._bindClose_key = null;
-	this._bindClose_mousedown = null;
+	this._bindClose_click = null;
 
 	// add element
 	this.context.element.editorArea.appendChild(element);
@@ -90,6 +91,7 @@ Controller.prototype = {
 		});
 
 		this.editor._antiBlur = true;
+		if (this.disabled) this.editor.blur();
 		if (typeof this.events.onShowController === 'function') this.events.onShowController(this.kind, this.editor.openControllers);
 	},
 
@@ -179,12 +181,12 @@ Controller.prototype = {
 	__addGlobalEvent: function () {
 		this.__removeGlobalEvent();
 		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers[0], true);
-		this._bindClose_mousedown = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers[1], true);
+		this._bindClose_click = this.eventManager.addGlobalEvent('click', this.__globalEventHandlers[1], true);
 	},
 
 	__removeGlobalEvent: function () {
 		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);
-		if (this._bindClose_mousedown) this._bindClose_mousedown = this.eventManager.removeGlobalEvent(this._bindClose_mousedown);
+		if (this._bindClose_click) this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
 	},
 
 	_checkFixed: function () {
@@ -230,7 +232,7 @@ function CloseListener_key(e) {
 	this.close();
 }
 
-function CloseListener_mousedown(e) {
+function CloseListener_click(e) {
 	if (this._checkFixed()) return;
 	if (this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) return;
 	this.close();

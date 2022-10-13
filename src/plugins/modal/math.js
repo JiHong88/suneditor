@@ -17,7 +17,7 @@ const Math_ = function (editor, target) {
 
 	// modules
 	this.modal = new Modal(this, modalEl);
-	this.controller = new Controller(this, controllerEl, 'bottom');
+	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
 
 	// members
 	this.textArea = modalEl.querySelector('.se-math-exp');
@@ -50,7 +50,7 @@ Math_.prototype = {
 			this._element = element;
 			this.controller.open(element);
 			domUtils.addClass(element, 'se-focus');
-			domUtils.setDisabled(true, this.editor.controllerOnDisabledButtons);
+			domUtils.setDisabled(this.editor.controllerOnDisabledButtons, true);
 			return true;
 		}
 
@@ -62,7 +62,7 @@ Math_.prototype = {
 	 */
 	reset: function () {
 		domUtils.removeClass(this._element, 'se-focus');
-		domUtils.setDisabled(false, this.editor.controllerOnDisabledButtons);
+		domUtils.setDisabled(this.editor.controllerOnDisabledButtons, false);
 		this._element = null;
 	},
 

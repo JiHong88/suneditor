@@ -15,7 +15,7 @@ const Audio_ = function (editor, target) {
 
 	// modules
 	this.modal = new Modal(this, modalEl);
-	this.controller = new Controller(this, controllerEl, 'bottom');
+	this.controller = new Controller(this, controllerEl, { position: 'bottom' });
 	this.fileManager = new FileManager(this, { tagNames: ['audio'], eventHandler: this.events.onAudioUpload, checkHandler: FileCheckHandler.bind(this), figure: null });
 
 	// members

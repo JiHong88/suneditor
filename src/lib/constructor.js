@@ -15,19 +15,18 @@ const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 
 /**
  * @description document create
- * @param {Element} element Textarea
+ * @param {Array.<Element>} editorTargets Target textarea
  * @param {Object} options Options
  * @returns {Object}
  */
-const Constructor = function (element, options) {
+const Constructor = function (editorTargets, options) {
 	if (typeof options !== 'object') options = {};
 
 	/** --- init options --- */
-	InitOptions(element, options);
+	InitOptions(editorTargets, options);
 
 	// suneditor div
 	const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (options._rtl ? ' se-rtl' : '') });
-	if (element.id) top_div.id = 'suneditor_' + element.id;
 
 	// relative div
 	const relative = domUtils.createElement('DIV', { class: 'se-container' });
@@ -112,7 +111,6 @@ const Constructor = function (element, options) {
 			wwFrame: wysiwyg_div,
 			codeFrame: textarea
 		},
-		options: options,
 		plugins: tool_bar.plugins,
 		pluginCallButtons: tool_bar.pluginCallButtons,
 		_responsiveButtons: tool_bar.responsiveButtons
@@ -121,17 +119,17 @@ const Constructor = function (element, options) {
 
 /**
  * @description Reset the options.
- * @param {Object} mergeOptions The new options
  * @param {Object} context Context object
- * @param {Object} originOptions The origin optins
+ * @param {Object} mergeOptions The new options
  * @returns {Object}
  */
-export function ResetOptions(mergeOptions, context, originOptions) {
+export function ResetOptions(context, mergeOptions) {
+	const originOptions = context.options;
 	InitOptions(context.element.originElement, mergeOptions);
-
-	const el = context.element;
-	const relative = el.relative;
-	const editorArea = el.editorArea;
+	
+	const ctxEl = context.element;
+	const editorContainer = ctxEl.container;
+	const editorArea = ctxEl.editorArea;
 	const isNewToolbarContainer = mergeOptions.toolbar_container && mergeOptions.toolbar_container !== originOptions.toolbar_container;
 	const isNewToolbar = mergeOptions.lang !== originOptions.lang || mergeOptions.buttonList !== originOptions.buttonList || mergeOptions.mode !== originOptions.mode || isNewToolbarContainer;
 
@@ -144,29 +142,29 @@ export function ResetOptions(mergeOptions, context, originOptions) {
 		// toolbar container
 		if (isNewToolbarContainer) {
 			mergeOptions.toolbar_container.appendChild(tool_bar.element);
-			el.toolbar.parentElement.removeChild(el.toolbar);
+			ctxEl.toolbar.parentElement.removeChild(ctxEl.toolbar);
 		} else {
-			el.toolbar.parentElement.replaceChild(tool_bar.element, el.toolbar);
+			ctxEl.toolbar.parentElement.replaceChild(tool_bar.element, ctxEl.toolbar);
 		}
 
-		el.toolbar = tool_bar.element;
-		el._menuTray = tool_bar._menuTray;
-		el._arrow = arrow;
+		ctxEl.toolbar = tool_bar.element;
+		ctxEl._menuTray = tool_bar._menuTray;
+		ctxEl._arrow = arrow;
 	}
 
-	const initElements = _initElements(mergeOptions, el.topArea, isNewToolbar ? tool_bar.element : el.toolbar, arrow);
+	const initElements = _initElements(mergeOptions, ctxEl.topArea, isNewToolbar ? tool_bar.element : ctxEl.toolbar, arrow);
 
 	const statusBar = initElements.bottomBar;
 	const wysiwygFrame = initElements.wysiwygFrame;
 	const placeholder_span = initElements.placeholder;
 	let code = initElements.codeView;
 
-	if (el.statusbar) domUtils.removeItem(el.statusbar);
+	if (ctxEl.statusbar) domUtils.removeItem(ctxEl.statusbar);
 	if (statusBar.statusbar) {
 		if (mergeOptions.statusbar_container && mergeOptions.statusbar_container !== originOptions.statusbar_container) {
 			mergeOptions.statusbar_container.appendChild(statusBar.statusbar);
 		} else {
-			relative.appendChild(statusBar.statusbar);
+			editorContainer.appendChild(statusBar.statusbar);
 		}
 	}
 
@@ -176,16 +174,16 @@ export function ResetOptions(mergeOptions, context, originOptions) {
 
 	code = _checkCodeMirror(mergeOptions, code);
 
-	el.statusbar = statusBar.statusbar;
-	el.navigation = statusBar.navigation;
-	el.charWrapper = statusBar.charWrapper;
-	el.charCounter = statusBar.charCounter;
-	el.wysiwygFrame = wysiwygFrame;
-	el.code = code;
-	el.placeholder = placeholder_span;
+	ctxEl.statusbar = statusBar.statusbar;
+	ctxEl.navigation = statusBar.navigation;
+	ctxEl.charWrapper = statusBar.charWrapper;
+	ctxEl.charCounter = statusBar.charCounter;
+	ctxEl.wysiwygFrame = wysiwygFrame;
+	ctxEl.code = code;
+	ctxEl.placeholder = placeholder_span;
 
-	if (mergeOptions._rtl) domUtils.addClass(el.topArea, 'se-rtl');
-	else domUtils.removeClass(el.topArea, 'se-rtl');
+	if (mergeOptions._rtl) domUtils.addClass(ctxEl.topArea, 'se-rtl');
+	else domUtils.removeClass(ctxEl.topArea, 'se-rtl');
 
 	return {
 		callButtons: tool_bar.pluginCallButtons,
@@ -196,10 +194,10 @@ export function ResetOptions(mergeOptions, context, originOptions) {
 
 /**
  * @description Initialize options
- * @param {Element} element Options object
+ * @param {Array.<Element>} editorTargets Target textarea
  * @param {Object} options Options object
  */
-function InitOptions(element, options) {
+function InitOptions(editorTargets, options) {
 	const plugins = {};
 	if (options.plugins) {
 		const _plugins = (options._init_plugins = options.plugins);
@@ -330,12 +328,11 @@ function InitOptions(element, options) {
 	options.iframe_cssFileName = options.iframe ? (typeof options.iframe_cssFileName === 'string' ? [options.iframe_cssFileName] : options.iframe_cssFileName || ['suneditor']) : null;
 
 	/** Styles */
-	options.modallType = options.modallType || 'full';
 	options.editorCSSText = typeof options.editorCSSText === 'string' ? options.editorCSSText : '';
-	options.width = options.width ? (numbers.is(options.width) ? options.width + 'px' : options.width) : element.clientWidth ? element.clientWidth + 'px' : '100%';
+	options.width = options.width ? (numbers.is(options.width) ? options.width + 'px' : options.width) : editorTargets.clientWidth ? editorTargets.clientWidth + 'px' : '100%';
 	options.minWidth = (numbers.is(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
 	options.maxWidth = (numbers.is(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
-	options.height = options.height ? (numbers.is(options.height) ? options.height + 'px' : options.height) : element.clientHeight ? element.clientHeight + 'px' : 'auto';
+	options.height = options.height ? (numbers.is(options.height) ? options.height + 'px' : options.height) : editorTargets.clientHeight ? editorTargets.clientHeight + 'px' : 'auto';
 	options.minHeight = (numbers.is(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
 	options.maxHeight = (numbers.is(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
 	options._editorStyles = converter._setDefaultOptionStyle(options, options.editorCSSText);

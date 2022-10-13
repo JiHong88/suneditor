@@ -18,8 +18,8 @@ const Table = function (editor, target) {
 	const splitMenu = CreateSplitMenu(this.lang);
 
 	// members
-	this.controller_table = new Controller(this, controller_table, 'top');
-	this.controller_cell = new Controller(this, controller_cell, this.cellControllerTop ? 'top' : 'bottom');
+	this.controller_table = new Controller(this, controller_table, { position: 'top' });
+	this.controller_cell = new Controller(this, controller_cell, { position: this.cellControllerTop ? 'top' : 'bottom' });
 	this.splitButton = controller_cell.querySelector('[data-command="onsplit"]');
 	this.selectMenu_split = new SelectMenu(this, false, 'bottom-center');
 	this.selectMenu_split.on(this.splitButton, OnSplitCells.bind(this));
@@ -73,9 +73,6 @@ const Table = function (editor, target) {
 		shiftOff: OffCellShift.bind(this),
 		touchOff: OffCellTouch.bind(this)
 	};
-
-	// this.context.element.relative.appendChild(controller_cell);
-	// this.context.element.relative.appendChild(controller_table);
 
 	// init
 	this.menu.initTarget(target, menu);
