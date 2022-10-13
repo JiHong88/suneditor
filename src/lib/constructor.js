@@ -15,21 +15,16 @@ const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 
 /**
  * @description document create
- * @param {Array.<Element>} editorTargets Target textarea
  * @param {Object} options Options
+ * @param {Array.<Element>} editorTargets Target textarea
  * @returns {Object}
  */
 const Constructor = function (editorTargets, options) {
 	if (typeof options !== 'object') options = {};
 
 	/** --- init options --- */
-	InitOptions(editorTargets, options);
-
-	// suneditor div
-	const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (options._rtl ? ' se-rtl' : '') });
-
-	// relative div
-	const relative = domUtils.createElement('DIV', { class: 'se-container' });
+	const multiMode = editorTargets.length > 1;
+	InitOptions(options);
 
 	// toolbar
 	const tool_bar = CreateToolBar(options.buttonList, options.plugins, options);
@@ -38,16 +33,16 @@ const Constructor = function (editorTargets, options) {
 	tool_bar.element.style.visibility = 'hidden';
 	if (tool_bar.pluginCallButtons.math) _checkKatexMath(options.katex);
 	const arrow = domUtils.createElement('DIV', { class: 'se-arrow' });
-
-	// sticky toolbar dummy
-	const sticky_dummy = domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' });
+	
+	// suneditor div
+	const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (options._rtl ? ' se-rtl' : '') });
+	const container = domUtils.createElement('DIV', { class: 'se-container' });
 
 	// inner editor div
 	const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' });
 
-	/** --- init elements and create bottom bar --- */
+	// init element
 	const initElements = _initElements(options, top_div, tool_bar.element, arrow);
-
 	const bottomBar = initElements.bottomBar;
 	const wysiwyg_div = initElements.wysiwygFrame;
 	const placeholder_span = initElements.placeholder;
@@ -56,6 +51,16 @@ const Constructor = function (editorTargets, options) {
 	// status bar
 	const status_bar = bottomBar.statusbar;
 
+	// modal
+	const modal = domUtils.createElement('DIV', { class: 'se-modal sun-editor-common' });
+	const modal_back = domUtils.createElement('DIV', { class: 'se-modal-back', style: 'display: none;' });
+	const modal_inner = domUtils.createElement('DIV', { class: 'se-modal-inner', style: 'display: none;' });
+	modal.appendChild(modal_back);
+	modal.appendChild(modal_inner);
+	tool_bar.element.appendChild(modal);
+
+	// sticky toolbar dummy
+	const sticky_dummy = domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' });
 	// loading box
 	const loading_box = domUtils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>');
 	// enter line
@@ -82,28 +87,20 @@ const Constructor = function (editorTargets, options) {
 	editor_div.appendChild(textarea);
 	if (placeholder_span) editor_div.appendChild(placeholder_span);
 	if (!toolbar_container) {
-		relative.appendChild(tool_bar.element);
-		relative.appendChild(toolbarShadow);
+		container.appendChild(tool_bar.element);
+		container.appendChild(toolbarShadow);
 	}
-	relative.appendChild(sticky_dummy);
-	relative.appendChild(editor_div);
-	relative.appendChild(resize_back);
-	relative.appendChild(loading_box);
+	container.appendChild(sticky_dummy);
+	container.appendChild(editor_div);
+	container.appendChild(resize_back);
+	container.appendChild(loading_box);
 	editor_div.appendChild(line_breaker);
 	editor_div.appendChild(line_breaker_t);
 	editor_div.appendChild(line_breaker_b);
-	if (status_bar && !statusbar_container) relative.appendChild(status_bar);
-	top_div.appendChild(relative);
+	if (status_bar && !statusbar_container) container.appendChild(status_bar);
+	top_div.appendChild(container);
 
 	textarea = _checkCodeMirror(options, textarea);
-
-	// modal
-	const modal = domUtils.createElement('DIV', { class: 'se-modal sun-editor-common' });
-	const modal_back = domUtils.createElement('DIV', { class: 'se-modal-back', style: 'display: none;' });
-	const modal_inner = domUtils.createElement('DIV', { class: 'se-modal-inner', style: 'display: none;' });
-	modal.appendChild(modal_back);
-	modal.appendChild(modal_inner);
-	relative.appendChild(modal);
 
 	return {
 		constructed: {
@@ -111,7 +108,6 @@ const Constructor = function (editorTargets, options) {
 			wwFrame: wysiwyg_div,
 			codeFrame: textarea
 		},
-		plugins: tool_bar.plugins,
 		pluginCallButtons: tool_bar.pluginCallButtons,
 		_responsiveButtons: tool_bar.responsiveButtons
 	};
@@ -125,7 +121,7 @@ const Constructor = function (editorTargets, options) {
  */
 export function ResetOptions(context, mergeOptions) {
 	const originOptions = context.options;
-	InitOptions(context.element.originElement, mergeOptions);
+	InitOptions(mergeOptions);
 	
 	const ctxEl = context.element;
 	const editorContainer = ctxEl.container;
@@ -153,18 +149,17 @@ export function ResetOptions(context, mergeOptions) {
 	}
 
 	const initElements = _initElements(mergeOptions, ctxEl.topArea, isNewToolbar ? tool_bar.element : ctxEl.toolbar, arrow);
-
-	const statusBar = initElements.bottomBar;
+	const bottomBar = initElements.bottomBar;
 	const wysiwygFrame = initElements.wysiwygFrame;
 	const placeholder_span = initElements.placeholder;
 	let code = initElements.codeView;
 
 	if (ctxEl.statusbar) domUtils.removeItem(ctxEl.statusbar);
-	if (statusBar.statusbar) {
+	if (bottomBar.statusbar) {
 		if (mergeOptions.statusbar_container && mergeOptions.statusbar_container !== originOptions.statusbar_container) {
-			mergeOptions.statusbar_container.appendChild(statusBar.statusbar);
+			mergeOptions.statusbar_container.appendChild(bottomBar.statusbar);
 		} else {
-			editorContainer.appendChild(statusBar.statusbar);
+			editorContainer.appendChild(bottomBar.statusbar);
 		}
 	}
 
@@ -174,10 +169,10 @@ export function ResetOptions(context, mergeOptions) {
 
 	code = _checkCodeMirror(mergeOptions, code);
 
-	ctxEl.statusbar = statusBar.statusbar;
-	ctxEl.navigation = statusBar.navigation;
-	ctxEl.charWrapper = statusBar.charWrapper;
-	ctxEl.charCounter = statusBar.charCounter;
+	ctxEl.statusbar = bottomBar.statusbar;
+	ctxEl.navigation = bottomBar.navigation;
+	ctxEl.charWrapper = bottomBar.charWrapper;
+	ctxEl.charCounter = bottomBar.charCounter;
 	ctxEl.wysiwygFrame = wysiwygFrame;
 	ctxEl.code = code;
 	ctxEl.placeholder = placeholder_span;
@@ -187,17 +182,15 @@ export function ResetOptions(context, mergeOptions) {
 
 	return {
 		callButtons: tool_bar.pluginCallButtons,
-		plugins: tool_bar.plugins,
 		toolbar: tool_bar
 	};
 }
 
 /**
  * @description Initialize options
- * @param {Array.<Element>} editorTargets Target textarea
  * @param {Object} options Options object
  */
-function InitOptions(editorTargets, options) {
+function InitOptions(options) {
 	const plugins = {};
 	if (options.plugins) {
 		const _plugins = (options._init_plugins = options.plugins);
@@ -329,10 +322,10 @@ function InitOptions(editorTargets, options) {
 
 	/** Styles */
 	options.editorCSSText = typeof options.editorCSSText === 'string' ? options.editorCSSText : '';
-	options.width = options.width ? (numbers.is(options.width) ? options.width + 'px' : options.width) : editorTargets.clientWidth ? editorTargets.clientWidth + 'px' : '100%';
+	options.width = options.width ? (numbers.is(options.width) ? options.width + 'px' : options.width) : '100%';
 	options.minWidth = (numbers.is(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
 	options.maxWidth = (numbers.is(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
-	options.height = options.height ? (numbers.is(options.height) ? options.height + 'px' : options.height) : editorTargets.clientHeight ? editorTargets.clientHeight + 'px' : 'auto';
+	options.height = options.height ? (numbers.is(options.height) ? options.height + 'px' : options.height) : 'auto';
 	options.minHeight = (numbers.is(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
 	options.maxHeight = (numbers.is(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
 	options._editorStyles = converter._setDefaultOptionStyle(options, options.editorCSSText);
@@ -536,7 +529,7 @@ function _initElements(options, topDiv, toolBar, toolBarArrow) {
 	});
 	if (options.height === 'auto') textarea.style.overflow = 'hidden';
 
-	/** resize bar */
+	/** status bar */
 	let statusbar = null;
 	let navigation = null;
 	let charWrapper = null;
@@ -968,22 +961,17 @@ export function CreateToolBar(buttonList, plugins, options) {
 			}
 	}
 
-	if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
 	if (moreLayer.children.length > 0) _buttonTray.appendChild(moreLayer);
+	if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
 
 	// menu tray
 	const _menuTray = domUtils.createElement('DIV', { class: 'se-menu-tray' });
 	tool_bar.appendChild(_menuTray);
 
-	// cover
-	const tool_cover = domUtils.createElement('DIV', { class: 'se-toolbar-cover' });
-	tool_bar.appendChild(tool_cover);
-
 	if (options.toolbar_hide) tool_bar.style.display = 'none';
 
 	return {
 		element: tool_bar,
-		plugins: plugins,
 		pluginCallButtons: pluginCallButtons,
 		responsiveButtons: responsiveButtons,
 		_menuTray: _menuTray,

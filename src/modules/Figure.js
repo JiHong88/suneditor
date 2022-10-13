@@ -816,7 +816,7 @@ function CreateAlign(editor) {
 }
 
 function OffFigureContainer() {
-	domUtils.setDisabled(false, this.editor.controllerOnDisabledButtons);
+	domUtils.setDisabled(this.editor.controllerOnDisabledButtons, false);
 	this.resizeDot.style.display = 'none';
 	this.editor._figureContainer = null;
 	this.inst.init();

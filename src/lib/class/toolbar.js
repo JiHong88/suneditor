@@ -32,14 +32,14 @@ Toolbar.prototype = {
 		this.menu.dropdownOff();
 		this.menu._moreLayerOff();
 		this.menu.containerOff();
-		this.context.buttons.cover.style.display = 'block';
+		domUtils.setDisabled(this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]'), true);
 	},
 
 	/**
 	 * @description Enable the toolbar
 	 */
 	enable: function () {
-		this.context.buttons.cover.style.display = 'none';
+		domUtils.setDisabled(this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]'), false);
 	},
 
 	/**
@@ -81,12 +81,7 @@ Toolbar.prototype = {
 
 		const newToolbar = CreateToolBar(buttonList, this.options._init_plugins, this.options);
 		this.context.element.toolbar.replaceChild(newToolbar._buttonTray, this.context.element._buttonTray);
-		const newContext = Context(this.context.element.originElement, this.context.element.topArea, this.context.element.wysiwygFrame, this.context.element.code, this.options);
-
-		this.context.element = newContext.element;
-		this.context.tool = newContext.tool;
-		this.context.element.eventWysiwyg = this.options.iframe ? this._ww : this.context.element.wysiwyg;
-		if (this.options.iframe) this.context.element.wysiwyg = this._wd.body;
+		this.context.element._buttonTray = newToolbar._buttonTray;
 
 		this.editor._recoverButtonStates();
 		this.editor._cachingButtons();

@@ -1,6 +1,6 @@
 /**
  * @description Elements and variables you should have
- * @param {Element} editorTargets textarea element
+ * @param {Element} editorTarget textarea element
  * @param {Element} top Editor top div
  * @param {Element} wwFrame Editor wysiwyg frame
  * @param {Element} codeFrame Editor code view frame
@@ -8,11 +8,10 @@
  * @returns {Object} {Elements, variables of the editor, option}
  * @private
  */
-const Context = function (editorTargets, top, wwFrame, codeFrame, options) {
+const Context = function (editorTarget, top, wwFrame, codeFrame, options) {
 	return {
-		mode: editorTargets.length > 1 ? 'multi' : 'single',
 		element: {
-			originElement: editorTargets,
+			originElement: editorTarget,
 			topArea: top,
 			container: top.querySelector('.se-container'),
 			toolbar: top.querySelector('.se-toolbar'),
@@ -37,7 +36,6 @@ const Context = function (editorTargets, top, wwFrame, codeFrame, options) {
 			_arrow: top.querySelector('.se-toolbar .se-arrow')
 		},
 		buttons: {
-			cover: top.querySelector('.se-toolbar .se-toolbar-cover'),
 			bold: top.querySelector('.se-toolbar [data-command="bold"]'),
 			underline: top.querySelector('.se-toolbar [data-command="underline"]'),
 			italic: top.querySelector('.se-toolbar [data-command="italic"]'),

@@ -68,7 +68,7 @@ const Core = function (editorTargets, options) {
 	 * @description Plugins
 	 * @type {Object.<string, any>}
 	 */
-	this.plugins = product.plugins || {};
+	this.plugins = options.plugins || {};
 
 	/**
 	 * @description Elements and user options parameters of the suneditor
@@ -860,14 +860,6 @@ Core.prototype = {
 		if (!mergeOptions.iframe) {
 			this._setOptionsInit(ctxEl, product, mergeOptions, initHTML);
 		}
-	},
-
-	getContext: function (key, value) {
-		
-	},
-
-	setContext: function (key, value) {
-
 	},
 
 	/**
@@ -1688,8 +1680,8 @@ Core.prototype = {
 
 		// util classes
 		this.offset = new Offset(this);
-		this.notice = new Notice(this);
 		this.shortcuts = new Shortcuts(this);
+		this.notice = new Notice(this);
 		// main classes
 		this.node = new Node_(this);
 		this.html = new HTML(this);
@@ -1937,9 +1929,9 @@ Core.prototype = {
 	 */
 	_setOptionsInit: function (el, product, newOptions, initHTML) {
 		if (product.callButtons) this._pluginCallButtons = product.callButtons;
-		if (product.plugins) this.plugins = product.plugins;
 		if (el._menuTray.children.length === 0) this.menu._menuTrayMap = {};
-
+		
+		this.plugins = newOptions.plugins;
 		this.options = newOptions;
 		this.lang = this.options.lang;
 		this._responsiveButtons = product.toolbar.responsiveButtons;

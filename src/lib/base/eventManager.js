@@ -39,9 +39,11 @@ EventManager.prototype = {
 	 * @param {string} type Event type
 	 * @param {Function} listener Event handler
 	 * @param {boolean|undefined} useCapture Event useCapture option
-	 * @return {target, type, listener, useCapture}
+	 * @return {boolean}
 	 */
 	addEvent: function (target, type, listener, useCapture) {
+		if (!target) return false;
+
 		target.addEventListener(type, listener, useCapture);
 		this._events.push({
 			target: target,
@@ -49,6 +51,8 @@ EventManager.prototype = {
 			handler: listener,
 			useCapture: useCapture
 		});
+
+		return true;
 	},
 
 	/**

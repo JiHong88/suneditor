@@ -142,7 +142,6 @@
 /** --- toolbar ---------------------------------------------------------- */
 .sun-editor .se-toolbar {display:block; position:relative; height:auto; width:100%; overflow:visible; padding:0; margin:0; background-color:#fafafa; outline:1px solid #dadada; z-index:7;}
 .sun-editor .se-toolbar-shadow {display:block !important; height:0px !important; padding:0 !important; margin:0 !important; background-color:transparent !important;  outline:none !important; border: none !important; z-index:0 !important;}
-.sun-editor .se-toolbar-cover {position:absolute; display:none; font-size:36px; width:100%; height:100%; top:0; left:0; background-color:#fefefe; opacity:.5; filter:alpha(opacity=50); cursor:not-allowed; z-index:4;}
 .sun-editor .se-toolbar-separator-vertical {display:inline-block; height:0px; width:0px; margin:0px; vertical-align:top;}
 /* inline toolbar */
 .sun-editor .se-toolbar.se-toolbar-inline {display:none; position:absolute; box-shadow:0 3px 9px rgba(0,0,0,.5); -webkit-box-shadow:0 3px 9px rgba(0,0,0,.5);}
@@ -463,7 +462,7 @@
 .sun-editor .se-file-browser .se-file-browser-list.se-image-list .se-file-item-img > .se-file-img-name.se-file-name-back {background-color:#333; opacity:0.6;}
 
 /** --- notice */
-.sun-editor .se-notice {position:absolute; top:0; display:none; z-index:7; width:100%; height:auto; word-break:break-all; font-size:13px; color:#b94a48; background-color:#f2dede; padding:15px; margin:0; border:1px solid #eed3d7; user-select:auto; -o-user-select:auto; -moz-user-select:auto; -khtml-user-select:auto; -webkit-user-select:auto; -ms-user-select:auto;}
+.sun-editor .se-notice {position:relative; display:none; z-index:7; max-width:500px; width:auto; height:auto; margin:1.75rem auto; border-radius:4px; -webkit-box-shadow:0 3px 9px rgba(0, 0, 0, .5); box-shadow:0 3px 9px rgba(0, 0, 0, .5); word-break:break-all; color:#b94a48; background-color:#fff; padding:15px; border:1px solid rgba(0, 0, 0, .2);}
 .sun-editor .se-notice button {float:right; padding:7px;}
 
 /** --- tooltip */

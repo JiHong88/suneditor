@@ -3,38 +3,14 @@
  * @author Yi JiHong.
  */
 
+import Modal from '../../modules/Modal';
 import { domUtils } from '../../helper';
 
 const Notice = function (editor) {
-	this.modal = domUtils.createElement(
-		'DIV',
-		{
-			class: 'se-notice'
-		},
-		null
-	);
-
-	this.message = domUtils.createElement('SPAN');
-	let notice_button = domUtils.createElement(
-		'BUTTON',
-		{
-			class: 'close',
-			'aria-label': 'Close',
-			title: editor.lang.modalBox.close
-		},
-		editor.icons.cancel
-	);
-
-	this.modal.appendChild(this.message);
-	this.modal.appendChild(notice_button);
-
-	/** add event */
-	editor.eventManager.addEvent(notice_button, 'click', OnClick_cancel.bind(this));
-
-	/** append html */
-	editor.context.element.editorArea.appendChild(this.modal);
-
-	notice_button = null;
+	const modalEl = CreateHTML(editor);
+	this.editor = editor;
+	this.modal = new Modal(this, modalEl);
+	this.message = modalEl.querySelector('span');
 };
 
 Notice.prototype = {
@@ -44,27 +20,22 @@ Notice.prototype = {
 	 */
 	open: function (text) {
 		this.message.textContent = text;
-		this.modal.style.display = 'block';
+		this.modal.open();
 	},
 
 	/**
 	 * @description  Close the notice panel
 	 */
 	close: function () {
-		this.modal.style.display = 'none';
+		this.modal.close();
 	},
 
 	constructor: Notice
 };
 
-/**
- * @description Event when clicking the cancel button
- * @param {MouseEvent} e Event object
- */
-function OnClick_cancel(e) {
-	e.preventDefault();
-	e.stopPropagation();
-	this.close.call(this);
+function CreateHTML(editor) {
+	let html = '<div><button class="close" data-command="close" title="' + editor.lang.modalBox.close + '">' + editor.icons.cancel + '</button></div><div><span></span></div>';
+	return domUtils.createElement('DIV', { class: 'se-notice' }, html);
 }
 
 export default Notice;

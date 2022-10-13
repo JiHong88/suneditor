@@ -10,9 +10,9 @@ const Modal = function (inst, element) {
 	this.form = element;
 	this.focusElement = element.querySelector('[data-focus]');
 	this.isUpdate = false;
-	this._modalArea = this.context.element.container.querySelector('.se-modal'),
-	this._modalBack = this.context.element.container.querySelector('.se-modal-back'),
-	this._modalInner = this.context.element.container.querySelector('.se-modal-inner')
+	this._modalArea = this.context.element.toolbar.querySelector('.se-modal'),
+	this._modalBack = this.context.element.toolbar.querySelector('.se-modal-back'),
+	this._modalInner = this.context.element.toolbar.querySelector('.se-modal-inner')
 	this._closeListener = [CloseListener.bind(this), OnClick_dialog.bind(this)];
 	this._bindClose = null;
 	this._onClickEvent = null;
@@ -23,12 +23,7 @@ const Modal = function (inst, element) {
 
 	// init
 	this.eventManager.addEvent(element.querySelector('form'), 'submit', Action.bind(this));
-	const closeButton = element.querySelector('[data-command="close"]');
-	if (closeButton) {
-		this.eventManager.addEvent(closeButton, 'click', this.close.bind(this));
-	} else {
-		this._closeSignal = true;
-	}
+	this._closeSignal = !this.eventManager.addEvent(element.querySelector('[data-command="close"]'), 'click', this.close.bind(this));
 };
 
 Modal.CreateBasic = function () {

@@ -721,7 +721,7 @@ function CreateHTML_modal(editor) {
 	const lang = editor.lang;
 	let html =
 		'<div class="se-modal-header">' +
-		'<button type="button" data-command="close" class="se-btn se-modal-close" class="close" title="' +
+		'<button type="button" data-command="close" class="se-btn se-modal-close close" title="' +
 		lang.modalBox.close +
 		'" aria-label="' +
 		lang.modalBox.close +

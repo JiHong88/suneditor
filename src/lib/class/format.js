@@ -3005,7 +3005,7 @@ Format.prototype = {
 	 */
 	_sn_getMaintainedNode: function (_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove) return null;
-		return domUtils.getParentElement(element, this._isNonSplitNode) || (!_isSizeNode ? domUtils.getParentElement(element, Format.IsSizeNode) : null);
+		return domUtils.getParentElement(element, this._isNonSplitNode) || (!_isSizeNode ? domUtils.getParentElement(element, this._sn_isSizeNode.bind(this)) : null);
 	},
 
 	/**
@@ -3017,7 +3017,7 @@ Format.prototype = {
 	_sn_isMaintainedNode: function (_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove || element.nodeType !== 1) return false;
 		const anchor = this._isNonSplitNode(element);
-		return domUtils.getParentElement(element, this._isNonSplitNode) ? anchor : anchor || (!_isSizeNode ? Format.IsSizeNode(element) : false);
+		return domUtils.getParentElement(element, this._isNonSplitNode) ? anchor : anchor || (!_isSizeNode ? this._sn_isSizeNode(element) : false);
 	},
 
 	/**
