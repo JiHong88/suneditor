@@ -85,7 +85,7 @@ Toolbar.prototype = {
 
 		this.context.element = newContext.element;
 		this.context.tool = newContext.tool;
-		this.context.element.eventWysiwyg = this.options.iframe ? this._ww : this.context.element.wysiwyg
+		this.context.element.eventWysiwyg = this.options.iframe ? this._ww : this.context.element.wysiwyg;
 		if (this.options.iframe) this.context.element.wysiwyg = this._wd.body;
 
 		this.editor._recoverButtonStates();

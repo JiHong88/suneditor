@@ -47,6 +47,7 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 	elementBlacklist: 'p',
 	width: '100%',
 	height: '500px',
+	minHeight: '',
 	charCounter: true,
 	// tableCellControllerPosition: 'top',
 	statusbar: true,
@@ -72,7 +73,6 @@ window.e = suneditor.create(document.getElementById('editor2'), {
 	katex: {
 		src: Katex
 	},
-	minHeight: 300,
 	charCounter: true,
 	font: ['Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'],
 	templates: [

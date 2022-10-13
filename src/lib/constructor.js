@@ -686,7 +686,7 @@ function _createBlacklist(blacklist, defaultLineTag) {
 			if (v !== defaultLineTag) {
 				return true;
 			} else {
-				console.warn('[SUNEDITOR.constructor.createBlacklist.warn] defaultLineTag("<' + defaultLineTag + '>") cannot be included in the blacklist and will be removed.')
+				console.warn('[SUNEDITOR.constructor.createBlacklist.warn] defaultLineTag("<' + defaultLineTag + '>") cannot be included in the blacklist and will be removed.');
 				return false;
 			}
 		})
