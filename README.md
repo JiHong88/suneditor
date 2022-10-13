@@ -468,9 +468,6 @@ mathFontSize    : Math plugin font size list.                       default: [{.
                     {text: '2.5', value: '2.5em'}
                   ]
 
-// Display-------------------------------------------------------------------------------------------------------
-modallType    : Size of background area when activating modal window ('full'||'local') default: 'full' {string}
-
 // Statusbar-------------------------------------------------------------------------------------------
 statusbar     : Show the bottom resizing bar.
                   If 'height' value is 'auto', it will not be resized. default: true {Boolean}

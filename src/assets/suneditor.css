@@ -287,7 +287,7 @@
 .sun-editor .se-status-bar .se-char-counter-wrapper .se-char-label {margin-right:4px;}
 
 /* --- modal ---------------------------------------------------------- */
-.sun-editor .se-modal {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
+.sun-editor .se-modal {position:fixed; display:none; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
 .sun-editor .se-modal label, .sun-editor .se-modal input, .sun-editor .se-modal button {font-size:14px; line-height:1.5; color:#111; margin:0;}
 .sun-editor .se-modal .se-modal-back {position:absolute; width:100%; height:100%; top:0; left:0; background-color:#222; opacity:0.5;}
 /* modal - modal */
@@ -425,7 +425,7 @@
 .sun-editor .se-select-menu.se-resizing-align-list {width:74px; overflow-y:inherit; overflow-x:inherit;}
 
 /* --- browser ---------------------------------------------------------- */
-.sun-editor .se-file-browser {position:absolute; display:none; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
+.sun-editor .se-file-browser {position:fixed; display:none; top:0; left:0; width:100%; height:100%; z-index:2147483647;}
 .sun-editor .se-file-browser label, .sun-editor .se-file-browser input, .sun-editor .se-file-browser button {font-size:14px; line-height:1.5; color:#111; margin:0;}
 .sun-editor .se-file-browser .se-file-browser-back {position:absolute; display:block; width:100%; height:100%; top:0; left:0; background-color:#222; opacity:0.5;}
 .sun-editor .se-file-browser .se-file-browser-inner {position:absolute; display:block; width:100%; height:100%; top:0; left:0;}

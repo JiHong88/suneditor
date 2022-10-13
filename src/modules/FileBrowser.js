@@ -150,12 +150,6 @@
 				fileBrowserContext.list.className = 'se-file-browser-list ' + listClassName;
 			}
 
-			if (this.options.modallType === 'full') {
-				fileBrowserContext.area.style.position = 'fixed';
-			} else {
-				fileBrowserContext.area.style.position = 'absolute';
-			}
-
 			fileBrowserContext.titleArea.textContent = pluginContext.title;
 			fileBrowserContext.area.style.display = 'block';
 

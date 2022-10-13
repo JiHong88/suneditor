@@ -44,15 +44,8 @@ Modal.prototype = {
 		if (this._closeSignal) this._modalElement.inner.addEventListener('click', this._closeListener[1]);
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 		this._bindClose = this.eventManager.addGlobalEvent('keydown', this._closeListener[0]);
-
-		// open
-		if (this.options.modallType === 'full') {
-			this._modalElement.area.style.position = 'fixed';
-		} else {
-			this._modalElement.area.style.position = 'absolute';
-		}
-
 		this.isUpdate = this.kind === this.editor.currentControllerName;
+		
 		if (typeof this.inst.on === 'function') this.inst.on(this.isUpdate);
 
 		this._modalElement.area.style.display = 'block';
