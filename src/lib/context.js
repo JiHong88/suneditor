@@ -10,11 +10,16 @@
  */
 const Context = function (editorTarget, top, wwFrame, codeFrame, options) {
 	return {
+		toolbar: {
+			main: top.querySelector('.se-toolbar'),
+			buttonTray: top.querySelector('.se-toolbar .se-btn-tray'),
+			_menuTray: top.querySelector('.se-toolbar .se-menu-tray'),
+			_arrow: top.querySelector('.se-toolbar .se-arrow')
+		},
 		element: {
 			originElement: editorTarget,
 			topArea: top,
 			container: top.querySelector('.se-container'),
-			toolbar: top.querySelector('.se-toolbar'),
 			statusbar: top.querySelector('.se-status-bar'),
 			navigation: top.querySelector('.se-status-bar .se-navigation'),
 			charWrapper: top.querySelector('.se-status-bar .se-char-counter-wrapper'),
@@ -30,10 +35,7 @@ const Context = function (editorTarget, top, wwFrame, codeFrame, options) {
 			lineBreaker_b: top.querySelector('.se-line-breaker-component-b'),
 			resizeBackground: top.querySelector('.se-resizing-back'),
 			_toolbarShadow: top.querySelector('.se-toolbar-shadow'),
-			_buttonTray: top.querySelector('.se-toolbar .se-btn-tray'),
-			_menuTray: top.querySelector('.se-toolbar .se-menu-tray'),
-			_stickyDummy: top.querySelector('.se-toolbar-sticky-dummy'),
-			_arrow: top.querySelector('.se-toolbar .se-arrow')
+			_stickyDummy: top.querySelector('.se-toolbar-sticky-dummy')
 		},
 		buttons: {
 			bold: top.querySelector('.se-toolbar [data-command="bold"]'),

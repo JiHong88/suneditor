@@ -75,6 +75,6 @@ export default {
 			editorTargets.push(e);
 		}
 
-		return new Core(editorTargets[0], options);
+		return new Core(editorTargets, options);
 	}
 };

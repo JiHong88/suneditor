@@ -10,9 +10,7 @@ const Modal = function (inst, element) {
 	this.form = element;
 	this.focusElement = element.querySelector('[data-focus]');
 	this.isUpdate = false;
-	this._modalArea = this.context.element.toolbar.querySelector('.se-modal'),
-	this._modalBack = this.context.element.toolbar.querySelector('.se-modal-back'),
-	this._modalInner = this.context.element.toolbar.querySelector('.se-modal-inner')
+	(this._modalArea = this.context.toolbar.main.querySelector('.se-modal')), (this._modalBack = this.context.toolbar.main.querySelector('.se-modal-back')), (this._modalInner = this.context.toolbar.main.querySelector('.se-modal-inner'));
 	this._closeListener = [CloseListener.bind(this), OnClick_dialog.bind(this)];
 	this._bindClose = null;
 	this._onClickEvent = null;
@@ -42,7 +40,7 @@ Modal.prototype = {
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 		this._bindClose = this.eventManager.addGlobalEvent('keydown', this._closeListener[0]);
 		this.isUpdate = this.kind === this.editor.currentControllerName;
-		
+
 		if (typeof this.inst.on === 'function') this.inst.on(this.isUpdate);
 
 		this._modalArea.style.display = 'block';

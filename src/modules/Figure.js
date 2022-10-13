@@ -64,10 +64,7 @@ const Figure = function (inst, controls, params) {
 
 	// init
 	this.eventManager.addEvent(this.alignButton, 'click', OnClick_alignButton.bind(this));
-	const resizeEvent = OnResizeContainer.bind(this);
-	for (let i = 0, len = this.resizeHandles.length; i < len; i++) {
-		this.eventManager.addEvent(this.resizeHandles[i], 'mousedown', resizeEvent);
-	}
+	this.eventManager.addEvent(this.resizeHandles, 'mousedown', OnResizeContainer.bind(this));
 };
 
 /**

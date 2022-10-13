@@ -35,7 +35,7 @@ EventManager.prototype = {
 	/**
 	 * @description Register for an event.
 	 * Only events registered with this method are unregistered or re-registered when methods such as 'setOptions', 'destroy' are called.
-	 * @param {Element} target Target element
+	 * @param {Element|Array.<Element>} target Target element
 	 * @param {string} type Event type
 	 * @param {Function} listener Event handler
 	 * @param {boolean|undefined} useCapture Event useCapture option
@@ -43,14 +43,17 @@ EventManager.prototype = {
 	 */
 	addEvent: function (target, type, listener, useCapture) {
 		if (!target) return false;
+		if (!target.length) target = [target];
 
-		target.addEventListener(type, listener, useCapture);
-		this._events.push({
-			target: target,
-			type: type,
-			handler: listener,
-			useCapture: useCapture
-		});
+		for (let i = 0, len = target.length; i < len; i++) {
+			target[i].addEventListener(type, listener, useCapture);
+			this._events.push({
+				target: target[i],
+				type: type,
+				handler: listener,
+				useCapture: useCapture
+			});
+		}
 
 		return true;
 	},
@@ -499,9 +502,9 @@ EventManager.prototype = {
 
 		/** toolbar event */
 		const toolbarHandler = ToolbarButtonsHandler.bind(this);
-		this.addEvent(this.context.element.toolbar, 'mousedown', toolbarHandler, false);
-		this.addEvent(this.context.element._menuTray, 'mousedown', toolbarHandler, false);
-		this.addEvent(this.context.element.toolbar, 'click', OnClick_toolbar.bind(this), false);
+		this.addEvent(this.context.toolbar.main, 'mousedown', toolbarHandler, false);
+		this.addEvent(this.context.toolbar._menuTray, 'mousedown', toolbarHandler, false);
+		this.addEvent(this.context.toolbar.main, 'click', OnClick_toolbar.bind(this), false);
 
 		/** editor area */
 		const wwMouseDown = OnMouseDown_wysiwyg.bind(this);
@@ -1683,9 +1686,9 @@ function OnMouseMove_wysiwyg(e) {
 		const wScroll = ctxEl.wysiwyg.scrollTop;
 		const offsets = this.offset.getGlobal(this.context.element.topArea);
 		const componentTop = this.offset.get(component).top + wScroll;
-		const y = e.pageY + scrollTop + (this.options.iframe && !this.options.toolbar_container ? ctxEl.toolbar.offsetHeight : 0);
+		const y = e.pageY + scrollTop + (this.options.iframe && !this.options.toolbar_container ? this.context.toolbar.main.offsetHeight : 0);
 		const c = componentTop + (this.options.iframe ? scrollTop : offsets.top);
-		const toolbarH = this.context.element.toolbar.offsetHeight;
+		const toolbarH = this.context.toolbar.main.offsetHeight;
 
 		const isList = domUtils.isListCell(component.parentNode);
 		let dir = '',
@@ -1764,7 +1767,7 @@ function OnResize_window() {
 
 	if (env.isIE) this.toolbar.resetResponsiveToolbar();
 
-	if (this.context.element.toolbar.offsetWidth === 0) return;
+	if (this.context.toolbar.main.offsetWidth === 0) return;
 
 	if (this.context.fileBrowser && this.context.fileBrowser.area.style.display === 'block') {
 		this.context.fileBrowser.body.style.maxHeight = _w.innerHeight - this.context.fileBrowser.header.offsetHeight - 50 + 'px';
@@ -1775,7 +1778,7 @@ function OnResize_window() {
 	}
 
 	if (this.status.isFullScreen) {
-		this._transformStatus.fullScreenInnerHeight += _w.innerHeight - this.context.element.toolbar.offsetHeight - this._transformStatus.fullScreenInnerHeight;
+		this._transformStatus.fullScreenInnerHeight += _w.innerHeight - this.context.toolbar.main.offsetHeight - this._transformStatus.fullScreenInnerHeight;
 		this.context.element.editorArea.style.height = this._transformStatus.fullScreenInnerHeight + 'px';
 		return;
 	}
@@ -1788,7 +1791,7 @@ function OnResize_window() {
 	this.editor._iframeAutoHeight();
 
 	if (this.toolbar._sticky) {
-		this.context.element.toolbar.style.width = this.context.element.topArea.offsetWidth - 2 + 'px';
+		this.context.toolbar.main.style.width = this.context.element.topArea.offsetWidth - 2 + 'px';
 		this.toolbar._resetSticky();
 	}
 }

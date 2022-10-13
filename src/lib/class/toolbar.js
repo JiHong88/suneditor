@@ -3,7 +3,6 @@
  * @author Yi JiHong.
  */
 
-import Context from '../context';
 import { domUtils, unicode } from '../../helper';
 import CoreInterface from '../../interface/_core';
 import { CreateToolBar } from '../constructor';
@@ -32,14 +31,14 @@ Toolbar.prototype = {
 		this.menu.dropdownOff();
 		this.menu._moreLayerOff();
 		this.menu.containerOff();
-		domUtils.setDisabled(this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]'), true);
+		domUtils.setDisabled(this.context.toolbar.buttonTray.querySelectorAll('.se-menu-list button[data-type]'), true);
 	},
 
 	/**
 	 * @description Enable the toolbar
 	 */
 	enable: function () {
-		domUtils.setDisabled(this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]'), false);
+		domUtils.setDisabled(this.context.toolbar.buttonTray.querySelectorAll('.se-menu-list button[data-type]'), false);
 	},
 
 	/**
@@ -51,7 +50,7 @@ Toolbar.prototype = {
 		} else if (this.editor._isBalloon) {
 			this._showBalloon();
 		} else {
-			this.context.element.toolbar.style.display = '';
+			this.context.toolbar.main.style.display = '';
 			this.context.element._stickyDummy.style.display = '';
 		}
 	},
@@ -61,10 +60,10 @@ Toolbar.prototype = {
 	 */
 	hide: function () {
 		if (this.editor._isInline) {
-			this.context.element.toolbar.style.display = 'none';
+			this.context.toolbar.main.style.display = 'none';
 			this._inlineToolbarAttr.isShow = false;
 		} else {
-			this.context.element.toolbar.style.display = 'none';
+			this.context.toolbar.main.style.display = 'none';
 			this.context.element._stickyDummy.style.display = 'none';
 		}
 	},
@@ -80,8 +79,8 @@ Toolbar.prototype = {
 		this.menu._moreLayerOff();
 
 		const newToolbar = CreateToolBar(buttonList, this.options._init_plugins, this.options);
-		this.context.element.toolbar.replaceChild(newToolbar._buttonTray, this.context.element._buttonTray);
-		this.context.element._buttonTray = newToolbar._buttonTray;
+		this.context.toolbar.main.replaceChild(newToolbar._buttonTray, this.context.toolbar.buttonTray);
+		this.context.toolbar.buttonTray = newToolbar._buttonTray;
 
 		this.editor._recoverButtonStates();
 		this.editor._cachingButtons();
@@ -105,7 +104,7 @@ Toolbar.prototype = {
 			if ((this.editor._isBalloon || this.editor._isInline) && this.options.toolbar_width === 'auto') {
 				w = this.context.element.topArea.offsetWidth;
 			} else {
-				w = this.context.element.toolbar.offsetWidth;
+				w = this.context.toolbar.main.offsetWidth;
 			}
 
 			let responsiveWidth = 'default';
@@ -124,47 +123,47 @@ Toolbar.prototype = {
 	},
 
 	_resetSticky: function () {
-		if (this.status.isFullScreen || this.context.element.toolbar.offsetWidth === 0 || this.options.toolbar_sticky < 0) return;
+		if (this.status.isFullScreen || this.context.toolbar.main.offsetWidth === 0 || this.options.toolbar_sticky < 0) return;
 
 		const ctxEl = this.context.element;
 		const editorHeight = ctxEl.editorArea.offsetHeight;
 		const y = (this._w.scrollY || this._d.documentElement.scrollTop) + this.options.toolbar_sticky;
-		const editorTop = this.offset.getGlobal(this.options.toolbar_container).top - (this.editor._isInline ? ctxEl.toolbar.offsetHeight : 0);
-		const inlineOffset = this.editor._isInline && y - editorTop > 0 ? y - editorTop - this.context.element.toolbar.offsetHeight : 0;
+		const editorTop = this.offset.getGlobal(this.options.toolbar_container).top - (this.editor._isInline ? this.context.toolbar.main.offsetHeight : 0);
+		const inlineOffset = this.editor._isInline && y - editorTop > 0 ? y - editorTop - this.context.toolbar.main.offsetHeight : 0;
 
 		if (y < editorTop) {
 			this._offSticky();
 		} else if (y + this.status._minHeight >= editorHeight + editorTop) {
 			if (!this._sticky) this._onSticky(inlineOffset);
-			ctxEl.toolbar.style.top = inlineOffset + editorHeight + editorTop + this.options.toolbar_sticky - y - this.status._minHeight + 'px';
+			this.context.toolbar.main.style.top = inlineOffset + editorHeight + editorTop + this.options.toolbar_sticky - y - this.status._minHeight + 'px';
 		} else if (y >= editorTop) {
 			this._onSticky(inlineOffset);
 		}
 	},
 
 	_onSticky: function (inlineOffset) {
-		const ctxEl = this.context.element;
+		const toolbar = this.context.toolbar.main;
 
 		if (!this.editor._isInline && !this.options.toolbar_container) {
-			ctxEl._stickyDummy.style.height = ctxEl.toolbar.offsetHeight + 'px';
-			ctxEl._stickyDummy.style.display = 'block';
+			this.context.element._stickyDummy.style.height = toolbar.offsetHeight + 'px';
+			this.context.element._stickyDummy.style.display = 'block';
 		}
 
-		ctxEl.toolbar.style.top = this.options.toolbar_sticky + inlineOffset + 'px';
-		ctxEl.toolbar.style.width = this.editor._isInline ? this._inlineToolbarAttr.width : ctxEl.toolbar.offsetWidth + 'px';
-		domUtils.addClass(ctxEl.toolbar, 'se-toolbar-sticky');
+		toolbar.style.top = this.options.toolbar_sticky + inlineOffset + 'px';
+		toolbar.style.width = this.editor._isInline ? this._inlineToolbarAttr.width : toolbar.offsetWidth + 'px';
+		domUtils.addClass(toolbar, 'se-toolbar-sticky');
 		this._sticky = true;
 	},
 
 	_offSticky: function () {
-		const ctxEl = this.context.element;
+		const toolbar = this.context.toolbar.main;
 
-		ctxEl._stickyDummy.style.display = 'none';
-		ctxEl.toolbar.style.top = this.editor._isInline ? this._inlineToolbarAttr.top : '';
-		ctxEl.toolbar.style.width = this.editor._isInline ? this._inlineToolbarAttr.width : '';
-		ctxEl.editorArea.style.marginTop = '';
+		this.context.element._stickyDummy.style.display = 'none';
+		toolbar.style.top = this.editor._isInline ? this._inlineToolbarAttr.top : '';
+		toolbar.style.width = this.editor._isInline ? this._inlineToolbarAttr.width : '';
+		this.context.element.editorArea.style.marginTop = '';
 
-		domUtils.removeClass(ctxEl.toolbar, 'se-toolbar-sticky');
+		domUtils.removeClass(toolbar, 'se-toolbar-sticky');
 		this._sticky = false;
 	},
 
@@ -198,7 +197,7 @@ Toolbar.prototype = {
 		if (!this.editor._isBalloon) return;
 
 		const range = rangeObj || this.selection.getRange();
-		const toolbar = this.context.element.toolbar;
+		const toolbar = this.context.toolbar.main;
 		const topArea = this.context.element.topArea;
 		const selection = this.selection.get();
 
@@ -255,7 +254,7 @@ Toolbar.prototype = {
 			isDirTop = true;
 		}
 
-		const arrowMargin = this._w.Math.round(this.context.element._arrow.offsetWidth / 2);
+		const arrowMargin = this._w.Math.round(this.context.toolbar._arrow.offsetWidth / 2);
 		const toolbarWidth = toolbar.offsetWidth;
 		const toolbarHeight = toolbar.offsetHeight;
 		const iframeRects = /iframe/i.test(this.context.element.wysiwygFrame.nodeName) ? this.context.element.wysiwygFrame.getClientRects()[0] : null;
@@ -320,17 +319,17 @@ Toolbar.prototype = {
 		toolbarEl.style.top = this._w.Math.floor(t) + 'px';
 
 		if (isDirTop) {
-			domUtils.removeClass(this.context.element._arrow, 'se-arrow-up');
-			domUtils.addClass(this.context.element._arrow, 'se-arrow-down');
-			this.context.element._arrow.style.top = toolbarHeight + 'px';
+			domUtils.removeClass(this.context.toolbar._arrow, 'se-arrow-up');
+			domUtils.addClass(this.context.toolbar._arrow, 'se-arrow-down');
+			this.context.toolbar._arrow.style.top = toolbarHeight + 'px';
 		} else {
-			domUtils.removeClass(this.context.element._arrow, 'se-arrow-down');
-			domUtils.addClass(this.context.element._arrow, 'se-arrow-up');
-			this.context.element._arrow.style.top = -arrowMargin + 'px';
+			domUtils.removeClass(this.context.toolbar._arrow, 'se-arrow-down');
+			domUtils.addClass(this.context.toolbar._arrow, 'se-arrow-up');
+			this.context.toolbar._arrow.style.top = -arrowMargin + 'px';
 		}
 
 		const arrow_left = this._w.Math.floor(toolbarWidth / 2 + (absoluteLeft - l));
-		this.context.element._arrow.style.left = (arrow_left + arrowMargin > toolbarEl.offsetWidth ? toolbarEl.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
+		this.context.toolbar._arrow.style.left = (arrow_left + arrowMargin > toolbarEl.offsetWidth ? toolbarEl.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
 	},
 
 	_getPageBottomSpace: function () {
@@ -340,7 +339,7 @@ Toolbar.prototype = {
 	_showInline: function () {
 		if (!this.editor._isInline) return;
 
-		const toolbar = this.context.element.toolbar;
+		const toolbar = this.context.toolbar.main;
 		if (this.options.toolbar_container) toolbar.style.position = 'relative';
 		else toolbar.style.position = 'absolute';
 

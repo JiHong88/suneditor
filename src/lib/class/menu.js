@@ -26,13 +26,13 @@ Menu.prototype = {
 	/**
 	 * @description Method for managing dropdown element.
 	 * You must add the "dropdown" element using the this method at custom plugin.
-	 * @param {Element|null} target Target button
+	 * @param {Element|string} target Target button
 	 * @param {Element} menu Dropdown element
 	 */
 	initTarget: function (target, menu) {
 		if (target) {
-			this.context.element._menuTray.appendChild(menu);
-			this._menuTrayMap[target.getAttribute('data-command')] = menu;
+			this.context.toolbar._menuTray.appendChild(menu);
+			this._menuTrayMap[typeof target === 'string' ? target : target.getAttribute('data-command')] = menu;
 		}
 	},
 
@@ -124,9 +124,9 @@ Menu.prototype = {
 		menu.style.height = '';
 		domUtils.addClass(element, 'on');
 
-		const toolbar = this.context.element.toolbar;
+		const toolbar = this.context.toolbar.main;
 		const toolbarW = toolbar.offsetWidth;
-		const toolbarOffset = this.offset.getGlobal(this.context.element.toolbar);
+		const toolbarOffset = this.offset.getGlobal(this.context.toolbar.main);
 		const menuW = menu.offsetWidth;
 		const l = element.parentElement.offsetLeft + 3;
 
@@ -198,7 +198,7 @@ Menu.prototype = {
 	 */
 	_moreLayerOff: function () {
 		if (this.currentMoreLayerActiveButton) {
-			const layer = this.context.element.toolbar.querySelector('.' + this.currentMoreLayerActiveButton.getAttribute('data-command'));
+			const layer = this.context.toolbar.main.querySelector('.' + this.currentMoreLayerActiveButton.getAttribute('data-command'));
 			layer.style.display = 'none';
 			domUtils.removeClass(this.currentMoreLayerActiveButton, 'on');
 			this.currentMoreLayerActiveButton = null;

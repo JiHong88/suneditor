@@ -33,7 +33,7 @@ const Constructor = function (editorTargets, options) {
 	tool_bar.element.style.visibility = 'hidden';
 	if (tool_bar.pluginCallButtons.math) _checkKatexMath(options.katex);
 	const arrow = domUtils.createElement('DIV', { class: 'se-arrow' });
-	
+
 	// suneditor div
 	const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (options._rtl ? ' se-rtl' : '') });
 	const container = domUtils.createElement('DIV', { class: 'se-container' });
@@ -122,8 +122,9 @@ const Constructor = function (editorTargets, options) {
 export function ResetOptions(context, mergeOptions) {
 	const originOptions = context.options;
 	InitOptions(mergeOptions);
-	
+
 	const ctxEl = context.element;
+	const toolbar = context.toolBar.main;
 	const editorContainer = ctxEl.container;
 	const editorArea = ctxEl.editorArea;
 	const isNewToolbarContainer = mergeOptions.toolbar_container && mergeOptions.toolbar_container !== originOptions.toolbar_container;
@@ -138,17 +139,17 @@ export function ResetOptions(context, mergeOptions) {
 		// toolbar container
 		if (isNewToolbarContainer) {
 			mergeOptions.toolbar_container.appendChild(tool_bar.element);
-			ctxEl.toolbar.parentElement.removeChild(ctxEl.toolbar);
+			toolbar.parentElement.removeChild(toolbar);
 		} else {
-			ctxEl.toolbar.parentElement.replaceChild(tool_bar.element, ctxEl.toolbar);
+			toolbar.parentElement.replaceChild(tool_bar.element, toolbar);
 		}
 
-		ctxEl.toolbar = tool_bar.element;
-		ctxEl._menuTray = tool_bar._menuTray;
-		ctxEl._arrow = arrow;
+		context.toolBar.main = tool_bar.element;
+		context.toolBar._menuTray = tool_bar._menuTray;
+		context.toolBar._arrow = arrow;
 	}
 
-	const initElements = _initElements(mergeOptions, ctxEl.topArea, isNewToolbar ? tool_bar.element : ctxEl.toolbar, arrow);
+	const initElements = _initElements(mergeOptions, ctxEl.topArea, isNewToolbar ? tool_bar.element : toolbar, arrow);
 	const bottomBar = initElements.bottomBar;
 	const wysiwygFrame = initElements.wysiwygFrame;
 	const placeholder_span = initElements.placeholder;

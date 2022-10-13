@@ -443,7 +443,7 @@ Core.prototype = {
 		if (type) {
 			if (/more/i.test(type)) {
 				if (target !== this.menu.currentMoreLayerActiveButton) {
-					const layer = this.context.element.toolbar.querySelector('.' + command);
+					const layer = this.context.toolbar.main.querySelector('.' + command);
 					if (layer) {
 						this.menu._moreLayerOn(target, layer);
 						this.toolbar._showBalloon();
@@ -844,21 +844,21 @@ Core.prototype = {
 		}, {});
 
 		// set option
-		const ctxEl = this.context.element;
-		const initHTML = ctxEl.wysiwyg.innerHTML;
+		const ctx = this.context;
+		const initHTML = ctx.element.wysiwyg.innerHTML;
 		const product = ResetOptions(this.context, mergeOptions);
 
 		if (mergeOptions.iframe) {
-			ctxEl.wysiwygFrame.addEventListener('load', function () {
+			ctx.element.wysiwygFrame.addEventListener('load', function () {
 				converter._setIframeDocument(this, mergeOptions);
-				this._setOptionsInit(ctxEl, product, mergeOptions, initHTML);
+				this._setOptionsInit(ctx, product, mergeOptions, initHTML);
 			});
 		}
 
-		ctxEl.editorArea.appendChild(ctxEl.wysiwygFrame);
+		ctx.element.editorArea.appendChild(ctx.element.wysiwygFrame);
 
 		if (!mergeOptions.iframe) {
-			this._setOptionsInit(ctxEl, product, mergeOptions, initHTML);
+			this._setOptionsInit(ctx, product, mergeOptions, initHTML);
 		}
 	},
 
@@ -981,7 +981,7 @@ Core.prototype = {
 			if (!this.status.isFullScreen) {
 				this._notHideToolbar = false;
 				if (/balloon|balloon-always/i.test(this.options.mode)) {
-					this.context.element._arrow.style.display = '';
+					this.context.toolbar._arrow.style.display = '';
 					this._isInline = false;
 					this._isBalloon = true;
 					this.eventManager._hideToolbar();
@@ -1014,8 +1014,8 @@ Core.prototype = {
 			if (!this.status.isFullScreen) {
 				this._notHideToolbar = true;
 				if (this._isBalloon) {
-					this.context.element._arrow.style.display = 'none';
-					this.context.element.toolbar.style.left = '';
+					this.context.toolbar._arrow.style.display = 'none';
+					this.context.toolbar.main.style.left = '';
 					this._isInline = true;
 					this._isBalloon = false;
 					this.toolbar._showInline();
@@ -1043,7 +1043,7 @@ Core.prototype = {
 		this.status.isFullScreen = value;
 
 		const topArea = this.context.element.topArea;
-		const toolbar = this.context.element.toolbar;
+		const toolbar = this.context.toolbar.main;
 		const editorArea = this.context.element.editorArea;
 		const wysiwygFrame = this.context.element.wysiwygFrame;
 		const code = this.context.element.code;
@@ -1773,7 +1773,7 @@ Core.prototype = {
 	 * @private
 	 */
 	_saveButtonStates: function () {
-		const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]');
+		const currentButtons = this.context.toolbar.buttonTray.querySelectorAll('.se-menu-list button[data-type]');
 		for (let i = 0, element, command; i < currentButtons.length; i++) {
 			element = currentButtons[i];
 			command = element.getAttribute('data-command');
@@ -1786,7 +1786,7 @@ Core.prototype = {
 	 * @private
 	 */
 	_recoverButtonStates: function () {
-		const currentButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]');
+		const currentButtons = this.context.toolbar.buttonTray.querySelectorAll('.se-menu-list button[data-type]');
 		for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
 			button = currentButtons[i];
 			command = button.getAttribute('data-command');
@@ -1804,8 +1804,8 @@ Core.prototype = {
 	 * @private
 	 */
 	_cachingButtons: function () {
-		this.codeViewDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])');
-		this.controllerOnDisabledButtons = this.context.element._buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
+		this.codeViewDisabledButtons = this.context.toolbar.buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])');
+		this.controllerOnDisabledButtons = this.context.toolbar.buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
 
 		this._saveButtonStates();
 
@@ -1858,7 +1858,7 @@ Core.prototype = {
 		if (this.context.buttons.save) this.context.buttons.save.removeAttribute('disabled');
 		// user event
 		if (this.events.onChange) this.events.onChange(this.getContent(true));
-		if (this.context.element.toolbar.style.display === 'block') this.toolbar._showBalloon();
+		if (this.context.toolbar.main.style.display === 'block') this.toolbar._showBalloon();
 	},
 
 	/**
@@ -1923,21 +1923,21 @@ Core.prototype = {
 	/**
 	 * @todo plugin, lang, class사용 option 등 바뀌었을때 클래스 리로드 문제
 	 * @description Initialization after "setOptions"
-	 * @param {Object} el context.element
+	 * @param {Object} ctx context
 	 * @param {string} initHTML Initial html string
 	 * @private
 	 */
-	_setOptionsInit: function (el, product, newOptions, initHTML) {
+	_setOptionsInit: function (ctx, product, newOptions, initHTML) {
 		if (product.callButtons) this._pluginCallButtons = product.callButtons;
-		if (el._menuTray.children.length === 0) this.menu._menuTrayMap = {};
-		
+		if (ctx.toolbar._menuTray.children.length === 0) this.menu._menuTrayMap = {};
+
 		this.plugins = newOptions.plugins;
 		this.options = newOptions;
 		this.lang = this.options.lang;
 		this._responsiveButtons = product.toolbar.responsiveButtons;
 		// this.toolbar._setResponsive();
 
-		this.context = Context(el.originElement, el.top, el.wysiwygFrame, el.code, this.options); //@todo context don't reset
+		this.context = Context(ctx.element.originElement, ctx.element.top, ctx.element.wysiwygFrame, ctx.element.code, this.options); //@todo context don't reset
 		this._componentsInfoReset = true;
 		this._editorInit(true, initHTML);
 	},
@@ -1957,7 +1957,7 @@ Core.prototype = {
 		this.toolbar._resetSticky();
 
 		// toolbar visibility
-		this.context.element.toolbar.style.visibility = '';
+		this.context.toolbar.main.style.visibility = '';
 		// wisywig attributes
 		const attr = this.options.frameAttrbutes;
 		for (let k in attr) {
