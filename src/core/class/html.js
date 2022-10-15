@@ -106,7 +106,7 @@ HTML.prototype = {
 		const dom = this._d.createRange().createContextualFragment(html, true);
 
 		try {
-			this._consistencyCheckOfHTML.call(this, dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, true);
+			this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, true);
 		} catch (error) {
 			console.warn('[SUNEDITOR.html.clean.fail] ' + error.message);
 		}

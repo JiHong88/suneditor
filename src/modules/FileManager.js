@@ -33,7 +33,7 @@ FileManager.prototype = {
 	 * @example this.plugins.fileManager.upload.call(this, imageUploadUrl, this.options.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.events.onImageUploadError);
 	 */
 	upload: function (uploadUrl, uploadHeader, data, callBack, errorCallBack) {
-		this.editor.openLoading();
+		this.editor._openLoading();
 
 		let formData = null;
 		// create formData
@@ -291,11 +291,11 @@ function CallBackUpload(xmlHttp, callBack, errorCallBack) {
 			} catch (error) {
 				throw Error('[SUNEDITOR.FileManager[' + this.kind + '].upload.callBack.fail] ' + error.message);
 			} finally {
-				this.editor.closeLoading();
+				this.editor._closeLoading();
 			}
 		} else {
 			// exception
-			this.editor.closeLoading();
+			this.editor._closeLoading();
 			const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
 			if (typeof errorCallBack !== 'function' || errorCallBack.call(this.events, '', res)) {
 				const err = '[SUNEDITOR.FileManager[' + this.kind + '].upload.serverException] status: ' + xmlHttp.status + ', response: ' + (res.errorMessage || xmlHttp.responseText);

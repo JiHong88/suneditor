@@ -220,8 +220,6 @@ class domUtils {
 
 	/**
 	 * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
-	 * core.codeViewDisabledButtons (An array of buttons whose class name is not "se-code-view-enabled")
-	 * core.controllerOnDisabledButtons (An array of buttons whose class name is not "se-resizing-enabled")
 	 * @param buttonList Button array
 	 * @param disabled Disabled value
 	 */

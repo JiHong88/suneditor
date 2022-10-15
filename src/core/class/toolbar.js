@@ -18,6 +18,10 @@ const Toolbar = function (editor) {
 		width: '',
 		isShow: false
 	};
+	this._balloonOffset = {
+		top: 0,
+		left: 0
+	};
 
 	this._setResponsive();
 };
@@ -31,23 +35,23 @@ Toolbar.prototype = {
 		this.menu.dropdownOff();
 		this.menu._moreLayerOff();
 		this.menu.containerOff();
-		domUtils.setDisabled(this.context.toolbar.buttonTray.querySelectorAll('.se-menu-list button[data-type]'), true);
+		domUtils.setDisabled(this.context.toolbar._buttonTray.querySelectorAll('.se-menu-list button[data-type]'), true);
 	},
 
 	/**
 	 * @description Enable the toolbar
 	 */
 	enable: function () {
-		domUtils.setDisabled(this.context.toolbar.buttonTray.querySelectorAll('.se-menu-list button[data-type]'), false);
+		domUtils.setDisabled(this.context.toolbar._buttonTray.querySelectorAll('.se-menu-list button[data-type]'), false);
 	},
 
 	/**
 	 * @description Show the toolbar
 	 */
 	show: function () {
-		if (this.editor._isInline) {
+		if (this.editor.isInline) {
 			this._showInline();
-		} else if (this.editor._isBalloon) {
+		} else if (this.editor.isBalloon) {
 			this._showBalloon();
 		} else {
 			this.context.toolbar.main.style.display = '';
@@ -59,12 +63,16 @@ Toolbar.prototype = {
 	 * @description Hide the toolbar
 	 */
 	hide: function () {
-		if (this.editor._isInline) {
+		if (this.editor.isInline) {
 			this.context.toolbar.main.style.display = 'none';
+			this.context.toolbar.main.style.top = '0px';
 			this._inlineToolbarAttr.isShow = false;
 		} else {
 			this.context.toolbar.main.style.display = 'none';
 			this.context.element._stickyDummy.style.display = 'none';
+			if (this.editorisBalloon) {
+				this._balloonOffset = { top: 0, left: 0 };
+			}
 		}
 	},
 
@@ -79,8 +87,8 @@ Toolbar.prototype = {
 		this.menu._moreLayerOff();
 
 		const newToolbar = CreateToolBar(buttonList, this.options._init_plugins, this.options);
-		this.context.toolbar.main.replaceChild(newToolbar._buttonTray, this.context.toolbar.buttonTray);
-		this.context.toolbar.buttonTray = newToolbar._buttonTray;
+		this.context.toolbar.main.replaceChild(newToolbar._buttonTray, this.context.toolbar._buttonTray);
+		this.context.toolbar._buttonTray = newToolbar._buttonTray;
 
 		this.editor._recoverButtonStates();
 		this.editor._cachingButtons();
@@ -88,7 +96,7 @@ Toolbar.prototype = {
 
 		this.editor.effectNode = null;
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
-		if (this.status.isReadOnly) domUtils.setDisabled(this.editor.controllerOnDisabledButtons, true);
+		if (this.status.isReadOnly) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
 		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'));
 	},
 
@@ -101,7 +109,7 @@ Toolbar.prototype = {
 		const responsiveSize = this._rButtonsize;
 		if (responsiveSize) {
 			let w = 0;
-			if ((this.editor._isBalloon || this.editor._isInline) && this.options.toolbar_width === 'auto') {
+			if ((this.editor.isBalloon || this.editor.isInline) && this.options.toolbar_width === 'auto') {
 				w = this.context.element.topArea.offsetWidth;
 			} else {
 				w = this.context.toolbar.main.offsetWidth;
@@ -125,17 +133,17 @@ Toolbar.prototype = {
 	_resetSticky: function () {
 		if (this.status.isFullScreen || this.context.toolbar.main.offsetWidth === 0 || this.options.toolbar_sticky < 0) return;
 
-		const ctxEl = this.context.element;
-		const editorHeight = ctxEl.editorArea.offsetHeight;
+		const toolbar = this.context.toolbar.main;
+		const editorHeight = this.context.element.editorArea.offsetHeight;
 		const y = (this._w.scrollY || this._d.documentElement.scrollTop) + this.options.toolbar_sticky;
-		const editorTop = this.offset.getGlobal(this.options.toolbar_container).top - (this.editor._isInline ? this.context.toolbar.main.offsetHeight : 0);
-		const inlineOffset = this.editor._isInline && y - editorTop > 0 ? y - editorTop - this.context.toolbar.main.offsetHeight : 0;
+		const editorTop = this.offset.getGlobal(this.editor.isBalloon || this.editor.isInline ? null : this.options.toolbar_container).top - (this.editor.isInline ? toolbar.offsetHeight : 0);
+		const inlineOffset = 1;
 
 		if (y < editorTop) {
 			this._offSticky();
 		} else if (y + this.status._minHeight >= editorHeight + editorTop) {
 			if (!this._sticky) this._onSticky(inlineOffset);
-			this.context.toolbar.main.style.top = inlineOffset + editorHeight + editorTop + this.options.toolbar_sticky - y - this.status._minHeight + 'px';
+			toolbar.style.top = inlineOffset + editorHeight + editorTop + this.options.toolbar_sticky - y - this.status._minHeight + 'px';
 		} else if (y >= editorTop) {
 			this._onSticky(inlineOffset);
 		}
@@ -144,13 +152,13 @@ Toolbar.prototype = {
 	_onSticky: function (inlineOffset) {
 		const toolbar = this.context.toolbar.main;
 
-		if (!this.editor._isInline && !this.options.toolbar_container) {
+		if (!this.editor.isInline && !this.options.toolbar_container) {
 			this.context.element._stickyDummy.style.height = toolbar.offsetHeight + 'px';
 			this.context.element._stickyDummy.style.display = 'block';
 		}
 
 		toolbar.style.top = this.options.toolbar_sticky + inlineOffset + 'px';
-		toolbar.style.width = this.editor._isInline ? this._inlineToolbarAttr.width : toolbar.offsetWidth + 'px';
+		toolbar.style.width = this.editor.isInline ? this._inlineToolbarAttr.width : toolbar.offsetWidth + 'px';
 		domUtils.addClass(toolbar, 'se-toolbar-sticky');
 		this._sticky = true;
 	},
@@ -159,8 +167,8 @@ Toolbar.prototype = {
 		const toolbar = this.context.toolbar.main;
 
 		this.context.element._stickyDummy.style.display = 'none';
-		toolbar.style.top = this.editor._isInline ? this._inlineToolbarAttr.top : '';
-		toolbar.style.width = this.editor._isInline ? this._inlineToolbarAttr.width : '';
+		toolbar.style.top = this.editor.isInline ? this._inlineToolbarAttr.top : '';
+		toolbar.style.width = this.editor.isInline ? this._inlineToolbarAttr.width : '';
 		this.context.element.editorArea.style.marginTop = '';
 
 		domUtils.removeClass(toolbar, 'se-toolbar-sticky');
@@ -194,7 +202,9 @@ Toolbar.prototype = {
 	},
 
 	_showBalloon: function (rangeObj) {
-		if (!this.editor._isBalloon) return;
+		if (!this.editor.isBalloon || this.editor.opendControllers.length > 0) {
+			return;
+		}
 
 		const range = rangeObj || this.selection.getRange();
 		const toolbar = this.context.toolbar.main;
@@ -202,7 +212,7 @@ Toolbar.prototype = {
 		const selection = this.selection.get();
 
 		let isDirTop;
-		if (this.editor._isBalloonAlways && range.collapsed) {
+		if (this.editor.isBalloonAlways && range.collapsed) {
 			isDirTop = true;
 		} else if (selection.focusNode === selection.anchorNode) {
 			isDirTop = selection.focusOffset < selection.anchorOffset;
@@ -224,8 +234,10 @@ Toolbar.prototype = {
 		const editorLeft = offsets.left;
 
 		toolbar.style.top = '-10000px';
-		toolbar.style.visibility = 'hidden';
-		toolbar.style.display = 'block';
+		if (toolbar.style.display !== 'block') {
+			toolbar.style.visibility = 'hidden';
+			toolbar.style.display = 'block';
+		}
 
 		if (!rects) {
 			const node = this.selection.getNode();
@@ -289,7 +301,11 @@ Toolbar.prototype = {
 			toolbar.style.top = toolbar.offsetTop - top + topArea.offsetTop + 'px';
 		}
 
-		toolbar.style.visibility = '';
+		this._balloonOffset = { top: toolbar.offsetTop + (this.context.element.eventWysiwyg.scrollY || this.context.element.eventWysiwyg.scrollTop || 0), left: toolbar.offsetLeft + (this.context.element.eventWysiwyg.scrollX || this.context.element.eventWysiwyg.scrollLeft || 0) };
+
+		this._w.setTimeout(function () {
+			toolbar.style.visibility = '';
+		});
 	},
 
 	_setBalloonOffset: function (isDirTop, rects, toolbarEl, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin) {
@@ -337,16 +353,14 @@ Toolbar.prototype = {
 	},
 
 	_showInline: function () {
-		if (!this.editor._isInline) return;
+		if (!this.editor.isInline) return;
 
 		const toolbar = this.context.toolbar.main;
-		if (this.options.toolbar_container) toolbar.style.position = 'relative';
-		else toolbar.style.position = 'absolute';
-
 		toolbar.style.visibility = 'hidden';
 		toolbar.style.display = 'block';
+		toolbar.style.top = '0px';
 		this._inlineToolbarAttr.width = toolbar.style.width = this.options.toolbar_width;
-		this._inlineToolbarAttr.top = toolbar.style.top = (this.options.toolbar_container ? 0 : -1 - toolbar.offsetHeight) + 'px';
+		this._inlineToolbarAttr.top = toolbar.style.top = (this.options.toolbar_container ? -1 + (this.offset.getGlobal(this.context.element.topArea).top - this.offset.getGlobal(toolbar).top - toolbar.offsetHeight) : -1 - toolbar.offsetHeight) + 'px';
 
 		if (typeof this.events.onShowInline === 'function') this.events.onShowInline(toolbar);
 

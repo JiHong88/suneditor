@@ -14,7 +14,7 @@ const Figure = function (inst, controls, params) {
 	this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
 
 	// modules
-	this.controller = new Controller(this, controllerEl, { position: 'bottom' }, inst.constructor.key);
+	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, inst.constructor.key);
 	this.selectMenu_align = new SelectMenu(this, false, 'bottom-center');
 	this.selectMenu_align.on(this.alignButton, SetMenuAlign.bind(this), { class: 'se-resizing-align-list' });
 	this.selectMenu_align.create(alignMenus.items, alignMenus.html);
@@ -175,7 +175,7 @@ Figure.prototype = {
 	},
 
 	open: function (target, nonResizing, __fileManagerInfo) {
-		this.editor.offCurrentController();
+		this.editor._offCurrentController();
 		const figureInfo = Figure.GetContainer(target);
 		this._container = figureInfo.container;
 		this._cover = figureInfo.cover;
@@ -222,7 +222,7 @@ Figure.prototype = {
 		this.resizeBorder.style.width = w + 'px';
 		this.resizeBorder.style.height = h + 'px';
 
-		this.editor.openControllers.push({
+		this.editor.opendControllers.push({
 			position: 'none',
 			form: this.resizeDot,
 			target: target,
@@ -255,7 +255,6 @@ Figure.prototype = {
 
 		this.resizeDot.style.display = 'block';
 		this.controller.open(this.resizeDot, null, this.__offContainer);
-		domUtils.setDisabled(this.editor.controllerOnDisabledButtons, true);
 
 		// set members
 		domUtils.addClass(this._cover, 'se-figure-selected');
@@ -689,9 +688,9 @@ Figure.prototype = {
 		this.eventManager.removeGlobalEvent(this.__onResizeESCEvent);
 
 		this._displayResizeHandles(true);
-		this.editor.offCurrentController();
-		this.context.element.resizeBackground.style.display = 'none';
-		this.context.element.resizeBackground.style.cursor = 'default';
+		this.editor._offCurrentController();
+		this.context._resizeBackground.style.display = 'none';
+		this.context._resizeBackground.style.cursor = 'default';
 	},
 
 	constructor: Figure
@@ -719,8 +718,8 @@ function OnResizeContainer(e) {
 	this._resizeClientX = e.clientX;
 	this._resizeClientY = e.clientY;
 	this.resizeDot.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
-	this.context.element.resizeBackground.style.cursor = DIRECTION_CURSOR_MAP[direction];
-	this.context.element.resizeBackground.style.display = 'block';
+	this.context._resizeBackground.style.cursor = DIRECTION_CURSOR_MAP[direction];
+	this.context._resizeBackground.style.display = 'block';
 
 	this.__onContainerEvent = this.eventManager.addGlobalEvent('mousemove', this.__containerResizing);
 	this.__offContainerEvent = this.eventManager.addGlobalEvent('mouseup', this.__containerResizingOff);
@@ -813,7 +812,6 @@ function CreateAlign(editor) {
 }
 
 function OffFigureContainer() {
-	domUtils.setDisabled(this.editor.controllerOnDisabledButtons, false);
 	this.resizeDot.style.display = 'none';
 	this.editor._figureContainer = null;
 	this.inst.init();

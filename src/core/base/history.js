@@ -39,7 +39,7 @@ export default function (editor, change) {
 			}
 		}
 
-		editor.offCurrentController();
+		editor._offCurrentController();
 		editor._checkComponents();
 		editor.char.display();
 		editor._resourcesStateChange();

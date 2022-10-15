@@ -1,4 +1,4 @@
-import Core from './lib/core';
+import Editor from './core/editor';
 
 import EditorInterface from './interface';
 import Plugins from './plugins';
@@ -67,7 +67,7 @@ export default {
 		target = typeof target !== 'string' && target.length > -1 ? target : [target];
 		for (let i = 0, len = target.length, t, e; i < len; i++) {
 			t = target[i];
-			e = typeof t === 'string' ? document.getElementById(t) : t;
+			e = typeof t === 'string' ? document.querySelector(t) : t;
 			if (!e) {
 				if (typeof t === 'string') throw Error('[SUNEDITOR.create.fail] The element for that id was not found (ID:"' + t + '")');
 				throw Error("[SUNEDITOR.create.fail] suneditor requires textarea's element or id value");
@@ -75,6 +75,6 @@ export default {
 			editorTargets.push(e);
 		}
 
-		return new Core(editorTargets, options);
+		return new Editor(editorTargets[0], options);
 	}
 };

@@ -41,10 +41,13 @@ require('codemirror5/mode/htmlmixed/htmlmixed');
 // import imageGallery from '../../src/plugins/fileBrowser/imageGallery';
 import plugins from '../../src/plugins';
 
-window.e = suneditor.create(['editor1'], {
+window.e = suneditor.create(['#editor1'], {
 	// value: '<h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2>',
 	// textDirection: 'rtl',
+	mode: ['inline', 'balloon-always', 'balloon', 'classic'][1],
+	toolbar_container: document.getElementById('ttt'),
 	elementBlacklist: 'p',
+	// toolbar_sticky: 60,
 	width: '100%',
 	height: '500px',
 	minHeight: '',
@@ -59,7 +62,7 @@ window.e = suneditor.create(['editor1'], {
 				matchClosingTags: true,
 				autoCloseTags: true
 			}),
-			javascript(),
+			javascript()
 		],
 		minimalSetup: minimalSetup
 	},
@@ -105,7 +108,7 @@ window.e = suneditor.create(['editor1'], {
 			console.log('blur', a);
 		},
 		onFocus: function () {
-			console.log('focus')
+			console.log('focus');
 		}
 	},
 	// buttonList: [
@@ -122,21 +125,23 @@ window.e = suneditor.create(['editor1'], {
 	buttonList: [
 		['undo', 'redo', 'dir'],
 		['dir_ltr', 'dir_rtl'],
-			['font', 'fontSize', 'formatBlock'],
-			['paragraphStyle', 'blockquote'],
-			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-			['fontColor', 'backgroundColor', 'textStyle'],
-			['removeFormat'],
-			'/',
-			['outdent', 'indent'],
-			['align', 'horizontalLine', 'list', 'lineHeight'],
-			['table', 'link', 'image', 'video', 'audio', 'math'],
-			['imageGallery'],
-			['fullScreen', 'showBlocks', 'codeView'],
-			['preview', 'print'],
-			['save', 'template', 'layout'],
-			// (min-width: 1565)
-			['%1565', [
+		['font', 'fontSize', 'formatBlock'],
+		['paragraphStyle', 'blockquote'],
+		['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+		['fontColor', 'backgroundColor', 'textStyle'],
+		['removeFormat'],
+		'/',
+		['outdent', 'indent'],
+		['align', 'horizontalLine', 'list', 'lineHeight'],
+		['table', 'link', 'image', 'video', 'audio', 'math'],
+		['imageGallery'],
+		['fullScreen', 'showBlocks', 'codeView'],
+		['preview', 'print'],
+		['save', 'template', 'layout'],
+		// (min-width: 1565)
+		[
+			'%1565',
+			[
 				['undo', 'redo'],
 				['font', 'fontSize', 'formatBlock'],
 				['paragraphStyle', 'blockquote'],
@@ -149,9 +154,12 @@ window.e = suneditor.create(['editor1'], {
 				['imageGallery'],
 				['fullScreen', 'showBlocks', 'codeView'],
 				['-right', ':More Misc-default.more_vertical', 'preview', 'print', 'save', 'template', 'layout']
-			]],
-			// (min-width: 1455)
-			['%1455', [
+			]
+		],
+		// (min-width: 1455)
+		[
+			'%1455',
+			[
 				['undo', 'redo'],
 				['font', 'fontSize', 'formatBlock'],
 				['paragraphStyle', 'blockquote'],
@@ -163,9 +171,12 @@ window.e = suneditor.create(['editor1'], {
 				['table', 'link', 'image', 'video', 'audio', 'math'],
 				['imageGallery'],
 				['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout']
-			]],
-			// (min-width: 1326)
-			['%1326', [
+			]
+		],
+		// (min-width: 1326)
+		[
+			'%1326',
+			[
 				['undo', 'redo'],
 				['font', 'fontSize', 'formatBlock'],
 				['paragraphStyle', 'blockquote'],
@@ -176,9 +187,12 @@ window.e = suneditor.create(['editor1'], {
 				['align', 'horizontalLine', 'list', 'lineHeight'],
 				['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout'],
 				['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
-			]],
-			// (min-width: 1123)
-			['%1123', [
+			]
+		],
+		// (min-width: 1123)
+		[
+			'%1123',
+			[
 				['undo', 'redo'],
 				[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 				['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -188,9 +202,12 @@ window.e = suneditor.create(['editor1'], {
 				['align', 'horizontalLine', 'list', 'lineHeight'],
 				['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout'],
 				['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
-			]],
-			// (min-width: 817)
-			['%817', [
+			]
+		],
+		// (min-width: 817)
+		[
+			'%817',
+			[
 				['undo', 'redo'],
 				[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 				['bold', 'underline', 'italic', 'strike'],
@@ -200,9 +217,12 @@ window.e = suneditor.create(['editor1'], {
 				['align', 'horizontalLine', 'list', 'lineHeight'],
 				['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout'],
 				['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
-			]],
-			// (min-width: 673)
-			['%673', [
+			]
+		],
+		// (min-width: 673)
+		[
+			'%673',
+			[
 				['undo', 'redo'],
 				[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 				[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
@@ -211,9 +231,12 @@ window.e = suneditor.create(['editor1'], {
 				['align', 'horizontalLine', 'list', 'lineHeight'],
 				[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
 				['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout']
-			]],
-			// (min-width: 525)
-			['%525', [
+			]
+		],
+		// (min-width: 525)
+		[
+			'%525',
+			[
 				['undo', 'redo'],
 				[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 				[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
@@ -222,18 +245,27 @@ window.e = suneditor.create(['editor1'], {
 				[':More Line-default.more_horizontal', 'align', 'horizontalLine', 'list', 'lineHeight'],
 				[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
 				['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout']
-			]],
-			// (min-width: 420)
-			['%420', [
+			]
+		],
+		// (min-width: 420)
+		[
+			'%420',
+			[
 				['undo', 'redo'],
 				[':lang.test-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 				[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'removeFormat'],
 				[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'horizontalLine', 'list', 'lineHeight'],
 				[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
 				['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout']
-			]]
-	],
+			]
+		]
+	]
 });
+
+e.events.onload = () => {
+	console.log('onload');
+	window.scrollTo(0, scrollTo);
+};
 
 // window.e.events.onAudioUpload = () => {
 //     console.log("arg", arguments)

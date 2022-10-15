@@ -200,6 +200,14 @@
     border-radius: 4px;
 }
 
+.sun-editor .se-toolbar-more-layer {
+    background-color: #fff;
+}
+
+.sun-editor .se-toolbar-more-layer .se-more-layer {
+    border-top: 1px solid #e1e1e1;
+}
+
 /* .sun-editor .se-toolbar-separator-vertical {
     height: 34px;
     width: 1px;
@@ -247,6 +255,14 @@
 
 .sun-editor .se-toolbar .se-arrow.se-arrow-down::after {
     border-top-color: #e1e1e1;
+}
+
+.sun-editor .se-toolbar .se-arrow.se-arrow-down::after {
+    border-top-color: #fff;
+}
+
+.sun-editor .se-toolbar .se-arrow.se-arrow-up::after {
+    border-bottom-color: #fff;
 }
 
 /* controller */

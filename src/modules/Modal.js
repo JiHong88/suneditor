@@ -10,7 +10,7 @@ const Modal = function (inst, element) {
 	this.form = element;
 	this.focusElement = element.querySelector('[data-focus]');
 	this.isUpdate = false;
-	(this._modalArea = this.context.toolbar.main.querySelector('.se-modal')), (this._modalBack = this.context.toolbar.main.querySelector('.se-modal-back')), (this._modalInner = this.context.toolbar.main.querySelector('.se-modal-inner'));
+	(this._modalArea = this.context._carrierWrapper.querySelector('.se-modal')), (this._modalBack = this.context._carrierWrapper.querySelector('.se-modal-back')), (this._modalInner = this.context._carrierWrapper.querySelector('.se-modal-inner'));
 	this._closeListener = [CloseListener.bind(this), OnClick_dialog.bind(this)];
 	this._bindClose = null;
 	this._onClickEvent = null;
@@ -35,11 +35,14 @@ Modal.prototype = {
 	 * @description Open a modal plugin
 	 */
 	open: function () {
+		this.editor._offCurrentModal();
 		this.editor._fixCurrentController(true);
+
 		if (this._closeSignal) this._modalInner.addEventListener('click', this._closeListener[1]);
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 		this._bindClose = this.eventManager.addGlobalEvent('keydown', this._closeListener[0]);
 		this.isUpdate = this.kind === this.editor.currentControllerName;
+		this.editor.opendModal = this;
 
 		if (typeof this.inst.on === 'function') this.inst.on(this.isUpdate);
 
@@ -57,12 +60,16 @@ Modal.prototype = {
 	 */
 	close: function () {
 		this.editor._fixCurrentController(false);
+		this.editor.opendModal = null;
+
 		if (this._closeSignal) this._modalInner.removeEventListener('click', this._closeListener[1]);
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
+
 		// close
 		this.form.style.display = 'none';
 		this._modalBack.style.display = 'none';
 		this._modalArea.style.display = 'none';
+
 		if (typeof this.inst.init === 'function' && !this.isUpdate) this.inst.init();
 		this.editor.focus();
 	},
@@ -83,21 +90,21 @@ function Action(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
-	this.editor.openLoading();
+	this.editor._openLoading();
 
 	try {
 		const result = this.inst.modalAction();
 		if (result === false) {
-			this.editor.closeLoading();
+			this.editor._closeLoading();
 		} else if (result === undefined) {
 			this.close();
 		} else {
 			this.close();
-			this.editor.closeLoading();
+			this.editor._closeLoading();
 		}
 	} catch (error) {
 		this.close();
-		this.editor.closeLoading();
+		this.editor._closeLoading();
 		throw Error('[SUNEDITOR.Modal[' + this.kind + '].warn] ' + error.message);
 	}
 }

@@ -22,34 +22,16 @@ const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 const Constructor = function (editorTargets, options) {
 	if (typeof options !== 'object') options = {};
 
-	/** --- init options --- */
+	/** --- options --------------------------------------------------------------- */
 	const multiMode = editorTargets.length > 1;
 	InitOptions(options);
 
-	// toolbar
-	const tool_bar = CreateToolBar(options.buttonList, options.plugins, options);
-	const toolbarShadow = tool_bar.element.cloneNode(false);
-	toolbarShadow.className += ' se-toolbar-shadow';
-	tool_bar.element.style.visibility = 'hidden';
-	if (tool_bar.pluginCallButtons.math) _checkKatexMath(options.katex);
-	const arrow = domUtils.createElement('DIV', { class: 'se-arrow' });
-
-	// suneditor div
+	/** --- editor div --------------------------------------------------------------- */
 	const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (options._rtl ? ' se-rtl' : '') });
 	const container = domUtils.createElement('DIV', { class: 'se-container' });
 
-	// inner editor div
-	const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' });
-
-	// init element
-	const initElements = _initElements(options, top_div, tool_bar.element, arrow);
-	const bottomBar = initElements.bottomBar;
-	const wysiwyg_div = initElements.wysiwygFrame;
-	const placeholder_span = initElements.placeholder;
-	let textarea = initElements.codeView;
-
-	// status bar
-	const status_bar = bottomBar.statusbar;
+	/** --- carrier wrapper --------------------------------------------------------------- */
+	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper' });
 
 	// modal
 	const modal = domUtils.createElement('DIV', { class: 'se-modal sun-editor-common' });
@@ -57,59 +39,79 @@ const Constructor = function (editorTargets, options) {
 	const modal_inner = domUtils.createElement('DIV', { class: 'se-modal-inner', style: 'display: none;' });
 	modal.appendChild(modal_back);
 	modal.appendChild(modal_inner);
-	tool_bar.element.appendChild(modal);
+	editor_carrier_wrapper.appendChild(modal);
 
-	// sticky toolbar dummy
-	const sticky_dummy = domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' });
-	// loading box
-	const loading_box = domUtils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>');
-	// enter line
-	const line_breaker = domUtils.createElement('DIV', { class: 'se-line-breaker' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
-	const line_breaker_t = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
-	const line_breaker_b = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
-	line_breaker_t.innerHTML = line_breaker_b.innerHTML = options.icons.line_break;
+	// loding box, resizing back
+	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-resizing-back' }));
+	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>'));
 
-	// resize operation background
-	const resize_back = domUtils.createElement('DIV', { class: 'se-resizing-back' });
+	_d.body.appendChild(editor_carrier_wrapper);
+
+	/** --- toolbar --------------------------------------------------------------- */
+	const tool_bar_main = CreateToolBar(options.buttonList, options.plugins, options);
+	const toolbar = tool_bar_main.element;
+	const toolbarShadow = toolbar.cloneNode(false);
+	toolbarShadow.className += ' se-toolbar-shadow';
+	container.appendChild(toolbarShadow);
+	toolbar.style.visibility = 'hidden';
+	if (tool_bar_main.pluginCallButtons.math) _checkKatexMath(options.katex);
 
 	// toolbar container
 	const toolbar_container = options.toolbar_container;
 	if (toolbar_container) {
-		toolbar_container.appendChild(tool_bar.element);
-		toolbar_container.appendChild(toolbarShadow);
+		const _t = top_div.cloneNode(false);
+		const _c = container.cloneNode(false);
+		_c.appendChild(toolbar);
+		_t.appendChild(_c);
+		toolbar_container.appendChild(_t);
+	} else {
+		container.appendChild(toolbar);
 	}
+
+	/** --- editor area --------------------------------------------------------------- */
+	const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' });
+
+	// init element
+	const initElements = _initElements(options, top_div, toolbar, domUtils.createElement('DIV', { class: 'se-arrow' }));
+	const bottomBar = initElements.bottomBar;
+	const status_bar = bottomBar.statusbar;
+	const wysiwyg_div = initElements.wysiwygFrame;
+	const placeholder_span = initElements.placeholder;
+	let textarea = initElements.codeView;
+
+	// line breaker
+	const line_breaker = domUtils.createElement('DIV', { class: 'se-line-breaker' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
+	const line_breaker_t = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
+	const line_breaker_b = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
+	line_breaker_t.innerHTML = line_breaker_b.innerHTML = options.icons.line_break;
+	editor_div.appendChild(line_breaker);
+	editor_div.appendChild(line_breaker_t);
+	editor_div.appendChild(line_breaker_b);
 
 	// statusbar
 	const statusbar_container = options.statusbar_container;
 	if (status_bar && statusbar_container) statusbar_container.appendChild(status_bar);
 
-	/** append html */
+	// append container
 	editor_div.appendChild(textarea);
 	if (placeholder_span) editor_div.appendChild(placeholder_span);
-	if (!toolbar_container) {
-		container.appendChild(tool_bar.element);
-		container.appendChild(toolbarShadow);
-	}
-	container.appendChild(sticky_dummy);
+	container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
 	container.appendChild(editor_div);
-	container.appendChild(resize_back);
-	container.appendChild(loading_box);
-	editor_div.appendChild(line_breaker);
-	editor_div.appendChild(line_breaker_t);
-	editor_div.appendChild(line_breaker_b);
-	if (status_bar && !statusbar_container) container.appendChild(status_bar);
-	top_div.appendChild(container);
 
+	if (status_bar && !statusbar_container) container.appendChild(status_bar);
 	textarea = _checkCodeMirror(options, textarea);
+	top_div.appendChild(container);
 
 	return {
 		constructed: {
+			toolbar: toolbar,
 			top: top_div,
 			wwFrame: wysiwyg_div,
-			codeFrame: textarea
+			codeFrame: textarea,
+			carrierWrapper: editor_carrier_wrapper
 		},
-		pluginCallButtons: tool_bar.pluginCallButtons,
-		_responsiveButtons: tool_bar.responsiveButtons
+		pluginCallButtons: tool_bar_main.pluginCallButtons,
+		_responsiveButtons: tool_bar_main.responsiveButtons
 	};
 };
 
@@ -300,7 +302,7 @@ function InitOptions(options) {
 	/** Toolbar */
 	options.toolbar_width = options.toolbar_width ? (numbers.is(options.toolbar_width) ? options.toolbar_width + 'px' : options.toolbar_width) : 'auto';
 	options.toolbar_container = typeof options.toolbar_container === 'string' ? _d.querySelector(options.toolbar_container) : options.toolbar_container;
-	options.toolbar_sticky = /balloon/i.test(options.mode) || !!options.toolbar_container ? -1 : options.toolbar_sticky === undefined ? 0 : /^\d+/.test(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1;
+	options.toolbar_sticky = /balloon/i.test(options.mode) ? -1 : options.toolbar_sticky === undefined ? 0 : /^\d+/.test(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1;
 	options.toolbar_hide = !!options.toolbar_hide;
 
 	/** Status bar */
@@ -591,6 +593,7 @@ function _initElements(options, topDiv, toolBar, toolBarArrow) {
  * @param {Element} textarea textarea element
  */
 function _checkCodeMirror(options, textarea) {
+	let cmeditor = null;
 	options.hasCodeMirror = false;
 
 	if (options.codeMirror6Editor) {
@@ -602,8 +605,8 @@ function _checkCodeMirror(options, textarea) {
 		});
 
 		options.codeMirror6Editor = cm;
-		textarea = cm.dom;
-		textarea.style.cssText = codeStyles;
+		cmeditor = cm.dom;
+		cmeditor.style.cssText = codeStyles;
 		options.hasCodeMirror = true;
 	} else if (options.codeMirror5Editor) {
 		const cmOptions = [
@@ -629,12 +632,17 @@ function _checkCodeMirror(options, textarea) {
 		const codeStyles = textarea.style.cssText;
 		const cm = options.codeMirror.src.fromTextArea(textarea, cmOptions);
 		options.codeMirror5Editor = cm;
-		textarea = cm.display.wrapper;
-		textarea.style.cssText = codeStyles;
+		cmeditor = cm.display.wrapper;
+		cmeditor.style.cssText = codeStyles;
 		options.hasCodeMirror = true;
 	}
 
-	textarea.className += ' se-wrapper-code-mirror se-display-none';
+	if (cmeditor) {
+		domUtils.removeItem(textarea);
+		cmeditor.className += ' se-wrapper-code-mirror se-display-none';
+		return cmeditor;
+	}
+
 	return textarea;
 }
 

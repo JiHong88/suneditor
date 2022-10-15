@@ -64,14 +64,15 @@ Offset.prototype = {
 
 	/**
 	 * @description Gets the current editor-relative scroll offset.
+	 * @param {Element} element Target element
 	 * @returns {Object} {top, left, width, height}
 	 */
-	getGlobalScroll: function () {
+	getGlobalScroll: function (element) {
 		let t = 0,
 			l = 0,
 			h = 0,
 			w = 0;
-		let el = this.context.element.topArea;
+		let el = element || this.context.element.topArea;
 		while (el) {
 			t += el.scrollTop;
 			l += el.scrollLeft;
@@ -95,6 +96,57 @@ Offset.prototype = {
 			width: w,
 			height: h
 		};
+	},
+
+	setAbsPosition: function (element, target, container) {
+		const elW = element.offsetWidth;
+		const targetL = target.offsetLeft;
+
+		// left
+		if (this.options._rtl) {
+			const elementW = target.offsetWidth;
+			const rtlW = elW > elementW ? elW - elementW : 0;
+			const rtlL = rtlW > 0 ? 0 : elementW - elW;
+			element.style.left = targetL - rtlW + rtlL + 'px';
+			if (this.getGlobal(container).left > this.getGlobal(element).left) {
+				element.style.left = '0px';
+			}
+		} else {
+			const cw = container.offsetWidth;
+			const overLeft = cw <= elW ? 0 : cw - (targetL + elW);
+			if (overLeft < 0) element.style.left = targetL + overLeft + 'px';
+			else element.style.left = targetL + 'px';
+		}
+
+		// top
+		const containerTop = this.getGlobal(container).top;
+		const elHeight = element.offsetHeight;
+		const scrollTop = this.getGlobalScroll().top;
+		let bt = 0;
+		let offsetEl = target;
+		while (offsetEl && offsetEl !== container) {
+			bt += offsetEl.offsetTop;
+			offsetEl = offsetEl.offsetParent;
+		}
+
+		const menuHeight_bottom = this._w.innerHeight - (containerTop - scrollTop + bt + target.offsetHeight);
+		if (menuHeight_bottom < elHeight) {
+			let menuTop = -1 * (elHeight - bt + 3);
+			const insTop = containerTop - scrollTop + menuTop;
+			const menuHeight_top = elHeight + (insTop < 0 ? insTop : 0);
+
+			if (menuHeight_top > menuHeight_bottom) {
+				element.style.height = menuHeight_top + 'px';
+				menuTop = -1 * (menuHeight_top - bt + 3);
+			} else {
+				element.style.height = menuHeight_bottom + 'px';
+				menuTop = bt + target.offsetHeight;
+			}
+
+			element.style.top = menuTop + 'px';
+		} else {
+			element.style.top = bt + target.offsetHeight + 'px';
+		}
 	},
 
 	constructor: Offset

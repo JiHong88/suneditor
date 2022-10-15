@@ -3,7 +3,7 @@ import { History } from './history';
 import { Plugin } from '../src/plugins/Plugin';
 import { Lang } from './Lang';
 import { SunEditorOptions } from '../src/options';
-import { Context } from '../src/lib/context';
+import { Context } from '../src/core/context';
 import { Module } from '../src/plugins/Module';
 import _Notice from './notice';
 
@@ -116,16 +116,6 @@ export interface Core {
 	 * @description The file component object of current selected file tag (component.get(): {target, component, pluginName})
 	 */
 	currentFileComponentInfo: seledtedFileInfo;
-
-	/**
-	 * @description An array of buttons whose class name is not "se-code-view-enabled"
-	 */
-	codeViewDisabledButtons: Element[];
-
-	/**
-	 * @description An array of buttons whose class name is not "se-resizing-enabled"
-	 */
-	controllerOnDisabledButtons: Element[];
 
 	/**
 	 * @description Editor tags whitelist (RegExp object)
@@ -276,12 +266,12 @@ export interface Core {
 	/**
 	 * @description Show loading box
 	 */
-	openLoading(): void;
+	_openLoading(): void;
 
 	/**
 	 * @description Close loading box
 	 */
-	closeLoading(): void;
+	_closeLoading(): void;
 
 	/**
 	 * @description Run plugin calls and basic commands.
@@ -376,7 +366,7 @@ export interface Core {
 	 * @param comp If true, does not line break and indentation of tags.
 	 * @returns
 	 */
-	_convertHTMLForCodeView(html: Element | string, comp?: boolean): string;
+	_convertHTMLToCode(html: Element | string, comp?: boolean): string;
 }
 
 export interface Toolbar {

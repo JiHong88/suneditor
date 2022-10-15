@@ -14,8 +14,8 @@ Node_.prototype = {
 	/**
 	 * @description Split all tags based on "baseNode"
 	 * Returns the last element of the splited tag.
-	 * @param {Node_} baseNode Element or text node on which to base
-	 * @param {Number|Node_|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
+	 * @param {Node} baseNode Element or text node on which to base
+	 * @param {Number|Node|null} offset Text offset of "baseNode" (Only valid when "baseNode" is a text node)
 	 * @param {number} depth The nesting depth of the element being split. (default: 0)
 	 * @returns {Element}
 	 */
@@ -23,7 +23,7 @@ Node_.prototype = {
 		if (domUtils.isWysiwygFrame(baseNode)) return baseNode;
 
 		if (!!offset && !numbers.is(offset)) {
-			const children =  baseNode.childNodes;
+			const children = baseNode.childNodes;
 			let index = domUtils.getPositionIndex(offset);
 			const prev = baseNode.cloneNode(false);
 			const next = baseNode.cloneNode(false);
@@ -283,7 +283,7 @@ Node_.prototype = {
 	/**
 	 * @description Delete itself and all parent nodes that match the condition.
 	 * Returns an {sc: previousSibling, ec: nextSibling}(the deleted node reference) or null.
-	 * @param {Node_} item Node to be remove
+	 * @param {Node} item Node to be remove
 	 * @param {Function|null} validation Validation function. default(Deleted if it only have breakLine and blanks)
 	 * @param {Element|null} stopParent Stop when the parent node reaches stopParent
 	 * @returns {Object|null} {sc: previousSibling, ec: nextSibling}
@@ -319,7 +319,7 @@ Node_.prototype = {
 	/**
 	 * @description Delete a empty child node of argument element
 	 * @param {Element} element Element node
-	 * @param {Node_|null} notRemoveNode Do not remove node
+	 * @param {Node|null} notRemoveNode Do not remove node
 	 */
 	removeEmptyNode: function (element, notRemoveNode) {
 		const inst = this;

@@ -644,8 +644,6 @@ export function setStyle(element, styleName, value) {
 
 /**
  * @description In the predefined code view mode, the buttons except the executable button are changed to the 'disabled' state.
- * core.codeViewDisabledButtons (An array of buttons whose class name is not "se-code-view-enabled")
- * core.controllerOnDisabledButtons (An array of buttons whose class name is not "se-resizing-enabled")
  * @param {Array.<Element>|HTMLCollection|NodeList} buttonList Button array
  * @param {boolean} disabled Disabled value
  * @param {boolean} important If priveleged mode should be used (Necessary to switch importantDisabled buttons)

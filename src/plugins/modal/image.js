@@ -536,14 +536,14 @@ Image_.prototype = {
 
 					if (--this._base64RenderIndex === 0) {
 						this._onRenderBase64(update, filesStack, updateElement, anchor, width, height, align, alt);
-						this.editor.closeLoading();
+						this.editor._closeLoading();
 					}
 				}.bind(this, reader, isUpdate, this._element, file, i);
 
 				reader.readAsDataURL(file);
 			}
 		} catch (error) {
-			this.editor.closeLoading();
+			this.editor._closeLoading();
 			throw Error('[SUNEDITOR.plugins.image._setBase64.fail] ' + error.message);
 		}
 	},

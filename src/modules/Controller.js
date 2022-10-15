@@ -1,7 +1,7 @@
 import EditorInterface from '../interface';
 import { domUtils, env } from '../helper';
 
-const NON_TEXT_KEYCODE = new env._w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$');
+const NON_TEXT_KEYCODE = new env._w.RegExp('^(8|13|1[6-9]|20|27|40|45|46|11[2-9]|12[0-3]|144|145)$');
 
 /**
  *
@@ -23,12 +23,12 @@ const Controller = function (inst, element, params, _name) {
 	this.position = params.position || 'bottom';
 	this.disabled = !!params.disabled;
 	this._initMethod = null;
-	this.__globalEventHandlers = [CloseListener_key.bind(this), CloseListener_click.bind(this)];
+	this.__globalEventHandlers = [CloseListener_key.bind(this), CloseListener_mouse.bind(this)];
 	this._bindClose_key = null;
-	this._bindClose_click = null;
+	this._bindClose_mouse = null;
 
 	// add element
-	this.context.element.editorArea.appendChild(element);
+	this.context._carrierWrapper.appendChild(element);
 
 	// init
 	this.eventManager.addEvent(element, 'click', Action.bind(this));
@@ -39,10 +39,14 @@ Controller.prototype = {
 	 * @description Open a modal plugin
 	 */
 	open: function (target, positionTarget, initMethod) {
+		if (this.editor.isBalloon) this.toolbar.hide();
+		if (this.disabled) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
+
 		this.currentTarget = target;
 		this.currentPositionTarget = positionTarget || target;
 		this._initMethod = initMethod;
 		this.editor.currentControllerName = this.kind;
+
 		this.__addGlobalEvent();
 		this._setControllerPosition(this.form, this.currentPositionTarget);
 		this._controllerOn(this.form, target);
@@ -53,9 +57,12 @@ Controller.prototype = {
 	 * The plugin's "init" method is called.
 	 */
 	close: function () {
+		if (this.disabled) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
 		this.editor.currentControllerName = null;
+
 		this.__removeGlobalEvent();
 		this._controllerOff();
+
 		if (typeof this._initMethod === 'function') this._initMethod();
 	},
 
@@ -82,7 +89,7 @@ Controller.prototype = {
 			});
 		}
 
-		this.editor.openControllers.push({
+		this.editor.opendControllers.push({
 			position: this.position,
 			form: form,
 			target: target,
@@ -91,8 +98,7 @@ Controller.prototype = {
 		});
 
 		this.editor._antiBlur = true;
-		if (this.disabled) this.editor.blur();
-		if (typeof this.events.onShowController === 'function') this.events.onShowController(this.kind, this.editor.openControllers);
+		if (typeof this.events.onShowController === 'function') this.events.onShowController(this.kind, this.editor.opendControllers);
 	},
 
 	/**
@@ -104,7 +110,7 @@ Controller.prototype = {
 		this.context.element.lineBreaker_t.style.display = this.context.element.lineBreaker_b.style.display = 'none';
 		this.editor.currentFileComponentInfo = null;
 		this.editor.effectNode = null;
-		this.editor.openControllers = [];
+		this.editor.opendControllers = [];
 		this.editor._antiBlur = false;
 		if (typeof this.inst.reset === 'function') this.inst.reset();
 	},
@@ -116,8 +122,8 @@ Controller.prototype = {
 	 */
 	_setControllerPosition: function (controller, referEl) {
 		const addOffset = { left: 0, top: 0 };
-		if (this.editor.openControllers.length > 0) {
-			const openCont = this.editor.openControllers;
+		if (this.editor.opendControllers.length > 0) {
+			const openCont = this.editor.opendControllers;
 			for (let i = 0; i < openCont.length; i++) {
 				if (openCont[i].form !== this.form && openCont[i].position === this.position) addOffset.left += openCont[i].form.offsetWidth;
 			}
@@ -139,8 +145,14 @@ Controller.prototype = {
 		controller.style.display = 'block';
 
 		// Height value of the arrow element is 11px
+		let editorTop = 0;
+		if (this.options.toolbar_container) {
+			const gOffset = this.offset.getGlobal();
+			editorTop = gOffset.top - gOffset.scroll;
+		}
 		const topMargin = this.position === 'top' ? -(controller.offsetHeight + 2) : referEl.offsetHeight + 12;
-		controller.style.top = offset.top + topMargin + addOffset.top + globalOffset.top + 'px';
+		const ct = offset.top + topMargin + addOffset.top + globalOffset.top + editorTop - this.context._carrierWrapper.offsetTop;
+		controller.style.top = ct + 'px';
 
 		const l = offset.left - this.context.element.wysiwygFrame.scrollLeft + addOffset.left + globalOffset.left;
 		const controllerW = controller.offsetWidth;
@@ -175,22 +187,25 @@ Controller.prototype = {
 			}
 		}
 
+		const aaaa = this.offset.getAbsolutePosition(controller, referEl, this.context.element.editorArea);
+		console.log('aaaa', aaaa);
+		controller.style.top = aaaa + 'px';
 		controller.style.visibility = '';
 	},
 
 	__addGlobalEvent: function () {
 		this.__removeGlobalEvent();
 		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers[0], true);
-		this._bindClose_click = this.eventManager.addGlobalEvent('click', this.__globalEventHandlers[1], true);
+		this._bindClose_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers[1], true);
 	},
 
 	__removeGlobalEvent: function () {
 		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);
-		if (this._bindClose_click) this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
+		if (this._bindClose_mouse) this._bindClose_mouse = this.eventManager.removeGlobalEvent(this._bindClose_mouse);
 	},
 
 	_checkFixed: function () {
-		const cont = this.editor.openControllers;
+		const cont = this.editor.opendControllers;
 		for (let i = 0; i < cont.length; i++) {
 			if (cont[i].inst === this && cont[i].fixed) {
 				return true;
@@ -232,7 +247,7 @@ function CloseListener_key(e) {
 	this.close();
 }
 
-function CloseListener_click(e) {
+function CloseListener_mouse(e) {
 	if (this._checkFixed()) return;
 	if (this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) return;
 	this.close();

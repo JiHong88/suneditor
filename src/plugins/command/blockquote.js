@@ -20,13 +20,12 @@ Blockquote.prototype = {
 	 * @override core
 	 */
 	active: function (element) {
-		if (!element) {
-			domUtils.removeClass(this.target, 'active');
-		} else if (/blockquote/i.test(element.nodeName)) {
+		if (element && /blockquote/i.test(element.nodeName)) {
 			domUtils.addClass(this.target, 'active');
 			return true;
 		}
 
+		domUtils.removeClass(this.target, 'active');
 		return false;
 	},
 

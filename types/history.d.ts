@@ -1,4 +1,4 @@
-import { Core } from "./core";
+import { Core } from "./editor";
 
 export interface History {
     /**

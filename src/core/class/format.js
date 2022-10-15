@@ -1305,7 +1305,7 @@ Format.prototype = {
 		}
 
 		// set range
-		this.editor.offCurrentController();
+		this.editor._offCurrentController();
 		this.selection.setRange(start.container, start.offset, end.container, end.offset);
 
 		// history stack
@@ -1346,11 +1346,11 @@ Format.prototype = {
 	/**
 	 * @description It is judged whether it is a node related to the text style.
 	 * (strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)
-	 * @param {Node} element The node to check
+	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
 	 */
 	isTextStyleNode: function (element) {
-		return element && element.nodeType !== 3 && /^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)$/i.test(element.nodeName);
+		return element && element.nodeType !== 3 && /^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)$/i.test(element.nodeName || element);
 	},
 
 	/**

@@ -1,5 +1,5 @@
 import CoreInterface from './_core';
-import ModuleInterface from './_module';
+import ClassInterface from './_classes';
 
 /**
  * @interface
@@ -8,7 +8,7 @@ import ModuleInterface from './_module';
  */
 function EditorInterface(editor) {
 	CoreInterface.call(this, editor);
-	ModuleInterface.call(this, editor);
+	ClassInterface.call(this, editor);
 }
 
 export default EditorInterface;
