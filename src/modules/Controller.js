@@ -1,7 +1,7 @@
 import EditorInterface from '../interface';
 import { domUtils, env } from '../helper';
 
-const NON_TEXT_KEYCODE = new env._w.RegExp('^(8|13|1[6-9]|20|27|40|45|46|11[2-9]|12[0-3]|144|145)$');
+const NON_RESPONSE_KEYCODE = new env._w.RegExp('^(13|1[6-9]|20|27|40|45|11[2-9]|12[0-3]|144|145)$');
 
 /**
  *
@@ -26,6 +26,7 @@ const Controller = function (inst, element, params, _name) {
 	this.__globalEventHandlers = [CloseListener_key.bind(this), CloseListener_mouse.bind(this)];
 	this._bindClose_key = null;
 	this._bindClose_mouse = null;
+	this.__offset = {};
 
 	// add element
 	this.context._carrierWrapper.appendChild(element);
@@ -59,6 +60,7 @@ Controller.prototype = {
 	close: function () {
 		if (this.disabled) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
 		this.editor.currentControllerName = null;
+		this.__offset = {};
 
 		this.__removeGlobalEvent();
 		this._controllerOff();
@@ -93,8 +95,7 @@ Controller.prototype = {
 			position: this.position,
 			form: form,
 			target: target,
-			inst: this,
-			_offset: { left: form.offsetLeft + (this.context.element.eventWysiwyg.scrollX || this.context.element.eventWysiwyg.scrollLeft || 0), top: form.offsetTop + (this.context.element.eventWysiwyg.scrollY || this.context.element.eventWysiwyg.scrollTop || 0) }
+			inst: this
 		});
 
 		this.editor._antiBlur = true;
@@ -129,67 +130,11 @@ Controller.prototype = {
 			}
 		}
 
-		const globalOffset = { left: 0, top: 0 };
-		if (this.options.iframe && this._w.getComputedStyle(referEl).position === 'absolute') {
-			globalOffset.left -= this.context.element.wysiwygFrame.parentElement.offsetLeft;
-			globalOffset.top -= this.context.element.wysiwygFrame.parentElement.offsetTop;
-		}
-
-		if (this.options._rtl) {
-			addOffset.left *= -1;
-			globalOffset.left *= -1;
-		}
-
-		const offset = this.offset.get(referEl);
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
-		// Height value of the arrow element is 11px
-		let editorTop = 0;
-		if (this.options.toolbar_container) {
-			const gOffset = this.offset.getGlobal();
-			editorTop = gOffset.top - gOffset.scroll;
-		}
-		const topMargin = this.position === 'top' ? -(controller.offsetHeight + 2) : referEl.offsetHeight + 12;
-		const ct = offset.top + topMargin + addOffset.top + globalOffset.top + editorTop - this.context._carrierWrapper.offsetTop;
-		controller.style.top = ct + 'px';
+		this.offset.setAbsPosition(controller, referEl, this.context.element.wysiwygFrame, { addOffset: addOffset, position: this.positionf, inst: this });
 
-		const l = offset.left - this.context.element.wysiwygFrame.scrollLeft + addOffset.left + globalOffset.left;
-		const controllerW = controller.offsetWidth;
-		const referElW = referEl.offsetWidth;
-
-		const allow = domUtils.hasClass(controller.firstElementChild, 'se-arrow') ? controller.firstElementChild : null;
-
-		// rtl (Width value of the arrow element is 22px)
-		if (this.options._rtl) {
-			const rtlW = controllerW > referElW ? controllerW - referElW : 0;
-			const rtlL = rtlW > 0 ? 0 : referElW - controllerW;
-			controller.style.left = l - rtlW + rtlL + 'px';
-
-			if (rtlW > 0) {
-				if (allow) allow.style.left = (controllerW - 14 < 10 + rtlW ? controllerW - 14 : 10 + rtlW) + 'px';
-			}
-
-			const overSize = this.context.element.wysiwygFrame.offsetLeft - controller.offsetLeft;
-			if (overSize > 0) {
-				controller.style.left = '0px';
-				if (allow) allow.style.left = overSize + 'px';
-			}
-		} else {
-			controller.style.left = l + 'px';
-
-			const overSize = this.context.element.wysiwygFrame.offsetWidth - (controller.offsetLeft + controllerW);
-			if (overSize < 0) {
-				controller.style.left = controller.offsetLeft + overSize + 'px';
-				if (allow) allow.style.left = 20 - overSize + 'px';
-			} else {
-				if (allow) allow.style.left = '20px';
-			}
-		}
-
-		const aaaa = this.offset.getAbsolutePosition(controller, referEl, this.context.element.editorArea);
-		console.log('aaaa', aaaa);
-		controller.style.top = aaaa + 'px';
 		controller.style.visibility = '';
 	},
 
@@ -238,7 +183,7 @@ function CloseListener_key(e) {
 	if (this._checkFixed()) return;
 	const keyCode = e.keyCode;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
-	if (ctrl || NON_TEXT_KEYCODE.test(keyCode)) return;
+	if (ctrl || NON_RESPONSE_KEYCODE.test(keyCode)) return;
 
 	this.editor._lineBreaker.style.display = 'none';
 	if (this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) return;

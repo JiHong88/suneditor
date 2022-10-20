@@ -142,6 +142,67 @@ Selection.prototype = {
 	},
 
 	/**
+	 * @description  Get hte clientRects object.
+	 * @param {Range|null} range Range object
+	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
+	 * @returns
+	 */
+	getRects: function (range, position) {
+		range = range || this.getRange();
+		const globalScroll = this.offset.getGlobalScroll();
+		let isStartPosition = position === 'start';
+		let scrollLeft = globalScroll.left;
+		let scrollTop = globalScroll.top;
+
+		let rects = range.getClientRects();
+		rects = rects[isStartPosition ? 0 : rects.length - 1];
+
+		if (!rects) {
+			const node = this.getNode();
+			if (this.format.isLine(node)) {
+				const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
+				this.html.insertNode(zeroWidth, null, true);
+				this.setRange(zeroWidth, 1, zeroWidth, 1);
+				this._init();
+				rects = this.getRange().getClientRects();
+				rects = rects[isStartPosition ? 0 : rects.length - 1];
+			}
+
+			if (!rects) {
+				const nodeOffset = this.offset.get(node);
+				rects = {
+					left: nodeOffset.left,
+					top: nodeOffset.top,
+					right: nodeOffset.left,
+					bottom: nodeOffset.top + node.offsetHeight,
+					noText: true
+				};
+				scrollLeft = 0;
+				scrollTop = 0;
+			}
+
+			isStartPosition = true;
+		}
+
+		const iframeRects = /iframe/i.test(this.context.element.wysiwygFrame.nodeName) ? this.context.element.wysiwygFrame.getClientRects()[0] : null;
+		if (iframeRects) {
+			rects = {
+				left: rects.left + iframeRects.left,
+				top: rects.top + iframeRects.top,
+				right: rects.right + iframeRects.right - iframeRects.width,
+				bottom: rects.bottom + iframeRects.bottom - iframeRects.height
+			};
+		}
+
+		return {
+			rects: rects,
+			position: isStartPosition ? 'start' : 'end',
+			scrollLeft: scrollLeft,
+			scrollTop: scrollTop
+		};
+	},
+
+	/**
 	 * @description Returns true if there is no valid selection.
 	 * @param {Object} range selection.getRange()
 	 * @returns {boolean}

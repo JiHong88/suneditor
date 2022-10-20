@@ -197,19 +197,27 @@
     border: 11px solid transparent;
 }
 
-/* arrow up */
-.sun-editor .se-arrow.se-arrow-up {
-    top: -11px;
+.sun-editor .se-controller .se-arrow {
     left: 20px;
     right: auto;
     margin-left: -11px;
+    margin-right: 0;
+}
+
+.sun-editor .se-controller .se-arrow::after {
+    margin-right: 0;
+    margin-left: -11px;
+}
+
+/* arrow up */
+.sun-editor .se-arrow.se-arrow-up {
+    top: -11px;
     border-top-width: 0;
     border-bottom-color: #dadada;
 }
 
 .sun-editor .se-arrow.se-arrow-up::after {
     top: 1px;
-    margin-left: -11px;
     content: " ";
     border-top-width: 0;
     border-bottom-color: #fff;
@@ -221,16 +229,14 @@
 
 /* arrow down */
 .sun-editor .se-arrow.se-arrow-down {
-    top: 0px;
+    bottom: -12px;
     left: 0px;
-    margin-left: -11px;
     border-bottom-width: 0;
     border-top-color: #dadada;
 }
 
 .sun-editor .se-arrow.se-arrow-down::after {
     top: -12px;
-    margin-left: -11px;
     content: " ";
     border-bottom-width: 0;
     border-top-color: #fff;
@@ -1084,7 +1090,7 @@
     display: block;
 }
 
-.sun-editor .sun-editor-editable .katex.se-focus {
+.sun-editor-editable .katex.se-focus {
     outline: 1px solid #80bdff;
 }
 
@@ -1595,7 +1601,7 @@
     position: absolute;
     display: none;
     overflow: visible;
-    z-index: 6;
+    z-index: 2147483647;
     padding: 2px 2px 0 2px;
     margin: 0;
     border: 1px solid rgba(0, 0, 0, .25);
@@ -2459,9 +2465,11 @@
 }
 
 /** arrow--- */
-.sun-editor.se-rtl .se-arrow.se-arrow-up {
+.sun-editor.se-rtl .se-controller .se-arrow {
     right: 20px;
     left: auto;
+    margin-right: -11px;
+    margin-left: 0;
 }
 
 /** --- RTL ---------------------------------------------------------- */
@@ -2510,7 +2518,7 @@ textarea.se-error:focus {
 
 /** --- controller wrapper ---------------------------------------------------------- */
 .sun-editor.sun-editor-carrier-wrapper {
-    position: relative !important;
+    position: initial !important;
     display: block !important;
     width: 0 !important;
     height: 0 !important;
@@ -2518,8 +2526,6 @@ textarea.se-error:focus {
     outline: none !important;
     margin: 0 !important;
     padding: 0 !important;
-    background-color: transparent !important;
-    color: transparent !important;
 }
 
 

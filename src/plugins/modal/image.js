@@ -228,7 +228,7 @@ Image_.prototype = {
 		this.init();
 
 		if (emptyDiv !== this.context.element.wysiwyg) {
-			domUtils.removeAllParents(
+			this.node.removeAllParents(
 				emptyDiv,
 				function (current) {
 					return current.childNodes.length === 0;

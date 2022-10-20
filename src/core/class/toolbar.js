@@ -3,7 +3,7 @@
  * @author Yi JiHong.
  */
 
-import { domUtils, unicode } from '../../helper';
+import { domUtils } from '../../helper';
 import CoreInterface from '../../interface/_core';
 import { CreateToolBar } from '../constructor';
 
@@ -77,30 +77,6 @@ Toolbar.prototype = {
 	},
 
 	/**
-	 * @description Reset the buttons on the toolbar. (Editor is not reloaded)
-	 * You cannot set a new plugin for the button.
-	 * @param {Array} buttonList Button list
-	 */
-	setButtons: function (buttonList) {
-		this.menu.dropdownOff();
-		this.menu.containerOff();
-		this.menu._moreLayerOff();
-
-		const newToolbar = CreateToolBar(buttonList, this.options._init_plugins, this.options);
-		this.context.toolbar.main.replaceChild(newToolbar._buttonTray, this.context.toolbar._buttonTray);
-		this.context.toolbar._buttonTray = newToolbar._buttonTray;
-
-		this.editor._recoverButtonStates();
-		this.editor._cachingButtons();
-		this.history._resetCachingButton();
-
-		this.editor.effectNode = null;
-		if (this.status.hasFocus) this.eventManager.applyTagEffect();
-		if (this.status.isReadOnly) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
-		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'));
-	},
-
-	/**
 	 * @description Reset buttons of the responsive toolbar.
 	 */
 	resetResponsiveToolbar: function () {
@@ -128,6 +104,31 @@ Toolbar.prototype = {
 				this.setButtons(this._rButtonArray[responsiveWidth]);
 			}
 		}
+	},
+
+	/**
+	 * @description Reset the buttons on the toolbar. (Editor is not reloaded)
+	 * You cannot set a new plugin for the button.
+	 * @param {Array} buttonList Button list
+	 */
+	setButtons: function (buttonList) {
+		this.menu.dropdownOff();
+		this.menu.containerOff();
+		this.menu._moreLayerOff();
+
+		const newToolbar = CreateToolBar(buttonList, this.options._init_plugins, this.options);
+		this.context.toolbar.main.replaceChild(newToolbar._buttonTray, this.context.toolbar._buttonTray);
+		this.context.toolbar._buttonTray = newToolbar._buttonTray;
+
+		this.editor._recoverButtonStates();
+		this.editor._cachingButtons();
+		this.history._resetCachingButton();
+		this._resetSticky();
+
+		this.editor.effectNode = null;
+		if (this.status.hasFocus) this.eventManager.applyTagEffect();
+		if (this.status.isReadOnly) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
+		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'));
 	},
 
 	_resetSticky: function () {
@@ -208,7 +209,6 @@ Toolbar.prototype = {
 
 		const range = rangeObj || this.selection.getRange();
 		const toolbar = this.context.toolbar.main;
-		const topArea = this.context.element.topArea;
 		const selection = this.selection.get();
 
 		let isDirTop;
@@ -221,71 +221,42 @@ Toolbar.prototype = {
 			isDirTop = domUtils.getArrayIndex(childNodes, selection.focusNode) < domUtils.getArrayIndex(childNodes, selection.anchorNode);
 		}
 
-		let rects = range.getClientRects();
-		rects = rects[isDirTop ? 0 : rects.length - 1];
-
-		const globalScroll = this.offset.getGlobalScroll();
-		let scrollLeft = globalScroll.left;
-		let scrollTop = globalScroll.top;
-
-		const editorWidth = topArea.offsetWidth;
-		const offsets = this.offset.getGlobal(this.context.element.topArea);
-		const stickyTop = offsets.top;
-		const editorLeft = offsets.left;
-
 		toolbar.style.top = '-10000px';
 		if (toolbar.style.display !== 'block') {
 			toolbar.style.visibility = 'hidden';
 			toolbar.style.display = 'block';
 		}
 
-		if (!rects) {
-			const node = this.selection.getNode();
-			if (this.format.isLine(node)) {
-				const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
-				this.html.insertNode(zeroWidth, null, true);
-				this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
-				this.selection._init();
-				rects = this.selection.getRange().getClientRects();
-				rects = rects[isDirTop ? 0 : rects.length - 1];
-			}
+		this._setBalloonOffset(isDirTop, range);
 
-			if (!rects) {
-				const nodeOffset = this.offset.get(node);
-				rects = {
-					left: nodeOffset.left,
-					top: nodeOffset.top,
-					right: nodeOffset.left,
-					bottom: nodeOffset.top + node.offsetHeight,
-					noText: true
-				};
-				scrollLeft = 0;
-				scrollTop = 0;
-			}
+		this._w.setTimeout(function () {
+			toolbar.style.visibility = '';
+		});
+	},
 
-			isDirTop = true;
-		}
-
-		const arrowMargin = this._w.Math.round(this.context.toolbar._arrow.offsetWidth / 2);
+	_setBalloonOffset: function (positionTop, range) {
+		range = range || this.selection.getRange();
+		const rectsObj = this.selection.getRects(range, positionTop ? 'start' : 'end');
+		positionTop = rectsObj.position === 'start';
+		const toolbar = this.context.toolbar.main;
+		const topArea = this.context.element.topArea;
+		const rects = rectsObj.rects;
+		const scrollLeft = rectsObj.scrollLeft;
+		const scrollTop = rectsObj.scrollTop;
+		const editorWidth = topArea.offsetWidth;
+		const offsets = this.offset.getGlobal(topArea);
+		const stickyTop = offsets.top;
+		const editorLeft = offsets.left;
 		const toolbarWidth = toolbar.offsetWidth;
 		const toolbarHeight = toolbar.offsetHeight;
-		const iframeRects = /iframe/i.test(this.context.element.wysiwygFrame.nodeName) ? this.context.element.wysiwygFrame.getClientRects()[0] : null;
-		if (iframeRects) {
-			rects = {
-				left: rects.left + iframeRects.left,
-				top: rects.top + iframeRects.top,
-				right: rects.right + iframeRects.right - iframeRects.width,
-				bottom: rects.bottom + iframeRects.bottom - iframeRects.height
-			};
-		}
 
-		this._setBalloonOffset(isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
+		this._setBalloonPosition(positionTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop);
 		if (toolbarWidth !== toolbar.offsetWidth || toolbarHeight !== toolbar.offsetHeight) {
-			this._setBalloonOffset(isDirTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin);
+			this._setBalloonPosition(positionTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop);
 		}
 
 		if (this.options.toolbar_container) {
-			const editorParent = topArea.parentElement;
+			const editorParent = this.context.element.topArea.parentElement;
 
 			let container = this.options.toolbar_container;
 			let left = container.offsetLeft;
@@ -301,15 +272,18 @@ Toolbar.prototype = {
 			toolbar.style.top = toolbar.offsetTop - top + topArea.offsetTop + 'px';
 		}
 
-		this._balloonOffset = { top: toolbar.offsetTop + (this.context.element.eventWysiwyg.scrollY || this.context.element.eventWysiwyg.scrollTop || 0), left: toolbar.offsetLeft + (this.context.element.eventWysiwyg.scrollX || this.context.element.eventWysiwyg.scrollLeft || 0) };
-
-		this._w.setTimeout(function () {
-			toolbar.style.visibility = '';
-		});
+		const wwScroll = this.offset.getWWScroll();
+		this._balloonOffset = {
+			top: toolbar.offsetTop + wwScroll.top,
+			left: toolbar.offsetLeft + wwScroll.left,
+			position: positionTop ? 'top' : 'bottom'
+		};
 	},
 
-	_setBalloonOffset: function (isDirTop, rects, toolbarEl, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop, arrowMargin) {
+	_setBalloonPosition: function (isDirTop, rects, toolbarEl, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop) {
 		const padding = 1;
+		const arrow = this.context.toolbar._arrow;
+		const arrowMargin = this._w.Math.round(arrow.offsetWidth / 2);
 		const toolbarWidth = toolbarEl.offsetWidth;
 		const toolbarHeight = rects.noText && !isDirTop ? 0 : toolbarEl.offsetHeight;
 
@@ -335,17 +309,17 @@ Toolbar.prototype = {
 		toolbarEl.style.top = this._w.Math.floor(t) + 'px';
 
 		if (isDirTop) {
-			domUtils.removeClass(this.context.toolbar._arrow, 'se-arrow-up');
-			domUtils.addClass(this.context.toolbar._arrow, 'se-arrow-down');
-			this.context.toolbar._arrow.style.top = toolbarHeight + 'px';
+			domUtils.removeClass(arrow, 'se-arrow-up');
+			domUtils.addClass(arrow, 'se-arrow-down');
+			arrow.style.top = toolbarHeight - 1 + 'px';
 		} else {
-			domUtils.removeClass(this.context.toolbar._arrow, 'se-arrow-down');
-			domUtils.addClass(this.context.toolbar._arrow, 'se-arrow-up');
-			this.context.toolbar._arrow.style.top = -arrowMargin + 'px';
+			domUtils.removeClass(arrow, 'se-arrow-down');
+			domUtils.addClass(arrow, 'se-arrow-up');
+			arrow.style.top = -arrowMargin - 1 + 'px';
 		}
 
 		const arrow_left = this._w.Math.floor(toolbarWidth / 2 + (absoluteLeft - l));
-		this.context.toolbar._arrow.style.left = (arrow_left + arrowMargin > toolbarEl.offsetWidth ? toolbarEl.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
+		arrow.style.left = (arrow_left + arrowMargin > toolbarEl.offsetWidth ? toolbarEl.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
 	},
 
 	_getPageBottomSpace: function () {

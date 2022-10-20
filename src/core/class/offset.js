@@ -4,7 +4,8 @@
  */
 
 import CoreInterface from '../../interface/_core';
-import { getParentElement, isWysiwygFrame, hasClass } from '../../helper/domUtils';
+import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass } from '../../helper/domUtils';
+import { numbers } from '../../helper';
 
 const Offset = function (editor) {
 	CoreInterface.call(this, editor);
@@ -14,7 +15,7 @@ Offset.prototype = {
 	/**
 	 * @description Returns the position of the argument, "context.element.editorArea" to inside the editor.Returns the position of the element in "context.element.editorArea".
 	 * @param {Node} node Target node
-	 * @returns {Object} {left, top}
+	 * @returns {{top:boolean, left:boolean}}
 	 */
 	get: function (node) {
 		let offsetLeft = 0;
@@ -40,7 +41,7 @@ Offset.prototype = {
 	/**
 	 * @description Returns the position of the argument, relative to global document. {left:0, top:0, scroll: 0}
 	 * @param {Element} element Target element
-	 * @returns {Object} {left, top, scroll}
+	 * @returns {{top:boolean, left:boolean, scroll:boolean}}
 	 */
 	getGlobal: function (element) {
 		if (!element) element = this.context.element.topArea;
@@ -65,7 +66,7 @@ Offset.prototype = {
 	/**
 	 * @description Gets the current editor-relative scroll offset.
 	 * @param {Element} element Target element
-	 * @returns {Object} {top, left, width, height}
+	 * @returns {{top:boolean, left:boolean, width:boolean, height:boolean}}
 	 */
 	getGlobalScroll: function (element) {
 		let t = 0,
@@ -98,7 +99,18 @@ Offset.prototype = {
 		};
 	},
 
-	setAbsPosition: function (element, target, container) {
+	/**
+	 * @description Get the scroll info of the WYSIWYG area.
+	 * @returns {{top:boolean, left:boolean}}
+	 */
+	getWWScroll: function () {
+		return {
+			top: this.context.element.eventWysiwyg.scrollY || this.context.element.eventWysiwyg.scrollTop || 0,
+			left: this.context.element.eventWysiwyg.scrollX || this.context.element.eventWysiwyg.scrollLeft || 0
+		};
+	},
+
+	setRelPosition: function (element, target, container) {
 		const elW = element.offsetWidth;
 		const targetL = target.offsetLeft;
 
@@ -146,6 +158,194 @@ Offset.prototype = {
 			element.style.top = menuTop + 'px';
 		} else {
 			element.style.top = bt + target.offsetHeight + 'px';
+		}
+	},
+
+	setAbsPosition: function (element, target, container, params) {
+		const addOffset = params.addOffset || { left: 0, top: 0 };
+		const position = params.position || 'bottom';
+		const inst = params.inst;
+		const targetOffset = this._getRelTargetOffset(target);
+		const frameOffset = this.getGlobal(this.context.element.wysiwygFrame);
+
+		if (this.options._rtl) {
+			addOffset.left *= -1;
+		}
+
+		const targetAbs = this._w.getComputedStyle(target).position === 'absolute';
+		const offset = this.getGlobal(target);
+		const elW = element.offsetWidth;
+		const radius = numbers.get(this._w.getComputedStyle(element).borderRadius) || 0;
+		const arrow = hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null;
+		const aw = arrow ? arrow.offsetWidth : 0;
+		const awHalf = aw / 2;
+
+		// top
+		element.style.top = this._getAbsMargin(position, element, target, arrow, targetOffset.top + addOffset.top, targetAbs) + 'px';
+
+		// left
+		const wwScroll = this.getWWScroll();
+		const l = offset.left + targetOffset.left + addOffset.left;
+		const referElW = target.offsetWidth;
+		const sl = this._getLeftSceollMargin();
+		// left margin
+		if (this.options._rtl) {
+			const rtlW = elW > referElW ? elW - referElW : 0;
+			const rtlL = rtlW > 0 ? 0 : referElW - elW;
+			element.style.left = l - rtlW + rtlL + sl + 'px';
+
+			if (rtlW > 0) {
+				if (arrow) arrow.style.left = (elW - awHalf < awHalf + rtlW ? elW - awHalf - radius : awHalf - radius + rtlW) + 'px';
+			}
+
+			const overSize = container.offsetLeft - element.offsetLeft;
+			if (overSize > 0) {
+				element.style.left = frameOffset.left + 'px';
+				if (arrow) arrow.style.left = overSize + 'px';
+			}
+		} else {
+			element.style.left = l + sl + 'px';
+
+			const overSize = container.offsetWidth - (element.offsetLeft + elW);
+			if (overSize < 0) {
+				element.style.left = element.offsetLeft + overSize + 'px';
+				if (arrow) arrow.style.left = aw - overSize + 'px';
+			} else {
+				if (arrow) arrow.style.left = (target.offsetWidth <= aw + awHalf ? awHalf + radius : aw) + 'px';
+			}
+		}
+
+		inst.__offset = { left: element.offsetLeft + wwScroll.left, top: element.offsetTop + wwScroll.top, addOffset: addOffset, sl: sl, targetAbs: targetAbs };
+	},
+
+	_resetControllerOffset: function (cont) {
+		if (cont.notInCarrier) return;
+
+		const arrow = hasClass(cont.form.firstElementChild, 'se-arrow') ? cont.form.firstElementChild : null;
+		const element = cont.form;
+		const __offset = cont.inst.__offset;
+		const y = this._getAbsMargin(cont.position, element, cont.target, arrow, (__offset.addOffset.top || 0) + this._getRelTargetOffset(cont.target).top, __offset.targetAbs);
+		if (element.offsetTop !== y) {
+			element.style.top = y + 'px';
+		}
+		const sl = this._getLeftSceollMargin();
+		if (sl - __offset.sl !== 0) {
+			element.style.left = element.offsetLeft + (sl - __offset.sl) + 'px';
+		}
+	},
+
+	_getAbsMargin: function (position, element, target, arrow, addTop, targetAbs) {
+		const targetH = target.offsetHeight;
+		const offset = this.getGlobal(target);
+		const wwTop = this.getGlobal(this.context.element.wysiwygFrame).top;
+		const wwH = this.context.element.wysiwygFrame.offsetHeight;
+
+		if (targetAbs) {
+			if (offset.top + targetH - wwTop < 1 || wwTop + wwH - offset.top < 1) return -10000;
+		} else {
+			const wwScrollTop = this.getWWScroll().top;
+			const targetT = target.offsetTop;
+			if (targetT + targetH - wwScrollTop < 1 || wwScrollTop + wwH - targetT < 1) return -10000;
+		}
+
+		const arrowH = arrow ? arrow.offsetHeight : 0;
+		const elementH = element.offsetHeight;
+		let y = 0;
+		let elementT = targetH + offset.top + (position === 'top' ? -(elementH + targetH + arrowH) : arrowH) + addTop;
+
+		if (position === 'bottom') {
+			this._setArrow(arrow, 'up');
+			y = this._getAbsBottomMargin(elementT, elementH, targetH, arrowH);
+			if (y < 0) {
+				elementT += y;
+				y = this._getAbsTopMargin(elementT, elementH, targetH, arrowH);
+				if (y > 0) {
+					elementT += elementH + arrowH;
+					const overMargin = this.getGlobal().top - elementT;
+					if (overMargin > 0) elementT += overMargin;
+					this._setArrow(arrow, '');
+				} else {
+					this._setArrow(arrow, 'down');
+				}
+			}
+		} else {
+			this._setArrow(arrow, 'down');
+			let y = this._getAbsTopMargin(elementT, elementH, targetH, arrowH);
+			if (y > 0) {
+				elementT += y;
+				y = this._getAbsBottomMargin(elementT, elementH, targetH, arrowH);
+				if (y < 0) {
+					elementT -= elementH + arrowH;
+					const overMargin = this.getGlobal().top + this.context.element.topArea.offsetHeight - (elementT + elementH);
+					if (overMargin < 0) elementT += overMargin;
+					this._setArrow(arrow, '');
+				} else {
+					this._setArrow(arrow, 'up');
+				}
+			}
+		}
+
+		return elementT;
+	},
+
+	_getLeftSceollMargin: function () {
+		const sl = (this.options._rtl ? -1 : 1) * this.getWWScroll().left - this.editor._editorPadding.left;
+		return sl < 0 ? 0 : (this.options._rtl ? -1 : 1) * sl;
+	},
+
+	_getRelTargetOffset: function (target) {
+		if (this._w.getComputedStyle(target).position === 'absolute') return { top: 0, left: 0 };
+
+		const eventWysiwyg = this.context.element.eventWysiwyg;
+		const wwScrollY = eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0;
+		const wwScrollX = eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0;
+		let gt = 0;
+		let gl = 0;
+
+		if (this.options.iframe) {
+			const frameOffset = this.getGlobal(this.context.element.wysiwygFrame);
+			gt += this._w.scrollY - wwScrollY + frameOffset.top - this._w.scrollY;
+			gl += this._w.scrollX - wwScrollX + frameOffset.left - this._w.scrollX;
+		} else {
+			gt -= wwScrollY;
+			gl -= wwScrollX;
+		}
+
+		return {
+			top: gt,
+			left: gl
+		};
+	},
+
+	_getAbsBottomMargin: function (elementT, elementH, targetH, arrowH) {
+		const margin_y = this.getGlobal(this.context.element.topArea).top + this.context.element.topArea.offsetHeight - this._w.scrollY - (elementT - this._w.scrollY + elementH);
+		if (margin_y < 0) {
+			return -(arrowH * 2 + targetH + elementH);
+		} else {
+			return 0;
+		}
+	},
+
+	_getAbsTopMargin: function (elementT, elementH, targetH, arrowH) {
+		const margin_y = elementT - this.getGlobal(this.context.element.topArea).top;
+		if (margin_y < 0) {
+			return arrowH * 2 + targetH + elementH;
+		} else {
+			return 0;
+		}
+	},
+
+	_setArrow: function (arrow, key) {
+		if (key === 'up') {
+			if (arrow) arrow.style.visibility = '';
+			addClass(arrow, 'se-arrow-up');
+			removeClass(arrow, 'se-arrow-down');
+		} else if (key === 'down') {
+			if (arrow) arrow.style.visibility = '';
+			addClass(arrow, 'se-arrow-down');
+			removeClass(arrow, 'se-arrow-up');
+		} else {
+			if (arrow) arrow.style.visibility = 'hidden';
 		}
 	},
 

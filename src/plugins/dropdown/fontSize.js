@@ -30,7 +30,7 @@ FontSize.prototype = {
 	 */
 	active: function (element) {
 		if (!element) {
-			domUtils.changeTxt(this.targetText, this.status.hasFocus ? this.options.__defaultFontSize || this.wwComputedStyle.fontSize : this.lang.toolbar.fontSize);
+			domUtils.changeTxt(this.targetText, this.status.hasFocus ? this.options.__defaultFontSize || this.editor.wwComputedStyle.fontSize : this.lang.toolbar.fontSize);
 		} else if (element.style && element.style.fontSize.length > 0) {
 			domUtils.changeTxt(this.targetText, element.style.fontSize);
 			return true;

@@ -124,7 +124,7 @@ Menu.prototype = {
 		menu.style.height = '';
 		domUtils.addClass(element, 'on');
 
-		this.offset.setAbsPosition(menu, element.parentElement, this.context.toolbar.main);
+		this.offset.setRelPosition(menu, element.parentElement, this.context.toolbar.main);
 
 		menu.style.visibility = '';
 	},

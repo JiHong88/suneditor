@@ -7,11 +7,11 @@ const _w = env._w;
 const DEFAULT_BUTTON_LIST = [['undo', 'redo'], ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'], ['removeFormat'], ['outdent', 'indent'], ['fullScreen', 'showBlocks', 'codeView'], ['preview', 'print']];
 const DEFAULT_ELEMENT_WHITELIST = 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls';
-const DEFAULT_FORMAT_LINE = 'P|DIV|H[1-6]|PRE|LI|TH|TD|DETAILS';
+const DEFAULT_FORMAT_LINE = 'P|DIV|H[1-6]|LI|TH|TD|DETAILS';
 const DEFAULT_FORMAT_BR_LINE = 'PRE';
-const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|TH|TD|DETAILS';
-const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
+const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|DETAILS';
+const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 
 /**
  * @description document create
@@ -31,7 +31,7 @@ const Constructor = function (editorTargets, options) {
 	const container = domUtils.createElement('DIV', { class: 'se-container' });
 
 	/** --- carrier wrapper --------------------------------------------------------------- */
-	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper' });
+	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper' + (options._rtl ? ' se-rtl' : '') });
 
 	// modal
 	const modal = domUtils.createElement('DIV', { class: 'se-modal sun-editor-common' });
@@ -180,8 +180,15 @@ export function ResetOptions(context, mergeOptions) {
 	ctxEl.code = code;
 	ctxEl.placeholder = placeholder_span;
 
-	if (mergeOptions._rtl) domUtils.addClass(ctxEl.topArea, 'se-rtl');
-	else domUtils.removeClass(ctxEl.topArea, 'se-rtl');
+	if (mergeOptions._rtl) {
+		domUtils.addClass(ctxEl.topArea, 'se-rtl');
+		domUtils.addClass(context.toolbar._wrapper, 'se-rtl');
+		domUtils.addClass(context._carrierWrapper, 'se-rtl');
+	} else {
+		domUtils.removeClass(ctxEl.topArea, 'se-rtl');
+		domUtils.removeClass(context.toolbar._wrapper, 'se-rtl');
+		domUtils.removeClass(context._carrierWrapper, 'se-rtl');
+	}
 
 	return {
 		callButtons: tool_bar.pluginCallButtons,
@@ -291,11 +298,11 @@ function InitOptions(options) {
 	options.attributeWhitelist = !options.attributeWhitelist || typeof options.attributeWhitelist !== 'object' ? null : options.attributeWhitelist;
 	options.attributeBlacklist = !options.attributeBlacklist || typeof options.attributeBlacklist !== 'object' ? null : options.attributeBlacklist;
 	// format tag
-	options.formatLine = _createFormatInfo(options.formatLine, (options.__defaultFormatLine = typeof options.__defaultFormatLine === 'string' ? options.__defaultFormatLine : DEFAULT_FORMAT_LINE).toLowerCase(), options.elementBlacklist);
-	options.formatBrLine = _createFormatInfo(options.formatBrLine, (options.__defaultFormatBrLine = typeof options.__defaultFormatBrLine === 'string' ? options.__defaultFormatBrLine : DEFAULT_FORMAT_BR_LINE).toLowerCase(), options.elementBlacklist);
-	options.formatBlock = _createFormatInfo(options.formatBlock, (options.__defaultFormatBlock = typeof options.__defaultFormatBlock === 'string' ? options.__defaultFormatBlock : DEFAULT_FORMAT_BLOCK).toLowerCase(), options.elementBlacklist);
-	options.formatClosureBlock = _createFormatInfo(options.formatClosureBlock, (options.__defaultFormatClosureBlock = typeof options.__defaultFormatClosureBlock === 'string' ? options.__defaultFormatClosureBlock : DEFAULT_FORMAT_CLOSURE_BLOCK).toLowerCase(), options.elementBlacklist);
 	options.formatClosureBrLine = _createFormatInfo(options.formatClosureBrLine, (options.__defaultFormatClosureBrLine = typeof options.__defaultFormatClosureBrLine === 'string' ? options.__defaultFormatClosureBrLine : DEFAULT_FORMAT_CLOSURE_BR_LINE).toLowerCase(), options.elementBlacklist);
+	options.formatBrLine = _createFormatInfo((options.formatBrLine || '') + '|' + options.formatClosureBrLine.str, (options.__defaultFormatBrLine = typeof options.__defaultFormatBrLine === 'string' ? options.__defaultFormatBrLine : DEFAULT_FORMAT_BR_LINE).toLowerCase(), options.elementBlacklist);
+	options.formatLine = _createFormatInfo((options.formatLine || '') + '|' + options.formatBrLine.str, (options.__defaultFormatLine = typeof options.__defaultFormatLine === 'string' ? options.__defaultFormatLine : DEFAULT_FORMAT_LINE).toLowerCase(), options.elementBlacklist);
+	options.formatClosureBlock = _createFormatInfo(options.formatClosureBlock, (options.__defaultFormatClosureBlock = typeof options.__defaultFormatClosureBlock === 'string' ? options.__defaultFormatClosureBlock : DEFAULT_FORMAT_CLOSURE_BLOCK).toLowerCase(), options.elementBlacklist);
+	options.formatBlock = _createFormatInfo((options.formatBlock || '') + '|' + options.formatClosureBlock.str, (options.__defaultFormatBlock = typeof options.__defaultFormatBlock === 'string' ? options.__defaultFormatBlock : DEFAULT_FORMAT_BLOCK).toLowerCase(), options.elementBlacklist);
 	// --- create element whitelist (__defaultElementWhiteList + elementWhitelist + format[line, BrLine, Block, Closureblock, ClosureBrLine] - elementBlacklist)
 	options._editorElementWhitelist = options.elementWhitelist === '*' ? '*' : _createWhitelist(options);
 

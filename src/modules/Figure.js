@@ -52,6 +52,7 @@ const Figure = function (inst, controls, params) {
 		right: this.icons.align_right,
 		center: this.icons.align_center
 	};
+	this.__offset = {};
 	this.__paddingSize = numbers.get(this._w.getComputedStyle(this.context.element.wysiwyg).paddingLeft) || 16;
 	this.__offContainer = OffFigureContainer.bind(this);
 	this.__containerResizing = ContainerResizing.bind(this);
@@ -184,11 +185,13 @@ Figure.prototype = {
 		this.align = target.style.float || target.getAttribute('data-align') || 'none';
 		this.isVertical = /^(90|270)$/.test(Math.abs(target.getAttribute('data-rotate')).toString());
 
+		const eventWysiwyg = this.context.element.eventWysiwyg;
 		const offset = this.offset.get(target);
+		const frameOffset = this.offset.get(this.context.element.wysiwygFrame);
 		const w = (this.isVertical ? target.offsetHeight : target.offsetWidth) - 1;
 		const h = (this.isVertical ? target.offsetWidth : target.offsetHeight) - 1;
-		const t = offset.top;
-		const l = offset.left - this.context.element.wysiwygFrame.scrollLeft;
+		const t = offset.top - (this.options.iframe ? frameOffset.top : 0);
+		const l = offset.left - (this.options.iframe ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - this.context.element.wysiwygFrame.scrollLeft;
 		const originSize = (target.getAttribute('data-origin') || '').split(',');
 		const dataSize = (target.getAttribute('data-size') || '').split(',');
 		const ratio = Figure.GetRatio(dataSize[0] || numbers.get(target.style.width, 2) || w, dataSize[1] || numbers.get(target.style.height, 2) || h, this.sizeUnit);
@@ -222,12 +225,13 @@ Figure.prototype = {
 		this.resizeBorder.style.width = w + 'px';
 		this.resizeBorder.style.height = h + 'px';
 
+		this.__offset = { left: l + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0), top: t + (eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0) };
 		this.editor.opendControllers.push({
 			position: 'none',
 			form: this.resizeDot,
 			target: target,
 			inst: this,
-			_offset: { left: l + (this.context.element.eventWysiwyg.scrollX || this.context.element.eventWysiwyg.scrollLeft || 0), top: t + (this.context.element.eventWysiwyg.scrollY || this.context.element.eventWysiwyg.scrollTop || 0) }
+			notInCarrier: true
 		});
 
 		const size = this.getSize(target);

@@ -1203,8 +1203,13 @@ Editor.prototype = {
 		this._charTypeHTML = options.charCounter_type === 'byte-html';
 		this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
 		this._editorHeight = context.element.wysiwygFrame.offsetHeight;
-		this._editorHeightPadding = numbers.get(this.wwComputedStyle.getPropertyValue('padding-top')) + numbers.get(this.wwComputedStyle.getPropertyValue('padding-bottom'));
-		this.opendControllers = [];
+		this._editorPadding = {
+			left: numbers.get(this.wwComputedStyle.getPropertyValue('padding-left')),
+			right: numbers.get(this.wwComputedStyle.getPropertyValue('padding-right')),
+			top: numbers.get(this.wwComputedStyle.getPropertyValue('padding-top')),
+			bottom: numbers.get(this.wwComputedStyle.getPropertyValue('padding-bottom'))
+		};
+		this._editorHeightPadding = this._editorPadding.top + this._editorPadding.bottom;
 
 		if (!options.iframe && typeof _w.ShadowRoot === 'function') {
 			let child = context.element.wysiwygFrame;

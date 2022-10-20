@@ -42,14 +42,17 @@ require('codemirror5/mode/htmlmixed/htmlmixed');
 import plugins from '../../src/plugins';
 
 window.e = suneditor.create(['#editor1'], {
+	placeholder: 'placeholder',
 	// value: '<h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2>',
 	// textDirection: 'rtl',
-	mode: ['inline', 'balloon-always', 'balloon', 'classic'][1],
-	toolbar_container: document.getElementById('ttt'),
+	// iframe: true,
+	// iframe_fullPage: true,
+	// mode: ['inline', 'balloon-always', 'balloon', 'classic'][1],
+	// toolbar_container: document.getElementById('ttt'),
 	elementBlacklist: 'p',
 	// toolbar_sticky: 60,
 	width: '100%',
-	height: '500px',
+	height: '345',
 	minHeight: '',
 	charCounter: true,
 	// tableCellControllerPosition: 'top',
@@ -94,8 +97,6 @@ window.e = suneditor.create(['#editor1'], {
 			html: '<div class="__se__block"><table><tr><td contenteditable="false">aaaa</td><td><br></td></tr></table></div>'
 		}
 	],
-	// iframe: true,
-	// iframe_fullPage: true,
 	linkRel: ['author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],
 	linkRelDefault: 'noreferrer noopener',
 	linkTargetNewWindow: true,
@@ -104,12 +105,15 @@ window.e = suneditor.create(['#editor1'], {
 	imageResizing: true,
 	plugins: plugins,
 	events: {
-		onBlur: function (a, b, c, d, e) {
-			console.log('blur', a);
-		},
-		onFocus: function () {
-			console.log('focus');
-		}
+		// onBlur: function (a, b, c, d, e) {
+		// 	console.log('blur', a);
+		// },
+		// onFocus: function () {
+		// 	console.log('focus');
+		// },
+		// onload: () => {
+		// 	console.log('onload');
+		// }
 	},
 	// buttonList: [
 	// 	['undo', 'redo'],
@@ -261,11 +265,6 @@ window.e = suneditor.create(['#editor1'], {
 		]
 	]
 });
-
-e.events.onload = () => {
-	console.log('onload');
-	window.scrollTo(0, scrollTo);
-};
 
 // window.e.events.onAudioUpload = () => {
 //     console.log("arg", arguments)

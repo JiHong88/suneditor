@@ -35,7 +35,7 @@ Font.prototype = {
 		const tooltip = this.targetTooltip;
 
 		if (!element) {
-			const font = this.status.hasFocus ? this.wwComputedStyle.fontFamily : this.lang.toolbar.font;
+			const font = this.status.hasFocus ? this.editor.wwComputedStyle.fontFamily : this.lang.toolbar.font;
 			domUtils.changeTxt(target, font);
 			domUtils.changeTxt(tooltip, this.status.hasFocus ? this.lang.toolbar.font + (font ? ' (' + font + ')' : '') : font);
 		} else if (element.style && element.style.fontFamily.length > 0) {

@@ -19,7 +19,6 @@ function CoreInterface(editor) {
 	this.history = editor.history;
 	this.events = editor.events;
 	this.shadowRoot = editor.shadowRoot;
-	this.wwComputedStyle = editor.wwComputedStyle;
 }
 
 export default CoreInterface;

@@ -568,9 +568,7 @@ EventManager.prototype = {
 
 		/** window event */
 		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
-		if (this.options.toolbar_sticky > -1) {
-			this.addEvent(_w, 'scroll', this.toolbar._resetSticky.bind(this.toolbar), false);
-		}
+		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
 	},
 
 	_removeAllEvents: function () {
@@ -612,8 +610,9 @@ EventManager.prototype = {
 
 		const openCont = this.editor.opendControllers;
 		for (let i = 0; i < openCont.length; i++) {
-			openCont[i].form.style.top = openCont[i]._offset.top - y + 'px';
-			openCont[i].form.style.left = openCont[i]._offset.left - x + 'px';
+			openCont[i].form.style.top = openCont[i].inst.__offset.top - y + 'px';
+			openCont[i].form.style.left = openCont[i].inst.__offset.left - x + 'px';
+			this.offset._resetControllerOffset(openCont[i]);
 		}
 
 		if (this.editor.isBalloon) {
@@ -1663,6 +1662,7 @@ function OnBlur_wysiwyg(e) {
 	if (this.editor.isInline || this.editor.isBalloon) this._hideToolbar();
 
 	this._setKeyEffect([]);
+	this.selection.removeRange();
 
 	this.status.currentNodes = [];
 	this.status.currentNodesMap = [];
@@ -1768,6 +1768,7 @@ function DisplayLineBreak(dir, e) {
 
 function OnResize_window() {
 	this.editor._offCurrentController();
+	if (this.editor.isBalloon) this.toolbar.hide();
 
 	if (env.isIE) this.toolbar.resetResponsiveToolbar();
 
@@ -1798,6 +1799,21 @@ function OnResize_window() {
 		this.context.toolbar.main.style.width = this.context.element.topArea.offsetWidth - 2 + 'px';
 		this.toolbar._resetSticky();
 	}
+}
+
+function OnScroll_window() {
+	if (this.options.toolbar_sticky > -1) {
+		this.toolbar._resetSticky();
+	}
+
+	if (this.editor.isBalloon && this.context.toolbar.main.style.display === 'block') {
+		// this.toolbar._setBalloonOffset(this.toolbar._balloonOffset.position === 'top');
+	}
+
+	// const openCont = this.editor.opendControllers;
+	// for (let i = 0; i < openCont.length; i++) {
+	// 	this.offset._resetControllerOffset(openCont[i]);
+	// }
 }
 
 export default EventManager;
