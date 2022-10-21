@@ -170,7 +170,7 @@ Viewer.prototype = {
 			code.style.cssText = _var.codeOriginCssText;
 			toolbar.style.cssText = '';
 			editorArea.style.cssText = _var.editorAreaOriginCssText;
-			topArea.style.cssText = _var.editorOriginCssText;
+			topArea.style.cssText = this.context.element.topArea.style.cssText;
 			this._d.body.style.overflow = _var.bodyOverflow;
 
 			if (this.options.height === 'auto' && !this.options.hasCodeMirror) this._codeViewAutoHeight();
@@ -242,7 +242,7 @@ Viewer.prototype = {
 
 		const contentHTML = this.options.printTemplate ? this.options.printTemplate.replace(/\{\{\s*content\s*\}\}/i, this.editor.getContent(true)) : this.editor.getContent(true);
 		const printDocument = domUtils.getIframeDocument(iframe);
-		const wDoc = this._wd;
+		const wDoc = this.context.element._wd;
 
 		if (this.options.iframe) {
 			const arrts = this.options._printClass !== null ? 'class="' + this.options._printClass + '"' : this.options.iframe_fullPage ? domUtils.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + this.options._editableClass + '"';
@@ -302,7 +302,7 @@ Viewer.prototype = {
 		const contentHTML = this.options.previewTemplate ? this.options.previewTemplate.replace(/\{\{\s*content\s*\}\}/i, this.editor.getContent(true)) : this.editor.getContent(true);
 		const windowObject = this._w.open('', '_blank');
 		windowObject.mimeType = 'text/html';
-		const wDoc = this._wd;
+		const wDoc = this.context.element._wd;
 
 		if (this.options.iframe) {
 			const arrts = this.options._printClass !== null ? 'class="' + this.options._printClass + '"' : this.options.iframe_fullPage ? domUtils.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + this.options._editableClass + '"';
@@ -413,6 +413,7 @@ Viewer.prototype = {
 		const code_html = this._getCodeView();
 
 		if (this.options.iframe_fullPage) {
+			const wDoc = this.context.element._wd;
 			const parseDocument = this.editor._parser.parseFromString(code_html, 'text/html');
 			const headChildren = parseDocument.head.children;
 
@@ -428,18 +429,18 @@ Viewer.prototype = {
 				headers += converter._setIframeCssTags(this.options);
 			}
 
-			this._wd.head.innerHTML = headers;
-			this._wd.body.innerHTML = this.html.clean(parseDocument.body.innerHTML, true, null, null);
+			wDoc.head.innerHTML = headers;
+			wDoc.body.innerHTML = this.html.clean(parseDocument.body.innerHTML, true, null, null);
 
 			const attrs = parseDocument.body.attributes;
 			for (let i = 0, len = attrs.length; i < len; i++) {
 				if (attrs[i].name === 'contenteditable') continue;
-				this._wd.body.setAttribute(attrs[i].name, attrs[i].value);
+				wDoc.body.setAttribute(attrs[i].name, attrs[i].value);
 			}
-			if (!domUtils.hasClass(this._wd.body, 'sun-editor-editable')) {
+			if (!domUtils.hasClass(wDoc.body, 'sun-editor-editable')) {
 				const editableClasses = this.options._editableClass.split(' ');
 				for (let i = 0; i < editableClasses.length; i++) {
-					domUtils.addClass(this._wd.body, this.options._editableClass[i]);
+					domUtils.addClass(wDoc.body, this.options._editableClass[i]);
 				}
 			}
 		} else {
@@ -456,8 +457,8 @@ Viewer.prototype = {
 		let codeValue = '';
 
 		if (this.options.iframe_fullPage) {
-			const attrs = domUtils.getAttributesToString(this._wd.body, null);
-			codeValue = '<!DOCTYPE html>\n<html>\n' + this._wd.head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContent + '</body>\n</html>';
+			const attrs = domUtils.getAttributesToString(this.context.element._wd.body, null);
+			codeValue = '<!DOCTYPE html>\n<html>\n' + this.context.element._wd.head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContent + '</body>\n</html>';
 		} else {
 			codeValue = codeContent;
 		}

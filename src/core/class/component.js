@@ -125,7 +125,7 @@ Component.prototype = {
 	 */
 	_setComponentLineBreaker: function (element) {
 		this.status._lineBreakComp = null;
-		this.editor._lineBreaker.style.display = 'none';
+		this.context.element.lineBreaker.style.display = 'none';
 
 		const ctxEl = this.context.element;
 		const yScroll = ctxEl.wysiwyg.scrollY || ctxEl.wysiwyg.scrollTop || 0;

@@ -1,5 +1,6 @@
 import _icons from '../assets/defaultIcons';
 import _defaultLang from '../langs/en';
+import Context, { CreateContextElement } from './context';
 import { domUtils, numbers, converter, env } from '../helper';
 
 const _d = env._d;
@@ -23,12 +24,8 @@ const Constructor = function (editorTargets, options) {
 	if (typeof options !== 'object') options = {};
 
 	/** --- options --------------------------------------------------------------- */
-	const multiMode = editorTargets.length > 1;
+	options.multiMode = editorTargets.length > 1;
 	InitOptions(options);
-
-	/** --- editor div --------------------------------------------------------------- */
-	const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (options._rtl ? ' se-rtl' : '') });
-	const container = domUtils.createElement('DIV', { class: 'se-container' });
 
 	/** --- carrier wrapper --------------------------------------------------------------- */
 	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper' + (options._rtl ? ' se-rtl' : '') });
@@ -44,74 +41,87 @@ const Constructor = function (editorTargets, options) {
 	// loding box, resizing back
 	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-resizing-back' }));
 	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>'));
-
 	_d.body.appendChild(editor_carrier_wrapper);
 
 	/** --- toolbar --------------------------------------------------------------- */
 	const tool_bar_main = CreateToolBar(options.buttonList, options.plugins, options);
 	const toolbar = tool_bar_main.element;
-	const toolbarShadow = toolbar.cloneNode(false);
-	toolbarShadow.className += ' se-toolbar-shadow';
-	container.appendChild(toolbarShadow);
 	toolbar.style.visibility = 'hidden';
 	if (tool_bar_main.pluginCallButtons.math) _checkKatexMath(options.katex);
+
+	// toolbar mode
+	if (/inline/i.test(options.mode)) {
+		toolbar.className += ' se-toolbar-inline';
+		toolbar.style.width = options.toolbar_width;
+	} else if (/balloon/i.test(options.mode)) {
+		toolbar.className += ' se-toolbar-balloon';
+		toolbar.style.width = options.toolbar_width;
+		toolbar.appendChild(toolBarArrow);
+	}
+
+	/** --- editor div --------------------------------------------------------------- */
+	const elementContext = [];
+	for (let i = 0, len = editorTargets.length; i < len; i++) {
+		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (options._rtl ? ' se-rtl' : '') });
+		const container = domUtils.createElement('DIV', { class: 'se-container' });
+		const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' });
+
+		const toolbarShadow = toolbar.cloneNode(false);
+		toolbarShadow.className += ' se-toolbar-shadow';
+		container.appendChild(toolbarShadow);
+
+		// init element
+		const initElements = _initElements(options, top_div);
+		const bottomBar = initElements.bottomBar;
+		const status_bar = bottomBar.statusbar;
+		const wysiwyg_div = initElements.wysiwygFrame;
+		const placeholder_span = initElements.placeholder;
+		let textarea = initElements.codeView;
+
+		// line breaker
+		const line_breaker = domUtils.createElement('DIV', { class: 'se-line-breaker' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
+		const line_breaker_t = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
+		const line_breaker_b = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
+		line_breaker_t.innerHTML = line_breaker_b.innerHTML = options.icons.line_break;
+		editor_div.appendChild(line_breaker);
+		editor_div.appendChild(line_breaker_t);
+		editor_div.appendChild(line_breaker_b);
+
+		// statusbar
+		const statusbar_container = options.statusbar_container;
+		if (status_bar && statusbar_container) statusbar_container.appendChild(status_bar);
+
+		// append container
+		editor_div.appendChild(textarea);
+		if (placeholder_span) editor_div.appendChild(placeholder_span);
+		container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
+		container.appendChild(editor_div);
+
+		if (status_bar && !statusbar_container) container.appendChild(status_bar);
+		textarea = _checkCodeMirror(options, textarea);
+		top_div.appendChild(container);
+		top_div.setAttribute('data-se-root', i);
+
+		elementContext.push(CreateContextElement(editorTargets[i], top_div, wysiwyg_div, textarea));
+	}
 
 	// toolbar container
 	const toolbar_container = options.toolbar_container;
 	if (toolbar_container) {
-		const _t = top_div.cloneNode(false);
-		const _c = container.cloneNode(false);
-		_c.appendChild(toolbar);
-		_t.appendChild(_c);
-		toolbar_container.appendChild(_t);
-	} else {
+		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (options._rtl ? ' se-rtl' : '') });
+		const container = domUtils.createElement('DIV', { class: 'se-container' });
 		container.appendChild(toolbar);
+		top_div.appendChild(container);
+		toolbar_container.appendChild(top_div);
+	} else {
+		elementContext[0].container.insertBefore(toolbar, elementContext[0].container.firstElementChild);
 	}
 
-	/** --- editor area --------------------------------------------------------------- */
-	const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' });
-
-	// init element
-	const initElements = _initElements(options, top_div, toolbar, domUtils.createElement('DIV', { class: 'se-arrow' }));
-	const bottomBar = initElements.bottomBar;
-	const status_bar = bottomBar.statusbar;
-	const wysiwyg_div = initElements.wysiwygFrame;
-	const placeholder_span = initElements.placeholder;
-	let textarea = initElements.codeView;
-
-	// line breaker
-	const line_breaker = domUtils.createElement('DIV', { class: 'se-line-breaker' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
-	const line_breaker_t = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
-	const line_breaker_b = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
-	line_breaker_t.innerHTML = line_breaker_b.innerHTML = options.icons.line_break;
-	editor_div.appendChild(line_breaker);
-	editor_div.appendChild(line_breaker_t);
-	editor_div.appendChild(line_breaker_b);
-
-	// statusbar
-	const statusbar_container = options.statusbar_container;
-	if (status_bar && statusbar_container) statusbar_container.appendChild(status_bar);
-
-	// append container
-	editor_div.appendChild(textarea);
-	if (placeholder_span) editor_div.appendChild(placeholder_span);
-	container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
-	container.appendChild(editor_div);
-
-	if (status_bar && !statusbar_container) container.appendChild(status_bar);
-	textarea = _checkCodeMirror(options, textarea);
-	top_div.appendChild(container);
-
 	return {
-		constructed: {
-			toolbar: toolbar,
-			top: top_div,
-			wwFrame: wysiwyg_div,
-			codeFrame: textarea,
-			carrierWrapper: editor_carrier_wrapper
-		},
+		commonContext: Context(editorTargets, toolbar, editor_carrier_wrapper, options),
+		elementContext: elementContext,
 		pluginCallButtons: tool_bar_main.pluginCallButtons,
-		_responsiveButtons: tool_bar_main.responsiveButtons
+		responsiveButtons: tool_bar_main.responsiveButtons
 	};
 };
 
@@ -496,23 +506,11 @@ function InitOptions(options) {
  * @description Initialize property of suneditor elements
  * @param {Object} options Options
  * @param {Element} topDiv Suneditor top div
- * @param {Element} toolBar Tool bar
- * @param {Element} toolBarArrow Tool bar arrow (balloon editor)
  * @returns {Object} Bottom bar elements (statusbar, navigation, charWrapper, charCounter)
  */
-function _initElements(options, topDiv, toolBar, toolBarArrow) {
+function _initElements(options, topDiv) {
 	/** top div */
 	topDiv.style.cssText = options._editorStyles.top;
-
-	/** toolbar */
-	if (/inline/i.test(options.mode)) {
-		toolBar.className += ' se-toolbar-inline';
-		toolBar.style.width = options.toolbar_width;
-	} else if (/balloon/i.test(options.mode)) {
-		toolBar.className += ' se-toolbar-balloon';
-		toolBar.style.width = options.toolbar_width;
-		toolBar.appendChild(toolBarArrow);
-	}
 
 	/** editor */
 	// wysiwyg div or iframe

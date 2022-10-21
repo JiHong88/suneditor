@@ -6,20 +6,28 @@ const Figure = function (inst, controls, params) {
 	EditorInterface.call(this, inst.editor);
 
 	// create HTML
-	const resizeDot = (this.resizeDot = CreateHTML_resizeDot());
-	this.resizeBorder = resizeDot.querySelector('.se-resize-dot');
-	this.context.element.editorArea.appendChild(resizeDot);
+	const targetElements = this.context.targetElements;
+	for (let i = 0, len = targetElements.length, main, handles; i < len; i++) {
+		main = CreateHTML_resizeDot();
+		handles = main.querySelectorAll('.se-resize-dot > span');
+		targetElements[i]._figure = {
+			main: main,
+			border: main.querySelector('.se-resize-dot'),
+			display: main.querySelector('.se-resize-display'),
+			handles: handles
+		};
+		targetElements[i].editorArea.appendChild(main);
+		this.eventManager.addEvent(handles, 'mousedown', OnResizeContainer.bind(this));
+	}
+
+	// modules
 	const controllerEl = CreateHTML_controller(inst.editor, controls || []);
 	const alignMenus = CreateAlign(this);
 	this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
-
-	// modules
 	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, inst.constructor.key);
 	this.selectMenu_align = new SelectMenu(this, false, 'bottom-center');
 	this.selectMenu_align.on(this.alignButton, SetMenuAlign.bind(this), { class: 'se-resizing-align-list' });
 	this.selectMenu_align.create(alignMenus.items, alignMenus.html);
-	this.resizeDisplay = resizeDot.querySelector('.se-resize-display');
-	this.resizeHandles = resizeDot.querySelectorAll('.se-resize-dot > span');
 
 	// members
 	this.kind = inst.constructor.key;
@@ -53,7 +61,6 @@ const Figure = function (inst, controls, params) {
 		center: this.icons.align_center
 	};
 	this.__offset = {};
-	this.__paddingSize = numbers.get(this._w.getComputedStyle(this.context.element.wysiwyg).paddingLeft) || 16;
 	this.__offContainer = OffFigureContainer.bind(this);
 	this.__containerResizing = ContainerResizing.bind(this);
 	this.__containerResizingOff = ContainerResizingOff.bind(this);
@@ -65,7 +72,6 @@ const Figure = function (inst, controls, params) {
 
 	// init
 	this.eventManager.addEvent(this.alignButton, 'click', OnClick_alignButton.bind(this));
-	this.eventManager.addEvent(this.resizeHandles, 'mousedown', OnResizeContainer.bind(this));
 };
 
 /**
@@ -215,27 +221,28 @@ Figure.prototype = {
 		this._height = targetInfo.height;
 		if (__fileManagerInfo || this.__fileManagerInfo) return targetInfo;
 
-		this.editor._figureContainer = this.resizeDot;
-		this.resizeDot.style.top = t + 'px';
-		this.resizeDot.style.left = l + 'px';
-		this.resizeDot.style.width = w + 'px';
-		this.resizeDot.style.height = h + 'px';
-		this.resizeBorder.style.top = '0px';
-		this.resizeBorder.style.left = '0px';
-		this.resizeBorder.style.width = w + 'px';
-		this.resizeBorder.style.height = h + 'px';
+		const _figure = this.context.element._figure;
+		this.editor._figureContainer = _figure.main;
+		_figure.main.style.top = t + 'px';
+		_figure.main.style.left = l + 'px';
+		_figure.main.style.width = w + 'px';
+		_figure.main.style.height = h + 'px';
+		_figure.border.style.top = '0px';
+		_figure.border.style.left = '0px';
+		_figure.border.style.width = w + 'px';
+		_figure.border.style.height = h + 'px';
 
 		this.__offset = { left: l + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0), top: t + (eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0) };
 		this.editor.opendControllers.push({
 			position: 'none',
-			form: this.resizeDot,
+			form: _figure.main,
 			target: target,
 			inst: this,
 			notInCarrier: true
 		});
 
 		const size = this.getSize(target);
-		domUtils.changeTxt(this.resizeDisplay, this.lang.modalBox[this.align === 'none' ? 'basic' : this.align] + ' (' + (size.w || 'auto') + ', ' + (size.h || 'auto') + ')');
+		domUtils.changeTxt(this.context.element._figure.display, this.lang.modalBox[this.align === 'none' ? 'basic' : this.align] + ' (' + (size.w || 'auto') + ', ' + (size.h || 'auto') + ')');
 		this._displayResizeHandles(!nonResizing);
 
 		// percentage active
@@ -257,8 +264,8 @@ Figure.prototype = {
 			}
 		}
 
-		this.resizeDot.style.display = 'block';
-		this.controller.open(this.resizeDot, null, this.__offContainer);
+		_figure.main.style.display = 'block';
+		this.controller.open(_figure.main, null, this.__offContainer);
 
 		// set members
 		domUtils.addClass(this._cover, 'se-figure-selected');
@@ -674,15 +681,16 @@ Figure.prototype = {
 		display = !display ? 'none' : 'flex';
 		this.controller.form.style.display = display;
 
-		for (let i = 0, len = this.resizeHandles.length; i < len; i++) {
-			this.resizeHandles[i].style.display = display;
+		const resizeHandles = this.context.element._figure.handles;
+		for (let i = 0, len = resizeHandles.length; i < len; i++) {
+			resizeHandles[i].style.display = display;
 		}
 
 		if (display === 'none') {
-			domUtils.addClass(this.resizeDot, 'se-resize-ing');
+			domUtils.addClass(this.context.element._figure.main, 'se-resize-ing');
 			this.__onResizeESCEvent = this.eventManager.addGlobalEvent('keydown', this.__containerResizingESC);
 		} else {
-			domUtils.removeClass(this.resizeDot, 'se-resize-ing');
+			domUtils.removeClass(this.context.element._figure.main, 'se-resize-ing');
 		}
 	},
 
@@ -721,7 +729,7 @@ function OnResizeContainer(e) {
 	const direction = (this._resize_direction = e.target.classList[0]);
 	this._resizeClientX = e.clientX;
 	this._resizeClientY = e.clientY;
-	this.resizeDot.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
+	this.context.element._figure.main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
 	this.context._resizeBackground.style.cursor = DIRECTION_CURSOR_MAP[direction];
 	this.context._resizeBackground.style.display = 'block';
 
@@ -741,26 +749,27 @@ function ContainerResizing(e) {
 	let w = this._element_w + (/r/.test(direction) ? clientX - this._resizeClientX : this._resizeClientX - clientX);
 	let h = this._element_h + (/b/.test(direction) ? clientY - this._resizeClientY : this._resizeClientY - clientY);
 	const wh = (this._element_h / this._element_w) * w;
+	const resizeBorder = this.context.element._figure.border;
 
-	if (/t/.test(direction)) this.resizeBorder.style.top = this._element_h - (/h/.test(direction) ? h : wh) + 'px';
-	if (/l/.test(direction)) this.resizeBorder.style.left = this._element_w - w + 'px';
+	if (/t/.test(direction)) resizeBorder.style.top = this._element_h - (/h/.test(direction) ? h : wh) + 'px';
+	if (/l/.test(direction)) resizeBorder.style.left = this._element_w - w + 'px';
 
 	if (/r|l/.test(direction)) {
-		this.resizeBorder.style.width = w + 'px';
+		resizeBorder.style.width = w + 'px';
 		resultW = w;
 	}
 
 	if (/^(t|b)[^h]$/.test(direction)) {
-		this.resizeBorder.style.height = wh + 'px';
+		resizeBorder.style.height = wh + 'px';
 		resultH = wh;
 	} else if (/^(t|b)h$/.test(direction)) {
-		this.resizeBorder.style.height = h + 'px';
+		resizeBorder.style.height = h + 'px';
 		resultH = h;
 	}
 
 	this._resize_w = /h$/.test(direction) ? this._width : this._w.Math.round(resultW);
 	this._resize_h = /w$/.test(direction) ? this._height : this._w.Math.round(resultH);
-	domUtils.changeTxt(this.resizeDisplay, this._resize_w + ' x ' + this._resize_h);
+	domUtils.changeTxt(this.context.element._figure.display, this._resize_w + ' x ' + this._resize_h);
 }
 
 function ContainerResizingOff() {
@@ -773,7 +782,7 @@ function ContainerResizingOff() {
 	h = this._w.Math.round(h) || h;
 
 	if (!this.isVertical && !/%$/.test(w)) {
-		const limit = this.context.element.wysiwygFrame.clientWidth - this.__paddingSize * 2 - 2;
+		const limit = this.context.element.wysiwygFrame.clientWidth - this._editorPadding.left + this._editorPadding.right - 2;
 		if (numbers.get(w, 0) > limit) {
 			h = this._w.Math.round((h / w) * limit);
 			w = limit;
@@ -816,7 +825,7 @@ function CreateAlign(editor) {
 }
 
 function OffFigureContainer() {
-	this.resizeDot.style.display = 'none';
+	this.context.element._figure.main.style.display = 'none';
 	this.editor._figureContainer = null;
 	this.inst.init();
 }

@@ -30,10 +30,12 @@ import Toolbar from './class/toolbar';
  * @returns {Object}
  */
 const Editor = function (editorTargets, options) {
-	const product = Constructor(editorTargets, options);
-	const context = Context(editorTargets, product.constructed.toolbar, product.constructed.top, product.constructed.wwFrame, product.constructed.codeFrame, product.constructed.carrierWrapper, options);
-	const _d = editorTargets.ownerDocument || env._d;
+	const _d = editorTargets[0].ownerDocument || env._d;
 	const _w = _d.defaultView || env._w;
+	const product = Constructor(editorTargets, options);
+	const context = product.commonContext;
+	context.targetElements = product.elementContext;
+	context.element = product.elementContext[0];
 
 	/**
 	 * @description Document object
@@ -48,22 +50,10 @@ const Editor = function (editorTargets, options) {
 	this._w = _w;
 
 	/**
-	 * @description Document object of the iframe if created as an iframe || _d
-	 * @type {Document}
-	 */
-	this._wd = null;
-
-	/**
-	 * @description Window object of the iframe if created as an iframe || _w
-	 * @type {Window}
-	 */
-	this._ww = null;
-
-	/**
 	 * @description Editor options
 	 * @type {Object.<string, any>}
 	 */
-	this.options = context.options;
+	this.options = options;
 
 	/**
 	 * @description Plugins
@@ -133,7 +123,6 @@ const Editor = function (editorTargets, options) {
 		currentNodesMap: [],
 		_range: null,
 		_selectionNode: null,
-		_minHeight: numbers.get(context.element.wysiwygFrame.style.minHeight || '65', 0),
 		_resizeClientY: 0,
 		_lineBreakComp: null,
 		_lineBreakDir: ''
@@ -199,18 +188,19 @@ const Editor = function (editorTargets, options) {
 	 * @description Controller, modal relative
 	 * @private
 	 */
+	this.opendModal = null;
 	this.opendControllers = [];
 	this.currentControllerName = '';
 	this.currentControllerTarget = null;
 	this._controllerOnDisabledButtons = [];
 	this._codeViewDisabledButtons = [];
-	this.opendModal = null;
+	this._controllerTargetContext = null;
 
 	/**
 	 * @description Button List in Responsive Toolbar.
 	 * @private
 	 */
-	this._responsiveButtons = product._responsiveButtons;
+	this._responsiveButtons = product.responsiveButtons;
 
 	/**
 	 * @description Property related to rtl and ltr conversions.
@@ -236,12 +226,6 @@ const Editor = function (editorTargets, options) {
 	 * @private
 	 */
 	this._antiBlur = false;
-
-	/**
-	 * @description Component line breaker element
-	 * @private
-	 */
-	this._lineBreaker = null;
 
 	/**
 	 * @description If true, (initialize, reset) all indexes of image, video information
@@ -355,7 +339,6 @@ const Editor = function (editorTargets, options) {
 	 * @description FullScreen and codeView relative status
 	 */
 	this._transformStatus = {
-		editorOriginCssText: context.element.topArea.style.cssText,
 		bodyOverflow: '',
 		editorAreaOriginCssText: '',
 		wysiwygOriginCssText: '',
@@ -373,31 +356,28 @@ const Editor = function (editorTargets, options) {
 	this._parser = new _w.DOMParser();
 
 	/** ----- Create editor ------------------------------------------------------------ */
-	// Create to sibling node
-	const ctxEl = context.element;
-	const originEl = ctxEl.originElement;
-	const topEl = ctxEl.topArea;
-	originEl.style.display = 'none';
-	topEl.style.display = 'block';
+	this._editorInit(false);
+	const inst = this;
+	const els = context.targetElements;
+	for (let i = 0, len = els.length, e, o, t; i < len; i++) {
+		e = els[i];
+		o = e.originElement;
+		t = e.topArea;
+		o.style.display = 'none';
+		t.style.display = 'block';
+		o.parentNode.insertBefore(t, o.nextElementSibling);
+		e.editorArea.appendChild(e.wysiwygFrame);
 
-	// insert editor element
-	if (typeof originEl.nextElementSibling === 'object') {
-		originEl.parentNode.insertBefore(topEl, originEl.nextElementSibling);
-	} else {
-		originEl.parentNode.appendChild(topEl);
-	}
-
-	ctxEl.editorArea.appendChild(ctxEl.wysiwygFrame);
-
-	// init
-	if (!options.iframe) {
-		this._editorInit(false, options.value);
-	} else {
-		const inst = this;
-		ctxEl.wysiwygFrame.addEventListener('load', function () {
-			converter._setIframeDocument(this, options);
-			inst._editorInit(false, options.value);
-		});
+		if (!options.iframe) {
+			inst._setEditorParams(e);
+			inst._initWysiwygArea(e, false, options.value);
+		} else {
+			e.wysiwygFrame.addEventListener('load', function () {
+				converter._setIframeDocument(this, options);
+				inst._setEditorParams(e);
+				inst._initWysiwygArea(e, false, options.value);
+			});
+		}
 	}
 };
 
@@ -611,7 +591,7 @@ Editor.prototype = {
 	 * @param {string|undefined} value javascript execCommand function property
 	 */
 	execCommand: function (command, showDefaultUI, value) {
-		this._wd.execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
+		this.context.element._wd.execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
 		// history stack
 		this.history.push(true);
 	},
@@ -735,8 +715,8 @@ Editor.prototype = {
 	 */
 	setFullPageContent: function (ctx) {
 		if (!this.options.iframe) return false;
-		if (ctx.head) this._wd.head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
-		if (ctx.body) this._wd.body.innerHTML = this.html.clean(ctx.body, true, null, null);
+		if (ctx.head) this.context.element._wd.head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
+		if (ctx.body) this.context.element._wd.body.innerHTML = this.html.clean(ctx.body, true, null, null);
 	},
 
 	/**
@@ -758,8 +738,8 @@ Editor.prototype = {
 
 		if (this.options.iframe_fullPage) {
 			if (includeFullPage) {
-				const attrs = domUtils.getAttributesToString(this._wd.body, ['contenteditable']);
-				return '<!DOCTYPE html><html>' + this._wd.head.outerHTML + '<body ' + attrs + '>' + renderHTML.innerHTML + '</body></html>';
+				const attrs = domUtils.getAttributesToString(this.context.element._wd.body, ['contenteditable']);
+				return '<!DOCTYPE html><html>' + this.context.element._wd.head.outerHTML + '<body ' + attrs + '>' + renderHTML.innerHTML + '</body></html>';
 			} else {
 				return renderHTML.innerHTML;
 			}
@@ -1185,24 +1165,13 @@ Editor.prototype = {
 		}
 	},
 
-	/**
-	 * @description Initializ core variable
-	 * @param {boolean} reload Is relooad?
-	 * @param {string} _initHTML initial html string
-	 * @private
-	 */
-	_init: function (reload, _initHTML) {
-		const _w = this._w;
-		const wRegExp = _w.RegExp;
+	_setEditorParams: function (e) {
 		const options = this.options;
-		const context = this.context;
-		const plugins = this.plugins;
+		const _w = this._w;
 
-		this._ww = options.iframe ? context.element.wysiwygFrame.contentWindow : _w;
-		this._wd = this._d;
 		this._charTypeHTML = options.charCounter_type === 'byte-html';
-		this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
-		this._editorHeight = context.element.wysiwygFrame.offsetHeight;
+		this.wwComputedStyle = _w.getComputedStyle(e.wysiwyg);
+		this._editorHeight = e.wysiwygFrame.offsetHeight;
 		this._editorPadding = {
 			left: numbers.get(this.wwComputedStyle.getPropertyValue('padding-left')),
 			right: numbers.get(this.wwComputedStyle.getPropertyValue('padding-right')),
@@ -1212,7 +1181,7 @@ Editor.prototype = {
 		this._editorHeightPadding = this._editorPadding.top + this._editorPadding.bottom;
 
 		if (!options.iframe && typeof _w.ShadowRoot === 'function') {
-			let child = context.element.wysiwygFrame;
+			let child = e.wysiwygFrame;
 			while (child) {
 				if (child.shadowRoot) {
 					this.shadowRoot = child.shadowRoot;
@@ -1227,22 +1196,30 @@ Editor.prototype = {
 
 		// set modes
 		this.isInline = /inline/i.test(options.mode);
-		this.isBalloon = /balloon|balloon-always/i.test(options.mode);
+		this.isBalloon = /balloon/i.test(options.mode);
 		this.isBalloonAlways = /balloon-always/i.test(options.mode);
 
-		// cache editor's element
-		this._transformStatus.editorOriginCssText = context.element.topArea.style.cssText;
-		this._placeholder = context.element.placeholder;
-		this._lineBreaker = context.element.lineBreaker;
-
-		// Init, validate
-		if (options.iframe) {
-			this._wd = context.element.wysiwygFrame.contentDocument;
-			context.element.wysiwyg = this._wd.body;
-			if (options._editorStyles.editor) context.element.wysiwyg.style.cssText = options._editorStyles.editor;
-			if (options.height === 'auto') this._iframeAuto = this._wd.body;
+		// wisywig attributes
+		const attr = this.options.frameAttrbutes;
+		for (let k in attr) {
+			e.wysiwyg.setAttribute(k, attr[k]);
 		}
 
+		// init, validate
+		e._ww = options.iframe ? e.wysiwygFrame.contentWindow : _w;
+		e._wd = this._d;
+		if (options.iframe) {
+			e._wd = e.wysiwygFrame.contentDocument;
+			e.wysiwyg = e._wd.body;
+			if (options._editorStyles.editor) e.wysiwyg.style.cssText = options._editorStyles.editor;
+			if (options.height === 'auto') this._iframeAuto = e._wd.body;
+		}
+
+		// add events
+		this.eventManager._addEvent(e);
+	},
+
+	_registerClass: function () {
 		// base
 		this.events = this.options.events;
 		this.history = History(this, this._onChange_historyStack.bind(this));
@@ -1275,73 +1252,6 @@ Editor.prototype = {
 		ClassInterface.call(this.toolbar, this);
 		ClassInterface.call(this.char, this);
 		ClassInterface.call(this.menu, this);
-
-		// file components
-		this._fileInfoPluginsCheck = [];
-		this._fileInfoPluginsReset = [];
-
-		// text components
-		this._MELInfo = {
-			query: '',
-			map: {}
-		};
-
-		// caching buttons
-		this._cachingButtons();
-
-		// plugins install
-		// Command and file plugins registration
-		this.activePlugins = [];
-		this._onMousedownPlugins = [];
-		this._onKeyDownPlugins = [];
-		this._fileManager.tags = [];
-		this._fileManager.pluginMap = {};
-
-		const managedClass = [];
-		let filePluginRegExp = [];
-		let plugin;
-		for (let key in plugins) {
-			if (!plugins.hasOwnProperty(key)) continue;
-			this.registerPlugin(key, this._pluginCallButtons[key]);
-			plugin = this.plugins[key];
-
-			// Filemanager
-			if (typeof plugin.__fileManagement === 'object') {
-				const fm = plugin.__fileManagement;
-				this._fileInfoPluginsCheck.push(fm._checkInfo.bind(fm));
-				this._fileInfoPluginsReset.push(fm._resetInfo.bind(fm));
-				if (_w.Array.isArray(fm.tagNames)) {
-					const tagNames = fm.tagNames;
-					this._fileManager.tags = this._fileManager.tags.concat(tagNames);
-					filePluginRegExp.push(key);
-					for (let tag = 0, tLen = tagNames.length; tag < tLen; tag++) {
-						this._fileManager.pluginMap[tagNames[tag].toLowerCase()] = key;
-					}
-				}
-			}
-
-			if (typeof plugin.onPluginMousedown === 'function') {
-				this._onMousedownPlugins.push(plugin.onPluginMousedown.bind(plugin));
-			}
-
-			if (typeof plugin.onPluginKeyDown === 'function') {
-				this._onKeyDownPlugins.push(plugin.onPluginKeyDown.bind(plugin));
-			}
-
-			if (plugin.preservedClass) {
-				const info = plugin.preservedClass();
-				managedClass.push('.' + info.className);
-				this._MELInfo.map[info.className] = info.method;
-			}
-		}
-
-		this._MELInfo.query = managedClass.toString();
-		this._fileManager.queryString = this._fileManager.tags.join(',');
-		this._fileManager.regExp = new wRegExp('^(' + (this._fileManager.tags.join('|') || '\\^') + ')$', 'i');
-		this._fileManager.pluginRegExp = new wRegExp('^(' + (filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')) + ')$', 'i');
-
-		// init content
-		this._initWysiwygArea(reload, _initHTML);
 	},
 
 	/**
@@ -1411,8 +1321,10 @@ Editor.prototype = {
 	 * @param {string} _initHTML initial html string
 	 * @private
 	 */
-	_initWysiwygArea: function (reload, _initHTML) {
-		this.context.element.wysiwyg.innerHTML = reload ? _initHTML : this.html.clean(typeof _initHTML === 'string' ? _initHTML : this.context.element.originElement.value, true, null, null);
+	_initWysiwygArea: function (e, reload, _initHTML) {
+		e.wysiwyg.innerHTML = reload ? _initHTML : this.html.clean(typeof _initHTML === 'string' ? _initHTML : e.originElement.value, true, null, null);
+		this.context.element = e;
+		e.charCounter.textContent = this.char.getLength();
 	},
 
 	/**
@@ -1481,17 +1393,18 @@ Editor.prototype = {
 	 * @private
 	 */
 	_checkPlaceholder: function () {
-		if (this._placeholder) {
+		let placeholder;
+		if ((placeholder = this.context.element.placeholder)) {
 			if (this.status.isCodeView) {
-				this._placeholder.style.display = 'none';
+				placeholder.style.display = 'none';
 				return;
 			}
 
 			const wysiwyg = this.context.element.wysiwyg;
 			if (!domUtils.isZeroWith(wysiwyg.textContent) || wysiwyg.querySelector(domUtils._allowedEmptyNodeList) || (wysiwyg.innerText.match(/\n/g) || '').length > 1) {
-				this._placeholder.style.display = 'none';
+				placeholder.style.display = 'none';
 			} else {
-				this._placeholder.style.display = 'block';
+				placeholder.style.display = 'block';
 			}
 		}
 	},
@@ -1521,29 +1434,22 @@ Editor.prototype = {
 	/**
 	 * @description Initializ editor
 	 * @param {boolean} reload Is relooad?
-	 * @param {string} _initHTML initial html string
 	 * @private
 	 */
-	_editorInit: function (reload, _initHTML) {
+	_editorInit: function (reload) {
 		// initialize core and add event listeners
-		this._init(reload, _initHTML);
-		this.eventManager._addEvent();
-		this.char.display();
+		this._init();
 		this.toolbar._offSticky();
 		this.toolbar._resetSticky();
 
 		// toolbar visibility
 		this.context.toolbar.main.style.visibility = '';
-		// wisywig attributes
-		const attr = this.options.frameAttrbutes;
-		for (let k in attr) {
-			this.context.element.wysiwyg.setAttribute(k, attr[k]);
-		}
 
-		this._checkComponents();
 		this._componentsInfoInit = false;
 		this._componentsInfoReset = false;
+		this._checkComponents();
 
+		this.eventManager._addCommonEvent();
 		this.history.reset(true);
 
 		this._w.setTimeout(
@@ -1557,6 +1463,77 @@ Editor.prototype = {
 				if (typeof this.events.onload === 'function') this.events.onload(reload);
 			}.bind(this)
 		);
+	},
+
+	/**
+	 * @description Initializ core variable
+	 * @private
+	 */
+	_init: function () {
+		this._registerClass();
+		this._cachingButtons();
+
+		// file components
+		this._fileInfoPluginsCheck = [];
+		this._fileInfoPluginsReset = [];
+
+		// text components
+		this._MELInfo = {
+			query: '',
+			map: {}
+		};
+
+		// Command and file plugins registration
+		this.activePlugins = [];
+		this._onMousedownPlugins = [];
+		this._onKeyDownPlugins = [];
+		this._fileManager.tags = [];
+		this._fileManager.pluginMap = {};
+
+		const plugins = this.plugins;
+		const isArray = this._w.Array.isArray;
+		const managedClass = [];
+		let filePluginRegExp = [];
+		let plugin;
+		for (let key in plugins) {
+			if (!plugins.hasOwnProperty(key)) continue;
+			this.registerPlugin(key, this._pluginCallButtons[key]);
+			plugin = this.plugins[key];
+
+			// Filemanager
+			if (typeof plugin.__fileManagement === 'object') {
+				const fm = plugin.__fileManagement;
+				this._fileInfoPluginsCheck.push(fm._checkInfo.bind(fm));
+				this._fileInfoPluginsReset.push(fm._resetInfo.bind(fm));
+				if (isArray(fm.tagNames)) {
+					const tagNames = fm.tagNames;
+					this._fileManager.tags = this._fileManager.tags.concat(tagNames);
+					filePluginRegExp.push(key);
+					for (let tag = 0, tLen = tagNames.length; tag < tLen; tag++) {
+						this._fileManager.pluginMap[tagNames[tag].toLowerCase()] = key;
+					}
+				}
+			}
+
+			if (typeof plugin.onPluginMousedown === 'function') {
+				this._onMousedownPlugins.push(plugin.onPluginMousedown.bind(plugin));
+			}
+
+			if (typeof plugin.onPluginKeyDown === 'function') {
+				this._onKeyDownPlugins.push(plugin.onPluginKeyDown.bind(plugin));
+			}
+
+			if (plugin.preservedClass) {
+				const info = plugin.preservedClass();
+				managedClass.push('.' + info.className);
+				this._MELInfo.map[info.className] = info.method;
+			}
+		}
+
+		this._MELInfo.query = managedClass.toString();
+		this._fileManager.queryString = this._fileManager.tags.join(',');
+		this._fileManager.regExp = new this._w.RegExp('^(' + (this._fileManager.tags.join('|') || '\\^') + ')$', 'i');
+		this._fileManager.pluginRegExp = new this._w.RegExp('^(' + (filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')) + ')$', 'i');
 	},
 
 	_fixCurrentController: function (fixed) {

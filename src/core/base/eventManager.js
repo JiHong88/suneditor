@@ -18,12 +18,9 @@ const EventManager = function (editor) {
 	this._onButtonsCheck = new _w.RegExp('^(' + _w.Object.keys(editor.options._styleNodeMap).join('|') + ')$', 'i');
 	this._onShortcutKey = false;
 	this._IEisComposing = false; // In IE, there is no 'e.isComposing' in the key-up event.
-	this._lineBreakerButton = editor._lineBreaker.querySelector('button');
 	this._balloonDelay = null;
 	this._resizeObserver = null;
 	this._toolbarObserver = null;
-	this._lineBreaker_t = this.context.element.lineBreaker_t;
-	this._lineBreaker_b = this.context.element.lineBreaker_b;
 	this._onMousedownPlugins = editor._onMousedownPlugins;
 	this._onKeyDownPlugins = editor._onKeyDownPlugins;
 	this.__resize_editor = null;
@@ -68,7 +65,7 @@ EventManager.prototype = {
 	 */
 	addGlobalEvent: function (type, listener, useCapture) {
 		if (this.options.iframe) {
-			this._ww.addEventListener(type, listener, useCapture);
+			this.context.element._ww.addEventListener(type, listener, useCapture);
 		}
 		this._w.addEventListener(type, listener, useCapture);
 		return { type: type, listener: listener, useCapture: useCapture };
@@ -88,7 +85,7 @@ EventManager.prototype = {
 			type = type.type;
 		}
 		if (this.options.iframe) {
-			this._ww.removeEventListener(type, listener, useCapture);
+			this.context.element._ww.removeEventListener(type, listener, useCapture);
 		}
 		this._w.removeEventListener(type, listener, useCapture);
 	},
@@ -388,8 +385,8 @@ EventManager.prototype = {
 	_setDropLocationSelection: function (e) {
 		if (e.rangeParent) {
 			this.selection.setRange(e.rangeParent, e.rangeOffset, e.rangeParent, e.rangeOffset);
-		} else if (this._wd.caretRangeFromPoint) {
-			const r = this._wd.caretRangeFromPoint(e.clientX, e.clientY);
+		} else if (this.context.element._wd.caretRangeFromPoint) {
+			const r = this.context.element._wd.caretRangeFromPoint(e.clientX, e.clientY);
 			this.selection.setRange(r.startContainer, r.startOffset, r.endContainer, r.endOffset);
 		} else {
 			const r = this.selection.getRange();
@@ -490,8 +487,20 @@ EventManager.prototype = {
 		}
 	},
 
-	_addEvent: function () {
-		const eventWysiwyg = (this.context.element.eventWysiwyg = this.options.iframe ? this._ww : this.context.element.wysiwyg);
+	_addCommonEvent: function () {
+		/** toolbar event */
+		const toolbarHandler = ToolbarButtonsHandler.bind(this);
+		this.addEvent(this.context.toolbar.main, 'mousedown', toolbarHandler, false);
+		this.addEvent(this.context.toolbar._menuTray, 'mousedown', toolbarHandler, false);
+		this.addEvent(this.context.toolbar.main, 'click', OnClick_toolbar.bind(this), false);
+
+		/** window event */
+		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
+		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
+	},
+
+	_addEvent: function (e) {
+		const eventWysiwyg = (e.eventWysiwyg = this.options.iframe ? e._ww : e.wysiwyg);
 		if (!env.isIE) {
 			this._resizeObserver = new _w.ResizeObserver(
 				function (entries) {
@@ -499,12 +508,6 @@ EventManager.prototype = {
 				}.bind(this)
 			);
 		}
-
-		/** toolbar event */
-		const toolbarHandler = ToolbarButtonsHandler.bind(this);
-		this.addEvent(this.context.toolbar.main, 'mousedown', toolbarHandler, false);
-		this.addEvent(this.context.toolbar._menuTray, 'mousedown', toolbarHandler, false);
-		this.addEvent(this.context.toolbar.main, 'click', OnClick_toolbar.bind(this), false);
 
 		/** editor area */
 		const wwMouseDown = OnMouseDown_wysiwyg.bind(this);
@@ -518,8 +521,9 @@ EventManager.prototype = {
 		this.addEvent(eventWysiwyg, 'cut', OnCut_wysiwyg.bind(this), false);
 		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this), false);
 		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, eventWysiwyg), false);
-		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this, e.topArea.getAttribute('data-se-root')), false);
 		this.addEvent(eventWysiwyg, 'blur', OnBlur_wysiwyg.bind(this), false);
+		this.addEvent(e.topArea, 'mouseenter', OnMouseIn_editor.bind(this, e.topArea.getAttribute('data-se-root')), false);
 
 		/** line breaker */
 		this.addEvent(eventWysiwyg, 'mousemove', OnMouseMove_wysiwyg.bind(this), false);
@@ -532,8 +536,8 @@ EventManager.prototype = {
 			false
 		);
 		this.addEvent(this._lineBreakerButton, 'click', DisplayLineBreak.bind(this, ''), false);
-		this.addEvent(this.context.element.lineBreaker_t, 'mousedown', DisplayLineBreak.bind(this, 't'), false);
-		this.addEvent(this.context.element.lineBreaker_b, 'mousedown', DisplayLineBreak.bind(this, 'b'), false);
+		this.addEvent(e.lineBreaker_t, 'mousedown', DisplayLineBreak.bind(this, 't'), false);
+		this.addEvent(e.lineBreaker_b, 'mousedown', DisplayLineBreak.bind(this, 'b'), false);
 
 		/** Events are registered only when there is a table plugin.  */
 		if (this.plugins.table) {
@@ -546,17 +550,17 @@ EventManager.prototype = {
 		/** code view area auto line */
 		if (this.options.height === 'auto' && !this.options.hasCodeMirror) {
 			const cvAuthHeight = this.editor._codeViewAutoHeight.bind(this.editor);
-			this.addEvent(this.context.element.code, 'keydown', cvAuthHeight, false);
-			this.addEvent(this.context.element.code, 'keyup', cvAuthHeight, false);
-			this.addEvent(this.context.element.code, 'paste', cvAuthHeight, false);
+			this.addEvent(e.code, 'keydown', cvAuthHeight, false);
+			this.addEvent(e.code, 'keyup', cvAuthHeight, false);
+			this.addEvent(e.code, 'paste', cvAuthHeight, false);
 		}
 
 		/** statusbar */
-		if (this.context.element.statusbar) {
+		if (e.statusbar) {
 			if (/\d+/.test(this.options.height) && this.options.statusbar_resizeEnable) {
-				this.addEvent(this.context.element.statusbar, 'mousedown', OnMouseDown_statusbar.bind(this), false);
+				this.addEvent(e.statusbar, 'mousedown', OnMouseDown_statusbar.bind(this), false);
 			} else {
-				domUtils.addClass(this.context.element.statusbar, 'se-resizing-none');
+				domUtils.addClass(e.statusbar, 'se-resizing-none');
 			}
 		}
 
@@ -565,10 +569,6 @@ EventManager.prototype = {
 
 		/** responsive toolbar observer */
 		if (!env.isIE) this._toolbarObserver = new _w.ResizeObserver(this.toolbar.resetResponsiveToolbar.bind(this.toolbar));
-
-		/** window event */
-		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
-		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
 	},
 
 	_removeAllEvents: function () {
@@ -591,6 +591,15 @@ EventManager.prototype = {
 	},
 
 	_moveContainer: function (eventWysiwyg) {
+		if (this.editor.isBalloon) {
+			this.context.toolbar.main.style.top = this.toolbar._balloonOffset.top - y + 'px';
+			this.context.toolbar.main.style.left = this.toolbar._balloonOffset.left - x + 'px';
+		}
+
+		if (this.editor._controllerTargetContext !== this.context.element.topArea) {
+			this.editor._offCurrentController();
+		}
+
 		const y = eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0;
 		const x = eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0;
 
@@ -614,11 +623,13 @@ EventManager.prototype = {
 			openCont[i].form.style.left = openCont[i].inst.__offset.left - x + 'px';
 			this.offset._resetControllerOffset(openCont[i]);
 		}
+	},
 
-		if (this.editor.isBalloon) {
-			this.context.toolbar.main.style.top = this.toolbar._balloonOffset.top - y + 'px';
-			this.context.toolbar.main.style.left = this.toolbar._balloonOffset.left - x + 'px';
-		}
+	_changeContextElement: function (rootKey) {
+		const el = (this.context.element = this.context.targetElements[rootKey]);
+		this._lineBreakerButton = el.lineBreaker.querySelector('button');
+		this._lineBreaker_t = el.lineBreaker_t;
+		this._lineBreaker_b = el.lineBreaker_b;
 	},
 
 	constructor: EventManager
@@ -1637,15 +1648,20 @@ function OnCut_wysiwyg(e) {
 
 function OnScroll_wysiwyg(eventWysiwyg, e) {
 	this._moveContainer(eventWysiwyg);
-
 	// user event
 	if (typeof this.events.onScroll === 'function') this.events.onScroll(e);
 }
 
-function OnFocus_wysiwyg(e) {
+function OnMouseIn_editor(rootKey) {
+	this._changeContextElement(rootKey);
+}
+
+function OnFocus_wysiwyg(rootKey, e) {
 	if (this.editor._antiBlur) return;
 	this.status.hasFocus = true;
-	_w.setTimeout(this.applyTagEffect.bind(this));
+
+	this._changeContextElement(rootKey);
+	this._w.setTimeout(this.applyTagEffect.bind(this));
 
 	if (this.editor.isInline) this.toolbar._showInline();
 
@@ -1676,7 +1692,7 @@ function OnMouseMove_wysiwyg(e) {
 	if (this.status.isDisabled || this.status.isReadOnly) return false;
 
 	const component = domUtils.getParentElement(e.target, this.component.is);
-	const lineBreakerStyle = this.editor._lineBreaker.style;
+	const lineBreakerStyle = this.context.element.lineBreaker.style;
 
 	if (component && !this.editor.currentControllerName) {
 		const ctxEl = this.context.element;
@@ -1730,7 +1746,7 @@ function OnMouseDown_statusbar(e) {
 
 function __resizeEditor(e) {
 	const resizeInterval = this.context.element.editorArea.offsetHeight + (e.clientY - this.status._resizeClientY);
-	const h = resizeInterval < this.status._minHeight ? this.status._minHeight : resizeInterval;
+	const h = resizeInterval < this.context.element._minHeight ? this.context.element._minHeight : resizeInterval;
 	this.context.element.wysiwygFrame.style.height = this.context.element.code.style.height = h + 'px';
 	this.status._resizeClientY = e.clientY;
 	if (env.isIE) this.editor.__callResizeFunction(h, null);
@@ -1756,7 +1772,7 @@ function DisplayLineBreak(dir, e) {
 	if (this.options.charCounter_type === 'byte-html' && !this.char.check(format.outerHTML)) return;
 
 	component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
-	this.editor._lineBreaker.style.display = 'none';
+	this.context.element.lineBreaker.style.display = 'none';
 	this.status._lineBreakComp = null;
 
 	const focusEl = isList ? format : format.firstChild;
@@ -1807,13 +1823,8 @@ function OnScroll_window() {
 	}
 
 	if (this.editor.isBalloon && this.context.toolbar.main.style.display === 'block') {
-		// this.toolbar._setBalloonOffset(this.toolbar._balloonOffset.position === 'top');
+		this.toolbar._setBalloonOffset(this.toolbar._balloonOffset.position === 'top');
 	}
-
-	// const openCont = this.editor.opendControllers;
-	// for (let i = 0; i < openCont.length; i++) {
-	// 	this.offset._resetControllerOffset(openCont[i]);
-	// }
 }
 
 export default EventManager;

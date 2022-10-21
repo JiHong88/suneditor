@@ -91,6 +91,7 @@ Controller.prototype = {
 			});
 		}
 
+		this.editor._controllerTargetContext = this.context.element.topArea;
 		this.editor.opendControllers.push({
 			position: this.position,
 			form: form,
@@ -113,6 +114,7 @@ Controller.prototype = {
 		this.editor.effectNode = null;
 		this.editor.opendControllers = [];
 		this.editor._antiBlur = false;
+		this.editor._controllerTargetContext = null;
 		if (typeof this.inst.reset === 'function') this.inst.reset();
 	},
 
@@ -185,7 +187,7 @@ function CloseListener_key(e) {
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 	if (ctrl || NON_RESPONSE_KEYCODE.test(keyCode)) return;
 
-	this.editor._lineBreaker.style.display = 'none';
+	this.context.element.lineBreaker.style.display = 'none';
 	if (this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) return;
 	if (this.editor._fileManager.pluginRegExp.test(this.kind) && keyCode !== 27) return;
 

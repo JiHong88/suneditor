@@ -77,7 +77,7 @@ export function getXMLHttpRequest() {
 /**
  * @deprecated
  * @description Returns the CSS text that has been applied to the current page.
- * @param {Document|null} doc To get the CSS text of an document(core._wd). If null get the current document.
+ * @param {Document|null} doc To get the CSS text of an document. If null get the current document.
  * @returns {string} Styles string
  */
 export function getPageStyle(doc) {

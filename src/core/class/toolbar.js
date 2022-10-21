@@ -142,9 +142,9 @@ Toolbar.prototype = {
 
 		if (y < editorTop) {
 			this._offSticky();
-		} else if (y + this.status._minHeight >= editorHeight + editorTop) {
+		} else if (y + this.context.element._minHeight >= editorHeight + editorTop) {
 			if (!this._sticky) this._onSticky(inlineOffset);
-			toolbar.style.top = inlineOffset + editorHeight + editorTop + this.options.toolbar_sticky - y - this.status._minHeight + 'px';
+			toolbar.style.top = inlineOffset + editorHeight + editorTop + this.options.toolbar_sticky - y - this.context.element._minHeight + 'px';
 		} else if (y >= editorTop) {
 			this._onSticky(inlineOffset);
 		}

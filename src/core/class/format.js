@@ -2994,7 +2994,7 @@ Format.prototype = {
 	 * @private
 	 */
 	_sn_isSizeNode: function (element) {
-		return element && element.nodeType !== 3 && this.isTextStyleNode(element) && !!element.style.fontSize;
+		return element && typeof element !== 'string' && element.nodeType !== 3 && this.isTextStyleNode(element) && !!element.style.fontSize;
 	},
 
 	/**

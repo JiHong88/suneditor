@@ -7,8 +7,6 @@ function CoreInterface(editor) {
 	this.editor = editor;
 	this._w = editor._w;
 	this._d = editor._d;
-	this._ww = editor._ww;
-	this._wd = editor._wd;
 	this.options = editor.options;
 	this.plugins = editor.plugins;
 	this.context = editor.context;

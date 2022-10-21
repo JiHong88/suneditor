@@ -1,42 +1,59 @@
+import { numbers } from '../helper';
+
 /**
  * @description Elements and variables you should have
- * @param {Element} toolbar Editor top div
- * @param {Element} editorTarget textarea element
- * @param {Element} wwFrame Toolbar frame
+ * @param {Element} editorTargets Target textarea
+ * @param {Element} top Editor top area
  * @param {Element} wwFrame Editor wysiwyg frame
  * @param {Element} codeFrame Editor code view frame
- * @param {Element} carrierWrapper Carrier wrapper
- * * @param {JSON|Object} options Inserted options
- * @returns {Object} {Elements, variables of the editor, option}
+ * @returns {Object}
  * @private
  */
-const Context = function (editorTarget, toolbar, top, wwFrame, codeFrame, carrierWrapper, options) {
+export const CreateContextElement = function (editorTarget, top, wwFrame, codeFrame) {
 	return {
+		originElement: editorTarget,
+		topArea: top,
+		container: top.querySelector('.se-container'),
+		statusbar: top.querySelector('.se-status-bar'),
+		navigation: top.querySelector('.se-status-bar .se-navigation'),
+		charWrapper: top.querySelector('.se-status-bar .se-char-counter-wrapper'),
+		charCounter: top.querySelector('.se-char-counter-wrapper .se-char-counter'),
+		editorArea: top.querySelector('.se-wrapper'),
+		wysiwygFrame: wwFrame,
+		wysiwyg: wwFrame, // options.iframe ? wwFrame.contentDocument.body : wwFrame
+		code: codeFrame,
+		placeholder: top.querySelector('.se-placeholder'),
+		lineBreaker: top.querySelector('.se-line-breaker'),
+		lineBreaker_t: top.querySelector('.se-line-breaker-component-t'),
+		lineBreaker_b: top.querySelector('.se-line-breaker-component-b'),
+		_stickyDummy: top.querySelector('.se-toolbar-sticky-dummy'),
+		_toolbarShadow: top.querySelector('.se-toolbar-shadow'),
+		_minHeight: numbers.get(wwFrame.style.minHeight || '65', 0),
+		_ww: null,
+		_wd: null,
+		_figure: null
+	};
+};
+
+/**
+ * @description Common elements and variables you should have
+ * @param {Array.<Element>} editorTargets Target textareas
+ * @param {Element} toolbar Toolbar frame
+ * @param {Element} carrierWrapper Carrier wrapper
+ * @param {JSON|Object} options Inserted options
+ * @returns {Object}
+ * @private
+ */
+const Context = function (editorTargets, toolbar, carrierWrapper, options) {
+	return {
+		editorTargets: editorTargets,
+		options: options,
 		toolbar: {
 			main: toolbar,
 			_buttonTray: toolbar.querySelector('.se-btn-tray'),
 			_menuTray: toolbar.querySelector('.se-menu-tray'),
 			_arrow: toolbar.querySelector('.se-arrow'),
 			_wrapper: toolbar.parentElement.parentElement
-		},
-		element: {
-			originElement: editorTarget,
-			topArea: top,
-			container: top.querySelector('.se-container'),
-			statusbar: top.querySelector('.se-status-bar'),
-			navigation: top.querySelector('.se-status-bar .se-navigation'),
-			charWrapper: top.querySelector('.se-status-bar .se-char-counter-wrapper'),
-			charCounter: top.querySelector('.se-char-counter-wrapper .se-char-counter'),
-			editorArea: top.querySelector('.se-wrapper'),
-			wysiwygFrame: wwFrame,
-			wysiwyg: wwFrame, // options.iframe ? wwFrame.contentDocument.body : wwFrame
-			code: codeFrame,
-			placeholder: top.querySelector('.se-placeholder'),
-			lineBreaker: top.querySelector('.se-line-breaker'),
-			lineBreaker_t: top.querySelector('.se-line-breaker-component-t'),
-			lineBreaker_b: top.querySelector('.se-line-breaker-component-b'),
-			_stickyDummy: top.querySelector('.se-toolbar-sticky-dummy'),
-			_toolbarShadow: top.querySelector('.se-toolbar-shadow')
 		},
 		buttons: {
 			bold: toolbar.querySelector('[data-command="bold"]'),
@@ -57,7 +74,6 @@ const Context = function (editorTarget, toolbar, top, wwFrame, codeFrame, carrie
 			dir_ltr: toolbar.querySelector('[data-command="dir_ltr"]'),
 			dir_rtl: toolbar.querySelector('[data-command="dir_rtl"]')
 		},
-		options: options,
 		_carrierWrapper: carrierWrapper,
 		_loading: carrierWrapper.querySelector('.se-loading-box'),
 		_resizeBackground: carrierWrapper.querySelector('.se-resizing-back')

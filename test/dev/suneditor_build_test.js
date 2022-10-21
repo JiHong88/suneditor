@@ -41,14 +41,14 @@ require('codemirror5/mode/htmlmixed/htmlmixed');
 // import imageGallery from '../../src/plugins/fileBrowser/imageGallery';
 import plugins from '../../src/plugins';
 
-window.e = suneditor.create(['#editor1'], {
+window.e = suneditor.create(['#editor1', '#editor2', '#editor3'], {
 	placeholder: 'placeholder',
+	toolbar_container: document.getElementById('ttt'),
 	// value: '<h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2>',
 	// textDirection: 'rtl',
 	// iframe: true,
 	// iframe_fullPage: true,
 	// mode: ['inline', 'balloon-always', 'balloon', 'classic'][1],
-	// toolbar_container: document.getElementById('ttt'),
 	elementBlacklist: 'p',
 	// toolbar_sticky: 60,
 	width: '100%',

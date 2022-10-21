@@ -18,7 +18,7 @@ Selection.prototype = {
 	 * @returns {Object}
 	 */
 	get: function () {
-		return this.shadowRoot && this.shadowRoot.getSelection ? this.shadowRoot.getSelection() : this._ww.getSelection();
+		return this.shadowRoot && this.shadowRoot.getSelection ? this.shadowRoot.getSelection() : this.context.element._ww.getSelection();
 	},
 
 	/**
@@ -65,7 +65,7 @@ Selection.prototype = {
 			endOff = endOff > 0 ? (endCon.nodeType === 1 ? 1 : endCon.textContent ? endCon.textContent.length : 0) : 0;
 		}
 
-		const range = this._wd.createRange();
+		const range = this.context.element._wd.createRange();
 
 		try {
 			range.setStart(startCon, startOff);
@@ -220,7 +220,7 @@ Selection.prototype = {
 	_createDefaultRange: function () {
 		const wysiwyg = this.context.element.wysiwyg;
 		wysiwyg.focus();
-		const range = this._wd.createRange();
+		const range = this.context.element._wd.createRange();
 
 		let focusEl = wysiwyg.firstElementChild;
 		if (!focusEl) {

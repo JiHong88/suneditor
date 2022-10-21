@@ -187,7 +187,8 @@ Offset.prototype = {
 		const wwScroll = this.getWWScroll();
 		const l = offset.left + targetOffset.left + addOffset.left;
 		const referElW = target.offsetWidth;
-		const sl = this._getLeftSceollMargin();
+		const ml = this.getGlobal(this.context.element.topArea).left + this.editor._editorPadding.left;
+		const sl = this._getLeftSceollMargin(ml);
 		// left margin
 		if (this.options._rtl) {
 			const rtlW = elW > referElW ? elW - referElW : 0;
@@ -215,7 +216,7 @@ Offset.prototype = {
 			}
 		}
 
-		inst.__offset = { left: element.offsetLeft + wwScroll.left, top: element.offsetTop + wwScroll.top, addOffset: addOffset, sl: sl, targetAbs: targetAbs };
+		inst.__offset = { left: element.offsetLeft + wwScroll.left, top: element.offsetTop + wwScroll.top, addOffset: addOffset, sl: sl, ml: ml, targetAbs: targetAbs };
 	},
 
 	_resetControllerOffset: function (cont) {
@@ -228,7 +229,7 @@ Offset.prototype = {
 		if (element.offsetTop !== y) {
 			element.style.top = y + 'px';
 		}
-		const sl = this._getLeftSceollMargin();
+		const sl = this._getLeftSceollMargin(__offset.ml);
 		if (sl - __offset.sl !== 0) {
 			element.style.left = element.offsetLeft + (sl - __offset.sl) + 'px';
 		}
@@ -288,8 +289,8 @@ Offset.prototype = {
 		return elementT;
 	},
 
-	_getLeftSceollMargin: function () {
-		const sl = (this.options._rtl ? -1 : 1) * this.getWWScroll().left - this.editor._editorPadding.left;
+	_getLeftSceollMargin: function (ml) {
+		const sl = (this.options._rtl ? -1 : 1) * this.getWWScroll().left - ml;
 		return sl < 0 ? 0 : (this.options._rtl ? -1 : 1) * sl;
 	},
 
