@@ -135,17 +135,20 @@ Toolbar.prototype = {
 		if (this.status.isFullScreen || this.context.toolbar.main.offsetWidth === 0 || this.options.toolbar_sticky < 0) return;
 
 		const toolbar = this.context.toolbar.main;
+		const minHeight = this.context.element._minHeight;
 		const editorHeight = this.context.element.editorArea.offsetHeight;
+		const editorOffset = this.offset.getGlobal(this.context.element.topArea);
 		const y = (this._w.scrollY || this._d.documentElement.scrollTop) + this.options.toolbar_sticky;
-		const editorTop = this.offset.getGlobal(this.editor.isBalloon || this.editor.isInline ? null : this.options.toolbar_container).top - (this.editor.isInline ? toolbar.offsetHeight : 0);
+		const t = (this.editor.isBalloon || this.editor.isInline ? editorOffset.top : this.offset.getGlobal(this.options.toolbar_container).top) - (this.editor.isInline ? toolbar.offsetHeight : 0);
 		const inlineOffset = 1;
 
-		if (y < editorTop) {
+		const offSticky = !this.options.toolbar_container ? editorHeight + t + this.options.toolbar_sticky - y - minHeight : editorOffset.top - this._w.scrollY + editorHeight - minHeight - this.options.toolbar_sticky - toolbar.offsetHeight;
+		if (y < t) {
 			this._offSticky();
-		} else if (y + this.context.element._minHeight >= editorHeight + editorTop) {
+		} else if (offSticky < 0) {
 			if (!this._sticky) this._onSticky(inlineOffset);
-			toolbar.style.top = inlineOffset + editorHeight + editorTop + this.options.toolbar_sticky - y - this.context.element._minHeight + 'px';
-		} else if (y >= editorTop) {
+			toolbar.style.top = inlineOffset + offSticky + 'px';
+		} else {
 			this._onSticky(inlineOffset);
 		}
 	},

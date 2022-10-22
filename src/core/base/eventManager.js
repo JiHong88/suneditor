@@ -26,6 +26,9 @@ const EventManager = function (editor) {
 	this.__resize_editor = null;
 	this.__close_move = null;
 	this.__geckoActiveEvent = null;
+	this._lineBreakerButton = null;
+	this._lineBreaker_t = null;
+	this._lineBreaker_b = null;
 };
 
 EventManager.prototype = {
@@ -494,6 +497,12 @@ EventManager.prototype = {
 		this.addEvent(this.context.toolbar._menuTray, 'mousedown', toolbarHandler, false);
 		this.addEvent(this.context.toolbar.main, 'click', OnClick_toolbar.bind(this), false);
 
+		/** set response toolbar */
+		this.toolbar._setResponsive();
+
+		/** responsive toolbar observer */
+		if (!env.isIE) this._toolbarObserver = new _w.ResizeObserver(this.toolbar.resetResponsiveToolbar.bind(this.toolbar));
+
 		/** window event */
 		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
 		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
@@ -528,14 +537,14 @@ EventManager.prototype = {
 		/** line breaker */
 		this.addEvent(eventWysiwyg, 'mousemove', OnMouseMove_wysiwyg.bind(this), false);
 		this.addEvent(
-			this._lineBreakerButton,
+			e.lineBreaker.querySelector('button'),
 			'mousedown',
 			function (e) {
 				e.preventDefault();
 			},
 			false
 		);
-		this.addEvent(this._lineBreakerButton, 'click', DisplayLineBreak.bind(this, ''), false);
+		this.addEvent(e.lineBreaker.querySelector('button'), 'click', DisplayLineBreak.bind(this, ''), false);
 		this.addEvent(e.lineBreaker_t, 'mousedown', DisplayLineBreak.bind(this, 't'), false);
 		this.addEvent(e.lineBreaker_b, 'mousedown', DisplayLineBreak.bind(this, 'b'), false);
 
@@ -563,12 +572,6 @@ EventManager.prototype = {
 				domUtils.addClass(e.statusbar, 'se-resizing-none');
 			}
 		}
-
-		/** set response toolbar */
-		this.toolbar._setResponsive();
-
-		/** responsive toolbar observer */
-		if (!env.isIE) this._toolbarObserver = new _w.ResizeObserver(this.toolbar.resetResponsiveToolbar.bind(this.toolbar));
 	},
 
 	_removeAllEvents: function () {
@@ -603,18 +606,22 @@ EventManager.prototype = {
 		const y = eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0;
 		const x = eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0;
 
-		const t_style = this._lineBreaker_t.style;
-		const t_offset = (this._lineBreaker_t.getAttribute('data-offset') || ',').split(',');
-		if (t_style.display !== 'none') {
-			t_style.top = numbers.get(t_offset[0], 0) - y + 'px';
-			t_style.left = numbers.get(t_offset[1], 0) - x + 'px';
+		if (this._lineBreaker_t) {
+			const t_style = this._lineBreaker_t.style;
+			const t_offset = (this._lineBreaker_t.getAttribute('data-offset') || ',').split(',');
+			if (t_style.display !== 'none') {
+				t_style.top = numbers.get(t_offset[0], 0) - y + 'px';
+				t_style.left = numbers.get(t_offset[1], 0) - x + 'px';
+			}
 		}
 
-		const b_style = this._lineBreaker_b.style;
-		const b_offset = (this._lineBreaker_b.getAttribute('data-offset') || ',').split(',');
-		if (b_style.display !== 'none') {
-			b_style.top = numbers.get(b_offset[0], 0) - y + 'px';
-			b_style.left = numbers.get(b_offset[1], 0) - x + 'px';
+		if (this._lineBreaker_b) {
+			const b_style = this._lineBreaker_b.style;
+			const b_offset = (this._lineBreaker_b.getAttribute('data-offset') || ',').split(',');
+			if (b_style.display !== 'none') {
+				b_style.top = numbers.get(b_offset[0], 0) - y + 'px';
+				b_style.left = numbers.get(b_offset[1], 0) - x + 'px';
+			}
 		}
 
 		const openCont = this.editor.opendControllers;
@@ -1824,6 +1831,11 @@ function OnScroll_window() {
 
 	if (this.editor.isBalloon && this.context.toolbar.main.style.display === 'block') {
 		this.toolbar._setBalloonOffset(this.toolbar._balloonOffset.position === 'top');
+	}
+
+	const openCont = this.editor.opendControllers;
+	for (let i = 0; i < openCont.length; i++) {
+		this.offset._resetControllerOffset(openCont[i]);
 	}
 }
 

@@ -320,7 +320,8 @@ Offset.prototype = {
 
 	_getAbsBottomMargin: function (elementT, elementH, targetH, arrowH) {
 		const margin_y = this.getGlobal(this.context.element.topArea).top + this.context.element.topArea.offsetHeight - this._w.scrollY - (elementT - this._w.scrollY + elementH);
-		if (margin_y < 0) {
+		const margin_y_window = this._w.innerHeight - (elementT - this._w.scrollY + elementH);
+		if (margin_y < 0 || margin_y_window < 0) {
 			return -(arrowH * 2 + targetH + elementH);
 		} else {
 			return 0;
@@ -329,7 +330,8 @@ Offset.prototype = {
 
 	_getAbsTopMargin: function (elementT, elementH, targetH, arrowH) {
 		const margin_y = elementT - this.getGlobal(this.context.element.topArea).top;
-		if (margin_y < 0) {
+		const margin_y_window = elementT - this._w.scrollY;
+		if (margin_y < 0 || margin_y_window < 0) {
 			return arrowH * 2 + targetH + elementH;
 		} else {
 			return 0;

@@ -5,21 +5,6 @@ import { domUtils, numbers } from '../helper';
 const Figure = function (inst, controls, params) {
 	EditorInterface.call(this, inst.editor);
 
-	// create HTML
-	const targetElements = this.context.targetElements;
-	for (let i = 0, len = targetElements.length, main, handles; i < len; i++) {
-		main = CreateHTML_resizeDot();
-		handles = main.querySelectorAll('.se-resize-dot > span');
-		targetElements[i]._figure = {
-			main: main,
-			border: main.querySelector('.se-resize-dot'),
-			display: main.querySelector('.se-resize-display'),
-			handles: handles
-		};
-		targetElements[i].editorArea.appendChild(main);
-		this.eventManager.addEvent(handles, 'mousedown', OnResizeContainer.bind(this));
-	}
-
 	// modules
 	const controllerEl = CreateHTML_controller(inst.editor, controls || []);
 	const alignMenus = CreateAlign(this);
@@ -72,6 +57,20 @@ const Figure = function (inst, controls, params) {
 
 	// init
 	this.eventManager.addEvent(this.alignButton, 'click', OnClick_alignButton.bind(this));
+	const targetElements = this.context.targetElements;
+	for (let i = 0, len = targetElements.length, main, handles; i < len; i++) {
+		if (targetElements[i].editorArea.querySelector('.se-controller.se-resizing-container')) continue;
+		main = CreateHTML_resizeDot();
+		handles = main.querySelectorAll('.se-resize-dot > span');
+		targetElements[i]._figure = {
+			main: main,
+			border: main.querySelector('.se-resize-dot'),
+			display: main.querySelector('.se-resize-display'),
+			handles: handles
+		};
+		targetElements[i].editorArea.appendChild(main);
+		this.eventManager.addEvent(handles, 'mousedown', OnResizeContainer.bind(this));
+	}
 };
 
 /**
@@ -746,13 +745,13 @@ function ContainerResizing(e) {
 	let resultW = this._element_w;
 	let resultH = this._element_h;
 
-	let w = this._element_w + (/r/.test(direction) ? clientX - this._resizeClientX : this._resizeClientX - clientX);
-	let h = this._element_h + (/b/.test(direction) ? clientY - this._resizeClientY : this._resizeClientY - clientY);
-	const wh = (this._element_h / this._element_w) * w;
+	let w = resultW + (/r/.test(direction) ? clientX - this._resizeClientX : this._resizeClientX - clientX);
+	let h = resultH + (/b/.test(direction) ? clientY - this._resizeClientY : this._resizeClientY - clientY);
+	const wh = (resultH / resultW) * w;
 	const resizeBorder = this.context.element._figure.border;
 
-	if (/t/.test(direction)) resizeBorder.style.top = this._element_h - (/h/.test(direction) ? h : wh) + 'px';
-	if (/l/.test(direction)) resizeBorder.style.left = this._element_w - w + 'px';
+	if (/t/.test(direction)) resizeBorder.style.top = resultH - (/h/.test(direction) ? h : wh) + 'px';
+	if (/l/.test(direction)) resizeBorder.style.left = resultW - w + 'px';
 
 	if (/r|l/.test(direction)) {
 		resizeBorder.style.width = w + 'px';
@@ -782,7 +781,7 @@ function ContainerResizingOff() {
 	h = this._w.Math.round(h) || h;
 
 	if (!this.isVertical && !/%$/.test(w)) {
-		const limit = this.context.element.wysiwygFrame.clientWidth - this._editorPadding.left + this._editorPadding.right - 2;
+		const limit = this.context.element.wysiwygFrame.clientWidth - this.editor._editorPadding.left + this.editor._editorPadding.right - 2;
 		if (numbers.get(w, 0) > limit) {
 			h = this._w.Math.round((h / w) * limit);
 			w = limit;
