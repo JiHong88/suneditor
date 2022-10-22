@@ -262,7 +262,9 @@ Offset.prototype = {
 				y = this._getAbsTopMargin(elementT, elementH, targetH, arrowH);
 				if (y > 0) {
 					elementT += elementH + arrowH;
-					const overMargin = this.getGlobal().top - elementT;
+					let overMargin = this.getGlobal().top - elementT;
+					if (overMargin > 0) elementT += overMargin;
+					overMargin = this._w.scrollY - elementT;
 					if (overMargin > 0) elementT += overMargin;
 					this._setArrow(arrow, '');
 				} else {
@@ -277,7 +279,9 @@ Offset.prototype = {
 				y = this._getAbsBottomMargin(elementT, elementH, targetH, arrowH);
 				if (y < 0) {
 					elementT -= elementH + arrowH;
-					const overMargin = this.getGlobal().top + this.context.element.topArea.offsetHeight - (elementT + elementH);
+					let overMargin = this.getGlobal().top + this.context.element.topArea.offsetHeight - (elementT + elementH);
+					if (overMargin < 0) elementT += overMargin;
+					overMargin = this._w.innerHeight + this._w.scrollY - (elementT + elementH);
 					if (overMargin < 0) elementT += overMargin;
 					this._setArrow(arrow, '');
 				} else {
