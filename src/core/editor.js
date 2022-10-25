@@ -1324,7 +1324,7 @@ Editor.prototype = {
 	_initWysiwygArea: function (e, reload, _initHTML) {
 		e.wysiwyg.innerHTML = reload ? _initHTML : this.html.clean(typeof _initHTML === 'string' ? _initHTML : e.originElement.value, true, null, null);
 		this.context.element = e;
-		e.charCounter.textContent = this.char.getLength();
+		if (this.options.charCounter && e.charCounter) e.charCounter.textContent = this.char.getLength();
 	},
 
 	/**

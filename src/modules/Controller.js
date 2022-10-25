@@ -135,7 +135,7 @@ Controller.prototype = {
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
-		this.offset.setAbsPosition(controller, referEl, this.context.element.wysiwygFrame, { addOffset: addOffset, position: this.positionf, inst: this });
+		this.offset.setAbsPosition(controller, referEl, this.context.element.wysiwygFrame, { addOffset: addOffset, position: this.position, inst: this });
 
 		controller.style.visibility = '';
 	},

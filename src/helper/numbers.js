@@ -6,7 +6,7 @@ import { _w } from './env';
  * @returns {boolean}
  */
 export function is(text) {
-	return !!text && /^-?\d+(\.\d+)?$/.test(text + '');
+	return /^-?\d+(\.\d+)?$/.test(text + '');
 }
 
 /**

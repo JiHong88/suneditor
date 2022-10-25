@@ -29,6 +29,7 @@ const EventManager = function (editor) {
 	this._lineBreakerButton = null;
 	this._lineBreaker_t = null;
 	this._lineBreaker_b = null;
+	this.__scrollparents = [];
 };
 
 EventManager.prototype = {
@@ -43,7 +44,8 @@ EventManager.prototype = {
 	 */
 	addEvent: function (target, type, listener, useCapture) {
 		if (!target) return false;
-		if (!target.length || target.nodeName) target = [target];
+		if (!numbers.is(target.length) || target.nodeName || (!_w.Array.isArray(target) && target.length < 1)) target = [target];
+		if (target.length === 0) return false;
 
 		for (let i = 0, len = target.length; i < len; i++) {
 			target[i].addEventListener(type, listener, useCapture);
@@ -571,6 +573,13 @@ EventManager.prototype = {
 			} else {
 				domUtils.addClass(e.statusbar, 'se-resizing-none');
 			}
+		}
+
+		const OffScrollParent = this.editor._offCurrentController.bind(this.editor);
+		let scrollParent = e.originElement;
+		while ((scrollParent = domUtils.getScrollParent(scrollParent.parentElement))) {
+			this.__scrollparents.push(scrollParent);
+			this.addEvent(scrollParent, 'scroll', OffScrollParent, false);
 		}
 	},
 

@@ -853,6 +853,23 @@ export function isImportantDisabled(element) {
 	return element.hasAttribute('data-important-disabled');
 }
 
+/**
+ * @description Get nearest scrollable parent
+ * @param {Element} element Element
+ * @returns {Element|null}
+ */
+export function getScrollParent(element) {
+	if (!element || /^(body|html)$/i.test(element.nodeName)) {
+		return null;
+	}
+
+	if (element.scrollHeight > element.clientHeight) {
+		return element;
+	} else {
+		return getScrollParent(element.parentNode);
+	}
+}
+
 const domUtils = {
 	isZeroWith: isZeroWith,
 	createElement: createElement,
@@ -901,7 +918,8 @@ const domUtils = {
 	isEmptyLine: isEmptyLine,
 	isSpanWithoutAttr: isSpanWithoutAttr,
 	isUneditable: isUneditable,
-	isImportantDisabled: isImportantDisabled
+	isImportantDisabled: isImportantDisabled,
+	getScrollParent: getScrollParent
 };
 
 export default domUtils;

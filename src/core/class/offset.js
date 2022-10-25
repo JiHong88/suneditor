@@ -41,7 +41,7 @@ Offset.prototype = {
 	/**
 	 * @description Returns the position of the argument, relative to global document. {left:0, top:0, scroll: 0}
 	 * @param {Element} element Target element
-	 * @returns {{top:boolean, left:boolean, scroll:boolean}}
+	 * @returns {{top:boolean, left:boolean}}
 	 */
 	getGlobal: function (element) {
 		if (!element) element = this.context.element.topArea;
@@ -52,14 +52,12 @@ Offset.prototype = {
 		while (element) {
 			t += element.offsetTop;
 			l += element.offsetLeft;
-			s += element.scrollTop;
 			element = element.offsetParent;
 		}
 
 		return {
 			top: t,
-			left: l,
-			scroll: s
+			left: l
 		};
 	},
 
@@ -238,11 +236,20 @@ Offset.prototype = {
 	_getAbsMargin: function (position, element, target, arrow, addTop, targetAbs) {
 		const targetH = target.offsetHeight;
 		const offset = this.getGlobal(target);
-		const wwTop = this.getGlobal(this.context.element.wysiwygFrame).top;
+		const targetScroll = this.getGlobalScroll(target);
+		const wMarginT = this.getGlobalScroll().top - this._w.scrollY;
 		const wwH = this.context.element.wysiwygFrame.offsetHeight;
 
 		if (targetAbs) {
-			if (offset.top + targetH - wwTop < 1 || wwTop + wwH - offset.top < 1) return -10000;
+			if (this._w.scrollY + this._w.innerHeight - offset.top < 0) return -10000;
+			if (this.editor.toolbar._sticky) {
+				let th = this.getGlobal(this.context.toolbar.main).top;
+				th = th < 0 ? 0 : th + this.context.toolbar.main.offsetHeight;
+				if (offset.top + targetH - (this._w.scrollY + th) < 0) return -10000;
+			} else {
+				const wwTop = this.getGlobal(this.context.element.wysiwygFrame).top;
+				if (offset.top + targetH - wwTop < 1 || wwTop + wwH - offset.top < 1) return -10000;
+			}
 		} else {
 			const wwScrollTop = this.getWWScroll().top;
 			const targetT = target.offsetTop;
@@ -251,39 +258,41 @@ Offset.prototype = {
 
 		const arrowH = arrow ? arrow.offsetHeight : 0;
 		const elementH = element.offsetHeight;
+		const editorTop = this.getGlobal().top;
+		const globalTop = this.getGlobalScroll().top;
+		let elementT = targetH + offset.top + (position === 'top' ? -(elementH + targetH + arrowH) : arrowH) + addTop - (targetScroll.top - this._w.scrollY);
 		let y = 0;
-		let elementT = targetH + offset.top + (position === 'top' ? -(elementH + targetH + arrowH) : arrowH) + addTop;
 
 		if (position === 'bottom') {
 			this._setArrow(arrow, 'up');
-			y = this._getAbsBottomMargin(elementT, elementH, targetH, arrowH);
+			y = this._getAbsBottomMargin(elementT, elementH, targetH, arrowH, editorTop, globalTop);
 			if (y < 0) {
 				elementT += y;
-				y = this._getAbsTopMargin(elementT, elementH, targetH, arrowH);
+				y = this._getAbsTopMargin(elementT, elementH, targetH, arrowH, editorTop, globalTop);
 				if (y > 0) {
-					elementT += elementH + arrowH;
-					let overMargin = this.getGlobal().top - elementT;
-					if (overMargin > 0) elementT += overMargin;
-					overMargin = this._w.scrollY - elementT;
-					if (overMargin > 0) elementT += overMargin;
 					this._setArrow(arrow, '');
+					elementT += elementH + arrowH;
+					let overMargin = targetScroll.top - (elementT + wMarginT);
+					if (overMargin > 0) elementT += overMargin;
+					overMargin = this._w.scrollY - (elementT + wMarginT);
+					if (overMargin > 0) elementT += overMargin;
 				} else {
 					this._setArrow(arrow, 'down');
 				}
 			}
 		} else {
 			this._setArrow(arrow, 'down');
-			let y = this._getAbsTopMargin(elementT, elementH, targetH, arrowH);
+			let y = this._getAbsTopMargin(elementT, elementH, targetH, arrowH, editorTop, globalTop);
 			if (y > 0) {
 				elementT += y;
-				y = this._getAbsBottomMargin(elementT, elementH, targetH, arrowH);
+				y = this._getAbsBottomMargin(elementT, elementH, targetH, arrowH, editorTop, globalTop);
 				if (y < 0) {
-					elementT -= elementH + arrowH;
-					let overMargin = this.getGlobal().top + this.context.element.topArea.offsetHeight - (elementT + elementH);
-					if (overMargin < 0) elementT += overMargin;
-					overMargin = this._w.innerHeight + this._w.scrollY - (elementT + elementH);
-					if (overMargin < 0) elementT += overMargin;
 					this._setArrow(arrow, '');
+					elementT -= elementH + arrowH;
+					let overMargin = targetScroll.top + this.context.element.topArea.offsetHeight - (elementT + wMarginT + elementH);
+					if (overMargin < 0) elementT += overMargin;
+					overMargin = this._w.innerHeight + this._w.scrollY - (elementT + wMarginT + elementH);
+					if (overMargin < 0) elementT += overMargin;
 				} else {
 					this._setArrow(arrow, 'up');
 				}
@@ -322,9 +331,9 @@ Offset.prototype = {
 		};
 	},
 
-	_getAbsBottomMargin: function (elementT, elementH, targetH, arrowH) {
-		const margin_y = this.getGlobal(this.context.element.topArea).top + this.context.element.topArea.offsetHeight - this._w.scrollY - (elementT - this._w.scrollY + elementH);
-		const margin_y_window = this._w.innerHeight - (elementT - this._w.scrollY + elementH);
+	_getAbsBottomMargin: function (elementT, elementH, targetH, arrowH, editorTop, globalTop) {
+		const margin_y = editorTop + this.context.element.topArea.offsetHeight - (elementT + (globalTop - this._w.scrollY) + elementH);
+		const margin_y_window = this._w.innerHeight - (elementT - globalTop + elementH);
 		if (margin_y < 0 || margin_y_window < 0) {
 			return -(arrowH * 2 + targetH + elementH);
 		} else {
@@ -332,9 +341,9 @@ Offset.prototype = {
 		}
 	},
 
-	_getAbsTopMargin: function (elementT, elementH, targetH, arrowH) {
-		const margin_y = elementT - this.getGlobal(this.context.element.topArea).top;
-		const margin_y_window = elementT - this._w.scrollY;
+	_getAbsTopMargin: function (elementT, elementH, targetH, arrowH, editorTop, globalTop) {
+		const margin_y = elementT + (globalTop - this._w.scrollY) - editorTop;
+		const margin_y_window = elementT - globalTop;
 		if (margin_y < 0 || margin_y_window < 0) {
 			return arrowH * 2 + targetH + elementH;
 		} else {

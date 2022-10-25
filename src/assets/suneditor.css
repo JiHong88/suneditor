@@ -1759,6 +1759,7 @@
     pointer-events: none;
     border: 0;
     padding: 0;
+    z-index: 6;
     background-color: transparent !important;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
