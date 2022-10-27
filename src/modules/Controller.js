@@ -1,7 +1,7 @@
 import EditorInterface from '../interface';
 import { domUtils, env } from '../helper';
 
-const NON_RESPONSE_KEYCODE = new env._w.RegExp('^(13|1[6-9]|20|27|40|45|11[2-9]|12[0-3]|144|145)$');
+const NON_RESPONSE_KEYCODE = new env._w.RegExp('^(13|1[7-9]|20|27|40|45|11[2-9]|12[0-3]|144|145)$');
 
 /**
  *
@@ -125,13 +125,6 @@ Controller.prototype = {
 	 */
 	_setControllerPosition: function (controller, referEl) {
 		const addOffset = { left: 0, top: 0 };
-		if (this.editor.opendControllers.length > 0) {
-			const openCont = this.editor.opendControllers;
-			for (let i = 0; i < openCont.length; i++) {
-				if (openCont[i].form !== this.form && openCont[i].position === this.position) addOffset.left += openCont[i].form.offsetWidth;
-			}
-		}
-
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
