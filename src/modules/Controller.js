@@ -68,6 +68,15 @@ Controller.prototype = {
 		if (typeof this._initMethod === 'function') this._initMethod();
 	},
 
+	hide: function () {
+		this.form.style.display = 'none';
+	},
+
+	show: function () {
+		this._setControllerPosition(this.form, this.currentPositionTarget);
+		this.form.style.display = 'block';
+	},
+
 	/**
 	 * @description Reset controller position
 	 * @param {Element|undefined} target
@@ -125,11 +134,13 @@ Controller.prototype = {
 	 */
 	_setControllerPosition: function (controller, referEl) {
 		const addOffset = { left: 0, top: 0 };
+		const prevDisplay = controller.style.display;
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
 		this.offset.setAbsPosition(controller, referEl, this.context.element.wysiwygFrame, { addOffset: addOffset, position: this.position, inst: this });
 
+		controller.style.display = prevDisplay;
 		controller.style.visibility = '';
 	},
 

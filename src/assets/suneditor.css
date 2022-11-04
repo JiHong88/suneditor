@@ -264,7 +264,7 @@
     width: 34px;
     height: 34px;
     border: 0;
-    border-radius: 4px;
+    border-radius: 3px;
     margin: 1px;
     padding: 0;
     font-size: 12px;
@@ -294,7 +294,7 @@
     color: #000;
     background-color: #d0e3ff;
     border: 1px solid #80bdff;
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .sun-editor .se-btn-primary:hover,
@@ -319,7 +319,7 @@
 .sun-editor textarea {
     color: #000;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .sun-editor input:focus,
@@ -453,7 +453,7 @@
     background-color: #4592ff;
     border: 1px solid #3288ff;
     opacity: 0.75;
-    border-radius: 4px;
+    border-radius: 3px;
     cursor: pointer;
     z-index: 7;
 }
@@ -536,7 +536,7 @@
 
 .sun-editor .se-btn-module-border {
     border: 1px solid #dadada;
-    border-radius: 4px;
+    border-radius: 3px;
     margin-left: 1px;
     margin-right: 1px;
 }
@@ -652,7 +652,7 @@
     height: auto;
     z-index: 5;
     border: 1px solid #bababa;
-    border-radius: 4px;
+    border-radius: 3px;
     padding: 4px;
     background-color: #fff;
     -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
@@ -867,7 +867,7 @@
     margin: 0;
     background-color: #f9f9f9;
     border: 1px solid #e1e1e1;
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 /* dropdown layer --- table selector */
@@ -887,7 +887,7 @@
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 3px;
     -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
     box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
 }
@@ -1239,7 +1239,7 @@
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     border: 1px solid rgba(0, 0, 0, .2);
-    border-radius: 4px;
+    border-radius: 3px;
     outline: 0;
     -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
     box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
@@ -1270,7 +1270,7 @@
     vertical-align: middle;
     -ms-touch-action: manipulation;
     touch-action: manipulation;
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-header {
@@ -1456,6 +1456,7 @@
 
 /* modal - revert button */
 .sun-editor .se-modal .se-modal-inner .se-modal-btn-revert {
+    float: right;
     border: 1px solid #ccc;
 }
 
@@ -1610,8 +1611,7 @@
     z-index: 2147483647;
     padding: 2px 2px 0 2px;
     margin: 0;
-    border: 1px solid rgba(0, 0, 0, .25);
-    border-radius: 4px;
+    border: 0;
     text-align: start;
     text-decoration: none;
     text-shadow: none;
@@ -1665,7 +1665,7 @@
     min-height: 34px;
     height: auto;
     border: none;
-    border-radius: 4px;
+    border-radius: 3px;
     margin: 1px;
     padding: 5px 10px;
     font-size: 12px;
@@ -1847,7 +1847,7 @@
     font-size: 12px;
     color: #fff;
     background-color: #333;
-    border-radius: 4px;
+    border-radius: 3px;
     opacity: 0.75;
 }
 
@@ -1917,7 +1917,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     background-color: #fff;
-    border-radius: 4px;
+    border-radius: 3px;
     padding: 2px 0;
     margin: 0;
     border: 1px solid #bababa;
@@ -2030,7 +2030,7 @@
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     border: 1px solid rgba(0, 0, 0, .2);
-    border-radius: 4px;
+    border-radius: 3px;
     outline: 0;
     -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
     box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
@@ -2170,7 +2170,7 @@
     cursor: pointer;
     width: 100%;
     height: auto;
-    border-radius: 4px;
+    border-radius: 3px;
     outline: 0;
     margin: 10px 0;
 }
@@ -2185,7 +2185,7 @@
     position: relative;
     display: block;
     width: 100%;
-    border-radius: 4px;
+    border-radius: 3px;
     outline: 0;
     height: auto;
 }
@@ -2219,7 +2219,7 @@
     width: auto;
     height: auto;
     margin: 1.75rem auto;
-    border-radius: 4px;
+    border-radius: 3px;
     -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
     box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
     word-break: break-all;
@@ -2312,7 +2312,7 @@
 }
 
 
-/** --- RTL ---------------------------------------------------------- */
+/** --- RTL -------------------------------------------------------------------------------------------------------------------------------------------------- */
 /* tray */
 .sun-editor.se-rtl .se-btn-tray {
     direction: rtl;
@@ -2437,6 +2437,11 @@
     text-align: right;
 }
 
+/* modal - revert button */
+.sun-editor.se-rtl .se-modal .se-modal-inner .se-modal-btn-revert {
+    float: left;
+}
+
 /* anchor module */
 .sun-editor.se-rtl .se-modal .se-modal-inner .se-anchor-rel-btn {
     float: right;
@@ -2479,7 +2484,7 @@
     margin-left: 0;
 }
 
-/** --- RTL ---------------------------------------------------------- */
+/** --- RTL -------------------------------------------------------------------------------------------------------------------------------------------------- */
 
 /** button module float --------------------------------------------- */
 .sun-editor .se-btn-module-border.module-float-left {

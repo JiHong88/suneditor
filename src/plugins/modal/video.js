@@ -746,7 +746,7 @@ function CreateHTML_modal(editor) {
 			lang.modalBox.revertButton +
 			'" aria-label="' +
 			lang.modalBox.revertButton +
-			'" class="se-btn se-modal-btn-revert" style="float: right;">' +
+			'" class="se-btn se-modal-btn-revert">' +
 			editor.icons.revert +
 			'</button>' +
 			'</div>' +

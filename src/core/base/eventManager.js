@@ -30,6 +30,7 @@ const EventManager = function (editor) {
 	this._lineBreaker_t = null;
 	this._lineBreaker_b = null;
 	this.__scrollparents = [];
+	this.__scrollID = '';
 };
 
 EventManager.prototype = {
@@ -575,11 +576,11 @@ EventManager.prototype = {
 			}
 		}
 
-		const OffScrollParent = this.editor._offCurrentController.bind(this.editor);
+		const OnScrollAbs = OnScroll_Abs.bind(this);
 		let scrollParent = e.originElement;
 		while ((scrollParent = domUtils.getScrollParent(scrollParent.parentElement))) {
 			this.__scrollparents.push(scrollParent);
-			this.addEvent(scrollParent, 'scroll', OffScrollParent, false);
+			this.addEvent(scrollParent, 'scroll', OnScrollAbs, false);
 		}
 	},
 
@@ -635,10 +636,33 @@ EventManager.prototype = {
 
 		const openCont = this.editor.opendControllers;
 		for (let i = 0; i < openCont.length; i++) {
+			if (!openCont[i].notInCarrier) continue;
 			openCont[i].form.style.top = openCont[i].inst.__offset.top - y + 'px';
 			openCont[i].form.style.left = openCont[i].inst.__offset.left - x + 'px';
-			this.offset._resetControllerOffset(openCont[i]);
 		}
+	},
+
+	_scrollContainer: function () {
+		const openCont = this.editor.opendControllers;
+		if (!openCont.length) return;
+		if (this.__scrollID) _w.clearTimeout(this.__scrollID);
+
+		for (let i = 0; i < openCont.length; i++) {
+			if (openCont[i].notInCarrier) continue;
+			openCont[i].inst.hide();
+		}
+
+		this.__scrollID = _w.setTimeout(
+			function () {
+				_w.clearTimeout(this.__scrollID);
+				this.__scrollID = '';
+				for (let i = 0; i < openCont.length; i++) {
+					if (openCont[i].notInCarrier) continue;
+					openCont[i].inst.show();
+				}
+			}.bind(this),
+			250
+		);
 	},
 
 	_changeContextElement: function (rootKey) {
@@ -1664,6 +1688,7 @@ function OnCut_wysiwyg(e) {
 
 function OnScroll_wysiwyg(eventWysiwyg, e) {
 	this._moveContainer(eventWysiwyg);
+	this._scrollContainer();
 	// user event
 	if (typeof this.events.onScroll === 'function') this.events.onScroll(e);
 }
@@ -1842,10 +1867,11 @@ function OnScroll_window() {
 		this.toolbar._setBalloonOffset(this.toolbar._balloonOffset.position === 'top');
 	}
 
-	const openCont = this.editor.opendControllers;
-	for (let i = 0; i < openCont.length; i++) {
-		this.offset._resetControllerOffset(openCont[i]);
-	}
+	this._scrollContainer();
+}
+
+function OnScroll_Abs() {
+	this._scrollContainer();
 }
 
 export default EventManager;
