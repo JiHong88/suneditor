@@ -1,10 +1,10 @@
-import EditorInterface from '../../interface';
+import EditorDependency from '../../dependency';
 import { Modal, Controller, ModalAnchorEditor } from '../../modules';
 import { domUtils } from '../../helper';
 
 const Link = function (editor, target) {
 	// plugin bisic properties
-	EditorInterface.call(this, editor);
+	EditorDependency.call(this, editor);
 	this.target = target;
 	this.title = this.lang.toolbar.link;
 	this.icon = this.icons.link;

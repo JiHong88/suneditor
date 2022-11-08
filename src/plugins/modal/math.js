@@ -1,4 +1,4 @@
-import EditorInterface from '../../interface';
+import EditorDependency from '../../dependency';
 import { Modal, Controller } from '../../modules';
 import { domUtils, env, converter, unicode } from '../../helper';
 
@@ -6,7 +6,7 @@ const KATEX_WEBSITE = 'https://katex.org/docs/supported.html';
 
 const Math_ = function (editor, target) {
 	// plugin bisic properties
-	EditorInterface.call(this, editor);
+	EditorDependency.call(this, editor);
 	this.target = target;
 	this.title = this.lang.toolbar.math;
 	this.icon = this.icons.math;

@@ -1,5 +1,5 @@
 import { domUtils } from '../helper';
-import CoreInterface from '../interface/_core';
+import CoreDependency from '../dependency/_core';
 
 /**
  * @description Create a color picker element and register for related events. (this.target)
@@ -10,7 +10,7 @@ import CoreInterface from '../interface/_core';
  * @param {Array.<string>} colorList color list
  */
 const ColorPicker = function (inst, styles, defaultColor, colorList) {
-	CoreInterface.call(this, inst.editor);
+	CoreDependency.call(this, inst.editor);
 	// members
 	this.kind = inst.constructor.key;
 	this.inst = inst;

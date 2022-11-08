@@ -1,9 +1,9 @@
-import EditorInterface from '../../interface';
+import EditorDependency from '../../dependency';
 import { domUtils } from '../../helper';
 
 const Align = function (editor, target) {
 	// plugin bisic properties
-	EditorInterface.call(this, editor);
+	EditorDependency.call(this, editor);
 	this.target = target;
 	this.title = this.lang.toolbar.align;
 	this.icon = this.options._rtl ? this.icons.align_right : this.icons.align_left;

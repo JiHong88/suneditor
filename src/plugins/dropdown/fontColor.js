@@ -1,9 +1,9 @@
-import EditorInterface from '../../interface';
+import EditorDependency from '../../dependency';
 import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 
 const FontColor = function (editor, target) {
-	EditorInterface.call(this, editor);
+	EditorDependency.call(this, editor);
 	// plugin basic properties
 	this.target = target;
 	this.title = this.lang.toolbar.fontColor;

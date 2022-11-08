@@ -4,11 +4,11 @@
  */
 
 import { domUtils } from '../../helper';
-import CoreInterface from '../../interface/_core';
+import CoreDependency from '../../dependency/_core';
 import { CreateToolBar } from '../constructor';
 
 const Toolbar = function (editor) {
-	CoreInterface.call(this, editor);
+	CoreDependency.call(this, editor);
 	this._responsiveCurrentSize = 'default';
 	this._rButtonArray = editor._responsiveButtons;
 	this._rButtonsize = null;

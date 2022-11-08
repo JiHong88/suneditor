@@ -1,14 +1,16 @@
 import Editor from './core/editor';
 
-import EditorInterface from './interface';
+import EditorDependency from './dependency';
 import Plugins from './plugins';
 import Langs from './langs';
 import Modules from './modules';
+import Helper from './helper';
 
-export const editorInterface = EditorInterface;
+export const editorDependency = EditorDependency;
 export const plugins = Plugins;
-export const langs = Langs;
 export const modules = Modules;
+export const langs = Langs;
+export const helper = Helper;
 
 export default {
 	/**

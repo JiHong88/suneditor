@@ -1,4 +1,4 @@
-import EditorInterface from '../interface';
+import EditorDependency from '../dependency';
 import { domUtils, env } from '../helper';
 
 const NON_RESPONSE_KEYCODE = new env._w.RegExp('^(13|1[7-9]|20|27|40|45|11[2-9]|12[0-3]|144|145)$');
@@ -12,7 +12,7 @@ const NON_RESPONSE_KEYCODE = new env._w.RegExp('^(13|1[7-9]|20|27|40|45|11[2-9]|
  * When using the "bottom" position there should be an arrow on the controller.
  */
 const Controller = function (inst, element, params, _name) {
-	EditorInterface.call(this, inst.editor);
+	EditorDependency.call(this, inst.editor);
 
 	// members
 	this.kind = _name || inst.constructor.key;
@@ -74,7 +74,6 @@ Controller.prototype = {
 
 	show: function () {
 		this._setControllerPosition(this.form, this.currentPositionTarget);
-		this.form.style.display = 'block';
 	},
 
 	/**
@@ -134,13 +133,14 @@ Controller.prototype = {
 	 */
 	_setControllerPosition: function (controller, referEl) {
 		const addOffset = { left: 0, top: 0 };
-		const prevDisplay = controller.style.display;
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
-		this.offset.setAbsPosition(controller, referEl, this.context.element.wysiwygFrame, { addOffset: addOffset, position: this.position, inst: this });
+		if (!this.offset.setAbsPosition(controller, referEl, this.context.element.wysiwygFrame, { addOffset: addOffset, position: this.position, inst: this })) {
+			this.hide();
+			return;
+		}
 
-		controller.style.display = prevDisplay;
 		controller.style.visibility = '';
 	},
 

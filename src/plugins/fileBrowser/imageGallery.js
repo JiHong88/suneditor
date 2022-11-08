@@ -1,4 +1,4 @@
-import EditorInterface from '../../interface';
+import EditorDependency from '../../dependency';
 import { FileBrowser } from '../../modules';
 
 var a = {
@@ -65,7 +65,7 @@ var a = {
 
 const ImageGallery = function (editor, target) {
 	// plugin bisic properties
-	EditorInterface.call(this, editor);
+	EditorDependency.call(this, editor);
 	this.target = target;
 	this.title = this.lang.toolbar.imageGallery;
 	this.icon = this.icons.image_gallery;

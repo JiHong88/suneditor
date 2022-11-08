@@ -3,7 +3,7 @@
  * @author Yi JiHong.
  */
 
-import CoreInterface from '../../interface/_core';
+import CoreDependency from '../../dependency/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
 
 const _w = env._w;
@@ -13,7 +13,7 @@ const HISTORY_IGNORE_KEYCODE = new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9
 const FRONT_ZEROWIDTH = new _w.RegExp(unicode.zeroWidthSpace + '+', '');
 
 const EventManager = function (editor) {
-	CoreInterface.call(this, editor);
+	CoreDependency.call(this, editor);
 	this._events = [];
 	this._onButtonsCheck = new _w.RegExp('^(' + _w.Object.keys(editor.options._styleNodeMap).join('|') + ')$', 'i');
 	this._onShortcutKey = false;

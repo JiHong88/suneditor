@@ -1,10 +1,10 @@
-import EditorInterface from '../../interface';
+import EditorDependency from '../../dependency';
 import { Modal, Figure, FileManager, ModalAnchorEditor } from '../../modules';
 import { domUtils, numbers } from '../../helper';
 
 const Image_ = function (editor, target) {
 	// plugin bisic properties
-	EditorInterface.call(this, editor);
+	EditorDependency.call(this, editor);
 	this.target = target;
 	this.title = this.lang.toolbar.image;
 	this.icon = this.icons.image;

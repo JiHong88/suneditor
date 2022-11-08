@@ -3,7 +3,7 @@
  * @param {any} editor Editor object
  * @private
  */
-function ClassInterface(editor) {
+function ClassDependency(editor) {
 	// class
 	if (this !== editor.char) this.char = editor.char;
 	if (this !== editor.component) this.component = editor.component;
@@ -18,4 +18,4 @@ function ClassInterface(editor) {
 	if (this !== editor.toolbar) this.toolbar = editor.toolbar;
 }
 
-export default ClassInterface;
+export default ClassDependency;

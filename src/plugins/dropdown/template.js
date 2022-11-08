@@ -1,9 +1,9 @@
-import EditorInterface from '../../interface';
+import EditorDependency from '../../dependency';
 import { domUtils } from '../../helper';
 
 const Template = function (editor, target) {
 	// plugin bisic properties
-	EditorInterface.call(this, editor);
+	EditorDependency.call(this, editor);
 	this.target = target;
 	this.title = this.lang.toolbar.template;
 	this.icon = this.icons.template;

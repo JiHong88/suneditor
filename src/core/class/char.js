@@ -3,12 +3,12 @@
  * @author Yi JiHong.
  */
 
-import CoreInterface from '../../interface/_core';
+import CoreDependency from '../../dependency/_core';
 import env from '../../helper/env';
 import { addClass, removeClass, hasClass } from '../../helper/domUtils';
 
 const Char = function (editor) {
-	CoreInterface.call(this, editor);
+	CoreDependency.call(this, editor);
 	this.maxCharCount = this.options.charCounter_max;
 	this._encoder = this._w.encodeURIComponent;
 	this._unescape = this._w.unescape;

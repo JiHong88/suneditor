@@ -1,8 +1,8 @@
 import { domUtils } from '../helper';
-import CoreInterface from '../interface/_core';
+import CoreDependency from '../dependency/_core';
 
 const Modal = function (inst, element) {
-	CoreInterface.call(this, inst.editor);
+	CoreDependency.call(this, inst.editor);
 
 	// members
 	this.inst = inst;

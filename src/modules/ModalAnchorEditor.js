@@ -1,10 +1,10 @@
-import EditorInterface from '../interface';
+import EditorDependency from '../dependency';
 import SelectMenu from './SelectMenu';
 import { domUtils } from '../helper';
 
 const ModalAnchorEditor = function (inst, modalForm) {
 	// plugin bisic properties
-	EditorInterface.call(this, inst.editor);
+	EditorDependency.call(this, inst.editor);
 
 	// create HTML
 	const forms = CreatetModalForm(inst.editor);

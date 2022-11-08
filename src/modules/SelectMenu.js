@@ -1,4 +1,4 @@
-import CoreInterface from '../interface/_core';
+import CoreDependency from '../dependency/_core';
 import { domUtils } from '../helper';
 
 /**
@@ -9,7 +9,7 @@ import { domUtils } from '../helper';
  */
 const SelectMenu = function (inst, checkList, position) {
 	// plugin bisic properties
-	CoreInterface.call(this, inst.editor);
+	CoreDependency.call(this, inst.editor);
 
 	// members
 	this.kink = inst.constructor.key;

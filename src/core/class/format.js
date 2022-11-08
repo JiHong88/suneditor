@@ -3,11 +3,11 @@
  * @author Yi JiHong.
  */
 
-import CoreInterface from '../../interface/_core';
+import CoreDependency from '../../dependency/_core';
 import { domUtils, unicode, numbers, env } from '../../helper';
 
 const Format = function (editor) {
-	CoreInterface.call(this, editor);
+	CoreDependency.call(this, editor);
 	this._listCamel = this.options.__listCommonStyle;
 	this._listKebab = env.camelToKebabCase(this.options.__listCommonStyle);
 	this._formatLineCheck = this.options.formatLine.reg;

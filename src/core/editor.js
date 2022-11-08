@@ -2,8 +2,8 @@ import Helper, { env, converter, domUtils, numbers } from '../helper';
 import Constructor, { ResetOptions, UpdateButton } from './constructor';
 import Context from './context';
 
-// interface
-import ClassInterface from '../interface/_classes';
+// class dependency
+import ClassDependency from '../dependency/_classes';
 
 // base
 import History from './base/history';
@@ -148,7 +148,7 @@ const Editor = function (editorTargets, options) {
 	 */
 	this.helper = Helper;
 
-	// ----- Properties not shared with coreInterface -----
+	// ----- Properties not shared with core -----
 	/**
 	 * @description Command button map
 	 */
@@ -1242,16 +1242,16 @@ Editor.prototype = {
 		this.menu = new Menu(this);
 
 		// register main classes
-		ClassInterface.call(this.eventManager, this);
-		ClassInterface.call(this.viewer, this);
-		ClassInterface.call(this.node, this);
-		ClassInterface.call(this.selection, this);
-		ClassInterface.call(this.html, this);
-		ClassInterface.call(this.component, this);
-		ClassInterface.call(this.format, this);
-		ClassInterface.call(this.toolbar, this);
-		ClassInterface.call(this.char, this);
-		ClassInterface.call(this.menu, this);
+		ClassDependency.call(this.eventManager, this);
+		ClassDependency.call(this.viewer, this);
+		ClassDependency.call(this.node, this);
+		ClassDependency.call(this.selection, this);
+		ClassDependency.call(this.html, this);
+		ClassDependency.call(this.component, this);
+		ClassDependency.call(this.format, this);
+		ClassDependency.call(this.toolbar, this);
+		ClassDependency.call(this.char, this);
+		ClassDependency.call(this.menu, this);
 	},
 
 	/**

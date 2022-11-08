@@ -1,8 +1,8 @@
-import EditorInterface from '../../interface';
+import EditorDependency from '../../dependency';
 import { domUtils } from '../../helper';
 
 const Font = function (editor, target) {
-	EditorInterface.call(this, editor);
+	EditorDependency.call(this, editor);
 	// plugin basic properties
 	this.target = target;
 	this.title = this.lang.toolbar.font;

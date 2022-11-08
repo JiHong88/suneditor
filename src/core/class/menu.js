@@ -3,11 +3,11 @@
  * @author Yi JiHong.
  */
 
-import CoreInterface from '../../interface/_core';
+import CoreDependency from '../../dependency/_core';
 import { domUtils } from '../../helper';
 
 const Menu = function (editor) {
-	CoreInterface.call(this, editor);
+	CoreDependency.call(this, editor);
 	this._menuTrayMap = {};
 	// dropdown
 	this.currentDropdown = null;

@@ -3,12 +3,12 @@
  * @author Yi JiHong.
  */
 
-import CoreInterface from '../../interface/_core';
+import CoreDependency from '../../dependency/_core';
 import { domUtils } from '../../helper';
 import Figure from '../../modules/Figure';
 
 const Component = function (editor) {
-	CoreInterface.call(this, editor);
+	CoreDependency.call(this, editor);
 };
 
 Component.prototype = {

@@ -1,9 +1,9 @@
-import EditorInterface from '../interface';
+import EditorDependency from '../dependency';
 import { Controller, SelectMenu } from '../modules';
 import { domUtils, numbers } from '../helper';
 
 const Figure = function (inst, controls, params) {
-	EditorInterface.call(this, inst.editor);
+	EditorDependency.call(this, inst.editor);
 
 	// modules
 	const controllerEl = CreateHTML_controller(inst.editor, controls || []);

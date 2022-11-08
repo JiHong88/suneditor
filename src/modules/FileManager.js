@@ -1,4 +1,4 @@
-import CoreInterface from '../interface/_core';
+import CoreDependency from '../dependency/_core';
 import { domUtils, numbers, env } from '../helper';
 
 /**
@@ -7,7 +7,7 @@ import { domUtils, numbers, env } from '../helper';
  * @param {{ tagNames: array, eventHandler: Function, checkHandler: Function, figure: Figure instance | null }} params
  */
 const FileManager = function (inst, params) {
-	CoreInterface.call(this, inst.editor);
+	CoreDependency.call(this, inst.editor);
 
 	// members
 	inst.__fileManagement = this;

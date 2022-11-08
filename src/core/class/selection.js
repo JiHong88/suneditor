@@ -3,11 +3,11 @@
  * @author Yi JiHong.
  */
 
-import CoreInterface from '../../interface/_core';
+import CoreDependency from '../../dependency/_core';
 import { domUtils, unicode } from '../../helper';
 
 const Selection = function (editor) {
-	CoreInterface.call(this, editor);
+	CoreDependency.call(this, editor);
 	this.range = null;
 	this.selectionNode = null;
 };

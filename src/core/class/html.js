@@ -3,11 +3,11 @@
  * @author Yi JiHong.
  */
 
-import CoreInterface from '../../interface/_core';
+import CoreDependency from '../../dependency/_core';
 import { domUtils, converter, numbers, unicode, env } from '../../helper';
 
 const HTML = function (editor) {
-	CoreInterface.call(this, editor);
+	CoreDependency.call(this, editor);
 
 	this._allowHTMLComment = null;
 	this._disallowedStyleNodesRegExp = null;

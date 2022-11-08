@@ -3,11 +3,11 @@
  * @author Yi JiHong.
  */
 
-import CoreInterface from '../../interface/_core';
+import CoreDependency from '../../dependency/_core';
 import { domUtils, env, converter } from '../../helper';
 
 const Viewer = function (editor) {
-	CoreInterface.call(this, editor);
+	CoreDependency.call(this, editor);
 };
 
 Viewer.prototype = {

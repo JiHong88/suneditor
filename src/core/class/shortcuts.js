@@ -3,10 +3,10 @@
  * @author Yi JiHong.
  */
 
-import CoreInterface from '../../interface/_core';
+import CoreDependency from '../../dependency/_core';
 
 const Shortcuts = function (editor) {
-	CoreInterface.call(this, editor);
+	CoreDependency.call(this, editor);
 	this.isDisabled = false;
 	this._keyCodeShortcut = {
 		65: 'A',

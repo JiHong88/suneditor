@@ -3,7 +3,7 @@
  * @param {any} editor Editor's core
  * @private
  */
-function CoreInterface(editor) {
+function CoreDependency(editor) {
 	this.editor = editor;
 	this._w = editor._w;
 	this._d = editor._d;
@@ -20,4 +20,4 @@ function CoreInterface(editor) {
 	this.helper = editor.helper;
 }
 
-export default CoreInterface;
+export default CoreDependency;
