@@ -205,6 +205,19 @@ suneditor.create('#scrolleditor', {
 	buttonList: bl
 });
 
+suneditor.create('#editor_classic', {
+	// value: begContent,
+	plugins: plugins,
+	toolbar_sticky: 0,
+	width: 450,
+	height:350,
+	katex: {
+		src: Katex
+	},
+	// textDirection: 'rtl',
+	buttonList: bl
+});
+
 window.e = suneditor.create(['#editor1'], {
 	placeholder: 'placeholder',
 	toolbar_container: document.getElementById('ttt'),
