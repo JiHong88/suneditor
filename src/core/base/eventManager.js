@@ -208,7 +208,7 @@ EventManager.prototype = {
 				this._balloonDelay = null;
 				this.toolbar._showBalloon();
 			}.bind(this),
-			350
+			250
 		);
 	},
 
@@ -604,6 +604,9 @@ EventManager.prototype = {
 	},
 
 	_moveContainer: function (eventWysiwyg) {
+		const y = eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0;
+		const x = eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0;
+
 		if (this.editor.isBalloon) {
 			this.context.toolbar.main.style.top = this.toolbar._balloonOffset.top - y + 'px';
 			this.context.toolbar.main.style.left = this.toolbar._balloonOffset.left - x + 'px';
@@ -612,9 +615,6 @@ EventManager.prototype = {
 		if (this.editor._controllerTargetContext !== this.context.element.topArea) {
 			this.editor._offCurrentController();
 		}
-
-		const y = eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0;
-		const x = eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0;
 
 		if (this._lineBreaker_t) {
 			const t_style = this._lineBreaker_t.style;

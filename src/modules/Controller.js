@@ -33,6 +33,8 @@ const Controller = function (inst, element, params, _name) {
 
 	// init
 	this.eventManager.addEvent(element, 'click', Action.bind(this));
+	this.eventManager.addEvent(element, 'mouseenter', MouseEnter.bind(this));
+	this.eventManager.addEvent(element, 'mouseleave', MouseLeave.bind(this));
 };
 
 Controller.prototype = {
@@ -183,6 +185,14 @@ function Action(e) {
 	e.preventDefault();
 
 	this.inst.controllerAction(target);
+}
+
+function MouseEnter(e) {
+	e.target.style.zIndex = 2147483647;
+}
+
+function MouseLeave(e) {
+	e.target.style.zIndex = 2147483646;
 }
 
 function CloseListener_key(e) {

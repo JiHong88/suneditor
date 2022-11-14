@@ -56,7 +56,7 @@ const Constructor = function (editorTargets, options) {
 	} else if (/balloon/i.test(options.mode)) {
 		toolbar.className += ' se-toolbar-balloon';
 		toolbar.style.width = options.toolbar_width;
-		toolbar.appendChild(toolBarArrow);
+		toolbar.appendChild(domUtils.createElement('DIV', { class: 'se-arrow' }));
 	}
 
 	/** --- editor div --------------------------------------------------------------- */

@@ -211,9 +211,9 @@
 
 /* arrow up */
 .sun-editor .se-arrow.se-arrow-up {
-    top: -11px;
+    top: -12px;
     border-top-width: 0;
-    border-bottom-color: #dadada;
+    border-bottom-color: #999;
 }
 
 .sun-editor .se-arrow.se-arrow-up::after {
@@ -223,16 +223,11 @@
     border-bottom-color: #fff;
 }
 
-.sun-editor .se-toolbar .se-arrow.se-arrow-up::after {
-    border-bottom-color: #fafafa;
-}
-
 /* arrow down */
 .sun-editor .se-arrow.se-arrow-down {
     bottom: -12px;
-    left: 0px;
     border-bottom-width: 0;
-    border-top-color: #dadada;
+    border-top-color: #999;
 }
 
 .sun-editor .se-arrow.se-arrow-down::after {
@@ -240,10 +235,6 @@
     content: " ";
     border-bottom-width: 0;
     border-top-color: #fff;
-}
-
-.sun-editor .se-toolbar .se-arrow.se-arrow-down::after {
-    border-top-color: #fafafa;
 }
 
 /** --- container */
@@ -264,7 +255,7 @@
     width: 34px;
     height: 34px;
     border: 0;
-    border-radius: 3px;
+    border-radius: 2px;
     margin: 1px;
     padding: 0;
     font-size: 12px;
@@ -282,30 +273,32 @@
     outline: 0 none;
 }
 
-.sun-editor .se-btn:enabled:active {
-    background-color: #d1d1d1;
-    border-color: #c1c1c1;
-    -webkit-box-shadow: inset 0 3px 5px #c1c1c1;
-    box-shadow: inset 0 3px 5px #c1c1c1;
+.sun-editor .se-btn:enabled:active,
+.sun-editor .se-btn:enabled.__se__active {
+    background-color: #e1e1e1;
+    border: 1px solid #b1b1b1;
+    -webkit-box-shadow: 0 0 0 0.2rem #e1e1e1;
+    box-shadow: 0 0 0 0.2rem #e1e1e1;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    outline: 0 none;
 }
 
 /** --- primary button */
 .sun-editor .se-btn-primary {
-    color: #000;
     background-color: #d0e3ff;
     border: 1px solid #80bdff;
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 .sun-editor .se-btn-primary:hover,
 .sun-editor .se-btn-primary:focus {
-    color: #000;
     background-color: #80bdff;
     border-color: #3f9dff;
     outline: 0 none;
 }
 
-.sun-editor .se-btn-primary:active {
+.sun-editor .se-btn-primary:active,
+.sun-editor .se-btn-primary.__se__active {
     color: #fff;
     background-color: #3f9dff;
     border-color: #4592ff;
@@ -319,7 +312,7 @@
 .sun-editor textarea {
     color: #000;
     border: 1px solid #ccc;
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 .sun-editor input:focus,
@@ -334,22 +327,25 @@
 
 /* se-btn button active*/
 .sun-editor .se-btn:enabled.active {
+    background-color: #eaf3ff;
     color: #4592ff;
     outline: 0 none;
 }
 
 .sun-editor .se-btn:enabled.active:hover,
 .sun-editor .se-btn:enabled.active:focus {
-    background-color: #e1e1e1;
-    border-color: #d1d1d1;
+    background-color: #d0e3ff;
+    color: #3288ff;
     outline: 0 none;
 }
 
-.sun-editor .se-btn:enabled.active:active {
-    background-color: #d1d1d1;
-    border-color: #c1c1c1;
-    -webkit-box-shadow: inset 0 3px 5px #c1c1c1;
-    box-shadow: inset 0 3px 5px #c1c1c1;
+.sun-editor .se-btn:enabled.active:active,
+.sun-editor .se-btn:enabled.active.__se__active {
+    background-color: #d0e3ff;
+    border: 1px solid #4592ff;
+    -webkit-box-shadow: 0 0 0 0.2rem #d0e3ff;
+    box-shadow: 0 0 0 0.2rem #d0e3ff;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
 /* se-btn button on */
@@ -366,7 +362,8 @@
     outline: 0 none;
 }
 
-.sun-editor .se-btn:enabled.on:active {
+.sun-editor .se-btn:enabled.on:active,
+.sun-editor .se-btn:enabled.on.__se__active {
     background-color: #c1c1c1;
     border-color: #b1b1b1;
     -webkit-box-shadow: inset 0 3px 5px #b1b1b1;
@@ -453,7 +450,7 @@
     background-color: #4592ff;
     border: 1px solid #3288ff;
     opacity: 0.75;
-    border-radius: 3px;
+    border-radius: 2px;
     cursor: pointer;
     z-index: 7;
 }
@@ -471,8 +468,8 @@
     overflow: visible;
     padding: 0;
     margin: 0;
-    background-color: #fafafa;
-    outline: 1px solid #dadada;
+    background-color: #fff;
+    outline: 1px solid #e1e1e1;
     z-index: 7;
 }
 
@@ -535,8 +532,8 @@
 }
 
 .sun-editor .se-btn-module-border {
-    border: 1px solid #dadada;
-    border-radius: 3px;
+    border: 1px solid #e1e1e1;
+    border-radius: 2px;
     margin-left: 1px;
     margin-right: 1px;
 }
@@ -553,12 +550,12 @@
 /* ---more - layer */
 .sun-editor .se-toolbar-more-layer {
     margin: 0 -3px;
-    background-color: #fafafa;
+    background-color: #fff;
 }
 
 .sun-editor .se-toolbar-more-layer .se-more-layer {
     display: none;
-    border-top: 1px solid #dadada;
+    border-top: 1px solid #e1e1e1;
 }
 
 .sun-editor .se-toolbar-more-layer .se-more-layer .se-more-form {
@@ -651,8 +648,8 @@
     left: 0px;
     height: auto;
     z-index: 5;
-    border: 1px solid #bababa;
-    border-radius: 3px;
+    border: 1px solid #e1e1e1;
+    border-radius: 2px;
     padding: 4px;
     background-color: #fff;
     -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
@@ -737,7 +734,7 @@
 
 .sun-editor .se-btn-list.default_value {
     background-color: #f3f3f3;
-    border: 1px dotted #b1b1b1;
+    border: 1px dotted #e1e1e1;
 }
 
 .sun-editor .se-btn-list:hover,
@@ -867,7 +864,7 @@
     margin: 0;
     background-color: #f9f9f9;
     border: 1px solid #e1e1e1;
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 /* dropdown layer --- table selector */
@@ -887,7 +884,7 @@
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     border: 1px solid #ccc;
-    border-radius: 3px;
+    border-radius: 2px;
     -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
     box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
 }
@@ -1126,9 +1123,9 @@
     width: auto;
     height: auto;
     min-height: 16px;
-    border-top: 1px solid #dadada;
+    border-top: 1px solid #e1e1e1;
     padding: 0 4px;
-    background-color: #fafafa;
+    background-color: #fff;
     cursor: ns-resize;
 }
 
@@ -1239,7 +1236,7 @@
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     border: 1px solid rgba(0, 0, 0, .2);
-    border-radius: 3px;
+    border-radius: 2px;
     outline: 0;
     -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
     box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
@@ -1270,7 +1267,7 @@
     vertical-align: middle;
     -ms-touch-action: manipulation;
     touch-action: manipulation;
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-header {
@@ -1608,10 +1605,10 @@
     position: absolute;
     display: none;
     overflow: visible;
-    z-index: 2147483647;
+    z-index: 2147483646;
     padding: 2px 2px 0 2px;
     margin: 0;
-    border: 0;
+    border: 1px solid #999;
     text-align: start;
     text-decoration: none;
     text-shadow: none;
@@ -1627,10 +1624,6 @@
     -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
     box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
     line-break: auto;
-}
-
-.sun-editor .se-controller .se-arrow.se-arrow-up {
-    border-bottom-color: rgba(0, 0, 0, .25);
 }
 
 .sun-editor .sun-editor-editable .se-component figure.se-figure-selected::after {
@@ -1665,7 +1658,7 @@
     min-height: 34px;
     height: auto;
     border: none;
-    border-radius: 3px;
+    border-radius: 2px;
     margin: 1px;
     padding: 5px 10px;
     font-size: 12px;
@@ -1847,7 +1840,7 @@
     font-size: 12px;
     color: #fff;
     background-color: #333;
-    border-radius: 3px;
+    border-radius: 2px;
     opacity: 0.75;
 }
 
@@ -1917,7 +1910,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     background-color: #fff;
-    border-radius: 3px;
+    border-radius: 2px;
     padding: 2px 0;
     margin: 0;
     border: 1px solid #bababa;
@@ -2030,7 +2023,7 @@
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
     border: 1px solid rgba(0, 0, 0, .2);
-    border-radius: 3px;
+    border-radius: 2px;
     outline: 0;
     -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
     box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
@@ -2170,7 +2163,7 @@
     cursor: pointer;
     width: 100%;
     height: auto;
-    border-radius: 3px;
+    border-radius: 2px;
     outline: 0;
     margin: 10px 0;
 }
@@ -2185,7 +2178,7 @@
     position: relative;
     display: block;
     width: 100%;
-    border-radius: 3px;
+    border-radius: 2px;
     outline: 0;
     height: auto;
 }
@@ -2219,7 +2212,7 @@
     width: auto;
     height: auto;
     margin: 1.75rem auto;
-    border-radius: 3px;
+    border-radius: 2px;
     -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
     box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
     word-break: break-all;

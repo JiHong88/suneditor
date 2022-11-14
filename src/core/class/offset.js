@@ -4,7 +4,7 @@
  */
 
 import CoreDependency from '../../dependency/_core';
-import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass, getScrollParent } from '../../helper/domUtils';
+import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass } from '../../helper/domUtils';
 import { numbers } from '../../helper';
 
 const Offset = function (editor) {
@@ -136,15 +136,22 @@ Offset.prototype = {
 
 		const heightEditorRefer = topArea.contains(ohOffsetEl);
 		const widthEditorRefer = topArea.contains(owOffsetEl);
+		ohOffsetEl = heightEditorRefer ? topArea : ohOffsetEl;
+		owOffsetEl = widthEditorRefer ? topArea : owOffsetEl;
+		const ts = !ohOffsetEl ? 0 : ohOffsetEl.getBoundingClientRect().top + (!ohOffsetEl.parentElement || /^html$/i.test(ohOffsetEl.parentElement.nodeName) ? this._w.scrollY : 0);
+		const ls = !owOffsetEl ? 0 : owOffsetEl.getBoundingClientRect().left + (!owOffsetEl.parentElement || /^html$/i.test(owOffsetEl.parentElement.nodeName) ? this._w.scrollX : 0);
+
 		return {
 			top: t,
+			ts: ts,
 			left: l,
+			ls: ls,
 			width: w,
 			height: h,
 			x: x,
 			y: y,
-			ohOffsetEl: heightEditorRefer ? topArea : ohOffsetEl,
-			owOffsetEl: widthEditorRefer ? topArea : owOffsetEl,
+			ohOffsetEl: ohOffsetEl,
+			owOffsetEl: owOffsetEl,
 			oh: heightEditorRefer ? topArea.clientHeight : oh,
 			ow: widthEditorRefer ? topArea.clientWidth : ow,
 			heightEditorRefer: heightEditorRefer,
@@ -225,66 +232,55 @@ Offset.prototype = {
 			addOffset.left *= -1;
 		}
 
-		const frameOffset = this.getGlobal(this.context.element.wysiwygFrame);
+		const targetAbs = this._w.getComputedStyle(target).position === 'absolute';
 		const wwScroll = this.getWWScroll();
 		const editorOffset = this.getGlobal();
+		const editorScroll = this.getGlobalScroll();
 		const targetRect = target.getBoundingClientRect();
-		const targetAbs = this._w.getComputedStyle(target).position === 'absolute';
 		const targetOffset = this.getGlobal(target);
-		const targetW = targetOffset.width;
-		const targetLeft = targetOffset.left;
 		const targetScroll = this.getGlobalScroll(target);
-		const elW = element.offsetWidth;
-		const radius = numbers.get(this._w.getComputedStyle(element).borderRadius) || 0;
 		const arrow = hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null;
-		if (arrow) arrow.style.left = '';
-		const aw = arrow ? arrow.offsetWidth : 0;
-		const awHalf = aw / 2;
 
 		// top ----------------------------------------------------------------------------------------------------
-		const editorScroll = this.getGlobalScroll();
 		const editorH = this.context.element.topArea.offsetHeight;
-		const wwH = this.context.element.wysiwygFrame.offsetHeight;
 		const ah = arrow ? arrow.offsetHeight : 0;
 		const elH = element.offsetHeight;
 		const targetH = target.offsetHeight;
-		const targetOffsetTop = target.offsetTop;
 		// margin
-		const toolbarH = this.editor.isBalloon || this.editor.isInline ? 0 : this.context.toolbar.main.offsetHeight;
 		const tmtw = targetRect.top;
 		const tmbw = this._w.innerHeight - targetRect.bottom;
+		let toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline || this.options.toolbar_container) ? 0 : this.context.toolbar.main.offsetHeight;
 		let rmt, rmb;
 		if (this.editor.status.isFullScreen) {
 			rmt = tmtw - toolbarH;
 			rmb = tmbw;
 		} else {
-			const emt = editorOffset.top - editorScroll.top - (!editorScroll.ohOffsetEl ? 0 : editorScroll.ohOffsetEl.getBoundingClientRect().top + (!editorScroll.ohOffsetEl.parentElement ? this._w.scrollY : 0));
-			const tmt = targetOffset.top - targetScroll.top - (!targetScroll.ohOffsetEl ? 0 : targetScroll.ohOffsetEl.getBoundingClientRect().top + (!targetScroll.ohOffsetEl.parentElement ? this._w.scrollY : 0));
+			// top margin
+			const emt = editorOffset.top - editorScroll.top - editorScroll.ts;
+			const tmt = targetOffset.top - targetScroll.top - targetScroll.ts;
+			const vt = target.offsetTop;
+			let etmt = tmt < 0 || emt < 0 || targetScroll.heightEditorRefer || (tmt >= 0 && emt >= 0 && emt > tmt) ? tmt : tmt - emt;
+			etmt = vt < 0 && vt < etmt ? vt : etmt;
+			// bottom margin
+			toolbarH = editorH + emt <= 0 ? toolbarH : 0;
 			const emb = editorScroll.oh - (editorH + emt);
 			const tmb = targetScroll.oh - (targetH + tmt);
-			const targetT = target.offsetTop < 0 ? target.offsetTop : 0;
-			let etmt = tmt < 0 || emt < 0 || targetScroll.heightEditorRefer || (tmt >= 0 && emt >= 0 && emt > tmt) ? tmt : tmt - emt;
-			etmt = targetT < 0 && targetT < etmt ? targetT : etmt;
-			const tm = editorH - (target.offsetTop + targetH + this.editor._editorPadding.top + toolbarH);
+			const vb = editorH - (target.offsetTop + targetH + toolbarH) + (targetAbs ? 0 : wwScroll.top);
 			let etmb = tmb < 0 || emb < 0 || targetScroll.heightEditorRefer || (tmb >= 0 && emb >= 0 && emb > tmb) ? tmb : tmb - emb;
-			etmb = tm < 0 && tm < etmb ? tm : etmb;
+			etmb = vb < 0 && vb < etmb ? vb : etmb;
 			// marging result
-			rmt = (etmt < tmtw ? etmt : tmtw) - (this.editor.toolbar._sticky || editorH + emt <= 0 ? toolbarH : 0);
+			rmt = (etmt < tmtw ? etmt : tmtw) - ((this.editor.toolbar._sticky && emt < this.context.toolbar.main.getBoundingClientRect().bottom) || toolbarH);
 			rmb = etmb < tmbw ? etmb : tmbw;
 		}
 
-		if (targetAbs) {
-			if (rmb + targetH <= 0 || rmt + targetH <= 0 || targetH - elH + (rmb + rmt) < 0) return;
-		} else {
-			if (targetOffsetTop + targetH - wwScroll.top < 1 || wwScroll.top + wwH - targetOffsetTop < 1) return;
-		}
+		if (rmb + targetH <= 0 || rmt + targetH <= 0) return;
 
 		let t = addOffset.top;
 		let y = 0;
 		let arrowDir = '';
 		if (position === 'bottom') {
 			arrowDir = 'up';
-			t += targetRect.top + targetH + ah + this._w.scrollY;
+			t += targetRect.bottom + ah + this._w.scrollY;
 			y = rmb - (elH + ah);
 			if (y < 0) {
 				arrowDir = 'down';
@@ -314,109 +310,122 @@ Offset.prototype = {
 		element.style.top = t + 'px';
 
 		// left ----------------------------------------------------------------------------------------------------
-		const editorLeft = editorOffset.left;
 		const editorW = this.context.element.topArea.offsetWidth;
-		let l = addOffset.left;
-		let ml = 0,
-			sl = 0;
-
-		if (!this.options._rtl) {
-			l += targetRect.left + this._w.scrollX;
-			const padding = targetOffset.left - editorLeft + wwScroll.left;
-			const paddingMargin = padding - wwScroll.left;
-			ml = targetAbs ? editorLeft - targetScroll.left + (paddingMargin < 0 ? 0 : paddingMargin) : targetLeft - editorLeft;
-			sl = targetAbs ? (ml < 0 && paddingMargin < 0 ? -1 * (ml + paddingMargin) : ml < 0 ? -1 * (ml + (paddingMargin > 0 ? 0 : -paddingMargin)) : paddingMargin < 0 ? wwScroll.left - padding : 0) : this._getLeftScrollMargin(l, ml, targetAbs, editorOffset, wwScroll);
-
-			if (sl >= targetW) return;
-			element.style.left = l + sl + 'px';
-
-			const overSize = container.offsetWidth - (element.offsetLeft + elW);
-			if (overSize < 0) {
-				element.style.left = element.offsetLeft + overSize + 'px';
-				if (arrow) arrow.style.left = (aw - overSize + awHalf > elW ? elW - awHalf - radius : aw - overSize) + 'px';
-			} else if (arrow) {
-				arrow.style.left = (targetW <= aw + awHalf ? awHalf + radius : aw) + 'px';
-			}
+		const radius = numbers.get(this._w.getComputedStyle(element).borderRadius) || 0;
+		const targetW = targetOffset.width;
+		const elW = element.offsetWidth;
+		const aw = arrow ? arrow.offsetWidth : 0;
+		// margin
+		const tmlw = targetRect.left;
+		const tmrw = this._w.innerWidth - targetRect.right;
+		let rml, rmr;
+		if (this.editor.status.isFullScreen) {
+			rml = tmlw;
+			rmr = tmrw;
 		} else {
-			l += targetRect.right - elW + this._w.scrollX;
-			const padding = editorLeft + editorW - (targetOffset.left + targetW) - wwScroll.left;
-			const paddingMargin = padding + wwScroll.left;
-			ml = targetAbs ? targetScroll.ow - targetScroll.x - (editorLeft + editorW - targetScroll.left) + (paddingMargin < 0 ? 0 : paddingMargin) - this._w.scrollX : editorW + padding - (targetLeft + targetW) - (editorW - (editorLeft + editorW));
-			sl = targetAbs ? (ml < 0 && paddingMargin < 0 ? ml + paddingMargin : ml < 0 ? ml + (paddingMargin > 0 ? 0 : -paddingMargin) : paddingMargin < 0 ? wwScroll.left + padding : 0) : this._getLeftScrollMargin(l, ml, targetAbs, editorOffset, wwScroll);
-
-			if (-sl >= targetW) return;
-			element.style.left = l + sl + 'px';
-
-			const overSize = container.offsetLeft - element.offsetLeft;
-			if (overSize > 0) {
-				element.style.left = frameOffset.left + 'px';
-				if (arrow) arrow.style.left = elW - aw * 2 - overSize + 'px';
-			} else if (arrow) {
-				if (elW - (arrow.offsetLeft + awHalf) >= targetW) {
-					arrow.style.left = elW - aw - radius + 'px';
-				}
-			}
+			// left margin
+			const eml = editorOffset.left - editorScroll.left - editorScroll.ls;
+			const tml = targetOffset.left - targetScroll.left - targetScroll.ls;
+			const vl = target.offsetLeft - wwScroll.left;
+			let etml = eml < 0 || tml < 0 || targetScroll.widthEditorRefer || (tml >= 0 && eml >= 0 && eml < tml) ? tml : tml - eml;
+			etml = vl < 0 && vl < etml ? vl : etml;
+			// right margin
+			const emr = editorScroll.ow - (editorW + eml);
+			const tmr = targetScroll.ow - (targetW + tml);
+			const vr = editorW - (target.offsetLeft + targetW) + (targetAbs ? 0 : wwScroll.left);
+			let etmr = emr < 0 || tmr < 0 || targetScroll.widthEditorRefer || (tmr >= 0 && emr >= 0 && emr > tmr) ? tmr : tmr - emr;
+			etmr = vr < 0 && vr < etmr ? vr : etmr;
+			// margin result
+			rml = etml < tmlw ? etml : tmlw;
+			rmr = etmr < tmrw ? etmr : tmrw;
 		}
+
+		if (rml + targetW <= 0 || rmr + targetW <= 0) return;
+		if (arrow) {
+			arrow.style.left = '';
+			arrow.style.right = '';
+		}
+
+		let l = addOffset.left;
+		let x = 0;
+		let ax = 0;
+		let awLimit = 0;
+		if (!this.options._rtl) {
+			l += targetRect.left + this._w.scrollX - (rml < 0 ? rml : 0);
+			x = targetW + rml;
+			if (x < aw) {
+				awLimit = aw / 2 - 1 + (radius <= 2 ? 0 : radius - 2);
+				ax = awLimit;
+			}
+			x = targetW + rmr - elW;
+			if (x < 0) {
+				l += x;
+				awLimit = elW - 1 - (aw / 2 + (radius <= 2 ? 0 : radius - 2));
+				ax = -(x - aw / 2);
+				ax = ax > awLimit ? awLimit : ax;
+			}
+			if (arrow && ax > 0) arrow.style.left = ax + 'px';
+		} else {
+			l += targetRect.right - elW + this._w.scrollX + (rmr < 0 ? rmr : 0);
+			x = targetW + rmr;
+			if (x < aw) {
+				awLimit = aw / 2 - 1 + (radius <= 2 ? 0 : radius - 2);
+				ax = awLimit;
+			}
+			x = targetW + rml - elW;
+			if (x < 0) {
+				l -= x;
+				awLimit = aw / 2 - 1 + (radius <= 2 ? 0 : radius - 2);
+				ax = -(x - aw / 2);
+				ax = ax < awLimit ? awLimit : ax > elW - awLimit ? elW - awLimit : ax;
+			}
+			if (arrow && ax > 0) arrow.style.right = ax + 'px';
+		}
+
+		element.style.left = l + 'px';
 
 		inst.__offset = { left: element.offsetLeft + wwScroll.left, top: element.offsetTop + wwScroll.top, addOffset: addOffset };
-
 		return true;
-	},
 
-	_getLeftScrollMargin: function (l, ml, targetAbs, editorOffset, wwScroll) {
-		const rtlConst = this.options._rtl ? -1 : 1;
-		let sl = 0;
-		if (rtlConst > 0) {
-			if (l >= ml) return 0;
-			sl = targetAbs ? ml - l : wwScroll.left - ml;
-		} else {
-			sl = targetAbs ? editorOffset.left + editorOffset.width : 0;
-		}
-		return rtlConst * sl < 0 ? 0 : rtlConst * sl;
-	},
+		// let ml = 0,
+		// 	sl = 0;
+		// if (!this.options._rtl) {
+		// 	l += targetRect.left + this._w.scrollX;
+		// 	const padding = targetOffset.left - editorLeft + wwScroll.left;
+		// 	const paddingMargin = padding - wwScroll.left;
+		// 	ml = targetAbs ? editorLeft - targetScroll.left + (paddingMargin < 0 ? 0 : paddingMargin) : targetLeft - editorLeft;
+		// 	sl = targetAbs ? (ml < 0 && paddingMargin < 0 ? -1 * (ml + paddingMargin) : ml < 0 ? -1 * (ml + (paddingMargin > 0 ? 0 : -paddingMargin)) : paddingMargin < 0 ? wwScroll.left - padding : 0) : this._getLeftScrollMargin(l, ml, targetAbs, editorOffset, wwScroll);
 
-	_getRelTargetOffset: function (target) {
-		if (this._w.getComputedStyle(target).position === 'absolute') return { top: 0, left: 0 };
+		// 	if (sl >= targetW) return;
+		// 	element.style.left = l + sl + 'px';
 
-		const eventWysiwyg = this.context.element.eventWysiwyg;
-		const wwScrollY = eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0;
-		const wwScrollX = eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0;
-		let gt = 0;
-		let gl = 0;
+		// 	const overSize = container.offsetWidth - (element.offsetLeft + elW);
+		// 	if (overSize < 0) {
+		// 		element.style.left = element.offsetLeft + overSize + 'px';
+		// 		if (arrow) arrow.style.left = (aw - overSize + awHalf > elW ? elW - awHalf - radius : aw - overSize) + 'px';
+		// 	} else if (arrow) {
+		// 		arrow.style.left = (targetW <= aw + awHalf ? awHalf + radius : aw) + 'px';
+		// 	}
+		// } else {
+		// 	l += targetRect.right - elW + this._w.scrollX;
+		// 	const padding = editorLeft + editorW - (targetOffset.left + targetW) - wwScroll.left;
+		// 	const paddingMargin = padding + wwScroll.left;
+		// 	ml = targetAbs ? targetScroll.ow - targetScroll.x - (editorLeft + editorW - targetScroll.left) + (paddingMargin < 0 ? 0 : paddingMargin) - this._w.scrollX : editorW + padding - (targetLeft + targetW) - (editorW - (editorLeft + editorW));
+		// 	sl = targetAbs ? (ml < 0 && paddingMargin < 0 ? ml + paddingMargin : ml < 0 ? ml + (paddingMargin > 0 ? 0 : -paddingMargin) : paddingMargin < 0 ? wwScroll.left + padding : 0) : this._getLeftScrollMargin(l, ml, targetAbs, editorOffset, wwScroll);
 
-		if (this.options.iframe) {
-			const frameOffset = this.getGlobal(this.context.element.wysiwygFrame);
-			gt += this._w.scrollY - wwScrollY + frameOffset.top - this._w.scrollY;
-			gl += this._w.scrollX - wwScrollX + frameOffset.left - this._w.scrollX;
-		} else {
-			gt -= wwScrollY;
-			gl -= wwScrollX;
-		}
+		// 	if (-sl >= targetW) return;
+		// 	element.style.left = l + sl + 'px';
 
-		return {
-			top: gt,
-			left: gl
-		};
-	},
-
-	_getAbsBottomMargin: function (elementT, elementH, targetH, arrowH, editorTop, globalTop, targetAbs) {
-		const margin_y = editorTop + this.context.element.topArea.offsetHeight - (elementT + (targetAbs ? globalTop - this._w.scrollY : 0) + elementH);
-		const margin_y_window = this._w.innerHeight - (elementT - (targetAbs ? globalTop : this._w.scrollY) + elementH);
-		if (margin_y < 0 || margin_y_window < 0) {
-			return -(arrowH * 2 + targetH + elementH);
-		} else {
-			return 0;
-		}
-	},
-
-	_getAbsTopMargin: function (elementT, elementH, targetH, arrowH, editorTop, globalTop, targetAbs) {
-		const margin_y = elementT + (targetAbs ? globalTop - this._w.scrollY : 0) - editorTop;
-		const margin_y_window = elementT - (targetAbs ? globalTop : this._w.scrollY);
-		if (margin_y < 0 || margin_y_window < 0) {
-			return arrowH * 2 + targetH + elementH;
-		} else {
-			return 0;
-		}
+		// 	const overSize = container.offsetLeft - element.offsetLeft;
+		// 	if (overSize > 0) {
+		// 		element.style.left = frameOffset.left + 'px';
+		// 		if (arrow) arrow.style.left = elW - aw * 2 - overSize + 'px';
+		// 	} else if (arrow) {
+		// 		if (elW - (arrow.offsetLeft + awHalf) >= targetW) {
+		// 			arrow.style.left = elW - aw - radius + 'px';
+		// 		}
+		// 	}
+		// }
 	},
 
 	_setArrow: function (arrow, key) {
