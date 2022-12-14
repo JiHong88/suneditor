@@ -195,6 +195,8 @@
     width: 0;
     height: 0;
     border: 11px solid transparent;
+    margin-right: 0;
+    margin-left: -11px;
 }
 
 .sun-editor .se-controller .se-arrow {
@@ -202,11 +204,6 @@
     right: auto;
     margin-left: -11px;
     margin-right: 0;
-}
-
-.sun-editor .se-controller .se-arrow::after {
-    margin-right: 0;
-    margin-left: -11px;
 }
 
 /* arrow up */
@@ -523,6 +520,24 @@
     display: none;
     position: static;
     z-index: -1;
+}
+
+/* toolbar arrow up */
+.sun-editor .se-arrow.se-arrow-up {
+    border-bottom-color: #e1e1e1;
+}
+
+.sun-editor .se-arrow.se-arrow-up::after {
+    border-bottom-color: #fff;
+}
+
+/* toolbar arrow down */
+.sun-editor .se-arrow.se-arrow-down {
+    border-top-color: #e1e1e1;
+}
+
+.sun-editor .se-arrow.se-arrow-down::after {
+    border-top-color: #fff;
 }
 
 /** --- tool bar --- module --- button, module, group ----------------------------------------------------------  */

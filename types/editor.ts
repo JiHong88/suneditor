@@ -424,10 +424,10 @@ export default class SunEditor {
 	/**
 	 * @description Set "options.editorCSSText" style.
 	 * Define the style of the edit area
-	 * It can also be defined with the "setOptions" method, but the "setEditorCSSText" method does not render the editor again.
+	 * It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
 	 * @param style Style string
 	 */
-	setEditorCSSText(style: string): void;
+	setEditorStyle(style: string): void;
 
 	/**
 	 * @description Copying the content of the editor to the original textarea and execute onSave callback.

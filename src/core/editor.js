@@ -25,17 +25,21 @@ import Toolbar from './class/toolbar';
 
 /**
  * @description SunEditor constructor function.
- * @param {Array.Element} editorTargets Target textarea
+ * @param {Array.<Element>} multiTargets Target textarea
  * @param {Object} options options
  * @returns {Object}
  */
-const Editor = function (editorTargets, options) {
-	const _d = editorTargets[0].ownerDocument || env._d;
+const Editor = function (multiTargets, options) {
+	const _d = multiTargets[0].target.ownerDocument || env._d;
 	const _w = _d.defaultView || env._w;
-	const product = Constructor(editorTargets, options);
+	const product = Constructor(multiTargets, options);
 	const context = product.commonContext;
 	context.targetElements = product.elementContext;
-	context.element = product.elementContext[0];
+	context.element = product.elementContext[product.rootId];
+
+	// properties
+	this.rootId = product.rootId;
+	this.rootKeys = product.rootKeys;
 
 	/**
 	 * @description Document object
@@ -107,6 +111,7 @@ const Editor = function (editorTargets, options) {
 	 * @property {number} codeIndentSize Indent size of Code view mode (2)
 	 * @property {Array} currentNodes  An element array of the current cursor's node structure
 	 * @property {Array} currentNodesMap  An element name array of the current cursor's node structure
+	 * @property {number} rootKey  Root index
 	 */
 	this.status = {
 		hasFocus: false,
@@ -121,6 +126,7 @@ const Editor = function (editorTargets, options) {
 		codeIndentSize: 2,
 		currentNodes: [],
 		currentNodesMap: [],
+		rootKey: product.rootId,
 		_range: null,
 		_selectionNode: null,
 		_resizeClientY: 0,
@@ -357,12 +363,13 @@ const Editor = function (editorTargets, options) {
 
 	/** ----- Create editor ------------------------------------------------------------ */
 	this._editorInit(false);
+	
 	const inst = this;
 	const els = context.targetElements;
-	for (let i = 0, len = els.length, e, o, t; i < len; i++) {
-		e = els[i];
-		o = e.originElement;
-		t = e.topArea;
+	for (let key in els) {
+		const e = els[key];
+		const o = e.originElement;
+		const t = e.topArea;
 		o.style.display = 'none';
 		t.style.display = 'block';
 		o.parentNode.insertBefore(t, o.nextElementSibling);
@@ -379,6 +386,8 @@ const Editor = function (editorTargets, options) {
 			});
 		}
 	}
+
+	this.history.reset();
 };
 
 Editor.prototype = {
@@ -554,7 +563,7 @@ Editor.prototype = {
 				break;
 			case 'save':
 				if (typeof this.options.callBackSave === 'function') {
-					this.options.callBackSave(this.getContent(false), this.status.isChanged);
+					this.options.callBackSave(this.getContent(), this.status.isChanged);
 				} else if (this.status.isChanged && typeof this.events.save === 'function') {
 					this.events.save();
 				} else {
@@ -582,178 +591,6 @@ Editor.prototype = {
 				this.format.applyTextStyle(cmd, this._commandMapStyles[command] || null, [removeNode], false);
 				this.focus();
 		}
-	},
-
-	/**
-	 * @description javascript execCommand
-	 * @param {string} command javascript execCommand function property
-	 * @param {Boolean|undefined} showDefaultUI javascript execCommand function property
-	 * @param {string|undefined} value javascript execCommand function property
-	 */
-	execCommand: function (command, showDefaultUI, value) {
-		this.context.element._wd.execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
-		// history stack
-		this.history.push(true);
-	},
-
-	/**
-	 * @description Focus to wysiwyg area
-	 */
-	focus: function () {
-		if (this.context.element.wysiwygFrame.style.display === 'none') return;
-
-		if (this.options.iframe || !this.context.element.wysiwyg.contains(this.selection.getNode())) {
-			this._nativeFocus();
-		} else {
-			try {
-				const range = this.selection.getRange();
-				if (range.startContainer === range.endContainer && domUtils.isWysiwygFrame(range.startContainer)) {
-					const currentNode = range.commonAncestorContainer.children[range.startOffset];
-					if (!this.format.isLine(currentNode) && !this.component.is(currentNode)) {
-						const br = domUtils.createElement('BR');
-						const format = domUtils.createElement(this.options.defaultLineTag, null, br);
-						this.context.element.wysiwyg.insertBefore(format, currentNode);
-						this.selection.setRange(br, 0, br, 0);
-						return;
-					}
-				}
-				this.selection.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
-			} catch (e) {
-				console.warn('[SUNEDITOR.focus.warn] ' + e);
-				this._nativeFocus();
-			}
-		}
-
-		this.eventManager.applyTagEffect();
-		if (this.isBalloon) this.eventManager._toggleToolbarBalloon();
-	},
-
-	/**
-	 * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
-	 * If "focusEdge" is null, then selected last element
-	 * @param {Element|null} focusEl Focus element
-	 */
-	focusEdge: function (focusEl) {
-		if (!focusEl) focusEl = this.context.element.wysiwyg.lastElementChild;
-
-		const fileComponentInfo = this.component.get(focusEl);
-		if (fileComponentInfo) {
-			this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
-		} else if (focusEl) {
-			focusEl = domUtils.getEdgeChild(
-				focusEl,
-				function (current) {
-					return current.childNodes.length === 0 || current.nodeType === 3;
-				},
-				true
-			);
-			if (!focusEl) this._nativeFocus();
-			else this.selection.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
-		} else {
-			this.focus();
-		}
-	},
-
-	/**
-	 * @description Focusout to wysiwyg area (.blur())
-	 */
-	blur: function () {
-		if (this.options.iframe) {
-			this.context.element.wysiwygFrame.blur();
-		} else {
-			this.context.element.wysiwyg.blur();
-		}
-	},
-
-	/**
-	 * @description Sets the HTML string
-	 * @param {string|undefined} html HTML string
-	 */
-	setContent: function (html) {
-		this.selection.removeRange();
-
-		const convertValue = html === null || html === undefined ? '' : this.html.clean(html, true, null, null);
-		this._resetComponents();
-
-		if (!this.status.isCodeView) {
-			this.context.element.wysiwyg.innerHTML = convertValue;
-			// history stack
-			this.history.push(false);
-		} else {
-			const value = this._convertHTMLToCode(convertValue, false);
-			this.viewer._setCodeView(value);
-		}
-	},
-
-	/**
-	 * @description Add content to the end of content.
-	 * @param {string} content Content to Input
-	 */
-	addContent: function (content) {
-		const convertValue = this.html.clean(content, true, null, null);
-
-		if (!this.status.isCodeView) {
-			const temp = domUtils.createElement('DIV', null, convertValue);
-			const wysiwyg = this.context.element.wysiwyg;
-			const children = temp.children;
-			for (let i = 0, len = children.length; i < len; i++) {
-				if (children[i]) {
-					wysiwyg.appendChild(children[i]);
-				}
-			}
-		} else {
-			this.viewer._setCodeView(this.viewer._getCodeView() + '\n' + this._convertHTMLToCode(convertValue, false));
-		}
-
-		// history stack
-		this.history.push(false);
-	},
-
-	/**
-	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
-	 * @param {Object} ctx { head: HTML string, body: HTML string}
-	 */
-	setFullPageContent: function (ctx) {
-		if (!this.options.iframe) return false;
-		if (ctx.head) this.context.element._wd.head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
-		if (ctx.body) this.context.element._wd.body.innerHTML = this.html.clean(ctx.body, true, null, null);
-	},
-
-	/**
-	 * @description Gets the current content
-	 * @param {boolean} withFrame Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
-	 * Ignored for options.iframe_fullPage is true.
-	 * @param {boolean} includeFullPage Return only the content of the body without headers when the "iframe_fullPage" option is true
-	 * @returns {Object}
-	 */
-	getContent: function (withFrame, includeFullPage) {
-		const renderHTML = domUtils.createElement('DIV', null, this._convertHTMLToCode(this.context.element.wysiwyg, true));
-		const figcaptions = domUtils.getListChildren(renderHTML, function (current) {
-			return /FIGCAPTION/i.test(current.nodeName);
-		});
-
-		for (let i = 0, len = figcaptions.length; i < len; i++) {
-			figcaptions[i].removeAttribute('contenteditable');
-		}
-
-		if (this.options.iframe_fullPage) {
-			if (includeFullPage) {
-				const attrs = domUtils.getAttributesToString(this.context.element._wd.body, ['contenteditable']);
-				return '<!DOCTYPE html><html>' + this.context.element._wd.head.outerHTML + '<body ' + attrs + '>' + renderHTML.innerHTML + '</body></html>';
-			} else {
-				return renderHTML.innerHTML;
-			}
-		} else {
-			return withFrame ? '<div class="sun-editor-editable' + (this.options._rtl ? ' se-rtl' : '') + '">' + renderHTML.innerHTML + '</div>' : renderHTML.innerHTML;
-		}
-	},
-
-	/**
-	 * @description Gets only the text of the suneditor content
-	 * @returns {string}
-	 */
-	getText: function () {
-		return this.context.element.wysiwyg.textContent;
 	},
 
 	/**
@@ -814,35 +651,6 @@ Editor.prototype = {
 
 		if (!mergeOptions.iframe) {
 			this._setOptionsInit(ctx, product, mergeOptions, initHTML);
-		}
-	},
-
-	/**
-	 * @description Set "options.editorCSSText" style.
-	 * Define the style of the edit area
-	 * It can also be defined with the "setOptions" method, but the "setEditorCSSText" method does not render the editor again.
-	 * @param {string} style Style string
-	 */
-	setEditorCSSText: function (style) {
-		const newStyles = (this.options._editorStyles = converter._setDefaultOptionStyle(this.options, style));
-		const ctxEl = this.context.element;
-
-		// top area
-		ctxEl.topArea.style.cssText = newStyles.top;
-		// code view
-		ctxEl.code.style.cssText = this.options._editorStyles.frame;
-		ctxEl.code.style.display = 'none';
-		if (this.options.height === 'auto') {
-			ctxEl.code.style.overflow = 'hidden';
-		} else {
-			ctxEl.code.style.overflow = '';
-		}
-		// wysiwyg frame
-		if (!this.options.iframe) {
-			ctxEl.wysiwygFrame.style.cssText = newStyles.frame + newStyles.editor;
-		} else {
-			ctxEl.wysiwygFrame.style.cssText = newStyles.frame;
-			ctxEl.wysiwyg.style.cssText = newStyles.editor;
 		}
 	},
 
@@ -914,10 +722,284 @@ Editor.prototype = {
 	},
 
 	/**
+	 * @description Change the current root index.
+	 * @param {number} rootKey
+	 */
+	changeContextElement: function (rootKey) {
+		if (!rootKey) return;
+
+		this.status.rootKey = rootKey;
+
+		const ctx = this.context;
+		const el = (ctx.element = ctx.targetElements[rootKey]);
+		this._lineBreakerButton = el.lineBreaker.querySelector('button');
+		this._lineBreaker_t = el.lineBreaker_t;
+		this._lineBreaker_b = el.lineBreaker_b;
+	},
+
+	/**
+	 * @description javascript execCommand
+	 * @param {string} command javascript execCommand function property
+	 * @param {Boolean|undefined} showDefaultUI javascript execCommand function property
+	 * @param {string|undefined} value javascript execCommand function property
+	 */
+	execCommand: function (command, showDefaultUI, value) {
+		this.context.element._wd.execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
+		// history stack
+		this.history.push(true);
+	},
+
+	/**
+	 * @description Focus to wysiwyg area
+	 * @param {number|undefined} rootKey Root index
+	 */
+	focus: function (rootKey) {
+		if (numbers.is(rootKey)) this.changeContextElement(rootKey);
+		if (this.context.element.wysiwygFrame.style.display === 'none') return;
+
+		if (this.options.iframe || !this.context.element.wysiwyg.contains(this.selection.getNode())) {
+			this._nativeFocus();
+		} else {
+			try {
+				const range = this.selection.getRange();
+				if (range.startContainer === range.endContainer && domUtils.isWysiwygFrame(range.startContainer)) {
+					const currentNode = range.commonAncestorContainer.children[range.startOffset];
+					if (!this.format.isLine(currentNode) && !this.component.is(currentNode)) {
+						const br = domUtils.createElement('BR');
+						const format = domUtils.createElement(this.options.defaultLineTag, null, br);
+						this.context.element.wysiwyg.insertBefore(format, currentNode);
+						this.selection.setRange(br, 0, br, 0);
+						return;
+					}
+				}
+				this.selection.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
+			} catch (e) {
+				console.warn('[SUNEDITOR.focus.warn] ' + e);
+				this._nativeFocus();
+			}
+		}
+
+		this.eventManager.applyTagEffect();
+		if (this.isBalloon) this.eventManager._toggleToolbarBalloon();
+	},
+
+	/**
+	 * @description If "focusEl" is a component, then that component is selected; if it is a format element, the last text is selected
+	 * If "focusEdge" is null, then selected last element
+	 * @param {Element|null} focusEl Focus element
+	 */
+	focusEdge: function (focusEl) {
+		if (!focusEl) focusEl = this.context.element.wysiwyg.lastElementChild;
+
+		const fileComponentInfo = this.component.get(focusEl);
+		if (fileComponentInfo) {
+			this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
+		} else if (focusEl) {
+			focusEl = domUtils.getEdgeChild(
+				focusEl,
+				function (current) {
+					return current.childNodes.length === 0 || current.nodeType === 3;
+				},
+				true
+			);
+			if (!focusEl) this._nativeFocus();
+			else this.selection.setRange(focusEl, focusEl.textContent.length, focusEl, focusEl.textContent.length);
+		} else {
+			this.focus();
+		}
+	},
+
+	/**
+	 * @description Focusout to wysiwyg area (.blur())
+	 */
+	blur: function () {
+		if (this.options.iframe) {
+			this.context.element.wysiwygFrame.blur();
+		} else {
+			this.context.element.wysiwyg.blur();
+		}
+	},
+
+	/**
+	 * @description Sets the HTML string
+	 * @param {string|undefined} html HTML string
+	 * @param {number|Array.<number>|undefined} rootKey Root index
+	 */
+	setContent: function (html, rootKey) {
+		this.selection.removeRange();
+		const convertValue = html === null || html === undefined ? '' : this.html.clean(html, true, null, null);
+
+		if (!rootKey) rootKey = [this.status.rootKey];
+		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
+
+		for (let i = 0; i < rootKey.length; i++) {
+			this.changeContextElement(rootKey[i]);
+
+			if (!this.status.isCodeView) {
+				this.context.element.wysiwyg.innerHTML = convertValue;
+			} else {
+				const value = this._convertHTMLToCode(convertValue, false);
+				this.viewer._setCodeView(value);
+			}
+		}
+
+		if (!this.status.isCodeView) {
+			this._resetComponents();
+			// history stack
+			this.history.push(false);
+		}
+	},
+
+	/**
+	 * @description Add content to the end of content.
+	 * @param {string} content Content to Input
+	 * @param {number|Array.<number>|undefined} rootKey Root index
+	 */
+	addContent: function (content, rootKey) {
+		if (!rootKey) rootKey = [this.status.rootKey];
+		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
+
+		for (let i = 0; i < rootKey.length; i++) {
+			this.changeContextElement(rootKey[i]);
+
+			const convertValue = this.html.clean(content, true, null, null);
+			if (!this.status.isCodeView) {
+				const temp = domUtils.createElement('DIV', null, convertValue);
+				const children = temp.children;
+				for (let i = 0, len = children.length; i < len; i++) {
+					if (!children[i]) continue;
+					this.context.element.wysiwyg.appendChild(children[i]);
+				}
+			} else {
+				this.viewer._setCodeView(this.viewer._getCodeView() + '\n' + this._convertHTMLToCode(convertValue, false));
+			}
+		}
+
+		if (!this.status.isCodeView) {
+			// history stack
+			this.history.push(false);
+		}
+	},
+
+	/**
+	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
+	 * @param {Object} ctx { head: HTML string, body: HTML string}
+	 * @param {number|Array.<number>|undefined} rootKey Root index
+	 */
+	setFullPageContent: function (ctx, rootKey) {
+		if (!this.options.iframe) return false;
+
+		if (!rootKey) rootKey = [this.status.rootKey];
+		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
+
+		for (let i = 0; i < rootKey.length; i++) {
+			this.changeContextElement(rootKey[i]);
+
+			if (ctx.head) this.context.element._wd.head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
+			if (ctx.body) this.context.element._wd.body.innerHTML = this.html.clean(ctx.body, true, null, null);
+		}
+	},
+
+	/**
+	 * @description Gets the current content
+	 * @param {boolean} withFrame Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
+	 * Ignored for options.iframe_fullPage is true.
+	 * @param {boolean} includeFullPage Return only the content of the body without headers when the "iframe_fullPage" option is true
+	 * @param {number|Array.<number>|undefined} rootKey Root index
+	 * @returns {string|Array.<string>}
+	 */
+	getContent: function (withFrame, includeFullPage, rootKey) {
+		if (!rootKey) rootKey = [this.status.rootKey];
+		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
+
+		const prevrootKey = this.status.rootKey;
+		const resultValue = {};
+		for (let i = 0, len = rootKey.length, r; i < len; i++) {
+			this.changeContextElement(rootKey[i]);
+
+			const ctxElement = this.context.element;
+			const renderHTML = domUtils.createElement('DIV', null, this._convertHTMLToCode(ctxElement.wysiwyg, true));
+			const figcaptions = domUtils.getListChildren(renderHTML, function (current) {
+				return /FIGCAPTION/i.test(current.nodeName);
+			});
+
+			for (let i = 0, len = figcaptions.length; i < len; i++) {
+				figcaptions[i].removeAttribute('contenteditable');
+			}
+
+			if (this.options.iframe_fullPage) {
+				if (includeFullPage) {
+					const attrs = domUtils.getAttributesToString(ctxElement._wd.body, ['contenteditable']);
+					r = '<!DOCTYPE html><html>' + ctxElement._wd.head.outerHTML + '<body ' + attrs + '>' + renderHTML.innerHTML + '</body></html>';
+				} else {
+					r = renderHTML.innerHTML;
+				}
+			} else {
+				r = withFrame ? '<div class="sun-editor-editable' + (this.options._rtl ? ' se-rtl' : '') + '">' + renderHTML.innerHTML + '</div>' : renderHTML.innerHTML;
+			}
+
+			resultValue[rootKey[i]] = r;
+		}
+
+		this.changeContextElement(prevrootKey);
+		return rootKey.length > 1 ? resultValue : resultValue[rootKey[0]];
+	},
+
+	/**
+	 * @description Gets only the text of the suneditor content
+	 * @param {number|Array.<number>|undefined} rootKey Root index
+	 * @returns {string|Array.<string>}
+	 */
+	getText: function (rootKey) {
+		if (!rootKey) rootKey = [this.status.rootKey];
+		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
+
+		const prevrootKey = this.status.rootKey;
+		const resultValue = {};
+		for (let i = 0, len = rootKey.length; i < len; i++) {
+			this.changeContextElement(rootKey[i]);
+			resultValue[rootKey[i]] = this.context.element.wysiwyg.textContent;
+		}
+
+		this.changeContextElement(prevrootKey);
+		return rootKey.length > 1 ? resultValue : resultValue[rootKey[0]];
+	},
+
+	/**
+	 * @description Set "options.editorCSSText" style.
+	 * Define the style of the edit area
+	 * It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
+	 * @param {string} style Style string
+	 */
+	setEditorStyle: function (style) {
+		const newStyles = (this.options._editorStyles = converter._setDefaultOptionStyle(this.options, style));
+		const ctxElement = this.context.element;
+
+		// top area
+		ctxElement.topArea.style.cssText = newStyles.top;
+		// code view
+		ctxElement.code.style.cssText = this.options._editorStyles.frame;
+		ctxElement.code.style.display = 'none';
+		if (this.options.height === 'auto') {
+			ctxElement.code.style.overflow = 'hidden';
+		} else {
+			ctxElement.code.style.overflow = '';
+		}
+		// wysiwyg frame
+		if (!this.options.iframe) {
+			ctxElement.wysiwygFrame.style.cssText = newStyles.frame + newStyles.editor;
+		} else {
+			ctxElement.wysiwygFrame.style.cssText = newStyles.frame;
+			ctxElement.wysiwyg.style.cssText = newStyles.editor;
+		}
+	},
+
+	/**
 	 * @description Switch to or off "ReadOnly" mode.
 	 * @param {boolean} value "readOnly" boolean value.
+	 * @param {number|Array.<number>|undefined} rootKey Root index
 	 */
-	readOnly: function (value) {
+	readOnly: function (value, rootKey) {
 		this.status.isReadOnly = value;
 		domUtils.setDisabled(this._controllerOnDisabledButtons, !!value);
 
@@ -945,7 +1027,7 @@ Editor.prototype = {
 	/**
 	 * @description Disable the suneditor
 	 */
-	disable: function () {
+	disable: function (rootKey) {
 		this.toolbar.disable();
 		this._offCurrentController();
 		this._offCurrentModal();
@@ -965,7 +1047,7 @@ Editor.prototype = {
 	/**
 	 * @description Enable the suneditor
 	 */
-	enable: function () {
+	enable: function (rootKey) {
 		this.toolbar.enable();
 		this.context.element.wysiwyg.setAttribute('contenteditable', true);
 		this.isDisabled = false;
@@ -980,7 +1062,7 @@ Editor.prototype = {
 	/**
 	 * @description Show the suneditor
 	 */
-	show: function () {
+	show: function (rootKey) {
 		const topAreaStyle = this.context.element.topArea.style;
 		if (topAreaStyle.display === 'none') topAreaStyle.display = 'block';
 	},
@@ -988,7 +1070,7 @@ Editor.prototype = {
 	/**
 	 * @description Hide the suneditor
 	 */
-	hide: function () {
+	hide: function (rootKey) {
 		this.context.element.topArea.style.display = 'none';
 	},
 
@@ -996,7 +1078,7 @@ Editor.prototype = {
 	 * @description Copying the content of the editor to the original textarea and execute onSave callback.
 	 */
 	save: function () {
-		const value = this.getContent(false);
+		const value = this.getContent();
 		this.context.element.originElement.value = value;
 		// user event
 		if (typeof this.events.onSave === 'function') {
@@ -1012,7 +1094,10 @@ Editor.prototype = {
 		/** remove element */
 		domUtils.removeItem(this.context._carrierWrapper);
 		domUtils.removeItem(this.context.toolbar._wrapper);
-		domUtils.removeItem(this.context.element.topArea);
+		const ctxElements = this.context.targetElements;
+		for (let k in ctxElements) {
+			domUtils.removeItem(ctxElements[k].topArea);
+		}
 
 		/** remove history */
 		this.history._destroy();
@@ -1322,7 +1407,7 @@ Editor.prototype = {
 	 * @private
 	 */
 	_initWysiwygArea: function (e, reload, _initHTML) {
-		e.wysiwyg.innerHTML = reload ? _initHTML : this.html.clean(typeof _initHTML === 'string' ? _initHTML : e.originElement.value, true, null, null);
+		e.wysiwyg.innerHTML = (reload ? _initHTML : this.html.clean(typeof _initHTML === 'string' ? _initHTML : e.originElement.value, true, null, null)) || '<' + this.options.defaultLineTag + '><br></' + this.options.defaultLineTag + '>';
 		this.context.element = e;
 		if (this.options.charCounter && e.charCounter) e.charCounter.textContent = this.char.getLength();
 	},
@@ -1345,7 +1430,7 @@ Editor.prototype = {
 		this.status.isChanged = true;
 		if (this.context.buttons.save) this.context.buttons.save.removeAttribute('disabled');
 		// user event
-		if (this.events.onChange) this.events.onChange(this.getContent(true));
+		if (this.events.onChange) this.events.onChange(this.getContent());
 		if (this.context.toolbar.main.style.display === 'block') this.toolbar._showBalloon();
 	},
 
@@ -1450,7 +1535,6 @@ Editor.prototype = {
 		this._checkComponents();
 
 		this.eventManager._addCommonEvent();
-		this.history.reset(true);
 
 		this._w.setTimeout(
 			function () {

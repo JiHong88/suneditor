@@ -7,21 +7,51 @@ import { _w } from '../../helper/env';
 import { getNodeFromPath, getNodePath } from '../../helper/domUtils';
 
 export default function (editor, change) {
+	const ctx = editor.context;
 	const delayTime = editor.options.historyStackDelayTime;
-	let ctx = editor.context;
 	let undo = editor.context.buttons.undo;
 	let redo = editor.context.buttons.redo;
-
 	let pushDelay = null;
-	let stackIndex = 0;
-	let stack = [];
+	let stackIndex, stack, rootStack, rootInitContents;
 
-	function setContentFromStack() {
-		const item = stack[stackIndex];
-		ctx.element.wysiwyg.innerHTML = item.content;
+	function setContentFromStack(increase) {
+		const prevKey = stack[stackIndex];
+		const prevRoot = rootStack[prevKey];
 
-		editor.selection.setRange(getNodeFromPath(item.s.path, ctx.element.wysiwyg), item.s.offset, getNodeFromPath(item.e.path, ctx.element.wysiwyg), item.e.offset);
+		stackIndex += increase;
+		const tempRoot = rootStack[stack[stackIndex]];
+		const rootKey = increase < 0 && prevKey !== stack[stackIndex] && prevRoot.index > 0 ? prevKey : stack[stackIndex];
+		const root = rootStack[rootKey];
+		root.index += increase;
+
+		const item = root.value[root.index];
+		ctx.targetElements[rootKey].wysiwyg.innerHTML = item.content;
+
+		if (prevKey !== rootKey && increase < 0 && stackIndex === 1) {
+			stackIndex = 0;
+		} else if (prevKey !== rootKey && increase > 0 && root.index === 1) {
+			stackIndex++;
+		} else if ((increase < 0 && root.index < 1) || (increase > 0 && root.index > root.value.length)) {
+			stackIndex += increase;
+		}
+
+		let focusKey = rootKey;
+		let focusItem = item;
+		if (increase < 0 && stackIndex > 0 && root.index === 0) {
+			const nextKey = stack[stackIndex + increase];
+			if (nextKey !== rootKey) {
+				const nextRoot = rootStack[nextKey];
+				focusKey = nextKey;
+				focusItem = nextRoot.value[nextRoot.index];
+			}
+		}
+
+		editor.changeContextElement(focusKey);
+		editor.selection.setRange(getNodeFromPath(focusItem.s.path, ctx.element.wysiwyg), focusItem.s.offset, getNodeFromPath(focusItem.e.path, ctx.element.wysiwyg), focusItem.e.offset);
 		editor.focus();
+
+		if (stackIndex < 0) stackIndex = 0;
+		else if (stackIndex >= stack.length) stackIndex = stack.length - 1;
 
 		if (stack.length <= 1) {
 			if (undo) undo.setAttribute('disabled', true);
@@ -48,52 +78,86 @@ export default function (editor, change) {
 		change();
 	}
 
-	function pushStack() {
-		editor._checkComponents();
-		const current = editor.getContent(true);
-		if (!current || (!!stack[stackIndex] && current === stack[stackIndex].content)) return;
-
-		stackIndex++;
-		const range = editor.status._range;
-
-		if (stack.length > stackIndex) {
-			stack = stack.slice(0, stackIndex);
-			if (redo) redo.setAttribute('disabled', true);
-		}
-
+	function setStack(content, range, rootKey, increase) {
+		let s, e;
 		if (!range) {
-			stack[stackIndex] = {
-				content: current,
-				s: { path: [0, 0], offset: [0, 0] },
-				e: { path: 0, offset: 0 }
-			};
+			s = { path: [0, 0], offset: [0, 0] };
+			e = { path: 0, offset: 0 };
 		} else {
-			stack[stackIndex] = {
-				content: current,
-				s: {
-					path: getNodePath(range.startContainer, null, null),
-					offset: range.startOffset
-				},
-				e: {
-					path: getNodePath(range.endContainer, null, null),
-					offset: range.endOffset
-				}
+			s = {
+				path: getNodePath(range.startContainer, null, null),
+				offset: range.startOffset
+			};
+			e = {
+				path: getNodePath(range.endContainer, null, null),
+				offset: range.endOffset
 			};
 		}
+
+		// set root stack
+		stackIndex += increase;
+		stack[stackIndex] = rootKey;
+		const root = rootStack[rootKey];
+		root.index += increase;
+		root.value[root.index] = {
+			content: content,
+			s: s,
+			e: e
+		};
+	}
+
+	function resetRoot(rootKey) {
+		stackIndex++;
+		stack[stackIndex] = rootKey;
+		const root = rootStack[rootKey];
+		root.index = 0;
+		root.value[0] = {
+			content: rootInitContents[rootKey],
+			s: { path: [0, 0], offset: [0, 0] },
+			e: { path: 0, offset: 0 }
+		};
+	}
+
+	function initRoot(rootKey) {
+		rootStack[rootKey] = { value: [], index: -1 };
+		rootInitContents[rootKey] = ctx.targetElements[rootKey].wysiwyg.innerHTML;
+	}
+
+	function refreshRoots(root) {
+		const deleteRoot = [];
+		for (let i = stackIndex + 1, len = stack.length; i < len; i++) {
+			if (deleteRoot.indexOf(stack[i]) > -1) continue;
+			deleteRoot.push(stack[i]);
+		}
+
+		stack = stack.slice(0, stackIndex + 1);
+		root.value.splice(stackIndex + 1);
+		if (redo) redo.setAttribute('disabled', true);
+
+		for (let i = 0, len = deleteRoot.length; i < len; i++) {
+			if (stack.indexOf(deleteRoot[i]) === -1) initRoot(deleteRoot[i]);
+		}
+	}
+
+	function pushStack(rootKey, range) {
+		editor._checkComponents();
+
+		const current = ctx.targetElements[rootKey].wysiwyg.innerHTML;
+		const root = rootStack[rootKey];
+		if (!current || (root.value[root.index] && current === root.value[root.index].content)) return;
+		if (stack.length > stackIndex + 1) refreshRoots(root);
+		if (root.value.length === 0) resetRoot(rootKey);
+
+		setStack(current, range, rootKey, 1);
+		console.log('stack', rootStack);
 
 		if (stackIndex === 1 && undo) undo.removeAttribute('disabled');
 
 		editor.char.display();
-		// onChange
 		change();
 	}
 
 	return {
-		/**
-		 * @description History stack
-		 */
-		stack: stack,
-
 		/**
 		 * @description Saving the current status to the history object stack
 		 * If "delay" is true, it will be saved after (options.historyStackDelayTime || 400) miliseconds
@@ -101,14 +165,17 @@ export default function (editor, change) {
 		 * You can specify the delay time by sending a number.
 		 * @param {Boolean|Number} delay If true, Add stack without delay time.
 		 */
-		push: function (delay) {
+		push: function (delay, rootKey) {
+			rootKey = rootKey || editor.status.rootKey;
+			const range = editor.status._range;
+
 			_w.setTimeout(editor._resourcesStateChange.bind(editor));
 			const time = typeof delay === 'number' ? (delay > 0 ? delay : 0) : !delay ? 0 : delayTime;
 
 			if (!time || pushDelay) {
 				_w.clearTimeout(pushDelay);
 				if (!time) {
-					pushStack();
+					pushStack(rootKey, range);
 					return;
 				}
 			}
@@ -116,8 +183,16 @@ export default function (editor, change) {
 			pushDelay = _w.setTimeout(function () {
 				_w.clearTimeout(pushDelay);
 				pushDelay = null;
-				pushStack();
+				pushStack(rootKey, range);
 			}, time);
+		},
+
+		check: function (rootKey, range) {
+			if (pushDelay) {
+				_w.clearTimeout(pushDelay);
+				pushDelay = null;
+				pushStack(rootKey, range);
+			}
 		},
 
 		/**
@@ -125,8 +200,7 @@ export default function (editor, change) {
 		 */
 		undo: function () {
 			if (stackIndex > 0) {
-				stackIndex--;
-				setContentFromStack();
+				setContentFromStack(-1);
 			}
 		},
 
@@ -135,55 +209,32 @@ export default function (editor, change) {
 		 */
 		redo: function () {
 			if (stack.length - 1 > stackIndex) {
-				stackIndex++;
-				setContentFromStack();
+				setContentFromStack(1);
 			}
 		},
 
-		/**
-		 * @description Go to the history stack for that index.
-		 * If "index" is -1, go to the last stack
-		 * @param {number} index Stack index
-		 */
-		go: function (index) {
-			stackIndex = index < 0 ? stack.length - 1 : index;
-			setContentFromStack();
-		},
-
-		/**
-		 * @description Get the current history stack index.
-		 * @returns {number} Current Stack index
-		 */
-		getCurrentIndex: function () {
-			return stackIndex;
+		overwrite: function (rootKey) {
+			setStack(ctx.targetElements[rootKey || editor.status.rootKey].wysiwyg.innerHTML, editor.status.rootKey, 0);
 		},
 
 		/**
 		 * @description Reset the history object
 		 */
-		reset: function (ignoreChangeEvent) {
+		reset: function () {
 			if (undo) undo.setAttribute('disabled', true);
 			if (redo) redo.setAttribute('disabled', true);
 			editor.status.isChanged = false;
 			if (editor.context.buttons.save) editor.context.buttons.save.setAttribute('disabled', true);
 
-			stack.splice(0);
-			stackIndex = 0;
+			stackIndex = -1;
+			stack = [];
+			rootStack = {};
+			rootInitContents = {};
 
-			// pushStack
-			stack[stackIndex] = {
-				content: editor.getContent(true),
-				s: {
-					path: [0, 0],
-					offset: 0
-				},
-				e: {
-					path: [0, 0],
-					offset: 0
-				}
-			};
-
-			if (!ignoreChangeEvent) change();
+			const rootKeys = editor.rootKeys;
+			for (let i = 0, len = rootKeys.length, k; i < len; i++) {
+				initRoot(rootKeys[i]);
+			}
 		},
 
 		/**
@@ -191,7 +242,6 @@ export default function (editor, change) {
 		 * @private
 		 */
 		_resetCachingButton: function () {
-			ctx = editor.context;
 			undo = editor.context.buttons.undo;
 			redo = editor.context.buttons.redo;
 
@@ -211,7 +261,7 @@ export default function (editor, change) {
 		 */
 		_destroy: function () {
 			if (pushDelay) _w.clearTimeout(pushDelay);
-			stack = null;
+			stack = rootStack = rootInitContents = null;
 		}
 	};
 }

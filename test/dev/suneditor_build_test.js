@@ -193,120 +193,163 @@ c &amp;amp; d
 `;
 
 let dir = '';
-dir = 'rtl'
+// dir = 'rtl'
+const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 
-suneditor.create('#scrolleditor', {
-	// value: begContent,
-	plugins: plugins,
-	toolbar_sticky: 0,
-	width: 450,
-	height:350,
-	katex: {
-		src: Katex
-	},
-	textDirection: dir,
-	buttonList: bl
-});
+// suneditor.create('#scrolleditor', {
+// 	// value: begContent,
+// 	plugins: plugins,
+// 	toolbar_sticky: 0,
+// 	width: 450,
+// 	height: 350,
+// 	katex: {
+// 		src: Katex
+// 	},
+// 	textDirection: dir,
+// 	mode: mode,
+// 	buttonList: bl
+// });
 
-suneditor.create('#editor_classic', {
-	// value: begContent,
-	plugins: plugins,
-	toolbar_sticky: 0,
-	width: 450,
-	height:350,
-	katex: {
-		src: Katex
-	},
-	textDirection: dir,
-	buttonList: bl
-});
+// suneditor.create('#editor_classic', {
+// 	// value: begContent,
+// 	plugins: plugins,
+// 	toolbar_sticky: 0,
+// 	width: 450,
+// 	height: 350,
+// 	katex: {
+// 		src: Katex
+// 	},
+// 	textDirection: dir,
+// 	mode: mode,
+// 	buttonList: bl
+// });
 
-window.e = suneditor.create(['#editor1'], {
-	placeholder: 'placeholder',
-	toolbar_container: document.getElementById('ttt'),
-	textDirection: dir,
-	// toolbar_sticky: 50,
-	// value: `<p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p>`,
-	// value: '<h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2>',
-	// iframe: true,
-	// iframe_fullPage: true,
-	// mode: ['inline', 'balloon-always', 'balloon', 'classic'][1],
-	elementBlacklist: 'p',
-	// toolbar_sticky: 60,
-	width: '350px',
-	height: '345',
-	minHeight: '',
-	charCounter: true,
-	// tableCellControllerPosition: 'top',
-	statusbar: true,
-	codeMirror: {
-		EditorView: EditorView,
-		extensions: [
-			basicSetup,
-			html({
-				matchClosingTags: true,
-				autoCloseTags: true
-			}),
-			javascript()
-		],
-		minimalSetup: minimalSetup
-	},
-	// codeMirror: {
-	// 	src: Codemirror5
-	// },
-	// mode: "inline",
-	// imageUploadUrl: 'http://localhost:3000/editor/upload',
-	// videoUploadUrl: 'http://localhost:3000/editor/upload',
-	// audioUploadUrl: 'http://localhost:3000/editor/upload',
-	katex: {
-		src: Katex
-	},
-	charCounter: true,
-	font: ['Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'],
-	templates: [
-		{
-			name: 'Template-1',
-			html: '<p>HTML source1</p>'
+// window.e = suneditor.create(['#editor1'], {
+// 	placeholder: 'placeholder',
+// 	toolbar_container: document.getElementById('ttt'),
+// 	textDirection: dir,
+// 	mode: mode,
+// 	// toolbar_sticky: 50,
+// 	// value: `<p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p><p>aaaaa</p>`,
+// 	// value: '<h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2><h2 style="text-align: right">Hello</h2>',
+// 	// iframe: true,
+// 	// iframe_fullPage: true,
+// 	elementBlacklist: 'p',
+// 	// toolbar_sticky: 60,
+// 	width: '350px',
+// 	height: '345',
+// 	minHeight: '',
+// 	charCounter: true,
+// 	// tableCellControllerPosition: 'top',
+// 	statusbar: true,
+// 	codeMirror: {
+// 		EditorView: EditorView,
+// 		extensions: [
+// 			basicSetup,
+// 			html({
+// 				matchClosingTags: true,
+// 				autoCloseTags: true
+// 			}),
+// 			javascript()
+// 		],
+// 		minimalSetup: minimalSetup
+// 	},
+// 	// codeMirror: {
+// 	// 	src: Codemirror5
+// 	// },
+// 	// mode: "inline",
+// 	// imageUploadUrl: 'http://localhost:3000/editor/upload',
+// 	// videoUploadUrl: 'http://localhost:3000/editor/upload',
+// 	// audioUploadUrl: 'http://localhost:3000/editor/upload',
+// 	katex: {
+// 		src: Katex
+// 	},
+// 	charCounter: true,
+// 	font: ['Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'],
+// 	templates: [
+// 		{
+// 			name: 'Template-1',
+// 			html: '<p>HTML source1</p>'
+// 		},
+// 		{
+// 			name: 'Template-2',
+// 			html: '<p>HTML source2</p>'
+// 		}
+// 	],
+// 	layouts: [
+// 		{
+// 			name: 'Layout-1',
+// 			html: '<div class="__se__block"><table><tr><td contenteditable="false">aaaa</td><td><br></td></tr></table></div>'
+// 		}
+// 	],
+// 	linkRel: ['author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],
+// 	linkRelDefault: 'noreferrer noopener',
+// 	linkTargetNewWindow: true,
+// 	linkProtocol: 'https://',
+// 	imageMultipleFile: true,
+// 	imageResizing: true,
+// 	plugins: plugins,
+// 	events: {
+// 		// onBlur: function (a, b, c, d, e) {
+// 		// 	console.log('blur', a);
+// 		// },
+// 		// onFocus: function () {
+// 		// 	console.log('focus');
+// 		// },
+// 		// onload: () => {
+// 		// 	console.log('onload');
+// 		// }
+// 	},
+// 	// buttonList: [
+// 	// 	['undo', 'redo'],
+// 	// 	['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+// 	// 	['removeFormat'],
+// 	// 	['outdent', 'indent'],
+// 	// 	['fullScreen', 'showBlocks', 'codeView'],
+// 	// 	['preview', 'print'],
+// 	// 	['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'horizontalLine'],
+// 	// 	['lineHeight', 'list', 'paragraphStyle', 'template', 'layout', 'textStyle', 'table'],
+// 	// 	['math', 'link', 'audio', 'image', 'video']
+// 	// ],
+// 	buttonList: bl
+// });
+
+window.e=suneditor.create(
+	{
+		editor1: {
+			target: document.querySelector('#multi_editor_1'),
+			options: {
+				value: '<p>ed1</p>',
+				placeholder: 'place1'
+			}
 		},
-		{
-			name: 'Template-2',
-			html: '<p>HTML source2</p>'
+		editor2: {
+			target: document.querySelector('#multi_editor_2'),
+			options: {
+				value: '<p>ed2</p>',
+				placeholder: 'place21'
+			}
+		},
+		editor3: {
+			target: document.querySelector('#multi_editor_3'),
+			options: {
+				value: '<p>ed3</p>',
+				placeholder: 'place3'
+			}
+		},
+		editor4: {
+			target: document.querySelector('#multi_editor_4'),
+			options: {
+				value: '<p>ed4</p>',
+				placeholder: 'place4'
+			}
 		}
-	],
-	layouts: [
-		{
-			name: 'Layout-1',
-			html: '<div class="__se__block"><table><tr><td contenteditable="false">aaaa</td><td><br></td></tr></table></div>'
-		}
-	],
-	linkRel: ['author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],
-	linkRelDefault: 'noreferrer noopener',
-	linkTargetNewWindow: true,
-	linkProtocol: 'https://',
-	imageMultipleFile: true,
-	imageResizing: true,
-	plugins: plugins,
-	events: {
-		// onBlur: function (a, b, c, d, e) {
-		// 	console.log('blur', a);
-		// },
-		// onFocus: function () {
-		// 	console.log('focus');
-		// },
-		// onload: () => {
-		// 	console.log('onload');
-		// }
 	},
-	// buttonList: [
-	// 	['undo', 'redo'],
-	// 	['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-	// 	['removeFormat'],
-	// 	['outdent', 'indent'],
-	// 	['fullScreen', 'showBlocks', 'codeView'],
-	// 	['preview', 'print'],
-	// 	['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'horizontalLine'],
-	// 	['lineHeight', 'list', 'paragraphStyle', 'template', 'layout', 'textStyle', 'table'],
-	// 	['math', 'link', 'audio', 'image', 'video']
-	// ],
-	buttonList: bl
-});
+	{
+		plugins: plugins,
+		toolbar_container: '#root_toolbar_container',
+		// statusbar_container: '#root_statusbar_container',
+		toolbar_sticky: 0,
+		buttonList: bl
+	}
+);

@@ -58,17 +58,17 @@ const Figure = function (inst, controls, params) {
 	// init
 	this.eventManager.addEvent(this.alignButton, 'click', OnClick_alignButton.bind(this));
 	const targetElements = this.context.targetElements;
-	for (let i = 0, len = targetElements.length, main, handles; i < len; i++) {
-		if (targetElements[i].editorArea.querySelector('.se-controller.se-resizing-container')) continue;
-		main = CreateHTML_resizeDot();
-		handles = main.querySelectorAll('.se-resize-dot > span');
-		targetElements[i]._figure = {
+	for (let k in targetElements) {
+		if (targetElements[k].editorArea.querySelector('.se-controller.se-resizing-container')) continue;
+		const main = CreateHTML_resizeDot();
+		const handles = main.querySelectorAll('.se-resize-dot > span');
+		targetElements[k]._figure = {
 			main: main,
 			border: main.querySelector('.se-resize-dot'),
 			display: main.querySelector('.se-resize-display'),
 			handles: handles
 		};
-		targetElements[i].editorArea.appendChild(main);
+		targetElements[k].editorArea.appendChild(main);
 		this.eventManager.addEvent(handles, 'mousedown', OnResizeContainer.bind(this));
 	}
 };

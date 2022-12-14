@@ -11,7 +11,8 @@ import { numbers } from '../helper';
  */
 export const CreateContextElement = function (editorTarget, top, wwFrame, codeFrame) {
 	return {
-		originElement: editorTarget,
+		originElement: editorTarget.target,
+		options: editorTarget.options,
 		topArea: top,
 		container: top.querySelector('.se-container'),
 		statusbar: top.querySelector('.se-status-bar'),

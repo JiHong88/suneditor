@@ -7,7 +7,8 @@ import CoreDependency from '../../dependency/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
 
 const _w = env._w;
-const DIRECTION_KEYCODE = new _w.RegExp('^(8|13|3[2-9]|40|46)$');
+const DIRECTION_KEYCODE = new _w.RegExp('^(3[3-9]|40)$');
+const SPACE_DEL_DIR_KEYCODE = new _w.RegExp('^(8|13|3[2-9]|40|46)$');
 const NON_TEXT_KEYCODE = new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$');
 const HISTORY_IGNORE_KEYCODE = new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$');
 const FRONT_ZEROWIDTH = new _w.RegExp(unicode.zeroWidthSpace + '+', '');
@@ -23,12 +24,12 @@ const EventManager = function (editor) {
 	this._toolbarObserver = null;
 	this._onMousedownPlugins = editor._onMousedownPlugins;
 	this._onKeyDownPlugins = editor._onKeyDownPlugins;
-	this.__resize_editor = null;
-	this.__close_move = null;
-	this.__geckoActiveEvent = null;
 	this._lineBreakerButton = null;
 	this._lineBreaker_t = null;
 	this._lineBreaker_b = null;
+	this.__resize_editor = null;
+	this.__close_move = null;
+	this.__geckoActiveEvent = null;
 	this.__scrollparents = [];
 	this.__scrollID = '';
 };
@@ -522,6 +523,7 @@ EventManager.prototype = {
 		}
 
 		/** editor area */
+		const rootKey = e.topArea.getAttribute('data-se-root');
 		const wwMouseDown = OnMouseDown_wysiwyg.bind(this);
 		this.addEvent(eventWysiwyg, 'mousedown', wwMouseDown, false);
 		this.addEvent(eventWysiwyg, 'click', OnClick_wysiwyg.bind(this), false);
@@ -533,9 +535,8 @@ EventManager.prototype = {
 		this.addEvent(eventWysiwyg, 'cut', OnCut_wysiwyg.bind(this), false);
 		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this), false);
 		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, eventWysiwyg), false);
-		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this, e.topArea.getAttribute('data-se-root')), false);
-		this.addEvent(eventWysiwyg, 'blur', OnBlur_wysiwyg.bind(this), false);
-		this.addEvent(e.topArea, 'mouseenter', OnMouseIn_editor.bind(this, e.topArea.getAttribute('data-se-root')), false);
+		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this, rootKey), false);
+		this.addEvent(eventWysiwyg, 'blur', OnBlur_wysiwyg.bind(this, rootKey), false);
 
 		/** line breaker */
 		this.addEvent(eventWysiwyg, 'mousemove', OnMouseMove_wysiwyg.bind(this), false);
@@ -663,13 +664,6 @@ EventManager.prototype = {
 			}.bind(this),
 			250
 		);
-	},
-
-	_changeContextElement: function (rootKey) {
-		const el = (this.context.element = this.context.targetElements[rootKey]);
-		this._lineBreakerButton = el.lineBreaker.querySelector('button');
-		this._lineBreaker_t = el.lineBreaker_t;
-		this._lineBreaker_b = el.lineBreaker_b;
 	},
 
 	constructor: EventManager
@@ -834,7 +828,6 @@ function OnInput_wysiwyg(e) {
 	if (this.status.isReadOnly || this.status.isDisabled) {
 		e.preventDefault();
 		e.stopPropagation();
-		this.history.go(this.history.getCurrentIndex());
 		return false;
 	}
 
@@ -1567,7 +1560,7 @@ function OnKeyUp_wysiwyg(e) {
 	const alt = e.altKey;
 
 	if (this.status.isReadOnly) {
-		if (!ctrl && DIRECTION_KEYCODE.test(keyCode)) this.applyTagEffect();
+		if (!ctrl && SPACE_DEL_DIR_KEYCODE.test(keyCode)) this.applyTagEffect();
 		return;
 	}
 
@@ -1605,7 +1598,7 @@ function OnKeyUp_wysiwyg(e) {
 		selectionNode = this.selection.getNode();
 	}
 
-	if (DIRECTION_KEYCODE.test(keyCode)) {
+	if (SPACE_DEL_DIR_KEYCODE.test(keyCode)) {
 		this.applyTagEffect();
 	}
 
@@ -1693,15 +1686,11 @@ function OnScroll_wysiwyg(eventWysiwyg, e) {
 	if (typeof this.events.onScroll === 'function') this.events.onScroll(e);
 }
 
-function OnMouseIn_editor(rootKey) {
-	this._changeContextElement(rootKey);
-}
-
 function OnFocus_wysiwyg(rootKey, e) {
 	if (this.editor._antiBlur) return;
 	this.status.hasFocus = true;
 
-	this._changeContextElement(rootKey);
+	this.editor.changeContextElement(rootKey);
 	this._w.setTimeout(this.applyTagEffect.bind(this));
 
 	if (this.editor.isInline) this.toolbar._showInline();
@@ -1710,7 +1699,7 @@ function OnFocus_wysiwyg(rootKey, e) {
 	if (typeof this.events.onFocus === 'function') this.events.onFocus(e);
 }
 
-function OnBlur_wysiwyg(e) {
+function OnBlur_wysiwyg(rootKey, e) {
 	if (this.editor._antiBlur || this.status.isCodeView) return;
 
 	this.status.hasFocus = false;
@@ -1719,11 +1708,20 @@ function OnBlur_wysiwyg(e) {
 	if (this.editor.isInline || this.editor.isBalloon) this._hideToolbar();
 
 	this._setKeyEffect([]);
-	this.selection.removeRange();
 
 	this.status.currentNodes = [];
 	this.status.currentNodesMap = [];
-	if (this.options.statusbar_showPathLabel) this.context.element.navigation.textContent = '';
+	if (this.options.statusbar_showPathLabel) {
+		const rootKeys = this.editor.rootKeys;
+		const targetElements = this.context.targetElements;
+		for (let i = 0, len = rootKeys.length, navi; i < len; i++) {
+			navi = targetElements[rootKeys[i]].navigation;
+			if (navi) navi.textContent = '';
+		}
+	}
+
+	this.history.check(rootKey, this.status._range);
+	this.selection.removeRange();
 
 	// user event
 	if (typeof this.events.onBlur === 'function') this.events.onBlur(e);

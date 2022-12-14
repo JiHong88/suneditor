@@ -314,11 +314,9 @@ Toolbar.prototype = {
 		if (isDirTop) {
 			domUtils.removeClass(arrow, 'se-arrow-up');
 			domUtils.addClass(arrow, 'se-arrow-down');
-			arrow.style.top = toolbarHeight - 1 + 'px';
 		} else {
 			domUtils.removeClass(arrow, 'se-arrow-down');
 			domUtils.addClass(arrow, 'se-arrow-up');
-			arrow.style.top = -arrowMargin - 1 + 'px';
 		}
 
 		const arrow_left = this._w.Math.floor(toolbarWidth / 2 + (absoluteLeft - l));

@@ -17,15 +17,14 @@ const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 /**
  * @description document create
  * @param {Object} options Options
- * @param {Array.<Element>} editorTargets Target textarea
+ * @param {Element|Array.<Element>} editorTargets Target textarea
  * @returns {Object}
  */
 const Constructor = function (editorTargets, options) {
 	if (typeof options !== 'object') options = {};
 
 	/** --- options --------------------------------------------------------------- */
-	options.multiMode = editorTargets.length > 1;
-	InitOptions(options);
+	InitOptions(options, editorTargets);
 
 	/** --- carrier wrapper --------------------------------------------------------------- */
 	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper' + (options._rtl ? ' se-rtl' : '') });
@@ -60,7 +59,10 @@ const Constructor = function (editorTargets, options) {
 	}
 
 	/** --- editor div --------------------------------------------------------------- */
-	const elementContext = [];
+	const defaultId = '_';
+	const rootId = editorTargets[0].key || defaultId;
+	const rootKeys = [];
+	const elementContext = {};
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
 		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (options._rtl ? ' se-rtl' : '') });
 		const container = domUtils.createElement('DIV', { class: 'se-container' });
@@ -97,12 +99,14 @@ const Constructor = function (editorTargets, options) {
 		container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
 		container.appendChild(editor_div);
 
+		const key = editorTargets[i].key || defaultId;
 		if (status_bar && !statusbar_container) container.appendChild(status_bar);
 		textarea = _checkCodeMirror(options, textarea);
 		top_div.appendChild(container);
-		top_div.setAttribute('data-se-root', i);
+		top_div.setAttribute('data-se-root', key);
 
-		elementContext.push(CreateContextElement(editorTargets[i], top_div, wysiwyg_div, textarea));
+		rootKeys.push(key);
+		elementContext[key] = CreateContextElement(editorTargets[i], top_div, wysiwyg_div, textarea);
 	}
 
 	// toolbar container
@@ -114,11 +118,13 @@ const Constructor = function (editorTargets, options) {
 		top_div.appendChild(container);
 		toolbar_container.appendChild(top_div);
 	} else {
-		elementContext[0].container.insertBefore(toolbar, elementContext[0].container.firstElementChild);
+		elementContext[rootId].container.insertBefore(toolbar, elementContext[0].container.firstElementChild);
 	}
 
 	return {
 		commonContext: Context(editorTargets, toolbar, editor_carrier_wrapper, options),
+		rootId: rootId,
+		rootKeys: rootKeys,
 		elementContext: elementContext,
 		pluginCallButtons: tool_bar_main.pluginCallButtons,
 		responsiveButtons: tool_bar_main.responsiveButtons
@@ -209,8 +215,14 @@ export function ResetOptions(context, mergeOptions) {
 /**
  * @description Initialize options
  * @param {Object} options Options object
+ * @param {Element|Array.<Element>} editorTargets Target textarea
  */
-function InitOptions(options) {
+function InitOptions(options, editorTargets) {
+	if (options.multiRoot) {
+		if (!options.toolbar_container && !/inline|balloon/i.test(options.mode)) throw Error('[SUNEDITOR.create.fail] In multi root, The "mode" option cannot be "classic" without using the "toolbar_container" option.');
+		if (options.statusbar && !options.statusbar_container) throw Error('[SUNEDITOR.create.fail] In multi root, The "statusbar_container" option is required unless the "statusbar" option is "false".');
+	}
+
 	const plugins = {};
 	if (options.plugins) {
 		const _plugins = (options._init_plugins = options.plugins);
@@ -227,10 +239,9 @@ function InitOptions(options) {
 	options.plugins = plugins;
 	options.events = options.events || {};
 
-	/** base */
+	/** Base */
 	options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
 	options.lang = options.lang || _defaultLang;
-	options.value = typeof options.value === 'string' ? options.value : null;
 	// text style tags
 	const textTags = (options.textTags = [{ bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL', sub: 'SUB', sup: 'SUP' }, options.textTags || {}].reduce(function (_default, _new) {
 		for (let key in _new) {
@@ -266,7 +277,6 @@ function InitOptions(options) {
 	options._rtl = options.textDirection === 'rtl';
 	if (options._rtl) options.buttonList = options.buttonList.reverse();
 	// icons
-	// custom
 	options.icons =
 		!options.icons || typeof options.icons !== 'object'
 			? _icons
@@ -285,9 +295,7 @@ function InitOptions(options) {
 				}
 				return _default;
 		  }, {});
-	options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
-	options.mediaAutoSelect = options.mediaAutoSelect === undefined ? true : !!options.mediaAutoSelect;
-	options.buttonList = !!options.buttonList ? options.buttonList : DEFAULT_BUTTON_LIST;
+	// etc
 	options.callBackSave = !options.callBackSave ? null : options.callBackSave;
 	options.lineAttrReset = typeof options.lineAttrReset === 'string' && options.lineAttrReset ? (options.lineAttrReset === '*' ? '*' : new _w.RegExp('^(' + options.lineAttrReset + ')$', 'i')) : null;
 	options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
@@ -317,18 +325,34 @@ function InitOptions(options) {
 	options._editorElementWhitelist = options.elementWhitelist === '*' ? '*' : _createWhitelist(options);
 
 	/** Toolbar */
+	options.buttonList = !!options.buttonList ? options.buttonList : DEFAULT_BUTTON_LIST;
 	options.toolbar_width = options.toolbar_width ? (numbers.is(options.toolbar_width) ? options.toolbar_width + 'px' : options.toolbar_width) : 'auto';
-	options.toolbar_container = typeof options.toolbar_container === 'string' ? _d.querySelector(options.toolbar_container) : options.toolbar_container;
+	options.toolbar_container = /inline/i.test(options.mode) ? null : typeof options.toolbar_container === 'string' ? _d.querySelector(options.toolbar_container) : options.toolbar_container;
 	options.toolbar_sticky = /balloon/i.test(options.mode) ? -1 : options.toolbar_sticky === undefined ? 0 : /^\d+/.test(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1;
 	options.toolbar_hide = !!options.toolbar_hide;
 
+	// value
+	options.value = typeof options.value === 'string' ? options.value : null;
+	options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
+	// styles
+	options.editorCSSText = typeof options.editorCSSText === 'string' ? options.editorCSSText : '';
+	options.width = options.width ? (numbers.is(options.width) ? options.width + 'px' : options.width) : '100%';
+	options.minWidth = (numbers.is(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
+	options.maxWidth = (numbers.is(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
+	options.height = options.height ? (numbers.is(options.height) ? options.height + 'px' : options.height) : 'auto';
+	options.minHeight = (numbers.is(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
+	options.maxHeight = (numbers.is(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
+	options._editorStyles = converter._setDefaultOptionStyle(options, options.editorCSSText);
+
 	/** Status bar */
+	/** Multi root */
+	if (options.multiRoot) InitMultiRootOptions(editorTargets);
+
 	options.statusbar = options.statusbar === undefined ? true : options.statusbar;
 	options.statusbar_showPathLabel = !options.statusbar ? false : typeof options.statusbar_showPathLabel === 'boolean' ? options.statusbar_showPathLabel : true;
 	options.statusbar_resizeEnable = options.statusbar_resizeEnable === undefined ? true : !!options.statusbar_resizeEnable;
 	options.statusbar_container = typeof options.statusbar_container === 'string' ? _d.querySelector(options.statusbar_container) : options.statusbar_container;
-
-	/** Character count */
+	// status bar - character count
 	options.charCounter = options.charCounter_max > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
 	options.charCounter_max = numbers.is(options.charCounter_max) && options.charCounter_max > -1 ? options.charCounter_max * 1 : null;
 	options.charCounter_label = typeof options.charCounter_label === 'string' ? options.charCounter_label.trim() : null;
@@ -340,19 +364,9 @@ function InitOptions(options) {
 	options.iframe_attributes = options.iframe_attributes || {};
 	options.iframe_cssFileName = options.iframe ? (typeof options.iframe_cssFileName === 'string' ? [options.iframe_cssFileName] : options.iframe_cssFileName || ['suneditor']) : null;
 
-	/** Styles */
-	options.editorCSSText = typeof options.editorCSSText === 'string' ? options.editorCSSText : '';
-	options.width = options.width ? (numbers.is(options.width) ? options.width + 'px' : options.width) : '100%';
-	options.minWidth = (numbers.is(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
-	options.maxWidth = (numbers.is(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
-	options.height = options.height ? (numbers.is(options.height) ? options.height + 'px' : options.height) : 'auto';
-	options.minHeight = (numbers.is(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
-	options.maxHeight = (numbers.is(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
-	options._editorStyles = converter._setDefaultOptionStyle(options, options.editorCSSText);
-
 	/** Key actions */
 	options.tabDisable = !!options.tabDisable;
-	options.shortcutsDisable = Array.isArray(options.shortcutsDisable) ? options.shortcutsDisable : [];
+	options.shortcutsDisable = _w.Array.isArray(options.shortcutsDisable) ? options.shortcutsDisable : [];
 	options.shortcutsHint = options.shortcutsHint === undefined ? true : !!options.shortcutsHint;
 
 	/** View */
@@ -393,6 +407,9 @@ function InitOptions(options) {
 					value: '2.5em'
 				}
 		  ];
+
+	/** --- Media */
+	options.mediaAutoSelect = options.mediaAutoSelect === undefined ? true : !!options.mediaAutoSelect;
 
 	/** Image */
 	options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
@@ -475,7 +492,7 @@ function InitOptions(options) {
 	/** Link */
 	options.linkTargetNewWindow = !!options.linkTargetNewWindow;
 	options.linkProtocol = typeof options.linkProtocol === 'string' ? options.linkProtocol : null;
-	options.linkRel = Array.isArray(options.linkRel) ? options.linkRel : [];
+	options.linkRel = _w.Array.isArray(options.linkRel) ? options.linkRel : [];
 	options.linkRelDefault = options.linkRelDefault || {};
 
 	/** External library */
@@ -500,6 +517,36 @@ function InitOptions(options) {
 	/** Private options */
 	options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle'];
 	// options.__defaultFontSize;
+}
+
+function InitMultiRootOptions(editorTargets) {
+	for (let i = 0, len = editorTargets.length, options; i < len; i++) {
+		options = editorTargets.options;
+		if (!options) continue;
+
+		// value
+		options.value = typeof options.value === 'string' ? options.value : null;
+		options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
+		// styles
+		options.editorCSSText = typeof options.editorCSSText === 'string' ? options.editorCSSText : '';
+		options.width = options.width ? (numbers.is(options.width) ? options.width + 'px' : options.width) : '100%';
+		options.minWidth = (numbers.is(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
+		options.maxWidth = (numbers.is(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
+		options.height = options.height ? (numbers.is(options.height) ? options.height + 'px' : options.height) : 'auto';
+		options.minHeight = (numbers.is(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
+		options.maxHeight = (numbers.is(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
+		options._editorStyles = converter._setDefaultOptionStyle(options, options.editorCSSText);
+		// status bar
+		options.statusbar = options.statusbar === undefined ? true : options.statusbar;
+		options.statusbar_showPathLabel = !options.statusbar ? false : typeof options.statusbar_showPathLabel === 'boolean' ? options.statusbar_showPathLabel : true;
+		options.statusbar_resizeEnable = options.statusbar_resizeEnable === undefined ? true : !!options.statusbar_resizeEnable;
+		options.statusbar_container = typeof options.statusbar_container === 'string' ? _d.querySelector(options.statusbar_container) : options.statusbar_container;
+		// status bar - character count
+		options.charCounter = options.charCounter_max > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
+		options.charCounter_max = numbers.is(options.charCounter_max) && options.charCounter_max > -1 ? options.charCounter_max * 1 : null;
+		options.charCounter_label = typeof options.charCounter_label === 'string' ? options.charCounter_label.trim() : null;
+		options.charCounter_type = typeof options.charCounter_type === 'string' ? options.charCounter_type : 'char';
+	}
 }
 
 /**

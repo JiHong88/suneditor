@@ -65,18 +65,23 @@ export default {
 			}, {});
 		}
 
-		const editorTargets = [];
-		target = typeof target !== 'string' && target.length > -1 ? target : [target];
-		for (let i = 0, len = target.length, t, e; i < len; i++) {
-			t = target[i];
-			e = typeof t === 'string' ? document.querySelector(t) : t;
-			if (!e) {
-				if (typeof t === 'string') throw Error('[SUNEDITOR.create.fail] The element for that id was not found (ID:"' + t + '")');
-				throw Error("[SUNEDITOR.create.fail] suneditor requires textarea's element or id value");
+		if (!target) throw Error("[SUNEDITOR.create.fail] suneditor requires textarea's element");
+
+		const multiTargets = [];
+		if (target.nodeType === 1) {
+			multiTargets.push({ target: target });
+			options.multiRoot = false;
+		} else {
+			let props;
+			for (let key in target) {
+				props = target[key];
+				if (!props.target || props.target.nodeType !== 1) throw Error('[SUNEDITOR.create.fail] suneditor multi root requires textarea\'s element at the "target" property.');
+				props.key = key;
+				multiTargets.push(props);
 			}
-			editorTargets.push(e);
+			options.multiRoot = true;
 		}
 
-		return new Editor(editorTargets, options);
+		return new Editor(multiTargets, options);
 	}
 };
