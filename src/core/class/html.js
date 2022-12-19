@@ -215,8 +215,6 @@ HTML.prototype = {
 
 		this.editor.effectNode = null;
 		this.editor.focus();
-
-		// history stack
 		this.history.push(false);
 	},
 
@@ -578,7 +576,6 @@ HTML.prototype = {
 				this.selection.setRange(oNode, offset, oNode, offset);
 			}
 
-			// history stack
 			this.history.push(true);
 
 			return oNode;
@@ -734,7 +731,6 @@ HTML.prototype = {
 
 		// set range
 		this.selection.setRange(container, offset, container, offset);
-		// history stack
 		this.history.push(true);
 
 		return {

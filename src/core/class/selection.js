@@ -94,7 +94,7 @@ Selection.prototype = {
 	 */
 	removeRange: function () {
 		this.status._range = null;
-		this.status._selectionNode = null;
+		this.selectionNode = null;
 		if (this.status.hasFocus) this.get().removeAllRanges();
 		this.eventManager._setKeyEffect([]);
 	},
@@ -122,8 +122,8 @@ Selection.prototype = {
 	 * @returns {Node}
 	 */
 	getNode: function () {
-		if (!this.context.element.wysiwyg.contains(this.status._selectionNode)) this._init();
-		if (!this.status._selectionNode) {
+		if (!this.context.element.wysiwyg.contains(this.selectionNode)) this._init();
+		if (!this.selectionNode) {
 			const selectionNode = domUtils.getEdgeChild(
 				this.context.element.wysiwyg.firstChild,
 				function (current) {
@@ -134,11 +134,11 @@ Selection.prototype = {
 			if (!selectionNode) {
 				this._init();
 			} else {
-				this.status._selectionNode = selectionNode;
+				this.selectionNode = selectionNode;
 				return selectionNode;
 			}
 		}
-		return this.status._selectionNode;
+		return this.selectionNode;
 	},
 
 	/**
@@ -250,7 +250,7 @@ Selection.prototype = {
 			selectionNode = selection.extentNode || selection.anchorNode;
 		}
 
-		this.status._selectionNode = selectionNode;
+		this.selectionNode = selectionNode;
 	},
 
 	/**

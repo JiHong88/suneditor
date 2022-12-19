@@ -9,6 +9,7 @@ import Figure from '../../modules/Figure';
 
 const Component = function (editor) {
 	CoreDependency.call(this, editor);
+	this._lineBreakComp = null;
 };
 
 Component.prototype = {
@@ -57,7 +58,6 @@ Component.prototype = {
 			}
 		}
 
-		// history stack
 		if (!notHistoryPush) this.history.push(1);
 
 		return oNode || element;
@@ -124,7 +124,7 @@ Component.prototype = {
 	 * @private
 	 */
 	_setComponentLineBreaker: function (element) {
-		this.status._lineBreakComp = null;
+		this._lineBreakComp = null;
 		this.context.element.lineBreaker.style.display = 'none';
 
 		const ctxEl = this.context.element;
@@ -139,7 +139,7 @@ Component.prototype = {
 		let componentTop, w;
 		// top
 		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
-			this.status._lineBreakComp = container;
+			this._lineBreakComp = container;
 			componentTop = this.offset.get(element).top + yScroll;
 			w = target.offsetWidth / 2 / 2;
 
@@ -153,7 +153,7 @@ Component.prototype = {
 		// bottom
 		if (isList ? !container.nextSibling : !this.format.isLine(container.nextElementSibling)) {
 			if (!componentTop) {
-				this.status._lineBreakComp = container;
+				this._lineBreakComp = container;
 				componentTop = this.offset.get(element).top + yScroll;
 				w = target.offsetWidth / 2 / 2;
 			}

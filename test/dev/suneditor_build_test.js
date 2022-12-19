@@ -340,12 +340,13 @@ window.e=suneditor.create(
 		editor4: {
 			target: document.querySelector('#multi_editor_4'),
 			options: {
-				value: '<p>ed4</p>',
+				// value: '<p>ed4</p>',
 				placeholder: 'place4'
 			}
 		}
 	},
 	{
+		// value: 'Common value',
 		plugins: plugins,
 		toolbar_container: '#root_toolbar_container',
 		// statusbar_container: '#root_statusbar_container',

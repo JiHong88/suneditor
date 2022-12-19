@@ -58,12 +58,14 @@ const Constructor = function (editorTargets, options) {
 		toolbar.appendChild(domUtils.createElement('DIV', { class: 'se-arrow' }));
 	}
 
+	/** multi root set - start -------------------------------------------------------------- */
 	/** --- editor div --------------------------------------------------------------- */
 	const defaultId = '_';
 	const rootId = editorTargets[0].key || defaultId;
 	const rootKeys = [];
 	const elementContext = {};
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
+		const editTarget = editorTargets[i];
 		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (options._rtl ? ' se-rtl' : '') });
 		const container = domUtils.createElement('DIV', { class: 'se-container' });
 		const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' });
@@ -73,7 +75,7 @@ const Constructor = function (editorTargets, options) {
 		container.appendChild(toolbarShadow);
 
 		// init element
-		const initElements = _initElements(options, top_div);
+		const initElements = _initElements(options, top_div, editTarget.options || {});
 		const bottomBar = initElements.bottomBar;
 		const status_bar = bottomBar.statusbar;
 		const wysiwyg_div = initElements.wysiwygFrame;
@@ -89,7 +91,7 @@ const Constructor = function (editorTargets, options) {
 		editor_div.appendChild(line_breaker_t);
 		editor_div.appendChild(line_breaker_b);
 
-		// statusbar
+		// statusbar @todo - statusbar ..??
 		const statusbar_container = options.statusbar_container;
 		if (status_bar && statusbar_container) statusbar_container.appendChild(status_bar);
 
@@ -99,15 +101,16 @@ const Constructor = function (editorTargets, options) {
 		container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
 		container.appendChild(editor_div);
 
-		const key = editorTargets[i].key || defaultId;
+		const key = editTarget.key || defaultId;
 		if (status_bar && !statusbar_container) container.appendChild(status_bar);
 		textarea = _checkCodeMirror(options, textarea);
 		top_div.appendChild(container);
 		top_div.setAttribute('data-se-root', key);
 
 		rootKeys.push(key);
-		elementContext[key] = CreateContextElement(editorTargets[i], top_div, wysiwyg_div, textarea);
+		elementContext[key] = CreateContextElement(editTarget, top_div, wysiwyg_div, textarea);
 	}
+	/** multi root set - end -------------------------------------------------------------- */
 
 	// toolbar container
 	const toolbar_container = options.toolbar_container;
@@ -555,7 +558,7 @@ function InitMultiRootOptions(editorTargets) {
  * @param {Element} topDiv Suneditor top div
  * @returns {Object} Bottom bar elements (statusbar, navigation, charWrapper, charCounter)
  */
-function _initElements(options, topDiv) {
+function _initElements(options, topDiv, targetOptions) {
 	/** top div */
 	topDiv.style.cssText = options._editorStyles.top;
 
@@ -589,7 +592,7 @@ function _initElements(options, topDiv) {
 	let navigation = null;
 	let charWrapper = null;
 	let charCounter = null;
-	if (options.statusbar) {
+	if (targetOptions.statusbar) {
 		statusbar = domUtils.createElement('DIV', { class: 'se-status-bar sun-editor-common' });
 
 		/** navigation */
@@ -597,12 +600,12 @@ function _initElements(options, topDiv) {
 		statusbar.appendChild(navigation);
 
 		/** char counter */
-		if (options.charCounter) {
+		if (targetOptions.charCounter) {
 			charWrapper = domUtils.createElement('DIV', { class: 'se-char-counter-wrapper' });
 
-			if (options.charCounter_label) {
+			if (targetOptions.charCounter_label) {
 				const charLabel = domUtils.createElement('SPAN', { class: 'se-char-label' });
-				charLabel.textContent = options.charCounter_label;
+				charLabel.textContent = targetOptions.charCounter_label;
 				charWrapper.appendChild(charLabel);
 			}
 
@@ -610,9 +613,9 @@ function _initElements(options, topDiv) {
 			charCounter.textContent = '0';
 			charWrapper.appendChild(charCounter);
 
-			if (options.charCounter_max > 0) {
+			if (targetOptions.charCounter_max > 0) {
 				const char_max = domUtils.createElement('SPAN');
-				char_max.textContent = ' / ' + options.charCounter_max;
+				char_max.textContent = ' / ' + targetOptions.charCounter_max;
 				charWrapper.appendChild(char_max);
 			}
 
@@ -621,7 +624,7 @@ function _initElements(options, topDiv) {
 	}
 
 	let placeholder = null;
-	if (options.placeholder) {
+	if (targetOptions.placeholder) {
 		placeholder = domUtils.createElement('SPAN', { class: 'se-placeholder' });
 		placeholder.innerText = options.placeholder;
 	}

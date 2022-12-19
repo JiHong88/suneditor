@@ -112,8 +112,6 @@ Align.prototype = {
 		this.editor.effectNode = null;
 		this.menu.dropdownOff();
 		this.editor.focus();
-
-		// history stack
 		this.history.push(false);
 	},
 

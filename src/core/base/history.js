@@ -149,7 +149,6 @@ export default function (editor, change) {
 		if (root.value.length === 0) resetRoot(rootKey);
 
 		setStack(current, range, rootKey, 1);
-		console.log('stack', rootStack);
 
 		if (stackIndex === 1 && undo) undo.removeAttribute('disabled');
 
@@ -261,7 +260,7 @@ export default function (editor, change) {
 		 */
 		_destroy: function () {
 			if (pushDelay) _w.clearTimeout(pushDelay);
-			stack = rootStack = rootInitContents = null;
+			stackIndex = stack = rootStack = rootInitContents = null;
 		}
 	};
 }

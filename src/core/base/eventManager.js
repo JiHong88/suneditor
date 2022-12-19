@@ -27,6 +27,9 @@ const EventManager = function (editor) {
 	this._lineBreakerButton = null;
 	this._lineBreaker_t = null;
 	this._lineBreaker_b = null;
+	this._lineBreakDir = null;
+	this._lineBreakComp = null;
+	this._resizeClientY = 0;
 	this.__resize_editor = null;
 	this.__close_move = null;
 	this.__geckoActiveEvent = null;
@@ -843,7 +846,6 @@ function OnInput_wysiwyg(e) {
 	// user event
 	if (typeof this.events.onInput === 'function' && this.events.onInput(e) === false) return;
 
-	// history stack
 	this.history.push(true);
 }
 
@@ -994,7 +996,7 @@ function OnKeyDown_wysiwyg(e) {
 						if (range.startContainer.nodeType === 3) {
 							this.selection.setRange(range.startContainer, range.startContainer.textContent.length, range.startContainer, range.startContainer.textContent.length);
 						}
-						// history stack
+						
 						this.history.push(true);
 					} else {
 						let prev = formatEl.previousElementSibling || rangeEl.parentNode;
@@ -1028,7 +1030,6 @@ function OnKeyDown_wysiwyg(e) {
 							if (rangeEl.children.length === 0) domUtils.removeItem(rangeEl);
 
 							this.selection.setRange(con, offset, con, offset);
-							// history stack
 							this.history.push(true);
 						}
 					}
@@ -1053,7 +1054,6 @@ function OnKeyDown_wysiwyg(e) {
 					if (detach && rangeEl.parentNode) {
 						e.preventDefault();
 						this.format.removeBlock(rangeEl, domUtils.isListCell(formatEl) ? [formatEl] : null, null, false, false);
-						// history stack
 						this.history.push(true);
 						break;
 					}
@@ -1196,7 +1196,6 @@ function OnKeyDown_wysiwyg(e) {
 						domUtils.removeItem(next);
 					}
 					this.selection.setRange(con, 0, con, 0);
-					// history stack
 					this.history.push(true);
 				}
 				break;
@@ -1311,7 +1310,6 @@ function OnKeyDown_wysiwyg(e) {
 			}
 
 			this.selection.setRange(r.sc, r.so, r.ec, r.eo);
-			// history stack
 			this.history.push(false);
 
 			break;
@@ -1618,7 +1616,6 @@ function OnKeyUp_wysiwyg(e) {
 	// user event
 	if (typeof this.events.onKeyUp === 'function' && this.events.onKeyUp(e) === false) return;
 
-	// history stack
 	if (!ctrl && !alt && !HISTORY_IGNORE_KEYCODE.test(keyCode)) {
 		this.history.push(true);
 	}
@@ -1674,7 +1671,6 @@ function OnCut_wysiwyg(e) {
 	}
 
 	_w.setTimeout(function () {
-		// history stack
 		this.history.push(false);
 	});
 }
@@ -1763,8 +1759,8 @@ function OnMouseMove_wysiwyg(e) {
 			return;
 		}
 
-		this.status._lineBreakComp = component;
-		this.status._lineBreakDir = dir;
+		this._lineBreakComp = component;
+		this._lineBreakDir = dir;
 		lineBreakerStyle.top = top - wScroll + 'px';
 		this._lineBreakerButton.style.left = this.offset.get(component).left + component.offsetWidth / 2 - 15 + 'px';
 		lineBreakerStyle.display = 'block';
@@ -1776,7 +1772,7 @@ function OnMouseMove_wysiwyg(e) {
 
 function OnMouseDown_statusbar(e) {
 	e.stopPropagation();
-	this.status._resizeClientY = e.clientY;
+	this._resizeClientY = e.clientY;
 	this.context._resizeBackground.style.display = 'block';
 	this.context._resizeBackground.style.cursor = 'ns-resize';
 	this.__resize_editor = this.addGlobalEvent('mousemove', __resizeEditor.bind(this));
@@ -1784,10 +1780,10 @@ function OnMouseDown_statusbar(e) {
 }
 
 function __resizeEditor(e) {
-	const resizeInterval = this.context.element.editorArea.offsetHeight + (e.clientY - this.status._resizeClientY);
+	const resizeInterval = this.context.element.editorArea.offsetHeight + (e.clientY - this._resizeClientY);
 	const h = resizeInterval < this.context.element._minHeight ? this.context.element._minHeight : resizeInterval;
 	this.context.element.wysiwygFrame.style.height = this.context.element.code.style.height = h + 'px';
-	this.status._resizeClientY = e.clientY;
+	this._resizeClientY = e.clientY;
 	if (env.isIE) this.editor.__callResizeFunction(h, null);
 }
 
@@ -1801,8 +1797,8 @@ function __closeMove() {
 function DisplayLineBreak(dir, e) {
 	e.preventDefault();
 
-	dir = !dir ? this.status._lineBreakDir : dir;
-	const component = this.status._lineBreakComp;
+	dir = !dir ? this._lineBreakDir : dir;
+	const component = this._lineBreakComp;
 	const isList = domUtils.isListCell(component.parentNode);
 
 	const format = domUtils.createElement(isList ? 'BR' : domUtils.isTableCell(component.parentNode) ? 'DIV' : this.options.defaultLineTag);
@@ -1812,12 +1808,10 @@ function DisplayLineBreak(dir, e) {
 
 	component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
 	this.context.element.lineBreaker.style.display = 'none';
-	this.status._lineBreakComp = null;
+	this._lineBreakComp = null;
 
 	const focusEl = isList ? format : format.firstChild;
 	this.selection.setRange(focusEl, 1, focusEl, 1);
-
-	// history stack
 	this.history.push(false);
 }
 

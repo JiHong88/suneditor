@@ -159,8 +159,6 @@ Audio_.prototype = {
 
 		// focus
 		this.editor.focusEdge(focusEl);
-
-		// history stack
 		this.history.push(false);
 	},
 

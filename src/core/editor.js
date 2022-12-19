@@ -111,7 +111,7 @@ const Editor = function (multiTargets, options) {
 	 * @property {number} codeIndentSize Indent size of Code view mode (2)
 	 * @property {Array} currentNodes  An element array of the current cursor's node structure
 	 * @property {Array} currentNodesMap  An element name array of the current cursor's node structure
-	 * @property {number} rootKey  Root index
+	 * @property {number} rootKey Current root key
 	 */
 	this.status = {
 		hasFocus: false,
@@ -128,10 +128,6 @@ const Editor = function (multiTargets, options) {
 		currentNodesMap: [],
 		rootKey: product.rootId,
 		_range: null,
-		_selectionNode: null,
-		_resizeClientY: 0,
-		_lineBreakComp: null,
-		_lineBreakDir: ''
 	};
 
 	/**
@@ -363,7 +359,7 @@ const Editor = function (multiTargets, options) {
 
 	/** ----- Create editor ------------------------------------------------------------ */
 	this._editorInit(false);
-	
+
 	const inst = this;
 	const els = context.targetElements;
 	for (let key in els) {
@@ -377,12 +373,12 @@ const Editor = function (multiTargets, options) {
 
 		if (!options.iframe) {
 			inst._setEditorParams(e);
-			inst._initWysiwygArea(e, false, options.value);
+			inst._initWysiwygArea(e, false, e.options.value || options.value);
 		} else {
 			e.wysiwygFrame.addEventListener('load', function () {
 				converter._setIframeDocument(this, options);
 				inst._setEditorParams(e);
-				inst._initWysiwygArea(e, false, options.value);
+				inst._initWysiwygArea(e, false, e.options.value || options.value);
 			});
 		}
 	}
@@ -745,7 +741,6 @@ Editor.prototype = {
 	 */
 	execCommand: function (command, showDefaultUI, value) {
 		this.context.element._wd.execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
-		// history stack
 		this.history.push(true);
 	},
 
@@ -845,7 +840,6 @@ Editor.prototype = {
 
 		if (!this.status.isCodeView) {
 			this._resetComponents();
-			// history stack
 			this.history.push(false);
 		}
 	},
@@ -876,7 +870,6 @@ Editor.prototype = {
 		}
 
 		if (!this.status.isCodeView) {
-			// history stack
 			this.history.push(false);
 		}
 	},
@@ -1187,7 +1180,7 @@ Editor.prototype = {
 		}.bind(this);
 		const brChar = comp ? '' : '\n';
 
-		let indentSize = comp ? 0 : this.status.codeIndent * 1;
+		let indentSize = comp ? 0 : this.status.codeIndentSize * 1;
 		indentSize = indentSize > 0 ? new _w.Array(indentSize + 1).join(' ') : '';
 
 		(function recursionFunc(element, indent) {

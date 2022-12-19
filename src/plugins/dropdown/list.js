@@ -85,8 +85,6 @@ List.prototype = {
 		if (range) this.selection.setRange(range.sc, range.so, range.ec, range.eo);
 
 		this.menu.dropdownOff();
-
-		// history stack
 		this.history.push(false);
 	},
 

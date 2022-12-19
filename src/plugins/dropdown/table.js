@@ -218,7 +218,6 @@ Table.prototype = {
 				this.editor.focus();
 		}
 
-		// history stack
 		this.history.push(false);
 	},
 

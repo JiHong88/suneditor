@@ -441,7 +441,6 @@ Figure.prototype = {
 			this.component.select(element, this.kind);
 		}
 
-		// history stack
 		this.history.push(false);
 	},
 
@@ -792,8 +791,6 @@ function ContainerResizingOff() {
 	if (this.isVertical) this.setTransform(this._element, w, h);
 
 	this.component.select(this._element, this.kind);
-
-	// history stack
 	this.history.push(false);
 }
 

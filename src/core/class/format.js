@@ -51,8 +51,6 @@ Format.prototype = {
 		}
 
 		this.selection.setRange(domUtils.getNodeFromPath(info.firstPath, first), info.startOffset, domUtils.getNodeFromPath(info.lastPath, last), info.endOffset);
-
-		// history stack
 		this.history.push(false);
 	},
 
@@ -148,8 +146,6 @@ Format.prototype = {
 		}
 
 		this.selection.setRange(focusElement, 0, focusElement, 0);
-
-		// history stack
 		this.history.push(false);
 	},
 
@@ -405,7 +401,6 @@ Format.prototype = {
 			this.selection.setRange(edge.ec, edge.ec.textContent.length, edge.ec, edge.ec.textContent.length);
 		}
 
-		// history stack
 		this.history.push(false);
 	},
 
@@ -637,7 +632,6 @@ Format.prototype = {
 			}
 		}
 
-		// history stack
 		this.history.push(false);
 	},
 
@@ -929,8 +923,6 @@ Format.prototype = {
 
 		this.editor.effectNode = null;
 		this.selection.setRange(sc, so, ec, eo);
-
-		// history stack
 		this.history.push(false);
 	},
 
@@ -955,8 +947,6 @@ Format.prototype = {
 
 		this.editor.effectNode = null;
 		this.selection.setRange(sc, so, ec, eo);
-
-		// history stack
 		this.history.push(false);
 	},
 
@@ -1307,8 +1297,6 @@ Format.prototype = {
 		// set range
 		this.editor._offCurrentController();
 		this.selection.setRange(start.container, start.offset, end.container, end.offset);
-
-		// history stack
 		this.history.push(false);
 	},
 

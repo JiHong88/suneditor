@@ -76,7 +76,6 @@ Viewer.prototype = {
 			this.editor._nativeFocus();
 			domUtils.removeClass(this.editor._styleCommandMap.codeView, 'active');
 
-			// history stack
 			if (!domUtils.isNonEditable(ctxEl.wysiwygFrame)) {
 				this.history.push(false);
 				this.history._resetCachingButton();

@@ -57,8 +57,6 @@ LineHeight.prototype = {
 		}
 
 		this.menu.dropdownOff();
-
-		// history stack
 		this.history.push(false);
 	},
 

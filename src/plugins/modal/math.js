@@ -165,8 +165,6 @@ Math_.prototype = {
 			domUtils.removeItem(this.controller.currentTarget);
 			this.controller.close();
 			this.editor.focus();
-
-			// history stack
 			this.history.push(false);
 		}
 	},

@@ -129,8 +129,6 @@ Link.prototype = {
 			domUtils.removeItem(this.controller.currentTarget);
 			this.controller.currentTarget = null;
 			this.editor.focus();
-
-			// history stack
 			this.history.push(false);
 		}
 	},
