@@ -341,7 +341,8 @@ window.e=suneditor.create(
 			target: document.querySelector('#multi_editor_4'),
 			options: {
 				// value: '<p>ed4</p>',
-				placeholder: 'place4'
+				placeholder: 'place4',
+				statusbar: true
 			}
 		}
 	},

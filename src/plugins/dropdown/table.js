@@ -207,7 +207,7 @@ Table.prototype = {
 				domUtils.removeItem(this._element);
 				this._closeController();
 
-				if (emptyDiv !== this.context.element.wysiwyg)
+				if (emptyDiv !== this.targetContext.get('wysiwyg'))
 					this.node.removeAllParents(
 						emptyDiv,
 						function (current) {
@@ -893,9 +893,10 @@ Table.prototype = {
 	},
 
 	_toggleEditor: function (enabled) {
-		this.context.element.wysiwyg.setAttribute('contenteditable', enabled);
-		if (enabled) domUtils.removeClass(this.context.element.wysiwyg, 'se-disabled');
-		else domUtils.addClass(this.context.element.wysiwyg, 'se-disabled');
+		const wysiwyg = this.targetContext.get('wysiwyg');
+		wysiwyg.setAttribute('contenteditable', enabled);
+		if (enabled) domUtils.removeClass(wysiwyg, 'se-disabled');
+		else domUtils.addClass(wysiwyg, 'se-disabled');
 	},
 
 	_setMultiCells: function (startCell, endCell) {

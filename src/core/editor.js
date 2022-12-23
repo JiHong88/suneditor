@@ -33,13 +33,12 @@ const Editor = function (multiTargets, options) {
 	const _d = multiTargets[0].target.ownerDocument || env._d;
 	const _w = _d.defaultView || env._w;
 	const product = Constructor(multiTargets, options);
-	const context = product.commonContext;
-	context.targetElements = product.elementContext;
-	context.element = product.elementContext[product.rootId];
 
 	// properties
-	this.rootId = product.rootId;
 	this.rootKeys = product.rootKeys;
+	this.rootTargets = product.rootTargets;
+	this.targetContext = product.rootTargets.get(product.rootId);
+	this.commonContext = product.commonContext;
 
 	/**
 	 * @description Document object
@@ -66,11 +65,6 @@ const Editor = function (multiTargets, options) {
 	this.plugins = options.plugins || {};
 
 	/**
-	 * @description Elements and user options parameters of the suneditor
-	 */
-	this.context = context;
-
-	/**
 	 * @description Default icons object
 	 * @type {Object.<string, string>}
 	 */
@@ -94,7 +88,7 @@ const Editor = function (multiTargets, options) {
 	this.shadowRoot = null;
 
 	/**
-	 * @description Computed style of the wysiwyg area (window.getComputedStyle(context.element.wysiwyg))
+	 * @description Computed style of the wysiwyg area (window.getComputedStyle(this.targetContext.get('wysiwyg')))
 	 */
 	this.wwComputedStyle = null;
 
@@ -127,7 +121,7 @@ const Editor = function (multiTargets, options) {
 		currentNodes: [],
 		currentNodesMap: [],
 		rootKey: product.rootId,
-		_range: null,
+		_range: null
 	};
 
 	/**
@@ -361,15 +355,15 @@ const Editor = function (multiTargets, options) {
 	this._editorInit(false);
 
 	const inst = this;
-	const els = context.targetElements;
-	for (let key in els) {
-		const e = els[key];
-		const o = e.originElement;
-		const t = e.topArea;
+	const rt = this.rootTargets;
+	this.rootTargets.forEach(function (e) {
+		e = rt[i];
+		const o = e.get('originElement');
+		const t = e.get('topArea');
 		o.style.display = 'none';
 		t.style.display = 'block';
-		o.parentNode.insertBefore(t, o.nextElementSibling);
-		e.editorArea.appendChild(e.wysiwygFrame);
+		o.parentNode.insertBefore(t, o.get('nextElementSibling'));
+		e.editorArea.appendChild(e.get('wysiwygFrame'));
 
 		if (!options.iframe) {
 			inst._setEditorParams(e);
@@ -381,7 +375,7 @@ const Editor = function (multiTargets, options) {
 				inst._initWysiwygArea(e, false, e.options.value || options.value);
 			});
 		}
-	}
+	});
 
 	this.history.reset();
 };
@@ -485,7 +479,7 @@ Editor.prototype = {
 				this._offCurrentController();
 				this.menu.containerOff();
 				const figcaption = domUtils.getParentElement(this.selection.getNode(), 'FIGCAPTION');
-				const selectArea = figcaption || this.context.element.wysiwyg;
+				const selectArea = figcaption || this.targetContext.get('wysiwyg');
 				let first =
 					domUtils.getEdgeChild(
 						selectArea.firstChild,
@@ -634,7 +628,7 @@ Editor.prototype = {
 		// set option
 		const ctx = this.context;
 		const initHTML = ctx.element.wysiwyg.innerHTML;
-		const product = ResetOptions(this.context, mergeOptions);
+		const product = ResetOptions(this.context, this.options, mergeOptions);
 
 		if (mergeOptions.iframe) {
 			ctx.element.wysiwygFrame.addEventListener('load', function () {
@@ -657,7 +651,7 @@ Editor.prototype = {
 	setDir: function (dir) {
 		const rtl = dir === 'rtl';
 		const changeDir = this._prevRtl !== rtl;
-		const ctxEl = this.context.element;
+		const tc = this.targetContext;
 		const buttons = this.context.buttons;
 		this._prevRtl = this.options._rtl = rtl;
 
@@ -672,15 +666,15 @@ Editor.prototype = {
 		}
 
 		if (rtl) {
-			domUtils.addClass(ctxEl.topArea, 'se-rtl');
-			domUtils.addClass(ctxEl.wysiwygFrame, 'se-rtl');
+			domUtils.addClass(tc.get('topArea'), 'se-rtl');
+			domUtils.addClass(tc.get('wysiwygFrame'), 'se-rtl');
 		} else {
-			domUtils.removeClass(ctxEl.topArea, 'se-rtl');
-			domUtils.removeClass(ctxEl.wysiwygFrame, 'se-rtl');
+			domUtils.removeClass(tc.get('topArea'), 'se-rtl');
+			domUtils.removeClass(tc.get('wysiwygFrame'), 'se-rtl');
 		}
 
 		const lineNodes = domUtils.getListChildren(
-			ctxEl.wysiwyg,
+			tc.wysiwyg,
 			function (current) {
 				return this.format.isLine(current) && (current.style.marginRight || current.style.marginLeft || current.style.textAlign);
 			}.bind(this)
@@ -726,8 +720,7 @@ Editor.prototype = {
 
 		this.status.rootKey = rootKey;
 
-		const ctx = this.context;
-		const el = (ctx.element = ctx.targetElements[rootKey]);
+		const el = (this.targetContext = this.rootTargets.get(rootKey));
 		this._lineBreakerButton = el.lineBreaker.querySelector('button');
 		this._lineBreaker_t = el.lineBreaker_t;
 		this._lineBreaker_b = el.lineBreaker_b;
@@ -740,7 +733,7 @@ Editor.prototype = {
 	 * @param {string|undefined} value javascript execCommand function property
 	 */
 	execCommand: function (command, showDefaultUI, value) {
-		this.context.element._wd.execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
+		this.targetContext.get('_wd').execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
 		this.history.push(true);
 	},
 
@@ -750,9 +743,9 @@ Editor.prototype = {
 	 */
 	focus: function (rootKey) {
 		if (numbers.is(rootKey)) this.changeContextElement(rootKey);
-		if (this.context.element.wysiwygFrame.style.display === 'none') return;
+		if (this.targetContext.get('wysiwygFrame').style.display === 'none') return;
 
-		if (this.options.iframe || !this.context.element.wysiwyg.contains(this.selection.getNode())) {
+		if (this.options.iframe || !this.targetContext.get('wysiwyg').contains(this.selection.getNode())) {
 			this._nativeFocus();
 		} else {
 			try {
@@ -762,7 +755,7 @@ Editor.prototype = {
 					if (!this.format.isLine(currentNode) && !this.component.is(currentNode)) {
 						const br = domUtils.createElement('BR');
 						const format = domUtils.createElement(this.options.defaultLineTag, null, br);
-						this.context.element.wysiwyg.insertBefore(format, currentNode);
+						this.targetContext.get('wysiwyg').insertBefore(format, currentNode);
 						this.selection.setRange(br, 0, br, 0);
 						return;
 					}
@@ -784,7 +777,7 @@ Editor.prototype = {
 	 * @param {Element|null} focusEl Focus element
 	 */
 	focusEdge: function (focusEl) {
-		if (!focusEl) focusEl = this.context.element.wysiwyg.lastElementChild;
+		if (!focusEl) focusEl = this.targetContext.get('wysiwyg').lastElementChild;
 
 		const fileComponentInfo = this.component.get(focusEl);
 		if (fileComponentInfo) {
@@ -809,9 +802,9 @@ Editor.prototype = {
 	 */
 	blur: function () {
 		if (this.options.iframe) {
-			this.context.element.wysiwygFrame.blur();
+			this.targetContext.get('wysiwygFrame').blur();
 		} else {
-			this.context.element.wysiwyg.blur();
+			this.targetContext.get('wysiwyg').blur();
 		}
 	},
 
@@ -831,7 +824,7 @@ Editor.prototype = {
 			this.changeContextElement(rootKey[i]);
 
 			if (!this.status.isCodeView) {
-				this.context.element.wysiwyg.innerHTML = convertValue;
+				this.targetContext.get('wysiwyg').innerHTML = convertValue;
 			} else {
 				const value = this._convertHTMLToCode(convertValue, false);
 				this.viewer._setCodeView(value);
@@ -862,7 +855,7 @@ Editor.prototype = {
 				const children = temp.children;
 				for (let i = 0, len = children.length; i < len; i++) {
 					if (!children[i]) continue;
-					this.context.element.wysiwyg.appendChild(children[i]);
+					this.targetContext.get('wysiwyg').appendChild(children[i]);
 				}
 			} else {
 				this.viewer._setCodeView(this.viewer._getCodeView() + '\n' + this._convertHTMLToCode(convertValue, false));
@@ -888,8 +881,8 @@ Editor.prototype = {
 		for (let i = 0; i < rootKey.length; i++) {
 			this.changeContextElement(rootKey[i]);
 
-			if (ctx.head) this.context.element._wd.head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
-			if (ctx.body) this.context.element._wd.body.innerHTML = this.html.clean(ctx.body, true, null, null);
+			if (ctx.head) this.targetContext.get('_wd').head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
+			if (ctx.body) this.targetContext.get('_wd').body.innerHTML = this.html.clean(ctx.body, true, null, null);
 		}
 	},
 
@@ -910,8 +903,8 @@ Editor.prototype = {
 		for (let i = 0, len = rootKey.length, r; i < len; i++) {
 			this.changeContextElement(rootKey[i]);
 
-			const ctxElement = this.context.element;
-			const renderHTML = domUtils.createElement('DIV', null, this._convertHTMLToCode(ctxElement.wysiwyg, true));
+			const tc = this.targetContext;
+			const renderHTML = domUtils.createElement('DIV', null, this._convertHTMLToCode(tc.get('wysiwyg'), true));
 			const figcaptions = domUtils.getListChildren(renderHTML, function (current) {
 				return /FIGCAPTION/i.test(current.nodeName);
 			});
@@ -922,8 +915,8 @@ Editor.prototype = {
 
 			if (this.options.iframe_fullPage) {
 				if (includeFullPage) {
-					const attrs = domUtils.getAttributesToString(ctxElement._wd.body, ['contenteditable']);
-					r = '<!DOCTYPE html><html>' + ctxElement._wd.head.outerHTML + '<body ' + attrs + '>' + renderHTML.innerHTML + '</body></html>';
+					const attrs = domUtils.getAttributesToString(tc.get('_wd').body, ['contenteditable']);
+					r = '<!DOCTYPE html><html>' + tc.get('_wd').head.outerHTML + '<body ' + attrs + '>' + renderHTML.innerHTML + '</body></html>';
 				} else {
 					r = renderHTML.innerHTML;
 				}
@@ -951,7 +944,7 @@ Editor.prototype = {
 		const resultValue = {};
 		for (let i = 0, len = rootKey.length; i < len; i++) {
 			this.changeContextElement(rootKey[i]);
-			resultValue[rootKey[i]] = this.context.element.wysiwyg.textContent;
+			resultValue[rootKey[i]] = this.targetContext.get('wysiwyg').textContent;
 		}
 
 		this.changeContextElement(prevrootKey);
@@ -966,24 +959,27 @@ Editor.prototype = {
 	 */
 	setEditorStyle: function (style) {
 		const newStyles = (this.options._editorStyles = converter._setDefaultOptionStyle(this.options, style));
-		const ctxElement = this.context.element;
+		const tc = this.targetContext;
 
 		// top area
-		ctxElement.topArea.style.cssText = newStyles.top;
+		tc.get('topArea').style.cssText = newStyles.top;
+
 		// code view
-		ctxElement.code.style.cssText = this.options._editorStyles.frame;
-		ctxElement.code.style.display = 'none';
+		const code = tc.get('code');
+		code.style.cssText = this.options._editorStyles.frame;
+		code.style.display = 'none';
 		if (this.options.height === 'auto') {
-			ctxElement.code.style.overflow = 'hidden';
+			code.style.overflow = 'hidden';
 		} else {
-			ctxElement.code.style.overflow = '';
+			code.style.overflow = '';
 		}
+
 		// wysiwyg frame
 		if (!this.options.iframe) {
-			ctxElement.wysiwygFrame.style.cssText = newStyles.frame + newStyles.editor;
+			tc.get('wysiwygFrame').style.cssText = newStyles.frame + newStyles.editor;
 		} else {
-			ctxElement.wysiwygFrame.style.cssText = newStyles.frame;
-			ctxElement.wysiwyg.style.cssText = newStyles.editor;
+			tc.get('wysiwygFrame').style.cssText = newStyles.frame;
+			tc.get('wysiwyg').style.cssText = newStyles.editor;
 		}
 	},
 
@@ -1005,11 +1001,11 @@ Editor.prototype = {
 			if (this.menu.currentContainerActiveButton && this.menu.currentContainerActiveButton.disabled) this.menu.containerOff();
 			if (this.modalForm) this.plugins.modal.close.call(this);
 
-			this.context.element.code.setAttribute('readOnly', 'true');
-			domUtils.addClass(this.context.element.wysiwygFrame, 'se-read-only');
+			this.targetContext.get('code').setAttribute('readOnly', 'true');
+			domUtils.addClass(this.targetContext.get('wysiwygFrame'), 'se-read-only');
 		} else {
-			this.context.element.code.removeAttribute('readOnly');
-			domUtils.removeClass(this.context.element.wysiwygFrame, 'se-read-only');
+			this.targetContext.get('code').removeAttribute('readOnly');
+			domUtils.removeClass(this.targetContext.get('wysiwygFrame'), 'se-read-only');
 		}
 
 		if (this.options.hasCodeMirror) {
@@ -1027,13 +1023,13 @@ Editor.prototype = {
 
 		if (this.modalForm) this.plugins.modal.close.call(this);
 
-		this.context.element.wysiwyg.setAttribute('contenteditable', false);
+		this.targetContext.get('wysiwyg').setAttribute('contenteditable', false);
 		this.isDisabled = true;
 
 		if (this.options.hasCodeMirror) {
 			this.viewer._codeMirrorEditor('readonly', true);
 		} else {
-			this.context.element.code.setAttribute('disabled', 'disabled');
+			this.targetContext.get('code').setAttribute('disabled', 'disabled');
 		}
 	},
 
@@ -1042,13 +1038,13 @@ Editor.prototype = {
 	 */
 	enable: function (rootKey) {
 		this.toolbar.enable();
-		this.context.element.wysiwyg.setAttribute('contenteditable', true);
+		this.targetContext.get('wysiwyg').setAttribute('contenteditable', true);
 		this.isDisabled = false;
 
 		if (this.options.hasCodeMirror) {
 			this.viewer._codeMirrorEditor('readonly', false);
 		} else {
-			this.context.element.code.removeAttribute('disabled');
+			this.targetContext.get('code').removeAttribute('disabled');
 		}
 	},
 
@@ -1056,7 +1052,7 @@ Editor.prototype = {
 	 * @description Show the suneditor
 	 */
 	show: function (rootKey) {
-		const topAreaStyle = this.context.element.topArea.style;
+		const topAreaStyle = this.targetContext.get('topArea').style;
 		if (topAreaStyle.display === 'none') topAreaStyle.display = 'block';
 	},
 
@@ -1064,7 +1060,7 @@ Editor.prototype = {
 	 * @description Hide the suneditor
 	 */
 	hide: function (rootKey) {
-		this.context.element.topArea.style.display = 'none';
+		this.targetContext.get('topArea').style.display = 'none';
 	},
 
 	/**
@@ -1072,7 +1068,7 @@ Editor.prototype = {
 	 */
 	save: function () {
 		const value = this.getContent();
-		this.context.element.originElement.value = value;
+		this.targetContext.get('originElement').value = value;
 		// user event
 		if (typeof this.events.onSave === 'function') {
 			this.events.onSave(value);
@@ -1087,10 +1083,14 @@ Editor.prototype = {
 		/** remove element */
 		domUtils.removeItem(this.context._carrierWrapper);
 		domUtils.removeItem(this.context.toolbar._wrapper);
-		const ctxElements = this.context.targetElements;
-		for (let k in ctxElements) {
-			domUtils.removeItem(ctxElements[k].topArea);
-		}
+
+		this.rootTargets.forEach(function (e) {
+			domUtils.removeItem(e.topArea);
+		});
+
+		this.commonContext.clear();
+		this.rootTargets.clear();
+		this.targetContext.clear();
 
 		/** remove history */
 		this.history._destroy();
@@ -1165,7 +1165,7 @@ Editor.prototype = {
 
 	/**
 	 * @description construct wysiwyg area element to html string
-	 * @param {Element|String} html WYSIWYG element (context.element.wysiwyg) or HTML string.
+	 * @param {Element|String} html WYSIWYG element (this.targetContext.get('wysiwyg')) or HTML string.
 	 * @param {Boolean} comp If true, does not line break and indentation of tags.
 	 * @returns {string}
 	 */
@@ -1248,8 +1248,8 @@ Editor.prototype = {
 		const _w = this._w;
 
 		this._charTypeHTML = options.charCounter_type === 'byte-html';
-		this.wwComputedStyle = _w.getComputedStyle(e.wysiwyg);
-		this._editorHeight = e.wysiwygFrame.offsetHeight;
+		this.wwComputedStyle = _w.getComputedStyle(e.get('wysiwyg'));
+		this._editorHeight = e.get('wysiwygFrame').offsetHeight;
 		this._editorPadding = {
 			left: numbers.get(this.wwComputedStyle.getPropertyValue('padding-left')),
 			right: numbers.get(this.wwComputedStyle.getPropertyValue('padding-right')),
@@ -1259,7 +1259,7 @@ Editor.prototype = {
 		this._editorHeightPadding = this._editorPadding.top + this._editorPadding.bottom;
 
 		if (!options.iframe && typeof _w.ShadowRoot === 'function') {
-			let child = e.wysiwygFrame;
+			let child = e.get('wysiwygFrame');
 			while (child) {
 				if (child.shadowRoot) {
 					this.shadowRoot = child.shadowRoot;
@@ -1280,17 +1280,18 @@ Editor.prototype = {
 		// wisywig attributes
 		const attr = this.options.frameAttrbutes;
 		for (let k in attr) {
-			e.wysiwyg.setAttribute(k, attr[k]);
+			e.get('wysiwyg').setAttribute(k, attr[k]);
 		}
 
 		// init, validate
-		e._ww = options.iframe ? e.wysiwygFrame.contentWindow : _w;
-		e._wd = this._d;
+		e.set('_ww', options.iframe ? e.wysiwygFrame.contentWindow : _w);
 		if (options.iframe) {
-			e._wd = e.wysiwygFrame.contentDocument;
-			e.wysiwyg = e._wd.body;
-			if (options._editorStyles.editor) e.wysiwyg.style.cssText = options._editorStyles.editor;
-			if (options.height === 'auto') this._iframeAuto = e._wd.body;
+			e.set('_wd', e.get('wysiwygFrame').contentDocument);
+			e.set('wysiwyg', e.get('_wd').body);
+			if (options._editorStyles.editor) e.get('wysiwyg').style.cssText = options._editorStyles.editor;
+			if (options.height === 'auto') this._iframeAuto = e.get('_wd').body;
+		} else {
+			e.set('_wd', this._d);
 		}
 
 		// add events
@@ -1400,9 +1401,9 @@ Editor.prototype = {
 	 * @private
 	 */
 	_initWysiwygArea: function (e, reload, _initHTML) {
-		e.wysiwyg.innerHTML = (reload ? _initHTML : this.html.clean(typeof _initHTML === 'string' ? _initHTML : e.originElement.value, true, null, null)) || '<' + this.options.defaultLineTag + '><br></' + this.options.defaultLineTag + '>';
-		this.context.element = e;
-		if (this.options.charCounter && e.charCounter) e.charCounter.textContent = this.char.getLength();
+		e.get('wysiwyg').innerHTML = (reload ? _initHTML : this.html.clean(typeof _initHTML === 'string' ? _initHTML : e.get('originElement').value, true, null, null)) || '<' + this.options.defaultLineTag + '><br></' + this.options.defaultLineTag + '>';
+		this.targetContext = e;
+		if (this.options.charCounter && e.get('charCounter')) e.get('charCounter').textContent = this.char.getLength();
 	},
 
 	/**
@@ -1435,7 +1436,7 @@ Editor.prototype = {
 		if (this._iframeAuto) {
 			this._w.setTimeout(
 				function () {
-					this.context.element.wysiwygFrame.style.height = this._iframeAuto.offsetHeight + 'px';
+					this.targetContext.get('wysiwygFrame').style.height = this._iframeAuto.offsetHeight + 'px';
 				}.bind(this)
 			);
 		}
@@ -1444,12 +1445,12 @@ Editor.prototype = {
 			this._w.setTimeout(
 				function () {
 					const h = this._iframeAuto.offsetHeight;
-					this.context.element.wysiwygFrame.style.height = h + 'px';
+					this.targetContext.get('wysiwygFrame').style.height = h + 'px';
 					if (env.isIE) this.__callResizeFunction(h, null);
 				}.bind(this)
 			);
 		} else if (env.isIE) {
-			this.__callResizeFunction(this.context.element.wysiwygFrame.offsetHeight, null);
+			this.__callResizeFunction(this.targetContext.get('wysiwygFrame').offsetHeight, null);
 		}
 	},
 
@@ -1463,7 +1464,7 @@ Editor.prototype = {
 
 	_codeViewAutoHeight: function () {
 		if (this.status.isFullScreen) return;
-		this.context.element.code.style.height = this.context.element.code.scrollHeight + 'px';
+		this.targetContext.get('code').style.height = this.targetContext.get('code').scrollHeight + 'px';
 	},
 
 	/**
@@ -1472,13 +1473,13 @@ Editor.prototype = {
 	 */
 	_checkPlaceholder: function () {
 		let placeholder;
-		if ((placeholder = this.context.element.placeholder)) {
+		if ((placeholder = this.targetContext.get('placeholder'))) {
 			if (this.status.isCodeView) {
 				placeholder.style.display = 'none';
 				return;
 			}
 
-			const wysiwyg = this.context.element.wysiwyg;
+			const wysiwyg = this.targetContext.get('wysiwyg');
 			if (!domUtils.isZeroWith(wysiwyg.textContent) || wysiwyg.querySelector(domUtils._allowedEmptyNodeList) || (wysiwyg.innerText.match(/\n/g) || '').length > 1) {
 				placeholder.style.display = 'none';
 			} else {
@@ -1504,7 +1505,7 @@ Editor.prototype = {
 		this._responsiveButtons = product.toolbar.responsiveButtons;
 		// this.toolbar._setResponsive();
 
-		this.context = Context(ctx.element.originElement, ctx.toolbar.main, ctx.element.top, ctx.element.wysiwygFrame, ctx.element.code, ctx._carrierWrapper, this.options); //@todo context don't reset
+		this.context = Context(ctx.toolbar.main, ctx.element.top, ctx.element.wysiwygFrame, ctx.element.code, ctx._carrierWrapper, this.options); //@todo context don't reset
 		this._componentsInfoReset = true;
 		this._editorInit(true, initHTML);
 	},
@@ -1532,8 +1533,8 @@ Editor.prototype = {
 		this._w.setTimeout(
 			function () {
 				// observer
-				if (this.eventManager._resizeObserver) this.eventManager._resizeObserver.observe(this.context.element.wysiwygFrame);
-				if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(this.context.element._toolbarShadow);
+				if (this.eventManager._resizeObserver) this.eventManager._resizeObserver.observe(this.targetContext.get('wysiwygFrame'));
+				if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(this.targetContext.get('_toolbarShadow'));
 				// resource state
 				this._resourcesStateChange();
 				// user event

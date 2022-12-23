@@ -57,20 +57,20 @@ const Figure = function (inst, controls, params) {
 
 	// init
 	this.eventManager.addEvent(this.alignButton, 'click', OnClick_alignButton.bind(this));
-	const targetElements = this.context.targetElements;
-	for (let k in targetElements) {
-		if (targetElements[k].editorArea.querySelector('.se-controller.se-resizing-container')) continue;
-		const main = CreateHTML_resizeDot();
-		const handles = main.querySelectorAll('.se-resize-dot > span');
-		targetElements[k]._figure = {
-			main: main,
-			border: main.querySelector('.se-resize-dot'),
-			display: main.querySelector('.se-resize-display'),
-			handles: handles
-		};
-		targetElements[k].editorArea.appendChild(main);
-		this.eventManager.addEvent(handles, 'mousedown', OnResizeContainer.bind(this));
-	}
+	this.rootTargets.forEach(function (e) {
+		if (!e.get('editorArea').querySelector('.se-controller.se-resizing-container')) {
+			const main = CreateHTML_resizeDot();
+			const handles = main.querySelectorAll('.se-resize-dot > span');
+			e.set('_figure', {
+				main: main,
+				border: main.querySelector('.se-resize-dot'),
+				display: main.querySelector('.se-resize-display'),
+				handles: handles
+			});
+			e.get('editorArea').appendChild(main);
+			this.eventManager.addEvent(handles, 'mousedown', OnResizeContainer.bind(this));
+		}
+	});
 };
 
 /**
@@ -190,13 +190,13 @@ Figure.prototype = {
 		this.align = target.style.float || target.getAttribute('data-align') || 'none';
 		this.isVertical = /^(90|270)$/.test(Math.abs(target.getAttribute('data-rotate')).toString());
 
-		const eventWysiwyg = this.context.element.eventWysiwyg;
+		const eventWysiwyg = this.targetContext.get('eventWysiwyg');
 		const offset = this.offset.get(target);
-		const frameOffset = this.offset.get(this.context.element.wysiwygFrame);
+		const frameOffset = this.offset.get(this.targetContext.get('wysiwygFrame'));
 		const w = (this.isVertical ? target.offsetHeight : target.offsetWidth) - 1;
 		const h = (this.isVertical ? target.offsetWidth : target.offsetHeight) - 1;
 		const t = offset.top - (this.options.iframe ? frameOffset.top : 0);
-		const l = offset.left - (this.options.iframe ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - this.context.element.wysiwygFrame.scrollLeft;
+		const l = offset.left - (this.options.iframe ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - this.targetContext.get('wysiwygFrame').scrollLeft;
 		const originSize = (target.getAttribute('data-origin') || '').split(',');
 		const dataSize = (target.getAttribute('data-size') || '').split(',');
 		const ratio = Figure.GetRatio(dataSize[0] || numbers.get(target.style.width, 2) || w, dataSize[1] || numbers.get(target.style.height, 2) || h, this.sizeUnit);
@@ -220,7 +220,7 @@ Figure.prototype = {
 		this._height = targetInfo.height;
 		if (__fileManagerInfo || this.__fileManagerInfo) return targetInfo;
 
-		const _figure = this.context.element._figure;
+		const _figure = this.targetContext.get('_figure');
 		this.editor._figureContainer = _figure.main;
 		_figure.main.style.top = t + 'px';
 		_figure.main.style.left = l + 'px';
@@ -241,7 +241,7 @@ Figure.prototype = {
 		});
 
 		const size = this.getSize(target);
-		domUtils.changeTxt(this.context.element._figure.display, this.lang.modalBox[this.align === 'none' ? 'basic' : this.align] + ' (' + (size.w || 'auto') + ', ' + (size.h || 'auto') + ')');
+		domUtils.changeTxt(_figure.display, this.lang.modalBox[this.align === 'none' ? 'basic' : this.align] + ' (' + (size.w || 'auto') + ', ' + (size.h || 'auto') + ')');
 		this._displayResizeHandles(!nonResizing);
 
 		// percentage active
@@ -679,16 +679,17 @@ Figure.prototype = {
 		display = !display ? 'none' : 'flex';
 		this.controller.form.style.display = display;
 
-		const resizeHandles = this.context.element._figure.handles;
+		const _figure = this.targetContext.get('_figure');
+		const resizeHandles = _figure.handles;
 		for (let i = 0, len = resizeHandles.length; i < len; i++) {
 			resizeHandles[i].style.display = display;
 		}
 
 		if (display === 'none') {
-			domUtils.addClass(this.context.element._figure.main, 'se-resize-ing');
+			domUtils.addClass(_figure.main, 'se-resize-ing');
 			this.__onResizeESCEvent = this.eventManager.addGlobalEvent('keydown', this.__containerResizingESC);
 		} else {
-			domUtils.removeClass(this.context.element._figure.main, 'se-resize-ing');
+			domUtils.removeClass(_figure.main, 'se-resize-ing');
 		}
 	},
 
@@ -727,7 +728,7 @@ function OnResizeContainer(e) {
 	const direction = (this._resize_direction = e.target.classList[0]);
 	this._resizeClientX = e.clientX;
 	this._resizeClientY = e.clientY;
-	this.context.element._figure.main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
+	this.targetContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
 	this.context._resizeBackground.style.cursor = DIRECTION_CURSOR_MAP[direction];
 	this.context._resizeBackground.style.display = 'block';
 
@@ -747,7 +748,7 @@ function ContainerResizing(e) {
 	let w = resultW + (/r/.test(direction) ? clientX - this._resizeClientX : this._resizeClientX - clientX);
 	let h = resultH + (/b/.test(direction) ? clientY - this._resizeClientY : this._resizeClientY - clientY);
 	const wh = (resultH / resultW) * w;
-	const resizeBorder = this.context.element._figure.border;
+	const resizeBorder = this.targetContext.get('_figure').border;
 
 	if (/t/.test(direction)) resizeBorder.style.top = resultH - (/h/.test(direction) ? h : wh) + 'px';
 	if (/l/.test(direction)) resizeBorder.style.left = resultW - w + 'px';
@@ -767,7 +768,7 @@ function ContainerResizing(e) {
 
 	this._resize_w = /h$/.test(direction) ? this._width : this._w.Math.round(resultW);
 	this._resize_h = /w$/.test(direction) ? this._height : this._w.Math.round(resultH);
-	domUtils.changeTxt(this.context.element._figure.display, this._resize_w + ' x ' + this._resize_h);
+	domUtils.changeTxt(this.targetContext.get('_figure').display, this._resize_w + ' x ' + this._resize_h);
 }
 
 function ContainerResizingOff() {
@@ -780,7 +781,7 @@ function ContainerResizingOff() {
 	h = this._w.Math.round(h) || h;
 
 	if (!this.isVertical && !/%$/.test(w)) {
-		const limit = this.context.element.wysiwygFrame.clientWidth - this.editor._editorPadding.left + this.editor._editorPadding.right - 2;
+		const limit = this.targetContext.get('wysiwygFrame').clientWidth - this.editor._editorPadding.left + this.editor._editorPadding.right - 2;
 		if (numbers.get(w, 0) > limit) {
 			h = this._w.Math.round((h / w) * limit);
 			w = limit;
@@ -821,7 +822,7 @@ function CreateAlign(editor) {
 }
 
 function OffFigureContainer() {
-	this.context.element._figure.main.style.display = 'none';
+	this.targetContext.get('_figure').main.style.display = 'none';
 	this.editor._figureContainer = null;
 	this.inst.init();
 }

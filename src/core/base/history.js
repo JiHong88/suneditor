@@ -8,6 +8,7 @@ import { getNodeFromPath, getNodePath } from '../../helper/domUtils';
 
 export default function (editor, change) {
 	const ctx = editor.context;
+	const rootTargets = editor.rootTargets;
 	const delayTime = editor.options.historyStackDelayTime;
 	let undo = editor.context.buttons.undo;
 	let redo = editor.context.buttons.redo;
@@ -19,13 +20,12 @@ export default function (editor, change) {
 		const prevRoot = rootStack[prevKey];
 
 		stackIndex += increase;
-		const tempRoot = rootStack[stack[stackIndex]];
 		const rootKey = increase < 0 && prevKey !== stack[stackIndex] && prevRoot.index > 0 ? prevKey : stack[stackIndex];
 		const root = rootStack[rootKey];
 		root.index += increase;
 
 		const item = root.value[root.index];
-		ctx.targetElements[rootKey].wysiwyg.innerHTML = item.content;
+		this.rootTargets.get(rootKey).get('wysiwyg').innerHTML = item.content;
 
 		if (prevKey !== rootKey && increase < 0 && stackIndex === 1) {
 			stackIndex = 0;
@@ -120,7 +120,7 @@ export default function (editor, change) {
 
 	function initRoot(rootKey) {
 		rootStack[rootKey] = { value: [], index: -1 };
-		rootInitContents[rootKey] = ctx.targetElements[rootKey].wysiwyg.innerHTML;
+		rootInitContents[rootKey] = rootTargets.get(rootKey).get('wysiwyg').innerHTML;
 	}
 
 	function refreshRoots(root) {
@@ -142,7 +142,7 @@ export default function (editor, change) {
 	function pushStack(rootKey, range) {
 		editor._checkComponents();
 
-		const current = ctx.targetElements[rootKey].wysiwyg.innerHTML;
+		const current = rootTargets.get(rootKey).get('wysiwyg').innerHTML;
 		const root = rootStack[rootKey];
 		if (!current || (root.value[root.index] && current === root.value[root.index].content)) return;
 		if (stack.length > stackIndex + 1) refreshRoots(root);
@@ -213,7 +213,7 @@ export default function (editor, change) {
 		},
 
 		overwrite: function (rootKey) {
-			setStack(ctx.targetElements[rootKey || editor.status.rootKey].wysiwyg.innerHTML, editor.status.rootKey, 0);
+			setStack(rootTargets.get(rootKey || editor.status.rootKey).get('wysiwyg').innerHTML, editor.status.rootKey, 0);
 		},
 
 		/**

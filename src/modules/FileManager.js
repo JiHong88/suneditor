@@ -175,7 +175,7 @@ FileManager.prototype = {
 	_checkInfo: function () {
 		let tags = [];
 		for (let i = 0, len = this.tagNames.length; i < len; i++) {
-			tags = tags.concat([].slice.call(this.context.element.wysiwyg.querySelectorAll(this.tagNames[i] + ':not([data-se-embed="true"])')));
+			tags = tags.concat([].slice.call(this.targetContext.get('wysiwyg').querySelectorAll(this.tagNames[i] + ':not([data-se-embed="true"])')));
 		}
 
 		if (tags.length === this.infoList.length) {

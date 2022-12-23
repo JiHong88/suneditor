@@ -60,10 +60,9 @@ const Constructor = function (editorTargets, options) {
 
 	/** multi root set - start -------------------------------------------------------------- */
 	/** --- editor div --------------------------------------------------------------- */
-	const defaultId = '_';
-	const rootId = editorTargets[0].key || defaultId;
+	const rootId = editorTargets[0].key || null;
 	const rootKeys = [];
-	const elementContext = {};
+	const rootTargets = new _w.Map();
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
 		const editTarget = editorTargets[i];
 		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (options._rtl ? ' se-rtl' : '') });
@@ -91,7 +90,7 @@ const Constructor = function (editorTargets, options) {
 		editor_div.appendChild(line_breaker_t);
 		editor_div.appendChild(line_breaker_b);
 
-		// statusbar @todo - statusbar ..??
+		// statusbar
 		const statusbar_container = options.statusbar_container;
 		if (status_bar && statusbar_container) statusbar_container.appendChild(status_bar);
 
@@ -101,14 +100,14 @@ const Constructor = function (editorTargets, options) {
 		container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
 		container.appendChild(editor_div);
 
-		const key = editTarget.key || defaultId;
+		const key = editTarget.key || null;
 		if (status_bar && !statusbar_container) container.appendChild(status_bar);
 		textarea = _checkCodeMirror(options, textarea);
 		top_div.appendChild(container);
 		top_div.setAttribute('data-se-root', key);
 
 		rootKeys.push(key);
-		elementContext[key] = CreateContextElement(editTarget, top_div, wysiwyg_div, textarea);
+		rootTargets.set(key, CreateContextElement(editTarget, top_div, wysiwyg_div, textarea));
 	}
 	/** multi root set - end -------------------------------------------------------------- */
 
@@ -121,14 +120,15 @@ const Constructor = function (editorTargets, options) {
 		top_div.appendChild(container);
 		toolbar_container.appendChild(top_div);
 	} else {
-		elementContext[rootId].container.insertBefore(toolbar, elementContext[0].container.firstElementChild);
+		const rootContainer = rootTargets.get(rootId).get('container');
+		rootContainer.insertBefore(toolbar, rootContainer.firstElementChild);
 	}
 
 	return {
-		commonContext: Context(editorTargets, toolbar, editor_carrier_wrapper, options),
+		commonContext: Context(toolbar, editor_carrier_wrapper, options),
 		rootId: rootId,
 		rootKeys: rootKeys,
-		elementContext: elementContext,
+		rootTargets: rootTargets,
 		pluginCallButtons: tool_bar_main.pluginCallButtons,
 		responsiveButtons: tool_bar_main.responsiveButtons
 	};
@@ -140,14 +140,13 @@ const Constructor = function (editorTargets, options) {
  * @param {Object} mergeOptions The new options
  * @returns {Object}
  */
-export function ResetOptions(context, mergeOptions) {
-	const originOptions = context.options;
+export function ResetOptions(context, originOptions, mergeOptions) {
 	InitOptions(mergeOptions);
 
-	const ctxEl = context.element;
+	const tc = this.targetContext;
 	const toolbar = context.toolBar.main;
-	const editorContainer = ctxEl.container;
-	const editorArea = ctxEl.editorArea;
+	const editorContainer = tc.get('container');
+	const editorArea = tc.get('editorArea');
 	const isNewToolbarContainer = mergeOptions.toolbar_container && mergeOptions.toolbar_container !== originOptions.toolbar_container;
 	const isNewToolbar = mergeOptions.lang !== originOptions.lang || mergeOptions.buttonList !== originOptions.buttonList || mergeOptions.mode !== originOptions.mode || isNewToolbarContainer;
 
@@ -170,13 +169,13 @@ export function ResetOptions(context, mergeOptions) {
 		context.toolBar._arrow = arrow;
 	}
 
-	const initElements = _initElements(mergeOptions, ctxEl.topArea, isNewToolbar ? tool_bar.element : toolbar, arrow);
+	const initElements = _initElements(mergeOptions, tc.get('topArea'), isNewToolbar ? tool_bar.element : toolbar, arrow);
 	const bottomBar = initElements.bottomBar;
 	const wysiwygFrame = initElements.wysiwygFrame;
 	const placeholder_span = initElements.placeholder;
 	let code = initElements.codeView;
 
-	if (ctxEl.statusbar) domUtils.removeItem(ctxEl.statusbar);
+	if (tc.get('statusbar')) domUtils.removeItem(tc.get('statusbar'));
 	if (bottomBar.statusbar) {
 		if (mergeOptions.statusbar_container && mergeOptions.statusbar_container !== originOptions.statusbar_container) {
 			mergeOptions.statusbar_container.appendChild(bottomBar.statusbar);
@@ -191,20 +190,20 @@ export function ResetOptions(context, mergeOptions) {
 
 	code = _checkCodeMirror(mergeOptions, code);
 
-	ctxEl.statusbar = bottomBar.statusbar;
-	ctxEl.navigation = bottomBar.navigation;
-	ctxEl.charWrapper = bottomBar.charWrapper;
-	ctxEl.charCounter = bottomBar.charCounter;
-	ctxEl.wysiwygFrame = wysiwygFrame;
-	ctxEl.code = code;
-	ctxEl.placeholder = placeholder_span;
+	tc.set('statusbar', bottomBar.statusbar);
+	tc.set('navigation', bottomBar.navigation);
+	tc.set('charWrapper', bottomBar.charWrapper);
+	tc.set('charCounter', bottomBar.charCounter);
+	tc.set('wysiwygFrame', wysiwygFrame);
+	tc.set('code', code);
+	tc.set('placeholder', placeholder_span);
 
 	if (mergeOptions._rtl) {
-		domUtils.addClass(ctxEl.topArea, 'se-rtl');
+		domUtils.addClass(tc.get('topArea'), 'se-rtl');
 		domUtils.addClass(context.toolbar._wrapper, 'se-rtl');
 		domUtils.addClass(context._carrierWrapper, 'se-rtl');
 	} else {
-		domUtils.removeClass(ctxEl.topArea, 'se-rtl');
+		domUtils.removeClass(tc.get('topArea'), 'se-rtl');
 		domUtils.removeClass(context.toolbar._wrapper, 'se-rtl');
 		domUtils.removeClass(context._carrierWrapper, 'se-rtl');
 	}

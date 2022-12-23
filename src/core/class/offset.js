@@ -13,7 +13,7 @@ const Offset = function (editor) {
 
 Offset.prototype = {
 	/**
-	 * @description Returns the position of the argument, "context.element.editorArea" to inside the editor.Returns the position of the element in "context.element.editorArea".
+	 * @description Returns the position of the argument, "this.targetContext.get('editorArea')" to inside the editor.Returns the position of the element in "this.targetContext.get('editorArea')".
 	 * @param {Node} node Target node
 	 * @returns {{top:boolean, left:boolean}}
 	 */
@@ -29,7 +29,7 @@ Offset.prototype = {
 			offsetElement = offsetElement.offsetParent;
 		}
 
-		const wFrame = this.context.element.wysiwygFrame;
+		const wFrame = this.targetContext.get('wysiwygFrame');
 		const iframe = wFrame && /iframe/i.test(wFrame.nodeName);
 
 		return {
@@ -44,7 +44,7 @@ Offset.prototype = {
 	 * @returns {{top:boolean, left:boolean}}
 	 */
 	getGlobal: function (element) {
-		if (!element) element = this.context.element.topArea;
+		if (!element) element = this.targetContext.get('topArea');
 		const w = element.offsetWidth;
 		const h = element.offsetHeight;
 		let t = 0,
@@ -70,7 +70,7 @@ Offset.prototype = {
 	 * @returns {{top:boolean, left:boolean, width:boolean, height:boolean}}
 	 */
 	getGlobalScroll: function (element) {
-		const topArea = this.context.element.topArea;
+		const topArea = this.targetContext.get('topArea');
 		let t = 0,
 			l = 0,
 			h = 0,
@@ -164,11 +164,12 @@ Offset.prototype = {
 	 * @returns {{top:boolean, left:boolean}}
 	 */
 	getWWScroll: function () {
+		const eventWysiwyg = this.targetContext.get('eventWysiwyg');
 		return {
-			top: this.context.element.eventWysiwyg.scrollY || this.context.element.eventWysiwyg.scrollTop || 0,
-			left: this.context.element.eventWysiwyg.scrollX || this.context.element.eventWysiwyg.scrollLeft || 0,
-			width: this.context.element.eventWysiwyg.scrollWidth || 0,
-			height: this.context.element.eventWysiwyg.scrollHeight || 0
+			top: eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0,
+			left: eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0,
+			width: eventWysiwyg.scrollWidth || 0,
+			height: eventWysiwyg.scrollHeight || 0
 		};
 	},
 
@@ -242,7 +243,7 @@ Offset.prototype = {
 		const arrow = hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null;
 
 		// top ----------------------------------------------------------------------------------------------------
-		const editorH = this.context.element.topArea.offsetHeight;
+		const editorH = this.targetContext.get('topArea').offsetHeight;
 		const ah = arrow ? arrow.offsetHeight : 0;
 		const elH = element.offsetHeight;
 		const targetH = target.offsetHeight;
@@ -310,7 +311,7 @@ Offset.prototype = {
 		element.style.top = t + 'px';
 
 		// left ----------------------------------------------------------------------------------------------------
-		const editorW = this.context.element.topArea.offsetWidth;
+		const editorW = this.targetContext.get('topArea').offsetWidth;
 		const radius = numbers.get(this._w.getComputedStyle(element).borderRadius) || 0;
 		const targetW = targetOffset.width;
 		const elW = element.offsetWidth;

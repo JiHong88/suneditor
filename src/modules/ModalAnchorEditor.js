@@ -153,7 +153,7 @@ ModalAnchorEditor.prototype = {
 	},
 
 	_createHeaderList: function (urlValue) {
-		const headers = domUtils.getListChildren(this.context.element.wysiwyg, function (current) {
+		const headers = domUtils.getListChildren(this.targetContext.get('wysiwyg'), function (current) {
 			return /h[1-6]/i.test(current.nodeName);
 		});
 		if (headers.length === 0) return;

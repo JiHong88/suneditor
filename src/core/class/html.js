@@ -156,7 +156,7 @@ HTML.prototype = {
 	 * @param {boolean} notCleanData If true, inserts the HTML string without refining it with html.clean.
 	 */
 	insert: function (html, rangeSelection, notCheckCharCount, notCleanData) {
-		if (!this.context.element.wysiwygFrame.contains(this.selection.get().focusNode)) this.editor.focus();
+		if (!this.targetContext.get('wysiwygFrame').contains(this.selection.get().focusNode)) this.editor.focus();
 
 		if (typeof html === 'string') {
 			if (!notCleanData) html = this.clean(html, false, null, null);
@@ -411,9 +411,10 @@ HTML.prototype = {
 
 		try {
 			// set node
+			const wysiwyg = this.targetContext.get('wysiwyg');
 			if (!insertListCell) {
-				if (domUtils.isWysiwygFrame(afterNode) || parentNode === this.context.element.wysiwyg.parentNode) {
-					parentNode = this.context.element.wysiwyg;
+				if (domUtils.isWysiwygFrame(afterNode) || parentNode === wysiwyg.parentNode) {
+					parentNode = wysiwyg;
 					afterNode = null;
 				}
 
@@ -449,7 +450,7 @@ HTML.prototype = {
 			// insert--
 			if (insertListCell) {
 				if (!tempParentNode.parentNode) {
-					parentNode = this.context.element.wysiwyg;
+					parentNode = wysiwyg;
 					afterNode = null;
 				} else {
 					parentNode = tempParentNode;
@@ -726,7 +727,7 @@ HTML.prototype = {
 
 		if (!domUtils.isWysiwygFrame(container) && container.childNodes.length === 0) {
 			const rc = this.node.removeAllParents(container, null, null);
-			if (rc) container = rc.sc || rc.ec || this.context.element.wysiwyg;
+			if (rc) container = rc.sc || rc.ec || this.targetContext.get('wysiwyg');
 		}
 
 		// set range

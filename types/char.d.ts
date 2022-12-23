@@ -10,7 +10,7 @@ class Char extends EditorDependency {
 	/**
 	 * @description Get the [content]'s number of characters or binary data size. (options.charCounter_type)
 	 * If [content] is undefined, get the current editor's number of characters or binary data size.
-	 * @param content Content to count. (defalut: this.context.element.wysiwyg)
+	 * @param content Content to count. (defalut: this.targetContext.get('wysiwyg'))
 	 */
 	getLength(content?: string): number;
 
