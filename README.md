@@ -117,6 +117,7 @@ In "suneditor-contents.css", you can define the style of all the tags created in
 ### 1. Load only what you want
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
+// import 'suneditor/assets/css/_variables.css'
 // import 'suneditor/assets/css/suneditor.css'
 // import 'suneditor/assets/css/suneditor-contents.css'
 import suneditor from 'suneditor'
@@ -181,7 +182,7 @@ suneditor.create('sample', {
 ```javascript
 import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
-import {align, font, fontSize, fontColor, hiliteColor, 
+import {align, font, fontSize, fontColor, hiliteColor,
         horizontalRule, image, template} from 'suneditor/src/plugins'
 
 suneditor.create('sample', {
@@ -384,7 +385,7 @@ plugins: [
     imageGallery
 ]
 : Plugins array.     default: null {Array}
-// * Custom options and default options are all treated the same. 
+// * Custom options and default options are all treated the same.
 // * When using a custom plugin and a default plugin together, register as follows.
 // * {custom_plugin, ...plugins}
 
@@ -440,7 +441,7 @@ lineAttrReset   : Deletes other attributes except for the property set at the ti
                   If there is no value, no all attribute is deleted.    default: '' {String}
                   ex) 'class|style': Attributes other than "class" and "style" are deleted at line break.
                       '*': All attributes are deleted at line break.
-toolbarWidth    : The width of the toolbar. Applies only when the editor mode is 
+toolbarWidth    : The width of the toolbar. Applies only when the editor mode is
                   'inline' or 'balloon' mode.     default: 'auto' {Number|String}
 toolbarContainer: A custom HTML selector placing the toolbar inside.
                   The class name of the element must be 'sun-editor'.
@@ -516,7 +517,7 @@ resizingBarContainer: A custom HTML selector placing the resizing bar inside.
                       ex) document.querySelector('#id') || '#id'
 
 // Character count-----------------------------------------------------------------------------------------------
-charCounter     : Shows the number of characters in the editor.     
+charCounter     : Shows the number of characters in the editor.
                   If the maxCharCount option has a value, it becomes true. default: false {Boolean}
 charCounterType : Defines the calculation method of the "charCounter" option.
                   'char': Characters length.
@@ -658,7 +659,7 @@ imageWidth      : The default width size of the image frame.          default: '
 imageHeight     : The default height size of the image frame.         default: 'auto' {String}
 imageSizeOnlyPercentage : If true, image size can only be scaled by percentage.   default: false {Boolean}
 imageRotation   : Choose whether to image rotation buttons display.
-                  When "imageSizeOnlyPercentage" is "true" or  or "imageHeightShow" is "false" the default value is false.                       
+                  When "imageSizeOnlyPercentage" is "true" or  or "imageHeightShow" is "false" the default value is false.
                   If you want the button to be visible, put it a true.     default: true {Boolean}
 imageFileInput  : Choose whether to create a file input tag in the image upload window.  default: true {Boolean}
 imageUrlInput   : Choose whether to create a image url input tag in the image upload window.
@@ -702,7 +703,7 @@ imageGalleryUrl     : The url of the image gallery, if you use the image gallery
                                 }
                             ],
                             "nullMessage": "Text string or HTML string", // It is displayed when "result" is empty.
-                            "errorMessage": "Insert error message", // It is displayed when an error occurs. 
+                            "errorMessage": "Insert error message", // It is displayed when an error occurs.
                         }
                       You can redefine the "plugins.imageGallery.drawItems" method.
 imageGalleryHeader: Http Header when get image gallery.         default: null {Object}
@@ -758,7 +759,7 @@ videoUploadUrl  : The video upload to server mapping address.       default: nul
 videoUploadSizeLimit: The size of the total uploadable videos (in bytes).
                       Invokes the "onVideoUploadError" method.  default: null {Number}
 videoMultipleFile: If true, multiple videos can be selected.    default: false {Boolean}
-videoTagAttrs    : Define "Attributes" of the video tag.                      default: null {Object} 
+videoTagAttrs    : Define "Attributes" of the video tag.                      default: null {Object}
                    ex) { poster: "http://suneditor.com/docs/loading.gif", autoplay: true }
 videoIframeAttrs : Define "Attributes" of the iframe tag. (Youtube, Vimeo).   default: null {Object}
                    ex) { style: "border: 2px solid red;" }
@@ -792,7 +793,7 @@ audioUploadUrl  : The audio upload to server mapping address.       default: nul
 audioUploadSizeLimit: The size of the total uploadable audios (in bytes).
                       Invokes the "onAudioUploadError" method.  default: null {Number}
 audioMultipleFile: If true, multiple audios can be selected.    default: false {Boolean}
-audioTagAttrs    : Define "Attributes" of the audio tag.        default: null {Object} 
+audioTagAttrs    : Define "Attributes" of the audio tag.        default: null {Object}
                    ex) { controlslist: "nodownload", autoplay: true }
 videoAccept      : Define the "accept" attribute of the input.  default: "*" {String}
                    ex) "*" or ".mp3, .wav .."
@@ -823,10 +824,10 @@ linkRel         : Defines "rel" attribute list of anchor tag.   default: [] {Arr
 linkRelDefault  : Defines default "rel" attributes of anchor tag.   default: {} {Object}
                   ex) linkRelDefault: {
                         default: 'nofollow', // Default rel
-                        check_new_window: 'noreferrer noopener', // When "open new window" is checked 
-                        check_bookmark: 'bookmark' // When "bookmark" is checked 
+                        check_new_window: 'noreferrer noopener', // When "open new window" is checked
+                        check_bookmark: 'bookmark' // When "bookmark" is checked
                     },
-                    // If properties other than "default" start with "only:", the existing "rel" is cleared and applied. 
+                    // If properties other than "default" start with "only:", the existing "rel" is cleared and applied.
                     linkRelDefault: {
                         check_new_window: 'only:noreferrer noopener'
                     }
@@ -850,12 +851,12 @@ shortcutsDisable: You can disable shortcuts.    default: [] {Array}
 shortcutsHint   : If false, hide the shortcuts hint.    default: true {Boolean}
 
 // Defining save button-------------------------------------------------------------------------------------------
-callBackSave    : Callback functions that is called when the Save button is clicked. 
+callBackSave    : Callback functions that is called when the Save button is clicked.
                   Arguments - (contents, isChanged).                            default: functions.save {Function}
 
 // Templates Array------------------------------------------------------------------------------------------------
 templates       : If you use a template plugin, add it.
-                  Defines a list of templates.                       default: null {Array} 
+                  Defines a list of templates.                       default: null {Array}
                   ex) [
                     {
                         name: 'Template-1',
@@ -938,7 +939,7 @@ buttonList      : Defines button list to array {Array}
                     [':v-View-text.View', 'fullScreen', 'codeView', 'print'],
                     ['-right', ':o-More Others-<i class="xxx"></i>', 'save', 'template'], // Used with alignment
                   ]
-                  
+
 ----------------- ex) Responsive setting: -------------------------------------------------------------------------
                   // You can specify the arrangement of buttons according to the screen size in advance.
                   // Responsive settings start with a percent sign.("%").
@@ -983,7 +984,7 @@ buttonList      : Defines button list to array {Array}
                         ['-right', ':i-More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template']
                     ]]
                   ]
-                  
+
 ```
 
 ## Functions
@@ -1044,7 +1045,7 @@ editor.getFullContents(onlyContents: Boolean);
 editor.getText();
 
 // Gets a list of images uploaded to the editor
-/** 
+/**
  * {
  *  element: image element
  *  src: imgage src
@@ -1060,7 +1061,7 @@ editor.getImagesInfo();
 // Gets uploaded files(plugin using fileManager) information list.
 // image: [img], video: [video, iframe], audio: [audio]
 // When the argument value is 'image', it is the same function as "getImagesInfo".
-/** 
+/**
  * {
  *  element: image element
  *  src: imgage src
@@ -1110,7 +1111,7 @@ editor.hide();
 
 // Show the suneditor
 editor.show();
-    
+
 // Destroy the suneditor
 editor.destroy();
 
@@ -1208,7 +1209,7 @@ editor.onDrop = function (e, cleanData, maxCharCount, core) { console.log('onDro
 /**
  * contents Editor content
  * core: Core object
- */   
+ */
 editor.onSave = function (contents, core) {console.log(contents) };
 
 // Called before the image is uploaded
@@ -1248,7 +1249,7 @@ editor.onImageUploadBefore: function (files, info, core, uploadHandler) {
 // If false is returned, no video(iframe, video) upload is performed.
 // If new fileList are returned,  replaced the previous fileList
 // If undefined is returned, it waits until "uploadHandler" is executed.
-/** 
+/**
  * files: Files array
  * info: {
  * - inputWidth: Value of width input
@@ -1278,7 +1279,7 @@ editor.onVideoUploadBefore: function (files, info, core, uploadHandler) {
 // If false is returned, no audio upload is performed.
 // If new fileList are returned,  replaced the previous fileList
 // If undefined is returned, it waits until "uploadHandler" is executed.
-/** 
+/**
  * files: Files array
  * info: {
  * - isUpdate: Update audio if true, create audio if false
@@ -1364,13 +1365,13 @@ editor.onAudioUploadError = function (errorMessage, result, core) {
 // height, prevHeight are number
 editor.onResizeEditor = function (height, prevHeight, core, resizeObserverEntry) {
     console.log(`height: ${height}, prevHeight: ${prevHeight}`, resizeObserverEntry)
-    // "resizeObserverEntry" is not provided in IE Browser. 
+    // "resizeObserverEntry" is not provided in IE Browser.
 }
 
 // Called after the "setToolbarButtons" invocation
 // Can be used to tweak buttons properties (useful for custom buttons)
 /**
- * buttonList: buttonList array 
+ * buttonList: buttonList array
  * core: Core object
  */
 editor.onSetToolbarButtons = function (buttonList, core) {
@@ -1580,6 +1581,6 @@ editor.showController = function (name, controllers, core) {
 <a id="lib-pluxml"></a>[Plugin for Pluxml](https://forum.pluxml.org/discussion/comment/59339) ([@sudwebdesign](https://github.com/sudwebdesign)) - Plugin for Pluxml.
 
 <a id="lib-aem-suneditor"></a>[AEM-SunEditor](https://blogs.perficientdigital.com/2019/08/13/suneditor-an-alternative-to-the-aem-rte) ([@ahmed-musallam](https://github.com/ahmed-musallam/AEM-SunEditor)) - Enables using SunEditor in AEM dialogs as an RTE replacement.
-    
+
 ## License
 Suneditor may be freely distributed under the MIT license.

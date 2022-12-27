@@ -1,5 +1,6 @@
 'use strict';
 
+import './assets/css/_variables.css';
 import './assets/css/suneditor.css';
 import './assets/css/suneditor-contents.css';
 

@@ -1,5 +1,6 @@
 'use strict';
 
+import '../../src/assets/css/_variables.css';
 import '../../src/assets/css/suneditor.css';
 import '../../src/assets/css/suneditor-contents.css';
 
@@ -282,7 +283,7 @@ let s1 = suneditor.create('editor', {
     value: '',
     resizingBar: false,
     showPathLabel: false,
-    display: "inline",  
+    display: "inline",
     tabDisable: false,
     placeholder: "Enter the question image here",
     buttonList: [["table","removeFormat"]],
@@ -309,7 +310,7 @@ let s1 = suneditor.create('editor', {
 //     if (maxCharCount > 0) {
 //         let over = false;
 //         const count = wysiwyg.textContent.length + emptyListCount; // add empty list
-        
+
 //         if (count > maxCharCount) {
 //             this._editorRange();
 //             const range = this.getRange();
@@ -355,7 +356,7 @@ window.cm = CodeMirror
 //     imageWidth: 150,
 //     placeholder: 'Start typing something...'
 //     // fullPage: true,
-    
+
 // });
 
 window.sun_destroy1 = function () {
@@ -520,7 +521,7 @@ let ss = window.ss = suneditor.create(document.getElementById('editor1'), {
     //     autoplay: true
     // },
     // videoIframeAttrs: {
-    //     style: "border: 2px solid red;" 
+    //     style: "border: 2px solid red;"
     // },
     // height: 'auto',
     iframeCSSFileName: '.+',
@@ -725,7 +726,7 @@ function ResizeImage (files, uploadHandler) {
 
 // ss.onImageUploadBefore = function (files, info, core, uploadHandler) {
 //     // ResizeImage(files, uploadHandler)
-    
+
 //     console.log("infoinfoinfo", info);
 //     info.alt = "test-123";
 //     const response = { // Same format as "videoUploadUrl" response
@@ -776,9 +777,9 @@ window.sun_noticeOpen = function () {
     // ss.setOptions({
     //     resizingBarContainer: null,
     // })
-    
+
     // ss.core.setDir(!window.aaa ? 'rtl' : 'ltr');
-    
+
     // window.aaa = !window.aaa
     // ss.core.setDir("rtl")
     // ss.noticeOpen('test notice');
@@ -949,7 +950,7 @@ let s2 = window.s2 = editor.create(document.getElementById('editor2'), {
     value: `<p>12313123<span style="color: rgb(255, 94, 0);">123</span><span style="color: rgb(0, 85, 255);">123</span><span style="color: rgb(255, 0, 221);">123</span><span style="color: rgb(255, 0, 221); background-color: rgb(255, 228, 0);">123</span><span style="background-color: rgb(255, 0, 0);"></span></p>
 
     <p> </p>
-    
+
   `,
     buttonList:complexEditor,
     plugins: plugins,
@@ -1009,7 +1010,7 @@ s2.onResizeEditor = (height, prevHeight, core) => {
     // console.log("core", core)
 }
 
-// plugins.mention.getItems = async term => 
+// plugins.mention.getItems = async term =>
 //   [
 //     {name: 'auser1'},
 //     {name: 'buser2'},
@@ -1129,7 +1130,7 @@ window.setVideoList = function () {
 
     for (let i = 0, video; i < videoList.length; i++) {
         video = videoList[i];
-            
+
         list += '<li>' +
                     '<button title="delete" onclick="selectVideo(\'delete\',' + video.index + ')">X</button>' +
                     '<a href="javascript:void(0)" onclick="selectVideo(\'select\',' + video.index + ')">' + video.src + '</a>' +
@@ -1168,7 +1169,7 @@ window.checkImage = function (index) {
 
 window.deleteCheckedImages = function () {
     const iamgesInfo = s2.getImagesInfo();
-    
+
     for (let i = 0; i < iamgesInfo.length; i++) {
         if (selectedImages.indexOf(iamgesInfo[i].index) > -1) {
             iamgesInfo[i].delete();
@@ -1189,7 +1190,7 @@ window.setImageList = function () {
     for (let i = 0, image, fixSize; i < imageList.length; i++) {
         image = imageList[i];
         fixSize = (image.size / 1000).toFixed(1) * 1
-            
+
         list += '<li id="img_' + image.index + '">' +
                     '<div onclick="checkImage(' + image.index + ')">' +
                         '<div><img src="' + image.src + '"></div>' +
@@ -1197,7 +1198,7 @@ window.setImageList = function () {
                     '<a href="javascript:void(0)" onclick="setImage(\'select\',' + image.index + ')" class="image-size">' + fixSize + 'KB</a>' +
                     '<div class="image-check"><svg aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path></svg></div>' +
                 '</li>';
-        
+
         size += fixSize;
     }
 
@@ -1220,7 +1221,7 @@ s2.onload = (core, isUpdate) => {
 //             const image = s2.getImagesInfo()[findIndex(s2.getImagesInfo(), index)]
 //             imageList.push(image)
 //         } else { // update
-            
+
 //         }
 //     }
 
