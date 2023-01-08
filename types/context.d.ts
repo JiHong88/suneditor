@@ -36,7 +36,5 @@ type Constructor = {
     _icons: Record<string, string>
 };
 
-declare function Context(element: Element, cons: Constructor, options: SunEditorOptions): Context;
-
-export default Context;
+declare function CreateToolContext(element: Element, cons: Constructor, options: SunEditorOptions): Context;
 

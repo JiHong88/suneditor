@@ -1,6 +1,6 @@
 import Helper, { env, converter, domUtils, numbers } from '../helper';
 import Constructor, { ResetOptions, UpdateButton } from './constructor';
-import Context from './context';
+import { CreateToolContext } from './context';
 
 // class dependency
 import ClassDependency from '../dependency/_classes';
@@ -37,8 +37,8 @@ const Editor = function (multiTargets, options) {
 	// properties
 	this.rootKeys = product.rootKeys;
 	this.rootTargets = product.rootTargets;
-	this.targetContext = product.rootTargets.get(product.rootId);
-	this.commonContext = product.commonContext;
+	this.frameContext = product.rootTargets.get(product.rootId);
+	this.toolContext = product.toolContext;
 
 	/**
 	 * @description Document object
@@ -88,7 +88,7 @@ const Editor = function (multiTargets, options) {
 	this.shadowRoot = null;
 
 	/**
-	 * @description Computed style of the wysiwyg area (window.getComputedStyle(this.targetContext.get('wysiwyg')))
+	 * @description Computed style of the wysiwyg area (window.getComputedStyle(this.frameContext.get('wysiwyg')))
 	 */
 	this.wwComputedStyle = null;
 
@@ -148,7 +148,7 @@ const Editor = function (multiTargets, options) {
 	/**
 	 * @description Command button map
 	 */
-	this.allCommandButtons = {};
+	this.allCommandButtons = new _w.Map();
 
 	/**
 	 * @description Plugins array with "active" method.
@@ -303,7 +303,7 @@ const Editor = function (multiTargets, options) {
 	 * @property {Element} INDENT indent button
 	 * @private
 	 */
-	this._commandMap = null;
+	this._commandMap = new _w.Map();
 
 	/**
 	 * @description CSS properties related to style tags
@@ -353,31 +353,27 @@ const Editor = function (multiTargets, options) {
 
 	/** ----- Create editor ------------------------------------------------------------ */
 	this._editorInit(false);
+	this.rootTargets.forEach(
+		function (e) {
+			const o = e.get('originElement');
+			const t = e.get('topArea');
+			o.style.display = 'none';
+			t.style.display = 'block';
+			o.parentNode.insertBefore(t, o.nextElementSibling);
+			e.get('editorArea').appendChild(e.get('wysiwygFrame'));
 
-	const inst = this;
-	const rt = this.rootTargets;
-	this.rootTargets.forEach(function (e) {
-		e = rt[i];
-		const o = e.get('originElement');
-		const t = e.get('topArea');
-		o.style.display = 'none';
-		t.style.display = 'block';
-		o.parentNode.insertBefore(t, o.get('nextElementSibling'));
-		e.editorArea.appendChild(e.get('wysiwygFrame'));
-
-		if (!options.iframe) {
-			inst._setEditorParams(e);
-			inst._initWysiwygArea(e, false, e.options.value || options.value);
-		} else {
-			e.wysiwygFrame.addEventListener('load', function () {
-				converter._setIframeDocument(this, options);
-				inst._setEditorParams(e);
-				inst._initWysiwygArea(e, false, e.options.value || options.value);
-			});
-		}
-	});
-
-	this.history.reset();
+			if (!options.iframe) {
+				this._setEditorParams(e);
+				this._initWysiwygArea(e, false, e.get('options').value || options.value);
+			} else {
+				e.get('wysiwygFrame').addEventListener('load', function () {
+					converter._setIframeDocument(this, options);
+					this._setEditorParams(e);
+					this._initWysiwygArea(e, false, e.get('options').value || options.value);
+				});
+			}
+		}.bind(this)
+	);
 };
 
 Editor.prototype = {
@@ -398,8 +394,8 @@ Editor.prototype = {
 			if (typeof plugin.init === 'function') plugin.init();
 		}
 
-		if (this.plugins[pluginName].active && !this._commandMap[pluginName] && !!target) {
-			this._commandMap[pluginName] = target;
+		if (this.plugins[pluginName].active && !this._commandMap.get(pluginName) && !!target) {
+			this._commandMap.set(pluginName, target);
 			this.activePlugins.push(pluginName);
 		}
 	},
@@ -414,7 +410,7 @@ Editor.prototype = {
 		if (type) {
 			if (/more/i.test(type)) {
 				if (target !== this.menu.currentMoreLayerActiveButton) {
-					const layer = this.context.toolbar.main.querySelector('.' + command);
+					const layer = this.toolContext.get('toolbar.main').querySelector('.' + command);
 					if (layer) {
 						this.menu._moreLayerOn(target, layer);
 						this.toolbar._showBalloon();
@@ -479,7 +475,7 @@ Editor.prototype = {
 				this._offCurrentController();
 				this.menu.containerOff();
 				const figcaption = domUtils.getParentElement(this.selection.getNode(), 'FIGCAPTION');
-				const selectArea = figcaption || this.targetContext.get('wysiwyg');
+				const selectArea = figcaption || this.frameContext.get('wysiwyg');
 				let first =
 					domUtils.getEdgeChild(
 						selectArea.firstChild,
@@ -561,12 +557,12 @@ Editor.prototype = {
 				}
 
 				this.status.isChanged = false;
-				if (this.context.buttons.save) this.context.buttons.save.setAttribute('disabled', true);
+				if (this.toolContext.has('buttons.save')) this.toolContext.get('buttons.save').setAttribute('disabled', true);
 				break;
 			default:
 				// 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'..
 				command = this.options._defaultCommand[command.toLowerCase()] || command;
-				if (!this._commandMap[command]) this._commandMap[command] = target;
+				if (!this._commandMap.get(command)) this._commandMap.set(command, target);
 
 				const nodesMap = this.status.currentNodesMap;
 				const cmd = nodesMap.indexOf(command) > -1 ? null : domUtils.createElement(command);
@@ -626,21 +622,22 @@ Editor.prototype = {
 		}, {});
 
 		// set option
-		const ctx = this.context;
-		const initHTML = ctx.element.wysiwyg.innerHTML;
-		const product = ResetOptions(this.context, this.options, mergeOptions);
+		const tc = this.toolContext;
+		const fc = this.frameContext;
+		const initHTML = fc.get('wysiwyg').innerHTML;
+		const product = ResetOptions(tc, this.options, mergeOptions);
 
 		if (mergeOptions.iframe) {
-			ctx.element.wysiwygFrame.addEventListener('load', function () {
+			fc.get('wysiwygFrame').addEventListener('load', function () {
 				converter._setIframeDocument(this, mergeOptions);
-				this._setOptionsInit(ctx, product, mergeOptions, initHTML);
+				this._setOptionsInit(tc, product, mergeOptions, initHTML);
 			});
 		}
 
-		ctx.element.editorArea.appendChild(ctx.element.wysiwygFrame);
+		fc.get('editorArea').appendChild(fc.get('wysiwygFrame'));
 
 		if (!mergeOptions.iframe) {
-			this._setOptionsInit(ctx, product, mergeOptions, initHTML);
+			this._setOptionsInit(tc, product, mergeOptions, initHTML);
 		}
 	},
 
@@ -651,8 +648,8 @@ Editor.prototype = {
 	setDir: function (dir) {
 		const rtl = dir === 'rtl';
 		const changeDir = this._prevRtl !== rtl;
-		const tc = this.targetContext;
-		const buttons = this.context.buttons;
+		const fc = this.frameContext;
+		const tc = this.toolContext;
 		this._prevRtl = this.options._rtl = rtl;
 
 		if (changeDir) {
@@ -661,20 +658,20 @@ Editor.prototype = {
 				if (typeof plugins[k].setDir === 'function') plugins[k].setDir(dir);
 			}
 			// indent buttons
-			if (buttons.indent) domUtils.changeElement(buttons.indent.firstElementChild, this.icons.indent);
-			if (buttons.outdent) domUtils.changeElement(buttons.outdent.firstElementChild, this.icons.outdent);
+			if (tc.has('buttons.indent')) domUtils.changeElement(tc.get('buttons.indent').firstElementChild, this.icons.indent);
+			if (tc.has('buttons.outdent')) domUtils.changeElement(tc.get('buttons.outdent').firstElementChild, this.icons.outdent);
 		}
 
 		if (rtl) {
-			domUtils.addClass(tc.get('topArea'), 'se-rtl');
-			domUtils.addClass(tc.get('wysiwygFrame'), 'se-rtl');
+			domUtils.addClass(fc.get('topArea'), 'se-rtl');
+			domUtils.addClass(fc.get('wysiwygFrame'), 'se-rtl');
 		} else {
-			domUtils.removeClass(tc.get('topArea'), 'se-rtl');
-			domUtils.removeClass(tc.get('wysiwygFrame'), 'se-rtl');
+			domUtils.removeClass(fc.get('topArea'), 'se-rtl');
+			domUtils.removeClass(fc.get('wysiwygFrame'), 'se-rtl');
 		}
 
 		const lineNodes = domUtils.getListChildren(
-			tc.wysiwyg,
+			fc.wysiwyg,
 			function (current) {
 				return this.format.isLine(current) && (current.style.marginRight || current.style.marginLeft || current.style.textAlign);
 			}.bind(this)
@@ -720,10 +717,10 @@ Editor.prototype = {
 
 		this.status.rootKey = rootKey;
 
-		const el = (this.targetContext = this.rootTargets.get(rootKey));
-		this._lineBreakerButton = el.lineBreaker.querySelector('button');
-		this._lineBreaker_t = el.lineBreaker_t;
-		this._lineBreaker_b = el.lineBreaker_b;
+		const fc = (this.frameContext = this.rootTargets.get(rootKey));
+		this._lineBreakerButton = fc.get('lineBreaker').querySelector('button');
+		this._lineBreaker_t = fc.get('lineBreaker_t');
+		this._lineBreaker_b = fc.get('lineBreaker_b');
 	},
 
 	/**
@@ -733,7 +730,7 @@ Editor.prototype = {
 	 * @param {string|undefined} value javascript execCommand function property
 	 */
 	execCommand: function (command, showDefaultUI, value) {
-		this.targetContext.get('_wd').execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
+		this.frameContext.get('_wd').execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
 		this.history.push(true);
 	},
 
@@ -743,9 +740,9 @@ Editor.prototype = {
 	 */
 	focus: function (rootKey) {
 		if (numbers.is(rootKey)) this.changeContextElement(rootKey);
-		if (this.targetContext.get('wysiwygFrame').style.display === 'none') return;
+		if (this.frameContext.get('wysiwygFrame').style.display === 'none') return;
 
-		if (this.options.iframe || !this.targetContext.get('wysiwyg').contains(this.selection.getNode())) {
+		if (this.options.iframe || !this.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
 			this._nativeFocus();
 		} else {
 			try {
@@ -755,7 +752,7 @@ Editor.prototype = {
 					if (!this.format.isLine(currentNode) && !this.component.is(currentNode)) {
 						const br = domUtils.createElement('BR');
 						const format = domUtils.createElement(this.options.defaultLineTag, null, br);
-						this.targetContext.get('wysiwyg').insertBefore(format, currentNode);
+						this.frameContext.get('wysiwyg').insertBefore(format, currentNode);
 						this.selection.setRange(br, 0, br, 0);
 						return;
 					}
@@ -777,7 +774,7 @@ Editor.prototype = {
 	 * @param {Element|null} focusEl Focus element
 	 */
 	focusEdge: function (focusEl) {
-		if (!focusEl) focusEl = this.targetContext.get('wysiwyg').lastElementChild;
+		if (!focusEl) focusEl = this.frameContext.get('wysiwyg').lastElementChild;
 
 		const fileComponentInfo = this.component.get(focusEl);
 		if (fileComponentInfo) {
@@ -802,9 +799,9 @@ Editor.prototype = {
 	 */
 	blur: function () {
 		if (this.options.iframe) {
-			this.targetContext.get('wysiwygFrame').blur();
+			this.frameContext.get('wysiwygFrame').blur();
 		} else {
-			this.targetContext.get('wysiwyg').blur();
+			this.frameContext.get('wysiwyg').blur();
 		}
 	},
 
@@ -824,7 +821,7 @@ Editor.prototype = {
 			this.changeContextElement(rootKey[i]);
 
 			if (!this.status.isCodeView) {
-				this.targetContext.get('wysiwyg').innerHTML = convertValue;
+				this.frameContext.get('wysiwyg').innerHTML = convertValue;
 			} else {
 				const value = this._convertHTMLToCode(convertValue, false);
 				this.viewer._setCodeView(value);
@@ -855,7 +852,7 @@ Editor.prototype = {
 				const children = temp.children;
 				for (let i = 0, len = children.length; i < len; i++) {
 					if (!children[i]) continue;
-					this.targetContext.get('wysiwyg').appendChild(children[i]);
+					this.frameContext.get('wysiwyg').appendChild(children[i]);
 				}
 			} else {
 				this.viewer._setCodeView(this.viewer._getCodeView() + '\n' + this._convertHTMLToCode(convertValue, false));
@@ -881,8 +878,8 @@ Editor.prototype = {
 		for (let i = 0; i < rootKey.length; i++) {
 			this.changeContextElement(rootKey[i]);
 
-			if (ctx.head) this.targetContext.get('_wd').head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
-			if (ctx.body) this.targetContext.get('_wd').body.innerHTML = this.html.clean(ctx.body, true, null, null);
+			if (ctx.head) this.frameContext.get('_wd').head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
+			if (ctx.body) this.frameContext.get('_wd').body.innerHTML = this.html.clean(ctx.body, true, null, null);
 		}
 	},
 
@@ -903,8 +900,8 @@ Editor.prototype = {
 		for (let i = 0, len = rootKey.length, r; i < len; i++) {
 			this.changeContextElement(rootKey[i]);
 
-			const tc = this.targetContext;
-			const renderHTML = domUtils.createElement('DIV', null, this._convertHTMLToCode(tc.get('wysiwyg'), true));
+			const fc = this.frameContext;
+			const renderHTML = domUtils.createElement('DIV', null, this._convertHTMLToCode(fc.get('wysiwyg'), true));
 			const figcaptions = domUtils.getListChildren(renderHTML, function (current) {
 				return /FIGCAPTION/i.test(current.nodeName);
 			});
@@ -913,15 +910,16 @@ Editor.prototype = {
 				figcaptions[i].removeAttribute('contenteditable');
 			}
 
+			const content = this.html.clean(renderHTML.innerHTML, false, null, null);
 			if (this.options.iframe_fullPage) {
 				if (includeFullPage) {
-					const attrs = domUtils.getAttributesToString(tc.get('_wd').body, ['contenteditable']);
-					r = '<!DOCTYPE html><html>' + tc.get('_wd').head.outerHTML + '<body ' + attrs + '>' + renderHTML.innerHTML + '</body></html>';
+					const attrs = domUtils.getAttributesToString(fc.get('_wd').body, ['contenteditable']);
+					r = '<!DOCTYPE html><html>' + fc.get('_wd').head.outerHTML + '<body ' + attrs + '>' + content + '</body></html>';
 				} else {
-					r = renderHTML.innerHTML;
+					r = content;
 				}
 			} else {
-				r = withFrame ? '<div class="sun-editor-editable' + (this.options._rtl ? ' se-rtl' : '') + '">' + renderHTML.innerHTML + '</div>' : renderHTML.innerHTML;
+				r = withFrame ? '<div class="sun-editor-editable' + (this.options._rtl ? ' se-rtl' : '') + '">' + content + '</div>' : renderHTML.innerHTML;
 			}
 
 			resultValue[rootKey[i]] = r;
@@ -944,7 +942,7 @@ Editor.prototype = {
 		const resultValue = {};
 		for (let i = 0, len = rootKey.length; i < len; i++) {
 			this.changeContextElement(rootKey[i]);
-			resultValue[rootKey[i]] = this.targetContext.get('wysiwyg').textContent;
+			resultValue[rootKey[i]] = this.frameContext.get('wysiwyg').textContent;
 		}
 
 		this.changeContextElement(prevrootKey);
@@ -959,13 +957,13 @@ Editor.prototype = {
 	 */
 	setEditorStyle: function (style) {
 		const newStyles = (this.options._editorStyles = converter._setDefaultOptionStyle(this.options, style));
-		const tc = this.targetContext;
+		const fc = this.frameContext;
 
 		// top area
-		tc.get('topArea').style.cssText = newStyles.top;
+		fc.get('topArea').style.cssText = newStyles.top;
 
 		// code view
-		const code = tc.get('code');
+		const code = fc.get('code');
 		code.style.cssText = this.options._editorStyles.frame;
 		code.style.display = 'none';
 		if (this.options.height === 'auto') {
@@ -976,10 +974,10 @@ Editor.prototype = {
 
 		// wysiwyg frame
 		if (!this.options.iframe) {
-			tc.get('wysiwygFrame').style.cssText = newStyles.frame + newStyles.editor;
+			fc.get('wysiwygFrame').style.cssText = newStyles.frame + newStyles.editor;
 		} else {
-			tc.get('wysiwygFrame').style.cssText = newStyles.frame;
-			tc.get('wysiwyg').style.cssText = newStyles.editor;
+			fc.get('wysiwygFrame').style.cssText = newStyles.frame;
+			fc.get('wysiwyg').style.cssText = newStyles.editor;
 		}
 	},
 
@@ -1001,11 +999,11 @@ Editor.prototype = {
 			if (this.menu.currentContainerActiveButton && this.menu.currentContainerActiveButton.disabled) this.menu.containerOff();
 			if (this.modalForm) this.plugins.modal.close.call(this);
 
-			this.targetContext.get('code').setAttribute('readOnly', 'true');
-			domUtils.addClass(this.targetContext.get('wysiwygFrame'), 'se-read-only');
+			this.frameContext.get('code').setAttribute('readOnly', 'true');
+			domUtils.addClass(this.frameContext.get('wysiwygFrame'), 'se-read-only');
 		} else {
-			this.targetContext.get('code').removeAttribute('readOnly');
-			domUtils.removeClass(this.targetContext.get('wysiwygFrame'), 'se-read-only');
+			this.frameContext.get('code').removeAttribute('readOnly');
+			domUtils.removeClass(this.frameContext.get('wysiwygFrame'), 'se-read-only');
 		}
 
 		if (this.options.hasCodeMirror) {
@@ -1023,13 +1021,13 @@ Editor.prototype = {
 
 		if (this.modalForm) this.plugins.modal.close.call(this);
 
-		this.targetContext.get('wysiwyg').setAttribute('contenteditable', false);
+		this.frameContext.get('wysiwyg').setAttribute('contenteditable', false);
 		this.isDisabled = true;
 
 		if (this.options.hasCodeMirror) {
 			this.viewer._codeMirrorEditor('readonly', true);
 		} else {
-			this.targetContext.get('code').setAttribute('disabled', 'disabled');
+			this.frameContext.get('code').setAttribute('disabled', 'disabled');
 		}
 	},
 
@@ -1038,13 +1036,13 @@ Editor.prototype = {
 	 */
 	enable: function (rootKey) {
 		this.toolbar.enable();
-		this.targetContext.get('wysiwyg').setAttribute('contenteditable', true);
+		this.frameContext.get('wysiwyg').setAttribute('contenteditable', true);
 		this.isDisabled = false;
 
 		if (this.options.hasCodeMirror) {
 			this.viewer._codeMirrorEditor('readonly', false);
 		} else {
-			this.targetContext.get('code').removeAttribute('disabled');
+			this.frameContext.get('code').removeAttribute('disabled');
 		}
 	},
 
@@ -1052,7 +1050,7 @@ Editor.prototype = {
 	 * @description Show the suneditor
 	 */
 	show: function (rootKey) {
-		const topAreaStyle = this.targetContext.get('topArea').style;
+		const topAreaStyle = this.frameContext.get('topArea').style;
 		if (topAreaStyle.display === 'none') topAreaStyle.display = 'block';
 	},
 
@@ -1060,7 +1058,7 @@ Editor.prototype = {
 	 * @description Hide the suneditor
 	 */
 	hide: function (rootKey) {
-		this.targetContext.get('topArea').style.display = 'none';
+		this.frameContext.get('topArea').style.display = 'none';
 	},
 
 	/**
@@ -1068,7 +1066,7 @@ Editor.prototype = {
 	 */
 	save: function () {
 		const value = this.getContent();
-		this.targetContext.get('originElement').value = value;
+		this.frameContext.get('originElement').value = value;
 		// user event
 		if (typeof this.events.onSave === 'function') {
 			this.events.onSave(value);
@@ -1081,16 +1079,16 @@ Editor.prototype = {
 	 */
 	destroy: function () {
 		/** remove element */
-		domUtils.removeItem(this.context._carrierWrapper);
-		domUtils.removeItem(this.context.toolbar._wrapper);
+		domUtils.removeItem(this.toolContext.get('_carrierWrapper'));
+		domUtils.removeItem(this.toolContext.get('toolbar._wrapper'));
 
 		this.rootTargets.forEach(function (e) {
-			domUtils.removeItem(e.topArea);
+			domUtils.removeItem(e.get('topArea'));
 		});
 
-		this.commonContext.clear();
 		this.rootTargets.clear();
-		this.targetContext.clear();
+		this.toolContext.clear();
+		this.frameContext.clear();
 
 		/** remove history */
 		this.history._destroy();
@@ -1105,7 +1103,7 @@ Editor.prototype = {
 
 		/** remove object reference */
 		for (let k in this) {
-			if (this.hasOwnProperty(k)) delete this[k];
+			delete this[k];
 		}
 	},
 
@@ -1143,7 +1141,7 @@ Editor.prototype = {
 	 * @private
 	 */
 	_openLoading: function () {
-		this.context._loading.style.display = 'block';
+		this.toolContext.get('_loading').style.display = 'block';
 	},
 
 	/**
@@ -1151,7 +1149,7 @@ Editor.prototype = {
 	 * @private
 	 */
 	_closeLoading: function () {
-		this.context._loading.style.display = 'none';
+		this.toolContext.get('_loading').style.display = 'none';
 	},
 
 	/**
@@ -1165,7 +1163,7 @@ Editor.prototype = {
 
 	/**
 	 * @description construct wysiwyg area element to html string
-	 * @param {Element|String} html WYSIWYG element (this.targetContext.get('wysiwyg')) or HTML string.
+	 * @param {Element|String} html WYSIWYG element (this.frameContext.get('wysiwyg')) or HTML string.
 	 * @param {Boolean} comp If true, does not line break and indentation of tags.
 	 * @returns {string}
 	 */
@@ -1284,7 +1282,7 @@ Editor.prototype = {
 		}
 
 		// init, validate
-		e.set('_ww', options.iframe ? e.wysiwygFrame.contentWindow : _w);
+		e.set('_ww', options.iframe ? e.get('wysiwygFrame').contentWindow : _w);
 		if (options.iframe) {
 			e.set('_wd', e.get('wysiwygFrame').contentDocument);
 			e.set('wysiwyg', e.get('_wd').body);
@@ -1334,32 +1332,32 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Save the current buttons states to "allCommandButtons" object
+	 * @description Save the current buttons states to "allCommandButtons" map
 	 * @private
 	 */
 	_saveButtonStates: function () {
-		const currentButtons = this.context.toolbar._buttonTray.querySelectorAll('.se-menu-list button[data-type]');
+		const currentButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-type]');
 		for (let i = 0, element, command; i < currentButtons.length; i++) {
 			element = currentButtons[i];
 			command = element.getAttribute('data-command');
-			this.allCommandButtons[command] = element;
+			this.allCommandButtons.set(command, element);
 		}
 	},
 
 	/**
-	 * @description Recover the current buttons states from "allCommandButtons" object
+	 * @description Recover the current buttons states from "allCommandButtons" map
 	 * @private
 	 */
 	_recoverButtonStates: function () {
-		const currentButtons = this.context.toolbar._buttonTray.querySelectorAll('.se-menu-list button[data-type]');
+		const currentButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-type]');
 		for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
 			button = currentButtons[i];
 			command = button.getAttribute('data-command');
 
-			oldButton = this.allCommandButtons[command];
+			oldButton = this.allCommandButtons.get(command);
 			if (oldButton) {
 				button.parentElement.replaceChild(oldButton, button);
-				if (this.context.buttons[command]) this.context.buttons[command] = oldButton;
+				if (this.toolContext.get('buttons.' + command)) this.toolContext.set('buttons.' + command, oldButton);
 			}
 		}
 	},
@@ -1369,28 +1367,26 @@ Editor.prototype = {
 	 * @private
 	 */
 	_cachingButtons: function () {
-		this._codeViewDisabledButtons = this.context.toolbar._buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])');
-		this._controllerOnDisabledButtons = this.context.toolbar._buttonTray.querySelectorAll('.se-menu-list button[data-type]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
+		this._codeViewDisabledButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-type]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])');
+		this._controllerOnDisabledButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-type]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
 
 		this._saveButtonStates();
 
-		const buttons = this.context.buttons;
+		const tc = this.toolContext;
 		const textTags = this.options.textTags;
-		this._commandMap = {
-			OUTDENT: buttons.outdent,
-			INDENT: buttons.indent
-		};
-		this._commandMap[textTags.bold.toUpperCase()] = buttons.bold;
-		this._commandMap[textTags.underline.toUpperCase()] = buttons.underline;
-		this._commandMap[textTags.italic.toUpperCase()] = buttons.italic;
-		this._commandMap[textTags.strike.toUpperCase()] = buttons.strike;
-		this._commandMap[textTags.sub.toUpperCase()] = buttons.subscript;
-		this._commandMap[textTags.sup.toUpperCase()] = buttons.superscript;
+		this._commandMap.set('OUTDENT', tc.get('outdent'));
+		this._commandMap.set('INDENT', tc.get('indent'));
+		this._commandMap.set(textTags.bold.toUpperCase(), tc.get('bold'));
+		this._commandMap.set(textTags.underline.toUpperCase(), tc.get('underline'));
+		this._commandMap.set(textTags.italic.toUpperCase(), tc.get('italic'));
+		this._commandMap.set(textTags.strike.toUpperCase(), tc.get('strike'));
+		this._commandMap.set(textTags.sub.toUpperCase(), tc.get('subscript'));
+		this._commandMap.set(textTags.sup.toUpperCase(), tc.get('superscript'));
 
 		this._styleCommandMap = {
-			fullScreen: buttons.fullScreen,
-			showBlocks: buttons.showBlocks,
-			codeView: buttons.codeView
+			fullScreen: tc.fullScreen,
+			showBlocks: tc.showBlocks,
+			codeView: tc.codeView
 		};
 	},
 
@@ -1402,8 +1398,8 @@ Editor.prototype = {
 	 */
 	_initWysiwygArea: function (e, reload, _initHTML) {
 		e.get('wysiwyg').innerHTML = (reload ? _initHTML : this.html.clean(typeof _initHTML === 'string' ? _initHTML : e.get('originElement').value, true, null, null)) || '<' + this.options.defaultLineTag + '><br></' + this.options.defaultLineTag + '>';
-		this.targetContext = e;
-		if (this.options.charCounter && e.get('charCounter')) e.get('charCounter').textContent = this.char.getLength();
+		this.frameContext = e;
+		if (this.options.charCounter && e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
 	},
 
 	/**
@@ -1422,10 +1418,10 @@ Editor.prototype = {
 	_onChange_historyStack: function () {
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
 		this.status.isChanged = true;
-		if (this.context.buttons.save) this.context.buttons.save.removeAttribute('disabled');
+		if (this.toolContext.has('buttons.save')) this.toolContext.get('buttons.save').removeAttribute('disabled');
 		// user event
 		if (this.events.onChange) this.events.onChange(this.getContent());
-		if (this.context.toolbar.main.style.display === 'block') this.toolbar._showBalloon();
+		if (this.toolContext.has('toolbar.main').style.display === 'block') this.toolbar._showBalloon();
 	},
 
 	/**
@@ -1436,7 +1432,7 @@ Editor.prototype = {
 		if (this._iframeAuto) {
 			this._w.setTimeout(
 				function () {
-					this.targetContext.get('wysiwygFrame').style.height = this._iframeAuto.offsetHeight + 'px';
+					this.frameContext.get('wysiwygFrame').style.height = this._iframeAuto.offsetHeight + 'px';
 				}.bind(this)
 			);
 		}
@@ -1445,12 +1441,12 @@ Editor.prototype = {
 			this._w.setTimeout(
 				function () {
 					const h = this._iframeAuto.offsetHeight;
-					this.targetContext.get('wysiwygFrame').style.height = h + 'px';
+					this.frameContext.get('wysiwygFrame').style.height = h + 'px';
 					if (env.isIE) this.__callResizeFunction(h, null);
 				}.bind(this)
 			);
 		} else if (env.isIE) {
-			this.__callResizeFunction(this.targetContext.get('wysiwygFrame').offsetHeight, null);
+			this.__callResizeFunction(this.frameContext.get('wysiwygFrame').offsetHeight, null);
 		}
 	},
 
@@ -1464,7 +1460,7 @@ Editor.prototype = {
 
 	_codeViewAutoHeight: function () {
 		if (this.status.isFullScreen) return;
-		this.targetContext.get('code').style.height = this.targetContext.get('code').scrollHeight + 'px';
+		this.frameContext.get('code').style.height = this.frameContext.get('code').scrollHeight + 'px';
 	},
 
 	/**
@@ -1473,13 +1469,13 @@ Editor.prototype = {
 	 */
 	_checkPlaceholder: function () {
 		let placeholder;
-		if ((placeholder = this.targetContext.get('placeholder'))) {
+		if ((placeholder = this.frameContext.get('placeholder'))) {
 			if (this.status.isCodeView) {
 				placeholder.style.display = 'none';
 				return;
 			}
 
-			const wysiwyg = this.targetContext.get('wysiwyg');
+			const wysiwyg = this.frameContext.get('wysiwyg');
 			if (!domUtils.isZeroWith(wysiwyg.textContent) || wysiwyg.querySelector(domUtils._allowedEmptyNodeList) || (wysiwyg.innerText.match(/\n/g) || '').length > 1) {
 				placeholder.style.display = 'none';
 			} else {
@@ -1505,7 +1501,7 @@ Editor.prototype = {
 		this._responsiveButtons = product.toolbar.responsiveButtons;
 		// this.toolbar._setResponsive();
 
-		this.context = Context(ctx.toolbar.main, ctx.element.top, ctx.element.wysiwygFrame, ctx.element.code, ctx._carrierWrapper, this.options); //@todo context don't reset
+		this.toolContext = CreateToolContext(ctx.toolbar.main, ctx.element.top, ctx.element.wysiwygFrame, ctx.element.code, ctx._carrierWrapper, this.options); //@todo context don't reset
 		this._componentsInfoReset = true;
 		this._editorInit(true, initHTML);
 	},
@@ -1522,7 +1518,7 @@ Editor.prototype = {
 		this.toolbar._resetSticky();
 
 		// toolbar visibility
-		this.context.toolbar.main.style.visibility = '';
+		this.toolContext.get('toolbar.main').style.visibility = '';
 
 		this._componentsInfoInit = false;
 		this._componentsInfoReset = false;
@@ -1533,10 +1529,12 @@ Editor.prototype = {
 		this._w.setTimeout(
 			function () {
 				// observer
-				if (this.eventManager._resizeObserver) this.eventManager._resizeObserver.observe(this.targetContext.get('wysiwygFrame'));
-				if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(this.targetContext.get('_toolbarShadow'));
+				if (this.eventManager._resizeObserver) this.eventManager._resizeObserver.observe(this.frameContext.get('wysiwygFrame'));
+				if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(this.frameContext.get('_toolbarShadow'));
 				// resource state
 				this._resourcesStateChange();
+				// history reset
+				if (!reload) this.history.reset();
 				// user event
 				if (typeof this.events.onload === 'function') this.events.onload(reload);
 			}.bind(this)

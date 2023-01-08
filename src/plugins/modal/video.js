@@ -221,7 +221,7 @@ Video.prototype = {
 		domUtils.removeItem(container);
 		this.init();
 
-		if (emptyDiv !== this.targetContext.get('wysiwyg')) {
+		if (emptyDiv !== this.editor.frameContext.get('wysiwyg')) {
 			this.node.removeAllParents(
 				emptyDiv,
 				function (current) {

@@ -9,7 +9,7 @@ function CoreDependency(editor) {
 	this._d = editor._d;
 	this.options = editor.options;
 	this.plugins = editor.plugins;
-	this.context = editor.context;
+	this.rootTargets = editor.rootTargets;
 	this.icons = editor.icons;
 	this.lang = editor.lang;
 	this.status = editor.status;

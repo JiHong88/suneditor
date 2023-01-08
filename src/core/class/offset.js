@@ -13,7 +13,7 @@ const Offset = function (editor) {
 
 Offset.prototype = {
 	/**
-	 * @description Returns the position of the argument, "this.targetContext.get('editorArea')" to inside the editor.Returns the position of the element in "this.targetContext.get('editorArea')".
+	 * @description Returns the position of the argument, "this.editor.frameContext.get('editorArea')" to inside the editor.Returns the position of the element in "this.editor.frameContext.get('editorArea')".
 	 * @param {Node} node Target node
 	 * @returns {{top:boolean, left:boolean}}
 	 */
@@ -29,7 +29,7 @@ Offset.prototype = {
 			offsetElement = offsetElement.offsetParent;
 		}
 
-		const wFrame = this.targetContext.get('wysiwygFrame');
+		const wFrame = this.editor.frameContext.get('wysiwygFrame');
 		const iframe = wFrame && /iframe/i.test(wFrame.nodeName);
 
 		return {
@@ -44,7 +44,7 @@ Offset.prototype = {
 	 * @returns {{top:boolean, left:boolean}}
 	 */
 	getGlobal: function (element) {
-		if (!element) element = this.targetContext.get('topArea');
+		if (!element) element = this.editor.frameContext.get('topArea');
 		const w = element.offsetWidth;
 		const h = element.offsetHeight;
 		let t = 0,
@@ -70,7 +70,7 @@ Offset.prototype = {
 	 * @returns {{top:boolean, left:boolean, width:boolean, height:boolean}}
 	 */
 	getGlobalScroll: function (element) {
-		const topArea = this.targetContext.get('topArea');
+		const topArea = this.editor.frameContext.get('topArea');
 		let t = 0,
 			l = 0,
 			h = 0,
@@ -164,7 +164,7 @@ Offset.prototype = {
 	 * @returns {{top:boolean, left:boolean}}
 	 */
 	getWWScroll: function () {
-		const eventWysiwyg = this.targetContext.get('eventWysiwyg');
+		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
 		return {
 			top: eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0,
 			left: eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0,
@@ -243,14 +243,14 @@ Offset.prototype = {
 		const arrow = hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null;
 
 		// top ----------------------------------------------------------------------------------------------------
-		const editorH = this.targetContext.get('topArea').offsetHeight;
+		const editorH = this.editor.frameContext.get('topArea').offsetHeight;
 		const ah = arrow ? arrow.offsetHeight : 0;
 		const elH = element.offsetHeight;
 		const targetH = target.offsetHeight;
 		// margin
 		const tmtw = targetRect.top;
 		const tmbw = this._w.innerHeight - targetRect.bottom;
-		let toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline || this.options.toolbar_container) ? 0 : this.context.toolbar.main.offsetHeight;
+		let toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline || this.options.toolbar_container) ? 0 : this.editor.toolContext.get('toolbar.main').offsetHeight;
 		let rmt, rmb;
 		if (this.status.isFullScreen) {
 			rmt = tmtw - toolbarH;
@@ -270,7 +270,7 @@ Offset.prototype = {
 			let etmb = tmb < 0 || emb < 0 || targetScroll.heightEditorRefer || (tmb >= 0 && emb >= 0 && emb > tmb) ? tmb : tmb - emb;
 			etmb = vb < 0 && vb < etmb ? vb : etmb;
 			// marging result
-			rmt = (etmt < tmtw ? etmt : tmtw) - ((this.editor.toolbar._sticky && emt < this.context.toolbar.main.getBoundingClientRect().bottom) || toolbarH);
+			rmt = (etmt < tmtw ? etmt : tmtw) - ((this.editor.toolbar._sticky && emt < this.editor.toolContext.get('toolbar.main').getBoundingClientRect().bottom) || toolbarH);
 			rmb = etmb < tmbw ? etmb : tmbw;
 		}
 
@@ -311,7 +311,7 @@ Offset.prototype = {
 		element.style.top = t + 'px';
 
 		// left ----------------------------------------------------------------------------------------------------
-		const editorW = this.targetContext.get('topArea').offsetWidth;
+		const editorW = this.editor.frameContext.get('topArea').offsetWidth;
 		const radius = numbers.get(this._w.getComputedStyle(element).borderRadius) || 0;
 		const targetW = targetOffset.width;
 		const elW = element.offsetWidth;
@@ -384,49 +384,9 @@ Offset.prototype = {
 		}
 
 		element.style.left = l + 'px';
-
 		inst.__offset = { left: element.offsetLeft + wwScroll.left, top: element.offsetTop + wwScroll.top, addOffset: addOffset };
+
 		return true;
-
-		// let ml = 0,
-		// 	sl = 0;
-		// if (!this.options._rtl) {
-		// 	l += targetRect.left + this._w.scrollX;
-		// 	const padding = targetOffset.left - editorLeft + wwScroll.left;
-		// 	const paddingMargin = padding - wwScroll.left;
-		// 	ml = targetAbs ? editorLeft - targetScroll.left + (paddingMargin < 0 ? 0 : paddingMargin) : targetLeft - editorLeft;
-		// 	sl = targetAbs ? (ml < 0 && paddingMargin < 0 ? -1 * (ml + paddingMargin) : ml < 0 ? -1 * (ml + (paddingMargin > 0 ? 0 : -paddingMargin)) : paddingMargin < 0 ? wwScroll.left - padding : 0) : this._getLeftScrollMargin(l, ml, targetAbs, editorOffset, wwScroll);
-
-		// 	if (sl >= targetW) return;
-		// 	element.style.left = l + sl + 'px';
-
-		// 	const overSize = container.offsetWidth - (element.offsetLeft + elW);
-		// 	if (overSize < 0) {
-		// 		element.style.left = element.offsetLeft + overSize + 'px';
-		// 		if (arrow) arrow.style.left = (aw - overSize + awHalf > elW ? elW - awHalf - radius : aw - overSize) + 'px';
-		// 	} else if (arrow) {
-		// 		arrow.style.left = (targetW <= aw + awHalf ? awHalf + radius : aw) + 'px';
-		// 	}
-		// } else {
-		// 	l += targetRect.right - elW + this._w.scrollX;
-		// 	const padding = editorLeft + editorW - (targetOffset.left + targetW) - wwScroll.left;
-		// 	const paddingMargin = padding + wwScroll.left;
-		// 	ml = targetAbs ? targetScroll.ow - targetScroll.x - (editorLeft + editorW - targetScroll.left) + (paddingMargin < 0 ? 0 : paddingMargin) - this._w.scrollX : editorW + padding - (targetLeft + targetW) - (editorW - (editorLeft + editorW));
-		// 	sl = targetAbs ? (ml < 0 && paddingMargin < 0 ? ml + paddingMargin : ml < 0 ? ml + (paddingMargin > 0 ? 0 : -paddingMargin) : paddingMargin < 0 ? wwScroll.left + padding : 0) : this._getLeftScrollMargin(l, ml, targetAbs, editorOffset, wwScroll);
-
-		// 	if (-sl >= targetW) return;
-		// 	element.style.left = l + sl + 'px';
-
-		// 	const overSize = container.offsetLeft - element.offsetLeft;
-		// 	if (overSize > 0) {
-		// 		element.style.left = frameOffset.left + 'px';
-		// 		if (arrow) arrow.style.left = elW - aw * 2 - overSize + 'px';
-		// 	} else if (arrow) {
-		// 		if (elW - (arrow.offsetLeft + awHalf) >= targetW) {
-		// 			arrow.style.left = elW - aw - radius + 'px';
-		// 		}
-		// 	}
-		// }
 	},
 
 	_setArrow: function (arrow, key) {

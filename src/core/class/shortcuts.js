@@ -86,7 +86,7 @@ Shortcuts.prototype = {
 
 		if (!command) return !!this._keyCodeShortcut[keyCode];
 
-		this.editor.commandHandler(command, this.editor._commandMap[command]);
+		this.editor.commandHandler(command, this.editor._commandMap.get(command));
 		return true;
 	},
 

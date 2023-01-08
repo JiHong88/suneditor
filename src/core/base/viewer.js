@@ -17,15 +17,15 @@ Viewer.prototype = {
 	 */
 	codeView: function (value) {
 		if (value === undefined) value = !this.status.isCodeView;
-		const tc = this.targetContext;
+		const fc = this.editor.frameContext;
 		this.status.isCodeView = value;
 		this.editor._offCurrentController();
 		this.editor._offCurrentModal();
 
 		domUtils.setDisabled(this.editor._codeViewDisabledButtons, value);
 		const _var = this.editor._transformStatus;
-		const code = tc.get('code');
-		const wysiwygFrame = tc.get('wysiwygFrame');
+		const code = fc.get('code');
+		const wysiwygFrame = fc.get('wysiwygFrame');
 
 		if (value) {
 			this._setEditorDataToCodeView();
@@ -45,8 +45,8 @@ Viewer.prototype = {
 			if (!this.status.isFullScreen) {
 				this.editor._notHideToolbar = true;
 				if (/balloon/i.test(this.options.mode)) {
-					this.context.toolbar._arrow.style.display = 'none';
-					this.context.toolbar.main.style.left = '';
+					this.editor.toolContext.get('toolbar._arrow').style.display = 'none';
+					this.editor.toolContext.get('toolbar.main').style.left = '';
 					this.editor.isInline = true;
 					this.editor.isBalloon = false;
 					this.editor.toolbar._showInline();
@@ -63,12 +63,12 @@ Viewer.prototype = {
 			wysiwygFrame.style.display = 'block';
 			_var.wysiwygOriginCssText = _var.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
 
-			if (this.options.height === 'auto' && !this.options.hasCodeMirror) tc.code.style.height = '0px';
+			if (this.options.height === 'auto' && !this.options.hasCodeMirror) fc.get('code').style.height = '0px';
 
 			if (!this.status.isFullScreen) {
 				this.editor._notHideToolbar = false;
 				if (/balloon/i.test(this.options.mode)) {
-					this.context.toolbar._arrow.style.display = '';
+					this.editor.toolContext.get('toolbar._arrow').style.display = '';
 					this.editor.isInline = false;
 					this.editor.isBalloon = true;
 					this.eventManager._hideToolbar();
@@ -97,14 +97,14 @@ Viewer.prototype = {
 	 */
 	fullScreen: function (value) {
 		if (value === undefined) value = !this.status.isFullScreen;
-		const tc = this.targetContext;
+		const fc = this.editor.frameContext;
 		this.status.isFullScreen = value;
 
-		const topArea = tc.get('topArea');
-		const toolbar = this.context.toolbar.main;
-		const editorArea = tc.get('editorArea');
-		const wysiwygFrame = tc.get('wysiwygFrame');
-		const code = tc.get('code');
+		const topArea = fc.get('topArea');
+		const toolbar = this.editor.toolContext.get('toolbar.main');
+		const editorArea = fc.get('editorArea');
+		const wysiwygFrame = fc.get('wysiwygFrame');
+		const code = fc.get('code');
 		const _var = this.editor._transformStatus;
 
 		this.editor._offCurrentController();
@@ -112,7 +112,7 @@ Viewer.prototype = {
 
 		if (value) {
 			if (/balloon|inline/i.test(this.options.mode)) {
-				this.context.toolbar._arrow.style.display = 'none';
+				this.editor.toolContext.get('toolbar._arrow').style.display = 'none';
 				_var.fullScreenInline = this.editor.isInline;
 				_var.fullScreenBalloon = this.editor.isBalloon;
 				this.editor.isInline = false;
@@ -121,7 +121,7 @@ Viewer.prototype = {
 
 			if (this.options.toolbar_container) {
 				_var.toolbarParent = toolbar.parentElement;
-				tc.get('container').insertBefore(toolbar, editorArea);
+				fc.get('container').insertBefore(toolbar, editorArea);
 			}
 
 			topArea.style.position = 'fixed';
@@ -132,9 +132,9 @@ Viewer.prototype = {
 			topArea.style.height = '100%';
 			topArea.style.zIndex = '2147483647';
 
-			if (tc.get('_stickyDummy').style.display !== ('none' && '')) {
+			if (fc.get('_stickyDummy').style.display !== ('none' && '')) {
 				_var.fullScreenSticky = true;
-				tc.get('_stickyDummy').style.display = 'none';
+				fc.get('_stickyDummy').style.display = 'none';
 				domUtils.removeClass(toolbar, 'se-toolbar-sticky');
 			}
 
@@ -160,7 +160,7 @@ Viewer.prototype = {
 				this.editor._iframeAutoHeight();
 			}
 
-			tc.get('topArea').style.marginTop = this.options.fullScreenOffset + 'px';
+			fc.get('topArea').style.marginTop = this.options.fullScreenOffset + 'px';
 
 			if (this.editor._styleCommandMap.fullScreen) {
 				domUtils.changeElement(this.editor._styleCommandMap.fullScreen.firstElementChild, this.icons.reduction);
@@ -171,7 +171,7 @@ Viewer.prototype = {
 			code.style.cssText = _var.codeOriginCssText;
 			toolbar.style.cssText = '';
 			editorArea.style.cssText = _var.editorAreaOriginCssText;
-			topArea.style.cssText = tc.get('topArea').style.cssText;
+			topArea.style.cssText = fc.get('topArea').style.cssText;
 			this._d.body.style.overflow = _var.bodyOverflow;
 
 			if (this.options.height === 'auto' && !this.options.hasCodeMirror) this._codeViewAutoHeight();
@@ -187,19 +187,19 @@ Viewer.prototype = {
 
 			if (_var.fullScreenSticky && !this.options.toolbar_container) {
 				_var.fullScreenSticky = false;
-				tc.get('_stickyDummy').style.display = 'block';
+				fc.get('_stickyDummy').style.display = 'block';
 				domUtils.addClass(toolbar, 'se-toolbar-sticky');
 			}
 
 			if (/balloon|inline/i.test(this.options.mode)) {
-				this.context.toolbar._arrow.style.display = '';
+				this.editor.toolContext.get('toolbar._arrow').style.display = '';
 				this.editor.isInline = _var.fullScreenInline;
 				this.editor.isBalloon = _var.fullScreenBalloon;
 				this.editor.toolbar._showInline();
 			}
 
 			this.editor.toolbar._resetSticky();
-			tc.get('topArea').style.marginTop = '';
+			fc.get('topArea').style.marginTop = '';
 
 			if (this.editor._styleCommandMap.fullScreen) {
 				domUtils.changeElement(this.editor._styleCommandMap.fullScreen.firstElementChild, this.icons.expansion);
@@ -222,10 +222,10 @@ Viewer.prototype = {
 		this.status.isShowBlocks = value;
 
 		if (value) {
-			domUtils.addClass(this.targetContext.get('wysiwyg'), 'se-show-block');
+			domUtils.addClass(this.editor.frameContext.get('wysiwyg'), 'se-show-block');
 			domUtils.addClass(this.editor._styleCommandMap.showBlocks, 'active');
 		} else {
-			domUtils.removeClass(this.targetContext.get('wysiwyg'), 'se-show-block');
+			domUtils.removeClass(this.editor.frameContext.get('wysiwyg'), 'se-show-block');
 			domUtils.removeClass(this.editor._styleCommandMap.showBlocks, 'active');
 		}
 
@@ -243,7 +243,7 @@ Viewer.prototype = {
 
 		const contentHTML = this.options.printTemplate ? this.options.printTemplate.replace(/\{\{\s*content\s*\}\}/i, this.editor.getContent(true)) : this.editor.getContent(true);
 		const printDocument = domUtils.getIframeDocument(iframe);
-		const wDoc = this.targetContext.get('_wd');
+		const wDoc = this.editor.frameContext.get('_wd');
 
 		if (this.options.iframe) {
 			const arrts = this.options._printClass !== null ? 'class="' + this.options._printClass + '"' : this.options.iframe_fullPage ? domUtils.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + this.options._editableClass + '"';
@@ -303,7 +303,7 @@ Viewer.prototype = {
 		const contentHTML = this.options.previewTemplate ? this.options.previewTemplate.replace(/\{\{\s*content\s*\}\}/i, this.editor.getContent(true)) : this.editor.getContent(true);
 		const windowObject = this._w.open('', '_blank');
 		windowObject.mimeType = 'text/html';
-		const wDoc = this.targetContext.get('_wd');
+		const wDoc = this.editor.frameContext.get('_wd');
 
 		if (this.options.iframe) {
 			const arrts = this.options._printClass !== null ? 'class="' + this.options._printClass + '"' : this.options.iframe_fullPage ? domUtils.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + this.options._editableClass + '"';
@@ -390,7 +390,7 @@ Viewer.prototype = {
 		if (this.options.hasCodeMirror) {
 			this._codeMirrorEditor('set', value);
 		} else {
-			this.targetContext.get('code').value = value;
+			this.editor.frameContext.get('code').value = value;
 		}
 	},
 
@@ -402,7 +402,7 @@ Viewer.prototype = {
 		if (this.options.hasCodeMirror) {
 			return this._codeMirrorEditor('get', null);
 		} else {
-			return this.targetContext.get('code').value;
+			return this.editor.frameContext.get('code').value;
 		}
 	},
 
@@ -414,7 +414,7 @@ Viewer.prototype = {
 		const code_html = this._getCodeView();
 
 		if (this.options.iframe_fullPage) {
-			const wDoc = this.targetContext.get('_wd');
+			const wDoc = this.editor.frameContext.get('_wd');
 			const parseDocument = this.editor._parser.parseFromString(code_html, 'text/html');
 			const headChildren = parseDocument.head.children;
 
@@ -445,7 +445,7 @@ Viewer.prototype = {
 				}
 			}
 		} else {
-			this.targetContext.get('wysiwyg').innerHTML = code_html.length > 0 ? this.html.clean(code_html, true, null, null) : '<' + this.options.defaultLineTag + '><br></' + this.options.defaultLineTag + '>';
+			this.editor.frameContext.get('wysiwyg').innerHTML = code_html.length > 0 ? this.html.clean(code_html, true, null, null) : '<' + this.options.defaultLineTag + '><br></' + this.options.defaultLineTag + '>';
 		}
 	},
 
@@ -454,18 +454,18 @@ Viewer.prototype = {
 	 * @private
 	 */
 	_setEditorDataToCodeView: function () {
-		const codeContent = this.editor._convertHTMLToCode(this.targetContext.get('wysiwyg'), false);
+		const codeContent = this.editor._convertHTMLToCode(this.editor.frameContext.get('wysiwyg'), false);
 		let codeValue = '';
 
 		if (this.options.iframe_fullPage) {
-			const attrs = domUtils.getAttributesToString(this.targetContext.get('_wd').body, null);
-			codeValue = '<!DOCTYPE html>\n<html>\n' + this.targetContext.get('_wd').head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContent + '</body>\n</html>';
+			const attrs = domUtils.getAttributesToString(this.editor.frameContext.get('_wd').body, null);
+			codeValue = '<!DOCTYPE html>\n<html>\n' + this.editor.frameContext.get('_wd').head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContent + '</body>\n</html>';
 		} else {
 			codeValue = codeContent;
 		}
 
-		this.targetContext.get('code').style.display = 'block';
-		this.targetContext.get('wysiwygFrame').style.display = 'none';
+		this.editor.frameContext.get('code').style.display = 'block';
+		this.editor.frameContext.get('wysiwygFrame').style.display = 'none';
 
 		this._setCodeView(codeValue);
 	},

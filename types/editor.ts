@@ -33,7 +33,7 @@ export interface Core {
 	options: SunEditorOptions;
 
 	/**
-	 * @description Computed style of the wysiwyg area window.getComputedStyle(this.targetContext('wysiwyg'))
+	 * @description Computed style of the wysiwyg area window.getComputedStyle(this.editor.frameContext('wysiwyg'))
 	 */
 	wwComputedStyle: any;
 
@@ -362,7 +362,7 @@ export interface Core {
 
 	/**
 	 * @description Converts wysiwyg area element into a format that can be placed in an editor of code view mode
-	 * @param html WYSIWYG element (this.targetContext.get('wysiwyg')) or HTML string.
+	 * @param html WYSIWYG element (this.editor.frameContext.get('wysiwyg')) or HTML string.
 	 * @param comp If true, does not line break and indentation of tags.
 	 * @returns
 	 */

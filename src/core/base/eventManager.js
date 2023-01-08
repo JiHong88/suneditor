@@ -24,7 +24,7 @@ const EventManager = function (editor) {
 	this._toolbarObserver = null;
 	this._onMousedownPlugins = editor._onMousedownPlugins;
 	this._onKeyDownPlugins = editor._onKeyDownPlugins;
-	this._showPathLabel = (this.targetContext.get('options').statusbar_showPathLabel !== false && this.options.statusbar_showPathLabel) || this.targetContext.get('options').statusbar_showPathLabel;
+	this._showPathLabel = (editor.frameContext.get('options').statusbar_showPathLabel !== false && this.options.statusbar_showPathLabel) || editor.frameContext.get('options').statusbar_showPathLabel;
 	this._lineBreakerButton = null;
 	this._lineBreaker_t = null;
 	this._lineBreaker_b = null;
@@ -76,7 +76,7 @@ EventManager.prototype = {
 	 */
 	addGlobalEvent: function (type, listener, useCapture) {
 		if (this.options.iframe) {
-			this.targetContext.get('_ww').addEventListener(type, listener, useCapture);
+			this.editor.frameContext.get('_ww').addEventListener(type, listener, useCapture);
 		}
 		this._w.addEventListener(type, listener, useCapture);
 		return { type: type, listener: listener, useCapture: useCapture };
@@ -96,7 +96,7 @@ EventManager.prototype = {
 			type = type.type;
 		}
 		if (this.options.iframe) {
-			this.targetContext.get('_ww').removeEventListener(type, listener, useCapture);
+			this.editor.frameContext.get('_ww').removeEventListener(type, listener, useCapture);
 		}
 		this._w.removeEventListener(type, listener, useCapture);
 	},
@@ -142,20 +142,20 @@ EventManager.prototype = {
 
 			if (this.format.isLine(element)) {
 				/* Outdent */
-				if (commandMapNodes.indexOf('OUTDENT') === -1 && commandMap.OUTDENT && !domUtils.isImportantDisabled(commandMap.OUTDENT)) {
+				if (commandMapNodes.indexOf('OUTDENT') === -1 && commandMap.get('OUTDENT') && !domUtils.isImportantDisabled(commandMap.get('OUTDENT'))) {
 					if (domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0)) {
 						commandMapNodes.push('OUTDENT');
-						commandMap.OUTDENT.removeAttribute('disabled');
+						commandMap.get('OUTDENT').removeAttribute('disabled');
 					}
 				}
 
 				/* Indent */
-				if (commandMapNodes.indexOf('INDENT') === -1 && commandMap.INDENT && !domUtils.isImportantDisabled(commandMap.INDENT)) {
+				if (commandMapNodes.indexOf('INDENT') === -1 && commandMap.get('INDENT') && !domUtils.isImportantDisabled(commandMap.get('INDENT'))) {
 					commandMapNodes.push('INDENT');
 					if (domUtils.isListCell(element) && !element.previousElementSibling) {
-						commandMap.INDENT.setAttribute('disabled', true);
+						commandMap.get('INDENT').setAttribute('disabled', true);
 					} else {
-						commandMap.INDENT.removeAttribute('disabled');
+						commandMap.get('INDENT').removeAttribute('disabled');
 					}
 				}
 
@@ -176,7 +176,7 @@ EventManager.prototype = {
 		this.status.currentNodesMap = commandMapNodes;
 
 		/**  Displays the current node structure to statusbar */
-		if (this._showPathLabel && this.targetContext.get('navigation')) this.targetContext.get('navigation').textContent = this.status.currentNodes.join(' > ');
+		if (this._showPathLabel && this.editor.frameContext.get('navigation')) this.editor.frameContext.get('navigation').textContent = this.status.currentNodes.join(' > ');
 	},
 
 	/**
@@ -185,21 +185,22 @@ EventManager.prototype = {
 	 * @private
 	 */
 	_setKeyEffect: function (ignoredList) {
-		const commandMap = this.editor._commandMap;
 		const activePlugins = this.editor.activePlugins;
 
-		for (let key in commandMap) {
-			if (ignoredList.indexOf(key) > -1 || !commandMap.hasOwnProperty(key)) continue;
-			if (activePlugins.indexOf(key) > -1) {
-				this.plugins[key].active(null);
-			} else if (commandMap.OUTDENT && /^OUTDENT$/i.test(key)) {
-				if (!domUtils.isImportantDisabled(commandMap.OUTDENT)) commandMap.OUTDENT.setAttribute('disabled', true);
-			} else if (commandMap.INDENT && /^INDENT$/i.test(key)) {
-				if (!domUtils.isImportantDisabled(commandMap.INDENT)) commandMap.INDENT.removeAttribute('disabled');
-			} else {
-				domUtils.removeClass(commandMap[key], 'active');
-			}
-		}
+		this.editor._commandMap.forEach(
+			function (e, k) {
+				if (ignoredList.indexOf(k) > -1 || !e) return;
+				if (activePlugins.indexOf(k) > -1) {
+					this.plugins[k].active(null);
+				} else if (e && /^OUTDENT$/i.test(k)) {
+					if (!domUtils.isImportantDisabled(e)) e.setAttribute('disabled', true);
+				} else if (e && /^INDENT$/i.test(k)) {
+					if (!domUtils.isImportantDisabled(e)) e.removeAttribute('disabled');
+				} else {
+					domUtils.removeClass(e, 'active');
+				}
+			}.bind(this)
+		);
 	},
 
 	_showToolbarBalloonDelay: function () {
@@ -396,8 +397,8 @@ EventManager.prototype = {
 	_setDropLocationSelection: function (e) {
 		if (e.rangeParent) {
 			this.selection.setRange(e.rangeParent, e.rangeOffset, e.rangeParent, e.rangeOffset);
-		} else if (this.targetContext.get('_wd').caretRangeFromPoint) {
-			const r = this.targetContext.get('_wd').caretRangeFromPoint(e.clientX, e.clientY);
+		} else if (this.editor.frameContext.get('_wd').caretRangeFromPoint) {
+			const r = this.editor.frameContext.get('_wd').caretRangeFromPoint(e.clientX, e.clientY);
 			this.selection.setRange(r.startContainer, r.startOffset, r.endContainer, r.endOffset);
 		} else {
 			const r = this.selection.getRange();
@@ -422,7 +423,7 @@ EventManager.prototype = {
 			tempDiv.setAttribute('contenteditable', true);
 			tempDiv.style.cssText = 'position:absolute; top:0; left:0; width:1px; height:1px; overflow:hidden;';
 
-			this.targetContext.get('container').appendChild(tempDiv);
+			this.editor.frameContext.get('container').appendChild(tempDiv);
 			tempDiv.focus();
 
 			_w.setTimeout(
@@ -501,9 +502,9 @@ EventManager.prototype = {
 	_addCommonEvent: function () {
 		/** toolbar event */
 		const toolbarHandler = ToolbarButtonsHandler.bind(this);
-		this.addEvent(this.context.toolbar.main, 'mousedown', toolbarHandler, false);
-		this.addEvent(this.context.toolbar._menuTray, 'mousedown', toolbarHandler, false);
-		this.addEvent(this.context.toolbar.main, 'click', OnClick_toolbar.bind(this), false);
+		this.addEvent(this.editor.toolContext.get('toolbar.main'), 'mousedown', toolbarHandler, false);
+		this.addEvent(this.editor.toolContext.get('toolbar._menuTray'), 'mousedown', toolbarHandler, false);
+		this.addEvent(this.editor.toolContext.get('toolbar.main'), 'click', OnClick_toolbar.bind(this), false);
 
 		/** set response toolbar */
 		this.toolbar._setResponsive();
@@ -516,8 +517,9 @@ EventManager.prototype = {
 		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
 	},
 
-	_addEvent: function (e) {
-		const eventWysiwyg = (e.eventWysiwyg = this.options.iframe ? e._ww : e.wysiwyg);
+	_addEvent: function (frameContext) {
+		const eventWysiwyg = this.options.iframe ? frameContext.get('_ww') : frameContext.get('wysiwyg');
+		frameContext.set('eventWysiwyg', eventWysiwyg);
 		if (!env.isIE) {
 			this._resizeObserver = new _w.ResizeObserver(
 				function (entries) {
@@ -527,7 +529,7 @@ EventManager.prototype = {
 		}
 
 		/** editor area */
-		const rootKey = e.topArea.getAttribute('data-se-root');
+		const rootKey = frameContext.get('topArea').getAttribute('data-se-root');
 		const wwMouseDown = OnMouseDown_wysiwyg.bind(this);
 		this.addEvent(eventWysiwyg, 'mousedown', wwMouseDown, false);
 		this.addEvent(eventWysiwyg, 'click', OnClick_wysiwyg.bind(this), false);
@@ -545,16 +547,16 @@ EventManager.prototype = {
 		/** line breaker */
 		this.addEvent(eventWysiwyg, 'mousemove', OnMouseMove_wysiwyg.bind(this), false);
 		this.addEvent(
-			e.lineBreaker.querySelector('button'),
+			frameContext.get('lineBreaker').querySelector('button'),
 			'mousedown',
 			function (e) {
 				e.preventDefault();
 			},
 			false
 		);
-		this.addEvent(e.lineBreaker.querySelector('button'), 'click', DisplayLineBreak.bind(this, ''), false);
-		this.addEvent(e.lineBreaker_t, 'mousedown', DisplayLineBreak.bind(this, 't'), false);
-		this.addEvent(e.lineBreaker_b, 'mousedown', DisplayLineBreak.bind(this, 'b'), false);
+		this.addEvent(frameContext.get('lineBreaker').querySelector('button'), 'click', DisplayLineBreak.bind(this, ''), false);
+		this.addEvent(frameContext.get('lineBreaker_t'), 'mousedown', DisplayLineBreak.bind(this, 't'), false);
+		this.addEvent(frameContext.get('lineBreaker_b'), 'mousedown', DisplayLineBreak.bind(this, 'b'), false);
 
 		/** Events are registered only when there is a table plugin.  */
 		if (this.plugins.table) {
@@ -567,22 +569,22 @@ EventManager.prototype = {
 		/** code view area auto line */
 		if (this.options.height === 'auto' && !this.options.hasCodeMirror) {
 			const cvAuthHeight = this.editor._codeViewAutoHeight.bind(this.editor);
-			this.addEvent(e.code, 'keydown', cvAuthHeight, false);
-			this.addEvent(e.code, 'keyup', cvAuthHeight, false);
-			this.addEvent(e.code, 'paste', cvAuthHeight, false);
+			this.addEvent(frameContext.get('code'), 'keydown', cvAuthHeight, false);
+			this.addEvent(frameContext.get('code'), 'keyup', cvAuthHeight, false);
+			this.addEvent(frameContext.get('code'), 'paste', cvAuthHeight, false);
 		}
 
 		/** statusbar */
-		if (e.statusbar) {
+		if (frameContext.has('statusbar')) {
 			if (/\d+/.test(this.options.height) && this.options.statusbar_resizeEnable) {
-				this.addEvent(e.statusbar, 'mousedown', OnMouseDown_statusbar.bind(this), false);
+				this.addEvent(frameContext.get('statusbar'), 'mousedown', OnMouseDown_statusbar.bind(this), false);
 			} else {
-				domUtils.addClass(e.statusbar, 'se-resizing-none');
+				domUtils.addClass(frameContext.get('statusbar'), 'se-resizing-none');
 			}
 		}
 
 		const OnScrollAbs = OnScroll_Abs.bind(this);
-		let scrollParent = e.originElement;
+		let scrollParent = frameContext.get('originElement');
 		while ((scrollParent = domUtils.getScrollParent(scrollParent.parentElement))) {
 			this.__scrollparents.push(scrollParent);
 			this.addEvent(scrollParent, 'scroll', OnScrollAbs, false);
@@ -598,12 +600,12 @@ EventManager.prototype = {
 		this._events = [];
 
 		if (this._resizeObserver) {
-			this._resizeObserver.unobserve(this.targetContext.get('wysiwygFrame'));
+			this._resizeObserver.unobserve(this.editor.frameContext.get('wysiwygFrame'));
 			this._resizeObserver = null;
 		}
 
 		if (this._toolbarObserver) {
-			this._toolbarObserver.unobserve(this.targetContext.get('_toolbarShadow'));
+			this._toolbarObserver.unobserve(this.editor.frameContext.get('_toolbarShadow'));
 			this._toolbarObserver = null;
 		}
 	},
@@ -613,11 +615,11 @@ EventManager.prototype = {
 		const x = eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0;
 
 		if (this.editor.isBalloon) {
-			this.context.toolbar.main.style.top = this.toolbar._balloonOffset.top - y + 'px';
-			this.context.toolbar.main.style.left = this.toolbar._balloonOffset.left - x + 'px';
+			this.editor.toolContext.get('toolbar.main').style.top = this.toolbar._balloonOffset.top - y + 'px';
+			this.editor.toolContext.get('toolbar.main').style.left = this.toolbar._balloonOffset.left - x + 'px';
 		}
 
-		if (this.editor._controllerTargetContext !== this.targetContext.get('topArea')) {
+		if (this.editor._controllerTargetContext !== this.editor.frameContext.get('topArea')) {
 			this.editor._offCurrentController();
 		}
 
@@ -681,7 +683,7 @@ function ToolbarButtonsHandler(e) {
 		this.editor._antiBlur = false;
 	}
 
-	if (!this.targetContext.get('wysiwyg').contains(this.selection.getNode())) {
+	if (!this.editor.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
 		this.editor.focus();
 	}
 
@@ -738,7 +740,7 @@ function OnClick_toolbar(e) {
 }
 
 function OnMouseDown_wysiwyg(e) {
-	if (this.status.isReadOnly || domUtils.isNonEditable(this.targetContext.get('wysiwyg'))) return;
+	if (this.status.isReadOnly || domUtils.isNonEditable(this.editor.frameContext.get('wysiwyg'))) return;
 
 	// user event
 	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown(e) === false) return;
@@ -766,7 +768,7 @@ function OnClick_wysiwyg(e) {
 		return false;
 	}
 
-	if (domUtils.isNonEditable(this.targetContext.get('wysiwyg'))) return;
+	if (domUtils.isNonEditable(this.editor.frameContext.get('wysiwyg'))) return;
 
 	// user event
 	if (typeof this.events.onClick === 'function' && this.events.onClick(e) === false) return;
@@ -912,7 +914,7 @@ function OnKeyDown_wysiwyg(e) {
 				break;
 			}
 
-			if (!this.format.isLine(formatEl) && !this.targetContext.get('wysiwyg').firstElementChild && !this.component.is(selectionNode) && this._setDefaultLine(this.options.defaultLineTag) !== null) {
+			if (!this.format.isLine(formatEl) && !this.editor.frameContext.get('wysiwyg').firstElementChild && !this.component.is(selectionNode) && this._setDefaultLine(this.options.defaultLineTag) !== null) {
 				e.preventDefault();
 				e.stopPropagation();
 				return false;
@@ -1710,7 +1712,7 @@ function OnBlur_wysiwyg(rootKey, e) {
 	this.status.currentNodesMap = [];
 
 	this.rootTargets.forEach(function (e) {
-		if (e.navigation) e.navigation.textContent = '';
+		if (e.get('navigation')) e.get('navigation').textContent = '';
 	});
 
 	this.history.check(rootKey, this.status._range);
@@ -1724,23 +1726,23 @@ function OnMouseMove_wysiwyg(e) {
 	if (this.status.isDisabled || this.status.isReadOnly) return false;
 
 	const component = domUtils.getParentElement(e.target, this.component.is);
-	const lineBreakerStyle = this.targetContext.get('lineBreaker').style;
+	const lineBreakerStyle = this.editor.frameContext.get('lineBreaker').style;
 
 	if (component && !this.editor.currentControllerName) {
-		const tc = this.targetContext;
+		const fc = this.editor.frameContext;
 		let scrollTop = 0;
-		let el = tc.get('wysiwyg');
+		let el = fc.get('wysiwyg');
 		do {
 			scrollTop += el.scrollTop;
 			el = el.parentElement;
 		} while (el && !/^(BODY|HTML)$/i.test(el.nodeName));
 
-		const wScroll = tc.get('wysiwyg').scrollTop;
-		const offsets = this.offset.getGlobal(tc.get('topArea'));
+		const wScroll = fc.get('wysiwyg').scrollTop;
+		const offsets = this.offset.getGlobal(fc.get('topArea'));
 		const componentTop = this.offset.get(component).top + wScroll;
-		const y = e.pageY + scrollTop + (this.options.iframe && !this.options.toolbar_container ? this.context.toolbar.main.offsetHeight : 0);
+		const y = e.pageY + scrollTop + (this.options.iframe && !this.options.toolbar_container ? this.editor.toolContext.get('toolbar.main').offsetHeight : 0);
 		const c = componentTop + (this.options.iframe ? scrollTop : offsets.top);
-		const toolbarH = this.context.toolbar.main.offsetHeight;
+		const toolbarH = this.editor.toolContext.get('toolbar.main').offsetHeight;
 
 		const isList = domUtils.isListCell(component.parentNode);
 		let dir = '',
@@ -1770,23 +1772,23 @@ function OnMouseMove_wysiwyg(e) {
 function OnMouseDown_statusbar(e) {
 	e.stopPropagation();
 	this._resizeClientY = e.clientY;
-	this.context._resizeBackground.style.display = 'block';
-	this.context._resizeBackground.style.cursor = 'ns-resize';
+	this.editor.toolContext.get('_resizeBackground').style.display = 'block';
+	this.editor.toolContext.get('_resizeBackground').style.cursor = 'ns-resize';
 	this.__resize_editor = this.addGlobalEvent('mousemove', __resizeEditor.bind(this));
 	this.__close_move = this.addGlobalEvent('mouseup', __closeMove.bind(this));
 }
 
 function __resizeEditor(e) {
-	const resizeInterval = this.targetContext.get('editorArea').offsetHeight + (e.clientY - this._resizeClientY);
-	const h = resizeInterval < this.targetContext.get('_minHeight') ? this.targetContext.get('_minHeight') : resizeInterval;
-	this.targetContext.get('wysiwygFrame').style.height = this.targetContext.get('code').style.height = h + 'px';
+	const resizeInterval = this.editor.frameContext.get('editorArea').offsetHeight + (e.clientY - this._resizeClientY);
+	const h = resizeInterval < this.editor.frameContext.get('_minHeight') ? this.editor.frameContext.get('_minHeight') : resizeInterval;
+	this.editor.frameContext.get('wysiwygFrame').style.height = this.editor.frameContext.get('code').style.height = h + 'px';
 	this._resizeClientY = e.clientY;
 	if (env.isIE) this.editor.__callResizeFunction(h, null);
 }
 
 function __closeMove() {
-	this.context._resizeBackground.style.display = 'none';
-	this.context._resizeBackground.style.cursor = 'auto';
+	this.editor.toolContext.get('_resizeBackground').style.display = 'none';
+	this.editor.toolContext.get('_resizeBackground').style.cursor = 'auto';
 	if (this.__resize_editor) this.__resize_editor = this.removeGlobalEvent(this.__resize_editor);
 	if (this.__close_move) this.__close_move = this.removeGlobalEvent(this.__close_move);
 }
@@ -1804,7 +1806,7 @@ function DisplayLineBreak(dir, e) {
 	if (this.options.charCounter_type === 'byte-html' && !this.char.check(format.outerHTML)) return;
 
 	component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
-	this.targetContext.get('lineBreaker').style.display = 'none';
+	this.editor.frameContext.get('lineBreaker').style.display = 'none';
 	this._lineBreakComp = null;
 
 	const focusEl = isList ? format : format.firstChild;
@@ -1818,10 +1820,11 @@ function OnResize_window() {
 
 	if (env.isIE) this.toolbar.resetResponsiveToolbar();
 
-	if (this.context.toolbar.main.offsetWidth === 0) return;
+	if (this.editor.toolContext.get('toolbar.main').offsetWidth === 0) return;
 
-	if (this.context.fileBrowser && this.context.fileBrowser.area.style.display === 'block') {
-		this.context.fileBrowser.body.style.maxHeight = _w.innerHeight - this.context.fileBrowser.header.offsetHeight - 50 + 'px';
+	const fileBrowser = this.editor.frameContext.get('fileBrowser');
+	if (fileBrowser && fileBrowser.area.style.display === 'block') {
+		fileBrowser.body.style.maxHeight = _w.innerHeight - fileBrowser.header.offsetHeight - 50 + 'px';
 	}
 
 	if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {
@@ -1829,8 +1832,8 @@ function OnResize_window() {
 	}
 
 	if (this.status.isFullScreen) {
-		this.editor._transformStatus.fullScreenInnerHeight += _w.innerHeight - this.context.toolbar.main.offsetHeight - this.editor._transformStatus.fullScreenInnerHeight;
-		this.targetContext.get('editorArea').style.height = this.editor._transformStatus.fullScreenInnerHeight + 'px';
+		this.editor._transformStatus.fullScreenInnerHeight += _w.innerHeight - this.editor.toolContext.get('toolbar.main').offsetHeight - this.editor._transformStatus.fullScreenInnerHeight;
+		this.editor.frameContext.get('editorArea').style.height = this.editor._transformStatus.fullScreenInnerHeight + 'px';
 		return;
 	}
 
@@ -1842,7 +1845,7 @@ function OnResize_window() {
 	this.editor._iframeAutoHeight();
 
 	if (this.toolbar._sticky) {
-		this.context.toolbar.main.style.width = this.targetContext.get('topArea').offsetWidth - 2 + 'px';
+		this.editor.toolContext.get('toolbar.main').style.width = this.editor.frameContext.get('topArea').offsetWidth - 2 + 'px';
 		this.toolbar._resetSticky();
 	}
 }
@@ -1852,7 +1855,7 @@ function OnScroll_window() {
 		this.toolbar._resetSticky();
 	}
 
-	if (this.editor.isBalloon && this.context.toolbar.main.style.display === 'block') {
+	if (this.editor.isBalloon && this.editor.frameContexteContexteContext.get('toolbar.main').style.display === 'block') {
 		this.toolbar._setBalloonOffset(this.toolbar._balloonOffset.position === 'top');
 	}
 

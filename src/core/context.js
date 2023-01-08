@@ -10,7 +10,7 @@ import { get as getNumber } from '../helper/numbers';
  * @returns {Object}
  * @private
  */
-export const CreateContextElement = function (editorTarget, top, wwFrame, codeFrame) {
+export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFrame) {
 	return new _w.Map([
 		['originElement', editorTarget.target],
 		['options', editorTarget.options],
@@ -30,6 +30,7 @@ export const CreateContextElement = function (editorTarget, top, wwFrame, codeFr
 		['lineBreaker_b', top.querySelector('.se-line-breaker-component-b')],
 		['_stickyDummy', top.querySelector('.se-toolbar-sticky-dummy')],
 		['_toolbarShadow', top.querySelector('.se-toolbar-shadow')],
+
 		['_minHeight', getNumber(wwFrame.style.minHeight || '65', 0)]
 	]);
 };
@@ -41,7 +42,7 @@ export const CreateContextElement = function (editorTarget, top, wwFrame, codeFr
  * @returns {Object}
  * @private
  */
-const Context = function (toolbar, carrierWrapper) {
+export const CreateToolContext = function (toolbar, carrierWrapper) {
 	return new _w.Map([
 		['toolbar.main', toolbar],
 		['toolbar._buttonTray', toolbar.querySelector('.se-btn-tray')],
@@ -72,5 +73,3 @@ const Context = function (toolbar, carrierWrapper) {
 		['_resizeBackground', carrierWrapper.querySelector('.se-resizing-back')]
 	]);
 };
-
-export default Context;

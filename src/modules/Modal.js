@@ -5,12 +5,13 @@ const Modal = function (inst, element) {
 	CoreDependency.call(this, inst.editor);
 
 	// members
+	const carrierWrapper = this.editor.toolContext.get('_carrierWrapper');
 	this.inst = inst;
 	this.kind = inst.constructor.key;
 	this.form = element;
 	this.focusElement = element.querySelector('[data-focus]');
 	this.isUpdate = false;
-	(this._modalArea = this.context._carrierWrapper.querySelector('.se-modal')), (this._modalBack = this.context._carrierWrapper.querySelector('.se-modal-back')), (this._modalInner = this.context._carrierWrapper.querySelector('.se-modal-inner'));
+	(this._modalArea = carrierWrapper.querySelector('.se-modal')), (this._modalBack = carrierWrapper.querySelector('.se-modal-back')), (this._modalInner = carrierWrapper.querySelector('.se-modal-inner'));
 	this._closeListener = [CloseListener.bind(this), OnClick_dialog.bind(this)];
 	this._bindClose = null;
 	this._onClickEvent = null;

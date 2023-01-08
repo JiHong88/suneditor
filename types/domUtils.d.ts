@@ -17,7 +17,7 @@ class domUtils {
 
 	/**
 	 * @description Get the argument iframe's document object
-	 * @param iframe Iframe element (this.targetContext('wysiwygFrame'))
+	 * @param iframe Iframe element (this.editor.frameContext('wysiwygFrame'))
 	 * @returns
 	 */
 	getIframeDocument(iframe: Element): Document;

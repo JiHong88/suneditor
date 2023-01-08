@@ -156,7 +156,7 @@ HTML.prototype = {
 	 * @param {boolean} notCleanData If true, inserts the HTML string without refining it with html.clean.
 	 */
 	insert: function (html, rangeSelection, notCheckCharCount, notCleanData) {
-		if (!this.targetContext.get('wysiwygFrame').contains(this.selection.get().focusNode)) this.editor.focus();
+		if (!this.editor.frameContext.get('wysiwygFrame').contains(this.selection.get().focusNode)) this.editor.focus();
 
 		if (typeof html === 'string') {
 			if (!notCleanData) html = this.clean(html, false, null, null);
@@ -411,7 +411,7 @@ HTML.prototype = {
 
 		try {
 			// set node
-			const wysiwyg = this.targetContext.get('wysiwyg');
+			const wysiwyg = this.editor.frameContext.get('wysiwyg');
 			if (!insertListCell) {
 				if (domUtils.isWysiwygFrame(afterNode) || parentNode === wysiwyg.parentNode) {
 					parentNode = wysiwyg;
@@ -727,7 +727,7 @@ HTML.prototype = {
 
 		if (!domUtils.isWysiwygFrame(container) && container.childNodes.length === 0) {
 			const rc = this.node.removeAllParents(container, null, null);
-			if (rc) container = rc.sc || rc.ec || this.targetContext.get('wysiwyg');
+			if (rc) container = rc.sc || rc.ec || this.editor.frameContext.get('wysiwyg');
 		}
 
 		// set range

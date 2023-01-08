@@ -7,11 +7,10 @@ import { _w } from '../../helper/env';
 import { getNodeFromPath, getNodePath } from '../../helper/domUtils';
 
 export default function (editor, change) {
-	const ctx = editor.context;
 	const rootTargets = editor.rootTargets;
 	const delayTime = editor.options.historyStackDelayTime;
-	let undo = editor.context.buttons.undo;
-	let redo = editor.context.buttons.redo;
+	let undo = editor.toolContext.get('buttons.undo');
+	let redo = editor.toolContext.get('buttons.redo');
 	let pushDelay = null;
 	let stackIndex, stack, rootStack, rootInitContents;
 
@@ -25,7 +24,7 @@ export default function (editor, change) {
 		root.index += increase;
 
 		const item = root.value[root.index];
-		this.rootTargets.get(rootKey).get('wysiwyg').innerHTML = item.content;
+		rootTargets.get(rootKey).get('wysiwyg').innerHTML = item.content;
 
 		if (prevKey !== rootKey && increase < 0 && stackIndex === 1) {
 			stackIndex = 0;
@@ -47,7 +46,7 @@ export default function (editor, change) {
 		}
 
 		editor.changeContextElement(focusKey);
-		editor.selection.setRange(getNodeFromPath(focusItem.s.path, ctx.element.wysiwyg), focusItem.s.offset, getNodeFromPath(focusItem.e.path, ctx.element.wysiwyg), focusItem.e.offset);
+		editor.selection.setRange(getNodeFromPath(focusItem.s.path, focusItem.frame), focusItem.s.offset, getNodeFromPath(focusItem.e.path, focusItem.frame), focusItem.e.offset);
 		editor.focus();
 
 		if (stackIndex < 0) stackIndex = 0;
@@ -102,7 +101,8 @@ export default function (editor, change) {
 		root.value[root.index] = {
 			content: content,
 			s: s,
-			e: e
+			e: e,
+			frame: rootTargets.get(rootKey).get('wysiwyg')
 		};
 	}
 
@@ -114,7 +114,8 @@ export default function (editor, change) {
 		root.value[0] = {
 			content: rootInitContents[rootKey],
 			s: { path: [0, 0], offset: [0, 0] },
-			e: { path: 0, offset: 0 }
+			e: { path: 0, offset: 0 },
+			frame: rootTargets.get(rootKey).get('wysiwyg')
 		};
 	}
 
@@ -223,7 +224,7 @@ export default function (editor, change) {
 			if (undo) undo.setAttribute('disabled', true);
 			if (redo) redo.setAttribute('disabled', true);
 			editor.status.isChanged = false;
-			if (editor.context.buttons.save) editor.context.buttons.save.setAttribute('disabled', true);
+			if (editor.toolContext.has('buttons.save')) editor.toolContext.get('buttons.save').setAttribute('disabled', true);
 
 			stackIndex = -1;
 			stack = [];
@@ -241,14 +242,14 @@ export default function (editor, change) {
 		 * @private
 		 */
 		_resetCachingButton: function () {
-			undo = editor.context.buttons.undo;
-			redo = editor.context.buttons.redo;
+			undo = editor.toolContext.get('buttons.undo');
+			redo = editor.toolContext.get('buttons.redo');
 
 			if (stackIndex === 0) {
 				if (undo) undo.setAttribute('disabled', true);
 				if (redo && stackIndex === stack.length - 1) redo.setAttribute('disabled', true);
 				editor.status.isChanged = false;
-				if (editor.context.buttons.save) editor.context.buttons.save.setAttribute('disabled', true);
+				if (editor.toolContext.get('buttons.save')) editor.toolContext.get('buttons.save').setAttribute('disabled', true);
 			} else if (stackIndex === stack.length - 1) {
 				if (redo) redo.setAttribute('disabled', true);
 			}

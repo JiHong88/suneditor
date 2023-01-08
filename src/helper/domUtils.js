@@ -50,7 +50,7 @@ export function createTextNode(text) {
 
 /**
  * @description Get the argument iframe's document object if use the "iframe" or "fullPage" options
- * @param {Element} iframe Iframe element (this.targetContext.get('wysiwygFrame'))
+ * @param {Element} iframe Iframe element (this.editor.frameContext.get('wysiwygFrame'))
  * @returns {Document}
  */
 export function getIframeDocument(iframe) {

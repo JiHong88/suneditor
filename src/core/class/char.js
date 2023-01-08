@@ -25,7 +25,7 @@ Char.prototype = {
 		if (this.maxCharCount) {
 			const length = this.getLength(typeof html === 'string' ? html : this.options.charCounter_type === 'byte-html' && html.nodeType === 1 ? html.outerHTML : html.textContent);
 			if (length > 0 && length + this.getLength() > this.maxCharCount) {
-				CounterBlink(this.targetContext.get('charWrapper'));
+				CounterBlink(this.editor.frameContext.get('charWrapper'));
 				return false;
 			}
 		}
@@ -35,12 +35,12 @@ Char.prototype = {
 	/**
 	 * @description Get the [content]'s number of characters or binary data size. (options.charCounter_type)
 	 * If [content] is undefined, get the current editor's number of characters or binary data size.
-	 * @param {string|undefined} content Content to count. (defalut: this.targetContext.get('wysiwyg'))
+	 * @param {string|undefined} content Content to count. (defalut: this.editor.frameContext.get('wysiwyg'))
 	 * @returns {number}
 	 */
 	getLength: function (content) {
 		if (typeof content !== 'string') {
-			content = this.options.charCounter_type === 'byte-html' ? this.targetContext.get('wysiwyg').innerHTML : this.targetContext.get('wysiwyg').textContent;
+			content = this.options.charCounter_type === 'byte-html' ? this.editor.frameContext.get('wysiwyg').innerHTML : this.editor.frameContext.get('wysiwyg').textContent;
 		}
 		return /byte/.test(this.options.charCounter_type) ? this.getByteLength(content) : content.length;
 	},
@@ -81,10 +81,10 @@ Char.prototype = {
 	 * @description Set the char count to charCounter element textContent.
 	 */
 	display: function () {
-		if (this.targetContext.get('charCounter')) {
+		if (this.editor.frameContext.has('charCounter')) {
 			this._w.setTimeout(
 				function () {
-					this.targetContext.get('charCounter').textContent = this.getLength();
+					this.editor.frameContext.get('charCounter').textContent = this.getLength();
 				}.bind(this)
 			);
 		}
@@ -124,7 +124,7 @@ Char.prototype = {
 			}
 
 			if (over) {
-				CounterBlink(this.targetContext.get('charWrapper'));
+				CounterBlink(this.editor.frameContext.get('charWrapper'));
 				if (nextCharCount > 0) return false;
 			}
 		}
@@ -137,7 +137,7 @@ Char.prototype = {
 
 /**
  * @description The character counter blinks.
- * @param charWrapper {Element} this.targetContext.get('charWrapper')
+ * @param charWrapper {Element} this.editor.frameContext.get('charWrapper')
  * @private
  */
 function CounterBlink(charWrapper) {
