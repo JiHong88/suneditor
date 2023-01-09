@@ -7580,9 +7580,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core._variable.currentNodes = [];
             core._variable.currentNodesMap = [];
             if (options.showPathLabel) context.element.navigation.textContent = '';
-
             // user event
-            if (typeof functions.onBlur === 'function') functions.onBlur(e, core);
+            if (typeof functions.onBlur === 'function') functions.onBlur(e, core,this);
         },
 
         onMouseDown_resizingBar: function (e) {
@@ -8166,6 +8165,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onCopy: null,
         onCut: null,
         onFocus: null,
+        
+        /**
+         * @description Event functions
+         * @param {Object} e Event Object
+         * @param {Object} core Core object
+         * @param {String} contents Current contents
+         */
         onBlur: null,
 
         /**
