@@ -119,10 +119,10 @@ function OnClickMenu(e) {
 }
 
 function CreateHTML(editor) {
-	const option = editor.options;
+	const options = editor.options;
 	const lang_toolbar = editor.lang.toolbar;
 	const defaultFormats = ['p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
-	const formatList = !option.formats || option.formats.length === 0 ? defaultFormats : option.formats;
+	const formatList = !options.get('formats') || options.get('formats').length === 0 ? defaultFormats : options.get('formats');
 
 	let list = '<div class="se-list-inner"><ul class="se-list-basic">';
 	for (let i = 0, len = formatList.length, format, tagName, command, name, h, attrs, className; i < len; i++) {

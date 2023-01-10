@@ -178,7 +178,7 @@ Offset.prototype = {
 		const targetL = target.offsetLeft;
 
 		// left
-		if (this.options._rtl) {
+		if (this.options.get('_rtl')) {
 			const elementW = target.offsetWidth;
 			const rtlW = elW > elementW ? elW - elementW : 0;
 			const rtlL = rtlW > 0 ? 0 : elementW - elW;
@@ -229,7 +229,7 @@ Offset.prototype = {
 		const position = params.position || 'bottom';
 		const inst = params.inst;
 
-		if (this.options._rtl) {
+		if (this.options.get('_rtl')) {
 			addOffset.left *= -1;
 		}
 
@@ -250,7 +250,7 @@ Offset.prototype = {
 		// margin
 		const tmtw = targetRect.top;
 		const tmbw = this._w.innerHeight - targetRect.bottom;
-		let toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline || this.options.toolbar_container) ? 0 : this.editor.toolContext.get('toolbar.main').offsetHeight;
+		let toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline || this.options.get('toolbar_container')) ? 0 : this.editor.toolContext.get('toolbar.main').offsetHeight;
 		let rmt, rmb;
 		if (this.status.isFullScreen) {
 			rmt = tmtw - toolbarH;
@@ -351,7 +351,7 @@ Offset.prototype = {
 		let x = 0;
 		let ax = 0;
 		let awLimit = 0;
-		if (!this.options._rtl) {
+		if (!this.options.get('_rtl')) {
 			l += targetRect.left + this._w.scrollX - (rml < 0 ? rml : 0);
 			x = targetW + rml;
 			if (x < aw) {

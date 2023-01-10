@@ -68,7 +68,7 @@ function OnClickMenu(e) {
 
 function CreateHTML(editor) {
 	const lang = editor.lang;
-	const items = editor.options.hrItems || [
+	const items = editor.options.get('hrItems') || [
 		{ name: lang.toolbar.hr_solid, class: '__se__solid' },
 		{ name: lang.toolbar.hr_dashed, class: '__se__dashed' },
 		{ name: lang.toolbar.hr_dotted, class: '__se__dotted' }

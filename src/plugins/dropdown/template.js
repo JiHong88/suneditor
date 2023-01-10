@@ -28,7 +28,7 @@ Template.prototype = {
 	 * @param {number} index template menu index
 	 */
 	action: function (index) {
-		const temp = this.options.templates[(this.selectedIndex = index)];
+		const temp = this.options.get('templates')[(this.selectedIndex = index)];
 
 		if (temp.html) {
 			this.html.insert(temp.html);
@@ -53,7 +53,7 @@ function OnClickMenu(e) {
 }
 
 function CreateHTML(editor) {
-	const templateList = editor.options.templates;
+	const templateList = editor.options.get('templates');
 	if (!templateList || templateList.length === 0) {
 		console.warn('[SUNEDITOR.plugins.template.warn] To use the "template" plugin, please define the "templates" option.');
 	}

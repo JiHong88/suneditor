@@ -38,7 +38,6 @@ export default {
 		if (_init_options) {
 			options = [_init_options, options].reduce(function (init, option) {
 				for (let key in option) {
-					if (!option.hasOwnProperty(key)) continue;
 					if (key === 'plugins' && option[key] && init[key]) {
 						let i = init[key],
 							o = option[key];

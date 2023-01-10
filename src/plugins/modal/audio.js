@@ -22,8 +22,8 @@ const Audio_ = function (editor, target) {
 	this.audioInputFile = modalEl.querySelector('._se_audio_files');
 	this.audioUrlFile = modalEl.querySelector('.se-input-url');
 	this.preview = modalEl.querySelector('.se-link-preview');
-	this._origin_w = this.options.audioWidth;
-	this._origin_h = this.options.audioHeight;
+	this._origin_w = this.options.get('audioWidth');
+	this._origin_h = this.options.get('audioHeight');
 	this.urlValue = '';
 	this._element = null;
 
@@ -56,12 +56,12 @@ Audio_.prototype = {
 	 */
 	on: function (isUpdate) {
 		if (!isUpdate) {
-			if (this.audioInputFile && this.options.audioMultipleFile) this.audioInputFile.setAttribute('multiple', 'multiple');
+			if (this.audioInputFile && this.options.get('audioMultipleFile')) this.audioInputFile.setAttribute('multiple', 'multiple');
 		} else if (this._element) {
 			this.urlValue = this.preview.textContent = this.audioUrlFile.value = this._element.src;
-			if (this.audioInputFile && this.options.audioMultipleFile) this.audioInputFile.removeAttribute('multiple');
+			if (this.audioInputFile && this.options.get('audioMultipleFile')) this.audioInputFile.removeAttribute('multiple');
 		} else {
-			if (this.audioInputFile && this.options.audioMultipleFile) this.audioInputFile.removeAttribute('multiple');
+			if (this.audioInputFile && this.options.get('audioMultipleFile')) this.audioInputFile.removeAttribute('multiple');
 		}
 	},
 
@@ -174,7 +174,7 @@ Audio_.prototype = {
 			}
 		}
 
-		const limitSize = this.options.audioUploadSizeLimit;
+		const limitSize = this.options.get('audioUploadSizeLimit');
 		if (limitSize > 0 && fileSize + this.fileManager.getSize() > limitSize) {
 			const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable total audios: ' + limitSize / 1000 + 'KB';
 			if (typeof this.events.onAudioUploadError !== 'function' || this.events.onAudioUploadError(err, { limitSize: limitSize, currentSize: this.fileManager.getSize(), uploadSize: fileSize })) {
@@ -232,11 +232,11 @@ Audio_.prototype = {
 		if (!isUpdate) {
 			element.src = src;
 			const figure = Figure.CreateContainer(element);
-			if (!this.component.insert(figure.container, false, false, !this.options.mediaAutoSelect)) {
+			if (!this.component.insert(figure.container, false, false, !this.options.get('mediaAutoSelect'))) {
 				this.editor.focus();
 				return;
 			}
-			if (!this.options.mediaAutoSelect) {
+			if (!this.options.get('mediaAutoSelect')) {
 				const line = this.format.addLine(figure.container, null);
 				if (line) this.selection.setRange(line, 0, line, 0);
 			}
@@ -266,11 +266,10 @@ Audio_.prototype = {
 	_setTagAttrs: function (element) {
 		element.setAttribute('controls', true);
 
-		const attrs = this.options.audioTagAttrs;
+		const attrs = this.options.get('audioTagAttrs');
 		if (!attrs) return;
 
 		for (let key in attrs) {
-			if (!attrs.hasOwnProperty(key)) continue;
 			element.setAttribute(key, attrs[key]);
 		}
 	},
@@ -283,7 +282,7 @@ Audio_.prototype = {
 		}
 
 		const uploadFiles = this.modal.isUpdate ? [files[0]] : files;
-		this.fileManager.upload(this.options.audioUploadUrl, this.options.audioUploadHeader, uploadFiles, UploadCallBack.bind(this, info), this.events.onAudioUploadError);
+		this.fileManager.upload(this.options.get('audioUploadUrl'), this.options.get('audioUploadHeader'), uploadFiles, UploadCallBack.bind(this, info), this.events.onAudioUploadError);
 	},
 
 	_error: function (message, response) {
@@ -349,7 +348,7 @@ function UploadCallBack(info, xmlHttp) {
 
 function OnLinkPreview(e) {
 	const value = e.target.value.trim();
-	this.urlValue = this.preview.textContent = !value ? '' : this.options.linkProtocol && value.indexOf('://') === -1 && value.indexOf('#') !== 0 ? this.options.linkProtocol + value : value.indexOf('://') === -1 ? '/' + value : value;
+	this.urlValue = this.preview.textContent = !value ? '' : this.options.get('linkProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0 ? this.options.get('linkProtocol') + value : value.indexOf('://') === -1 ? '/' + value : value;
 }
 
 // Disable url input when uploading files
@@ -373,7 +372,7 @@ function FileInputChange() {
 }
 
 function CreateHTML_modal(editor) {
-	const option = editor.options;
+	const options = editor.options;
 	const lang = editor.lang;
 	let html =
 		'<form method="post" enctype="multipart/form-data">' +
@@ -391,7 +390,7 @@ function CreateHTML_modal(editor) {
 		'</div>' +
 		'<div class="se-modal-body">';
 
-	if (option.audioFileInput) {
+	if (options.get('audioFileInput')) {
 		html +=
 			'' +
 			'<div class="se-modal-form">' +
@@ -400,9 +399,9 @@ function CreateHTML_modal(editor) {
 			'</label>' +
 			'<div class="se-modal-form-files">' +
 			'<input class="se-input-form _se_audio_files" data-focus type="file" accept="' +
-			option.audioAccept +
+			options.get('audioAccept') +
 			'"' +
-			(option.audioMultipleFile ? ' multiple="multiple"' : '') +
+			(options.get('audioMultipleFile') ? ' multiple="multiple"' : '') +
 			'/>' +
 			'<button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="' +
 			lang.controller.remove +
@@ -415,7 +414,7 @@ function CreateHTML_modal(editor) {
 			'</div>';
 	}
 
-	if (option.audioUrlInput) {
+	if (options.get('audioUrlInput')) {
 		html += '' + '<div class="se-modal-form">' + '<label>' + lang.modalBox.audioBox.url + '</label>' + '<input class="se-input-form se-input-url" data-focus type="text" />' + '<pre class="se-link-preview"></pre>' + '</div>';
 	}
 

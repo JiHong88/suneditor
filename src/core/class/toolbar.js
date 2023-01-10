@@ -85,7 +85,7 @@ Toolbar.prototype = {
 		const responsiveSize = this._rButtonsize;
 		if (responsiveSize) {
 			let w = 0;
-			if ((this.editor.isBalloon || this.editor.isInline) && this.options.toolbar_width === 'auto') {
+			if ((this.editor.isBalloon || this.editor.isInline) && this.options.get('toolbar_width') === 'auto') {
 				w = this.editor.frameContext.get('topArea').offsetWidth;
 			} else {
 				w = this.editor.toolContext.get('toolbar.main').offsetWidth;
@@ -116,7 +116,7 @@ Toolbar.prototype = {
 		this.menu.containerOff();
 		this.menu._moreLayerOff();
 
-		const newToolbar = CreateToolBar(buttonList, this.plugins.__init__, this.options);
+		const newToolbar = CreateToolBar(buttonList, this.plugins, this.options);
 		this.editor.toolContext.get('toolbar.main').replaceChild(newToolbar._buttonTray, this.editor.toolContext.get('toolbar._buttonTray'));
 		this.editor.frameContext.set('toolbar._buttonTray', newToolbar._buttonTray);
 
@@ -133,16 +133,16 @@ Toolbar.prototype = {
 
 	_resetSticky: function () {
 		const toolbar = this.editor.toolContext.get('toolbar.main');
-		if (this.status.isFullScreen || toolbar.offsetWidth === 0 || this.options.toolbar_sticky < 0) return;
+		if (this.status.isFullScreen || toolbar.offsetWidth === 0 || this.options.get('toolbar_sticky') < 0) return;
 
 		const minHeight = this.editor.frameContext.get('_minHeight');
 		const editorHeight = this.editor.frameContext.get('editorArea').offsetHeight;
 		const editorOffset = this.offset.getGlobal(this.editor.frameContext.get('topArea'));
-		const y = (this._w.scrollY || this._d.documentElement.scrollTop) + this.options.toolbar_sticky;
-		const t = (this.editor.isBalloon || this.editor.isInline ? editorOffset.top : this.offset.getGlobal(this.options.toolbar_container).top) - (this.editor.isInline ? toolbar.offsetHeight : 0);
+		const y = (this._w.scrollY || this._d.documentElement.scrollTop) + this.options.get('toolbar_sticky');
+		const t = (this.editor.isBalloon || this.editor.isInline ? editorOffset.top : this.offset.getGlobal(this.options.get('toolbar_container')).top) - (this.editor.isInline ? toolbar.offsetHeight : 0);
 		const inlineOffset = 1;
 
-		const offSticky = !this.options.toolbar_container ? editorHeight + t + this.options.toolbar_sticky - y - minHeight : editorOffset.top - this._w.scrollY + editorHeight - minHeight - this.options.toolbar_sticky - toolbar.offsetHeight;
+		const offSticky = !this.options.get('toolbar_container') ? editorHeight + t + this.options.get('toolbar_sticky') - y - minHeight : editorOffset.top - this._w.scrollY + editorHeight - minHeight - this.options.get('toolbar_sticky') - toolbar.offsetHeight;
 		if (y < t) {
 			this._offSticky();
 		} else if (offSticky < 0) {
@@ -156,12 +156,12 @@ Toolbar.prototype = {
 	_onSticky: function (inlineOffset) {
 		const toolbar = this.editor.toolContext.get('toolbar.main');
 
-		if (!this.editor.isInline && !this.options.toolbar_container) {
+		if (!this.editor.isInline && !this.options.get('toolbar_container')) {
 			this.editor.frameContext.get('_stickyDummy').style.height = toolbar.offsetHeight + 'px';
 			this.editor.frameContext.get('_stickyDummy').style.display = 'block';
 		}
 
-		toolbar.style.top = this.options.toolbar_sticky + inlineOffset + 'px';
+		toolbar.style.top = this.options.get('toolbar_sticky') + inlineOffset + 'px';
 		toolbar.style.width = this.editor.isInline ? this._inlineToolbarAttr.width : toolbar.offsetWidth + 'px';
 		domUtils.addClass(toolbar, 'se-toolbar-sticky');
 		this._sticky = true;
@@ -258,10 +258,10 @@ Toolbar.prototype = {
 			this._setBalloonPosition(positionTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop);
 		}
 
-		if (this.options.toolbar_container) {
+		if (this.options.get('toolbar_container')) {
 			const editorParent = topArea.parentElement;
 
-			let container = this.options.toolbar_container;
+			let container = this.options.get('toolbar_container');
 			let left = container.offsetLeft;
 			let top = container.offsetTop;
 
@@ -335,8 +335,8 @@ Toolbar.prototype = {
 		toolbar.style.visibility = 'hidden';
 		toolbar.style.display = 'block';
 		toolbar.style.top = '0px';
-		this._inlineToolbarAttr.width = toolbar.style.width = this.options.toolbar_width;
-		this._inlineToolbarAttr.top = toolbar.style.top = (this.options.toolbar_container ? -1 + (this.offset.getGlobal(this.editor.frameContext.get('topArea')).top - this.offset.getGlobal(toolbar).top - toolbar.offsetHeight) : -1 - toolbar.offsetHeight) + 'px';
+		this._inlineToolbarAttr.width = toolbar.style.width = this.options.get('toolbar_width');
+		this._inlineToolbarAttr.top = toolbar.style.top = (this.options.get('toolbar_container') ? -1 + (this.offset.getGlobal(this.editor.frameContext.get('topArea')).top - this.offset.getGlobal(toolbar).top - toolbar.offsetHeight) : -1 - toolbar.offsetHeight) + 'px';
 
 		if (typeof this.events.onShowInline === 'function') this.events.onShowInline(toolbar);
 

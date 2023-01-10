@@ -319,7 +319,7 @@ window.e=suneditor.create(
 		editor1: {
 			target: document.querySelector('#multi_editor_1'),
 			options: {
-				value: '<p>ed1</p>',
+				// value: '<p>ed1</p>',
 				placeholder: 'place1'
 			}
 		},
@@ -348,7 +348,7 @@ window.e=suneditor.create(
 	},
 	{
 		// value: 'Common value',
-		plugins: plugins,
+		// plugins: plugins,
 		toolbar_container: '#root_toolbar_container',
 		// statusbar_container: '#root_statusbar_container',
 		toolbar_sticky: 0,

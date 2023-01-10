@@ -1,6 +1,6 @@
 import _icons from '../assets/defaultIcons';
 import _defaultLang from '../langs/en';
-import Context, { CreateContextElement } from './context';
+import { CreateToolContext, CreateFrameContext } from './context';
 import { domUtils, numbers, converter, env } from '../helper';
 
 const _d = env._d;
@@ -24,10 +24,14 @@ const Constructor = function (editorTargets, options) {
 	if (typeof options !== 'object') options = {};
 
 	/** --- options --------------------------------------------------------------- */
-	InitOptions(options, editorTargets);
+	const optionMap = InitOptions(options, editorTargets);
+	const o = optionMap.o;
+	const plugins = optionMap.p;
+	const icons = optionMap.i;
+	const lang = optionMap.l;
 
 	/** --- carrier wrapper --------------------------------------------------------------- */
-	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper' + (options._rtl ? ' se-rtl' : '') });
+	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper' + (o.get('_rtl') ? ' se-rtl' : '') });
 
 	// modal
 	const modal = domUtils.createElement('DIV', { class: 'se-modal sun-editor-common' });
@@ -43,29 +47,30 @@ const Constructor = function (editorTargets, options) {
 	_d.body.appendChild(editor_carrier_wrapper);
 
 	/** --- toolbar --------------------------------------------------------------- */
-	const tool_bar_main = CreateToolBar(options.buttonList, options.plugins, options);
+	const tool_bar_main = CreateToolBar(o.get('buttonList'), plugins, o, icons, lang);
 	const toolbar = tool_bar_main.element;
 	toolbar.style.visibility = 'hidden';
-	if (tool_bar_main.pluginCallButtons.math) _checkKatexMath(options.katex);
+	if (tool_bar_main.pluginCallButtons.math) _checkKatexMath(o.get('katex'));
 
 	// toolbar mode
-	if (/inline/i.test(options.mode)) {
+	if (/inline/i.test(o.get('mode'))) {
 		toolbar.className += ' se-toolbar-inline';
-		toolbar.style.width = options.toolbar_width;
-	} else if (/balloon/i.test(options.mode)) {
+		toolbar.style.width = o.get('toolbar_width');
+	} else if (/balloon/i.test(o.get('mode'))) {
 		toolbar.className += ' se-toolbar-balloon';
-		toolbar.style.width = options.toolbar_width;
+		toolbar.style.width = o.get('toolbar_width');
 		toolbar.appendChild(domUtils.createElement('DIV', { class: 'se-arrow' }));
 	}
 
+	// editor frame
 	/** multi root set - start -------------------------------------------------------------- */
-	/** --- editor div --------------------------------------------------------------- */
 	const rootId = editorTargets[0].key || null;
 	const rootKeys = [];
 	const rootTargets = new _w.Map();
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
 		const editTarget = editorTargets[i];
-		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (options._rtl ? ' se-rtl' : '') });
+		const to = editTarget.options;
+		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (to.get('_rtl') ? ' se-rtl' : '') });
 		const container = domUtils.createElement('DIV', { class: 'se-container' });
 		const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' });
 
@@ -74,7 +79,7 @@ const Constructor = function (editorTargets, options) {
 		container.appendChild(toolbarShadow);
 
 		// init element
-		const initElements = _initElements(options, top_div, editTarget.options || {});
+		const initElements = _initTargetElements(o, top_div, to);
 		const bottomBar = initElements.bottomBar;
 		const status_bar = bottomBar.statusbar;
 		const wysiwyg_div = initElements.wysiwygFrame;
@@ -82,17 +87,13 @@ const Constructor = function (editorTargets, options) {
 		let textarea = initElements.codeView;
 
 		// line breaker
-		const line_breaker = domUtils.createElement('DIV', { class: 'se-line-breaker' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
-		const line_breaker_t = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
-		const line_breaker_b = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b' }, '<button class="se-btn">' + options.icons.line_break + '</button>');
-		line_breaker_t.innerHTML = line_breaker_b.innerHTML = options.icons.line_break;
+		const line_breaker = domUtils.createElement('DIV', { class: 'se-line-breaker' }, '<button class="se-btn">' + icons.line_break + '</button>');
+		const line_breaker_t = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t' }, '<button class="se-btn">' + icons.line_break + '</button>');
+		const line_breaker_b = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b' }, '<button class="se-btn">' + icons.line_break + '</button>');
+		line_breaker_t.innerHTML = line_breaker_b.innerHTML = icons.line_break;
 		editor_div.appendChild(line_breaker);
 		editor_div.appendChild(line_breaker_t);
 		editor_div.appendChild(line_breaker_b);
-
-		// statusbar
-		const statusbar_container = options.statusbar_container;
-		if (status_bar && statusbar_container) statusbar_container.appendChild(status_bar);
 
 		// append container
 		editor_div.appendChild(textarea);
@@ -100,21 +101,28 @@ const Constructor = function (editorTargets, options) {
 		container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
 		container.appendChild(editor_div);
 
+		// statusbar
+		if (status_bar) {
+			const statusbar_container = to.get('statusbar_container');
+			if (statusbar_container) statusbar_container.appendChild(status_bar);
+			else container.appendChild(status_bar);
+		}
+
+		// root setting
 		const key = editTarget.key || null;
-		if (status_bar && !statusbar_container) container.appendChild(status_bar);
-		textarea = _checkCodeMirror(options, textarea);
+		textarea = _checkCodeMirror(o, to, textarea);
 		top_div.appendChild(container);
 		top_div.setAttribute('data-se-root', key);
 
 		rootKeys.push(key);
-		rootTargets.set(key, CreateContextElement(editTarget, top_div, wysiwyg_div, textarea));
+		rootTargets.set(key, CreateFrameContext(editTarget, top_div, wysiwyg_div, textarea));
 	}
 	/** multi root set - end -------------------------------------------------------------- */
 
 	// toolbar container
-	const toolbar_container = options.toolbar_container;
+	const toolbar_container = o.get('toolbar_container');
 	if (toolbar_container) {
-		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (options._rtl ? ' se-rtl' : '') });
+		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (o.get('_rtl') ? ' se-rtl' : '') });
 		const container = domUtils.createElement('DIV', { class: 'se-container' });
 		container.appendChild(toolbar);
 		top_div.appendChild(container);
@@ -125,7 +133,12 @@ const Constructor = function (editorTargets, options) {
 	}
 
 	return {
-		commonContext: Context(toolbar, editor_carrier_wrapper, options),
+		toolContext: CreateToolContext(toolbar, editor_carrier_wrapper),
+		options: o,
+		plugins: plugins,
+		icons: icons,
+		lang: lang,
+		value: optionMap.v,
 		rootId: rootId,
 		rootKeys: rootKeys,
 		rootTargets: rootTargets,
@@ -135,18 +148,18 @@ const Constructor = function (editorTargets, options) {
 };
 
 /**
- * @description Reset the options.
- * @param {Object} context Context object
+ * @description Reset the options
+ * @param {Object} toolContext Context object
  * @param {Object} mergeOptions The new options
  * @returns {Object}
  */
-export function ResetOptions(context, originOptions, mergeOptions) {
+export function ResetOptions(toolContext, originOptions, mergeOptions) {
 	InitOptions(mergeOptions);
 
-	const tc = this.targetContext;
-	const toolbar = context.toolBar.main;
-	const editorContainer = tc.get('container');
-	const editorArea = tc.get('editorArea');
+	const fc = this.frameContext;
+	const toolbar = toolContext.get('toolBar.main');
+	const editorContainer = fc.get('container');
+	const editorArea = fc.get('editorArea');
 	const isNewToolbarContainer = mergeOptions.toolbar_container && mergeOptions.toolbar_container !== originOptions.toolbar_container;
 	const isNewToolbar = mergeOptions.lang !== originOptions.lang || mergeOptions.buttonList !== originOptions.buttonList || mergeOptions.mode !== originOptions.mode || isNewToolbarContainer;
 
@@ -164,18 +177,18 @@ export function ResetOptions(context, originOptions, mergeOptions) {
 			toolbar.parentElement.replaceChild(tool_bar.element, toolbar);
 		}
 
-		context.toolBar.main = tool_bar.element;
-		context.toolBar._menuTray = tool_bar._menuTray;
-		context.toolBar._arrow = arrow;
+		toolContext.set('toolBar.main', tool_bar.element);
+		toolContext.set('toolBar._menuTray', tool_bar._menuTray);
+		toolContext.set('toolBar._arrow', arrow);
 	}
 
-	const initElements = _initElements(mergeOptions, tc.get('topArea'), isNewToolbar ? tool_bar.element : toolbar, arrow);
+	const initElements = _initTargetElements(mergeOptions, fc.get('topArea'), isNewToolbar ? tool_bar.element : toolbar, arrow);
 	const bottomBar = initElements.bottomBar;
 	const wysiwygFrame = initElements.wysiwygFrame;
 	const placeholder_span = initElements.placeholder;
 	let code = initElements.codeView;
 
-	if (tc.get('statusbar')) domUtils.removeItem(tc.get('statusbar'));
+	if (fc.has('statusbar')) domUtils.removeItem(fc.get('statusbar'));
 	if (bottomBar.statusbar) {
 		if (mergeOptions.statusbar_container && mergeOptions.statusbar_container !== originOptions.statusbar_container) {
 			mergeOptions.statusbar_container.appendChild(bottomBar.statusbar);
@@ -190,22 +203,22 @@ export function ResetOptions(context, originOptions, mergeOptions) {
 
 	code = _checkCodeMirror(mergeOptions, code);
 
-	tc.set('statusbar', bottomBar.statusbar);
-	tc.set('navigation', bottomBar.navigation);
-	tc.set('charWrapper', bottomBar.charWrapper);
-	tc.set('charCounter', bottomBar.charCounter);
-	tc.set('wysiwygFrame', wysiwygFrame);
-	tc.set('code', code);
-	tc.set('placeholder', placeholder_span);
+	fc.set('statusbar', bottomBar.statusbar);
+	fc.set('navigation', bottomBar.navigation);
+	fc.set('charWrapper', bottomBar.charWrapper);
+	fc.set('charCounter', bottomBar.charCounter);
+	fc.set('wysiwygFrame', wysiwygFrame);
+	fc.set('code', code);
+	fc.set('placeholder', placeholder_span);
 
 	if (mergeOptions._rtl) {
-		domUtils.addClass(tc.get('topArea'), 'se-rtl');
-		domUtils.addClass(context.toolbar._wrapper, 'se-rtl');
-		domUtils.addClass(context._carrierWrapper, 'se-rtl');
+		domUtils.addClass(fc.get('topArea'), 'se-rtl');
+		domUtils.addClass(toolContext.get('toolbar._wrapper'), 'se-rtl');
+		domUtils.addClass(toolContext.get('_carrierWrapper'), 'se-rtl');
 	} else {
-		domUtils.removeClass(tc.get('topArea'), 'se-rtl');
-		domUtils.removeClass(context.toolbar._wrapper, 'se-rtl');
-		domUtils.removeClass(context._carrierWrapper, 'se-rtl');
+		domUtils.removeClass(fc.get('topArea'), 'se-rtl');
+		domUtils.removeClass(toolContext.get('toolbar._wrapper'), 'se-rtl');
+		domUtils.removeClass(toolContext.get('_carrierWrapper'), 'se-rtl');
 	}
 
 	return {
@@ -218,42 +231,32 @@ export function ResetOptions(context, originOptions, mergeOptions) {
  * @description Initialize options
  * @param {Object} options Options object
  * @param {Element|Array.<Element>} editorTargets Target textarea
+ * @returns {o:Map, p:Map} {{o: options map, p: plugins map}}
  */
 function InitOptions(options, editorTargets) {
+	const buttonList = (options.buttonList = DEFAULT_BUTTON_LIST);
+	const o = new _w.Map();
+	o.set('events', options.events || {});
+
+	/** Multi root */
 	if (options.multiRoot) {
 		if (!options.toolbar_container && !/inline|balloon/i.test(options.mode)) throw Error('[SUNEDITOR.create.fail] In multi root, The "mode" option cannot be "classic" without using the "toolbar_container" option.');
 		if (options.statusbar && !options.statusbar_container) throw Error('[SUNEDITOR.create.fail] In multi root, The "statusbar_container" option is required unless the "statusbar" option is "false".');
 	}
 
-	const plugins = {};
-	if (options.plugins) {
-		const _plugins = (options._init_plugins = options.plugins);
-		const pluginsValues = _plugins.length
-			? _plugins
-			: _w.Object.keys(_plugins).map(function (name) {
-					return _plugins[name];
-			  });
-		for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
-			p = pluginsValues[i].default || pluginsValues[i];
-			plugins[p.key] = p;
-		}
-	}
-	options.plugins = plugins;
-	options.events = options.events || {};
-
 	/** Base */
-	options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
-	options.lang = options.lang || _defaultLang;
+	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
 	// text style tags
-	const textTags = (options.textTags = [{ bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL', sub: 'SUB', sup: 'SUP' }, options.textTags || {}].reduce(function (_default, _new) {
+	const textTags = [{ bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL', sub: 'SUB', sup: 'SUP' }, options.textTags || {}].reduce(function (_default, _new) {
 		for (let key in _new) {
 			_default[key] = _new[key];
 		}
 		return _default;
-	}, {}));
-	options._spanStylesRegExp = new _w.RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi');
-	options._formatStylesRegExp = new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right' + (options.formatStyles ? '|' + options.formatStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi');
-	options._styleNodeMap = {
+	}, {});
+	o.set('textTags', textTags);
+	o.set('_spanStylesRegExp', new _w.RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi'));
+	o.set('_formatStylesRegExp', new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right' + (options.formatStyles ? '|' + options.formatStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi'));
+	o.set('_styleNodeMap', {
 		strong: textTags.bold.toLowerCase(),
 		b: textTags.bold.toLowerCase(),
 		u: textTags.underline.toLowerCase(),
@@ -265,290 +268,307 @@ function InitOptions(options, editorTargets) {
 		s: textTags.strike.toLowerCase(),
 		sub: textTags.sub.toLowerCase(),
 		sup: textTags.sup.toLowerCase()
-	};
-	options._defaultCommand = {
-		bold: options.textTags.bold,
-		underline: options.textTags.underline,
-		italic: options.textTags.italic,
-		strike: options.textTags.strike,
-		subscript: options.textTags.sub,
-		superscript: options.textTags.sup
-	};
+	});
+	o.set('_defaultCommand', {
+		bold: textTags.bold,
+		underline: textTags.underline,
+		italic: textTags.italic,
+		strike: textTags.strike,
+		subscript: textTags.sub,
+		superscript: textTags.sup
+	});
 	// text direction
-	options.textDirection = typeof options.textDirection !== 'string' ? 'ltr' : options.textDirection;
-	options._rtl = options.textDirection === 'rtl';
-	if (options._rtl) options.buttonList = options.buttonList.reverse();
-	// icons
-	options.icons =
-		!options.icons || typeof options.icons !== 'object'
-			? _icons
-			: [_icons, options.icons].reduce(function (_default, _new) {
-					for (let key in _new) {
-						if (_new.hasOwnProperty(key)) _default[key] = _new[key];
-					}
-					return _default;
-			  }, {});
-	// rtl
-	options.icons = !options._rtl
-		? options.icons
-		: [options.icons, options.icons._rtl].reduce(function (_default, _new) {
-				for (let key in _new) {
-					if (_new.hasOwnProperty(key)) _default[key] = _new[key];
-				}
-				return _default;
-		  }, {});
+	o.set('_rtl', o.get('textDirection') === 'rtl');
+	o.set('textDirection', typeof options.textDirection !== 'string' ? 'ltr' : options.textDirection);
+	o.set('buttonList', o.get('_rtl') ? buttonList.reverse() : buttonList);
+
 	// etc
-	options.callBackSave = !options.callBackSave ? null : options.callBackSave;
-	options.lineAttrReset = typeof options.lineAttrReset === 'string' && options.lineAttrReset ? (options.lineAttrReset === '*' ? '*' : new _w.RegExp('^(' + options.lineAttrReset + ')$', 'i')) : null;
-	options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
-	options.frameAttrbutes = options.frameAttrbutes || {};
-	options._editableClass = 'sun-editor-editable' + (options._rtl ? ' se-rtl' : '');
-	options._printClass = typeof options._printClass === 'string' ? options._printClass : null;
+	o.set('historyStackDelayTime', typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400);
+	o.set('frameAttrbutes', options.frameAttrbutes || {});
+	o.set('_editableClass', 'sun-editor-editable' + (o.get('_rtl') ? ' se-rtl' : ''));
+	o.set('callBackSave', options.callBackSave);
+	o.set('lineAttrReset', typeof options.lineAttrReset === 'string' && options.lineAttrReset ? (options.lineAttrReset === '*' ? '*' : new _w.RegExp('^(' + options.lineAttrReset + ')$', 'i')) : null);
+	o.set('_printClass', typeof options._printClass === 'string' ? options._printClass : null);
 
 	/** whitelist, blacklist */
 	// default line
-	options.defaultLineTag = typeof options.defaultLineTag === 'string' && options.defaultLineTag.length > 0 ? options.defaultLineTag : 'p';
-	// __defaults
-	options.__defaultElementWhitelist = (typeof options.__defaultElementWhitelist === 'string' ? options.__defaultElementWhitelist : DEFAULT_ELEMENT_WHITELIST).toLowerCase();
-	options.__defaultAttributeWhitelist = (typeof options.__defaultAttributeWhitelist === 'string' ? options.__defaultAttributeWhitelist : DEFAULT_ATTRIBUTE_WHITELIST).toLowerCase();
+	o.set('defaultLineTag', typeof options.defaultLineTag === 'string' && options.defaultLineTag.length > 0 ? options.defaultLineTag : 'p');
 	// element
-	options.elementWhitelist = (typeof options.elementWhitelist === 'string' ? options.elementWhitelist : '').toLowerCase();
-	options.elementBlacklist = _createBlacklist((typeof options.elementBlacklist === 'string' ? options.elementBlacklist : '').toLowerCase(), options.defaultLineTag);
+	o.set('elementWhitelist', (typeof options.elementWhitelist === 'string' ? options.elementWhitelist : '').toLowerCase());
+	o.set('elementBlacklist', _createBlacklist((typeof options.elementBlacklist === 'string' ? options.elementBlacklist : '').toLowerCase(), o.get('defaultLineTag')));
 	// attribute
-	options.attributeWhitelist = !options.attributeWhitelist || typeof options.attributeWhitelist !== 'object' ? null : options.attributeWhitelist;
-	options.attributeBlacklist = !options.attributeBlacklist || typeof options.attributeBlacklist !== 'object' ? null : options.attributeBlacklist;
+	o.set('attributeWhitelist', !options.attributeWhitelist || typeof options.attributeWhitelist !== 'object' ? null : options.attributeWhitelist);
+	o.set('attributeBlacklist', !options.attributeBlacklist || typeof options.attributeBlacklist !== 'object' ? null : options.attributeBlacklist);
 	// format tag
-	options.formatClosureBrLine = _createFormatInfo(options.formatClosureBrLine, (options.__defaultFormatClosureBrLine = typeof options.__defaultFormatClosureBrLine === 'string' ? options.__defaultFormatClosureBrLine : DEFAULT_FORMAT_CLOSURE_BR_LINE).toLowerCase(), options.elementBlacklist);
-	options.formatBrLine = _createFormatInfo((options.formatBrLine || '') + '|' + options.formatClosureBrLine.str, (options.__defaultFormatBrLine = typeof options.__defaultFormatBrLine === 'string' ? options.__defaultFormatBrLine : DEFAULT_FORMAT_BR_LINE).toLowerCase(), options.elementBlacklist);
-	options.formatLine = _createFormatInfo((options.formatLine || '') + '|' + options.formatBrLine.str, (options.__defaultFormatLine = typeof options.__defaultFormatLine === 'string' ? options.__defaultFormatLine : DEFAULT_FORMAT_LINE).toLowerCase(), options.elementBlacklist);
-	options.formatClosureBlock = _createFormatInfo(options.formatClosureBlock, (options.__defaultFormatClosureBlock = typeof options.__defaultFormatClosureBlock === 'string' ? options.__defaultFormatClosureBlock : DEFAULT_FORMAT_CLOSURE_BLOCK).toLowerCase(), options.elementBlacklist);
-	options.formatBlock = _createFormatInfo((options.formatBlock || '') + '|' + options.formatClosureBlock.str, (options.__defaultFormatBlock = typeof options.__defaultFormatBlock === 'string' ? options.__defaultFormatBlock : DEFAULT_FORMAT_BLOCK).toLowerCase(), options.elementBlacklist);
+	o.set('formatClosureBrLine', _createFormatInfo(options.formatClosureBrLine, (options.__defaultFormatClosureBrLine = typeof options.__defaultFormatClosureBrLine === 'string' ? options.__defaultFormatClosureBrLine : DEFAULT_FORMAT_CLOSURE_BR_LINE).toLowerCase(), o.get('elementBlacklist')));
+	o.set('formatBrLine', _createFormatInfo((options.formatBrLine || '') + '|' + o.get('formatClosureBrLine').str, (options.__defaultFormatBrLine = typeof options.__defaultFormatBrLine === 'string' ? options.__defaultFormatBrLine : DEFAULT_FORMAT_BR_LINE).toLowerCase(), o.get('elementBlacklist')));
+	o.set('formatLine', _createFormatInfo((options.formatLine || '') + '|' + o.get('formatBrLine').str, (options.__defaultFormatLine = typeof options.__defaultFormatLine === 'string' ? options.__defaultFormatLine : DEFAULT_FORMAT_LINE).toLowerCase(), o.get('elementBlacklist')));
+	o.set('formatClosureBlock', _createFormatInfo(options.formatClosureBlock, (options.__defaultFormatClosureBlock = typeof options.__defaultFormatClosureBlock === 'string' ? options.__defaultFormatClosureBlock : DEFAULT_FORMAT_CLOSURE_BLOCK).toLowerCase(), o.get('elementBlacklist')));
+	o.set('formatBlock', _createFormatInfo((options.formatBlock || '') + '|' + o.get('formatClosureBlock').str, (options.__defaultFormatBlock = typeof options.__defaultFormatBlock === 'string' ? options.__defaultFormatBlock : DEFAULT_FORMAT_BLOCK).toLowerCase(), o.get('elementBlacklist')));
+
+	/** __defaults */
+	o.set('__defaultElementWhitelist', (typeof options.__defaultElementWhitelist === 'string' ? options.__defaultElementWhitelist : DEFAULT_ELEMENT_WHITELIST).toLowerCase());
+	o.set('__defaultAttributeWhitelist', (typeof options.__defaultAttributeWhitelist === 'string' ? options.__defaultAttributeWhitelist : DEFAULT_ATTRIBUTE_WHITELIST).toLowerCase());
 	// --- create element whitelist (__defaultElementWhiteList + elementWhitelist + format[line, BrLine, Block, Closureblock, ClosureBrLine] - elementBlacklist)
-	options._editorElementWhitelist = options.elementWhitelist === '*' ? '*' : _createWhitelist(options);
+	o.set('_editorElementWhitelist', o.get('elementWhitelist') === '*' ? '*' : _createWhitelist(o));
 
 	/** Toolbar */
-	options.buttonList = !!options.buttonList ? options.buttonList : DEFAULT_BUTTON_LIST;
-	options.toolbar_width = options.toolbar_width ? (numbers.is(options.toolbar_width) ? options.toolbar_width + 'px' : options.toolbar_width) : 'auto';
-	options.toolbar_container = /inline/i.test(options.mode) ? null : typeof options.toolbar_container === 'string' ? _d.querySelector(options.toolbar_container) : options.toolbar_container;
-	options.toolbar_sticky = /balloon/i.test(options.mode) ? -1 : options.toolbar_sticky === undefined ? 0 : /^\d+/.test(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1;
-	options.toolbar_hide = !!options.toolbar_hide;
+	o.set('toolbar_width', options.toolbar_width ? (numbers.is(options.toolbar_width) ? options.toolbar_width + 'px' : options.toolbar_width) : 'auto');
+	o.set('toolbar_container', options.toolbar_container && !/inline/i.test(o.get('mode')) ? (typeof options.toolbar_container === 'string' ? _d.querySelector(options.toolbar_container) : options.toolbar_container) : null);
+	o.set('toolbar_sticky', /balloon/i.test(o.get('mode')) ? -1 : options.toolbar_sticky === undefined ? 0 : /^\d+/.test(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1);
+	o.set('toolbar_hide', !!options.toolbar_hide);
 
-	// value
-	options.value = typeof options.value === 'string' ? options.value : null;
-	options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
-	// styles
-	options.editorCSSText = typeof options.editorCSSText === 'string' ? options.editorCSSText : '';
-	options.width = options.width ? (numbers.is(options.width) ? options.width + 'px' : options.width) : '100%';
-	options.minWidth = (numbers.is(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
-	options.maxWidth = (numbers.is(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
-	options.height = options.height ? (numbers.is(options.height) ? options.height + 'px' : options.height) : 'auto';
-	options.minHeight = (numbers.is(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
-	options.maxHeight = (numbers.is(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
-	options._editorStyles = converter._setDefaultOptionStyle(options, options.editorCSSText);
-
-	/** Status bar */
-	/** Multi root */
-	if (options.multiRoot) InitMultiRootOptions(editorTargets);
-
-	options.statusbar = options.statusbar === undefined ? true : options.statusbar;
-	options.statusbar_showPathLabel = !options.statusbar ? false : typeof options.statusbar_showPathLabel === 'boolean' ? options.statusbar_showPathLabel : true;
-	options.statusbar_resizeEnable = options.statusbar_resizeEnable === undefined ? true : !!options.statusbar_resizeEnable;
-	options.statusbar_container = typeof options.statusbar_container === 'string' ? _d.querySelector(options.statusbar_container) : options.statusbar_container;
-	// status bar - character count
-	options.charCounter = options.charCounter_max > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
-	options.charCounter_max = numbers.is(options.charCounter_max) && options.charCounter_max > -1 ? options.charCounter_max * 1 : null;
-	options.charCounter_label = typeof options.charCounter_label === 'string' ? options.charCounter_label.trim() : null;
-	options.charCounter_type = typeof options.charCounter_type === 'string' ? options.charCounter_type : 'char';
+	/** styles */
+	InitRootOptions(editorTargets, o, options.multiRoot);
 
 	/** IFrame */
-	options.iframe = !!options.iframe_fullPage || !!options.iframe;
-	options.iframe_fullPage = !!options.iframe_fullPage;
-	options.iframe_attributes = options.iframe_attributes || {};
-	options.iframe_cssFileName = options.iframe ? (typeof options.iframe_cssFileName === 'string' ? [options.iframe_cssFileName] : options.iframe_cssFileName || ['suneditor']) : null;
+	o.set('iframe', !!options.iframe_fullPage || !!options.iframe);
+	o.set('iframe_fullPage', !!options.iframe_fullPage);
+	o.set('iframe_attributes', options.iframe_attributes || {});
+	o.set('iframe_cssFileName', options.iframe ? (typeof options.iframe_cssFileName === 'string' ? [options.iframe_cssFileName] : options.iframe_cssFileName || ['suneditor']) : null);
 
 	/** Key actions */
-	options.tabDisable = !!options.tabDisable;
-	options.shortcutsDisable = _w.Array.isArray(options.shortcutsDisable) ? options.shortcutsDisable : [];
-	options.shortcutsHint = options.shortcutsHint === undefined ? true : !!options.shortcutsHint;
+	o.set('tabDisable', !!options.tabDisable);
+	o.set('shortcutsDisable', _w.Array.isArray(options.shortcutsDisable) ? options.shortcutsDisable : []);
+	o.set('shortcutsHint', options.shortcutsHint === undefined ? true : !!options.shortcutsHint);
 
 	/** View */
-	options.fullScreenOffset = options.fullScreenOffset === undefined ? 0 : /^\d+/.test(options.fullScreenOffset) ? numbers.get(options.fullScreenOffset, 0) : 0;
-	options.previewTemplate = typeof options.previewTemplate === 'string' ? options.previewTemplate : null;
-	options.printTemplate = typeof options.printTemplate === 'string' ? options.printTemplate : null;
+	o.set('fullScreenOffset', options.fullScreenOffset === undefined ? 0 : /^\d+/.test(options.fullScreenOffset) ? numbers.get(options.fullScreenOffset, 0) : 0);
+	o.set('previewTemplate', typeof options.previewTemplate === 'string' ? options.previewTemplate : null);
+	o.set('printTemplate', typeof options.printTemplate === 'string' ? options.printTemplate : null);
 
 	/** Defining menu items */
-	options.hrItems = !options.hrItems ? null : options.hrItems;
-	options.font = !options.font ? ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'] : options.font;
-	options.fontSize = !options.fontSize ? null : options.fontSize;
-	options.formats = !options.formats ? null : options.formats;
-	options.colorList_font = !options.colorList_font ? null : options.colorList_font;
-	options.colorList_background = !options.colorList_background ? null : options.colorList_background;
-	options.lineHeights = !options.lineHeights ? null : options.lineHeights;
-	options.paragraphStyles = !options.paragraphStyles ? null : options.paragraphStyles;
-	options.textStyles = !options.textStyles ? null : options.textStyles;
-	options.fontSizeUnit = typeof options.fontSizeUnit === 'string' ? options.fontSizeUnit.trim().toLowerCase() || 'px' : 'px';
-	options.alignItems = typeof options.alignItems === 'object' ? options.alignItems : options._rtl ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'];
-	options.templates = !options.templates ? null : options.templates;
-	options.mathFontSize = !!options.mathFontSize
-		? options.mathFontSize
-		: [
-				{
-					text: '1',
-					value: '1em'
-				},
-				{
-					text: '1.5',
-					value: '1.5em'
-				},
-				{
-					text: '2',
-					value: '2em'
-				},
-				{
-					text: '2.5',
-					value: '2.5em'
-				}
-		  ];
+	o.set('hrItems', !options.hrItems ? null : options.hrItems);
+	o.set('font', !options.font ? ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'] : options.font);
+	o.set('fontSize', !options.fontSize ? null : options.fontSize);
+	o.set('formats', !options.formats ? null : options.formats);
+	o.set('colorList_font', !options.colorList_font ? null : options.colorList_font);
+	o.set('colorList_background', !options.colorList_background ? null : options.colorList_background);
+	o.set('lineHeights', !options.lineHeights ? null : options.lineHeights);
+	o.set('paragraphStyles', !options.paragraphStyles ? null : options.paragraphStyles);
+	o.set('textStyles', !options.textStyles ? null : options.textStyles);
+	o.set('fontSizeUnit', typeof options.fontSizeUnit === 'string' ? options.fontSizeUnit.trim().toLowerCase() || 'px' : 'px');
+	o.set('alignItems', typeof options.alignItems === 'object' ? options.alignItems : o.get('_rtl') ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify']);
+	o.set('templates', !options.templates ? null : options.templates);
+	o.set(
+		'mathFontSize',
+		!!options.mathFontSize
+			? options.mathFontSize
+			: [
+					{
+						text: '1',
+						value: '1em'
+					},
+					{
+						text: '1.5',
+						value: '1.5em'
+					},
+					{
+						text: '2',
+						value: '2em'
+					},
+					{
+						text: '2.5',
+						value: '2.5em'
+					}
+			  ]
+	);
 
 	/** --- Media */
-	options.mediaAutoSelect = options.mediaAutoSelect === undefined ? true : !!options.mediaAutoSelect;
+	o.set('mediaAutoSelect', options.mediaAutoSelect === undefined ? true : !!options.mediaAutoSelect);
 
 	/** Image */
-	options.imageResizing = options.imageResizing === undefined ? true : options.imageResizing;
-	options.imageWidth = !options.imageWidth ? 'auto' : numbers.is(options.imageWidth) ? options.imageWidth + 'px' : options.imageWidth;
-	options.imageHeight = !options.imageHeight ? 'auto' : numbers.is(options.imageHeight) ? options.imageHeight + 'px' : options.imageHeight;
-	options.imageControls =
-		options.imageControls || !options.imageResizing
+	o.set('imageResizing', options.imageResizing === undefined ? true : options.imageResizing);
+	o.set('imageWidth', !options.imageWidth ? 'auto' : numbers.is(options.imageWidth) ? options.imageWidth + 'px' : options.imageWidth);
+	o.set('imageHeight', !options.imageHeight ? 'auto' : numbers.is(options.imageHeight) ? options.imageHeight + 'px' : options.imageHeight);
+	o.set(
+		'imageControls',
+		options.imageControls || !o.get('imageResizing')
 			? [['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']]
 			: [
 					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
 					['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']
-			  ];
-
+			  ]
+	);
 	// @todo
-	options.imageHeightShow = options.imageHeightShow === undefined ? true : !!options.imageHeightShow;
-	options.imageAlignShow = options.imageAlignShow === undefined ? true : !!options.imageAlignShow;
-	options.imageSizeOnlyPercentage = !!options.imageSizeOnlyPercentage;
-	options._imageSizeUnit = options.imageSizeOnlyPercentage ? '%' : 'px';
-	options.imageRotation = options.imageRotation !== undefined ? options.imageRotation : !(options.imageSizeOnlyPercentage || !options.imageHeightShow);
-	options.imageFileInput = options.imageFileInput === undefined ? true : options.imageFileInput;
-	options.imageUrlInput = options.imageUrlInput === undefined || !options.imageFileInput ? true : options.imageUrlInput;
-	options.imageUploadHeader = options.imageUploadHeader || null;
-	options.imageUploadUrl = typeof options.imageUploadUrl === 'string' ? options.imageUploadUrl : null;
-	options.imageUploadSizeLimit = /\d+/.test(options.imageUploadSizeLimit) ? numbers.get(options.imageUploadSizeLimit, 0) : null;
-	options.imageMultipleFile = !!options.imageMultipleFile;
-	options.imageAccept = typeof options.imageAccept !== 'string' || options.imageAccept.trim() === '*' ? 'image/*' : options.imageAccept.trim() || 'image/*';
+	o.set('imageHeightShow', options.imageHeightShow === undefined ? true : !!options.imageHeightShow);
+	o.set('imageAlignShow', options.imageAlignShow === undefined ? true : !!options.imageAlignShow);
+	o.set('imageSizeOnlyPercentage', !!options.imageSizeOnlyPercentage);
+	o.set('_imageSizeUnit', o.get('imageSizeOnlyPercentage') ? '%' : 'px');
+	o.set('imageRotation', options.imageRotation !== undefined ? options.imageRotation : !(o.get('imageSizeOnlyPercentage') || !o.get('imageHeightShow')));
+	o.set('imageFileInput', options.imageFileInput === undefined ? true : options.imageFileInput);
+	o.set('imageUrlInput', options.imageUrlInput === undefined || !options.imageFileInput ? true : options.imageUrlInput);
+	o.set('imageUploadHeader', options.imageUploadHeader || null);
+	o.set('imageUploadUrl', typeof options.imageUploadUrl === 'string' ? options.imageUploadUrl : null);
+	o.set('imageUploadSizeLimit', /\d+/.test(options.imageUploadSizeLimit) ? numbers.get(options.imageUploadSizeLimit, 0) : null);
+	o.set('imageMultipleFile', !!options.imageMultipleFile);
+	o.set('imageAccept', typeof options.imageAccept !== 'string' || options.imageAccept.trim() === '*' ? 'image/*' : options.imageAccept.trim() || 'image/*');
 
 	/** Image - image gallery */
-	options.imageGalleryUrl = typeof options.imageGalleryUrl === 'string' ? options.imageGalleryUrl : null;
-	options.imageGalleryHeader = options.imageGalleryHeader || null;
+	o.set('imageGalleryUrl', typeof options.imageGalleryUrl === 'string' ? options.imageGalleryUrl : null);
+	o.set('imageGalleryHeader', options.imageGalleryHeader || null);
 
 	/** Video */
-	options.videoResizing = options.videoResizing === undefined ? true : options.videoResizing;
-	options.videoWidth = !options.videoWidth || !numbers.get(options.videoWidth, 0) ? '' : numbers.is(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth;
-	options.videoHeight = !options.videoHeight || !numbers.get(options.videoHeight, 0) ? '' : numbers.is(options.videoHeight) ? options.videoHeight + 'px' : options.videoHeight;
-	options.videoControls =
-		options.videoControls || !options.videoResizing
+	o.set('videoResizing', options.videoResizing === undefined ? true : options.videoResizing);
+	o.set('videoWidth', !options.videoWidth || !numbers.get(options.videoWidth, 0) ? '' : numbers.is(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth);
+	o.set('videoHeight', !options.videoHeight || !numbers.get(options.videoHeight, 0) ? '' : numbers.is(options.videoHeight) ? options.videoHeight + 'px' : options.videoHeight);
+	o.set(
+		'videoControls',
+		options.videoControls || !o.get('videoResizing')
 			? [['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']]
 			: [
 					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
 					['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']
-			  ];
-
+			  ]
+	);
 	// @todo
-	options.videoRatioShow = options.videoRatioShow === undefined ? true : !!options.videoRatioShow;
-	options.videoRatio = numbers.get(options.videoRatio, 4) || 0.5625;
-	options.videoRatioList = !options.videoRatioList ? null : options.videoRatioList;
+	o.set('videoRatioShow', options.videoRatioShow === undefined ? true : !!options.videoRatioShow);
+	o.set('videoRatio', numbers.get(options.videoRatio, 4) || 0.5625);
+	o.set('videoRatioList', !options.videoRatioList ? null : options.videoRatioList);
 	// @todo
-	options.videoHeightShow = options.videoHeightShow === undefined ? true : !!options.videoHeightShow;
-	options.videoAlignShow = options.videoAlignShow === undefined ? true : !!options.videoAlignShow;
-	options.videoSizeOnlyPercentage = !!options.videoSizeOnlyPercentage;
-	options._videoSizeUnit = options.videoSizeOnlyPercentage ? '%' : 'px';
-	options.videoRotation = options.videoRotation !== undefined ? options.videoRotation : !(options.videoSizeOnlyPercentage || !options.videoHeightShow);
-	options.youtubeQuery = (options.youtubeQuery || '').replace('?', '');
-	options.videoFileInput = !!options.videoFileInput;
-	options.videoUrlInput = options.videoUrlInput === undefined || !options.videoFileInput ? true : options.videoUrlInput;
-	options.videoUploadHeader = options.videoUploadHeader || null;
-	options.videoUploadUrl = typeof options.videoUploadUrl === 'string' ? options.videoUploadUrl : null;
-	options.videoUploadSizeLimit = /\d+/.test(options.videoUploadSizeLimit) ? numbers.get(options.videoUploadSizeLimit, 0) : null;
-	options.videoMultipleFile = !!options.videoMultipleFile;
-	options.videoTagAttrs = options.videoTagAttrs || null;
-	options.videoIframeAttrs = options.videoIframeAttrs || null;
-	options.videoAccept = typeof options.videoAccept !== 'string' || options.videoAccept.trim() === '*' ? 'video/*' : options.videoAccept.trim() || 'video/*';
+	o.set('videoHeightShow', options.videoHeightShow === undefined ? true : !!options.videoHeightShow);
+	o.set('videoAlignShow', options.videoAlignShow === undefined ? true : !!options.videoAlignShow);
+	o.set('videoSizeOnlyPercentage', !!options.videoSizeOnlyPercentage);
+	o.set('_videoSizeUnit', o.get('videoSizeOnlyPercentage') ? '%' : 'px');
+	o.set('videoRotation', options.videoRotation !== undefined ? options.videoRotation : !(o.get('videoSizeOnlyPercentage') || !o.get('videoHeightShow')));
+	o.set('youtubeQuery', (options.youtubeQuery || '').replace('?', ''));
+	o.set('videoFileInput', !!options.videoFileInput);
+	o.set('videoUrlInput', options.videoUrlInput === undefined || !options.videoFileInput ? true : options.videoUrlInput);
+	o.set('videoUploadHeader', options.videoUploadHeader || null);
+	o.set('videoUploadUrl', typeof options.videoUploadUrl === 'string' ? options.videoUploadUrl : null);
+	o.set('videoUploadSizeLimit', /\d+/.test(options.videoUploadSizeLimit) ? numbers.get(options.videoUploadSizeLimit, 0) : null);
+	o.set('videoMultipleFile', !!options.videoMultipleFile);
+	o.set('videoTagAttrs', options.videoTagAttrs || null);
+	o.set('videoIframeAttrs', options.videoIframeAttrs || null);
+	o.set('videoAccept', typeof options.videoAccept !== 'string' || options.videoAccept.trim() === '*' ? 'video/*' : options.videoAccept.trim() || 'video/*');
 
 	/** Audio */
-	options.audioWidth = !options.audioWidth ? '' : numbers.is(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth;
-	options.audioHeight = !options.audioHeight ? '' : numbers.is(options.audioHeight) ? options.audioHeight + 'px' : options.audioHeight;
-	options.audioFileInput = !!options.audioFileInput;
-	options.audioUrlInput = options.audioUrlInput === undefined || !options.audioFileInput ? true : options.audioUrlInput;
-	options.audioUploadHeader = options.audioUploadHeader || null;
-	options.audioUploadUrl = typeof options.audioUploadUrl === 'string' ? options.audioUploadUrl : null;
-	options.audioUploadSizeLimit = /\d+/.test(options.audioUploadSizeLimit) ? numbers.get(options.audioUploadSizeLimit, 0) : null;
-	options.audioMultipleFile = !!options.audioMultipleFile;
-	options.audioTagAttrs = options.audioTagAttrs || null;
-	options.audioAccept = typeof options.audioAccept !== 'string' || options.audioAccept.trim() === '*' ? 'audio/*' : options.audioAccept.trim() || 'audio/*';
+	o.set('audioWidth', !options.audioWidth ? '' : numbers.is(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth);
+	o.set('audioHeight', !options.audioHeight ? '' : numbers.is(options.audioHeight) ? options.audioHeight + 'px' : options.audioHeight);
+	o.set('audioFileInput', !!options.audioFileInput);
+	o.set('audioUrlInput', options.audioUrlInput === undefined || !options.audioFileInput ? true : options.audioUrlInput);
+	o.set('audioUploadHeader', options.audioUploadHeader || null);
+	o.set('audioUploadUrl', typeof options.audioUploadUrl === 'string' ? options.audioUploadUrl : null);
+	o.set('audioUploadSizeLimit', /\d+/.test(options.audioUploadSizeLimit) ? numbers.get(options.audioUploadSizeLimit, 0) : null);
+	o.set('audioMultipleFile', !!options.audioMultipleFile);
+	o.set('audioTagAttrs', options.audioTagAttrs || null);
+	o.set('audioAccept', typeof options.audioAccept !== 'string' || options.audioAccept.trim() === '*' ? 'audio/*' : options.audioAccept.trim() || 'audio/*');
 
 	/** Table */
-	options.tableCellControllerPosition = typeof options.tableCellControllerPosition === 'string' ? options.tableCellControllerPosition.toLowerCase() : 'cell';
+	o.set('tableCellControllerPosition', typeof options.tableCellControllerPosition === 'string' ? options.tableCellControllerPosition.toLowerCase() : 'cell');
 
 	/** Link */
-	options.linkTargetNewWindow = !!options.linkTargetNewWindow;
-	options.linkProtocol = typeof options.linkProtocol === 'string' ? options.linkProtocol : null;
-	options.linkRel = _w.Array.isArray(options.linkRel) ? options.linkRel : [];
-	options.linkRelDefault = options.linkRelDefault || {};
+	o.set('linkTargetNewWindow', !!options.linkTargetNewWindow);
+	o.set('linkProtocol', typeof options.linkProtocol === 'string' ? options.linkProtocol : null);
+	o.set('linkRel', _w.Array.isArray(options.linkRel) ? options.linkRel : []);
+	o.set('linkRelDefault', options.linkRelDefault || {});
 
 	/** External library */
 	// CodeMirror
 	if (options.codeMirror) {
+		o.set('codeMirror', options.codeMirro);
 		if (options.codeMirror.EditorView) {
-			options.codeMirror6Editor = true;
+			o.set('codeMirror6Editor', true);
 		} else if (options.codeMirror.src) {
-			options.codeMirror5Editor = true;
+			o.set('codeMirror5Editor', true);
 		} else {
 			console.warn('[SUNEDITOR.options.codeMirror.fail] The codeMirror option is set incorrectly.');
-			options.codeMirror = null;
+			o.set('codeMirror', null);
 		}
 	}
 
 	// katex (Math plugin)
-	if (options.katex && !options.katex.src) {
-		console.warn('[SUNEDITOR.options.katex.fail] The katex option is set incorrectly.');
-		options.katex = null;
+	if (options.katex) {
+		if (!options.katex.src) {
+			console.warn('[SUNEDITOR.options.katex.fail] The katex option is set incorrectly.');
+			o.set('katex', null);
+		} else {
+			o.set('katex', options.katex);
+		}
 	}
 
 	/** Private options */
-	options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle'];
-	// options.__defaultFontSize;
+	o.set('__listCommonStyle', options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle']);
+	o.set('__defaultFontSize', options.__defaultFontSize);
+
+	/** --- Plugins ------------------------------------------------------------------------------------------ */
+	const plugins = {};
+	if (options.plugins) {
+		const _plugins = options.plugins;
+		const pluginsValues = numbers.is(_plugins.length)
+			? _plugins
+			: _w.Object.keys(_plugins).map(function (name) {
+					return _plugins[name];
+			  });
+		for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
+			p = pluginsValues[i].default || pluginsValues[i];
+			plugins[p.key] = p;
+		}
+	}
+
+	/** --- Icons ------------------------------------------------------------------------------------------ */
+	let icons =
+		!options.icons || typeof options.icons !== 'object'
+			? _icons
+			: [_icons, options.icons].reduce(function (_default, _new) {
+					for (let key in _new) {
+						_default[key] = _new[key];
+					}
+					return _default;
+			  }, {});
+	// rtl
+	if (o.get('_rtl')) {
+		icons = [o.get('icons'), o.get('icons')._rtl].reduce(function (_default, _new) {
+			for (let key in _new) {
+				_default[key] = _new[key];
+			}
+			return _default;
+		}, {});
+	}
+
+	return {
+		o: o,
+		p: plugins,
+		i: icons,
+		l: options.lang || _defaultLang,
+		v: (options.value = typeof options.value === 'string' ? options.value : null)
+	};
 }
 
-function InitMultiRootOptions(editorTargets) {
-	for (let i = 0, len = editorTargets.length, options; i < len; i++) {
-		options = editorTargets.options;
-		if (!options) continue;
-
-		// value
-		options.value = typeof options.value === 'string' ? options.value : null;
-		options.placeholder = typeof options.placeholder === 'string' ? options.placeholder : null;
-		// styles
-		options.editorCSSText = typeof options.editorCSSText === 'string' ? options.editorCSSText : '';
-		options.width = options.width ? (numbers.is(options.width) ? options.width + 'px' : options.width) : '100%';
-		options.minWidth = (numbers.is(options.minWidth) ? options.minWidth + 'px' : options.minWidth) || '';
-		options.maxWidth = (numbers.is(options.maxWidth) ? options.maxWidth + 'px' : options.maxWidth) || '';
-		options.height = options.height ? (numbers.is(options.height) ? options.height + 'px' : options.height) : 'auto';
-		options.minHeight = (numbers.is(options.minHeight) ? options.minHeight + 'px' : options.minHeight) || '';
-		options.maxHeight = (numbers.is(options.maxHeight) ? options.maxHeight + 'px' : options.maxHeight) || '';
-		options._editorStyles = converter._setDefaultOptionStyle(options, options.editorCSSText);
-		// status bar
-		options.statusbar = options.statusbar === undefined ? true : options.statusbar;
-		options.statusbar_showPathLabel = !options.statusbar ? false : typeof options.statusbar_showPathLabel === 'boolean' ? options.statusbar_showPathLabel : true;
-		options.statusbar_resizeEnable = options.statusbar_resizeEnable === undefined ? true : !!options.statusbar_resizeEnable;
-		options.statusbar_container = typeof options.statusbar_container === 'string' ? _d.querySelector(options.statusbar_container) : options.statusbar_container;
-		// status bar - character count
-		options.charCounter = options.charCounter_max > 0 ? true : typeof options.charCounter === 'boolean' ? options.charCounter : false;
-		options.charCounter_max = numbers.is(options.charCounter_max) && options.charCounter_max > -1 ? options.charCounter_max * 1 : null;
-		options.charCounter_label = typeof options.charCounter_label === 'string' ? options.charCounter_label.trim() : null;
-		options.charCounter_type = typeof options.charCounter_type === 'string' ? options.charCounter_type : 'char';
+function InitRootOptions(editorTargets, options, isMultiRoot) {
+	if (!isMultiRoot) {
+		InitFrameOptions(options, options);
+		return;
 	}
+
+	for (let i = 0, len = editorTargets.length; i < len; i++) {
+		InitFrameOptions(editorTargets[i].options || {}, (editorTargets[i].options = new _w.Map()));
+	}
+}
+
+function InitFrameOptions(to, o) {
+	// value
+	o.set('value', to.value);
+	o.set('placeholder', to.placeholder);
+	// styles
+	o.set('width', to.width ? (numbers.is(to.width) ? to.width + 'px' : to.width) : '100%');
+	o.set('minWidth', (numbers.is(to.minWidth) ? to.minWidth + 'px' : to.minWidth) || '');
+	o.set('maxWidth', (numbers.is(to.maxWidth) ? to.maxWidth + 'px' : to.maxWidth) || '');
+	o.set('height', to.height ? (numbers.is(to.height) ? to.height + 'px' : to.height) : 'auto');
+	o.set('minHeight', (numbers.is(to.minHeight) ? to.minHeight + 'px' : to.minHeight) || '');
+	o.set('maxHeight', (numbers.is(to.maxHeight) ? to.maxHeight + 'px' : to.maxHeight) || '');
+	o.set('_editorStyles', converter._setDefaultOptionStyle(o, typeof to.editorCSSText === 'string' ? to.editorCSSText : ''));
+	// status bar
+	const hasStatusbar = to.statusbar === undefined ? true : to.statusbar;
+	o.set('statusbar', hasStatusbar);
+	o.set('statusbar_showPathLabel', !hasStatusbar ? false : typeof to.statusbar_showPathLabel === 'boolean' ? to.statusbar_showPathLabel : true);
+	o.set('statusbar_resizeEnable', !hasStatusbar ? false : to.statusbar_resizeEnable === undefined ? true : !!to.statusbar_resizeEnable);
+	o.set('statusbar_container', typeof to.statusbar_container === 'string' ? _d.querySelector(to.statusbar_container) : to.statusbar_container);
+	// status bar - character count
+	o.set('charCounter', to.charCounter_max > 0 ? true : typeof to.charCounter === 'boolean' ? to.charCounter : false);
+	o.set('charCounter_max', numbers.is(to.charCounter_max) && to.charCounter_max > -1 ? to.charCounter_max * 1 : null);
+	o.set('charCounter_label', typeof to.charCounter_label === 'string' ? to.charCounter_label.trim() : null);
+	o.set('charCounter_type', typeof to.charCounter_type === 'string' ? to.charCounter_type : 'char');
 }
 
 /**
@@ -557,41 +577,43 @@ function InitMultiRootOptions(editorTargets) {
  * @param {Element} topDiv Suneditor top div
  * @returns {Object} Bottom bar elements (statusbar, navigation, charWrapper, charCounter)
  */
-function _initElements(options, topDiv, targetOptions) {
+function _initTargetElements(options, topDiv, targetOptions) {
+	const editorStyles = targetOptions.get('_editorStyles');
 	/** top div */
-	topDiv.style.cssText = options._editorStyles.top;
+	topDiv.style.cssText = editorStyles.top;
 
 	/** editor */
 	// wysiwyg div or iframe
-	const wysiwygDiv = domUtils.createElement(!options.iframe ? 'DIV' : 'IFRAME', { class: 'se-wrapper-inner se-wrapper-wysiwyg' });
+	const wysiwygDiv = domUtils.createElement(!options.get('iframe') ? 'DIV' : 'IFRAME', { class: 'se-wrapper-inner se-wrapper-wysiwyg' });
 
-	if (!options.iframe) {
+	if (!options.get('iframe')) {
 		wysiwygDiv.setAttribute('contenteditable', true);
 		wysiwygDiv.setAttribute('scrolling', 'auto');
-		for (let key in options.iframe_attributes) {
-			wysiwygDiv.setAttribute(key, options.iframe_attributes[key]);
+		const frameAttrs = options.get('iframe_attributes');
+		for (let key in frameAttrs) {
+			wysiwygDiv.setAttribute(key, frameAttrs[key]);
 		}
-		wysiwygDiv.className += ' ' + options._editableClass;
-		wysiwygDiv.style.cssText = options._editorStyles.frame + options._editorStyles.editor;
+		wysiwygDiv.className += ' ' + options.get('_editableClass');
+		wysiwygDiv.style.cssText = editorStyles.frame + editorStyles.editor;
 	} else {
 		wysiwygDiv.allowFullscreen = true;
 		wysiwygDiv.frameBorder = 0;
-		wysiwygDiv.style.cssText = options._editorStyles.frame;
+		wysiwygDiv.style.cssText = editorStyles.frame;
 	}
 
 	// textarea for code view
 	const textarea = domUtils.createElement('TEXTAREA', {
 		class: 'se-wrapper-inner se-wrapper-code se-display-none',
-		style: options._editorStyles.frame
+		style: editorStyles.frame
 	});
-	if (options.height === 'auto') textarea.style.overflow = 'hidden';
+	if (targetOptions.get('height') === 'auto') textarea.style.overflow = 'hidden';
 
 	/** status bar */
 	let statusbar = null;
 	let navigation = null;
 	let charWrapper = null;
 	let charCounter = null;
-	if (targetOptions.statusbar) {
+	if (targetOptions.get('statusbar')) {
 		statusbar = domUtils.createElement('DIV', { class: 'se-status-bar sun-editor-common' });
 
 		/** navigation */
@@ -599,12 +621,12 @@ function _initElements(options, topDiv, targetOptions) {
 		statusbar.appendChild(navigation);
 
 		/** char counter */
-		if (targetOptions.charCounter) {
+		if (targetOptions.get('charCounter')) {
 			charWrapper = domUtils.createElement('DIV', { class: 'se-char-counter-wrapper' });
 
-			if (targetOptions.charCounter_label) {
+			if (targetOptions.get('charCounter_label')) {
 				const charLabel = domUtils.createElement('SPAN', { class: 'se-char-label' });
-				charLabel.textContent = targetOptions.charCounter_label;
+				charLabel.textContent = targetOptions.get('charCounter_label');
 				charWrapper.appendChild(charLabel);
 			}
 
@@ -612,9 +634,9 @@ function _initElements(options, topDiv, targetOptions) {
 			charCounter.textContent = '0';
 			charWrapper.appendChild(charCounter);
 
-			if (targetOptions.charCounter_max > 0) {
+			if (targetOptions.get('charCounter_max') > 0) {
 				const char_max = domUtils.createElement('SPAN');
-				char_max.textContent = ' / ' + targetOptions.charCounter_max;
+				char_max.textContent = ' / ' + targetOptions.get('charCounter_max');
 				charWrapper.appendChild(char_max);
 			}
 
@@ -623,9 +645,9 @@ function _initElements(options, topDiv, targetOptions) {
 	}
 
 	let placeholder = null;
-	if (targetOptions.placeholder) {
+	if (targetOptions.get('placeholder')) {
 		placeholder = domUtils.createElement('SPAN', { class: 'se-placeholder' });
-		placeholder.innerText = options.placeholder;
+		placeholder.innerText = targetOptions.get('placeholder');
 	}
 
 	return {
@@ -646,23 +668,25 @@ function _initElements(options, topDiv, targetOptions) {
  * @param {Object} options options
  * @param {Element} textarea textarea element
  */
-function _checkCodeMirror(options, textarea) {
+function _checkCodeMirror(options, targetOptions, textarea) {
 	let cmeditor = null;
-	options.hasCodeMirror = false;
+	let hasCodeMirror = false;
 
-	if (options.codeMirror6Editor) {
+	if (options.get('codeMirror6Editor')) {
+		const codeMirror = options.get('codeMirror');
 		const codeStyles = textarea.style.cssText;
-		const cm = new options.codeMirror.EditorView({
+		const cm = new codeMirror.EditorView({
 			parent: textarea.parentElement,
-			extensions: options.codeMirror.extensions,
-			state: options.codeMirror.state
+			extensions: codeMirror.extensions,
+			state: codeMirror.state
 		});
 
-		options.codeMirror6Editor = cm;
+		options.set('codeMirror6Editor', cm);
 		cmeditor = cm.dom;
 		cmeditor.style.cssText = codeStyles;
-		options.hasCodeMirror = true;
-	} else if (options.codeMirror5Editor) {
+		hasCodeMirror = true;
+	} else if (options.get('codeMirror5Editor')) {
+		const codeMirror = options.get('codeMirror');
 		const cmOptions = [
 			{
 				mode: 'htmlmixed',
@@ -670,27 +694,28 @@ function _checkCodeMirror(options, textarea) {
 				lineNumbers: true,
 				lineWrapping: true
 			},
-			options.codeMirror.options || {}
+			codeMirror.options || {}
 		].reduce(function (init, option) {
 			for (let key in option) {
-				if (option.hasOwnProperty(key)) init[key] = option[key];
+				init[key] = option[key];
 			}
 			return init;
 		}, {});
 
-		if (options.height === 'auto') {
+		if ((targetOptions.get('height') ? targetOptions.get('height') : options.get('height')) === 'auto') {
 			cmOptions.viewportMargin = Infinity;
 			cmOptions.height = 'auto';
 		}
 
 		const codeStyles = textarea.style.cssText;
-		const cm = options.codeMirror.src.fromTextArea(textarea, cmOptions);
-		options.codeMirror5Editor = cm;
+		const cm = codeMirror.src.fromTextArea(textarea, cmOptions);
+		options.set('codeMirror5Editor', cm);
 		cmeditor = cm.display.wrapper;
 		cmeditor.style.cssText = codeStyles;
-		options.hasCodeMirror = true;
+		hasCodeMirror = true;
 	}
 
+	options.set('hasCodeMirror', hasCodeMirror);
 	if (cmeditor) {
 		domUtils.removeItem(textarea);
 		cmeditor.className += ' se-wrapper-code-mirror se-display-none';
@@ -717,7 +742,7 @@ function _checkKatexMath(katex) {
 		katex.options || {}
 	].reduce(function (init, option) {
 		for (let key in option) {
-			if (option.hasOwnProperty(key)) init[key] = option[key];
+			init[key] = option[key];
 		}
 		return init;
 	}, {});
@@ -728,7 +753,7 @@ function _checkKatexMath(katex) {
 /**
  * @description create blacklist
  * @param {string} blacklist blacklist
- * @param {string} defaultLineTag options.defaultLineTag
+ * @param {string} defaultLineTag options.get('defaultLineTag')
  * @returns {string}
  */
 function _createBlacklist(blacklist, defaultLineTag) {
@@ -769,12 +794,12 @@ function _createFormatInfo(value, defaultValue, blacklist) {
 
 /**
  * @description create whitelist or blacklist.
- * @param {Object} options options
+ * @param {Object} o options
  * @returns {string} whitelist
  */
-function _createWhitelist(options) {
-	const blacklist = options.elementBlacklist.split('|');
-	const whitelist = (options.__defaultElementWhitelist + '|' + options.elementWhitelist + '|' + options.formatLine.str + '|' + options.formatBrLine.str + '|' + options.formatClosureBlock.str + '|' + options.formatClosureBrLine.str)
+function _createWhitelist(o) {
+	const blacklist = o.get('elementBlacklist').split('|');
+	const whitelist = (o.get('__defaultElementWhitelist') + '|' + o.get('elementWhitelist') + '|' + o.get('formatLine').str + '|' + o.get('formatBrLine').str + '|' + o.get('formatClosureBlock').str + '|' + o.get('formatClosureBrLine').str)
 		.replace(/(^\||\|$)/g, '')
 		.split('|')
 		.filter(function (v, i, a) {
@@ -788,14 +813,13 @@ function _createWhitelist(options) {
  * @description Suneditor's Default button list
  * @param {Object} options options
  */
-function _defaultButtons(options) {
-	const icons = options.icons;
-	const lang = options.lang;
+function _defaultButtons(options, icons, lang) {
 	const cmdIcon = env.cmdIcon;
 	const shiftIcon = env.shiftIcon;
-	const shortcutsDisable = !options.shortcutsHint ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent', 'save'] : options.shortcutsDisable;
-	const indentKey = options._rtl ? ['[', ']'] : [']', '['];
-	const indentIcon = options._rtl ? [icons.outdent, icons.indent] : [icons.indent, icons.outdent];
+	const shortcutsDisable = !options.get('shortcutsHint') ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent', 'save'] : options.get('shortcutsDisable');
+	const isRTL = options.get('_rtl');
+	const indentKey = isRTL ? ['[', ']'] : [']', '['];
+	const indentIcon = isRTL ? [icons.outdent, icons.indent] : [icons.indent, icons.outdent];
 
 	return {
 		bold: ['', lang.toolbar.bold + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('bold') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">B</span>') + '</span>', 'bold', '', icons.bold],
@@ -814,7 +838,7 @@ function _defaultButtons(options) {
 		redo: ['', lang.toolbar.redo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">Y</span> / ' + cmdIcon + shiftIcon + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'redo', '', icons.redo],
 		preview: ['se-resizing-enabled', lang.toolbar.preview, 'preview', '', icons.preview],
 		print: ['se-resizing-enabled', lang.toolbar.print, 'print', '', icons.print],
-		dir: ['', lang.toolbar[options._rtl ? 'dir_ltr' : 'dir_rtl'], 'dir', '', icons[options._rtl ? 'dir_ltr' : 'dir_rtl']],
+		dir: ['', lang.toolbar[isRTL ? 'dir_ltr' : 'dir_rtl'], 'dir', '', icons[isRTL ? 'dir_ltr' : 'dir_rtl']],
 		dir_ltr: ['', lang.toolbar.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
 		dir_rtl: ['', lang.toolbar.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
 		save: ['se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save]
@@ -843,10 +867,10 @@ function _createModuleGroup() {
  * @param {string} dataType The data-type property of the button ('modal', 'dropdown', 'command',  'container')
  * @param {string} innerHTML Html in button
  * @param {string} _disabled Button disabled
- * @param {Object} _icons Icons
+ * @param {Object} icons Icons
  * @returns {Object}
  */
-function _createButton(className, title, dataCommand, dataType, innerHTML, _disabled, _icons) {
+function _createButton(className, title, dataCommand, dataType, innerHTML, _disabled, icons) {
 	const oLi = domUtils.createElement('LI');
 	const label = title || '';
 	const oButton = domUtils.createElement('BUTTON', {
@@ -859,7 +883,7 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 	});
 
 	if (/^default\./i.test(innerHTML)) {
-		innerHTML = _icons[innerHTML.replace(/^default\./i, '')];
+		innerHTML = icons[innerHTML.replace(/^default\./i, '')];
 	}
 	if (/^text\./i.test(innerHTML)) {
 		innerHTML = innerHTML.replace(/^text\./i, '');
@@ -892,17 +916,18 @@ export function UpdateButton(element, plugin) {
  * @param {Array} buttonList option.buttonList
  * @param {Object|null} plugins Plugins
  * @param {Array} options options
+ * @param {Object} icons icons
+ * @param {Object} lang lang
  * @returns {Object} { element: (Element) Toolbar element, plugins: (Array|null) Plugins Array, pluginCallButtons: (Object), responsiveButtons: (Array) }
  */
-export function CreateToolBar(buttonList, plugins, options) {
+export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 	const _buttonTray = domUtils.createElement('DIV', { class: 'se-btn-tray' });
 	const separator_vertical = domUtils.createElement('DIV', { class: 'se-toolbar-separator-vertical' });
 	const tool_bar = domUtils.createElement('DIV', { class: 'se-toolbar sun-editor-common' }, _buttonTray);
 
 	/** create button list */
 	buttonList = _w.JSON.parse(_w.JSON.stringify(buttonList));
-	const icons = options.icons;
-	const defaultButtonList = _defaultButtons(options);
+	const defaultButtonList = _defaultButtons(options, icons, lang);
 	const pluginCallButtons = {};
 	const responsiveButtons = [];
 
@@ -962,7 +987,7 @@ export function CreateToolBar(buttonList, plugins, options) {
 						moreCommand = '__se__more_' + i;
 						const title = matched[1].trim();
 						const innerHTML = matched[2].trim();
-						module = ['se-btn-more', /^lang\./i.test(title) ? options.lang[title.replace(/^lang\./i, '')] : title, moreCommand, 'MORE', innerHTML];
+						module = ['se-btn-more', /^lang\./i.test(title) ? lang[title.replace(/^lang\./i, '')] : title, moreCommand, 'MORE', innerHTML];
 					} else {
 						// buttons
 						module = defaultButtonList[button];
@@ -1017,7 +1042,7 @@ export function CreateToolBar(buttonList, plugins, options) {
 			domUtils.removeClass(_buttonTray.firstElementChild, 'se-btn-module-border');
 			break;
 		default:
-			if (options._rtl) {
+			if (options.get('_rtl')) {
 				const sv = separator_vertical.cloneNode(false);
 				sv.style.float = _buttonTray.lastElementChild.style.float;
 				_buttonTray.appendChild(sv);
@@ -1031,7 +1056,7 @@ export function CreateToolBar(buttonList, plugins, options) {
 	const _menuTray = domUtils.createElement('DIV', { class: 'se-menu-tray' });
 	tool_bar.appendChild(_menuTray);
 
-	if (options.toolbar_hide) tool_bar.style.display = 'none';
+	if (options.get('toolbar_hide')) tool_bar.style.display = 'none';
 
 	return {
 		element: tool_bar,

@@ -71,7 +71,7 @@ Math_.prototype = {
 		return {
 			className: 'katex',
 			method: function (element) {
-				if (!element.getAttribute('data-exp') || !this.options.katex) return;
+				if (!element.getAttribute('data-exp') || !this.options.get('katex')) return;
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(element.getAttribute('data-exp'))));
 				element.innerHTML = dom.querySelector('.katex').innerHTML;
 			}.bind(this)
@@ -173,7 +173,7 @@ Math_.prototype = {
 		let result = '';
 		try {
 			domUtils.removeClass(this.textArea, 'se-error');
-			result = this.options.katex.src.renderToString(exp, { throwOnError: true, displayMode: true });
+			result = this.options.get('katex').src.renderToString(exp, { throwOnError: true, displayMode: true });
 		} catch (error) {
 			domUtils.addClass(this.textArea, 'se-error');
 			result = '<span class="se-math-katex-error">Katex syntax error. (Refer <a href="' + KATEX_WEBSITE + '" target="_blank">KaTeX</a>)</span>';
@@ -191,7 +191,7 @@ function RenderMathExp(e) {
 
 function CreateHTML_modal(editor, math) {
 	const lang = editor.lang;
-	const fontSize = editor.options.mathFontSize;
+	const fontSize = editor.options.get('mathFontSize');
 	let defaultFontSize = fontSize[0].value;
 
 	let html =

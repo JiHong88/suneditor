@@ -84,7 +84,7 @@ Selection.prototype = {
 
 		selection.addRange(range);
 		this._rangeInfo(range, this.get());
-		if (this.options.iframe) this.__focus();
+		if (this.options.get('iframe')) this.__focus();
 
 		return range;
 	},
@@ -109,7 +109,7 @@ Selection.prototype = {
 	getRangeAndAddLine: function (range, container) {
 		if (this._isNone(range)) {
 			const wysiwyg = this.editor.frameContext.get('wysiwyg');
-			const op = domUtils.createElement(this.options.defaultLineTag, null, '<br>');
+			const op = domUtils.createElement(this.options.get('defaultLineTag'), null, '<br>');
 			wysiwyg.insertBefore(op, container && container !== wysiwyg ? container.nextElementSibling : wysiwyg.firstElementChild);
 			this.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
 			range = this.status._range;
@@ -224,7 +224,7 @@ Selection.prototype = {
 
 		let focusEl = wysiwyg.firstElementChild;
 		if (!focusEl) {
-			focusEl = domUtils.createElement(this.options.defaultLineTag, null, '<br>');
+			focusEl = domUtils.createElement(this.options.get('defaultLineTag'), null, '<br>');
 			wysiwyg.appendChild(focusEl);
 		}
 
@@ -339,7 +339,7 @@ Selection.prototype = {
 
 				let format = this.format.getLine(tempCon, null);
 				if (format === this.format.getBlock(format, null)) {
-					format = domUtils.createElement(domUtils.getParentElement(tempCon, domUtils.isTableCell) ? 'DIV' : this.options.defaultLineTag);
+					format = domUtils.createElement(domUtils.getParentElement(tempCon, domUtils.isTableCell) ? 'DIV' : this.options.get('defaultLineTag'));
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
 				}
@@ -378,7 +378,7 @@ Selection.prototype = {
 
 				let format = this.format.getLine(tempCon, null);
 				if (format === this.format.getBlock(format, null)) {
-					format = domUtils.createElement(domUtils.isTableCell(format) ? 'DIV' : this.options.defaultLineTag);
+					format = domUtils.createElement(domUtils.isTableCell(format) ? 'DIV' : this.options.get('defaultLineTag'));
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
 				}

@@ -91,7 +91,7 @@ function OnClickMenu(e) {
 }
 
 function CreateHTML(editor) {
-	const option = editor.options;
+	const options = editor.options;
 	const defaultList = {
 		code: {
 			name: editor.lang.menu.code,
@@ -104,7 +104,7 @@ function CreateHTML(editor) {
 			tag: 'span'
 		}
 	};
-	const styleList = !option.textStyles ? editor._w.Object.keys(defaultList) : option.textStyles;
+	const styleList = !options.get('textStyles') ? editor._w.Object.keys(defaultList) : options.get('textStyles');
 
 	let list = '<div class="se-list-inner"><ul class="se-list-basic">';
 	for (let i = 0, len = styleList.length, t, tag, name, attrs, command, value, _class; i < len; i++) {
@@ -112,9 +112,9 @@ function CreateHTML(editor) {
 		(attrs = ''), (value = ''), (command = []);
 
 		if (typeof t === 'string') {
-			const editorCSSText = defaultList[t.toLowerCase()];
-			if (!editorCSSText) continue;
-			t = editorCSSText;
+			const cssText = defaultList[t.toLowerCase()];
+			if (!cssText) continue;
+			t = cssText;
 		}
 
 		name = t.name;

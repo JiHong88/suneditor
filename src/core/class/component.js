@@ -18,7 +18,7 @@ Component.prototype = {
 	 * If "element" is "HR", insert and return the new line.
 	 * @param {Element} element Element to be inserted
 	 * @param {boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (domUtils.getEdgeChildNodes)
-	 * @param {boolean} notCheckCharCount If true, it will be inserted even if "options.charCounter_max" is exceeded.
+	 * @param {boolean} notCheckCharCount If true, it will be inserted even if "options.get('charCounter_max')" is exceeded.
 	 * @param {boolean} notSelect If true, Do not automatically select the inserted component.
 	 * @returns {Element}
 	 */

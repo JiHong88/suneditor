@@ -33,6 +33,8 @@ Menu.prototype = {
 		if (target) {
 			this.editor.toolContext.get('toolbar._menuTray').appendChild(menu);
 			this._menuTrayMap[typeof target === 'string' ? target : target.getAttribute('data-command')] = menu;
+		} else {
+			throw Error("[SUNEDITOR.init.fail] The plugin's button is not added.");
 		}
 	},
 

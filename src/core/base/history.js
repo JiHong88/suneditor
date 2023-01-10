@@ -8,7 +8,7 @@ import { getNodeFromPath, getNodePath } from '../../helper/domUtils';
 
 export default function (editor, change) {
 	const rootTargets = editor.rootTargets;
-	const delayTime = editor.options.historyStackDelayTime;
+	const delayTime = editor.options.get('historyStackDelayTime');
 	let undo = editor.toolContext.get('buttons.undo');
 	let redo = editor.toolContext.get('buttons.redo');
 	let pushDelay = null;
@@ -160,7 +160,7 @@ export default function (editor, change) {
 	return {
 		/**
 		 * @description Saving the current status to the history object stack
-		 * If "delay" is true, it will be saved after (options.historyStackDelayTime || 400) miliseconds
+		 * If "delay" is true, it will be saved after (options.get('historyStackDelayTime') || 400) miliseconds
 		 * If the function is called again with the "delay" argument true before it is saved, the delay time is renewal
 		 * You can specify the delay time by sending a number.
 		 * @param {Boolean|Number} delay If true, Add stack without delay time.
@@ -232,7 +232,7 @@ export default function (editor, change) {
 			rootInitContents = {};
 
 			const rootKeys = editor.rootKeys;
-			for (let i = 0, len = rootKeys.length, k; i < len; i++) {
+			for (let i = 0, len = rootKeys.length; i < len; i++) {
 				initRoot(rootKeys[i]);
 			}
 		},

@@ -62,24 +62,24 @@ export function createElementBlacklist(list) {
 /**
  * @description Converts options-related styles and returns them for each frame.
  * @param {Object.<string, any>} options Options
- * @param {string} editorCSSText Style string
+ * @param {string} cssText Style string
  * @returns {{top: string, frame: string, editor: string}}
  * @private
  */
-export function _setDefaultOptionStyle(options, editorCSSText) {
+export function _setDefaultOptionStyle(options, cssText) {
 	let optionStyle = '';
-	if (options.height) optionStyle += 'height:' + options.height + ';';
-	if (options.minHeight) optionStyle += 'min-height:' + options.minHeight + ';';
-	if (options.maxHeight) optionStyle += 'max-height:' + options.maxHeight + ';';
-	if (options.width) optionStyle += 'width:' + options.width + ';';
-	if (options.minWidth) optionStyle += 'min-width:' + options.minWidth + ';';
-	if (options.maxWidth) optionStyle += 'max-width:' + options.maxWidth + ';';
+	if (options.get('height')) optionStyle += 'height:' + options.get('height') + ';';
+	if (options.get('minHeight')) optionStyle += 'min-height:' + options.get('minHeight') + ';';
+	if (options.get('maxHeight')) optionStyle += 'max-height:' + options.get('maxHeight') + ';';
+	if (options.get('width')) optionStyle += 'width:' + options.get('width') + ';';
+	if (options.get('minWidth')) optionStyle += 'min-width:' + options.get('minWidth') + ';';
+	if (options.get('maxWidth')) optionStyle += 'max-width:' + options.get('maxWidth') + ';';
 
 	let top = '',
 		frame = '',
 		editor = '';
-	editorCSSText = optionStyle + editorCSSText;
-	const styleArr = editorCSSText.split(';');
+	cssText = optionStyle + cssText;
+	const styleArr = cssText.split(';');
 	for (let i = 0, len = styleArr.length, s; i < len; i++) {
 		s = styleArr[i].trim();
 		if (!s) continue;
@@ -89,7 +89,7 @@ export function _setDefaultOptionStyle(options, editorCSSText) {
 		}
 		if (/^(min-|max-)?height\s*:/.test(s)) {
 			if (/^height/.test(s) && s.split(':')[1].trim() === 'auto') {
-				options.height = 'auto';
+				options.set('height', 'auto');
 			}
 			frame += s + ';';
 			continue;
@@ -110,10 +110,10 @@ export function _setDefaultOptionStyle(options, editorCSSText) {
  * @param {Object.<string, any>} options Options
  * @private
  */
-export function _setIframeDocument(frame, options) {
+export function _setIframeDocument(frame, options, frameHeight) {
 	frame.setAttribute('scrolling', 'auto');
-	frame.contentDocument.head.innerHTML = '<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' + _setIframeCssTags(options);
-	frame.contentDocument.body.className = options._editableClass;
+	frame.contentDocument.head.innerHTML = '<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' + _setIframeCssTags(options, frameHeight);
+	frame.contentDocument.body.className = options.get('_editableClass');
 	frame.contentDocument.body.setAttribute('contenteditable', true);
 }
 
@@ -122,8 +122,8 @@ export function _setIframeDocument(frame, options) {
  * @param {Object.<string, any>} options Options
  * @returns {string} "<style>...</style>"
  */
-export function _setIframeCssTags(options) {
-	const linkNames = options.iframe_cssFileName;
+export function _setIframeCssTags(options, frameHeight) {
+	const linkNames = options.get('iframe_cssFileName');
 	const wRegExp = _w.RegExp;
 	let tagString = '';
 
@@ -147,7 +147,7 @@ export function _setIframeCssTags(options) {
 		}
 	}
 
-	return tagString + (options.height === 'auto' ? '<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>' : '');
+	return tagString + (frameHeight === 'auto' ? '<style>\n/** Iframe height auto */\nbody{height: min-content; overflow: hidden;}\n</style>' : '');
 }
 
 const converter = {

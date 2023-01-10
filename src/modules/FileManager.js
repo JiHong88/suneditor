@@ -30,7 +30,7 @@ FileManager.prototype = {
 	 * @param {Files|{FormData, size}} data FormData in body or Files array
 	 * @param {Function|null} callBack Success call back function
 	 * @param {Function|null} errorCallBack Error call back function
-	 * @example this.plugins.fileManager.upload.call(this, imageUploadUrl, this.options.imageUploadHeader, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.events.onImageUploadError);
+	 * @example this.plugins.fileManager.upload.call(this, imageUploadUrl, this.options.get('imageUploadHeader'), formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.events.onImageUploadError);
 	 */
 	upload: function (uploadUrl, uploadHeader, data, callBack, errorCallBack) {
 		this.editor._openLoading();

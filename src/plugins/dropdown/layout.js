@@ -28,7 +28,7 @@ Layout.prototype = {
 	 * @param {number} index layout menu index
 	 */
 	action: function (index) {
-		const temp = this.options.layouts[(this.selectedIndex = index)];
+		const temp = this.options.get('layouts')[(this.selectedIndex = index)];
 
 		if (temp.html) {
 			this.editor.setContent(temp.html);
@@ -53,7 +53,7 @@ function OnClickMenu(e) {
 }
 
 function CreateHTML(editor) {
-	const layoutList = editor.options.layouts;
+	const layoutList = editor.options.get('layouts');
 	if (!layoutList || layoutList.length === 0) {
 		console.warn('[SUNEDITOR.plugins.layout.warn] To use the "layout" plugin, please define the "layouts" option.');
 	}

@@ -6,15 +6,15 @@ const Align = function (editor, target) {
 	EditorDependency.call(this, editor);
 	this.target = target;
 	this.title = this.lang.toolbar.align;
-	this.icon = this.options._rtl ? this.icons.align_right : this.icons.align_left;
+	this.icon = this.options.get('_rtl') ? this.icons.align_right : this.icons.align_left;
 
 	// create HTML
-	const menu = CreateHTML(editor, !editor.options._rtl);
+	const menu = CreateHTML(editor, !editor.options.get('_rtl'));
 	const commandArea = (this._itemMenu = menu.querySelector('ul'));
 
 	// members
 	this.currentAlign = '';
-	this.defaultDir = editor.options._rtl ? 'right' : 'left';
+	this.defaultDir = editor.options.get('_rtl') ? 'right' : 'left';
 	this.alignIcons = {
 		justify: editor.icons.align_justify,
 		left: editor.icons.align_left,
@@ -131,7 +131,7 @@ function OnClickMenu(e) {
 function CreateHTML(core) {
 	const lang = core.lang;
 	const icons = core.icons;
-	const alignItems = core.options.alignItems;
+	const alignItems = core.options.get('alignItems');
 
 	let html = '';
 	for (let i = 0, item, text; i < alignItems.length; i++) {

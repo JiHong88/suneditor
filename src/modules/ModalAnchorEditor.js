@@ -22,18 +22,18 @@ const ModalAnchorEditor = function (inst, modalForm) {
 	this.preview = forms.querySelector('.se-link-preview');
 	this.bookmark = forms.querySelector('._se_anchor_bookmark_icon');
 	this.bookmarkButton = forms.querySelector('._se_bookmark_button');
-	this.linkDefaultRel = this.options.linkRelDefault;
-	this.defaultRel = this.options.linkRelDefault.default || '';
+	this.linkDefaultRel = this.options.get('linkRelDefault');
+	this.defaultRel = this.options.get('linkRelDefault').default || '';
 	this.currentRel = [];
 	this.currentTarget = null;
 	this.linkValue = '';
 	this._change = false;
-	this._isRel = this.options.linkRel.length > 0;
+	this._isRel = this.options.get('linkRel').length > 0;
 	// members - rel
 	if (this._isRel) {
 		this.relButton = forms.querySelector('.se-anchor-rel-btn');
 		this.relPreview = forms.querySelector('.se-anchor-rel-preview');
-		const relList = this.options.linkRel;
+		const relList = this.options.get('linkRel');
 		const defaultRel = (this.linkDefaultRel.default || '').split(' ');
 		const list = [];
 		for (let i = 0, len = relList.length, rel; i < len; i++) {
@@ -67,7 +67,7 @@ ModalAnchorEditor.prototype = {
 		if (!isUpdate) {
 			this.init();
 			this.anchorText.value = this.selection.get().toString().trim();
-			this.newWindowCheck.checked = this.options.linkTargetNewWindow;
+			this.newWindowCheck.checked = this.options.get('linkTargetNewWindow');
 		} else if (this.currentTarget) {
 			const href = this.currentTarget.getAttribute('href');
 			this.linkValue = this.preview.textContent = this.urlInput.value = this._selfPathBookmark(href) ? href.substr(href.lastIndexOf('#')) : href;
@@ -172,14 +172,14 @@ ModalAnchorEditor.prototype = {
 			this.selectMenu_bookmark.close();
 		} else {
 			this.selectMenu_bookmark.create(list, menus);
-			this.selectMenu_bookmark.open(this.options._rtl ? 'bottom-right' : '');
+			this.selectMenu_bookmark.open(this.options.get('_rtl') ? 'bottom-right' : '');
 		}
 	},
 
 	_setLinkPreview: function (value) {
 		const preview = this.preview;
-		const protocol = this.options.linkProtocol;
-		const noPrefix = this.options.linkNoPrefix;
+		const protocol = this.options.get('linkProtocol');
+		const noPrefix = this.options.get('linkNoPrefix');
 		const reservedProtocol = /^(mailto\:|tel\:|sms\:|https*\:\/\/|#)/.test(value);
 		const sameProtocol = !protocol ? false : this._w.RegExp('^' + value.substr(0, protocol.length)).test(protocol);
 		value = this.linkValue = preview.textContent = !value ? '' : noPrefix ? value : protocol && !reservedProtocol && !sameProtocol ? protocol + value : reservedProtocol ? value : /^www\./.test(value) ? 'http://' + value : this.host + (/^\//.test(value) ? '' : '/') + value;
@@ -231,7 +231,7 @@ ModalAnchorEditor.prototype = {
 };
 
 function OnClick_relbutton() {
-	this.selectMenu_rel.open(this.options._rtl ? 'left-middle' : '');
+	this.selectMenu_rel.open(this.options.get('_rtl') ? 'left-middle' : '');
 }
 
 function SetHeaderBookmark(item) {
@@ -333,7 +333,7 @@ function CreatetModalForm(editor) {
 		'</label>' +
 		'<div class="se-modal-form-files">' +
 		'<input data-focus class="se-input-form se-input-url" type="text" placeholder="' +
-		(editor.options.protocol || '') +
+		(editor.options.get('protocol') || '') +
 		'" />' +
 		'<button type="button" class="se-btn se-modal-files-edge-button _se_bookmark_button" title="' +
 		lang.modalBox.linkBox.bookmark +
@@ -365,7 +365,7 @@ function CreatetModalForm(editor) {
 		'<label><input type="checkbox" class="se-modal-btn-check _se_anchor_download" />&nbsp;' +
 		lang.modalBox.linkBox.downloadLinkCheck +
 		'</label>';
-	if (editor.options.linkRel.length > 0) {
+	if (editor.options.get('linkRel').length > 0) {
 		html += '<div class="se-anchor-rel"><button type="button" class="se-btn se-btn-select se-anchor-rel-btn">&lt;rel&gt;</button>' + '<div class="se-anchor-rel-wrapper"><pre class="se-link-preview se-anchor-rel-preview"></pre></div>' + '</div></div>';
 	}
 

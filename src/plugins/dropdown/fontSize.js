@@ -30,7 +30,7 @@ FontSize.prototype = {
 	 */
 	active: function (element) {
 		if (!element) {
-			domUtils.changeTxt(this.targetText, this.status.hasFocus ? this.options.__defaultFontSize || this.editor.wwComputedStyle.fontSize : this.lang.toolbar.fontSize);
+			domUtils.changeTxt(this.targetText, this.status.hasFocus ? this.options.get('__defaultFontSize') || this.editor.wwComputedStyle.fontSize : this.lang.toolbar.fontSize);
 		} else if (element.style && element.style.fontSize.length > 0) {
 			domUtils.changeTxt(this.targetText, element.style.fontSize);
 			return true;
@@ -94,12 +94,12 @@ function OnClickMenu(e) {
 }
 
 function CreateHTML(editor) {
-	const option = editor.options;
+	const options = editor.options;
 	const lang = editor.lang;
-	const sizeList = !option.fontSize ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : option.fontSize;
+	const sizeList = !options.get('fontSize') ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : options.get('fontSize');
 
 	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '" aria-label="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
-	for (let i = 0, unit = option.fontSizeUnit, len = sizeList.length, size; i < len; i++) {
+	for (let i = 0, unit = options.get('fontSizeUnit'), len = sizeList.length, size; i < len; i++) {
 		size = sizeList[i];
 		list += '<li><button type="button" class="se-btn-list" data-value="' + size + unit + '" title="' + size + unit + '" aria-label="' + size + unit + '" style="font-size:' + size + unit + ';">' + size + '</button></li>';
 	}

@@ -2,7 +2,9 @@
 Vanilla javscript based WYSIWYG web editor.
 SunEditor supports IE11 and all modern browsers with no dependencies and polyfill.
 
-#### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
+#### 🌤 Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a> 🌤
+
+⭐ If you would like to contribute, please refer to [guidelines](/CONTRIBUTING.md) and a list of [open tasks](https://github.com/jihong88/suneditor/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22).⭐
 
 [![GitHub](https://img.shields.io/github/license/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt)
 [![GitHub release](https://img.shields.io/github/release/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases)
@@ -316,7 +318,7 @@ let editor = suneditor.create('sample', {
 editor.core.registerPlugin('mention');
 editor.onKeyDown = e => {
   if (e.key === '@') {
-    editor.core.context.mention.open();
+    editor.core.mention.open();
     e.preventDefault();
     e.stopPropagation();
   }

@@ -73,16 +73,16 @@ function OnClickMenu(e) {
 }
 
 function CreateHTML(editor) {
-	const option = editor.options;
+	const options = editor.options;
 	const lang = editor.lang;
-	const sizeList = !option.lineHeights
+	const sizeList = !options.get('lineHeights')
 		? [
 				{ text: '1', value: 1 },
 				{ text: '1.15', value: 1.15 },
 				{ text: '1.5', value: 1.5 },
 				{ text: '2', value: 2 }
 		  ]
-		: option.lineHeights;
+		: options.get('lineHeights');
 
 	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '" aria-label="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
 	for (let i = 0, len = sizeList.length, size; i < len; i++) {

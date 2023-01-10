@@ -12,7 +12,7 @@ const Image_ = function (editor, target) {
 	// create HTML
 	const options = this.options;
 	const modalEl = CreateHTML_modal(editor);
-	const figureControls = options.imageControls;
+	const figureControls = options.get('imageControls');
 
 	// controls
 	let showAlign = false;
@@ -28,7 +28,7 @@ const Image_ = function (editor, target) {
 	// modules
 	this.anchor = new ModalAnchorEditor(this, modalEl);
 	this.modal = new Modal(this, modalEl);
-	this.figure = new Figure(this, figureControls, { sizeUnit: options._imageSizeUnit });
+	this.figure = new Figure(this, figureControls, { sizeUnit: options.get('_imageSizeUnit') });
 	this.fileManager = new FileManager(this, { tagNames: ['img'], eventHandler: this.events.onImageUpload, checkHandler: FileCheckHandler.bind(this), figure: this.figure });
 
 	// members
@@ -38,7 +38,7 @@ const Image_ = function (editor, target) {
 	this.altText = modalEl.querySelector('._se_image_alt');
 	this.captionCheckEl = modalEl.querySelector('._se_image_check_caption');
 	this.previewSrc = modalEl.querySelector('._se_tab_content_image .se-link-preview');
-	this.sizeUnit = options._imageSizeUnit;
+	this.sizeUnit = options.get('_imageSizeUnit');
 	this.proportion = {};
 	this.inputX = {};
 	this.inputY = {};
@@ -52,11 +52,11 @@ const Image_ = function (editor, target) {
 	this._container = null;
 	this._caption = null;
 	this._ratio = { w: 1, h: 1 };
-	this._origin_w = options.imageWidth === 'auto' ? '' : options.imageWidth;
-	this._origin_h = options.imageHeight === 'auto' ? '' : options.imageHeight;
-	this._resizing = options.imageResizing;
-	this._onlyPercentage = options.imageSizeOnlyPercentage;
-	this._nonResizing = !this._resizing || !options.imageHeightShow || this._onlyPercentage;
+	this._origin_w = options.get('imageWidth') === 'auto' ? '' : options.get('imageWidth');
+	this._origin_h = options.get('imageHeight') === 'auto' ? '' : options.get('imageHeight');
+	this._resizing = options.get('imageResizing');
+	this._onlyPercentage = options.get('imageSizeOnlyPercentage');
+	this._nonResizing = !this._resizing || !options.get('imageHeightShow') || this._onlyPercentage;
 
 	// init
 	modalEl.querySelector('.se-modal-tabs').addEventListener('click', this._openTab.bind(this));
@@ -71,8 +71,8 @@ const Image_ = function (editor, target) {
 		this.proportion = modalEl.querySelector('._se_image_check_proportion');
 		this.inputX = modalEl.querySelector('._se_image_size_x');
 		this.inputY = modalEl.querySelector('._se_image_size_y');
-		this.inputX.value = options.imageWidth;
-		this.inputY.value = options.imageHeight;
+		this.inputX.value = options.get('imageWidth');
+		this.inputY.value = options.get('imageHeight');
 
 		const ratioChange = OnChangeRatio.bind(this);
 		this.eventManager.addEvent(this.inputX, 'keyup', OnInputSize.bind(this, 'x'));
@@ -101,11 +101,11 @@ Image_.prototype = {
 	 */
 	on: function (isUpdate) {
 		if (!isUpdate) {
-			this.inputX.value = this._origin_w = this.options.imageWidth === 'auto' ? '' : this.options.imageWidth;
-			this.inputY.value = this._origin_h = this.options.imageHeight === 'auto' ? '' : this.options.imageHeight;
-			if (this.imgInputFile && this.options.imageMultipleFile) this.imgInputFile.setAttribute('multiple', 'multiple');
+			this.inputX.value = this._origin_w = this.options.get('imageWidth') === 'auto' ? '' : this.options.get('imageWidth');
+			this.inputY.value = this._origin_h = this.options.get('imageHeight') === 'auto' ? '' : this.options.get('imageHeight');
+			if (this.imgInputFile && this.options.get('imageMultipleFile')) this.imgInputFile.setAttribute('multiple', 'multiple');
 		} else {
-			if (this.imgInputFile && this.options.imageMultipleFile) this.imgInputFile.removeAttribute('multiple');
+			if (this.imgInputFile && this.options.get('imageMultipleFile')) this.imgInputFile.removeAttribute('multiple');
 		}
 
 		this.anchor.on(isUpdate);
@@ -150,8 +150,8 @@ Image_.prototype = {
 		this._openTab('init');
 
 		if (this._resizing) {
-			this.inputX.value = this.options.imageWidth === 'auto' ? '' : this.options.imageWidth;
-			this.inputY.value = this.options.imageHeight === 'auto' ? '' : this.options.imageHeight;
+			this.inputX.value = this.options.get('imageWidth') === 'auto' ? '' : this.options.get('imageWidth');
+			this.inputY.value = this.options.get('imageHeight') === 'auto' ? '' : this.options.get('imageHeight');
 			this.proportion.checked = true;
 		}
 
@@ -254,7 +254,7 @@ Image_.prototype = {
 			}
 		}
 
-		const limitSize = this.options.imageUploadSizeLimit;
+		const limitSize = this.options.get('imageUploadSizeLimit');
 		const currentSize = this.fileManager.getSize();
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + limitSize / 1000 + 'KB';
@@ -470,8 +470,8 @@ Image_.prototype = {
 	},
 
 	applySize: function (w, h) {
-		if (!w) w = this.inputX.value || this.options.imageWidth;
-		if (!h) h = this.inputY.value || this.options.imageHeight;
+		if (!w) w = this.inputX.value || this.options.get('imageWidth');
+		if (!h) h = this.inputY.value || this.options.get('imageHeight');
 		if (this._onlyPercentage) {
 			if (!w) w = '100%';
 			else if (/%$/.test(w)) w += '%';
@@ -508,9 +508,9 @@ Image_.prototype = {
 		}
 
 		// server upload
-		const imageUploadUrl = this.options.imageUploadUrl;
+		const imageUploadUrl = this.options.get('imageUploadUrl');
 		if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
-			this.fileManager.upload(imageUploadUrl, this.options.imageUploadHeader, files, UploadCallBack.bind(this, info), this.events.onImageUploadError);
+			this.fileManager.upload(imageUploadUrl, this.options.get('imageUploadHeader'), files, UploadCallBack.bind(this, info), this.events.onImageUploadError);
 		} else {
 			this._setBase64(files, info.anchor, info.inputWidth, info.inputHeight, info.align, info.alt, info.isUpdate);
 		}
@@ -679,7 +679,7 @@ function OnClickRevert() {
 
 function OnLinkPreview(e) {
 	const value = e.target.value.trim();
-	this._linkValue = this.previewSrc.textContent = !value ? '' : this.options.linkProtocol && value.indexOf('://') === -1 && value.indexOf('#') !== 0 ? this.options.linkProtocol + value : value.indexOf('://') === -1 ? '/' + value : value;
+	this._linkValue = this.previewSrc.textContent = !value ? '' : this.options.get('linkProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0 ? this.options.get('linkProtocol') + value : value.indexOf('://') === -1 ? '/' + value : value;
 }
 
 function OnfileInputChange() {
@@ -705,7 +705,7 @@ function _setUrlInput(target) {
 function OnloadImg(oImg, _svgDefaultSize, container) {
 	// svg exception handling
 	if (oImg.offsetWidth === 0) this.applySize(_svgDefaultSize, '');
-	if (this.options.mediaAutoSelect) {
+	if (this.options.get('mediaAutoSelect')) {
 		this.init();
 		this.component.select(oImg, 'image');
 	} else {
@@ -715,7 +715,7 @@ function OnloadImg(oImg, _svgDefaultSize, container) {
 }
 
 function CreateHTML_modal(editor) {
-	const option = editor.options;
+	const options = editor.options;
 	const lang = editor.lang;
 	let html =
 		'<div class="se-modal-header">' +
@@ -742,7 +742,7 @@ function CreateHTML_modal(editor) {
 		'<div class="_se_tab_content _se_tab_content_image">' +
 		'<div class="se-modal-body"><div style="border-bottom: 1px dashed #ccc;">';
 
-	if (option.imageFileInput) {
+	if (options.get('imageFileInput')) {
 		html +=
 			'<div class="se-modal-form">' +
 			'<label>' +
@@ -750,9 +750,9 @@ function CreateHTML_modal(editor) {
 			'</label>' +
 			'<div class="se-modal-form-files">' +
 			'<input class="se-input-form _se_image_file" data-focus type="file" accept="' +
-			option.imageAccept +
+			options.get('imageAccept') +
 			'"' +
-			(option.imageMultipleFile ? ' multiple="multiple"' : '') +
+			(options.get('imageMultipleFile') ? ' multiple="multiple"' : '') +
 			'/>' +
 			'<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="' +
 			lang.controller.remove +
@@ -765,7 +765,7 @@ function CreateHTML_modal(editor) {
 			'</div>';
 	}
 
-	if (option.imageUrlInput) {
+	if (options.get('imageUrlInput')) {
 		html +=
 			'<div class="se-modal-form">' +
 			'<label>' +
@@ -773,7 +773,7 @@ function CreateHTML_modal(editor) {
 			'</label>' +
 			'<div class="se-modal-form-files">' +
 			'<input class="se-input-form se-input-url _se_image_url" data-focus type="text" />' +
-			(option.imageGalleryUrl && editor.plugins.imageGallery ? '<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '" aria-label="' + lang.toolbar.imageGallery + '">' + editor.icons.image_gallery + '</button>' : '') +
+			(options.get('imageGalleryUrl') && editor.plugins.imageGallery ? '<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '" aria-label="' + lang.toolbar.imageGallery + '">' + editor.icons.image_gallery + '</button>' : '') +
 			'</div>' +
 			'<pre class="se-link-preview"></pre>' +
 			'</div>';
@@ -781,12 +781,12 @@ function CreateHTML_modal(editor) {
 
 	html += '</div>' + '<div class="se-modal-form">' + '<label>' + lang.modalBox.imageBox.altText + '</label><input class="se-input-form _se_image_alt" type="text" />' + '</div>';
 
-	if (option.imageResizing) {
-		const onlyPercentage = option.imageSizeOnlyPercentage;
+	if (options.get('imageResizing')) {
+		const onlyPercentage = options.get('imageSizeOnlyPercentage');
 		const onlyPercentDisplay = onlyPercentage ? ' style="display: none !important;"' : '';
-		const heightDisplay = !option.imageHeightShow ? ' style="display: none !important;"' : '';
+		const heightDisplay = !options.get('imageHeightShow') ? ' style="display: none !important;"' : '';
 		html += '<div class="se-modal-form">';
-		if (onlyPercentage || !option.imageHeightShow) {
+		if (onlyPercentage || !options.get('imageHeightShow')) {
 			html += '<div class="se-modal-size-text">' + '<label class="size-w">' + lang.modalBox.size + '</label>' + '</div>';
 		} else {
 			html += '<div class="se-modal-size-text">' + '<label class="size-w">' + lang.modalBox.width + '</label>' + '<label class="se-modal-size-x">&nbsp;</label>' + '<label class="size-h">' + lang.modalBox.height + '</label>' + '</div>';

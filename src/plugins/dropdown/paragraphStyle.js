@@ -76,7 +76,7 @@ function OnClickMenu(e) {
 }
 
 function CreateHTML(editor) {
-	const option = editor.options;
+	const options = editor.options;
 	const menuLang = editor.lang.menu;
 	const defaultList = {
 		spaced: {
@@ -95,16 +95,16 @@ function CreateHTML(editor) {
 			_class: ''
 		}
 	};
-	const paragraphStyles = !option.paragraphStyles || option.paragraphStyles.length === 0 ? ['spaced', 'bordered', 'neon'] : option.paragraphStyles;
+	const paragraphStyles = !options.get('paragraphStyles') || options.get('paragraphStyles').length === 0 ? ['spaced', 'bordered', 'neon'] : options.get('paragraphStyles');
 
 	let list = '<div class="se-list-inner"><ul class="se-list-basic">';
 	for (let i = 0, len = paragraphStyles.length, p, name, attrs, _class; i < len; i++) {
 		p = paragraphStyles[i];
 
 		if (typeof p === 'string') {
-			const editorCSSText = defaultList[p.toLowerCase()];
-			if (!editorCSSText) continue;
-			p = editorCSSText;
+			const cssText = defaultList[p.toLowerCase()];
+			if (!cssText) continue;
+			p = cssText;
 		}
 
 		name = p.name;

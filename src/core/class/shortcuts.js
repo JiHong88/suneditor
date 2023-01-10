@@ -37,29 +37,29 @@ Shortcuts.prototype = {
 				command = 'selectAll';
 				break;
 			case 66: // B
-				if (this.options.shortcutsDisable.indexOf('bold') === -1) {
+				if (this.options.get('shortcutsDisable').indexOf('bold') === -1) {
 					command = 'bold';
 				}
 				break;
 			case 83: // S
-				if (shift && this.options.shortcutsDisable.indexOf('strike') === -1) {
+				if (shift && this.options.get('shortcutsDisable').indexOf('strike') === -1) {
 					command = 'strike';
-				} else if (!shift && this.options.shortcutsDisable.indexOf('save') === -1) {
+				} else if (!shift && this.options.get('shortcutsDisable').indexOf('save') === -1) {
 					command = 'save';
 				}
 				break;
 			case 85: // U
-				if (this.options.shortcutsDisable.indexOf('underline') === -1) {
+				if (this.options.get('shortcutsDisable').indexOf('underline') === -1) {
 					command = 'underline';
 				}
 				break;
 			case 73: // I
-				if (this.options.shortcutsDisable.indexOf('italic') === -1) {
+				if (this.options.get('shortcutsDisable').indexOf('italic') === -1) {
 					command = 'italic';
 				}
 				break;
 			case 90: // Z
-				if (this.options.shortcutsDisable.indexOf('undo') === -1) {
+				if (this.options.get('shortcutsDisable').indexOf('undo') === -1) {
 					if (shift) {
 						command = 'redo';
 					} else {
@@ -68,18 +68,18 @@ Shortcuts.prototype = {
 				}
 				break;
 			case 89: // Y
-				if (this.options.shortcutsDisable.indexOf('undo') === -1) {
+				if (this.options.get('shortcutsDisable').indexOf('undo') === -1) {
 					command = 'redo';
 				}
 				break;
 			case 219: // [
-				if (this.options.shortcutsDisable.indexOf('indent') === -1) {
-					command = this.options._rtl ? 'indent' : 'outdent';
+				if (this.options.get('shortcutsDisable').indexOf('indent') === -1) {
+					command = this.options.get('_rtl') ? 'indent' : 'outdent';
 				}
 				break;
 			case 221: // ]
-				if (this.options.shortcutsDisable.indexOf('indent') === -1) {
-					command = this.options._rtl ? 'outdent' : 'indent';
+				if (this.options.get('shortcutsDisable').indexOf('indent') === -1) {
+					command = this.options.get('_rtl') ? 'outdent' : 'indent';
 				}
 				break;
 		}

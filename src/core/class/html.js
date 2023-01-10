@@ -21,18 +21,18 @@ const HTML = function (editor) {
 	this._attributeBlacklist = null;
 	this._attributeBlacklistRegExp = null;
 	this._cleanStyleRegExp = {
-		span: editor.options._spanStylesRegExp,
-		format: editor.options._formatStylesRegExp,
-		fontSizeUnit: new this._w.RegExp('\\d+' + this.options.fontSizeUnit + '$', 'i')
+		span: editor.options.get('_spanStylesRegExp'),
+		format: editor.options.get('_formatStylesRegExp'),
+		fontSizeUnit: new this._w.RegExp('\\d+' + this.options.get('fontSizeUnit') + '$', 'i')
 	};
 
 	// set disallow text nodes
 	const options = this.options;
 	const _w = this._w;
-	const disallowStyleNodes = _w.Object.keys(options._styleNodeMap);
-	const allowStyleNodes = !options.elementWhitelist
+	const disallowStyleNodes = _w.Object.keys(options.get('_styleNodeMap'));
+	const allowStyleNodes = !options.get('elementWhitelist')
 		? []
-		: options.elementWhitelist.split('|').filter(function (v) {
+		: options.get('elementWhitelist').split('|').filter(function (v) {
 				return /b|i|ins|s|strike/i.test(v);
 		  });
 	for (let i = 0; i < allowStyleNodes.length; i++) {
@@ -42,23 +42,23 @@ const HTML = function (editor) {
 
 	// whitelist
 	// tags
-	const defaultAttr = options.__defaultAttributeWhitelist;
+	const defaultAttr = options.get('__defaultAttributeWhitelist');
 	const dataAttr = 'data-origin|data-origin-size|data-size|data-file-size|data-file-name|data-align|data-image-link|data-rotate|data-proportion|data-percentage|data-exp|data-font-size';
-	this._allowHTMLComment = options._editorElementWhitelist.indexOf('//') > -1 || options._editorElementWhitelist === '*';
+	this._allowHTMLComment = options.get('_editorElementWhitelist').indexOf('//') > -1 || options.get('_editorElementWhitelist') === '*';
 	// html check
-	this._htmlCheckWhitelistRegExp = new _w.RegExp('^(' + GetRegList(options._editorElementWhitelist.replace('|//', ''), '') + ')$', 'i');
-	this._htmlCheckBlacklistRegExp = new _w.RegExp('^(' + (options.elementBlacklist || '^') + ')$', 'i');
+	this._htmlCheckWhitelistRegExp = new _w.RegExp('^(' + GetRegList(options.get('_editorElementWhitelist').replace('|//', ''), '') + ')$', 'i');
+	this._htmlCheckBlacklistRegExp = new _w.RegExp('^(' + (options.get('elementBlacklist') || '^') + ')$', 'i');
 	// elements
-	this._elementWhitelistRegExp = converter.createElementWhitelist(GetRegList(options._editorElementWhitelist.replace('|//', '|<!--|-->'), ''));
-	this._elementBlacklistRegExp = converter.createElementBlacklist(options.elementBlacklist.replace('|//', '|<!--|-->'));
+	this._elementWhitelistRegExp = converter.createElementWhitelist(GetRegList(options.get('_editorElementWhitelist').replace('|//', '|<!--|-->'), ''));
+	this._elementBlacklistRegExp = converter.createElementBlacklist(options.get('elementBlacklist').replace('|//', '|<!--|-->'));
 	// attributes
 	const regEndStr = '\\s*=\\s*(")[^"]*\\1';
-	const _wAttr = options.attributeWhitelist;
+	const _wAttr = options.get('attributeWhitelist');
 	let tagsAttr = {};
 	let allAttr = '';
 	if (!!_wAttr) {
 		for (let k in _wAttr) {
-			if (!_wAttr.hasOwnProperty(k) || /^on[a-z]+$/i.test(_wAttr[k])) continue;
+			if (/^on[a-z]+$/i.test(_wAttr[k])) continue;
 			if (k === 'all') {
 				allAttr = GetRegList(_wAttr[k], defaultAttr);
 			} else {
@@ -72,12 +72,11 @@ const HTML = function (editor) {
 	this._attributeWhitelist = tagsAttr;
 
 	// blacklist
-	const _bAttr = options.attributeBlacklist;
+	const _bAttr = options.get('attributeBlacklist');
 	tagsAttr = {};
 	allAttr = '';
 	if (!!_bAttr) {
 		for (let k in _bAttr) {
-			if (!_bAttr.hasOwnProperty(k)) continue;
 			if (k === 'all') {
 				allAttr = GetRegList(_bAttr[k], '');
 			} else {
@@ -149,10 +148,10 @@ HTML.prototype = {
 
 	/**
 	 * @description Insert an (HTML element / HTML string / plain string) at selection range.
-	 * If "options.charCounter_max" is exceeded when "html" is added, null is returned without addition.
+	 * If "options.get('charCounter_max')" is exceeded when "html" is added, null is returned without addition.
 	 * @param {Element|String} html HTML Element or HTML string or plain string
 	 * @param {boolean} rangeSelection If true, range select the inserted node.
-	 * @param {boolean} notCheckCharCount If true, it will be inserted even if "options.charCounter_max" is exceeded.
+	 * @param {boolean} notCheckCharCount If true, it will be inserted even if "options.get('charCounter_max')" is exceeded.
 	 * @param {boolean} notCleanData If true, inserts the HTML string without refining it with html.clean.
 	 */
 	insert: function (html, rangeSelection, notCheckCharCount, notCleanData) {
@@ -171,7 +170,7 @@ HTML.prototype = {
 				const domTree = dom.childNodes;
 
 				if (!notCheckCharCount) {
-					const type = this.options.charCounter_type === 'byte-html' ? 'outerHTML' : 'textContent';
+					const type = this.options.get('charCounter_type') === 'byte-html' ? 'outerHTML' : 'textContent';
 					let checkHTML = '';
 					for (let i = 0, len = domTree.length; i < len; i++) {
 						checkHTML += domTree[i][type];
@@ -224,7 +223,7 @@ HTML.prototype = {
 	 * Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
 	 * @param {Node} oNode Node to be inserted
 	 * @param {Node|null} afterNode If the node exists, it is inserted after the node
-	 * @param {boolean|null} notCheckCharCount If true, it will be inserted even if "options.charCounter_max" is exceeded.
+	 * @param {boolean|null} notCheckCharCount If true, it will be inserted even if "options.get('charCounter_max')" is exceeded.
 	 * @returns {Object|Node|null}
 	 */
 	insertNode: function (oNode, afterNode, notCheckCharCount) {
@@ -371,7 +370,7 @@ HTML.prototype = {
 							if (this.format.isLine(container)) {
 								container.innerHTML = '<br>';
 							} else if (this.format.isBlock(container)) {
-								container.innerHTML = '<' + this.options.defaultLineTag + '><br></' + this.options.defaultLineTag + '>';
+								container.innerHTML = '<' + this.options.get('defaultLineTag') + '><br></' + this.options.get('defaultLineTag') + '>';
 							}
 						}
 
@@ -442,7 +441,7 @@ HTML.prototype = {
 				}
 
 				if (domUtils.isWysiwygFrame(parentNode) && (oNode.nodeType === 3 || domUtils.isBreak(oNode))) {
-					const fNode = domUtils.createElement(this.options.defaultLineTag, null, oNode);
+					const fNode = domUtils.createElement(this.options.get('defaultLineTag'), null, oNode);
 					oNode = fNode;
 				}
 			}
@@ -795,7 +794,7 @@ HTML.prototype = {
 	 * @private
 	 */
 	_makeLine: function (node, requireFormat) {
-		const defaultLineTag = this.options.defaultLineTag;
+		const defaultLineTag = this.options.get('defaultLineTag');
 		// element
 		if (node.nodeType === 1) {
 			if (DisallowedElements(node)) return '';
@@ -975,7 +974,7 @@ HTML.prototype = {
 	_tagConvertor: function (text) {
 		if (!this._disallowedStyleNodesRegExp) return text;
 
-		const ec = this.options._styleNodeMap;
+		const ec = this.options.get('_styleNodeMap');
 		return text.replace(this._disallowedStyleNodesRegExp, function (m, t, n, p) {
 			return t + (typeof ec[n] === 'string' ? ec[n] : n) + (p ? ' ' + p : '');
 		});
@@ -994,7 +993,7 @@ HTML.prototype = {
 		for (let i = 0, len = tempTree.length, n; i < len; i++) {
 			n = tempTree[i];
 			if (!this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !/meta/i.test(n.nodeName)) {
-				if (!f) f = domUtils.createElement(this.options.defaultLineTag);
+				if (!f) f = domUtils.createElement(this.options.get('defaultLineTag'));
 				f.appendChild(n);
 				i--;
 				len--;
@@ -1066,19 +1065,19 @@ HTML.prototype = {
 						const c = r[3].trim();
 						switch (k) {
 							case 'fontFamily':
-								if (!this.options.plugins.font || this.options.font.indexOf(c) === -1) continue;
+								if (!this.options.get('plugins').font || this.options.get('font').indexOf(c) === -1) continue;
 								break;
 							case 'fontSize':
-								if (!this.options.plugins.fontSize) continue;
+								if (!this.options.get('plugins').fontSize) continue;
 								if (!this._cleanStyleRegExp.fontSizeUnit.test(r[0])) {
-									r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), ConvertFontSize.bind(this._w.Math, this.options.fontSizeUnit));
+									r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), ConvertFontSize.bind(this._w.Math, this.options.get('fontSizeUnit')));
 								}
 								break;
 							case 'color':
-								if (!this.options.plugins.fontColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
+								if (!this.options.get('plugins').fontColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
 								break;
 							case 'backgroundColor':
-								if (!this.options.plugins.backgroundColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
+								if (!this.options.get('plugins').backgroundColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
 								break;
 						}
 

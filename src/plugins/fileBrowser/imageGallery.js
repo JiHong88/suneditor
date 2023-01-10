@@ -13,8 +13,8 @@ var a = {
 		const context = core.context;
 		context.imageGallery = {
 			title: core.lang.toolbar.imageGallery, // @Required @override fileBrowser - File browser window title.
-			url: core.options.imageGalleryUrl, // @Required @override fileBrowser - File server url.
-			header: core.options.imageGalleryHeader, // @Required @override fileBrowser - File server http header.
+			url: core.options.get('imageGalleryUrl'), // @Required @override fileBrowser - File server url.
+			header: core.options.get('imageGalleryHeader'), // @Required @override fileBrowser - File server http header.
 			listClass: 'se-image-list', // @Required @override fileBrowser - Class name of list div.
 			itemTemplateHandler: this.drawItems, // @Required @override fileBrowser - Function that defines the HTML of an file item.
 			selectorHandler: this.setImage.bind(core), // @Required @override fileBrowser - Function that action when item click.

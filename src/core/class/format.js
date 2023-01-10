@@ -8,13 +8,13 @@ import { domUtils, unicode, numbers, env } from '../../helper';
 
 const Format = function (editor) {
 	CoreDependency.call(this, editor);
-	this._listCamel = this.options.__listCommonStyle;
-	this._listKebab = env.camelToKebabCase(this.options.__listCommonStyle);
-	this._formatLineCheck = this.options.formatLine.reg;
-	this._formatBrLineCheck = this.options.formatBrLine.reg;
-	this._formatBlockCheck = this.options.formatBlock.reg;
-	this._formatClosureBlockCheck = this.options.formatClosureBlock.reg;
-	this._formatClosureBrLineCheck = this.options.formatClosureBrLine.reg;
+	this._listCamel = this.options.get('__listCommonStyle');
+	this._listKebab = env.camelToKebabCase(this.options.get('__listCommonStyle'));
+	this._formatLineCheck = this.options.get('formatLine').reg;
+	this._formatBrLineCheck = this.options.get('formatBrLine').reg;
+	this._formatBlockCheck = this.options.get('formatBlock').reg;
+	this._formatClosureBlockCheck = this.options.get('formatClosureBlock').reg;
+	this._formatClosureBrLineCheck = this.options.get('formatClosureBrLine').reg;
 };
 
 Format.prototype = {
@@ -189,7 +189,7 @@ Format.prototype = {
 		if (!this.isBrLine(element) && this.isBrLine(currentFormatEl || element.parentNode)) {
 			oFormat = domUtils.createElement('BR');
 		} else {
-			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isLine(currentFormatEl) && !this.isBlock(currentFormatEl) && !this.isBrLine(currentFormatEl) ? currentFormatEl.nodeName : this.options.defaultLineTag;
+			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isLine(currentFormatEl) && !this.isBlock(currentFormatEl) && !this.isBrLine(currentFormatEl) ? currentFormatEl.nodeName : this.options.get('defaultLineTag');
 			oFormat = domUtils.createElement(oFormatName, null, '<br>');
 			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && this.isLine(currentFormatEl))) {
 				domUtils.copyTagAttributes(oFormat, lineNode || currentFormatEl);
@@ -530,7 +530,7 @@ Format.prototype = {
 						}
 					} else {
 						const inner = insNode;
-						insNode = domUtils.createElement(remove ? inner.nodeName : domUtils.isList(rangeElement.parentNode) || domUtils.isListCell(rangeElement.parentNode) ? 'LI' : domUtils.isTableCell(rangeElement.parentNode) ? 'DIV' : this.options.defaultLineTag);
+						insNode = domUtils.createElement(remove ? inner.nodeName : domUtils.isList(rangeElement.parentNode) || domUtils.isListCell(rangeElement.parentNode) ? 'LI' : domUtils.isTableCell(rangeElement.parentNode) ? 'DIV' : this.options.get('defaultLineTag'));
 						const isCell = domUtils.isListCell(insNode);
 						const innerChildren = inner.childNodes;
 						while (innerChildren[0]) {
@@ -914,7 +914,7 @@ Format.prototype = {
 		const eo = range.endOffset;
 
 		const lines = this.getLines(null);
-		const cells = SetLineMargin(lines, this.status.indentSize, this.options._rtl ? 'marginRight' : 'marginLeft');
+		const cells = SetLineMargin(lines, this.status.indentSize, this.options.get('_rtl') ? 'marginRight' : 'marginLeft');
 
 		// list cells
 		if (cells.length > 0) {
@@ -938,7 +938,7 @@ Format.prototype = {
 		const eo = range.endOffset;
 
 		const lines = this.getLines(null);
-		const cells = SetLineMargin(lines, this.status.indentSize * -1, this.options._rtl ? 'marginRight' : 'marginLeft');
+		const cells = SetLineMargin(lines, this.status.indentSize * -1, this.options.get('_rtl') ? 'marginRight' : 'marginLeft');
 
 		// list cells
 		if (cells.length > 0) {
@@ -3035,8 +3035,8 @@ Format.prototype = {
 		let appliedEl = false;
 
 		// bold, italic
-		if (this.options._styleNodeMap[nodeName] === this.options._defaultCommand.bold.toLowerCase()) elStyle.fontWeight = 'bold';
-		if (this.options._styleNodeMap[nodeName] === this.options._defaultCommand.italic.toLowerCase()) elStyle.fontStyle = 'italic';
+		if (this.options.get('_styleNodeMap')[nodeName] === this.options.get('_defaultCommand').bold.toLowerCase()) elStyle.fontWeight = 'bold';
+		if (this.options.get('_styleNodeMap')[nodeName] === this.options.get('_defaultCommand').italic.toLowerCase()) elStyle.fontStyle = 'italic';
 
 		// styles
 		const cKeys = env.getValues(childStyle);
@@ -3108,7 +3108,7 @@ Format.prototype = {
 			appliedEl = false;
 		for (let i = 0, len = children.length, c, s; i < len; i++) {
 			c = children[i];
-			if (this.options._styleNodeMap[c.nodeName.toLowerCase()]) continue;
+			if (this.options.get('_styleNodeMap')[c.nodeName.toLowerCase()]) continue;
 
 			s = env.getValues(c.style);
 			if (

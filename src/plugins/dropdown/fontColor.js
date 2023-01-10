@@ -10,7 +10,7 @@ const FontColor = function (editor, target) {
 	this.icon = this.icons.font_color;
 
 	// members
-	this.colorPicker = new ColorPicker(this, 'color', '#333333', this.options.colorList_font);
+	this.colorPicker = new ColorPicker(this, 'color', '#333333', this.options.get('colorList_font'));
 
 	// create HTML
 	const menu = CreateHTML(this.colorPicker.target);

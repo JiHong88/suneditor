@@ -16,7 +16,7 @@ const FRONT_ZEROWIDTH = new _w.RegExp(unicode.zeroWidthSpace + '+', '');
 const EventManager = function (editor) {
 	CoreDependency.call(this, editor);
 	this._events = [];
-	this._onButtonsCheck = new _w.RegExp('^(' + _w.Object.keys(editor.options._styleNodeMap).join('|') + ')$', 'i');
+	this._onButtonsCheck = new _w.RegExp('^(' + _w.Object.keys(editor.options.get('_styleNodeMap')).join('|') + ')$', 'i');
 	this._onShortcutKey = false;
 	this._IEisComposing = false; // In IE, there is no 'e.isComposing' in the key-up event.
 	this._balloonDelay = null;
@@ -24,7 +24,7 @@ const EventManager = function (editor) {
 	this._toolbarObserver = null;
 	this._onMousedownPlugins = editor._onMousedownPlugins;
 	this._onKeyDownPlugins = editor._onKeyDownPlugins;
-	this._showPathLabel = (editor.frameContext.get('options').statusbar_showPathLabel !== false && this.options.statusbar_showPathLabel) || editor.frameContext.get('options').statusbar_showPathLabel;
+	this._showPathLabel = editor.frameOptions.get('statusbar_showPathLabel');
 	this._lineBreakerButton = null;
 	this._lineBreaker_t = null;
 	this._lineBreaker_b = null;
@@ -75,7 +75,7 @@ EventManager.prototype = {
 	 * @return {type, listener, useCapture}
 	 */
 	addGlobalEvent: function (type, listener, useCapture) {
-		if (this.options.iframe) {
+		if (this.options.get('iframe')) {
 			this.editor.frameContext.get('_ww').addEventListener(type, listener, useCapture);
 		}
 		this._w.addEventListener(type, listener, useCapture);
@@ -95,7 +95,7 @@ EventManager.prototype = {
 			useCapture = type.useCapture;
 			type = type.type;
 		}
-		if (this.options.iframe) {
+		if (this.options.get('iframe')) {
 			this.editor.frameContext.get('_ww').removeEventListener(type, listener, useCapture);
 		}
 		this._w.removeEventListener(type, listener, useCapture);
@@ -110,7 +110,7 @@ EventManager.prototype = {
 		if (selectionNode === this.editor.effectNode) return;
 		this.editor.effectNode = selectionNode;
 
-		const marginDir = this.options._rtl ? 'marginRight' : 'marginLeft';
+		const marginDir = this.options.get('_rtl') ? 'marginRight' : 'marginLeft';
 		const commandMap = this.editor._commandMap;
 		const classOnCheck = this._onButtonsCheck;
 		const commandMapNodes = [];
@@ -140,6 +140,7 @@ EventManager.prototype = {
 				}
 			}
 
+			/** indent, outdent */
 			if (this.format.isLine(element)) {
 				/* Outdent */
 				if (commandMapNodes.indexOf('OUTDENT') === -1 && commandMap.get('OUTDENT') && !domUtils.isImportantDisabled(commandMap.get('OUTDENT'))) {
@@ -163,9 +164,9 @@ EventManager.prototype = {
 			}
 
 			/** default active buttons [strong, ins, em, del, sub, sup] */
-			if (classOnCheck && classOnCheck.test(nodeName)) {
+			if (classOnCheck.test(nodeName)) {
 				commandMapNodes.push(nodeName);
-				domUtils.addClass(commandMap[nodeName], 'active');
+				domUtils.addClass(commandMap.get(nodeName), 'active');
 			}
 		}
 
@@ -325,7 +326,7 @@ EventManager.prototype = {
 			return;
 		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-se-embed') === 'true') {
 			let el = commonCon.nextElementSibling;
-			if (!this.format.isLine(el)) el = this.format.addLine(commonCon, this.options.defaultLineTag);
+			if (!this.format.isLine(el)) el = this.format.addLine(commonCon, this.options.get('defaultLineTag'));
 			this.selection.setRange(el.firstChild, 0, el.firstChild, 0);
 			return;
 		}
@@ -334,7 +335,7 @@ EventManager.prototype = {
 		if (domUtils.getParentElement(commonCon, this.html._isNotCheckingNode)) return null;
 
 		if (rangeEl) {
-			format = domUtils.createElement(formatName || this.options.defaultLineTag);
+			format = domUtils.createElement(formatName || this.options.get('defaultLineTag'));
 			format.innerHTML = rangeEl.innerHTML;
 			if (format.childNodes.length === 0) format.innerHTML = unicode.zeroWidthSpace;
 
@@ -365,7 +366,7 @@ EventManager.prototype = {
 			return;
 		}
 
-		this.editor.execCommand('formatBlock', false, formatName || this.options.defaultLineTag);
+		this.editor.execCommand('formatBlock', false, formatName || this.options.get('defaultLineTag'));
 		focusNode = domUtils.getEdgeChildNodes(commonCon, commonCon);
 		focusNode = focusNode ? focusNode.ec : commonCon;
 
@@ -465,7 +466,7 @@ EventManager.prototype = {
 			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, '<br>');
 		}
 
-		const maxCharCount = this.char.test(this.options.charCounter_type === 'byte-html' ? cleanData : plainText);
+		const maxCharCount = this.char.test(this.options.get('charCounter_type') === 'byte-html' ? cleanData : plainText);
 		// user event - paste
 		if (type === 'paste' && typeof this.events.onPaste === 'function') {
 			const value = this.events.onPaste(e, cleanData, maxCharCount);
@@ -518,7 +519,7 @@ EventManager.prototype = {
 	},
 
 	_addEvent: function (frameContext) {
-		const eventWysiwyg = this.options.iframe ? frameContext.get('_ww') : frameContext.get('wysiwyg');
+		const eventWysiwyg = this.options.get('iframe') ? frameContext.get('_ww') : frameContext.get('wysiwyg');
 		frameContext.set('eventWysiwyg', eventWysiwyg);
 		if (!env.isIE) {
 			this._resizeObserver = new _w.ResizeObserver(
@@ -567,7 +568,7 @@ EventManager.prototype = {
 		}
 
 		/** code view area auto line */
-		if (this.options.height === 'auto' && !this.options.hasCodeMirror) {
+		if (this.options.get('height') === 'auto' && !this.options.get('hasCodeMirror')) {
 			const cvAuthHeight = this.editor._codeViewAutoHeight.bind(this.editor);
 			this.addEvent(frameContext.get('code'), 'keydown', cvAuthHeight, false);
 			this.addEvent(frameContext.get('code'), 'keyup', cvAuthHeight, false);
@@ -576,7 +577,7 @@ EventManager.prototype = {
 
 		/** statusbar */
 		if (frameContext.has('statusbar')) {
-			if (/\d+/.test(this.options.height) && this.options.statusbar_resizeEnable) {
+			if (/\d+/.test(this.options.get('height')) && this.frameOptions.get('statusbar_resizeEnable')) {
 				this.addEvent(frameContext.get('statusbar'), 'mousedown', OnMouseDown_statusbar.bind(this), false);
 			} else {
 				domUtils.addClass(frameContext.get('statusbar'), 'se-resizing-none');
@@ -816,7 +817,7 @@ function OnClick_wysiwyg(e) {
 				const oLi = domUtils.createElement('LI', null, selectionNode);
 				rangeEl.insertBefore(oLi, prevLi);
 				this.editor.focus();
-			} else if (!domUtils.isWysiwygFrame(selectionNode) && !this.component.is(selectionNode) && (!domUtils.isTable(selectionNode) || domUtils.isTableCell(selectionNode)) && this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.defaultLineTag) !== null) {
+			} else if (!domUtils.isWysiwygFrame(selectionNode) && !this.component.is(selectionNode) && (!domUtils.isTable(selectionNode) || domUtils.isTableCell(selectionNode)) && this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLineTag')) !== null) {
 				e.preventDefault();
 				this.editor.focus();
 			} else {
@@ -914,7 +915,7 @@ function OnKeyDown_wysiwyg(e) {
 				break;
 			}
 
-			if (!this.format.isLine(formatEl) && !this.editor.frameContext.get('wysiwyg').firstElementChild && !this.component.is(selectionNode) && this._setDefaultLine(this.options.defaultLineTag) !== null) {
+			if (!this.format.isLine(formatEl) && !this.editor.frameContext.get('wysiwyg').firstElementChild && !this.component.is(selectionNode) && this._setDefaultLine(this.options.get('defaultLineTag')) !== null) {
 				e.preventDefault();
 				e.stopPropagation();
 				return false;
@@ -932,14 +933,14 @@ function OnKeyDown_wysiwyg(e) {
 					e.preventDefault();
 					e.stopPropagation();
 
-					if (formatEl.nodeName.toUpperCase() === this.options.defaultLineTag.toUpperCase()) {
+					if (formatEl.nodeName.toUpperCase() === this.options.get('defaultLineTag').toUpperCase()) {
 						formatEl.innerHTML = '<br>';
 						const attrs = formatEl.attributes;
 						while (attrs[0]) {
 							formatEl.removeAttribute(attrs[0].name);
 						}
 					} else {
-						formatEl.parentElement.replaceChild(domUtils.createElement(this.options.defaultLineTag, null, '<br>'), formatEl);
+						formatEl.parentElement.replaceChild(domUtils.createElement(this.options.get('defaultLineTag'), null, '<br>'), formatEl);
 					}
 
 					this.editor._nativeFocus();
@@ -1206,7 +1207,7 @@ function OnKeyDown_wysiwyg(e) {
 
 			break;
 		case 9 /** tab key */:
-			if (fileComponentName || this.options.tabDisable) break;
+			if (fileComponentName || this.options.get('tabDisable')) break;
 			e.preventDefault();
 			if (ctrl || alt || domUtils.isWysiwygFrame(selectionNode)) break;
 
@@ -1319,7 +1320,7 @@ function OnKeyDown_wysiwyg(e) {
 		case 13 /** enter key */:
 			const brBlock = this.format.getBrLine(selectionNode, null);
 
-			if (this.options.charCounter_type === 'byte-html') {
+			if (this.options.get('charCounter_type') === 'byte-html') {
 				let enterHTML = '';
 				if ((!shift && brBlock) || shift) {
 					enterHTML = '<br>';
@@ -1338,7 +1339,7 @@ function OnKeyDown_wysiwyg(e) {
 				if ((formatInners && /^H[1-6]$/i.test(formatEl.nodeName)) || /^HR$/i.test(formatEl.nodeName)) {
 					e.preventDefault();
 					let temp = null;
-					const newFormat = this.format.addLine(formatEl, this.options.defaultLineTag);
+					const newFormat = this.format.addLine(formatEl, this.options.get('defaultLineTag'));
 
 					if (formatInners && formatInners.length > 0) {
 						temp = formatInners.pop();
@@ -1352,7 +1353,7 @@ function OnKeyDown_wysiwyg(e) {
 					temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
 					this.selection.setRange(temp, 0, temp, 0);
 					break;
-				} else if (this.options.lineAttrReset && formatEl && !domUtils.isListCell(formatEl)) {
+				} else if (this.options.get('lineAttrReset') && formatEl && !domUtils.isListCell(formatEl)) {
 					e.preventDefault();
 					e.stopPropagation();
 
@@ -1378,7 +1379,7 @@ function OnKeyDown_wysiwyg(e) {
 						else newEl = this.node.split(range.endContainer, range.endOffset, 0);
 					}
 
-					const resetAttr = this.options.lineAttrReset === '*' ? null : this.options.lineAttrReset;
+					const resetAttr = this.options.get('lineAttrReset') === '*' ? null : this.options.get('lineAttrReset');
 					const attrs = newEl.attributes;
 					let i = 0;
 					while (attrs[i]) {
@@ -1493,7 +1494,7 @@ function OnKeyDown_wysiwyg(e) {
 							? rangeEl.nextElementSibling.nodeName
 							: this.format.isLine(rangeEl.previousElementSibling) && !this.format.isBlock(rangeEl.previousElementSibling)
 							? rangeEl.previousElementSibling.nodeName
-							: this.options.defaultLineTag;
+							: this.options.get('defaultLineTag');
 
 						newEl = domUtils.createElement(newFormat);
 						const edge = this.format.removeBlock(rangeEl, [formatEl], null, true, true);
@@ -1525,7 +1526,7 @@ function OnKeyDown_wysiwyg(e) {
 				if (domUtils.isListCell(container.parentNode)) {
 					newEl = domUtils.createElement('BR');
 				} else {
-					newEl = domUtils.createElement(this.format.isLine(sibling) && !this.format.isBlock(sibling) ? sibling.nodeName : this.options.defaultLineTag, null, '<br>');
+					newEl = domUtils.createElement(this.format.isLine(sibling) && !this.format.isBlock(sibling) ? sibling.nodeName : this.options.get('defaultLineTag'), null, '<br>');
 				}
 
 				container.parentNode.insertBefore(newEl, container);
@@ -1584,7 +1585,7 @@ function OnKeyUp_wysiwyg(e) {
 
 		selectionNode.innerHTML = '';
 
-		const oFormatTag = domUtils.createElement(this.format.isLine(this.status.currentNodes[0]) ? this.status.currentNodes[0] : this.options.defaultLineTag, null, '<br>');
+		const oFormatTag = domUtils.createElement(this.format.isLine(this.status.currentNodes[0]) ? this.status.currentNodes[0] : this.options.get('defaultLineTag'), null, '<br>');
 		selectionNode.appendChild(oFormatTag);
 		this.selection.setRange(oFormatTag, 0, oFormatTag, 0);
 		this.applyTagEffect();
@@ -1595,7 +1596,7 @@ function OnKeyUp_wysiwyg(e) {
 
 	const formatEl = this.format.getLine(selectionNode, null);
 	const rangeEl = this.format.getBlock(selectionNode, null);
-	if (!formatEl && range.collapsed && !this.component.is(selectionNode) && !domUtils.isList(selectionNode) && this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.defaultLineTag) !== null) {
+	if (!formatEl && range.collapsed && !this.component.is(selectionNode) && !domUtils.isList(selectionNode) && this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLineTag')) !== null) {
 		selectionNode = this.selection.getNode();
 	}
 
@@ -1740,8 +1741,8 @@ function OnMouseMove_wysiwyg(e) {
 		const wScroll = fc.get('wysiwyg').scrollTop;
 		const offsets = this.offset.getGlobal(fc.get('topArea'));
 		const componentTop = this.offset.get(component).top + wScroll;
-		const y = e.pageY + scrollTop + (this.options.iframe && !this.options.toolbar_container ? this.editor.toolContext.get('toolbar.main').offsetHeight : 0);
-		const c = componentTop + (this.options.iframe ? scrollTop : offsets.top);
+		const y = e.pageY + scrollTop + (this.options.get('iframe') && !this.options.get('toolbar_container') ? this.editor.toolContext.get('toolbar.main').offsetHeight : 0);
+		const c = componentTop + (this.options.get('iframe') ? scrollTop : offsets.top);
 		const toolbarH = this.editor.toolContext.get('toolbar.main').offsetHeight;
 
 		const isList = domUtils.isListCell(component.parentNode);
@@ -1800,10 +1801,10 @@ function DisplayLineBreak(dir, e) {
 	const component = this._lineBreakComp;
 	const isList = domUtils.isListCell(component.parentNode);
 
-	const format = domUtils.createElement(isList ? 'BR' : domUtils.isTableCell(component.parentNode) ? 'DIV' : this.options.defaultLineTag);
+	const format = domUtils.createElement(isList ? 'BR' : domUtils.isTableCell(component.parentNode) ? 'DIV' : this.options.get('defaultLineTag'));
 	if (!isList) format.innerHTML = '<br>';
 
-	if (this.options.charCounter_type === 'byte-html' && !this.char.check(format.outerHTML)) return;
+	if (this.options.get('charCounter_type') === 'byte-html' && !this.char.check(format.outerHTML)) return;
 
 	component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
 	this.editor.frameContext.get('lineBreaker').style.display = 'none';
@@ -1851,7 +1852,7 @@ function OnResize_window() {
 }
 
 function OnScroll_window() {
-	if (this.options.toolbar_sticky > -1) {
+	if (this.options.get('toolbar_sticky') > -1) {
 		this.toolbar._resetSticky();
 	}
 

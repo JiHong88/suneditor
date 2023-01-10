@@ -34,17 +34,17 @@ Viewer.prototype = {
 
 			if (this.status.isFullScreen) {
 				code.style.height = '100%';
-			} else if (this.options.height === 'auto' && !this.options.hasCodeMirror) {
+			} else if (this.options.get('height') === 'auto' && !this.options.get('hasCodeMirror')) {
 				code.style.height = code.scrollHeight > 0 ? code.scrollHeight + 'px' : 'auto';
 			}
 
-			if (this.options.hasCodeMirror) {
+			if (this.options.get('hasCodeMirror')) {
 				this._codeMirrorEditor('refresh', null);
 			}
 
 			if (!this.status.isFullScreen) {
 				this.editor._notHideToolbar = true;
-				if (/balloon/i.test(this.options.mode)) {
+				if (/balloon/i.test(this.options.get('mode'))) {
 					this.editor.toolContext.get('toolbar._arrow').style.display = 'none';
 					this.editor.toolContext.get('toolbar.main').style.left = '';
 					this.editor.isInline = true;
@@ -63,11 +63,11 @@ Viewer.prototype = {
 			wysiwygFrame.style.display = 'block';
 			_var.wysiwygOriginCssText = _var.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
 
-			if (this.options.height === 'auto' && !this.options.hasCodeMirror) fc.get('code').style.height = '0px';
+			if (this.options.get('height') === 'auto' && !this.options.get('hasCodeMirror')) fc.get('code').style.height = '0px';
 
 			if (!this.status.isFullScreen) {
 				this.editor._notHideToolbar = false;
-				if (/balloon/i.test(this.options.mode)) {
+				if (/balloon/i.test(this.options.get('mode'))) {
 					this.editor.toolContext.get('toolbar._arrow').style.display = '';
 					this.editor.isInline = false;
 					this.editor.isBalloon = true;
@@ -111,7 +111,7 @@ Viewer.prototype = {
 		const wasToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.editor.toolbar._inlineToolbarAttr.isShow);
 
 		if (value) {
-			if (/balloon|inline/i.test(this.options.mode)) {
+			if (/balloon|inline/i.test(this.options.get('mode'))) {
 				this.editor.toolContext.get('toolbar._arrow').style.display = 'none';
 				_var.fullScreenInline = this.editor.isInline;
 				_var.fullScreenBalloon = this.editor.isBalloon;
@@ -119,7 +119,7 @@ Viewer.prototype = {
 				this.editor.isBalloon = false;
 			}
 
-			if (this.options.toolbar_container) {
+			if (this.options.get('toolbar_container')) {
 				_var.toolbarParent = toolbar.parentElement;
 				fc.get('container').insertBefore(toolbar, editorArea);
 			}
@@ -146,21 +146,21 @@ Viewer.prototype = {
 			_var.codeOriginCssText = code.style.cssText;
 
 			editorArea.style.cssText = toolbar.style.cssText = '';
-			wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + this.options.defaultStyle;
+			wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + this.options.get('defaultStyle');
 			code.style.cssText = (code.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
 			toolbar.style.width = wysiwygFrame.style.height = code.style.height = '100%';
 			toolbar.style.position = 'relative';
 			toolbar.style.display = 'block';
 
 			_var.fullScreenInnerHeight = this._w.innerHeight - toolbar.offsetHeight;
-			editorArea.style.height = _var.fullScreenInnerHeight - this.options.fullScreenOffset + 'px';
+			editorArea.style.height = _var.fullScreenInnerHeight - this.options.get('fullScreenOffset') + 'px';
 
-			if (this.options.iframe && this.options.height === 'auto') {
+			if (this.options.get('iframe') && this.options.get('height') === 'auto') {
 				editorArea.style.overflow = 'auto';
 				this.editor._iframeAutoHeight();
 			}
 
-			fc.get('topArea').style.marginTop = this.options.fullScreenOffset + 'px';
+			fc.get('topArea').style.marginTop = this.options.get('fullScreenOffset') + 'px';
 
 			if (this.editor._styleCommandMap.fullScreen) {
 				domUtils.changeElement(this.editor._styleCommandMap.fullScreen.firstElementChild, this.icons.reduction);
@@ -174,24 +174,24 @@ Viewer.prototype = {
 			topArea.style.cssText = fc.get('topArea').style.cssText;
 			this._d.body.style.overflow = _var.bodyOverflow;
 
-			if (this.options.height === 'auto' && !this.options.hasCodeMirror) this._codeViewAutoHeight();
+			if (this.options.get('height') === 'auto' && !this.options.get('hasCodeMirror')) this._codeViewAutoHeight();
 
 			if (_var.toolbarParent) {
 				_var.toolbarParent.appendChild(toolbar);
 				_var.toolbarParent = null;
 			}
 
-			if (this.options.toolbar_sticky > -1) {
+			if (this.options.get('toolbar_sticky') > -1) {
 				domUtils.removeClass(toolbar, 'se-toolbar-sticky');
 			}
 
-			if (_var.fullScreenSticky && !this.options.toolbar_container) {
+			if (_var.fullScreenSticky && !this.options.get('toolbar_container')) {
 				_var.fullScreenSticky = false;
 				fc.get('_stickyDummy').style.display = 'block';
 				domUtils.addClass(toolbar, 'se-toolbar-sticky');
 			}
 
-			if (/balloon|inline/i.test(this.options.mode)) {
+			if (/balloon|inline/i.test(this.options.get('mode'))) {
 				this.editor.toolContext.get('toolbar._arrow').style.display = '';
 				this.editor.isInline = _var.fullScreenInline;
 				this.editor.isBalloon = _var.fullScreenBalloon;
@@ -241,12 +241,12 @@ Viewer.prototype = {
 		});
 		this._d.body.appendChild(iframe);
 
-		const contentHTML = this.options.printTemplate ? this.options.printTemplate.replace(/\{\{\s*content\s*\}\}/i, this.editor.getContent(true)) : this.editor.getContent(true);
+		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*content\s*\}\}/i, this.editor.getContent(true)) : this.editor.getContent(true);
 		const printDocument = domUtils.getIframeDocument(iframe);
 		const wDoc = this.editor.frameContext.get('_wd');
 
-		if (this.options.iframe) {
-			const arrts = this.options._printClass !== null ? 'class="' + this.options._printClass + '"' : this.options.iframe_fullPage ? domUtils.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + this.options._editableClass + '"';
+		if (this.options.get('iframe')) {
+			const arrts = this.options.get('_printClass') !== null ? 'class="' + this.options.get('_printClass') + '"' : this.options.get('iframe_fullPage') ? domUtils.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + this.options.get('_editableClass') + '"';
 
 			printDocument.write('' + '<!DOCTYPE html><html>' + '<head>' + wDoc.head.innerHTML + '</head>' + '<body ' + arrts + '>' + contentHTML + '</body>' + '</html>');
 		} else {
@@ -260,7 +260,7 @@ Viewer.prototype = {
 				linkHTML += styles[i].outerHTML;
 			}
 
-			printDocument.write('<!DOCTYPE html><html><head>' + linkHTML + '</head><body class="' + (this.options._printClass !== null ? this.options._printClass : this.options._editableClass) + '">' + contentHTML + '</body></html>');
+			printDocument.write('<!DOCTYPE html><html><head>' + linkHTML + '</head><body class="' + (this.options.get('_printClass') !== null ? this.options.get('_printClass') : this.options.get('_editableClass')) + '">' + contentHTML + '</body></html>');
 		}
 
 		this.editor._openLoading();
@@ -300,13 +300,13 @@ Viewer.prototype = {
 		this.editor._offCurrentController();
 		this.editor._offCurrentModal();
 
-		const contentHTML = this.options.previewTemplate ? this.options.previewTemplate.replace(/\{\{\s*content\s*\}\}/i, this.editor.getContent(true)) : this.editor.getContent(true);
+		const contentHTML = this.options.get('previewTemplate') ? this.options.get('previewTemplate').replace(/\{\{\s*content\s*\}\}/i, this.editor.getContent(true)) : this.editor.getContent(true);
 		const windowObject = this._w.open('', '_blank');
 		windowObject.mimeType = 'text/html';
 		const wDoc = this.editor.frameContext.get('_wd');
 
-		if (this.options.iframe) {
-			const arrts = this.options._printClass !== null ? 'class="' + this.options._printClass + '"' : this.options.iframe_fullPage ? domUtils.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + this.options._editableClass + '"';
+		if (this.options.get('iframe')) {
+			const arrts = this.options.get('_printClass') !== null ? 'class="' + this.options.get('_printClass') + '"' : this.options.get('iframe_fullPage') ? domUtils.getAttributesToString(wDoc.body, ['contenteditable']) : 'class="' + this.options.get('_editableClass') + '"';
 
 			windowObject.document.write('<!DOCTYPE html><html><head>' + wDoc.head.innerHTML + '<style>body {overflow:auto !important; margin: 10px auto !important; height:auto !important; outline:1px dashed #ccc;}</style></head><body ' + arrts + '>' + contentHTML + '</body></html>');
 		} else {
@@ -331,7 +331,7 @@ Viewer.prototype = {
 					linkHTML +
 					'</head>' +
 					'<body class="' +
-					(this.options._printClass !== null ? this.options._printClass : this.options._editableClass) +
+					(this.options.get('_printClass') !== null ? this.options.get('_printClass') : this.options.get('_editableClass')) +
 					'" style="margin:10px auto !important; height:auto !important; outline:1px dashed #ccc;">' +
 					contentHTML +
 					'</body>' +
@@ -350,32 +350,32 @@ Viewer.prototype = {
 	_codeMirrorEditor: function (key, value) {
 		switch (key) {
 			case 'set':
-				if (this.options.codeMirror5Editor) {
-					this.options.codeMirror5Editor.getDoc().setValue(value);
-				} else if (this.options.codeMirror6Editor) {
-					this.options.codeMirror6Editor.dispatch({
-						changes: { from: 0, to: this.options.codeMirror6Editor.state.doc.length, insert: value }
+				if (this.options.get('codeMirror5Editor')) {
+					this.options.get('codeMirror5Editor').getDoc().setValue(value);
+				} else if (this.options.get('codeMirror6Editor')) {
+					this.options.get('codeMirror6Editor').dispatch({
+						changes: { from: 0, to: this.options.get('codeMirror6Editor').state.doc.length, insert: value }
 					});
 				}
 				break;
 			case 'get':
-				if (this.options.codeMirror5Editor) {
-					return this.options.codeMirror5Editor.getDoc().getValue();
-				} else if (this.options.codeMirror6Editor) {
-					return this.options.codeMirror6Editor.state.doc.toString();
+				if (this.options.get('codeMirror5Editor')) {
+					return this.options.get('codeMirror5Editor').getDoc().getValue();
+				} else if (this.options.get('codeMirror6Editor')) {
+					return this.options.get('codeMirror6Editor').state.doc.toString();
 				}
 				break;
 			case 'readonly':
-				if (this.options.codeMirror5Editor) {
-					this.options.codeMirror5Editor.setOption('readOnly', value);
-				} else if (this.options.codeMirror6Editor) {
-					if (!value) this.options.codeMirror6Editor.contentDOM.setAttribute('contenteditable', true);
-					else this.options.codeMirror6Editor.contentDOM.removeAttribute('contenteditable');
+				if (this.options.get('codeMirror5Editor')) {
+					this.options.get('codeMirror5Editor').setOption('readOnly', value);
+				} else if (this.options.get('codeMirror6Editor')) {
+					if (!value) this.options.get('codeMirror6Editor').contentDOM.setAttribute('contenteditable', true);
+					else this.options.get('codeMirror6Editor').contentDOM.removeAttribute('contenteditable');
 				}
 				break;
 			case 'refresh':
-				if (this.options.codeMirror5Editor) {
-					this.options.codeMirror5Editor.refresh();
+				if (this.options.get('codeMirror5Editor')) {
+					this.options.get('codeMirror5Editor').refresh();
 				}
 				break;
 		}
@@ -387,7 +387,7 @@ Viewer.prototype = {
 	 * @private
 	 */
 	_setCodeView: function (value) {
-		if (this.options.hasCodeMirror) {
+		if (this.options.get('hasCodeMirror')) {
 			this._codeMirrorEditor('set', value);
 		} else {
 			this.editor.frameContext.get('code').value = value;
@@ -399,7 +399,7 @@ Viewer.prototype = {
 	 * @private
 	 */
 	_getCodeView: function () {
-		if (this.options.hasCodeMirror) {
+		if (this.options.get('hasCodeMirror')) {
 			return this._codeMirrorEditor('get', null);
 		} else {
 			return this.editor.frameContext.get('code').value;
@@ -413,7 +413,7 @@ Viewer.prototype = {
 	_setCodeDataToEditor: function () {
 		const code_html = this._getCodeView();
 
-		if (this.options.iframe_fullPage) {
+		if (this.options.get('iframe_fullPage')) {
 			const wDoc = this.editor.frameContext.get('_wd');
 			const parseDocument = this.editor._parser.parseFromString(code_html, 'text/html');
 			const headChildren = parseDocument.head.children;
@@ -426,8 +426,8 @@ Viewer.prototype = {
 			}
 
 			let headers = parseDocument.head.innerHTML;
-			if (!parseDocument.head.querySelector('link[rel="stylesheet"]') || (this.options.height === 'auto' && !parseDocument.head.querySelector('style'))) {
-				headers += converter._setIframeCssTags(this.options);
+			if (!parseDocument.head.querySelector('link[rel="stylesheet"]') || (this.options.get('height') === 'auto' && !parseDocument.head.querySelector('style'))) {
+				headers += converter._setIframeCssTags(this.options, this.frameOptions.get('height'));
 			}
 
 			wDoc.head.innerHTML = headers;
@@ -439,13 +439,13 @@ Viewer.prototype = {
 				wDoc.body.setAttribute(attrs[i].name, attrs[i].value);
 			}
 			if (!domUtils.hasClass(wDoc.body, 'sun-editor-editable')) {
-				const editableClasses = this.options._editableClass.split(' ');
+				const editableClasses = this.options.get('_editableClass').split(' ');
 				for (let i = 0; i < editableClasses.length; i++) {
-					domUtils.addClass(wDoc.body, this.options._editableClass[i]);
+					domUtils.addClass(wDoc.body, this.options.get('_editableClass')[i]);
 				}
 			}
 		} else {
-			this.editor.frameContext.get('wysiwyg').innerHTML = code_html.length > 0 ? this.html.clean(code_html, true, null, null) : '<' + this.options.defaultLineTag + '><br></' + this.options.defaultLineTag + '>';
+			this.editor.frameContext.get('wysiwyg').innerHTML = code_html.length > 0 ? this.html.clean(code_html, true, null, null) : '<' + this.options.get('defaultLineTag') + '><br></' + this.options.get('defaultLineTag') + '>';
 		}
 	},
 
@@ -457,7 +457,7 @@ Viewer.prototype = {
 		const codeContent = this.editor._convertHTMLToCode(this.editor.frameContext.get('wysiwyg'), false);
 		let codeValue = '';
 
-		if (this.options.iframe_fullPage) {
+		if (this.options.get('iframe_fullPage')) {
 			const attrs = domUtils.getAttributesToString(this.editor.frameContext.get('_wd').body, null);
 			codeValue = '<!DOCTYPE html>\n<html>\n' + this.editor.frameContext.get('_wd').head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContent + '</body>\n</html>';
 		} else {

@@ -10,7 +10,7 @@ const Table = function (editor, target) {
 	this.icon = this.icons.table;
 
 	// create HTML
-	this.cellControllerTop = this.options.tableCellControllerPosition === 'top';
+	this.cellControllerTop = this.options.get('tableCellControllerPosition') === 'top';
 	const menu = CreateHTML(editor);
 	const commandArea = menu.querySelector('.se-controller-table-picker');
 	const controller_table = CreateHTML_controller_table(editor);
@@ -44,7 +44,7 @@ const Table = function (editor, target) {
 	this._tableXY = [];
 	this._maxWidth = true;
 	this._fixedColumn = false;
-	this._rtl = this.options._rtl;
+	this._rtl = this.options.get('_rtl');
 	this._physical_cellCnt = 0;
 	this._logical_cellCnt = 0;
 	this._rowCnt = 0;
