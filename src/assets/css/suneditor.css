@@ -22,7 +22,7 @@
 }
 .sun-editor-common input, .sun-editor-common select, .sun-editor-common textarea {
     background-color: rgb(var(--se-grey-accent-1));
-    color: rbg(var(--se-font-color));
+    color: rgb(var(--se-font-color));
 }
 .sun-editor-common input, .sun-editor-common select, .sun-editor-common textarea, .sun-editor-common button {
     font-size:14px;
