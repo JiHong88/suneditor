@@ -1743,7 +1743,7 @@
 }
 .sun-editor .se-file-browser .se-file-browser-tags a {
     display:inline-block;
-    background-color:rgb(rgb(var(--se-grey-accent-13)));
+    background-color: rgb(var(--se-grey-accent-13));
     padding:6px 12px;
     margin:8px 0 8px 8px;
     color:rgb(var(--se-font-color));
