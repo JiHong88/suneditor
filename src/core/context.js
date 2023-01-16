@@ -55,16 +55,13 @@ const BASIC_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'sub', 'sup', '
  * @returns {Object}
  * @private
  */
-export const CreateToolContext = function (toolbar, carrierWrapper) {
+export const CreateToolContext = function (toolbar) {
 	const m = new _w.Map([
 		['toolbar.main', toolbar],
 		['toolbar._buttonTray', toolbar.querySelector('.se-btn-tray')],
 		['toolbar._menuTray', toolbar.querySelector('.se-menu-tray')],
 		['toolbar._arrow', toolbar.querySelector('.se-arrow')],
-		['toolbar._wrapper', toolbar.parentElement.parentElement],
-		['_carrierWrapper', carrierWrapper],
-		['_loading', carrierWrapper.querySelector('.se-loading-box')],
-		['_resizeBackground', carrierWrapper.querySelector('.se-resizing-back')]
+		['toolbar._wrapper', toolbar.parentElement.parentElement]
 	]);
 
 	for (let i = 0, len = BASIC_COMMANDS.length, b; i < len; i++) {

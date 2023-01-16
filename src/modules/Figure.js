@@ -702,8 +702,8 @@ Figure.prototype = {
 
 		this._displayResizeHandles(true);
 		this.editor._offCurrentController();
-		this.editor.toolContext.get('_resizeBackground').style.display = 'none';
-		this.editor.toolContext.get('_resizeBackground').style.cursor = 'default';
+		this.editor._resizeBackground.style.display = 'none';
+		this.editor._resizeBackground.style.cursor = 'default';
 	},
 
 	constructor: Figure
@@ -731,8 +731,8 @@ function OnResizeContainer(e) {
 	this._resizeClientX = e.clientX;
 	this._resizeClientY = e.clientY;
 	this.editor.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
-	this.editor.toolContext.get('_resizeBackground').style.cursor = DIRECTION_CURSOR_MAP[direction];
-	this.editor.toolContext.get('_resizeBackground').style.display = 'block';
+	this.editor._resizeBackground.style.cursor = DIRECTION_CURSOR_MAP[direction];
+	this.editor._resizeBackground.style.display = 'block';
 
 	this.__onContainerEvent = this.eventManager.addGlobalEvent('mousemove', this.__containerResizing);
 	this.__offContainerEvent = this.eventManager.addGlobalEvent('mouseup', this.__containerResizingOff);

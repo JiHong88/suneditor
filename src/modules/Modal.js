@@ -5,7 +5,7 @@ const Modal = function (inst, element) {
 	CoreDependency.call(this, inst.editor);
 
 	// members
-	const carrierWrapper = this.editor.toolContext.get('_carrierWrapper');
+	const carrierWrapper = this.editor._carrierWrapper;
 	this.inst = inst;
 	this.kind = inst.constructor.key;
 	this.form = element;

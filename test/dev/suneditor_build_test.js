@@ -314,7 +314,7 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // 	buttonList: bl
 // });
 
-window.e=suneditor.create(
+window.e = suneditor.create(
 	{
 		editor1: {
 			target: document.querySelector('#multi_editor_1'),
@@ -352,6 +352,7 @@ window.e=suneditor.create(
 		toolbar_container: '#root_toolbar_container',
 		// statusbar_container: '#root_statusbar_container',
 		toolbar_sticky: 0,
+		imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
 		buttonList: bl
 	}
 );

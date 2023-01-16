@@ -55,6 +55,13 @@ const Editor = function (multiTargets, options) {
 	this._w = _w;
 
 	/**
+	 * @description Controllers carrier
+	 */
+	this._carrierWrapper = product.carrierWrapper;
+	this._loadingBox = product.carrierWrapper.querySelector('.se-loading-box');
+	this._resizeBackground = product.carrierWrapper.querySelector('.se-resizing-back');
+
+	/**
 	 * @description Editor options
 	 * @type {Object.<string, any>}
 	 */
@@ -1076,7 +1083,7 @@ Editor.prototype = {
 	 */
 	destroy: function () {
 		/** remove element */
-		domUtils.removeItem(this.toolContext.get('_carrierWrapper'));
+		domUtils.removeItem(this._carrierWrapper);
 		domUtils.removeItem(this.toolContext.get('toolbar._wrapper'));
 
 		this.rootTargets.forEach(function (e) {
@@ -1147,7 +1154,7 @@ Editor.prototype = {
 	 * @private
 	 */
 	_openLoading: function () {
-		this.toolContext.get('_loading').style.display = 'block';
+		this._loadingBox.style.display = 'block';
 	},
 
 	/**
@@ -1155,7 +1162,7 @@ Editor.prototype = {
 	 * @private
 	 */
 	_closeLoading: function () {
-		this.toolContext.get('_loading').style.display = 'none';
+		this._loadingBox.style.display = 'none';
 	},
 
 	/**
@@ -1513,7 +1520,7 @@ Editor.prototype = {
 		this._responsiveButtons = product.toolbar.responsiveButtons;
 		// this.toolbar._setResponsive();
 
-		this.toolContext = CreateToolContext(ctx.toolbar.main, ctx.element.top, ctx.element.wysiwygFrame, ctx.element.code, ctx._carrierWrapper, this.options); //@todo context don't reset
+		this.toolContext = CreateToolContext(ctx.toolbar.main, ctx.element.top, ctx.element.wysiwygFrame, ctx.element.code, this._carrierWrapper, this.options); //@todo context don't reset
 		this._componentsInfoReset = true;
 		this._editorInit(true, initHTML);
 	},

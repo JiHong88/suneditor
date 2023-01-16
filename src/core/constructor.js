@@ -5,7 +5,7 @@ import { domUtils, numbers, converter, env } from '../helper';
 
 const _d = env._d;
 const _w = env._w;
-const DEFAULT_COMMANDS = ['bold', 'underline', 'italic','strike','sub','sup','removeFormat','indent','outdent','fullScreen','showBlocks','codeView','undo','redo','preview','print','dir','dir_ltr','dir_rtl','save']
+const DEFAULT_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'sub', 'sup', 'removeFormat', 'indent', 'outdent', 'fullScreen', 'showBlocks', 'codeView', 'undo', 'redo', 'preview', 'print', 'dir', 'dir_ltr', 'dir_rtl', 'save'];
 const DEFAULT_BUTTON_LIST = [['undo', 'redo'], ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'], ['removeFormat'], ['outdent', 'indent'], ['fullScreen', 'showBlocks', 'codeView'], ['preview', 'print']];
 const DEFAULT_ELEMENT_WHITELIST = 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls';
@@ -132,7 +132,8 @@ const Constructor = function (editorTargets, options) {
 	}
 
 	return {
-		toolContext: CreateToolContext(toolbar, editor_carrier_wrapper),
+		toolContext: CreateToolContext(toolbar),
+		carrierWrapper: editor_carrier_wrapper,
 		options: o,
 		plugins: plugins,
 		icons: icons,

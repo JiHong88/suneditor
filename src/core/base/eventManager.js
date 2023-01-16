@@ -1773,8 +1773,8 @@ function OnMouseMove_wysiwyg(e) {
 function OnMouseDown_statusbar(e) {
 	e.stopPropagation();
 	this._resizeClientY = e.clientY;
-	this.editor.toolContext.get('_resizeBackground').style.display = 'block';
-	this.editor.toolContext.get('_resizeBackground').style.cursor = 'ns-resize';
+	this.editor._resizeBackground.style.display = 'block';
+	this.editor._resizeBackground.style.cursor = 'ns-resize';
 	this.__resize_editor = this.addGlobalEvent('mousemove', __resizeEditor.bind(this));
 	this.__close_move = this.addGlobalEvent('mouseup', __closeMove.bind(this));
 }
@@ -1788,8 +1788,8 @@ function __resizeEditor(e) {
 }
 
 function __closeMove() {
-	this.editor.toolContext.get('_resizeBackground').style.display = 'none';
-	this.editor.toolContext.get('_resizeBackground').style.cursor = 'auto';
+	this.editor._resizeBackground.style.display = 'none';
+	this.editor._resizeBackground.style.cursor = 'auto';
 	if (this.__resize_editor) this.__resize_editor = this.removeGlobalEvent(this.__resize_editor);
 	if (this.__close_move) this.__close_move = this.removeGlobalEvent(this.__close_move);
 }

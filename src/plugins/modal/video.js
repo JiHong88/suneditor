@@ -246,6 +246,77 @@ Video.prototype = {
 		this.figure.setSize(w, h);
 	},
 
+	create: function (oFrame, src, width, height, align, isUpdate, file) {
+		let cover = null;
+		let container = null;
+
+		/** update */
+		if (isUpdate) {
+			oFrame = this._element;
+			if (oFrame.src !== src) {
+				const isYoutube = /youtu\.?be/.test(src);
+				const isVimeo = /vimeo\.com/.test(src);
+				if ((isYoutube || isVimeo) && !/^iframe$/i.test(oFrame.nodeName)) {
+					const newTag = this._createVideoTag();
+					newTag.src = src;
+					oFrame.parentNode.replaceChild(newTag, oFrame);
+					this._element = oFrame = newTag;
+				} else if (!isYoutube && !isVimeo && !/^videoo$/i.test(oFrame.nodeName)) {
+					const newTag = this._createVideoTag();
+					newTag.src = src;
+					oFrame.parentNode.replaceChild(newTag, oFrame);
+					this._element = oFrame = newTag;
+				} else {
+					oFrame.src = src;
+				}
+			}
+			container = this._container;
+			cover = domUtils.getParentElement(oFrame, 'FIGURE');
+		} else {
+			/** create */
+			oFrame.src = src;
+			this._element = oFrame;
+			const figure = Figure.CreateContainer(oFrame, 'se-video-container');
+			cover = figure.cover;
+			container = figure.container;
+		}
+
+		/** rendering */
+		this._element = oFrame;
+		this._cover = cover;
+		this._container = container;
+		this.figure.open(oFrame, this._nonResizing, true);
+
+		width = width || this._defaultSizeX;
+		height = height || this._videoRatio;
+		const size = this.figure.getSize(oFrame);
+		const inputUpdate = size.w !== width || size.h !== height;
+		const changeSize = !isUpdate || inputUpdate;
+
+		if (this._resizing) {
+			oFrame.setAttribute('data-proportion', this.proportion.checked);
+		}
+
+		// set size
+		if (changeSize) {
+			this.applySize(width, height);
+		}
+
+		// align
+		this.figure.setAlign(oFrame, align);
+
+		if (!isUpdate) {
+			if (this.component.insert(container, false, false, !this.options.get('mediaAutoSelect'))) this.fileManager.setInfo(oFrame, file);
+			if (!this.options.get('mediaAutoSelect')) {
+				const line = this.format.addLine(container, null);
+				if (line) this.selection.setRange(line, 0, line, 0);
+			}
+		} else if (this._resizing && changeSize) {
+			if (this.figure.isVertical) this.figure.setTransform(oFrame, width, height);
+			this.figure.open(oFrame, this._nonResizing);
+		}
+	},
+
 	_submitFile: function (fileList) {
 		if (fileList.length === 0) return;
 
@@ -331,7 +402,7 @@ Video.prototype = {
 			url = 'https://player.vimeo.com/video/' + url.slice(url.lastIndexOf('/') + 1);
 		}
 
-		this._create(this[!/embed|iframe|player|\/e\/|\.php|\.html?/.test(url) && !/vimeo\.com/.test(url) ? '_createVideoTag' : '_createVideoTag'](), url, this.inputX.value, this.inputY.value, this._align, this.modal.isUpdate, { name: url.split('/').pop(), size: 0 });
+		this.create(this[!/embed|iframe|player|\/e\/|\.php|\.html?/.test(url) && !/vimeo\.com/.test(url) ? '_createVideoTag' : '_createVideoTag'](), url, this.inputX.value, this.inputY.value, this._align, this.modal.isUpdate, { name: url.split('/').pop(), size: 0 });
 		return true;
 	},
 
@@ -395,7 +466,7 @@ Video.prototype = {
 		const videoTag = this._createVideoTag();
 
 		for (let i = 0, len = fileList.length; i < len; i++) {
-			this._create(info.isUpdate ? info.element : videoTag.cloneNode(false), fileList[i].url, info.inputWidth, info.inputHeight, info.align, info.isUpdate, { name: fileList[i].name, size: fileList[i].size });
+			this.create(info.isUpdate ? info.element : videoTag.cloneNode(false), fileList[i].url, info.inputWidth, info.inputHeight, info.align, info.isUpdate, { name: fileList[i].name, size: fileList[i].size });
 		}
 	},
 
@@ -409,77 +480,6 @@ Video.prototype = {
 		const videoUploadUrl = this.options.get('videoUploadUrl');
 		if (typeof videoUploadUrl === 'string' && videoUploadUrl.length > 0) {
 			this.fileManager.upload(videoUploadUrl, this.options.get('videoUploadHeader'), files, UploadCallBack.bind(this, info), this.events.onVideoUploadError);
-		}
-	},
-
-	_create: function (oFrame, src, width, height, align, isUpdate, file) {
-		let cover = null;
-		let container = null;
-
-		/** update */
-		if (isUpdate) {
-			oFrame = this._element;
-			if (oFrame.src !== src) {
-				const isYoutube = /youtu\.?be/.test(src);
-				const isVimeo = /vimeo\.com/.test(src);
-				if ((isYoutube || isVimeo) && !/^iframe$/i.test(oFrame.nodeName)) {
-					const newTag = this._createVideoTag();
-					newTag.src = src;
-					oFrame.parentNode.replaceChild(newTag, oFrame);
-					this._element = oFrame = newTag;
-				} else if (!isYoutube && !isVimeo && !/^videoo$/i.test(oFrame.nodeName)) {
-					const newTag = this._createVideoTag();
-					newTag.src = src;
-					oFrame.parentNode.replaceChild(newTag, oFrame);
-					this._element = oFrame = newTag;
-				} else {
-					oFrame.src = src;
-				}
-			}
-			container = this._container;
-			cover = domUtils.getParentElement(oFrame, 'FIGURE');
-		} else {
-			/** create */
-			oFrame.src = src;
-			this._element = oFrame;
-			const figure = Figure.CreateContainer(oFrame, 'se-video-container');
-			cover = figure.cover;
-			container = figure.container;
-		}
-
-		/** rendering */
-		this._element = oFrame;
-		this._cover = cover;
-		this._container = container;
-		this.figure.open(oFrame, this._nonResizing, true);
-
-		width = width || this._defaultSizeX;
-		height = height || this._videoRatio;
-		const size = this.figure.getSize(oFrame);
-		const inputUpdate = size.w !== width || size.h !== height;
-		const changeSize = !isUpdate || inputUpdate;
-
-		if (this._resizing) {
-			oFrame.setAttribute('data-proportion', this.proportion.checked);
-		}
-
-		// set size
-		if (changeSize) {
-			this.applySize(width, height);
-		}
-
-		// align
-		this.figure.setAlign(oFrame, align);
-
-		if (!isUpdate) {
-			if (this.component.insert(container, false, false, !this.options.get('mediaAutoSelect'))) this.fileManager.setInfo(oFrame, file);
-			if (!this.options.get('mediaAutoSelect')) {
-				const line = this.format.addLine(container, null);
-				if (line) this.selection.setRange(line, 0, line, 0);
-			}
-		} else if (this._resizing && changeSize) {
-			if (this.figure.isVertical) this.figure.setTransform(oFrame, width, height);
-			this.figure.open(oFrame, this._nonResizing);
 		}
 	},
 

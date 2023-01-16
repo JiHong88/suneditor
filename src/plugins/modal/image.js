@@ -301,7 +301,7 @@ Image_.prototype = {
 
 		const file = { name: url.split('/').pop(), size: 0 };
 		if (this.modal.isUpdate) this._updateSrc(url, this._element, file);
-		else this._create(url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
+		else this.create(url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
 
 		return true;
 	},
@@ -479,6 +479,42 @@ Image_.prototype = {
 		this.figure.setSize(w, h, null);
 	},
 
+	create: function (src, anchor, width, height, align, file, alt) {
+		let oImg = domUtils.createElement('IMG');
+		oImg.src = src;
+		oImg.alt = alt;
+		oImg.setAttribute('data-rotate', '0');
+		anchor = this._setAnchor(oImg, anchor ? anchor.cloneNode(false) : null);
+
+		if (this._resizing) {
+			oImg.setAttribute('data-proportion', !!this.proportion.checked);
+		}
+
+		const figureInfo = Figure.CreateContainer(anchor, 'se-image-container');
+		const cover = figureInfo.cover;
+		const container = figureInfo.container;
+
+		// caption
+		if (this.captionCheckEl.checked) {
+			this._caption = this._caption = Figure.CreateCaption(cover, this.lang.modalBox.caption);
+			this._caption.setAttribute('contenteditable', false);
+		}
+
+		this._element = oImg;
+		this._cover = cover;
+		this._container = container;
+		this.figure.open(oImg, this._nonResizing, true);
+
+		// set size
+		this.applySize(width, height);
+
+		// align
+		this.figure.setAlign(oImg, align);
+
+		oImg.onload = OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
+		if (this.component.insert(container, true, false, true)) this.fileManager.setInfo(oImg, file);
+	},
+
 	_updateSrc: function (src, element, file) {
 		element.src = src;
 		this._w.setTimeout(this.fileManager.setInfo.bind(this.fileManager, element, file));
@@ -495,7 +531,7 @@ Image_.prototype = {
 				this._updateSrc(fileList[i].url, info.element, file);
 				break;
 			} else {
-				this._create(fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt);
+				this.create(fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt);
 			}
 		}
 	},
@@ -553,45 +589,9 @@ Image_.prototype = {
 				this._element.setAttribute('data-file-size', filesStack[i].file.size);
 				this._updateSrc(filesStack[i].result, updateElement, filesStack[i].file);
 			} else {
-				this._create(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt);
+				this.create(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt);
 			}
 		}
-	},
-
-	_create: function (src, anchor, width, height, align, file, alt) {
-		let oImg = domUtils.createElement('IMG');
-		oImg.src = src;
-		oImg.alt = alt;
-		oImg.setAttribute('data-rotate', '0');
-		anchor = this._setAnchor(oImg, anchor ? anchor.cloneNode(false) : null);
-
-		if (this._resizing) {
-			oImg.setAttribute('data-proportion', !!this.proportion.checked);
-		}
-
-		const figureInfo = Figure.CreateContainer(anchor, 'se-image-container');
-		const cover = figureInfo.cover;
-		const container = figureInfo.container;
-
-		// caption
-		if (this.captionCheckEl.checked) {
-			this._caption = this._caption = Figure.CreateCaption(cover, this.lang.modalBox.caption);
-			this._caption.setAttribute('contenteditable', false);
-		}
-
-		this._element = oImg;
-		this._cover = cover;
-		this._container = container;
-		this.figure.open(oImg, this._nonResizing, true);
-
-		// set size
-		this.applySize(width, height);
-
-		// align
-		this.figure.setAlign(oImg, align);
-
-		oImg.onload = OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
-		if (this.component.insert(container, true, false, true)) this.fileManager.setInfo(oImg, file);
 	},
 
 	_setAnchor: function (imgTag, anchor) {

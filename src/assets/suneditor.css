@@ -2076,6 +2076,7 @@
 /* --- browser - header - tags */
 .sun-editor .se-file-browser .se-file-browser-tags {
     display: block;
+    font-size: 13px;
     width: 100%;
     padding: 0;
     text-align: left;
