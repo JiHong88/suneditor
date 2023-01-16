@@ -5,6 +5,7 @@ import { domUtils, numbers, converter, env } from '../helper';
 
 const _d = env._d;
 const _w = env._w;
+const DEFAULT_COMMANDS = ['bold', 'underline', 'italic','strike','sub','sup','removeFormat','indent','outdent','fullScreen','showBlocks','codeView','undo','redo','preview','print','dir','dir_ltr','dir_rtl','save']
 const DEFAULT_BUTTON_LIST = [['undo', 'redo'], ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'], ['removeFormat'], ['outdent', 'indent'], ['fullScreen', 'showBlocks', 'codeView'], ['preview', 'print']];
 const DEFAULT_ELEMENT_WHITELIST = 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls';
@@ -108,14 +109,12 @@ const Constructor = function (editorTargets, options) {
 			else container.appendChild(status_bar);
 		}
 
-		// root setting
+		// root key
 		const key = editTarget.key || null;
 		textarea = _checkCodeMirror(o, to, textarea);
 		top_div.appendChild(container);
-		top_div.setAttribute('data-se-root', key);
-
 		rootKeys.push(key);
-		rootTargets.set(key, CreateFrameContext(editTarget, top_div, wysiwyg_div, textarea));
+		rootTargets.set(key, CreateFrameContext(editTarget, top_div, wysiwyg_div, textarea, key));
 	}
 	/** multi root set - end -------------------------------------------------------------- */
 
@@ -234,7 +233,7 @@ export function ResetOptions(toolContext, originOptions, mergeOptions) {
  * @returns {o:Map, p:Map} {{o: options map, p: plugins map}}
  */
 function InitOptions(options, editorTargets) {
-	const buttonList = (options.buttonList = DEFAULT_BUTTON_LIST);
+	const buttonList = options.buttonList || DEFAULT_BUTTON_LIST;
 	const o = new _w.Map();
 	o.set('events', options.events || {});
 
@@ -319,7 +318,7 @@ function InitOptions(options, editorTargets) {
 	o.set('toolbar_hide', !!options.toolbar_hide);
 
 	/** styles */
-	InitRootOptions(editorTargets, o, options.multiRoot);
+	InitRootOptions(editorTargets);
 
 	/** IFrame */
 	o.set('iframe', !!options.iframe_fullPage || !!options.iframe);
@@ -535,40 +534,35 @@ function InitOptions(options, editorTargets) {
 	};
 }
 
-function InitRootOptions(editorTargets, options, isMultiRoot) {
-	if (!isMultiRoot) {
-		InitFrameOptions(options, options);
-		return;
-	}
-
+function InitRootOptions(editorTargets) {
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
 		InitFrameOptions(editorTargets[i].options || {}, (editorTargets[i].options = new _w.Map()));
 	}
 }
 
-function InitFrameOptions(to, o) {
+function InitFrameOptions(o, fo) {
 	// value
-	o.set('value', to.value);
-	o.set('placeholder', to.placeholder);
+	fo.set('value', o.value);
+	fo.set('placeholder', o.placeholder);
 	// styles
-	o.set('width', to.width ? (numbers.is(to.width) ? to.width + 'px' : to.width) : '100%');
-	o.set('minWidth', (numbers.is(to.minWidth) ? to.minWidth + 'px' : to.minWidth) || '');
-	o.set('maxWidth', (numbers.is(to.maxWidth) ? to.maxWidth + 'px' : to.maxWidth) || '');
-	o.set('height', to.height ? (numbers.is(to.height) ? to.height + 'px' : to.height) : 'auto');
-	o.set('minHeight', (numbers.is(to.minHeight) ? to.minHeight + 'px' : to.minHeight) || '');
-	o.set('maxHeight', (numbers.is(to.maxHeight) ? to.maxHeight + 'px' : to.maxHeight) || '');
-	o.set('_editorStyles', converter._setDefaultOptionStyle(o, typeof to.editorCSSText === 'string' ? to.editorCSSText : ''));
+	fo.set('width', o.width ? (numbers.is(o.width) ? o.width + 'px' : o.width) : '100%');
+	fo.set('minWidth', (numbers.is(o.minWidth) ? o.minWidth + 'px' : o.minWidth) || '');
+	fo.set('maxWidth', (numbers.is(o.maxWidth) ? o.maxWidth + 'px' : o.maxWidth) || '');
+	fo.set('height', o.height ? (numbers.is(o.height) ? o.height + 'px' : o.height) : 'auto');
+	fo.set('minHeight', (numbers.is(o.minHeight) ? o.minHeight + 'px' : o.minHeight) || '');
+	fo.set('maxHeight', (numbers.is(o.maxHeight) ? o.maxHeight + 'px' : o.maxHeight) || '');
+	fo.set('_editorStyles', converter._setDefaultOptionStyle(fo, typeof o.editorCSSText === 'string' ? o.editorCSSText : ''));
 	// status bar
-	const hasStatusbar = to.statusbar === undefined ? true : to.statusbar;
-	o.set('statusbar', hasStatusbar);
-	o.set('statusbar_showPathLabel', !hasStatusbar ? false : typeof to.statusbar_showPathLabel === 'boolean' ? to.statusbar_showPathLabel : true);
-	o.set('statusbar_resizeEnable', !hasStatusbar ? false : to.statusbar_resizeEnable === undefined ? true : !!to.statusbar_resizeEnable);
-	o.set('statusbar_container', typeof to.statusbar_container === 'string' ? _d.querySelector(to.statusbar_container) : to.statusbar_container);
+	const hasStatusbar = o.statusbar === undefined ? true : o.statusbar;
+	fo.set('statusbar', hasStatusbar);
+	fo.set('statusbar_showPathLabel', !hasStatusbar ? false : typeof o.statusbar_showPathLabel === 'boolean' ? o.statusbar_showPathLabel : true);
+	fo.set('statusbar_resizeEnable', !hasStatusbar ? false : o.statusbar_resizeEnable === undefined ? true : !!o.statusbar_resizeEnable);
+	fo.set('statusbar_container', typeof o.statusbar_container === 'string' ? _d.querySelector(o.statusbar_container) : o.statusbar_container);
 	// status bar - character count
-	o.set('charCounter', to.charCounter_max > 0 ? true : typeof to.charCounter === 'boolean' ? to.charCounter : false);
-	o.set('charCounter_max', numbers.is(to.charCounter_max) && to.charCounter_max > -1 ? to.charCounter_max * 1 : null);
-	o.set('charCounter_label', typeof to.charCounter_label === 'string' ? to.charCounter_label.trim() : null);
-	o.set('charCounter_type', typeof to.charCounter_type === 'string' ? to.charCounter_type : 'char');
+	fo.set('charCounter', o.charCounter_max > 0 ? true : typeof o.charCounter === 'boolean' ? o.charCounter : false);
+	fo.set('charCounter_max', numbers.is(o.charCounter_max) && o.charCounter_max > -1 ? o.charCounter_max * 1 : null);
+	fo.set('charCounter_label', typeof o.charCounter_label === 'string' ? o.charCounter_label.trim() : null);
+	fo.set('charCounter_type', typeof o.charCounter_type === 'string' ? o.charCounter_type : 'char');
 }
 
 /**
@@ -702,7 +696,7 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 			return init;
 		}, {});
 
-		if ((targetOptions.get('height') ? targetOptions.get('height') : options.get('height')) === 'auto') {
+		if (targetOptions.get('height') === 'auto') {
 			cmOptions.viewportMargin = Infinity;
 			cmOptions.height = 'auto';
 		}
@@ -890,11 +884,11 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 		oButton.className += ' se-btn-more-text';
 	}
 
-	if (label) innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + label + '</span></span>';
-
 	if (_disabled) oButton.setAttribute('disabled', true);
 
-	oButton.innerHTML = innerHTML;
+	if (label) innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + label + '</span></span>';
+	if (innerHTML) oButton.innerHTML = innerHTML;
+
 	oLi.appendChild(oButton);
 
 	return {

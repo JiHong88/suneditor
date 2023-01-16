@@ -148,10 +148,10 @@ HTML.prototype = {
 
 	/**
 	 * @description Insert an (HTML element / HTML string / plain string) at selection range.
-	 * If "options.get('charCounter_max')" is exceeded when "html" is added, null is returned without addition.
+	 * If "frameOptions.get('charCounter_max')" is exceeded when "html" is added, null is returned without addition.
 	 * @param {Element|String} html HTML Element or HTML string or plain string
 	 * @param {boolean} rangeSelection If true, range select the inserted node.
-	 * @param {boolean} notCheckCharCount If true, it will be inserted even if "options.get('charCounter_max')" is exceeded.
+	 * @param {boolean} notCheckCharCount If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} notCleanData If true, inserts the HTML string without refining it with html.clean.
 	 */
 	insert: function (html, rangeSelection, notCheckCharCount, notCleanData) {
@@ -170,7 +170,7 @@ HTML.prototype = {
 				const domTree = dom.childNodes;
 
 				if (!notCheckCharCount) {
-					const type = this.options.get('charCounter_type') === 'byte-html' ? 'outerHTML' : 'textContent';
+					const type = this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? 'outerHTML' : 'textContent';
 					let checkHTML = '';
 					for (let i = 0, len = domTree.length; i < len; i++) {
 						checkHTML += domTree[i][type];
@@ -223,7 +223,7 @@ HTML.prototype = {
 	 * Inserting a text node merges with both text nodes on both sides and returns a new "{ container, startOffset, endOffset }".
 	 * @param {Node} oNode Node to be inserted
 	 * @param {Node|null} afterNode If the node exists, it is inserted after the node
-	 * @param {boolean|null} notCheckCharCount If true, it will be inserted even if "options.get('charCounter_max')" is exceeded.
+	 * @param {boolean|null} notCheckCharCount If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @returns {Object|Node|null}
 	 */
 	insertNode: function (oNode, afterNode, notCheckCharCount) {

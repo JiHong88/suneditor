@@ -61,19 +61,19 @@ export function createElementBlacklist(list) {
 
 /**
  * @description Converts options-related styles and returns them for each frame.
- * @param {Object.<string, any>} options Options
+ * @param {Object.<string, any>} fo frameOptions
  * @param {string} cssText Style string
  * @returns {{top: string, frame: string, editor: string}}
  * @private
  */
-export function _setDefaultOptionStyle(options, cssText) {
+export function _setDefaultOptionStyle(fo, cssText) {
 	let optionStyle = '';
-	if (options.get('height')) optionStyle += 'height:' + options.get('height') + ';';
-	if (options.get('minHeight')) optionStyle += 'min-height:' + options.get('minHeight') + ';';
-	if (options.get('maxHeight')) optionStyle += 'max-height:' + options.get('maxHeight') + ';';
-	if (options.get('width')) optionStyle += 'width:' + options.get('width') + ';';
-	if (options.get('minWidth')) optionStyle += 'min-width:' + options.get('minWidth') + ';';
-	if (options.get('maxWidth')) optionStyle += 'max-width:' + options.get('maxWidth') + ';';
+	if (fo.get('height')) optionStyle += 'height:' + fo.get('height') + ';';
+	if (fo.get('minHeight')) optionStyle += 'min-height:' + fo.get('minHeight') + ';';
+	if (fo.get('maxHeight')) optionStyle += 'max-height:' + fo.get('maxHeight') + ';';
+	if (fo.get('width')) optionStyle += 'width:' + fo.get('width') + ';';
+	if (fo.get('minWidth')) optionStyle += 'min-width:' + fo.get('minWidth') + ';';
+	if (fo.get('maxWidth')) optionStyle += 'max-width:' + fo.get('maxWidth') + ';';
 
 	let top = '',
 		frame = '',
@@ -89,7 +89,7 @@ export function _setDefaultOptionStyle(options, cssText) {
 		}
 		if (/^(min-|max-)?height\s*:/.test(s)) {
 			if (/^height/.test(s) && s.split(':')[1].trim() === 'auto') {
-				options.set('height', 'auto');
+				fo.set('height', 'auto');
 			}
 			frame += s + ';';
 			continue;

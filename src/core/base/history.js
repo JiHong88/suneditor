@@ -241,7 +241,7 @@ export default function (editor, change) {
 		 * @description Reset the disabled state of the buttons to fit the current stack.
 		 * @private
 		 */
-		_resetCachingButton: function () {
+		_resetButtons: function () {
 			undo = editor.toolContext.get('buttons.undo');
 			redo = editor.toolContext.get('buttons.redo');
 

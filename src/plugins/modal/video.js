@@ -514,17 +514,17 @@ Video.prototype = {
 
 	_setVideoRatioSelect: function (value) {
 		let ratioSelected = false;
-		const ratioOptions = this.videoRatioOption.options;
+		const ratioOption = this.videoRatioOption.options;
 
 		if (/%$/.test(value) || this._onlyPercentage) value = numbers.get(value, 2) / 100 + '';
 		else if (!numbers.is(value) || value * 1 >= 1) value = '';
 
 		this.inputY.placeholder = '';
-		for (let i = 0, len = ratioOptions.get('length'); i < len; i++) {
-			if (ratioOptions[i].value === value) {
-				ratioSelected = ratioOptions[i].selected = true;
+		for (let i = 0, len = ratioOption.length; i < len; i++) {
+			if (ratioOption[i].value === value) {
+				ratioSelected = ratioOption[i].selected = true;
 				this.inputY.placeholder = !value ? '' : value * 100 + '%';
-			} else ratioOptions[i].selected = false;
+			} else ratioOption[i].selected = false;
 		}
 
 		return ratioSelected;

@@ -116,13 +116,12 @@ Toolbar.prototype = {
 		this.menu.containerOff();
 		this.menu._moreLayerOff();
 
-		const newToolbar = CreateToolBar(buttonList, this.plugins, this.options);
+		const newToolbar = CreateToolBar(buttonList, this.plugins, this.options, this.icons, this.lang);
 		this.editor.toolContext.get('toolbar.main').replaceChild(newToolbar._buttonTray, this.editor.toolContext.get('toolbar._buttonTray'));
-		this.editor.frameContext.set('toolbar._buttonTray', newToolbar._buttonTray);
+		this.editor.toolContext.set('toolbar._buttonTray', newToolbar._buttonTray);
 
 		this.editor._recoverButtonStates();
-		this.editor._cachingButtons();
-		this.history._resetCachingButton();
+		this.history._resetButtons();
 		this._resetSticky();
 
 		this.editor.effectNode = null;

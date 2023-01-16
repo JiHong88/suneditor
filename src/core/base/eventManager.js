@@ -466,7 +466,7 @@ EventManager.prototype = {
 			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, '<br>');
 		}
 
-		const maxCharCount = this.char.test(this.options.get('charCounter_type') === 'byte-html' ? cleanData : plainText);
+		const maxCharCount = this.char.test(this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText);
 		// user event - paste
 		if (type === 'paste' && typeof this.events.onPaste === 'function') {
 			const value = this.events.onPaste(e, cleanData, maxCharCount);
@@ -530,7 +530,7 @@ EventManager.prototype = {
 		}
 
 		/** editor area */
-		const rootKey = frameContext.get('topArea').getAttribute('data-se-root');
+		const rootKey = frameContext.get('key');
 		const wwMouseDown = OnMouseDown_wysiwyg.bind(this);
 		this.addEvent(eventWysiwyg, 'mousedown', wwMouseDown, false);
 		this.addEvent(eventWysiwyg, 'click', OnClick_wysiwyg.bind(this), false);
@@ -568,7 +568,7 @@ EventManager.prototype = {
 		}
 
 		/** code view area auto line */
-		if (this.options.get('height') === 'auto' && !this.options.get('hasCodeMirror')) {
+		if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) {
 			const cvAuthHeight = this.editor._codeViewAutoHeight.bind(this.editor);
 			this.addEvent(frameContext.get('code'), 'keydown', cvAuthHeight, false);
 			this.addEvent(frameContext.get('code'), 'keyup', cvAuthHeight, false);
@@ -577,7 +577,7 @@ EventManager.prototype = {
 
 		/** statusbar */
 		if (frameContext.has('statusbar')) {
-			if (/\d+/.test(this.options.get('height')) && this.frameOptions.get('statusbar_resizeEnable')) {
+			if (/\d+/.test(this.editor.frameOptions.get('height')) && this.editor.frameOptions.get('statusbar_resizeEnable')) {
 				this.addEvent(frameContext.get('statusbar'), 'mousedown', OnMouseDown_statusbar.bind(this), false);
 			} else {
 				domUtils.addClass(frameContext.get('statusbar'), 'se-resizing-none');
@@ -1320,7 +1320,7 @@ function OnKeyDown_wysiwyg(e) {
 		case 13 /** enter key */:
 			const brBlock = this.format.getBrLine(selectionNode, null);
 
-			if (this.options.get('charCounter_type') === 'byte-html') {
+			if (this.editor.frameOptions.get('charCounter_type') === 'byte-html') {
 				let enterHTML = '';
 				if ((!shift && brBlock) || shift) {
 					enterHTML = '<br>';
@@ -1804,7 +1804,7 @@ function DisplayLineBreak(dir, e) {
 	const format = domUtils.createElement(isList ? 'BR' : domUtils.isTableCell(component.parentNode) ? 'DIV' : this.options.get('defaultLineTag'));
 	if (!isList) format.innerHTML = '<br>';
 
-	if (this.options.get('charCounter_type') === 'byte-html' && !this.char.check(format.outerHTML)) return;
+	if (this.editor.frameOptions.get('charCounter_type') === 'byte-html' && !this.char.check(format.outerHTML)) return;
 
 	component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
 	this.editor.frameContext.get('lineBreaker').style.display = 'none';

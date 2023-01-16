@@ -348,7 +348,7 @@ window.e=suneditor.create(
 	},
 	{
 		// value: 'Common value',
-		// plugins: plugins,
+		plugins: plugins,
 		toolbar_container: '#root_toolbar_container',
 		// statusbar_container: '#root_statusbar_container',
 		toolbar_sticky: 0,

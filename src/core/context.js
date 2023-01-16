@@ -7,11 +7,13 @@ import { get as getNumber } from '../helper/numbers';
  * @param {Element} top Editor top area
  * @param {Element} wwFrame Editor wysiwyg frame
  * @param {Element} codeFrame Editor code view frame
+ * @param {any} key root key
  * @returns {Object}
  * @private
  */
-export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFrame) {
+export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFrame, key) {
 	const m = new _w.Map([
+		['key', key],
 		['options', editorTarget.options],
 		['originElement', editorTarget.target],
 		['topArea', top],

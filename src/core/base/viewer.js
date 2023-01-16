@@ -34,7 +34,7 @@ Viewer.prototype = {
 
 			if (this.status.isFullScreen) {
 				code.style.height = '100%';
-			} else if (this.options.get('height') === 'auto' && !this.options.get('hasCodeMirror')) {
+			} else if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) {
 				code.style.height = code.scrollHeight > 0 ? code.scrollHeight + 'px' : 'auto';
 			}
 
@@ -63,7 +63,7 @@ Viewer.prototype = {
 			wysiwygFrame.style.display = 'block';
 			_var.wysiwygOriginCssText = _var.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
 
-			if (this.options.get('height') === 'auto' && !this.options.get('hasCodeMirror')) fc.get('code').style.height = '0px';
+			if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) fc.get('code').style.height = '0px';
 
 			if (!this.status.isFullScreen) {
 				this.editor._notHideToolbar = false;
@@ -80,7 +80,7 @@ Viewer.prototype = {
 
 			if (!domUtils.isNonEditable(wysiwygFrame)) {
 				this.history.push(false);
-				this.history._resetCachingButton();
+				this.history._resetButtons();
 			}
 		}
 
@@ -155,7 +155,7 @@ Viewer.prototype = {
 			_var.fullScreenInnerHeight = this._w.innerHeight - toolbar.offsetHeight;
 			editorArea.style.height = _var.fullScreenInnerHeight - this.options.get('fullScreenOffset') + 'px';
 
-			if (this.options.get('iframe') && this.options.get('height') === 'auto') {
+			if (this.options.get('iframe') && this.editor.frameOptions.get('height') === 'auto') {
 				editorArea.style.overflow = 'auto';
 				this.editor._iframeAutoHeight();
 			}
@@ -174,7 +174,7 @@ Viewer.prototype = {
 			topArea.style.cssText = fc.get('topArea').style.cssText;
 			this._d.body.style.overflow = _var.bodyOverflow;
 
-			if (this.options.get('height') === 'auto' && !this.options.get('hasCodeMirror')) this._codeViewAutoHeight();
+			if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) this._codeViewAutoHeight();
 
 			if (_var.toolbarParent) {
 				_var.toolbarParent.appendChild(toolbar);
@@ -426,8 +426,8 @@ Viewer.prototype = {
 			}
 
 			let headers = parseDocument.head.innerHTML;
-			if (!parseDocument.head.querySelector('link[rel="stylesheet"]') || (this.options.get('height') === 'auto' && !parseDocument.head.querySelector('style'))) {
-				headers += converter._setIframeCssTags(this.options, this.frameOptions.get('height'));
+			if (!parseDocument.head.querySelector('link[rel="stylesheet"]') || (this.editor.frameOptions.get('height') === 'auto' && !parseDocument.head.querySelector('style'))) {
+				headers += converter._setIframeCssTags(this.options, this.editor.frameOptions.get('height'));
 			}
 
 			wDoc.head.innerHTML = headers;

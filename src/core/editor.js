@@ -952,7 +952,7 @@ Editor.prototype = {
 	 * @param {string} style Style string
 	 */
 	setEditorStyle: function (style) {
-		const newStyles = converter._setDefaultOptionStyle(this.options, style);
+		const newStyles = converter._setDefaultOptionStyle(this.frameOptions, style);
 		this.frameOptions.set('_editorStyles', newStyles);
 		const fc = this.frameContext;
 
@@ -963,7 +963,7 @@ Editor.prototype = {
 		const code = fc.get('code');
 		code.style.cssText = this.frameOptions.get('_editorStyles').frame;
 		code.style.display = 'none';
-		if (this.options.get('height') === 'auto') {
+		if (this.frameOptions.get('height') === 'auto') {
 			code.style.overflow = 'hidden';
 		} else {
 			code.style.overflow = '';
@@ -1252,7 +1252,7 @@ Editor.prototype = {
 		const frameOptions = e.get('options');
 		const _w = this._w;
 
-		this._charTypeHTML = options.get('charCounter_type') === 'byte-html';
+		this._charTypeHTML = frameOptions.get('charCounter_type') === 'byte-html';
 		this.wwComputedStyle = _w.getComputedStyle(e.get('wysiwyg'));
 		this._editorHeight = e.get('wysiwygFrame').offsetHeight;
 		this._editorPadding = {
@@ -1343,7 +1343,7 @@ Editor.prototype = {
 	 * @private
 	 */
 	_saveButtonStates: function () {
-		const currentButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-type]');
+		const currentButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
 		for (let i = 0, element, command; i < currentButtons.length; i++) {
 			element = currentButtons[i];
 			command = element.getAttribute('data-command');
@@ -1356,7 +1356,7 @@ Editor.prototype = {
 	 * @private
 	 */
 	_recoverButtonStates: function () {
-		const currentButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-type]');
+		const currentButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
 		for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
 			button = currentButtons[i];
 			command = button.getAttribute('data-command');
@@ -1374,21 +1374,22 @@ Editor.prototype = {
 	 * @private
 	 */
 	_cachingButtons: function () {
-		this._codeViewDisabledButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-type]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])');
-		this._controllerOnDisabledButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-type]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
+		this._codeViewDisabledButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])');
+		this._controllerOnDisabledButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
 
 		this._saveButtonStates();
 
 		const tc = this.toolContext;
 		const textTags = this.options.get('textTags');
-		this._commandMap.set('OUTDENT', tc.get('buttons.outdent'));
-		this._commandMap.set('INDENT', tc.get('buttons.indent'));
-		this._commandMap.set(textTags.bold.toUpperCase(), tc.get('buttons.bold'));
-		this._commandMap.set(textTags.underline.toUpperCase(), tc.get('buttons.underline'));
-		this._commandMap.set(textTags.italic.toUpperCase(), tc.get('buttons.italic'));
-		this._commandMap.set(textTags.strike.toUpperCase(), tc.get('buttons.strike'));
-		this._commandMap.set(textTags.sub.toUpperCase(), tc.get('buttons.subscript'));
-		this._commandMap.set(textTags.sup.toUpperCase(), tc.get('buttons.superscript'));
+		const commandMap = this._commandMap;
+		commandMap.set('OUTDENT', tc.get('buttons.outdent'));
+		commandMap.set('INDENT', tc.get('buttons.indent'));
+		commandMap.set(textTags.bold.toUpperCase(), tc.get('buttons.bold'));
+		commandMap.set(textTags.underline.toUpperCase(), tc.get('buttons.underline'));
+		commandMap.set(textTags.italic.toUpperCase(), tc.get('buttons.italic'));
+		commandMap.set(textTags.strike.toUpperCase(), tc.get('buttons.strike'));
+		commandMap.set(textTags.sub.toUpperCase(), tc.get('buttons.subscript'));
+		commandMap.set(textTags.sup.toUpperCase(), tc.get('buttons.superscript'));
 
 		this._styleCommandMap = {
 			fullScreen: tc.fullScreen,
@@ -1406,7 +1407,7 @@ Editor.prototype = {
 	_initWysiwygArea: function (e, reload, _initHTML) {
 		e.get('wysiwyg').innerHTML = (reload ? _initHTML : this.html.clean(typeof _initHTML === 'string' ? _initHTML : e.get('originElement').value, true, null, null)) || '<' + this.options.get('defaultLineTag') + '><br></' + this.options.get('defaultLineTag') + '>';
 		this._setFrameInfo(e);
-		if (this.options.get('charCounter') && e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
+		if (e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
 	},
 
 	/**
