@@ -6,7 +6,7 @@ const Link = function (editor, target) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.target = target;
-	this.title = this.lang.toolbar.link;
+	this.title = this.lang.link;
 	this.icon = this.icons.link;
 
 	// create HTML
@@ -150,24 +150,24 @@ function CreateHTML_modal(editor) {
 		'<form>' +
 		'<div class="se-modal-header">' +
 		'<button type="button" data-command="close" class="se-btn se-modal-close" title="' +
-		lang.modalBox.close +
+		lang.close +
 		'" aria-label="' +
-		lang.modalBox.close +
+		lang.close +
 		'">' +
 		icons.cancel +
 		'</button>' +
 		'<span class="se-modal-title">' +
-		lang.modalBox.linkBox.title +
+		lang.link_modal_title +
 		'</span>' +
 		'</div>' +
 		'<div class="se-anchor-editor"></div>' +
 		'<div class="se-modal-footer">' +
 		'<button type="submit" class="se-btn-primary" title="' +
-		lang.modalBox.submitButton +
+		lang.submitButton +
 		'" aria-label="' +
-		lang.modalBox.submitButton +
+		lang.submitButton +
 		'"><span>' +
-		lang.modalBox.submitButton +
+		lang.submitButton +
 		'</span></button>' +
 		'</div>' +
 		'</form>';
@@ -185,19 +185,19 @@ function CreateHTML_controller(editor) {
 		'<button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">' +
 		icons.edit +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.edit +
+		lang.edit +
 		'</span></span>' +
 		'</button>' +
 		'<button type="button" data-command="unlink" tabindex="-1" class="se-btn se-tooltip">' +
 		icons.unlink +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.unlink +
+		lang.unlink +
 		'</span></span>' +
 		'</button>' +
 		'<button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">' +
 		icons.delete +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.remove +
+		lang.remove +
 		'</span></span>' +
 		'</button>' +
 		'</div>' +

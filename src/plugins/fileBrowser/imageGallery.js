@@ -5,12 +5,12 @@ const ImageGallery = function (editor, target) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.target = target;
-	this.title = this.lang.toolbar.imageGallery;
+	this.title = this.lang.imageGallery;
 	this.icon = this.icons.image_gallery;
 
 	// modules
 	this.fileBrowser = new FileBrowser(this, {
-		title: this.lang.toolbar.imageGallery, // @Required @override fileBrowser - File browser window title.
+		title: this.lang.imageGallery, // @Required @override fileBrowser - File browser window title.
 		url: this.options.get('imageGalleryUrl'), // @Required @override fileBrowser - File server url.
 		urlHeader: this.options.get('imageGalleryHeader'), // @Required @override fileBrowser - File server http header.
 		listClass: 'se-image-list', // @Required @override fileBrowser - Class name of list div.

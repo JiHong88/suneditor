@@ -5,7 +5,7 @@ const Align = function (editor, target) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.target = target;
-	this.title = this.lang.toolbar.align;
+	this.title = this.lang.align;
 	this.icon = this.options.get('_rtl') ? this.icons.align_right : this.icons.align_left;
 
 	// create HTML
@@ -136,7 +136,7 @@ function CreateHTML(core) {
 	let html = '';
 	for (let i = 0, item, text; i < alignItems.length; i++) {
 		item = alignItems[i];
-		text = lang.toolbar['align' + item.charAt(0).toUpperCase() + item.slice(1)];
+		text = lang['align' + item.charAt(0).toUpperCase() + item.slice(1)];
 		html += '<li>' + '<button type="button" class="se-btn-list" data-command="' + item + '" title="' + text + '" aria-label="' + text + '">' + '<span class="se-list-icon">' + icons['align_' + item] + '</span>' + text + '</button>' + '</li>';
 	}
 

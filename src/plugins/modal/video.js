@@ -6,7 +6,7 @@ const Video = function (editor, target) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.target = target;
-	this.title = this.lang.toolbar.video;
+	this.title = this.lang.video;
 	this.icon = this.icons.video;
 
 	// create HTML
@@ -638,14 +638,14 @@ function CreateHTML_modal(editor) {
 		'<form method="post" enctype="multipart/form-data">' +
 		'<div class="se-modal-header">' +
 		'<button type="button" data-command="close" class="se-btn se-modal-close" title="' +
-		lang.modalBox.close +
+		lang.close +
 		'" aria-label="' +
-		lang.modalBox.close +
+		lang.close +
 		'">' +
 		editor.icons.cancel +
 		'</button>' +
 		'<span class="se-modal-title">' +
-		lang.modalBox.videoBox.title +
+		lang.video_modal_title +
 		'</span>' +
 		'</div>' +
 		'<div class="se-modal-body">';
@@ -655,7 +655,7 @@ function CreateHTML_modal(editor) {
 			'' +
 			'<div class="se-modal-form">' +
 			'<label>' +
-			lang.modalBox.videoBox.file +
+			lang.video_modal_file +
 			'</label>' +
 			'<div class="se-modal-form-files">' +
 			'<input class="se-input-form _se_video_file" type="file" data-focus accept="' +
@@ -664,9 +664,9 @@ function CreateHTML_modal(editor) {
 			(options.get('videoMultipleFile') ? ' multiple="multiple"' : '') +
 			'/>' +
 			'<button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="' +
-			lang.controller.remove +
+			lang.remove +
 			'" aria-label="' +
-			lang.controller.remove +
+			lang.remove +
 			'">' +
 			editor.icons.cancel +
 			'</button>' +
@@ -675,7 +675,7 @@ function CreateHTML_modal(editor) {
 	}
 
 	if (options.get('videoUrlInput')) {
-		html += '' + '<div class="se-modal-form">' + '<label>' + lang.modalBox.videoBox.url + '</label>' + '<input class="se-input-form se-input-url" type="text" data-focus />' + '<pre class="se-link-preview"></pre>' + '</div>';
+		html += '' + '<div class="se-modal-form">' + '<label>' + lang.video_modal_url + '</label>' + '<input class="se-input-form se-input-url" type="text" data-focus />' + '<pre class="se-link-preview"></pre>' + '</div>';
 	}
 
 	if (options.get('videoResizing')) {
@@ -695,18 +695,18 @@ function CreateHTML_modal(editor) {
 			'<div class="se-modal-form">' +
 			'<div class="se-modal-size-text">' +
 			'<label class="size-w">' +
-			lang.modalBox.width +
+			lang.width +
 			'</label>' +
 			'<label class="se-modal-size-x">&nbsp;</label>' +
 			'<label class="size-h"' +
 			heightDisplay +
 			'>' +
-			lang.modalBox.height +
+			lang.height +
 			'</label>' +
 			'<label class="size-h"' +
 			ratioDisplay +
 			'>(' +
-			lang.modalBox.ratio +
+			lang.ratio +
 			')</label>' +
 			'</div>' +
 			'<input class="se-input-control _se_video_size_x" placeholder="100%"' +
@@ -726,9 +726,9 @@ function CreateHTML_modal(editor) {
 			heightDisplay +
 			'/>' +
 			'<select class="se-input-select se-video-ratio" title="' +
-			lang.modalBox.ratio +
+			lang.ratio +
 			'" aria-label="' +
-			lang.modalBox.ratio +
+			lang.ratio +
 			'"' +
 			ratioDisplay +
 			'>';
@@ -739,9 +739,9 @@ function CreateHTML_modal(editor) {
 		html +=
 			'</select>' +
 			'<button type="button" title="' +
-			lang.modalBox.revertButton +
+			lang.revertButton +
 			'" aria-label="' +
-			lang.modalBox.revertButton +
+			lang.revertButton +
 			'" class="se-btn se-modal-btn-revert">' +
 			editor.icons.revert +
 			'</button>' +
@@ -752,7 +752,7 @@ function CreateHTML_modal(editor) {
 			'>' +
 			'<label><input type="checkbox" class="se-modal-btn-check _se_video_check_proportion" />&nbsp;' +
 			'<span>' +
-			lang.modalBox.proportion +
+			lang.proportion +
 			'</span>' +
 			'</label>' +
 			'</div>';
@@ -764,24 +764,24 @@ function CreateHTML_modal(editor) {
 		'<div class="se-modal-footer">' +
 		'<div class="se-figure-align">' +
 		'<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="none" checked>' +
-		lang.modalBox.basic +
+		lang.basic +
 		'</label>' +
 		'<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="left">' +
-		lang.modalBox.left +
+		lang.left +
 		'</label>' +
 		'<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="center">' +
-		lang.modalBox.center +
+		lang.center +
 		'</label>' +
 		'<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="right">' +
-		lang.modalBox.right +
+		lang.right +
 		'</label>' +
 		'</div>' +
 		'<button type="submit" class="se-btn-primary" title="' +
-		lang.modalBox.submitButton +
+		lang.submitButton +
 		'" aria-label="' +
-		lang.modalBox.submitButton +
+		lang.submitButton +
 		'"><span>' +
-		lang.modalBox.submitButton +
+		lang.submitButton +
 		'</span></button>' +
 		'</div>' +
 		'</form>';

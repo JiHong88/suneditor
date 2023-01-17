@@ -5,8 +5,8 @@ const Font = function (editor, target) {
 	EditorDependency.call(this, editor);
 	// plugin basic properties
 	this.target = target;
-	this.title = this.lang.toolbar.font;
-	this.icon = '<span class="txt">' + this.lang.toolbar.font + '</span>' + this.icons.arrow_down;
+	this.title = this.lang.font;
+	this.icon = '<span class="txt">' + this.lang.font + '</span>' + this.icons.arrow_down;
 
 	// create HTML
 	const menu = CreateHTML(editor);
@@ -35,13 +35,13 @@ Font.prototype = {
 		const tooltip = this.targetTooltip;
 
 		if (!element) {
-			const font = this.status.hasFocus ? this.editor.wwComputedStyle.fontFamily : this.lang.toolbar.font;
+			const font = this.status.hasFocus ? this.editor.wwComputedStyle.fontFamily : this.lang.font;
 			domUtils.changeTxt(target, font);
-			domUtils.changeTxt(tooltip, this.status.hasFocus ? this.lang.toolbar.font + (font ? ' (' + font + ')' : '') : font);
+			domUtils.changeTxt(tooltip, this.status.hasFocus ? this.lang.font + (font ? ' (' + font + ')' : '') : font);
 		} else if (element.style && element.style.fontFamily.length > 0) {
 			const selectFont = element.style.fontFamily.replace(/["']/g, '');
 			domUtils.changeTxt(target, selectFont);
-			domUtils.changeTxt(tooltip, this.lang.toolbar.font + ' (' + selectFont + ')');
+			domUtils.changeTxt(tooltip, this.lang.font + ' (' + selectFont + ')');
 			return true;
 		}
 
@@ -107,7 +107,7 @@ function CreateHTML(editor) {
 	const lang = editor.lang;
 	const fontList = editor.options.get('font');
 
-	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '" aria-label="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
+	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="default_value se-btn-list" title="' + lang.default + '" aria-label="' + lang.default + '">(' + lang.default + ')</button></li>';
 	for (let i = 0, len = fontList.length, font, text; i < len; i++) {
 		font = fontList[i];
 		text = font.split(',')[0];

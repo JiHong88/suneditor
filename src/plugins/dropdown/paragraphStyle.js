@@ -5,7 +5,7 @@ const ParagraphStyle = function (editor, target) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.target = target;
-	this.title = this.lang.toolbar.paragraphStyle;
+	this.title = this.lang.paragraphStyle;
 	this.icon = this.icons.paragraph_style;
 
 	// create HTML
@@ -77,20 +77,19 @@ function OnClickMenu(e) {
 
 function CreateHTML(editor) {
 	const options = editor.options;
-	const menuLang = editor.lang.menu;
 	const defaultList = {
 		spaced: {
-			name: menuLang.spaced,
+			name: editor.lang.menu_spaced,
 			class: '__se__p-spaced',
 			_class: ''
 		},
 		bordered: {
-			name: menuLang.bordered,
+			name: editor.lang.menu_bordered,
 			class: '__se__p-bordered',
 			_class: ''
 		},
 		neon: {
-			name: menuLang.neon,
+			name: editor.lang.menu_neon,
 			class: '__se__p-neon',
 			_class: ''
 		}

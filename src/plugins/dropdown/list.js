@@ -5,7 +5,7 @@ const List = function (editor, target) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.target = target;
-	this.title = this.lang.toolbar.list;
+	this.title = this.lang.list;
 	this.icon = this.icons.list_number;
 
 	// create HTML
@@ -107,16 +107,16 @@ function CreateHTML(editor) {
 		'<div class="se-list-inner">' +
 		'<ul class="se-list-basic">' +
 		'<li><button type="button" class="se-btn-list se-tooltip" data-command="bullet" title="' +
-		lang.toolbar.orderList +
+		lang.orderList +
 		'" aria-label="' +
-		lang.toolbar.orderList +
+		lang.orderList +
 		'">' +
 		editor.icons.list_number +
 		'</button></li>' +
 		'<li><button type="button" class="se-btn-list se-tooltip" data-command="numbered" title="' +
-		lang.toolbar.unorderList +
+		lang.unorderList +
 		'" aria-label="' +
-		lang.toolbar.unorderList +
+		lang.unorderList +
 		'">' +
 		editor.icons.list_bullets +
 		'</button></li>' +

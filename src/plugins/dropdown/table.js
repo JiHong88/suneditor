@@ -6,7 +6,7 @@ const Table = function (editor, target) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.target = target;
-	this.title = this.lang.toolbar.table;
+	this.title = this.lang.table;
 	this.icon = this.icons.table;
 
 	// create HTML
@@ -24,8 +24,8 @@ const Table = function (editor, target) {
 	this.selectMenu_split = new SelectMenu(this, false, 'bottom-center');
 	this.selectMenu_split.on(this.splitButton, OnSplitCells.bind(this));
 	this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
-	this.maxText = this.lang.controller.maxSize;
-	this.minText = this.lang.controller.minSize;
+	this.maxText = this.lang.maxSize;
+	this.minText = this.lang.minSize;
 	this.tableHighlight = menu.querySelector('.se-table-size-highlighted');
 	this.tableUnHighlight = menu.querySelector('.se-table-size-unhighlighted');
 	this.tableDisplay = menu.querySelector('.se-table-size-display');
@@ -1323,18 +1323,18 @@ function CreateSplitMenu(lang) {
 		'DIV',
 		null,
 		'<div title="' +
-			lang.controller.VerticalSplit +
+			lang.verticalSplit +
 			'" aria-label="' +
-			lang.controller.VerticalSplit +
+			lang.verticalSplit +
 			'">' +
-			lang.controller.VerticalSplit +
+			lang.verticalSplit +
 			'</div>' +
 			'<div title="' +
-			lang.controller.HorizontalSplit +
+			lang.horizontalSplit +
 			'" aria-label="' +
-			lang.controller.HorizontalSplit +
+			lang.horizontalSplit +
 			'">' +
-			lang.controller.HorizontalSplit +
+			lang.horizontalSplit +
 			'</div>'
 	);
 
@@ -1355,25 +1355,25 @@ function CreateHTML_controller_table(editor) {
 		'<button type="button" data-command="resize" class="se-btn se-tooltip _se_table_resize">' +
 		icons.expansion +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.maxSize +
+		lang.maxSize +
 		'</span></span>' +
 		'</button>' +
 		'<button type="button" data-command="layout" class="se-btn se-tooltip _se_table_fixed_column">' +
 		icons.fixed_column_width +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.fixedColumnWidth +
+		lang.fixedColumnWidth +
 		'</span></span>' +
 		'</button>' +
 		'<button type="button" data-command="header" class="se-btn se-tooltip _se_table_header">' +
 		icons.table_header +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.tableHeader +
+		lang.tableHeader +
 		'</span></span>' +
 		'</button>' +
 		'<button type="button" data-command="remove" class="se-btn se-tooltip">' +
 		icons.delete +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.remove +
+		lang.remove +
 		'</span></span>' +
 		'</button>' +
 		'</div>' +
@@ -1391,25 +1391,25 @@ function CreateHTML_controller_cell(editor, cellControllerTop) {
 		'<button type="button" data-command="insert" data-value="row" data-option="up" class="se-btn se-tooltip _se_table_insert_row_a">' +
 		icons.insert_row_above +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.insertRowAbove +
+		lang.insertRowAbove +
 		'</span></span>' +
 		'</button>' +
 		'<button type="button" data-command="insert" data-value="row" data-option="down" class="se-btn se-tooltip _se_table_insert_row_b">' +
 		icons.insert_row_below +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.insertRowBelow +
+		lang.insertRowBelow +
 		'</span></span>' +
 		'</button>' +
 		'<button type="button" data-command="delete" data-value="row" class="se-btn se-tooltip">' +
 		icons.delete_row +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.deleteRow +
+		lang.deleteRow +
 		'</span></span>' +
 		'</button>' +
 		'<button type="button" data-command="merge" class="_se_table_merge_button se-btn se-tooltip" disabled>' +
 		icons.merge_cell +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.mergeCells +
+		lang.mergeCells +
 		'</span></span>' +
 		'</button>' +
 		'</div>' +
@@ -1417,25 +1417,25 @@ function CreateHTML_controller_cell(editor, cellControllerTop) {
 		'<button type="button" data-command="insert" data-value="cell" data-option="left" class="se-btn se-tooltip">' +
 		icons.insert_column_left +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.insertColumnBefore +
+		lang.insertColumnBefore +
 		'</span></span>' +
 		'</button>' +
 		'<button type="button" data-command="insert" data-value="cell" data-option="right" class="se-btn se-tooltip">' +
 		icons.insert_column_right +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.insertColumnAfter +
+		lang.insertColumnAfter +
 		'</span></span>' +
 		'</button>' +
 		'<button type="button" data-command="delete" data-value="cell" class="se-btn se-tooltip">' +
 		icons.delete_column +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.deleteColumn +
+		lang.deleteColumn +
 		'</span></span>' +
 		'</button>' +
 		'<button type="button" data-command="onsplit" class="se-btn se-tooltip">' +
 		icons.split_cell +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.splitCells +
+		lang.splitCells +
 		'</span></span>' +
 		'</button>' +
 		'</div>';

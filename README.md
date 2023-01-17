@@ -787,9 +787,9 @@ linkNoPrefix   : If true, disables the automatic prefixing of the host URL to th
 hrItems         : Defines the hr items.
                   "class" or "style" must be specified.
                   default: [
-                      {name: lang.toolbar.hr_solid, class: '__se__solid'},
-                      {name: lang.toolbar.hr_dashed, class: '__se__dashed'},
-                      {name: lang.toolbar.hr_dotted, class: '__se__dotted'}
+                      {name: lang.hr_solid, class: '__se__solid'},
+                      {name: lang.hr_dashed, class: '__se__dashed'},
+                      {name: lang.hr_dotted, class: '__se__dotted'}
                   ]
                   ex) [ {name: "Outset", style: "border-style: outset;"} ]
 

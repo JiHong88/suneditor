@@ -243,7 +243,7 @@ Figure.prototype = {
 		});
 
 		const size = this.getSize(target);
-		domUtils.changeTxt(_figure.display, this.lang.modalBox[this.align === 'none' ? 'basic' : this.align] + ' (' + (size.w || 'auto') + ', ' + (size.h || 'auto') + ')');
+		domUtils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + (size.w || 'auto') + ', ' + (size.h || 'auto') + ')');
 		this._displayResizeHandles(!nonResizing);
 
 		// percentage active
@@ -401,7 +401,7 @@ Figure.prototype = {
 				break;
 			case 'caption':
 				if (!this._caption) {
-					const caption = Figure.CreateCaption(this._cover, this.lang.modalBox.caption);
+					const caption = Figure.CreateCaption(this._cover, this.lang.caption);
 					const captionText = domUtils.getEdgeChild(caption, function (current) {
 						return current.nodeType === 3;
 					});
@@ -811,7 +811,7 @@ function SetMenuAlign(item) {
 
 function CreateAlign(editor) {
 	const icons = [editor.icons.align_justify, editor.icons.align_left, editor.icons.align_center, editor.icons.align_right];
-	const langs = [editor.lang.modalBox.basic, editor.lang.modalBox.left, editor.lang.modalBox.center, editor.lang.modalBox.right];
+	const langs = [editor.lang.basic, editor.lang.left, editor.lang.center, editor.lang.right];
 	const commands = ['none', 'left', 'center', 'right'];
 	const html = [];
 	const items = [];
@@ -943,7 +943,7 @@ function CreateHTML_controller(editor, controls) {
 				'se-btn se-tooltip">' +
 				(icons[m.icon] || m.text || '!') +
 				'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-				(lang.controller[m.l] || m.l) +
+				(lang[m.l] || m.l) +
 				'</span></span></button>';
 		}
 		html += '</div>';

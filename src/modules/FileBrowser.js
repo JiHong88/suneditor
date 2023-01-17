@@ -261,9 +261,9 @@ function CreateHTML(editor) {
 		'<div class="se-file-browser-content">' +
 		'<div class="se-file-browser-header">' +
 		'<button type="button" data-command="close" class="se-btn se-file-browser-close" class="close" title="' +
-		lang.modalBox.close +
+		lang.close +
 		'" aria-label="' +
-		lang.modalBox.close +
+		lang.close +
 		'">' +
 		editor.icons.cancel +
 		'</button>' +

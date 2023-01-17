@@ -5,7 +5,7 @@ const TextStyle = function (editor, target) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.target = target;
-	this.title = this.lang.toolbar.textStyle;
+	this.title = this.lang.textStyle;
 	this.icon = this.icons.text_style;
 
 	// create HTML
@@ -94,12 +94,12 @@ function CreateHTML(editor) {
 	const options = editor.options;
 	const defaultList = {
 		code: {
-			name: editor.lang.menu.code,
+			name: editor.lang.menu_code,
 			class: '__se__t-code',
 			tag: 'code'
 		},
 		shadow: {
-			name: editor.lang.menu.shadow,
+			name: editor.lang.menu_shadow,
 			class: '__se__t-shadow',
 			tag: 'span'
 		}

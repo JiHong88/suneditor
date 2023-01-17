@@ -6,7 +6,7 @@ const Image_ = function (editor, target) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.target = target;
-	this.title = this.lang.toolbar.image;
+	this.title = this.lang.image;
 	this.icon = this.icons.image;
 
 	// create HTML
@@ -340,7 +340,7 @@ Image_.prototype = {
 		let modifiedCaption = false;
 		if (this.captionCheckEl.checked) {
 			if (!this._caption) {
-				this._caption = Figure.CreateCaption(cover, this.lang.modalBox.caption);
+				this._caption = Figure.CreateCaption(cover, this.lang.caption);
 				modifiedCaption = true;
 			}
 		} else {
@@ -496,7 +496,7 @@ Image_.prototype = {
 
 		// caption
 		if (this.captionCheckEl.checked) {
-			this._caption = this._caption = Figure.CreateCaption(cover, this.lang.modalBox.caption);
+			this._caption = this._caption = Figure.CreateCaption(cover, this.lang.caption);
 			this._caption.setAttribute('contenteditable', false);
 		}
 
@@ -720,22 +720,22 @@ function CreateHTML_modal(editor) {
 	let html =
 		'<div class="se-modal-header">' +
 		'<button type="button" data-command="close" class="se-btn se-modal-close close" title="' +
-		lang.modalBox.close +
+		lang.close +
 		'" aria-label="' +
-		lang.modalBox.close +
+		lang.close +
 		'">' +
 		editor.icons.cancel +
 		'</button>' +
 		'<span class="se-modal-title">' +
-		lang.modalBox.imageBox.title +
+		lang.image_modal_title +
 		'</span>' +
 		'</div>' +
 		'<div class="se-modal-tabs">' +
 		'<button type="button" class="_se_tab_link active" data-tab-link="image">' +
-		lang.toolbar.image +
+		lang.image +
 		'</button>' +
 		'<button type="button" class="_se_tab_link" data-tab-link="url">' +
-		lang.toolbar.link +
+		lang.link +
 		'</button>' +
 		'</div>' +
 		'<form method="post" enctype="multipart/form-data">' +
@@ -746,7 +746,7 @@ function CreateHTML_modal(editor) {
 		html +=
 			'<div class="se-modal-form">' +
 			'<label>' +
-			lang.modalBox.imageBox.file +
+			lang.image_modal_file +
 			'</label>' +
 			'<div class="se-modal-form-files">' +
 			'<input class="se-input-form _se_image_file" data-focus type="file" accept="' +
@@ -755,9 +755,9 @@ function CreateHTML_modal(editor) {
 			(options.get('imageMultipleFile') ? ' multiple="multiple"' : '') +
 			'/>' +
 			'<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="' +
-			lang.controller.remove +
+			lang.remove +
 			'" aria-label="' +
-			lang.controller.remove +
+			lang.remove +
 			'">' +
 			editor.icons.cancel +
 			'</button>' +
@@ -769,17 +769,17 @@ function CreateHTML_modal(editor) {
 		html +=
 			'<div class="se-modal-form">' +
 			'<label>' +
-			lang.modalBox.imageBox.url +
+			lang.image_modal_url +
 			'</label>' +
 			'<div class="se-modal-form-files">' +
 			'<input class="se-input-form se-input-url _se_image_url" data-focus type="text" />' +
-			(options.get('imageGalleryUrl') && editor.plugins.imageGallery ? '<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="' + lang.toolbar.imageGallery + '" aria-label="' + lang.toolbar.imageGallery + '">' + editor.icons.image_gallery + '</button>' : '') +
+			(options.get('imageGalleryUrl') && editor.plugins.imageGallery ? '<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="' + lang.imageGallery + '" aria-label="' + lang.imageGallery + '">' + editor.icons.image_gallery + '</button>' : '') +
 			'</div>' +
 			'<pre class="se-link-preview"></pre>' +
 			'</div>';
 	}
 
-	html += '</div>' + '<div class="se-modal-form">' + '<label>' + lang.modalBox.imageBox.altText + '</label><input class="se-input-form _se_image_alt" type="text" />' + '</div>';
+	html += '</div>' + '<div class="se-modal-form">' + '<label>' + lang.image_modal_altText + '</label><input class="se-input-form _se_image_alt" type="text" />' + '</div>';
 
 	if (options.get('imageResizing')) {
 		const onlyPercentage = options.get('imageSizeOnlyPercentage');
@@ -787,9 +787,9 @@ function CreateHTML_modal(editor) {
 		const heightDisplay = !options.get('imageHeightShow') ? ' style="display: none !important;"' : '';
 		html += '<div class="se-modal-form">';
 		if (onlyPercentage || !options.get('imageHeightShow')) {
-			html += '<div class="se-modal-size-text">' + '<label class="size-w">' + lang.modalBox.size + '</label>' + '</div>';
+			html += '<div class="se-modal-size-text">' + '<label class="size-w">' + lang.size + '</label>' + '</div>';
 		} else {
-			html += '<div class="se-modal-size-text">' + '<label class="size-w">' + lang.modalBox.width + '</label>' + '<label class="se-modal-size-x">&nbsp;</label>' + '<label class="size-h">' + lang.modalBox.height + '</label>' + '</div>';
+			html += '<div class="se-modal-size-text">' + '<label class="size-w">' + lang.width + '</label>' + '<label class="se-modal-size-x">&nbsp;</label>' + '<label class="size-h">' + lang.height + '</label>' + '</div>';
 		}
 		html +=
 			'<input class="se-input-control _se_image_size_x" placeholder="auto"' +
@@ -810,12 +810,12 @@ function CreateHTML_modal(editor) {
 			onlyPercentDisplay +
 			heightDisplay +
 			'><input type="checkbox" class="se-modal-btn-check _se_image_check_proportion" checked/>&nbsp;' +
-			lang.modalBox.proportion +
+			lang.proportion +
 			'</label>' +
 			'<button type="button" title="' +
-			lang.modalBox.revertButton +
+			lang.revertButton +
 			'" aria-label="' +
-			lang.modalBox.revertButton +
+			lang.revertButton +
 			'" class="se-btn se-modal-btn-revert">' +
 			editor.icons.revert +
 			'</button>' +
@@ -825,7 +825,7 @@ function CreateHTML_modal(editor) {
 	html +=
 		'<div class="se-modal-form se-modal-form-footer">' +
 		'<label><input type="checkbox" class="se-modal-btn-check _se_image_check_caption" />&nbsp;' +
-		lang.modalBox.caption +
+		lang.caption +
 		'</label>' +
 		'</div>' +
 		'</div>' +
@@ -834,24 +834,24 @@ function CreateHTML_modal(editor) {
 		'<div class="se-modal-footer">' +
 		'<div class="se-figure-align">' +
 		'<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="none" checked>' +
-		lang.modalBox.basic +
+		lang.basic +
 		'</label>' +
 		'<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="left">' +
-		lang.modalBox.left +
+		lang.left +
 		'</label>' +
 		'<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="center">' +
-		lang.modalBox.center +
+		lang.center +
 		'</label>' +
 		'<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="right">' +
-		lang.modalBox.right +
+		lang.right +
 		'</label>' +
 		'</div>' +
 		'<button type="submit" class="se-btn-primary" title="' +
-		lang.modalBox.submitButton +
+		lang.submitButton +
 		'" aria-label="' +
-		lang.modalBox.submitButton +
+		lang.submitButton +
 		'"><span>' +
-		lang.modalBox.submitButton +
+		lang.submitButton +
 		'</span></button>' +
 		'</div>' +
 		'</form>';

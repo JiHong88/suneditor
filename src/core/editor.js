@@ -393,7 +393,7 @@ Editor.prototype = {
 			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "' + pluginName + '")');
 		} else {
 			const plugin = (this.plugins[pluginName] = new this.plugins[pluginName](this, target));
-			UpdateButton(target, plugin);
+			UpdateButton(target, plugin, this.icons, this.lang);
 			if (typeof plugin.init === 'function') plugin.init();
 		}
 
@@ -696,7 +696,7 @@ Editor.prototype = {
 		}
 
 		if (buttons.dir) {
-			domUtils.changeTxt(buttons.dir.querySelector('.se-tooltip-text'), this.lang.toolbar[this.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
+			domUtils.changeTxt(buttons.dir.querySelector('.se-tooltip-text'), this.lang[this.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
 			domUtils.changeElement(buttons.dir.firstElementChild, this.icons[this.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
 		}
 

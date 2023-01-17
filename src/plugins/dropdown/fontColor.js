@@ -6,7 +6,7 @@ const FontColor = function (editor, target) {
 	EditorDependency.call(this, editor);
 	// plugin basic properties
 	this.target = target;
-	this.title = this.lang.toolbar.fontColor;
+	this.title = this.lang.fontColor;
 	this.icon = this.icons.font_color;
 
 	// members

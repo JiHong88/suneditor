@@ -5,7 +5,7 @@ const HorizontalLine = function (editor, target) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.target = target;
-	this.title = this.lang.toolbar.horizontalLine;
+	this.title = this.lang.horizontalLine;
 	this.icon = this.icons.horizontal_line;
 
 	// create HTML
@@ -69,9 +69,9 @@ function OnClickMenu(e) {
 function CreateHTML(editor) {
 	const lang = editor.lang;
 	const items = editor.options.get('hrItems') || [
-		{ name: lang.toolbar.hr_solid, class: '__se__solid' },
-		{ name: lang.toolbar.hr_dashed, class: '__se__dashed' },
-		{ name: lang.toolbar.hr_dotted, class: '__se__dotted' }
+		{ name: lang.hr_solid, class: '__se__solid' },
+		{ name: lang.hr_dashed, class: '__se__dashed' },
+		{ name: lang.hr_dotted, class: '__se__dotted' }
 	];
 
 	let list = '';

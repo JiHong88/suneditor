@@ -8,7 +8,7 @@ const Math_ = function (editor, target) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.target = target;
-	this.title = this.lang.toolbar.math;
+	this.title = this.lang.math;
 	this.icon = this.icons.math;
 
 	// create HTML
@@ -198,20 +198,20 @@ function CreateHTML_modal(editor, math) {
 		'<form>' +
 		'<div class="se-modal-header">' +
 		'<button type="button" data-command="close" class="se-btn se-modal-close" title="' +
-		lang.modalBox.close +
+		lang.close +
 		'" aria-label="' +
-		lang.modalBox.close +
+		lang.close +
 		'">' +
 		editor.icons.cancel +
 		'</button>' +
 		'<span class="se-modal-title">' +
-		lang.modalBox.mathBox.title +
+		lang.math_modal_title +
 		'</span>' +
 		'</div>' +
 		'<div class="se-modal-body">' +
 		'<div class="se-modal-form">' +
 		'<label>' +
-		lang.modalBox.mathBox.inputLabel +
+		lang.math_modal_inputLabel +
 		' (<a href="' +
 		KATEX_WEBSITE +
 		'" target="_blank">KaTeX</a>)</label>' +
@@ -219,7 +219,7 @@ function CreateHTML_modal(editor, math) {
 		'</div>' +
 		'<div class="se-modal-form">' +
 		'<label>' +
-		lang.modalBox.mathBox.fontSizeLabel +
+		lang.math_modal_fontSizeLabel +
 		'</label>' +
 		'<select class="se-input-select se-math-size">';
 	for (let i = 0, len = fontSize.length, f; i < len; i++) {
@@ -232,18 +232,18 @@ function CreateHTML_modal(editor, math) {
 		'</div>' +
 		'<div class="se-modal-form">' +
 		'<label>' +
-		lang.modalBox.mathBox.previewLabel +
+		lang.math_modal_previewLabel +
 		'</label>' +
 		'<p class="se-math-preview"></p>' +
 		'</div>' +
 		'</div>' +
 		'<div class="se-modal-footer">' +
 		'<button type="submit" class="se-btn-primary" title="' +
-		lang.modalBox.submitButton +
+		lang.submitButton +
 		'" aria-label="' +
-		lang.modalBox.submitButton +
+		lang.submitButton +
 		'"><span>' +
-		lang.modalBox.submitButton +
+		lang.submitButton +
 		'</span></button>' +
 		'</div>' +
 		'</form>';
@@ -261,13 +261,13 @@ function CreateHTML_controller(core) {
 		'<button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">' +
 		core.icons.edit +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.edit +
+		lang.edit +
 		'</span></span>' +
 		'</button>' +
 		'<button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">' +
 		core.icons.delete +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.remove +
+		lang.remove +
 		'</span></span>' +
 		'</button>' +
 		'</div>' +

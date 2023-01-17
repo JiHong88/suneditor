@@ -6,7 +6,7 @@ const Audio_ = function (editor, target) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.target = target;
-	this.title = this.lang.toolbar.audio;
+	this.title = this.lang.audio;
 	this.icon = this.icons.audio;
 
 	// create HTML
@@ -378,14 +378,14 @@ function CreateHTML_modal(editor) {
 		'<form method="post" enctype="multipart/form-data">' +
 		'<div class="se-modal-header">' +
 		'<button type="button" data-command="close" class="se-btn se-modal-close" title="' +
-		lang.modalBox.close +
+		lang.close +
 		'" aria-label="' +
-		lang.modalBox.close +
+		lang.close +
 		'">' +
 		editor.icons.cancel +
 		'</button>' +
 		'<span class="se-modal-title">' +
-		lang.modalBox.audioBox.title +
+		lang.audio_modal_title +
 		'</span>' +
 		'</div>' +
 		'<div class="se-modal-body">';
@@ -395,7 +395,7 @@ function CreateHTML_modal(editor) {
 			'' +
 			'<div class="se-modal-form">' +
 			'<label>' +
-			lang.modalBox.audioBox.file +
+			lang.audio_modal_file +
 			'</label>' +
 			'<div class="se-modal-form-files">' +
 			'<input class="se-input-form _se_audio_files" data-focus type="file" accept="' +
@@ -404,9 +404,9 @@ function CreateHTML_modal(editor) {
 			(options.get('audioMultipleFile') ? ' multiple="multiple"' : '') +
 			'/>' +
 			'<button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="' +
-			lang.controller.remove +
+			lang.remove +
 			'" aria-label="' +
-			lang.controller.remove +
+			lang.remove +
 			'">' +
 			editor.icons.cancel +
 			'</button>' +
@@ -415,10 +415,10 @@ function CreateHTML_modal(editor) {
 	}
 
 	if (options.get('audioUrlInput')) {
-		html += '' + '<div class="se-modal-form">' + '<label>' + lang.modalBox.audioBox.url + '</label>' + '<input class="se-input-form se-input-url" data-focus type="text" />' + '<pre class="se-link-preview"></pre>' + '</div>';
+		html += '' + '<div class="se-modal-form">' + '<label>' + lang.audio_modal_url + '</label>' + '<input class="se-input-form se-input-url" data-focus type="text" />' + '<pre class="se-link-preview"></pre>' + '</div>';
 	}
 
-	html += '' + '</div>' + '<div class="se-modal-footer">' + '<button type="submit" class="se-btn-primary" title="' + lang.modalBox.submitButton + '" aria-label="' + lang.modalBox.submitButton + '"><span>' + lang.modalBox.submitButton + '</span></button>' + '</div>' + '</form>';
+	html += '' + '</div>' + '<div class="se-modal-footer">' + '<button type="submit" class="se-btn-primary" title="' + lang.submitButton + '" aria-label="' + lang.submitButton + '"><span>' + lang.submitButton + '</span></button>' + '</div>' + '</form>';
 
 	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
@@ -433,13 +433,13 @@ function CreateHTML_controller(editor) {
 		'<button type="button" data-command="update" tabindex="-1" class="se-tooltip">' +
 		icons.edit +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.edit +
+		lang.edit +
 		'</span></span>' +
 		'</button>' +
 		'<button type="button" data-command="delete" tabindex="-1" class="se-tooltip">' +
 		icons.delete +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.controller.remove +
+		lang.remove +
 		'</span></span>' +
 		'</button>' +
 		'</div>' +

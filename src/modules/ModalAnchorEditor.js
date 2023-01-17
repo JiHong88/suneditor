@@ -329,16 +329,16 @@ function CreatetModalForm(editor) {
 		'<div class="se-modal-body">' +
 		'<div class="se-modal-form">' +
 		'<label>' +
-		lang.modalBox.linkBox.url +
+		lang.link_modal_url +
 		'</label>' +
 		'<div class="se-modal-form-files">' +
 		'<input data-focus class="se-input-form se-input-url" type="text" placeholder="' +
 		(editor.options.get('protocol') || '') +
 		'" />' +
 		'<button type="button" class="se-btn se-modal-files-edge-button _se_bookmark_button" title="' +
-		lang.modalBox.linkBox.bookmark +
+		lang.link_modal_bookmark +
 		'" aria-label="' +
-		lang.modalBox.linkBox.bookmark +
+		lang.link_modal_bookmark +
 		'">' +
 		icons.bookmark +
 		'</button>' +
@@ -355,15 +355,15 @@ function CreatetModalForm(editor) {
 		'</div>' +
 		'<div class="se-modal-form">' +
 		'<label>' +
-		lang.modalBox.linkBox.text +
+		lang.link_modal_text +
 		'</label><input class="se-input-form _se_anchor_text" type="text" />' +
 		'</div>' +
 		'<div class="se-modal-form-footer">' +
 		'<label><input type="checkbox" class="se-modal-btn-check _se_anchor_check" />&nbsp;' +
-		lang.modalBox.linkBox.newWindowCheck +
+		lang.link_modal_newWindowCheck +
 		'</label>' +
 		'<label><input type="checkbox" class="se-modal-btn-check _se_anchor_download" />&nbsp;' +
-		lang.modalBox.linkBox.downloadLinkCheck +
+		lang.link_modal_downloadLinkCheck +
 		'</label>';
 	if (editor.options.get('linkRel').length > 0) {
 		html += '<div class="se-anchor-rel"><button type="button" class="se-btn se-btn-select se-anchor-rel-btn">&lt;rel&gt;</button>' + '<div class="se-anchor-rel-wrapper"><pre class="se-link-preview se-anchor-rel-preview"></pre></div>' + '</div></div>';

@@ -5,7 +5,7 @@ const LineHeight = function (editor, target) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.target = target;
-	this.title = this.lang.toolbar.lineHeight;
+	this.title = this.lang.lineHeight;
 	this.icon = this.icons.line_height;
 
 	// create HTML
@@ -84,7 +84,7 @@ function CreateHTML(editor) {
 		  ]
 		: options.get('lineHeights');
 
-	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="default_value se-btn-list" title="' + lang.toolbar.default + '" aria-label="' + lang.toolbar.default + '">(' + lang.toolbar.default + ')</button></li>';
+	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="default_value se-btn-list" title="' + lang.default + '" aria-label="' + lang.default + '">(' + lang.default + ')</button></li>';
 	for (let i = 0, len = sizeList.length, size; i < len; i++) {
 		size = sizeList[i];
 		list += '<li><button type="button" class="se-btn-list" data-value="' + size.value + '" title="' + size.text + '" aria-label="' + size.text + '">' + size.text + '</button></li>';

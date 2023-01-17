@@ -224,16 +224,16 @@ function CreateHTML(editor, colorList) {
 		'<form class="se-form-group">' +
 		'<input type="text" maxlength="9" class="se-color-input"/>' +
 		'<button type="submit" class="se-btn _se_color_picker_submit" title="' +
-		lang.modalBox.submitButton +
+		lang.submitButton +
 		'" aria-label="' +
-		lang.modalBox.submitButton +
+		lang.submitButton +
 		'">' +
 		editor.icons.checked +
 		'</button>' +
 		'<button type="button" class="se-btn _se_color_picker_remove" title="' +
-		lang.toolbar.removeFormat +
+		lang.removeFormat +
 		'" aria-label="' +
-		lang.toolbar.removeFormat +
+		lang.removeFormat +
 		'">' +
 		editor.icons.erase +
 		'</button>' +

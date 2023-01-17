@@ -24,10 +24,25 @@ const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 const Constructor = function (editorTargets, options) {
 	if (typeof options !== 'object') options = {};
 
+	/** --- Plugins ------------------------------------------------------------------------------------------ */
+	const plugins = {};
+	if (options.plugins) {
+		const originPlugins = options.plugins;
+		const pluginsValues = _w.Array.isArray(originPlugins.length)
+			? originPlugins
+			: _w.Object.keys(originPlugins).map(function (name) {
+					return originPlugins[name];
+			  });
+
+		for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
+			p = pluginsValues[i].default || pluginsValues[i];
+			plugins[p.key] = p;
+		}
+	}
+
 	/** --- options --------------------------------------------------------------- */
 	const optionMap = InitOptions(options, editorTargets);
 	const o = optionMap.o;
-	const plugins = optionMap.p;
 	const icons = optionMap.i;
 	const lang = optionMap.l;
 
@@ -491,21 +506,6 @@ function InitOptions(options, editorTargets) {
 	o.set('__listCommonStyle', options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle']);
 	o.set('__defaultFontSize', options.__defaultFontSize);
 
-	/** --- Plugins ------------------------------------------------------------------------------------------ */
-	const plugins = {};
-	if (options.plugins) {
-		const _plugins = options.plugins;
-		const pluginsValues = numbers.is(_plugins.length)
-			? _plugins
-			: _w.Object.keys(_plugins).map(function (name) {
-					return _plugins[name];
-			  });
-		for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
-			p = pluginsValues[i].default || pluginsValues[i];
-			plugins[p.key] = p;
-		}
-	}
-
 	/** --- Icons ------------------------------------------------------------------------------------------ */
 	let icons =
 		!options.icons || typeof options.icons !== 'object'
@@ -528,7 +528,6 @@ function InitOptions(options, editorTargets) {
 
 	return {
 		o: o,
-		p: plugins,
 		i: icons,
 		l: options.lang || _defaultLang,
 		v: (options.value = typeof options.value === 'string' ? options.value : null)
@@ -817,26 +816,26 @@ function _defaultButtons(options, icons, lang) {
 	const indentIcon = isRTL ? [icons.outdent, icons.indent] : [icons.indent, icons.outdent];
 
 	return {
-		bold: ['', lang.toolbar.bold + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('bold') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">B</span>') + '</span>', 'bold', '', icons.bold],
-		underline: ['', lang.toolbar.underline + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('underline') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">U</span>') + '</span>', 'underline', '', icons.underline],
-		italic: ['', lang.toolbar.italic + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('italic') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">I</span>') + '</span>', 'italic', '', icons.italic],
-		strike: ['', lang.toolbar.strike + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('strike') > -1 ? '' : cmdIcon + shiftIcon + '+<span class="se-shortcut-key">S</span>') + '</span>', 'strike', '', icons.strike],
-		subscript: ['', lang.toolbar.subscript, 'SUB', '', icons.subscript],
-		superscript: ['', lang.toolbar.superscript, 'SUP', '', icons.superscript],
-		removeFormat: ['', lang.toolbar.removeFormat, 'removeFormat', '', icons.erase],
-		indent: ['', lang.toolbar.indent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">' + indentKey[0] + '</span>') + '</span>', 'indent', '', indentIcon[0]],
-		outdent: ['', lang.toolbar.outdent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">' + indentKey[1] + '</span>') + '</span>', 'outdent', '', indentIcon[1]],
-		fullScreen: ['se-code-view-enabled se-resizing-enabled', lang.toolbar.fullScreen, 'fullScreen', '', icons.expansion],
-		showBlocks: ['', lang.toolbar.showBlocks, 'showBlocks', '', icons.show_blocks],
-		codeView: ['se-code-view-enabled se-resizing-enabled', lang.toolbar.codeView, 'codeView', '', icons.code_view],
-		undo: ['', lang.toolbar.undo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'undo', '', icons.undo],
-		redo: ['', lang.toolbar.redo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">Y</span> / ' + cmdIcon + shiftIcon + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'redo', '', icons.redo],
-		preview: ['se-resizing-enabled', lang.toolbar.preview, 'preview', '', icons.preview],
-		print: ['se-resizing-enabled', lang.toolbar.print, 'print', '', icons.print],
-		dir: ['', lang.toolbar[isRTL ? 'dir_ltr' : 'dir_rtl'], 'dir', '', icons[isRTL ? 'dir_ltr' : 'dir_rtl']],
-		dir_ltr: ['', lang.toolbar.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
-		dir_rtl: ['', lang.toolbar.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
-		save: ['se-resizing-enabled', lang.toolbar.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save]
+		bold: ['', lang.bold + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('bold') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">B</span>') + '</span>', 'bold', '', icons.bold],
+		underline: ['', lang.underline + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('underline') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">U</span>') + '</span>', 'underline', '', icons.underline],
+		italic: ['', lang.italic + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('italic') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">I</span>') + '</span>', 'italic', '', icons.italic],
+		strike: ['', lang.strike + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('strike') > -1 ? '' : cmdIcon + shiftIcon + '+<span class="se-shortcut-key">S</span>') + '</span>', 'strike', '', icons.strike],
+		subscript: ['', lang.subscript, 'SUB', '', icons.subscript],
+		superscript: ['', lang.superscript, 'SUP', '', icons.superscript],
+		removeFormat: ['', lang.removeFormat, 'removeFormat', '', icons.erase],
+		indent: ['', lang.indent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">' + indentKey[0] + '</span>') + '</span>', 'indent', '', indentIcon[0]],
+		outdent: ['', lang.outdent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">' + indentKey[1] + '</span>') + '</span>', 'outdent', '', indentIcon[1]],
+		fullScreen: ['se-code-view-enabled se-resizing-enabled', lang.fullScreen, 'fullScreen', '', icons.expansion],
+		showBlocks: ['', lang.showBlocks, 'showBlocks', '', icons.show_blocks],
+		codeView: ['se-code-view-enabled se-resizing-enabled', lang.codeView, 'codeView', '', icons.code_view],
+		undo: ['', lang.undo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'undo', '', icons.undo],
+		redo: ['', lang.redo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">Y</span> / ' + cmdIcon + shiftIcon + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'redo', '', icons.redo],
+		preview: ['se-resizing-enabled', lang.preview, 'preview', '', icons.preview],
+		print: ['se-resizing-enabled', lang.print, 'print', '', icons.print],
+		dir: ['', lang[isRTL ? 'dir_ltr' : 'dir_rtl'], 'dir', '', icons[isRTL ? 'dir_ltr' : 'dir_rtl']],
+		dir_ltr: ['', lang.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
+		dir_rtl: ['', lang.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
+		save: ['se-resizing-enabled', lang.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save]
 	};
 }
 
@@ -870,7 +869,7 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 	const label = title || '';
 	const oButton = domUtils.createElement('BUTTON', {
 		type: 'button',
-		class: 'se-btn' + (className ? ' ' + className : '') + ' se-tooltip',
+		class: 'se-btn se-tooltip' + (className ? ' ' + className : ''),
 		'data-command': dataCommand,
 		'data-type': dataType,
 		'aria-label': label.replace(/<span .+<\/span>/, ''),
@@ -898,9 +897,9 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 	};
 }
 
-export function UpdateButton(element, plugin) {
+export function UpdateButton(element, plugin, icons, lang) {
 	if (!element) return;
-	element.innerHTML = (plugin.icon || '<span class="se-icon-text">!</span>') + '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + plugin.title + '</span></span>';
+	element.innerHTML = (icons[plugin.icon] || plugin.icon || '<span class="se-icon-text">!</span>') + '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (lang[plugin.title] || plugin.title) + '</span></span>';
 	element.setAttribute('aria-label', plugin.title);
 	if (plugin.type) element.setAttribute('data-type', plugin.type);
 	if (plugin.className) element.className += ' ' + plugin.className;

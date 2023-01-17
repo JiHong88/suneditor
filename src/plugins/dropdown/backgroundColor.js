@@ -6,7 +6,7 @@ const BackgroundColor = function (editor, target) {
 	EditorDependency.call(this, editor);
 	// plugin basic properties
 	this.target = target;
-	this.title = this.lang.toolbar.backgroundColor;
+	this.title = this.lang.backgroundColor;
 	this.icon = this.icons.background_color;
 
 	// members

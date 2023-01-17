@@ -5,8 +5,8 @@ const FormatBlock = function (editor, target) {
 	EditorDependency.call(this, editor);
 	// plugin basic properties
 	this.target = target;
-	this.title = this.lang.toolbar.formats;
-	this.icon = '<span class="txt">' + this.lang.toolbar.formats + '</span>' + this.icons.arrow_down;
+	this.title = this.lang.formats;
+	this.icon = '<span class="txt">' + this.lang.formats + '</span>' + this.icons.arrow_down;
 
 	// create HTML
 	const menu = CreateHTML(editor);
@@ -30,7 +30,7 @@ FormatBlock.prototype = {
 	 * @override core
 	 */
 	active: function (element) {
-		let formatTitle = this.lang.toolbar.formats;
+		let formatTitle = this.lang.formats;
 		const target = this.targetText;
 
 		if (!element) {
@@ -120,7 +120,6 @@ function OnClickMenu(e) {
 
 function CreateHTML(editor) {
 	const options = editor.options;
-	const lang_toolbar = editor.lang.toolbar;
 	const defaultFormats = ['p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 	const formatList = !options.get('formats') || options.get('formats').length === 0 ? defaultFormats : options.get('formats');
 
@@ -132,7 +131,7 @@ function CreateHTML(editor) {
 			tagName = format.toLowerCase();
 			command = tagName === 'blockquote' ? 'block' : tagName === 'pre' ? 'br-line' : 'line';
 			h = /^h/.test(tagName) ? tagName.match(/\d+/)[0] : '';
-			name = lang_toolbar['tag_' + (h ? 'h' : tagName)] + h;
+			name = editor.lang['tag_' + (h ? 'h' : tagName)] + h;
 			className = '';
 			attrs = '';
 		} else {
