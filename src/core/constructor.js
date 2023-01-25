@@ -1,6 +1,6 @@
 import _icons from '../assets/defaultIcons';
 import _defaultLang from '../langs/en';
-import { CreateToolContext, CreateFrameContext } from './context';
+import { CreateContext, CreateFrameContext } from './context';
 import { domUtils, numbers, converter, env } from '../helper';
 
 const _d = env._d;
@@ -60,7 +60,7 @@ const Constructor = function (editorTargets, options) {
 	// loding box, resizing back
 	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-resizing-back' }));
 	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>'));
-	_d.body.appendChild(editor_carrier_wrapper);
+	_d.body.insertBefore(editor_carrier_wrapper, _d.body.firstElementChild);
 
 	/** --- toolbar --------------------------------------------------------------- */
 	const tool_bar_main = CreateToolBar(o.get('buttonList'), plugins, o, icons, lang);
@@ -141,13 +141,14 @@ const Constructor = function (editorTargets, options) {
 		container.appendChild(toolbar);
 		top_div.appendChild(container);
 		toolbar_container.appendChild(top_div);
+		toolbar_container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
 	} else {
 		const rootContainer = rootTargets.get(rootId).get('container');
 		rootContainer.insertBefore(toolbar, rootContainer.firstElementChild);
 	}
 
 	return {
-		toolContext: CreateToolContext(toolbar),
+		context: CreateContext(toolbar, toolbar_container),
 		carrierWrapper: editor_carrier_wrapper,
 		options: o,
 		plugins: plugins,
@@ -164,83 +165,11 @@ const Constructor = function (editorTargets, options) {
 
 /**
  * @description Reset the options
- * @param {Object} toolContext Context object
+ * @param {Object} context Context object
  * @param {Object} mergeOptions The new options
  * @returns {Object}
  */
-export function ResetOptions(toolContext, originOptions, mergeOptions) {
-	InitOptions(mergeOptions);
-
-	const fc = this.frameContext;
-	const toolbar = toolContext.get('toolBar.main');
-	const editorContainer = fc.get('container');
-	const editorArea = fc.get('editorArea');
-	const isNewToolbarContainer = mergeOptions.toolbar_container && mergeOptions.toolbar_container !== originOptions.toolbar_container;
-	const isNewToolbar = mergeOptions.lang !== originOptions.lang || mergeOptions.buttonList !== originOptions.buttonList || mergeOptions.mode !== originOptions.mode || isNewToolbarContainer;
-
-	const tool_bar = CreateToolBar(isNewToolbar ? mergeOptions.buttonList : originOptions.buttonList, mergeOptions.plugins, mergeOptions);
-	if (tool_bar.pluginCallButtons.math) _checkKatexMath(mergeOptions.katex);
-	const arrow = domUtils.createElement('DIV', { class: 'se-arrow' });
-
-	if (isNewToolbar) {
-		tool_bar.element.style.visibility = 'hidden';
-		// toolbar container
-		if (isNewToolbarContainer) {
-			mergeOptions.toolbar_container.appendChild(tool_bar.element);
-			toolbar.parentElement.removeChild(toolbar);
-		} else {
-			toolbar.parentElement.replaceChild(tool_bar.element, toolbar);
-		}
-
-		toolContext.set('toolBar.main', tool_bar.element);
-		toolContext.set('toolBar._menuTray', tool_bar._menuTray);
-		toolContext.set('toolBar._arrow', arrow);
-	}
-
-	const initElements = _initTargetElements(mergeOptions, fc.get('topArea'), isNewToolbar ? tool_bar.element : toolbar, arrow);
-	const bottomBar = initElements.bottomBar;
-	const wysiwygFrame = initElements.wysiwygFrame;
-	const placeholder_span = initElements.placeholder;
-	let code = initElements.codeView;
-
-	if (fc.has('statusbar')) domUtils.removeItem(fc.get('statusbar'));
-	if (bottomBar.statusbar) {
-		if (mergeOptions.statusbar_container && mergeOptions.statusbar_container !== originOptions.statusbar_container) {
-			mergeOptions.statusbar_container.appendChild(bottomBar.statusbar);
-		} else {
-			editorContainer.appendChild(bottomBar.statusbar);
-		}
-	}
-
-	editorArea.innerHTML = '';
-	editorArea.appendChild(code);
-	if (placeholder_span) editorArea.appendChild(placeholder_span);
-
-	code = _checkCodeMirror(mergeOptions, code);
-
-	fc.set('statusbar', bottomBar.statusbar);
-	fc.set('navigation', bottomBar.navigation);
-	fc.set('charWrapper', bottomBar.charWrapper);
-	fc.set('charCounter', bottomBar.charCounter);
-	fc.set('wysiwygFrame', wysiwygFrame);
-	fc.set('code', code);
-	fc.set('placeholder', placeholder_span);
-
-	if (mergeOptions._rtl) {
-		domUtils.addClass(fc.get('topArea'), 'se-rtl');
-		domUtils.addClass(toolContext.get('toolbar._wrapper'), 'se-rtl');
-		domUtils.addClass(toolContext.get('_carrierWrapper'), 'se-rtl');
-	} else {
-		domUtils.removeClass(fc.get('topArea'), 'se-rtl');
-		domUtils.removeClass(toolContext.get('toolbar._wrapper'), 'se-rtl');
-		domUtils.removeClass(toolContext.get('_carrierWrapper'), 'se-rtl');
-	}
-
-	return {
-		callButtons: tool_bar.pluginCallButtons,
-		toolbar: tool_bar
-	};
-}
+export function ResetOptions(context, originOptions, mergeOptions) {}
 
 /**
  * @description Initialize options

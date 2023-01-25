@@ -8,7 +8,7 @@ const common = require('./common');
 
 module.exports = merge(common, {
 	mode: 'production',
-	entry: './webpack/_cdn-builder',
+	entry: './webpack/cdn-builder',
 	output: {
 		filename: 'suneditor.min.js',
 		path: path.resolve(__dirname, '../dist')

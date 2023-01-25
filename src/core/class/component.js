@@ -125,7 +125,7 @@ Component.prototype = {
 	 */
 	_setComponentLineBreaker: function (element) {
 		this._lineBreakComp = null;
-		const fc = this.editor.frameContext;
+		const fc = this.frameContext;
 		const wysiwyg = fc.get('wysiwyg');
 		fc.get('lineBreaker').style.display = 'none';
 

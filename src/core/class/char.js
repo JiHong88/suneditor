@@ -9,7 +9,7 @@ import { addClass, removeClass, hasClass } from '../../helper/domUtils';
 
 const Char = function (editor) {
 	CoreDependency.call(this, editor);
-	this.maxCharCount = this.editor.frameOptions.get('charCounter_max');
+	this.maxCharCount = this.frameOptions.get('charCounter_max');
 	this._encoder = this._w.encodeURIComponent;
 	this._unescape = this._w.unescape;
 	this._textEncoder = this._w.TextEncoder;
@@ -23,9 +23,9 @@ Char.prototype = {
 	 */
 	check: function (html) {
 		if (this.maxCharCount) {
-			const length = this.getLength(typeof html === 'string' ? html : this.editor.frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? html.outerHTML : html.textContent);
+			const length = this.getLength(typeof html === 'string' ? html : this.frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? html.outerHTML : html.textContent);
 			if (length > 0 && length + this.getLength() > this.maxCharCount) {
-				CounterBlink(this.editor.frameContext.get('charWrapper'));
+				CounterBlink(this.frameContext.get('charWrapper'));
 				return false;
 			}
 		}
@@ -35,14 +35,14 @@ Char.prototype = {
 	/**
 	 * @description Get the [content]'s number of characters or binary data size. (frameOptions.get('charCounter_type'))
 	 * If [content] is undefined, get the current editor's number of characters or binary data size.
-	 * @param {string|undefined} content Content to count. (defalut: this.editor.frameContext.get('wysiwyg'))
+	 * @param {string|undefined} content Content to count. (defalut: this.frameContext.get('wysiwyg'))
 	 * @returns {number}
 	 */
 	getLength: function (content) {
 		if (typeof content !== 'string') {
-			content = this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? this.editor.frameContext.get('wysiwyg').innerHTML : this.editor.frameContext.get('wysiwyg').textContent;
+			content = this.frameOptions.get('charCounter_type') === 'byte-html' ? this.frameContext.get('wysiwyg').innerHTML : this.frameContext.get('wysiwyg').textContent;
 		}
-		return /byte/.test(this.editor.frameOptions.get('charCounter_type')) ? this.getByteLength(content) : content.length;
+		return /byte/.test(this.frameOptions.get('charCounter_type')) ? this.getByteLength(content) : content.length;
 	},
 
 	/**
@@ -81,10 +81,10 @@ Char.prototype = {
 	 * @description Set the char count to charCounter element textContent.
 	 */
 	display: function () {
-		if (this.editor.frameContext.has('charCounter')) {
+		if (this.frameContext.has('charCounter')) {
 			this._w.setTimeout(
 				function () {
-					this.editor.frameContext.get('charCounter').textContent = this.getLength();
+					this.frameContext.get('charCounter').textContent = this.getLength();
 				}.bind(this)
 			);
 		}
@@ -124,7 +124,7 @@ Char.prototype = {
 			}
 
 			if (over) {
-				CounterBlink(this.editor.frameContext.get('charWrapper'));
+				CounterBlink(this.frameContext.get('charWrapper'));
 				if (nextCharCount > 0) return false;
 			}
 		}
@@ -137,7 +137,7 @@ Char.prototype = {
 
 /**
  * @description The character counter blinks.
- * @param charWrapper {Element} this.editor.frameContext.get('charWrapper')
+ * @param charWrapper {Element} this.frameContext.get('charWrapper')
  * @private
  */
 function CounterBlink(charWrapper) {

@@ -1409,7 +1409,7 @@ Format.prototype = {
 		let range = this.selection.getRange();
 
 		if (domUtils.isWysiwygFrame(range.startContainer)) {
-			const children = this.editor.frameContext.get('wysiwyg').children;
+			const children = this.frameContext.get('wysiwyg').children;
 			if (children.length === 0) return [];
 
 			this.selection.setRange(children[0], 0, children[children.length - 1], children[children.length - 1].textContent.trim().length);

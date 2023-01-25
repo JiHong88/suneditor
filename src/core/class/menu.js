@@ -31,7 +31,7 @@ Menu.prototype = {
 	 */
 	initTarget: function (target, menu) {
 		if (target) {
-			this.editor.toolContext.get('toolbar._menuTray').appendChild(menu);
+			this.context.get('toolbar._menuTray').appendChild(menu);
 			this._menuTrayMap[typeof target === 'string' ? target : target.getAttribute('data-command')] = menu;
 		} else {
 			throw Error("[SUNEDITOR.init.fail] The plugin's button is not added.");
@@ -126,7 +126,7 @@ Menu.prototype = {
 		menu.style.height = '';
 		domUtils.addClass(element, 'on');
 
-		this.offset.setRelPosition(menu, element.parentElement, this.editor.toolContext.get('toolbar.main'));
+		this.offset.setRelPosition(menu, element.parentElement, this.context.get('toolbar.main'));
 
 		menu.style.visibility = '';
 	},
@@ -142,7 +142,7 @@ Menu.prototype = {
 	 */
 	_moreLayerOff: function () {
 		if (this.currentMoreLayerActiveButton) {
-			const layer = this.editor.toolContext.get('toolbar.main').querySelector('.' + this.currentMoreLayerActiveButton.getAttribute('data-command'));
+			const layer = this.context.get('toolbar.main').querySelector('.' + this.currentMoreLayerActiveButton.getAttribute('data-command'));
 			layer.style.display = 'none';
 			domUtils.removeClass(this.currentMoreLayerActiveButton, 'on');
 			this.currentMoreLayerActiveButton = null;

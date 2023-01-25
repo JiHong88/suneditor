@@ -94,14 +94,14 @@ Controller.prototype = {
 		this.editor.currentFileComponentInfo = this.component.get(target);
 
 		form.style.display = 'block';
-		if (this.shadowRoot) {
+		if (this._shadowRoot) {
 			form.addEventListener('mousedown', function (e) {
 				e.preventDefault();
 				e.stopPropagation();
 			});
 		}
 
-		this.editor._controllerTargetContext = this.editor.frameContext.get('topArea');
+		this.editor._controllerTargetContext = this.frameContext.get('topArea');
 		this.editor.opendControllers.push({
 			position: this.position,
 			form: form,
@@ -119,7 +119,7 @@ Controller.prototype = {
 	 */
 	_controllerOff: function () {
 		this.form.style.display = 'none';
-		this.editor.frameContext.get('lineBreaker_t').style.display = this.editor.frameContext.get('lineBreaker_b').style.display = 'none';
+		this.frameContext.get('lineBreaker_t').style.display = this.frameContext.get('lineBreaker_b').style.display = 'none';
 		this.editor.currentFileComponentInfo = null;
 		this.editor.effectNode = null;
 		this.editor.opendControllers = [];
@@ -138,7 +138,7 @@ Controller.prototype = {
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
-		if (!this.offset.setAbsPosition(controller, referEl, this.editor.frameContext.get('wysiwygFrame'), { addOffset: addOffset, position: this.position, inst: this })) {
+		if (!this.offset.setAbsPosition(controller, referEl, this.frameContext.get('wysiwygFrame'), { addOffset: addOffset, position: this.position, inst: this })) {
 			this.hide();
 			return;
 		}
@@ -201,7 +201,7 @@ function CloseListener_key(e) {
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 	if (ctrl || NON_RESPONSE_KEYCODE.test(keyCode)) return;
 
-	this.editor.frameContext.get('lineBreaker').style.display = 'none';
+	this.frameContext.get('lineBreaker').style.display = 'none';
 	if (this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) return;
 	if (this.editor._fileManager.pluginRegExp.test(this.kind) && keyCode !== 27) return;
 

@@ -1,6 +1,6 @@
 import Helper, { env, converter, domUtils, numbers } from '../helper';
 import Constructor, { ResetOptions, UpdateButton } from './constructor';
-import { CreateToolContext } from './context';
+import { UpdateContextMap, CreateContext } from './context';
 
 // class dependency
 import ClassDependency from '../dependency/_classes';
@@ -37,9 +37,9 @@ const Editor = function (multiTargets, options) {
 	// properties
 	this.rootKeys = product.rootKeys;
 	this.rootTargets = product.rootTargets;
-	this.toolContext = product.toolContext;
-	this.frameContext = null;
-	this.frameOptions = null;
+	this.context = product.context;
+	this.frameContext = new _w.Map();
+	this.frameOptions = new _w.Map();
 	this._setFrameInfo(product.rootTargets.get(product.rootId));
 
 	/**
@@ -84,12 +84,6 @@ const Editor = function (multiTargets, options) {
 	 * @type {Object.<string, any>}
 	 */
 	this.lang = product.lang;
-
-	/**
-	 * @description Closest ShadowRoot to editor if found
-	 * @type {ShadowRoot}
-	 */
-	this.shadowRoot = null;
 
 	/**
 	 * @description Computed style of the wysiwyg area (window.getComputedStyle(this.frameContext.get('wysiwyg')))
@@ -171,6 +165,13 @@ const Editor = function (multiTargets, options) {
 	this.currentFileComponentInfo = null;
 
 	// ----- private properties -----
+	/**
+	 * @description Closest ShadowRoot to editor if found
+	 * @type {ShadowRoot}
+	 * @private
+	 */
+	this._shadowRoot = null;
+
 	/**
 	 * @description Plugin buttons
 	 * @private
@@ -413,7 +414,7 @@ Editor.prototype = {
 		if (type) {
 			if (/more/i.test(type)) {
 				if (target !== this.menu.currentMoreLayerActiveButton) {
-					const layer = this.toolContext.get('toolbar.main').querySelector('.' + command);
+					const layer = this.context.get('toolbar.main').querySelector('.' + command);
 					if (layer) {
 						this.menu._moreLayerOn(target, layer);
 						this.toolbar._showBalloon();
@@ -560,7 +561,7 @@ Editor.prototype = {
 				}
 
 				this.status.isChanged = false;
-				if (this.toolContext.has('buttons.save')) this.toolContext.get('buttons.save').setAttribute('disabled', true);
+				if (this.context.has('buttons.save')) this.context.get('buttons.save').setAttribute('disabled', true);
 				break;
 			default:
 				// 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'..
@@ -587,35 +588,13 @@ Editor.prototype = {
 	 * @param {Object} _options Options
 	 */
 	setOptions: function (_options) {
-		this.eventManager._removeAllEvents();
-		this._resetComponents();
+		this.viewer.codeView(false);
+		this.viewer.showBlocks(false);
 
-		domUtils.removeClass(this._styleCommandMap.showBlocks, 'active');
-		domUtils.removeClass(this._styleCommandMap.codeView, 'active');
-		this.status.isCodeView = false;
-		this._iframeAuto = null;
-
-		this.plugins = _options.get('plugins') || this.plugins; //@todo plugins don't reset
 		const mergeOptions = [this.options, _options].reduce(function (init, option) {
 			for (let key in option) {
-				if (key === 'plugins' && option[key] && init[key]) {
-					let i = init[key],
-						o = option[key];
-					i = i.length
-						? i
-						: this._w.Object.keys(i).map(function (name) {
-								return i[name];
-						  });
-					o = o.length
-						? o
-						: this._w.Object.keys(o).map(function (name) {
-								return o[name];
-						  });
-					init[key] = o
-						.filter(function (val) {
-							return i.indexOf(val) === -1;
-						})
-						.concat(i);
+				if (key === 'plugins') {
+					continue;
 				} else {
 					init[key] = option[key];
 				}
@@ -623,25 +602,8 @@ Editor.prototype = {
 			return init;
 		}, {});
 
-		// set option
-		const tc = this.toolContext;
-		const fc = this.frameContext;
-		const initHTML = fc.get('wysiwyg').innerHTML;
-		const product = ResetOptions(tc, this.options, mergeOptions);
-		const inst = this;
-
-		if (mergeOptions.get('iframe')) {
-			fc.get('wysiwygFrame').addEventListener('load', function () {
-				converter._setIframeDocument(this, inst, fc.get('options').get('height'));
-				this._setOptionsInit(tc, product, mergeOptions, initHTML);
-			});
-		}
-
-		fc.get('editorArea').appendChild(fc.get('wysiwygFrame'));
-
-		if (!mergeOptions.get('iframe')) {
-			this._setOptionsInit(tc, product, mergeOptions, initHTML);
-		}
+		// @todo
+		ResetOptions(tc, this.options, mergeOptions);
 	},
 
 	/**
@@ -652,7 +614,7 @@ Editor.prototype = {
 		const rtl = dir === 'rtl';
 		const changeDir = this._prevRtl !== rtl;
 		const fc = this.frameContext;
-		const tc = this.toolContext;
+		const ctx = this.context;
 		this.options.set('_rtl', (this._prevRtl = rtl));
 
 		if (changeDir) {
@@ -661,8 +623,8 @@ Editor.prototype = {
 				if (typeof plugins[k].setDir === 'function') plugins[k].setDir(dir);
 			}
 			// indent buttons
-			if (tc.has('buttons.indent')) domUtils.changeElement(tc.get('buttons.indent').firstElementChild, this.icons.indent);
-			if (tc.has('buttons.outdent')) domUtils.changeElement(tc.get('buttons.outdent').firstElementChild, this.icons.outdent);
+			if (ctx.has('buttons.indent')) domUtils.changeElement(ctx.get('buttons.indent').firstElementChild, this.icons.indent);
+			if (ctx.has('buttons.outdent')) domUtils.changeElement(ctx.get('buttons.outdent').firstElementChild, this.icons.outdent);
 		}
 
 		if (rtl) {
@@ -715,7 +677,7 @@ Editor.prototype = {
 	 * @description Change the current root index.
 	 * @param {number} rootKey
 	 */
-	changeContextElement: function (rootKey) {
+	changeFrameContext: function (rootKey) {
 		if (!rootKey) return;
 
 		this.status.rootKey = rootKey;
@@ -724,6 +686,8 @@ Editor.prototype = {
 		this._lineBreakerButton = this.frameContext.get('lineBreaker').querySelector('button');
 		this._lineBreaker_t = this.frameContext.get('lineBreaker_t');
 		this._lineBreaker_b = this.frameContext.get('lineBreaker_b');
+
+		this.toolbar._resetSticky();
 	},
 
 	/**
@@ -742,7 +706,7 @@ Editor.prototype = {
 	 * @param {number|undefined} rootKey Root index
 	 */
 	focus: function (rootKey) {
-		if (numbers.is(rootKey)) this.changeContextElement(rootKey);
+		if (numbers.is(rootKey)) this.changeFrameContext(rootKey);
 		if (this.frameContext.get('wysiwygFrame').style.display === 'none') return;
 
 		if (this.options.get('iframe') || !this.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
@@ -821,7 +785,7 @@ Editor.prototype = {
 		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
 
 		for (let i = 0; i < rootKey.length; i++) {
-			this.changeContextElement(rootKey[i]);
+			this.changeFrameContext(rootKey[i]);
 
 			if (!this.status.isCodeView) {
 				this.frameContext.get('wysiwyg').innerHTML = convertValue;
@@ -847,7 +811,7 @@ Editor.prototype = {
 		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
 
 		for (let i = 0; i < rootKey.length; i++) {
-			this.changeContextElement(rootKey[i]);
+			this.changeFrameContext(rootKey[i]);
 
 			const convertValue = this.html.clean(content, true, null, null);
 			if (!this.status.isCodeView) {
@@ -879,7 +843,7 @@ Editor.prototype = {
 		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
 
 		for (let i = 0; i < rootKey.length; i++) {
-			this.changeContextElement(rootKey[i]);
+			this.changeFrameContext(rootKey[i]);
 
 			if (ctx.head) this.frameContext.get('_wd').head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
 			if (ctx.body) this.frameContext.get('_wd').body.innerHTML = this.html.clean(ctx.body, true, null, null);
@@ -901,7 +865,7 @@ Editor.prototype = {
 		const prevrootKey = this.status.rootKey;
 		const resultValue = {};
 		for (let i = 0, len = rootKey.length, r; i < len; i++) {
-			this.changeContextElement(rootKey[i]);
+			this.changeFrameContext(rootKey[i]);
 
 			const fc = this.frameContext;
 			const renderHTML = domUtils.createElement('DIV', null, this._convertHTMLToCode(fc.get('wysiwyg'), true));
@@ -928,7 +892,7 @@ Editor.prototype = {
 			resultValue[rootKey[i]] = r;
 		}
 
-		this.changeContextElement(prevrootKey);
+		this.changeFrameContext(prevrootKey);
 		return rootKey.length > 1 ? resultValue : resultValue[rootKey[0]];
 	},
 
@@ -944,11 +908,11 @@ Editor.prototype = {
 		const prevrootKey = this.status.rootKey;
 		const resultValue = {};
 		for (let i = 0, len = rootKey.length; i < len; i++) {
-			this.changeContextElement(rootKey[i]);
+			this.changeFrameContext(rootKey[i]);
 			resultValue[rootKey[i]] = this.frameContext.get('wysiwyg').textContent;
 		}
 
-		this.changeContextElement(prevrootKey);
+		this.changeFrameContext(prevrootKey);
 		return rootKey.length > 1 ? resultValue : resultValue[rootKey[0]];
 	},
 
@@ -1084,14 +1048,14 @@ Editor.prototype = {
 	destroy: function () {
 		/** remove element */
 		domUtils.removeItem(this._carrierWrapper);
-		domUtils.removeItem(this.toolContext.get('toolbar._wrapper'));
+		domUtils.removeItem(this.context.get('toolbar._wrapper'));
 
 		this.rootTargets.forEach(function (e) {
 			domUtils.removeItem(e.get('topArea'));
 		});
 
 		this.rootTargets.clear();
-		this.toolContext.clear();
+		this.context.clear();
 		this.frameContext.clear();
 
 		/** remove history */
@@ -1117,8 +1081,8 @@ Editor.prototype = {
 	 * @param {rootTarget} rt
 	 */
 	_setFrameInfo: function (rt) {
-		this.frameContext = rt;
-		this.frameOptions = rt.get('options');
+		UpdateContextMap(this.frameContext, rt);
+		UpdateContextMap(this.frameOptions, rt.get('options'));
 	},
 
 	/**
@@ -1274,10 +1238,10 @@ Editor.prototype = {
 			let child = e.get('wysiwygFrame');
 			while (child) {
 				if (child.shadowRoot) {
-					this.shadowRoot = child.shadowRoot;
+					this._shadowRoot = child.shadowRoot;
 					break;
 				} else if (child instanceof _w.ShadowRoot) {
-					this.shadowRoot = child;
+					this._shadowRoot = child;
 					break;
 				}
 				child = child.parentNode;
@@ -1350,7 +1314,7 @@ Editor.prototype = {
 	 * @private
 	 */
 	_saveButtonStates: function () {
-		const currentButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
+		const currentButtons = this.context.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
 		for (let i = 0, element, command; i < currentButtons.length; i++) {
 			element = currentButtons[i];
 			command = element.getAttribute('data-command');
@@ -1363,7 +1327,7 @@ Editor.prototype = {
 	 * @private
 	 */
 	_recoverButtonStates: function () {
-		const currentButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
+		const currentButtons = this.context.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
 		for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
 			button = currentButtons[i];
 			command = button.getAttribute('data-command');
@@ -1371,7 +1335,7 @@ Editor.prototype = {
 			oldButton = this.allCommandButtons.get(command);
 			if (oldButton) {
 				button.parentElement.replaceChild(oldButton, button);
-				if (this.toolContext.get('buttons.' + command)) this.toolContext.set('buttons.' + command, oldButton);
+				if (this.context.get('buttons.' + command)) this.context.set('buttons.' + command, oldButton);
 			}
 		}
 	},
@@ -1381,12 +1345,12 @@ Editor.prototype = {
 	 * @private
 	 */
 	_cachingButtons: function () {
-		this._codeViewDisabledButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])');
-		this._controllerOnDisabledButtons = this.toolContext.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
+		this._codeViewDisabledButtons = this.context.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])');
+		this._controllerOnDisabledButtons = this.context.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
 
 		this._saveButtonStates();
 
-		const tc = this.toolContext;
+		const tc = this.context;
 		const textTags = this.options.get('textTags');
 		const commandMap = this._commandMap;
 		commandMap.set('OUTDENT', tc.get('buttons.outdent'));
@@ -1413,7 +1377,6 @@ Editor.prototype = {
 	 */
 	_initWysiwygArea: function (e, reload, _initHTML) {
 		e.get('wysiwyg').innerHTML = (reload ? _initHTML : this.html.clean(typeof _initHTML === 'string' ? _initHTML : e.get('originElement').value, true, null, null)) || '<' + this.options.get('defaultLineTag') + '><br></' + this.options.get('defaultLineTag') + '>';
-		this._setFrameInfo(e);
 		if (e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
 	},
 
@@ -1484,10 +1447,10 @@ Editor.prototype = {
 	_onChange_historyStack: function () {
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
 		this.status.isChanged = true;
-		if (this.toolContext.has('buttons.save')) this.toolContext.get('buttons.save').removeAttribute('disabled');
+		if (this.context.has('buttons.save')) this.context.get('buttons.save').removeAttribute('disabled');
 		// user event
 		if (this.events.onChange) this.events.onChange(this.getContent());
-		if (this.toolContext.get('toolbar.main').style.display === 'block') this.toolbar._showBalloon();
+		if (this.context.get('toolbar.main').style.display === 'block') this.toolbar._showBalloon();
 	},
 
 	__callResizeFunction: function (h, resizeObserverEntry) {
@@ -1520,7 +1483,7 @@ Editor.prototype = {
 		this._responsiveButtons = product.toolbar.responsiveButtons;
 		// this.toolbar._setResponsive();
 
-		this.toolContext = CreateToolContext(ctx.toolbar.main, ctx.element.top, ctx.element.wysiwygFrame, ctx.element.code, this._carrierWrapper, this.options); //@todo context don't reset
+		this.context = CreateContext(ctx.toolbar.main, ctx.element.top, ctx.element.wysiwygFrame, ctx.element.code, this._carrierWrapper, this.options); //@todo context don't reset
 		this._componentsInfoReset = true;
 		this._editorInit(true, initHTML);
 	},
@@ -1537,7 +1500,7 @@ Editor.prototype = {
 		this.toolbar._resetSticky();
 
 		// toolbar visibility
-		this.toolContext.get('toolbar.main').style.visibility = '';
+		this.context.get('toolbar.main').style.visibility = '';
 
 		this._componentsInfoInit = false;
 		this._componentsInfoReset = false;

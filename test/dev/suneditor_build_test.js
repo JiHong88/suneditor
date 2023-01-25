@@ -319,7 +319,7 @@ window.e = suneditor.create(
 		editor1: {
 			target: document.querySelector('#multi_editor_1'),
 			options: {
-				// value: '<p>ed1</p>',
+				value: '<p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p>',
 				placeholder: 'place1'
 			}
 		},

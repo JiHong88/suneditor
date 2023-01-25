@@ -9,8 +9,8 @@ import { getNodeFromPath, getNodePath } from '../../helper/domUtils';
 export default function (editor, change) {
 	const rootTargets = editor.rootTargets;
 	const delayTime = editor.options.get('historyStackDelayTime');
-	let undo = editor.toolContext.get('buttons.undo');
-	let redo = editor.toolContext.get('buttons.redo');
+	let undo = editor.context.get('buttons.undo');
+	let redo = editor.context.get('buttons.redo');
 	let pushDelay = null;
 	let stackIndex, stack, rootStack, rootInitContents;
 
@@ -45,7 +45,7 @@ export default function (editor, change) {
 			}
 		}
 
-		editor.changeContextElement(focusKey);
+		editor.changeFrameContext(focusKey);
 		editor.selection.setRange(getNodeFromPath(focusItem.s.path, focusItem.frame), focusItem.s.offset, getNodeFromPath(focusItem.e.path, focusItem.frame), focusItem.e.offset);
 		editor.focus();
 
@@ -224,7 +224,7 @@ export default function (editor, change) {
 			if (undo) undo.setAttribute('disabled', true);
 			if (redo) redo.setAttribute('disabled', true);
 			editor.status.isChanged = false;
-			if (editor.toolContext.has('buttons.save')) editor.toolContext.get('buttons.save').setAttribute('disabled', true);
+			if (editor.context.has('buttons.save')) editor.context.get('buttons.save').setAttribute('disabled', true);
 
 			stackIndex = -1;
 			stack = [];
@@ -242,14 +242,14 @@ export default function (editor, change) {
 		 * @private
 		 */
 		_resetButtons: function () {
-			undo = editor.toolContext.get('buttons.undo');
-			redo = editor.toolContext.get('buttons.redo');
+			undo = editor.context.get('buttons.undo');
+			redo = editor.context.get('buttons.redo');
 
 			if (stackIndex === 0) {
 				if (undo) undo.setAttribute('disabled', true);
 				if (redo && stackIndex === stack.length - 1) redo.setAttribute('disabled', true);
 				editor.status.isChanged = false;
-				if (editor.toolContext.get('buttons.save')) editor.toolContext.get('buttons.save').setAttribute('disabled', true);
+				if (editor.context.get('buttons.save')) editor.context.get('buttons.save').setAttribute('disabled', true);
 			} else if (stackIndex === stack.length - 1) {
 				if (redo) redo.setAttribute('disabled', true);
 			}

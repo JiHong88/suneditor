@@ -8,8 +8,7 @@ import { get as getNumber } from '../helper/numbers';
  * @param {Element} wwFrame Editor wysiwyg frame
  * @param {Element} codeFrame Editor code view frame
  * @param {any} key root key
- * @returns {Object}
- * @private
+ * @returns {Map}
  */
 export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFrame, key) {
 	const m = new _w.Map([
@@ -51,23 +50,35 @@ const BASIC_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'sub', 'sup', '
 /**
  * @description Common elements and variables you should have
  * @param {Element} toolbar Toolbar frame
- * @param {Element} carrierWrapper Carrier wrapper
- * @returns {Object}
- * @private
+ * @param {Element|null} toolbarContainer Toolbar container
+ * @returns {Map}
  */
-export const CreateToolContext = function (toolbar) {
+export const CreateContext = function (toolbar, toolbarContainer) {
 	const m = new _w.Map([
 		['toolbar.main', toolbar],
 		['toolbar._buttonTray', toolbar.querySelector('.se-btn-tray')],
 		['toolbar._menuTray', toolbar.querySelector('.se-menu-tray')],
 		['toolbar._arrow', toolbar.querySelector('.se-arrow')],
-		['toolbar._wrapper', toolbar.parentElement.parentElement]
+		['toolbar._wrapper', toolbar.parentElement.parentElement],
+		['_stickyDummy', toolbarContainer ? toolbarContainer.querySelector('.se-toolbar-sticky-dummy') : null]
 	]);
 
 	for (let i = 0, len = BASIC_COMMANDS.length, b; i < len; i++) {
 		b = toolbar.querySelector('[data-command="' + BASIC_COMMANDS[i] + '"]');
-		if (b) m.set('buttons.' + BASIC_COMMANDS[i] + '', b);
+		if (b) m.set('buttons.' + BASIC_COMMANDS[i], b);
 	}
 
 	return m;
+};
+
+/**
+ * @description Update context
+ * @param {Map} fc context
+ * @param {Map} ctx context to change
+ */
+export const UpdateContextMap = function (c, ctx) {
+	ctx.forEach(function (v, k) {
+		if (v) c.set(k, v);
+		else c.delete(k);
+	});
 };

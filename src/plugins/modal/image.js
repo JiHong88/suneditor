@@ -227,7 +227,7 @@ Image_.prototype = {
 		domUtils.removeItem(container);
 		this.init();
 
-		if (emptyDiv !== this.editor.frameContext.get('wysiwyg')) {
+		if (emptyDiv !== this.frameContext.get('wysiwyg')) {
 			this.node.removeAllParents(
 				emptyDiv,
 				function (current) {
