@@ -17,6 +17,7 @@ const util = {
     isIE_Edge: null,
     isOSX_IOS: null,
     isChromium: null,
+    isResizeObserverSupported: null, 
     _propertiesInit: function () {
         if (this._d) return;
         this._d =  document;
@@ -25,6 +26,7 @@ const util = {
         this.isIE_Edge = (navigator.userAgent.indexOf('Trident') > -1) || (navigator.appVersion.indexOf('Edge') > -1);
         this.isOSX_IOS = /(Mac|iPhone|iPod|iPad)/.test(navigator.platform);
         this.isChromium = !!window.chrome;
+        this.isResizeObserverSupported = (typeof ResizeObserver === 'function');
     },
 
     _allowedEmptyNodeList: '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas',
