@@ -7615,7 +7615,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onResize_window: function () {
             if (util.isIE) core.resetResponsiveToolbar();
 
-            if (context.element.toolbar.offsetWidth === 0) return;
+            const toolbar = context.element.toolbar;
+            const isToolbarHidden = (toolbar.style.display === 'none' || (core._isInline && !core._inlineToolbarAttr.isShow));
+            if (context.element.toolbar.offsetWidth === 0 && !isToolbarHidden) return;
 
             if (context.fileBrowser && context.fileBrowser.area.style.display === 'block') {
                 context.fileBrowser.body.style.maxHeight = (_w.innerHeight - context.fileBrowser.header.offsetHeight - 50) + 'px';
@@ -8898,6 +8900,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     context.element.toolbar.style.display = '';
                     context.element._stickyDummy.style.display = '';
                 }
+
+                event.onResize_window();
             },
 
             /**
@@ -8910,6 +8914,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     context.element.toolbar.style.display = 'none';
                     context.element._stickyDummy.style.display = 'none';
                 }
+
+                event.onResize_window();
             },
         },
 
