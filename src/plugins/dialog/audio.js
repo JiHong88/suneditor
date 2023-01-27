@@ -464,7 +464,9 @@ export default {
         const container = this.plugins.component.set_container.call(this, cover, 'se-audio-container');
 
         try {
-            if (this.util.isListCell(existElement)) {
+            if (this.util.getParentElement(prevElement, this.util.isNotCheckingNode)) {
+                prevElement.parentNode.replaceChild(container, prevElement);
+            } else if (this.util.isListCell(existElement)) {
                 const refer = this.util.getParentElement(prevElement, function (current) { return current.parentNode === existElement; });
                 existElement.insertBefore(container, refer);
                 this.util.removeItem(prevElement);

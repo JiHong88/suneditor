@@ -671,7 +671,9 @@ export default {
             if (format) contextVideo._align = format.style.textAlign || format.style.float;
             this.plugins.video.setAlign.call(this, null, oFrame, cover, container);
 
-            if (this.util.isListCell(existElement)) {
+            if (this.util.getParentElement(prevFrame, this.util.isNotCheckingNode)) {
+                prevFrame.parentNode.replaceChild(container, prevFrame);
+            } else if (this.util.isListCell(existElement)) {
                 const refer = this.util.getParentElement(prevFrame, function (current) { return current.parentNode === existElement; });
                 existElement.insertBefore(container, refer);
                 this.util.removeItem(prevFrame);

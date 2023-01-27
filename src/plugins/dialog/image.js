@@ -772,7 +772,9 @@ export default {
                 contextImage._element : 
                 /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
                 
-            if (this.util.isListCell(existElement)) {
+            if (this.util.getParentElement(contextImage._element, this.util.isNotCheckingNode)) {
+                contextImage._element.parentNode.replaceChild(container, contextImage._element);
+            } else if (this.util.isListCell(existElement)) {
                 const refer = this.util.getParentElement(contextImage._element, function (current) { return current.parentNode === existElement; });
                 existElement.insertBefore(container, refer);
                 this.util.removeItem(contextImage._element);
