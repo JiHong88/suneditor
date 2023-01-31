@@ -6,7 +6,7 @@
     box-sizing:border-box;
     font-family:var(--se-font-family);
     border:1px solid rgb(var(--se-grey-accent-14));
-    background-color:var(--se-background-color-editable);
+    background-color: rgb(var(--se-background-color-editable));
     color:rgb(var(--se-secondary-color));
     user-select:none;
     -o-user-select:none;

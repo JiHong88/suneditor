@@ -2,6 +2,7 @@
 
 :root, .light, body[color-theme="light"] {
   --se-font-family: Helvetica Neue;
+  --se-background-color-editable: 255,255,255;
   --se-table-highlight-background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAARklEQVQ4T2NkoBJgBJnTsPf/f3LNa3BmBJsBN8hdkXSjdt4HOmLUILwBNxpGhNPVaBiRGUaEtWFXgZJpyTUEWR+4GKEGAAAYxVYTTalYKwAAAABJRU5ErkJggg==') repeat;
   --se-table-background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASAgMAAAAroGbEAAAACVBMVEUAAIj4+Pjp6ekKlAqjAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfYAR0BKhmnaJzPAAAAG0lEQVQI12NgAAOtVatWMTCohoaGUY+EmIkEAEruEzK2J7tvAAAAAElFTkSuQmCC') repeat;
   --se-primary-color: 255,255,255;
@@ -60,6 +61,7 @@
 }
 
 .dark, body[color-theme="dark"] {
+  --se-primary-color: 0,0,0;
   --se-table-highlight-background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAARklEQVQ4T2NkoBJgBJnTsPf/f3LNa3BmBJsBN8hdkXSjdt4HOmLUILwBNxpGhNPVaBiRGUaEtWFXgZJpyTUEWR+4GKEGAAAYxVYTTalYKwAAAABJRU5ErkJggg==') repeat;
   --se-table-background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAR0lEQVQ4T2NkoBJgBJljZmb2n1zzTp06BTYDbpC6ujrJZt28eZNh1CD8wTYaRoST1WgYkRlGhLVhV4GSack1BFkfuBihBgAAelVjE8BnSWYAAAAASUVORK5CYII=') repeat;
   --se-primary-color: 0,0,0;

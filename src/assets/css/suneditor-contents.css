@@ -5,7 +5,7 @@
     font-family: var(--se-font-family);
     font-size: 13px;
     color: rgb(var(--se-font-color));
-    background-color: var(--se-background-color-editable);
+    background-color: rgb(var(--se-background-color-editable));
     line-height: 1.5;
     word-break: normal;
     word-wrap: break-word;
@@ -32,8 +32,8 @@
 }
 
 /** controllers on tag */
-.sun-editor-editable td, .sun-editor-editable th, 
-.sun-editor-editable figure, .sun-editor-editable figcaption, .sun-editor-editable img, 
+.sun-editor-editable td, .sun-editor-editable th,
+.sun-editor-editable figure, .sun-editor-editable figcaption, .sun-editor-editable img,
 .sun-editor-editable iframe, .sun-editor-editable video, .sun-editor-editable audio {
     position: relative;
 }
@@ -457,10 +457,10 @@
 }
 
 /** --- show blocks mode */
-.sun-editor-editable.se-show-block p, .sun-editor-editable.se-show-block div, 
-.sun-editor-editable.se-show-block h1, .sun-editor-editable.se-show-block h2, .sun-editor-editable.se-show-block h3, 
-.sun-editor-editable.se-show-block h4, .sun-editor-editable.se-show-block h5, .sun-editor-editable.se-show-block h6, .sun-editor-editable.se-show-block li, 
-.sun-editor-editable.se-show-block ol, .sun-editor-editable.se-show-block ul, 
+.sun-editor-editable.se-show-block p, .sun-editor-editable.se-show-block div,
+.sun-editor-editable.se-show-block h1, .sun-editor-editable.se-show-block h2, .sun-editor-editable.se-show-block h3,
+.sun-editor-editable.se-show-block h4, .sun-editor-editable.se-show-block h5, .sun-editor-editable.se-show-block h6, .sun-editor-editable.se-show-block li,
+.sun-editor-editable.se-show-block ol, .sun-editor-editable.se-show-block ul,
 .sun-editor-editable.se-show-block pre {
     border:1px dashed rgb(var(--se-blue-accent-3)) !important;
     padding:14px 8px 8px 8px !important;
@@ -504,7 +504,7 @@
     border: 2px solid rgb(var(--se-primary-color));
     border-radius: 6px;
     text-transform: uppercase;
-    animation: neonFlicker 1.5s infinite alternate;     
+    animation: neonFlicker 1.5s infinite alternate;
 }
 @keyframes neonFlicker {
     0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
@@ -522,12 +522,12 @@
             0 0 2px var(--se-blue-accent-5),
             inset 0 0 2px var(--se-blue-accent-5),
             0 0 4px var(--se-blue-accent-5),
-            inset 0 0 4px var(--se-blue-accent-5);        
+            inset 0 0 4px var(--se-blue-accent-5);
     }
-    20%, 24%, 55% {        
+    20%, 24%, 55% {
         text-shadow: none;
         box-shadow: none;
-    }    
+    }
 }
 
 /* -- Text styles custom -- */
