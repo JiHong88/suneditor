@@ -1884,6 +1884,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 } else {
                                     afterNode = null;
                                 }
+                            } else if (util.isWysiwygDiv(container) && !util.isFormatElement(oNode)) {
+                                parentNode = container.appendChild(util.createElement(options.defaultTag));
+                                afterNode = null;
                             } else {
                                 afterNode = isFormats ? endCon : container === prevContainer ? container.nextSibling : container;
                                 parentNode = (!afterNode || !afterNode.parentNode) ? commonCon : afterNode.parentNode;
@@ -5172,13 +5175,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _deleteDisallowedTags: function (html) {
-            return html
-                .replace(/\n/g, '')
-                .replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '')
-                .replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '')
-                .replace(this.editorTagsWhitelistRegExp, '')
-                .replace(this.editorTagsBlacklistRegExp, '');
-        },
+			html = html
+				.replace(/\n/g, '')
+				.replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '')
+				.replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '');
+
+            if (!/\bfont\b/i.test(this.options._editorTagsWhitelist)) {
+                html = html.replace(/(<\/?)font(\s?)/gi, '$1span$2');
+            }
+
+			return html.replace(this.editorTagsWhitelistRegExp, '').replace(this.editorTagsBlacklistRegExp, '');
+		},
 
         _convertFontSize: function (to, size) {
             const value = size.match(/(\d+(?:\.\d+)?)(.+)/);
@@ -5207,10 +5214,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         _cleanStyle: function (m, v, name) {
-            const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
+            let sv = (m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/) || [])[0];
+            if (/span/i.test(name) && !sv && (m.match(/<span\s(.+)/) || [])[1]) {
+                const size = (m.match(/\ssize="([^"]+)"/i) || [])[1];
+                const face = (m.match(/\sface="([^"]+)"/i) || [])[1];
+                const color = (m.match(/\scolor="([^"]+)"/i) || [])[1];
+                if (size || face || color) {
+                    sv = 'style="' + (size ? 'font-size:' + (this.util.getNumber(size/3.333, 1)) + 'rem;' : '') + (face ? 'font-family:' + face + ';' : '') + (color ? 'color:' + color + ';' : '') + '"';
+                }
+            }
+
             if (sv) {
                 if (!v) v = [];
-                const style = sv[0].replace(/&quot;/g, '').match(this._cleanStyleRegExp[name]);
+                const style = sv.replace(/&quot;/g, '').match(this._cleanStyleRegExp[name]);
                 if (style) {
                     const allowedStyle = [];
                     for (let i = 0, len = style.length, r; i < len; i++) {
@@ -5259,21 +5275,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         _cleanTags: function (lowLevelCheck, m, t) {
             if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
-
+            
             let v = null;
             const tagName = t.match(/(?!<)[a-zA-Z0-9\-]+/)[0].toLowerCase();
-
+            
             // blacklist
             const bAttr = this._attributesTagsBlacklist[tagName];
             m = m.replace(/\s(?:on[a-z]+)\s*=\s*(")[^"]*\1/ig, '');
             if (bAttr) m = m.replace(bAttr, '');
             else m = m.replace(this._attributesBlacklistRegExp, '');
-
+            
             // whitelist
             const wAttr = this._attributesTagsWhitelist[tagName];
             if (wAttr) v = m.match(wAttr);
             else v = m.match(lowLevelCheck ? this._attributesWhitelistRegExp : this._attributesWhitelistRegExp_all_data);
-
+            
             // attribute
             if (lowLevelCheck) {
                 if (tagName === 'a') {
@@ -5337,9 +5353,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _editFormat: function (dom) {
             let value = '', f;
             const tempTree = dom.childNodes;
+            
             for (let i = 0, len = tempTree.length, n; i < len; i++) {
                 n = tempTree[i];
-                if (!util.isFormatElement(n) && !util.isRangeFormatElement(n) && !util.isComponent(n) && !/meta/i.test(n.nodeName)) {
+                if  (n.nodeType === 8) {
+                    value += '<!-- ' + n.textContent + ' -->';
+                } else if (!util.isFormatElement(n) && !util.isRangeFormatElement(n) && !util.isComponent(n) && !/meta/i.test(n.nodeName)) {
                     if (!f) f = util.createElement(options.defaultTag);
                     f.appendChild(n);
                     i--; len--;
@@ -7891,8 +7910,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (MSData) {
                     cleanData = cleanData.replace(/\n/g, ' ');
                     plainText = plainText.replace(/\n/g, ' ');
-                } else {
-                    cleanData = (plainText === cleanData ? plainText : cleanData).replace(/\n/g, '<br>');
                 }
                 cleanData = core.cleanHTML(cleanData, core.pasteTagsWhitelistRegExp, core.pasteTagsBlacklistRegExp);
             } else {
