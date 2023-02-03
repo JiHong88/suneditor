@@ -314,7 +314,7 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // 	buttonList: bl
 // });
 
-window.e = suneditor.create(
+const editor_root = window.e = suneditor.create(
 	{
 		editor1: {
 			target: document.querySelector('#multi_editor_1'),
@@ -356,3 +356,7 @@ window.e = suneditor.create(
 		buttonList: bl
 	}
 );
+
+editor_root.events.onBlur = (e) => {
+	console.log("eeee", e)
+}

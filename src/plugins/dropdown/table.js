@@ -75,7 +75,7 @@ const Table = function (editor, target) {
 	};
 
 	// init
-	this.menu.initTarget(target, menu);
+	this.menu.initDropdownTarget(target, menu);
 	this.eventManager.addEvent(commandArea, 'mousemove', OnMouseMoveTablePicker.bind(this));
 	this.eventManager.addEvent(commandArea, 'click', OnClickTablePicker.bind(this));
 };

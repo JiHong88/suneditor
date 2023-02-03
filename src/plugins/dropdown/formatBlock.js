@@ -18,7 +18,7 @@ const FormatBlock = function (editor, target) {
 	this.currentFormat = '';
 
 	// init
-	this.menu.initTarget(target, menu);
+	this.menu.initDropdownTarget(target, menu);
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 

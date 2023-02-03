@@ -10,13 +10,13 @@ const BackgroundColor = function (editor, target) {
 	this.icon = this.icons.background_color;
 
 	// members
-	this.colorPicker = new ColorPicker(this, 'backgroundColor', '#ffffff', this.options.get('colorList_background'));
+	this.colorPicker = new ColorPicker(this, 'backgroundColor', this.frameContext.get('wwComputedStyle').backgroundColor, this.options.get('colorList_background'));
 
 	// create HTML
 	const menu = CreateHTML(this.colorPicker.target);
 
 	// itit
-	this.menu.initTarget(target, menu);
+	this.menu.initDropdownTarget(target, menu);
 	this.eventManager.addEvent(menu, 'click', OnClickMenu.bind(this));
 };
 

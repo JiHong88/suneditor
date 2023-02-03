@@ -29,7 +29,7 @@ Menu.prototype = {
 	 * @param {Element|string} target Target button
 	 * @param {Element} menu Dropdown element
 	 */
-	initTarget: function (target, menu) {
+	initDropdownTarget: function (target, menu) {
 		if (target) {
 			this.context.get('toolbar._menuTray').appendChild(menu);
 			this._menuTrayMap[typeof target === 'string' ? target : target.getAttribute('data-command')] = menu;

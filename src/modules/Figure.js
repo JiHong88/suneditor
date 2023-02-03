@@ -783,7 +783,7 @@ function ContainerResizingOff() {
 	h = this._w.Math.round(h) || h;
 
 	if (!this.isVertical && !/%$/.test(w)) {
-		const limit = this.frameContext.get('wysiwygFrame').clientWidth - this.editor._editorPadding.left + this.editor._editorPadding.right - 2;
+		const limit = this.frameContext.get('wysiwygFrame').clientWidth - numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-right')) - 2;
 		if (numbers.get(w, 0) > limit) {
 			h = this._w.Math.round((h / w) * limit);
 			w = limit;

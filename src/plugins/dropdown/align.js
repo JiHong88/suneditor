@@ -24,7 +24,7 @@ const Align = function (editor, target) {
 	this.alignList = commandArea.querySelectorAll('li button');
 
 	// init
-	this.menu.initTarget(target, menu);
+	this.menu.initDropdownTarget(target, menu);
 	this.eventManager.addEvent(commandArea, 'click', OnClickMenu.bind(this));
 };
 

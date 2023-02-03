@@ -15,7 +15,7 @@ const Template = function (editor, target) {
 	this.selectedIndex = -1;
 
 	// init
-	this.menu.initTarget(target, menu);
+	this.menu.initDropdownTarget(target, menu);
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 

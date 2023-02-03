@@ -31,7 +31,7 @@ export default {
         // @Required
         // You must add the "dropdown" element using the "menu.initTarget" method.
         /** append target button menu */
-        core.menu.initTarget(this.name, targetElement, listDiv);
+        core.menu.initDropdownTarget(this.name, targetElement, listDiv);
     },
 
     setDropdown: function (core) {

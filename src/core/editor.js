@@ -40,7 +40,6 @@ const Editor = function (multiTargets, options) {
 	this.context = product.context;
 	this.frameContext = new _w.Map();
 	this.frameOptions = new _w.Map();
-	this._setFrameInfo(product.rootTargets.get(product.rootId));
 
 	/**
 	 * @description Document object
@@ -84,11 +83,6 @@ const Editor = function (multiTargets, options) {
 	 * @type {Object.<string, any>}
 	 */
 	this.lang = product.lang;
-
-	/**
-	 * @description Computed style of the wysiwyg area (window.getComputedStyle(this.frameContext.get('wysiwyg')))
-	 */
-	this.wwComputedStyle = null;
 
 	/**
 	 * @description Variables used internally in editor operation
@@ -214,7 +208,6 @@ const Editor = function (multiTargets, options) {
 	 * @private
 	 */
 	this._editorHeight = 0;
-	this._editorHeightPadding = 0;
 
 	/**
 	 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
@@ -358,7 +351,8 @@ const Editor = function (multiTargets, options) {
 
 	/** ----- Create editor ------------------------------------------------------------ */
 	const inst = this;
-	this._editorInit(false);
+	const rootSize = this.rootTargets.size;
+	let rootIndex = 0;
 	this.rootTargets.forEach(function (e) {
 		const o = e.get('originElement');
 		const t = e.get('topArea');
@@ -368,13 +362,11 @@ const Editor = function (multiTargets, options) {
 		e.get('editorArea').appendChild(e.get('wysiwygFrame'));
 
 		if (!inst.options.get('iframe')) {
-			inst._setEditorParams(e);
-			inst._initWysiwygArea(e, false, e.get('options').get('value'));
+			if (rootSize === ++rootIndex) inst._editorInit();
 		} else {
 			e.get('wysiwygFrame').addEventListener('load', function () {
 				converter._setIframeDocument(this, inst, e.get('options').get('height'));
-				inst._setEditorParams(e);
-				inst._initWysiwygArea(e, false, e.get('options').get('value'));
+				if (rootSize === ++rootIndex) inst._editorInit();
 			});
 		}
 	});
@@ -1083,6 +1075,7 @@ Editor.prototype = {
 	_setFrameInfo: function (rt) {
 		UpdateContextMap(this.frameContext, rt);
 		UpdateContextMap(this.frameOptions, rt.get('options'));
+		this._editorHeight = this.frameContext.get('wysiwygFrame').offsetHeight;
 	},
 
 	/**
@@ -1223,16 +1216,7 @@ Editor.prototype = {
 		const frameOptions = e.get('options');
 		const _w = this._w;
 
-		this._charTypeHTML = frameOptions.get('charCounter_type') === 'byte-html';
-		this.wwComputedStyle = _w.getComputedStyle(e.get('wysiwyg'));
-		this._editorHeight = e.get('wysiwygFrame').offsetHeight;
-		this._editorPadding = {
-			left: numbers.get(this.wwComputedStyle.getPropertyValue('padding-left')),
-			right: numbers.get(this.wwComputedStyle.getPropertyValue('padding-right')),
-			top: numbers.get(this.wwComputedStyle.getPropertyValue('padding-top')),
-			bottom: numbers.get(this.wwComputedStyle.getPropertyValue('padding-bottom'))
-		};
-		this._editorHeightPadding = this._editorPadding.top + this._editorPadding.bottom;
+		e.set('wwComputedStyle', _w.getComputedStyle(e.get('wysiwyg')));
 
 		if (!options.get('iframe') && typeof _w.ShadowRoot === 'function') {
 			let child = e.get('wysiwygFrame');
@@ -1247,11 +1231,6 @@ Editor.prototype = {
 				child = child.parentNode;
 			}
 		}
-
-		// set modes
-		this.isInline = /inline/i.test(options.get('mode'));
-		this.isBalloon = /balloon/i.test(options.get('mode'));
-		this.isBalloonAlways = /balloon-always/i.test(options.get('mode'));
 
 		// wisywig attributes
 		const attr = options.get('frameAttrbutes');
@@ -1269,9 +1248,6 @@ Editor.prototype = {
 		} else {
 			e.set('_wd', this._d);
 		}
-
-		// add events
-		this.eventManager._addEvent(e);
 	},
 
 	_registerClass: function () {
@@ -1454,7 +1430,12 @@ Editor.prototype = {
 	},
 
 	__callResizeFunction: function (h, resizeObserverEntry) {
-		h = h === -1 ? (resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0] ? resizeObserverEntry.borderBoxSize[0].blockSize : resizeObserverEntry.contentRect.height + this._editorHeightPadding) : h;
+		h =
+			h === -1
+				? resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0]
+					? resizeObserverEntry.borderBoxSize[0].blockSize
+					: resizeObserverEntry.contentRect.height + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-right'))
+				: h;
 		if (this._editorHeight !== h) {
 			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, this._editorHeight, resizeObserverEntry);
 			this._editorHeight = h;
@@ -1467,34 +1448,27 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @todo plugin, lang, class사용 option 등 바뀌었을때 클래스 리로드 문제
-	 * @description Initialization after "setOptions"
-	 * @param {Object} ctx context
-	 * @param {string} initHTML Initial html string
-	 * @private
-	 */
-	_setOptionsInit: function (ctx, product, newOptions, initHTML) {
-		if (product.callButtons) this._pluginCallButtons = product.callButtons;
-		if (ctx.toolbar._menuTray.children.length === 0) this.menu._menuTrayMap = {};
-
-		this.plugins = newOptions.get('plugins');
-		this.options = newOptions;
-		this.lang = this.options.get('lang');
-		this._responsiveButtons = product.toolbar.responsiveButtons;
-		// this.toolbar._setResponsive();
-
-		this.context = CreateContext(ctx.toolbar.main, ctx.element.top, ctx.element.wysiwygFrame, ctx.element.code, this._carrierWrapper, this.options); //@todo context don't reset
-		this._componentsInfoReset = true;
-		this._editorInit(true, initHTML);
-	},
-
-	/**
 	 * @description Initializ editor
-	 * @param {boolean} reload Is relooad?
 	 * @private
 	 */
-	_editorInit: function (reload) {
+	_editorInit: function () {
+		// set modes
+		this.isInline = /inline/i.test(this.options.get('mode'));
+		this.isBalloon = /balloon/i.test(this.options.get('mode'));
+		this.isBalloonAlways = /balloon-always/i.test(this.options.get('mode'));
+
+		this._registerClass();
+
+		this.rootTargets.forEach(
+			function (e) {
+				this._setEditorParams(e);
+				this._initWysiwygArea(e, false, e.get('options').get('value'));
+				this.eventManager._addEvent(e);
+			}.bind(this)
+		);
+
 		// initialize core and add event listeners
+		this._setFrameInfo(this.rootTargets.get(this.status.rootKey));
 		this._init();
 		this.toolbar._offSticky();
 		this.toolbar._resetSticky();
@@ -1521,9 +1495,9 @@ Editor.prototype = {
 					}.bind(this)
 				);
 				// history reset
-				if (!reload) this.history.reset();
+				this.history.reset();
 				// user event
-				if (typeof this.events.onload === 'function') this.events.onload(reload);
+				if (typeof this.events.onload === 'function') this.events.onload();
 			}.bind(this)
 		);
 	},
@@ -1533,7 +1507,6 @@ Editor.prototype = {
 	 * @private
 	 */
 	_init: function () {
-		this._registerClass();
 		this._cachingButtons();
 
 		// file components

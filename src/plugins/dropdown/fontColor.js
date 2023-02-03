@@ -10,13 +10,13 @@ const FontColor = function (editor, target) {
 	this.icon = this.icons.font_color;
 
 	// members
-	this.colorPicker = new ColorPicker(this, 'color', '#333333', this.options.get('colorList_font'));
+	this.colorPicker = new ColorPicker(this, 'color', this.frameContext.get('wwComputedStyle').color, this.options.get('colorList_font'));
 
 	// create HTML
 	const menu = CreateHTML(this.colorPicker.target);
 
 	// itit
-	this.menu.initTarget(target, menu);
+	this.menu.initDropdownTarget(target, menu);
 	this.eventManager.addEvent(menu, 'click', OnClickMenu.bind(this));
 };
 

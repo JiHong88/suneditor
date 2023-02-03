@@ -34,7 +34,7 @@ ColorPicker.prototype = {
 	 * @param {string|null} color Color value
 	 */
 	init: function (node) {
-		const computedColor = this.editor.wwComputedStyle[this.styleProperties];
+		const computedColor = this.frameContext.get('wwComputedStyle')[this.styleProperties];
 		const defaultColor = computedColor ? (this.isHexColor(computedColor) ? computedColor : this.rgb2hex(computedColor)) : this.defaultColor;
 
 		let fillColor = this._getColorInNode(node) || defaultColor;

@@ -20,7 +20,7 @@ const List = function (editor, target) {
 	};
 
 	// init
-	this.menu.initTarget(target, menu);
+	this.menu.initDropdownTarget(target, menu);
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 

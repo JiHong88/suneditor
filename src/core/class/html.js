@@ -1061,7 +1061,7 @@ HTML.prototype = {
 					r = style[i].match(/([a-zA-Z0-9-]+)(:)([^:]+$)/);
 					if (r && !/inherit|initial/i.test(r[3])) {
 						const k = env.kebabToCamelCase(r[1].trim());
-						const v = this.editor.wwComputedStyle[k].replace(/"/g, '');
+						const v = this.frameContext.get('wwComputedStyle')[k].replace(/"/g, '');
 						const c = r[3].trim();
 						switch (k) {
 							case 'fontFamily':
