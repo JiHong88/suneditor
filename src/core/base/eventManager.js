@@ -24,7 +24,6 @@ const EventManager = function (editor) {
 	this._toolbarObserver = null;
 	this._onMousedownPlugins = editor._onMousedownPlugins;
 	this._onKeyDownPlugins = editor._onKeyDownPlugins;
-	this._showPathLabel = editor.frameOptions.get('statusbar_showPathLabel');
 	this._lineBreakerButton = null;
 	this._lineBreaker_t = null;
 	this._lineBreaker_b = null;
@@ -177,7 +176,7 @@ EventManager.prototype = {
 		this.status.currentNodesMap = commandMapNodes;
 
 		/**  Displays the current node structure to statusbar */
-		if (this._showPathLabel && this.frameContext.get('navigation')) this.frameContext.get('navigation').textContent = this.status.currentNodes.join(' > ');
+		if (this.frameOptions.get('statusbar_showPathLabel') && this.frameContext.get('navigation')) this.frameContext.get('navigation').textContent = this.status.currentNodes.join(' > ');
 	},
 
 	/**
@@ -682,9 +681,7 @@ function ToolbarButtonsHandler(e) {
 
 	if (/^(input|textarea|select|option)$/i.test(target.nodeName)) {
 		this.editor._antiBlur = false;
-	}
-
-	if (!this.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
+	} else if (!this.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
 		this.editor.focus();
 	}
 

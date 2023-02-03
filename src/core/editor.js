@@ -1457,6 +1457,7 @@ Editor.prototype = {
 		this.isBalloon = /balloon/i.test(this.options.get('mode'));
 		this.isBalloonAlways = /balloon-always/i.test(this.options.get('mode'));
 
+		// register class
 		this._registerClass();
 
 		this.rootTargets.forEach(
