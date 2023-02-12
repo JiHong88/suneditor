@@ -179,6 +179,7 @@ Figure.prototype = {
 	 * @override controller
 	 */
 	reset: function () {
+		this.editor._antiBlur = false;
 		domUtils.removeClass(this._cover, 'se-figure-selected');
 	},
 
@@ -192,13 +193,13 @@ Figure.prototype = {
 		this.align = target.style.float || target.getAttribute('data-align') || 'none';
 		this.isVertical = /^(90|270)$/.test(Math.abs(target.getAttribute('data-rotate')).toString());
 
-		const eventWysiwyg = this.frameContext.get('eventWysiwyg');
+		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
 		const offset = this.offset.get(target);
-		const frameOffset = this.offset.get(this.frameContext.get('wysiwygFrame'));
+		const frameOffset = this.offset.get(this.editor.frameContext.get('wysiwygFrame'));
 		const w = (this.isVertical ? target.offsetHeight : target.offsetWidth) - 1;
 		const h = (this.isVertical ? target.offsetWidth : target.offsetHeight) - 1;
 		const t = offset.top - (this.options.get('iframe') ? frameOffset.top : 0);
-		const l = offset.left - (this.options.get('iframe') ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - this.frameContext.get('wysiwygFrame').scrollLeft;
+		const l = offset.left - (this.options.get('iframe') ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - this.editor.frameContext.get('wysiwygFrame').scrollLeft;
 		const originSize = (target.getAttribute('data-origin') || '').split(',');
 		const dataSize = (target.getAttribute('data-size') || '').split(',');
 		const ratio = Figure.GetRatio(dataSize[0] || numbers.get(target.style.width, 2) || w, dataSize[1] || numbers.get(target.style.height, 2) || h, this.sizeUnit);
@@ -222,7 +223,7 @@ Figure.prototype = {
 		this._height = targetInfo.height;
 		if (__fileManagerInfo || this.__fileManagerInfo) return targetInfo;
 
-		const _figure = this.frameContext.get('_figure');
+		const _figure = this.editor.frameContext.get('_figure');
 		this.editor._figureContainer = _figure.main;
 		_figure.main.style.top = t + 'px';
 		_figure.main.style.left = l + 'px';
@@ -681,7 +682,7 @@ Figure.prototype = {
 		display = !display ? 'none' : 'flex';
 		this.controller.form.style.display = display;
 
-		const _figure = this.frameContext.get('_figure');
+		const _figure = this.editor.frameContext.get('_figure');
 		const resizeHandles = _figure.handles;
 		for (let i = 0, len = resizeHandles.length; i < len; i++) {
 			resizeHandles[i].style.display = display;
@@ -730,7 +731,7 @@ function OnResizeContainer(e) {
 	const direction = (this._resize_direction = e.target.classList[0]);
 	this._resizeClientX = e.clientX;
 	this._resizeClientY = e.clientY;
-	this.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
+	this.editor.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
 	this.editor._resizeBackground.style.cursor = DIRECTION_CURSOR_MAP[direction];
 	this.editor._resizeBackground.style.display = 'block';
 
@@ -750,7 +751,7 @@ function ContainerResizing(e) {
 	let w = resultW + (/r/.test(direction) ? clientX - this._resizeClientX : this._resizeClientX - clientX);
 	let h = resultH + (/b/.test(direction) ? clientY - this._resizeClientY : this._resizeClientY - clientY);
 	const wh = (resultH / resultW) * w;
-	const resizeBorder = this.frameContext.get('_figure').border;
+	const resizeBorder = this.editor.frameContext.get('_figure').border;
 
 	if (/t/.test(direction)) resizeBorder.style.top = resultH - (/h/.test(direction) ? h : wh) + 'px';
 	if (/l/.test(direction)) resizeBorder.style.left = resultW - w + 'px';
@@ -770,7 +771,7 @@ function ContainerResizing(e) {
 
 	this._resize_w = /h$/.test(direction) ? this._width : this._w.Math.round(resultW);
 	this._resize_h = /w$/.test(direction) ? this._height : this._w.Math.round(resultH);
-	domUtils.changeTxt(this.frameContext.get('_figure').display, this._resize_w + ' x ' + this._resize_h);
+	domUtils.changeTxt(this.editor.frameContext.get('_figure').display, this._resize_w + ' x ' + this._resize_h);
 }
 
 function ContainerResizingOff() {
@@ -783,7 +784,7 @@ function ContainerResizingOff() {
 	h = this._w.Math.round(h) || h;
 
 	if (!this.isVertical && !/%$/.test(w)) {
-		const limit = this.frameContext.get('wysiwygFrame').clientWidth - numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-right')) - 2;
+		const limit = this.editor.frameContext.get('wysiwygFrame').clientWidth - numbers.get(this.editor.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(this.editor.frameContext.get('wwComputedStyle').getPropertyValue('padding-right')) - 2;
 		if (numbers.get(w, 0) > limit) {
 			h = this._w.Math.round((h / w) * limit);
 			w = limit;
@@ -824,7 +825,7 @@ function CreateAlign(editor) {
 }
 
 function OffFigureContainer() {
-	this.frameContext.get('_figure').main.style.display = 'none';
+	this.editor.frameContext.get('_figure').main.style.display = 'none';
 	this.editor._figureContainer = null;
 	this.inst.init();
 }

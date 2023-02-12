@@ -55,7 +55,7 @@ Toolbar.prototype = {
 			this._showBalloon();
 		} else {
 			this.context.get('toolbar.main').style.display = '';
-			this.frameContext.get('_stickyDummy').style.display = '';
+			this.editor.frameContext.get('_stickyDummy').style.display = '';
 		}
 	},
 
@@ -69,7 +69,7 @@ Toolbar.prototype = {
 			this._inlineToolbarAttr.isShow = false;
 		} else {
 			this.context.get('toolbar.main').style.display = 'none';
-			this.frameContext.get('_stickyDummy').style.display = 'none';
+			this.editor.frameContext.get('_stickyDummy').style.display = 'none';
 			if (this.editorisBalloon) {
 				this._balloonOffset = { top: 0, left: 0 };
 			}
@@ -86,7 +86,7 @@ Toolbar.prototype = {
 		if (responsiveSize) {
 			let w = 0;
 			if ((this.editor.isBalloon || this.editor.isInline) && this.options.get('toolbar_width') === 'auto') {
-				w = this.frameContext.get('topArea').offsetWidth;
+				w = this.editor.frameContext.get('topArea').offsetWidth;
 			} else {
 				w = this.context.get('toolbar.main').offsetWidth;
 			}
@@ -134,9 +134,9 @@ Toolbar.prototype = {
 		const toolbar = this.context.get('toolbar.main');
 		if (this.status.isFullScreen || toolbar.offsetWidth === 0 || this.options.get('toolbar_sticky') < 0) return;
 
-		const minHeight = this.frameContext.get('_minHeight');
-		const editorHeight = this.frameContext.get('editorArea').offsetHeight;
-		const editorOffset = this.offset.getGlobal(this.frameContext.get('topArea'));
+		const minHeight = this.editor.frameContext.get('_minHeight');
+		const editorHeight = this.editor.frameContext.get('editorArea').offsetHeight;
+		const editorOffset = this.offset.getGlobal(this.editor.frameContext.get('topArea'));
 		const y = (this._w.scrollY || this._d.documentElement.scrollTop) + this.options.get('toolbar_sticky');
 		const t = (this.editor.isBalloon || this.editor.isInline ? editorOffset.top : this.offset.getGlobal(this.options.get('toolbar_container')).top) - (this.editor.isInline ? toolbar.offsetHeight : 0);
 		const inlineOffset = 1;
@@ -156,7 +156,7 @@ Toolbar.prototype = {
 		const toolbar = this.context.get('toolbar.main');
 
 		if (!this.editor.isInline) {
-			const stickyDummy = !this.options.get('toolbar_container') ? this.frameContext.get('_stickyDummy') : this.context.get('_stickyDummy')
+			const stickyDummy = !this.options.get('toolbar_container') ? this.editor.frameContext.get('_stickyDummy') : this.context.get('_stickyDummy');
 			stickyDummy.style.height = toolbar.offsetHeight + 'px';
 			stickyDummy.style.display = 'block';
 		}
@@ -168,13 +168,13 @@ Toolbar.prototype = {
 	},
 
 	_offSticky: function () {
-		const stickyDummy = !this.options.get('toolbar_container') ? this.frameContext.get('_stickyDummy') : this.context.get('_stickyDummy')
+		const stickyDummy = !this.options.get('toolbar_container') ? this.editor.frameContext.get('_stickyDummy') : this.context.get('_stickyDummy');
 		stickyDummy.style.display = 'none';
-		
+
 		const toolbar = this.context.get('toolbar.main');
 		toolbar.style.top = this.editor.isInline ? this._inlineToolbarAttr.top : '';
 		toolbar.style.width = this.editor.isInline ? this._inlineToolbarAttr.width : '';
-		this.frameContext.get('editorArea').style.marginTop = '';
+		this.editor.frameContext.get('editorArea').style.marginTop = '';
 
 		domUtils.removeClass(toolbar, 'se-toolbar-sticky');
 		this._sticky = false;
@@ -243,7 +243,7 @@ Toolbar.prototype = {
 		const rectsObj = this.selection.getRects(range, positionTop ? 'start' : 'end');
 		positionTop = rectsObj.position === 'start';
 		const toolbar = this.context.get('toolbar.main');
-		const topArea = this.frameContext.get('topArea');
+		const topArea = this.editor.frameContext.get('topArea');
 		const rects = rectsObj.rects;
 		const scrollLeft = rectsObj.scrollLeft;
 		const scrollTop = rectsObj.scrollTop;
@@ -298,7 +298,7 @@ Toolbar.prototype = {
 		let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
 
 		let resetTop = false;
-		const space = t + (isDirTop ? this.offset.getGlobal(this.frameContext.get('topArea')).top : toolbarEl.offsetHeight - this.frameContext.get('wysiwyg').offsetHeight);
+		const space = t + (isDirTop ? this.offset.getGlobal(this.editor.frameContext.get('topArea')).top : toolbarEl.offsetHeight - this.editor.frameContext.get('wysiwyg').offsetHeight);
 		if (!isDirTop && space > 0 && this._getPageBottomSpace() < space) {
 			isDirTop = true;
 			resetTop = true;
@@ -325,7 +325,7 @@ Toolbar.prototype = {
 	},
 
 	_getPageBottomSpace: function () {
-		const topArea = this.frameContext.get('topArea');
+		const topArea = this.editor.frameContext.get('topArea');
 		return this._d.documentElement.scrollHeight - (this.offset.getGlobal(topArea).top + topArea.offsetHeight);
 	},
 
@@ -337,7 +337,7 @@ Toolbar.prototype = {
 		toolbar.style.display = 'block';
 		toolbar.style.top = '0px';
 		this._inlineToolbarAttr.width = toolbar.style.width = this.options.get('toolbar_width');
-		this._inlineToolbarAttr.top = toolbar.style.top = (this.options.get('toolbar_container') ? -1 + (this.offset.getGlobal(this.frameContext.get('topArea')).top - this.offset.getGlobal(toolbar).top - toolbar.offsetHeight) : -1 - toolbar.offsetHeight) + 'px';
+		this._inlineToolbarAttr.top = toolbar.style.top = (this.options.get('toolbar_container') ? -1 + (this.offset.getGlobal(this.editor.frameContext.get('topArea')).top - this.offset.getGlobal(toolbar).top - toolbar.offsetHeight) : -1 - toolbar.offsetHeight) + 'px';
 
 		if (typeof this.events.onShowInline === 'function') this.events.onShowInline(toolbar);
 

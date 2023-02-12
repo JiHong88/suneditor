@@ -70,15 +70,3 @@ export const CreateContext = function (toolbar, toolbarContainer) {
 
 	return m;
 };
-
-/**
- * @description Update context
- * @param {Map} fc context
- * @param {Map} ctx context to change
- */
-export const UpdateContextMap = function (c, ctx) {
-	ctx.forEach(function (v, k) {
-		if (v) c.set(k, v);
-		else c.delete(k);
-	});
-};

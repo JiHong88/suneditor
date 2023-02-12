@@ -207,7 +207,7 @@ Table.prototype = {
 				domUtils.removeItem(this._element);
 				this._closeController();
 
-				if (emptyDiv !== this.frameContext.get('wysiwyg'))
+				if (emptyDiv !== this.editor.frameContext.get('wysiwyg'))
 					this.node.removeAllParents(
 						emptyDiv,
 						function (current) {
@@ -893,7 +893,7 @@ Table.prototype = {
 	},
 
 	_toggleEditor: function (enabled) {
-		const wysiwyg = this.frameContext.get('wysiwyg');
+		const wysiwyg = this.editor.frameContext.get('wysiwyg');
 		wysiwyg.setAttribute('contenteditable', enabled);
 		if (enabled) domUtils.removeClass(wysiwyg, 'se-disabled');
 		else domUtils.addClass(wysiwyg, 'se-disabled');

@@ -6,18 +6,18 @@ import CoreDependency from '../dependency/_core';
  * When calling the color selection, "submit", and "remove" buttons, the "action" method of the instance is called with the "color" value as an argument.
  * @param {Object} inst The "this" object of the calling function.
  * @param {string} styles style property ("color", "backgroundColor"..)
- * @param {string} defaultColor default color
  * @param {Array.<string>} colorList color list
+ * @param {string} _defaultColor default color
  */
-const ColorPicker = function (inst, styles, defaultColor, colorList) {
+const ColorPicker = function (inst, styles, colorList, _defaultColor) {
 	CoreDependency.call(this, inst.editor);
 	// members
 	this.kind = inst.constructor.key;
 	this.inst = inst;
 	this.target = CreateHTML(inst.editor, colorList);
 	this.inputElement = this.target.querySelector('.se-color-input');
-	this.defaultColor = defaultColor;
 	this.styleProperties = styles;
+	this.defaultColor = _defaultColor;
 	this.currentColor = '';
 	this.colorList = this.target.querySelectorAll('li button') || [];
 
@@ -34,8 +34,8 @@ ColorPicker.prototype = {
 	 * @param {string|null} color Color value
 	 */
 	init: function (node) {
-		const computedColor = this.frameContext.get('wwComputedStyle')[this.styleProperties];
-		const defaultColor = computedColor ? (this.isHexColor(computedColor) ? computedColor : this.rgb2hex(computedColor)) : this.defaultColor;
+		const computedColor = this.editor.frameContext.get('wwComputedStyle')[this.styleProperties];
+		const defaultColor = this.defaultColor || this.isHexColor(computedColor) ? computedColor : this.rgb2hex(computedColor);
 
 		let fillColor = this._getColorInNode(node) || defaultColor;
 		fillColor = this.isHexColor(fillColor) ? fillColor : this.rgb2hex(fillColor) || fillColor;

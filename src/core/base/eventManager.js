@@ -75,7 +75,7 @@ EventManager.prototype = {
 	 */
 	addGlobalEvent: function (type, listener, useCapture) {
 		if (this.options.get('iframe')) {
-			this.frameContext.get('_ww').addEventListener(type, listener, useCapture);
+			this.editor.frameContext.get('_ww').addEventListener(type, listener, useCapture);
 		}
 		this._w.addEventListener(type, listener, useCapture);
 		return { type: type, listener: listener, useCapture: useCapture };
@@ -95,7 +95,7 @@ EventManager.prototype = {
 			type = type.type;
 		}
 		if (this.options.get('iframe')) {
-			this.frameContext.get('_ww').removeEventListener(type, listener, useCapture);
+			this.editor.frameContext.get('_ww').removeEventListener(type, listener, useCapture);
 		}
 		this._w.removeEventListener(type, listener, useCapture);
 	},
@@ -176,7 +176,7 @@ EventManager.prototype = {
 		this.status.currentNodesMap = commandMapNodes;
 
 		/**  Displays the current node structure to statusbar */
-		if (this.frameOptions.get('statusbar_showPathLabel') && this.frameContext.get('navigation')) this.frameContext.get('navigation').textContent = this.status.currentNodes.join(' > ');
+		if (this.editor.frameOptions.get('statusbar_showPathLabel') && this.editor.frameContext.get('navigation')) this.editor.frameContext.get('navigation').textContent = this.status.currentNodes.join(' > ');
 	},
 
 	/**
@@ -397,8 +397,8 @@ EventManager.prototype = {
 	_setDropLocationSelection: function (e) {
 		if (e.rangeParent) {
 			this.selection.setRange(e.rangeParent, e.rangeOffset, e.rangeParent, e.rangeOffset);
-		} else if (this.frameContext.get('_wd').caretRangeFromPoint) {
-			const r = this.frameContext.get('_wd').caretRangeFromPoint(e.clientX, e.clientY);
+		} else if (this.editor.frameContext.get('_wd').caretRangeFromPoint) {
+			const r = this.editor.frameContext.get('_wd').caretRangeFromPoint(e.clientX, e.clientY);
 			this.selection.setRange(r.startContainer, r.startOffset, r.endContainer, r.endOffset);
 		} else {
 			const r = this.selection.getRange();
@@ -406,7 +406,7 @@ EventManager.prototype = {
 		}
 	},
 
-	_dataTransferAction: function (type, e, data) {
+	_dataTransferAction: function (type, e, data, rootKey) {
 		let plainText, cleanData;
 		if (env.isIE) {
 			plainText = data.getData('Text');
@@ -423,7 +423,7 @@ EventManager.prototype = {
 			tempDiv.setAttribute('contenteditable', true);
 			tempDiv.style.cssText = 'position:absolute; top:0; left:0; width:1px; height:1px; overflow:hidden;';
 
-			this.frameContext.get('container').appendChild(tempDiv);
+			this.editor.frameContext.get('container').appendChild(tempDiv);
 			tempDiv.focus();
 
 			_w.setTimeout(
@@ -431,7 +431,7 @@ EventManager.prototype = {
 					cleanData = tempDiv.innerHTML;
 					domUtils.removeItem(tempDiv);
 					this.selection.setRange(tempRange.sc, tempRange.so, tempRange.ec, tempRange.eo);
-					this._setClipboardData(type, e, plainText, cleanData, data);
+					this._setClipboardData(type, e, plainText, cleanData, data, rootKey);
 				}.bind(this)
 			);
 
@@ -439,7 +439,7 @@ EventManager.prototype = {
 		} else {
 			plainText = data.getData('text/plain');
 			cleanData = data.getData('text/html');
-			if (this._setClipboardData(type, e, plainText, cleanData, data) === false) {
+			if (this._setClipboardData(type, e, plainText, cleanData, data, rootKey) === false) {
 				e.preventDefault();
 				e.stopPropagation();
 				return false;
@@ -447,7 +447,7 @@ EventManager.prototype = {
 		}
 	},
 
-	_setClipboardData: function (type, e, plainText, cleanData, data) {
+	_setClipboardData: function (type, e, plainText, cleanData, data, rootKey) {
 		// MS word, OneNode, Excel
 		const MSData = /class=["']*Mso(Normal|List)/i.test(cleanData) || /content=["']*Word.Document/i.test(cleanData) || /content=["']*OneNote.File/i.test(cleanData) || /content=["']*Excel.Sheet/i.test(cleanData);
 		const onlyText = !cleanData;
@@ -465,16 +465,16 @@ EventManager.prototype = {
 			cleanData = converter.htmlToEntity(plainText).replace(/\n/g, '<br>');
 		}
 
-		const maxCharCount = this.char.test(this.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText);
+		const maxCharCount = this.char.test(this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText);
 		// user event - paste
 		if (type === 'paste' && typeof this.events.onPaste === 'function') {
-			const value = this.events.onPaste(e, cleanData, maxCharCount);
+			const value = this.events.onPaste(e, cleanData, maxCharCount, rootKey);
 			if (!value) return false;
 			if (typeof value === 'string') cleanData = value;
 		}
 		// user event - drop
 		if (type === 'drop' && typeof this.events.onDrop === 'function') {
-			const value = this.events.onDrop(e, cleanData, maxCharCount);
+			const value = this.events.onDrop(e, cleanData, maxCharCount, rootKey);
 			if (!value) return false;
 			if (typeof value === 'string') cleanData = value;
 		}
@@ -527,22 +527,24 @@ EventManager.prototype = {
 				}.bind(this)
 			);
 		}
+		const codeArea = frameContext.get('code');
 
 		/** editor area */
 		const rootKey = frameContext.get('key');
-		const wwMouseDown = OnMouseDown_wysiwyg.bind(this);
+		const wwMouseDown = OnMouseDown_wysiwyg.bind(this, rootKey);
 		this.addEvent(eventWysiwyg, 'mousedown', wwMouseDown, false);
-		this.addEvent(eventWysiwyg, 'click', OnClick_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, env.isIE ? 'textinput' : 'input', OnInput_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, 'keydown', OnKeyDown_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, 'keyup', OnKeyUp_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, 'paste', OnPaste_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, 'copy', OnCopy_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, 'cut', OnCut_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this), false);
-		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, eventWysiwyg), false);
+		this.addEvent(eventWysiwyg, 'click', OnClick_wysiwyg.bind(this, rootKey), false);
+		this.addEvent(eventWysiwyg, env.isIE ? 'textinput' : 'input', OnInput_wysiwyg.bind(this, rootKey), false);
+		this.addEvent(eventWysiwyg, 'keydown', OnKeyDown_wysiwyg.bind(this, rootKey), false);
+		this.addEvent(eventWysiwyg, 'keyup', OnKeyUp_wysiwyg.bind(this, rootKey), false);
+		this.addEvent(eventWysiwyg, 'paste', OnPaste_wysiwyg.bind(this, rootKey), false);
+		this.addEvent(eventWysiwyg, 'copy', OnCopy_wysiwyg.bind(this, rootKey), false);
+		this.addEvent(eventWysiwyg, 'cut', OnCut_wysiwyg.bind(this, rootKey), false);
+		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, rootKey), false);
+		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, rootKey, eventWysiwyg), false);
 		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this, rootKey), false);
 		this.addEvent(eventWysiwyg, 'blur', OnBlur_wysiwyg.bind(this, rootKey), false);
+		this.addEvent(codeArea, 'mousedown', OnFocus_code.bind(this, rootKey), false);
 
 		/** line breaker */
 		this.addEvent(eventWysiwyg, 'mousemove', OnMouseMove_wysiwyg.bind(this), false);
@@ -567,16 +569,16 @@ EventManager.prototype = {
 		}
 
 		/** code view area auto line */
-		if (this.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) {
+		if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) {
 			const cvAuthHeight = this.editor._codeViewAutoHeight.bind(this.editor);
-			this.addEvent(frameContext.get('code'), 'keydown', cvAuthHeight, false);
-			this.addEvent(frameContext.get('code'), 'keyup', cvAuthHeight, false);
-			this.addEvent(frameContext.get('code'), 'paste', cvAuthHeight, false);
+			this.addEvent(codeArea, 'keydown', cvAuthHeight, false);
+			this.addEvent(codeArea, 'keyup', cvAuthHeight, false);
+			this.addEvent(codeArea, 'paste', cvAuthHeight, false);
 		}
 
 		/** statusbar */
 		if (frameContext.has('statusbar')) {
-			if (/\d+/.test(this.frameOptions.get('height')) && this.frameOptions.get('statusbar_resizeEnable')) {
+			if (/\d+/.test(this.editor.frameOptions.get('height')) && this.editor.frameOptions.get('statusbar_resizeEnable')) {
 				this.addEvent(frameContext.get('statusbar'), 'mousedown', OnMouseDown_statusbar.bind(this), false);
 			} else {
 				domUtils.addClass(frameContext.get('statusbar'), 'se-resizing-none');
@@ -600,12 +602,12 @@ EventManager.prototype = {
 		this._events = [];
 
 		if (this._resizeObserver) {
-			this._resizeObserver.unobserve(this.frameContext.get('wysiwygFrame'));
+			this._resizeObserver.unobserve(this.editor.frameContext.get('wysiwygFrame'));
 			this._resizeObserver = null;
 		}
 
 		if (this._toolbarObserver) {
-			this._toolbarObserver.unobserve(this.frameContext.get('_toolbarShadow'));
+			this._toolbarObserver.unobserve(this.editor.frameContext.get('_toolbarShadow'));
 			this._toolbarObserver = null;
 		}
 	},
@@ -619,7 +621,7 @@ EventManager.prototype = {
 			this.context.get('toolbar.main').style.left = this.toolbar._balloonOffset.left - x + 'px';
 		}
 
-		if (this.editor._controllerTargetContext !== this.frameContext.get('topArea')) {
+		if (this.editor._controllerTargetContext !== this.editor.frameContext.get('topArea')) {
 			this.editor._offCurrentController();
 		}
 
@@ -681,7 +683,7 @@ function ToolbarButtonsHandler(e) {
 
 	if (/^(input|textarea|select|option)$/i.test(target.nodeName)) {
 		this.editor._antiBlur = false;
-	} else if (!this.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
+	} else if (!this.editor.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
 		this.editor.focus();
 	}
 
@@ -698,7 +700,7 @@ function ToolbarButtonsHandler(e) {
 			className = target.className;
 		}
 
-		if (!this.status.isCodeView) {
+		if (!this.editor.frameContext.get('isCodeView')) {
 			e.preventDefault();
 			if (env.isGecko && command) {
 				domUtils.addClass(target, '__se__active');
@@ -737,11 +739,11 @@ function OnClick_toolbar(e) {
 	this.editor.runPlugin(command, type, target);
 }
 
-function OnMouseDown_wysiwyg(e) {
-	if (this.status.isReadOnly || domUtils.isNonEditable(this.frameContext.get('wysiwyg'))) return;
+function OnMouseDown_wysiwyg(rootKey, e) {
+	if (this.status.isReadOnly || domUtils.isNonEditable(this.editor.frameContext.get('wysiwyg'))) return;
 
 	// user event
-	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown(e) === false) return;
+	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown(e, rootKey) === false) return;
 
 	const eventPlugins = this.editor._onMousedownPlugins;
 	for (let i = 0; i < eventPlugins.length; i++) {
@@ -755,7 +757,7 @@ function OnMouseDown_wysiwyg(e) {
 	if (/FIGURE/i.test(e.target.nodeName)) e.preventDefault();
 }
 
-function OnClick_wysiwyg(e) {
+function OnClick_wysiwyg(rootKey, e) {
 	const targetElement = e.target;
 
 	if (this.status.isReadOnly) {
@@ -766,10 +768,10 @@ function OnClick_wysiwyg(e) {
 		return false;
 	}
 
-	if (domUtils.isNonEditable(this.frameContext.get('wysiwyg'))) return;
+	if (domUtils.isNonEditable(this.editor.frameContext.get('wysiwyg'))) return;
 
 	// user event
-	if (typeof this.events.onClick === 'function' && this.events.onClick(e) === false) return;
+	if (typeof this.events.onClick === 'function' && this.events.onClick(e, rootKey) === false) return;
 
 	const fileComponentInfo = this.component.get(targetElement);
 	if (fileComponentInfo) {
@@ -828,7 +830,7 @@ function OnClick_wysiwyg(e) {
 	if (this.editor.isBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this));
 }
 
-function OnInput_wysiwyg(e) {
+function OnInput_wysiwyg(rootKey, e) {
 	if (this.status.isReadOnly || this.status.isDisabled) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -845,12 +847,12 @@ function OnInput_wysiwyg(e) {
 	}
 
 	// user event
-	if (typeof this.events.onInput === 'function' && this.events.onInput(e) === false) return;
+	if (typeof this.events.onInput === 'function' && this.events.onInput(e, rootKey) === false) return;
 
 	this.history.push(true);
 }
 
-function OnKeyDown_wysiwyg(e) {
+function OnKeyDown_wysiwyg(rootKey, e) {
 	const keyCode = e.keyCode;
 	const shift = e.shiftKey;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
@@ -869,7 +871,7 @@ function OnKeyDown_wysiwyg(e) {
 	}
 
 	// user event
-	if (typeof this.events.onKeyDown === 'function' && this.events.onKeyDown(e) === false) return;
+	if (typeof this.events.onKeyDown === 'function' && this.events.onKeyDown(e, rootKey) === false) return;
 
 	/** Shortcuts */
 	if (ctrl && this.shortcuts.command(keyCode, shift)) {
@@ -912,7 +914,7 @@ function OnKeyDown_wysiwyg(e) {
 				break;
 			}
 
-			if (!this.format.isLine(formatEl) && !this.frameContext.get('wysiwyg').firstElementChild && !this.component.is(selectionNode) && this._setDefaultLine(this.options.get('defaultLineTag')) !== null) {
+			if (!this.format.isLine(formatEl) && !this.editor.frameContext.get('wysiwyg').firstElementChild && !this.component.is(selectionNode) && this._setDefaultLine(this.options.get('defaultLineTag')) !== null) {
 				e.preventDefault();
 				e.stopPropagation();
 				return false;
@@ -1317,7 +1319,7 @@ function OnKeyDown_wysiwyg(e) {
 		case 13 /** enter key */:
 			const brBlock = this.format.getBrLine(selectionNode, null);
 
-			if (this.frameOptions.get('charCounter_type') === 'byte-html') {
+			if (this.editor.frameOptions.get('charCounter_type') === 'byte-html') {
 				let enterHTML = '';
 				if ((!shift && brBlock) || shift) {
 					enterHTML = '<br>';
@@ -1550,7 +1552,7 @@ function OnKeyDown_wysiwyg(e) {
 	}
 }
 
-function OnKeyUp_wysiwyg(e) {
+function OnKeyUp_wysiwyg(rootKey, e) {
 	if (this._onShortcutKey) return;
 
 	this.selection._init();
@@ -1615,31 +1617,31 @@ function OnKeyUp_wysiwyg(e) {
 	this.char.test('');
 
 	// user event
-	if (typeof this.events.onKeyUp === 'function' && this.events.onKeyUp(e) === false) return;
+	if (typeof this.events.onKeyUp === 'function' && this.events.onKeyUp(e, rootKey) === false) return;
 
 	if (!ctrl && !alt && !HISTORY_IGNORE_KEYCODE.test(keyCode)) {
 		this.history.push(true);
 	}
 }
 
-function OnPaste_wysiwyg(e) {
+function OnPaste_wysiwyg(rootKey, e) {
 	const clipboardData = env.isIE ? _w.clipboardData : e.clipboardData;
 	if (!clipboardData) return true;
-	return this._dataTransferAction('paste', e, clipboardData);
+	return this._dataTransferAction('paste', e, clipboardData, rootKey);
 }
 
-function OnCopy_wysiwyg(e) {
+function OnCopy_wysiwyg(rootKey, e) {
 	const clipboardData = env.isIE ? _w.clipboardData : e.clipboardData;
 
 	// user event
-	if (typeof this.events.onCopy === 'function' && !this.events.onCopy(e, clipboardData)) {
+	if (typeof this.events.onCopy === 'function' && !this.events.onCopy(e, clipboardData, rootKey)) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
 	}
 }
 
-function OnDrop_wysiwyg(e) {
+function OnDrop_wysiwyg(rootKey, e) {
 	if (this.status.isReadOnly || env.isIE) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -1651,14 +1653,14 @@ function OnDrop_wysiwyg(e) {
 
 	this.html.remove();
 	this._setDropLocationSelection(e);
-	return this._dataTransferAction('drop', e, dataTransfer);
+	return this._dataTransferAction('drop', e, dataTransfer, rootKey);
 }
 
-function OnCut_wysiwyg(e) {
+function OnCut_wysiwyg(rootKey, e) {
 	const clipboardData = env.isIE ? _w.clipboardData : e.clipboardData;
 
 	// user event
-	if (typeof this.events.onCut === 'function' && !this.events.onCut(e, clipboardData)) {
+	if (typeof this.events.onCut === 'function' && !this.events.onCut(e, clipboardData, rootKey)) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -1676,11 +1678,11 @@ function OnCut_wysiwyg(e) {
 	});
 }
 
-function OnScroll_wysiwyg(eventWysiwyg, e) {
+function OnScroll_wysiwyg(rootKey, eventWysiwyg, e) {
 	this._moveContainer(eventWysiwyg);
 	this._scrollContainer();
 	// user event
-	if (typeof this.events.onScroll === 'function') this.events.onScroll(e);
+	if (typeof this.events.onScroll === 'function') this.events.onScroll(e, rootKey);
 }
 
 function OnFocus_wysiwyg(rootKey, e) {
@@ -1692,12 +1694,15 @@ function OnFocus_wysiwyg(rootKey, e) {
 
 	if (this.editor.isInline) this.toolbar._showInline();
 
+	domUtils.removeClass(this.editor._styleCommandMap.codeView, 'active');
+	domUtils.setDisabled(this.editor._codeViewDisabledButtons, false);
+
 	// user event
-	if (typeof this.events.onFocus === 'function') this.events.onFocus(e);
+	if (typeof this.events.onFocus === 'function') this.events.onFocus(e, rootKey);
 }
 
 function OnBlur_wysiwyg(rootKey, e) {
-	if (this.editor._antiBlur || this.status.isCodeView) return;
+	if (this.editor._antiBlur || this.editor.rootTargets.get(rootKey).get('isCodeView')) return;
 
 	this.status.hasFocus = false;
 	this.editor.effectNode = null;
@@ -1717,17 +1722,17 @@ function OnBlur_wysiwyg(rootKey, e) {
 	this.selection.removeRange();
 
 	// user event
-	if (typeof this.events.onBlur === 'function') this.events.onBlur(e);
+	if (typeof this.events.onBlur === 'function') this.events.onBlur(e, rootKey);
 }
 
 function OnMouseMove_wysiwyg(e) {
 	if (this.status.isDisabled || this.status.isReadOnly) return false;
 
 	const component = domUtils.getParentElement(e.target, this.component.is);
-	const lineBreakerStyle = this.frameContext.get('lineBreaker').style;
+	const lineBreakerStyle = this.editor.frameContext.get('lineBreaker').style;
 
 	if (component && !this.editor.currentControllerName) {
-		const fc = this.frameContext;
+		const fc = this.editor.frameContext;
 		let scrollTop = 0;
 		let el = fc.get('wysiwyg');
 		do {
@@ -1777,9 +1782,9 @@ function OnMouseDown_statusbar(e) {
 }
 
 function __resizeEditor(e) {
-	const resizeInterval = this.frameContext.get('editorArea').offsetHeight + (e.clientY - this._resizeClientY);
-	const h = resizeInterval < this.frameContext.get('_minHeight') ? this.frameContext.get('_minHeight') : resizeInterval;
-	this.frameContext.get('wysiwygFrame').style.height = this.frameContext.get('code').style.height = h + 'px';
+	const resizeInterval = this.editor.frameContext.get('editorArea').offsetHeight + (e.clientY - this._resizeClientY);
+	const h = resizeInterval < this.editor.frameContext.get('_minHeight') ? this.editor.frameContext.get('_minHeight') : resizeInterval;
+	this.editor.frameContext.get('wysiwygFrame').style.height = this.editor.frameContext.get('code').style.height = h + 'px';
 	this._resizeClientY = e.clientY;
 	if (env.isIE) this.editor.__callResizeFunction(h, null);
 }
@@ -1801,10 +1806,10 @@ function DisplayLineBreak(dir, e) {
 	const format = domUtils.createElement(isList ? 'BR' : domUtils.isTableCell(component.parentNode) ? 'DIV' : this.options.get('defaultLineTag'));
 	if (!isList) format.innerHTML = '<br>';
 
-	if (this.frameOptions.get('charCounter_type') === 'byte-html' && !this.char.check(format.outerHTML)) return;
+	if (this.editor.frameOptions.get('charCounter_type') === 'byte-html' && !this.char.check(format.outerHTML)) return;
 
 	component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
-	this.frameContext.get('lineBreaker').style.display = 'none';
+	this.editor.frameContext.get('lineBreaker').style.display = 'none';
 	this._lineBreakComp = null;
 
 	const focusEl = isList ? format : format.firstChild;
@@ -1820,7 +1825,7 @@ function OnResize_window() {
 
 	if (this.context.get('toolbar.main').offsetWidth === 0) return;
 
-	const fileBrowser = this.frameContext.get('fileBrowser');
+	const fileBrowser = this.editor.frameContext.get('fileBrowser');
 	if (fileBrowser && fileBrowser.area.style.display === 'block') {
 		fileBrowser.body.style.maxHeight = _w.innerHeight - fileBrowser.header.offsetHeight - 50 + 'px';
 	}
@@ -1831,11 +1836,11 @@ function OnResize_window() {
 
 	if (this.status.isFullScreen) {
 		this.editor._transformStatus.fullScreenInnerHeight += _w.innerHeight - this.context.get('toolbar.main').offsetHeight - this.editor._transformStatus.fullScreenInnerHeight;
-		this.frameContext.get('editorArea').style.height = this.editor._transformStatus.fullScreenInnerHeight + 'px';
+		this.editor.frameContext.get('editorArea').style.height = this.editor._transformStatus.fullScreenInnerHeight + 'px';
 		return;
 	}
 
-	if (this.status.isCodeView && this.editor.isInline) {
+	if (this.editor.frameContext.get('isCodeView') && this.editor.isInline) {
 		this.toolbar._showInline();
 		return;
 	}
@@ -1843,7 +1848,7 @@ function OnResize_window() {
 	this.editor._iframeAutoHeight();
 
 	if (this.toolbar._sticky) {
-		this.context.get('toolbar.main').style.width = this.frameContext.get('topArea').offsetWidth - 2 + 'px';
+		this.context.get('toolbar.main').style.width = this.editor.frameContext.get('topArea').offsetWidth - 2 + 'px';
 		this.toolbar._resetSticky();
 	}
 }
@@ -1853,7 +1858,7 @@ function OnScroll_window() {
 		this.toolbar._resetSticky();
 	}
 
-	if (this.editor.isBalloon && this.frameContexteContexteContext.get('toolbar.main').style.display === 'block') {
+	if (this.editor.isBalloon && this.editor.frameContexteContexteContext.get('toolbar.main').style.display === 'block') {
 		this.toolbar._setBalloonOffset(this.toolbar._balloonOffset.position === 'top');
 	}
 
@@ -1862,6 +1867,12 @@ function OnScroll_window() {
 
 function OnScroll_Abs() {
 	this._scrollContainer();
+}
+
+function OnFocus_code(rootKey) {
+	this.editor.changeFrameContext(rootKey);
+	domUtils.addClass(this.editor._styleCommandMap.codeView, 'active');
+	domUtils.setDisabled(this.editor._codeViewDisabledButtons, true);
 }
 
 export default EventManager;

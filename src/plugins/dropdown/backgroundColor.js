@@ -10,7 +10,7 @@ const BackgroundColor = function (editor, target) {
 	this.icon = this.icons.background_color;
 
 	// members
-	this.colorPicker = new ColorPicker(this, 'backgroundColor', this.frameContext.get('wwComputedStyle').backgroundColor, this.options.get('colorList_background'));
+	this.colorPicker = new ColorPicker(this, 'backgroundColor', this.options.get('colorList_background'));
 
 	// create HTML
 	const menu = CreateHTML(this.colorPicker.target);

@@ -96,8 +96,9 @@ Component.prototype = {
 	 * @param {string} pluginName Plugin name (image, video)
 	 */
 	select: function (element, pluginName) {
+		this.editor._antiBlur = true;
+
 		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is)) || domUtils.isUneditable(element)) return false;
-		if (!this.editor.hasFocus) this.editor.focus();
 
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;
@@ -125,7 +126,7 @@ Component.prototype = {
 	 */
 	_setComponentLineBreaker: function (element) {
 		this._lineBreakComp = null;
-		const fc = this.frameContext;
+		const fc = this.editor.frameContext;
 		const wysiwyg = fc.get('wysiwyg');
 		fc.get('lineBreaker').style.display = 'none';
 

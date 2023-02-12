@@ -13,7 +13,7 @@ const Offset = function (editor) {
 
 Offset.prototype = {
 	/**
-	 * @description Returns the position of the argument, "this.frameContext.get('editorArea')" to inside the editor.Returns the position of the element in "this.frameContext.get('editorArea')".
+	 * @description Returns the position of the argument, "this.editor.frameContext.get('editorArea')" to inside the editor.Returns the position of the element in "this.editor.frameContext.get('editorArea')".
 	 * @param {Node} node Target node
 	 * @returns {{top:boolean, left:boolean}}
 	 */
@@ -29,7 +29,7 @@ Offset.prototype = {
 			offsetElement = offsetElement.offsetParent;
 		}
 
-		const wFrame = this.frameContext.get('wysiwygFrame');
+		const wFrame = this.editor.frameContext.get('wysiwygFrame');
 		const iframe = wFrame && /iframe/i.test(wFrame.nodeName);
 
 		return {
@@ -44,7 +44,7 @@ Offset.prototype = {
 	 * @returns {{top:boolean, left:boolean}}
 	 */
 	getGlobal: function (element) {
-		if (!element) element = this.frameContext.get('topArea');
+		if (!element) element = this.editor.frameContext.get('topArea');
 		const w = element.offsetWidth;
 		const h = element.offsetHeight;
 		let t = 0,
@@ -70,7 +70,7 @@ Offset.prototype = {
 	 * @returns {{top:boolean, left:boolean, width:boolean, height:boolean}}
 	 */
 	getGlobalScroll: function (element) {
-		const topArea = this.frameContext.get('topArea');
+		const topArea = this.editor.frameContext.get('topArea');
 		let t = 0,
 			l = 0,
 			h = 0,
@@ -164,7 +164,7 @@ Offset.prototype = {
 	 * @returns {{top:boolean, left:boolean}}
 	 */
 	getWWScroll: function () {
-		const eventWysiwyg = this.frameContext.get('eventWysiwyg');
+		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
 		return {
 			top: eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0,
 			left: eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0,
@@ -243,7 +243,7 @@ Offset.prototype = {
 		const arrow = hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null;
 
 		// top ----------------------------------------------------------------------------------------------------
-		const editorH = this.frameContext.get('topArea').offsetHeight;
+		const editorH = this.editor.frameContext.get('topArea').offsetHeight;
 		const ah = arrow ? arrow.offsetHeight : 0;
 		const elH = element.offsetHeight;
 		const targetH = target.offsetHeight;
@@ -311,7 +311,7 @@ Offset.prototype = {
 		element.style.top = t + 'px';
 
 		// left ----------------------------------------------------------------------------------------------------
-		const editorW = this.frameContext.get('topArea').offsetWidth;
+		const editorW = this.editor.frameContext.get('topArea').offsetWidth;
 		const radius = numbers.get(this._w.getComputedStyle(element).borderRadius) || 0;
 		const targetW = targetOffset.width;
 		const elW = element.offsetWidth;

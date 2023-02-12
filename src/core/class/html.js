@@ -155,7 +155,7 @@ HTML.prototype = {
 	 * @param {boolean} notCleanData If true, inserts the HTML string without refining it with html.clean.
 	 */
 	insert: function (html, rangeSelection, notCheckCharCount, notCleanData) {
-		if (!this.frameContext.get('wysiwygFrame').contains(this.selection.get().focusNode)) this.editor.focus();
+		if (!this.editor.frameContext.get('wysiwygFrame').contains(this.selection.get().focusNode)) this.editor.focus();
 
 		if (typeof html === 'string') {
 			if (!notCleanData) html = this.clean(html, false, null, null);
@@ -170,7 +170,7 @@ HTML.prototype = {
 				const domTree = dom.childNodes;
 
 				if (!notCheckCharCount) {
-					const type = this.frameOptions.get('charCounter_type') === 'byte-html' ? 'outerHTML' : 'textContent';
+					const type = this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? 'outerHTML' : 'textContent';
 					let checkHTML = '';
 					for (let i = 0, len = domTree.length; i < len; i++) {
 						checkHTML += domTree[i][type];
@@ -410,7 +410,7 @@ HTML.prototype = {
 
 		try {
 			// set node
-			const wysiwyg = this.frameContext.get('wysiwyg');
+			const wysiwyg = this.editor.frameContext.get('wysiwyg');
 			if (!insertListCell) {
 				if (domUtils.isWysiwygFrame(afterNode) || parentNode === wysiwyg.parentNode) {
 					parentNode = wysiwyg;
@@ -726,7 +726,7 @@ HTML.prototype = {
 
 		if (!domUtils.isWysiwygFrame(container) && container.childNodes.length === 0) {
 			const rc = this.node.removeAllParents(container, null, null);
-			if (rc) container = rc.sc || rc.ec || this.frameContext.get('wysiwyg');
+			if (rc) container = rc.sc || rc.ec || this.editor.frameContext.get('wysiwyg');
 		}
 
 		// set range
@@ -1061,7 +1061,7 @@ HTML.prototype = {
 					r = style[i].match(/([a-zA-Z0-9-]+)(:)([^:]+$)/);
 					if (r && !/inherit|initial/i.test(r[3])) {
 						const k = env.kebabToCamelCase(r[1].trim());
-						const v = this.frameContext.get('wwComputedStyle')[k].replace(/"/g, '');
+						const v = this.editor.frameContext.get('wwComputedStyle')[k].replace(/"/g, '');
 						const c = r[3].trim();
 						switch (k) {
 							case 'fontFamily':

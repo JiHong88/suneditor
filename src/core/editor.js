@@ -1,6 +1,6 @@
 import Helper, { env, converter, domUtils, numbers } from '../helper';
 import Constructor, { ResetOptions, UpdateButton } from './constructor';
-import { UpdateContextMap, CreateContext } from './context';
+import { UpdateContextMap } from './context';
 
 // class dependency
 import ClassDependency from '../dependency/_classes';
@@ -89,9 +89,7 @@ const Editor = function (multiTargets, options) {
 	 * @property {boolean} hasFocus Boolean value of whether the editor has focus
 	 * @property {boolean} isDisabled Boolean value of whether the editor is disabled
 	 * @property {boolean} isReadOnly Boolean value of whether the editor is readOnly
-	 * @property {boolean} isCodeView State of code view
 	 * @property {boolean} isFullScreen State of full screen
-	 * @property {boolean} isShowBlocks State of show blocks
 	 * @property {number} tabSize Indent size of tab (4)
 	 * @property {number} indentSize Indent size (25)px
 	 * @property {number} codeIndentSize Indent size of Code view mode (2)
@@ -104,11 +102,9 @@ const Editor = function (multiTargets, options) {
 		isDisabled: false,
 		isReadOnly: false,
 		isChanged: false,
-		isCodeView: false,
 		isFullScreen: false,
-		isShowBlocks: false,
-		indentSize: 25,
 		tabSize: 4,
+		indentSize: 25,
 		codeIndentSize: 2,
 		currentNodes: [],
 		currentNodesMap: [],
@@ -504,7 +500,7 @@ Editor.prototype = {
 				this.toolbar._showBalloon(this.selection.setRange(first, 0, last, last.textContent.length));
 				break;
 			case 'codeView':
-				this.viewer.codeView(!this.status.isCodeView);
+				this.viewer.codeView(!this.frameContext.get('isCodeView'));
 				break;
 			case 'fullScreen':
 				this.viewer.fullScreen(!this.status.isFullScreen);
@@ -532,7 +528,7 @@ Editor.prototype = {
 				this.viewer.preview();
 				break;
 			case 'showBlocks':
-				this.viewer.showBlocks(!this.status.isShowBlocks);
+				this.viewer.showBlocks(!this.frameContext.get('isShowBlocks'));
 				break;
 			case 'dir':
 				this.setDir(this.options.get('textDirection'));
@@ -595,7 +591,7 @@ Editor.prototype = {
 		}, {});
 
 		// @todo
-		ResetOptions(tc, this.options, mergeOptions);
+		ResetOptions();
 	},
 
 	/**
@@ -649,19 +645,20 @@ Editor.prototype = {
 			else if (r === 'right') n.style.textAlign = 'left';
 		}
 
-		if (buttons.dir) {
-			domUtils.changeTxt(buttons.dir.querySelector('.se-tooltip-text'), this.lang[this.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
-			domUtils.changeElement(buttons.dir.firstElementChild, this.icons[this.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
+		let dir_button = null;
+		if ((dir_button = this.context.get('buttons.dir'))) {
+			domUtils.changeTxt(dir_button.querySelector('.se-tooltip-text'), this.lang[this.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
+			domUtils.changeElement(dir_button.firstElementChild, this.icons[this.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
 		}
 
-		if (buttons.dir_ltr) {
-			if (rtl) domUtils.removeClass(buttons.dir_ltr, 'active');
-			else domUtils.addClass(buttons.dir_ltr, 'active');
+		if ((dir_button = this.context.get('buttons.dir_ltr'))) {
+			if (rtl) domUtils.removeClass(dir_button, 'active');
+			else domUtils.addClass(dir_button, 'active');
 		}
 
-		if (buttons.dir_rtl) {
-			if (rtl) domUtils.addClass(buttons.dir_rtl, 'active');
-			else domUtils.removeClass(buttons.dir_rtl, 'active');
+		if ((dir_button = this.context.get('buttons.dir_rtl'))) {
+			if (rtl) domUtils.addClass(dir_button, 'active');
+			else domUtils.removeClass(dir_button, 'active');
 		}
 	},
 
@@ -670,7 +667,7 @@ Editor.prototype = {
 	 * @param {number} rootKey
 	 */
 	changeFrameContext: function (rootKey) {
-		if (!rootKey) return;
+		if (rootKey === this.status.rootKey) return;
 
 		this.status.rootKey = rootKey;
 		this._setFrameInfo(this.rootTargets.get(rootKey));
@@ -779,17 +776,14 @@ Editor.prototype = {
 		for (let i = 0; i < rootKey.length; i++) {
 			this.changeFrameContext(rootKey[i]);
 
-			if (!this.status.isCodeView) {
+			if (!this.frameContext.get('isCodeView')) {
 				this.frameContext.get('wysiwyg').innerHTML = convertValue;
+				this._resetComponents();
+				this.history.push(false, rootKey[i]);
 			} else {
 				const value = this._convertHTMLToCode(convertValue, false);
 				this.viewer._setCodeView(value);
 			}
-		}
-
-		if (!this.status.isCodeView) {
-			this._resetComponents();
-			this.history.push(false);
 		}
 	},
 
@@ -804,22 +798,19 @@ Editor.prototype = {
 
 		for (let i = 0; i < rootKey.length; i++) {
 			this.changeFrameContext(rootKey[i]);
-
 			const convertValue = this.html.clean(content, true, null, null);
-			if (!this.status.isCodeView) {
+
+			if (!this.frameContext.get('isCodeView')) {
 				const temp = domUtils.createElement('DIV', null, convertValue);
 				const children = temp.children;
 				for (let i = 0, len = children.length; i < len; i++) {
 					if (!children[i]) continue;
 					this.frameContext.get('wysiwyg').appendChild(children[i]);
 				}
+				this.history.push(false, rootKey[i]);
 			} else {
 				this.viewer._setCodeView(this.viewer._getCodeView() + '\n' + this._convertHTMLToCode(convertValue, false));
 			}
-		}
-
-		if (!this.status.isCodeView) {
-			this.history.push(false);
 		}
 	},
 
@@ -944,9 +935,11 @@ Editor.prototype = {
 	/**
 	 * @description Switch to or off "ReadOnly" mode.
 	 * @param {boolean} value "readOnly" boolean value.
-	 * @param {number|Array.<number>|undefined} rootKey Root index
+	 * @param {string|undefined} rootKey Root key
 	 */
 	readOnly: function (value, rootKey) {
+		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
+
 		this.status.isReadOnly = value;
 		domUtils.setDisabled(this._controllerOnDisabledButtons, !!value);
 
@@ -959,66 +952,76 @@ Editor.prototype = {
 			if (this.menu.currentContainerActiveButton && this.menu.currentContainerActiveButton.disabled) this.menu.containerOff();
 			if (this.modalForm) this.plugins.modal.close.call(this);
 
-			this.frameContext.get('code').setAttribute('readOnly', 'true');
-			domUtils.addClass(this.frameContext.get('wysiwygFrame'), 'se-read-only');
+			fc.get('code').setAttribute('readOnly', 'true');
+			domUtils.addClass(fc.get('wysiwygFrame'), 'se-read-only');
 		} else {
-			this.frameContext.get('code').removeAttribute('readOnly');
-			domUtils.removeClass(this.frameContext.get('wysiwygFrame'), 'se-read-only');
+			fc.get('code').removeAttribute('readOnly');
+			domUtils.removeClass(fc.get('wysiwygFrame'), 'se-read-only');
 		}
 
 		if (this.options.get('hasCodeMirror')) {
-			this.viewer._codeMirrorEditor('readonly', !!value);
+			this.viewer._codeMirrorEditor('readonly', !!value, rootKey);
 		}
 	},
 
 	/**
 	 * @description Disable the suneditor
+	 * @param {string|undefined} rootKey Root key
 	 */
 	disable: function (rootKey) {
+		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
+
 		this.toolbar.disable();
 		this._offCurrentController();
 		this._offCurrentModal();
 
 		if (this.modalForm) this.plugins.modal.close.call(this);
 
-		this.frameContext.get('wysiwyg').setAttribute('contenteditable', false);
+		fc.get('wysiwyg').setAttribute('contenteditable', false);
 		this.isDisabled = true;
 
 		if (this.options.get('hasCodeMirror')) {
-			this.viewer._codeMirrorEditor('readonly', true);
+			this.viewer._codeMirrorEditor('readonly', true, rootKey);
 		} else {
-			this.frameContext.get('code').setAttribute('disabled', 'disabled');
+			fc.get('code').setAttribute('disabled', 'disabled');
 		}
 	},
 
 	/**
 	 * @description Enable the suneditor
+	 * @param {string|undefined} rootKey Root key
 	 */
 	enable: function (rootKey) {
+		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
+
 		this.toolbar.enable();
-		this.frameContext.get('wysiwyg').setAttribute('contenteditable', true);
+		fc.get('wysiwyg').setAttribute('contenteditable', true);
 		this.isDisabled = false;
 
 		if (this.options.get('hasCodeMirror')) {
-			this.viewer._codeMirrorEditor('readonly', false);
+			this.viewer._codeMirrorEditor('readonly', false, rootKey);
 		} else {
-			this.frameContext.get('code').removeAttribute('disabled');
+			fc.get('code').removeAttribute('disabled');
 		}
 	},
 
 	/**
 	 * @description Show the suneditor
+	 * @param {string|undefined} rootKey Root key
 	 */
 	show: function (rootKey) {
-		const topAreaStyle = this.frameContext.get('topArea').style;
+		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
+		const topAreaStyle = fc.get('topArea').style;
 		if (topAreaStyle.display === 'none') topAreaStyle.display = 'block';
 	},
 
 	/**
 	 * @description Hide the suneditor
+	 * @param {string|undefined} rootKey Root key
 	 */
 	hide: function (rootKey) {
-		this.frameContext.get('topArea').style.display = 'none';
+		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
+		fc.get('topArea').style.display = 'none';
 	},
 
 	/**
@@ -1073,8 +1076,8 @@ Editor.prototype = {
 	 * @param {rootTarget} rt
 	 */
 	_setFrameInfo: function (rt) {
-		UpdateContextMap(this.frameContext, rt);
-		UpdateContextMap(this.frameOptions, rt.get('options'));
+		this.frameContext = rt;
+		this.frameOptions = rt.get('options');
 		this._editorHeight = this.frameContext.get('wysiwygFrame').offsetHeight;
 	},
 
@@ -1326,22 +1329,22 @@ Editor.prototype = {
 
 		this._saveButtonStates();
 
-		const tc = this.context;
+		const ctx = this.context;
 		const textTags = this.options.get('textTags');
 		const commandMap = this._commandMap;
-		commandMap.set('OUTDENT', tc.get('buttons.outdent'));
-		commandMap.set('INDENT', tc.get('buttons.indent'));
-		commandMap.set(textTags.bold.toUpperCase(), tc.get('buttons.bold'));
-		commandMap.set(textTags.underline.toUpperCase(), tc.get('buttons.underline'));
-		commandMap.set(textTags.italic.toUpperCase(), tc.get('buttons.italic'));
-		commandMap.set(textTags.strike.toUpperCase(), tc.get('buttons.strike'));
-		commandMap.set(textTags.sub.toUpperCase(), tc.get('buttons.subscript'));
-		commandMap.set(textTags.sup.toUpperCase(), tc.get('buttons.superscript'));
+		commandMap.set('OUTDENT', ctx.get('buttons.outdent'));
+		commandMap.set('INDENT', ctx.get('buttons.indent'));
+		commandMap.set(textTags.bold.toUpperCase(), ctx.get('buttons.bold'));
+		commandMap.set(textTags.underline.toUpperCase(), ctx.get('buttons.underline'));
+		commandMap.set(textTags.italic.toUpperCase(), ctx.get('buttons.italic'));
+		commandMap.set(textTags.strike.toUpperCase(), ctx.get('buttons.strike'));
+		commandMap.set(textTags.sub.toUpperCase(), ctx.get('buttons.subscript'));
+		commandMap.set(textTags.sup.toUpperCase(), ctx.get('buttons.superscript'));
 
 		this._styleCommandMap = {
-			fullScreen: tc.fullScreen,
-			showBlocks: tc.showBlocks,
-			codeView: tc.codeView
+			fullScreen: ctx.fullScreen,
+			showBlocks: ctx.showBlocks,
+			codeView: ctx.codeView
 		};
 	},
 
@@ -1402,7 +1405,7 @@ Editor.prototype = {
 		const placeholder = fc.get('placeholder');
 
 		if (placeholder) {
-			if (this.status.isCodeView) {
+			if (fc.get('isCodeView')) {
 				placeholder.style.display = 'none';
 				return;
 			}

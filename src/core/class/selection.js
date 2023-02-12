@@ -18,7 +18,7 @@ Selection.prototype = {
 	 * @returns {Object}
 	 */
 	get: function () {
-		return this._shadowRoot && this._shadowRoot.getSelection ? this._shadowRoot.getSelection() : this.frameContext.get('_ww').getSelection();
+		return this._shadowRoot && this._shadowRoot.getSelection ? this._shadowRoot.getSelection() : this.editor.frameContext.get('_ww').getSelection();
 	},
 
 	/**
@@ -28,7 +28,7 @@ Selection.prototype = {
 	getRange: function () {
 		const range = this.status._range || this._createDefaultRange();
 		const selection = this.get();
-		if (range.collapsed === selection.isCollapsed || !this.frameContext.get('wysiwyg').contains(selection.focusNode)) return range;
+		if (range.collapsed === selection.isCollapsed || !this.editor.frameContext.get('wysiwyg').contains(selection.focusNode)) return range;
 
 		if (selection.rangeCount > 0) {
 			this.status._range = selection.getRangeAt(0);
@@ -65,7 +65,7 @@ Selection.prototype = {
 			endOff = endOff > 0 ? (endCon.nodeType === 1 ? 1 : endCon.textContent ? endCon.textContent.length : 0) : 0;
 		}
 
-		const range = this.frameContext.get('_wd').createRange();
+		const range = this.editor.frameContext.get('_wd').createRange();
 
 		try {
 			range.setStart(startCon, startOff);
@@ -108,7 +108,7 @@ Selection.prototype = {
 	 */
 	getRangeAndAddLine: function (range, container) {
 		if (this._isNone(range)) {
-			const wysiwyg = this.frameContext.get('wysiwyg');
+			const wysiwyg = this.editor.frameContext.get('wysiwyg');
 			const op = domUtils.createElement(this.options.get('defaultLineTag'), null, '<br>');
 			wysiwyg.insertBefore(op, container && container !== wysiwyg ? container.nextElementSibling : wysiwyg.firstElementChild);
 			this.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
@@ -122,10 +122,10 @@ Selection.prototype = {
 	 * @returns {Node}
 	 */
 	getNode: function () {
-		if (!this.frameContext.get('wysiwyg').contains(this.selectionNode)) this._init();
+		if (!this.editor.frameContext.get('wysiwyg').contains(this.selectionNode)) this._init();
 		if (!this.selectionNode) {
 			const selectionNode = domUtils.getEdgeChild(
-				this.frameContext.get('wysiwyg').firstChild,
+				this.editor.frameContext.get('wysiwyg').firstChild,
 				function (current) {
 					return current.childNodes.length === 0 || current.nodeType === 3;
 				},
@@ -184,7 +184,7 @@ Selection.prototype = {
 			isStartPosition = true;
 		}
 
-		const iframeRects = /iframe/i.test(this.frameContext.get('wysiwygFrame').nodeName) ? this.frameContext.get('wysiwygFrame').getClientRects()[0] : null;
+		const iframeRects = /iframe/i.test(this.editor.frameContext.get('wysiwygFrame').nodeName) ? this.editor.frameContext.get('wysiwygFrame').getClientRects()[0] : null;
 		if (iframeRects) {
 			rects = {
 				left: rects.left + iframeRects.left,
@@ -218,9 +218,9 @@ Selection.prototype = {
 	 * @private
 	 */
 	_createDefaultRange: function () {
-		const wysiwyg = this.frameContext.get('wysiwyg');
+		const wysiwyg = this.editor.frameContext.get('wysiwyg');
 		wysiwyg.focus();
-		const range = this.frameContext.get('_wd').createRange();
+		const range = this.editor.frameContext.get('_wd').createRange();
 
 		let focusEl = wysiwyg.firstElementChild;
 		if (!focusEl) {
@@ -285,7 +285,7 @@ Selection.prototype = {
 		if (caption) {
 			caption.focus();
 		} else {
-			this.frameContext.get('wysiwyg').focus();
+			this.editor.frameContext.get('wysiwyg').focus();
 		}
 	},
 
@@ -326,7 +326,7 @@ Selection.prototype = {
 		}
 
 		// startContainer
-		tempCon = domUtils.isWysiwygFrame(startCon) ? this.frameContext.get('wysiwyg').firstChild : startCon;
+		tempCon = domUtils.isWysiwygFrame(startCon) ? this.editor.frameContext.get('wysiwyg').firstChild : startCon;
 		tempOffset = startOff;
 
 		if (domUtils.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
@@ -363,7 +363,7 @@ Selection.prototype = {
 		startOff = tempOffset;
 
 		// endContainer
-		tempCon = domUtils.isWysiwygFrame(endCon) ? this.frameContext.get('wysiwyg').lastChild : endCon;
+		tempCon = domUtils.isWysiwygFrame(endCon) ? this.editor.frameContext.get('wysiwyg').lastChild : endCon;
 		tempOffset = endOff;
 
 		if (domUtils.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {

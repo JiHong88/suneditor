@@ -314,7 +314,7 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // 	buttonList: bl
 // });
 
-const editor_root = window.e = suneditor.create(
+const editor_root = (window.e = suneditor.create(
 	{
 		editor1: {
 			target: document.querySelector('#multi_editor_1'),
@@ -350,13 +350,30 @@ const editor_root = window.e = suneditor.create(
 		// value: 'Common value',
 		plugins: plugins,
 		toolbar_container: '#root_toolbar_container',
-		// statusbar_container: '#root_statusbar_container',
+		statusbar_container: '#root_statusbar_container',
+		codeMirror: {
+			EditorView: EditorView,
+			extensions: [
+				basicSetup,
+				html({
+					matchClosingTags: true,
+					autoCloseTags: true
+				}),
+				javascript()
+			],
+			minimalSetup: minimalSetup
+		},
+		// codeMirror: {
+		// 	src: Codemirror5
+		// },
 		toolbar_sticky: 0,
 		imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
+		lineAttrReset: 'id',
+		attributeWhitelist: 'id',
 		buttonList: bl
 	}
-);
+));
 
 editor_root.events.onBlur = (e) => {
-	console.log("eeee", e)
-}
+	console.log('blur', editor_root.frameContext);
+};

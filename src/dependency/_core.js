@@ -11,8 +11,6 @@ function CoreDependency(editor) {
 	this.status = editor.status;
 	this.context = editor.context;
 	this.options = editor.options;
-	this.frameContext = editor.frameContext;
-	this.frameOptions = editor.frameOptions;
 	this.eventManager = editor.eventManager;
 	this.events = editor.events;
 	this.history = editor.history;

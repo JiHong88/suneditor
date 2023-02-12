@@ -10,7 +10,7 @@ const FontColor = function (editor, target) {
 	this.icon = this.icons.font_color;
 
 	// members
-	this.colorPicker = new ColorPicker(this, 'color', this.frameContext.get('wwComputedStyle').color, this.options.get('colorList_font'));
+	this.colorPicker = new ColorPicker(this, 'color', this.options.get('colorList_font'));
 
 	// create HTML
 	const menu = CreateHTML(this.colorPicker.target);

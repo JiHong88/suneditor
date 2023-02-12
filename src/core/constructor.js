@@ -5,7 +5,6 @@ import { domUtils, numbers, converter, env } from '../helper';
 
 const _d = env._d;
 const _w = env._w;
-const DEFAULT_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'sub', 'sup', 'removeFormat', 'indent', 'outdent', 'fullScreen', 'showBlocks', 'codeView', 'undo', 'redo', 'preview', 'print', 'dir', 'dir_ltr', 'dir_rtl', 'save'];
 const DEFAULT_BUTTON_LIST = [['undo', 'redo'], ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'], ['removeFormat'], ['outdent', 'indent'], ['fullScreen', 'showBlocks', 'codeView'], ['preview', 'print']];
 const DEFAULT_ELEMENT_WHITELIST = 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls';
@@ -165,11 +164,9 @@ const Constructor = function (editorTargets, options) {
 
 /**
  * @description Reset the options
- * @param {Object} context Context object
- * @param {Object} mergeOptions The new options
  * @returns {Object}
  */
-export function ResetOptions(context, originOptions, mergeOptions) {}
+export function ResetOptions() {}
 
 /**
  * @description Initialize options
@@ -410,7 +407,7 @@ function InitOptions(options, editorTargets) {
 	/** External library */
 	// CodeMirror
 	if (options.codeMirror) {
-		o.set('codeMirror', options.codeMirro);
+		o.set('codeMirror', options.codeMirror);
 		if (options.codeMirror.EditorView) {
 			o.set('codeMirror6Editor', true);
 		} else if (options.codeMirror.src) {
@@ -604,7 +601,7 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 			state: codeMirror.state
 		});
 
-		options.set('codeMirror6Editor', cm);
+		targetOptions.set('codeMirror6Editor', cm);
 		cmeditor = cm.dom;
 		cmeditor.style.cssText = codeStyles;
 		hasCodeMirror = true;
@@ -632,7 +629,7 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 
 		const codeStyles = textarea.style.cssText;
 		const cm = codeMirror.src.fromTextArea(textarea, cmOptions);
-		options.set('codeMirror5Editor', cm);
+		targetOptions.set('codeMirror5Editor', cm);
 		cmeditor = cm.display.wrapper;
 		cmeditor.style.cssText = codeStyles;
 		hasCodeMirror = true;
