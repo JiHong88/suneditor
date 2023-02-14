@@ -357,15 +357,15 @@ const Editor = function (multiTargets, options) {
 		o.parentNode.insertBefore(t, o.nextElementSibling);
 		e.get('editorArea').appendChild(e.get('wysiwygFrame'));
 
-		if (!inst.options.get('iframe')) {
-			if (rootSize === ++rootIndex) inst._editorInit();
-		} else {
+		if (inst.options.get('iframe')) {
 			e.get('wysiwygFrame').addEventListener('load', function () {
 				converter._setIframeDocument(this, inst, e.get('options').get('height'));
 				if (rootSize === ++rootIndex) inst._editorInit();
 			});
 		}
 	});
+
+	if (!this.options.get('iframe')) this._editorInit();
 };
 
 Editor.prototype = {
@@ -1474,11 +1474,6 @@ Editor.prototype = {
 		// initialize core and add event listeners
 		this._setFrameInfo(this.rootTargets.get(this.status.rootKey));
 		this._init();
-		this.toolbar._offSticky();
-		this.toolbar._resetSticky();
-
-		// toolbar visibility
-		this.context.get('toolbar.main').style.visibility = '';
 
 		this._componentsInfoInit = false;
 		this._componentsInfoReset = false;
@@ -1488,6 +1483,8 @@ Editor.prototype = {
 
 		this._w.setTimeout(
 			function () {
+				// toolbar visibility
+				this.context.get('toolbar.main').style.visibility = '';
 				// roots
 				this.rootTargets.forEach(
 					function (e) {
