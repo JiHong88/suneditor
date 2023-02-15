@@ -1351,11 +1351,11 @@ Editor.prototype = {
 	/**
 	 * @description Initializ wysiwyg area (Only called from core._init)
 	 * @param {boolean} reload Is relooad?
-	 * @param {string} _initHTML initial html string
+	 * @param {string} value initial html string
 	 * @private
 	 */
-	_initWysiwygArea: function (e, reload, _initHTML) {
-		e.get('wysiwyg').innerHTML = (reload ? _initHTML : this.html.clean(typeof _initHTML === 'string' ? _initHTML : e.get('originElement').value, true, null, null)) || '<' + this.options.get('defaultLineTag') + '><br></' + this.options.get('defaultLineTag') + '>';
+	_initWysiwygArea: function (e, value) {
+		e.get('wysiwyg').innerHTML = this.html.clean(typeof value === 'string' ? value : e.get('originElement').value, true, null, null) || '<' + this.options.get('defaultLineTag') + '><br></' + this.options.get('defaultLineTag') + '>';
 		if (e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
 	},
 
@@ -1466,7 +1466,7 @@ Editor.prototype = {
 		this.rootTargets.forEach(
 			function (e) {
 				this._setEditorParams(e);
-				this._initWysiwygArea(e, false, e.get('options').get('value'));
+				this._initWysiwygArea(e, e.get('options').get('value'));
 				this.eventManager._addEvent(e);
 			}.bind(this)
 		);

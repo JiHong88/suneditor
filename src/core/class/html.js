@@ -32,9 +32,12 @@ const HTML = function (editor) {
 	const disallowStyleNodes = _w.Object.keys(options.get('_styleNodeMap'));
 	const allowStyleNodes = !options.get('elementWhitelist')
 		? []
-		: options.get('elementWhitelist').split('|').filter(function (v) {
-				return /b|i|ins|s|strike/i.test(v);
-		  });
+		: options
+				.get('elementWhitelist')
+				.split('|')
+				.filter(function (v) {
+					return /b|i|ins|s|strike/i.test(v);
+				});
 	for (let i = 0; i < allowStyleNodes.length; i++) {
 		disallowStyleNodes.splice(disallowStyleNodes.indexOf(allowStyleNodes[i].toLowerCase()), 1);
 	}
@@ -91,7 +94,7 @@ const HTML = function (editor) {
 
 HTML.prototype = {
 	/**
-	 * @description Gets the clean HTML code for editor
+	 * @description Clean and compress the HTML code to suit the editor format.
 	 * @param {string} html HTML string
 	 * @param {boolean} requireFormat If true, text nodes that do not have a format node is wrapped with the format tag.
 	 * @param {string|RegExp|null} whitelist Regular expression of allowed tags.
@@ -102,6 +105,7 @@ HTML.prototype = {
 	 */
 	clean: function (html, requireFormat, whitelist, blacklist) {
 		html = DeleteDisallowedTags(this.editor._parser.parseFromString(html, 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, true));
+		html = this.compress(html);
 		const dom = this._d.createRange().createContextualFragment(html, true);
 
 		try {
@@ -740,6 +744,15 @@ HTML.prototype = {
 		};
 	},
 
+	/**
+	 * @description HTML code compression
+	 * @param {string} html HTML string
+	 * @returns {string} HTML string
+	 */
+	compress: function (html) {
+		return html.replace(/(>)(?:[^>]*\n+)|(?:\s+)(<)/g, '$1$2');
+	},
+
 	_nodeRemoveListItem: function (item) {
 		const line = this.format.getLine(item, null);
 		domUtils.removeItem(item);
@@ -967,15 +980,15 @@ HTML.prototype = {
 
 	/**
 	 * @description Removes attribute values such as style and converts tags that do not conform to the "html5" standard.
-	 * @param {string} text
+	 * @param {string} html HTML string
 	 * @returns {string} HTML string
 	 * @private
 	 */
-	_tagConvertor: function (text) {
-		if (!this._disallowedStyleNodesRegExp) return text;
+	_tagConvertor: function (html) {
+		if (!this._disallowedStyleNodesRegExp) return html;
 
 		const ec = this.options.get('_styleNodeMap');
-		return text.replace(this._disallowedStyleNodesRegExp, function (m, t, n, p) {
+		return html.replace(this._disallowedStyleNodesRegExp, function (m, t, n, p) {
 			return t + (typeof ec[n] === 'string' ? ec[n] : n) + (p ? ' ' + p : '');
 		});
 	},
@@ -1065,19 +1078,19 @@ HTML.prototype = {
 						const c = r[3].trim();
 						switch (k) {
 							case 'fontFamily':
-								if (!this.options.get('plugins').font || this.options.get('font').indexOf(c) === -1) continue;
+								if (!this.plugins.font || this.options.get('font').indexOf(c) === -1) continue;
 								break;
 							case 'fontSize':
-								if (!this.options.get('plugins').fontSize) continue;
+								if (!this.plugins.fontSize) continue;
 								if (!this._cleanStyleRegExp.fontSizeUnit.test(r[0])) {
 									r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), ConvertFontSize.bind(this._w.Math, this.options.get('fontSizeUnit')));
 								}
 								break;
 							case 'color':
-								if (!this.options.get('plugins').fontColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
+								if (!this.plugins.fontColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
 								break;
 							case 'backgroundColor':
-								if (!this.options.get('plugins').backgroundColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
+								if (!this.plugins.backgroundColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
 								break;
 						}
 

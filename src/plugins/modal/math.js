@@ -5,6 +5,11 @@ import { domUtils, env, converter, unicode } from '../../helper';
 const KATEX_WEBSITE = 'https://katex.org/docs/supported.html';
 
 const Math_ = function (editor, target) {
+	// exception
+	if (!editor.options.get('katex')) {
+		throw Error('[SUNEDITOR.plugins.math.fail] The math plugin must need the "KaTeX" library, Please add the katex option.');
+	}
+
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.target = target;

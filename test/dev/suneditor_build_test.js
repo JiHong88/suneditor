@@ -370,7 +370,10 @@ const editor_root = (window.e = suneditor.create(
 		imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
 		lineAttrReset: 'id',
 		attributeWhitelist: 'id',
-		buttonList: bl
+		buttonList: bl,
+		katex: {
+			src: Katex
+		}
 	}
 ));
 
