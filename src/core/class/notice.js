@@ -8,6 +8,8 @@ import { domUtils } from '../../helper';
 
 const Notice = function (editor) {
 	const modalEl = CreateHTML(editor);
+
+	// members
 	this.editor = editor;
 	this.modal = new Modal(this, modalEl);
 	this.message = modalEl.querySelector('span');

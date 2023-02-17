@@ -8,6 +8,8 @@ import { domUtils, unicode } from '../../helper';
 
 const Selection = function (editor) {
 	CoreDependency.call(this, editor);
+
+	// members
 	this.range = null;
 	this.selectionNode = null;
 };

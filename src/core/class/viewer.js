@@ -1,5 +1,5 @@
 /**
- * @fileoverview Component class
+ * @fileoverview Viewer class
  * @author Yi JiHong.
  */
 
@@ -8,6 +8,17 @@ import { domUtils, env, converter } from '../../helper';
 
 const Viewer = function (editor) {
 	CoreDependency.call(this, editor);
+
+	// members
+	this.bodyOverflow = '';
+	this.editorAreaOriginCssText = '';
+	this.wysiwygOriginCssText = '';
+	this.codeOriginCssText = '';
+	this.fullScreenInnerHeight = 0;
+	this.fullScreenSticky = false;
+	this.fullScreenBalloon = false;
+	this.fullScreenInline = false;
+	this.toolbarParent = null;
 };
 
 Viewer.prototype = {
@@ -23,14 +34,13 @@ Viewer.prototype = {
 		this.editor._offCurrentController();
 		this.editor._offCurrentModal();
 
-		const _var = this.editor._transformStatus;
 		const code = fc.get('code');
 		const wysiwygFrame = fc.get('wysiwygFrame');
 
 		if (value) {
 			this._setEditorDataToCodeView();
 			domUtils.removeClass(code, 'se-display-none');
-			_var.wysiwygOriginCssText = _var.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
+			this.wysiwygOriginCssText = this.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 
 			if (this.status.isFullScreen) {
 				code.style.height = '100%';
@@ -55,13 +65,13 @@ Viewer.prototype = {
 
 			this.status._range = null;
 			code.focus();
-			domUtils.addClass(this.editor._styleCommandMap.codeView, 'active');
+			domUtils.addClass(this.context.get('buttons.codeView'), 'active');
 		} else {
 			if (!domUtils.isNonEditable(wysiwygFrame)) this._setCodeDataToEditor();
 			wysiwygFrame.scrollTop = 0;
 			domUtils.addClass(code, 'se-display-none');
 			wysiwygFrame.style.display = 'block';
-			_var.wysiwygOriginCssText = _var.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
+			this.wysiwygOriginCssText = this.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
 
 			if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) fc.get('code').style.height = '0px';
 
@@ -76,11 +86,11 @@ Viewer.prototype = {
 			}
 
 			this.editor._nativeFocus();
-			domUtils.removeClass(this.editor._styleCommandMap.codeView, 'active');
+			domUtils.removeClass(this.context.get('buttons.codeView'), 'active');
 
 			if (!domUtils.isNonEditable(wysiwygFrame)) {
 				this.history.push(false);
-				this.history._resetButtons();
+				this.history.resetButtons();
 			}
 		}
 
@@ -105,7 +115,7 @@ Viewer.prototype = {
 		const editorArea = fc.get('editorArea');
 		const wysiwygFrame = fc.get('wysiwygFrame');
 		const code = fc.get('code');
-		const _var = this.editor._transformStatus;
+		const targetButton = this.context.get('buttons.fullScreen');
 
 		this.editor._offCurrentController();
 		const wasToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.editor.toolbar._inlineToolbarAttr.isShow);
@@ -113,16 +123,21 @@ Viewer.prototype = {
 		if (value) {
 			if (/balloon|inline/i.test(this.options.get('mode'))) {
 				this.context.get('toolbar._arrow').style.display = 'none';
-				_var.fullScreenInline = this.editor.isInline;
-				_var.fullScreenBalloon = this.editor.isBalloon;
+				this.fullScreenInline = this.editor.isInline;
+				this.fullScreenBalloon = this.editor.isBalloon;
 				this.editor.isInline = false;
 				this.editor.isBalloon = false;
 			}
 
 			if (this.options.get('toolbar_container')) {
-				_var.toolbarParent = toolbar.parentElement;
+				this.toolbarParent = toolbar.parentElement;
 				fc.get('container').insertBefore(toolbar, editorArea);
 			}
+
+			this._originCssText = topArea.style.cssText;
+			this.editorAreaOriginCssText = editorArea.style.cssText;
+			this.wysiwygOriginCssText = wysiwygFrame.style.cssText;
+			this.codeOriginCssText = code.style.cssText;
 
 			topArea.style.position = 'fixed';
 			topArea.style.top = '0';
@@ -133,17 +148,13 @@ Viewer.prototype = {
 			topArea.style.zIndex = '2147483647';
 
 			if (fc.get('_stickyDummy').style.display !== ('none' && '')) {
-				_var.fullScreenSticky = true;
+				this.fullScreenSticky = true;
 				fc.get('_stickyDummy').style.display = 'none';
 				domUtils.removeClass(toolbar, 'se-toolbar-sticky');
 			}
 
-			_var.bodyOverflow = this._d.body.style.overflow;
+			this.bodyOverflow = this._d.body.style.overflow;
 			this._d.body.style.overflow = 'hidden';
-
-			_var.editorAreaOriginCssText = editorArea.style.cssText;
-			_var.wysiwygOriginCssText = wysiwygFrame.style.cssText;
-			_var.codeOriginCssText = code.style.cssText;
 
 			editorArea.style.cssText = toolbar.style.cssText = '';
 			wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + this.options.get('defaultStyle');
@@ -152,8 +163,8 @@ Viewer.prototype = {
 			toolbar.style.position = 'relative';
 			toolbar.style.display = 'block';
 
-			_var.fullScreenInnerHeight = this._w.innerHeight - toolbar.offsetHeight;
-			editorArea.style.height = _var.fullScreenInnerHeight - this.options.get('fullScreenOffset') + 'px';
+			this.fullScreenInnerHeight = this._w.innerHeight - toolbar.offsetHeight;
+			editorArea.style.height = this.fullScreenInnerHeight - (fc.has('statusbar') ? fc.get('statusbar').offsetHeight : 0) - this.options.get('fullScreenOffset') + 'px';
 
 			if (this.options.get('iframe') && this.editor.frameOptions.get('height') === 'auto') {
 				editorArea.style.overflow = 'auto';
@@ -162,48 +173,48 @@ Viewer.prototype = {
 
 			fc.get('topArea').style.marginTop = this.options.get('fullScreenOffset') + 'px';
 
-			if (this.editor._styleCommandMap.fullScreen) {
-				domUtils.changeElement(this.editor._styleCommandMap.fullScreen.firstElementChild, this.icons.reduction);
-				domUtils.addClass(this.editor._styleCommandMap.fullScreen, 'active');
+			if (targetButton) {
+				domUtils.changeElement(targetButton.firstElementChild, this.icons.reduction);
+				domUtils.addClass(targetButton, 'active');
 			}
 		} else {
-			wysiwygFrame.style.cssText = _var.wysiwygOriginCssText;
-			code.style.cssText = _var.codeOriginCssText;
+			wysiwygFrame.style.cssText = this.wysiwygOriginCssText;
+			code.style.cssText = this.codeOriginCssText;
 			toolbar.style.cssText = '';
-			editorArea.style.cssText = _var.editorAreaOriginCssText;
-			topArea.style.cssText = fc.get('topArea').style.cssText;
-			this._d.body.style.overflow = _var.bodyOverflow;
+			editorArea.style.cssText = this.editorAreaOriginCssText;
+			topArea.style.cssText = this._originCssText;
+			this._d.body.style.overflow = this.bodyOverflow;
 
 			if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) this.editor._codeViewAutoHeight();
 
-			if (_var.toolbarParent) {
-				_var.toolbarParent.appendChild(toolbar);
-				_var.toolbarParent = null;
+			if (this.toolbarParent) {
+				this.toolbarParent.appendChild(toolbar);
+				this.toolbarParent = null;
 			}
 
 			if (this.options.get('toolbar_sticky') > -1) {
 				domUtils.removeClass(toolbar, 'se-toolbar-sticky');
 			}
 
-			if (_var.fullScreenSticky && !this.options.get('toolbar_container')) {
-				_var.fullScreenSticky = false;
+			if (this.fullScreenSticky && !this.options.get('toolbar_container')) {
+				this.fullScreenSticky = false;
 				fc.get('_stickyDummy').style.display = 'block';
 				domUtils.addClass(toolbar, 'se-toolbar-sticky');
 			}
 
 			if (/balloon|inline/i.test(this.options.get('mode'))) {
 				this.context.get('toolbar._arrow').style.display = '';
-				this.editor.isInline = _var.fullScreenInline;
-				this.editor.isBalloon = _var.fullScreenBalloon;
+				this.editor.isInline = this.fullScreenInline;
+				this.editor.isBalloon = this.fullScreenBalloon;
 				this.editor.toolbar._showInline();
 			}
 
 			this.editor.toolbar._resetSticky();
 			fc.get('topArea').style.marginTop = '';
 
-			if (this.editor._styleCommandMap.fullScreen) {
-				domUtils.changeElement(this.editor._styleCommandMap.fullScreen.firstElementChild, this.icons.expansion);
-				domUtils.removeClass(this.editor._styleCommandMap.fullScreen, 'active');
+			if (targetButton) {
+				domUtils.changeElement(targetButton.firstElementChild, this.icons.expansion);
+				domUtils.removeClass(targetButton, 'active');
 			}
 		}
 
@@ -223,10 +234,10 @@ Viewer.prototype = {
 
 		if (value) {
 			domUtils.addClass(this.editor.frameContext.get('wysiwyg'), 'se-show-block');
-			domUtils.addClass(this.editor._styleCommandMap.showBlocks, 'active');
+			domUtils.addClass(this.context.get('buttons.showBlocks'), 'active');
 		} else {
 			domUtils.removeClass(this.editor.frameContext.get('wysiwyg'), 'se-show-block');
-			domUtils.removeClass(this.editor._styleCommandMap.showBlocks, 'active');
+			domUtils.removeClass(this.context.get('buttons.showBlocks'), 'active');
 		}
 
 		this.editor._resourcesStateChange();
@@ -337,6 +348,14 @@ Viewer.prototype = {
 					'</body>' +
 					'</html>'
 			);
+		}
+	},
+
+	_resetFullScreenHeight: function () {
+		if (this.status.isFullScreen) {
+			this.fullScreenInnerHeight += this._w.innerHeight - this.context.get('toolbar.main').offsetHeight - (this.editor.frameContext.has('statusbar') ? this.editor.frameContext.get('statusbar').offsetHeight : 0) - this.fullScreenInnerHeight;
+			this.editor.frameContext.get('editorArea').style.height = this.fullScreenInnerHeight + 'px';
+			return true;
 		}
 	},
 

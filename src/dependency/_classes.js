@@ -16,6 +16,7 @@ function ClassDependency(editor) {
 	if (this !== editor.selection) this.selection = editor.selection;
 	if (this !== editor.shortcuts) this.shortcuts = editor.shortcuts;
 	if (this !== editor.toolbar) this.toolbar = editor.toolbar;
+	if (this !== editor.viewer) this.viewer = editor.viewer;
 }
 
 export default ClassDependency;

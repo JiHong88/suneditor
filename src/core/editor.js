@@ -1,6 +1,5 @@
 import Helper, { env, converter, domUtils, numbers } from '../helper';
 import Constructor, { ResetOptions, UpdateButton } from './constructor';
-import { UpdateContextMap } from './context';
 
 // class dependency
 import ClassDependency from '../dependency/_classes';
@@ -8,7 +7,6 @@ import ClassDependency from '../dependency/_classes';
 // base
 import History from './base/history';
 import EventManager from './base/eventManager';
-import Viewer from './base/viewer';
 
 // modules
 import Char from './class/char';
@@ -22,6 +20,7 @@ import Offset from './class/offset';
 import Selection from './class/selection';
 import Shortcuts from './class/shortcuts';
 import Toolbar from './class/toolbar';
+import Viewer from './class/viewer';
 
 /**
  * @description SunEditor constructor function.
@@ -311,34 +310,10 @@ const Editor = function (multiTargets, options) {
 	};
 
 	/**
-	 * @description Style button related to edit area
-	 * @property {Element} fullScreen fullScreen button element
-	 * @property {Element} showBlocks showBlocks button element
-	 * @property {Element} codeView codeView button element
-	 * @private
-	 */
-	this._styleCommandMap = null;
-
-	/**
 	 * @description Current Figure container.
 	 * @private
 	 */
 	this._figureContainer = null;
-
-	/**
-	 * @description FullScreen and codeView relative status
-	 */
-	this._transformStatus = {
-		bodyOverflow: '',
-		editorAreaOriginCssText: '',
-		wysiwygOriginCssText: '',
-		codeOriginCssText: '',
-		fullScreenInnerHeight: 0,
-		fullScreenSticky: false,
-		fullScreenBalloon: false,
-		fullScreenInline: false,
-		toolbarParent: null
-	};
 
 	/**
 	 * @description Parser
@@ -1054,7 +1029,7 @@ Editor.prototype = {
 		this.frameContext.clear();
 
 		/** remove history */
-		this.history._destroy();
+		this.history.destroy();
 
 		/** remove event listeners */
 		this.eventManager._removeAllEvents();
@@ -1258,7 +1233,6 @@ Editor.prototype = {
 		this.events = this.options.get('events');
 		this.history = History(this, this._onChange_historyStack.bind(this));
 		this.eventManager = new EventManager(this);
-		this.viewer = new Viewer(this);
 
 		// util classes
 		this.offset = new Offset(this);
@@ -1266,6 +1240,7 @@ Editor.prototype = {
 		this.notice = new Notice(this);
 
 		// main classes
+		this.viewer = new Viewer(this);
 		this.node = new Node_(this);
 		this.html = new HTML(this);
 		this.component = new Component(this);
@@ -1340,17 +1315,11 @@ Editor.prototype = {
 		commandMap.set(textTags.strike.toUpperCase(), ctx.get('buttons.strike'));
 		commandMap.set(textTags.sub.toUpperCase(), ctx.get('buttons.subscript'));
 		commandMap.set(textTags.sup.toUpperCase(), ctx.get('buttons.superscript'));
-
-		this._styleCommandMap = {
-			fullScreen: ctx.fullScreen,
-			showBlocks: ctx.showBlocks,
-			codeView: ctx.codeView
-		};
 	},
 
 	/**
 	 * @description Initializ wysiwyg area (Only called from core._init)
-	 * @param {boolean} reload Is relooad?
+	 * @param {Map} e frameContext
 	 * @param {string} value initial html string
 	 * @private
 	 */

@@ -9,6 +9,8 @@ import { addClass, removeClass, hasClass } from '../../helper/domUtils';
 
 const Char = function (editor) {
 	CoreDependency.call(this, editor);
+
+	// members
 	this._encoder = this._w.encodeURIComponent;
 	this._unescape = this._w.unescape;
 	this._textEncoder = this._w.TextEncoder;

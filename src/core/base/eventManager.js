@@ -1689,13 +1689,14 @@ function OnFocus_wysiwyg(rootKey, e) {
 	if (this.editor._antiBlur) return;
 	this.status.hasFocus = true;
 
+	domUtils.removeClass(this.context.get('buttons.codeView'), 'active');
+	domUtils.setDisabled(this.editor._codeViewDisabledButtons, false);
+
 	this.editor.changeFrameContext(rootKey);
-	this._w.setTimeout(this.applyTagEffect.bind(this));
+	this.history.resetButtons();
+	this.applyTagEffect();
 
 	if (this.editor.isInline) this.toolbar._showInline();
-
-	domUtils.removeClass(this.editor._styleCommandMap.codeView, 'active');
-	domUtils.setDisabled(this.editor._codeViewDisabledButtons, false);
 
 	// user event
 	if (typeof this.events.onFocus === 'function') this.events.onFocus(e, rootKey);
@@ -1719,7 +1720,6 @@ function OnBlur_wysiwyg(rootKey, e) {
 	});
 
 	this.history.check(rootKey, this.status._range);
-	this.selection.removeRange();
 
 	// user event
 	if (typeof this.events.onBlur === 'function') this.events.onBlur(e, rootKey);
@@ -1834,11 +1834,7 @@ function OnResize_window() {
 		this.menu._setMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
 	}
 
-	if (this.status.isFullScreen) {
-		this.editor._transformStatus.fullScreenInnerHeight += _w.innerHeight - this.context.get('toolbar.main').offsetHeight - this.editor._transformStatus.fullScreenInnerHeight;
-		this.editor.frameContext.get('editorArea').style.height = this.editor._transformStatus.fullScreenInnerHeight + 'px';
-		return;
-	}
+	if (this.viewer._resetFullScreenHeight()) return;
 
 	if (this.editor.frameContext.get('isCodeView') && this.editor.isInline) {
 		this.toolbar._showInline();
@@ -1871,7 +1867,7 @@ function OnScroll_Abs() {
 
 function OnFocus_code(rootKey) {
 	this.editor.changeFrameContext(rootKey);
-	domUtils.addClass(this.editor._styleCommandMap.codeView, 'active');
+	domUtils.addClass(this.context.get('buttons.codeView'), 'active');
 	domUtils.setDisabled(this.editor._codeViewDisabledButtons, true);
 }
 

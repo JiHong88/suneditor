@@ -9,6 +9,8 @@ import Figure from '../../modules/Figure';
 
 const Component = function (editor) {
 	CoreDependency.call(this, editor);
+
+	// members
 	this._lineBreakComp = null;
 };
 
@@ -97,6 +99,7 @@ Component.prototype = {
 	 */
 	select: function (element, pluginName) {
 		this.editor._antiBlur = true;
+		this.editor.blur();
 
 		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is)) || domUtils.isUneditable(element)) return false;
 

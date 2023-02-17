@@ -7,7 +7,7 @@ const KATEX_WEBSITE = 'https://katex.org/docs/supported.html';
 const Math_ = function (editor, target) {
 	// exception
 	if (!editor.options.get('katex')) {
-		throw Error('[SUNEDITOR.plugins.math.fail] The math plugin must need the "KaTeX" library, Please add the katex option.');
+		console.warn('[SUNEDITOR.plugins.math.warn] The math plugin must need the "KaTeX" library, Please add the katex option.');
 	}
 
 	// plugin bisic properties

@@ -7,6 +7,8 @@ import CoreDependency from '../../dependency/_core';
 
 const Shortcuts = function (editor) {
 	CoreDependency.call(this, editor);
+
+	// members
 	this.isDisabled = false;
 	this._keyCodeShortcut = {
 		65: 'A',

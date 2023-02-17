@@ -9,6 +9,8 @@ import { CreateToolBar } from '../constructor';
 
 const Toolbar = function (editor) {
 	CoreDependency.call(this, editor);
+
+	// members
 	this._responsiveCurrentSize = 'default';
 	this._rButtonArray = editor._responsiveButtons;
 	this._rButtonsize = null;
@@ -102,6 +104,7 @@ Toolbar.prototype = {
 			if (this._responsiveCurrentSize !== responsiveWidth) {
 				this._responsiveCurrentSize = responsiveWidth;
 				this.setButtons(this._rButtonArray[responsiveWidth]);
+				this.viewer._resetFullScreenHeight();
 			}
 		}
 	},
@@ -121,7 +124,7 @@ Toolbar.prototype = {
 		this.context.set('toolbar._buttonTray', newToolbar._buttonTray);
 
 		this.editor._recoverButtonStates();
-		this.history._resetButtons();
+		this.history.resetButtons();
 		this._resetSticky();
 
 		this.editor.effectNode = null;

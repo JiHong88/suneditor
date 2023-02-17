@@ -8,6 +8,8 @@ import { domUtils, unicode, numbers, env } from '../../helper';
 
 const Format = function (editor) {
 	CoreDependency.call(this, editor);
+
+	// members
 	this._listCamel = this.options.get('__listCommonStyle');
 	this._listKebab = env.camelToKebabCase(this.options.get('__listCommonStyle'));
 	this._formatLineCheck = this.options.get('formatLine').reg;

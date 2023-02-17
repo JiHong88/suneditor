@@ -9,6 +9,7 @@ import { domUtils, converter, numbers, unicode, env } from '../../helper';
 const HTML = function (editor) {
 	CoreDependency.call(this, editor);
 
+	// members
 	this._allowHTMLComment = null;
 	this._disallowedStyleNodesRegExp = null;
 	this._htmlCheckWhitelistRegExp = null;
@@ -612,7 +613,7 @@ HTML.prototype = {
 			if (startCon.textContent && domUtils.isZeroWith(startCon.textContent.substr(startOff))) {
 				return {
 					container: startCon,
-					offset: offset,
+					offset: startOff,
 					prevContainer: startCon && startCon.parentNode ? startCon : null
 				};
 			}

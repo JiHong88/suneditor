@@ -8,6 +8,8 @@ import { domUtils } from '../../helper';
 
 const Menu = function (editor) {
 	CoreDependency.call(this, editor);
+
+	// members--
 	this._menuTrayMap = {};
 	// dropdown
 	this.currentDropdown = null;

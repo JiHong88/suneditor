@@ -239,9 +239,8 @@ export default function (editor, change) {
 
 		/**
 		 * @description Reset the disabled state of the buttons to fit the current stack.
-		 * @private
 		 */
-		_resetButtons: function () {
+		resetButtons: function () {
 			undo = editor.context.get('buttons.undo');
 			redo = editor.context.get('buttons.redo');
 
@@ -257,9 +256,8 @@ export default function (editor, change) {
 
 		/**
 		 * @description Remove all stacks and remove the timeout function.
-		 * @private
 		 */
-		_destroy: function () {
+		destroy: function () {
 			if (pushDelay) _w.clearTimeout(pushDelay);
 			stackIndex = stack = rootStack = rootInitContents = null;
 		}

@@ -42,7 +42,7 @@ export interface History {
      * @description Remove all stacks and remove the timeout function.
      * @private
      */
-    _destroy: () => void;
+    destroy: () => void;
 }
 
 export default function _default(core: Core, change: any): History;
