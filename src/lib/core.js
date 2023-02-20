@@ -2132,7 +2132,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 if (startCon.textContent && util.onlyZeroWidthSpace(startCon.textContent.substr(startOff))) {
                     return {
                         container: startCon,
-                        offset: offset,
+                        offset: startOff,
                         prevContainer: startCon && startCon.parentNode ? startCon : null
                     };
                 }
