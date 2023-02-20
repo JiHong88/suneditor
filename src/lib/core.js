@@ -6043,9 +6043,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 _w.setTimeout(function () { 
                     const h = core._iframeAuto.offsetHeight;
                     context.element.wysiwygFrame.style.height = h + 'px';
-                    if (util.isIE) core.__callResizeFunction(h, null);
+                    if (!util.isResizeObserverSupported) core.__callResizeFunction(h, null);
                 });
-            } else if (util.isIE) {
+            } else if (!util.isResizeObserverSupported) {
                 core.__callResizeFunction(context.element.wysiwygFrame.offsetHeight, null);
             }
         },
@@ -7627,13 +7627,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const h = (resizeInterval < core._variable.minResizingSize ? core._variable.minResizingSize : resizeInterval);
             context.element.wysiwygFrame.style.height = context.element.code.style.height = h + 'px';
             core._variable.resizeClientY = e.clientY;
-            if (util.isIE) core.__callResizeFunction(h, null);
+            if (!util.isResizeObserverSupported) core.__callResizeFunction(h, null);
         },
 
         onResize_window: function () {
-            if (util.isIE) core.resetResponsiveToolbar();
+            if (!util.isResizeObserverSupported) core.resetResponsiveToolbar();
 
-            if (context.element.toolbar.offsetWidth === 0) return;
+            const toolbar = context.element.toolbar;
+            const isToolbarHidden = (toolbar.style.display === 'none' || (core._isInline && !core._inlineToolbarAttr.isShow));
+            if (toolbar.offsetWidth === 0 && !isToolbarHidden) return;
 
             if (context.fileBrowser && context.fileBrowser.area.style.display === 'block') {
                 context.fileBrowser.body.style.maxHeight = (_w.innerHeight - context.fileBrowser.header.offsetHeight - 50) + 'px';
@@ -7644,7 +7646,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             if (core._variable.isFullScreen) {
-                core._variable.innerHeight_fullScreen += (_w.innerHeight - context.element.toolbar.offsetHeight) - core._variable.innerHeight_fullScreen;
+                core._variable.innerHeight_fullScreen += (_w.innerHeight - toolbar.offsetHeight) - core._variable.innerHeight_fullScreen;
                 context.element.editorArea.style.height = core._variable.innerHeight_fullScreen + 'px';
                 return;
             }
@@ -7657,7 +7659,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             core._iframeAutoHeight();
 
             if (core._sticky) {
-                context.element.toolbar.style.width = (context.element.topArea.offsetWidth - 2) + 'px';
+                toolbar.style.width = (context.element.topArea.offsetWidth - 2) + 'px';
                 event.onScroll_window();
             }
         },
@@ -8022,7 +8024,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _toolbarObserver: null,
         _addEvent: function () {
             const eventWysiwyg = options.iframe ? core._ww : context.element.wysiwyg;
-            if (!util.isIE) {
+            if (util.isResizeObserverSupported) {
                 this._resizeObserver = new _w.ResizeObserver(function(entries) {
                     core.__callResizeFunction(-1, entries[0]);
                 });
@@ -8079,7 +8081,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             event._setResponsiveToolbar();
 
             /** responsive toolbar observer */
-            if (!util.isIE) this._toolbarObserver = new _w.ResizeObserver(core.resetResponsiveToolbar);
+            if (util.isResizeObserverSupported) this._toolbarObserver = new _w.ResizeObserver(core.resetResponsiveToolbar);
             
             /** window event */
             _w.addEventListener('resize', event.onResize_window, false);
@@ -8921,6 +8923,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     context.element.toolbar.style.display = '';
                     context.element._stickyDummy.style.display = '';
                 }
+
+                event.onResize_window();
             },
 
             /**
@@ -8933,6 +8937,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     context.element.toolbar.style.display = 'none';
                     context.element._stickyDummy.style.display = 'none';
                 }
+
+                event.onResize_window();
             },
         },
 
