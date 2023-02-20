@@ -44,13 +44,13 @@
             align: 'Alinhar',
             alignLeft: 'Alinhar à esquerda',
             alignRight: 'Alinhar à direita',
-            alignCenter: 'Alinhar ao centro',
-            alignJustify: 'Alinhat justificado',
+            alignCenter: 'Centralizar',
+            alignJustify: 'Justificar',
             list: 'Lista',
             orderList: 'Lista ordenada',
             unorderList: 'Lista desordenada',
             horizontalRule: 'Linha horizontal',
-            hr_solid: 'solida',
+            hr_solid: 'sólida',
             hr_dotted: 'pontilhada',
             hr_dashed: 'tracejada',
             table: 'Tabela',
@@ -65,7 +65,7 @@
             undo: 'Voltar',
             redo: 'Refazer',
             preview: 'Prever',
-            print: 'imprimir',
+            print: 'Imprimir',
             tag_p: 'Paragráfo',
             tag_div: '(DIV) Normal',
             tag_h: 'Cabeçalho',
@@ -76,7 +76,7 @@
             paragraphStyle: 'Estilo do parágrafo',
             textStyle: 'Estilo do texto',
             imageGallery: 'Galeria de imagens',
-            dir_ltr: 'Da esquerda para direita',
+            dir_ltr: 'Esquerda para direita',
             dir_rtl: 'Direita para esquerda',
             mention: 'Menção'
         },
@@ -84,10 +84,10 @@
             linkBox: {
                 title: 'Inserir link',
                 url: 'URL para link',
-                text: 'Texto à mostrar',
+                text: 'Texto a mostrar',
                 newWindowCheck: 'Abrir em nova guia',
                 downloadLinkCheck: 'Link para Download',
-                bookmark: 'marca páginas'
+                bookmark: 'marcar páginas'
             },
             mathBox: {
                 title: 'Matemática',
@@ -107,9 +107,9 @@
                 url: 'URL do YouTube/Vimeo'
             },
             audioBox: {
-                title: 'Inserir audio',
+                title: 'Inserir áudio',
                 file: 'Selecionar arquivos',
-                url: 'URL da audio'
+                url: 'URL da áudio'
             },
             browser: {
                 tags: 'Tag',
@@ -119,7 +119,7 @@
             close: 'Fechar',
             submitButton: 'Enviar',
             revertButton: 'Reverter',
-            proportion: 'restringir proporções',
+            proportion: 'Restringir proporções',
             basic: 'Básico',
             left: 'Esquerda',
             right: 'Direita',
@@ -131,7 +131,7 @@
         },
         controller: {
             edit: 'Editar',
-            unlink: 'Retirar link',
+            unlink: 'Remover link',
             remove: 'Remover',
             insertRowAbove: 'Inserir linha acima',
             insertRowBelow: 'Inserir linha abaixo',
@@ -149,8 +149,8 @@
             mirrorVertical: 'Espelho, Vertical',
             rotateLeft: 'Girar para esquerda',
             rotateRight: 'Girar para direita',
-            maxSize: 'Tam max',
-            minSize: 'Tam min',
+            maxSize: 'Tam máx',
+            minSize: 'Tam mín',
             tableHeader: 'Cabeçalho da tabela',
             mergeCells: 'Mesclar células',
             splitCells: 'Dividir células',
@@ -160,7 +160,7 @@
         menu: {
             spaced: 'Espaçado',
             bordered: 'Com borda',
-            neon: 'Néon',
+            neon: 'Neon',
             translucent: 'Translúcido',
             shadow: 'Sombreado',
             code: 'Código'
