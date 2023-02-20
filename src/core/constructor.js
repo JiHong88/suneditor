@@ -523,9 +523,11 @@ function _initTargetElements(options, topDiv, targetOptions) {
 
 	// textarea for code view
 	const textarea = domUtils.createElement('TEXTAREA', {
-		class: 'se-wrapper-inner se-wrapper-code se-display-none',
+		class: 'se-wrapper-inner se-wrapper-code',
 		style: editorStyles.frame
 	});
+
+	textarea.style.setProperty('display', 'none', 'important');
 	if (targetOptions.get('height') === 'auto') textarea.style.overflow = 'hidden';
 
 	/** status bar */
@@ -638,7 +640,8 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 	options.set('hasCodeMirror', hasCodeMirror);
 	if (cmeditor) {
 		domUtils.removeItem(textarea);
-		cmeditor.className += ' se-wrapper-code-mirror se-display-none';
+		cmeditor.className += ' se-wrapper-code-mirror';
+		cmeditor.style.setProperty('display', 'none', 'important');
 		return cmeditor;
 	}
 

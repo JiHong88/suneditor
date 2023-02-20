@@ -34,18 +34,18 @@ Viewer.prototype = {
 		this.editor._offCurrentController();
 		this.editor._offCurrentModal();
 
-		const code = fc.get('code');
+		const codeFrame = fc.get('code');
 		const wysiwygFrame = fc.get('wysiwygFrame');
 
 		if (value) {
 			this._setEditorDataToCodeView();
-			domUtils.removeClass(code, 'se-display-none');
+			codeFrame.style.setProperty('display', 'block', 'important');
 			this.wysiwygOriginCssText = this.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
 
 			if (this.status.isFullScreen) {
-				code.style.height = '100%';
+				codeFrame.style.height = '100%';
 			} else if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) {
-				code.style.height = code.scrollHeight > 0 ? code.scrollHeight + 'px' : 'auto';
+				codeFrame.style.height = codeFrame.scrollHeight > 0 ? codeFrame.scrollHeight + 'px' : 'auto';
 			}
 
 			if (this.options.get('hasCodeMirror')) {
@@ -64,12 +64,12 @@ Viewer.prototype = {
 			}
 
 			this.status._range = null;
-			code.focus();
+			codeFrame.focus();
 			domUtils.addClass(this.context.get('buttons.codeView'), 'active');
 		} else {
 			if (!domUtils.isNonEditable(wysiwygFrame)) this._setCodeDataToEditor();
 			wysiwygFrame.scrollTop = 0;
-			domUtils.addClass(code, 'se-display-none');
+			codeFrame.style.setProperty('display', 'none', 'important');
 			wysiwygFrame.style.display = 'block';
 			this.wysiwygOriginCssText = this.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
 
