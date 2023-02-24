@@ -618,7 +618,6 @@ export default {
         }, {});
 
         /** Private options */
-        // options.__defaultFontSize;
         options.__listCommonStyle = options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle'];
 
         /** _init options */

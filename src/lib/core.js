@@ -448,7 +448,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @property {Element} OUTDENT outdent button
          * @property {Element} INDENT indent button
          */
-        commandMap: null,
+        commandMap: {},
 
         /**
          * @description CSS properties related to style tags 
@@ -5188,15 +5188,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 		},
 
         _convertFontSize: function (to, size) {
+            const math = this._w.Math;
             const value = size.match(/(\d+(?:\.\d+)?)(.+)/);
             const sizeNum = value[1] * 1;
             const from = value[2];
             let pxSize = sizeNum;
             
             if (/em/.test(from)) {
-                pxSize = this.round(sizeNum / 0.0625);
+                pxSize = math.round(sizeNum / 0.0625);
             } else if (from === 'pt') {
-                pxSize = this.round(sizeNum * 1.333);
+                pxSize = math.round(sizeNum * 1.333);
             } else if (from === '%') {
                 pxSize = sizeNum / 100;
             }
@@ -5207,7 +5208,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 case '%':
                     return (pxSize * 0.0625).toFixed(2) + to;
                 case 'pt':
-                    return this.floor(pxSize / 1.333) + to;
+                    return math.floor(pxSize / 1.333) + to;
                 default: // px
                     return pxSize + to;
             }
@@ -5242,7 +5243,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 case 'fontSize':
                                     if (!options.plugins.fontSize) continue;
                                     if (!this._cleanStyleRegExp.fontSizeUnit.test(r[0])) {
-                                        r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), this._convertFontSize.bind(this._w.Math, options.fontSizeUnit));
+                                        r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), this._convertFontSize.bind(this, options.fontSizeUnit));
                                     }
                                     break;
                                 case 'color':
@@ -5981,25 +5982,24 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.codeViewDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-code-view-enabled"]):not([data-display="MORE"])');
             this.resizingDisabledButtons = context.element._buttonTray.querySelectorAll('.se-menu-list button[data-display]:not([class~="se-resizing-enabled"]):not([data-display="MORE"])');
 
-            this._saveButtonStates();
-
             const tool = context.tool;
-            this.commandMap = {
-                OUTDENT: tool.outdent,
-                INDENT: tool.indent
-            };
-            this.commandMap[options.textTags.bold.toUpperCase()] = tool.bold;
-            this.commandMap[options.textTags.underline.toUpperCase()] = tool.underline;
-            this.commandMap[options.textTags.italic.toUpperCase()] = tool.italic;
-            this.commandMap[options.textTags.strike.toUpperCase()] = tool.strike;
-            this.commandMap[options.textTags.sub.toUpperCase()] = tool.subscript;
-            this.commandMap[options.textTags.sup.toUpperCase()] = tool.superscript;
+            const commandMap = this.commandMap;
+            commandMap['INDENT'] = tool.indent;
+            commandMap['OUTDENT'] = tool.outdent;
+            commandMap[options.textTags.bold.toUpperCase()] = tool.bold;
+            commandMap[options.textTags.underline.toUpperCase()] = tool.underline;
+            commandMap[options.textTags.italic.toUpperCase()] = tool.italic;
+            commandMap[options.textTags.strike.toUpperCase()] = tool.strike;
+            commandMap[options.textTags.sub.toUpperCase()] = tool.subscript;
+            commandMap[options.textTags.sup.toUpperCase()] = tool.superscript;
             
             this._styleCommandMap = {
                 fullScreen: tool.fullScreen,
                 showBlocks: tool.showBlocks,
                 codeView: tool.codeView
             };
+
+            this._saveButtonStates();
         },
 
         /**
