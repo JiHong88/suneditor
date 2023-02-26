@@ -4802,7 +4802,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 _var._codeOriginCssText = code.style.cssText;
 
                 editorArea.style.cssText = toolbar.style.cssText = '';
-                wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + options.defaultStyle;
+                wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + options._editorStyles.editor;
                 code.style.cssText = (code.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
                 toolbar.style.width = wysiwygFrame.style.height = code.style.height = '100%';
                 toolbar.style.position = 'relative';
