@@ -6986,7 +6986,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         const prev = formatEl.previousSibling;
                         // select file component
                         const ignoreZWS = (commonCon.nodeType === 3 || util.isBreak(commonCon)) && !commonCon.previousSibling && range.startOffset === 0;
-                        if (!sel.previousSibling && (util.isComponent(commonCon.previousSibling) || (ignoreZWS && util.isComponent(prev)))) {
+                        if (sel && !sel.previousSibling && ( (commonCon && util.isComponent(commonCon.previousSibling)) || (ignoreZWS && util.isComponent(prev)))) {
                             const fileComponentInfo = core.getFileComponent(prev);
                             if (fileComponentInfo) {
                                 e.preventDefault();
@@ -7001,7 +7001,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             break;
                         }
                         // delete nonEditable
-                        if (util.isNonEditable(sel.previousSibling)) {
+                        if (sel && util.isNonEditable(sel.previousSibling)) {
                             e.preventDefault();
                             e.stopPropagation();
                             util.removeItem(sel.previousSibling);
