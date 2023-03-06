@@ -322,7 +322,7 @@
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-/* se-btn button active*/
+/* se-btn button active */
 .sun-editor .se-btn:enabled.active {
     background-color: #eaf3ff;
     color: #4592ff;
@@ -339,7 +339,7 @@
 .sun-editor .se-btn:enabled.active:active,
 .sun-editor .se-btn:enabled.active.__se__active {
     background-color: #d0e3ff;
-    border: 1px solid #4592ff;
+    border: 1px solid #80bdff;
     -webkit-box-shadow: 0 0 0 0.2rem #d0e3ff;
     box-shadow: 0 0 0 0.2rem #d0e3ff;
     transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
@@ -347,24 +347,25 @@
 
 /* se-btn button on */
 .sun-editor .se-btn:enabled.on {
-    background-color: #e1e1e1;
-    border-color: #d1d1d1;
+    background-color: #eaf3ff;
+    color: #4592ff;
     outline: 0 none;
 }
 
 .sun-editor .se-btn:enabled.on:hover,
 .sun-editor .se-btn:enabled.on:focus {
-    background-color: #d1d1d1;
-    border-color: #c1c1c1;
+    background-color: #d0e3ff;
+    color: #4592ff;
     outline: 0 none;
 }
 
 .sun-editor .se-btn:enabled.on:active,
 .sun-editor .se-btn:enabled.on.__se__active {
-    background-color: #c1c1c1;
-    border-color: #b1b1b1;
-    -webkit-box-shadow: inset 0 3px 5px #b1b1b1;
-    box-shadow: inset 0 3px 5px #b1b1b1;
+    background-color: #d0e3ff;
+    border: 1px solid #80bdff;
+    -webkit-box-shadow: 0 0 0 0.2rem #d0e3ff;
+    box-shadow: 0 0 0 0.2rem #d0e3ff;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
 /* disabled buttons, icon blur */
@@ -1514,7 +1515,7 @@
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-input-form.se-math-exp {
     resize: vertical;
     height: 14em;
-    border: 1px solid #ccc;
+    border: 1px solid #3f9dff;
     font-size: 13px;
     padding: 4px;
     direction: ltr;
@@ -1675,7 +1676,6 @@
     border: none;
     border-radius: 2px;
     margin: 1px;
-    padding: 5px 10px;
     font-size: 12px;
     line-height: 1.5;
     display: inline-block;
@@ -1686,65 +1686,10 @@
     touch-action: manipulation;
 }
 
-.sun-editor .se-controller .se-btn-group button:hover:enabled,
-.sun-editor .se-controller .se-btn-group button:focus:enabled {
-    background-color: #e1e1e1;
-    border-color: #d1d1d1;
-    outline: 0 none;
-}
-
-.sun-editor .se-controller .se-btn-group button:active:enabled {
-    background-color: #d1d1d1;
-    border-color: #c1c1c1;
-    -webkit-box-shadow: inset 0 3px 5px #c1c1c1;
-    box-shadow: inset 0 3px 5px #c1c1c1;
-}
-
 .sun-editor .se-controller .se-btn-group button span {
     display: block;
-    padding: 0;
+    padding: 5px 10px;
     margin: 0;
-}
-
-/* controller - buttn group active */
-.sun-editor .se-controller .se-btn-group button:enabled.active {
-    color: #4592ff;
-    outline: 0 none;
-}
-
-.sun-editor .se-controller .se-btn-group button:enabled.active:hover,
-.sun-editor .se-controller .se-btn-group button:enabled.active:focus {
-    background-color: #e1e1e1;
-    border-color: #d1d1d1;
-    outline: 0 none;
-}
-
-.sun-editor .se-controller .se-btn-group button:enabled.active:active {
-    background-color: #d1d1d1;
-    border-color: #c1c1c1;
-    -webkit-box-shadow: inset 0 3px 5px #c1c1c1;
-    box-shadow: inset 0 3px 5px #c1c1c1;
-}
-
-/* controller - buttn group on */
-.sun-editor .se-controller .se-btn-group button:enabled.on {
-    background-color: #e1e1e1;
-    border-color: #d1d1d1;
-    outline: 0 none;
-}
-
-.sun-editor .se-controller .se-btn-group button:enabled.on:hover,
-.sun-editor .se-controller .se-btn-group button:enabled.on:focus {
-    background-color: #d1d1d1;
-    border-color: #c1c1c1;
-    outline: 0 none;
-}
-
-.sun-editor .se-controller .se-btn-group button:enabled.on:active {
-    background-color: #c1c1c1;
-    border-color: #b1b1b1;
-    -webkit-box-shadow: inset 0 3px 5px #b1b1b1;
-    box-shadow: inset 0 3px 5px #b1b1b1;
 }
 
 /* controller - input */

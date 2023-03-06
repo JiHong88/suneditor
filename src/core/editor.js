@@ -875,14 +875,14 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Set "options.get('editorCSSText')" style.
+	 * @description Set "options.get('editorStyle')" style.
 	 * Define the style of the edit area
 	 * It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
 	 * @param {string} style Style string
 	 */
 	setEditorStyle: function (style) {
 		const newStyles = converter._setDefaultOptionStyle(this.frameOptions, style);
-		this.frameOptions.set('_editorStyles', newStyles);
+		this.frameOptions.set('_defaultStyles', newStyles);
 		const fc = this.frameContext;
 
 		// top area
@@ -890,7 +890,7 @@ Editor.prototype = {
 
 		// code view
 		const code = fc.get('code');
-		code.style.cssText = this.frameOptions.get('_editorStyles').frame;
+		code.style.cssText = this.frameOptions.get('_defaultStyles').frame;
 		code.style.display = 'none';
 		if (this.frameOptions.get('height') === 'auto') {
 			code.style.overflow = 'hidden';
@@ -1221,7 +1221,7 @@ Editor.prototype = {
 		if (options.get('iframe')) {
 			e.set('_wd', e.get('wysiwygFrame').contentDocument);
 			e.set('wysiwyg', e.get('_wd').body);
-			if (frameOptions.get('_editorStyles').editor) e.get('wysiwyg').style.cssText = frameOptions.get('_editorStyles').editor;
+			if (frameOptions.get('_defaultStyles').editor) e.get('wysiwyg').style.cssText = frameOptions.get('_defaultStyles').editor;
 			if (frameOptions.get('height') === 'auto') this._iframeAuto = e.get('_wd').body;
 		} else {
 			e.set('_wd', this._d);

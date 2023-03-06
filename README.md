@@ -507,7 +507,7 @@ maxHeight       : The max-height size of the editor.
 
 // Editing area -------------------------------------------------------------------------------------------------
 className       : Add a "class" to the editing area[.sun-editor-editable].    default: '' {string}
-editorCSSText    : You can define the style of the editing area[.sun-editor-editable].
+editorStyle    : You can define the style of the editing area[.sun-editor-editable].
                   It affects the entire editing area.               default: '' {string}
                   ('z-index', 'position', 'display', 'width' properties apply to the top div.)
                   ex) 'font-family: cursive; font-size: 10px;'
@@ -955,7 +955,7 @@ editor.setOptions({
     ]
 });
 
-// Set "options.editorCSSText" style.
+// Set "options.editorStyle" style.
 // Define the style of the edit area
 // It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
 editor.setEditorStyle('font-family: cursive; font-size: 10px;');

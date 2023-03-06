@@ -422,7 +422,7 @@ export default class SunEditor {
 	setOptions(options: SunEditorOptions): void;
 
 	/**
-	 * @description Set "options.editorCSSText" style.
+	 * @description Set "options.editorStyle" style.
 	 * Define the style of the edit area
 	 * It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
 	 * @param style Style string

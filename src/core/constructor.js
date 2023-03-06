@@ -260,7 +260,7 @@ function InitOptions(options, editorTargets) {
 	o.set('toolbar_hide', !!options.toolbar_hide);
 
 	/** styles */
-	InitRootOptions(editorTargets);
+	InitRootOptions(editorTargets, options);
 
 	/** IFrame */
 	o.set('iframe', !!options.iframe_fullPage || !!options.iframe);
@@ -460,35 +460,54 @@ function InitOptions(options, editorTargets) {
 	};
 }
 
-function InitRootOptions(editorTargets) {
+function InitRootOptions(editorTargets, options) {
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
-		InitFrameOptions(editorTargets[i].options || {}, (editorTargets[i].options = new _w.Map()));
+		InitFrameOptions(editorTargets[i].options || {}, options, (editorTargets[i].options = new _w.Map()));
 	}
 }
 
-function InitFrameOptions(o, fo) {
+function InitFrameOptions(o, origin, fo) {
+	// members
+	const value = o.value === undefined ? origin.value : o.value;
+	const placeholder = o.placeholder === undefined ? origin.placeholder : o.placeholder;
+	const width = o.width === undefined ? origin.width : o.width;
+	const minWidth = o.minWidth === undefined ? origin.minWidth : o.minWidth;
+	const maxWidth = o.maxWidth === undefined ? origin.maxWidth : o.maxWidth;
+	const height = o.height === undefined ? origin.height : o.height;
+	const minHeight = o.minHeight === undefined ? origin.minHeight : o.minHeight;
+	const maxHeight = o.maxHeight === undefined ? origin.maxHeight : o.maxHeight;
+	const editorStyle = o.editorStyle === undefined ? origin.editorStyle : o.editorStyle;
+	const statusbar = o.statusbar === undefined ? origin.statusbar : o.statusbar;
+	const statusbar_showPathLabel = o.statusbar_showPathLabel === undefined ? origin.statusbar_showPathLabel : o.statusbar_showPathLabel;
+	const statusbar_resizeEnable = o.statusbar_resizeEnable === undefined ? origin.statusbar_resizeEnable : o.statusbar_resizeEnable;
+	const statusbar_container = o.statusbar_container === undefined ? origin.statusbar_container : o.statusbar_container;
+	const charCounter = o.charCounter === undefined ? origin.charCounter : o.charCounter;
+	const charCounter_max = o.charCounter_max === undefined ? origin.charCounter_max : o.charCounter_max;
+	const charCounter_label = o.charCounter_label === undefined ? origin.charCounter_label : o.charCounter_label;
+	const charCounter_type = o.charCounter_type === undefined ? origin.charCounter_type : o.charCounter_type;
+
 	// value
-	fo.set('value', o.value);
-	fo.set('placeholder', o.placeholder);
+	fo.set('value', value);
+	fo.set('placeholder', placeholder);
 	// styles
-	fo.set('width', o.width ? (numbers.is(o.width) ? o.width + 'px' : o.width) : '100%');
-	fo.set('minWidth', (numbers.is(o.minWidth) ? o.minWidth + 'px' : o.minWidth) || '');
-	fo.set('maxWidth', (numbers.is(o.maxWidth) ? o.maxWidth + 'px' : o.maxWidth) || '');
-	fo.set('height', o.height ? (numbers.is(o.height) ? o.height + 'px' : o.height) : 'auto');
-	fo.set('minHeight', (numbers.is(o.minHeight) ? o.minHeight + 'px' : o.minHeight) || '');
-	fo.set('maxHeight', (numbers.is(o.maxHeight) ? o.maxHeight + 'px' : o.maxHeight) || '');
-	fo.set('_editorStyles', converter._setDefaultOptionStyle(fo, typeof o.editorCSSText === 'string' ? o.editorCSSText : ''));
+	fo.set('width', width ? (numbers.is(width) ? width + 'px' : width) : '100%');
+	fo.set('minWidth', (numbers.is(minWidth) ? minWidth + 'px' : minWidth) || '');
+	fo.set('maxWidth', (numbers.is(maxWidth) ? maxWidth + 'px' : maxWidth) || '');
+	fo.set('height', height ? (numbers.is(height) ? height + 'px' : height) : 'auto');
+	fo.set('minHeight', (numbers.is(minHeight) ? minHeight + 'px' : minHeight) || '');
+	fo.set('maxHeight', (numbers.is(maxHeight) ? maxHeight + 'px' : maxHeight) || '');
+	fo.set('_defaultStyles', converter._setDefaultOptionStyle(fo, typeof editorStyle === 'string' ? editorStyle : ''));
 	// status bar
-	const hasStatusbar = o.statusbar === undefined ? true : o.statusbar;
+	const hasStatusbar = statusbar === undefined ? true : statusbar;
 	fo.set('statusbar', hasStatusbar);
-	fo.set('statusbar_showPathLabel', !hasStatusbar ? false : typeof o.statusbar_showPathLabel === 'boolean' ? o.statusbar_showPathLabel : true);
-	fo.set('statusbar_resizeEnable', !hasStatusbar ? false : o.statusbar_resizeEnable === undefined ? true : !!o.statusbar_resizeEnable);
-	fo.set('statusbar_container', typeof o.statusbar_container === 'string' ? _d.querySelector(o.statusbar_container) : o.statusbar_container);
+	fo.set('statusbar_showPathLabel', !hasStatusbar ? false : typeof statusbar_showPathLabel === 'boolean' ? statusbar_showPathLabel : true);
+	fo.set('statusbar_resizeEnable', !hasStatusbar ? false : statusbar_resizeEnable === undefined ? true : !!statusbar_resizeEnable);
+	fo.set('statusbar_container', typeof statusbar_container === 'string' ? _d.querySelector(statusbar_container) : statusbar_container);
 	// status bar - character count
-	fo.set('charCounter', o.charCounter_max > 0 ? true : typeof o.charCounter === 'boolean' ? o.charCounter : false);
-	fo.set('charCounter_max', numbers.is(o.charCounter_max) && o.charCounter_max > -1 ? o.charCounter_max * 1 : null);
-	fo.set('charCounter_label', typeof o.charCounter_label === 'string' ? o.charCounter_label.trim() : null);
-	fo.set('charCounter_type', typeof o.charCounter_type === 'string' ? o.charCounter_type : 'char');
+	fo.set('charCounter', charCounter_max > 0 ? true : typeof charCounter === 'boolean' ? charCounter : false);
+	fo.set('charCounter_max', numbers.is(charCounter_max) && charCounter_max > -1 ? charCounter_max * 1 : null);
+	fo.set('charCounter_label', typeof charCounter_label === 'string' ? charCounter_label.trim() : null);
+	fo.set('charCounter_type', typeof charCounter_type === 'string' ? charCounter_type : 'char');
 }
 
 /**
@@ -498,7 +517,7 @@ function InitFrameOptions(o, fo) {
  * @returns {Object} Bottom bar elements (statusbar, navigation, charWrapper, charCounter)
  */
 function _initTargetElements(options, topDiv, targetOptions) {
-	const editorStyles = targetOptions.get('_editorStyles');
+	const editorStyles = targetOptions.get('_defaultStyles');
 	/** top div */
 	topDiv.style.cssText = editorStyles.top;
 

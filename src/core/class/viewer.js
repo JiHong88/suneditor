@@ -40,7 +40,7 @@ Viewer.prototype = {
 		if (value) {
 			this._setEditorDataToCodeView();
 			codeFrame.style.setProperty('display', 'block', 'important');
-			this.wysiwygOriginCssText = this.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: none');
+			wysiwygFrame.style.display = 'none';
 
 			if (this.status.isFullScreen) {
 				codeFrame.style.height = '100%';
@@ -71,7 +71,6 @@ Viewer.prototype = {
 			wysiwygFrame.scrollTop = 0;
 			codeFrame.style.setProperty('display', 'none', 'important');
 			wysiwygFrame.style.display = 'block';
-			this.wysiwygOriginCssText = this.wysiwygOriginCssText.replace(/(\s?display(\s+)?:(\s+)?)[a-zA-Z]+(?=;)/, 'display: block');
 
 			if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) fc.get('code').style.height = '0px';
 
@@ -114,8 +113,9 @@ Viewer.prototype = {
 		const toolbar = this.context.get('toolbar.main');
 		const editorArea = fc.get('editorArea');
 		const wysiwygFrame = fc.get('wysiwygFrame');
-		const code = fc.get('code');
+		const codeFrame = fc.get('code');
 		const targetButton = this.context.get('buttons.fullScreen');
+		const isCodeView = this.editor.frameContext.get('isCodeView');
 
 		this.editor._offCurrentController();
 		const wasToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.editor.toolbar._inlineToolbarAttr.isShow);
@@ -137,7 +137,7 @@ Viewer.prototype = {
 			this._originCssText = topArea.style.cssText;
 			this.editorAreaOriginCssText = editorArea.style.cssText;
 			this.wysiwygOriginCssText = wysiwygFrame.style.cssText;
-			this.codeOriginCssText = code.style.cssText;
+			this.codeOriginCssText = codeFrame.style.cssText;
 
 			topArea.style.position = 'fixed';
 			topArea.style.top = '0';
@@ -157,9 +157,9 @@ Viewer.prototype = {
 			this._d.body.style.overflow = 'hidden';
 
 			editorArea.style.cssText = toolbar.style.cssText = '';
-			wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + this.options.get('defaultStyle');
-			code.style.cssText = (code.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0];
-			toolbar.style.width = wysiwygFrame.style.height = code.style.height = '100%';
+			wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + this.editor.frameOptions.get('_defaultStyles').editor + (isCodeView ? 'display: none;' : '');
+			codeFrame.style.cssText = (codeFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + (!isCodeView ? 'display: none !important;' : 'display: block !important;');
+			toolbar.style.width = wysiwygFrame.style.height = codeFrame.style.height = '100%';
 			toolbar.style.position = 'relative';
 			toolbar.style.display = 'block';
 
@@ -178,8 +178,8 @@ Viewer.prototype = {
 				domUtils.addClass(targetButton, 'active');
 			}
 		} else {
-			wysiwygFrame.style.cssText = this.wysiwygOriginCssText;
-			code.style.cssText = this.codeOriginCssText;
+			wysiwygFrame.style.cssText = this.wysiwygOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + (isCodeView ? 'display: none;' : '');
+			codeFrame.style.cssText = this.codeOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + (!isCodeView ? 'display: none !important;' : 'display: block !important;');
 			toolbar.style.cssText = '';
 			editorArea.style.cssText = this.editorAreaOriginCssText;
 			topArea.style.cssText = this._originCssText;
@@ -484,9 +484,6 @@ Viewer.prototype = {
 		} else {
 			codeValue = codeContent;
 		}
-
-		this.editor.frameContext.get('code').style.display = 'block';
-		this.editor.frameContext.get('wysiwygFrame').style.display = 'none';
 
 		this._setCodeView(codeValue);
 	},

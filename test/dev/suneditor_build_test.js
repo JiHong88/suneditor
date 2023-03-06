@@ -348,6 +348,7 @@ const editor_root = (window.e = suneditor.create(
 	},
 	{
 		// value: 'Common value',
+		editorStyle: 'font-size:40px',
 		plugins: plugins,
 		toolbar_container: '#root_toolbar_container',
 		statusbar_container: '#root_statusbar_container',

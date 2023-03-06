@@ -234,7 +234,7 @@ export interface SunEditorOptions {
 	 * ('z-index', 'position', 'display', 'width' properties apply to the top div.)
 	 * @example 'font-family: cursive; font-size: 10px;'
 	 */
-	editorCSSText?: string;
+	editorStyle?: string;
 	/**
 	 * Defining menu items
 	 * ===================
