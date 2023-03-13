@@ -542,19 +542,25 @@ const util = {
      * @description Add style and className of copyEl to originEl
      * @param {Element} originEl Origin element
      * @param {Element} copyEl Element to copy
+     * @param {Array|null} blacklist Blacklist array(LowerCase)
      */
-    copyTagAttributes: function (originEl, copyEl) {
+    copyTagAttributes: function (originEl, copyEl, blacklist) {
         if (copyEl.style.cssText) {
             originEl.style.cssText += copyEl.style.cssText;
         }
 
-        const classes = copyEl.classList;
-        for (let i = 0, len = classes.length; i < len; i++) {
-            this.addClass(originEl, classes[i]);
+        const attrs = copyEl.attributes;
+        for (let i = 0, len = attrs.length; i < len; i++) {
+            if (blacklist && blacklist.indexOf(attrs[i].name.toLowerCase()) > -1) continue;
+            originEl.setAttribute(attrs[i].name, attrs[i].value);
         }
 
-        if (!originEl.style.cssText) originEl.removeAttribute('style');
-        if (!originEl.className.trim()) originEl.removeAttribute('class');
+        const originAttrs = originEl.attributes;
+        for (let i = 0, len = originAttrs.length; i < len; i++) {
+            if (!originAttrs[i].value) {
+                originEl.removeAttribute(originAttrs[i].name);
+            }
+        }
     },
 
     /**

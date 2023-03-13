@@ -515,6 +515,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         /**
+         * @description Temp variable for set line attrs
+         * @private
+         */
+        _formatAttrsTemp: null,
+
+        /**
          * @description Save the current buttons states to "allCommandButtons" object
          * @private
          */
@@ -1518,7 +1524,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 oFormat = util.createElement(oFormatName);
                 oFormat.innerHTML = '<br>';
                 if ((formatNode && typeof formatNode !== 'string') || (!formatNode && util.isFormatElement(currentFormatEl))) {
-                    util.copyTagAttributes(oFormat, formatNode || currentFormatEl);
+                    util.copyTagAttributes(oFormat, formatNode || currentFormatEl, ['id']);
                 }
             }
 
@@ -5984,8 +5990,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const tool = context.tool;
             const commandMap = this.commandMap;
-            commandMap['INDENT'] = tool.indent;
-            commandMap['OUTDENT'] = tool.outdent;
+            commandMap.INDENT = tool.indent;
+            commandMap.OUTDENT = tool.outdent;
             commandMap[options.textTags.bold.toUpperCase()] = tool.bold;
             commandMap[options.textTags.underline.toUpperCase()] = tool.underline;
             commandMap[options.textTags.italic.toUpperCase()] = tool.italic;
@@ -6919,6 +6925,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         break;
                     }
 
+                    // format attributes
+                    if (!selectRange && core._isEdgeFormat(range.startContainer, range.startOffset, 'start')) {
+                        if (util.isFormatElement(formatEl.previousElementSibling)) {
+                            core._formatAttrsTemp = formatEl.previousElementSibling.attributes;
+                        }
+                    }
+
                     // nested list
                     const commonCon = range.commonAncestorContainer;
                     formatEl = util.getFormatElement(range.startContainer, null);
@@ -7095,6 +7108,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             e.stopPropagation();
                             util.removeItem(sel);
                             break;
+                        }
+                    }
+
+                    // format attributes
+                    if (!selectRange && core._isEdgeFormat(range.endContainer, range.endOffset, 'end')) {
+                        if (util.isFormatElement(formatEl.nextElementSibling)) {
+                            core._formatAttrsTemp = formatEl.attributes;
                         }
                     }
 
@@ -7279,17 +7299,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     if (!shift) {
-                        const formatInners = core._isEdgeFormat(range.endContainer, range.endOffset, 'end');
-                        if ((formatInners && /^H[1-6]$/i.test(formatEl.nodeName)) || /^HR$/i.test(formatEl.nodeName)) {
+                        const formatEndEdge = core._isEdgeFormat(range.endContainer, range.endOffset, 'end');
+                        const formatStartEdge = core._isEdgeFormat(range.startContainer, range.startOffset, 'start');
+                        // add default format line
+                        if (formatEndEdge && (/^H[1-6]$/i.test(formatEl.nodeName) || /^HR$/i.test(formatEl.nodeName))) {
                             e.preventDefault();
                             let temp = null;
                             const newFormat = core.appendFormatTag(formatEl, options.defaultTag);
 
-                            if (formatInners && formatInners.length > 0) {
-                                temp = formatInners.pop();
+                            if (formatEndEdge && formatEndEdge.length > 0) {
+                                temp = formatEndEdge.pop();
                                 const innerNode = temp;
-                                while(formatInners.length > 0) {
-                                    temp = temp.appendChild(formatInners.pop());
+                                while(formatEndEdge.length > 0) {
+                                    temp = temp.appendChild(formatEndEdge.pop());
                                 }
                                 newFormat.appendChild(innerNode);
                             }
@@ -7297,7 +7319,28 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
                             core.setRange(temp, 0, temp, 0);
                             break;
-                        } else if (options.lineAttrReset && formatEl && !util.isListCell(formatEl)) {
+                        }
+                        
+                        // set format attrs - edge
+                        if (formatStartEdge || formatEndEdge) {
+                            e.preventDefault();
+                            const focusBR = util.createElement('BR');
+                            const newFormat = util.createElement(formatEl.nodeName);
+                            newFormat.appendChild(focusBR);
+
+                            util.copyTagAttributes(newFormat, formatEl, ['id'].concat(options.lineAttrReset));
+
+                            formatEl.parentNode.insertBefore(newFormat, formatStartEdge ? formatEl : formatEl.nextElementSibling);
+                            if (formatEndEdge) {
+                                core.setRange(focusBR, 1, focusBR, 1);
+                            }
+                            
+                            break;
+                        } else {
+                            core._formatAttrsTemp = formatEl.attributes;
+                        }
+                        
+                        if (options.lineAttrReset && formatEl && !util.isListCell(formatEl)) {
                             e.preventDefault();
                             e.stopPropagation();
 
@@ -7323,11 +7366,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 else newEl = util.splitElement(range.endContainer, range.endOffset, 0);
                             }
 
-                            const resetAttr = options.lineAttrReset === '*' ? null : options.lineAttrReset;
+                            const resetAttr = options.lineAttrReset;
                             const attrs = newEl.attributes;
                             let i = 0;
                             while (attrs[i]) {
-                                if (resetAttr && resetAttr.test(attrs[i].name)) {
+                                if (resetAttr && resetAttr.indexOf(attrs[i].name.toLowerCase()) > -1) {
                                     i++;
                                     continue;
                                 }
@@ -7539,6 +7582,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
+            const attrs = core._formatAttrsTemp;
+
+            if (attrs) {
+                for (let i = 0, len = attrs.length; i < len; i++) {
+                    if (keyCode === 13 && /^id$/i.test(attrs[i].name)) {
+                        formatEl.removeAttribute('id');
+                        continue;
+                    }
+                    formatEl.setAttribute(attrs[i].name, attrs[i].value);
+                }
+                core._formatAttrsTemp = null;
+            }
+
             if (!formatEl && range.collapsed && !util.isComponent(selectionNode) && !util.isList(selectionNode) && core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag) !== null) {
                 selectionNode = core.getSelectionNode();
             }

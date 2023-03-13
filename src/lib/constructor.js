@@ -455,7 +455,7 @@ export default {
         /** Layout */
         options.mode = options.mode || 'classic'; // classic, inline, balloon, balloon-always
         options.rtl = !!options.rtl;
-        options.lineAttrReset = typeof options.lineAttrReset === 'string' && options.lineAttrReset ? options.lineAttrReset === '*' ? '*' : new RegExp('^(' + options.lineAttrReset + ')$', 'i') : null;
+        options.lineAttrReset = typeof options.lineAttrReset === 'string' && options.lineAttrReset ? options.lineAttrReset.toLowerCase().split('|') : null;
         options._editableClass = 'sun-editor-editable' + (options.rtl ? ' se-rtl' : '');
         options._printClass = typeof options._printClass === 'string' ? options._printClass : null;
         options.toolbarWidth = options.toolbarWidth ? (util.isNumber(options.toolbarWidth) ? options.toolbarWidth + 'px' : options.toolbarWidth) : 'auto';
