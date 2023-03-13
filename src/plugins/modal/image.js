@@ -207,7 +207,7 @@ Image_.prototype = {
 			this.inputY.value = h === 'auto' ? '' : h;
 		}
 
-		this.proportion.checked = target.getAttribute('data-proportion') !== 'false';
+		this.proportion.checked = target.getAttribute('data-se-proportion') !== 'false';
 		this.inputX.disabled = percentageRotation ? true : false;
 		this.inputY.disabled = percentageRotation ? true : false;
 		this.proportion.disabled = percentageRotation ? true : false;
@@ -359,10 +359,10 @@ Image_.prototype = {
 				cover.insertBefore(this._setAnchor(imageEl, this._linkElement), this._caption);
 				domUtils.removeItem(anchor);
 			} else {
-				this._linkElement.setAttribute('data-image-link', 'image');
+				this._linkElement.setAttribute('data-se-image-link', 'image');
 			}
 		} else if (this._linkElement !== null) {
-			imageEl.setAttribute('data-image-link', '');
+			imageEl.setAttribute('data-se-image-link', '');
 			if (cover.contains(this._linkElement)) {
 				const newEl = imageEl.cloneNode(true);
 				cover.removeChild(this._linkElement);
@@ -408,7 +408,7 @@ Image_.prototype = {
 
 		// size
 		if (this._resizing) {
-			imageEl.setAttribute('data-proportion', !!this.proportion.checked);
+			imageEl.setAttribute('data-se-proportion', !!this.proportion.checked);
 			if (changeSize) {
 				this.applySize(width, height);
 			}
@@ -483,11 +483,11 @@ Image_.prototype = {
 		let oImg = domUtils.createElement('IMG');
 		oImg.src = src;
 		oImg.alt = alt;
-		oImg.setAttribute('data-rotate', '0');
+		oImg.setAttribute('data-se-rotate', '0');
 		anchor = this._setAnchor(oImg, anchor ? anchor.cloneNode(false) : null);
 
 		if (this._resizing) {
-			oImg.setAttribute('data-proportion', !!this.proportion.checked);
+			oImg.setAttribute('data-se-proportion', !!this.proportion.checked);
 		}
 
 		const figureInfo = Figure.CreateContainer(anchor, 'se-image-container');
@@ -585,8 +585,8 @@ Image_.prototype = {
 	_onRenderBase64: function (update, filesStack, updateElement, anchor, width, height, align, alt) {
 		for (let i = 0, len = filesStack.length; i < len; i++) {
 			if (update) {
-				this._element.setAttribute('data-file-name', filesStack[i].file.name);
-				this._element.setAttribute('data-file-size', filesStack[i].file.size);
+				this._element.setAttribute('data-se-file-name', filesStack[i].file.name);
+				this._element.setAttribute('data-se-file-size', filesStack[i].file.size);
 				this._updateSrc(filesStack[i].result, updateElement, filesStack[i].file);
 			} else {
 				this.create(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt);
@@ -596,8 +596,8 @@ Image_.prototype = {
 
 	_setAnchor: function (imgTag, anchor) {
 		if (anchor) {
-			anchor.setAttribute('data-image-link', 'image');
-			imgTag.setAttribute('data-image-link', anchor.href);
+			anchor.setAttribute('data-se-image-link', 'image');
+			imgTag.setAttribute('data-se-image-link', anchor.href);
 			anchor.appendChild(imgTag);
 			return anchor;
 		}

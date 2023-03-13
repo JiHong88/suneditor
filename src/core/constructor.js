@@ -13,6 +13,7 @@ const DEFAULT_FORMAT_BR_LINE = 'PRE';
 const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|DETAILS';
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
+const DEFAULT_DATA_ATTRS = 'data-se-index|data-se-file-size|data-se-file-name|data-se-origin|data-se-size|data-se-align|data-se-image-link|data-se-rotate|data-se-proportion|data-se-percentage|data-se-font-size|data-se-embed|data-se-exp|data-se-duple';
 
 /**
  * @description document create
@@ -248,6 +249,7 @@ function InitOptions(options, editorTargets) {
 	o.set('formatBlock', _createFormatInfo((options.formatBlock || '') + '|' + o.get('formatClosureBlock').str, (options.__defaultFormatBlock = typeof options.__defaultFormatBlock === 'string' ? options.__defaultFormatBlock : DEFAULT_FORMAT_BLOCK).toLowerCase(), o.get('elementBlacklist')));
 
 	/** __defaults */
+	o.set('__defaultDataAttrs', DEFAULT_DATA_ATTRS);
 	o.set('__defaultElementWhitelist', (typeof options.__defaultElementWhitelist === 'string' ? options.__defaultElementWhitelist : DEFAULT_ELEMENT_WHITELIST).toLowerCase());
 	o.set('__defaultAttributeWhitelist', (typeof options.__defaultAttributeWhitelist === 'string' ? options.__defaultAttributeWhitelist : DEFAULT_ATTRIBUTE_WHITELIST).toLowerCase());
 	// --- create element whitelist (__defaultElementWhiteList + elementWhitelist + format[line, BrLine, Block, Closureblock, ClosureBrLine] - elementBlacklist)

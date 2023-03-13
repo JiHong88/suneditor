@@ -392,7 +392,7 @@ elementBlacklist         : Blacklist of the editor default tags.               d
 attributeWhitelist   : Add attributes whitelist of tags that should be kept undeleted from the editor.   default: null {Object}
                         // -- Fixed whitelist --
                         // Native attributes: 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls'
-                        // Editor attributes: 'data-format|data-size|data-file-size|data-file-name|data-origin|data-align|data-image-link|data-rotate|data-proportion|data-percentage|data-origin-size|data-exp|data-font-size'
+                        // Editor attributes: 'data-se-size|data-se-file-size|data-se-file-name|data-se-origin|data-se-align|data-se-image-link|data-se-rotate|data-se-proportion|data-se-percentage|data-se-origin-size|data-se-exp|data-se-font-size'
                         ex) {
                             'all': 'style|data-.+', // Apply to all tags
                             'input': 'checked|name' // Apply to input tag

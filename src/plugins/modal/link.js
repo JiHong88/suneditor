@@ -30,7 +30,7 @@ Link.prototype = {
 	 * @override core
 	 */
 	active: function (element) {
-		if (element && domUtils.isAnchor(element) && element.getAttribute('data-image-link') === null) {
+		if (element && domUtils.isAnchor(element) && element.getAttribute('data-se-image-link') === null) {
 			const tempLink = this.controller.form.querySelector('a');
 			tempLink.href = element.href;
 			tempLink.title = element.textContent;

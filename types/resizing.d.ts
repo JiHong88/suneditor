@@ -68,7 +68,7 @@ declare interface Figure extends Module {
     _module_sizeRevert(contextPlugin: Object): void;
 
     /**
-     * @description Save the size data (element.setAttribute("data-size"))
+     * @description Save the size data (element.setAttribute("data-se-size"))
      * Used at the "setSize" method
      * @param contextPlugin context object of plugin (core.context[plugin])
      */

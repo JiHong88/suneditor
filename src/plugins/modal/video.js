@@ -201,7 +201,7 @@ Video.prototype = {
 
 		if (!this._setVideoRatioSelect(h)) this.inputY.value = this._onlyPercentage ? this.util.getNumber(h, 2) : h;
 
-		this.proportion.checked = target.getAttribute('data-proportion') !== 'false';
+		this.proportion.checked = target.getAttribute('data-se-proportion') !== 'false';
 		this.inputX.disabled = percentageRotation ? true : false;
 		this.inputY.disabled = percentageRotation ? true : false;
 		this.proportion.disabled = percentageRotation ? true : false;
@@ -294,7 +294,7 @@ Video.prototype = {
 		const changeSize = !isUpdate || inputUpdate;
 
 		if (this._resizing) {
-			oFrame.setAttribute('data-proportion', this.proportion.checked);
+			oFrame.setAttribute('data-se-proportion', this.proportion.checked);
 		}
 
 		// set size
@@ -428,7 +428,7 @@ Video.prototype = {
 		}
 
 		// size
-		const size = (oFrame.getAttribute('data-size') || oFrame.getAttribute('data-origin') || '').split(',');
+		const size = (oFrame.getAttribute('data-se-size') || oFrame.getAttribute('data-se-origin') || '').split(',');
 		this.applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
 
 		// align

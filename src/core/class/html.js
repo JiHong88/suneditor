@@ -47,7 +47,6 @@ const HTML = function (editor) {
 	// whitelist
 	// tags
 	const defaultAttr = options.get('__defaultAttributeWhitelist');
-	const dataAttr = 'data-origin|data-origin-size|data-size|data-file-size|data-file-name|data-align|data-image-link|data-rotate|data-proportion|data-percentage|data-exp|data-font-size';
 	this._allowHTMLComment = options.get('_editorElementWhitelist').indexOf('//') > -1 || options.get('_editorElementWhitelist') === '*';
 	// html check
 	this._htmlCheckWhitelistRegExp = new _w.RegExp('^(' + GetRegList(options.get('_editorElementWhitelist').replace('|//', ''), '') + ')$', 'i');
@@ -71,7 +70,7 @@ const HTML = function (editor) {
 		}
 	}
 
-	this._attributeWhitelistRegExp = new _w.RegExp('\\s(?:' + (allAttr || defaultAttr + '|' + dataAttr) + ')' + regEndStr, 'ig');
+	this._attributeWhitelistRegExp = new _w.RegExp('\\s(?:' + (allAttr || defaultAttr + '|' + options.get('__defaultDataAttrs')) + ')' + regEndStr, 'ig');
 	this._attributeWhitelistRegExp_all_data = new _w.RegExp('\\s(?:' + ((allAttr || defaultAttr) + '|data-[a-z0-9\\-]+') + ')' + regEndStr, 'ig');
 	this._attributeWhitelist = tagsAttr;
 
@@ -1261,7 +1260,7 @@ function CleanElements(lowLevelCheck, m, t) {
 				h = !h ? numbers.get(avh ? avh[1] : '') || '' : h;
 			}
 		}
-		v.push('data-origin="' + (w + ',' + h) + '"');
+		v.push('data-se-origin="' + (w + ',' + h) + '"');
 	}
 
 	if (v) {
