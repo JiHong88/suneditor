@@ -6792,7 +6792,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!siblingNode) {
                 siblingNode = util.getFormatElement(container);
                 siblingNode = siblingNode ? siblingNode[siblingKey] : null;
-                if (siblingNode && !util.isComponent(siblingNode)) siblingNode = siblingKey === 'previousSibling' ? siblingNode.firstElementChild : siblingNode.lastElementChild;
+                if (siblingNode && !util.isComponent(siblingNode)) siblingNode = siblingKey === 'previousSibling' ? siblingNode.firstChild : siblingNode.lastChild;
                 else return null;
             }
 
