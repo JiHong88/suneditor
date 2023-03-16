@@ -5129,7 +5129,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (node.nodeType === 1) {
                 if (util._disallowedTags(node)) return '';
 
-                const ch = util.getListChildNodes(node, function(current) { return util.isSpanWithoutAttr(current); }) || [];
+                const ch = util.getListChildNodes(node, function(current) { return util.isSpanWithoutAttr(current) && !util.getParentElement(current, util.isNotCheckingNode); }) || [];
                 for (let i = ch.length - 1; i >= 0; i--) {
                     ch[i].outerHTML = ch[i].innerHTML;
                 }
