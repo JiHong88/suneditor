@@ -2480,8 +2480,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         detachRangeFormatElement: function (rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush) {
             const range = this.getRange();
-            const so = range.startOffset;
-            const eo = range.endOffset;
+            let so = range.startOffset;
+            let eo = range.endOffset;
 
             let children = util.getListChildNodes(rangeElement, function (current) { return current.parentNode === rangeElement; });
             let parent = rangeElement.parentNode;
@@ -2496,7 +2496,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let moveComplete = false;
 
             function appendNode (parent, insNode, sibling, originNode) {
-                if (util.onlyZeroWidthSpace(insNode)) insNode.innerHTML = util.zeroWidthSpace;
+                if (util.onlyZeroWidthSpace(insNode)) {
+                    insNode.innerHTML = util.zeroWidthSpace;
+                    so = eo = 1;
+                }
 
                 if (insNode.nodeType === 3) {
                     parent.insertBefore(insNode, sibling);
@@ -2665,7 +2668,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 edge = {
                     cc: rangeParent,
                     sc: firstNode,
+                    so: so,
                     ec: rangeRight,
+                    eo: eo,
                     removeArray: removeArray
                 };
             } else {
@@ -2675,7 +2680,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 edge = {
                     cc: (childEdge.sc || childEdge.ec).parentNode,
                     sc: childEdge.sc,
-                    ec: childEdge.ec
+                    so: so,
+                    ec: childEdge.ec,
+                    eo: eo,
+                    removeArray: null
                 };
             }
 
