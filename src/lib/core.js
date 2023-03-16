@@ -1149,7 +1149,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Object}
          */
         getSelection: function () {
-            return this._shadowRoot && this._shadowRoot.getSelection ? this._shadowRoot.getSelection() : this._ww.getSelection();
+            const selection = this._shadowRoot && this._shadowRoot.getSelection ? this._shadowRoot.getSelection() : this._ww.getSelection();
+            if (!context.element.wysiwyg.contains(selection.focusNode)) {
+                selection.removeAllRanges();
+                selection.addRange(this._createDefaultRange());
+            }
+            return selection;
         },
 
         /**
@@ -1218,14 +1223,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         _createDefaultRange: function () {
             const wysiwyg = context.element.wysiwyg;
-            wysiwyg.focus();
             const range = this._wd.createRange();
 
-            let focusEl = wysiwyg.firstElementChild;
-            if (!focusEl) {
-                focusEl = util.createElement(options.defaultTag);
-                focusEl.innerHTML = '<br>';
-                wysiwyg.appendChild(focusEl);
+            let firstFormat = wysiwyg.firstElementChild;
+            let focusEl = null;
+            if (!firstFormat) {
+                firstFormat = util.createElement(options.defaultTag);
+                focusEl = util.createElement('BR');
+                firstFormat.appendChild(focusEl);
+                wysiwyg.appendChild(firstFormat);
+            } else {
+                focusEl = firstFormat.firstChild;
+                if (!focusEl) {
+                    focusEl = util.createElement('BR');
+                    firstFormat.appendChild(focusEl);
+                }
             }
 
             range.setStart(focusEl, 0);
