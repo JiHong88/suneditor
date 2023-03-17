@@ -747,12 +747,13 @@ export default {
         }
 
         // link
+        let isNewAnchor = null;
         const anchor = this.plugins.anchor.createAnchor.call(this, contextImage.anchorCtx, true);
         if (anchor) {
-            if (contextImage._linkElement !== anchor) {
+            if (contextImage._linkElement !== anchor || (isNewContainer && !container.contains(anchor))) {
                 contextImage._linkElement = anchor.cloneNode(false);
                 cover.insertBefore(this.plugins.image.onRender_link.call(this, imageEl, contextImage._linkElement), contextImage._caption);
-                this.util.removeItem(anchor);
+                isNewAnchor = contextImage._element;
             } else {
                 contextImage._linkElement.setAttribute('data-image-link', 'image');
             }
@@ -767,10 +768,11 @@ export default {
             }
         }
 
+        let existElement = null;
         if (isNewContainer) {
-            let existElement = (this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode)) ? 
+            existElement = (this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode)) ? 
                 contextImage._element : 
-                /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
+                this.util.isAnchor(contextImage._element.parentNode) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
                 
             if (this.util.getParentElement(contextImage._element, this.util.isNotCheckingNode)) {
                 contextImage._element.parentNode.replaceChild(container, contextImage._element);
@@ -790,7 +792,7 @@ export default {
                 if (this.util.isFormatElement(existElement.parentNode)) {
                     const formats = existElement.parentNode;
                     formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
-                    this.util.removeItem(existElement);
+                    if (contextImage.__updateTags.map(function (current) { return existElement.contains(current); }).length === 0) this.util.removeItem(existElement);
                 } else {
                     existElement.parentNode.replaceChild(container, existElement);
                 }
@@ -801,6 +803,17 @@ export default {
             contextImage._element = imageEl;
             contextImage._cover = cover;
             contextImage._container = container;
+        }
+
+        if (isNewAnchor) {
+            if (!isNewContainer) {
+                this.util.removeItem(anchor);
+            } else {
+                this.util.removeItem(isNewAnchor);
+                if (this.util.getListChildren(anchor, function (current) { return /IMG/i.test(current.tagName); }).length === 0) {
+                    this.util.removeItem(anchor);
+                }
+            }
         }
 
         // transform
@@ -851,7 +864,7 @@ export default {
         if (!element) return;
         
         const contextImage = this.context.image;
-        contextImage._linkElement = contextImage.anchorCtx.linkAnchor = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
+        contextImage._linkElement = contextImage.anchorCtx.linkAnchor = this.util.isAnchor(element.parentNode) ? element.parentNode : null;
         contextImage._element = element;
         contextImage._cover = this.util.getParentElement(element, 'FIGURE');
         contextImage._container = this.util.getParentElement(element, this.util.isMediaComponent);

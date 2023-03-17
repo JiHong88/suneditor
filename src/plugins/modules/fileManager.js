@@ -133,9 +133,10 @@
             for (let i = 0, len = infoList.length; i < len; i++) {
                 infoIndex[i] = infoList[i].index;
             }
-            
-            for (let i = 0, len = tags.length, tag; i < len; i++) {
-                tag = tags[i];
+            context.__updateTags = tags;
+
+            while (tags.length > 0) {
+                const tag = tags.shift();
                 if (!this.util.getParentElement(tag, this.util.isMediaComponent) || !fileManagerPlugin._checkMediaComponent(tag)) {
                     currentTags.push(context._infoIndex);
                     modifyHandler(tag);
