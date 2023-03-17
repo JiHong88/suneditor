@@ -5207,7 +5207,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         _deleteDisallowedTags: function (html) {
 			html = html
-				.replace(/\n/g, '')
 				.replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '')
 				.replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '');
 
