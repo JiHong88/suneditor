@@ -2146,6 +2146,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 startOff = endOff = 0;
             }
 
+            if (!startCon || !endCon) return  {
+                container: commonCon,
+                offset: 0
+            };
+
             if (startCon === endCon && range.collapsed) {
                 if (startCon.textContent && util.onlyZeroWidthSpace(startCon.textContent.substr(startOff))) {
                     return {

@@ -781,7 +781,7 @@ const util = {
      * @returns {Boolean}
      */
     isEmptyLine: function (element) {
-        return !element || !element.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && this.onlyZeroWidthSpace(element.textContent));
+        return !element || !element.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && element.children.length === 0 && this.onlyZeroWidthSpace(element.textContent));
     },
 
     /**
