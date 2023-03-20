@@ -1664,11 +1664,12 @@ const util = {
     },
 
     /**
-     * @description Delete a empty child node of argument element
+     * @description Delete a empty child node of argument element.
      * @param {Element} element Element node
      * @param {Node|null} notRemoveNode Do not remove node
+     * @param {boolean} forceDelete When all child nodes are deleted, the parent node is also deleted.
      */
-    removeEmptyNode: function (element, notRemoveNode) {
+    removeEmptyNode: function (element, notRemoveNode, forceDelete) {
         const inst = this;
 
         if (notRemoveNode) {
@@ -1695,7 +1696,13 @@ const util = {
             return 0;
         })(element);
 
-        if (element.childNodes.length === 0) element.innerHTML = '<br>';
+        if (element.childNodes.length === 0) {
+            if (forceDelete) {
+                this.removeItem(element);
+            } else {
+                element.innerHTML = '<br>';
+            }
+        }
     },
 
     /**

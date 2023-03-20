@@ -2665,7 +2665,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (rangeElement.children.length === 0 || rangeElement.textContent.length === 0) {
                 util.removeItem(rangeElement);
             } else {
-                util.removeEmptyNode(rangeElement, null);
+                util.removeEmptyNode(rangeElement, null, false);
             }
 
             let edge = null;
@@ -3638,7 +3638,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            util.removeEmptyNode(pNode, newInnerNode);
+            util.removeEmptyNode(pNode, newInnerNode, false);
 
             if (collapsed) {
                 startOffset = startContainer.textContent.length;
@@ -3945,7 +3945,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     element.appendChild(container);
                 }
             } else {
-                util.removeEmptyNode(pNode, newInnerNode);
+                util.removeEmptyNode(pNode, newInnerNode, false);
 
                 if (util.onlyZeroWidthSpace(pNode.textContent)) {
                     container = pNode.firstChild;
@@ -4094,7 +4094,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            util.removeEmptyNode(pNode, newInnerNode);
+            util.removeEmptyNode(pNode, newInnerNode, false);
             util.mergeSameTags(pNode, null, true);
 
             // node change
@@ -4369,7 +4369,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             } else {
                 if (!isRemoveNode && newInnerNode.textContent.length === 0) {
-                    util.removeEmptyNode(pNode, null);
+                    util.removeEmptyNode(pNode, null, false);
                     return {
                         ancestor: null,
                         container: null,
@@ -4377,7 +4377,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     };
                 }
 
-                util.removeEmptyNode(pNode, newInnerNode);
+                util.removeEmptyNode(pNode, newInnerNode, false);
 
                 if (util.onlyZeroWidthSpace(pNode.textContent)) {
                     container = pNode.firstChild;

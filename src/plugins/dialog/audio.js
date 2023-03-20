@@ -470,13 +470,13 @@ export default {
                 const refer = this.util.getParentElement(prevElement, function (current) { return current.parentNode === existElement; });
                 existElement.insertBefore(container, refer);
                 this.util.removeItem(prevElement);
-                this.util.removeEmptyNode(refer, null);
+                this.util.removeEmptyNode(refer, null, true);
             } else if (this.util.isFormatElement(existElement)) {
                 const refer = this.util.getParentElement(prevElement, function (current) { return current.parentNode === existElement; });
                 existElement = this.util.splitElement(existElement, refer);
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(prevElement);
-                this.util.removeEmptyNode(existElement, null);
+                this.util.removeEmptyNode(existElement, null, true);
                 if (existElement.children.length === 0) existElement.innerHTML = this.util.htmlRemoveWhiteSpace(existElement.innerHTML);
             } else {
                 existElement.parentNode.replaceChild(container, existElement);
