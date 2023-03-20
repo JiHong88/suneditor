@@ -5082,7 +5082,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         setContents: function (html) {
             this.removeRange();
             
-            const convertValue = (html === null || html === undefined) ? '' : this.convertContentsForEditor(html);
+            const convertValue = (html === null || html === undefined) ? '' : this.cleanHTML(html, null, null);
             this._resetComponents();
 
             if (!this._variable.isCodeView) {
@@ -5367,7 +5367,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (v) {
                 for (let i = 0, len = v.length; i < len; i++) {
-                    if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i].trim())) continue;
+                    // if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i].trim())) continue;
                     t += ' ' + (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i].trim()) ? '' : v[i]);
                 }
             }

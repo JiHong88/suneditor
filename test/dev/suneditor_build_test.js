@@ -948,7 +948,7 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
     // mode: "inline",
     value: `<p>Instead of buying low and selling high like investing genius Warren Buffet once said, your long-term investment strategy can be even easier than that: Buy low, never sell.</p><p>It can be easy to buy low and sell high when it comes to investing, but this is not a long-term strategy. Instead, you should aim to buy assets that will never go down in value, such as stocks or real estate. This will allow you to make a profit over the long term, even if the market goes down.</p><p>“The Millionaire Next Door” reported that the majority of millionaires never sell their assets. Whether it’s stocks, bonds, real estate, or any alternative asset — one thing remains consistent: They don’t ever sell.</p><p>“Well, how do you make money if you never sell off your assets?“</p><p>It should be noted that “buy and never sell” is a bit of an extreme exaggeration. It’s not that these millionaires have never sold an asset, it’s just that they held onto their assets long into the future.</p><p>Here’s a real-world example. Say you were one of the amazingly smart people who bought a box of Base Set Pokemon cards for $80 in 1998 and never opened them. This unopened box of cards consistently sells for anywhere between $16,000 to $40,000</p>`,
     buttonList:complexEditor,
-    attributesWhitelist: {'all': 'id'},
+    attributesWhitelist: {'all': 'id|class'},
     plugins: plugins,
     katex: Katex,
     // value: 'abc',
@@ -973,12 +973,31 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
     // iframe: true,
     // fullPage: true,
     imageMultipleFile: true,
-    addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header",
+    addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header|section",
     lineAttrReset: 'class'
 });
 
 window.sun_setOptions2 = () => {
-    s2.insertHTML("<img src='https://cdn.britannica.com/56/112156-050-E0CDD0A3/aqueduct-Pont-du-Gard-Roman-France-Nimes.jpg'>")
+    s2.setContents(`<section class="__se__tag content-pages page-brands">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="brand-outer">
+                    <div class="brand-items __se__">
+                        <a href="javascript:void()" target="_blank">
+                            <img src="https://example.com/uploads/images/logo1.png" alt="" />
+                        </a>
+                    </div>
+                    <div class="brand-items">
+                        <a href="javascript:void()" target="_blank">
+                            <img src="https://example.com/uploads/images/logo2.png" alt="" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section><p class="afsdf">fdsafds</p>`)
 }
 
 // s2.setDefaultStyle('font-size: 50px')

@@ -1830,8 +1830,8 @@ const util = {
                 return false;
             }
 
-            const nrtag = !this.getParentElement(current, this.isNotCheckingNode);
             // empty tags
+            const nrtag = !this.getParentElement(current, this.isNotCheckingNode);
             if ((!this.isTable(current) && !this.isListCell(current) && !this.isAnchor(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && nrtag) {
                 emptyTags.push(current);
                 return false;
@@ -1850,6 +1850,13 @@ const util = {
                     withoutFormatCells.push(current);
                     return false;
                 }
+            }
+
+            // class filter
+            if (lowLevelCheck && nrtag && current.className) {
+                const className = new this._w.Array(current.classList).map(this._classNameFilter).join(' ').trim();
+                if (className) current.className = className;
+                else current.removeAttribute('class');
             }
 
             const result = current.parentNode !== documentFragment && nrtag &&
@@ -1919,6 +1926,10 @@ const util = {
             f.innerHTML = (t.textContent.trim().length === 0 && t.children.length === 0) ? '<br>' : t.innerHTML;
             t.innerHTML = f.outerHTML;
         }
+    },
+
+    _classNameFilter: function (v) {
+        return /(^__se__|^se-|katex)/.test(v) ? v : '';
     },
 
     _setDefaultOptionStyle: function (options, defaultStyle) {

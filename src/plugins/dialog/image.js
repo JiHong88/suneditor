@@ -623,8 +623,7 @@ export default {
             const format = this.util.getFormatElement(tag);
             if (format) contextImage._align = format.style.textAlign || format.style.float;
             // link
-            const link = this.util.getParentElement(tag, this.util.isAnchor);
-            if (link && !contextImage.anchorCtx.linkValue) contextImage.anchorCtx.linkValue = ' ';
+            if (this.util.isAnchor(tag.parentNode) && !contextImage.anchorCtx.linkValue) contextImage.anchorCtx.linkValue = ' ';
             
             imagePlugin.update_image.call(this, true, false, true);
             imagePlugin.init.call(this);
@@ -775,7 +774,8 @@ export default {
                 this.util.isAnchor(contextImage._element.parentNode) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
                 
             if (this.util.getParentElement(contextImage._element, this.util.isNotCheckingNode)) {
-                contextImage._element.parentNode.replaceChild(container, contextImage._element);
+                existElement = isNewAnchor ? anchor : contextImage._element;
+                existElement.parentNode.replaceChild(container, existElement);
             } else if (this.util.isListCell(existElement)) {
                 const refer = this.util.getParentElement(contextImage._element, function (current) { return current.parentNode === existElement; });
                 existElement.insertBefore(container, refer);
