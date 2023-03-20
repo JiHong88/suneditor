@@ -1439,7 +1439,7 @@ const util = {
 
         if (baseNode.nodeType === 3) {
             index = this.getPositionIndex(baseNode);
-            if (offset >= 0) {
+            if (offset >= 0 && baseNode.length !== offset) {
                 baseNode.splitText(offset);
                 const after = this.getNodeFromPath([index + 1], bp);
                 if (this.onlyZeroWidthSpace(after)) after.data = this.zeroWidthSpace;
