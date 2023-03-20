@@ -5111,7 +5111,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Object}
          */
         getContents: function (onlyContents) {
-            const contents = this.convertHTMLForCodeView(context.element.wysiwyg, true);
+            const contents = this.cleanHTML(context.element.wysiwyg.innerHTML, null, null);
             const renderHTML = util.createElement('DIV');
             renderHTML.innerHTML = contents;
 
