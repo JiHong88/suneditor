@@ -29,7 +29,7 @@
     "bower_components"
   ],
   "devDependencies": {
-    "@babel/core": "7.0.0",
+    "@babel/core": "^7.21.3",
     "@webpack-cli/init": "^0.2.2",
     "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^0.1.19",
