@@ -7867,7 +7867,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
             
             // user event
-            if (typeof functions.onCopy === 'function' && !functions.onCopy(e, clipboardData, core)) {
+            if (typeof functions.onCopy === 'function' && functions.onCopy(e, clipboardData, core) === false) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -7896,7 +7896,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const clipboardData = util.isIE ? _w.clipboardData : e.clipboardData;
 
             // user event
-            if (typeof functions.onCut === 'function' && !functions.onCut(e, clipboardData, core)) {
+            if (typeof functions.onCut === 'function' && functions.onCut(e, clipboardData, core) === false) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -8001,14 +8001,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // user event - paste
             if (type === 'paste' && typeof functions.onPaste === 'function') {
                 const value = functions.onPaste(e, cleanData, maxCharCount, core);
-                if (!value) return false;
-                if (typeof value === 'string') cleanData = value;
+                if (value === false) {
+                    return false;
+                } else if (typeof value === 'string') {
+                    if (!value) return false;
+                    cleanData = value;
+                }
             }
             // user event - drop
             if (type === 'drop' && typeof functions.onDrop === 'function') {
                 const value = functions.onDrop(e, cleanData, maxCharCount, core);
-                if (!value) return false;
-                if (typeof value === 'string') cleanData = value;
+                if (value === false) {
+                    return false;
+                } else if (typeof value === 'string') {
+                    if (!value) return false;
+                    cleanData = value;
+                }
             }
 
             // files
