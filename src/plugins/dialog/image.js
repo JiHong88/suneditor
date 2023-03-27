@@ -623,8 +623,7 @@ export default {
             const format = this.util.getFormatElement(tag);
             if (format) contextImage._align = format.style.textAlign || format.style.float;
             // link
-            const link = this.util.getParentElement(tag, this.util.isAnchor);
-            if (link && !contextImage.anchorCtx.linkValue) contextImage.anchorCtx.linkValue = ' ';
+            if (this.util.isAnchor(tag.parentNode) && !contextImage.anchorCtx.linkValue) contextImage.anchorCtx.linkValue = ' ';
             
             imagePlugin.update_image.call(this, true, false, true);
             imagePlugin.init.call(this);
@@ -747,12 +746,13 @@ export default {
         }
 
         // link
+        let isNewAnchor = null;
         const anchor = this.plugins.anchor.createAnchor.call(this, contextImage.anchorCtx, true);
         if (anchor) {
-            if (contextImage._linkElement !== anchor) {
+            if (contextImage._linkElement !== anchor || (isNewContainer && !container.contains(anchor))) {
                 contextImage._linkElement = anchor.cloneNode(false);
                 cover.insertBefore(this.plugins.image.onRender_link.call(this, imageEl, contextImage._linkElement), contextImage._caption);
-                this.util.removeItem(anchor);
+                isNewAnchor = contextImage._element;
             } else {
                 contextImage._linkElement.setAttribute('data-image-link', 'image');
             }
@@ -767,28 +767,32 @@ export default {
             }
         }
 
+        let existElement = null;
         if (isNewContainer) {
-            let existElement = (this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode)) ? 
+            existElement = (this.util.isRangeFormatElement(contextImage._element.parentNode) || this.util.isWysiwygDiv(contextImage._element.parentNode)) ? 
                 contextImage._element : 
-                /^A$/i.test(contextImage._element.parentNode.nodeName) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
+                this.util.isAnchor(contextImage._element.parentNode) ? contextImage._element.parentNode : this.util.getFormatElement(contextImage._element) || contextImage._element;
                 
-            if (this.util.isListCell(existElement)) {
+            if (this.util.getParentElement(contextImage._element, this.util.isNotCheckingNode)) {
+                existElement = isNewAnchor ? anchor : contextImage._element;
+                existElement.parentNode.replaceChild(container, existElement);
+            } else if (this.util.isListCell(existElement)) {
                 const refer = this.util.getParentElement(contextImage._element, function (current) { return current.parentNode === existElement; });
                 existElement.insertBefore(container, refer);
                 this.util.removeItem(contextImage._element);
-                this.util.removeEmptyNode(refer, null);
+                this.util.removeEmptyNode(refer, null, true);
             } else if (this.util.isFormatElement(existElement)) {
                 const refer = this.util.getParentElement(contextImage._element, function (current) { return current.parentNode === existElement; });
                 existElement = this.util.splitElement(existElement, refer);
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(contextImage._element);
-                this.util.removeEmptyNode(existElement, null);
+                this.util.removeEmptyNode(existElement, null, true);
                 if (existElement.children.length === 0) existElement.innerHTML = this.util.htmlRemoveWhiteSpace(existElement.innerHTML);
             } else {
                 if (this.util.isFormatElement(existElement.parentNode)) {
                     const formats = existElement.parentNode;
                     formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
-                    this.util.removeItem(existElement);
+                    if (contextImage.__updateTags.map(function (current) { return existElement.contains(current); }).length === 0) this.util.removeItem(existElement);
                 } else {
                     existElement.parentNode.replaceChild(container, existElement);
                 }
@@ -799,6 +803,17 @@ export default {
             contextImage._element = imageEl;
             contextImage._cover = cover;
             contextImage._container = container;
+        }
+
+        if (isNewAnchor) {
+            if (!isNewContainer) {
+                this.util.removeItem(anchor);
+            } else {
+                this.util.removeItem(isNewAnchor);
+                if (this.util.getListChildren(anchor, function (current) { return /IMG/i.test(current.tagName); }).length === 0) {
+                    this.util.removeItem(anchor);
+                }
+            }
         }
 
         // transform
@@ -849,7 +864,7 @@ export default {
         if (!element) return;
         
         const contextImage = this.context.image;
-        contextImage._linkElement = contextImage.anchorCtx.linkAnchor = /^A$/i.test(element.parentNode.nodeName) ? element.parentNode : null;
+        contextImage._linkElement = contextImage.anchorCtx.linkAnchor = this.util.isAnchor(element.parentNode) ? element.parentNode : null;
         contextImage._element = element;
         contextImage._cover = this.util.getParentElement(element, 'FIGURE');
         contextImage._container = this.util.getParentElement(element, this.util.isMediaComponent);

@@ -61,9 +61,9 @@ export default {
      */
     active: function (element) {
         if (!element) {
-            this.util.changeTxt(this.context.fontSize.targetText, this.hasFocus ? (this.options.__defaultFontSize || this.wwComputedStyle.fontSize) : this.lang.toolbar.fontSize);
+            this.util.changeTxt(this.context.fontSize.targetText, this.hasFocus ? this._convertFontSize.call(this, this.options.fontSizeUnit, this.wwComputedStyle.fontSize) : this.lang.toolbar.fontSize);
         } else if (element.style && element.style.fontSize.length > 0) {
-            this.util.changeTxt(this.context.fontSize.targetText, element.style.fontSize);
+            this.util.changeTxt(this.context.fontSize.targetText, this._convertFontSize.call(this, this.options.fontSizeUnit, element.style.fontSize));
             return true;
         }
 

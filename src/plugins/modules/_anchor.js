@@ -129,7 +129,7 @@ export default {
             this.context.dialog.updateModal = true;
             const href = contextAnchor.linkAnchor.getAttribute('href');
             contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = anchorPlugin.selfPathBookmark.call(this, href) ? href.substr(href.lastIndexOf('#')) : href;
-            contextAnchor.anchorText.value = contextAnchor.linkAnchor.textContent || contextAnchor.linkAnchor.getAttribute('alt');
+            contextAnchor.anchorText.value = contextAnchor.linkAnchor.textContent;
             contextAnchor.newWindowCheck.checked = (/_blank/i.test(contextAnchor.linkAnchor.target) ? true : false);
             contextAnchor.downloadCheck.checked = contextAnchor.linkAnchor.download;
         }
@@ -328,10 +328,10 @@ export default {
         contextAnchor.currentRel = anchor.rel.split(" ");
     },
 
-    updateAnchor: function (anchor, url, alt, contextAnchor, notText) {
+    updateAnchor: function (anchor, url, displayText, contextAnchor, notText) {
         // download
         if (!this.plugins.anchor.selfPathBookmark.call(this, url) && contextAnchor.downloadCheck.checked) {
-            anchor.setAttribute('download', alt || url);
+            anchor.setAttribute('download', displayText || url);
         } else {
             anchor.removeAttribute('download');
         }
@@ -345,13 +345,12 @@ export default {
         if (!rel) anchor.removeAttribute('rel');
         else anchor.rel = rel;
 
-        // est url, alt
+        // set url
         anchor.href = url;
-        anchor.setAttribute('alt', alt);
         if (notText) {
             if (anchor.children.length === 0) anchor.textContent = '';
         } else {
-            anchor.textContent = alt;
+            anchor.textContent = displayText;
         }
     },
 
@@ -360,10 +359,10 @@ export default {
         
         const url = contextAnchor.linkValue;
         const anchor = contextAnchor.anchorText;
-        const anchorText = anchor.value.length === 0 ? url : anchor.value;
+        const displayText = anchor.value.length === 0 ? url : anchor.value;
 
         const oA = contextAnchor.linkAnchor || this.util.createElement('A');
-        this.plugins.anchor.updateAnchor.call(this, oA, url, anchorText, contextAnchor, notText);
+        this.plugins.anchor.updateAnchor.call(this, oA, url, displayText, contextAnchor, notText);
 
         contextAnchor.linkValue = contextAnchor.preview.textContent = contextAnchor.urlInput.value = contextAnchor.anchorText.value = '';
 
