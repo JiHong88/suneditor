@@ -126,13 +126,14 @@ export default {
         let topEl = (util.isListCell(firstSel) || util.isComponent(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentNode.previousElementSibling : firstSel.previousElementSibling;
         let bottomEl = (util.isListCell(lastSel) || util.isComponent(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentNode.nextElementSibling : lastSel.nextElementSibling;
 
+        const isCollapsed = range.collapsed;
         const originRange = {
             sc: range.startContainer,
             so: (range.startContainer === range.endContainer && util.onlyZeroWidthSpace(range.startContainer) && range.startOffset === 0 && range.endOffset === 1) ? range.endOffset : range.startOffset,
             ec: range.endContainer,
             eo: range.endOffset
         };
-
+        let afterRange = null;
         let isRemove = true;
 
         for (let i = 0, len = selectedFormats.length; i < len; i++) {
@@ -178,7 +179,7 @@ export default {
                         if (detach && util.isListCell(o.parentNode)) {
                             this.plugins.list._detachNested.call(this, rangeArr.f);
                         } else {
-                            this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
+                            afterRange = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
                         }
                         
                         o = selectedFormats[i].parentNode;
@@ -195,7 +196,7 @@ export default {
                     if (detach && util.isListCell(o.parentNode)) {
                         this.plugins.list._detachNested.call(this, rangeArr.f);
                     } else {
-                        this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
+                        afterRange = this.detachRangeFormatElement(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
                     }
                 }
             }
@@ -285,7 +286,7 @@ export default {
         }
         
         this.effectNode = null;
-        return originRange;
+        return !isCollapsed ? originRange : afterRange;
     },
 
     _detachNested: function (cells) {

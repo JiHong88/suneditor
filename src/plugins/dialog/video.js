@@ -671,17 +671,19 @@ export default {
             if (format) contextVideo._align = format.style.textAlign || format.style.float;
             this.plugins.video.setAlign.call(this, null, oFrame, cover, container);
 
-            if (this.util.isListCell(existElement)) {
+            if (this.util.getParentElement(prevFrame, this.util.isNotCheckingNode)) {
+                prevFrame.parentNode.replaceChild(container, prevFrame);
+            } else if (this.util.isListCell(existElement)) {
                 const refer = this.util.getParentElement(prevFrame, function (current) { return current.parentNode === existElement; });
                 existElement.insertBefore(container, refer);
                 this.util.removeItem(prevFrame);
-                this.util.removeEmptyNode(refer, null);
+                this.util.removeEmptyNode(refer, null, true);
             } else if (this.util.isFormatElement(existElement)) {
                 const refer = this.util.getParentElement(prevFrame, function (current) { return current.parentNode === existElement; });
                 existElement = this.util.splitElement(existElement, refer);
                 existElement.parentNode.insertBefore(container, existElement);
                 this.util.removeItem(prevFrame);
-                this.util.removeEmptyNode(existElement, null);
+                this.util.removeEmptyNode(existElement, null, true);
                 if (existElement.children.length === 0) existElement.innerHTML = this.util.htmlRemoveWhiteSpace(existElement.innerHTML);
             } else {
                 existElement.parentNode.replaceChild(container, existElement);

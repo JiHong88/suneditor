@@ -542,19 +542,25 @@ const util = {
      * @description Add style and className of copyEl to originEl
      * @param {Element} originEl Origin element
      * @param {Element} copyEl Element to copy
+     * @param {Array|null} blacklist Blacklist array(LowerCase)
      */
-    copyTagAttributes: function (originEl, copyEl) {
+    copyTagAttributes: function (originEl, copyEl, blacklist) {
         if (copyEl.style.cssText) {
             originEl.style.cssText += copyEl.style.cssText;
         }
 
-        const classes = copyEl.classList;
-        for (let i = 0, len = classes.length; i < len; i++) {
-            this.addClass(originEl, classes[i]);
+        const attrs = copyEl.attributes;
+        for (let i = 0, len = attrs.length; i < len; i++) {
+            if (blacklist && blacklist.indexOf(attrs[i].name.toLowerCase()) > -1) continue;
+            originEl.setAttribute(attrs[i].name, attrs[i].value);
         }
 
-        if (!originEl.style.cssText) originEl.removeAttribute('style');
-        if (!originEl.className.trim()) originEl.removeAttribute('class');
+        const originAttrs = originEl.attributes;
+        for (let i = 0, len = originAttrs.length; i < len; i++) {
+            if (!originAttrs[i].value) {
+                originEl.removeAttribute(originAttrs[i].name);
+            }
+        }
     },
 
     /**
@@ -775,7 +781,7 @@ const util = {
      * @returns {Boolean}
      */
     isEmptyLine: function (element) {
-        return !element || !element.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && this.onlyZeroWidthSpace(element.textContent));
+        return !element || !element.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && element.children.length === 0 && this.onlyZeroWidthSpace(element.textContent));
     },
 
     /**
@@ -1433,7 +1439,7 @@ const util = {
 
         if (baseNode.nodeType === 3) {
             index = this.getPositionIndex(baseNode);
-            if (offset >= 0) {
+            if (offset >= 0 && baseNode.length !== offset) {
                 baseNode.splitText(offset);
                 const after = this.getNodeFromPath([index + 1], bp);
                 if (this.onlyZeroWidthSpace(after)) after.data = this.zeroWidthSpace;
@@ -1658,11 +1664,12 @@ const util = {
     },
 
     /**
-     * @description Delete a empty child node of argument element
+     * @description Delete a empty child node of argument element.
      * @param {Element} element Element node
      * @param {Node|null} notRemoveNode Do not remove node
+     * @param {boolean} forceDelete When all child nodes are deleted, the parent node is also deleted.
      */
-    removeEmptyNode: function (element, notRemoveNode) {
+    removeEmptyNode: function (element, notRemoveNode, forceDelete) {
         const inst = this;
 
         if (notRemoveNode) {
@@ -1689,7 +1696,13 @@ const util = {
             return 0;
         })(element);
 
-        if (element.childNodes.length === 0) element.innerHTML = '<br>';
+        if (element.childNodes.length === 0) {
+            if (forceDelete) {
+                this.removeItem(element);
+            } else {
+                element.innerHTML = '<br>';
+            }
+        }
     },
 
     /**
@@ -1817,8 +1830,8 @@ const util = {
                 return false;
             }
 
-            const nrtag = !this.getParentElement(current, this.isNotCheckingNode);
             // empty tags
+            const nrtag = !this.getParentElement(current, this.isNotCheckingNode);
             if ((!this.isTable(current) && !this.isListCell(current) && !this.isAnchor(current)) && (this.isFormatElement(current) || this.isRangeFormatElement(current) || this.isTextStyleElement(current)) && current.childNodes.length === 0 && nrtag) {
                 emptyTags.push(current);
                 return false;
@@ -1837,6 +1850,13 @@ const util = {
                     withoutFormatCells.push(current);
                     return false;
                 }
+            }
+
+            // class filter
+            if (lowLevelCheck && nrtag && current.className) {
+                const className = new this._w.Array(current.classList).map(this._classNameFilter).join(' ').trim();
+                if (className) current.className = className;
+                else current.removeAttribute('class');
             }
 
             const result = current.parentNode !== documentFragment && nrtag &&
@@ -1906,6 +1926,10 @@ const util = {
             f.innerHTML = (t.textContent.trim().length === 0 && t.children.length === 0) ? '<br>' : t.innerHTML;
             t.innerHTML = f.outerHTML;
         }
+    },
+
+    _classNameFilter: function (v) {
+        return /(^__se__|^se-|katex)/.test(v) ? v : '';
     },
 
     _setDefaultOptionStyle: function (options, defaultStyle) {
