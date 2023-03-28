@@ -1150,7 +1150,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         getSelection: function () {
             const selection = this._shadowRoot && this._shadowRoot.getSelection ? this._shadowRoot.getSelection() : this._ww.getSelection();
-            if (!context.element.wysiwyg.contains(selection.focusNode)) {
+            if (!this._variable._range && !context.element.wysiwyg.contains(selection.focusNode)) {
                 selection.removeAllRanges();
                 selection.addRange(this._createDefaultRange());
             }
