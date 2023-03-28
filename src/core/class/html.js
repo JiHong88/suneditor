@@ -1200,7 +1200,7 @@ function DisallowedElements(element) {
 function DeleteDisallowedTags(html, whitelistRegExp, blacklistRegExp) {
 	html = html.replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '').replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '');
 
-	if (!whitelistRegExp.test("<font></font>")) {
+	if (whitelistRegExp.test("<font>")) {
 		html = html.replace(/(<\/?)font(\s?)/gi, '$1span$2');
 	}
 

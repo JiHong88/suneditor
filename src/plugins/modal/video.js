@@ -199,7 +199,7 @@ Video.prototype = {
 			this.inputY.value = h === 'auto' ? '' : h;
 		}
 
-		if (!this._setVideoRatioSelect(h)) this.inputY.value = this._onlyPercentage ? this.util.getNumber(h, 2) : h;
+		if (!this._setVideoRatioSelect(h)) this.inputY.value = this._onlyPercentage ? numbers.get(h, 2) : h;
 
 		this.proportion.checked = target.getAttribute('data-se-proportion') !== 'false';
 		this.inputX.disabled = percentageRotation ? true : false;
