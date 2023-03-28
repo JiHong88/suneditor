@@ -4,7 +4,10 @@
  */
 
 import CoreDependency from '../../dependency/_core';
-import { domUtils, unicode } from '../../helper';
+import {
+	domUtils,
+	unicode
+} from '../../helper';
 
 const Selection = function (editor) {
 	CoreDependency.call(this, editor);
@@ -20,7 +23,12 @@ Selection.prototype = {
 	 * @returns {Object}
 	 */
 	get: function () {
-		return this._shadowRoot && this._shadowRoot.getSelection ? this._shadowRoot.getSelection() : this.editor.frameContext.get('_ww').getSelection();
+		const selection = this._shadowRoot && this._shadowRoot.getSelection ? this._shadowRoot.getSelection() : this.editor.frameContext.get('_ww').getSelection();
+		if (!this.editor.frameContext.get('wysiwyg').contains(selection.focusNode)) {
+			selection.removeAllRanges();
+			selection.addRange(this._createDefaultRange());
+		}
+		return selection;
 	},
 
 	/**
@@ -221,13 +229,20 @@ Selection.prototype = {
 	 */
 	_createDefaultRange: function () {
 		const wysiwyg = this.editor.frameContext.get('wysiwyg');
-		wysiwyg.focus();
 		const range = this.editor.frameContext.get('_wd').createRange();
 
-		let focusEl = wysiwyg.firstElementChild;
-		if (!focusEl) {
-			focusEl = domUtils.createElement(this.options.get('defaultLineTag'), null, '<br>');
-			wysiwyg.appendChild(focusEl);
+		let firstFormat = wysiwyg.firstElementChild;
+		let focusEl = null;
+		if (!firstFormat) {
+			focusEl = domUtils.createElement('BR');
+			firstFormat = domUtils.createElement(this.options.get('defaultLineTag'), null, focusEl);
+			wysiwyg.appendChild(firstFormat);
+		} else {
+			focusEl = firstFormat.firstChild;
+			if (!focusEl) {
+				focusEl = domUtils.createElement('BR');
+				firstFormat.appendChild(focusEl);
+			}
 		}
 
 		range.setStart(focusEl, 0);

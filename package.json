@@ -30,7 +30,7 @@
     "bower_components"
   ],
   "devDependencies": {
-    "@babel/core": "7.19.3",
+    "@babel/core": "^7.21.3",
     "@codemirror/lang-html": "^6.1.2",
     "@codemirror/lang-javascript": "^6.1.0",
     "@webpack-cli/init": "^1.1.3",

@@ -4,7 +4,13 @@
  */
 
 import CoreDependency from '../../dependency/_core';
-import { domUtils, converter, numbers, unicode, env } from '../../helper';
+import {
+	domUtils,
+	converter,
+	numbers,
+	unicode,
+	env
+} from '../../helper';
 
 const HTML = function (editor) {
 	CoreDependency.call(this, editor);
@@ -31,14 +37,14 @@ const HTML = function (editor) {
 	const options = this.options;
 	const _w = this._w;
 	const disallowStyleNodes = _w.Object.keys(options.get('_styleNodeMap'));
-	const allowStyleNodes = !options.get('elementWhitelist')
-		? []
-		: options
-				.get('elementWhitelist')
-				.split('|')
-				.filter(function (v) {
-					return /b|i|ins|s|strike/i.test(v);
-				});
+	const allowStyleNodes = !options.get('elementWhitelist') ?
+		[] :
+		options
+		.get('elementWhitelist')
+		.split('|')
+		.filter(function (v) {
+			return /b|i|ins|s|strike/i.test(v);
+		});
 	for (let i = 0; i < allowStyleNodes.length; i++) {
 		disallowStyleNodes.splice(disallowStyleNodes.indexOf(allowStyleNodes[i].toLowerCase()), 1);
 	}
@@ -394,6 +400,9 @@ HTML.prototype = {
 							} else {
 								afterNode = null;
 							}
+						} else if (domUtils.isWysiwygFrame(container) && !this.format.isLine(oNode)) {
+							parentNode = container.appendChild(domUtils.createElement(this.options.get('defaultLineTag')));
+							afterNode = null;
 						} else {
 							afterNode = isFormats ? endCon : container === prevContainer ? container.nextSibling : container;
 							parentNode = !afterNode || !afterNode.parentNode ? commonCon : afterNode.parentNode;
@@ -607,6 +616,11 @@ HTML.prototype = {
 			endCon = commonCon.children[endOff];
 			startOff = endOff = 0;
 		}
+
+		if (!startCon || !endCon) return  {
+			container: commonCon,
+			offset: 0
+		};
 
 		if (startCon === endCon && range.collapsed) {
 			if (startCon.textContent && domUtils.isZeroWith(startCon.textContent.substr(startOff))) {

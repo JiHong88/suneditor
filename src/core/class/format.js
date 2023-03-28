@@ -4,7 +4,12 @@
  */
 
 import CoreDependency from '../../dependency/_core';
-import { domUtils, unicode, numbers, env } from '../../helper';
+import {
+	domUtils,
+	unicode,
+	numbers,
+	env
+} from '../../helper';
 
 const Format = function (editor) {
 	CoreDependency.call(this, editor);
@@ -194,7 +199,7 @@ Format.prototype = {
 			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isLine(currentFormatEl) && !this.isBlock(currentFormatEl) && !this.isBrLine(currentFormatEl) ? currentFormatEl.nodeName : this.options.get('defaultLineTag');
 			oFormat = domUtils.createElement(oFormatName, null, '<br>');
 			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && this.isLine(currentFormatEl))) {
-				domUtils.copyTagAttributes(oFormat, lineNode || currentFormatEl);
+				domUtils.copyTagAttributes(oFormat, lineNode || currentFormatEl, ['id']);
 			}
 		}
 
@@ -420,8 +425,8 @@ Format.prototype = {
 	removeBlock: function (rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush) {
 		const inst = this;
 		const range = this.selection.getRange();
-		const so = range.startOffset;
-		const eo = range.endOffset;
+		let so = range.startOffset;
+		let eo = range.endOffset;
 
 		let children = domUtils.getListChildNodes(rangeElement, function (current) {
 			return current.parentNode === rangeElement;
@@ -438,7 +443,10 @@ Format.prototype = {
 		let moveComplete = false;
 
 		function appendNode(parent, insNode, sibling, originNode) {
-			if (domUtils.isZeroWith(insNode)) insNode.innerHTML = unicode.zeroWidthSpace;
+			if (domUtils.isZeroWith(insNode)) {
+				insNode.innerHTML = unicode.zeroWidthSpace;
+				so = eo = 1;
+			}
 
 			if (insNode.nodeType === 3) {
 				parent.insertBefore(insNode, sibling);
@@ -601,7 +609,7 @@ Format.prototype = {
 		if (rangeElement.children.length === 0 || rangeElement.textContent.length === 0) {
 			domUtils.removeItem(rangeElement);
 		} else {
-			this.node.removeEmptyNode(rangeElement, null);
+			this.node.removeEmptyNode(rangeElement, null, false);
 		}
 
 		let edge = null;
@@ -609,7 +617,9 @@ Format.prototype = {
 			edge = {
 				cc: rangeParent,
 				sc: firstNode,
+				so: so,
 				ec: rangeRight,
+				eo: eo,
 				removeArray: removeArray
 			};
 		} else {
@@ -619,7 +629,10 @@ Format.prototype = {
 			edge = {
 				cc: (childEdge.sc || childEdge.ec).parentNode,
 				sc: childEdge.sc,
-				ec: childEdge.ec
+				so: so,
+				ec: childEdge.ec,
+				eo: eo,
+				removeArray: null
 			};
 		}
 
@@ -712,7 +725,9 @@ Format.prototype = {
 			}.bind(this);
 
 			if (!cancel) {
-				tempList = domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
+				tempList = domUtils.createElement(listTag, {
+					style: 'list-style-type: ' + listStyle
+				});
 			}
 
 			for (let i = 0, len = selectedFormats.length, r, o; i < len; i++) {
@@ -735,7 +750,9 @@ Format.prototype = {
 
 						o = selectedFormats[i].parentNode;
 						if (!cancel) {
-							tempList = domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
+							tempList = domUtils.createElement(listTag, {
+								style: 'list-style-type: ' + listStyle
+							});
 						}
 
 						r = o;
@@ -765,7 +782,9 @@ Format.prototype = {
 			const mergeTop = topEl && topEl.tagName === listTag;
 			const mergeBottom = bottomEl && bottomEl.tagName === listTag;
 
-			let list = mergeTop ? topEl : domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
+			let list = mergeTop ? topEl : domUtils.createElement(listTag, {
+				style: 'list-style-type: ' + listStyle
+			});
 			let firstList = null;
 			let lastList = null;
 			let topNumber = null;
@@ -815,7 +834,9 @@ Format.prototype = {
 				domUtils.removeItem(fTag);
 				if (mergeTop && topNumber === null) topNumber = list.children.length - 1;
 				if (next && (this.getBlock(nextParent, passComponent) !== this.getBlock(originParent, passComponent) || (domUtils.isList(nextParent) && domUtils.isList(originParent) && domUtils.getNodeDepth(nextParent) !== domUtils.getNodeDepth(originParent)))) {
-					list = domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
+					list = domUtils.createElement(listTag, {
+						style: 'list-style-type: ' + listStyle
+					});
 				}
 
 				if (rangeTag && rangeTag.children.length === 0) domUtils.removeItem(rangeTag);
@@ -1477,14 +1498,14 @@ Format.prototype = {
 	getLinesAndComponents: function (removeDuplicate) {
 		const commonCon = this.selection.getRange().commonAncestorContainer;
 		const myComponent = domUtils.getParentElement(commonCon, this.component.is);
-		const selectedLines = domUtils.isTable(commonCon)
-			? this.getLines(null)
-			: this.getLines(
-					function (current) {
-						const component = domUtils.getParentElement(current, this.component.is);
-						return (this.isLine(current) && (!component || component === myComponent)) || (this.component.is(current) && !this.getLine(current));
-					}.bind(this)
-			  );
+		const selectedLines = domUtils.isTable(commonCon) ?
+			this.getLines(null) :
+			this.getLines(
+				function (current) {
+					const component = domUtils.getParentElement(current, this.component.is);
+					return (this.isLine(current) && (!component || component === myComponent)) || (this.component.is(current) && !this.getLine(current));
+				}.bind(this)
+			);
 
 		if (removeDuplicate) {
 			for (let i = 0, len = selectedLines.length; i < len; i++) {
@@ -1664,11 +1685,11 @@ Format.prototype = {
 	 * @private
 	 */
 	_applyNestedList: function (selectedCells, nested) {
-		selectedCells = !selectedCells
-			? this.getLines().filter(function (el) {
-					return domUtils.isListCell(el);
-			  })
-			: selectedCells;
+		selectedCells = !selectedCells ?
+			this.getLines().filter(function (el) {
+				return domUtils.isListCell(el);
+			}) :
+			selectedCells;
 		const cellsLen = selectedCells.length;
 		if (cellsLen === 0 || (!nested && !domUtils.isListCell(selectedCells[0].previousElementSibling) && !domUtils.isListCell(selectedCells[cellsLen - 1].nextElementSibling))) {
 			return {
@@ -2180,7 +2201,7 @@ Format.prototype = {
 			}
 		}
 
-		this.node.removeEmptyNode(pNode, newInnerNode);
+		this.node.removeEmptyNode(pNode, newInnerNode, false);
 
 		if (collapsed) {
 			startOffset = startContainer.textContent.length;
@@ -3116,8 +3137,8 @@ Format.prototype = {
 			if (
 				s.length === 0 ||
 				(ec.some(function (k) {
-					return s.indexOf(k) === -1;
-				}) &&
+						return s.indexOf(k) === -1;
+					}) &&
 					s.some(function (k) {
 						ec.indexOf(k) > -1;
 					}))

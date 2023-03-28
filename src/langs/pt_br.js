@@ -1,13 +1,13 @@
 (function (global, factory) {
 	if (typeof module === 'object' && typeof module.exports === 'object') {
-		module.exports = global.document
-			? factory(global, true)
-			: function (w) {
-					if (!w.document) {
-						throw new Error('SUNEDITOR_LANG a window with a document');
-					}
-					return factory(w);
-			  };
+		module.exports = global.document ?
+			factory(global, true) :
+			function (w) {
+				if (!w.document) {
+					throw new Error('SUNEDITOR_LANG a window with a document');
+				}
+				return factory(w);
+			};
 	} else {
 		factory(global);
 	}
@@ -33,13 +33,13 @@
 		align: 'Alinhar',
 		alignLeft: 'Alinhar à esquerda',
 		alignRight: 'Alinhar à direita',
-		alignCenter: 'Alinhar ao centro',
-		alignJustify: 'Alinhat justificado',
+		alignCenter: 'Centralizar',
+		alignJustify: 'Justificar',
 		list: 'Lista',
 		orderList: 'Lista ordenada',
 		unorderList: 'Lista desordenada',
 		horizontalLine: 'Linha horizontal',
-		hr_solid: 'solida',
+		hr_solid: 'sólida',
 		hr_dotted: 'pontilhada',
 		hr_dashed: 'tracejada',
 		table: 'Tabela',
@@ -54,7 +54,7 @@
 		undo: 'Voltar',
 		redo: 'Refazer',
 		preview: 'Prever',
-		print: 'imprimir',
+		print: 'Imprimir',
 		tag_p: 'Paragráfo',
 		tag_div: '(DIV) Normal',
 		tag_h: 'Cabeçalho',
@@ -65,7 +65,7 @@
 		paragraphStyle: 'Estilo do parágrafo',
 		textStyle: 'Estilo do texto',
 		imageGallery: 'Galeria de imagens',
-		dir_ltr: 'Da esquerda para direita',
+		dir_ltr: 'Esquerda para direita',
 		dir_rtl: 'Direita para esquerda',
 		mention: 'Menção',
 		tags: 'Tag',
@@ -74,7 +74,7 @@
 		close: 'Fechar',
 		submitButton: 'Enviar',
 		revertButton: 'Reverter',
-		proportion: 'restringir proporções',
+		proportion: 'Restringir proporções',
 		basic: 'Básico',
 		left: 'Esquerda',
 		right: 'Direita',
@@ -84,14 +84,14 @@
 		size: 'Tamanho',
 		ratio: 'Proporções',
 		edit: 'Editar',
-		unlink: 'Retirar link',
+		unlink: 'Remover link',
 		remove: 'Remover',
 		link_modal_title: 'Inserir link',
 		link_modal_url: 'URL para link',
-		link_modal_text: 'Texto à mostrar',
+		link_modal_text: 'Texto a mostrar',
 		link_modal_newWindowCheck: 'Abrir em nova guia',
 		link_modal_downloadLinkCheck: 'Link para Download',
-		link_modal_bookmark: 'marca páginas',
+		link_modal_bookmark: 'marcar páginas',
 		math_modal_title: 'Matemática',
 		math_modal_inputLabel: 'Notação matemática',
 		math_modal_fontSizeLabel: 'Tamanho',
@@ -103,9 +103,9 @@
 		video_modal_title: 'Inserir vídeo',
 		video_modal_file: 'Selecionar arquivos',
 		video_modal_url: 'URL do YouTube/Vimeo',
-		audio_modal_title: 'Inserir audio',
+		audio_modal_title: 'Inserir áudio',
 		audio_modal_file: 'Selecionar arquivos',
-		audio_modal_url: 'URL da audio',
+		audio_modal_url: 'URL da áudio',
 		insertRowAbove: 'Inserir linha acima',
 		insertRowBelow: 'Inserir linha abaixo',
 		deleteRow: 'Deletar linha',
@@ -122,8 +122,8 @@
 		mirrorVertical: 'Espelho, Vertical',
 		rotateLeft: 'Girar para esquerda',
 		rotateRight: 'Girar para direita',
-		maxSize: 'Tam max',
-		minSize: 'Tam min',
+		maxSize: 'Tam máx',
+		minSize: 'Tam mín',
 		tableHeader: 'Cabeçalho da tabela',
 		mergeCells: 'Mesclar células',
 		splitCells: 'Dividir células',
@@ -131,7 +131,7 @@
 		verticalSplit: 'Divisão vertical',
 		menu_spaced: 'Espaçado',
 		menu_bordered: 'Com borda',
-		menu_neon: 'Néon',
+		menu_neon: 'Neon',
 		menu_translucent: 'Translúcido',
 		menu_shadow: 'Sombreado',
 		menu_code: 'Código'

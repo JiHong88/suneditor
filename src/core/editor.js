@@ -1,5 +1,13 @@
-import Helper, { env, converter, domUtils, numbers } from '../helper';
-import Constructor, { ResetOptions, UpdateButton } from './constructor';
+import Helper, {
+	env,
+	converter,
+	domUtils,
+	numbers
+} from '../helper';
+import Constructor, {
+	ResetOptions,
+	UpdateButton
+} from './constructor';
 
 // class dependency
 import ClassDependency from '../dependency/_classes';
@@ -319,6 +327,12 @@ const Editor = function (multiTargets, options) {
 	 * @description Parser
 	 */
 	this._parser = new _w.DOMParser();
+
+	/**
+	 * @description Temp variable for set line attrs
+	 * @private
+	 */
+	this._formatAttrsTemp = null
 
 	/** ----- Create editor ------------------------------------------------------------ */
 	const inst = this;
@@ -1403,11 +1417,11 @@ Editor.prototype = {
 
 	__callResizeFunction: function (h, resizeObserverEntry) {
 		h =
-			h === -1
-				? resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0]
-					? resizeObserverEntry.borderBoxSize[0].blockSize
-					: resizeObserverEntry.contentRect.height + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-right'))
-				: h;
+			h === -1 ?
+			resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0] ?
+			resizeObserverEntry.borderBoxSize[0].blockSize :
+			resizeObserverEntry.contentRect.height + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-right')) :
+			h;
 		if (this._editorHeight !== h) {
 			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, this._editorHeight, resizeObserverEntry);
 			this._editorHeight = h;
