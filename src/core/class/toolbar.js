@@ -3,9 +3,13 @@
  * @author Yi JiHong.
  */
 
-import { domUtils } from '../../helper';
+import {
+	domUtils
+} from '../../helper';
 import CoreDependency from '../../dependency/_core';
-import { CreateToolBar } from '../constructor';
+import {
+	CreateToolBar
+} from '../constructor';
 
 const Toolbar = function (editor) {
 	CoreDependency.call(this, editor);
@@ -59,6 +63,8 @@ Toolbar.prototype = {
 			this.context.get('toolbar.main').style.display = '';
 			this.editor.frameContext.get('_stickyDummy').style.display = '';
 		}
+
+		this.eventManager._resetFrameStatus();
 	},
 
 	/**
@@ -73,9 +79,14 @@ Toolbar.prototype = {
 			this.context.get('toolbar.main').style.display = 'none';
 			this.editor.frameContext.get('_stickyDummy').style.display = 'none';
 			if (this.editorisBalloon) {
-				this._balloonOffset = { top: 0, left: 0 };
+				this._balloonOffset = {
+					top: 0,
+					left: 0
+				};
 			}
 		}
+
+		this.eventManager._resetFrameStatus();
 	},
 
 	/**

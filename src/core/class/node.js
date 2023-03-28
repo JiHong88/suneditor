@@ -4,7 +4,12 @@
  */
 
 import CoreDependency from '../../dependency/_core';
-import { domUtils, unicode, env, numbers } from '../../helper';
+import {
+	domUtils,
+	unicode,
+	env,
+	numbers
+} from '../../helper';
 
 const Node_ = function (editor) {
 	CoreDependency.call(this, editor);
@@ -52,7 +57,7 @@ Node_.prototype = {
 
 		if (baseNode.nodeType === 3) {
 			index = domUtils.getPositionIndex(baseNode);
-			if (offset >= 0) {
+			if (offset >= 0 && baseNode.length !== offset) {
 				baseNode.splitText(offset);
 				const after = domUtils.getNodeFromPath([index + 1], bp);
 				if (domUtils.isZeroWith(after)) after.data = unicode.zeroWidthSpace;
@@ -320,8 +325,9 @@ Node_.prototype = {
 	 * @description Delete a empty child node of argument element
 	 * @param {Element} element Element node
 	 * @param {Node|null} notRemoveNode Do not remove node
+	 * @param {boolean} forceDelete When all child nodes are deleted, the parent node is also deleted.
 	 */
-	removeEmptyNode: function (element, notRemoveNode) {
+	removeEmptyNode: function (element, notRemoveNode, forceDelete) {
 		const inst = this;
 
 		if (notRemoveNode) {
@@ -348,7 +354,13 @@ Node_.prototype = {
 			return 0;
 		})(element);
 
-		if (element.childNodes.length === 0) element.innerHTML = '<br>';
+		if (element.childNodes.length === 0) {
+			if (forceDelete) {
+				domUtils.removeItem(element);
+			} else {
+				element.innerHTML = '<br>';
+			}
+		}
 	},
 
 	/**

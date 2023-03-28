@@ -1,6 +1,14 @@
 import EditorDependency from '../../dependency';
-import { Modal, Figure, FileManager, ModalAnchorEditor } from '../../modules';
-import { domUtils, numbers } from '../../helper';
+import {
+	Modal,
+	Figure,
+	FileManager,
+	ModalAnchorEditor
+} from '../../modules';
+import {
+	domUtils,
+	numbers
+} from '../../helper';
 
 const Image_ = function (editor, target) {
 	// plugin bisic properties
@@ -28,8 +36,15 @@ const Image_ = function (editor, target) {
 	// modules
 	this.anchor = new ModalAnchorEditor(this, modalEl);
 	this.modal = new Modal(this, modalEl);
-	this.figure = new Figure(this, figureControls, { sizeUnit: options.get('_imageSizeUnit') });
-	this.fileManager = new FileManager(this, { tagNames: ['img'], eventHandler: this.events.onImageUpload, checkHandler: FileCheckHandler.bind(this), figure: this.figure });
+	this.figure = new Figure(this, figureControls, {
+		sizeUnit: options.get('_imageSizeUnit')
+	});
+	this.fileManager = new FileManager(this, {
+		tagNames: ['img'],
+		eventHandler: this.events.onImageUpload,
+		checkHandler: FileCheckHandler.bind(this),
+		figure: this.figure
+	});
 
 	// members
 	this.imgInputFile = modalEl.querySelector('._se_image_file');
@@ -51,7 +66,10 @@ const Image_ = function (editor, target) {
 	this._cover = null;
 	this._container = null;
 	this._caption = null;
-	this._ratio = { w: 1, h: 1 };
+	this._ratio = {
+		w: 1,
+		h: 1
+	};
 	this._origin_w = options.get('imageWidth') === 'auto' ? '' : options.get('imageWidth');
 	this._origin_h = options.get('imageHeight') === 'auto' ? '' : options.get('imageHeight');
 	this._resizing = options.get('imageResizing');
@@ -146,7 +164,10 @@ Image_.prototype = {
 		this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]').checked = true;
 		this.captionCheckEl.checked = false;
 		this._element = null;
-		this._ratio = { w: 1, h: 1 };
+		this._ratio = {
+			w: 1,
+			h: 1
+		};
 		this._openTab('init');
 
 		if (this._resizing) {
@@ -173,7 +194,7 @@ Image_.prototype = {
 	ready: function (target) {
 		if (!target) return;
 		const figureInfo = this.figure.open(target, this._nonResizing);
-		this.anchor.set(/^A$/i.test(target.parentNode.nodeName) ? target.parentNode : null);
+		this.anchor.set(domUtils.isAnchor(target.parentNode) ? target.parentNode : null);
 
 		this._linkElement = this.anchor.currentTarget;
 		this._element = target;
@@ -212,7 +233,10 @@ Image_.prototype = {
 		this.inputY.disabled = percentageRotation ? true : false;
 		this.proportion.disabled = percentageRotation ? true : false;
 
-		this._ratio = this.proportion.checked ? figureInfo.ratio : { w: 1, h: 1 };
+		this._ratio = this.proportion.checked ? figureInfo.ratio : {
+			w: 1,
+			h: 1
+		};
 	},
 
 	/**
@@ -258,7 +282,11 @@ Image_.prototype = {
 		const currentSize = this.fileManager.getSize();
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + limitSize / 1000 + 'KB';
-			if (typeof this.events.onImageUploadError !== 'function' || this.events.onImageUploadError(err, { limitSize: limitSize, currentSize: currentSize, uploadSize: fileSize })) {
+			if (typeof this.events.onImageUploadError !== 'function' || this.events.onImageUploadError(err, {
+					limitSize: limitSize,
+					currentSize: currentSize,
+					uploadSize: fileSize
+				})) {
 				this.notice.open(err);
 			}
 			return false;
@@ -299,7 +327,10 @@ Image_.prototype = {
 		if (!url) url = this._linkValue;
 		if (!url) return false;
 
-		const file = { name: url.split('/').pop(), size: 0 };
+		const file = {
+			name: url.split('/').pop(),
+			size: 0
+		};
 		if (this.modal.isUpdate) this._updateSrc(url, this._element, file);
 		else this.create(url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
 
@@ -352,12 +383,13 @@ Image_.prototype = {
 		}
 
 		// link
+		let isNewAnchor = null;
 		const anchor = this.anchor.create(true);
 		if (anchor) {
-			if (this._linkElement !== anchor) {
+			if (this._linkElement !== anchor || (isNewContainer && !container.contains(anchor))) {
 				this._linkElement = anchor.cloneNode(false);
 				cover.insertBefore(this._setAnchor(imageEl, this._linkElement), this._caption);
-				domUtils.removeItem(anchor);
+				isNewAnchor = this._element;
 			} else {
 				this._linkElement.setAttribute('data-se-image-link', 'image');
 			}
@@ -371,17 +403,21 @@ Image_.prototype = {
 			}
 		}
 
+		let existElement = null;
 		if (isNewContainer) {
 			imageEl = this._element;
-			let existElement = this.format.isBlock(imageEl.parentNode) || domUtils.isWysiwygFrame(imageEl.parentNode) ? imageEl : /^A$/i.test(imageEl.parentNode.nodeName) ? imageEl.parentNode : this.format.getLine(imageEl) || imageEl;
+			existElement = this.format.isBlock(imageEl.parentNode) || domUtils.isWysiwygFrame(imageEl.parentNode) ? imageEl : domUtils.isAnchor(imageEl.parentNode) ? imageEl.parentNode : this.format.getLine(imageEl) || imageEl;
 
-			if (domUtils.isListCell(existElement)) {
+			if (domUtils.getParentElement(this._element, domUtils.isNotCheckingNode)) {
+				existElement = isNewAnchor ? anchor : this._element;
+				existElement.parentNode.replaceChild(container, existElement);
+			} else if (domUtils.isListCell(existElement)) {
 				const refer = domUtils.getParentElement(imageEl, function (current) {
 					return current.parentNode === existElement;
 				});
 				existElement.insertBefore(container, refer);
 				domUtils.removeItem(imageEl);
-				this.node.removeEmptyNode(refer, null);
+				this.node.removeEmptyNode(refer, null, true);
 			} else if (this.format.isLine(existElement)) {
 				const refer = domUtils.getParentElement(imageEl, function (current) {
 					return current.parentNode === existElement;
@@ -389,13 +425,15 @@ Image_.prototype = {
 				existElement = this.node.split(existElement, refer);
 				existElement.parentNode.insertBefore(container, existElement);
 				domUtils.removeItem(imageEl);
-				this.node.removeEmptyNode(existElement, null);
+				this.node.removeEmptyNode(existElement, null, true);
 				if (existElement.children.length === 0) existElement.innerHTML = this.node.removeWhiteSpace(existElement.innerHTML);
 			} else {
 				if (this.format.isLine(existElement.parentNode)) {
 					const formats = existElement.parentNode;
 					formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
-					domUtils.removeItem(existElement);
+					if (this.fileManager.__updateTags.map(function (current) {
+							return existElement.contains(current);
+						}).length === 0) domUtils.removeItem(existElement);
 				} else {
 					existElement.parentNode.replaceChild(container, existElement);
 				}
@@ -411,6 +449,19 @@ Image_.prototype = {
 			imageEl.setAttribute('data-se-proportion', !!this.proportion.checked);
 			if (changeSize) {
 				this.applySize(width, height);
+			}
+		}
+
+		if (isNewAnchor) {
+			if (!isNewContainer) {
+				domUtils.removeItem(anchor);
+			} else {
+				domUtils.removeItem(isNewAnchor);
+				if (domUtils.getListChildren(anchor, function (current) {
+						return /IMG/i.test(current.tagName);
+					}).length === 0) {
+					domUtils.removeItem(anchor);
+				}
 			}
 		}
 
@@ -526,7 +577,10 @@ Image_.prototype = {
 		const fileList = response.result;
 
 		for (let i = 0, len = fileList.length, file; i < len; i++) {
-			file = { name: fileList[i].name, size: fileList[i].size };
+			file = {
+				name: fileList[i].name,
+				size: fileList[i].size
+			};
 			if (info.isUpdate) {
 				this._updateSrc(fileList[i].url, info.element, file);
 				break;
@@ -566,7 +620,10 @@ Image_.prototype = {
 				file = files[i];
 
 				reader.onload = function (reader, update, updateElement, file, index) {
-					filesStack[index] = { result: reader.result, file: file };
+					filesStack[index] = {
+						result: reader.result,
+						file: file
+					};
 
 					if (--this._base64RenderIndex === 0) {
 						this._onRenderBase64(update, filesStack, updateElement, anchor, width, height, align, alt);
@@ -617,11 +674,11 @@ Image_.prototype = {
 
 function FileCheckHandler(element) {
 	this.ready(element);
+
 	const line = this.format.getLine(element);
 	if (line) this._align = line.style.textAlign || line.style.float;
 
 	this._update(this._origin_w, this._origin_h);
-
 	return element;
 }
 
@@ -665,7 +722,10 @@ function OnInputSize(xy, e) {
 }
 
 function OnChangeRatio() {
-	this._ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : { w: 1, h: 1 };
+	this._ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : {
+		w: 1,
+		h: 1
+	};
 }
 
 function OnClickRevert() {
@@ -856,7 +916,9 @@ function CreateHTML_modal(editor) {
 		'</div>' +
 		'</form>';
 
-	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
+	return domUtils.createElement('DIV', {
+		class: 'se-modal-content'
+	}, html);
 }
 
 export default Image_;

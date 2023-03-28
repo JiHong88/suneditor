@@ -678,13 +678,14 @@ Format.prototype = {
 		let topEl = (domUtils.isListCell(firstSel) || this.component.is(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentNode.previousElementSibling : firstSel.previousElementSibling;
 		let bottomEl = (domUtils.isListCell(lastSel) || this.component.is(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentNode.nextElementSibling : lastSel.nextElementSibling;
 
+		const isCollapsed = range.collapsed;
 		const originRange = {
 			sc: range.startContainer,
 			so: range.startContainer === range.endContainer && domUtils.isZeroWith(range.startContainer) && range.startOffset === 0 && range.endOffset === 1 ? range.endOffset : range.startOffset,
 			ec: range.endContainer,
 			eo: range.endOffset
 		};
-
+		let afterRange = null;
 		let isRemove = true;
 
 		for (let i = 0, len = selectedFormats.length; i < len; i++) {
@@ -745,7 +746,7 @@ Format.prototype = {
 						if (nested && domUtils.isListCell(o.parentNode)) {
 							this._detachNested(rangeArr.f);
 						} else {
-							this.removeBlock(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
+							afterRange = this.removeBlock(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
 						}
 
 						o = selectedFormats[i].parentNode;
@@ -769,7 +770,7 @@ Format.prototype = {
 					if (nested && domUtils.isListCell(o.parentNode)) {
 						this._detachNested(rangeArr.f);
 					} else {
-						this.removeBlock(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
+						afterRange = this.removeBlock(rangeArr.f[0].parentNode, rangeArr.f, tempList, false, true);
 					}
 				}
 			}
@@ -855,7 +856,7 @@ Format.prototype = {
 		}
 
 		this.editor.effectNode = null;
-		return originRange;
+		return !isCollapsed ? originRange : afterRange;
 	},
 
 	/**
@@ -2517,7 +2518,7 @@ Format.prototype = {
 				element.appendChild(container);
 			}
 		} else {
-			this.node.removeEmptyNode(pNode, newInnerNode);
+			this.node.removeEmptyNode(pNode, newInnerNode, false);
 
 			if (domUtils.isZeroWith(pNode.textContent)) {
 				container = pNode.firstChild;
@@ -2675,7 +2676,7 @@ Format.prototype = {
 			}
 		}
 
-		this.node.removeEmptyNode(pNode, newInnerNode);
+		this.node.removeEmptyNode(pNode, newInnerNode, false);
 		this.node.mergeSameTags(pNode, null, true);
 
 		// node change
@@ -2956,7 +2957,7 @@ Format.prototype = {
 			}
 		} else {
 			if (!isRemoveNode && newInnerNode.textContent.length === 0) {
-				this.node.removeEmptyNode(pNode, null);
+				this.node.removeEmptyNode(pNode, null, false);
 				return {
 					ancestor: null,
 					container: null,
@@ -2964,7 +2965,7 @@ Format.prototype = {
 				};
 			}
 
-			this.node.removeEmptyNode(pNode, newInnerNode);
+			this.node.removeEmptyNode(pNode, newInnerNode, false);
 
 			if (domUtils.isZeroWith(pNode.textContent)) {
 				container = pNode.firstChild;

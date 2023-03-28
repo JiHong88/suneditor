@@ -1,5 +1,11 @@
-import { _d, _w } from './env';
-import { onlyZeroWidthRegExp, zeroWidthRegExp } from './unicode';
+import {
+	_d,
+	_w
+} from './env';
+import {
+	onlyZeroWidthRegExp,
+	zeroWidthRegExp
+} from './unicode';
 
 /**
  * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (unicode.zeroWidthSpace)
@@ -531,19 +537,25 @@ export function prevIndex(array, item) {
  * @description Add style and className of copyEl to originEl
  * @param {Element} originEl Origin element
  * @param {Element} copyEl Element to copy
+ * @param {Array.<string>|null} blacklist Blacklist array(LowerCase)
  */
-export function copyTagAttributes(originEl, copyEl) {
+export function copyTagAttributes(originEl, copyEl, blacklist) {
 	if (copyEl.style.cssText) {
 		originEl.style.cssText += copyEl.style.cssText;
 	}
 
-	const classes = copyEl.classList;
-	for (let i = 0, len = classes.length; i < len; i++) {
-		addClass(originEl, classes[i]);
+	const attrs = copyEl.attributes;
+	for (let i = 0, len = attrs.length; i < len; i++) {
+		if (blacklist && blacklist.indexOf(attrs[i].name.toLowerCase()) > -1) continue;
+		originEl.setAttribute(attrs[i].name, attrs[i].value);
 	}
 
-	if (!originEl.style.cssText) originEl.removeAttribute('style');
-	if (!originEl.className.trim()) originEl.removeAttribute('class');
+	const originAttrs = originEl.attributes;
+	for (let i = 0, len = originAttrs.length; i < len; i++) {
+		if (!originAttrs[i].value) {
+			originEl.removeAttribute(originAttrs[i].name);
+		}
+	}
 }
 
 /**
@@ -823,7 +835,7 @@ export function isMedia(node) {
  * @returns {boolean}
  */
 export function isEmptyLine(element) {
-	return !element || !element.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && isZeroWith(element.textContent));
+	return !element || !element.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && element.children.length === 0 && isZeroWith(element.textContent));
 }
 
 /**
@@ -851,6 +863,19 @@ export function isUneditable(element) {
  */
 export function isImportantDisabled(element) {
 	return element.hasAttribute('data-important-disabled');
+}
+
+export function isAllowClassName(v) {
+	return /^(__se__|se-|katex)/.test(v) ? v : '';
+}
+
+/**
+ * @description It is judged whether it is the not checking node. (class="katex", "__se__block")
+ * @param {Node} element The node to check
+ * @returns {boolean}
+ */
+export function isNotCheckingNode(element) {
+	return element && /\b(katex|__se__block)\b/.test(element.className);
 }
 
 /**
@@ -919,7 +944,9 @@ const domUtils = {
 	isSpanWithoutAttr: isSpanWithoutAttr,
 	isUneditable: isUneditable,
 	isImportantDisabled: isImportantDisabled,
-	getScrollParent: getScrollParent
+	isAllowClassName: isAllowClassName,
+	isNotCheckingNode: isNotCheckingNode,
+	getScrollParent: getScrollParent,
 };
 
 export default domUtils;

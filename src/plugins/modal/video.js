@@ -436,13 +436,15 @@ Video.prototype = {
 		if (format) this._align = format.style.textAlign || format.style.float;
 		this.figure.setAlign(oFrame, this._align);
 
-		if (domUtils.isListCell(existElement)) {
+		if (domUtils.getParentElement(prevFrame, domUtils.isNotCheckingNode)) {
+			prevFrame.parentNode.replaceChild(container, prevFrame);
+		} else if (domUtils.isListCell(existElement)) {
 			const refer = domUtils.getParentElement(prevFrame, function (current) {
 				return current.parentNode === existElement;
 			});
 			existElement.insertBefore(container, refer);
 			domUtils.removeItem(prevFrame);
-			this.node.removeEmptyNode(refer, null);
+			this.node.removeEmptyNode(refer, null, true);
 		} else if (this.format.isLine(existElement)) {
 			const refer = domUtils.getParentElement(prevFrame, function (current) {
 				return current.parentNode === existElement;
@@ -450,7 +452,7 @@ Video.prototype = {
 			existElement = this.node.split(existElement, refer);
 			existElement.parentNode.insertBefore(container, existElement);
 			domUtils.removeItem(prevFrame);
-			this.node.removeEmptyNode(existElement, null);
+			this.node.removeEmptyNode(existElement, null, true);
 			if (existElement.children.length === 0) existElement.innerHTML = this.node.removeWhiteSpace(existElement.innerHTML);
 		} else {
 			existElement.parentNode.replaceChild(container, existElement);

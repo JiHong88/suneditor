@@ -37,8 +37,7 @@ const HTML = function (editor) {
 	const options = this.options;
 	const _w = this._w;
 	const disallowStyleNodes = _w.Object.keys(options.get('_styleNodeMap'));
-	const allowStyleNodes = !options.get('elementWhitelist') ?
-		[] :
+	const allowStyleNodes = !options.get('elementWhitelist') ? [] :
 		options
 		.get('elementWhitelist')
 		.split('|')
@@ -617,7 +616,7 @@ HTML.prototype = {
 			startOff = endOff = 0;
 		}
 
-		if (!startCon || !endCon) return  {
+		if (!startCon || !endCon) return {
 			container: commonCon,
 			offset: 0
 		};
@@ -815,7 +814,7 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @description Returns HTML string according to tag type and configuration.
+	 * @description Returns HTML string according to tag type and configurati isNotCheckingNodeon.
 	 * @param {Node} node Node
 	 * @param {boolean} requireFormat If true, text nodes that do not have a format node is wrapped with the format tag.
 	 * @private
@@ -826,7 +825,9 @@ HTML.prototype = {
 		if (node.nodeType === 1) {
 			if (DisallowedElements(node)) return '';
 
-			const ch = domUtils.getListChildNodes(node, domUtils.isSpanWithoutAttr) || [];
+			const ch = domUtils.getListChildNodes(node, function (current) {
+				return domUtils.isSpanWithoutAttr(current) && !domUtils.getParentElement(current, domUtils.isNotCheckingNode);
+			}) || [];
 			for (let i = ch.length - 1; i >= 0; i--) {
 				ch[i].outerHTML = ch[i].innerHTML;
 			}
@@ -857,16 +858,6 @@ HTML.prototype = {
 	},
 
 	/**
-	 * @description It is judged whether it is the not checking node. (class="katex", "__se__block")
-	 * @param {Node} element The node to check
-	 * @returns {boolean}
-	 * @private
-	 */
-	_isNotCheckingNode: function (element) {
-		return element && /katex|__se__block/.test(element.className);
-	},
-
-	/**
 	 * @description Fix tags that do not fit the editor format.
 	 * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
 	 * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist
@@ -894,13 +885,13 @@ HTML.prototype = {
 				}
 
 				// white list
-				if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && this._isNotCheckingNode(current))) {
+				if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && domUtils.isNotCheckingNode(current))) {
 					removeTags.push(current);
 					return false;
 				}
 
-				const nrtag = !domUtils.getParentElement(current, this._isNotCheckingNode);
 				// empty tags
+				const nrtag = !domUtils.getParentElement(current, domUtils.isNotCheckingNode);
 				if (!domUtils.isTable(current) && !domUtils.isListCell(current) && !domUtils.isAnchor(current) && (this.format.isLine(current) || this.format.isBlock(current) || this.format.isTextStyleNode(current)) && current.childNodes.length === 0 && nrtag) {
 					emptyTags.push(current);
 					return false;
@@ -919,6 +910,13 @@ HTML.prototype = {
 						withoutFormatCells.push(current);
 						return false;
 					}
+				}
+
+				// class filter
+				if (lowLevelCheck && nrtag && current.className) {
+					const className = new this._w.Array(current.classList).map(domUtils.isAllowClassName).join(' ').trim();
+					if (className) current.className = className;
+					else current.removeAttribute('class');
 				}
 
 				const result =
@@ -1017,14 +1015,12 @@ HTML.prototype = {
 		let value = '',
 			f;
 		const tempTree = dom.childNodes;
+
 		for (let i = 0, len = tempTree.length, n; i < len; i++) {
 			n = tempTree[i];
-			if (!this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !/meta/i.test(n.nodeName)) {
-				if (!f) f = domUtils.createElement(this.options.get('defaultLineTag'));
-				f.appendChild(n);
-				i--;
-				len--;
-			} else {
+			if (n.nodeType === 8) {
+				value += '<!-- ' + n.textContent + ' -->';
+			} else if (!this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !/meta/i.test(n.nodeName)) {
 				if (f) {
 					value += f.outerHTML;
 					f = null;
@@ -1078,10 +1074,19 @@ HTML.prototype = {
 	},
 
 	_cleanStyle: function (m, v, name) {
-		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
+		let sv = (m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/) || [])[0];
+		if (/span/i.test(name) && !sv && (m.match(/<span\s(.+)/) || [])[1]) {
+			const size = (m.match(/\ssize="([^"]+)"/i) || [])[1];
+			const face = (m.match(/\sface="([^"]+)"/i) || [])[1];
+			const color = (m.match(/\scolor="([^"]+)"/i) || [])[1];
+			if (size || face || color) {
+				sv = 'style="' + (size ? 'font-size:' + (numbers.get(size / 3.333, 1)) + 'rem;' : '') + (face ? 'font-family:' + face + ';' : '') + (color ? 'color:' + color + ';' : '') + '"';
+			}
+		}
+
 		if (sv) {
 			if (!v) v = [];
-			const style = sv[0].replace(/&quot;/g, '').match(this._cleanStyleRegExp[name]);
+			const style = sv.replace(/&quot;/g, '').match(this._cleanStyleRegExp[name]);
 			if (style) {
 				const allowedStyle = [];
 				for (let i = 0, len = style.length, r; i < len; i++) {
@@ -1097,7 +1102,7 @@ HTML.prototype = {
 							case 'fontSize':
 								if (!this.plugins.fontSize) continue;
 								if (!this._cleanStyleRegExp.fontSizeUnit.test(r[0])) {
-									r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), ConvertFontSize.bind(this._w.Math, this.options.get('fontSizeUnit')));
+									r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), converter.fontSize.bind(null, this.options.get('fontSizeUnit')));
 								}
 								break;
 							case 'color':
@@ -1193,12 +1198,13 @@ function DisallowedElements(element) {
  * @private
  */
 function DeleteDisallowedTags(html, whitelistRegExp, blacklistRegExp) {
-	return html
-		.replace(/\n/g, '')
-		.replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '')
-		.replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '')
-		.replace(whitelistRegExp, '')
-		.replace(blacklistRegExp, '');
+	html = html.replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '').replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '');
+
+	if (!whitelistRegExp.test("<font></font>")) {
+		html = html.replace(/(<\/?)font(\s?)/gi, '$1span$2');
+	}
+
+	return html.replace(whitelistRegExp, '').replace(blacklistRegExp, '');
 }
 
 /**
@@ -1279,7 +1285,6 @@ function CleanElements(lowLevelCheck, m, t) {
 
 	if (v) {
 		for (let i = 0, len = v.length; i < len; i++) {
-			if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i].trim())) continue;
 			t += ' ' + (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i].trim()) ? '' : v[i]);
 		}
 	}
@@ -1289,33 +1294,6 @@ function CleanElements(lowLevelCheck, m, t) {
 
 function GetRegList(str, str2) {
 	return !str ? '^' : str === '*' ? '[a-z-]+' : !str2 ? str : str + '|' + str2;
-}
-
-function ConvertFontSize(to, size) {
-	const value = size.match(/(\d+(?:\.\d+)?)(.+)/);
-	const sizeNum = value[1] * 1;
-	const from = value[2];
-	let pxSize = sizeNum;
-
-	if (/em/.test(from)) {
-		pxSize = this.round(sizeNum / 0.0625);
-	} else if (from === 'pt') {
-		pxSize = this.round(sizeNum * 1.333);
-	} else if (from === '%') {
-		pxSize = sizeNum / 100;
-	}
-
-	switch (to) {
-		case 'em':
-		case 'rem':
-		case '%':
-			return (pxSize * 0.0625).toFixed(2) + to;
-		case 'pt':
-			return this.floor(pxSize / 1.333) + to;
-		default:
-			// px
-			return pxSize + to;
-	}
 }
 
 export default HTML;

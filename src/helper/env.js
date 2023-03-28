@@ -9,11 +9,10 @@ const userAgent = _w.navigator.userAgent.toLowerCase();
  * @returns {Array.<any>}
  */
 export function getValues(obj) {
-	return !obj
-		? []
-		: this._w.Object.keys(obj).map(function (i) {
-				return obj[i];
-		  });
+	return !obj ? [] :
+		this._w.Object.keys(obj).map(function (i) {
+			return obj[i];
+		});
 }
 
 /**
@@ -139,74 +138,83 @@ export function getIncludePath(nameArray, extension) {
 
 	if (path === '') path = pathList.length > 0 ? pathList[0][src] : '';
 
-	-1 === path.indexOf(':/') && '//' !== path.slice(0, 2) && (path = 0 === path.indexOf('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
+	path.indexOf(':/') < 0 && '//' !== path.slice(0, 2) && (path = 0 === path.indexOf('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
 
 	if (!path) throw '[SUNEDITOR.helper.env.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (name: +' + name + ', extension: ' + extension + ')';
 
 	return path;
 }
 
+/** --- Check browser --- */
 /**
- * @description Checks if User Agent is IE
+ * @description Check if support ResizeObserver function
+ * @returns {boolean} Whether support ResizeObserver function or not.
+ */
+function isResizeObserverSupported() {
+	return typeof _w.ResizeObserver === 'function';
+}
+
+/**
+ * @description Check if User Agent is IE
  * @returns {boolean} Whether User Agent is IE or not.
  */
-export function isIE() {
+function isIE() {
 	return userAgent.indexOf('trident') > -1;
 }
 
 /**
- * @description Checks if User Agent is Edge
+ * @description Check if User Agent is Edge
  * @returns {boolean} Whether User Agent is Edge or not.
  */
-export function isEdge() {
+function isEdge() {
 	return navigator.appVersion.indexOf('Edge') > -1;
 }
 
 /**
- * @description Checks if platform is OSX or IOS
+ * @description Check if platform is OSX or IOS
  * @returns {boolean} Whether platform is (OSX || IOS) or not.
  */
-export function isOSX_IOS() {
+function isOSX_IOS() {
 	return /(Mac|iPhone|iPod|iPad)/.test(navigator.platform);
 }
 
 /**
- * @description Checks if User Agent Blink engine.
+ * @description Check if User Agent Blink engine.
  * @returns {boolean} Whether User Agent is Blink engine or not.
  */
-export function isBlink() {
+function isBlink() {
 	return userAgent.indexOf('chrome/') > -1 && userAgent.indexOf('edge/') < 0;
 }
 
 /**
- * @description Checks if User Agent is Firefox (Gecko).
+ * @description Check if User Agent is Firefox (Gecko).
  * @returns {boolean} Whether User Agent is Firefox or not.
  */
-export function isGecko() {
+function isGecko() {
 	return !!userAgent.match(/gecko\/\d+/);
 }
 
 /**
- * @description Checks if User Agent is Chromium browser.
+ * @description Check if User Agent is Chromium browser.
  * @returns {boolean} Whether User Agent is Chromium browser.
  */
-export function isChromium() {
+function isChromium() {
 	return !!window.chrome;
 }
 
 /**
- * @description Checks if User Agent is Safari.
+ * @description Check if User Agent is Safari.
  * @returns {boolean} Whether User Agent is Safari or not.
  */
-export function isSafari() {
+function isSafari() {
 	return userAgent.indexOf('applewebkit/') > -1 && userAgent.indexOf('chrome') === -1;
 }
 
 /**
- * @description Checks if User Agent is Android mobile device.
+ * @description Check if User Agent is Android mobile device.
  * @returns {boolean} Whether User Agent is Android or not.
  */
-export function isAndroid() {
+function isAndroid() {
 	return userAgent.indexOf('android') > -1;
 }
 
@@ -231,6 +239,7 @@ const env = {
 	getXMLHttpRequest: getXMLHttpRequest,
 	getPageStyle: getPageStyle,
 	getIncludePath: getIncludePath,
+	isResizeObserverSupported: isResizeObserverSupported(),
 	isIE: isIE(),
 	isEdge: isEdge(),
 	isBlink: isBlink(),

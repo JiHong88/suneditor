@@ -432,7 +432,6 @@ function InitOptions(options, editorTargets) {
 
 	/** Private options */
 	o.set('__listCommonStyle', options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle']);
-	o.set('__defaultFontSize', options.__defaultFontSize);
 
 	/** --- Icons ------------------------------------------------------------------------------------------ */
 	let icons =

@@ -378,6 +378,6 @@ const editor_root = (window.e = suneditor.create(
 	}
 ));
 
-editor_root.events.onBlur = (e) => {
+editor_root.events.onBlur = (rootKey, e, htmlFrame) => {
 	console.log('blur', editor_root.frameContext);
 };

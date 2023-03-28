@@ -307,13 +307,15 @@ function FileCheckHandler(element) {
 	const figure = Figure.CreateContainer(element);
 
 	try {
-		if (domUtils.isListCell(existElement)) {
+		if (domUtils.getParentElement(prevElement, domUtils.isNotCheckingNode)) {
+			prevElement.parentNode.replaceChild(figure.container, prevElement);
+		} else if (domUtils.isListCell(existElement)) {
 			const refer = domUtils.getParentElement(prevElement, function (current) {
 				return current.parentNode === existElement;
 			});
 			existElement.insertBefore(figure.container, refer);
 			domUtils.removeItem(prevElement);
-			domUtils.removeEmptyNode(refer, null);
+			this.node.removeEmptyNode(refer, null, true);
 		} else if (this.format.isLine(existElement)) {
 			const refer = domUtils.getParentElement(prevElement, function (current) {
 				return current.parentNode === existElement;
@@ -321,7 +323,7 @@ function FileCheckHandler(element) {
 			existElement = this.node.split(existElement, refer);
 			existElement.parentNode.insertBefore(figure.container, existElement);
 			domUtils.removeItem(prevElement);
-			domUtils.removeEmptyNode(existElement, null);
+			this.node.removeEmptyNode(existElement, null, true);
 			if (existElement.children.length === 0) existElement.innerHTML = this.node.removeWhiteSpace(existElement.innerHTML);
 		} else {
 			existElement.parentNode.replaceChild(figure.container, existElement);

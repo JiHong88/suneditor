@@ -40,6 +40,40 @@ export function entityToHTML(content) {
 }
 
 /**
+ * 
+ * @param {"em"|"rem"|"%"|"pt"|"px"} to Size units to be converted
+ * @param {string} size siSize to convert with units (ex: "15rem")
+ * @returns {string}
+ */
+export function fontSize(to, size) {
+	const math = _w.Math;
+	const value = size.match(/(\d+(?:\.\d+)?)(.+)/);
+	const sizeNum = value[1] * 1;
+	const from = value[2];
+	let pxSize = sizeNum;
+
+	if (/em/.test(from)) {
+		pxSize = math.round(sizeNum / 0.0625);
+	} else if (from === 'pt') {
+		pxSize = math.round(sizeNum * 1.333);
+	} else if (from === '%') {
+		pxSize = sizeNum / 100;
+	}
+
+	switch (to) {
+		case 'em':
+		case 'rem':
+		case '%':
+			return (pxSize * 0.0625).toFixed(2) + to;
+		case 'pt':
+			return math.floor(pxSize / 1.333) + to;
+		default:
+			// px
+			return pxSize + to;
+	}
+}
+
+/**
  * @description Create whitelist RegExp object.
  * Return RegExp format: new RegExp("<\\/?\\b(?!" + list + ")\\b[^>^<]*+>", "gi")
  * @param {string} list Tags list ("br|p|div|pre...")
@@ -153,6 +187,7 @@ export function _setIframeCssTags(options, frameHeight) {
 const converter = {
 	htmlToEntity: htmlToEntity,
 	entityToHTML: entityToHTML,
+	fontSize: fontSize,
 	createElementWhitelist: createElementWhitelist,
 	createElementBlacklist: createElementBlacklist,
 	_setDefaultOptionStyle: _setDefaultOptionStyle,

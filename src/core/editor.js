@@ -328,12 +328,6 @@ const Editor = function (multiTargets, options) {
 	 */
 	this._parser = new _w.DOMParser();
 
-	/**
-	 * @description Temp variable for set line attrs
-	 * @private
-	 */
-	this._formatAttrsTemp = null
-
 	/** ----- Create editor ------------------------------------------------------------ */
 	const inst = this;
 	const rootSize = this.rootTargets.size;
@@ -1316,8 +1310,6 @@ Editor.prototype = {
 		this._codeViewDisabledButtons = this.context.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])');
 		this._controllerOnDisabledButtons = this.context.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
 
-		this._saveButtonStates();
-
 		const ctx = this.context;
 		const textTags = this.options.get('textTags');
 		const commandMap = this._commandMap;
@@ -1329,6 +1321,8 @@ Editor.prototype = {
 		commandMap.set(textTags.strike.toUpperCase(), ctx.get('buttons.strike'));
 		commandMap.set(textTags.sub.toUpperCase(), ctx.get('buttons.subscript'));
 		commandMap.set(textTags.sup.toUpperCase(), ctx.get('buttons.superscript'));
+
+		this._saveButtonStates();
 	},
 
 	/**
@@ -1371,10 +1365,10 @@ Editor.prototype = {
 				function () {
 					const h = this._iframeAuto.offsetHeight;
 					fc.get('wysiwygFrame').style.height = h + 'px';
-					if (env.isIE) this.__callResizeFunction(h, null);
+					if (!env.isResizeObserverSupported) this.__callResizeFunction(h, null);
 				}.bind(this)
 			);
-		} else if (env.isIE) {
+		} else if (!env.isResizeObserverSupported) {
 			this.__callResizeFunction(fc.get('wysiwygFrame').offsetHeight, null);
 		}
 	},

@@ -4,7 +4,13 @@
  */
 
 import CoreDependency from '../../dependency/_core';
-import { domUtils, unicode, numbers, env, converter } from '../../helper';
+import {
+	domUtils,
+	unicode,
+	numbers,
+	env,
+	converter
+} from '../../helper';
 
 const _w = env._w;
 const DIRECTION_KEYCODE = new _w.RegExp('^(3[3-9]|40)$');
@@ -29,6 +35,7 @@ const EventManager = function (editor) {
 	this._lineBreaker_b = null;
 	this._lineBreakDir = null;
 	this._lineBreakComp = null;
+	this._formatAttrsTemp = null;
 	this._resizeClientY = 0;
 	this.__resize_editor = null;
 	this.__close_move = null;
@@ -78,7 +85,11 @@ EventManager.prototype = {
 			this.editor.frameContext.get('_ww').addEventListener(type, listener, useCapture);
 		}
 		this._w.addEventListener(type, listener, useCapture);
-		return { type: type, listener: listener, useCapture: useCapture };
+		return {
+			type: type,
+			listener: listener,
+			useCapture: useCapture
+		};
 	},
 
 	/**
@@ -254,7 +265,7 @@ EventManager.prototype = {
 		if (!siblingNode) {
 			siblingNode = this.format.getLine(container);
 			siblingNode = siblingNode ? siblingNode[siblingKey] : null;
-			if (siblingNode && !this.component.is(siblingNode)) siblingNode = siblingKey === 'previousSibling' ? siblingNode.firstElementChild : siblingNode.lastElementChild;
+			if (siblingNode && !this.component.is(siblingNode)) siblingNode = siblingKey === 'previousSibling' ? siblingNode.firstChild : siblingNode.lastChild;
 			else return null;
 		}
 
@@ -331,7 +342,7 @@ EventManager.prototype = {
 		}
 
 		if ((this.format.isBlock(startCon) || domUtils.isWysiwygFrame(startCon)) && (this.component.is(startCon.children[range.startOffset]) || this.component.is(startCon.children[range.startOffset - 1]))) return;
-		if (domUtils.getParentElement(commonCon, this.html._isNotCheckingNode)) return null;
+		if (domUtils.getParentElement(commonCon, domUtils.isNotCheckingNode)) return null;
 
 		if (rangeEl) {
 			format = domUtils.createElement(formatName || this.options.get('defaultLineTag'));
@@ -457,8 +468,6 @@ EventManager.prototype = {
 			if (MSData) {
 				cleanData = cleanData.replace(/\n/g, ' ');
 				plainText = plainText.replace(/\n/g, ' ');
-			} else {
-				cleanData = (plainText === cleanData ? plainText : cleanData).replace(/\n/g, '<br>');
 			}
 			cleanData = this.html.clean(cleanData, false, null, null);
 		} else {
@@ -468,15 +477,23 @@ EventManager.prototype = {
 		const maxCharCount = this.char.test(this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText);
 		// user event - paste
 		if (type === 'paste' && typeof this.events.onPaste === 'function') {
-			const value = this.events.onPaste(e, cleanData, maxCharCount, rootKey);
-			if (!value) return false;
-			if (typeof value === 'string') cleanData = value;
+			const value = this.events.onPaste(rootKey, e, cleanData, maxCharCount);
+			if (value === false) {
+				return false;
+			} else if (typeof value === 'string') {
+				if (!value) return false;
+				cleanData = value;
+			}
 		}
 		// user event - drop
 		if (type === 'drop' && typeof this.events.onDrop === 'function') {
-			const value = this.events.onDrop(e, cleanData, maxCharCount, rootKey);
-			if (!value) return false;
-			if (typeof value === 'string') cleanData = value;
+			const value = this.events.onDrop(rootKey, e, cleanData, maxCharCount);
+			if (value === false) {
+				return false;
+			} else if (typeof value === 'string') {
+				if (!value) return false;
+				cleanData = value;
+			}
 		}
 
 		// files
@@ -510,7 +527,7 @@ EventManager.prototype = {
 		this.toolbar._setResponsive();
 
 		/** responsive toolbar observer */
-		if (!env.isIE) this._toolbarObserver = new _w.ResizeObserver(this.toolbar.resetResponsiveToolbar.bind(this.toolbar));
+		if (env.isResizeObserverSupported) this._toolbarObserver = new _w.ResizeObserver(this.toolbar.resetResponsiveToolbar.bind(this.toolbar));
 
 		/** window event */
 		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
@@ -520,7 +537,7 @@ EventManager.prototype = {
 	_addEvent: function (frameContext) {
 		const eventWysiwyg = this.options.get('iframe') ? frameContext.get('_ww') : frameContext.get('wysiwyg');
 		frameContext.set('eventWysiwyg', eventWysiwyg);
-		if (!env.isIE) {
+		if (env.isResizeObserverSupported) {
 			this._resizeObserver = new _w.ResizeObserver(
 				function (entries) {
 					this.editor.__callResizeFunction(-1, entries[0]);
@@ -674,6 +691,39 @@ EventManager.prototype = {
 		);
 	},
 
+	_resetFrameStatus: function () {
+		this.editor._offCurrentController();
+		if (this.editor.isBalloon) this.toolbar.hide();
+
+		if (!env.isResizeObserverSupported) this.toolbar.resetResponsiveToolbar();
+		const toolbar = this.context.get('toolbar.main');
+		const isToolbarHidden = (toolbar.style.display === 'none' || (this.editor.isInline && !this.toolbar._inlineToolbarAttr.isShow));
+		if (toolbar.offsetWidth === 0 && !isToolbarHidden) return;
+
+		const fileBrowser = this.editor.frameContext.get('fileBrowser');
+		if (fileBrowser && fileBrowser.area.style.display === 'block') {
+			fileBrowser.body.style.maxHeight = _w.innerHeight - fileBrowser.header.offsetHeight - 50 + 'px';
+		}
+
+		if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {
+			this.menu._setMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
+		}
+
+		if (this.viewer._resetFullScreenHeight()) return;
+
+		if (this.editor.frameContext.get('isCodeView') && this.editor.isInline) {
+			this.toolbar._showInline();
+			return;
+		}
+
+		this.editor._iframeAutoHeight();
+
+		if (this.toolbar._sticky) {
+			this.context.get('toolbar.main').style.width = this.editor.frameContext.get('topArea').offsetWidth - 2 + 'px';
+			this.toolbar._resetSticky();
+		}
+	},
+
 	constructor: EventManager
 };
 
@@ -743,7 +793,7 @@ function OnMouseDown_wysiwyg(rootKey, e) {
 	if (this.status.isReadOnly || domUtils.isNonEditable(this.editor.frameContext.get('wysiwyg'))) return;
 
 	// user event
-	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown(e, rootKey) === false) return;
+	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown(rootKey, e) === false) return;
 
 	const eventPlugins = this.editor._onMousedownPlugins;
 	for (let i = 0; i < eventPlugins.length; i++) {
@@ -771,7 +821,7 @@ function OnClick_wysiwyg(rootKey, e) {
 	if (domUtils.isNonEditable(this.editor.frameContext.get('wysiwyg'))) return;
 
 	// user event
-	if (typeof this.events.onClick === 'function' && this.events.onClick(e, rootKey) === false) return;
+	if (typeof this.events.onClick === 'function' && this.events.onClick(rootKey, e) === false) return;
 
 	const fileComponentInfo = this.component.get(targetElement);
 	if (fileComponentInfo) {
@@ -847,7 +897,7 @@ function OnInput_wysiwyg(rootKey, e) {
 	}
 
 	// user event
-	if (typeof this.events.onInput === 'function' && this.events.onInput(e, rootKey) === false) return;
+	if (typeof this.events.onInput === 'function' && this.events.onInput(rootKey, e) === false) return;
 
 	this.history.push(true);
 }
@@ -871,7 +921,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 	}
 
 	// user event
-	if (typeof this.events.onKeyDown === 'function' && this.events.onKeyDown(e, rootKey) === false) return;
+	if (typeof this.events.onKeyDown === 'function' && this.events.onKeyDown(rootKey, e) === false) return;
 
 	/** Shortcuts */
 	if (ctrl && this.shortcuts.command(keyCode, shift)) {
@@ -897,7 +947,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 	}
 
 	switch (keyCode) {
-		case 8 /** backspace key */:
+		case 8 /** backspace key */ :
 			if (!selectRange) {
 				if (fileComponentName) {
 					e.preventDefault();
@@ -978,6 +1028,13 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 				e.preventDefault();
 				e.stopPropagation();
 				break;
+			}
+
+			// format attributes
+			if (!selectRange && this.format.isEdgeLine(range.startContainer, range.startOffset, 'start')) {
+				if (this.format.isLine(formatEl.previousElementSibling)) {
+					this._formatAttrsTemp = formatEl.previousElementSibling.attributes;
+				}
 			}
 
 			// nested list
@@ -1069,7 +1126,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 				const prev = formatEl.previousSibling;
 				// select file component
 				const ignoreZWS = (commonCon.nodeType === 3 || domUtils.isBreak(commonCon)) && !commonCon.previousSibling && range.startOffset === 0;
-				if (!sel.previousSibling && (this.component.is(commonCon.previousSibling) || (ignoreZWS && this.component.is(prev)))) {
+				if (sel && !sel.previousSibling && ((commonCon && this.component.is(commonCon.previousSibling)) || (ignoreZWS && this.component.is(prev)))) {
 					const fileComponentInfo = this.component.get(prev);
 					if (fileComponentInfo) {
 						e.preventDefault();
@@ -1084,7 +1141,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 					break;
 				}
 				// delete nonEditable
-				if (domUtils.isNonEditable(sel.previousSibling)) {
+				if (sel && domUtils.isNonEditable(sel.previousSibling)) {
 					e.preventDefault();
 					e.stopPropagation();
 					domUtils.removeItem(sel.previousSibling);
@@ -1093,7 +1150,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 			}
 
 			break;
-		case 46 /** delete key */:
+		case 46 /** delete key */ :
 			if (fileComponentName) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -1163,6 +1220,13 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 				}
 			}
 
+			// format attributes
+			if (!selectRange && this.format.isEdgeLine(range.endContainer, range.endOffset, 'end')) {
+				if (this.format.isLine(formatEl.nextElementSibling)) {
+					this._formatAttrsTemp = formatEl.attributes;
+				}
+			}
+
 			// nested list
 			formatEl = this.format.getLine(range.startContainer, null);
 			rangeEl = this.format.getBlock(formatEl, null);
@@ -1205,7 +1269,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 			}
 
 			break;
-		case 9 /** tab key */:
+		case 9 /** tab key */ :
 			if (fileComponentName || this.options.get('tabDisable')) break;
 			e.preventDefault();
 			if (ctrl || alt || domUtils.isWysiwygFrame(selectionNode)) break;
@@ -1316,7 +1380,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 			this.history.push(false);
 
 			break;
-		case 13 /** enter key */:
+		case 13 /** enter key */ :
 			const brBlock = this.format.getBrLine(selectionNode, null);
 
 			if (this.editor.frameOptions.get('charCounter_type') === 'byte-html') {
@@ -1334,17 +1398,20 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 			}
 
 			if (!shift) {
-				const formatInners = this.format.isEdgeLine(range.endContainer, range.endOffset, 'end');
-				if ((formatInners && /^H[1-6]$/i.test(formatEl.nodeName)) || /^HR$/i.test(formatEl.nodeName)) {
+				const formatEndEdge = this.format.isEdgeLine(range.endContainer, range.endOffset, 'end');
+				const formatStartEdge = this.format.isEdgeLine(range.startContainer, range.startOffset, 'start');
+
+				// add default format line
+				if (formatEndEdge && (/^H[1-6]$/i.test(formatEl.nodeName) || /^HR$/i.test(formatEl.nodeName))) {
 					e.preventDefault();
 					let temp = null;
 					const newFormat = this.format.addLine(formatEl, this.options.get('defaultLineTag'));
 
-					if (formatInners && formatInners.length > 0) {
-						temp = formatInners.pop();
+					if (formatEndEdge && formatEndEdge.length > 0) {
+						temp = formatEndEdge.pop();
 						const innerNode = temp;
-						while (formatInners.length > 0) {
-							temp = temp.appendChild(formatInners.pop());
+						while (formatEndEdge.length > 0) {
+							temp = temp.appendChild(formatEndEdge.pop());
 						}
 						newFormat.appendChild(innerNode);
 					}
@@ -1352,7 +1419,27 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 					temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
 					this.selection.setRange(temp, 0, temp, 0);
 					break;
-				} else if (this.options.get('lineAttrReset') && formatEl && !domUtils.isListCell(formatEl)) {
+				}
+
+				// set format attrs - edge
+				if (formatStartEdge || formatEndEdge) {
+					e.preventDefault();
+					const focusBR = domUtils.createElement('BR');
+					const newFormat = domUtils.createElement(formatEl.nodeName, null, focusBR);
+
+					domUtils.copyTagAttributes(newFormat, formatEl, ['id'].concat(this.options.get('lineAttrReset')));
+
+					formatEl.parentNode.insertBefore(newFormat, formatStartEdge ? formatEl : formatEl.nextElementSibling);
+					if (formatEndEdge) {
+						this.selection.setRange(focusBR, 1, focusBR, 1);
+					}
+
+					break;
+				} else {
+					this._formatAttrsTemp = formatEl.attributes;
+				}
+
+				if (this.options.get('lineAttrReset') && formatEl && !domUtils.isListCell(formatEl)) {
 					e.preventDefault();
 					e.stopPropagation();
 
@@ -1378,11 +1465,11 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 						else newEl = this.node.split(range.endContainer, range.endOffset, 0);
 					}
 
-					const resetAttr = this.options.get('lineAttrReset') === '*' ? null : this.options.get('lineAttrReset');
+					const resetAttr = this.options.get('lineAttrReset');
 					const attrs = newEl.attributes;
 					let i = 0;
 					while (attrs[i]) {
-						if (resetAttr && resetAttr.test(attrs[i].name)) {
+						if (resetAttr && resetAttr.indexOf(attrs[i].name.toLowerCase()) > -1) {
 							i++;
 							continue;
 						}
@@ -1406,12 +1493,12 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 						!this.format.isClosureBrLine(brBlock) &&
 						!!children &&
 						((selectionFormat &&
-							range.collapsed &&
-							children.length - 1 <= offset + 1 &&
-							domUtils.isBreak(children[offset]) &&
-							(!children[offset + 1] || ((!children[offset + 2] || domUtils.isZeroWith(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && domUtils.isZeroWith(children[offset + 1].textContent))) &&
-							offset > 0 &&
-							domUtils.isBreak(children[offset - 1])) ||
+								range.collapsed &&
+								children.length - 1 <= offset + 1 &&
+								domUtils.isBreak(children[offset]) &&
+								(!children[offset + 1] || ((!children[offset + 2] || domUtils.isZeroWith(children[offset + 2].textContent)) && children[offset + 1].nodeType === 3 && domUtils.isZeroWith(children[offset + 1].textContent))) &&
+								offset > 0 &&
+								domUtils.isBreak(children[offset - 1])) ||
 							(!selectionFormat &&
 								domUtils.isZeroWith(selectionNode.textContent) &&
 								domUtils.isBreak(prev) &&
@@ -1485,15 +1572,15 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 							newEl = newListCell;
 						}
 					} else {
-						const newFormat = domUtils.isTableCell(rangeEl.parentNode)
-							? 'DIV'
-							: domUtils.isList(rangeEl.parentNode)
-							? 'LI'
-							: this.format.isLine(rangeEl.nextElementSibling) && !this.format.isBlock(rangeEl.nextElementSibling)
-							? rangeEl.nextElementSibling.nodeName
-							: this.format.isLine(rangeEl.previousElementSibling) && !this.format.isBlock(rangeEl.previousElementSibling)
-							? rangeEl.previousElementSibling.nodeName
-							: this.options.get('defaultLineTag');
+						const newFormat = domUtils.isTableCell(rangeEl.parentNode) ?
+							'DIV' :
+							domUtils.isList(rangeEl.parentNode) ?
+							'LI' :
+							this.format.isLine(rangeEl.nextElementSibling) && !this.format.isBlock(rangeEl.nextElementSibling) ?
+							rangeEl.nextElementSibling.nodeName :
+							this.format.isLine(rangeEl.previousElementSibling) && !this.format.isBlock(rangeEl.previousElementSibling) ?
+							rangeEl.previousElementSibling.nodeName :
+							this.options.get('defaultLineTag');
 
 						newEl = domUtils.createElement(newFormat);
 						const edge = this.format.removeBlock(rangeEl, [formatEl], null, true, true);
@@ -1595,6 +1682,19 @@ function OnKeyUp_wysiwyg(rootKey, e) {
 
 	const formatEl = this.format.getLine(selectionNode, null);
 	const rangeEl = this.format.getBlock(selectionNode, null);
+	const attrs = this._formatAttrsTemp;
+
+	if (attrs) {
+		for (let i = 0, len = attrs.length; i < len; i++) {
+			if (keyCode === 13 && /^id$/i.test(attrs[i].name)) {
+				formatEl.removeAttribute('id');
+				continue;
+			}
+			formatEl.setAttribute(attrs[i].name, attrs[i].value);
+		}
+		this._formatAttrsTemp = null;
+	}
+
 	if (!formatEl && range.collapsed && !this.component.is(selectionNode) && !domUtils.isList(selectionNode) && this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLineTag')) !== null) {
 		selectionNode = this.selection.getNode();
 	}
@@ -1617,7 +1717,7 @@ function OnKeyUp_wysiwyg(rootKey, e) {
 	this.char.test('');
 
 	// user event
-	if (typeof this.events.onKeyUp === 'function' && this.events.onKeyUp(e, rootKey) === false) return;
+	if (typeof this.events.onKeyUp === 'function' && this.events.onKeyUp(rootKey, e) === false) return;
 
 	if (!ctrl && !alt && !HISTORY_IGNORE_KEYCODE.test(keyCode)) {
 		this.history.push(true);
@@ -1634,7 +1734,7 @@ function OnCopy_wysiwyg(rootKey, e) {
 	const clipboardData = env.isIE ? _w.clipboardData : e.clipboardData;
 
 	// user event
-	if (typeof this.events.onCopy === 'function' && !this.events.onCopy(e, clipboardData, rootKey)) {
+	if (typeof this.events.onCopy === 'function' && this.events.onCopy(rootKey, e, clipboardData) === false) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -1660,7 +1760,7 @@ function OnCut_wysiwyg(rootKey, e) {
 	const clipboardData = env.isIE ? _w.clipboardData : e.clipboardData;
 
 	// user event
-	if (typeof this.events.onCut === 'function' && !this.events.onCut(e, clipboardData, rootKey)) {
+	if (typeof this.events.onCut === 'function' && this.events.onCut(rootKey, e, clipboardData) === false) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -1682,7 +1782,7 @@ function OnScroll_wysiwyg(rootKey, eventWysiwyg, e) {
 	this._moveContainer(eventWysiwyg);
 	this._scrollContainer();
 	// user event
-	if (typeof this.events.onScroll === 'function') this.events.onScroll(e, rootKey);
+	if (typeof this.events.onScroll === 'function') this.events.onScroll(rootKey, e);
 }
 
 function OnFocus_wysiwyg(rootKey, e) {
@@ -1699,7 +1799,7 @@ function OnFocus_wysiwyg(rootKey, e) {
 	if (this.editor.isInline) this.toolbar._showInline();
 
 	// user event
-	if (typeof this.events.onFocus === 'function') this.events.onFocus(e, rootKey);
+	if (typeof this.events.onFocus === 'function') this.events.onFocus(rootKey, e);
 }
 
 function OnBlur_wysiwyg(rootKey, e) {
@@ -1722,7 +1822,7 @@ function OnBlur_wysiwyg(rootKey, e) {
 	this.history.check(rootKey, this.status._range);
 
 	// user event
-	if (typeof this.events.onBlur === 'function') this.events.onBlur(e, rootKey);
+	if (typeof this.events.onBlur === 'function') this.events.onBlur(rootKey, e, this.editor.frameContext.get('wysiwyg'));
 }
 
 function OnMouseMove_wysiwyg(e) {
@@ -1786,7 +1886,7 @@ function __resizeEditor(e) {
 	const h = resizeInterval < this.editor.frameContext.get('_minHeight') ? this.editor.frameContext.get('_minHeight') : resizeInterval;
 	this.editor.frameContext.get('wysiwygFrame').style.height = this.editor.frameContext.get('code').style.height = h + 'px';
 	this._resizeClientY = e.clientY;
-	if (env.isIE) this.editor.__callResizeFunction(h, null);
+	if (!env.isResizeObserverSupported) this.editor.__callResizeFunction(h, null);
 }
 
 function __closeMove() {
@@ -1818,35 +1918,7 @@ function DisplayLineBreak(dir, e) {
 }
 
 function OnResize_window() {
-	this.editor._offCurrentController();
-	if (this.editor.isBalloon) this.toolbar.hide();
-
-	if (env.isIE) this.toolbar.resetResponsiveToolbar();
-
-	if (this.context.get('toolbar.main').offsetWidth === 0) return;
-
-	const fileBrowser = this.editor.frameContext.get('fileBrowser');
-	if (fileBrowser && fileBrowser.area.style.display === 'block') {
-		fileBrowser.body.style.maxHeight = _w.innerHeight - fileBrowser.header.offsetHeight - 50 + 'px';
-	}
-
-	if (this.menu.currentDropdownActiveButton && this.menu.currentDropdown) {
-		this.menu._setMenuPosition(this.menu.currentDropdownActiveButton, this.menu.currentDropdown);
-	}
-
-	if (this.viewer._resetFullScreenHeight()) return;
-
-	if (this.editor.frameContext.get('isCodeView') && this.editor.isInline) {
-		this.toolbar._showInline();
-		return;
-	}
-
-	this.editor._iframeAutoHeight();
-
-	if (this.toolbar._sticky) {
-		this.context.get('toolbar.main').style.width = this.editor.frameContext.get('topArea').offsetWidth - 2 + 'px';
-		this.toolbar._resetSticky();
-	}
+	this._resetFrameStatus();
 }
 
 function OnScroll_window() {

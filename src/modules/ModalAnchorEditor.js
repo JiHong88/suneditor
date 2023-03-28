@@ -1,6 +1,8 @@
 import EditorDependency from '../dependency';
 import SelectMenu from './SelectMenu';
-import { domUtils } from '../helper';
+import {
+	domUtils
+} from '../helper';
 
 const ModalAnchorEditor = function (inst, modalForm) {
 	// plugin bisic properties
@@ -15,7 +17,7 @@ const ModalAnchorEditor = function (inst, modalForm) {
 	this.modalForm = modalForm;
 	this.host = (this._w.location.origin + this._w.location.pathname).replace(/\/$/, '');
 	this.urlInput = forms.querySelector('.se-input-url');
-	this.anchorText = forms.querySelector('._se_anchor_text');
+	this.displayText = forms.querySelector('._se_display_text');
 	this.newWindowCheck = forms.querySelector('._se_anchor_check');
 	this.downloadCheck = forms.querySelector('._se_anchor_download');
 	this.download = forms.querySelector('._se_anchor_download_icon');
@@ -38,7 +40,13 @@ const ModalAnchorEditor = function (inst, modalForm) {
 		const list = [];
 		for (let i = 0, len = relList.length, rel; i < len; i++) {
 			rel = relList[i];
-			list.push(domUtils.createElement('BUTTON', { type: 'button', class: 'se-btn-list' + (defaultRel.indexOf(rel) > -1 ? ' se-checked' : ''), 'data-command': rel, title: rel, 'aria-label': rel }, rel + '<span class="se-svg">' + this.icons.checked + '</span>'));
+			list.push(domUtils.createElement('BUTTON', {
+				type: 'button',
+				class: 'se-btn-list' + (defaultRel.indexOf(rel) > -1 ? ' se-checked' : ''),
+				'data-command': rel,
+				title: rel,
+				'aria-label': rel
+			}, rel + '<span class="se-svg">' + this.icons.checked + '</span>'));
 		}
 		this.selectMenu_rel = new SelectMenu(this, true, 'right-middle');
 		this.selectMenu_rel.on(this.relButton, SetRelItem.bind(this));
@@ -52,7 +60,7 @@ const ModalAnchorEditor = function (inst, modalForm) {
 	this.selectMenu_bookmark.on(this.urlInput, SetHeaderBookmark.bind(this));
 	this.eventManager.addEvent(this.newWindowCheck, 'change', OnChange_newWindowCheck.bind(this));
 	this.eventManager.addEvent(this.downloadCheck, 'change', OnChange_downloadCheck.bind(this));
-	this.eventManager.addEvent(this.anchorText, 'input', OnChange_anchorText.bind(this));
+	this.eventManager.addEvent(this.displayText, 'input', OnChange_displayText.bind(this));
 	this.eventManager.addEvent(this.urlInput, 'input', OnChange_urlInput.bind(this));
 	this.eventManager.addEvent(this.urlInput, 'focus', OnFocus_urlInput.bind(this));
 	this.eventManager.addEvent(this.bookmarkButton, 'click', OnClick_bookmarkButton.bind(this));
@@ -66,12 +74,12 @@ ModalAnchorEditor.prototype = {
 	on: function (isUpdate) {
 		if (!isUpdate) {
 			this.init();
-			this.anchorText.value = this.selection.get().toString().trim();
+			this.displayText.value = this.selection.get().toString().trim();
 			this.newWindowCheck.checked = this.options.get('linkTargetNewWindow');
 		} else if (this.currentTarget) {
 			const href = this.currentTarget.getAttribute('href');
 			this.linkValue = this.preview.textContent = this.urlInput.value = this._selfPathBookmark(href) ? href.substr(href.lastIndexOf('#')) : href;
-			this.anchorText.value = this.currentTarget.textContent || this.currentTarget.getAttribute('alt');
+			this.displayText.value = this.currentTarget.textContent;
 			this.newWindowCheck.checked = /_blank/i.test(this.currentTarget.target) ? true : false;
 			this.downloadCheck.checked = this.currentTarget.download;
 		}
@@ -84,11 +92,11 @@ ModalAnchorEditor.prototype = {
 		if (this.linkValue.length === 0) return null;
 
 		const url = this.linkValue;
-		const anchorText = this.anchorText.value.length === 0 ? url : this.anchorText.value;
+		const displayText = this.displayText.value.length === 0 ? url : this.displayText.value;
 
 		const oA = this.currentTarget || domUtils.createElement('A');
-		this._updateAnchor(oA, url, anchorText, notText);
-		this.linkValue = this.preview.textContent = this.urlInput.value = this.anchorText.value = '';
+		this._updateAnchor(oA, url, displayText, notText);
+		this.linkValue = this.preview.textContent = this.urlInput.value = this.displayText.value = '';
 
 		return oA;
 	},
@@ -96,17 +104,17 @@ ModalAnchorEditor.prototype = {
 	init: function () {
 		this.currentTarget = null;
 		this.linkValue = this.preview.textContent = this.urlInput.value = '';
-		this.anchorText.value = '';
+		this.displayText.value = '';
 		this.newWindowCheck.checked = false;
 		this.downloadCheck.checked = false;
 		this._change = false;
 		this._setRel(this.defaultRel);
 	},
 
-	_updateAnchor: function (anchor, url, alt, notText) {
+	_updateAnchor: function (anchor, url, displayText, notText) {
 		// download
 		if (!this._selfPathBookmark(url) && this.downloadCheck.checked) {
-			anchor.setAttribute('download', alt || url);
+			anchor.setAttribute('download', displayText || url);
 		} else {
 			anchor.removeAttribute('download');
 		}
@@ -120,13 +128,12 @@ ModalAnchorEditor.prototype = {
 		if (!rel) anchor.removeAttribute('rel');
 		else anchor.rel = rel;
 
-		// est url, alt
+		// est url
 		anchor.href = url;
-		anchor.setAttribute('alt', alt);
 		if (notText) {
 			if (anchor.children.length === 0) anchor.textContent = '';
 		} else {
-			anchor.textContent = alt;
+			anchor.textContent = displayText;
 		}
 	},
 
@@ -239,8 +246,8 @@ function SetHeaderBookmark(item) {
 	item.id = id;
 	this.urlInput.value = '#' + id;
 
-	if (!this.anchorText.value.trim() || !this._change) {
-		this.anchorText.value = item.textContent;
+	if (!this.displayText.value.trim() || !this._change) {
+		this.displayText.value = item.textContent;
 	}
 
 	this._setLinkPreview(this.urlInput.value);
@@ -260,7 +267,7 @@ function SetRelItem(item) {
 	this.relPreview.title = this.relPreview.textContent = current.join(', ');
 }
 
-function OnChange_anchorText(e) {
+function OnChange_displayText(e) {
 	this._change = !!e.target.value.trim();
 }
 
@@ -356,7 +363,7 @@ function CreatetModalForm(editor) {
 		'<div class="se-modal-form">' +
 		'<label>' +
 		lang.link_modal_text +
-		'</label><input class="se-input-form _se_anchor_text" type="text" />' +
+		'</label><input class="se-input-form _se_display_text" type="text" />' +
 		'</div>' +
 		'<div class="se-modal-form-footer">' +
 		'<label><input type="checkbox" class="se-modal-btn-check _se_anchor_check" />&nbsp;' +

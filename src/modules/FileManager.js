@@ -1,5 +1,9 @@
 import CoreDependency from '../dependency/_core';
-import { domUtils, numbers, env } from '../helper';
+import {
+	domUtils,
+	numbers,
+	env
+} from '../helper';
 
 /**
  *
@@ -20,6 +24,7 @@ const FileManager = function (inst, params) {
 	this.infoList = [];
 	this.infoIndex = 0;
 	this.uploadFileLength = 0;
+	this.__updateTags = [];
 };
 
 FileManager.prototype = {
@@ -108,7 +113,9 @@ FileManager.prototype = {
 
 			if (!info) {
 				dataIndex = this.infoIndex++;
-				info = { index: dataIndex };
+				info = {
+					index: dataIndex
+				};
 				this.infoList.push(info);
 			}
 
@@ -209,9 +216,10 @@ FileManager.prototype = {
 		for (let i = 0, len = this.infoList.length; i < len; i++) {
 			infoIndex[i] = this.infoList[i].index;
 		}
+		this.__updateTags = tags;
 
-		for (let i = 0, len = tags.length, tag; i < len; i++) {
-			tag = tags[i];
+		while (tags.length > 0) {
+			let tag = tags.shift();
 			if (!domUtils.getParentElement(tag, this.editor.component.is)) {
 				currentTags.push(this.infoIndex);
 				try {
