@@ -340,7 +340,7 @@ const editor_root = (window.e = suneditor.create(
 		editor4: {
 			target: document.querySelector('#multi_editor_4'),
 			options: {
-				// value: '<p>ed4</p>',
+				// value: '<p>ed4</p>', 
 				placeholder: 'place4',
 				statusbar: true
 			}
