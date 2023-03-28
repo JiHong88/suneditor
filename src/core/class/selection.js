@@ -24,7 +24,7 @@ Selection.prototype = {
 	 */
 	get: function () {
 		const selection = this._shadowRoot && this._shadowRoot.getSelection ? this._shadowRoot.getSelection() : this.editor.frameContext.get('_ww').getSelection();
-		if (!this.editor.frameContext.get('wysiwyg').contains(selection.focusNode)) {
+		if (!this.status._range && !this.editor.frameContext.get('wysiwyg').contains(selection.focusNode)) {
 			selection.removeAllRanges();
 			selection.addRange(this._createDefaultRange());
 		}
