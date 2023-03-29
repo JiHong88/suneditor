@@ -87,6 +87,7 @@
 		edit: 'Edit',
 		unlink: 'Unlink',
 		remove: 'Remove',
+		title: 'Title',
 		link_modal_title: 'Insert Link',
 		link_modal_url: 'URL to link',
 		link_modal_text: 'Text to display',

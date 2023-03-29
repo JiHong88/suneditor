@@ -17,7 +17,8 @@ const ModalAnchorEditor = function (inst, modalForm) {
 	this.modalForm = modalForm;
 	this.host = (this._w.location.origin + this._w.location.pathname).replace(/\/$/, '');
 	this.urlInput = forms.querySelector('.se-input-url');
-	this.displayText = forms.querySelector('._se_display_text');
+	this.displayInput = forms.querySelector('._se_display_text');
+	this.titleInput = forms.querySelector('._se_title');
 	this.newWindowCheck = forms.querySelector('._se_anchor_check');
 	this.downloadCheck = forms.querySelector('._se_anchor_download');
 	this.download = forms.querySelector('._se_anchor_download_icon');
@@ -60,7 +61,7 @@ const ModalAnchorEditor = function (inst, modalForm) {
 	this.selectMenu_bookmark.on(this.urlInput, SetHeaderBookmark.bind(this));
 	this.eventManager.addEvent(this.newWindowCheck, 'change', OnChange_newWindowCheck.bind(this));
 	this.eventManager.addEvent(this.downloadCheck, 'change', OnChange_downloadCheck.bind(this));
-	this.eventManager.addEvent(this.displayText, 'input', OnChange_displayText.bind(this));
+	this.eventManager.addEvent(this.displayInput, 'input', OnChange_displayInput.bind(this));
 	this.eventManager.addEvent(this.urlInput, 'input', OnChange_urlInput.bind(this));
 	this.eventManager.addEvent(this.urlInput, 'focus', OnFocus_urlInput.bind(this));
 	this.eventManager.addEvent(this.bookmarkButton, 'click', OnClick_bookmarkButton.bind(this));
@@ -74,12 +75,14 @@ ModalAnchorEditor.prototype = {
 	on: function (isUpdate) {
 		if (!isUpdate) {
 			this.init();
-			this.displayText.value = this.selection.get().toString().trim();
+			this.displayInput.value = this.selection.get().toString().trim();
 			this.newWindowCheck.checked = this.options.get('linkTargetNewWindow');
+			this.titleInput.value = '';
 		} else if (this.currentTarget) {
 			const href = this.currentTarget.getAttribute('href');
 			this.linkValue = this.preview.textContent = this.urlInput.value = this._selfPathBookmark(href) ? href.substr(href.lastIndexOf('#')) : href;
-			this.displayText.value = this.currentTarget.textContent;
+			this.displayInput.value = this.currentTarget.textContent;
+			this.titleInput.value = this.currentTarget.title;
 			this.newWindowCheck.checked = /_blank/i.test(this.currentTarget.target) ? true : false;
 			this.downloadCheck.checked = this.currentTarget.download;
 		}
@@ -92,11 +95,11 @@ ModalAnchorEditor.prototype = {
 		if (this.linkValue.length === 0) return null;
 
 		const url = this.linkValue;
-		const displayText = this.displayText.value.length === 0 ? url : this.displayText.value;
+		const displayText = this.displayInput.value.length === 0 ? url : this.displayInput.value;
 
 		const oA = this.currentTarget || domUtils.createElement('A');
-		this._updateAnchor(oA, url, displayText, notText);
-		this.linkValue = this.preview.textContent = this.urlInput.value = this.displayText.value = '';
+		this._updateAnchor(oA, url, displayText, this.titleInput.value, notText);
+		this.linkValue = this.preview.textContent = this.urlInput.value = this.displayInput.value = '';
 
 		return oA;
 	},
@@ -104,14 +107,14 @@ ModalAnchorEditor.prototype = {
 	init: function () {
 		this.currentTarget = null;
 		this.linkValue = this.preview.textContent = this.urlInput.value = '';
-		this.displayText.value = '';
+		this.displayInput.value = '';
 		this.newWindowCheck.checked = false;
 		this.downloadCheck.checked = false;
 		this._change = false;
 		this._setRel(this.defaultRel);
 	},
 
-	_updateAnchor: function (anchor, url, displayText, notText) {
+	_updateAnchor: function (anchor, url, displayText, title, notText) {
 		// download
 		if (!this._selfPathBookmark(url) && this.downloadCheck.checked) {
 			anchor.setAttribute('download', displayText || url);
@@ -128,8 +131,11 @@ ModalAnchorEditor.prototype = {
 		if (!rel) anchor.removeAttribute('rel');
 		else anchor.rel = rel;
 
-		// est url
+		// set url
 		anchor.href = url;
+		if (title) anchor.title = title;
+		else anchor.removeAttribute('title');
+
 		if (notText) {
 			if (anchor.children.length === 0) anchor.textContent = '';
 		} else {
@@ -267,7 +273,7 @@ function SetRelItem(item) {
 	this.relPreview.title = this.relPreview.textContent = current.join(', ');
 }
 
-function OnChange_displayText(e) {
+function OnChange_displayInput(e) {
 	this._change = !!e.target.value.trim();
 }
 
@@ -359,11 +365,12 @@ function CreatetModalForm(editor) {
 		'</span>' +
 		'<pre class="se-link-preview"></pre>' +
 		'</div>' +
-		'</div>' +
-		'<div class="se-modal-form">' +
 		'<label>' +
 		lang.link_modal_text +
 		'</label><input class="se-input-form _se_display_text" type="text" />' +
+		'<label>' +
+		lang.title +
+		'</label><input class="se-input-form _se_title" type="text" />' +
 		'</div>' +
 		'<div class="se-modal-form-footer">' +
 		'<label><input type="checkbox" class="se-modal-btn-check _se_anchor_check" />&nbsp;' +
