@@ -5,12 +5,14 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const common = require('./common');
+const env = require('./env');
 
 module.exports = merge(common, {
 	mode: 'production',
 	entry: './webpack/cdn-builder',
 	output: {
 		filename: 'suneditor.min.js',
+		environment: env,
 		path: path.resolve(__dirname, '../dist')
 	},
 	plugins: [

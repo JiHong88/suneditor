@@ -2,12 +2,14 @@ const { merge } = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const common = require('./common');
+const env = require('./env');
 
 module.exports = merge(common, {
 	mode: 'development',
 	entry: './test/dev/suneditor_build_test',
 	output: {
-		filename: 'suneditor.[fullhash].js'
+		filename: 'suneditor.[fullhash].js',
+		environment: env
 	},
 	devtool: 'eval-source-map',
 	devServer: {
