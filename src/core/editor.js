@@ -170,12 +170,6 @@ const Editor = function (multiTargets, options) {
 	this._shadowRoot = null;
 
 	/**
-	 * @description Plugin buttons
-	 * @private
-	 */
-	this._pluginCallButtons = product.pluginCallButtons;
-
-	/**
 	 * @description Plugin call
 	 * @private
 	 */
@@ -294,14 +288,6 @@ const Editor = function (multiTargets, options) {
 	/**
 	 * @description Elements that need to change text or className for each selection change
 	 * After creating the editor, "activePlugins" are added.
-	 * @property {Element} STRONG bold button
-	 * @property {Element} U underline button
-	 * @property {Element} EM italic button
-	 * @property {Element} DEL strike button
-	 * @property {Element} SUB subscript button
-	 * @property {Element} SUP superscript button
-	 * @property {Element} OUTDENT outdent button
-	 * @property {Element} INDENT indent button
 	 * @private
 	 */
 	this._commandMap = new _w.Map();
@@ -352,6 +338,14 @@ const Editor = function (multiTargets, options) {
 };
 
 Editor.prototype = {
+	_set_commandMap: function (pluginName, target) {
+		if (!this._commandMap.get(pluginName)) {
+			this._commandMap.set(pluginName, [target]);
+		} else if (this._commandMap.get(pluginName).indexOf(target) < 0) {
+			this._commandMap.get(pluginName).push(target);
+		}
+	},
+
 	/**
 	 * @description If the plugin is not added, add the plugin and call the 'add' function.
 	 * If the plugin is added call callBack function.
@@ -359,8 +353,6 @@ Editor.prototype = {
 	 * @param {Element|null} target Plugin target button (This is not necessary if you have a button list when creating the editor)
 	 */
 	registerPlugin: function (pluginName, target) {
-		target = target || this._pluginCallButtons[pluginName];
-
 		if (!this.plugins[pluginName]) {
 			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "' + pluginName + '")');
 		} else {
@@ -369,9 +361,12 @@ Editor.prototype = {
 			if (typeof plugin.init === 'function') plugin.init();
 		}
 
-		if (this.plugins[pluginName].active && !this._commandMap.get(pluginName) && !!target) {
-			this._commandMap.set(pluginName, target);
-			this.activePlugins.push(pluginName);
+		if (this.plugins[pluginName].active && target) {
+			this._set_commandMap(pluginName, target);
+
+			if (this.activePlugins.indexOf(pluginName) < 0) {
+				this.activePlugins.push(pluginName);
+			}
 		}
 	},
 
@@ -418,7 +413,7 @@ Editor.prototype = {
 				this.plugins[command].open(null);
 			}
 		} else if (command) {
-			this.commandHandler(command, target);
+			this.commandHandler(command);
 		}
 
 		if (/dropdown/.test(type)) {
@@ -433,9 +428,8 @@ Editor.prototype = {
 	 * @description Execute command of command button(All Buttons except dropdown and modal)
 	 * (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
 	 * @param {string} command Property of command button (data-value)
-	 * @param {Element|null} target The element of command button
 	 */
-	commandHandler: function (command, target) {
+	commandHandler: function (command) {
 		if (this.status.isReadOnly && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) return;
 
 		switch (command) {
@@ -537,8 +531,6 @@ Editor.prototype = {
 			default:
 				// 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'..
 				command = this.options.get('_defaultCommand')[command.toLowerCase()] || command;
-				if (!this._commandMap.get(command)) this._commandMap.set(command, target);
-
 				const nodesMap = this.status.currentNodesMap;
 				const cmd = nodesMap.indexOf(command) > -1 ? null : domUtils.createElement(command);
 				let removeNode = command;
@@ -1312,15 +1304,22 @@ Editor.prototype = {
 
 		const ctx = this.context;
 		const textTags = this.options.get('textTags');
-		const commandMap = this._commandMap;
-		commandMap.set('OUTDENT', ctx.get('buttons.outdent'));
-		commandMap.set('INDENT', ctx.get('buttons.indent'));
-		commandMap.set(textTags.bold.toUpperCase(), ctx.get('buttons.bold'));
-		commandMap.set(textTags.underline.toUpperCase(), ctx.get('buttons.underline'));
-		commandMap.set(textTags.italic.toUpperCase(), ctx.get('buttons.italic'));
-		commandMap.set(textTags.strike.toUpperCase(), ctx.get('buttons.strike'));
-		commandMap.set(textTags.sub.toUpperCase(), ctx.get('buttons.subscript'));
-		commandMap.set(textTags.sup.toUpperCase(), ctx.get('buttons.superscript'));
+		this._set_commandMap('OUTDENT', ctx.get('buttons.outdent'));
+		this._set_commandMap('OUTDENT', ctx.get('buttons.sub.outdent'));
+		this._set_commandMap('INDENT', ctx.get('buttons.indent'));
+		this._set_commandMap('INDENT', ctx.get('buttons.sub.indent'));
+		this._set_commandMap(textTags.bold.toUpperCase(), ctx.get('buttons.bold'));
+		this._set_commandMap(textTags.bold.toUpperCase(), ctx.get('buttons.sub.bold'));
+		this._set_commandMap(textTags.underline.toUpperCase(), ctx.get('buttons.underline'));
+		this._set_commandMap(textTags.underline.toUpperCase(), ctx.get('buttons.sub.underline'));
+		this._set_commandMap(textTags.italic.toUpperCase(), ctx.get('buttons.italic'));
+		this._set_commandMap(textTags.italic.toUpperCase(), ctx.get('buttons.sub.italic'));
+		this._set_commandMap(textTags.strike.toUpperCase(), ctx.get('buttons.strike'));
+		this._set_commandMap(textTags.strike.toUpperCase(), ctx.get('buttons.sub.strike'));
+		this._set_commandMap(textTags.sub.toUpperCase(), ctx.get('buttons.subscript'));
+		this._set_commandMap(textTags.sub.toUpperCase(), ctx.get('buttons.sub.subscript'));
+		this._set_commandMap(textTags.sup.toUpperCase(), ctx.get('buttons.superscript'));
+		this._set_commandMap(textTags.sup.toUpperCase(), ctx.get('buttons.sub.superscript'));
 
 		this._saveButtonStates();
 	},
@@ -1510,7 +1509,7 @@ Editor.prototype = {
 		let filePluginRegExp = [];
 		let plugin;
 		for (let key in plugins) {
-			this.registerPlugin(key, this._pluginCallButtons[key]);
+			this.registerPlugin(key, product.pluginCallButtons[key]);
 			plugin = this.plugins[key];
 
 			// Filemanager

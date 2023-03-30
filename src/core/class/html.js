@@ -64,7 +64,7 @@ const HTML = function (editor) {
 	const _wAttr = options.get('attributeWhitelist');
 	let tagsAttr = {};
 	let allAttr = '';
-	if (!!_wAttr) {
+	if (_wAttr) {
 		for (let k in _wAttr) {
 			if (/^on[a-z]+$/i.test(_wAttr[k])) continue;
 			if (k === 'all') {
@@ -83,7 +83,7 @@ const HTML = function (editor) {
 	const _bAttr = options.get('attributeBlacklist');
 	tagsAttr = {};
 	allAttr = '';
-	if (!!_bAttr) {
+	if (_bAttr) {
 		for (let k in _bAttr) {
 			if (k === 'all') {
 				allAttr = GetRegList(_bAttr[k], '');

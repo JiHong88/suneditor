@@ -280,7 +280,7 @@ Viewer.prototype = {
 				try {
 					iframe.focus();
 					// IE or Edge, Chromium
-					if (env.isIE || env.isEdge || env.isChromium || !!this._d.documentMode || !!this._w.StyleMedia) {
+					if (env.isIE || env.isEdge || env.isChromium || this._d.documentMode || this._w.StyleMedia) {
 						try {
 							iframe.contentWindow.document.execCommand('print', false, null);
 						} catch (e) {

@@ -121,7 +121,7 @@ EventManager.prototype = {
 		this.editor.effectNode = selectionNode;
 
 		const marginDir = this.options.get('_rtl') ? 'marginRight' : 'marginLeft';
-		const commandMap = this.editor._commandMap;
+		const _commandMap = this.editor._commandMap;
 		const classOnCheck = this._onButtonsCheck;
 		const commandMapNodes = [];
 		const currentNodes = [];
@@ -153,20 +153,20 @@ EventManager.prototype = {
 			/** indent, outdent */
 			if (this.format.isLine(element)) {
 				/* Outdent */
-				if (commandMapNodes.indexOf('OUTDENT') === -1 && commandMap.get('OUTDENT') && !domUtils.isImportantDisabled(commandMap.get('OUTDENT'))) {
+				if (commandMapNodes.indexOf('OUTDENT') === -1 && _commandMap.get('OUTDENT') && !domUtils.isImportantDisabled(_commandMap.get('OUTDENT'))) {
 					if (domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0)) {
 						commandMapNodes.push('OUTDENT');
-						commandMap.get('OUTDENT').removeAttribute('disabled');
+						_commandMap.get('OUTDENT').removeAttribute('disabled');
 					}
 				}
 
 				/* Indent */
-				if (commandMapNodes.indexOf('INDENT') === -1 && commandMap.get('INDENT') && !domUtils.isImportantDisabled(commandMap.get('INDENT'))) {
+				if (commandMapNodes.indexOf('INDENT') === -1 && _commandMap.get('INDENT') && !domUtils.isImportantDisabled(_commandMap.get('INDENT'))) {
 					commandMapNodes.push('INDENT');
 					if (domUtils.isListCell(element) && !element.previousElementSibling) {
-						commandMap.get('INDENT').setAttribute('disabled', true);
+						_commandMap.get('INDENT').setAttribute('disabled', true);
 					} else {
-						commandMap.get('INDENT').removeAttribute('disabled');
+						_commandMap.get('INDENT').removeAttribute('disabled');
 					}
 				}
 
@@ -176,7 +176,7 @@ EventManager.prototype = {
 			/** default active buttons [strong, ins, em, del, sub, sup] */
 			if (classOnCheck.test(nodeName)) {
 				commandMapNodes.push(nodeName);
-				domUtils.addClass(commandMap.get(nodeName), 'active');
+				domUtils.addClass(_commandMap.get(nodeName), 'active');
 			}
 		}
 
@@ -1121,7 +1121,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 			}
 
 			// component
-			if (!selectRange && formatEl && (range.startOffset === 0 || (selectionNode === formatEl ? !!formatEl.childNodes[range.startOffset] : false))) {
+			if (!selectRange && formatEl && (range.startOffset === 0 || (selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : false))) {
 				const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : selectionNode;
 				const prev = formatEl.previousSibling;
 				// select file component
@@ -1204,7 +1204,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 				}
 			}
 
-			if (!selectRange && (domUtils.isEdgePoint(range.endContainer, range.endOffset) || (selectionNode === formatEl ? !!formatEl.childNodes[range.startOffset] : false))) {
+			if (!selectRange && (domUtils.isEdgePoint(range.endContainer, range.endOffset) || (selectionNode === formatEl ? formatEl.childNodes[range.startOffset] : false))) {
 				const sel = selectionNode === formatEl ? formatEl.childNodes[range.startOffset] || selectionNode : selectionNode;
 				// delete nonEditable
 				if (sel && domUtils.isNonEditable(sel.nextSibling)) {
@@ -1491,7 +1491,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 
 					if (
 						!this.format.isClosureBrLine(brBlock) &&
-						!!children &&
+						children &&
 						((selectionFormat &&
 								range.collapsed &&
 								children.length - 1 <= offset + 1 &&

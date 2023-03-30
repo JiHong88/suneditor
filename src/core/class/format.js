@@ -149,7 +149,7 @@ Format.prototype = {
 			}
 
 			if (!isComp) domUtils.removeItem(f);
-			if (!!html) first = false;
+			if (html) first = false;
 		}
 
 		this.selection.setRange(focusElement, 0, focusElement, 0);
@@ -1926,7 +1926,7 @@ Format.prototype = {
 					}
 
 					const prevAnchorNode = _getMaintainedNode(ancestor);
-					if (!!prevAnchorNode) anchorNode = prevAnchorNode;
+					if (prevAnchorNode) anchorNode = prevAnchorNode;
 					if (anchorNode) line = anchorNode;
 
 					newNode = child;
@@ -2429,7 +2429,7 @@ Format.prototype = {
 					}
 
 					const prevAnchorNode = _getMaintainedNode(ancestor);
-					if (!!prevAnchorNode) anchorNode = prevAnchorNode;
+					if (prevAnchorNode) anchorNode = prevAnchorNode;
 					if (anchorNode) line = anchorNode;
 
 					newNode = ancestor;
@@ -3006,7 +3006,7 @@ Format.prototype = {
 	 * @private
 	 */
 	_sn_isSizeNode: function (element) {
-		return element && typeof element !== 'string' && element.nodeType !== 3 && this.isTextStyleNode(element) && !!element.style.fontSize;
+		return element && typeof element !== 'string' && element.nodeType !== 3 && this.isTextStyleNode(element) && element.style.fontSize;
 	},
 
 	/**

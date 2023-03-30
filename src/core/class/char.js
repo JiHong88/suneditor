@@ -101,7 +101,7 @@ Char.prototype = {
 	 */
 	test: function (inputText) {
 		let nextCharCount = 0;
-		if (!!inputText) nextCharCount = this.getLength(inputText);
+		if (inputText) nextCharCount = this.getLength(inputText);
 
 		this.display();
 

@@ -34,7 +34,7 @@ export function createElement(elementName, attributes, inner) {
 		}
 	}
 
-	if (!!inner) {
+	if (inner) {
 		if (typeof inner === 'string') {
 			el.innerHTML = inner;
 		} else if (typeof inner === 'object') {
@@ -198,7 +198,7 @@ export function getListChildren(element, validation) {
 			children.push(current);
 		}
 
-		if (!!current.children) {
+		if (current.children) {
 			for (let i = 0, len = current.children.length; i < len; i++) {
 				recursionFunc(current.children[i]);
 			}
@@ -688,30 +688,31 @@ export function hasClass(element, className) {
 
 /**
  * @description Append the className value of the argument value element
- * @param {Element} element Elements to add class name
+ * @param {Element|Array.<Element>} element Elements to add class name
  * @param {string} className Class name to be add
  */
 export function addClass(element, className) {
 	if (!element) return;
 
 	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
-	if (check.test(element.className)) return;
-
-	element.className += (element.className.length > 0 ? ' ' : '') + className;
+	(_w.Array.isArray(element) ? element : [element]).forEach(function (e) {
+		if (!check.test(e.className)) e.className += (e.className.length > 0 ? ' ' : '') + e;
+	})
 }
 
 /**
  * @description Delete the className value of the argument value element
- * @param {Element} element Elements to remove class name
+ * @param {Element|Array.<Element>} element Elements to remove class name
  * @param {string} className Class name to be remove
  */
 export function removeClass(element, className) {
 	if (!element) return;
 
 	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
-	element.className = element.className.replace(check, ' ').trim();
-
-	if (!element.className.trim()) element.removeAttribute('class');
+	(_w.Array.isArray(element) ? element : [element]).forEach(function (e) {
+		e.className = e.className.replace(check, ' ').trim();
+		if (!e.className.trim()) e.removeAttribute('class');
+	})
 }
 
 /**
@@ -745,7 +746,7 @@ export function toggleClass(element, className) {
  * @returns {boolean}
  */
 export function isEdgePoint(container, offset, dir) {
-	return (dir !== 'end' && offset === 0) || ((!dir || dir !== 'front') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && !!container.nodeValue && offset === container.nodeValue.length);
+	return (dir !== 'end' && offset === 0) || ((!dir || dir !== 'front') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && container.nodeValue && offset === container.nodeValue.length);
 }
 
 /**
@@ -844,7 +845,7 @@ export function isEmptyLine(element) {
  * @returns {Boolean}
  */
 export function isSpanWithoutAttr(element) {
-	return !!element && element.nodeType === 1 && /^SPAN$/i.test(element.nodeName) && !element.className && !element.style.cssText;
+	return element && element.nodeType === 1 && /^SPAN$/i.test(element.nodeName) && !element.className && !element.style.cssText;
 }
 
 /**

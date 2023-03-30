@@ -41,7 +41,7 @@ TextStyle.prototype = {
 				while (node && !this.format.isLine(node) && !this.component.is(node)) {
 					if (node.nodeName.toLowerCase() === btn.getAttribute('data-command').toLowerCase()) {
 						value = data[v];
-						if (/^\./.test(value) ? domUtils.hasClass(node, value.replace(/^\./, '')) : !!node.style[value]) {
+						if (/^\./.test(value) ? domUtils.hasClass(node, value.replace(/^\./, '')) : node.style[value]) {
 							active = true;
 							break;
 						}

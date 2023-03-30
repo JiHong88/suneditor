@@ -4,18 +4,18 @@ require('../../src/assets/suneditor-content.css');
 require('../../src/assets/theme/test.css');
 
 // katex
-import Katex from 'katex';
-require('katex/dist/katex.css');
+// import Katex from 'katex';
+// require('katex/dist/katex.css');
 
 // codemirror6
-import { EditorView, basicSetup, minimalSetup } from 'codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { html } from '@codemirror/lang-html';
+// import { EditorView, basicSetup, minimalSetup } from 'codemirror';
+// import { javascript } from '@codemirror/lang-javascript';
+// import { html } from '@codemirror/lang-html';
 
-// codemirror5
-import Codemirror5 from 'codemirror5';
-require('codemirror5/lib/codemirror.css');
-require('codemirror5/mode/htmlmixed/htmlmixed');
+// // codemirror5
+// import Codemirror5 from 'codemirror5';
+// require('codemirror5/lib/codemirror.css');
+// require('codemirror5/mode/htmlmixed/htmlmixed');
 
 // import lang from '../../src/langs';
 // import blockquote from '../../src/plugins/command/blockquote';
@@ -352,18 +352,18 @@ const editor_root = (window.e = suneditor.create(
 		plugins: plugins,
 		toolbar_container: '#root_toolbar_container',
 		statusbar_container: '#root_statusbar_container',
-		codeMirror: {
-			EditorView: EditorView,
-			extensions: [
-				basicSetup,
-				html({
-					matchClosingTags: true,
-					autoCloseTags: true
-				}),
-				javascript()
-			],
-			minimalSetup: minimalSetup
-		},
+		// codeMirror: {
+		// 	EditorView: EditorView,
+		// 	extensions: [
+		// 		basicSetup,
+		// 		html({
+		// 			matchClosingTags: true,
+		// 			autoCloseTags: true
+		// 		}),
+		// 		javascript()
+		// 	],
+		// 	minimalSetup: minimalSetup
+		// },
 		// codeMirror: {
 		// 	src: Codemirror5
 		// },
@@ -372,12 +372,13 @@ const editor_root = (window.e = suneditor.create(
 		lineAttrReset: 'id',
 		attributeWhitelist: 'id',
 		buttonList: bl,
-		katex: {
-			src: Katex
-		}
+		subToolbar: bl,
+		// katex: {
+		// 	src: Katex
+		// }
 	}
 ));
 
-editor_root.events.onBlur = (rootKey, e, htmlFrame) => {
-	console.log('blur', editor_root.frameContext);
-};
+// editor_root.events.onBlur = (rootKey, e, htmlFrame) => {
+// 	console.log('blur', editor_root.frameContext);
+// };

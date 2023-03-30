@@ -598,7 +598,7 @@ Figure.prototype = {
 
 	_setPercentSize: function (w, h) {
 		if (!h) h = this.autoRatio ? (/%$/.test(this.autoRatio.current) ? this.autoRatio.current : this.autoRatio.default) : h;
-		h = !!h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || (this.autoRatio ? this.autoRatio.default : '');
+		h = h && !/%$/.test(h) && !numbers.get(h, 0) ? (numbers.is(h) ? h + '%' : h) : numbers.is(h) ? h + this.sizeUnit : h || (this.autoRatio ? this.autoRatio.default : '');
 
 		const heightPercentage = /%$/.test(h);
 		this._container.style.width = numbers.is(w) ? w + '%' : w;
@@ -661,7 +661,7 @@ Figure.prototype = {
 	_saveCurrentSize: function () {
 		const size = this.getSize(this._element);
 		this._element.setAttribute('data-se-size', (size.w || 'auto') + ',' + (size.h || 'auto'));
-		// if (!!contextPlugin._videoRatio) contextPlugin._videoRatio = size.y; @todo
+		// if (contextPlugin._videoRatio) contextPlugin._videoRatio = size.y; @todo
 	},
 
 	_setCaptionPosition: function (element) {
