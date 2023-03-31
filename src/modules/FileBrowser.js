@@ -1,12 +1,19 @@
 import CoreDependency from '../dependency/_core';
-import { domUtils, env } from '../helper';
+import {
+	domUtils,
+	env
+} from '../helper';
 
 const FileBrowser = function (inst, params) {
 	CoreDependency.call(this, inst.editor);
 
 	// create HTML
-	const browserFrame = domUtils.createElement('DIV', { class: 'se-file-browser sun-editor-common' });
-	const content = domUtils.createElement('DIV', { class: 'se-file-browser-inner' }, CreateHTML(inst.editor));
+	const browserFrame = domUtils.createElement('DIV', {
+		class: 'se-file-browser sun-editor-common'
+	});
+	const content = domUtils.createElement('DIV', {
+		class: 'se-file-browser-inner'
+	}, CreateHTML(inst.editor));
 
 	// members
 	this.inst = inst;
@@ -28,8 +35,8 @@ const FileBrowser = function (inst, params) {
 
 	this.items = [];
 	this.selectedTags = [];
+	this._xhr = null;
 	this._closeSignal = false;
-	this._xmlHttp = null;
 	this._bindClose = null;
 	this.__globalEventHandler = function (e) {
 		if (!/27/.test(e.keyCode)) return;
@@ -37,7 +44,9 @@ const FileBrowser = function (inst, params) {
 	}.bind(this);
 
 	// init
-	browserFrame.appendChild(domUtils.createElement('DIV', { class: 'se-file-browser-back' }));
+	browserFrame.appendChild(domUtils.createElement('DIV', {
+		class: 'se-file-browser-back'
+	}));
 	browserFrame.appendChild(content);
 	this.editor._carrierWrapper.appendChild(browserFrame);
 
@@ -74,7 +83,7 @@ FileBrowser.prototype = {
 	 */
 	close: function () {
 		this.__removeGlobalEvent();
-		if (this._xmlHttp) this._xmlHttp.abort();
+		if (this._xhr) this._xhr.abort();
 
 		this.area.style.display = 'none';
 		this.selectedTags = [];
@@ -99,16 +108,16 @@ FileBrowser.prototype = {
 	},
 
 	_drawFileList: function (url, urlHeader) {
-		const xmlHttp = (this._xmlHttp = env.getXMLHttpRequest());
+		const xhr = (this._xhr = env.getXMLHttpRequest());
 
-		xmlHttp.onreadystatechange = CallBackGet.bind(this, xmlHttp);
-		xmlHttp.open('get', url, true);
+		xhr.onreadystatechange = CallBackGet.bind(this, xhr);
+		xhr.open('get', url, true);
 		if (urlHeader !== null && typeof urlHeader === 'object' && this._w.Object.keys(urlHeader).length > 0) {
 			for (let key in urlHeader) {
-				xmlHttp.setRequestHeader(key, urlHeader[key]);
+				xhr.setRequestHeader(key, urlHeader[key]);
 			}
 		}
-		xmlHttp.send(null);
+		xhr.send(null);
 
 		this.showBrowserLoading();
 	},
@@ -170,7 +179,7 @@ FileBrowser.prototype = {
 
 function CallBackGet(xmlHttp) {
 	if (xmlHttp.readyState === 4) {
-		this._xmlHttp = null;
+		this._xhr = null;
 		if (xmlHttp.status === 200) {
 			try {
 				const res = this._w.JSON.parse(xmlHttp.responseText);
@@ -215,13 +224,13 @@ function OnClickTag(e) {
 	}
 
 	this._drawListItem(
-		selectedTags.length === 0
-			? this.items
-			: this.items.filter(function (item) {
-					return item.tag.some(function (tag) {
-						return selectedTags.indexOf(tag) > -1;
-					});
-			  }),
+		selectedTags.length === 0 ?
+		this.items :
+		this.items.filter(function (item) {
+			return item.tag.some(function (tag) {
+				return selectedTags.indexOf(tag) > -1;
+			});
+		}),
 		false
 	);
 }

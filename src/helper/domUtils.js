@@ -871,12 +871,12 @@ export function isAllowClassName(v) {
 }
 
 /**
- * @description It is judged whether it is the not checking node. (class="katex", "__se__block")
+ * @description It is judged whether it is the not checking node. (class="katex", "__se__tag")
  * @param {Node} element The node to check
  * @returns {boolean}
  */
 export function isNotCheckingNode(element) {
-	return element && /\b(katex|__se__block)\b/.test(element.className);
+	return element && /\b(katex|__se__tag)\b/.test(element.className);
 }
 
 /**
