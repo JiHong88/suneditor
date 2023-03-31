@@ -31,7 +31,7 @@ Layout.prototype = {
 		const temp = this.options.get('layouts')[(this.selectedIndex = index)];
 
 		if (temp.html) {
-			this.editor.setContent(temp.html);
+			this.html.set(temp.html);
 		} else {
 			this.menu.dropdownOff();
 			throw Error('[SUNEDITOR.layout.fail] cause : "layouts[i].html not found"');

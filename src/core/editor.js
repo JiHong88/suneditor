@@ -520,7 +520,7 @@ Editor.prototype = {
 				break;
 			case 'save':
 				if (typeof this.options.get('callBackSave') === 'function') {
-					this.options.get('callBackSave')(this.getContent(), this.status.isChanged);
+					this.options.get('callBackSave')(this.html.get(), this.status.isChanged);
 				} else if (this.status.isChanged && typeof this.events.save === 'function') {
 					this.events.save();
 				} else {
@@ -739,144 +739,6 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Sets the HTML string
-	 * @param {string|undefined} html HTML string
-	 * @param {number|Array.<number>|undefined} rootKey Root index
-	 */
-	setContent: function (html, rootKey) {
-		this.selection.removeRange();
-		const convertValue = html === null || html === undefined ? '' : this.html.clean(html, true, null, null);
-
-		if (!rootKey) rootKey = [this.status.rootKey];
-		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
-
-		for (let i = 0; i < rootKey.length; i++) {
-			this.changeFrameContext(rootKey[i]);
-
-			if (!this.frameContext.get('isCodeView')) {
-				this.frameContext.get('wysiwyg').innerHTML = convertValue;
-				this._resetComponents();
-				this.history.push(false, rootKey[i]);
-			} else {
-				const value = this._convertHTMLToCode(convertValue, false);
-				this.viewer._setCodeView(value);
-			}
-		}
-	},
-
-	/**
-	 * @description Add content to the end of content.
-	 * @param {string} content Content to Input
-	 * @param {number|Array.<number>|undefined} rootKey Root index
-	 */
-	addContent: function (content, rootKey) {
-		if (!rootKey) rootKey = [this.status.rootKey];
-		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
-
-		for (let i = 0; i < rootKey.length; i++) {
-			this.changeFrameContext(rootKey[i]);
-			const convertValue = this.html.clean(content, true, null, null);
-
-			if (!this.frameContext.get('isCodeView')) {
-				const temp = domUtils.createElement('DIV', null, convertValue);
-				const children = temp.children;
-				for (let i = 0, len = children.length; i < len; i++) {
-					if (!children[i]) continue;
-					this.frameContext.get('wysiwyg').appendChild(children[i]);
-				}
-				this.history.push(false, rootKey[i]);
-			} else {
-				this.viewer._setCodeView(this.viewer._getCodeView() + '\n' + this._convertHTMLToCode(convertValue, false));
-			}
-		}
-	},
-
-	/**
-	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
-	 * @param {Object} ctx { head: HTML string, body: HTML string}
-	 * @param {number|Array.<number>|undefined} rootKey Root index
-	 */
-	setFullPageContent: function (ctx, rootKey) {
-		if (!this.options.get('iframe')) return false;
-
-		if (!rootKey) rootKey = [this.status.rootKey];
-		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
-
-		for (let i = 0; i < rootKey.length; i++) {
-			this.changeFrameContext(rootKey[i]);
-			if (ctx.head) this.frameContext.get('_wd').head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
-			if (ctx.body) this.frameContext.get('_wd').body.innerHTML = this.html.clean(ctx.body, true, null, null);
-			this._resetComponents();
-		}
-	},
-
-	/**
-	 * @description Gets the current content
-	 * @param {boolean} withFrame Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
-	 * Ignored for options.get('iframe_fullPage') is true.
-	 * @param {boolean} includeFullPage Return only the content of the body without headers when the "iframe_fullPage" option is true
-	 * @param {number|Array.<number>|undefined} rootKey Root index
-	 * @returns {string|Array.<string>}
-	 */
-	getContent: function (withFrame, includeFullPage, rootKey) {
-		if (!rootKey) rootKey = [this.status.rootKey];
-		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
-
-		const prevrootKey = this.status.rootKey;
-		const resultValue = {};
-		for (let i = 0, len = rootKey.length, r; i < len; i++) {
-			this.changeFrameContext(rootKey[i]);
-
-			const fc = this.frameContext;
-			const renderHTML = domUtils.createElement('DIV', null, this._convertHTMLToCode(fc.get('wysiwyg'), true));
-			const figcaptions = domUtils.getListChildren(renderHTML, function (current) {
-				return /FIGCAPTION/i.test(current.nodeName);
-			});
-
-			for (let i = 0, len = figcaptions.length; i < len; i++) {
-				figcaptions[i].removeAttribute('contenteditable');
-			}
-
-			const content = this.html.clean(renderHTML.innerHTML, false, null, null);
-			if (this.options.get('iframe_fullPage')) {
-				if (includeFullPage) {
-					const attrs = domUtils.getAttributesToString(fc.get('_wd').body, ['contenteditable']);
-					r = '<!DOCTYPE html><html>' + fc.get('_wd').head.outerHTML + '<body ' + attrs + '>' + content + '</body></html>';
-				} else {
-					r = content;
-				}
-			} else {
-				r = withFrame ? '<div class="sun-editor-editable' + (this.options.get('_rtl') ? ' se-rtl' : '') + '">' + content + '</div>' : renderHTML.innerHTML;
-			}
-
-			resultValue[rootKey[i]] = r;
-		}
-
-		this.changeFrameContext(prevrootKey);
-		return rootKey.length > 1 ? resultValue : resultValue[rootKey[0]];
-	},
-
-	/**
-	 * @description Gets only the text of the suneditor content
-	 * @param {number|Array.<number>|undefined} rootKey Root index
-	 * @returns {string|Array.<string>}
-	 */
-	getText: function (rootKey) {
-		if (!rootKey) rootKey = [this.status.rootKey];
-		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
-
-		const prevrootKey = this.status.rootKey;
-		const resultValue = {};
-		for (let i = 0, len = rootKey.length; i < len; i++) {
-			this.changeFrameContext(rootKey[i]);
-			resultValue[rootKey[i]] = this.frameContext.get('wysiwyg').textContent;
-		}
-
-		this.changeFrameContext(prevrootKey);
-		return rootKey.length > 1 ? resultValue : resultValue[rootKey[0]];
-	},
-
-	/**
 	 * @description Set "options.get('editorStyle')" style.
 	 * Define the style of the edit area
 	 * It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
@@ -1005,7 +867,7 @@ Editor.prototype = {
 	 * @description Copying the content of the editor to the original textarea and execute onSave callback.
 	 */
 	save: function () {
-		const value = this.getContent();
+		const value = this.html.get();
 		this.frameContext.get('originElement').value = value;
 		// user event
 		if (typeof this.events.onSave === 'function') {
@@ -1109,66 +971,6 @@ Editor.prototype = {
 	_nativeFocus: function () {
 		this.selection.__focus();
 		this.selection._init();
-	},
-
-	/**
-	 * @description construct wysiwyg area element to html string
-	 * @param {Element|String} html WYSIWYG element (this.frameContext.get('wysiwyg')) or HTML string.
-	 * @param {Boolean} comp If true, does not line break and indentation of tags.
-	 * @returns {string}
-	 */
-	_convertHTMLToCode: function (html, comp) {
-		let returnHTML = '';
-		const _w = this._w;
-		const wRegExp = _w.RegExp;
-		const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
-		const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
-		const isFormat = function (current) {
-			return this.format.isLine(current) || this.component.is(current);
-		}.bind(this);
-		const brChar = comp ? '' : '\n';
-
-		let indentSize = comp ? 0 : this.status.codeIndentSize * 1;
-		indentSize = indentSize > 0 ? new _w.Array(indentSize + 1).join(' ') : '';
-
-		(function recursionFunc(element, indent) {
-			const children = element.childNodes;
-			const elementRegTest = brReg.test(element.nodeName);
-			const elementIndent = elementRegTest ? indent : '';
-
-			for (let i = 0, len = children.length, node, br, lineBR, nodeRegTest, tag, tagIndent; i < len; i++) {
-				node = children[i];
-				nodeRegTest = brReg.test(node.nodeName);
-				br = nodeRegTest ? brChar : '';
-				lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? brChar : '';
-
-				if (node.nodeType === 8) {
-					returnHTML += '\n<!-- ' + node.textContent.trim() + ' -->' + br;
-					continue;
-				}
-				if (node.nodeType === 3) {
-					if (!domUtils.isList(node.parentElement)) returnHTML += converter.htmlToEntity(/^\n+$/.test(node.data) ? '' : node.data);
-					continue;
-				}
-				if (node.childNodes.length === 0) {
-					returnHTML += (/^HR$/i.test(node.nodeName) ? brChar : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + node.outerHTML + br;
-					continue;
-				}
-
-				if (!node.outerHTML) {
-					// IE
-					returnHTML += new _w.XMLSerializer().serializeToString(node);
-				} else {
-					tag = node.nodeName.toLowerCase();
-					tagIndent = elementIndent || nodeRegTest ? indent : '';
-					returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
-					recursionFunc(node, indent + indentSize, '');
-					returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? brChar : '' || /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
-				}
-			}
-		})(wDoc, '');
-
-		return returnHTML.trim() + brChar;
 	},
 
 	/**
@@ -1406,7 +1208,7 @@ Editor.prototype = {
 		this.status.isChanged = true;
 		if (this.context.has('buttons.save')) this.context.get('buttons.save').removeAttribute('disabled');
 		// user event
-		if (this.events.onChange) this.events.onChange(this.getContent());
+		if (this.events.onChange) this.events.onChange(this.html.get());
 		if (this.context.get('toolbar.main').style.display === 'block') this.toolbar._showBalloon();
 	},
 

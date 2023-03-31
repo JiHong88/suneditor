@@ -252,7 +252,7 @@ Viewer.prototype = {
 		});
 		this._d.body.appendChild(iframe);
 
-		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*content\s*\}\}/i, this.editor.getContent(true)) : this.editor.getContent(true);
+		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*content\s*\}\}/i, this.html.get(true)) : this.html.get(true);
 		const printDocument = domUtils.getIframeDocument(iframe);
 		const wDoc = this.editor.frameContext.get('_wd');
 
@@ -311,7 +311,7 @@ Viewer.prototype = {
 		this.editor._offCurrentController();
 		this.editor._offCurrentModal();
 
-		const contentHTML = this.options.get('previewTemplate') ? this.options.get('previewTemplate').replace(/\{\{\s*content\s*\}\}/i, this.editor.getContent(true)) : this.editor.getContent(true);
+		const contentHTML = this.options.get('previewTemplate') ? this.options.get('previewTemplate').replace(/\{\{\s*content\s*\}\}/i, this.html.get(true)) : this.html.get(true);
 		const windowObject = this._w.open('', '_blank');
 		windowObject.mimeType = 'text/html';
 		const wDoc = this.editor.frameContext.get('_wd');
@@ -475,7 +475,7 @@ Viewer.prototype = {
 	 * @private
 	 */
 	_setEditorDataToCodeView: function () {
-		const codeContent = this.editor._convertHTMLToCode(this.editor.frameContext.get('wysiwyg'), false);
+		const codeContent = this.html._convertToCode(this.editor.frameContext.get('wysiwyg'), false);
 		let codeValue = '';
 
 		if (this.options.get('iframe_fullPage')) {

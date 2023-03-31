@@ -758,12 +758,190 @@ HTML.prototype = {
 	},
 
 	/**
+	 * @description Gets the current content
+	 * @param {boolean} withFrame Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
+	 * Ignored for options.get('iframe_fullPage') is true.
+	 * @param {boolean} includeFullPage Return only the content of the body without headers when the "iframe_fullPage" option is true
+	 * @param {number|Array.<number>|undefined} rootKey Root index
+	 * @returns {string|Array.<string>}
+	 */
+	get: function (withFrame, includeFullPage, rootKey) {
+		if (!rootKey) rootKey = [this.status.rootKey];
+		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
+
+		const prevrootKey = this.status.rootKey;
+		const resultValue = {};
+		for (let i = 0, len = rootKey.length, r; i < len; i++) {
+			this.editor.changeFrameContext(rootKey[i]);
+
+			const fc = this.editor.frameContext;
+			const renderHTML = domUtils.createElement('DIV', null, this._convertToCode(fc.get('wysiwyg'), true));
+			const figcaptions = domUtils.getListChildren(renderHTML, function (current) {
+				return /FIGCAPTION/i.test(current.nodeName);
+			});
+
+			for (let i = 0, len = figcaptions.length; i < len; i++) {
+				figcaptions[i].removeAttribute('contenteditable');
+			}
+
+			const content = this.clean(renderHTML.innerHTML, false, null, null);
+			if (this.options.get('iframe_fullPage')) {
+				if (includeFullPage) {
+					const attrs = domUtils.getAttributesToString(fc.get('_wd').body, ['contenteditable']);
+					r = '<!DOCTYPE html><html>' + fc.get('_wd').head.outerHTML + '<body ' + attrs + '>' + content + '</body></html>';
+				} else {
+					r = content;
+				}
+			} else {
+				r = withFrame ? '<div class="sun-editor-editable' + (this.options.get('_rtl') ? ' se-rtl' : '') + '">' + content + '</div>' : renderHTML.innerHTML;
+			}
+
+			resultValue[rootKey[i]] = r;
+		}
+
+		this.editor.changeFrameContext(prevrootKey);
+		return rootKey.length > 1 ? resultValue : resultValue[rootKey[0]];
+	},
+
+	/**
+	 * @description Sets the HTML string
+	 * @param {string|undefined} html HTML string
+	 * @param {number|Array.<number>|undefined} rootKey Root index
+	 */
+	set: function (html, rootKey) {
+		this.selection.removeRange();
+		const convertValue = html === null || html === undefined ? '' : this.clean(html, true, null, null);
+
+		if (!rootKey) rootKey = [this.status.rootKey];
+		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
+
+		for (let i = 0; i < rootKey.length; i++) {
+			this.editor.changeFrameContext(rootKey[i]);
+
+			if (!this.editor.frameContext.get('isCodeView')) {
+				this.editor.frameContext.get('wysiwyg').innerHTML = convertValue;
+				this.editor._resetComponents();
+				this.history.push(false, rootKey[i]);
+			} else {
+				const value = this._convertToCode(convertValue, false);
+				this.viewer._setCodeView(value);
+			}
+		}
+	},
+
+	/**
+	 * @description Add content to the end of content.
+	 * @param {string} content Content to Input
+	 * @param {number|Array.<number>|undefined} rootKey Root index
+	 */
+	add: function (content, rootKey) {
+		if (!rootKey) rootKey = [this.status.rootKey];
+		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
+
+		for (let i = 0; i < rootKey.length; i++) {
+			this.editor.changeFrameContext(rootKey[i]);
+			const convertValue = this.clean(content, true, null, null);
+
+			if (!this.editor.frameContext.get('isCodeView')) {
+				const temp = domUtils.createElement('DIV', null, convertValue);
+				const children = temp.children;
+				for (let i = 0, len = children.length; i < len; i++) {
+					if (!children[i]) continue;
+					this.editor.frameContext.get('wysiwyg').appendChild(children[i]);
+				}
+				this.history.push(false, rootKey[i]);
+			} else {
+				this.viewer._setCodeView(this.viewer._getCodeView() + '\n' + this._convertToCode(convertValue, false));
+			}
+		}
+	},
+
+	/**
+	 * @description Sets the content of the iframe's head tag and body tag when using the "iframe" or "iframe_fullPage" option.
+	 * @param {Object} ctx { head: HTML string, body: HTML string}
+	 * @param {number|Array.<number>|undefined} rootKey Root index
+	 */
+	setFullPage: function (ctx, rootKey) {
+		if (!this.options.get('iframe')) return false;
+
+		if (!rootKey) rootKey = [this.status.rootKey];
+		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
+
+		for (let i = 0; i < rootKey.length; i++) {
+			this.editor.changeFrameContext(rootKey[i]);
+			if (ctx.head) this.editor.frameContext.get('_wd').head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
+			if (ctx.body) this.editor.frameContext.get('_wd').body.innerHTML = this.clean(ctx.body, true, null, null);
+			this.editor._resetComponents();
+		}
+	},
+
+	/**
 	 * @description HTML code compression
 	 * @param {string} html HTML string
 	 * @returns {string} HTML string
 	 */
 	compress: function (html) {
 		return html.replace(/(>)(?:[^>]*\n+)|(?:\s+)(<)/g, '$1$2');
+	},
+
+	/**
+	 * @description construct wysiwyg area element to html string
+	 * @param {Element|String} html WYSIWYG element (this.editor.frameContext.get('wysiwyg')) or HTML string.
+	 * @param {Boolean} comp If true, does not line break and indentation of tags.
+	 * @returns {string}
+	 */
+	_convertToCode: function (html, comp) {
+		let returnHTML = '';
+		const _w = this._w;
+		const wRegExp = _w.RegExp;
+		const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
+		const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
+		const isFormat = function (current) {
+			return this.format.isLine(current) || this.component.is(current);
+		}.bind(this);
+		const brChar = comp ? '' : '\n';
+
+		let indentSize = comp ? 0 : this.status.codeIndentSize * 1;
+		indentSize = indentSize > 0 ? new _w.Array(indentSize + 1).join(' ') : '';
+
+		(function recursionFunc(element, indent) {
+			const children = element.childNodes;
+			const elementRegTest = brReg.test(element.nodeName);
+			const elementIndent = elementRegTest ? indent : '';
+
+			for (let i = 0, len = children.length, node, br, lineBR, nodeRegTest, tag, tagIndent; i < len; i++) {
+				node = children[i];
+				nodeRegTest = brReg.test(node.nodeName);
+				br = nodeRegTest ? brChar : '';
+				lineBR = isFormat(node) && !elementRegTest && !/^(TH|TD)$/i.test(element.nodeName) ? brChar : '';
+
+				if (node.nodeType === 8) {
+					returnHTML += '\n<!-- ' + node.textContent.trim() + ' -->' + br;
+					continue;
+				}
+				if (node.nodeType === 3) {
+					if (!domUtils.isList(node.parentElement)) returnHTML += converter.htmlToEntity(/^\n+$/.test(node.data) ? '' : node.data);
+					continue;
+				}
+				if (node.childNodes.length === 0) {
+					returnHTML += (/^HR$/i.test(node.nodeName) ? brChar : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + node.outerHTML + br;
+					continue;
+				}
+
+				if (!node.outerHTML) {
+					// IE
+					returnHTML += new _w.XMLSerializer().serializeToString(node);
+				} else {
+					tag = node.nodeName.toLowerCase();
+					tagIndent = elementIndent || nodeRegTest ? indent : '';
+					returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
+					recursionFunc(node, indent + indentSize, '');
+					returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? brChar : '' || /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
+				}
+			}
+		})(wDoc, '');
+
+		return returnHTML.trim() + brChar;
 	},
 
 	_nodeRemoveListItem: function (item) {
@@ -1024,7 +1202,8 @@ HTML.prototype = {
 			} else if (!this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !/meta/i.test(n.nodeName) && !/\b__se__tag\b/.test(n.className)) {
 				if (!f) f = domUtils.createElement(this.options.get('defaultLineTag'));
 				f.appendChild(n);
-				i--; len--;
+				i--;
+				len--;
 			} else {
 				if (f) {
 					value += f.outerHTML;

@@ -385,5 +385,5 @@ const editor_root = (window.e = suneditor.create(
 
 editor_root.events.onload = function() {
 
-	editor_root.setContent('fdjksl;afjds ...fdjksafl;d')
+	editor_root.html.set('fdjksl;afjds ...fdjksafl;d')
 }
