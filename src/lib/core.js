@@ -5082,11 +5082,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         setContents: function (html) {
             this.removeRange();
             
-            const convertValue = (html === null || html === undefined) ? '' : this.cleanHTML(html, null, null);
-            this._resetComponents();
-
+            const convertValue = (html === null || html === undefined) ? '' : this.convertContentsForEditor(html, null, null);
             if (!this._variable.isCodeView) {
                 context.element.wysiwyg.innerHTML = convertValue;
+                this._resetComponents();
                 // history stack
                 this.history.push(false);
             } else {
@@ -5103,6 +5102,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!options.iframe) return false;
             if (ctx.head) this._wd.head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
             if (ctx.body) this._wd.body.innerHTML = this.convertContentsForEditor(ctx.body);
+            this._resetComponents();
         },
 
         /**
@@ -5153,6 +5153,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             // element
             if (node.nodeType === 1) {
                 if (util._disallowedTags(node)) return '';
+                if (/__se__tag/.test(node.className)) return node.outerHTML;
 
                 const ch = util.getListChildNodes(node, function(current) { return util.isSpanWithoutAttr(current) && !util.getParentElement(current, util.isNotCheckingNode); }) || [];
                 for (let i = ch.length - 1; i >= 0; i--) {
@@ -5457,7 +5458,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         cleanHTML: function (html, whitelist, blacklist) {
             html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
-
             const dom = _d.createRange().createContextualFragment(html);
             try {
                 util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, true);
@@ -5536,7 +5536,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             for (let i = 0, t; i < domTree.length; i++) {
                 t = domTree[i];
 
-                if (!util.isFormatElement(t) && !util.isRangeFormatElement(t) && !util.isComponent(t) && !util.isMedia(t) && t.nodeType !== 8) {
+                if (!util.isFormatElement(t) && !util.isRangeFormatElement(t) && !util.isComponent(t) && !util.isMedia(t) && t.nodeType !== 8 && !/__se__tag/.test(t.className)) {
                     if (!p) p = util.createElement(options.defaultTag);
                     p.appendChild(t);
                     i--;
