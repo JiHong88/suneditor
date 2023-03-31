@@ -187,6 +187,7 @@ const Editor = function (multiTargets, options) {
 	this._controllerOnDisabledButtons = [];
 	this._codeViewDisabledButtons = [];
 	this._controllerTargetContext = null;
+	this._pluginCallButtons = product.pluginCallButtons;
 
 	/**
 	 * @description Button List in Responsive Toolbar.
@@ -339,6 +340,7 @@ const Editor = function (multiTargets, options) {
 
 Editor.prototype = {
 	_set_commandMap: function (pluginName, target) {
+		if (!pluginName || !target) return;
 		if (!this._commandMap.get(pluginName)) {
 			this._commandMap.set(pluginName, [target]);
 		} else if (this._commandMap.get(pluginName).indexOf(target) < 0) {
@@ -802,9 +804,9 @@ Editor.prototype = {
 
 		for (let i = 0; i < rootKey.length; i++) {
 			this.changeFrameContext(rootKey[i]);
-
 			if (ctx.head) this.frameContext.get('_wd').head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
 			if (ctx.body) this.frameContext.get('_wd').body.innerHTML = this.html.clean(ctx.body, true, null, null);
+			this._resetComponents();
 		}
 	},
 
@@ -1509,7 +1511,7 @@ Editor.prototype = {
 		let filePluginRegExp = [];
 		let plugin;
 		for (let key in plugins) {
-			this.registerPlugin(key, product.pluginCallButtons[key]);
+			this.registerPlugin(key, this._pluginCallButtons[key]);
 			plugin = this.plugins[key];
 
 			// Filemanager

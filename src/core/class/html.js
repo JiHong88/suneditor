@@ -824,6 +824,7 @@ HTML.prototype = {
 		// element
 		if (node.nodeType === 1) {
 			if (DisallowedElements(node)) return '';
+			if (/\b__se__tag\b/.test(node.className)) return node.outerHTML;
 
 			const ch = domUtils.getListChildNodes(node, function (current) {
 				return domUtils.isSpanWithoutAttr(current) && !domUtils.getParentElement(current, domUtils.isNotCheckingNode);
@@ -1020,7 +1021,11 @@ HTML.prototype = {
 			n = tempTree[i];
 			if (n.nodeType === 8) {
 				value += '<!-- ' + n.textContent + ' -->';
-			} else if (!this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !/meta/i.test(n.nodeName)) {
+			} else if (!this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !/meta/i.test(n.nodeName) && !/\b__se__tag\b/.test(n.className)) {
+				if (!f) f = domUtils.createElement(this.options.get('defaultLineTag'));
+				f.appendChild(n);
+				i--; len--;
+			} else {
 				if (f) {
 					value += f.outerHTML;
 					f = null;

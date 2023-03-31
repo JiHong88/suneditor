@@ -348,7 +348,7 @@ const editor_root = (window.e = suneditor.create(
 	},
 	{
 		// value: 'Common value',
-		editorStyle: 'font-size:40px',
+		// editorStyle: 'font-size:40px',
 		plugins: plugins,
 		toolbar_container: '#root_toolbar_container',
 		statusbar_container: '#root_statusbar_container',
@@ -382,3 +382,8 @@ const editor_root = (window.e = suneditor.create(
 // editor_root.events.onBlur = (rootKey, e, htmlFrame) => {
 // 	console.log('blur', editor_root.frameContext);
 // };
+
+editor_root.events.onload = function() {
+
+	editor_root.setContent('fdjksl;afjds ...fdjksafl;d')
+}

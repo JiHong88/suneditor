@@ -153,21 +153,31 @@ EventManager.prototype = {
 			/** indent, outdent */
 			if (this.format.isLine(element)) {
 				/* Outdent */
-				if (commandMapNodes.indexOf('OUTDENT') === -1 && _commandMap.get('OUTDENT') && !domUtils.isImportantDisabled(_commandMap.get('OUTDENT'))) {
-					if (domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0)) {
+				if (commandMapNodes.indexOf('OUTDENT') === -1 && _commandMap.get('OUTDENT') && (domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))) {
+					if (_commandMap.get('OUTDENT').filter(function (e) {
+							if (domUtils.isImportantDisabled(e)) return false;
+							e.removeAttribute('disabled');
+							return true;
+						}).length > 0) {
 						commandMapNodes.push('OUTDENT');
-						_commandMap.get('OUTDENT').removeAttribute('disabled');
 					}
 				}
 
 				/* Indent */
-				if (commandMapNodes.indexOf('INDENT') === -1 && _commandMap.get('INDENT') && !domUtils.isImportantDisabled(_commandMap.get('INDENT'))) {
-					commandMapNodes.push('INDENT');
-					if (domUtils.isListCell(element) && !element.previousElementSibling) {
-						_commandMap.get('INDENT').setAttribute('disabled', true);
-					} else {
-						_commandMap.get('INDENT').removeAttribute('disabled');
+				if (commandMapNodes.indexOf('INDENT') === -1 && _commandMap.get('INDENT')) {
+					const indentDisable = domUtils.isListCell(element) && !element.previousElementSibling
+					if (_commandMap.get('INDENT').filter(function (e) {
+							if (domUtils.isImportantDisabled(e)) return false;
+							if (indentDisable) {
+								e.setAttribute('disabled', true);
+							} else {
+								e.removeAttribute('disabled');
+							}
+							return true;
+						}).length > 0) {
+						commandMapNodes.push('INDENT');
 					}
+
 				}
 
 				continue;
@@ -200,13 +210,17 @@ EventManager.prototype = {
 
 		this.editor._commandMap.forEach(
 			function (e, k) {
-				if (ignoredList.indexOf(k) > -1 || !e) return;
+				if (ignoredList.indexOf(k) > -1 || !e || e.length === 0) return;
 				if (activePlugins.indexOf(k) > -1) {
 					this.plugins[k].active(null);
-				} else if (e && /^OUTDENT$/i.test(k)) {
-					if (!domUtils.isImportantDisabled(e)) e.setAttribute('disabled', true);
-				} else if (e && /^INDENT$/i.test(k)) {
-					if (!domUtils.isImportantDisabled(e)) e.removeAttribute('disabled');
+				} else if (/^OUTDENT$/i.test(k)) {
+					e.forEach(function (v) {
+						if (!domUtils.isImportantDisabled(v)) v.setAttribute('disabled', true);
+					})
+				} else if (/^INDENT$/i.test(k)) {
+					e.forEach(function (v) {
+						if (!domUtils.isImportantDisabled(v)) v.removeAttribute('disabled');
+					})
 				} else {
 					domUtils.removeClass(e, 'active');
 				}
