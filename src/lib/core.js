@@ -5349,11 +5349,27 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (!v) v = [];
                 if (sv) {
-                    w = sv[0].match(/width:(.+);/);
-                    w = util.getNumber(w ? w[1] : '', -1) || '';
-                    h = sv[0].match(/height:(.+);/);
-                    h = util.getNumber(h ? h[1] : '', -1) || '';
-                } 
+                    let w_px = '';
+                    let h_px = '';
+                    let w_per = '';
+                    let h_per = '';
+
+                    w_px = sv[0].match(/width:(.+)px;/);
+                    w_px = util.getNumber(w_px ? w_px[1] : '', -1) || null;
+                    h_px = sv[0].match(/height:(.+)px;/);
+                    h_px = util.getNumber(h_px ? h_px[1] : '', -1) || null;
+
+                    w_per = sv[0].match(/width:(.+)%;/);
+                    w_per = util.getNumber(w_per ? w_per[1] : '', -1) || null;
+                    h_per = sv[0].match(/height:(.+)%;/);
+                    h_per = util.getNumber(h_per ? h_per[1] : '', -1) || null;
+
+                    w = w_px || w_per;
+                    h = h_px || h_per;
+                    let w_ = w_px ? w_px + 'px' : w_per ? w_per + '%' : 'auto';
+                    let h_ = h_px ? h_px + 'px' : h_per ? w_per + '%' : 'auto';
+                    v.push(`style="width: ${w_}; height: ${h_}"`);
+                }
                 
                 if (!w || !h) {
                     const avw = m.match(/width\s*=\s*((?:"|')[^"']*(?:"|'))/);
