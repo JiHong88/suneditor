@@ -535,7 +535,7 @@ EventManager.prototype = {
 		/** toolbar event */
 		const toolbarHandler = ToolbarButtonsHandler.bind(this);
 		this.addEvent(this.context.get('toolbar.main'), 'mousedown', toolbarHandler, false);
-		this.addEvent(this.context.get('toolbar._menuTray'), 'mousedown', toolbarHandler, false);
+		this.addEvent(this.context.get('_menuTray'), 'mousedown', toolbarHandler, false);
 		this.addEvent(this.context.get('toolbar.main'), 'click', OnClick_toolbar.bind(this), false);
 
 		/** set response toolbar */
@@ -708,7 +708,6 @@ EventManager.prototype = {
 
 	_resetFrameStatus: function () {
 		this.editor._offCurrentController();
-		if (this.editor.isBalloon) this.toolbar.hide();
 
 		if (!env.isResizeObserverSupported) this.toolbar.resetResponsiveToolbar();
 		const toolbar = this.context.get('toolbar.main');
@@ -1933,6 +1932,7 @@ function DisplayLineBreak(dir, e) {
 }
 
 function OnResize_window() {
+	if (this.editor.isBalloon) this.toolbar.hide();
 	this._resetFrameStatus();
 }
 
@@ -1941,7 +1941,7 @@ function OnScroll_window() {
 		this.toolbar._resetSticky();
 	}
 
-	if (this.editor.isBalloon && this.editor.frameContexteContexteContext.get('toolbar.main').style.display === 'block') {
+	if (this.editor.isBalloon && this.editor.frameContexte.get('toolbar.main').style.display === 'block') {
 		this.toolbar._setBalloonOffset(this.toolbar._balloonOffset.position === 'top');
 	}
 

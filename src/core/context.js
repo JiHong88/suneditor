@@ -51,15 +51,16 @@ const BASIC_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'sub', 'sup', '
  * @description Common elements and variables you should have
  * @param {Element} toolbar Toolbar frame
  * @param {Element|null} toolbarContainer Toolbar container
+ * @param {Element} menuTray menu tray
  * @returns {Map}
  */
-export const CreateContext = function (toolbar, toolbarContainer) {
+export const CreateContext = function (toolbar, toolbarContainer, menuTray) {
 	const m = new _w.Map([
 		['toolbar.main', toolbar],
 		['toolbar._buttonTray', toolbar.querySelector('.se-btn-tray')],
-		['toolbar._menuTray', toolbar.querySelector('.se-menu-tray')],
 		['toolbar._arrow', toolbar.querySelector('.se-arrow')],
 		['toolbar._wrapper', toolbar.parentElement.parentElement],
+		['_menuTray', menuTray],
 		['_stickyDummy', toolbarContainer ? toolbarContainer.querySelector('.se-toolbar-sticky-dummy') : null]
 	]);
 

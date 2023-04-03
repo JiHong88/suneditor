@@ -89,13 +89,17 @@ const Constructor = function (editorTargets, options) {
 	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', {
 		class: 'se-loading-box sun-editor-common'
 	}, '<div class="se-loading-effect"></div>'));
-	_d.body.insertBefore(editor_carrier_wrapper, _d.body.firstElementChild);
+	_d.body.appendChild(editor_carrier_wrapper);
 
 	/** --- toolbar --------------------------------------------------------------- */
 	const tool_bar_main = CreateToolBar(o.get('buttonList'), plugins, o, icons, lang);
 	const toolbar = tool_bar_main.element;
+	const menuTray = tool_bar_main._menuTray;
 	toolbar.style.visibility = 'hidden';
 	if (tool_bar_main.pluginCallButtons.math) _checkKatexMath(o.get('katex'));
+
+	// menuTray
+	editor_carrier_wrapper.appendChild(menuTray);
 
 	// toolbar mode
 	if (/inline/i.test(o.get('mode'))) {
@@ -199,7 +203,7 @@ const Constructor = function (editorTargets, options) {
 	}
 
 	return {
-		context: CreateContext(toolbar, toolbar_container),
+		context: CreateContext(toolbar, toolbar_container, menuTray),
 		carrierWrapper: editor_carrier_wrapper,
 		options: o,
 		plugins: plugins,
@@ -1084,7 +1088,6 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 	const _menuTray = domUtils.createElement('DIV', {
 		class: 'se-menu-tray'
 	});
-	tool_bar.appendChild(_menuTray);
 
 	if (options.get('toolbar_hide')) tool_bar.style.display = 'none';
 

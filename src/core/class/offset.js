@@ -173,7 +173,7 @@ Offset.prototype = {
 		};
 	},
 
-	setRelPosition: function (element, target, container) {
+	setRelPosition: function (element, e_container, target, t_container) {
 		const elW = element.offsetWidth;
 		const targetL = target.offsetLeft;
 
@@ -183,23 +183,23 @@ Offset.prototype = {
 			const rtlW = elW > elementW ? elW - elementW : 0;
 			const rtlL = rtlW > 0 ? 0 : elementW - elW;
 			element.style.left = targetL - rtlW + rtlL + 'px';
-			if (this.getGlobal(container).left > this.getGlobal(element).left) {
-				element.style.left = '0px';
+			if (this.getGlobal(e_container).left > this.getGlobal(element).left) {
+				element.style.left = this.getGlobal(t_container).left + '0px';
 			}
 		} else {
-			const cw = container.offsetWidth;
+			const cw = e_container.offsetWidth;
 			const overLeft = cw <= elW ? 0 : cw - (targetL + elW);
 			if (overLeft < 0) element.style.left = targetL + overLeft + 'px';
-			else element.style.left = targetL + 'px';
+			else element.style.left = targetL + this.getGlobal(t_container).left + 'px';
 		}
 
 		// top
-		const containerTop = this.getGlobal(container).top;
+		const containerTop = this.getGlobal(e_container).top;
 		const elHeight = element.offsetHeight;
 		const scrollTop = this.getGlobalScroll().top;
 		let bt = 0;
 		let offsetEl = target;
-		while (offsetEl && offsetEl !== container) {
+		while (offsetEl && offsetEl !== e_container) {
 			bt += offsetEl.offsetTop;
 			offsetEl = offsetEl.offsetParent;
 		}

@@ -33,7 +33,7 @@ Menu.prototype = {
 	 */
 	initDropdownTarget: function (key, menu) {
 		if (key) {
-			this.context.get('toolbar._menuTray').appendChild(menu);
+			this.context.get('_menuTray').appendChild(menu);
 			this._menuTrayMap[key] = menu;
 		} else {
 			throw Error("[SUNEDITOR.init.fail] The plugin's key is not added.");
@@ -128,7 +128,7 @@ Menu.prototype = {
 		menu.style.height = '';
 		domUtils.addClass(element, 'on');
 
-		this.offset.setRelPosition(menu, element.parentElement, this.context.get('toolbar.main'));
+		this.offset.setRelPosition(menu, this.editor._carrierWrapper, element.parentElement, domUtils.getParentElement(element, '.se-toolbar'));
 
 		menu.style.visibility = '';
 	},
