@@ -1,26 +1,11 @@
 import _icons from '../assets/defaultIcons';
 import _defaultLang from '../langs/en';
-import {
-	CreateContext,
-	CreateFrameContext
-} from './context';
-import {
-	domUtils,
-	numbers,
-	converter,
-	env
-} from '../helper';
+import { CreateContext, CreateFrameContext } from './context';
+import { domUtils, numbers, converter, env } from '../helper';
 
 const _d = env._d;
 const _w = env._w;
-const DEFAULT_BUTTON_LIST = [
-	['undo', 'redo'],
-	['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-	['removeFormat'],
-	['outdent', 'indent'],
-	['fullScreen', 'showBlocks', 'codeView'],
-	['preview', 'print']
-];
+const DEFAULT_BUTTON_LIST = [['undo', 'redo'], ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'], ['removeFormat'], ['outdent', 'indent'], ['fullScreen', 'showBlocks', 'codeView'], ['preview', 'print']];
 const DEFAULT_ELEMENT_WHITELIST = 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls';
 const DEFAULT_FORMAT_LINE = 'P|DIV|H[1-6]|LI|TH|TD|DETAILS';
@@ -43,11 +28,11 @@ const Constructor = function (editorTargets, options) {
 	const plugins = {};
 	if (options.plugins) {
 		const originPlugins = options.plugins;
-		const pluginsValues = _w.Array.isArray(originPlugins.length) ?
-			originPlugins :
-			_w.Object.keys(originPlugins).map(function (name) {
-				return originPlugins[name];
-			});
+		const pluginsValues = _w.Array.isArray(originPlugins.length)
+			? originPlugins
+			: _w.Object.keys(originPlugins).map(function (name) {
+					return originPlugins[name];
+			  });
 
 		for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
 			p = pluginsValues[i].default || pluginsValues[i];
@@ -83,12 +68,20 @@ const Constructor = function (editorTargets, options) {
 	editor_carrier_wrapper.appendChild(modal);
 
 	// loding box, resizing back
-	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', {
-		class: 'se-resizing-back'
-	}));
-	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', {
-		class: 'se-loading-box sun-editor-common'
-	}, '<div class="se-loading-effect"></div>'));
+	editor_carrier_wrapper.appendChild(
+		domUtils.createElement('DIV', {
+			class: 'se-resizing-back'
+		})
+	);
+	editor_carrier_wrapper.appendChild(
+		domUtils.createElement(
+			'DIV',
+			{
+				class: 'se-loading-box sun-editor-common'
+			},
+			'<div class="se-loading-effect"></div>'
+		)
+	);
 	_d.body.appendChild(editor_carrier_wrapper);
 
 	/** --- toolbar --------------------------------------------------------------- */
@@ -108,9 +101,11 @@ const Constructor = function (editorTargets, options) {
 	} else if (/balloon/i.test(o.get('mode'))) {
 		toolbar.className += ' se-toolbar-balloon';
 		toolbar.style.width = o.get('toolbar_width');
-		toolbar.appendChild(domUtils.createElement('DIV', {
-			class: 'se-arrow'
-		}));
+		toolbar.appendChild(
+			domUtils.createElement('DIV', {
+				class: 'se-arrow'
+			})
+		);
 	}
 
 	// editor frame
@@ -144,15 +139,27 @@ const Constructor = function (editorTargets, options) {
 		let textarea = initElements.codeView;
 
 		// line breaker
-		const line_breaker = domUtils.createElement('DIV', {
-			class: 'se-line-breaker'
-		}, '<button class="se-btn">' + icons.line_break + '</button>');
-		const line_breaker_t = domUtils.createElement('DIV', {
-			class: 'se-line-breaker-component se-line-breaker-component-t'
-		}, '<button class="se-btn">' + icons.line_break + '</button>');
-		const line_breaker_b = domUtils.createElement('DIV', {
-			class: 'se-line-breaker-component se-line-breaker-component-b'
-		}, '<button class="se-btn">' + icons.line_break + '</button>');
+		const line_breaker = domUtils.createElement(
+			'DIV',
+			{
+				class: 'se-line-breaker'
+			},
+			'<button class="se-btn">' + icons.line_break + '</button>'
+		);
+		const line_breaker_t = domUtils.createElement(
+			'DIV',
+			{
+				class: 'se-line-breaker-component se-line-breaker-component-t'
+			},
+			'<button class="se-btn">' + icons.line_break + '</button>'
+		);
+		const line_breaker_b = domUtils.createElement(
+			'DIV',
+			{
+				class: 'se-line-breaker-component se-line-breaker-component-b'
+			},
+			'<button class="se-btn">' + icons.line_break + '</button>'
+		);
 		line_breaker_t.innerHTML = line_breaker_b.innerHTML = icons.line_break;
 		editor_div.appendChild(line_breaker);
 		editor_div.appendChild(line_breaker_t);
@@ -161,9 +168,11 @@ const Constructor = function (editorTargets, options) {
 		// append container
 		editor_div.appendChild(textarea);
 		if (placeholder_span) editor_div.appendChild(placeholder_span);
-		container.appendChild(domUtils.createElement('DIV', {
-			class: 'se-toolbar-sticky-dummy'
-		}));
+		container.appendChild(
+			domUtils.createElement('DIV', {
+				class: 'se-toolbar-sticky-dummy'
+			})
+		);
 		container.appendChild(editor_div);
 
 		// statusbar
@@ -194,9 +203,11 @@ const Constructor = function (editorTargets, options) {
 		container.appendChild(toolbar);
 		top_div.appendChild(container);
 		toolbar_container.appendChild(top_div);
-		toolbar_container.appendChild(domUtils.createElement('DIV', {
-			class: 'se-toolbar-sticky-dummy'
-		}));
+		toolbar_container.appendChild(
+			domUtils.createElement('DIV', {
+				class: 'se-toolbar-sticky-dummy'
+			})
+		);
 	} else {
 		const rootContainer = rootTargets.get(rootId).get('container');
 		rootContainer.insertBefore(toolbar, rootContainer.firstElementChild);
@@ -244,14 +255,17 @@ function InitOptions(options, editorTargets) {
 	/** Base */
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
 	// text style tags
-	const textTags = [{
-		bold: 'STRONG',
-		underline: 'U',
-		italic: 'EM',
-		strike: 'DEL',
-		sub: 'SUB',
-		sup: 'SUP'
-	}, options.textTags || {}].reduce(function (_default, _new) {
+	const textTags = [
+		{
+			bold: 'STRONG',
+			underline: 'U',
+			italic: 'EM',
+			strike: 'DEL',
+			sub: 'SUB',
+			sup: 'SUP'
+		},
+		options.textTags || {}
+	].reduce(function (_default, _new) {
 		for (let key in _new) {
 			_default[key] = _new[key];
 		}
@@ -282,8 +296,8 @@ function InitOptions(options, editorTargets) {
 		superscript: textTags.sup
 	});
 	// text direction
-	o.set('_rtl', o.get('textDirection') === 'rtl');
 	o.set('textDirection', typeof options.textDirection !== 'string' ? 'ltr' : options.textDirection);
+	o.set('_rtl', o.get('textDirection') === 'rtl');
 	o.set('buttonList', o.get('_rtl') ? buttonList.reverse() : buttonList);
 
 	// etc
@@ -357,25 +371,26 @@ function InitOptions(options, editorTargets) {
 	o.set('templates', !options.templates ? null : options.templates);
 	o.set(
 		'mathFontSize',
-		!!options.mathFontSize ?
-		options.mathFontSize :
-		[{
-				text: '1',
-				value: '1em'
-			},
-			{
-				text: '1.5',
-				value: '1.5em'
-			},
-			{
-				text: '2',
-				value: '2em'
-			},
-			{
-				text: '2.5',
-				value: '2.5em'
-			}
-		]
+		!!options.mathFontSize
+			? options.mathFontSize
+			: [
+					{
+						text: '1',
+						value: '1em'
+					},
+					{
+						text: '1.5',
+						value: '1.5em'
+					},
+					{
+						text: '2',
+						value: '2em'
+					},
+					{
+						text: '2.5',
+						value: '2.5em'
+					}
+			  ]
 	);
 
 	/** --- Media */
@@ -387,14 +402,12 @@ function InitOptions(options, editorTargets) {
 	o.set('imageHeight', !options.imageHeight ? 'auto' : numbers.is(options.imageHeight) ? options.imageHeight + 'px' : options.imageHeight);
 	o.set(
 		'imageControls',
-		options.imageControls || !o.get('imageResizing') ?
-		[
-			['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']
-		] :
-		[
-			['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
-			['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']
-		]
+		options.imageControls || !o.get('imageResizing')
+			? [['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']]
+			: [
+					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
+					['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']
+			  ]
 	);
 	// @todo
 	o.set('imageHeightShow', options.imageHeightShow === undefined ? true : !!options.imageHeightShow);
@@ -420,14 +433,12 @@ function InitOptions(options, editorTargets) {
 	o.set('videoHeight', !options.videoHeight || !numbers.get(options.videoHeight, 0) ? '' : numbers.is(options.videoHeight) ? options.videoHeight + 'px' : options.videoHeight);
 	o.set(
 		'videoControls',
-		options.videoControls || !o.get('videoResizing') ?
-		[
-			['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']
-		] :
-		[
-			['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
-			['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']
-		]
+		options.videoControls || !o.get('videoResizing')
+			? [['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']]
+			: [
+					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
+					['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']
+			  ]
 	);
 	// @todo
 	o.set('videoRatioShow', options.videoRatioShow === undefined ? true : !!options.videoRatioShow);
@@ -499,23 +510,25 @@ function InitOptions(options, editorTargets) {
 	o.set('__listCommonStyle', options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle']);
 
 	/** --- Icons ------------------------------------------------------------------------------------------ */
-	let icons = !options.icons || typeof options.icons !== 'object' ?
-		_icons :
-		[_icons, options.icons].reduce(function (_default, _new) {
-			for (let key in _new) {
-				_default[key] = _new[key];
-			}
-			return _default;
-		}, {});
+	let icons =
+		!options.icons || typeof options.icons !== 'object'
+			? _icons
+			: [_icons, options.icons].reduce(function (_default, _new) {
+					for (let key in _new) {
+						_default[key] = _new[key];
+					}
+					return _default;
+			  }, {});
 	// rtl
 	if (o.get('_rtl')) {
-		icons = [o.get('icons'), o.get('icons')._rtl].reduce(function (_default, _new) {
+		icons = [icons, icons.rtl].reduce(function (_default, _new) {
 			for (let key in _new) {
 				_default[key] = _new[key];
 			}
 			return _default;
 		}, {});
 	}
+	o.set('icons', icons);
 
 	return {
 		o: o,
@@ -707,7 +720,8 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 		hasCodeMirror = true;
 	} else if (options.get('codeMirror5Editor')) {
 		const codeMirror = options.get('codeMirror');
-		const cmOptions = [{
+		const cmOptions = [
+			{
 				mode: 'htmlmixed',
 				htmlMode: true,
 				lineNumbers: true,
@@ -755,7 +769,8 @@ function _checkKatexMath(katex) {
 		return;
 	}
 
-	const katexOptions = [{
+	const katexOptions = [
+		{
 			throwOnError: false
 		},
 		katex.options || {}
@@ -872,9 +887,13 @@ function _createModuleGroup() {
 	const oUl = domUtils.createElement('UL', {
 		class: 'se-menu-list'
 	});
-	const oDiv = domUtils.createElement('DIV', {
-		class: 'se-btn-module se-btn-module-border'
-	}, oUl);
+	const oDiv = domUtils.createElement(
+		'DIV',
+		{
+			class: 'se-btn-module se-btn-module-border'
+		},
+		oUl
+	);
 
 	return {
 		div: oDiv,
@@ -950,9 +969,13 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 	const separator_vertical = domUtils.createElement('DIV', {
 		class: 'se-toolbar-separator-vertical'
 	});
-	const tool_bar = domUtils.createElement('DIV', {
-		class: 'se-toolbar sun-editor-common'
-	}, _buttonTray);
+	const tool_bar = domUtils.createElement(
+		'DIV',
+		{
+			class: 'se-toolbar sun-editor-common'
+		},
+		_buttonTray
+	);
 
 	/** create button list */
 	buttonList = _w.JSON.parse(_w.JSON.stringify(buttonList));

@@ -346,6 +346,7 @@ const editor_root = (window.e = suneditor.create({
 	}
 }, {
 	mode: "balloon",
+	// textDirection: 'rtl',
 	// value: 'Common value',
 	// editorStyle: 'font-size:40px',
 	plugins: plugins,

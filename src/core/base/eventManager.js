@@ -1941,7 +1941,7 @@ function OnScroll_window() {
 		this.toolbar._resetSticky();
 	}
 
-	if (this.editor.isBalloon && this.editor.frameContexte.get('toolbar.main').style.display === 'block') {
+	if (this.editor.isBalloon && this.context.get('toolbar.main').style.display === 'block') {
 		this.toolbar._setBalloonOffset(this.toolbar._balloonOffset.position === 'top');
 	}
 

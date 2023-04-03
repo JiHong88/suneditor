@@ -182,9 +182,9 @@ Offset.prototype = {
 			const elementW = target.offsetWidth;
 			const rtlW = elW > elementW ? elW - elementW : 0;
 			const rtlL = rtlW > 0 ? 0 : elementW - elW;
-			element.style.left = targetL - rtlW + rtlL + 'px';
+			element.style.left = targetL - rtlW + rtlL + this.getGlobal(t_container).left + 'px';
 			if (this.getGlobal(e_container).left > this.getGlobal(element).left) {
-				element.style.left = this.getGlobal(t_container).left + '0px';
+				element.style.left = '0px';
 			}
 		} else {
 			const cw = e_container.offsetWidth;

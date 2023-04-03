@@ -2308,6 +2308,8 @@
     padding: 0 7px 0 0;
     border-right-width: 5px;
     border-left-width: 0;
+    border-top: 0;
+    border-bottom: 0;
 }
 
 /* menu list - color picker */
