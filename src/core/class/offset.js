@@ -174,23 +174,24 @@ Offset.prototype = {
 	},
 
 	setRelPosition: function (element, e_container, target, t_container) {
-		const elW = element.offsetWidth;
-		const targetL = target.offsetLeft;
+		const ew = element.offsetWidth;
+		const tw = target.offsetWidth;
+		const tl = this.getGlobal(target).left;
+		const tcleft = this.getGlobal(t_container).left;
 
 		// left
 		if (this.options.get('_rtl')) {
-			const elementW = target.offsetWidth;
-			const rtlW = elW > elementW ? elW - elementW : 0;
-			const rtlL = rtlW > 0 ? 0 : elementW - elW;
-			element.style.left = targetL - rtlW + rtlL + this.getGlobal(t_container).left + 'px';
-			if (this.getGlobal(e_container).left > this.getGlobal(element).left) {
-				element.style.left = '0px';
+			const rtlW = ew > tw ? ew - tw : 0;
+			const rtlL = rtlW > 0 ? 0 : tw - ew;
+			element.style.left = tl - rtlW + rtlL + tcleft + 'px';
+			if (tcleft > this.getGlobal(element).left) {
+				element.style.left = tcleft + 'px';
 			}
 		} else {
-			const cw = e_container.offsetWidth;
-			const overLeft = cw <= elW ? 0 : cw - (targetL + elW);
-			if (overLeft < 0) element.style.left = targetL + overLeft + 'px';
-			else element.style.left = targetL + this.getGlobal(t_container).left + 'px';
+			const cw = t_container.offsetWidth;
+			const overLeft = cw <= ew ? 0 : cw - (tl + ew);
+			if (overLeft < 0) element.style.left = tl + overLeft + tcleft + 'px';
+			else element.style.left = tl + 'px';
 		}
 
 		// top
