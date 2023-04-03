@@ -5344,11 +5344,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             // img
-            if (tagName === 'img') {
+            if (util.isFigures(tagName)) {
                 let w = '', h = '';
                 const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (!v) v = [];
                 if (sv) {
+                    v.push(sv[0]);
+                    
                     let w_px = '';
                     let h_px = '';
                     let w_per = '';
@@ -5366,9 +5368,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                     w = w_px || w_per;
                     h = h_px || h_per;
-                    let w_ = w_px ? w_px + 'px' : w_per ? w_per + '%' : 'auto';
-                    let h_ = h_px ? h_px + 'px' : h_per ? w_per + '%' : 'auto';
-                    v.push(`style="width: ${w_}; height: ${h_}"`);
                 }
                 
                 if (!w || !h) {

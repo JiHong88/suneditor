@@ -858,6 +858,15 @@ const util = {
     },
 
     /**
+     * @description Check the node is a figure tag or util.isMedia()
+     * @param {Node|String} node The element or element name to check
+     * @returns {Boolean}
+     */
+    isFigures: function (node) {
+        return node && (this.isMedia(node) || /^(FIGURE)$/i.test(typeof node === 'string' ? node : node.nodeName));
+    },
+
+    /**
      * @description Checks for numeric (with decimal point).
      * @param {String|Number} text Text string or number
      * @returns {Boolean}
