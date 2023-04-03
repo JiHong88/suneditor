@@ -2,10 +2,9 @@ import EditorDependency from '../../dependency';
 import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 
-const FontColor = function (editor, target) {
+const FontColor = function (editor) {
 	EditorDependency.call(this, editor);
 	// plugin basic properties
-	this.target = target;
 	this.title = this.lang.fontColor;
 	this.icon = this.icons.font_color;
 
@@ -16,7 +15,7 @@ const FontColor = function (editor, target) {
 	const menu = CreateHTML(this.colorPicker.target);
 
 	// itit
-	this.menu.initDropdownTarget(target, menu);
+	this.menu.initDropdownTarget(FontColor.key, menu);
 	this.eventManager.addEvent(menu, 'click', OnClickMenu.bind(this));
 };
 

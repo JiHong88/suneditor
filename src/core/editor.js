@@ -352,19 +352,24 @@ Editor.prototype = {
 	 * @description If the plugin is not added, add the plugin and call the 'add' function.
 	 * If the plugin is added call callBack function.
 	 * @param {string} pluginName The name of the plugin to call
-	 * @param {Element|null} target Plugin target button (This is not necessary if you have a button list when creating the editor)
+	 * @param {Array.<Element>|null} targets Plugin target button (This is not necessary if you have a button list when creating the editor)
 	 */
-	registerPlugin: function (pluginName, target) {
-		if (!this.plugins[pluginName]) {
+	registerPlugin: function (pluginName, targets) {
+		let plugin = this.plugins[pluginName];
+		if (!plugin) {
 			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "' + pluginName + '")');
 		} else {
-			const plugin = (this.plugins[pluginName] = new this.plugins[pluginName](this, target));
-			UpdateButton(target, plugin, this.icons, this.lang);
+			plugin = (this.plugins[pluginName] = new this.plugins[pluginName](this));
 			if (typeof plugin.init === 'function') plugin.init();
 		}
 
-		if (this.plugins[pluginName].active && target) {
-			this._set_commandMap(pluginName, target);
+		if (targets) {
+			for (let i = 0, len = targets.length; i < len; i++) {
+				UpdateButton(targets[i], plugin, this.icons, this.lang);
+				if (plugin.active) {
+					this._set_commandMap(pluginName, targets[i]);
+				}
+			}
 
 			if (this.activePlugins.indexOf(pluginName) < 0) {
 				this.activePlugins.push(pluginName);

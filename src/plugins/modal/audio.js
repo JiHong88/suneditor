@@ -2,10 +2,9 @@ import EditorDependency from '../../dependency';
 import { Modal, Controller, FileManager, Figure } from '../../modules';
 import { domUtils } from '../../helper';
 
-const Audio_ = function (editor, target) {
+const Audio_ = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
-	this.target = target;
 	this.title = this.lang.audio;
 	this.icon = this.icons.audio;
 
@@ -15,7 +14,7 @@ const Audio_ = function (editor, target) {
 
 	// modules
 	this.modal = new Modal(this, modalEl);
-	this.controller = new Controller(this, controllerEl, { position: 'bottom' });
+	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
 	this.fileManager = new FileManager(this, { tagNames: ['audio'], eventHandler: this.events.onAudioUpload, checkHandler: FileCheckHandler.bind(this), figure: null });
 
 	// members

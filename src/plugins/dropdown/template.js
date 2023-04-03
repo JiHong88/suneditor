@@ -1,10 +1,9 @@
 import EditorDependency from '../../dependency';
 import { domUtils } from '../../helper';
 
-const Template = function (editor, target) {
+const Template = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
-	this.target = target;
 	this.title = this.lang.template;
 	this.icon = this.icons.template;
 
@@ -15,7 +14,7 @@ const Template = function (editor, target) {
 	this.selectedIndex = -1;
 
 	// init
-	this.menu.initDropdownTarget(target, menu);
+	this.menu.initDropdownTarget(Template.key, menu);
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 

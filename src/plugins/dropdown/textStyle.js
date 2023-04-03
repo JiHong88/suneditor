@@ -1,10 +1,9 @@
 import EditorDependency from '../../dependency';
 import { domUtils } from '../../helper';
 
-const TextStyle = function (editor, target) {
+const TextStyle = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
-	this.target = target;
 	this.title = this.lang.textStyle;
 	this.icon = this.icons.text_style;
 
@@ -15,7 +14,7 @@ const TextStyle = function (editor, target) {
 	this.styleList = menu.querySelectorAll('li button');
 
 	// init
-	this.menu.initDropdownTarget(target, menu);
+	this.menu.initDropdownTarget(TextStyle.key, menu);
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 

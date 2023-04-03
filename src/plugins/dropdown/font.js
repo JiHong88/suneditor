@@ -1,10 +1,9 @@
 import EditorDependency from '../../dependency';
 import { domUtils } from '../../helper';
 
-const Font = function (editor, target) {
+const Font = function (editor) {
 	EditorDependency.call(this, editor);
 	// plugin basic properties
-	this.target = target;
 	this.title = this.lang.font;
 	this.icon = '<span class="txt">' + this.lang.font + '</span>' + this.icons.arrow_down;
 
@@ -13,13 +12,11 @@ const Font = function (editor, target) {
 	const commandArea = menu.querySelector('.se-list-inner');
 
 	// members
-	this.targetText = null;
-	this.targetTooltip = null;
 	this.currentFont = '';
 	this.fontList = menu.querySelectorAll('ul li button');
 
 	// init
-	this.menu.initDropdownTarget(target, menu);
+	this.menu.initDropdownTarget(Font.key, menu);
 	this.eventManager.addEvent(commandArea, 'click', OnClickMenu.bind(this));
 };
 
@@ -30,17 +27,17 @@ Font.prototype = {
 	/**
 	 * @override core
 	 */
-	active: function (element) {
-		const target = this.targetText;
-		const tooltip = this.targetTooltip;
+	active: function (element, target) {
+		const targetText = target.querySelector('.txt');
+		const tooltip = target.parentNode.querySelector('.se-tooltip-text');
 
 		if (!element) {
 			const font = this.status.hasFocus ? this.editor.frameContext.get('wwComputedStyle').fontFamily : this.lang.font;
-			domUtils.changeTxt(target, font);
+			domUtils.changeTxt(targetText, font);
 			domUtils.changeTxt(tooltip, this.status.hasFocus ? this.lang.font + (font ? ' (' + font + ')' : '') : font);
 		} else if (element.style && element.style.fontFamily.length > 0) {
 			const selectFont = element.style.fontFamily.replace(/["']/g, '');
-			domUtils.changeTxt(target, selectFont);
+			domUtils.changeTxt(targetText, selectFont);
 			domUtils.changeTxt(tooltip, this.lang.font + ' (' + selectFont + ')');
 			return true;
 		}
@@ -51,9 +48,9 @@ Font.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on: function () {
+	on: function (target) {
 		const fontList = this.fontList;
-		const currentFont = this.targetText.textContent;
+		const currentFont = target.querySelector('.txt').textContent;
 
 		if (currentFont !== this.currentFont) {
 			for (let i = 0, len = fontList.length; i < len; i++) {
@@ -81,14 +78,6 @@ Font.prototype = {
 		}
 
 		this.menu.dropdownOff();
-	},
-
-	/**
-	 * @override core
-	 */
-	init: function () {
-		this.targetText = this.target.querySelector('.txt');
-		this.targetTooltip = this.target.parentNode.querySelector('.se-tooltip-text');
 	},
 
 	constructor: Font

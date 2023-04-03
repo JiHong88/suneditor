@@ -4,10 +4,9 @@ import {
 	converter
 } from '../../helper';
 
-const FontSize = function (editor, target) {
+const FontSize = function (editor) {
 	EditorDependency.call(this, editor);
 	// plugin basic properties
-	this.target = target;
 	this.title = this.lang.fontSize;
 	this.icon = '<span class="txt">' + this.lang.fontSize + '</span>' + this.icons.arrow_down;
 
@@ -15,12 +14,11 @@ const FontSize = function (editor, target) {
 	const menu = CreateHTML(editor);
 
 	// members
-	this.targetText = null;
 	this.sizeList = menu.querySelectorAll('li button');
 	this.currentSize = '';
 
 	// init
-	this.menu.initDropdownTarget(target, menu);
+	this.menu.initDropdownTarget(FontSize.key, menu);
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
@@ -31,11 +29,12 @@ FontSize.prototype = {
 	/**
 	 * @override core
 	 */
-	active: function (element) {
+	active: function (element, target) {
+		const targetText = target.querySelector('.txt');
 		if (!element) {
-			domUtils.changeTxt(this.targetText, this.status.hasFocus ? converter.fontSize(this.options.get('fontSizeUnit'), this.editor.frameContext.get('wwComputedStyle').fontSize) : this.lang.fontSize);
+			domUtils.changeTxt(targetText, this.status.hasFocus ? converter.fontSize(this.options.get('fontSizeUnit'), this.editor.frameContext.get('wwComputedStyle').fontSize) : this.lang.fontSize);
 		} else if (element.style && element.style.fontSize.length > 0) {
-			domUtils.changeTxt(this.targetText, converter.fontSize(this.options.get('fontSizeUnit'), element.style.fontSize));
+			domUtils.changeTxt(targetText, converter.fontSize(this.options.get('fontSizeUnit'), element.style.fontSize));
 			return true;
 		}
 
@@ -45,9 +44,9 @@ FontSize.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on: function () {
+	on: function (target) {
 		const sizeList = this.sizeList;
-		const currentSize = this.targetText.textContent;
+		const currentSize = target.querySelector('.txt').textContent;
 
 		if (currentSize !== this.currentSize) {
 			for (let i = 0, len = sizeList.length; i < len; i++) {
@@ -77,13 +76,6 @@ FontSize.prototype = {
 		}
 
 		this.menu.dropdownOff();
-	},
-
-	/**
-	 * @override core
-	 */
-	init: function () {
-		this.targetText = this.target.querySelector('.txt');
 	},
 
 	constructor: FontSize

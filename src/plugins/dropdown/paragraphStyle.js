@@ -1,10 +1,9 @@
 import EditorDependency from '../../dependency';
 import { domUtils } from '../../helper';
 
-const ParagraphStyle = function (editor, target) {
+const ParagraphStyle = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
-	this.target = target;
 	this.title = this.lang.paragraphStyle;
 	this.icon = this.icons.paragraph_style;
 
@@ -15,7 +14,7 @@ const ParagraphStyle = function (editor, target) {
 	this.classList = menu.querySelectorAll('li button');
 
 	// init
-	this.menu.initDropdownTarget(target, menu);
+	this.menu.initDropdownTarget(ParagraphStyle.key, menu);
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 

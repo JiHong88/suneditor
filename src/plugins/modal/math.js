@@ -4,7 +4,7 @@ import { domUtils, env, converter, unicode } from '../../helper';
 
 const KATEX_WEBSITE = 'https://katex.org/docs/supported.html';
 
-const Math_ = function (editor, target) {
+const Math_ = function (editor) {
 	// exception
 	if (!editor.options.get('katex')) {
 		console.warn('[SUNEDITOR.plugins.math.warn] The math plugin must need the "KaTeX" library, Please add the katex option.');
@@ -12,7 +12,6 @@ const Math_ = function (editor, target) {
 
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
-	this.target = target;
 	this.title = this.lang.math;
 	this.icon = this.icons.math;
 

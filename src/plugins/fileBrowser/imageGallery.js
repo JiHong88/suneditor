@@ -1,10 +1,9 @@
 import EditorDependency from '../../dependency';
 import { FileBrowser } from '../../modules';
 
-const ImageGallery = function (editor, target) {
+const ImageGallery = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
-	this.target = target;
 	this.title = this.lang.imageGallery;
 	this.icon = this.icons.image_gallery;
 

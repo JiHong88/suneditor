@@ -4,8 +4,8 @@ require('../../src/assets/suneditor-content.css');
 require('../../src/assets/theme/test.css');
 
 // katex
-// import Katex from 'katex';
-// require('katex/dist/katex.css');
+import Katex from 'katex';
+require('katex/dist/katex.css');
 
 // codemirror6
 // import { EditorView, basicSetup, minimalSetup } from 'codemirror';
@@ -314,76 +314,94 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // 	buttonList: bl
 // });
 
-const editor_root = (window.e = suneditor.create(
-	{
-		editor1: {
-			target: document.querySelector('#multi_editor_1'),
-			options: {
-				value: '<p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p>',
-				placeholder: 'place1'
-			}
-		},
-		editor2: {
-			target: document.querySelector('#multi_editor_2'),
-			options: {
-				value: '<p>ed2</p>',
-				placeholder: 'place21'
-			}
-		},
-		editor3: {
-			target: document.querySelector('#multi_editor_3'),
-			options: {
-				value: '<p>ed3</p>',
-				placeholder: 'place3'
-			}
-		},
-		editor4: {
-			target: document.querySelector('#multi_editor_4'),
-			options: {
-				// value: '<p>ed4</p>', 
-				placeholder: 'place4',
-				statusbar: true
-			}
+const editor_root = (window.e = suneditor.create({
+	editor1: {
+		target: document.querySelector('#multi_editor_1'),
+		options: {
+			value: '<p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p>',
+			placeholder: 'place1'
 		}
 	},
-	{
-		// value: 'Common value',
-		// editorStyle: 'font-size:40px',
-		plugins: plugins,
-		toolbar_container: '#root_toolbar_container',
-		statusbar_container: '#root_statusbar_container',
-		// codeMirror: {
-		// 	EditorView: EditorView,
-		// 	extensions: [
-		// 		basicSetup,
-		// 		html({
-		// 			matchClosingTags: true,
-		// 			autoCloseTags: true
-		// 		}),
-		// 		javascript()
-		// 	],
-		// 	minimalSetup: minimalSetup
-		// },
-		// codeMirror: {
-		// 	src: Codemirror5
-		// },
-		toolbar_sticky: 0,
-		imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
-		lineAttrReset: 'id',
-		attributeWhitelist: 'id',
-		buttonList: bl,
-		subToolbar: bl,
-		// katex: {
-		// 	src: Katex
-		// }
+	editor2: {
+		target: document.querySelector('#multi_editor_2'),
+		options: {
+			value: '<p>ed2</p>',
+			placeholder: 'place21'
+		}
+	},
+	editor3: {
+		target: document.querySelector('#multi_editor_3'),
+		options: {
+			value: '<p>ed3</p>',
+			placeholder: 'place3'
+		}
+	},
+	editor4: {
+		target: document.querySelector('#multi_editor_4'),
+		options: {
+			// value: '<p>ed4</p>', 
+			placeholder: 'place4',
+			statusbar: true
+		}
 	}
-));
+}, {
+	// value: 'Common value',
+	// editorStyle: 'font-size:40px',
+	plugins: plugins,
+	toolbar_container: '#root_toolbar_container',
+	statusbar_container: '#root_statusbar_container',
+	// codeMirror: {
+	// 	EditorView: EditorView,
+	// 	extensions: [
+	// 		basicSetup,
+	// 		html({
+	// 			matchClosingTags: true,
+	// 			autoCloseTags: true
+	// 		}),
+	// 		javascript()
+	// 	],
+	// 	minimalSetup: minimalSetup
+	// },
+	// codeMirror: {
+	// 	src: Codemirror5
+	// },
+	toolbar_sticky: 0,
+	imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
+	lineAttrReset: 'id',
+	attributeWhitelist: 'id',
+	buttonList: [
+		['align', 'align'],
+		['backgroundColor', 'backgroundColor'],
+		['font', 'font'],
+		['fontColor', 'fontColor'],
+		['fontSize', 'fontSize'],
+		['formatBlock','formatBlock'],
+		['horizontalLine','horizontalLine'],
+		['layout','layout'],
+		['lineHeight','lineHeight'],
+		['list','list'],
+		['paragraphStyle','paragraphStyle'],
+		['table','table'],
+		['template','template'],
+		['textStyle','textStyle'],
+		['blockquote','blockquote'],
+		['audio','audio'],
+		['image','image'],
+		['link','link'],
+		['video','video'],
+		['math','math'],
+	],
+	subToolbar: bl,
+	katex: {
+		src: Katex
+	}
+}));
 
 // editor_root.events.onBlur = (rootKey, e, htmlFrame) => {
 // 	console.log('blur', editor_root.frameContext);
 // };
 
-editor_root.events.onload = function() {
+editor_root.events.onload = function () {
 
 	editor_root.html.set('fdjksl;afjds ...fdjksafl;d')
 }

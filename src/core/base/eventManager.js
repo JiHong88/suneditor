@@ -121,6 +121,7 @@ EventManager.prototype = {
 		this.editor.effectNode = selectionNode;
 
 		const marginDir = this.options.get('_rtl') ? 'marginRight' : 'marginLeft';
+		const plugins = this.plugins;
 		const _commandMap = this.editor._commandMap;
 		const classOnCheck = this._onButtonsCheck;
 		const commandMapNodes = [];
@@ -144,7 +145,9 @@ EventManager.prototype = {
 			if (!this.status.isReadOnly) {
 				for (let c = 0, name; c < cLen; c++) {
 					name = activePlugins[c];
-					if (commandMapNodes.indexOf(name) === -1 && this.plugins[name].active(element)) {
+					if (commandMapNodes.indexOf(name) === -1 && _commandMap.get(name) && _commandMap.get(name).filter(function (e) {
+							return plugins[name].active(element, e);
+						}).length > 0) {
 						commandMapNodes.push(name);
 					}
 				}
@@ -190,7 +193,7 @@ EventManager.prototype = {
 			}
 		}
 
-		this._setKeyEffect(commandMapNodes);
+		this._setKeyEffect(commandMapNodes, plugins, _commandMap);
 
 		/** save current nodes */
 		this.status.currentNodes = currentNodes.reverse();
@@ -205,26 +208,24 @@ EventManager.prototype = {
 	 * @param {Array|null} ignoredList Igonred button list
 	 * @private
 	 */
-	_setKeyEffect: function (ignoredList) {
+	_setKeyEffect: function (ignoredList, plugins, _commandMap) {
 		const activePlugins = this.editor.activePlugins;
 
-		this.editor._commandMap.forEach(
+		_commandMap.forEach(
 			function (e, k) {
 				if (ignoredList.indexOf(k) > -1 || !e || e.length === 0) return;
-				if (activePlugins.indexOf(k) > -1) {
-					this.plugins[k].active(null);
-				} else if (/^OUTDENT$/i.test(k)) {
-					e.forEach(function (v) {
+				e.forEach(function (v) {
+					if (activePlugins.indexOf(k) > -1) {
+						plugins[k].active(null, v);
+					} else if (/^OUTDENT$/i.test(k)) {
 						if (!domUtils.isImportantDisabled(v)) v.setAttribute('disabled', true);
-					})
-				} else if (/^INDENT$/i.test(k)) {
-					e.forEach(function (v) {
+					} else if (/^INDENT$/i.test(k)) {
 						if (!domUtils.isImportantDisabled(v)) v.removeAttribute('disabled');
-					})
-				} else {
-					domUtils.removeClass(e, 'active');
-				}
-			}.bind(this)
+					} else {
+						domUtils.removeClass(v, 'active');
+					}
+				});
+			}
 		);
 	},
 
@@ -1698,7 +1699,7 @@ function OnKeyUp_wysiwyg(rootKey, e) {
 	const rangeEl = this.format.getBlock(selectionNode, null);
 	const attrs = this._formatAttrsTemp;
 
-	if (attrs) {
+	if (formatEl && attrs) {
 		for (let i = 0, len = attrs.length; i < len; i++) {
 			if (keyCode === 13 && /^id$/i.test(attrs[i].name)) {
 				formatEl.removeAttribute('id');
@@ -1824,7 +1825,7 @@ function OnBlur_wysiwyg(rootKey, e) {
 	this.editor._offCurrentController();
 	if (this.editor.isInline || this.editor.isBalloon) this._hideToolbar();
 
-	this._setKeyEffect([]);
+	this._setKeyEffect([], null, []);
 
 	this.status.currentNodes = [];
 	this.status.currentNodesMap = [];

@@ -2,10 +2,9 @@ import EditorDependency from '../../dependency';
 import { Modal, Controller, ModalAnchorEditor } from '../../modules';
 import { domUtils } from '../../helper';
 
-const Link = function (editor, target) {
+const Link = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
-	this.target = target;
 	this.title = this.lang.link;
 	this.icon = this.icons.link;
 
@@ -16,7 +15,7 @@ const Link = function (editor, target) {
 	// modules
 	this.anchor = new ModalAnchorEditor(this, modalEl);
 	this.modal = new Modal(this, modalEl);
-	this.controller = new Controller(this, controllerEl, { position: 'bottom' });
+	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
 
 	// members
 	this.isUpdateState = false;

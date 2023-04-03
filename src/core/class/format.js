@@ -657,7 +657,7 @@ Format.prototype = {
 	 * @param {boolean} nested If true, indenting existing list cells.
 	 */
 	applyList: function (type, selectedCells, nested) {
-		const listTag = type.split(':')[0] === 'bullet' ? 'OL' : 'UL';
+		const listTag = type.split(':')[0] === 'bullet' ? 'UL' : 'OL';
 		const listStyle = type.split(':')[1] || '';
 
 		let range = this.selection.getRange();
@@ -856,7 +856,7 @@ Format.prototype = {
 		}
 
 		this.editor.effectNode = null;
-		return !isCollapsed ? originRange : afterRange;
+		return (!isRemove || !isCollapsed) ? originRange : afterRange;
 	},
 
 	/**
@@ -1713,7 +1713,7 @@ Format.prototype = {
 					lastCell = lastCell.nextElementSibling;
 				}
 			}
-			range = this.applyList((originList.nodeName.toUpperCase() === 'OL' ? 'bullet' : 'numbered') + ':' + originList.style.listStyleType, selectedCells, true);
+			range = this.applyList((/^OL$/i.test(originList.nodeName) ? 'numbered' : 'bullet') + ':' + originList.style.listStyleType, selectedCells, true);
 		} else {
 			let innerList = domUtils.createElement(originList.nodeName);
 			let prev = selectedCells[0].previousElementSibling;

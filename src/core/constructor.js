@@ -1,11 +1,26 @@
 import _icons from '../assets/defaultIcons';
 import _defaultLang from '../langs/en';
-import { CreateContext, CreateFrameContext } from './context';
-import { domUtils, numbers, converter, env } from '../helper';
+import {
+	CreateContext,
+	CreateFrameContext
+} from './context';
+import {
+	domUtils,
+	numbers,
+	converter,
+	env
+} from '../helper';
 
 const _d = env._d;
 const _w = env._w;
-const DEFAULT_BUTTON_LIST = [['undo', 'redo'], ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'], ['removeFormat'], ['outdent', 'indent'], ['fullScreen', 'showBlocks', 'codeView'], ['preview', 'print']];
+const DEFAULT_BUTTON_LIST = [
+	['undo', 'redo'],
+	['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+	['removeFormat'],
+	['outdent', 'indent'],
+	['fullScreen', 'showBlocks', 'codeView'],
+	['preview', 'print']
+];
 const DEFAULT_ELEMENT_WHITELIST = 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls';
 const DEFAULT_FORMAT_LINE = 'P|DIV|H[1-6]|LI|TH|TD|DETAILS';
@@ -28,11 +43,11 @@ const Constructor = function (editorTargets, options) {
 	const plugins = {};
 	if (options.plugins) {
 		const originPlugins = options.plugins;
-		const pluginsValues = _w.Array.isArray(originPlugins.length)
-			? originPlugins
-			: _w.Object.keys(originPlugins).map(function (name) {
-					return originPlugins[name];
-			  });
+		const pluginsValues = _w.Array.isArray(originPlugins.length) ?
+			originPlugins :
+			_w.Object.keys(originPlugins).map(function (name) {
+				return originPlugins[name];
+			});
 
 		for (let i = 0, len = pluginsValues.length, p; i < len; i++) {
 			p = pluginsValues[i].default || pluginsValues[i];
@@ -47,19 +62,33 @@ const Constructor = function (editorTargets, options) {
 	const lang = optionMap.l;
 
 	/** --- carrier wrapper --------------------------------------------------------------- */
-	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper' + (o.get('_rtl') ? ' se-rtl' : '') });
+	const editor_carrier_wrapper = domUtils.createElement('DIV', {
+		class: 'sun-editor sun-editor-carrier-wrapper' + (o.get('_rtl') ? ' se-rtl' : '')
+	});
 
 	// modal
-	const modal = domUtils.createElement('DIV', { class: 'se-modal sun-editor-common' });
-	const modal_back = domUtils.createElement('DIV', { class: 'se-modal-back', style: 'display: none;' });
-	const modal_inner = domUtils.createElement('DIV', { class: 'se-modal-inner', style: 'display: none;' });
+	const modal = domUtils.createElement('DIV', {
+		class: 'se-modal sun-editor-common'
+	});
+	const modal_back = domUtils.createElement('DIV', {
+		class: 'se-modal-back',
+		style: 'display: none;'
+	});
+	const modal_inner = domUtils.createElement('DIV', {
+		class: 'se-modal-inner',
+		style: 'display: none;'
+	});
 	modal.appendChild(modal_back);
 	modal.appendChild(modal_inner);
 	editor_carrier_wrapper.appendChild(modal);
 
 	// loding box, resizing back
-	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-resizing-back' }));
-	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>'));
+	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', {
+		class: 'se-resizing-back'
+	}));
+	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', {
+		class: 'se-loading-box sun-editor-common'
+	}, '<div class="se-loading-effect"></div>'));
 	_d.body.insertBefore(editor_carrier_wrapper, _d.body.firstElementChild);
 
 	/** --- toolbar --------------------------------------------------------------- */
@@ -75,7 +104,9 @@ const Constructor = function (editorTargets, options) {
 	} else if (/balloon/i.test(o.get('mode'))) {
 		toolbar.className += ' se-toolbar-balloon';
 		toolbar.style.width = o.get('toolbar_width');
-		toolbar.appendChild(domUtils.createElement('DIV', { class: 'se-arrow' }));
+		toolbar.appendChild(domUtils.createElement('DIV', {
+			class: 'se-arrow'
+		}));
 	}
 
 	// editor frame
@@ -86,9 +117,15 @@ const Constructor = function (editorTargets, options) {
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
 		const editTarget = editorTargets[i];
 		const to = editTarget.options;
-		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (to.get('_rtl') ? ' se-rtl' : '') });
-		const container = domUtils.createElement('DIV', { class: 'se-container' });
-		const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' });
+		const top_div = domUtils.createElement('DIV', {
+			class: 'sun-editor' + (to.get('_rtl') ? ' se-rtl' : '')
+		});
+		const container = domUtils.createElement('DIV', {
+			class: 'se-container'
+		});
+		const editor_div = domUtils.createElement('DIV', {
+			class: 'se-wrapper'
+		});
 
 		const toolbarShadow = toolbar.cloneNode(false);
 		toolbarShadow.className += ' se-toolbar-shadow';
@@ -103,9 +140,15 @@ const Constructor = function (editorTargets, options) {
 		let textarea = initElements.codeView;
 
 		// line breaker
-		const line_breaker = domUtils.createElement('DIV', { class: 'se-line-breaker' }, '<button class="se-btn">' + icons.line_break + '</button>');
-		const line_breaker_t = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t' }, '<button class="se-btn">' + icons.line_break + '</button>');
-		const line_breaker_b = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b' }, '<button class="se-btn">' + icons.line_break + '</button>');
+		const line_breaker = domUtils.createElement('DIV', {
+			class: 'se-line-breaker'
+		}, '<button class="se-btn">' + icons.line_break + '</button>');
+		const line_breaker_t = domUtils.createElement('DIV', {
+			class: 'se-line-breaker-component se-line-breaker-component-t'
+		}, '<button class="se-btn">' + icons.line_break + '</button>');
+		const line_breaker_b = domUtils.createElement('DIV', {
+			class: 'se-line-breaker-component se-line-breaker-component-b'
+		}, '<button class="se-btn">' + icons.line_break + '</button>');
 		line_breaker_t.innerHTML = line_breaker_b.innerHTML = icons.line_break;
 		editor_div.appendChild(line_breaker);
 		editor_div.appendChild(line_breaker_t);
@@ -114,7 +157,9 @@ const Constructor = function (editorTargets, options) {
 		// append container
 		editor_div.appendChild(textarea);
 		if (placeholder_span) editor_div.appendChild(placeholder_span);
-		container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
+		container.appendChild(domUtils.createElement('DIV', {
+			class: 'se-toolbar-sticky-dummy'
+		}));
 		container.appendChild(editor_div);
 
 		// statusbar
@@ -136,12 +181,18 @@ const Constructor = function (editorTargets, options) {
 	// toolbar container
 	const toolbar_container = o.get('toolbar_container');
 	if (toolbar_container) {
-		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (o.get('_rtl') ? ' se-rtl' : '') });
-		const container = domUtils.createElement('DIV', { class: 'se-container' });
+		const top_div = domUtils.createElement('DIV', {
+			class: 'sun-editor' + (o.get('_rtl') ? ' se-rtl' : '')
+		});
+		const container = domUtils.createElement('DIV', {
+			class: 'se-container'
+		});
 		container.appendChild(toolbar);
 		top_div.appendChild(container);
 		toolbar_container.appendChild(top_div);
-		toolbar_container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
+		toolbar_container.appendChild(domUtils.createElement('DIV', {
+			class: 'se-toolbar-sticky-dummy'
+		}));
 	} else {
 		const rootContainer = rootTargets.get(rootId).get('container');
 		rootContainer.insertBefore(toolbar, rootContainer.firstElementChild);
@@ -189,7 +240,14 @@ function InitOptions(options, editorTargets) {
 	/** Base */
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
 	// text style tags
-	const textTags = [{ bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL', sub: 'SUB', sup: 'SUP' }, options.textTags || {}].reduce(function (_default, _new) {
+	const textTags = [{
+		bold: 'STRONG',
+		underline: 'U',
+		italic: 'EM',
+		strike: 'DEL',
+		sub: 'SUB',
+		sup: 'SUP'
+	}, options.textTags || {}].reduce(function (_default, _new) {
 		for (let key in _new) {
 			_default[key] = _new[key];
 		}
@@ -295,26 +353,25 @@ function InitOptions(options, editorTargets) {
 	o.set('templates', !options.templates ? null : options.templates);
 	o.set(
 		'mathFontSize',
-		!!options.mathFontSize
-			? options.mathFontSize
-			: [
-					{
-						text: '1',
-						value: '1em'
-					},
-					{
-						text: '1.5',
-						value: '1.5em'
-					},
-					{
-						text: '2',
-						value: '2em'
-					},
-					{
-						text: '2.5',
-						value: '2.5em'
-					}
-			  ]
+		!!options.mathFontSize ?
+		options.mathFontSize :
+		[{
+				text: '1',
+				value: '1em'
+			},
+			{
+				text: '1.5',
+				value: '1.5em'
+			},
+			{
+				text: '2',
+				value: '2em'
+			},
+			{
+				text: '2.5',
+				value: '2.5em'
+			}
+		]
 	);
 
 	/** --- Media */
@@ -326,12 +383,14 @@ function InitOptions(options, editorTargets) {
 	o.set('imageHeight', !options.imageHeight ? 'auto' : numbers.is(options.imageHeight) ? options.imageHeight + 'px' : options.imageHeight);
 	o.set(
 		'imageControls',
-		options.imageControls || !o.get('imageResizing')
-			? [['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']]
-			: [
-					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
-					['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']
-			  ]
+		options.imageControls || !o.get('imageResizing') ?
+		[
+			['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']
+		] :
+		[
+			['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
+			['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']
+		]
 	);
 	// @todo
 	o.set('imageHeightShow', options.imageHeightShow === undefined ? true : !!options.imageHeightShow);
@@ -357,12 +416,14 @@ function InitOptions(options, editorTargets) {
 	o.set('videoHeight', !options.videoHeight || !numbers.get(options.videoHeight, 0) ? '' : numbers.is(options.videoHeight) ? options.videoHeight + 'px' : options.videoHeight);
 	o.set(
 		'videoControls',
-		options.videoControls || !o.get('videoResizing')
-			? [['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']]
-			: [
-					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
-					['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']
-			  ]
+		options.videoControls || !o.get('videoResizing') ?
+		[
+			['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']
+		] :
+		[
+			['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
+			['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']
+		]
 	);
 	// @todo
 	o.set('videoRatioShow', options.videoRatioShow === undefined ? true : !!options.videoRatioShow);
@@ -434,15 +495,14 @@ function InitOptions(options, editorTargets) {
 	o.set('__listCommonStyle', options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle']);
 
 	/** --- Icons ------------------------------------------------------------------------------------------ */
-	let icons =
-		!options.icons || typeof options.icons !== 'object'
-			? _icons
-			: [_icons, options.icons].reduce(function (_default, _new) {
-					for (let key in _new) {
-						_default[key] = _new[key];
-					}
-					return _default;
-			  }, {});
+	let icons = !options.icons || typeof options.icons !== 'object' ?
+		_icons :
+		[_icons, options.icons].reduce(function (_default, _new) {
+			for (let key in _new) {
+				_default[key] = _new[key];
+			}
+			return _default;
+		}, {});
 	// rtl
 	if (o.get('_rtl')) {
 		icons = [o.get('icons'), o.get('icons')._rtl].reduce(function (_default, _new) {
@@ -524,7 +584,9 @@ function _initTargetElements(options, topDiv, targetOptions) {
 
 	/** editor */
 	// wysiwyg div or iframe
-	const wysiwygDiv = domUtils.createElement(!options.get('iframe') ? 'DIV' : 'IFRAME', { class: 'se-wrapper-inner se-wrapper-wysiwyg' });
+	const wysiwygDiv = domUtils.createElement(!options.get('iframe') ? 'DIV' : 'IFRAME', {
+		class: 'se-wrapper-inner se-wrapper-wysiwyg'
+	});
 
 	if (!options.get('iframe')) {
 		wysiwygDiv.setAttribute('contenteditable', true);
@@ -556,23 +618,33 @@ function _initTargetElements(options, topDiv, targetOptions) {
 	let charWrapper = null;
 	let charCounter = null;
 	if (targetOptions.get('statusbar')) {
-		statusbar = domUtils.createElement('DIV', { class: 'se-status-bar sun-editor-common' });
+		statusbar = domUtils.createElement('DIV', {
+			class: 'se-status-bar sun-editor-common'
+		});
 
 		/** navigation */
-		navigation = domUtils.createElement('DIV', { class: 'se-navigation sun-editor-common' });
+		navigation = domUtils.createElement('DIV', {
+			class: 'se-navigation sun-editor-common'
+		});
 		statusbar.appendChild(navigation);
 
 		/** char counter */
 		if (targetOptions.get('charCounter')) {
-			charWrapper = domUtils.createElement('DIV', { class: 'se-char-counter-wrapper' });
+			charWrapper = domUtils.createElement('DIV', {
+				class: 'se-char-counter-wrapper'
+			});
 
 			if (targetOptions.get('charCounter_label')) {
-				const charLabel = domUtils.createElement('SPAN', { class: 'se-char-label' });
+				const charLabel = domUtils.createElement('SPAN', {
+					class: 'se-char-label'
+				});
 				charLabel.textContent = targetOptions.get('charCounter_label');
 				charWrapper.appendChild(charLabel);
 			}
 
-			charCounter = domUtils.createElement('SPAN', { class: 'se-char-counter' });
+			charCounter = domUtils.createElement('SPAN', {
+				class: 'se-char-counter'
+			});
 			charCounter.textContent = '0';
 			charWrapper.appendChild(charCounter);
 
@@ -588,7 +660,9 @@ function _initTargetElements(options, topDiv, targetOptions) {
 
 	let placeholder = null;
 	if (targetOptions.get('placeholder')) {
-		placeholder = domUtils.createElement('SPAN', { class: 'se-placeholder' });
+		placeholder = domUtils.createElement('SPAN', {
+			class: 'se-placeholder'
+		});
 		placeholder.innerText = targetOptions.get('placeholder');
 	}
 
@@ -629,8 +703,7 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 		hasCodeMirror = true;
 	} else if (options.get('codeMirror5Editor')) {
 		const codeMirror = options.get('codeMirror');
-		const cmOptions = [
-			{
+		const cmOptions = [{
 				mode: 'htmlmixed',
 				htmlMode: true,
 				lineNumbers: true,
@@ -678,8 +751,7 @@ function _checkKatexMath(katex) {
 		return;
 	}
 
-	const katexOptions = [
-		{
+	const katexOptions = [{
 			throwOnError: false
 		},
 		katex.options || {}
@@ -793,8 +865,12 @@ function _defaultButtons(options, icons, lang) {
  * @returns {Object}
  */
 function _createModuleGroup() {
-	const oUl = domUtils.createElement('UL', { class: 'se-menu-list' });
-	const oDiv = domUtils.createElement('DIV', { class: 'se-btn-module se-btn-module-border' }, oUl);
+	const oUl = domUtils.createElement('UL', {
+		class: 'se-menu-list'
+	});
+	const oDiv = domUtils.createElement('DIV', {
+		class: 'se-btn-module se-btn-module-border'
+	}, oUl);
 
 	return {
 		div: oDiv,
@@ -864,9 +940,15 @@ export function UpdateButton(element, plugin, icons, lang) {
  * @returns {Object} { element: (Element) Toolbar element, plugins: (Array|null) Plugins Array, pluginCallButtons: (Object), responsiveButtons: (Array) }
  */
 export function CreateToolBar(buttonList, plugins, options, icons, lang) {
-	const _buttonTray = domUtils.createElement('DIV', { class: 'se-btn-tray' });
-	const separator_vertical = domUtils.createElement('DIV', { class: 'se-toolbar-separator-vertical' });
-	const tool_bar = domUtils.createElement('DIV', { class: 'se-toolbar sun-editor-common' }, _buttonTray);
+	const _buttonTray = domUtils.createElement('DIV', {
+		class: 'se-btn-tray'
+	});
+	const separator_vertical = domUtils.createElement('DIV', {
+		class: 'se-toolbar-separator-vertical'
+	});
+	const tool_bar = domUtils.createElement('DIV', {
+		class: 'se-toolbar sun-editor-common'
+	}, _buttonTray);
 
 	/** create button list */
 	buttonList = _w.JSON.parse(_w.JSON.stringify(buttonList));
@@ -948,7 +1030,8 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 				(more ? moreContainer : moduleElement.ul).appendChild(buttonElement.li);
 
 				if (plugins[pluginName]) {
-					pluginCallButtons[pluginName] = buttonElement.button;
+					if (pluginCallButtons[pluginName]) pluginCallButtons[pluginName].push(buttonElement.button);
+					else pluginCallButtons[pluginName] = [buttonElement.button];
 				}
 
 				// more button
@@ -971,7 +1054,9 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 			vertical = true;
 		} else if (/^\/$/.test(buttonGroup)) {
 			/** line break  */
-			const enterDiv = domUtils.createElement('DIV', { class: 'se-btn-module-enter' });
+			const enterDiv = domUtils.createElement('DIV', {
+				class: 'se-btn-module-enter'
+			});
 			_buttonTray.appendChild(enterDiv);
 			vertical = false;
 		}
@@ -996,7 +1081,9 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 	if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
 
 	// menu tray
-	const _menuTray = domUtils.createElement('DIV', { class: 'se-menu-tray' });
+	const _menuTray = domUtils.createElement('DIV', {
+		class: 'se-menu-tray'
+	});
 	tool_bar.appendChild(_menuTray);
 
 	if (options.get('toolbar_hide')) tool_bar.style.display = 'none';

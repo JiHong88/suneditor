@@ -2,10 +2,9 @@ import EditorDependency from '../../dependency';
 import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 
-const BackgroundColor = function (editor, target) {
+const BackgroundColor = function (editor) {
 	EditorDependency.call(this, editor);
 	// plugin basic properties
-	this.target = target;
 	this.title = this.lang.backgroundColor;
 	this.icon = this.icons.background_color;
 
@@ -16,7 +15,7 @@ const BackgroundColor = function (editor, target) {
 	const menu = CreateHTML(this.colorPicker.target);
 
 	// itit
-	this.menu.initDropdownTarget(target, menu);
+	this.menu.initDropdownTarget(BackgroundColor.key, menu);
 	this.eventManager.addEvent(menu, 'click', OnClickMenu.bind(this));
 };
 

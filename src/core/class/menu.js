@@ -28,15 +28,15 @@ Menu.prototype = {
 	/**
 	 * @description Method for managing dropdown element.
 	 * You must add the "dropdown" element using the this method at custom plugin.
-	 * @param {Element|string} target Target button
+	 * @param {Element|string} key Key string
 	 * @param {Element} menu Dropdown element
 	 */
-	initDropdownTarget: function (target, menu) {
-		if (target) {
+	initDropdownTarget: function (key, menu) {
+		if (key) {
 			this.context.get('toolbar._menuTray').appendChild(menu);
-			this._menuTrayMap[typeof target === 'string' ? target : target.getAttribute('data-command')] = menu;
+			this._menuTrayMap[key] = menu;
 		} else {
-			throw Error("[SUNEDITOR.init.fail] The plugin's button is not added.");
+			throw Error("[SUNEDITOR.init.fail] The plugin's key is not added.");
 		}
 	},
 
@@ -55,7 +55,7 @@ Menu.prototype = {
 		this._bindedDropdownOff = this.dropdownOff.bind(this);
 		this.eventManager.addGlobalEvent('mousedown', this._bindedDropdownOff, false);
 
-		if (this.plugins[dropdownName].on) this.plugins[dropdownName].on();
+		if (this.plugins[dropdownName].on) this.plugins[dropdownName].on(button);
 		this.editor._antiBlur = true;
 	},
 
@@ -93,7 +93,7 @@ Menu.prototype = {
 		this._bindedContainerOff = this.containerOff.bind(this);
 		this.eventManager.addGlobalEvent('mousedown', this._bindedContainerOff, false);
 
-		if (this.plugins[containerName].on) this.plugins[containerName].on();
+		if (this.plugins[containerName].on) this.plugins[containerName].on(button);
 		this.editor._antiBlur = true;
 	},
 

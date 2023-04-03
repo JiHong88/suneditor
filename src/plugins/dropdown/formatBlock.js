@@ -1,10 +1,9 @@
 import EditorDependency from '../../dependency';
 import { domUtils } from '../../helper';
 
-const FormatBlock = function (editor, target) {
+const FormatBlock = function (editor) {
 	EditorDependency.call(this, editor);
 	// plugin basic properties
-	this.target = target;
 	this.title = this.lang.formats;
 	this.icon = '<span class="txt">' + this.lang.formats + '</span>' + this.icons.arrow_down;
 
@@ -12,13 +11,11 @@ const FormatBlock = function (editor, target) {
 	const menu = CreateHTML(editor);
 
 	// members
-	this.targetText = null;
-	this.targetTooltip = null;
 	this.formatList = menu.querySelectorAll('li button');
 	this.currentFormat = '';
 
 	// init
-	this.menu.initDropdownTarget(target, menu);
+	this.menu.initDropdownTarget(FormatBlock.key, menu);
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
@@ -29,12 +26,12 @@ FormatBlock.prototype = {
 	/**
 	 * @override core
 	 */
-	active: function (element) {
+	active: function (element, target) {
 		let formatTitle = this.lang.formats;
-		const target = this.targetText;
+		const targetText = target.querySelector('.txt');
 
 		if (!element) {
-			domUtils.changeTxt(target, formatTitle);
+			domUtils.changeTxt(targetText, formatTitle);
 		} else if (this.format.isLine(element)) {
 			const formatList = this.formatList;
 			const nodeName = element.nodeName.toLowerCase();
@@ -48,9 +45,9 @@ FormatBlock.prototype = {
 				}
 			}
 
-			domUtils.changeTxt(target, formatTitle);
-			target.setAttribute('data-value', nodeName);
-			target.setAttribute('data-class', className);
+			domUtils.changeTxt(targetText, formatTitle);
+			targetText.setAttribute('data-value', nodeName);
+			targetText.setAttribute('data-class', className);
 
 			return true;
 		}
@@ -61,10 +58,10 @@ FormatBlock.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on: function () {
+	on: function (target) {
 		const formatList = this.formatList;
-		const target = this.targetText;
-		const currentFormat = (target.getAttribute('data-value') || '') + (target.getAttribute('data-class') || '');
+		const targetText = target.querySelector('.txt');
+		const currentFormat = (targetText.getAttribute('data-value') || '') + (targetText.getAttribute('data-class') || '');
 
 		if (currentFormat !== this.currentFormat) {
 			for (let i = 0, len = formatList.length, f; i < len; i++) {
@@ -95,14 +92,6 @@ FormatBlock.prototype = {
 		}
 
 		this.menu.dropdownOff();
-	},
-
-	/**
-	 * @override core
-	 */
-	init: function () {
-		this.targetText = this.target.querySelector('.txt');
-		this.targetTooltip = this.target.parentNode.querySelector('.se-tooltip-text');
 	},
 
 	constructor: FormatBlock

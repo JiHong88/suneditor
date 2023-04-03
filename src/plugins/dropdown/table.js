@@ -2,10 +2,9 @@ import EditorDependency from '../../dependency';
 import { domUtils, numbers } from '../../helper';
 import { Controller, SelectMenu } from '../../modules';
 
-const Table = function (editor, target) {
+const Table = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
-	this.target = target;
 	this.title = this.lang.table;
 	this.icon = this.icons.table;
 
@@ -75,7 +74,7 @@ const Table = function (editor, target) {
 	};
 
 	// init
-	this.menu.initDropdownTarget(target, menu);
+	this.menu.initDropdownTarget(Table.key, menu);
 	this.eventManager.addEvent(commandArea, 'mousemove', OnMouseMoveTablePicker.bind(this));
 	this.eventManager.addEvent(commandArea, 'click', OnClickTablePicker.bind(this));
 };

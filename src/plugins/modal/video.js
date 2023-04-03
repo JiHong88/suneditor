@@ -2,10 +2,9 @@ import EditorDependency from '../../dependency';
 import { Modal, Figure, FileManager } from '../../modules';
 import { domUtils, numbers } from '../../helper';
 
-const Video = function (editor, target) {
+const Video = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
-	this.target = target;
 	this.title = this.lang.video;
 	this.icon = this.icons.video;
 

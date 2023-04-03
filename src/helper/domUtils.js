@@ -696,7 +696,7 @@ export function addClass(element, className) {
 
 	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
 	(_w.Array.isArray(element) ? element : [element]).forEach(function (e) {
-		if (!check.test(e.className)) e.className += (e.className.length > 0 ? ' ' : '') + e;
+		if (!check.test(e.className)) e.className += (e.className.length > 0 ? ' ' : '') + className;
 	})
 }
 

@@ -1,10 +1,12 @@
 import EditorDependency from '../../dependency';
-import { domUtils } from '../../helper';
+import {
+	domUtils
+} from '../../helper';
 
-const Align = function (editor, target) {
+const Align = function (editor) {
+	console.log("align---")
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
-	this.target = target;
 	this.title = this.lang.align;
 	this.icon = this.options.get('_rtl') ? this.icons.align_right : this.icons.align_left;
 
@@ -13,7 +15,6 @@ const Align = function (editor, target) {
 	const commandArea = (this._itemMenu = menu.querySelector('ul'));
 
 	// members
-	this.currentAlign = '';
 	this.defaultDir = editor.options.get('_rtl') ? 'right' : 'left';
 	this.alignIcons = {
 		justify: editor.icons.align_justify,
@@ -24,7 +25,7 @@ const Align = function (editor, target) {
 	this.alignList = commandArea.querySelectorAll('li button');
 
 	// init
-	this.menu.initDropdownTarget(target, menu);
+	this.menu.initDropdownTarget(Align.key, menu);
 	this.eventManager.addEvent(commandArea, 'click', OnClickMenu.bind(this));
 };
 
@@ -35,20 +36,20 @@ Align.prototype = {
 	/**
 	 * @override core
 	 * @param {Node} element Selection node.
+	 * @param {Element} target Target button.
 	 * @returns {boolean}
 	 */
-	active: function (element) {
-		const targetButton = this.target;
-		const target = targetButton.firstElementChild;
+	active: function (element, target) {
+		const targetChild = target.firstElementChild;
 
 		if (!element) {
-			domUtils.changeElement(target, this.alignIcons[this.defaultDir]);
-			targetButton.removeAttribute('data-focus');
+			domUtils.changeElement(targetChild, this.alignIcons[this.defaultDir]);
+			target.removeAttribute('data-focus');
 		} else if (this.format.isLine(element)) {
 			const textAlign = element.style.textAlign;
 			if (textAlign) {
-				domUtils.changeElement(target, this.alignIcons[textAlign] || this.alignIcons[this.defaultDir]);
-				targetButton.setAttribute('data-focus', textAlign);
+				domUtils.changeElement(targetChild, this.alignIcons[textAlign] || this.alignIcons[this.defaultDir]);
+				target.setAttribute('data-focus', textAlign);
 				return true;
 			}
 		}
@@ -59,20 +60,17 @@ Align.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on: function () {
+	on: function (target) {
+		const currentAlign = target.getAttribute('data-focus') || this.defaultDir;
+		if (!currentAlign) return;
+
 		const alignList = this.alignList;
-		const currentAlign = this.target.getAttribute('data-focus') || this.defaultDir;
-
-		if (currentAlign !== this.currentAlign) {
-			for (let i = 0, len = alignList.length; i < len; i++) {
-				if (currentAlign === alignList[i].getAttribute('data-command')) {
-					domUtils.addClass(alignList[i], 'active');
-				} else {
-					domUtils.removeClass(alignList[i], 'active');
-				}
+		for (let i = 0, len = alignList.length; i < len; i++) {
+			if (currentAlign === alignList[i].getAttribute('data-command')) {
+				domUtils.addClass(alignList[i], 'active');
+			} else {
+				domUtils.removeClass(alignList[i], 'active');
 			}
-
-			this.currentAlign = currentAlign;
 		}
 	},
 
@@ -141,8 +139,7 @@ function CreateHTML(core) {
 	}
 
 	return domUtils.createElement(
-		'div',
-		{
+		'div', {
 			class: 'se-dropdown se-list-layer se-list-align'
 		},
 		'<div class="se-list-inner">' + '<ul class="se-list-basic">' + html + '</ul>' + '</div>'

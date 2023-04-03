@@ -10,10 +10,9 @@ import {
 	numbers
 } from '../../helper';
 
-const Image_ = function (editor, target) {
+const Image_ = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
-	this.target = target;
 	this.title = this.lang.image;
 	this.icon = this.icons.image;
 

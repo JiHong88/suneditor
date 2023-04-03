@@ -4,7 +4,6 @@ import { domUtils } from '../../helper';
 const Blockquote = function (editor, target) {
 	EditorDependency.call(this, editor);
 	// plugin basic properties
-	this.target = target;
 	this.title = this.lang.tag_blockquote;
 	this.icon = this.icons.blockquote;
 
@@ -19,13 +18,13 @@ Blockquote.prototype = {
 	/**
 	 * @override core
 	 */
-	active: function (element) {
+	active: function (element, target) {
 		if (element && /blockquote/i.test(element.nodeName)) {
-			domUtils.addClass(this.target, 'active');
+			domUtils.addClass(target, 'active');
 			return true;
 		}
 
-		domUtils.removeClass(this.target, 'active');
+		domUtils.removeClass(target, 'active');
 		return false;
 	},
 

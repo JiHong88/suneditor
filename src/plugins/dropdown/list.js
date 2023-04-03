@@ -1,10 +1,9 @@
 import EditorDependency from '../../dependency';
 import { domUtils } from '../../helper';
 
-const List = function (editor, target) {
+const List = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
-	this.target = target;
 	this.title = this.lang.list;
 	this.icon = this.icons.list_number;
 
@@ -13,14 +12,13 @@ const List = function (editor, target) {
 
 	// members
 	this.listItems = menu.querySelectorAll('li button');
-	this.currentList = '';
 	this.icons = {
 		bullets: editor.icons.list_bullets,
 		number: editor.icons.list_number
 	};
 
 	// init
-	this.menu.initDropdownTarget(target, menu);
+	this.menu.initDropdownTarget(List.key, menu);
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
@@ -31,13 +29,13 @@ List.prototype = {
 	/**
 	 * @override core
 	 */
-	active: function (element) {
-		const icon = this.target.firstElementChild;
+	active: function (element, target) {
+		const icon = target.firstElementChild;
 
 		if (domUtils.isList(element)) {
-			const nodeName = element.nodeName;
-			this.target.setAttribute('data-focus', nodeName);
-			domUtils.addClass(this.target, 'active');
+			const nodeName = /^OL$/i.test(element.nodeName) ? 'numbered' : 'bullet';
+			target.setAttribute('data-focus', nodeName);
+			domUtils.addClass(target, 'active');
 
 			if (/UL/i.test(nodeName)) {
 				domUtils.changeElement(icon, this.icons.bullets);
@@ -47,9 +45,9 @@ List.prototype = {
 
 			return true;
 		} else {
-			this.target.removeAttribute('data-focus');
+			target.removeAttribute('data-focus');
 			domUtils.changeElement(icon, this.icons.number);
-			domUtils.removeClass(this.target, 'active');
+			domUtils.removeClass(target, 'active');
 		}
 
 		return false;
@@ -58,11 +56,9 @@ List.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on: function () {
-		const currentList = this.target.getAttribute('data-focus') || '';
-
-		if (currentList !== this.currentList) {
-			const list = this.listItems;
+	on: function (target) {
+		const currentList = target.getAttribute('data-focus') || '';
+		const list = this.listItems;
 			for (let i = 0, len = list.length; i < len; i++) {
 				if (currentList === list[i].getAttribute('data-command')) {
 					domUtils.addClass(list[i], 'active');
@@ -70,9 +66,6 @@ List.prototype = {
 					domUtils.removeClass(list[i], 'active');
 				}
 			}
-
-			this.currentList = currentList;
-		}
 	},
 
 	/**
@@ -106,14 +99,14 @@ function CreateHTML(editor) {
 	const html =
 		'<div class="se-list-inner">' +
 		'<ul class="se-list-basic">' +
-		'<li><button type="button" class="se-btn-list se-tooltip" data-command="bullet" title="' +
+		'<li><button type="button" class="se-btn-list se-tooltip" data-command="numbered" title="' +
 		lang.orderList +
 		'" aria-label="' +
 		lang.orderList +
 		'">' +
 		editor.icons.list_number +
 		'</button></li>' +
-		'<li><button type="button" class="se-btn-list se-tooltip" data-command="numbered" title="' +
+		'<li><button type="button" class="se-btn-list se-tooltip" data-command="bullet" title="' +
 		lang.unorderList +
 		'" aria-label="' +
 		lang.unorderList +

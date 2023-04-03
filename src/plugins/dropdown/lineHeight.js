@@ -1,10 +1,9 @@
 import EditorDependency from '../../dependency';
 import { domUtils } from '../../helper';
 
-const LineHeight = function (editor, target) {
+const LineHeight = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
-	this.target = target;
 	this.title = this.lang.lineHeight;
 	this.icon = this.icons.line_height;
 
@@ -16,7 +15,7 @@ const LineHeight = function (editor, target) {
 	this.currentSize = -1;
 
 	// init
-	this.menu.initDropdownTarget(target, menu);
+	this.menu.initDropdownTarget(LineHeight.key, menu);
 	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
