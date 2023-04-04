@@ -30,9 +30,6 @@ const EventManager = function (editor) {
 	this._toolbarObserver = null;
 	this._onMousedownPlugins = editor._onMousedownPlugins;
 	this._onKeyDownPlugins = editor._onKeyDownPlugins;
-	this._lineBreakerButton = null;
-	this._lineBreaker_t = null;
-	this._lineBreaker_b = null;
 	this._lineBreakDir = null;
 	this._lineBreakComp = null;
 	this._formatAttrsTemp = null;
@@ -657,18 +654,18 @@ EventManager.prototype = {
 			this.editor._offCurrentController();
 		}
 
-		if (this._lineBreaker_t) {
-			const t_style = this._lineBreaker_t.style;
-			const t_offset = (this._lineBreaker_t.getAttribute('data-offset') || ',').split(',');
+		if (this.editor._lineBreaker_t) {
+			const t_style = this.editor._lineBreaker_t.style;
+			const t_offset = (this.editor._lineBreaker_t.getAttribute('data-offset') || ',').split(',');
 			if (t_style.display !== 'none') {
 				t_style.top = numbers.get(t_offset[0], 0) - y + 'px';
 				t_style.left = numbers.get(t_offset[1], 0) - x + 'px';
 			}
 		}
 
-		if (this._lineBreaker_b) {
-			const b_style = this._lineBreaker_b.style;
-			const b_offset = (this._lineBreaker_b.getAttribute('data-offset') || ',').split(',');
+		if (this.editor._lineBreaker_b) {
+			const b_style = this.editor._lineBreaker_b.style;
+			const b_offset = (this.editor._lineBreaker_b.getAttribute('data-offset') || ',').split(',');
 			if (b_style.display !== 'none') {
 				b_style.top = numbers.get(b_offset[0], 0) - y + 'px';
 				b_style.left = numbers.get(b_offset[1], 0) - x + 'px';
@@ -707,8 +704,6 @@ EventManager.prototype = {
 	},
 
 	_resetFrameStatus: function () {
-		this.editor._offCurrentController();
-
 		if (!env.isResizeObserverSupported) this.toolbar.resetResponsiveToolbar();
 		const toolbar = this.context.get('toolbar.main');
 		const isToolbarHidden = (toolbar.style.display === 'none' || (this.editor.isInline && !this.toolbar._inlineToolbarAttr.isShow));
@@ -1878,7 +1873,7 @@ function OnMouseMove_wysiwyg(e) {
 		this._lineBreakComp = component;
 		this._lineBreakDir = dir;
 		lineBreakerStyle.top = top - wScroll + 'px';
-		this._lineBreakerButton.style.left = this.offset.get(component).left + component.offsetWidth / 2 - 15 + 'px';
+		this.editor._lineBreakerButton.style.left = this.offset.get(component).left + component.offsetWidth / 2 - 15 + 'px';
 		lineBreakerStyle.display = 'block';
 	} // off line breaker
 	else if (lineBreakerStyle.display !== 'none') {
@@ -1913,10 +1908,11 @@ function __closeMove() {
 function DisplayLineBreak(dir, e) {
 	e.preventDefault();
 
-	dir = !dir ? this._lineBreakDir : dir;
 	const component = this._lineBreakComp;
+	if (!component) return;
+	
+	dir = !dir ? this._lineBreakDir : dir;
 	const isList = domUtils.isListCell(component.parentNode);
-
 	const format = domUtils.createElement(isList ? 'BR' : domUtils.isTableCell(component.parentNode) ? 'DIV' : this.options.get('defaultLineTag'));
 	if (!isList) format.innerHTML = '<br>';
 
@@ -1924,7 +1920,6 @@ function DisplayLineBreak(dir, e) {
 
 	component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
 	this.editor.frameContext.get('lineBreaker').style.display = 'none';
-	this._lineBreakComp = null;
 
 	const focusEl = isList ? format : format.firstChild;
 	this.selection.setRange(focusEl, 1, focusEl, 1);
@@ -1932,8 +1927,9 @@ function DisplayLineBreak(dir, e) {
 }
 
 function OnResize_window() {
+	this.editor._offCurrentController();
 	if (this.editor.isBalloon) this.toolbar.hide();
-	this._resetFrameStatus();
+	else this._resetFrameStatus();
 }
 
 function OnScroll_window() {

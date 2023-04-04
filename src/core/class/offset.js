@@ -195,7 +195,8 @@ Offset.prototype = {
 		}
 
 		// top
-		const containerTop = this.getGlobal(e_container).top;
+		const isSameContainer = t_container.contains(element);
+		const containerTop = isSameContainer ? this.getGlobal(e_container).top : 0;
 		const elHeight = element.offsetHeight;
 		const scrollTop = this.getGlobalScroll().top;
 		let bt = 0;
@@ -225,7 +226,7 @@ Offset.prototype = {
 		}
 	},
 
-	setAbsPosition: function (element, target, container, params) {
+	setAbsPosition: function (element, target, params) {
 		const addOffset = params.addOffset || { left: 0, top: 0 };
 		const position = params.position || 'bottom';
 		const inst = params.inst;

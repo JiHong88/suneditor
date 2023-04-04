@@ -653,11 +653,6 @@ Editor.prototype = {
 
 		this.status.rootKey = rootKey;
 		this._setFrameInfo(this.rootTargets.get(rootKey));
-
-		this._lineBreakerButton = this.frameContext.get('lineBreaker').querySelector('button');
-		this._lineBreaker_t = this.frameContext.get('lineBreaker_t');
-		this._lineBreaker_b = this.frameContext.get('lineBreaker_b');
-
 		this.toolbar._resetSticky();
 	},
 
@@ -922,7 +917,10 @@ Editor.prototype = {
 	_setFrameInfo: function (rt) {
 		this.frameContext = rt;
 		this.frameOptions = rt.get('options');
-		this._editorHeight = this.frameContext.get('wysiwygFrame').offsetHeight;
+		this._editorHeight = rt.get('wysiwygFrame').offsetHeight;
+		this._lineBreakerButton = rt.get('lineBreaker').querySelector('button');
+		this._lineBreaker_t = rt.get('lineBreaker_t');
+		this._lineBreaker_b = rt.get('lineBreaker_b');
 	},
 
 	/**
@@ -1196,7 +1194,7 @@ Editor.prototype = {
 			}
 
 			const wysiwyg = fc.get('wysiwyg');
-			if (!domUtils.isZeroWith(wysiwyg.textContent) || wysiwyg.querySelector(domUtils._allowedEmptyNodeList) || (wysiwyg.innerText.match(/\n/g) || '').length > 1) {
+			if (!domUtils.isZeroWith(wysiwyg.textContent) || wysiwyg.querySelector(env._allowedEmptyNodeList) || (wysiwyg.innerText.match(/\n/g) || '').length > 1) {
 				placeholder.style.display = 'none';
 			} else {
 				placeholder.style.display = 'block';

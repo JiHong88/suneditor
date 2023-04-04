@@ -319,7 +319,8 @@ const editor_root = (window.e = suneditor.create({
 		target: document.querySelector('#multi_editor_1'),
 		options: {
 			value: '<p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p>',
-			placeholder: 'place1'
+			placeholder: 'place1',
+			height: 500
 		}
 	},
 	editor2: {

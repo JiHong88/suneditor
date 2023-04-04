@@ -138,7 +138,7 @@ Controller.prototype = {
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
-		if (!this.offset.setAbsPosition(controller, referEl, this.editor.frameContext.get('wysiwygFrame'), { addOffset: addOffset, position: this.position, inst: this })) {
+		if (!this.offset.setAbsPosition(controller, referEl, { addOffset: addOffset, position: this.position, inst: this })) {
 			this.hide();
 			return;
 		}
