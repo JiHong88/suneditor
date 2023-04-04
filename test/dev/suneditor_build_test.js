@@ -346,7 +346,7 @@ const editor_root = (window.e = suneditor.create({
 		}
 	}
 }, {
-	mode: "balloon",
+	// mode: "balloon",
 	// textDirection: 'rtl',
 	// value: 'Common value',
 	// editorStyle: 'font-size:40px',
@@ -394,7 +394,10 @@ const editor_root = (window.e = suneditor.create({
 		['video','video'],
 		['math','math'],
 	],
-	subToolbar: bl,
+	subToolbar: {
+		buttonList: bl,
+		mode: 'balloon-always' // balloon-always, balloon, balloon-block
+	},
 	katex: {
 		src: Katex
 	}

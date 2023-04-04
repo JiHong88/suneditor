@@ -4,13 +4,7 @@
  */
 
 import CoreDependency from '../../dependency/_core';
-import {
-	domUtils,
-	converter,
-	numbers,
-	unicode,
-	env
-} from '../../helper';
+import { domUtils, converter, numbers, unicode, env } from '../../helper';
 
 const HTML = function (editor) {
 	CoreDependency.call(this, editor);
@@ -37,13 +31,14 @@ const HTML = function (editor) {
 	const options = this.options;
 	const _w = this._w;
 	const disallowStyleNodes = _w.Object.keys(options.get('_styleNodeMap'));
-	const allowStyleNodes = !options.get('elementWhitelist') ? [] :
-		options
-		.get('elementWhitelist')
-		.split('|')
-		.filter(function (v) {
-			return /b|i|ins|s|strike/i.test(v);
-		});
+	const allowStyleNodes = !options.get('elementWhitelist')
+		? []
+		: options
+				.get('elementWhitelist')
+				.split('|')
+				.filter(function (v) {
+					return /b|i|ins|s|strike/i.test(v);
+				});
 	for (let i = 0; i < allowStyleNodes.length; i++) {
 		disallowStyleNodes.splice(disallowStyleNodes.indexOf(allowStyleNodes[i].toLowerCase()), 1);
 	}
@@ -616,10 +611,11 @@ HTML.prototype = {
 			startOff = endOff = 0;
 		}
 
-		if (!startCon || !endCon) return {
-			container: commonCon,
-			offset: 0
-		};
+		if (!startCon || !endCon)
+			return {
+				container: commonCon,
+				offset: 0
+			};
 
 		if (startCon === endCon && range.collapsed) {
 			if (startCon.textContent && domUtils.isZeroWith(startCon.textContent.substr(startOff))) {
@@ -1004,9 +1000,10 @@ HTML.prototype = {
 			if (DisallowedElements(node)) return '';
 			if (/\b__se__tag\b/.test(node.className)) return node.outerHTML;
 
-			const ch = domUtils.getListChildNodes(node, function (current) {
-				return domUtils.isSpanWithoutAttr(current) && !domUtils.getParentElement(current, domUtils.isNotCheckingNode);
-			}) || [];
+			const ch =
+				domUtils.getListChildNodes(node, function (current) {
+					return domUtils.isSpanWithoutAttr(current) && !domUtils.getParentElement(current, domUtils.isNotCheckingNode);
+				}) || [];
 			for (let i = ch.length - 1; i >= 0; i--) {
 				ch[i].outerHTML = ch[i].innerHTML;
 			}
@@ -1264,7 +1261,7 @@ HTML.prototype = {
 			const face = (m.match(/\sface="([^"]+)"/i) || [])[1];
 			const color = (m.match(/\scolor="([^"]+)"/i) || [])[1];
 			if (size || face || color) {
-				sv = 'style="' + (size ? 'font-size:' + (numbers.get(size / 3.333, 1)) + 'rem;' : '') + (face ? 'font-family:' + face + ';' : '') + (color ? 'color:' + color + ';' : '') + '"';
+				sv = 'style="' + (size ? 'font-size:' + numbers.get(size / 3.333, 1) + 'rem;' : '') + (face ? 'font-family:' + face + ';' : '') + (color ? 'color:' + color + ';' : '') + '"';
 			}
 		}
 
@@ -1384,7 +1381,7 @@ function DisallowedElements(element) {
 function DeleteDisallowedTags(html, whitelistRegExp, blacklistRegExp) {
 	html = html.replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '').replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '');
 
-	if (whitelistRegExp.test("<font>")) {
+	if (whitelistRegExp.test('<font>')) {
 		html = html.replace(/(<\/?)font(\s?)/gi, '$1span$2');
 	}
 

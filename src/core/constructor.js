@@ -45,55 +45,33 @@ const Constructor = function (editorTargets, options) {
 	const o = optionMap.o;
 	const icons = optionMap.i;
 	const lang = optionMap.l;
+	let exlib_katex = false;
 
 	/** --- carrier wrapper --------------------------------------------------------------- */
-	const editor_carrier_wrapper = domUtils.createElement('DIV', {
-		class: 'sun-editor sun-editor-carrier-wrapper' + (o.get('_rtl') ? ' se-rtl' : '')
-	});
+	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper' + (o.get('_rtl') ? ' se-rtl' : '') });
+	// menuTray
+	const menuTray = domUtils.createElement('DIV', { class: 'se-menu-tray' });
+	editor_carrier_wrapper.appendChild(menuTray);
 
 	// modal
-	const modal = domUtils.createElement('DIV', {
-		class: 'se-modal sun-editor-common'
-	});
-	const modal_back = domUtils.createElement('DIV', {
-		class: 'se-modal-back',
-		style: 'display: none;'
-	});
-	const modal_inner = domUtils.createElement('DIV', {
-		class: 'se-modal-inner',
-		style: 'display: none;'
-	});
+	const modal = domUtils.createElement('DIV', { class: 'se-modal sun-editor-common' });
+	const modal_back = domUtils.createElement('DIV', { class: 'se-modal-back', style: 'display: none;' });
+	const modal_inner = domUtils.createElement('DIV', { class: 'se-modal-inner', style: 'display: none;' });
 	modal.appendChild(modal_back);
 	modal.appendChild(modal_inner);
 	editor_carrier_wrapper.appendChild(modal);
 
 	// loding box, resizing back
-	editor_carrier_wrapper.appendChild(
-		domUtils.createElement('DIV', {
-			class: 'se-resizing-back'
-		})
-	);
-	editor_carrier_wrapper.appendChild(
-		domUtils.createElement(
-			'DIV',
-			{
-				class: 'se-loading-box sun-editor-common'
-			},
-			'<div class="se-loading-effect"></div>'
-		)
-	);
+	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-resizing-back' }));
+	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>'));
 	_d.body.appendChild(editor_carrier_wrapper);
 
 	/** --- toolbar --------------------------------------------------------------- */
+	let subbar = null;
 	const tool_bar_main = CreateToolBar(o.get('buttonList'), plugins, o, icons, lang);
 	const toolbar = tool_bar_main.element;
-	const menuTray = tool_bar_main._menuTray;
 	toolbar.style.visibility = 'hidden';
-	if (tool_bar_main.pluginCallButtons.math) _checkKatexMath(o.get('katex'));
-
-	// menuTray
-	editor_carrier_wrapper.appendChild(menuTray);
-
+	exlib_katex = tool_bar_main.pluginCallButtons.math;
 	// toolbar mode
 	if (/inline/i.test(o.get('mode'))) {
 		toolbar.className += ' se-toolbar-inline';
@@ -101,30 +79,35 @@ const Constructor = function (editorTargets, options) {
 	} else if (/balloon/i.test(o.get('mode'))) {
 		toolbar.className += ' se-toolbar-balloon';
 		toolbar.style.width = o.get('toolbar_width');
-		toolbar.appendChild(
-			domUtils.createElement('DIV', {
-				class: 'se-arrow'
-			})
-		);
+		toolbar.appendChild(domUtils.createElement('DIV', { class: 'se-arrow' }));
 	}
 
-	// editor frame
-	/** multi root set - start -------------------------------------------------------------- */
+	/** --- subToolbar --------------------------------------------------------------- */
+	if (o.get('subButtonList')) {
+		const sub_main = CreateToolBar(o.get('subButtonList'), plugins, o, icons, lang);
+		subbar = sub_main.element;
+		subbar.style.visibility = 'hidden';
+		if (!exlib_katex) exlib_katex = sub_main.pluginCallButtons.math;
+		// subbar mode must be balloon-*
+		subbar.className += ' se-toolbar-balloon';
+		subbar.style.width = o.get('toolbar_width');
+		subbar.appendChild(domUtils.createElement('DIV', { class: 'se-arrow' }));
+	}
+
+	/** --- external library --------------------------------------------------------------- */
+	// katex
+	if (exlib_katex) _checkKatexMath(o.get('katex'));
+
+	/** frame - multi root set - start -------------------------------------------------------------- */
 	const rootId = editorTargets[0].key || null;
 	const rootKeys = [];
 	const rootTargets = new _w.Map();
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
 		const editTarget = editorTargets[i];
 		const to = editTarget.options;
-		const top_div = domUtils.createElement('DIV', {
-			class: 'sun-editor' + (to.get('_rtl') ? ' se-rtl' : '')
-		});
-		const container = domUtils.createElement('DIV', {
-			class: 'se-container'
-		});
-		const editor_div = domUtils.createElement('DIV', {
-			class: 'se-wrapper'
-		});
+		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (to.get('_rtl') ? ' se-rtl' : '') });
+		const container = domUtils.createElement('DIV', { class: 'se-container' });
+		const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' });
 
 		const toolbarShadow = toolbar.cloneNode(false);
 		toolbarShadow.className += ' se-toolbar-shadow';
@@ -139,27 +122,9 @@ const Constructor = function (editorTargets, options) {
 		let textarea = initElements.codeView;
 
 		// line breaker
-		const line_breaker = domUtils.createElement(
-			'DIV',
-			{
-				class: 'se-line-breaker'
-			},
-			'<button class="se-btn">' + icons.line_break + '</button>'
-		);
-		const line_breaker_t = domUtils.createElement(
-			'DIV',
-			{
-				class: 'se-line-breaker-component se-line-breaker-component-t'
-			},
-			'<button class="se-btn">' + icons.line_break + '</button>'
-		);
-		const line_breaker_b = domUtils.createElement(
-			'DIV',
-			{
-				class: 'se-line-breaker-component se-line-breaker-component-b'
-			},
-			'<button class="se-btn">' + icons.line_break + '</button>'
-		);
+		const line_breaker = domUtils.createElement('DIV', { class: 'se-line-breaker' }, '<button class="se-btn">' + icons.line_break + '</button>');
+		const line_breaker_t = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t' }, '<button class="se-btn">' + icons.line_break + '</button>');
+		const line_breaker_b = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b' }, '<button class="se-btn">' + icons.line_break + '</button>');
 		line_breaker_t.innerHTML = line_breaker_b.innerHTML = icons.line_break;
 		editor_div.appendChild(line_breaker);
 		editor_div.appendChild(line_breaker_t);
@@ -168,11 +133,7 @@ const Constructor = function (editorTargets, options) {
 		// append container
 		editor_div.appendChild(textarea);
 		if (placeholder_span) editor_div.appendChild(placeholder_span);
-		container.appendChild(
-			domUtils.createElement('DIV', {
-				class: 'se-toolbar-sticky-dummy'
-			})
-		);
+		container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
 		container.appendChild(editor_div);
 
 		// statusbar
@@ -189,32 +150,26 @@ const Constructor = function (editorTargets, options) {
 		rootKeys.push(key);
 		rootTargets.set(key, CreateFrameContext(editTarget, top_div, wysiwyg_div, textarea, key));
 	}
-	/** multi root set - end -------------------------------------------------------------- */
+	/** frame - multi root set - end -------------------------------------------------------------- */
 
 	// toolbar container
 	const toolbar_container = o.get('toolbar_container');
 	if (toolbar_container) {
-		const top_div = domUtils.createElement('DIV', {
-			class: 'sun-editor' + (o.get('_rtl') ? ' se-rtl' : '')
-		});
-		const container = domUtils.createElement('DIV', {
-			class: 'se-container'
-		});
+		const top_div = domUtils.createElement('DIV', { class: 'sun-editor' + (o.get('_rtl') ? ' se-rtl' : '') });
+		const container = domUtils.createElement('DIV', { class: 'se-container' });
 		container.appendChild(toolbar);
+		if (subbar) container.appendChild(subbar);
 		top_div.appendChild(container);
 		toolbar_container.appendChild(top_div);
-		toolbar_container.appendChild(
-			domUtils.createElement('DIV', {
-				class: 'se-toolbar-sticky-dummy'
-			})
-		);
+		toolbar_container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
 	} else {
 		const rootContainer = rootTargets.get(rootId).get('container');
 		rootContainer.insertBefore(toolbar, rootContainer.firstElementChild);
+		if (subbar) rootContainer.insertBefore(subbar, rootContainer.firstElementChild);
 	}
 
 	return {
-		context: CreateContext(toolbar, toolbar_container, menuTray),
+		context: CreateContext(toolbar, toolbar_container, menuTray, subbar),
 		carrierWrapper: editor_carrier_wrapper,
 		options: o,
 		plugins: plugins,
@@ -299,6 +254,11 @@ function InitOptions(options, editorTargets) {
 	o.set('textDirection', typeof options.textDirection !== 'string' ? 'ltr' : options.textDirection);
 	o.set('_rtl', o.get('textDirection') === 'rtl');
 	o.set('buttonList', o.get('_rtl') ? buttonList.reverse() : buttonList);
+	if (options.subToolbar && options.subToolbar.buttonList && options.subToolbar.buttonList.length > 0) {
+		if (/balloon/.test(o.get('mode'))) throw Error('[SUNEDITOR.create.fail] When using the "subToolbar" option, the main option cannot be "balloon-*".');
+		o.set('subMode', options.subToolbar.mode || 'balloon');
+		o.set('subButtonList', o.get('_rtl') ? options.subToolbar.buttonList.reverse() : options.subToolbar.buttonList);
+	}
 
 	// etc
 	o.set('historyStackDelayTime', typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400);
@@ -621,10 +581,7 @@ function _initTargetElements(options, topDiv, targetOptions) {
 	}
 
 	// textarea for code view
-	const textarea = domUtils.createElement('TEXTAREA', {
-		class: 'se-wrapper-inner se-wrapper-code',
-		style: editorStyles.frame
-	});
+	const textarea = domUtils.createElement('TEXTAREA', { class: 'se-wrapper-inner se-wrapper-code', style: editorStyles.frame });
 
 	textarea.style.setProperty('display', 'none', 'important');
 	if (targetOptions.get('height') === 'auto') textarea.style.overflow = 'hidden';
@@ -635,33 +592,23 @@ function _initTargetElements(options, topDiv, targetOptions) {
 	let charWrapper = null;
 	let charCounter = null;
 	if (targetOptions.get('statusbar')) {
-		statusbar = domUtils.createElement('DIV', {
-			class: 'se-status-bar sun-editor-common'
-		});
+		statusbar = domUtils.createElement('DIV', { class: 'se-status-bar sun-editor-common' });
 
 		/** navigation */
-		navigation = domUtils.createElement('DIV', {
-			class: 'se-navigation sun-editor-common'
-		});
+		navigation = domUtils.createElement('DIV', { class: 'se-navigation sun-editor-common' });
 		statusbar.appendChild(navigation);
 
 		/** char counter */
 		if (targetOptions.get('charCounter')) {
-			charWrapper = domUtils.createElement('DIV', {
-				class: 'se-char-counter-wrapper'
-			});
+			charWrapper = domUtils.createElement('DIV', { class: 'se-char-counter-wrapper' });
 
 			if (targetOptions.get('charCounter_label')) {
-				const charLabel = domUtils.createElement('SPAN', {
-					class: 'se-char-label'
-				});
+				const charLabel = domUtils.createElement('SPAN', { class: 'se-char-label' });
 				charLabel.textContent = targetOptions.get('charCounter_label');
 				charWrapper.appendChild(charLabel);
 			}
 
-			charCounter = domUtils.createElement('SPAN', {
-				class: 'se-char-counter'
-			});
+			charCounter = domUtils.createElement('SPAN', { class: 'se-char-counter' });
 			charCounter.textContent = '0';
 			charWrapper.appendChild(charCounter);
 
@@ -677,9 +624,7 @@ function _initTargetElements(options, topDiv, targetOptions) {
 
 	let placeholder = null;
 	if (targetOptions.get('placeholder')) {
-		placeholder = domUtils.createElement('SPAN', {
-			class: 'se-placeholder'
-		});
+		placeholder = domUtils.createElement('SPAN', { class: 'se-placeholder' });
 		placeholder.innerText = targetOptions.get('placeholder');
 	}
 
@@ -884,16 +829,8 @@ function _defaultButtons(options, icons, lang) {
  * @returns {Object}
  */
 function _createModuleGroup() {
-	const oUl = domUtils.createElement('UL', {
-		class: 'se-menu-list'
-	});
-	const oDiv = domUtils.createElement(
-		'DIV',
-		{
-			class: 'se-btn-module se-btn-module-border'
-		},
-		oUl
-	);
+	const oUl = domUtils.createElement('UL', { class: 'se-menu-list' });
+	const oDiv = domUtils.createElement('DIV', { class: 'se-btn-module se-btn-module-border' }, oUl);
 
 	return {
 		div: oDiv,
@@ -963,35 +900,20 @@ export function UpdateButton(element, plugin, icons, lang) {
  * @returns {Object} { element: (Element) Toolbar element, plugins: (Array|null) Plugins Array, pluginCallButtons: (Object), responsiveButtons: (Array) }
  */
 export function CreateToolBar(buttonList, plugins, options, icons, lang) {
-	const _buttonTray = domUtils.createElement('DIV', {
-		class: 'se-btn-tray'
-	});
-	const separator_vertical = domUtils.createElement('DIV', {
-		class: 'se-toolbar-separator-vertical'
-	});
-	const tool_bar = domUtils.createElement(
-		'DIV',
-		{
-			class: 'se-toolbar sun-editor-common'
-		},
-		_buttonTray
-	);
-
 	/** create button list */
 	buttonList = _w.JSON.parse(_w.JSON.stringify(buttonList));
 	const defaultButtonList = _defaultButtons(options, icons, lang);
 	const pluginCallButtons = {};
 	const responsiveButtons = [];
 
-	let module = null;
+	let modules = null;
 	let button = null;
 	let moduleElement = null;
 	let buttonElement = null;
-	let pluginName = '';
 	let vertical = false;
-	const moreLayer = domUtils.createElement('DIV', {
-		class: 'se-toolbar-more-layer'
-	});
+	const moreLayer = domUtils.createElement('DIV', { class: 'se-toolbar-more-layer' });
+	const _buttonTray = domUtils.createElement('DIV', { class: 'se-btn-tray' });
+	const separator_vertical = domUtils.createElement('DIV', { class: 'se-toolbar-separator-vertical' });
 
 	buttonGroupLoop: for (let i = 0, more, moreContainer, moreCommand, buttonGroup, align; i < buttonList.length; i++) {
 		more = false;
@@ -1005,6 +927,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 			for (let j = 0, moreButton; j < buttonGroup.length; j++) {
 				button = buttonGroup[j];
 				moreButton = false;
+				const plugin = plugins[button];
 
 				if (/^\%\d+/.test(button) && j === 0) {
 					buttonGroup[0] = button.replace(/[^\d]/g, '');
@@ -1013,10 +936,8 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 					continue buttonGroupLoop;
 				}
 
-				if (/object|function/.test(typeof plugins[button])) {
-					const plugin = plugins[button];
-					pluginName = button;
-					module = [plugin.className, plugin.title, pluginName, plugin.type, plugin.innerHTML, plugin._disabled];
+				if (/function/.test(typeof plugin)) {
+					modules = [plugin.className, plugin.title, button, plugin.type, plugin.innerHTML, plugin._disabled];
 				} else {
 					// align
 					if (/^\-/.test(button)) {
@@ -1039,26 +960,24 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 						moreCommand = '__se__more_' + i;
 						const title = matched[1].trim();
 						const innerHTML = matched[2].trim();
-						module = ['se-btn-more', /^lang\./i.test(title) ? lang[title.replace(/^lang\./i, '')] : title, moreCommand, 'MORE', innerHTML];
+						modules = ['se-btn-more', /^lang\./i.test(title) ? lang[title.replace(/^lang\./i, '')] : title, moreCommand, 'MORE', innerHTML];
 					} else {
-						// buttons
-						module = defaultButtonList[button];
+						// default command
+						modules = defaultButtonList[button];
 					}
 
-					pluginName = button;
-					if (!module) {
-						const custom = plugins[pluginName];
-						if (!custom) throw Error('[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [' + pluginName + ']');
-						module = [custom.className, custom.title, custom.key, custom.type, custom.innerHTML, custom._disabled];
+					if (!modules) {
+						if (!plugin) throw Error('[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [' + button + ']');
+						modules = [plugin.className, plugin.title, plugin.key, plugin.type, plugin.innerHTML, plugin._disabled];
 					}
 				}
 
-				buttonElement = _createButton(module[0], module[1], module[2], module[3], module[4], module[5], icons);
+				buttonElement = _createButton(modules[0], modules[1], modules[2], modules[3], modules[4], modules[5], icons);
 				(more ? moreContainer : moduleElement.ul).appendChild(buttonElement.li);
 
-				if (plugins[pluginName]) {
-					if (pluginCallButtons[pluginName]) pluginCallButtons[pluginName].push(buttonElement.button);
-					else pluginCallButtons[pluginName] = [buttonElement.button];
+				if (plugin) {
+					if (pluginCallButtons[button]) pluginCallButtons[button].push(buttonElement.button);
+					else pluginCallButtons[button] = [buttonElement.button];
 				}
 
 				// more button
@@ -1081,9 +1000,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 			vertical = true;
 		} else if (/^\/$/.test(buttonGroup)) {
 			/** line break  */
-			const enterDiv = domUtils.createElement('DIV', {
-				class: 'se-btn-module-enter'
-			});
+			const enterDiv = domUtils.createElement('DIV', { class: 'se-btn-module-enter' });
 			_buttonTray.appendChild(enterDiv);
 			vertical = false;
 		}
@@ -1107,10 +1024,8 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 	if (moreLayer.children.length > 0) _buttonTray.appendChild(moreLayer);
 	if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
 
-	// menu tray
-	const _menuTray = domUtils.createElement('DIV', {
-		class: 'se-menu-tray'
-	});
+	// rendering toolbar
+	const tool_bar = domUtils.createElement('DIV', { class: 'se-toolbar sun-editor-common' }, _buttonTray);
 
 	if (options.get('toolbar_hide')) tool_bar.style.display = 'none';
 
@@ -1118,7 +1033,6 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 		element: tool_bar,
 		pluginCallButtons: pluginCallButtons,
 		responsiveButtons: responsiveButtons,
-		_menuTray: _menuTray,
 		_buttonTray: _buttonTray
 	};
 }

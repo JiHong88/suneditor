@@ -1,10 +1,8 @@
 import EditorDependency from '../../dependency';
-import {
-	domUtils
-} from '../../helper';
+import { domUtils } from '../../helper';
 
 const Align = function (editor) {
-	console.log("align---")
+	console.log('align---');
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.align;
@@ -139,7 +137,8 @@ function CreateHTML(core) {
 	}
 
 	return domUtils.createElement(
-		'div', {
+		'div',
+		{
 			class: 'se-dropdown se-list-layer se-list-align'
 		},
 		'<div class="se-list-inner">' + '<ul class="se-list-basic">' + html + '</ul>' + '</div>'

@@ -1318,24 +1318,7 @@ function OffCellTouch() {
 
 // init element
 function CreateSplitMenu(lang) {
-	const menus = domUtils.createElement(
-		'DIV',
-		null,
-		'<div title="' +
-			lang.verticalSplit +
-			'" aria-label="' +
-			lang.verticalSplit +
-			'">' +
-			lang.verticalSplit +
-			'</div>' +
-			'<div title="' +
-			lang.horizontalSplit +
-			'" aria-label="' +
-			lang.horizontalSplit +
-			'">' +
-			lang.horizontalSplit +
-			'</div>'
-	);
+	const menus = domUtils.createElement('DIV', null, '<div title="' + lang.verticalSplit + '" aria-label="' + lang.verticalSplit + '">' + lang.verticalSplit + '</div>' + '<div title="' + lang.horizontalSplit + '" aria-label="' + lang.horizontalSplit + '">' + lang.horizontalSplit + '</div>');
 
 	return { items: ['vertical', 'horizontal'], menus: menus.querySelectorAll('div') };
 }

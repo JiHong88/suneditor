@@ -1,8 +1,5 @@
 import EditorDependency from '../../dependency';
-import {
-	domUtils,
-	converter
-} from '../../helper';
+import { domUtils, converter } from '../../helper';
 
 const FontSize = function (editor) {
 	EditorDependency.call(this, editor);
@@ -67,9 +64,7 @@ FontSize.prototype = {
 	 */
 	action: function (value) {
 		if (value) {
-			const newNode = domUtils.createElement('SPAN', {
-				style: 'font-size: ' + value + ';'
-			});
+			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + value + ';' });
 			this.format.applyTextStyle(newNode, ['font-size'], null, null);
 		} else {
 			this.format.applyTextStyle(null, ['font-size'], ['span'], true);
@@ -95,16 +90,14 @@ function CreateHTML(editor) {
 	const lang = editor.lang;
 	const sizeList = !options.get('fontSize') ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : options.get('fontSize');
 
-	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="default_value se-btn-list" title="' + lang.default+'" aria-label="' + lang.default+'">(' + lang.default+')</button></li>';
+	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="default_value se-btn-list" title="' + lang.default + '" aria-label="' + lang.default + '">(' + lang.default + ')</button></li>';
 	for (let i = 0, unit = options.get('fontSizeUnit'), len = sizeList.length, size; i < len; i++) {
 		size = sizeList[i];
 		list += '<li><button type="button" class="se-btn-list" data-value="' + size + unit + '" title="' + size + unit + '" aria-label="' + size + unit + '" style="font-size:' + size + unit + ';">' + size + '</button></li>';
 	}
 	list += '</ul></div>';
 
-	return domUtils.createElement('DIV', {
-		class: 'se-dropdown se-list-layer se-list-font-size'
-	}, list);
+	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-font-size' }, list);
 }
 
 export default FontSize;

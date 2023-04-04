@@ -1,14 +1,6 @@
 import EditorDependency from '../../dependency';
-import {
-	Modal,
-	Figure,
-	FileManager,
-	ModalAnchorEditor
-} from '../../modules';
-import {
-	domUtils,
-	numbers
-} from '../../helper';
+import { Modal, Figure, FileManager, ModalAnchorEditor } from '../../modules';
+import { domUtils, numbers } from '../../helper';
 
 const Image_ = function (editor) {
 	// plugin bisic properties
@@ -232,10 +224,12 @@ Image_.prototype = {
 		this.inputY.disabled = percentageRotation ? true : false;
 		this.proportion.disabled = percentageRotation ? true : false;
 
-		this._ratio = this.proportion.checked ? figureInfo.ratio : {
-			w: 1,
-			h: 1
-		};
+		this._ratio = this.proportion.checked
+			? figureInfo.ratio
+			: {
+					w: 1,
+					h: 1
+			  };
 	},
 
 	/**
@@ -281,11 +275,14 @@ Image_.prototype = {
 		const currentSize = this.fileManager.getSize();
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + limitSize / 1000 + 'KB';
-			if (typeof this.events.onImageUploadError !== 'function' || this.events.onImageUploadError(err, {
+			if (
+				typeof this.events.onImageUploadError !== 'function' ||
+				this.events.onImageUploadError(err, {
 					limitSize: limitSize,
 					currentSize: currentSize,
 					uploadSize: fileSize
-				})) {
+				})
+			) {
 				this.notice.open(err);
 			}
 			return false;
@@ -430,9 +427,12 @@ Image_.prototype = {
 				if (this.format.isLine(existElement.parentNode)) {
 					const formats = existElement.parentNode;
 					formats.parentNode.insertBefore(container, existElement.previousSibling ? formats.nextElementSibling : formats);
-					if (this.fileManager.__updateTags.map(function (current) {
+					if (
+						this.fileManager.__updateTags.map(function (current) {
 							return existElement.contains(current);
-						}).length === 0) domUtils.removeItem(existElement);
+						}).length === 0
+					)
+						domUtils.removeItem(existElement);
 				} else {
 					existElement.parentNode.replaceChild(container, existElement);
 				}
@@ -456,9 +456,11 @@ Image_.prototype = {
 				domUtils.removeItem(anchor);
 			} else {
 				domUtils.removeItem(isNewAnchor);
-				if (domUtils.getListChildren(anchor, function (current) {
+				if (
+					domUtils.getListChildren(anchor, function (current) {
 						return /IMG/i.test(current.tagName);
-					}).length === 0) {
+					}).length === 0
+				) {
 					domUtils.removeItem(anchor);
 				}
 			}
@@ -721,10 +723,12 @@ function OnInputSize(xy, e) {
 }
 
 function OnChangeRatio() {
-	this._ratio = this.proportion.checked ? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit) : {
-		w: 1,
-		h: 1
-	};
+	this._ratio = this.proportion.checked
+		? Figure.GetRatio(this.inputX.value, this.inputY.value, this.sizeUnit)
+		: {
+				w: 1,
+				h: 1
+		  };
 }
 
 function OnClickRevert() {
@@ -915,9 +919,7 @@ function CreateHTML_modal(editor) {
 		'</div>' +
 		'</form>';
 
-	return domUtils.createElement('DIV', {
-		class: 'se-modal-content'
-	}, html);
+	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
 export default Image_;

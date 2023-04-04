@@ -1,11 +1,5 @@
-import {
-	_d,
-	_w
-} from './env';
-import {
-	onlyZeroWidthRegExp,
-	zeroWidthRegExp
-} from './unicode';
+import { _d, _w } from './env';
+import { onlyZeroWidthRegExp, zeroWidthRegExp } from './unicode';
 
 /**
  * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (unicode.zeroWidthSpace)
@@ -697,7 +691,7 @@ export function addClass(element, className) {
 	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
 	(_w.Array.isArray(element) ? element : [element]).forEach(function (e) {
 		if (!check.test(e.className)) e.className += (e.className.length > 0 ? ' ' : '') + className;
-	})
+	});
 }
 
 /**
@@ -712,7 +706,7 @@ export function removeClass(element, className) {
 	(_w.Array.isArray(element) ? element : [element]).forEach(function (e) {
 		e.className = e.className.replace(check, ' ').trim();
 		if (!e.className.trim()) e.removeAttribute('class');
-	})
+	});
 }
 
 /**
@@ -947,7 +941,7 @@ const domUtils = {
 	isImportantDisabled: isImportantDisabled,
 	isAllowClassName: isAllowClassName,
 	isNotCheckingNode: isNotCheckingNode,
-	getScrollParent: getScrollParent,
+	getScrollParent: getScrollParent
 };
 
 export default domUtils;

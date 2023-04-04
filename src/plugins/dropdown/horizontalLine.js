@@ -1,7 +1,5 @@
 import EditorDependency from '../../dependency';
-import {
-	domUtils
-} from '../../helper';
+import { domUtils } from '../../helper';
 
 const HorizontalLine = function (editor) {
 	// plugin bisic properties
@@ -48,7 +46,7 @@ HorizontalLine.prototype = {
 		this.editor.focus();
 		this.component.insert(hr, false, false, false);
 		this.menu.dropdownOff();
-		
+
 		const line = this.format.addLine(hr);
 		this.selection.setRange(line, 1, line, 1);
 	},
@@ -68,7 +66,8 @@ function OnClickMenu(e) {
 
 function CreateHTML(editor) {
 	const lang = editor.lang;
-	const items = editor.options.get('hrItems') || [{
+	const items = editor.options.get('hrItems') || [
+		{
 			name: lang.hr_solid,
 			class: '__se__solid'
 		},
@@ -101,9 +100,13 @@ function CreateHTML(editor) {
 			'</li>';
 	}
 
-	return domUtils.createElement('DIV', {
-		class: 'se-dropdown se-list-layer se-list-line'
-	}, '<div class="se-list-inner">' + '<ul class="se-list-basic">' + list + '</ul>' + '</div>');
+	return domUtils.createElement(
+		'DIV',
+		{
+			class: 'se-dropdown se-list-layer se-list-line'
+		},
+		'<div class="se-list-inner">' + '<ul class="se-list-basic">' + list + '</ul>' + '</div>'
+	);
 }
 
 export default HorizontalLine;

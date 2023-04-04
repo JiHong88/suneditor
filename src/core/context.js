@@ -52,9 +52,10 @@ const BASIC_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'sub', 'sup', '
  * @param {Element} toolbar Toolbar frame
  * @param {Element|null} toolbarContainer Toolbar container
  * @param {Element} menuTray menu tray
+ * @param {Element|null} subbar sub toolbar
  * @returns {Map}
  */
-export const CreateContext = function (toolbar, toolbarContainer, menuTray) {
+export const CreateContext = function (toolbar, toolbarContainer, menuTray, subbar) {
 	const m = new _w.Map([
 		['toolbar.main', toolbar],
 		['toolbar._buttonTray', toolbar.querySelector('.se-btn-tray')],
@@ -68,6 +69,8 @@ export const CreateContext = function (toolbar, toolbarContainer, menuTray) {
 		b = toolbar.querySelector('[data-command="' + BASIC_COMMANDS[i] + '"]');
 		if (b) m.set('buttons.' + BASIC_COMMANDS[i], b);
 	}
+
+	if (subbar) m.set('toolbar.sub', subbar);
 
 	return m;
 };

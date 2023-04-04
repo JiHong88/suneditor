@@ -4,12 +4,7 @@
  */
 
 import CoreDependency from '../../dependency/_core';
-import {
-	domUtils,
-	unicode,
-	numbers,
-	env
-} from '../../helper';
+import { domUtils, unicode, numbers, env } from '../../helper';
 
 const Format = function (editor) {
 	CoreDependency.call(this, editor);
@@ -726,9 +721,7 @@ Format.prototype = {
 			}.bind(this);
 
 			if (!cancel) {
-				tempList = domUtils.createElement(listTag, {
-					style: 'list-style-type: ' + listStyle
-				});
+				tempList = domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
 			}
 
 			for (let i = 0, len = selectedFormats.length, r, o; i < len; i++) {
@@ -751,9 +744,7 @@ Format.prototype = {
 
 						o = selectedFormats[i].parentNode;
 						if (!cancel) {
-							tempList = domUtils.createElement(listTag, {
-								style: 'list-style-type: ' + listStyle
-							});
+							tempList = domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
 						}
 
 						r = o;
@@ -783,9 +774,7 @@ Format.prototype = {
 			const mergeTop = topEl && topEl.tagName === listTag;
 			const mergeBottom = bottomEl && bottomEl.tagName === listTag;
 
-			let list = mergeTop ? topEl : domUtils.createElement(listTag, {
-				style: 'list-style-type: ' + listStyle
-			});
+			let list = mergeTop ? topEl : domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
 			let firstList = null;
 			let lastList = null;
 			let topNumber = null;
@@ -835,9 +824,7 @@ Format.prototype = {
 				domUtils.removeItem(fTag);
 				if (mergeTop && topNumber === null) topNumber = list.children.length - 1;
 				if (next && (this.getBlock(nextParent, passComponent) !== this.getBlock(originParent, passComponent) || (domUtils.isList(nextParent) && domUtils.isList(originParent) && domUtils.getNodeDepth(nextParent) !== domUtils.getNodeDepth(originParent)))) {
-					list = domUtils.createElement(listTag, {
-						style: 'list-style-type: ' + listStyle
-					});
+					list = domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
 				}
 
 				if (rangeTag && rangeTag.children.length === 0) domUtils.removeItem(rangeTag);
@@ -856,7 +843,7 @@ Format.prototype = {
 		}
 
 		this.editor.effectNode = null;
-		return (!isRemove || !isCollapsed) ? originRange : afterRange;
+		return !isRemove || !isCollapsed ? originRange : afterRange;
 	},
 
 	/**
@@ -1499,14 +1486,14 @@ Format.prototype = {
 	getLinesAndComponents: function (removeDuplicate) {
 		const commonCon = this.selection.getRange().commonAncestorContainer;
 		const myComponent = domUtils.getParentElement(commonCon, this.component.is);
-		const selectedLines = domUtils.isTable(commonCon) ?
-			this.getLines(null) :
-			this.getLines(
-				function (current) {
-					const component = domUtils.getParentElement(current, this.component.is);
-					return (this.isLine(current) && (!component || component === myComponent)) || (this.component.is(current) && !this.getLine(current));
-				}.bind(this)
-			);
+		const selectedLines = domUtils.isTable(commonCon)
+			? this.getLines(null)
+			: this.getLines(
+					function (current) {
+						const component = domUtils.getParentElement(current, this.component.is);
+						return (this.isLine(current) && (!component || component === myComponent)) || (this.component.is(current) && !this.getLine(current));
+					}.bind(this)
+			  );
 
 		if (removeDuplicate) {
 			for (let i = 0, len = selectedLines.length; i < len; i++) {
@@ -1686,11 +1673,11 @@ Format.prototype = {
 	 * @private
 	 */
 	_applyNestedList: function (selectedCells, nested) {
-		selectedCells = !selectedCells ?
-			this.getLines().filter(function (el) {
-				return domUtils.isListCell(el);
-			}) :
-			selectedCells;
+		selectedCells = !selectedCells
+			? this.getLines().filter(function (el) {
+					return domUtils.isListCell(el);
+			  })
+			: selectedCells;
 		const cellsLen = selectedCells.length;
 		if (cellsLen === 0 || (!nested && !domUtils.isListCell(selectedCells[0].previousElementSibling) && !domUtils.isListCell(selectedCells[cellsLen - 1].nextElementSibling))) {
 			return {
@@ -3138,8 +3125,8 @@ Format.prototype = {
 			if (
 				s.length === 0 ||
 				(ec.some(function (k) {
-						return s.indexOf(k) === -1;
-					}) &&
+					return s.indexOf(k) === -1;
+				}) &&
 					s.some(function (k) {
 						ec.indexOf(k) > -1;
 					}))

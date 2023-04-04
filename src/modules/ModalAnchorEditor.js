@@ -1,8 +1,6 @@
 import EditorDependency from '../dependency';
 import SelectMenu from './SelectMenu';
-import {
-	domUtils
-} from '../helper';
+import { domUtils } from '../helper';
 
 const ModalAnchorEditor = function (inst, modalForm) {
 	// plugin bisic properties
@@ -41,13 +39,19 @@ const ModalAnchorEditor = function (inst, modalForm) {
 		const list = [];
 		for (let i = 0, len = relList.length, rel; i < len; i++) {
 			rel = relList[i];
-			list.push(domUtils.createElement('BUTTON', {
-				type: 'button',
-				class: 'se-btn-list' + (defaultRel.indexOf(rel) > -1 ? ' se-checked' : ''),
-				'data-command': rel,
-				title: rel,
-				'aria-label': rel
-			}, rel + '<span class="se-svg">' + this.icons.checked + '</span>'));
+			list.push(
+				domUtils.createElement(
+					'BUTTON',
+					{
+						type: 'button',
+						class: 'se-btn-list' + (defaultRel.indexOf(rel) > -1 ? ' se-checked' : ''),
+						'data-command': rel,
+						title: rel,
+						'aria-label': rel
+					},
+					rel + '<span class="se-svg">' + this.icons.checked + '</span>'
+				)
+			);
 		}
 		this.selectMenu_rel = new SelectMenu(this, true, 'right-middle');
 		this.selectMenu_rel.on(this.relButton, SetRelItem.bind(this));

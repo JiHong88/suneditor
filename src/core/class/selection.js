@@ -4,10 +4,7 @@
  */
 
 import CoreDependency from '../../dependency/_core';
-import {
-	domUtils,
-	unicode
-} from '../../helper';
+import { domUtils, unicode } from '../../helper';
 
 const Selection = function (editor) {
 	CoreDependency.call(this, editor);

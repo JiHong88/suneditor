@@ -116,9 +116,7 @@ ColorPicker.prototype = {
 	 */
 	_colorName2hex: function (colorName) {
 		if (/^#/.test(colorName)) return colorName;
-		const temp = domUtils.createElement('div', {
-			style: 'display: none; color: ' + colorName
-		});
+		const temp = domUtils.createElement('div', { style: 'display: none; color: ' + colorName });
 		const colors = this._w
 			.getComputedStyle(this._d.body.appendChild(temp))
 			.color.match(/\d+/g)

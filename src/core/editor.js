@@ -1,13 +1,5 @@
-import Helper, {
-	env,
-	converter,
-	domUtils,
-	numbers
-} from '../helper';
-import Constructor, {
-	ResetOptions,
-	UpdateButton
-} from './constructor';
+import Helper, { env, converter, domUtils, numbers } from '../helper';
+import Constructor, { ResetOptions, UpdateButton } from './constructor';
 
 // class dependency
 import ClassDependency from '../dependency/_classes';
@@ -133,6 +125,16 @@ const Editor = function (multiTargets, options) {
 	 * @description Is balloon-always mode?
 	 */
 	this.isBalloonAlways = null;
+
+	/**
+	 * @description Is balloon|balloon-always mode of the subToolbar?
+	 */
+	this.isSubBalloon = null;
+
+	/**
+	 * @description Is balloon-always mode of the subToolbar?
+	 */
+	this.isSubBalloonAlways = null;
 
 	/**
 	 * @description Helper util
@@ -359,7 +361,7 @@ Editor.prototype = {
 		if (!plugin) {
 			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "' + pluginName + '")');
 		} else {
-			plugin = (this.plugins[pluginName] = new this.plugins[pluginName](this));
+			plugin = this.plugins[pluginName] = new this.plugins[pluginName](this);
 			if (typeof plugin.init === 'function') plugin.init();
 		}
 
@@ -1217,11 +1219,11 @@ Editor.prototype = {
 
 	__callResizeFunction: function (h, resizeObserverEntry) {
 		h =
-			h === -1 ?
-			resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0] ?
-			resizeObserverEntry.borderBoxSize[0].blockSize :
-			resizeObserverEntry.contentRect.height + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-right')) :
-			h;
+			h === -1
+				? resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0]
+					? resizeObserverEntry.borderBoxSize[0].blockSize
+					: resizeObserverEntry.contentRect.height + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-right'))
+				: h;
 		if (this._editorHeight !== h) {
 			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, this._editorHeight, resizeObserverEntry);
 			this._editorHeight = h;
@@ -1242,6 +1244,8 @@ Editor.prototype = {
 		this.isInline = /inline/i.test(this.options.get('mode'));
 		this.isBalloon = /balloon/i.test(this.options.get('mode'));
 		this.isBalloonAlways = /balloon-always/i.test(this.options.get('mode'));
+		this.isSubBalloon = /balloon/i.test(this.options.get('subMode'));
+		this.isSubBalloonAlways = /balloon-always/i.test(this.options.get('subMode'));
 
 		// register class
 		this._registerClass();

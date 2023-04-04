@@ -247,9 +247,7 @@ Viewer.prototype = {
 	 * @description Prints the current content of the editor.
 	 */
 	print: function () {
-		const iframe = domUtils.createElement('IFRAME', {
-			style: 'display: none;'
-		});
+		const iframe = domUtils.createElement('IFRAME', { style: 'display: none;' });
 		this._d.body.appendChild(iframe);
 
 		const contentHTML = this.options.get('printTemplate') ? this.options.get('printTemplate').replace(/\{\{\s*content\s*\}\}/i, this.html.get(true)) : this.html.get(true);

@@ -1,19 +1,12 @@
 import CoreDependency from '../dependency/_core';
-import {
-	domUtils,
-	env
-} from '../helper';
+import { domUtils, env } from '../helper';
 
 const FileBrowser = function (inst, params) {
 	CoreDependency.call(this, inst.editor);
 
 	// create HTML
-	const browserFrame = domUtils.createElement('DIV', {
-		class: 'se-file-browser sun-editor-common'
-	});
-	const content = domUtils.createElement('DIV', {
-		class: 'se-file-browser-inner'
-	}, CreateHTML(inst.editor));
+	const browserFrame = domUtils.createElement('DIV', { class: 'se-file-browser sun-editor-common' });
+	const content = domUtils.createElement('DIV', { class: 'se-file-browser-inner' }, CreateHTML(inst.editor));
 
 	// members
 	this.inst = inst;
@@ -44,9 +37,7 @@ const FileBrowser = function (inst, params) {
 	}.bind(this);
 
 	// init
-	browserFrame.appendChild(domUtils.createElement('DIV', {
-		class: 'se-file-browser-back'
-	}));
+	browserFrame.appendChild(domUtils.createElement('DIV', { class: 'se-file-browser-back' }));
 	browserFrame.appendChild(content);
 	this.editor._carrierWrapper.appendChild(browserFrame);
 
@@ -224,13 +215,13 @@ function OnClickTag(e) {
 	}
 
 	this._drawListItem(
-		selectedTags.length === 0 ?
-		this.items :
-		this.items.filter(function (item) {
-			return item.tag.some(function (tag) {
-				return selectedTags.indexOf(tag) > -1;
-			});
-		}),
+		selectedTags.length === 0
+			? this.items
+			: this.items.filter(function (item) {
+					return item.tag.some(function (tag) {
+						return selectedTags.indexOf(tag) > -1;
+					});
+			  }),
 		false
 	);
 }
