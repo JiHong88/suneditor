@@ -3,13 +3,9 @@
  * @author Yi JiHong.
  */
 
-import {
-	domUtils
-} from '../../helper';
+import { domUtils } from '../../helper';
 import CoreDependency from '../../dependency/_core';
-import {
-	CreateToolBar
-} from '../constructor';
+import { CreateToolBar } from '../constructor';
 
 const Toolbar = function (editor) {
 	CoreDependency.call(this, editor);
@@ -226,7 +222,7 @@ Toolbar.prototype = {
 		}
 
 		const range = rangeObj || this.selection.getRange();
-		const toolbar = this.context.get('toolbar.main');
+		const toolbar = this.options.has('subMode') ? this.context.get('toolbar.sub') : this.context.get('toolbar.main');
 		const selection = this.selection.get();
 
 		let isDirTop;
@@ -300,7 +296,7 @@ Toolbar.prototype = {
 
 	_setBalloonPosition: function (isDirTop, rects, toolbarEl, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop) {
 		const padding = 1;
-		const arrow = this.context.get('toolbar._arrow');
+		const arrow = this.context.get(this.options.has('subMode') ? 'toolbar.sub._arrow' : 'toolbar._arrow');
 		const arrowMargin = this._w.Math.round(arrow.offsetWidth / 2);
 		const toolbarWidth = toolbarEl.offsetWidth;
 		const toolbarHeight = rects.noText && !isDirTop ? 0 : toolbarEl.offsetHeight;

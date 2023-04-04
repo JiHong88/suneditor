@@ -127,16 +127,6 @@ const Editor = function (multiTargets, options) {
 	this.isBalloonAlways = null;
 
 	/**
-	 * @description Is balloon|balloon-always mode of the subToolbar?
-	 */
-	this.isSubBalloon = null;
-
-	/**
-	 * @description Is balloon-always mode of the subToolbar?
-	 */
-	this.isSubBalloonAlways = null;
-
-	/**
 	 * @description Helper util
 	 */
 	this.helper = Helper;
@@ -885,6 +875,7 @@ Editor.prototype = {
 		/** remove element */
 		domUtils.removeItem(this._carrierWrapper);
 		domUtils.removeItem(this.context.get('toolbar._wrapper'));
+		domUtils.removeItem(this.context.get('toolbar.sub._wrapper'));
 
 		this.rootTargets.forEach(function (e) {
 			domUtils.removeItem(e.get('topArea'));
@@ -1242,10 +1233,8 @@ Editor.prototype = {
 	_editorInit: function () {
 		// set modes
 		this.isInline = /inline/i.test(this.options.get('mode'));
-		this.isBalloon = /balloon/i.test(this.options.get('mode'));
-		this.isBalloonAlways = /balloon-always/i.test(this.options.get('mode'));
-		this.isSubBalloon = /balloon/i.test(this.options.get('subMode'));
-		this.isSubBalloonAlways = /balloon-always/i.test(this.options.get('subMode'));
+		this.isBalloon = /balloon/i.test(this.options.get('mode')) || /balloon/i.test(this.options.get('subMode'));
+		this.isBalloonAlways = /balloon-always/i.test(this.options.get('mode')) || /balloon-always/i.test(this.options.get('subMode'));
 
 		// register class
 		this._registerClass();

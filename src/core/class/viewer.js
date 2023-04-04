@@ -54,9 +54,9 @@ Viewer.prototype = {
 
 			if (!this.status.isFullScreen) {
 				this.editor._notHideToolbar = true;
-				if (/balloon/i.test(this.options.get('mode'))) {
-					this.context.get('toolbar._arrow').style.display = 'none';
-					this.context.get('toolbar.main').style.left = '';
+				if (this.editor.isBalloon) {
+					this.context.get(this.options.has('subMode') ? 'toolbar.sub._arrow' : 'toolbar._arrow').style.display = 'none';
+					this.context.get(this.options.has('subMode') ? 'toolbar.sub' : 'toolbar.main').style.left = '';
 					this.editor.isInline = true;
 					this.editor.isBalloon = false;
 					this.editor.toolbar._showInline();
@@ -76,8 +76,8 @@ Viewer.prototype = {
 
 			if (!this.status.isFullScreen) {
 				this.editor._notHideToolbar = false;
-				if (/balloon/i.test(this.options.get('mode'))) {
-					this.context.get('toolbar._arrow').style.display = '';
+				if (this.editor.isBalloon) {
+					this.context.get(this.options.has('subMode') ? 'toolbar.sub._arrow' : 'toolbar._arrow').style.display = '';
 					this.editor.isInline = false;
 					this.editor.isBalloon = true;
 					this.eventManager._hideToolbar();
@@ -121,8 +121,8 @@ Viewer.prototype = {
 		const wasToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.editor.toolbar._inlineToolbarAttr.isShow);
 
 		if (value) {
-			if (/balloon|inline/i.test(this.options.get('mode'))) {
-				this.context.get('toolbar._arrow').style.display = 'none';
+			if (this.editor.isBalloon || this.editor.isInline) {
+				this.context.get(this.options.has('subMode') ? 'toolbar.sub._arrow' : 'toolbar._arrow').style.display = 'none';
 				this.fullScreenInline = this.editor.isInline;
 				this.fullScreenBalloon = this.editor.isBalloon;
 				this.editor.isInline = false;
@@ -202,8 +202,8 @@ Viewer.prototype = {
 				domUtils.addClass(toolbar, 'se-toolbar-sticky');
 			}
 
-			if (/balloon|inline/i.test(this.options.get('mode'))) {
-				this.context.get('toolbar._arrow').style.display = '';
+			if (this.editor.isBalloon || this.editor.isInline) {
+				this.context.get(this.options.has('subMode') ? 'toolbar.sub._arrow' : 'toolbar._arrow').style.display = '';
 				this.editor.isInline = this.fullScreenInline;
 				this.editor.isBalloon = this.fullScreenBalloon;
 				this.editor.toolbar._showInline();

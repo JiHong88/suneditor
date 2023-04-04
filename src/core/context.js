@@ -70,7 +70,11 @@ export const CreateContext = function (toolbar, toolbarContainer, menuTray, subb
 		if (b) m.set('buttons.' + BASIC_COMMANDS[i], b);
 	}
 
-	if (subbar) m.set('toolbar.sub', subbar);
+	if (subbar) {
+		m.set('toolbar.sub', subbar);
+		m.set('toolbar.sub._arrow', subbar.querySelector('.se-arrow'));
+		m.set('toolbar.sub._wrapper', subbar.parentElement.parentElement);
+	}
 
 	return m;
 };
