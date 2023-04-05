@@ -67,7 +67,8 @@ const Constructor = function (editorTargets, options) {
 	_d.body.appendChild(editor_carrier_wrapper);
 
 	/** --- toolbar --------------------------------------------------------------- */
-	let subbar = null, sub_main = null;
+	let subbar = null,
+		sub_main = null;
 	const tool_bar_main = CreateToolBar(o.get('buttonList'), plugins, o, icons, lang);
 	const toolbar = tool_bar_main.element;
 	toolbar.style.visibility = 'hidden';
@@ -109,9 +110,7 @@ const Constructor = function (editorTargets, options) {
 		const container = domUtils.createElement('DIV', { class: 'se-container' });
 		const editor_div = domUtils.createElement('DIV', { class: 'se-wrapper' });
 
-		const toolbarShadow = toolbar.cloneNode(false);
-		toolbarShadow.className += ' se-toolbar-shadow';
-		container.appendChild(toolbarShadow);
+		container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-shadow' }));
 
 		// init element
 		const initElements = _initTargetElements(o, top_div, to);
@@ -297,10 +296,13 @@ function InitOptions(options, editorTargets) {
 	/** subToolbar */
 	const subbar = options.subToolbar;
 	if (subbar && subbar.buttonList && subbar.buttonList.length > 0) {
-		if (/balloon/.test(o.get('mode'))) throw Error('[SUNEDITOR.create.fail] When using the "subToolbar" option, the main option cannot be "balloon-*".');
-		o.set('subMode', subbar.mode || 'balloon');
-		o.set('subButtonList', o.get('_rtl') ? subbar.buttonList.reverse() : subbar.buttonList);
-		o.set('toolbar.sub_width', subbar.width ? (numbers.is(subbar.width) ? subbar.width + 'px' : subbar.width) : 'auto');
+		if (/balloon/.test(o.get('mode'))) {
+			console.warn('[SUNEDITOR.create.subToolbar.fail] When the "mode" option is "balloon-*", the "subToolbar" option is omitted.');
+		} else {
+			o.set('subMode', subbar.mode || 'balloon');
+			o.set('subButtonList', o.get('_rtl') ? subbar.buttonList.reverse() : subbar.buttonList);
+			o.set('toolbar.sub_width', subbar.width ? (numbers.is(subbar.width) ? subbar.width + 'px' : subbar.width) : 'auto');
+		}
 	}
 
 	/** styles */

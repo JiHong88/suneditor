@@ -177,7 +177,7 @@ Viewer.prototype = {
 
 			if (this.options.get('iframe') && this.editor.frameOptions.get('height') === 'auto') {
 				editorArea.style.overflow = 'auto';
-				this.editor._iframeAutoHeight();
+				this.editor._iframeAutoHeight(fc);
 			}
 
 			fc.get('topArea').style.marginTop = this.options.get('fullScreenOffset') + 'px';

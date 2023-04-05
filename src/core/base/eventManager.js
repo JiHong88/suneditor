@@ -244,11 +244,13 @@ EventManager.prototype = {
 	_toggleToolbarBalloon: function () {
 		this.selection._init();
 		const range = this.selection.getRange();
-		if (this.menu._bindControllersOff || ((!this.editor.isBalloonAlways || !this.editor.isSubBalloonAlways) && range.collapsed)) {
-			if (this.editor.isSubBalloon) this._hideToolbar_sub();
+		const hasSubMode = this.options.has('subMode');
+
+		if (this.menu._bindControllersOff || (!(hasSubMode ? this.editor.isSubBalloonAlways : this.editor.isBalloonAlways) && range.collapsed)) {
+			if (hasSubMode) this._hideToolbar_sub();
 			else this._hideToolbar();
 		} else {
-			if (this.editor.isSubBalloon) this.subToolbar._showBalloon(range);
+			if (hasSubMode) this.subToolbar._showBalloon(range);
 			else this.toolbar._showBalloon(range);
 		}
 	},
@@ -260,7 +262,7 @@ EventManager.prototype = {
 	},
 
 	_hideToolbar_sub: function () {
-		if (!this.editor._notHideToolbar && !this.editor.frameContext.get('isFullScreen')) {
+		if (this.subToolbar && !this.editor._notHideToolbar && !this.editor.frameContext.get('isFullScreen')) {
 			this.subToolbar.hide();
 		}
 	},
@@ -539,12 +541,12 @@ EventManager.prototype = {
 		}
 	},
 
-	_addCommonEvent: function () {
+	_addCommonEvents: function () {
 		const buttonsHandler = ButtonsHandler.bind(this);
 		const toolbarHandler = OnClick_toolbar.bind(this);
 		/** menu event */
 		this.addEvent(this.context.get('_menuTray'), 'mousedown', buttonsHandler, false);
-		
+
 		/** toolbar event */
 		this.addEvent(this.context.get('toolbar.main'), 'mousedown', buttonsHandler, false);
 		this.addEvent(this.context.get('toolbar.main'), 'click', toolbarHandler, false);
@@ -557,24 +559,29 @@ EventManager.prototype = {
 		/** set response toolbar */
 		this.toolbar._setResponsive();
 
-		/** responsive toolbar observer */
-		if (env.isResizeObserverSupported) this._toolbarObserver = new _w.ResizeObserver(this.toolbar.resetResponsiveToolbar.bind(this.toolbar));
-
-		/** window event */
-		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
-		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
-	},
-
-	_addEvent: function (frameContext) {
-		const eventWysiwyg = this.options.get('iframe') ? frameContext.get('_ww') : frameContext.get('wysiwyg');
-		frameContext.set('eventWysiwyg', eventWysiwyg);
+		/** observer */
 		if (env.isResizeObserverSupported) {
+			this._toolbarObserver = new _w.ResizeObserver(
+				function () {
+					this.toolbar.resetResponsiveToolbar();
+					if (this.options.has('subMode')) this.subToolbar.resetResponsiveToolbar();
+				}.bind(this)
+			);
 			this._resizeObserver = new _w.ResizeObserver(
 				function (entries) {
 					this.editor.__callResizeFunction(-1, entries[0]);
 				}.bind(this)
 			);
 		}
+
+		/** window event */
+		this.addEvent(_w, 'resize', OnResize_window.bind(this), false);
+		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
+	},
+
+	_addFrameEvents: function (frameContext) {
+		const eventWysiwyg = this.options.get('iframe') ? frameContext.get('_ww') : frameContext.get('wysiwyg');
+		frameContext.set('eventWysiwyg', eventWysiwyg);
 		const codeArea = frameContext.get('code');
 
 		/** editor area */
@@ -650,12 +657,12 @@ EventManager.prototype = {
 		this._events = [];
 
 		if (this._resizeObserver) {
-			this._resizeObserver.unobserve(this.editor.frameContext.get('wysiwygFrame'));
+			this._resizeObserver.disconnect();
 			this._resizeObserver = null;
 		}
 
 		if (this._toolbarObserver) {
-			this._toolbarObserver.unobserve(this.editor.frameContext.get('_toolbarShadow'));
+			this._toolbarObserver.disconnect();
 			this._toolbarObserver = null;
 		}
 	},
@@ -726,7 +733,11 @@ EventManager.prototype = {
 	},
 
 	_resetFrameStatus: function () {
-		if (!env.isResizeObserverSupported) this.toolbar.resetResponsiveToolbar();
+		if (!env.isResizeObserverSupported) {
+			this.toolbar.resetResponsiveToolbar();
+			if (this.options.get('subMode')) this.subToolbar.resetResponsiveToolbar();
+		}
+
 		const toolbar = this.context.get('toolbar.main');
 		const isToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.toolbar._inlineToolbarAttr.isShow);
 		if (toolbar.offsetWidth === 0 && !isToolbarHidden) return;
@@ -747,7 +758,7 @@ EventManager.prototype = {
 			return;
 		}
 
-		this.editor._iframeAutoHeight();
+		this.editor._iframeAutoHeight(this.editor.frameContext);
 
 		if (this.toolbar._sticky) {
 			this.context.get('toolbar.main').style.width = this.editor.frameContext.get('topArea').offsetWidth - 2 + 'px';

@@ -65,7 +65,7 @@ Toolbar.prototype = {
 			this.editor.frameContext.get('_stickyDummy').style.display = '';
 		}
 
-		this.eventManager._resetFrameStatus();
+		this.resetResponsiveToolbar();
 	},
 
 	/**
@@ -86,8 +86,6 @@ Toolbar.prototype = {
 				};
 			}
 		}
-
-		this.eventManager._resetFrameStatus();
 	},
 
 	/**
@@ -349,10 +347,12 @@ Toolbar.prototype = {
 
 		const toolbar = this.context.get(this.keyName + '.main');
 		toolbar.style.visibility = 'hidden';
+		this._offSticky();
+
 		toolbar.style.display = 'block';
 		toolbar.style.top = '0px';
 		this._inlineToolbarAttr.width = toolbar.style.width = this.options.get(this.keyName + '_width');
-		this._inlineToolbarAttr.top = toolbar.style.top = (this.options.get('toolbar_container') ? -1 + (this.offset.getGlobal(this.editor.frameContext.get('topArea')).top - this.offset.getGlobal(toolbar).top - toolbar.offsetHeight) : -1 - toolbar.offsetHeight) + 'px';
+		this._inlineToolbarAttr.top = toolbar.style.top = -1 + (this.offset.getGlobal(this.editor.frameContext.get('topArea')).top - this.offset.getGlobal(toolbar).top - toolbar.offsetHeight) + 'px';
 
 		if (typeof this.events.onShowInline === 'function') this.events.onShowInline(toolbar);
 

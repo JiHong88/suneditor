@@ -346,7 +346,8 @@ const editor_root = (window.e = suneditor.create({
 		}
 	}
 }, {
-	mode: "classic",
+	mode: "balloon-always",
+	// toolbar_width: 300,
 	// textDirection: 'rtl',
 	// value: 'Common value',
 	// editorStyle: 'font-size:40px',
@@ -372,30 +373,7 @@ const editor_root = (window.e = suneditor.create({
 	imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
 	lineAttrReset: 'id',
 	attributeWhitelist: 'id',
-	buttonList: [
-		['align', 'align'],
-		['backgroundColor', 'backgroundColor'],
-		['font', 'font'],
-		['fontColor', 'fontColor'],
-		['fontSize', 'fontSize'],
-		['formatBlock','formatBlock'],
-		['horizontalLine','horizontalLine'],
-		['layout','layout'],
-		['lineHeight','lineHeight'],
-		['list','list'],
-		['paragraphStyle','paragraphStyle'],
-		['table','table'],
-		['template','template'],
-		['textStyle','textStyle'],
-		['blockquote','blockquote'],
-		['audio','audio'],
-		['image','image'],
-		['link','link'],
-		['video','video'],
-		['math','math'],
-		['dir', 'dir_rtl', 'dir_ltr'],
-		['codeView', 'fullScreen']
-	],
+	buttonList: bl,
 	subToolbar: {
 		buttonList: bl,
 		width: 'auto',

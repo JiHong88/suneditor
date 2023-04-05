@@ -473,10 +473,11 @@
 
 .sun-editor .se-toolbar-shadow {
     display: block !important;
-    position: relative;
-    width: 100%;
+    position: relative !important;
+    width: 100% !important;
     height: 0px !important;
-    overflow: visible;
+    overflow: visible !important;
+    visibility: hidden !important;
     padding: 0 !important;
     margin: 0 !important;
     background-color: transparent !important;

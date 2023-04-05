@@ -10,6 +10,17 @@ export const converter = Converter;
 export const domUtils = DomUtils;
 export const numbers = Numbers;
 
+export const deepDelete = function (ref) {
+	for (let key in ref) {
+		if (typeof ref[key] == 'Object' && ref[key] !== null) deepDelete(ref[key]);
+		try {
+			delete ref[key];
+		} catch (err) {
+			ref[key] = null;
+		}
+	}
+};
+
 export default {
 	env: env,
 	unicode: unicode,

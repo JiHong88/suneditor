@@ -1,4 +1,4 @@
-import Helper, { env, converter, domUtils, numbers } from '../helper';
+import Helper, { env, converter, domUtils, numbers, deepDelete } from '../helper';
 import Constructor, { ResetOptions, UpdateButton } from './constructor';
 
 // class dependency
@@ -190,11 +190,11 @@ const Editor = function (multiTargets, options) {
 	this._controllerOnDisabledButtons = [];
 	this._codeViewDisabledButtons = [];
 	this._controllerTargetContext = null;
-	
+
 	/**
 	 * @description Button List in Responsive Toolbar.
 	 * @private
-	*/
+	 */
 	this._pluginCallButtons = product.pluginCallButtons;
 	this._pluginCallButtons_sub = product.pluginCallButtons_sub;
 	this._responsiveButtons = product.responsiveButtons;
@@ -363,7 +363,7 @@ Editor.prototype = {
 		let plugin = this.plugins[pluginName];
 		if (!plugin) {
 			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "' + pluginName + '")');
-		} else if (typeof this.plugins[pluginName] === 'function'){
+		} else if (typeof this.plugins[pluginName] === 'function') {
 			plugin = this.plugins[pluginName] = new this.plugins[pluginName](this);
 			if (typeof plugin.init === 'function') plugin.init();
 		}
@@ -901,34 +901,29 @@ Editor.prototype = {
 	 * @description Destroy the suneditor
 	 */
 	destroy: function () {
-		/** remove element */
-		domUtils.removeItem(this._carrierWrapper);
-		domUtils.removeItem(this.context.get('toolbar._wrapper'));
-		domUtils.removeItem(this.context.get('toolbar.sub._wrapper'));
-
-		this.rootTargets.forEach(function (e) {
-			domUtils.removeItem(e.get('topArea'));
-		});
-
-		this.rootTargets.clear();
-		this.context.clear();
-		this.frameContext.clear();
-
 		/** remove history */
 		this.history.destroy();
 
 		/** remove event listeners */
 		this.eventManager._removeAllEvents();
 
-		/** destory external library */
+		/** destroy external library */
 		if (this.options.get('codeMirror6Editor')) {
 			this.options.get('codeMirror6Editor').destroy();
 		}
 
+		/** remove element */
+		domUtils.removeItem(this._carrierWrapper);
+		domUtils.removeItem(this.context.get('toolbar._wrapper'));
+		domUtils.removeItem(this.context.get('toolbar.sub._wrapper'));
+		this.rootTargets.forEach(function (e) {
+			domUtils.removeItem(e.get('topArea'));
+		});
+
 		/** remove object reference */
-		for (let k in this) {
-			delete this[k];
-		}
+		deepDelete(this);
+
+		return null;
 	},
 
 	/** ----- private methods ----------------------------------------------------------------------------------------------------------------------------- */
@@ -1155,7 +1150,7 @@ Editor.prototype = {
 		this._set_commandMap(textTags.strike.toUpperCase(), ctx.get('buttons.strike'));
 		this._set_commandMap(textTags.sub.toUpperCase(), ctx.get('buttons.subscript'));
 		this._set_commandMap(textTags.sup.toUpperCase(), ctx.get('buttons.superscript'));
-		
+
 		if (this.options.has('subMode')) {
 			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(this._w.Array.prototype.slice.call(ctx.get('toolbar.sub._buttonTray').querySelectorAll(codeDisabledQuery)));
 			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(this._w.Array.prototype.slice.call(ctx.get('toolbar.sub._buttonTray').querySelectorAll(controllerDisabledQuery)));
@@ -1197,8 +1192,6 @@ Editor.prototype = {
 	 * @private
 	 */
 	_iframeAutoHeight: function (fc) {
-		fc = fc || this.frameContext;
-
 		if (this._iframeAuto) {
 			this._w.setTimeout(
 				function () {
@@ -1217,6 +1210,19 @@ Editor.prototype = {
 			);
 		} else if (!env.isResizeObserverSupported) {
 			this.__callResizeFunction(fc.get('wysiwygFrame').offsetHeight, null);
+		}
+	},
+
+	__callResizeFunction: function (h, resizeObserverEntry) {
+		h =
+			h === -1
+				? resizeObserverEntry && resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0]
+					? resizeObserverEntry.borderBoxSize[0].blockSize
+					: resizeObserverEntry.contentRect.height + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-right'))
+				: h;
+		if (this._editorHeight !== h) {
+			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, this._editorHeight, resizeObserverEntry);
+			this._editorHeight = h;
 		}
 	},
 
@@ -1257,19 +1263,6 @@ Editor.prototype = {
 		if (this.context.get('toolbar.main').style.display === 'block') this.toolbar._showBalloon();
 	},
 
-	__callResizeFunction: function (h, resizeObserverEntry) {
-		h =
-			h === -1
-				? resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0]
-					? resizeObserverEntry.borderBoxSize[0].blockSize
-					: resizeObserverEntry.contentRect.height + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-right'))
-				: h;
-		if (this._editorHeight !== h) {
-			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, this._editorHeight, resizeObserverEntry);
-			this._editorHeight = h;
-		}
-	},
-
 	_codeViewAutoHeight: function () {
 		if (this.frameContext.get('isFullScreen')) return;
 		this.frameContext.get('code').style.height = this.frameContext.get('code').scrollHeight + 'px';
@@ -1295,7 +1288,7 @@ Editor.prototype = {
 			function (e) {
 				this._setEditorParams(e);
 				this._initWysiwygArea(e, e.get('options').get('value'));
-				this.eventManager._addEvent(e);
+				this.eventManager._addFrameEvents(e);
 			}.bind(this)
 		);
 
@@ -1307,7 +1300,7 @@ Editor.prototype = {
 		this._componentsInfoReset = false;
 		this._checkComponents();
 
-		this.eventManager._addCommonEvent();
+		this.eventManager._addCommonEvents();
 
 		this._w.setTimeout(
 			function () {
