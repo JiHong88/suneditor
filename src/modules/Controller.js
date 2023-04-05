@@ -43,6 +43,8 @@ Controller.prototype = {
 	 */
 	open: function (target, positionTarget, initMethod) {
 		if (this.editor.isBalloon) this.toolbar.hide();
+		else if (this.editor.isSubBalloon) this.subToolbar.hide();
+
 		if (this.disabled) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
 
 		this.currentTarget = target;

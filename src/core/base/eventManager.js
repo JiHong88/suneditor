@@ -234,7 +234,8 @@ EventManager.prototype = {
 			function () {
 				_w.clearTimeout(this._balloonDelay);
 				this._balloonDelay = null;
-				this.toolbar._showBalloon();
+				if (this.editor.isSubBalloon) this.subToolbar._showBalloon();
+				else this.toolbar._showBalloon();
 			}.bind(this),
 			250
 		);
@@ -243,13 +244,24 @@ EventManager.prototype = {
 	_toggleToolbarBalloon: function () {
 		this.selection._init();
 		const range = this.selection.getRange();
-		if (this.menu._bindControllersOff || (!this.editor.isBalloonAlways && range.collapsed)) this._hideToolbar();
-		else this.toolbar._showBalloon(range);
+		if (this.menu._bindControllersOff || ((!this.editor.isBalloonAlways || !this.editor.isSubBalloonAlways) && range.collapsed)) {
+			if (this.editor.isSubBalloon) this._hideToolbar_sub();
+			else this._hideToolbar();
+		} else {
+			if (this.editor.isSubBalloon) this.subToolbar._showBalloon(range);
+			else this.toolbar._showBalloon(range);
+		}
 	},
 
 	_hideToolbar: function () {
-		if (!this.editor._notHideToolbar && !this.status.isFullScreen) {
+		if (!this.editor._notHideToolbar && !this.editor.frameContext.get('isFullScreen')) {
 			this.toolbar.hide();
+		}
+	},
+
+	_hideToolbar_sub: function () {
+		if (!this.editor._notHideToolbar && !this.editor.frameContext.get('isFullScreen')) {
+			this.subToolbar.hide();
 		}
 	},
 
@@ -528,11 +540,19 @@ EventManager.prototype = {
 	},
 
 	_addCommonEvent: function () {
+		const buttonsHandler = ButtonsHandler.bind(this);
+		const toolbarHandler = OnClick_toolbar.bind(this);
+		/** menu event */
+		this.addEvent(this.context.get('_menuTray'), 'mousedown', buttonsHandler, false);
+		
 		/** toolbar event */
-		const toolbarHandler = ToolbarButtonsHandler.bind(this);
-		this.addEvent(this.context.get('toolbar.main'), 'mousedown', toolbarHandler, false);
-		this.addEvent(this.context.get('_menuTray'), 'mousedown', toolbarHandler, false);
-		this.addEvent(this.context.get('toolbar.main'), 'click', OnClick_toolbar.bind(this), false);
+		this.addEvent(this.context.get('toolbar.main'), 'mousedown', buttonsHandler, false);
+		this.addEvent(this.context.get('toolbar.main'), 'click', toolbarHandler, false);
+		// subToolbar
+		if (this.options.has('subMode')) {
+			this.addEvent(this.context.get('toolbar.sub.main'), 'mousedown', buttonsHandler, false);
+			this.addEvent(this.context.get('toolbar.sub.main'), 'click', toolbarHandler, false);
+		}
 
 		/** set response toolbar */
 		this.toolbar._setResponsive();
@@ -647,6 +667,9 @@ EventManager.prototype = {
 		if (this.editor.isBalloon) {
 			this.context.get('toolbar.main').style.top = this.toolbar._balloonOffset.top - y + 'px';
 			this.context.get('toolbar.main').style.left = this.toolbar._balloonOffset.left - x + 'px';
+		} else if (this.editor.isSubBalloon) {
+			this.context.get('toolbar.sub.main').style.top = this.subToolbar._balloonOffset.top - y + 'px';
+			this.context.get('toolbar.sub.main').style.left = this.subToolbar._balloonOffset.left - x + 'px';
 		}
 
 		if (this.editor._controllerTargetContext !== this.editor.frameContext.get('topArea')) {
@@ -735,7 +758,7 @@ EventManager.prototype = {
 	constructor: EventManager
 };
 
-function ToolbarButtonsHandler(e) {
+function ButtonsHandler(e) {
 	let target = e.target;
 	if (this.menu._bindControllersOff) e.stopPropagation();
 
@@ -810,6 +833,8 @@ function OnMouseDown_wysiwyg(rootKey, e) {
 
 	if (this.editor.isBalloon) {
 		this._hideToolbar();
+	} else if (this.editor.isSubBalloon) {
+		this._hideToolbar_sub();
 	}
 
 	if (/FIGURE/i.test(e.target.nodeName)) e.preventDefault();
@@ -885,7 +910,7 @@ function OnClick_wysiwyg(rootKey, e) {
 		this.applyTagEffect();
 	}
 
-	if (this.editor.isBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this));
+	if (this.editor.isBalloon || this.editor.isSubBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this));
 }
 
 function OnInput_wysiwyg(rootKey, e) {
@@ -926,6 +951,8 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 
 	if (this.editor.isBalloon) {
 		this._hideToolbar();
+	} else if (this.editor.isSubBalloon) {
+		this._hideToolbar_sub();
 	}
 
 	// user event
@@ -1663,11 +1690,12 @@ function OnKeyUp_wysiwyg(rootKey, e) {
 	const range = this.selection.getRange();
 	let selectionNode = this.selection.getNode();
 
-	if (this.editor.isBalloon && ((this.editor.isBalloonAlways && keyCode !== 27) || !range.collapsed)) {
-		if (this.editor.isBalloonAlways) {
+	if ((this.editor.isBalloon || this.editor.isSubBalloon) && (((this.editor.isBalloonAlways || this.editor.isSubBalloonAlways) && keyCode !== 27) || !range.collapsed)) {
+		if (this.editor.isBalloonAlways || this.editor.isSubBalloonAlways) {
 			if (keyCode !== 27) this._showToolbarBalloonDelay();
 		} else {
-			this.toolbar._showBalloon();
+			if (this.editor.isSubBalloon) this.subToolbar._showBalloon();
+			else this.toolbar._showBalloon();
 			return;
 		}
 	}
@@ -1817,6 +1845,7 @@ function OnBlur_wysiwyg(rootKey, e) {
 	this.editor.effectNode = null;
 	this.editor._offCurrentController();
 	if (this.editor.isInline || this.editor.isBalloon) this._hideToolbar();
+	else if (this.editor.isSubBalloon) this._hideToolbar_sub();
 
 	this._setKeyEffect([], null, []);
 
@@ -1928,6 +1957,7 @@ function DisplayLineBreak(dir, e) {
 function OnResize_window() {
 	this.editor._offCurrentController();
 	if (this.editor.isBalloon) this.toolbar.hide();
+	else if (this.editor.isSubBalloon) this.subToolbar.hide();
 	else this._resetFrameStatus();
 }
 
@@ -1938,6 +1968,8 @@ function OnScroll_window() {
 
 	if (this.editor.isBalloon && this.context.get('toolbar.main').style.display === 'block') {
 		this.toolbar._setBalloonOffset(this.toolbar._balloonOffset.position === 'top');
+	} else if (this.editor.isSubBalloon && this.context.get('toolbar.sub.main').style.display === 'block') {
+		this.subToolbar._setBalloonOffset(this.subToolbar._balloonOffset.position === 'top');
 	}
 
 	this._scrollContainer();

@@ -67,7 +67,7 @@ const Constructor = function (editorTargets, options) {
 	_d.body.appendChild(editor_carrier_wrapper);
 
 	/** --- toolbar --------------------------------------------------------------- */
-	let subbar = null;
+	let subbar = null, sub_main = null;
 	const tool_bar_main = CreateToolBar(o.get('buttonList'), plugins, o, icons, lang);
 	const toolbar = tool_bar_main.element;
 	toolbar.style.visibility = 'hidden';
@@ -84,13 +84,13 @@ const Constructor = function (editorTargets, options) {
 
 	/** --- subToolbar --------------------------------------------------------------- */
 	if (o.get('subButtonList')) {
-		const sub_main = CreateToolBar(o.get('subButtonList'), plugins, o, icons, lang);
+		sub_main = CreateToolBar(o.get('subButtonList'), plugins, o, icons, lang);
 		subbar = sub_main.element;
 		subbar.style.visibility = 'hidden';
 		if (!exlib_katex) exlib_katex = sub_main.pluginCallButtons.math;
 		// subbar mode must be balloon-*
-		subbar.className += ' se-toolbar-balloon';
-		subbar.style.width = o.get('toolbar_width');
+		subbar.className += ' se-toolbar-balloon se-toolbar-sub';
+		subbar.style.width = o.get('toolbar.sub_width');
 		subbar.appendChild(domUtils.createElement('DIV', { class: 'se-arrow' }));
 	}
 
@@ -180,7 +180,9 @@ const Constructor = function (editorTargets, options) {
 		rootKeys: rootKeys,
 		rootTargets: rootTargets,
 		pluginCallButtons: tool_bar_main.pluginCallButtons,
-		responsiveButtons: tool_bar_main.responsiveButtons
+		responsiveButtons: tool_bar_main.responsiveButtons,
+		pluginCallButtons_sub: sub_main ? sub_main.pluginCallButtons : [],
+		responsiveButtons_sub: sub_main ? sub_main.responsiveButtons : []
 	};
 };
 
@@ -253,12 +255,6 @@ function InitOptions(options, editorTargets) {
 	// text direction
 	o.set('textDirection', typeof options.textDirection !== 'string' ? 'ltr' : options.textDirection);
 	o.set('_rtl', o.get('textDirection') === 'rtl');
-	o.set('buttonList', o.get('_rtl') ? buttonList.reverse() : buttonList);
-	if (options.subToolbar && options.subToolbar.buttonList && options.subToolbar.buttonList.length > 0) {
-		if (/balloon/.test(o.get('mode'))) throw Error('[SUNEDITOR.create.fail] When using the "subToolbar" option, the main option cannot be "balloon-*".');
-		o.set('subMode', options.subToolbar.mode || 'balloon');
-		o.set('subButtonList', o.get('_rtl') ? options.subToolbar.buttonList.reverse() : options.subToolbar.buttonList);
-	}
 
 	// etc
 	o.set('historyStackDelayTime', typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400);
@@ -296,6 +292,16 @@ function InitOptions(options, editorTargets) {
 	o.set('toolbar_container', options.toolbar_container && !/inline/i.test(o.get('mode')) ? (typeof options.toolbar_container === 'string' ? _d.querySelector(options.toolbar_container) : options.toolbar_container) : null);
 	o.set('toolbar_sticky', /balloon/i.test(o.get('mode')) ? -1 : options.toolbar_sticky === undefined ? 0 : /^\d+/.test(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1);
 	o.set('toolbar_hide', !!options.toolbar_hide);
+	o.set('buttonList', o.get('_rtl') ? buttonList.reverse() : buttonList);
+
+	/** subToolbar */
+	const subbar = options.subToolbar;
+	if (subbar && subbar.buttonList && subbar.buttonList.length > 0) {
+		if (/balloon/.test(o.get('mode'))) throw Error('[SUNEDITOR.create.fail] When using the "subToolbar" option, the main option cannot be "balloon-*".');
+		o.set('subMode', subbar.mode || 'balloon');
+		o.set('subButtonList', o.get('_rtl') ? subbar.buttonList.reverse() : subbar.buttonList);
+		o.set('toolbar.sub_width', subbar.width ? (numbers.is(subbar.width) ? subbar.width + 'px' : subbar.width) : 'auto');
+	}
 
 	/** styles */
 	InitRootOptions(editorTargets, options);

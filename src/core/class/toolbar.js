@@ -7,12 +7,17 @@ import { domUtils } from '../../helper';
 import CoreDependency from '../../dependency/_core';
 import { CreateToolBar } from '../constructor';
 
-const Toolbar = function (editor) {
+const Toolbar = function (editor, params) {
 	CoreDependency.call(this, editor);
 
 	// members
+	this.keyName = params.keyName;
+	this._isBalloon = params.balloon;
+	this._isInline = params.inline;
+	this._isBalloonAlways = params.balloonAlways;
 	this._responsiveCurrentSize = 'default';
-	this._rButtonArray = editor._responsiveButtons;
+	this._originRes = params.res;
+	this._rButtonArray = params.res;
 	this._rButtonsize = null;
 	this._sticky = false;
 	this._inlineToolbarAttr = {
@@ -37,26 +42,26 @@ Toolbar.prototype = {
 		this.menu.dropdownOff();
 		this.menu._moreLayerOff();
 		this.menu.containerOff();
-		domUtils.setDisabled(this.context.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-type]'), true);
+		domUtils.setDisabled(this.context.get(this.keyName + '._buttonTray').querySelectorAll('.se-menu-list button[data-type]'), true);
 	},
 
 	/**
 	 * @description Enable the toolbar
 	 */
 	enable: function () {
-		domUtils.setDisabled(this.context.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-type]'), false);
+		domUtils.setDisabled(this.context.get(this.keyName + '._buttonTray').querySelectorAll('.se-menu-list button[data-type]'), false);
 	},
 
 	/**
 	 * @description Show the toolbar
 	 */
 	show: function () {
-		if (this.editor.isInline) {
+		if (this._isInline) {
 			this._showInline();
-		} else if (this.editor.isBalloon) {
+		} else if (this._isBalloon) {
 			this._showBalloon();
 		} else {
-			this.context.get('toolbar.main').style.display = '';
+			this.context.get(this.keyName + '.main').style.display = '';
 			this.editor.frameContext.get('_stickyDummy').style.display = '';
 		}
 
@@ -67,12 +72,12 @@ Toolbar.prototype = {
 	 * @description Hide the toolbar
 	 */
 	hide: function () {
-		if (this.editor.isInline) {
-			this.context.get('toolbar.main').style.display = 'none';
-			this.context.get('toolbar.main').style.top = '0px';
+		if (this._isInline) {
+			this.context.get(this.keyName + '.main').style.display = 'none';
+			this.context.get(this.keyName + '.main').style.top = '0px';
 			this._inlineToolbarAttr.isShow = false;
 		} else {
-			this.context.get('toolbar.main').style.display = 'none';
+			this.context.get(this.keyName + '.main').style.display = 'none';
 			this.editor.frameContext.get('_stickyDummy').style.display = 'none';
 			if (this.editorisBalloon) {
 				this._balloonOffset = {
@@ -94,10 +99,10 @@ Toolbar.prototype = {
 		const responsiveSize = this._rButtonsize;
 		if (responsiveSize) {
 			let w = 0;
-			if ((this.editor.isBalloon || this.editor.isInline) && this.options.get('toolbar_width') === 'auto') {
+			if (((this._isBalloon || this._isInline) && this.options.get('toolbar_width') === 'auto') || (this._isSubBalloon && this.options.get('toolbar.sub_width') === 'auto')) {
 				w = this.editor.frameContext.get('topArea').offsetWidth;
 			} else {
-				w = this.context.get('toolbar.main').offsetWidth;
+				w = this.context.get(this.keyName + '.main').offsetWidth;
 			}
 
 			let responsiveWidth = 'default';
@@ -127,8 +132,8 @@ Toolbar.prototype = {
 		this.menu._moreLayerOff();
 
 		const newToolbar = CreateToolBar(buttonList, this.plugins, this.options, this.icons, this.lang);
-		this.context.get('toolbar.main').replaceChild(newToolbar._buttonTray, this.context.get('toolbar._buttonTray'));
-		this.context.set('toolbar._buttonTray', newToolbar._buttonTray);
+		this.context.get(this.keyName + '.main').replaceChild(newToolbar._buttonTray, this.context.get(this.keyName + '._buttonTray'));
+		this.context.set(this.keyName + '._buttonTray', newToolbar._buttonTray);
 
 		this.editor._recoverButtonStates();
 		this.history.resetButtons();
@@ -141,14 +146,14 @@ Toolbar.prototype = {
 	},
 
 	_resetSticky: function () {
-		const toolbar = this.context.get('toolbar.main');
-		if (this.status.isFullScreen || toolbar.offsetWidth === 0 || this.options.get('toolbar_sticky') < 0) return;
+		const toolbar = this.context.get(this.keyName + '.main');
+		if (this.editor.frameContext.get('isFullScreen') || toolbar.offsetWidth === 0 || this.options.get('toolbar_sticky') < 0) return;
 
 		const minHeight = this.editor.frameContext.get('_minHeight');
 		const editorHeight = this.editor.frameContext.get('editorArea').offsetHeight;
 		const editorOffset = this.offset.getGlobal(this.editor.frameContext.get('topArea'));
 		const y = (this._w.scrollY || this._d.documentElement.scrollTop) + this.options.get('toolbar_sticky');
-		const t = (this.editor.isBalloon || this.editor.isInline ? editorOffset.top : this.offset.getGlobal(this.options.get('toolbar_container')).top) - (this.editor.isInline ? toolbar.offsetHeight : 0);
+		const t = (this._isBalloon || this._isInline ? editorOffset.top : this.offset.getGlobal(this.options.get('toolbar_container')).top) - (this._isInline ? toolbar.offsetHeight : 0);
 		const inlineOffset = 1;
 
 		const offSticky = !this.options.get('toolbar_container') ? editorHeight + t + this.options.get('toolbar_sticky') - y - minHeight : editorOffset.top - this._w.scrollY + editorHeight - minHeight - this.options.get('toolbar_sticky') - toolbar.offsetHeight;
@@ -163,16 +168,16 @@ Toolbar.prototype = {
 	},
 
 	_onSticky: function (inlineOffset) {
-		const toolbar = this.context.get('toolbar.main');
+		const toolbar = this.context.get(this.keyName + '.main');
 
-		if (!this.editor.isInline) {
+		if (!this._isInline) {
 			const stickyDummy = !this.options.get('toolbar_container') ? this.editor.frameContext.get('_stickyDummy') : this.context.get('_stickyDummy');
 			stickyDummy.style.height = toolbar.offsetHeight + 'px';
 			stickyDummy.style.display = 'block';
 		}
 
 		toolbar.style.top = this.options.get('toolbar_sticky') + inlineOffset + 'px';
-		toolbar.style.width = this.editor.isInline ? this._inlineToolbarAttr.width : toolbar.offsetWidth + 'px';
+		toolbar.style.width = this._isInline ? this._inlineToolbarAttr.width : toolbar.offsetWidth + 'px';
 		domUtils.addClass(toolbar, 'se-toolbar-sticky');
 		this._sticky = true;
 	},
@@ -181,9 +186,9 @@ Toolbar.prototype = {
 		const stickyDummy = !this.options.get('toolbar_container') ? this.editor.frameContext.get('_stickyDummy') : this.context.get('_stickyDummy');
 		stickyDummy.style.display = 'none';
 
-		const toolbar = this.context.get('toolbar.main');
-		toolbar.style.top = this.editor.isInline ? this._inlineToolbarAttr.top : '';
-		toolbar.style.width = this.editor.isInline ? this._inlineToolbarAttr.width : '';
+		const toolbar = this.context.get(this.keyName + '.main');
+		toolbar.style.top = this._isInline ? this._inlineToolbarAttr.top : '';
+		toolbar.style.width = this._isInline ? this._inlineToolbarAttr.width : '';
 		this.editor.frameContext.get('editorArea').style.marginTop = '';
 
 		domUtils.removeClass(toolbar, 'se-toolbar-sticky');
@@ -197,19 +202,19 @@ Toolbar.prototype = {
 		}
 
 		this._responsiveCurrentSize = 'default';
-		const sizeArray = (this._rButtonsize = []);
-		const _responsiveButtons = this.editor._responsiveButtons;
+		const _rButtonsize = (this._rButtonsize = []);
+		const _responsiveButtons = this._originRes;
 		const buttonsObj = (this._rButtonArray = {
 			default: _responsiveButtons[0]
 		});
 		for (let i = 1, len = _responsiveButtons.length, size, buttonGroup; i < len; i++) {
 			buttonGroup = _responsiveButtons[i];
 			size = buttonGroup[0] * 1;
-			sizeArray.push(size);
+			_rButtonsize.push(size);
 			buttonsObj[size] = buttonGroup[1];
 		}
 
-		sizeArray
+		_rButtonsize
 			.sort(function (a, b) {
 				return a - b;
 			})
@@ -217,16 +222,16 @@ Toolbar.prototype = {
 	},
 
 	_showBalloon: function (rangeObj) {
-		if (!this.editor.isBalloon || this.editor.opendControllers.length > 0) {
+		if (!this._isBalloon || this.editor.opendControllers.length > 0) {
 			return;
 		}
 
 		const range = rangeObj || this.selection.getRange();
-		const toolbar = this.options.has('subMode') ? this.context.get('toolbar.sub') : this.context.get('toolbar.main');
+		const toolbar = this.context.get(this.keyName + '.main');
 		const selection = this.selection.get();
 
 		let isDirTop;
-		if (this.editor.isBalloonAlways && range.collapsed) {
+		if (this._isBalloonAlways && range.collapsed) {
 			isDirTop = true;
 		} else if (selection.focusNode === selection.anchorNode) {
 			isDirTop = selection.focusOffset < selection.anchorOffset;
@@ -252,7 +257,7 @@ Toolbar.prototype = {
 		range = range || this.selection.getRange();
 		const rectsObj = this.selection.getRects(range, positionTop ? 'start' : 'end');
 		positionTop = rectsObj.position === 'start';
-		const toolbar = this.context.get('toolbar.main');
+		const toolbar = this.context.get(this.keyName + '.main');
 		const topArea = this.editor.frameContext.get('topArea');
 		const rects = rectsObj.rects;
 		const scrollLeft = rectsObj.scrollLeft;
@@ -296,7 +301,7 @@ Toolbar.prototype = {
 
 	_setBalloonPosition: function (isDirTop, rects, toolbarEl, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop) {
 		const padding = 1;
-		const arrow = this.context.get(this.options.has('subMode') ? 'toolbar.sub._arrow' : 'toolbar._arrow');
+		const arrow = this.context.get(this.keyName + '._arrow');
 		const arrowMargin = this._w.Math.round(arrow.offsetWidth / 2);
 		const toolbarWidth = toolbarEl.offsetWidth;
 		const toolbarHeight = rects.noText && !isDirTop ? 0 : toolbarEl.offsetHeight;
@@ -340,13 +345,13 @@ Toolbar.prototype = {
 	},
 
 	_showInline: function () {
-		if (!this.editor.isInline) return;
+		if (!this._isInline) return;
 
-		const toolbar = this.context.get('toolbar.main');
+		const toolbar = this.context.get(this.keyName + '.main');
 		toolbar.style.visibility = 'hidden';
 		toolbar.style.display = 'block';
 		toolbar.style.top = '0px';
-		this._inlineToolbarAttr.width = toolbar.style.width = this.options.get('toolbar_width');
+		this._inlineToolbarAttr.width = toolbar.style.width = this.options.get(this.keyName + '_width');
 		this._inlineToolbarAttr.top = toolbar.style.top = (this.options.get('toolbar_container') ? -1 + (this.offset.getGlobal(this.editor.frameContext.get('topArea')).top - this.offset.getGlobal(toolbar).top - toolbar.offsetHeight) : -1 - toolbar.offsetHeight) + 'px';
 
 		if (typeof this.events.onShowInline === 'function') this.events.onShowInline(toolbar);

@@ -1,7 +1,7 @@
 import EditorDependency from '../../dependency';
 import { domUtils } from '../../helper';
 
-const Blockquote = function (editor, target) {
+const Blockquote = function (editor) {
 	EditorDependency.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.tag_blockquote;

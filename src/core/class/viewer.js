@@ -14,6 +14,8 @@ const Viewer = function (editor) {
 	this.editorAreaOriginCssText = '';
 	this.wysiwygOriginCssText = '';
 	this.codeOriginCssText = '';
+	this.toolbarOriginCssText = '';
+	this.arrowOriginCssText = '';
 	this.fullScreenInnerHeight = 0;
 	this.fullScreenSticky = false;
 	this.fullScreenBalloon = false;
@@ -42,7 +44,7 @@ Viewer.prototype = {
 			codeFrame.style.setProperty('display', 'block', 'important');
 			wysiwygFrame.style.display = 'none';
 
-			if (this.status.isFullScreen) {
+			if (fc.get('isFullScreen')) {
 				codeFrame.style.height = '100%';
 			} else if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) {
 				codeFrame.style.height = codeFrame.scrollHeight > 0 ? codeFrame.scrollHeight + 'px' : 'auto';
@@ -52,15 +54,19 @@ Viewer.prototype = {
 				this._codeMirrorEditor('refresh', null, null);
 			}
 
-			if (!this.status.isFullScreen) {
+			if (!fc.get('isFullScreen')) {
 				this.editor._notHideToolbar = true;
 				if (this.editor.isBalloon) {
-					this.context.get(this.options.has('subMode') ? 'toolbar.sub._arrow' : 'toolbar._arrow').style.display = 'none';
-					this.context.get(this.options.has('subMode') ? 'toolbar.sub' : 'toolbar.main').style.left = '';
-					this.editor.isInline = true;
-					this.editor.isBalloon = false;
-					this.editor.toolbar._showInline();
+					this.context.get('toolbar._arrow').style.display = 'none';
+					this.context.get('toolbar.main').style.left = '';
+					this.editor.isInline = this.toolbar._isInline = true;
+					this.editor.isBalloon = this.toolbar._isBalloon = false;
+					this.toolbar._showInline();
 				}
+			}
+
+			if (this.editor.isSubBalloon) {
+				this.subToolbar.hide();
 			}
 
 			this.status._range = null;
@@ -74,12 +80,12 @@ Viewer.prototype = {
 
 			if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) fc.get('code').style.height = '0px';
 
-			if (!this.status.isFullScreen) {
+			if (!fc.get('isFullScreen')) {
 				this.editor._notHideToolbar = false;
-				if (this.editor.isBalloon) {
-					this.context.get(this.options.has('subMode') ? 'toolbar.sub._arrow' : 'toolbar._arrow').style.display = '';
-					this.editor.isInline = false;
-					this.editor.isBalloon = true;
+				if (/balloon/.test(this.options.get('mode'))) {
+					this.context.get('toolbar._arrow').style.display = '';
+					this.editor.isInline = this.toolbar._isInline = false;
+					this.editor.isBalloon = this.toolbar._isBalloon = true;
 					this.eventManager._hideToolbar();
 				}
 			}
@@ -105,9 +111,9 @@ Viewer.prototype = {
 	 * @param {boolean|undefined} value true/false, If undefined toggle the codeView mode.
 	 */
 	fullScreen: function (value) {
-		if (value === undefined) value = !this.status.isFullScreen;
 		const fc = this.editor.frameContext;
-		this.status.isFullScreen = value;
+		if (value === undefined) value = !fc.get('isFullScreen');
+		fc.set('isFullScreen', value);
 
 		const topArea = fc.get('topArea');
 		const toolbar = this.context.get('toolbar.main');
@@ -116,28 +122,31 @@ Viewer.prototype = {
 		const codeFrame = fc.get('code');
 		const targetButton = this.context.get('buttons.fullScreen');
 		const isCodeView = this.editor.frameContext.get('isCodeView');
+		const arrow = this.context.get('toolbar._arrow');
 
 		this.editor._offCurrentController();
 		const wasToolbarHidden = toolbar.style.display === 'none' || (this.editor.isInline && !this.editor.toolbar._inlineToolbarAttr.isShow);
 
 		if (value) {
+			this._originCssText = topArea.style.cssText;
+			this.editorAreaOriginCssText = editorArea.style.cssText;
+			this.wysiwygOriginCssText = wysiwygFrame.style.cssText;
+			this.codeOriginCssText = codeFrame.style.cssText;
+			this.toolbarOriginCssText = toolbar.style.cssText;
+			if (arrow) this.arrowOriginCssText = arrow.style.cssText;
+
 			if (this.editor.isBalloon || this.editor.isInline) {
-				this.context.get(this.options.has('subMode') ? 'toolbar.sub._arrow' : 'toolbar._arrow').style.display = 'none';
+				if (arrow) arrow.style.display = 'none';
 				this.fullScreenInline = this.editor.isInline;
 				this.fullScreenBalloon = this.editor.isBalloon;
-				this.editor.isInline = false;
-				this.editor.isBalloon = false;
+				this.editor.isInline = this.toolbar._isInline = false;
+				this.editor.isBalloon = this.toolbar._isBalloon = false;
 			}
 
 			if (this.options.get('toolbar_container')) {
 				this.toolbarParent = toolbar.parentElement;
 				fc.get('container').insertBefore(toolbar, editorArea);
 			}
-
-			this._originCssText = topArea.style.cssText;
-			this.editorAreaOriginCssText = editorArea.style.cssText;
-			this.wysiwygOriginCssText = wysiwygFrame.style.cssText;
-			this.codeOriginCssText = codeFrame.style.cssText;
 
 			topArea.style.position = 'fixed';
 			topArea.style.top = '0';
@@ -180,9 +189,10 @@ Viewer.prototype = {
 		} else {
 			wysiwygFrame.style.cssText = this.wysiwygOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + (isCodeView ? 'display: none;' : '');
 			codeFrame.style.cssText = this.codeOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + (!isCodeView ? 'display: none !important;' : 'display: block !important;');
-			toolbar.style.cssText = '';
+			toolbar.style.cssText = this.toolbarOriginCssText;
 			editorArea.style.cssText = this.editorAreaOriginCssText;
 			topArea.style.cssText = this._originCssText;
+			if (arrow) arrow.style.cssText = this.arrowOriginCssText;
 			this._d.body.style.overflow = this.bodyOverflow;
 
 			if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) this.editor._codeViewAutoHeight();
@@ -202,11 +212,11 @@ Viewer.prototype = {
 				domUtils.addClass(toolbar, 'se-toolbar-sticky');
 			}
 
-			if (this.editor.isBalloon || this.editor.isInline) {
-				this.context.get(this.options.has('subMode') ? 'toolbar.sub._arrow' : 'toolbar._arrow').style.display = '';
-				this.editor.isInline = this.fullScreenInline;
-				this.editor.isBalloon = this.fullScreenBalloon;
-				this.editor.toolbar._showInline();
+			this.editor.isInline = this.toolbar._isInline = this.fullScreenInline;
+			this.editor.isBalloon = this.toolbar._isBalloon = this.fullScreenBalloon;
+			if (!fc.get('isCodeView')) {
+				if (this.editor.isInline) this.editor.toolbar._showInline();
+				else if (this.editor.isBalloon) this.editor.toolbar._showBalloon();
 			}
 
 			this.editor.toolbar._resetSticky();
@@ -218,10 +228,10 @@ Viewer.prototype = {
 			}
 		}
 
-		if (wasToolbarHidden) this.editor.toolbar.hide();
+		if (wasToolbarHidden && !fc.get('isCodeView')) this.editor.toolbar.hide();
 
 		// user event
-		if (typeof this.events.onToggleFullScreen === 'function') this.events.onToggleFullScreen(this.status.isFullScreen);
+		if (typeof this.events.onToggleFullScreen === 'function') this.events.onToggleFullScreen(fc.get('isFullScreen'));
 	},
 
 	/**
@@ -350,7 +360,7 @@ Viewer.prototype = {
 	},
 
 	_resetFullScreenHeight: function () {
-		if (this.status.isFullScreen) {
+		if (this.editor.frameContext.get('isFullScreen')) {
 			this.fullScreenInnerHeight += this._w.innerHeight - this.context.get('toolbar.main').offsetHeight - (this.editor.frameContext.has('statusbar') ? this.editor.frameContext.get('statusbar').offsetHeight : 0) - this.fullScreenInnerHeight;
 			this.editor.frameContext.get('editorArea').style.height = this.fullScreenInnerHeight + 'px';
 			return true;

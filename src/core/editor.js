@@ -127,6 +127,16 @@ const Editor = function (multiTargets, options) {
 	this.isBalloonAlways = null;
 
 	/**
+	 * @description Is subToolbar balloon|balloon-always mode?
+	 */
+	this.isSubBalloon = null;
+
+	/**
+	 * @description Is subToolbar balloon-always mode?
+	 */
+	this.isSubBalloonAlways = null;
+
+	/**
 	 * @description Helper util
 	 */
 	this.helper = Helper;
@@ -136,6 +146,7 @@ const Editor = function (multiTargets, options) {
 	 * @description Command button map
 	 */
 	this.allCommandButtons = new _w.Map();
+	this.subAllCommandButtons = new _w.Map();
 
 	/**
 	 * @description Plugins array with "active" method.
@@ -179,13 +190,15 @@ const Editor = function (multiTargets, options) {
 	this._controllerOnDisabledButtons = [];
 	this._codeViewDisabledButtons = [];
 	this._controllerTargetContext = null;
-	this._pluginCallButtons = product.pluginCallButtons;
-
+	
 	/**
 	 * @description Button List in Responsive Toolbar.
 	 * @private
-	 */
+	*/
+	this._pluginCallButtons = product.pluginCallButtons;
+	this._pluginCallButtons_sub = product.pluginCallButtons_sub;
 	this._responsiveButtons = product.responsiveButtons;
+	this._responsiveButtons_sub = product.responsiveButtons_sub;
 
 	/**
 	 * @description Property related to rtl and ltr conversions.
@@ -350,7 +363,7 @@ Editor.prototype = {
 		let plugin = this.plugins[pluginName];
 		if (!plugin) {
 			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "' + pluginName + '")');
-		} else {
+		} else if (typeof this.plugins[pluginName] === 'function'){
 			plugin = this.plugins[pluginName] = new this.plugins[pluginName](this);
 			if (typeof plugin.init === 'function') plugin.init();
 		}
@@ -379,7 +392,7 @@ Editor.prototype = {
 		if (type) {
 			if (/more/i.test(type)) {
 				if (target !== this.menu.currentMoreLayerActiveButton) {
-					const layer = this.context.get('toolbar.main').querySelector('.' + command);
+					const layer = domUtils.getParentElement(target, '.se-toolbar').querySelector('.' + command);
 					if (layer) {
 						this.menu._moreLayerOn(target, layer);
 						this.toolbar._showBalloon();
@@ -479,7 +492,7 @@ Editor.prototype = {
 				this.viewer.codeView(!this.frameContext.get('isCodeView'));
 				break;
 			case 'fullScreen':
-				this.viewer.fullScreen(!this.status.isFullScreen);
+				this.viewer.fullScreen(!this.frameContext.get('isFullScreen'));
 				break;
 			case 'indent':
 				this.format.indent();
@@ -507,7 +520,7 @@ Editor.prototype = {
 				this.viewer.showBlocks(!this.frameContext.get('isShowBlocks'));
 				break;
 			case 'dir':
-				this.setDir(this.options.get('textDirection'));
+				this.setDir(this.options.get('_rtl') ? 'ltr' : 'rtl');
 				break;
 			case 'dir_ltr':
 				this.setDir('ltr');
@@ -526,6 +539,7 @@ Editor.prototype = {
 
 				this.status.isChanged = false;
 				if (this.context.has('buttons.save')) this.context.get('buttons.save').setAttribute('disabled', true);
+				if (this.context.has('buttons.sub.save')) this.context.get('buttons.sub.save').setAttribute('disabled', true);
 				break;
 			default:
 				// 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'..
@@ -586,7 +600,9 @@ Editor.prototype = {
 			}
 			// indent buttons
 			if (ctx.has('buttons.indent')) domUtils.changeElement(ctx.get('buttons.indent').firstElementChild, this.icons.indent);
+			if (ctx.has('buttons.sub.indent')) domUtils.changeElement(ctx.get('buttons.sub.indent').firstElementChild, this.icons.indent);
 			if (ctx.has('buttons.outdent')) domUtils.changeElement(ctx.get('buttons.outdent').firstElementChild, this.icons.outdent);
+			if (ctx.has('buttons.sub.outdent')) domUtils.changeElement(ctx.get('buttons.sub.outdent').firstElementChild, this.icons.outdent);
 		}
 
 		if (rtl) {
@@ -619,20 +635,33 @@ Editor.prototype = {
 			else if (r === 'right') n.style.textAlign = 'left';
 		}
 
-		let dir_button = null;
-		if ((dir_button = this.context.get('buttons.dir'))) {
-			domUtils.changeTxt(dir_button.querySelector('.se-tooltip-text'), this.lang[this.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
-			domUtils.changeElement(dir_button.firstElementChild, this.icons[this.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
+		this._setDirButtonActive(this.context.get('buttons.dir'), '', rtl);
+		this._setDirButtonActive(this.context.get('buttons.sub.dir'), '', rtl);
+		this._setDirButtonActive(this.context.get('buttons.dir_ltr'), 'ltr', rtl);
+		this._setDirButtonActive(this.context.get('buttons.sub.dir_ltr'), 'ltr', rtl);
+		this._setDirButtonActive(this.context.get('buttons.dir_rtl'), 'rtl', rtl);
+		this._setDirButtonActive(this.context.get('buttons.sub.dir_rtl'), 'rtl', rtl);
+	},
+
+	_setDirButtonActive: function (btn, str, rtl) {
+		if (!btn) return;
+
+		if (str === '') {
+			domUtils.changeTxt(btn.querySelector('.se-tooltip-text'), this.lang[this.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
+			domUtils.changeElement(btn.firstElementChild, this.icons[this.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
+			return;
 		}
 
-		if ((dir_button = this.context.get('buttons.dir_ltr'))) {
-			if (rtl) domUtils.removeClass(dir_button, 'active');
-			else domUtils.addClass(dir_button, 'active');
+		if (str === 'ltr') {
+			if (rtl) domUtils.removeClass(btn, 'active');
+			else domUtils.addClass(btn, 'active');
+			return;
 		}
 
-		if ((dir_button = this.context.get('buttons.dir_rtl'))) {
-			if (rtl) domUtils.addClass(dir_button, 'active');
-			else domUtils.removeClass(dir_button, 'active');
+		if (str === 'rtl') {
+			if (rtl) domUtils.addClass(btn, 'active');
+			else domUtils.removeClass(btn, 'active');
+			return;
 		}
 	},
 
@@ -1045,7 +1074,8 @@ Editor.prototype = {
 		this.html = new HTML(this);
 		this.component = new Component(this);
 		this.format = new Format(this);
-		this.toolbar = new Toolbar(this);
+		this.toolbar = new Toolbar(this, { keyName: 'toolbar', balloon: this.isBalloon, balloonAlways: this.isBalloonAlways, inline: this.isInline, res: this._responsiveButtons });
+		if (this.options.has('subMode')) this.subToolbar = new Toolbar(this, { keyName: 'toolbar.sub', balloon: this.isSubBalloon, balloonAlways: this.isSubBalloonAlways, inline: false, res: this._responsiveButtons_sub });
 		this.selection = new Selection(this);
 		this.char = new Char(this);
 		this.menu = new Menu(this);
@@ -1059,20 +1089,27 @@ Editor.prototype = {
 		ClassDependency.call(this.component, this);
 		ClassDependency.call(this.format, this);
 		ClassDependency.call(this.toolbar, this);
+		if (this.options.has('subMode')) ClassDependency.call(this.subToolbar, this);
 		ClassDependency.call(this.char, this);
 		ClassDependency.call(this.menu, this);
+
+		this._responsiveButtons = this._responsiveButtons_res = null;
 	},
 
 	/**
 	 * @description Save the current buttons states to "allCommandButtons" map
 	 * @private
 	 */
-	_saveButtonStates: function () {
-		const currentButtons = this.context.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
+	_saveButtonStates: function (isSub) {
+		const currentButtons = this.context.get(isSub ? 'toolbar.sub._buttonTray' : 'toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
+		const btns = isSub ? this.subAllCommandButtons : this.allCommandButtons;
 		for (let i = 0, element, command; i < currentButtons.length; i++) {
 			element = currentButtons[i];
 			command = element.getAttribute('data-command');
-			this.allCommandButtons.set(command, element);
+			btns.set(command, element);
+		}
+		if (!isSub && this.options.has('subMode')) {
+			this._saveButtonStates(true);
 		}
 	},
 
@@ -1080,17 +1117,21 @@ Editor.prototype = {
 	 * @description Recover the current buttons states from "allCommandButtons" map
 	 * @private
 	 */
-	_recoverButtonStates: function () {
-		const currentButtons = this.context.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
+	_recoverButtonStates: function (isSub) {
+		const currentButtons = this.context.get(isSub ? 'toolbar.sub._buttonTray' : 'toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
+		const btns = isSub ? this.subAllCommandButtons : this.allCommandButtons;
 		for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
 			button = currentButtons[i];
 			command = button.getAttribute('data-command');
 
-			oldButton = this.allCommandButtons.get(command);
+			oldButton = btns.get(command);
 			if (oldButton) {
 				button.parentElement.replaceChild(oldButton, button);
-				if (this.context.get('buttons.' + command)) this.context.set('buttons.' + command, oldButton);
+				if (this.context.get('buttons.' + (isSub ? 'sub.' : '') + command)) this.context.set('buttons.' + (isSub ? 'sub.' : '') + command, oldButton);
 			}
+		}
+		if (!isSub && this.options.has('subMode')) {
+			this._recoverButtonStates(true);
 		}
 	},
 
@@ -1099,27 +1140,34 @@ Editor.prototype = {
 	 * @private
 	 */
 	_cachingButtons: function () {
-		this._codeViewDisabledButtons = this.context.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])');
-		this._controllerOnDisabledButtons = this.context.get('toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])');
-
 		const ctx = this.context;
 		const textTags = this.options.get('textTags');
+		const codeDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])';
+		const controllerDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])';
+
+		this._codeViewDisabledButtons = this._w.Array.prototype.slice.call(ctx.get('toolbar._buttonTray').querySelectorAll(codeDisabledQuery));
+		this._controllerOnDisabledButtons = this._w.Array.prototype.slice.call(ctx.get('toolbar._buttonTray').querySelectorAll(controllerDisabledQuery));
 		this._set_commandMap('OUTDENT', ctx.get('buttons.outdent'));
-		this._set_commandMap('OUTDENT', ctx.get('buttons.sub.outdent'));
 		this._set_commandMap('INDENT', ctx.get('buttons.indent'));
-		this._set_commandMap('INDENT', ctx.get('buttons.sub.indent'));
 		this._set_commandMap(textTags.bold.toUpperCase(), ctx.get('buttons.bold'));
-		this._set_commandMap(textTags.bold.toUpperCase(), ctx.get('buttons.sub.bold'));
 		this._set_commandMap(textTags.underline.toUpperCase(), ctx.get('buttons.underline'));
-		this._set_commandMap(textTags.underline.toUpperCase(), ctx.get('buttons.sub.underline'));
 		this._set_commandMap(textTags.italic.toUpperCase(), ctx.get('buttons.italic'));
-		this._set_commandMap(textTags.italic.toUpperCase(), ctx.get('buttons.sub.italic'));
 		this._set_commandMap(textTags.strike.toUpperCase(), ctx.get('buttons.strike'));
-		this._set_commandMap(textTags.strike.toUpperCase(), ctx.get('buttons.sub.strike'));
 		this._set_commandMap(textTags.sub.toUpperCase(), ctx.get('buttons.subscript'));
-		this._set_commandMap(textTags.sub.toUpperCase(), ctx.get('buttons.sub.subscript'));
 		this._set_commandMap(textTags.sup.toUpperCase(), ctx.get('buttons.superscript'));
-		this._set_commandMap(textTags.sup.toUpperCase(), ctx.get('buttons.sub.superscript'));
+		
+		if (this.options.has('subMode')) {
+			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(this._w.Array.prototype.slice.call(ctx.get('toolbar.sub._buttonTray').querySelectorAll(codeDisabledQuery)));
+			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(this._w.Array.prototype.slice.call(ctx.get('toolbar.sub._buttonTray').querySelectorAll(controllerDisabledQuery)));
+			this._set_commandMap('OUTDENT', ctx.get('buttons.sub.outdent'));
+			this._set_commandMap('INDENT', ctx.get('buttons.sub.indent'));
+			this._set_commandMap(textTags.bold.toUpperCase(), ctx.get('buttons.sub.bold'));
+			this._set_commandMap(textTags.underline.toUpperCase(), ctx.get('buttons.sub.underline'));
+			this._set_commandMap(textTags.italic.toUpperCase(), ctx.get('buttons.sub.italic'));
+			this._set_commandMap(textTags.strike.toUpperCase(), ctx.get('buttons.sub.strike'));
+			this._set_commandMap(textTags.sub.toUpperCase(), ctx.get('buttons.sub.subscript'));
+			this._set_commandMap(textTags.sup.toUpperCase(), ctx.get('buttons.sub.superscript'));
+		}
 
 		this._saveButtonStates();
 	},
@@ -1203,6 +1251,7 @@ Editor.prototype = {
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
 		this.status.isChanged = true;
 		if (this.context.has('buttons.save')) this.context.get('buttons.save').removeAttribute('disabled');
+		if (this.context.has('buttons.sub.save')) this.context.get('buttons.sub.save').removeAttribute('disabled');
 		// user event
 		if (this.events.onChange) this.events.onChange(this.html.get());
 		if (this.context.get('toolbar.main').style.display === 'block') this.toolbar._showBalloon();
@@ -1222,7 +1271,7 @@ Editor.prototype = {
 	},
 
 	_codeViewAutoHeight: function () {
-		if (this.status.isFullScreen) return;
+		if (this.frameContext.get('isFullScreen')) return;
 		this.frameContext.get('code').style.height = this.frameContext.get('code').scrollHeight + 'px';
 	},
 
@@ -1233,8 +1282,11 @@ Editor.prototype = {
 	_editorInit: function () {
 		// set modes
 		this.isInline = /inline/i.test(this.options.get('mode'));
-		this.isBalloon = /balloon/i.test(this.options.get('mode')) || /balloon/i.test(this.options.get('subMode'));
-		this.isBalloonAlways = /balloon-always/i.test(this.options.get('mode')) || /balloon-always/i.test(this.options.get('subMode'));
+		this.isBalloon = /balloon/i.test(this.options.get('mode'));
+		this.isBalloonAlways = /balloon-always/i.test(this.options.get('mode'));
+		// set subToolbar modes
+		this.isSubBalloon = /balloon/i.test(this.options.get('subMode'));
+		this.isSubBalloonAlways = /balloon-always/i.test(this.options.get('subMode'));
 
 		// register class
 		this._registerClass();
@@ -1310,6 +1362,7 @@ Editor.prototype = {
 		let plugin;
 		for (let key in plugins) {
 			this.registerPlugin(key, this._pluginCallButtons[key]);
+			this.registerPlugin(key, this._pluginCallButtons_sub[key]);
 			plugin = this.plugins[key];
 
 			// Filemanager
@@ -1346,6 +1399,8 @@ Editor.prototype = {
 		this._fileManager.queryString = this._fileManager.tags.join(',');
 		this._fileManager.regExp = new this._w.RegExp('^(' + (this._fileManager.tags.join('|') || '\\^') + ')$', 'i');
 		this._fileManager.pluginRegExp = new this._w.RegExp('^(' + (filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')) + ')$', 'i');
+
+		this._pluginCallButtons = this._pluginCallButtons_sub = null;
 	},
 
 	_fixCurrentController: function (fixed) {

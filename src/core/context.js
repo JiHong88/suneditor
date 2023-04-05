@@ -1,5 +1,9 @@
-import { _w } from '../helper/env';
-import { get as getNumber } from '../helper/numbers';
+import {
+	_w
+} from '../helper/env';
+import {
+	get as getNumber
+} from '../helper/numbers';
 
 /**
  * @description Elements and variables you should have
@@ -71,9 +75,14 @@ export const CreateContext = function (toolbar, toolbarContainer, menuTray, subb
 	}
 
 	if (subbar) {
-		m.set('toolbar.sub', subbar);
+		m.set('toolbar.sub.main', subbar);
+		m.set('toolbar.sub._buttonTray', subbar.querySelector('.se-btn-tray'));
 		m.set('toolbar.sub._arrow', subbar.querySelector('.se-arrow'));
 		m.set('toolbar.sub._wrapper', subbar.parentElement.parentElement);
+		for (let i = 0, len = BASIC_COMMANDS.length, b; i < len; i++) {
+			b = subbar.querySelector('[data-command="' + BASIC_COMMANDS[i] + '"]');
+			if (b) m.set('buttons.sub.' + BASIC_COMMANDS[i], b);
+		}
 	}
 
 	return m;
