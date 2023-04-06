@@ -1111,10 +1111,9 @@ Editor.prototype = {
 	_saveButtonStates: function (isSub) {
 		const currentButtons = this.context.get(isSub ? 'toolbar.sub._buttonTray' : 'toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
 		const btns = isSub ? this.subAllCommandButtons : this.allCommandButtons;
-		for (let i = 0, element, command; i < currentButtons.length; i++) {
+		for (let i = 0, element; i < currentButtons.length; i++) {
 			element = currentButtons[i];
-			command = element.getAttribute('data-command');
-			btns.set(command, element);
+			btns.set(element.getAttribute('data-command'), element);
 		}
 		if (!isSub && this.options.has('subMode')) {
 			this._saveButtonStates(true);
@@ -1128,14 +1127,11 @@ Editor.prototype = {
 	_recoverButtonStates: function (isSub) {
 		const currentButtons = this.context.get(isSub ? 'toolbar.sub._buttonTray' : 'toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
 		const btns = isSub ? this.subAllCommandButtons : this.allCommandButtons;
-		for (let i = 0, button, command, oldButton; i < currentButtons.length; i++) {
+		for (let i = 0, button, oldButton; i < currentButtons.length; i++) {
 			button = currentButtons[i];
-			command = button.getAttribute('data-command');
-
-			oldButton = btns.get(command);
+			oldButton = btns.get(button.getAttribute('data-command'));
 			if (oldButton) {
 				button.parentElement.replaceChild(oldButton, button);
-				if (this.context.get('buttons.' + (isSub ? 'sub.' : '') + command)) this.context.set('buttons.' + (isSub ? 'sub.' : '') + command, oldButton);
 			}
 		}
 	},

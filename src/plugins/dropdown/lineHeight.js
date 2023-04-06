@@ -24,6 +24,19 @@ LineHeight.type = 'dropdown';
 LineHeight.className = '';
 LineHeight.prototype = {
 	/**
+	 * @override core
+	 */
+	active: function (element, target) {
+		if (element && element.style && element.style.lineHeight.length > 0) {
+			domUtils.addClass(target, 'active');
+			return true;
+		}
+
+		domUtils.removeClass(target, 'active');
+		return false;
+	},
+
+	/**
 	 * @override dropdown
 	 */
 	on: function () {
@@ -56,6 +69,8 @@ LineHeight.prototype = {
 		}
 
 		this.menu.dropdownOff();
+
+		this.editor.effectNode = null;
 		this.history.push(false);
 	},
 
