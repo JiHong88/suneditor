@@ -1,6 +1,5 @@
 /**
  * @fileoverview Menu class
- * @author Yi JiHong.
  */
 
 import Modal from '../../modules/Modal';

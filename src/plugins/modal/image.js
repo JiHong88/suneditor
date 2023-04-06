@@ -6,7 +6,7 @@ const Image_ = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.image;
-	this.icon = this.icons.image;
+	this.icon = 'image';
 
 	// create HTML
 	const options = this.options;

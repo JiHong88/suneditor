@@ -346,7 +346,7 @@ const editor_root = (window.e = suneditor.create({
 		}
 	}
 }, {
-	mode: "balloon-always",
+	mode: "inline",
 	// toolbar_width: 300,
 	// textDirection: 'rtl',
 	// value: 'Common value',
@@ -369,6 +369,7 @@ const editor_root = (window.e = suneditor.create({
 	// codeMirror: {
 	// 	src: Codemirror5
 	// },
+	// iframe:true,
 	toolbar_sticky: 0,
 	imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
 	lineAttrReset: 'id',

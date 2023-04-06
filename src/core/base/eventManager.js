@@ -1,6 +1,5 @@
 /**
  * @fileoverview eventManager class
- * @author Yi JiHong.
  */
 
 import CoreDependency from '../../dependency/_core';
@@ -564,12 +563,14 @@ EventManager.prototype = {
 			this._toolbarObserver = new _w.ResizeObserver(
 				function () {
 					this.toolbar.resetResponsiveToolbar();
-					if (this.options.has('subMode')) this.subToolbar.resetResponsiveToolbar();
 				}.bind(this)
 			);
 			this._resizeObserver = new _w.ResizeObserver(
 				function (entries) {
-					this.editor.__callResizeFunction(-1, entries[0]);
+					const inst = this;
+					entries.forEach(function (e) {
+						inst.editor.__callResizeFunction(inst.editor.rootTargets.get(e.target.getAttribute('data-root-key')), -1, e);
+					})
 				}.bind(this)
 			);
 		}

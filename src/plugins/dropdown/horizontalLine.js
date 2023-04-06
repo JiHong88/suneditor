@@ -5,7 +5,7 @@ const HorizontalLine = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.horizontalLine;
-	this.icon = this.icons.horizontal_line;
+	this.icon = 'horizontal_line';
 
 	// create HTML
 	const HRMenus = CreateHTML(editor);

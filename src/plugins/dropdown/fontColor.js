@@ -6,7 +6,7 @@ const FontColor = function (editor) {
 	EditorDependency.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.fontColor;
-	this.icon = this.icons.font_color;
+	this.icon = 'font_color';
 
 	// members
 	this.colorPicker = new ColorPicker(this, 'color', this.options.get('colorList_font'));

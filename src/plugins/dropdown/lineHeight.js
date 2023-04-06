@@ -5,7 +5,7 @@ const LineHeight = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.lineHeight;
-	this.icon = this.icons.line_height;
+	this.icon = 'line_height';
 
 	// create HTML
 	const menu = CreateHTML(editor);

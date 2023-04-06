@@ -1,6 +1,5 @@
 /**
  * @fileoverview Menu class
- * @author Yi JiHong.
  */
 
 import CoreDependency from '../../dependency/_core';
@@ -20,8 +19,6 @@ const Menu = function (editor) {
 	this.currentContainer = null;
 	this.currentContainerActiveButton = null;
 	this._bindedContainerOff = null;
-	// more layer
-	this.currentMoreLayerActiveButton = null;
 };
 
 Menu.prototype = {
@@ -131,24 +128,6 @@ Menu.prototype = {
 		this.offset.setRelPosition(menu, this.editor._carrierWrapper, element.parentElement, domUtils.getParentElement(element, '.se-toolbar'));
 
 		menu.style.visibility = '';
-	},
-
-	_moreLayerOn: function (button, layer) {
-		this._moreLayerOff();
-		this.currentMoreLayerActiveButton = button;
-		layer.style.display = 'block';
-	},
-
-	/**
-	 * @description Disable more layer
-	 */
-	_moreLayerOff: function () {
-		if (this.currentMoreLayerActiveButton) {
-			const layer = this.context.get('toolbar.main').querySelector('.' + this.currentMoreLayerActiveButton.getAttribute('data-command'));
-			layer.style.display = 'none';
-			domUtils.removeClass(this.currentMoreLayerActiveButton, 'on');
-			this.currentMoreLayerActiveButton = null;
-		}
 	}
 };
 

@@ -5,7 +5,7 @@ const TextStyle = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.textStyle;
-	this.icon = this.icons.text_style;
+	this.icon = 'text_style';
 
 	// create HTML
 	const menu = CreateHTML(editor);

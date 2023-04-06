@@ -1,6 +1,5 @@
 /**
  * @fileoverview Viewer class
- * @author Yi JiHong.
  */
 
 import CoreDependency from '../../dependency/_core';
@@ -456,7 +455,7 @@ Viewer.prototype = {
 
 			let headers = parseDocument.head.innerHTML;
 			if (!parseDocument.head.querySelector('link[rel="stylesheet"]') || (this.editor.frameOptions.get('height') === 'auto' && !parseDocument.head.querySelector('style'))) {
-				headers += converter._setIframeCssTags(this.options, this.editor.frameOptions.get('height'));
+				headers += converter._setIframeCssTags(this.options.get('iframe_cssFileName'), this.editor.frameOptions.get('height'));
 			}
 
 			wDoc.head.innerHTML = headers;

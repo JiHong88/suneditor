@@ -5,7 +5,7 @@ const ParagraphStyle = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.paragraphStyle;
-	this.icon = this.icons.paragraph_style;
+	this.icon = 'paragraph_style';
 
 	// create HTML
 	const menu = CreateHTML(editor);

@@ -5,7 +5,7 @@ const Layout = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.layout;
-	this.icon = this.icons.layout;
+	this.icon = 'layout';
 
 	// create HTML
 	const menu = CreateHTML(editor);

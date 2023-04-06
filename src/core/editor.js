@@ -207,12 +207,6 @@ const Editor = function (multiTargets, options) {
 	this._prevRtl = this.options.get('_rtl');
 
 	/**
-	 * @description Property related to editor resizing.
-	 * @private
-	 */
-	this._editorHeight = 0;
-
-	/**
 	 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
 	 * @private
 	 */
@@ -321,7 +315,20 @@ const Editor = function (multiTargets, options) {
 	this._parser = new _w.DOMParser();
 
 	/** ----- Create editor ------------------------------------------------------------ */
+	// set modes
+	this.isInline = /inline/i.test(this.options.get('mode'));
+	this.isBalloon = /balloon/i.test(this.options.get('mode'));
+	this.isBalloonAlways = /balloon-always/i.test(this.options.get('mode'));
+	// set subToolbar modes
+	this.isSubBalloon = /balloon/i.test(this.options.get('subMode'));
+	this.isSubBalloonAlways = /balloon-always/i.test(this.options.get('subMode'));
+	
+	// register class
+	this._registerClass();
+	
+	// init
 	const inst = this;
+	const isIframe = inst.options.get('iframe');
 	const rootSize = this.rootTargets.size;
 	let rootIndex = 0;
 	this.rootTargets.forEach(function (e) {
@@ -330,17 +337,20 @@ const Editor = function (multiTargets, options) {
 		o.style.display = 'none';
 		t.style.display = 'block';
 		o.parentNode.insertBefore(t, o.nextElementSibling);
-		e.get('editorArea').appendChild(e.get('wysiwygFrame'));
 
-		if (inst.options.get('iframe')) {
+		if (isIframe) {
 			e.get('wysiwygFrame').addEventListener('load', function () {
-				converter._setIframeDocument(this, inst, e.get('options').get('height'));
+				converter._setIframeDocument(this, inst.options, e.get('options').get('height'));
 				if (rootSize === ++rootIndex) inst._editorInit();
 			});
 		}
+
+		e.get('editorArea').appendChild(e.get('wysiwygFrame'));
 	});
 
-	if (!this.options.get('iframe')) this._editorInit();
+	if (!isIframe) {
+		this._editorInit();
+	}
 };
 
 Editor.prototype = {
@@ -391,18 +401,20 @@ Editor.prototype = {
 	runPlugin: function (command, type, target) {
 		if (type) {
 			if (/more/i.test(type)) {
-				if (target !== this.menu.currentMoreLayerActiveButton) {
-					const layer = domUtils.getParentElement(target, '.se-toolbar').querySelector('.' + command);
+				const toolbar = domUtils.getParentElement(target, '.se-toolbar');
+				const toolInst = domUtils.hasClass(toolbar, 'se-toolbar-sub') ? this.subToolbar : this.toolbar;
+				if (target !== toolInst.currentMoreLayerActiveButton) {
+					const layer = toolbar.querySelector('.' + command);
 					if (layer) {
-						this.menu._moreLayerOn(target, layer);
-						this.toolbar._showBalloon();
-						this.toolbar._showInline();
+						toolInst._moreLayerOn(target, layer);
+						toolInst._showBalloon();
+						toolInst._showInline();
 					}
 					domUtils.addClass(target, 'on');
-				} else if (this.menu.currentMoreLayerActiveButton) {
-					this.menu._moreLayerOff();
-					this.toolbar._showBalloon();
-					this.toolbar._showInline();
+				} else if (toolInst.currentMoreLayerActiveButton) {
+					toolInst._moreLayerOff();
+					toolInst._showBalloon();
+					toolInst._showInline();
 				}
 				return;
 			}
@@ -807,8 +819,9 @@ Editor.prototype = {
 			this._offCurrentController();
 			this._offCurrentModal();
 
+			if (this.toolbar.currentMoreLayerActiveButton && this.toolbar.currentMoreLayerActiveButton.disabled) this.toolbar.moreLayerOff();
+			if (this.subToolbar && this.subToolbar.currentMoreLayerActiveButton && this.subToolbar.currentMoreLayerActiveButton.disabled) this.subToolbar.moreLayerOff();
 			if (this.menu.currentDropdownActiveButton && this.menu.currentDropdownActiveButton.disabled) this.menu.dropdownOff();
-			if (this.menu.currentMoreLayerActiveButton && this.menu.currentMoreLayerActiveButton.disabled) this.menu.moreLayerOff();
 			if (this.menu.currentContainerActiveButton && this.menu.currentContainerActiveButton.disabled) this.menu.containerOff();
 			if (this.modalForm) this.plugins.modal.close.call(this);
 
@@ -934,7 +947,7 @@ Editor.prototype = {
 	_setFrameInfo: function (rt) {
 		this.frameContext = rt;
 		this.frameOptions = rt.get('options');
-		this._editorHeight = rt.get('wysiwygFrame').offsetHeight;
+		rt.set('_editorHeight', rt.get('wysiwygFrame').offsetHeight)
 		this._lineBreakerButton = rt.get('lineBreaker').querySelector('button');
 		this._lineBreaker_t = rt.get('lineBreaker_t');
 		this._lineBreaker_b = rt.get('lineBreaker_b');
@@ -1125,9 +1138,6 @@ Editor.prototype = {
 				if (this.context.get('buttons.' + (isSub ? 'sub.' : '') + command)) this.context.set('buttons.' + (isSub ? 'sub.' : '') + command, oldButton);
 			}
 		}
-		if (!isSub && this.options.has('subMode')) {
-			this._recoverButtonStates(true);
-		}
 	},
 
 	/**
@@ -1205,24 +1215,24 @@ Editor.prototype = {
 				function () {
 					const h = this._iframeAuto.offsetHeight;
 					fc.get('wysiwygFrame').style.height = h + 'px';
-					if (!env.isResizeObserverSupported) this.__callResizeFunction(h, null);
+					if (!env.isResizeObserverSupported) this.__callResizeFunction(fc, h, null);
 				}.bind(this)
 			);
 		} else if (!env.isResizeObserverSupported) {
-			this.__callResizeFunction(fc.get('wysiwygFrame').offsetHeight, null);
+			this.__callResizeFunction(fc, fc.get('wysiwygFrame').offsetHeight, null);
 		}
 	},
 
-	__callResizeFunction: function (h, resizeObserverEntry) {
+	__callResizeFunction: function (fc, h, resizeObserverEntry) {
 		h =
 			h === -1
 				? resizeObserverEntry && resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0]
 					? resizeObserverEntry.borderBoxSize[0].blockSize
-					: resizeObserverEntry.contentRect.height + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(this.frameContext.get('wwComputedStyle').getPropertyValue('padding-right'))
+					: resizeObserverEntry.contentRect.height + numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-right'))
 				: h;
-		if (this._editorHeight !== h) {
-			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, this._editorHeight, resizeObserverEntry);
-			this._editorHeight = h;
+		if (fc.get('_editorHeight') !== h) {
+			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, fc.get('_editorHeight'), resizeObserverEntry);
+			fc.set('_editorHeight', h);
 		}
 	},
 
@@ -1261,6 +1271,7 @@ Editor.prototype = {
 		// user event
 		if (this.events.onChange) this.events.onChange(this.html.get());
 		if (this.context.get('toolbar.main').style.display === 'block') this.toolbar._showBalloon();
+		else if (this.context.get('toolbar.sub.main').style.display === 'block') this.subToolbar._showBalloon();
 	},
 
 	_codeViewAutoHeight: function () {
@@ -1273,17 +1284,6 @@ Editor.prototype = {
 	 * @private
 	 */
 	_editorInit: function () {
-		// set modes
-		this.isInline = /inline/i.test(this.options.get('mode'));
-		this.isBalloon = /balloon/i.test(this.options.get('mode'));
-		this.isBalloonAlways = /balloon-always/i.test(this.options.get('mode'));
-		// set subToolbar modes
-		this.isSubBalloon = /balloon/i.test(this.options.get('subMode'));
-		this.isSubBalloonAlways = /balloon-always/i.test(this.options.get('subMode'));
-
-		// register class
-		this._registerClass();
-
 		this.rootTargets.forEach(
 			function (e) {
 				this._setEditorParams(e);

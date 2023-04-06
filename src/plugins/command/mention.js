@@ -5,7 +5,7 @@ const Mention = function (editor) {
 	EditorDependency.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.mention;
-	this.icon = this.icons.mention;
+	this.icon = 'mention';
 
 	// members
 };

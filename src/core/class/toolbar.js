@@ -1,6 +1,5 @@
 /**
  * @fileoverview Toolbar class
- * @author Yi JiHong.
  */
 
 import { domUtils } from '../../helper';
@@ -12,6 +11,8 @@ const Toolbar = function (editor, params) {
 
 	// members
 	this.keyName = params.keyName;
+	this.isSub = /sub/.test(params.keyName);
+	this.currentMoreLayerActiveButton = null;
 	this._isBalloon = params.balloon;
 	this._isInline = params.inline;
 	this._isBalloonAlways = params.balloonAlways;
@@ -39,8 +40,8 @@ Toolbar.prototype = {
 	 */
 	disable: function () {
 		/** off menus */
+		this._moreLayerOff();
 		this.menu.dropdownOff();
-		this.menu._moreLayerOff();
 		this.menu.containerOff();
 		domUtils.setDisabled(this.context.get(this.keyName + '._buttonTray').querySelectorAll('.se-menu-list button[data-type]'), true);
 	},
@@ -65,7 +66,7 @@ Toolbar.prototype = {
 			this.editor.frameContext.get('_stickyDummy').style.display = '';
 		}
 
-		this.resetResponsiveToolbar();
+		if (!this.isSub) this.resetResponsiveToolbar();
 	},
 
 	/**
@@ -125,15 +126,15 @@ Toolbar.prototype = {
 	 * @param {Array} buttonList Button list
 	 */
 	setButtons: function (buttonList) {
+		this._moreLayerOff();
 		this.menu.dropdownOff();
 		this.menu.containerOff();
-		this.menu._moreLayerOff();
 
 		const newToolbar = CreateToolBar(buttonList, this.plugins, this.options, this.icons, this.lang);
 		this.context.get(this.keyName + '.main').replaceChild(newToolbar._buttonTray, this.context.get(this.keyName + '._buttonTray'));
 		this.context.set(this.keyName + '._buttonTray', newToolbar._buttonTray);
 
-		this.editor._recoverButtonStates();
+		this.editor._recoverButtonStates(this.isSub);
 		this.history.resetButtons();
 		this._resetSticky();
 
@@ -223,6 +224,7 @@ Toolbar.prototype = {
 		if (!this._isBalloon || this.editor.opendControllers.length > 0) {
 			return;
 		}
+		if (this.isSub) this.resetResponsiveToolbar();
 
 		const range = rangeObj || this.selection.getRange();
 		const toolbar = this.context.get(this.keyName + '.main');
@@ -268,6 +270,11 @@ Toolbar.prototype = {
 		const toolbarHeight = toolbar.offsetHeight;
 
 		this._setBalloonPosition(positionTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop);
+		if (this.isSub && (this.offset.getGlobal(toolbar).top - offsets.top) < 0) {
+			positionTop = !positionTop;
+			this._setBalloonPosition(positionTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop);
+		}
+
 		if (toolbarWidth !== toolbar.offsetWidth || toolbarHeight !== toolbar.offsetHeight) {
 			this._setBalloonPosition(positionTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop);
 		}
@@ -359,6 +366,24 @@ Toolbar.prototype = {
 		this._resetSticky();
 		this._inlineToolbarAttr.isShow = true;
 		toolbar.style.visibility = '';
+	},
+
+	_moreLayerOn: function (button, layer) {
+		this._moreLayerOff();
+		this.currentMoreLayerActiveButton = button;
+		layer.style.display = 'block';
+	},
+
+	/**
+	 * @description Disable more layer
+	 */
+	_moreLayerOff: function () {
+		if (this.currentMoreLayerActiveButton) {
+			const layer = this.context.get(this.keyName + '.main').querySelector('.' + this.currentMoreLayerActiveButton.getAttribute('data-command'));
+			layer.style.display = 'none';
+			domUtils.removeClass(this.currentMoreLayerActiveButton, 'on');
+			this.currentMoreLayerActiveButton = null;
+		}
 	},
 
 	constructor: Toolbar

@@ -141,13 +141,13 @@ export function _setDefaultOptionStyle(fo, cssText) {
 /**
  * @description Set default attribute of the iframe
  * @param {HTMLIFrameElement} frame iframe
- * @param {Object.<string, any>} options Options
+ * @param {Object.<string, any>} originOptions Options
  * @private
  */
-export function _setIframeDocument(frame, options, frameHeight) {
+export function _setIframeDocument(frame, originOptions, frameHeight) {
 	frame.setAttribute('scrolling', 'auto');
-	frame.contentDocument.head.innerHTML = '<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' + _setIframeCssTags(options, frameHeight);
-	frame.contentDocument.body.className = options.get('_editableClass');
+	frame.contentDocument.head.innerHTML = '<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' + _setIframeCssTags(originOptions.get('iframe_cssFileName'), frameHeight);
+	frame.contentDocument.body.className = originOptions.get('_editableClass');
 	frame.contentDocument.body.setAttribute('contenteditable', true);
 }
 
@@ -156,28 +156,29 @@ export function _setIframeDocument(frame, options, frameHeight) {
  * @param {Object.<string, any>} options Options
  * @returns {string} "<style>...</style>"
  */
-export function _setIframeCssTags(options, frameHeight) {
-	const linkNames = options.get('iframe_cssFileName');
+export function _setIframeCssTags(linkNames, frameHeight) {
 	const wRegExp = _w.RegExp;
 	let tagString = '';
 
-	for (let f = 0, len = linkNames.length, path; f < len; f++) {
-		path = [];
-
-		if (/(^https?:\/\/)|(^data:text\/css,)/.test(linkNames[f])) {
-			path.push(linkNames[f]);
-		} else {
-			const CSSFileName = new wRegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?\\.css(?:\\?.*|;.*)?$', 'i');
-			for (let c = _d.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
-				styleTag = c[i].href.match(CSSFileName);
-				if (styleTag) path.push(styleTag[0]);
+	if (linkNames) {
+		for (let f = 0, len = linkNames.length, path; f < len; f++) {
+			path = [];
+	
+			if (/(^https?:\/\/)|(^data:text\/css,)/.test(linkNames[f])) {
+				path.push(linkNames[f]);
+			} else {
+				const CSSFileName = new wRegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?\\.css(?:\\?.*|;.*)?$', 'i');
+				for (let c = _d.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
+					styleTag = c[i].href.match(CSSFileName);
+					if (styleTag) path.push(styleTag[0]);
+				}
 			}
-		}
-
-		if (!path || path.length === 0) throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframe_cssFileName" before creating editor instances.';
-
-		for (let i = 0, len = path.length; i < len; i++) {
-			tagString += '<link href="' + path[i] + '" rel="stylesheet">';
+	
+			if (!path || path.length === 0) throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframe_cssFileName" before creating editor instances.';
+	
+			for (let i = 0, len = path.length; i < len; i++) {
+				tagString += '<link href="' + path[i] + '" rel="stylesheet">';
+			}
 		}
 	}
 

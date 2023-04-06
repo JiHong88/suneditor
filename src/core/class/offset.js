@@ -1,6 +1,5 @@
 /**
  * @fileoverview Offset class
- * @author Yi JiHong.
  */
 
 import CoreDependency from '../../dependency/_core';

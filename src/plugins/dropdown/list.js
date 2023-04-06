@@ -5,7 +5,7 @@ const List = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.list;
-	this.icon = this.icons.list_number;
+	this.icon = 'list_number';
 
 	// create HTML
 	const menu = CreateHTML(editor);

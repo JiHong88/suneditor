@@ -6,7 +6,7 @@ const Video = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.video;
-	this.icon = this.icons.video;
+	this.icon = 'video';
 
 	// create HTML
 	const options = this.options;

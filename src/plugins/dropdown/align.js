@@ -6,7 +6,7 @@ const Align = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.align;
-	this.icon = this.options.get('_rtl') ? this.icons.align_right : this.icons.align_left;
+	this.icon = this.options.get('_rtl') ? 'align_right' : 'align_left';
 
 	// create HTML
 	const menu = CreateHTML(editor, !editor.options.get('_rtl'));

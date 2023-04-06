@@ -5,7 +5,7 @@ const ImageGallery = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.imageGallery;
-	this.icon = this.icons.image_gallery;
+	this.icon = 'image_gallery';
 
 	// modules
 	this.fileBrowser = new FileBrowser(this, {

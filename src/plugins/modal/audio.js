@@ -6,7 +6,7 @@ const Audio_ = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.audio;
-	this.icon = this.icons.audio;
+	this.icon = 'audio';
 
 	// create HTML
 	const modalEl = CreateHTML_modal(editor);

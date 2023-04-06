@@ -5,7 +5,7 @@ const Blockquote = function (editor) {
 	EditorDependency.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.tag_blockquote;
-	this.icon = this.icons.blockquote;
+	this.icon = 'blockquote';
 
 	// members
 	this.quoteTag = domUtils.createElement('BLOCKQUOTE');

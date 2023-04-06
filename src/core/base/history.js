@@ -1,6 +1,5 @@
 /**
  * @fileoverview history stack closure
- * @author Yi JiHong.
  */
 
 import { _w } from '../../helper/env';
@@ -169,7 +168,7 @@ export default function (editor, change) {
 			rootKey = rootKey || editor.status.rootKey;
 			const range = editor.status._range;
 
-			_w.setTimeout(editor._resourcesStateChange.bind(editor));
+			_w.setTimeout(editor._resourcesStateChange.bind(editor, rootTargets.get(rootKey)));
 			const time = typeof delay === 'number' ? (delay > 0 ? delay : 0) : !delay ? 0 : delayTime;
 
 			if (!time || pushDelay) {

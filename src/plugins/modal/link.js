@@ -6,7 +6,7 @@ const Link = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.link;
-	this.icon = this.icons.link;
+	this.icon = 'link';
 
 	// create HTML
 	const modalEl = CreateHTML_modal(editor);

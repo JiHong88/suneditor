@@ -13,7 +13,7 @@ const Math_ = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.math;
-	this.icon = this.icons.math;
+	this.icon = 'math';
 
 	// create HTML
 	const modalEl = CreateHTML_modal(editor, this);

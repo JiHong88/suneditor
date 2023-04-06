@@ -113,7 +113,7 @@ const Constructor = function (editorTargets, options) {
 		container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-shadow' }));
 
 		// init element
-		const initElements = _initTargetElements(o, top_div, to);
+		const initElements = _initTargetElements(editTarget.key, o, top_div, to);
 		const bottomBar = initElements.bottomBar;
 		const status_bar = bottomBar.statusbar;
 		const wysiwyg_div = initElements.wysiwygFrame;
@@ -558,11 +558,12 @@ function InitFrameOptions(o, origin, fo) {
 
 /**
  * @description Initialize property of suneditor elements
+ * @param {string} key Key
  * @param {Object} options Options
  * @param {Element} topDiv Suneditor top div
  * @returns {Object} Bottom bar elements (statusbar, navigation, charWrapper, charCounter)
  */
-function _initTargetElements(options, topDiv, targetOptions) {
+function _initTargetElements(key, options, topDiv, targetOptions) {
 	const editorStyles = targetOptions.get('_defaultStyles');
 	/** top div */
 	topDiv.style.cssText = editorStyles.top;
@@ -570,7 +571,8 @@ function _initTargetElements(options, topDiv, targetOptions) {
 	/** editor */
 	// wysiwyg div or iframe
 	const wysiwygDiv = domUtils.createElement(!options.get('iframe') ? 'DIV' : 'IFRAME', {
-		class: 'se-wrapper-inner se-wrapper-wysiwyg'
+		class: 'se-wrapper-inner se-wrapper-wysiwyg',
+		'data-root-key': key
 	});
 
 	if (!options.get('iframe')) {
@@ -916,6 +918,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 
 	let modules = null;
 	let button = null;
+	let plugin = null;
 	let moduleElement = null;
 	let buttonElement = null;
 	let vertical = false;
@@ -935,7 +938,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 			for (let j = 0, moreButton; j < buttonGroup.length; j++) {
 				button = buttonGroup[j];
 				moreButton = false;
-				const plugin = plugins[button];
+				plugin = plugins[button];
 
 				if (/^\%\d+/.test(button) && j === 0) {
 					buttonGroup[0] = button.replace(/[^\d]/g, '');
@@ -944,7 +947,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 					continue buttonGroupLoop;
 				}
 
-				if (/function/.test(typeof plugin)) {
+				if (/function|object/.test(typeof plugin)) {
 					modules = [plugin.className, plugin.title, button, plugin.type, plugin.innerHTML, plugin._disabled];
 				} else {
 					// align

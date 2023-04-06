@@ -6,7 +6,7 @@ const Table = function (editor) {
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.table;
-	this.icon = this.icons.table;
+	this.icon = 'table';
 
 	// create HTML
 	this.cellControllerTop = this.options.get('tableCellControllerPosition') === 'top';
