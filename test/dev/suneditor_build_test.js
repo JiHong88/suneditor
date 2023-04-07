@@ -346,7 +346,7 @@ const editor_root = (window.e = suneditor.create({
 		}
 	}
 }, {
-	mode: "inline",
+	// mode: "inline",
 	// toolbar_width: 300,
 	// textDirection: 'rtl',
 	// value: 'Common value',
@@ -376,7 +376,7 @@ const editor_root = (window.e = suneditor.create({
 	attributeWhitelist: 'id',
 	buttonList: bl,
 	subToolbar: {
-		buttonList: [['bold','dir', 'dir_ltr', 'dir_rtl']],
+		buttonList: [['bold','dir', 'dir_ltr', 'dir_rtl', 'save']],
 		width: 'auto',
 		mode: 'balloon' // balloon, balloon-always, balloon-block
 	},

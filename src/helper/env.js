@@ -221,12 +221,12 @@ function isAndroid() {
 /**
  * @description Command(Mac) or CTRL(Window) icon.
  */
-export const cmdIcon = isOSX_IOS ? '⌘' : 'CTRL';
+export const cmdIcon = isOSX_IOS() ? '⌘' : 'CTRL';
 
 /**
  * @description SHIFT(Mac, Window) icon.
  */
-export const shiftIcon = isOSX_IOS ? '⇧' : '+SHIFT';
+export const shiftIcon = isOSX_IOS() ? '⇧' : '+SHIFT';
 
 export const _allowedEmptyNodeList = '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details';
 

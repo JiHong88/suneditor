@@ -7,7 +7,7 @@ import EventManager from './eventManager';
 import ClassDependency from '../dependency/_classes';
 
 // base
-import { SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './base/actives';
+import { SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE, BASIC_COMMANDS, GET_DEFAULT_COMMAND_KEY } from './base/actives';
 
 // classes
 import Char from './class/char';
@@ -142,12 +142,18 @@ const Editor = function (multiTargets, options) {
 	 */
 	this.helper = Helper;
 
-	// ----- Properties not shared with core -----
+	// ----- Properties not shared with _core -----
 	/**
-	 * @description Command button map
+	 * @description All command buttons map
 	 */
 	this.allCommandButtons = new _w.Map();
 	this.subAllCommandButtons = new _w.Map();
+
+	/**
+	 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
+	 * Each button is contained in an array.
+	 */
+	this.cmdTargetMap = new _w.Map();
 
 	/**
 	 * @description Plugins array with "active" method.
@@ -281,13 +287,6 @@ const Editor = function (multiTargets, options) {
 	};
 
 	/**
-	 * @description Elements that need to change text or className for each selection change
-	 * After creating the editor, "activePlugins" are added.
-	 * @private
-	 */
-	this._commandMap = new _w.Map();
-
-	/**
 	 * @description Current Figure container.
 	 * @private
 	 */
@@ -306,10 +305,10 @@ const Editor = function (multiTargets, options) {
 	// set subToolbar modes
 	this.isSubBalloon = /balloon/i.test(this.options.get('subMode'));
 	this.isSubBalloonAlways = /balloon-always/i.test(this.options.get('subMode'));
-	
+
 	// register class
 	this._registerClass();
-	
+
 	// init
 	const inst = this;
 	const isIframe = inst.options.get('iframe');
@@ -338,15 +337,6 @@ const Editor = function (multiTargets, options) {
 };
 
 Editor.prototype = {
-	_set_commandMap: function (pluginName, target) {
-		if (!pluginName || !target) return;
-		if (!this._commandMap.get(pluginName)) {
-			this._commandMap.set(pluginName, [target]);
-		} else if (this._commandMap.get(pluginName).indexOf(target) < 0) {
-			this._commandMap.get(pluginName).push(target);
-		}
-	},
-
 	/**
 	 * @description If the plugin is not added, add the plugin and call the 'add' function.
 	 * If the plugin is added call callBack function.
@@ -365,9 +355,6 @@ Editor.prototype = {
 		if (targets) {
 			for (let i = 0, len = targets.length; i < len; i++) {
 				UpdateButton(targets[i], plugin, this.icons, this.lang);
-				if (plugin.active) {
-					this._set_commandMap(pluginName, targets[i]);
-				}
 			}
 
 			if (this.activePlugins.indexOf(pluginName) < 0) {
@@ -500,6 +487,18 @@ Editor.prototype = {
 	},
 
 	/**
+	 * @description It is executed by inserting the button of cmdTargetMap as the argument value of the "f" function.
+	 * "f" is called as long as the button array's length.
+	 * @param {string} cmd data-command
+	 * @param {Function} f Function.
+	 */
+	applyCmdTarget: function (cmd, f) {
+		if (this.cmdTargetMap.has(cmd)) {
+			this.cmdTargetMap.get(cmd).forEach(f);
+		}
+	},
+
+	/**
 	 * @description Set direction to "rtl" or "ltr".
 	 * @param {string} dir "rtl" or "ltr"
 	 */
@@ -546,6 +545,12 @@ Editor.prototype = {
 		}
 
 		DIR_BTN_ACTIVE(this, rtl);
+
+		if (this.isBalloon) this.toolbar._showBalloon();
+		else if (this.isSubBalloon) this.subToolbar._showBalloon();
+
+		this.effectNode = null;
+		this.eventManager.applyTagEffect();
 	},
 
 	/**
@@ -994,22 +999,6 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Save the current buttons states to "allCommandButtons" map
-	 * @private
-	 */
-	_saveButtonStates: function (isSub) {
-		const currentButtons = this.context.get(isSub ? 'toolbar.sub._buttonTray' : 'toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
-		const btns = isSub ? this.subAllCommandButtons : this.allCommandButtons;
-		for (let i = 0, element; i < currentButtons.length; i++) {
-			element = currentButtons[i];
-			btns.set(element.getAttribute('data-command'), element);
-		}
-		if (!isSub && this.options.has('subMode')) {
-			this._saveButtonStates(true);
-		}
-	},
-
-	/**
 	 * @description Recover the current buttons states from "allCommandButtons" map
 	 * @private
 	 */
@@ -1023,43 +1012,6 @@ Editor.prototype = {
 				button.parentElement.replaceChild(oldButton, button);
 			}
 		}
-	},
-
-	/**
-	 * @description Caching basic buttons to use
-	 * @private
-	 */
-	_cachingButtons: function () {
-		const ctx = this.context;
-		const textTags = this.options.get('textTags');
-		const codeDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])';
-		const controllerDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])';
-
-		this._codeViewDisabledButtons = this._w.Array.prototype.slice.call(ctx.get('toolbar._buttonTray').querySelectorAll(codeDisabledQuery));
-		this._controllerOnDisabledButtons = this._w.Array.prototype.slice.call(ctx.get('toolbar._buttonTray').querySelectorAll(controllerDisabledQuery));
-		this._set_commandMap('OUTDENT', ctx.get('buttons.outdent'));
-		this._set_commandMap('INDENT', ctx.get('buttons.indent'));
-		this._set_commandMap(textTags.bold.toUpperCase(), ctx.get('buttons.bold'));
-		this._set_commandMap(textTags.underline.toUpperCase(), ctx.get('buttons.underline'));
-		this._set_commandMap(textTags.italic.toUpperCase(), ctx.get('buttons.italic'));
-		this._set_commandMap(textTags.strike.toUpperCase(), ctx.get('buttons.strike'));
-		this._set_commandMap(textTags.sub.toUpperCase(), ctx.get('buttons.subscript'));
-		this._set_commandMap(textTags.sup.toUpperCase(), ctx.get('buttons.superscript'));
-
-		if (this.options.has('subMode')) {
-			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(this._w.Array.prototype.slice.call(ctx.get('toolbar.sub._buttonTray').querySelectorAll(codeDisabledQuery)));
-			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(this._w.Array.prototype.slice.call(ctx.get('toolbar.sub._buttonTray').querySelectorAll(controllerDisabledQuery)));
-			this._set_commandMap('OUTDENT', ctx.get('buttons.sub.outdent'));
-			this._set_commandMap('INDENT', ctx.get('buttons.sub.indent'));
-			this._set_commandMap(textTags.bold.toUpperCase(), ctx.get('buttons.sub.bold'));
-			this._set_commandMap(textTags.underline.toUpperCase(), ctx.get('buttons.sub.underline'));
-			this._set_commandMap(textTags.italic.toUpperCase(), ctx.get('buttons.sub.italic'));
-			this._set_commandMap(textTags.strike.toUpperCase(), ctx.get('buttons.sub.strike'));
-			this._set_commandMap(textTags.sub.toUpperCase(), ctx.get('buttons.sub.subscript'));
-			this._set_commandMap(textTags.sup.toUpperCase(), ctx.get('buttons.sub.superscript'));
-		}
-
-		this._saveButtonStates();
 	},
 
 	/**
@@ -1151,8 +1103,9 @@ Editor.prototype = {
 	_onChange_historyStack: function () {
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
 		this.status.isChanged = true;
-		if (this.context.has('buttons.save')) this.context.get('buttons.save').removeAttribute('disabled');
-		if (this.context.has('buttons.sub.save')) this.context.get('buttons.sub.save').removeAttribute('disabled');
+		this.applyCmdTarget('save', function (e) {
+			e.removeAttribute('disabled');
+		});
 		// user event
 		if (this.events.onChange) this.events.onChange(this.html.get());
 		if (this.context.get('toolbar.main').style.display === 'block') this.toolbar._showBalloon();
@@ -1279,6 +1232,59 @@ Editor.prototype = {
 		this._fileManager.pluginRegExp = new this._w.RegExp('^(' + (filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')) + ')$', 'i');
 
 		this._pluginCallButtons = this._pluginCallButtons_sub = null;
+	},
+
+	/**
+	 * @description Caching basic buttons to use
+	 * @private
+	 */
+	_cachingButtons: function () {
+		const ctx = this.context;
+		const codeDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])';
+		const controllerDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])';
+
+		this._codeViewDisabledButtons = this._w.Array.prototype.slice.call(ctx.get('toolbar._buttonTray').querySelectorAll(codeDisabledQuery));
+		this._controllerOnDisabledButtons = this._w.Array.prototype.slice.call(ctx.get('toolbar._buttonTray').querySelectorAll(controllerDisabledQuery));
+
+		if (this.options.has('subMode')) {
+			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(this._w.Array.prototype.slice.call(ctx.get('toolbar.sub._buttonTray').querySelectorAll(codeDisabledQuery)));
+			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(this._w.Array.prototype.slice.call(ctx.get('toolbar.sub._buttonTray').querySelectorAll(controllerDisabledQuery)));
+		}
+
+		this._saveButtonStates();
+	},
+
+	/**
+	 * @description Save the current buttons states to "allCommandButtons" map
+	 * @private
+	 */
+	_saveButtonStates: function (isSub) {
+		const currentButtons = this.context.get(isSub ? 'toolbar.sub._buttonTray' : 'toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
+		const btns = isSub ? this.subAllCommandButtons : this.allCommandButtons;
+		const textTAgs = this.options.get('textTags');
+		for (let i = 0, e, c; i < currentButtons.length; i++) {
+			e = currentButtons[i];
+			c = e.getAttribute('data-command');
+			btns.set(c, e);
+			this._setCmdTargetMap(c, e, textTAgs);
+		}
+		if (!isSub && this.options.has('subMode')) {
+			this._saveButtonStates(true);
+		}
+	},
+
+	_setCmdTargetMap: function (cmd, target, textTags) {
+		if (!cmd || !target) return;
+
+		const isBasicCmd = BASIC_COMMANDS.indexOf(cmd) > -1;
+		if (!isBasicCmd && !(this.plugins[cmd] && typeof this.plugins[cmd].active === 'function')) return;
+		if (isBasicCmd) cmd = GET_DEFAULT_COMMAND_KEY(textTags, cmd);
+
+		if (!this.cmdTargetMap.get(cmd)) {
+			this.cmdTargetMap.set(cmd, [target]);
+		} else if (this.cmdTargetMap.get(cmd).indexOf(target) < 0) {
+			this.cmdTargetMap.get(cmd).push(target);
+		}
 	},
 
 	_fixCurrentController: function (fixed) {

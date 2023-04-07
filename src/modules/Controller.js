@@ -118,6 +118,7 @@ Controller.prototype = {
 	/**
 	 * @description Hide controller at editor area (link button, image resize button..)
 	 * @param {KeyboardEvent|MouseEvent|null} e Event object when called from mousedown and keydown events registered in "_controllerOn"
+	 * @private
 	 */
 	_controllerOff: function () {
 		this.form.style.display = 'none';

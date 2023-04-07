@@ -1,9 +1,5 @@
-import {
-	_w
-} from '../helper/env';
-import {
-	get as getNumber
-} from '../helper/numbers';
+import { _w } from '../helper/env';
+import { get as getNumber } from '../helper/numbers';
 
 /**
  * @description Elements and variables you should have
@@ -50,7 +46,6 @@ export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFram
 	return m;
 };
 
-const BASIC_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'sub', 'sup', 'undo', 'redo', 'save', 'outdent', 'indent', 'fullScreen', 'showBlocks', 'codeView', 'dir', 'dir_ltr', 'dir_rtl'];
 /**
  * @description Common elements and variables you should have
  * @param {Element} toolbar Toolbar frame
@@ -69,20 +64,11 @@ export const CreateContext = function (toolbar, toolbarContainer, menuTray, subb
 		['_stickyDummy', toolbarContainer ? toolbarContainer.querySelector('.se-toolbar-sticky-dummy') : null]
 	]);
 
-	for (let i = 0, len = BASIC_COMMANDS.length, b; i < len; i++) {
-		b = toolbar.querySelector('[data-command="' + BASIC_COMMANDS[i] + '"]');
-		if (b) m.set('buttons.' + BASIC_COMMANDS[i], b);
-	}
-
 	if (subbar) {
 		m.set('toolbar.sub.main', subbar);
 		m.set('toolbar.sub._buttonTray', subbar.querySelector('.se-btn-tray'));
 		m.set('toolbar.sub._arrow', subbar.querySelector('.se-arrow'));
 		m.set('toolbar.sub._wrapper', subbar.parentElement.parentElement);
-		for (let i = 0, len = BASIC_COMMANDS.length, b; i < len; i++) {
-			b = subbar.querySelector('[data-command="' + BASIC_COMMANDS[i] + '"]');
-			if (b) m.set('buttons.sub.' + BASIC_COMMANDS[i], b);
-		}
 	}
 
 	return m;

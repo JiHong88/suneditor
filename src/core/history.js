@@ -8,8 +8,6 @@ import { getNodeFromPath, getNodePath } from '../helper/domUtils';
 export default function (editor, change) {
 	const rootTargets = editor.rootTargets;
 	const delayTime = editor.options.get('historyStackDelayTime');
-	let undo = editor.context.get('buttons.undo');
-	let redo = editor.context.get('buttons.redo');
 	let pushDelay = null;
 	let stackIndex, stack, rootStack, rootInitContents;
 
@@ -52,18 +50,34 @@ export default function (editor, change) {
 		else if (stackIndex >= stack.length) stackIndex = stack.length - 1;
 
 		if (stack.length <= 1) {
-			if (undo) undo.setAttribute('disabled', true);
-			if (redo) redo.setAttribute('disabled', true);
+			editor.applyCmdTarget('undo', function (e) {
+				e.setAttribute('disabled', true);
+			});
+			editor.applyCmdTarget('redo', function (e) {
+				e.setAttribute('disabled', true);
+			});
 		} else {
 			if (stackIndex === 0) {
-				if (undo) undo.setAttribute('disabled', true);
-				if (redo) redo.removeAttribute('disabled');
+				editor.applyCmdTarget('undo', function (e) {
+					e.setAttribute('disabled', true);
+				});
+				editor.applyCmdTarget('redo', function (e) {
+					e.removeAttribute('disabled');
+				});
 			} else if (stackIndex === stack.length - 1) {
-				if (undo) undo.removeAttribute('disabled');
-				if (redo) redo.setAttribute('disabled', true);
+				editor.applyCmdTarget('undo', function (e) {
+					e.removeAttribute('disabled');
+				});
+				editor.applyCmdTarget('redo', function (e) {
+					e.setAttribute('disabled', true);
+				});
 			} else {
-				if (undo) undo.removeAttribute('disabled');
-				if (redo) redo.removeAttribute('disabled');
+				editor.applyCmdTarget('undo', function (e) {
+					e.removeAttribute('disabled');
+				});
+				editor.applyCmdTarget('redo', function (e) {
+					e.removeAttribute('disabled');
+				});
 			}
 		}
 
@@ -132,7 +146,9 @@ export default function (editor, change) {
 
 		stack = stack.slice(0, stackIndex + 1);
 		root.value.splice(stackIndex + 1);
-		if (redo) redo.setAttribute('disabled', true);
+		editor.applyCmdTarget('redo', function (e) {
+			e.setAttribute('disabled', true);
+		});
 
 		for (let i = 0, len = deleteRoot.length; i < len; i++) {
 			if (stack.indexOf(deleteRoot[i]) === -1) initRoot(deleteRoot[i]);
@@ -150,7 +166,11 @@ export default function (editor, change) {
 
 		setStack(current, range, rootKey, 1);
 
-		if (stackIndex === 1 && undo) undo.removeAttribute('disabled');
+		if (stackIndex === 1) {
+			editor.applyCmdTarget('undo', function (e) {
+				e.removeAttribute('disabled');
+			});
+		}
 
 		editor.char.display();
 		change();
@@ -220,10 +240,17 @@ export default function (editor, change) {
 		 * @description Reset the history object
 		 */
 		reset: function () {
-			if (undo) undo.setAttribute('disabled', true);
-			if (redo) redo.setAttribute('disabled', true);
+			editor.applyCmdTarget('undo', function (e) {
+				e.setAttribute('disabled', true);
+			});
+			editor.applyCmdTarget('redo', function (e) {
+				e.setAttribute('disabled', true);
+			});
+
 			editor.status.isChanged = false;
-			if (editor.context.has('buttons.save')) editor.context.get('buttons.save').setAttribute('disabled', true);
+			editor.applyCmdTarget('save', function (e) {
+				e.setAttribute('disabled', true);
+			});
 
 			stackIndex = -1;
 			stack = [];
@@ -240,16 +267,23 @@ export default function (editor, change) {
 		 * @description Reset the disabled state of the buttons to fit the current stack.
 		 */
 		resetButtons: function () {
-			undo = editor.context.get('buttons.undo');
-			redo = editor.context.get('buttons.redo');
-
 			if (stackIndex === 0) {
-				if (undo) undo.setAttribute('disabled', true);
-				if (redo && stackIndex === stack.length - 1) redo.setAttribute('disabled', true);
+				editor.applyCmdTarget('undo', function (e) {
+					e.setAttribute('disabled', true);
+				});
+				if (stackIndex === stack.length - 1) {
+					editor.applyCmdTarget('redo', function (e) {
+						e.setAttribute('disabled', true);
+					});
+				}
 				editor.status.isChanged = false;
-				if (editor.context.get('buttons.save')) editor.context.get('buttons.save').setAttribute('disabled', true);
+				editor.applyCmdTarget('save', function (e) {
+					e.setAttribute('disabled', true);
+				});
 			} else if (stackIndex === stack.length - 1) {
-				if (redo) redo.setAttribute('disabled', true);
+				editor.applyCmdTarget('redo', function (e) {
+					e.setAttribute('disabled', true);
+				});
 			}
 		},
 

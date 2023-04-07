@@ -610,6 +610,8 @@ export function removeItem(item) {
  * @param {string|Element} newElement String or element of the new element to apply
  */
 export function changeElement(element, newElement) {
+	if (!element) return;
+
 	if (typeof newElement === 'string') {
 		if (element.outerHTML) {
 			element.outerHTML = newElement;
@@ -619,7 +621,7 @@ export function changeElement(element, newElement) {
 			newElement = doc.firstChild;
 			element.parentNode.replaceChild(newElement, element);
 		}
-	} else if (newElement.nodeType === 1) {
+	} else if (newElement && newElement.nodeType === 1) {
 		element.parentNode.replaceChild(newElement, element);
 	}
 }

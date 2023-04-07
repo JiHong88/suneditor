@@ -70,7 +70,9 @@ Viewer.prototype = {
 
 			this.status._range = null;
 			codeFrame.focus();
-			domUtils.addClass(this.context.get('buttons.codeView'), 'active');
+			this.editor.applyCmdTarget('codeView', function (e) {
+				domUtils.addClass(e, 'active');
+			});
 		} else {
 			if (!domUtils.isNonEditable(wysiwygFrame)) this._setCodeDataToEditor();
 			wysiwygFrame.scrollTop = 0;
@@ -90,7 +92,9 @@ Viewer.prototype = {
 			}
 
 			this.editor._nativeFocus();
-			domUtils.removeClass(this.context.get('buttons.codeView'), 'active');
+			this.editor.applyCmdTarget('codeView', function (e) {
+				domUtils.removeClass(e, 'active');
+			});
 
 			if (!domUtils.isNonEditable(wysiwygFrame)) {
 				this.history.push(false);
@@ -119,7 +123,6 @@ Viewer.prototype = {
 		const editorArea = fc.get('editorArea');
 		const wysiwygFrame = fc.get('wysiwygFrame');
 		const codeFrame = fc.get('code');
-		const targetButton = this.context.get('buttons.fullScreen');
 		const isCodeView = this.editor.frameContext.get('isCodeView');
 		const arrow = this.context.get('toolbar._arrow');
 
@@ -181,10 +184,11 @@ Viewer.prototype = {
 
 			fc.get('topArea').style.marginTop = this.options.get('fullScreenOffset') + 'px';
 
-			if (targetButton) {
-				domUtils.changeElement(targetButton.firstElementChild, this.icons.reduction);
-				domUtils.addClass(targetButton, 'active');
-			}
+			const reductionIcon = this.icons.reduction;
+			this.editor.applyCmdTarget('fullScreen', function (e) {
+				domUtils.changeElement(e.firstElementChild, reductionIcon);
+				domUtils.addClass(e, 'active');
+			});
 		} else {
 			wysiwygFrame.style.cssText = this.wysiwygOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + (isCodeView ? 'display: none;' : '');
 			codeFrame.style.cssText = this.codeOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + (!isCodeView ? 'display: none !important;' : 'display: block !important;');
@@ -221,10 +225,11 @@ Viewer.prototype = {
 			this.editor.toolbar._resetSticky();
 			fc.get('topArea').style.marginTop = '';
 
-			if (targetButton) {
-				domUtils.changeElement(targetButton.firstElementChild, this.icons.expansion);
-				domUtils.removeClass(targetButton, 'active');
-			}
+			const expansionIcon = this.icons.expansion;
+			this.editor.applyCmdTarget('fullScreen', function (e) {
+				domUtils.changeElement(e.firstElementChild, expansionIcon);
+				domUtils.removeClass(e, 'active');
+			});
 		}
 
 		if (wasToolbarHidden && !fc.get('isCodeView')) this.editor.toolbar.hide();
@@ -243,10 +248,14 @@ Viewer.prototype = {
 
 		if (value) {
 			domUtils.addClass(this.editor.frameContext.get('wysiwyg'), 'se-show-block');
-			domUtils.addClass(this.context.get('buttons.showBlocks'), 'active');
+			this.editor.applyCmdTarget('showBlocks', function (e) {
+				domUtils.addClass(e, 'active');
+			});
 		} else {
 			domUtils.removeClass(this.editor.frameContext.get('wysiwyg'), 'se-show-block');
-			domUtils.removeClass(this.context.get('buttons.showBlocks'), 'active');
+			this.editor.applyCmdTarget('showBlocks', function (e) {
+				domUtils.removeClass(e, 'active');
+			});
 		}
 
 		this.editor._resourcesStateChange();

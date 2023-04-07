@@ -112,7 +112,7 @@ EventManager.prototype = {
 
 		const marginDir = this.options.get('_rtl') ? 'marginRight' : 'marginLeft';
 		const plugins = this.plugins;
-		const _commandMap = this.editor._commandMap;
+		const cmdTargetMap = this.editor.cmdTargetMap;
 		const classOnCheck = this._onButtonsCheck;
 		const commandMapNodes = [];
 		const currentNodes = [];
@@ -128,7 +128,7 @@ EventManager.prototype = {
 		for (let element = selectionNode; !domUtils.isWysiwygFrame(element); element = element.parentNode) {
 			if (!element) break;
 			if (element.nodeType !== 1 || domUtils.isBreak(element)) continue;
-			nodeName = element.nodeName.toUpperCase();
+			nodeName = element.nodeName.toLowerCase();
 			currentNodes.push(nodeName);
 
 			/* Active plugins */
@@ -137,8 +137,8 @@ EventManager.prototype = {
 					name = activePlugins[c];
 					if (
 						commandMapNodes.indexOf(name) === -1 &&
-						_commandMap.get(name) &&
-						_commandMap.get(name).filter(function (e) {
+						cmdTargetMap.get(name) &&
+						cmdTargetMap.get(name).filter(function (e) {
 							return plugins[name].active(element, e);
 						}).length > 0
 					) {
@@ -150,23 +150,23 @@ EventManager.prototype = {
 			/** indent, outdent */
 			if (this.format.isLine(element)) {
 				/* Outdent */
-				if (commandMapNodes.indexOf('OUTDENT') === -1 && _commandMap.get('OUTDENT') && (domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))) {
+				if (commandMapNodes.indexOf('outdent') === -1 && cmdTargetMap.get('outdent') && (domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))) {
 					if (
-						_commandMap.get('OUTDENT').filter(function (e) {
+						cmdTargetMap.get('outdent').filter(function (e) {
 							if (domUtils.isImportantDisabled(e)) return false;
 							e.removeAttribute('disabled');
 							return true;
 						}).length > 0
 					) {
-						commandMapNodes.push('OUTDENT');
+						commandMapNodes.push('outdent');
 					}
 				}
 
 				/* Indent */
-				if (commandMapNodes.indexOf('INDENT') === -1 && _commandMap.get('INDENT')) {
+				if (commandMapNodes.indexOf('indent') === -1 && cmdTargetMap.get('indent')) {
 					const indentDisable = domUtils.isListCell(element) && !element.previousElementSibling;
 					if (
-						_commandMap.get('INDENT').filter(function (e) {
+						cmdTargetMap.get('indent').filter(function (e) {
 							if (domUtils.isImportantDisabled(e)) return false;
 							if (indentDisable) {
 								e.setAttribute('disabled', true);
@@ -176,7 +176,7 @@ EventManager.prototype = {
 							return true;
 						}).length > 0
 					) {
-						commandMapNodes.push('INDENT');
+						commandMapNodes.push('indent');
 					}
 				}
 
@@ -186,11 +186,11 @@ EventManager.prototype = {
 			/** default active buttons [strong, ins, em, del, sub, sup] */
 			if (classOnCheck.test(nodeName)) {
 				commandMapNodes.push(nodeName);
-				domUtils.addClass(_commandMap.get(nodeName), 'active');
+				domUtils.addClass(cmdTargetMap.get(nodeName), 'active');
 			}
 		}
 
-		this._setKeyEffect(commandMapNodes, plugins, _commandMap);
+		this._setKeyEffect(commandMapNodes, plugins, cmdTargetMap);
 
 		/** save current nodes */
 		this.status.currentNodes = currentNodes.reverse();
@@ -205,17 +205,16 @@ EventManager.prototype = {
 	 * @param {Array|null} ignoredList Igonred button list
 	 * @private
 	 */
-	_setKeyEffect: function (ignoredList, plugins, _commandMap) {
+	_setKeyEffect: function (ignoredList, plugins, cmdTargetMap) {
 		const activePlugins = this.editor.activePlugins;
-
-		_commandMap.forEach(function (e, k) {
+		cmdTargetMap.forEach(function (e, k) {
 			if (ignoredList.indexOf(k) > -1 || !e || e.length === 0) return;
 			e.forEach(function (v) {
 				if (activePlugins.indexOf(k) > -1) {
 					plugins[k].active(null, v);
-				} else if (/^OUTDENT$/i.test(k)) {
+				} else if (/^outdent$/i.test(k)) {
 					if (!domUtils.isImportantDisabled(v)) v.setAttribute('disabled', true);
-				} else if (/^INDENT$/i.test(k)) {
+				} else if (/^indent$/i.test(k)) {
 					if (!domUtils.isImportantDisabled(v)) v.removeAttribute('disabled');
 				} else {
 					domUtils.removeClass(v, 'active');
@@ -1837,7 +1836,9 @@ function OnFocus_wysiwyg(rootKey, e) {
 	if (this.editor._antiBlur) return;
 	this.status.hasFocus = true;
 
-	domUtils.removeClass(this.context.get('buttons.codeView'), 'active');
+	this.editor.applyCmdTarget('codeView', function (e) {
+		domUtils.removeClass(e, 'active');
+	});
 	domUtils.setDisabled(this.editor._codeViewDisabledButtons, false);
 
 	this.editor.changeFrameContext(rootKey);
@@ -1993,7 +1994,9 @@ function OnScroll_Abs() {
 
 function OnFocus_code(rootKey) {
 	this.editor.changeFrameContext(rootKey);
-	domUtils.addClass(this.context.get('buttons.codeView'), 'active');
+	this.editor.applyCmdTarget('codeView', function (e) {
+		domUtils.addClass(e, 'active');
+	});
 	domUtils.setDisabled(this.editor._codeViewDisabledButtons, true);
 }
 

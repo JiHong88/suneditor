@@ -213,17 +213,19 @@ function InitOptions(options, editorTargets) {
 	// text style tags
 	const textTags = [
 		{
-			bold: 'STRONG',
-			underline: 'U',
-			italic: 'EM',
-			strike: 'DEL',
-			sub: 'SUB',
-			sup: 'SUP'
+			bold: 'strong',
+			underline: 'u',
+			italic: 'em',
+			strike: 'del',
+			sub: 'sub',
+			sup: 'sup',
+			indent: 'indent',
+			outdent: 'outdent'
 		},
 		options.textTags || {}
 	].reduce(function (_default, _new) {
 		for (let key in _new) {
-			_default[key] = _new[key];
+			_default[key] = (_new[key] || '').toLowerCase();
 		}
 		return _default;
 	}, {});
@@ -231,17 +233,17 @@ function InitOptions(options, editorTargets) {
 	o.set('_spanStylesRegExp', new _w.RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi'));
 	o.set('_formatStylesRegExp', new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right' + (options.formatStyles ? '|' + options.formatStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi'));
 	o.set('_styleNodeMap', {
-		strong: textTags.bold.toLowerCase(),
-		b: textTags.bold.toLowerCase(),
-		u: textTags.underline.toLowerCase(),
-		ins: textTags.underline.toLowerCase(),
-		em: textTags.italic.toLowerCase(),
-		i: textTags.italic.toLowerCase(),
-		del: textTags.strike.toLowerCase(),
-		strike: textTags.strike.toLowerCase(),
-		s: textTags.strike.toLowerCase(),
-		sub: textTags.sub.toLowerCase(),
-		sup: textTags.sup.toLowerCase()
+		strong: textTags.bold,
+		b: textTags.bold,
+		u: textTags.underline,
+		ins: textTags.underline,
+		em: textTags.italic,
+		i: textTags.italic,
+		del: textTags.strike,
+		strike: textTags.strike,
+		s: textTags.strike,
+		sub: textTags.sub,
+		sup: textTags.sup
 	});
 	o.set('_defaultCommand', {
 		bold: textTags.bold,

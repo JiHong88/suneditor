@@ -206,6 +206,7 @@ Toolbar.prototype = {
 		const buttonsObj = (this._rButtonArray = {
 			default: _responsiveButtons[0]
 		});
+
 		for (let i = 1, len = _responsiveButtons.length, size, buttonGroup; i < len; i++) {
 			buttonGroup = _responsiveButtons[i];
 			size = buttonGroup[0] * 1;
@@ -270,7 +271,7 @@ Toolbar.prototype = {
 		const toolbarHeight = toolbar.offsetHeight;
 
 		this._setBalloonPosition(positionTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop);
-		if (this.isSub && (this.offset.getGlobal(toolbar).top - offsets.top) < 0) {
+		if (this.isSub && this.offset.getGlobal(toolbar).top - offsets.top < 0) {
 			positionTop = !positionTop;
 			this._setBalloonPosition(positionTop, rects, toolbar, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop);
 		}
