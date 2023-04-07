@@ -5221,8 +5221,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _convertFontSize: function (to, size) {
             const math = this._w.Math;
             const value = size.match(/(\d+(?:\.\d+)?)(.+)/);
-            const sizeNum = value[1] * 1;
-            const from = value[2];
+            const sizeNum = value ? value[1] * 1 : util.fontValueMap[size];
+            const from = value ? value[2] : 'rem';
             let pxSize = sizeNum;
             
             if (/em/.test(from)) {
@@ -5263,7 +5263,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     const allowedStyle = [];
                     for (let i = 0, len = style.length, r; i < len; i++) {
                         r = style[i].match(/([a-zA-Z0-9-]+)(:)([^:]+$)/);
-                        if (r && !/inherit|initial/i.test(r[3])) {
+                        if (r && !/inherit|initial|revert|unset/i.test(r[3])) {
                             const k = util.kebabToCamelCase(r[1].trim());
                             const v = this.wwComputedStyle[k].replace(/"/g, '');
                             const c = r[3].trim();
@@ -5274,7 +5274,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 case 'fontSize':
                                     if (!options.plugins.fontSize) continue;
                                     if (!this._cleanStyleRegExp.fontSizeUnit.test(r[0])) {
-                                        r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), this._convertFontSize.bind(this, options.fontSizeUnit));
+                                        r[0] = r[0].replace((r[0].match(/:\s*([^;]+)/) || [])[1], this._convertFontSize.bind(this, options.fontSizeUnit));
                                     }
                                     break;
                                 case 'color':
@@ -5323,7 +5323,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             else v = m.match(lowLevelCheck ? this._attributesWhitelistRegExp : this._attributesWhitelistRegExp_all_data);
             
             // attribute
-            if (lowLevelCheck) {
+            if (lowLevelCheck || tagName === 'span') {
                 if (tagName === 'a') {
                     const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
                     if (sv) {
