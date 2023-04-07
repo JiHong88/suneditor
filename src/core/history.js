@@ -2,8 +2,8 @@
  * @fileoverview history stack closure
  */
 
-import { _w } from '../../helper/env';
-import { getNodeFromPath, getNodePath } from '../../helper/domUtils';
+import { _w } from '../helper/env';
+import { getNodeFromPath, getNodePath } from '../helper/domUtils';
 
 export default function (editor, change) {
 	const rootTargets = editor.rootTargets;

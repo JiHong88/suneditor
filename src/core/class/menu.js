@@ -9,7 +9,7 @@ const Menu = function (editor) {
 	CoreDependency.call(this, editor);
 
 	// members--
-	this._menuTrayMap = {};
+	this.targetMap = {};
 	// dropdown
 	this.currentDropdown = null;
 	this.currentDropdownActiveButton = null;
@@ -31,7 +31,7 @@ Menu.prototype = {
 	initDropdownTarget: function (key, menu) {
 		if (key) {
 			this.context.get('_menuTray').appendChild(menu);
-			this._menuTrayMap[key] = menu;
+			this.targetMap[key] = menu;
 		} else {
 			throw Error("[SUNEDITOR.init.fail] The plugin's key is not added.");
 		}
@@ -45,7 +45,7 @@ Menu.prototype = {
 		if (this._bindedDropdownOff) this._bindedDropdownOff();
 
 		const dropdownName = (this.currentDropdownName = button.getAttribute('data-command'));
-		const menu = (this.currentDropdown = this._menuTrayMap[dropdownName]);
+		const menu = (this.currentDropdown = this.targetMap[dropdownName]);
 		this.currentDropdownActiveButton = button;
 		this._setMenuPosition(button, menu);
 
@@ -83,7 +83,7 @@ Menu.prototype = {
 		if (this._bindedContainerOff) this._bindedContainerOff();
 
 		const containerName = (this._containerName = button.getAttribute('data-command'));
-		const menu = (this.currentContainer = this._menuTrayMap[containerName]);
+		const menu = (this.currentContainer = this.targetMap[containerName]);
 		this.currentContainerActiveButton = button;
 		this._setMenuPosition(button, menu);
 

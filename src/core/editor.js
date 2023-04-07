@@ -1,14 +1,15 @@
-import Helper, { env, converter, domUtils, numbers, deepDelete } from '../helper';
+import Helper, { env, converter, domUtils, numbers } from '../helper';
 import Constructor, { ResetOptions, UpdateButton } from './constructor';
+import History from './history';
+import EventManager from './eventManager';
 
 // class dependency
 import ClassDependency from '../dependency/_classes';
 
 // base
-import History from './base/history';
-import EventManager from './base/eventManager';
+import { SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './base/actives';
 
-// modules
+// classes
 import Char from './class/char';
 import Component from './class/component';
 import Format from './class/format';
@@ -201,12 +202,6 @@ const Editor = function (multiTargets, options) {
 	this._responsiveButtons_sub = product.responsiveButtons_sub;
 
 	/**
-	 * @description Property related to rtl and ltr conversions.
-	 * @private
-	 */
-	this._prevRtl = this.options.get('_rtl');
-
-	/**
 	 * @description Variable that controls the "blur" event in the editor of inline or balloon mode when the focus is moved to dropdown
 	 * @private
 	 */
@@ -291,17 +286,6 @@ const Editor = function (multiTargets, options) {
 	 * @private
 	 */
 	this._commandMap = new _w.Map();
-
-	/**
-	 * @description CSS properties related to style tags
-	 * @private
-	 */
-	this._commandMapStyles = {
-		STRONG: ['font-weight'],
-		U: ['text-decoration'],
-		EM: ['font-style'],
-		DEL: ['text-decoration']
-	};
 
 	/**
 	 * @description Current Figure container.
@@ -396,9 +380,9 @@ Editor.prototype = {
 	 * @description Run plugin calls and basic commands.
 	 * @param {string} command Command string
 	 * @param {string} type Display type string ('command', 'dropdown', 'modal', 'container')
-	 * @param {Element} target The element of command button
+	 * @param {Element|null} target The element of command button
 	 */
-	runPlugin: function (command, type, target) {
+	run: function (command, type, target) {
 		if (type) {
 			if (/more/i.test(type)) {
 				const toolbar = domUtils.getParentElement(target, '.se-toolbar');
@@ -419,13 +403,13 @@ Editor.prototype = {
 				return;
 			}
 
-			if (/container/.test(type) && (this.menu._menuTrayMap[command] === null || target !== this.menu.currentContainerActiveButton)) {
+			if (/container/.test(type) && (this.menu.targetMap[command] === null || target !== this.menu.currentContainerActiveButton)) {
 				this.menu.containerOn(target);
 				return;
 			}
 
 			if (this.isReadOnly && domUtils.arrayIncludes(this._controllerOnDisabledButtons, target)) return;
-			if (/dropdown/.test(type) && (this.menu._menuTrayMap[command] === null || target !== this.menu.currentDropdownActiveButton)) {
+			if (/dropdown/.test(type) && (this.menu.targetMap[command] === null || target !== this.menu.currentDropdownActiveButton)) {
 				this.menu.dropdownOn(target);
 				return;
 			} else if (/modal/.test(type)) {
@@ -465,40 +449,7 @@ Editor.prototype = {
 				// @todo
 				break;
 			case 'selectAll':
-				this._offCurrentController();
-				this.menu.containerOff();
-				const figcaption = domUtils.getParentElement(this.selection.getNode(), 'FIGCAPTION');
-				const selectArea = figcaption || this.frameContext.get('wysiwyg');
-				let first =
-					domUtils.getEdgeChild(
-						selectArea.firstChild,
-						function (current) {
-							return current.childNodes.length === 0 || current.nodeType === 3;
-						},
-						false
-					) || selectArea.firstChild;
-				let last =
-					domUtils.getEdgeChild(
-						selectArea.lastChild,
-						function (current) {
-							return current.childNodes.length === 0 || current.nodeType === 3;
-						},
-						true
-					) || selectArea.lastChild;
-				if (!first || !last) return;
-				if (domUtils.isMedia(first)) {
-					const info = this.component.get(first);
-					const br = domUtils.createElement('BR');
-					const format = domUtils.createElement(this.options.get('defaultLineTag'), null, br);
-					first = info ? info.container : first;
-					first.parentNode.insertBefore(format, first);
-					first = br;
-				}
-				if (domUtils.isMedia(last)) {
-					last = domUtils.createElement('BR');
-					selectArea.appendChild(domUtils.createElement(this.options.get('defaultLineTag'), null, last));
-				}
-				this.toolbar._showBalloon(this.selection.setRange(first, 0, last, last.textContent.length));
+				SELECT_ALL(this);
 				break;
 			case 'codeView':
 				this.viewer.codeView(!this.frameContext.get('isCodeView'));
@@ -541,57 +492,11 @@ Editor.prototype = {
 				this.setDir('rtl');
 				break;
 			case 'save':
-				if (typeof this.options.get('callBackSave') === 'function') {
-					this.options.get('callBackSave')(this.html.get(), this.status.isChanged);
-				} else if (this.status.isChanged && typeof this.events.save === 'function') {
-					this.events.save();
-				} else {
-					throw Error('[SUNEDITOR.commandHandler.fail] Please register call back function in creation option. (callBackSave : Function)');
-				}
-
-				this.status.isChanged = false;
-				if (this.context.has('buttons.save')) this.context.get('buttons.save').setAttribute('disabled', true);
-				if (this.context.has('buttons.sub.save')) this.context.get('buttons.sub.save').setAttribute('disabled', true);
+				SAVE(this);
 				break;
 			default:
-				// 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'..
-				command = this.options.get('_defaultCommand')[command.toLowerCase()] || command;
-				const nodesMap = this.status.currentNodesMap;
-				const cmd = nodesMap.indexOf(command) > -1 ? null : domUtils.createElement(command);
-				let removeNode = command;
-
-				if (/^SUB$/i.test(command) && nodesMap.indexOf('SUP') > -1) {
-					removeNode = 'SUP';
-				} else if (/^SUP$/i.test(command) && nodesMap.indexOf('SUB') > -1) {
-					removeNode = 'SUB';
-				}
-
-				this.format.applyTextStyle(cmd, this._commandMapStyles[command] || null, [removeNode], false);
-				this.focus();
+				FONT_STYLE(this, command);
 		}
-	},
-
-	/**
-	 * @description Add or reset option property (Editor is reloaded)
-	 * @param {Object} _options Options
-	 */
-	setOptions: function (_options) {
-		this.viewer.codeView(false);
-		this.viewer.showBlocks(false);
-
-		const mergeOptions = [this.options, _options].reduce(function (init, option) {
-			for (let key in option) {
-				if (key === 'plugins') {
-					continue;
-				} else {
-					init[key] = option[key];
-				}
-			}
-			return init;
-		}, {});
-
-		// @todo
-		ResetOptions();
 	},
 
 	/**
@@ -600,21 +505,14 @@ Editor.prototype = {
 	 */
 	setDir: function (dir) {
 		const rtl = dir === 'rtl';
-		const changeDir = this._prevRtl !== rtl;
-		const fc = this.frameContext;
-		const ctx = this.context;
-		this.options.set('_rtl', (this._prevRtl = rtl));
+		if (this.options.get('_rtl') === rtl) return;
 
-		if (changeDir) {
-			const plugins = this.plugins;
-			for (let k in plugins) {
-				if (typeof plugins[k].setDir === 'function') plugins[k].setDir(dir);
-			}
-			// indent buttons
-			if (ctx.has('buttons.indent')) domUtils.changeElement(ctx.get('buttons.indent').firstElementChild, this.icons.indent);
-			if (ctx.has('buttons.sub.indent')) domUtils.changeElement(ctx.get('buttons.sub.indent').firstElementChild, this.icons.indent);
-			if (ctx.has('buttons.outdent')) domUtils.changeElement(ctx.get('buttons.outdent').firstElementChild, this.icons.outdent);
-			if (ctx.has('buttons.sub.outdent')) domUtils.changeElement(ctx.get('buttons.sub.outdent').firstElementChild, this.icons.outdent);
+		const fc = this.frameContext;
+		this.options.set('_rtl', rtl);
+
+		const plugins = this.plugins;
+		for (let k in plugins) {
+			if (typeof plugins[k].setDir === 'function') plugins[k].setDir(dir);
 		}
 
 		if (rtl) {
@@ -647,34 +545,30 @@ Editor.prototype = {
 			else if (r === 'right') n.style.textAlign = 'left';
 		}
 
-		this._setDirButtonActive(this.context.get('buttons.dir'), '', rtl);
-		this._setDirButtonActive(this.context.get('buttons.sub.dir'), '', rtl);
-		this._setDirButtonActive(this.context.get('buttons.dir_ltr'), 'ltr', rtl);
-		this._setDirButtonActive(this.context.get('buttons.sub.dir_ltr'), 'ltr', rtl);
-		this._setDirButtonActive(this.context.get('buttons.dir_rtl'), 'rtl', rtl);
-		this._setDirButtonActive(this.context.get('buttons.sub.dir_rtl'), 'rtl', rtl);
+		DIR_BTN_ACTIVE(this, rtl);
 	},
 
-	_setDirButtonActive: function (btn, str, rtl) {
-		if (!btn) return;
+	/**
+	 * @description Add or reset option property (Editor is reloaded)
+	 * @param {Object} _options Options
+	 */
+	setOptions: function (_options) {
+		this.viewer.codeView(false);
+		this.viewer.showBlocks(false);
 
-		if (str === '') {
-			domUtils.changeTxt(btn.querySelector('.se-tooltip-text'), this.lang[this.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
-			domUtils.changeElement(btn.firstElementChild, this.icons[this.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
-			return;
-		}
+		const mergeOptions = [this.options, _options].reduce(function (init, option) {
+			for (let key in option) {
+				if (key === 'plugins') {
+					continue;
+				} else {
+					init[key] = option[key];
+				}
+			}
+			return init;
+		}, {});
 
-		if (str === 'ltr') {
-			if (rtl) domUtils.removeClass(btn, 'active');
-			else domUtils.addClass(btn, 'active');
-			return;
-		}
-
-		if (str === 'rtl') {
-			if (rtl) domUtils.addClass(btn, 'active');
-			else domUtils.removeClass(btn, 'active');
-			return;
-		}
+		// @todo
+		ResetOptions();
 	},
 
 	/**
@@ -898,19 +792,6 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Copying the content of the editor to the original textarea and execute onSave callback.
-	 */
-	save: function () {
-		const value = this.html.get();
-		this.frameContext.get('originElement').value = value;
-		// user event
-		if (typeof this.events.onSave === 'function') {
-			this.events.onSave(value);
-			return;
-		}
-	},
-
-	/**
 	 * @description Destroy the suneditor
 	 */
 	destroy: function () {
@@ -934,7 +815,15 @@ Editor.prototype = {
 		});
 
 		/** remove object reference */
-		deepDelete(this);
+		for (let k in this.plugins) {
+			delete this.plugins[k];
+		}
+		for (let k in this.events) {
+			delete this.events[k];
+		}
+		for (let k in this.events) {
+			delete this[k];
+		}
 
 		return null;
 	},
@@ -947,7 +836,7 @@ Editor.prototype = {
 	_setFrameInfo: function (rt) {
 		this.frameContext = rt;
 		this.frameOptions = rt.get('options');
-		rt.set('_editorHeight', rt.get('wysiwygFrame').offsetHeight)
+		rt.set('_editorHeight', rt.get('wysiwygFrame').offsetHeight);
 		this._lineBreakerButton = rt.get('lineBreaker').querySelector('button');
 		this._lineBreaker_t = rt.get('lineBreaker_t');
 		this._lineBreaker_b = rt.get('lineBreaker_b');

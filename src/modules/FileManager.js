@@ -307,7 +307,7 @@ function CallBackUpload(xmlHttp, callBack, errorCallBack) {
 			const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
 			if (typeof errorCallBack !== 'function' || errorCallBack.call(this.events, '', res)) {
 				const err = '[SUNEDITOR.FileManager[' + this.kind + '].upload.serverException] status: ' + xmlHttp.status + ', response: ' + (res.errorMessage || xmlHttp.responseText);
-				this.editor.notice.open(err);
+				this.notice.open(err);
 				throw Error(err);
 			}
 		}

@@ -5,9 +5,10 @@
  */
 function CoreDependency(editor) {
 	this.editor = editor;
+	this.eventManager = editor.eventManager;
+	this.history = editor.history;
 	this._w = editor._w;
 	this._d = editor._d;
-	// status, plugins..
 	this.plugins = editor.plugins;
 	this.status = editor.status;
 	this.context = editor.context;
@@ -16,10 +17,6 @@ function CoreDependency(editor) {
 	this.icons = editor.icons;
 	this.lang = editor.lang;
 	this.helper = editor.helper;
-	// base
-	this.eventManager = editor.eventManager;
-	this.history = editor.history;
-	// shadow root
 	this._shadowRoot = editor._shadowRoot;
 }
 

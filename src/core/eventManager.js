@@ -2,8 +2,8 @@
  * @fileoverview eventManager class
  */
 
-import CoreDependency from '../../dependency/_core';
-import { domUtils, unicode, numbers, env, converter } from '../../helper';
+import CoreDependency from '../dependency/_core';
+import { domUtils, unicode, numbers, env, converter } from '../helper';
 
 const _w = env._w;
 const DIRECTION_KEYCODE = new _w.RegExp('^(3[3-9]|40)$');
@@ -570,7 +570,7 @@ EventManager.prototype = {
 					const inst = this;
 					entries.forEach(function (e) {
 						inst.editor.__callResizeFunction(inst.editor.rootTargets.get(e.target.getAttribute('data-root-key')), -1, e);
-					})
+					});
 				}.bind(this)
 			);
 		}
@@ -829,7 +829,7 @@ function OnClick_toolbar(e) {
 	if (!command && !type) return;
 	if (target.disabled) return;
 
-	this.editor.runPlugin(command, type, target);
+	this.editor.run(command, type, target);
 }
 
 function OnMouseDown_wysiwyg(rootKey, e) {
@@ -1857,7 +1857,7 @@ function OnBlur_wysiwyg(rootKey, e) {
 	this.editor.effectNode = null;
 	this.editor._offCurrentController();
 	if (this.editor.isInline || this.editor.isBalloon) this._hideToolbar();
-	else if (this.editor.isSubBalloon) this._hideToolbar_sub();
+	if (this.editor.isSubBalloon) this._hideToolbar_sub();
 
 	this._setKeyEffect([], null, []);
 

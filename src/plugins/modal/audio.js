@@ -323,7 +323,7 @@ function FileCheckHandler(element) {
 			existElement.parentNode.insertBefore(figure.container, existElement);
 			domUtils.removeItem(prevElement);
 			this.node.removeEmptyNode(existElement, null, true);
-			if (existElement.children.length === 0) existElement.innerHTML = this.node.removeWhiteSpace(existElement.innerHTML);
+			if (existElement.children.length === 0) existElement.innerHTML = this.node.removeWhitespace(existElement.innerHTML);
 		} else {
 			existElement.parentNode.replaceChild(figure.container, existElement);
 		}

@@ -2,7 +2,6 @@ import EditorDependency from '../../dependency';
 import { domUtils } from '../../helper';
 
 const Align = function (editor) {
-	console.log('align---');
 	// plugin bisic properties
 	EditorDependency.call(this, editor);
 	this.title = this.lang.align;

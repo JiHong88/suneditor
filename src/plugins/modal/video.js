@@ -452,7 +452,7 @@ Video.prototype = {
 			existElement.parentNode.insertBefore(container, existElement);
 			domUtils.removeItem(prevFrame);
 			this.node.removeEmptyNode(existElement, null, true);
-			if (existElement.children.length === 0) existElement.innerHTML = this.node.removeWhiteSpace(existElement.innerHTML);
+			if (existElement.children.length === 0) existElement.innerHTML = this.node.removeWhitespace(existElement.innerHTML);
 		} else {
 			existElement.parentNode.replaceChild(container, existElement);
 		}

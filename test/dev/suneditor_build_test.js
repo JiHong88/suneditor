@@ -376,7 +376,7 @@ const editor_root = (window.e = suneditor.create({
 	attributeWhitelist: 'id',
 	buttonList: bl,
 	subToolbar: {
-		buttonList: bl,
+		buttonList: [['bold','dir', 'dir_ltr', 'dir_rtl']],
 		width: 'auto',
 		mode: 'balloon' // balloon, balloon-always, balloon-block
 	},
