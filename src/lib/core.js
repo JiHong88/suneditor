@@ -5343,31 +5343,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 else if (sv && !v.some(function (v) { return /^style/.test(v.trim()); })) v.push(sv[0]);
             }
 
-            // img
+            // figure
             if (util.isFigures(tagName)) {
                 let w = '', h = '';
                 const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (!v) v = [];
                 if (sv) {
-                    v.push(sv[0]);
-                    
-                    let w_px = '';
-                    let h_px = '';
-                    let w_per = '';
-                    let h_per = '';
-
-                    w_px = sv[0].match(/width:(.+)px;/);
-                    w_px = util.getNumber(w_px ? w_px[1] : '', -1) || null;
-                    h_px = sv[0].match(/height:(.+)px;/);
-                    h_px = util.getNumber(h_px ? h_px[1] : '', -1) || null;
-
-                    w_per = sv[0].match(/width:(.+)%;/);
-                    w_per = util.getNumber(w_per ? w_per[1] : '', -1) || null;
-                    h_per = sv[0].match(/height:(.+)%;/);
-                    h_per = util.getNumber(h_per ? h_per[1] : '', -1) || null;
-
-                    w = w_px || w_per;
-                    h = h_px || h_per;
+                    const wsize = sv[0].match(/width\s?:\s?(\d+)(px|%)/);
+                    const hsize = sv[0].match(/height\s?:\s?(\d+)(px|%)/);
+                    const w_ = wsize && wsize[1] && wsize[2] ? wsize[1] + wsize[2] : 'auto';
+                    const h_ = hsize && hsize[1] && hsize[2] ? hsize[1] + hsize[2] : 'auto';
+                    w = util.getNumber(w_, -1) || '';
+                    h = util.getNumber(h_, -1) || '';
+                    v.push('style="width:'+ w_ + '; height:'+ h_ + ';"');
                 }
                 
                 if (!w || !h) {
@@ -5378,7 +5366,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         h = !h ? util.getNumber(avh ? avh[1] : '') || '' : h;
                     }
                 }
-                v.push('data-origin="' + (w + ',' + h) + '"');
             }
 
             if (v) {
