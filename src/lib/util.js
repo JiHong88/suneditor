@@ -59,6 +59,16 @@ const util = {
      */
     onlyZeroWidthRegExp: new RegExp('^' + String.fromCharCode(8203) + '+$'),
 
+    fontValueMap: {
+        'xx-small': 1,
+        'x-small': 2,
+        'small': 3,
+        'medium': 4,
+        'large': 5,
+        'x-large': 6,
+        'xx-large': 7
+    },
+
     /**
      * @description A method that checks If the text is blank or to see if it contains 'ZERO WIDTH SPACE' or empty (util.zeroWidthSpace)
      * @param {String|Node} text String value or Node
@@ -855,6 +865,15 @@ const util = {
      */
     isMedia: function (node) {
         return node && /^(IMG|IFRAME|AUDIO|VIDEO|CANVAS)$/i.test(typeof node === 'string' ? node : node.nodeName);
+    },
+
+    /**
+     * @description Check the node is a figure tag or util.isMedia()
+     * @param {Node|String} node The element or element name to check
+     * @returns {Boolean}
+     */
+    isFigures: function (node) {
+        return node && (this.isMedia(node) || /^(FIGURE)$/i.test(typeof node === 'string' ? node : node.nodeName));
     },
 
     /**

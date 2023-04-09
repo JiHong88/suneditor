@@ -5221,8 +5221,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _convertFontSize: function (to, size) {
             const math = this._w.Math;
             const value = size.match(/(\d+(?:\.\d+)?)(.+)/);
-            const sizeNum = value[1] * 1;
-            const from = value[2];
+            const sizeNum = value ? value[1] * 1 : util.fontValueMap[size];
+            const from = value ? value[2] : 'rem';
             let pxSize = sizeNum;
             
             if (/em/.test(from)) {
@@ -5263,7 +5263,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     const allowedStyle = [];
                     for (let i = 0, len = style.length, r; i < len; i++) {
                         r = style[i].match(/([a-zA-Z0-9-]+)(:)([^:]+$)/);
-                        if (r && !/inherit|initial/i.test(r[3])) {
+                        if (r && !/inherit|initial|revert|unset/i.test(r[3])) {
                             const k = util.kebabToCamelCase(r[1].trim());
                             const v = this.wwComputedStyle[k].replace(/"/g, '');
                             const c = r[3].trim();
@@ -5274,7 +5274,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 case 'fontSize':
                                     if (!options.plugins.fontSize) continue;
                                     if (!this._cleanStyleRegExp.fontSizeUnit.test(r[0])) {
-                                        r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), this._convertFontSize.bind(this, options.fontSizeUnit));
+                                        r[0] = r[0].replace((r[0].match(/:\s*([^;]+)/) || [])[1], this._convertFontSize.bind(this, options.fontSizeUnit));
                                     }
                                     break;
                                 case 'color':
@@ -5323,7 +5323,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             else v = m.match(lowLevelCheck ? this._attributesWhitelistRegExp : this._attributesWhitelistRegExp_all_data);
             
             // attribute
-            if (lowLevelCheck) {
+            if (lowLevelCheck || tagName === 'span') {
                 if (tagName === 'a') {
                     const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
                     if (sv) {
@@ -5343,27 +5343,17 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 else if (sv && !v.some(function (v) { return /^style/.test(v.trim()); })) v.push(sv[0]);
             }
 
-            // img
-            if (tagName === 'img') {
-                let w = '', h = '';
+            // figure
+            if (util.isFigures(tagName)) {
                 const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (!v) v = [];
                 if (sv) {
-                    w = sv[0].match(/width:(.+);/);
-                    w = util.getNumber(w ? w[1] : '', -1) || '';
-                    h = sv[0].match(/height:(.+);/);
-                    h = util.getNumber(h ? h[1] : '', -1) || '';
-                } 
-                
-                if (!w || !h) {
-                    const avw = m.match(/width\s*=\s*((?:"|')[^"']*(?:"|'))/);
-                    const avh = m.match(/height\s*=\s*((?:"|')[^"']*(?:"|'))/);
-                    if (avw || avh) {
-                        w = !w ? util.getNumber(avw ? avw[1] : '') || '' : w;
-                        h = !h ? util.getNumber(avh ? avh[1] : '') || '' : h;
-                    }
+                    const wsize = sv[0].match(/width\s?:\s?(\d+)(px|%)/);
+                    const hsize = sv[0].match(/height\s?:\s?(\d+)(px|%)/);
+                    const w_ = wsize && wsize[1] && wsize[2] ? wsize[1] + wsize[2] : 'auto';
+                    const h_ = hsize && hsize[1] && hsize[2] ? hsize[1] + hsize[2] : 'auto';
+                    v.push('style="width:'+ w_ + '; height:'+ h_ + ';"');
                 }
-                v.push('data-origin="' + (w + ',' + h) + '"');
             }
 
             if (v) {
