@@ -192,6 +192,27 @@ const Constructor = function (editorTargets, options) {
 export function ResetOptions() {}
 
 /**
+ * @description Create shortcuts desc span.
+ * @param {string} command Command string
+ * @param {Array.<string>} values options.shortcuts[command]
+ * @param {Element} button Command button element
+ * @param {Map} keyMap Map to store shortcut key info
+ */
+export function CreateShortcuts(command, button, values, keyMap) {
+	if (!values || values.length < 2) return;
+	const tooptip = button.querySelector('.se-tooltip-text');
+
+	for (let i = 0, v, s, t, k; i < values.length; i += 2) {
+		v = values[i];
+		s = /^s/i.test(v);
+		k = numbers.get(v) + (s ? 1000 : 0);
+		if (!keyMap.has(k)) keyMap.set(k, { c: command, r: v.replace(/^[^r]+(r)?(-)?/, ''), t: button.getAttribute('data-type'), e: button });
+		if (!(t = values[i + 1])) continue;
+		if (tooptip) tooptip.appendChild(domUtils.createElement('SPAN', { class: 'se-shortcut' }, env.cmdIcon + (s ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + t + '</span>'));
+	}
+}
+
+/**
  * @description Initialize options
  * @param {Object} options Options object
  * @param {Element|Array.<Element>} editorTargets Target textarea
@@ -318,8 +339,33 @@ function InitOptions(options, editorTargets) {
 
 	/** Key actions */
 	o.set('tabDisable', !!options.tabDisable);
-	o.set('shortcutsDisable', _w.Array.isArray(options.shortcutsDisable) ? options.shortcutsDisable : []);
 	o.set('shortcutsHint', options.shortcutsHint === undefined ? true : !!options.shortcutsHint);
+	o.set('shortcutsDisable', options.shortcutsDisable === undefined ? true : !!options.shortcutsDisable);
+	const shortcuts = !o.get('shortcutsDisable')
+		? {}
+		: [
+				{
+					selectAll: ['65', 'A'],
+					bold: ['66', 'B'],
+					strike: ['s83', 'S'],
+					underline: ['85', 'U'],
+					italic: ['73', 'I'],
+					redo: ['89', 'Y', 's90', 'Z'],
+					undo: ['90', 'Z'],
+					indent: ['221r-outdent', ']'],
+					outdent: ['219r-indent', '['],
+					sup: ['187', '='],
+					sub: ['s187', '='],
+					save: ['83', 'S']
+				},
+				options.shortcuts || {}
+		  ].reduce(function (_default, _new) {
+				for (let key in _new) {
+					_default[key] = _new[key];
+				}
+				return _default;
+		  }, {});
+	o.set('shortcuts', shortcuts);
 
 	/** View */
 	o.set('fullScreenOffset', options.fullScreenOffset === undefined ? 0 : /^\d+/.test(options.fullScreenOffset) ? numbers.get(options.fullScreenOffset, 0) : 0);
@@ -805,34 +851,28 @@ function _createWhitelist(o) {
  * @param {Object} options options
  */
 function _defaultButtons(options, icons, lang) {
-	const cmdIcon = env.cmdIcon;
-	const shiftIcon = env.shiftIcon;
-	const shortcutsDisable = !options.get('shortcutsHint') ? ['bold', 'strike', 'underline', 'italic', 'undo', 'indent', 'save'] : options.get('shortcutsDisable');
 	const isRTL = options.get('_rtl');
-	const indentKey = isRTL ? ['[', ']'] : [']', '['];
-	const indentIcon = isRTL ? [icons.outdent, icons.indent] : [icons.indent, icons.outdent];
-
 	return {
-		bold: ['', lang.bold + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('bold') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">B</span>') + '</span>', 'bold', '', icons.bold],
-		underline: ['', lang.underline + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('underline') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">U</span>') + '</span>', 'underline', '', icons.underline],
-		italic: ['', lang.italic + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('italic') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">I</span>') + '</span>', 'italic', '', icons.italic],
-		strike: ['', lang.strike + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('strike') > -1 ? '' : cmdIcon + shiftIcon + '+<span class="se-shortcut-key">S</span>') + '</span>', 'strike', '', icons.strike],
-		subscript: ['', lang.subscript, 'SUB', '', icons.subscript],
-		superscript: ['', lang.superscript, 'SUP', '', icons.superscript],
+		bold: ['', lang.bold, 'bold', '', icons.bold],
+		underline: ['', lang.underline, 'underline', '', icons.underline],
+		italic: ['', lang.italic, 'italic', '', icons.italic],
+		strike: ['', lang.strike, 'strike', '', icons.strike],
+		subscript: ['', lang.subscript, 'sub', '', icons.subscript],
+		superscript: ['', lang.superscript, 'sup', '', icons.superscript],
 		removeFormat: ['', lang.removeFormat, 'removeFormat', '', icons.erase],
-		indent: ['', lang.indent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">' + indentKey[0] + '</span>') + '</span>', 'indent', '', indentIcon[0]],
-		outdent: ['', lang.outdent + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('indent') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">' + indentKey[1] + '</span>') + '</span>', 'outdent', '', indentIcon[1]],
+		indent: ['', lang.indent, 'indent', '', isRTL ? icons.outdent : icons.indent],
+		outdent: ['', lang.outdent, 'outdent', '', isRTL ? icons.indent : icons.outdent],
 		fullScreen: ['se-code-view-enabled se-resizing-enabled', lang.fullScreen, 'fullScreen', '', icons.expansion],
 		showBlocks: ['', lang.showBlocks, 'showBlocks', '', icons.show_blocks],
 		codeView: ['se-code-view-enabled se-resizing-enabled', lang.codeView, 'codeView', '', icons.code_view],
-		undo: ['', lang.undo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'undo', '', icons.undo],
-		redo: ['', lang.redo + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('undo') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">Y</span> / ' + cmdIcon + shiftIcon + '+<span class="se-shortcut-key">Z</span>') + '</span>', 'redo', '', icons.redo],
+		undo: ['', lang.undo, 'undo', '', icons.undo],
+		redo: ['', lang.redo, 'redo', '', icons.redo],
 		preview: ['se-resizing-enabled', lang.preview, 'preview', '', icons.preview],
 		print: ['se-resizing-enabled', lang.print, 'print', '', icons.print],
 		dir: ['', lang[isRTL ? 'dir_ltr' : 'dir_rtl'], 'dir', '', icons[isRTL ? 'dir_ltr' : 'dir_rtl']],
 		dir_ltr: ['', lang.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
 		dir_rtl: ['', lang.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
-		save: ['se-resizing-enabled', lang.save + '<span class="se-shortcut">' + (shortcutsDisable.indexOf('save') > -1 ? '' : cmdIcon + '+<span class="se-shortcut-key">S</span>') + '</span>', 'save', '', icons.save]
+		save: ['se-resizing-enabled', lang.save, 'save', '', icons.save]
 	};
 }
 
@@ -998,6 +1038,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 					more = true;
 					moreContainer = domUtils.createElement('DIV');
 					moreContainer.className = 'se-more-layer ' + moreCommand;
+					moreContainer.setAttribute('data-ref', moreCommand);
 					moreContainer.innerHTML = '<div class="se-more-form"><ul class="se-menu-list"' + (align ? ' style="float: ' + align + ';"' : '') + '></ul></div>';
 					moreLayer.appendChild(moreContainer);
 					moreContainer = moreContainer.firstElementChild.firstElementChild;
@@ -1038,7 +1079,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 	if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
 
 	// rendering toolbar
-	const tool_bar = domUtils.createElement('DIV', { class: 'se-toolbar sun-editor-common' }, _buttonTray);
+	const tool_bar = domUtils.createElement('DIV', { class: 'se-toolbar sun-editor-common' + (!options.get('shortcutsHint') ? ' se-shortcut-hide' : '') }, _buttonTray);
 
 	if (options.get('toolbar_hide')) tool_bar.style.display = 'none';
 

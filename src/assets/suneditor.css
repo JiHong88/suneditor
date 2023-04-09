@@ -2254,8 +2254,12 @@
     opacity: 1;
 }
 
-.sun-editor .se-tooltip .se-tooltip-inner .se-tooltip-text .se-shortcut {
+.sun-editor :not(.se-shortcut-hide) .se-tooltip .se-tooltip-inner .se-tooltip-text .se-shortcut {
     display: block !important;
+}
+
+.sun-editor .se-shortcut-hide .se-tooltip .se-tooltip-inner .se-tooltip-text .se-shortcut {
+    display: none !important;
 }
 
 .sun-editor .se-tooltip .se-tooltip-inner .se-tooltip-text .se-shortcut>.se-shortcut-key {

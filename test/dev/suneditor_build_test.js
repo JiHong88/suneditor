@@ -354,6 +354,7 @@ const editor_root = (window.e = suneditor.create({
 	plugins: plugins,
 	toolbar_container: '#root_toolbar_container',
 	statusbar_container: '#root_statusbar_container',
+	// shortcutsHint: false,
 	// codeMirror: {
 	// 	EditorView: EditorView,
 	// 	extensions: [
@@ -382,6 +383,12 @@ const editor_root = (window.e = suneditor.create({
 	},
 	katex: {
 		src: Katex
+	},
+	shortcuts: {
+		bold: ['s75r-underline', 'K'],
+		italic:[],
+		image: ['73', 'I'],
+		list: ['76', 'L']
 	}
 }));
 

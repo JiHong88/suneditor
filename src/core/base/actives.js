@@ -58,13 +58,16 @@ export function SELECT_ALL(editor) {
 
 export function DIR_BTN_ACTIVE(editor, rtl) {
 	const icons = editor.icons;
+	const shortcutKey = editor.shortcuts.keyMap;
 
 	// change indent buttons
 	editor.applyCmdTarget('indent', function (e) {
 		domUtils.changeElement(e.firstElementChild, rtl ? icons.outdent : icons.indent);
+		domUtils.changeTxt(e.querySelector('.se-shortcut-key'), rtl ? shortcutKey.outdent[1] : shortcutKey.indent[1]);
 	});
 	editor.applyCmdTarget('outdent', function (e) {
 		domUtils.changeElement(e.firstElementChild, rtl ? icons.indent : icons.outdent);
+		domUtils.changeTxt(e.querySelector('.se-shortcut-key'), rtl ? shortcutKey.indent[1] : shortcutKey.outdent[1]);
 	});
 
 	// change dir buttons
@@ -114,10 +117,10 @@ export function FONT_STYLE(editor, command) {
 	const cmd = nodesMap.indexOf(command) > -1 ? null : domUtils.createElement(command);
 	let removeNode = command;
 
-	if (/^SUB$/i.test(command) && nodesMap.indexOf('SUP') > -1) {
-		removeNode = 'SUP';
-	} else if (/^SUP$/i.test(command) && nodesMap.indexOf('SUB') > -1) {
-		removeNode = 'SUB';
+	if (/^sub$/i.test(command) && nodesMap.indexOf('sup') > -1) {
+		removeNode = 'sup';
+	} else if (/^sup$/i.test(command) && nodesMap.indexOf('sub') > -1) {
+		removeNode = 'sub';
 	}
 
 	editor.format.applyTextStyle(cmd, StyleMap[command] || null, [removeNode], false);

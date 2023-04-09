@@ -1,5 +1,5 @@
 import Helper, { env, converter, domUtils, numbers } from '../helper';
-import Constructor, { ResetOptions, UpdateButton } from './constructor';
+import Constructor, { ResetOptions, UpdateButton, CreateShortcuts } from './constructor';
 import History from './history';
 import EventManager from './eventManager';
 
@@ -148,6 +148,11 @@ const Editor = function (multiTargets, options) {
 	 */
 	this.allCommandButtons = new _w.Map();
 	this.subAllCommandButtons = new _w.Map();
+
+	/**
+	 * @description Shoutcuts key map
+	 */
+	this.shortcutsKeyMap = new _w.Map();
 
 	/**
 	 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
@@ -1132,7 +1137,7 @@ Editor.prototype = {
 
 		// initialize core and add event listeners
 		this._setFrameInfo(this.rootTargets.get(this.status.rootKey));
-		this._init();
+		this.__init();
 
 		this._componentsInfoInit = false;
 		this._componentsInfoReset = false;
@@ -1166,7 +1171,7 @@ Editor.prototype = {
 	 * @description Initializ core variable
 	 * @private
 	 */
-	_init: function () {
+	__init: function () {
 		this._cachingButtons();
 
 		// file components
@@ -1251,25 +1256,30 @@ Editor.prototype = {
 			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(this._w.Array.prototype.slice.call(ctx.get('toolbar.sub._buttonTray').querySelectorAll(controllerDisabledQuery)));
 		}
 
-		this._saveButtonStates();
+		this._saveCommandButtons();
 	},
 
 	/**
 	 * @description Save the current buttons states to "allCommandButtons" map
 	 * @private
 	 */
-	_saveButtonStates: function (isSub) {
+	_saveCommandButtons: function (isSub) {
 		const currentButtons = this.context.get(isSub ? 'toolbar.sub._buttonTray' : 'toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
-		const btns = isSub ? this.subAllCommandButtons : this.allCommandButtons;
+		const cmdButtons = isSub ? this.subAllCommandButtons : this.allCommandButtons;
 		const textTAgs = this.options.get('textTags');
+		const shortcuts = this.options.get('shortcuts');
+		const keyMap = this.shortcutsKeyMap;
+
 		for (let i = 0, e, c; i < currentButtons.length; i++) {
 			e = currentButtons[i];
 			c = e.getAttribute('data-command');
-			btns.set(c, e);
+			CreateShortcuts(c, e, shortcuts[c], keyMap);
+			cmdButtons.set(c, e);
 			this._setCmdTargetMap(c, e, textTAgs);
 		}
+
 		if (!isSub && this.options.has('subMode')) {
-			this._saveButtonStates(true);
+			this._saveCommandButtons(true);
 		}
 	},
 

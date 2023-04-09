@@ -43,6 +43,15 @@ Menu.prototype = {
 	 */
 	dropdownOn: function (button) {
 		if (this._bindedDropdownOff) this._bindedDropdownOff();
+		const moreBtn = this._checkMoreLayer(button);
+		if (moreBtn) {
+			const target = domUtils.getParentElement(moreBtn, '.se-btn-tray').querySelector('[data-command="' + moreBtn.getAttribute('data-ref') + '"]');
+			if (target) {
+				this.editor.run(target.getAttribute('data-command'), target.getAttribute('data-type'), target);
+				this.dropdownOn(button);
+				return;
+			}
+		}
 
 		const dropdownName = (this.currentDropdownName = button.getAttribute('data-command'));
 		const menu = (this.currentDropdown = this.targetMap[dropdownName]);
@@ -128,6 +137,15 @@ Menu.prototype = {
 		this.offset.setRelPosition(menu, this.editor._carrierWrapper, element.parentElement, domUtils.getParentElement(element, '.se-toolbar'));
 
 		menu.style.visibility = '';
+	},
+
+	_checkMoreLayer: function (element) {
+		const more = domUtils.getParentElement(element, '.se-more-layer');
+		if (more && more.style.display !== 'block') {
+			return more.getAttribute('data-ref') ? more : null;
+		} else {
+			return null;
+		}
 	}
 };
 
