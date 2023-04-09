@@ -5345,7 +5345,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             // figure
             if (util.isFigures(tagName)) {
-                let w = '', h = '';
                 const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (!v) v = [];
                 if (sv) {
@@ -5353,18 +5352,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     const hsize = sv[0].match(/height\s?:\s?(\d+)(px|%)/);
                     const w_ = wsize && wsize[1] && wsize[2] ? wsize[1] + wsize[2] : 'auto';
                     const h_ = hsize && hsize[1] && hsize[2] ? hsize[1] + hsize[2] : 'auto';
-                    w = util.getNumber(w_, -1) || '';
-                    h = util.getNumber(h_, -1) || '';
                     v.push('style="width:'+ w_ + '; height:'+ h_ + ';"');
-                }
-                
-                if (!w || !h) {
-                    const avw = m.match(/width\s*=\s*((?:"|')[^"']*(?:"|'))/);
-                    const avh = m.match(/height\s*=\s*((?:"|')[^"']*(?:"|'))/);
-                    if (avw || avh) {
-                        w = !w ? util.getNumber(avw ? avw[1] : '') || '' : w;
-                        h = !h ? util.getNumber(avh ? avh[1] : '') || '' : h;
-                    }
                 }
             }
 
