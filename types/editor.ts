@@ -131,9 +131,9 @@ export interface Core {
 
 	/**
 	 * @description Plugins array with "active" method.
-	 * "activePlugins" runs the "add" method when creating the editor.
+	 * "activeCommands" runs the "add" method when creating the editor.
 	 */
-	activePlugins: Plugin[];
+	activeCommands: Plugin[];
 
 	/**
 	 * @description Plugins array with "checkFiletInfo" and "resetFileInfo" methods.
@@ -144,7 +144,7 @@ export interface Core {
 
 	/**
 	 * @description Elements that need to change text or className for each selection change
-	 * After creating the editor, "activePlugins" are added.
+	 * After creating the editor, "activeCommands" are added.
 	 * @property STRONG bold button
 	 * @property U underline button
 	 * @property EM italic button

@@ -113,13 +113,14 @@ EventManager.prototype = {
 
 		const marginDir = this.options.get('_rtl') ? 'marginRight' : 'marginLeft';
 		const plugins = this.plugins;
-		const cmdTargetMap = this.editor.cmdTargetMap;
+		const commandTargets = this.editor.commandTargets;
 		const classOnCheck = this._onButtonsCheck;
+		const styleCommand = this.options.get('_styleCommandMap');
 		const commandMapNodes = [];
 		const currentNodes = [];
 
-		const activePlugins = this.editor.activePlugins;
-		const cLen = activePlugins.length;
+		const activeCommands = this.editor.activeCommands;
+		const cLen = activeCommands.length;
 		let nodeName = '';
 
 		while (selectionNode.firstChild) {
@@ -135,12 +136,12 @@ EventManager.prototype = {
 			/* Active plugins */
 			if (!this.status.isReadOnly) {
 				for (let c = 0, name; c < cLen; c++) {
-					name = activePlugins[c];
+					name = activeCommands[c];
 					if (
 						commandMapNodes.indexOf(name) === -1 &&
-						cmdTargetMap.get(name) &&
-						cmdTargetMap.get(name).filter(function (e) {
-							return plugins[name].active(element, e);
+						commandTargets.get(name) &&
+						commandTargets.get(name).filter(function (e) {
+							return plugins[name] ? plugins[name].active(element, e) : false;
 						}).length > 0
 					) {
 						commandMapNodes.push(name);
@@ -151,9 +152,9 @@ EventManager.prototype = {
 			/** indent, outdent */
 			if (this.format.isLine(element)) {
 				/* Outdent */
-				if (commandMapNodes.indexOf('outdent') === -1 && cmdTargetMap.get('outdent') && (domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))) {
+				if (commandMapNodes.indexOf('outdent') === -1 && commandTargets.get('outdent') && (domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))) {
 					if (
-						cmdTargetMap.get('outdent').filter(function (e) {
+						commandTargets.get('outdent').filter(function (e) {
 							if (domUtils.isImportantDisabled(e)) return false;
 							e.removeAttribute('disabled');
 							return true;
@@ -164,10 +165,10 @@ EventManager.prototype = {
 				}
 
 				/* Indent */
-				if (commandMapNodes.indexOf('indent') === -1 && cmdTargetMap.get('indent')) {
+				if (commandMapNodes.indexOf('indent') === -1 && commandTargets.get('indent')) {
 					const indentDisable = domUtils.isListCell(element) && !element.previousElementSibling;
 					if (
-						cmdTargetMap.get('indent').filter(function (e) {
+						commandTargets.get('indent').filter(function (e) {
 							if (domUtils.isImportantDisabled(e)) return false;
 							if (indentDisable) {
 								e.setAttribute('disabled', true);
@@ -186,12 +187,13 @@ EventManager.prototype = {
 
 			/** default active buttons [strong, ins, em, del, sub, sup] */
 			if (classOnCheck.test(nodeName)) {
+				nodeName = styleCommand[nodeName] || nodeName;
 				commandMapNodes.push(nodeName);
-				domUtils.addClass(cmdTargetMap.get(nodeName), 'active');
+				domUtils.addClass(commandTargets.get(nodeName), 'active');
 			}
 		}
 
-		this._setKeyEffect(commandMapNodes, plugins, cmdTargetMap);
+		this._setKeyEffect(commandMapNodes);
 
 		/** save current nodes */
 		this.status.currentNodes = currentNodes.reverse();
@@ -206,22 +208,26 @@ EventManager.prototype = {
 	 * @param {Array|null} ignoredList Igonred button list
 	 * @private
 	 */
-	_setKeyEffect: function (ignoredList, plugins, cmdTargetMap) {
-		const activePlugins = this.editor.activePlugins;
-		cmdTargetMap.forEach(function (e, k) {
-			if (ignoredList.indexOf(k) > -1 || !e || e.length === 0) return;
-			e.forEach(function (v) {
-				if (activePlugins.indexOf(k) > -1) {
-					plugins[k].active(null, v);
+	_setKeyEffect: function (ignoredList) {
+		const activeCommands = this.editor.activeCommands;
+		const commandTargets = this.editor.commandTargets;
+		const plugins = this.plugins;
+		for (let i = 0, len = activeCommands.length, k; i < len; i++) {
+			k = activeCommands[i];
+			if (ignoredList.indexOf(k) > -1 || !commandTargets.has(k)) return;
+			commandTargets.get(k).forEach(function (e) {
+				if (!e || e.length === 0) return;
+				if (plugins[k]) {
+					plugins[k].active(null, e);
 				} else if (/^outdent$/i.test(k)) {
-					if (!domUtils.isImportantDisabled(v)) v.setAttribute('disabled', true);
+					if (!domUtils.isImportantDisabled(e)) e.setAttribute('disabled', true);
 				} else if (/^indent$/i.test(k)) {
-					if (!domUtils.isImportantDisabled(v)) v.removeAttribute('disabled');
+					if (!domUtils.isImportantDisabled(e)) e.removeAttribute('disabled');
 				} else {
-					domUtils.removeClass(v, 'active');
+					domUtils.removeClass(e, 'active');
 				}
 			});
-		});
+		}
 	},
 
 	_showToolbarBalloonDelay: function () {
@@ -1837,9 +1843,7 @@ function OnFocus_wysiwyg(rootKey, e) {
 	if (this.editor._antiBlur) return;
 	this.status.hasFocus = true;
 
-	this.editor.applyCmdTarget('codeView', function (e) {
-		domUtils.removeClass(e, 'active');
-	});
+	domUtils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
 	domUtils.setDisabled(this.editor._codeViewDisabledButtons, false);
 
 	this.editor.changeFrameContext(rootKey);
@@ -1861,7 +1865,7 @@ function OnBlur_wysiwyg(rootKey, e) {
 	if (this.editor.isInline || this.editor.isBalloon) this._hideToolbar();
 	if (this.editor.isSubBalloon) this._hideToolbar_sub();
 
-	this._setKeyEffect([], null, []);
+	this._setKeyEffect([]);
 
 	this.status.currentNodes = [];
 	this.status.currentNodesMap = [];
@@ -1995,9 +1999,7 @@ function OnScroll_Abs() {
 
 function OnFocus_code(rootKey) {
 	this.editor.changeFrameContext(rootKey);
-	this.editor.applyCmdTarget('codeView', function (e) {
-		domUtils.addClass(e, 'active');
-	});
+	domUtils.addClass(this.editor.commandTargets.get('codeView'), 'active');
 	domUtils.setDisabled(this.editor._codeViewDisabledButtons, true);
 }
 

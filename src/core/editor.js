@@ -7,7 +7,7 @@ import EventManager from './eventManager';
 import ClassDependency from '../dependency/_classes';
 
 // base
-import { SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE, BASIC_COMMANDS, GET_DEFAULT_COMMAND_KEY } from './base/actives';
+import { BASIC_COMMANDS, DEFAULT_ACTIVE_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE, GET_DEFAULT_COMMAND_KEY } from './base/actives';
 
 // classes
 import Char from './class/char';
@@ -158,13 +158,13 @@ const Editor = function (multiTargets, options) {
 	 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
 	 * Each button is contained in an array.
 	 */
-	this.cmdTargetMap = new _w.Map();
+	this.commandTargets = new _w.Map();
 
 	/**
 	 * @description Plugins array with "active" method.
-	 * "activePlugins" runs the "add" method when creating the editor.
+	 * "activeCommands" runs the "add" method when creating the editor.
 	 */
-	this.activePlugins = null;
+	this.activeCommands = null;
 
 	/**
 	 * @description The selection node (selection.getNode()) to which the effect was last applied
@@ -362,8 +362,8 @@ Editor.prototype = {
 				UpdateButton(targets[i], plugin, this.icons, this.lang);
 			}
 
-			if (this.activePlugins.indexOf(pluginName) < 0) {
-				this.activePlugins.push(pluginName);
+			if (this.activeCommands.indexOf(pluginName) === -1 && typeof this.plugins[pluginName].active === 'function') {
+				this.activeCommands.push(pluginName);
 			}
 		}
 	},
@@ -492,14 +492,14 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description It is executed by inserting the button of cmdTargetMap as the argument value of the "f" function.
+	 * @description It is executed by inserting the button of commandTargets as the argument value of the "f" function.
 	 * "f" is called as long as the button array's length.
 	 * @param {string} cmd data-command
 	 * @param {Function} f Function.
 	 */
-	applyCmdTarget: function (cmd, f) {
-		if (this.cmdTargetMap.has(cmd)) {
-			this.cmdTargetMap.get(cmd).forEach(f);
+	applyCommandTargets: function (cmd, f) {
+		if (this.commandTargets.has(cmd)) {
+			this.commandTargets.get(cmd).forEach(f);
 		}
 	},
 
@@ -1108,7 +1108,7 @@ Editor.prototype = {
 	_onChange_historyStack: function () {
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
 		this.status.isChanged = true;
-		this.applyCmdTarget('save', function (e) {
+		this.applyCommandTargets('save', function (e) {
 			e.removeAttribute('disabled');
 		});
 		// user event
@@ -1185,7 +1185,7 @@ Editor.prototype = {
 		};
 
 		// Command and file plugins registration
-		this.activePlugins = [];
+		this.activeCommands = DEFAULT_ACTIVE_COMMANDS;
 		this._onMousedownPlugins = [];
 		this._onKeyDownPlugins = [];
 		this._fileManager.tags = [];
@@ -1275,7 +1275,7 @@ Editor.prototype = {
 			c = e.getAttribute('data-command');
 			CreateShortcuts(c, e, shortcuts[c], keyMap);
 			cmdButtons.set(c, e);
-			this._setCmdTargetMap(c, e, textTAgs);
+			this._setCommandTargets(c, e, textTAgs);
 		}
 
 		if (!isSub && this.options.has('subMode')) {
@@ -1283,17 +1283,17 @@ Editor.prototype = {
 		}
 	},
 
-	_setCmdTargetMap: function (cmd, target, textTags) {
+	_setCommandTargets: function (cmd, target, textTags) {
 		if (!cmd || !target) return;
 
 		const isBasicCmd = BASIC_COMMANDS.indexOf(cmd) > -1;
-		if (!isBasicCmd && !(this.plugins[cmd] && typeof this.plugins[cmd].active === 'function')) return;
-		if (isBasicCmd) cmd = GET_DEFAULT_COMMAND_KEY(textTags, cmd);
+		if (!isBasicCmd && !this.plugins[cmd]) return;
+		// if (isBasicCmd) cmd = GET_DEFAULT_COMMAND_KEY(textTags, cmd);
 
-		if (!this.cmdTargetMap.get(cmd)) {
-			this.cmdTargetMap.set(cmd, [target]);
-		} else if (this.cmdTargetMap.get(cmd).indexOf(target) < 0) {
-			this.cmdTargetMap.get(cmd).push(target);
+		if (!this.commandTargets.get(cmd)) {
+			this.commandTargets.set(cmd, [target]);
+		} else if (this.commandTargets.get(cmd).indexOf(target) < 0) {
+			this.commandTargets.get(cmd).push(target);
 		}
 	},
 

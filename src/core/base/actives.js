@@ -1,13 +1,14 @@
 import { domUtils } from '../../helper';
 
 const StyleMap = {
-	STRONG: ['font-weight'],
-	U: ['text-decoration'],
-	EM: ['font-style'],
-	DEL: ['text-decoration']
+	bold: ['font-weight'],
+	underline: ['text-decoration'],
+	italic: ['font-style'],
+	strike: ['text-decoration']
 };
 
-export const BASIC_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'sub', 'sup', 'undo', 'redo', 'save', 'outdent', 'indent', 'fullScreen', 'showBlocks', 'codeView', 'dir', 'dir_ltr', 'dir_rtl'];
+export const BASIC_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'undo', 'redo', 'save', 'outdent', 'indent', 'fullScreen', 'showBlocks', 'codeView', 'dir', 'dir_ltr', 'dir_rtl'];
+export const DEFAULT_ACTIVE_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fullScreen', 'showBlocks', 'codeView'];
 
 export function GET_DEFAULT_COMMAND_KEY(textTags, command) {
 	return textTags[command] || command;
@@ -58,31 +59,35 @@ export function SELECT_ALL(editor) {
 
 export function DIR_BTN_ACTIVE(editor, rtl) {
 	const icons = editor.icons;
-	const shortcutKey = editor.shortcuts.keyMap;
 
-	// change indent buttons
-	editor.applyCmdTarget('indent', function (e) {
-		domUtils.changeElement(e.firstElementChild, rtl ? icons.outdent : icons.indent);
-		domUtils.changeTxt(e.querySelector('.se-shortcut-key'), rtl ? shortcutKey.outdent[1] : shortcutKey.indent[1]);
-	});
-	editor.applyCmdTarget('outdent', function (e) {
-		domUtils.changeElement(e.firstElementChild, rtl ? icons.indent : icons.outdent);
-		domUtils.changeTxt(e.querySelector('.se-shortcut-key'), rtl ? shortcutKey.indent[1] : shortcutKey.outdent[1]);
+	// change reverse buttons
+	editor.options.get('reverseCommands').forEach(function (reverseCmds) {
+		const cmds = reverseCmds.split('-');
+		let a = editor.commandTargets.get(cmds[0]);
+		let b = editor.commandTargets.get(cmds[1]);
+		if (!a || !b) return;
+		a = a[0].innerHTML;
+		b = b[0].innerHTML;
+		editor.applyCommandTargets(cmds[0], function (e) {
+			e.innerHTML = b;
+		});
+		editor.applyCommandTargets(cmds[1], function (e) {
+			e.innerHTML = a;
+		});
 	});
 
 	// change dir buttons
-	editor.applyCmdTarget('dir', function (e) {
-		domUtils.changeTxt(e.querySelector('.se-tooltip-text'), editor.lang[editor.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
-		domUtils.changeElement(e.firstElementChild, icons[editor.options.get('_rtl') ? 'dir_ltr' : 'dir_rtl']);
+	editor.applyCommandTargets('dir', function (e) {
+		domUtils.changeTxt(e.querySelector('.se-tooltip-text'), editor.lang[rtl ? 'dir_ltr' : 'dir_rtl']);
+		domUtils.changeElement(e.firstElementChild, icons[rtl ? 'dir_ltr' : 'dir_rtl']);
 	});
-	editor.applyCmdTarget('dir_ltr', function (e) {
-		if (rtl) domUtils.removeClass(e, 'active');
-		else domUtils.addClass(e, 'active');
-	});
-	editor.applyCmdTarget('dir_rtl', function (e) {
-		if (rtl) domUtils.addClass(e, 'active');
-		else domUtils.removeClass(e, 'active');
-	});
+	if (rtl) {
+		domUtils.addClass(editor.commandTargets.get('dir_rtl'), 'active');
+		domUtils.removeClass(editor.commandTargets.get('dir_ltr'), 'active');
+	} else {
+		domUtils.addClass(editor.commandTargets.get('dir_ltr'), 'active');
+		domUtils.removeClass(editor.commandTargets.get('dir_rtl'), 'active');
+	}
 }
 
 export function SAVE(editor) {
@@ -99,7 +104,7 @@ export function SAVE(editor) {
 	editor.status.isChanged = false;
 
 	// set save button disable
-	editor.applyCmdTarget('save', function (e) {
+	editor.applyCommandTargets('save', function (e) {
 		e.setAttribute('disabled', true);
 	});
 
@@ -110,19 +115,18 @@ export function SAVE(editor) {
 	}
 }
 
-// 'STRONG', 'U', 'EM', 'DEL', 'SUB', 'SUP'
 export function FONT_STYLE(editor, command) {
 	command = editor.options.get('_defaultCommand')[command.toLowerCase()] || command;
+	let nodeName = editor.options.get('textTags')[command] || command;
 	const nodesMap = editor.status.currentNodesMap;
-	const cmd = nodesMap.indexOf(command) > -1 ? null : domUtils.createElement(command);
-	let removeNode = command;
+	const el = nodesMap.indexOf(nodeName) > -1 ? null : domUtils.createElement(nodeName);
 
-	if (/^sub$/i.test(command) && nodesMap.indexOf('sup') > -1) {
-		removeNode = 'sup';
-	} else if (/^sup$/i.test(command) && nodesMap.indexOf('sub') > -1) {
-		removeNode = 'sub';
+	if (/^sub$/i.test(nodeName) && nodesMap.indexOf('sup') > -1) {
+		nodeName = 'sup';
+	} else if (/^sup$/i.test(nodeName) && nodesMap.indexOf('sub') > -1) {
+		nodeName = 'sub';
 	}
 
-	editor.format.applyTextStyle(cmd, StyleMap[command] || null, [removeNode], false);
+	editor.format.applyTextStyle(el, StyleMap[command] || null, [nodeName], false);
 	editor.focus();
 }

@@ -50,32 +50,32 @@ export default function (editor, change) {
 		else if (stackIndex >= stack.length) stackIndex = stack.length - 1;
 
 		if (stack.length <= 1) {
-			editor.applyCmdTarget('undo', function (e) {
+			editor.applyCommandTargets('undo', function (e) {
 				e.setAttribute('disabled', true);
 			});
-			editor.applyCmdTarget('redo', function (e) {
+			editor.applyCommandTargets('redo', function (e) {
 				e.setAttribute('disabled', true);
 			});
 		} else {
 			if (stackIndex === 0) {
-				editor.applyCmdTarget('undo', function (e) {
+				editor.applyCommandTargets('undo', function (e) {
 					e.setAttribute('disabled', true);
 				});
-				editor.applyCmdTarget('redo', function (e) {
+				editor.applyCommandTargets('redo', function (e) {
 					e.removeAttribute('disabled');
 				});
 			} else if (stackIndex === stack.length - 1) {
-				editor.applyCmdTarget('undo', function (e) {
+				editor.applyCommandTargets('undo', function (e) {
 					e.removeAttribute('disabled');
 				});
-				editor.applyCmdTarget('redo', function (e) {
+				editor.applyCommandTargets('redo', function (e) {
 					e.setAttribute('disabled', true);
 				});
 			} else {
-				editor.applyCmdTarget('undo', function (e) {
+				editor.applyCommandTargets('undo', function (e) {
 					e.removeAttribute('disabled');
 				});
-				editor.applyCmdTarget('redo', function (e) {
+				editor.applyCommandTargets('redo', function (e) {
 					e.removeAttribute('disabled');
 				});
 			}
@@ -146,7 +146,7 @@ export default function (editor, change) {
 
 		stack = stack.slice(0, stackIndex + 1);
 		root.value.splice(stackIndex + 1);
-		editor.applyCmdTarget('redo', function (e) {
+		editor.applyCommandTargets('redo', function (e) {
 			e.setAttribute('disabled', true);
 		});
 
@@ -167,7 +167,7 @@ export default function (editor, change) {
 		setStack(current, range, rootKey, 1);
 
 		if (stackIndex === 1) {
-			editor.applyCmdTarget('undo', function (e) {
+			editor.applyCommandTargets('undo', function (e) {
 				e.removeAttribute('disabled');
 			});
 		}
@@ -240,15 +240,15 @@ export default function (editor, change) {
 		 * @description Reset the history object
 		 */
 		reset: function () {
-			editor.applyCmdTarget('undo', function (e) {
+			editor.applyCommandTargets('undo', function (e) {
 				e.setAttribute('disabled', true);
 			});
-			editor.applyCmdTarget('redo', function (e) {
+			editor.applyCommandTargets('redo', function (e) {
 				e.setAttribute('disabled', true);
 			});
 
 			editor.status.isChanged = false;
-			editor.applyCmdTarget('save', function (e) {
+			editor.applyCommandTargets('save', function (e) {
 				e.setAttribute('disabled', true);
 			});
 
@@ -268,20 +268,20 @@ export default function (editor, change) {
 		 */
 		resetButtons: function () {
 			if (stackIndex === 0) {
-				editor.applyCmdTarget('undo', function (e) {
+				editor.applyCommandTargets('undo', function (e) {
 					e.setAttribute('disabled', true);
 				});
 				if (stackIndex === stack.length - 1) {
-					editor.applyCmdTarget('redo', function (e) {
+					editor.applyCommandTargets('redo', function (e) {
 						e.setAttribute('disabled', true);
 					});
 				}
 				editor.status.isChanged = false;
-				editor.applyCmdTarget('save', function (e) {
+				editor.applyCommandTargets('save', function (e) {
 					e.setAttribute('disabled', true);
 				});
 			} else if (stackIndex === stack.length - 1) {
-				editor.applyCmdTarget('redo', function (e) {
+				editor.applyCommandTargets('redo', function (e) {
 					e.setAttribute('disabled', true);
 				});
 			}

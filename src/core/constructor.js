@@ -206,7 +206,7 @@ export function CreateShortcuts(command, button, values, keyMap) {
 		v = values[i];
 		s = /^s/i.test(v);
 		k = numbers.get(v) + (s ? 1000 : 0);
-		if (!keyMap.has(k)) keyMap.set(k, { c: command, r: v.replace(/^[^r]+(r)?(-)?/, ''), t: button.getAttribute('data-type'), e: button });
+		if (!keyMap.has(k)) keyMap.set(k, { c: command, r: v.replace(/^[^-]+(-)?/, ''), t: button.getAttribute('data-type'), e: button });
 		if (!(t = values[i + 1])) continue;
 		if (tooptip) tooptip.appendChild(domUtils.createElement('SPAN', { class: 'se-shortcut' }, env.cmdIcon + (s ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + t + '</span>'));
 	}
@@ -238,8 +238,8 @@ function InitOptions(options, editorTargets) {
 			underline: 'u',
 			italic: 'em',
 			strike: 'del',
-			sub: 'sub',
-			sup: 'sup',
+			subscript: 'sub',
+			superscript: 'sup',
 			indent: 'indent',
 			outdent: 'outdent'
 		},
@@ -263,8 +263,21 @@ function InitOptions(options, editorTargets) {
 		del: textTags.strike,
 		strike: textTags.strike,
 		s: textTags.strike,
-		sub: textTags.sub,
-		sup: textTags.sup
+		sub: textTags.subscript,
+		sup: textTags.superscript
+	});
+	o.set('_styleCommandMap', {
+		strong: 'bold',
+		b: 'bold',
+		u: 'underline',
+		ins: 'underline',
+		em: 'italic',
+		i: 'italic',
+		del: 'strike',
+		strike: 'strike',
+		s: 'strike',
+		sub: 'subscript',
+		sup: 'superscript'
 	});
 	o.set('_defaultCommand', {
 		bold: textTags.bold,
@@ -277,6 +290,7 @@ function InitOptions(options, editorTargets) {
 	// text direction
 	o.set('textDirection', typeof options.textDirection !== 'string' ? 'ltr' : options.textDirection);
 	o.set('_rtl', o.get('textDirection') === 'rtl');
+	o.set('reverseCommands', ['indent-outdent'].concat(options.reverseButtons || []));
 
 	// etc
 	o.set('historyStackDelayTime', typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400);
@@ -352,8 +366,8 @@ function InitOptions(options, editorTargets) {
 					italic: ['73', 'I'],
 					redo: ['89', 'Y', 's90', 'Z'],
 					undo: ['90', 'Z'],
-					indent: ['221r-outdent', ']'],
-					outdent: ['219r-indent', '['],
+					indent: ['221-outdent', ']'],
+					outdent: ['219-indent', '['],
 					sup: ['187', '='],
 					sub: ['s187', '='],
 					save: ['83', 'S']
@@ -857,8 +871,8 @@ function _defaultButtons(options, icons, lang) {
 		underline: ['', lang.underline, 'underline', '', icons.underline],
 		italic: ['', lang.italic, 'italic', '', icons.italic],
 		strike: ['', lang.strike, 'strike', '', icons.strike],
-		subscript: ['', lang.subscript, 'sub', '', icons.subscript],
-		superscript: ['', lang.superscript, 'sup', '', icons.superscript],
+		subscript: ['', lang.subscript, 'subscript', '', icons.subscript],
+		superscript: ['', lang.superscript, 'superscript', '', icons.superscript],
 		removeFormat: ['', lang.removeFormat, 'removeFormat', '', icons.erase],
 		indent: ['', lang.indent, 'indent', '', isRTL ? icons.outdent : icons.indent],
 		outdent: ['', lang.outdent, 'outdent', '', isRTL ? icons.indent : icons.outdent],

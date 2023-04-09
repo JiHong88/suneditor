@@ -70,9 +70,7 @@ Viewer.prototype = {
 
 			this.status._range = null;
 			codeFrame.focus();
-			this.editor.applyCmdTarget('codeView', function (e) {
-				domUtils.addClass(e, 'active');
-			});
+			domUtils.addClass(this.editor.commandTargets.get('codeView'), 'active');
 		} else {
 			if (!domUtils.isNonEditable(wysiwygFrame)) this._setCodeDataToEditor();
 			wysiwygFrame.scrollTop = 0;
@@ -92,9 +90,7 @@ Viewer.prototype = {
 			}
 
 			this.editor._nativeFocus();
-			this.editor.applyCmdTarget('codeView', function (e) {
-				domUtils.removeClass(e, 'active');
-			});
+			domUtils.removeClass(this.editor.commandTargets.get('codeView'), 'active');
 
 			if (!domUtils.isNonEditable(wysiwygFrame)) {
 				this.history.push(false);
@@ -185,7 +181,7 @@ Viewer.prototype = {
 			fc.get('topArea').style.marginTop = this.options.get('fullScreenOffset') + 'px';
 
 			const reductionIcon = this.icons.reduction;
-			this.editor.applyCmdTarget('fullScreen', function (e) {
+			this.editor.applyCommandTargets('fullScreen', function (e) {
 				domUtils.changeElement(e.firstElementChild, reductionIcon);
 				domUtils.addClass(e, 'active');
 			});
@@ -226,7 +222,7 @@ Viewer.prototype = {
 			fc.get('topArea').style.marginTop = '';
 
 			const expansionIcon = this.icons.expansion;
-			this.editor.applyCmdTarget('fullScreen', function (e) {
+			this.editor.applyCommandTargets('fullScreen', function (e) {
 				domUtils.changeElement(e.firstElementChild, expansionIcon);
 				domUtils.removeClass(e, 'active');
 			});
@@ -247,15 +243,11 @@ Viewer.prototype = {
 		this.editor.frameContext.set('isShowBlocks', !!value);
 
 		if (value) {
-			domUtils.addClass(this.editor.frameContext.get('wysiwyg'), 'se-show-block');
-			this.editor.applyCmdTarget('showBlocks', function (e) {
-				domUtils.addClass(e, 'active');
-			});
+			domUtils.addClass(this.editor.frameContext.get('wysiwyg'), 'se-show-block');;
+			domUtils.addClass(this.editor.commandTargets.get('showBlocks'), 'active');
 		} else {
 			domUtils.removeClass(this.editor.frameContext.get('wysiwyg'), 'se-show-block');
-			this.editor.applyCmdTarget('showBlocks', function (e) {
-				domUtils.removeClass(e, 'active');
-			});
+			domUtils.removeClass(this.editor.commandTargets.get('showBlocks'), 'active');
 		}
 
 		this.editor._resourcesStateChange();
