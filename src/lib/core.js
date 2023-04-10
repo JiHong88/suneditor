@@ -6570,7 +6570,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            _w.setTimeout(core._editorRange.bind(core));
             core._editorRange();
 
             const selectionNode = core.getSelectionNode();
@@ -7466,35 +7465,39 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                         }
                         
                         if (options.lineAttrReset && formatEl) {
-                            e.preventDefault();
-                            e.stopPropagation();
-
                             let newEl;
                             let offset = 0;
                             if (!range.collapsed) {
                                 const isMultiLine = util.getFormatElement(range.startContainer, null) !== util.getFormatElement(range.endContainer, null);
+                                const newFormat = formatEl.cloneNode(false);
+                                newFormat.innerHTML = '<br>';
                                 const r = core.removeNode();
                                 newEl = util.getFormatElement(r.container, null);
+                                if (!newEl) break;
+                                
+                                const innerRange = util.getRangeFormatElement(r.container);
+                                newEl = newEl.contains(innerRange) ? util.getChildElement(innerRange, util.getFormatElement.bind(util)) : newEl;
                                 if (isMultiLine) {
-                                    if (formatEndEdge) {
-                                        const newFormat = formatEl.cloneNode(false);
-                                        newFormat.innerHTML = '<br>';
+                                    if (formatEndEdge && !formatStartEdge) {
                                         newEl.parentNode.insertBefore(newFormat, (!r.prevContainer || r.container === r.prevContainer) ? newEl.nextElementSibling : newEl);
                                         newEl = newFormat;
                                         offset = 0;
-                                    } else if (newEl !== formatEl && newEl.nextElementSibling === formatEl) {
-                                        newEl = formatEl;
                                     } else {
                                         offset = r.offset;
+                                        if (formatStartEdge) {
+                                            const tempEl = newEl.parentNode.insertBefore(newFormat, newEl);
+                                            if (formatEndEdge) {
+                                                newEl = tempEl;
+                                                offset = 0;
+                                            }
+                                        }
                                     }
                                 } else {
-                                    if (!formatEl.parentElement || util.onlyZeroWidthSpace(r.container)) {
-                                        const newFormat = formatEl.cloneNode(false);
-                                        newFormat.innerHTML = '<br>';
-                                        newEl.parentNode.insertBefore(newFormat, (!r.prevContainer || r.container === r.prevContainer) ? newEl.nextElementSibling : newEl);
+                                    if (formatEndEdge && formatStartEdge) {
+                                        newEl.parentNode.insertBefore(newFormat, (r.prevContainer && r.container === r.prevContainer) ? newEl.nextElementSibling : newEl);
                                         newEl = newFormat;
                                         offset = 0;
-                                    } else {
+                                    } else {;
                                         newEl = util.splitElement(r.container, r.offset, util.getElementDepth(formatEl));
                                     }
                                 }
@@ -7505,6 +7508,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                     newEl = util.splitElement(range.endContainer, range.endOffset, util.getElementDepth(formatEl));
                                 }
                             }
+
+                            e.preventDefault();
+                            e.stopPropagation();
 
                             util.copyTagAttributes(newEl, formatEl, ['id'].concat(options.lineAttrReset));
                             core.setRange(newEl, offset, newEl, offset);
@@ -7706,6 +7712,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         onMouseDown_resizingBar: function (e) {
             e.stopPropagation();
+            _w.setTimeout(core._editorRange.bind(core));
 
             core.submenuOff();
             core.controllersOff();
