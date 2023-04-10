@@ -7374,7 +7374,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 break;
                             }
     
-                            if ((range.commonAncestorContainer.nodeType === 3 ? !range.commonAncestorContainer.nextElementSibling : true) && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
+                            if ((range.commonAncestorContainer.nodeType === 3 ? !range.commonAncestorContainer.nextElementSibling : true) && util.onlyZeroWidthSpace(formatEl.innerText.trim()) && !util.isListCell(formatEl.nextElementSibling)) {
                                 e.preventDefault();
                                 let newEl = null;
     
@@ -7497,7 +7497,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                         newEl.parentNode.insertBefore(newFormat, (r.prevContainer && r.container === r.prevContainer) ? newEl.nextElementSibling : newEl);
                                         newEl = newFormat;
                                         offset = 0;
-                                    } else {;
+                                    } else {
                                         newEl = util.splitElement(r.container, r.offset, util.getElementDepth(formatEl));
                                     }
                                 }

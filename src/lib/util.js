@@ -1501,6 +1501,10 @@ const util = {
         if (newEl.childNodes.length > 0) pElement.insertBefore(newEl, depthEl);
         else newEl = depthEl;
 
+        if (this.isListCell(newEl) && newEl.children && this.isList(newEl.children[0])) {
+            newEl.insertBefore(this.createElement('BR'), newEl.children[0]);
+        }
+
         if (bp.childNodes.length === 0) this.removeItem(bp);
 
         return newEl;
