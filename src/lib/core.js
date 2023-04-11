@@ -6510,6 +6510,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         onMouseDown_wysiwyg: function (e) {
             if (core.isReadOnly || util.isNonEditable(context.element.wysiwyg)) return;
+            _w.setTimeout(core._editorRange.bind(core));
 
             // user event
             if (typeof functions.onMouseDown === 'function' && functions.onMouseDown(e, core) === false) return;
@@ -7723,7 +7724,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         onMouseDown_resizingBar: function (e) {
             e.stopPropagation();
-            _w.setTimeout(core._editorRange.bind(core));
 
             core.submenuOff();
             core.controllersOff();
