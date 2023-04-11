@@ -1,5 +1,15 @@
 import { _d, _w } from './env';
 
+const FONT_VALUES_MAP = {
+	'xx-small': 1,
+	'x-small': 2,
+	'small': 3,
+	'medium': 4,
+	'large': 5,
+	'x-large': 6,
+	'xx-large': 7
+};
+
 /**
  * @description Convert HTML string to HTML Entity
  * @param {string} content
@@ -48,8 +58,8 @@ export function entityToHTML(content) {
 export function fontSize(to, size) {
 	const math = _w.Math;
 	const value = size.match(/(\d+(?:\.\d+)?)(.+)/);
-	const sizeNum = value[1] * 1;
-	const from = value[2];
+	const sizeNum = value ? value[1] * 1 : FONT_VALUES_MAP[size];
+	const from = value ? value[2] : 'rem';
 	let pxSize = sizeNum;
 
 	if (/em/.test(from)) {

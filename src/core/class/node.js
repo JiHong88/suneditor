@@ -105,6 +105,10 @@ Node_.prototype = {
 		if (newEl.childNodes.length > 0) pElement.insertBefore(newEl, depthEl);
 		else newEl = depthEl;
 
+		if (domUtils.isListCell(newEl) && newEl.children && domUtils.isList(newEl.children[0])) {
+            newEl.insertBefore(domUtils.createElement('BR'), newEl.children[0]);
+        }
+
 		if (bp.childNodes.length === 0) domUtils.removeItem(bp);
 
 		return newEl;

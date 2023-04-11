@@ -297,7 +297,7 @@ function InitOptions(options, editorTargets) {
 	o.set('frameAttrbutes', options.frameAttrbutes || {});
 	o.set('_editableClass', 'sun-editor-editable' + (o.get('_rtl') ? ' se-rtl' : ''));
 	o.set('callBackSave', options.callBackSave);
-	o.set('lineAttrReset', typeof options.lineAttrReset === 'string' && options.lineAttrReset ? options.lineAttrReset.toLowerCase().split('|') : null);
+	o.set('lineAttrReset', ['id'].concat((options.lineAttrReset && typeof options.lineAttrReset === 'string') ? options.lineAttrReset.toLowerCase().split('|') : []));
 	o.set('_printClass', typeof options._printClass === 'string' ? options._printClass : null);
 
 	/** whitelist, blacklist */

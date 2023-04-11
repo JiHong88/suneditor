@@ -103,7 +103,7 @@ HTML.prototype = {
 	 * @returns {string}
 	 */
 	clean: function (html, requireFormat, whitelist, blacklist) {
-		html = DeleteDisallowedTags(this.editor._parser.parseFromString(html, 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, true));
+		html = DeleteDisallowedTags(this.editor._parser.parseFromString(html, 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, true)).replace(/<br\/?>$/i, '');
 		html = this.compress(html);
 		const dom = this._d.createRange().createContextualFragment(html, true);
 
@@ -597,6 +597,21 @@ HTML.prototype = {
 		this.selection._resetRangeToTextNode();
 
 		const range = this.selection.getRange();
+		const isStartEdge = range.startOffset === 0;
+		const isEndEdge = domUtils.isEdgePoint(range.endContainer, range.endOffset, 'end');
+		let prevContainer = null;
+		let startPrevEl = null;
+		let endNextEl = null;
+		if (isStartEdge) {
+			startPrevEl = this.format.getLine(range.startContainer);
+			prevContainer = startPrevEl.previousElementSibling;
+			startPrevEl = startPrevEl ? prevContainer : startPrevEl;
+		}
+		if (isEndEdge) {
+			endNextEl = this.format.getLine(range.endContainer);
+			endNextEl = endNextEl ? endNextEl.nextElementSibling : endNextEl;
+		}
+
 		let container,
 			offset = 0;
 		let startCon = range.startContainer;
@@ -733,7 +748,18 @@ HTML.prototype = {
 			container = endUl.previousSibling;
 			offset = container.textContent.length;
 		} else {
-			container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : range.endContainer || range.startContainer;
+			container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : (range.endContainer || range.startContainer);
+			offset = (!isStartEdge && !isEndEdge) ? offset : isEndEdge ? container.textContent.length : 0;
+		}
+
+		if (!this.format.getLine(container) && !(startCon && startCon.parentNode)) {
+			if (endNextEl) {
+				container = endNextEl;
+				offset = 0;
+			} else if (startPrevEl) {
+				container = startPrevEl;
+				offset = 1;
+			}
 		}
 
 		if (!domUtils.isWysiwygFrame(container) && container.childNodes.length === 0) {
@@ -748,7 +774,7 @@ HTML.prototype = {
 		return {
 			container: container,
 			offset: offset,
-			prevContainer: startCon && startCon.parentNode ? startCon : null
+			prevContainer: prevContainer
 		};
 	},
 
@@ -1270,8 +1296,8 @@ HTML.prototype = {
 			if (style) {
 				const allowedStyle = [];
 				for (let i = 0, len = style.length, r; i < len; i++) {
-					r = style[i].match(/([a-zA-Z0-9-]+)(:)([^:]+$)/);
-					if (r && !/inherit|initial/i.test(r[3])) {
+					r = style[i].match(/([a-zA-Z0-9-]+)(:)([^"]+)/);
+					if (r && !/inherit|initial|revert|unset/i.test(r[3])) {
 						const k = env.kebabToCamelCase(r[1].trim());
 						const v = this.editor.frameContext.get('wwComputedStyle')[k].replace(/"/g, '');
 						const c = r[3].trim();
@@ -1282,7 +1308,7 @@ HTML.prototype = {
 							case 'fontSize':
 								if (!this.plugins.fontSize) continue;
 								if (!this._cleanStyleRegExp.fontSizeUnit.test(r[0])) {
-									r[0] = r[0].replace(this._w.RegExp('\\d+' + r[0].match(/\d+(.+$)/)[1]), converter.fontSize.bind(null, this.options.get('fontSizeUnit')));
+									r[0] = r[0].replace((r[0].match(/:\s*([^;]+)/) || [])[1], converter.fontSize.bind(null, this.options.get('fontSizeUnit')));
 								}
 								break;
 							case 'color':
@@ -1413,7 +1439,7 @@ function CleanElements(lowLevelCheck, m, t) {
 	else v = m.match(lowLevelCheck ? this._attributeWhitelistRegExp : this._attributeWhitelistRegExp_all_data);
 
 	// attribute
-	if (lowLevelCheck) {
+	if (lowLevelCheck || tagName === 'span') {
 		if (tagName === 'a') {
 			const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
 			if (sv) {
@@ -1439,28 +1465,17 @@ function CleanElements(lowLevelCheck, m, t) {
 			v.push(sv[0]);
 	}
 
-	// img
-	if (tagName === 'img') {
-		let w = '',
-			h = '';
+	// figure
+	if (domUtils.isFigures(tagName)) {
 		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
 		if (!v) v = [];
 		if (sv) {
-			w = sv[0].match(/width:(.+);/);
-			w = numbers.get(w ? w[1] : '', -1) || '';
-			h = sv[0].match(/height:(.+);/);
-			h = numbers.get(h ? h[1] : '', -1) || '';
+			const wsize = sv[0].match(/width\s?:\s?(\d+)(px|%)/);
+			const hsize = sv[0].match(/height\s?:\s?(\d+)(px|%)/);
+			const w_ = wsize && wsize[1] && wsize[2] ? wsize[1] + wsize[2] : 'auto';
+			const h_ = hsize && hsize[1] && hsize[2] ? hsize[1] + hsize[2] : 'auto';
+			v.push('style="width:'+ w_ + '; height:'+ h_ + ';"');
 		}
-
-		if (!w || !h) {
-			const avw = m.match(/width\s*=\s*((?:"|')[^"']*(?:"|'))/);
-			const avh = m.match(/height\s*=\s*((?:"|')[^"']*(?:"|'))/);
-			if (avw || avh) {
-				w = !w ? numbers.get(avw ? avw[1] : '') || '' : w;
-				h = !h ? numbers.get(avh ? avh[1] : '') || '' : h;
-			}
-		}
-		v.push('data-se-origin="' + (w + ',' + h) + '"');
 	}
 
 	if (v) {

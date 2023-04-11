@@ -539,16 +539,10 @@ export function copyTagAttributes(originEl, copyEl, blacklist) {
 	}
 
 	const attrs = copyEl.attributes;
-	for (let i = 0, len = attrs.length; i < len; i++) {
-		if (blacklist && blacklist.indexOf(attrs[i].name.toLowerCase()) > -1) continue;
-		originEl.setAttribute(attrs[i].name, attrs[i].value);
-	}
-
-	const originAttrs = originEl.attributes;
-	for (let i = 0, len = originAttrs.length; i < len; i++) {
-		if (!originAttrs[i].value) {
-			originEl.removeAttribute(originAttrs[i].name);
-		}
+	for (let i = 0, len = attrs.length, name; i < len; i++) {
+		name = attrs[i].name.toLowerCase();
+		if ((blacklist && blacklist.indexOf(name) > -1) || !attrs[i].value) originEl.removeAttribute(name);
+		else originEl.setAttribute(attrs[i].name, attrs[i].value);
 	}
 }
 
@@ -827,6 +821,15 @@ export function isMedia(node) {
 }
 
 /**
+ * @description Check the node is a figure tag or domUtils.isMedia()
+ * @param {Node|String} node The element or element name to check
+ * @returns {Boolean}
+ */
+export function isFigures (node) {
+	return node && (isMedia(node) || /^(FIGURE)$/i.test(typeof node === 'string' ? node : node.nodeName));
+}
+
+/**
  * @description Check the line element is empty.
  * @param {Element} element Format element node
  * @returns {boolean}
@@ -937,6 +940,7 @@ const domUtils = {
 	isBreak: isBreak,
 	isAnchor: isAnchor,
 	isMedia: isMedia,
+	isFigures: isFigures,
 	isEmptyLine: isEmptyLine,
 	isSpanWithoutAttr: isSpanWithoutAttr,
 	isUneditable: isUneditable,

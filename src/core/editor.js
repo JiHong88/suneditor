@@ -1152,6 +1152,7 @@ Editor.prototype = {
 				// roots
 				this.rootTargets.forEach(
 					function (e) {
+						if (typeof this._resourcesStateChange !== 'function') return;
 						// observer
 						if (this.eventManager._resizeObserver) this.eventManager._resizeObserver.observe(e.get('wysiwygFrame'));
 						if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(e.get('_toolbarShadow'));

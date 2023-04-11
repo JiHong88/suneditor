@@ -594,8 +594,9 @@ EventManager.prototype = {
 		/** editor area */
 		const rootKey = frameContext.get('key');
 		const wwMouseDown = OnMouseDown_wysiwyg.bind(this, rootKey);
+		const wwClickEvent = OnClick_wysiwyg.bind(this, rootKey);
 		this.addEvent(eventWysiwyg, 'mousedown', wwMouseDown, false);
-		this.addEvent(eventWysiwyg, 'click', OnClick_wysiwyg.bind(this, rootKey), false);
+		this.addEvent(eventWysiwyg, 'click', wwClickEvent, false);
 		this.addEvent(eventWysiwyg, env.isIE ? 'textinput' : 'input', OnInput_wysiwyg.bind(this, rootKey), false);
 		this.addEvent(eventWysiwyg, 'keydown', OnKeyDown_wysiwyg.bind(this, rootKey), false);
 		this.addEvent(eventWysiwyg, 'keyup', OnKeyUp_wysiwyg.bind(this, rootKey), false);
@@ -622,13 +623,15 @@ EventManager.prototype = {
 		this.addEvent(frameContext.get('lineBreaker_t'), 'mousedown', DisplayLineBreak.bind(this, 't'), false);
 		this.addEvent(frameContext.get('lineBreaker_b'), 'mousedown', DisplayLineBreak.bind(this, 'b'), false);
 
-		/** Events are registered only when there is a table plugin.  */
-		if (this.plugins.table) {
-			this.addEvent(eventWysiwyg, 'touchstart', wwMouseDown, {
-				passive: true,
-				useCapture: false
-			});
-		}
+		/** Events are registered mobile. */
+		this.addEvent(eventWysiwyg, 'touchstart', wwMouseDown, {
+			passive: true,
+			useCapture: false
+		});
+		this.addEvent(eventWysiwyg, 'touchend', wwClickEvent, {
+			passive: true,
+			useCapture: false
+		});
 
 		/** code view area auto line */
 		if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) {
@@ -840,6 +843,7 @@ function OnClick_toolbar(e) {
 
 function OnMouseDown_wysiwyg(rootKey, e) {
 	if (this.status.isReadOnly || domUtils.isNonEditable(this.editor.frameContext.get('wysiwyg'))) return;
+	_w.setTimeout(this.selection._init.bind(this.selection));
 
 	// user event
 	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown(rootKey, e) === false) return;
@@ -902,7 +906,6 @@ function OnClick_wysiwyg(rootKey, e) {
 		}
 	}
 
-	_w.setTimeout(this.selection._init.bind(this.selection));
 	this.selection._init();
 
 	const selectionNode = this.selection.getNode();
@@ -1472,65 +1475,53 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 					temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
 					this.selection.setRange(temp, 0, temp, 0);
 					break;
-				}
-
-				// set format attrs - edge
-				if (formatStartEdge || formatEndEdge) {
-					e.preventDefault();
-					const focusBR = domUtils.createElement('BR');
-					const newFormat = domUtils.createElement(formatEl.nodeName, null, focusBR);
-
-					domUtils.copyTagAttributes(newFormat, formatEl, ['id'].concat(this.options.get('lineAttrReset')));
-
-					formatEl.parentNode.insertBefore(newFormat, formatStartEdge ? formatEl : formatEl.nextElementSibling);
-					if (formatEndEdge) {
-						this.selection.setRange(focusBR, 1, focusBR, 1);
+				} else if (rangeEl && formatEl && !domUtils.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
+					const range = this.selection.getRange();
+					if (domUtils.isEdgePoint(range.endContainer, range.endOffset) && domUtils.isList(selectionNode.nextSibling)) {
+						e.preventDefault();
+						const br = domUtils.createElement('BR');
+						const newEl = domUtils.createElement('LI', null, br);
+	
+						formatEl.parentNode.insertBefore(newEl, formatEl.nextElementSibling);
+						newEl.appendChild(selectionNode.nextSibling);
+	
+						this.selection.setRange(br, 1, br, 1);
+						break;
 					}
-
-					break;
-				} else {
-					this._formatAttrsTemp = formatEl.attributes;
-				}
-
-				if (this.options.get('lineAttrReset') && formatEl && !domUtils.isListCell(formatEl)) {
-					e.preventDefault();
-					e.stopPropagation();
-
-					let newEl;
-					if (!range.collapsed) {
-						const isMultiLine = this.format.getLine(range.startContainer, null) !== this.format.getLine(range.endContainer, null);
-						const r = this.html.remove();
-						if (isMultiLine) {
-							newEl = this.format.getLine(r.container, null);
-
-							if (!r.prevContainer) {
-								const newFormat = formatEl.cloneNode(false);
-								newFormat.innerHTML = '<br>';
-								newEl.parentNode.insertBefore(newFormat, newEl);
-							} else if (newEl !== formatEl && newEl.nextElementSibling === formatEl) {
-								newEl = formatEl;
+	
+					if ((range.commonAncestorContainer.nodeType === 3 ? !range.commonAncestorContainer.nextElementSibling : true) && domUtils.isZeroWith(formatEl.innerText.trim()) && !domUtils.isListCell(formatEl.nextElementSibling)) {
+						e.preventDefault();
+						let newEl = null;
+	
+						if (domUtils.isListCell(rangeEl.parentNode)) {
+							rangeEl = formatEl.parentNode.parentNode.parentNode;
+							newEl = this.node.split(formatEl, null, domUtils.getNodeDepth(formatEl) - 2);
+							if (!newEl) {
+								const newListCell = domUtils.createElement('LI', null, '<br>');
+								rangeEl.insertBefore(newListCell, newEl);
+								newEl = newListCell;
 							}
 						} else {
-							newEl = this.node.split(r.container, r.offset, 0);
+							const newFormat = domUtils.isTableCell(rangeEl.parentNode)
+								? 'DIV'
+								: domUtils.isList(rangeEl.parentNode)
+								? 'LI'
+								: this.format.isLine(rangeEl.nextElementSibling) && !this.format.isBlock(rangeEl.nextElementSibling)
+								? rangeEl.nextElementSibling.nodeName
+								: this.format.isLine(rangeEl.previousElementSibling) && !this.format.isBlock(rangeEl.previousElementSibling)
+								? rangeEl.previousElementSibling.nodeName
+								: this.options.get('defaultLineTag');
+	
+							newEl = domUtils.createElement(newFormat);
+							const edge = this.format.removeBlock(rangeEl, [formatEl], null, true, true);
+							edge.cc.insertBefore(newEl, edge.ec);
 						}
-					} else {
-						if (domUtils.isZeroWith(formatEl)) newEl = this.format.addLine(formatEl, formatEl.cloneNode(false));
-						else newEl = this.node.split(range.endContainer, range.endOffset, 0);
+	
+						newEl.innerHTML = '<br>';
+						this.node.removeAllParents(formatEl, null, null);
+						this.selection.setRange(newEl, 1, newEl, 1);
+						break;
 					}
-
-					const resetAttr = this.options.get('lineAttrReset');
-					const attrs = newEl.attributes;
-					let i = 0;
-					while (attrs[i]) {
-						if (resetAttr && resetAttr.indexOf(attrs[i].name.toLowerCase()) > -1) {
-							i++;
-							continue;
-						}
-						newEl.removeAttribute(attrs[i].name);
-					}
-					this.selection.setRange(newEl.firstChild, 0, newEl.firstChild, 0);
-
-					break;
 				}
 
 				if (brBlock) {
@@ -1594,58 +1585,88 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 					this._onShortcutKey = true;
 					break;
 				}
+
+				// set format attrs - edge
+				if (range.collapsed && (formatStartEdge || formatEndEdge)) {
+					e.preventDefault();
+					const focusBR = domUtils.createElement('BR');
+					const newFormat = domUtils.createElement(formatEl.nodeName, null, focusBR);
+
+					domUtils.copyTagAttributes(newFormat, formatEl, this.options.get('lineAttrReset'));
+
+					formatEl.parentNode.insertBefore(newFormat, formatStartEdge ? formatEl : formatEl.nextElementSibling);
+					if (formatEndEdge) {
+						this.selection.setRange(focusBR, 1, focusBR, 1);
+					}
+
+					break;
+				}
+
+				if (formatEl) {
+					e.stopPropagation();
+
+					let newEl;
+					let offset = 0;
+					if (!range.collapsed) {
+						const isMultiLine = this.format.getLine(range.startContainer, null) !== this.format.getLine(range.endContainer, null);
+						const newFormat = formatEl.cloneNode(false);
+						newFormat.innerHTML = '<br>';
+						const r = this.html.remove();
+						newEl = this.format.getLine(r.container, null);
+						if (!newEl) {
+							if (domUtils.isWysiwygFrame(r.container)) {
+								e.preventDefault();
+								this.frameContext.get('wysiwyg').appendChild(newFormat);
+								newEl = newFormat;
+								domUtils.copyTagAttributes(newEl, formatEl, options.lineAttrReset);
+								this.selection.setRange(newEl, offset, newEl, offset);
+							}
+							break;
+						}
+						
+						const innerRange = this.format.getBlock(r.container);
+						newEl = newEl.contains(innerRange) ? domUtils.getEdgeChild(innerRange, this.format.getLine.bind(util)) : newEl;
+						if (isMultiLine) {
+							if (formatEndEdge && !formatStartEdge) {
+								newEl.parentNode.insertBefore(newFormat, (!r.prevContainer || r.container === r.prevContainer) ? newEl.nextElementSibling : newEl);
+								newEl = newFormat;
+								offset = 0;
+							} else {
+								offset = r.offset;
+								if (formatStartEdge) {
+									const tempEl = newEl.parentNode.insertBefore(newFormat, newEl);
+									if (formatEndEdge) {
+										newEl = tempEl;
+										offset = 0;
+									}
+								}
+							}
+						} else {
+							if (formatEndEdge && formatStartEdge) {
+								newEl.parentNode.insertBefore(newFormat, (r.prevContainer && r.container === r.prevContainer) ? newEl.nextElementSibling : newEl);
+								newEl = newFormat;
+								offset = 0;
+							} else {
+								newEl = this.node.split(r.container, r.offset, domUtils.getNodeDepth(formatEl));
+							}
+						}
+					} else {
+						if (domUtils.isZeroWith(formatEl)) {
+							newEl = this.format.addLine(formatEl, formatEl.cloneNode(false));
+						} else {
+							newEl = this.node.split(range.endContainer, range.endOffset, domUtils.getNodeDepth(formatEl));
+						}
+					}
+
+					e.preventDefault();
+					domUtils.copyTagAttributes(newEl, formatEl, options.lineAttrReset);
+					this.selection.setRange(newEl, offset, newEl, offset);
+
+					break;
+				}
 			}
 
 			if (selectRange) break;
-
-			if (rangeEl && formatEl && !domUtils.isTableCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
-				const range = this.selection.getRange();
-				if (domUtils.isEdgePoint(range.endContainer, range.endOffset) && domUtils.isList(selectionNode.nextSibling)) {
-					e.preventDefault();
-					const br = domUtils.createElement('BR');
-					const newEl = domUtils.createElement('LI', null, br);
-
-					formatEl.parentNode.insertBefore(newEl, formatEl.nextElementSibling);
-					newEl.appendChild(selectionNode.nextSibling);
-
-					this.selection.setRange(br, 1, br, 1);
-					break;
-				}
-
-				if ((range.commonAncestorContainer.nodeType === 3 ? !range.commonAncestorContainer.nextElementSibling : true) && domUtils.isZeroWith(formatEl.innerText.trim())) {
-					e.preventDefault();
-					let newEl = null;
-
-					if (domUtils.isListCell(rangeEl.parentNode)) {
-						rangeEl = formatEl.parentNode.parentNode.parentNode;
-						newEl = this.node.split(formatEl, null, domUtils.getNodeDepth(formatEl) - 2);
-						if (!newEl) {
-							const newListCell = domUtils.createElement('LI', null, '<br>');
-							rangeEl.insertBefore(newListCell, newEl);
-							newEl = newListCell;
-						}
-					} else {
-						const newFormat = domUtils.isTableCell(rangeEl.parentNode)
-							? 'DIV'
-							: domUtils.isList(rangeEl.parentNode)
-							? 'LI'
-							: this.format.isLine(rangeEl.nextElementSibling) && !this.format.isBlock(rangeEl.nextElementSibling)
-							? rangeEl.nextElementSibling.nodeName
-							: this.format.isLine(rangeEl.previousElementSibling) && !this.format.isBlock(rangeEl.previousElementSibling)
-							? rangeEl.previousElementSibling.nodeName
-							: this.options.get('defaultLineTag');
-
-						newEl = domUtils.createElement(newFormat);
-						const edge = this.format.removeBlock(rangeEl, [formatEl], null, true, true);
-						edge.cc.insertBefore(newEl, edge.ec);
-					}
-
-					newEl.innerHTML = '<br>';
-					this.node.removeAllParents(formatEl, null, null);
-					this.selection.setRange(newEl, 1, newEl, 1);
-					break;
-				}
-			}
 
 			if (rangeEl && domUtils.getParentElement(rangeEl, 'FIGCAPTION') && domUtils.getParentElement(rangeEl, domUtils.isList)) {
 				e.preventDefault();
@@ -1655,7 +1676,6 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 
 			if (fileComponentName) {
 				e.preventDefault();
-				e.stopPropagation();
 
 				const compContext = this.component.get(this.editor.currentControllerTarget);
 				const container = compContext.container;
