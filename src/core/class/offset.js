@@ -2,12 +2,14 @@
  * @fileoverview Offset class
  */
 
-import CoreDependency from '../../dependency/_core';
 import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass } from '../../helper/domUtils';
+import { _w } from '../../helper/env';
 import { numbers } from '../../helper';
 
 const Offset = function (editor) {
-	CoreDependency.call(this, editor);
+	this.editor = editor;
+	this.options = editor.options;
+	this.context = editor.context;
 };
 
 Offset.prototype = {
@@ -137,8 +139,8 @@ Offset.prototype = {
 		const widthEditorRefer = topArea.contains(owOffsetEl);
 		ohOffsetEl = heightEditorRefer ? topArea : ohOffsetEl;
 		owOffsetEl = widthEditorRefer ? topArea : owOffsetEl;
-		const ts = !ohOffsetEl ? 0 : ohOffsetEl.getBoundingClientRect().top + (!ohOffsetEl.parentElement || /^html$/i.test(ohOffsetEl.parentElement.nodeName) ? this._w.scrollY : 0);
-		const ls = !owOffsetEl ? 0 : owOffsetEl.getBoundingClientRect().left + (!owOffsetEl.parentElement || /^html$/i.test(owOffsetEl.parentElement.nodeName) ? this._w.scrollX : 0);
+		const ts = !ohOffsetEl ? 0 : ohOffsetEl.getBoundingClientRect().top + (!ohOffsetEl.parentElement || /^html$/i.test(ohOffsetEl.parentElement.nodeName) ? _w.scrollY : 0);
+		const ls = !owOffsetEl ? 0 : owOffsetEl.getBoundingClientRect().left + (!owOffsetEl.parentElement || /^html$/i.test(owOffsetEl.parentElement.nodeName) ? _w.scrollX : 0);
 
 		return {
 			top: t,
@@ -205,7 +207,7 @@ Offset.prototype = {
 			offsetEl = offsetEl.offsetParent;
 		}
 
-		const menuHeight_bottom = this._w.innerHeight - (containerTop - scrollTop + bt + target.offsetHeight);
+		const menuHeight_bottom = _w.innerHeight - (containerTop - scrollTop + bt + target.offsetHeight);
 		if (menuHeight_bottom < elHeight) {
 			let menuTop = -1 * (elHeight - bt + 3);
 			const insTop = containerTop - scrollTop + menuTop;
@@ -234,7 +236,7 @@ Offset.prototype = {
 			addOffset.left *= -1;
 		}
 
-		const targetAbs = this._w.getComputedStyle(target).position === 'absolute';
+		const targetAbs = _w.getComputedStyle(target).position === 'absolute';
 		const wwScroll = this.getWWScroll();
 		const editorOffset = this.getGlobal();
 		const editorScroll = this.getGlobalScroll();
@@ -250,7 +252,7 @@ Offset.prototype = {
 		const targetH = target.offsetHeight;
 		// margin
 		const tmtw = targetRect.top;
-		const tmbw = this._w.innerHeight - targetRect.bottom;
+		const tmbw = _w.innerHeight - targetRect.bottom;
 		let toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline || this.options.get('toolbar_container')) ? 0 : this.context.get('toolbar.main').offsetHeight;
 		let rmt, rmb;
 		if (this.editor.frameContext.get('isFullScreen')) {
@@ -282,7 +284,7 @@ Offset.prototype = {
 		let arrowDir = '';
 		if (position === 'bottom') {
 			arrowDir = 'up';
-			t += targetRect.bottom + ah + this._w.scrollY;
+			t += targetRect.bottom + ah + _w.scrollY;
 			y = rmb - (elH + ah);
 			if (y < 0) {
 				arrowDir = 'down';
@@ -295,7 +297,7 @@ Offset.prototype = {
 			}
 		} else {
 			arrowDir = 'down';
-			t += targetRect.top - elH - ah + this._w.scrollY;
+			t += targetRect.top - elH - ah + _w.scrollY;
 			y = rmt - (elH + ah);
 			if (y < 0) {
 				arrowDir = 'up';
@@ -313,13 +315,13 @@ Offset.prototype = {
 
 		// left ----------------------------------------------------------------------------------------------------
 		const editorW = this.editor.frameContext.get('topArea').offsetWidth;
-		const radius = numbers.get(this._w.getComputedStyle(element).borderRadius) || 0;
+		const radius = numbers.get(_w.getComputedStyle(element).borderRadius) || 0;
 		const targetW = targetOffset.width;
 		const elW = element.offsetWidth;
 		const aw = arrow ? arrow.offsetWidth : 0;
 		// margin
 		const tmlw = targetRect.left;
-		const tmrw = this._w.innerWidth - targetRect.right;
+		const tmrw = _w.innerWidth - targetRect.right;
 		let rml, rmr;
 		if (this.editor.frameContext.get('isFullScreen')) {
 			rml = tmlw;
@@ -353,7 +355,7 @@ Offset.prototype = {
 		let ax = 0;
 		let awLimit = 0;
 		if (!this.options.get('_rtl')) {
-			l += targetRect.left + this._w.scrollX - (rml < 0 ? rml : 0);
+			l += targetRect.left + _w.scrollX - (rml < 0 ? rml : 0);
 			x = targetW + rml;
 			if (x < aw) {
 				awLimit = aw / 2 - 1 + (radius <= 2 ? 0 : radius - 2);
@@ -368,7 +370,7 @@ Offset.prototype = {
 			}
 			if (arrow && ax > 0) arrow.style.left = ax + 'px';
 		} else {
-			l += targetRect.right - elW + this._w.scrollX + (rmr < 0 ? rmr : 0);
+			l += targetRect.right - elW + _w.scrollX + (rmr < 0 ? rmr : 0);
 			x = targetW + rmr;
 			if (x < aw) {
 				awLimit = aw / 2 - 1 + (radius <= 2 ? 0 : radius - 2);

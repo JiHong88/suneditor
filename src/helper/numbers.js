@@ -41,10 +41,30 @@ export function getOverlapRangeAtIndex(aStart, aEnd, bStart, bEnd) {
 	return (overlap < 0 ? overlap * -1 : overlap) + 1;
 }
 
+/**
+ * @description Discriminate an even number
+ * @param {number} value number
+ * @returns {boolean}
+ */
+export function isEven(value) {
+	return (value & 1) === 0;
+}
+
+/**
+ * @description Discriminate an odd number
+ * @param {number} value number
+ * @returns {boolean}
+ */
+export function isOdd(value) {
+	return (value & 1) === 1;
+}
+
 const numbers = {
 	is: is,
 	get: get,
-	getOverlapRangeAtIndex: getOverlapRangeAtIndex
+	getOverlapRangeAtIndex: getOverlapRangeAtIndex,
+	isEven: isEven,
+	isOdd: isOdd
 };
 
 export default numbers;

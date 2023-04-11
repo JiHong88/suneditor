@@ -10,10 +10,6 @@ const StyleMap = {
 export const BASIC_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'undo', 'redo', 'save', 'outdent', 'indent', 'fullScreen', 'showBlocks', 'codeView', 'dir', 'dir_ltr', 'dir_rtl'];
 export const DEFAULT_ACTIVE_COMMANDS = ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fullScreen', 'showBlocks', 'codeView'];
 
-export function GET_DEFAULT_COMMAND_KEY(textTags, command) {
-	return textTags[command] || command;
-}
-
 export function SELECT_ALL(editor) {
 	editor._offCurrentController();
 	editor.menu.containerOff();
@@ -59,13 +55,25 @@ export function SELECT_ALL(editor) {
 
 export function DIR_BTN_ACTIVE(editor, rtl) {
 	const icons = editor.icons;
+	const commandTargets = editor.commandTargets;
+	const shortcutsKeyMap = editor.shortcutsKeyMap;
+
+	// change reverse shortcuts key
+	editor.reverseKeys.forEach(function (e) {
+		const info = shortcutsKeyMap.get(e);
+		if (!info) return;
+		const temp = info.c;
+		info.c = info.r;
+		info.r = temp;
+	});
 
 	// change reverse buttons
 	editor.options.get('reverseCommands').forEach(function (reverseCmds) {
 		const cmds = reverseCmds.split('-');
-		let a = editor.commandTargets.get(cmds[0]);
-		let b = editor.commandTargets.get(cmds[1]);
+		let a = commandTargets.get(cmds[0]);
+		let b = commandTargets.get(cmds[1]);
 		if (!a || !b) return;
+
 		a = a[0].innerHTML;
 		b = b[0].innerHTML;
 		editor.applyCommandTargets(cmds[0], function (e) {
@@ -82,11 +90,11 @@ export function DIR_BTN_ACTIVE(editor, rtl) {
 		domUtils.changeElement(e.firstElementChild, icons[rtl ? 'dir_ltr' : 'dir_rtl']);
 	});
 	if (rtl) {
-		domUtils.addClass(editor.commandTargets.get('dir_rtl'), 'active');
-		domUtils.removeClass(editor.commandTargets.get('dir_ltr'), 'active');
+		domUtils.addClass(commandTargets.get('dir_rtl'), 'active');
+		domUtils.removeClass(commandTargets.get('dir_ltr'), 'active');
 	} else {
-		domUtils.addClass(editor.commandTargets.get('dir_ltr'), 'active');
-		domUtils.removeClass(editor.commandTargets.get('dir_rtl'), 'active');
+		domUtils.addClass(commandTargets.get('dir_ltr'), 'active');
+		domUtils.removeClass(commandTargets.get('dir_rtl'), 'active');
 	}
 }
 

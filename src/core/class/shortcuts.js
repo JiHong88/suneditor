@@ -2,10 +2,9 @@
  * @fileoverview Shortcuts class
  */
 
-import CoreDependency from '../../dependency/_core';
-
 const Shortcuts = function (editor) {
-	CoreDependency.call(this, editor);
+	this.editor = editor;
+	this.options = editor.options;
 
 	// members
 	this.isDisabled = false;
@@ -24,7 +23,7 @@ Shortcuts.prototype = {
 		const info = this.editor.shortcutsKeyMap.get(keyCode + (shift ? 1000 : 0));
 		if (!info || (!shift && info.s)) return false;
 
-		this.editor.run((this.options.get('_rtl') ? info.r : info.c) || info.c, info.t, info.e);
+		this.editor.run(info.c, info.t, info.e);
 		return true;
 	},
 

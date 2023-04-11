@@ -137,8 +137,6 @@ HTML.prototype = {
 			cleanData += this._makeLine(domTree[i], requireFormat);
 		}
 
-		cleanData = this.node.removeWhitespace(cleanData);
-
 		if (!cleanData) {
 			cleanData = html;
 		} else {

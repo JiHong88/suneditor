@@ -2,8 +2,8 @@
  * @fileoverview eventManager class
  */
 
-import CoreDependency from '../dependency/_core';
-import { domUtils, unicode, numbers, env, converter } from '../helper';
+import CoreDependency from '../../dependency/_core';
+import { domUtils, unicode, numbers, env, converter } from '../../helper';
 
 const _w = env._w;
 const ARROW_KEYCODE = new _w.RegExp('^3[7-9]|40$');
@@ -152,7 +152,7 @@ EventManager.prototype = {
 			/** indent, outdent */
 			if (this.format.isLine(element)) {
 				/* Outdent */
-				if (commandMapNodes.indexOf('outdent') === -1 && commandTargets.get('outdent') && (domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))) {
+				if (commandMapNodes.indexOf('outdent') === -1 && commandTargets.has('outdent') && (domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))) {
 					if (
 						commandTargets.get('outdent').filter(function (e) {
 							if (domUtils.isImportantDisabled(e)) return false;
@@ -163,9 +163,8 @@ EventManager.prototype = {
 						commandMapNodes.push('outdent');
 					}
 				}
-
 				/* Indent */
-				if (commandMapNodes.indexOf('indent') === -1 && commandTargets.get('indent')) {
+				if (commandMapNodes.indexOf('indent') === -1 && commandTargets.has('indent')) {
 					const indentDisable = domUtils.isListCell(element) && !element.previousElementSibling;
 					if (
 						commandTargets.get('indent').filter(function (e) {
@@ -1618,14 +1617,14 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 								e.preventDefault();
 								this.frameContext.get('wysiwyg').appendChild(newFormat);
 								newEl = newFormat;
-								domUtils.copyTagAttributes(newEl, formatEl, options.lineAttrReset);
+								domUtils.copyTagAttributes(newEl, formatEl, this.options.lineAttrReset);
 								this.selection.setRange(newEl, offset, newEl, offset);
 							}
 							break;
 						}
 						
 						const innerRange = this.format.getBlock(r.container);
-						newEl = newEl.contains(innerRange) ? domUtils.getEdgeChild(innerRange, this.format.getLine.bind(util)) : newEl;
+						newEl = newEl.contains(innerRange) ? domUtils.getEdgeChild(innerRange, this.format.getLine.bind(this.format)) : newEl;
 						if (isMultiLine) {
 							if (formatEndEdge && !formatStartEdge) {
 								newEl.parentNode.insertBefore(newFormat, (!r.prevContainer || r.container === r.prevContainer) ? newEl.nextElementSibling : newEl);
@@ -1659,7 +1658,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 					}
 
 					e.preventDefault();
-					domUtils.copyTagAttributes(newEl, formatEl, options.lineAttrReset);
+					domUtils.copyTagAttributes(newEl, formatEl, this.options.lineAttrReset);
 					this.selection.setRange(newEl, offset, newEl, offset);
 
 					break;

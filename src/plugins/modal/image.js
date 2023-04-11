@@ -422,7 +422,6 @@ Image_.prototype = {
 				existElement.parentNode.insertBefore(container, existElement);
 				domUtils.removeItem(imageEl);
 				this.node.removeEmptyNode(existElement, null, true);
-				if (existElement.children.length === 0) existElement.innerHTML = this.node.removeWhitespace(existElement.innerHTML);
 			} else {
 				if (this.format.isLine(existElement.parentNode)) {
 					const formats = existElement.parentNode;

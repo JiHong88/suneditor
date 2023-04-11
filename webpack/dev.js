@@ -6,7 +6,7 @@ const env = require('./env');
 
 module.exports = merge(common, {
 	mode: 'development',
-	entry: './test/dev/suneditor_build_test',
+	entry: './test/dev/se_test',
 	output: {
 		filename: 'suneditor.[fullhash].js',
 		environment: env
@@ -22,7 +22,7 @@ module.exports = merge(common, {
 			filename: 'suneditor.[fullhash].css'
 		}),
 		new HtmlWebpackPlugin({
-			template: './test/dev/suneditor_build_test.html',
+			template: './test/dev/se_test.html',
 			inject: true
 		})
 	],

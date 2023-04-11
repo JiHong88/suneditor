@@ -36,7 +36,7 @@ Modal.prototype = {
 	 */
 	open: function () {
 		this.editor._offCurrentModal();
-		this.editor._fixCurrentController(true);
+		this._fixCurrentController(true);
 
 		if (this._closeSignal) this._modalInner.addEventListener('click', this._closeListener[1]);
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
@@ -59,7 +59,7 @@ Modal.prototype = {
 	 * The plugin's "init" method is called.
 	 */
 	close: function () {
-		this.editor._fixCurrentController(false);
+		this._fixCurrentController(false);
 		this.editor.opendModal = null;
 
 		if (this._closeSignal) this._modalInner.removeEventListener('click', this._closeListener[1]);
@@ -72,6 +72,14 @@ Modal.prototype = {
 
 		if (typeof this.inst.init === 'function' && !this.isUpdate) this.inst.init();
 		this.editor.focus();
+	},
+
+	_fixCurrentController: function (fixed) {
+		const cont = this.editor.opendControllers;
+		for (let i = 0; i < cont.length; i++) {
+			cont[i].fixed = fixed;
+			cont[i].form.style.display = fixed ? 'none' : 'block';
+		}
 	},
 
 	constructor: Modal

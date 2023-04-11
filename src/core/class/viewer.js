@@ -243,7 +243,7 @@ Viewer.prototype = {
 		this.editor.frameContext.set('isShowBlocks', !!value);
 
 		if (value) {
-			domUtils.addClass(this.editor.frameContext.get('wysiwyg'), 'se-show-block');;
+			domUtils.addClass(this.editor.frameContext.get('wysiwyg'), 'se-show-block');
 			domUtils.addClass(this.editor.commandTargets.get('showBlocks'), 'active');
 		} else {
 			domUtils.removeClass(this.editor.frameContext.get('wysiwyg'), 'se-show-block');

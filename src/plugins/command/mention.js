@@ -1,5 +1,5 @@
 import EditorDependency from '../../dependency';
-import { domUtils } from '../../helper';
+// import { domUtils } from '../../helper';
 
 const Mention = function (editor) {
 	EditorDependency.call(this, editor);

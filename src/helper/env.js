@@ -228,7 +228,9 @@ export const cmdIcon = isOSX_IOS() ? '⌘' : 'CTRL';
  */
 export const shiftIcon = isOSX_IOS() ? '⇧' : '+SHIFT';
 
+/** --- editor env --- */
 export const _allowedEmptyNodeList = '.se-component, pre, blockquote, hr, li, table, img, iframe, video, audio, canvas, details';
+export const KATEX_WEBSITE = 'https://katex.org/docs/supported.html';
 
 const env = {
 	_w: _w,

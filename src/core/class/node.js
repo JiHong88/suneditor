@@ -366,18 +366,6 @@ Node_.prototype = {
 		}
 	},
 
-	/**
-	 * @description Remove whitespace between tags in HTML string.
-	 * @param {string} html HTML string
-	 * @returns {string}
-	 */
-	removeWhitespace: function (html) {
-		if (!html) return '';
-		return html.trim().replace(/<\/?(?!strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)[^>^<]+>\s+(?=<)/gi, function (m) {
-			return m.replace(/\n/g, '').replace(/\s+/, ' ');
-		});
-	},
-
 	constructor: Node_
 };
 

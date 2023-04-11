@@ -1,13 +1,13 @@
 import Helper, { env, converter, domUtils, numbers } from '../helper';
 import Constructor, { ResetOptions, UpdateButton, CreateShortcuts } from './constructor';
-import History from './history';
-import EventManager from './eventManager';
+import History from './base/history';
+import EventManager from './base/eventManager';
 
 // class dependency
 import ClassDependency from '../dependency/_classes';
 
 // base
-import { BASIC_COMMANDS, DEFAULT_ACTIVE_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE, GET_DEFAULT_COMMAND_KEY } from './base/actives';
+import { BASIC_COMMANDS, DEFAULT_ACTIVE_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './base/actives';
 
 // classes
 import Char from './class/char';
@@ -153,6 +153,7 @@ const Editor = function (multiTargets, options) {
 	 * @description Shoutcuts key map
 	 */
 	this.shortcutsKeyMap = new _w.Map();
+	this.reverseKeys = [];
 
 	/**
 	 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
@@ -329,7 +330,7 @@ const Editor = function (multiTargets, options) {
 		if (isIframe) {
 			e.get('wysiwygFrame').addEventListener('load', function () {
 				converter._setIframeDocument(this, inst.options, e.get('options').get('height'));
-				if (rootSize === ++rootIndex) inst._editorInit();
+				if (rootSize === ++rootIndex) inst.__editorInit();
 			});
 		}
 
@@ -337,7 +338,7 @@ const Editor = function (multiTargets, options) {
 	});
 
 	if (!isIframe) {
-		this._editorInit();
+		this.__editorInit();
 	}
 };
 
@@ -566,7 +567,7 @@ Editor.prototype = {
 		this.viewer.codeView(false);
 		this.viewer.showBlocks(false);
 
-		const mergeOptions = [this.options, _options].reduce(function (init, option) {
+		[this.options, _options].reduce(function (init, option) {
 			for (let key in option) {
 				if (key === 'plugins') {
 					continue;
@@ -965,40 +966,41 @@ Editor.prototype = {
 	},
 
 	_registerClass: function () {
-		// base
+		// use events, history function
 		this.events = this.options.get('events');
 		this.history = History(this, this._onChange_historyStack.bind(this));
+
+		// eventManager
 		this.eventManager = new EventManager(this);
 
 		// util classes
 		this.offset = new Offset(this);
 		this.shortcuts = new Shortcuts(this);
 		this.notice = new Notice(this);
-
 		// main classes
-		this.viewer = new Viewer(this);
-		this.node = new Node_(this);
-		this.html = new HTML(this);
-		this.component = new Component(this);
-		this.format = new Format(this);
 		this.toolbar = new Toolbar(this, { keyName: 'toolbar', balloon: this.isBalloon, balloonAlways: this.isBalloonAlways, inline: this.isInline, res: this._responsiveButtons });
 		if (this.options.has('subMode')) this.subToolbar = new Toolbar(this, { keyName: 'toolbar.sub', balloon: this.isSubBalloon, balloonAlways: this.isSubBalloonAlways, inline: false, res: this._responsiveButtons_sub });
 		this.selection = new Selection(this);
-		this.char = new Char(this);
+		this.html = new HTML(this);
+		this.node = new Node_(this);
+		this.component = new Component(this);
+		this.format = new Format(this);
 		this.menu = new Menu(this);
+		this.char = new Char(this);
+		this.viewer = new Viewer(this);
 
-		// register main classes
+		// register classes to the eventManager and main classes
 		ClassDependency.call(this.eventManager, this);
-		ClassDependency.call(this.viewer, this);
-		ClassDependency.call(this.node, this);
-		ClassDependency.call(this.selection, this);
-		ClassDependency.call(this.html, this);
-		ClassDependency.call(this.component, this);
-		ClassDependency.call(this.format, this);
 		ClassDependency.call(this.toolbar, this);
 		if (this.options.has('subMode')) ClassDependency.call(this.subToolbar, this);
-		ClassDependency.call(this.char, this);
+		ClassDependency.call(this.selection, this);
+		ClassDependency.call(this.html, this);
+		ClassDependency.call(this.node, this);
+		ClassDependency.call(this.format, this);
+		ClassDependency.call(this.component, this);
 		ClassDependency.call(this.menu, this);
+		ClassDependency.call(this.char, this);
+		ClassDependency.call(this.viewer, this);
 
 		this._responsiveButtons = this._responsiveButtons_res = null;
 	},
@@ -1126,7 +1128,7 @@ Editor.prototype = {
 	 * @description Initializ editor
 	 * @private
 	 */
-	_editorInit: function () {
+	__editorInit: function () {
 		this.rootTargets.forEach(
 			function (e) {
 				this._setEditorParams(e);
@@ -1173,7 +1175,7 @@ Editor.prototype = {
 	 * @private
 	 */
 	__init: function () {
-		this._cachingButtons();
+		this.__cachingButtons();
 
 		// file components
 		this._fileInfoPluginsCheck = [];
@@ -1244,7 +1246,7 @@ Editor.prototype = {
 	 * @description Caching basic buttons to use
 	 * @private
 	 */
-	_cachingButtons: function () {
+	__cachingButtons: function () {
 		const ctx = this.context;
 		const codeDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])';
 		const controllerDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])';
@@ -1257,52 +1259,46 @@ Editor.prototype = {
 			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(this._w.Array.prototype.slice.call(ctx.get('toolbar.sub._buttonTray').querySelectorAll(controllerDisabledQuery)));
 		}
 
-		this._saveCommandButtons();
+		this.__saveCommandButtons();
 	},
 
 	/**
 	 * @description Save the current buttons states to "allCommandButtons" map
 	 * @private
 	 */
-	_saveCommandButtons: function (isSub) {
+	__saveCommandButtons: function (isSub) {
 		const currentButtons = this.context.get(isSub ? 'toolbar.sub._buttonTray' : 'toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
 		const cmdButtons = isSub ? this.subAllCommandButtons : this.allCommandButtons;
-		const textTAgs = this.options.get('textTags');
 		const shortcuts = this.options.get('shortcuts');
+		const reverseCommandArray = this.options.get('_reverseCommandArray');
 		const keyMap = this.shortcutsKeyMap;
+		const reverseKeys = this.reverseKeys;
 
 		for (let i = 0, e, c; i < currentButtons.length; i++) {
 			e = currentButtons[i];
 			c = e.getAttribute('data-command');
-			CreateShortcuts(c, e, shortcuts[c], keyMap);
+			// command set
 			cmdButtons.set(c, e);
-			this._setCommandTargets(c, e, textTAgs);
+			this.__setCommandTargets(c, e);
+			// shortcuts
+			CreateShortcuts(c, e, shortcuts[c], keyMap, reverseCommandArray, reverseKeys);
 		}
 
 		if (!isSub && this.options.has('subMode')) {
-			this._saveCommandButtons(true);
+			this.__saveCommandButtons(true);
 		}
 	},
 
-	_setCommandTargets: function (cmd, target, textTags) {
+	__setCommandTargets: function (cmd, target) {
 		if (!cmd || !target) return;
 
 		const isBasicCmd = BASIC_COMMANDS.indexOf(cmd) > -1;
 		if (!isBasicCmd && !this.plugins[cmd]) return;
-		// if (isBasicCmd) cmd = GET_DEFAULT_COMMAND_KEY(textTags, cmd);
 
 		if (!this.commandTargets.get(cmd)) {
 			this.commandTargets.set(cmd, [target]);
 		} else if (this.commandTargets.get(cmd).indexOf(target) < 0) {
 			this.commandTargets.get(cmd).push(target);
-		}
-	},
-
-	_fixCurrentController: function (fixed) {
-		const cont = this.opendControllers;
-		for (let i = 0; i < cont.length; i++) {
-			cont[i].fixed = fixed;
-			cont[i].form.style.display = fixed ? 'none' : 'block';
 		}
 	},
 

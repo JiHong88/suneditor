@@ -2,8 +2,6 @@ import EditorDependency from '../../dependency';
 import { Modal, Controller } from '../../modules';
 import { domUtils, env, converter, unicode } from '../../helper';
 
-const KATEX_WEBSITE = 'https://katex.org/docs/supported.html';
-
 const Math_ = function (editor) {
 	// exception
 	if (!editor.options.get('katex')) {
@@ -180,7 +178,7 @@ Math_.prototype = {
 			result = this.options.get('katex').src.renderToString(exp, { throwOnError: true, displayMode: true });
 		} catch (error) {
 			domUtils.addClass(this.textArea, 'se-error');
-			result = '<span class="se-math-katex-error">Katex syntax error. (Refer <a href="' + KATEX_WEBSITE + '" target="_blank">KaTeX</a>)</span>';
+			result = '<span class="se-math-katex-error">Katex syntax error. (Refer <a href="' + env.KATEX_WEBSITE + '" target="_blank">KaTeX</a>)</span>';
 			console.warn('[SUNEDITOR.math.Katex.error] ', error.message);
 		}
 		return result;
@@ -217,7 +215,7 @@ function CreateHTML_modal(editor, math) {
 		'<label>' +
 		lang.math_modal_inputLabel +
 		' (<a href="' +
-		KATEX_WEBSITE +
+		env.KATEX_WEBSITE +
 		'" target="_blank">KaTeX</a>)</label>' +
 		'<textarea class="se-input-form se-math-exp" type="text" data-focus></textarea>' +
 		'</div>' +

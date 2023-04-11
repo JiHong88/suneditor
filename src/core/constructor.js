@@ -197,16 +197,24 @@ export function ResetOptions() {}
  * @param {Array.<string>} values options.shortcuts[command]
  * @param {Element} button Command button element
  * @param {Map} keyMap Map to store shortcut key info
+ * @param {Array} rca "_reverseCommandArray" option
+ * @param {Array} reverseKeys Reverse key array
  */
-export function CreateShortcuts(command, button, values, keyMap) {
+export function CreateShortcuts(command, button, values, keyMap, rca, reverseKeys) {
 	if (!values || values.length < 2) return;
 	const tooptip = button.querySelector('.se-tooltip-text');
 
-	for (let i = 0, v, s, t, k; i < values.length; i += 2) {
+	for (let i = 0, v, s, t, k, r; i < values.length; i += 2) {
 		v = values[i];
 		s = /^s/i.test(v);
 		k = numbers.get(v) + (s ? 1000 : 0);
-		if (!keyMap.has(k)) keyMap.set(k, { c: command, r: v.replace(/^[^-]+(-)?/, ''), t: button.getAttribute('data-type'), e: button });
+		if (!keyMap.has(k)) {
+			r = rca.indexOf(command);
+			r = r === -1 ? '' : numbers.isOdd(r) ? rca[r + 1] : rca[r - 1];
+			if (r) reverseKeys.push(k);
+			keyMap.set(k, { c: command, r: r, t: button.getAttribute('data-type'), e: button });
+		}
+
 		if (!(t = values[i + 1])) continue;
 		if (tooptip) tooptip.appendChild(domUtils.createElement('SPAN', { class: 'se-shortcut' }, env.cmdIcon + (s ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + t + '</span>'));
 	}
@@ -291,13 +299,17 @@ function InitOptions(options, editorTargets) {
 	o.set('textDirection', typeof options.textDirection !== 'string' ? 'ltr' : options.textDirection);
 	o.set('_rtl', o.get('textDirection') === 'rtl');
 	o.set('reverseCommands', ['indent-outdent'].concat(options.reverseButtons || []));
+	o.set('_reverseCommandArray', ('-' + o.get('reverseCommands').join('-')).split('-'));
+	if (numbers.isEven(o.get('_reverseCommandArray').length)) {
+		console.warn('[SUNEDITOR.create.warning] The "reverseCommands" option is invalid, Shortcuts key may not work properly.');
+	}
 
 	// etc
 	o.set('historyStackDelayTime', typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400);
 	o.set('frameAttrbutes', options.frameAttrbutes || {});
 	o.set('_editableClass', 'sun-editor-editable' + (o.get('_rtl') ? ' se-rtl' : ''));
 	o.set('callBackSave', options.callBackSave);
-	o.set('lineAttrReset', ['id'].concat((options.lineAttrReset && typeof options.lineAttrReset === 'string') ? options.lineAttrReset.toLowerCase().split('|') : []));
+	o.set('lineAttrReset', ['id'].concat(options.lineAttrReset && typeof options.lineAttrReset === 'string' ? options.lineAttrReset.toLowerCase().split('|') : []));
 	o.set('_printClass', typeof options._printClass === 'string' ? options._printClass : null);
 
 	/** whitelist, blacklist */
@@ -366,8 +378,8 @@ function InitOptions(options, editorTargets) {
 					italic: ['73', 'I'],
 					redo: ['89', 'Y', 's90', 'Z'],
 					undo: ['90', 'Z'],
-					indent: ['221-outdent', ']'],
-					outdent: ['219-indent', '['],
+					indent: ['221', ']'],
+					outdent: ['219', '['],
 					sup: ['187', '='],
 					sub: ['s187', '='],
 					save: ['83', 'S']
