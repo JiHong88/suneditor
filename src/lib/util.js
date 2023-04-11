@@ -560,16 +560,10 @@ const util = {
         }
 
         const attrs = copyEl.attributes;
-        for (let i = 0, len = attrs.length; i < len; i++) {
-            if (blacklist && blacklist.indexOf(attrs[i].name.toLowerCase()) > -1) continue;
-            originEl.setAttribute(attrs[i].name, attrs[i].value);
-        }
-
-        const originAttrs = originEl.attributes;
-        for (let i = 0, len = originAttrs.length; i < len; i++) {
-            if (!originAttrs[i].value) {
-                originEl.removeAttribute(originAttrs[i].name);
-            }
+        for (let i = 0, len = attrs.length, name; i < len; i++) {
+            name = attrs[i].name.toLowerCase();
+            if ((blacklist && blacklist.indexOf(name) > -1) || !attrs[i].value) originEl.removeAttribute(name);
+            else originEl.setAttribute(attrs[i].name, attrs[i].value);
         }
     },
 
@@ -1431,7 +1425,7 @@ const util = {
     splitElement: function (baseNode, offset, depth) {
         if (this.isWysiwygDiv(baseNode)) return baseNode;
 
-        if (!!offset && !this.isNumber(offset)) {
+        if (offset && !this.isNumber(offset)) {
             const children =  baseNode.childNodes;
             let index = this.getPositionIndex(offset);
             const prev = baseNode.cloneNode(false);
@@ -1506,6 +1500,10 @@ const util = {
         
         if (newEl.childNodes.length > 0) pElement.insertBefore(newEl, depthEl);
         else newEl = depthEl;
+
+        if (this.isListCell(newEl) && newEl.children && this.isList(newEl.children[0])) {
+            newEl.insertBefore(this.createElement('BR'), newEl.children[0]);
+        }
 
         if (bp.childNodes.length === 0) this.removeItem(bp);
 

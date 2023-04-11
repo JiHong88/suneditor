@@ -2134,6 +2134,21 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._resetRangeToTextNode();
 
             const range = this.getRange();
+            const isStartEdge = range.startOffset === 0;
+            const isEndEdge = core.isEdgePoint(range.endContainer, range.endOffset);
+            let prevContainer = null;
+            let startPrevEl = null;
+            let endNextEl = null;
+            if (isStartEdge) {
+                startPrevEl = util.getFormatElement(range.startContainer);
+                prevContainer = startPrevEl.previousElementSibling;
+                startPrevEl = startPrevEl ? prevContainer : startPrevEl;
+            }
+            if (isEndEdge) {
+                endNextEl = util.getFormatElement(range.endContainer);
+                endNextEl = endNextEl ? endNextEl.nextElementSibling : endNextEl;
+            }
+
             let container, offset = 0;
             let startCon = range.startContainer;
             let endCon = range.endContainer;
@@ -2269,11 +2284,22 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 offset = container.textContent.length;
             } else {
                 container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : (range.endContainer || range.startContainer);
+                offset = (!isStartEdge && !isEndEdge) ? offset : isEndEdge ? container.textContent.length : 0;
             }
             
             if (!util.isWysiwygDiv(container) && container.childNodes.length === 0) {
                 const rc = util.removeItemAllParents(container, null, null);
                 if (rc) container = rc.sc || rc.ec || context.element.wysiwyg;
+            }
+
+            if (!util.getFormatElement(container) && !(startCon && startCon.parentNode)) {
+                if (endNextEl) {
+                    container = endNextEl;
+                    offset = 0;
+                } else if (startPrevEl) {
+                    container = startPrevEl;
+                    offset = 1;
+                }
             }
 
             // set range
@@ -2284,7 +2310,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             return {
                 container: container,
                 offset: offset,
-                prevContainer: startCon && startCon.parentNode ? startCon : null
+                prevContainer: prevContainer
             };
         },
 
@@ -6222,14 +6248,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.history.reset(true);
             
             _w.setTimeout(function () {
+                if (typeof core._resourcesStateChange !== 'function') return;
+
                 // observer
                 if (event._resizeObserver) event._resizeObserver.observe(context.element.wysiwygFrame);
                 if (event._toolbarObserver) event._toolbarObserver.observe(context.element._toolbarShadow);
                 // resource state
-                this._resourcesStateChange();
+                core._resourcesStateChange();
                 // user event
                 if (typeof functions.onload === 'function') functions.onload(core, reload);
-            }.bind(this));
+            });
         },
 
         /**
@@ -6544,7 +6572,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            _w.setTimeout(core._editorRange.bind(core));
             core._editorRange();
 
             const selectionNode = core.getSelectionNode();
@@ -7315,6 +7342,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     if (!shift) {
                         const formatEndEdge = core._isEdgeFormat(range.endContainer, range.endOffset, 'end');
                         const formatStartEdge = core._isEdgeFormat(range.startContainer, range.startOffset, 'start');
+
                         // add default format line
                         if (formatEndEdge && (/^H[1-6]$/i.test(formatEl.nodeName) || /^HR$/i.test(formatEl.nodeName))) {
                             e.preventDefault();
@@ -7333,66 +7361,48 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             temp = !temp ? newFormat.firstChild : temp.appendChild(newFormat.firstChild);
                             core.setRange(temp, 0, temp, 0);
                             break;
-                        }
-                        
-                        // set format attrs - edge
-                        if (formatStartEdge || formatEndEdge) {
-                            e.preventDefault();
-                            const focusBR = util.createElement('BR');
-                            const newFormat = util.createElement(formatEl.nodeName);
-                            newFormat.appendChild(focusBR);
-
-                            util.copyTagAttributes(newFormat, formatEl, ['id'].concat(options.lineAttrReset));
-
-                            formatEl.parentNode.insertBefore(newFormat, formatStartEdge ? formatEl : formatEl.nextElementSibling);
-                            if (formatEndEdge) {
-                                core.setRange(focusBR, 1, focusBR, 1);
+                        } else if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
+                            const range = core.getRange();
+                            if(core.isEdgePoint(range.endContainer, range.endOffset) && util.isList(selectionNode.nextSibling)) {
+                                e.preventDefault();
+                                const newEl = util.createElement('LI');
+                                const br = util.createElement('BR');
+                                newEl.appendChild(br);
+    
+                                formatEl.parentNode.insertBefore(newEl, formatEl.nextElementSibling);
+                                newEl.appendChild(selectionNode.nextSibling);
+                                
+                                core.setRange(br, 1, br, 1);
+                                break;
                             }
-                            
-                            break;
-                        } else {
-                            core._formatAttrsTemp = formatEl.attributes;
-                        }
-                        
-                        if (options.lineAttrReset && formatEl && !util.isListCell(formatEl)) {
-                            e.preventDefault();
-                            e.stopPropagation();
-
-                            let newEl;
-                            if (!range.collapsed) {
-                                const isMultiLine = util.getFormatElement(range.startContainer, null) !== util.getFormatElement(range.endContainer, null);
-                                const r = core.removeNode();
-                                if (isMultiLine) {
-                                    newEl = util.getFormatElement(r.container, null);
-
-                                    if (!r.prevContainer) {
-                                        const newFormat = formatEl.cloneNode(false);
-                                        newFormat.innerHTML = '<br>';
-                                        newEl.parentNode.insertBefore(newFormat, newEl);
-                                    } else if (newEl !== formatEl && newEl.nextElementSibling === formatEl) {
-                                        newEl = formatEl;
+    
+                            if ((range.commonAncestorContainer.nodeType === 3 ? !range.commonAncestorContainer.nextElementSibling : true) && util.onlyZeroWidthSpace(formatEl.innerText.trim()) && !util.isListCell(formatEl.nextElementSibling)) {
+                                e.preventDefault();
+                                let newEl = null;
+    
+                                if (util.isListCell(rangeEl.parentNode)) {
+                                    rangeEl = formatEl.parentNode.parentNode.parentNode;
+                                    newEl = util.splitElement(formatEl, null, util.getElementDepth(formatEl) - 2);
+                                    if (!newEl) {
+                                        const newListCell = util.createElement('LI');
+                                        newListCell.innerHTML = '<br>';
+                                        util.copyTagAttributes(newListCell, formatEl, options.lineAttrReset);
+                                        rangeEl.insertBefore(newListCell, newEl);
+                                        newEl = newListCell;
                                     }
                                 } else {
-                                    newEl = util.splitElement(r.container, r.offset, 0);
+                                    const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : (util.isFormatElement(rangeEl.nextElementSibling) && !util.isRangeFormatElement(rangeEl.nextElementSibling)) ? rangeEl.nextElementSibling.nodeName : (util.isFormatElement(rangeEl.previousElementSibling) && !util.isRangeFormatElement(rangeEl.previousElementSibling)) ? rangeEl.previousElementSibling.nodeName : options.defaultTag;
+                                    newEl = util.createElement(newFormat);
+                                    util.copyTagAttributes(newEl, formatEl, options.lineAttrReset);
+                                    const edge = core.detachRangeFormatElement(rangeEl, [formatEl], null, true, true);
+                                    edge.cc.insertBefore(newEl, edge.ec);
                                 }
-                            } else {
-                                if (util.onlyZeroWidthSpace(formatEl)) newEl = core.appendFormatTag(formatEl, formatEl.cloneNode(false));
-                                else newEl = util.splitElement(range.endContainer, range.endOffset, 0);
+                                
+                                newEl.innerHTML = '<br>';
+                                util.removeItemAllParents(formatEl, null, null);
+                                core.setRange(newEl, 1, newEl, 1);
+                                break;
                             }
-
-                            const resetAttr = options.lineAttrReset;
-                            const attrs = newEl.attributes;
-                            let i = 0;
-                            while (attrs[i]) {
-                                if (resetAttr && resetAttr.indexOf(attrs[i].name.toLowerCase()) > -1) {
-                                    i++;
-                                    continue;
-                                }
-                                newEl.removeAttribute(attrs[i].name);
-                            }
-                            core.setRange(newEl.firstChild, 0, newEl.firstChild, 0);
-
-                            break;
                         }
 
                         if (freeFormatEl) {
@@ -7438,52 +7448,90 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             event._onShortcutKey = true;
                             break;
                         }
+                        
+                        // set format attrs - edge
+                        if (range.collapsed && (formatStartEdge || formatEndEdge)) {
+                            e.preventDefault();
+                            const focusBR = util.createElement('BR');
+                            const newFormat = util.createElement(formatEl.nodeName);
+                            newFormat.appendChild(focusBR);
+
+                            util.copyTagAttributes(newFormat, formatEl, options.lineAttrReset);
+
+                            formatEl.parentNode.insertBefore(newFormat, formatStartEdge ? formatEl : formatEl.nextElementSibling);
+                            if (formatEndEdge) {
+                                core.setRange(focusBR, 1, focusBR, 1);
+                            }
+                            
+                            break;
+                        }
+                        
+                        if (formatEl) {
+                            e.stopPropagation();
+
+                            let newEl;
+                            let offset = 0;
+                            if (!range.collapsed) {
+                                const isMultiLine = util.getFormatElement(range.startContainer, null) !== util.getFormatElement(range.endContainer, null);
+                                const newFormat = formatEl.cloneNode(false);
+                                newFormat.innerHTML = '<br>';
+                                const r = core.removeNode();
+                                newEl = util.getFormatElement(r.container, null);
+                                if (!newEl) {
+                                    if (util.isWysiwygDiv(r.container)) {
+                                        e.preventDefault();
+                                        context.element.wysiwyg.appendChild(newFormat);
+                                        newEl = newFormat;
+                                        util.copyTagAttributes(newEl, formatEl, options.lineAttrReset);
+                                        core.setRange(newEl, offset, newEl, offset);
+                                    }
+                                    break;
+                                }
+                                
+                                const innerRange = util.getRangeFormatElement(r.container);
+                                newEl = newEl.contains(innerRange) ? util.getChildElement(innerRange, util.getFormatElement.bind(util)) : newEl;
+                                if (isMultiLine) {
+                                    if (formatEndEdge && !formatStartEdge) {
+                                        newEl.parentNode.insertBefore(newFormat, (!r.prevContainer || r.container === r.prevContainer) ? newEl.nextElementSibling : newEl);
+                                        newEl = newFormat;
+                                        offset = 0;
+                                    } else {
+                                        offset = r.offset;
+                                        if (formatStartEdge) {
+                                            const tempEl = newEl.parentNode.insertBefore(newFormat, newEl);
+                                            if (formatEndEdge) {
+                                                newEl = tempEl;
+                                                offset = 0;
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    if (formatEndEdge && formatStartEdge) {
+                                        newEl.parentNode.insertBefore(newFormat, (r.prevContainer && r.container === r.prevContainer) ? newEl.nextElementSibling : newEl);
+                                        newEl = newFormat;
+                                        offset = 0;
+                                    } else {
+                                        newEl = util.splitElement(r.container, r.offset, util.getElementDepth(formatEl));
+                                    }
+                                }
+                            } else {
+                                if (util.onlyZeroWidthSpace(formatEl)) {
+                                    newEl = core.appendFormatTag(formatEl, formatEl.cloneNode(false));
+                                } else {
+                                    newEl = util.splitElement(range.endContainer, range.endOffset, util.getElementDepth(formatEl));
+                                }
+                            }
+
+                            e.preventDefault();
+                            util.copyTagAttributes(newEl, formatEl, options.lineAttrReset);
+                            core.setRange(newEl, offset, newEl, offset);
+
+                            break;
+                        }
                     }
 
                     if (selectRange) break;
                     
-                    if (rangeEl && formatEl && !util.isCell(rangeEl) && !/^FIGCAPTION$/i.test(rangeEl.nodeName)) {
-                        const range = core.getRange();
-                        if(core.isEdgePoint(range.endContainer, range.endOffset) && util.isList(selectionNode.nextSibling)) {
-                            e.preventDefault();
-                            const newEl = util.createElement('LI');
-                            const br = util.createElement('BR');
-                            newEl.appendChild(br);
-
-                            formatEl.parentNode.insertBefore(newEl, formatEl.nextElementSibling);
-                            newEl.appendChild(selectionNode.nextSibling);
-                            
-                            core.setRange(br, 1, br, 1);
-                            break;
-                        }
-
-                        if ((range.commonAncestorContainer.nodeType === 3 ? !range.commonAncestorContainer.nextElementSibling : true) && util.onlyZeroWidthSpace(formatEl.innerText.trim())) {
-                            e.preventDefault();
-                            let newEl = null;
-
-                            if (util.isListCell(rangeEl.parentNode)) {
-                                rangeEl = formatEl.parentNode.parentNode.parentNode;
-                                newEl = util.splitElement(formatEl, null, util.getElementDepth(formatEl) - 2);
-                                if (!newEl) {
-                                    const newListCell = util.createElement('LI');
-                                    newListCell.innerHTML = '<br>';
-                                    rangeEl.insertBefore(newListCell, newEl);
-                                    newEl = newListCell;
-                                }
-                            } else {
-                                const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : (util.isFormatElement(rangeEl.nextElementSibling) && !util.isRangeFormatElement(rangeEl.nextElementSibling)) ? rangeEl.nextElementSibling.nodeName : (util.isFormatElement(rangeEl.previousElementSibling) && !util.isRangeFormatElement(rangeEl.previousElementSibling)) ? rangeEl.previousElementSibling.nodeName : options.defaultTag;
-                                newEl = util.createElement(newFormat);
-                                const edge = core.detachRangeFormatElement(rangeEl, [formatEl], null, true, true);
-                                edge.cc.insertBefore(newEl, edge.ec);
-                            }
-                            
-                            newEl.innerHTML = '<br>';
-                            util.removeItemAllParents(formatEl, null, null);
-                            core.setRange(newEl, 1, newEl, 1);
-                            break;
-                        }
-                    }
-
                     if (rangeEl && util.getParentElement(rangeEl, 'FIGCAPTION') && util.getParentElement(rangeEl, util.isList)) {
                         e.preventDefault();
                         formatEl = core.appendFormatTag(formatEl, null);
@@ -7675,6 +7723,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         onMouseDown_resizingBar: function (e) {
             e.stopPropagation();
+            _w.setTimeout(core._editorRange.bind(core));
 
             core.submenuOff();
             core.controllersOff();
@@ -8134,10 +8183,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             context.element.lineBreaker_t.addEventListener('mousedown', event._lineBreakerBind.t, false);
             context.element.lineBreaker_b.addEventListener('mousedown', event._lineBreakerBind.b, false);
 
-            /** Events are registered only when there is a table plugin.  */
-            if (core.plugins.table) {
-                eventWysiwyg.addEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
-            }
+            /** Events are registered mobile.  */
+            eventWysiwyg.addEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
+            eventWysiwyg.addEventListener('touchend', event.onClick_wysiwyg, {passive: true, useCapture: false});
             
             /** code view area auto line */
             if (options.height === 'auto' && !options.codeMirrorEditor) {
@@ -8194,6 +8242,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             event._lineBreakerBind = null;
             
             eventWysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
+            eventWysiwyg.removeEventListener('touchend', event.onClick_wysiwyg, {passive: true, useCapture: false});
             eventWysiwyg.removeEventListener('focus', event.onFocus_wysiwyg);
             eventWysiwyg.removeEventListener('blur', event.onBlur_wysiwyg);
 
