@@ -8183,10 +8183,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             context.element.lineBreaker_t.addEventListener('mousedown', event._lineBreakerBind.t, false);
             context.element.lineBreaker_b.addEventListener('mousedown', event._lineBreakerBind.b, false);
 
-            /** Events are registered only when there is a table plugin.  */
-            if (core.plugins.table) {
-                eventWysiwyg.addEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
-            }
+            /** Events are registered mobile.  */
+            eventWysiwyg.addEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
+            eventWysiwyg.addEventListener('touchend', event.onClick_wysiwyg, {passive: true, useCapture: false});
             
             /** code view area auto line */
             if (options.height === 'auto' && !options.codeMirrorEditor) {
@@ -8243,6 +8242,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             event._lineBreakerBind = null;
             
             eventWysiwyg.removeEventListener('touchstart', event.onMouseDown_wysiwyg, {passive: true, useCapture: false});
+            eventWysiwyg.removeEventListener('touchend', event.onClick_wysiwyg, {passive: true, useCapture: false});
             eventWysiwyg.removeEventListener('focus', event.onFocus_wysiwyg);
             eventWysiwyg.removeEventListener('blur', event.onBlur_wysiwyg);
 
