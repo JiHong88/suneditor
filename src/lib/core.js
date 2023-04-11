@@ -7386,14 +7386,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                     if (!newEl) {
                                         const newListCell = util.createElement('LI');
                                         newListCell.innerHTML = '<br>';
-                                        util.copyTagAttributes(newListCell, formatEl, ['id'].concat(options.lineAttrReset));
+                                        util.copyTagAttributes(newListCell, formatEl, options.lineAttrReset);
                                         rangeEl.insertBefore(newListCell, newEl);
                                         newEl = newListCell;
                                     }
                                 } else {
                                     const newFormat = util.isCell(rangeEl.parentNode) ? 'DIV' : util.isList(rangeEl.parentNode) ? 'LI' : (util.isFormatElement(rangeEl.nextElementSibling) && !util.isRangeFormatElement(rangeEl.nextElementSibling)) ? rangeEl.nextElementSibling.nodeName : (util.isFormatElement(rangeEl.previousElementSibling) && !util.isRangeFormatElement(rangeEl.previousElementSibling)) ? rangeEl.previousElementSibling.nodeName : options.defaultTag;
                                     newEl = util.createElement(newFormat);
-                                    util.copyTagAttributes(newEl, formatEl, ['id'].concat(options.lineAttrReset));
+                                    util.copyTagAttributes(newEl, formatEl, options.lineAttrReset);
                                     const edge = core.detachRangeFormatElement(rangeEl, [formatEl], null, true, true);
                                     edge.cc.insertBefore(newEl, edge.ec);
                                 }
@@ -7456,7 +7456,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             const newFormat = util.createElement(formatEl.nodeName);
                             newFormat.appendChild(focusBR);
 
-                            util.copyTagAttributes(newFormat, formatEl, ['id'].concat(options.lineAttrReset));
+                            util.copyTagAttributes(newFormat, formatEl, options.lineAttrReset);
 
                             formatEl.parentNode.insertBefore(newFormat, formatStartEdge ? formatEl : formatEl.nextElementSibling);
                             if (formatEndEdge) {
@@ -7466,7 +7466,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             break;
                         }
                         
-                        if (options.lineAttrReset && formatEl) {
+                        if (formatEl) {
+                            e.stopPropagation();
+
                             let newEl;
                             let offset = 0;
                             if (!range.collapsed) {
@@ -7475,7 +7477,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                                 newFormat.innerHTML = '<br>';
                                 const r = core.removeNode();
                                 newEl = util.getFormatElement(r.container, null);
-                                if (!newEl) break;
+                                if (!newEl) {
+                                    if (util.isWysiwygDiv(r.container)) {
+                                        e.preventDefault();
+                                        context.element.wysiwyg.appendChild(newFormat);
+                                        newEl = newFormat;
+                                        util.copyTagAttributes(newEl, formatEl, options.lineAttrReset);
+                                        core.setRange(newEl, offset, newEl, offset);
+                                    }
+                                    break;
+                                }
                                 
                                 const innerRange = util.getRangeFormatElement(r.container);
                                 newEl = newEl.contains(innerRange) ? util.getChildElement(innerRange, util.getFormatElement.bind(util)) : newEl;
@@ -7512,9 +7523,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             }
 
                             e.preventDefault();
-                            e.stopPropagation();
-
-                            util.copyTagAttributes(newEl, formatEl, ['id'].concat(options.lineAttrReset));
+                            util.copyTagAttributes(newEl, formatEl, options.lineAttrReset);
                             core.setRange(newEl, offset, newEl, offset);
 
                             break;
