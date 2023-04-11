@@ -7,7 +7,7 @@ import EventManager from './base/eventManager';
 import ClassDependency from '../dependency/_classes';
 
 // base
-import { BASIC_COMMANDS, DEFAULT_ACTIVE_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './base/actives';
+import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './base/actives';
 
 // classes
 import Char from './class/char';
@@ -1188,7 +1188,7 @@ Editor.prototype = {
 		};
 
 		// Command and file plugins registration
-		this.activeCommands = DEFAULT_ACTIVE_COMMANDS;
+		this.activeCommands = ACTIVE_EVENT_COMMANDS;
 		this._onMousedownPlugins = [];
 		this._onKeyDownPlugins = [];
 		this._fileManager.tags = [];
