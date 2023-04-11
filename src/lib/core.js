@@ -6248,14 +6248,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.history.reset(true);
             
             _w.setTimeout(function () {
+                if (typeof core._resourcesStateChange !== 'function') return;
+
                 // observer
                 if (event._resizeObserver) event._resizeObserver.observe(context.element.wysiwygFrame);
                 if (event._toolbarObserver) event._toolbarObserver.observe(context.element._toolbarShadow);
                 // resource state
-                this._resourcesStateChange();
+                core._resourcesStateChange();
                 // user event
                 if (typeof functions.onload === 'function') functions.onload(core, reload);
-            }.bind(this));
+            });
         },
 
         /**
