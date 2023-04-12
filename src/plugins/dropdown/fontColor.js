@@ -1,9 +1,9 @@
-import EditorDependency from '../../dependency';
+import EditorInjector from '../../injector';
 import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 
 const FontColor = function (editor) {
-	EditorDependency.call(this, editor);
+	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.fontColor;
 	this.icon = 'font_color';

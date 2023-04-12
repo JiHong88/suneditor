@@ -2,12 +2,12 @@
  * @fileoverview Component class
  */
 
-import CoreDependency from '../../dependency/_core';
+import CoreInjector from '../../injector/_core';
 import { domUtils } from '../../helper';
 import Figure from '../../modules/Figure';
 
 const Component = function (editor) {
-	CoreDependency.call(this, editor);
+	CoreInjector.call(this, editor);
 
 	// members
 	this._lineBreakComp = null;

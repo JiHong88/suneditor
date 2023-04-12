@@ -1,10 +1,10 @@
-import EditorDependency from '../../dependency';
+import EditorInjector from '../../injector';
 import { Modal, Controller, ModalAnchorEditor } from '../../modules';
 import { domUtils } from '../../helper';
 
 const Link = function (editor) {
 	// plugin bisic properties
-	EditorDependency.call(this, editor);
+	EditorInjector.call(this, editor);
 	this.title = this.lang.link;
 	this.icon = 'link';
 
@@ -29,7 +29,7 @@ Link.prototype = {
 	 * @override core
 	 */
 	active: function (element) {
-		if (element && domUtils.isAnchor(element) && element.getAttribute('data-se-image-link') === null) {
+		if (element && domUtils.isAnchor(element) && element.getAttribute('data-image-link') === null) {
 			const tempLink = this.controller.form.querySelector('a');
 			tempLink.href = element.href;
 			tempLink.title = element.textContent;

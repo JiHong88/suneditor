@@ -1,9 +1,9 @@
-import EditorDependency from '../../dependency';
+import EditorInjector from '../../injector';
 import { domUtils } from '../../helper';
 
 const TextStyle = function (editor) {
 	// plugin bisic properties
-	EditorDependency.call(this, editor);
+	EditorInjector.call(this, editor);
 	this.title = this.lang.textStyle;
 	this.icon = 'text_style';
 

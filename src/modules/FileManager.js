@@ -1,4 +1,4 @@
-import CoreDependency from '../dependency/_core';
+import CoreInjector from '../injector/_core';
 import {
 	domUtils,
 	numbers,
@@ -11,7 +11,7 @@ import {
  * @param {{ tagNames: array, eventHandler: Function, checkHandler: Function, figure: Figure instance | null }} params
  */
 const FileManager = function (inst, params) {
-	CoreDependency.call(this, inst.editor);
+	CoreInjector.call(this, inst.editor);
 
 	// members
 	inst.__fileManagement = this;
@@ -71,14 +71,14 @@ FileManager.prototype = {
 	 * @param {Object|null} file
 	 */
 	setInfo: function (element, file) {
-		let dataIndex = element.getAttribute('data-se-index');
+		let dataIndex = element.getAttribute('data-index');
 		let info = null;
 		let state = '';
 
 		if (!file) {
 			file = {
-				name: element.getAttribute('data-se-file-name') || (typeof element.src === 'string' ? element.src.split('/').pop() : ''),
-				size: element.getAttribute('data-se-file-size') || 0
+				name: element.getAttribute('data-file-name') || (typeof element.src === 'string' ? element.src.split('/').pop() : ''),
+				size: element.getAttribute('data-file-size') || 0
 			};
 		}
 
@@ -87,9 +87,9 @@ FileManager.prototype = {
 			state = 'create';
 			dataIndex = this.infoIndex++;
 
-			element.setAttribute('data-se-index', dataIndex);
-			element.setAttribute('data-se-file-name', file.name);
-			element.setAttribute('data-se-file-size', file.size);
+			element.setAttribute('data-index', dataIndex);
+			element.setAttribute('data-file-name', file.name);
+			element.setAttribute('data-file-size', file.size);
 
 			info = {
 				src: element.src,
@@ -120,15 +120,15 @@ FileManager.prototype = {
 			}
 
 			info.src = element.src;
-			info.name = element.getAttribute('data-se-file-name');
-			info.size = element.getAttribute('data-se-file-size') * 1;
+			info.name = element.getAttribute('data-file-name');
+			info.size = element.getAttribute('data-file-size') * 1;
 		}
 
 		// method bind
 		info.element = element;
 		info.delete = function (element) {
 			this.inst.destroy.call(this.inst, element);
-			this._deleteInfo(element.getAttribute('data-se-index') * 1);
+			this._deleteInfo(element.getAttribute('data-index') * 1);
 		}.bind(this, element);
 		info.select = function (element) {
 			element.scrollIntoView(true);
@@ -137,17 +137,17 @@ FileManager.prototype = {
 
 		// figure
 		if (this.figure) {
-			if (!element.getAttribute('data-se-origin')) {
+			if (!element.getAttribute('data-origin')) {
 				const size = this.figure.getSize(element);
 				const w = element.naturalWidth || size.w;
 				const h = element.naturalHeight || size.h;
-				element.setAttribute('data-se-origin', w + ',' + h);
-				if (!element.getAttribute('data-se-size')) element.setAttribute('data-se-size', w + ',' + h);
+				element.setAttribute('data-origin', w + ',' + h);
+				if (!element.getAttribute('data-size')) element.setAttribute('data-size', w + ',' + h);
 			}
 
 			if (!element.style.width) {
 				try {
-					const size = (element.getAttribute('data-se-size') || element.getAttribute('data-se-origin') || '').split(',');
+					const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
 					this.figure.__fileManagerInfo = true;
 					this.inst.ready(element, null);
 					this.figure.setSize(numbers.get(size[0]) ? size[0] : 'auto', numbers.get(size[1]) ? size[1] : 'auto');
@@ -182,7 +182,7 @@ FileManager.prototype = {
 	_checkInfo: function () {
 		let tags = [];
 		for (let i = 0, len = this.tagNames.length; i < len; i++) {
-			tags = tags.concat([].slice.call(this.editor.frameContext.get('wysiwyg').querySelectorAll(this.tagNames[i] + ':not([data-se-embed="true"])')));
+			tags = tags.concat([].slice.call(this.editor.frameContext.get('wysiwyg').querySelectorAll(this.tagNames[i] + ':not([data-embed="true"])')));
 		}
 
 		if (tags.length === this.infoList.length) {
@@ -198,7 +198,7 @@ FileManager.prototype = {
 					info = this.infoList[i];
 					if (
 						tags.filter(function (t) {
-							return info.src === t.src && info.index.toString() === t.getAttribute('data-se-index');
+							return info.src === t.src && info.index.toString() === t.getAttribute('data-index');
 						}).length === 0
 					) {
 						infoUpdate = true;
@@ -236,12 +236,12 @@ FileManager.prototype = {
 				} finally {
 					this.figure.__fileManagerInfo = false;
 				}
-			} else if (!tag.getAttribute('data-se-index') || infoIndex.indexOf(tag.getAttribute('data-se-index') * 1) < 0) {
+			} else if (!tag.getAttribute('data-index') || infoIndex.indexOf(tag.getAttribute('data-index') * 1) < 0) {
 				currentTags.push(this.infoIndex);
-				tag.removeAttribute('data-se-index');
+				tag.removeAttribute('data-index');
 				this.setInfo(tag, null);
 			} else {
-				currentTags.push(tag.getAttribute('data-se-index') * 1);
+				currentTags.push(tag.getAttribute('data-index') * 1);
 			}
 		}
 

@@ -1,4 +1,4 @@
-import EditorDependency from '../dependency';
+import EditorInjector from '../injector';
 import { domUtils, env } from '../helper';
 
 const NON_RESPONSE_KEYCODE = new env._w.RegExp('^(13|1[7-9]|20|27|40|45|11[2-9]|12[0-3]|144|145)$');
@@ -12,7 +12,7 @@ const NON_RESPONSE_KEYCODE = new env._w.RegExp('^(13|1[7-9]|20|27|40|45|11[2-9]|
  * When using the "bottom" position there should be an arrow on the controller.
  */
 const Controller = function (inst, element, params, _name) {
-	EditorDependency.call(this, inst.editor);
+	EditorInjector.call(this, inst.editor);
 
 	// members
 	this.kind = _name || inst.constructor.key;

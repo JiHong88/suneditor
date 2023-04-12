@@ -1,13 +1,11 @@
 import Helper, { env, converter, domUtils, numbers } from '../helper';
-import Constructor, { ResetOptions, UpdateButton, CreateShortcuts } from './constructor';
+import Constructor, { ResetOptions, UpdateButton, CreateShortcuts } from './section/constructor';
+import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './section/actives';
 import History from './base/history';
 import EventManager from './base/eventManager';
 
-// class dependency
-import ClassDependency from '../dependency/_classes';
-
-// base
-import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './base/actives';
+// class injector
+import ClassInjector from '../injector/_classes';
 
 // classes
 import Char from './class/char';
@@ -990,17 +988,17 @@ Editor.prototype = {
 		this.viewer = new Viewer(this);
 
 		// register classes to the eventManager and main classes
-		ClassDependency.call(this.eventManager, this);
-		ClassDependency.call(this.toolbar, this);
-		if (this.options.has('subMode')) ClassDependency.call(this.subToolbar, this);
-		ClassDependency.call(this.selection, this);
-		ClassDependency.call(this.html, this);
-		ClassDependency.call(this.node, this);
-		ClassDependency.call(this.format, this);
-		ClassDependency.call(this.component, this);
-		ClassDependency.call(this.menu, this);
-		ClassDependency.call(this.char, this);
-		ClassDependency.call(this.viewer, this);
+		ClassInjector.call(this.eventManager, this);
+		ClassInjector.call(this.toolbar, this);
+		if (this.options.has('subMode')) ClassInjector.call(this.subToolbar, this);
+		ClassInjector.call(this.selection, this);
+		ClassInjector.call(this.html, this);
+		ClassInjector.call(this.node, this);
+		ClassInjector.call(this.format, this);
+		ClassInjector.call(this.component, this);
+		ClassInjector.call(this.menu, this);
+		ClassInjector.call(this.char, this);
+		ClassInjector.call(this.viewer, this);
 
 		this._responsiveButtons = this._responsiveButtons_res = null;
 	},

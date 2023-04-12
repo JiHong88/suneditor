@@ -1,7 +1,7 @@
 require('../src/assets/suneditor.css');
 require('../src/assets/suneditor-content.css');
 
-import suneditor, { editorDependency, plugins, modules, langs, helper } from '../src/suneditor';
+import suneditor, { EditorInjector, plugins, modules, langs, helper } from '../src/suneditor';
 
 if (!window.SUNEDITOR) {
 	Object.defineProperty(window, 'SUNEDITOR', {
@@ -10,7 +10,7 @@ if (!window.SUNEDITOR) {
 		configurable: false,
 		value: {
 			inst: suneditor,
-			editorDependency: editorDependency,
+			EditorInjector: EditorInjector,
 			plugins: plugins,
 			modules: modules,
 			langs: langs,

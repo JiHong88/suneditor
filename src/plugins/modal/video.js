@@ -1,10 +1,10 @@
-import EditorDependency from '../../dependency';
+import EditorInjector from '../../injector';
 import { Modal, Figure, FileManager } from '../../modules';
 import { domUtils, numbers } from '../../helper';
 
 const Video = function (editor) {
 	// plugin bisic properties
-	EditorDependency.call(this, editor);
+	EditorInjector.call(this, editor);
 	this.title = this.lang.video;
 	this.icon = 'video';
 
@@ -200,7 +200,7 @@ Video.prototype = {
 
 		if (!this._setVideoRatioSelect(h)) this.inputY.value = this._onlyPercentage ? numbers.get(h, 2) : h;
 
-		this.proportion.checked = target.getAttribute('data-se-proportion') !== 'false';
+		this.proportion.checked = target.getAttribute('data-proportion') !== 'false';
 		this.inputX.disabled = percentageRotation ? true : false;
 		this.inputY.disabled = percentageRotation ? true : false;
 		this.proportion.disabled = percentageRotation ? true : false;
@@ -293,7 +293,7 @@ Video.prototype = {
 		const changeSize = !isUpdate || inputUpdate;
 
 		if (this._resizing) {
-			oFrame.setAttribute('data-se-proportion', this.proportion.checked);
+			oFrame.setAttribute('data-proportion', this.proportion.checked);
 		}
 
 		// set size
@@ -427,7 +427,7 @@ Video.prototype = {
 		}
 
 		// size
-		const size = (oFrame.getAttribute('data-se-size') || oFrame.getAttribute('data-se-origin') || '').split(',');
+		const size = (oFrame.getAttribute('data-size') || oFrame.getAttribute('data-origin') || '').split(',');
 		this.applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
 
 		// align

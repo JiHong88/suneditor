@@ -1,8 +1,8 @@
 import { domUtils } from '../helper';
-import CoreDependency from '../dependency/_core';
+import CoreInjector from '../injector/_core';
 
 const Modal = function (inst, element) {
-	CoreDependency.call(this, inst.editor);
+	CoreInjector.call(this, inst.editor);
 
 	// members
 	const carrierWrapper = this.editor._carrierWrapper;

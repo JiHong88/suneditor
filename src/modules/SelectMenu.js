@@ -1,4 +1,4 @@
-import CoreDependency from '../dependency/_core';
+import CoreInjector from '../injector/_core';
 import { domUtils } from '../helper';
 
 /**
@@ -9,7 +9,7 @@ import { domUtils } from '../helper';
  */
 const SelectMenu = function (inst, checkList, position) {
 	// plugin bisic properties
-	CoreDependency.call(this, inst.editor);
+	CoreInjector.call(this, inst.editor);
 
 	// members
 	this.kink = inst.constructor.key;
@@ -39,7 +39,7 @@ SelectMenu.prototype = {
 		menus = menus || items;
 		let html = '';
 		for (let i = 0, len = menus.length; i < len; i++) {
-			html += '<li class="se-select-item" data-se-index="' + i + '">' + (typeof menus[i] === 'string' ? menus[i] : menus[i].outerHTML) + '</li>';
+			html += '<li class="se-select-item" data-index="' + i + '">' + (typeof menus[i] === 'string' ? menus[i] : menus[i].outerHTML) + '</li>';
 		}
 
 		this.items = items;
@@ -304,7 +304,7 @@ function OnMousedown_list(e) {
 
 function OnMouseMove_list(e) {
 	domUtils.addClass(this.form, '__se_select-menu-mouse-move');
-	const index = e.target.getAttribute('data-se-index');
+	const index = e.target.getAttribute('data-index');
 	if (!index) return;
 	this.index = index * 1;
 }
@@ -314,7 +314,7 @@ function OnClick_list(e) {
 	let index = null;
 
 	while (!index && !/UL/i.test(target.tagName) && !domUtils.hasClass(target, 'se-container')) {
-		index = target.getAttribute('data-se-index');
+		index = target.getAttribute('data-index');
 		target = target.parentNode;
 	}
 

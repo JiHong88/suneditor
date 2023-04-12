@@ -1,9 +1,9 @@
-import EditorDependency from '../../dependency';
+import EditorInjector from '../../injector';
 import { domUtils } from '../../helper';
 
 const ParagraphStyle = function (editor) {
 	// plugin bisic properties
-	EditorDependency.call(this, editor);
+	EditorInjector.call(this, editor);
 	this.title = this.lang.paragraphStyle;
 	this.icon = 'paragraph_style';
 

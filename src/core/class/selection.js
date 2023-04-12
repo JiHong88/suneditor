@@ -2,11 +2,11 @@
  * @fileoverview Selection class
  */
 
-import CoreDependency from '../../dependency/_core';
+import CoreInjector from '../../injector/_core';
 import { domUtils, unicode } from '../../helper';
 
 const Selection = function (editor) {
-	CoreDependency.call(this, editor);
+	CoreInjector.call(this, editor);
 
 	// members
 	this.range = null;

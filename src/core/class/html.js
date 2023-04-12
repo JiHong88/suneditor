@@ -2,11 +2,11 @@
  * @fileoverview Char class
  */
 
-import CoreDependency from '../../dependency/_core';
+import CoreInjector from '../../injector/_core';
 import { domUtils, converter, numbers, unicode, env } from '../../helper';
 
 const HTML = function (editor) {
-	CoreDependency.call(this, editor);
+	CoreInjector.call(this, editor);
 
 	// members
 	this._allowHTMLComment = null;
@@ -504,7 +504,7 @@ HTML.prototype = {
 			parentNode.appendChild(oNode);
 			console.warn('[SUNEDITOR.html.insertNode.warn]', error);
 		} finally {
-			const dupleNodes = parentNode.querySelectorAll('[data-se-duple]');
+			const dupleNodes = parentNode.querySelectorAll('[data-duple]');
 			if (dupleNodes.length > 0) {
 				for (let i = 0, len = dupleNodes.length, d, c, ch, parent; i < len; i++) {
 					d = dupleNodes[i];
@@ -1375,7 +1375,7 @@ HTML.prototype = {
 				oNode.removeAttribute('style');
 			}
 			if (!oNode.attributes.length) {
-				oNode.setAttribute('data-se-duple', 'true');
+				oNode.setAttribute('data-duple', 'true');
 			}
 		}
 

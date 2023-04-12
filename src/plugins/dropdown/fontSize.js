@@ -1,8 +1,8 @@
-import EditorDependency from '../../dependency';
+import EditorInjector from '../../injector';
 import { domUtils, converter } from '../../helper';
 
 const FontSize = function (editor) {
-	EditorDependency.call(this, editor);
+	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.fontSize;
 	this.icon = '<span class="txt">' + this.lang.fontSize + '</span>' + this.icons.arrow_down;

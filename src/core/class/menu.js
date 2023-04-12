@@ -2,11 +2,11 @@
  * @fileoverview Menu class
  */
 
-import CoreDependency from '../../dependency/_core';
+import CoreInjector from '../../injector/_core';
 import { domUtils } from '../../helper';
 
 const Menu = function (editor) {
-	CoreDependency.call(this, editor);
+	CoreInjector.call(this, editor);
 
 	// members--
 	this.targetMap = {};

@@ -2,11 +2,11 @@
  * @fileoverview Format class
  */
 
-import CoreDependency from '../../dependency/_core';
+import CoreInjector from '../../injector/_core';
 import { domUtils, unicode, numbers, env } from '../../helper';
 
 const Format = function (editor) {
-	CoreDependency.call(this, editor);
+	CoreInjector.call(this, editor);
 
 	// members
 	this._listCamel = this.options.get('__listCommonStyle');

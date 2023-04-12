@@ -2,12 +2,12 @@
  * @fileoverview Char class
  */
 
-import CoreDependency from '../../dependency/_core';
+import CoreInjector from '../../injector/_core';
 import env from '../../helper/env';
 import { addClass, removeClass, hasClass } from '../../helper/domUtils';
 
 const Char = function (editor) {
-	CoreDependency.call(this, editor);
+	CoreInjector.call(this, editor);
 
 	// members
 	this._encoder = this._w.encodeURIComponent;

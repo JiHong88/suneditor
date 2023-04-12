@@ -1,10 +1,10 @@
-import EditorDependency from '../../dependency';
+import EditorInjector from '../../injector';
 import { Modal, Controller, FileManager, Figure } from '../../modules';
 import { domUtils } from '../../helper';
 
 const Audio_ = function (editor) {
 	// plugin bisic properties
-	EditorDependency.call(this, editor);
+	EditorInjector.call(this, editor);
 	this.title = this.lang.audio;
 	this.icon = 'audio';
 

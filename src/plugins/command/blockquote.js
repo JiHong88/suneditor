@@ -1,8 +1,8 @@
-import EditorDependency from '../../dependency';
+import EditorInjector from '../../injector';
 import { domUtils } from '../../helper';
 
 const Blockquote = function (editor) {
-	EditorDependency.call(this, editor);
+	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.tag_blockquote;
 	this.icon = 'blockquote';

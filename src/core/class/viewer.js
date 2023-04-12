@@ -2,11 +2,11 @@
  * @fileoverview Viewer class
  */
 
-import CoreDependency from '../../dependency/_core';
+import CoreInjector from '../../injector/_core';
 import { domUtils, env, converter } from '../../helper';
 
 const Viewer = function (editor) {
-	CoreDependency.call(this, editor);
+	CoreInjector.call(this, editor);
 
 	// members
 	this.bodyOverflow = '';

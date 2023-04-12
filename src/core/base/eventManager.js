@@ -2,7 +2,7 @@
  * @fileoverview eventManager class
  */
 
-import CoreDependency from '../../dependency/_core';
+import CoreInjector from '../../injector/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
 
 const _w = env._w;
@@ -14,7 +14,7 @@ const HISTORY_IGNORE_KEYCODE = new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9
 const FRONT_ZEROWIDTH = new _w.RegExp(unicode.zeroWidthSpace + '+', '');
 
 const EventManager = function (editor) {
-	CoreDependency.call(this, editor);
+	CoreInjector.call(this, editor);
 	this._events = [];
 	this._onButtonsCheck = new _w.RegExp('^(' + _w.Object.keys(editor.options.get('_styleNodeMap')).join('|') + ')$', 'i');
 	this._onShortcutKey = false;
@@ -366,7 +366,7 @@ EventManager.prototype = {
 		const fileComponent = domUtils.getParentElement(commonCon, this.component.is);
 		if (fileComponent && !domUtils.isTable(fileComponent)) {
 			return;
-		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-se-embed') === 'true') {
+		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-embed') === 'true') {
 			let el = commonCon.nextElementSibling;
 			if (!this.format.isLine(el)) el = this.format.addLine(commonCon, this.options.get('defaultLineTag'));
 			this.selection.setRange(el.firstChild, 0, el.firstChild, 0);

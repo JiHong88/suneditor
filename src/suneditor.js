@@ -1,12 +1,12 @@
 import Editor from './core/editor';
 
-import EditorDependency from './dependency';
+import EditorInjector from './injector';
 import Plugins from './plugins';
 import Langs from './langs';
 import Modules from './modules';
 import Helper from './helper';
 
-export const editorDependency = EditorDependency;
+export const editorInjector = EditorInjector;
 export const plugins = Plugins;
 export const modules = Modules;
 export const langs = Langs;

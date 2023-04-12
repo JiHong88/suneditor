@@ -3,7 +3,7 @@
  * @param {any} editor Editor's core
  * @private
  */
-function CoreDependency(editor) {
+function CoreInjector(editor) {
 	this.editor = editor;
 	this.eventManager = editor.eventManager;
 	this.history = editor.history;
@@ -20,4 +20,4 @@ function CoreDependency(editor) {
 	this._shadowRoot = editor._shadowRoot;
 }
 
-export default CoreDependency;
+export default CoreInjector;

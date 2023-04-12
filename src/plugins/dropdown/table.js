@@ -1,10 +1,10 @@
-import EditorDependency from '../../dependency';
+import EditorInjector from '../../injector';
 import { domUtils, numbers } from '../../helper';
 import { Controller, SelectMenu } from '../../modules';
 
 const Table = function (editor) {
 	// plugin bisic properties
-	EditorDependency.call(this, editor);
+	EditorInjector.call(this, editor);
 	this.title = this.lang.table;
 	this.icon = 'table';
 

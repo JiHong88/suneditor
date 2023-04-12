@@ -3,7 +3,7 @@
  * @param {any} editor Editor object
  * @private
  */
-function ClassDependency(editor) {
+function ClassInjector(editor) {
 	// class
 	if (this !== editor.char) this.char = editor.char;
 	if (this !== editor.component) this.component = editor.component;
@@ -20,4 +20,4 @@ function ClassDependency(editor) {
 	if (this !== editor.viewer) this.viewer = editor.viewer;
 }
 
-export default ClassDependency;
+export default ClassInjector;

@@ -3,11 +3,11 @@
  */
 
 import { domUtils } from '../../helper';
-import CoreDependency from '../../dependency/_core';
-import { CreateToolBar } from '../constructor';
+import CoreInjector from '../../injector/_core';
+import { CreateToolBar } from '../section/constructor';
 
 const Toolbar = function (editor, params) {
-	CoreDependency.call(this, editor);
+	CoreInjector.call(this, editor);
 
 	// members
 	this.keyName = params.keyName;

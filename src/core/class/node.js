@@ -1,17 +1,12 @@
 /**
- * @fileoverview Event class
+ * @fileoverview Node util class
  */
 
-import CoreDependency from '../../dependency/_core';
-import {
-	domUtils,
-	unicode,
-	env,
-	numbers
-} from '../../helper';
+import CoreInjector from '../../injector/_core';
+import { domUtils, unicode, env, numbers } from '../../helper';
 
 const Node_ = function (editor) {
-	CoreDependency.call(this, editor);
+	CoreInjector.call(this, editor);
 };
 
 Node_.prototype = {

@@ -1,8 +1,8 @@
-import CoreDependency from '../dependency/_core';
+import CoreInjector from '../injector/_core';
 import { domUtils, env } from '../helper';
 
 const FileBrowser = function (inst, params) {
-	CoreDependency.call(this, inst.editor);
+	CoreInjector.call(this, inst.editor);
 
 	// create HTML
 	const browserFrame = domUtils.createElement('DIV', { class: 'se-file-browser sun-editor-common' });

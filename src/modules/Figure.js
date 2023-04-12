@@ -1,9 +1,9 @@
-import EditorDependency from '../dependency';
+import EditorInjector from '../injector';
 import { Controller, SelectMenu } from '../modules';
 import { domUtils, numbers } from '../helper';
 
 const Figure = function (inst, controls, params) {
-	EditorDependency.call(this, inst.editor);
+	EditorInjector.call(this, inst.editor);
 
 	// modules
 	const controllerEl = CreateHTML_controller(inst.editor, controls || []);
@@ -190,8 +190,8 @@ Figure.prototype = {
 		this._cover = figureInfo.cover;
 		this._caption = figureInfo.caption;
 		this._element = target;
-		this.align = target.style.float || target.getAttribute('data-se-align') || 'none';
-		this.isVertical = /^(90|270)$/.test(Math.abs(target.getAttribute('data-se-rotate')).toString());
+		this.align = target.style.float || target.getAttribute('data-align') || 'none';
+		this.isVertical = /^(90|270)$/.test(Math.abs(target.getAttribute('data-rotate')).toString());
 
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
 		const offset = this.offset.get(target);
@@ -200,8 +200,8 @@ Figure.prototype = {
 		const h = (this.isVertical ? target.offsetWidth : target.offsetHeight) - 1;
 		const t = offset.top - (this.options.get('iframe') ? frameOffset.top : 0);
 		const l = offset.left - (this.options.get('iframe') ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - this.editor.frameContext.get('wysiwygFrame').scrollLeft;
-		const originSize = (target.getAttribute('data-se-origin') || '').split(',');
-		const dataSize = (target.getAttribute('data-se-size') || '').split(',');
+		const originSize = (target.getAttribute('data-origin') || '').split(',');
+		const dataSize = (target.getAttribute('data-size') || '').split(',');
 		const ratio = Figure.GetRatio(dataSize[0] || numbers.get(target.style.width, 2) || w, dataSize[1] || numbers.get(target.style.height, 2) || h, this.sizeUnit);
 		const targetInfo = {
 			container: figureInfo.container,
@@ -345,7 +345,7 @@ Figure.prototype = {
 			domUtils.addClass(container, '__se__float-' + align);
 		}
 
-		target.setAttribute('data-se-align', align);
+		target.setAttribute('data-align', align);
 		this._setAlignIcon();
 	},
 
@@ -368,7 +368,7 @@ Figure.prototype = {
 			case 'resize_percent':
 				let percentY = this.getSize(element);
 				if (this.isVertical) {
-					const percentage = element.getAttribute('data-se-percentage');
+					const percentage = element.getAttribute('data-percentage');
 					if (percentage) percentY = percentage.split(',')[1];
 				}
 
@@ -376,9 +376,9 @@ Figure.prototype = {
 				this._setPercentSize(value * 100, numbers.get(percentY, 0) === null || !/%$/.test(percentY) ? '' : percentY);
 				break;
 			case 'mirror':
-				const r = element.getAttribute('data-se-rotate') || '0';
-				let x = element.getAttribute('data-se-rotateX') || '';
-				let y = element.getAttribute('data-se-rotateY') || '';
+				const r = element.getAttribute('data-rotate') || '0';
+				let x = element.getAttribute('data-rotateX') || '';
+				let y = element.getAttribute('data-rotateY') || '';
 
 				if ((value === 'h' && !this.isVertical) || (value === 'v' && this.isVertical)) {
 					y = y ? '' : '180';
@@ -386,16 +386,16 @@ Figure.prototype = {
 					x = x ? '' : '180';
 				}
 
-				element.setAttribute('data-se-rotateX', x);
-				element.setAttribute('data-se-rotateY', y);
+				element.setAttribute('data-rotateX', x);
+				element.setAttribute('data-rotateY', y);
 
 				this._setRotate(element, r, x, y);
 				break;
 			case 'rotate':
-				const slope = element.getAttribute('data-se-rotate') * 1 + value * 1;
+				const slope = element.getAttribute('data-rotate') * 1 + value * 1;
 				const deg = this._w.Math.abs(slope) >= 360 ? 0 : slope;
 
-				element.setAttribute('data-se-rotate', deg);
+				element.setAttribute('data-rotate', deg);
 				this.isVertical = /^(90|270)$/.test(this._w.Math.abs(deg).toString());
 
 				this.setTransform(element, null, null);
@@ -454,15 +454,15 @@ Figure.prototype = {
 	deleteTransform: function (element) {
 		if (!element) element = this._element;
 
-		const size = (element.getAttribute('data-se-size') || element.getAttribute('data-se-origin') || '').split(',');
+		const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
 		this.isVertical = false;
 
 		element.style.maxWidth = '';
 		element.style.transform = '';
 		element.style.transformOrigin = '';
-		element.setAttribute('data-se-rotate', '');
-		element.setAttribute('data-se-rotateX', '');
-		element.setAttribute('data-se-rotateY', '');
+		element.setAttribute('data-rotate', '');
+		element.setAttribute('data-rotateX', '');
+		element.setAttribute('data-rotateY', '');
 
 		this._deleteCaptionPosition(element);
 		this._applySize(numbers.get(size[0]) || 'auto', numbers.get(size[1]) || '', true, '');
@@ -477,9 +477,9 @@ Figure.prototype = {
 	setTransform: function (element, width, height) {
 		width = numbers.get(width, 0);
 		height = numbers.get(height, 0);
-		let percentage = element.getAttribute('data-se-percentage');
+		let percentage = element.getAttribute('data-percentage');
 		const isVertical = this.isVertical;
-		const deg = element.getAttribute('data-se-rotate') * 1;
+		const deg = element.getAttribute('data-rotate') * 1;
 		let transOrigin = '';
 
 		if (percentage && !isVertical) {
@@ -510,7 +510,7 @@ Figure.prototype = {
 		}
 
 		element.style.transformOrigin = transOrigin;
-		this._setRotate(element, deg.toString(), element.getAttribute('data-se-rotateX') || '', element.getAttribute('data-se-rotateY') || '');
+		this._setRotate(element, deg.toString(), element.getAttribute('data-rotateX') || '', element.getAttribute('data-rotateY') || '');
 
 		if (isVertical) element.style.maxWidth = 'none';
 		else element.style.maxWidth = '';
@@ -572,7 +572,7 @@ Figure.prototype = {
 		}
 
 		if (this.align === 'center') this.setAlign(this._element, this.align);
-		if (!notResetPercentage) this._element.removeAttribute('data-se-percentage');
+		if (!notResetPercentage) this._element.removeAttribute('data-percentage');
 
 		// save current size
 		this._saveCurrentSize();
@@ -590,7 +590,7 @@ Figure.prototype = {
 		this._cover.style.height = '';
 
 		this.setAlign(this._element, this.align);
-		this._element.setAttribute('data-se-percentage', 'auto,auto');
+		this._element.setAttribute('data-percentage', 'auto,auto');
 
 		// save current size
 		this._saveCurrentSize();
@@ -612,7 +612,7 @@ Figure.prototype = {
 		if (this.autoRatio) this._cover.style.paddingBottom = h;
 		if (this.align === 'center') this.setAlign(this._element, this.align);
 
-		this._element.setAttribute('data-se-percentage', w + ',' + h);
+		this._element.setAttribute('data-percentage', w + ',' + h);
 		this._setCaptionPosition(this._element);
 
 		// save current size
@@ -632,12 +632,12 @@ Figure.prototype = {
 	},
 
 	_setOriginSize: function () {
-		this._element.removeAttribute('data-se-percentage');
+		this._element.removeAttribute('data-percentage');
 
 		this.deleteTransform();
 		this._deletePercentSize();
 
-		const originSize = (this._element.getAttribute('data-se-origin') || '').split(',');
+		const originSize = (this._element.getAttribute('data-origin') || '').split(',');
 		const w = originSize[0];
 		const h = originSize[1];
 
@@ -660,7 +660,7 @@ Figure.prototype = {
 
 	_saveCurrentSize: function () {
 		const size = this.getSize(this._element);
-		this._element.setAttribute('data-se-size', (size.w || 'auto') + ',' + (size.h || 'auto'));
+		this._element.setAttribute('data-size', (size.w || 'auto') + ',' + (size.h || 'auto'));
 		// if (contextPlugin._videoRatio) contextPlugin._videoRatio = size.y; @todo
 	},
 
