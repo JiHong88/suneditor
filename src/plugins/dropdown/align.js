@@ -92,10 +92,11 @@ Align.prototype = {
 
 	/**
 	 * @override core
-	 * @param {"left"|"right"|"center"|"justify"} value
+	 * @param {Element} target Target command button
 	 * @returns
 	 */
-	action: function (value) {
+	action: function (target) {
+		const value = target.getAttribute('data-command')
 		if (!value) return;
 
 		const defaultDir = this.defaultDir;
@@ -117,10 +118,7 @@ function OnClickMenu(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
-	const target = domUtils.getCommandTarget(e.target);
-	if (!target) return;
-
-	this.action(target.getAttribute('data-command'));
+	this.action(domUtils.getCommandTarget(e.target));
 }
 
 function CreateHTML(core) {

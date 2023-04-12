@@ -88,7 +88,7 @@ SelectMenu.prototype = {
 	},
 
 	_moveItem: function (num) {
-		domUtils.removeClass(this.form, '__se_select-menu-mouse-move');
+		domUtils.removeClass(this.form, 'se-select-menu-mouse-move');
 		num = this.index + num;
 		const len = this.menus.length;
 		const selectIndex = (this.index = num >= len ? 0 : num < 0 ? len - 1 : num);
@@ -303,7 +303,7 @@ function OnMousedown_list(e) {
 }
 
 function OnMouseMove_list(e) {
-	domUtils.addClass(this.form, '__se_select-menu-mouse-move');
+	domUtils.addClass(this.form, 'se-select-menu-mouse-move');
 	const index = e.target.getAttribute('data-index');
 	if (!index) return;
 	this.index = index * 1;

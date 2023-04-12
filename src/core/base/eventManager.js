@@ -825,22 +825,7 @@ function ButtonsHandler(e) {
 }
 
 function OnClick_toolbar(e) {
-	let target = e.target;
-	let type = target.getAttribute('data-type');
-	let command = target.getAttribute('data-command');
-	let className = target.className;
-
-	while (target.parentNode && !command && !/se-menu-list/.test(className) && !/se-toolbar/.test(className)) {
-		target = target.parentNode;
-		command = target.getAttribute('data-command');
-		type = target.getAttribute('data-type');
-		className = target.className;
-	}
-
-	if (!command && !type) return;
-	if (target.disabled) return;
-
-	this.editor.run(command, type, target);
+	this.editor.runTarget(e.target);
 }
 
 function OnMouseDown_wysiwyg(rootKey, e) {
@@ -959,6 +944,8 @@ function OnInput_wysiwyg(rootKey, e) {
 }
 
 function OnKeyDown_wysiwyg(rootKey, e) {
+	if (this.menu.currentDropdownName) return;
+
 	const keyCode = e.keyCode;
 	const shift = e.shiftKey;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
@@ -1715,7 +1702,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 }
 
 function OnKeyUp_wysiwyg(rootKey, e) {
-	if (this._onShortcutKey) return;
+	if (this._onShortcutKey || this.menu.currentDropdownName) return;
 
 	this.selection._init();
 	const keyCode = e.keyCode;

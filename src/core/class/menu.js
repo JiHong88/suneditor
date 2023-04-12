@@ -3,22 +3,28 @@
  */
 
 import CoreInjector from '../../injector/_core';
-import { domUtils } from '../../helper';
+import { domUtils, converter } from '../../helper';
 
 const Menu = function (editor) {
 	CoreInjector.call(this, editor);
 
 	// members--
 	this.targetMap = {};
+	this.index = -1;
+	this.menus = [];
 	// dropdown
 	this.currentDropdown = null;
 	this.currentDropdownActiveButton = null;
 	this.currentDropdownName = '';
-	this._bindedDropdownOff = null;
+	this.currentDropdownType = '';
 	// container
 	this.currentContainer = null;
 	this.currentContainerActiveButton = null;
-	this._bindedContainerOff = null;
+	// event
+	this.__globalEventHandler = [this.dropdownOff.bind(this), this.containerOff.bind(this), OnKeyDown_dropdown.bind(this), OnMousemove_dropdown.bind(this)];
+	this._bindClose_dropdown_mouse = null;
+	this._bindClose_dropdown_key = null;
+	this._bindClose_cons_mouse = null;
 };
 
 Menu.prototype = {
@@ -42,24 +48,27 @@ Menu.prototype = {
 	 * @param {Element} button Dropdown's button element to call
 	 */
 	dropdownOn: function (button) {
-		if (this._bindedDropdownOff) this._bindedDropdownOff();
+		this.__removeGlobalEvent();
 		const moreBtn = this._checkMoreLayer(button);
 		if (moreBtn) {
 			const target = domUtils.getParentElement(moreBtn, '.se-btn-tray').querySelector('[data-command="' + moreBtn.getAttribute('data-ref') + '"]');
 			if (target) {
-				this.editor.run(target.getAttribute('data-command'), target.getAttribute('data-type'), target);
+				this.editor.runTarget(target);
 				this.dropdownOn(button);
 				return;
 			}
 		}
 
 		const dropdownName = (this.currentDropdownName = button.getAttribute('data-command'));
+		this.currentDropdownType = button.getAttribute('data-type');
 		const menu = (this.currentDropdown = this.targetMap[dropdownName]);
+		this.menus = converter.nodeListToArray(menu.querySelectorAll('button'));
 		this.currentDropdownActiveButton = button;
 		this._setMenuPosition(button, menu);
 
-		this._bindedDropdownOff = this.dropdownOff.bind(this);
-		this.eventManager.addGlobalEvent('mousedown', this._bindedDropdownOff, false);
+		this._bindClose_dropdown_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandler[0], false);
+		this._bindClose_dropdown_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandler[2], false);
+		menu.addEventListener('mousemove', this.__globalEventHandler[3], false);
 
 		if (this.plugins[dropdownName].on) this.plugins[dropdownName].on(button);
 		this.editor._antiBlur = true;
@@ -69,11 +78,13 @@ Menu.prototype = {
 	 * @description Off dropdown
 	 */
 	dropdownOff: function () {
-		this.eventManager.removeGlobalEvent('mousedown', this._bindedDropdownOff, false);
-		this._bindedDropdownOff = null;
+		this.__removeGlobalEvent();
+		this.index = -1;
+		this.menus = [];
 
 		if (this.currentDropdown) {
 			this.currentDropdownName = '';
+			this.currentDropdownType = '';
 			this.currentDropdown.style.display = 'none';
 			this.currentDropdown = null;
 			domUtils.removeClass(this.currentDropdownActiveButton, 'on');
@@ -89,15 +100,13 @@ Menu.prototype = {
 	 * @param {Element} button Container's button element to call
 	 */
 	containerOn: function (button) {
-		if (this._bindedContainerOff) this._bindedContainerOff();
+		this.__removeGlobalEvent();
 
 		const containerName = (this._containerName = button.getAttribute('data-command'));
-		const menu = (this.currentContainer = this.targetMap[containerName]);
 		this.currentContainerActiveButton = button;
-		this._setMenuPosition(button, menu);
+		this._setMenuPosition(button, (this.currentContainer = this.targetMap[containerName]));
 
-		this._bindedContainerOff = this.containerOff.bind(this);
-		this.eventManager.addGlobalEvent('mousedown', this._bindedContainerOff, false);
+		this._bindClose_cons_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandler[1], false);
 
 		if (this.plugins[containerName].on) this.plugins[containerName].on(button);
 		this.editor._antiBlur = true;
@@ -107,8 +116,7 @@ Menu.prototype = {
 	 * @description Off menu container
 	 */
 	containerOff: function () {
-		this.eventManager.removeGlobalEvent('mousedown', this._bindedContainerOff, false);
-		this._bindedContainerOff = null;
+		this.__removeGlobalEvent();
 
 		if (this.currentContainer) {
 			this._containerName = '';
@@ -146,7 +154,75 @@ Menu.prototype = {
 		} else {
 			return null;
 		}
-	}
+	},
+
+	_moveItem: function (num) {
+		domUtils.removeClass(this.currentDropdown, 'se-select-menu-mouse-move');
+		domUtils.addClass(this.currentDropdown, 'se-select-menu-key-action');
+		num = this.index + num;
+		const len = this.menus.length;
+		const selectIndex = (this.index = num >= len ? 0 : num < 0 ? len - 1 : num);
+
+		for (let i = 0; i < len; i++) {
+			if (i === selectIndex) {
+				domUtils.addClass(this.menus[i], 'on');
+			} else {
+				domUtils.removeClass(this.menus[i], 'on');
+			}
+		}
+	},
+
+	__removeGlobalEvent: function () {
+		if (this._bindClose_dropdown_mouse) this._bindClose_dropdown_mouse = this.eventManager.removeGlobalEvent(this._bindClose_dropdown_mouse);
+		if (this._bindClose_cons_mouse) this._bindClose_cons_mouse = this.eventManager.removeGlobalEvent(this._bindClose_cons_mouse);
+		if (this._bindClose_dropdown_key) {
+			this._bindClose_dropdown_key = this.eventManager.removeGlobalEvent(this._bindClose_dropdown_key);
+			domUtils.removeClass(this.menus, 'on');
+			domUtils.removeClass(this.currentDropdown, 'se-select-menu-key-action');
+		}
+		if (this.currentDropdown) {
+			domUtils.removeClass(this.currentDropdown, 'se-select-menu-mouse-move');
+			this.currentDropdown.removeEventListener('mousemove', this.__globalEventHandler[3], false);
+		}
+	},
+
+	constructor: Menu
 };
+
+function OnKeyDown_dropdown(e) {
+	const keyCode = e.keyCode;
+	switch (keyCode) {
+		case 38: // up
+			e.preventDefault();
+			e.stopPropagation();
+			this._moveItem(-1);
+			break;
+		case 40: // down
+			e.preventDefault();
+			e.stopPropagation();
+			this._moveItem(1);
+			break;
+		case 13:
+		case 32: // enter, space
+			if (this.index > -1) {
+				e.preventDefault();
+				e.stopPropagation();
+				const target = this.menus[this.index];
+				if (!target || typeof this.plugins[this.currentDropdownName].action !== 'function') return;
+				this.plugins[this.currentDropdownName].action(target);
+				this.dropdownOff();
+			}
+			break;
+	}
+}
+
+function OnMousemove_dropdown(e) {
+	domUtils.addClass(this.currentDropdown, 'se-select-menu-mouse-move');
+	domUtils.removeClass(this.currentDropdown, 'se-select-menu-key-action');
+
+	const index = this.menus.indexOf(e.target);
+	if (index === -1) return;
+	this.index = index * 1;
+}
 
 export default Menu;

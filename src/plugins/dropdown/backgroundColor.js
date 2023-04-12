@@ -32,9 +32,10 @@ BackgroundColor.prototype = {
 
 	/**
 	 * @override core
-	 * @param {string} value color
+	 * @param {Element} target Target command button
 	 */
-	action: function (value) {
+	action: function (target) {
+		const value = target.getAttribute('data-value');
 		if (value) {
 			const newNode = domUtils.createElement('SPAN', { style: 'background-color: ' + value + ';' });
 			this.format.applyTextStyle(newNode, ['background-color'], null, null);
@@ -52,10 +53,7 @@ function OnClickMenu(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
-	const color = e.target.getAttribute('data-value');
-	if (!color) return;
-
-	this.action(color);
+	this.action(e.target);
 }
 
 function CreateHTML(colorList) {

@@ -84,6 +84,16 @@ export function fontSize(to, size) {
 }
 
 /**
+ * @description Convert the node list to an array. If not, returns an empty array.
+ * @param {NodeList|null} nodeList 
+ * @returns Array
+ */
+export function nodeListToArray(nodeList) {
+	if (!nodeList) return [];
+	return _w.Array.prototype.slice.call(nodeList);
+}
+
+/**
  * @description Create whitelist RegExp object.
  * Return RegExp format: new RegExp("<\\/?\\b(?!" + list + ")\\b[^>^<]*+>", "gi")
  * @param {string} list Tags list ("br|p|div|pre...")
@@ -199,6 +209,7 @@ const converter = {
 	htmlToEntity: htmlToEntity,
 	entityToHTML: entityToHTML,
 	fontSize: fontSize,
+	nodeListToArray: nodeListToArray,
 	createElementWhitelist: createElementWhitelist,
 	createElementBlacklist: createElementBlacklist,
 	_setDefaultOptionStyle: _setDefaultOptionStyle,

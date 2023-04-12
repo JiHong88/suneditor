@@ -326,7 +326,7 @@ export function getParentElement(element, query) {
 		let attr;
 		if (/^\./.test(query)) {
 			attr = 'className';
-			query = query.split('.')[1];
+			query = '(\\s|^)' + query.split('.')[1] + '(\\s|$)';
 		} else if (/^#/.test(query)) {
 			attr = 'id';
 			query = '^' + query.split('#')[1] + '$';
@@ -394,7 +394,7 @@ export function getEdgeChild(node, query, last) {
 		let attr;
 		if (/^\./.test(query)) {
 			attr = 'className';
-			query = query.split('.')[1];
+			query = '(\\s|^)' + query.split('.')[1] + '(\\s|$)';
 		} else if (/^#/.test(query)) {
 			attr = 'id';
 			query = '^' + query.split('#')[1] + '$';
@@ -678,28 +678,28 @@ export function hasClass(element, className) {
 
 /**
  * @description Append the className value of the argument value element
- * @param {Element|Array.<Element>} element Elements to add class name
+ * @param {Element|Array.<Element>|NodeList} element Elements to add class name
  * @param {string} className Class name to be add
  */
 export function addClass(element, className) {
 	if (!element) return;
 
 	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
-	(_w.Array.isArray(element) ? element : [element]).forEach(function (e) {
+	((element instanceof window.NodeList || element instanceof window.Array) ? element : [element]).forEach(function (e) {
 		if (!check.test(e.className)) e.className += (e.className.length > 0 ? ' ' : '') + className;
 	});
 }
 
 /**
  * @description Delete the className value of the argument value element
- * @param {Element|Array.<Element>} element Elements to remove class name
+ * @param {Element|Array.<Element>|NodeList} element Elements to remove class name
  * @param {string} className Class name to be remove
  */
 export function removeClass(element, className) {
 	if (!element) return;
 
 	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
-	(_w.Array.isArray(element) ? element : [element]).forEach(function (e) {
+	((element instanceof window.NodeList || element instanceof window.Array) ? element : [element]).forEach(function (e) {
 		e.className = e.className.replace(check, ' ').trim();
 		if (!e.className.trim()) e.removeAttribute('class');
 	});
@@ -875,7 +875,7 @@ export function isAllowClassName(v) {
  * @returns {boolean}
  */
 export function isNotCheckingNode(element) {
-	return element && /\b(katex|__se__tag)\b/.test(element.className);
+	return element && /(\s|^)(katex|__se__tag)(\s|$)/.test(element.className);
 }
 
 /**

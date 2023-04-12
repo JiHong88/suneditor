@@ -756,8 +756,9 @@
     border: 1px dotted #e1e1e1;
 }
 
-.sun-editor .se-btn-list:hover,
-.sun-editor .se-btn-list:focus {
+.sun-editor .se-dropdown.se-select-menu-mouse-move .se-btn-list:hover,
+.sun-editor .se-dropdown.se-select-menu-mouse-move .se-btn-list:focus,
+.sun-editor .se-dropdown.se-select-menu-key-action .se-btn-list.on {
     background-color: #e1e1e1;
     border-color: #d1d1d1;
     outline: 0 none;
@@ -873,6 +874,7 @@
     border-style: solid;
     border-color: #b1b1b1;
     padding: 0 0 0 7px;
+    border-width: 0;
     border-left-width: 5px;
 }
 
@@ -1914,12 +1916,12 @@
     color: #4592ff;
 }
 
-.sun-editor .se-select-menu.__se_select-menu-mouse-move .se-select-item:hover,
-.sun-editor .se-select-menu:not(.__se_select-menu-mouse-move) .se-select-item.active {
+.sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item:hover,
+.sun-editor .se-select-menu:not(.se-select-menu-mouse-move) .se-select-item.active {
     background-color: #e1e1e1;
 }
 
-.sun-editor .se-select-menu.__se_select-menu-mouse-move .se-select-item:active {
+.sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item:active {
     background-color: #c1c1c1;
     border-color: #b1b1b1;
     -webkit-box-shadow: inset 0 3px 5px #b1b1b1;

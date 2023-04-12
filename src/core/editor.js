@@ -491,6 +491,22 @@ Editor.prototype = {
 	},
 
 	/**
+	 * @description Execute "editor.run" with command button.
+	 * @param {Element} target Command button
+	 */
+	runTarget: function (target) {
+		if (!(target = domUtils.getCommandTarget(target))) return;
+
+		const command = target.getAttribute('data-command');
+		const type = target.getAttribute('data-type');
+
+		if (!command && !type) return;
+		if (target.disabled) return;
+
+		this.run(command, type, target);
+	},
+
+	/**
 	 * @description It is executed by inserting the button of commandTargets as the argument value of the "f" function.
 	 * "f" is called as long as the button array's length.
 	 * @param {string} cmd data-command
@@ -521,9 +537,11 @@ Editor.prototype = {
 		if (rtl) {
 			domUtils.addClass(fc.get('topArea'), 'se-rtl');
 			domUtils.addClass(fc.get('wysiwygFrame'), 'se-rtl');
+			domUtils.addClass(this._carrierWrapper, 'se-rtl');
 		} else {
 			domUtils.removeClass(fc.get('topArea'), 'se-rtl');
 			domUtils.removeClass(fc.get('wysiwygFrame'), 'se-rtl');
+			domUtils.removeClass(this._carrierWrapper, 'se-rtl');
 		}
 
 		const lineNodes = domUtils.getListChildren(
@@ -1249,12 +1267,12 @@ Editor.prototype = {
 		const codeDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])';
 		const controllerDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])';
 
-		this._codeViewDisabledButtons = this._w.Array.prototype.slice.call(ctx.get('toolbar._buttonTray').querySelectorAll(codeDisabledQuery));
-		this._controllerOnDisabledButtons = this._w.Array.prototype.slice.call(ctx.get('toolbar._buttonTray').querySelectorAll(controllerDisabledQuery));
+		this._codeViewDisabledButtons = converter.nodeListToArray(ctx.get('toolbar._buttonTray').querySelectorAll(codeDisabledQuery));
+		this._controllerOnDisabledButtons = converter.nodeListToArray(ctx.get('toolbar._buttonTray').querySelectorAll(controllerDisabledQuery));
 
 		if (this.options.has('subMode')) {
-			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(this._w.Array.prototype.slice.call(ctx.get('toolbar.sub._buttonTray').querySelectorAll(codeDisabledQuery)));
-			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(this._w.Array.prototype.slice.call(ctx.get('toolbar.sub._buttonTray').querySelectorAll(controllerDisabledQuery)));
+			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar.sub._buttonTray').querySelectorAll(codeDisabledQuery)));
+			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar.sub._buttonTray').querySelectorAll(controllerDisabledQuery)));
 		}
 
 		this.__saveCommandButtons();

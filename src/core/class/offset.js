@@ -10,6 +10,9 @@ const Offset = function (editor) {
 	this.editor = editor;
 	this.options = editor.options;
 	this.context = editor.context;
+	this._scrollEvent = null;
+	this._elTop = 0;
+	this._scrollY = 0;
 };
 
 Offset.prototype = {
@@ -175,6 +178,15 @@ Offset.prototype = {
 	},
 
 	setRelPosition: function (element, e_container, target, t_container) {
+		this.__removeGlobalEvent();
+		this._scrollY = _w.scrollY;
+		this._scrollEvent = this.editor.eventManager.addGlobalEvent('scroll', FixedScroll.bind(this, element, t_container), false);
+
+		let wy = 0;
+		if (/^fixed$/i.test(_w.getComputedStyle(t_container).position)) {
+			wy += this._scrollY;
+		}
+
 		const ew = element.offsetWidth;
 		const tw = target.offsetWidth;
 		const tl = this.getGlobal(target).left;
@@ -200,7 +212,7 @@ Offset.prototype = {
 		const containerTop = isSameContainer ? this.getGlobal(e_container).top : 0;
 		const elHeight = element.offsetHeight;
 		const scrollTop = this.getGlobalScroll().top;
-		let bt = 0;
+		let bt = wy;
 		let offsetEl = target;
 		while (offsetEl && offsetEl !== e_container) {
 			bt += offsetEl.offsetTop;
@@ -225,10 +237,17 @@ Offset.prototype = {
 		} else {
 			element.style.top = bt + target.offsetHeight + 'px';
 		}
+
+		if (/^fixed$/i.test(_w.getComputedStyle(t_container).position)) {
+			this._elTop = element.offsetTop;
+		} 
 	},
 
 	setAbsPosition: function (element, target, params) {
-		const addOffset = params.addOffset || { left: 0, top: 0 };
+		const addOffset = params.addOffset || {
+			left: 0,
+			top: 0
+		};
 		const position = params.position || 'bottom';
 		const inst = params.inst;
 
@@ -387,7 +406,11 @@ Offset.prototype = {
 		}
 
 		element.style.left = l + 'px';
-		inst.__offset = { left: element.offsetLeft + wwScroll.left, top: element.offsetTop + wwScroll.top, addOffset: addOffset };
+		inst.__offset = {
+			left: element.offsetLeft + wwScroll.left,
+			top: element.offsetTop + wwScroll.top,
+			addOffset: addOffset
+		};
 
 		return true;
 	},
@@ -406,7 +429,27 @@ Offset.prototype = {
 		}
 	},
 
+	__removeGlobalEvent: function () {
+		if (this._scrollEvent) {
+			this._scrollEvent = this.editor.eventManager.removeGlobalEvent(this._scrollEvent);
+			this._scrollY = 0;
+			this._elTop = null;
+		}
+	},
+
 	constructor: Offset
 };
+
+function FixedScroll(element, container) {
+	if (!/^fixed$/i.test(_w.getComputedStyle(container).position)) {
+		// this._elTop = null;
+		return;
+	} else if (this._elTop === null) {
+		this._elTop = element.offsetTop;
+		return;
+	}
+
+	element.style.top = (this._elTop - (this._scrollY - _w.scrollY - container.offsetTop)) + 'px';
+}
 
 export default Offset;
