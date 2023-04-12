@@ -6,7 +6,6 @@ import CoreInjector from '../../injector/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
 
 const _w = env._w;
-const ARROW_KEYCODE = new _w.RegExp('^3[7-9]|40$');
 const DIRECTION_KEYCODE = new _w.RegExp('^(3[3-9]|40)$');
 const SPACE_DEL_DIR_KEYCODE = new _w.RegExp('^(8|13|3[2-9]|40|46)$');
 const NON_TEXT_KEYCODE = new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$');
@@ -552,7 +551,8 @@ EventManager.prototype = {
 		const buttonsHandler = ButtonsHandler.bind(this);
 		const toolbarHandler = OnClick_toolbar.bind(this);
 		/** menu event */
-		this.addEvent(this.context.get('_menuTray'), 'mousedown', buttonsHandler, false);
+		this.addEvent(this.context.get('menuTray'), 'mousedown', buttonsHandler, false);
+		this.addEvent(this.context.get('menuTray'), 'click', OnClick_menuTray.bind(this), true);
 
 		/** toolbar event */
 		this.addEvent(this.context.get('toolbar.main'), 'mousedown', buttonsHandler, false);
@@ -798,7 +798,7 @@ function ButtonsHandler(e) {
 		let command = target.getAttribute('data-command');
 		let className = target.className;
 
-		while (!command && !/(se-menu-list|sun-editor-common)/.test(className)) {
+		while (target && !command && !/(se-menu-list|sun-editor-common|se-menu-tray)/.test(className)) {
 			target = target.parentNode;
 			command = target.getAttribute('data-command');
 			className = target.className;
@@ -822,6 +822,26 @@ function ButtonsHandler(e) {
 			e.stopPropagation();
 		}
 	}
+}
+
+function OnClick_menuTray(e) {
+	const target = domUtils.getCommandTarget(e.target);
+	if (!target) return;
+
+	let t = target;
+	let k = '';
+	while (t && !domUtils.hasClass(t, 'se-menu-tray') && !k) {
+		t = t.parentElement;
+		k = t.getAttribute('data-key');
+	}
+	if (!k) return;
+
+	const plugin = this.plugins[k];
+	if (!plugin || typeof plugin.action !== 'function') return;
+
+	e.preventDefault();
+	e.stopPropagation();
+	plugin.action(target);
 }
 
 function OnClick_toolbar(e) {

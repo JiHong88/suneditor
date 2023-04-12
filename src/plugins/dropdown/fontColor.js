@@ -16,7 +16,6 @@ const FontColor = function (editor) {
 
 	// itit
 	this.menu.initDropdownTarget(FontColor.key, menu);
-	this.eventManager.addEvent(menu, 'click', OnClickMenu.bind(this));
 };
 
 FontColor.key = 'fontColor';
@@ -32,9 +31,9 @@ FontColor.prototype = {
 
 	/**
 	 * @override core
-	 * @param {string} value color
 	 */
-	action: function (value) {
+	action: function (target) {
+		const value = typeof target === 'string' ? target : target.getAttribute('data-command');
 		if (value) {
 			const newNode = domUtils.createElement('SPAN', { style: 'color: ' + value + ';' });
 			this.format.applyTextStyle(newNode, ['color'], null, null);
@@ -47,16 +46,6 @@ FontColor.prototype = {
 
 	constructor: FontColor
 };
-
-function OnClickMenu(e) {
-	e.preventDefault();
-	e.stopPropagation();
-
-	const color = e.target.getAttribute('data-value');
-	if (!color) return;
-
-	this.action(color);
-}
 
 function CreateHTML(colorList) {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, colorList);

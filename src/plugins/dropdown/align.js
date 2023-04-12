@@ -23,7 +23,6 @@ const Align = function (editor) {
 
 	// init
 	this.menu.initDropdownTarget(Align.key, menu);
-	this.eventManager.addEvent(commandArea, 'click', OnClickMenu.bind(this));
 };
 
 Align.key = 'align';
@@ -96,7 +95,7 @@ Align.prototype = {
 	 * @returns
 	 */
 	action: function (target) {
-		const value = target.getAttribute('data-command')
+		const value = target.getAttribute('data-command');
 		if (!value) return;
 
 		const defaultDir = this.defaultDir;
@@ -113,13 +112,6 @@ Align.prototype = {
 
 	constructor: Align
 };
-
-function OnClickMenu(e) {
-	e.preventDefault();
-	e.stopPropagation();
-
-	this.action(domUtils.getCommandTarget(e.target));
-}
 
 function CreateHTML(core) {
 	const lang = core.lang;

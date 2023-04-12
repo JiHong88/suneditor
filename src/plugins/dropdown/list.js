@@ -19,7 +19,6 @@ const List = function (editor) {
 
 	// init
 	this.menu.initDropdownTarget(List.key, menu);
-	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
 List.key = 'list';
@@ -59,21 +58,22 @@ List.prototype = {
 	on: function (target) {
 		const currentList = target.getAttribute('data-focus') || '';
 		const list = this.listItems;
-			for (let i = 0, len = list.length; i < len; i++) {
-				if (currentList === list[i].getAttribute('data-command')) {
-					domUtils.addClass(list[i], 'active');
-				} else {
-					domUtils.removeClass(list[i], 'active');
-				}
+		for (let i = 0, len = list.length; i < len; i++) {
+			if (currentList === list[i].getAttribute('data-command')) {
+				domUtils.addClass(list[i], 'active');
+			} else {
+				domUtils.removeClass(list[i], 'active');
 			}
+		}
 	},
 
 	/**
 	 * @override core
-	 * @param {"bullet"|"numbered"} command List type
-	 * @param {string} type List style type
+	 * @param {Element} target Target command button
 	 */
-	action: function (command, type) {
+	action: function (target) {
+		const command = target.getAttribute('data-command');
+		const type = target.getAttribute('data-value') || '';
 		const range = this.format.applyList(command + ':' + type, null, false);
 		if (range) this.selection.setRange(range.sc, range.so, range.ec, range.eo);
 
@@ -83,16 +83,6 @@ List.prototype = {
 
 	constructor: List
 };
-
-function OnClickMenu(e) {
-	e.preventDefault();
-	e.stopPropagation();
-
-	const target = domUtils.getCommandTarget(e.target);
-	if (!target) return;
-
-	this.action(target.getAttribute('data-command'), target.getAttribute('data-value') || '');
-}
 
 function CreateHTML(editor) {
 	const lang = editor.lang;

@@ -36,7 +36,8 @@ Menu.prototype = {
 	 */
 	initDropdownTarget: function (key, menu) {
 		if (key) {
-			this.context.get('_menuTray').appendChild(menu);
+			menu.setAttribute('data-key', key);
+			this.context.get('menuTray').appendChild(menu);
 			this.targetMap[key] = menu;
 		} else {
 			throw Error("[SUNEDITOR.init.fail] The plugin's key is not added.");
@@ -204,14 +205,15 @@ function OnKeyDown_dropdown(e) {
 			break;
 		case 13:
 		case 32: // enter, space
-			if (this.index > -1) {
-				e.preventDefault();
-				e.stopPropagation();
-				const target = this.menus[this.index];
-				if (!target || typeof this.plugins[this.currentDropdownName].action !== 'function') return;
-				this.plugins[this.currentDropdownName].action(target);
-				this.dropdownOff();
-			}
+			if (this.index < 0) break;
+
+			const target = this.menus[this.index];
+			if (!target || typeof this.plugins[this.currentDropdownName].action !== 'function') return;
+
+			e.preventDefault();
+			e.stopPropagation();
+			this.plugins[this.currentDropdownName].action(target);
+			this.dropdownOff();
 			break;
 	}
 }

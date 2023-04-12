@@ -15,7 +15,6 @@ const HorizontalLine = function (editor) {
 
 	// init
 	this.menu.initDropdownTarget(HorizontalLine.key, HRMenus);
-	this.eventManager.addEvent(HRMenus.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
 HorizontalLine.key = 'horizontalLine';
@@ -39,10 +38,10 @@ HorizontalLine.prototype = {
 
 	/**
 	 * @override core
-	 * @param {Element} referNode HR element
+	 * @param {Element} target Target command button
 	 */
-	action: function (referNode) {
-		const hr = referNode.cloneNode(false);
+	action: function (target) {
+		const hr = target.firstElementChild.cloneNode(false);
 		this.editor.focus();
 		this.component.insert(hr, false, false, false);
 		this.menu.dropdownOff();
@@ -53,16 +52,6 @@ HorizontalLine.prototype = {
 
 	constructor: HorizontalLine
 };
-
-function OnClickMenu(e) {
-	e.preventDefault();
-	e.stopPropagation();
-
-	const target = domUtils.getCommandTarget(e.target);
-	if (!target) return;
-
-	this.action(target.firstElementChild);
-}
 
 function CreateHTML(editor) {
 	const lang = editor.lang;

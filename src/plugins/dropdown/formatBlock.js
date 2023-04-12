@@ -16,7 +16,6 @@ const FormatBlock = function (editor) {
 
 	// init
 	this.menu.initDropdownTarget(FormatBlock.key, menu);
-	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
 FormatBlock.key = 'formatBlock';
@@ -79,10 +78,12 @@ FormatBlock.prototype = {
 
 	/**
 	 * @override core
-	 * @param {"line"|"br-line"|"block"} command Format block command
-	 * @param {Element} tag Command element
+	 * @param {Element} target Target command button
 	 */
-	action: function (command, tag) {
+	action: function (target) {
+		// "line"|"br-line"|"block"
+		const command = target.getAttribute('data-command');
+		const tag = target.firstChild;
 		if (command === 'block') {
 			this.format.applyBlock(tag);
 		} else if (command === 'br-line') {
@@ -96,16 +97,6 @@ FormatBlock.prototype = {
 
 	constructor: FormatBlock
 };
-
-function OnClickMenu(e) {
-	e.preventDefault();
-	e.stopPropagation();
-
-	const target = domUtils.getCommandTarget(e.target);
-	if (!target) return;
-
-	this.action(target.getAttribute('data-command'), target.firstChild);
-}
 
 function CreateHTML(editor) {
 	const options = editor.options;

@@ -56,17 +56,17 @@ export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFram
  */
 export const CreateContext = function (toolbar, toolbarContainer, menuTray, subbar) {
 	const m = new _w.Map([
+		['menuTray', menuTray],
 		['toolbar.main', toolbar],
-		['toolbar._buttonTray', toolbar.querySelector('.se-btn-tray')],
+		['toolbar.buttonTray', toolbar.querySelector('.se-btn-tray')],
 		['toolbar._arrow', toolbar.querySelector('.se-arrow')],
 		['toolbar._wrapper', toolbar.parentElement.parentElement],
-		['_menuTray', menuTray],
 		['_stickyDummy', toolbarContainer ? toolbarContainer.querySelector('.se-toolbar-sticky-dummy') : null]
 	]);
 
 	if (subbar) {
 		m.set('toolbar.sub.main', subbar);
-		m.set('toolbar.sub._buttonTray', subbar.querySelector('.se-btn-tray'));
+		m.set('toolbar.sub.buttonTray', subbar.querySelector('.se-btn-tray'));
 		m.set('toolbar.sub._arrow', subbar.querySelector('.se-arrow'));
 		m.set('toolbar.sub._wrapper', subbar.parentElement.parentElement);
 	}

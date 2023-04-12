@@ -1026,7 +1026,7 @@ Editor.prototype = {
 	 * @private
 	 */
 	_recoverButtonStates: function (isSub) {
-		const currentButtons = this.context.get(isSub ? 'toolbar.sub._buttonTray' : 'toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
+		const currentButtons = this.context.get(isSub ? 'toolbar.sub.buttonTray' : 'toolbar.buttonTray').querySelectorAll('.se-menu-list button[data-command]');
 		const btns = isSub ? this.subAllCommandButtons : this.allCommandButtons;
 		for (let i = 0, button, oldButton; i < currentButtons.length; i++) {
 			button = currentButtons[i];
@@ -1267,12 +1267,12 @@ Editor.prototype = {
 		const codeDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])';
 		const controllerDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])';
 
-		this._codeViewDisabledButtons = converter.nodeListToArray(ctx.get('toolbar._buttonTray').querySelectorAll(codeDisabledQuery));
-		this._controllerOnDisabledButtons = converter.nodeListToArray(ctx.get('toolbar._buttonTray').querySelectorAll(controllerDisabledQuery));
+		this._codeViewDisabledButtons = converter.nodeListToArray(ctx.get('toolbar.buttonTray').querySelectorAll(codeDisabledQuery));
+		this._controllerOnDisabledButtons = converter.nodeListToArray(ctx.get('toolbar.buttonTray').querySelectorAll(controllerDisabledQuery));
 
 		if (this.options.has('subMode')) {
-			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar.sub._buttonTray').querySelectorAll(codeDisabledQuery)));
-			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar.sub._buttonTray').querySelectorAll(controllerDisabledQuery)));
+			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(codeDisabledQuery)));
+			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(controllerDisabledQuery)));
 		}
 
 		this.__saveCommandButtons();
@@ -1283,7 +1283,7 @@ Editor.prototype = {
 	 * @private
 	 */
 	__saveCommandButtons: function (isSub) {
-		const currentButtons = this.context.get(isSub ? 'toolbar.sub._buttonTray' : 'toolbar._buttonTray').querySelectorAll('.se-menu-list button[data-command]');
+		const currentButtons = this.context.get(isSub ? 'toolbar.sub.buttonTray' : 'toolbar.buttonTray').querySelectorAll('.se-menu-list button[data-command]');
 		const cmdButtons = isSub ? this.subAllCommandButtons : this.allCommandButtons;
 		const shortcuts = this.options.get('shortcuts');
 		const reverseCommandArray = this.options.get('_reverseCommandArray');

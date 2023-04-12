@@ -15,7 +15,6 @@ const ParagraphStyle = function (editor) {
 
 	// init
 	this.menu.initDropdownTarget(ParagraphStyle.key, menu);
-	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
 ParagraphStyle.key = 'paragraphStyle';
@@ -40,10 +39,10 @@ ParagraphStyle.prototype = {
 
 	/**
 	 * @override core
-	 * @param {string} value paragraph className
-	 * @param {Element} targetElement current menu target
+	 * @param {Element} target Target command button
 	 */
-	action: function (value, targetElement) {
+	action: function (target) {
+		const value = target.getAttribute('data-command');
 		let selectedFormsts = this.format.getLines();
 		if (selectedFormsts.length === 0) {
 			this.selection.getRangeAndAddLine(this.selection.getRange(), null);
@@ -52,7 +51,7 @@ ParagraphStyle.prototype = {
 		}
 
 		// change format class
-		const toggleClass = domUtils.hasClass(targetElement, 'active') ? domUtils.removeClass : domUtils.addClass;
+		const toggleClass = domUtils.hasClass(target, 'active') ? domUtils.removeClass : domUtils.addClass;
 		for (let i = 0, len = selectedFormsts.length; i < len; i++) {
 			toggleClass(selectedFormsts[i], value);
 		}
@@ -63,16 +62,6 @@ ParagraphStyle.prototype = {
 
 	constructor: ParagraphStyle
 };
-
-function OnClickMenu(e) {
-	e.preventDefault();
-	e.stopPropagation();
-
-	const target = domUtils.getCommandTarget(e.target);
-	if (!target) return;
-
-	this.action(target.getAttribute('data-command'), target);
-}
 
 function CreateHTML(editor) {
 	const options = editor.options;

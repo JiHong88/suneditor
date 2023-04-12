@@ -9,7 +9,6 @@ const Font = function (editor) {
 
 	// create HTML
 	const menu = CreateHTML(editor);
-	const commandArea = menu.querySelector('.se-list-inner');
 
 	// members
 	this.currentFont = '';
@@ -17,7 +16,6 @@ const Font = function (editor) {
 
 	// init
 	this.menu.initDropdownTarget(Font.key, menu);
-	this.eventManager.addEvent(commandArea, 'click', OnClickMenu.bind(this));
 };
 
 Font.key = 'font';
@@ -54,7 +52,7 @@ Font.prototype = {
 
 		if (currentFont !== this.currentFont) {
 			for (let i = 0, len = fontList.length; i < len; i++) {
-				if (currentFont === fontList[i].getAttribute('data-value')) {
+				if (currentFont === fontList[i].getAttribute('data-command')) {
 					domUtils.addClass(fontList[i], 'active');
 				} else {
 					domUtils.removeClass(fontList[i], 'active');
@@ -67,9 +65,10 @@ Font.prototype = {
 
 	/**
 	 * @override core
-	 * @param {string} value font
+	 * @param {Element} target Target command button
 	 */
-	action: function (value) {
+	action: function (target) {
+		const value = target.getAttribute('data-command');
 		if (value) {
 			const newNode = domUtils.createElement('SPAN', { style: 'font-family: ' + value + ';' });
 			this.format.applyTextStyle(newNode, ['font-family'], null, null);
@@ -83,15 +82,6 @@ Font.prototype = {
 	constructor: Font
 };
 
-function OnClickMenu(e) {
-	if (!/^BUTTON$/i.test(e.target.tagName)) return false;
-
-	e.preventDefault();
-	e.stopPropagation();
-
-	this.action(e.target.getAttribute('data-value'));
-}
-
 function CreateHTML(editor) {
 	const lang = editor.lang;
 	const fontList = editor.options.get('font');
@@ -100,7 +90,7 @@ function CreateHTML(editor) {
 	for (let i = 0, len = fontList.length, font, text; i < len; i++) {
 		font = fontList[i];
 		text = font.split(',')[0];
-		list += '<li><button type="button" class="se-btn-list" data-value="' + font + '" data-txt="' + text + '" title="' + text + '" aria-label="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
+		list += '<li><button type="button" class="se-btn-list" data-command="' + font + '" data-txt="' + text + '" title="' + text + '" aria-label="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
 	}
 	list += '</ul></div>';
 

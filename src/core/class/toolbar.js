@@ -43,14 +43,14 @@ Toolbar.prototype = {
 		this._moreLayerOff();
 		this.menu.dropdownOff();
 		this.menu.containerOff();
-		domUtils.setDisabled(this.context.get(this.keyName + '._buttonTray').querySelectorAll('.se-menu-list button[data-type]'), true);
+		domUtils.setDisabled(this.context.get(this.keyName + '.buttonTray').querySelectorAll('.se-menu-list button[data-type]'), true);
 	},
 
 	/**
 	 * @description Enable the toolbar
 	 */
 	enable: function () {
-		domUtils.setDisabled(this.context.get(this.keyName + '._buttonTray').querySelectorAll('.se-menu-list button[data-type]'), false);
+		domUtils.setDisabled(this.context.get(this.keyName + '.buttonTray').querySelectorAll('.se-menu-list button[data-type]'), false);
 	},
 
 	/**
@@ -131,8 +131,8 @@ Toolbar.prototype = {
 		this.menu.containerOff();
 
 		const newToolbar = CreateToolBar(buttonList, this.plugins, this.options, this.icons, this.lang);
-		this.context.get(this.keyName + '.main').replaceChild(newToolbar._buttonTray, this.context.get(this.keyName + '._buttonTray'));
-		this.context.set(this.keyName + '._buttonTray', newToolbar._buttonTray);
+		this.context.get(this.keyName + '.main').replaceChild(newToolbar.buttonTray, this.context.get(this.keyName + '.buttonTray'));
+		this.context.set(this.keyName + '.buttonTray', newToolbar.buttonTray);
 
 		this.editor._recoverButtonStates(this.isSub);
 		this.history.resetButtons();
@@ -141,7 +141,7 @@ Toolbar.prototype = {
 		this.editor.effectNode = null;
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
 		if (this.status.isReadOnly) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
-		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar._buttonTray.querySelectorAll('button'));
+		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar.buttonTray.querySelectorAll('button'));
 	},
 
 	_resetSticky: function () {

@@ -991,7 +991,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 	let buttonElement = null;
 	let vertical = false;
 	const moreLayer = domUtils.createElement('DIV', { class: 'se-toolbar-more-layer' });
-	const _buttonTray = domUtils.createElement('DIV', { class: 'se-btn-tray' });
+	const buttonTray = domUtils.createElement('DIV', { class: 'se-btn-tray' });
 	const separator_vertical = domUtils.createElement('DIV', { class: 'se-toolbar-separator-vertical' });
 
 	buttonGroupLoop: for (let i = 0, more, moreContainer, moreCommand, buttonGroup, align; i < buttonList.length; i++) {
@@ -1073,39 +1073,39 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 
 			if (vertical) {
 				const sv = separator_vertical.cloneNode(false);
-				_buttonTray.appendChild(sv);
+				buttonTray.appendChild(sv);
 			}
 
-			_buttonTray.appendChild(moduleElement.div);
+			buttonTray.appendChild(moduleElement.div);
 			vertical = true;
 		} else if (/^\/$/.test(buttonGroup)) {
 			/** line break  */
 			const enterDiv = domUtils.createElement('DIV', { class: 'se-btn-module-enter' });
-			_buttonTray.appendChild(enterDiv);
+			buttonTray.appendChild(enterDiv);
 			vertical = false;
 		}
 	}
 
-	switch (_buttonTray.children.length) {
+	switch (buttonTray.children.length) {
 		case 0:
-			_buttonTray.style.display = 'none';
+			buttonTray.style.display = 'none';
 			break;
 		case 1:
-			domUtils.removeClass(_buttonTray.firstElementChild, 'se-btn-module-border');
+			domUtils.removeClass(buttonTray.firstElementChild, 'se-btn-module-border');
 			break;
 		default:
 			if (options.get('_rtl')) {
 				const sv = separator_vertical.cloneNode(false);
-				sv.style.float = _buttonTray.lastElementChild.style.float;
-				_buttonTray.appendChild(sv);
+				sv.style.float = buttonTray.lastElementChild.style.float;
+				buttonTray.appendChild(sv);
 			}
 	}
 
-	if (moreLayer.children.length > 0) _buttonTray.appendChild(moreLayer);
+	if (moreLayer.children.length > 0) buttonTray.appendChild(moreLayer);
 	if (responsiveButtons.length > 0) responsiveButtons.unshift(buttonList);
 
 	// rendering toolbar
-	const tool_bar = domUtils.createElement('DIV', { class: 'se-toolbar sun-editor-common' + (!options.get('shortcutsHint') ? ' se-shortcut-hide' : '') }, _buttonTray);
+	const tool_bar = domUtils.createElement('DIV', { class: 'se-toolbar sun-editor-common' + (!options.get('shortcutsHint') ? ' se-shortcut-hide' : '') }, buttonTray);
 
 	if (options.get('toolbar_hide')) tool_bar.style.display = 'none';
 
@@ -1113,7 +1113,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 		element: tool_bar,
 		pluginCallButtons: pluginCallButtons,
 		responsiveButtons: responsiveButtons,
-		_buttonTray: _buttonTray
+		buttonTray: buttonTray
 	};
 }
 

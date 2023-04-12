@@ -23,7 +23,7 @@ const ColorPicker = function (inst, styles, colorList, _defaultColor) {
 
 	// init
 	this.eventManager.addEvent(this.inputElement, 'input', OnChangeInput.bind(this));
-	this.eventManager.addEvent(this.target.querySelector('._se_color_picker_submit'), 'click', Submit.bind(this));
+	this.eventManager.addEvent(this.target.querySelector('form'), 'submit', Submit.bind(this), true);
 	this.eventManager.addEvent(this.target.querySelector('._se_color_picker_remove'), 'click', Remove.bind(this));
 };
 
@@ -42,7 +42,7 @@ ColorPicker.prototype = {
 
 		const colorList = this.colorList;
 		for (let i = 0, len = colorList.length; i < len; i++) {
-			if (fillColor.toLowerCase() === colorList[i].getAttribute('data-value').toLowerCase()) {
+			if (fillColor.toLowerCase() === colorList[i].getAttribute('data-command').toLowerCase()) {
 				domUtils.addClass(colorList[i], 'active');
 			} else {
 				domUtils.removeClass(colorList[i], 'active');
@@ -130,7 +130,8 @@ ColorPicker.prototype = {
 	constructor: ColorPicker
 };
 
-function Submit() {
+function Submit(e) {
+	e.preventDefault();
 	this.inst.action(this.currentColor);
 }
 
@@ -221,7 +222,7 @@ function CreateHTML(editor, colorList) {
 	list +=
 		'<form class="se-form-group">' +
 		'<input type="text" maxlength="9" class="se-color-input"/>' +
-		'<button type="submit" class="se-btn _se_color_picker_submit" title="' +
+		'<button type="submit" class="se-btn" title="' +
 		lang.submitButton +
 		'" aria-label="' +
 		lang.submitButton +
@@ -247,7 +248,7 @@ function _makeColor(colorList) {
 	for (let i = 0, len = colorList.length, color; i < len; i++) {
 		color = colorList[i];
 		if (typeof color === 'string') {
-			list += '<li><button type="button" data-value="' + color + '" title="' + color + '" aria-label="' + color + '" style="background-color:' + color + ';"></button></li>';
+			list += '<li><button type="button" data-command="' + color + '" title="' + color + '" aria-label="' + color + '" style="background-color:' + color + ';"></button></li>';
 		}
 	}
 	list += '</ul>';

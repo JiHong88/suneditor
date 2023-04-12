@@ -85,11 +85,21 @@ Table.className = '';
 Table.prototype = {
 	/**
 	 * @override core
-	 * @param {Element} element New table element
 	 */
-	action: function (element) {
-		if (this.component.insert(element, false, false, false)) {
-			const firstTd = element.querySelector('td div');
+	action: function () {
+		const oTable = domUtils.createElement('TABLE');
+		const x = this._tableXY[0];
+		let y = this._tableXY[1];
+		let tableHTML = '<tbody>';
+		while (y > 0) {
+			tableHTML += '<tr>' + CreateCells('td', x, false) + '</tr>';
+			--y;
+		}
+		tableHTML += '</tbody>';
+		oTable.innerHTML = tableHTML;
+
+		if (this.component.insert(oTable, false, false, false)) {
+			const firstTd = oTable.querySelector('td div');
 			this.selection.setRange(firstTd, 0, firstTd, 0);
 			this._resetTablePicker();
 		}
@@ -1234,18 +1244,7 @@ function OnMouseMoveTablePicker(e) {
 }
 
 function OnClickTablePicker() {
-	const oTable = domUtils.createElement('TABLE');
-	const x = this._tableXY[0];
-	let y = this._tableXY[1];
-	let tableHTML = '<tbody>';
-	while (y > 0) {
-		tableHTML += '<tr>' + CreateCells('td', x, false) + '</tr>';
-		--y;
-	}
-	tableHTML += '</tbody>';
-	oTable.innerHTML = tableHTML;
-
-	this.action(oTable);
+	this.action();
 }
 
 function CreateCells(nodeName, cnt, returnElement) {

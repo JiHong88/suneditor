@@ -15,7 +15,6 @@ const Template = function (editor) {
 
 	// init
 	this.menu.initDropdownTarget(Template.key, menu);
-	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
 Template.key = 'template';
@@ -24,9 +23,9 @@ Template.className = '';
 Template.prototype = {
 	/**
 	 * @override core
-	 * @param {number} index template menu index
 	 */
-	action: function (index) {
+	action: function (target) {
+		const index = target.getAttribute('data-value') * 1;
 		const temp = this.options.get('templates')[(this.selectedIndex = index)];
 
 		if (temp.html) {
@@ -41,15 +40,6 @@ Template.prototype = {
 
 	constructor: Template
 };
-
-function OnClickMenu(e) {
-	if (!/^BUTTON$/i.test(e.target.tagName)) return false;
-
-	e.preventDefault();
-	e.stopPropagation();
-
-	this.action(e.target.getAttribute('data-value') * 1);
-}
 
 function CreateHTML(editor) {
 	const templateList = editor.options.get('templates');

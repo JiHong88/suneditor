@@ -16,7 +16,6 @@ const BackgroundColor = function (editor) {
 
 	// itit
 	this.menu.initDropdownTarget(BackgroundColor.key, menu);
-	this.eventManager.addEvent(menu, 'click', OnClickMenu.bind(this));
 };
 
 BackgroundColor.key = 'backgroundColor';
@@ -32,10 +31,9 @@ BackgroundColor.prototype = {
 
 	/**
 	 * @override core
-	 * @param {Element} target Target command button
 	 */
 	action: function (target) {
-		const value = target.getAttribute('data-value');
+		const value = typeof target === 'string' ? target : target.getAttribute('data-command');
 		if (value) {
 			const newNode = domUtils.createElement('SPAN', { style: 'background-color: ' + value + ';' });
 			this.format.applyTextStyle(newNode, ['background-color'], null, null);
@@ -48,13 +46,6 @@ BackgroundColor.prototype = {
 
 	constructor: BackgroundColor
 };
-
-function OnClickMenu(e) {
-	e.preventDefault();
-	e.stopPropagation();
-
-	this.action(e.target);
-}
 
 function CreateHTML(colorList) {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, colorList);

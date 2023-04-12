@@ -15,7 +15,6 @@ const TextStyle = function (editor) {
 
 	// init
 	this.menu.initDropdownTarget(TextStyle.key, menu);
-	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
 TextStyle.key = 'textStyle';
@@ -57,10 +56,10 @@ TextStyle.prototype = {
 
 	/**
 	 * @override core
-	 * @param {Element} tempElement text style template element
-	 * @param {Element} targetElement current menu target
+	 * @param {Element} target Target command button
 	 */
-	action: function (tempElement, targetElement) {
+	action: function (target) {
+		const tempElement = target.firstChild;
 		const checkStyles = tempElement.style.cssText.replace(/:.+(;|$)/g, ',').split(',');
 		checkStyles.pop();
 
@@ -69,7 +68,7 @@ TextStyle.prototype = {
 			checkStyles.push('.' + classes[i]);
 		}
 
-		const newNode = domUtils.hasClass(targetElement, 'active') ? null : tempElement.cloneNode(false);
+		const newNode = domUtils.hasClass(target, 'active') ? null : tempElement.cloneNode(false);
 		const removeNodes = newNode ? null : [tempElement.nodeName];
 		this.format.applyTextStyle(newNode, checkStyles, removeNodes, true);
 
@@ -78,16 +77,6 @@ TextStyle.prototype = {
 
 	constructor: TextStyle
 };
-
-function OnClickMenu(e) {
-	e.preventDefault();
-	e.stopPropagation();
-
-	const target = domUtils.getCommandTarget(e.target);
-	if (!target) return;
-
-	this.action(target.firstChild, target);
-}
 
 function CreateHTML(editor) {
 	const options = editor.options;

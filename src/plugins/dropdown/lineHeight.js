@@ -16,7 +16,6 @@ const LineHeight = function (editor) {
 
 	// init
 	this.menu.initDropdownTarget(LineHeight.key, menu);
-	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
 LineHeight.key = 'lineHeight';
@@ -46,7 +45,7 @@ LineHeight.prototype = {
 		if (currentSize !== this.currentSize) {
 			const sizeList = this.sizeList;
 			for (let i = 0, len = sizeList.length; i < len; i++) {
-				if (currentSize === sizeList[i].getAttribute('data-value')) {
+				if (currentSize === sizeList[i].getAttribute('data-command')) {
 					domUtils.addClass(sizeList[i], 'active');
 				} else {
 					domUtils.removeClass(sizeList[i], 'active');
@@ -59,9 +58,10 @@ LineHeight.prototype = {
 
 	/**
 	 * @override core
-	 * @param {string} value line height value
+	 * @param {Element} target Target command button
 	 */
-	action: function (value) {
+	action: function (target) {
+		const value = target.getAttribute('data-command') || '';
 		const formats = this.format.getLines();
 
 		for (let i = 0, len = formats.length; i < len; i++) {
@@ -76,15 +76,6 @@ LineHeight.prototype = {
 
 	constructor: LineHeight
 };
-
-function OnClickMenu(e) {
-	if (!/^BUTTON$/i.test(e.target.tagName)) return false;
-
-	e.preventDefault();
-	e.stopPropagation();
-
-	this.action(e.target.getAttribute('data-value') || '');
-}
 
 function CreateHTML(editor) {
 	const options = editor.options;
@@ -101,7 +92,7 @@ function CreateHTML(editor) {
 	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="default_value se-btn-list" title="' + lang.default + '" aria-label="' + lang.default + '">(' + lang.default + ')</button></li>';
 	for (let i = 0, len = sizeList.length, size; i < len; i++) {
 		size = sizeList[i];
-		list += '<li><button type="button" class="se-btn-list" data-value="' + size.value + '" title="' + size.text + '" aria-label="' + size.text + '">' + size.text + '</button></li>';
+		list += '<li><button type="button" class="se-btn-list" data-command="' + size.value + '" title="' + size.text + '" aria-label="' + size.text + '">' + size.text + '</button></li>';
 	}
 	list += '</ul></div>';
 

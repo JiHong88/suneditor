@@ -15,7 +15,6 @@ const Layout = function (editor) {
 
 	// init
 	this.menu.initDropdownTarget(Layout.key, menu);
-	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
 Layout.key = 'layout';
@@ -24,9 +23,10 @@ Layout.className = '';
 Layout.prototype = {
 	/**
 	 * @override core
-	 * @param {number} index layout menu index
+	 * @param {Element} target Target command button
 	 */
-	action: function (index) {
+	action: function (target) {
+		const index = target.getAttribute('data-value') * 1;
 		const temp = this.options.get('layouts')[(this.selectedIndex = index)];
 
 		if (temp.html) {
@@ -41,15 +41,6 @@ Layout.prototype = {
 
 	constructor: Layout
 };
-
-function OnClickMenu(e) {
-	if (!/^BUTTON$/i.test(e.target.tagName)) return false;
-
-	e.preventDefault();
-	e.stopPropagation();
-
-	this.action(e.target.getAttribute('data-value') * 1);
-}
 
 function CreateHTML(editor) {
 	const layoutList = editor.options.get('layouts');

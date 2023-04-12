@@ -16,7 +16,6 @@ const FontSize = function (editor) {
 
 	// init
 	this.menu.initDropdownTarget(FontSize.key, menu);
-	this.eventManager.addEvent(menu.querySelector('ul'), 'click', OnClickMenu.bind(this));
 };
 
 FontSize.key = 'fontSize';
@@ -60,9 +59,10 @@ FontSize.prototype = {
 
 	/**
 	 * @override
-	 * @param {string} value font-size
+	 * @param {Element} target Target command button
 	 */
-	action: function (value) {
+	action: function (target) {
+		const value = target.getAttribute('data-value');
 		if (value) {
 			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + value + ';' });
 			this.format.applyTextStyle(newNode, ['font-size'], null, null);
@@ -75,15 +75,6 @@ FontSize.prototype = {
 
 	constructor: FontSize
 };
-
-function OnClickMenu(e) {
-	if (!/^BUTTON$/i.test(e.target.tagName)) return false;
-
-	e.preventDefault();
-	e.stopPropagation();
-
-	this.action(e.target.getAttribute('data-value'));
-}
 
 function CreateHTML(editor) {
 	const options = editor.options;
