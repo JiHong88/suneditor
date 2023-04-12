@@ -101,12 +101,12 @@
                 altText: 'Alternativer Text'
             },
             videoBox: {
-                title: 'Video enfügen',
+                title: 'Video einfügen',
                 file: 'Datei auswählen',
                 url: 'Video-URL, YouTube/Vimeo'
             },
             audioBox: {
-                title: 'Audio enfügen',
+                title: 'Audio einfügen',
                 file: 'Datei auswählen',
                 url: 'Audio-URL'
             },
