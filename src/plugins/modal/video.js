@@ -236,8 +236,8 @@ Video.prototype = {
 	},
 
 	applySize: function (w, h) {
-		if (!w) w = this.inputX.value || this.options.get('imageWidth');
-		if (!h) h = this.inputY.value || this.options.get('imageHeight');
+		if (!w) w = this.inputX.value || this.options.get('videoWidth');
+		if (!h) h = this.inputY.value || this.options.get('videoHeight');
 		if (this._onlyPercentage) {
 			if (!w) w = '100%';
 			else if (/%$/.test(w)) w += '%';
@@ -408,8 +408,11 @@ Video.prototype = {
 	_update: function (oFrame) {
 		if (!oFrame) return;
 
-		if (/^video$/i.test(oFrame.nodeName)) this._setTagAttrs(oFrame);
-		else this._setIframeAttrs(oFrame);
+		if (/^video$/i.test(oFrame.nodeName)) {
+			this._setTagAttrs(oFrame);
+		} else if (/^iframe$/i.test(oFrame.nodeName)) {
+			this._setIframeAttrs(oFrame);
+		}
 
 		let existElement = this.format.isBlock(oFrame.parentNode) || domUtils.isWysiwygFrame(oFrame.parentNode) ? oFrame : this.format.getLine(oFrame) || oFrame;
 
@@ -427,6 +430,7 @@ Video.prototype = {
 		}
 
 		// size
+		this.figure.open(oFrame, true, true);
 		const size = (oFrame.getAttribute('data-size') || oFrame.getAttribute('data-origin') || '').split(',');
 		this.applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
 

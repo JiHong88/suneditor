@@ -1,9 +1,5 @@
 import CoreInjector from '../injector/_core';
-import {
-	domUtils,
-	numbers,
-	env
-} from '../helper';
+import { domUtils, numbers, env } from '../helper';
 
 /**
  *
@@ -223,7 +219,7 @@ FileManager.prototype = {
 			if (!domUtils.getParentElement(tag, this.editor.component.is)) {
 				currentTags.push(this.infoIndex);
 				try {
-					this.figure.__fileManagerInfo = true;
+					if (this.figure) this.figure.__fileManagerInfo = true;
 					tag = this.checkHandler(tag);
 					if (!tag) {
 						console.warn('[SUNEDITOR.FileManager[' + this.kind + '].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).');
@@ -234,7 +230,7 @@ FileManager.prototype = {
 				} catch (error) {
 					console.warn('[SUNEDITOR.FileManager[' + this.kind + '].checkHandler.error] ' + error.message);
 				} finally {
-					this.figure.__fileManagerInfo = false;
+					if (this.figure) this.figure.__fileManagerInfo = false;
 				}
 			} else if (!tag.getAttribute('data-index') || infoIndex.indexOf(tag.getAttribute('data-index') * 1) < 0) {
 				currentTags.push(this.infoIndex);

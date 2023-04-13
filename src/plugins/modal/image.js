@@ -342,12 +342,13 @@ Image_.prototype = {
 		let container = this._container;
 		let isNewContainer = false;
 
-		if (cover === null || container === null) {
+		if (!cover || !container) {
 			isNewContainer = true;
 			imageEl = this._element.cloneNode(true);
 			const figureInfo = Figure.CreateContainer(imageEl, 'se-image-container');
 			cover = figureInfo.cover;
 			container = figureInfo.container;
+			this.figure.open(imageEl, true, true);
 		}
 
 		// check size

@@ -104,6 +104,7 @@ Figure.CreateCaption = function (cover, text) {
  */
 Figure.GetContainer = function (element) {
 	return {
+		target: element,
 		container: domUtils.getParentElement(element, Figure.__isComponent),
 		cover: domUtils.getParentElement(element, 'FIGURE'),
 		caption: domUtils.getEdgeChild(element.parentElement, 'FIGCAPTION')
@@ -186,11 +187,13 @@ Figure.prototype = {
 	open: function (target, nonResizing, __fileManagerInfo) {
 		this.editor._offCurrentController();
 		const figureInfo = Figure.GetContainer(target);
-		const figure = this._cover = figureInfo.cover;
+		if (!figureInfo.container) return { container: null, cover: null };
+
+		const figure = (this._cover = figureInfo.cover);
 		this._container = figureInfo.container;
 		this._caption = figureInfo.caption;
 		this._element = target;
-		this.align = target.style.float || target.getAttribute('data-align') || 'none';
+		this.align = (this._container.className.match(/(?:^|\s)__se__float-(none|left|center|right)(?:$|\s)/) || [])[1] || target.style.float || 'none';
 		this.isVertical = /^(90|270)$/.test(Math.abs(target.getAttribute('data-rotate')).toString());
 
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
@@ -345,7 +348,6 @@ Figure.prototype = {
 			domUtils.addClass(container, '__se__float-' + align);
 		}
 
-		target.setAttribute('data-align', align);
 		this._setAlignIcon();
 	},
 

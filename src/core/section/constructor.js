@@ -13,7 +13,7 @@ const DEFAULT_FORMAT_BR_LINE = 'PRE';
 const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|DETAILS';
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
-const DEFAULT_DATA_ATTRS = 'data-index|data-file-size|data-file-name|data-origin|data-size|data-align|data-image-link|data-rotate|data-proportion|data-percentage|data-font-size|data-embed|data-exp|data-duple';
+const DEFAULT_DATA_ATTRS = 'data-index|data-file-size|data-file-name|data-origin|data-size|data-image-link|data-rotate|data-proportion|data-percentage|data-font-size|data-embed|data-exp|data-duple';
 
 /**
  * @description document create
