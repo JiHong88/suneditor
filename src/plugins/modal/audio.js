@@ -231,7 +231,7 @@ Audio_.prototype = {
 		if (!isUpdate) {
 			element.src = src;
 			const figure = Figure.CreateContainer(element);
-			if (!this.component.insert(figure.container, false, false, !this.options.get('mediaAutoSelect'))) {
+			if (!this.component.insert(figure.container, false, !this.options.get('mediaAutoSelect'))) {
 				this.editor.focus();
 				return;
 			}

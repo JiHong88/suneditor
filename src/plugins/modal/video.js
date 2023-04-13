@@ -305,7 +305,7 @@ Video.prototype = {
 		this.figure.setAlign(oFrame, align);
 
 		if (!isUpdate) {
-			if (this.component.insert(container, false, false, !this.options.get('mediaAutoSelect'))) this.fileManager.setInfo(oFrame, file);
+			if (this.component.insert(container, false, !this.options.get('mediaAutoSelect'))) this.fileManager.setInfo(oFrame, file);
 			if (!this.options.get('mediaAutoSelect')) {
 				const line = this.format.addLine(container, null);
 				if (line) this.selection.setRange(line, 0, line, 0);

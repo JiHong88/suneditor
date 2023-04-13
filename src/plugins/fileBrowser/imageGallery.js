@@ -30,7 +30,8 @@ ImageGallery.prototype = {
 	/**
 	 * @description Open image gallery
 	 */
-	open: function () {
+	open: function (inputTarget) {
+		this.inputTarget = inputTarget;
 		this.fileBrowser.open();
 	},
 
@@ -38,6 +39,7 @@ ImageGallery.prototype = {
 	 * @description Close image gallery
 	 */
 	close: function () {
+		this.inputTarget = null;
 		this.fileBrowser.close();
 	},
 
@@ -62,8 +64,8 @@ function DrawItems(item) {
 		'" data-command="pick" data-value="' +
 		(item.src || item.thumbnail) +
 		'">' +
-		'<div class="se-file-img-name se-file-name-back"></div>' +
-		'<div class="se-file-img-name __se__img_name">' +
+		'<div class="se-file-name-image se-file-name-back"></div>' +
+		'<div class="se-file-name-image __se__img_name">' +
 		(item.name || srcName) +
 		'</div>' +
 		'</div>'
@@ -71,8 +73,12 @@ function DrawItems(item) {
 }
 
 function SetImage(target) {
-	const file = { name: target.parentNode.querySelector('.__se__img_name').textContent, size: 0 };
-	this.plugins.image.create(target.getAttribute('data-value'), null, this._origin_w, this._origin_h, 'none', file, target.alt);
+	if (this.inputTarget) {
+		this.inputTarget(target);
+	} else {
+		const file = { name: target.parentNode.querySelector('.__se__img_name').textContent, size: 0 };
+		this.plugins.image.create(target.getAttribute('data-value'), null, this._origin_w, this._origin_h, 'none', file, target.alt);
+	}
 }
 
 export default ImageGallery;

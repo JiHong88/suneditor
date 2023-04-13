@@ -43,7 +43,7 @@ HorizontalLine.prototype = {
 	action: function (target) {
 		const hr = target.firstElementChild.cloneNode(false);
 		this.editor.focus();
-		this.component.insert(hr, false, false, false);
+		this.component.insert(hr, false, false);
 		this.menu.dropdownOff();
 
 		const line = this.format.addLine(hr);

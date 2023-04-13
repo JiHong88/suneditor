@@ -430,12 +430,6 @@ EventManager.prototype = {
 		this.editor._nativeFocus();
 	},
 
-	_setClipboardComponent: function (e, info, clipboardData) {
-		e.preventDefault();
-		e.stopPropagation();
-		clipboardData.setData('text/html', info.component.outerHTML);
-	},
-
 	_setDropLocationSelection: function (e) {
 		if (e.rangeParent) {
 			this.selection.setRange(e.rangeParent, e.rangeOffset, e.rangeParent, e.rangeOffset);
@@ -614,7 +608,7 @@ EventManager.prototype = {
 		/** line breaker */
 		this.addEvent(eventWysiwyg, 'mousemove', OnMouseMove_wysiwyg.bind(this), false);
 		this.addEvent(
-			frameContext.get('lineBreaker').querySelector('button'),
+			[frameContext.get('lineBreaker').querySelector('button'), frameContext.get('lineBreaker_t'), frameContext.get('lineBreaker_b')],
 			'mousedown',
 			function (e) {
 				e.preventDefault();
@@ -888,11 +882,10 @@ function OnClick_wysiwyg(rootKey, e) {
 	const fileComponentInfo = this.component.get(targetElement);
 	if (fileComponentInfo) {
 		e.preventDefault();
-		this.editor.currentControllerTarget = fileComponentInfo.target;
 		this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
 		return;
 	} else {
-		this.editor.currentControllerTarget = null;
+		this.component.currentTarget = null;
 	}
 
 	const figcaption = domUtils.getParentElement(targetElement, 'FIGCAPTION');
@@ -1686,7 +1679,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 			if (fileComponentName) {
 				e.preventDefault();
 
-				const compContext = this.component.get(this.editor.currentControllerTarget);
+				const compContext = this.component.get(this.component.currentTarget);
 				const container = compContext.container;
 				const sibling = container.previousElementSibling || container.nextElementSibling;
 
@@ -1847,13 +1840,6 @@ function OnCut_wysiwyg(rootKey, e) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
-	}
-
-	const info = this.editor.currentFileComponentInfo;
-	if (info && !env.isIE) {
-		this._setClipboardComponent(e, info, clipboardData);
-		domUtils.removeItem(info.component);
-		this.editor._offCurrentController();
 	}
 
 	_w.setTimeout(function () {

@@ -407,13 +407,6 @@
     outline: 1px dashed #e1e1e1;
 }
 
-/** component copy effect */
-.sun-editor-editable[contenteditable=true] .se-component.se-component-copy {
-    -webkit-box-shadow: 0 0 0 0.2rem #80bdff;
-    box-shadow: 0 0 0 0.2rem #3f9dff;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
 /* float */
 .sun-editor-editable .__se__float-left {
     float: left;

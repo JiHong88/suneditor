@@ -186,8 +186,8 @@ Figure.prototype = {
 	open: function (target, nonResizing, __fileManagerInfo) {
 		this.editor._offCurrentController();
 		const figureInfo = Figure.GetContainer(target);
+		const figure = this._cover = figureInfo.cover;
 		this._container = figureInfo.container;
-		this._cover = figureInfo.cover;
 		this._caption = figureInfo.caption;
 		this._element = target;
 		this.align = target.style.float || target.getAttribute('data-align') || 'none';
@@ -196,8 +196,8 @@ Figure.prototype = {
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
 		const offset = this.offset.get(target);
 		const frameOffset = this.offset.get(this.editor.frameContext.get('wysiwygFrame'));
-		const w = (this.isVertical ? target.offsetHeight : target.offsetWidth) - 1;
-		const h = (this.isVertical ? target.offsetWidth : target.offsetHeight) - 1;
+		const w = figure.offsetWidth - 1;
+		const h = figure.offsetHeight - 1;
 		const t = offset.top - (this.options.get('iframe') ? frameOffset.top : 0);
 		const l = offset.left - (this.options.get('iframe') ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - this.editor.frameContext.get('wysiwygFrame').scrollLeft;
 		const originSize = (target.getAttribute('data-origin') || '').split(',');
@@ -709,19 +709,6 @@ Figure.prototype = {
 
 	constructor: Figure
 };
-
-// @todo
-// function OnCopy(e) {
-// 	const info = this.editor.currentFileComponentInfo;
-// 	if (info && !env.isIE) {
-// 		this._setClipboardComponent(e, info, clipboardData);
-// 		// copy effect
-// 		domUtils.addClass(info.component, 'se-component-copy');
-// 		_w.setTimeout(function () {
-// 			domUtils.removeClass(info.component, 'se-component-copy');
-// 		}, 150);
-// 	}
-// }
 
 const DIRECTION_CURSOR_MAP = { tl: 'nw-resize', tr: 'ne-resize', bl: 'sw-resize', br: 'se-resize', lw: 'w-resize', th: 'n-resize', rw: 'e-resize', bh: 's-resize' };
 function OnResizeContainer(e) {

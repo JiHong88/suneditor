@@ -563,7 +563,7 @@ Image_.prototype = {
 		this.figure.setAlign(oImg, align);
 
 		oImg.onload = OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
-		if (this.component.insert(container, true, false, true)) this.fileManager.setInfo(oImg, file);
+		if (this.component.insert(container, false, true)) this.fileManager.setInfo(oImg, file);
 	},
 
 	_updateSrc: function (src, element, file) {
@@ -755,7 +755,7 @@ function OnfileInputChange() {
 }
 
 function OpenGallery() {
-	this.gallery.open(_setUrlInput.bind(this));
+	this.plugins.imageGallery.open(_setUrlInput.bind(this));
 }
 
 function _setUrlInput(target) {

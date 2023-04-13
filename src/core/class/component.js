@@ -3,14 +3,18 @@
  */
 
 import CoreInjector from '../../injector/_core';
-import { domUtils } from '../../helper';
+import { domUtils, env } from '../../helper';
 import Figure from '../../modules/Figure';
 
 const Component = function (editor) {
 	CoreInjector.call(this, editor);
 
 	// members
-	this._lineBreakComp = null;
+	this.info = null;
+	this.currentTarget = null;
+	this.__globalEvents = [OnCopy_component.bind(this), OnCut_component.bind(this)];
+	this._bindClose_copy = null;
+	this._bindClose_cut = null;
 };
 
 Component.prototype = {
@@ -18,12 +22,11 @@ Component.prototype = {
 	 * @description The method to insert a element and return. (used elements : table, hr, image, video)
 	 * If "element" is "HR", insert and return the new line.
 	 * @param {Element} element Element to be inserted
-	 * @param {boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (domUtils.getEdgeChildNodes)
 	 * @param {boolean} notCheckCharCount If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} notSelect If true, Do not automatically select the inserted component.
 	 * @returns {Element}
 	 */
-	insert: function (element, notHistoryPush, notCheckCharCount, notSelect) {
+	insert: function (element, notCheckCharCount, notSelect) {
 		if (this.editor.isReadOnly || (!notCheckCharCount && !this.char.check(element))) {
 			return null;
 		}
@@ -47,9 +50,10 @@ Component.prototype = {
 			if (formatEl && domUtils.isZeroWith(formatEl)) domUtils.removeItem(formatEl);
 		}
 
+		this.history.push(false);
+	
 		if (!notSelect) {
 			this.selection.setRange(element, 0, element, 0);
-
 			const fileComponentInfo = this.get(element);
 			if (fileComponentInfo) {
 				this.select(fileComponentInfo.target, fileComponentInfo.pluginName);
@@ -58,8 +62,6 @@ Component.prototype = {
 				this.selection.setRange(oNode, 0, oNode, 0);
 			}
 		}
-
-		if (!notHistoryPush) this.history.push(1);
 
 		return oNode || element;
 	},
@@ -84,10 +86,13 @@ Component.prototype = {
 			return null;
 		}
 
+		const info = Figure.GetContainer(target);
 		return {
 			target: target,
-			container: domUtils.getParentElement(target, this.is),
-			pluginName: this.editor._fileManager.pluginMap[target.nodeName.toLowerCase()] || ''
+			pluginName: this.editor._fileManager.pluginMap[target.nodeName.toLowerCase()] || '',
+			container: info.container,
+			cover: info.cover,
+			caption: info.caption
 		};
 	},
 
@@ -98,18 +103,18 @@ Component.prototype = {
 	 */
 	select: function (element, pluginName) {
 		this.editor._antiBlur = true;
+		this.currentTarget = element;
+		this.info = Figure.GetContainer(element);
 		this.editor.blur();
 
 		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is)) || domUtils.isUneditable(element)) return false;
 
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;
-		this._w.setTimeout(
-			function () {
-				if (typeof plugin.select === 'function') plugin.select(element);
-				this._setComponentLineBreaker(element);
-			}.bind(this)
-		);
+		if (typeof plugin.select === 'function') plugin.select(element);
+
+		this._setComponentLineBreaker(element);
+		this.__addGlobalEvent();
 	},
 
 	/**
@@ -127,7 +132,7 @@ Component.prototype = {
 	 * @private
 	 */
 	_setComponentLineBreaker: function (element) {
-		this._lineBreakComp = null;
+		this.eventManager._lineBreakComp = null;
 		const fc = this.editor.frameContext;
 		const wysiwyg = fc.get('wysiwyg');
 		fc.get('lineBreaker').style.display = 'none';
@@ -143,7 +148,7 @@ Component.prototype = {
 		let componentTop, w;
 		// top
 		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
-			this._lineBreakComp = container;
+			this.eventManager._lineBreakComp = container;
 			componentTop = this.offset.get(element).top + yScroll;
 			w = target.offsetWidth / 2 / 2;
 
@@ -157,7 +162,7 @@ Component.prototype = {
 		// bottom
 		if (isList ? !container.nextSibling : !this.format.isLine(container.nextElementSibling)) {
 			if (!componentTop) {
-				this._lineBreakComp = container;
+				this.eventManager._lineBreakComp = container;
 				componentTop = this.offset.get(element).top + yScroll;
 				w = target.offsetWidth / 2 / 2;
 			}
@@ -171,7 +176,46 @@ Component.prototype = {
 		}
 	},
 
+	__addGlobalEvent: function () {
+		this.__removeGlobalEvent();
+		this._bindClose_copy = this.eventManager.addGlobalEvent('copy', this.__globalEvents[0]);
+		this._bindClose_cut = this.eventManager.addGlobalEvent('cut', this.__globalEvents[1]);
+	},
+
+	__removeGlobalEvent: function () {
+		if (this._bindClose_copy) this._bindClose_copy = this.eventManager.removeGlobalEvent(this._bindClose_copy);
+		if (this._bindClose_cut) this._bindClose_cut = this.eventManager.removeGlobalEvent(this._bindClose_cut);
+	},
+
 	constructor: Component
 };
+
+function OnCopy_component(e) {
+	const info = this.info;
+	if (info && !env.isIE) {
+		SetClipboardComponent(e, info.container, e.clipboardData);
+		domUtils.addClass(info.container, 'se-component-copy');
+		// copy effect
+		this._w.setTimeout(function () {
+			domUtils.removeClass(info.container, 'se-component-copy');
+		}, 120);
+	}
+}
+
+function OnCut_component(e) {
+	const info = this.info;
+	if (info && !env.isIE) {
+		this.__removeGlobalEvent();
+		SetClipboardComponent(e, info.container, e.clipboardData);
+		this.editor._offCurrentController();
+		domUtils.removeItem(info.container);
+	}
+}
+
+function SetClipboardComponent (e, container, clipboardData) {
+	e.preventDefault();
+	e.stopPropagation();
+	clipboardData.setData('text/html', container.outerHTML);
+}
 
 export default Component;

@@ -203,7 +203,7 @@ HTML.prototype = {
 			}
 		} else {
 			if (this.component.is(html)) {
-				this.component.insert(html, false, notCheckCharCount, false);
+				this.component.insert(html, notCheckCharCount, false);
 			} else {
 				let afterNode = null;
 				if (this.format.isLine(html) || domUtils.isMedia(html)) {

@@ -170,11 +170,6 @@ const Editor = function (multiTargets, options) {
 	 */
 	this.effectNode = null;
 
-	/**
-	 * @description The file component object of current selected file tag (component.get)
-	 */
-	this.currentFileComponentInfo = null;
-
 	// ----- private properties -----
 	/**
 	 * @description Closest ShadowRoot to editor if found
@@ -197,7 +192,6 @@ const Editor = function (multiTargets, options) {
 	this.opendModal = null;
 	this.opendControllers = [];
 	this.currentControllerName = '';
-	this.currentControllerTarget = null;
 	this._controllerOnDisabledButtons = [];
 	this._codeViewDisabledButtons = [];
 	this._controllerTargetContext = null;

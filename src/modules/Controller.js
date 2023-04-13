@@ -93,8 +93,6 @@ Controller.prototype = {
 	 * @param {any} arguments controller elements, function..
 	 */
 	_controllerOn: function (form, target) {
-		this.editor.currentFileComponentInfo = this.component.get(target);
-
 		form.style.display = 'block';
 		if (this._shadowRoot) {
 			form.addEventListener('mousedown', function (e) {
@@ -123,7 +121,6 @@ Controller.prototype = {
 	_controllerOff: function () {
 		this.form.style.display = 'none';
 		this.editor.frameContext.get('lineBreaker_t').style.display = this.editor.frameContext.get('lineBreaker_b').style.display = 'none';
-		this.editor.currentFileComponentInfo = null;
 		this.editor.effectNode = null;
 		this.editor.opendControllers = [];
 		this.editor._antiBlur = false;
@@ -156,6 +153,7 @@ Controller.prototype = {
 	},
 
 	__removeGlobalEvent: function () {
+		this.component.__removeGlobalEvent();
 		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);
 		if (this._bindClose_mouse) this._bindClose_mouse = this.eventManager.removeGlobalEvent(this._bindClose_mouse);
 	},

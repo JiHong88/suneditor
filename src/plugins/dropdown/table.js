@@ -98,7 +98,7 @@ Table.prototype = {
 		tableHTML += '</tbody>';
 		oTable.innerHTML = tableHTML;
 
-		if (this.component.insert(oTable, false, false, false)) {
+		if (this.component.insert(oTable, false, false)) {
 			const firstTd = oTable.querySelector('td div');
 			this.selection.setRange(firstTd, 0, firstTd, 0);
 			this._resetTablePicker();
