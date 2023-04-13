@@ -15,11 +15,14 @@ const BackgroundColor = function (editor) {
 	const menu = CreateHTML(this.colorPicker.target);
 
 	// itit
-	this.menu.initDropdownTarget(BackgroundColor.key, menu);
+	this.menu.initDropdownTarget(BackgroundColor, menu);
+
+	// dropdown-free : register event
+	this.eventManager.addEvent(menu, 'click', OnClickMenu.bind(this));
 };
 
 BackgroundColor.key = 'backgroundColor';
-BackgroundColor.type = 'dropdown';
+BackgroundColor.type = 'dropdown-free';
 BackgroundColor.className = '';
 BackgroundColor.prototype = {
 	/**
@@ -32,8 +35,7 @@ BackgroundColor.prototype = {
 	/**
 	 * @override core
 	 */
-	action: function (target) {
-		const value = typeof target === 'string' ? target : target.getAttribute('data-command');
+	action: function (value) {
 		if (value) {
 			const newNode = domUtils.createElement('SPAN', { style: 'background-color: ' + value + ';' });
 			this.format.applyTextStyle(newNode, ['background-color'], null, null);
@@ -46,6 +48,16 @@ BackgroundColor.prototype = {
 
 	constructor: BackgroundColor
 };
+
+function OnClickMenu(e) {
+	e.preventDefault();
+	e.stopPropagation();
+
+	const color = e.target.getAttribute('data-value');
+	if (!color) return;
+
+	this.action(color);
+}
 
 function CreateHTML(colorList) {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, colorList);

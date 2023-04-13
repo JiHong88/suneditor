@@ -14,7 +14,7 @@ const Layout = function (editor) {
 	this.selectedIndex = -1;
 
 	// init
-	this.menu.initDropdownTarget(Layout.key, menu);
+	this.menu.initDropdownTarget(Layout, menu);
 };
 
 Layout.key = 'layout';

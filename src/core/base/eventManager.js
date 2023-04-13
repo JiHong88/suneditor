@@ -830,7 +830,7 @@ function OnClick_menuTray(e) {
 
 	let t = target;
 	let k = '';
-	while (t && !domUtils.hasClass(t, 'se-menu-tray') && !k) {
+	while (t && !/se-menu-tray/.test(t.className) && !k) {
 		t = t.parentElement;
 		k = t.getAttribute('data-key');
 	}

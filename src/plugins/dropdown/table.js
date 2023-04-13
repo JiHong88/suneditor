@@ -74,13 +74,13 @@ const Table = function (editor) {
 	};
 
 	// init
-	this.menu.initDropdownTarget(Table.key, menu);
+	this.menu.initDropdownTarget(Table, menu);
 	this.eventManager.addEvent(commandArea, 'mousemove', OnMouseMoveTablePicker.bind(this));
 	this.eventManager.addEvent(commandArea, 'click', OnClickTablePicker.bind(this));
 };
 
 Table.key = 'table';
-Table.type = 'dropdown';
+Table.type = 'dropdown-free';
 Table.className = '';
 Table.prototype = {
 	/**

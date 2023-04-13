@@ -14,7 +14,7 @@ const HorizontalLine = function (editor) {
 	this.list = HRMenus.querySelectorAll('button');
 
 	// init
-	this.menu.initDropdownTarget(HorizontalLine.key, HRMenus);
+	this.menu.initDropdownTarget(HorizontalLine, HRMenus);
 };
 
 HorizontalLine.key = 'horizontalLine';

@@ -15,7 +15,7 @@ const LineHeight = function (editor) {
 	this.currentSize = -1;
 
 	// init
-	this.menu.initDropdownTarget(LineHeight.key, menu);
+	this.menu.initDropdownTarget(LineHeight, menu);
 };
 
 LineHeight.key = 'lineHeight';

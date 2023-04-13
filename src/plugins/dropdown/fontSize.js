@@ -15,7 +15,7 @@ const FontSize = function (editor) {
 	this.currentSize = '';
 
 	// init
-	this.menu.initDropdownTarget(FontSize.key, menu);
+	this.menu.initDropdownTarget(FontSize, menu);
 };
 
 FontSize.key = 'fontSize';

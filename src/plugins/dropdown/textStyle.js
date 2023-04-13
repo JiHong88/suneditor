@@ -14,7 +14,7 @@ const TextStyle = function (editor) {
 	this.styleList = menu.querySelectorAll('li button');
 
 	// init
-	this.menu.initDropdownTarget(TextStyle.key, menu);
+	this.menu.initDropdownTarget(TextStyle, menu);
 };
 
 TextStyle.key = 'textStyle';

@@ -15,7 +15,7 @@ const Font = function (editor) {
 	this.fontList = menu.querySelectorAll('ul li button');
 
 	// init
-	this.menu.initDropdownTarget(Font.key, menu);
+	this.menu.initDropdownTarget(Font, menu);
 };
 
 Font.key = 'font';

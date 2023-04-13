@@ -21,6 +21,7 @@ const Menu = function (editor) {
 	this.currentContainer = null;
 	this.currentContainerActiveButton = null;
 	// event
+	this._dropdownCommands = [];
 	this.__globalEventHandler = [this.dropdownOff.bind(this), this.containerOff.bind(this), OnKeyDown_dropdown.bind(this), OnMousemove_dropdown.bind(this)];
 	this._bindClose_dropdown_mouse = null;
 	this._bindClose_dropdown_key = null;
@@ -34,9 +35,13 @@ Menu.prototype = {
 	 * @param {Element|string} key Key string
 	 * @param {Element} menu Dropdown element
 	 */
-	initDropdownTarget: function (key, menu) {
+	initDropdownTarget: function (classObj, menu) {
+		const key = classObj.key;
 		if (key) {
-			menu.setAttribute('data-key', key);
+			if (!/free$/.test(classObj.type)) {
+				menu.setAttribute('data-key', key);
+				this._dropdownCommands.push(key);
+			}
 			this.context.get('menuTray').appendChild(menu);
 			this.targetMap[key] = menu;
 		} else {
@@ -68,7 +73,7 @@ Menu.prototype = {
 		this._setMenuPosition(button, menu);
 
 		this._bindClose_dropdown_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandler[0], false);
-		this._bindClose_dropdown_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandler[2], false);
+		if (this._dropdownCommands.indexOf(dropdownName) > -1) this._bindClose_dropdown_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandler[2], false);
 		menu.addEventListener('mousemove', this.__globalEventHandler[3], false);
 
 		if (this.plugins[dropdownName].on) this.plugins[dropdownName].on(button);

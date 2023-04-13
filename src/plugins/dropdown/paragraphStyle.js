@@ -14,7 +14,7 @@ const ParagraphStyle = function (editor) {
 	this.classList = menu.querySelectorAll('li button');
 
 	// init
-	this.menu.initDropdownTarget(ParagraphStyle.key, menu);
+	this.menu.initDropdownTarget(ParagraphStyle, menu);
 };
 
 ParagraphStyle.key = 'paragraphStyle';

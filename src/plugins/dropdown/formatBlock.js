@@ -15,7 +15,7 @@ const FormatBlock = function (editor) {
 	this.currentFormat = '';
 
 	// init
-	this.menu.initDropdownTarget(FormatBlock.key, menu);
+	this.menu.initDropdownTarget(FormatBlock, menu);
 };
 
 FormatBlock.key = 'formatBlock';

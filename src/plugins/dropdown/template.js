@@ -14,7 +14,7 @@ const Template = function (editor) {
 	this.selectedIndex = -1;
 
 	// init
-	this.menu.initDropdownTarget(Template.key, menu);
+	this.menu.initDropdownTarget(Template, menu);
 };
 
 Template.key = 'template';

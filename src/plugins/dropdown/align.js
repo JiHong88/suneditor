@@ -22,7 +22,7 @@ const Align = function (editor) {
 	this.alignList = commandArea.querySelectorAll('li button');
 
 	// init
-	this.menu.initDropdownTarget(Align.key, menu);
+	this.menu.initDropdownTarget(Align, menu);
 };
 
 Align.key = 'align';

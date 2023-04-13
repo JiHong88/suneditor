@@ -18,7 +18,7 @@ const List = function (editor) {
 	};
 
 	// init
-	this.menu.initDropdownTarget(List.key, menu);
+	this.menu.initDropdownTarget(List, menu);
 };
 
 List.key = 'list';

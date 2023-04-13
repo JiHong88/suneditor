@@ -42,7 +42,7 @@ ColorPicker.prototype = {
 
 		const colorList = this.colorList;
 		for (let i = 0, len = colorList.length; i < len; i++) {
-			if (fillColor.toLowerCase() === colorList[i].getAttribute('data-command').toLowerCase()) {
+			if (fillColor.toLowerCase() === colorList[i].getAttribute('data-value').toLowerCase()) {
 				domUtils.addClass(colorList[i], 'active');
 			} else {
 				domUtils.removeClass(colorList[i], 'active');
@@ -248,7 +248,7 @@ function _makeColor(colorList) {
 	for (let i = 0, len = colorList.length, color; i < len; i++) {
 		color = colorList[i];
 		if (typeof color === 'string') {
-			list += '<li><button type="button" data-command="' + color + '" title="' + color + '" aria-label="' + color + '" style="background-color:' + color + ';"></button></li>';
+			list += '<li><button type="button" data-value="' + color + '" title="' + color + '" aria-label="' + color + '" style="background-color:' + color + ';"></button></li>';
 		}
 	}
 	list += '</ul>';
