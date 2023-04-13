@@ -13,6 +13,7 @@ const Offset = function (editor) {
 	this._scrollEvent = null;
 	this._elTop = 0;
 	this._scrollY = 0;
+	this._isFixed = false;
 };
 
 Offset.prototype = {
@@ -177,13 +178,15 @@ Offset.prototype = {
 		};
 	},
 
-	setRelPosition: function (element, e_container, target, t_container) {
-		this.__removeGlobalEvent();
-		this._scrollY = _w.scrollY;
-		this._scrollEvent = this.editor.eventManager.addGlobalEvent('scroll', FixedScroll.bind(this, element, t_container), false);
+	setRelPosition: function (element, e_container, target, t_container, _reload) {
+		if (!_reload) {
+			this.__removeGlobalEvent();
+			this._scrollEvent = this.editor.eventManager.addGlobalEvent('scroll', FixedScroll.bind(this, element, e_container, target, t_container), false);
+		}
 
+		this._scrollY = _w.scrollY;
 		let wy = 0;
-		if (/^fixed$/i.test(_w.getComputedStyle(t_container).position)) {
+		if ((this._isFixed = /^fixed$/i.test(_w.getComputedStyle(t_container).position))) {
 			wy += this._scrollY;
 		}
 
@@ -240,7 +243,7 @@ Offset.prototype = {
 
 		if (/^fixed$/i.test(_w.getComputedStyle(t_container).position)) {
 			this._elTop = element.offsetTop;
-		} 
+		}
 	},
 
 	setAbsPosition: function (element, target, params) {
@@ -440,16 +443,19 @@ Offset.prototype = {
 	constructor: Offset
 };
 
-function FixedScroll(element, container) {
-	if (!/^fixed$/i.test(_w.getComputedStyle(container).position)) {
-		// this._elTop = null;
+function FixedScroll(element, e_container, target, t_container) {
+	const isFixed = /^fixed$/i.test(_w.getComputedStyle(t_container).position);
+	if (!this._isFixed) {
+		if (isFixed) {
+			this.setRelPosition(element, e_container, target, t_container, true);
+		}
 		return;
-	} else if (this._elTop === null) {
-		this._elTop = element.offsetTop;
+	} else if (!isFixed) {
+		this.setRelPosition(element, e_container, target, t_container, true);
 		return;
 	}
 
-	element.style.top = (this._elTop - (this._scrollY - _w.scrollY - container.offsetTop)) + 'px';
+	element.style.top = (this._elTop - (this._scrollY - _w.scrollY - t_container.offsetTop)) + 'px';
 }
 
 export default Offset;

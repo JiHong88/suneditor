@@ -153,7 +153,7 @@ Menu.prototype = {
 		menu.style.height = '';
 		domUtils.addClass(element, 'on');
 
-		this.offset.setRelPosition(menu, this.editor._carrierWrapper, element.parentElement, domUtils.getParentElement(element, '.se-toolbar'));
+		this.offset.setRelPosition(menu, this.editor._carrierWrapper, element.parentElement, domUtils.getParentElement(element, '.se-toolbar'), false);
 
 		menu.style.visibility = '';
 	},
