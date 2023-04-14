@@ -129,6 +129,8 @@ Image_.prototype = {
 
 		if (this.modal.isUpdate) {
 			this._update(this.inputX.value, this.inputY.value);
+			this.history.push(false);
+			this.figure.open(this._element);
 		}
 
 		if (this.imgInputFile && this.imgInputFile.files.length > 0) {

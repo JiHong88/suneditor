@@ -304,16 +304,23 @@ Video.prototype = {
 		// align
 		this.figure.setAlign(oFrame, align);
 
+		// select figure
+		this._w.setTimeout(function () {
+			this.init();
+			this.component.select(oFrame, 'video')
+		}.bind(this));
+
 		if (!isUpdate) {
-			if (this.component.insert(container, false, !this.options.get('mediaAutoSelect'))) this.fileManager.setInfo(oFrame, file);
+			if (this.component.insert(container, false, true)) this.fileManager.setInfo(oFrame, file);
 			if (!this.options.get('mediaAutoSelect')) {
 				const line = this.format.addLine(container, null);
 				if (line) this.selection.setRange(line, 0, line, 0);
 			}
-		} else if (this._resizing && changeSize) {
-			if (this.figure.isVertical) this.figure.setTransform(oFrame, width, height);
-			this.figure.open(oFrame, this._nonResizing);
+			return;
 		}
+
+		if (this._resizing && changeSize && this.figure.isVertical) this.figure.setTransform(oFrame, width, height);
+		this.history.push(false);
 	},
 
 	_submitFile: function (fileList) {

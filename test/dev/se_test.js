@@ -400,3 +400,6 @@ editor_root.events.onload = function () {
 
 	editor_root.html.set('fdjksl;afjds ...fdjksafl;d')
 }
+editor_root.events.onChange = function (c) {
+	console.log(c);
+}

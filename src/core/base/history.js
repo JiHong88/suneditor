@@ -233,7 +233,7 @@ export default function (editor, change) {
 		},
 
 		overwrite: function (rootKey) {
-			setStack(rootTargets.get(rootKey || editor.status.rootKey).get('wysiwyg').innerHTML, editor.status.rootKey, 0);
+			setStack(rootTargets.get(rootKey || editor.status.rootKey).get('wysiwyg').innerHTML, null, editor.status.rootKey, 0);
 		},
 
 		/**
