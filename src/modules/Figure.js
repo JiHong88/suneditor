@@ -416,7 +416,7 @@ Figure.prototype = {
 					this.controller.close();
 				} else {
 					domUtils.removeItem(this._caption);
-					this.component.select(element, this.kind);
+					this._w.setTimeout(this.component.select.bind(this.component, element, this.kind));
 				}
 
 				this._caption = !this._caption;
@@ -440,11 +440,12 @@ Figure.prototype = {
 				break;
 		}
 
-		if (!/^edit|remove|caption$/.test(command)) {
-			this.component.select(element, this.kind);
-		}
+		if (/^edit$/.test(command)) return;
 
 		this.history.push(false);
+		if (!/^remove|caption$/.test(command)) {
+			this.component.select(element, this.kind);
+		}
 	},
 
 	/**
@@ -781,8 +782,8 @@ function ContainerResizingOff() {
 	this._applySize(w, h, false, this._resize_direction);
 	if (this.isVertical) this.setTransform(this._element, w, h);
 
-	this.component.select(this._element, this.kind);
 	this.history.push(false);
+	this.component.select(this._element, this.kind);
 }
 
 function ContainerResizingESC(e) {
@@ -906,7 +907,7 @@ const CONTROLLER_BUTTONS_MAP = {
 		icon: 'modify'
 	},
 	remove: {
-		c: 'edit',
+		c: 'remove',
 		v: '',
 		l: 'remove',
 		icon: 'delete'

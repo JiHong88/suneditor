@@ -216,6 +216,7 @@ FileManager.prototype = {
 		for (let i = 0, len = this.infoList.length; i < len; i++) {
 			infoIndex[i] = this.infoList[i].index;
 		}
+
 		this.__updateTags = tags;
 
 		while (tags.length > 0) {
