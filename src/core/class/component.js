@@ -12,9 +12,10 @@ const Component = function (editor) {
 	// members
 	this.info = null;
 	this.currentTarget = null;
-	this.__globalEvents = [OnCopy_component.bind(this), OnCut_component.bind(this)];
+	this.__globalEvents = [OnCopy_component.bind(this), OnCut_component.bind(this), OnKeyDown_component.bind(this)];
 	this._bindClose_copy = null;
 	this._bindClose_cut = null;
+	this._bindClose_redo = null;
 };
 
 Component.prototype = {
@@ -51,7 +52,7 @@ Component.prototype = {
 		}
 
 		this.history.push(false);
-	
+
 		if (!notSelect) {
 			this.selection.setRange(element, 0, element, 0);
 			const fileComponentInfo = this.get(element);
@@ -180,11 +181,13 @@ Component.prototype = {
 		this.__removeGlobalEvent();
 		this._bindClose_copy = this.eventManager.addGlobalEvent('copy', this.__globalEvents[0]);
 		this._bindClose_cut = this.eventManager.addGlobalEvent('cut', this.__globalEvents[1]);
+		this._bindClose_redo = this.eventManager.addGlobalEvent('keydown', this.__globalEvents[2]);
 	},
 
 	__removeGlobalEvent: function () {
 		if (this._bindClose_copy) this._bindClose_copy = this.eventManager.removeGlobalEvent(this._bindClose_copy);
 		if (this._bindClose_cut) this._bindClose_cut = this.eventManager.removeGlobalEvent(this._bindClose_cut);
+		if (this._bindClose_redo) this._bindClose_redo = this.eventManager.removeGlobalEvent(this._bindClose_redo);
 	},
 
 	constructor: Component
@@ -212,7 +215,21 @@ function OnCut_component(e) {
 	}
 }
 
-function SetClipboardComponent (e, container, clipboardData) {
+function OnKeyDown_component(e) {
+	const keyCode = e.keyCode;
+	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
+	if (ctrl && keyCode !== 17) {
+		const info = this.editor.shortcutsKeyMap.get(keyCode + (e.shiftKey ? 1000 : 0));
+		if (info && /^(redo|undo)$/.test(info.c)) {
+			e.preventDefault();
+			e.stopPropagation();
+			this.__removeGlobalEvent();
+			this.editor.run(info.c, info.t, info.e);
+		}
+	}
+}
+
+function SetClipboardComponent(e, container, clipboardData) {
 	e.preventDefault();
 	e.stopPropagation();
 	clipboardData.setData('text/html', container.outerHTML);

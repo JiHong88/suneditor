@@ -1,5 +1,5 @@
 import CoreInjector from '../injector/_core';
-import { domUtils } from '../helper';
+import { domUtils, env } from '../helper';
 
 /**
  *
@@ -30,7 +30,7 @@ const SelectMenu = function (inst, checkList, position) {
 	this._bindClose_click = null;
 	this._closeSignal = false;
 	this.__events = [];
-	this.__eventHandlers = [OnMousedown_list, OnMouseMove_list.bind(this), OnClick_list.bind(this), OnKeyDown_refer.bind(this)];
+	this.__eventHandlers = [OnMousedown_list.bind(this.eventManager), OnMouseMove_list.bind(this), OnClick_list.bind(this), OnKeyDown_refer.bind(this)];
 	this.__globalEventHandlers = [CloseListener_key.bind(this), CloseListener_mousedown.bind(this), CloseListener_click.bind(this)];
 };
 
@@ -300,6 +300,10 @@ function OnKeyDown_refer(e) {
 function OnMousedown_list(e) {
 	e.preventDefault();
 	e.stopPropagation();
+	if (env.isGecko) {
+		const target = domUtils.getParentElement(e.target, '.se-select-item');
+		if (target) this._injectActiveEvent(target);
+	}
 }
 
 function OnMouseMove_list(e) {

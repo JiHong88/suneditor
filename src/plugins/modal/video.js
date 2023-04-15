@@ -140,8 +140,8 @@ Video.prototype = {
 		}
 
 		this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]').checked = true;
-		this._element = null;
 		this._ratio = { w: 1, h: 1 };
+		this._nonResizing = false;
 
 		if (this._resizing) {
 			this.inputX.value = this.options.get('videoWidth') === this._defaultSizeX ? '' : this.options.get('videoWidth');
@@ -167,7 +167,7 @@ Video.prototype = {
 	 */
 	ready: function (target) {
 		if (!target) return;
-		const figureInfo = this.figure.open(target, this._nonResizing);
+		const figureInfo = this.figure.open(target, this._nonResizing, false);
 
 		this._element = target;
 		this._cover = figureInfo.cover;
@@ -305,10 +305,7 @@ Video.prototype = {
 		this.figure.setAlign(oFrame, align);
 
 		// select figure
-		this._w.setTimeout(function () {
-			this.init();
-			this.component.select(oFrame, 'video')
-		}.bind(this));
+		oFrame.onload = OnloadVideo.bind(this, oFrame);
 
 		if (!isUpdate) {
 			if (this.component.insert(container, false, true)) this.fileManager.setInfo(oFrame, file);
@@ -437,7 +434,7 @@ Video.prototype = {
 		}
 
 		// size
-		this.figure.open(oFrame, true, true);
+		this.figure.open(oFrame, this._nonResizing, true);
 		const size = (oFrame.getAttribute('data-size') || oFrame.getAttribute('data-origin') || '').split(',');
 		this.applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
 
@@ -550,6 +547,11 @@ Video.prototype = {
 
 	constructor: Video
 };
+
+function OnloadVideo(element) {
+	this.init();
+	this.component.select(element, 'video');
+}
 
 function FileCheckHandler(element) {
 	this.ready(element);

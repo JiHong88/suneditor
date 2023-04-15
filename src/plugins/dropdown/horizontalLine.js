@@ -74,7 +74,7 @@ function CreateHTML(editor) {
 	for (let i = 0, len = items.length; i < len; i++) {
 		list +=
 			'<li>' +
-			'<button type="button" class="se-btn-list" data-command="horizontalLine" data-value="' +
+			'<button type="button" class="se-btn se-btn-list" data-command="horizontalLine" data-value="' +
 			items[i].class +
 			'" title="' +
 			items[i].name +

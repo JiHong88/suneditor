@@ -59,7 +59,7 @@ Menu.prototype = {
 		if (moreBtn) {
 			const target = domUtils.getParentElement(moreBtn, '.se-btn-tray').querySelector('[data-command="' + moreBtn.getAttribute('data-ref') + '"]');
 			if (target) {
-				this.editor.runTarget(target);
+				this.editor.runFromTarget(target);
 				this.dropdownOn(button);
 				return;
 			}

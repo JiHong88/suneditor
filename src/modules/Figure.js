@@ -75,6 +75,8 @@ const Figure = function (inst, controls, params) {
 	);
 };
 
+Figure.__figureControllerInst = null;
+
 /**
  * @description Create a container for the resizing component and insert the element.
  * @param {Element} element Target element
@@ -189,6 +191,7 @@ Figure.prototype = {
 		const figureInfo = Figure.GetContainer(target);
 		if (!figureInfo.container) return { container: null, cover: null };
 
+		Figure.__figureControllerInst = this;
 		const figure = (this._cover = figureInfo.cover);
 		this._container = figureInfo.container;
 		this._caption = figureInfo.caption;
@@ -273,7 +276,7 @@ Figure.prototype = {
 		this.controller.open(_figure.main, null, this.__offContainer);
 
 		// set members
-		domUtils.addClass(this._cover, 'se-figure-selected');
+		this._w.setTimeout(domUtils.addClass.bind(null, this._cover, 'se-figure-selected'));
 		this._element_w = this._resize_w = w;
 		this._element_h = this._resize_h = h;
 		this._element_l = l;
@@ -559,11 +562,13 @@ Figure.prototype = {
 		const onlyW = /^(rw|lw)$/.test(direction) && /\d+/.test(this._element.style.height);
 		const onlyH = /^(th|bh)$/.test(direction) && /\d+/.test(this._element.style.width);
 		h = h || (this.autoRatio ? this.autoRatio.current || this.autoRatio.default : h);
+		w = numbers.is(w) ? w + this.sizeUnit : w;
 
-		if (!/%$/.test(w) && !/%$/.test(h)) this._deletePercentSize();
+		if (!/%$/.test(w) && !/%$/.test(h) && !onlyW && !onlyH) this._deletePercentSize();
 
+		if (this.autoRatio) this._cover.style.width = w;
 		if (!onlyH) {
-			this._element.style.width = numbers.is(w) ? w + this.sizeUnit : w;
+			this._element.style.width = w;
 		}
 		if (!onlyW) {
 			h = numbers.is(h) ? h + this.sizeUnit : h;
@@ -586,14 +591,18 @@ Figure.prototype = {
 		this.deleteTransform();
 		this._deletePercentSize();
 
-		this._element.style.maxWidth = '';
-		this._element.style.width = '';
-		this._element.style.height = '';
-		this._cover.style.width = '';
-		this._cover.style.height = '';
+		if (this.autoRatio) {
+			this._setPercentSize('100%', this.autoRatio.default);
+		} else {
+			this._element.style.maxWidth = '';
+			this._element.style.width = '';
+			this._element.style.height = '';
+			this._cover.style.width = '';
+			this._cover.style.height = '';
+			this._element.setAttribute('data-percentage', 'auto,auto');
+		}
 
 		this.setAlign(this._element, this.align);
-		this._element.setAttribute('data-percentage', 'auto,auto');
 
 		// save current size
 		this._saveCurrentSize();
@@ -718,16 +727,17 @@ function OnResizeContainer(e) {
 	e.stopPropagation();
 	e.preventDefault();
 
-	const direction = (this._resize_direction = e.target.classList[0]);
-	this._resizeClientX = e.clientX;
-	this._resizeClientY = e.clientY;
-	this.editor.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
-	this.editor._resizeBackground.style.cursor = DIRECTION_CURSOR_MAP[direction];
-	this.editor._resizeBackground.style.display = 'block';
+	const inst = Figure.__figureControllerInst;
+	const direction = (inst._resize_direction = e.target.classList[0]);
+	inst._resizeClientX = e.clientX;
+	inst._resizeClientY = e.clientY;
+	inst.editor.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
+	inst.editor._resizeBackground.style.cursor = DIRECTION_CURSOR_MAP[direction];
+	inst.editor._resizeBackground.style.display = 'block';
 
-	this.__onContainerEvent = this.eventManager.addGlobalEvent('mousemove', this.__containerResizing);
-	this.__offContainerEvent = this.eventManager.addGlobalEvent('mouseup', this.__containerResizingOff);
-	this._displayResizeHandles(false);
+	inst.__onContainerEvent = inst.eventManager.addGlobalEvent('mousemove', inst.__containerResizing);
+	inst.__offContainerEvent = inst.eventManager.addGlobalEvent('mouseup', inst.__containerResizingOff);
+	inst._displayResizeHandles(false);
 }
 
 function ContainerResizing(e) {
@@ -818,6 +828,7 @@ function OffFigureContainer() {
 	this.editor.frameContext.get('_figure').main.style.display = 'none';
 	this.editor._figureContainer = null;
 	this.inst.init();
+	Figure.__figureControllerInst = null;
 }
 
 function OnClick_alignButton() {

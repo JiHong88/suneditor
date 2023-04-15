@@ -48,7 +48,7 @@ const Constructor = function (editorTargets, options) {
 	let exlib_katex = false;
 
 	/** --- carrier wrapper --------------------------------------------------------------- */
-	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper' + (o.get('_rtl') ? ' se-rtl' : '') });
+	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper sun-editor-common' + (o.get('_rtl') ? ' se-rtl' : '') });
 	// menuTray
 	const menuTray = domUtils.createElement('DIV', { class: 'se-menu-tray' });
 	editor_carrier_wrapper.appendChild(menuTray);
@@ -240,7 +240,7 @@ function InitOptions(options, editorTargets) {
 	/** Base */
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
 	// text style tags
-	const textTags = [
+	const textTags = converter.mergeObject(
 		{
 			bold: 'strong',
 			underline: 'u',
@@ -252,16 +252,11 @@ function InitOptions(options, editorTargets) {
 			outdent: 'outdent'
 		},
 		options.textTags || {}
-	].reduce(function (_default, _new) {
-		for (let key in _new) {
-			_default[key] = (_new[key] || '').toLowerCase();
-		}
-		return _default;
-	}, {});
+	);
 	o.set('textTags', textTags);
 	o.set('_spanStylesRegExp', new _w.RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi'));
 	o.set('_formatStylesRegExp', new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right' + (options.formatStyles ? '|' + options.formatStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi'));
-	o.set('_styleNodeMap', {
+	o.set('_defaultStyleTagMap', {
 		strong: textTags.bold,
 		b: textTags.bold,
 		u: textTags.underline,
@@ -274,20 +269,23 @@ function InitOptions(options, editorTargets) {
 		sub: textTags.subscript,
 		sup: textTags.superscript
 	});
-	o.set('_styleCommandMap', {
-		strong: 'bold',
-		b: 'bold',
-		u: 'underline',
-		ins: 'underline',
-		em: 'italic',
-		i: 'italic',
-		del: 'strike',
-		strike: 'strike',
-		s: 'strike',
-		sub: 'subscript',
-		sup: 'superscript'
-	});
-	o.set('_defaultCommand', {
+	o.set(
+		'_styleCommandMap',
+		converter.mergeObject(converter.swapKeyValue(textTags), {
+			strong: 'bold',
+			b: 'bold',
+			u: 'underline',
+			ins: 'underline',
+			em: 'italic',
+			i: 'italic',
+			del: 'strike',
+			strike: 'strike',
+			s: 'strike',
+			sub: 'subscript',
+			sup: 'superscript'
+		})
+	);
+	o.set('_defaultTagCommand', {
 		bold: textTags.bold,
 		underline: textTags.underline,
 		italic: textTags.italic,
@@ -891,8 +889,8 @@ function _defaultButtons(options, icons, lang) {
 		fullScreen: ['se-code-view-enabled se-resizing-enabled', lang.fullScreen, 'fullScreen', '', icons.expansion],
 		showBlocks: ['', lang.showBlocks, 'showBlocks', '', icons.show_blocks],
 		codeView: ['se-code-view-enabled se-resizing-enabled', lang.codeView, 'codeView', '', icons.code_view],
-		undo: ['', lang.undo, 'undo', '', icons.undo],
-		redo: ['', lang.redo, 'redo', '', icons.redo],
+		undo: ['se-resizing-enabled', lang.undo, 'undo', '', icons.undo],
+		redo: ['se-resizing-enabled', lang.redo, 'redo', '', icons.redo],
 		preview: ['se-resizing-enabled', lang.preview, 'preview', '', icons.preview],
 		print: ['se-resizing-enabled', lang.print, 'print', '', icons.print],
 		dir: ['', lang[isRTL ? 'dir_ltr' : 'dir_rtl'], 'dir', '', icons[isRTL ? 'dir_ltr' : 'dir_rtl']],

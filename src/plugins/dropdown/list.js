@@ -89,14 +89,14 @@ function CreateHTML(editor) {
 	const html =
 		'<div class="se-list-inner">' +
 		'<ul class="se-list-basic">' +
-		'<li><button type="button" class="se-btn-list se-tooltip" data-command="numbered" title="' +
+		'<li><button type="button" class="se-btn se-btn-list se-tooltip" data-command="numbered" title="' +
 		lang.orderList +
 		'" aria-label="' +
 		lang.orderList +
 		'">' +
 		editor.icons.list_number +
 		'</button></li>' +
-		'<li><button type="button" class="se-btn-list se-tooltip" data-command="bullet" title="' +
+		'<li><button type="button" class="se-btn se-btn-list se-tooltip" data-command="bullet" title="' +
 		lang.unorderList +
 		'" aria-label="' +
 		lang.unorderList +

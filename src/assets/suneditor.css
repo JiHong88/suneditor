@@ -1,7 +1,7 @@
 /* used color #000 , #fff , #CCC, #f5f5f5, #f9f9f9 */
 /* font color #333, background color: #fff */
-/* grey color #e1e1e1 , #d1d1d1 , #c1c1c1 , #b1b1b1 */
-/* blue color #eaf3ff, #d0e3ff , #80bdff , #3f9dff , #4592ff, #407dd1, #3288ff */
+/* grey color #e1e1e1, #ececec, #d1d1d1 , #c1c1c1 , #b1b1b1 */
+/* blue color #eaf3ff, #dbeaff, #c4ddff, #d0e3ff , #80bdff , #3f9dff , #4592ff, #407dd1, #3288ff, #1275ff */
 /* red color #b94a48 , #f2dede , #eed3d7, #d9534f */
 
 /** --- suneditor main */
@@ -123,6 +123,161 @@
     -moz-backface-visibility: hidden;
 }
 
+/** button */
+.sun-editor button {
+    color: #000;
+}
+
+/** --- se buttons ---------------------------------------------------------- */
+/** --- se-btn */
+.sun-editor .se-btn {
+    float: left;
+    width: 34px;
+    height: auto;
+    min-height: 34px;
+    border: 0;
+    border-radius: 2px;
+    margin: 1px;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.sun-editor .se-btn-w-auto {
+    width: auto !important;
+}
+
+.sun-editor .se-btn:enabled:hover,
+.sun-editor .se-btn:enabled:focus {
+    background-color: #e1e1e1;
+    border-color: #d1d1d1 !important;
+}
+
+.sun-editor .se-btn:enabled:active,
+.sun-editor .se-btn:enabled.__se__active {
+    background-color: #ececec;
+    border-color: #ececec !important;
+    outline: 1px solid #b1b1b1 !important;
+    -webkit-box-shadow: 0 0 0 0.3rem #ececec;
+    box-shadow: 0 0 0 0.3rem #ececec;
+    transition: box-shadow .1s ease-in-out;
+}
+
+/* se-btn.on */
+.sun-editor .se-btn:enabled.on {
+    background-color: #eaf3ff;
+    color: #4592ff;
+}
+
+.sun-editor .se-btn:enabled.on:hover,
+.sun-editor .se-btn:enabled.on:focus {
+    background-color: #d0e3ff;
+    color: #4592ff;
+}
+
+.sun-editor .se-btn:enabled.on:active,
+.sun-editor .se-btn:enabled.on.__se__active {
+    background-color: #d0e3ff;
+    color: #4592ff;
+    border-color: #d0e3ff !important;
+    outline: 1px solid #3288ff !important;
+    color: 1px solid #3288ff;
+    -webkit-box-shadow: 0 0 0 0.3rem #d0e3ff;
+    box-shadow: 0 0 0 0.3rem #d0e3ff;
+    transition: box-shadow .1s ease-in-out;
+}
+
+/* se-btn.active */
+.sun-editor .se-btn:enabled.active {
+    background-color: #dbeaff;
+    color: #4592ff;
+}
+
+.sun-editor .se-btn:enabled.active:hover,
+.sun-editor .se-btn:enabled.active:focus {
+    background-color: #c4ddff;
+    color: #1275ff;
+}
+
+.sun-editor .se-btn:enabled.active:active,
+.sun-editor .se-btn:enabled.active.__se__active {
+    background-color: #c4ddff;
+    color: #1275ff;
+    border-color: #1275ff !important;
+    outline: 1px solid #1275ff !important;
+    -webkit-box-shadow: 0 0 0 0.3rem #c4ddff;
+    box-shadow: 0 0 0 0.3rem #c4ddff;
+    transition: box-shadow .1s ease-in-out;
+}
+
+/** --- primary button */
+.sun-editor .se-btn-primary {
+    background-color: #eaf3ff;
+    border: 1px solid #1275ff;
+    border-radius: 2px;
+    outline: 0 none;
+}
+
+.sun-editor .se-btn-primary:hover,
+.sun-editor .se-btn-primary:focus {
+    background-color: #c4ddff;
+}
+
+.sun-editor .se-btn-primary:active,
+.sun-editor .se-btn-primary.__se__active {
+    background-color: #eaf3ff;
+    border-color: #eaf3ff !important;
+    outline: 1px solid #1275ff !important;
+    -webkit-box-shadow: 0 0 0 0.3rem #eaf3ff;
+    box-shadow: 0 0 0 0.3rem #eaf3ff;
+    transition: box-shadow .1s ease-in-out;
+}
+
+/** --- Input */
+.sun-editor input,
+.sun-editor select,
+.sun-editor textarea {
+    color: #000;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+}
+
+.sun-editor input:focus,
+.sun-editor select:focus,
+.sun-editor textarea:focus {
+    border: 1px solid #80bdff;
+    outline: 0;
+    -webkit-box-shadow: 0 0 0 0.2rem #d0e3ff;
+    box-shadow: 0 0 0 0.2rem #d0e3ff;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+/* disabled buttons, icon blur */
+.sun-editor .se-btn:disabled,
+.sun-editor button:disabled {
+    cursor: not-allowed;
+    background-color: inherit;
+    color: #bdbdbd;
+}
+
+/* dropdown layer - list button */
+.sun-editor .se-btn-list {
+    width: 100%;
+    height: auto;
+    min-height: 32px;
+    padding: 0 14px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: normal;
+    text-indent: 0;
+    text-decoration: none;
+    text-align: left;
+}
+
+.sun-editor .se-btn-list.default_value {
+    background-color: #f3f3f3;
+    border: 1px dotted #e1e1e1;
+}
 
 /** --- Icons ---------------------------------------------------------- */
 /* default svg */
@@ -132,8 +287,8 @@
 
 .sun-editor button>svg,
 .sun-editor .se-svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     margin: auto;
     fill: currentColor;
     display: block;
@@ -151,8 +306,8 @@
 /* se-select-btn icon */
 .sun-editor .se-btn-select>svg {
     float: right;
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
 }
 
 /* se-btn-list inner icon */
@@ -166,8 +321,8 @@
 
 /* se-line-breaker inner icon */
 .sun-editor .se-line-breaker>button>svg {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
 }
 
 /* icon class */
@@ -241,142 +396,6 @@
     height: 100%;
 }
 
-/** button */
-.sun-editor button {
-    color: #000;
-}
-
-/** --- se-btn button */
-.sun-editor .se-btn {
-    float: left;
-    width: 34px;
-    height: 34px;
-    border: 0;
-    border-radius: 2px;
-    margin: 1px;
-    padding: 0;
-    font-size: 12px;
-    line-height: 27px;
-}
-
-.sun-editor .se-btn-w-auto {
-    width: auto !important;
-}
-
-.sun-editor .se-btn:enabled:hover,
-.sun-editor .se-btn:enabled:focus {
-    background-color: #e1e1e1;
-    border-color: #d1d1d1;
-    outline: 0 none;
-}
-
-.sun-editor .se-btn:enabled:active,
-.sun-editor .se-btn:enabled.__se__active {
-    background-color: #e1e1e1;
-    border: 1px solid #b1b1b1;
-    -webkit-box-shadow: 0 0 0 0.2rem #e1e1e1;
-    box-shadow: 0 0 0 0.2rem #e1e1e1;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-    outline: 0 none;
-}
-
-/** --- primary button */
-.sun-editor .se-btn-primary {
-    background-color: #d0e3ff;
-    border: 1px solid #80bdff;
-    border-radius: 2px;
-}
-
-.sun-editor .se-btn-primary:hover,
-.sun-editor .se-btn-primary:focus {
-    background-color: #80bdff;
-    border-color: #3f9dff;
-    outline: 0 none;
-}
-
-.sun-editor .se-btn-primary:active,
-.sun-editor .se-btn-primary.__se__active {
-    color: #fff;
-    background-color: #3f9dff;
-    border-color: #4592ff;
-    -webkit-box-shadow: inset 0 3px 5px #4592ff;
-    box-shadow: inset 0 3px 5px #4592ff;
-}
-
-/** --- Input */
-.sun-editor input,
-.sun-editor select,
-.sun-editor textarea {
-    color: #000;
-    border: 1px solid #ccc;
-    border-radius: 2px;
-}
-
-.sun-editor input:focus,
-.sun-editor select:focus,
-.sun-editor textarea:focus {
-    border: 1px solid #80bdff;
-    outline: 0;
-    -webkit-box-shadow: 0 0 0 0.2rem #d0e3ff;
-    box-shadow: 0 0 0 0.2rem #d0e3ff;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-/* se-btn button active */
-.sun-editor .se-btn:enabled.active {
-    background-color: #eaf3ff;
-    color: #4592ff;
-    outline: 0 none;
-}
-
-.sun-editor .se-btn:enabled.active:hover,
-.sun-editor .se-btn:enabled.active:focus {
-    background-color: #d0e3ff;
-    color: #3288ff;
-    outline: 0 none;
-}
-
-.sun-editor .se-btn:enabled.active:active,
-.sun-editor .se-btn:enabled.active.__se__active {
-    background-color: #d0e3ff;
-    border: 1px solid #80bdff;
-    -webkit-box-shadow: 0 0 0 0.2rem #d0e3ff;
-    box-shadow: 0 0 0 0.2rem #d0e3ff;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-/* se-btn button on */
-.sun-editor .se-btn:enabled.on {
-    background-color: #eaf3ff;
-    color: #4592ff;
-    outline: 0 none;
-}
-
-.sun-editor .se-btn:enabled.on:hover,
-.sun-editor .se-btn:enabled.on:focus {
-    background-color: #d0e3ff;
-    color: #4592ff;
-    outline: 0 none;
-}
-
-.sun-editor .se-btn:enabled.on:active,
-.sun-editor .se-btn:enabled.on.__se__active {
-    background-color: #d0e3ff;
-    border: 1px solid #80bdff;
-    -webkit-box-shadow: 0 0 0 0.2rem #d0e3ff;
-    box-shadow: 0 0 0 0.2rem #d0e3ff;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-/* disabled buttons, icon blur */
-.sun-editor .se-btn:disabled,
-.sun-editor .se-btn-list:disabled,
-.sun-editor button:disabled {
-    cursor: not-allowed;
-    background-color: inherit;
-    color: #bdbdbd;
-}
-
 /** --- loading box */
 .sun-editor .se-loading-box {
     position: fixed;
@@ -419,8 +438,8 @@
 .sun-editor .se-line-breaker>button.se-btn {
     position: relative;
     display: inline-block;
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     top: -15px;
     float: none;
     left: -50%;
@@ -442,8 +461,8 @@
 .sun-editor .se-line-breaker-component {
     position: absolute;
     display: none;
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     color: #fff;
     background-color: #4592ff;
     border: 1px solid #3288ff;
@@ -612,6 +631,7 @@
 .sun-editor .se-btn-select .txt {
     flex: auto;
     text-align: left;
+    margin-right: 4px;
 }
 
 .sun-editor .se-btn-select.on .txt+svg {
@@ -702,23 +722,6 @@
     width: 100%;
 }
 
-.sun-editor .se-list-inner .se-list-basic li button.active {
-    background-color: #80bdff;
-    border: 1px solid #3f9dff;
-}
-
-.sun-editor .se-list-inner .se-list-basic li button.active:hover {
-    background-color: #3f9dff;
-    border: 1px solid #4592ff;
-}
-
-.sun-editor .se-list-inner .se-list-basic li button.active:active {
-    background-color: #4592ff;
-    border: 1px solid #407dd1;
-    -webkit-box-shadow: inset 0 3px 5px #407dd1;
-    box-shadow: inset 0 3px 5px #407dd1;
-}
-
 /* dropdown layer - checked list */
 .sun-editor .se-list-inner .se-list-checked li .se-svg {
     float: left;
@@ -735,40 +738,6 @@
 
 .sun-editor .se-list-inner .se-list-checked li.se-checked .se-svg>svg {
     display: block;
-}
-
-/* dropdown layer - list button */
-.sun-editor .se-btn-list {
-    width: 100%;
-    height: auto;
-    min-height: 32px;
-    padding: 0 14px;
-    cursor: pointer;
-    font-size: 12px;
-    line-height: normal;
-    text-indent: 0;
-    text-decoration: none;
-    text-align: left;
-}
-
-.sun-editor .se-btn-list.default_value {
-    background-color: #f3f3f3;
-    border: 1px dotted #e1e1e1;
-}
-
-.sun-editor .se-dropdown.se-select-menu-mouse-move .se-btn-list:hover,
-.sun-editor .se-dropdown.se-select-menu-mouse-move .se-btn-list:focus,
-.sun-editor .se-dropdown.se-select-menu-key-action .se-btn-list.on {
-    background-color: #e1e1e1;
-    border-color: #d1d1d1;
-    outline: 0 none;
-}
-
-.sun-editor .se-btn-list:active {
-    background-color: #d1d1d1;
-    border-color: #c1c1c1;
-    -webkit-box-shadow: inset 0 3px 5px #c1c1c1;
-    box-shadow: inset 0 3px 5px #c1c1c1;
 }
 
 /** --- dropdown layer - se-list-inner > exception */
@@ -1278,7 +1247,7 @@
 
 .sun-editor .se-modal .se-modal-inner .se-modal-content .se-btn-primary {
     display: inline-block;
-    padding: 6px 12px;
+    padding: 5px 11px;
     margin: 0 0 10px 0 !important;
     font-size: 14px;
     font-weight: normal;
@@ -1307,7 +1276,7 @@
 
 .sun-editor .se-modal .se-modal-inner .se-modal-header .se-modal-title {
     float: left;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: bold;
     margin: 0;
     padding: 0;
@@ -1362,6 +1331,7 @@
 
 .sun-editor .se-modal .se-modal-inner .se-modal-footer>div {
     float: left;
+    line-height: 1.7;
 }
 
 .sun-editor .se-modal .se-modal-inner .se-modal-footer>div>label {
@@ -1414,18 +1384,6 @@
     height: 8px;
 }
 
-/* custom."remove icon" */
-.sun-editor .se-modal .se-modal-inner .se-modal-form .se-modal-form-files .se-modal-files-edge-button:hover {
-    background-color: #f0f0f0;
-    outline: 0 none;
-}
-
-.sun-editor .se-modal .se-modal-inner .se-modal-form .se-modal-form-files .se-modal-files-edge-button:active {
-    background-color: #e9e9e9;
-    -webkit-box-shadow: inset 0 3px 5px #d6d6d6;
-    box-shadow: inset 0 3px 5px #d6d6d6;
-}
-
 /* modal - modal - input */
 .sun-editor .se-modal .se-modal-inner .se-modal-form .se-input-select {
     display: inline-block;
@@ -1476,19 +1434,6 @@
 .sun-editor .se-modal .se-modal-inner .se-modal-btn-revert {
     float: right;
     border: 1px solid #ccc;
-}
-
-.sun-editor .se-modal .se-modal-inner .se-modal-btn-revert:hover {
-    background-color: #e1e1e1;
-    border-color: #d1d1d1;
-    outline: 0 none;
-}
-
-.sun-editor .se-modal .se-modal-inner .se-modal-btn-revert:active {
-    background-color: #d1d1d1;
-    border-color: #c1c1c1;
-    -webkit-box-shadow: inset 0 3px 5px #c1c1c1;
-    box-shadow: inset 0 3px 5px #c1c1c1;
 }
 
 /* modal - inner tab */
@@ -1650,12 +1595,13 @@
 .sun-editor .sun-editor-editable .se-component figure.se-figure-selected::after {
     pointer-events: none;
 }
+
 .sun-editor .sun-editor-editable[contenteditable=true] .se-component.se-component-copy {
-    -webkit-box-shadow: 0 0 0 0.5rem #d1d1d1;
-    box-shadow: 0 0 0 0.5rem #d1d1d1;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     background-color: #d1d1d1;
     opacity: 0.3;
+    -webkit-box-shadow: 0 0 0 0.5rem #1275ff;
+    box-shadow: 0 0 0 0.5rem #1275ff;
+    transition: box-shadow .15s ease-in-out;
 }
 
 /* controller - button group */
@@ -1925,14 +1871,22 @@
 
 .sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item:hover,
 .sun-editor .se-select-menu:not(.se-select-menu-mouse-move) .se-select-item.active {
-    background-color: #e1e1e1;
+    border-color: #d0e3ff !important;
+    outline: 1px solid #3288ff !important;
+    -webkit-box-shadow: 0 0 0 0.3rem #d0e3ff;
+    box-shadow: 0 0 0 0.3rem #d0e3ff;
+    transition: box-shadow .1s ease-in-out;
 }
 
-.sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item:active {
-    background-color: #c1c1c1;
-    border-color: #b1b1b1;
-    -webkit-box-shadow: inset 0 3px 5px #b1b1b1;
-    box-shadow: inset 0 3px 5px #b1b1b1;
+.sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item:active,
+.sun-editor .se-select-menu.se-select-menu-mouse-move .se-select-item.__se__active {
+    background-color: #dbeaff;
+    border-color: #c4ddff !important;
+    outline: 1px solid #3288ff !important;
+    -webkit-box-shadow: none;
+    box-shadow: inset 0 3px 5px #80bdff;
+    box-shadow: inset 0 3px 5px #80bdff;
+    transition: background-color .1s ease-in-out, box-shadow .1s ease-in-out;
 }
 
 .sun-editor .se-modal-form-files .se-select-menu {
@@ -2295,6 +2249,7 @@
     flex: auto;
     text-align: right;
     direction: rtl;
+    margin-left: 4px;
 }
 
 /* button - se-menu-list */

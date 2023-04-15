@@ -3045,8 +3045,8 @@ Format.prototype = {
 		let appliedEl = false;
 
 		// bold, italic
-		if (this.options.get('_styleNodeMap')[nodeName] === this.options.get('_defaultCommand').bold.toLowerCase()) elStyle.fontWeight = 'bold';
-		if (this.options.get('_styleNodeMap')[nodeName] === this.options.get('_defaultCommand').italic.toLowerCase()) elStyle.fontStyle = 'italic';
+		if (this.options.get('_defaultStyleTagMap')[nodeName] === this.options.get('_defaultTagCommand').bold.toLowerCase()) elStyle.fontWeight = 'bold';
+		if (this.options.get('_defaultStyleTagMap')[nodeName] === this.options.get('_defaultTagCommand').italic.toLowerCase()) elStyle.fontStyle = 'italic';
 
 		// styles
 		const cKeys = env.getValues(childStyle);
@@ -3118,7 +3118,7 @@ Format.prototype = {
 			appliedEl = false;
 		for (let i = 0, len = children.length, c, s; i < len; i++) {
 			c = children[i];
-			if (this.options.get('_styleNodeMap')[c.nodeName.toLowerCase()]) continue;
+			if (this.options.get('_defaultStyleTagMap')[c.nodeName.toLowerCase()]) continue;
 
 			s = env.getValues(c.style);
 			if (

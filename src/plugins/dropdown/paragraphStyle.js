@@ -98,7 +98,7 @@ function CreateHTML(editor) {
 		attrs = p.class ? ' class="' + p.class + '"' : '';
 		_class = p._class;
 
-		list += '<li>' + '<button type="button" class="se-btn-list' + (_class ? ' ' + _class : '') + '" data-command="' + p.class + '" title="' + name + '" aria-label="' + name + '">' + '<div' + attrs + '>' + name + '</div>' + '</button></li>';
+		list += '<li>' + '<button type="button" class="se-btn se-btn-list' + (_class ? ' ' + _class : '') + '" data-command="' + p.class + '" title="' + name + '" aria-label="' + name + '">' + '<div' + attrs + '>' + name + '</div>' + '</button></li>';
 	}
 	list += '</ul></div>';
 

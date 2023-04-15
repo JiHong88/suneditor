@@ -124,10 +124,10 @@ export function SAVE(editor) {
 }
 
 export function FONT_STYLE(editor, command) {
-	command = editor.options.get('_defaultCommand')[command.toLowerCase()] || command;
+	command = editor.options.get('_defaultTagCommand')[command.toLowerCase()] || command;
 	let nodeName = editor.options.get('textTags')[command] || command;
 	const nodesMap = editor.status.currentNodesMap;
-	const el = nodesMap.indexOf(nodeName) > -1 ? null : domUtils.createElement(nodeName);
+	const el = nodesMap.indexOf(editor.options.get('_styleCommandMap')[nodeName]) > -1 ? null : domUtils.createElement(nodeName);
 
 	if (/^sub$/i.test(nodeName) && nodesMap.indexOf('sup') > -1) {
 		nodeName = 'sup';

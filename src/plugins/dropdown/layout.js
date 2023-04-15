@@ -51,7 +51,7 @@ function CreateHTML(editor) {
 	let list = '<div class="se-dropdown se-list-inner"><ul class="se-list-basic">';
 	for (let i = 0, len = (layoutList || []).length, t; i < len; i++) {
 		t = layoutList[i];
-		list += '<li><button type="button" class="se-btn-list" data-value="' + i + '" title="' + t.name + '" aria-label="' + t.name + '">' + t.name + '</button></li>';
+		list += '<li><button type="button" class="se-btn se-btn-list" data-value="' + i + '" title="' + t.name + '" aria-label="' + t.name + '">' + t.name + '</button></li>';
 	}
 	list += '</ul></div>';
 

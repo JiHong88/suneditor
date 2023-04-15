@@ -3,9 +3,9 @@ import { _d, _w } from './env';
 const FONT_VALUES_MAP = {
 	'xx-small': 1,
 	'x-small': 2,
-	'small': 3,
-	'medium': 4,
-	'large': 5,
+	small: 3,
+	medium: 4,
+	large: 5,
 	'x-large': 6,
 	'xx-large': 7
 };
@@ -50,7 +50,7 @@ export function entityToHTML(content) {
 }
 
 /**
- * 
+ *
  * @param {"em"|"rem"|"%"|"pt"|"px"} to Size units to be converted
  * @param {string} size siSize to convert with units (ex: "15rem")
  * @returns {string}
@@ -85,12 +85,43 @@ export function fontSize(to, size) {
 
 /**
  * @description Convert the node list to an array. If not, returns an empty array.
- * @param {NodeList|null} nodeList 
+ * @param {NodeList|null} nodeList
  * @returns Array
  */
 export function nodeListToArray(nodeList) {
 	if (!nodeList) return [];
 	return _w.Array.prototype.slice.call(nodeList);
+}
+
+/**
+ * @description Returns a new object with keys and values swapped.
+ * @param {Object} obj object
+ * @returns {Object}
+ */
+export function swapKeyValue(obj) {
+	const swappedObj = {};
+
+	for (const key in obj) {
+		if (obj.hasOwnProperty(key)) {
+			swappedObj[obj[key]] = key;
+		}
+	}
+
+	return swappedObj;
+}
+
+/**
+ * @description Returns a new object with merge "a" and "b"
+ * @param {Object} obj object
+ * @returns {Object}
+ */
+export function mergeObject(a, b) {
+	return [a, b].reduce(function (_default, _new) {
+		for (let key in _new) {
+			_default[key] = (_new[key] || '').toLowerCase();
+		}
+		return _default;
+	}, {});
 }
 
 /**
@@ -183,7 +214,7 @@ export function _setIframeCssTags(linkNames, frameHeight) {
 	if (linkNames) {
 		for (let f = 0, len = linkNames.length, path; f < len; f++) {
 			path = [];
-	
+
 			if (/(^https?:\/\/)|(^data:text\/css,)/.test(linkNames[f])) {
 				path.push(linkNames[f]);
 			} else {
@@ -193,9 +224,9 @@ export function _setIframeCssTags(linkNames, frameHeight) {
 					if (styleTag) path.push(styleTag[0]);
 				}
 			}
-	
+
 			if (!path || path.length === 0) throw '[SUNEDITOR.constructor.iframe.fail] The suneditor CSS files installation path could not be automatically detected. Please set the option property "iframe_cssFileName" before creating editor instances.';
-	
+
 			for (let i = 0, len = path.length; i < len; i++) {
 				tagString += '<link href="' + path[i] + '" rel="stylesheet">';
 			}
@@ -210,6 +241,8 @@ const converter = {
 	entityToHTML: entityToHTML,
 	fontSize: fontSize,
 	nodeListToArray: nodeListToArray,
+	swapKeyValue: swapKeyValue,
+	mergeObject: mergeObject,
 	createElementWhitelist: createElementWhitelist,
 	createElementBlacklist: createElementBlacklist,
 	_setDefaultOptionStyle: _setDefaultOptionStyle,

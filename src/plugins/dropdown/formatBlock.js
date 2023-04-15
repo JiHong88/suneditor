@@ -122,7 +122,7 @@ function CreateHTML(editor) {
 			attrs = className ? ' class="' + className + '"' : '';
 		}
 
-		list += '<li>' + '<button type="button" class="se-btn-list" data-command="' + command + '" data-value="' + tagName + '" data-class="' + className + '" title="' + name + '" aria-label="' + name + '">' + '<' + tagName + attrs + '>' + name + '</' + tagName + '>' + '</button></li>';
+		list += '<li>' + '<button type="button" class="se-btn se-btn-list" data-command="' + command + '" data-value="' + tagName + '" data-class="' + className + '" title="' + name + '" aria-label="' + name + '">' + '<' + tagName + attrs + '>' + name + '</' + tagName + '>' + '</button></li>';
 	}
 	list += '</ul></div>';
 

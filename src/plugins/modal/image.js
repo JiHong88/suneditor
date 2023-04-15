@@ -572,7 +572,6 @@ Image_.prototype = {
 	_updateSrc: function (src, element, file) {
 		element.src = src;
 		this._w.setTimeout(this.fileManager.setInfo.bind(this.fileManager, element, file));
-		this.init();
 		this.component.select(element, 'image');
 	},
 
@@ -771,7 +770,6 @@ function OnloadImg(oImg, _svgDefaultSize, container) {
 	// svg exception handling
 	if (oImg.offsetWidth === 0) this.applySize(_svgDefaultSize, '');
 	if (this.options.get('mediaAutoSelect')) {
-		this.init();
 		this.component.select(oImg, 'image');
 	} else {
 		const line = this.format.addLine(container, null);

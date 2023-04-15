@@ -418,7 +418,7 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Execute command of command button(All Buttons except dropdown and modal)
+	 * @description Execute default command of command button
 	 * (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
 	 * @param {string} command Property of command button (data-value)
 	 */
@@ -488,7 +488,7 @@ Editor.prototype = {
 	 * @description Execute "editor.run" with command button.
 	 * @param {Element} target Command button
 	 */
-	runTarget: function (target) {
+	runFromTarget: function (target) {
 		if (!(target = domUtils.getCommandTarget(target))) return;
 
 		const command = target.getAttribute('data-command');

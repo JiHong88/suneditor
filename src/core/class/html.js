@@ -29,7 +29,7 @@ const HTML = function (editor) {
 	// set disallow text nodes
 	const options = this.options;
 	const _w = this._w;
-	const disallowStyleNodes = _w.Object.keys(options.get('_styleNodeMap'));
+	const disallowStyleNodes = _w.Object.keys(options.get('_defaultStyleTagMap'));
 	const allowStyleNodes = !options.get('elementWhitelist')
 		? []
 		: options
@@ -103,7 +103,9 @@ HTML.prototype = {
 	 * @returns {string}
 	 */
 	clean: function (html, requireFormat, whitelist, blacklist) {
-		html = DeleteDisallowedTags(this.editor._parser.parseFromString(html, 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, true)).replace(/<br\/?>$/i, '');
+		html = DeleteDisallowedTags(this.editor._parser.parseFromString(html, 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp)
+			.replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, true))
+			.replace(/<br\/?>$/i, '');
 		html = this.compress(html);
 		const dom = this._d.createRange().createContextualFragment(html, true);
 
@@ -602,7 +604,7 @@ HTML.prototype = {
 		let endNextEl = null;
 		if (isStartEdge) {
 			startPrevEl = this.format.getLine(range.startContainer);
-			prevContainer = startPrevEl.previousElementSibling;
+			prevContainer = startPrevEl ? startPrevEl.previousElementSibling : null;
 			startPrevEl = startPrevEl ? prevContainer : startPrevEl;
 		}
 		if (isEndEdge) {
@@ -746,8 +748,8 @@ HTML.prototype = {
 			container = endUl.previousSibling;
 			offset = container.textContent.length;
 		} else {
-			container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : (range.endContainer || range.startContainer);
-			offset = (!isStartEdge && !isEndEdge) ? offset : isEndEdge ? container.textContent.length : 0;
+			container = endCon && endCon.parentNode ? endCon : startCon && startCon.parentNode ? startCon : range.endContainer || range.startContainer;
+			offset = !isStartEdge && !isEndEdge ? offset : isEndEdge ? container.textContent.length : 0;
 		}
 
 		if (!this.format.getLine(container) && !(startCon && startCon.parentNode)) {
@@ -1198,7 +1200,7 @@ HTML.prototype = {
 	_tagConvertor: function (html) {
 		if (!this._disallowedStyleNodesRegExp) return html;
 
-		const ec = this.options.get('_styleNodeMap');
+		const ec = this.options.get('_defaultStyleTagMap');
 		return html.replace(this._disallowedStyleNodesRegExp, function (m, t, n, p) {
 			return t + (typeof ec[n] === 'string' ? ec[n] : n) + (p ? ' ' + p : '');
 		});
@@ -1472,7 +1474,7 @@ function CleanElements(lowLevelCheck, m, t) {
 			const hsize = sv[0].match(/height\s?:\s?(\d+)(px|%)/);
 			const w_ = wsize && wsize[1] && wsize[2] ? wsize[1] + wsize[2] : 'auto';
 			const h_ = hsize && hsize[1] && hsize[2] ? hsize[1] + hsize[2] : 'auto';
-			v.push('style="width:'+ w_ + '; height:'+ h_ + ';"');
+			v.push('style="width:' + w_ + '; height:' + h_ + ';"');
 		}
 	}
 

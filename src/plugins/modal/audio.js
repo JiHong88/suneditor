@@ -87,8 +87,6 @@ Audio_.prototype = {
 			this.audioUrlFile.removeAttribute('disabled');
 			this.preview.style.textDecoration = '';
 		}
-		this._element = null;
-		this.controller.close();
 	},
 
 	/**
@@ -129,8 +127,8 @@ Audio_.prototype = {
 	ready: function (target) {
 		domUtils.addClass(target, 'active');
 		domUtils.addClass(target.parentElement, 'se-figure-selected');
-		this.controller.open(target);
 		this._element = target;
+		this.controller.open(target, null, UnSelect.bind(null, target));
 	},
 
 	/**
@@ -145,6 +143,7 @@ Audio_.prototype = {
 		const emptyDiv = container.parentNode;
 		domUtils.removeItem(container);
 		this.init();
+		this.controller.close();
 
 		if (emptyDiv !== this.editor.frameContext.get('wysiwyg')) {
 			this.node.removeAllParents(
@@ -333,6 +332,13 @@ function FileCheckHandler(element) {
 	return element;
 }
 
+function UnSelect(target) {
+	if (target) {
+		domUtils.removeClass(target, 'active');
+		domUtils.removeClass(target.parentElement, 'se-figure-selected');
+	}
+}
+
 function UploadCallBack(info, xmlHttp) {
 	if (typeof this.events.audioUploadHandler === 'function') {
 		this.events.audioUploadHandler(xmlHttp, info);
@@ -430,13 +436,13 @@ function CreateHTML_controller(editor) {
 		'<div class="se-arrow se-arrow-up"></div>' +
 		'<div class="link-content">' +
 		'<div class="se-btn-group">' +
-		'<button type="button" data-command="update" tabindex="-1" class="se-tooltip">' +
+		'<button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">' +
 		icons.edit +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
 		lang.edit +
 		'</span></span>' +
 		'</button>' +
-		'<button type="button" data-command="delete" tabindex="-1" class="se-tooltip">' +
+		'<button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">' +
 		icons.delete +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
 		lang.remove +

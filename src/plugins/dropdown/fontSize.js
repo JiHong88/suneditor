@@ -81,10 +81,10 @@ function CreateHTML(editor) {
 	const lang = editor.lang;
 	const sizeList = !options.get('fontSize') ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : options.get('fontSize');
 
-	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="default_value se-btn-list" title="' + lang.default + '" aria-label="' + lang.default + '">(' + lang.default + ')</button></li>';
+	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="se-btn se-btn-list default_value" title="' + lang.default + '" aria-label="' + lang.default + '">(' + lang.default + ')</button></li>';
 	for (let i = 0, unit = options.get('fontSizeUnit'), len = sizeList.length, size; i < len; i++) {
 		size = sizeList[i];
-		list += '<li><button type="button" class="se-btn-list" data-value="' + size + unit + '" title="' + size + unit + '" aria-label="' + size + unit + '" style="font-size:' + size + unit + ';">' + size + '</button></li>';
+		list += '<li><button type="button" class="se-btn se-btn-list" data-value="' + size + unit + '" title="' + size + unit + '" aria-label="' + size + unit + '" style="font-size:' + size + unit + ';">' + size + '</button></li>';
 	}
 	list += '</ul></div>';
 

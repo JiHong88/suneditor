@@ -92,7 +92,7 @@ function CreateHTML(editor) {
 	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="default_value se-btn-list" title="' + lang.default + '" aria-label="' + lang.default + '">(' + lang.default + ')</button></li>';
 	for (let i = 0, len = sizeList.length, size; i < len; i++) {
 		size = sizeList[i];
-		list += '<li><button type="button" class="se-btn-list" data-command="' + size.value + '" title="' + size.text + '" aria-label="' + size.text + '">' + size.text + '</button></li>';
+		list += '<li><button type="button" class="se-btn se-btn-list" data-command="' + size.value + '" title="' + size.text + '" aria-label="' + size.text + '">' + size.text + '</button></li>';
 	}
 	list += '</ul></div>';
 

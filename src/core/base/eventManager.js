@@ -15,7 +15,7 @@ const FRONT_ZEROWIDTH = new _w.RegExp(unicode.zeroWidthSpace + '+', '');
 const EventManager = function (editor) {
 	CoreInjector.call(this, editor);
 	this._events = [];
-	this._onButtonsCheck = new _w.RegExp('^(' + _w.Object.keys(editor.options.get('_styleNodeMap')).join('|') + ')$', 'i');
+	this._onButtonsCheck = new _w.RegExp('^(' + _w.Object.keys(editor.options.get('_defaultStyleTagMap')).join('|') + ')$', 'i');
 	this._onShortcutKey = false;
 	this._IEisComposing = false; // In IE, there is no 'e.isComposing' in the key-up event.
 	this._balloonDelay = null;
@@ -199,6 +199,22 @@ EventManager.prototype = {
 
 		/**  Displays the current node structure to statusbar */
 		if (this.editor.frameOptions.get('statusbar_showPathLabel') && this.editor.frameContext.get('navigation')) this.editor.frameContext.get('navigation').textContent = this.status.currentNodes.join(' > ');
+	},
+
+	/**
+	 * @description Gives an active effect when the mouse down event is blocked. (Used when "env.isGecko" is true)
+	 * @param {Element} target Target element
+	 * @private
+	 */
+	_injectActiveEvent: function (target) {
+		domUtils.addClass(target, '__se__active');
+		this.__geckoActiveEvent = this.addGlobalEvent(
+			'mouseup',
+			function (t) {
+				domUtils.removeClass(t, '__se__active');
+				this.__geckoActiveEvent = this.removeGlobalEvent(this.__geckoActiveEvent);
+			}.bind(this, target)
+		);
 	},
 
 	/**
@@ -801,14 +817,7 @@ function ButtonsHandler(e) {
 		if (!this.editor.frameContext.get('isCodeView')) {
 			e.preventDefault();
 			if (env.isGecko && command) {
-				domUtils.addClass(target, '__se__active');
-				this.__geckoActiveEvent = this.addGlobalEvent(
-					'mouseup',
-					function (t) {
-						domUtils.removeClass(t, '__se__active');
-						this.__geckoActiveEvent = this.removeGlobalEvent(this.__geckoActiveEvent);
-					}.bind(this, target)
-				);
+				this._injectActiveEvent(target);
 			}
 		}
 
@@ -839,7 +848,7 @@ function OnClick_menuTray(e) {
 }
 
 function OnClick_toolbar(e) {
-	this.editor.runTarget(e.target);
+	this.editor.runFromTarget(e.target);
 }
 
 function OnMouseDown_wysiwyg(rootKey, e) {
