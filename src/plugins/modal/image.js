@@ -25,7 +25,7 @@ const Image_ = function (editor) {
 	if (showAlign) modalEl.querySelector('.se-figure-align').style.display = 'none';
 
 	// modules
-	this.anchor = new ModalAnchorEditor(this, modalEl);
+	this.anchor = new ModalAnchorEditor(this, modalEl, { textToDisplay: false, title: true });
 	this.modal = new Modal(this, modalEl);
 	this.figure = new Figure(this, figureControls, {
 		sizeUnit: options.get('_imageSizeUnit')
@@ -130,7 +130,6 @@ Image_.prototype = {
 		if (this.modal.isUpdate) {
 			this._update(this.inputX.value, this.inputY.value);
 			this.history.push(false);
-			this.figure.open(this._element);
 		}
 
 		if (this.imgInputFile && this.imgInputFile.files.length > 0) {
@@ -389,11 +388,8 @@ Image_.prototype = {
 				this._linkElement = anchor.cloneNode(false);
 				cover.insertBefore(this._setAnchor(imageEl, this._linkElement), this._caption);
 				isNewAnchor = this._element;
-			} else {
-				this._linkElement.setAttribute('data-image-link', 'image');
 			}
 		} else if (this._linkElement !== null) {
-			imageEl.setAttribute('data-image-link', '');
 			if (cover.contains(this._linkElement)) {
 				const newEl = imageEl.cloneNode(true);
 				cover.removeChild(this._linkElement);
@@ -474,7 +470,7 @@ Image_.prototype = {
 				if (/auto|%$/.test(width) || /auto|%$/.test(height)) {
 					this.figure.deleteTransform(imageEl);
 				} else {
-					this.figure.setTransform(imageEl, width, height);
+					this.figure.setTransform(imageEl, width, height, 0);
 				}
 			}
 		}
@@ -537,7 +533,6 @@ Image_.prototype = {
 		let oImg = domUtils.createElement('IMG');
 		oImg.src = src;
 		oImg.alt = alt;
-		oImg.setAttribute('data-rotate', '0');
 		anchor = this._setAnchor(oImg, anchor ? anchor.cloneNode(false) : null);
 
 		if (this._resizing) {
@@ -571,7 +566,7 @@ Image_.prototype = {
 
 	_updateSrc: function (src, element, file) {
 		element.src = src;
-		this._w.setTimeout(this.fileManager.setInfo.bind(this.fileManager, element, file));
+		this.fileManager.setInfo(element, file);
 		this.component.select(element, 'image');
 	},
 
@@ -655,8 +650,6 @@ Image_.prototype = {
 
 	_setAnchor: function (imgTag, anchor) {
 		if (anchor) {
-			anchor.setAttribute('data-image-link', 'image');
-			imgTag.setAttribute('data-image-link', anchor.href);
 			anchor.appendChild(imgTag);
 			return anchor;
 		}
@@ -775,6 +768,8 @@ function OnloadImg(oImg, _svgDefaultSize, container) {
 		const line = this.format.addLine(container, null);
 		if (line) this.setRange(line, 0, line, 0);
 	}
+
+	delete oImg.onload;
 }
 
 function CreateHTML_modal(editor) {

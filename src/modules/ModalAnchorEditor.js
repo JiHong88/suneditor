@@ -2,12 +2,12 @@ import EditorInjector from '../injector';
 import SelectMenu from './SelectMenu';
 import { domUtils } from '../helper';
 
-const ModalAnchorEditor = function (inst, modalForm) {
+const ModalAnchorEditor = function (inst, modalForm, params) {
 	// plugin bisic properties
 	EditorInjector.call(this, inst.editor);
 
 	// create HTML
-	const forms = CreatetModalForm(inst.editor);
+	const forms = CreatetModalForm(inst.editor, params);
 
 	// members
 	this.kink = inst.constructor.key;
@@ -339,9 +339,12 @@ function OnChange_downloadCheck(e) {
 	}
 }
 
-function CreatetModalForm(editor) {
+function CreatetModalForm(editor, params) {
 	const lang = editor.lang;
 	const icons = editor.icons;
+	const textDisplayShow = params.textToDisplay ? '' : ' style="display: none;"';
+	const titleShow = params.title ? '' : ' style="display: none;"';
+
 	let html =
 		'<div class="se-modal-body">' +
 		'<div class="se-modal-form">' +
@@ -369,12 +372,20 @@ function CreatetModalForm(editor) {
 		'</span>' +
 		'<pre class="se-link-preview"></pre>' +
 		'</div>' +
-		'<label>' +
+		'<label' +
+		textDisplayShow +
+		'>' +
 		lang.link_modal_text +
-		'</label><input class="se-input-form _se_display_text" type="text" />' +
-		'<label>' +
+		'</label><input class="se-input-form _se_display_text" type="text"' +
+		textDisplayShow +
+		' />' +
+		'<label' +
+		titleShow +
+		'>' +
 		lang.title +
-		'</label><input class="se-input-form _se_title" type="text" />' +
+		'</label><input class="se-input-form _se_title" type="text"' +
+		titleShow +
+		' />' +
 		'</div>' +
 		'<div class="se-modal-form-footer">' +
 		'<label><input type="checkbox" class="se-modal-btn-check _se_anchor_check" />&nbsp;' +

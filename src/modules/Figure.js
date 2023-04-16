@@ -197,7 +197,7 @@ Figure.prototype = {
 		this._caption = figureInfo.caption;
 		this._element = target;
 		this.align = (this._container.className.match(/(?:^|\s)__se__float-(none|left|center|right)(?:$|\s)/) || [])[1] || target.style.float || 'none';
-		this.isVertical = /^(90|270)$/.test(Math.abs(target.getAttribute('data-rotate')).toString());
+		this.isVertical = /^(90|270)$/.test(Math.abs(GetRotateValue(target).r).toString());
 
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
 		const offset = this.offset.get(target);
@@ -381,9 +381,9 @@ Figure.prototype = {
 				this._setPercentSize(value * 100, numbers.get(percentY, 0) === null || !/%$/.test(percentY) ? '' : percentY);
 				break;
 			case 'mirror':
-				const r = element.getAttribute('data-rotate') || '0';
-				let x = element.getAttribute('data-rotateX') || '';
-				let y = element.getAttribute('data-rotateY') || '';
+				const info = GetRotateValue(element);
+				let x = info.x;
+				let y = info.y;
 
 				if ((value === 'h' && !this.isVertical) || (value === 'v' && this.isVertical)) {
 					y = y ? '' : '180';
@@ -391,19 +391,10 @@ Figure.prototype = {
 					x = x ? '' : '180';
 				}
 
-				element.setAttribute('data-rotateX', x);
-				element.setAttribute('data-rotateY', y);
-
-				this._setRotate(element, r, x, y);
+				this._setRotate(element, info.r, x, y);
 				break;
 			case 'rotate':
-				const slope = element.getAttribute('data-rotate') * 1 + value * 1;
-				const deg = this._w.Math.abs(slope) >= 360 ? 0 : slope;
-
-				element.setAttribute('data-rotate', deg);
-				this.isVertical = /^(90|270)$/.test(this._w.Math.abs(deg).toString());
-
-				this.setTransform(element, null, null);
+				this.setTransform(element, null, null, value);
 				break;
 			case 'caption':
 				if (!this._caption) {
@@ -429,7 +420,7 @@ Figure.prototype = {
 					if (/%$/.test(element.style.width) || /auto/.test(element.style.height)) {
 						this.deleteTransform();
 					} else {
-						this.setTransform(element, element.style.width, element.style.height);
+						this.setTransform(element, element.style.width, element.style.height, 0);
 					}
 				}
 				break;
@@ -466,9 +457,6 @@ Figure.prototype = {
 		element.style.maxWidth = '';
 		element.style.transform = '';
 		element.style.transformOrigin = '';
-		element.setAttribute('data-rotate', '');
-		element.setAttribute('data-rotateX', '');
-		element.setAttribute('data-rotateY', '');
 
 		this._deleteCaptionPosition(element);
 		this._applySize(numbers.get(size[0]) || 'auto', numbers.get(size[1]) || '', true, '');
@@ -480,12 +468,15 @@ Figure.prototype = {
 	 * @param {Number|null} width Element's width size
 	 * @param {Number|null} height Element's height size
 	 */
-	setTransform: function (element, width, height) {
+	setTransform: function (element, width, height, deg) {
+		const info = GetRotateValue(element);
+		const slope = info.r + (deg || 0) * 1;
+		deg = this._w.Math.abs(slope) >= 360 ? 0 : slope;
+		const isVertical = (this.isVertical = /^(90|270)$/.test(this._w.Math.abs(deg).toString()));
+
 		width = numbers.get(width, 0);
 		height = numbers.get(height, 0);
 		let percentage = element.getAttribute('data-percentage');
-		const isVertical = this.isVertical;
-		const deg = element.getAttribute('data-rotate') * 1;
 		let transOrigin = '';
 
 		if (percentage && !isVertical) {
@@ -516,7 +507,7 @@ Figure.prototype = {
 		}
 
 		element.style.transformOrigin = transOrigin;
-		this._setRotate(element, deg.toString(), element.getAttribute('data-rotateX') || '', element.getAttribute('data-rotateY') || '');
+		this._setRotate(element, deg, info.x, info.y);
 
 		if (isVertical) element.style.maxWidth = 'none';
 		else element.style.maxWidth = '';
@@ -525,13 +516,13 @@ Figure.prototype = {
 	},
 
 	_setRotate: function (element, r, x, y) {
-		let width = (element.offsetWidth - element.offsetHeight) * (/-/.test(r) ? 1 : -1);
+		let width = (element.offsetWidth - element.offsetHeight) * (/^-/.test(r) ? 1 : -1);
 		let translate = '';
 
 		if (/[1-9]/.test(r) && (x || y)) {
 			translate = x ? 'Y' : 'X';
 
-			switch (r) {
+			switch (r + '') {
 				case '90':
 					translate = x && y ? 'X' : y ? translate : '';
 					break;
@@ -722,6 +713,16 @@ Figure.prototype = {
 	constructor: Figure
 };
 
+function GetRotateValue(element) {
+	const transform = element.style.transform;
+	if (!transform) return { r: 0, x: '', y: '' };
+	return {
+		r: ((transform.match(/rotate\(([-0-9]+)deg\)/) || [])[1] || 0) * 1,
+		x: (transform.match(/rotateX\(([-0-9]+)deg\)/) || [])[1] || '',
+		y: (transform.match(/rotateY\(([-0-9]+)deg\)/) || [])[1] || ''
+	};
+}
+
 const DIRECTION_CURSOR_MAP = { tl: 'nw-resize', tr: 'ne-resize', bl: 'sw-resize', br: 'se-resize', lw: 'w-resize', th: 'n-resize', rw: 'e-resize', bh: 's-resize' };
 function OnResizeContainer(e) {
 	e.stopPropagation();
@@ -792,7 +793,7 @@ function ContainerResizingOff() {
 	}
 
 	this._applySize(w, h, false, this._resize_direction);
-	if (this.isVertical) this.setTransform(this._element, w, h);
+	if (this.isVertical) this.setTransform(this._element, w, h, 0);
 
 	this.history.push(false);
 	this.component.select(this._element, this.kind);
@@ -840,92 +841,74 @@ function CreateHTML_resizeDot() {
 	return domUtils.createElement('DIV', { class: 'se-controller se-resizing-container', style: 'display: none;' }, html);
 }
 
-const CONTROLLER_BUTTONS_MAP = {
-	percent_100: {
-		c: 'resize_percent',
-		v: '1',
-		l: 'resize100',
-		text: '<span>100%</span>'
-	},
-	percent_75: {
-		c: 'resize_percent',
-		v: '0.75',
-		l: 'resize75',
-		text: '<span>75%</span>'
-	},
-	percent_50: {
-		c: 'resize_percent',
-		v: '0.5',
-		l: 'resize50',
-		text: '<span>50%</span>'
-	},
-	percent_25: {
-		c: 'resize_percent',
-		v: '0.25',
-		l: 'resize25',
-		text: '<span>25%</span>'
-	},
-	auto: {
-		c: 'auto',
-		v: '',
-		l: 'autoSize',
-		icon: 'auto_size'
-	},
-	rotate_l: {
-		c: 'rotate',
-		v: '-90',
-		l: 'rotateLeft',
-		icon: 'rotate_left'
-	},
-	rotate_r: {
-		c: 'rotate',
-		v: '90',
-		l: 'rotateRight',
-		icon: 'rotate_right'
-	},
-	mirror_h: {
-		c: 'mirror',
-		v: 'h',
-		l: 'mirrorHorizontal',
-		icon: 'mirror_horizontal'
-	},
-	mirror_v: {
-		c: 'mirror',
-		v: 'v',
-		l: 'mirrorVertical',
-		icon: 'mirror_vertical'
-	},
-	align: {
-		c: 'onalign',
-		v: '',
-		l: 'align',
-		icon: 'align_justify'
-	},
-	caption: {
-		c: 'caption',
-		v: '',
-		l: 'caption',
-		icon: 'caption'
-	},
-	revert: {
-		c: 'revert',
-		v: '',
-		l: 'revertButton',
-		icon: 'revert'
-	},
-	edit: {
-		c: 'edit',
-		v: '',
-		l: 'edit',
-		icon: 'modify'
-	},
-	remove: {
-		c: 'remove',
-		v: '',
-		l: 'remove',
-		icon: 'delete'
+function GET_CONTROLLER_BUTTONS(group) {
+	const g = group.split('_');
+	const command = g[0];
+	const value = g[1];
+	let c, v, l, t, i;
+
+	switch (command) {
+		case 'percent':
+			c = 'resize_percent';
+			v = value / 100;
+			l = 'resize' + value;
+			t = '<span>' + value + '%</span>';
+			break;
+		case 'auto':
+			c = 'auto';
+			l = 'autoSize';
+			i = 'auto_size';
+			break;
+		case 'rotate':
+			c = 'rotate';
+			v = numbers.get(value);
+			l = v < 0 ? 'rotateLeft' : 'rotateRight';
+			i = v < 0 ? 'rotate_left' : 'rotate_right';
+			break;
+		case 'mirror':
+			c = 'mirror';
+			v = value;
+			l = value === 'h' ? 'mirrorHorizontal' : 'mirrorVertical';
+			i = value === 'h' ? 'mirror_horizontal' : 'mirror_vertical';
+			break;
+		case 'align':
+			c = 'onalign';
+			l = 'align';
+			i = 'align_justify';
+			break;
+		case 'caption':
+			c = 'caption';
+			l = 'caption';
+			i = 'caption';
+			break;
+		case 'revert':
+			c = 'revert';
+			l = 'revertButton';
+			i = 'revert';
+			break;
+		case 'edit':
+			c = 'edit';
+			l = 'edit';
+			i = 'modify';
+			break;
+		case 'remove':
+			c = 'remove';
+			l = 'remove';
+			i = 'delete';
+			break;
 	}
-};
+
+	if (!c) return null;
+
+	return {
+		c: c,
+		v: v,
+		l: l,
+		t: t,
+		i: i
+	};
+}
+
 function CreateHTML_controller(editor, controls) {
 	const lang = editor.lang;
 	const icons = editor.icons;
@@ -934,19 +917,10 @@ function CreateHTML_controller(editor, controls) {
 		group = controls[i];
 		html += '<div class="se-btn-group">';
 		for (let j = 0, len = group.length, m; j < len; j++) {
-			m = CONTROLLER_BUTTONS_MAP[group[j]];
+			m = GET_CONTROLLER_BUTTONS(group[j]);
+			if (!m) continue;
 			html +=
-				'<button type="button" data-command="' +
-				m.c +
-				'" data-value="' +
-				m.v +
-				'" class="' +
-				(m.text ? 'se-btn-w-auto ' : '') +
-				'se-btn se-tooltip">' +
-				(icons[m.icon] || m.text || '!') +
-				'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-				(lang[m.l] || m.l) +
-				'</span></span></button>';
+				'<button type="button" data-command="' + m.c + '" data-value="' + m.v + '" class="' + (m.t ? 'se-btn-w-auto ' : '') + 'se-btn se-tooltip">' + (icons[m.i] || m.t || '!') + '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (lang[m.l] || m.l) + '</span></span></button>';
 		}
 		html += '</div>';
 	}

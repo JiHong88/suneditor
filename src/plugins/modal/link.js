@@ -13,7 +13,7 @@ const Link = function (editor) {
 	const controllerEl = CreateHTML_controller(editor);
 
 	// modules
-	this.anchor = new ModalAnchorEditor(this, modalEl);
+	this.anchor = new ModalAnchorEditor(this, modalEl, { textToDisplay: true, title: true });
 	this.modal = new Modal(this, modalEl);
 	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
 
@@ -29,7 +29,7 @@ Link.prototype = {
 	 * @override core
 	 */
 	active: function (element) {
-		if (element && domUtils.isAnchor(element) && element.getAttribute('data-image-link') === null) {
+		if (element && domUtils.isAnchor(element)) {
 			const tempLink = this.controller.form.querySelector('a');
 			tempLink.href = element.href;
 			tempLink.title = element.textContent;

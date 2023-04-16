@@ -316,7 +316,7 @@ Video.prototype = {
 			return;
 		}
 
-		if (this._resizing && changeSize && this.figure.isVertical) this.figure.setTransform(oFrame, width, height);
+		if (this._resizing && changeSize && this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
 		this.history.push(false);
 	},
 

@@ -13,7 +13,7 @@ const DEFAULT_FORMAT_BR_LINE = 'PRE';
 const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|DETAILS';
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
-const DEFAULT_DATA_ATTRS = 'data-index|data-file-size|data-file-name|data-origin|data-size|data-image-link|data-rotate|data-proportion|data-percentage|data-font-size|data-embed|data-exp|data-duple';
+const DEFAULT_DATA_ATTRS = 'data-index|data-file-size|data-file-name|data-origin|data-size|data-proportion|data-percentage|data-font-size|data-embed|data-exp|data-duple';
 
 /**
  * @description document create
@@ -445,7 +445,7 @@ function InitOptions(options, editorTargets) {
 		options.imageControls || !o.get('imageResizing')
 			? [['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']]
 			: [
-					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
+					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_-90', 'rotate_+90'],
 					['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']
 			  ]
 	);
@@ -476,7 +476,7 @@ function InitOptions(options, editorTargets) {
 		options.videoControls || !o.get('videoResizing')
 			? [['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']]
 			: [
-					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
+					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_-90', 'rotate_+90'],
 					['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']
 			  ]
 	);
