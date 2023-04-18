@@ -632,7 +632,7 @@ Editor.prototype = {
 					const currentNode = range.commonAncestorContainer.children[range.startOffset];
 					if (!this.format.isLine(currentNode) && !this.component.is(currentNode)) {
 						const br = domUtils.createElement('BR');
-						const format = domUtils.createElement(this.options.get('defaultLineTag'), null, br);
+						const format = domUtils.createElement(this.options.get('defaultLine'), null, br);
 						this.frameContext.get('wysiwyg').insertBefore(format, currentNode);
 						this.selection.setRange(br, 0, br, 0);
 						return;
@@ -1038,7 +1038,7 @@ Editor.prototype = {
 	 * @private
 	 */
 	_initWysiwygArea: function (e, value) {
-		e.get('wysiwyg').innerHTML = this.html.clean(typeof value === 'string' ? value : e.get('originElement').value, true, null, null) || '<' + this.options.get('defaultLineTag') + '><br></' + this.options.get('defaultLineTag') + '>';
+		e.get('wysiwyg').innerHTML = this.html.clean(typeof value === 'string' ? value : e.get('originElement').value, true, null, null) || '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
 		if (e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
 	},
 

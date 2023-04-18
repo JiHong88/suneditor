@@ -318,10 +318,10 @@ function InitOptions(options, editorTargets) {
 
 	/** whitelist, blacklist */
 	// default line
-	o.set('defaultLineTag', typeof options.defaultLineTag === 'string' && options.defaultLineTag.length > 0 ? options.defaultLineTag : 'p');
+	o.set('defaultLine', typeof options.defaultLine === 'string' && options.defaultLine.length > 0 ? options.defaultLine : 'p');
 	// element
 	o.set('elementWhitelist', (typeof options.elementWhitelist === 'string' ? options.elementWhitelist : '').toLowerCase());
-	o.set('elementBlacklist', _createBlacklist((typeof options.elementBlacklist === 'string' ? options.elementBlacklist : '').toLowerCase(), o.get('defaultLineTag')));
+	o.set('elementBlacklist', _createBlacklist((typeof options.elementBlacklist === 'string' ? options.elementBlacklist : '').toLowerCase(), o.get('defaultLine')));
 	// attribute
 	o.set('attributeWhitelist', !options.attributeWhitelist || typeof options.attributeWhitelist !== 'object' ? null : options.attributeWhitelist);
 	o.set('attributeBlacklist', !options.attributeBlacklist || typeof options.attributeBlacklist !== 'object' ? null : options.attributeBlacklist);
@@ -822,18 +822,18 @@ function _checkKatexMath(katex) {
 /**
  * @description create blacklist
  * @param {string} blacklist blacklist
- * @param {string} defaultLineTag options.get('defaultLineTag')
+ * @param {string} defaultLine options.get('defaultLine')
  * @returns {string}
  */
-function _createBlacklist(blacklist, defaultLineTag) {
-	defaultLineTag = defaultLineTag.toLowerCase();
+function _createBlacklist(blacklist, defaultLine) {
+	defaultLine = defaultLine.toLowerCase();
 	return blacklist
 		.split('|')
 		.filter(function (v) {
-			if (v !== defaultLineTag) {
+			if (v !== defaultLine) {
 				return true;
 			} else {
-				console.warn('[SUNEDITOR.constructor.createBlacklist.warn] defaultLineTag("<' + defaultLineTag + '>") cannot be included in the blacklist and will be removed.');
+				console.warn('[SUNEDITOR.constructor.createBlacklist.warn] defaultLine("<' + defaultLine + '>") cannot be included in the blacklist and will be removed.');
 				return false;
 			}
 		})

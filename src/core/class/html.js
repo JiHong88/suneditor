@@ -371,7 +371,7 @@ HTML.prototype = {
 							if (this.format.isLine(container)) {
 								container.innerHTML = '<br>';
 							} else if (this.format.isBlock(container)) {
-								container.innerHTML = '<' + this.options.get('defaultLineTag') + '><br></' + this.options.get('defaultLineTag') + '>';
+								container.innerHTML = '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
 							}
 						}
 
@@ -392,7 +392,7 @@ HTML.prototype = {
 								afterNode = null;
 							}
 						} else if (domUtils.isWysiwygFrame(container) && !this.format.isLine(oNode)) {
-							parentNode = container.appendChild(domUtils.createElement(this.options.get('defaultLineTag')));
+							parentNode = container.appendChild(domUtils.createElement(this.options.get('defaultLine')));
 							afterNode = null;
 						} else {
 							afterNode = isFormats ? endCon : container === prevContainer ? container.nextSibling : container;
@@ -445,7 +445,7 @@ HTML.prototype = {
 				}
 
 				if (domUtils.isWysiwygFrame(parentNode) && (oNode.nodeType === 3 || domUtils.isBreak(oNode))) {
-					const fNode = domUtils.createElement(this.options.get('defaultLineTag'), null, oNode);
+					const fNode = domUtils.createElement(this.options.get('defaultLine'), null, oNode);
 					oNode = fNode;
 				}
 			}
@@ -1017,7 +1017,7 @@ HTML.prototype = {
 	 * @private
 	 */
 	_makeLine: function (node, requireFormat) {
-		const defaultLineTag = this.options.get('defaultLineTag');
+		const defaultLine = this.options.get('defaultLine');
 		// element
 		if (node.nodeType === 1) {
 			if (DisallowedElements(node)) return '';
@@ -1034,7 +1034,7 @@ HTML.prototype = {
 			if (!requireFormat || this.format.isLine(node) || this.format.isBlock(node) || this.component.is(node) || domUtils.isMedia(node) || (domUtils.isAnchor(node) && domUtils.isMedia(node.firstElementChild))) {
 				return domUtils.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML;
 			} else {
-				return '<' + defaultLineTag + '>' + (domUtils.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML) + '</' + defaultLineTag + '>';
+				return '<' + defaultLine + '>' + (domUtils.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML) + '</' + defaultLine + '>';
 			}
 		}
 		// text
@@ -1044,7 +1044,7 @@ HTML.prototype = {
 			let html = '';
 			for (let i = 0, tLen = textArray.length, text; i < tLen; i++) {
 				text = textArray[i].trim();
-				if (text.length > 0) html += '<' + defaultLineTag + '>' + converter.htmlToEntity(text) + '</' + defaultLineTag + '>';
+				if (text.length > 0) html += '<' + defaultLine + '>' + converter.htmlToEntity(text) + '</' + defaultLine + '>';
 			}
 			return html;
 		}
@@ -1219,7 +1219,7 @@ HTML.prototype = {
 			if (n.nodeType === 8) {
 				value += '<!-- ' + n.textContent + ' -->';
 			} else if (!this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !/meta/i.test(n.nodeName) && !/(\s|^)__se__tag(\s|$)/.test(n.className)) {
-				if (!f) f = domUtils.createElement(this.options.get('defaultLineTag'));
+				if (!f) f = domUtils.createElement(this.options.get('defaultLine'));
 				f.appendChild(n);
 				i--;
 				len--;

@@ -115,7 +115,7 @@ Selection.prototype = {
 	getRangeAndAddLine: function (range, container) {
 		if (this._isNone(range)) {
 			const wysiwyg = this.editor.frameContext.get('wysiwyg');
-			const op = domUtils.createElement(this.options.get('defaultLineTag'), null, '<br>');
+			const op = domUtils.createElement(this.options.get('defaultLine'), null, '<br>');
 			wysiwyg.insertBefore(op, container && container !== wysiwyg ? container.nextElementSibling : wysiwyg.firstElementChild);
 			this.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
 			range = this.status._range;
@@ -231,7 +231,7 @@ Selection.prototype = {
 		let focusEl = null;
 		if (!firstFormat) {
 			focusEl = domUtils.createElement('BR');
-			firstFormat = domUtils.createElement(this.options.get('defaultLineTag'), null, focusEl);
+			firstFormat = domUtils.createElement(this.options.get('defaultLine'), null, focusEl);
 			wysiwyg.appendChild(firstFormat);
 		} else {
 			focusEl = firstFormat.firstChild;
@@ -352,7 +352,7 @@ Selection.prototype = {
 
 				let format = this.format.getLine(tempCon, null);
 				if (format === this.format.getBlock(format, null)) {
-					format = domUtils.createElement(domUtils.getParentElement(tempCon, domUtils.isTableCell) ? 'DIV' : this.options.get('defaultLineTag'));
+					format = domUtils.createElement(domUtils.getParentElement(tempCon, domUtils.isTableCell) ? 'DIV' : this.options.get('defaultLine'));
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
 				}
@@ -391,7 +391,7 @@ Selection.prototype = {
 
 				let format = this.format.getLine(tempCon, null);
 				if (format === this.format.getBlock(format, null)) {
-					format = domUtils.createElement(domUtils.isTableCell(format) ? 'DIV' : this.options.get('defaultLineTag'));
+					format = domUtils.createElement(domUtils.isTableCell(format) ? 'DIV' : this.options.get('defaultLine'));
 					tempCon.parentNode.insertBefore(format, tempCon);
 					format.appendChild(tempCon);
 				}
