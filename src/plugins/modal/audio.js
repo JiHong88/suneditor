@@ -305,7 +305,7 @@ function FileCheckHandler(element) {
 	const figure = Figure.CreateContainer(element);
 
 	try {
-		if (domUtils.getParentElement(prevElement, domUtils.isNotCheckingNode)) {
+		if (domUtils.getParentElement(prevElement, domUtils.isExcludeFormat)) {
 			prevElement.parentNode.replaceChild(figure.container, prevElement);
 		} else if (domUtils.isListCell(existElement)) {
 			const refer = domUtils.getParentElement(prevElement, function (current) {

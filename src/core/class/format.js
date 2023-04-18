@@ -190,7 +190,7 @@ Format.prototype = {
 		if (!this.isBrLine(element) && this.isBrLine(currentFormatEl || element.parentNode)) {
 			oFormat = domUtils.createElement('BR');
 		} else {
-			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isLine(currentFormatEl) && !this.isBlock(currentFormatEl) && !this.isBrLine(currentFormatEl) ? currentFormatEl.nodeName : this.options.get('defaultLineTag');
+			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isLine(currentFormatEl) && !this.isBlock(currentFormatEl) && !this.isBrLine(currentFormatEl) ? currentFormatEl.nodeName : this.options.get('defaultLine');
 			oFormat = domUtils.createElement(oFormatName, null, '<br>');
 			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && this.isLine(currentFormatEl))) {
 				domUtils.copyTagAttributes(oFormat, lineNode || currentFormatEl, ['id']);
@@ -534,7 +534,7 @@ Format.prototype = {
 						}
 					} else {
 						const inner = insNode;
-						insNode = domUtils.createElement(remove ? inner.nodeName : domUtils.isList(rangeElement.parentNode) || domUtils.isListCell(rangeElement.parentNode) ? 'LI' : domUtils.isTableCell(rangeElement.parentNode) ? 'DIV' : this.options.get('defaultLineTag'));
+						insNode = domUtils.createElement(remove ? inner.nodeName : domUtils.isList(rangeElement.parentNode) || domUtils.isListCell(rangeElement.parentNode) ? 'LI' : domUtils.isTableCell(rangeElement.parentNode) ? 'DIV' : this.options.get('defaultLine'));
 						const isCell = domUtils.isListCell(insNode);
 						const innerChildren = inner.childNodes;
 						while (innerChildren[0]) {
@@ -1358,7 +1358,14 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isLine: function (element) {
-		return element && element.nodeType === 1 && (this._formatLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__line_.+(\\s|$)|(\\s|^)__se__format__br_line_.+(\\s|$)')) && !this.component.is(element) && !domUtils.isWysiwygFrame(element);
+		return (
+			element &&
+			element.nodeType === 1 &&
+			(this._formatLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__line_.+(\\s|$)|(\\s|^)__se__format__br_line_.+(\\s|$)')) &&
+			!domUtils.isExcludeFormat(element) &&
+			!this.component.is(element) &&
+			!domUtils.isWysiwygFrame(element)
+		);
 	},
 
 	/**
@@ -1370,7 +1377,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isBrLine: function (element) {
-		return element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line_.+(\\s|$)')) && !this.component.is(element) && !domUtils.isWysiwygFrame(element);
+		return element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line_.+(\\s|$)')) && !domUtils.isExcludeFormat(element) && !this.component.is(element) && !domUtils.isWysiwygFrame(element);
 	},
 
 	/**

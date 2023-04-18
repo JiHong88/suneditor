@@ -870,12 +870,12 @@ export function isAllowClassName(v) {
 }
 
 /**
- * @description It is judged whether it is the not checking node. (class="katex", "__se__tag")
+ * @description It is judged whether it is the not checking node. (class="katex", "__se__exclude-format")
  * @param {Node} element The node to check
  * @returns {boolean}
  */
-export function isNotCheckingNode(element) {
-	return element && /(\s|^)(katex|__se__tag)(\s|$)/.test(element.className);
+export function isExcludeFormat(element) {
+	return element && /(\s|^)(katex|__se__exclude-format)(\s|$)/.test(element.className);
 }
 
 /**
@@ -946,7 +946,7 @@ const domUtils = {
 	isUneditable: isUneditable,
 	isImportantDisabled: isImportantDisabled,
 	isAllowClassName: isAllowClassName,
-	isNotCheckingNode: isNotCheckingNode,
+	isExcludeFormat: isExcludeFormat,
 	getScrollParent: getScrollParent
 };
 

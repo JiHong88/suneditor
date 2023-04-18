@@ -383,16 +383,16 @@ EventManager.prototype = {
 			return;
 		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-embed') === 'true') {
 			let el = commonCon.nextElementSibling;
-			if (!this.format.isLine(el)) el = this.format.addLine(commonCon, this.options.get('defaultLineTag'));
+			if (!this.format.isLine(el)) el = this.format.addLine(commonCon, this.options.get('defaultLine'));
 			this.selection.setRange(el.firstChild, 0, el.firstChild, 0);
 			return;
 		}
 
 		if ((this.format.isBlock(startCon) || domUtils.isWysiwygFrame(startCon)) && (this.component.is(startCon.children[range.startOffset]) || this.component.is(startCon.children[range.startOffset - 1]))) return;
-		if (domUtils.getParentElement(commonCon, domUtils.isNotCheckingNode)) return null;
+		if (domUtils.getParentElement(commonCon, domUtils.isExcludeFormat)) return null;
 
 		if (rangeEl) {
-			format = domUtils.createElement(formatName || this.options.get('defaultLineTag'));
+			format = domUtils.createElement(formatName || this.options.get('defaultLine'));
 			format.innerHTML = rangeEl.innerHTML;
 			if (format.childNodes.length === 0) format.innerHTML = unicode.zeroWidthSpace;
 
@@ -423,7 +423,7 @@ EventManager.prototype = {
 			return;
 		}
 
-		this.editor.execCommand('formatBlock', false, formatName || this.options.get('defaultLineTag'));
+		this.editor.execCommand('formatBlock', false, formatName || this.options.get('defaultLine'));
 		focusNode = domUtils.getEdgeChildNodes(commonCon, commonCon);
 		focusNode = focusNode ? focusNode.ec : commonCon;
 
@@ -929,7 +929,7 @@ function OnClick_wysiwyg(rootKey, e) {
 				const oLi = domUtils.createElement('LI', null, selectionNode);
 				rangeEl.insertBefore(oLi, prevLi);
 				this.editor.focus();
-			} else if (!domUtils.isWysiwygFrame(selectionNode) && !this.component.is(selectionNode) && (!domUtils.isTable(selectionNode) || domUtils.isTableCell(selectionNode)) && this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLineTag')) !== null) {
+			} else if (!domUtils.isWysiwygFrame(selectionNode) && !this.component.is(selectionNode) && (!domUtils.isTable(selectionNode) || domUtils.isTableCell(selectionNode)) && this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLine')) !== null) {
 				e.preventDefault();
 				this.editor.focus();
 			} else {
@@ -1031,7 +1031,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 				break;
 			}
 
-			if (!this.format.isLine(formatEl) && !this.editor.frameContext.get('wysiwyg').firstElementChild && !this.component.is(selectionNode) && this._setDefaultLine(this.options.get('defaultLineTag')) !== null) {
+			if (!this.format.isLine(formatEl) && !this.editor.frameContext.get('wysiwyg').firstElementChild && !this.component.is(selectionNode) && this._setDefaultLine(this.options.get('defaultLine')) !== null) {
 				e.preventDefault();
 				e.stopPropagation();
 				return false;
@@ -1049,14 +1049,14 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 					e.preventDefault();
 					e.stopPropagation();
 
-					if (formatEl.nodeName.toUpperCase() === this.options.get('defaultLineTag').toUpperCase()) {
+					if (formatEl.nodeName.toUpperCase() === this.options.get('defaultLine').toUpperCase()) {
 						formatEl.innerHTML = '<br>';
 						const attrs = formatEl.attributes;
 						while (attrs[0]) {
 							formatEl.removeAttribute(attrs[0].name);
 						}
 					} else {
-						formatEl.parentElement.replaceChild(domUtils.createElement(this.options.get('defaultLineTag'), null, '<br>'), formatEl);
+						formatEl.parentElement.replaceChild(domUtils.createElement(this.options.get('defaultLine'), null, '<br>'), formatEl);
 					}
 
 					this.editor._nativeFocus();
@@ -1472,7 +1472,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 				if (formatEndEdge && (/^H[1-6]$/i.test(formatEl.nodeName) || /^HR$/i.test(formatEl.nodeName))) {
 					e.preventDefault();
 					let temp = null;
-					const newFormat = this.format.addLine(formatEl, this.options.get('defaultLineTag'));
+					const newFormat = this.format.addLine(formatEl, this.options.get('defaultLine'));
 
 					if (formatEndEdge && formatEndEdge.length > 0) {
 						temp = formatEndEdge.pop();
@@ -1521,7 +1521,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 								? rangeEl.nextElementSibling.nodeName
 								: this.format.isLine(rangeEl.previousElementSibling) && !this.format.isBlock(rangeEl.previousElementSibling)
 								? rangeEl.previousElementSibling.nodeName
-								: this.options.get('defaultLineTag');
+								: this.options.get('defaultLine');
 
 							newEl = domUtils.createElement(newFormat);
 							const edge = this.format.removeBlock(rangeEl, [formatEl], null, true, true);
@@ -1696,7 +1696,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 				if (domUtils.isListCell(container.parentNode)) {
 					newEl = domUtils.createElement('BR');
 				} else {
-					newEl = domUtils.createElement(this.format.isLine(sibling) && !this.format.isBlock(sibling) ? sibling.nodeName : this.options.get('defaultLineTag'), null, '<br>');
+					newEl = domUtils.createElement(this.format.isLine(sibling) && !this.format.isBlock(sibling) ? sibling.nodeName : this.options.get('defaultLine'), null, '<br>');
 				}
 
 				container.parentNode.insertBefore(newEl, container);
@@ -1756,7 +1756,7 @@ function OnKeyUp_wysiwyg(rootKey, e) {
 
 		selectionNode.innerHTML = '';
 
-		const oFormatTag = domUtils.createElement(this.format.isLine(this.status.currentNodes[0]) ? this.status.currentNodes[0] : this.options.get('defaultLineTag'), null, '<br>');
+		const oFormatTag = domUtils.createElement(this.format.isLine(this.status.currentNodes[0]) ? this.status.currentNodes[0] : this.options.get('defaultLine'), null, '<br>');
 		selectionNode.appendChild(oFormatTag);
 		this.selection.setRange(oFormatTag, 0, oFormatTag, 0);
 		this.applyTagEffect();
@@ -1780,7 +1780,7 @@ function OnKeyUp_wysiwyg(rootKey, e) {
 		this._formatAttrsTemp = null;
 	}
 
-	if (!formatEl && range.collapsed && !this.component.is(selectionNode) && !domUtils.isList(selectionNode) && this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLineTag')) !== null) {
+	if (!formatEl && range.collapsed && !this.component.is(selectionNode) && !domUtils.isList(selectionNode) && this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLine')) !== null) {
 		selectionNode = this.selection.getNode();
 	}
 
@@ -1983,7 +1983,7 @@ function DisplayLineBreak(dir, e) {
 
 	dir = !dir ? this._lineBreakDir : dir;
 	const isList = domUtils.isListCell(component.parentNode);
-	const format = domUtils.createElement(isList ? 'BR' : domUtils.isTableCell(component.parentNode) ? 'DIV' : this.options.get('defaultLineTag'));
+	const format = domUtils.createElement(isList ? 'BR' : domUtils.isTableCell(component.parentNode) ? 'DIV' : this.options.get('defaultLine'));
 	if (!isList) format.innerHTML = '<br>';
 
 	if (this.editor.frameOptions.get('charCounter_type') === 'byte-html' && !this.char.check(format.outerHTML)) return;

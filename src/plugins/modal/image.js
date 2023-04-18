@@ -403,7 +403,7 @@ Image_.prototype = {
 			imageEl = this._element;
 			existElement = this.format.isBlock(imageEl.parentNode) || domUtils.isWysiwygFrame(imageEl.parentNode) ? imageEl : domUtils.isAnchor(imageEl.parentNode) ? imageEl.parentNode : this.format.getLine(imageEl) || imageEl;
 
-			if (domUtils.getParentElement(this._element, domUtils.isNotCheckingNode)) {
+			if (domUtils.getParentElement(this._element, domUtils.isExcludeFormat)) {
 				existElement = isNewAnchor ? anchor : this._element;
 				existElement.parentNode.replaceChild(container, existElement);
 			} else if (domUtils.isListCell(existElement)) {

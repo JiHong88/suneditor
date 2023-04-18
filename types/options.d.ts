@@ -14,7 +14,7 @@ export interface SunEditorOptions {
 	/**
 	 * Specifies default tag name of the editor. (default: "p")
 	 */
-	defaultLineTag?: string;
+	defaultLine?: string;
 	/**
 	 * You can change the tag of the default text button.   default: { bold: 'STRONG', underline: 'U', italic: 'EM', strike: 'DEL', sub: 'SUB', sup: 'SUP' }
 	 */

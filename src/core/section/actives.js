@@ -39,7 +39,7 @@ export function SELECT_ALL(editor) {
 	if (domUtils.isMedia(first)) {
 		const info = editor.component.get(first);
 		const br = domUtils.createElement('BR');
-		const format = domUtils.createElement(editor.options.get('defaultLineTag'), null, br);
+		const format = domUtils.createElement(editor.options.get('defaultLine'), null, br);
 		first = info ? info.container : first;
 		first.parentNode.insertBefore(format, first);
 		first = br;
@@ -47,7 +47,7 @@ export function SELECT_ALL(editor) {
 
 	if (domUtils.isMedia(last)) {
 		last = domUtils.createElement('BR');
-		selectArea.appendChild(domUtils.createElement(editor.options.get('defaultLineTag'), null, last));
+		selectArea.appendChild(domUtils.createElement(editor.options.get('defaultLine'), null, last));
 	}
 
 	editor.toolbar._showBalloon(editor.selection.setRange(first, 0, last, last.textContent.length));

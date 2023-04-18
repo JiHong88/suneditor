@@ -474,7 +474,7 @@ Viewer.prototype = {
 				}
 			}
 		} else {
-			this.editor.frameContext.get('wysiwyg').innerHTML = code_html.length > 0 ? this.html.clean(code_html, true, null, null) : '<' + this.options.get('defaultLineTag') + '><br></' + this.options.get('defaultLineTag') + '>';
+			this.editor.frameContext.get('wysiwyg').innerHTML = code_html.length > 0 ? this.html.clean(code_html, true, null, null) : '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
 		}
 	},
 
