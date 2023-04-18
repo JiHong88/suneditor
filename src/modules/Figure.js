@@ -45,6 +45,7 @@ const Figure = function (inst, controls, params) {
 		right: this.icons.align_right,
 		center: this.icons.align_center
 	};
+	this.__preventSizechange = false;
 	this.__offset = {};
 	this.__offContainer = OffFigureContainer.bind(this);
 	this.__containerResizing = ContainerResizing.bind(this);
@@ -207,7 +208,7 @@ Figure.prototype = {
 		const t = offset.top - (this.options.get('iframe') ? frameOffset.top : 0);
 		const l = offset.left - (this.options.get('iframe') ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - this.editor.frameContext.get('wysiwygFrame').scrollLeft;
 		const originSize = (target.getAttribute('data-origin') || '').split(',');
-		const dataSize = (target.getAttribute('data-size') || '').split(',');
+		const dataSize = (target.getAttribute('data-se-size') || '').split(',');
 		const ratio = Figure.GetRatio(dataSize[0] || numbers.get(target.style.width, 2) || w, dataSize[1] || numbers.get(target.style.height, 2) || h, this.sizeUnit);
 		const targetInfo = {
 			container: figureInfo.container,
@@ -371,7 +372,7 @@ Figure.prototype = {
 				this._setAutoSize();
 				break;
 			case 'resize_percent':
-				let percentY = this.getSize(element);
+				let percentY = this.getSize(element).h;
 				if (this.isVertical) {
 					const percentage = element.getAttribute('data-percentage');
 					if (percentage) percentY = percentage.split(',')[1];
@@ -451,7 +452,7 @@ Figure.prototype = {
 	deleteTransform: function (element) {
 		if (!element) element = this._element;
 
-		const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
+		const size = (element.getAttribute('data-se-size') || element.getAttribute('data-origin') || '').split(',');
 		this.isVertical = false;
 
 		element.style.maxWidth = '';
@@ -469,50 +470,55 @@ Figure.prototype = {
 	 * @param {Number|null} height Element's height size
 	 */
 	setTransform: function (element, width, height, deg) {
-		const info = GetRotateValue(element);
-		const slope = info.r + (deg || 0) * 1;
-		deg = this._w.Math.abs(slope) >= 360 ? 0 : slope;
-		const isVertical = (this.isVertical = /^(90|270)$/.test(this._w.Math.abs(deg).toString()));
-
-		width = numbers.get(width, 0);
-		height = numbers.get(height, 0);
-		let percentage = element.getAttribute('data-percentage');
-		let transOrigin = '';
-
-		if (percentage && !isVertical) {
-			percentage = percentage.split(',');
-			if (percentage[0] === 'auto' && percentage[1] === 'auto') {
-				this._setAutoSize();
+		try {
+			this.__preventSizechange = true;
+			const info = GetRotateValue(element);
+			const slope = info.r + (deg || 0) * 1;
+			deg = this._w.Math.abs(slope) >= 360 ? 0 : slope;
+			const isVertical = (this.isVertical = /^(90|270)$/.test(this._w.Math.abs(deg).toString()));
+	
+			width = numbers.get(width, 0);
+			height = numbers.get(height, 0);
+			let percentage = element.getAttribute('data-percentage');
+			let transOrigin = '';
+	
+			if (percentage && !isVertical) {
+				percentage = percentage.split(',');
+				if (percentage[0] === 'auto' && percentage[1] === 'auto') {
+					this._setAutoSize();
+				} else {
+					this._setPercentSize(percentage[0], percentage[1]);
+				}
 			} else {
-				this._setPercentSize(percentage[0], percentage[1]);
+				const figureInfo = Figure.GetContainer(element);
+				const offsetW = width || element.offsetWidth;
+				const offsetH = height || element.offsetHeight;
+				const w = (isVertical ? offsetH : offsetW) + 'px';
+				const h = (isVertical ? offsetW : offsetH) + 'px';
+	
+				this._deletePercentSize();
+				this._applySize(offsetW + 'px', offsetH + 'px', true, '');
+	
+				figureInfo.cover.style.width = w;
+				figureInfo.cover.style.height = figureInfo.caption ? '' : h;
+	
+				if (isVertical) {
+					let transW = offsetW / 2 + 'px ' + offsetW / 2 + 'px 0';
+					let transH = offsetH / 2 + 'px ' + offsetH / 2 + 'px 0';
+					transOrigin = deg === 90 || deg === -270 ? transH : transW;
+				}
 			}
-		} else {
-			const figureInfo = Figure.GetContainer(element);
-			const offsetW = width || element.offsetWidth;
-			const offsetH = height || element.offsetHeight;
-			const w = (isVertical ? offsetH : offsetW) + 'px';
-			const h = (isVertical ? offsetW : offsetH) + 'px';
-
-			this._deletePercentSize();
-			this._applySize(offsetW + 'px', offsetH + 'px', true, '');
-
-			figureInfo.cover.style.width = w;
-			figureInfo.cover.style.height = figureInfo.caption ? '' : h;
-
-			if (isVertical) {
-				let transW = offsetW / 2 + 'px ' + offsetW / 2 + 'px 0';
-				let transH = offsetH / 2 + 'px ' + offsetH / 2 + 'px 0';
-				transOrigin = deg === 90 || deg === -270 ? transH : transW;
-			}
+	
+			element.style.transformOrigin = transOrigin;
+			this._setRotate(element, deg, info.x, info.y);
+	
+			if (isVertical) element.style.maxWidth = 'none';
+			else element.style.maxWidth = '';
+	
+			this._setCaptionPosition(element);
+		} finally {
+			this.__preventSizechange = false;
 		}
-
-		element.style.transformOrigin = transOrigin;
-		this._setRotate(element, deg, info.x, info.y);
-
-		if (isVertical) element.style.maxWidth = 'none';
-		else element.style.maxWidth = '';
-
-		this._setCaptionPosition(element);
 	},
 
 	_setRotate: function (element, r, x, y) {
@@ -563,7 +569,7 @@ Figure.prototype = {
 		}
 		if (!onlyW) {
 			h = numbers.is(h) ? h + this.sizeUnit : h;
-			this._element.style.height = this.autoRatio ? '100%' : h;
+			this._element.style.height = (this.autoRatio && !this.isVertical) ? '100%' : h;
 			if (this.autoRatio) {
 				this._cover.style.paddingBottom = h;
 				this._cover.style.height = h;
@@ -662,8 +668,9 @@ Figure.prototype = {
 	},
 
 	_saveCurrentSize: function () {
+		if (this.__preventSizechange) return;
 		const size = this.getSize(this._element);
-		this._element.setAttribute('data-size', (size.w || 'auto') + ',' + (size.h || 'auto'));
+		this._element.setAttribute('data-se-size', (size.w || 'auto') + ',' + (size.h || 'auto'));
 		// if (contextPlugin._videoRatio) contextPlugin._videoRatio = size.y; @todo
 	},
 

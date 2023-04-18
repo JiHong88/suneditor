@@ -119,13 +119,16 @@ Video.prototype = {
 	modalAction: function () {
 		this._align = this.modal.form.querySelector('input[name="suneditor_video_radio"]:checked').value;
 
+		let result = false;
 		if (this.videoInputFile && this.videoInputFile.files.length > 0) {
-			return this._submitFile(this.videoInputFile.files);
+			result = this._submitFile(this.videoInputFile.files);
 		} else if (this.videoUrlFile && this._linkValue.length > 0) {
-			return this._submitURL(this._linkValue);
+			result = this._submitURL(this._linkValue);
 		}
 
-		return false;
+		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, 'video'));
+
+		return result;
 	},
 
 	/**
@@ -305,7 +308,7 @@ Video.prototype = {
 		this.figure.setAlign(oFrame, align);
 
 		// select figure
-		oFrame.onload = OnloadVideo.bind(this, oFrame);
+		// oFrame.onload = OnloadVideo.bind(this, oFrame);
 
 		if (!isUpdate) {
 			if (this.component.insert(container, false, true)) this.fileManager.setInfo(oFrame, file);
@@ -435,7 +438,7 @@ Video.prototype = {
 
 		// size
 		this.figure.open(oFrame, this._nonResizing, true);
-		const size = (oFrame.getAttribute('data-size') || oFrame.getAttribute('data-origin') || '').split(',');
+		const size = (oFrame.getAttribute('data-se-size') || oFrame.getAttribute('data-origin') || '').split(',');
 		this.applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
 
 		// align

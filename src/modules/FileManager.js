@@ -73,8 +73,8 @@ FileManager.prototype = {
 
 		if (!file) {
 			file = {
-				name: element.getAttribute('data-file-name') || (typeof element.src === 'string' ? element.src.split('/').pop() : ''),
-				size: element.getAttribute('data-file-size') || 0
+				name: element.getAttribute('data-se-file-name') || (typeof element.src === 'string' ? element.src.split('/').pop() : ''),
+				size: element.getAttribute('data-se-file-size') || 0
 			};
 		}
 
@@ -84,8 +84,8 @@ FileManager.prototype = {
 			dataIndex = this.infoIndex++;
 
 			element.setAttribute('data-se-index', dataIndex);
-			element.setAttribute('data-file-name', file.name);
-			element.setAttribute('data-file-size', file.size);
+			element.setAttribute('data-se-file-name', file.name);
+			element.setAttribute('data-se-file-size', file.size);
 
 			info = {
 				src: element.src,
@@ -116,8 +116,8 @@ FileManager.prototype = {
 			}
 
 			info.src = element.src;
-			info.name = element.getAttribute('data-file-name');
-			info.size = element.getAttribute('data-file-size') * 1;
+			info.name = element.getAttribute('data-se-file-name');
+			info.size = element.getAttribute('data-se-file-size') * 1;
 		}
 
 		// method bind
@@ -138,12 +138,12 @@ FileManager.prototype = {
 				const w = element.naturalWidth || size.w;
 				const h = element.naturalHeight || size.h;
 				element.setAttribute('data-origin', w + ',' + h);
-				if (!element.getAttribute('data-size')) element.setAttribute('data-size', w + ',' + h);
+				if (!element.getAttribute('data-se-size')) element.setAttribute('data-se-size', w + ',' + h);
 			}
 
 			if (!element.style.width) {
 				try {
-					const size = (element.getAttribute('data-size') || element.getAttribute('data-origin') || '').split(',');
+					const size = (element.getAttribute('data-se-size') || element.getAttribute('data-origin') || '').split(',');
 					this.figure.__fileManagerInfo = true;
 					this.inst.ready(element, null);
 					this.figure.setSize(numbers.get(size[0]) ? size[0] : 'auto', numbers.get(size[1]) ? size[1] : 'auto');

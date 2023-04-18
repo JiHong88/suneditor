@@ -639,8 +639,8 @@ Image_.prototype = {
 	_onRenderBase64: function (update, filesStack, updateElement, anchor, width, height, align, alt) {
 		for (let i = 0, len = filesStack.length; i < len; i++) {
 			if (update) {
-				this._element.setAttribute('data-file-name', filesStack[i].file.name);
-				this._element.setAttribute('data-file-size', filesStack[i].file.size);
+				this._element.setAttribute('data-se-file-name', filesStack[i].file.name);
+				this._element.setAttribute('data-se-file-size', filesStack[i].file.size);
 				this._updateSrc(filesStack[i].result, updateElement, filesStack[i].file);
 			} else {
 				this.create(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt);
