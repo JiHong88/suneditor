@@ -67,7 +67,7 @@ FileManager.prototype = {
 	 * @param {Object|null} file
 	 */
 	setInfo: function (element, file) {
-		let dataIndex = element.getAttribute('data-index');
+		let dataIndex = element.getAttribute('data-se-index');
 		let info = null;
 		let state = '';
 
@@ -83,7 +83,7 @@ FileManager.prototype = {
 			state = 'create';
 			dataIndex = this.infoIndex++;
 
-			element.setAttribute('data-index', dataIndex);
+			element.setAttribute('data-se-index', dataIndex);
 			element.setAttribute('data-file-name', file.name);
 			element.setAttribute('data-file-size', file.size);
 
@@ -124,7 +124,7 @@ FileManager.prototype = {
 		info.element = element;
 		info.delete = function (element) {
 			this.inst.destroy.call(this.inst, element);
-			this._deleteInfo(element.getAttribute('data-index') * 1);
+			this._deleteInfo(element.getAttribute('data-se-index') * 1);
 		}.bind(this, element);
 		info.select = function (element) {
 			element.scrollIntoView(true);
@@ -194,7 +194,7 @@ FileManager.prototype = {
 					info = this.infoList[i];
 					if (
 						tags.filter(function (t) {
-							return info.src === t.src && info.index.toString() === t.getAttribute('data-index');
+							return info.src === t.src && info.index.toString() === t.getAttribute('data-se-index');
 						}).length === 0
 					) {
 						infoUpdate = true;
@@ -233,12 +233,12 @@ FileManager.prototype = {
 				} finally {
 					if (this.figure) this.figure.__fileManagerInfo = false;
 				}
-			} else if (!tag.getAttribute('data-index') || infoIndex.indexOf(tag.getAttribute('data-index') * 1) < 0) {
+			} else if (!tag.getAttribute('data-se-index') || infoIndex.indexOf(tag.getAttribute('data-se-index') * 1) < 0) {
 				currentTags.push(this.infoIndex);
-				tag.removeAttribute('data-index');
+				tag.removeAttribute('data-se-index');
 				this.setInfo(tag, null);
 			} else {
-				currentTags.push(tag.getAttribute('data-index') * 1);
+				currentTags.push(tag.getAttribute('data-se-index') * 1);
 			}
 		}
 

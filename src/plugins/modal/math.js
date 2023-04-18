@@ -48,7 +48,7 @@ Math_.prototype = {
 	 * @override core
 	 */
 	active: function (element) {
-		if (element && element.getAttribute('data-exp')) {
+		if (element && element.getAttribute('data-se-value')) {
 			this._element = element;
 			this.controller.open(element);
 			domUtils.addClass(element, 'se-focus');
@@ -73,8 +73,8 @@ Math_.prototype = {
 		return {
 			className: 'katex',
 			method: function (element) {
-				if (!element.getAttribute('data-exp') || !this.options.get('katex')) return;
-				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(element.getAttribute('data-exp'))));
+				if (!element.getAttribute('data-se-value') || !this.options.get('katex')) return;
+				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(element.getAttribute('data-se-value'))));
 				element.innerHTML = dom.querySelector('.katex').innerHTML;
 			}.bind(this)
 		};
@@ -96,8 +96,8 @@ Math_.prototype = {
 		if (!isUpdate) {
 			this.init();
 		} else if (this.controller.currentTarget) {
-			const exp = converter.entityToHTML(this.controller.currentTarget.getAttribute('data-exp'));
-			const fontSize = this.controller.currentTarget.getAttribute('data-font-size') || '1em';
+			const exp = converter.entityToHTML(this.controller.currentTarget.getAttribute('data-se-value'));
+			const fontSize = this.controller.currentTarget.getAttribute('data-se-type') || '1em';
 			this.textArea.value = exp;
 			this.fontSizeElement.value = fontSize;
 			this.previewElement.innerHTML = this._renderer(exp);
@@ -118,8 +118,8 @@ Math_.prototype = {
 		if (!katexEl) return false;
 		katexEl.className = '__se__katex ' + katexEl.className;
 		katexEl.setAttribute('contenteditable', false);
-		katexEl.setAttribute('data-exp', converter.htmlToEntity(mathExp));
-		katexEl.setAttribute('data-font-size', this.fontSizeElement.value);
+		katexEl.setAttribute('data-se-value', converter.htmlToEntity(mathExp));
+		katexEl.setAttribute('data-se-type', this.fontSizeElement.value);
 		katexEl.style.fontSize = this.fontSizeElement.value;
 
 		if (!this.isUpdateState) {

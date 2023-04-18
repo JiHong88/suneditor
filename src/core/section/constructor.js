@@ -13,7 +13,7 @@ const DEFAULT_FORMAT_BR_LINE = 'PRE';
 const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|DETAILS';
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
-const DEFAULT_DATA_ATTRS = 'data-index|data-file-size|data-file-name|data-origin|data-size|data-proportion|data-percentage|data-font-size|data-embed|data-exp|data-duple';
+const DEFAULT_DATA_ATTRS = 'data-se-index|data-se-value|data-se-type|data-file-size|data-file-name|data-origin|data-size|data-proportion|data-percentage|data-embed';
 
 /**
  * @description document create
@@ -99,10 +99,12 @@ const Constructor = function (editorTargets, options) {
 	// katex
 	if (exlib_katex) _checkKatexMath(o.get('katex'));
 
-	/** frame - multi root set - start -------------------------------------------------------------- */
+	/** frame - root set - start -------------------------------------------------------------- */
 	const rootId = editorTargets[0].key || null;
 	const rootKeys = [];
 	const rootTargets = new _w.Map();
+	const statusbarContainer = o.get('statusbar_container');
+	let default_status_bar = null;
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
 		const editTarget = editorTargets[i];
 		const to = editTarget.options;
@@ -115,7 +117,7 @@ const Constructor = function (editorTargets, options) {
 		// init element
 		const initElements = _initTargetElements(editTarget.key, o, top_div, to);
 		const bottomBar = initElements.bottomBar;
-		const status_bar = bottomBar.statusbar;
+		const statusbar = bottomBar.statusbar;
 		const wysiwyg_div = initElements.wysiwygFrame;
 		const placeholder_span = initElements.placeholder;
 		let textarea = initElements.codeView;
@@ -136,10 +138,15 @@ const Constructor = function (editorTargets, options) {
 		container.appendChild(editor_div);
 
 		// statusbar
-		if (status_bar) {
-			const statusbar_container = to.get('statusbar_container');
-			if (statusbar_container) statusbar_container.appendChild(status_bar);
-			else container.appendChild(status_bar);
+		if (statusbar) {
+			if (statusbarContainer) {
+				if (!default_status_bar) {
+					statusbarContainer.appendChild(domUtils.createElement('DIV', { class: 'sun-editor' }, statusbar));
+					default_status_bar = statusbar;
+				}
+			} else {
+				container.appendChild(statusbar);
+			}
 		}
 
 		// root key
@@ -147,9 +154,9 @@ const Constructor = function (editorTargets, options) {
 		textarea = _checkCodeMirror(o, to, textarea);
 		top_div.appendChild(container);
 		rootKeys.push(key);
-		rootTargets.set(key, CreateFrameContext(editTarget, top_div, wysiwyg_div, textarea, key));
+		rootTargets.set(key, CreateFrameContext(editTarget, top_div, wysiwyg_div, textarea, default_status_bar || statusbar, key));
 	}
-	/** frame - multi root set - end -------------------------------------------------------------- */
+	/** frame - root set - end -------------------------------------------------------------- */
 
 	// toolbar container
 	const toolbar_container = o.get('toolbar_container');
@@ -234,7 +241,6 @@ function InitOptions(options, editorTargets) {
 	/** Multi root */
 	if (options.multiRoot) {
 		if (!options.toolbar_container && !/inline|balloon/i.test(options.mode)) throw Error('[SUNEDITOR.create.fail] In multi root, The "mode" option cannot be "classic" without using the "toolbar_container" option.');
-		if (options.statusbar && !options.statusbar_container) throw Error('[SUNEDITOR.create.fail] In multi root, The "statusbar_container" option is required unless the "statusbar" option is "false".');
 	}
 
 	/** Base */
@@ -351,6 +357,8 @@ function InitOptions(options, editorTargets) {
 			o.set('toolbar.sub_width', subbar.width ? (numbers.is(subbar.width) ? subbar.width + 'px' : subbar.width) : 'auto');
 		}
 	}
+	options.statusbar_container = typeof options.statusbar_container === 'string' ? _d.querySelector(options.statusbar_container) : options.statusbar_container;
+	o.set('statusbar_container', options.statusbar_container);
 
 	/** styles */
 	InitRootOptions(editorTargets, options);
@@ -585,6 +593,8 @@ function InitRootOptions(editorTargets, options) {
 }
 
 function InitFrameOptions(o, origin, fo) {
+	const barContainer = origin.statusbar_container;
+	
 	// members
 	const value = o.value === undefined ? origin.value : o.value;
 	const placeholder = o.placeholder === undefined ? origin.placeholder : o.placeholder;
@@ -595,14 +605,13 @@ function InitFrameOptions(o, origin, fo) {
 	const minHeight = o.minHeight === undefined ? origin.minHeight : o.minHeight;
 	const maxHeight = o.maxHeight === undefined ? origin.maxHeight : o.maxHeight;
 	const editorStyle = o.editorStyle === undefined ? origin.editorStyle : o.editorStyle;
-	const statusbar = o.statusbar === undefined ? origin.statusbar : o.statusbar;
-	const statusbar_showPathLabel = o.statusbar_showPathLabel === undefined ? origin.statusbar_showPathLabel : o.statusbar_showPathLabel;
-	const statusbar_resizeEnable = o.statusbar_resizeEnable === undefined ? origin.statusbar_resizeEnable : o.statusbar_resizeEnable;
-	const statusbar_container = o.statusbar_container === undefined ? origin.statusbar_container : o.statusbar_container;
-	const charCounter = o.charCounter === undefined ? origin.charCounter : o.charCounter;
-	const charCounter_max = o.charCounter_max === undefined ? origin.charCounter_max : o.charCounter_max;
-	const charCounter_label = o.charCounter_label === undefined ? origin.charCounter_label : o.charCounter_label;
-	const charCounter_type = o.charCounter_type === undefined ? origin.charCounter_type : o.charCounter_type;
+	const statusbar = (barContainer || o.statusbar === undefined) ? origin.statusbar : o.statusbar;
+	const statusbar_showPathLabel = (barContainer || o.statusbar_showPathLabel === undefined) ? origin.statusbar_showPathLabel : o.statusbar_showPathLabel;
+	const statusbar_resizeEnable = barContainer ? false : o.statusbar_resizeEnable === undefined ? origin.statusbar_resizeEnable : o.statusbar_resizeEnable;
+	const charCounter = (barContainer || o.charCounter === undefined) ? origin.charCounter : o.charCounter;
+	const charCounter_max = (barContainer || o.charCounter_max === undefined) ? origin.charCounter_max : o.charCounter_max;
+	const charCounter_label = (barContainer || o.charCounter_label === undefined) ? origin.charCounter_label : o.charCounter_label;
+	const charCounter_type = (barContainer || o.charCounter_type === undefined) ? origin.charCounter_type : o.charCounter_type;
 
 	// value
 	fo.set('value', value);
@@ -620,7 +629,6 @@ function InitFrameOptions(o, origin, fo) {
 	fo.set('statusbar', hasStatusbar);
 	fo.set('statusbar_showPathLabel', !hasStatusbar ? false : typeof statusbar_showPathLabel === 'boolean' ? statusbar_showPathLabel : true);
 	fo.set('statusbar_resizeEnable', !hasStatusbar ? false : statusbar_resizeEnable === undefined ? true : !!statusbar_resizeEnable);
-	fo.set('statusbar_container', typeof statusbar_container === 'string' ? _d.querySelector(statusbar_container) : statusbar_container);
 	// status bar - character count
 	fo.set('charCounter', charCounter_max > 0 ? true : typeof charCounter === 'boolean' ? charCounter : false);
 	fo.set('charCounter_max', numbers.is(charCounter_max) && charCounter_max > -1 ? charCounter_max * 1 : null);

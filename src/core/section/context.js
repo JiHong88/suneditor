@@ -7,10 +7,11 @@ import { get as getNumber } from '../../helper/numbers';
  * @param {Element} top Editor top area
  * @param {Element} wwFrame Editor wysiwyg frame
  * @param {Element} codeFrame Editor code view frame
+ * @param {Element|null} statusbar Editor statusbar
  * @param {any} key root key
  * @returns {Map}
  */
-export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFrame, key) {
+export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFrame, statusbar, key) {
 	const m = new _w.Map([
 		['key', key],
 		['options', editorTarget.options],
@@ -29,12 +30,11 @@ export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFram
 		['_minHeight', getNumber(wwFrame.style.minHeight || '65', 0)]
 	]);
 
-	const statusbar = top.querySelector('.se-status-bar');
 	if (statusbar) {
 		m.set('statusbar', statusbar);
-		const navigation = top.querySelector('.se-status-bar .se-navigation');
-		const charWrapper = top.querySelector('.se-status-bar .se-char-counter-wrapper');
-		const charCounter = top.querySelector('.se-char-counter-wrapper .se-char-counter');
+		const navigation = statusbar.querySelector('.se-navigation');
+		const charWrapper = statusbar.querySelector('.se-char-counter-wrapper');
+		const charCounter = statusbar.querySelector('.se-char-counter-wrapper .se-char-counter');
 		if (navigation) m.set('navigation', navigation);
 		if (charWrapper) m.set('charWrapper', charWrapper);
 		if (charCounter) m.set('charCounter', charCounter);
