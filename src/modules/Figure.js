@@ -861,7 +861,7 @@ function GET_CONTROLLER_BUTTONS(group) {
 			break;
 		case 'rotate':
 			c = 'rotate';
-			v = numbers.get(value);
+			v = value === 'l' ? -90 : value === 'r' ? 90 : numbers.get(value);
 			l = v < 0 ? 'rotateLeft' : 'rotateRight';
 			i = v < 0 ? 'rotate_left' : 'rotate_right';
 			break;

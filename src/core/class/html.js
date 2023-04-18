@@ -17,7 +17,6 @@ const HTML = function (editor) {
 	this._elementBlacklistRegExp = null;
 	this._attributeWhitelist = null;
 	this._attributeWhitelistRegExp = null;
-	this._attributeWhitelistRegExp_all_data = null;
 	this._attributeBlacklist = null;
 	this._attributeBlacklistRegExp = null;
 	this._cleanStyleRegExp = {
@@ -70,7 +69,6 @@ const HTML = function (editor) {
 	}
 
 	this._attributeWhitelistRegExp = new _w.RegExp('\\s(?:' + (allAttr || defaultAttr + '|' + options.get('__defaultDataAttrs')) + ')' + regEndStr, 'ig');
-	this._attributeWhitelistRegExp_all_data = new _w.RegExp('\\s(?:' + ((allAttr || defaultAttr) + '|data-[a-z0-9\\-]+') + ')' + regEndStr, 'ig');
 	this._attributeWhitelist = tagsAttr;
 
 	// blacklist
@@ -104,13 +102,13 @@ HTML.prototype = {
 	 */
 	clean: function (html, requireFormat, whitelist, blacklist) {
 		html = DeleteDisallowedTags(this.editor._parser.parseFromString(html, 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp)
-			.replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this, true))
+			.replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this))
 			.replace(/<br\/?>$/i, '');
 		html = this.compress(html);
 		const dom = this._d.createRange().createContextualFragment(html, true);
 
 		try {
-			this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, true);
+			this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp);
 		} catch (error) {
 			console.warn('[SUNEDITOR.html.clean.fail] ' + error.message);
 		}
@@ -1063,10 +1061,9 @@ HTML.prototype = {
 	 * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
 	 * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist
 	 * @param {RegExp} htmlCheckBlacklistRegExp Editor tags blacklist
-	 * @param {Boolean} lowLevelCheck Row level check
 	 * @private
 	 */
-	_consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, lowLevelCheck) {
+	_consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp) {
 		/**
 		 * It is can use ".children(domUtils.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
 		 * So check the node type and exclude the text no (current.nodeType !== 1)
@@ -1114,7 +1111,7 @@ HTML.prototype = {
 				}
 
 				// class filter
-				if (lowLevelCheck && nrtag && current.className) {
+				if (nrtag && current.className) {
 					const className = new this._w.Array(current.classList).map(domUtils.isAllowClassName).join(' ').trim();
 					if (className) current.className = className;
 					else current.removeAttribute('class');
@@ -1123,7 +1120,7 @@ HTML.prototype = {
 				const result =
 					current.parentNode !== documentFragment &&
 					nrtag &&
-					((domUtils.isListCell(current) && !domUtils.isList(current.parentNode)) || (lowLevelCheck && (this.format.isLine(current) || this.component.is(current)) && !this.format.isBlock(current.parentNode) && !domUtils.getParentElement(current, this.component.is)));
+					((domUtils.isListCell(current) && !domUtils.isList(current.parentNode)) || ((this.format.isLine(current) || this.component.is(current)) && !this.format.isBlock(current.parentNode) && !domUtils.getParentElement(current, this.component.is)));
 
 				return result;
 			}.bind(this)
@@ -1415,13 +1412,12 @@ function DeleteDisallowedTags(html, whitelistRegExp, blacklistRegExp) {
 
 /**
  * @description Tag and tag attribute check RegExp function.
- * @param {boolean} lowLevelCheck Low level check
  * @param {string} m RegExp value
  * @param {string} t RegExp value
  * @returns {string}
  * @private
  */
-function CleanElements(lowLevelCheck, m, t) {
+function CleanElements(m, t) {
 	if (/^<[a-z0-9]+\:[a-z0-9]+/i.test(m)) return m;
 
 	let v = null;
@@ -1436,33 +1432,21 @@ function CleanElements(lowLevelCheck, m, t) {
 	// whitelist
 	const wAttr = this._attributeWhitelist[tagName];
 	if (wAttr) v = m.match(wAttr);
-	else v = m.match(lowLevelCheck ? this._attributeWhitelistRegExp : this._attributeWhitelistRegExp_all_data);
+	else v = m.match(this._attributeWhitelistRegExp);
 
 	// attribute
-	if (lowLevelCheck || tagName === 'span') {
-		if (tagName === 'a') {
-			const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
-			if (sv) {
-				if (!v) v = [];
-				v.push(sv[0]);
-			}
-		} else if (!v || !/style=/i.test(v.toString())) {
-			if (tagName === 'span') {
-				v = this._cleanStyle(m, v, 'span');
-			} else if (/^(P|DIV|H[1-6]|PRE)$/i.test(tagName)) {
-				v = this._cleanStyle(m, v, 'format');
-			}
-		}
-	} else {
-		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
-		if (sv && !v) v = [sv[0]];
-		else if (
-			sv &&
-			!v.some(function (v) {
-				return /^style/.test(v.trim());
-			})
-		)
+	if (tagName === 'a') {
+		const sv = m.match(/(?:(?:id|name)\s*=\s*(?:"|')[^"']*(?:"|'))/g);
+		if (sv) {
+			if (!v) v = [];
 			v.push(sv[0]);
+		}
+	} else if (!v || !/style=/i.test(v.toString())) {
+		if (tagName === 'span') {
+			v = this._cleanStyle(m, v, 'span');
+		} else if (/^(P|DIV|H[1-6]|PRE)$/i.test(tagName)) {
+			v = this._cleanStyle(m, v, 'format');
+		}
 	}
 
 	// figure

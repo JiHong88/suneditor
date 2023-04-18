@@ -445,7 +445,7 @@ function InitOptions(options, editorTargets) {
 		options.imageControls || !o.get('imageResizing')
 			? [['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']]
 			: [
-					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_-90', 'rotate_+90'],
+					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
 					['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']
 			  ]
 	);
@@ -476,7 +476,7 @@ function InitOptions(options, editorTargets) {
 		options.videoControls || !o.get('videoResizing')
 			? [['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']]
 			: [
-					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_-90', 'rotate_+90'],
+					['percent_100', 'percent_75', 'percent_50', 'auto', 'rotate_l', 'rotate_r'],
 					['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']
 			  ]
 	);
