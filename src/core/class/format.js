@@ -1358,14 +1358,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isLine: function (element) {
-		return (
-			element &&
-			element.nodeType === 1 &&
-			(this._formatLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__line_.+(\\s|$)|(\\s|^)__se__format__br_line_.+(\\s|$)')) &&
-			!domUtils.isExcludeFormat(element) &&
-			!this.component.is(element) &&
-			!domUtils.isWysiwygFrame(element)
-		);
+		return element && element.nodeType === 1 && (this._formatLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__line_.+(\\s|$)|(\\s|^)__se__format__br_line_.+(\\s|$)')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1377,7 +1370,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isBrLine: function (element) {
-		return element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line_.+(\\s|$)')) && !domUtils.isExcludeFormat(element) && !this.component.is(element) && !domUtils.isWysiwygFrame(element);
+		return element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line_.+(\\s|$)')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1387,7 +1380,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isBlock: function (element) {
-		return element && element.nodeType === 1 && (this._formatBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__block_.+(\\s|$)'));
+		return element && element.nodeType === 1 && (this._formatBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__block_.+(\\s|$)')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1400,7 +1393,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isClosureBlock: function (element) {
-		return element && element.nodeType === 1 && (this._formatClosureBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__block_closure_.+(\\s|$)'));
+		return element && element.nodeType === 1 && (this._formatClosureBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__block_closure_.+(\\s|$)')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1413,7 +1406,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 */
 	isClosureBrLine: function (element) {
-		return element && element.nodeType === 1 && (this._formatClosureBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line__closure_.+(\\s|$)'));
+		return element && element.nodeType === 1 && (this._formatClosureBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line__closure_.+(\\s|$)')) && !this._nonFormat(element);
 	},
 
 	/**
@@ -1515,6 +1508,15 @@ Format.prototype = {
 		}
 
 		return selectedLines;
+	},
+
+	/**
+	 * @description A function that distinguishes non-formatting HTML elements or tags from formatting ones.
+	 * @param {Element} element Element
+	 * @returns {boolean}
+	 */
+	_nonFormat: function (element) {
+		return domUtils.isExcludeFormat(element) || this.component.is(element) || domUtils.isWysiwygFrame(element);
 	},
 
 	/**
