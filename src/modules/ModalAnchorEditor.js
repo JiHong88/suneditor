@@ -53,7 +53,7 @@ const ModalAnchorEditor = function (inst, modalForm, params) {
 				)
 			);
 		}
-		this.selectMenu_rel = new SelectMenu(this, true, 'right-middle');
+		this.selectMenu_rel = new SelectMenu(this, { checkList: true, position: 'right-middle', dir: 'ltr' });
 		this.selectMenu_rel.on(this.relButton, SetRelItem.bind(this));
 		this.selectMenu_rel.create(list);
 		this.eventManager.addEvent(this.relButton, 'click', OnClick_relbutton.bind(this));
@@ -61,7 +61,7 @@ const ModalAnchorEditor = function (inst, modalForm, params) {
 
 	// init
 	modalForm.querySelector('.se-anchor-editor').appendChild(forms);
-	this.selectMenu_bookmark = new SelectMenu(this, false, 'bottom-left');
+	this.selectMenu_bookmark = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr' });
 	this.selectMenu_bookmark.on(this.urlInput, SetHeaderBookmark.bind(this));
 	this.eventManager.addEvent(this.newWindowCheck, 'change', OnChange_newWindowCheck.bind(this));
 	this.eventManager.addEvent(this.downloadCheck, 'change', OnChange_downloadCheck.bind(this));

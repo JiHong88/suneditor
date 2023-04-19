@@ -12,7 +12,7 @@ const Figure = function (inst, controls, params) {
 	this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
 	const alignMenus = CreateAlign(this, this.alignButton);
 	if (alignMenus) {
-		this.selectMenu_align = new SelectMenu(this, false, 'bottom-center');
+		this.selectMenu_align = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
 		this.selectMenu_align.on(this.alignButton, SetMenuAlign.bind(this), { class: 'se-resizing-align-list' });
 		this.selectMenu_align.create(alignMenus.items, alignMenus.html);
 	}
@@ -20,7 +20,7 @@ const Figure = function (inst, controls, params) {
 	this.resizeButton = controllerEl.querySelector('[data-command="onresize"]');
 	const resizeMenus = CreateResize(this, this.resizeButton);
 	if (resizeMenus) {
-		this.selectMenu_resize = new SelectMenu(this, false, 'bottom-center');
+		this.selectMenu_resize = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr' });
 		this.selectMenu_resize.on(this.resizeButton, SetResize.bind(this));
 		this.selectMenu_resize.create(resizeMenus.items, resizeMenus.html);
 	}
@@ -478,12 +478,12 @@ Figure.prototype = {
 			const slope = info.r + (deg || 0) * 1;
 			deg = this._w.Math.abs(slope) >= 360 ? 0 : slope;
 			const isVertical = (this.isVertical = /^(90|270)$/.test(this._w.Math.abs(deg).toString()));
-	
+
 			width = numbers.get(width, 0);
 			height = numbers.get(height, 0);
 			let percentage = element.getAttribute('data-percentage');
 			let transOrigin = '';
-	
+
 			if (percentage && !isVertical) {
 				percentage = percentage.split(',');
 				if (percentage[0] === 'auto' && percentage[1] === 'auto') {
@@ -497,26 +497,26 @@ Figure.prototype = {
 				const offsetH = height || element.offsetHeight;
 				const w = (isVertical ? offsetH : offsetW) + 'px';
 				const h = (isVertical ? offsetW : offsetH) + 'px';
-	
+
 				this._deletePercentSize();
 				this._applySize(offsetW + 'px', offsetH + 'px', true, '');
-	
+
 				figureInfo.cover.style.width = w;
 				figureInfo.cover.style.height = figureInfo.caption ? '' : h;
-	
+
 				if (isVertical) {
 					let transW = offsetW / 2 + 'px ' + offsetW / 2 + 'px 0';
 					let transH = offsetH / 2 + 'px ' + offsetH / 2 + 'px 0';
 					transOrigin = deg === 90 || deg === -270 ? transH : transW;
 				}
 			}
-	
+
 			element.style.transformOrigin = transOrigin;
 			this._setRotate(element, deg, info.x, info.y);
-	
+
 			if (isVertical) element.style.maxWidth = 'none';
 			else element.style.maxWidth = '';
-	
+
 			this._setCaptionPosition(element);
 		} finally {
 			this.__preventSizechange = false;
@@ -571,7 +571,7 @@ Figure.prototype = {
 		}
 		if (!onlyW) {
 			h = numbers.is(h) ? h + this.sizeUnit : h;
-			this._element.style.height = (this.autoRatio && !this.isVertical) ? '100%' : h;
+			this._element.style.height = this.autoRatio && !this.isVertical ? '100%' : h;
 			if (this.autoRatio) {
 				this._cover.style.paddingBottom = h;
 				this._cover.style.height = h;
@@ -834,7 +834,7 @@ function SetResize(item) {
 		this.deleteTransform();
 		this._setPercentSize(item * 1, numbers.get(percentY, 0) === null || !/%$/.test(percentY) ? '' : percentY);
 	}
-	
+
 	this.selectMenu_resize.close();
 	this.component.select(this._element, this.kind);
 }

@@ -107,7 +107,8 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 2.5;
+    line-height: 2;
+    max-height: 24px;
 }
 
 .sun-editor .se-wrapper .se-wrapper-code-mirror,

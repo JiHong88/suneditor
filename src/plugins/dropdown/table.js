@@ -20,7 +20,7 @@ const Table = function (editor) {
 	this.controller_table = new Controller(this, controller_table, { position: 'top' });
 	this.controller_cell = new Controller(this, controller_cell, { position: this.cellControllerTop ? 'top' : 'bottom' });
 	this.splitButton = controller_cell.querySelector('[data-command="onsplit"]');
-	this.selectMenu_split = new SelectMenu(this, false, 'bottom-center');
+	this.selectMenu_split = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
 	this.selectMenu_split.on(this.splitButton, OnSplitCells.bind(this));
 	this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
 	this.maxText = this.lang.maxSize;

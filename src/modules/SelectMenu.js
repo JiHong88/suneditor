@@ -4,25 +4,27 @@ import { domUtils, env } from '../helper';
 /**
  *
  * @param {*} inst
- * @param {boolean} checkList
- * @param {string} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
+ * @param {object} params { checkList: boolean, position: "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]", dir?: "rtl" | "ltr" }
  */
-const SelectMenu = function (inst, checkList, position) {
+const SelectMenu = function (inst, params) {
 	// plugin bisic properties
 	CoreInjector.call(this, inst.editor);
 
 	// members
 	this.kink = inst.constructor.key;
 	this.inst = inst;
-	const positionItems = position.split('-');
+	const positionItems = params.position.split('-');
 	this.form = null;
 	this.items = [];
 	this.menus = [];
 	this.index = -1;
 	this.item = null;
-	this.checkList = !!checkList;
+	this.checkList = !!params.checkList;
 	this.position = positionItems[0];
 	this.subPosition = positionItems[1];
+	this._dirPosition = /^(left|right)$/.test(this.position) ? (this.position === 'left' ? 'right' : 'left') : this.position;
+	this._dirSubPosition = /^(left|right)$/.test(this.subPosition) ? (this.subPosition === 'left' ? 'right' : 'left') : this.subPosition;
+	this._textDirInitValue = params.dir === 'ltr' ? false : params.dir === 'rtl' ? true : null;
 	this._refer = null;
 	this._selectMethod = null;
 	this._bindClose_key = null;
@@ -51,7 +53,10 @@ SelectMenu.prototype = {
 		if (!attr) attr = {};
 		this._refer = referElement;
 		this._selectMethod = selectMethod;
-		this.form = domUtils.createElement('DIV', { class: 'se-select-menu ' + (attr.class || ''), style: attr.style || '' }, '<div class="se-list-inner"></div>');
+		this.form = domUtils.createElement('DIV', {
+			class: 'se-select-menu ' + (attr.class || ''),
+			style: attr.style || ''
+		}, '<div class="se-list-inner"></div>');
 		referElement.parentNode.insertBefore(this.form, referElement);
 	},
 
@@ -64,7 +69,9 @@ SelectMenu.prototype = {
 		this.__addEvents();
 		this.__addGlobalEvent();
 		const positionItems = position ? position.split('-') : [];
-		this._setPosition(positionItems[0] || this.position, positionItems[1] || this.subPosition, onItemQuerySelector);
+		const mainPosition = positionItems[0] || ((this._textDirInitValue !== null && this._textDirInitValue !== this.options.get('_rtl')) ? this._dirPosition : this.position);
+		const subPosition = positionItems[1] || ((this._textDirInitValue !== null && this._textDirInitValue !== this.options.get('_rtl')) ? this._dirSubPosition : this.subPosition);
+		this._setPosition(mainPosition, subPosition, onItemQuerySelector);
 	},
 
 	close: function () {
