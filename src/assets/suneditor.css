@@ -1836,6 +1836,8 @@
     -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
     box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
     outline: 0 none;
+    overflow-y: inherit;
+    overflow-x: inherit;
 }
 
 .sun-editor .se-select-menu ul {
@@ -1856,12 +1858,16 @@
     min-height: 28px;
     font-size: 12px;
     padding: 0 14px;
-    ;
     margin: 2px 0;
     cursor: pointer;
 }
 
 .sun-editor .se-select-menu .se-select-item button {
+    padding: 0;
+    margin: 0;
+    min-height: 28px;
+}
+.sun-editor .se-select-menu .se-select-item button span {
     padding: 0;
     margin: 0;
 }
@@ -1896,8 +1902,6 @@
 
 .sun-editor .se-select-menu.se-resizing-align-list {
     width: 74px;
-    overflow-y: inherit;
-    overflow-x: inherit;
 }
 
 /* --- browser ---------------------------------------------------------- */

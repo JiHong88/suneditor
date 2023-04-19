@@ -203,7 +203,7 @@ Video.prototype = {
 
 		if (!this._setVideoRatioSelect(h)) this.inputY.value = this._onlyPercentage ? numbers.get(h, 2) : h;
 
-		this.proportion.checked = target.getAttribute('data-proportion') !== 'false';
+		this.proportion.checked = true;
 		this.inputX.disabled = percentageRotation ? true : false;
 		this.inputY.disabled = percentageRotation ? true : false;
 		this.proportion.disabled = percentageRotation ? true : false;
@@ -294,10 +294,6 @@ Video.prototype = {
 		const size = this.figure.getSize(oFrame);
 		const inputUpdate = size.w !== width || size.h !== height;
 		const changeSize = !isUpdate || inputUpdate;
-
-		if (this._resizing) {
-			oFrame.setAttribute('data-proportion', this.proportion.checked);
-		}
 
 		// set size
 		if (changeSize) {

@@ -220,7 +220,7 @@ Image_.prototype = {
 			this.inputY.value = h === 'auto' ? '' : h;
 		}
 
-		this.proportion.checked = target.getAttribute('data-proportion') !== 'false';
+		this.proportion.checked = true;
 		this.inputX.disabled = percentageRotation ? true : false;
 		this.inputY.disabled = percentageRotation ? true : false;
 		this.proportion.disabled = percentageRotation ? true : false;
@@ -442,11 +442,8 @@ Image_.prototype = {
 		}
 
 		// size
-		if (this._resizing) {
-			imageEl.setAttribute('data-proportion', !!this.proportion.checked);
-			if (changeSize) {
-				this.applySize(width, height);
-			}
+		if (this._resizing && changeSize) {
+			this.applySize(width, height);
 		}
 
 		if (isNewAnchor) {
@@ -534,10 +531,6 @@ Image_.prototype = {
 		oImg.src = src;
 		oImg.alt = alt;
 		anchor = this._setAnchor(oImg, anchor ? anchor.cloneNode(false) : null);
-
-		if (this._resizing) {
-			oImg.setAttribute('data-proportion', !!this.proportion.checked);
-		}
 
 		const figureInfo = Figure.CreateContainer(anchor, 'se-image-container');
 		const cover = figureInfo.cover;

@@ -7,12 +7,23 @@ const Figure = function (inst, controls, params) {
 
 	// modules
 	const controllerEl = CreateHTML_controller(inst.editor, controls || []);
-	const alignMenus = CreateAlign(this);
-	this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
 	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, inst.constructor.key);
-	this.selectMenu_align = new SelectMenu(this, false, 'bottom-center');
-	this.selectMenu_align.on(this.alignButton, SetMenuAlign.bind(this), { class: 'se-resizing-align-list' });
-	this.selectMenu_align.create(alignMenus.items, alignMenus.html);
+	// align selectmenu
+	this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
+	const alignMenus = CreateAlign(this, this.alignButton);
+	if (alignMenus) {
+		this.selectMenu_align = new SelectMenu(this, false, 'bottom-center');
+		this.selectMenu_align.on(this.alignButton, SetMenuAlign.bind(this), { class: 'se-resizing-align-list' });
+		this.selectMenu_align.create(alignMenus.items, alignMenus.html);
+	}
+	// resize selectmenu
+	this.resizeButton = controllerEl.querySelector('[data-command="onresize"]');
+	const resizeMenus = CreateResize(this, this.resizeButton);
+	if (resizeMenus) {
+		this.selectMenu_resize = new SelectMenu(this, false, 'bottom-center');
+		this.selectMenu_resize.on(this.resizeButton, SetResize.bind(this));
+		this.selectMenu_resize.create(resizeMenus.items, resizeMenus.html);
+	}
 
 	// members
 	this.kind = inst.constructor.key;
@@ -58,6 +69,7 @@ const Figure = function (inst, controls, params) {
 
 	// init
 	this.eventManager.addEvent(this.alignButton, 'click', OnClick_alignButton.bind(this));
+	this.eventManager.addEvent(this.resizeButton, 'click', OnClick_resizeButton.bind(this));
 	this.editor.rootTargets.forEach(
 		function (e) {
 			if (!e.get('editorArea').querySelector('.se-controller.se-resizing-container')) {
@@ -251,7 +263,7 @@ Figure.prototype = {
 		});
 
 		const size = this.getSize(target);
-		domUtils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + (size.w || 'auto') + ', ' + (size.h || 'auto') + ')');
+		domUtils.changeTxt(_figure.display, this.lang[this.align === 'none' ? 'basic' : this.align] + ' (' + size.w + ', ' + size.h + ')');
 		this._displayResizeHandles(!nonResizing);
 
 		// percentage active
@@ -310,14 +322,18 @@ Figure.prototype = {
 		if (!target) return { w: '', h: '' };
 
 		const figure = Figure.GetContainer(target);
-		if (!figure.container || !figure.cover)
+		if (!figure.container || !figure.cover) {
 			return {
 				w: '',
 				h: target.style.height
 			};
+		}
+
+		const w = !/%$/.test(target.style.width) ? target.style.width : ((figure.container && numbers.get(figure.container.style.width, 2)) || 100) + '%';
+		const h = numbers.get(figure.cover.style.paddingBottom, 0) > 0 && !this.isVertical ? figure.cover.style.height : !/%$/.test(target.style.height) || !/%$/.test(target.style.width) ? target.style.height : ((figure.container && numbers.get(figure.container.style.height, 2)) || 100) + '%';
 		return {
-			w: !/%$/.test(target.style.width) ? target.style.width : ((figure.container && numbers.get(figure.container.style.width, 2)) || 100) + '%',
-			h: numbers.get(figure.cover.style.paddingBottom, 0) > 0 && !this.isVertical ? figure.cover.style.height : !/%$/.test(target.style.height) || !/%$/.test(target.style.width) ? target.style.height : ((figure.container && numbers.get(figure.container.style.height, 2)) || 100) + '%'
+			w: w || 'auto',
+			h: h || 'auto'
 		};
 	},
 
@@ -364,23 +380,9 @@ Figure.prototype = {
 		const command = target.getAttribute('data-command');
 		const value = target.getAttribute('data-value');
 		const element = this._element;
-		if (command === 'onalign') return;
+		if (/^(onalign|onresize)$/.test(command)) return;
 
 		switch (command) {
-			case 'auto':
-				this.deleteTransform();
-				this._setAutoSize();
-				break;
-			case 'resize_percent':
-				let percentY = this.getSize(element).h;
-				if (this.isVertical) {
-					const percentage = element.getAttribute('data-percentage');
-					if (percentage) percentY = percentage.split(',')[1];
-				}
-
-				this.deleteTransform();
-				this._setPercentSize(value * 100, numbers.get(percentY, 0) === null || !/%$/.test(percentY) ? '' : percentY);
-				break;
 			case 'mirror':
 				const info = GetRotateValue(element);
 				let x = info.x;
@@ -670,7 +672,7 @@ Figure.prototype = {
 	_saveCurrentSize: function () {
 		if (this.__preventSizechange) return;
 		const size = this.getSize(this._element);
-		this._element.setAttribute('data-se-size', (size.w || 'auto') + ',' + (size.h || 'auto'));
+		this._element.setAttribute('data-se-size', size.w + ',' + size.h);
 		// if (contextPlugin._videoRatio) contextPlugin._videoRatio = size.y; @todo
 	},
 
@@ -818,7 +820,28 @@ function SetMenuAlign(item) {
 	this.component.select(this._element, this.kind);
 }
 
-function CreateAlign(editor) {
+function SetResize(item) {
+	if (item === 'auto') {
+		this.deleteTransform();
+		this._setAutoSize();
+	} else {
+		let percentY = this.getSize(this._element).h;
+		if (this.isVertical) {
+			const percentage = this._element.getAttribute('data-percentage');
+			if (percentage) percentY = percentage.split(',')[1];
+		}
+
+		this.deleteTransform();
+		this._setPercentSize(item * 1, numbers.get(percentY, 0) === null || !/%$/.test(percentY) ? '' : percentY);
+	}
+	
+	this.selectMenu_resize.close();
+	this.component.select(this._element, this.kind);
+}
+
+function CreateAlign(editor, button) {
+	if (!button) return null;
+
 	const icons = [editor.icons.align_justify, editor.icons.align_left, editor.icons.align_center, editor.icons.align_right];
 	const langs = [editor.lang.basic, editor.lang.left, editor.lang.center, editor.lang.right];
 	const commands = ['none', 'left', 'center', 'right'];
@@ -827,6 +850,22 @@ function CreateAlign(editor) {
 	for (let i = 0; i < commands.length; i++) {
 		html.push('<button type="button" class="se-btn-list se-tooltip" data-command="' + commands[i] + '">' + icons[i] + '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + langs[i] + '</span></span>' + '</button>');
 		items.push(commands[i]);
+	}
+
+	return { html: html, items: items };
+}
+
+function CreateResize(editor, button) {
+	if (!button) return null;
+
+	const items = button.getAttribute('data-value').split(',');
+	const html = [];
+	for (let i = 0, n, c, v, l; i < items.length; i++) {
+		v = items[i];
+		n = numbers.is(v);
+		c = n ? 'resize_percent' + v : 'auto';
+		l = n ? v + '%' : editor.lang.autoSize;
+		html.push('<button type="button" class="se-btn-list" data-command="' + c + '" data-value="' + v + '"><span>' + l + '</span></button>');
 	}
 
 	return { html: html, items: items };
@@ -843,6 +882,28 @@ function OnClick_alignButton() {
 	this.selectMenu_align.open('', '[data-command="' + this.align + '"]');
 }
 
+function OnClick_resizeButton() {
+	const size = this.getSize(this._element);
+	const w = size.w;
+	const h = size.h;
+	let command = '';
+	if (this.autoRatio) {
+		if (h === this.autoRatio.default && /%$/.test(w)) {
+			const nw = numbers.get(w);
+			if (nw === 100) command = 'auto';
+			else command = 'resize_percent' + nw;
+		}
+	} else if (h === 'auto') {
+		if (w === 'auto') {
+			command = 'auto';
+		} else if (/%$/.test(w)) {
+			command = 'resize_percent' + numbers.get(w);
+		}
+	}
+
+	this.selectMenu_resize.open('', '[data-command="' + command + '"]');
+}
+
 function CreateHTML_resizeDot() {
 	const html = '<div class="se-resize-dot"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span><span class="lw"></span><span class="th"></span><span class="rw"></span><span class="bh"></span><div class="se-resize-display"></div></div>';
 	return domUtils.createElement('DIV', { class: 'se-controller se-resizing-container', style: 'display: none;' }, html);
@@ -855,11 +916,11 @@ function GET_CONTROLLER_BUTTONS(group) {
 	let c, v, l, t, i;
 
 	switch (command) {
-		case 'percent':
-			c = 'resize_percent';
-			v = value / 100;
-			l = 'resize' + value;
-			t = '<span>' + value + '%</span>';
+		case 'resize':
+			c = 'onresize';
+			v = value;
+			l = 'resize';
+			i = 'resize';
 			break;
 		case 'auto':
 			c = 'auto';
