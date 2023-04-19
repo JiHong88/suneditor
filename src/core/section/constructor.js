@@ -9,15 +9,14 @@ const DEFAULT_BUTTON_LIST = [['undo', 'redo'], ['bold', 'underline', 'italic', '
 
 const REQUIRED_FORMAT_LINE = 'div';
 const REQUIRED_ELEMENT_WHITELIST = 'br|div';
-const REQUIRED_DATA_ATTRS = 'data-se-index|data-se-key|data-se-value|data-se-type|data-se-size|data-se-file-name|data-se-file-size|data-origin|data-proportion|data-percentage|data-embed';
-
-const DEFAULT_ELEMENT_WHITELIST = 'br|div|p|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
+const DEFAULT_ELEMENT_WHITELIST = 'p|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls';
-const DEFAULT_FORMAT_LINE = 'P|div|H[1-6]|LI|TH|TD|DETAILS';
+const DEFAULT_FORMAT_LINE = 'P|H[1-6]|LI|TH|TD|DETAILS';
 const DEFAULT_FORMAT_BR_LINE = 'PRE';
 const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|DETAILS';
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
+const REQUIRED_DATA_ATTRS = 'data-se-index|data-se-key|data-se-value|data-se-type|data-se-size|data-se-file-name|data-se-file-size|data-origin|data-proportion|data-percentage|data-embed';
 
 /**
  * @description document create
@@ -332,13 +331,13 @@ function InitOptions(options, editorTargets) {
 	// format tag
 	o.set('formatClosureBrLine', _createFormatInfo(options.formatClosureBrLine, (options.__defaultFormatClosureBrLine = typeof options.__defaultFormatClosureBrLine === 'string' ? options.__defaultFormatClosureBrLine : DEFAULT_FORMAT_CLOSURE_BR_LINE).toLowerCase(), o.get('elementBlacklist')));
 	o.set('formatBrLine', _createFormatInfo((options.formatBrLine || '') + '|' + o.get('formatClosureBrLine').str, (options.__defaultFormatBrLine = typeof options.__defaultFormatBrLine === 'string' ? options.__defaultFormatBrLine : DEFAULT_FORMAT_BR_LINE).toLowerCase(), o.get('elementBlacklist')));
-	o.set('formatLine', _createFormatInfo((options.formatLine || '') + '|' + o.get('formatBrLine').str, (options.__defaultFormatLine = typeof options.__defaultFormatLine === 'string' ? (REQUIRED_FORMAT_LINE + '|' + options.__defaultFormatLine) : DEFAULT_FORMAT_LINE).toLowerCase(), o.get('elementBlacklist')));
+	o.set('formatLine', _createFormatInfo(REQUIRED_FORMAT_LINE + '|' + (options.formatLine || '') + '|' + o.get('formatBrLine').str, (options.__defaultFormatLine = typeof options.__defaultFormatLine === 'string' ? (options.__defaultFormatLine) : DEFAULT_FORMAT_LINE).toLowerCase(), o.get('elementBlacklist')));
 	o.set('formatClosureBlock', _createFormatInfo(options.formatClosureBlock, (options.__defaultFormatClosureBlock = typeof options.__defaultFormatClosureBlock === 'string' ? options.__defaultFormatClosureBlock : DEFAULT_FORMAT_CLOSURE_BLOCK).toLowerCase(), o.get('elementBlacklist')));
 	o.set('formatBlock', _createFormatInfo((options.formatBlock || '') + '|' + o.get('formatClosureBlock').str, (options.__defaultFormatBlock = typeof options.__defaultFormatBlock === 'string' ? options.__defaultFormatBlock : DEFAULT_FORMAT_BLOCK).toLowerCase(), o.get('elementBlacklist')));
 
 	/** __defaults */
 	o.set('__defaultDataAttrs', REQUIRED_DATA_ATTRS);
-	o.set('__defaultElementWhitelist', (typeof options.__defaultElementWhitelist === 'string' ? REQUIRED_ELEMENT_WHITELIST + '|' + options.__defaultElementWhitelist : DEFAULT_ELEMENT_WHITELIST).toLowerCase());
+	o.set('__defaultElementWhitelist', REQUIRED_ELEMENT_WHITELIST + '|' + (typeof options.__defaultElementWhitelist === 'string' ? options.__defaultElementWhitelist : DEFAULT_ELEMENT_WHITELIST).toLowerCase());
 	o.set('__defaultAttributeWhitelist', (typeof options.__defaultAttributeWhitelist === 'string' ? options.__defaultAttributeWhitelist : DEFAULT_ATTRIBUTE_WHITELIST).toLowerCase());
 	// --- create element whitelist (__defaultElementWhiteList + elementWhitelist + format[line, BrLine, Block, Closureblock, ClosureBrLine] - elementBlacklist)
 	o.set('_editorElementWhitelist', o.get('elementWhitelist') === '*' ? '*' : _createWhitelist(o));

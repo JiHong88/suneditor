@@ -100,7 +100,7 @@ FormatBlock.prototype = {
 
 function CreateHTML(editor) {
 	const options = editor.options;
-	const defaultFormats = ['p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+	const defaultFormats = ['p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 	const formatList = !options.get('formats') || options.get('formats').length === 0 ? defaultFormats : options.get('formats');
 
 	let list = '<div class="se-list-inner"><ul class="se-list-basic">';

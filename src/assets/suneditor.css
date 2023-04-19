@@ -107,6 +107,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 2.5;
 }
 
 .sun-editor .se-wrapper .se-wrapper-code-mirror,
@@ -172,13 +173,13 @@
 .sun-editor .se-btn:enabled.on:hover,
 .sun-editor .se-btn:enabled.on:focus {
     background-color: #d0e3ff;
-    color: #4592ff;
+    color: #407dd1;
 }
 
 .sun-editor .se-btn:enabled.on:active,
 .sun-editor .se-btn:enabled.on.__se__active {
     background-color: #d0e3ff;
-    color: #4592ff;
+    color: #3288ff;
     border-color: #d0e3ff !important;
     outline: 1px solid #3288ff !important;
     color: 1px solid #3288ff;
