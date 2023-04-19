@@ -205,7 +205,7 @@ Figure.prototype = {
 		if (!figureInfo.container) return { container: null, cover: null };
 
 		Figure.__figureControllerInst = this;
-		const figure = (this._cover = figureInfo.cover);
+		this._cover = figureInfo.cover;
 		this._container = figureInfo.container;
 		this._caption = figureInfo.caption;
 		this._element = target;
@@ -215,8 +215,8 @@ Figure.prototype = {
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
 		const offset = this.offset.get(target);
 		const frameOffset = this.offset.get(this.editor.frameContext.get('wysiwygFrame'));
-		const w = figure.offsetWidth - 1;
-		const h = figure.offsetHeight - 1;
+		const w = target.offsetWidth - 1;
+		const h = target.offsetHeight - 1;
 		const t = offset.top - (this.options.get('iframe') ? frameOffset.top : 0);
 		const l = offset.left - (this.options.get('iframe') ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - this.editor.frameContext.get('wysiwygFrame').scrollLeft;
 		const originSize = (target.getAttribute('data-origin') || '').split(',');
@@ -246,12 +246,12 @@ Figure.prototype = {
 		this.editor._figureContainer = _figure.main;
 		_figure.main.style.top = t + 'px';
 		_figure.main.style.left = l + 'px';
-		_figure.main.style.width = w + 'px';
-		_figure.main.style.height = h + 'px';
+		_figure.main.style.width = (this.isVertical ? h : w) + 'px';
+		_figure.main.style.height = (this.isVertical ? w : h) + 'px';
 		_figure.border.style.top = '0px';
 		_figure.border.style.left = '0px';
-		_figure.border.style.width = w + 'px';
-		_figure.border.style.height = h + 'px';
+		_figure.border.style.width = (this.isVertical ? h : w) + 'px';
+		_figure.border.style.height = (this.isVertical ? w : h) + 'px';
 
 		this.__offset = { left: l + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0), top: t + (eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0) };
 		this.editor.opendControllers.push({

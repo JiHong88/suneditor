@@ -24,7 +24,7 @@ const SelectMenu = function (inst, params) {
 	this.subPosition = positionItems[1];
 	this._dirPosition = /^(left|right)$/.test(this.position) ? (this.position === 'left' ? 'right' : 'left') : this.position;
 	this._dirSubPosition = /^(left|right)$/.test(this.subPosition) ? (this.subPosition === 'left' ? 'right' : 'left') : this.subPosition;
-	this._textDirInitValue = params.dir === 'ltr' ? false : params.dir === 'rtl' ? true : null;
+	this._textDirDiff = params.dir === 'ltr' ? false : params.dir === 'rtl' ? true : null;
 	this._refer = null;
 	this._selectMethod = null;
 	this._bindClose_key = null;
@@ -69,8 +69,8 @@ SelectMenu.prototype = {
 		this.__addEvents();
 		this.__addGlobalEvent();
 		const positionItems = position ? position.split('-') : [];
-		const mainPosition = positionItems[0] || ((this._textDirInitValue !== null && this._textDirInitValue !== this.options.get('_rtl')) ? this._dirPosition : this.position);
-		const subPosition = positionItems[1] || ((this._textDirInitValue !== null && this._textDirInitValue !== this.options.get('_rtl')) ? this._dirSubPosition : this.subPosition);
+		const mainPosition = positionItems[0] || ((this._textDirDiff !== null && this._textDirDiff !== this.options.get('_rtl')) ? this._dirPosition : this.position);
+		const subPosition = positionItems[1] || ((this._textDirDiff !== null && this._textDirDiff !== this.options.get('_rtl')) ? this._dirSubPosition : this.subPosition);
 		this._setPosition(mainPosition, subPosition, onItemQuerySelector);
 	},
 
