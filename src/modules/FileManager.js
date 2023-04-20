@@ -1,5 +1,6 @@
 import CoreInjector from '../injector/_core';
 import { domUtils, numbers, env } from '../helper';
+import Figure from './Figure';
 
 /**
  *
@@ -141,7 +142,8 @@ FileManager.prototype = {
 				if (!element.getAttribute('data-se-size')) element.setAttribute('data-se-size', w + ',' + h);
 			}
 
-			if (!element.style.width) {
+			const figureInfo = Figure.GetContainer(element);
+			if (!figureInfo.container || !figureInfo.cover) {
 				try {
 					const size = (element.getAttribute('data-se-size') || element.getAttribute('data-origin') || '').split(',');
 					this.figure.__fileManagerInfo = true;

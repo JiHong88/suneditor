@@ -19,8 +19,8 @@ const ImageGallery = function (editor) {
 	});
 
 	// members
-	this._origin_w = this.options.get('imageWidth') === 'auto' ? '' : this.options.get('imageWidth');
-	this._origin_h = this.options.get('imageHeight') === 'auto' ? '' : this.options.get('imageHeight');
+	this.width = this.options.get('imageWidth') === 'auto' ? '' : this.options.get('imageWidth');
+	this.height = this.options.get('imageHeight') === 'auto' ? '' : this.options.get('imageHeight');
 };
 
 ImageGallery.key = 'imageGallery';
@@ -61,11 +61,11 @@ function DrawItems(item) {
 		(item.thumbnail || item.src) +
 		'" alt="' +
 		(item.alt || srcName) +
-		'" data-command="pick" data-value="' +
-		(item.src || item.thumbnail) +
+		'" data-command="' + (item.src || item.thumbnail) + '" data-value="' +
+		(item.name || srcName) +
 		'">' +
 		'<div class="se-file-name-image se-file-name-back"></div>' +
-		'<div class="se-file-name-image __se__img_name">' +
+		'<div class="se-file-name-image">' +
 		(item.name || srcName) +
 		'</div>' +
 		'</div>'
@@ -76,8 +76,8 @@ function SetImage(target) {
 	if (this.inputTarget) {
 		this.inputTarget(target);
 	} else {
-		const file = { name: target.parentNode.querySelector('.__se__img_name').textContent, size: 0 };
-		this.plugins.image.create(target.getAttribute('data-value'), null, this._origin_w, this._origin_h, 'none', file, target.alt);
+		const file = { name: target.getAttribute('data-value'), size: 0 };
+		this.plugins.image.create(target.getAttribute('data-command'), null, this.width, this.height, 'none', file, target.alt);
 	}
 }
 

@@ -97,7 +97,7 @@ Figure.__figureControllerInst = null;
  * @returns {object} {container, cover, caption}
  */
 Figure.CreateContainer = function (element, className) {
-	domUtils.createElement('DIV', { class: 'se-component' + (className ? ' ' + className : ''), contenteditable: false }, domUtils.createElement('FIGURE', null, element));
+	domUtils.createElement('DIV', { class: 'se-component' + (className ? ' ' + className : '') }, domUtils.createElement('FIGURE', null, element));
 	return Figure.GetContainer(element);
 };
 
@@ -107,7 +107,7 @@ Figure.CreateContainer = function (element, className) {
  * @returns {Element} caption element
  */
 Figure.CreateCaption = function (cover, text) {
-	const caption = domUtils.createElement('FIGCAPTION', { contenteditable: true }, '<div>' + text + '</div>');
+	const caption = domUtils.createElement('FIGCAPTION', null, '<div>' + text + '</div>');
 	cover.appendChild(caption);
 	return caption;
 };
@@ -348,12 +348,6 @@ Figure.prototype = {
 		const figure = Figure.GetContainer(target);
 		const cover = figure.cover;
 		const container = figure.container;
-
-		if (align && align !== 'none') {
-			cover.style.margin = 'auto';
-		} else {
-			cover.style.margin = '0';
-		}
 
 		if (/%$/.test(target.style.width) && align === 'center') {
 			container.style.minWidth = '100%';

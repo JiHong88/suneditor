@@ -483,8 +483,13 @@
 .sun-editor-editable figure {
     display: block;
     outline: none;
-    margin: 0;
     padding: 0;
+    margin: 0;
+}
+.sun-editor-editable .__se__float-left figure,
+.sun-editor-editable .__se__float-right figure,
+.sun-editor-editable .__se__float-center figure {
+    margin: auto !important;
 }
 
 .sun-editor-editable figure figcaption {

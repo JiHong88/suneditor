@@ -538,8 +538,7 @@ Image_.prototype = {
 
 		// caption
 		if (this.captionCheckEl.checked) {
-			this._caption = this._caption = Figure.CreateCaption(cover, this.lang.caption);
-			this._caption.setAttribute('contenteditable', false);
+			this._caption = Figure.CreateCaption(cover, this.lang.caption);
 		}
 
 		this._element = oImg;

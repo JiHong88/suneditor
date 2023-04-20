@@ -76,6 +76,7 @@ Math_.prototype = {
 				if (!element.getAttribute('data-se-value') || !this.options.get('katex')) return;
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(element.getAttribute('data-se-value'))));
 				element.innerHTML = dom.querySelector('.katex').innerHTML;
+				element.setAttribute('contenteditable', false);
 			}.bind(this)
 		};
 	},

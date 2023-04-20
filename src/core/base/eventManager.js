@@ -853,6 +853,11 @@ function OnClick_toolbar(e) {
 
 function OnMouseDown_wysiwyg(rootKey, e) {
 	if (this.status.isReadOnly || domUtils.isNonEditable(this.editor.frameContext.get('wysiwyg'))) return;
+	if (this.format._isExcludeSelectionElement(e.target)) {
+		e.preventDefault();
+		return;
+	}
+
 	_w.setTimeout(this.selection._init.bind(this.selection));
 
 	// user event
@@ -895,24 +900,6 @@ function OnClick_wysiwyg(rootKey, e) {
 		return;
 	} else {
 		this.component.currentTarget = null;
-	}
-
-	const figcaption = domUtils.getParentElement(targetElement, 'FIGCAPTION');
-	if (figcaption && (domUtils.isNonEditable(figcaption) || !figcaption.getAttribute('contenteditable'))) {
-		e.preventDefault();
-		figcaption.setAttribute('contenteditable', true);
-		figcaption.focus();
-
-		if (this.editor.isInline && !this.toolbar._inlineToolbarAttr.isShow) {
-			this.toolbar._showInline();
-
-			const hideToolbar = function () {
-				this._hideToolbar();
-				figcaption.removeEventListener('blur', hideToolbar);
-			};
-
-			figcaption.addEventListener('blur', hideToolbar);
-		}
 	}
 
 	this.selection._init();

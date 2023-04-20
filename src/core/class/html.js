@@ -281,29 +281,29 @@ HTML.prototype = {
 				);
 				afterNode = this.node.split(container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
 				if (afterNode) {
-					if (insertListCell) {
-						if (line.contains(container)) {
-							const subList = domUtils.isList(line.lastElementChild);
-							let newCell = null;
-							if (!isEdge) {
-								newCell = line.cloneNode(false);
-								newCell.appendChild(afterNode.textContent.trim() ? afterNode : domUtils.createTextNode(unicode.zeroWidthSpace));
-							}
-							if (subList) {
-								if (!newCell) {
-									newCell = line.cloneNode(false);
-									newCell.appendChild(domUtils.createTextNode(unicode.zeroWidthSpace));
-								}
-								newCell.appendChild(line.lastElementChild);
-							}
-							if (newCell) {
-								line.parentNode.insertBefore(newCell, line.nextElementSibling);
-								tempAfterNode = afterNode = newCell;
-							}
+					tempAfterNode = afterNode = line;
+				} else if (insertListCell) {
+					if (line.contains(container)) {
+						const subList = domUtils.isList(line.lastElementChild);
+						let newCell = null;
+						if (!isEdge) {
+							newCell = line.cloneNode(false);
+							newCell.appendChild(afterNode.textContent.trim() ? afterNode : domUtils.createTextNode(unicode.zeroWidthSpace));
 						}
-					} else {
-						afterNode = afterNode.previousSibling;
+						if (subList) {
+							if (!newCell) {
+								newCell = line.cloneNode(false);
+								newCell.appendChild(domUtils.createTextNode(unicode.zeroWidthSpace));
+							}
+							newCell.appendChild(line.lastElementChild);
+						}
+						if (newCell) {
+							line.parentNode.insertBefore(newCell, line.nextElementSibling);
+							tempAfterNode = afterNode = newCell;
+						}
 					}
+				} else {
+					afterNode = afterNode.previousSibling;
 				}
 			}
 		}
@@ -795,12 +795,12 @@ HTML.prototype = {
 
 			const fc = this.editor.frameContext;
 			const renderHTML = domUtils.createElement('DIV', null, this._convertToCode(fc.get('wysiwyg'), true));
-			const figcaptions = domUtils.getListChildren(renderHTML, function (current) {
-				return /FIGCAPTION/i.test(current.nodeName);
+			const editableEls = domUtils.getListChildren(renderHTML, function (current) {
+				return current.hasAttribute('contenteditable');
 			});
 
-			for (let i = 0, len = figcaptions.length; i < len; i++) {
-				figcaptions[i].removeAttribute('contenteditable');
+			for (let i = 0, len = editableEls.length; i < len; i++) {
+				editableEls[i].removeAttribute('contenteditable');
 			}
 
 			const content = this.clean(renderHTML.innerHTML, false, null, null);
@@ -1453,13 +1453,7 @@ function CleanElements(m, t) {
 	if (domUtils.isFigures(tagName)) {
 		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
 		if (!v) v = [];
-		if (sv) {
-			const wsize = sv[0].match(/width\s?:\s?(\d+)(px|%)/);
-			const hsize = sv[0].match(/height\s?:\s?(\d+)(px|%)/);
-			const w_ = wsize && wsize[1] && wsize[2] ? wsize[1] + wsize[2] : 'auto';
-			const h_ = hsize && hsize[1] && hsize[2] ? hsize[1] + hsize[2] : 'auto';
-			v.push('style="width:' + w_ + '; height:' + h_ + ';"');
-		}
+		if (sv) v.push(sv[0]);
 	}
 
 	if (v) {

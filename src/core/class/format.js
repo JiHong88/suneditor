@@ -1511,9 +1511,20 @@ Format.prototype = {
 	},
 
 	/**
+	 * @description A function that distinguishes areas where "selection" should not be placed
+	 * @param {Element} element Element
+	 * @returns {boolean}
+	 * @private
+	 */
+	_isExcludeSelectionElement: function (element) {
+        return !/FIGCAPTION/i.test(element.nodeName) && (this.component.is(element) || /FIGURE/i.test(element.nodeName));
+    },
+
+	/**
 	 * @description A function that distinguishes non-formatting HTML elements or tags from formatting ones.
 	 * @param {Element} element Element
 	 * @returns {boolean}
+	 * @private
 	 */
 	_nonFormat: function (element) {
 		return domUtils.isExcludeFormat(element) || this.component.is(element) || domUtils.isWysiwygFrame(element);
@@ -1821,7 +1832,7 @@ Format.prototype = {
 		if (!isRemoveNode && parentCon === endCon.parentNode && parentCon.nodeName === newInnerNode.nodeName) {
 			if (domUtils.isZeroWith(startCon.textContent.slice(0, startOff)) && domUtils.isZeroWith(endCon.textContent.slice(endOff))) {
 				const children = parentCon.childNodes;
-				let sameTag = true;
+				let sameTag = false;
 
 				for (let i = 0, len = children.length, c, s, e, z; i < len; i++) {
 					c = children[i];
@@ -2270,7 +2281,7 @@ Format.prototype = {
 		}
 
 		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.nextSibling && domUtils.isZeroWith(startCon.textContent.slice(0, startOff))) {
-			let sameTag = true;
+			let sameTag = false;
 			let s = startCon.previousSibling;
 			while (s) {
 				if (!domUtils.isZeroWith(s)) {
@@ -2703,7 +2714,7 @@ Format.prototype = {
 		}
 
 		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.previousSibling && domUtils.isZeroWith(endCon.textContent.slice(endOff))) {
-			let sameTag = true;
+			let sameTag = false;
 			let e = endCon.nextSibling;
 			while (e) {
 				if (!domUtils.isZeroWith(e)) {
