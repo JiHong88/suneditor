@@ -1792,30 +1792,30 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 } else if (container.nodeType === 3 || util.isBreak(container) || insertListCell) {
                     const depthFormat = util.getParentElement(container, function (current) { return this.isRangeFormatElement(current) || this.isListCell(current); }.bind(util));
                     afterNode = util.splitElement(container, r.offset, !depthFormat ? 0 : util.getElementDepth(depthFormat) + 1);
-                    if (afterNode) {
-                        if (insertListCell) {
-                            if (line.contains(container)) {
-                                const subList = util.isList(line.lastElementChild);
-                                let newCell = null;
-                                if (!isEdge) {
-                                    newCell = line.cloneNode(false);
-                                    newCell.appendChild(afterNode.textContent.trim() ? afterNode : util.createTextNode(util.zeroWidthSpace));
-                                }
-                                if (subList) {
-                                    if (!newCell) {
-                                        newCell = line.cloneNode(false);
-                                        newCell.appendChild(util.createTextNode(util.zeroWidthSpace));
-                                    }
-                                    newCell.appendChild(line.lastElementChild);
-                                }
-                                if (newCell) {
-                                    line.parentNode.insertBefore(newCell, line.nextElementSibling);
-                                    tempAfterNode = afterNode = newCell;
-                                }
+                    if (!afterNode) {
+                        tempAfterNode = afterNode = line;
+                    } else if (insertListCell) {
+                        if (line.contains(container)) {
+                            const subList = util.isList(line.lastElementChild);
+                            let newCell = null;
+                            if (!isEdge) {
+                                newCell = line.cloneNode(false);
+                                newCell.appendChild(afterNode.textContent.trim() ? afterNode : util.createTextNode(util.zeroWidthSpace));
                             }
-                        } else {
-                            afterNode = afterNode.previousSibling;
+                            if (subList) {
+                                if (!newCell) {
+                                    newCell = line.cloneNode(false);
+                                    newCell.appendChild(util.createTextNode(util.zeroWidthSpace));
+                                }
+                                newCell.appendChild(line.lastElementChild);
+                            }
+                            if (newCell) {
+                                line.parentNode.insertBefore(newCell, line.nextElementSibling);
+                                tempAfterNode = afterNode = newCell;
+                            }
                         }
+                    } else {
+                        afterNode = afterNode.previousSibling;
                     }
                 }
             }
@@ -2135,7 +2135,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const range = this.getRange();
             const isStartEdge = range.startOffset === 0;
-            const isEndEdge = core.isEdgePoint(range.endContainer, range.endOffset);
+            const isEndEdge = core.isEdgePoint(range.endContainer, range.endOffset, 'end');
             let prevContainer = null;
             let startPrevEl = null;
             let endNextEl = null;
@@ -6506,7 +6506,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         onMouseDown_wysiwyg: function (e) {
             if (core.isReadOnly || util.isNonEditable(context.element.wysiwyg)) return;
             if (util._isExcludeSelectionElement(e.target)) {
-                console.log("excldfjdsoiafjkls")
                 e.preventDefault();
                 return;
             }
