@@ -931,12 +931,6 @@ export default {
         if (!cover) cover = contextVideo._cover;
         if (!container) container = contextVideo._container;
 
-        if (align && align !== 'none') {
-            cover.style.margin = 'auto';
-        } else {
-            cover.style.margin = '0';
-        }
-
         if (/%$/.test(element.style.width) && align === 'center') {
             container.style.minWidth = '100%';
             cover.style.width = container.style.width;

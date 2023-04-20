@@ -868,7 +868,7 @@ export default {
         contextImage._cover = this.util.getParentElement(element, 'FIGURE');
         contextImage._container = this.util.getParentElement(element, this.util.isMediaComponent);
         contextImage._caption = this.util.getChildElement(contextImage._cover, 'FIGCAPTION');
-        contextImage._align = element.style.float || element.getAttribute('data-align') || 'none';
+        contextImage._align =  element.getAttribute('data-align') || element.style.float || 'none';
         element.style.float = '';
         this.plugins.anchor.setCtx(contextImage._linkElement, contextImage.anchorCtx);
 
@@ -1066,12 +1066,6 @@ export default {
         if (!element) element = contextImage._element;
         if (!cover) cover = contextImage._cover;
         if (!container) container = contextImage._container;
-
-        if (align && align !== 'none') {
-            cover.style.margin = 'auto';
-        } else {
-            cover.style.margin = '0';
-        }
 
         if (/%$/.test(element.style.width) && align === 'center') {
             container.style.minWidth = '100%';

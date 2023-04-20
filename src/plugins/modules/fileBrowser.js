@@ -347,8 +347,8 @@
             if (!command) return;
 
             const handler = (fileBrowserContext.selectorHandler || this.context[fileBrowserContext.contextPlugin].selectorHandler);
+            handler(target, target.parentNode.querySelector('.__se__img_name').textContent);
             this.plugins.fileBrowser.close.call(this);
-            handler(target);
         }
     };
 
