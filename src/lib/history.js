@@ -53,7 +53,7 @@ export default function (core, change) {
 
     function pushStack () {
         core._checkComponents();
-        const current = core.getContents(true);
+        const current = editor.wysiwyg.innerHTML;
         if (!current || (!!stack[stackIndex] && current === stack[stackIndex].contents)) return;
 
         stackIndex++;

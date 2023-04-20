@@ -5373,13 +5373,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (util.isFigures(tagName)) {
                 const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
                 if (!v) v = [];
-                if (sv) {
-                    const wsize = sv[0].match(/width\s?:\s?(\d+)(px|%)/);
-                    const hsize = sv[0].match(/height\s?:\s?(\d+)(px|%)/);
-                    const w_ = wsize && wsize[1] && wsize[2] ? wsize[1] + wsize[2] : 'auto';
-                    const h_ = hsize && hsize[1] && hsize[2] ? hsize[1] + hsize[2] : 'auto';
-                    v.push('style="width:'+ w_ + '; height:'+ h_ + ';"');
-                }
+                if (sv) v.push(sv[0]);
             }
 
             if (v) {
