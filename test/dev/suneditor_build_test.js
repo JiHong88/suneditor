@@ -1012,6 +1012,10 @@ window.sun_setOptions2 = () => {
 //     return html;
 // }
 
+ s2.onChange = (content) => {
+    console.log(content)
+ }
+
 s2.onClick = (event, core) => {
     const element = event.target
     if(core.util.hasClass(element, "metaData")){

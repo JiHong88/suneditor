@@ -1749,6 +1749,10 @@ const util = {
         }.bind(this));
     },
 
+    _isExcludeSelectionElement: function (element) {
+        return !/FIGCAPTION/i.test(element.nodeName) && (this.isComponent(element) || /FIGURE/i.test(element.nodeName));
+    },
+
     /**
      * @description Nodes that need to be added without modification when changing text nodes
      * @param {Node} element Element to check

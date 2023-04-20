@@ -32,7 +32,6 @@
         set_container: function (cover, className) {
             const container = this.util.createElement('DIV');
             container.className = 'se-component ' + className;
-            container.setAttribute('contenteditable', false);
             container.appendChild(cover);
     
             return container;
@@ -55,7 +54,6 @@
          */
         create_caption: function () {
             const caption = this.util.createElement('FIGCAPTION');
-            caption.setAttribute('contenteditable', true);
             caption.innerHTML = '<div>' + this.lang.dialogBox.caption + '</div>';
             return caption;
         }

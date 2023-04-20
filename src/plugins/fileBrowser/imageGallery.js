@@ -55,9 +55,9 @@ export default {
                 '</div>';
     },
 
-    setImage: function (target) {
+    setImage: function (target, fileName) {
         this.callPlugin('image', function () {
-            const file = {name: target.parentNode.querySelector('.__se__img_name').textContent, size: 0};
+            const file = {name: fileName, size: 0};
             this.plugins.image.create_image.call(this, target.getAttribute('data-value'), null, this.context.image._origin_w, this.context.image._origin_h, 'none', file, target.alt);
         }.bind(this), null);
     }

@@ -212,7 +212,7 @@
 .sun-editor .se-list-layer.se-list-line {width:125px;}
 .sun-editor .se-list-layer.se-list-line hr {border-width: 1px 0 0; height: 1px;}
 /* submenu layer - align */
-.sun-editor .se-list-layer.se-list-align .se-list-inner {left:9px; width:125px;}
+.sun-editor .se-list-layer.se-list-align .se-list-inner {left:9px;}
 /** submenu layer - format block, paragraph style, text style */
 .sun-editor .se-list-layer.se-list-format {min-width:156px;}
 .sun-editor .se-list-layer.se-list-format li {padding:0; width:100%;}
