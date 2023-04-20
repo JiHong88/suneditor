@@ -5141,12 +5141,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const renderHTML = util.createElement('DIV');
             renderHTML.innerHTML = contents;
 
-            const figcaptions = util.getListChildren(renderHTML, function (current) {
-                return /FIGCAPTION/i.test(current.nodeName);
+            const editableEls = util.getListChildren(renderHTML, function (current) {
+                return current.hasAttribute('contenteditable');
             });
 
-            for (let i = 0, len = figcaptions.length; i < len; i++) {
-                figcaptions[i].removeAttribute('contenteditable');
+            for (let i = 0, len = editableEls.length; i < len; i++) {
+                editableEls[i].removeAttribute('contenteditable');
             }
 
             if (options.fullPage && !onlyContents) {
@@ -6454,11 +6454,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (options.showPathLabel) context.element.navigation.textContent = core._variable.currentNodes.join(' > ');
         },
 
-        _cancelCaptionEdit: function () {
-            this.setAttribute('contenteditable', false);
-            this.removeEventListener('blur', event._cancelCaptionEdit);
-        },
-
         _buttonsEventHandler: function (e) {
             let target = e.target;
             if (core._bindControllersOff) e.stopPropagation();
@@ -6510,6 +6505,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         onMouseDown_wysiwyg: function (e) {
             if (core.isReadOnly || util.isNonEditable(context.element.wysiwyg)) return;
+            if (util._isExcludeSelectionElement(e.target)) {
+                console.log("excldfjdsoiafjkls")
+                e.preventDefault();
+                return;
+            }
+
             _w.setTimeout(core._editorRange.bind(core));
 
             // user event
@@ -6528,8 +6529,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (core._isBalloon) {
                 event._hideToolbar();
             }
-
-            if (/FIGURE/i.test(e.target.nodeName)) e.preventDefault();
         },
 
         onClick_wysiwyg: function (e) {
@@ -6556,9 +6555,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             const figcaption = util.getParentElement(targetElement, 'FIGCAPTION');
-            if (figcaption && (util.isNonEditable(figcaption) || !figcaption.getAttribute("contenteditable"))) {
+            if (figcaption && util.isNonEditable(figcaption)) {
                 e.preventDefault();
-                figcaption.setAttribute('contenteditable', true);
                 figcaption.focus();
 
                 if (core._isInline && !core._inlineToolbarAttr.isShow) {

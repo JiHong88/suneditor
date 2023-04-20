@@ -660,7 +660,6 @@ export default {
         // caption
         if (contextImage._captionChecked) {
             contextImage._caption = this.plugins.component.create_caption.call(this);
-            contextImage._caption.setAttribute('contenteditable', false);
             cover.appendChild(contextImage._caption);
         }
 
