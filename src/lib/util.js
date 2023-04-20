@@ -556,14 +556,17 @@ const util = {
      */
     copyTagAttributes: function (originEl, copyEl, blacklist) {
         if (copyEl.style.cssText) {
-            originEl.style.cssText += copyEl.style.cssText;
+            const copyStyles = copyEl.style;
+            for (let i = 0, len = copyStyles.length; i < len; i++) {
+                originEl.style[copyStyles[i]] = copyStyles[copyStyles[i]];
+            }
         }
 
         const attrs = copyEl.attributes;
         for (let i = 0, len = attrs.length, name; i < len; i++) {
             name = attrs[i].name.toLowerCase();
             if ((blacklist && blacklist.indexOf(name) > -1) || !attrs[i].value) originEl.removeAttribute(name);
-            else originEl.setAttribute(attrs[i].name, attrs[i].value);
+            else if (name !== 'style') originEl.setAttribute(attrs[i].name, attrs[i].value);
         }
     },
 
