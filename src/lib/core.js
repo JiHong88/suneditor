@@ -3288,7 +3288,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             if (!isRemoveNode && parentCon === endCon.parentNode && parentCon.nodeName === newInnerNode.nodeName) {
                 if (util.onlyZeroWidthSpace(startCon.textContent.slice(0, startOff)) && util.onlyZeroWidthSpace(endCon.textContent.slice(endOff))) {
                     const children = parentCon.childNodes;
-                    let sameTag = false;
+                    let sameTag = true;
     
                     for (let i = 0, len = children.length, c, s, e, z; i < len; i++) {
                         c = children[i];
