@@ -185,7 +185,7 @@ Image_.prototype = {
 	 */
 	ready: function (target) {
 		if (!target) return;
-		const figureInfo = this.figure.open(target, this._nonResizing);
+		const figureInfo = this.figure.open(target, this._nonResizing, false);
 		this.anchor.set(domUtils.isAnchor(target.parentNode) ? target.parentNode : null);
 
 		this._linkElement = this.anchor.currentTarget;

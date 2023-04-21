@@ -1,5 +1,5 @@
 import CoreInjector from '../editorInjector/_core';
-import { domUtils, numbers, env } from '../helper';
+import { domUtils, env } from '../helper';
 import Figure from './Figure';
 
 /**
@@ -134,21 +134,20 @@ FileManager.prototype = {
 
 		// figure
 		if (this.figure) {
-			if (!element.getAttribute('data-origin')) {
+			if (!element.getAttribute('data-se-size')) {
 				const size = this.figure.getSize(element);
 				const w = element.naturalWidth || size.w;
 				const h = element.naturalHeight || size.h;
-				element.setAttribute('data-origin', w + ',' + h);
 				if (!element.getAttribute('data-se-size')) element.setAttribute('data-se-size', w + ',' + h);
 			}
 
 			const figureInfo = Figure.GetContainer(element);
 			if (!figureInfo.container || !figureInfo.cover) {
 				try {
-					const size = (element.getAttribute('data-se-size') || element.getAttribute('data-origin') || '').split(',');
+					const size = (element.getAttribute('data-se-size') || ',').split(',');
 					this.figure.__fileManagerInfo = true;
 					this.inst.ready(element, null);
-					this.figure.setSize(numbers.get(size[0]) ? size[0] : 'auto', numbers.get(size[1]) ? size[1] : 'auto');
+					this.figure.setSize(size[0], size[1]);
 					this.inst.init();
 				} catch (error) {
 					console.warn('[SUNEDITOR.FileManager[' + this.kind + '].setInfo.error] ' + error.message);
@@ -180,7 +179,7 @@ FileManager.prototype = {
 	_checkInfo: function () {
 		let tags = [];
 		for (let i = 0, len = this.tagNames.length; i < len; i++) {
-			tags = tags.concat([].slice.call(this.editor.frameContext.get('wysiwyg').querySelectorAll(this.tagNames[i] + ':not([data-embed="true"])')));
+			tags = tags.concat([].slice.call(this.editor.frameContext.get('wysiwyg').querySelectorAll(this.tagNames[i] + ':not([data-se-embed="true"])')));
 		}
 
 		if (tags.length === this.infoList.length) {

@@ -434,7 +434,7 @@ Video.prototype = {
 
 		// size
 		this.figure.open(oFrame, this._nonResizing, true);
-		const size = (oFrame.getAttribute('data-se-size') || oFrame.getAttribute('data-origin') || '').split(',');
+		const size = (oFrame.getAttribute('data-se-size') || ',').split(',');
 		this.applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
 
 		// align
@@ -546,11 +546,6 @@ Video.prototype = {
 
 	constructor: Video
 };
-
-function OnloadVideo(element) {
-	this.init();
-	this.component.select(element, 'video');
-}
 
 function FileCheckHandler(element) {
 	this.ready(element);

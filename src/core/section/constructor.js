@@ -16,7 +16,7 @@ const DEFAULT_FORMAT_BR_LINE = 'PRE';
 const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|DETAILS';
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
-const REQUIRED_DATA_ATTRS = 'data-se-index|data-se-key|data-se-value|data-se-type|data-se-size|data-se-file-name|data-se-file-size|data-origin|data-percentage|data-embed';
+const REQUIRED_DATA_ATTRS = 'data-se-index|data-se-key|data-se-value|data-se-type|data-se-size|data-se-file-name|data-se-file-size|data-se-embed';
 
 /**
  * @description document create

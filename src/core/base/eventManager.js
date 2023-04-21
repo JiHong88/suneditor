@@ -381,7 +381,7 @@ EventManager.prototype = {
 		const fileComponent = domUtils.getParentElement(commonCon, this.component.is);
 		if (fileComponent && !domUtils.isTable(fileComponent)) {
 			return;
-		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-embed') === 'true') {
+		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-se-embed') === 'true') {
 			let el = commonCon.nextElementSibling;
 			if (!this.format.isLine(el)) el = this.format.addLine(commonCon, this.options.get('defaultLine'));
 			this.selection.setRange(el.firstChild, 0, el.firstChild, 0);
