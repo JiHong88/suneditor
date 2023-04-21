@@ -2,7 +2,7 @@
  * @fileoverview eventManager class
  */
 
-import CoreInjector from '../../injector/_core';
+import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
 
 const _w = env._w;

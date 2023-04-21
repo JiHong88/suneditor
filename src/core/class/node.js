@@ -2,7 +2,7 @@
  * @fileoverview Node util class
  */
 
-import CoreInjector from '../../injector/_core';
+import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, env, numbers } from '../../helper';
 
 const Node_ = function (editor) {

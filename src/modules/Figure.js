@@ -1,4 +1,4 @@
-import EditorInjector from '../injector';
+import EditorInjector from '../editorInjector';
 import { Controller, SelectMenu } from '../modules';
 import { domUtils, numbers } from '../helper';
 

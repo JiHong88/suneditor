@@ -1,5 +1,5 @@
 import { domUtils } from '../helper';
-import CoreInjector from '../injector/_core';
+import CoreInjector from '../editorInjector/_core';
 
 /**
  * @description Create a color picker element and register for related events. (this.target)

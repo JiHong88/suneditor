@@ -1,4 +1,4 @@
-import EditorInjector from '../../injector';
+import EditorInjector from '../../editorInjector';
 import { Modal, Controller } from '../../modules';
 import { domUtils, env, converter, unicode } from '../../helper';
 

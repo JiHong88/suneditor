@@ -2,7 +2,7 @@
  * @fileoverview Menu class
  */
 
-import CoreInjector from '../../injector/_core';
+import CoreInjector from '../../editorInjector/_core';
 import { domUtils, converter } from '../../helper';
 
 const Menu = function (editor) {

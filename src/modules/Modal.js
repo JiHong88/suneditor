@@ -1,5 +1,5 @@
 import { domUtils } from '../helper';
-import CoreInjector from '../injector/_core';
+import CoreInjector from '../editorInjector/_core';
 
 const Modal = function (inst, element) {
 	CoreInjector.call(this, inst.editor);

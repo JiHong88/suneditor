@@ -2,7 +2,7 @@
  * @fileoverview Component class
  */
 
-import CoreInjector from '../../injector/_core';
+import CoreInjector from '../../editorInjector/_core';
 import { domUtils, env } from '../../helper';
 import Figure from '../../modules/Figure';
 

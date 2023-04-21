@@ -1,4 +1,4 @@
-import EditorInjector from '../../injector';
+import EditorInjector from '../../editorInjector';
 import { domUtils, converter } from '../../helper';
 
 const FontSize = function (editor) {
@@ -46,7 +46,7 @@ FontSize.prototype = {
 
 		if (currentSize !== this.currentSize) {
 			for (let i = 0, len = sizeList.length; i < len; i++) {
-				if (currentSize === sizeList[i].getAttribute('data-value')) {
+				if (currentSize === sizeList[i].getAttribute('data-command')) {
 					domUtils.addClass(sizeList[i], 'active');
 				} else {
 					domUtils.removeClass(sizeList[i], 'active');
@@ -62,7 +62,7 @@ FontSize.prototype = {
 	 * @param {Element} target Target command button
 	 */
 	action: function (target) {
-		const value = target.getAttribute('data-value');
+		const value = target.getAttribute('data-command');
 		if (value) {
 			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + value + ';' });
 			this.format.applyTextStyle(newNode, ['font-size'], null, null);
@@ -84,7 +84,7 @@ function CreateHTML(editor) {
 	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="se-btn se-btn-list default_value" title="' + lang.default + '" aria-label="' + lang.default + '">(' + lang.default + ')</button></li>';
 	for (let i = 0, unit = options.get('fontSizeUnit'), len = sizeList.length, size; i < len; i++) {
 		size = sizeList[i];
-		list += '<li><button type="button" class="se-btn se-btn-list" data-value="' + size + unit + '" title="' + size + unit + '" aria-label="' + size + unit + '" style="font-size:' + size + unit + ';">' + size + '</button></li>';
+		list += '<li><button type="button" class="se-btn se-btn-list" data-command="' + size + unit + '" title="' + size + unit + '" aria-label="' + size + unit + '" style="font-size:' + size + unit + ';">' + size + '</button></li>';
 	}
 	list += '</ul></div>';
 

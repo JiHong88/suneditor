@@ -1,6 +1,6 @@
 import Editor from './core/editor';
 
-import EditorInjector from './injector';
+import EditorInjector from './editorInjector';
 import Plugins from './plugins';
 import Langs from './langs';
 import Modules from './modules';

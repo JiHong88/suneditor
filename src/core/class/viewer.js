@@ -2,7 +2,7 @@
  * @fileoverview Viewer class
  */
 
-import CoreInjector from '../../injector/_core';
+import CoreInjector from '../../editorInjector/_core';
 import { domUtils, env, converter } from '../../helper';
 
 const Viewer = function (editor) {

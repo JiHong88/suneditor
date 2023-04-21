@@ -2,7 +2,7 @@
  * @fileoverview Selection class
  */
 
-import CoreInjector from '../../injector/_core';
+import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode } from '../../helper';
 
 const Selection = function (editor) {

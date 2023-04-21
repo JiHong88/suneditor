@@ -5,7 +5,7 @@ import History from './base/history';
 import EventManager from './base/eventManager';
 
 // class injector
-import ClassInjector from '../injector/_classes';
+import ClassInjector from '../editorInjector/_classes';
 
 // classes
 import Char from './class/char';

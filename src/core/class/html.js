@@ -2,7 +2,7 @@
  * @fileoverview Char class
  */
 
-import CoreInjector from '../../injector/_core';
+import CoreInjector from '../../editorInjector/_core';
 import { domUtils, converter, numbers, unicode, env } from '../../helper';
 
 const HTML = function (editor) {
@@ -280,7 +280,7 @@ HTML.prototype = {
 					}.bind(this)
 				);
 				afterNode = this.node.split(container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
-				if (afterNode) {
+				if (!afterNode) {
 					tempAfterNode = afterNode = line;
 				} else if (insertListCell) {
 					if (line.contains(container)) {

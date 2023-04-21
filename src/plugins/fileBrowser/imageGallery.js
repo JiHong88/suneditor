@@ -1,4 +1,4 @@
-import EditorInjector from '../../injector';
+import EditorInjector from '../../editorInjector';
 import { FileBrowser } from '../../modules';
 
 const ImageGallery = function (editor) {

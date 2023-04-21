@@ -1,4 +1,4 @@
-import CoreInjector from '../injector/_core';
+import CoreInjector from '../editorInjector/_core';
 import { domUtils, numbers, env } from '../helper';
 import Figure from './Figure';
 

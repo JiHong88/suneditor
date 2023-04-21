@@ -2,7 +2,7 @@
  * @fileoverview Char class
  */
 
-import CoreInjector from '../../injector/_core';
+import CoreInjector from '../../editorInjector/_core';
 import env from '../../helper/env';
 import { addClass, removeClass, hasClass } from '../../helper/domUtils';
 

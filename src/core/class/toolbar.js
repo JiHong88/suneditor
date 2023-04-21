@@ -3,7 +3,7 @@
  */
 
 import { domUtils } from '../../helper';
-import CoreInjector from '../../injector/_core';
+import CoreInjector from '../../editorInjector/_core';
 import { CreateToolBar } from '../section/constructor';
 
 const Toolbar = function (editor, params) {

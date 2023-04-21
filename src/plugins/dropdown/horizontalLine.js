@@ -1,4 +1,4 @@
-import EditorInjector from '../../injector';
+import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 const HorizontalLine = function (editor) {
@@ -74,9 +74,7 @@ function CreateHTML(editor) {
 	for (let i = 0, len = items.length; i < len; i++) {
 		list +=
 			'<li>' +
-			'<button type="button" class="se-btn se-btn-list" data-command="horizontalLine" data-value="' +
-			items[i].class +
-			'" title="' +
+			'<button type="button" class="se-btn se-btn-list" data-command="horizontalLine" title="' +
 			items[i].name +
 			'" aria-label="' +
 			items[i].name +

@@ -1,4 +1,4 @@
-import EditorInjector from '../injector';
+import EditorInjector from '../editorInjector';
 import SelectMenu from './SelectMenu';
 import { domUtils } from '../helper';
 

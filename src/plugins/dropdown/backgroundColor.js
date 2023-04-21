@@ -1,4 +1,4 @@
-import EditorInjector from '../../injector';
+import EditorInjector from '../../editorInjector';
 import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 

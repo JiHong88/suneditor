@@ -2,7 +2,7 @@
  * @fileoverview Format class
  */
 
-import CoreInjector from '../../injector/_core';
+import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers, env } from '../../helper';
 
 const Format = function (editor) {

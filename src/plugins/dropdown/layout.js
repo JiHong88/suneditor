@@ -1,4 +1,4 @@
-import EditorInjector from '../../injector';
+import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
 const Layout = function (editor) {
