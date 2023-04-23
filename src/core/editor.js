@@ -312,7 +312,7 @@ const Editor = function (multiTargets, options) {
 	const isIframe = inst.options.get('iframe');
 	const rootSize = this.rootTargets.size;
 	let rootIndex = 0;
-	this.rootTargets.forEach(function (e) {
+	this.applyRootTargets(function (e) {
 		const o = e.get('originElement');
 		const t = e.get('topArea');
 		o.style.display = 'none';
@@ -513,6 +513,14 @@ Editor.prototype = {
 	},
 
 	/**
+	 * @description Executes a function by traversing all root targets.
+	 * @param {Function} f Function
+	 */
+	applyRootTargets: function (f) {
+		this.rootTargets.forEach(f);
+	},
+
+	/**
 	 * @description Set direction to "rtl" or "ltr".
 	 * @param {string} dir "rtl" or "ltr"
 	 */
@@ -528,14 +536,20 @@ Editor.prototype = {
 			if (typeof plugins[k].setDir === 'function') plugins[k].setDir(dir);
 		}
 
+		const toolbarContainer = this.options.get('toolbar_container');
+		const toolbarTopArea = toolbarContainer ? toolbarContainer.querySelector('.sun-editor') : null;
+		const statusbarContainer = this.options.get('statusbar_container');
+		const statusbarTopArea = statusbarContainer ? statusbarContainer.querySelector('.sun-editor') : null;
 		if (rtl) {
-			domUtils.addClass(fc.get('topArea'), 'se-rtl');
-			domUtils.addClass(fc.get('wysiwygFrame'), 'se-rtl');
-			domUtils.addClass(this._carrierWrapper, 'se-rtl');
+			this.applyRootTargets(function (e) {
+				domUtils.addClass([e.get('topArea'), e.get('wysiwygFrame')], 'se-rtl');
+			});
+			domUtils.addClass([this._carrierWrapper, toolbarTopArea, statusbarTopArea], 'se-rtl');
 		} else {
-			domUtils.removeClass(fc.get('topArea'), 'se-rtl');
-			domUtils.removeClass(fc.get('wysiwygFrame'), 'se-rtl');
-			domUtils.removeClass(this._carrierWrapper, 'se-rtl');
+			this.applyRootTargets(function (e) {
+				domUtils.removeClass([e.get('topArea'), e.get('wysiwygFrame')], 'se-rtl');
+			});
+			domUtils.removeClass([this._carrierWrapper, toolbarTopArea, statusbarTopArea], 'se-rtl');
 		}
 
 		const lineNodes = domUtils.getListChildren(
@@ -571,25 +585,18 @@ Editor.prototype = {
 
 	/**
 	 * @description Add or reset option property (Editor is reloaded)
-	 * @param {Object} _options Options
+	 * @param {Object} newOptions Options
 	 */
-	setOptions: function (_options) {
+	setOptions: function (newOptions) {
 		this.viewer.codeView(false);
 		this.viewer.showBlocks(false);
 
-		[this.options, _options].reduce(function (init, option) {
-			for (let key in option) {
-				if (key === 'plugins') {
-					continue;
-				} else {
-					init[key] = option[key];
-				}
-			}
-			return init;
-		}, {});
-
-		// @todo
-		ResetOptions();
+		const origin = this.options;
+		const newKeys = this._w.Object.keys(newOptions);
+		const newMap = ResetOptions(newOptions);
+		for (let i = 0, len = newKeys.length; i < len; i++) {
+			origin.set(newKeys[i], newMap.get(newKeys[i]));
+		}
 	},
 
 	/**
@@ -831,7 +838,7 @@ Editor.prototype = {
 		domUtils.removeItem(this._carrierWrapper);
 		domUtils.removeItem(this.context.get('toolbar._wrapper'));
 		domUtils.removeItem(this.context.get('toolbar.sub._wrapper'));
-		this.rootTargets.forEach(function (e) {
+		this.applyRootTargets(function (e) {
 			domUtils.removeItem(e.get('topArea'));
 		});
 
@@ -1139,7 +1146,7 @@ Editor.prototype = {
 	 * @private
 	 */
 	__editorInit: function () {
-		this.rootTargets.forEach(
+		this.applyRootTargets(
 			function (e) {
 				this._setEditorParams(e);
 				this._initWysiwygArea(e, e.get('options').get('value'));
@@ -1162,7 +1169,7 @@ Editor.prototype = {
 				// toolbar visibility
 				this.context.get('toolbar.main').style.visibility = '';
 				// roots
-				this.rootTargets.forEach(
+				this.applyRootTargets(
 					function (e) {
 						if (typeof this._resourcesStateChange !== 'function') return;
 						// observer
@@ -1281,6 +1288,7 @@ Editor.prototype = {
 		const cmdButtons = isSub ? this.subAllCommandButtons : this.allCommandButtons;
 		const shortcuts = this.options.get('shortcuts');
 		const reverseCommandArray = this.options.get('_reverseCommandArray');
+		const reverseIconArray = this.options.get('reverseIcons');
 		const keyMap = this.shortcutsKeyMap;
 		const reverseKeys = this.reverseKeys;
 
@@ -1289,7 +1297,7 @@ Editor.prototype = {
 			c = e.getAttribute('data-command');
 			// command set
 			cmdButtons.set(c, e);
-			this.__setCommandTargets(c, e);
+			this.__setCommandTargets(c, e, reverseIconArray);
 			// shortcuts
 			CreateShortcuts(c, e, shortcuts[c], keyMap, reverseCommandArray, reverseKeys);
 		}
@@ -1299,8 +1307,10 @@ Editor.prototype = {
 		}
 	},
 
-	__setCommandTargets: function (cmd, target) {
+	__setCommandTargets: function (cmd, target, ri) {
 		if (!cmd || !target) return;
+
+		if (ri.indexOf(cmd) > -1) domUtils.addClass(target, 'se-icon-flip-rtl');
 
 		const isBasicCmd = BASIC_COMMANDS.indexOf(cmd) > -1;
 		if (!isBasicCmd && !this.plugins[cmd]) return;

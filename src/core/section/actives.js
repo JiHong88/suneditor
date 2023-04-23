@@ -67,23 +67,6 @@ export function DIR_BTN_ACTIVE(editor, rtl) {
 		info.r = temp;
 	});
 
-	// change reverse buttons
-	editor.options.get('reverseCommands').forEach(function (reverseCmds) {
-		const cmds = reverseCmds.split('-');
-		let a = commandTargets.get(cmds[0]);
-		let b = commandTargets.get(cmds[1]);
-		if (!a || !b) return;
-
-		a = a[0].innerHTML;
-		b = b[0].innerHTML;
-		editor.applyCommandTargets(cmds[0], function (e) {
-			e.innerHTML = b;
-		});
-		editor.applyCommandTargets(cmds[1], function (e) {
-			e.innerHTML = a;
-		});
-	});
-
 	// change dir buttons
 	editor.applyCommandTargets('dir', function (e) {
 		domUtils.changeTxt(e.querySelector('.se-tooltip-text'), editor.lang[rtl ? 'dir_ltr' : 'dir_rtl']);

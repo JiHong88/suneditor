@@ -198,7 +198,9 @@ EventManager.prototype = {
 		this.status.currentNodesMap = commandMapNodes;
 
 		/**  Displays the current node structure to statusbar */
-		if (this.editor.frameOptions.get('statusbar_showPathLabel') && this.editor.frameContext.get('navigation')) this.editor.frameContext.get('navigation').textContent = this.status.currentNodes.join(' > ');
+		if (this.editor.frameOptions.get('statusbar_showPathLabel') && this.editor.frameContext.get('navigation')) {
+			this.editor.frameContext.get('navigation').textContent = this.options.get('_rtl') ? this.status.currentNodes.reverse().join(' < ') : this.status.currentNodes.join(' > ');
+		}
 	},
 
 	/**
@@ -1881,7 +1883,7 @@ function OnBlur_wysiwyg(rootKey, e) {
 	this.status.currentNodes = [];
 	this.status.currentNodesMap = [];
 
-	this.editor.rootTargets.forEach(function (e) {
+	this.editor.applyRootTargets(function (e) {
 		if (e.get('navigation')) e.get('navigation').textContent = '';
 	});
 

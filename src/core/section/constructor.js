@@ -197,9 +197,11 @@ const Constructor = function (editorTargets, options) {
 
 /**
  * @description Reset the options
- * @returns {Object}
+ * @param {Object} options Options object
  */
-export function ResetOptions() {}
+export function ResetOptions(options) {
+	return InitOptions(options, []);
+}
 
 /**
  * @description Create shortcuts desc span.
@@ -207,10 +209,10 @@ export function ResetOptions() {}
  * @param {Array.<string>} values options.shortcuts[command]
  * @param {Element} button Command button element
  * @param {Map} keyMap Map to store shortcut key info
- * @param {Array} rca "_reverseCommandArray" option
+ * @param {Array} rc "_reverseCommandArray" option
  * @param {Array} reverseKeys Reverse key array
  */
-export function CreateShortcuts(command, button, values, keyMap, rca, reverseKeys) {
+export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys) {
 	if (!values || values.length < 2) return;
 	const tooptip = button.querySelector('.se-tooltip-text');
 
@@ -219,8 +221,8 @@ export function CreateShortcuts(command, button, values, keyMap, rca, reverseKey
 		s = /^s/i.test(v);
 		k = numbers.get(v) + (s ? 1000 : 0);
 		if (!keyMap.has(k)) {
-			r = rca.indexOf(command);
-			r = r === -1 ? '' : numbers.isOdd(r) ? rca[r + 1] : rca[r - 1];
+			r = rc.indexOf(command);
+			r = r === -1 ? '' : numbers.isOdd(r) ? rc[r + 1] : rc[r - 1];
 			if (r) reverseKeys.push(k);
 			keyMap.set(k, { c: command, r: r, t: button.getAttribute('data-type'), e: button });
 		}
@@ -248,6 +250,7 @@ function InitOptions(options, editorTargets) {
 
 	/** Base */
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
+	o.set('fontSizeUnit', typeof options.fontSizeUnit === 'string' ? options.fontSizeUnit.trim().toLowerCase() || 'px' : 'px');
 	// text style tags
 	const textTags = converter.mergeObject(
 		{
@@ -310,6 +313,7 @@ function InitOptions(options, editorTargets) {
 	if (numbers.isEven(o.get('_reverseCommandArray').length)) {
 		console.warn('[SUNEDITOR.create.warning] The "reverseCommands" option is invalid, Shortcuts key may not work properly.');
 	}
+	o.set('reverseIcons', ['indent', 'outdent', 'list', 'link'].concat(options.reverseIcons || []));
 
 	// etc
 	o.set('historyStackDelayTime', typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400);
@@ -317,7 +321,7 @@ function InitOptions(options, editorTargets) {
 	o.set('_editableClass', 'sun-editor-editable' + (o.get('_rtl') ? ' se-rtl' : ''));
 	o.set('callBackSave', options.callBackSave);
 	o.set('lineAttrReset', ['id'].concat(options.lineAttrReset && typeof options.lineAttrReset === 'string' ? options.lineAttrReset.toLowerCase().split('|') : []));
-	o.set('_printClass', typeof options._printClass === 'string' ? options._printClass : null);
+	o.set('printClass', typeof options.printClass === 'string' ? options.printClass : null);
 
 	/** whitelist, blacklist */
 	// default line
@@ -417,7 +421,6 @@ function InitOptions(options, editorTargets) {
 	o.set('lineHeights', !options.lineHeights ? null : options.lineHeights);
 	o.set('paragraphStyles', !options.paragraphStyles ? null : options.paragraphStyles);
 	o.set('textStyles', !options.textStyles ? null : options.textStyles);
-	o.set('fontSizeUnit', typeof options.fontSizeUnit === 'string' ? options.fontSizeUnit.trim().toLowerCase() || 'px' : 'px');
 	o.set('alignItems', typeof options.alignItems === 'object' ? options.alignItems : o.get('_rtl') ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify']);
 	o.set('templates', !options.templates ? null : options.templates);
 	o.set(
@@ -561,7 +564,7 @@ function InitOptions(options, editorTargets) {
 	o.set('__listCommonStyle', options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle']);
 
 	/** --- Icons ------------------------------------------------------------------------------------------ */
-	let icons =
+	const icons =
 		!options.icons || typeof options.icons !== 'object'
 			? _icons
 			: [_icons, options.icons].reduce(function (_default, _new) {
@@ -570,15 +573,6 @@ function InitOptions(options, editorTargets) {
 					}
 					return _default;
 			  }, {});
-	// rtl
-	if (o.get('_rtl')) {
-		icons = [icons, icons.rtl].reduce(function (_default, _new) {
-			for (let key in _new) {
-				_default[key] = _new[key];
-			}
-			return _default;
-		}, {});
-	}
 	o.set('icons', icons);
 
 	return {

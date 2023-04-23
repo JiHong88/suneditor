@@ -71,7 +71,7 @@ const Figure = function (inst, controls, params) {
 	// init
 	this.eventManager.addEvent(this.alignButton, 'click', OnClick_alignButton.bind(this));
 	this.eventManager.addEvent(this.resizeButton, 'click', OnClick_resizeButton.bind(this));
-	this.editor.rootTargets.forEach(
+	this.editor.applyRootTargets(
 		function (e) {
 			if (!e.get('editorArea').querySelector('.se-controller.se-resizing-container')) {
 				const main = CreateHTML_resizeDot();

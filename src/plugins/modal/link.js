@@ -187,7 +187,7 @@ function CreateHTML_controller(editor) {
 		lang.edit +
 		'</span></span>' +
 		'</button>' +
-		'<button type="button" data-command="unlink" tabindex="-1" class="se-btn se-tooltip">' +
+		'<button type="button" data-command="unlink" tabindex="-1" class="se-btn se-tooltip se-icon-flip-rtl">' +
 		icons.unlink +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
 		lang.unlink +

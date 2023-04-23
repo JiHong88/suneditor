@@ -2238,13 +2238,19 @@
 
 
 /** --- RTL -------------------------------------------------------------------------------------------------------------------------------------------------- */
-/* tray */
-.sun-editor.se-rtl .se-btn-tray {
-    direction: rtl;
+/* icon */
+.sun-editor.se-rtl .se-icon-flip-rtl svg,
+.sun-editor.se-rtl .se-icon-flip-rtl .se-svg {
+    transform: scaleX(-1);
 }
 
 .sun-editor.se-rtl .se-btn-select svg {
     margin: auto 1px;
+}
+
+/* statusbar */
+.sun-editor.se-rtl .se-status-bar .se-navigation {
+    direction: rtl;
 }
 
 /* button--- */
