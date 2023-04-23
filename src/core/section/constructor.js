@@ -18,6 +18,15 @@ const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|D
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 const REQUIRED_DATA_ATTRS = 'data-se-index|data-se-key|data-se-value|data-se-type|data-se-size|data-se-file-name|data-se-file-size|data-se-embed';
 
+export const RE_OPTIONS = ['events', 'textDirection', 'textTags', 'callBackSave', 'lineAttrReset', 'defaultLine', 'tabDisable',
+	'shortcutsHint', 'shortcutsDisable', 'shortcuts', 'fullScreenOffset', 'previewTemplate', 'printTemplate', 'mediaAutoSelect'
+];
+// ?['mode', 'reverseCommands', 'toolbar_width','toolbar_container','toolbar_sticky','buttonList','statusbar_container','frameAttrbutes', 'iframe','iframe_fullPage','iframe_attributes','iframe_cssFileName']
+// ?plugin_menu['hrItems','font','fontSize','formats','colorList_font','colorList_background','lineHeights','paragraphStyles','textStyles','alignItems','templates','mathFontSize']
+// x['historyStackDelayTime','elementWhitelist','elementBlacklist','attributeWhitelist', 'attributeBlacklist',
+// 'formatLine','formatBrLine','formatBlock','formatClosureBrLine','formatClosureBlock','toolbar_hide',
+// 'fontSizeUnit']
+
 /**
  * @description document create
  * @param {Object} options Options

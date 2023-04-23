@@ -17,7 +17,7 @@ const EventManager = function (editor) {
 	this._events = [];
 	this._onButtonsCheck = new _w.RegExp('^(' + _w.Object.keys(editor.options.get('_defaultStyleTagMap')).join('|') + ')$', 'i');
 	this._onShortcutKey = false;
-	this._IEisComposing = false; // In IE, there is no 'e.isComposing' in the key-up event.
+	this.isComposing = false; // In IE, there is no 'e.isComposing' in the key-up event.
 	this._balloonDelay = null;
 	this._resizeObserver = null;
 	this._toolbarObserver = null;
@@ -961,7 +961,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 	const shift = e.shiftKey;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 	const alt = e.altKey;
-	this._IEisComposing = keyCode === 229;
+	this.isComposing = keyCode === 229;
 
 	if (!ctrl && this.status.isReadOnly && !DIRECTION_KEYCODE.test(keyCode)) {
 		e.preventDefault();
@@ -1778,7 +1778,7 @@ function OnKeyUp_wysiwyg(rootKey, e) {
 	}
 
 	const textKey = !ctrl && !alt && !NON_TEXT_KEYCODE.test(keyCode);
-	if (textKey && selectionNode.nodeType === 3 && unicode.zeroWidthRegExp.test(selectionNode.textContent) && !(e.isComposing !== undefined ? e.isComposing : this._IEisComposing)) {
+	if (textKey && selectionNode.nodeType === 3 && unicode.zeroWidthRegExp.test(selectionNode.textContent) && !(e.isComposing !== undefined ? e.isComposing : this.isComposing)) {
 		let so = range.startOffset,
 			eo = range.endOffset;
 		const frontZeroWidthCnt = (selectionNode.textContent.substring(0, eo).match(FRONT_ZEROWIDTH) || '').length;

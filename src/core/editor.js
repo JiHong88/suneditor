@@ -1,5 +1,5 @@
 import Helper, { env, converter, domUtils, numbers } from '../helper';
-import Constructor, { ResetOptions, UpdateButton, CreateShortcuts } from './section/constructor';
+import Constructor, { ResetOptions, UpdateButton, CreateShortcuts, RE_OPTIONS } from './section/constructor';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './section/actives';
 import History from './base/history';
 import EventManager from './base/eventManager';
@@ -594,8 +594,9 @@ Editor.prototype = {
 		const origin = this.options;
 		const newKeys = this._w.Object.keys(newOptions);
 		const newMap = ResetOptions(newOptions);
-		for (let i = 0, len = newKeys.length; i < len; i++) {
-			origin.set(newKeys[i], newMap.get(newKeys[i]));
+		for (let i = 0, len = newKeys.length, k; i < len; i++) {
+			k = newKeys[i];
+			if (RE_OPTIONS.indexOf(k) > -1) origin.set(k, newMap.get(k));
 		}
 	},
 
