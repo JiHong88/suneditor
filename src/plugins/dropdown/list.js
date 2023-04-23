@@ -23,7 +23,7 @@ const List = function (editor) {
 
 List.key = 'list';
 List.type = 'dropdown';
-List.className = '';
+List.className = 'se-icon-flip-rtl';
 List.prototype = {
 	/**
 	 * @override core

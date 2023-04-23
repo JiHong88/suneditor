@@ -313,7 +313,6 @@ function InitOptions(options, editorTargets) {
 	if (numbers.isEven(o.get('_reverseCommandArray').length)) {
 		console.warn('[SUNEDITOR.create.warning] The "reverseCommands" option is invalid, Shortcuts key may not work properly.');
 	}
-	o.set('reverseIcons', ['indent', 'outdent', 'list', 'link'].concat(options.reverseIcons || []));
 
 	// etc
 	o.set('historyStackDelayTime', typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400);
@@ -889,8 +888,8 @@ function _defaultButtons(options, icons, lang) {
 		subscript: ['', lang.subscript, 'subscript', '', icons.subscript],
 		superscript: ['', lang.superscript, 'superscript', '', icons.superscript],
 		removeFormat: ['', lang.removeFormat, 'removeFormat', '', icons.erase],
-		indent: ['', lang.indent, 'indent', '', isRTL ? icons.outdent : icons.indent],
-		outdent: ['', lang.outdent, 'outdent', '', isRTL ? icons.indent : icons.outdent],
+		indent: ['se-icon-flip-rtl', lang.indent, 'indent', '', isRTL ? icons.outdent : icons.indent],
+		outdent: ['se-icon-flip-rtl', lang.outdent, 'outdent', '', isRTL ? icons.indent : icons.outdent],
 		fullScreen: ['se-code-view-enabled se-resizing-enabled', lang.fullScreen, 'fullScreen', '', icons.expansion],
 		showBlocks: ['', lang.showBlocks, 'showBlocks', '', icons.show_blocks],
 		codeView: ['se-code-view-enabled se-resizing-enabled', lang.codeView, 'codeView', '', icons.code_view],

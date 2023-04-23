@@ -1288,7 +1288,6 @@ Editor.prototype = {
 		const cmdButtons = isSub ? this.subAllCommandButtons : this.allCommandButtons;
 		const shortcuts = this.options.get('shortcuts');
 		const reverseCommandArray = this.options.get('_reverseCommandArray');
-		const reverseIconArray = this.options.get('reverseIcons');
 		const keyMap = this.shortcutsKeyMap;
 		const reverseKeys = this.reverseKeys;
 
@@ -1297,7 +1296,7 @@ Editor.prototype = {
 			c = e.getAttribute('data-command');
 			// command set
 			cmdButtons.set(c, e);
-			this.__setCommandTargets(c, e, reverseIconArray);
+			this.__setCommandTargets(c, e);
 			// shortcuts
 			CreateShortcuts(c, e, shortcuts[c], keyMap, reverseCommandArray, reverseKeys);
 		}
@@ -1307,10 +1306,8 @@ Editor.prototype = {
 		}
 	},
 
-	__setCommandTargets: function (cmd, target, ri) {
+	__setCommandTargets: function (cmd, target) {
 		if (!cmd || !target) return;
-
-		if (ri.indexOf(cmd) > -1) domUtils.addClass(target, 'se-icon-flip-rtl');
 
 		const isBasicCmd = BASIC_COMMANDS.indexOf(cmd) > -1;
 		if (!isBasicCmd && !this.plugins[cmd]) return;

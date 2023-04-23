@@ -23,7 +23,7 @@ const Link = function (editor) {
 
 Link.key = 'link';
 Link.type = 'modal';
-Link.className = '';
+Link.className = 'se-icon-flip-rtl';
 Link.prototype = {
 	/**
 	 * @override core
