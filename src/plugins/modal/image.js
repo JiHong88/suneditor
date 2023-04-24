@@ -202,7 +202,10 @@ Image_.prototype = {
 
 		if (this.imgUrlFile) this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = this._element.src;
 
-		(this.modal.form.querySelector('input[name="suneditor_image_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]')).checked = true;
+		(
+			this.modal.form.querySelector('input[name="suneditor_image_radio"][value="' + this._align + '"]') ||
+			this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]')
+		).checked = true;
 		this.captionCheckEl.checked = !!this._caption;
 
 		if (!this._resizing) return;
@@ -401,7 +404,12 @@ Image_.prototype = {
 		let existElement = null;
 		if (isNewContainer) {
 			imageEl = this._element;
-			existElement = this.format.isBlock(imageEl.parentNode) || domUtils.isWysiwygFrame(imageEl.parentNode) ? imageEl : domUtils.isAnchor(imageEl.parentNode) ? imageEl.parentNode : this.format.getLine(imageEl) || imageEl;
+			existElement =
+				this.format.isBlock(imageEl.parentNode) || domUtils.isWysiwygFrame(imageEl.parentNode)
+					? imageEl
+					: domUtils.isAnchor(imageEl.parentNode)
+					? imageEl.parentNode
+					: this.format.getLine(imageEl) || imageEl;
 
 			if (domUtils.getParentElement(this._element, domUtils.isExcludeFormat)) {
 				existElement = isNewAnchor ? anchor : this._element;
@@ -728,7 +736,13 @@ function OnClickRevert() {
 
 function OnLinkPreview(e) {
 	const value = e.target.value.trim();
-	this._linkValue = this.previewSrc.textContent = !value ? '' : this.options.get('linkProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0 ? this.options.get('linkProtocol') + value : value.indexOf('://') === -1 ? '/' + value : value;
+	this._linkValue = this.previewSrc.textContent = !value
+		? ''
+		: this.options.get('linkProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0
+		? this.options.get('linkProtocol') + value
+		: value.indexOf('://') === -1
+		? '/' + value
+		: value;
 }
 
 function OnfileInputChange() {
@@ -823,7 +837,15 @@ function CreateHTML_modal(editor) {
 			'</label>' +
 			'<div class="se-modal-form-files">' +
 			'<input class="se-input-form se-input-url _se_image_url" data-focus type="text" />' +
-			(options.get('imageGalleryUrl') && editor.plugins.imageGallery ? '<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="' + lang.imageGallery + '" aria-label="' + lang.imageGallery + '">' + editor.icons.image_gallery + '</button>' : '') +
+			(options.get('imageGalleryUrl') && editor.plugins.imageGallery
+				? '<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="' +
+				  lang.imageGallery +
+				  '" aria-label="' +
+				  lang.imageGallery +
+				  '">' +
+				  editor.icons.image_gallery +
+				  '</button>'
+				: '') +
 			'</div>' +
 			'<pre class="se-link-preview"></pre>' +
 			'</div>';
@@ -839,7 +861,16 @@ function CreateHTML_modal(editor) {
 		if (onlyPercentage || !options.get('imageHeightShow')) {
 			html += '<div class="se-modal-size-text">' + '<label class="size-w">' + lang.size + '</label>' + '</div>';
 		} else {
-			html += '<div class="se-modal-size-text">' + '<label class="size-w">' + lang.width + '</label>' + '<label class="se-modal-size-x">&nbsp;</label>' + '<label class="size-h">' + lang.height + '</label>' + '</div>';
+			html +=
+				'<div class="se-modal-size-text">' +
+				'<label class="size-w">' +
+				lang.width +
+				'</label>' +
+				'<label class="se-modal-size-x">&nbsp;</label>' +
+				'<label class="size-h">' +
+				lang.height +
+				'</label>' +
+				'</div>';
 		}
 		html +=
 			'<input class="se-input-control _se_image_size_x" placeholder="auto"' +

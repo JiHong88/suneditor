@@ -2,14 +2,14 @@ import EditorInjector from '../../editorInjector';
 import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 
-const BackgroundColor = function (editor) {
+const BackgroundColor = function (editor, option) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.backgroundColor;
 	this.icon = 'background_color';
 
 	// members
-	this.colorPicker = new ColorPicker(this, 'backgroundColor', this.options.get('colorList_background'));
+	this.colorPicker = new ColorPicker(this, 'backgroundColor', option.items);
 
 	// create HTML
 	const menu = CreateHTML(this.colorPicker.target);

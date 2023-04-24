@@ -1,14 +1,14 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
-const ParagraphStyle = function (editor) {
+const ParagraphStyle = function (editor, option) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.paragraphStyle;
 	this.icon = 'paragraph_style';
 
 	// create HTML
-	const menu = CreateHTML(editor);
+	const menu = CreateHTML(editor, option.items);
 
 	// members
 	this.classList = menu.querySelectorAll('li button');
@@ -63,8 +63,7 @@ ParagraphStyle.prototype = {
 	constructor: ParagraphStyle
 };
 
-function CreateHTML(editor) {
-	const options = editor.options;
+function CreateHTML(editor, items) {
 	const defaultList = {
 		spaced: {
 			name: editor.lang.menu_spaced,
@@ -82,7 +81,7 @@ function CreateHTML(editor) {
 			_class: ''
 		}
 	};
-	const paragraphStyles = !options.get('paragraphStyles') || options.get('paragraphStyles').length === 0 ? ['spaced', 'bordered', 'neon'] : options.get('paragraphStyles');
+	const paragraphStyles = !items || items.length === 0 ? ['spaced', 'bordered', 'neon'] : items;
 
 	let list = '<div class="se-list-inner"><ul class="se-list-basic">';
 	for (let i = 0, len = paragraphStyles.length, p, name, attrs, _class; i < len; i++) {
@@ -98,7 +97,23 @@ function CreateHTML(editor) {
 		attrs = p.class ? ' class="' + p.class + '"' : '';
 		_class = p._class;
 
-		list += '<li>' + '<button type="button" class="se-btn se-btn-list' + (_class ? ' ' + _class : '') + '" data-command="' + p.class + '" title="' + name + '" aria-label="' + name + '">' + '<div' + attrs + '>' + name + '</div>' + '</button></li>';
+		list +=
+			'<li>' +
+			'<button type="button" class="se-btn se-btn-list' +
+			(_class ? ' ' + _class : '') +
+			'" data-command="' +
+			p.class +
+			'" title="' +
+			name +
+			'" aria-label="' +
+			name +
+			'">' +
+			'<div' +
+			attrs +
+			'>' +
+			name +
+			'</div>' +
+			'</button></li>';
 	}
 	list += '</ul></div>';
 

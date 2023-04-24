@@ -1,17 +1,18 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
-const Template = function (editor) {
+const Template = function (editor, option) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.template;
 	this.icon = 'template';
 
 	// create HTML
-	const menu = CreateHTML(editor);
+	const menu = CreateHTML(option.items);
 
 	// members
 	this.selectedIndex = -1;
+	this.items = option.items;
 
 	// init
 	this.menu.initDropdownTarget(Template, menu);
@@ -26,7 +27,7 @@ Template.prototype = {
 	 */
 	action: function (target) {
 		const index = target.getAttribute('data-value') * 1;
-		const temp = this.options.get('templates')[(this.selectedIndex = index)];
+		const temp = this.items[(this.selectedIndex = index)];
 
 		if (temp.html) {
 			this.html.insert(temp.html);
@@ -41,8 +42,7 @@ Template.prototype = {
 	constructor: Template
 };
 
-function CreateHTML(editor) {
-	const templateList = editor.options.get('templates');
+function CreateHTML(templateList) {
 	if (!templateList || templateList.length === 0) {
 		console.warn('[SUNEDITOR.plugins.template.warn] To use the "template" plugin, please define the "templates" option.');
 	}

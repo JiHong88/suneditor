@@ -2,14 +2,14 @@ import EditorInjector from '../../editorInjector';
 import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 
-const FontColor = function (editor) {
+const FontColor = function (editor, option) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.fontColor;
 	this.icon = 'font_color';
 
 	// members
-	this.colorPicker = new ColorPicker(this, 'color', this.options.get('colorList_font'));
+	this.colorPicker = new ColorPicker(this, 'color', option.items);
 
 	// create HTML
 	const menu = CreateHTML(this.colorPicker.target);
@@ -52,7 +52,7 @@ FontColor.prototype = {
 function OnClickMenu(e) {
 	e.preventDefault();
 	e.stopPropagation();
-	
+
 	const color = e.target.getAttribute('data-value');
 	if (!color) return;
 

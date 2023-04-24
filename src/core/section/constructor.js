@@ -5,11 +5,19 @@ import { domUtils, numbers, converter, env } from '../../helper';
 
 const _d = env._d;
 const _w = env._w;
-const DEFAULT_BUTTON_LIST = [['undo', 'redo'], ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'], ['removeFormat'], ['outdent', 'indent'], ['fullScreen', 'showBlocks', 'codeView'], ['preview', 'print']];
+const DEFAULT_BUTTON_LIST = [
+	['undo', 'redo'],
+	['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+	['removeFormat'],
+	['outdent', 'indent'],
+	['fullScreen', 'showBlocks', 'codeView'],
+	['preview', 'print']
+];
 
 const REQUIRED_FORMAT_LINE = 'div';
 const REQUIRED_ELEMENT_WHITELIST = 'br|div';
-const DEFAULT_ELEMENT_WHITELIST = 'p|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
+const DEFAULT_ELEMENT_WHITELIST =
+	'p|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls';
 const DEFAULT_FORMAT_LINE = 'P|H[1-6]|LI|TH|TD|DETAILS';
 const DEFAULT_FORMAT_BR_LINE = 'PRE';
@@ -18,14 +26,23 @@ const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|D
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 const REQUIRED_DATA_ATTRS = 'data-se-index|data-se-key|data-se-value|data-se-type|data-se-size|data-se-file-name|data-se-file-size|data-se-embed';
 
-export const RE_OPTIONS = ['events', 'textDirection', 'textTags', 'callBackSave', 'lineAttrReset', 'defaultLine', 'tabDisable',
-	'shortcutsHint', 'shortcutsDisable', 'shortcuts', 'fullScreenOffset', 'previewTemplate', 'printTemplate', 'mediaAutoSelect'
+export const RE_OPTIONS = [
+	'events',
+	'textDirection',
+	'textTags',
+	'callBackSave',
+	'lineAttrReset',
+	'defaultLine',
+	'tabDisable',
+	'shortcutsHint',
+	'shortcutsDisable',
+	'shortcuts',
+	'fullScreenOffset',
+	'previewTemplate',
+	'printTemplate',
+	'mediaAutoSelect'
 ];
 // ?['mode', 'reverseCommands', 'toolbar_width','toolbar_container','toolbar_sticky','buttonList','statusbar_container','frameAttrbutes', 'iframe','iframe_fullPage','iframe_attributes','iframe_cssFileName']
-// ?plugin_menu['hrItems','font','fontSize','formats','colorList_font','colorList_background','lineHeights','paragraphStyles','textStyles','alignItems','templates','mathFontSize']
-// x['historyStackDelayTime','elementWhitelist','elementBlacklist','attributeWhitelist', 'attributeBlacklist',
-// 'formatLine','formatBrLine','formatBlock','formatClosureBrLine','formatClosureBlock','toolbar_hide',
-// 'fontSizeUnit']
 
 /**
  * @description document create
@@ -136,8 +153,16 @@ const Constructor = function (editorTargets, options) {
 
 		// line breaker
 		const line_breaker = domUtils.createElement('DIV', { class: 'se-line-breaker' }, '<button class="se-btn">' + icons.line_break + '</button>');
-		const line_breaker_t = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t' }, '<button class="se-btn">' + icons.line_break + '</button>');
-		const line_breaker_b = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b' }, '<button class="se-btn">' + icons.line_break + '</button>');
+		const line_breaker_t = domUtils.createElement(
+			'DIV',
+			{ class: 'se-line-breaker-component se-line-breaker-component-t' },
+			'<button class="se-btn">' + icons.line_break + '</button>'
+		);
+		const line_breaker_b = domUtils.createElement(
+			'DIV',
+			{ class: 'se-line-breaker-component se-line-breaker-component-b' },
+			'<button class="se-btn">' + icons.line_break + '</button>'
+		);
 		line_breaker_t.innerHTML = line_breaker_b.innerHTML = icons.line_break;
 		editor_div.appendChild(line_breaker);
 		editor_div.appendChild(line_breaker_t);
@@ -237,7 +262,10 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 		}
 
 		if (!(t = values[i + 1])) continue;
-		if (tooptip) tooptip.appendChild(domUtils.createElement('SPAN', { class: 'se-shortcut' }, env.cmdIcon + (s ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + t + '</span>'));
+		if (tooptip)
+			tooptip.appendChild(
+				domUtils.createElement('SPAN', { class: 'se-shortcut' }, env.cmdIcon + (s ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + t + '</span>')
+			);
 	}
 }
 
@@ -254,7 +282,8 @@ function InitOptions(options, editorTargets) {
 
 	/** Multi root */
 	if (options.multiRoot) {
-		if (!options.toolbar_container && !/inline|balloon/i.test(options.mode)) throw Error('[SUNEDITOR.create.fail] In multi root, The "mode" option cannot be "classic" without using the "toolbar_container" option.');
+		if (!options.toolbar_container && !/inline|balloon/i.test(options.mode))
+			throw Error('[SUNEDITOR.create.fail] In multi root, The "mode" option cannot be "classic" without using the "toolbar_container" option.');
 	}
 
 	/** Base */
@@ -275,8 +304,14 @@ function InitOptions(options, editorTargets) {
 		options.textTags || {}
 	);
 	o.set('textTags', textTags);
-	o.set('_spanStylesRegExp', new _w.RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi'));
-	o.set('_formatStylesRegExp', new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right' + (options.formatStyles ? '|' + options.formatStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi'));
+	o.set(
+		'_spanStylesRegExp',
+		new _w.RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi')
+	);
+	o.set(
+		'_formatStylesRegExp',
+		new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right' + (options.formatStyles ? '|' + options.formatStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi')
+	);
 	o.set('_defaultStyleTagMap', {
 		strong: textTags.bold,
 		b: textTags.bold,
@@ -341,23 +376,76 @@ function InitOptions(options, editorTargets) {
 	o.set('attributeWhitelist', !options.attributeWhitelist || typeof options.attributeWhitelist !== 'object' ? null : options.attributeWhitelist);
 	o.set('attributeBlacklist', !options.attributeBlacklist || typeof options.attributeBlacklist !== 'object' ? null : options.attributeBlacklist);
 	// format tag
-	o.set('formatClosureBrLine', _createFormatInfo(options.formatClosureBrLine, (options.__defaultFormatClosureBrLine = typeof options.__defaultFormatClosureBrLine === 'string' ? options.__defaultFormatClosureBrLine : DEFAULT_FORMAT_CLOSURE_BR_LINE).toLowerCase(), o.get('elementBlacklist')));
-	o.set('formatBrLine', _createFormatInfo((options.formatBrLine || '') + '|' + o.get('formatClosureBrLine').str, (options.__defaultFormatBrLine = typeof options.__defaultFormatBrLine === 'string' ? options.__defaultFormatBrLine : DEFAULT_FORMAT_BR_LINE).toLowerCase(), o.get('elementBlacklist')));
-	o.set('formatLine', _createFormatInfo(REQUIRED_FORMAT_LINE + '|' + (options.formatLine || '') + '|' + o.get('formatBrLine').str, (options.__defaultFormatLine = typeof options.__defaultFormatLine === 'string' ? (options.__defaultFormatLine) : DEFAULT_FORMAT_LINE).toLowerCase(), o.get('elementBlacklist')));
-	o.set('formatClosureBlock', _createFormatInfo(options.formatClosureBlock, (options.__defaultFormatClosureBlock = typeof options.__defaultFormatClosureBlock === 'string' ? options.__defaultFormatClosureBlock : DEFAULT_FORMAT_CLOSURE_BLOCK).toLowerCase(), o.get('elementBlacklist')));
-	o.set('formatBlock', _createFormatInfo((options.formatBlock || '') + '|' + o.get('formatClosureBlock').str, (options.__defaultFormatBlock = typeof options.__defaultFormatBlock === 'string' ? options.__defaultFormatBlock : DEFAULT_FORMAT_BLOCK).toLowerCase(), o.get('elementBlacklist')));
+	o.set(
+		'formatClosureBrLine',
+		_createFormatInfo(
+			options.formatClosureBrLine,
+			(options.__defaultFormatClosureBrLine =
+				typeof options.__defaultFormatClosureBrLine === 'string' ? options.__defaultFormatClosureBrLine : DEFAULT_FORMAT_CLOSURE_BR_LINE).toLowerCase(),
+			o.get('elementBlacklist')
+		)
+	);
+	o.set(
+		'formatBrLine',
+		_createFormatInfo(
+			(options.formatBrLine || '') + '|' + o.get('formatClosureBrLine').str,
+			(options.__defaultFormatBrLine = typeof options.__defaultFormatBrLine === 'string' ? options.__defaultFormatBrLine : DEFAULT_FORMAT_BR_LINE).toLowerCase(),
+			o.get('elementBlacklist')
+		)
+	);
+	o.set(
+		'formatLine',
+		_createFormatInfo(
+			REQUIRED_FORMAT_LINE + '|' + (options.formatLine || '') + '|' + o.get('formatBrLine').str,
+			(options.__defaultFormatLine = typeof options.__defaultFormatLine === 'string' ? options.__defaultFormatLine : DEFAULT_FORMAT_LINE).toLowerCase(),
+			o.get('elementBlacklist')
+		)
+	);
+	o.set(
+		'formatClosureBlock',
+		_createFormatInfo(
+			options.formatClosureBlock,
+			(options.__defaultFormatClosureBlock =
+				typeof options.__defaultFormatClosureBlock === 'string' ? options.__defaultFormatClosureBlock : DEFAULT_FORMAT_CLOSURE_BLOCK).toLowerCase(),
+			o.get('elementBlacklist')
+		)
+	);
+	o.set(
+		'formatBlock',
+		_createFormatInfo(
+			(options.formatBlock || '') + '|' + o.get('formatClosureBlock').str,
+			(options.__defaultFormatBlock = typeof options.__defaultFormatBlock === 'string' ? options.__defaultFormatBlock : DEFAULT_FORMAT_BLOCK).toLowerCase(),
+			o.get('elementBlacklist')
+		)
+	);
 
 	/** __defaults */
 	o.set('__defaultDataAttrs', REQUIRED_DATA_ATTRS);
-	o.set('__defaultElementWhitelist', REQUIRED_ELEMENT_WHITELIST + '|' + (typeof options.__defaultElementWhitelist === 'string' ? options.__defaultElementWhitelist : DEFAULT_ELEMENT_WHITELIST).toLowerCase());
-	o.set('__defaultAttributeWhitelist', (typeof options.__defaultAttributeWhitelist === 'string' ? options.__defaultAttributeWhitelist : DEFAULT_ATTRIBUTE_WHITELIST).toLowerCase());
+	o.set(
+		'__defaultElementWhitelist',
+		REQUIRED_ELEMENT_WHITELIST + '|' + (typeof options.__defaultElementWhitelist === 'string' ? options.__defaultElementWhitelist : DEFAULT_ELEMENT_WHITELIST).toLowerCase()
+	);
+	o.set(
+		'__defaultAttributeWhitelist',
+		(typeof options.__defaultAttributeWhitelist === 'string' ? options.__defaultAttributeWhitelist : DEFAULT_ATTRIBUTE_WHITELIST).toLowerCase()
+	);
 	// --- create element whitelist (__defaultElementWhiteList + elementWhitelist + format[line, BrLine, Block, Closureblock, ClosureBrLine] - elementBlacklist)
 	o.set('_editorElementWhitelist', o.get('elementWhitelist') === '*' ? '*' : _createWhitelist(o));
 
 	/** Toolbar */
 	o.set('toolbar_width', options.toolbar_width ? (numbers.is(options.toolbar_width) ? options.toolbar_width + 'px' : options.toolbar_width) : 'auto');
-	o.set('toolbar_container', options.toolbar_container && !/inline/i.test(o.get('mode')) ? (typeof options.toolbar_container === 'string' ? _d.querySelector(options.toolbar_container) : options.toolbar_container) : null);
-	o.set('toolbar_sticky', /balloon/i.test(o.get('mode')) ? -1 : options.toolbar_sticky === undefined ? 0 : /^\d+/.test(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1);
+	o.set(
+		'toolbar_container',
+		options.toolbar_container && !/inline/i.test(o.get('mode'))
+			? typeof options.toolbar_container === 'string'
+				? _d.querySelector(options.toolbar_container)
+				: options.toolbar_container
+			: null
+	);
+	o.set(
+		'toolbar_sticky',
+		/balloon/i.test(o.get('mode')) ? -1 : options.toolbar_sticky === undefined ? 0 : /^\d+/.test(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1
+	);
 	o.set('toolbar_hide', !!options.toolbar_hide);
 	o.set('buttonList', o.get('_rtl') ? buttonList.reverse() : buttonList);
 
@@ -382,7 +470,10 @@ function InitOptions(options, editorTargets) {
 	o.set('iframe', !!options.iframe_fullPage || !!options.iframe);
 	o.set('iframe_fullPage', !!options.iframe_fullPage);
 	o.set('iframe_attributes', options.iframe_attributes || {});
-	o.set('iframe_cssFileName', options.iframe ? (typeof options.iframe_cssFileName === 'string' ? [options.iframe_cssFileName] : options.iframe_cssFileName || ['suneditor']) : null);
+	o.set(
+		'iframe_cssFileName',
+		options.iframe ? (typeof options.iframe_cssFileName === 'string' ? [options.iframe_cssFileName] : options.iframe_cssFileName || ['suneditor']) : null
+	);
 
 	/** Key actions */
 	o.set('tabDisable', !!options.tabDisable);
@@ -419,42 +510,6 @@ function InitOptions(options, editorTargets) {
 	o.set('previewTemplate', typeof options.previewTemplate === 'string' ? options.previewTemplate : null);
 	o.set('printTemplate', typeof options.printTemplate === 'string' ? options.printTemplate : null);
 
-	/** Defining menu items */
-	o.set('hrItems', !options.hrItems ? null : options.hrItems);
-	o.set('font', !options.font ? ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'] : options.font);
-	o.set('fontSize', !options.fontSize ? null : options.fontSize);
-	o.set('formats', !options.formats ? null : options.formats);
-	o.set('colorList_font', !options.colorList_font ? null : options.colorList_font);
-	o.set('colorList_background', !options.colorList_background ? null : options.colorList_background);
-	o.set('lineHeights', !options.lineHeights ? null : options.lineHeights);
-	o.set('paragraphStyles', !options.paragraphStyles ? null : options.paragraphStyles);
-	o.set('textStyles', !options.textStyles ? null : options.textStyles);
-	o.set('alignItems', typeof options.alignItems === 'object' ? options.alignItems : o.get('_rtl') ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify']);
-	o.set('templates', !options.templates ? null : options.templates);
-	o.set(
-		'mathFontSize',
-		!!options.mathFontSize
-			? options.mathFontSize
-			: [
-					{
-						text: '1',
-						value: '1em'
-					},
-					{
-						text: '1.5',
-						value: '1.5em'
-					},
-					{
-						text: '2',
-						value: '2em'
-					},
-					{
-						text: '2.5',
-						value: '2.5em'
-					}
-			  ]
-	);
-
 	/** --- Media */
 	o.set('mediaAutoSelect', options.mediaAutoSelect === undefined ? true : !!options.mediaAutoSelect);
 
@@ -467,8 +522,8 @@ function InitOptions(options, editorTargets) {
 		options.imageControls || !o.get('imageResizing')
 			? [['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']]
 			: [
-				['resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
-				['edit', 'align', 'caption', 'revert', 'remove']
+					['resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
+					['edit', 'align', 'caption', 'revert', 'remove']
 			  ]
 	);
 	// @todo
@@ -498,8 +553,8 @@ function InitOptions(options, editorTargets) {
 		options.videoControls || !o.get('videoResizing')
 			? [['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']]
 			: [
-				['resize_auto,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
-				['edit', 'align', 'revert', 'remove']
+					['resize_auto,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
+					['edit', 'align', 'revert', 'remove']
 			  ]
 	);
 	// @todo
@@ -599,7 +654,7 @@ function InitRootOptions(editorTargets, options) {
 
 function InitFrameOptions(o, origin, fo) {
 	const barContainer = origin.statusbar_container;
-	
+
 	// members
 	const value = o.value === undefined ? origin.value : o.value;
 	const placeholder = o.placeholder === undefined ? origin.placeholder : o.placeholder;
@@ -610,13 +665,13 @@ function InitFrameOptions(o, origin, fo) {
 	const minHeight = o.minHeight === undefined ? origin.minHeight : o.minHeight;
 	const maxHeight = o.maxHeight === undefined ? origin.maxHeight : o.maxHeight;
 	const editorStyle = o.editorStyle === undefined ? origin.editorStyle : o.editorStyle;
-	const statusbar = (barContainer || o.statusbar === undefined) ? origin.statusbar : o.statusbar;
-	const statusbar_showPathLabel = (barContainer || o.statusbar_showPathLabel === undefined) ? origin.statusbar_showPathLabel : o.statusbar_showPathLabel;
+	const statusbar = barContainer || o.statusbar === undefined ? origin.statusbar : o.statusbar;
+	const statusbar_showPathLabel = barContainer || o.statusbar_showPathLabel === undefined ? origin.statusbar_showPathLabel : o.statusbar_showPathLabel;
 	const statusbar_resizeEnable = barContainer ? false : o.statusbar_resizeEnable === undefined ? origin.statusbar_resizeEnable : o.statusbar_resizeEnable;
-	const charCounter = (barContainer || o.charCounter === undefined) ? origin.charCounter : o.charCounter;
-	const charCounter_max = (barContainer || o.charCounter_max === undefined) ? origin.charCounter_max : o.charCounter_max;
-	const charCounter_label = (barContainer || o.charCounter_label === undefined) ? origin.charCounter_label : o.charCounter_label;
-	const charCounter_type = (barContainer || o.charCounter_type === undefined) ? origin.charCounter_type : o.charCounter_type;
+	const charCounter = barContainer || o.charCounter === undefined ? origin.charCounter : o.charCounter;
+	const charCounter_max = barContainer || o.charCounter_max === undefined ? origin.charCounter_max : o.charCounter_max;
+	const charCounter_label = barContainer || o.charCounter_label === undefined ? origin.charCounter_label : o.charCounter_label;
+	const charCounter_type = barContainer || o.charCounter_type === undefined ? origin.charCounter_type : o.charCounter_type;
 
 	// value
 	fo.set('value', value);
@@ -873,7 +928,19 @@ function _createFormatInfo(value, defaultValue, blacklist) {
  */
 function _createWhitelist(o) {
 	const blacklist = o.get('elementBlacklist').split('|');
-	const whitelist = (o.get('__defaultElementWhitelist') + '|' + o.get('elementWhitelist') + '|' + o.get('formatLine').str + '|' + o.get('formatBrLine').str + '|' + o.get('formatClosureBlock').str + '|' + o.get('formatClosureBrLine').str)
+	const whitelist = (
+		o.get('__defaultElementWhitelist') +
+		'|' +
+		o.get('elementWhitelist') +
+		'|' +
+		o.get('formatLine').str +
+		'|' +
+		o.get('formatBrLine').str +
+		'|' +
+		o.get('formatClosureBlock').str +
+		'|' +
+		o.get('formatClosureBrLine').str
+	)
 		.replace(/(^\||\|$)/g, '')
 		.split('|')
 		.filter(function (v, i, a) {
@@ -973,7 +1040,11 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 
 export function UpdateButton(element, plugin, icons, lang) {
 	if (!element) return;
-	element.innerHTML = (icons[plugin.icon] || plugin.icon || '<span class="se-icon-text">!</span>') + '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (lang[plugin.title] || plugin.title) + '</span></span>';
+	element.innerHTML =
+		(icons[plugin.icon] || plugin.icon || '<span class="se-icon-text">!</span>') +
+		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
+		(lang[plugin.title] || plugin.title) +
+		'</span></span>';
 	element.setAttribute('aria-label', plugin.title);
 	if (plugin.type) element.setAttribute('data-type', plugin.type);
 	if (plugin.className) element.className += ' ' + plugin.className;

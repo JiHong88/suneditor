@@ -2,7 +2,7 @@ import EditorInjector from '../../editorInjector';
 import { Modal, Controller } from '../../modules';
 import { domUtils, env, converter, unicode } from '../../helper';
 
-const Math_ = function (editor) {
+const Math_ = function (editor, option) {
 	// exception
 	if (!editor.options.get('katex')) {
 		console.warn('[SUNEDITOR.plugins.math.warn] The math plugin must need the "KaTeX" library, Please add the katex option.');
@@ -14,7 +14,7 @@ const Math_ = function (editor) {
 	this.icon = 'math';
 
 	// create HTML
-	const modalEl = CreateHTML_modal(editor, this);
+	const modalEl = CreateHTML_modal(editor, this, option.fontSizeList);
 	const controllerEl = CreateHTML_controller(editor);
 
 	// modules
@@ -192,9 +192,26 @@ function RenderMathExp(e) {
 	this.previewElement.innerHTML = this._renderer(e.target.value);
 }
 
-function CreateHTML_modal(editor, math) {
+function CreateHTML_modal(editor, math, fontSizeList) {
 	const lang = editor.lang;
-	const fontSize = editor.options.get('mathFontSize');
+	const fontSize = fontSizeList || [
+		{
+			text: '1',
+			value: '1em'
+		},
+		{
+			text: '1.5',
+			value: '1.5em'
+		},
+		{
+			text: '2',
+			value: '2em'
+		},
+		{
+			text: '2.5',
+			value: '2.5em'
+		}
+	];
 	let defaultFontSize = fontSize[0].value;
 
 	let html =

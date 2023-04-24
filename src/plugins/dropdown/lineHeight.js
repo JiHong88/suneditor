@@ -1,14 +1,14 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
-const LineHeight = function (editor) {
+const LineHeight = function (editor, option) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.lineHeight;
 	this.icon = 'line_height';
 
 	// create HTML
-	const menu = CreateHTML(editor);
+	const menu = CreateHTML(editor, option.items);
 
 	// members
 	this.sizeList = menu.querySelectorAll('li button');
@@ -77,22 +77,37 @@ LineHeight.prototype = {
 	constructor: LineHeight
 };
 
-function CreateHTML(editor) {
-	const options = editor.options;
+function CreateHTML(editor, items) {
 	const lang = editor.lang;
-	const sizeList = !options.get('lineHeights')
-		? [
-				{ text: '1', value: 1 },
-				{ text: '1.15', value: 1.15 },
-				{ text: '1.5', value: 1.5 },
-				{ text: '2', value: 2 }
-		  ]
-		: options.get('lineHeights');
+	const sizeList = items || [
+		{ text: '1', value: 1 },
+		{ text: '1.15', value: 1.15 },
+		{ text: '1.5', value: 1.5 },
+		{ text: '2', value: 2 }
+	];
 
-	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="default_value se-btn-list" title="' + lang.default + '" aria-label="' + lang.default + '">(' + lang.default + ')</button></li>';
+	let list =
+		'<div class="se-list-inner">' +
+		'<ul class="se-list-basic">' +
+		'<li><button type="button" class="default_value se-btn-list" title="' +
+		lang.default +
+		'" aria-label="' +
+		lang.default +
+		'">(' +
+		lang.default +
+		')</button></li>';
 	for (let i = 0, len = sizeList.length, size; i < len; i++) {
 		size = sizeList[i];
-		list += '<li><button type="button" class="se-btn se-btn-list" data-command="' + size.value + '" title="' + size.text + '" aria-label="' + size.text + '">' + size.text + '</button></li>';
+		list +=
+			'<li><button type="button" class="se-btn se-btn-list" data-command="' +
+			size.value +
+			'" title="' +
+			size.text +
+			'" aria-label="' +
+			size.text +
+			'">' +
+			size.text +
+			'</button></li>';
 	}
 	list += '</ul></div>';
 

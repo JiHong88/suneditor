@@ -25,7 +25,7 @@ require('katex/dist/katex.css');
 // import backgroundColor from '../../src/plugins/dropdown/backgroundColor';
 // import fontSize from '../../src/plugins/dropdown/fontSize';
 // import formatBlock from '../../src/plugins/dropdown/formatBlock';
-// import horizontalLine from '../../src/plugins/dropdown/horizontalLine';
+// import hr from '../../src/plugins/dropdown/hr';
 // import lineHeight from '../../src/plugins/dropdown/lineHeight';
 // import list from '../../src/plugins/dropdown/list';
 // import paragraphStyle from '../../src/plugins/dropdown/paragraphStyle';
@@ -51,7 +51,7 @@ const bl = [
 	['removeFormat'],
 	'/',
 	['outdent', 'indent'],
-	['align', 'horizontalLine', 'list', 'lineHeight'],
+	['align', 'hr', 'list', 'lineHeight'],
 	['table', 'link', 'image', 'video', 'audio', 'math'],
 	['imageGallery'],
 	['fullScreen', 'showBlocks', 'codeView'],
@@ -68,7 +68,7 @@ const bl = [
 			['fontColor', 'backgroundColor', 'textStyle'],
 			['removeFormat'],
 			['outdent', 'indent'],
-			['align', 'horizontalLine', 'list', 'lineHeight'],
+			['align', 'hr', 'list', 'lineHeight'],
 			['table', 'link', 'image', 'video', 'audio', 'math'],
 			['imageGallery'],
 			['fullScreen', 'showBlocks', 'codeView'],
@@ -86,7 +86,7 @@ const bl = [
 			['fontColor', 'backgroundColor', 'textStyle'],
 			['removeFormat'],
 			['outdent', 'indent'],
-			['align', 'horizontalLine', 'list', 'lineHeight'],
+			['align', 'hr', 'list', 'lineHeight'],
 			['table', 'link', 'image', 'video', 'audio', 'math'],
 			['imageGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout']
@@ -103,7 +103,7 @@ const bl = [
 			['fontColor', 'backgroundColor', 'textStyle'],
 			['removeFormat'],
 			['outdent', 'indent'],
-			['align', 'horizontalLine', 'list', 'lineHeight'],
+			['align', 'hr', 'list', 'lineHeight'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout'],
 			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
 		]
@@ -118,7 +118,7 @@ const bl = [
 			['fontColor', 'backgroundColor', 'textStyle'],
 			['removeFormat'],
 			['outdent', 'indent'],
-			['align', 'horizontalLine', 'list', 'lineHeight'],
+			['align', 'hr', 'list', 'lineHeight'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout'],
 			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
 		]
@@ -133,7 +133,7 @@ const bl = [
 			[':More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
 			['removeFormat'],
 			['outdent', 'indent'],
-			['align', 'horizontalLine', 'list', 'lineHeight'],
+			['align', 'hr', 'list', 'lineHeight'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout'],
 			['-right', ':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery']
 		]
@@ -147,7 +147,7 @@ const bl = [
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
 			['removeFormat'],
 			['outdent', 'indent'],
-			['align', 'horizontalLine', 'list', 'lineHeight'],
+			['align', 'hr', 'list', 'lineHeight'],
 			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout']
 		]
@@ -161,7 +161,7 @@ const bl = [
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
 			['removeFormat'],
 			['outdent', 'indent'],
-			[':More Line-default.more_horizontal', 'align', 'horizontalLine', 'list', 'lineHeight'],
+			[':More Line-default.more_horizontal', 'align', 'hr', 'list', 'lineHeight'],
 			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout']
 		]
@@ -173,7 +173,7 @@ const bl = [
 			['undo', 'redo'],
 			[':lang.test-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'removeFormat'],
-			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'horizontalLine', 'list', 'lineHeight'],
+			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'lineHeight'],
 			[':More Rich-default.more_plus', 'table', 'link', 'image', 'video', 'audio', 'math', 'imageGallery'],
 			['-right', ':More Misc-default.more_vertical', 'fullScreen', 'showBlocks', 'codeView', 'preview', 'print', 'save', 'template', 'layout']
 		]
@@ -307,98 +307,112 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // 	// 	['outdent', 'indent'],
 // 	// 	['fullScreen', 'showBlocks', 'codeView'],
 // 	// 	['preview', 'print'],
-// 	// 	['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'horizontalLine'],
+// 	// 	['align', 'blockquote', 'font', 'fontColor', 'backgroundColor', 'fontSize', 'formatBlock', 'hr'],
 // 	// 	['lineHeight', 'list', 'paragraphStyle', 'template', 'layout', 'textStyle', 'table'],
 // 	// 	['math', 'link', 'audio', 'image', 'video']
 // 	// ],
 // 	buttonList: bl
 // });
 
-const editor_root = (window.e = suneditor.create({
-	editor1: {
-		target: document.querySelector('#multi_editor_1'),
-		options: {
-			value: '<p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p>',
-			placeholder: 'place1',
-			height: 500
+const editor_root = (window.e = suneditor.create(
+	{
+		editor1: {
+			target: document.querySelector('#multi_editor_1'),
+			options: {
+				value: '<p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p>',
+				placeholder: 'place1',
+				height: 500
+			}
+		},
+		editor2: {
+			target: document.querySelector('#multi_editor_2'),
+			options: {
+				value: '<p>ed2</p>',
+				placeholder: 'place21'
+			}
+		},
+		editor3: {
+			target: document.querySelector('#multi_editor_3'),
+			options: {
+				value: '<p>ed3</p>',
+				placeholder: 'place3'
+			}
+		},
+		editor4: {
+			target: document.querySelector('#multi_editor_4'),
+			options: {
+				// value: '<p>ed4</p>',
+				placeholder: 'place4'
+			}
 		}
 	},
-	editor2: {
-		target: document.querySelector('#multi_editor_2'),
-		options: {
-			value: '<p>ed2</p>',
-			placeholder: 'place21'
-		}
-	},
-	editor3: {
-		target: document.querySelector('#multi_editor_3'),
-		options: {
-			value: '<p>ed3</p>',
-			placeholder: 'place3'
-		}
-	},
-	editor4: {
-		target: document.querySelector('#multi_editor_4'),
-		options: {
-			// value: '<p>ed4</p>', 
-			placeholder: 'place4',
+	{
+		// mode: "inline",
+		// toolbar_width: 300,
+		// textDirection: 'rtl',
+		// value: 'Common value',
+		// editorStyle: 'font-size:40px',
+		plugins: plugins,
+		toolbar_container: '#root_toolbar_container',
+		statusbar_container: '#root_statusbar_container',
+		// shortcutsHint: false,
+		// codeMirror: {
+		// 	EditorView: EditorView,
+		// 	extensions: [
+		// 		basicSetup,
+		// 		html({
+		// 			matchClosingTags: true,
+		// 			autoCloseTags: true
+		// 		}),
+		// 		javascript()
+		// 	],
+		// 	minimalSetup: minimalSetup
+		// },
+		// codeMirror: {
+		// 	src: Codemirror5
+		// },
+		// iframe:true,
+		toolbar_sticky: 0,
+		imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
+		lineAttrReset: 'id',
+		attributeWhitelist: 'id',
+		buttonList: bl,
+		subToolbar: {
+			buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
+			width: 'auto',
+			mode: 'balloon' // balloon, balloon-always, balloon-block
+		},
+		katex: {
+			src: Katex
+		},
+		shortcuts: {
+			bold: ['s75r-underline', 'K'],
+			italic: [],
+			image: ['73', 'I'],
+			list: ['76', 'L']
+		},
+		math: {
+			fontSizeList: [
+				{
+					text: '1',
+					value: '1em'
+				},
+				{
+					text: '1.5',
+					value: '1.5em'
+				}
+			]
 		}
 	}
-}, {
-	// mode: "inline",
-	// toolbar_width: 300,
-	// textDirection: 'rtl',
-	// value: 'Common value',
-	// editorStyle: 'font-size:40px',
-	plugins: plugins,
-	toolbar_container: '#root_toolbar_container',
-	statusbar_container: '#root_statusbar_container',
-	// shortcutsHint: false,
-	// codeMirror: {
-	// 	EditorView: EditorView,
-	// 	extensions: [
-	// 		basicSetup,
-	// 		html({
-	// 			matchClosingTags: true,
-	// 			autoCloseTags: true
-	// 		}),
-	// 		javascript()
-	// 	],
-	// 	minimalSetup: minimalSetup
-	// },
-	// codeMirror: {
-	// 	src: Codemirror5
-	// },
-	// iframe:true,
-	toolbar_sticky: 0,
-	imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
-	lineAttrReset: 'id',
-	attributeWhitelist: 'id',
-	buttonList: bl,
-	subToolbar: {
-		buttonList: [['bold','dir', 'dir_ltr', 'dir_rtl', 'save']],
-		width: 'auto',
-		mode: 'balloon' // balloon, balloon-always, balloon-block
-	},
-	katex: {
-		src: Katex
-	},
-	shortcuts: {
-		bold: ['s75r-underline', 'K'],
-		italic:[],
-		image: ['73', 'I'],
-		list: ['76', 'L']
-	}
-}));
+));
 
 // editor_root.events.onBlur = (rootKey, e, htmlFrame) => {
 // 	console.log('blur', editor_root.frameContext);
 // };
 
 editor_root.events.onload = function () {
-
-	editor_root.html.set('fdjksl;afjds ...fdjksafl;d')
-}
+	editor_root.html.set('fdjksl;afjds ...fdjksafl;d');
+};
 editor_root.events.onChange = function (c) {
 	console.log(c);
-}
+};

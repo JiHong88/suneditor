@@ -1,26 +1,26 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
-const HorizontalLine = function (editor) {
+const HR = function (editor, option) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.horizontalLine;
 	this.icon = 'horizontal_line';
 
 	// create HTML
-	const HRMenus = CreateHTML(editor);
+	const HRMenus = CreateHTML(editor, option.items);
 
 	// members
 	this.list = HRMenus.querySelectorAll('button');
 
 	// init
-	this.menu.initDropdownTarget(HorizontalLine, HRMenus);
+	this.menu.initDropdownTarget(HR, HRMenus);
 };
 
-HorizontalLine.key = 'horizontalLine';
-HorizontalLine.type = 'dropdown';
-HorizontalLine.className = '';
-HorizontalLine.prototype = {
+HR.key = 'hr';
+HR.type = 'dropdown';
+HR.className = '';
+HR.prototype = {
 	/**
 	 * @override core
 	 */
@@ -50,12 +50,12 @@ HorizontalLine.prototype = {
 		this.selection.setRange(line, 1, line, 1);
 	},
 
-	constructor: HorizontalLine
+	constructor: HR
 };
 
-function CreateHTML(editor) {
+function CreateHTML(editor, HRItems) {
 	const lang = editor.lang;
-	const items = editor.options.get('hrItems') || [
+	const items = HRItems || [
 		{
 			name: lang.hr_solid,
 			class: '__se__solid'
@@ -74,7 +74,7 @@ function CreateHTML(editor) {
 	for (let i = 0, len = items.length; i < len; i++) {
 		list +=
 			'<li>' +
-			'<button type="button" class="se-btn se-btn-list" data-command="horizontalLine" title="' +
+			'<button type="button" class="se-btn se-btn-list" data-command="hr" title="' +
 			items[i].name +
 			'" aria-label="' +
 			items[i].name +
@@ -96,4 +96,4 @@ function CreateHTML(editor) {
 	);
 }
 
-export default HorizontalLine;
+export default HR;

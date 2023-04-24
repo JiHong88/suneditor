@@ -1,18 +1,20 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
-const Font = function (editor) {
+const Font = function (editor, option) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.font;
 	this.icon = '<span class="txt">' + this.lang.font + '</span>' + this.icons.arrow_down;
 
 	// create HTML
-	const menu = CreateHTML(editor);
+	const fontList = option.items || ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'];
+	const menu = CreateHTML(editor, fontList);
 
 	// members
 	this.currentFont = '';
 	this.fontList = menu.querySelectorAll('ul li button');
+	this.fontArray = fontList;
 
 	// init
 	this.menu.initDropdownTarget(Font, menu);
@@ -82,15 +84,35 @@ Font.prototype = {
 	constructor: Font
 };
 
-function CreateHTML(editor) {
+function CreateHTML(editor, fontList) {
 	const lang = editor.lang;
-	const fontList = editor.options.get('font');
-
-	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="se-btn se-btn-list default_value" title="' + lang.default + '" aria-label="' + lang.default + '">(' + lang.default + ')</button></li>';
+	let list =
+		'<div class="se-list-inner">' +
+		'<ul class="se-list-basic">' +
+		'<li><button type="button" class="se-btn se-btn-list default_value" title="' +
+		lang.default +
+		'" aria-label="' +
+		lang.default +
+		'">(' +
+		lang.default +
+		')</button></li>';
 	for (let i = 0, len = fontList.length, font, text; i < len; i++) {
 		font = fontList[i];
 		text = font.split(',')[0];
-		list += '<li><button type="button" class="se-btn se-btn-list" data-command="' + font + '" data-txt="' + text + '" title="' + text + '" aria-label="' + text + '" style="font-family:' + font + ';">' + text + '</button></li>';
+		list +=
+			'<li><button type="button" class="se-btn se-btn-list" data-command="' +
+			font +
+			'" data-txt="' +
+			text +
+			'" title="' +
+			text +
+			'" aria-label="' +
+			text +
+			'" style="font-family:' +
+			font +
+			';">' +
+			text +
+			'</button></li>';
 	}
 	list += '</ul></div>';
 

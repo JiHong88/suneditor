@@ -113,16 +113,27 @@ Align.prototype = {
 	constructor: Align
 };
 
-function CreateHTML(core) {
-	const lang = core.lang;
-	const icons = core.icons;
-	const alignItems = core.options.get('alignItems');
+function CreateHTML(editor, items) {
+	const lang = editor.lang;
+	const icons = editor.icons;
+	const alignItems = editor._w.Array.isArray(items) ? items : editor.options.get('_rtl') ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'];
 
 	let html = '';
 	for (let i = 0, item, text; i < alignItems.length; i++) {
 		item = alignItems[i];
 		text = lang['align' + item.charAt(0).toUpperCase() + item.slice(1)];
-		html += '<li>' + '<button type="button" class="se-btn se-btn-list" data-command="' + item + '" title="' + text + '" aria-label="' + text + '">' + '<span class="se-list-icon">' + icons['align_' + item] + '</span>' + text + '</button>' + '</li>';
+		html +=
+			'<li><button type="button" class="se-btn se-btn-list" data-command="' +
+			item +
+			'" title="' +
+			text +
+			'" aria-label="' +
+			text +
+			'"><span class="se-list-icon">' +
+			icons['align_' + item] +
+			'</span>' +
+			text +
+			'</button></li>';
 	}
 
 	return domUtils.createElement(

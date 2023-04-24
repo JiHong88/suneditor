@@ -22,7 +22,13 @@ const Menu = function (editor) {
 	this.currentContainerActiveButton = null;
 	// event
 	this._dropdownCommands = [];
-	this.__globalEventHandler = [this.dropdownOff.bind(this), this.containerOff.bind(this), OnKeyDown_dropdown.bind(this), OnMousemove_dropdown.bind(this), OnMouseout_dropdown.bind(this)];
+	this.__globalEventHandler = [
+		this.dropdownOff.bind(this),
+		this.containerOff.bind(this),
+		OnKeyDown_dropdown.bind(this),
+		OnMousemove_dropdown.bind(this),
+		OnMouseout_dropdown.bind(this)
+	];
 	this._bindClose_dropdown_mouse = null;
 	this._bindClose_dropdown_key = null;
 	this._bindClose_cons_mouse = null;
@@ -70,7 +76,7 @@ Menu.prototype = {
 		const menu = (this.currentDropdown = this.targetMap[dropdownName]);
 		this.currentDropdownActiveButton = button;
 		this._setMenuPosition(button, menu);
-		
+
 		this._bindClose_dropdown_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandler[0], false);
 		if (this._dropdownCommands.indexOf(dropdownName) > -1) {
 			this.menus = converter.nodeListToArray(menu.querySelectorAll('button[data-command]'));

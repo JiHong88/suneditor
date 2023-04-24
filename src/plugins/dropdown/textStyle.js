@@ -1,14 +1,14 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
-const TextStyle = function (editor) {
+const TextStyle = function (editor, option) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.textStyle;
 	this.icon = 'text_style';
 
 	// create HTML
-	const menu = CreateHTML(editor);
+	const menu = CreateHTML(editor, option.items);
 
 	// members
 	this.styleList = menu.querySelectorAll('li button');
@@ -78,8 +78,7 @@ TextStyle.prototype = {
 	constructor: TextStyle
 };
 
-function CreateHTML(editor) {
-	const options = editor.options;
+function CreateHTML(editor, items) {
 	const defaultList = {
 		code: {
 			name: editor.lang.menu_code,
@@ -92,7 +91,7 @@ function CreateHTML(editor) {
 			tag: 'span'
 		}
 	};
-	const styleList = !options.get('textStyles') ? editor._w.Object.keys(defaultList) : options.get('textStyles');
+	const styleList = items || editor._w.Object.keys(defaultList);
 
 	let list = '<div class="se-list-inner"><ul class="se-list-basic">';
 	for (let i = 0, len = styleList.length, t, tag, name, attrs, command, value, _class; i < len; i++) {
@@ -115,7 +114,23 @@ function CreateHTML(editor) {
 
 		value = value.replace(/,$/, '');
 
-		list += '<li><button type="button" class="se-btn se-btn-list" data-command="' + tag + '" data-value="' + value + '" title="' + name + '" aria-label="' + name + '">' + '<' + tag + attrs + '>' + name + '</' + tag + '></button></li>';
+		list +=
+			'<li><button type="button" class="se-btn se-btn-list" data-command="' +
+			tag +
+			'" data-value="' +
+			value +
+			'" title="' +
+			name +
+			'" aria-label="' +
+			name +
+			'"><' +
+			tag +
+			attrs +
+			'>' +
+			name +
+			'</' +
+			tag +
+			'></button></li>';
 	}
 	list += '</ul></div>';
 

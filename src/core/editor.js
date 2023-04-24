@@ -322,7 +322,7 @@ const Editor = function (multiTargets, options) {
 		if (isIframe) {
 			e.get('wysiwygFrame').addEventListener('load', function () {
 				converter._setIframeDocument(this, inst.options, e.get('options').get('height'));
-				if (rootSize === ++rootIndex) inst.__editorInit();
+				if (rootSize === ++rootIndex) inst.__editorInit(options);
 			});
 		}
 
@@ -330,7 +330,7 @@ const Editor = function (multiTargets, options) {
 	});
 
 	if (!isIframe) {
-		this.__editorInit();
+		this.__editorInit(options);
 	}
 };
 
@@ -341,12 +341,12 @@ Editor.prototype = {
 	 * @param {string} pluginName The name of the plugin to call
 	 * @param {Array.<Element>|null} targets Plugin target button (This is not necessary if you have a button list when creating the editor)
 	 */
-	registerPlugin: function (pluginName, targets) {
+	registerPlugin: function (pluginName, targets, option) {
 		let plugin = this.plugins[pluginName];
 		if (!plugin) {
 			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "' + pluginName + '")');
 		} else if (typeof this.plugins[pluginName] === 'function') {
-			plugin = this.plugins[pluginName] = new this.plugins[pluginName](this);
+			plugin = this.plugins[pluginName] = new this.plugins[pluginName](this, option || {});
 			if (typeof plugin.init === 'function') plugin.init();
 		}
 
@@ -997,7 +997,14 @@ Editor.prototype = {
 		this.notice = new Notice(this);
 		// main classes
 		this.toolbar = new Toolbar(this, { keyName: 'toolbar', balloon: this.isBalloon, balloonAlways: this.isBalloonAlways, inline: this.isInline, res: this._responsiveButtons });
-		if (this.options.has('subMode')) this.subToolbar = new Toolbar(this, { keyName: 'toolbar.sub', balloon: this.isSubBalloon, balloonAlways: this.isSubBalloonAlways, inline: false, res: this._responsiveButtons_sub });
+		if (this.options.has('subMode'))
+			this.subToolbar = new Toolbar(this, {
+				keyName: 'toolbar.sub',
+				balloon: this.isSubBalloon,
+				balloonAlways: this.isSubBalloonAlways,
+				inline: false,
+				res: this._responsiveButtons_sub
+			});
 		this.selection = new Selection(this);
 		this.html = new HTML(this);
 		this.node = new Node_(this);
@@ -1046,7 +1053,9 @@ Editor.prototype = {
 	 * @private
 	 */
 	_initWysiwygArea: function (e, value) {
-		e.get('wysiwyg').innerHTML = this.html.clean(typeof value === 'string' ? value : e.get('originElement').value, true, null, null) || '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
+		e.get('wysiwyg').innerHTML =
+			this.html.clean(typeof value === 'string' ? value : e.get('originElement').value, true, null, null) ||
+			'<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
 		if (e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
 	},
 
@@ -1090,7 +1099,9 @@ Editor.prototype = {
 			h === -1
 				? resizeObserverEntry && resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0]
 					? resizeObserverEntry.borderBoxSize[0].blockSize
-					: resizeObserverEntry.contentRect.height + numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-right'))
+					: resizeObserverEntry.contentRect.height +
+					  numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-left')) +
+					  numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-right'))
 				: h;
 		if (fc.get('_editorHeight') !== h) {
 			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, fc.get('_editorHeight'), resizeObserverEntry);
@@ -1146,7 +1157,7 @@ Editor.prototype = {
 	 * @description Initializ editor
 	 * @private
 	 */
-	__editorInit: function () {
+	__editorInit: function (options) {
 		this.applyRootTargets(
 			function (e) {
 				this._setEditorParams(e);
@@ -1157,7 +1168,7 @@ Editor.prototype = {
 
 		// initialize core and add event listeners
 		this._setFrameInfo(this.rootTargets.get(this.status.rootKey));
-		this.__init();
+		this.__init(options);
 
 		this._componentsInfoInit = false;
 		this._componentsInfoReset = false;
@@ -1192,7 +1203,7 @@ Editor.prototype = {
 	 * @description Initializ core variable
 	 * @private
 	 */
-	__init: function () {
+	__init: function (options) {
 		this.__cachingButtons();
 
 		// file components
@@ -1218,8 +1229,8 @@ Editor.prototype = {
 		let filePluginRegExp = [];
 		let plugin;
 		for (let key in plugins) {
-			this.registerPlugin(key, this._pluginCallButtons[key]);
-			this.registerPlugin(key, this._pluginCallButtons_sub[key]);
+			this.registerPlugin(key, this._pluginCallButtons[key], options[key]);
+			this.registerPlugin(key, this._pluginCallButtons_sub[key], options[key]);
 			plugin = this.plugins[key];
 
 			// Filemanager
@@ -1274,7 +1285,9 @@ Editor.prototype = {
 
 		if (this.options.has('subMode')) {
 			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(codeDisabledQuery)));
-			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(controllerDisabledQuery)));
+			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(
+				converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(controllerDisabledQuery))
+			);
 		}
 
 		this.__saveCommandButtons();

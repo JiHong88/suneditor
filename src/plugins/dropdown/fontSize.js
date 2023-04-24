@@ -1,14 +1,14 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils, converter } from '../../helper';
 
-const FontSize = function (editor) {
+const FontSize = function (editor, option) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.fontSize;
 	this.icon = '<span class="txt">' + this.lang.fontSize + '</span>' + this.icons.arrow_down;
 
 	// create HTML
-	const menu = CreateHTML(editor);
+	const menu = CreateHTML(editor, option.items);
 
 	// members
 	this.sizeList = menu.querySelectorAll('li button');
@@ -28,7 +28,10 @@ FontSize.prototype = {
 	active: function (element, target) {
 		const targetText = target.querySelector('.txt');
 		if (!element) {
-			domUtils.changeTxt(targetText, this.status.hasFocus ? converter.fontSize(this.options.get('fontSizeUnit'), this.editor.frameContext.get('wwComputedStyle').fontSize) : this.lang.fontSize);
+			domUtils.changeTxt(
+				targetText,
+				this.status.hasFocus ? converter.fontSize(this.options.get('fontSizeUnit'), this.editor.frameContext.get('wwComputedStyle').fontSize) : this.lang.fontSize
+			);
 		} else if (element.style && element.style.fontSize.length > 0) {
 			domUtils.changeTxt(targetText, converter.fontSize(this.options.get('fontSizeUnit'), element.style.fontSize));
 			return true;
@@ -76,15 +79,39 @@ FontSize.prototype = {
 	constructor: FontSize
 };
 
-function CreateHTML(editor) {
+function CreateHTML(editor, items) {
 	const options = editor.options;
 	const lang = editor.lang;
-	const sizeList = !options.get('fontSize') ? [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72] : options.get('fontSize');
+	const sizeList = items || [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
 
-	let list = '<div class="se-list-inner">' + '<ul class="se-list-basic">' + '<li><button type="button" class="se-btn se-btn-list default_value" title="' + lang.default + '" aria-label="' + lang.default + '">(' + lang.default + ')</button></li>';
+	let list =
+		'<div class="se-list-inner">' +
+		'<ul class="se-list-basic">' +
+		'<li><button type="button" class="se-btn se-btn-list default_value" title="' +
+		lang.default +
+		'" aria-label="' +
+		lang.default +
+		'">(' +
+		lang.default +
+		')</button></li>';
 	for (let i = 0, unit = options.get('fontSizeUnit'), len = sizeList.length, size; i < len; i++) {
 		size = sizeList[i];
-		list += '<li><button type="button" class="se-btn se-btn-list" data-command="' + size + unit + '" title="' + size + unit + '" aria-label="' + size + unit + '" style="font-size:' + size + unit + ';">' + size + '</button></li>';
+		list +=
+			'<li><button type="button" class="se-btn se-btn-list" data-command="' +
+			size +
+			unit +
+			'" title="' +
+			size +
+			unit +
+			'" aria-label="' +
+			size +
+			unit +
+			'" style="font-size:' +
+			size +
+			unit +
+			';">' +
+			size +
+			'</button></li>';
 	}
 	list += '</ul></div>';
 
