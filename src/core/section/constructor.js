@@ -510,46 +510,8 @@ function InitOptions(options, editorTargets) {
 	o.set('previewTemplate', typeof options.previewTemplate === 'string' ? options.previewTemplate : null);
 	o.set('printTemplate', typeof options.printTemplate === 'string' ? options.printTemplate : null);
 
-	/** --- Media */
+	/** --- Media select */
 	o.set('mediaAutoSelect', options.mediaAutoSelect === undefined ? true : !!options.mediaAutoSelect);
-
-	/** image gallery */
-	o.set('imageGalleryUrl', typeof options.imageGalleryUrl === 'string' ? options.imageGalleryUrl : null);
-	o.set('imageGalleryHeader', options.imageGalleryHeader || null);
-
-	/** Video */
-	o.set('videoResizing', options.videoResizing === undefined ? true : options.videoResizing);
-	o.set('videoWidth', !options.videoWidth || !numbers.get(options.videoWidth, 0) ? '' : numbers.is(options.videoWidth) ? options.videoWidth + 'px' : options.videoWidth);
-	o.set('videoHeight', !options.videoHeight || !numbers.get(options.videoHeight, 0) ? '' : numbers.is(options.videoHeight) ? options.videoHeight + 'px' : options.videoHeight);
-	o.set(
-		'videoControls',
-		options.videoControls || !o.get('videoResizing')
-			? [['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']]
-			: [
-					['resize_auto,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
-					['edit', 'align', 'revert', 'remove']
-			  ]
-	);
-	// @todo
-	o.set('videoRatioShow', options.videoRatioShow === undefined ? true : !!options.videoRatioShow);
-	o.set('videoRatio', numbers.get(options.videoRatio, 4) || 0.5625);
-	o.set('videoRatioList', !options.videoRatioList ? null : options.videoRatioList);
-	// @todo
-	o.set('videoHeightShow', options.videoHeightShow === undefined ? true : !!options.videoHeightShow);
-	o.set('videoAlignShow', options.videoAlignShow === undefined ? true : !!options.videoAlignShow);
-	o.set('videoSizeOnlyPercentage', !!options.videoSizeOnlyPercentage);
-	o.set('_videoSizeUnit', o.get('videoSizeOnlyPercentage') ? '%' : 'px');
-	o.set('videoRotation', options.videoRotation !== undefined ? options.videoRotation : !(o.get('videoSizeOnlyPercentage') || !o.get('videoHeightShow')));
-	o.set('youtubeQuery', (options.youtubeQuery || '').replace('?', ''));
-	o.set('videoFileInput', !!options.videoFileInput);
-	o.set('videoUrlInput', options.videoUrlInput === undefined || !options.videoFileInput ? true : options.videoUrlInput);
-	o.set('videoUploadHeader', options.videoUploadHeader || null);
-	o.set('videoUploadUrl', typeof options.videoUploadUrl === 'string' ? options.videoUploadUrl : null);
-	o.set('videoUploadSizeLimit', /\d+/.test(options.videoUploadSizeLimit) ? numbers.get(options.videoUploadSizeLimit, 0) : null);
-	o.set('videoMultipleFile', !!options.videoMultipleFile);
-	o.set('videoTagAttrs', options.videoTagAttrs || null);
-	o.set('videoIframeAttrs', options.videoIframeAttrs || null);
-	o.set('videoAccept', typeof options.videoAccept !== 'string' || options.videoAccept.trim() === '*' ? 'video/*' : options.videoAccept.trim() || 'video/*');
 
 	/** Audio */
 	o.set('audioWidth', !options.audioWidth ? '' : numbers.is(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth);

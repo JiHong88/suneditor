@@ -373,7 +373,6 @@ const editor_root = (window.e = suneditor.create(
 		// },
 		// iframe:true,
 		toolbar_sticky: 0,
-		imageGalleryUrl: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo',
 		lineAttrReset: 'id',
 		attributeWhitelist: 'id',
 		buttonList: bl,
@@ -402,6 +401,9 @@ const editor_root = (window.e = suneditor.create(
 					value: '1.5em'
 				}
 			]
+		},
+		imageGallery: {
+			url: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo'
 		}
 	}
 ));

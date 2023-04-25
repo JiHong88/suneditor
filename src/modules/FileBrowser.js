@@ -1,6 +1,17 @@
 import CoreInjector from '../editorInjector/_core';
 import { domUtils, env } from '../helper';
 
+/**
+ * @param {*} inst
+ * @param {Object} params
+ * @param {string} params.title File browser window title. Required. Can be overridden in fileBrowser.
+ * @param {string} params.url File server url. Required. Can be overridden in fileBrowser.
+ * @param {Object} params.headers File server http header. Required. Can be overridden in fileBrowser.
+ * @param {string} params.listClass Class name of list div. Required. Can be overridden in fileBrowser.
+ * @param {function} params.drawItemHandler Function that defines the HTML of a file item. Required. Can be overridden in fileBrowser.
+ * @param {function} params.selectorHandler Function that actions when an item is clicked. Required. Can be overridden in fileBrowser.
+ * @param {number} params.columnSize Number of "div.se-file-item-column" to be created. Optional. Can be overridden in fileBrowser. Default: 4.
+ */
 const FileBrowser = function (inst, params) {
 	CoreInjector.call(this, inst.editor);
 
@@ -21,7 +32,7 @@ const FileBrowser = function (inst, params) {
 	this.title = params.title;
 	this.listClass = params.listClass;
 	this.url = params.url;
-	this.urlHeader = params.header;
+	this.urlHeader = params.headers;
 	this.drawItemHandler = params.drawItemHandler;
 	this.selectorHandler = params.selectorHandler;
 	this.columnSize = params.columnSize || 4;

@@ -1,7 +1,7 @@
 import EditorInjector from '../../editorInjector';
 import { FileBrowser } from '../../modules';
 
-const ImageGallery = function (editor) {
+const ImageGallery = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.imageGallery;
@@ -9,13 +9,13 @@ const ImageGallery = function (editor) {
 
 	// modules
 	this.fileBrowser = new FileBrowser(this, {
-		title: this.lang.imageGallery, // @Required @override fileBrowser - File browser window title.
-		url: this.options.get('imageGalleryUrl'), // @Required @override fileBrowser - File server url.
-		urlHeader: this.options.get('imageGalleryHeader'), // @Required @override fileBrowser - File server http header.
-		listClass: 'se-image-list', // @Required @override fileBrowser - Class name of list div.
-		drawItemHandler: DrawItems, // @Required @override fileBrowser - Function that defines the HTML of an file item.
-		selectorHandler: SetImage.bind(this), // @Required @override fileBrowser - Function that action when item click.
-		columnSize: 4 // @Option @override fileBrowser - Number of "div.se-file-item-column" to be created (default: 4)
+		title: this.lang.imageGallery,
+		url: pluginOptions.url,
+		headers: pluginOptions.headers,
+		listClass: 'se-image-list',
+		drawItemHandler: DrawItems,
+		selectorHandler: SetImage.bind(this),
+		columnSize: 4
 	});
 
 	// members
@@ -61,7 +61,9 @@ function DrawItems(item) {
 		(item.thumbnail || item.src) +
 		'" alt="' +
 		(item.alt || srcName) +
-		'" data-command="' + (item.src || item.thumbnail) + '" data-value="' +
+		'" data-command="' +
+		(item.src || item.thumbnail) +
+		'" data-value="' +
 		(item.name || srcName) +
 		'">' +
 		'<div class="se-file-name-image se-file-name-back"></div>' +

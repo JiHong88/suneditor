@@ -199,7 +199,20 @@ ModalAnchorEditor.prototype = {
 		const noPrefix = this.options.get('linkNoPrefix');
 		const reservedProtocol = /^(mailto\:|tel\:|sms\:|https*\:\/\/|#)/.test(value);
 		const sameProtocol = !protocol ? false : this._w.RegExp('^' + value.substr(0, protocol.length)).test(protocol);
-		value = this.linkValue = preview.textContent = !value ? '' : noPrefix ? value : protocol && !reservedProtocol && !sameProtocol ? protocol + value : reservedProtocol ? value : /^www\./.test(value) ? 'http://' + value : this.host + (/^\//.test(value) ? '' : '/') + value;
+		value =
+			this.linkValue =
+			preview.textContent =
+				!value
+					? ''
+					: noPrefix
+					? value
+					: protocol && !reservedProtocol && !sameProtocol
+					? protocol + value
+					: reservedProtocol
+					? value
+					: /^www\./.test(value)
+					? 'http://' + value
+					: this.host + (/^\//.test(value) ? '' : '/') + value;
 
 		if (this._selfPathBookmark(value)) {
 			this.bookmark.style.display = 'block';
@@ -395,7 +408,10 @@ function CreatetModalForm(editor, params) {
 		lang.link_modal_downloadLinkCheck +
 		'</label>';
 	if (editor.options.get('linkRel').length > 0) {
-		html += '<div class="se-anchor-rel"><button type="button" class="se-btn se-btn-select se-anchor-rel-btn">&lt;rel&gt;</button>' + '<div class="se-anchor-rel-wrapper"><pre class="se-link-preview se-anchor-rel-preview"></pre></div>' + '</div></div>';
+		html +=
+			'<div class="se-anchor-rel"><button type="button" class="se-btn se-btn-select se-anchor-rel-btn">&lt;rel&gt;</button>' +
+			'<div class="se-anchor-rel-wrapper"><pre class="se-link-preview se-anchor-rel-preview"></pre></div>' +
+			'</div></div>';
 	}
 
 	html += '</div></div>';

@@ -2,34 +2,69 @@ import EditorInjector from '../../editorInjector';
 import { Modal, Figure, FileManager } from '../../modules';
 import { domUtils, numbers } from '../../helper';
 
-const Video = function (editor) {
+const Video = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.video;
 	this.icon = 'video';
 
-	// create HTML
-	const options = this.options;
-	const modalEl = CreateHTML_modal(editor);
-	const figureControls = options.get('videoControls');
+	// members-plugin options
+	this.pluginOptions = {
+		canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
+		showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,
+		defaultWidth:
+			!pluginOptions.defaultWidth || !numbers.get(pluginOptions.defaultWidth, 0)
+				? ''
+				: numbers.is(pluginOptions.defaultWidth)
+				? pluginOptions.defaultWidth + 'px'
+				: pluginOptions.defaultWidth,
+		defaultHeight:
+			!pluginOptions.defaultHeight || !numbers.get(pluginOptions.defaultHeight, 0)
+				? ''
+				: numbers.is(pluginOptions.defaultHeight)
+				? pluginOptions.defaultHeight + 'px'
+				: pluginOptions.defaultHeight,
+		percentageOnlySize: !!pluginOptions.percentageOnlySize,
+		createFileInput: !!pluginOptions.createFileInput,
+		createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createUrlInput ? true : pluginOptions.createUrlInput,
+		uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
+		uploadHeaders: pluginOptions.uploadHeaders || null,
+		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
+		allowMultiple: !!pluginOptions.allowMultiple,
+		acceptedFormats:
+			typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'video/*' : pluginOptions.acceptedFormats.trim() || 'video/*',
+		defaultRatio: numbers.get(pluginOptions.defaultRatio, 4) || 0.5625,
+		showRatioOption: pluginOptions.showRatioOption === undefined ? true : !!pluginOptions.showRatioOption,
+		ratioOptions: !pluginOptions.ratioOptions ? null : pluginOptions.ratioOptions,
+		videoTagAttributes: pluginOptions.videoTagAttributes || null,
+		iframeTagAttributes: pluginOptions.iframeTagAttributes || null
+	};
 
-	// controls
-	let showAlign = false;
-	for (let i = 0; i < figureControls.length; i++) {
-		if (!figureControls[i]) break;
-		for (let j = 0; j < figureControls[i].length; j++) {
-			this._rotation = /rotate/.test(figureControls[i][j]);
-			showAlign = /align/.test(figureControls[i][j]);
-		}
-	}
+	// create HTML
+	const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
+	const modalEl = CreateHTML_modal(editor, this.pluginOptions);
+	const showAlign = (pluginOptions.showAlignRadio === undefined ? true : !!pluginOptions.showAlignRadio) ? 'align' : '';
+	const figureControls =
+		pluginOptions.controls || !this.pluginOptions.canResize
+			? [['mirror_h', 'mirror_v', showAlign, 'revert', 'edit', 'remove']]
+			: [
+					['resize_auto,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
+					['edit', showAlign, 'revert', 'remove']
+			  ];
+
+	// show align
 	if (showAlign) modalEl.querySelector('.se-figure-align').style.display = 'none';
 
 	// modules
-	const videoRatio = options.get('videoRatio') * 100 + '%';
-	const defaultRatio = options.get('videoRatio') * 100 + '%';
+	const defaultRatio = this.pluginOptions.defaultRatio * 100 + '%';
 	this.modal = new Modal(this, modalEl);
-	this.figure = new Figure(this, figureControls, { sizeUnit: options.get('_videoSizeUnit'), autoRatio: { current: videoRatio, default: defaultRatio } });
-	this.fileManager = new FileManager(this, { tagNames: ['iframe', 'video'], eventHandler: this.events.onVideoUpload, checkHandler: FileCheckHandler.bind(this), figure: this.figure });
+	this.figure = new Figure(this, figureControls, { sizeUnit: sizeUnit, autoRatio: { current: defaultRatio, default: defaultRatio } });
+	this.fileManager = new FileManager(this, {
+		tagNames: ['iframe', 'video'],
+		eventHandler: this.events.onVideoUpload,
+		checkHandler: FileCheckHandler.bind(this),
+		figure: this.figure
+	});
 
 	// members
 	this.videoInputFile = modalEl.querySelector('._se_video_file');
@@ -38,12 +73,12 @@ const Video = function (editor) {
 	this.previewSrc = modalEl.querySelector('.se-link-preview');
 	this._linkValue = '';
 	this._align = 'none';
-	this._youtubeQuery = options.get('youtubeQuery');
-	this._videoRatio = videoRatio;
+	this._youtubeQuery = (pluginOptions.youtubeQueryString || '').replace('?', '');
+	this._videoRatio = defaultRatio;
 	this._defaultRatio = defaultRatio;
 	this._defaultSizeX = '100%';
-	this._defaultSizeY = options.get('videoRatio') * 100 + '%';
-	this.sizeUnit = options.get('_videoSizeUnit');
+	this._defaultSizeY = this.pluginOptions.defaultRatio * 100 + '%';
+	this.sizeUnit = sizeUnit;
 	this.proportion = {};
 	this.videoRatioOption = {};
 	this.inputX = {};
@@ -52,11 +87,11 @@ const Video = function (editor) {
 	this._cover = null;
 	this._container = null;
 	this._ratio = { w: 1, h: 1 };
-	this._origin_w = options.get('videoWidth') === '100%' ? '' : options.get('videoWidth');
-	this._origin_h = options.get('videoHeight') === '56.25%' ? '' : options.get('videoHeight');
-	this._resizing = options.get('videoResizing');
-	this._onlyPercentage = options.get('videoSizeOnlyPercentage');
-	this._nonResizing = !this._resizing || !options.get('videoHeightShow') || this._onlyPercentage;
+	this._origin_w = this.pluginOptions.defaultWidth === '100%' ? '' : this.pluginOptions.defaultWidth;
+	this._origin_h = this.pluginOptions.defaultHeight === defaultRatio ? '' : this.pluginOptions.defaultHeight;
+	this._resizing = this.pluginOptions.canResize;
+	this._onlyPercentage = this.pluginOptions.percentageOnlySize;
+	this._nonResizing = !this._resizing || !this.pluginOptions.showHeightInput || this._onlyPercentage;
 
 	// init
 	if (this.videoInputFile) modalEl.querySelector('.se-file-remove').addEventListener('click', RemoveSelectedFiles.bind(this));
@@ -68,8 +103,8 @@ const Video = function (editor) {
 		this.videoRatioOption = modalEl.querySelector('.se-video-ratio');
 		this.inputX = modalEl.querySelector('._se_video_size_x');
 		this.inputY = modalEl.querySelector('._se_video_size_y');
-		this.inputX.value = options.get('videoWidth');
-		this.inputY.value = options.get('videoHeight');
+		this.inputX.value = this.pluginOptions.defaultWidth;
+		this.inputY.value = this.pluginOptions.defaultHeight;
 
 		const ratioChange = OnChangeRatio.bind(this);
 		this.inputX.addEventListener('keyup', OnInputSize.bind(this, 'x'));
@@ -99,12 +134,12 @@ Video.prototype = {
 	 */
 	on: function (isUpdate) {
 		if (!isUpdate) {
-			this.inputX.value = this._origin_w = this.options.get('videoWidth') === this._defaultSizeX ? '' : this.options.get('videoWidth');
-			this.inputY.value = this._origin_h = this.options.get('videoHeight') === this._defaultSizeY ? '' : this.options.get('videoHeight');
+			this.inputX.value = this._origin_w = this.pluginOptions.defaultWidth === this._defaultSizeX ? '' : this.pluginOptions.defaultWidth;
+			this.inputY.value = this._origin_h = this.pluginOptions.defaultHeight === this._defaultSizeY ? '' : this.pluginOptions.defaultHeight;
 			this.proportion.disabled = true;
-			if (this.videoInputFile && this.options.get('videoMultipleFile')) this.videoInputFile.setAttribute('multiple', 'multiple');
+			if (this.videoInputFile && this.pluginOptions.allowMultiple) this.videoInputFile.setAttribute('multiple', 'multiple');
 		} else {
-			if (this.videoInputFile && this.options.get('videoMultipleFile')) this.videoInputFile.removeAttribute('multiple');
+			if (this.videoInputFile && this.pluginOptions.allowMultiple) this.videoInputFile.removeAttribute('multiple');
 		}
 
 		if (this._resizing) {
@@ -147,8 +182,8 @@ Video.prototype = {
 		this._nonResizing = false;
 
 		if (this._resizing) {
-			this.inputX.value = this.options.get('videoWidth') === this._defaultSizeX ? '' : this.options.get('videoWidth');
-			this.inputY.value = this.options.get('videoHeight') === this._defaultSizeY ? '' : this.options.get('videoHeight');
+			this.inputX.value = this.pluginOptions.defaultWidth === this._defaultSizeX ? '' : this.pluginOptions.defaultWidth;
+			this.inputY.value = this.pluginOptions.defaultHeight === this._defaultSizeY ? '' : this.pluginOptions.defaultHeight;
 			this.proportion.checked = false;
 			this.proportion.disabled = true;
 			this._setVideoRatioSelect(this._defaultRatio);
@@ -184,8 +219,12 @@ Video.prototype = {
 		let w = figureInfo.width || figureInfo.w || this._origin_w || '';
 		let h = figureInfo.height || figureInfo.h || this._origin_h || '';
 
-		if (this.videoUrlFile) this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this._element.src || (this._element.querySelector('source') || '').src || '';
-		(this.modal.form.querySelector('input[name="suneditor_video_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]')).checked = true;
+		if (this.videoUrlFile)
+			this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this._element.src || (this._element.querySelector('source') || '').src || '';
+		(
+			this.modal.form.querySelector('input[name="suneditor_video_radio"][value="' + this._align + '"]') ||
+			this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]')
+		).checked = true;
 
 		if (!this._resizing) return;
 
@@ -239,8 +278,8 @@ Video.prototype = {
 	},
 
 	applySize: function (w, h) {
-		if (!w) w = this.inputX.value || this.options.get('videoWidth');
-		if (!h) h = this.inputY.value || this.options.get('videoHeight');
+		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
+		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
 		if (this._onlyPercentage) {
 			if (!w) w = '100%';
 			else if (/%$/.test(w)) w += '%';
@@ -331,11 +370,14 @@ Video.prototype = {
 			}
 		}
 
-		const limitSize = this.options.get('videoUploadSizeLimit');
+		const limitSize = this.pluginOptions.uploadSizeLimit;
 		const currentSize = this.fileManager.getSize();
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.video.submitFile.fail] Size of uploadable total videos: ' + limitSize / 1000 + 'KB';
-			if (typeof this.events.onVideoUploadError !== 'function' || this.events.onVideoUploadError(err, { limitSize: limitSize, currentSize: currentSize, uploadSize: fileSize })) {
+			if (
+				typeof this.events.onVideoUploadError !== 'function' ||
+				this.events.onVideoUploadError(err, { limitSize: limitSize, currentSize: currentSize, uploadSize: fileSize })
+			) {
 				this.notice.open(err);
 			}
 			return false;
@@ -404,7 +446,15 @@ Video.prototype = {
 			url = 'https://player.vimeo.com/video/' + url.slice(url.lastIndexOf('/') + 1);
 		}
 
-		this.create(this[!/embed|iframe|player|\/e\/|\.php|\.html?/.test(url) && !/vimeo\.com/.test(url) ? '_createVideoTag' : '_createVideoTag'](), url, this.inputX.value, this.inputY.value, this._align, this.modal.isUpdate, { name: url.split('/').pop(), size: 0 });
+		this.create(
+			this[!/embed|iframe|player|\/e\/|\.php|\.html?/.test(url) && !/vimeo\.com/.test(url) ? '_createVideoTag' : '_createVideoTag'](),
+			url,
+			this.inputX.value,
+			this.inputY.value,
+			this._align,
+			this.modal.isUpdate,
+			{ name: url.split('/').pop(), size: 0 }
+		);
 		return true;
 	},
 
@@ -473,7 +523,10 @@ Video.prototype = {
 		const videoTag = this._createVideoTag();
 
 		for (let i = 0, len = fileList.length; i < len; i++) {
-			this.create(info.isUpdate ? info.element : videoTag.cloneNode(false), fileList[i].url, info.inputWidth, info.inputHeight, info.align, info.isUpdate, { name: fileList[i].name, size: fileList[i].size });
+			this.create(info.isUpdate ? info.element : videoTag.cloneNode(false), fileList[i].url, info.inputWidth, info.inputHeight, info.align, info.isUpdate, {
+				name: fileList[i].name,
+				size: fileList[i].size
+			});
 		}
 	},
 
@@ -484,16 +537,16 @@ Video.prototype = {
 			return;
 		}
 
-		const videoUploadUrl = this.options.get('videoUploadUrl');
+		const videoUploadUrl = this.pluginOptions.uploadUrl;
 		if (typeof videoUploadUrl === 'string' && videoUploadUrl.length > 0) {
-			this.fileManager.upload(videoUploadUrl, this.options.get('videoUploadHeader'), files, UploadCallBack.bind(this, info), this.events.onVideoUploadError);
+			this.fileManager.upload(videoUploadUrl, this.pluginOptions.uploadHeaders, files, UploadCallBack.bind(this, info), this.events.onVideoUploadError);
 		}
 	},
 
 	_setTagAttrs: function (element) {
 		element.setAttribute('controls', true);
 
-		const attrs = this.options.get('videoTagAttrs');
+		const attrs = this.pluginOptions.videoTagAttributes;
 		if (!attrs) return;
 
 		for (let key in attrs) {
@@ -505,7 +558,7 @@ Video.prototype = {
 		element.frameBorder = '0';
 		element.allowFullscreen = true;
 
-		const attrs = this.options.get('videoIframeAttrs');
+		const attrs = this.pluginOptions.iframeTagAttributes;
 		if (!attrs) return;
 
 		for (let key in attrs) {
@@ -582,7 +635,13 @@ function OnLinkPreview(e) {
 		this._linkValue = value;
 		this.previewSrc.textContent = '<IFrame :src=".."></IFrame>';
 	} else {
-		this._linkValue = this.previewSrc.textContent = !value ? '' : this.options.get('linkProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0 ? this.options.get('linkProtocol') + value : value.indexOf('://') === -1 ? '/' + value : value;
+		this._linkValue = this.previewSrc.textContent = !value
+			? ''
+			: this.options.get('linkProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0
+			? this.options.get('linkProtocol') + value
+			: value.indexOf('://') === -1
+			? '/' + value
+			: value;
 	}
 }
 
@@ -638,7 +697,7 @@ function OnInputSize(xy, e) {
 	}
 }
 
-function CreateHTML_modal(editor) {
+function CreateHTML_modal(editor, pluginOptions) {
 	const options = editor.options;
 	const lang = editor.lang;
 	let html =
@@ -657,7 +716,7 @@ function CreateHTML_modal(editor) {
 		'</div>' +
 		'<div class="se-modal-body">';
 
-	if (options.get('videoFileInput')) {
+	if (pluginOptions.createFileInput) {
 		html +=
 			'' +
 			'<div class="se-modal-form">' +
@@ -666,9 +725,9 @@ function CreateHTML_modal(editor) {
 			'</label>' +
 			'<div class="se-modal-form-files">' +
 			'<input class="se-input-form _se_video_file" type="file" data-focus accept="' +
-			options.get('videoAccept') +
+			pluginOptions.acceptedFormats +
 			'"' +
-			(options.get('videoMultipleFile') ? ' multiple="multiple"' : '') +
+			(pluginOptions.allowMultiple ? ' multiple="multiple"' : '') +
 			'/>' +
 			'<button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="' +
 			lang.remove +
@@ -681,22 +740,30 @@ function CreateHTML_modal(editor) {
 			'</div>';
 	}
 
-	if (options.get('videoUrlInput')) {
-		html += '' + '<div class="se-modal-form">' + '<label>' + lang.video_modal_url + '</label>' + '<input class="se-input-form se-input-url" type="text" data-focus />' + '<pre class="se-link-preview"></pre>' + '</div>';
+	if (pluginOptions.createUrlInput) {
+		html +=
+			'' +
+			'<div class="se-modal-form">' +
+			'<label>' +
+			lang.video_modal_url +
+			'</label>' +
+			'<input class="se-input-form se-input-url" type="text" data-focus />' +
+			'<pre class="se-link-preview"></pre>' +
+			'</div>';
 	}
 
-	if (options.get('videoResizing')) {
-		const ratioList = options.get('videoRatioList') || [
+	if (pluginOptions.canResize) {
+		const ratioList = pluginOptions.ratioOptions || [
 			{ name: '16:9', value: 0.5625 },
 			{ name: '4:3', value: 0.75 },
 			{ name: '21:9', value: 0.4285 }
 		];
-		const ratio = options.get('videoRatio');
-		const onlyPercentage = options.get('videoSizeOnlyPercentage');
+		const ratio = pluginOptions.defaultRatio;
+		const onlyPercentage = pluginOptions.percentageOnlySize;
 		const onlyPercentDisplay = onlyPercentage ? ' style="display: none !important;"' : '';
-		const heightDisplay = !options.get('videoHeightShow') ? ' style="display: none !important;"' : '';
-		const ratioDisplay = !options.get('videoRatioShow') ? ' style="display: none !important;"' : '';
-		const onlyWidthDisplay = !onlyPercentage && !options.get('videoHeightShow') && !options.get('videoRatioShow') ? ' style="display: none !important;"' : '';
+		const heightDisplay = !pluginOptions.showHeightInput ? ' style="display: none !important;"' : '';
+		const ratioDisplay = !pluginOptions.showRatioOption ? ' style="display: none !important;"' : '';
+		const onlyWidthDisplay = !onlyPercentage && !pluginOptions.showHeightInput && !pluginOptions.showRatioOption ? ' style="display: none !important;"' : '';
 		html +=
 			'' +
 			'<div class="se-modal-form">' +
@@ -726,7 +793,7 @@ function CreateHTML_modal(editor) {
 			(onlyPercentage ? '%' : 'x') +
 			'</label>' +
 			'<input class="se-input-control _se_video_size_y" placeholder="' +
-			options.get('videoRatio') * 100 +
+			pluginOptions.defaultRatio * 100 +
 			'%"' +
 			(onlyPercentage ? ' type="number" min="1"' : 'type="text"') +
 			(onlyPercentage ? ' max="100"' : '') +

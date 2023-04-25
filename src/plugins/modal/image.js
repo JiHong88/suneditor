@@ -12,14 +12,13 @@ const Image_ = function (editor, pluginOptions) {
 	this.pluginOptions = {
 		canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
 		showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,
-		showAlignRadio: pluginOptions.showAlignRadio === undefined ? true : !!pluginOptions.showAlignRadio,
 		defaultWidth: !pluginOptions.defaultWidth ? 'auto' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + 'px' : pluginOptions.defaultWidth,
 		defaultHeight: !pluginOptions.defaultHeight ? 'auto' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
 		percentageOnlySize: !!pluginOptions.percentageOnlySize,
 		createFileInput: pluginOptions.createFileInput === undefined ? true : pluginOptions.createFileInput,
 		createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createUrlInput ? true : pluginOptions.createUrlInput,
-		uploadHeaders: pluginOptions.uploadHeaders || null,
 		uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
+		uploadHeaders: pluginOptions.uploadHeaders || null,
 		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
 		allowMultiple: !!pluginOptions.allowMultiple,
 		acceptedFormats:
@@ -29,9 +28,9 @@ const Image_ = function (editor, pluginOptions) {
 	// create HTML
 	const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
 	const modalEl = CreateHTML_modal(editor, this.pluginOptions);
-	const showAlign = this.pluginOptions.showAlignRadio ? 'align' : '';
+	const showAlign = (pluginOptions.showAlignRadio === undefined ? true : !!pluginOptions.showAlignRadio) ? 'align' : '';
 	const figureControls =
-		pluginOptions.imageControls || !this.pluginOptions.canResize
+		pluginOptions.controls || !this.pluginOptions.canResize
 			? [['mirror_h', 'mirror_v', showAlign, 'caption', 'revert', 'edit', 'remove']]
 			: [
 					['resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
@@ -40,10 +39,6 @@ const Image_ = function (editor, pluginOptions) {
 
 	// show align
 	if (!showAlign) modalEl.querySelector('.se-figure-align').style.display = 'none';
-	// controls
-	for (let i = 0; i < figureControls.length; i++) {
-		if ((this._rotation = figureControls[i].indexOf('rotate_l') > -1 || figureControls[i].indexOf('rotate_r') > -1)) break;
-	}
 
 	// modules
 	this.anchor = new ModalAnchorEditor(this, modalEl, { textToDisplay: false, title: true });
@@ -800,9 +795,78 @@ function OnloadImg(oImg, _svgDefaultSize, container) {
 }
 
 function CreateHTML_modal(editor, pluginOptions) {
-	const options = editor.options;
 	const lang = editor.lang;
-	let html =
+	const createFileInputHtml = pluginOptions.createFileInput
+		? '<div class="se-modal-form">' +
+		  '<label>' +
+		  lang.image_modal_file +
+		  '</label>' +
+		  '<div class="se-modal-form-files">' +
+		  '<input class="se-input-form _se_image_file" data-focus type="file" accept="' +
+		  pluginOptions.acceptedFormats +
+		  '"' +
+		  (pluginOptions.allowMultiple ? ' multiple="multiple"' : '') +
+		  '/>' +
+		  '<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="' +
+		  lang.remove +
+		  '" aria-label="' +
+		  lang.remove +
+		  '">' +
+		  editor.icons.cancel +
+		  '</button>' +
+		  '</div>' +
+		  '</div>'
+		: '';
+
+	const createUrlInputHtml = pluginOptions.createUrlInput
+		? '<div class="se-modal-form">' +
+		  '<label>' +
+		  lang.image_modal_url +
+		  '</label>' +
+		  '<div class="se-modal-form-files">' +
+		  '<input class="se-input-form se-input-url _se_image_url" data-focus type="text" />' +
+		  (editor.plugins.imageGallery
+				? '<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="' +
+				  lang.imageGallery +
+				  '" aria-label="' +
+				  lang.imageGallery +
+				  '">' +
+				  editor.icons.image_gallery +
+				  '</button>'
+				: '') +
+		  '</div>' +
+		  '<pre class="se-link-preview"></pre>' +
+		  '</div>'
+		: '';
+
+	const canResizeHtml = pluginOptions.canResize
+		? '<div class="se-modal-form">' +
+		  '<label class="size-w">' +
+		  lang.width +
+		  '</label>' +
+		  '<label class="se-modal-size-x">&nbsp;</label>' +
+		  '<label class="size-h">' +
+		  lang.height +
+		  '</label>' +
+		  '</div>' +
+		  '<input class="se-input-control _se_image_size_x" placeholder="auto" type="text" />' +
+		  '<label class="se-modal-size-x">' +
+		  'x' +
+		  '</label>' +
+		  '<input type="text" class="se-input-control _se_image_size_y" placeholder="auto" />' +
+		  '<label><input type="checkbox" class="se-modal-btn-check _se_image_check_proportion" checked/>&nbsp;' +
+		  lang.proportion +
+		  '</label>' +
+		  '<button type="button" title="' +
+		  lang.revertButton +
+		  '" aria-label="' +
+		  lang.revertButton +
+		  '" class="se-btn se-modal-btn-revert">' +
+		  editor.icons.revert +
+		  '</button>'
+		: '';
+
+	const html =
 		'<div class="se-modal-header">' +
 		'<button type="button" data-command="close" class="se-btn se-modal-close close" title="' +
 		lang.close +
@@ -825,106 +889,16 @@ function CreateHTML_modal(editor, pluginOptions) {
 		'</div>' +
 		'<form method="post" enctype="multipart/form-data">' +
 		'<div class="_se_tab_content _se_tab_content_image">' +
-		'<div class="se-modal-body"><div style="border-bottom: 1px dashed #ccc;">';
-
-	if (pluginOptions.createFileInput) {
-		html +=
-			'<div class="se-modal-form">' +
-			'<label>' +
-			lang.image_modal_file +
-			'</label>' +
-			'<div class="se-modal-form-files">' +
-			'<input class="se-input-form _se_image_file" data-focus type="file" accept="' +
-			pluginOptions.acceptedFormats +
-			'"' +
-			(pluginOptions.allowMultiple ? ' multiple="multiple"' : '') +
-			'/>' +
-			'<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="' +
-			lang.remove +
-			'" aria-label="' +
-			lang.remove +
-			'">' +
-			editor.icons.cancel +
-			'</button>' +
-			'</div>' +
-			'</div>';
-	}
-
-	if (pluginOptions.createUrlInput) {
-		html +=
-			'<div class="se-modal-form">' +
-			'<label>' +
-			lang.image_modal_url +
-			'</label>' +
-			'<div class="se-modal-form-files">' +
-			'<input class="se-input-form se-input-url _se_image_url" data-focus type="text" />' +
-			(options.get('imageGalleryUrl') && editor.plugins.imageGallery
-				? '<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="' +
-				  lang.imageGallery +
-				  '" aria-label="' +
-				  lang.imageGallery +
-				  '">' +
-				  editor.icons.image_gallery +
-				  '</button>'
-				: '') +
-			'</div>' +
-			'<pre class="se-link-preview"></pre>' +
-			'</div>';
-	}
-
-	html += '</div>' + '<div class="se-modal-form">' + '<label>' + lang.image_modal_altText + '</label><input class="se-input-form _se_image_alt" type="text" />' + '</div>';
-
-	if (pluginOptions.canResize) {
-		const onlyPercentage = pluginOptions.percentageOnlySize;
-		const onlyPercentDisplay = onlyPercentage ? ' style="display: none !important;"' : '';
-		const heightDisplay = !pluginOptions.showHeightInput ? ' style="display: none !important;"' : '';
-		html += '<div class="se-modal-form">';
-		if (onlyPercentage || !pluginOptions.showHeightInput) {
-			html += '<div class="se-modal-size-text">' + '<label class="size-w">' + lang.size + '</label>' + '</div>';
-		} else {
-			html +=
-				'<div class="se-modal-size-text">' +
-				'<label class="size-w">' +
-				lang.width +
-				'</label>' +
-				'<label class="se-modal-size-x">&nbsp;</label>' +
-				'<label class="size-h">' +
-				lang.height +
-				'</label>' +
-				'</div>';
-		}
-		html +=
-			'<input class="se-input-control _se_image_size_x" placeholder="auto"' +
-			(onlyPercentage ? ' type="number" min="1"' : 'type="text"') +
-			(onlyPercentage ? ' max="100"' : '') +
-			' />' +
-			'<label class="se-modal-size-x"' +
-			heightDisplay +
-			'>' +
-			(onlyPercentage ? '%' : 'x') +
-			'</label>' +
-			'<input type="text" class="se-input-control _se_image_size_y" placeholder="auto"' +
-			onlyPercentDisplay +
-			(onlyPercentage ? ' max="100"' : '') +
-			heightDisplay +
-			'/>' +
-			'<label' +
-			onlyPercentDisplay +
-			heightDisplay +
-			'><input type="checkbox" class="se-modal-btn-check _se_image_check_proportion" checked/>&nbsp;' +
-			lang.proportion +
-			'</label>' +
-			'<button type="button" title="' +
-			lang.revertButton +
-			'" aria-label="' +
-			lang.revertButton +
-			'" class="se-btn se-modal-btn-revert">' +
-			editor.icons.revert +
-			'</button>' +
-			'</div>';
-	}
-
-	html +=
+		'<div class="se-modal-body"><div style="border-bottom: 1px dashed #ccc;">' +
+		createFileInputHtml +
+		createUrlInputHtml +
+		'</div>' +
+		'<div class="se-modal-form">' +
+		'<label>' +
+		lang.image_modal_altText +
+		'</label><input class="se-input-form _se_image_alt" type="text" />' +
+		'</div>' +
+		canResizeHtml +
 		'<div class="se-modal-form se-modal-form-footer">' +
 		'<label><input type="checkbox" class="se-modal-btn-check _se_image_check_caption" />&nbsp;' +
 		lang.caption +
