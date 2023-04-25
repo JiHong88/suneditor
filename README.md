@@ -817,6 +817,18 @@ templates       : If you use a template plugin, add it.
                         html: '<p>HTML source2</p>'
                     }
                   ]
+layouts       : If you use a layout plugin, add it.
+                  Defines a list of templates.                       default: null {Array} 
+                  ex) [
+                    {
+                        name: 'Template-1',
+                        html: '<p>HTML source1</p>'
+                    },
+                    {
+                        name: 'Template-2',
+                        html: '<p>HTML source2</p>'
+                    }
+                  ]
 
 // ETC------------------------------------------------------------------------------------------------------------
 placeholder     : The placeholder text.                              default: null {string}

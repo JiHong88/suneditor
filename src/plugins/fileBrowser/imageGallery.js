@@ -19,8 +19,8 @@ const ImageGallery = function (editor) {
 	});
 
 	// members
-	this.width = this.options.get('imageWidth') === 'auto' ? '' : this.options.get('imageWidth');
-	this.height = this.options.get('imageHeight') === 'auto' ? '' : this.options.get('imageHeight');
+	this.width = this.plugins.image.pluginOptions.defaultWidth === 'auto' ? '' : this.plugins.image.pluginOptions.defaultWidth;
+	this.height = this.plugins.image.pluginOptions.defaultHeight === 'auto' ? '' : this.plugins.image.pluginOptions.defaultHeight;
 };
 
 ImageGallery.key = 'imageGallery';

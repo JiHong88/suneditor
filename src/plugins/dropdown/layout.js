@@ -1,17 +1,18 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
-const Layout = function (editor) {
+const Layout = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.layout;
 	this.icon = 'layout';
 
-	// create HTML
-	const menu = CreateHTML(editor);
-
 	// members
 	this.selectedIndex = -1;
+	this.items = pluginOptions.items;
+
+	// create HTML
+	const menu = CreateHTML(this.items);
 
 	// init
 	this.menu.initDropdownTarget(Layout, menu);
@@ -27,7 +28,7 @@ Layout.prototype = {
 	 */
 	action: function (target) {
 		const index = target.getAttribute('data-value') * 1;
-		const temp = this.options.get('layouts')[(this.selectedIndex = index)];
+		const temp = this.items[(this.selectedIndex = index)];
 
 		if (temp.html) {
 			this.html.set(temp.html);
@@ -42,8 +43,7 @@ Layout.prototype = {
 	constructor: Layout
 };
 
-function CreateHTML(editor) {
-	const layoutList = editor.options.get('layouts');
+function CreateHTML(layoutList) {
 	if (!layoutList || layoutList.length === 0) {
 		console.warn('[SUNEDITOR.plugins.layout.warn] To use the "layout" plugin, please define the "layouts" option.');
 	}

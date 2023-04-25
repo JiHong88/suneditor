@@ -1,14 +1,14 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
-const HR = function (editor, option) {
+const HR = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.horizontalLine;
 	this.icon = 'horizontal_line';
 
 	// create HTML
-	const HRMenus = CreateHTML(editor, option.items);
+	const HRMenus = CreateHTML(editor, pluginOptions.items);
 
 	// members
 	this.list = HRMenus.querySelectorAll('button');

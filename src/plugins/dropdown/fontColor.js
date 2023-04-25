@@ -2,14 +2,14 @@ import EditorInjector from '../../editorInjector';
 import ColorPicker from '../../modules/ColorPicker';
 import { domUtils } from '../../helper';
 
-const FontColor = function (editor, option) {
+const FontColor = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.fontColor;
 	this.icon = 'font_color';
 
 	// members
-	this.colorPicker = new ColorPicker(this, 'color', option.items);
+	this.colorPicker = new ColorPicker(this, 'color', pluginOptions.items);
 
 	// create HTML
 	const menu = CreateHTML(this.colorPicker.target);

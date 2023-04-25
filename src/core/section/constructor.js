@@ -513,34 +513,7 @@ function InitOptions(options, editorTargets) {
 	/** --- Media */
 	o.set('mediaAutoSelect', options.mediaAutoSelect === undefined ? true : !!options.mediaAutoSelect);
 
-	/** Image */
-	o.set('imageResizing', options.imageResizing === undefined ? true : options.imageResizing);
-	o.set('imageWidth', !options.imageWidth ? 'auto' : numbers.is(options.imageWidth) ? options.imageWidth + 'px' : options.imageWidth);
-	o.set('imageHeight', !options.imageHeight ? 'auto' : numbers.is(options.imageHeight) ? options.imageHeight + 'px' : options.imageHeight);
-	o.set(
-		'imageControls',
-		options.imageControls || !o.get('imageResizing')
-			? [['mirror_h', 'mirror_v', 'align', 'caption', 'revert', 'edit', 'remove']]
-			: [
-					['resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
-					['edit', 'align', 'caption', 'revert', 'remove']
-			  ]
-	);
-	// @todo
-	o.set('imageHeightShow', options.imageHeightShow === undefined ? true : !!options.imageHeightShow);
-	o.set('imageAlignShow', options.imageAlignShow === undefined ? true : !!options.imageAlignShow);
-	o.set('imageSizeOnlyPercentage', !!options.imageSizeOnlyPercentage);
-	o.set('_imageSizeUnit', o.get('imageSizeOnlyPercentage') ? '%' : 'px');
-	o.set('imageRotation', options.imageRotation !== undefined ? options.imageRotation : !(o.get('imageSizeOnlyPercentage') || !o.get('imageHeightShow')));
-	o.set('imageFileInput', options.imageFileInput === undefined ? true : options.imageFileInput);
-	o.set('imageUrlInput', options.imageUrlInput === undefined || !options.imageFileInput ? true : options.imageUrlInput);
-	o.set('imageUploadHeader', options.imageUploadHeader || null);
-	o.set('imageUploadUrl', typeof options.imageUploadUrl === 'string' ? options.imageUploadUrl : null);
-	o.set('imageUploadSizeLimit', /\d+/.test(options.imageUploadSizeLimit) ? numbers.get(options.imageUploadSizeLimit, 0) : null);
-	o.set('imageMultipleFile', !!options.imageMultipleFile);
-	o.set('imageAccept', typeof options.imageAccept !== 'string' || options.imageAccept.trim() === '*' ? 'image/*' : options.imageAccept.trim() || 'image/*');
-
-	/** Image - image gallery */
+	/** image gallery */
 	o.set('imageGalleryUrl', typeof options.imageGalleryUrl === 'string' ? options.imageGalleryUrl : null);
 	o.set('imageGalleryHeader', options.imageGalleryHeader || null);
 

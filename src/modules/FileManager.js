@@ -32,7 +32,7 @@ FileManager.prototype = {
 	 * @param {Files|{FormData, size}} data FormData in body or Files array
 	 * @param {Function|null} callBack Success call back function
 	 * @param {Function|null} errorCallBack Error call back function
-	 * @example this.plugins.fileManager.upload.call(this, imageUploadUrl, this.options.get('imageUploadHeader'), formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.events.onImageUploadError);
+	 * @example this.plugins.fileManager.upload.call(this, pluginOptions.uploadUrl, pluginOptions.uploadHeaders, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.events.onImageUploadError);
 	 */
 	upload: function (uploadUrl, uploadHeader, data, callBack, errorCallBack) {
 		this.editor._openLoading();
@@ -224,7 +224,11 @@ FileManager.prototype = {
 					if (this.figure) this.figure.__fileManagerInfo = true;
 					tag = this.checkHandler(tag);
 					if (!tag) {
-						console.warn('[SUNEDITOR.FileManager[' + this.kind + '].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).');
+						console.warn(
+							'[SUNEDITOR.FileManager[' +
+								this.kind +
+								'].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).'
+						);
 					} else {
 						this.setInfo(tag, null);
 						this.inst.init();
@@ -304,7 +308,8 @@ function CallBackUpload(xmlHttp, callBack, errorCallBack) {
 			this.editor._closeLoading();
 			const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
 			if (typeof errorCallBack !== 'function' || errorCallBack.call(this.events, '', res)) {
-				const err = '[SUNEDITOR.FileManager[' + this.kind + '].upload.serverException] status: ' + xmlHttp.status + ', response: ' + (res.errorMessage || xmlHttp.responseText);
+				const err =
+					'[SUNEDITOR.FileManager[' + this.kind + '].upload.serverException] status: ' + xmlHttp.status + ', response: ' + (res.errorMessage || xmlHttp.responseText);
 				this.notice.open(err);
 				throw Error(err);
 			}

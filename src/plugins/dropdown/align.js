@@ -1,14 +1,14 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
-const Align = function (editor) {
+const Align = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.align;
 	this.icon = this.options.get('_rtl') ? 'align_right' : 'align_left';
 
 	// create HTML
-	const menu = CreateHTML(editor, !editor.options.get('_rtl'));
+	const menu = CreateHTML(editor, pluginOptions.items);
 	const commandArea = (this._itemMenu = menu.querySelector('ul'));
 
 	// members

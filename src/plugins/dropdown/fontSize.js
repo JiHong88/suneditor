@@ -1,14 +1,14 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils, converter } from '../../helper';
 
-const FontSize = function (editor, option) {
+const FontSize = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.fontSize;
 	this.icon = '<span class="txt">' + this.lang.fontSize + '</span>' + this.icons.arrow_down;
 
 	// create HTML
-	const menu = CreateHTML(editor, option.items);
+	const menu = CreateHTML(editor, pluginOptions.items);
 
 	// members
 	this.sizeList = menu.querySelectorAll('li button');

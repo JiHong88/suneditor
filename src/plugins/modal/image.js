@@ -2,33 +2,54 @@ import EditorInjector from '../../editorInjector';
 import { Modal, Figure, FileManager, ModalAnchorEditor } from '../../modules';
 import { domUtils, numbers } from '../../helper';
 
-const Image_ = function (editor) {
+const Image_ = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.image;
 	this.icon = 'image';
 
-	// create HTML
-	const options = this.options;
-	const modalEl = CreateHTML_modal(editor);
-	const figureControls = options.get('imageControls');
+	// members-plugin options
+	this.pluginOptions = {
+		canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
+		showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,
+		showAlignRadio: pluginOptions.showAlignRadio === undefined ? true : !!pluginOptions.showAlignRadio,
+		defaultWidth: !pluginOptions.defaultWidth ? 'auto' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + 'px' : pluginOptions.defaultWidth,
+		defaultHeight: !pluginOptions.defaultHeight ? 'auto' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
+		percentageOnlySize: !!pluginOptions.percentageOnlySize,
+		createFileInput: pluginOptions.createFileInput === undefined ? true : pluginOptions.createFileInput,
+		createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createUrlInput ? true : pluginOptions.createUrlInput,
+		uploadHeaders: pluginOptions.uploadHeaders || null,
+		uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
+		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
+		allowMultiple: !!pluginOptions.allowMultiple,
+		acceptedFormats:
+			typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*'
+	};
 
+	// create HTML
+	const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
+	const modalEl = CreateHTML_modal(editor, this.pluginOptions);
+	const showAlign = this.pluginOptions.showAlignRadio ? 'align' : '';
+	const figureControls =
+		pluginOptions.imageControls || !this.pluginOptions.canResize
+			? [['mirror_h', 'mirror_v', showAlign, 'caption', 'revert', 'edit', 'remove']]
+			: [
+					['resize_auto,100,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
+					['edit', showAlign, 'caption', 'revert', 'remove']
+			  ];
+
+	// show align
+	if (!showAlign) modalEl.querySelector('.se-figure-align').style.display = 'none';
 	// controls
-	let showAlign = false;
 	for (let i = 0; i < figureControls.length; i++) {
-		if (!figureControls[i]) break;
-		for (let j = 0; j < figureControls[i].length; j++) {
-			this._rotation = /rotate/.test(figureControls[i][j]);
-			showAlign = /align/.test(figureControls[i][j]);
-		}
+		if ((this._rotation = figureControls[i].indexOf('rotate_l') > -1 || figureControls[i].indexOf('rotate_r') > -1)) break;
 	}
-	if (showAlign) modalEl.querySelector('.se-figure-align').style.display = 'none';
 
 	// modules
 	this.anchor = new ModalAnchorEditor(this, modalEl, { textToDisplay: false, title: true });
 	this.modal = new Modal(this, modalEl);
 	this.figure = new Figure(this, figureControls, {
-		sizeUnit: options.get('_imageSizeUnit')
+		sizeUnit: sizeUnit
 	});
 	this.fileManager = new FileManager(this, {
 		tagNames: ['img'],
@@ -44,7 +65,7 @@ const Image_ = function (editor) {
 	this.altText = modalEl.querySelector('._se_image_alt');
 	this.captionCheckEl = modalEl.querySelector('._se_image_check_caption');
 	this.previewSrc = modalEl.querySelector('._se_tab_content_image .se-link-preview');
-	this.sizeUnit = options.get('_imageSizeUnit');
+	this.sizeUnit = sizeUnit;
 	this.proportion = {};
 	this.inputX = {};
 	this.inputY = {};
@@ -61,11 +82,11 @@ const Image_ = function (editor) {
 		w: 1,
 		h: 1
 	};
-	this._origin_w = options.get('imageWidth') === 'auto' ? '' : options.get('imageWidth');
-	this._origin_h = options.get('imageHeight') === 'auto' ? '' : options.get('imageHeight');
-	this._resizing = options.get('imageResizing');
-	this._onlyPercentage = options.get('imageSizeOnlyPercentage');
-	this._nonResizing = !this._resizing || !options.get('imageHeightShow') || this._onlyPercentage;
+	this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
+	this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
+	this._resizing = this.pluginOptions.canResize;
+	this._onlyPercentage = this.pluginOptions.percentageOnlySize;
+	this._nonResizing = !this._resizing || !this.pluginOptions.showHeightInput || this._onlyPercentage;
 
 	// init
 	modalEl.querySelector('.se-modal-tabs').addEventListener('click', this._openTab.bind(this));
@@ -80,8 +101,8 @@ const Image_ = function (editor) {
 		this.proportion = modalEl.querySelector('._se_image_check_proportion');
 		this.inputX = modalEl.querySelector('._se_image_size_x');
 		this.inputY = modalEl.querySelector('._se_image_size_y');
-		this.inputX.value = options.get('imageWidth');
-		this.inputY.value = options.get('imageHeight');
+		this.inputX.value = this.pluginOptions.defaultWidth;
+		this.inputY.value = this.pluginOptions.defaultHeight;
 
 		const ratioChange = OnChangeRatio.bind(this);
 		this.eventManager.addEvent(this.inputX, 'keyup', OnInputSize.bind(this, 'x'));
@@ -110,11 +131,11 @@ Image_.prototype = {
 	 */
 	on: function (isUpdate) {
 		if (!isUpdate) {
-			this.inputX.value = this._origin_w = this.options.get('imageWidth') === 'auto' ? '' : this.options.get('imageWidth');
-			this.inputY.value = this._origin_h = this.options.get('imageHeight') === 'auto' ? '' : this.options.get('imageHeight');
-			if (this.imgInputFile && this.options.get('imageMultipleFile')) this.imgInputFile.setAttribute('multiple', 'multiple');
+			this.inputX.value = this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
+			this.inputY.value = this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
+			if (this.imgInputFile && this.pluginOptions.allowMultiple) this.imgInputFile.setAttribute('multiple', 'multiple');
 		} else {
-			if (this.imgInputFile && this.options.get('imageMultipleFile')) this.imgInputFile.removeAttribute('multiple');
+			if (this.imgInputFile && this.pluginOptions.allowMultiple) this.imgInputFile.removeAttribute('multiple');
 		}
 
 		this.anchor.on(isUpdate);
@@ -163,8 +184,8 @@ Image_.prototype = {
 		this._openTab('init');
 
 		if (this._resizing) {
-			this.inputX.value = this.options.get('imageWidth') === 'auto' ? '' : this.options.get('imageWidth');
-			this.inputY.value = this.options.get('imageHeight') === 'auto' ? '' : this.options.get('imageHeight');
+			this.inputX.value = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
+			this.inputY.value = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
 			this.proportion.checked = true;
 		}
 
@@ -275,7 +296,7 @@ Image_.prototype = {
 			}
 		}
 
-		const limitSize = this.options.get('imageUploadSizeLimit');
+		const limitSize = this.pluginOptions.uploadSizeLimit;
 		const currentSize = this.fileManager.getSize();
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + limitSize / 1000 + 'KB';
@@ -525,8 +546,8 @@ Image_.prototype = {
 	},
 
 	applySize: function (w, h) {
-		if (!w) w = this.inputX.value || this.options.get('imageWidth');
-		if (!h) h = this.inputY.value || this.options.get('imageHeight');
+		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
+		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
 		if (this._onlyPercentage) {
 			if (!w) w = '100%';
 			else if (/%$/.test(w)) w += '%';
@@ -595,9 +616,9 @@ Image_.prototype = {
 		}
 
 		// server upload
-		const imageUploadUrl = this.options.get('imageUploadUrl');
+		const imageUploadUrl = this.pluginOptions.uploadUrl;
 		if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
-			this.fileManager.upload(imageUploadUrl, this.options.get('imageUploadHeader'), files, UploadCallBack.bind(this, info), this.events.onImageUploadError);
+			this.fileManager.upload(imageUploadUrl, this.pluginOptions.uploadHeaders, files, UploadCallBack.bind(this, info), this.events.onImageUploadError);
 		} else {
 			this._setBase64(files, info.anchor, info.inputWidth, info.inputHeight, info.align, info.alt, info.isUpdate);
 		}
@@ -778,7 +799,7 @@ function OnloadImg(oImg, _svgDefaultSize, container) {
 	delete oImg.onload;
 }
 
-function CreateHTML_modal(editor) {
+function CreateHTML_modal(editor, pluginOptions) {
 	const options = editor.options;
 	const lang = editor.lang;
 	let html =
@@ -806,7 +827,7 @@ function CreateHTML_modal(editor) {
 		'<div class="_se_tab_content _se_tab_content_image">' +
 		'<div class="se-modal-body"><div style="border-bottom: 1px dashed #ccc;">';
 
-	if (options.get('imageFileInput')) {
+	if (pluginOptions.createFileInput) {
 		html +=
 			'<div class="se-modal-form">' +
 			'<label>' +
@@ -814,9 +835,9 @@ function CreateHTML_modal(editor) {
 			'</label>' +
 			'<div class="se-modal-form-files">' +
 			'<input class="se-input-form _se_image_file" data-focus type="file" accept="' +
-			options.get('imageAccept') +
+			pluginOptions.acceptedFormats +
 			'"' +
-			(options.get('imageMultipleFile') ? ' multiple="multiple"' : '') +
+			(pluginOptions.allowMultiple ? ' multiple="multiple"' : '') +
 			'/>' +
 			'<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="' +
 			lang.remove +
@@ -829,7 +850,7 @@ function CreateHTML_modal(editor) {
 			'</div>';
 	}
 
-	if (options.get('imageUrlInput')) {
+	if (pluginOptions.createUrlInput) {
 		html +=
 			'<div class="se-modal-form">' +
 			'<label>' +
@@ -853,12 +874,12 @@ function CreateHTML_modal(editor) {
 
 	html += '</div>' + '<div class="se-modal-form">' + '<label>' + lang.image_modal_altText + '</label><input class="se-input-form _se_image_alt" type="text" />' + '</div>';
 
-	if (options.get('imageResizing')) {
-		const onlyPercentage = options.get('imageSizeOnlyPercentage');
+	if (pluginOptions.canResize) {
+		const onlyPercentage = pluginOptions.percentageOnlySize;
 		const onlyPercentDisplay = onlyPercentage ? ' style="display: none !important;"' : '';
-		const heightDisplay = !options.get('imageHeightShow') ? ' style="display: none !important;"' : '';
+		const heightDisplay = !pluginOptions.showHeightInput ? ' style="display: none !important;"' : '';
 		html += '<div class="se-modal-form">';
-		if (onlyPercentage || !options.get('imageHeightShow')) {
+		if (onlyPercentage || !pluginOptions.showHeightInput) {
 			html += '<div class="se-modal-size-text">' + '<label class="size-w">' + lang.size + '</label>' + '</div>';
 		} else {
 			html +=

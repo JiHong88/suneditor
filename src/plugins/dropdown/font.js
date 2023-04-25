@@ -1,14 +1,14 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
-const Font = function (editor, option) {
+const Font = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.font;
 	this.icon = '<span class="txt">' + this.lang.font + '</span>' + this.icons.arrow_down;
 
 	// create HTML
-	const fontList = option.items || ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'];
+	const fontList = pluginOptions.items || ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'];
 	const menu = CreateHTML(editor, fontList);
 
 	// members

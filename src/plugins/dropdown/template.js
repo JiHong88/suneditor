@@ -1,18 +1,18 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
-const Template = function (editor, option) {
+const Template = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.template;
 	this.icon = 'template';
 
-	// create HTML
-	const menu = CreateHTML(option.items);
-
 	// members
 	this.selectedIndex = -1;
-	this.items = option.items;
+	this.items = pluginOptions.items;
+
+	// create HTML
+	const menu = CreateHTML(this.items);
 
 	// init
 	this.menu.initDropdownTarget(Template, menu);

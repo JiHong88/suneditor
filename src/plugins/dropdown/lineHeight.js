@@ -1,14 +1,14 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
-const LineHeight = function (editor, option) {
+const LineHeight = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.lineHeight;
 	this.icon = 'line_height';
 
 	// create HTML
-	const menu = CreateHTML(editor, option.items);
+	const menu = CreateHTML(editor, pluginOptions.items);
 
 	// members
 	this.sizeList = menu.querySelectorAll('li button');

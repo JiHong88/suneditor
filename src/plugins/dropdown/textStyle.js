@@ -1,14 +1,14 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
-const TextStyle = function (editor, option) {
+const TextStyle = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.textStyle;
 	this.icon = 'text_style';
 
 	// create HTML
-	const menu = CreateHTML(editor, option.items);
+	const menu = CreateHTML(editor, pluginOptions.items);
 
 	// members
 	this.styleList = menu.querySelectorAll('li button');
