@@ -751,11 +751,12 @@ videoAccept      : Define the "accept" attribute of the input.  default: "*" {st
 // Table----------------------------------------------------------------------------------------------------------
 tableCellControllerPosition : Define position to the table cell controller('cell', 'top'). default: 'cell' {string}
 
+// Url input
+defaultUrlProtocol    : Default protocol for the links. ('link', 'image', 'video', 'audio')
+                  This applies to all plugins that enter the internet url.   default: null {string}
+                  
 // Link-----------------------------------------------------------------------------------------------------------
 linkTargetNewWindow : Default checked value of the "Open in new window" checkbox.   default: false {Boolean}
-linkProtocol    : Default protocol for the links. ('link', 'image', 'video', 'audio')
-                  This applies to all plugins that enter the internet url.   default: null {string}
-linkRel         : Defines "rel" attribute list of anchor tag.   default: [] {Array}
                   // https://www.w3schools.com/tags/att_a_rel.asp
                   ex) [
                     'author',
@@ -781,6 +782,7 @@ linkRelDefault  : Defines default "rel" attributes of anchor tag.   default: {} 
                     linkRelDefault: {
                         check_new_window: 'only:noreferrer noopener'
                     }
+linkRel         : Defines "rel" attribute list of anchor tag.   default: [] {Array}
 linkNoPrefix   : If true, disables the automatic prefixing of the host URL to the value of the link. default: false {Boolean}
 
 // HR----------------------------------------------------------------------------------------------------

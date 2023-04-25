@@ -2,22 +2,27 @@ import EditorInjector from '../../editorInjector';
 import { Modal, Controller, ModalAnchorEditor } from '../../modules';
 import { domUtils } from '../../helper';
 
-const Link = function (editor) {
+const Link = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.link;
 	this.icon = 'link';
 
+	// define plugin options
+	pluginOptions.textToDisplay = true;
+	pluginOptions.title = true;
+	
 	// create HTML
 	const modalEl = CreateHTML_modal(editor);
 	const controllerEl = CreateHTML_controller(editor);
-
+	
 	// modules
-	this.anchor = new ModalAnchorEditor(this, modalEl, { textToDisplay: true, title: true });
+	this.anchor = new ModalAnchorEditor(this, modalEl, pluginOptions);
 	this.modal = new Modal(this, modalEl);
 	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
-
+	
 	// members
+	this.pluginOptions = pluginOptions;
 	this.isUpdateState = false;
 };
 

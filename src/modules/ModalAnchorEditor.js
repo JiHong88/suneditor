@@ -2,12 +2,36 @@ import EditorInjector from '../editorInjector';
 import SelectMenu from './SelectMenu';
 import { domUtils } from '../helper';
 
+/**
+ * @param {*} inst
+ * @param {Element} modalForm
+ * @param {object} params
+ * @param {boolean} params.textToDisplay - Create Text to display input.
+ * @param {string} params.title - Modal title
+ * @param {boolean} params.openNewWindow - Default checked value of the "Open in new window" checkbox.
+ * @param {boolean} params.relList - The "rel" attribute list of anchor tag.
+ * @param {object} params.defaultRel - Default "rel" attributes of anchor tag.
+ * @param {boolean} params.noAutoPrefix - If true, disables the automatic prefixing of the host URL to the value of the link.
+	Example:
+	{
+		default: 'nofollow', // Default rel
+		check_new_window: 'noreferrer noopener', // When "open new window" is checked
+		check_bookmark: 'bookmark' // When "bookmark" is checked
+	}
+ * @param {boolean} params.noAutoPrefix - If true, disables the automatic prefixing of the host URL to the value of the link.
+ */
 const ModalAnchorEditor = function (inst, modalForm, params) {
 	// plugin bisic properties
 	EditorInjector.call(this, inst.editor);
 
+	// params
+	this.openNewWindow = !!params.openNewWindow;
+	this.relList = this._w.Array.isArray(params.relList) ? params.relList : [];
+	this.defaultRel = params.defaultRel || {};
+	this.noAutoPrefix = !!params.noAutoPrefix;
+
 	// create HTML
-	const forms = CreatetModalForm(inst.editor, params);
+	const forms = CreatetModalForm(inst.editor, params, this.relList);
 
 	// members
 	this.kink = inst.constructor.key;
@@ -23,19 +47,17 @@ const ModalAnchorEditor = function (inst, modalForm, params) {
 	this.preview = forms.querySelector('.se-link-preview');
 	this.bookmark = forms.querySelector('._se_anchor_bookmark_icon');
 	this.bookmarkButton = forms.querySelector('._se_bookmark_button');
-	this.linkDefaultRel = this.options.get('linkRelDefault');
-	this.defaultRel = this.options.get('linkRelDefault').default || '';
 	this.currentRel = [];
 	this.currentTarget = null;
 	this.linkValue = '';
 	this._change = false;
-	this._isRel = this.options.get('linkRel').length > 0;
+	this._isRel = this.relList.length > 0;
 	// members - rel
 	if (this._isRel) {
 		this.relButton = forms.querySelector('.se-anchor-rel-btn');
 		this.relPreview = forms.querySelector('.se-anchor-rel-preview');
-		const relList = this.options.get('linkRel');
-		const defaultRel = (this.linkDefaultRel.default || '').split(' ');
+		const relList = this.relList;
+		const defaultRel = (this.defaultRel.default || '').split(' ');
 		const list = [];
 		for (let i = 0, len = relList.length, rel; i < len; i++) {
 			rel = relList[i];
@@ -80,7 +102,7 @@ ModalAnchorEditor.prototype = {
 		if (!isUpdate) {
 			this.init();
 			this.displayInput.value = this.selection.get().toString().trim();
-			this.newWindowCheck.checked = this.options.get('linkTargetNewWindow');
+			this.newWindowCheck.checked = this.openNewWindow;
 			this.titleInput.value = '';
 		} else if (this.currentTarget) {
 			const href = this.currentTarget.getAttribute('href');
@@ -91,7 +113,7 @@ ModalAnchorEditor.prototype = {
 			this.downloadCheck.checked = this.currentTarget.download;
 		}
 
-		this._setRel(isUpdate && this.currentTarget ? this.currentTarget.rel : this.defaultRel);
+		this._setRel(isUpdate && this.currentTarget ? this.currentTarget.rel : this.defaultRel.default || '');
 		this._setLinkPreview(this.linkValue);
 	},
 
@@ -115,7 +137,7 @@ ModalAnchorEditor.prototype = {
 		this.newWindowCheck.checked = false;
 		this.downloadCheck.checked = false;
 		this._change = false;
-		this._setRel(this.defaultRel);
+		this._setRel(this.defaultRel.default || '');
 	},
 
 	_updateAnchor: function (anchor, url, displayText, title, notText) {
@@ -195,8 +217,8 @@ ModalAnchorEditor.prototype = {
 
 	_setLinkPreview: function (value) {
 		const preview = this.preview;
-		const protocol = this.options.get('linkProtocol');
-		const noPrefix = this.options.get('linkNoPrefix');
+		const protocol = this.options.get('defaultUrlProtocol');
+		const noPrefix = this.noAutoPrefix;
 		const reservedProtocol = /^(mailto\:|tel\:|sms\:|https*\:\/\/|#)/.test(value);
 		const sameProtocol = !protocol ? false : this._w.RegExp('^' + value.substr(0, protocol.length)).test(protocol);
 		value =
@@ -327,11 +349,11 @@ function OnClick_bookmarkButton() {
 }
 
 function OnChange_newWindowCheck(e) {
-	if (typeof this.linkDefaultRel.check_new_window !== 'string') return;
+	if (typeof this.defaultRel.check_new_window !== 'string') return;
 	if (e.target.checked) {
-		this._setRel(this._relMerge(this.linkDefaultRel.check_new_window));
+		this._setRel(this._relMerge(this.defaultRel.check_new_window));
 	} else {
-		this._setRel(this._relDelete(this.linkDefaultRel.check_new_window));
+		this._setRel(this._relDelete(this.defaultRel.check_new_window));
 	}
 }
 
@@ -341,18 +363,18 @@ function OnChange_downloadCheck(e) {
 		this.bookmark.style.display = 'none';
 		domUtils.removeClass(this.bookmarkButton, 'active');
 		this.linkValue = this.preview.textContent = this.urlInput.value = this.urlInput.value.replace(/^\#+/, '');
-		if (typeof this.linkDefaultRel.check_bookmark === 'string') {
-			this._setRel(this._relMerge(this.linkDefaultRel.check_bookmark));
+		if (typeof this.defaultRel.check_bookmark === 'string') {
+			this._setRel(this._relMerge(this.defaultRel.check_bookmark));
 		}
 	} else {
 		this.download.style.display = 'none';
-		if (typeof this.linkDefaultRel.check_bookmark === 'string') {
-			this._setRel(this._relDelete(this.linkDefaultRel.check_bookmark));
+		if (typeof this.defaultRel.check_bookmark === 'string') {
+			this._setRel(this._relDelete(this.defaultRel.check_bookmark));
 		}
 	}
 }
 
-function CreatetModalForm(editor, params) {
+function CreatetModalForm(editor, params, relList) {
 	const lang = editor.lang;
 	const icons = editor.icons;
 	const textDisplayShow = params.textToDisplay ? '' : ' style="display: none;"';
@@ -407,7 +429,7 @@ function CreatetModalForm(editor, params) {
 		'<label><input type="checkbox" class="se-modal-btn-check _se_anchor_download" />&nbsp;' +
 		lang.link_modal_downloadLinkCheck +
 		'</label>';
-	if (editor.options.get('linkRel').length > 0) {
+	if (relList.length > 0) {
 		html +=
 			'<div class="se-anchor-rel"><button type="button" class="se-btn se-btn-select se-anchor-rel-btn">&lt;rel&gt;</button>' +
 			'<div class="se-anchor-rel-wrapper"><pre class="se-link-preview se-anchor-rel-preview"></pre></div>' +

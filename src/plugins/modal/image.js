@@ -8,7 +8,7 @@ const Image_ = function (editor, pluginOptions) {
 	this.title = this.lang.image;
 	this.icon = 'image';
 
-	// members-plugin options
+	// define plugin options
 	this.pluginOptions = {
 		canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
 		showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,
@@ -16,7 +16,7 @@ const Image_ = function (editor, pluginOptions) {
 		defaultHeight: !pluginOptions.defaultHeight ? 'auto' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
 		percentageOnlySize: !!pluginOptions.percentageOnlySize,
 		createFileInput: pluginOptions.createFileInput === undefined ? true : pluginOptions.createFileInput,
-		createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createUrlInput ? true : pluginOptions.createUrlInput,
+		createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput ? true : pluginOptions.createUrlInput,
 		uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
 		uploadHeaders: pluginOptions.uploadHeaders || null,
 		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
@@ -41,14 +41,24 @@ const Image_ = function (editor, pluginOptions) {
 	if (!showAlign) modalEl.querySelector('.se-figure-align').style.display = 'none';
 
 	// modules
-	this.anchor = new ModalAnchorEditor(this, modalEl, { textToDisplay: false, title: true });
+	const Link = this.plugins.link ? this.plugins.link.pluginOptions : {};
+	this.anchor = new ModalAnchorEditor(this, modalEl, {
+		textToDisplay: false,
+		title: true,
+		openNewWindow: Link.openNewWindow,
+		relList: Link.relList,
+		defaultRel: Link.defaultRel,
+		noAutoPrefix: Link.noAutoPrefix
+	});
 	this.modal = new Modal(this, modalEl);
 	this.figure = new Figure(this, figureControls, {
 		sizeUnit: sizeUnit
 	});
 	this.fileManager = new FileManager(this, {
 		tagNames: ['img'],
-		eventHandler: this.events.onImageUpload,
+		eventHandler: function (element, dataIndex, state, info, uploadFilesLeft) {
+			this.events.onImageUpload(element, dataIndex, state, info, uploadFilesLeft);
+		},
 		checkHandler: FileCheckHandler.bind(this),
 		figure: this.figure
 	});
@@ -685,10 +695,6 @@ Image_.prototype = {
 
 function FileCheckHandler(element) {
 	this.ready(element);
-
-	const line = this.format.getLine(element);
-	if (line) this._align = line.style.textAlign || line.style.float;
-
 	this._update(this._origin_w, this._origin_h);
 	return element;
 }
@@ -754,8 +760,8 @@ function OnLinkPreview(e) {
 	const value = e.target.value.trim();
 	this._linkValue = this.previewSrc.textContent = !value
 		? ''
-		: this.options.get('linkProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0
-		? this.options.get('linkProtocol') + value
+		: this.options.get('defaultUrlProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0
+		? this.options.get('defaultUrlProtocol') + value
 		: value.indexOf('://') === -1
 		? '/' + value
 		: value;

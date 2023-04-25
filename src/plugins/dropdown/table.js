@@ -2,14 +2,15 @@ import EditorInjector from '../../editorInjector';
 import { domUtils, numbers } from '../../helper';
 import { Controller, SelectMenu } from '../../modules';
 
-const Table = function (editor) {
+const Table = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.table;
 	this.icon = 'table';
 
 	// create HTML
-	this.cellControllerTop = this.options.get('tableCellControllerPosition') === 'top';
+	const controllerPosition = typeof pluginOptions.cellControllerPosition === 'string' ? pluginOptions.cellControllerPosition.toLowerCase() : 'cell';
+	this.cellControllerTop = controllerPosition === 'top';
 	const menu = CreateHTML(editor);
 	const commandArea = menu.querySelector('.se-controller-table-picker');
 	const controller_table = CreateHTML_controller_table(editor);
@@ -878,7 +879,10 @@ Table.prototype = {
 		}
 
 		const tableElement = this._element || this._selectedTable || domUtils.getParentElement(tdElement, 'TABLE');
-		this._maxWidth = domUtils.hasClass(tableElement, 'se-table-size-100') || tableElement.style.width === '100%' || (!tableElement.style.width && !domUtils.hasClass(tableElement, 'se-table-size-auto'));
+		this._maxWidth =
+			domUtils.hasClass(tableElement, 'se-table-size-100') ||
+			tableElement.style.width === '100%' ||
+			(!tableElement.style.width && !domUtils.hasClass(tableElement, 'se-table-size-auto'));
 		this._fixedColumn = domUtils.hasClass(tableElement, 'se-table-layout-fixed') || tableElement.style.tableLayout === 'fixed';
 		this.setTableStyle(this._maxWidth ? 'width|column' : 'width');
 
@@ -1317,13 +1321,37 @@ function OffCellTouch() {
 
 // init element
 function CreateSplitMenu(lang) {
-	const menus = domUtils.createElement('DIV', null, '<div title="' + lang.verticalSplit + '" aria-label="' + lang.verticalSplit + '">' + lang.verticalSplit + '</div>' + '<div title="' + lang.horizontalSplit + '" aria-label="' + lang.horizontalSplit + '">' + lang.horizontalSplit + '</div>');
+	const menus = domUtils.createElement(
+		'DIV',
+		null,
+		'<div title="' +
+			lang.verticalSplit +
+			'" aria-label="' +
+			lang.verticalSplit +
+			'">' +
+			lang.verticalSplit +
+			'</div>' +
+			'<div title="' +
+			lang.horizontalSplit +
+			'" aria-label="' +
+			lang.horizontalSplit +
+			'">' +
+			lang.horizontalSplit +
+			'</div>'
+	);
 
 	return { items: ['vertical', 'horizontal'], menus: menus.querySelectorAll('div') };
 }
 
 function CreateHTML() {
-	const html = '' + '<div class="se-table-size">' + '<div class="se-table-size-picker se-controller-table-picker"></div>' + '<div class="se-table-size-highlighted"></div>' + '<div class="se-table-size-unhighlighted"></div>' + '</div>' + '<div class="se-table-size-display">1 x 1</div>';
+	const html =
+		'' +
+		'<div class="se-table-size">' +
+		'<div class="se-table-size-picker se-controller-table-picker"></div>' +
+		'<div class="se-table-size-highlighted"></div>' +
+		'<div class="se-table-size-unhighlighted"></div>' +
+		'</div>' +
+		'<div class="se-table-size-display">1 x 1</div>';
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-selector-table' }, html);
 }
 

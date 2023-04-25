@@ -1,5 +1,5 @@
 import Helper, { env, converter, domUtils, numbers } from '../helper';
-import Constructor, { ResetOptions, UpdateButton, CreateShortcuts, RE_OPTIONS } from './section/constructor';
+import Constructor, { ResetOptions, UpdateButton, CreateShortcuts, NOT_RELOAD_OPTIONS } from './section/constructor';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './section/actives';
 import History from './base/history';
 import EventManager from './base/eventManager';
@@ -340,13 +340,14 @@ Editor.prototype = {
 	 * If the plugin is added call callBack function.
 	 * @param {string} pluginName The name of the plugin to call
 	 * @param {Array.<Element>|null} targets Plugin target button (This is not necessary if you have a button list when creating the editor)
+	 * @param {object|null} pluginOptions Plugin's options
 	 */
-	registerPlugin: function (pluginName, targets, option) {
+	registerPlugin: function (pluginName, targets, pluginOptions) {
 		let plugin = this.plugins[pluginName];
 		if (!plugin) {
 			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "' + pluginName + '")');
 		} else if (typeof this.plugins[pluginName] === 'function') {
-			plugin = this.plugins[pluginName] = new this.plugins[pluginName](this, option || {});
+			plugin = this.plugins[pluginName] = new this.plugins[pluginName](this, pluginOptions || {});
 			if (typeof plugin.init === 'function') plugin.init();
 		}
 
@@ -591,12 +592,21 @@ Editor.prototype = {
 		this.viewer.codeView(false);
 		this.viewer.showBlocks(false);
 
-		const origin = this.options;
+		let readload = false;
 		const newKeys = this._w.Object.keys(newOptions);
+		for (let i = 0, len = NOT_RELOAD_OPTIONS.length; i < len; i++) {
+			if (newKeys.indexOf(NOT_RELOAD_OPTIONS[i]) === -1) {
+				readload = true;
+				console.warn('[SUNEDITOR.info.setOptions] "There is an option to reload the editor. The editor will reload."');
+				break;
+			}
+		}
+
+		const origin = this.options;
 		const newMap = ResetOptions(newOptions);
 		for (let i = 0, len = newKeys.length, k; i < len; i++) {
 			k = newKeys[i];
-			if (RE_OPTIONS.indexOf(k) > -1) origin.set(k, newMap.get(k));
+			origin.set(k, newMap.get(k));
 		}
 	},
 

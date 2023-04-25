@@ -26,7 +26,7 @@ const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|D
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 const REQUIRED_DATA_ATTRS = 'data-se-index|data-se-key|data-se-value|data-se-type|data-se-size|data-se-file-name|data-se-file-size|data-se-embed';
 
-export const RE_OPTIONS = [
+export const NOT_RELOAD_OPTIONS = [
 	'events',
 	'textDirection',
 	'textTags',
@@ -40,9 +40,16 @@ export const RE_OPTIONS = [
 	'fullScreenOffset',
 	'previewTemplate',
 	'printTemplate',
-	'mediaAutoSelect'
+	'mediaAutoSelect',
+	'toolbar_container',
+	'toolbar_width',
+	'toolbar_sticky',
+	'statusbar_container',
+	'frameAttrbutes',
+	'iframe_fullPage',
+	'iframe_attributes',
+	'iframe_cssFileName'
 ];
-// ?['mode', 'reverseCommands', 'toolbar_width','toolbar_container','toolbar_sticky','buttonList','statusbar_container','frameAttrbutes', 'iframe','iframe_fullPage','iframe_attributes','iframe_cssFileName']
 
 /**
  * @description document create
@@ -513,26 +520,8 @@ function InitOptions(options, editorTargets) {
 	/** --- Media select */
 	o.set('mediaAutoSelect', options.mediaAutoSelect === undefined ? true : !!options.mediaAutoSelect);
 
-	/** Audio */
-	o.set('audioWidth', !options.audioWidth ? '' : numbers.is(options.audioWidth) ? options.audioWidth + 'px' : options.audioWidth);
-	o.set('audioHeight', !options.audioHeight ? '' : numbers.is(options.audioHeight) ? options.audioHeight + 'px' : options.audioHeight);
-	o.set('audioFileInput', !!options.audioFileInput);
-	o.set('audioUrlInput', options.audioUrlInput === undefined || !options.audioFileInput ? true : options.audioUrlInput);
-	o.set('audioUploadHeader', options.audioUploadHeader || null);
-	o.set('audioUploadUrl', typeof options.audioUploadUrl === 'string' ? options.audioUploadUrl : null);
-	o.set('audioUploadSizeLimit', /\d+/.test(options.audioUploadSizeLimit) ? numbers.get(options.audioUploadSizeLimit, 0) : null);
-	o.set('audioMultipleFile', !!options.audioMultipleFile);
-	o.set('audioTagAttrs', options.audioTagAttrs || null);
-	o.set('audioAccept', typeof options.audioAccept !== 'string' || options.audioAccept.trim() === '*' ? 'audio/*' : options.audioAccept.trim() || 'audio/*');
-
-	/** Table */
-	o.set('tableCellControllerPosition', typeof options.tableCellControllerPosition === 'string' ? options.tableCellControllerPosition.toLowerCase() : 'cell');
-
-	/** Link */
-	o.set('linkTargetNewWindow', !!options.linkTargetNewWindow);
-	o.set('linkProtocol', typeof options.linkProtocol === 'string' ? options.linkProtocol : null);
-	o.set('linkRel', _w.Array.isArray(options.linkRel) ? options.linkRel : []);
-	o.set('linkRelDefault', options.linkRelDefault || {});
+	/** --- Url input protocol */
+	o.set('defaultUrlProtocol', typeof options.defaultUrlProtocol === 'string' ? options.defaultUrlProtocol : null);
 
 	/** External library */
 	// CodeMirror

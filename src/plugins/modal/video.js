@@ -8,7 +8,7 @@ const Video = function (editor, pluginOptions) {
 	this.title = this.lang.video;
 	this.icon = 'video';
 
-	// members-plugin options
+	// define plugin options
 	this.pluginOptions = {
 		canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
 		showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,
@@ -26,7 +26,7 @@ const Video = function (editor, pluginOptions) {
 				: pluginOptions.defaultHeight,
 		percentageOnlySize: !!pluginOptions.percentageOnlySize,
 		createFileInput: !!pluginOptions.createFileInput,
-		createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createUrlInput ? true : pluginOptions.createUrlInput,
+		createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput ? true : pluginOptions.createUrlInput,
 		uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
 		uploadHeaders: pluginOptions.uploadHeaders || null,
 		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
@@ -61,7 +61,9 @@ const Video = function (editor, pluginOptions) {
 	this.figure = new Figure(this, figureControls, { sizeUnit: sizeUnit, autoRatio: { current: defaultRatio, default: defaultRatio } });
 	this.fileManager = new FileManager(this, {
 		tagNames: ['iframe', 'video'],
-		eventHandler: this.events.onVideoUpload,
+		eventHandler: function (element, dataIndex, state, info, uploadFilesLeft) {
+			this.events.onVideoUpload(element, dataIndex, state, info, uploadFilesLeft);
+		}.bind(this),
 		checkHandler: FileCheckHandler.bind(this),
 		figure: this.figure
 	});
@@ -637,8 +639,8 @@ function OnLinkPreview(e) {
 	} else {
 		this._linkValue = this.previewSrc.textContent = !value
 			? ''
-			: this.options.get('linkProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0
-			? this.options.get('linkProtocol') + value
+			: this.options.get('defaultUrlProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0
+			? this.options.get('defaultUrlProtocol') + value
 			: value.indexOf('://') === -1
 			? '/' + value
 			: value;

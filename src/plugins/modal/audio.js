@@ -2,27 +2,49 @@ import EditorInjector from '../../editorInjector';
 import { Modal, Controller, FileManager, Figure } from '../../modules';
 import { domUtils } from '../../helper';
 
-const Audio_ = function (editor) {
+const Audio_ = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.audio;
 	this.icon = 'audio';
 
+	// define plugin options
+	this.pluginOptions = {
+		defaultWidth: !pluginOptions.defaultWidth ? '' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + 'px' : pluginOptions.defaultWidth,
+		defaultHeight: !pluginOptions.defaultHeight ? '' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
+		createFileInput: !!pluginOptions.createFileInput,
+		createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput ? true : pluginOptions.createUrlInput,
+		uploadUrl: typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null,
+		uploadHeaders: pluginOptions.uploadHeaders || null,
+		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
+		allowMultiple: !!pluginOptions.allowMultiple,
+		acceptedFormats:
+			typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'audio/*' : pluginOptions.acceptedFormats.trim() || 'audio/*',
+		audioTagAttributes: pluginOptions.audioTagAttributes || null
+	};
+
 	// create HTML
-	const modalEl = CreateHTML_modal(editor);
+	const modalEl = CreateHTML_modal(editor, this.pluginOptions);
 	const controllerEl = CreateHTML_controller(editor);
 
 	// modules
 	this.modal = new Modal(this, modalEl);
 	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
-	this.fileManager = new FileManager(this, { tagNames: ['audio'], eventHandler: this.events.onAudioUpload, checkHandler: FileCheckHandler.bind(this), figure: null });
+	this.fileManager = new FileManager(this, {
+		tagNames: ['audio'],
+		eventHandler: function (element, dataIndex, state, info, uploadFilesLeft) {
+			this.events.onAudioUpload(element, dataIndex, state, info, uploadFilesLeft);
+		}.bind(this),
+		checkHandler: FileCheckHandler.bind(this),
+		figure: null
+	});
 
 	// members
 	this.audioInputFile = modalEl.querySelector('._se_audio_files');
 	this.audioUrlFile = modalEl.querySelector('.se-input-url');
 	this.preview = modalEl.querySelector('.se-link-preview');
-	this._origin_w = this.options.get('audioWidth');
-	this._origin_h = this.options.get('audioHeight');
+	this.defaultWidth = this.pluginOptions.defaultWidth;
+	this.defaultHeight = this.pluginOptions.defaultHeight;
 	this.urlValue = '';
 	this._element = null;
 
@@ -55,12 +77,12 @@ Audio_.prototype = {
 	 */
 	on: function (isUpdate) {
 		if (!isUpdate) {
-			if (this.audioInputFile && this.options.get('audioMultipleFile')) this.audioInputFile.setAttribute('multiple', 'multiple');
+			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.setAttribute('multiple', 'multiple');
 		} else if (this._element) {
 			this.urlValue = this.preview.textContent = this.audioUrlFile.value = this._element.src;
-			if (this.audioInputFile && this.options.get('audioMultipleFile')) this.audioInputFile.removeAttribute('multiple');
+			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.removeAttribute('multiple');
 		} else {
-			if (this.audioInputFile && this.options.get('audioMultipleFile')) this.audioInputFile.removeAttribute('multiple');
+			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.removeAttribute('multiple');
 		}
 	},
 
@@ -172,10 +194,13 @@ Audio_.prototype = {
 			}
 		}
 
-		const limitSize = this.options.get('audioUploadSizeLimit');
+		const limitSize = this.pluginOptions.uploadSizeLimit;
 		if (limitSize > 0 && fileSize + this.fileManager.getSize() > limitSize) {
 			const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable total audios: ' + limitSize / 1000 + 'KB';
-			if (typeof this.events.onAudioUploadError !== 'function' || this.events.onAudioUploadError(err, { limitSize: limitSize, currentSize: this.fileManager.getSize(), uploadSize: fileSize })) {
+			if (
+				typeof this.events.onAudioUploadError !== 'function' ||
+				this.events.onAudioUploadError(err, { limitSize: limitSize, currentSize: this.fileManager.getSize(), uploadSize: fileSize })
+			) {
 				this.notice.open(err);
 			}
 			return false;
@@ -254,8 +279,8 @@ Audio_.prototype = {
 	},
 
 	_createAudioTag: function () {
-		const w = this._origin_w;
-		const h = this._origin_h;
+		const w = this.defaultWidth;
+		const h = this.defaultHeight;
 		const oAudio = domUtils.createElement('AUDIO', { style: (w ? 'width:' + w + '; ' : '') + (h ? 'height:' + h + ';' : '') });
 		this._setTagAttrs(oAudio);
 		return oAudio;
@@ -264,7 +289,7 @@ Audio_.prototype = {
 	_setTagAttrs: function (element) {
 		element.setAttribute('controls', true);
 
-		const attrs = this.options.get('audioTagAttrs');
+		const attrs = this.pluginOptions.audioTagAttributes;
 		if (!attrs) return;
 
 		for (let key in attrs) {
@@ -280,7 +305,7 @@ Audio_.prototype = {
 		}
 
 		const uploadFiles = this.modal.isUpdate ? [files[0]] : files;
-		this.fileManager.upload(this.options.get('audioUploadUrl'), this.options.get('audioUploadHeader'), uploadFiles, UploadCallBack.bind(this, info), this.events.onAudioUploadError);
+		this.fileManager.upload(this.pluginOptions.uploadUrl, this.pluginOptions.uploadHeaders, uploadFiles, UploadCallBack.bind(this, info), this.events.onAudioUploadError);
 	},
 
 	_error: function (message, response) {
@@ -354,7 +379,13 @@ function UploadCallBack(info, xmlHttp) {
 
 function OnLinkPreview(e) {
 	const value = e.target.value.trim();
-	this.urlValue = this.preview.textContent = !value ? '' : this.options.get('linkProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0 ? this.options.get('linkProtocol') + value : value.indexOf('://') === -1 ? '/' + value : value;
+	this.urlValue = this.preview.textContent = !value
+		? ''
+		: this.options.get('defaultUrlProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0
+		? this.options.get('defaultUrlProtocol') + value
+		: value.indexOf('://') === -1
+		? '/' + value
+		: value;
 }
 
 // Disable url input when uploading files
@@ -377,7 +408,7 @@ function FileInputChange() {
 	}
 }
 
-function CreateHTML_modal(editor) {
+function CreateHTML_modal(editor, pluginOptions) {
 	const options = editor.options;
 	const lang = editor.lang;
 	let html =
@@ -396,7 +427,7 @@ function CreateHTML_modal(editor) {
 		'</div>' +
 		'<div class="se-modal-body">';
 
-	if (options.get('audioFileInput')) {
+	if (pluginOptions.createFileInput) {
 		html +=
 			'' +
 			'<div class="se-modal-form">' +
@@ -405,9 +436,9 @@ function CreateHTML_modal(editor) {
 			'</label>' +
 			'<div class="se-modal-form-files">' +
 			'<input class="se-input-form _se_audio_files" data-focus type="file" accept="' +
-			options.get('audioAccept') +
+			pluginOptions.acceptedFormats +
 			'"' +
-			(options.get('audioMultipleFile') ? ' multiple="multiple"' : '') +
+			(pluginOptions.allowMultiple ? ' multiple="multiple"' : '') +
 			'/>' +
 			'<button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="' +
 			lang.remove +
@@ -420,11 +451,31 @@ function CreateHTML_modal(editor) {
 			'</div>';
 	}
 
-	if (options.get('audioUrlInput')) {
-		html += '' + '<div class="se-modal-form">' + '<label>' + lang.audio_modal_url + '</label>' + '<input class="se-input-form se-input-url" data-focus type="text" />' + '<pre class="se-link-preview"></pre>' + '</div>';
+	if (pluginOptions.createUrlInput) {
+		html +=
+			'' +
+			'<div class="se-modal-form">' +
+			'<label>' +
+			lang.audio_modal_url +
+			'</label>' +
+			'<input class="se-input-form se-input-url" data-focus type="text" />' +
+			'<pre class="se-link-preview"></pre>' +
+			'</div>';
 	}
 
-	html += '' + '</div>' + '<div class="se-modal-footer">' + '<button type="submit" class="se-btn-primary" title="' + lang.submitButton + '" aria-label="' + lang.submitButton + '"><span>' + lang.submitButton + '</span></button>' + '</div>' + '</form>';
+	html +=
+		'' +
+		'</div>' +
+		'<div class="se-modal-footer">' +
+		'<button type="submit" class="se-btn-primary" title="' +
+		lang.submitButton +
+		'" aria-label="' +
+		lang.submitButton +
+		'"><span>' +
+		lang.submitButton +
+		'</span></button>' +
+		'</div>' +
+		'</form>';
 
 	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
 }

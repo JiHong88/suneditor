@@ -285,7 +285,7 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // 	linkRel: ['author', 'external', 'help', 'license', 'next', 'follow', 'nofollow', 'noreferrer', 'noopener', 'prev', 'search', 'tag'],
 // 	linkRelDefault: 'noreferrer noopener',
 // 	linkTargetNewWindow: true,
-// 	linkProtocol: 'https://',
+// 	defaultUrlProtocol: 'https://',
 // 	imageMultipleFile: true,
 // 	imageResizing: true,
 // 	plugins: plugins,
