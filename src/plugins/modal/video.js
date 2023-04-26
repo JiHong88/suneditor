@@ -700,7 +700,6 @@ function OnInputSize(xy, e) {
 }
 
 function CreateHTML_modal(editor, pluginOptions) {
-	const options = editor.options;
 	const lang = editor.lang;
 	let html =
 		'<form method="post" enctype="multipart/form-data">' +

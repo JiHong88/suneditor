@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Controller, FileManager, Figure } from '../../modules';
-import { domUtils } from '../../helper';
+import { domUtils, numbers } from '../../helper';
 
 const Audio_ = function (editor, pluginOptions) {
 	// plugin bisic properties
@@ -409,7 +409,6 @@ function FileInputChange() {
 }
 
 function CreateHTML_modal(editor, pluginOptions) {
-	const options = editor.options;
 	const lang = editor.lang;
 	let html =
 		'<form method="post" enctype="multipart/form-data">' +

@@ -314,7 +314,7 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // 	buttonList: bl
 // });
 
-const editor_root = (window.e = suneditor.create(
+window.editor_root = suneditor.create(
 	{
 		editor1: {
 			target: document.querySelector('#multi_editor_1'),
@@ -406,15 +406,15 @@ const editor_root = (window.e = suneditor.create(
 			url: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo'
 		}
 	}
-));
+);
 
 // editor_root.events.onBlur = (rootKey, e, htmlFrame) => {
 // 	console.log('blur', editor_root.frameContext);
 // };
 
-editor_root.events.onload = function () {
-	editor_root.html.set('fdjksl;afjds ...fdjksafl;d');
-};
-editor_root.events.onChange = function (c) {
-	console.log(c);
-};
+// editor_root.events.onload = function () {
+// 	editor_root.html.set('fdjksl;afjds ...fdjksafl;d');
+// };
+// editor_root.events.onChange = function (c) {
+// 	console.log(c);
+// };

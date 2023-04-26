@@ -1,4 +1,4 @@
-import Helper, { env, converter, domUtils, numbers } from '../helper';
+import { env, converter, domUtils, numbers } from '../helper';
 import Constructor, { ResetOptions, UpdateButton, CreateShortcuts, NOT_RELOAD_OPTIONS } from './section/constructor';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './section/actives';
 import History from './base/history';
@@ -134,11 +134,6 @@ const Editor = function (multiTargets, options) {
 	 * @description Is subToolbar balloon-always mode?
 	 */
 	this.isSubBalloonAlways = null;
-
-	/**
-	 * @description Helper util
-	 */
-	this.helper = Helper;
 
 	// ----- Properties not shared with _core -----
 	/**
@@ -296,42 +291,7 @@ const Editor = function (multiTargets, options) {
 	this._parser = new _w.DOMParser();
 
 	/** ----- Create editor ------------------------------------------------------------ */
-	// set modes
-	this.isInline = /inline/i.test(this.options.get('mode'));
-	this.isBalloon = /balloon/i.test(this.options.get('mode'));
-	this.isBalloonAlways = /balloon-always/i.test(this.options.get('mode'));
-	// set subToolbar modes
-	this.isSubBalloon = /balloon/i.test(this.options.get('subMode'));
-	this.isSubBalloonAlways = /balloon-always/i.test(this.options.get('subMode'));
-
-	// register class
-	this._registerClass();
-
-	// init
-	const inst = this;
-	const isIframe = inst.options.get('iframe');
-	const rootSize = this.rootTargets.size;
-	let rootIndex = 0;
-	this.applyRootTargets(function (e) {
-		const o = e.get('originElement');
-		const t = e.get('topArea');
-		o.style.display = 'none';
-		t.style.display = 'block';
-		o.parentNode.insertBefore(t, o.nextElementSibling);
-
-		if (isIframe) {
-			e.get('wysiwygFrame').addEventListener('load', function () {
-				converter._setIframeDocument(this, inst.options, e.get('options').get('height'));
-				if (rootSize === ++rootIndex) inst.__editorInit(options);
-			});
-		}
-
-		e.get('editorArea').appendChild(e.get('wysiwygFrame'));
-	});
-
-	if (!isIframe) {
-		this.__editorInit(options);
-	}
+	this.__Create(options);
 };
 
 Editor.prototype = {
@@ -851,16 +811,20 @@ Editor.prototype = {
 		domUtils.removeItem(this.context.get('toolbar.sub._wrapper'));
 		this.applyRootTargets(function (e) {
 			domUtils.removeItem(e.get('topArea'));
+			e.get('options').clear();
+			e.clear();
 		});
 
 		/** remove object reference */
+		this.options.clear();
+
 		for (let k in this.plugins) {
 			delete this.plugins[k];
 		}
 		for (let k in this.events) {
 			delete this.events[k];
 		}
-		for (let k in this.events) {
+		for (let k in this) {
 			delete this[k];
 		}
 
@@ -1340,6 +1304,45 @@ Editor.prototype = {
 			this.commandTargets.set(cmd, [target]);
 		} else if (this.commandTargets.get(cmd).indexOf(target) < 0) {
 			this.commandTargets.get(cmd).push(target);
+		}
+	},
+
+	__Create: function (originOptions) {
+		// set modes
+		this.isInline = /inline/i.test(this.options.get('mode'));
+		this.isBalloon = /balloon/i.test(this.options.get('mode'));
+		this.isBalloonAlways = /balloon-always/i.test(this.options.get('mode'));
+		// set subToolbar modes
+		this.isSubBalloon = /balloon/i.test(this.options.get('subMode'));
+		this.isSubBalloonAlways = /balloon-always/i.test(this.options.get('subMode'));
+
+		// register class
+		this._registerClass();
+
+		// init
+		const inst = this;
+		const isIframe = inst.options.get('iframe');
+		const rootSize = this.rootTargets.size;
+		let rootIndex = 0;
+		this.applyRootTargets(function (e) {
+			const o = e.get('originElement');
+			const t = e.get('topArea');
+			o.style.display = 'none';
+			t.style.display = 'block';
+			o.parentNode.insertBefore(t, o.nextElementSibling);
+
+			if (isIframe) {
+				e.get('wysiwygFrame').addEventListener('load', function () {
+					converter._setIframeDocument(this, inst.options, e.get('options').get('height'));
+					if (rootSize === ++rootIndex) inst.__editorInit(originOptions);
+				});
+			}
+
+			e.get('editorArea').appendChild(e.get('wysiwygFrame'));
+		});
+
+		if (!isIframe) {
+			this.__editorInit(originOptions);
 		}
 	},
 
