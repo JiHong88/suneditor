@@ -394,13 +394,13 @@ attributeWhitelist   : Add attributes whitelist of tags that should be kept unde
                         // Native attributes: 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls'
                         // Editor attributes: 'data-se-index|data-se-key|data-se-value|data-se-type|data-se-size|data-se-file-name|data-se-file-size|data-se-embed'
                         ex) {
-                            'all': 'style|data-.+', // Apply to all tags
+                            '*': 'style|data-.+', // Apply to all tags
                             'input': 'checked|name' // Apply to input tag
                             '???': '*' // "*" === all attributes
                         }
 attributeBlacklist   : Add attribute blacklist of tags that should be deleted in editor.   default: null {Object}
                         ex) {
-                            'all': 'id', // Apply to all tags
+                            '*': 'id', // Apply to all tags
                             'input': 'style' // Apply to input tag
                             '???': '*' // "*" === all attributes
                         }

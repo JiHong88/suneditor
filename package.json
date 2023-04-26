@@ -29,6 +29,7 @@
     "node_modules",
     "bower_components"
   ],
+  "types": "typings/index.d.ts",
   "devDependencies": {
     "@babel/core": "^7.21.3",
     "@codemirror/lang-html": "^6.1.2",

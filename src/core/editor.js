@@ -1,8 +1,9 @@
 import { env, converter, domUtils, numbers } from '../helper';
-import Constructor, { ResetOptions, UpdateButton, CreateShortcuts } from './section/constructor';
+import Constructor, { InitOptions, UpdateButton, CreateShortcuts } from './section/constructor';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './section/actives';
 import History from './base/history';
 import EventManager from './base/eventManager';
+import Events from './base/events';
 
 // class injector
 import ClassInjector from '../editorInjector/_classes';
@@ -282,8 +283,15 @@ const Editor = function (multiTargets, options) {
 
 	/**
 	 * @description Parser
+	 * @private
 	 */
 	this._parser = new _w.DOMParser();
+
+	/**
+	 * @description Origin options
+	 * @private
+	 */
+	this._originOptions = options;
 
 	/** ----- Create editor ------------------------------------------------------------ */
 	this.__Create(options);
@@ -541,25 +549,53 @@ Editor.prototype = {
 	 * @description Add or reset option property (Editor is reloaded)
 	 * @param {Object} newOptions Options
 	 */
-	setOptions: function (newOptions) {
+	resetOptions: function (newOptions) {
 		this.viewer.codeView(false);
 		this.viewer.showBlocks(false);
 
-		let readload = false;
 		const newKeys = this._w.Object.keys(newOptions);
-		// for (let i = 0, len = NOT_RELOAD_OPTIONS.length; i < len; i++) {
-		// 	if (newKeys.indexOf(NOT_RELOAD_OPTIONS[i]) === -1) {
-		// 		readload = true;
-		// 		console.warn('[SUNEDITOR.info.setOptions] "There is an option to reload the editor. The editor will reload."');
-		// 		break;
-		// 	}
-		// }
+		for (let i = 0, len = newKeys.length; i < len; i++) {
+			if (RE_OPTIONS_UNAVAILABD.indexOf(newKeys[i]) > -1) {
+				console.warn('[SUNEDITOR.fail.resetOptions] "It contains options not available in resetOptions."');
+				return;
+			}
+		}
 
-		const origin = this.options;
-		const newMap = ResetOptions(newOptions);
+		// option merge
+		this._originOptions = [this._originOptions, newOptions].reduce(function (init, option) {
+			for (let key in option) {
+				init[key] = option[key];
+			}
+			return init;
+		}, {});
+
+		// init options
+		const options = this.options;
+		const newMap = InitOptions(this._originOptions, []);
 		for (let i = 0, len = newKeys.length, k; i < len; i++) {
 			k = newKeys[i];
-			origin.set(k, newMap.get(k));
+			options.set(k, newMap.get(k));
+		}
+
+		/** apply options  */
+		// history delay time
+		if (newKeys.indexOf(RE_OPTION_HISTORY) > -1) {
+			this.history.resetDelayTime(options.get(RE_OPTION_HISTORY));
+		}
+
+		// wisywig attributes
+		if (newKeys.indexOf(RE_OPTION_WWATTR) > -1) {
+			const attr = options.get(RE_OPTION_WWATTR);
+			this.applyRootTargets(function (e) {
+				for (let k in attr) {
+					e.get('wysiwyg').setAttribute(k, attr[k]);
+				}
+			});
+		}
+
+		// set dir
+		if (newKeys.indexOf(RE_OPTION_DIR) > -1) {
+			this.setDir(options.get('_rtl') ? 'ltr' : 'rtl');
 		}
 	},
 
@@ -977,7 +1013,7 @@ Editor.prototype = {
 
 	_registerClass: function () {
 		// use events, history function
-		this.events = this.options.get('events');
+		this.events = Events();
 		this.history = History(this, this._onChange_historyStack.bind(this));
 
 		// eventManager
@@ -1362,8 +1398,6 @@ Editor.prototype = {
 		if (!isIframe) {
 			this.__editorInit(originOptions);
 		}
-
-		originOptions = null;
 	},
 
 	Constructor: Editor

@@ -10,7 +10,6 @@ gen
 
 # modules
 node_modules/
-bower_components/
 *.log
 
 #build
@@ -20,10 +19,10 @@ bower_components/
 .git/
 sample/
 test/
+webpack/
 .jshintrc
 .jshintignore
+.prettierrc
 karma.conf.js
-bower.json
-webpack.*.js
 tsconfig.json
 package-lock.json

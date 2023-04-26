@@ -58,7 +58,7 @@ const Image_ = function (editor, pluginOptions) {
 		tagNames: ['img'],
 		eventHandler: function (element, dataIndex, state, info, uploadFilesLeft) {
 			this.events.onImageUpload(element, dataIndex, state, info, uploadFilesLeft);
-		},
+		}.bind(this),
 		checkHandler: FileCheckHandler.bind(this),
 		figure: this.figure
 	});

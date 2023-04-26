@@ -62,7 +62,7 @@ const HTML = function (editor) {
 	if (_wAttr) {
 		for (let k in _wAttr) {
 			if (/^on[a-z]+$/i.test(_wAttr[k])) continue;
-			if (k === 'all') {
+			if (k === '*') {
 				allAttr = GetRegList(_wAttr[k], defaultAttr);
 			} else {
 				tagsAttr[k] = new _w.RegExp('\\s(?:' + GetRegList(_wAttr[k], '') + ')' + regEndStr, 'ig');
@@ -79,7 +79,7 @@ const HTML = function (editor) {
 	allAttr = '';
 	if (_bAttr) {
 		for (let k in _bAttr) {
-			if (k === 'all') {
+			if (k === '*') {
 				allAttr = GetRegList(_bAttr[k], '');
 			} else {
 				tagsAttr[k] = new _w.RegExp('\\s(?:' + GetRegList(_bAttr[k], '') + ')' + regEndStr, 'ig');

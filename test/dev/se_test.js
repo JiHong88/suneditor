@@ -373,6 +373,7 @@ window.c = () => {
 			// 	src: Codemirror5
 			// },
 			// iframe:true,
+			defaultLine: 'div',
 			toolbar_sticky: 0,
 			lineAttrReset: 'id',
 			attributeWhitelist: 'id',

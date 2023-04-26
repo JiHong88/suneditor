@@ -26,27 +26,28 @@ const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|D
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 
 // resetOptions - constant
-export const RE_OPTIONS_NOT_RELOAD = [
-	'events',
-	'lineAttrReset',
-	'printClass',
-	'toolbar_sticky',
-	'tabDisable',
-	'fullScreenOffset',
-	'previewTemplate',
-	'printTemplate',
-	'mediaAutoSelect',
-	'defaultUrlProtocol'
-];
-export const RE_OPTIONS_DIR = ['textDirection'];
-export const RE_OPTIONS_HISTORY = ['historyStackDelayTime'];
-export const RE_OPTIONS_WWATTR = ['frameAttrbutes'];
-export const RE_OPTIONS_TOOLBAR_RELOAD = ['mode', 'toolbar_container'];
+// export const RE_OPTIONS_NOT_RELOAD = [
+// 	'lineAttrReset',
+// 	'printClass',
+// 	'toolbar_sticky',
+// 	'tabDisable',
+// 	'fullScreenOffset',
+// 	'previewTemplate',
+// 	'printTemplate',
+// 	'mediaAutoSelect',
+// 	'defaultUrlProtocol',
+// ];
+
+export const RE_OPTION_DIR = 'textDirection';
+export const RE_OPTION_HISTORY = 'historyStackDelayTime';
+export const RE_OPTION_WWATTR = 'frameAttrbutes';
+
+export const RE_OPTIONS_TOOLBAR_RELOAD = ['mode'];
 export const RE_OPTIONS_TOOLBAR = ['toolbar_width', 'toolbar_hide', 'shortcutsHint'];
-export const RE_OPTIONS_STATUSBAR_RELOAD = ['statusbar_container'];
-export const RE_OPTIONS_FRAME_RELOAD = ['defaultLine'];
-export const RE_OPTIONS_IFRAME_Attr = ['iframe_attributes', 'iframe_cssFileName'];
-export const RE_OPTIONS_ALL_RELOAD = [
+export const RE_OPTIONS_STATUSBAR_RELOAD = [];
+export const RE_OPTIONS_IFRAME_ATTR = ['iframe_fullPage', 'iframe_attributes', 'iframe_cssFileName'];
+
+export const RE_OPTIONS_UNAVAILABD = [
 	'textTags',
 	'fontSizeUnit',
 	'spanStyles',
@@ -56,12 +57,14 @@ export const RE_OPTIONS_ALL_RELOAD = [
 	'shortcuts',
 	'buttonList',
 	'subToolbar',
+	'toolbar_container',
+	'statusbar_container',
 	'iframe',
-	'iframe_fullPage',
 	'elementWhitelist',
 	'elementBlacklist',
 	'attributeWhitelist',
 	'attributeBlacklist',
+	'defaultLine',
 	'formatClosureBrLine',
 	'formatBrLine',
 	'formatLine',
@@ -71,6 +74,7 @@ export const RE_OPTIONS_ALL_RELOAD = [
 	'__defaultAttributeWhitelist',
 	'__listCommonStyle',
 	'icons',
+	'lang',
 	'codeMirror'
 ];
 
@@ -253,14 +257,6 @@ const Constructor = function (editorTargets, options) {
 };
 
 /**
- * @description Reset the options
- * @param {Object} options Options object
- */
-export function ResetOptions(options) {
-	return InitOptions(options, []);
-}
-
-/**
  * @description Create shortcuts desc span.
  * @param {string} command Command string
  * @param {Array.<string>} values options.shortcuts[command]
@@ -295,16 +291,15 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 /**
  * @description Initialize options
  * @param {Object} options Options object
- * @param {Element|Array.<Element>} editorTargets Target textarea
+ * @param {Array.<Element>} editorTargets Target textarea
  * @returns {o:Map, p:Map} {{o: options map, p: plugins map}}
  */
-function InitOptions(options, editorTargets) {
+export function InitOptions(options, editorTargets) {
 	const buttonList = options.buttonList || DEFAULT_BUTTON_LIST;
 	const o = new _w.Map();
-	o.set('events', options.events || {});
 
 	/** Multi root */
-	if (options.multiRoot) {
+	if (editorTargets.length > 1) {
 		if (!options.toolbar_container && !/inline|balloon/i.test(options.mode))
 			throw Error('[SUNEDITOR.create.fail] In multi root, The "mode" option cannot be "classic" without using the "toolbar_container" option.');
 	}
@@ -482,7 +477,7 @@ function InitOptions(options, editorTargets) {
 		}
 	}
 
-	/** styles */
+	/** root options */
 	InitRootOptions(editorTargets, options);
 
 	/** IFrame */
