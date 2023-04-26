@@ -809,6 +809,7 @@ Editor.prototype = {
 		domUtils.removeItem(this._carrierWrapper);
 		domUtils.removeItem(this.context.get('toolbar._wrapper'));
 		domUtils.removeItem(this.context.get('toolbar.sub._wrapper'));
+		domUtils.removeItem(this.context.get('statusbar._wrapper'));
 		this.applyRootTargets(function (e) {
 			domUtils.removeItem(e.get('topArea'));
 			e.get('options').clear();
@@ -819,11 +820,29 @@ Editor.prototype = {
 		this.options.clear();
 
 		for (let k in this.plugins) {
+			for (let p in this.plugins) {
+				delete this.plugins[k][p];
+			}
 			delete this.plugins[k];
 		}
 		for (let k in this.events) {
 			delete this.events[k];
 		}
+
+		const classes = ['eventManager', 'char', 'component', 'format', 'html', 'menu', 'node', 'notice', 'offset', 'selection', 'shortcuts', 'toolbar', 'viewer'];
+		for (let i = 0, len = classes.length, c; i < len; i++) {
+			c = this[classes[i]];
+			for (let k in c) {
+				delete c[k];
+			}
+		}
+		const subtoolbar = this.subToolbar;
+		if (subtoolbar) {
+			for (let k in subtoolbar) {
+				delete subtoolbar[k];
+			}
+		}
+
 		for (let k in this) {
 			delete this[k];
 		}

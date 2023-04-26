@@ -219,7 +219,7 @@ const Constructor = function (editorTargets, options) {
 	}
 
 	return {
-		context: CreateContext(toolbar, toolbar_container, menuTray, subbar),
+		context: CreateContext(toolbar, toolbar_container, menuTray, subbar, statusbarContainer),
 		carrierWrapper: editor_carrier_wrapper,
 		options: o,
 		plugins: plugins,

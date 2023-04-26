@@ -54,7 +54,7 @@ export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFram
  * @param {Element|null} subbar sub toolbar
  * @returns {Map}
  */
-export const CreateContext = function (toolbar, toolbarContainer, menuTray, subbar) {
+export const CreateContext = function (toolbar, toolbarContainer, menuTray, subbar, statusbarContainer) {
 	const m = new _w.Map([
 		['menuTray', menuTray],
 		['toolbar.main', toolbar],
@@ -69,6 +69,10 @@ export const CreateContext = function (toolbar, toolbarContainer, menuTray, subb
 		m.set('toolbar.sub.buttonTray', subbar.querySelector('.se-btn-tray'));
 		m.set('toolbar.sub._arrow', subbar.querySelector('.se-arrow'));
 		m.set('toolbar.sub._wrapper', subbar.parentElement.parentElement);
+	}
+
+	if (statusbarContainer) {
+		m.set('statusbar._wrapper', statusbarContainer);
 	}
 
 	return m;
