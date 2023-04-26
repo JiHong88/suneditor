@@ -82,12 +82,11 @@ export function DIR_BTN_ACTIVE(editor, rtl) {
 }
 
 export function SAVE(editor) {
-	const value = editor.html.get();
+	if (!editor.status.isChanged) return;
 
-	if (typeof editor.options.get('callBackSave') === 'function') {
-		editor.options.get('callBackSave')(value, editor.status.isChanged);
-	} else if (editor.status.isChanged && typeof editor.events.save === 'function') {
-		editor.events.save();
+	const value = editor.html.get();
+	if (editor.status.isChanged && typeof editor.events.onSave === 'function') {
+		editor.events.onSave(value);
 	} else {
 		editor.frameContext.get('originElement').value = value;
 	}

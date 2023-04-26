@@ -1,5 +1,5 @@
 import { env, converter, domUtils, numbers } from '../helper';
-import Constructor, { ResetOptions, UpdateButton, CreateShortcuts, NOT_RELOAD_OPTIONS } from './section/constructor';
+import Constructor, { ResetOptions, UpdateButton, CreateShortcuts } from './section/constructor';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './section/actives';
 import History from './base/history';
 import EventManager from './base/eventManager';
@@ -251,18 +251,13 @@ const Editor = function (multiTargets, options) {
 	this._MELInfo = null;
 
 	/**
-	 * @description Array of "checkFileInfo" functions with the core bound
-	 * (Plugins with "checkFileInfo" and "resetFileInfo" methods)
-	 * "fileInfoPlugins" runs the "add" method when creating the editor.
-	 * "checkFileInfo" method is always call just before the "change" event.
+	 * @description Properties for managing files in the "FileManager" module
 	 * @private
 	 */
 	this._fileInfoPluginsCheck = null;
 
 	/**
-	 * @description Array of "resetFileInfo" functions with the core bound
-	 * (Plugins with "checkFileInfo" and "resetFileInfo" methods)
-	 * "checkFileInfo" method is always call just before the "editorInstance.setOptions" method.
+	 * @description Properties for managing files in the "FileManager" module
 	 * @private
 	 */
 	this._fileInfoPluginsReset = null;
@@ -497,20 +492,18 @@ Editor.prototype = {
 			if (typeof plugins[k].setDir === 'function') plugins[k].setDir(dir);
 		}
 
-		const toolbarContainer = this.options.get('toolbar_container');
-		const toolbarTopArea = toolbarContainer ? toolbarContainer.querySelector('.sun-editor') : null;
-		const statusbarContainer = this.options.get('statusbar_container');
-		const statusbarTopArea = statusbarContainer ? statusbarContainer.querySelector('.sun-editor') : null;
+		const toolbarWrapper = this.context.get('toolbar._wrapper');
+		const statusbarWrapper = this.context.get('statusbar._wrapper');
 		if (rtl) {
 			this.applyRootTargets(function (e) {
 				domUtils.addClass([e.get('topArea'), e.get('wysiwygFrame')], 'se-rtl');
 			});
-			domUtils.addClass([this._carrierWrapper, toolbarTopArea, statusbarTopArea], 'se-rtl');
+			domUtils.addClass([this._carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 		} else {
 			this.applyRootTargets(function (e) {
 				domUtils.removeClass([e.get('topArea'), e.get('wysiwygFrame')], 'se-rtl');
 			});
-			domUtils.removeClass([this._carrierWrapper, toolbarTopArea, statusbarTopArea], 'se-rtl');
+			domUtils.removeClass([this._carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 		}
 
 		const lineNodes = domUtils.getListChildren(
@@ -554,13 +547,13 @@ Editor.prototype = {
 
 		let readload = false;
 		const newKeys = this._w.Object.keys(newOptions);
-		for (let i = 0, len = NOT_RELOAD_OPTIONS.length; i < len; i++) {
-			if (newKeys.indexOf(NOT_RELOAD_OPTIONS[i]) === -1) {
-				readload = true;
-				console.warn('[SUNEDITOR.info.setOptions] "There is an option to reload the editor. The editor will reload."');
-				break;
-			}
-		}
+		// for (let i = 0, len = NOT_RELOAD_OPTIONS.length; i < len; i++) {
+		// 	if (newKeys.indexOf(NOT_RELOAD_OPTIONS[i]) === -1) {
+		// 		readload = true;
+		// 		console.warn('[SUNEDITOR.info.setOptions] "There is an option to reload the editor. The editor will reload."');
+		// 		break;
+		// 	}
+		// }
 
 		const origin = this.options;
 		const newMap = ResetOptions(newOptions);
@@ -818,31 +811,37 @@ Editor.prototype = {
 
 		/** remove object reference */
 		this.options.clear();
+		this.context.clear();
 
-		for (let k in this.plugins) {
-			for (let p in this.plugins) {
-				delete this.plugins[k][p];
+		let obj = this.plugins;
+		for (let k in obj) {
+			const p = obj[k];
+			if (typeof p._destroy === 'function') p._destroy();
+			for (let pk in p) {
+				delete p[pk];
 			}
-			delete this.plugins[k];
+			delete obj[k];
 		}
-		for (let k in this.events) {
-			delete this.events[k];
+		obj = this.events;
+		for (let k in obj) {
+			delete obj[k];
 		}
 
-		const classes = ['eventManager', 'char', 'component', 'format', 'html', 'menu', 'node', 'notice', 'offset', 'selection', 'shortcuts', 'toolbar', 'viewer'];
-		for (let i = 0, len = classes.length, c; i < len; i++) {
-			c = this[classes[i]];
+		obj = ['eventManager', 'char', 'component', 'format', 'html', 'menu', 'node', 'notice', 'offset', 'selection', 'shortcuts', 'toolbar', 'viewer'];
+		for (let i = 0, len = obj.length, c; i < len; i++) {
+			c = this[obj[i]];
 			for (let k in c) {
 				delete c[k];
 			}
 		}
-		const subtoolbar = this.subToolbar;
-		if (subtoolbar) {
-			for (let k in subtoolbar) {
-				delete subtoolbar[k];
+		obj = this.subToolbar;
+		if (obj) {
+			for (let k in obj) {
+				delete obj[k];
 			}
 		}
 
+		obj = null;
 		for (let k in this) {
 			delete this[k];
 		}
@@ -990,7 +989,7 @@ Editor.prototype = {
 		this.notice = new Notice(this);
 		// main classes
 		this.toolbar = new Toolbar(this, { keyName: 'toolbar', balloon: this.isBalloon, balloonAlways: this.isBalloonAlways, inline: this.isInline, res: this._responsiveButtons });
-		if (this.options.has('subMode'))
+		if (this.options.has('_subMode'))
 			this.subToolbar = new Toolbar(this, {
 				keyName: 'toolbar.sub',
 				balloon: this.isSubBalloon,
@@ -1010,7 +1009,7 @@ Editor.prototype = {
 		// register classes to the eventManager and main classes
 		ClassInjector.call(this.eventManager, this);
 		ClassInjector.call(this.toolbar, this);
-		if (this.options.has('subMode')) ClassInjector.call(this.subToolbar, this);
+		if (this.options.has('_subMode')) ClassInjector.call(this.subToolbar, this);
 		ClassInjector.call(this.selection, this);
 		ClassInjector.call(this.html, this);
 		ClassInjector.call(this.node, this);
@@ -1276,7 +1275,7 @@ Editor.prototype = {
 		this._codeViewDisabledButtons = converter.nodeListToArray(ctx.get('toolbar.buttonTray').querySelectorAll(codeDisabledQuery));
 		this._controllerOnDisabledButtons = converter.nodeListToArray(ctx.get('toolbar.buttonTray').querySelectorAll(controllerDisabledQuery));
 
-		if (this.options.has('subMode')) {
+		if (this.options.has('_subMode')) {
 			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(codeDisabledQuery)));
 			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(
 				converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(controllerDisabledQuery))
@@ -1308,7 +1307,7 @@ Editor.prototype = {
 			CreateShortcuts(c, e, shortcuts[c], keyMap, reverseCommandArray, reverseKeys);
 		}
 
-		if (!isSub && this.options.has('subMode')) {
+		if (!isSub && this.options.has('_subMode')) {
 			this.__saveCommandButtons(true);
 		}
 	},
@@ -1332,8 +1331,8 @@ Editor.prototype = {
 		this.isBalloon = /balloon/i.test(this.options.get('mode'));
 		this.isBalloonAlways = /balloon-always/i.test(this.options.get('mode'));
 		// set subToolbar modes
-		this.isSubBalloon = /balloon/i.test(this.options.get('subMode'));
-		this.isSubBalloonAlways = /balloon-always/i.test(this.options.get('subMode'));
+		this.isSubBalloon = /balloon/i.test(this.options.get('_subMode'));
+		this.isSubBalloonAlways = /balloon-always/i.test(this.options.get('_subMode'));
 
 		// register class
 		this._registerClass();
@@ -1363,6 +1362,8 @@ Editor.prototype = {
 		if (!isIframe) {
 			this.__editorInit(originOptions);
 		}
+
+		originOptions = null;
 	},
 
 	Constructor: Editor

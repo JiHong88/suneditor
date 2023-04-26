@@ -5,6 +5,8 @@
 import CoreInjector from '../../editorInjector/_core';
 import { domUtils, converter, numbers, unicode, env } from '../../helper';
 
+const REQUIRED_DATA_ATTRS = 'data-se-index|data-se-key|data-se-value|data-se-type|data-se-size|data-se-file-name|data-se-file-size|data-se-embed';
+
 const HTML = function (editor) {
 	CoreInjector.call(this, editor);
 
@@ -68,7 +70,7 @@ const HTML = function (editor) {
 		}
 	}
 
-	this._attributeWhitelistRegExp = new _w.RegExp('\\s(?:' + (allAttr || defaultAttr + '|' + options.get('__defaultDataAttrs')) + ')' + regEndStr, 'ig');
+	this._attributeWhitelistRegExp = new _w.RegExp('\\s(?:' + (allAttr || defaultAttr + '|' + REQUIRED_DATA_ATTRS) + ')' + regEndStr, 'ig');
 	this._attributeWhitelist = tagsAttr;
 
 	// blacklist

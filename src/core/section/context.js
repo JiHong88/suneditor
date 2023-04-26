@@ -59,9 +59,7 @@ export const CreateContext = function (toolbar, toolbarContainer, menuTray, subb
 		['menuTray', menuTray],
 		['toolbar.main', toolbar],
 		['toolbar.buttonTray', toolbar.querySelector('.se-btn-tray')],
-		['toolbar._arrow', toolbar.querySelector('.se-arrow')],
-		['toolbar._wrapper', toolbar.parentElement.parentElement],
-		['_stickyDummy', toolbarContainer ? toolbarContainer.querySelector('.se-toolbar-sticky-dummy') : null]
+		['toolbar._arrow', toolbar.querySelector('.se-arrow')]
 	]);
 
 	if (subbar) {
@@ -71,8 +69,13 @@ export const CreateContext = function (toolbar, toolbarContainer, menuTray, subb
 		m.set('toolbar.sub._wrapper', subbar.parentElement.parentElement);
 	}
 
+	if (toolbarContainer) {
+		m.set('toolbar._wrapper', statusbarContainer.querySelector('.sun-editor'));
+		m.set('_stickyDummy', toolbarContainer.querySelector('.se-toolbar-sticky-dummy'));
+	}
+
 	if (statusbarContainer) {
-		m.set('statusbar._wrapper', statusbarContainer);
+		m.set('statusbar._wrapper', statusbarContainer.querySelector('.sun-editor'));
 	}
 
 	return m;

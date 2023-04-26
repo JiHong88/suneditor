@@ -29,7 +29,6 @@ const Table = function (editor, pluginOptions) {
 	this.tableHighlight = menu.querySelector('.se-table-size-highlighted');
 	this.tableUnHighlight = menu.querySelector('.se-table-size-unhighlighted');
 	this.tableDisplay = menu.querySelector('.se-table-size-display');
-	if (this._rtl) this.tableHighlight.style.left = 10 * 18 - 13 + 'px';
 	this.resizeButton = controller_table.querySelector('._se_table_resize');
 	this.resizeText = controller_table.querySelector('._se_table_resize > span > span');
 	this.columnFixedButton = controller_table.querySelector('._se_table_fixed_column');
@@ -44,7 +43,6 @@ const Table = function (editor, pluginOptions) {
 	this._tableXY = [];
 	this._maxWidth = true;
 	this._fixedColumn = false;
-	this._rtl = this.options.get('_rtl');
 	this._physical_cellCnt = 0;
 	this._logical_cellCnt = 0;
 	this._rowCnt = 0;
@@ -104,6 +102,15 @@ Table.prototype = {
 			this.selection.setRange(firstTd, 0, firstTd, 0);
 			this._resetTablePicker();
 		}
+	},
+
+	/**
+	 * @override core
+	 * @param {"rtl"|"ltr"} dir Direction
+	 */
+	setDir: function (dir) {
+		this.tableHighlight.style.left = dir === 'rtl' ? 10 * 18 - 13 + 'px' : '';
+		this._resetTablePicker();
 	},
 
 	/**
@@ -1230,7 +1237,7 @@ function OnMouseMoveTablePicker(e) {
 	x = x < 1 ? 1 : x;
 	y = y < 1 ? 1 : y;
 
-	if (this._rtl) {
+	if (this.options.get('_rtl')) {
 		this.tableHighlight.style.left = x * 18 - 13 + 'px';
 		x = 11 - x;
 	}

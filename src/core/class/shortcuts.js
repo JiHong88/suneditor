@@ -4,9 +4,6 @@
 
 const Shortcuts = function (editor) {
 	this.editor = editor;
-	this.options = editor.options;
-
-	// members
 	this.isDisabled = false;
 };
 

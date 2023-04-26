@@ -274,7 +274,7 @@ EventManager.prototype = {
 	_toggleToolbarBalloon: function () {
 		this.selection._init();
 		const range = this.selection.getRange();
-		const hasSubMode = this.options.has('subMode');
+		const hasSubMode = this.options.has('_subMode');
 
 		if (this.menu._bindControllersOff || (!(hasSubMode ? this.editor.isSubBalloonAlways : this.editor.isBalloonAlways) && range.collapsed)) {
 			if (hasSubMode) this._hideToolbar_sub();
@@ -593,7 +593,7 @@ EventManager.prototype = {
 		this.addEvent(this.context.get('toolbar.main'), 'mousedown', buttonsHandler, false);
 		this.addEvent(this.context.get('toolbar.main'), 'click', toolbarHandler, false);
 		// subToolbar
-		if (this.options.has('subMode')) {
+		if (this.options.has('_subMode')) {
 			this.addEvent(this.context.get('toolbar.sub.main'), 'mousedown', buttonsHandler, false);
 			this.addEvent(this.context.get('toolbar.sub.main'), 'click', toolbarHandler, false);
 		}
@@ -782,7 +782,7 @@ EventManager.prototype = {
 	_resetFrameStatus: function () {
 		if (!env.isResizeObserverSupported) {
 			this.toolbar.resetResponsiveToolbar();
-			if (this.options.get('subMode')) this.subToolbar.resetResponsiveToolbar();
+			if (this.options.get('_subMode')) this.subToolbar.resetResponsiveToolbar();
 		}
 
 		const toolbar = this.context.get('toolbar.main');
@@ -1678,7 +1678,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 								e.preventDefault();
 								this.frameContext.get('wysiwyg').appendChild(newFormat);
 								newEl = newFormat;
-								domUtils.copyTagAttributes(newEl, formatEl, this.options.lineAttrReset);
+								domUtils.copyTagAttributes(newEl, formatEl, this.options.get('lineAttrReset'));
 								this.selection.setRange(newEl, offset, newEl, offset);
 							}
 							break;
@@ -1719,7 +1719,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 					}
 
 					e.preventDefault();
-					domUtils.copyTagAttributes(newEl, formatEl, this.options.lineAttrReset);
+					domUtils.copyTagAttributes(newEl, formatEl, this.options.get('lineAttrReset'));
 					this.selection.setRange(newEl, offset, newEl, offset);
 
 					break;

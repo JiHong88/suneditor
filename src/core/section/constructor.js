@@ -24,31 +24,54 @@ const DEFAULT_FORMAT_BR_LINE = 'PRE';
 const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|DETAILS';
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
-const REQUIRED_DATA_ATTRS = 'data-se-index|data-se-key|data-se-value|data-se-type|data-se-size|data-se-file-name|data-se-file-size|data-se-embed';
 
-export const NOT_RELOAD_OPTIONS = [
+// resetOptions - constant
+export const RE_OPTIONS_NOT_RELOAD = [
 	'events',
-	'textDirection',
-	'textTags',
-	'callBackSave',
 	'lineAttrReset',
-	'defaultLine',
+	'printClass',
+	'toolbar_sticky',
 	'tabDisable',
-	'shortcutsHint',
-	'shortcutsDisable',
-	'shortcuts',
 	'fullScreenOffset',
 	'previewTemplate',
 	'printTemplate',
 	'mediaAutoSelect',
-	'toolbar_container',
-	'toolbar_width',
-	'toolbar_sticky',
-	'statusbar_container',
-	'frameAttrbutes',
+	'defaultUrlProtocol'
+];
+export const RE_OPTIONS_DIR = ['textDirection'];
+export const RE_OPTIONS_HISTORY = ['historyStackDelayTime'];
+export const RE_OPTIONS_WWATTR = ['frameAttrbutes'];
+export const RE_OPTIONS_TOOLBAR_RELOAD = ['mode', 'toolbar_container'];
+export const RE_OPTIONS_TOOLBAR = ['toolbar_width', 'toolbar_hide', 'shortcutsHint'];
+export const RE_OPTIONS_STATUSBAR_RELOAD = ['statusbar_container'];
+export const RE_OPTIONS_FRAME_RELOAD = ['defaultLine'];
+export const RE_OPTIONS_IFRAME_Attr = ['iframe_attributes', 'iframe_cssFileName'];
+export const RE_OPTIONS_ALL_RELOAD = [
+	'textTags',
+	'fontSizeUnit',
+	'spanStyles',
+	'formatStyles',
+	'reverseCommands',
+	'shortcutsDisable',
+	'shortcuts',
+	'buttonList',
+	'subToolbar',
+	'iframe',
 	'iframe_fullPage',
-	'iframe_attributes',
-	'iframe_cssFileName'
+	'elementWhitelist',
+	'elementBlacklist',
+	'attributeWhitelist',
+	'attributeBlacklist',
+	'formatClosureBrLine',
+	'formatBrLine',
+	'formatLine',
+	'formatClosureBlock',
+	'formatBlock',
+	'__defaultElementWhitelist',
+	'__defaultAttributeWhitelist',
+	'__listCommonStyle',
+	'icons',
+	'codeMirror'
 ];
 
 /**
@@ -81,7 +104,6 @@ const Constructor = function (editorTargets, options) {
 	const o = optionMap.o;
 	const icons = optionMap.i;
 	const lang = optionMap.l;
-	let exlib_katex = false;
 
 	/** --- carrier wrapper --------------------------------------------------------------- */
 	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper sun-editor-common' + (o.get('_rtl') ? ' se-rtl' : '') });
@@ -105,10 +127,9 @@ const Constructor = function (editorTargets, options) {
 	/** --- toolbar --------------------------------------------------------------- */
 	let subbar = null,
 		sub_main = null;
-	const tool_bar_main = CreateToolBar(o.get('buttonList'), plugins, o, icons, lang);
+	const tool_bar_main = CreateToolBar(optionMap.buttons, plugins, o, icons, lang);
 	const toolbar = tool_bar_main.element;
 	toolbar.style.visibility = 'hidden';
-	exlib_katex = tool_bar_main.pluginCallButtons.math;
 	// toolbar mode
 	if (/inline/i.test(o.get('mode'))) {
 		toolbar.className += ' se-toolbar-inline';
@@ -120,26 +141,21 @@ const Constructor = function (editorTargets, options) {
 	}
 
 	/** --- subToolbar --------------------------------------------------------------- */
-	if (o.get('subButtonList')) {
-		sub_main = CreateToolBar(o.get('subButtonList'), plugins, o, icons, lang);
+	if (optionMap.subButtons) {
+		sub_main = CreateToolBar(optionMap.subButtons, plugins, o, icons, lang);
 		subbar = sub_main.element;
 		subbar.style.visibility = 'hidden';
-		if (!exlib_katex) exlib_katex = sub_main.pluginCallButtons.math;
 		// subbar mode must be balloon-*
 		subbar.className += ' se-toolbar-balloon se-toolbar-sub';
 		subbar.style.width = o.get('toolbar.sub_width');
 		subbar.appendChild(domUtils.createElement('DIV', { class: 'se-arrow' }));
 	}
 
-	/** --- external library --------------------------------------------------------------- */
-	// katex
-	if (exlib_katex) _checkKatexMath(o.get('katex'));
-
 	/** frame - root set - start -------------------------------------------------------------- */
 	const rootId = editorTargets[0].key || null;
 	const rootKeys = [];
 	const rootTargets = new _w.Map();
-	const statusbarContainer = o.get('statusbar_container');
+	const statusbarContainer = optionMap.statusbarContainer;
 	let default_status_bar = null;
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
 		const editTarget = editorTargets[i];
@@ -369,7 +385,6 @@ function InitOptions(options, editorTargets) {
 	o.set('historyStackDelayTime', typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400);
 	o.set('frameAttrbutes', options.frameAttrbutes || {});
 	o.set('_editableClass', 'sun-editor-editable' + (o.get('_rtl') ? ' se-rtl' : ''));
-	o.set('callBackSave', options.callBackSave);
 	o.set('lineAttrReset', ['id'].concat(options.lineAttrReset && typeof options.lineAttrReset === 'string' ? options.lineAttrReset.toLowerCase().split('|') : []));
 	o.set('printClass', typeof options.printClass === 'string' ? options.printClass : null);
 
@@ -427,7 +442,6 @@ function InitOptions(options, editorTargets) {
 	);
 
 	/** __defaults */
-	o.set('__defaultDataAttrs', REQUIRED_DATA_ATTRS);
 	o.set(
 		'__defaultElementWhitelist',
 		REQUIRED_ELEMENT_WHITELIST + '|' + (typeof options.__defaultElementWhitelist === 'string' ? options.__defaultElementWhitelist : DEFAULT_ELEMENT_WHITELIST).toLowerCase()
@@ -454,21 +468,19 @@ function InitOptions(options, editorTargets) {
 		/balloon/i.test(o.get('mode')) ? -1 : options.toolbar_sticky === undefined ? 0 : /^\d+/.test(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1
 	);
 	o.set('toolbar_hide', !!options.toolbar_hide);
-	o.set('buttonList', o.get('_rtl') ? buttonList.reverse() : buttonList);
 
 	/** subToolbar */
+	let subButtons = null;
 	const subbar = options.subToolbar;
 	if (subbar && subbar.buttonList && subbar.buttonList.length > 0) {
 		if (/balloon/.test(o.get('mode'))) {
 			console.warn('[SUNEDITOR.create.subToolbar.fail] When the "mode" option is "balloon-*", the "subToolbar" option is omitted.');
 		} else {
-			o.set('subMode', subbar.mode || 'balloon');
-			o.set('subButtonList', o.get('_rtl') ? subbar.buttonList.reverse() : subbar.buttonList);
+			o.set('_subMode', subbar.mode || 'balloon');
 			o.set('toolbar.sub_width', subbar.width ? (numbers.is(subbar.width) ? subbar.width + 'px' : subbar.width) : 'auto');
+			subButtons = o.get('_rtl') ? subbar.buttonList.reverse() : subbar.buttonList;
 		}
 	}
-	options.statusbar_container = typeof options.statusbar_container === 'string' ? _d.querySelector(options.statusbar_container) : options.statusbar_container;
-	o.set('statusbar_container', options.statusbar_container);
 
 	/** styles */
 	InitRootOptions(editorTargets, options);
@@ -485,8 +497,7 @@ function InitOptions(options, editorTargets) {
 	/** Key actions */
 	o.set('tabDisable', !!options.tabDisable);
 	o.set('shortcutsHint', options.shortcutsHint === undefined ? true : !!options.shortcutsHint);
-	o.set('shortcutsDisable', options.shortcutsDisable === undefined ? true : !!options.shortcutsDisable);
-	const shortcuts = !o.get('shortcutsDisable')
+	const shortcuts = !(options.shortcutsDisable === undefined ? true : !!options.shortcutsDisable)
 		? {}
 		: [
 				{
@@ -537,16 +548,6 @@ function InitOptions(options, editorTargets) {
 		}
 	}
 
-	// katex (Math plugin)
-	if (options.katex) {
-		if (!options.katex.src) {
-			console.warn('[SUNEDITOR.options.katex.fail] The katex option is set incorrectly.');
-			o.set('katex', null);
-		} else {
-			o.set('katex', options.katex);
-		}
-	}
-
 	/** Private options */
 	o.set('__listCommonStyle', options.__listCommonStyle || ['fontSize', 'color', 'fontFamily', 'fontWeight', 'fontStyle']);
 
@@ -566,7 +567,10 @@ function InitOptions(options, editorTargets) {
 		o: o,
 		i: icons,
 		l: options.lang || _defaultLang,
-		v: (options.value = typeof options.value === 'string' ? options.value : null)
+		v: (options.value = typeof options.value === 'string' ? options.value : null),
+		buttons: o.get('_rtl') ? buttonList.reverse() : buttonList,
+		subButtons: subButtons,
+		statusbarContainer: typeof options.statusbar_container === 'string' ? _d.querySelector(options.statusbar_container) : options.statusbar_container
 	};
 }
 
@@ -776,31 +780,6 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 	}
 
 	return textarea;
-}
-
-/**
- * @description Check for a katex object.
- * @param {Object} katex katex object
- */
-function _checkKatexMath(katex) {
-	if (!katex) {
-		console.warn('[SUNEDITOR.create.fail] To use the math button you need to add a "katex" object to the options.');
-		return;
-	}
-
-	const katexOptions = [
-		{
-			throwOnError: false
-		},
-		katex.options || {}
-	].reduce(function (init, option) {
-		for (let key in option) {
-			init[key] = option[key];
-		}
-		return init;
-	}, {});
-
-	katex.options = katexOptions;
 }
 
 /**
@@ -1099,12 +1078,6 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 		case 1:
 			domUtils.removeClass(buttonTray.firstElementChild, 'se-btn-module-border');
 			break;
-		default:
-			if (options.get('_rtl')) {
-				const sv = separator_vertical.cloneNode(false);
-				sv.style.float = buttonTray.lastElementChild.style.float;
-				buttonTray.appendChild(sv);
-			}
 	}
 
 	if (moreLayer.children.length > 0) buttonTray.appendChild(moreLayer);

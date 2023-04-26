@@ -7,7 +7,7 @@ import { getNodeFromPath, getNodePath } from '../../helper/domUtils';
 
 export default function (editor, change) {
 	const rootTargets = editor.rootTargets;
-	const delayTime = editor.options.get('historyStackDelayTime');
+	let delayTime = editor.options.get('historyStackDelayTime');
 	let pushDelay = null;
 	let stackIndex, stack, rootStack, rootInitContents;
 
@@ -285,6 +285,14 @@ export default function (editor, change) {
 					e.setAttribute('disabled', true);
 				});
 			}
+		},
+
+		/**
+		 * @description Reset the delay time.
+		 * @param {number} time millisecond
+		 */
+		resetDelayTime: function (time) {
+			delayTime = time;
 		},
 
 		/**

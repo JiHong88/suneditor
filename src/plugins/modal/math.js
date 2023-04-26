@@ -2,9 +2,9 @@ import EditorInjector from '../../editorInjector';
 import { Modal, Controller } from '../../modules';
 import { domUtils, env, converter, unicode } from '../../helper';
 
-const Math_ = function (editor, option) {
+const Math_ = function (editor, pluginOptions) {
 	// exception
-	if (!editor.options.get('katex')) {
+	if (!(this.katex = CheckKatex(pluginOptions.katex))) {
 		console.warn('[SUNEDITOR.plugins.math.warn] The math plugin must need the "KaTeX" library, Please add the katex option.');
 	}
 
@@ -14,7 +14,7 @@ const Math_ = function (editor, option) {
 	this.icon = 'math';
 
 	// create HTML
-	const modalEl = CreateHTML_modal(editor, this, option.fontSizeList);
+	const modalEl = CreateHTML_modal(editor, this, pluginOptions.fontSizeList);
 	const controllerEl = CreateHTML_controller(editor);
 
 	// modules
@@ -73,7 +73,7 @@ Math_.prototype = {
 		return {
 			className: 'katex',
 			method: function (element) {
-				if (!element.getAttribute('data-se-value') || !this.options.get('katex')) return;
+				if (!element.getAttribute('data-se-value') || !this.katex) return;
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(element.getAttribute('data-se-value'))));
 				element.innerHTML = dom.querySelector('.katex').innerHTML;
 				element.setAttribute('contenteditable', false);
@@ -176,7 +176,7 @@ Math_.prototype = {
 		let result = '';
 		try {
 			domUtils.removeClass(this.textArea, 'se-error');
-			result = this.options.get('katex').src.renderToString(exp, { throwOnError: true, displayMode: true });
+			result = this.katex.src.renderToString(exp, { throwOnError: true, displayMode: true });
 		} catch (error) {
 			domUtils.addClass(this.textArea, 'se-error');
 			result = '<span class="se-math-katex-error">Katex syntax error. (Refer <a href="' + env.KATEX_WEBSITE + '" target="_blank">KaTeX</a>)</span>';
@@ -190,6 +190,29 @@ Math_.prototype = {
 
 function RenderMathExp(e) {
 	this.previewElement.innerHTML = this._renderer(e.target.value);
+}
+
+function CheckKatex(katex) {
+	if (!katex) return null;
+	if (!katex.src) {
+		console.warn('[SUNEDITOR.math.katex.fail] The katex option is set incorrectly.');
+		return null;
+	}
+
+	const katexOptions = [
+		{
+			throwOnError: false
+		},
+		katex.options || {}
+	].reduce(function (init, option) {
+		for (let key in option) {
+			init[key] = option[key];
+		}
+		return init;
+	}, {});
+
+	katex.options = katexOptions;
+	return katex;
 }
 
 function CreateHTML_modal(editor, math, fontSizeList) {

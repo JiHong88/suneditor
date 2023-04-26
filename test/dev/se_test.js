@@ -382,9 +382,6 @@ window.c = () => {
 				width: 'auto',
 				mode: 'balloon' // balloon, balloon-always, balloon-block
 			},
-			katex: {
-				src: Katex
-			},
 			shortcuts: {
 				bold: ['s75r-underline', 'K'],
 				italic: [],
@@ -392,6 +389,9 @@ window.c = () => {
 				list: ['76', 'L']
 			},
 			math: {
+				katex: {
+					src: Katex
+				},
 				fontSizeList: [
 					{
 						text: '1',
@@ -413,6 +413,8 @@ window.c = () => {
 window.d = () => {
 	window.editor_root = window.editor_root.destroy()
 }
+
+c()
 
 // editor_root.events.onBlur = (rootKey, e, htmlFrame) => {
 // 	console.log('blur', editor_root.frameContext);
