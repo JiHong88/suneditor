@@ -26,28 +26,15 @@ const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|D
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 
 // resetOptions - constant
-// export const RE_OPTIONS_NOT_RELOAD = [
-// 	'lineAttrReset',
-// 	'printClass',
-// 	'toolbar_sticky',
-// 	'tabDisable',
-// 	'fullScreenOffset',
-// 	'previewTemplate',
-// 	'printTemplate',
-// 	'mediaAutoSelect',
-// 	'defaultUrlProtocol',
-// ];
-
+// RE_OPTIONS_NOT_RELOAD = ['lineAttrReset', 'printClass', 'toolbar_sticky', 'tabDisable', 'fullScreenOffset', 'previewTemplate', 'printTemplate', 'mediaAutoSelect', 'defaultUrlProtocol'];
 export const RE_OPTION_DIR = 'textDirection';
 export const RE_OPTION_HISTORY = 'historyStackDelayTime';
 export const RE_OPTION_WWATTR = 'frameAttrbutes';
 
-export const RE_OPTIONS_TOOLBAR_RELOAD = ['mode'];
 export const RE_OPTIONS_TOOLBAR = ['toolbar_width', 'toolbar_hide', 'shortcutsHint'];
-export const RE_OPTIONS_STATUSBAR_RELOAD = [];
-export const RE_OPTIONS_IFRAME_ATTR = ['iframe_fullPage', 'iframe_attributes', 'iframe_cssFileName'];
-
+export const RE_OPTIONS_IFRAME_ATTR = ['iframe_cssFileName'];
 export const RE_OPTIONS_UNAVAILABD = [
+	'mode',
 	'textTags',
 	'fontSizeUnit',
 	'spanStyles',
@@ -70,6 +57,8 @@ export const RE_OPTIONS_UNAVAILABD = [
 	'formatLine',
 	'formatClosureBlock',
 	'formatBlock',
+	'iframe_fullPage',
+	'iframe_attributes',
 	'__defaultElementWhitelist',
 	'__defaultAttributeWhitelist',
 	'__listCommonStyle',
