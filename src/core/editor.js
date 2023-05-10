@@ -496,6 +496,18 @@ Editor.prototype = {
 	},
 
 	/**
+	 * @description Checks if the content of the editor is empty.
+	 * Display criteria for "placeholder".
+	 * @param {frameContext|null} fc Frame context, if not present, currently selected frame context.
+	 * @returns {boolean}
+	 */
+	isEmpty: function (fc) {
+		fc = fc || this.frameContext;
+		const wysiwyg = fc.get('wysiwyg');
+		return domUtils.isZeroWith(wysiwyg.textContent) && !wysiwyg.querySelector(env._allowedEmptyNodeList) && (wysiwyg.innerText.match(/\n/g) || '').length <= 1;
+	},
+
+	/**
 	 * @description Set direction to "rtl" or "ltr".
 	 * @param {string} dir "rtl" or "ltr"
 	 */
@@ -1198,11 +1210,10 @@ Editor.prototype = {
 				return;
 			}
 
-			const wysiwyg = fc.get('wysiwyg');
-			if (!domUtils.isZeroWith(wysiwyg.textContent) || wysiwyg.querySelector(env._allowedEmptyNodeList) || (wysiwyg.innerText.match(/\n/g) || '').length > 1) {
-				placeholder.style.display = 'none';
-			} else {
+			if (this.isEmpty(fc)) {
 				placeholder.style.display = 'block';
+			} else {
+				placeholder.style.display = 'none';
 			}
 		}
 	},
