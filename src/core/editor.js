@@ -1,5 +1,16 @@
 import { env, converter, domUtils, numbers } from '../helper';
-import Constructor, { InitOptions, UpdateButton, CreateShortcuts } from './section/constructor';
+import Constructor, {
+	InitOptions,
+	UpdateButton,
+	CreateShortcuts,
+	RO_UNAVAILABD,
+	RO_DIR,
+	RO_HISTORY,
+	RO_WWATTR,
+	ROS_TOOLBAR,
+	RO_IFRAME_CSS,
+	RO_IFRAME_ATTR
+} from './section/constructor';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './section/actives';
 import History from './base/history';
 import EventManager from './base/eventManager';
@@ -555,7 +566,7 @@ Editor.prototype = {
 
 		const newKeys = this._w.Object.keys(newOptions);
 		for (let i = 0, len = newKeys.length; i < len; i++) {
-			if (RE_OPTIONS_UNAVAILABD.indexOf(newKeys[i]) > -1) {
+			if (RO_UNAVAILABD.indexOf(newKeys[i]) > -1) {
 				console.warn('[SUNEDITOR.fail.resetOptions] "It contains options not available in resetOptions."');
 				return;
 			}
@@ -577,15 +588,15 @@ Editor.prototype = {
 			options.set(k, newMap.get(k));
 		}
 
-		/** apply options  */
+		/** options that must be applied separately */
 		// history delay time
-		if (newKeys.indexOf(RE_OPTION_HISTORY) > -1) {
-			this.history.resetDelayTime(options.get(RE_OPTION_HISTORY));
+		if (newKeys.indexOf(RO_HISTORY) > -1) {
+			this.history.resetDelayTime(options.get(RO_HISTORY));
 		}
 
 		// wisywig attributes
-		if (newKeys.indexOf(RE_OPTION_WWATTR) > -1) {
-			const attr = options.get(RE_OPTION_WWATTR);
+		if (newKeys.indexOf(RO_WWATTR) > -1) {
+			const attr = options.get(RO_WWATTR);
 			this.applyRootTargets(function (e) {
 				for (let k in attr) {
 					e.get('wysiwyg').setAttribute(k, attr[k]);
@@ -594,8 +605,44 @@ Editor.prototype = {
 		}
 
 		// set dir
-		if (newKeys.indexOf(RE_OPTION_DIR) > -1) {
+		if (newKeys.indexOf(RO_DIR) > -1) {
 			this.setDir(options.get('_rtl') ? 'ltr' : 'rtl');
+		}
+
+		// toolbar
+		if (
+			newKeys.some(function (k) {
+				ROS_TOOLBAR.indexOf(k) > -1;
+			})
+		) {
+			const toolbar = this.context.get('toolbar.main');
+			// width
+			if (/inline|balloon/i.test(options.get('mode'))) {
+				toolbar.style.width = options.get('toolbar_width');
+			}
+			// hide
+			if (options.get('toolbar_hide')) {
+				toolbar.style.display = 'none';
+			}
+			// shortcuts hint
+			if (options.get('shortcutsHint')) {
+				domUtils.removeClass(toolbar, 'se-shortcut-hide');
+			} else {
+				domUtils.addClass(toolbar, 'se-shortcut-hide');
+			}
+		}
+
+		// iframe
+		if (options.get('iframe')) {
+			if (newKeys.indexOf(RO_IFRAME_CSS) > -1) {
+				converter._setIframeCssTags(options.get('iframe_cssFileName'), frameHeight);
+			}
+			if (newKeys.indexOf(RO_IFRAME_ATTR) > -1) {
+				const frameAttrs = options.get('iframe_attributes');
+				for (let key in frameAttrs) {
+					wysiwygDiv.setAttribute(key, frameAttrs[key]);
+				}
+			}
 		}
 	},
 
@@ -1361,6 +1408,15 @@ Editor.prototype = {
 		}
 	},
 
+	__setIframeDocument(frame, originOptions, frameHeight) {
+		frame.setAttribute('scrolling', 'auto');
+		frame.contentDocument.head.innerHTML =
+			'<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' +
+			converter._setIframeCssTags(originOptions.get('iframe_cssFileName'), frameHeight);
+		frame.contentDocument.body.className = originOptions.get('_editableClass');
+		frame.contentDocument.body.setAttribute('contenteditable', true);
+	},
+
 	__Create: function (originOptions) {
 		// set modes
 		this.isInline = /inline/i.test(this.options.get('mode'));
@@ -1387,7 +1443,7 @@ Editor.prototype = {
 
 			if (isIframe) {
 				e.get('wysiwygFrame').addEventListener('load', function () {
-					converter._setIframeDocument(this, inst.options, e.get('options').get('height'));
+					inst.__setIframeDocument(this, inst.options, e.get('options').get('height'));
 					if (rootSize === ++rootIndex) inst.__editorInit(originOptions);
 				});
 			}

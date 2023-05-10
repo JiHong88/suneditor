@@ -25,15 +25,20 @@ const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|DETAILS';
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 
-// resetOptions - constant
-// RE_OPTIONS_NOT_RELOAD = ['lineAttrReset', 'printClass', 'toolbar_sticky', 'tabDisable', 'fullScreenOffset', 'previewTemplate', 'printTemplate', 'mediaAutoSelect', 'defaultUrlProtocol'];
-export const RE_OPTION_DIR = 'textDirection';
-export const RE_OPTION_HISTORY = 'historyStackDelayTime';
-export const RE_OPTION_WWATTR = 'frameAttrbutes';
-
-export const RE_OPTIONS_TOOLBAR = ['toolbar_width', 'toolbar_hide', 'shortcutsHint'];
-export const RE_OPTIONS_IFRAME_ATTR = ['iframe_cssFileName'];
-export const RE_OPTIONS_UNAVAILABD = [
+/** Reset options
+ * -default arrowed-
+ * 'lineAttrReset', 'printClass', 'toolbar_sticky', 'tabDisable', 
+ * 'fullScreenOffset', 'mediaAutoSelect', 'defaultUrlProtocol'
+ * 'iframe_fullPage'
+ * 'previewTemplate', 'printTemplate'
+ */
+export const RO_DIR = 'textDirection';
+export const RO_HISTORY = 'historyStackDelayTime';
+export const RO_WWATTR = 'frameAttrbutes';
+export const ROS_TOOLBAR = ['toolbar_width', 'toolbar_hide', 'shortcutsHint'];
+export const RO_IFRAME_CSS = 'iframe_cssFileName';
+export const RO_IFRAME_ATTR = 'iframe_attributes';
+export const RO_UNAVAILABD = [
 	'mode',
 	'textTags',
 	'fontSizeUnit',
@@ -57,8 +62,6 @@ export const RE_OPTIONS_UNAVAILABD = [
 	'formatLine',
 	'formatClosureBlock',
 	'formatBlock',
-	'iframe_fullPage',
-	'iframe_attributes',
 	'__defaultElementWhitelist',
 	'__defaultAttributeWhitelist',
 	'__listCommonStyle',
