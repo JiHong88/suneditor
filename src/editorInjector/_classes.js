@@ -4,20 +4,19 @@
  * @private
  */
 function ClassInjector(editor) {
-	// class
-	if (this !== editor.char) this.char = editor.char;
-	if (this !== editor.component) this.component = editor.component;
-	if (this !== editor.format) this.format = editor.format;
-	if (this !== editor.html) this.html = editor.html;
-	if (this !== editor.menu) this.menu = editor.menu;
-	if (this !== editor.node) this.node = editor.node;
-	if (this !== editor.notice) this.notice = editor.notice;
-	if (this !== editor.offset) this.offset = editor.offset;
-	if (this !== editor.selection) this.selection = editor.selection;
-	if (this !== editor.shortcuts) this.shortcuts = editor.shortcuts;
-	if (this !== editor.toolbar) this.toolbar = editor.toolbar;
-	if (editor.subToolbar && this !== editor.subToolbar) this.subToolbar = editor.subToolbar;
-	if (this !== editor.viewer) this.viewer = editor.viewer;
+	this.char = editor.char;
+	this.component = editor.component;
+	this.format = editor.format;
+	this.html = editor.html;
+	this.menu = editor.menu;
+	this.node = editor.node;
+	this.notice = editor.notice;
+	this.offset = editor.offset;
+	this.selection = editor.selection;
+	this.shortcuts = editor.shortcuts;
+	this.toolbar = editor.toolbar;
+	this.viewer = editor.viewer;
+	if (editor.subToolbar) this.subToolbar = editor.subToolbar;
 }
 
 export default ClassInjector;

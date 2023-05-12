@@ -25,19 +25,6 @@ const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|DETAILS';
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 
-/** Reset options
- * -default arrowed-
- * 'lineAttrReset', 'printClass', 'toolbar_sticky', 'tabDisable', 
- * 'fullScreenOffset', 'mediaAutoSelect', 'defaultUrlProtocol'
- * 'iframe_fullPage'
- * 'previewTemplate', 'printTemplate'
- */
-export const RO_DIR = 'textDirection';
-export const RO_HISTORY = 'historyStackDelayTime';
-export const RO_WWATTR = 'frameAttrbutes';
-export const ROS_TOOLBAR = ['toolbar_width', 'toolbar_hide', 'shortcutsHint'];
-export const RO_IFRAME_CSS = 'iframe_cssFileName';
-export const RO_IFRAME_ATTR = 'iframe_attributes';
 export const RO_UNAVAILABD = [
 	'mode',
 	'textTags',
@@ -69,6 +56,7 @@ export const RO_UNAVAILABD = [
 	'lang',
 	'codeMirror'
 ];
+export const RO_ROOT_UNAVAILABD = [];
 
 /**
  * @description document create
@@ -470,7 +458,9 @@ export function InitOptions(options, editorTargets) {
 	}
 
 	/** root options */
-	InitRootOptions(editorTargets, options);
+	for (let i = 0, len = editorTargets.length; i < len; i++) {
+		InitFrameOptions(editorTargets[i].options || {}, options, (editorTargets[i].options = new _w.Map()));
+	}
 
 	/** IFrame */
 	o.set('iframe', !!options.iframe_fullPage || !!options.iframe);
@@ -561,13 +551,8 @@ export function InitOptions(options, editorTargets) {
 	};
 }
 
-function InitRootOptions(editorTargets, options) {
-	for (let i = 0, len = editorTargets.length; i < len; i++) {
-		InitFrameOptions(editorTargets[i].options || {}, options, (editorTargets[i].options = new _w.Map()));
-	}
-}
-
 function InitFrameOptions(o, origin, fo) {
+	fo.set('_origin', o);
 	const barContainer = origin.statusbar_container;
 
 	// members

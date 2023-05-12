@@ -322,7 +322,8 @@ window.c = () => {
 				options: {
 					value: '<p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p>',
 					placeholder: 'place1',
-					height: 500
+					height: 500,
+					width: '200px'
 				}
 			},
 			editor2: {

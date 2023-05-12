@@ -1,16 +1,5 @@
 import { env, converter, domUtils, numbers } from '../helper';
-import Constructor, {
-	InitOptions,
-	UpdateButton,
-	CreateShortcuts,
-	RO_UNAVAILABD,
-	RO_DIR,
-	RO_HISTORY,
-	RO_WWATTR,
-	ROS_TOOLBAR,
-	RO_IFRAME_CSS,
-	RO_IFRAME_ATTR
-} from './section/constructor';
+import Constructor, { InitOptions, UpdateButton, CreateShortcuts, RO_UNAVAILABD } from './section/constructor';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './section/actives';
 import History from './base/history';
 import EventManager from './base/eventManager';
@@ -585,71 +574,96 @@ Editor.prototype = {
 		}
 
 		// option merge
+		const rootKeys = this.rootKeys;
+		const rootTargets = this.rootTargets;
+		const newRoots = [];
+		const newRootKeys = {};
 		this._originOptions = [this._originOptions, newOptions].reduce(function (init, option) {
 			for (let key in option) {
-				init[key] = option[key];
+				if (rootKeys.indexOf(key) > -1 && option[key]) {
+					const nro = option[key];
+					const o = [rootTargets.get(key).get('options').get('_origin'), nro].reduce(function (ri, ro) {
+						for (let rk in ro) {
+							ri[rk] = ro[rk];
+						}
+						return ri;
+					}, {});
+					newRoots.push((newRootKeys[key] = { options: o }));
+				} else {
+					init[key] = option[key];
+				}
 			}
 			return init;
 		}, {});
 
 		// init options
 		const options = this.options;
-		const newMap = InitOptions(this._originOptions, []);
+		const newMap = InitOptions(this._originOptions, newRoots).o;
 		for (let i = 0, len = newKeys.length, k; i < len; i++) {
 			k = newKeys[i];
+			if (newRootKeys[k]) {
+				const fc = rootTargets.get(k);
+				fc.set('options', newRootKeys[k].options);
+				this.setEditorStyle(fc.get('options').get('_defaultStyles'), fc);
+				continue;
+			}
+
 			options.set(k, newMap.get(k));
+
+			/** apply option */
+			// history delay time
+			if (k === 'historyStackDelayTime') {
+				this.history.resetDelayTime(options.get('historyStackDelayTime'));
+				continue;
+			}
+			// wisywig attributes
+			if (k === 'frameAttrbutes') {
+				const attr = options.get('frameAttrbutes');
+				this.applyRootTargets(function (e) {
+					for (let k in attr) {
+						e.get('wysiwyg').setAttribute(k, attr[k]);
+					}
+				});
+				continue;
+			}
+			// set dir
+			if (k === 'textDirection') {
+				this.setDir(options.get('_rtl') ? 'ltr' : 'rtl');
+				continue;
+			}
+
+			if (rootKeys.indexOf(k) > -1) {
+				const frameOptions = this.rootTargets.get(k).get('options');
+				InitFrameOptions;
+				frameOptions.set();
+				continue;
+			}
 		}
 
-		/** options that must be applied separately */
-		// history delay time
-		if (newKeys.indexOf(RO_HISTORY) > -1) {
-			this.history.resetDelayTime(options.get(RO_HISTORY));
-		}
-
-		// wisywig attributes
-		if (newKeys.indexOf(RO_WWATTR) > -1) {
-			const attr = options.get(RO_WWATTR);
-			this.applyRootTargets(function (e) {
-				for (let k in attr) {
-					e.get('wysiwyg').setAttribute(k, attr[k]);
-				}
-			});
-		}
-
-		// set dir
-		if (newKeys.indexOf(RO_DIR) > -1) {
-			this.setDir(options.get('_rtl') ? 'ltr' : 'rtl');
-		}
-
+		/** apply options */
 		// toolbar
-		if (
-			newKeys.some(function (k) {
-				ROS_TOOLBAR.indexOf(k) > -1;
-			})
-		) {
-			const toolbar = this.context.get('toolbar.main');
-			// width
-			if (/inline|balloon/i.test(options.get('mode'))) {
-				toolbar.style.width = options.get('toolbar_width');
-			}
-			// hide
-			if (options.get('toolbar_hide')) {
-				toolbar.style.display = 'none';
-			}
-			// shortcuts hint
-			if (options.get('shortcutsHint')) {
-				domUtils.removeClass(toolbar, 'se-shortcut-hide');
-			} else {
-				domUtils.addClass(toolbar, 'se-shortcut-hide');
-			}
+		const toolbar = this.context.get('toolbar.main');
+		// width
+		if (/inline|balloon/i.test(options.get('mode')) && newKeys.indexOf('toolbar_width') > -1) {
+			toolbar.style.width = options.get('toolbar_width');
+		}
+		// hide
+		if (options.get('toolbar_hide')) {
+			toolbar.style.display = 'none';
+		}
+		// shortcuts hint
+		if (options.get('shortcutsHint')) {
+			domUtils.removeClass(toolbar, 'se-shortcut-hide');
+		} else {
+			domUtils.addClass(toolbar, 'se-shortcut-hide');
 		}
 
 		// iframe
 		if (options.get('iframe')) {
-			if (newKeys.indexOf(RO_IFRAME_CSS) > -1) {
+			if (newKeys.indexOf('iframe_cssFileName') > -1) {
 				converter._setIframeCssTags(options.get('iframe_cssFileName'), frameHeight);
 			}
-			if (newKeys.indexOf(RO_IFRAME_ATTR) > -1) {
+			if (newKeys.indexOf('iframe_attributes') > -1) {
 				const frameAttrs = options.get('iframe_attributes');
 				for (let key in frameAttrs) {
 					wysiwygDiv.setAttribute(key, frameAttrs[key]);
@@ -757,20 +771,23 @@ Editor.prototype = {
 	 * Define the style of the edit area
 	 * It can also be defined with the "setOptions" method, but the "setEditorStyle" method does not render the editor again.
 	 * @param {string} style Style string
+	 * @param {FrameContext|null} fc Frame context
 	 */
-	setEditorStyle: function (style) {
-		const newStyles = converter._setDefaultOptionStyle(this.frameOptions, style);
-		this.frameOptions.set('_defaultStyles', newStyles);
-		const fc = this.frameContext;
+	setEditorStyle: function (style, fc) {
+		fc = fc || this.frameContext;
+		const fo = fc.get('options');
+
+		const newStyles = converter._setDefaultOptionStyle(fo, style);
+		fo.set('_defaultStyles', newStyles);
 
 		// top area
 		fc.get('topArea').style.cssText = newStyles.top;
 
 		// code view
 		const code = fc.get('code');
-		code.style.cssText = this.frameOptions.get('_defaultStyles').frame;
+		code.style.cssText = fo.get('_defaultStyles').frame;
 		code.style.display = 'none';
-		if (this.frameOptions.get('height') === 'auto') {
+		if (fo.get('height') === 'auto') {
 			code.style.overflow = 'hidden';
 		} else {
 			code.style.overflow = '';
@@ -947,7 +964,7 @@ Editor.prototype = {
 	/** ----- private methods ----------------------------------------------------------------------------------------------------------------------------- */
 	/**
 	 * @description Set frameContext, frameOptions
-	 * @param {rootTarget} rt
+	 * @param {rootTarget} rt Root target
 	 */
 	_setFrameInfo: function (rt) {
 		this.frameContext = rt;
@@ -1101,18 +1118,31 @@ Editor.prototype = {
 		this.char = new Char(this);
 		this.viewer = new Viewer(this);
 
-		// register classes to the eventManager and main classes
+		// register classes to the eventManager
 		ClassInjector.call(this.eventManager, this);
-		ClassInjector.call(this.toolbar, this);
-		if (this.options.has('_subMode')) ClassInjector.call(this.subToolbar, this);
-		ClassInjector.call(this.selection, this);
-		ClassInjector.call(this.html, this);
-		ClassInjector.call(this.node, this);
-		ClassInjector.call(this.format, this);
-		ClassInjector.call(this.component, this);
-		ClassInjector.call(this.menu, this);
+		// register main classes
 		ClassInjector.call(this.char, this);
+		ClassInjector.call(this.component, this);
+		ClassInjector.call(this.format, this);
+		ClassInjector.call(this.html, this);
+		ClassInjector.call(this.menu, this);
+		ClassInjector.call(this.node, this);
+		ClassInjector.call(this.selection, this);
+		ClassInjector.call(this.toolbar, this);
 		ClassInjector.call(this.viewer, this);
+		if (this.options.has('_subMode')) ClassInjector.call(this.subToolbar, this);
+
+		// delete self reference
+		delete this.char.char;
+		delete this.component.component;
+		delete this.format.format;
+		delete this.html.html;
+		delete this.menu.menu;
+		delete this.node.node;
+		delete this.selection.selection;
+		delete this.toolbar.toolbar;
+		delete this.viewer.viewer;
+		if (this.subToolbar) delete this.subToolbar.subToolbar;
 
 		this._responsiveButtons = this._responsiveButtons_res = null;
 	},
