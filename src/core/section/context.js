@@ -27,23 +27,32 @@ export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFram
 		['lineBreaker_b', top.querySelector('.se-line-breaker-component-b')],
 		['_stickyDummy', top.querySelector('.se-toolbar-sticky-dummy')],
 		['_toolbarShadow', top.querySelector('.se-toolbar-shadow')],
-		['_minHeight', getNumber(wwFrame.style.minHeight || '65', 0)]
+		['_minHeight', getNumber(wwFrame.style.minHeight || '65', 0)],
+		['isCodeView', false],
+		['isFullScreen', false]
 	]);
 
-	if (statusbar) {
-		m.set('statusbar', statusbar);
-		const navigation = statusbar.querySelector('.se-navigation');
-		const charWrapper = statusbar.querySelector('.se-char-counter-wrapper');
-		const charCounter = statusbar.querySelector('.se-char-counter-wrapper .se-char-counter');
-		if (navigation) m.set('navigation', navigation);
-		if (charWrapper) m.set('charWrapper', charWrapper);
-		if (charCounter) m.set('charCounter', charCounter);
-	}
+	if (statusbar) UpdateStatusbarContext(statusbar, m);
 
 	const placeholder = top.querySelector('.se-placeholder');
 	if (placeholder) m.set('placeholder', placeholder);
 
 	return m;
+};
+
+/**
+ * @description Update statusbar context
+ * @param {Element} statusbar Statusbar element
+ * @param {FrameContext} mapper FrameContext map
+ */
+export const UpdateStatusbarContext = function (statusbar, mapper) {
+	statusbar ? mapper.set('statusbar', statusbar) : mapper.delete('statusbar');
+	const navigation = statusbar ? statusbar.querySelector('.se-navigation') : null;
+	const charWrapper = statusbar ? statusbar.querySelector('.se-char-counter-wrapper') : null;
+	const charCounter = statusbar ? statusbar.querySelector('.se-char-counter-wrapper .se-char-counter') : null;
+	navigation ? mapper.set('navigation', navigation) : mapper.delete('navigation');
+	charWrapper ? mapper.set('charWrapper', charWrapper) : mapper.delete('charWrapper');
+	charCounter ? mapper.set('charCounter', charCounter) : mapper.delete('charCounter');
 };
 
 /**
@@ -70,7 +79,7 @@ export const CreateContext = function (toolbar, toolbarContainer, menuTray, subb
 	}
 
 	if (toolbarContainer) {
-		m.set('toolbar._wrapper', statusbarContainer.querySelector('.sun-editor'));
+		m.set('toolbar._wrapper', toolbarContainer.querySelector('.sun-editor'));
 		m.set('_stickyDummy', toolbarContainer.querySelector('.se-toolbar-sticky-dummy'));
 	}
 

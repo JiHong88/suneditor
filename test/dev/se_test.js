@@ -322,8 +322,12 @@ window.c = () => {
 				options: {
 					value: '<p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p>',
 					placeholder: 'place1',
-					height: 500,
-					width: '200px'
+					height: 'auto',
+					width: '200px',
+					iframe: true,
+					iframe_fullPage: true,
+					statusbar: true,
+					statusbar_resizeEnable: true
 				}
 			},
 			editor2: {
@@ -356,7 +360,7 @@ window.c = () => {
 			// editorStyle: 'font-size:40px',
 			plugins: plugins,
 			toolbar_container: '#root_toolbar_container',
-			statusbar_container: '#root_statusbar_container',
+			// statusbar_container: '#root_statusbar_container',
 			// shortcutsHint: false,
 			// codeMirror: {
 			// 	EditorView: EditorView,
@@ -373,7 +377,7 @@ window.c = () => {
 			// codeMirror: {
 			// 	src: Codemirror5
 			// },
-			// iframe:true,
+			iframe:true,
 			defaultLine: 'div',
 			toolbar_sticky: 0,
 			lineAttrReset: 'id',
@@ -412,8 +416,16 @@ window.c = () => {
 	);
 }
 
+window.r = () => {
+	window.editor_root.resetOptions({
+		editor1: {
+			statusbar_resizeEnable: false
+		}
+	})
+}
+
 window.d = () => {
-	window.editor_root = window.editor_root.destroy()
+	// window.editor_root = window.editor_root.destroy()
 }
 
 c()

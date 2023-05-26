@@ -32,9 +32,7 @@ const Audio_ = function (editor, pluginOptions) {
 	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
 	this.fileManager = new FileManager(this, {
 		tagNames: ['audio'],
-		eventHandler: function (element, dataIndex, state, info, uploadFilesLeft) {
-			this.events.onAudioUpload(element, dataIndex, state, info, uploadFilesLeft);
-		}.bind(this),
+		eventHandler: typeof this.events.onAudioUpload !== 'function' ? this.events.onAudioUpload : null,
 		checkHandler: FileCheckHandler.bind(this),
 		figure: null
 	});

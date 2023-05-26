@@ -61,9 +61,7 @@ const Video = function (editor, pluginOptions) {
 	this.figure = new Figure(this, figureControls, { sizeUnit: sizeUnit, autoRatio: { current: defaultRatio, default: defaultRatio } });
 	this.fileManager = new FileManager(this, {
 		tagNames: ['iframe', 'video'],
-		eventHandler: function (element, dataIndex, state, info, uploadFilesLeft) {
-			this.events.onVideoUpload(element, dataIndex, state, info, uploadFilesLeft);
-		}.bind(this),
+		eventHandler: typeof this.events.onVideoUpload !== 'function' ? this.events.onVideoUpload : null,
 		checkHandler: FileCheckHandler.bind(this),
 		figure: this.figure
 	});

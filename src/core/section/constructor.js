@@ -27,6 +27,7 @@ const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 
 export const RO_UNAVAILABD = [
 	'mode',
+	'iframe',
 	'textTags',
 	'fontSizeUnit',
 	'spanStyles',
@@ -38,7 +39,6 @@ export const RO_UNAVAILABD = [
 	'subToolbar',
 	'toolbar_container',
 	'statusbar_container',
-	'iframe',
 	'elementWhitelist',
 	'elementBlacklist',
 	'attributeWhitelist',
@@ -56,7 +56,6 @@ export const RO_UNAVAILABD = [
 	'lang',
 	'codeMirror'
 ];
-export const RO_ROOT_UNAVAILABD = [];
 
 /**
  * @description document create
@@ -358,7 +357,6 @@ export function InitOptions(options, editorTargets) {
 
 	// etc
 	o.set('historyStackDelayTime', typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400);
-	o.set('frameAttrbutes', options.frameAttrbutes || {});
 	o.set('_editableClass', 'sun-editor-editable' + (o.get('_rtl') ? ' se-rtl' : ''));
 	o.set('lineAttrReset', ['id'].concat(options.lineAttrReset && typeof options.lineAttrReset === 'string' ? options.lineAttrReset.toLowerCase().split('|') : []));
 	o.set('printClass', typeof options.printClass === 'string' ? options.printClass : null);
@@ -462,15 +460,6 @@ export function InitOptions(options, editorTargets) {
 		InitFrameOptions(editorTargets[i].options || {}, options, (editorTargets[i].options = new _w.Map()));
 	}
 
-	/** IFrame */
-	o.set('iframe', !!options.iframe_fullPage || !!options.iframe);
-	o.set('iframe_fullPage', !!options.iframe_fullPage);
-	o.set('iframe_attributes', options.iframe_attributes || {});
-	o.set(
-		'iframe_cssFileName',
-		options.iframe ? (typeof options.iframe_cssFileName === 'string' ? [options.iframe_cssFileName] : options.iframe_cssFileName || ['suneditor']) : null
-	);
-
 	/** Key actions */
 	o.set('tabDisable', !!options.tabDisable);
 	o.set('shortcutsHint', options.shortcutsHint === undefined ? true : !!options.shortcutsHint);
@@ -551,6 +540,50 @@ export function InitOptions(options, editorTargets) {
 	};
 }
 
+export function CreateStatusbar(targetOptions, statusbar) {
+	let navigation = null;
+	let charWrapper = null;
+	let charCounter = null;
+
+	if (targetOptions.get('statusbar')) {
+		statusbar = statusbar || domUtils.createElement('DIV', { class: 'se-status-bar sun-editor-common' });
+
+		/** navigation */
+		navigation = statusbar.querySelector('.se-navigation') || domUtils.createElement('DIV', { class: 'se-navigation sun-editor-common' });
+		statusbar.appendChild(navigation);
+
+		/** char counter */
+		if (targetOptions.get('charCounter')) {
+			charWrapper = statusbar.querySelector('.se-char-counter-wrapper') || domUtils.createElement('DIV', { class: 'se-char-counter-wrapper' });
+
+			if (targetOptions.get('charCounter_label')) {
+				const charLabel = charWrapper.querySelector('.se-char-label') || domUtils.createElement('SPAN', { class: 'se-char-label' });
+				charLabel.textContent = targetOptions.get('charCounter_label');
+				charWrapper.appendChild(charLabel);
+			}
+
+			charCounter = charWrapper.querySelector('.se-char-counter') || domUtils.createElement('SPAN', { class: 'se-char-counter' });
+			charCounter.textContent = '0';
+			charWrapper.appendChild(charCounter);
+
+			if (targetOptions.get('charCounter_max') > 0) {
+				const char_max = charWrapper.querySelector('.se-char-max') || domUtils.createElement('SPAN', { class: 'se-char-max' });
+				char_max.textContent = ' / ' + targetOptions.get('charCounter_max');
+				charWrapper.appendChild(char_max);
+			}
+
+			statusbar.appendChild(charWrapper);
+		}
+	}
+
+	return {
+		statusbar: statusbar,
+		navigation: navigation,
+		charWrapper: charWrapper,
+		charCounter: charCounter
+	};
+}
+
 function InitFrameOptions(o, origin, fo) {
 	fo.set('_origin', o);
 	const barContainer = origin.statusbar_container;
@@ -558,6 +591,7 @@ function InitFrameOptions(o, origin, fo) {
 	// members
 	const value = o.value === undefined ? origin.value : o.value;
 	const placeholder = o.placeholder === undefined ? origin.placeholder : o.placeholder;
+	const editableFrameAttributes = o.editableFrameAttributes === undefined ? origin.editableFrameAttributes : o.editableFrameAttributes;
 	const width = o.width === undefined ? origin.width : o.width;
 	const minWidth = o.minWidth === undefined ? origin.minWidth : o.minWidth;
 	const maxWidth = o.maxWidth === undefined ? origin.maxWidth : o.maxWidth;
@@ -565,6 +599,10 @@ function InitFrameOptions(o, origin, fo) {
 	const minHeight = o.minHeight === undefined ? origin.minHeight : o.minHeight;
 	const maxHeight = o.maxHeight === undefined ? origin.maxHeight : o.maxHeight;
 	const editorStyle = o.editorStyle === undefined ? origin.editorStyle : o.editorStyle;
+	const iframe = o.iframe === undefined ? origin.iframe : o.iframe;
+	const iframe_fullPage = o.iframe_fullPage === undefined ? origin.iframe_fullPage : o.iframe_fullPage;
+	const iframe_attributes = o.iframe_attributes === undefined ? origin.iframe_attributes : o.iframe_attributes;
+	const iframe_cssFileName = o.iframe_cssFileName === undefined ? origin.iframe_cssFileName : o.iframe_cssFileName;
 	const statusbar = barContainer || o.statusbar === undefined ? origin.statusbar : o.statusbar;
 	const statusbar_showPathLabel = barContainer || o.statusbar_showPathLabel === undefined ? origin.statusbar_showPathLabel : o.statusbar_showPathLabel;
 	const statusbar_resizeEnable = barContainer ? false : o.statusbar_resizeEnable === undefined ? origin.statusbar_resizeEnable : o.statusbar_resizeEnable;
@@ -576,6 +614,7 @@ function InitFrameOptions(o, origin, fo) {
 	// value
 	fo.set('value', value);
 	fo.set('placeholder', placeholder);
+	fo.set('editableFrameAttributes', editableFrameAttributes || {});
 	// styles
 	fo.set('width', width ? (numbers.is(width) ? width + 'px' : width) : '100%');
 	fo.set('minWidth', (numbers.is(minWidth) ? minWidth + 'px' : minWidth) || '');
@@ -584,8 +623,13 @@ function InitFrameOptions(o, origin, fo) {
 	fo.set('minHeight', (numbers.is(minHeight) ? minHeight + 'px' : minHeight) || '');
 	fo.set('maxHeight', (numbers.is(maxHeight) ? maxHeight + 'px' : maxHeight) || '');
 	fo.set('_defaultStyles', converter._setDefaultOptionStyle(fo, typeof editorStyle === 'string' ? editorStyle : ''));
+	// iframe
+	fo.set('iframe', !!(iframe_fullPage || iframe));
+	fo.set('iframe_fullPage', !!iframe_fullPage);
+	fo.set('iframe_attributes', iframe_attributes || {});
+	fo.set('iframe_cssFileName', iframe ? (typeof iframe_cssFileName === 'string' ? [iframe_cssFileName] : iframe_cssFileName || ['suneditor']) : null);
 	// status bar
-	const hasStatusbar = statusbar === undefined ? true : statusbar;
+	const hasStatusbar = statusbar === undefined ? true : !!statusbar;
 	fo.set('statusbar', hasStatusbar);
 	fo.set('statusbar_showPathLabel', !hasStatusbar ? false : typeof statusbar_showPathLabel === 'boolean' ? statusbar_showPathLabel : true);
 	fo.set('statusbar_resizeEnable', !hasStatusbar ? false : statusbar_resizeEnable === undefined ? true : !!statusbar_resizeEnable);
@@ -610,21 +654,21 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 
 	/** editor */
 	// wysiwyg div or iframe
-	const wysiwygDiv = domUtils.createElement(!options.get('iframe') ? 'DIV' : 'IFRAME', {
+	const wysiwygDiv = domUtils.createElement(!targetOptions.get('iframe') ? 'DIV' : 'IFRAME', {
 		class: 'se-wrapper-inner se-wrapper-wysiwyg',
 		'data-root-key': key
 	});
 
-	if (!options.get('iframe')) {
+	if (!targetOptions.get('iframe')) {
 		wysiwygDiv.setAttribute('contenteditable', true);
 		wysiwygDiv.setAttribute('scrolling', 'auto');
-		const frameAttrs = options.get('iframe_attributes');
-		for (let key in frameAttrs) {
-			wysiwygDiv.setAttribute(key, frameAttrs[key]);
-		}
 		wysiwygDiv.className += ' ' + options.get('_editableClass');
 		wysiwygDiv.style.cssText = editorStyles.frame + editorStyles.editor;
 	} else {
+		const frameAttrs = targetOptions.get('iframe_attributes');
+		for (let key in frameAttrs) {
+			wysiwygDiv.setAttribute(key, frameAttrs[key]);
+		}
 		wysiwygDiv.allowFullscreen = true;
 		wysiwygDiv.frameBorder = 0;
 		wysiwygDiv.style.cssText = editorStyles.frame;
@@ -636,42 +680,6 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 	textarea.style.setProperty('display', 'none', 'important');
 	if (targetOptions.get('height') === 'auto') textarea.style.overflow = 'hidden';
 
-	/** status bar */
-	let statusbar = null;
-	let navigation = null;
-	let charWrapper = null;
-	let charCounter = null;
-	if (targetOptions.get('statusbar')) {
-		statusbar = domUtils.createElement('DIV', { class: 'se-status-bar sun-editor-common' });
-
-		/** navigation */
-		navigation = domUtils.createElement('DIV', { class: 'se-navigation sun-editor-common' });
-		statusbar.appendChild(navigation);
-
-		/** char counter */
-		if (targetOptions.get('charCounter')) {
-			charWrapper = domUtils.createElement('DIV', { class: 'se-char-counter-wrapper' });
-
-			if (targetOptions.get('charCounter_label')) {
-				const charLabel = domUtils.createElement('SPAN', { class: 'se-char-label' });
-				charLabel.textContent = targetOptions.get('charCounter_label');
-				charWrapper.appendChild(charLabel);
-			}
-
-			charCounter = domUtils.createElement('SPAN', { class: 'se-char-counter' });
-			charCounter.textContent = '0';
-			charWrapper.appendChild(charCounter);
-
-			if (targetOptions.get('charCounter_max') > 0) {
-				const char_max = domUtils.createElement('SPAN');
-				char_max.textContent = ' / ' + targetOptions.get('charCounter_max');
-				charWrapper.appendChild(char_max);
-			}
-
-			statusbar.appendChild(charWrapper);
-		}
-	}
-
 	let placeholder = null;
 	if (targetOptions.get('placeholder')) {
 		placeholder = domUtils.createElement('SPAN', { class: 'se-placeholder' });
@@ -679,12 +687,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 	}
 
 	return {
-		bottomBar: {
-			statusbar: statusbar,
-			navigation: navigation,
-			charWrapper: charWrapper,
-			charCounter: charCounter
-		},
+		bottomBar: CreateStatusbar(targetOptions, null),
 		wysiwygFrame: wysiwygDiv,
 		codeView: textarea,
 		placeholder: placeholder

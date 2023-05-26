@@ -376,7 +376,7 @@ textTags        : You can change the tag of the default text button.   default: 
 value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {string}
 historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {number}
-frameAttrbutes  : Specifies the properties of the editing area DIV.     default: {} {Object}
+editableFrameAttributes  : Specifies the properties of the editing area DIV.     default: {} {Object}
                   ex)  {
                     "spellcheck": false
                   }

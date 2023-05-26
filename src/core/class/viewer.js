@@ -30,7 +30,7 @@ Viewer.prototype = {
 	codeView: function (value) {
 		const fc = this.editor.frameContext;
 		if (value === undefined) value = !fc.get('isCodeView');
-		if (value === !!fc.get('isCodeView')) return;
+		if (value === fc.get('isCodeView')) return;
 
 		fc.set('isCodeView', value);
 		this.editor._offCurrentController();
@@ -113,7 +113,7 @@ Viewer.prototype = {
 	fullScreen: function (value) {
 		const fc = this.editor.frameContext;
 		if (value === undefined) value = !fc.get('isFullScreen');
-		if (value === !!fc.get('isFullScreen')) return;
+		if (value === fc.get('isFullScreen')) return;
 
 		fc.set('isFullScreen', value);
 		const topArea = fc.get('topArea');
@@ -179,7 +179,7 @@ Viewer.prototype = {
 			this.fullScreenInnerHeight = this._w.innerHeight - toolbar.offsetHeight;
 			editorArea.style.height = this.fullScreenInnerHeight - (fc.has('statusbar') ? fc.get('statusbar').offsetHeight : 0) - this.options.get('fullScreenOffset') + 'px';
 
-			if (this.options.get('iframe') && this.editor.frameOptions.get('height') === 'auto') {
+			if (this.editor.frameOptions.get('iframe') && this.editor.frameOptions.get('height') === 'auto') {
 				editorArea.style.overflow = 'auto';
 				this.editor._iframeAutoHeight(fc);
 			}
@@ -231,6 +231,7 @@ Viewer.prototype = {
 			const expansionIcon = this.icons.expansion;
 			this.editor.applyCommandTargets('fullScreen', function (e) {
 				domUtils.changeElement(e.firstElementChild, expansionIcon);
+				fc;
 				domUtils.removeClass(e, 'active');
 			});
 		}
@@ -246,18 +247,19 @@ Viewer.prototype = {
 	 * @param {boolean|undefined} value true/false, If undefined toggle the codeView mode.
 	 */
 	showBlocks: function (value) {
-		if (value === undefined) value = !this.editor.frameContext.get('isShowBlocks');
-		this.editor.frameContext.set('isShowBlocks', !!value);
+		const fc = this.editor.frameContext;
+		if (value === undefined) value = !fc.get('isShowBlocks');
+		fc.set('isShowBlocks', !!value);
 
 		if (value) {
-			domUtils.addClass(this.editor.frameContext.get('wysiwyg'), 'se-show-block');
+			domUtils.addClass(fc.get('wysiwyg'), 'se-show-block');
 			domUtils.addClass(this.editor.commandTargets.get('showBlocks'), 'active');
 		} else {
-			domUtils.removeClass(this.editor.frameContext.get('wysiwyg'), 'se-show-block');
+			domUtils.removeClass(fc.get('wysiwyg'), 'se-show-block');
 			domUtils.removeClass(this.editor.commandTargets.get('showBlocks'), 'active');
 		}
 
-		this.editor._resourcesStateChange();
+		this.editor._resourcesStateChange(fc);
 	},
 
 	/**
@@ -271,10 +273,10 @@ Viewer.prototype = {
 		const printDocument = domUtils.getIframeDocument(iframe);
 		const wDoc = this.editor.frameContext.get('_wd');
 
-		if (this.options.get('iframe')) {
+		if (this.editor.frameOptions.get('iframe')) {
 			const arrts = this.options.get('printClass')
 				? 'class="' + this.options.get('printClass') + '"'
-				: this.options.get('iframe_fullPage')
+				: this.editor.frameOptions.get('iframe_fullPage')
 				? domUtils.getAttributesToString(wDoc.body, ['contenteditable'])
 				: 'class="' + this.options.get('_editableClass') + '"';
 
@@ -343,10 +345,10 @@ Viewer.prototype = {
 		windowObject.mimeType = 'text/html';
 		const wDoc = this.editor.frameContext.get('_wd');
 
-		if (this.options.get('iframe')) {
+		if (this.editor.frameOptions.get('iframe')) {
 			const arrts = this.options.get('printClass')
 				? 'class="' + this.options.get('printClass') + '"'
-				: this.options.get('iframe_fullPage')
+				: this.editor.frameOptions.get('iframe_fullPage')
 				? domUtils.getAttributesToString(wDoc.body, ['contenteditable'])
 				: 'class="' + this.options.get('_editableClass') + '"';
 
@@ -477,7 +479,7 @@ Viewer.prototype = {
 	_setCodeDataToEditor: function () {
 		const code_html = this._getCodeView();
 
-		if (this.options.get('iframe_fullPage')) {
+		if (this.editor.frameOptions.get('iframe_fullPage')) {
 			const wDoc = this.editor.frameContext.get('_wd');
 			const parseDocument = this.editor._parser.parseFromString(code_html, 'text/html');
 			const headChildren = parseDocument.head.children;
@@ -491,7 +493,8 @@ Viewer.prototype = {
 
 			let headers = parseDocument.head.innerHTML;
 			if (!parseDocument.head.querySelector('link[rel="stylesheet"]') || (this.editor.frameOptions.get('height') === 'auto' && !parseDocument.head.querySelector('style'))) {
-				headers += converter._setIframeCssTags(this.options.get('iframe_cssFileName'), this.editor.frameOptions.get('height'));
+				headers +=
+					converter._setIframeStyleLinks(this.editor.frameOptions.get('iframe_cssFileName')) + converter._setAutoHeightStyle(this.editor.frameOptions.get('height'));
 			}
 
 			wDoc.head.innerHTML = headers;
@@ -522,7 +525,7 @@ Viewer.prototype = {
 		const codeContent = this.html._convertToCode(this.editor.frameContext.get('wysiwyg'), false);
 		let codeValue = '';
 
-		if (this.options.get('iframe_fullPage')) {
+		if (this.editor.frameOptions.get('iframe_fullPage')) {
 			const attrs = domUtils.getAttributesToString(this.editor.frameContext.get('_wd').body, null);
 			codeValue =
 				'<!DOCTYPE html>\n<html>\n' +

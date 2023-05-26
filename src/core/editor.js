@@ -1,5 +1,6 @@
 import { env, converter, domUtils, numbers } from '../helper';
-import Constructor, { InitOptions, UpdateButton, CreateShortcuts, RO_UNAVAILABD } from './section/constructor';
+import Constructor, { InitOptions, UpdateButton, CreateShortcuts, CreateStatusbar, RO_UNAVAILABD } from './section/constructor';
+import { UpdateStatusbarContext } from './section/context';
 import { BASIC_COMMANDS, ACTIVE_EVENT_COMMANDS, SELECT_ALL, DIR_BTN_ACTIVE, SAVE, FONT_STYLE } from './section/actives';
 import History from './base/history';
 import EventManager from './base/eventManager';
@@ -562,32 +563,36 @@ Editor.prototype = {
 	 * @param {Object} newOptions Options
 	 */
 	resetOptions: function (newOptions) {
+		const _keys = this._w.Object.keys;
 		this.viewer.codeView(false);
 		this.viewer.showBlocks(false);
 
-		const newKeys = this._w.Object.keys(newOptions);
-		for (let i = 0, len = newKeys.length; i < len; i++) {
-			if (RO_UNAVAILABD.indexOf(newKeys[i]) > -1) {
-				console.warn('[SUNEDITOR.fail.resetOptions] "It contains options not available in resetOptions."');
-				return;
-			}
-		}
+		const newKeys = _keys(newOptions);
+		CheckResetKeys(newKeys, this.plugins, '');
+		if (newKeys.length === 0) return;
 
 		// option merge
+		const rootDiff = {};
 		const rootKeys = this.rootKeys;
 		const rootTargets = this.rootTargets;
 		const newRoots = [];
 		const newRootKeys = {};
-		this._originOptions = [this._originOptions, newOptions].reduce(function (init, option) {
+		this._originOptions = [newOptions, this._originOptions].reduce(function (init, option) {
 			for (let key in option) {
 				if (rootKeys.indexOf(key) > -1 && option[key]) {
 					const nro = option[key];
-					const o = [rootTargets.get(key).get('options').get('_origin'), nro].reduce(function (ri, ro) {
-						for (let rk in ro) {
-							ri[rk] = ro[rk];
-						}
-						return ri;
-					}, {});
+					const newKeys = _keys(nro);
+					CheckResetKeys(newKeys, null, key + '.');
+					if (newKeys.length === 0) continue;
+
+					rootDiff[key] = new env._w.Map();
+					const o = rootTargets.get(key).get('options').get('_origin');
+					for (let rk in nro) {
+						const roV = nro[rk];
+						if (newKeys.indexOf(rk) === -1 || o[rk] === roV) continue;
+						rootDiff[key].set(GetResetDiffKey(rk), true);
+						o[rk] = roV;
+					}
 					newRoots.push((newRootKeys[key] = { options: o }));
 				} else {
 					init[key] = option[key];
@@ -601,12 +606,63 @@ Editor.prototype = {
 		const newMap = InitOptions(this._originOptions, newRoots).o;
 		for (let i = 0, len = newKeys.length, k; i < len; i++) {
 			k = newKeys[i];
+
+			/** --------- root start --------- */
 			if (newRootKeys[k]) {
+				const diff = rootDiff[k];
 				const fc = rootTargets.get(k);
-				fc.set('options', newRootKeys[k].options);
-				this.setEditorStyle(fc.get('options').get('_defaultStyles'), fc);
+				const originOptions = fc.get('options');
+				const newOptions = newRootKeys[k].options;
+
+				// statusbar
+				if (diff.has('statusbar')) {
+					domUtils.removeItem(fc.get('statusbar'));
+					if (newOptions.get('statusbar')) {
+						const statusbar = CreateStatusbar(newOptions, null).statusbar;
+						fc.get('container').appendChild(statusbar);
+						UpdateStatusbarContext(statusbar, fc);
+						this.eventManager.__addStatusbarEvent(fc, newOptions);
+					} else {
+						this.eventManager.removeEvent(originOptions.get('__statusbarEvent'));
+						newOptions.set('__statusbarEvent', null);
+						UpdateStatusbarContext(null, fc);
+					}
+				}
+
+				// iframe's options
+				if (diff.has('iframe_attributes')) {
+					const frame = fc.get('wysiwygFrame');
+					const originAttr = originOptions.get('iframe_attributes');
+					const newAttr = newOptions.get('iframe_attributes');
+					for (let k in originAttr) frame.removeAttribute(k, originAttr[k]);
+					for (let k in newAttr) frame.setAttribute(k, newAttr[k]);
+				}
+				if (diff.has('iframe_cssFileName')) {
+					const docHead = fc.get('_wd').head;
+					const links = docHead.getElementsByTagName('link');
+					while (links[0]) docHead.removeChild(links[0]);
+					const parseDocument = this._parser.parseFromString(converter._setIframeStyleLinks(newOptions.get('iframe_cssFileName')), 'text/html');
+					const newLinks = parseDocument.head.children;
+					const sTag = docHead.querySelector('style');
+					while (newLinks[0]) docHead.insertBefore(newLinks[0], sTag);
+				}
+
+				// --- options set ---
+				fc.set('options', newOptions);
+
+				// frame styles
+				this.setEditorStyle(newOptions.get('_defaultStyles'), fc);
+
+				// frame attributes
+				const frame = fc.get('wysiwyg');
+				const originAttr = originOptions.get('editableFrameAttributes');
+				const newAttr = newOptions.get('editableFrameAttributes');
+				for (let k in originAttr) frame.removeAttribute(k, originAttr[k]);
+				for (let k in newAttr) frame.setAttribute(k, newAttr[k]);
+
 				continue;
 			}
+			/** --------- root end --------- */
 
 			options.set(k, newMap.get(k));
 
@@ -616,26 +672,9 @@ Editor.prototype = {
 				this.history.resetDelayTime(options.get('historyStackDelayTime'));
 				continue;
 			}
-			// wisywig attributes
-			if (k === 'frameAttrbutes') {
-				const attr = options.get('frameAttrbutes');
-				this.applyRootTargets(function (e) {
-					for (let k in attr) {
-						e.get('wysiwyg').setAttribute(k, attr[k]);
-					}
-				});
-				continue;
-			}
 			// set dir
 			if (k === 'textDirection') {
 				this.setDir(options.get('_rtl') ? 'ltr' : 'rtl');
-				continue;
-			}
-
-			if (rootKeys.indexOf(k) > -1) {
-				const frameOptions = this.rootTargets.get(k).get('options');
-				InitFrameOptions;
-				frameOptions.set();
 				continue;
 			}
 		}
@@ -658,18 +697,8 @@ Editor.prototype = {
 			domUtils.addClass(toolbar, 'se-shortcut-hide');
 		}
 
-		// iframe
-		if (options.get('iframe')) {
-			if (newKeys.indexOf('iframe_cssFileName') > -1) {
-				converter._setIframeCssTags(options.get('iframe_cssFileName'), frameHeight);
-			}
-			if (newKeys.indexOf('iframe_attributes') > -1) {
-				const frameAttrs = options.get('iframe_attributes');
-				for (let key in frameAttrs) {
-					wysiwygDiv.setAttribute(key, frameAttrs[key]);
-				}
-			}
-		}
+		this.effectNode = null;
+		this._setFrameInfo(this.rootTargets.get(this.status.rootKey));
 	},
 
 	/**
@@ -700,10 +729,10 @@ Editor.prototype = {
 	 * @param {number|undefined} rootKey Root index
 	 */
 	focus: function (rootKey) {
-		if (numbers.is(rootKey)) this.changeFrameContext(rootKey);
+		if (rootKey) this.changeFrameContext(rootKey);
 		if (this.frameContext.get('wysiwygFrame').style.display === 'none') return;
 
-		if (this.options.get('iframe') || !this.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
+		if (this.frameOptions.get('iframe') || !this.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
 			this._nativeFocus();
 		} else {
 			try {
@@ -759,7 +788,7 @@ Editor.prototype = {
 	 * @description Focusout to wysiwyg area (.blur())
 	 */
 	blur: function () {
-		if (this.options.get('iframe')) {
+		if (this.frameOptions.get('iframe')) {
 			this.frameContext.get('wysiwygFrame').blur();
 		} else {
 			this.frameContext.get('wysiwyg').blur();
@@ -794,7 +823,7 @@ Editor.prototype = {
 		}
 
 		// wysiwyg frame
-		if (!this.options.get('iframe')) {
+		if (!fo.get('iframe')) {
 			fc.get('wysiwygFrame').style.cssText = newStyles.frame + newStyles.editor;
 		} else {
 			fc.get('wysiwygFrame').style.cssText = newStyles.frame;
@@ -1048,105 +1077,6 @@ Editor.prototype = {
 		}
 	},
 
-	_setEditorParams: function (e) {
-		const options = this.options;
-		const frameOptions = e.get('options');
-		const _w = this._w;
-
-		e.set('wwComputedStyle', _w.getComputedStyle(e.get('wysiwyg')));
-
-		if (!options.get('iframe') && typeof _w.ShadowRoot === 'function') {
-			let child = e.get('wysiwygFrame');
-			while (child) {
-				if (child.shadowRoot) {
-					this._shadowRoot = child.shadowRoot;
-					break;
-				} else if (child instanceof _w.ShadowRoot) {
-					this._shadowRoot = child;
-					break;
-				}
-				child = child.parentNode;
-			}
-		}
-
-		// wisywig attributes
-		const attr = options.get('frameAttrbutes');
-		for (let k in attr) {
-			e.get('wysiwyg').setAttribute(k, attr[k]);
-		}
-
-		// init, validate
-		e.set('_ww', options.get('iframe') ? e.get('wysiwygFrame').contentWindow : _w);
-		if (options.get('iframe')) {
-			e.set('_wd', e.get('wysiwygFrame').contentDocument);
-			e.set('wysiwyg', e.get('_wd').body);
-			if (frameOptions.get('_defaultStyles').editor) e.get('wysiwyg').style.cssText = frameOptions.get('_defaultStyles').editor;
-			if (frameOptions.get('height') === 'auto') this._iframeAuto = e.get('_wd').body;
-		} else {
-			e.set('_wd', this._d);
-		}
-	},
-
-	_registerClass: function () {
-		// use events, history function
-		this.events = Events();
-		this.history = History(this, this._onChange_historyStack.bind(this));
-
-		// eventManager
-		this.eventManager = new EventManager(this);
-
-		// util classes
-		this.offset = new Offset(this);
-		this.shortcuts = new Shortcuts(this);
-		this.notice = new Notice(this);
-		// main classes
-		this.toolbar = new Toolbar(this, { keyName: 'toolbar', balloon: this.isBalloon, balloonAlways: this.isBalloonAlways, inline: this.isInline, res: this._responsiveButtons });
-		if (this.options.has('_subMode'))
-			this.subToolbar = new Toolbar(this, {
-				keyName: 'toolbar.sub',
-				balloon: this.isSubBalloon,
-				balloonAlways: this.isSubBalloonAlways,
-				inline: false,
-				res: this._responsiveButtons_sub
-			});
-		this.selection = new Selection(this);
-		this.html = new HTML(this);
-		this.node = new Node_(this);
-		this.component = new Component(this);
-		this.format = new Format(this);
-		this.menu = new Menu(this);
-		this.char = new Char(this);
-		this.viewer = new Viewer(this);
-
-		// register classes to the eventManager
-		ClassInjector.call(this.eventManager, this);
-		// register main classes
-		ClassInjector.call(this.char, this);
-		ClassInjector.call(this.component, this);
-		ClassInjector.call(this.format, this);
-		ClassInjector.call(this.html, this);
-		ClassInjector.call(this.menu, this);
-		ClassInjector.call(this.node, this);
-		ClassInjector.call(this.selection, this);
-		ClassInjector.call(this.toolbar, this);
-		ClassInjector.call(this.viewer, this);
-		if (this.options.has('_subMode')) ClassInjector.call(this.subToolbar, this);
-
-		// delete self reference
-		delete this.char.char;
-		delete this.component.component;
-		delete this.format.format;
-		delete this.html.html;
-		delete this.menu.menu;
-		delete this.node.node;
-		delete this.selection.selection;
-		delete this.toolbar.toolbar;
-		delete this.viewer.viewer;
-		if (this.subToolbar) delete this.subToolbar.subToolbar;
-
-		this._responsiveButtons = this._responsiveButtons_res = null;
-	},
-
 	/**
 	 * @description Recover the current buttons states from "allCommandButtons" map
 	 * @private
@@ -1190,18 +1120,19 @@ Editor.prototype = {
 	 * @private
 	 */
 	_iframeAutoHeight: function (fc) {
-		if (this._iframeAuto) {
+		const autoFrame = fc.get('_iframeAuto');
+		if (autoFrame) {
 			this._w.setTimeout(
 				function () {
-					fc.get('wysiwygFrame').style.height = this._iframeAuto.offsetHeight + 'px';
+					fc.get('wysiwygFrame').style.height = autoFrame.offsetHeight + 'px';
 				}.bind(this)
 			);
 		}
 
-		if (this._iframeAuto) {
+		if (autoFrame) {
 			this._w.setTimeout(
 				function () {
-					const h = this._iframeAuto.offsetHeight;
+					const h = autoFrame.offsetHeight;
 					fc.get('wysiwygFrame').style.height = h + 'px';
 					if (!env.isResizeObserverSupported) this.__callResizeFunction(fc, h, null);
 				}.bind(this)
@@ -1276,7 +1207,7 @@ Editor.prototype = {
 	__editorInit: function (options) {
 		this.applyRootTargets(
 			function (e) {
-				this._setEditorParams(e);
+				this.__setEditorParams(e);
 				this._initWysiwygArea(e, e.get('options').get('value'));
 				this.eventManager._addFrameEvents(e);
 			}.bind(this)
@@ -1449,13 +1380,113 @@ Editor.prototype = {
 		}
 	},
 
-	__setIframeDocument(frame, originOptions, frameHeight) {
+	__setIframeDocument(frame, originOptions, targetOptions) {
 		frame.setAttribute('scrolling', 'auto');
 		frame.contentDocument.head.innerHTML =
 			'<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' +
-			converter._setIframeCssTags(originOptions.get('iframe_cssFileName'), frameHeight);
+			converter._setIframeStyleLinks(targetOptions.get('iframe_cssFileName')) +
+			converter._setAutoHeightStyle(targetOptions.get('height'));
 		frame.contentDocument.body.className = originOptions.get('_editableClass');
 		frame.contentDocument.body.setAttribute('contenteditable', true);
+	},
+
+	__setEditorParams: function (e) {
+		const frameOptions = e.get('options');
+		const _w = this._w;
+
+		e.set('wwComputedStyle', _w.getComputedStyle(e.get('wysiwyg')));
+
+		if (!frameOptions.get('iframe') && typeof _w.ShadowRoot === 'function') {
+			let child = e.get('wysiwygFrame');
+			while (child) {
+				if (child.shadowRoot) {
+					this._shadowRoot = child.shadowRoot;
+					break;
+				} else if (child instanceof _w.ShadowRoot) {
+					this._shadowRoot = child;
+					break;
+				}
+				child = child.parentNode;
+			}
+		}
+
+		// wisywig attributes
+		const attr = frameOptions.get('editableFrameAttributes');
+		for (let k in attr) {
+			e.get('wysiwyg').setAttribute(k, attr[k]);
+		}
+
+		// init, validate
+		e.set('_ww', frameOptions.get('iframe') ? e.get('wysiwygFrame').contentWindow : _w);
+		if (frameOptions.get('iframe')) {
+			e.set('_wd', e.get('wysiwygFrame').contentDocument);
+			e.set('wysiwyg', e.get('_wd').body);
+			// e.get('wysiwyg').className += ' ' + options.get('_editableClass');
+			if (frameOptions.get('_defaultStyles').editor) e.get('wysiwyg').style.cssText = frameOptions.get('_defaultStyles').editor;
+			if (frameOptions.get('height') === 'auto') e.set('_iframeAuto', e.get('_wd').body);
+		} else {
+			e.set('_wd', this._d);
+		}
+	},
+
+	__registerClass: function () {
+		// use events, history function
+		this.events = Events();
+		this.history = History(this, this._onChange_historyStack.bind(this));
+
+		// eventManager
+		this.eventManager = new EventManager(this);
+
+		// util classes
+		this.offset = new Offset(this);
+		this.shortcuts = new Shortcuts(this);
+		this.notice = new Notice(this);
+		// main classes
+		this.toolbar = new Toolbar(this, { keyName: 'toolbar', balloon: this.isBalloon, balloonAlways: this.isBalloonAlways, inline: this.isInline, res: this._responsiveButtons });
+		if (this.options.has('_subMode'))
+			this.subToolbar = new Toolbar(this, {
+				keyName: 'toolbar.sub',
+				balloon: this.isSubBalloon,
+				balloonAlways: this.isSubBalloonAlways,
+				inline: false,
+				res: this._responsiveButtons_sub
+			});
+		this.selection = new Selection(this);
+		this.html = new HTML(this);
+		this.node = new Node_(this);
+		this.component = new Component(this);
+		this.format = new Format(this);
+		this.menu = new Menu(this);
+		this.char = new Char(this);
+		this.viewer = new Viewer(this);
+
+		// register classes to the eventManager
+		ClassInjector.call(this.eventManager, this);
+		// register main classes
+		ClassInjector.call(this.char, this);
+		ClassInjector.call(this.component, this);
+		ClassInjector.call(this.format, this);
+		ClassInjector.call(this.html, this);
+		ClassInjector.call(this.menu, this);
+		ClassInjector.call(this.node, this);
+		ClassInjector.call(this.selection, this);
+		ClassInjector.call(this.toolbar, this);
+		ClassInjector.call(this.viewer, this);
+		if (this.options.has('_subMode')) ClassInjector.call(this.subToolbar, this);
+
+		// delete self reference
+		delete this.char.char;
+		delete this.component.component;
+		delete this.format.format;
+		delete this.html.html;
+		delete this.menu.menu;
+		delete this.node.node;
+		delete this.selection.selection;
+		delete this.toolbar.toolbar;
+		delete this.viewer.viewer;
+		if (this.subToolbar) delete this.subToolbar.subToolbar;
+
+		this._responsiveButtons = this._responsiveButtons_res = null;
 	},
 
 	__Create: function (originOptions) {
@@ -1468,13 +1499,12 @@ Editor.prototype = {
 		this.isSubBalloonAlways = /balloon-always/i.test(this.options.get('_subMode'));
 
 		// register class
-		this._registerClass();
+		this.__registerClass();
 
 		// init
 		const inst = this;
-		const isIframe = inst.options.get('iframe');
-		const rootSize = this.rootTargets.size;
-		let rootIndex = 0;
+		let iframeRootSize = 0;
+		let iframeIndex = 0;
 		this.applyRootTargets(function (e) {
 			const o = e.get('originElement');
 			const t = e.get('topArea');
@@ -1482,22 +1512,39 @@ Editor.prototype = {
 			t.style.display = 'block';
 			o.parentNode.insertBefore(t, o.nextElementSibling);
 
-			if (isIframe) {
+			if (e.get('options').get('iframe')) {
+				iframeRootSize++;
 				e.get('wysiwygFrame').addEventListener('load', function () {
-					inst.__setIframeDocument(this, inst.options, e.get('options').get('height'));
-					if (rootSize === ++rootIndex) inst.__editorInit(originOptions);
+					inst.__setIframeDocument(this, inst.options, e.get('options'));
+					if (iframeRootSize === ++iframeIndex) inst.__editorInit(originOptions);
 				});
 			}
 
 			e.get('editorArea').appendChild(e.get('wysiwygFrame'));
 		});
 
-		if (!isIframe) {
+		if (!iframeRootSize) {
 			this.__editorInit(originOptions);
 		}
 	},
 
 	Constructor: Editor
 };
+
+function GetResetDiffKey(key) {
+	if (/^statusbar/i.test(key)) return 'statusbar';
+	return key;
+}
+
+function CheckResetKeys(keys, plugins, root) {
+	for (let i = 0, len = keys.length, k; i < len; i++) {
+		k = keys[i];
+		if (RO_UNAVAILABD.indexOf(k) > -1 || (plugins && plugins[k])) {
+			console.warn('[SUNEDITOR.warn.resetOptions] "[' + root + k + ']" options not available in resetOptions have no effect.');
+			keys.splice(i--, 1);
+			len--;
+		}
+	}
+}
 
 export default Editor;

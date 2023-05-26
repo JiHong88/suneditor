@@ -49,7 +49,8 @@ EventManager.prototype = {
 		if (!numbers.is(target.length) || target.nodeName || (!_w.Array.isArray(target) && target.length < 1)) target = [target];
 		if (target.length === 0) return false;
 
-		for (let i = 0, len = target.length; i < len; i++) {
+		const len = target.length;
+		for (let i = 0; i < len; i++) {
 			target[i].addEventListener(type, listener, useCapture);
 			this._events.push({
 				target: target[i],
@@ -59,7 +60,33 @@ EventManager.prototype = {
 			});
 		}
 
-		return true;
+		return {
+			target: len > 1 ? target : target[0],
+			type: type,
+			handler: listener,
+			useCapture: useCapture
+		};
+	},
+
+	/**
+	 * @description Remove event
+	 * @param {object} params { target, type, listener, useCapture } = this.addEvent()
+	 */
+	removeEvent: function (params) {
+		if (!params) return;
+
+		let target = params.target;
+		const type = params.type;
+		const listener = params.listener;
+		const useCapture = params.useCapture;
+
+		if (!target) return false;
+		if (!numbers.is(target.length) || target.nodeName || (!_w.Array.isArray(target) && target.length < 1)) target = [target];
+		if (target.length === 0) return false;
+
+		for (let i = 0, len = target.length; i < len; i++) {
+			target[i].removeEventListener(type, listener, useCapture);
+		}
 	},
 
 	/**
@@ -71,7 +98,7 @@ EventManager.prototype = {
 	 * @return {type, listener, useCapture}
 	 */
 	addGlobalEvent: function (type, listener, useCapture) {
-		if (this.options.get('iframe')) {
+		if (this.editor.frameOptions.get('iframe')) {
 			this.editor.frameContext.get('_ww').addEventListener(type, listener, useCapture);
 		}
 		this._w.addEventListener(type, listener, useCapture);
@@ -95,7 +122,7 @@ EventManager.prototype = {
 			useCapture = type.useCapture;
 			type = type.type;
 		}
-		if (this.options.get('iframe')) {
+		if (this.editor.frameOptions.get('iframe')) {
 			this.editor.frameContext.get('_ww').removeEventListener(type, listener, useCapture);
 		}
 		this._w.removeEventListener(type, listener, useCapture);
@@ -624,7 +651,7 @@ EventManager.prototype = {
 	},
 
 	_addFrameEvents: function (frameContext) {
-		const eventWysiwyg = this.options.get('iframe') ? frameContext.get('_ww') : frameContext.get('wysiwyg');
+		const eventWysiwyg = frameContext.get('options').get('iframe') ? frameContext.get('_ww') : frameContext.get('wysiwyg');
 		frameContext.set('eventWysiwyg', eventWysiwyg);
 		const codeArea = frameContext.get('code');
 
@@ -678,20 +705,21 @@ EventManager.prototype = {
 			this.addEvent(codeArea, 'paste', cvAuthHeight, false);
 		}
 
-		/** statusbar */
-		if (frameContext.has('statusbar')) {
-			if (/\d+/.test(this.editor.frameOptions.get('height')) && this.editor.frameOptions.get('statusbar_resizeEnable')) {
-				this.addEvent(frameContext.get('statusbar'), 'mousedown', OnMouseDown_statusbar.bind(this), false);
-			} else {
-				domUtils.addClass(frameContext.get('statusbar'), 'se-resizing-none');
-			}
-		}
+		if (frameContext.has('statusbar')) this.__addStatusbarEvent(frameContext, frameContext.get('options'));
 
 		const OnScrollAbs = OnScroll_Abs.bind(this);
 		let scrollParent = frameContext.get('originElement');
 		while ((scrollParent = domUtils.getScrollParent(scrollParent.parentElement))) {
 			this.__scrollparents.push(scrollParent);
 			this.addEvent(scrollParent, 'scroll', OnScrollAbs, false);
+		}
+	},
+
+	__addStatusbarEvent: function (fc, fo) {
+		if (/\d+/.test(fo.get('height')) && fo.get('statusbar_resizeEnable')) {
+			fo.set('__statusbarEvent', this.addEvent(fc.get('statusbar'), 'mousedown', OnMouseDown_statusbar.bind(this), false));
+		} else {
+			domUtils.addClass(fc.get('statusbar'), 'se-resizing-none');
 		}
 	},
 
@@ -1977,8 +2005,8 @@ function OnMouseMove_wysiwyg(e) {
 		const wScroll = fc.get('wysiwyg').scrollTop;
 		const offsets = this.offset.getGlobal(fc.get('topArea'));
 		const componentTop = this.offset.get(component).top + wScroll;
-		const y = e.pageY + scrollTop + (this.options.get('iframe') && !this.options.get('toolbar_container') ? this.context.get('toolbar.main').offsetHeight : 0);
-		const c = componentTop + (this.options.get('iframe') ? scrollTop : offsets.top);
+		const y = e.pageY + scrollTop + (this.editor.frameOptions.get('iframe') && !this.options.get('toolbar_container') ? this.context.get('toolbar.main').offsetHeight : 0);
+		const c = componentTop + (this.editor.frameOptions.get('iframe') ? scrollTop : offsets.top);
 		const toolbarH = this.context.get('toolbar.main').offsetHeight;
 
 		const isList = domUtils.isListCell(component.parentNode);

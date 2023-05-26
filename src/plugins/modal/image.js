@@ -56,9 +56,7 @@ const Image_ = function (editor, pluginOptions) {
 	});
 	this.fileManager = new FileManager(this, {
 		tagNames: ['img'],
-		eventHandler: function (element, dataIndex, state, info, uploadFilesLeft) {
-			this.events.onImageUpload(element, dataIndex, state, info, uploadFilesLeft);
-		}.bind(this),
+		eventHandler: typeof this.events.onImageUpload !== 'function' ? this.events.onImageUpload : null,
 		checkHandler: FileCheckHandler.bind(this),
 		figure: this.figure
 	});

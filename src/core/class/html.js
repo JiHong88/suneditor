@@ -793,7 +793,7 @@ HTML.prototype = {
 	/**
 	 * @description Gets the current content
 	 * @param {boolean} withFrame Gets the current content with containing parent div.sun-editor-editable (<div class="sun-editor-editable">{content}</div>).
-	 * Ignored for options.get('iframe_fullPage') is true.
+	 * Ignored for targetOptions.get('iframe_fullPage') is true.
 	 * @param {boolean} includeFullPage Return only the content of the body without headers when the "iframe_fullPage" option is true
 	 * @param {number|Array.<number>|undefined} rootKey Root index
 	 * @returns {string|Array.<string>}
@@ -818,7 +818,7 @@ HTML.prototype = {
 			}
 
 			const content = this.clean(renderHTML.innerHTML, false, null, null);
-			if (this.options.get('iframe_fullPage')) {
+			if (this.editor.frameOptions.get('iframe_fullPage')) {
 				if (includeFullPage) {
 					const attrs = domUtils.getAttributesToString(fc.get('_wd').body, ['contenteditable']);
 					r = '<!DOCTYPE html><html>' + fc.get('_wd').head.outerHTML + '<body ' + attrs + '>' + content + '</body></html>';
@@ -895,7 +895,7 @@ HTML.prototype = {
 	 * @param {number|Array.<number>|undefined} rootKey Root index
 	 */
 	setFullPage: function (ctx, rootKey) {
-		if (!this.options.get('iframe')) return false;
+		if (!this.editor.frameOptions.get('iframe')) return false;
 
 		if (!rootKey) rootKey = [this.status.rootKey];
 		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
