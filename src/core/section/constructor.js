@@ -268,6 +268,20 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 }
 
 /**
+ * @description Returns a new object with merge "a" and "b"
+ * @param {Object} obj object
+ * @returns {Object}
+ */
+function _mergeObject(a, b) {
+	return [a, b].reduce(function (_default, _new) {
+		for (let key in _new) {
+			_default[key] = (_new[key] || '').toLowerCase();
+		}
+		return _default;
+	}, {});
+}
+
+/**
  * @description Initialize options
  * @param {Object} options Options object
  * @param {Array.<Element>} editorTargets Target textarea
@@ -287,7 +301,7 @@ export function InitOptions(options, editorTargets) {
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
 	o.set('fontSizeUnit', typeof options.fontSizeUnit === 'string' ? options.fontSizeUnit.trim().toLowerCase() || 'px' : 'px');
 	// text style tags
-	const textTags = converter.mergeObject(
+	const textTags = _mergeObject(
 		{
 			bold: 'strong',
 			underline: 'u',
@@ -324,7 +338,7 @@ export function InitOptions(options, editorTargets) {
 	});
 	o.set(
 		'_styleCommandMap',
-		converter.mergeObject(converter.swapKeyValue(textTags), {
+		_mergeObject(converter.swapKeyValue(textTags), {
 			strong: 'bold',
 			b: 'bold',
 			u: 'underline',

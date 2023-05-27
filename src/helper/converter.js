@@ -73,8 +73,9 @@ export function fontSize(to, size) {
 	switch (to) {
 		case 'em':
 		case 'rem':
-		case '%':
 			return (pxSize * 0.0625).toFixed(2) + to;
+		case '%':
+			return (pxSize * 0.0625).toFixed(2) * 100 + to;
 		case 'pt':
 			return math.floor(pxSize / 1.333) + to;
 		default:
@@ -108,20 +109,6 @@ export function swapKeyValue(obj) {
 	}
 
 	return swappedObj;
-}
-
-/**
- * @description Returns a new object with merge "a" and "b"
- * @param {Object} obj object
- * @returns {Object}
- */
-export function mergeObject(a, b) {
-	return [a, b].reduce(function (_default, _new) {
-		for (let key in _new) {
-			_default[key] = (_new[key] || '').toLowerCase();
-		}
-		return _default;
-	}, {});
 }
 
 /**
@@ -205,7 +192,7 @@ export function _setIframeStyleLinks(linkNames) {
 			if (/(^https?:\/\/)|(^data:text\/css,)/.test(linkNames[f])) {
 				path.push(linkNames[f]);
 			} else {
-				const CSSFileName = new wRegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?\.css((\\??.+?)|\\b)$', 'i');
+				const CSSFileName = new wRegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?.css((\\??.+?)|\\b)$', 'i');
 				for (let c = _d.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
 					styleTag = c[i].href.match(CSSFileName);
 					if (styleTag) path.push(styleTag[0]);
@@ -239,7 +226,6 @@ const converter = {
 	fontSize: fontSize,
 	nodeListToArray: nodeListToArray,
 	swapKeyValue: swapKeyValue,
-	mergeObject: mergeObject,
 	createElementWhitelist: createElementWhitelist,
 	createElementBlacklist: createElementBlacklist,
 	_setDefaultOptionStyle: _setDefaultOptionStyle,
