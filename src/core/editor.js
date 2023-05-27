@@ -1315,7 +1315,8 @@ Editor.prototype = {
 		this._fileManager.regExp = new this._w.RegExp('^(' + (this._fileManager.tags.join('|') || '\\^') + ')$', 'i');
 		this._fileManager.pluginRegExp = new this._w.RegExp('^(' + (filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')) + ')$', 'i');
 
-		this._pluginCallButtons = this._pluginCallButtons_sub = null;
+		delete this._pluginCallButtons;
+		delete this._pluginCallButtons_sub;
 	},
 
 	/**
@@ -1417,14 +1418,15 @@ Editor.prototype = {
 		}
 
 		// init, validate
-		e.set('_ww', frameOptions.get('iframe') ? e.get('wysiwygFrame').contentWindow : _w);
 		if (frameOptions.get('iframe')) {
+			e.set('_ww', e.get('wysiwygFrame').contentWindow);
 			e.set('_wd', e.get('wysiwygFrame').contentDocument);
 			e.set('wysiwyg', e.get('_wd').body);
 			// e.get('wysiwyg').className += ' ' + options.get('_editableClass');
 			if (frameOptions.get('_defaultStyles').editor) e.get('wysiwyg').style.cssText = frameOptions.get('_defaultStyles').editor;
 			if (frameOptions.get('height') === 'auto') e.set('_iframeAuto', e.get('_wd').body);
 		} else {
+			e.set('_ww', _w);
 			e.set('_wd', this._d);
 		}
 	},

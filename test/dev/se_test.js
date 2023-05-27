@@ -324,8 +324,8 @@ window.c = () => {
 					placeholder: 'place1',
 					height: 'auto',
 					width: '200px',
-					iframe: true,
-					iframe_fullPage: true,
+					// iframe: true,
+					// iframe_fullPage: true,
 					statusbar: true,
 					statusbar_resizeEnable: true
 				}
@@ -360,6 +360,7 @@ window.c = () => {
 			// editorStyle: 'font-size:40px',
 			plugins: plugins,
 			toolbar_container: '#root_toolbar_container',
+			attributeWhitelist: {"*":"class|data-.+"},
 			// statusbar_container: '#root_statusbar_container',
 			// shortcutsHint: false,
 			// codeMirror: {
@@ -381,7 +382,6 @@ window.c = () => {
 			defaultLine: 'div',
 			toolbar_sticky: 0,
 			lineAttrReset: 'id',
-			attributeWhitelist: 'id',
 			buttonList: bl,
 			subToolbar: {
 				buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
