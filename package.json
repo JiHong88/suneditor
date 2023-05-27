@@ -1,82 +1,85 @@
 {
-  "name": "suneditor",
-  "version": "3.0.0-alpha.0",
-  "description": "Pure JavaScript based WYSIWYG web editor",
-  "author": "Yi JiHong",
-  "license": "MIT",
-  "main": "src/suneditor.js",
-  "sideEffects": [
-    "./src/assets/css/*.css"
-  ],
-  "scripts": {
-    "dev": "webpack-dev-server --config webpack/dev.js",
-    "start": "npm run dev",
-    "build": "webpack --config webpack/prod.js",
-    "interface": "webpack --config webpack/interface.js",
-    "lint": "jshint src",
-    "test": "karma start"
-  },
-  "bugs": {
-    "url": "https://github.com/JiHong88/SunEditor/issues"
-  },
-  "homepage": "http://suneditor.com",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/JiHong88/SunEditor.git"
-  },
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components"
-  ],
-  "types": "typings/index.d.ts",
-  "devDependencies": {
-    "@babel/core": "^7.22.1",
-    "@codemirror/lang-html": "^6.4.3",
-    "@codemirror/lang-javascript": "^6.1.8",
-    "@webpack-cli/serve": "^2.0.4",
-    "babel-loader": "^9.1.2",
-    "clean-webpack-plugin": "^4.0.0",
-    "codemirror": "^6.0.1",
-    "codemirror5": "npm:codemirror@^5.65.9",
-    "css-loader": "^6.7.4",
-    "css-minimizer-webpack-plugin": "^5.0.0",
-    "csstype": "^3.1.2",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.5.1",
-    "jasmine": "^5.0.0",
-    "jshint": "^2.13.6",
-    "karma": "^6.4.2",
-    "karma-chrome-launcher": "^3.2.0",
-    "karma-firefox-launcher": "^2.1.2",
-    "karma-ie-launcher": "^1.0.0",
-    "karma-jasmine": "^5.1.0",
-    "karma-opera-launcher": "^1.0.0",
-    "karma-safari-launcher": "^1.0.0",
-    "karma-webpack": "^5.0.0",
-    "katex": "^0.16.7",
-    "mini-css-extract-plugin": "^2.7.6",
-    "prettier": "^2.8.8",
-    "url-loader": "^4.1.1",
-    "webpack": "^5.84.1",
-    "webpack-cli": "^5.1.1",
-    "webpack-dev-server": "^4.15.0",
-    "webpack-merge": "^5.9.0"
-  },
-  "keywords": [
-    "wysiwyg",
-    "wysiwyg editor",
-    "wysiwyg html editor",
-    "rich text",
-    "rich editor",
-    "rich text editor",
-    "html",
-    "text",
-    "editor",
-    "contenteditable",
-    "javascript",
-    "vanillajs"
-  ]
+	"name": "suneditor",
+	"version": "3.0.0-alpha.0",
+	"description": "Vanilla javascript based WYSIWYG web editor",
+	"author": "Yi JiHong",
+	"license": "MIT",
+	"main": "src/suneditor.js",
+	"sideEffects": [
+		"./src/assets/css/*.css"
+	],
+	"scripts": {
+		"dev": "webpack-dev-server --config webpack/dev.js",
+		"start": "npm run dev",
+		"build": "webpack --config webpack/prod.js",
+		"interface": "webpack --config webpack/interface.js",
+		"lint": "jshint src",
+		"test": "karma start"
+	},
+	"bugs": {
+		"url": "https://github.com/JiHong88/SunEditor/issues"
+	},
+	"homepage": "http://suneditor.com",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/JiHong88/SunEditor.git"
+	},
+	"ignore": [
+		"**/.*",
+		"node_modules",
+		"bower_components"
+	],
+	"types": "typings/index.d.ts",
+	"engines": {
+		"node": ">=14.21.3"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.22.1",
+		"@codemirror/lang-html": "^6.4.3",
+		"@codemirror/lang-javascript": "^6.1.8",
+		"@webpack-cli/serve": "^2.0.4",
+		"babel-loader": "^9.1.2",
+		"clean-webpack-plugin": "^4.0.0",
+		"codemirror": "^6.0.1",
+		"codemirror5": "npm:codemirror@^5.65.9",
+		"css-loader": "^6.7.4",
+		"css-minimizer-webpack-plugin": "^5.0.0",
+		"csstype": "^3.1.2",
+		"eslint-config-prettier": "^8.8.0",
+		"eslint-plugin-prettier": "^4.2.1",
+		"file-loader": "^6.2.0",
+		"html-webpack-plugin": "^5.5.1",
+		"jasmine": "^5.0.0",
+		"jshint": "^2.13.6",
+		"karma": "^6.4.2",
+		"karma-chrome-launcher": "^3.2.0",
+		"karma-firefox-launcher": "^2.1.2",
+		"karma-ie-launcher": "^1.0.0",
+		"karma-jasmine": "^5.1.0",
+		"karma-opera-launcher": "^1.0.0",
+		"karma-safari-launcher": "^1.0.0",
+		"karma-webpack": "^5.0.0",
+		"katex": "^0.16.7",
+		"mini-css-extract-plugin": "^2.7.6",
+		"prettier": "^2.8.8",
+		"url-loader": "^4.1.1",
+		"webpack": "^5.84.1",
+		"webpack-cli": "^5.1.1",
+		"webpack-dev-server": "^4.15.0",
+		"webpack-merge": "^5.9.0"
+	},
+	"keywords": [
+		"wysiwyg",
+		"wysiwyg editor",
+		"wysiwyg html editor",
+		"rich text",
+		"rich editor",
+		"rich text editor",
+		"html",
+		"text",
+		"editor",
+		"contenteditable",
+		"javascript",
+		"vanillajs"
+	]
 }
