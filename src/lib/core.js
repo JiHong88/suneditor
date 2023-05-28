@@ -5476,7 +5476,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true)).replace(/<br\/?>$/i, '');
             const dom = _d.createRange().createContextualFragment(html);
             try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, true);
+                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, this._classNameFilter);
             } catch (error) {
                 console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
             }
@@ -5524,11 +5524,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
-            contents = this._deleteDisallowedTags(this._parser.parseFromString(contents, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, false));
+            contents = this._deleteDisallowedTags(this._parser.parseFromString(contents, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
             const dom = _d.createRange().createContextualFragment(contents);
 
             try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, false);
+                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, this._classNameFilter);
             } catch (error) {
                 console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
             }
@@ -5864,6 +5864,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
             this._editorHeight = context.element.wysiwygFrame.offsetHeight;
             this._editorHeightPadding = util.getNumber(this.wwComputedStyle.getPropertyValue('padding-top')) + util.getNumber(this.wwComputedStyle.getPropertyValue('padding-bottom'));
+            this._classNameFilter = function (v) {
+                return this.test(v) ? v : '';
+            }.bind(options.allowClassName);
 
             if (!options.iframe && typeof _w.ShadowRoot === 'function') {
                 let child = context.element.wysiwygFrame;

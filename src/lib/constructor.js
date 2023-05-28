@@ -409,6 +409,7 @@ export default {
         /** Values */
         options.lang = options.lang || _defaultLang;
         options.value = typeof options.value === 'string' ? options.value : null;
+        options.allowClassName = new util._w.RegExp((options.allowClassName && typeof options.allowClassName === 'string' ? options.allowClassName + '|' : '') + '^__se__|se-|katex');
         options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
         options.frameAttrbutes = options.frameAttrbutes || {};
         // tag style

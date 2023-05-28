@@ -1840,10 +1840,10 @@ const util = {
      * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
      * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist (core._htmlCheckWhitelistRegExp)
      * @param {RegExp} htmlCheckBlacklistRegExp Editor tags blacklist (core._htmlCheckBlacklistRegExp)
-     * @param {Boolean} lowLevelCheck Row level check
+     * @param {Function} classNameFilter Class name filter function
      * @private
      */
-    _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, lowLevelCheck) {
+    _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, classNameFilter) {
         /**
          * It is can use ".children(util.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
          * So check the node type and exclude the text no (current.nodeType !== 1)
@@ -1886,15 +1886,15 @@ const util = {
             }
 
             // class filter
-            if (lowLevelCheck && nrtag && current.className) {
-                const className = new this._w.Array(current.classList).map(this._classNameFilter).join(' ').trim();
+            if (nrtag && current.className) {
+                const className = new this._w.Array(current.classList).map(classNameFilter).join(' ').trim();
                 if (className) current.className = className;
                 else current.removeAttribute('class');
             }
 
             const result = current.parentNode !== documentFragment && nrtag &&
              ((this.isListCell(current) && !this.isList(current.parentNode)) ||
-              (lowLevelCheck && (this.isFormatElement(current) || this.isComponent(current)) && !this.isRangeFormatElement(current.parentNode) && !this.getParentElement(current, this.isComponent)));
+              ((this.isFormatElement(current) || this.isComponent(current)) && !this.isRangeFormatElement(current.parentNode) && !this.getParentElement(current, this.isComponent)));
 
             return result;
         }.bind(this));
@@ -1959,10 +1959,6 @@ const util = {
             f.innerHTML = (t.textContent.trim().length === 0 && t.children.length === 0) ? '<br>' : t.innerHTML;
             t.innerHTML = f.outerHTML;
         }
-    },
-
-    _classNameFilter: function (v) {
-        return /(^__se__|^se-|katex)/.test(v) ? v : '';
     },
 
     _setDefaultOptionStyle: function (options, defaultStyle) {
