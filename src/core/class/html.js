@@ -11,6 +11,10 @@ const HTML = function (editor) {
 	CoreInjector.call(this, editor);
 
 	// members
+	this._parser = new editor._w.DOMParser();
+	this._isAllowClassName = function (v) {
+		return this.test(v) ? v : '';
+	}.bind(editor.options.get('allowClassName'));
 	this._allowHTMLComment = null;
 	this._disallowedStyleNodesRegExp = null;
 	this._htmlCheckWhitelistRegExp = null;
@@ -103,7 +107,7 @@ HTML.prototype = {
 	 * @returns {string}
 	 */
 	clean: function (html, requireFormat, whitelist, blacklist) {
-		html = DeleteDisallowedTags(this.editor._parser.parseFromString(html, 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp)
+		html = DeleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp)
 			.replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this))
 			.replace(/<br\/?>$/i, '');
 		html = this.compress(html);
@@ -1152,7 +1156,7 @@ HTML.prototype = {
 
 				// class filter
 				if (nrtag && current.className) {
-					const className = new this._w.Array(current.classList).map(domUtils.isAllowClassName).join(' ').trim();
+					const className = new this._w.Array(current.classList).map(this._isAllowClassName).join(' ').trim();
 					if (className) current.className = className;
 					else current.removeAttribute('class');
 				}

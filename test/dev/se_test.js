@@ -359,6 +359,7 @@ window.c = () => {
 			// value: 'Common value',
 			// editorStyle: 'font-size:40px',
 			plugins: plugins,
+			allowClassName: '.+',
 			toolbar_container: '#root_toolbar_container',
 			attributeWhitelist: {"*":"class|data-.+"},
 			// statusbar_container: '#root_statusbar_container',

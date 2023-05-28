@@ -868,10 +868,6 @@ export function isImportantDisabled(element) {
 	return element.hasAttribute('data-important-disabled');
 }
 
-export function isAllowClassName(v) {
-	return /^(__se__|se-|katex)/.test(v) ? v : '';
-}
-
 /**
  * @description It is judged whether it is the not checking node. (class="katex", "__se__exclude-format")
  * @param {Node} element The node to check
@@ -948,7 +944,6 @@ const domUtils = {
 	isSpanWithoutAttr: isSpanWithoutAttr,
 	isUneditable: isUneditable,
 	isImportantDisabled: isImportantDisabled,
-	isAllowClassName: isAllowClassName,
 	isExcludeFormat: isExcludeFormat,
 	getScrollParent: getScrollParent
 };

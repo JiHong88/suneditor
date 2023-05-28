@@ -481,7 +481,7 @@ Viewer.prototype = {
 
 		if (this.editor.frameOptions.get('iframe_fullPage')) {
 			const wDoc = this.editor.frameContext.get('_wd');
-			const parseDocument = this.editor._parser.parseFromString(code_html, 'text/html');
+			const parseDocument = new this._w.DOMParser().parseFromString(code_html, 'text/html');
 			const headChildren = parseDocument.head.children;
 
 			for (let i = 0, len = headChildren.length; i < len; i++) {

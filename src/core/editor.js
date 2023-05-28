@@ -283,12 +283,6 @@ const Editor = function (multiTargets, options) {
 	this._figureContainer = null;
 
 	/**
-	 * @description Parser
-	 * @private
-	 */
-	this._parser = new _w.DOMParser();
-
-	/**
 	 * @description Origin options
 	 * @private
 	 */
@@ -641,7 +635,7 @@ Editor.prototype = {
 					const docHead = fc.get('_wd').head;
 					const links = docHead.getElementsByTagName('link');
 					while (links[0]) docHead.removeChild(links[0]);
-					const parseDocument = this._parser.parseFromString(converter._setIframeStyleLinks(newOptions.get('iframe_cssFileName')), 'text/html');
+					const parseDocument = new this._w.DOMParser().parseFromString(converter._setIframeStyleLinks(newOptions.get('iframe_cssFileName')), 'text/html');
 					const newLinks = parseDocument.head.children;
 					const sTag = docHead.querySelector('style');
 					while (newLinks[0]) docHead.insertBefore(newLinks[0], sTag);

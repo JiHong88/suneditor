@@ -300,6 +300,7 @@ export function InitOptions(options, editorTargets) {
 	/** Base */
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
 	o.set('fontSizeUnit', typeof options.fontSizeUnit === 'string' ? options.fontSizeUnit.trim().toLowerCase() || 'px' : 'px');
+	o.set('allowClassName', new _w.RegExp((options.allowClassName && typeof options.allowClassName === 'string' ? options.allowClassName + '|' : '') + '^__se__|se-|katex'));
 	// text style tags
 	const textTags = _mergeObject(
 		{
