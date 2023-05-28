@@ -20,6 +20,8 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import CodeMirror from 'codemirror';
 
+import { add_pricing_table_plugin } from "./tablePluginsTest";
+
 // console.log("pluginf???", plugins);
 // plugins.fontSize.pickup = function (e){
 //     console.log("font----------size", this)
@@ -939,43 +941,32 @@ const complexEditor = [
 //     // iframe: true,
 // });
 
+plugins.template.pickup = function (e) {
+    if (!/^BUTTON$/i.test(e.target.tagName)) return false;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    this.context.template.selectedIndex = e.target.getAttribute('data-value') * 1;
+    const temp = this.options.templates[this.context.template.selectedIndex];
+
+    if (temp.html) {
+        this.insertNode(temp.html);
+    } else {
+        this.submenuOff();
+        throw Error('[SUNEDITOR.template.fail] cause : "templates[i].html not found"');
+    }
+        
+    this.submenuOff();
+}
+
 let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
-    // rtl: true,
-    // defaultStyle: 'color: red;',
-    // shortcutsDisable: ['bold', 'underline', 'italic'],
-    width: '100%',
-    // fontSizeUnit: 'em',
-    // mode: "inline",
-    value: `<p>Instead of buying low and selling high like investing genius Warren Buffet once said, your long-term investment strategy can be even easier than that: Buy low, never sell.</p><p>It can be easy to buy low and sell high when it comes to investing, but this is not a long-term strategy. Instead, you should aim to buy assets that will never go down in value, such as stocks or real estate. This will allow you to make a profit over the long term, even if the market goes down.</p><p>“The Millionaire Next Door” reported that the majority of millionaires never sell their assets. Whether it’s stocks, bonds, real estate, or any alternative asset — one thing remains consistent: They don’t ever sell.</p><p>“Well, how do you make money if you never sell off your assets?“</p><p>It should be noted that “buy and never sell” is a bit of an extreme exaggeration. It’s not that these millionaires have never sold an asset, it’s just that they held onto their assets long into the future.</p><p>Here’s a real-world example. Say you were one of the amazingly smart people who bought a box of Base Set Pokemon cards for $80 in 1998 and never opened them. This unopened box of cards consistently sells for anywhere between $16,000 to $40,000</p>`,
-    buttonList:complexEditor,
-    attributesWhitelist: {'all': 'id|class|name'},
-    plugins: plugins,
-    katex: Katex,
-    // value: 'abc',
-    minHeight : 300,
-    height: "auto",
-    charCounter: true,
-    font: [
-        'Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact',
-        'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'
-    ],
-    linkNoPrefix: true,
-    formats: [
-        'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',{
-          tag: 'div', // Tag name
-          name: 'Custom div' || null, // default: tag name
-          command: 'replace' || 'range' || 'free', // default: "replace"
-          class: '__se__format__replace_xxx' || '__se__format__range_xxx' || '__se__format__free_xxx' || '__se__format__free__closure_xxx'
-          // Class names must always begin with "__se__format__(replace, range, free)_"
-        }
-        // "blockquote": range format, "pre": free format, "Other tags": replace format
-      ],
-    // iframe: true,
-    // fullPage: true,
-    imageMultipleFile: true,
-    addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header|section",
-    lineAttrReset: 'class'
+    buttonList: [["pricingTable"]],
+    plugins: {...{ add_pricing_table_plugin }, ...plugins},
+    value:''
 });
+
+s2.core._cleanStyleRegExp.span = new RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color|background-image)\\s*:[^;]+(?!;)*', 'ig'),
 
 window.sun_setOptions2 = () => {
     s2.setContents(`<section class="__se__tag content-pages page-brands">

@@ -1180,6 +1180,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _editorRange: function () {
+            const activeEl = this._wd.activeElement;
+            if (activeEl && /^INPUT$/i.test(activeEl.nodeName)) {
+                this._variable._selectionNode = activeEl;
+                return activeEl;
+            }
+
             const selection = this.getSelection();
             if (!selection) return null;
             let range = null;
@@ -6834,6 +6840,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         _onShortcutKey: false,
         onKeyDown_wysiwyg: function (e) {
+            let selectionNode = core.getSelectionNode();
+            if (selectionNode && /^INPUT$/i.test(selectionNode.nodeName)) return;
+
             const keyCode = e.keyCode;
             const shift = e.shiftKey;
             const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
@@ -6865,7 +6874,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             /** default key action */
-            let selectionNode = core.getSelectionNode();
             const range = core.getRange();
             const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
             const fileComponentName = core._fileManager.pluginRegExp.test(core.currentControllerName) ? core.currentControllerName : '';
