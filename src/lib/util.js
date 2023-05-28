@@ -366,6 +366,15 @@ const util = {
     },
 
     /**
+     * @description It is judged whether it is the input element (INPUT, TEXTAREA)
+     * @param {Node} element The node to check
+     * @returns 
+     */
+    isInputElement: function (element) {
+        return element && element.nodeType === 1 && /^(INPUT|TEXTAREA)$/i.test(element.nodeName);
+    },
+
+    /**
      * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI | class="__se__format__replace_xxx")
      * Format element also contain "free format Element"
      * @param {Node} element The node to check

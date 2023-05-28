@@ -1181,7 +1181,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         _editorRange: function () {
             const activeEl = this._wd.activeElement;
-            if (activeEl && /^INPUT$/i.test(activeEl.nodeName)) {
+            if (util.isInputElement(activeEl)) {
                 this._variable._selectionNode = activeEl;
                 return activeEl;
             }
@@ -6841,7 +6841,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _onShortcutKey: false,
         onKeyDown_wysiwyg: function (e) {
             let selectionNode = core.getSelectionNode();
-            if (selectionNode && /^INPUT$/i.test(selectionNode.nodeName)) return;
+            if (util.isInputElement(selectionNode)) return;
 
             const keyCode = e.keyCode;
             const shift = e.shiftKey;
