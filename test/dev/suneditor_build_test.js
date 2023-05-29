@@ -951,7 +951,7 @@ plugins.template.pickup = function (e) {
     const temp = this.options.templates[this.context.template.selectedIndex];
 
     if (temp.html) {
-        this.insertNode(temp.html);
+        this.insertHTML(temp.html);
     } else {
         this.submenuOff();
         throw Error('[SUNEDITOR.template.fail] cause : "templates[i].html not found"');
@@ -964,11 +964,17 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
     // rtl: true,
     // defaultStyle: 'color: red;',
     // shortcutsDisable: ['bold', 'underline', 'italic'],
-    allowClassName: '.',
+    __allowedScriptTag: true,
+    value: `<p>Inssell.</p>
+    <script>
+    alert(1)
+    </script>
+    <p>It can be easy to.</p>`,
+    allowedClassNames: '.',
     width: '100%',
     // fontSizeUnit: 'em',
     // mode: "inline",
-    value: `<p>Instead of buying low and selling high like investing genius Warren Buffet once said, your long-term investment strategy can be even easier than that: Buy low, never sell.</p><p>It can be easy to buy low and sell high when it comes to investing, but this is not a long-term strategy. Instead, you should aim to buy assets that will never go down in value, such as stocks or real estate. This will allow you to make a profit over the long term, even if the market goes down.</p><p>“The Millionaire Next Door” reported that the majority of millionaires never sell their assets. Whether it’s stocks, bonds, real estate, or any alternative asset — one thing remains consistent: They don’t ever sell.</p><p>“Well, how do you make money if you never sell off your assets?“</p><p>It should be noted that “buy and never sell” is a bit of an extreme exaggeration. It’s not that these millionaires have never sold an asset, it’s just that they held onto their assets long into the future.</p><p>Here’s a real-world example. Say you were one of the amazingly smart people who bought a box of Base Set Pokemon cards for $80 in 1998 and never opened them. This unopened box of cards consistently sells for anywhere between $16,000 to $40,000</p>`,
+    // value: `<p>Instead of buying low and selling high like investing genius Warren Buffet once said, your long-term investment strategy can be even easier than that: Buy low, never sell.</p><p>It can be easy to buy low and sell high when it comes to investing, but this is not a long-term strategy. Instead, you should aim to buy assets that will never go down in value, such as stocks or real estate. This will allow you to make a profit over the long term, even if the market goes down.</p><p>“The Millionaire Next Door” reported that the majority of millionaires never sell their assets. Whether it’s stocks, bonds, real estate, or any alternative asset — one thing remains consistent: They don’t ever sell.</p><p>“Well, how do you make money if you never sell off your assets?“</p><p>It should be noted that “buy and never sell” is a bit of an extreme exaggeration. It’s not that these millionaires have never sold an asset, it’s just that they held onto their assets long into the future.</p><p>Here’s a real-world example. Say you were one of the amazingly smart people who bought a box of Base Set Pokemon cards for $80 in 1998 and never opened them. This unopened box of cards consistently sells for anywhere between $16,000 to $40,000</p>`,
     buttonList:complexEditor,
     attributesWhitelist: {'all': 'id|class|name|style'},
     plugins: plugins,

@@ -1745,6 +1745,15 @@ const util = {
     },
 
     /**
+	 * @description HTML code compression
+	 * @param {string} html HTML string
+	 * @returns {string} HTML string
+	 */
+	htmlCompress: function (html) {
+		return html.replace(/(>)(?:([^>]*)\n+)|(?:\s+)(<)/g, '$1$2$3');
+	},
+
+    /**
      * @description Sort a element array by depth of element.
      * @param {Array} array Array object
      * @param {Boolean} des true: descending order / false: ascending order
@@ -1806,6 +1815,7 @@ const util = {
     },
 
     /**
+     * @deprecated
      * @description Check disallowed tags
      * @param {Node} element Element to check
      * @returns {Boolean}

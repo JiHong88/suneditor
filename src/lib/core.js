@@ -4761,12 +4761,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (options.fullPage) {
                 const parseDocument = this._parser.parseFromString(code_html, 'text/html');
-                const headChildren = parseDocument.head.children;
 
-                for (let i = 0, len = headChildren.length; i < len; i++) {
-                    if (/^script$/i.test(headChildren[i].tagName)) {
-                        parseDocument.head.removeChild(headChildren[i]);
-                        i--, len--;
+                if (!this.options.__allowedScriptTag) {
+                    const headChildren = parseDocument.head.children;
+                    for (let i = 0, len = headChildren.length; i < len; i++) {
+                        if (/^script$/i.test(headChildren[i].tagName)) {
+                            parseDocument.head.removeChild(headChildren[i]);
+                            i--, len--;
+                        }
                     }
                 }
 
@@ -5132,7 +5134,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         setIframeContents: function (ctx) {
             if (!options.iframe) return false;
-            if (ctx.head) this._wd.head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
+            if (ctx.head) this._wd.head.innerHTML = this.options.__allowedScriptTag ? ctx.head : ctx.head.replace(this.__scriptTagRegExp, '');
             if (ctx.body) this._wd.body.innerHTML = this.convertContentsForEditor(ctx.body);
             this._resetComponents();
         },
@@ -5184,7 +5186,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const defaultTag = options.defaultTag;
             // element
             if (node.nodeType === 1) {
-                if (util._disallowedTags(node)) return '';
+                if (this.__disallowedTagNameRegExp.test(node.nodeName)) return '';
                 if (/__se__tag/.test(node.className)) return node.outerHTML;
 
                 const ch = util.getListChildNodes(node, function(current) { return util.isSpanWithoutAttr(current) && !util.getParentElement(current, util.isNotCheckingNode); }) || [];
@@ -5240,7 +5242,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         _deleteDisallowedTags: function (html) {
 			html = html
-				.replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '')
+				.replace(this.__disallowedTagsRegExp, '')
 				.replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '');
 
             if (!/\bfont\b/i.test(this.options._editorTagsWhitelist)) {
@@ -5454,7 +5456,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             for (let i = 0, len = domTree.length, t; i < len; i++) {
                 t = domTree[i];
-                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !util._disallowedTags(t)) {
+                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !this.__disallowedTagNameRegExp.test(t.nodeName)) {
                     requireFormat = true;
                     break;
                 }
@@ -5473,7 +5475,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist, blacklist) {
-            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true)).replace(/<br\/?>$/i, '');
+            html = this._deleteDisallowedTags(this._parser.parseFromString(util.htmlCompress(html), 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true)).replace(/<br\/?>$/i, '');
             const dom = _d.createRange().createContextualFragment(html);
             try {
                 util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, this._classNameFilter);
@@ -5503,8 +5505,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 domTree = this._editFormat(dom).childNodes;
             }
 
-            for (let i = 0, len = domTree.length; i < len; i++) {
-                cleanHTML += this._makeLine(domTree[i], requireFormat);
+            for (let i = 0, len = domTree.length, t; i < len; i++) {
+                t = domTree[i];
+                if (this.__allowedScriptRegExp.test(t.nodeName)) {
+                    cleanHTML += t.outerHTML;
+                    continue;
+                }
+                cleanHTML += this._makeLine(t, requireFormat);
             }
 
             cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
@@ -5524,7 +5531,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
-            contents = this._deleteDisallowedTags(this._parser.parseFromString(contents, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
+            contents = this._deleteDisallowedTags(this._parser.parseFromString(util.htmlCompress(contents), 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
             const dom = _d.createRange().createContextualFragment(contents);
 
             try {
@@ -5551,6 +5558,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let cleanHTML = '', p = null;
             for (let i = 0, t; i < domTree.length; i++) {
                 t = domTree[i];
+
+                if (this.__allowedScriptRegExp.test(t.nodeName)) {
+                    cleanHTML += t.outerHTML;
+                    continue;
+                }
 
                 if (!util.isFormatElement(t) && !util.isRangeFormatElement(t) && !util.isComponent(t) && !util.isMedia(t) && t.nodeType !== 8 && !/__se__tag/.test(t.className)) {
                     if (!p) p = util.createElement(options.defaultTag);
@@ -5866,7 +5878,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._editorHeightPadding = util.getNumber(this.wwComputedStyle.getPropertyValue('padding-top')) + util.getNumber(this.wwComputedStyle.getPropertyValue('padding-bottom'));
             this._classNameFilter = function (v) {
                 return this.test(v) ? v : '';
-            }.bind(options.allowClassName);
+            }.bind(options.allowedClassNames);
+
+            const sPrefix = (options.__allowedScriptTag ? '' : 'script|');
+            this.__scriptTagRegExp = new wRegExp('<(script)[^>]*>([\\s\\S]*?)<\\/\\1>|<script[^>]*\\/?>', 'gi')
+            this.__disallowedTagsRegExp = new wRegExp('<(' + sPrefix + 'style)[^>]*>([\\s\\S]*?)<\\/\\1>|<(' + sPrefix + 'style)[^>]*\\/?>', 'gi');
+            this.__disallowedTagNameRegExp = new wRegExp('^(' + sPrefix + 'meta|link|style|[a-z]+\:[a-z]+)$', 'i');
+            this.__allowedScriptRegExp = new wRegExp('^' + (options.__allowedScriptTag ? 'script' : '') + '$', 'i');
 
             if (!options.iframe && typeof _w.ShadowRoot === 'function') {
                 let child = context.element.wysiwygFrame;

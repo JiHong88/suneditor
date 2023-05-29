@@ -82,6 +82,9 @@
             <label><input type="checkbox" id="editor_value">&nbsp;&nbsp;value&nbsp;&nbsp;&nbsp;</label><br>
             <textarea id="editor_value_value" placeholder="HTML String ('&lt;p&gt;..&lt;/p&gt;')" style="width:320px"></textarea>
             <br><br>
+            <label><input type="checkbox" id="editor_allowedClassNames">&nbsp;&nbsp;allowedClassNames&nbsp;&nbsp;&nbsp;</label><br>
+            <input type="text" id="editor_value_allowedClassNames" placeholder="String(RegExp)" style="width:320px"></textarea>
+            <br><br>
             <label><input type="checkbox" id="historyStackDelayTime">&nbsp;&nbsp;historyStackDelayTime&nbsp;&nbsp;&nbsp;</label>
             <input type="text" id="historyStackDelayTime_value" placeholder="Number (400)miliseconds">
             <br>
@@ -606,6 +609,7 @@ function sun_create () {
             strike: 's'
         } : undefined,
         value: document.getElementById('editor_value').checked ? document.getElementById('editor_value_value').value : undefined,
+        allowedClassNames: document.getElementById('editor_allowedClassNames').checked ? document.getElementById('editor_value_allowedClassNames').value : undefined,
         historyStackDelayTime: document.getElementById('historyStackDelayTime').checked ? document.getElementById('historyStackDelayTime_value').value * 1 : undefined,
         addTagsWhitelist: document.getElementById('addTagsWhitelist').checked ? document.getElementById('addTagsWhitelist_value').value : undefined,
         pasteTagsWhitelist: document.getElementById('pasteTagsWhitelist').checked ? document.getElementById('pasteTagsWhitelist_value').value : undefined,
