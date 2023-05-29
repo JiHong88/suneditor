@@ -398,6 +398,8 @@ textTags        : You can change the tag of the default text button.   default: 
                   }
 value           : Initial value(html string) of the edit area.
                   If not, the value of the "target textarea".   default: null {String}
+allowedClassNames  : Specifies the allowed class name, It can be specified in the form of a regular expression.
+                     Appended before the "default" value. (`${option}|${defaultValue}`)     default: '^se-|__se__|katex';
 historyStackDelayTime : When recording the history stack, this is the delay time(miliseconds) since the last input.  default: 400 {Number}
 frameAttrbutes  : Specifies the properties of the editing area DIV.     default: {} {Object}
                   ex)  {
@@ -868,6 +870,7 @@ templates       : If you use a template plugin, add it.
                   ]
 
 // ETC------------------------------------------------------------------------------------------------------------
+__allowedScriptTag  : Allows script tags.                            default: false {Boolean}
 placeholder     : The placeholder text.                              default: null {String}
 mediaAutoSelect : Activate the media[image, video, audio] selection status immediately after inserting the media tag.  default: true {Boolean}
 icons           : You can redefine icons.                            default: null {Object}

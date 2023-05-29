@@ -1750,7 +1750,7 @@ const util = {
 	 * @returns {string} HTML string
 	 */
 	htmlCompress: function (html) {
-		return html.replace(/(>)(?:([^>]*)\n+)|(?:\s+)(<)/g, '$1$2$3');
+		return html.replace(/\n/g, '').replace(/(>)(?:\s+)(<)/g, '$1$2');
 	},
 
     /**
