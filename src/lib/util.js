@@ -1458,8 +1458,10 @@ const util = {
         }
 
         const bp = baseNode.parentNode;
-        let index = 0, newEl, children, temp;
+        let index = 0;
+        let suffixIndex = 1;
         let next = true;
+        let newEl, children, temp;
         if (!depth || depth < 0) depth = 0;
 
         if (baseNode.nodeType === 3) {
@@ -1470,6 +1472,16 @@ const util = {
                 if (this.onlyZeroWidthSpace(after)) after.data = this.zeroWidthSpace;
             }
         } else if (baseNode.nodeType === 1) {
+            if (offset === 0) {
+                while (baseNode.firstChild) {
+                    baseNode = baseNode.firstChild;
+                }
+                if (baseNode.nodeType === 3) {
+                    const after = this.createTextNode(this.zeroWidthSpace)
+                    baseNode.parentNode.insertBefore(after, baseNode);
+                    baseNode = after;
+                }
+            }
             if (!baseNode.previousSibling) {
                 if (this.getElementDepth(baseNode) === depth) next = false;
             } else {
@@ -1477,9 +1489,10 @@ const util = {
             }
         }
 
+        if (baseNode.nodeType === 1) suffixIndex = 0;
         let depthEl = baseNode;
         while (this.getElementDepth(depthEl) > depth) {
-            index = this.getPositionIndex(depthEl) + 1;
+            index = this.getPositionIndex(depthEl) + suffixIndex;
             depthEl = depthEl.parentNode;
 
             temp = newEl;

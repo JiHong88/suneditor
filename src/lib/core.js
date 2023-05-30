@@ -5385,9 +5385,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             if (v) {
-                for (let i = 0, len = v.length; i < len; i++) {
+                for (let i = 0, len = v.length, a; i < len; i++) {
                     // if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i].trim())) continue;
-                    t += ' ' + (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i].trim()) ? '' : v[i]);
+                    a = (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i].trim()) ? '' : v[i]);
+                    t += (/^\s/.test(a) ? '' : ' ') + a;
                 }
             }
 
@@ -6956,27 +6957,27 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     // clean remove tag
-                    if (!formatEl.previousElementSibling && formatEl && range.startContainer === range.endContainer && selectionNode.nodeType === 3 && !util.isFormatElement(selectionNode.parentNode)) {
-                        if (range.collapsed ? selectionNode.textContent.length === 0 : (range.endOffset - range.startOffset) === selectionNode.textContent.length) {
-                            e.preventDefault();
-
-                            let offset = null;
-                            let prev = selectionNode.parentNode.previousSibling;
-                            const next = selectionNode.parentNode.nextSibling;
-                            if (!prev) {
-                                if (!next) {
-                                    prev = util.createElement('BR');
-                                    formatEl.appendChild(prev);
-                                } else {
-                                    prev = next;
-                                    offset = 0;
-                                }
+                    const startCon = range.startContainer;
+                    if (formatEl && !formatEl.previousElementSibling && range.startOffset === 0 && startCon.nodeType === 3 && !util.isFormatElement(startCon.parentNode)) {
+                        let prev = startCon.parentNode.previousSibling;
+                        const next = startCon.parentNode.nextSibling;
+                        if (!prev) {
+                            if (!next) {
+                                prev = util.createElement('BR');
+                                formatEl.appendChild(prev);
+                            } else {
+                                prev = next;
                             }
+                        }
 
-                            selectionNode.textContent = '';
-                            util.removeItemAllParents(selectionNode, null, formatEl);
-                            offset = typeof offset === 'number' ? offset : prev.nodeType === 3 ? prev.textContent.length : 1;
-                            core.setRange(prev, offset, prev, offset);
+                        let con = startCon;
+                        while(formatEl.contains(con) && !con.previousSibling) {
+                            con = con.parentNode;
+                        }
+
+                        if (!formatEl.contains(con)) {
+                            startCon.textContent = '';
+                            util.removeItemAllParents(startCon, null, formatEl);
                             break;
                         }
                     }
@@ -7480,7 +7481,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                             let child = focusBR;
                             do {
-                                if (selectionNode.nodeType === 1) {
+                                if (!util.isBreak(selectionNode) && selectionNode.nodeType === 1) {
                                     const f = selectionNode.cloneNode(false);
                                     f.appendChild(child);
                                     child = f;
@@ -7489,7 +7490,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             } while(formatEl !== selectionNode && formatEl.contains(selectionNode));
 
                             newFormat.appendChild(child);
-                            formatEl.parentNode.insertBefore(newFormat, formatStartEdge ? formatEl : formatEl.nextElementSibling);
+                            formatEl.parentNode.insertBefore(newFormat, formatStartEdge && !formatEndEdge ? formatEl : formatEl.nextElementSibling);
                             if (formatEndEdge) {
                                 core.setRange(focusBR, 1, focusBR, 1);
                             }
