@@ -965,11 +965,9 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
     // defaultStyle: 'color: red;',
     // shortcutsDisable: ['bold', 'underline', 'italic'],
     __allowedScriptTag: true,
-    value: `<p>Inssell.</p>
-    <script>
-    alert(1)
-    </script>
-    <p>It can be easy to.</p>`,
+    value: `
+    <p><span style="color: rgb(255, 228, 0);"></span><strong>Lorem Ipsum</strong><span style="color: rgb(0, 0, 0);font-size: 14px">&nbsp;is simply dummy text o f the </span><span style="color: rgb(242, 150, 97)">printing and typesetting industry</span><span style="color: rgb(0, 0, 0);font-size: 14px">. Lorem Ipsum has been the industry&apos; standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specim en book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker includin g versions of Lorem Ipsum.</span><br> </p>
+    `,
     allowedClassNames: '.',
     width: '100%',
     // fontSizeUnit: 'em',

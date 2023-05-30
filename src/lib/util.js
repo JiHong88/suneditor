@@ -1477,7 +1477,7 @@ const util = {
                     baseNode = baseNode.firstChild;
                 }
                 if (baseNode.nodeType === 3) {
-                    const after = this.createTextNode(this.zeroWidthSpace)
+                    const after = this.createTextNode(this.zeroWidthSpace);
                     baseNode.parentNode.insertBefore(after, baseNode);
                     baseNode = after;
                 }
