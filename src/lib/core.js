@@ -6955,8 +6955,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     // clean remove tag
-                    if (formatEl && range.startContainer === range.endContainer && selectionNode.nodeType === 3 && !util.isFormatElement(selectionNode.parentNode)) {
-                        if (range.collapsed ? selectionNode.textContent.length === 1 : (range.endOffset - range.startOffset) === selectionNode.textContent.length) {
+                    if (!formatEl.previousElementSibling && formatEl && range.startContainer === range.endContainer && selectionNode.nodeType === 3 && !util.isFormatElement(selectionNode.parentNode)) {
+                        if (range.collapsed ? selectionNode.textContent.length === 0 : (range.endOffset - range.startOffset) === selectionNode.textContent.length) {
                             e.preventDefault();
 
                             let offset = null;
