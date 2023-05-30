@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-					if (!w.document) {
-						throw new Error('SUNEDITOR_LANG a window with a document');
-					}
-					return factory(w);
-			  };
+				if (!w.document) {
+					throw new Error('SUNEDITOR_LANG a window with a document');
+				}
+				return factory(w);
+			};
 	} else {
 		factory(global);
 	}
@@ -80,7 +80,7 @@
 		maxSize: 'Max størrelse',
 		mention: 'Nævne',
 		menu_bordered: 'Afgrænsningslinje',
-		menu_code: 'Code'
+		menu_code: 'Code',
 		menu_neon: 'Neon',
 		menu_shadow: 'Skygge',
 		menu_spaced: 'Brev Afstand',

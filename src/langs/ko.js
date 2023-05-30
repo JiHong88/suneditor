@@ -80,7 +80,7 @@
 		maxSize: '최대화',
 		mention: '멘션',
 		menu_bordered: '경계선',
-		menu_code: '코드'
+		menu_code: '코드',
 		menu_neon: '네온',
 		menu_shadow: '그림자',
 		menu_spaced: '글자 간격',

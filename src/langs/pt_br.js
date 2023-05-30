@@ -80,7 +80,7 @@
 		maxSize: 'Tam máx',
 		mention: 'Menção',
 		menu_bordered: 'Com borda',
-		menu_code: 'Código'
+		menu_code: 'Código',
 		menu_neon: 'Neon',
 		menu_shadow: 'Sombreado',
 		menu_spaced: 'Espaçado',

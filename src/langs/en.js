@@ -80,7 +80,7 @@
 		maxSize: 'Max size',
 		mention: 'Mention',
 		menu_bordered: 'Bordered',
-		menu_code: 'Code'
+		menu_code: 'Code',
 		menu_neon: 'Neon',
 		menu_shadow: 'Shadow',
 		menu_spaced: 'Spaced',

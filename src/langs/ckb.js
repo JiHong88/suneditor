@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-					if (!w.document) {
-						throw new Error('SUNEDITOR_LANG a window with a document');
-					}
-					return factory(w);
-			  };
+				if (!w.document) {
+					throw new Error('SUNEDITOR_LANG a window with a document');
+				}
+				return factory(w);
+			};
 	} else {
 		factory(global);
 	}
@@ -80,7 +80,7 @@
 		maxSize: 'گه‌وره‌ترین قه‌باره‌',
 		mention: 'تنويه ب',
 		menu_bordered: 'لێواری هه‌بێت',
-		menu_code: 'كۆد'
+		menu_code: 'كۆد',
 		menu_neon: 'نیۆن',
 		menu_shadow: 'سێبه‌ر',
 		menu_spaced: 'بۆشای هه‌بێت',

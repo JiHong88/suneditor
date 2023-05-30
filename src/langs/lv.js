@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-					if (!w.document) {
-						throw new Error('SUNEDITOR_LANG a window with a document');
-					}
-					return factory(w);
-			  };
+				if (!w.document) {
+					throw new Error('SUNEDITOR_LANG a window with a document');
+				}
+				return factory(w);
+			};
 	} else {
 		factory(global);
 	}
@@ -80,7 +80,7 @@
 		maxSize: 'Maksimālais izmērs',
 		mention: 'Pieminēt',
 		menu_bordered: 'Robežojās',
-		menu_code: 'Kods'
+		menu_code: 'Kods',
 		menu_neon: 'Neona',
 		menu_shadow: 'Ēna',
 		menu_spaced: 'Ar atstarpi',

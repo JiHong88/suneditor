@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-					if (!w.document) {
-						throw new Error('SUNEDITOR_LANG a window with a document');
-					}
-					return factory(w);
-			  };
+				if (!w.document) {
+					throw new Error('SUNEDITOR_LANG a window with a document');
+				}
+				return factory(w);
+			};
 	} else {
 		factory(global);
 	}
@@ -62,7 +62,7 @@
 		insertRowBelow: 'Wstaw wiersz poniżej',
 		italic: 'Kursywa',
 		layout: 'Layout',
-		left: 'Do lewej', 
+		left: 'Do lewej',
 		lineHeight: 'Odstęp między wierszami',
 		link: 'Odnośnik',
 		link_modal_bookmark: 'Zakładka',
@@ -80,7 +80,7 @@
 		maxSize: 'Maksymalny rozmiar',
 		mention: 'Wzmianka',
 		menu_bordered: 'Z obwódką',
-		menu_code: 'Kod'
+		menu_code: 'Kod',
 		menu_neon: 'Neon',
 		menu_shadow: 'Cień',
 		menu_spaced: 'Rozstawiony',
@@ -104,7 +104,7 @@
 		resize50: 'Zmień rozmiar - 50%',
 		resize75: 'Zmień rozmiar - 75%',
 		resize: 'Resize',
-		revertButton: 'Cofnij zmiany', 
+		revertButton: 'Cofnij zmiany',
 		right: 'Do prawej',
 		rotateLeft: 'Obróć w lewo',
 		rotateRight: 'Obróć w prawo',

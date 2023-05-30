@@ -80,7 +80,7 @@
 		maxSize: 'Tamaño máximo',
 		mention: 'Mencionar',
 		menu_bordered: 'Bordeado',
-		menu_code: 'Código'
+		menu_code: 'Código',
 		menu_neon: 'Neón',
 		menu_shadow: 'Sombreado',
 		menu_spaced: 'Espaciado',

@@ -80,7 +80,7 @@
 		maxSize: 'Dimensiune maximă',
 		mention: 'Mentiune',
 		menu_bordered: 'Mărginit',
-		menu_code: 'Citat'
+		menu_code: 'Citat',
 		menu_neon: 'Neon',
 		menu_shadow: 'Umbră',
 		menu_spaced: 'Spațiat',

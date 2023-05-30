@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-					if (!w.document) {
-						throw new Error('SUNEDITOR_LANG a window with a document');
-					}
-					return factory(w);
-			  };
+				if (!w.document) {
+					throw new Error('SUNEDITOR_LANG a window with a document');
+				}
+				return factory(w);
+			};
 	} else {
 		factory(global);
 	}
@@ -69,7 +69,7 @@
 		link_modal_downloadLinkCheck: 'קישור להורדה',
 		link_modal_newWindowCheck: 'פתח בחלון חדש',
 		link_modal_text: 'תיאור',
-        link_modal_title: 'הכנס קשור',
+		link_modal_title: 'הכנס קשור',
 		link_modal_url: 'כתובת קשור',
 		list: 'רשימה',
 		math: 'מתמטיקה',
@@ -80,7 +80,7 @@
 		maxSize: 'גודל מרבי',
 		mention: 'הזכר',
 		menu_bordered: 'בעל מיתאר',
-		menu_code: 'קוד'
+		menu_code: 'קוד',
 		menu_neon: 'זוהר',
 		menu_shadow: 'צל',
 		menu_spaced: 'מרווח',

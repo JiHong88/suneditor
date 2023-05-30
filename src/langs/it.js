@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-					if (!w.document) {
-						throw new Error('SUNEDITOR_LANG una finestra con un documento');
-					}
-					return factory(w);
-			  };
+				if (!w.document) {
+					throw new Error('SUNEDITOR_LANG una finestra con un documento');
+				}
+				return factory(w);
+			};
 	} else {
 		factory(global);
 	}
@@ -80,7 +80,7 @@
 		maxSize: 'Dimensione massima',
 		mention: 'Menzione',
 		menu_bordered: 'Bordato',
-		menu_code: 'Codice'
+		menu_code: 'Codice',
 		menu_neon: 'Luminoso',
 		menu_shadow: 'Ombra',
 		menu_spaced: 'Spaziato',

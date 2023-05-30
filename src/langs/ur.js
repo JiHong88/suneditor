@@ -24,7 +24,7 @@
 		audio_modal_title: 'آواز داخل کریں',
 		audio_modal_url: 'آواز URL',
 		autoSize: 'ازخود حجم',
-		backgroundColor: 'Highlight Color',	 
+		backgroundColor: 'Highlight Color',
 		basic: 'بنیادی',
 		bold: 'بولڈ',
 		caption: 'عنوان',
@@ -80,7 +80,7 @@
 		maxSize: 'زیادہ سے زیادہ سائز',
 		mention: 'تذکرہ',
 		menu_bordered: 'سرحدی',
-		menu_code: 'کوڈ'
+		menu_code: 'کوڈ',
 		menu_neon: 'نیین',
 		menu_shadow: 'سایہ',
 		menu_spaced: 'فاصلہ',

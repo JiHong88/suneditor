@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-					if (!w.document) {
-						throw new Error('SUNEDITOR_LANG a window with a document');
-					}
-					return factory(w);
-			  };
+				if (!w.document) {
+					throw new Error('SUNEDITOR_LANG a window with a document');
+				}
+				return factory(w);
+			};
 	} else {
 		factory(global);
 	}
@@ -80,7 +80,7 @@
 		maxSize: '最大尺寸',
 		mention: '提到',
 		menu_bordered: '边界线',
-		menu_code: '代码'
+		menu_code: '代码',
 		menu_neon: '霓虹灯',
 		menu_shadow: '阴影',
 		menu_spaced: '间隔开',

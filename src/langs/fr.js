@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-					if (!w.document) {
-						throw new Error('SUNEDITOR_LANG a window with a document');
-					}
-					return factory(w);
-			  };
+				if (!w.document) {
+					throw new Error('SUNEDITOR_LANG a window with a document');
+				}
+				return factory(w);
+			};
 	} else {
 		factory(global);
 	}
@@ -69,7 +69,7 @@
 		link_modal_downloadLinkCheck: 'Lien de téléchargement',
 		link_modal_newWindowCheck: 'Ouvrir dans une nouvelle fenêtre',
 		link_modal_text: 'Texte à afficher',
-        link_modal_title: 'Insérer un lien',
+		link_modal_title: 'Insérer un lien',
 		link_modal_url: 'Adresse URL du lien',
 		list: 'Liste',
 		math: 'Math',
@@ -80,7 +80,7 @@
 		maxSize: 'Taille max',
 		mention: 'Mention',
 		menu_bordered: 'Ligne de démarcation',
-		menu_code: 'Code'
+		menu_code: 'Code',
 		menu_neon: 'Néon',
 		menu_shadow: 'Ombre',
 		menu_spaced: 'Espacement',

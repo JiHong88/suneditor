@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-					if (!w.document) {
-						throw new Error('SUNEDITOR_LANG a window with a document');
-					}
-					return factory(w);
-			  };
+				if (!w.document) {
+					throw new Error('SUNEDITOR_LANG a window with a document');
+				}
+				return factory(w);
+			};
 	} else {
 		factory(global);
 	}
@@ -64,7 +64,7 @@
 		layout: 'Layout',
 		left: 'Зліва',
 		lineHeight: 'Висота лінії',
-		link: 'Посилання', 
+		link: 'Посилання',
 		link_modal_bookmark: 'Закладка',
 		link_modal_downloadLinkCheck: 'Посилання для завантаження',
 		link_modal_newWindowCheck: 'Відкривати в новому вікні',
@@ -80,7 +80,7 @@
 		maxSize: 'Ширина за розміром сторінки',
 		mention: 'Згадати',
 		menu_bordered: 'З лініями',
-		menu_code: 'Код'
+		menu_code: 'Код',
 		menu_neon: 'Неон',
 		menu_shadow: 'Тінь',
 		menu_spaced: 'Інтервал',

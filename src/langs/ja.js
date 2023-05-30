@@ -80,7 +80,7 @@
 		maxSize: '最大サイズ',
 		mention: '言及する',
 		menu_bordered: '境界線',
-		menu_code: 'コード'
+		menu_code: 'コード',
 		menu_neon: 'ネオン',
 		menu_shadow: '影',
 		menu_spaced: '文字間隔',
