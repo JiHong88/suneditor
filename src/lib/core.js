@@ -5881,7 +5881,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }.bind(options.allowedClassNames);
 
             const sPrefix = (options.__allowedScriptTag ? '' : 'script|');
-            this.__scriptTagRegExp = new wRegExp('<(script)[^>]*>([\\s\\S]*?)<\\/\\1>|<script[^>]*\\/?>', 'gi')
+            this.__scriptTagRegExp = new wRegExp('<(script)[^>]*>([\\s\\S]*?)<\\/\\1>|<script[^>]*\\/?>', 'gi');
             this.__disallowedTagsRegExp = new wRegExp('<(' + sPrefix + 'style)[^>]*>([\\s\\S]*?)<\\/\\1>|<(' + sPrefix + 'style)[^>]*\\/?>', 'gi');
             this.__disallowedTagNameRegExp = new wRegExp('^(' + sPrefix + 'meta|link|style|[a-z]+\:[a-z]+)$', 'i');
             this.__allowedScriptRegExp = new wRegExp('^' + (options.__allowedScriptTag ? 'script' : '') + '$', 'i');
@@ -6322,6 +6322,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _responsiveCurrentSize: 'default',
         _responsiveButtonSize: null,
         _responsiveButtons: null,
+        _cursorMoveKeyCode: new _w.RegExp('^(8|3[2-9]|40|46)$'),
         _directionKeyCode: new _w.RegExp('^(8|13|3[2-9]|40|46)$'),
         _nonTextKeyCode: new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$'),
         _historyIgnoreKeyCode: new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
@@ -6870,7 +6871,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const alt = e.altKey;
             event._IEisComposing = keyCode === 229;
 
-            if (!ctrl && core.isReadOnly && !event._directionKeyCode.test(keyCode)) {
+            if (!ctrl && core.isReadOnly && !event._cursorMoveKeyCode.test(keyCode)) {
                 e.preventDefault();
                 return false;
             }
@@ -7480,12 +7481,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             let child = focusBR;
                             do {
                                 if (selectionNode.nodeType === 1) {
-                                    const f = selectionNode.cloneNode(false)
+                                    const f = selectionNode.cloneNode(false);
                                     f.appendChild(child);
                                     child = f;
                                 }
                                 selectionNode = selectionNode.parentNode;
-                            } while(formatEl !== selectionNode && formatEl.contains(selectionNode))
+                            } while(formatEl !== selectionNode && formatEl.contains(selectionNode));
 
                             newFormat.appendChild(child);
                             formatEl.parentNode.insertBefore(newFormat, formatStartEdge ? formatEl : formatEl.nextElementSibling);
@@ -7638,7 +7639,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const alt = e.altKey;
 
             if (core.isReadOnly) {
-                if (!ctrl && event._directionKeyCode.test(keyCode)) event._applyTagEffects();
+                if (!ctrl && event._cursorMoveKeyCode.test(keyCode)) event._applyTagEffects();
                 return;
             }
 
