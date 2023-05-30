@@ -224,17 +224,17 @@ ModalAnchorEditor.prototype = {
 		value =
 			this.linkValue =
 			preview.textContent =
-				!value
-					? ''
-					: noPrefix
+			!value
+				? ''
+				: noPrefix
 					? value
 					: protocol && !reservedProtocol && !sameProtocol
-					? protocol + value
-					: reservedProtocol
-					? value
-					: /^www\./.test(value)
-					? 'http://' + value
-					: this.host + (/^\//.test(value) ? '' : '/') + value;
+						? protocol + value
+						: reservedProtocol
+							? value
+							: /^www\./.test(value)
+								? 'http://' + value
+								: this.host + (/^\//.test(value) ? '' : '/') + value;
 
 		if (this._selfPathBookmark(value)) {
 			this.bookmark.style.display = 'block';
@@ -417,7 +417,7 @@ function CreatetModalForm(editor, params, relList) {
 		'<label' +
 		titleShow +
 		'>' +
-		lang.title +
+		lang.link_modal_title +
 		'</label><input class="se-input-form _se_title" type="text"' +
 		titleShow +
 		' />' +
