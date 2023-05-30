@@ -7475,10 +7475,19 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             e.preventDefault();
                             const focusBR = util.createElement('BR');
                             const newFormat = util.createElement(formatEl.nodeName);
-                            newFormat.appendChild(focusBR);
-
                             util.copyTagAttributes(newFormat, formatEl, options.lineAttrReset);
 
+                            let child = focusBR;
+                            do {
+                                if (selectionNode.nodeType === 1) {
+                                    const f = selectionNode.cloneNode(false)
+                                    f.appendChild(child);
+                                    child = f;
+                                }
+                                selectionNode = selectionNode.parentNode;
+                            } while(formatEl !== selectionNode && formatEl.contains(selectionNode))
+
+                            newFormat.appendChild(child);
                             formatEl.parentNode.insertBefore(newFormat, formatStartEdge ? formatEl : formatEl.nextElementSibling);
                             if (formatEndEdge) {
                                 core.setRange(focusBR, 1, focusBR, 1);
