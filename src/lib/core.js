@@ -1196,10 +1196,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 range = this._createDefaultRange();
             }
 
-            if (util.isFormatElement(range.endContainer) && range.endOffset === 0) {
-                range = this.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.length);
-            }
-
             this._rangeInfo(range, selection);
         },
 
@@ -6077,7 +6073,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _initWysiwygArea: function (reload, _initHTML) {
-            context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentsForEditor(typeof _initHTML === 'string' ? _initHTML : context.element.originElement.value);
+            context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentsForEditor((typeof _initHTML === 'string' ? _initHTML : /TEXTAREA/i.test(context.element.originElement) ? context.element.originElement.value : context.element.originElement.innerHTML) || '');
         },
 
         /**
@@ -6594,6 +6590,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             core._editorRange();
+
+            if (e.detail === 3) {
+                let range = core.getRange();
+                if (util.isFormatElement(range.endContainer) && range.endOffset === 0) {
+                    range = core.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.length);
+                    core._rangeInfo(range, core.getSelection());
+                }
+            }
 
             const selectionNode = core.getSelectionNode();
             const formatEl = util.getFormatElement(selectionNode, null);
@@ -7629,6 +7633,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 core.insertNode(zeroWidth, null, false);
                 core.setRange(zeroWidth, 1, zeroWidth, 1);
             }
+
+            if (event._directionKeyCode.test(keyCode)) {
+                core._editorRange();
+                event._applyTagEffects();
+            }
         },
 
         onKeyUp_wysiwyg: function (e) {
@@ -7691,10 +7700,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (!formatEl && range.collapsed && !util.isComponent(selectionNode) && !util.isList(selectionNode) && core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag) !== null) {
                 selectionNode = core.getSelectionNode();
-            }
-
-            if (event._directionKeyCode.test(keyCode)) {
-                event._applyTagEffects();
             }
 
             const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
