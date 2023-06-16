@@ -87,7 +87,7 @@ function CreateHTML(editor, items) {
 	let list =
 		'<div class="se-list-inner">' +
 		'<ul class="se-list-basic">' +
-		'<li><button type="button" class="se-btn se-btn-list default_value" title="' +
+		'<li><button type="button" class="se-btn se-btn-list default-value" title="' +
 		lang.default +
 		'" aria-label="' +
 		lang.default +
