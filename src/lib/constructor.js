@@ -409,6 +409,7 @@ export default {
         /** Values */
         options.lang = options.lang || _defaultLang;
         options.value = typeof options.value === 'string' ? options.value : null;
+        options.allowedClassNames = new util._w.RegExp((options.allowedClassNames && typeof options.allowedClassNames === 'string' ? options.allowedClassNames + '|' : '') + '^__se__|se-|katex');
         options.historyStackDelayTime = typeof options.historyStackDelayTime === 'number' ? options.historyStackDelayTime : 400;
         options.frameAttrbutes = options.frameAttrbutes || {};
         // tag style
@@ -441,10 +442,11 @@ export default {
             superscript: options.textTags.sup
         };
         /** Whitelist, Blacklist */
+        options.__allowedScriptTag = options.__allowedScriptTag === true;
         const whitelist = 'br|p|div|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
         // tags
         options.tagsBlacklist = options.tagsBlacklist || '';
-        options._defaultTagsWhitelist = typeof options._defaultTagsWhitelist === 'string' ? options._defaultTagsWhitelist : whitelist;
+        options._defaultTagsWhitelist = (typeof options._defaultTagsWhitelist === 'string' ? options._defaultTagsWhitelist : whitelist) + (options.__allowedScriptTag ? '|script' : '');
         options._editorTagsWhitelist = options.addTagsWhitelist === '*' ? '*' : this._setWhitelist(options._defaultTagsWhitelist + (typeof options.addTagsWhitelist === 'string' && options.addTagsWhitelist.length > 0 ? '|' + options.addTagsWhitelist : ''), options.tagsBlacklist);
         // paste tags
         options.pasteTagsBlacklist = options.tagsBlacklist + (options.tagsBlacklist && options.pasteTagsBlacklist ? ('|' + options.pasteTagsBlacklist) : (options.pasteTagsBlacklist || ''));

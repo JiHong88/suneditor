@@ -20,6 +20,8 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/htmlmixed/htmlmixed';
 import CodeMirror from 'codemirror';
 
+import { add_pricing_table_plugin } from "./tablePluginsTest";
+
 // console.log("pluginf???", plugins);
 // plugins.fontSize.pickup = function (e){
 //     console.log("font----------size", this)
@@ -939,17 +941,61 @@ const complexEditor = [
 //     // iframe: true,
 // });
 
+plugins.template.pickup = function (e) {
+    if (!/^BUTTON$/i.test(e.target.tagName)) return false;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    this.context.template.selectedIndex = e.target.getAttribute('data-value') * 1;
+    const temp = this.options.templates[this.context.template.selectedIndex];
+
+    if (temp.html) {
+        this.insertHTML(temp.html);
+    } else {
+        this.submenuOff();
+        throw Error('[SUNEDITOR.template.fail] cause : "templates[i].html not found"');
+    }
+        
+    this.submenuOff();
+}
+
 let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
     // rtl: true,
     // defaultStyle: 'color: red;',
     // shortcutsDisable: ['bold', 'underline', 'italic'],
+    __allowedScriptTag: true,
+//     value: `
+//     <ul>
+//   <li>Pasting from Microsoft Word and Excel.</li>
+//   <li>Custom table selection, merge and split.</li>
+//   <li>Media embed, images upload.</li>
+//   <li>Can use CodeMirror, KaTeX.    
+//     <ul>
+//       <li>And.. many other features :)</li>
+//       <li>And.. many other features :)</li>
+//       <li>And.. many other features :)</li>
+//       <li>And.. many other features :)</li>
+//     </ul>
+//   </li>
+//   <li>Pasting from Microsoft Word and Excel.</li>
+//   <li>Custom table selection, merge and split.</li>
+//   <li>Media embed, images upload.</li>
+//   <li>Pasting from Microsoft Word and Excel.</li>
+//   <li>Custom table selection, merge and split.</li>
+//   <li>Media embed, images upload.</li>
+// </ul>
+
+//     `,
+    allowedClassNames: '.',
     width: '100%',
     // fontSizeUnit: 'em',
     // mode: "inline",
-    value: `<p>Instead of buying low and selling high like investing genius Warren Buffet once said, your long-term investment strategy can be even easier than that: Buy low, never sell.</p><p>It can be easy to buy low and sell high when it comes to investing, but this is not a long-term strategy. Instead, you should aim to buy assets that will never go down in value, such as stocks or real estate. This will allow you to make a profit over the long term, even if the market goes down.</p><p>“The Millionaire Next Door” reported that the majority of millionaires never sell their assets. Whether it’s stocks, bonds, real estate, or any alternative asset — one thing remains consistent: They don’t ever sell.</p><p>“Well, how do you make money if you never sell off your assets?“</p><p>It should be noted that “buy and never sell” is a bit of an extreme exaggeration. It’s not that these millionaires have never sold an asset, it’s just that they held onto their assets long into the future.</p><p>Here’s a real-world example. Say you were one of the amazingly smart people who bought a box of Base Set Pokemon cards for $80 in 1998 and never opened them. This unopened box of cards consistently sells for anywhere between $16,000 to $40,000</p>`,
+    // value: `<p>Instead of buying low and selling high like investing genius Warren Buffet once said, your long-term investment strategy can be even easier than that: Buy low, never sell.</p><p>It can be easy to buy low and sell high when it comes to investing, but this is not a long-term strategy. Instead, you should aim to buy assets that will never go down in value, such as stocks or real estate. This will allow you to make a profit over the long term, even if the market goes down.</p><p>“The Millionaire Next Door” reported that the majority of millionaires never sell their assets. Whether it’s stocks, bonds, real estate, or any alternative asset — one thing remains consistent: They don’t ever sell.</p><p>“Well, how do you make money if you never sell off your assets?“</p><p>It should be noted that “buy and never sell” is a bit of an extreme exaggeration. It’s not that these millionaires have never sold an asset, it’s just that they held onto their assets long into the future.</p><p>Here’s a real-world example. Say you were one of the amazingly smart people who bought a box of Base Set Pokemon cards for $80 in 1998 and never opened them. This unopened box of cards consistently sells for anywhere between $16,000 to $40,000</p>`,
     buttonList:complexEditor,
-    attributesWhitelist: {'all': 'id|class|name'},
+    attributesWhitelist: {'all': 'id|class|name|style'},
     plugins: plugins,
+    linkProtocol: 'custom://',
     katex: Katex,
     // value: 'abc',
     minHeight : 300,
@@ -959,7 +1005,7 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
         'Vazir', 'Arial', 'Comic Sans MS', 'Courier New', 'Impact',
         'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'
     ],
-    linkNoPrefix: true,
+    // linkNoPrefix: true,
     formats: [
         'p', 'div', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',{
           tag: 'div', // Tag name
@@ -973,9 +1019,17 @@ let s2 = window.s2 = suneditor.create(document.getElementById('editor2'), {
     // iframe: true,
     // fullPage: true,
     imageMultipleFile: true,
+    templates: [
+        {
+            name: 'Template 1',
+            html: '<p>Template 1</p>'
+        }
+    ],
     addTagsWhitelist: "fld|sort|sortType|lst|lstfld|header|section",
     lineAttrReset: 'class'
 });
+
+s2.core._cleanStyleRegExp.span = new RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color|background-image)\\s*:[^;]+(?!;)*', 'ig'),
 
 window.sun_setOptions2 = () => {
     s2.setContents(`<section class="__se__tag content-pages page-brands">

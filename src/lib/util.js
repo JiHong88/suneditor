@@ -366,6 +366,15 @@ const util = {
     },
 
     /**
+     * @description It is judged whether it is the input element (INPUT, TEXTAREA)
+     * @param {Node} element The node to check
+     * @returns 
+     */
+    isInputElement: function (element) {
+        return element && element.nodeType === 1 && /^(INPUT|TEXTAREA)$/i.test(element.nodeName);
+    },
+
+    /**
      * @description It is judged whether it is the format element (P, DIV, H[1-6], PRE, LI | class="__se__format__replace_xxx")
      * Format element also contain "free format Element"
      * @param {Node} element The node to check
@@ -1449,8 +1458,10 @@ const util = {
         }
 
         const bp = baseNode.parentNode;
-        let index = 0, newEl, children, temp;
+        let index = 0;
+        let suffixIndex = 1;
         let next = true;
+        let newEl, children, temp;
         if (!depth || depth < 0) depth = 0;
 
         if (baseNode.nodeType === 3) {
@@ -1461,6 +1472,16 @@ const util = {
                 if (this.onlyZeroWidthSpace(after)) after.data = this.zeroWidthSpace;
             }
         } else if (baseNode.nodeType === 1) {
+            if (offset === 0) {
+                while (baseNode.firstChild) {
+                    baseNode = baseNode.firstChild;
+                }
+                if (baseNode.nodeType === 3) {
+                    const after = this.createTextNode(this.zeroWidthSpace);
+                    baseNode.parentNode.insertBefore(after, baseNode);
+                    baseNode = after;
+                }
+            }
             if (!baseNode.previousSibling) {
                 if (this.getElementDepth(baseNode) === depth) next = false;
             } else {
@@ -1468,9 +1489,10 @@ const util = {
             }
         }
 
+        if (baseNode.nodeType === 1) suffixIndex = 0;
         let depthEl = baseNode;
         while (this.getElementDepth(depthEl) > depth) {
-            index = this.getPositionIndex(depthEl) + 1;
+            index = this.getPositionIndex(depthEl) + suffixIndex;
             depthEl = depthEl.parentNode;
 
             temp = newEl;
@@ -1736,6 +1758,15 @@ const util = {
     },
 
     /**
+	 * @description HTML code compression
+	 * @param {string} html HTML string
+	 * @returns {string} HTML string
+	 */
+	htmlCompress: function (html) {
+		return html.replace(/\n/g, '').replace(/(>)(?:\s+)(<)/g, '$1$2');
+	},
+
+    /**
      * @description Sort a element array by depth of element.
      * @param {Array} array Array object
      * @param {Boolean} des true: descending order / false: ascending order
@@ -1797,6 +1828,7 @@ const util = {
     },
 
     /**
+     * @deprecated
      * @description Check disallowed tags
      * @param {Node} element Element to check
      * @returns {Boolean}
@@ -1831,10 +1863,10 @@ const util = {
      * @param {Element} documentFragment Document fragment "DOCUMENT_FRAGMENT_NODE" (nodeType === 11)
      * @param {RegExp} htmlCheckWhitelistRegExp Editor tags whitelist (core._htmlCheckWhitelistRegExp)
      * @param {RegExp} htmlCheckBlacklistRegExp Editor tags blacklist (core._htmlCheckBlacklistRegExp)
-     * @param {Boolean} lowLevelCheck Row level check
+     * @param {Function} classNameFilter Class name filter function
      * @private
      */
-    _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, lowLevelCheck) {
+    _consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp, classNameFilter) {
         /**
          * It is can use ".children(util.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
          * So check the node type and exclude the text no (current.nodeType !== 1)
@@ -1877,15 +1909,15 @@ const util = {
             }
 
             // class filter
-            if (lowLevelCheck && nrtag && current.className) {
-                const className = new this._w.Array(current.classList).map(this._classNameFilter).join(' ').trim();
+            if (nrtag && current.className) {
+                const className = new this._w.Array(current.classList).map(classNameFilter).join(' ').trim();
                 if (className) current.className = className;
                 else current.removeAttribute('class');
             }
 
             const result = current.parentNode !== documentFragment && nrtag &&
              ((this.isListCell(current) && !this.isList(current.parentNode)) ||
-              (lowLevelCheck && (this.isFormatElement(current) || this.isComponent(current)) && !this.isRangeFormatElement(current.parentNode) && !this.getParentElement(current, this.isComponent)));
+              ((this.isFormatElement(current) || this.isComponent(current)) && !this.isRangeFormatElement(current.parentNode) && !this.getParentElement(current, this.isComponent)));
 
             return result;
         }.bind(this));
@@ -1950,10 +1982,6 @@ const util = {
             f.innerHTML = (t.textContent.trim().length === 0 && t.children.length === 0) ? '<br>' : t.innerHTML;
             t.innerHTML = f.outerHTML;
         }
-    },
-
-    _classNameFilter: function (v) {
-        return /(^__se__|^se-|katex)/.test(v) ? v : '';
     },
 
     _setDefaultOptionStyle: function (options, defaultStyle) {

@@ -1180,6 +1180,12 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _editorRange: function () {
+            const activeEl = this._wd.activeElement;
+            if (util.isInputElement(activeEl)) {
+                this._variable._selectionNode = activeEl;
+                return activeEl;
+            }
+
             const selection = this.getSelection();
             if (!selection) return null;
             let range = null;
@@ -1188,10 +1194,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 range = selection.getRangeAt(0);
             } else {
                 range = this._createDefaultRange();
-            }
-
-            if (util.isFormatElement(range.endContainer) && range.endOffset === 0) {
-                range = this.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.length);
             }
 
             this._rangeInfo(range, selection);
@@ -4755,12 +4757,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (options.fullPage) {
                 const parseDocument = this._parser.parseFromString(code_html, 'text/html');
-                const headChildren = parseDocument.head.children;
 
-                for (let i = 0, len = headChildren.length; i < len; i++) {
-                    if (/^script$/i.test(headChildren[i].tagName)) {
-                        parseDocument.head.removeChild(headChildren[i]);
-                        i--, len--;
+                if (!this.options.__allowedScriptTag) {
+                    const headChildren = parseDocument.head.children;
+                    for (let i = 0, len = headChildren.length; i < len; i++) {
+                        if (/^script$/i.test(headChildren[i].tagName)) {
+                            parseDocument.head.removeChild(headChildren[i]);
+                            i--, len--;
+                        }
                     }
                 }
 
@@ -5126,7 +5130,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         setIframeContents: function (ctx) {
             if (!options.iframe) return false;
-            if (ctx.head) this._wd.head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
+            if (ctx.head) this._wd.head.innerHTML = this.options.__allowedScriptTag ? ctx.head : ctx.head.replace(this.__scriptTagRegExp, '');
             if (ctx.body) this._wd.body.innerHTML = this.convertContentsForEditor(ctx.body);
             this._resetComponents();
         },
@@ -5178,7 +5182,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const defaultTag = options.defaultTag;
             // element
             if (node.nodeType === 1) {
-                if (util._disallowedTags(node)) return '';
+                if (this.__disallowedTagNameRegExp.test(node.nodeName)) return '';
                 if (/__se__tag/.test(node.className)) return node.outerHTML;
 
                 const ch = util.getListChildNodes(node, function(current) { return util.isSpanWithoutAttr(current) && !util.getParentElement(current, util.isNotCheckingNode); }) || [];
@@ -5234,7 +5238,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          */
         _deleteDisallowedTags: function (html) {
 			html = html
-				.replace(/<(script|style)[\s\S]*>[\s\S]*<\/(script|style)>/gi, '')
+				.replace(this.__disallowedTagsRegExp, '')
 				.replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '');
 
             if (!/\bfont\b/i.test(this.options._editorTagsWhitelist)) {
@@ -5377,9 +5381,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             if (v) {
-                for (let i = 0, len = v.length; i < len; i++) {
+                for (let i = 0, len = v.length, a; i < len; i++) {
                     // if (lowLevelCheck && /^class="(?!(__se__|se-|katex))/.test(v[i].trim())) continue;
-                    t += ' ' + (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i].trim()) ? '' : v[i]);
+                    a = (/^(?:href|src)\s*=\s*('|"|\s)*javascript\s*\:/i.test(v[i].trim()) ? '' : v[i]);
+                    t += (/^\s/.test(a) ? '' : ' ') + a;
                 }
             }
 
@@ -5448,7 +5453,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             for (let i = 0, len = domTree.length, t; i < len; i++) {
                 t = domTree[i];
-                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !util._disallowedTags(t)) {
+                if (t.nodeType === 1 && !util.isTextStyleElement(t) && !util.isBreak(t) && !this.__disallowedTagNameRegExp.test(t.nodeName)) {
                     requireFormat = true;
                     break;
                 }
@@ -5467,10 +5472,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         cleanHTML: function (html, whitelist, blacklist) {
-            html = this._deleteDisallowedTags(this._parser.parseFromString(html, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true)).replace(/<br\/?>$/i, '');
+            html = this._deleteDisallowedTags(this._parser.parseFromString(util.htmlCompress(html), 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true)).replace(/<br\/?>$/i, '');
             const dom = _d.createRange().createContextualFragment(html);
             try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, true);
+                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, this._classNameFilter);
             } catch (error) {
                 console.warn('[SUNEDITOR.cleanHTML.consistencyCheck.fail] ' + error);
             }
@@ -5497,8 +5502,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 domTree = this._editFormat(dom).childNodes;
             }
 
-            for (let i = 0, len = domTree.length; i < len; i++) {
-                cleanHTML += this._makeLine(domTree[i], requireFormat);
+            for (let i = 0, len = domTree.length, t; i < len; i++) {
+                t = domTree[i];
+                if (this.__allowedScriptRegExp.test(t.nodeName)) {
+                    cleanHTML += t.outerHTML;
+                    continue;
+                }
+                cleanHTML += this._makeLine(t, requireFormat);
             }
 
             cleanHTML = util.htmlRemoveWhiteSpace(cleanHTML);
@@ -5518,11 +5528,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {String}
          */
         convertContentsForEditor: function (contents) {
-            contents = this._deleteDisallowedTags(this._parser.parseFromString(contents, 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, false));
+            contents = this._deleteDisallowedTags(this._parser.parseFromString(util.htmlCompress(contents), 'text/html').body.innerHTML).replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, this._cleanTags.bind(this, true));
             const dom = _d.createRange().createContextualFragment(contents);
 
             try {
-                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, false);
+                util._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp, this._classNameFilter);
             } catch (error) {
                 console.warn('[SUNEDITOR.convertContentsForEditor.consistencyCheck.fail] ' + error);
             }
@@ -5545,6 +5555,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let cleanHTML = '', p = null;
             for (let i = 0, t; i < domTree.length; i++) {
                 t = domTree[i];
+
+                if (this.__allowedScriptRegExp.test(t.nodeName)) {
+                    cleanHTML += t.outerHTML;
+                    continue;
+                }
 
                 if (!util.isFormatElement(t) && !util.isRangeFormatElement(t) && !util.isComponent(t) && !util.isMedia(t) && t.nodeType !== 8 && !/__se__tag/.test(t.className)) {
                     if (!p) p = util.createElement(options.defaultTag);
@@ -5858,6 +5873,15 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this.wwComputedStyle = _w.getComputedStyle(context.element.wysiwyg);
             this._editorHeight = context.element.wysiwygFrame.offsetHeight;
             this._editorHeightPadding = util.getNumber(this.wwComputedStyle.getPropertyValue('padding-top')) + util.getNumber(this.wwComputedStyle.getPropertyValue('padding-bottom'));
+            this._classNameFilter = function (v) {
+                return this.test(v) ? v : '';
+            }.bind(options.allowedClassNames);
+
+            const sPrefix = (options.__allowedScriptTag ? '' : 'script|');
+            this.__scriptTagRegExp = new wRegExp('<(script)[^>]*>([\\s\\S]*?)<\\/\\1>|<script[^>]*\\/?>', 'gi');
+            this.__disallowedTagsRegExp = new wRegExp('<(' + sPrefix + 'style)[^>]*>([\\s\\S]*?)<\\/\\1>|<(' + sPrefix + 'style)[^>]*\\/?>', 'gi');
+            this.__disallowedTagNameRegExp = new wRegExp('^(' + sPrefix + 'meta|link|style|[a-z]+\:[a-z]+)$', 'i');
+            this.__allowedScriptRegExp = new wRegExp('^' + (options.__allowedScriptTag ? 'script' : '') + '$', 'i');
 
             if (!options.iframe && typeof _w.ShadowRoot === 'function') {
                 let child = context.element.wysiwygFrame;
@@ -6049,7 +6073,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _initWysiwygArea: function (reload, _initHTML) {
-            context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentsForEditor(typeof _initHTML === 'string' ? _initHTML : context.element.originElement.value);
+            context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentsForEditor((typeof _initHTML === 'string' ? _initHTML : /TEXTAREA/i.test(context.element.originElement) ? context.element.originElement.value : context.element.originElement.innerHTML) || '');
         },
 
         /**
@@ -6295,6 +6319,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         _responsiveCurrentSize: 'default',
         _responsiveButtonSize: null,
         _responsiveButtons: null,
+        _cursorMoveKeyCode: new _w.RegExp('^(8|3[2-9]|40|46)$'),
         _directionKeyCode: new _w.RegExp('^(8|13|3[2-9]|40|46)$'),
         _nonTextKeyCode: new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$'),
         _historyIgnoreKeyCode: new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$'),
@@ -6566,6 +6591,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             core._editorRange();
 
+            if (e.detail === 3) {
+                let range = core.getRange();
+                if (util.isFormatElement(range.endContainer) && range.endOffset === 0) {
+                    range = core.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.length);
+                    core._rangeInfo(range, core.getSelection());
+                }
+            }
+
             const selectionNode = core.getSelectionNode();
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
@@ -6834,13 +6867,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         _onShortcutKey: false,
         onKeyDown_wysiwyg: function (e) {
+            let selectionNode = core.getSelectionNode();
+            if (util.isInputElement(selectionNode)) return;
+
             const keyCode = e.keyCode;
             const shift = e.shiftKey;
             const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
             const alt = e.altKey;
             event._IEisComposing = keyCode === 229;
 
-            if (!ctrl && core.isReadOnly && !event._directionKeyCode.test(keyCode)) {
+            if (!ctrl && core.isReadOnly && !event._cursorMoveKeyCode.test(keyCode)) {
                 e.preventDefault();
                 return false;
             }
@@ -6865,7 +6901,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
 
             /** default key action */
-            let selectionNode = core.getSelectionNode();
             const range = core.getRange();
             const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
             const fileComponentName = core._fileManager.pluginRegExp.test(core.currentControllerName) ? core.currentControllerName : '';
@@ -6926,27 +6961,27 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     }
 
                     // clean remove tag
-                    if (formatEl && range.startContainer === range.endContainer && selectionNode.nodeType === 3 && !util.isFormatElement(selectionNode.parentNode)) {
-                        if (range.collapsed ? selectionNode.textContent.length === 1 : (range.endOffset - range.startOffset) === selectionNode.textContent.length) {
-                            e.preventDefault();
-
-                            let offset = null;
-                            let prev = selectionNode.parentNode.previousSibling;
-                            const next = selectionNode.parentNode.nextSibling;
-                            if (!prev) {
-                                if (!next) {
-                                    prev = util.createElement('BR');
-                                    formatEl.appendChild(prev);
-                                } else {
-                                    prev = next;
-                                    offset = 0;
-                                }
+                    const startCon = range.startContainer;
+                    if (formatEl && !formatEl.previousElementSibling && range.startOffset === 0 && startCon.nodeType === 3 && !util.isFormatElement(startCon.parentNode)) {
+                        let prev = startCon.parentNode.previousSibling;
+                        const next = startCon.parentNode.nextSibling;
+                        if (!prev) {
+                            if (!next) {
+                                prev = util.createElement('BR');
+                                formatEl.appendChild(prev);
+                            } else {
+                                prev = next;
                             }
+                        }
 
-                            selectionNode.textContent = '';
-                            util.removeItemAllParents(selectionNode, null, formatEl);
-                            offset = typeof offset === 'number' ? offset : prev.nodeType === 3 ? prev.textContent.length : 1;
-                            core.setRange(prev, offset, prev, offset);
+                        let con = startCon;
+                        while(formatEl.contains(con) && !con.previousSibling) {
+                            con = con.parentNode;
+                        }
+
+                        if (!formatEl.contains(con)) {
+                            startCon.textContent = '';
+                            util.removeItemAllParents(startCon, null, formatEl);
                             break;
                         }
                     }
@@ -7446,11 +7481,20 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                             e.preventDefault();
                             const focusBR = util.createElement('BR');
                             const newFormat = util.createElement(formatEl.nodeName);
-                            newFormat.appendChild(focusBR);
-
                             util.copyTagAttributes(newFormat, formatEl, options.lineAttrReset);
 
-                            formatEl.parentNode.insertBefore(newFormat, formatStartEdge ? formatEl : formatEl.nextElementSibling);
+                            let child = focusBR;
+                            do {
+                                if (!util.isBreak(selectionNode) && selectionNode.nodeType === 1) {
+                                    const f = selectionNode.cloneNode(false);
+                                    f.appendChild(child);
+                                    child = f;
+                                }
+                                selectionNode = selectionNode.parentNode;
+                            } while(formatEl !== selectionNode && formatEl.contains(selectionNode));
+
+                            newFormat.appendChild(child);
+                            formatEl.parentNode.insertBefore(newFormat, formatStartEdge && !formatEndEdge ? formatEl : formatEl.nextElementSibling);
                             if (formatEndEdge) {
                                 core.setRange(focusBR, 1, focusBR, 1);
                             }
@@ -7589,6 +7633,11 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 core.insertNode(zeroWidth, null, false);
                 core.setRange(zeroWidth, 1, zeroWidth, 1);
             }
+
+            if (event._directionKeyCode.test(keyCode)) {
+                core._editorRange();
+                event._applyTagEffects();
+            }
         },
 
         onKeyUp_wysiwyg: function (e) {
@@ -7600,7 +7649,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const alt = e.altKey;
 
             if (core.isReadOnly) {
-                if (!ctrl && event._directionKeyCode.test(keyCode)) event._applyTagEffects();
+                if (!ctrl && event._cursorMoveKeyCode.test(keyCode)) event._applyTagEffects();
                 return;
             }
 
@@ -7651,10 +7700,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             if (!formatEl && range.collapsed && !util.isComponent(selectionNode) && !util.isList(selectionNode) && core._setDefaultFormat(util.isRangeFormatElement(rangeEl) ? 'DIV' : options.defaultTag) !== null) {
                 selectionNode = core.getSelectionNode();
-            }
-
-            if (event._directionKeyCode.test(keyCode)) {
-                event._applyTagEffects();
             }
 
             const textKey = !ctrl && !alt && !event._nonTextKeyCode.test(keyCode);
