@@ -6073,7 +6073,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @private
          */
         _initWysiwygArea: function (reload, _initHTML) {
-            context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentsForEditor((typeof _initHTML === 'string' ? _initHTML : /TEXTAREA/i.test(context.element.originElement) ? context.element.originElement.value : context.element.originElement.innerHTML) || '');
+            context.element.wysiwyg.innerHTML = reload ? _initHTML : this.convertContentsForEditor((typeof _initHTML === 'string' ? _initHTML : /^TEXTAREA$/i.test(context.element.originElement.nodeName) ? context.element.originElement.value : context.element.originElement.innerHTML) || '');
         },
 
         /**

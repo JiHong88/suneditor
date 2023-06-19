@@ -1,5 +1,6 @@
 # SunEditor
-Pure javscript based WYSIWYG web editor, with no dependencies
+Vanilla javascript based WYSIWYG web editor, with no dependencies.
+SunEditor supports IE11 and all modern browsers with no dependencies and polyfill.
 
 #### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
 
