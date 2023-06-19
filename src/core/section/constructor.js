@@ -300,7 +300,11 @@ export function InitOptions(options, editorTargets) {
 	/** Base */
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
 	o.set('fontSizeUnit', typeof options.fontSizeUnit === 'string' ? options.fontSizeUnit.trim().toLowerCase() || 'px' : 'px');
-	o.set('allowClassName', new _w.RegExp((options.allowClassName && typeof options.allowClassName === 'string' ? options.allowClassName + '|' : '') + '^__se__|se-|katex'));
+	o.set(
+		'allowedClassName',
+		new _w.RegExp((options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : '') + '^__se__|se-|katex')
+	);
+	o.set('__allowedScriptTag', options.__allowedScriptTag === true);
 	// text style tags
 	const textTags = _mergeObject(
 		{
@@ -380,7 +384,7 @@ export function InitOptions(options, editorTargets) {
 	// default line
 	o.set('defaultLine', typeof options.defaultLine === 'string' && options.defaultLine.length > 0 ? options.defaultLine : 'p');
 	// element
-	o.set('elementWhitelist', (typeof options.elementWhitelist === 'string' ? options.elementWhitelist : '').toLowerCase());
+	o.set('elementWhitelist', (typeof options.elementWhitelist === 'string' ? options.elementWhitelist : '').toLowerCase() + (o.get('__allowedScriptTag') ? '|script' : ''));
 	o.set('elementBlacklist', _createBlacklist((typeof options.elementBlacklist === 'string' ? options.elementBlacklist : '').toLowerCase(), o.get('defaultLine')));
 	// attribute
 	o.set('attributeWhitelist', !options.attributeWhitelist || typeof options.attributeWhitelist !== 'object' ? null : options.attributeWhitelist);

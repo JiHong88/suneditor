@@ -11,9 +11,9 @@ export const domUtils = DomUtils;
 export const numbers = Numbers;
 
 export default {
-	env: env,
-	unicode: unicode,
-	converter: converter,
-	domUtils: domUtils,
-	numbers: numbers
+	env,
+	unicode,
+	converter,
+	domUtils,
+	numbers
 };

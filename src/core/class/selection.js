@@ -216,7 +216,12 @@ Selection.prototype = {
 	 */
 	_isNone: function (range) {
 		const comm = range.commonAncestorContainer;
-		return (domUtils.isWysiwygFrame(range.startContainer) && domUtils.isWysiwygFrame(range.endContainer)) || /FIGURE/i.test(comm.nodeName) || this.editor._fileManager.regExp.test(comm.nodeName) || this.component.is(comm);
+		return (
+			(domUtils.isWysiwygFrame(range.startContainer) && domUtils.isWysiwygFrame(range.endContainer)) ||
+			/FIGURE/i.test(comm.nodeName) ||
+			this.editor._fileManager.regExp.test(comm.nodeName) ||
+			this.component.is(comm)
+		);
 	},
 
 	/**
@@ -272,6 +277,12 @@ Selection.prototype = {
 	 * @private
 	 */
 	_init: function () {
+		const activeEl = this.editor.frameContext.get('_wd').activeElement;
+		if (domUtils.isInputElement(activeEl)) {
+			this.selectionNode = activeEl;
+			return activeEl;
+		}
+
 		const selection = this.get();
 
 		if (!selection) return null;
@@ -281,10 +292,6 @@ Selection.prototype = {
 			range = selection.getRangeAt(0);
 		} else {
 			range = this._createDefaultRange();
-		}
-
-		if (this.format.isLine(range.endContainer) && range.endOffset === 0) {
-			range = this.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.length);
 		}
 
 		this._rangeInfo(range, selection);
@@ -386,7 +393,10 @@ Selection.prototype = {
 				while (tempCon && !domUtils.isBreak(tempCon) && tempCon.nodeType === 1) {
 					tempChild = tempCon.childNodes;
 					if (tempChild.length === 0) break;
-					tempCon = tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : tempCon.previousElementSibling || tempCon.previousSibling || startCon;
+					tempCon =
+						tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName)
+							? tempChild[0]
+							: tempCon.previousElementSibling || tempCon.previousSibling || startCon;
 					tempOffset = tempOffset > 0 ? tempCon.textContent.length : tempOffset;
 				}
 

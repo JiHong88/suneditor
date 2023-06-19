@@ -221,16 +221,16 @@ export function _setAutoHeightStyle(frameHeight) {
 }
 
 const converter = {
-	htmlToEntity: htmlToEntity,
-	entityToHTML: entityToHTML,
-	fontSize: fontSize,
-	nodeListToArray: nodeListToArray,
-	swapKeyValue: swapKeyValue,
-	createElementWhitelist: createElementWhitelist,
-	createElementBlacklist: createElementBlacklist,
-	_setDefaultOptionStyle: _setDefaultOptionStyle,
-	_setIframeStyleLinks: _setIframeStyleLinks,
-	_setAutoHeightStyle: _setAutoHeightStyle
+	htmlToEntity,
+	entityToHTML,
+	fontSize,
+	nodeListToArray,
+	swapKeyValue,
+	createElementWhitelist,
+	createElementBlacklist,
+	_setDefaultOptionStyle,
+	_setIframeStyleLinks,
+	_setAutoHeightStyle
 };
 
 export default converter;

@@ -1,6 +1,7 @@
 # SunEditor
 Vanilla javscript based WYSIWYG web editor.
-SunEditor supports IE11 and all modern browsers with no dependencies and polyfill.
+SunEditor supports all modern browsers except IE without any dependencies and polyfills.
+Coded based on ES9.
 
 #### 🌤 Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a> 🌤
 
@@ -380,6 +381,8 @@ editableFrameAttributes  : Specifies the properties of the editing area DIV.    
                   ex)  {
                     "spellcheck": false
                   }
+allowedClassNames  : Specifies the allowed class name, It can be specified in the form of a regular expression.
+                     Appended before the "default" value. (`${option}|${defaultValue}`)     default: '^se-|__se__|katex';
 
 // Whitelist, Blacklist -----------------------------------------------------------------------------------------
 // (You can use regular expression syntax.)
@@ -833,6 +836,7 @@ layouts       : If you use a layout plugin, add it.
                   ]
 
 // ETC------------------------------------------------------------------------------------------------------------
+__allowedScriptTag  : Allows script tags.                            default: false {Boolean}
 placeholder     : The placeholder text.                              default: null {string}
 mediaAutoSelect : Activate the media[image, video, audio] selection status immediately after inserting the media tag.  default: true {boolean}
 icons           : You can redefine icons.                            default: null {Object}

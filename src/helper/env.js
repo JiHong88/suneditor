@@ -9,10 +9,11 @@ const userAgent = _w.navigator.userAgent.toLowerCase();
  * @returns {Array.<any>}
  */
 export function getValues(obj) {
-	return !obj ? [] :
-		this._w.Object.keys(obj).map(function (i) {
-			return obj[i];
-		});
+	return !obj
+		? []
+		: this._w.Object.keys(obj).map(function (i) {
+				return obj[i];
+		  });
 }
 
 /**
@@ -138,9 +139,12 @@ export function getIncludePath(nameArray, extension) {
 
 	if (path === '') path = pathList.length > 0 ? pathList[0][src] : '';
 
-	path.indexOf(':/') < 0 && '//' !== path.slice(0, 2) && (path = 0 === path.indexOf('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
+	path.indexOf(':/') < 0 &&
+		'//' !== path.slice(0, 2) &&
+		(path = 0 === path.indexOf('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
 
-	if (!path) throw '[SUNEDITOR.helper.env.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (name: +' + name + ', extension: ' + extension + ')';
+	if (!path)
+		throw '[SUNEDITOR.helper.env.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (name: +' + name + ', extension: ' + extension + ')';
 
 	return path;
 }
@@ -233,14 +237,14 @@ export const _allowedEmptyNodeList = '.se-component, pre, blockquote, hr, li, ta
 export const KATEX_WEBSITE = 'https://katex.org/docs/supported.html';
 
 const env = {
-	_w: _w,
-	_d: _d,
-	getValues: getValues,
-	camelToKebabCase: camelToKebabCase,
-	kebabToCamelCase: kebabToCamelCase,
-	getXMLHttpRequest: getXMLHttpRequest,
-	getPageStyle: getPageStyle,
-	getIncludePath: getIncludePath,
+	_w,
+	_d,
+	getValues,
+	camelToKebabCase,
+	kebabToCamelCase,
+	getXMLHttpRequest,
+	getPageStyle,
+	getIncludePath,
 	isResizeObserverSupported: isResizeObserverSupported(),
 	isIE: isIE(),
 	isEdge: isEdge(),
@@ -250,9 +254,9 @@ const env = {
 	isSafari: isSafari(),
 	isOSX_IOS: isOSX_IOS(),
 	isAndroid: isAndroid(),
-	cmdIcon: cmdIcon,
-	shiftIcon: shiftIcon,
-	_allowedEmptyNodeList: _allowedEmptyNodeList
+	cmdIcon,
+	shiftIcon,
+	_allowedEmptyNodeList
 };
 
 export default env;

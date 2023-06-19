@@ -6,7 +6,7 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
 
 const _w = env._w;
-const DIRECTION_KEYCODE = new _w.RegExp('^(3[3-9]|40)$');
+const DIRECTION_KEYCODE = new _w.RegExp('^(8|3[2-9]|40|46)$');
 const SPACE_DEL_DIR_KEYCODE = new _w.RegExp('^(8|13|3[2-9]|40|46)$');
 const NON_TEXT_KEYCODE = new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$');
 const HISTORY_IGNORE_KEYCODE = new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$');
@@ -957,6 +957,14 @@ function OnClick_wysiwyg(rootKey, e) {
 
 	this.selection._init();
 
+	if (e.detail === 3) {
+		let range = this.selection.getRange();
+		if (this.format.isLine(range.endContainer) && range.endOffset === 0) {
+			range = this.selection.setRange(range.startContainer, range.startOffset, range.startContainer, range.startContainer.length);
+			this.selection._rangeInfo(range, this.selection.get());
+		}
+	}
+
 	const selectionNode = this.selection.getNode();
 	const formatEl = this.format.getLine(selectionNode, null);
 	const rangeEl = this.format.getBlock(selectionNode, null);
@@ -1011,6 +1019,8 @@ function OnInput_wysiwyg(rootKey, e) {
 }
 
 function OnKeyDown_wysiwyg(rootKey, e) {
+	let selectionNode = this.selection.getNode();
+	if (domUtils.isInputElement(selectionNode)) return;
 	if (this.menu.currentDropdownName) return;
 
 	const keyCode = e.keyCode;
@@ -1046,7 +1056,6 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 	}
 
 	/** default key action */
-	let selectionNode = this.selection.getNode();
 	const range = this.selection.getRange();
 	const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
 	const fileComponentName = this.editor._fileManager.pluginRegExp.test(this.editor.currentControllerName) ? this.editor.currentControllerName : '';
@@ -1123,27 +1132,27 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 			}
 
 			// clean remove tag
-			if (formatEl && range.startContainer === range.endContainer && selectionNode.nodeType === 3 && !this.format.isLine(selectionNode.parentNode)) {
-				if (range.collapsed ? selectionNode.textContent.length === 1 : range.endOffset - range.startOffset === selectionNode.textContent.length) {
-					e.preventDefault();
-
-					let offset = null;
-					let prev = selectionNode.parentNode.previousSibling;
-					const next = selectionNode.parentNode.nextSibling;
-					if (!prev) {
-						if (!next) {
-							prev = domUtils.createElement('BR');
-							formatEl.appendChild(prev);
-						} else {
-							prev = next;
-							offset = 0;
-						}
+			const startCon = range.startContainer;
+			if (formatEl && !formatEl.previousElementSibling && range.startOffset === 0 && startCon.nodeType === 3 && !this.format.isLine(startCon.parentNode)) {
+				let prev = startCon.parentNode.previousSibling;
+				const next = startCon.parentNode.nextSibling;
+				if (!prev) {
+					if (!next) {
+						prev = domUtils.createElement('BR');
+						formatEl.appendChild(prev);
+					} else {
+						prev = next;
 					}
+				}
 
-					selectionNode.textContent = '';
-					this.node.removeAllParents(selectionNode, null, formatEl);
-					offset = typeof offset === 'number' ? offset : prev.nodeType === 3 ? prev.textContent.length : 1;
-					this.selection.setRange(prev, offset, prev, offset);
+				let con = startCon;
+				while (formatEl.contains(con) && !con.previousSibling) {
+					con = con.parentNode;
+				}
+
+				if (!formatEl.contains(con)) {
+					startCon.textContent = '';
+					this.node.removeAllParents(startCon, null, formatEl);
 					break;
 				}
 			}
@@ -1682,7 +1691,18 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 
 					domUtils.copyTagAttributes(newFormat, formatEl, this.options.get('lineAttrReset'));
 
-					formatEl.parentNode.insertBefore(newFormat, formatStartEdge ? formatEl : formatEl.nextElementSibling);
+					let child = focusBR;
+					do {
+						if (!domUtils.isBreak(selectionNode) && selectionNode.nodeType === 1) {
+							const f = selectionNode.cloneNode(false);
+							f.appendChild(child);
+							child = f;
+						}
+						selectionNode = selectionNode.parentNode;
+					} while (formatEl !== selectionNode && formatEl.contains(selectionNode));
+
+					newFormat.appendChild(child);
+					formatEl.parentNode.insertBefore(newFormat, formatStartEdge && !formatEndEdge ? formatEl : formatEl.nextElementSibling);
 					if (formatEndEdge) {
 						this.selection.setRange(focusBR, 1, focusBR, 1);
 					}
@@ -1704,7 +1724,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 						if (!newEl) {
 							if (domUtils.isWysiwygFrame(r.container)) {
 								e.preventDefault();
-								this.frameContext.get('wysiwyg').appendChild(newFormat);
+								this.editor.frameContext.get('wysiwyg').appendChild(newFormat);
 								newEl = newFormat;
 								domUtils.copyTagAttributes(newEl, formatEl, this.options.get('lineAttrReset'));
 								this.selection.setRange(newEl, offset, newEl, offset);
@@ -1798,6 +1818,11 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 		this.html.insertNode(zeroWidth, null, true);
 		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 	}
+
+	if (SPACE_DEL_DIR_KEYCODE.test(keyCode)) {
+		this.selection._init();
+		this.applyTagEffect();
+	}
 }
 
 function OnKeyUp_wysiwyg(rootKey, e) {
@@ -1809,7 +1834,7 @@ function OnKeyUp_wysiwyg(rootKey, e) {
 	const alt = e.altKey;
 
 	if (this.status.isReadOnly) {
-		if (!ctrl && SPACE_DEL_DIR_KEYCODE.test(keyCode)) this.applyTagEffect();
+		if (!ctrl && DIRECTION_KEYCODE.test(keyCode)) this.applyTagEffect();
 		return;
 	}
 
@@ -1865,10 +1890,6 @@ function OnKeyUp_wysiwyg(rootKey, e) {
 		this._setDefaultLine(this.format.isBlock(rangeEl) ? 'DIV' : this.options.get('defaultLine')) !== null
 	) {
 		selectionNode = this.selection.getNode();
-	}
-
-	if (SPACE_DEL_DIR_KEYCODE.test(keyCode)) {
-		this.applyTagEffect();
 	}
 
 	const textKey = !ctrl && !alt && !NON_TEXT_KEYCODE.test(keyCode);

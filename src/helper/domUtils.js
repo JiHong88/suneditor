@@ -688,7 +688,7 @@ export function addClass(element, className) {
 	if (!element) return;
 
 	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
-	((element instanceof window.NodeList || element instanceof window.Array) ? element : [element]).forEach(function (e) {
+	(element instanceof window.NodeList || element instanceof window.Array ? element : [element]).forEach(function (e) {
 		if (!check.test(e.className)) e.className += (e.className.length > 0 ? ' ' : '') + className;
 	});
 }
@@ -702,7 +702,7 @@ export function removeClass(element, className) {
 	if (!element) return;
 
 	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
-	((element instanceof window.NodeList || element instanceof window.Array) ? element : [element]).forEach(function (e) {
+	(element instanceof window.NodeList || element instanceof window.Array ? element : [element]).forEach(function (e) {
 		e.className = e.className.replace(check, ' ').trim();
 		if (!e.className.trim()) e.removeAttribute('class');
 	});
@@ -739,7 +739,11 @@ export function toggleClass(element, className) {
  * @returns {boolean}
  */
 export function isEdgePoint(container, offset, dir) {
-	return (dir !== 'end' && offset === 0) || ((!dir || dir !== 'front') && !container.nodeValue && offset === 1) || ((!dir || dir === 'end') && container.nodeValue && offset === container.nodeValue.length);
+	return (
+		(dir !== 'end' && offset === 0) ||
+		((!dir || dir !== 'front') && !container.nodeValue && offset === 1) ||
+		((!dir || dir === 'end') && container.nodeValue && offset === container.nodeValue.length)
+	);
 }
 
 /**
@@ -828,8 +832,17 @@ export function isMedia(node) {
  * @param {Node|String} node The element or element name to check
  * @returns {Boolean}
  */
-export function isFigures (node) {
+export function isFigures(node) {
 	return node && (isMedia(node) || /^(FIGURE)$/i.test(typeof node === 'string' ? node : node.nodeName));
+}
+
+/**
+ * @description It is judged whether it is the input element (INPUT, TEXTAREA)
+ * @param {Node} element The node to check
+ * @returns {Boolean}
+ */
+export function isInputElement(element) {
+	return element && element.nodeType === 1 && /^(INPUT|TEXTAREA)$/i.test(element.nodeName);
 }
 
 /**
@@ -838,7 +851,9 @@ export function isFigures (node) {
  * @returns {boolean}
  */
 export function isEmptyLine(element) {
-	return !element || !element.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && element.children.length === 0 && isZeroWith(element.textContent));
+	return (
+		!element || !element.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && element.children.length === 0 && isZeroWith(element.textContent))
+	);
 }
 
 /**
@@ -895,57 +910,58 @@ export function getScrollParent(element) {
 }
 
 const domUtils = {
-	isZeroWith: isZeroWith,
-	createElement: createElement,
-	createTextNode: createTextNode,
-	getIframeDocument: getIframeDocument,
-	getAttributesToString: getAttributesToString,
-	getPositionIndex: getPositionIndex,
-	getNodePath: getNodePath,
-	getNodeFromPath: getNodeFromPath,
-	getListChildren: getListChildren,
-	getListChildNodes: getListChildNodes,
-	getNodeDepth: getNodeDepth,
-	sortNodeByDepth: sortNodeByDepth,
-	compareElements: compareElements,
-	getParentElement: getParentElement,
-	getCommandTarget: getCommandTarget,
-	getEdgeChild: getEdgeChild,
-	getEdgeChildNodes: getEdgeChildNodes,
-	getArrayItem: getArrayItem,
-	arrayIncludes: arrayIncludes,
-	getArrayIndex: getArrayIndex,
-	nextIndex: nextIndex,
-	prevIndex: prevIndex,
-	copyTagAttributes: copyTagAttributes,
-	copyFormatAttributes: copyFormatAttributes,
-	isSameAttributes: isSameAttributes,
-	removeItem: removeItem,
-	changeElement: changeElement,
-	changeTxt: changeTxt,
-	setStyle: setStyle,
-	setDisabled: setDisabled,
-	hasClass: hasClass,
-	addClass: addClass,
-	removeClass: removeClass,
-	toggleClass: toggleClass,
-	isEdgePoint: isEdgePoint,
-	isWysiwygFrame: isWysiwygFrame,
-	isNonEditable: isNonEditable,
-	isList: isList,
-	isListCell: isListCell,
-	isTable: isTable,
-	isTableCell: isTableCell,
-	isBreak: isBreak,
-	isAnchor: isAnchor,
-	isMedia: isMedia,
-	isFigures: isFigures,
-	isEmptyLine: isEmptyLine,
-	isSpanWithoutAttr: isSpanWithoutAttr,
-	isUneditable: isUneditable,
-	isImportantDisabled: isImportantDisabled,
-	isExcludeFormat: isExcludeFormat,
-	getScrollParent: getScrollParent
+	isZeroWith,
+	createElement,
+	createTextNode,
+	getIframeDocument,
+	getAttributesToString,
+	getPositionIndex,
+	getNodePath,
+	getNodeFromPath,
+	getListChildren,
+	getListChildNodes,
+	getNodeDepth,
+	sortNodeByDepth,
+	compareElements,
+	getParentElement,
+	getCommandTarget,
+	getEdgeChild,
+	getEdgeChildNodes,
+	getArrayItem,
+	arrayIncludes,
+	getArrayIndex,
+	nextIndex,
+	prevIndex,
+	copyTagAttributes,
+	copyFormatAttributes,
+	isSameAttributes,
+	removeItem,
+	changeElement,
+	changeTxt,
+	setStyle,
+	setDisabled,
+	hasClass,
+	addClass,
+	removeClass,
+	toggleClass,
+	isEdgePoint,
+	isWysiwygFrame,
+	isNonEditable,
+	isList,
+	isListCell,
+	isTable,
+	isTableCell,
+	isBreak,
+	isAnchor,
+	isMedia,
+	isFigures,
+	isInputElement,
+	isEmptyLine,
+	isSpanWithoutAttr,
+	isUneditable,
+	isImportantDisabled,
+	isExcludeFormat,
+	getScrollParent
 };
 
 export default domUtils;

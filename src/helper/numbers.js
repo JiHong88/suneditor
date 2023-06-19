@@ -60,11 +60,11 @@ export function isOdd(value) {
 }
 
 const numbers = {
-	is: is,
-	get: get,
-	getOverlapRangeAtIndex: getOverlapRangeAtIndex,
-	isEven: isEven,
-	isOdd: isOdd
+	is,
+	get,
+	getOverlapRangeAtIndex,
+	isEven,
+	isOdd
 };
 
 export default numbers;

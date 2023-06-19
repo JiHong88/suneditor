@@ -1095,8 +1095,13 @@ Editor.prototype = {
 	 */
 	_initWysiwygArea: function (e, value) {
 		e.get('wysiwyg').innerHTML =
-			this.html.clean(typeof value === 'string' ? value : e.get('originElement').value, true, null, null) ||
-			'<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
+			this.html.clean(
+				typeof value === 'string' ? value : (/^TEXTAREA$/i.test(e.get('originElement').nodeName) ? e.get('originElement').value : e.get('originElement').innerHTML) || '',
+				true,
+				null,
+				null
+			) || '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
+
 		if (e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
 	},
 

@@ -21,9 +21,9 @@ export const zeroWidthRegExp = new _w.RegExp(String.fromCharCode(zwsp), 'g');
 export const onlyZeroWidthRegExp = new _w.RegExp('^' + _w.String.fromCharCode(zwsp) + '+$');
 
 const unicode = {
-	zeroWidthSpace: zeroWidthSpace,
-	zeroWidthRegExp: zeroWidthRegExp,
-	onlyZeroWidthRegExp: onlyZeroWidthRegExp
+	zeroWidthSpace,
+	zeroWidthRegExp,
+	onlyZeroWidthRegExp
 };
 
 export default unicode;

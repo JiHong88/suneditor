@@ -42,11 +42,10 @@ Node_.prototype = {
 		}
 
 		const bp = baseNode.parentNode;
-		let index = 0,
-			newEl,
-			children,
-			temp;
+		let index = 0;
+		let suffixIndex = 1;
 		let next = true;
+		let newEl, children, temp;
 		if (!depth || depth < 0) depth = 0;
 
 		if (baseNode.nodeType === 3) {
@@ -57,6 +56,17 @@ Node_.prototype = {
 				if (domUtils.isZeroWith(after)) after.data = unicode.zeroWidthSpace;
 			}
 		} else if (baseNode.nodeType === 1) {
+			if (offset === 0) {
+				while (baseNode.firstChild) {
+					baseNode = baseNode.firstChild;
+				}
+				if (baseNode.nodeType === 3) {
+					const after = domUtils.createTextNode(unicode.zeroWidthSpace);
+					baseNode.parentNode.insertBefore(after, baseNode);
+					baseNode = after;
+				}
+			}
+
 			if (!baseNode.previousSibling) {
 				if (domUtils.getNodeDepth(baseNode) === depth) next = false;
 			} else {
@@ -64,9 +74,10 @@ Node_.prototype = {
 			}
 		}
 
+		if (baseNode.nodeType === 1) suffixIndex = 0;
 		let depthEl = baseNode;
 		while (domUtils.getNodeDepth(depthEl) > depth) {
-			index = domUtils.getPositionIndex(depthEl) + 1;
+			index = domUtils.getPositionIndex(depthEl) + suffixIndex;
 			depthEl = depthEl.parentNode;
 
 			temp = newEl;
@@ -101,8 +112,8 @@ Node_.prototype = {
 		else newEl = depthEl;
 
 		if (domUtils.isListCell(newEl) && newEl.children && domUtils.isList(newEl.children[0])) {
-            newEl.insertBefore(domUtils.createElement('BR'), newEl.children[0]);
-        }
+			newEl.insertBefore(domUtils.createElement('BR'), newEl.children[0]);
+		}
 
 		if (bp.childNodes.length === 0) domUtils.removeItem(bp);
 
@@ -134,7 +145,10 @@ Node_.prototype = {
 				child = children[i];
 				next = children[i + 1];
 				if (!child) break;
-				if ((onlyText && inst.format._isIgnoreNodeChange(child)) || (!onlyText && (domUtils.isTable(child) || domUtils.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrLine(child))))) {
+				if (
+					(onlyText && inst.format._isIgnoreNodeChange(child)) ||
+					(!onlyText && (domUtils.isTable(child) || domUtils.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrLine(child))))
+				) {
 					if (domUtils.isTable(child) || domUtils.isListCell(child)) {
 						recursionFunc(child, depth + 1, i);
 					}
@@ -336,7 +350,12 @@ Node_.prototype = {
 
 		(function recursionFunc(current) {
 			if (inst.format._notTextNode(current) || current === notRemoveNode || domUtils.isNonEditable(current)) return 0;
-			if (current !== element && domUtils.isZeroWith(current.textContent) && (!current.firstChild || !domUtils.isBreak(current.firstChild)) && !current.querySelector(env._allowedEmptyNodeList)) {
+			if (
+				current !== element &&
+				domUtils.isZeroWith(current.textContent) &&
+				(!current.firstChild || !domUtils.isBreak(current.firstChild)) &&
+				!current.querySelector(env._allowedEmptyNodeList)
+			) {
 				if (current.parentNode) {
 					current.parentNode.removeChild(current);
 					return -1;

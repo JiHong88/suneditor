@@ -219,22 +219,22 @@ ModalAnchorEditor.prototype = {
 		const preview = this.preview;
 		const protocol = this.options.get('defaultUrlProtocol');
 		const noPrefix = this.noAutoPrefix;
-		const reservedProtocol = /^(mailto\:|tel\:|sms\:|https*\:\/\/|#)/.test(value);
+		const reservedProtocol = /^(mailto\:|tel\:|sms\:|https*\:\/\/|#)/.test(value) || value.indexOf(protocol) === 0;
 		const sameProtocol = !protocol ? false : this._w.RegExp('^' + value.substr(0, protocol.length)).test(protocol);
 		value =
 			this.linkValue =
 			preview.textContent =
-			!value
-				? ''
-				: noPrefix
+				!value
+					? ''
+					: noPrefix
 					? value
 					: protocol && !reservedProtocol && !sameProtocol
-						? protocol + value
-						: reservedProtocol
-							? value
-							: /^www\./.test(value)
-								? 'http://' + value
-								: this.host + (/^\//.test(value) ? '' : '/') + value;
+					? protocol + value
+					: reservedProtocol
+					? value
+					: /^www\./.test(value)
+					? 'http://' + value
+					: this.host + (/^\//.test(value) ? '' : '/') + value;
 
 		if (this._selfPathBookmark(value)) {
 			this.bookmark.style.display = 'block';
