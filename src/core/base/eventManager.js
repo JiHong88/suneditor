@@ -6,16 +6,16 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
 
 const _w = env._w;
-const DIRECTION_KEYCODE = new _w.RegExp('^(8|3[2-9]|40|46)$');
-const SPACE_DEL_DIR_KEYCODE = new _w.RegExp('^(8|13|3[2-9]|40|46)$');
-const NON_TEXT_KEYCODE = new _w.RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$');
-const HISTORY_IGNORE_KEYCODE = new _w.RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$');
-const FRONT_ZEROWIDTH = new _w.RegExp(unicode.zeroWidthSpace + '+', '');
+const DIRECTION_KEYCODE = new RegExp('^(8|3[2-9]|40|46)$');
+const SPACE_DEL_DIR_KEYCODE = new RegExp('^(8|13|3[2-9]|40|46)$');
+const NON_TEXT_KEYCODE = new RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$');
+const HISTORY_IGNORE_KEYCODE = new RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$');
+const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
 
 const EventManager = function (editor) {
 	CoreInjector.call(this, editor);
 	this._events = [];
-	this._onButtonsCheck = new _w.RegExp('^(' + _w.Object.keys(editor.options.get('_defaultStyleTagMap')).join('|') + ')$', 'i');
+	this._onButtonsCheck = new RegExp('^(' + Object.keys(editor.options.get('_defaultStyleTagMap')).join('|') + ')$', 'i');
 	this._onShortcutKey = false;
 	this.isComposing = false; // Old browsers: When there is no 'e.isComposing' in the keyup event.
 	this._balloonDelay = null;
@@ -46,7 +46,7 @@ EventManager.prototype = {
 	 */
 	addEvent(target, type, listener, useCapture) {
 		if (!target) return false;
-		if (!numbers.is(target.length) || target.nodeName || (!_w.Array.isArray(target) && target.length < 1)) target = [target];
+		if (!numbers.is(target.length) || target.nodeName || (!Array.isArray(target) && target.length < 1)) target = [target];
 		if (target.length === 0) return false;
 
 		const len = target.length;
@@ -81,7 +81,7 @@ EventManager.prototype = {
 		const useCapture = params.useCapture;
 
 		if (!target) return false;
-		if (!numbers.is(target.length) || target.nodeName || (!_w.Array.isArray(target) && target.length < 1)) target = [target];
+		if (!numbers.is(target.length) || target.nodeName || (!Array.isArray(target) && target.length < 1)) target = [target];
 		if (target.length === 0) return false;
 
 		for (let i = 0, len = target.length; i < len; i++) {
@@ -867,7 +867,7 @@ function OnMouseDown_wysiwyg(rootKey, e) {
 		return;
 	}
 
-	_w.setTimeout(this.selection._init.bind(this.selection));
+	setTimeout(this.selection._init.bind(this.selection));
 
 	// user event
 	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown(rootKey, e) === false) return;
@@ -949,7 +949,7 @@ function OnClick_wysiwyg(rootKey, e) {
 		this.applyTagEffect();
 	}
 
-	if (this.editor.isBalloon || this.editor.isSubBalloon) _w.setTimeout(this._toggleToolbarBalloon.bind(this));
+	if (this.editor.isBalloon || this.editor.isSubBalloon) setTimeout(this._toggleToolbarBalloon.bind(this));
 }
 
 function OnInput_wysiwyg(rootKey, e) {
@@ -1407,7 +1407,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 			// Lines tab(4)
 			if (lines.length > 0) {
 				if (!shift) {
-					const tabText = domUtils.createTextNode(new _w.Array(this.status.tabSize + 1).join('\u00A0'));
+					const tabText = domUtils.createTextNode(new Array(this.status.tabSize + 1).join('\u00A0'));
 					if (lines.length === 1) {
 						const textRange = this.html.insertNode(tabText, null, false);
 						if (!textRange) return false;
@@ -1911,7 +1911,7 @@ function OnCut_wysiwyg(rootKey, e) {
 		return false;
 	}
 
-	_w.setTimeout(function () {
+	setTimeout(() => {
 		this.history.push(false);
 	});
 }

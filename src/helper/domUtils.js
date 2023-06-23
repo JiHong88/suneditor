@@ -1,4 +1,4 @@
-import { _d, _w } from './env';
+import { _d } from './env';
 import { onlyZeroWidthRegExp, zeroWidthRegExp } from './unicode';
 
 /**
@@ -335,7 +335,7 @@ export function getParentElement(element, query) {
 			query = '^' + query + '$';
 		}
 
-		const regExp = new _w.RegExp(query, 'i');
+		const regExp = new RegExp(query, 'i');
 		check = function (el) {
 			return regExp.test(el[attr]);
 		};
@@ -403,7 +403,7 @@ export function getEdgeChild(node, query, last) {
 			query = '^' + (query === 'text' ? '#' + query : query) + '$';
 		}
 
-		const regExp = new _w.RegExp(query, 'i');
+		const regExp = new RegExp(query, 'i');
 		check = function (el) {
 			return regExp.test(el[attr]);
 		};
@@ -578,11 +578,11 @@ export function isSameAttributes(a, b) {
 
 	const class_a = a.classList;
 	const class_b = b.classList;
-	const reg = _w.RegExp;
+	const wRegExp = RegExp;
 	let compClass = 0;
 
 	for (let i = 0, len = class_a.length; i < len; i++) {
-		if (reg('(s|^)' + class_a[i] + '(s|$)').test(class_b.value)) compClass++;
+		if (wRegExp('(s|^)' + class_a[i] + '(s|$)').test(class_b.value)) compClass++;
 	}
 
 	return compStyle === style_b.length && compStyle === style_a.length && compClass === class_b.length && compClass === class_a.length;
@@ -672,7 +672,7 @@ export function setDisabled(buttonList, disabled, important) {
  */
 export function hasClass(element, className) {
 	if (!element) return;
-	return new _w.RegExp(className).test(element.className);
+	return new RegExp(className).test(element.className);
 }
 
 /**
@@ -683,7 +683,7 @@ export function hasClass(element, className) {
 export function addClass(element, className) {
 	if (!element) return;
 
-	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
+	const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
 	for (const e of element instanceof window.NodeList || element instanceof window.Array ? element : [element]) {
 		if (!e) continue;
 		if (!check.test(e.className)) e.className += (e.className.length > 0 ? ' ' : '') + className;
@@ -698,7 +698,7 @@ export function addClass(element, className) {
 export function removeClass(element, className) {
 	if (!element) return;
 
-	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
+	const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
 	for (const e of element instanceof window.NodeList || element instanceof window.Array ? element : [element]) {
 		if (!e) continue;
 		e.className = e.className.replace(check, ' ').trim();
@@ -716,7 +716,7 @@ export function toggleClass(element, className) {
 	if (!element) return;
 	let result = false;
 
-	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
+	const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
 	if (check.test(element.className)) {
 		element.className = element.className.replace(check, ' ').trim();
 	} else {

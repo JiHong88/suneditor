@@ -1,4 +1,4 @@
-import { _d, _w } from './env';
+import { _d } from './env';
 
 const FONT_VALUES_MAP = {
 	'xx-small': 1,
@@ -56,16 +56,15 @@ export function entityToHTML(content) {
  * @returns {string}
  */
 export function fontSize(to, size) {
-	const math = _w.Math;
 	const value = size.match(/(\d+(?:\.\d+)?)(.+)/);
 	const sizeNum = value ? value[1] * 1 : FONT_VALUES_MAP[size];
 	const from = value ? value[2] : 'rem';
 	let pxSize = sizeNum;
 
 	if (/em/.test(from)) {
-		pxSize = math.round(sizeNum / 0.0625);
+		pxSize = Math.round(sizeNum / 0.0625);
 	} else if (from === 'pt') {
-		pxSize = math.round(sizeNum * 1.333);
+		pxSize = Math.round(sizeNum * 1.333);
 	} else if (from === '%') {
 		pxSize = sizeNum / 100;
 	}
@@ -77,7 +76,7 @@ export function fontSize(to, size) {
 		case '%':
 			return (pxSize * 0.0625).toFixed(2) * 100 + to;
 		case 'pt':
-			return math.floor(pxSize / 1.333) + to;
+			return Math.floor(pxSize / 1.333) + to;
 		default:
 			// px
 			return pxSize + to;
@@ -91,7 +90,7 @@ export function fontSize(to, size) {
  */
 export function nodeListToArray(nodeList) {
 	if (!nodeList) return [];
-	return _w.Array.prototype.slice.call(nodeList);
+	return Array.prototype.slice.call(nodeList);
 }
 
 /**
@@ -182,7 +181,6 @@ export function _setDefaultOptionStyle(fo, cssText) {
  * @returns {string} "<link rel="stylesheet" href=".." />.."
  */
 export function _setIframeStyleLinks(linkNames) {
-	const wRegExp = _w.RegExp;
 	let tagString = '';
 
 	if (linkNames) {
@@ -192,7 +190,7 @@ export function _setIframeStyleLinks(linkNames) {
 			if (/(^https?:\/\/)|(^data:text\/css,)/.test(linkNames[f])) {
 				path.push(linkNames[f]);
 			} else {
-				const CSSFileName = new wRegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?.css((\\??.+?)|\\b)$', 'i');
+				const CSSFileName = new RegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?.css((\\??.+?)|\\b)$', 'i');
 				for (let c = _d.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
 					styleTag = c[i].href.match(CSSFileName);
 					if (styleTag) path.push(styleTag[0]);

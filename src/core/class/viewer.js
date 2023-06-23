@@ -304,7 +304,7 @@ Viewer.prototype = {
 		}
 
 		this.editor._openLoading();
-		this._w.setTimeout(() => {
+		setTimeout(() => {
 			try {
 				iframe.focus();
 				// Edge, Chromium
@@ -478,7 +478,7 @@ Viewer.prototype = {
 
 		if (this.editor.frameOptions.get('iframe_fullPage')) {
 			const wDoc = this.editor.frameContext.get('_wd');
-			const parseDocument = new this._w.DOMParser().parseFromString(code_html, 'text/html');
+			const parseDocument = new DOMParser().parseFromString(code_html, 'text/html');
 
 			if (!this.options.get('__allowedScriptTag')) {
 				const headChildren = parseDocument.head.children;

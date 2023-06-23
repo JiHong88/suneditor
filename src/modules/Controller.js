@@ -1,7 +1,7 @@
 import EditorInjector from '../editorInjector';
-import { domUtils, env } from '../helper';
+import { domUtils } from '../helper';
 
-const NON_RESPONSE_KEYCODE = new env._w.RegExp('^(13|1[7-9]|20|27|40|45|11[2-9]|12[0-3]|144|145)$');
+const NON_RESPONSE_KEYCODE = new RegExp('^(13|1[7-9]|20|27|40|45|11[2-9]|12[0-3]|144|145)$');
 
 /**
  *

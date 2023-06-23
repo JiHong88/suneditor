@@ -40,7 +40,7 @@ FileManager.prototype = {
 		let formData = null;
 		// create formData
 		if (data.length) {
-			formData = new this._w.FormData();
+			formData = new FormData();
 			for (let i = 0, len = data.length; i < len; i++) {
 				formData.append('file-' + i, data[i]);
 			}
@@ -53,7 +53,7 @@ FileManager.prototype = {
 		const xmlHttp = env.getXMLHttpRequest();
 		xmlHttp.onreadystatechange = CallBackUpload.bind(this, xmlHttp, callBack, errorCallBack);
 		xmlHttp.open('post', uploadUrl, true);
-		if (uploadHeader !== null && typeof uploadHeader === 'object' && this._w.Object.keys(uploadHeader).length > 0) {
+		if (uploadHeader !== null && typeof uploadHeader === 'object' && Object.keys(uploadHeader).length > 0) {
 			for (let key in uploadHeader) {
 				xmlHttp.setRequestHeader(key, uploadHeader[key]);
 			}
@@ -129,7 +129,7 @@ FileManager.prototype = {
 		}.bind(this, element);
 		info.select = function (element) {
 			element.scrollIntoView(true);
-			this._w.setTimeout(this.inst.select.bind(this.inst, element));
+			setTimeout(this.inst.select.bind(this.inst, element));
 		}.bind(this, element);
 
 		// figure

@@ -116,7 +116,7 @@ Align.prototype = {
 function CreateHTML(editor, items) {
 	const lang = editor.lang;
 	const icons = editor.icons;
-	const alignItems = editor._w.Array.isArray(items) ? items : editor.options.get('_rtl') ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'];
+	const alignItems = Array.isArray(items) ? items : editor.options.get('_rtl') ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'];
 
 	let html = '';
 	for (let i = 0, item, text; i < alignItems.length; i++) {

@@ -328,7 +328,7 @@ Image_.prototype = {
 
 		if (typeof this.events.onImageUploadBefore === 'function') {
 			const result = this.events.onImageUploadBefore(files, info, (data) => {
-				if (data && this._w.Array.isArray(data.result)) {
+				if (data && Array.isArray(data.result)) {
 					this._register(info, data);
 				} else {
 					this._serverUpload(info, data);
@@ -337,7 +337,7 @@ Image_.prototype = {
 
 			if (result === undefined) return true;
 			if (result === false) return false;
-			if (this._w.Array.isArray(result) && result.length > 0) files = result;
+			if (Array.isArray(result) && result.length > 0) files = result;
 		}
 
 		this._serverUpload(info, files);
@@ -627,13 +627,12 @@ Image_.prototype = {
 		try {
 			const filesLen = this.modal.isUpdate ? 1 : files.length;
 			this._base64RenderIndex = filesLen;
-			const wFileReader = this._w.FileReader;
 			const filesStack = [filesLen];
 			this.inputX.value = width;
 			this.inputY.value = height;
 
 			for (let i = 0, reader, file; i < filesLen; i++) {
-				reader = new wFileReader();
+				reader = new FileReader();
 				file = files[i];
 
 				reader.onload = function (reader, update, updateElement, file, index) {
@@ -697,7 +696,7 @@ function UploadCallBack(info, xmlHttp) {
 	if (typeof this.events.imageUploadHandler === 'function') {
 		this.events.imageUploadHandler(xmlHttp, info);
 	} else {
-		const response = this._w.JSON.parse(xmlHttp.responseText);
+		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {
 			this._error(response.errorMessage, response);
 		} else {

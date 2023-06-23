@@ -69,9 +69,9 @@ ColorPicker.prototype = {
 		const rgbMatch = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
 		return rgbMatch && rgbMatch.length === 4
 			? '#' +
-					('0' + this._w.parseInt(rgbMatch[1], 10).toString(16)).slice(-2) +
-					('0' + this._w.parseInt(rgbMatch[2], 10).toString(16)).slice(-2) +
-					('0' + this._w.parseInt(rgbMatch[3], 10).toString(16)).slice(-2)
+					('0' + parseInt(rgbMatch[1], 10).toString(16)).slice(-2) +
+					('0' + parseInt(rgbMatch[2], 10).toString(16)).slice(-2) +
+					('0' + parseInt(rgbMatch[3], 10).toString(16)).slice(-2)
 			: '';
 	},
 

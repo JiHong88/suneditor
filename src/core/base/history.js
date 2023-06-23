@@ -199,7 +199,7 @@ export default function (editor, change) {
 				}
 			}
 
-			pushDelay = _w.setTimeout(function () {
+			pushDelay = _w.setTimeout(() => {
 				_w.clearTimeout(pushDelay);
 				pushDelay = null;
 				pushStack(rootKey, range);

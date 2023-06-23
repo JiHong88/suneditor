@@ -211,7 +211,7 @@ Audio_.prototype = {
 
 		if (typeof this.events.onAudioUploadBefore === 'function') {
 			const result = this.events.onAudioUploadBefore(files, info, (data) => {
-				if (data && this._w.Array.isArray(data.result)) {
+				if (data && Array.isArray(data.result)) {
 					this._register(info, data);
 				} else {
 					this._serverUpload(info, data);
@@ -362,7 +362,7 @@ function UploadCallBack(info, xmlHttp) {
 	if (typeof this.events.audioUploadHandler === 'function') {
 		this.events.audioUploadHandler(xmlHttp, info);
 	} else {
-		const response = this._w.JSON.parse(xmlHttp.responseText);
+		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {
 			this._error(response.errorMessage, response);
 		} else {

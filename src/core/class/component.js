@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { domUtils, env } from '../../helper';
+import { domUtils } from '../../helper';
 import Figure from '../../modules/Figure';
 
 const Component = function (editor) {
@@ -202,7 +202,7 @@ function OnCopy_component(e) {
 		SetClipboardComponent(e, info.container, e.clipboardData);
 		domUtils.addClass(info.container, 'se-component-copy');
 		// copy effect
-		this._w.setTimeout(function () {
+		setTimeout(() => {
 			domUtils.removeClass(info.container, 'se-component-copy');
 		}, 120);
 	}

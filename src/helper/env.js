@@ -11,7 +11,7 @@ const userAgent = _w.navigator.userAgent.toLowerCase();
 export function getValues(obj) {
 	return !obj
 		? []
-		: this._w.Object.keys(obj).map(function (i) {
+		: Object.keys(obj).map(function (i) {
 				return obj[i];
 		  });
 }
@@ -103,8 +103,8 @@ export function getIncludePath(nameArray, extension) {
 		fileName += nameArray[i] + (i < len - 1 ? '|' : ')');
 	}
 
-	const regExp = new _w.RegExp('(^|.*[\\/])' + fileName + '(\\.[^\\/]+)?.' + extension + '(?:\\?.*|;.*)?$', 'i');
-	const extRegExp = new _w.RegExp('.+\\.' + extension + '(?:\\?.*|;.*)?$', 'i');
+	const regExp = new RegExp('(^|.*[\\/])' + fileName + '(\\.[^\\/]+)?.' + extension + '(?:\\?.*|;.*)?$', 'i');
+	const extRegExp = new RegExp('.+\\.' + extension + '(?:\\?.*|;.*)?$', 'i');
 
 	for (let c = _d.getElementsByTagName(tagName), i = 0; i < c.length; i++) {
 		if (extRegExp.test(c[i][src])) {

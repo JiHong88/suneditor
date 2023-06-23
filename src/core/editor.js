@@ -38,8 +38,8 @@ const Editor = function (multiTargets, options) {
 	this.rootKeys = product.rootKeys;
 	this.rootTargets = product.rootTargets;
 	this.context = product.context;
-	this.frameContext = new _w.Map();
-	this.frameOptions = new _w.Map();
+	this.frameContext = new Map();
+	this.frameOptions = new Map();
 
 	/**
 	 * @description Document object
@@ -141,20 +141,20 @@ const Editor = function (multiTargets, options) {
 	/**
 	 * @description All command buttons map
 	 */
-	this.allCommandButtons = new _w.Map();
-	this.subAllCommandButtons = new _w.Map();
+	this.allCommandButtons = new Map();
+	this.subAllCommandButtons = new Map();
 
 	/**
 	 * @description Shoutcuts key map
 	 */
-	this.shortcutsKeyMap = new _w.Map();
+	this.shortcutsKeyMap = new Map();
 	this.reverseKeys = [];
 
 	/**
 	 * @description A map with the plugin's buttons having an "active" method and the default command buttons with an "active" action.
 	 * Each button is contained in an array.
 	 */
-	this.commandTargets = new _w.Map();
+	this.commandTargets = new Map();
 
 	/**
 	 * @description Plugins array with "active" method.
@@ -554,7 +554,7 @@ Editor.prototype = {
 	 * @param {Object} newOptions Options
 	 */
 	resetOptions(newOptions) {
-		const _keys = this._w.Object.keys;
+		const _keys = Object.keys;
 		this.viewer.codeView(false);
 		this.viewer.showBlocks(false);
 
@@ -576,7 +576,7 @@ Editor.prototype = {
 					CheckResetKeys(newKeys, null, key + '.');
 					if (newKeys.length === 0) continue;
 
-					rootDiff[key] = new env._w.Map();
+					rootDiff[key] = new Map();
 					const o = rootTargets.get(key).get('options').get('_origin');
 					for (let rk in nro) {
 						const roV = nro[rk];
@@ -632,7 +632,7 @@ Editor.prototype = {
 					const docHead = fc.get('_wd').head;
 					const links = docHead.getElementsByTagName('link');
 					while (links[0]) docHead.removeChild(links[0]);
-					const parseDocument = new this._w.DOMParser().parseFromString(converter._setIframeStyleLinks(newOptions.get('iframe_cssFileName')), 'text/html');
+					const parseDocument = new DOMParser().parseFromString(converter._setIframeStyleLinks(newOptions.get('iframe_cssFileName')), 'text/html');
 					const newLinks = parseDocument.head.children;
 					const sTag = docHead.querySelector('style');
 					while (newLinks[0]) docHead.insertBefore(newLinks[0], sTag);
@@ -1118,13 +1118,13 @@ Editor.prototype = {
 	_iframeAutoHeight(fc) {
 		const autoFrame = fc.get('_iframeAuto');
 		if (autoFrame) {
-			this._w.setTimeout(() => {
+			setTimeout(() => {
 				fc.get('wysiwygFrame').style.height = autoFrame.offsetHeight + 'px';
 			});
 		}
 
 		if (autoFrame) {
-			this._w.setTimeout(() => {
+			setTimeout(() => {
 				const h = autoFrame.offsetHeight;
 				fc.get('wysiwygFrame').style.height = h + 'px';
 				if (!env.isResizeObserverSupported) this.__callResizeFunction(fc, h, null);
@@ -1213,7 +1213,7 @@ Editor.prototype = {
 
 		this.eventManager._addCommonEvents();
 
-		this._w.setTimeout(() => {
+		setTimeout(() => {
 			// toolbar visibility
 			this.context.get('toolbar.main').style.visibility = '';
 			// roots
@@ -1257,7 +1257,7 @@ Editor.prototype = {
 		this._fileManager.pluginMap = {};
 
 		const plugins = this.plugins;
-		const isArray = this._w.Array.isArray;
+		const isArray = Array.isArray;
 		const managedClass = [];
 		let filePluginRegExp = [];
 		let plugin;
@@ -1298,8 +1298,8 @@ Editor.prototype = {
 
 		this._MELInfo.query = managedClass.toString();
 		this._fileManager.queryString = this._fileManager.tags.join(',');
-		this._fileManager.regExp = new this._w.RegExp('^(' + (this._fileManager.tags.join('|') || '\\^') + ')$', 'i');
-		this._fileManager.pluginRegExp = new this._w.RegExp('^(' + (filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')) + ')$', 'i');
+		this._fileManager.regExp = new RegExp('^(' + (this._fileManager.tags.join('|') || '\\^') + ')$', 'i');
+		this._fileManager.pluginRegExp = new RegExp('^(' + (filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')) + ')$', 'i');
 
 		delete this._pluginCallButtons;
 		delete this._pluginCallButtons_sub;

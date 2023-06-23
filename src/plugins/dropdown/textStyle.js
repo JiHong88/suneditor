@@ -91,7 +91,7 @@ function CreateHTML(editor, items) {
 			tag: 'span'
 		}
 	};
-	const styleList = items || editor._w.Object.keys(defaultList);
+	const styleList = items || Object.keys(defaultList);
 
 	let list = '<div class="se-list-inner"><ul class="se-list-basic">';
 	for (let i = 0, len = styleList.length, t, tag, name, attrs, command, value, _class; i < len; i++) {

@@ -26,7 +26,7 @@ const ModalAnchorEditor = function (inst, modalForm, params) {
 
 	// params
 	this.openNewWindow = !!params.openNewWindow;
-	this.relList = this._w.Array.isArray(params.relList) ? params.relList : [];
+	this.relList = Array.isArray(params.relList) ? params.relList : [];
 	this.defaultRel = params.defaultRel || {};
 	this.noAutoPrefix = !!params.noAutoPrefix;
 
@@ -197,7 +197,7 @@ ModalAnchorEditor.prototype = {
 		});
 		if (headers.length === 0) return;
 
-		const valueRegExp = new this._w.RegExp('^' + urlValue.replace(/^#/, ''), 'i');
+		const valueRegExp = new RegExp('^' + urlValue.replace(/^#/, ''), 'i');
 		const list = [];
 		const menus = [];
 		for (let i = 0, len = headers.length, v; i < len; i++) {
@@ -220,7 +220,7 @@ ModalAnchorEditor.prototype = {
 		const protocol = this.options.get('defaultUrlProtocol');
 		const noPrefix = this.noAutoPrefix;
 		const reservedProtocol = /^(mailto\:|tel\:|sms\:|https*\:\/\/|#)/.test(value) || value.indexOf(protocol) === 0;
-		const sameProtocol = !protocol ? false : this._w.RegExp('^' + value.substr(0, protocol.length)).test(protocol);
+		const sameProtocol = !protocol ? false : RegExp('^' + value.substr(0, protocol.length)).test(protocol);
 		value =
 			this.linkValue =
 			preview.textContent =
@@ -273,7 +273,7 @@ ModalAnchorEditor.prototype = {
 		if (!relAttr) return this.currentRel.join(' ');
 		if (/^only\:/.test(relAttr)) relAttr = relAttr.replace(/^only\:/, '').trim();
 
-		const rels = this.currentRel.join(' ').replace(this._w.RegExp(relAttr + '\\s*'), '');
+		const rels = this.currentRel.join(' ').replace(RegExp(relAttr + '\\s*'), '');
 		this.currentRel = rels.split(' ');
 		return rels;
 	},
@@ -286,7 +286,7 @@ function OnClick_relbutton() {
 }
 
 function SetHeaderBookmark(item) {
-	const id = item.id || 'h_' + this._w.Math.random().toString().replace(/.+\./, '');
+	const id = item.id || 'h_' + Math.random().toString().replace(/.+\./, '');
 	item.id = id;
 	this.urlInput.value = '#' + id;
 

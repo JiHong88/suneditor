@@ -114,7 +114,7 @@ FileBrowser.prototype = {
 
 		xhr.onreadystatechange = CallBackGet.bind(this, xhr);
 		xhr.open('get', url, true);
-		if (urlHeader !== null && typeof urlHeader === 'object' && this._w.Object.keys(urlHeader).length > 0) {
+		if (urlHeader !== null && typeof urlHeader === 'object' && Object.keys(urlHeader).length > 0) {
 			for (let key in urlHeader) {
 				xhr.setRequestHeader(key, urlHeader[key]);
 			}
@@ -184,7 +184,7 @@ function CallBackGet(xmlHttp) {
 		this._xhr = null;
 		if (xmlHttp.status === 200) {
 			try {
-				const res = this._w.JSON.parse(xmlHttp.responseText);
+				const res = JSON.parse(xmlHttp.responseText);
 				if (res.result.length > 0) {
 					this._drawListItem(res.result, true);
 				} else if (res.nullMessage) {

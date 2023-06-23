@@ -1,4 +1,3 @@
-import { _w } from '../../helper/env';
 import { get as getNumber } from '../../helper/numbers';
 
 /**
@@ -12,7 +11,7 @@ import { get as getNumber } from '../../helper/numbers';
  * @returns {Map}
  */
 export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFrame, statusbar, key) {
-	const m = new _w.Map([
+	const m = new Map([
 		['key', key],
 		['options', editorTarget.options],
 		['originElement', editorTarget.target],
@@ -64,7 +63,7 @@ export const UpdateStatusbarContext = function (statusbar, mapper) {
  * @returns {Map}
  */
 export const CreateContext = function (toolbar, toolbarContainer, menuTray, subbar, statusbarContainer) {
-	const m = new _w.Map([
+	const m = new Map([
 		['menuTray', menuTray],
 		['toolbar.main', toolbar],
 		['toolbar.buttonTray', toolbar.querySelector('.se-btn-tray')],

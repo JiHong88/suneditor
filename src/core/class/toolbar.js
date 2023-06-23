@@ -152,10 +152,13 @@ Toolbar.prototype = {
 		const editorHeight = this.editor.frameContext.get('editorArea').offsetHeight;
 		const editorOffset = this.offset.getGlobal(this.editor.frameContext.get('topArea'));
 		const y = (this._w.scrollY || this._d.documentElement.scrollTop) + this.options.get('toolbar_sticky');
-		const t = (this._isBalloon || this._isInline ? editorOffset.top : this.offset.getGlobal(this.options.get('toolbar_container')).top) - (this._isInline ? toolbar.offsetHeight : 0);
+		const t =
+			(this._isBalloon || this._isInline ? editorOffset.top : this.offset.getGlobal(this.options.get('toolbar_container')).top) - (this._isInline ? toolbar.offsetHeight : 0);
 		const inlineOffset = 1;
 
-		const offSticky = !this.options.get('toolbar_container') ? editorHeight + t + this.options.get('toolbar_sticky') - y - minHeight : editorOffset.top - this._w.scrollY + editorHeight - minHeight - this.options.get('toolbar_sticky') - toolbar.offsetHeight;
+		const offSticky = !this.options.get('toolbar_container')
+			? editorHeight + t + this.options.get('toolbar_sticky') - y - minHeight
+			: editorOffset.top - this._w.scrollY + editorHeight - minHeight - this.options.get('toolbar_sticky') - toolbar.offsetHeight;
 		if (y < t) {
 			this._offSticky();
 		} else if (offSticky < 0) {
@@ -249,7 +252,7 @@ Toolbar.prototype = {
 
 		this._setBalloonOffset(isDirTop, range);
 
-		this._w.setTimeout(function () {
+		setTimeout(() => {
 			toolbar.style.visibility = '';
 		});
 	},
@@ -308,7 +311,7 @@ Toolbar.prototype = {
 	_setBalloonPosition(isDirTop, rects, toolbarEl, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop) {
 		const padding = 1;
 		const arrow = this.context.get(this.keyName + '._arrow');
-		const arrowMargin = this._w.Math.round(arrow.offsetWidth / 2);
+		const arrowMargin = Math.round(arrow.offsetWidth / 2);
 		const toolbarWidth = toolbarEl.offsetWidth;
 		const toolbarHeight = rects.noText && !isDirTop ? 0 : toolbarEl.offsetHeight;
 
@@ -319,7 +322,8 @@ Toolbar.prototype = {
 		let l = absoluteLeft < 0 ? padding : overRight < 0 ? absoluteLeft : absoluteLeft - overRight - padding - 1;
 
 		let resetTop = false;
-		const space = t + (isDirTop ? this.offset.getGlobal(this.editor.frameContext.get('topArea')).top : toolbarEl.offsetHeight - this.editor.frameContext.get('wysiwyg').offsetHeight);
+		const space =
+			t + (isDirTop ? this.offset.getGlobal(this.editor.frameContext.get('topArea')).top : toolbarEl.offsetHeight - this.editor.frameContext.get('wysiwyg').offsetHeight);
 		if (!isDirTop && space > 0 && this._getPageBottomSpace() < space) {
 			isDirTop = true;
 			resetTop = true;
@@ -330,8 +334,8 @@ Toolbar.prototype = {
 
 		if (resetTop) t = (isDirTop ? rects.top - toolbarHeight - arrowMargin : rects.bottom + arrowMargin) - (rects.noText ? 0 : stickyTop) + scrollTop;
 
-		toolbarEl.style.left = this._w.Math.floor(l) + 'px';
-		toolbarEl.style.top = this._w.Math.floor(t) + 'px';
+		toolbarEl.style.left = Math.floor(l) + 'px';
+		toolbarEl.style.top = Math.floor(t) + 'px';
 
 		if (isDirTop) {
 			domUtils.removeClass(arrow, 'se-arrow-up');
@@ -341,7 +345,7 @@ Toolbar.prototype = {
 			domUtils.addClass(arrow, 'se-arrow-up');
 		}
 
-		const arrow_left = this._w.Math.floor(toolbarWidth / 2 + (absoluteLeft - l));
+		const arrow_left = Math.floor(toolbarWidth / 2 + (absoluteLeft - l));
 		arrow.style.left = (arrow_left + arrowMargin > toolbarEl.offsetWidth ? toolbarEl.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
 	},
 
@@ -360,7 +364,8 @@ Toolbar.prototype = {
 		toolbar.style.display = 'block';
 		toolbar.style.top = '0px';
 		this._inlineToolbarAttr.width = toolbar.style.width = this.options.get(this.keyName + '_width');
-		this._inlineToolbarAttr.top = toolbar.style.top = -1 + (this.offset.getGlobal(this.editor.frameContext.get('topArea')).top - this.offset.getGlobal(toolbar).top - toolbar.offsetHeight) + 'px';
+		this._inlineToolbarAttr.top = toolbar.style.top =
+			-1 + (this.offset.getGlobal(this.editor.frameContext.get('topArea')).top - this.offset.getGlobal(toolbar).top - toolbar.offsetHeight) + 'px';
 
 		if (typeof this.events.onShowInline === 'function') this.events.onShowInline(toolbar);
 

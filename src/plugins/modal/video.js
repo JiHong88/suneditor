@@ -161,7 +161,7 @@ Video.prototype = {
 			result = this._submitURL(this._linkValue);
 		}
 
-		if (result) this._w.setTimeout(this.component.select.bind(this.component, this._element, 'video'));
+		if (result) setTimeout(this.component.select.bind(this.component, this._element, 'video'));
 
 		return result;
 	},
@@ -393,7 +393,7 @@ Video.prototype = {
 
 		if (typeof this.events.onVideoUploadBefore === 'function') {
 			const result = this.events.onVideoUploadBefore(files, info, (data) => {
-				if (data && this._w.Array.isArray(data.result)) {
+				if (data && Array.isArray(data.result)) {
 					this._register(info, data);
 				} else {
 					this._serverUpload(info, data);
@@ -402,7 +402,7 @@ Video.prototype = {
 
 			if (result === undefined) return true;
 			if (result === false) return false;
-			if (this._w.Array.isArray(result) && result.length > 0) files = result;
+			if (Array.isArray(result) && result.length > 0) files = result;
 		}
 
 		this._serverUpload(info, files);
@@ -414,7 +414,7 @@ Video.prototype = {
 
 		/** iframe source */
 		if (/^<iframe.*\/iframe>$/.test(url)) {
-			const oIframe = new this._w.DOMParser().parseFromString(url, 'text/html').querySelector('iframe');
+			const oIframe = new DOMParser().parseFromString(url, 'text/html').querySelector('iframe');
 			url = oIframe.src;
 			if (url.length === 0) return false;
 		}
@@ -608,7 +608,7 @@ function UploadCallBack(info, xmlHttp) {
 	if (typeof this.events.videoUploadHandler === 'function') {
 		this.events.videoUploadHandler(xmlHttp, info);
 	} else {
-		const response = this._w.JSON.parse(xmlHttp.responseText);
+		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {
 			this._error(response.errorMessage, response);
 		} else {

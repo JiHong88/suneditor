@@ -1076,7 +1076,7 @@ Format.prototype = {
 			styleNode = domUtils.createElement('DIV');
 		}
 
-		const wRegExp = this._w.RegExp;
+		const wRegExp = RegExp;
 		const newNodeName = styleNode.nodeName;
 
 		/* checked same style property */
@@ -1989,8 +1989,7 @@ Format.prototype = {
 		let endPass = false;
 		let pCurrent, newNode, appendNode, cssText, anchorNode;
 
-		const wRegExp = this._w.RegExp;
-
+		const wRegExp = RegExp;
 		function checkCss(vNode) {
 			const regExp = new wRegExp('(?:;|^|\\s)(?:' + cssText + 'null)\\s*:[^;]*\\s*(?:;|$)', 'ig');
 			let style = '';
@@ -2392,19 +2391,7 @@ Format.prototype = {
 	 * @returns {Object} { ancestor, container, offset, endContainer }
 	 * @private
 	 */
-	_setNode_startLine(
-		element,
-		newInnerNode,
-		validation,
-		startCon,
-		startOff,
-		isRemoveFormat,
-		isRemoveNode,
-		_removeCheck,
-		_getMaintainedNode,
-		_isMaintainedNode,
-		_endContainer
-	) {
+	_setNode_startLine(element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, _endContainer) {
 		// not add tag
 		let parentCon = startCon.parentNode;
 		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.isLine(parentCon.parentNode) && !domUtils.isWysiwygFrame(parentCon.parentNode)) {

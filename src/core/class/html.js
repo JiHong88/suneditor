@@ -11,8 +11,8 @@ const HTML = function (editor) {
 	CoreInjector.call(this, editor);
 
 	// members
-	const wRegExp = editor._w.RegExp;
-	this._parser = new editor._w.DOMParser();
+	const wRegExp = RegExp;
+	this._parser = new DOMParser();
 	this._isAllowedClassName = function (v) {
 		return this.test(v) ? v : '';
 	}.bind(editor.options.get('allowedClassName'));
@@ -40,8 +40,7 @@ const HTML = function (editor) {
 
 	// set disallow text nodes
 	const options = this.options;
-	const _w = this._w;
-	const disallowStyleNodes = _w.Object.keys(options.get('_defaultStyleTagMap'));
+	const disallowStyleNodes = Object.keys(options.get('_defaultStyleTagMap'));
 	const allowStyleNodes = !options.get('elementWhitelist')
 		? []
 		: options
@@ -53,15 +52,15 @@ const HTML = function (editor) {
 	for (let i = 0; i < allowStyleNodes.length; i++) {
 		disallowStyleNodes.splice(disallowStyleNodes.indexOf(allowStyleNodes[i].toLowerCase()), 1);
 	}
-	this._disallowedStyleNodesRegExp = disallowStyleNodes.length === 0 ? null : new _w.RegExp('(<\\/?)(' + disallowStyleNodes.join('|') + ')\\b\\s*([^>^<]+)?\\s*(?=>)', 'gi');
+	this._disallowedStyleNodesRegExp = disallowStyleNodes.length === 0 ? null : new wRegExp('(<\\/?)(' + disallowStyleNodes.join('|') + ')\\b\\s*([^>^<]+)?\\s*(?=>)', 'gi');
 
 	// whitelist
 	// tags
 	const defaultAttr = options.get('__defaultAttributeWhitelist');
 	this._allowHTMLComment = options.get('_editorElementWhitelist').includes('//') || options.get('_editorElementWhitelist') === '*';
 	// html check
-	this._htmlCheckWhitelistRegExp = new _w.RegExp('^(' + GetRegList(options.get('_editorElementWhitelist').replace('|//', ''), '') + ')$', 'i');
-	this._htmlCheckBlacklistRegExp = new _w.RegExp('^(' + (options.get('elementBlacklist') || '^') + ')$', 'i');
+	this._htmlCheckWhitelistRegExp = new wRegExp('^(' + GetRegList(options.get('_editorElementWhitelist').replace('|//', ''), '') + ')$', 'i');
+	this._htmlCheckBlacklistRegExp = new wRegExp('^(' + (options.get('elementBlacklist') || '^') + ')$', 'i');
 	// elements
 	this._elementWhitelistRegExp = converter.createElementWhitelist(GetRegList(options.get('_editorElementWhitelist').replace('|//', '|<!--|-->'), ''));
 	this._elementBlacklistRegExp = converter.createElementBlacklist(options.get('elementBlacklist').replace('|//', '|<!--|-->'));
@@ -76,12 +75,12 @@ const HTML = function (editor) {
 			if (k === '*') {
 				allAttr = GetRegList(_wAttr[k], defaultAttr);
 			} else {
-				tagsAttr[k] = new _w.RegExp('\\s(?:' + GetRegList(_wAttr[k], '') + ')' + regEndStr, 'ig');
+				tagsAttr[k] = new wRegExp('\\s(?:' + GetRegList(_wAttr[k], '') + ')' + regEndStr, 'ig');
 			}
 		}
 	}
 
-	this._attributeWhitelistRegExp = new _w.RegExp('\\s(?:' + (allAttr || defaultAttr + '|' + REQUIRED_DATA_ATTRS) + ')' + regEndStr, 'ig');
+	this._attributeWhitelistRegExp = new wRegExp('\\s(?:' + (allAttr || defaultAttr + '|' + REQUIRED_DATA_ATTRS) + ')' + regEndStr, 'ig');
 	this._attributeWhitelist = tagsAttr;
 
 	// blacklist
@@ -93,12 +92,12 @@ const HTML = function (editor) {
 			if (k === '*') {
 				allAttr = GetRegList(_bAttr[k], '');
 			} else {
-				tagsAttr[k] = new _w.RegExp('\\s(?:' + GetRegList(_bAttr[k], '') + ')' + regEndStr, 'ig');
+				tagsAttr[k] = new wRegExp('\\s(?:' + GetRegList(_bAttr[k], '') + ')' + regEndStr, 'ig');
 			}
 		}
 	}
 
-	this._attributeBlacklistRegExp = new _w.RegExp('\\s(?:' + (allAttr || '^') + ')' + regEndStr, 'ig');
+	this._attributeBlacklistRegExp = new wRegExp('\\s(?:' + (allAttr || '^') + ')' + regEndStr, 'ig');
 	this._attributeBlacklist = tagsAttr;
 };
 
@@ -813,7 +812,7 @@ HTML.prototype = {
 	 */
 	get(withFrame, includeFullPage, rootKey) {
 		if (!rootKey) rootKey = [this.status.rootKey];
-		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
+		else if (!Array.isArray(rootKey)) rootKey = [rootKey];
 
 		const prevrootKey = this.status.rootKey;
 		const resultValue = {};
@@ -859,7 +858,7 @@ HTML.prototype = {
 		const convertValue = html === null || html === undefined ? '' : this.clean(html, true, null, null);
 
 		if (!rootKey) rootKey = [this.status.rootKey];
-		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
+		else if (!Array.isArray(rootKey)) rootKey = [rootKey];
 
 		for (let i = 0; i < rootKey.length; i++) {
 			this.editor.changeFrameContext(rootKey[i]);
@@ -882,7 +881,7 @@ HTML.prototype = {
 	 */
 	add(content, rootKey) {
 		if (!rootKey) rootKey = [this.status.rootKey];
-		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
+		else if (!Array.isArray(rootKey)) rootKey = [rootKey];
 
 		for (let i = 0; i < rootKey.length; i++) {
 			this.editor.changeFrameContext(rootKey[i]);
@@ -911,7 +910,7 @@ HTML.prototype = {
 		if (!this.editor.frameOptions.get('iframe')) return false;
 
 		if (!rootKey) rootKey = [this.status.rootKey];
-		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
+		else if (!Array.isArray(rootKey)) rootKey = [rootKey];
 
 		for (let i = 0; i < rootKey.length; i++) {
 			this.editor.changeFrameContext(rootKey[i]);
@@ -939,8 +938,7 @@ HTML.prototype = {
 	 */
 	_convertToCode(html, comp) {
 		let returnHTML = '';
-		const _w = this._w;
-		const wRegExp = _w.RegExp;
+		const wRegExp = RegExp;
 		const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
 		const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
 		const isFormat = (current) => {
@@ -949,7 +947,7 @@ HTML.prototype = {
 		const brChar = comp ? '' : '\n';
 
 		let indentSize = comp ? 0 : this.status.codeIndentSize * 1;
-		indentSize = indentSize > 0 ? new _w.Array(indentSize + 1).join(' ') : '';
+		indentSize = indentSize > 0 ? new Array(indentSize + 1).join(' ') : '';
 
 		(function recursionFunc(element, indent) {
 			const children = element.childNodes;
@@ -980,7 +978,7 @@ HTML.prototype = {
 				}
 
 				if (!node.outerHTML) {
-					returnHTML += new _w.XMLSerializer().serializeToString(node);
+					returnHTML += new XMLSerializer().serializeToString(node);
 				} else {
 					tag = node.nodeName.toLowerCase();
 					tagIndent = elementIndent || nodeRegTest ? indent : '';
@@ -1160,7 +1158,7 @@ HTML.prototype = {
 
 			// class filter
 			if (nrtag && current.className) {
-				const className = new this._w.Array(current.classList).map(this._isAllowedClassName).join(' ').trim();
+				const className = new Array(current.classList).map(this._isAllowedClassName).join(' ').trim();
 				if (className) current.className = className;
 				else current.removeAttribute('class');
 			}

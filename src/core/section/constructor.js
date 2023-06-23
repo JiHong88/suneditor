@@ -4,7 +4,6 @@ import { CreateContext, CreateFrameContext } from './context';
 import { domUtils, numbers, converter, env } from '../../helper';
 
 const _d = env._d;
-const _w = env._w;
 const DEFAULT_BUTTON_LIST = [
 	['undo', 'redo'],
 	['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -70,9 +69,9 @@ const Constructor = function (editorTargets, options) {
 	const plugins = {};
 	if (options.plugins) {
 		const originPlugins = options.plugins;
-		const pluginsValues = _w.Array.isArray(originPlugins.length)
+		const pluginsValues = Array.isArray(originPlugins.length)
 			? originPlugins
-			: _w.Object.keys(originPlugins).map(function (name) {
+			: Object.keys(originPlugins).map(function (name) {
 					return originPlugins[name];
 			  });
 
@@ -137,7 +136,7 @@ const Constructor = function (editorTargets, options) {
 	/** frame - root set - start -------------------------------------------------------------- */
 	const rootId = editorTargets[0].key || null;
 	const rootKeys = [];
-	const rootTargets = new _w.Map();
+	const rootTargets = new Map();
 	const statusbarContainer = optionMap.statusbarContainer;
 	let default_status_bar = null;
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
@@ -289,7 +288,7 @@ function _mergeObject(a, b) {
  */
 export function InitOptions(options, editorTargets) {
 	const buttonList = options.buttonList || DEFAULT_BUTTON_LIST;
-	const o = new _w.Map();
+	const o = new Map();
 
 	/** Multi root */
 	if (editorTargets.length > 1) {
@@ -302,7 +301,7 @@ export function InitOptions(options, editorTargets) {
 	o.set('fontSizeUnit', typeof options.fontSizeUnit === 'string' ? options.fontSizeUnit.trim().toLowerCase() || 'px' : 'px');
 	o.set(
 		'allowedClassName',
-		new _w.RegExp((options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : '') + '^__se__|se-|katex')
+		new RegExp((options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : '') + '^__se__|se-|katex')
 	);
 	o.set('__allowedScriptTag', options.__allowedScriptTag === true);
 	// text style tags
@@ -322,11 +321,11 @@ export function InitOptions(options, editorTargets) {
 	o.set('textTags', textTags);
 	o.set(
 		'_spanStylesRegExp',
-		new _w.RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi')
+		new RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi')
 	);
 	o.set(
 		'_formatStylesRegExp',
-		new _w.RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right' + (options.formatStyles ? '|' + options.formatStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi')
+		new RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right' + (options.formatStyles ? '|' + options.formatStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi')
 	);
 	o.set('_defaultStyleTagMap', {
 		strong: textTags.bold,
@@ -476,7 +475,7 @@ export function InitOptions(options, editorTargets) {
 
 	/** root options */
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
-		InitFrameOptions(editorTargets[i].options || {}, options, (editorTargets[i].options = new _w.Map()));
+		InitFrameOptions(editorTargets[i].options || {}, options, (editorTargets[i].options = new Map()));
 	}
 
 	/** Key actions */
@@ -813,7 +812,7 @@ function _createFormatInfo(value, defaultValue, blacklist) {
 		})
 		.join('|');
 	return {
-		reg: new _w.RegExp('^(' + str + ')$', 'i'),
+		reg: new RegExp('^(' + str + ')$', 'i'),
 		str: str
 	};
 }
@@ -958,7 +957,7 @@ export function UpdateButton(element, plugin, icons, lang) {
  */
 export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 	/** create button list */
-	buttonList = _w.JSON.parse(_w.JSON.stringify(buttonList));
+	buttonList = JSON.parse(JSON.stringify(buttonList));
 	const defaultButtonList = _defaultButtons(options, icons, lang);
 	const pluginCallButtons = {};
 	const responsiveButtons = [];

@@ -1070,7 +1070,7 @@ function OnSplitCells(direction) {
 
 		// colspan > 1
 		if (currentColSpan > 1) {
-			newCell.colSpan = this._w.Math.floor(currentColSpan / 2);
+			newCell.colSpan = Math.floor(currentColSpan / 2);
 			currentCell.colSpan = currentColSpan - newCell.colSpan;
 			currentRow.insertBefore(newCell, currentCell.nextElementSibling);
 		} else {
@@ -1145,7 +1145,7 @@ function OnSplitCells(direction) {
 
 		// rowspan > 1
 		if (currentRowSpan > 1) {
-			newCell.rowSpan = this._w.Math.floor(currentRowSpan / 2);
+			newCell.rowSpan = Math.floor(currentRowSpan / 2);
 			const newRowSpan = currentRowSpan - newCell.rowSpan;
 
 			const rowSpanArr = [];
@@ -1232,8 +1232,8 @@ function OnSplitCells(direction) {
 function OnMouseMoveTablePicker(e) {
 	e.stopPropagation();
 
-	let x = this._w.Math.ceil(e.offsetX / 18);
-	let y = this._w.Math.ceil(e.offsetY / 18);
+	let x = Math.ceil(e.offsetX / 18);
+	let y = Math.ceil(e.offsetY / 18);
 	x = x < 1 ? 1 : x;
 	y = y < 1 ? 1 : y;
 

@@ -135,7 +135,7 @@ Node_.prototype = {
 		let offsets = null;
 
 		if (nodePathLen) {
-			offsets = this._w.Array.apply(null, new this._w.Array(nodePathLen)).map(this._w.Number.prototype.valueOf, 0);
+			offsets = Array.apply(null, new Array(nodePathLen)).map(Number.prototype.valueOf, 0);
 		}
 
 		(function recursionFunc(current, depth, depthIndex) {
@@ -273,7 +273,7 @@ Node_.prototype = {
 		if (typeof validation === 'string') {
 			validation = function (current) {
 				return this.test(current.tagName);
-			}.bind(new this._w.RegExp('^(' + (validation ? validation : '.+') + ')$', 'i'));
+			}.bind(new RegExp('^(' + (validation ? validation : '.+') + ')$', 'i'));
 		} else if (typeof validation !== 'function') {
 			validation = function () {
 				return true;

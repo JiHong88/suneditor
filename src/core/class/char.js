@@ -8,11 +8,6 @@ import { addClass, removeClass, hasClass } from '../../helper/domUtils';
 
 const Char = function (editor) {
 	CoreInjector.call(this, editor);
-
-	// members
-	this._encoder = this._w.encodeURIComponent;
-	this._unescape = this._w.unescape;
-	this._textEncoder = this._w.TextEncoder;
 };
 
 Char.prototype = {
@@ -60,23 +55,22 @@ Char.prototype = {
 		if (!text || !text.toString) return 0;
 		text = text.toString();
 
-		const encoder = this._encoder;
 		let cr, cl;
 		if (env.isEdge) {
-			cl = this._unescape(encoder(text)).length;
+			cl = decodeURIComponent(encodeURIComponent(text)).length;
 			cr = 0;
 
-			if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
-				cr = encoder(text).match(/(%0A|%0D)/gi).length;
+			if (encodeURIComponent(text).match(/(%0A|%0D)/gi) !== null) {
+				cr = encodeURIComponent(text).match(/(%0A|%0D)/gi).length;
 			}
 
 			return cl + cr;
 		} else {
-			cl = new this._textEncoder('utf-8').encode(text).length;
+			cl = new TextEncoder('utf-8').encode(text).length;
 			cr = 0;
 
-			if (encoder(text).match(/(%0A|%0D)/gi) !== null) {
-				cr = encoder(text).match(/(%0A|%0D)/gi).length;
+			if (encodeURIComponent(text).match(/(%0A|%0D)/gi) !== null) {
+				cr = encodeURIComponent(text).match(/(%0A|%0D)/gi).length;
 			}
 
 			return cl + cr;
@@ -88,7 +82,7 @@ Char.prototype = {
 	 */
 	display() {
 		if (this.editor.frameContext.has('charCounter')) {
-			this._w.setTimeout(() => {
+			setTimeout(() => {
 				this.editor.frameContext.get('charCounter').textContent = this.getLength();
 			});
 		}
@@ -148,7 +142,7 @@ Char.prototype = {
 function CounterBlink(charWrapper) {
 	if (charWrapper && !hasClass(charWrapper, 'se-blink')) {
 		addClass(charWrapper, 'se-blink');
-		this._w.setTimeout(function () {
+		setTimeout(() => {
 			removeClass(charWrapper, 'se-blink');
 		}, 600);
 	}
