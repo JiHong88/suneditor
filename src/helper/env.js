@@ -54,24 +54,7 @@ export function kebabToCamelCase(param) {
  * @returns {XMLHttpRequest|ActiveXObject}
  */
 export function getXMLHttpRequest() {
-	/** IE */
-	if (_w.ActiveXObject) {
-		try {
-			return new _w.ActiveXObject('Msxml2.XMLHTTP');
-		} catch (e) {
-			try {
-				return new _w.ActiveXObject('Microsoft.XMLHTTP');
-			} catch (e1) {
-				return null;
-			}
-		}
-	} else if (_w.XMLHttpRequest) {
-		/** netscape */
-		return new _w.XMLHttpRequest();
-	} else {
-		/** fail */
-		return null;
-	}
+	return new _w.XMLHttpRequest();
 }
 
 /**
@@ -139,9 +122,9 @@ export function getIncludePath(nameArray, extension) {
 
 	if (path === '') path = pathList.length > 0 ? pathList[0][src] : '';
 
-	path.indexOf(':/') < 0 &&
+	!path.includes(':/') &&
 		'//' !== path.slice(0, 2) &&
-		(path = 0 === path.indexOf('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
+		(path = 0 === path.includes('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
 
 	if (!path)
 		throw '[SUNEDITOR.helper.env.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (name: +' + name + ', extension: ' + extension + ')';
@@ -159,19 +142,11 @@ function isResizeObserverSupported() {
 }
 
 /**
- * @description Check if User Agent is IE
- * @returns {boolean} Whether User Agent is IE or not.
- */
-function isIE() {
-	return userAgent.indexOf('trident') > -1;
-}
-
-/**
  * @description Check if User Agent is Edge
  * @returns {boolean} Whether User Agent is Edge or not.
  */
 function isEdge() {
-	return navigator.appVersion.indexOf('Edge') > -1;
+	return navigator.appVersion.includes('Edge');
 }
 
 /**
@@ -187,7 +162,7 @@ function isOSX_IOS() {
  * @returns {boolean} Whether User Agent is Blink engine or not.
  */
 function isBlink() {
-	return userAgent.indexOf('chrome/') > -1 && userAgent.indexOf('edge/') < 0;
+	return userAgent.includes('chrome/') && !userAgent.includes('edge/');
 }
 
 /**
@@ -211,7 +186,7 @@ function isChromium() {
  * @returns {boolean} Whether User Agent is Safari or not.
  */
 function isSafari() {
-	return userAgent.indexOf('applewebkit/') > -1 && userAgent.indexOf('chrome') === -1;
+	return userAgent.includes('applewebkit/') && !userAgent.includes('chrome');
 }
 
 /**
@@ -219,7 +194,7 @@ function isSafari() {
  * @returns {boolean} Whether User Agent is Android or not.
  */
 function isAndroid() {
-	return userAgent.indexOf('android') > -1;
+	return userAgent.includes('android');
 }
 
 /**
@@ -246,7 +221,6 @@ const env = {
 	getPageStyle,
 	getIncludePath,
 	isResizeObserverSupported: isResizeObserverSupported(),
-	isIE: isIE(),
 	isEdge: isEdge(),
 	isBlink: isBlink(),
 	isGecko: isGecko(),

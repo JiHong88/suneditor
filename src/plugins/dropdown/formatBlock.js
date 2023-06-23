@@ -25,7 +25,7 @@ FormatBlock.prototype = {
 	/**
 	 * @override core
 	 */
-	active: function (element, target) {
+	active(element, target) {
 		let formatTitle = this.lang.formats;
 		const targetText = target.querySelector('.txt');
 
@@ -57,7 +57,7 @@ FormatBlock.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on: function (target) {
+	on(target) {
 		const formatList = this.formatList;
 		const targetText = target.querySelector('.txt');
 		const currentFormat = (targetText.getAttribute('data-value') || '') + (targetText.getAttribute('data-class') || '');
@@ -80,7 +80,7 @@ FormatBlock.prototype = {
 	 * @override core
 	 * @param {Element} target Target command button
 	 */
-	action: function (target) {
+	action(target) {
 		// "line"|"br-line"|"block"
 		const command = target.getAttribute('data-command');
 		const tag = target.firstChild;
@@ -106,7 +106,7 @@ function CreateHTML(editor, items) {
 	for (let i = 0, len = formatList.length, format, tagName, command, name, h, attrs, className; i < len; i++) {
 		format = formatList[i];
 
-		if (typeof format === 'string' && defaultFormats.indexOf(format) > -1) {
+		if (typeof format === 'string' && defaultFormats.includes(format)) {
 			tagName = format.toLowerCase();
 			command = tagName === 'blockquote' ? 'block' : tagName === 'pre' ? 'br-line' : 'line';
 			h = /^h/.test(tagName) ? tagName.match(/\d+/)[0] : '';

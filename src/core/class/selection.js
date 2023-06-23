@@ -18,7 +18,7 @@ Selection.prototype = {
 	 * @description Get window selection obejct
 	 * @returns {Object}
 	 */
-	get: function () {
+	get() {
 		const selection = this._shadowRoot && this._shadowRoot.getSelection ? this._shadowRoot.getSelection() : this.editor.frameContext.get('_ww').getSelection();
 		if (!selection) return null;
 		if (!this.status._range && !this.editor.frameContext.get('wysiwyg').contains(selection.focusNode)) {
@@ -32,7 +32,7 @@ Selection.prototype = {
 	 * @description Get current editor's range object
 	 * @returns {Object}
 	 */
-	getRange: function () {
+	getRange() {
 		const range = this.status._range || this._createDefaultRange();
 		const selection = this.get();
 		if (range.collapsed === selection.isCollapsed || !this.editor.frameContext.get('wysiwyg').contains(selection.focusNode)) return range;
@@ -59,7 +59,7 @@ Selection.prototype = {
 	 * @param {number} endOff The endOffset property of the selection object.
 	 * @returns {Object} Range object.
 	 */
-	setRange: function (startCon, startOff, endCon, endOff) {
+	setRange(startCon, startOff, endCon, endOff) {
 		if (!startCon || !endCon) return;
 		if (startOff > startCon.textContent.length) startOff = startCon.textContent.length;
 		if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
@@ -99,7 +99,7 @@ Selection.prototype = {
 	/**
 	 * @description Remove range object and button effect
 	 */
-	removeRange: function () {
+	removeRange() {
 		this.status._range = null;
 		this.selectionNode = null;
 		if (this.status.hasFocus) this.get().removeAllRanges();
@@ -113,7 +113,7 @@ Selection.prototype = {
 	 * @param {Element|null} container If there is "container" argument, it creates a line in front of the container.
 	 * @returns {Object} range
 	 */
-	getRangeAndAddLine: function (range, container) {
+	getRangeAndAddLine(range, container) {
 		if (this._isNone(range)) {
 			const wysiwyg = this.editor.frameContext.get('wysiwyg');
 			const op = domUtils.createElement(this.options.get('defaultLine'), null, '<br>');
@@ -128,7 +128,7 @@ Selection.prototype = {
 	 * @description Get current select node
 	 * @returns {Node}
 	 */
-	getNode: function () {
+	getNode() {
 		if (!this.editor.frameContext.get('wysiwyg').contains(this.selectionNode)) this._init();
 		if (!this.selectionNode) {
 			const selectionNode = domUtils.getEdgeChild(
@@ -154,7 +154,7 @@ Selection.prototype = {
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
 	 * @returns
 	 */
-	getRects: function (range, position) {
+	getRects(range, position) {
 		range = range || this.getRange();
 		const globalScroll = this.offset.getGlobalScroll();
 		let isStartPosition = position === 'start';
@@ -214,7 +214,7 @@ Selection.prototype = {
 	 * @param {Object} range selection.getRange()
 	 * @returns {boolean}
 	 */
-	_isNone: function (range) {
+	_isNone(range) {
 		const comm = range.commonAncestorContainer;
 		return (
 			(domUtils.isWysiwygFrame(range.startContainer) && domUtils.isWysiwygFrame(range.endContainer)) ||
@@ -229,7 +229,7 @@ Selection.prototype = {
 	 * @returns {Object}
 	 * @private
 	 */
-	_createDefaultRange: function () {
+	_createDefaultRange() {
 		const wysiwyg = this.editor.frameContext.get('wysiwyg');
 		const range = this.editor.frameContext.get('_wd').createRange();
 
@@ -258,7 +258,7 @@ Selection.prototype = {
 	 * @param {Object} range range object.
 	 * @param {Object} selection selection object.
 	 */
-	_rangeInfo: function (range, selection) {
+	_rangeInfo(range, selection) {
 		let selectionNode = null;
 		this.status._range = range;
 
@@ -276,7 +276,7 @@ Selection.prototype = {
 	 * @description Saving the range object and the currently selected node of editor
 	 * @private
 	 */
-	_init: function () {
+	_init() {
 		const activeEl = this.editor.frameContext.get('_wd').activeElement;
 		if (domUtils.isInputElement(activeEl)) {
 			this.selectionNode = activeEl;
@@ -301,7 +301,7 @@ Selection.prototype = {
 	 * @description Focus method
 	 * @private
 	 */
-	__focus: function () {
+	__focus() {
 		const caption = domUtils.getParentElement(this.getNode(), 'figcaption');
 		if (caption) {
 			caption.focus();
@@ -315,7 +315,7 @@ Selection.prototype = {
 	 * @returns {boolean} Returns false if there is no valid selection.
 	 * @private
 	 */
-	_resetRangeToTextNode: function () {
+	_resetRangeToTextNode() {
 		const range = this.getRange();
 		if (this._isNone(range)) return false;
 

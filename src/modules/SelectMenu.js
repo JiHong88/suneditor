@@ -37,7 +37,7 @@ const SelectMenu = function (inst, params) {
 };
 
 SelectMenu.prototype = {
-	create: function (items, menus) {
+	create(items, menus) {
 		menus = menus || items;
 		let html = '';
 		for (let i = 0, len = menus.length; i < len; i++) {
@@ -49,7 +49,7 @@ SelectMenu.prototype = {
 		this.menus = this.form.querySelectorAll('li');
 	},
 
-	on: function (referElement, selectMethod, attr) {
+	on(referElement, selectMethod, attr) {
 		if (!attr) attr = {};
 		this._refer = referElement;
 		this._selectMethod = selectMethod;
@@ -65,7 +65,7 @@ SelectMenu.prototype = {
 	 * @param {string} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
 	 * @param {string|null|undefined} onItemQuerySelector The querySelector string of the menu to be activated
 	 */
-	open: function (position, onItemQuerySelector) {
+	open(position, onItemQuerySelector) {
 		this.__addEvents();
 		this.__addGlobalEvent();
 		const positionItems = position ? position.split('-') : [];
@@ -74,16 +74,16 @@ SelectMenu.prototype = {
 		this._setPosition(mainPosition, subPosition, onItemQuerySelector);
 	},
 
-	close: function () {
+	close() {
 		this._init();
 		if (this.form) this.form.style.cssText = '';
 	},
 
-	getItem: function (index) {
+	getItem(index) {
 		return this.items[index];
 	},
 
-	_init: function () {
+	_init() {
 		this.__removeEvents();
 		this.__removeGlobalEvent();
 		this.index = -1;
@@ -94,7 +94,7 @@ SelectMenu.prototype = {
 		}
 	},
 
-	_moveItem: function (num) {
+	_moveItem(num) {
 		domUtils.removeClass(this.form, 'se-select-menu-mouse-move');
 		num = this.index + num;
 		const len = this.menus.length;
@@ -117,7 +117,7 @@ SelectMenu.prototype = {
 	 * @param {["middle"|"top"|"bottom"] | ["center"|"left"|"right"]} subPosition Sub position
 	 * @private
 	 */
-	_setPosition: function (position, subPosition, onItemQuerySelector) {
+	_setPosition(position, subPosition, onItemQuerySelector) {
 		const originP = position;
 		const form = this.form;
 		const target = this._refer;
@@ -242,12 +242,12 @@ SelectMenu.prototype = {
 		form.style.visibility = '';
 	},
 
-	_select: function (index) {
+	_select(index) {
 		if (this.checkList) domUtils.toggleClass(this.menus[index], 'se-checked');
 		this._selectMethod(this.getItem(index));
 	},
 
-	__addEvents: function () {
+	__addEvents() {
 		this.__removeEvents();
 		this.__events = this.__eventHandlers;
 		this.form.addEventListener('mousedown', this.__events[0]);
@@ -256,7 +256,7 @@ SelectMenu.prototype = {
 		this._refer.addEventListener('keydown', this.__events[3]);
 	},
 
-	__removeEvents: function () {
+	__removeEvents() {
 		if (this.__events.length === 0) return;
 		this.form.removeEventListener('mousedown', this.__events[0]);
 		this.form.removeEventListener('mousemove', this.__events[1]);
@@ -265,13 +265,13 @@ SelectMenu.prototype = {
 		this.__events = [];
 	},
 
-	__addGlobalEvent: function () {
+	__addGlobalEvent() {
 		this.__removeGlobalEvent();
 		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers[0], true);
 		this._bindClose_mousedown = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers[1], true);
 	},
 
-	__removeGlobalEvent: function () {
+	__removeGlobalEvent() {
 		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);
 		if (this._bindClose_mousedown) this._bindClose_mousedown = this.eventManager.removeGlobalEvent(this._bindClose_mousedown);
 		if (this._bindClose_click) this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);

@@ -34,7 +34,7 @@ Modal.prototype = {
 	/**
 	 * @description Open a modal plugin
 	 */
-	open: function () {
+	open() {
 		this.editor._offCurrentModal();
 		this._fixCurrentController(true);
 
@@ -58,7 +58,7 @@ Modal.prototype = {
 	 * @description Close a modal plugin
 	 * The plugin's "init" method is called.
 	 */
-	close: function () {
+	close() {
 		this._fixCurrentController(false);
 		this.editor.opendModal = null;
 
@@ -74,7 +74,7 @@ Modal.prototype = {
 		this.editor.focus();
 	},
 
-	_fixCurrentController: function (fixed) {
+	_fixCurrentController(fixed) {
 		const cont = this.editor.opendControllers;
 		for (let i = 0; i < cont.length; i++) {
 			cont[i].fixed = fixed;

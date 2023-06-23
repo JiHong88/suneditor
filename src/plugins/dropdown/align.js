@@ -35,7 +35,7 @@ Align.prototype = {
 	 * @param {Element} target Target button.
 	 * @returns {boolean}
 	 */
-	active: function (element, target) {
+	active(element, target) {
 		const targetChild = target.firstElementChild;
 
 		if (!element) {
@@ -56,7 +56,7 @@ Align.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on: function (target) {
+	on(target) {
 		const currentAlign = target.getAttribute('data-focus') || this.defaultDir;
 		if (!currentAlign) return;
 
@@ -74,7 +74,7 @@ Align.prototype = {
 	 * @override core
 	 * @param {"rtl"|"ltr"} dir Direction
 	 */
-	setDir: function (dir) {
+	setDir(dir) {
 		const _dir = dir === 'rtl' ? 'right' : 'left';
 		if (this.defaultDir === _dir) return;
 
@@ -94,7 +94,7 @@ Align.prototype = {
 	 * @param {Element} target Target command button
 	 * @returns
 	 */
-	action: function (target) {
+	action(target) {
 		const value = target.getAttribute('data-command');
 		if (!value) return;
 

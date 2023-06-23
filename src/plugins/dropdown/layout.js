@@ -26,7 +26,7 @@ Layout.prototype = {
 	 * @override core
 	 * @param {Element} target Target command button
 	 */
-	action: function (target) {
+	action(target) {
 		const index = target.getAttribute('data-value') * 1;
 		const temp = this.items[(this.selectedIndex = index)];
 

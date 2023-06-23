@@ -25,7 +25,7 @@ FontSize.prototype = {
 	/**
 	 * @override core
 	 */
-	active: function (element, target) {
+	active(element, target) {
 		const targetText = target.querySelector('.txt');
 		if (!element) {
 			domUtils.changeTxt(
@@ -43,7 +43,7 @@ FontSize.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on: function (target) {
+	on(target) {
 		const sizeList = this.sizeList;
 		const currentSize = target.querySelector('.txt').textContent;
 
@@ -64,7 +64,7 @@ FontSize.prototype = {
 	 * @override
 	 * @param {Element} target Target command button
 	 */
-	action: function (target) {
+	action(target) {
 		const value = target.getAttribute('data-command');
 		if (value) {
 			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + value + ';' });

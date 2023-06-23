@@ -30,7 +30,7 @@ ImageGallery.prototype = {
 	/**
 	 * @description Open image gallery
 	 */
-	open: function (inputTarget) {
+	open(inputTarget) {
 		this.inputTarget = inputTarget;
 		this.fileBrowser.open();
 	},
@@ -38,7 +38,7 @@ ImageGallery.prototype = {
 	/**
 	 * @description Close image gallery
 	 */
-	close: function () {
+	close() {
 		this.inputTarget = null;
 		this.fileBrowser.close();
 	},

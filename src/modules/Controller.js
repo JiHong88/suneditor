@@ -41,7 +41,7 @@ Controller.prototype = {
 	/**
 	 * @description Open a modal plugin
 	 */
-	open: function (target, positionTarget, initMethod) {
+	open(target, positionTarget, initMethod) {
 		if (this.editor.isBalloon) this.toolbar.hide();
 		else if (this.editor.isSubBalloon) this.subToolbar.hide();
 
@@ -61,7 +61,7 @@ Controller.prototype = {
 	 * @description Close a modal plugin
 	 * The plugin's "init" method is called.
 	 */
-	close: function () {
+	close() {
 		if (this.disabled) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
 		this.editor.currentControllerName = null;
 		this.__offset = {};
@@ -72,11 +72,11 @@ Controller.prototype = {
 		if (typeof this._initMethod === 'function') this._initMethod();
 	},
 
-	hide: function () {
+	hide() {
 		this.form.style.display = 'none';
 	},
 
-	show: function () {
+	show() {
 		this._setControllerPosition(this.form, this.currentPositionTarget);
 	},
 
@@ -84,7 +84,7 @@ Controller.prototype = {
 	 * @description Reset controller position
 	 * @param {Element|undefined} target
 	 */
-	resetPosition: function (target) {
+	resetPosition(target) {
 		this._setControllerPosition(this.form, target || this.currentPositionTarget);
 	},
 
@@ -92,7 +92,7 @@ Controller.prototype = {
 	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
 	 * @param {any} arguments controller elements, function..
 	 */
-	_controllerOn: function (form, target) {
+	_controllerOn(form, target) {
 		form.style.display = 'block';
 		if (this._shadowRoot) {
 			form.addEventListener('mousedown', function (e) {
@@ -118,7 +118,7 @@ Controller.prototype = {
 	 * @param {KeyboardEvent|MouseEvent|null} e Event object when called from mousedown and keydown events registered in "_controllerOn"
 	 * @private
 	 */
-	_controllerOff: function () {
+	_controllerOff() {
 		this.form.style.display = 'none';
 		this.editor.frameContext.get('lineBreaker_t').style.display = this.editor.frameContext.get('lineBreaker_b').style.display = 'none';
 		this.editor.effectNode = null;
@@ -133,7 +133,7 @@ Controller.prototype = {
 	 * @param {Element} controller Controller element.
 	 * @param {Element} referEl Element that is the basis of the controller's position.
 	 */
-	_setControllerPosition: function (controller, referEl) {
+	_setControllerPosition(controller, referEl) {
 		const addOffset = { left: 0, top: 0 };
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
@@ -146,19 +146,19 @@ Controller.prototype = {
 		controller.style.visibility = '';
 	},
 
-	__addGlobalEvent: function () {
+	__addGlobalEvent() {
 		this.__removeGlobalEvent();
 		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers[0], true);
 		this._bindClose_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers[1], true);
 	},
 
-	__removeGlobalEvent: function () {
+	__removeGlobalEvent() {
 		this.component.__removeGlobalEvent();
 		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);
 		if (this._bindClose_mouse) this._bindClose_mouse = this.eventManager.removeGlobalEvent(this._bindClose_mouse);
 	},
 
-	_checkFixed: function () {
+	_checkFixed() {
 		const cont = this.editor.opendControllers;
 		for (let i = 0; i < cont.length; i++) {
 			if (cont[i].inst === this && cont[i].fixed) {

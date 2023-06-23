@@ -34,7 +34,7 @@ FileManager.prototype = {
 	 * @param {Function|null} errorCallBack Error call back function
 	 * @example this.plugins.fileManager.upload.call(this, pluginOptions.uploadUrl, pluginOptions.uploadHeaders, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.events.onImageUploadError);
 	 */
-	upload: function (uploadUrl, uploadHeader, data, callBack, errorCallBack) {
+	upload(uploadUrl, uploadHeader, data, callBack, errorCallBack) {
 		this.editor._openLoading();
 
 		let formData = null;
@@ -67,7 +67,7 @@ FileManager.prototype = {
 	 * @param {Element} element
 	 * @param {Object|null} file
 	 */
-	setInfo: function (element, file) {
+	setInfo(element, file) {
 		let dataIndex = element.getAttribute('data-se-index');
 		let info = null;
 		let state = '';
@@ -164,7 +164,7 @@ FileManager.prototype = {
 	 * @description Gets the sum of the sizes of the currently saved files.
 	 * @returns {number} Size
 	 */
-	getSize: function () {
+	getSize() {
 		let size = 0;
 		for (let i = 0, len = this.infoList.length; i < len; i++) {
 			size += this.infoList[i].size * 1;
@@ -176,7 +176,7 @@ FileManager.prototype = {
 	 * @description Checke the file's information and modify the tag that does not fit the format.
 	 * @private
 	 */
-	_checkInfo: function () {
+	_checkInfo() {
 		let tags = [];
 		for (let i = 0, len = this.tagNames.length; i < len; i++) {
 			tags = tags.concat([].slice.call(this.editor.frameContext.get('wysiwyg').querySelectorAll(this.tagNames[i] + ':not([data-se-embed="true"])')));
@@ -238,7 +238,7 @@ FileManager.prototype = {
 				} finally {
 					if (this.figure) this.figure.__fileManagerInfo = false;
 				}
-			} else if (!tag.getAttribute('data-se-index') || infoIndex.indexOf(tag.getAttribute('data-se-index') * 1) < 0) {
+			} else if (!tag.getAttribute('data-se-index') || !infoIndex.includes(tag.getAttribute('data-se-index') * 1)) {
 				currentTags.push(this.infoIndex);
 				tag.removeAttribute('data-se-index');
 				this.setInfo(tag, null);
@@ -249,7 +249,7 @@ FileManager.prototype = {
 
 		for (let i = 0, dataIndex; i < this.infoList.length; i++) {
 			dataIndex = this.infoList[i].index;
-			if (currentTags.indexOf(dataIndex) > -1) continue;
+			if (currentTags.includes(dataIndex)) continue;
 
 			this.infoList.splice(i, 1);
 			if (typeof this.eventHandler === 'function') this.eventHandler(null, dataIndex, 'delete', null, 0);
@@ -262,7 +262,7 @@ FileManager.prototype = {
 	 * @param {string} this.kind Plugin name
 	 * @private
 	 */
-	_resetInfo: function () {
+	_resetInfo() {
 		if (typeof this.eventHandler === 'function') {
 			for (let i = 0, len = this.infoList.length; i < len; i++) {
 				this.eventHandler.call(this.events, null, this.infoList[i].index, 'delete', null, 0);
@@ -278,7 +278,7 @@ FileManager.prototype = {
 	 * @param {number} index index of info object infoList[].index)
 	 * @private
 	 */
-	_deleteInfo: function (index) {
+	_deleteInfo(index) {
 		if (index >= 0) {
 			for (let i = 0, len = this.infoList.length; i < len; i++) {
 				if (index === this.infoList[i].index) {

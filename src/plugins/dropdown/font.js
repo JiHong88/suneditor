@@ -27,7 +27,7 @@ Font.prototype = {
 	/**
 	 * @override core
 	 */
-	active: function (element, target) {
+	active(element, target) {
 		const targetText = target.querySelector('.txt');
 		const tooltip = target.parentNode.querySelector('.se-tooltip-text');
 
@@ -48,7 +48,7 @@ Font.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on: function (target) {
+	on(target) {
 		const fontList = this.fontList;
 		const currentFont = target.querySelector('.txt').textContent;
 
@@ -69,7 +69,7 @@ Font.prototype = {
 	 * @override core
 	 * @param {Element} target Target command button
 	 */
-	action: function (target) {
+	action(target) {
 		const value = target.getAttribute('data-command');
 		if (value) {
 			const newNode = domUtils.createElement('SPAN', { style: 'font-family: ' + value + ';' });

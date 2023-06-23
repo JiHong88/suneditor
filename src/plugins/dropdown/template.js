@@ -25,7 +25,7 @@ Template.prototype = {
 	/**
 	 * @override core
 	 */
-	action: function (target) {
+	action(target) {
 		const index = target.getAttribute('data-value') * 1;
 		const temp = this.items[(this.selectedIndex = index)];
 

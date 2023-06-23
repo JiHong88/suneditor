@@ -1,7 +1,7 @@
 # SunEditor
 Vanilla javscript based WYSIWYG web editor.
 SunEditor supports all modern browsers except IE without any dependencies and polyfills.
-Coded based on ES9.
+Coded based on ES2018(ES9).
 
 #### 🌤 Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a> 🌤
 

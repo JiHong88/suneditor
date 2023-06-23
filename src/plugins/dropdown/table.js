@@ -85,7 +85,7 @@ Table.prototype = {
 	/**
 	 * @override core
 	 */
-	action: function () {
+	action() {
 		const oTable = domUtils.createElement('TABLE');
 		const x = this._tableXY[0];
 		let y = this._tableXY[1];
@@ -108,7 +108,7 @@ Table.prototype = {
 	 * @override core
 	 * @param {"rtl"|"ltr"} dir Direction
 	 */
-	setDir: function (dir) {
+	setDir(dir) {
 		this.tableHighlight.style.left = dir === 'rtl' ? 10 * 18 - 13 + 'px' : '';
 		this._resetTablePicker();
 	},
@@ -117,7 +117,7 @@ Table.prototype = {
 	 * @override core
 	 * @param {any} event Event object
 	 */
-	onPluginMousedown: function (event) {
+	onPluginMousedown(event) {
 		const tableCell = domUtils.getParentElement(event.target, domUtils.isTableCell);
 		if (!tableCell || !(tableCell !== this._fixedCell && !this._shift)) return;
 		this.selectCells(tableCell, false);
@@ -129,7 +129,7 @@ Table.prototype = {
 	 * @param {any} range range object
 	 * @param {Element} line Current line element
 	 */
-	onPluginKeyDown: function (event, range, line) {
+	onPluginKeyDown(event, range, line) {
 		// table
 		if (event.keyCode === 9) {
 			const tableCell = domUtils.getParentElement(line, domUtils.isTableCell);
@@ -186,7 +186,7 @@ Table.prototype = {
 	 * @param {Element} target Target button element
 	 * @returns
 	 */
-	controllerAction: function (target) {
+	controllerAction(target) {
 		if (target.getAttribute('disabled')) return;
 
 		const command = target.getAttribute('data-command');
@@ -241,7 +241,7 @@ Table.prototype = {
 	/**
 	 * @override controller
 	 */
-	reset: function () {
+	reset() {
 		this.__removeGlobalEvents();
 		this._deleteStyleSelectedCells();
 		this._toggleEditor(true);
@@ -272,7 +272,7 @@ Table.prototype = {
 		this._fixedCellName = null;
 	},
 
-	selectCells: function (tdElement, shift) {
+	selectCells(tdElement, shift) {
 		if (!this._shift && !this._ref) this.__removeGlobalEvents();
 
 		this._shift = shift;
@@ -294,7 +294,7 @@ Table.prototype = {
 		this._bindClose_touch = this.eventManager.addGlobalEvent('touchmove', this.__globalEvents.touchOff, false);
 	},
 
-	setCellInfo: function (tdElement, reset) {
+	setCellInfo(tdElement, reset) {
 		const table = (this._element = this._selectedTable || domUtils.getParentElement(tdElement, 'TABLE'));
 
 		if (/THEAD/i.test(table.firstElementChild.nodeName)) {
@@ -395,7 +395,7 @@ Table.prototype = {
 		}
 	},
 
-	editTable: function (type, option) {
+	editTable(type, option) {
 		const table = this._element;
 		const isRow = type === 'row';
 
@@ -500,7 +500,7 @@ Table.prototype = {
 		}
 	},
 
-	editRow: function (option, positionResetElement) {
+	editRow(option, positionResetElement) {
 		const remove = !option;
 		const up = option === 'up';
 		const originRowIndex = this._rowIndex;
@@ -584,7 +584,7 @@ Table.prototype = {
 		}
 	},
 
-	editCell: function (option, positionResetElement) {
+	editCell(option, positionResetElement) {
 		const remove = !option;
 		const left = option === 'left';
 		const colSpan = this._current_colSpan;
@@ -731,13 +731,13 @@ Table.prototype = {
 		}
 	},
 
-	insertBodyRow: function (table, rowIndex, cellCnt) {
+	insertBodyRow(table, rowIndex, cellCnt) {
 		const newRow = table.insertRow(rowIndex);
 		newRow.innerHTML = CreateCells('td', cellCnt, false);
 		return newRow;
 	},
 
-	mergeCells: function () {
+	mergeCells() {
 		const ref = this._ref;
 		const selectedCells = this._selectedCells;
 		const mergeCell = selectedCells[0];
@@ -807,7 +807,7 @@ Table.prototype = {
 		this.editor.focusEdge(mergeCell);
 	},
 
-	toggleHeader: function () {
+	toggleHeader() {
 		const headerButton = this.headerButton;
 		const active = domUtils.hasClass(headerButton, 'active');
 		const table = this._element;
@@ -829,8 +829,8 @@ Table.prototype = {
 		}
 	},
 
-	setTableStyle: function (styles) {
-		if (styles.indexOf('width') > -1) {
+	setTableStyle(styles) {
+		if (styles.includes('width')) {
 			let sizeIcon, text;
 			if (!this._maxWidth) {
 				sizeIcon = this.icons.expansion;
@@ -850,7 +850,7 @@ Table.prototype = {
 			domUtils.changeTxt(this.resizeText, text);
 		}
 
-		if (styles.indexOf('column') > -1) {
+		if (styles.includes('column')) {
 			if (!this._fixedColumn) {
 				domUtils.removeClass(this._element, 'se-table-layout-fixed');
 				domUtils.addClass(this._element, 'se-table-layout-auto');
@@ -863,7 +863,7 @@ Table.prototype = {
 		}
 	},
 
-	setActiveButton: function (fixedCell, selectedCell) {
+	setActiveButton(fixedCell, selectedCell) {
 		if (/^TH$/i.test(fixedCell.nodeName)) {
 			this.insertRowAboveButton.setAttribute('disabled', true);
 		} else {
@@ -879,7 +879,7 @@ Table.prototype = {
 		}
 	},
 
-	setController: function (tdElement) {
+	setController(tdElement) {
 		if (!this.selection.get().isCollapsed && !this._selectedCell) {
 			this._deleteStyleSelectedCells();
 			return;
@@ -898,12 +898,12 @@ Table.prototype = {
 		this.controller_cell.open(tdElement, this.cellControllerTop ? tableElement : null);
 	},
 
-	setCellControllerPosition: function (tdElement, reset) {
+	setCellControllerPosition(tdElement, reset) {
 		this.setCellInfo(tdElement, reset);
 		this.controller_cell.resetPosition(tdElement);
 	},
 
-	_deleteStyleSelectedCells: function () {
+	_deleteStyleSelectedCells() {
 		if (this._selectedTable) {
 			const selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
 			for (let i = 0, len = selectedCells.length; i < len; i++) {
@@ -912,14 +912,14 @@ Table.prototype = {
 		}
 	},
 
-	_toggleEditor: function (enabled) {
+	_toggleEditor(enabled) {
 		const wysiwyg = this.editor.frameContext.get('wysiwyg');
 		wysiwyg.setAttribute('contenteditable', enabled);
 		if (enabled) domUtils.removeClass(wysiwyg, 'se-disabled');
 		else domUtils.addClass(wysiwyg, 'se-disabled');
 	},
 
-	_setMultiCells: function (startCell, endCell) {
+	_setMultiCells(startCell, endCell) {
 		const rows = this._selectedTable.rows;
 		this._deleteStyleSelectedCells();
 
@@ -1023,7 +1023,7 @@ Table.prototype = {
 		}
 	},
 
-	_resetTablePicker: function () {
+	_resetTablePicker() {
 		if (!this.tableHighlight) return;
 
 		const highlight = this.tableHighlight.style;
@@ -1038,12 +1038,12 @@ Table.prototype = {
 		this.menu.dropdownOff();
 	},
 
-	_closeController: function () {
+	_closeController() {
 		this.controller_table.close();
 		this.controller_cell.close();
 	},
 
-	__removeGlobalEvents: function () {
+	__removeGlobalEvents() {
 		if (this._bindClose_touch) this._bindClose_touch = this.eventManager.removeGlobalEvent(this._bindClose_touch);
 		if (this._bindClose_move) this._bindClose_move = this.eventManager.removeGlobalEvent(this._bindClose_move);
 		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);

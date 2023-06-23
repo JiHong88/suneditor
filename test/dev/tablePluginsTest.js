@@ -17,13 +17,13 @@ export const add_pricing_table_plugin = {
     buttonClass: "",
   
     // @Required
-    add: function (core, targetElement) {
+    add(core, targetElement) {
       const context = core.context;
       context.addPricingTable = {
         targetButton: targetElement
       };
     },
-    active: function (element) {
+    active(element) {
       if (!element) {
         this.util.removeClass(
           this.context.addPricingTable.targetButton,
@@ -41,7 +41,7 @@ export const add_pricing_table_plugin = {
     },
   
     // Pricing table with input elements
-    action: function (event) {
+    action(event) {
       let subTotalValue = 0;
   
       function getTaxAmount(taxPercent, subTotal, discAmt) {

@@ -17,7 +17,7 @@ const EventManager = function (editor) {
 	this._events = [];
 	this._onButtonsCheck = new _w.RegExp('^(' + _w.Object.keys(editor.options.get('_defaultStyleTagMap')).join('|') + ')$', 'i');
 	this._onShortcutKey = false;
-	this.isComposing = false; // In IE, there is no 'e.isComposing' in the key-up event.
+	this.isComposing = false; // Old browsers: When there is no 'e.isComposing' in the keyup event.
 	this._balloonDelay = null;
 	this._resizeObserver = null;
 	this._toolbarObserver = null;
@@ -44,7 +44,7 @@ EventManager.prototype = {
 	 * @param {boolean|undefined} useCapture Event useCapture option
 	 * @return {boolean}
 	 */
-	addEvent: function (target, type, listener, useCapture) {
+	addEvent(target, type, listener, useCapture) {
 		if (!target) return false;
 		if (!numbers.is(target.length) || target.nodeName || (!_w.Array.isArray(target) && target.length < 1)) target = [target];
 		if (target.length === 0) return false;
@@ -72,7 +72,7 @@ EventManager.prototype = {
 	 * @description Remove event
 	 * @param {object} params { target, type, listener, useCapture } = this.addEvent()
 	 */
-	removeEvent: function (params) {
+	removeEvent(params) {
 		if (!params) return;
 
 		let target = params.target;
@@ -97,7 +97,7 @@ EventManager.prototype = {
 	 * @param {boolean|undefined} useCapture Use event capture
 	 * @return {type, listener, useCapture}
 	 */
-	addGlobalEvent: function (type, listener, useCapture) {
+	addGlobalEvent(type, listener, useCapture) {
 		if (this.editor.frameOptions.get('iframe')) {
 			this.editor.frameContext.get('_ww').addEventListener(type, listener, useCapture);
 		}
@@ -116,7 +116,7 @@ EventManager.prototype = {
 	 * @param {Function} listener Event listener
 	 * @param {boolean|undefined} useCapture Use event capture
 	 */
-	removeGlobalEvent: function (type, listener, useCapture) {
+	removeGlobalEvent(type, listener, useCapture) {
 		if (typeof type === 'object') {
 			listener = type.listener;
 			useCapture = type.useCapture;
@@ -132,7 +132,7 @@ EventManager.prototype = {
 	 * @description Activates the corresponding button with the tags information of the current cursor position,
 	 * such as 'bold', 'underline', etc., and executes the 'active' method of the plugins.
 	 */
-	applyTagEffect: function () {
+	applyTagEffect() {
 		let selectionNode = this.selection.getNode();
 		if (selectionNode === this.editor.effectNode) return;
 		this.editor.effectNode = selectionNode;
@@ -164,7 +164,7 @@ EventManager.prototype = {
 				for (let c = 0, name; c < cLen; c++) {
 					name = activeCommands[c];
 					if (
-						commandMapNodes.indexOf(name) === -1 &&
+						!commandMapNodes.includes(name) &&
 						commandTargets.get(name) &&
 						commandTargets.get(name).filter(function (e) {
 							return plugins[name] ? plugins[name].active(element, e) : false;
@@ -179,7 +179,7 @@ EventManager.prototype = {
 			if (this.format.isLine(element)) {
 				/* Outdent */
 				if (
-					commandMapNodes.indexOf('outdent') === -1 &&
+					!commandMapNodes.includes('outdent') &&
 					commandTargets.has('outdent') &&
 					(domUtils.isListCell(element) || (element.style[marginDir] && numbers.get(element.style[marginDir], 0) > 0))
 				) {
@@ -194,7 +194,7 @@ EventManager.prototype = {
 					}
 				}
 				/* Indent */
-				if (commandMapNodes.indexOf('indent') === -1 && commandTargets.has('indent')) {
+				if (!commandMapNodes.includes('indent') && commandTargets.has('indent')) {
 					const indentDisable = domUtils.isListCell(element) && !element.previousElementSibling;
 					if (
 						commandTargets.get('indent').filter(function (e) {
@@ -241,15 +241,12 @@ EventManager.prototype = {
 	 * @param {Element} target Target element
 	 * @private
 	 */
-	_injectActiveEvent: function (target) {
+	_injectActiveEvent(target) {
 		domUtils.addClass(target, '__se__active');
-		this.__geckoActiveEvent = this.addGlobalEvent(
-			'mouseup',
-			function (t) {
-				domUtils.removeClass(t, '__se__active');
-				this.__geckoActiveEvent = this.removeGlobalEvent(this.__geckoActiveEvent);
-			}.bind(this, target)
-		);
+		this.__geckoActiveEvent = this.addGlobalEvent('mouseup', () => {
+			domUtils.removeClass(target, '__se__active');
+			this.__geckoActiveEvent = this.removeGlobalEvent(this.__geckoActiveEvent);
+		});
 	},
 
 	/**
@@ -257,13 +254,13 @@ EventManager.prototype = {
 	 * @param {Array|null} ignoredList Igonred button list
 	 * @private
 	 */
-	_setKeyEffect: function (ignoredList) {
+	_setKeyEffect(ignoredList) {
 		const activeCommands = this.editor.activeCommands;
 		const commandTargets = this.editor.commandTargets;
 		const plugins = this.plugins;
 		for (let i = 0, len = activeCommands.length, k, c, p; i < len; i++) {
 			k = activeCommands[i];
-			if (ignoredList.indexOf(k) > -1 || !(c = commandTargets.get(k))) continue;
+			if (ignoredList.includes(k) || !(c = commandTargets.get(k))) continue;
 
 			p = plugins[k];
 			for (let j = 0, jLen = c.length, e; j < jLen; j++) {
@@ -282,23 +279,20 @@ EventManager.prototype = {
 		}
 	},
 
-	_showToolbarBalloonDelay: function () {
+	_showToolbarBalloonDelay() {
 		if (this._balloonDelay) {
 			_w.clearTimeout(this._balloonDelay);
 		}
 
-		this._balloonDelay = _w.setTimeout(
-			function () {
-				_w.clearTimeout(this._balloonDelay);
-				this._balloonDelay = null;
-				if (this.editor.isSubBalloon) this.subToolbar._showBalloon();
-				else this.toolbar._showBalloon();
-			}.bind(this),
-			250
-		);
+		this._balloonDelay = _w.setTimeout(() => {
+			_w.clearTimeout(this._balloonDelay);
+			this._balloonDelay = null;
+			if (this.editor.isSubBalloon) this.subToolbar._showBalloon();
+			else this.toolbar._showBalloon();
+		}, 250);
 	},
 
-	_toggleToolbarBalloon: function () {
+	_toggleToolbarBalloon() {
 		this.selection._init();
 		const range = this.selection.getRange();
 		const hasSubMode = this.options.has('_subMode');
@@ -312,19 +306,19 @@ EventManager.prototype = {
 		}
 	},
 
-	_hideToolbar: function () {
+	_hideToolbar() {
 		if (!this.editor._notHideToolbar && !this.editor.frameContext.get('isFullScreen')) {
 			this.toolbar.hide();
 		}
 	},
 
-	_hideToolbar_sub: function () {
+	_hideToolbar_sub() {
 		if (this.subToolbar && !this.editor._notHideToolbar && !this.editor.frameContext.get('isFullScreen')) {
 			this.subToolbar.hide();
 		}
 	},
 
-	_isUneditableNode: function (range, isFront) {
+	_isUneditableNode(range, isFront) {
 		const container = isFront ? range.startContainer : range.endContainer;
 		const offset = isFront ? range.startOffset : range.endOffset;
 		const siblingKey = isFront ? 'previousSibling' : 'nextSibling';
@@ -345,7 +339,7 @@ EventManager.prototype = {
 		}
 	},
 
-	_isUneditableNode_getSibling: function (selectNode, siblingKey, container) {
+	_isUneditableNode_getSibling(selectNode, siblingKey, container) {
 		if (!selectNode) return null;
 		let siblingNode = selectNode[siblingKey];
 
@@ -360,7 +354,7 @@ EventManager.prototype = {
 	},
 
 	// FireFox - table delete, Chrome - image, video, audio
-	_hardDelete: function () {
+	_hardDelete() {
 		const range = this.selection.getRange();
 		const sc = range.startContainer;
 		const ec = range.endContainer;
@@ -413,7 +407,7 @@ EventManager.prototype = {
 	 * @param {string|null} formatName Format tag name (default: 'P')
 	 * @private
 	 */
-	_setDefaultLine: function (formatName) {
+	_setDefaultLine(formatName) {
 		if (this.editor._fileManager.pluginRegExp.test(this.editor.currentControllerName)) return;
 
 		const range = this.selection.getRange();
@@ -494,7 +488,7 @@ EventManager.prototype = {
 		this.editor._nativeFocus();
 	},
 
-	_setDropLocationSelection: function (e) {
+	_setDropLocationSelection(e) {
 		if (e.rangeParent) {
 			this.selection.setRange(e.rangeParent, e.rangeOffset, e.rangeParent, e.rangeOffset);
 		} else if (this.editor.frameContext.get('_wd').caretRangeFromPoint) {
@@ -506,48 +500,18 @@ EventManager.prototype = {
 		}
 	},
 
-	_dataTransferAction: function (type, e, data, rootKey) {
+	_dataTransferAction(type, e, data, rootKey) {
 		let plainText, cleanData;
-		if (env.isIE) {
-			plainText = data.getData('Text');
-
-			const range = this.selection.getRange();
-			const tempDiv = domUtils.createElement('DIV');
-			const tempRange = {
-				sc: range.startContainer,
-				so: range.startOffset,
-				ec: range.endContainer,
-				eo: range.endOffset
-			};
-
-			tempDiv.setAttribute('contenteditable', true);
-			tempDiv.style.cssText = 'position:absolute; top:0; left:0; width:1px; height:1px; overflow:hidden;';
-
-			this.editor.frameContext.get('container').appendChild(tempDiv);
-			tempDiv.focus();
-
-			_w.setTimeout(
-				function () {
-					cleanData = tempDiv.innerHTML;
-					domUtils.removeItem(tempDiv);
-					this.selection.setRange(tempRange.sc, tempRange.so, tempRange.ec, tempRange.eo);
-					this._setClipboardData(type, e, plainText, cleanData, data, rootKey);
-				}.bind(this)
-			);
-
-			return true;
-		} else {
-			plainText = data.getData('text/plain');
-			cleanData = data.getData('text/html');
-			if (this._setClipboardData(type, e, plainText, cleanData, data, rootKey) === false) {
-				e.preventDefault();
-				e.stopPropagation();
-				return false;
-			}
+		plainText = data.getData('text/plain');
+		cleanData = data.getData('text/html');
+		if (this._setClipboardData(type, e, plainText, cleanData, data, rootKey) === false) {
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
 		}
 	},
 
-	_setClipboardData: function (type, e, plainText, cleanData, data, rootKey) {
+	_setClipboardData(type, e, plainText, cleanData, data, rootKey) {
 		// MS word, OneNode, Excel
 		const MSData =
 			/class=["']*Mso(Normal|List)/i.test(cleanData) ||
@@ -609,7 +573,7 @@ EventManager.prototype = {
 		}
 	},
 
-	_addCommonEvents: function () {
+	_addCommonEvents() {
 		const buttonsHandler = ButtonsHandler.bind(this);
 		const toolbarHandler = OnClick_toolbar.bind(this);
 		/** menu event */
@@ -630,19 +594,14 @@ EventManager.prototype = {
 
 		/** observer */
 		if (env.isResizeObserverSupported) {
-			this._toolbarObserver = new _w.ResizeObserver(
-				function () {
-					this.toolbar.resetResponsiveToolbar();
-				}.bind(this)
-			);
-			this._resizeObserver = new _w.ResizeObserver(
-				function (entries) {
-					const inst = this;
-					entries.forEach(function (e) {
-						inst.editor.__callResizeFunction(inst.editor.rootTargets.get(e.target.getAttribute('data-root-key')), -1, e);
-					});
-				}.bind(this)
-			);
+			this._toolbarObserver = new _w.ResizeObserver(() => {
+				this.toolbar.resetResponsiveToolbar();
+			});
+			this._resizeObserver = new _w.ResizeObserver((entries) => {
+				entries.forEach((e) => {
+					this.editor.__callResizeFunction(this.editor.rootTargets.get(e.target.getAttribute('data-root-key')), -1, e);
+				});
+			});
 		}
 
 		/** window event */
@@ -650,7 +609,7 @@ EventManager.prototype = {
 		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
 	},
 
-	_addFrameEvents: function (frameContext) {
+	_addFrameEvents(frameContext) {
 		const eventWysiwyg = frameContext.get('options').get('iframe') ? frameContext.get('_ww') : frameContext.get('wysiwyg');
 		frameContext.set('eventWysiwyg', eventWysiwyg);
 		const codeArea = frameContext.get('code');
@@ -661,7 +620,7 @@ EventManager.prototype = {
 		const wwClickEvent = OnClick_wysiwyg.bind(this, rootKey);
 		this.addEvent(eventWysiwyg, 'mousedown', wwMouseDown, false);
 		this.addEvent(eventWysiwyg, 'click', wwClickEvent, false);
-		this.addEvent(eventWysiwyg, env.isIE ? 'textinput' : 'input', OnInput_wysiwyg.bind(this, rootKey), false);
+		this.addEvent(eventWysiwyg, 'input', OnInput_wysiwyg.bind(this, rootKey), false);
 		this.addEvent(eventWysiwyg, 'keydown', OnKeyDown_wysiwyg.bind(this, rootKey), false);
 		this.addEvent(eventWysiwyg, 'keyup', OnKeyUp_wysiwyg.bind(this, rootKey), false);
 		this.addEvent(eventWysiwyg, 'paste', OnPaste_wysiwyg.bind(this, rootKey), false);
@@ -715,7 +674,7 @@ EventManager.prototype = {
 		}
 	},
 
-	__addStatusbarEvent: function (fc, fo) {
+	__addStatusbarEvent(fc, fo) {
 		if (/\d+/.test(fo.get('height')) && fo.get('statusbar_resizeEnable')) {
 			fo.set('__statusbarEvent', this.addEvent(fc.get('statusbar'), 'mousedown', OnMouseDown_statusbar.bind(this), false));
 		} else {
@@ -723,7 +682,7 @@ EventManager.prototype = {
 		}
 	},
 
-	_removeAllEvents: function () {
+	_removeAllEvents() {
 		for (let i = 0, len = this._events.length, e; i < len; i++) {
 			e = this._events[i];
 			e.target.removeEventListener(e.type, e.handler, e.useCapture);
@@ -742,7 +701,7 @@ EventManager.prototype = {
 		}
 	},
 
-	_moveContainer: function (eventWysiwyg) {
+	_moveContainer(eventWysiwyg) {
 		const y = eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0;
 		const x = eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0;
 
@@ -784,7 +743,7 @@ EventManager.prototype = {
 		}
 	},
 
-	_scrollContainer: function () {
+	_scrollContainer() {
 		const openCont = this.editor.opendControllers;
 		if (!openCont.length) return;
 		if (this.__scrollID) _w.clearTimeout(this.__scrollID);
@@ -794,20 +753,17 @@ EventManager.prototype = {
 			openCont[i].inst.hide();
 		}
 
-		this.__scrollID = _w.setTimeout(
-			function () {
-				_w.clearTimeout(this.__scrollID);
-				this.__scrollID = '';
-				for (let i = 0; i < openCont.length; i++) {
-					if (openCont[i].notInCarrier) continue;
-					openCont[i].inst.show();
-				}
-			}.bind(this),
-			250
-		);
+		this.__scrollID = _w.setTimeout(() => {
+			_w.clearTimeout(this.__scrollID);
+			this.__scrollID = '';
+			for (let i = 0; i < openCont.length; i++) {
+				if (openCont[i].notInCarrier) continue;
+				openCont[i].inst.show();
+			}
+		}, 250);
 	},
 
-	_resetFrameStatus: function () {
+	_resetFrameStatus() {
 		if (!env.isResizeObserverSupported) {
 			this.toolbar.resetResponsiveToolbar();
 			if (this.options.get('_subMode')) this.subToolbar.resetResponsiveToolbar();
@@ -1813,7 +1769,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 		}
 	}
 
-	if (env.isIE && !ctrl && !alt && !selectRange && !NON_TEXT_KEYCODE.test(keyCode) && domUtils.isBreak(range.commonAncestorContainer)) {
+	if (!ctrl && !alt && !selectRange && !NON_TEXT_KEYCODE.test(keyCode) && domUtils.isBreak(range.commonAncestorContainer)) {
 		const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
 		this.html.insertNode(zeroWidth, null, true);
 		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
@@ -1914,13 +1870,13 @@ function OnKeyUp_wysiwyg(rootKey, e) {
 }
 
 function OnPaste_wysiwyg(rootKey, e) {
-	const clipboardData = env.isIE ? _w.clipboardData : e.clipboardData;
+	const clipboardData = e.clipboardData;
 	if (!clipboardData) return true;
 	return this._dataTransferAction('paste', e, clipboardData, rootKey);
 }
 
 function OnCopy_wysiwyg(rootKey, e) {
-	const clipboardData = env.isIE ? _w.clipboardData : e.clipboardData;
+	const clipboardData = e.clipboardData;
 
 	// user event
 	if (typeof this.events.onCopy === 'function' && this.events.onCopy(rootKey, e, clipboardData) === false) {
@@ -1931,7 +1887,7 @@ function OnCopy_wysiwyg(rootKey, e) {
 }
 
 function OnDrop_wysiwyg(rootKey, e) {
-	if (this.status.isReadOnly || env.isIE) {
+	if (this.status.isReadOnly) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -1946,7 +1902,7 @@ function OnDrop_wysiwyg(rootKey, e) {
 }
 
 function OnCut_wysiwyg(rootKey, e) {
-	const clipboardData = env.isIE ? _w.clipboardData : e.clipboardData;
+	const clipboardData = e.clipboardData;
 
 	// user event
 	if (typeof this.events.onCut === 'function' && this.events.onCut(rootKey, e, clipboardData) === false) {

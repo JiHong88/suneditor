@@ -244,7 +244,7 @@ class Events extends EditorInterface {
 	 * @description Called when the audio upload failed
 	 * @param height Height after resized (px)
 	 * @param prevHeight Prev height before resized (px)
-	 * @param resizeObserverEntry ResizeObserverEntry object (This is not provided in IE Browser.)
+	 * @param resizeObserverEntry ResizeObserverEntry object
 	 * @returns
 	 */
 	onResizeEditor: (height: number, prevHeight: number, core: Core, resizeObserverEntry: ResizeObserverEntry | null) => {};

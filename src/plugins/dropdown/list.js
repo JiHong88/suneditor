@@ -28,7 +28,7 @@ List.prototype = {
 	/**
 	 * @override core
 	 */
-	active: function (element, target) {
+	active(element, target) {
 		const icon = target.firstElementChild;
 
 		if (domUtils.isList(element)) {
@@ -55,7 +55,7 @@ List.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on: function (target) {
+	on(target) {
 		const currentList = target.getAttribute('data-focus') || '';
 		const list = this.listItems;
 		for (let i = 0, len = list.length; i < len; i++) {
@@ -71,7 +71,7 @@ List.prototype = {
 	 * @override core
 	 * @param {Element} target Target command button
 	 */
-	action: function (target) {
+	action(target) {
 		const command = target.getAttribute('data-command');
 		const type = target.getAttribute('data-value') || '';
 		const range = this.format.applyList(command + ':' + type, null, false);

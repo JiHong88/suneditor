@@ -21,10 +21,12 @@ Char.prototype = {
 	 * @param {Node|String} html Element node or String.
 	 * @returns {boolean}
 	 */
-	check: function (html) {
+	check(html) {
 		const maxCharCount = this.editor.frameOptions.get('charCounter_max');
 		if (maxCharCount) {
-			const length = this.getLength(typeof html === 'string' ? html : this.editor.frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? html.outerHTML : html.textContent);
+			const length = this.getLength(
+				typeof html === 'string' ? html : this.editor.frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? html.outerHTML : html.textContent
+			);
 			if (length > 0 && length + this.getLength() > maxCharCount) {
 				CounterBlink(this.editor.frameContext.get('charWrapper'));
 				return false;
@@ -39,9 +41,12 @@ Char.prototype = {
 	 * @param {string|undefined} content Content to count. (defalut: this.editor.frameContext.get('wysiwyg'))
 	 * @returns {number}
 	 */
-	getLength: function (content) {
+	getLength(content) {
 		if (typeof content !== 'string') {
-			content = this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? this.editor.frameContext.get('wysiwyg').innerHTML : this.editor.frameContext.get('wysiwyg').textContent;
+			content =
+				this.editor.frameOptions.get('charCounter_type') === 'byte-html'
+					? this.editor.frameContext.get('wysiwyg').innerHTML
+					: this.editor.frameContext.get('wysiwyg').textContent;
 		}
 		return /byte/.test(this.editor.frameOptions.get('charCounter_type')) ? this.getByteLength(content) : content.length;
 	},
@@ -51,13 +56,13 @@ Char.prototype = {
 	 * @param {string} text String text
 	 * @returns {number}
 	 */
-	getByteLength: function (text) {
+	getByteLength(text) {
 		if (!text || !text.toString) return 0;
 		text = text.toString();
 
 		const encoder = this._encoder;
 		let cr, cl;
-		if (env.isIE || env.isEdge) {
+		if (env.isEdge) {
 			cl = this._unescape(encoder(text)).length;
 			cr = 0;
 
@@ -81,13 +86,11 @@ Char.prototype = {
 	/**
 	 * @description Set the char count to charCounter element textContent.
 	 */
-	display: function () {
+	display() {
 		if (this.editor.frameContext.has('charCounter')) {
-			this._w.setTimeout(
-				function () {
-					this.editor.frameContext.get('charCounter').textContent = this.getLength();
-				}.bind(this)
-			);
+			this._w.setTimeout(() => {
+				this.editor.frameContext.get('charCounter').textContent = this.getLength();
+			});
 		}
 	},
 
@@ -98,7 +101,7 @@ Char.prototype = {
 	 * @param {string} inputText Text added.
 	 * @returns {boolean}
 	 */
-	test: function (inputText) {
+	test(inputText) {
 		let nextCharCount = 0;
 		if (inputText) nextCharCount = this.getLength(inputText);
 

@@ -24,7 +24,7 @@ TextStyle.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on: function () {
+	on() {
 		const styleButtonList = this.styleList;
 		const selectionNode = this.selection.getNode();
 
@@ -58,7 +58,7 @@ TextStyle.prototype = {
 	 * @override core
 	 * @param {Element} target Target command button
 	 */
-	action: function (target) {
+	action(target) {
 		const tempElement = target.firstChild;
 		const checkStyles = tempElement.style.cssText.replace(/:.+(;|$)/g, ',').split(',');
 		checkStyles.pop();

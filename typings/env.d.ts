@@ -23,12 +23,6 @@ class env {
 	 * @returns
 	 */
 	getIncludePath(nameArray: string[], extension: string): string;
-	
-	/**
-	 * Checks if User Agent is IE
-	 * @returns
-	 */
-	isIE(): boolean;
 
 	/**
 	 * Checks if User Agent is Edge

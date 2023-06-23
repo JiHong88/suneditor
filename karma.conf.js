@@ -30,7 +30,6 @@ module.exports = function (config) {
       'karma-webpack',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
-      'karma-ie-launcher',
       'karma-opera-launcher',
       'karma-safari-launcher'
     ],

@@ -33,7 +33,7 @@ Link.prototype = {
 	/**
 	 * @override core
 	 */
-	active: function (element) {
+	active(element) {
 		if (element && domUtils.isAnchor(element)) {
 			const tempLink = this.controller.form.querySelector('a');
 			tempLink.href = element.href;
@@ -54,7 +54,7 @@ Link.prototype = {
 	/**
 	 * @override type = "modal"
 	 */
-	open: function () {
+	open() {
 		this.modal.open();
 	},
 
@@ -62,7 +62,7 @@ Link.prototype = {
 	 * @override modal
 	 * @param {boolean} isUpdate open state is update
 	 */
-	on: function (isUpdate) {
+	on(isUpdate) {
 		this.isUpdateState = isUpdate;
 		this.anchor.on(isUpdate);
 	},
@@ -71,7 +71,7 @@ Link.prototype = {
 	 * @override modal
 	 * @returns {boolean | undefined}
 	 */
-	modalAction: function () {
+	modalAction() {
 		const oA = this.anchor.create(false);
 		if (oA === null) return false;
 
@@ -96,7 +96,7 @@ Link.prototype = {
 	/**
 	 * @override modal
 	 */
-	init: function () {
+	init() {
 		this.controller.close();
 		this.anchor.init();
 	},
@@ -106,7 +106,7 @@ Link.prototype = {
 	 * @param {Element} target Target button element
 	 * @returns
 	 */
-	controllerAction: function (target) {
+	controllerAction(target) {
 		const command = target.getAttribute('data-command');
 
 		if (/update/.test(command)) {
@@ -140,7 +140,7 @@ Link.prototype = {
 	/**
 	 * @override controller
 	 */
-	reset: function () {
+	reset() {
 		domUtils.removeClass(this.controller.currentTarget, 'on');
 	},
 

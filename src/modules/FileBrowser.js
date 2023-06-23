@@ -42,10 +42,10 @@ const FileBrowser = function (inst, params) {
 	this._xhr = null;
 	this._closeSignal = false;
 	this._bindClose = null;
-	this.__globalEventHandler = function (e) {
+	this.__globalEventHandler = (e) => {
 		if (!/27/.test(e.keyCode)) return;
 		this.close();
-	}.bind(this);
+	};
 
 	// init
 	browserFrame.appendChild(domUtils.createElement('DIV', { class: 'se-file-browser-back' }));
@@ -65,7 +65,7 @@ FileBrowser.prototype = {
 	 * 	selectorHandler: When the function comes as an argument value, it substitutes "context.selectorHandler".
 	 * }
 	 */
-	open: function (params) {
+	open(params) {
 		if (!params) params = {};
 		this.__addGlobalEvent();
 
@@ -83,7 +83,7 @@ FileBrowser.prototype = {
 	 * @description Close a fileBrowser plugin
 	 * The plugin's "init" method is called.
 	 */
-	close: function () {
+	close() {
 		this.__removeGlobalEvent();
 		if (this._xhr) this._xhr.abort();
 
@@ -98,18 +98,18 @@ FileBrowser.prototype = {
 	/**
 	 * @description Show file browser loading box
 	 */
-	showBrowserLoading: function () {
+	showBrowserLoading() {
 		this._loading.style.display = 'block';
 	},
 
 	/**
 	 * @description Close file browser loading box
 	 */
-	closeBrowserLoading: function () {
+	closeBrowserLoading() {
 		this._loading.style.display = 'none';
 	},
 
-	_drawFileList: function (url, urlHeader) {
+	_drawFileList(url, urlHeader) {
 		const xhr = (this._xhr = env.getXMLHttpRequest());
 
 		xhr.onreadystatechange = CallBackGet.bind(this, xhr);
@@ -124,7 +124,7 @@ FileBrowser.prototype = {
 		this.showBrowserLoading();
 	},
 
-	_drawListItem: function (items, update) {
+	_drawListItem(items, update) {
 		const _tags = [];
 		const len = items.length;
 		const columnSize = this.columnSize;
@@ -150,7 +150,7 @@ FileBrowser.prototype = {
 			if (update && tags.length > 0) {
 				for (let t = 0, tLen = tags.length, tag; t < tLen; t++) {
 					tag = tags[t];
-					if (tag && _tags.indexOf(tag) === -1) {
+					if (tag && !_tags.includes(tag)) {
 						_tags.push(tag);
 						tagsHTML += '<a title="' + tag + '" aria-label="' + tag + '">' + tag + '</a>';
 					}
@@ -167,12 +167,12 @@ FileBrowser.prototype = {
 		}
 	},
 
-	__addGlobalEvent: function () {
+	__addGlobalEvent() {
 		this.__removeGlobalEvent();
 		this._bindClose = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandler, true);
 	},
 
-	__removeGlobalEvent: function () {
+	__removeGlobalEvent() {
 		if (this._bindClose) this._bindClose = this.eventManager.removeGlobalEvent(this._bindClose);
 	},
 
@@ -230,7 +230,7 @@ function OnClickTag(e) {
 			? this.items
 			: this.items.filter(function (item) {
 					return item.tag.some(function (tag) {
-						return selectedTags.indexOf(tag) > -1;
+						return selectedTags.includes(tag);
 					});
 			  }),
 		false

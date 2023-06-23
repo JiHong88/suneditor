@@ -273,7 +273,7 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
  * @returns {Object}
  */
 function _mergeObject(a, b) {
-	return [a, b].reduce(function (_default, _new) {
+	return [a, b].reduce((_default, _new) => {
 		for (let key in _new) {
 			_default[key] = (_new[key] || '').toLowerCase();
 		}
@@ -809,7 +809,7 @@ function _createFormatInfo(value, defaultValue, blacklist) {
 		.replace(/^\||\|$/g, '')
 		.split('|')
 		.filter(function (v) {
-			return v && blacklist.indexOf(v) < 0;
+			return v && !blacklist.includes(v);
 		})
 		.join('|');
 	return {
@@ -841,7 +841,7 @@ function _createWhitelist(o) {
 		.replace(/(^\||\|$)/g, '')
 		.split('|')
 		.filter(function (v, i, a) {
-			return v && a.indexOf(v) === i && blacklist.indexOf(v) < 0;
+			return v && a.indexOf(v) === i && !blacklist.includes(v);
 		});
 
 	return whitelist.join('|');
@@ -924,7 +924,7 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 
 	if (_disabled) oButton.setAttribute('disabled', true);
 
-	if (label) innerHTML += '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + label + '</span></span>';
+	if (label) innerHTML += `<span class="se-tooltip-inner"><span class="se-tooltip-text">${label}</span></span>`;
 	if (innerHTML) oButton.innerHTML = innerHTML;
 
 	oLi.appendChild(oButton);

@@ -242,7 +242,7 @@ const Editor = function (multiTargets, options) {
 	 *    className: "string", // Class name to identify the tag. ("__se__xxx", "se-xxx")
 	 *    // Change the html of the "element". ("element" is the element found with "className".)
 	 *    // "method" is executed by binding "core".
-	 *    method: function (element) {
+	 *    method(element) {
 	 *      // this === core
 	 *      element.innerHTML = // (rendered html);
 	 *    }
@@ -300,7 +300,7 @@ Editor.prototype = {
 	 * @param {Array.<Element>|null} targets Plugin target button (This is not necessary if you have a button list when creating the editor)
 	 * @param {object|null} pluginOptions Plugin's options
 	 */
-	registerPlugin: function (pluginName, targets, pluginOptions) {
+	registerPlugin(pluginName, targets, pluginOptions) {
 		let plugin = this.plugins[pluginName];
 		if (!plugin) {
 			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "' + pluginName + '")');
@@ -314,7 +314,7 @@ Editor.prototype = {
 				UpdateButton(targets[i], plugin, this.icons, this.lang);
 			}
 
-			if (this.activeCommands.indexOf(pluginName) === -1 && typeof this.plugins[pluginName].active === 'function') {
+			if (!this.activeCommands.includes(pluginName) && typeof this.plugins[pluginName].active === 'function') {
 				this.activeCommands.push(pluginName);
 			}
 		}
@@ -326,7 +326,7 @@ Editor.prototype = {
 	 * @param {string} type Display type string ('command', 'dropdown', 'modal', 'container')
 	 * @param {Element|null} target The element of command button
 	 */
-	run: function (command, type, target) {
+	run(command, type, target) {
 		if (type) {
 			if (/more/i.test(type)) {
 				const toolbar = domUtils.getParentElement(target, '.se-toolbar');
@@ -381,7 +381,7 @@ Editor.prototype = {
 	 * (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
 	 * @param {string} command Property of command button (data-value)
 	 */
-	commandHandler: function (command) {
+	commandHandler(command) {
 		if (this.status.isReadOnly && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) return;
 
 		switch (command) {
@@ -447,7 +447,7 @@ Editor.prototype = {
 	 * @description Execute "editor.run" with command button.
 	 * @param {Element} target Command button
 	 */
-	runFromTarget: function (target) {
+	runFromTarget(target) {
 		if (!(target = domUtils.getCommandTarget(target))) return;
 
 		const command = target.getAttribute('data-command');
@@ -465,7 +465,7 @@ Editor.prototype = {
 	 * @param {string} cmd data-command
 	 * @param {Function} f Function.
 	 */
-	applyCommandTargets: function (cmd, f) {
+	applyCommandTargets(cmd, f) {
 		if (this.commandTargets.has(cmd)) {
 			this.commandTargets.get(cmd).forEach(f);
 		}
@@ -475,7 +475,7 @@ Editor.prototype = {
 	 * @description Executes a function by traversing all root targets.
 	 * @param {Function} f Function
 	 */
-	applyRootTargets: function (f) {
+	applyRootTargets(f) {
 		this.rootTargets.forEach(f);
 	},
 
@@ -485,7 +485,7 @@ Editor.prototype = {
 	 * @param {frameContext|null} fc Frame context, if not present, currently selected frame context.
 	 * @returns {boolean}
 	 */
-	isEmpty: function (fc) {
+	isEmpty(fc) {
 		fc = fc || this.frameContext;
 		const wysiwyg = fc.get('wysiwyg');
 		return domUtils.isZeroWith(wysiwyg.textContent) && !wysiwyg.querySelector(env._allowedEmptyNodeList) && (wysiwyg.innerText.match(/\n/g) || '').length <= 1;
@@ -495,7 +495,7 @@ Editor.prototype = {
 	 * @description Set direction to "rtl" or "ltr".
 	 * @param {string} dir "rtl" or "ltr"
 	 */
-	setDir: function (dir) {
+	setDir(dir) {
 		const rtl = dir === 'rtl';
 		if (this.options.get('_rtl') === rtl) return;
 
@@ -511,22 +511,19 @@ Editor.prototype = {
 		const statusbarWrapper = this.context.get('statusbar._wrapper');
 		if (rtl) {
 			this.applyRootTargets(function (e) {
-				domUtils.addClass([e.get('topArea'), e.get('wysiwygFrame')], 'se-rtl');
+				domUtils.addClass([e.get('topArea'), e.get('wysiwyg')], 'se-rtl');
 			});
 			domUtils.addClass([this._carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 		} else {
 			this.applyRootTargets(function (e) {
-				domUtils.removeClass([e.get('topArea'), e.get('wysiwygFrame')], 'se-rtl');
+				domUtils.removeClass([e.get('topArea'), e.get('wysiwyg')], 'se-rtl');
 			});
 			domUtils.removeClass([this._carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 		}
 
-		const lineNodes = domUtils.getListChildren(
-			fc.wysiwyg,
-			function (current) {
-				return this.format.isLine(current) && (current.style.marginRight || current.style.marginLeft || current.style.textAlign);
-			}.bind(this)
-		);
+		const lineNodes = domUtils.getListChildren(fc.wysiwyg, (current) => {
+			return this.format.isLine(current) && (current.style.marginRight || current.style.marginLeft || current.style.textAlign);
+		});
 
 		for (let i = 0, len = lineNodes.length, n, l, r; i < len; i++) {
 			n = lineNodes[i];
@@ -556,7 +553,7 @@ Editor.prototype = {
 	 * @description Add or reset option property (Editor is reloaded)
 	 * @param {Object} newOptions Options
 	 */
-	resetOptions: function (newOptions) {
+	resetOptions(newOptions) {
 		const _keys = this._w.Object.keys;
 		this.viewer.codeView(false);
 		this.viewer.showBlocks(false);
@@ -573,7 +570,7 @@ Editor.prototype = {
 		const newRootKeys = {};
 		this._originOptions = [newOptions, this._originOptions].reduce(function (init, option) {
 			for (let key in option) {
-				if (rootKeys.indexOf(key) > -1 && option[key]) {
+				if (rootKeys.includes(key) && option[key]) {
 					const nro = option[key];
 					const newKeys = _keys(nro);
 					CheckResetKeys(newKeys, null, key + '.');
@@ -583,7 +580,7 @@ Editor.prototype = {
 					const o = rootTargets.get(key).get('options').get('_origin');
 					for (let rk in nro) {
 						const roV = nro[rk];
-						if (newKeys.indexOf(rk) === -1 || o[rk] === roV) continue;
+						if (!newKeys.includes(rk) || o[rk] === roV) continue;
 						rootDiff[key].set(GetResetDiffKey(rk), true);
 						o[rk] = roV;
 					}
@@ -677,7 +674,7 @@ Editor.prototype = {
 		// toolbar
 		const toolbar = this.context.get('toolbar.main');
 		// width
-		if (/inline|balloon/i.test(options.get('mode')) && newKeys.indexOf('toolbar_width') > -1) {
+		if (/inline|balloon/i.test(options.get('mode')) && newKeys.includes('toolbar_width')) {
 			toolbar.style.width = options.get('toolbar_width');
 		}
 		// hide
@@ -699,7 +696,7 @@ Editor.prototype = {
 	 * @description Change the current root index.
 	 * @param {number} rootKey
 	 */
-	changeFrameContext: function (rootKey) {
+	changeFrameContext(rootKey) {
 		if (rootKey === this.status.rootKey) return;
 
 		this.status.rootKey = rootKey;
@@ -713,7 +710,7 @@ Editor.prototype = {
 	 * @param {Boolean|undefined} showDefaultUI javascript execCommand function property
 	 * @param {string|undefined} value javascript execCommand function property
 	 */
-	execCommand: function (command, showDefaultUI, value) {
+	execCommand(command, showDefaultUI, value) {
 		this.frameContext.get('_wd').execCommand(command, showDefaultUI, command === 'formatBlock' ? '<' + value + '>' : value);
 		this.history.push(true);
 	},
@@ -722,7 +719,7 @@ Editor.prototype = {
 	 * @description Focus to wysiwyg area
 	 * @param {number|undefined} rootKey Root index
 	 */
-	focus: function (rootKey) {
+	focus(rootKey) {
 		if (rootKey) this.changeFrameContext(rootKey);
 		if (this.frameContext.get('wysiwygFrame').style.display === 'none') return;
 
@@ -757,7 +754,7 @@ Editor.prototype = {
 	 * If "focusEdge" is null, then selected last element
 	 * @param {Element|null} focusEl Focus element
 	 */
-	focusEdge: function (focusEl) {
+	focusEdge(focusEl) {
 		if (!focusEl) focusEl = this.frameContext.get('wysiwyg').lastElementChild;
 
 		const fileComponentInfo = this.component.get(focusEl);
@@ -781,7 +778,7 @@ Editor.prototype = {
 	/**
 	 * @description Focusout to wysiwyg area (.blur())
 	 */
-	blur: function () {
+	blur() {
 		if (this.frameOptions.get('iframe')) {
 			this.frameContext.get('wysiwygFrame').blur();
 		} else {
@@ -796,7 +793,7 @@ Editor.prototype = {
 	 * @param {string} style Style string
 	 * @param {FrameContext|null} fc Frame context
 	 */
-	setEditorStyle: function (style, fc) {
+	setEditorStyle(style, fc) {
 		fc = fc || this.frameContext;
 		const fo = fc.get('options');
 
@@ -830,7 +827,7 @@ Editor.prototype = {
 	 * @param {boolean} value "readOnly" boolean value.
 	 * @param {string|undefined} rootKey Root key
 	 */
-	readOnly: function (value, rootKey) {
+	readOnly(value, rootKey) {
 		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
 
 		this.status.isReadOnly = value;
@@ -862,7 +859,7 @@ Editor.prototype = {
 	 * @description Disable the suneditor
 	 * @param {string|undefined} rootKey Root key
 	 */
-	disable: function (rootKey) {
+	disable(rootKey) {
 		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
 
 		this.toolbar.disable();
@@ -885,7 +882,7 @@ Editor.prototype = {
 	 * @description Enable the suneditor
 	 * @param {string|undefined} rootKey Root key
 	 */
-	enable: function (rootKey) {
+	enable(rootKey) {
 		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
 
 		this.toolbar.enable();
@@ -903,7 +900,7 @@ Editor.prototype = {
 	 * @description Show the suneditor
 	 * @param {string|undefined} rootKey Root key
 	 */
-	show: function (rootKey) {
+	show(rootKey) {
 		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
 		const topAreaStyle = fc.get('topArea').style;
 		if (topAreaStyle.display === 'none') topAreaStyle.display = 'block';
@@ -913,7 +910,7 @@ Editor.prototype = {
 	 * @description Hide the suneditor
 	 * @param {string|undefined} rootKey Root key
 	 */
-	hide: function (rootKey) {
+	hide(rootKey) {
 		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
 		fc.get('topArea').style.display = 'none';
 	},
@@ -921,7 +918,7 @@ Editor.prototype = {
 	/**
 	 * @description Destroy the suneditor
 	 */
-	destroy: function () {
+	destroy() {
 		/** remove history */
 		this.history.destroy();
 
@@ -989,7 +986,7 @@ Editor.prototype = {
 	 * @description Set frameContext, frameOptions
 	 * @param {rootTarget} rt Root target
 	 */
-	_setFrameInfo: function (rt) {
+	_setFrameInfo(rt) {
 		this.frameContext = rt;
 		this.frameOptions = rt.get('options');
 		rt.set('_editorHeight', rt.get('wysiwygFrame').offsetHeight);
@@ -1002,7 +999,7 @@ Editor.prototype = {
 	 * @description Off current controllers
 	 * @private
 	 */
-	_offCurrentController: function () {
+	_offCurrentController() {
 		const cont = this.opendControllers;
 		const fixedCont = [];
 		for (let i = 0; i < cont.length; i++) {
@@ -1020,7 +1017,7 @@ Editor.prototype = {
 	 * @description Off current modal
 	 * @private
 	 */
-	_offCurrentModal: function () {
+	_offCurrentModal() {
 		if (this.opendModal) {
 			this.opendModal.close();
 		}
@@ -1030,7 +1027,7 @@ Editor.prototype = {
 	 * @description Show loading box
 	 * @private
 	 */
-	_openLoading: function () {
+	_openLoading() {
 		this._loadingBox.style.display = 'block';
 	},
 
@@ -1038,7 +1035,7 @@ Editor.prototype = {
 	 * @description Close loading box
 	 * @private
 	 */
-	_closeLoading: function () {
+	_closeLoading() {
 		this._loadingBox.style.display = 'none';
 	},
 
@@ -1046,7 +1043,7 @@ Editor.prototype = {
 	 * @description Focus to wysiwyg area using "native focus function"
 	 * @private
 	 */
-	_nativeFocus: function () {
+	_nativeFocus() {
 		this.selection.__focus();
 		this.selection._init();
 	},
@@ -1055,7 +1052,7 @@ Editor.prototype = {
 	 * @description Check the components such as image and video and modify them according to the format.
 	 * @private
 	 */
-	_checkComponents: function () {
+	_checkComponents() {
 		for (let i = 0, len = this._fileInfoPluginsCheck.length; i < len; i++) {
 			this._fileInfoPluginsCheck[i]();
 		}
@@ -1065,7 +1062,7 @@ Editor.prototype = {
 	 * @description Initialize the information of the components.
 	 * @private
 	 */
-	_resetComponents: function () {
+	_resetComponents() {
 		for (let i = 0, len = this._fileInfoPluginsReset.length; i < len; i++) {
 			this._fileInfoPluginsReset[i]();
 		}
@@ -1075,7 +1072,7 @@ Editor.prototype = {
 	 * @description Recover the current buttons states from "allCommandButtons" map
 	 * @private
 	 */
-	_recoverButtonStates: function (isSub) {
+	_recoverButtonStates(isSub) {
 		const currentButtons = this.context.get(isSub ? 'toolbar.sub.buttonTray' : 'toolbar.buttonTray').querySelectorAll('.se-menu-list button[data-command]');
 		const btns = isSub ? this.subAllCommandButtons : this.allCommandButtons;
 		for (let i = 0, button, oldButton; i < currentButtons.length; i++) {
@@ -1093,7 +1090,7 @@ Editor.prototype = {
 	 * @param {string} value initial html string
 	 * @private
 	 */
-	_initWysiwygArea: function (e, value) {
+	_initWysiwygArea(e, value) {
 		e.get('wysiwyg').innerHTML =
 			this.html.clean(
 				typeof value === 'string' ? value : (/^TEXTAREA$/i.test(e.get('originElement').nodeName) ? e.get('originElement').value : e.get('originElement').innerHTML) || '',
@@ -1109,7 +1106,7 @@ Editor.prototype = {
 	 * @description Called when there are changes to tags in the wysiwyg region.
 	 * @private
 	 */
-	_resourcesStateChange: function (fc) {
+	_resourcesStateChange(fc) {
 		this._iframeAutoHeight(fc);
 		this._checkPlaceholder(fc);
 	},
@@ -1118,30 +1115,26 @@ Editor.prototype = {
 	 * @description Modify the height value of the iframe when the height of the iframe is automatic.
 	 * @private
 	 */
-	_iframeAutoHeight: function (fc) {
+	_iframeAutoHeight(fc) {
 		const autoFrame = fc.get('_iframeAuto');
 		if (autoFrame) {
-			this._w.setTimeout(
-				function () {
-					fc.get('wysiwygFrame').style.height = autoFrame.offsetHeight + 'px';
-				}.bind(this)
-			);
+			this._w.setTimeout(() => {
+				fc.get('wysiwygFrame').style.height = autoFrame.offsetHeight + 'px';
+			});
 		}
 
 		if (autoFrame) {
-			this._w.setTimeout(
-				function () {
-					const h = autoFrame.offsetHeight;
-					fc.get('wysiwygFrame').style.height = h + 'px';
-					if (!env.isResizeObserverSupported) this.__callResizeFunction(fc, h, null);
-				}.bind(this)
-			);
+			this._w.setTimeout(() => {
+				const h = autoFrame.offsetHeight;
+				fc.get('wysiwygFrame').style.height = h + 'px';
+				if (!env.isResizeObserverSupported) this.__callResizeFunction(fc, h, null);
+			});
 		} else if (!env.isResizeObserverSupported) {
 			this.__callResizeFunction(fc, fc.get('wysiwygFrame').offsetHeight, null);
 		}
 	},
 
-	__callResizeFunction: function (fc, h, resizeObserverEntry) {
+	__callResizeFunction(fc, h, resizeObserverEntry) {
 		h =
 			h === -1
 				? resizeObserverEntry && resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0]
@@ -1160,7 +1153,7 @@ Editor.prototype = {
 	 * @description Set display property when there is placeholder.
 	 * @private
 	 */
-	_checkPlaceholder: function (fc) {
+	_checkPlaceholder(fc) {
 		fc = fc || this.frameContext;
 		const placeholder = fc.get('placeholder');
 
@@ -1182,7 +1175,7 @@ Editor.prototype = {
 	 * @description Called when after execute "history.push"
 	 * @private
 	 */
-	_onChange_historyStack: function () {
+	_onChange_historyStack() {
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
 		this.status.isChanged = true;
 		this.applyCommandTargets('save', function (e) {
@@ -1194,7 +1187,7 @@ Editor.prototype = {
 		else if (this.context.get('toolbar.sub.main').style.display === 'block') this.subToolbar._showBalloon();
 	},
 
-	_codeViewAutoHeight: function () {
+	_codeViewAutoHeight() {
 		if (this.frameContext.get('isFullScreen')) return;
 		this.frameContext.get('code').style.height = this.frameContext.get('code').scrollHeight + 'px';
 	},
@@ -1203,14 +1196,12 @@ Editor.prototype = {
 	 * @description Initializ editor
 	 * @private
 	 */
-	__editorInit: function (options) {
-		this.applyRootTargets(
-			function (e) {
-				this.__setEditorParams(e);
-				this._initWysiwygArea(e, e.get('options').get('value'));
-				this.eventManager._addFrameEvents(e);
-			}.bind(this)
-		);
+	__editorInit(options) {
+		this.applyRootTargets((e) => {
+			this.__setEditorParams(e);
+			this._initWysiwygArea(e, e.get('options').get('value'));
+			this.eventManager._addFrameEvents(e);
+		});
 
 		// initialize core and add event listeners
 		this._setFrameInfo(this.rootTargets.get(this.status.rootKey));
@@ -1222,34 +1213,30 @@ Editor.prototype = {
 
 		this.eventManager._addCommonEvents();
 
-		this._w.setTimeout(
-			function () {
-				// toolbar visibility
-				this.context.get('toolbar.main').style.visibility = '';
-				// roots
-				this.applyRootTargets(
-					function (e) {
-						if (typeof this._resourcesStateChange !== 'function') return;
-						// observer
-						if (this.eventManager._resizeObserver) this.eventManager._resizeObserver.observe(e.get('wysiwygFrame'));
-						if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(e.get('_toolbarShadow'));
-						// resource state
-						this._resourcesStateChange(e);
-					}.bind(this)
-				);
-				// history reset
-				this.history.reset();
-				// user event
-				if (typeof this.events.onload === 'function') this.events.onload();
-			}.bind(this)
-		);
+		this._w.setTimeout(() => {
+			// toolbar visibility
+			this.context.get('toolbar.main').style.visibility = '';
+			// roots
+			this.applyRootTargets((e) => {
+				if (typeof this._resourcesStateChange !== 'function') return;
+				// observer
+				if (this.eventManager._resizeObserver) this.eventManager._resizeObserver.observe(e.get('wysiwygFrame'));
+				if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(e.get('_toolbarShadow'));
+				// resource state
+				this._resourcesStateChange(e);
+			});
+			// history reset
+			this.history.reset();
+			// user event
+			if (typeof this.events.onload === 'function') this.events.onload();
+		});
 	},
 
 	/**
 	 * @description Initializ core variable
 	 * @private
 	 */
-	__init: function (options) {
+	__init(options) {
 		this.__cachingButtons();
 
 		// file components
@@ -1322,7 +1309,7 @@ Editor.prototype = {
 	 * @description Caching basic buttons to use
 	 * @private
 	 */
-	__cachingButtons: function () {
+	__cachingButtons() {
 		const ctx = this.context;
 		const codeDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])';
 		const controllerDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])';
@@ -1344,7 +1331,7 @@ Editor.prototype = {
 	 * @description Save the current buttons states to "allCommandButtons" map
 	 * @private
 	 */
-	__saveCommandButtons: function (isSub) {
+	__saveCommandButtons(isSub) {
 		const currentButtons = this.context.get(isSub ? 'toolbar.sub.buttonTray' : 'toolbar.buttonTray').querySelectorAll('.se-menu-list button[data-command]');
 		const cmdButtons = isSub ? this.subAllCommandButtons : this.allCommandButtons;
 		const shortcuts = this.options.get('shortcuts');
@@ -1367,15 +1354,15 @@ Editor.prototype = {
 		}
 	},
 
-	__setCommandTargets: function (cmd, target) {
+	__setCommandTargets(cmd, target) {
 		if (!cmd || !target) return;
 
-		const isBasicCmd = BASIC_COMMANDS.indexOf(cmd) > -1;
+		const isBasicCmd = BASIC_COMMANDS.includes(cmd);
 		if (!isBasicCmd && !this.plugins[cmd]) return;
 
 		if (!this.commandTargets.get(cmd)) {
 			this.commandTargets.set(cmd, [target]);
-		} else if (this.commandTargets.get(cmd).indexOf(target) < 0) {
+		} else if (!this.commandTargets.get(cmd).includes(target)) {
 			this.commandTargets.get(cmd).push(target);
 		}
 	},
@@ -1390,7 +1377,7 @@ Editor.prototype = {
 		frame.contentDocument.body.setAttribute('contenteditable', true);
 	},
 
-	__setEditorParams: function (e) {
+	__setEditorParams(e) {
 		const frameOptions = e.get('options');
 		const _w = this._w;
 
@@ -1430,7 +1417,7 @@ Editor.prototype = {
 		}
 	},
 
-	__registerClass: function () {
+	__registerClass() {
 		// use events, history function
 		this.events = Events();
 		this.history = History(this, this._onChange_historyStack.bind(this));
@@ -1490,7 +1477,7 @@ Editor.prototype = {
 		this._responsiveButtons = this._responsiveButtons_res = null;
 	},
 
-	__Create: function (originOptions) {
+	__Create(originOptions) {
 		// set modes
 		this.isInline = /inline/i.test(this.options.get('mode'));
 		this.isBalloon = /balloon/i.test(this.options.get('mode'));
@@ -1540,7 +1527,7 @@ function GetResetDiffKey(key) {
 function CheckResetKeys(keys, plugins, root) {
 	for (let i = 0, len = keys.length, k; i < len; i++) {
 		k = keys[i];
-		if (RO_UNAVAILABD.indexOf(k) > -1 || (plugins && plugins[k])) {
+		if (RO_UNAVAILABD.includes(k) || (plugins && plugins[k])) {
 			console.warn('[SUNEDITOR.warn.resetOptions] "[' + root + k + ']" options not available in resetOptions have no effect.');
 			keys.splice(i--, 1);
 			len--;

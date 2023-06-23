@@ -27,7 +27,7 @@ Component.prototype = {
 	 * @param {boolean} notSelect If true, Do not automatically select the inserted component.
 	 * @returns {Element}
 	 */
-	insert: function (element, notCheckCharCount, notSelect) {
+	insert(element, notCheckCharCount, notSelect) {
 		if (this.editor.isReadOnly || (!notCheckCharCount && !this.char.check(element))) {
 			return null;
 		}
@@ -73,7 +73,7 @@ Component.prototype = {
 	 * @param {Element} element Target element (figure tag, component div, file tag)
 	 * @returns {Object|null}
 	 */
-	get: function (element) {
+	get(element) {
 		if (!this.editor._fileManager.queryString || !element) return null;
 
 		let target;
@@ -102,7 +102,7 @@ Component.prototype = {
 	 * @param {Element} element Element tag (img, iframe, video)
 	 * @param {string} pluginName Plugin name (image, video)
 	 */
-	select: function (element, pluginName) {
+	select(element, pluginName) {
 		this.editor._antiBlur = true;
 		this.currentTarget = element;
 		this.info = Figure.GetContainer(element);
@@ -123,7 +123,7 @@ Component.prototype = {
 	 * @param {Node} element The node to check
 	 * @returns {boolean}
 	 */
-	is: function (element) {
+	is(element) {
 		return Figure.__isComponent(element);
 	},
 
@@ -132,7 +132,7 @@ Component.prototype = {
 	 * @param {Element} element Element tag (img, iframe, video)
 	 * @private
 	 */
-	_setComponentLineBreaker: function (element) {
+	_setComponentLineBreaker(element) {
 		this.eventManager._lineBreakComp = null;
 		const fc = this.editor.frameContext;
 		const wysiwyg = fc.get('wysiwyg');
@@ -168,7 +168,10 @@ Component.prototype = {
 				w = target.offsetWidth / 2 / 2;
 			}
 
-			fc.get('lineBreaker_b').setAttribute('data-offset', componentTop + target.offsetHeight - 12 + ',' + (this.offset.get(target).left + wScroll + target.offsetWidth - w - 24));
+			fc.get('lineBreaker_b').setAttribute(
+				'data-offset',
+				componentTop + target.offsetHeight - 12 + ',' + (this.offset.get(target).left + wScroll + target.offsetWidth - w - 24)
+			);
 			b_style.top = componentTop + target.offsetHeight - yScroll - 12 + 'px';
 			b_style.left = this.offset.get(target).left + target.offsetWidth - w - 24 + 'px';
 			b_style.display = 'block';
@@ -177,14 +180,14 @@ Component.prototype = {
 		}
 	},
 
-	__addGlobalEvent: function () {
+	__addGlobalEvent() {
 		this.__removeGlobalEvent();
 		this._bindClose_copy = this.eventManager.addGlobalEvent('copy', this.__globalEvents[0]);
 		this._bindClose_cut = this.eventManager.addGlobalEvent('cut', this.__globalEvents[1]);
 		this._bindClose_redo = this.eventManager.addGlobalEvent('keydown', this.__globalEvents[2]);
 	},
 
-	__removeGlobalEvent: function () {
+	__removeGlobalEvent() {
 		if (this._bindClose_copy) this._bindClose_copy = this.eventManager.removeGlobalEvent(this._bindClose_copy);
 		if (this._bindClose_cut) this._bindClose_cut = this.eventManager.removeGlobalEvent(this._bindClose_cut);
 		if (this._bindClose_redo) this._bindClose_redo = this.eventManager.removeGlobalEvent(this._bindClose_redo);
@@ -195,7 +198,7 @@ Component.prototype = {
 
 function OnCopy_component(e) {
 	const info = this.info;
-	if (info && !env.isIE) {
+	if (info) {
 		SetClipboardComponent(e, info.container, e.clipboardData);
 		domUtils.addClass(info.container, 'se-component-copy');
 		// copy effect
@@ -207,7 +210,7 @@ function OnCopy_component(e) {
 
 function OnCut_component(e) {
 	const info = this.info;
-	if (info && !env.isIE) {
+	if (info) {
 		this.__removeGlobalEvent();
 		SetClipboardComponent(e, info.container, e.clipboardData);
 		this.editor._offCurrentController();

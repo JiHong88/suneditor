@@ -28,14 +28,14 @@ BackgroundColor.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on: function () {
+	on() {
 		this.colorPicker.init(this.selection.getNode());
 	},
 
 	/**
 	 * @override core
 	 */
-	action: function (value) {
+	action(value) {
 		if (value) {
 			const newNode = domUtils.createElement('SPAN', { style: 'background-color: ' + value + ';' });
 			this.format.applyTextStyle(newNode, ['background-color'], null, null);

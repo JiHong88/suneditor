@@ -22,7 +22,7 @@ Offset.prototype = {
 	 * @param {Node} node Target node
 	 * @returns {{top:boolean, left:boolean}}
 	 */
-	get: function (node) {
+	get(node) {
 		let offsetLeft = 0;
 		let offsetTop = 0;
 		let offsetElement = node.nodeType === 3 ? node.parentElement : node;
@@ -48,7 +48,7 @@ Offset.prototype = {
 	 * @param {Element} element Target element
 	 * @returns {{top:boolean, left:boolean}}
 	 */
-	getGlobal: function (element) {
+	getGlobal(element) {
 		if (!element) element = this.editor.frameContext.get('topArea');
 		const w = element.offsetWidth;
 		const h = element.offsetHeight;
@@ -74,7 +74,7 @@ Offset.prototype = {
 	 * @param {Element} element Target element
 	 * @returns {{top:boolean, left:boolean, width:boolean, height:boolean}}
 	 */
-	getGlobalScroll: function (element) {
+	getGlobalScroll(element) {
 		const topArea = this.editor.frameContext.get('topArea');
 		let t = 0,
 			l = 0,
@@ -168,7 +168,7 @@ Offset.prototype = {
 	 * @description Get the scroll info of the WYSIWYG area.
 	 * @returns {{top:boolean, left:boolean}}
 	 */
-	getWWScroll: function () {
+	getWWScroll() {
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
 		return {
 			top: eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0,
@@ -178,7 +178,7 @@ Offset.prototype = {
 		};
 	},
 
-	setRelPosition: function (element, e_container, target, t_container, _reload) {
+	setRelPosition(element, e_container, target, t_container, _reload) {
 		if (!_reload) {
 			this.__removeGlobalEvent();
 			this._scrollEvent = this.editor.eventManager.addGlobalEvent('scroll', FixedScroll.bind(this, element, e_container, target, t_container), false);
@@ -246,7 +246,7 @@ Offset.prototype = {
 		}
 	},
 
-	setAbsPosition: function (element, target, params) {
+	setAbsPosition(element, target, params) {
 		const addOffset = params.addOffset || {
 			left: 0,
 			top: 0
@@ -418,7 +418,7 @@ Offset.prototype = {
 		return true;
 	},
 
-	_setArrow: function (arrow, key) {
+	_setArrow(arrow, key) {
 		if (key === 'up') {
 			if (arrow) arrow.style.visibility = '';
 			addClass(arrow, 'se-arrow-up');
@@ -432,7 +432,7 @@ Offset.prototype = {
 		}
 	},
 
-	__removeGlobalEvent: function () {
+	__removeGlobalEvent() {
 		if (this._scrollEvent) {
 			this._scrollEvent = this.editor.eventManager.removeGlobalEvent(this._scrollEvent);
 			this._scrollY = 0;

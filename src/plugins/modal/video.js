@@ -124,7 +124,7 @@ Video.prototype = {
 	/**
 	 * @override type = "modal"
 	 */
-	open: function () {
+	open() {
 		this.modal.open();
 	},
 
@@ -132,7 +132,7 @@ Video.prototype = {
 	 * @override modal
 	 * @param {boolean} isUpdate open state is update
 	 */
-	on: function (isUpdate) {
+	on(isUpdate) {
 		if (!isUpdate) {
 			this.inputX.value = this._origin_w = this.pluginOptions.defaultWidth === this._defaultSizeX ? '' : this.pluginOptions.defaultWidth;
 			this.inputY.value = this._origin_h = this.pluginOptions.defaultHeight === this._defaultSizeY ? '' : this.pluginOptions.defaultHeight;
@@ -151,7 +151,7 @@ Video.prototype = {
 	 * @override modal
 	 * @returns {boolean | undefined}
 	 */
-	modalAction: function () {
+	modalAction() {
 		this._align = this.modal.form.querySelector('input[name="suneditor_video_radio"]:checked').value;
 
 		let result = false;
@@ -169,7 +169,7 @@ Video.prototype = {
 	/**
 	 * @override modal
 	 */
-	init: function () {
+	init() {
 		if (this.videoInputFile) this.videoInputFile.value = '';
 		if (this.videoUrlFile) this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = '';
 		if (this.videoInputFile && this.videoUrlFile) {
@@ -195,7 +195,7 @@ Video.prototype = {
 	 * @description Called when a container is selected.
 	 * @param {Element} element Target element
 	 */
-	select: function (element) {
+	select(element) {
 		this.ready(element);
 	},
 
@@ -203,7 +203,7 @@ Video.prototype = {
 	 * @override fileManager, figure
 	 * @param {Element} target Target element
 	 */
-	ready: function (target) {
+	ready(target) {
 		if (!target) return;
 		const figureInfo = this.figure.open(target, this._nonResizing, false);
 
@@ -253,7 +253,7 @@ Video.prototype = {
 	/**
 	 * @override fileManager
 	 */
-	destroy: function (element) {
+	destroy(element) {
 		const targetEl = element || this._element;
 		const container = domUtils.getParentElement(targetEl, this.component.is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
@@ -277,7 +277,7 @@ Video.prototype = {
 		this.history.push(false);
 	},
 
-	applySize: function (w, h) {
+	applySize(w, h) {
 		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
 		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
 		if (this._onlyPercentage) {
@@ -287,7 +287,7 @@ Video.prototype = {
 		this.figure.setSize(w, h);
 	},
 
-	create: function (oFrame, src, width, height, align, isUpdate, file) {
+	create(oFrame, src, width, height, align, isUpdate, file) {
 		let cover = null;
 		let container = null;
 
@@ -358,7 +358,7 @@ Video.prototype = {
 		this.history.push(false);
 	},
 
-	_submitFile: function (fileList) {
+	_submitFile(fileList) {
 		if (fileList.length === 0) return;
 
 		let fileSize = 0;
@@ -392,17 +392,13 @@ Video.prototype = {
 		};
 
 		if (typeof this.events.onVideoUploadBefore === 'function') {
-			const result = this.events.onVideoUploadBefore(
-				files,
-				info,
-				function (data) {
-					if (data && this._w.Array.isArray(data.result)) {
-						this._register(info, data);
-					} else {
-						this._serverUpload(info, data);
-					}
-				}.bind(this)
-			);
+			const result = this.events.onVideoUploadBefore(files, info, (data) => {
+				if (data && this._w.Array.isArray(data.result)) {
+					this._register(info, data);
+				} else {
+					this._serverUpload(info, data);
+				}
+			});
 
 			if (result === undefined) return true;
 			if (result === false) return false;
@@ -412,7 +408,7 @@ Video.prototype = {
 		this._serverUpload(info, files);
 	},
 
-	_submitURL: function (url) {
+	_submitURL(url) {
 		if (!url) url = this._linkValue;
 		if (!url) return false;
 
@@ -458,7 +454,7 @@ Video.prototype = {
 		return true;
 	},
 
-	_update: function (oFrame) {
+	_update(oFrame) {
 		if (!oFrame) return;
 
 		if (/^video$/i.test(oFrame.nodeName)) {
@@ -518,7 +514,7 @@ Video.prototype = {
 		return oFrame;
 	},
 
-	_register: function (info, response) {
+	_register(info, response) {
 		const fileList = response.result;
 		const videoTag = this._createVideoTag();
 
@@ -530,7 +526,7 @@ Video.prototype = {
 		}
 	},
 
-	_serverUpload: function (info, files) {
+	_serverUpload(info, files) {
 		if (!files) return;
 		if (typeof files === 'string') {
 			this._error(files, null);
@@ -543,7 +539,7 @@ Video.prototype = {
 		}
 	},
 
-	_setTagAttrs: function (element) {
+	_setTagAttrs(element) {
 		element.setAttribute('controls', true);
 
 		const attrs = this.pluginOptions.videoTagAttributes;
@@ -554,7 +550,7 @@ Video.prototype = {
 		}
 	},
 
-	_setIframeAttrs: function (element) {
+	_setIframeAttrs(element) {
 		element.frameBorder = '0';
 		element.allowFullscreen = true;
 
@@ -566,13 +562,13 @@ Video.prototype = {
 		}
 	},
 
-	_createVideoTag: function () {
+	_createVideoTag() {
 		const iframeTag = domUtils.createElement('IFRAME');
 		this._setIframeAttrs(iframeTag);
 		return iframeTag;
 	},
 
-	_setVideoRatioSelect: function (value) {
+	_setVideoRatioSelect(value) {
 		let ratioSelected = false;
 		const ratioOption = this.videoRatioOption.options;
 
@@ -590,7 +586,7 @@ Video.prototype = {
 		return ratioSelected;
 	},
 
-	_error: function (message, response) {
+	_error(message, response) {
 		if (typeof this.events.onVideoUploadError !== 'function' || this.events.onVideoUploadError(message, response)) {
 			this.notice.open(message);
 			throw Error('[SUNEDITOR.plugin.video.error] response: ' + message);
@@ -637,9 +633,9 @@ function OnLinkPreview(e) {
 	} else {
 		this._linkValue = this.previewSrc.textContent = !value
 			? ''
-			: this.options.get('defaultUrlProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0
+			: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
 			? this.options.get('defaultUrlProtocol') + value
-			: value.indexOf('://') === -1
+			: !value.includes('://')
 			? '/' + value
 			: value;
 	}

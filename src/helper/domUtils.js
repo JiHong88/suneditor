@@ -72,7 +72,7 @@ export function getAttributesToString(element, exceptAttrs) {
 	let attrString = '';
 
 	for (let i = 0, len = attrs.length; i < len; i++) {
-		if (exceptAttrs && exceptAttrs.indexOf(attrs[i].name) > -1) continue;
+		if (exceptAttrs && exceptAttrs.includes(attrs[i].name)) continue;
 		attrString += attrs[i].name + '="' + attrs[i].value + '" ';
 	}
 
@@ -106,44 +106,41 @@ export function getNodePath(node, parentNode, _newOffsets) {
 	const path = [];
 	let finds = true;
 
-	getParentElement(
-		node,
-		function (el) {
-			if (el === parentNode) finds = false;
-			if (finds && !isWysiwygFrame(el)) {
-				// merge text nodes
-				if (_newOffsets && el.nodeType === 3) {
-					let temp = null,
-						tempText = null;
-					_newOffsets.s = _newOffsets.e = 0;
+	getParentElement(node, (el) => {
+		if (el === parentNode) finds = false;
+		if (finds && !isWysiwygFrame(el)) {
+			// merge text nodes
+			if (_newOffsets && el.nodeType === 3) {
+				let temp = null,
+					tempText = null;
+				_newOffsets.s = _newOffsets.e = 0;
 
-					let previous = el.previousSibling;
-					while (previous && previous.nodeType === 3) {
-						tempText = previous.textContent.replace(zeroWidthRegExp, '');
-						_newOffsets.s += tempText.length;
-						el.textContent = tempText + el.textContent;
-						temp = previous;
-						previous = previous.previousSibling;
-						removeItem(temp);
-					}
-
-					let next = el.nextSibling;
-					while (next && next.nodeType === 3) {
-						tempText = next.textContent.replace(zeroWidthRegExp, '');
-						_newOffsets.e += tempText.length;
-						el.textContent += tempText;
-						temp = next;
-						next = next.nextSibling;
-						removeItem(temp);
-					}
+				let previous = el.previousSibling;
+				while (previous && previous.nodeType === 3) {
+					tempText = previous.textContent.replace(zeroWidthRegExp, '');
+					_newOffsets.s += tempText.length;
+					el.textContent = tempText + el.textContent;
+					temp = previous;
+					previous = previous.previousSibling;
+					removeItem(temp);
 				}
 
-				// index push
-				path.push(el);
+				let next = el.nextSibling;
+				while (next && next.nodeType === 3) {
+					tempText = next.textContent.replace(zeroWidthRegExp, '');
+					_newOffsets.e += tempText.length;
+					el.textContent += tempText;
+					temp = next;
+					next = next.nextSibling;
+					removeItem(temp);
+				}
 			}
-			return false;
-		}.bind(this)
-	);
+
+			// index push
+			path.push(el);
+		}
+		return false;
+	});
 
 	return path.map(getPositionIndex).reverse();
 }
@@ -544,7 +541,7 @@ export function copyTagAttributes(originEl, copyEl, blacklist) {
 	const attrs = copyEl.attributes;
 	for (let i = 0, len = attrs.length, name; i < len; i++) {
 		name = attrs[i].name.toLowerCase();
-		if ((blacklist && blacklist.indexOf(name) > -1) || !attrs[i].value) originEl.removeAttribute(name);
+		if ((blacklist && blacklist.includes(name)) || !attrs[i].value) originEl.removeAttribute(name);
 		else if (name !== 'style') originEl.setAttribute(attrs[i].name, attrs[i].value);
 	}
 }
@@ -675,7 +672,6 @@ export function setDisabled(buttonList, disabled, important) {
  */
 export function hasClass(element, className) {
 	if (!element) return;
-
 	return new _w.RegExp(className).test(element.className);
 }
 
@@ -688,9 +684,10 @@ export function addClass(element, className) {
 	if (!element) return;
 
 	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
-	(element instanceof window.NodeList || element instanceof window.Array ? element : [element]).forEach(function (e) {
+	for (const e of element instanceof window.NodeList || element instanceof window.Array ? element : [element]) {
+		if (!e) continue;
 		if (!check.test(e.className)) e.className += (e.className.length > 0 ? ' ' : '') + className;
-	});
+	}
 }
 
 /**
@@ -702,10 +699,11 @@ export function removeClass(element, className) {
 	if (!element) return;
 
 	const check = new _w.RegExp('(\\s|^)' + className + '(\\s|$)');
-	(element instanceof window.NodeList || element instanceof window.Array ? element : [element]).forEach(function (e) {
+	for (const e of element instanceof window.NodeList || element instanceof window.Array ? element : [element]) {
+		if (!e) continue;
 		e.className = e.className.replace(check, ' ').trim();
 		if (!e.className.trim()) e.removeAttribute('class');
-	});
+	}
 }
 
 /**

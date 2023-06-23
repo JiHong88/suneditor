@@ -19,11 +19,9 @@ export default {
 	 * @param {Json} options Initialization options
 	 * @returns {Object}
 	 */
-	init: function (init_options) {
+	init(init_options) {
 		return {
-			create: function (targets, options) {
-				return this.create(targets, options, init_options);
-			}.bind(this)
+			create: (targets, options) => this.create(targets, options, init_options)
 		};
 	},
 
@@ -33,35 +31,23 @@ export default {
 	 * @param {JSON|Object} options user options
 	 * @returns {Object}
 	 */
-	create: function (target, options, _init_options) {
+	create(target, options, _init_options) {
 		if (typeof options !== 'object') options = {};
 		if (_init_options) {
-			options = [_init_options, options].reduce(function (init, option) {
-				for (let key in option) {
-					if (key === 'plugins' && option[key] && init[key]) {
-						let i = init[key],
-							o = option[key];
-						i = i.length
-							? i
-							: Object.keys(i).map(function (name) {
-									return i[name];
-							  });
-						o = o.length
-							? o
-							: Object.keys(o).map(function (name) {
-									return o[name];
-							  });
-						init[key] = o
-							.filter(function (val) {
-								return i.indexOf(val) === -1;
-							})
-							.concat(i);
-					} else {
-						init[key] = option[key];
-					}
-				}
-				return init;
-			}, {});
+			options = (() => {
+				return [_init_options, options].reduce((init, option) => {
+					Object.entries(option).forEach(([key, value]) => {
+						if (key === 'plugins' && value && init[key]) {
+							let i = Array.isArray(init[key]) ? init[key] : Object.values(init[key]);
+							let o = Array.isArray(value) ? value : Object.values(value);
+							init[key] = [...o.filter((val) => !i.includes(val)), ...i];
+						} else {
+							init[key] = value;
+						}
+					});
+					return init;
+				}, {});
+			})();
 		}
 
 		if (!target) throw Error("[SUNEDITOR.create.fail] suneditor requires textarea's element");

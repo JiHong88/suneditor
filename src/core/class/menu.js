@@ -41,7 +41,7 @@ Menu.prototype = {
 	 * @param {Element|string} key Key string
 	 * @param {Element} menu Dropdown element
 	 */
-	initDropdownTarget: function (classObj, menu) {
+	initDropdownTarget(classObj, menu) {
 		const key = classObj.key;
 		if (key) {
 			if (!/free$/.test(classObj.type)) {
@@ -59,7 +59,7 @@ Menu.prototype = {
 	 * @description On dropdown
 	 * @param {Element} button Dropdown's button element to call
 	 */
-	dropdownOn: function (button) {
+	dropdownOn(button) {
 		this.__removeGlobalEvent();
 		const moreBtn = this._checkMoreLayer(button);
 		if (moreBtn) {
@@ -78,7 +78,7 @@ Menu.prototype = {
 		this._setMenuPosition(button, menu);
 
 		this._bindClose_dropdown_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandler[0], false);
-		if (this._dropdownCommands.indexOf(dropdownName) > -1) {
+		if (this._dropdownCommands.includes(dropdownName)) {
 			this.menus = converter.nodeListToArray(menu.querySelectorAll('button[data-command]'));
 			if (this.menus.length > 0) {
 				this._bindClose_dropdown_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandler[2], false);
@@ -94,7 +94,7 @@ Menu.prototype = {
 	/**
 	 * @description Off dropdown
 	 */
-	dropdownOff: function () {
+	dropdownOff() {
 		this.__removeGlobalEvent();
 		this.index = -1;
 		this.menus = [];
@@ -116,7 +116,7 @@ Menu.prototype = {
 	 * @description On menu container
 	 * @param {Element} button Container's button element to call
 	 */
-	containerOn: function (button) {
+	containerOn(button) {
 		this.__removeGlobalEvent();
 
 		const containerName = (this._containerName = button.getAttribute('data-command'));
@@ -132,7 +132,7 @@ Menu.prototype = {
 	/**
 	 * @description Off menu container
 	 */
-	containerOff: function () {
+	containerOff() {
 		this.__removeGlobalEvent();
 
 		if (this.currentContainer) {
@@ -153,7 +153,7 @@ Menu.prototype = {
 	 * @param {*} menu Menu element
 	 * @private
 	 */
-	_setMenuPosition: function (element, menu) {
+	_setMenuPosition(element, menu) {
 		menu.style.visibility = 'hidden';
 		menu.style.display = 'block';
 		menu.style.height = '';
@@ -164,7 +164,7 @@ Menu.prototype = {
 		menu.style.visibility = '';
 	},
 
-	_checkMoreLayer: function (element) {
+	_checkMoreLayer(element) {
 		const more = domUtils.getParentElement(element, '.se-more-layer');
 		if (more && more.style.display !== 'block') {
 			return more.getAttribute('data-ref') ? more : null;
@@ -173,7 +173,7 @@ Menu.prototype = {
 		}
 	},
 
-	_moveItem: function (num) {
+	_moveItem(num) {
 		domUtils.removeClass(this.currentDropdown, 'se-select-menu-mouse-move');
 		domUtils.addClass(this.currentDropdown, 'se-select-menu-key-action');
 		num = this.index + num;
@@ -189,7 +189,7 @@ Menu.prototype = {
 		}
 	},
 
-	__removeGlobalEvent: function () {
+	__removeGlobalEvent() {
 		if (this._bindClose_dropdown_mouse) this._bindClose_dropdown_mouse = this.eventManager.removeGlobalEvent(this._bindClose_dropdown_mouse);
 		if (this._bindClose_cons_mouse) this._bindClose_cons_mouse = this.eventManager.removeGlobalEvent(this._bindClose_cons_mouse);
 		if (this._bindClose_dropdown_key) {

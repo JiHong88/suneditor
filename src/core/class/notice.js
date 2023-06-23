@@ -19,7 +19,7 @@ Notice.prototype = {
 	 * @description  Open the notice panel
 	 * @param {string} text Notice message
 	 */
-	open: function (text) {
+	open(text) {
 		this.message.textContent = text;
 		this.modal.open();
 	},
@@ -27,7 +27,7 @@ Notice.prototype = {
 	/**
 	 * @description  Close the notice panel
 	 */
-	close: function () {
+	close() {
 		this.modal.close();
 	},
 

@@ -66,7 +66,7 @@ const ModalAnchorEditor = function (inst, modalForm, params) {
 					'BUTTON',
 					{
 						type: 'button',
-						class: 'se-btn se-btn-list' + (defaultRel.indexOf(rel) > -1 ? ' se-checked' : ''),
+						class: 'se-btn se-btn-list' + (defaultRel.includes(rel) ? ' se-checked' : ''),
 						'data-command': rel,
 						title: rel,
 						'aria-label': rel
@@ -94,11 +94,11 @@ const ModalAnchorEditor = function (inst, modalForm, params) {
 };
 
 ModalAnchorEditor.prototype = {
-	set: function (element) {
+	set(element) {
 		this.currentTarget = element;
 	},
 
-	on: function (isUpdate) {
+	on(isUpdate) {
 		if (!isUpdate) {
 			this.init();
 			this.displayInput.value = this.selection.get().toString().trim();
@@ -117,7 +117,7 @@ ModalAnchorEditor.prototype = {
 		this._setLinkPreview(this.linkValue);
 	},
 
-	create: function (notText) {
+	create(notText) {
 		if (this.linkValue.length === 0) return null;
 
 		const url = this.linkValue;
@@ -130,7 +130,7 @@ ModalAnchorEditor.prototype = {
 		return oA;
 	},
 
-	init: function () {
+	init() {
 		this.currentTarget = null;
 		this.linkValue = this.preview.textContent = this.urlInput.value = '';
 		this.displayInput.value = '';
@@ -140,7 +140,7 @@ ModalAnchorEditor.prototype = {
 		this._setRel(this.defaultRel.default || '');
 	},
 
-	_updateAnchor: function (anchor, url, displayText, title, notText) {
+	_updateAnchor(anchor, url, displayText, title, notText) {
 		// download
 		if (!this._selfPathBookmark(url) && this.downloadCheck.checked) {
 			anchor.setAttribute('download', displayText || url);
@@ -169,19 +169,19 @@ ModalAnchorEditor.prototype = {
 		}
 	},
 
-	_selfPathBookmark: function (path) {
+	_selfPathBookmark(path) {
 		const href = this._w.location.href.replace(/\/$/, '');
-		return path.indexOf('#') === 0 || (path.indexOf(href) === 0 && path.indexOf('#') === (href.indexOf('#') === -1 ? href.length : href.substr(0, href.indexOf('#')).length));
+		return path.indexOf('#') === 0 || (path.indexOf(href) === 0 && path.indexOf('#') === (!href.includes('#') ? href.length : href.substr(0, href.indexOf('#')).length));
 	},
 
-	_setRel: function (relAttr) {
+	_setRel(relAttr) {
 		if (!this._isRel) return;
 
 		const rels = (this.currentRel = !relAttr ? [] : relAttr.split(' '));
 		const checkedRel = this.selectMenu_rel.form.querySelectorAll('button');
 		for (let i = 0, len = checkedRel.length, cmd; i < len; i++) {
 			cmd = checkedRel[i].getAttribute('data-command');
-			if (rels.indexOf(cmd) > -1) {
+			if (rels.includes(cmd)) {
 				domUtils.addClass(checkedRel[i], 'se-checked');
 			} else {
 				domUtils.removeClass(checkedRel[i], 'se-checked');
@@ -191,7 +191,7 @@ ModalAnchorEditor.prototype = {
 		this.relPreview.title = this.relPreview.textContent = rels.join(' ');
 	},
 
-	_createHeaderList: function (urlValue) {
+	_createHeaderList(urlValue) {
 		const headers = domUtils.getListChildren(this.editor.frameContext.get('wysiwyg'), function (current) {
 			return /h[1-6]/i.test(current.nodeName);
 		});
@@ -215,7 +215,7 @@ ModalAnchorEditor.prototype = {
 		}
 	},
 
-	_setLinkPreview: function (value) {
+	_setLinkPreview(value) {
 		const preview = this.preview;
 		const protocol = this.options.get('defaultUrlProtocol');
 		const noPrefix = this.noAutoPrefix;
@@ -251,7 +251,7 @@ ModalAnchorEditor.prototype = {
 		}
 	},
 
-	_relMerge: function (relAttr) {
+	_relMerge(relAttr) {
 		const current = this.currentRel;
 		if (!relAttr) return current.join(' ');
 
@@ -262,15 +262,14 @@ ModalAnchorEditor.prototype = {
 		}
 
 		const rels = relAttr.split(' ');
-		for (let i = 0, len = rels.length, index; i < len; i++) {
-			index = current.indexOf(rels[i]);
-			if (index === -1) current.push(rels[i]);
+		for (let i = 0, len = rels.length; i < len; i++) {
+			if (!current.includes(rels[i])) current.push(rels[i]);
 		}
 
 		return current.join(' ');
 	},
 
-	_relDelete: function (relAttr) {
+	_relDelete(relAttr) {
 		if (!relAttr) return this.currentRel.join(' ');
 		if (/^only\:/.test(relAttr)) relAttr = relAttr.replace(/^only\:/, '').trim();
 

@@ -18,7 +18,7 @@ Blockquote.prototype = {
 	/**
 	 * @override core
 	 */
-	active: function (element, target) {
+	active(element, target) {
 		if (element && /blockquote/i.test(element.nodeName)) {
 			domUtils.addClass(target, 'active');
 			return true;
@@ -31,7 +31,7 @@ Blockquote.prototype = {
 	/**
 	 * @override core
 	 */
-	action: function () {
+	action() {
 		const currentBlockquote = domUtils.getParentElement(this.selection.getNode(), 'blockquote');
 
 		if (currentBlockquote) {

@@ -18,7 +18,7 @@ Node_.prototype = {
 	 * @param {number} depth The nesting depth of the element being split. (default: 0)
 	 * @returns {Element}
 	 */
-	split: function (baseNode, offset, depth) {
+	split(baseNode, offset, depth) {
 		if (domUtils.isWysiwygFrame(baseNode)) return baseNode;
 
 		if (offset && !numbers.is(offset)) {
@@ -129,7 +129,7 @@ Node_.prototype = {
 	 * @param {boolean} onlyText If true, non-text nodes like 'span', 'strong'.. are ignored.
 	 * @returns {Array} [offset, ..]
 	 */
-	mergeSameTags: function (element, nodePathArray, onlyText) {
+	mergeSameTags(element, nodePathArray, onlyText) {
 		const inst = this;
 		const nodePathLen = nodePathArray ? nodePathArray.length : 0;
 		let offsets = null;
@@ -269,7 +269,7 @@ Node_.prototype = {
 	 * @param {Element} element Element object
 	 * @param {Function|String|null} validation Validation function / String("tag1|tag2..") / If null, all tags are applicable.
 	 */
-	mergeNestedTags: function (element, validation) {
+	mergeNestedTags(element, validation) {
 		if (typeof validation === 'string') {
 			validation = function (current) {
 				return this.test(current.tagName);
@@ -305,15 +305,15 @@ Node_.prototype = {
 	 * @param {Element|null} stopParent Stop when the parent node reaches stopParent
 	 * @returns {Object|null} {sc: previousSibling, ec: nextSibling}
 	 */
-	removeAllParents: function (item, validation, stopParent) {
+	removeAllParents(item, validation, stopParent) {
 		if (!item) return null;
 		let cc = null;
 		if (!validation) {
-			validation = function (current) {
+			validation = (current) => {
 				if (current === stopParent || this.component.is(current)) return false;
 				const text = current.textContent.trim();
 				return text.length === 0 || /^(\n|\u200B)+$/.test(text);
-			}.bind(this);
+			};
 		}
 
 		(function recursionFunc(element) {
@@ -339,7 +339,7 @@ Node_.prototype = {
 	 * @param {Node|null} notRemoveNode Do not remove node
 	 * @param {boolean} forceDelete When all child nodes are deleted, the parent node is also deleted.
 	 */
-	removeEmptyNode: function (element, notRemoveNode, forceDelete) {
+	removeEmptyNode(element, notRemoveNode, forceDelete) {
 		const inst = this;
 
 		if (notRemoveNode) {

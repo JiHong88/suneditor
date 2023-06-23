@@ -58,7 +58,7 @@ const HTML = function (editor) {
 	// whitelist
 	// tags
 	const defaultAttr = options.get('__defaultAttributeWhitelist');
-	this._allowHTMLComment = options.get('_editorElementWhitelist').indexOf('//') > -1 || options.get('_editorElementWhitelist') === '*';
+	this._allowHTMLComment = options.get('_editorElementWhitelist').includes('//') || options.get('_editorElementWhitelist') === '*';
 	// html check
 	this._htmlCheckWhitelistRegExp = new _w.RegExp('^(' + GetRegList(options.get('_editorElementWhitelist').replace('|//', ''), '') + ')$', 'i');
 	this._htmlCheckBlacklistRegExp = new _w.RegExp('^(' + (options.get('elementBlacklist') || '^') + ')$', 'i');
@@ -113,7 +113,7 @@ HTML.prototype = {
 	 * RegExp object is create by helper.converter.createElementBlacklist method.
 	 * @returns {string}
 	 */
-	clean: function (html, requireFormat, whitelist, blacklist) {
+	clean(html, requireFormat, whitelist, blacklist) {
 		html = this._deleteDisallowedTags(this._parser.parseFromString(this.compress(html), 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp)
 			.replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this))
 			.replace(/<br\/?>$/i, '');
@@ -173,7 +173,7 @@ HTML.prototype = {
 	 * @param {boolean} notCheckCharCount If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @param {boolean} notCleanData If true, inserts the HTML string without refining it with html.clean.
 	 */
-	insert: function (html, rangeSelection, notCheckCharCount, notCleanData) {
+	insert(html, rangeSelection, notCheckCharCount, notCleanData) {
 		if (!this.editor.frameContext.get('wysiwygFrame').contains(this.selection.get().focusNode)) this.editor.focus();
 
 		if (typeof html === 'string') {
@@ -245,7 +245,7 @@ HTML.prototype = {
 	 * @param {boolean|null} notCheckCharCount If true, it will be inserted even if "frameOptions.get('charCounter_max')" is exceeded.
 	 * @returns {Object|Node|null}
 	 */
-	insertNode: function (oNode, afterNode, notCheckCharCount) {
+	insertNode(oNode, afterNode, notCheckCharCount) {
 		if (this.editor.isReadOnly || (!notCheckCharCount && !this.char.check(oNode, null))) {
 			return null;
 		}
@@ -291,12 +291,9 @@ HTML.prototype = {
 				container.appendChild(tempParentNode);
 				tempAfterNode = null;
 			} else if (container.nodeType === 3 || domUtils.isBreak(container) || insertListCell) {
-				const depthFormat = domUtils.getParentElement(
-					container,
-					function (current) {
-						return this.format.isBlock(current) || domUtils.isListCell(current);
-					}.bind(this)
-				);
+				const depthFormat = domUtils.getParentElement(container, (current) => {
+					return this.format.isBlock(current) || domUtils.isListCell(current);
+				});
 				afterNode = this.node.split(container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
 				if (!afterNode) {
 					tempAfterNode = afterNode = line;
@@ -614,7 +611,7 @@ HTML.prototype = {
 	 * Returns {container: "the last element after deletion", offset: "offset", prevContainer: "previousElementSibling Of the deleted area"}
 	 * @returns {Object}
 	 */
-	remove: function () {
+	remove() {
 		this.selection._resetRangeToTextNode();
 
 		const range = this.selection.getRange();
@@ -814,7 +811,7 @@ HTML.prototype = {
 	 * @param {number|Array.<number>|undefined} rootKey Root index
 	 * @returns {string|Array.<string>}
 	 */
-	get: function (withFrame, includeFullPage, rootKey) {
+	get(withFrame, includeFullPage, rootKey) {
 		if (!rootKey) rootKey = [this.status.rootKey];
 		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
 
@@ -857,7 +854,7 @@ HTML.prototype = {
 	 * @param {string|undefined} html HTML string
 	 * @param {number|Array.<number>|undefined} rootKey Root index
 	 */
-	set: function (html, rootKey) {
+	set(html, rootKey) {
 		this.selection.removeRange();
 		const convertValue = html === null || html === undefined ? '' : this.clean(html, true, null, null);
 
@@ -883,7 +880,7 @@ HTML.prototype = {
 	 * @param {string} content Content to Input
 	 * @param {number|Array.<number>|undefined} rootKey Root index
 	 */
-	add: function (content, rootKey) {
+	add(content, rootKey) {
 		if (!rootKey) rootKey = [this.status.rootKey];
 		else if (!this._w.Array.isArray(rootKey)) rootKey = [rootKey];
 
@@ -910,7 +907,7 @@ HTML.prototype = {
 	 * @param {Object} ctx { head: HTML string, body: HTML string}
 	 * @param {number|Array.<number>|undefined} rootKey Root index
 	 */
-	setFullPage: function (ctx, rootKey) {
+	setFullPage(ctx, rootKey) {
 		if (!this.editor.frameOptions.get('iframe')) return false;
 
 		if (!rootKey) rootKey = [this.status.rootKey];
@@ -930,7 +927,7 @@ HTML.prototype = {
 	 * @param {string} html HTML string
 	 * @returns {string} HTML string
 	 */
-	compress: function (html) {
+	compress(html) {
 		return html.replace(/\n/g, '').replace(/(>)(?:\s+)(<)/g, '$1$2');
 	},
 
@@ -940,15 +937,15 @@ HTML.prototype = {
 	 * @param {Boolean} comp If true, does not line break and indentation of tags.
 	 * @returns {string}
 	 */
-	_convertToCode: function (html, comp) {
+	_convertToCode(html, comp) {
 		let returnHTML = '';
 		const _w = this._w;
 		const wRegExp = _w.RegExp;
 		const brReg = new wRegExp('^(BLOCKQUOTE|PRE|TABLE|THEAD|TBODY|TR|TH|TD|OL|UL|IMG|IFRAME|VIDEO|AUDIO|FIGURE|FIGCAPTION|HR|BR|CANVAS|SELECT)$', 'i');
 		const wDoc = typeof html === 'string' ? this._d.createRange().createContextualFragment(html) : html;
-		const isFormat = function (current) {
+		const isFormat = (current) => {
 			return this.format.isLine(current) || this.component.is(current);
-		}.bind(this);
+		};
 		const brChar = comp ? '' : '\n';
 
 		let indentSize = comp ? 0 : this.status.codeIndentSize * 1;
@@ -983,7 +980,6 @@ HTML.prototype = {
 				}
 
 				if (!node.outerHTML) {
-					// IE
 					returnHTML += new _w.XMLSerializer().serializeToString(node);
 				} else {
 					tag = node.nodeName.toLowerCase();
@@ -1003,7 +999,7 @@ HTML.prototype = {
 		return returnHTML.trim() + brChar;
 	},
 
-	_nodeRemoveListItem: function (item) {
+	_nodeRemoveListItem(item) {
 		const line = this.format.getLine(item, null);
 		domUtils.removeItem(item);
 
@@ -1022,7 +1018,7 @@ HTML.prototype = {
 	 * @returns {Node} "oNode"
 	 * @private
 	 */
-	_setIntoFreeFormat: function (oNode) {
+	_setIntoFreeFormat(oNode) {
 		const parentNode = oNode.parentNode;
 		let oNodeChildren, lastONode;
 
@@ -1056,7 +1052,7 @@ HTML.prototype = {
 	 * @param {boolean} requireFormat If true, text nodes that do not have a format node is wrapped with the format tag.
 	 * @private
 	 */
-	_makeLine: function (node, requireFormat) {
+	_makeLine(node, requireFormat) {
 		const defaultLine = this.options.get('defaultLine');
 		// element
 		if (node.nodeType === 1) {
@@ -1111,81 +1107,74 @@ HTML.prototype = {
 	 * @param {RegExp} htmlCheckBlacklistRegExp Editor tags blacklist
 	 * @private
 	 */
-	_consistencyCheckOfHTML: function (documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp) {
-		/**
-		 * It is can use ".children(domUtils.getListChildren)" to exclude text nodes, but "documentFragment.children" is not supported in IE.
-		 * So check the node type and exclude the text no (current.nodeType !== 1)
-		 */
+	_consistencyCheckOfHTML(documentFragment, htmlCheckWhitelistRegExp, htmlCheckBlacklistRegExp) {
 		const removeTags = [],
 			emptyTags = [],
 			wrongList = [],
 			withoutFormatCells = [];
 
 		// wrong position
-		const wrongTags = domUtils.getListChildNodes(
-			documentFragment,
-			function (current) {
-				if (current.nodeType !== 1) {
-					if (domUtils.isList(current.parentElement)) removeTags.push(current);
+		const wrongTags = domUtils.getListChildNodes(documentFragment, (current) => {
+			if (current.nodeType !== 1) {
+				if (domUtils.isList(current.parentElement)) removeTags.push(current);
+				return false;
+			}
+
+			// white list
+			if (
+				htmlCheckBlacklistRegExp.test(current.nodeName) ||
+				(!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && domUtils.isExcludeFormat(current))
+			) {
+				removeTags.push(current);
+				return false;
+			}
+
+			// empty tags
+			const nrtag = !domUtils.getParentElement(current, domUtils.isExcludeFormat);
+			if (
+				!domUtils.isTable(current) &&
+				!domUtils.isListCell(current) &&
+				!domUtils.isAnchor(current) &&
+				(this.format.isLine(current) || this.format.isBlock(current) || this.format.isTextStyleNode(current)) &&
+				current.childNodes.length === 0 &&
+				nrtag
+			) {
+				emptyTags.push(current);
+				return false;
+			}
+
+			// wrong list
+			if (domUtils.isList(current.parentNode) && !domUtils.isList(current) && !domUtils.isListCell(current)) {
+				wrongList.push(current);
+				return false;
+			}
+
+			// table cells
+			if (domUtils.isTableCell(current)) {
+				const fel = current.firstElementChild;
+				if (!this.format.isLine(fel) && !this.format.isBlock(fel) && !this.component.is(fel)) {
+					withoutFormatCells.push(current);
 					return false;
 				}
+			}
 
-				// white list
-				if (
-					htmlCheckBlacklistRegExp.test(current.nodeName) ||
-					(!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && domUtils.isExcludeFormat(current))
-				) {
-					removeTags.push(current);
-					return false;
-				}
+			// class filter
+			if (nrtag && current.className) {
+				const className = new this._w.Array(current.classList).map(this._isAllowedClassName).join(' ').trim();
+				if (className) current.className = className;
+				else current.removeAttribute('class');
+			}
 
-				// empty tags
-				const nrtag = !domUtils.getParentElement(current, domUtils.isExcludeFormat);
-				if (
-					!domUtils.isTable(current) &&
-					!domUtils.isListCell(current) &&
-					!domUtils.isAnchor(current) &&
-					(this.format.isLine(current) || this.format.isBlock(current) || this.format.isTextStyleNode(current)) &&
-					current.childNodes.length === 0 &&
-					nrtag
-				) {
-					emptyTags.push(current);
-					return false;
-				}
+			const result =
+				current.parentNode !== documentFragment &&
+				nrtag &&
+				((domUtils.isListCell(current) && !domUtils.isList(current.parentNode)) ||
+					((this.format.isLine(current) || this.component.is(current)) &&
+						!this.format.isBlock(current.parentNode) &&
+						!domUtils.getParentElement(current, this.component.is)));
 
-				// wrong list
-				if (domUtils.isList(current.parentNode) && !domUtils.isList(current) && !domUtils.isListCell(current)) {
-					wrongList.push(current);
-					return false;
-				}
-
-				// table cells
-				if (domUtils.isTableCell(current)) {
-					const fel = current.firstElementChild;
-					if (!this.format.isLine(fel) && !this.format.isBlock(fel) && !this.component.is(fel)) {
-						withoutFormatCells.push(current);
-						return false;
-					}
-				}
-
-				// class filter
-				if (nrtag && current.className) {
-					const className = new this._w.Array(current.classList).map(this._isAllowedClassName).join(' ').trim();
-					if (className) current.className = className;
-					else current.removeAttribute('class');
-				}
-
-				const result =
-					current.parentNode !== documentFragment &&
-					nrtag &&
-					((domUtils.isListCell(current) && !domUtils.isList(current.parentNode)) ||
-						((this.format.isLine(current) || this.component.is(current)) &&
-							!this.format.isBlock(current.parentNode) &&
-							!domUtils.getParentElement(current, this.component.is)));
-
-				return result;
-			}.bind(this)
-		);
+			return result;
+		});
 
 		for (let i = 0, len = removeTags.length; i < len; i++) {
 			domUtils.removeItem(removeTags[i]);
@@ -1255,7 +1244,7 @@ HTML.prototype = {
 	 * @returns {string} HTML string
 	 * @private
 	 */
-	_tagConvertor: function (html) {
+	_tagConvertor(html) {
 		if (!this._disallowedStyleNodesRegExp) return html;
 
 		const ec = this.options.get('_defaultStyleTagMap');
@@ -1270,7 +1259,7 @@ HTML.prototype = {
 	 * @returns {Element}
 	 * @private
 	 */
-	_editFormat: function (dom) {
+	_editFormat(dom) {
 		let value = '',
 			f;
 		const tempTree = dom.childNodes;
@@ -1304,7 +1293,7 @@ HTML.prototype = {
 		return this._d.createRange().createContextualFragment(value);
 	},
 
-	_convertListCell: function (domTree) {
+	_convertListCell(domTree) {
 		let html = '';
 
 		for (let i = 0, len = domTree.length, node; i < len; i++) {
@@ -1329,7 +1318,7 @@ HTML.prototype = {
 		return html;
 	},
 
-	_isFormatData: function (domTree) {
+	_isFormatData(domTree) {
 		let requireFormat = false;
 
 		for (let i = 0, len = domTree.length, t; i < len; i++) {
@@ -1343,7 +1332,7 @@ HTML.prototype = {
 		return requireFormat;
 	},
 
-	_cleanStyle: function (m, v, name) {
+	_cleanStyle(m, v, name) {
 		let sv = (m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/) || [])[0];
 		if (/span/i.test(name) && !sv && (m.match(/<span\s(.+)/) || [])[1]) {
 			const size = (m.match(/\ssize="([^"]+)"/i) || [])[1];
@@ -1372,7 +1361,7 @@ HTML.prototype = {
 						const c = r[3].trim();
 						switch (k) {
 							case 'fontFamily':
-								if (!this.plugins.font || this.plugins.font.fontArray.indexOf(c) === -1) continue;
+								if (!this.plugins.font || !this.plugins.font.fontArray.includes(c)) continue;
 								break;
 							case 'fontSize':
 								if (!this.plugins.fontSize) continue;
@@ -1416,7 +1405,7 @@ HTML.prototype = {
 		return html.replace(whitelistRegExp, '').replace(blacklistRegExp, '');
 	},
 
-	_checkDuplicateNode: function (oNode, parentNode) {
+	_checkDuplicateNode(oNode, parentNode) {
 		const inst = this;
 		(function recursionFunc(current) {
 			inst._dupleCheck(current, parentNode);
@@ -1427,7 +1416,7 @@ HTML.prototype = {
 		})(oNode);
 	},
 
-	_dupleCheck: function (oNode, parentNode) {
+	_dupleCheck(oNode, parentNode) {
 		if (!this.format.isTextStyleNode(oNode)) return;
 
 		const oStyles = (oNode.style.cssText.match(/[^;]+;/g) || []).map(function (v) {

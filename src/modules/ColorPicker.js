@@ -33,7 +33,7 @@ ColorPicker.prototype = {
 	 * @param {Node} node Current Selected node
 	 * @param {string|null} color Color value
 	 */
-	init: function (node) {
+	init(node) {
 		const computedColor = this.editor.frameContext.get('wwComputedStyle')[this.styleProperties];
 		const defaultColor = this.defaultColor || this.isHexColor(computedColor) ? computedColor : this.rgb2hex(computedColor);
 
@@ -56,7 +56,7 @@ ColorPicker.prototype = {
 	 * @description Function to check hex format color
 	 * @param {string} str Color value
 	 */
-	isHexColor: function (str) {
+	isHexColor(str) {
 		return /^#[0-9a-f]{3}(?:[0-9a-f]{3})?$/i.test(str);
 	},
 
@@ -65,7 +65,7 @@ ColorPicker.prototype = {
 	 * @param {string} rgb RGB color format
 	 * @returns {string}
 	 */
-	rgb2hex: function (rgb) {
+	rgb2hex(rgb) {
 		const rgbMatch = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
 		return rgbMatch && rgbMatch.length === 4
 			? '#' +
@@ -80,7 +80,7 @@ ColorPicker.prototype = {
 	 * @param {string} hexColorStr Hax color value
 	 * @private
 	 */
-	_setCurrentColor: function (hexColorStr) {
+	_setCurrentColor(hexColorStr) {
 		this.currentColor = hexColorStr;
 		this.inputElement.style.borderColor = hexColorStr;
 	},
@@ -90,7 +90,7 @@ ColorPicker.prototype = {
 	 * @param {string} hexColorStr Hax color value
 	 * @private
 	 */
-	_setInputText: function (hexColorStr) {
+	_setInputText(hexColorStr) {
 		hexColorStr = /^#/.test(hexColorStr) ? hexColorStr : '#' + hexColorStr;
 		this.inputElement.value = hexColorStr;
 		this._setCurrentColor.call(this, hexColorStr);
@@ -102,7 +102,7 @@ ColorPicker.prototype = {
 	 * @returns {string}
 	 * @private
 	 */
-	_getColorInNode: function (node) {
+	_getColorInNode(node) {
 		let findColor = '';
 		const sp = this.styleProperties;
 
@@ -119,7 +119,7 @@ ColorPicker.prototype = {
 	 * @param {string} colorName Color value
 	 * @returns {string}
 	 */
-	_colorName2hex: function (colorName) {
+	_colorName2hex(colorName) {
 		if (/^#/.test(colorName)) return colorName;
 		const temp = domUtils.createElement('div', { style: 'display: none; color: ' + colorName });
 		const colors = this._w
@@ -217,31 +217,18 @@ function CreateHTML(editor, colorList) {
 			if (i < len - 1) continue;
 		}
 		if (colorArr.length > 0) {
-			list += '<div class="se-selector-color">' + _makeColor(colorArr) + '</div>';
+			list += `<div class="se-selector-color">${_makeColor(colorArr)}</div>`;
 			colorArr = [];
 		}
 		if (typeof color === 'object') {
-			list += '<div class="se-selector-color">' + _makeColor(color) + '</div>';
+			list += `<div class="se-selector-color">${_makeColor(color)}</div>`;
 		}
 	}
-	list +=
-		'<form class="se-form-group">' +
-		'<input type="text" maxlength="9" class="se-color-input"/>' +
-		'<button type="submit" class="se-btn" title="' +
-		lang.submitButton +
-		'" aria-label="' +
-		lang.submitButton +
-		'">' +
-		editor.icons.checked +
-		'</button>' +
-		'<button type="button" class="se-btn _se_color_picker_remove" title="' +
-		lang.removeFormat +
-		'" aria-label="' +
-		lang.removeFormat +
-		'">' +
-		editor.icons.erase +
-		'</button>' +
-		'</form>';
+	list += `<form class="se-form-group">
+			<input type="text" maxlength="9" class="se-color-input"/>
+			<button type="submit" class="se-btn" title="${lang.submitButton}" aria-label="${lang.submitButton}">${editor.icons.checked}</button>
+			<button type="button" class="se-btn _se_color_picker_remove" title="${lang.removeFormat}" aria-label="${lang.removeFormat}">${editor.icons.erase}</button>
+		</form>`;
 
 	return domUtils.createElement('DIV', { class: 'se-list-inner' }, list);
 }
@@ -253,7 +240,7 @@ function _makeColor(colorList) {
 	for (let i = 0, len = colorList.length, color; i < len; i++) {
 		color = colorList[i];
 		if (typeof color === 'string') {
-			list += '<li><button type="button" data-value="' + color + '" title="' + color + '" aria-label="' + color + '" style="background-color:' + color + ';"></button></li>';
+			list += `<li><button type="button" data-value="${color}" title="${color}" aria-label="${color}" style="background-color:${color};"></button></li>`;
 		}
 	}
 	list += '</ul>';

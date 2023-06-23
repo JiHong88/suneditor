@@ -24,7 +24,7 @@ HR.prototype = {
 	/**
 	 * @override core
 	 */
-	active: function (element) {
+	active(element) {
 		domUtils.removeClass(this.currentHR, 'on');
 		if (element && /HR/i.test(element.nodeName)) {
 			domUtils.addClass(element, 'on');
@@ -40,7 +40,7 @@ HR.prototype = {
 	 * @override core
 	 * @param {Element} target Target command button
 	 */
-	action: function (target) {
+	action(target) {
 		const hr = target.firstElementChild.cloneNode(false);
 		this.editor.focus();
 		this.component.insert(hr, false, false);

@@ -14,7 +14,7 @@ Shortcuts.prototype = {
 	 * @param {boolean} shift Whether to press shift key
 	 * @returns {boolean} Whether to execute shortcuts
 	 */
-	command: function (keyCode, shift) {
+	command(keyCode, shift) {
 		if (this.isDisabled) return false;
 
 		const info = this.editor.shortcutsKeyMap.get(keyCode + (shift ? 1000 : 0));
@@ -24,11 +24,11 @@ Shortcuts.prototype = {
 		return true;
 	},
 
-	disable: function () {
+	disable() {
 		this.isDisabled = true;
 	},
 
-	enable: function () {
+	enable() {
 		this.isDisabled = false;
 	},
 

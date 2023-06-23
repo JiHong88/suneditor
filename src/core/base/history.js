@@ -140,7 +140,7 @@ export default function (editor, change) {
 	function refreshRoots(root) {
 		const deleteRoot = [];
 		for (let i = stackIndex + 1, len = stack.length; i < len; i++) {
-			if (deleteRoot.indexOf(stack[i]) > -1) continue;
+			if (deleteRoot.includes(stack[i])) continue;
 			deleteRoot.push(stack[i]);
 		}
 
@@ -151,7 +151,7 @@ export default function (editor, change) {
 		});
 
 		for (let i = 0, len = deleteRoot.length; i < len; i++) {
-			if (stack.indexOf(deleteRoot[i]) === -1) initRoot(deleteRoot[i]);
+			if (!stack.includes(deleteRoot[i])) initRoot(deleteRoot[i]);
 		}
 	}
 
@@ -184,7 +184,7 @@ export default function (editor, change) {
 		 * You can specify the delay time by sending a number.
 		 * @param {Boolean|Number} delay If true, Add stack without delay time.
 		 */
-		push: function (delay, rootKey) {
+		push(delay, rootKey) {
 			rootKey = rootKey || editor.status.rootKey;
 			const range = editor.status._range;
 
@@ -206,7 +206,7 @@ export default function (editor, change) {
 			}, time);
 		},
 
-		check: function (rootKey, range) {
+		check(rootKey, range) {
 			if (pushDelay) {
 				_w.clearTimeout(pushDelay);
 				pushDelay = null;
@@ -217,7 +217,7 @@ export default function (editor, change) {
 		/**
 		 * @description Undo function
 		 */
-		undo: function () {
+		undo() {
 			if (stackIndex > 0) {
 				setContentFromStack(-1);
 			}
@@ -226,20 +226,20 @@ export default function (editor, change) {
 		/**
 		 * @description Redo function
 		 */
-		redo: function () {
+		redo() {
 			if (stack.length - 1 > stackIndex) {
 				setContentFromStack(1);
 			}
 		},
 
-		overwrite: function (rootKey) {
+		overwrite(rootKey) {
 			setStack(rootTargets.get(rootKey || editor.status.rootKey).get('wysiwyg').innerHTML, null, editor.status.rootKey, 0);
 		},
 
 		/**
 		 * @description Reset the history object
 		 */
-		reset: function () {
+		reset() {
 			editor.applyCommandTargets('undo', function (e) {
 				e.setAttribute('disabled', true);
 			});
@@ -266,7 +266,7 @@ export default function (editor, change) {
 		/**
 		 * @description Reset the disabled state of the buttons to fit the current stack.
 		 */
-		resetButtons: function () {
+		resetButtons() {
 			if (stackIndex === 0) {
 				editor.applyCommandTargets('undo', function (e) {
 					e.setAttribute('disabled', true);
@@ -291,14 +291,14 @@ export default function (editor, change) {
 		 * @description Reset the delay time.
 		 * @param {number} time millisecond
 		 */
-		resetDelayTime: function (time) {
+		resetDelayTime(time) {
 			delayTime = time;
 		},
 
 		/**
 		 * @description Remove all stacks and remove the timeout function.
 		 */
-		destroy: function () {
+		destroy() {
 			if (pushDelay) _w.clearTimeout(pushDelay);
 			stackIndex = stack = rootStack = rootInitContents = null;
 		}

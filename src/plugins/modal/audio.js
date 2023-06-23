@@ -65,7 +65,7 @@ Audio_.prototype = {
 	/**
 	 * @override type = "modal"
 	 */
-	open: function () {
+	open() {
 		this.modal.open();
 	},
 
@@ -73,7 +73,7 @@ Audio_.prototype = {
 	 * @override modal
 	 * @param {boolean} isUpdate open state is update
 	 */
-	on: function (isUpdate) {
+	on(isUpdate) {
 		if (!isUpdate) {
 			if (this.audioInputFile && this.pluginOptions.allowMultiple) this.audioInputFile.setAttribute('multiple', 'multiple');
 		} else if (this._element) {
@@ -88,7 +88,7 @@ Audio_.prototype = {
 	 * @override modal
 	 * @returns {boolean | undefined}
 	 */
-	modalAction: function () {
+	modalAction() {
 		if (this.audioInputFile && this.audioInputFile.files.length > 0) {
 			return this._submitFile(this.audioInputFile.files);
 		} else if (this.audioUrlFile && this.urlValue.length > 0) {
@@ -100,7 +100,7 @@ Audio_.prototype = {
 	/**
 	 * @override modal
 	 */
-	init: function () {
+	init() {
 		if (this.audioInputFile) this.audioInputFile.value = '';
 		if (this.audioUrlFile) this.urlValue = this.preview.textContent = this.audioUrlFile.value = '';
 		if (this.audioInputFile && this.audioUrlFile) {
@@ -114,7 +114,7 @@ Audio_.prototype = {
 	 * @param {Element} target Target button element
 	 * @returns
 	 */
-	controllerAction: function (target) {
+	controllerAction(target) {
 		if (/update/.test(target.getAttribute('data-command'))) {
 			if (this.audioUrlFile) this.urlValue = this.preview.textContent = this.audioUrlFile.value = this._element.src;
 			this.open();
@@ -126,7 +126,7 @@ Audio_.prototype = {
 	/**
 	 * @override controller
 	 */
-	reset: function () {
+	reset() {
 		if (!this._element) return;
 		domUtils.removeClass(this._element, 'active');
 		domUtils.removeClass(this._element.parentElement, 'se-figure-selected');
@@ -137,14 +137,14 @@ Audio_.prototype = {
 	 * @description It is called from core.component.select
 	 * @param {Element} element Target element
 	 */
-	select: function (element) {
+	select(element) {
 		this.ready(element);
 	},
 
 	/**
 	 * @override fileManager
 	 */
-	ready: function (target) {
+	ready(target) {
 		domUtils.addClass(target, 'active');
 		domUtils.addClass(target.parentElement, 'se-figure-selected');
 		this._element = target;
@@ -154,7 +154,7 @@ Audio_.prototype = {
 	/**
 	 * @override fileManager
 	 */
-	destroy: function (element) {
+	destroy(element) {
 		element = element || this._element;
 		const figure = Figure.GetContainer(element);
 		const container = figure.container || element;
@@ -180,7 +180,7 @@ Audio_.prototype = {
 		this.history.push(false);
 	},
 
-	_submitFile: function (fileList) {
+	_submitFile(fileList) {
 		if (fileList.length === 0) return false;
 
 		let fileSize = 0;
@@ -210,17 +210,13 @@ Audio_.prototype = {
 		};
 
 		if (typeof this.events.onAudioUploadBefore === 'function') {
-			const result = this.events.onAudioUploadBefore(
-				files,
-				info,
-				function (data) {
-					if (data && this._w.Array.isArray(data.result)) {
-						this._register(info, data);
-					} else {
-						this._serverUpload(info, data);
-					}
-				}.bind(this)
-			);
+			const result = this.events.onAudioUploadBefore(files, info, (data) => {
+				if (data && this._w.Array.isArray(data.result)) {
+					this._register(info, data);
+				} else {
+					this._serverUpload(info, data);
+				}
+			});
 
 			if (typeof result === 'undefined') return;
 			if (!result) return false;
@@ -230,7 +226,7 @@ Audio_.prototype = {
 		this._serverUpload(info, files);
 	},
 
-	_register: function (info, response) {
+	_register(info, response) {
 		const fileList = response.result;
 
 		for (let i = 0, len = fileList.length, file, oAudio; i < len; i++) {
@@ -242,13 +238,13 @@ Audio_.prototype = {
 		}
 	},
 
-	_submitURL: function (src) {
+	_submitURL(src) {
 		if (src.length === 0) return false;
 		this._createComp(this._createAudioTag(), src, null, this.modal.isUpdate);
 		return true;
 	},
 
-	_createComp: function (element, src, file, isUpdate) {
+	_createComp(element, src, file, isUpdate) {
 		// create new tag
 		if (!isUpdate) {
 			element.src = src;
@@ -276,7 +272,7 @@ Audio_.prototype = {
 		if (isUpdate) this.history.push(false);
 	},
 
-	_createAudioTag: function () {
+	_createAudioTag() {
 		const w = this.defaultWidth;
 		const h = this.defaultHeight;
 		const oAudio = domUtils.createElement('AUDIO', { style: (w ? 'width:' + w + '; ' : '') + (h ? 'height:' + h + ';' : '') });
@@ -284,7 +280,7 @@ Audio_.prototype = {
 		return oAudio;
 	},
 
-	_setTagAttrs: function (element) {
+	_setTagAttrs(element) {
 		element.setAttribute('controls', true);
 
 		const attrs = this.pluginOptions.audioTagAttributes;
@@ -295,7 +291,7 @@ Audio_.prototype = {
 		}
 	},
 
-	_serverUpload: function (info, files) {
+	_serverUpload(info, files) {
 		if (!files) return;
 		if (typeof files === 'string') {
 			this._error(files, null);
@@ -306,7 +302,7 @@ Audio_.prototype = {
 		this.fileManager.upload(this.pluginOptions.uploadUrl, this.pluginOptions.uploadHeaders, uploadFiles, UploadCallBack.bind(this, info), this.events.onAudioUploadError);
 	},
 
-	_error: function (message, response) {
+	_error(message, response) {
 		if (typeof this.events.onAudioUploadError !== 'function' || this.events.onAudioUploadError(message, response)) {
 			this.notice.open(message);
 			console.warn('[SUNEDITOR.plugin.audio.exception] response: ' + message);
@@ -379,9 +375,9 @@ function OnLinkPreview(e) {
 	const value = e.target.value.trim();
 	this.urlValue = this.preview.textContent = !value
 		? ''
-		: this.options.get('defaultUrlProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0
+		: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
 		? this.options.get('defaultUrlProtocol') + value
-		: value.indexOf('://') === -1
+		: !value.includes('://')
 		? '/' + value
 		: value;
 }

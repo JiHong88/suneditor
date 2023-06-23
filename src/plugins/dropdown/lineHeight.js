@@ -25,7 +25,7 @@ LineHeight.prototype = {
 	/**
 	 * @override core
 	 */
-	active: function (element, target) {
+	active(element, target) {
 		if (element && element.style && element.style.lineHeight.length > 0) {
 			domUtils.addClass(target, 'active');
 			return true;
@@ -38,7 +38,7 @@ LineHeight.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on: function () {
+	on() {
 		const format = this.format.getLine(this.selection.getNode());
 		const currentSize = !format ? '' : format.style.lineHeight + '';
 
@@ -60,7 +60,7 @@ LineHeight.prototype = {
 	 * @override core
 	 * @param {Element} target Target command button
 	 */
-	action: function (target) {
+	action(target) {
 		const value = target.getAttribute('data-command') || '';
 		const formats = this.format.getLines();
 

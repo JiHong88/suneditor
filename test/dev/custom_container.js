@@ -13,7 +13,7 @@ export default {
     // add function - It is called only once when the plugin is first run.
     // This function generates HTML to append and register the event.
     // arguments - (core : core object, targetElement : clicked button element)
-    add: function (core, targetElement) {
+    add(core, targetElement) {
 
         // @Required
         // Registering a namespace for caching as a plugin name in the context object
@@ -34,7 +34,7 @@ export default {
         core.menu.initDropdownTarget(this.name, targetElement, listDiv);
     },
 
-    setDropdown: function (core) {
+    setDropdown(core) {
         const listDiv = core.util.createElement('DIV');
 
         listDiv.className = 'se-menu-container se-dropdown se-list-layer';
@@ -93,7 +93,7 @@ export default {
         return listDiv;
     },
 
-    onClick: function (e) {
+    onClick(e) {
         e.preventDefault();
         e.stopPropagation();
 

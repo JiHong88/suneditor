@@ -109,11 +109,11 @@ export function FONT_STYLE(editor, command) {
 	command = editor.options.get('_defaultTagCommand')[command.toLowerCase()] || command;
 	let nodeName = editor.options.get('textTags')[command] || command;
 	const nodesMap = editor.status.currentNodesMap;
-	const el = nodesMap.indexOf(editor.options.get('_styleCommandMap')[nodeName]) > -1 ? null : domUtils.createElement(nodeName);
+	const el = nodesMap.includes(editor.options.get('_styleCommandMap')[nodeName]) ? null : domUtils.createElement(nodeName);
 
-	if (/^sub$/i.test(nodeName) && nodesMap.indexOf('sup') > -1) {
+	if (/^sub$/i.test(nodeName) && nodesMap.includes('sup')) {
 		nodeName = 'sup';
-	} else if (/^sup$/i.test(nodeName) && nodesMap.indexOf('sub') > -1) {
+	} else if (/^sup$/i.test(nodeName) && nodesMap.includes('sub')) {
 		nodeName = 'sub';
 	}
 

@@ -27,7 +27,7 @@ Viewer.prototype = {
 	 * @description Changes to code view or wysiwyg view
 	 * @param {boolean|undefined} value true/false, If undefined toggle the codeView mode.
 	 */
-	codeView: function (value) {
+	codeView(value) {
 		const fc = this.editor.frameContext;
 		if (value === undefined) value = !fc.get('isCodeView');
 		if (value === fc.get('isCodeView')) return;
@@ -110,7 +110,7 @@ Viewer.prototype = {
 	 * @description Changes to full screen or default screen
 	 * @param {boolean|undefined} value true/false, If undefined toggle the codeView mode.
 	 */
-	fullScreen: function (value) {
+	fullScreen(value) {
 		const fc = this.editor.frameContext;
 		if (value === undefined) value = !fc.get('isFullScreen');
 		if (value === fc.get('isFullScreen')) return;
@@ -246,7 +246,7 @@ Viewer.prototype = {
 	 * @description Add or remove the class name of "body" so that the code block is visible
 	 * @param {boolean|undefined} value true/false, If undefined toggle the codeView mode.
 	 */
-	showBlocks: function (value) {
+	showBlocks(value) {
 		const fc = this.editor.frameContext;
 		if (value === undefined) value = !fc.get('isShowBlocks');
 		fc.set('isShowBlocks', !!value);
@@ -265,7 +265,7 @@ Viewer.prototype = {
 	/**
 	 * @description Prints the current content of the editor.
 	 */
-	print: function () {
+	print() {
 		const iframe = domUtils.createElement('IFRAME', { style: 'display: none;' });
 		this._d.body.appendChild(iframe);
 
@@ -304,37 +304,34 @@ Viewer.prototype = {
 		}
 
 		this.editor._openLoading();
-		this._w.setTimeout(
-			function () {
-				try {
-					iframe.focus();
-					// IE or Edge, Chromium
-					if (env.isIE || env.isEdge || env.isChromium || this._d.documentMode || this._w.StyleMedia) {
-						try {
-							iframe.contentWindow.document.execCommand('print', false, null);
-						} catch (e) {
-							console.warn('[SUNEDITOR.print.warn] ' + e);
-							iframe.contentWindow.print();
-						}
-					} else {
-						// Other browsers
+		this._w.setTimeout(() => {
+			try {
+				iframe.focus();
+				// Edge, Chromium
+				if (env.isEdge || env.isChromium || this._d.documentMode || this._w.StyleMedia) {
+					try {
+						iframe.contentWindow.document.execCommand('print', false, null);
+					} catch (e) {
+						console.warn('[SUNEDITOR.print.warn] ' + e);
 						iframe.contentWindow.print();
 					}
-				} catch (error) {
-					throw Error('[SUNEDITOR.print.fail] error: ' + error.message);
-				} finally {
-					this.editor._closeLoading();
-					domUtils.removeItem(iframe);
+				} else {
+					// Other browsers
+					iframe.contentWindow.print();
 				}
-			}.bind(this),
-			1000
-		);
+			} catch (error) {
+				throw Error('[SUNEDITOR.print.fail] error: ' + error.message);
+			} finally {
+				this.editor._closeLoading();
+				domUtils.removeItem(iframe);
+			}
+		}, 1000);
 	},
 
 	/**
 	 * @description Open the preview window.
 	 */
-	preview: function () {
+	preview() {
 		this.menu.dropdownOff();
 		this.menu.containerOff();
 		this.editor._offCurrentController();
@@ -392,7 +389,7 @@ Viewer.prototype = {
 		}
 	},
 
-	_resetFullScreenHeight: function () {
+	_resetFullScreenHeight() {
 		if (this.editor.frameContext.get('isFullScreen')) {
 			this.fullScreenInnerHeight +=
 				this._w.innerHeight -
@@ -412,7 +409,7 @@ Viewer.prototype = {
 	 * @returns
 	 * @private
 	 */
-	_codeMirrorEditor: function (key, value, rootKey) {
+	_codeMirrorEditor(key, value, rootKey) {
 		const fo = rootKey ? this.rootTargets.get(rootKey).get('options') : this.editor.frameOptions;
 		switch (key) {
 			case 'set':
@@ -452,7 +449,7 @@ Viewer.prototype = {
 	 * @param {string} value HTML string
 	 * @private
 	 */
-	_setCodeView: function (value) {
+	_setCodeView(value) {
 		if (this.options.get('hasCodeMirror')) {
 			this._codeMirrorEditor('set', value, null);
 		} else {
@@ -464,7 +461,7 @@ Viewer.prototype = {
 	 * @description Get method in the code view area
 	 * @private
 	 */
-	_getCodeView: function () {
+	_getCodeView() {
 		if (this.options.get('hasCodeMirror')) {
 			return this._codeMirrorEditor('get', null, null);
 		} else {
@@ -476,7 +473,7 @@ Viewer.prototype = {
 	 * @description Convert the data of the code view and put it in the WYSIWYG area.
 	 * @private
 	 */
-	_setCodeDataToEditor: function () {
+	_setCodeDataToEditor() {
 		const code_html = this._getCodeView();
 
 		if (this.editor.frameOptions.get('iframe_fullPage')) {
@@ -523,7 +520,7 @@ Viewer.prototype = {
 	 * @description Convert the data of the WYSIWYG area and put it in the code view area.
 	 * @private
 	 */
-	_setEditorDataToCodeView: function () {
+	_setEditorDataToCodeView() {
 		const codeContent = this.html._convertToCode(this.editor.frameContext.get('wysiwyg'), false);
 		let codeValue = '';
 

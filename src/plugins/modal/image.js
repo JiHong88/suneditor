@@ -124,7 +124,7 @@ Image_.prototype = {
 	/**
 	 * @override type = "modal"
 	 */
-	open: function () {
+	open() {
 		this.modal.open();
 	},
 
@@ -132,7 +132,7 @@ Image_.prototype = {
 	 * @override modal
 	 * @param {boolean} isUpdate open state is update
 	 */
-	on: function (isUpdate) {
+	on(isUpdate) {
 		if (!isUpdate) {
 			this.inputX.value = this._origin_w = this.pluginOptions.defaultWidth === 'auto' ? '' : this.pluginOptions.defaultWidth;
 			this.inputY.value = this._origin_h = this.pluginOptions.defaultHeight === 'auto' ? '' : this.pluginOptions.defaultHeight;
@@ -148,7 +148,7 @@ Image_.prototype = {
 	 * @override modal
 	 * @returns {boolean | undefined}
 	 */
-	modalAction: function () {
+	modalAction() {
 		this._align = this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
 
 		if (this.modal.isUpdate) {
@@ -168,7 +168,7 @@ Image_.prototype = {
 	/**
 	 * @override modal
 	 */
-	init: function () {
+	init() {
 		if (this.imgInputFile) this.imgInputFile.value = '';
 		if (this.imgUrlFile) this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = '';
 		if (this.imgInputFile && this.imgUrlFile) {
@@ -200,14 +200,14 @@ Image_.prototype = {
 	 * @description Called when a container is selected.
 	 * @param {Element} element Target element
 	 */
-	select: function (element) {
+	select(element) {
 		this.ready(element);
 	},
 
 	/**
 	 * @override fileManager, figure
 	 */
-	ready: function (target) {
+	ready(target) {
 		if (!target) return;
 		const figureInfo = this.figure.open(target, this._nonResizing, false);
 		this.anchor.set(domUtils.isAnchor(target.parentNode) ? target.parentNode : null);
@@ -263,7 +263,7 @@ Image_.prototype = {
 	/**
 	 * @override fileManager
 	 */
-	destroy: function (element) {
+	destroy(element) {
 		const targetEl = element || this._element;
 		const container = domUtils.getParentElement(targetEl, this.component.is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
@@ -287,7 +287,7 @@ Image_.prototype = {
 		this.history.push(false);
 	},
 
-	_submitFile: function (fileList) {
+	_submitFile(fileList) {
 		if (fileList.length === 0) return false;
 
 		let fileSize = 0;
@@ -327,17 +327,13 @@ Image_.prototype = {
 		};
 
 		if (typeof this.events.onImageUploadBefore === 'function') {
-			const result = this.events.onImageUploadBefore(
-				files,
-				info,
-				function (data) {
-					if (data && this._w.Array.isArray(data.result)) {
-						this._register(info, data);
-					} else {
-						this._serverUpload(info, data);
-					}
-				}.bind(this)
-			);
+			const result = this.events.onImageUploadBefore(files, info, (data) => {
+				if (data && this._w.Array.isArray(data.result)) {
+					this._register(info, data);
+				} else {
+					this._serverUpload(info, data);
+				}
+			});
 
 			if (result === undefined) return true;
 			if (result === false) return false;
@@ -347,7 +343,7 @@ Image_.prototype = {
 		this._serverUpload(info, files);
 	},
 
-	_submitURL: function (url) {
+	_submitURL(url) {
 		if (!url) url = this._linkValue;
 		if (!url) return false;
 
@@ -361,7 +357,7 @@ Image_.prototype = {
 		return true;
 	},
 
-	_update: function (width, height) {
+	_update(width, height) {
 		if (!width) width = this.inputX.value || 'auto';
 		if (!height) height = this.inputY.value || 'auto';
 
@@ -508,7 +504,7 @@ Image_.prototype = {
 		this.figure.setAlign(imageEl, this._align);
 	},
 
-	_openTab: function (e) {
+	_openTab(e) {
 		const modalForm = this.modal.form;
 		const targetElement = e === 'init' ? modalForm.querySelector('._se_tab_link') : e.target;
 
@@ -548,7 +544,7 @@ Image_.prototype = {
 		return false;
 	},
 
-	applySize: function (w, h) {
+	applySize(w, h) {
 		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
 		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
 		if (this._onlyPercentage) {
@@ -558,7 +554,7 @@ Image_.prototype = {
 		this.figure.setSize(w, h, null);
 	},
 
-	create: function (src, anchor, width, height, align, file, alt) {
+	create(src, anchor, width, height, align, file, alt) {
 		let oImg = domUtils.createElement('IMG');
 		oImg.src = src;
 		oImg.alt = alt;
@@ -588,13 +584,13 @@ Image_.prototype = {
 		if (this.component.insert(container, false, true)) this.fileManager.setInfo(oImg, file);
 	},
 
-	_updateSrc: function (src, element, file) {
+	_updateSrc(src, element, file) {
 		element.src = src;
 		this.fileManager.setInfo(element, file);
 		this.component.select(element, 'image');
 	},
 
-	_register: function (info, response) {
+	_register(info, response) {
 		const fileList = response.result;
 
 		for (let i = 0, len = fileList.length, file; i < len; i++) {
@@ -611,7 +607,7 @@ Image_.prototype = {
 		}
 	},
 
-	_serverUpload: function (info, files) {
+	_serverUpload(info, files) {
 		if (!files) return;
 		if (typeof files === 'string') {
 			this._error(files, null);
@@ -627,7 +623,7 @@ Image_.prototype = {
 		}
 	},
 
-	_setBase64: function (files, anchor, width, height, align, alt, isUpdate) {
+	_setBase64(files, anchor, width, height, align, alt, isUpdate) {
 		try {
 			const filesLen = this.modal.isUpdate ? 1 : files.length;
 			this._base64RenderIndex = filesLen;
@@ -660,7 +656,7 @@ Image_.prototype = {
 		}
 	},
 
-	_onRenderBase64: function (update, filesStack, updateElement, anchor, width, height, align, alt) {
+	_onRenderBase64(update, filesStack, updateElement, anchor, width, height, align, alt) {
 		for (let i = 0, len = filesStack.length; i < len; i++) {
 			if (update) {
 				this._element.setAttribute('data-se-file-name', filesStack[i].file.name);
@@ -672,7 +668,7 @@ Image_.prototype = {
 		}
 	},
 
-	_setAnchor: function (imgTag, anchor) {
+	_setAnchor(imgTag, anchor) {
 		if (anchor) {
 			anchor.appendChild(imgTag);
 			return anchor;
@@ -681,7 +677,7 @@ Image_.prototype = {
 		return imgTag;
 	},
 
-	_error: function (message, response) {
+	_error(message, response) {
 		if (typeof this.events.onImageUploadError !== 'function' || this.events.onImageUploadError(message, response)) {
 			this.notice.open(message);
 			throw Error('[SUNEDITOR.plugin.image.error] response: ' + message);
@@ -758,9 +754,9 @@ function OnLinkPreview(e) {
 	const value = e.target.value.trim();
 	this._linkValue = this.previewSrc.textContent = !value
 		? ''
-		: this.options.get('defaultUrlProtocol') && value.indexOf('://') === -1 && value.indexOf('#') !== 0
+		: this.options.get('defaultUrlProtocol') && !value.includes('://') && value.indexOf('#') !== 0
 		? this.options.get('defaultUrlProtocol') + value
-		: value.indexOf('://') === -1
+		: !value.includes('://')
 		? '/' + value
 		: value;
 }

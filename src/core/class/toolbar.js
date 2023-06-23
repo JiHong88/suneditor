@@ -38,7 +38,7 @@ Toolbar.prototype = {
 	/**
 	 * @description Disable the toolbar
 	 */
-	disable: function () {
+	disable() {
 		/** off menus */
 		this._moreLayerOff();
 		this.menu.dropdownOff();
@@ -49,14 +49,14 @@ Toolbar.prototype = {
 	/**
 	 * @description Enable the toolbar
 	 */
-	enable: function () {
+	enable() {
 		domUtils.setDisabled(this.context.get(this.keyName + '.buttonTray').querySelectorAll('.se-menu-list button[data-type]'), false);
 	},
 
 	/**
 	 * @description Show the toolbar
 	 */
-	show: function () {
+	show() {
 		if (this._isInline) {
 			this._showInline();
 		} else if (this._isBalloon) {
@@ -72,7 +72,7 @@ Toolbar.prototype = {
 	/**
 	 * @description Hide the toolbar
 	 */
-	hide: function () {
+	hide() {
 		if (this._isInline) {
 			this.context.get(this.keyName + '.main').style.display = 'none';
 			this.context.get(this.keyName + '.main').style.top = '0px';
@@ -92,7 +92,7 @@ Toolbar.prototype = {
 	/**
 	 * @description Reset buttons of the responsive toolbar.
 	 */
-	resetResponsiveToolbar: function () {
+	resetResponsiveToolbar() {
 		this.menu.containerOff();
 
 		const responsiveSize = this._rButtonsize;
@@ -125,7 +125,7 @@ Toolbar.prototype = {
 	 * You cannot set a new plugin for the button.
 	 * @param {Array} buttonList Button list
 	 */
-	setButtons: function (buttonList) {
+	setButtons(buttonList) {
 		this._moreLayerOff();
 		this.menu.dropdownOff();
 		this.menu.containerOff();
@@ -144,7 +144,7 @@ Toolbar.prototype = {
 		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar.buttonTray.querySelectorAll('button'));
 	},
 
-	_resetSticky: function () {
+	_resetSticky() {
 		const toolbar = this.context.get(this.keyName + '.main');
 		if (this.editor.frameContext.get('isFullScreen') || toolbar.offsetWidth === 0 || this.options.get('toolbar_sticky') < 0) return;
 
@@ -166,7 +166,7 @@ Toolbar.prototype = {
 		}
 	},
 
-	_onSticky: function (inlineOffset) {
+	_onSticky(inlineOffset) {
 		const toolbar = this.context.get(this.keyName + '.main');
 
 		if (!this._isInline) {
@@ -181,7 +181,7 @@ Toolbar.prototype = {
 		this._sticky = true;
 	},
 
-	_offSticky: function () {
+	_offSticky() {
 		const stickyDummy = !this.options.get('toolbar_container') ? this.editor.frameContext.get('_stickyDummy') : this.context.get('_stickyDummy');
 		stickyDummy.style.display = 'none';
 
@@ -194,7 +194,7 @@ Toolbar.prototype = {
 		this._sticky = false;
 	},
 
-	_setResponsive: function () {
+	_setResponsive() {
 		if (this._rButtonArray && this._rButtonArray.length === 0) {
 			this._rButtonArray = null;
 			return;
@@ -221,7 +221,7 @@ Toolbar.prototype = {
 			.unshift('default');
 	},
 
-	_showBalloon: function (rangeObj) {
+	_showBalloon(rangeObj) {
 		if (!this._isBalloon || this.editor.opendControllers.length > 0) {
 			return;
 		}
@@ -254,7 +254,7 @@ Toolbar.prototype = {
 		});
 	},
 
-	_setBalloonOffset: function (positionTop, range) {
+	_setBalloonOffset(positionTop, range) {
 		range = range || this.selection.getRange();
 		const rectsObj = this.selection.getRects(range, positionTop ? 'start' : 'end');
 		positionTop = rectsObj.position === 'start';
@@ -305,7 +305,7 @@ Toolbar.prototype = {
 		};
 	},
 
-	_setBalloonPosition: function (isDirTop, rects, toolbarEl, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop) {
+	_setBalloonPosition(isDirTop, rects, toolbarEl, editorLeft, editorWidth, scrollLeft, scrollTop, stickyTop) {
 		const padding = 1;
 		const arrow = this.context.get(this.keyName + '._arrow');
 		const arrowMargin = this._w.Math.round(arrow.offsetWidth / 2);
@@ -345,12 +345,12 @@ Toolbar.prototype = {
 		arrow.style.left = (arrow_left + arrowMargin > toolbarEl.offsetWidth ? toolbarEl.offsetWidth - arrowMargin : arrow_left < arrowMargin ? arrowMargin : arrow_left) + 'px';
 	},
 
-	_getPageBottomSpace: function () {
+	_getPageBottomSpace() {
 		const topArea = this.editor.frameContext.get('topArea');
 		return this._d.documentElement.scrollHeight - (this.offset.getGlobal(topArea).top + topArea.offsetHeight);
 	},
 
-	_showInline: function () {
+	_showInline() {
 		if (!this._isInline) return;
 
 		const toolbar = this.context.get(this.keyName + '.main');
@@ -369,7 +369,7 @@ Toolbar.prototype = {
 		toolbar.style.visibility = '';
 	},
 
-	_moreLayerOn: function (button, layer) {
+	_moreLayerOn(button, layer) {
 		this._moreLayerOff();
 		this.currentMoreLayerActiveButton = button;
 		layer.style.display = 'block';
@@ -378,7 +378,7 @@ Toolbar.prototype = {
 	/**
 	 * @description Disable more layer
 	 */
-	_moreLayerOff: function () {
+	_moreLayerOff() {
 		if (this.currentMoreLayerActiveButton) {
 			const layer = this.context.get(this.keyName + '.main').querySelector('.' + this.currentMoreLayerActiveButton.getAttribute('data-command'));
 			layer.style.display = 'none';

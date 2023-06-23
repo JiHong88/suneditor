@@ -23,7 +23,7 @@ Format.prototype = {
 	 * @description Replace the line tag of the current selection.
 	 * @param {Element} element Line element (P, DIV..)
 	 */
-	setLine: function (element) {
+	setLine(element) {
 		if (!this.isLine(element)) {
 			throw new Error('[SUNEDITOR.format.setLine.fail] The "element" must satisfy "format.isLine()".');
 		}
@@ -61,7 +61,7 @@ Format.prototype = {
 	 * @param {Function|null} validation Additional validation function.
 	 * @returns {Element|null}
 	 */
-	getLine: function (node, validation) {
+	getLine(node, validation) {
 		if (!node) return null;
 		if (!validation) {
 			validation = function () {
@@ -84,7 +84,7 @@ Format.prototype = {
 	 * @description Replace the br-line tag of the current selection.
 	 * @param {Element} element BR-Line element (PRE..)
 	 */
-	setBrLine: function (element) {
+	setBrLine(element) {
 		if (!this.isBrLine(element)) {
 			throw new Error('[SUNEDITOR.format.setBrLine.fail] The "element" must satisfy "format.isBrLine()".');
 		}
@@ -156,7 +156,7 @@ Format.prototype = {
 	 * @param {Function|null} validation Additional validation function.
 	 * @returns {Element|null}
 	 */
-	getBrLine: function (element, validation) {
+	getBrLine(element, validation) {
 		if (!element) return null;
 		if (!validation) {
 			validation = function () {
@@ -182,7 +182,7 @@ Format.prototype = {
 	 * @param {string|Element|null} lineNode Node name or node obejct to be inserted
 	 * @returns {Element}
 	 */
-	addLine: function (element, lineNode) {
+	addLine(element, lineNode) {
 		if (!element || !element.parentNode) return null;
 
 		const currentFormatEl = this.getLine(this.selection.getNode(), null);
@@ -190,7 +190,13 @@ Format.prototype = {
 		if (!this.isBrLine(element) && this.isBrLine(currentFormatEl || element.parentNode)) {
 			oFormat = domUtils.createElement('BR');
 		} else {
-			const oFormatName = lineNode ? (typeof lineNode === 'string' ? lineNode : lineNode.nodeName) : this.isLine(currentFormatEl) && !this.isBlock(currentFormatEl) && !this.isBrLine(currentFormatEl) ? currentFormatEl.nodeName : this.options.get('defaultLine');
+			const oFormatName = lineNode
+				? typeof lineNode === 'string'
+					? lineNode
+					: lineNode.nodeName
+				: this.isLine(currentFormatEl) && !this.isBlock(currentFormatEl) && !this.isBrLine(currentFormatEl)
+				? currentFormatEl.nodeName
+				: this.options.get('defaultLine');
 			oFormat = domUtils.createElement(oFormatName, null, '<br>');
 			if ((lineNode && typeof lineNode !== 'string') || (!lineNode && this.isLine(currentFormatEl))) {
 				domUtils.copyTagAttributes(oFormat, lineNode || currentFormatEl, ['id']);
@@ -209,7 +215,7 @@ Format.prototype = {
 	 * @param {Function|null} validation Additional validation function.
 	 * @returns {Element|null}
 	 */
-	getBlock: function (element, validation) {
+	getBlock(element, validation) {
 		if (!element) return null;
 		if (!validation) {
 			validation = function () {
@@ -230,7 +236,7 @@ Format.prototype = {
 	 * @description Appended all selected format Element to the argument element and insert
 	 * @param {Element} block Element of wrap the arguments (BLOCKQUOTE...)
 	 */
-	applyBlock: function (block) {
+	applyBlock(block) {
 		this.selection.getRangeAndAddLine(this.selection.getRange(), null);
 		const rangeLines = this.getLinesAndComponents(false);
 		if (!rangeLines || rangeLines.length === 0) return;
@@ -240,13 +246,13 @@ Format.prototype = {
 			if (!domUtils.isListCell(line)) continue;
 
 			nested = line.lastElementChild;
-			if (nested && domUtils.isListCell(line.nextElementSibling) && rangeLines.indexOf(line.nextElementSibling) > -1) {
+			if (nested && domUtils.isListCell(line.nextElementSibling) && rangeLines.includes(line.nextElementSibling)) {
 				lEl = nested.lastElementChild;
-				if (rangeLines.indexOf(lEl) > -1) {
+				if (rangeLines.includes(lEl)) {
 					let list = null;
 					while ((list = lEl.lastElementChild)) {
 						if (domUtils.isList(list)) {
-							if (rangeLines.indexOf(list.lastElementChild) > -1) {
+							if (rangeLines.includes(list.lastElementChild)) {
 								lEl = list.lastElementChild;
 							} else {
 								continue linesLoop;
@@ -285,7 +291,7 @@ Format.prototype = {
 		let parentDepth = domUtils.getNodeDepth(standTag);
 		let listParent = null;
 		const lineArr = [];
-		const removeItems = function (parent, origin, before) {
+		const removeItems = (parent, origin, before) => {
 			let cc = null;
 			if (parent !== origin && !domUtils.isTable(origin)) {
 				if (origin && domUtils.getNodeDepth(parent) === domUtils.getNodeDepth(origin)) return before;
@@ -293,7 +299,7 @@ Format.prototype = {
 			}
 
 			return cc ? cc.ec : before;
-		}.bind(this);
+		};
 
 		for (let i = 0, len = rangeLines.length, line, originParent, depth, before, nextLine, nextList, nested; i < len; i++) {
 			line = rangeLines[i];
@@ -381,12 +387,9 @@ Format.prototype = {
 
 		// Nested list
 		if (beforeTag && domUtils.getNodeDepth(beforeTag) > 0 && (domUtils.isList(beforeTag.parentNode) || domUtils.isList(beforeTag.parentNode.parentNode))) {
-			const depthFormat = domUtils.getParentElement(
-				beforeTag,
-				function (current) {
-					return this.isBlock(current) && !domUtils.isList(current);
-				}.bind(this)
-			);
+			const depthFormat = domUtils.getParentElement(beforeTag, (current) => {
+				return this.isBlock(current) && !domUtils.isList(current);
+			});
 			const splitRange = this.node.split(beforeTag, null, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
 			splitRange.parentNode.insertBefore(block, splitRange);
 		} else {
@@ -416,7 +419,7 @@ Format.prototype = {
 	 * @param {boolean} notHistoryPush When true, it does not update the history stack and the selection object and return EdgeNodes (domUtils.getEdgeChildNodes)
 	 * @returns {Object}
 	 */
-	removeBlock: function (rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush) {
+	removeBlock(rangeElement, selectedFormats, newRangeElement, remove, notHistoryPush) {
 		const inst = this;
 		const range = this.selection.getRange();
 		let so = range.startOffset;
@@ -525,7 +528,11 @@ Format.prototype = {
 				}
 
 				if (!newList && domUtils.isListCell(insNode)) {
-					if (next && domUtils.getNodeDepth(insNode) !== domUtils.getNodeDepth(next) && (domUtils.isListCell(parent) || domUtils.getArrayItem(insNode.children, domUtils.isList, false))) {
+					if (
+						next &&
+						domUtils.getNodeDepth(insNode) !== domUtils.getNodeDepth(next) &&
+						(domUtils.isListCell(parent) || domUtils.getArrayItem(insNode.children, domUtils.isList, false))
+					) {
 						const insNext = insNode.nextElementSibling;
 						const detachRange = this._removeNestedList(insNode, false);
 						if (rangeElement !== detachRange || insNext !== insNode.nextElementSibling) {
@@ -534,7 +541,15 @@ Format.prototype = {
 						}
 					} else {
 						const inner = insNode;
-						insNode = domUtils.createElement(remove ? inner.nodeName : domUtils.isList(rangeElement.parentNode) || domUtils.isListCell(rangeElement.parentNode) ? 'LI' : domUtils.isTableCell(rangeElement.parentNode) ? 'DIV' : this.options.get('defaultLine'));
+						insNode = domUtils.createElement(
+							remove
+								? inner.nodeName
+								: domUtils.isList(rangeElement.parentNode) || domUtils.isListCell(rangeElement.parentNode)
+								? 'LI'
+								: domUtils.isTableCell(rangeElement.parentNode)
+								? 'DIV'
+								: this.options.get('defaultLine')
+						);
 						const isCell = domUtils.isListCell(insNode);
 						const innerChildren = inner.childNodes;
 						while (innerChildren[0]) {
@@ -650,7 +665,7 @@ Format.prototype = {
 	 * @param {Element} selectedCells Format elements or list cells.
 	 * @param {boolean} nested If true, indenting existing list cells.
 	 */
-	applyList: function (type, selectedCells, nested) {
+	applyList(type, selectedCells, nested) {
 		const listTag = type.split(':')[0] === 'bullet' ? 'UL' : 'OL';
 		const listStyle = type.split(':')[1] || '';
 
@@ -669,13 +684,20 @@ Format.prototype = {
 		// merge
 		let firstSel = selectedFormats[0];
 		let lastSel = selectedFormats[selectedFormats.length - 1];
-		let topEl = (domUtils.isListCell(firstSel) || this.component.is(firstSel)) && !firstSel.previousElementSibling ? firstSel.parentNode.previousElementSibling : firstSel.previousElementSibling;
-		let bottomEl = (domUtils.isListCell(lastSel) || this.component.is(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentNode.nextElementSibling : lastSel.nextElementSibling;
+		let topEl =
+			(domUtils.isListCell(firstSel) || this.component.is(firstSel)) && !firstSel.previousElementSibling
+				? firstSel.parentNode.previousElementSibling
+				: firstSel.previousElementSibling;
+		let bottomEl =
+			(domUtils.isListCell(lastSel) || this.component.is(lastSel)) && !lastSel.nextElementSibling ? lastSel.parentNode.nextElementSibling : lastSel.nextElementSibling;
 
 		const isCollapsed = range.collapsed;
 		const originRange = {
 			sc: range.startContainer,
-			so: range.startContainer === range.endContainer && domUtils.isZeroWith(range.startContainer) && range.startOffset === 0 && range.endOffset === 1 ? range.endOffset : range.startOffset,
+			so:
+				range.startContainer === range.endContainer && domUtils.isZeroWith(range.startContainer) && range.startOffset === 0 && range.endOffset === 1
+					? range.endOffset
+					: range.startOffset,
 			ec: range.endContainer,
 			eo: range.endOffset
 		};
@@ -685,12 +707,9 @@ Format.prototype = {
 		for (let i = 0, len = selectedFormats.length; i < len; i++) {
 			if (
 				!domUtils.isList(
-					this.getBlock(
-						selectedFormats[i],
-						function (current) {
-							return this.getBlock(current) && current !== selectedFormats[i];
-						}.bind(this)
-					)
+					this.getBlock(selectedFormats[i], (current) => {
+						return this.getBlock(current) && current !== selectedFormats[i];
+					})
 				)
 			) {
 				isRemove = false;
@@ -698,7 +717,11 @@ Format.prototype = {
 			}
 		}
 
-		if (isRemove && (!topEl || firstSel.tagName !== topEl.tagName || listTag !== topEl.tagName.toUpperCase()) && (!bottomEl || lastSel.tagName !== bottomEl.tagName || listTag !== bottomEl.tagName.toUpperCase())) {
+		if (
+			isRemove &&
+			(!topEl || firstSel.tagName !== topEl.tagName || listTag !== topEl.tagName.toUpperCase()) &&
+			(!bottomEl || lastSel.tagName !== bottomEl.tagName || listTag !== bottomEl.tagName.toUpperCase())
+		) {
 			if (nested) {
 				for (let i = 0, len = selectedFormats.length; i < len; i++) {
 					for (let j = i - 1; j >= 0; j--) {
@@ -715,9 +738,9 @@ Format.prototype = {
 			const currentFormat = this.getBlock(firstSel);
 			const cancel = currentFormat && currentFormat.tagName === listTag;
 			let rangeArr, tempList;
-			const passComponent = function (current) {
+			const passComponent = (current) => {
 				return !this.component.is(current);
-			}.bind(this);
+			};
 
 			if (!cancel) {
 				tempList = domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
@@ -779,9 +802,9 @@ Format.prototype = {
 			let topNumber = null;
 			let bottomNumber = null;
 
-			const passComponent = function (current) {
+			const passComponent = (current) => {
 				return !this.component.is(current) && !domUtils.isList(current);
-			}.bind(this);
+			};
 
 			for (let i = 0, len = selectedFormats.length, newCell, fTag, isCell, next, originParent, nextParent, parentTag, siblingTag, rangeTag; i < len; i++) {
 				fTag = selectedFormats[i];
@@ -795,7 +818,8 @@ Format.prototype = {
 				isCell = domUtils.isListCell(fTag);
 				rangeTag = this.isBlock(originParent) ? originParent : null;
 				parentTag = isCell && !domUtils.isWysiwygFrame(originParent) ? originParent.parentNode : originParent;
-				siblingTag = isCell && !domUtils.isWysiwygFrame(originParent) ? (!next || domUtils.isListCell(parentTag) ? originParent : originParent.nextSibling) : fTag.nextSibling;
+				siblingTag =
+					isCell && !domUtils.isWysiwygFrame(originParent) ? (!next || domUtils.isListCell(parentTag) ? originParent : originParent.nextSibling) : fTag.nextSibling;
 
 				newCell = domUtils.createElement('LI');
 				domUtils.copyFormatAttributes(newCell, fTag);
@@ -822,7 +846,11 @@ Format.prototype = {
 
 				domUtils.removeItem(fTag);
 				if (mergeTop && topNumber === null) topNumber = list.children.length - 1;
-				if (next && (this.getBlock(nextParent, passComponent) !== this.getBlock(originParent, passComponent) || (domUtils.isList(nextParent) && domUtils.isList(originParent) && domUtils.getNodeDepth(nextParent) !== domUtils.getNodeDepth(originParent)))) {
+				if (
+					next &&
+					(this.getBlock(nextParent, passComponent) !== this.getBlock(originParent, passComponent) ||
+						(domUtils.isList(nextParent) && domUtils.isList(originParent) && domUtils.getNodeDepth(nextParent) !== domUtils.getNodeDepth(originParent)))
+				) {
 					list = domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
 				}
 
@@ -852,15 +880,15 @@ Format.prototype = {
 	 * @param {boolean} remove If true, It does not just remove the list, it deletes the content.
 	 * @returns {Object} {sc: <LI>, ec: <LI>}.
 	 */
-	removeList: function (selectedCells, remove) {
+	removeList(selectedCells, remove) {
 		let rangeArr = {};
 		let listFirst = false;
 		let listLast = false;
 		let first = null;
 		let last = null;
-		const passComponent = function (current) {
+		const passComponent = (current) => {
 			return !this.component.is(current);
-		}.bind(this);
+		};
 
 		for (let i = 0, len = selectedCells.length, r, o, lastIndex, isList; i < len; i++) {
 			lastIndex = i === len - 1;
@@ -916,7 +944,7 @@ Format.prototype = {
 	 * @description Indent more the selected lines.
 	 * margin size - 'status.indentSize'px
 	 */
-	indent: function () {
+	indent() {
 		const range = this.selection.getRange();
 		const sc = range.startContainer;
 		const ec = range.endContainer;
@@ -940,7 +968,7 @@ Format.prototype = {
 	 * @description Indent less the selected lines.
 	 * margin size - "status.indentSize"px
 	 */
-	outdent: function () {
+	outdent() {
 		const range = this.selection.getRange();
 		const sc = range.startContainer;
 		const ec = range.endContainer;
@@ -980,7 +1008,7 @@ Format.prototype = {
 	 * @param {Array|null} removeNodeArray An array of node names to remove types from, remove all formats when "styleNode" is null and there is an empty array or null value. (['span'], ['strong', 'em'] ...])
 	 * @param {Boolean|null} strictRemove If true, only nodes with all styles and classes removed from the nodes of "removeNodeArray" are removed.
 	 */
-	applyTextStyle: function (styleNode, styleArray, removeNodeArray, strictRemove) {
+	applyTextStyle(styleNode, styleArray, removeNodeArray, strictRemove) {
 		if (domUtils.getParentElement(this.selection.getNode(), domUtils.isNonEditable)) return;
 
 		this.selection._resetRangeToTextNode();
@@ -995,15 +1023,16 @@ Format.prototype = {
 		let endCon = range.endContainer;
 		let endOff = range.endOffset;
 
-		if ((isRemoveFormat && range.collapsed && this.isLine(startCon.parentNode) && this.isLine(endCon.parentNode)) || (startCon === endCon && startCon.nodeType === 1 && domUtils.isNonEditable(startCon))) {
+		if (
+			(isRemoveFormat && range.collapsed && this.isLine(startCon.parentNode) && this.isLine(endCon.parentNode)) ||
+			(startCon === endCon && startCon.nodeType === 1 && domUtils.isNonEditable(startCon))
+		) {
 			const format = startCon.parentNode;
 			if (
 				!domUtils.isListCell(format) ||
-				!env.getValues(format.style).some(
-					function (k) {
-						return this._listKebab.indexOf(k) > -1;
-					}.bind(this)
-				)
+				!env.getValues(format.style).some((k) => {
+					return this._listKebab.includes(k);
+				})
 			)
 				return;
 			return;
@@ -1074,7 +1103,12 @@ Format.prototype = {
 							const classReg = /^\./.test(s) ? new wRegExp('\\s*' + s.replace(/^\./, '') + '(\\s+|$)', 'ig') : false;
 
 							const styleCheck = isRemoveNode ? !!sNode.style[s] : !!sNode.style[s] && !!styleNode.style[s] && sNode.style[s] === styleNode.style[s];
-							const classCheck = classReg === false ? false : isRemoveNode ? !!sNode.className.match(classReg) : !!sNode.className.match(classReg) && !!styleNode.className.match(classReg);
+							const classCheck =
+								classReg === false
+									? false
+									: isRemoveNode
+									? !!sNode.className.match(classReg)
+									: !!sNode.className.match(classReg) && !!styleNode.className.match(classReg);
 							if (styleCheck || classCheck) {
 								checkCnt++;
 							}
@@ -1248,7 +1282,21 @@ Format.prototype = {
 		if (oneLine) {
 			if (this._sn_resetCommonListCell(lineNodes[0], styleArray)) range = this.selection.setRange(startCon, startOff, endCon, endOff);
 
-			const newRange = this._setNode_oneLine(lineNodes[0], newNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, range.collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode);
+			const newRange = this._setNode_oneLine(
+				lineNodes[0],
+				newNode,
+				validation,
+				startCon,
+				startOff,
+				endCon,
+				endOff,
+				isRemoveFormat,
+				isRemoveNode,
+				range.collapsed,
+				_removeCheck,
+				_getMaintainedNode,
+				_isMaintainedNode
+			);
 			start.container = newRange.startContainer;
 			start.offset = newRange.startOffset;
 			end.container = newRange.endContainer;
@@ -1268,7 +1316,18 @@ Format.prototype = {
 			// end
 			if (endLength > 0) {
 				newNode = styleNode.cloneNode(false);
-				end = this._setNode_endLine(lineNodes[endLength], newNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode);
+				end = this._setNode_endLine(
+					lineNodes[endLength],
+					newNode,
+					validation,
+					endCon,
+					endOff,
+					isRemoveFormat,
+					isRemoveNode,
+					_removeCheck,
+					_getMaintainedNode,
+					_isMaintainedNode
+				);
 			}
 
 			// mid
@@ -1285,7 +1344,19 @@ Format.prototype = {
 
 			// start
 			newNode = styleNode.cloneNode(false);
-			start = this._setNode_startLine(lineNodes[0], newNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, end.container);
+			start = this._setNode_startLine(
+				lineNodes[0],
+				newNode,
+				validation,
+				startCon,
+				startOff,
+				isRemoveFormat,
+				isRemoveNode,
+				_removeCheck,
+				_getMaintainedNode,
+				_isMaintainedNode,
+				end.container
+			);
 
 			if (start.endContainer) {
 				end.ancestor = null;
@@ -1313,7 +1384,7 @@ Format.prototype = {
 	/**
 	 * @description Remove format of the currently selected text.
 	 */
-	removeTextStyle: function () {
+	removeTextStyle() {
 		this.applyTextStyle(null, null, null, null);
 	},
 
@@ -1324,7 +1395,7 @@ Format.prototype = {
 	 * @param {string} dir Select check point - "front": Front edge, "end": End edge, undefined: Both edge.
 	 * @returns {boolean}
 	 */
-	isEdgeLine: function (node, offset, dir) {
+	isEdgeLine(node, offset, dir) {
 		if (!domUtils.isEdgePoint(node, offset, dir)) return false;
 
 		const result = [];
@@ -1347,7 +1418,7 @@ Format.prototype = {
 	 * @param {Node|string} element The node to check
 	 * @returns {boolean}
 	 */
-	isTextStyleNode: function (element) {
+	isTextStyleNode(element) {
 		return element && element.nodeType !== 3 && /^(strong|span|font|b|var|i|em|u|ins|s|strike|del|sub|sup|mark|a|label|code|summary)$/i.test(element.nodeName || element);
 	},
 
@@ -1357,8 +1428,13 @@ Format.prototype = {
 	 * @param {Node} element The node to check
 	 * @returns {boolean}
 	 */
-	isLine: function (element) {
-		return element && element.nodeType === 1 && (this._formatLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__line_.+(\\s|$)|(\\s|^)__se__format__br_line_.+(\\s|$)')) && !this._nonFormat(element);
+	isLine(element) {
+		return (
+			element &&
+			element.nodeType === 1 &&
+			(this._formatLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__line_.+(\\s|$)|(\\s|^)__se__format__br_line_.+(\\s|$)')) &&
+			!this._nonFormat(element)
+		);
 	},
 
 	/**
@@ -1369,8 +1445,13 @@ Format.prototype = {
 	 * @param {Node} element The node to check
 	 * @returns {boolean}
 	 */
-	isBrLine: function (element) {
-		return element && element.nodeType === 1 && (this._formatBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line_.+(\\s|$)')) && !this._nonFormat(element);
+	isBrLine(element) {
+		return (
+			element &&
+			element.nodeType === 1 &&
+			(this._formatBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line_.+(\\s|$)')) &&
+			!this._nonFormat(element)
+		);
 	},
 
 	/**
@@ -1379,8 +1460,13 @@ Format.prototype = {
 	 * @param {Node} element The node to check
 	 * @returns {boolean}
 	 */
-	isBlock: function (element) {
-		return element && element.nodeType === 1 && (this._formatBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__block_.+(\\s|$)')) && !this._nonFormat(element);
+	isBlock(element) {
+		return (
+			element &&
+			element.nodeType === 1 &&
+			(this._formatBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__block_.+(\\s|$)')) &&
+			!this._nonFormat(element)
+		);
 	},
 
 	/**
@@ -1392,8 +1478,13 @@ Format.prototype = {
 	 * @param {Node} element The node to check
 	 * @returns {boolean}
 	 */
-	isClosureBlock: function (element) {
-		return element && element.nodeType === 1 && (this._formatClosureBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__block_closure_.+(\\s|$)')) && !this._nonFormat(element);
+	isClosureBlock(element) {
+		return (
+			element &&
+			element.nodeType === 1 &&
+			(this._formatClosureBlockCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__block_closure_.+(\\s|$)')) &&
+			!this._nonFormat(element)
+		);
 	},
 
 	/**
@@ -1405,8 +1496,13 @@ Format.prototype = {
 	 * @param {Node} element The node to check
 	 * @returns {boolean}
 	 */
-	isClosureBrLine: function (element) {
-		return element && element.nodeType === 1 && (this._formatClosureBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line__closure_.+(\\s|$)')) && !this._nonFormat(element);
+	isClosureBrLine(element) {
+		return (
+			element &&
+			element.nodeType === 1 &&
+			(this._formatClosureBrLineCheck.test(element.nodeName) || domUtils.hasClass(element, '(\\s|^)__se__format__br_line__closure_.+(\\s|$)')) &&
+			!this._nonFormat(element)
+		);
 	},
 
 	/**
@@ -1414,7 +1510,7 @@ Format.prototype = {
 	 * @param {Function|null} validation The validation function. (Replaces the default validation format.isLine(current))
 	 * @returns {Array}
 	 */
-	getLines: function (validation) {
+	getLines(validation) {
 		if (!this.selection._resetRangeToTextNode()) return [];
 		let range = this.selection.getRange();
 
@@ -1431,12 +1527,9 @@ Format.prototype = {
 		const commonCon = range.commonAncestorContainer;
 
 		// get line nodes
-		const lineNodes = domUtils.getListChildren(
-			commonCon,
-			function (current) {
-				return validation ? validation(current) : this.isLine(current);
-			}.bind(this)
-		);
+		const lineNodes = domUtils.getListChildren(commonCon, (current) => {
+			return validation ? validation(current) : this.isLine(current);
+		});
 
 		if (!domUtils.isWysiwygFrame(commonCon) && !this.isBlock(commonCon)) lineNodes.unshift(this.getLine(commonCon, null));
 		if (startCon === endCon || lineNodes.length === 1) return lineNodes;
@@ -1482,17 +1575,15 @@ Format.prototype = {
 	 * @param {boolean} removeDuplicate If true, if there is a parent and child tag among the selected elements, the child tag is excluded.
 	 * @returns {Array}
 	 */
-	getLinesAndComponents: function (removeDuplicate) {
+	getLinesAndComponents(removeDuplicate) {
 		const commonCon = this.selection.getRange().commonAncestorContainer;
 		const myComponent = domUtils.getParentElement(commonCon, this.component.is);
 		const selectedLines = domUtils.isTable(commonCon)
 			? this.getLines(null)
-			: this.getLines(
-					function (current) {
-						const component = domUtils.getParentElement(current, this.component.is);
-						return (this.isLine(current) && (!component || component === myComponent)) || (this.component.is(current) && !this.getLine(current));
-					}.bind(this)
-			  );
+			: this.getLines((current) => {
+					const component = domUtils.getParentElement(current, this.component.is);
+					return (this.isLine(current) && (!component || component === myComponent)) || (this.component.is(current) && !this.getLine(current));
+			  });
 
 		if (removeDuplicate) {
 			for (let i = 0, len = selectedLines.length; i < len; i++) {
@@ -1516,9 +1607,9 @@ Format.prototype = {
 	 * @returns {boolean}
 	 * @private
 	 */
-	_isExcludeSelectionElement: function (element) {
-        return !/FIGCAPTION/i.test(element.nodeName) && (this.component.is(element) || /FIGURE/i.test(element.nodeName));
-    },
+	_isExcludeSelectionElement(element) {
+		return !/FIGCAPTION/i.test(element.nodeName) && (this.component.is(element) || /FIGURE/i.test(element.nodeName));
+	},
 
 	/**
 	 * @description A function that distinguishes non-formatting HTML elements or tags from formatting ones.
@@ -1526,7 +1617,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 * @private
 	 */
-	_nonFormat: function (element) {
+	_nonFormat(element) {
 		return domUtils.isExcludeFormat(element) || this.component.is(element) || domUtils.isWysiwygFrame(element);
 	},
 
@@ -1536,7 +1627,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 * @private
 	 */
-	_isNonSplitNode: function (element) {
+	_isNonSplitNode(element) {
 		return element && element.nodeType !== 3 && /^(a|label|code|summary)$/i.test(typeof element === 'string' ? element : element.nodeName);
 	},
 
@@ -1546,8 +1637,12 @@ Format.prototype = {
 	 * @returns {boolean}
 	 * @private
 	 */
-	_notTextNode: function (element) {
-		return element && element.nodeType !== 3 && (this.component.is(element) || /^(br|input|select|canvas|img|iframe|audio|video)$/i.test(typeof element === 'string' ? element : element.nodeName));
+	_notTextNode(element) {
+		return (
+			element &&
+			element.nodeType !== 3 &&
+			(this.component.is(element) || /^(br|input|select|canvas|img|iframe|audio|video)$/i.test(typeof element === 'string' ? element : element.nodeName))
+		);
 	},
 
 	/**
@@ -1556,7 +1651,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 * @private
 	 */
-	_isIgnoreNodeChange: function (element) {
+	_isIgnoreNodeChange(element) {
 		return element && element.nodeType !== 3 && (domUtils.isNonEditable(element) || !this.isTextStyleNode(element));
 	},
 
@@ -1565,7 +1660,7 @@ Format.prototype = {
 	 * @returns { lines: Array.<Element>, firstNode: Node,  lastNode: Node, firstPath: Array.<number>, lastPath: Array.<number>, startOffset: number, endOffset: number }
 	 * @private
 	 */
-	_lineWork: function () {
+	_lineWork() {
 		let range = this.selection.getRange();
 		let selectedFormsts = this.getLinesAndComponents(false);
 
@@ -1602,7 +1697,7 @@ Format.prototype = {
 		};
 	},
 
-	_attachNested: function (originList, innerList, prev, next, nodePath) {
+	_attachNested(originList, innerList, prev, next, nodePath) {
 		let insertPrev = false;
 
 		if (prev && innerList.tagName === prev.tagName) {
@@ -1651,7 +1746,7 @@ Format.prototype = {
 		return innerList;
 	},
 
-	_detachNested: function (cells) {
+	_detachNested(cells) {
 		const first = cells[0];
 		const last = cells[cells.length - 1];
 		const next = last.nextElementSibling;
@@ -1691,7 +1786,7 @@ Format.prototype = {
 	 * @param nested Nested or cancel nested.
 	 * @private
 	 */
-	_applyNestedList: function (selectedCells, nested) {
+	_applyNestedList(selectedCells, nested) {
 		selectedCells = !selectedCells
 			? this.getLines().filter(function (el) {
 					return domUtils.isListCell(el);
@@ -1767,7 +1862,7 @@ Format.prototype = {
 	 * @returns {Element}
 	 * @private
 	 */
-	_removeNestedList: function (baseNode, all) {
+	_removeNestedList(baseNode, all) {
 		const rNode = DeleteNestedList(baseNode);
 		let rangeElement, cNodes;
 
@@ -1821,7 +1916,21 @@ Format.prototype = {
 	 * @returns {{ancestor: *, startContainer: *, startOffset: *, endContainer: *, endOffset: *}}
 	 * @private
 	 */
-	_setNode_oneLine: function (element, newInnerNode, validation, startCon, startOff, endCon, endOff, isRemoveFormat, isRemoveNode, collapsed, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
+	_setNode_oneLine(
+		element,
+		newInnerNode,
+		validation,
+		startCon,
+		startOff,
+		endCon,
+		endOff,
+		isRemoveFormat,
+		isRemoveNode,
+		collapsed,
+		_removeCheck,
+		_getMaintainedNode,
+		_isMaintainedNode
+	) {
 		// not add tag
 		let parentCon = startCon.parentNode;
 		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.isLine(parentCon.parentNode) && !domUtils.isWysiwygFrame(parentCon.parentNode)) {
@@ -1907,7 +2016,18 @@ Format.prototype = {
 					let line = pNode;
 					anchorNode = _getMaintainedNode(child);
 					const prevNode = domUtils.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(0, startOffset));
-					const textNode = domUtils.createTextNode(startContainer.nodeType === 1 ? '' : startContainer.substringData(startOffset, isSameNode ? (endOffset >= startOffset ? endOffset - startOffset : startContainer.data.length - startOffset) : startContainer.data.length - startOffset));
+					const textNode = domUtils.createTextNode(
+						startContainer.nodeType === 1
+							? ''
+							: startContainer.substringData(
+									startOffset,
+									isSameNode
+										? endOffset >= startOffset
+											? endOffset - startOffset
+											: startContainer.data.length - startOffset
+										: startContainer.data.length - startOffset
+							  )
+					);
 
 					if (anchorNode) {
 						const a = _getMaintainedNode(ancestor);
@@ -2272,7 +2392,19 @@ Format.prototype = {
 	 * @returns {Object} { ancestor, container, offset, endContainer }
 	 * @private
 	 */
-	_setNode_startLine: function (element, newInnerNode, validation, startCon, startOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode, _endContainer) {
+	_setNode_startLine(
+		element,
+		newInnerNode,
+		validation,
+		startCon,
+		startOff,
+		isRemoveFormat,
+		isRemoveNode,
+		_removeCheck,
+		_getMaintainedNode,
+		_isMaintainedNode,
+		_endContainer
+	) {
 		// not add tag
 		let parentCon = startCon.parentNode;
 		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.isLine(parentCon.parentNode) && !domUtils.isWysiwygFrame(parentCon.parentNode)) {
@@ -2280,7 +2412,13 @@ Format.prototype = {
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.nextSibling && domUtils.isZeroWith(startCon.textContent.slice(0, startOff))) {
+		if (
+			!isRemoveNode &&
+			parentCon.nodeName === newInnerNode.nodeName &&
+			!this.isLine(parentCon) &&
+			!parentCon.nextSibling &&
+			domUtils.isZeroWith(startCon.textContent.slice(0, startOff))
+		) {
 			let sameTag = false;
 			let s = startCon.previousSibling;
 			while (s) {
@@ -2567,7 +2705,7 @@ Format.prototype = {
 	 * @returns {Object} { ancestor, endContainer: "If end container is renewed, returned renewed node" }
 	 * @private
 	 */
-	_setNode_middleLine: function (element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, _endContainer) {
+	_setNode_middleLine(element, newInnerNode, validation, isRemoveFormat, isRemoveNode, _removeCheck, _endContainer) {
 		// not add tag
 		if (!isRemoveNode) {
 			// end container path
@@ -2705,7 +2843,7 @@ Format.prototype = {
 	 * @returns {Object} { ancestor, container, offset }
 	 * @private
 	 */
-	_setNode_endLine: function (element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
+	_setNode_endLine(element, newInnerNode, validation, endCon, endOff, isRemoveFormat, isRemoveNode, _removeCheck, _getMaintainedNode, _isMaintainedNode) {
 		// not add tag
 		let parentCon = endCon.parentNode;
 		while (!parentCon.nextSibling && !parentCon.previousSibling && !this.isLine(parentCon.parentNode) && !domUtils.isWysiwygFrame(parentCon.parentNode)) {
@@ -2713,7 +2851,13 @@ Format.prototype = {
 			parentCon = parentCon.parentNode;
 		}
 
-		if (!isRemoveNode && parentCon.nodeName === newInnerNode.nodeName && !this.isLine(parentCon) && !parentCon.previousSibling && domUtils.isZeroWith(endCon.textContent.slice(endOff))) {
+		if (
+			!isRemoveNode &&
+			parentCon.nodeName === newInnerNode.nodeName &&
+			!this.isLine(parentCon) &&
+			!parentCon.previousSibling &&
+			domUtils.isZeroWith(endCon.textContent.slice(endOff))
+		) {
 			let sameTag = false;
 			let e = endCon.nextSibling;
 			while (e) {
@@ -3011,7 +3155,7 @@ Format.prototype = {
 	 * @returns {boolean}
 	 * @private
 	 */
-	_sn_isSizeNode: function (element) {
+	_sn_isSizeNode(element) {
 		return element && typeof element !== 'string' && element.nodeType !== 3 && this.isTextStyleNode(element) && element.style.fontSize;
 	},
 
@@ -3021,7 +3165,7 @@ Format.prototype = {
 	 * @returns {Element}
 	 * @private
 	 */
-	_sn_getMaintainedNode: function (_isRemove, _isSizeNode, element) {
+	_sn_getMaintainedNode(_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove) return null;
 		return domUtils.getParentElement(element, this._isNonSplitNode) || (!_isSizeNode ? domUtils.getParentElement(element, this._sn_isSizeNode.bind(this)) : null);
 	},
@@ -3032,7 +3176,7 @@ Format.prototype = {
 	 * @returns {Element}
 	 * @private
 	 */
-	_sn_isMaintainedNode: function (_isRemove, _isSizeNode, element) {
+	_sn_isMaintainedNode(_isRemove, _isSizeNode, element) {
 		if (!element || _isRemove || element.nodeType !== 1) return false;
 		const anchor = this._isNonSplitNode(element);
 		return domUtils.getParentElement(element, this._isNonSplitNode) ? anchor : anchor || (!_isSizeNode ? this._sn_isSizeNode(element) : false);
@@ -3044,7 +3188,7 @@ Format.prototype = {
 	 * @param {Element|null} child Variable for recursive call. ("null" on the first call)
 	 * @private
 	 */
-	_sn_setCommonListStyle: function (el, child) {
+	_sn_setCommonListStyle(el, child) {
 		if (!domUtils.isListCell(el)) return;
 
 		const children = domUtils.getArrayItem(
@@ -3072,7 +3216,7 @@ Format.prototype = {
 		const cKeys = env.getValues(childStyle);
 		if (cKeys.length > 0) {
 			for (let i = 0, len = this._listCamel.length; i < len; i++) {
-				if (cKeys.indexOf(this._listKebab[i]) > -1) {
+				if (cKeys.includes(this._listKebab[i])) {
 					elStyle[this._listCamel[i]] = childStyle[this._listCamel[i]];
 					childStyle.removeProperty(this._listKebab[i]);
 					appliedEl = true;
@@ -3101,7 +3245,7 @@ Format.prototype = {
 	 * @param {Array|null} styleArray Refer style array
 	 * @private
 	 */
-	_sn_resetCommonListCell: function (el, styleArray) {
+	_sn_resetCommonListCell(el, styleArray) {
 		if (!domUtils.isListCell(el)) return;
 		if (!styleArray) styleArray = this._listKebab;
 
@@ -3118,7 +3262,7 @@ Format.prototype = {
 			ek = [],
 			elKeys = env.getValues(elStyles);
 		for (let i = 0, len = this._listKebab.length; i < len; i++) {
-			if (elKeys.indexOf(this._listKebab[i]) > -1 && styleArray.indexOf(this._listKebab[i]) > -1) {
+			if (elKeys.includes(this._listKebab[i]) && styleArray.includes(this._listKebab[i])) {
 				ec.push(this._listCamel[i]);
 				ek.push(this._listKebab[i]);
 			}
@@ -3144,10 +3288,10 @@ Format.prototype = {
 			if (
 				s.length === 0 ||
 				(ec.some(function (k) {
-					return s.indexOf(k) === -1;
+					return !s.includes(k);
 				}) &&
 					s.some(function (k) {
-						ec.indexOf(k) > -1;
+						ec.includes(k);
 					}))
 			) {
 				r = c.nextSibling;

@@ -290,10 +290,10 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // 	imageResizing: true,
 // 	plugins: plugins,
 // 	events: {
-// 		// onBlur: function (a, b, c, d, e) {
+// 		// onBlur(a, b, c, d, e) {
 // 		// 	console.log('blur', a);
 // 		// },
-// 		// onFocus: function () {
+// 		// onFocus() {
 // 		// 	console.log('focus');
 // 		// },
 // 		// onload: () => {

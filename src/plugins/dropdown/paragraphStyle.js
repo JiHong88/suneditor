@@ -24,7 +24,7 @@ ParagraphStyle.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on: function () {
+	on() {
 		const paragraphList = this.classList;
 		const currentFormat = this.format.getLine(this.selection.getNode());
 
@@ -41,7 +41,7 @@ ParagraphStyle.prototype = {
 	 * @override core
 	 * @param {Element} target Target command button
 	 */
-	action: function (target) {
+	action(target) {
 		const value = target.getAttribute('data-command');
 		let selectedFormsts = this.format.getLines();
 		if (selectedFormsts.length === 0) {

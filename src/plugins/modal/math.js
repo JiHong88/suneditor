@@ -30,7 +30,7 @@ const Math_ = function (editor, pluginOptions) {
 
 	// init
 	this.previewElement.style.fontSize = this.defaultFontSize;
-	this.eventManager.addEvent(this.textArea, env.isIE ? 'textinput' : 'input', RenderMathExp.bind(this));
+	this.eventManager.addEvent(this.textArea, 'input', RenderMathExp.bind(this));
 	this.eventManager.addEvent(
 		this.fontSizeElement,
 		'change',
@@ -47,7 +47,7 @@ Math_.prototype = {
 	/**
 	 * @override core
 	 */
-	active: function (element) {
+	active(element) {
 		if (element && element.getAttribute('data-se-value')) {
 			this._element = element;
 			this.controller.open(element);
@@ -61,7 +61,7 @@ Math_.prototype = {
 	/**
 	 * @override controller
 	 */
-	reset: function () {
+	reset() {
 		domUtils.removeClass(this._element, 'se-focus');
 		this._element = null;
 	},
@@ -69,22 +69,22 @@ Math_.prototype = {
 	/**
 	 * @override core
 	 */
-	preservedClass: function () {
+	preservedClass() {
 		return {
 			className: 'katex',
-			method: function (element) {
+			method: (element) => {
 				if (!element.getAttribute('data-se-value') || !this.katex) return;
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(element.getAttribute('data-se-value'))));
 				element.innerHTML = dom.querySelector('.katex').innerHTML;
 				element.setAttribute('contenteditable', false);
-			}.bind(this)
+			}
 		};
 	},
 
 	/**
 	 * @override type = "modal"
 	 */
-	open: function () {
+	open() {
 		this.modal.open();
 	},
 
@@ -92,7 +92,7 @@ Math_.prototype = {
 	 * @override modal
 	 * @param {boolean} isUpdate open state is update
 	 */
-	on: function (isUpdate) {
+	on(isUpdate) {
 		this.isUpdateState = isUpdate;
 		if (!isUpdate) {
 			this.init();
@@ -110,7 +110,7 @@ Math_.prototype = {
 	 * @override modal
 	 * @returns {boolean | undefined}
 	 */
-	modalAction: function () {
+	modalAction() {
 		if (this.textArea.value.trim().length === 0) return false;
 
 		const mathExp = this.textArea.value;
@@ -148,7 +148,7 @@ Math_.prototype = {
 	/**
 	 * @override modal
 	 */
-	init: function () {
+	init() {
 		this.controller.close();
 		this.textArea.value = '';
 		this.previewElement.innerHTML = '';
@@ -159,7 +159,7 @@ Math_.prototype = {
 	 * @param {Element} target Target button element
 	 * @returns
 	 */
-	controllerAction: function (target) {
+	controllerAction(target) {
 		const command = target.getAttribute('data-command');
 		if (/update/.test(command)) {
 			this.modal.open();
@@ -172,7 +172,7 @@ Math_.prototype = {
 		}
 	},
 
-	_renderer: function (exp) {
+	_renderer(exp) {
 		let result = '';
 		try {
 			domUtils.removeClass(this.textArea, 'se-error');
