@@ -152,7 +152,7 @@ FileBrowser.prototype = {
 					tag = tags[t];
 					if (tag && !_tags.includes(tag)) {
 						_tags.push(tag);
-						tagsHTML += '<a title="' + tag + '" aria-label="' + tag + '">' + tag + '</a>';
+						tagsHTML += `<a title="${tag}" aria-label="${tag}">${tag}</a>`;
 					}
 				}
 			}
@@ -268,25 +268,20 @@ function OnClick_browser(e) {
 
 function CreateHTML(editor) {
 	const lang = editor.lang;
-	return (
-		'<div class="se-file-browser-content">' +
-		'<div class="se-file-browser-header">' +
-		'<button type="button" data-command="close" class="se-btn se-file-browser-close" class="close" title="' +
-		lang.close +
-		'" aria-label="' +
-		lang.close +
-		'">' +
-		editor.icons.cancel +
-		'</button>' +
-		'<span class="se-file-browser-title"></span>' +
-		'<div class="se-file-browser-tags"></div>' +
-		'</div>' +
-		'<div class="se-file-browser-body">' +
-		'<div class="se-loading-box sun-editor-common"><div class="se-loading-effect"></div></div>' +
-		'<div class="se-file-browser-list"></div>' +
-		'</div>' +
-		'</div>'
-	);
+	return `
+		<div class="se-file-browser-content">
+			<div class="se-file-browser-header">
+				<button type="button" data-command="close" class="se-btn se-file-browser-close" class="close" title="${lang.close}" aria-label="${lang.close}">
+					${editor.icons.cancel}
+				</button>
+				<span class="se-file-browser-title"></span>
+				<div class="se-file-browser-tags"></div>
+			</div>
+			<div class="se-file-browser-body">
+				<div class="se-loading-box sun-editor-common"><div class="se-loading-effect"></div></div>
+				<div class="se-file-browser-list"></div>
+			</div>
+		</div>`;
 }
 
 export default FileBrowser;

@@ -695,56 +695,36 @@ function OnInputSize(xy, e) {
 
 function CreateHTML_modal(editor, pluginOptions) {
 	const lang = editor.lang;
-	let html =
-		'<form method="post" enctype="multipart/form-data">' +
-		'<div class="se-modal-header">' +
-		'<button type="button" data-command="close" class="se-btn se-modal-close" title="' +
-		lang.close +
-		'" aria-label="' +
-		lang.close +
-		'">' +
-		editor.icons.cancel +
-		'</button>' +
-		'<span class="se-modal-title">' +
-		lang.video_modal_title +
-		'</span>' +
-		'</div>' +
-		'<div class="se-modal-body">';
+	let html = `
+	<form method="post" enctype="multipart/form-data">
+		<div class="se-modal-header">
+			<button type="button" data-command="close" class="se-btn se-modal-close" title="${lang.close}" aria-label="${lang.close}">
+			${editor.icons.cancel}
+			</button>
+			<span class="se-modal-title">${lang.video_modal_title}</span>
+		</div>
+		<div class="se-modal-body">`;
 
 	if (pluginOptions.createFileInput) {
-		html +=
-			'' +
-			'<div class="se-modal-form">' +
-			'<label>' +
-			lang.video_modal_file +
-			'</label>' +
-			'<div class="se-modal-form-files">' +
-			'<input class="se-input-form _se_video_file" type="file" data-focus accept="' +
-			pluginOptions.acceptedFormats +
-			'"' +
-			(pluginOptions.allowMultiple ? ' multiple="multiple"' : '') +
-			'/>' +
-			'<button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="' +
-			lang.remove +
-			'" aria-label="' +
-			lang.remove +
-			'">' +
-			editor.icons.cancel +
-			'</button>' +
-			'</div>' +
-			'</div>';
+		html += `
+			<div class="se-modal-form">
+				<label>${lang.video_modal_file}</label>
+				<div class="se-modal-form-files">
+					<input class="se-input-form _se_video_file" type="file" data-focus accept="${pluginOptions.acceptedFormats}"${pluginOptions.allowMultiple ? ' multiple="multiple"' : ''}/>
+					<button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">
+						${editor.icons.cancel}
+					</button>
+				</div>
+			</div>`;
 	}
 
 	if (pluginOptions.createUrlInput) {
-		html +=
-			'' +
-			'<div class="se-modal-form">' +
-			'<label>' +
-			lang.video_modal_url +
-			'</label>' +
-			'<input class="se-input-form se-input-url" type="text" data-focus />' +
-			'<pre class="se-link-preview"></pre>' +
-			'</div>';
+		html += `
+			<div class="se-modal-form">
+				<label>${lang.video_modal_url}</label>
+				<input class="se-input-form se-input-url" type="text" data-focus />
+				<pre class="se-link-preview"></pre>
+			</div>`;
 	}
 
 	if (pluginOptions.canResize) {
@@ -759,101 +739,49 @@ function CreateHTML_modal(editor, pluginOptions) {
 		const heightDisplay = !pluginOptions.showHeightInput ? ' style="display: none !important;"' : '';
 		const ratioDisplay = !pluginOptions.showRatioOption ? ' style="display: none !important;"' : '';
 		const onlyWidthDisplay = !onlyPercentage && !pluginOptions.showHeightInput && !pluginOptions.showRatioOption ? ' style="display: none !important;"' : '';
-		html +=
-			'' +
-			'<div class="se-modal-form">' +
-			'<div class="se-modal-size-text">' +
-			'<label class="size-w">' +
-			lang.width +
-			'</label>' +
-			'<label class="se-modal-size-x">&nbsp;</label>' +
-			'<label class="size-h"' +
-			heightDisplay +
-			'>' +
-			lang.height +
-			'</label>' +
-			'<label class="size-h"' +
-			ratioDisplay +
-			'>(' +
-			lang.ratio +
-			')</label>' +
-			'</div>' +
-			'<input class="se-input-control _se_video_size_x" placeholder="100%"' +
-			(onlyPercentage ? ' type="number" min="1"' : 'type="text"') +
-			(onlyPercentage ? ' max="100"' : '') +
-			'/>' +
-			'<label class="se-modal-size-x"' +
-			onlyWidthDisplay +
-			'>' +
-			(onlyPercentage ? '%' : 'x') +
-			'</label>' +
-			'<input class="se-input-control _se_video_size_y" placeholder="' +
-			pluginOptions.defaultRatio * 100 +
-			'%"' +
-			(onlyPercentage ? ' type="number" min="1"' : 'type="text"') +
-			(onlyPercentage ? ' max="100"' : '') +
-			heightDisplay +
-			'/>' +
-			'<select class="se-input-select se-video-ratio" title="' +
-			lang.ratio +
-			'" aria-label="' +
-			lang.ratio +
-			'"' +
-			ratioDisplay +
-			'>';
-		if (!heightDisplay) html += '<option value=""> - </option>';
-		for (let i = 0, len = ratioList.length; i < len; i++) {
-			html += '<option value="' + ratioList[i].value + '"' + (ratio.toString() === ratioList[i].value.toString() ? ' selected' : '') + '>' + ratioList[i].name + '</option>';
-		}
-		html +=
-			'</select>' +
-			'<button type="button" title="' +
-			lang.revertButton +
-			'" aria-label="' +
-			lang.revertButton +
-			'" class="se-btn se-modal-btn-revert">' +
-			editor.icons.revert +
-			'</button>' +
-			'</div>' +
-			'<div class="se-modal-form se-modal-form-footer"' +
-			onlyPercentDisplay +
-			onlyWidthDisplay +
-			'>' +
-			'<label><input type="checkbox" class="se-modal-btn-check _se_video_check_proportion" />&nbsp;' +
-			'<span>' +
-			lang.proportion +
-			'</span>' +
-			'</label>' +
-			'</div>';
+		html += `
+			<div class="se-modal-form">
+				<div class="se-modal-size-text">
+					<label class="size-w">${lang.width}</label>
+					<label class="se-modal-size-x">&nbsp;</label>
+					<label class="size-h"${heightDisplay}>${lang.height}</label>
+					<label class="size-h"${ratioDisplay}>(${lang.ratio})</label>
+				</div>
+				<input class="se-input-control _se_video_size_x" placeholder="100%"${onlyPercentage ? ' type="number" min="1"' : 'type="text"'}${onlyPercentage ? ' max="100"' : ''}/>
+				<label class="se-modal-size-x"${onlyWidthDisplay}>${onlyPercentage ? '%' : 'x'}</label>
+				<input class="se-input-control _se_video_size_y" placeholder="${pluginOptions.defaultRatio * 100}%"
+				${onlyPercentage ? ' type="number" min="1"' : 'type="text"'}${onlyPercentage ? ' max="100"' : ''}${heightDisplay}/>
+				<select class="se-input-select se-video-ratio" title="${lang.ratio}" aria-label="${lang.ratio}"${ratioDisplay}>
+					${!heightDisplay ? '<option value=""> - </option>' : ''} 
+					${ratioList
+						.map(
+							(ratioOption) =>
+								`<option value="${ratioOption.value}"${ratio.toString() === ratioOption.value.toString() ? ' selected' : ''}>${ratioOption.name}</option>`
+						)
+						.join('')}
+				</select>
+				<button type="button" title="${lang.revertButton}" aria-label="${lang.revertButton}" class="se-btn se-modal-btn-revert">${editor.icons.revert}</button>
+			</div>
+			<div class="se-modal-form se-modal-form-footer"${onlyPercentDisplay}${onlyWidthDisplay}>
+				<label>
+					<input type="checkbox" class="se-modal-btn-check _se_video_check_proportion" />&nbsp;
+					<span>${lang.proportion}</span>
+				</label>
+			</div>`;
 	}
 
-	html +=
-		'' +
-		'</div>' +
-		'<div class="se-modal-footer">' +
-		'<div class="se-figure-align">' +
-		'<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="none" checked>' +
-		lang.basic +
-		'</label>' +
-		'<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="left">' +
-		lang.left +
-		'</label>' +
-		'<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="center">' +
-		lang.center +
-		'</label>' +
-		'<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="right">' +
-		lang.right +
-		'</label>' +
-		'</div>' +
-		'<button type="submit" class="se-btn-primary" title="' +
-		lang.submitButton +
-		'" aria-label="' +
-		lang.submitButton +
-		'"><span>' +
-		lang.submitButton +
-		'</span></button>' +
-		'</div>' +
-		'</form>';
+	html += `
+		</div>
+		<div class="se-modal-footer">
+			<div class="se-figure-align">
+				<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="none" checked>${lang.basic}</label>
+				<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="left">${lang.left}</label>
+				<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="center">${lang.center}</label>
+				<label><input type="radio" name="suneditor_video_radio" class="se-modal-btn-radio" value="right">${lang.right}</label>
+			</div>
+			<button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}"><span>${lang.submitButton}</span></button>
+		</div>
+	</form>`;
 
 	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
 }

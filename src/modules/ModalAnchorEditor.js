@@ -379,60 +379,37 @@ function CreatetModalForm(editor, params, relList) {
 	const textDisplayShow = params.textToDisplay ? '' : ' style="display: none;"';
 	const titleShow = params.title ? '' : ' style="display: none;"';
 
-	let html =
-		'<div class="se-modal-body">' +
-		'<div class="se-modal-form">' +
-		'<label>' +
-		lang.link_modal_url +
-		'</label>' +
-		'<div class="se-modal-form-files">' +
-		'<input data-focus class="se-input-form se-input-url" type="text" placeholder="' +
-		(editor.options.get('protocol') || '') +
-		'" />' +
-		'<button type="button" class="se-btn se-modal-files-edge-button _se_bookmark_button" title="' +
-		lang.link_modal_bookmark +
-		'" aria-label="' +
-		lang.link_modal_bookmark +
-		'">' +
-		icons.bookmark +
-		'</button>' +
-		'</div>' +
-		'<div class="se-anchor-preview-form">' +
-		'<span class="se-svg se-anchor-preview-icon _se_anchor_bookmark_icon">' +
-		icons.bookmark +
-		'</span>' +
-		'<span class="se-svg se-anchor-preview-icon _se_anchor_download_icon">' +
-		icons.download +
-		'</span>' +
-		'<pre class="se-link-preview"></pre>' +
-		'</div>' +
-		'<label' +
-		textDisplayShow +
-		'>' +
-		lang.link_modal_text +
-		'</label><input class="se-input-form _se_display_text" type="text"' +
-		textDisplayShow +
-		' />' +
-		'<label' +
-		titleShow +
-		'>' +
-		lang.link_modal_title +
-		'</label><input class="se-input-form _se_title" type="text"' +
-		titleShow +
-		' />' +
-		'</div>' +
-		'<div class="se-modal-form-footer">' +
-		'<label><input type="checkbox" class="se-modal-btn-check _se_anchor_check" />&nbsp;' +
-		lang.link_modal_newWindowCheck +
-		'</label>' +
-		'<label><input type="checkbox" class="se-modal-btn-check _se_anchor_download" />&nbsp;' +
-		lang.link_modal_downloadLinkCheck +
-		'</label>';
+	let html = `
+		<div class="se-modal-body">
+			<div class="se-modal-form">
+				<label>${lang.link_modal_url}</label>
+				<div class="se-modal-form-files">
+					<input data-focus class="se-input-form se-input-url" type="text" placeholder="${editor.options.get('protocol') || ''}" />
+					<button type="button" class="se-btn se-modal-files-edge-button _se_bookmark_button" title="${lang.link_modal_bookmark}" aria-label="${lang.link_modal_bookmark}">
+						${icons.bookmark}
+					</button>
+				</div>
+				<div class="se-anchor-preview-form">
+					<span class="se-svg se-anchor-preview-icon _se_anchor_bookmark_icon">${icons.bookmark}</span>
+					<span class="se-svg se-anchor-preview-icon _se_anchor_download_icon">${icons.download}</span>
+					<pre class="se-link-preview"></pre>
+				</div>
+				<label${textDisplayShow}>${lang.link_modal_text}</label>
+				<input class="se-input-form _se_display_text" type="text"${textDisplayShow} />
+				<label${titleShow}>${lang.link_modal_title}</label>
+				<input class="se-input-form _se_title" type="text"${titleShow} />
+			</div>
+			<div class="se-modal-form-footer">
+				<label><input type="checkbox" class="se-modal-btn-check _se_anchor_check" />&nbsp;${lang.link_modal_newWindowCheck}</label>
+				<label><input type="checkbox" class="se-modal-btn-check _se_anchor_download" />&nbsp;${lang.link_modal_downloadLinkCheck}</label>`;
+
 	if (relList.length > 0) {
-		html +=
-			'<div class="se-anchor-rel"><button type="button" class="se-btn se-btn-select se-anchor-rel-btn">&lt;rel&gt;</button>' +
-			'<div class="se-anchor-rel-wrapper"><pre class="se-link-preview se-anchor-rel-preview"></pre></div>' +
-			'</div></div>';
+		html += `
+			<div class="se-anchor-rel">
+				<button type="button" class="se-btn se-btn-select se-anchor-rel-btn">&lt;rel&gt;</button>
+				<div class="se-anchor-rel-wrapper"><pre class="se-link-preview se-anchor-rel-preview"></pre></div>
+			</div>
+		</div>`;
 	}
 
 	html += '</div></div>';

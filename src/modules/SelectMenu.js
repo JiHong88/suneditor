@@ -41,11 +41,11 @@ SelectMenu.prototype = {
 		menus = menus || items;
 		let html = '';
 		for (let i = 0, len = menus.length; i < len; i++) {
-			html += '<li class="se-select-item" data-index="' + i + '">' + (typeof menus[i] === 'string' ? menus[i] : menus[i].outerHTML) + '</li>';
+			html += `<li class="se-select-item" data-index="${i}">${typeof menus[i] === 'string' ? menus[i] : menus[i].outerHTML}</li>`;
 		}
 
 		this.items = items;
-		this.form.firstElementChild.innerHTML = '<ul class="se-list-basic se-list-checked">' + html + '</ul>';
+		this.form.firstElementChild.innerHTML = `<ul class="se-list-basic se-list-checked">${html}</ul>`;
 		this.menus = this.form.querySelectorAll('li');
 	},
 
@@ -53,10 +53,14 @@ SelectMenu.prototype = {
 		if (!attr) attr = {};
 		this._refer = referElement;
 		this._selectMethod = selectMethod;
-		this.form = domUtils.createElement('DIV', {
-			class: 'se-select-menu ' + (attr.class || ''),
-			style: attr.style || ''
-		}, '<div class="se-list-inner"></div>');
+		this.form = domUtils.createElement(
+			'DIV',
+			{
+				class: 'se-select-menu ' + (attr.class || ''),
+				style: attr.style || ''
+			},
+			'<div class="se-list-inner"></div>'
+		);
 		referElement.parentNode.insertBefore(this.form, referElement);
 	},
 
@@ -69,8 +73,8 @@ SelectMenu.prototype = {
 		this.__addEvents();
 		this.__addGlobalEvent();
 		const positionItems = position ? position.split('-') : [];
-		const mainPosition = positionItems[0] || ((this._textDirDiff !== null && this._textDirDiff !== this.options.get('_rtl')) ? this._dirPosition : this.position);
-		const subPosition = positionItems[1] || ((this._textDirDiff !== null && this._textDirDiff !== this.options.get('_rtl')) ? this._dirSubPosition : this.subPosition);
+		const mainPosition = positionItems[0] || (this._textDirDiff !== null && this._textDirDiff !== this.options.get('_rtl') ? this._dirPosition : this.position);
+		const subPosition = positionItems[1] || (this._textDirDiff !== null && this._textDirDiff !== this.options.get('_rtl') ? this._dirSubPosition : this.subPosition);
 		this._setPosition(mainPosition, subPosition, onItemQuerySelector);
 	},
 

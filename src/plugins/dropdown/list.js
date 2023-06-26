@@ -86,25 +86,21 @@ List.prototype = {
 
 function CreateHTML(editor) {
 	const lang = editor.lang;
-	const html =
-		'<div class="se-list-inner">' +
-		'<ul class="se-list-basic">' +
-		'<li><button type="button" class="se-btn se-btn-list se-tooltip se-icon-flip-rtl" data-command="numbered" title="' +
-		lang.orderList +
-		'" aria-label="' +
-		lang.orderList +
-		'">' +
-		editor.icons.list_number +
-		'</button></li>' +
-		'<li><button type="button" class="se-btn se-btn-list se-tooltip se-icon-flip-rtl" data-command="bullet" title="' +
-		lang.unorderList +
-		'" aria-label="' +
-		lang.unorderList +
-		'">' +
-		editor.icons.list_bullets +
-		'</button></li>' +
-		'</ul>' +
-		'</div>';
+	const html = `
+	<div class="se-list-inner">
+		<ul class="se-list-basic">
+			<li>
+				<button type="button" class="se-btn se-btn-list se-tooltip se-icon-flip-rtl" data-command="numbered" title="${lang.orderList}" aria-label="${lang.orderList}">
+					${editor.icons.list_number}
+				</button>
+			</li>
+			<li>
+				<button type="button" class="se-btn se-btn-list se-tooltip se-icon-flip-rtl" data-command="bullet" title="${lang.unorderList}" aria-label="${lang.unorderList}">
+					${editor.icons.list_bullets}
+				</button>
+			</li>
+		</ul>
+	</div>`;
 
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, html);
 }

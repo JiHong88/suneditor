@@ -48,12 +48,23 @@ function CreateHTML(layoutList) {
 		console.warn('[SUNEDITOR.plugins.layout.warn] To use the "layout" plugin, please define the "layouts" option.');
 	}
 
-	let list = '<div class="se-dropdown se-list-inner"><ul class="se-list-basic">';
+	let list = `
+	<div class="se-dropdown se-list-inner">
+		<ul class="se-list-basic">`;
+
 	for (let i = 0, len = (layoutList || []).length, t; i < len; i++) {
 		t = layoutList[i];
-		list += '<li><button type="button" class="se-btn se-btn-list" data-value="' + i + '" title="' + t.name + '" aria-label="' + t.name + '">' + t.name + '</button></li>';
+		list += `
+			<li>
+				<button type="button" class="se-btn se-btn-list" data-value="${i}" title="${t.name}" aria-label="${t.name}">
+					${t.name}
+				</button>
+			</li>`;
 	}
-	list += '</ul></div>';
+
+	list += `
+		</ul>
+	</div>`;
 
 	return domUtils.createElement('DIV', { class: 'se-list-layer' }, list);
 }

@@ -108,29 +108,25 @@ function CreateHTML(editor, items) {
 		tag = t.tag || 'span';
 		_class = t.class;
 
-		attrs += ' class="' + t.class + '"';
-		value += '.' + t.class.trim().replace(/\s+/g, ',.');
+		attrs += ` class="${t.class}"`;
+		value += `.${t.class.trim().replace(/\s+/g, ',.')}`;
 		command.push('class');
 
 		value = value.replace(/,$/, '');
 
-		list +=
-			'<li><button type="button" class="se-btn se-btn-list" data-command="' +
-			tag +
-			'" data-value="' +
-			value +
-			'" title="' +
-			name +
-			'" aria-label="' +
-			name +
-			'"><' +
-			tag +
-			attrs +
-			'>' +
-			name +
-			'</' +
-			tag +
-			'></button></li>';
+		list += `
+		<li>
+			<button 
+				type="button" 
+				class="se-btn se-btn-list" 
+				data-command="${tag}" 
+				data-value="${value}" 
+				title="${name}" 
+				aria-label="${name}"
+			>
+				<${tag}${attrs}>${name}</${tag}>
+			</button>
+		</li>`;
 	}
 	list += '</ul></div>';
 

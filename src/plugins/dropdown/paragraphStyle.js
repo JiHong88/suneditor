@@ -83,7 +83,10 @@ function CreateHTML(editor, items) {
 	};
 	const paragraphStyles = !items || items.length === 0 ? ['spaced', 'bordered', 'neon'] : items;
 
-	let list = '<div class="se-list-inner"><ul class="se-list-basic">';
+	let list = `
+	<div class="se-list-inner">
+		<ul class="se-list-basic">`;
+
 	for (let i = 0, len = paragraphStyles.length, p, name, attrs, _class; i < len; i++) {
 		p = paragraphStyles[i];
 
@@ -94,28 +97,19 @@ function CreateHTML(editor, items) {
 		}
 
 		name = p.name;
-		attrs = p.class ? ' class="' + p.class + '"' : '';
+		attrs = p.class ? ` class="${p.class}"` : '';
 		_class = p._class;
 
-		list +=
-			'<li>' +
-			'<button type="button" class="se-btn se-btn-list' +
-			(_class ? ' ' + _class : '') +
-			'" data-command="' +
-			p.class +
-			'" title="' +
-			name +
-			'" aria-label="' +
-			name +
-			'">' +
-			'<div' +
-			attrs +
-			'>' +
-			name +
-			'</div>' +
-			'</button></li>';
+		list += `
+			<li>
+				<button type="button" class="se-btn se-btn-list${_class ? ' ' + _class : ''}" data-command="${p.class}" title="${name}" aria-label="${name}">
+					<div${attrs}>${name}</div>
+				</button>
+			</li>`;
 	}
-	list += '</ul></div>';
+	list += `
+		</ul>
+	</div>`;
 
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
 }

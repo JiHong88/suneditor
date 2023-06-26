@@ -56,22 +56,16 @@ ImageGallery.prototype = {
  */
 function DrawItems(item) {
 	const srcName = item.src.split('/').pop();
-	return (
-		'<div class="se-file-item-img"><img src="' +
-		(item.thumbnail || item.src) +
-		'" alt="' +
-		(item.alt || srcName) +
-		'" data-command="' +
-		(item.src || item.thumbnail) +
-		'" data-value="' +
-		(item.name || srcName) +
-		'">' +
-		'<div class="se-file-name-image se-file-name-back"></div>' +
-		'<div class="se-file-name-image">' +
-		(item.name || srcName) +
-		'</div>' +
-		'</div>'
-	);
+	return `
+	<div class="se-file-item-img">
+		<img 
+			src="${item.thumbnail || item.src}" 
+			alt="${item.alt || srcName}" 
+			data-command="${item.src || item.thumbnail}" 
+			data-value="${item.name || srcName}">
+		<div class="se-file-name-image se-file-name-back"></div>
+		<div class="se-file-name-image">${item.name || srcName}</div>
+	</div>`;
 }
 
 function SetImage(target) {

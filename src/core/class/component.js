@@ -103,19 +103,24 @@ Component.prototype = {
 	 * @param {string} pluginName Plugin name (image, video)
 	 */
 	select(element, pluginName) {
-		this.editor._antiBlur = true;
 		this.currentTarget = element;
 		this.info = Figure.GetContainer(element);
-		this.editor.blur();
-
 		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is)) || domUtils.isUneditable(element)) return false;
+
+		this.editor._antiBlur = true;
+		this.editor.blur();
 
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;
-		if (typeof plugin.select === 'function') plugin.select(element);
 
-		this._setComponentLineBreaker(element);
-		this.__addGlobalEvent();
+		setTimeout(
+			() => {
+				if (typeof plugin.select === 'function') plugin.select(element);
+				this._setComponentLineBreaker(element);
+				this.__addGlobalEvent();
+			},
+			this.editor.frameOptions.get('iframe') ? 100 : 0
+		);
 	},
 
 	/**

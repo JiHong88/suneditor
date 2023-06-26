@@ -11,16 +11,16 @@ const Link = function (editor, pluginOptions) {
 	// define plugin options
 	pluginOptions.textToDisplay = true;
 	pluginOptions.title = true;
-	
+
 	// create HTML
 	const modalEl = CreateHTML_modal(editor);
 	const controllerEl = CreateHTML_controller(editor);
-	
+
 	// modules
 	this.anchor = new ModalAnchorEditor(this, modalEl, pluginOptions);
 	this.modal = new Modal(this, modalEl);
 	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
-	
+
 	// members
 	this.pluginOptions = pluginOptions;
 	this.isUpdateState = false;
@@ -150,31 +150,21 @@ Link.prototype = {
 function CreateHTML_modal(editor) {
 	const lang = editor.lang;
 	const icons = editor.icons;
-	const html =
-		'<form>' +
-		'<div class="se-modal-header">' +
-		'<button type="button" data-command="close" class="se-btn se-modal-close" title="' +
-		lang.close +
-		'" aria-label="' +
-		lang.close +
-		'">' +
-		icons.cancel +
-		'</button>' +
-		'<span class="se-modal-title">' +
-		lang.link_modal_title +
-		'</span>' +
-		'</div>' +
-		'<div class="se-anchor-editor"></div>' +
-		'<div class="se-modal-footer">' +
-		'<button type="submit" class="se-btn-primary" title="' +
-		lang.submitButton +
-		'" aria-label="' +
-		lang.submitButton +
-		'"><span>' +
-		lang.submitButton +
-		'</span></button>' +
-		'</div>' +
-		'</form>';
+	const html = `
+	<form>
+		<div class="se-modal-header">
+			<button type="button" data-command="close" class="se-btn se-modal-close" title="${lang.close}" aria-label="${lang.close}">
+				${icons.cancel}
+			</button>
+			<span class="se-modal-title">${lang.link_modal_title}</span>
+		</div>
+		<div class="se-anchor-editor"></div>
+		<div class="se-modal-footer">
+			<button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}">
+				<span>${lang.submitButton}</span>
+			</button>
+		</div>
+	</form>`;
 
 	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
@@ -182,30 +172,31 @@ function CreateHTML_modal(editor) {
 function CreateHTML_controller(editor) {
 	const lang = editor.lang;
 	const icons = editor.icons;
-	const html =
-		'<div class="se-arrow se-arrow-up"></div>' +
-		'<div class="link-content"><span><a target="_blank" href=""></a>&nbsp;</span>' +
-		'<div class="se-btn-group">' +
-		'<button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">' +
-		icons.edit +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.edit +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="unlink" tabindex="-1" class="se-btn se-tooltip se-icon-flip-rtl">' +
-		icons.unlink +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.unlink +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">' +
-		icons.delete +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.remove +
-		'</span></span>' +
-		'</button>' +
-		'</div>' +
-		'</div>';
+	const html = `
+	<div class="se-arrow se-arrow-up"></div>
+	<div class="link-content">
+		<span><a target="_blank" href=""></a>&nbsp;</span>
+		<div class="se-btn-group">
+			<button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">
+				${icons.edit}
+				<span class="se-tooltip-inner">
+					<span class="se-tooltip-text">${lang.edit}</span>
+				</span>
+			</button>
+			<button type="button" data-command="unlink" tabindex="-1" class="se-btn se-tooltip se-icon-flip-rtl">
+				${icons.unlink}
+				<span class="se-tooltip-inner">
+					<span class="se-tooltip-text">${lang.unlink}</span>
+				</span>
+			</button>
+			<button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">
+				${icons.delete}
+				<span class="se-tooltip-inner">
+					<span class="se-tooltip-text">${lang.remove}</span>
+				</span>
+			</button>
+		</div>
+	</div>`;
 
 	return domUtils.createElement('DIV', { class: 'se-controller se-controller-link' }, html);
 }

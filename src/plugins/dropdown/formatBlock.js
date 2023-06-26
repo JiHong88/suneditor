@@ -102,7 +102,10 @@ function CreateHTML(editor, items) {
 	const defaultFormats = ['p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 	const formatList = !items || items.length === 0 ? defaultFormats : items;
 
-	let list = '<div class="se-list-inner"><ul class="se-list-basic">';
+	let list = `
+	<div class="se-list-inner">
+		<ul class="se-list-basic">`;
+
 	for (let i = 0, len = formatList.length, format, tagName, command, name, h, attrs, className; i < len; i++) {
 		format = formatList[i];
 
@@ -121,27 +124,16 @@ function CreateHTML(editor, items) {
 			attrs = className ? ' class="' + className + '"' : '';
 		}
 
-		list +=
-			'<li><button type="button" class="se-btn se-btn-list" data-command="' +
-			command +
-			'" data-value="' +
-			tagName +
-			'" data-class="' +
-			className +
-			'" title="' +
-			name +
-			'" aria-label="' +
-			name +
-			'"><' +
-			tagName +
-			attrs +
-			'>' +
-			name +
-			'</' +
-			tagName +
-			'></button></li>';
+		list += `
+			<li>
+				<button type="button" class="se-btn se-btn-list" data-command="${command}" data-value="${tagName}" data-class="${className}" title="${name}" aria-label="${name}">
+					<${tagName}${attrs}>${name}</${tagName}>
+				</button>
+			</li>`;
 	}
-	list += '</ul></div>';
+	list += `
+		</ul>
+	</div>`;
 
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer se-list-format' }, list);
 }

@@ -908,8 +908,18 @@ function OnClick_resizeButton() {
 }
 
 function CreateHTML_resizeDot() {
-	const html =
-		'<div class="se-resize-dot"><span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span><span class="lw"></span><span class="th"></span><span class="rw"></span><span class="bh"></span><div class="se-resize-display"></div></div>';
+	const html = `
+<div class="se-resize-dot">
+    <span class="tl"></span>
+    <span class="tr"></span>
+    <span class="bl"></span>
+    <span class="br"></span>
+    <span class="lw"></span>
+    <span class="th"></span>
+    <span class="rw"></span>
+    <span class="bh"></span>
+    <div class="se-resize-display"></div>
+</div>`;
 	return domUtils.createElement('DIV', { class: 'se-controller se-resizing-container', style: 'display: none;' }, html);
 }
 
@@ -984,6 +994,7 @@ function GET_CONTROLLER_BUTTONS(group) {
 function CreateHTML_controller(editor, controls) {
 	const lang = editor.lang;
 	const icons = editor.icons;
+
 	let html = '<div class="se-arrow se-arrow-up"></div>';
 	for (let i = 0, group; i < controls.length; i++) {
 		group = controls[i];
@@ -991,18 +1002,11 @@ function CreateHTML_controller(editor, controls) {
 		for (let j = 0, len = group.length, m; j < len; j++) {
 			m = GET_CONTROLLER_BUTTONS(group[j]);
 			if (!m) continue;
-			html +=
-				'<button type="button" data-command="' +
-				m.c +
-				'" data-value="' +
-				m.v +
-				'" class="' +
-				(m.t ? 'se-btn-w-auto ' : '') +
-				'se-btn se-tooltip">' +
-				(icons[m.i] || m.t || '!') +
-				'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-				(lang[m.l] || m.l) +
-				'</span></span></button>';
+			html += `
+				<button type="button" data-command="${m.c}" data-value="${m.v}" class="${m.t ? 'se-btn-w-auto ' : ''}se-btn se-tooltip">
+					${icons[m.i] || m.t || '!'}
+					<span class="se-tooltip-inner"><span class="se-tooltip-text">${lang[m.l] || m.l}</span></span>
+				</button>`;
 		}
 		html += '</div>';
 	}

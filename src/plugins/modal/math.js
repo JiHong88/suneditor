@@ -236,60 +236,42 @@ function CreateHTML_modal(editor, math, fontSizeList) {
 		}
 	];
 	let defaultFontSize = fontSize[0].value;
+	let html = `
+    <form>
+        <div class="se-modal-header">
+            <button type="button" data-command="close" class="se-btn se-modal-close" title="${lang.close}" aria-label="${lang.close}">
+                ${editor.icons.cancel}
+            </button>
+            <span class="se-modal-title">${lang.math_modal_title}</span>
+        </div>
+        <div class="se-modal-body">
+            <div class="se-modal-form">
+                <label>${lang.math_modal_inputLabel} (<a href="${env.KATEX_WEBSITE}" target="_blank">KaTeX</a>)</label>
+                <textarea class="se-input-form se-math-exp" type="text" data-focus></textarea>
+            </div>
+            <div class="se-modal-form">
+                <label>${lang.math_modal_fontSizeLabel}</label>
+                <select class="se-input-select se-math-size">`;
 
-	let html =
-		'<form>' +
-		'<div class="se-modal-header">' +
-		'<button type="button" data-command="close" class="se-btn se-modal-close" title="' +
-		lang.close +
-		'" aria-label="' +
-		lang.close +
-		'">' +
-		editor.icons.cancel +
-		'</button>' +
-		'<span class="se-modal-title">' +
-		lang.math_modal_title +
-		'</span>' +
-		'</div>' +
-		'<div class="se-modal-body">' +
-		'<div class="se-modal-form">' +
-		'<label>' +
-		lang.math_modal_inputLabel +
-		' (<a href="' +
-		env.KATEX_WEBSITE +
-		'" target="_blank">KaTeX</a>)</label>' +
-		'<textarea class="se-input-form se-math-exp" type="text" data-focus></textarea>' +
-		'</div>' +
-		'<div class="se-modal-form">' +
-		'<label>' +
-		lang.math_modal_fontSizeLabel +
-		'</label>' +
-		'<select class="se-input-select se-math-size">';
 	for (let i = 0, len = fontSize.length, f; i < len; i++) {
 		f = fontSize[i];
 		if (f.default) defaultFontSize = f.value;
-		html += '<option value="' + f.value + '"' + (f.default ? ' selected' : '') + '>' + f.text + '</option>';
+		html += `<option value="${f.value}"${f.default ? ' selected' : ''}>${f.text}</option>`;
 	}
-	html +=
-		'</select>' +
-		'</div>' +
-		'<div class="se-modal-form">' +
-		'<label>' +
-		lang.math_modal_previewLabel +
-		'</label>' +
-		'<p class="se-math-preview"></p>' +
-		'</div>' +
-		'</div>' +
-		'<div class="se-modal-footer">' +
-		'<button type="submit" class="se-btn-primary" title="' +
-		lang.submitButton +
-		'" aria-label="' +
-		lang.submitButton +
-		'"><span>' +
-		lang.submitButton +
-		'</span></button>' +
-		'</div>' +
-		'</form>';
+
+	html += `</select>
+            </div>
+            <div class="se-modal-form">
+                <label>${lang.math_modal_previewLabel}</label>
+                <p class="se-math-preview"></p>
+            </div>
+        </div>
+        <div class="se-modal-footer">
+            <button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}">
+                <span>${lang.submitButton}</span>
+            </button>
+        </div>
+    </form>`;
 
 	math.defaultFontSize = defaultFontSize;
 	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
@@ -297,24 +279,24 @@ function CreateHTML_modal(editor, math, fontSizeList) {
 
 function CreateHTML_controller(core) {
 	const lang = core.lang;
-	const html =
-		'<div class="se-arrow se-arrow-up"></div>' +
-		'<div class="link-content">' +
-		'<div class="se-btn-group">' +
-		'<button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">' +
-		core.icons.edit +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.edit +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">' +
-		core.icons.delete +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.remove +
-		'</span></span>' +
-		'</button>' +
-		'</div>' +
-		'</div>';
+	const html = `
+    <div class="se-arrow se-arrow-up"></div>
+    <div class="link-content">
+        <div class="se-btn-group">
+            <button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">
+                ${core.icons.edit}
+                <span class="se-tooltip-inner">
+                    <span class="se-tooltip-text">${lang.edit}</span>
+                </span>
+            </button>
+            <button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">
+                ${core.icons.delete}
+                <span class="se-tooltip-inner">
+                    <span class="se-tooltip-text">${lang.remove}</span>
+                </span>
+            </button>
+        </div>
+    </div>`;
 
 	return domUtils.createElement('DIV', { class: 'se-controller se-controller-link' }, html);
 }

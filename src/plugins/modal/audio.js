@@ -404,71 +404,45 @@ function FileInputChange() {
 
 function CreateHTML_modal(editor, pluginOptions) {
 	const lang = editor.lang;
-	let html =
-		'<form method="post" enctype="multipart/form-data">' +
-		'<div class="se-modal-header">' +
-		'<button type="button" data-command="close" class="se-btn se-modal-close" title="' +
-		lang.close +
-		'" aria-label="' +
-		lang.close +
-		'">' +
-		editor.icons.cancel +
-		'</button>' +
-		'<span class="se-modal-title">' +
-		lang.audio_modal_title +
-		'</span>' +
-		'</div>' +
-		'<div class="se-modal-body">';
-
+	let html = `
+    <form method="post" enctype="multipart/form-data">
+        <div class="se-modal-header">
+            <button type="button" data-command="close" class="se-btn se-modal-close" title="${lang.close}" aria-label="${lang.close}">
+                ${editor.icons.cancel}
+            </button>
+            <span class="se-modal-title">${lang.audio_modal_title}</span>
+        </div>
+        <div class="se-modal-body">`;
 	if (pluginOptions.createFileInput) {
-		html +=
-			'' +
-			'<div class="se-modal-form">' +
-			'<label>' +
-			lang.audio_modal_file +
-			'</label>' +
-			'<div class="se-modal-form-files">' +
-			'<input class="se-input-form _se_audio_files" data-focus type="file" accept="' +
-			pluginOptions.acceptedFormats +
-			'"' +
-			(pluginOptions.allowMultiple ? ' multiple="multiple"' : '') +
-			'/>' +
-			'<button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="' +
-			lang.remove +
-			'" aria-label="' +
-			lang.remove +
-			'">' +
-			editor.icons.cancel +
-			'</button>' +
-			'</div>' +
-			'</div>';
+		html += `
+        <div class="se-modal-form">
+            <label>${lang.audio_modal_file}</label>
+            <div class="se-modal-form-files">
+                <input class="se-input-form _se_audio_files" data-focus type="file" accept="${pluginOptions.acceptedFormats}"${
+			pluginOptions.allowMultiple ? ' multiple="multiple"' : ''
+		}/>
+                <button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">
+                    ${editor.icons.cancel}
+                </button>
+            </div>
+        </div>`;
 	}
-
 	if (pluginOptions.createUrlInput) {
-		html +=
-			'' +
-			'<div class="se-modal-form">' +
-			'<label>' +
-			lang.audio_modal_url +
-			'</label>' +
-			'<input class="se-input-form se-input-url" data-focus type="text" />' +
-			'<pre class="se-link-preview"></pre>' +
-			'</div>';
+		html += `
+        <div class="se-modal-form">
+            <label>${lang.audio_modal_url}</label>
+            <input class="se-input-form se-input-url" data-focus type="text" />
+            <pre class="se-link-preview"></pre>
+        </div>`;
 	}
-
-	html +=
-		'' +
-		'</div>' +
-		'<div class="se-modal-footer">' +
-		'<button type="submit" class="se-btn-primary" title="' +
-		lang.submitButton +
-		'" aria-label="' +
-		lang.submitButton +
-		'"><span>' +
-		lang.submitButton +
-		'</span></button>' +
-		'</div>' +
-		'</form>';
+	html += `
+        </div>
+        <div class="se-modal-footer">
+            <button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}">
+                <span>${lang.submitButton}</span>
+            </button>
+        </div>
+    </form>`;
 
 	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
@@ -476,24 +450,24 @@ function CreateHTML_modal(editor, pluginOptions) {
 function CreateHTML_controller(editor) {
 	const lang = editor.lang;
 	const icons = editor.icons;
-	const html =
-		'<div class="se-arrow se-arrow-up"></div>' +
-		'<div class="link-content">' +
-		'<div class="se-btn-group">' +
-		'<button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">' +
-		icons.edit +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.edit +
-		'</span></span>' +
-		'</button>' +
-		'<button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">' +
-		icons.delete +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		lang.remove +
-		'</span></span>' +
-		'</button>' +
-		'</div>' +
-		'</div>';
+	const html = `
+    <div class="se-arrow se-arrow-up"></div>
+    <div class="link-content">
+        <div class="se-btn-group">
+            <button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">
+                ${icons.edit}
+                <span class="se-tooltip-inner">
+                    <span class="se-tooltip-text">${lang.edit}</span>
+                </span>
+            </button>
+            <button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">
+                ${icons.delete}
+                <span class="se-tooltip-inner">
+                    <span class="se-tooltip-text">${lang.remove}</span>
+                </span>
+            </button>
+        </div>
+    </div>`;
 
 	return domUtils.createElement('DIV', { class: 'se-controller' }, html);
 }

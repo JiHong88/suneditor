@@ -795,141 +795,81 @@ function OnloadImg(oImg, _svgDefaultSize, container) {
 
 function CreateHTML_modal(editor, pluginOptions) {
 	const lang = editor.lang;
-	const createFileInputHtml = pluginOptions.createFileInput
-		? '<div class="se-modal-form">' +
-		  '<label>' +
-		  lang.image_modal_file +
-		  '</label>' +
-		  '<div class="se-modal-form-files">' +
-		  '<input class="se-input-form _se_image_file" data-focus type="file" accept="' +
-		  pluginOptions.acceptedFormats +
-		  '"' +
-		  (pluginOptions.allowMultiple ? ' multiple="multiple"' : '') +
-		  '/>' +
-		  '<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="' +
-		  lang.remove +
-		  '" aria-label="' +
-		  lang.remove +
-		  '">' +
-		  editor.icons.cancel +
-		  '</button>' +
-		  '</div>' +
-		  '</div>'
-		: '';
+	const createFileInputHtml = !pluginOptions.createFileInput
+		? ''
+		: `
+		<div class="se-modal-form">
+			<label>${lang.image_modal_file}</label>
+			<div class="se-modal-form-files">
+				<input class="se-input-form _se_image_file" data-focus type="file" accept="${pluginOptions.acceptedFormats}"${pluginOptions.allowMultiple ? ' multiple="multiple"' : ''}/>
+				<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">${editor.icons.cancel}</button>
+			</div>
+		</div>`;
 
-	const createUrlInputHtml = pluginOptions.createUrlInput
-		? '<div class="se-modal-form">' +
-		  '<label>' +
-		  lang.image_modal_url +
-		  '</label>' +
-		  '<div class="se-modal-form-files">' +
-		  '<input class="se-input-form se-input-url _se_image_url" data-focus type="text" />' +
-		  (editor.plugins.imageGallery
-				? '<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="' +
-				  lang.imageGallery +
-				  '" aria-label="' +
-				  lang.imageGallery +
-				  '">' +
-				  editor.icons.image_gallery +
-				  '</button>'
-				: '') +
-		  '</div>' +
-		  '<pre class="se-link-preview"></pre>' +
-		  '</div>'
-		: '';
+	const createUrlInputHtml = !pluginOptions.createUrlInput
+		? ''
+		: `
+		<div class="se-modal-form">
+			<label>${lang.image_modal_url}</label>
+			<div class="se-modal-form-files">
+				<input class="se-input-form se-input-url _se_image_url" data-focus type="text" />
+				${
+					editor.plugins.imageGallery
+						? `<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="${lang.imageGallery}" aria-label="${lang.imageGallery}">${editor.icons.image_gallery}</button>`
+						: ''
+				}
+			</div>
+			<pre class="se-link-preview"></pre>
+		</div>`;
 
-	const canResizeHtml = pluginOptions.canResize
-		? '<div class="se-modal-form">' +
-		  '<label class="size-w">' +
-		  lang.width +
-		  '</label>' +
-		  '<label class="se-modal-size-x">&nbsp;</label>' +
-		  '<label class="size-h">' +
-		  lang.height +
-		  '</label>' +
-		  '</div>' +
-		  '<input class="se-input-control _se_image_size_x" placeholder="auto" type="text" />' +
-		  '<label class="se-modal-size-x">' +
-		  'x' +
-		  '</label>' +
-		  '<input type="text" class="se-input-control _se_image_size_y" placeholder="auto" />' +
-		  '<label><input type="checkbox" class="se-modal-btn-check _se_image_check_proportion" checked/>&nbsp;' +
-		  lang.proportion +
-		  '</label>' +
-		  '<button type="button" title="' +
-		  lang.revertButton +
-		  '" aria-label="' +
-		  lang.revertButton +
-		  '" class="se-btn se-modal-btn-revert">' +
-		  editor.icons.revert +
-		  '</button>'
-		: '';
+	const canResizeHtml = !pluginOptions.canResize
+		? ''
+		: `
+		<div class="se-modal-form">
+			<label class="size-w">${lang.width}</label>
+			<label class="se-modal-size-x">&nbsp;</label>
+			<label class="size-h">${lang.height}</label>
+		</div>
+		<input class="se-input-control _se_image_size_x" placeholder="auto" type="text" />
+		<label class="se-modal-size-x">x</label>
+		<input type="text" class="se-input-control _se_image_size_y" placeholder="auto" />
+		<label><input type="checkbox" class="se-modal-btn-check _se_image_check_proportion" checked/>&nbsp;${lang.proportion}</label>
+		<button type="button" title="${lang.revertButton}" aria-label="${lang.revertButton}" class="se-btn se-modal-btn-revert">${editor.icons.revert}</button>`;
 
-	const html =
-		'<div class="se-modal-header">' +
-		'<button type="button" data-command="close" class="se-btn se-modal-close close" title="' +
-		lang.close +
-		'" aria-label="' +
-		lang.close +
-		'">' +
-		editor.icons.cancel +
-		'</button>' +
-		'<span class="se-modal-title">' +
-		lang.image_modal_title +
-		'</span>' +
-		'</div>' +
-		'<div class="se-modal-tabs">' +
-		'<button type="button" class="_se_tab_link active" data-tab-link="image">' +
-		lang.image +
-		'</button>' +
-		'<button type="button" class="_se_tab_link" data-tab-link="url">' +
-		lang.link +
-		'</button>' +
-		'</div>' +
-		'<form method="post" enctype="multipart/form-data">' +
-		'<div class="_se_tab_content _se_tab_content_image">' +
-		'<div class="se-modal-body"><div style="border-bottom: 1px dashed #ccc;">' +
-		createFileInputHtml +
-		createUrlInputHtml +
-		'</div>' +
-		'<div class="se-modal-form">' +
-		'<label>' +
-		lang.image_modal_altText +
-		'</label><input class="se-input-form _se_image_alt" type="text" />' +
-		'</div>' +
-		canResizeHtml +
-		'<div class="se-modal-form se-modal-form-footer">' +
-		'<label><input type="checkbox" class="se-modal-btn-check _se_image_check_caption" />&nbsp;' +
-		lang.caption +
-		'</label>' +
-		'</div>' +
-		'</div>' +
-		'</div>' +
-		'<div class="se-anchor-editor _se_tab_content _se_tab_content_url" style="display: none"></div>' +
-		'<div class="se-modal-footer">' +
-		'<div class="se-figure-align">' +
-		'<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="none" checked>' +
-		lang.basic +
-		'</label>' +
-		'<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="left">' +
-		lang.left +
-		'</label>' +
-		'<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="center">' +
-		lang.center +
-		'</label>' +
-		'<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="right">' +
-		lang.right +
-		'</label>' +
-		'</div>' +
-		'<button type="submit" class="se-btn-primary" title="' +
-		lang.submitButton +
-		'" aria-label="' +
-		lang.submitButton +
-		'"><span>' +
-		lang.submitButton +
-		'</span></button>' +
-		'</div>' +
-		'</form>';
+	const html = `
+		<div class="se-modal-header">
+			<button type="button" data-command="close" class="se-btn se-modal-close close" title="${lang.close}" aria-label="${lang.close}">${editor.icons.cancel}</button>
+			<span class="se-modal-title">${lang.image_modal_title}</span>
+		</div>
+		<div class="se-modal-tabs">
+			<button type="button" class="_se_tab_link active" data-tab-link="image">${lang.image}</button>
+			<button type="button" class="_se_tab_link" data-tab-link="url">${lang.link}</button>
+		</div>
+		<form method="post" enctype="multipart/form-data">
+			<div class="_se_tab_content _se_tab_content_image">
+				<div class="se-modal-body"><div style="border-bottom: 1px dashed #ccc;">
+					${createFileInputHtml}
+					${createUrlInputHtml}
+				</div>
+				<div class="se-modal-form">
+					<label>${lang.image_modal_altText}</label><input class="se-input-form _se_image_alt" type="text" />
+				</div>
+				${canResizeHtml}
+				<div class="se-modal-form se-modal-form-footer">
+					<label><input type="checkbox" class="se-modal-btn-check _se_image_check_caption" />&nbsp;${lang.caption}</label>
+				</div>
+			</div>
+			<div class="se-anchor-editor _se_tab_content _se_tab_content_url" style="display: none"></div>
+			<div class="se-modal-footer">
+				<div class="se-figure-align">
+					<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="none" checked>${lang.basic}</label>
+					<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="left">${lang.left}</label>
+					<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="center">${lang.center}</label>
+					<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="right">${lang.right}</label>
+				</div>
+				<button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}"><span>${lang.submitButton}</span></button>
+			</div>
+		</form>`;
 
 	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
