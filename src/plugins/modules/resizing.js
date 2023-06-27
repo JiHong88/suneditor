@@ -483,7 +483,11 @@
             }
 
             this.setControllerPosition(contextResizing.resizeButton, resizeContainer, 'bottom', addOffset);
-            this.controllersOn(resizeContainer, contextResizing.resizeButton, this.util.setDisabledButtons.bind(this.util, false, this.resizingDisabledButtons), targetElement, plugin);
+            const onControlsOff = function() {
+                this.util.setDisabledButtons.call(this.util, false, this.resizingDisabledButtons);
+                this.history._resetCachingButton();    
+            };
+            this.controllersOn(resizeContainer, contextResizing.resizeButton, onControlsOff.bind(this), targetElement, plugin);
             this.util.setDisabledButtons(true, this.resizingDisabledButtons);
     
             contextResizing._resize_w = w;
