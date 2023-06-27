@@ -8942,7 +8942,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         readOnly: function (value) {
             core.isReadOnly = value;
             
-            util.setDisabledButtons(!!value, core.resizingDisabledButtons);
+            util.setDisabledButtons(!!value, core.resizingDisabledButtons, true);
 
             if (value) {
                 /** off menus */
@@ -8955,6 +8955,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 context.element.code.setAttribute("readOnly", "true");
                 util.addClass(context.element.wysiwygFrame, 'se-read-only');
             } else {
+                core.history._resetCachingButton();
                 context.element.code.removeAttribute("readOnly");
                 util.removeClass(context.element.wysiwygFrame, 'se-read-only');
             }
