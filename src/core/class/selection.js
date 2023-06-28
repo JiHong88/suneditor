@@ -150,11 +150,12 @@ Selection.prototype = {
 
 	/**
 	 * @description  Get hte clientRects object.
-	 * @param {Range|null} range Range object
+	 * @param {Range|Element|null} range Range object
 	 * @param {"start"|"end"} position It is based on the position of the rect object to be returned in case of range selection.
 	 * @returns
 	 */
 	getRects(range, position) {
+		const targetAbs = range && range.nodeType === 1 ? window.getComputedStyle(range).position === 'absolute' : false;
 		range = range || this.getRange();
 		const globalScroll = this.offset.getGlobalScroll();
 		let isStartPosition = position === 'start';
@@ -191,8 +192,8 @@ Selection.prototype = {
 			isStartPosition = true;
 		}
 
-		const iframeRects = /iframe/i.test(this.editor.frameContext.get('wysiwygFrame').nodeName) ? this.editor.frameContext.get('wysiwygFrame').getClientRects()[0] : null;
-		if (iframeRects) {
+		const iframeRects = /^iframe$/i.test(this.editor.frameContext.get('wysiwygFrame').nodeName) ? this.editor.frameContext.get('wysiwygFrame').getClientRects()[0] : null;
+		if (!targetAbs && iframeRects) {
 			rects = {
 				left: rects.left + iframeRects.left,
 				top: rects.top + iframeRects.top,

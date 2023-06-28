@@ -1924,7 +1924,8 @@ function OnScroll_wysiwyg(rootKey, eventWysiwyg, e) {
 }
 
 function OnFocus_wysiwyg(rootKey, e) {
-	if (this.editor._antiBlur) return;
+	if (this.status.rootKey === rootKey && this.editor._antiBlur) return;
+	this.editor._offCurrentController();
 	this.status.hasFocus = true;
 
 	domUtils.removeClass(this.editor.commandTargets.get('codeView'), 'active');

@@ -3,7 +3,6 @@
  */
 
 import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass } from '../../helper/domUtils';
-import { _w } from '../../helper/env';
 import { numbers } from '../../helper';
 
 const Offset = function (editor) {
@@ -49,7 +48,15 @@ Offset.prototype = {
 	 * @returns {{top:boolean, left:boolean}}
 	 */
 	getGlobal(element) {
-		if (!element) element = this.editor.frameContext.get('topArea');
+		const topArea = this.editor.frameContext.get('topArea');
+		let isTop = false;
+		let targetAbs = false;
+		if (!element) element = topArea;
+		if (element === topArea) isTop = true;
+		if (!isTop) {
+			targetAbs = window.getComputedStyle(element).position === 'absolute';
+		}
+
 		const w = element.offsetWidth;
 		const h = element.offsetHeight;
 		let t = 0,
@@ -59,6 +66,15 @@ Offset.prototype = {
 			t += element.offsetTop;
 			l += element.offsetLeft;
 			element = element.offsetParent;
+		}
+
+		if (!targetAbs && !isTop && /^iframe$/i.test(this.editor.frameContext.get('wysiwygFrame').nodeName)) {
+			element = this.editor.frameContext.get('editorArea');
+			while (element) {
+				t += element.offsetTop;
+				l += element.offsetLeft;
+				element = element.offsetParent;
+			}
 		}
 
 		return {
@@ -76,6 +92,14 @@ Offset.prototype = {
 	 */
 	getGlobalScroll(element) {
 		const topArea = this.editor.frameContext.get('topArea');
+		let isTop = false;
+		let targetAbs = false;
+		if (!element) element = topArea;
+		if (element === topArea) isTop = true;
+		if (!isTop) {
+			targetAbs = window.getComputedStyle(element).position === 'absolute';
+		}
+
 		let t = 0,
 			l = 0,
 			h = 0,
@@ -88,7 +112,7 @@ Offset.prototype = {
 			owOffsetEl = null,
 			ohel = null,
 			owel = null,
-			el = element || topArea;
+			el = element;
 
 		while (el) {
 			t += el.scrollTop;
@@ -114,7 +138,34 @@ Offset.prototype = {
 			el = el.parentElement;
 		}
 
+		if (!targetAbs && !isTop && /^iframe$/i.test(this.editor.frameContext.get('wysiwygFrame').nodeName)) {
+			el = this.editor.frameContext.get('editorArea');
+			ohOffsetEl = owOffsetEl = topArea;
+			while (el) {
+				t += el.scrollTop;
+				l += el.scrollLeft;
+				h += el.scrollHeight;
+				w += el.scrollWidth;
+				if (el.scrollTop > 0) {
+					y += el.offsetTop;
+				}
+				if (el.scrollHeight > el.clientHeight) {
+					oh = /^html$/i.test(el.nodeName) ? oh || el.clientHeight : el.clientHeight + (ohel ? -ohel.clientTop : 0);
+					ohel = el;
+				}
+				if (el.scrollLeft > 0) {
+					x += el.offsetLeft;
+				}
+				if (el.scrollWidth > el.clientWidth) {
+					ow = /^html$/i.test(el.nodeName) ? ow || el.clientWidth : el.clientWidth + (owel ? -owel.clientLeft : 0);
+					owel = el;
+				}
+				el = el.parentElement;
+			}
+		}
+
 		el = this._shadowRoot ? this._shadowRoot.host : null;
+		if (el) ohOffsetEl = owOffsetEl = topArea;
 		while (el) {
 			t += el.scrollTop;
 			l += el.scrollLeft;
@@ -125,7 +176,6 @@ Offset.prototype = {
 			}
 			if (el.scrollHeight > el.clientHeight) {
 				oh = /^html$/i.test(el.nodeName) ? oh || el.clientHeight : el.clientHeight + (ohel ? -ohel.clientTop : 0);
-				ohOffsetEl = ohel || ohOffsetEl || el;
 				ohel = el;
 			}
 			if (el.scrollLeft > 0) {
@@ -133,7 +183,6 @@ Offset.prototype = {
 			}
 			if (el.scrollWidth > el.clientWidth) {
 				ow = /^html$/i.test(el.nodeName) ? ow || el.clientWidth : el.clientWidth + (owel ? -owel.clientLeft : 0);
-				owOffsetEl = owel || owOffsetEl || el;
 				owel = el;
 			}
 			el = el.parentElement;
@@ -143,8 +192,10 @@ Offset.prototype = {
 		const widthEditorRefer = topArea.contains(owOffsetEl);
 		ohOffsetEl = heightEditorRefer ? topArea : ohOffsetEl;
 		owOffsetEl = widthEditorRefer ? topArea : owOffsetEl;
-		const ts = !ohOffsetEl ? 0 : ohOffsetEl.getBoundingClientRect().top + (!ohOffsetEl.parentElement || /^html$/i.test(ohOffsetEl.parentElement.nodeName) ? _w.scrollY : 0);
-		const ls = !owOffsetEl ? 0 : owOffsetEl.getBoundingClientRect().left + (!owOffsetEl.parentElement || /^html$/i.test(owOffsetEl.parentElement.nodeName) ? _w.scrollX : 0);
+		const ts = !ohOffsetEl ? 0 : ohOffsetEl.getBoundingClientRect().top + (!ohOffsetEl.parentElement || /^html$/i.test(ohOffsetEl.parentElement.nodeName) ? window.scrollY : 0);
+		const ls = !owOffsetEl
+			? 0
+			: owOffsetEl.getBoundingClientRect().left + (!owOffsetEl.parentElement || /^html$/i.test(owOffsetEl.parentElement.nodeName) ? window.scrollX : 0);
 
 		return {
 			top: t,
@@ -184,9 +235,9 @@ Offset.prototype = {
 			this._scrollEvent = this.editor.eventManager.addGlobalEvent('scroll', FixedScroll.bind(this, element, e_container, target, t_container), false);
 		}
 
-		this._scrollY = _w.scrollY;
+		this._scrollY = window.scrollY;
 		let wy = 0;
-		if ((this._isFixed = /^fixed$/i.test(_w.getComputedStyle(t_container).position))) {
+		if ((this._isFixed = /^fixed$/i.test(window.getComputedStyle(t_container).position))) {
 			wy += this._scrollY;
 		}
 
@@ -199,15 +250,15 @@ Offset.prototype = {
 		if (this.options.get('_rtl')) {
 			const rtlW = ew > tw ? ew - tw : 0;
 			const rtlL = rtlW > 0 ? 0 : tw - ew;
-			element.style.left = tl - rtlW + rtlL + tcleft + 'px';
+			element.style.left = `${tl - rtlW + rtlL + tcleft}px`;
 			if (tcleft > this.getGlobal(element).left) {
 				element.style.left = tcleft + 'px';
 			}
 		} else {
 			const cw = t_container.offsetWidth;
 			const overLeft = cw <= ew ? 0 : cw - (tl + ew);
-			if (overLeft < 0) element.style.left = tl + overLeft + tcleft + 'px';
-			else element.style.left = tl + 'px';
+			if (overLeft < 0) element.style.left = `${tl + overLeft + tcleft}px`;
+			else element.style.left = `${tl}px`;
 		}
 
 		// top
@@ -222,26 +273,26 @@ Offset.prototype = {
 			offsetEl = offsetEl.offsetParent;
 		}
 
-		const menuHeight_bottom = _w.innerHeight - (containerTop - scrollTop + bt + target.offsetHeight);
+		const menuHeight_bottom = window.innerHeight - (containerTop - scrollTop + bt + target.offsetHeight);
 		if (menuHeight_bottom < elHeight) {
 			let menuTop = -1 * (elHeight - bt + 3);
 			const insTop = containerTop - scrollTop + menuTop;
 			const menuHeight_top = elHeight + (insTop < 0 ? insTop : 0);
 
 			if (menuHeight_top > menuHeight_bottom) {
-				element.style.height = menuHeight_top + 'px';
+				element.style.height = `${menuHeight_top}px`;
 				menuTop = -1 * (menuHeight_top - bt + 3);
 			} else {
-				element.style.height = menuHeight_bottom + 'px';
+				element.style.height = `${menuHeight_bottom}px`;
 				menuTop = bt + target.offsetHeight;
 			}
 
-			element.style.top = menuTop + 'px';
+			element.style.top = `${menuTop}px`;
 		} else {
-			element.style.top = bt + target.offsetHeight + 'px';
+			element.style.top = `${bt + target.offsetHeight}px`;
 		}
 
-		if (/^fixed$/i.test(_w.getComputedStyle(t_container).position)) {
+		if (/^fixed$/i.test(window.getComputedStyle(t_container).position)) {
 			this._elTop = element.offsetTop;
 		}
 	},
@@ -258,14 +309,15 @@ Offset.prototype = {
 			addOffset.left *= -1;
 		}
 
-		const targetAbs = _w.getComputedStyle(target).position === 'absolute';
+		const targetAbs = window.getComputedStyle(target).position === 'absolute';
 		const wwScroll = this.getWWScroll();
 		const editorOffset = this.getGlobal();
 		const editorScroll = this.getGlobalScroll();
-		const targetRect = target.getBoundingClientRect();
+		const targetRect = this.editor.selection.getRects(target, 'start').rects;
 		const targetOffset = this.getGlobal(target);
 		const targetScroll = this.getGlobalScroll(target);
 		const arrow = hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null;
+		console.log('targetRect', JSON.stringify(targetRect));
 
 		// top ----------------------------------------------------------------------------------------------------
 		const editorH = this.editor.frameContext.get('topArea').offsetHeight;
@@ -274,8 +326,11 @@ Offset.prototype = {
 		const targetH = target.offsetHeight;
 		// margin
 		const tmtw = targetRect.top;
-		const tmbw = _w.innerHeight - targetRect.bottom;
-		let toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline || this.options.get('toolbar_container')) ? 0 : this.context.get('toolbar.main').offsetHeight;
+		const tmbw = window.innerHeight - targetRect.bottom;
+		let toolbarH =
+			!this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline || this.options.get('toolbar_container'))
+				? 0
+				: this.context.get('toolbar.main').offsetHeight;
 		let rmt, rmb;
 		if (this.editor.frameContext.get('isFullScreen')) {
 			rmt = tmtw - toolbarH;
@@ -306,7 +361,7 @@ Offset.prototype = {
 		let arrowDir = '';
 		if (position === 'bottom') {
 			arrowDir = 'up';
-			t += targetRect.bottom + ah + _w.scrollY;
+			t += targetRect.bottom + ah + window.scrollY;
 			y = rmb - (elH + ah);
 			if (y < 0) {
 				arrowDir = 'down';
@@ -319,7 +374,7 @@ Offset.prototype = {
 			}
 		} else {
 			arrowDir = 'down';
-			t += targetRect.top - elH - ah + _w.scrollY;
+			t += targetRect.top - elH - ah + window.scrollY;
 			y = rmt - (elH + ah);
 			if (y < 0) {
 				arrowDir = 'up';
@@ -333,17 +388,17 @@ Offset.prototype = {
 		}
 
 		this._setArrow(arrow, arrowDir);
-		element.style.top = t + 'px';
+		element.style.top = `${t}px`;
 
 		// left ----------------------------------------------------------------------------------------------------
 		const editorW = this.editor.frameContext.get('topArea').offsetWidth;
-		const radius = numbers.get(_w.getComputedStyle(element).borderRadius) || 0;
+		const radius = numbers.get(window.getComputedStyle(element).borderRadius) || 0;
 		const targetW = targetOffset.width;
 		const elW = element.offsetWidth;
 		const aw = arrow ? arrow.offsetWidth : 0;
 		// margin
 		const tmlw = targetRect.left;
-		const tmrw = _w.innerWidth - targetRect.right;
+		const tmrw = window.innerWidth - targetRect.right;
 		let rml, rmr;
 		if (this.editor.frameContext.get('isFullScreen')) {
 			rml = tmlw;
@@ -377,7 +432,7 @@ Offset.prototype = {
 		let ax = 0;
 		let awLimit = 0;
 		if (!this.options.get('_rtl')) {
-			l += targetRect.left + _w.scrollX - (rml < 0 ? rml : 0);
+			l += targetRect.left + window.scrollX - (rml < 0 ? rml : 0);
 			x = targetW + rml;
 			if (x < aw) {
 				awLimit = aw / 2 - 1 + (radius <= 2 ? 0 : radius - 2);
@@ -392,7 +447,7 @@ Offset.prototype = {
 			}
 			if (arrow && ax > 0) arrow.style.left = ax + 'px';
 		} else {
-			l += targetRect.right - elW + _w.scrollX + (rmr < 0 ? rmr : 0);
+			l += targetRect.right - elW + window.scrollX + (rmr < 0 ? rmr : 0);
 			x = targetW + rmr;
 			if (x < aw) {
 				awLimit = aw / 2 - 1 + (radius <= 2 ? 0 : radius - 2);
@@ -408,7 +463,7 @@ Offset.prototype = {
 			if (arrow && ax > 0) arrow.style.right = ax + 'px';
 		}
 
-		element.style.left = l + 'px';
+		element.style.left = `${l}px`;
 		inst.__offset = {
 			left: element.offsetLeft + wwScroll.left,
 			top: element.offsetTop + wwScroll.top,
@@ -444,7 +499,7 @@ Offset.prototype = {
 };
 
 function FixedScroll(element, e_container, target, t_container) {
-	const isFixed = /^fixed$/i.test(_w.getComputedStyle(t_container).position);
+	const isFixed = /^fixed$/i.test(window.getComputedStyle(t_container).position);
 	if (!this._isFixed) {
 		if (isFixed) {
 			this.setRelPosition(element, e_container, target, t_container, true);
@@ -455,7 +510,7 @@ function FixedScroll(element, e_container, target, t_container) {
 		return;
 	}
 
-	element.style.top = (this._elTop - (this._scrollY - _w.scrollY - t_container.offsetTop)) + 'px';
+	element.style.top = `${this._elTop - (this._scrollY - window.scrollY - t_container.offsetTop)}px`;
 }
 
 export default Offset;

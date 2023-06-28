@@ -320,11 +320,23 @@ window.c = () => {
 			editor1: {
 				target: document.querySelector('#multi_editor_1'),
 				options: {
-					value: '<p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p><p>ed1</p>',
+					value: `
+					<p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
+					<p>ed1</p>
+					<p>ed2</p>
+					<div class="se-component se-image-container __se__float-none">
+					<figure>
+					<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" style="" data-se-size="auto,auto" data-se-index="0" data-se-file-name="cat.jpg" data-se-file-size="0">
+					</figure>
+					</div>
+					<p>ed3</p>
+					<p>ed4</p>
+					<p>edend--</p>
+					`,
 					placeholder: 'place1',
-					height: 'auto',
-					width: '200px',
-					// iframe: true,
+					height: '400px',
+					width: '500px',
+					iframe: true,
 					// iframe_fullPage: true,
 					statusbar: true,
 					statusbar_resizeEnable: true
@@ -379,7 +391,7 @@ window.c = () => {
 			// codeMirror: {
 			// 	src: Codemirror5
 			// },
-			iframe:true,
+			iframe:false,
 			defaultLine: 'div',
 			toolbar_sticky: 0,
 			lineAttrReset: 'id',

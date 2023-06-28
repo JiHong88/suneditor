@@ -145,7 +145,6 @@ HTML.prototype = {
 		if (requireFormat) domTree = this._editFormat(dom).childNodes;
 
 		for (let i = 0, len = domTree.length, t; i < len; i++) {
-			cleanData += this._makeLine(domTree[i], requireFormat);
 			t = domTree[i];
 			if (this.__allowedScriptRegExp.test(t.nodeName)) {
 				cleanData += t.outerHTML;

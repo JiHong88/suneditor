@@ -826,15 +826,17 @@ function CreateHTML_modal(editor, pluginOptions) {
 		? ''
 		: `
 		<div class="se-modal-form">
-			<label class="size-w">${lang.width}</label>
-			<label class="se-modal-size-x">&nbsp;</label>
-			<label class="size-h">${lang.height}</label>
-		</div>
-		<input class="se-input-control _se_image_size_x" placeholder="auto" type="text" />
-		<label class="se-modal-size-x">x</label>
-		<input type="text" class="se-input-control _se_image_size_y" placeholder="auto" />
-		<label><input type="checkbox" class="se-modal-btn-check _se_image_check_proportion" checked/>&nbsp;${lang.proportion}</label>
-		<button type="button" title="${lang.revertButton}" aria-label="${lang.revertButton}" class="se-btn se-modal-btn-revert">${editor.icons.revert}</button>`;
+			<div class="se-modal-size-text">
+				<label class="size-w">${lang.width}</label>
+				<label class="se-modal-size-x">&nbsp;</label>
+				<label class="size-h">${lang.height}</label>
+			</div>
+			<input class="se-input-control _se_image_size_x" placeholder="auto" type="text" />
+			<label class="se-modal-size-x">x</label>
+			<input type="text" class="se-input-control _se_image_size_y" placeholder="auto" />
+			<label><input type="checkbox" class="se-modal-btn-check _se_image_check_proportion" checked/>&nbsp;${lang.proportion}</label>
+			<button type="button" title="${lang.revertButton}" aria-label="${lang.revertButton}" class="se-btn se-modal-btn-revert">${editor.icons.revert}</button>
+		</div>`;
 
 	const html = `
 		<div class="se-modal-header">
@@ -847,19 +849,21 @@ function CreateHTML_modal(editor, pluginOptions) {
 		</div>
 		<form method="post" enctype="multipart/form-data">
 			<div class="_se_tab_content _se_tab_content_image">
-				<div class="se-modal-body"><div style="border-bottom: 1px dashed #ccc;">
+				<div class="se-modal-body">
 					${createFileInputHtml}
 					${createUrlInputHtml}
-				</div>
-				<div class="se-modal-form">
-					<label>${lang.image_modal_altText}</label><input class="se-input-form _se_image_alt" type="text" />
-				</div>
-				${canResizeHtml}
-				<div class="se-modal-form se-modal-form-footer">
-					<label><input type="checkbox" class="se-modal-btn-check _se_image_check_caption" />&nbsp;${lang.caption}</label>
+					<div style="border-bottom: 1px dashed #ccc;"></div>
+					<div class="se-modal-form">
+						<label>${lang.image_modal_altText}</label><input class="se-input-form _se_image_alt" type="text" />
+					</div>
+					${canResizeHtml}
+					<div class="se-modal-form se-modal-form-footer">
+						<label><input type="checkbox" class="se-modal-btn-check _se_image_check_caption" />&nbsp;${lang.caption}</label>
+					</div>
 				</div>
 			</div>
-			<div class="se-anchor-editor _se_tab_content _se_tab_content_url" style="display: none"></div>
+			<div class="se-anchor-editor _se_tab_content _se_tab_content_url" style="display: none;">
+			</div>
 			<div class="se-modal-footer">
 				<div class="se-figure-align">
 					<label><input type="radio" name="suneditor_image_radio" class="se-modal-btn-radio" value="none" checked>${lang.basic}</label>
