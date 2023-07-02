@@ -2143,8 +2143,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let endNextEl = null;
             if (isStartEdge) {
                 startPrevEl = util.getFormatElement(range.startContainer);
-                prevContainer = startPrevEl.previousElementSibling;
-                startPrevEl = startPrevEl ? prevContainer : startPrevEl;
+                if (startPrevEl) {
+                    prevContainer = startPrevEl.previousElementSibling;
+                    startPrevEl = prevContainer;
+                }
             }
             if (isEndEdge) {
                 endNextEl = util.getFormatElement(range.endContainer);
@@ -2304,6 +2306,14 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
+            if (container.children.length === 0) {
+                const br = util.createElement('BR');
+                const format = util.createElement(options.defaultTag);
+                format.appendChild(br);
+
+                util.changeElement(container, format);
+                container = format;
+            } 
             // set range
             this.setRange(container, offset, container, offset);
             // history stack
