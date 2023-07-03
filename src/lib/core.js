@@ -7999,22 +7999,44 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
             const dataTransfer = e.dataTransfer;
             if (!dataTransfer) return true;
-
-            core.removeNode();
+                
             event._setDropLocationSelection(e);
+            core.removeNode();
+
             return event._dataTransferAction('drop', e, dataTransfer);
         },
 
         _setDropLocationSelection: function (e) {
+            const range = { startContainer: null, startOffset: null, endContainer: null, endOffset: null };
+
+            let r = null;
             if (e.rangeParent) {
-                core.setRange(e.rangeParent, e.rangeOffset, e.rangeParent, e.rangeOffset);
+                range.startContainer = e.rangeParent;
+                range.startOffset = e.rangeOffset;
+                range.endContainer = e.rangeParent;
+                range.endOffset = e.rangeOffset;
             } else if (core._wd.caretRangeFromPoint) {
-                const r = core._wd.caretRangeFromPoint(e.clientX, e.clientY);
-                core.setRange(r.startContainer, r.startOffset, r.endContainer, r.endOffset);
+                r = core._wd.caretRangeFromPoint(e.clientX, e.clientY);
             } else {
-                const r = core.getRange();
-                core.setRange(r.startContainer, r.startOffset, r.endContainer, r.endOffset);
+                r = core.getRange();  
             }
+            if (r) {
+                range.startContainer = r.startContainer;
+                range.startOffset = r.startOffset;
+                range.endContainer = r.endContainer;
+                range.endOffset = r.endOffset;
+            }
+
+            if (range.startContainer === range.endContainer) {
+                const component = util.getParentElement(range.startContainer, util.isComponent);
+                if (component) {
+                    range.startContainer = component;
+                    range.startOffset = 0;
+                    range.endContainer = component;
+                    range.endOffset = component.textContent.length;
+                }
+            }
+            core.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
         },
 
         _dataTransferAction: function (type, e, data) {
