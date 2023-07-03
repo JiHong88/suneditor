@@ -81,6 +81,7 @@ const Table = function (editor, pluginOptions) {
 Table.key = 'table';
 Table.type = 'dropdown-free';
 Table.className = '';
+Table.component = (node) => node && (/^table$/i.test(node.nodeName) ? Table.key : '');
 Table.prototype = {
 	/**
 	 * @override core
@@ -241,7 +242,7 @@ Table.prototype = {
 	/**
 	 * @override controller
 	 */
-	reset() {
+	close() {
 		this.__removeGlobalEvents();
 		this._deleteStyleSelectedCells();
 		this._toggleEditor(true);
@@ -480,7 +481,7 @@ Table.prototype = {
 				}
 			}
 
-			if (!option) this.reset();
+			if (!option) this.close();
 		} // one
 		else {
 			this[isRow ? 'editRow' : 'editCell'](option);
@@ -1323,7 +1324,7 @@ function OffCellShift() {
 }
 
 function OffCellTouch() {
-	this.reset();
+	this.close();
 }
 
 // init element

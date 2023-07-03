@@ -1159,7 +1159,7 @@ Format.prototype = {
 		}
 
 		/** validation check function*/
-		const wBoolean = this._w.Boolean;
+		const wBoolean = Boolean;
 		const _removeCheck = {
 			v: false
 		};
@@ -1577,11 +1577,11 @@ Format.prototype = {
 	 */
 	getLinesAndComponents(removeDuplicate) {
 		const commonCon = this.selection.getRange().commonAncestorContainer;
-		const myComponent = domUtils.getParentElement(commonCon, this.component.is);
+		const myComponent = domUtils.getParentElement(commonCon, this.component.is.bind(this.component));
 		const selectedLines = domUtils.isTable(commonCon)
 			? this.getLines(null)
 			: this.getLines((current) => {
-					const component = domUtils.getParentElement(current, this.component.is);
+					const component = domUtils.getParentElement(current, this.component.is.bind(this.component));
 					return (this.isLine(current) && (!component || component === myComponent)) || (this.component.is(current) && !this.getLine(current));
 			  });
 

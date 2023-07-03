@@ -1168,7 +1168,7 @@ HTML.prototype = {
 				((domUtils.isListCell(current) && !domUtils.isList(current.parentNode)) ||
 					((this.format.isLine(current) || this.component.is(current)) &&
 						!this.format.isBlock(current.parentNode) &&
-						!domUtils.getParentElement(current, this.component.is)));
+						!domUtils.getParentElement(current, this.component.is.bind(this.component))));
 
 			return result;
 		});

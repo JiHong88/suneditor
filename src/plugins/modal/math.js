@@ -61,7 +61,7 @@ Math_.prototype = {
 	/**
 	 * @override controller
 	 */
-	reset() {
+	close() {
 		domUtils.removeClass(this._element, 'se-focus');
 		this._element = null;
 	},

@@ -20,20 +20,25 @@ const HR = function (editor, pluginOptions) {
 HR.key = 'hr';
 HR.type = 'dropdown';
 HR.className = '';
+HR.component = (node) => node && (/^hr$/i.test(node.nodeName) ? HR.key : '');
 HR.prototype = {
-	/**
-	 * @override core
-	 */
-	active(element) {
-		domUtils.removeClass(this.currentHR, 'on');
-		if (element && /HR/i.test(element.nodeName)) {
-			domUtils.addClass(element, 'on');
-			this.currentHR = element;
-			return true;
-		} else {
-			this.currentHR = null;
-			return false;
-		}
+	select(element) {
+		domUtils.addClass(element, 'on');
+	},
+
+	close(element) {
+		domUtils.removeClass(element, 'on');
+	},
+
+	destroy(element) {
+		if (!element) return;
+
+		const focusEl = element.previousElementSibling || element.nextElementSibling;
+		domUtils.removeItem(element);
+
+		// focus
+		this.editor.focusEdge(focusEl);
+		this.history.push(false);
 	},
 
 	/**

@@ -322,16 +322,30 @@ window.c = () => {
 				options: {
 					value: `
 					<p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
+
 					<p>ed1</p>
+
+					<hr class="__se__solid">
+
+					<p><br>
+					</p>
+
 					<p>ed2</p>
+
 					<div class="se-component se-image-container __se__float-none">
 					<figure>
-					<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" style="" data-se-size="auto,auto" data-se-index="0" data-se-file-name="cat.jpg" data-se-file-size="0">
+						<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
 					</figure>
 					</div>
+
 					<p>ed3</p>
+
 					<p>ed4</p>
+
 					<p>edend--</p>
+
+					<div>					</div>
+
 					`,
 					placeholder: 'place1',
 					height: '400px',

@@ -126,7 +126,7 @@ Audio_.prototype = {
 	/**
 	 * @override controller
 	 */
-	reset() {
+	close() {
 		if (!this._element) return;
 		domUtils.removeClass(this._element, 'active');
 		domUtils.removeClass(this._element.parentElement, 'se-figure-selected');

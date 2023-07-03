@@ -196,7 +196,7 @@ Image_.prototype = {
 	},
 
 	/**
-	 * @override fileManager, figure
+	 * @override component
 	 * @description Called when a container is selected.
 	 * @param {Element} element Target element
 	 */
@@ -261,11 +261,11 @@ Image_.prototype = {
 	},
 
 	/**
-	 * @override fileManager
+	 * @override component
 	 */
 	destroy(element) {
 		const targetEl = element || this._element;
-		const container = domUtils.getParentElement(targetEl, this.component.is) || targetEl;
+		const container = domUtils.getParentElement(targetEl, Figure.__is) || targetEl;
 		const focusEl = container.previousElementSibling || container.nextElementSibling;
 		const emptyDiv = container.parentNode;
 

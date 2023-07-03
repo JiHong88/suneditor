@@ -12,10 +12,13 @@ const Component = function (editor) {
 	// members
 	this.info = null;
 	this.currentTarget = null;
-	this.__globalEvents = [OnCopy_component.bind(this), OnCut_component.bind(this), OnKeyDown_component.bind(this)];
+	this.currentPlugin = null;
+	this.currentPluginName = '';
+	this.__globalEvents = [OnCopy_component.bind(this), OnCut_component.bind(this), OnKeyDown_component.bind(this), CloseListener_mouse.bind(this)];
 	this._bindClose_copy = null;
 	this._bindClose_cut = null;
-	this._bindClose_redo = null;
+	this._bindClose_keydown = null;
+	this._bindClose_mouse = null;
 };
 
 Component.prototype = {
@@ -74,26 +77,35 @@ Component.prototype = {
 	 * @returns {Object|null}
 	 */
 	get(element) {
-		if (!this.editor._fileManager.queryString || !element) return null;
+		if (!element) return null;
 
 		let target;
+		let pluginName = '';
+		let isFile = false;
 		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
 			if (this.editor._fileManager.queryString) target = element.querySelector(this.editor._fileManager.queryString);
 		}
-		if (!target && element.nodeName && this.editor._fileManager.regExp.test(element.nodeName)) {
-			target = element;
+		if (!target && element.nodeName) {
+			if (this.editor._fileManager.regExp.test(element.nodeName)) {
+				target = element;
+				isFile = true;
+			} else if ((pluginName = this.editor._componentManager.find((f) => f(element)))) {
+				target = element;
+				pluginName = pluginName(element);
+			}
 		}
 		if (!target) {
 			return null;
 		}
 
-		const info = Figure.GetContainer(target);
+		const figureInfo = Figure.GetContainer(target);
 		return {
 			target: target,
-			pluginName: this.editor._fileManager.pluginMap[target.nodeName.toLowerCase()] || '',
-			container: info.container,
-			cover: info.cover,
-			caption: info.caption
+			pluginName: pluginName || this.editor._fileManager.pluginMap[target.nodeName.toLowerCase()] || '',
+			container: figureInfo.container,
+			cover: figureInfo.cover,
+			caption: figureInfo.caption,
+			isFile: isFile
 		};
 	},
 
@@ -103,9 +115,8 @@ Component.prototype = {
 	 * @param {string} pluginName Plugin name (image, video)
 	 */
 	select(element, pluginName) {
-		this.currentTarget = element;
-		this.info = Figure.GetContainer(element);
-		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is)) || domUtils.isUneditable(element)) return false;
+		this.info = this.get(element);
+		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is.bind(this))) || domUtils.isUneditable(element)) return false;
 
 		this.editor._antiBlur = true;
 		this.editor.blur();
@@ -118,9 +129,22 @@ Component.prototype = {
 				if (typeof plugin.select === 'function') plugin.select(element);
 				this._setComponentLineBreaker(element);
 				this.__addGlobalEvent();
+				if (!this.info.isFile) this.__addNotFileGlobalEvent();
+				this.currentTarget = element;
+				this.currentPlugin = plugin;
+				this.currentPluginName = pluginName;
 			},
 			this.editor.frameOptions.get('iframe') ? 100 : 0
 		);
+	},
+
+	close() {
+		this.editor._antiBlur = false;
+		this.editor.frameContext.get('lineBreaker').style.display = 'none';
+		if (this.currentPlugin && typeof this.currentPlugin.close === 'function') {
+			this.currentPlugin.close(this.currentTarget);
+		}
+		this.__removeGlobalEvent();
 	},
 
 	/**
@@ -129,7 +153,20 @@ Component.prototype = {
 	 * @returns {boolean}
 	 */
 	is(element) {
-		return Figure.__isComponent(element);
+		if (!element) return false;
+
+		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
+			if (this.editor._fileManager.queryString) return true;
+		}
+		if (element.nodeName) {
+			if (this.editor._fileManager.regExp.test(element.nodeName)) {
+				return true;
+			} else if (this.editor._componentManager.find((f) => f(element))) {
+				return true;
+			}
+		}
+
+		return false;
 	},
 
 	/**
@@ -145,7 +182,7 @@ Component.prototype = {
 
 		const yScroll = wysiwyg.scrollY || wysiwyg.scrollTop || 0;
 		const wScroll = wysiwyg.scrollX || wysiwyg.scrollLeft || 0;
-		const container = domUtils.getParentElement(element, this.is);
+		const container = domUtils.getParentElement(element, this.is.bind(this));
 		const t_style = fc.get('lineBreaker_t').style;
 		const b_style = fc.get('lineBreaker_b').style;
 		const target = this.editor._figureContainer && this.editor._figureContainer.style.display === 'block' ? this.editor._figureContainer : element;
@@ -189,17 +226,34 @@ Component.prototype = {
 		this.__removeGlobalEvent();
 		this._bindClose_copy = this.eventManager.addGlobalEvent('copy', this.__globalEvents[0]);
 		this._bindClose_cut = this.eventManager.addGlobalEvent('cut', this.__globalEvents[1]);
-		this._bindClose_redo = this.eventManager.addGlobalEvent('keydown', this.__globalEvents[2]);
+		this._bindClose_keydown = this.eventManager.addGlobalEvent('keydown', this.__globalEvents[2]);
 	},
 
 	__removeGlobalEvent() {
+		this.__removeNotFileGlobalEvent();
 		if (this._bindClose_copy) this._bindClose_copy = this.eventManager.removeGlobalEvent(this._bindClose_copy);
 		if (this._bindClose_cut) this._bindClose_cut = this.eventManager.removeGlobalEvent(this._bindClose_cut);
-		if (this._bindClose_redo) this._bindClose_redo = this.eventManager.removeGlobalEvent(this._bindClose_redo);
+		if (this._bindClose_keydown) this._bindClose_keydown = this.eventManager.removeGlobalEvent(this._bindClose_keydown);
+		this.currentPlugin = null;
+		this.currentTarget = null;
+	},
+
+	__addNotFileGlobalEvent() {
+		this.__removeNotFileGlobalEvent();
+		this._bindClose_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEvents[3], true);
+	},
+
+	__removeNotFileGlobalEvent() {
+		if (this._bindClose_mouse) this._bindClose_mouse = this.eventManager.removeGlobalEvent(this._bindClose_mouse);
 	},
 
 	constructor: Component
 };
+
+function CloseListener_mouse(e) {
+	if (this.currentTarget && this.currentTarget.contains(e.target)) return;
+	this.close();
+}
 
 function OnCopy_component(e) {
 	const info = this.info;
@@ -226,6 +280,8 @@ function OnCut_component(e) {
 function OnKeyDown_component(e) {
 	const keyCode = e.keyCode;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
+
+	// redo, undo
 	if (ctrl && keyCode !== 17) {
 		const info = this.editor.shortcutsKeyMap.get(keyCode + (e.shiftKey ? 1000 : 0));
 		if (info && /^(redo|undo)$/.test(info.c)) {
@@ -233,7 +289,44 @@ function OnKeyDown_component(e) {
 			e.stopPropagation();
 			this.__removeGlobalEvent();
 			this.editor.run(info.c, info.t, info.e);
+			return;
 		}
+	}
+
+	// backspace, delete
+	if (!ctrl && (keyCode === 8 || keyCode === 46)) {
+		e.preventDefault();
+		e.stopPropagation();
+		if (this.currentPlugin && typeof this.currentPlugin.destroy === 'function') {
+			this.currentPlugin.destroy(this.currentTarget);
+			this.editor._offCurrentController();
+			this.__removeGlobalEvent();
+			return;
+		}
+	}
+
+	// enter
+	if (!ctrl && keyCode === 13) {
+		e.preventDefault();
+		const compContext = this.get(this.currentTarget);
+		const container = compContext.container || compContext.target;
+		const sibling = container.previousElementSibling || container.nextElementSibling;
+		let newEl = null;
+		if (domUtils.isListCell(container.parentNode)) {
+			newEl = domUtils.createElement('BR');
+		} else {
+			newEl = domUtils.createElement(this.format.isLine(sibling) && !this.format.isBlock(sibling) ? sibling.nodeName : this.options.get('defaultLine'), null, '<br>');
+		}
+
+		this.editor._offCurrentController();
+		container.parentNode.insertBefore(newEl, container);
+		if (this.select(compContext.target, this.currentPluginName) === false) this.editor.blur();
+	}
+
+	// ESC
+	if (!ctrl && keyCode === 27) {
+		this.close();
+		return;
 	}
 }
 

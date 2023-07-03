@@ -119,7 +119,7 @@ Figure.CreateCaption = function (cover, text) {
 Figure.GetContainer = function (element) {
 	return {
 		target: element,
-		container: domUtils.getParentElement(element, Figure.__isComponent),
+		container: domUtils.getParentElement(element, Figure.__is),
 		cover: domUtils.getParentElement(element, 'FIGURE'),
 		caption: domUtils.getEdgeChild(element.parentElement, 'FIGCAPTION')
 	};
@@ -185,7 +185,7 @@ Figure.CalcRatio = function (w, h, defaultSizeUnit, ratio) {
  * @returns {boolean}
  * @private
  */
-Figure.__isComponent = function (element) {
+Figure.__is = function (element) {
 	return element && (/se-component/.test(element.className) || /^(TABLE|HR)$/.test(element.nodeName));
 };
 
@@ -193,7 +193,7 @@ Figure.prototype = {
 	/**
 	 * @override controller
 	 */
-	reset() {
+	close() {
 		this.editor._antiBlur = false;
 		domUtils.removeClass(this._cover, 'se-figure-selected');
 	},

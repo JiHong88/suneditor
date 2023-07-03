@@ -305,7 +305,9 @@
 	border-width: 1px 0 0;
 	border-color: black;
 	border-image: initial;
-	height: 1px;
+	height: 20px;
+	margin-top: 20px;
+	margin-bottom: 0;
 }
 
 .sun-editor-editable hr.__se__solid {

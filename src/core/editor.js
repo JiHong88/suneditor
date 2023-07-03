@@ -275,6 +275,7 @@ const Editor = function (multiTargets, options) {
 		pluginRegExp: null,
 		pluginMap: null
 	};
+	this._componentManager = [];
 
 	/**
 	 * @description Current Figure container.
@@ -722,6 +723,7 @@ Editor.prototype = {
 	focus(rootKey) {
 		if (rootKey) this.changeFrameContext(rootKey);
 		if (this.frameContext.get('wysiwygFrame').style.display === 'none') return;
+		this._antiBlur = false;
 
 		if (this.frameOptions.get('iframe') || !this.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
 			this._nativeFocus();
@@ -755,6 +757,7 @@ Editor.prototype = {
 	 * @param {Element|null} focusEl Focus element
 	 */
 	focusEdge(focusEl) {
+		this._antiBlur = false;
 		if (!focusEl) focusEl = this.frameContext.get('wysiwyg').lastElementChild;
 
 		const fileComponentInfo = this.component.get(focusEl);
@@ -1199,13 +1202,16 @@ Editor.prototype = {
 	__editorInit(options) {
 		this.applyRootTargets((e) => {
 			this.__setEditorParams(e);
-			this._initWysiwygArea(e, e.get('options').get('value'));
-			this.eventManager._addFrameEvents(e);
 		});
 
 		// initialize core and add event listeners
 		this._setFrameInfo(this.rootTargets.get(this.status.rootKey));
 		this.__init(options);
+
+		this.applyRootTargets((e) => {
+			this._initWysiwygArea(e, e.get('options').get('value'));
+			this.eventManager._addFrameEvents(e);
+		});
 
 		this._componentsInfoInit = false;
 		this._componentsInfoReset = false;
@@ -1279,6 +1285,10 @@ Editor.prototype = {
 						this._fileManager.pluginMap[tagNames[tag].toLowerCase()] = key;
 					}
 				}
+			}
+			// Not file component
+			if (typeof plugin.constructor.component === 'function') {
+				this._componentManager.push(plugin.constructor.component);
 			}
 
 			if (typeof plugin.onPluginMousedown === 'function') {

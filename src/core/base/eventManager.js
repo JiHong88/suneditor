@@ -416,7 +416,7 @@ EventManager.prototype = {
 		const rangeEl = this.format.getBlock(commonCon, null);
 		let focusNode, offset, format;
 
-		const fileComponent = domUtils.getParentElement(commonCon, this.component.is);
+		const fileComponent = domUtils.getParentElement(commonCon, this.component.is.bind(this.component));
 		if (fileComponent && !domUtils.isTable(fileComponent)) {
 			return;
 		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-se-embed') === 'true') {
@@ -1014,7 +1014,6 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 	/** default key action */
 	const range = this.selection.getRange();
 	const selectRange = !range.collapsed || range.startContainer !== range.endContainer;
-	const fileComponentName = this.editor._fileManager.pluginRegExp.test(this.editor.currentControllerName) ? this.editor.currentControllerName : '';
 	let formatEl = this.format.getLine(selectionNode, null) || selectionNode;
 	let rangeEl = this.format.getBlock(formatEl, null);
 
@@ -1025,16 +1024,6 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 
 	switch (keyCode) {
 		case 8 /** backspace key */:
-			if (!selectRange) {
-				if (fileComponentName) {
-					e.preventDefault();
-					e.stopPropagation();
-					this.plugins[fileComponentName].destroy();
-					this.editor._offCurrentController();
-					break;
-				}
-			}
-
 			if (selectRange && this._hardDelete()) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -1243,14 +1232,6 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 
 			break;
 		case 46 /** delete key */:
-			if (fileComponentName) {
-				e.preventDefault();
-				e.stopPropagation();
-				this.plugins[fileComponentName].destroy();
-				this.editor._offCurrentController();
-				break;
-			}
-
 			if (selectRange && this._hardDelete()) {
 				e.preventDefault();
 				e.stopPropagation();
@@ -1369,7 +1350,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 
 			break;
 		case 9 /** tab key */:
-			if (fileComponentName || this.options.get('tabDisable')) break;
+			if (this.options.get('tabDisable')) break;
 			e.preventDefault();
 			if (ctrl || alt || domUtils.isWysiwygFrame(selectionNode)) break;
 
@@ -1738,24 +1719,6 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 				this.selection.setRange(formatEl, 0, formatEl, 0);
 			}
 
-			if (fileComponentName) {
-				e.preventDefault();
-
-				const compContext = this.component.get(this.component.currentTarget);
-				const container = compContext.container;
-				const sibling = container.previousElementSibling || container.nextElementSibling;
-
-				let newEl = null;
-				if (domUtils.isListCell(container.parentNode)) {
-					newEl = domUtils.createElement('BR');
-				} else {
-					newEl = domUtils.createElement(this.format.isLine(sibling) && !this.format.isBlock(sibling) ? sibling.nodeName : this.options.get('defaultLine'), null, '<br>');
-				}
-
-				container.parentNode.insertBefore(newEl, container);
-				if (this.component.select(compContext.target, fileComponentName) === false) this.editor.blur();
-			}
-
 			break;
 	}
 
@@ -1968,7 +1931,7 @@ function OnBlur_wysiwyg(rootKey, e) {
 function OnMouseMove_wysiwyg(e) {
 	if (this.status.isDisabled || this.status.isReadOnly) return false;
 
-	const component = domUtils.getParentElement(e.target, this.component.is);
+	const component = domUtils.getParentElement(e.target, this.component.is.bind(this.component));
 	const lineBreakerStyle = this.editor.frameContext.get('lineBreaker').style;
 
 	if (component && !this.editor.currentControllerName) {

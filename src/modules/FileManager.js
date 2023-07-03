@@ -218,7 +218,7 @@ FileManager.prototype = {
 
 		while (tags.length > 0) {
 			let tag = tags.shift();
-			if (!domUtils.getParentElement(tag, this.editor.component.is)) {
+			if (!domUtils.getParentElement(tag, Figure.__is)) {
 				currentTags.push(this.infoIndex);
 				try {
 					if (this.figure) this.figure.__fileManagerInfo = true;

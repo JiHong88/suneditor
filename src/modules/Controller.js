@@ -125,7 +125,7 @@ Controller.prototype = {
 		this.editor.opendControllers = [];
 		this.editor._antiBlur = false;
 		this.editor._controllerTargetContext = null;
-		if (typeof this.inst.reset === 'function') this.inst.reset();
+		if (typeof this.inst.reset === 'function') this.inst.close();
 	},
 
 	/**
@@ -199,12 +199,11 @@ function CloseListener_key(e) {
 	if (this._checkFixed()) return;
 	const keyCode = e.keyCode;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
-	if (ctrl || NON_RESPONSE_KEYCODE.test(keyCode)) return;
+	if (ctrl || !NON_RESPONSE_KEYCODE.test(keyCode)) return;
 
 	this.editor.frameContext.get('lineBreaker').style.display = 'none';
 	if (this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) return;
 	if (this.editor._fileManager.pluginRegExp.test(this.kind) && keyCode !== 27) return;
-
 	this.close();
 }
 

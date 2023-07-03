@@ -140,7 +140,7 @@ Link.prototype = {
 	/**
 	 * @override controller
 	 */
-	reset() {
+	close() {
 		domUtils.removeClass(this.controller.currentTarget, 'on');
 	},
 
