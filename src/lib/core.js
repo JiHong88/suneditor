@@ -2306,7 +2306,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            if (container.children.length === 0) {
+            if (container.children && container.children.length === 0) {
                 const br = util.createElement('BR');
                 const format = util.createElement(options.defaultTag);
                 format.appendChild(br);
