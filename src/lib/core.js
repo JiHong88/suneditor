@@ -1646,7 +1646,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
                 const compContext = context[pluginName];
                 const container = compContext._container;
-                core.setRange(container, 0, container, container.textContent.length);
+                core.setRange(container, 0, container, 0);
             }.bind(this));
         },
 
