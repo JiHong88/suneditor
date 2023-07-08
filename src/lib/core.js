@@ -2136,6 +2136,27 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             this._resetRangeToTextNode();
 
             const range = this.getRange();
+
+            if (range.startContainer === range.endContainer) {
+                const component = util.getParentElement(range.startContainer, util.isComponent);
+                if (component) {
+                    const br = util.createElement('BR');
+                    const format = util.createElement(options.defaultTag);
+                    format.appendChild(br);
+
+                    util.changeElement(component, format);
+                    
+                    core.setRange(format, 0, format, 0);
+                    this.history.push(true);
+
+                    return {
+                        container: format,
+                        offset: 0,
+                        prevContainer: null
+                    }; 
+                }
+            }
+
             const isStartEdge = range.startOffset === 0;
             const isEndEdge = core.isEdgePoint(range.endContainer, range.endOffset, 'end');
             let prevContainer = null;
@@ -2306,14 +2327,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                 }
             }
 
-            if (container.children && container.children.length === 0) {
-                const br = util.createElement('BR');
-                const format = util.createElement(options.defaultTag);
-                format.appendChild(br);
-
-                util.changeElement(container, format);
-                container = format;
-            } 
             // set range
             this.setRange(container, offset, container, offset);
             // history stack
