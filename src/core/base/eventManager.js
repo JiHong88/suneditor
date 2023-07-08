@@ -131,9 +131,11 @@ EventManager.prototype = {
 	/**
 	 * @description Activates the corresponding button with the tags information of the current cursor position,
 	 * such as 'bold', 'underline', etc., and executes the 'active' method of the plugins.
+	 * @param {Node|null} selectionNode selectionNode
+	 * @returns {Node|undefined} selectionNode
 	 */
-	applyTagEffect() {
-		let selectionNode = this.selection.getNode();
+	applyTagEffect(selectionNode) {
+		selectionNode = selectionNode || this.selection.getNode();
 		if (selectionNode === this.editor.effectNode) return;
 		this.editor.effectNode = selectionNode;
 
@@ -153,6 +155,13 @@ EventManager.prototype = {
 			selectionNode = selectionNode.firstChild;
 		}
 
+		if (this.component.is(selectionNode)) {
+			const component = this.component.get(selectionNode);
+			this.component.select(component.target, component.pluginName);
+			return;
+		}
+
+		this.editor._antiBlur = false;
 		for (let element = selectionNode; !domUtils.isWysiwygFrame(element); element = element.parentNode) {
 			if (!element) break;
 			if (element.nodeType !== 1 || domUtils.isBreak(element)) continue;
@@ -234,6 +243,8 @@ EventManager.prototype = {
 				? this.status.currentNodes.reverse().join(' < ')
 				: this.status.currentNodes.join(' > ');
 		}
+
+		return selectionNode;
 	},
 
 	/**
@@ -1752,10 +1763,12 @@ function OnKeyUp_wysiwyg(rootKey, e) {
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 	const alt = e.altKey;
 
-	if (this.status.isReadOnly) {
-		if (!ctrl && DIRECTION_KEYCODE.test(keyCode)) this.applyTagEffect();
-		return;
+	if (!ctrl && DIRECTION_KEYCODE.test(keyCode)) {
+		this.selection._init();
+		this.applyTagEffect();
 	}
+
+	if (this.status.isReadOnly) return;
 
 	const range = this.selection.getRange();
 	let selectionNode = this.selection.getNode();

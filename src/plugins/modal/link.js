@@ -48,6 +48,7 @@ Link.prototype = {
 			return true;
 		}
 
+		this.init();
 		return false;
 	},
 

@@ -1,7 +1,8 @@
 # SunEditor
 Vanilla javscript based WYSIWYG web editor.
 SunEditor supports all modern browsers except IE without any dependencies and polyfills.
-Coded based on ES2018(ES9), Node.js@v18 and written in "prototype" syntax.
+Coded based on ES2018(ES9), Nodejs@v18 and written in "prototype" syntax.
+Nodejs version 14 is required to build or test this project.
 
 #### 🌤 Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a> 🌤
 

@@ -196,6 +196,7 @@ Figure.prototype = {
 	close() {
 		this.editor._antiBlur = false;
 		domUtils.removeClass(this._cover, 'se-figure-selected');
+		this.controller.close();
 	},
 
 	open(target, nonResizing, __fileManagerInfo) {

@@ -102,6 +102,7 @@ Table.prototype = {
 			const firstTd = oTable.querySelector('td div');
 			this.selection.setRange(firstTd, 0, firstTd, 0);
 			this._resetTablePicker();
+			this.setController(domUtils.getParentElement(firstTd, 'TD'));
 		}
 	},
 
@@ -895,7 +896,7 @@ Table.prototype = {
 		this.setTableStyle(this._maxWidth ? 'width|column' : 'width');
 
 		this.setCellInfo(tdElement, this._shift);
-		this.controller_table.open(tableElement);
+		this.controller_table.open(tableElement, null, this.close.bind(this));
 		this.controller_cell.open(tdElement, this.cellControllerTop ? tableElement : null);
 	},
 

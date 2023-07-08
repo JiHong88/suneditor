@@ -99,14 +99,14 @@ Component.prototype = {
 		}
 
 		const figureInfo = Figure.GetContainer(target);
-		return {
+		return (this.info = {
 			target: target,
 			pluginName: pluginName || this.editor._fileManager.pluginMap[target.nodeName.toLowerCase()] || '',
 			container: figureInfo.container,
 			cover: figureInfo.cover,
 			caption: figureInfo.caption,
 			isFile: isFile
-		};
+		});
 	},
 
 	/**
@@ -115,7 +115,7 @@ Component.prototype = {
 	 * @param {string} pluginName Plugin name (image, video)
 	 */
 	select(element, pluginName) {
-		this.info = this.get(element);
+		this.get(element);
 		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is.bind(this))) || domUtils.isUneditable(element)) return false;
 
 		this.editor._antiBlur = true;
@@ -145,6 +145,7 @@ Component.prototype = {
 			this.currentPlugin.close(this.currentTarget);
 		}
 		this.__removeGlobalEvent();
+		this.editor._offCurrentController();
 	},
 
 	/**
@@ -282,19 +283,21 @@ function OnKeyDown_component(e) {
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 
 	// redo, undo
-	if (ctrl && keyCode !== 17) {
-		const info = this.editor.shortcutsKeyMap.get(keyCode + (e.shiftKey ? 1000 : 0));
-		if (info && /^(redo|undo)$/.test(info.c)) {
-			e.preventDefault();
-			e.stopPropagation();
-			this.__removeGlobalEvent();
-			this.editor.run(info.c, info.t, info.e);
-			return;
+	if (ctrl) {
+		if (keyCode !== 17) {
+			const info = this.editor.shortcutsKeyMap.get(keyCode + (e.shiftKey ? 1000 : 0));
+			if (info && /^(redo|undo)$/.test(info.c)) {
+				e.preventDefault();
+				e.stopPropagation();
+				this.__removeGlobalEvent();
+				this.editor.run(info.c, info.t, info.e);
+			}
 		}
+		return;
 	}
 
 	// backspace, delete
-	if (!ctrl && (keyCode === 8 || keyCode === 46)) {
+	if (keyCode === 8 || keyCode === 46) {
 		e.preventDefault();
 		e.stopPropagation();
 		if (this.currentPlugin && typeof this.currentPlugin.destroy === 'function') {
@@ -306,9 +309,9 @@ function OnKeyDown_component(e) {
 	}
 
 	// enter
-	if (!ctrl && keyCode === 13) {
+	if (keyCode === 13) {
 		e.preventDefault();
-		const compContext = this.get(this.currentTarget);
+		const compContext = this.currentInfo || this.get(this.currentTarget);
 		const container = compContext.container || compContext.target;
 		const sibling = container.previousElementSibling || container.nextElementSibling;
 		let newEl = null;
@@ -323,8 +326,25 @@ function OnKeyDown_component(e) {
 		if (this.select(compContext.target, this.currentPluginName) === false) this.editor.blur();
 	}
 
+	// up down
+	if (keyCode === 38 || keyCode === 40) {
+		const compContext = this.get(this.currentTarget);
+		const el = keyCode === 38 ? compContext.container.previousElementSibling : compContext.container.nextElementSibling;
+		if (!el) return;
+
+		this.close();
+
+		const focusEl = this.eventManager.applyTagEffect(el);
+		if (focusEl) {
+			e.stopPropagation();
+			e.preventDefault();
+			this.selection.setRange(focusEl, 0, focusEl, 0);
+		}
+		return;
+	}
+
 	// ESC
-	if (!ctrl && keyCode === 27) {
+	if (keyCode === 27) {
 		this.close();
 		return;
 	}
