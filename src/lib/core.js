@@ -8035,7 +8035,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     range.startContainer = component;
                     range.startOffset = 0;
                     range.endContainer = component;
-                    range.endOffset = component.textContent.length;
+                    range.endOffset = 0;
                 }
             }
             core.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
