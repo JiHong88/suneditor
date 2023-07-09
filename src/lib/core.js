@@ -6602,6 +6602,16 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const selectionNode = core.getSelectionNode();
             const formatEl = util.getFormatElement(selectionNode, null);
             const rangeEl = util.getRangeFormatElement(selectionNode, null);
+
+            let selectionNodeDeepestFirstChild = selectionNode;
+            while (selectionNodeDeepestFirstChild.firstChild) selectionNodeDeepestFirstChild = selectionNodeDeepestFirstChild.firstChild;
+
+            const selectedComponentInfo = core.getFileComponent(selectionNodeDeepestFirstChild);
+            if (selectedComponentInfo) {
+                const range = core.getRange();
+                if (!rangeEl && range.startContainer === range.endContainer) core.selectComponent(selectedComponentInfo.target, selectedComponentInfo.pluginName);
+            } else if (core.currentFileComponentInfo) core.controllersOff();
+
             if (!formatEl && !util.isNonEditable(targetElement) && !util.isList(rangeEl)) {
                 const range = core.getRange();
                 if (util.getFormatElement(range.startContainer) === util.getFormatElement(range.endContainer)) {
@@ -6906,6 +6916,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const fileComponentName = core._fileManager.pluginRegExp.test(core.currentControllerName) ? core.currentControllerName : '';
             let formatEl = util.getFormatElement(selectionNode, null) || selectionNode;
             let rangeEl = util.getRangeFormatElement(formatEl, null);
+
+            const isArrowKey = /37|38|39|40/.test(e.keyCode);
+            if (isArrowKey && event._onKeyDown_wysiwyg_arrowKey(e) === false) return;
 
             switch (keyCode) {
                 case 8: /** backspace key */
@@ -7640,6 +7653,82 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             }
         },
 
+        _onKeyDown_wysiwyg_arrowKey: function (e) {
+            if (e.shiftKey) return; // shiftkey needs(?) other custom handler. This one may be adapted (in 'selectNode(...)'), but not for table
+  
+            let selectionNode = core.getSelectionNode();
+
+            const selectNode = function (node, offset = 0) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (!node) return;
+
+                let componentInfo = core.getFileComponent(node);
+                if (componentInfo) {
+                    core.selectComponent(componentInfo.target, componentInfo.pluginName);   // more responsive for key holdness
+                } else {
+                    core.setRange(node, offset, node, offset);
+                    core.controllersOff();
+                }
+            }
+
+            const table = util.getParentElement(selectionNode, 'table');
+            if (table) {
+                const currentRow = util.getParentElement(selectionNode, 'tr');
+                const currentCell = util.getParentElement(selectionNode, 'td');
+
+                let currentCellFirstNode = currentCell;
+                let currentCellLastNode = currentCell;
+                if (currentCell) {
+                    while (currentCellFirstNode.firstChild) currentCellFirstNode = currentCellFirstNode.firstChild;
+                    while (currentCellLastNode.lastChild) currentCellLastNode = currentCellLastNode.lastChild;
+                }
+                
+                let selectionNodeDeepestFirstChild = selectionNode;
+                while (selectionNodeDeepestFirstChild.firstChild) selectionNodeDeepestFirstChild = selectionNodeDeepestFirstChild.firstChild; 
+                const isCellFirstNode = (selectionNodeDeepestFirstChild === currentCellFirstNode);
+                const isCellLastNode = (selectionNodeDeepestFirstChild === currentCellLastNode);
+
+                let siblingToSet = null;
+                let offset = 0;
+                if (e.keyCode === 38 && isCellFirstNode) { // UP
+                    const previousRow = currentRow && currentRow.previousElementSibling;
+                    if (previousRow) siblingToSet = previousRow.children[currentCell.cellIndex];
+                    else siblingToSet = util.getPreviousDeepestNode(table, core.context.element.wysiwyg);
+
+                    while (siblingToSet.lastChild) siblingToSet = siblingToSet.lastChild;
+                    if (siblingToSet) offset = siblingToSet.textContent.length;
+                } else if (e.keyCode === 40 && isCellLastNode) {  // DOWN
+                    const nextRow = currentRow && currentRow.nextElementSibling;
+                    if (nextRow) siblingToSet = nextRow.children[currentCell.cellIndex];
+                    else siblingToSet = util.getNextDeepestNode(table, core.context.element.wysiwyg);
+
+                    while (siblingToSet.firstChild) siblingToSet = siblingToSet.firstChild;
+                }  
+
+                if (siblingToSet) {
+                    selectNode(siblingToSet, offset);
+                    return false;
+                }
+            }
+
+            const componentInfo = core.getFileComponent(selectionNode);
+            if (componentInfo) {
+                const selectPrevious = /37|38/.test(e.keyCode);
+                const selectNext = /39|40/.test(e.keyCode);
+
+                if (selectPrevious) {
+                    const previousDeepestNode = util.getPreviousDeepestNode(componentInfo.target, core.context.element.wysiwyg);
+                    selectNode(previousDeepestNode, previousDeepestNode && previousDeepestNode.textContent.length);
+                } else if (selectNext) {
+                    const nextDeepestNode = util.getNextDeepestNode(componentInfo.target, core.context.element.wysiwyg);
+                    selectNode(nextDeepestNode);
+                }
+            }
+           
+        },
+
         onKeyUp_wysiwyg: function (e) {
             if (event._onShortcutKey) return;
 
@@ -7664,6 +7753,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     return;
                 }
             }
+
+            let selectionNodeDeepestFirstChild = selectionNode;
+            while (selectionNodeDeepestFirstChild.firstChild) selectionNodeDeepestFirstChild = selectionNodeDeepestFirstChild.firstChild;
+
+            const selectedComponentInfo = core.getFileComponent(selectionNodeDeepestFirstChild);
+            if (!(e.keyCode === 16 || e.shiftKey) && selectedComponentInfo) core.selectComponent(selectedComponentInfo.target, selectedComponentInfo.pluginName);
+            else if (core.currentFileComponentInfo) core.controllersOff();
 
             /** when format tag deleted */
             if (keyCode === 8 && util.isWysiwygDiv(selectionNode) && selectionNode.textContent === '' && selectionNode.children.length === 0) {
