@@ -317,7 +317,6 @@ Offset.prototype = {
 		const targetOffset = this.getGlobal(target);
 		const targetScroll = this.getGlobalScroll(target);
 		const arrow = hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null;
-		console.log('targetRect', JSON.stringify(targetRect));
 
 		// top ----------------------------------------------------------------------------------------------------
 		const editorH = this.editor.frameContext.get('topArea').offsetHeight;

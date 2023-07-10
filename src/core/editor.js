@@ -113,6 +113,11 @@ const Editor = function (multiTargets, options) {
 	};
 
 	/**
+	 * @description Is classic mode?
+	 */
+	this.isClassic = null;
+
+	/**
 	 * @description Is inline mode?
 	 */
 	this.isInline = null;
@@ -1492,6 +1497,7 @@ Editor.prototype = {
 		this.isInline = /inline/i.test(this.options.get('mode'));
 		this.isBalloon = /balloon/i.test(this.options.get('mode'));
 		this.isBalloonAlways = /balloon-always/i.test(this.options.get('mode'));
+		this.isClassic = /classic/i.test(this.options.get('mode'));
 		// set subToolbar modes
 		this.isSubBalloon = /balloon/i.test(this.options.get('_subMode'));
 		this.isSubBalloonAlways = /balloon-always/i.test(this.options.get('_subMode'));

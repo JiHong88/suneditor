@@ -1944,10 +1944,13 @@ function OnBlur_wysiwyg(rootKey, e) {
 function OnMouseMove_wysiwyg(e) {
 	if (this.status.isDisabled || this.status.isReadOnly) return false;
 
-	const component = domUtils.getParentElement(e.target, this.component.is.bind(this.component));
+	const info = this.component.get(e.target);
+	if (!info) return;
+
+	const container = info.container;
 	const lineBreakerStyle = this.editor.frameContext.get('lineBreaker').style;
 
-	if (component && !this.editor.currentControllerName) {
+	if (container && !this.editor.currentControllerName) {
 		const fc = this.editor.frameContext;
 		let scrollTop = 0;
 		let el = fc.get('wysiwyg');
@@ -1956,31 +1959,31 @@ function OnMouseMove_wysiwyg(e) {
 			el = el.parentElement;
 		} while (el && !/^(BODY|HTML)$/i.test(el.nodeName));
 
+		const toolbarH = this.editor.isClassic && !this.options.get('toolbar_container') ? this.context.get('toolbar.main').offsetHeight : 0;
 		const wScroll = fc.get('wysiwyg').scrollTop;
 		const offsets = this.offset.getGlobal(fc.get('topArea'));
-		const componentTop = this.offset.get(component).top + wScroll;
+		const componentTop = this.offset.get(container).top + wScroll - toolbarH;
 		const y = e.pageY + scrollTop + (this.editor.frameOptions.get('iframe') && !this.options.get('toolbar_container') ? this.context.get('toolbar.main').offsetHeight : 0);
 		const c = componentTop + (this.editor.frameOptions.get('iframe') ? scrollTop : offsets.top);
-		const toolbarH = this.context.get('toolbar.main').offsetHeight;
 
-		const isList = domUtils.isListCell(component.parentNode);
+		const isList = domUtils.isListCell(container.parentNode);
 		let dir = '',
 			top = '';
-		if ((isList ? !component.previousSibling : !this.format.isLine(component.previousElementSibling)) && y < c + toolbarH + 20) {
+		if ((isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) && y < c + toolbarH + 20) {
 			top = componentTop - 1;
 			dir = 't';
-		} else if ((isList ? !component.nextSibling : !this.format.isLine(component.nextElementSibling)) && y > c + component.offsetHeight + toolbarH - 20) {
-			top = componentTop + component.offsetHeight - 1;
+		} else if ((isList ? !container.nextSibling : !this.format.isLine(container.nextElementSibling)) && y > c + container.offsetHeight + toolbarH - 20) {
+			top = componentTop + container.offsetHeight - 1;
 			dir = 'b';
 		} else {
 			lineBreakerStyle.display = 'none';
 			return;
 		}
 
-		this._lineBreakComp = component;
+		this._lineBreakComp = container;
 		this._lineBreakDir = dir;
 		lineBreakerStyle.top = top - wScroll + 'px';
-		this.editor._lineBreakerButton.style.left = this.offset.get(component).left + component.offsetWidth / 2 - 15 + 'px';
+		this.editor._lineBreakerButton.style.left = this.offset.get(container).left + container.offsetWidth / 2 - 15 + 'px';
 		lineBreakerStyle.display = 'block';
 	} // off line breaker
 	else if (lineBreakerStyle.display !== 'none') {

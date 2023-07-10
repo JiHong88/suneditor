@@ -181,12 +181,16 @@ Component.prototype = {
 		const wysiwyg = fc.get('wysiwyg');
 		fc.get('lineBreaker').style.display = 'none';
 
+		const info = this.get(element);
+		if (!info) return;
+
 		const yScroll = wysiwyg.scrollY || wysiwyg.scrollTop || 0;
 		const wScroll = wysiwyg.scrollX || wysiwyg.scrollLeft || 0;
-		const container = domUtils.getParentElement(element, this.is.bind(this));
+		const container = info.container;
 		const t_style = fc.get('lineBreaker_t').style;
 		const b_style = fc.get('lineBreaker_b').style;
 		const target = this.editor._figureContainer && this.editor._figureContainer.style.display === 'block' ? this.editor._figureContainer : element;
+		const toolbarH = this.editor.isClassic && !this.options.get('toolbar_container') ? this.context.get('toolbar.main').offsetHeight : 0;
 
 		const isList = domUtils.isListCell(container.parentNode);
 		let componentTop, w;
@@ -197,7 +201,7 @@ Component.prototype = {
 			w = target.offsetWidth / 2 / 2;
 
 			fc.get('lineBreaker_t').setAttribute('data-offset', componentTop - 12 + ',' + (this.offset.get(target).left + wScroll + w));
-			t_style.top = componentTop - yScroll - 12 + 'px';
+			t_style.top = componentTop - yScroll - toolbarH - 12 + 'px';
 			t_style.left = this.offset.get(target).left + w + 'px';
 			t_style.display = 'block';
 		} else {
@@ -215,7 +219,7 @@ Component.prototype = {
 				'data-offset',
 				componentTop + target.offsetHeight - 12 + ',' + (this.offset.get(target).left + wScroll + target.offsetWidth - w - 24)
 			);
-			b_style.top = componentTop + target.offsetHeight - yScroll - 12 + 'px';
+			b_style.top = componentTop + target.offsetHeight - yScroll - toolbarH - 12 + 'px';
 			b_style.left = this.offset.get(target).left + target.offsetWidth - w - 24 + 'px';
 			b_style.display = 'block';
 		} else {
