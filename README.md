@@ -1,6 +1,7 @@
 # SunEditor
 Vanilla javascript based WYSIWYG web editor, with no dependencies.
 SunEditor supports IE11 and all modern browsers with no dependencies and polyfill.
+Coded based on ES5 in supported by IE11.
 
 #### Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a>
 
