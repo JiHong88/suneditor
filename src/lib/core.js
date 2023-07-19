@@ -1643,6 +1643,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             _w.setTimeout(function () {
                 if (typeof plugin.select === 'function') this.callPlugin(pluginName, plugin.select.bind(this, element), null);
                 this._setComponentLineBreaker(element);
+
+                const compContext = context[pluginName];
+                const container = compContext._container;
+                core.setRange(container, 0, container, 0);
             }.bind(this));
         },
 
@@ -4517,6 +4521,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
                     break;
                 case 'selectAll':
                     this.containerOff();
+                    this.controllersOff();
                     const wysiwyg = context.element.wysiwyg;
                     let first = util.getChildElement(wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false) || wysiwyg.firstChild;
                     let last = util.getChildElement(wysiwyg.lastChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, true) || wysiwyg.lastChild;
@@ -6812,6 +6817,8 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
         },
 
         onInput_wysiwyg: function (e) {
+            if (!document.body.contains(core.currentControllerTarget)) core.controllersOff();
+
             if (core.isReadOnly || core.isDisabled) {
                 e.preventDefault();
                 e.stopPropagation();
