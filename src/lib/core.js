@@ -1643,10 +1643,6 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             _w.setTimeout(function () {
                 if (typeof plugin.select === 'function') this.callPlugin(pluginName, plugin.select.bind(this, element), null);
                 this._setComponentLineBreaker(element);
-
-                const compContext = context[pluginName];
-                const container = compContext._container;
-                core.setRange(container, 0, container, 0);
             }.bind(this));
         },
 
