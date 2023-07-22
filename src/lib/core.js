@@ -2138,13 +2138,13 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             const range = this.getRange();
 
             if (range.startContainer === range.endContainer) {
-                const component = util.getParentElement(range.startContainer, util.isComponent);
-                if (component) {
+                const fileComponent = util.getParentElement(range.startContainer, util.isMediaComponent);
+                if (fileComponent) {
                     const br = util.createElement('BR');
                     const format = util.createElement(options.defaultTag);
                     format.appendChild(br);
 
-                    util.changeElement(component, format);
+                    util.changeElement(fileComponent, format);
                     
                     core.setRange(format, 0, format, 0);
                     this.history.push(true);
