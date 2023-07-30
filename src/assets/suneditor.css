@@ -412,6 +412,10 @@
 	z-index: 2147483647;
 }
 
+.sun-editor .se-container .se-loading-box {
+	position: absolute;
+}
+
 .sun-editor .se-loading-box .se-loading-effect {
 	position: absolute;
 	display: block;

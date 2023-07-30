@@ -11,7 +11,9 @@ const Modal = function (inst, element) {
 	this.form = element;
 	this.focusElement = element.querySelector('[data-focus]');
 	this.isUpdate = false;
-	(this._modalArea = carrierWrapper.querySelector('.se-modal')), (this._modalBack = carrierWrapper.querySelector('.se-modal-back')), (this._modalInner = carrierWrapper.querySelector('.se-modal-inner'));
+	(this._modalArea = carrierWrapper.querySelector('.se-modal')),
+		(this._modalBack = carrierWrapper.querySelector('.se-modal-back')),
+		(this._modalInner = carrierWrapper.querySelector('.se-modal-inner'));
 	this._closeListener = [CloseListener.bind(this), OnClick_dialog.bind(this)];
 	this._bindClose = null;
 	this._onClickEvent = null;
@@ -94,26 +96,26 @@ Modal.prototype = {
  * -
  * exception occurs : the modal window and loading bar are closed.
  */
-function Action(e) {
+async function Action(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
-	this.editor._openLoading();
+	this.editor.showLoading();
 
 	try {
-		const result = this.inst.modalAction();
+		const result = await this.inst.modalAction();
 		if (result === false) {
-			this.editor._closeLoading();
+			this.editor.hideLoading();
 		} else if (result === undefined) {
 			this.close();
 		} else {
 			this.close();
-			this.editor._closeLoading();
+			this.editor.hideLoading();
 		}
 	} catch (error) {
 		this.close();
-		this.editor._closeLoading();
-		throw Error('[SUNEDITOR.Modal[' + this.kind + '].warn] ' + error.message);
+		this.editor.hideLoading();
+		throw Error(`[SUNEDITOR.Modal[${this.kind}].warn] ${error.message}`);
 	}
 }
 

@@ -119,7 +119,7 @@ Table.prototype = {
 	 * @override core
 	 * @param {any} event Event object
 	 */
-	onPluginMousedown(event) {
+	onMousedown(event) {
 		const tableCell = domUtils.getParentElement(event.target, domUtils.isTableCell);
 		if (!tableCell || !(tableCell !== this._fixedCell && !this._shift)) return;
 		this.selectCells(tableCell, false);
@@ -131,7 +131,7 @@ Table.prototype = {
 	 * @param {any} range range object
 	 * @param {Element} line Current line element
 	 */
-	onPluginKeyDown(event, range, line) {
+	onKeyDown(event, range, line) {
 		// table
 		if (event.keyCode === 9) {
 			const tableCell = domUtils.getParentElement(line, domUtils.isTableCell);

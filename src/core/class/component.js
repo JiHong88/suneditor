@@ -31,7 +31,7 @@ Component.prototype = {
 	 * @returns {Element}
 	 */
 	insert(element, notCheckCharCount, notSelect) {
-		if (this.editor.isReadOnly || (!notCheckCharCount && !this.char.check(element))) {
+		if (this.editor.frameContext.get('isReadOnly') || (!notCheckCharCount && !this.char.check(element))) {
 			return null;
 		}
 

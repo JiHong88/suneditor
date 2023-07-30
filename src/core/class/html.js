@@ -121,7 +121,7 @@ HTML.prototype = {
 		try {
 			this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp);
 		} catch (error) {
-			console.warn('[SUNEDITOR.html.clean.fail] ' + error.message);
+			console.warn('[SUNEDITOR.html.clean.fail]', error.message);
 		}
 
 		if (this.editor._MELInfo && this.editor._MELInfo.query) {
@@ -213,8 +213,8 @@ HTML.prototype = {
 				if (rangeSelection) this.selection.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
 				else this.selection.setRange(a, offset, a, offset);
 			} catch (error) {
-				if (this.status.isDisabled || this.status.isReadOnly) return;
-				console.warn('[SUNEDITOR.html.insert.warn] ' + error.message);
+				if (this.editor.frameContext.get('isReadOnly') || this.editor.frameContext.get('isDisabled')) return;
+				console.warn('[SUNEDITOR.html.insert.warn]', error.message);
 				this.editor.execCommand('insertHTML', false, html);
 			}
 		} else {
@@ -244,7 +244,7 @@ HTML.prototype = {
 	 * @returns {Object|Node|null}
 	 */
 	insertNode(oNode, afterNode, notCheckCharCount) {
-		if (this.editor.isReadOnly || (!notCheckCharCount && !this.char.check(oNode, null))) {
+		if (this.editor.frameContext.get('isReadOnly') || (!notCheckCharCount && !this.char.check(oNode, null))) {
 			return null;
 		}
 

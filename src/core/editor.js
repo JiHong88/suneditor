@@ -36,7 +36,7 @@ const Editor = function (multiTargets, options) {
 
 	// properties
 	this.rootKeys = product.rootKeys;
-	this.rootTargets = product.rootTargets;
+	this.frameRoots = product.frameRoots;
 	this.context = product.context;
 	this.frameContext = new Map();
 	this.frameOptions = new Map();
@@ -57,7 +57,6 @@ const Editor = function (multiTargets, options) {
 	 * @description Controllers carrier
 	 */
 	this._carrierWrapper = product.carrierWrapper;
-	this._loadingBox = product.carrierWrapper.querySelector('.se-loading-box');
 	this._resizeBackground = product.carrierWrapper.querySelector('.se-resizing-back');
 
 	/**
@@ -87,9 +86,6 @@ const Editor = function (multiTargets, options) {
 	/**
 	 * @description Variables used internally in editor operation
 	 * @property {boolean} hasFocus Boolean value of whether the editor has focus
-	 * @property {boolean} isDisabled Boolean value of whether the editor is disabled
-	 * @property {boolean} isReadOnly Boolean value of whether the editor is readOnly
-	 * @property {boolean} isFullScreen State of full screen
 	 * @property {number} tabSize Indent size of tab (4)
 	 * @property {number} indentSize Indent size (25)px
 	 * @property {number} codeIndentSize Indent size of Code view mode (2)
@@ -99,10 +95,6 @@ const Editor = function (multiTargets, options) {
 	 */
 	this.status = {
 		hasFocus: false,
-		isDisabled: false,
-		isReadOnly: false,
-		isChanged: false,
-		isFullScreen: false,
 		tabSize: 4,
 		indentSize: 25,
 		codeIndentSize: 2,
@@ -184,8 +176,8 @@ const Editor = function (multiTargets, options) {
 	 * @description Plugin call
 	 * @private
 	 */
-	this._onMousedownPlugins = [];
-	this._onKeyDownPlugins = [];
+	this._onMousedownPlugins = null;
+	this._onKeyDownPlugins = null;
 
 	/**
 	 * @description Controller, modal relative
@@ -309,7 +301,7 @@ Editor.prototype = {
 	registerPlugin(pluginName, targets, pluginOptions) {
 		let plugin = this.plugins[pluginName];
 		if (!plugin) {
-			throw Error('[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "' + pluginName + '")');
+			throw Error(`[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "${pluginName}")`);
 		} else if (typeof this.plugins[pluginName] === 'function') {
 			plugin = this.plugins[pluginName] = new this.plugins[pluginName](this, pluginOptions || {});
 			if (typeof plugin.init === 'function') plugin.init();
@@ -330,21 +322,21 @@ Editor.prototype = {
 	 * @description Run plugin calls and basic commands.
 	 * @param {string} command Command string
 	 * @param {string} type Display type string ('command', 'dropdown', 'modal', 'container')
-	 * @param {Element|null} target The element of command button
+	 * @param {Element|null} button The element of command button
 	 */
-	run(command, type, target) {
+	run(command, type, button) {
 		if (type) {
 			if (/more/i.test(type)) {
-				const toolbar = domUtils.getParentElement(target, '.se-toolbar');
+				const toolbar = domUtils.getParentElement(button, '.se-toolbar');
 				const toolInst = domUtils.hasClass(toolbar, 'se-toolbar-sub') ? this.subToolbar : this.toolbar;
-				if (target !== toolInst.currentMoreLayerActiveButton) {
+				if (button !== toolInst.currentMoreLayerActiveButton) {
 					const layer = toolbar.querySelector('.' + command);
 					if (layer) {
-						toolInst._moreLayerOn(target, layer);
+						toolInst._moreLayerOn(button, layer);
 						toolInst._showBalloon();
 						toolInst._showInline();
 					}
-					domUtils.addClass(target, 'on');
+					domUtils.addClass(button, 'on');
 				} else if (toolInst.currentMoreLayerActiveButton) {
 					toolInst._moreLayerOff();
 					toolInst._showBalloon();
@@ -353,14 +345,14 @@ Editor.prototype = {
 				return;
 			}
 
-			if (/container/.test(type) && (this.menu.targetMap[command] === null || target !== this.menu.currentContainerActiveButton)) {
-				this.menu.containerOn(target);
+			if (/container/.test(type) && (this.menu.targetMap[command] === null || button !== this.menu.currentContainerActiveButton)) {
+				this.menu.containerOn(button);
 				return;
 			}
 
-			if (this.isReadOnly && domUtils.arrayIncludes(this._controllerOnDisabledButtons, target)) return;
-			if (/dropdown/.test(type) && (this.menu.targetMap[command] === null || target !== this.menu.currentDropdownActiveButton)) {
-				this.menu.dropdownOn(target);
+			if (this.frameContext.get('isReadOnly') && domUtils.arrayIncludes(this._controllerOnDisabledButtons, button)) return;
+			if (/dropdown/.test(type) && (this.menu.targetMap[command] === null || button !== this.menu.currentDropdownActiveButton)) {
+				this.menu.dropdownOn(button);
 				return;
 			} else if (/modal/.test(type)) {
 				this.plugins[command].open();
@@ -387,8 +379,10 @@ Editor.prototype = {
 	 * (selectAll, codeView, fullScreen, indent, outdent, undo, redo, removeFormat, print, preview, showBlocks, save, bold, underline, italic, strike, subscript, superscript, copy, cut, paste)
 	 * @param {string} command Property of command button (data-value)
 	 */
-	commandHandler(command) {
-		if (this.status.isReadOnly && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) return;
+	async commandHandler(command) {
+		if (this.frameContext.get('isReadOnly') && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) {
+			return;
+		}
 
 		switch (command) {
 			case 'copy':
@@ -442,7 +436,7 @@ Editor.prototype = {
 				this.setDir('rtl');
 				break;
 			case 'save':
-				SAVE(this);
+				await SAVE(this);
 				break;
 			default:
 				FONT_STYLE(this, command);
@@ -481,8 +475,8 @@ Editor.prototype = {
 	 * @description Executes a function by traversing all root targets.
 	 * @param {Function} f Function
 	 */
-	applyRootTargets(f) {
-		this.rootTargets.forEach(f);
+	applyFrameRoots(f) {
+		this.frameRoots.forEach(f);
 	},
 
 	/**
@@ -516,12 +510,12 @@ Editor.prototype = {
 		const toolbarWrapper = this.context.get('toolbar._wrapper');
 		const statusbarWrapper = this.context.get('statusbar._wrapper');
 		if (rtl) {
-			this.applyRootTargets(function (e) {
+			this.applyFrameRoots((e) => {
 				domUtils.addClass([e.get('topArea'), e.get('wysiwyg')], 'se-rtl');
 			});
 			domUtils.addClass([this._carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 		} else {
-			this.applyRootTargets(function (e) {
+			this.applyFrameRoots((e) => {
 				domUtils.removeClass([e.get('topArea'), e.get('wysiwyg')], 'se-rtl');
 			});
 			domUtils.removeClass([this._carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
@@ -571,7 +565,7 @@ Editor.prototype = {
 		// option merge
 		const rootDiff = {};
 		const rootKeys = this.rootKeys;
-		const rootTargets = this.rootTargets;
+		const frameRoots = this.frameRoots;
 		const newRoots = [];
 		const newRootKeys = {};
 		this._originOptions = [newOptions, this._originOptions].reduce(function (init, option) {
@@ -583,7 +577,7 @@ Editor.prototype = {
 					if (newKeys.length === 0) continue;
 
 					rootDiff[key] = new Map();
-					const o = rootTargets.get(key).get('options').get('_origin');
+					const o = frameRoots.get(key).get('options').get('_origin');
 					for (let rk in nro) {
 						const roV = nro[rk];
 						if (!newKeys.includes(rk) || o[rk] === roV) continue;
@@ -607,7 +601,7 @@ Editor.prototype = {
 			/** --------- root start --------- */
 			if (newRootKeys[k]) {
 				const diff = rootDiff[k];
-				const fc = rootTargets.get(k);
+				const fc = frameRoots.get(k);
 				const originOptions = fc.get('options');
 				const newOptions = newRootKeys[k].options;
 
@@ -695,7 +689,7 @@ Editor.prototype = {
 		}
 
 		this.effectNode = null;
-		this._setFrameInfo(this.rootTargets.get(this.status.rootKey));
+		this._setFrameInfo(this.frameRoots.get(this.status.rootKey));
 	},
 
 	/**
@@ -706,7 +700,7 @@ Editor.prototype = {
 		if (rootKey === this.status.rootKey) return;
 
 		this.status.rootKey = rootKey;
-		this._setFrameInfo(this.rootTargets.get(rootKey));
+		this._setFrameInfo(this.frameRoots.get(rootKey));
 		this.toolbar._resetSticky();
 	},
 
@@ -747,7 +741,7 @@ Editor.prototype = {
 				}
 				this.selection.setRange(range.startContainer, range.startOffset, range.endContainer, range.endOffset);
 			} catch (e) {
-				console.warn('[SUNEDITOR.focus.warn] ' + e);
+				console.warn('[SUNEDITOR.focus.warn] ', e);
 				this._nativeFocus();
 			}
 		}
@@ -836,9 +830,9 @@ Editor.prototype = {
 	 * @param {string|undefined} rootKey Root key
 	 */
 	readOnly(value, rootKey) {
-		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
+		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
 
-		this.status.isReadOnly = value;
+		fc.set('isReadOnly', !!value);
 		domUtils.setDisabled(this._controllerOnDisabledButtons, !!value);
 
 		if (value) {
@@ -868,7 +862,7 @@ Editor.prototype = {
 	 * @param {string|undefined} rootKey Root key
 	 */
 	disable(rootKey) {
-		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
+		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
 
 		this.toolbar.disable();
 		this._offCurrentController();
@@ -877,7 +871,7 @@ Editor.prototype = {
 		if (this.modalForm) this.plugins.modal.close.call(this);
 
 		fc.get('wysiwyg').setAttribute('contenteditable', false);
-		this.isDisabled = true;
+		fc.set('isDisabled', true);
 
 		if (this.options.get('hasCodeMirror')) {
 			this.viewer._codeMirrorEditor('readonly', true, rootKey);
@@ -891,11 +885,11 @@ Editor.prototype = {
 	 * @param {string|undefined} rootKey Root key
 	 */
 	enable(rootKey) {
-		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
+		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
 
 		this.toolbar.enable();
 		fc.get('wysiwyg').setAttribute('contenteditable', true);
-		this.isDisabled = false;
+		fc.set('isDisabled', false);
 
 		if (this.options.get('hasCodeMirror')) {
 			this.viewer._codeMirrorEditor('readonly', false, rootKey);
@@ -909,7 +903,7 @@ Editor.prototype = {
 	 * @param {string|undefined} rootKey Root key
 	 */
 	show(rootKey) {
-		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
+		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
 		const topAreaStyle = fc.get('topArea').style;
 		if (topAreaStyle.display === 'none') topAreaStyle.display = 'block';
 	},
@@ -919,8 +913,24 @@ Editor.prototype = {
 	 * @param {string|undefined} rootKey Root key
 	 */
 	hide(rootKey) {
-		const fc = rootKey ? this.rootTargets.get(rootKey) : this.frameContext;
+		const fc = rootKey ? this.frameRoots.get(rootKey) : this.frameContext;
 		fc.get('topArea').style.display = 'none';
+	},
+
+	/**
+	 * @description Show loading box
+	 * @param {string|undefined} rootKey Root key
+	 */
+	showLoading(rootKey) {
+		(rootKey ? this.frameRoots.get(rootKey).get('container') : this._carrierWrapper).querySelector('.se-loading-box').style.display = 'block';
+	},
+
+	/**
+	 * @description Hide loading box
+	 * @param {string|undefined} rootKey Root key
+	 */
+	hideLoading(rootKey) {
+		(rootKey ? this.frameRoots.get(rootKey).get('container') : this._carrierWrapper).querySelector('.se-loading-box').style.display = 'none';
 	},
 
 	/**
@@ -943,7 +953,7 @@ Editor.prototype = {
 		domUtils.removeItem(this.context.get('toolbar._wrapper'));
 		domUtils.removeItem(this.context.get('toolbar.sub._wrapper'));
 		domUtils.removeItem(this.context.get('statusbar._wrapper'));
-		this.applyRootTargets(function (e) {
+		this.applyFrameRoots((e) => {
 			domUtils.removeItem(e.get('topArea'));
 			e.get('options').clear();
 			e.clear();
@@ -1019,6 +1029,7 @@ Editor.prototype = {
 			else if (cont[i].form) cont[i].form.style.display = 'none';
 		}
 		this.opendControllers = fixedCont;
+		this.component.__removeGlobalEvent();
 	},
 
 	/**
@@ -1029,22 +1040,6 @@ Editor.prototype = {
 		if (this.opendModal) {
 			this.opendModal.close();
 		}
-	},
-
-	/**
-	 * @description Show loading box
-	 * @private
-	 */
-	_openLoading() {
-		this._loadingBox.style.display = 'block';
-	},
-
-	/**
-	 * @description Close loading box
-	 * @private
-	 */
-	_closeLoading() {
-		this._loadingBox.style.display = 'none';
 	},
 
 	/**
@@ -1183,14 +1178,12 @@ Editor.prototype = {
 	 * @description Called when after execute "history.push"
 	 * @private
 	 */
-	_onChange_historyStack() {
+	_onChange_historyStack(fc, index) {
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
-		this.status.isChanged = true;
-		this.applyCommandTargets('save', function (e) {
-			e.removeAttribute('disabled');
-		});
+		this.history.resetButtons(this.status.rootKey, index);
+
 		// user event
-		if (this.events.onChange) this.events.onChange(this.html.get());
+		if (this.events.onChange) this.events.onChange({ frameContext: fc, data: this.html.get() });
 		if (this.context.get('toolbar.main').style.display === 'block') this.toolbar._showBalloon();
 		else if (this.context.get('toolbar.sub.main').style.display === 'block') this.subToolbar._showBalloon();
 	},
@@ -1205,15 +1198,15 @@ Editor.prototype = {
 	 * @private
 	 */
 	__editorInit(options) {
-		this.applyRootTargets((e) => {
+		this.applyFrameRoots((e) => {
 			this.__setEditorParams(e);
 		});
 
 		// initialize core and add event listeners
-		this._setFrameInfo(this.rootTargets.get(this.status.rootKey));
+		this._setFrameInfo(this.frameRoots.get(this.status.rootKey));
 		this.__init(options);
 
-		this.applyRootTargets((e) => {
+		this.applyFrameRoots((e) => {
 			this._initWysiwygArea(e, e.get('options').get('value'));
 			this.eventManager._addFrameEvents(e);
 		});
@@ -1228,7 +1221,7 @@ Editor.prototype = {
 			// toolbar visibility
 			this.context.get('toolbar.main').style.visibility = '';
 			// roots
-			this.applyRootTargets((e) => {
+			this.applyFrameRoots((e) => {
 				if (typeof this._resourcesStateChange !== 'function') return;
 				// observer
 				if (this.eventManager._resizeObserver) this.eventManager._resizeObserver.observe(e.get('wysiwygFrame'));
@@ -1297,11 +1290,11 @@ Editor.prototype = {
 			}
 
 			if (typeof plugin.onPluginMousedown === 'function') {
-				this._onMousedownPlugins.push(plugin.onPluginMousedown.bind(plugin));
+				this._onMousedownPlugins.push(plugin.onMousedown.bind(plugin));
 			}
 
 			if (typeof plugin.onPluginKeyDown === 'function') {
-				this._onKeyDownPlugins.push(plugin.onPluginKeyDown.bind(plugin));
+				this._onKeyDownPlugins.push(plugin.onKeyDown.bind(plugin));
 			}
 
 			if (plugin.preservedClass) {
@@ -1313,8 +1306,8 @@ Editor.prototype = {
 
 		this._MELInfo.query = managedClass.toString();
 		this._fileManager.queryString = this._fileManager.tags.join(',');
-		this._fileManager.regExp = new RegExp('^(' + (this._fileManager.tags.join('|') || '\\^') + ')$', 'i');
-		this._fileManager.pluginRegExp = new RegExp('^(' + (filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')) + ')$', 'i');
+		this._fileManager.regExp = new RegExp(`^(${this._fileManager.tags.join('|') || '\\^'})$`, 'i');
+		this._fileManager.pluginRegExp = new RegExp(`^(${filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')})$`, 'i');
 
 		delete this._pluginCallButtons;
 		delete this._pluginCallButtons_sub;
@@ -1509,7 +1502,7 @@ Editor.prototype = {
 		const inst = this;
 		let iframeRootSize = 0;
 		let iframeIndex = 0;
-		this.applyRootTargets(function (e) {
+		this.applyFrameRoots(function (e) {
 			const o = e.get('originElement');
 			const t = e.get('topArea');
 			o.style.display = 'none';
@@ -1544,7 +1537,7 @@ function CheckResetKeys(keys, plugins, root) {
 	for (let i = 0, len = keys.length, k; i < len; i++) {
 		k = keys[i];
 		if (RO_UNAVAILABD.includes(k) || (plugins && plugins[k])) {
-			console.warn('[SUNEDITOR.warn.resetOptions] "[' + root + k + ']" options not available in resetOptions have no effect.');
+			console.warn(`[SUNEDITOR.warn.resetOptions] "[${root + k}]" options not available in resetOptions have no effect.`);
 			keys.splice(i--, 1);
 			len--;
 		}

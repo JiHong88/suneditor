@@ -266,12 +266,12 @@ export interface Core {
 	/**
 	 * @description Show loading box
 	 */
-	_openLoading(): void;
+	showLoading(): void;
 
 	/**
 	 * @description Close loading box
 	 */
-	_closeLoading(): void;
+	hideLoading(): void;
 
 	/**
 	 * @description Run plugin calls and basic commands.

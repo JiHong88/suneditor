@@ -316,68 +316,69 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 
 window.c = () => {
 	window.editor_root = suneditor.create(
-		{
-			editor1: {
-				target: document.querySelector('#multi_editor_1'),
-				options: {
-					value: `
-					<p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
+		document.querySelector('#multi_editor_1'),
+		// {
+		// 	editor1: {
+		// 		target: document.querySelector('#multi_editor_1'),
+		// 		options: {
+		// 			value: `
+		// 			<p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
 
-					<p>ed1</p>
+		// 			<p>ed1</p>
 
-					<hr class="__se__solid">
+		// 			<hr class="__se__solid">
 
-					<p><br>
-					</p>
+		// 			<p><br>
+		// 			</p>
 
-					<p>ed2</p>
+		// 			<p>ed2</p>
 
-					<div class="se-component se-image-container __se__float-none">
-					<figure>
-						<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
-					</figure>
-					</div>
+		// 			<div class="se-component se-image-container __se__float-none">
+		// 			<figure>
+		// 				<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
+		// 			</figure>
+		// 			</div>
 
-					<p>ed3</p>
+		// 			<p>ed3</p>
 
-					<p>ed4</p>
+		// 			<p>ed4</p>
 
-					<p>edend--</p>
+		// 			<p>edend--</p>
 
-					<div>					</div>
+		// 			<div>					</div>
 
-					`,
-					placeholder: 'place1',
-					height: '400px',
-					width: '500px',
-					iframe: true,
-					// iframe_fullPage: true,
-					statusbar: true,
-					statusbar_resizeEnable: true
-				}
-			},
-			editor2: {
-				target: document.querySelector('#multi_editor_2'),
-				options: {
-					value: '<p>ed2</p>',
-					placeholder: 'place21'
-				}
-			},
-			editor3: {
-				target: document.querySelector('#multi_editor_3'),
-				options: {
-					value: '<p>ed3</p>',
-					placeholder: 'place3'
-				}
-			},
-			editor4: {
-				target: document.querySelector('#multi_editor_4'),
-				options: {
-					// value: '<p>ed4</p>',
-					placeholder: 'place4'
-				}
-			}
-		},
+		// 			`,
+		// 			placeholder: 'place1',
+		// 			height: '400px',
+		// 			width: '500px',
+		// 			iframe: true,
+		// 			// iframe_fullPage: true,
+		// 			statusbar: true,
+		// 			statusbar_resizeEnable: true
+		// 		}
+		// 	},
+		// 	editor2: {
+		// 		target: document.querySelector('#multi_editor_2'),
+		// 		options: {
+		// 			value: '<p>ed2</p>',
+		// 			placeholder: 'place21'
+		// 		}
+		// 	},
+		// 	editor3: {
+		// 		target: document.querySelector('#multi_editor_3'),
+		// 		options: {
+		// 			value: '<p>ed3</p>',
+		// 			placeholder: 'place3'
+		// 		}
+		// 	},
+		// 	editor4: {
+		// 		target: document.querySelector('#multi_editor_4'),
+		// 		options: {
+		// 			// value: '<p>ed4</p>',
+		// 			placeholder: 'place4'
+		// 		}
+		// 	}
+		// },
 		{
 			// mode: "inline",
 			// toolbar_width: 300,
@@ -387,7 +388,7 @@ window.c = () => {
 			plugins: plugins,
 			allowedClassName: '.+',
 			toolbar_container: '#root_toolbar_container',
-			attributeWhitelist: {"*":"class|data-.+"},
+			attributeWhitelist: { '*': 'class|data-.+' },
 			// statusbar_container: '#root_statusbar_container',
 			// shortcutsHint: false,
 			// codeMirror: {
@@ -405,7 +406,7 @@ window.c = () => {
 			// codeMirror: {
 			// 	src: Codemirror5
 			// },
-			iframe:false,
+			iframe: false,
 			defaultLine: 'div',
 			toolbar_sticky: 0,
 			lineAttrReset: 'id',
@@ -438,24 +439,68 @@ window.c = () => {
 			},
 			imageGallery: {
 				url: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo'
+			},
+			image: {
+				uploadUrl: 'http://localhost:3000/editor/upload'
 			}
 		}
 	);
-}
+};
 
 window.r = () => {
 	window.editor_root.resetOptions({
 		editor1: {
 			statusbar_resizeEnable: false
 		}
-	})
-}
+	});
+};
 
 window.d = () => {
 	// window.editor_root = window.editor_root.destroy()
+};
+
+c();
+
+function delay(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-c()
+async function delayedFunction() {
+	console.log('Starting---');
+	await delay(2000);
+	console.log('Finished...');
+}
+
+function loadEvent() {
+	// editor_root.events.onClick = async (rootKey) => {
+	// 	await delayedFunction();
+	// 	console.log('rootkeuy', rootKey);
+	// };
+	editor_root.events.onSave = async ({ frameContext, data }) => {
+		await delayedFunction();
+		console.log('rootkeuy', data);
+	};
+
+	window.editor_root.events.imageUploadHandler = async ({ xmlHttp, info }) => {
+		await delayedFunction();
+		console.log(xmlHttp);
+		console.log(info);
+		editor_root.plugins.image._register(info, JSON.parse(xmlHttp.response));
+	};
+	window.editor_root.events.onImageUploadBefore = async ({ handler, info, files, file, url }) => {
+		await delayedFunction();
+		if(url) handler('http://suneditor.com/docs/cat.jpg')
+		else return true;
+	};
+	window.editor_root.events.onImageUpload = async ({ handler, info, files, file, url }) => {
+		await delayedFunction();
+		handler('http://suneditor.com/docs/cat.jpg')
+	};
+}
+
+editor_root.events.onload = () => {
+	loadEvent();
+};
 
 // editor_root.events.onBlur = (rootKey, e, htmlFrame) => {
 // 	console.log('blur', editor_root.frameContext);

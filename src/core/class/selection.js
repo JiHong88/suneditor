@@ -78,7 +78,7 @@ Selection.prototype = {
 			range.setStart(startCon, startOff);
 			range.setEnd(endCon, endOff);
 		} catch (error) {
-			console.warn('[SUNEDITOR.selection.focus.warn] ' + error.message);
+			console.warn('[SUNEDITOR.selection.focus.warn]', error.message);
 			this.editor._nativeFocus();
 			return;
 		}

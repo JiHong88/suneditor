@@ -68,7 +68,7 @@ export function DIR_BTN_ACTIVE(editor, rtl) {
 	});
 
 	// change dir buttons
-	editor.applyCommandTargets('dir', function (e) {
+	editor.applyCommandTargets('dir', (e) => {
 		domUtils.changeTxt(e.querySelector('.se-tooltip-text'), editor.lang[rtl ? 'dir_ltr' : 'dir_rtl']);
 		domUtils.changeElement(e.firstElementChild, icons[rtl ? 'dir_ltr' : 'dir_rtl']);
 	});
@@ -81,26 +81,33 @@ export function DIR_BTN_ACTIVE(editor, rtl) {
 	}
 }
 
-export function SAVE(editor) {
-	if (!editor.status.isChanged) return;
+export async function SAVE(editor) {
+	const fc = editor.frameContext;
+	if (!fc.get('isChanged')) return;
 
-	const value = editor.html.get();
-	if (editor.status.isChanged && typeof editor.events.onSave === 'function') {
-		editor.events.onSave(value);
+	const data = editor.html.get();
+	if (typeof editor.events.onSave === 'function') {
+		await editor.events.onSave({ frameContext: fc, data });
 	} else {
-		editor.frameContext.get('originElement').value = value;
+		const origin = fc.get('originElement');
+		if (/^TEXTAREA$/i.test(origin.nodeName)) {
+			origin.value = data;
+		} else {
+			origin.innerHTML = data;
+		}
 	}
 
-	editor.status.isChanged = false;
+	fc.set('isChanged', false);
+	fc.set('savedIndex', editor.history.getRootStack()[editor.status.rootKey].index);
 
 	// set save button disable
-	editor.applyCommandTargets('save', function (e) {
+	editor.applyCommandTargets('save', (e) => {
 		e.setAttribute('disabled', true);
 	});
 
 	// user event
 	if (typeof editor.events.onSave === 'function') {
-		editor.events.onSave(value);
+		editor.events.onSave({ frameContext: fc, data });
 		return;
 	}
 }

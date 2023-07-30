@@ -28,7 +28,12 @@ export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFram
 		['_toolbarShadow', top.querySelector('.se-toolbar-shadow')],
 		['_minHeight', getNumber(wwFrame.style.minHeight || '65', 0)],
 		['isCodeView', false],
-		['isFullScreen', false]
+		['isFullScreen', false],
+		['isReadOnly', false],
+		['isDisabled', false],
+		['isChanged', -1],
+		['historyIndex', -1],
+		['savedIndex', -1]
 	]);
 
 	if (statusbar) UpdateStatusbarContext(statusbar, m);

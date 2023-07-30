@@ -15,14 +15,12 @@ const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
 const EventManager = function (editor) {
 	CoreInjector.call(this, editor);
 	this._events = [];
-	this._onButtonsCheck = new RegExp('^(' + Object.keys(editor.options.get('_defaultStyleTagMap')).join('|') + ')$', 'i');
+	this._onButtonsCheck = new RegExp(`^(${Object.keys(editor.options.get('_defaultStyleTagMap')).join('|')})$`, 'i');
 	this._onShortcutKey = false;
 	this.isComposing = false; // Old browsers: When there is no 'e.isComposing' in the keyup event.
 	this._balloonDelay = null;
 	this._resizeObserver = null;
 	this._toolbarObserver = null;
-	this._onMousedownPlugins = editor._onMousedownPlugins;
-	this._onKeyDownPlugins = editor._onKeyDownPlugins;
 	this._lineBreakDir = null;
 	this._lineBreakComp = null;
 	this._formatAttrsTemp = null;
@@ -161,6 +159,8 @@ EventManager.prototype = {
 			return;
 		}
 
+		const fc = this.editor.frameContext;
+		const notReadonly = !fc.get('isReadOnly');
 		this.editor._antiBlur = false;
 		for (let element = selectionNode; !domUtils.isWysiwygFrame(element); element = element.parentNode) {
 			if (!element) break;
@@ -169,7 +169,7 @@ EventManager.prototype = {
 			currentNodes.push(nodeName);
 
 			/* Active plugins */
-			if (!this.status.isReadOnly) {
+			if (notReadonly) {
 				for (let c = 0, name; c < cLen; c++) {
 					name = activeCommands[c];
 					if (
@@ -238,10 +238,8 @@ EventManager.prototype = {
 		this.status.currentNodesMap = commandMapNodes;
 
 		/**  Displays the current node structure to statusbar */
-		if (this.editor.frameOptions.get('statusbar_showPathLabel') && this.editor.frameContext.get('navigation')) {
-			this.editor.frameContext.get('navigation').textContent = this.options.get('_rtl')
-				? this.status.currentNodes.reverse().join(' < ')
-				: this.status.currentNodes.join(' > ');
+		if (this.editor.frameOptions.get('statusbar_showPathLabel') && fc.get('navigation')) {
+			fc.get('navigation').textContent = this.options.get('_rtl') ? this.status.currentNodes.reverse().join(' < ') : this.status.currentNodes.join(' > ');
 		}
 
 		return selectionNode;
@@ -511,18 +509,18 @@ EventManager.prototype = {
 		}
 	},
 
-	_dataTransferAction(type, e, data, rootKey) {
+	_dataTransferAction(type, e, data, frameContext) {
 		let plainText, cleanData;
 		plainText = data.getData('text/plain');
 		cleanData = data.getData('text/html');
-		if (this._setClipboardData(type, e, plainText, cleanData, data, rootKey) === false) {
+		if (this._setClipboardData(type, e, plainText, cleanData, data, frameContext) === false) {
 			e.preventDefault();
 			e.stopPropagation();
 			return false;
 		}
 	},
 
-	_setClipboardData(type, e, plainText, cleanData, data, rootKey) {
+	async _setClipboardData(type, e, plainText, cleanData, data, frameContext) {
 		// MS word, OneNode, Excel
 		const MSData =
 			/class=["']*Mso(Normal|List)/i.test(cleanData) ||
@@ -545,7 +543,7 @@ EventManager.prototype = {
 		const maxCharCount = this.char.test(this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText);
 		// user event - paste
 		if (type === 'paste' && typeof this.events.onPaste === 'function') {
-			const value = this.events.onPaste(rootKey, e, cleanData, maxCharCount);
+			const value = await this.events.onPaste({ frameContext, e, cleanData, maxCharCount });
 			if (value === false) {
 				return false;
 			} else if (typeof value === 'string') {
@@ -555,7 +553,7 @@ EventManager.prototype = {
 		}
 		// user event - drop
 		if (type === 'drop' && typeof this.events.onDrop === 'function') {
-			const value = this.events.onDrop(rootKey, e, cleanData, maxCharCount);
+			const value = await this.events.onDrop({ frameContext, e, cleanData, maxCharCount });
 			if (value === false) {
 				return false;
 			} else if (typeof value === 'string') {
@@ -610,7 +608,7 @@ EventManager.prototype = {
 			});
 			this._resizeObserver = new _w.ResizeObserver((entries) => {
 				entries.forEach((e) => {
-					this.editor.__callResizeFunction(this.editor.rootTargets.get(e.target.getAttribute('data-root-key')), -1, e);
+					this.editor.__callResizeFunction(this.editor.frameRoots.get(e.target.getAttribute('data-root-key')), -1, e);
 				});
 			});
 		}
@@ -620,42 +618,41 @@ EventManager.prototype = {
 		this.addEvent(_w, 'scroll', OnScroll_window.bind(this), false);
 	},
 
-	_addFrameEvents(frameContext) {
-		const eventWysiwyg = frameContext.get('options').get('iframe') ? frameContext.get('_ww') : frameContext.get('wysiwyg');
-		frameContext.set('eventWysiwyg', eventWysiwyg);
-		const codeArea = frameContext.get('code');
+	_addFrameEvents(fc) {
+		const eventWysiwyg = fc.get('options').get('iframe') ? fc.get('_ww') : fc.get('wysiwyg');
+		fc.set('eventWysiwyg', eventWysiwyg);
+		const codeArea = fc.get('code');
 
 		/** editor area */
-		const rootKey = frameContext.get('key');
-		const wwMouseDown = OnMouseDown_wysiwyg.bind(this, rootKey);
-		const wwClickEvent = OnClick_wysiwyg.bind(this, rootKey);
+		const wwMouseDown = OnMouseDown_wysiwyg.bind(this, fc);
+		const wwClickEvent = OnClick_wysiwyg.bind(this, fc);
 		this.addEvent(eventWysiwyg, 'mousedown', wwMouseDown, false);
 		this.addEvent(eventWysiwyg, 'click', wwClickEvent, false);
-		this.addEvent(eventWysiwyg, 'input', OnInput_wysiwyg.bind(this, rootKey), false);
-		this.addEvent(eventWysiwyg, 'keydown', OnKeyDown_wysiwyg.bind(this, rootKey), false);
-		this.addEvent(eventWysiwyg, 'keyup', OnKeyUp_wysiwyg.bind(this, rootKey), false);
-		this.addEvent(eventWysiwyg, 'paste', OnPaste_wysiwyg.bind(this, rootKey), false);
-		this.addEvent(eventWysiwyg, 'copy', OnCopy_wysiwyg.bind(this, rootKey), false);
-		this.addEvent(eventWysiwyg, 'cut', OnCut_wysiwyg.bind(this, rootKey), false);
-		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, rootKey), false);
-		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, rootKey, eventWysiwyg), false);
-		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this, rootKey), false);
-		this.addEvent(eventWysiwyg, 'blur', OnBlur_wysiwyg.bind(this, rootKey), false);
-		this.addEvent(codeArea, 'mousedown', OnFocus_code.bind(this, rootKey), false);
+		this.addEvent(eventWysiwyg, 'input', OnInput_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'keydown', OnKeyDown_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'keyup', OnKeyUp_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'paste', OnPaste_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'copy', OnCopy_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'cut', OnCut_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'drop', OnDrop_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'scroll', OnScroll_wysiwyg.bind(this, fc, eventWysiwyg), false);
+		this.addEvent(eventWysiwyg, 'focus', OnFocus_wysiwyg.bind(this, fc), false);
+		this.addEvent(eventWysiwyg, 'blur', OnBlur_wysiwyg.bind(this, fc), false);
+		this.addEvent(codeArea, 'mousedown', OnFocus_code.bind(this, fc), false);
 
 		/** line breaker */
-		this.addEvent(eventWysiwyg, 'mousemove', OnMouseMove_wysiwyg.bind(this), false);
+		this.addEvent(eventWysiwyg, 'mousemove', OnMouseMove_wysiwyg.bind(this, fc), false);
 		this.addEvent(
-			[frameContext.get('lineBreaker').querySelector('button'), frameContext.get('lineBreaker_t'), frameContext.get('lineBreaker_b')],
+			[fc.get('lineBreaker').querySelector('button'), fc.get('lineBreaker_t'), fc.get('lineBreaker_b')],
 			'mousedown',
 			function (e) {
 				e.preventDefault();
 			},
 			false
 		);
-		this.addEvent(frameContext.get('lineBreaker').querySelector('button'), 'click', DisplayLineBreak.bind(this, ''), false);
-		this.addEvent(frameContext.get('lineBreaker_t'), 'mousedown', DisplayLineBreak.bind(this, 't'), false);
-		this.addEvent(frameContext.get('lineBreaker_b'), 'mousedown', DisplayLineBreak.bind(this, 'b'), false);
+		this.addEvent(fc.get('lineBreaker').querySelector('button'), 'click', DisplayLineBreak.bind(this, ''), false);
+		this.addEvent(fc.get('lineBreaker_t'), 'mousedown', DisplayLineBreak.bind(this, 't'), false);
+		this.addEvent(fc.get('lineBreaker_b'), 'mousedown', DisplayLineBreak.bind(this, 'b'), false);
 
 		/** Events are registered mobile. */
 		this.addEvent(eventWysiwyg, 'touchstart', wwMouseDown, {
@@ -675,10 +672,10 @@ EventManager.prototype = {
 			this.addEvent(codeArea, 'paste', cvAuthHeight, false);
 		}
 
-		if (frameContext.has('statusbar')) this.__addStatusbarEvent(frameContext, frameContext.get('options'));
+		if (fc.has('statusbar')) this.__addStatusbarEvent(fc, fc.get('options'));
 
 		const OnScrollAbs = OnScroll_Abs.bind(this);
-		let scrollParent = frameContext.get('originElement');
+		let scrollParent = fc.get('originElement');
 		while ((scrollParent = domUtils.getScrollParent(scrollParent.parentElement))) {
 			this.__scrollparents.push(scrollParent);
 			this.addEvent(scrollParent, 'scroll', OnScrollAbs, false);
@@ -871,8 +868,8 @@ function OnClick_toolbar(e) {
 	this.editor.runFromTarget(e.target);
 }
 
-function OnMouseDown_wysiwyg(rootKey, e) {
-	if (this.status.isReadOnly || domUtils.isNonEditable(this.editor.frameContext.get('wysiwyg'))) return;
+function OnMouseDown_wysiwyg(frameContext, e) {
+	if (frameContext.get('isReadOnly') || domUtils.isNonEditable(frameContext.get('wysiwyg'))) return;
 	if (this.format._isExcludeSelectionElement(e.target)) {
 		e.preventDefault();
 		return;
@@ -881,7 +878,7 @@ function OnMouseDown_wysiwyg(rootKey, e) {
 	setTimeout(this.selection._init.bind(this.selection));
 
 	// user event
-	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown(rootKey, e) === false) return;
+	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown({ frameContext, e }) === false) return;
 
 	const eventPlugins = this.editor._onMousedownPlugins;
 	for (let i = 0; i < eventPlugins.length; i++) {
@@ -897,10 +894,10 @@ function OnMouseDown_wysiwyg(rootKey, e) {
 	if (/FIGURE/i.test(e.target.nodeName)) e.preventDefault();
 }
 
-function OnClick_wysiwyg(rootKey, e) {
+function OnClick_wysiwyg(frameContext, e) {
 	const targetElement = e.target;
 
-	if (this.status.isReadOnly) {
+	if (frameContext.get('isReadOnly')) {
 		e.preventDefault();
 		if (domUtils.isAnchor(targetElement)) {
 			_w.open(targetElement.href, targetElement.target);
@@ -911,7 +908,7 @@ function OnClick_wysiwyg(rootKey, e) {
 	if (domUtils.isNonEditable(this.editor.frameContext.get('wysiwyg'))) return;
 
 	// user event
-	if (typeof this.events.onClick === 'function' && this.events.onClick(rootKey, e) === false) return;
+	if (typeof this.events.onClick === 'function' && this.events.onClick({ frameContext, e }) === false) return;
 
 	const fileComponentInfo = this.component.get(targetElement);
 	if (fileComponentInfo) {
@@ -963,8 +960,8 @@ function OnClick_wysiwyg(rootKey, e) {
 	if (this.editor.isBalloon || this.editor.isSubBalloon) setTimeout(this._toggleToolbarBalloon.bind(this));
 }
 
-function OnInput_wysiwyg(rootKey, e) {
-	if (this.status.isReadOnly || this.status.isDisabled) {
+function OnInput_wysiwyg(frameContext, e) {
+	if (frameContext.get('isReadOnly') || frameContext.get('isDisabled')) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -980,12 +977,12 @@ function OnInput_wysiwyg(rootKey, e) {
 	}
 
 	// user event
-	if (typeof this.events.onInput === 'function' && this.events.onInput(rootKey, e) === false) return;
+	if (typeof this.events.onInput === 'function' && this.events.onInput({ frameContext, e }) === false) return;
 
 	this.history.push(true);
 }
 
-function OnKeyDown_wysiwyg(rootKey, e) {
+function OnKeyDown_wysiwyg(frameContext, e) {
 	let selectionNode = this.selection.getNode();
 	if (domUtils.isInputElement(selectionNode)) return;
 	if (this.menu.currentDropdownName) return;
@@ -996,7 +993,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 	const alt = e.altKey;
 	this.isComposing = keyCode === 229;
 
-	if (!ctrl && this.status.isReadOnly && !DIRECTION_KEYCODE.test(keyCode)) {
+	if (!ctrl && frameContext.get('isReadOnly') && !DIRECTION_KEYCODE.test(keyCode)) {
 		e.preventDefault();
 		return false;
 	}
@@ -1010,7 +1007,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 	}
 
 	// user event
-	if (typeof this.events.onKeyDown === 'function' && this.events.onKeyDown(rootKey, e) === false) return;
+	if (typeof this.events.onKeyDown === 'function' && this.events.onKeyDown({ frameContext, e }) === false) return;
 
 	/** Shortcuts */
 	if (ctrl && this.shortcuts.command(keyCode, shift)) {
@@ -1755,7 +1752,7 @@ function OnKeyDown_wysiwyg(rootKey, e) {
 	}
 }
 
-function OnKeyUp_wysiwyg(rootKey, e) {
+function OnKeyUp_wysiwyg(frameContext, e) {
 	if (this._onShortcutKey || this.menu.currentDropdownName) return;
 
 	this.selection._init();
@@ -1768,7 +1765,7 @@ function OnKeyUp_wysiwyg(rootKey, e) {
 		this.applyTagEffect();
 	}
 
-	if (this.status.isReadOnly) return;
+	if (frameContext.get('isReadOnly')) return;
 
 	const range = this.selection.getRange();
 	let selectionNode = this.selection.getNode();
@@ -1838,32 +1835,32 @@ function OnKeyUp_wysiwyg(rootKey, e) {
 	this.char.test('');
 
 	// user event
-	if (typeof this.events.onKeyUp === 'function' && this.events.onKeyUp(rootKey, e) === false) return;
+	if (typeof this.events.onKeyUp === 'function' && this.events.onKeyUp({ frameContext, e }) === false) return;
 
 	if (!ctrl && !alt && !HISTORY_IGNORE_KEYCODE.test(keyCode)) {
 		this.history.push(true);
 	}
 }
 
-function OnPaste_wysiwyg(rootKey, e) {
+function OnPaste_wysiwyg(frameContext, e) {
 	const clipboardData = e.clipboardData;
 	if (!clipboardData) return true;
-	return this._dataTransferAction('paste', e, clipboardData, rootKey);
+	return this._dataTransferAction('paste', e, clipboardData, frameContext);
 }
 
-function OnCopy_wysiwyg(rootKey, e) {
+function OnCopy_wysiwyg(frameContext, e) {
 	const clipboardData = e.clipboardData;
 
 	// user event
-	if (typeof this.events.onCopy === 'function' && this.events.onCopy(rootKey, e, clipboardData) === false) {
+	if (typeof this.events.onCopy === 'function' && this.events.onCopy({ frameContext, e, clipboardData }) === false) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
 	}
 }
 
-function OnDrop_wysiwyg(rootKey, e) {
-	if (this.status.isReadOnly) {
+function OnDrop_wysiwyg(frameContext, e) {
+	if (frameContext.get('isReadOnly')) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -1874,14 +1871,14 @@ function OnDrop_wysiwyg(rootKey, e) {
 
 	this.html.remove();
 	this._setDropLocationSelection(e);
-	return this._dataTransferAction('drop', e, dataTransfer, rootKey);
+	return this._dataTransferAction('drop', e, dataTransfer, frameContext);
 }
 
-function OnCut_wysiwyg(rootKey, e) {
+function OnCut_wysiwyg(frameContext, e) {
 	const clipboardData = e.clipboardData;
 
 	// user event
-	if (typeof this.events.onCut === 'function' && this.events.onCut(rootKey, e, clipboardData) === false) {
+	if (typeof this.events.onCut === 'function' && this.events.onCut({ frameContext, e, clipboardData }) === false) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -1892,14 +1889,15 @@ function OnCut_wysiwyg(rootKey, e) {
 	});
 }
 
-function OnScroll_wysiwyg(rootKey, eventWysiwyg, e) {
+function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 	this._moveContainer(eventWysiwyg);
 	this._scrollContainer();
 	// user event
-	if (typeof this.events.onScroll === 'function') this.events.onScroll(rootKey, e);
+	if (typeof this.events.onScroll === 'function') this.events.onScroll({ frameContext, e });
 }
 
-function OnFocus_wysiwyg(rootKey, e) {
+function OnFocus_wysiwyg(frameContext, e) {
+	const rootKey = frameContext.get('key');
 	if (this.status.rootKey === rootKey && this.editor._antiBlur) return;
 	this.editor._offCurrentController();
 	this.status.hasFocus = true;
@@ -1908,17 +1906,17 @@ function OnFocus_wysiwyg(rootKey, e) {
 	domUtils.setDisabled(this.editor._codeViewDisabledButtons, false);
 
 	this.editor.changeFrameContext(rootKey);
-	this.history.resetButtons();
+	this.history.resetButtons(rootKey, null);
 	this.applyTagEffect();
 
 	if (this.editor.isInline) this.toolbar._showInline();
 
 	// user event
-	if (typeof this.events.onFocus === 'function') this.events.onFocus(rootKey, e);
+	if (typeof this.events.onFocus === 'function') this.events.onFocus({ frameContext, e });
 }
 
-function OnBlur_wysiwyg(rootKey, e) {
-	if (this.editor._antiBlur || this.editor.rootTargets.get(rootKey).get('isCodeView')) return;
+function OnBlur_wysiwyg(frameContext, e) {
+	if (this.editor._antiBlur || frameContext.get('isCodeView')) return;
 
 	this.status.hasFocus = false;
 	this.editor.effectNode = null;
@@ -1931,24 +1929,24 @@ function OnBlur_wysiwyg(rootKey, e) {
 	this.status.currentNodes = [];
 	this.status.currentNodesMap = [];
 
-	this.editor.applyRootTargets(function (e) {
+	this.editor.applyFrameRoots((e) => {
 		if (e.get('navigation')) e.get('navigation').textContent = '';
 	});
 
-	this.history.check(rootKey, this.status._range);
+	this.history.check(frameContext.get('key'), this.status._range);
 
 	// user event
-	if (typeof this.events.onBlur === 'function') this.events.onBlur(rootKey, e, this.editor.frameContext.get('wysiwyg'));
+	if (typeof this.events.onBlur === 'function') this.events.onBlur({ frameContext, e });
 }
 
-function OnMouseMove_wysiwyg(e) {
-	if (this.status.isDisabled || this.status.isReadOnly) return false;
+function OnMouseMove_wysiwyg(frameContext, e) {
+	if (frameContext.get('isReadOnly') || frameContext.get('isDisabled')) return false;
 
 	const info = this.component.get(e.target);
 	if (!info) return;
 
 	const container = info.container;
-	const lineBreakerStyle = this.editor.frameContext.get('lineBreaker').style;
+	const lineBreakerStyle = frameContext.get('lineBreaker').style;
 
 	if (container && !this.editor.currentControllerName) {
 		const fc = this.editor.frameContext;
@@ -2061,8 +2059,8 @@ function OnScroll_Abs() {
 	this._scrollContainer();
 }
 
-function OnFocus_code(rootKey) {
-	this.editor.changeFrameContext(rootKey);
+function OnFocus_code(frameContext) {
+	this.editor.changeFrameContext(frameContext.get('key'));
 	domUtils.addClass(this.editor.commandTargets.get('codeView'), 'active');
 	domUtils.setDisabled(this.editor._codeViewDisabledButtons, true);
 }

@@ -27,7 +27,7 @@ class Events extends EditorInterface {
 	 * @description Called just before the inline toolbar is positioned and displayed on the screen.
 	 * @param toolbar Toolbar Element
 	 */
-	onShowInline: (toolbar: Element) => void;
+	onShowToolbar: (toolbar: Element) => void;
 
 	/**
 	 * @description Called just after the controller is positioned and displayed on the screen.

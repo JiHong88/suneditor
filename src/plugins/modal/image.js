@@ -148,7 +148,7 @@ Image_.prototype = {
 	 * @override modal
 	 * @returns {boolean | undefined}
 	 */
-	modalAction() {
+	async modalAction() {
 		this._align = this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
 
 		if (this.modal.isUpdate) {
@@ -157,9 +157,9 @@ Image_.prototype = {
 		}
 
 		if (this.imgInputFile && this.imgInputFile.files.length > 0) {
-			return this._submitFile(this.imgInputFile.files);
+			return await this._submitFile(this.imgInputFile.files);
 		} else if (this.imgUrlFile && this._linkValue.length > 0) {
-			return this._submitURL(this._linkValue);
+			return await this._submitURL(this._linkValue);
 		}
 
 		return false;
@@ -287,7 +287,19 @@ Image_.prototype = {
 		this.history.push(false);
 	},
 
-	_submitFile(fileList) {
+	_getInfo() {
+		return {
+			element: this._element,
+			anchor: this.anchor.create(true),
+			inputWidth: this.inputX.value,
+			inputHeight: this.inputY.value,
+			align: this._align,
+			isUpdate: this.modal.isUpdate,
+			alt: this.altText.value
+		};
+	},
+
+	async _submitFile(fileList) {
 		if (fileList.length === 0) return false;
 
 		let fileSize = 0;
@@ -316,22 +328,18 @@ Image_.prototype = {
 			return false;
 		}
 
-		const info = {
-			element: this._element,
-			anchor: this.anchor.create(true),
-			inputWidth: this.inputX.value,
-			inputHeight: this.inputY.value,
-			align: this._align,
-			isUpdate: this.modal.isUpdate,
-			alt: this.altText.value
-		};
-
+		const info = this._getInfo();
 		if (typeof this.events.onImageUploadBefore === 'function') {
-			const result = this.events.onImageUploadBefore(files, info, (data) => {
-				if (data && Array.isArray(data.result)) {
-					this._register(info, data);
-				} else {
-					this._serverUpload(info, data);
+			const result = await this.events.onImageUploadBefore({
+				url: null,
+				files,
+				info,
+				handler: (data) => {
+					if (data && Array.isArray(data.result)) {
+						this._register(info, data);
+					} else {
+						this._serverUpload(info, data);
+					}
 				}
 			});
 
@@ -343,7 +351,7 @@ Image_.prototype = {
 		this._serverUpload(info, files);
 	},
 
-	_submitURL(url) {
+	async _submitURL(url) {
 		if (!url) url = this._linkValue;
 		if (!url) return false;
 
@@ -351,8 +359,26 @@ Image_.prototype = {
 			name: url.split('/').pop(),
 			size: 0
 		};
-		if (this.modal.isUpdate) this._updateSrc(url, this._element, file);
-		else this.create(url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
+
+		const handler = function (url, url_) {
+			if (this.modal.isUpdate) this._updateSrc(url_ || url, this._element, file);
+			else this.create(url_ || url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
+		}.bind(this, url);
+
+		if (typeof this.events.onImageUploadBefore === 'function') {
+			const result = await this.events.onImageUploadBefore({
+				url,
+				files: file,
+				info: this._getInfo(),
+				handler
+			});
+
+			if (result === undefined) return true;
+			if (result === false) return false;
+			if (typeof result === 'string' && result.length > 0) handler(result);
+		} else {
+			handler(null);
+		}
 
 		return true;
 	},
@@ -643,15 +669,15 @@ Image_.prototype = {
 
 					if (--this._base64RenderIndex === 0) {
 						this._onRenderBase64(update, filesStack, updateElement, anchor, width, height, align, alt);
-						this.editor._closeLoading();
+						this.editor.hideLoading();
 					}
 				}.bind(this, reader, isUpdate, this._element, file, i);
 
 				reader.readAsDataURL(file);
 			}
 		} catch (error) {
-			this.editor._closeLoading();
-			throw Error('[SUNEDITOR.plugins.image._setBase64.fail] ' + error.message);
+			this.editor.hideLoading();
+			throw Error(`[SUNEDITOR.plugins.image._setBase64.fail] ${error.message}`);
 		}
 	},
 
@@ -679,7 +705,7 @@ Image_.prototype = {
 	_error(message, response) {
 		if (typeof this.events.onImageUploadError !== 'function' || this.events.onImageUploadError(message, response)) {
 			this.notice.open(message);
-			throw Error('[SUNEDITOR.plugin.image.error] response: ' + message);
+			throw Error(`[SUNEDITOR.plugin.image.error] response: ${message}`);
 		}
 	},
 
@@ -692,9 +718,9 @@ function FileCheckHandler(element) {
 	return element;
 }
 
-function UploadCallBack(info, xmlHttp) {
+async function UploadCallBack(info, xmlHttp) {
 	if (typeof this.events.imageUploadHandler === 'function') {
-		this.events.imageUploadHandler(xmlHttp, info);
+		await this.events.imageUploadHandler({ xmlHttp, info });
 	} else {
 		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {

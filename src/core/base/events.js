@@ -2,8 +2,6 @@ export default function () {
 	return {
 		/**
 		 * @description Event functions
-		 * @param {Object} e Event Object
-		 * @param {Object} core Core object
 		 */
 		onload: null,
 		onScroll: null,
@@ -15,26 +13,16 @@ export default function () {
 		onCopy: null,
 		onCut: null,
 		onFocus: null,
-
-		/**
-		 * @description Event functions
-		 * @param {Object} e Event Object
-		 * @param {Object} core Core object
-		 * @param {String} contents Current contents
-		 */
 		onBlur: null,
-
-		/**
-		 * @description Event functions
-		 * @param {String} contents Current contents
-		 * @param {Object} core Core object
-		 */
 		onChange: null,
 
 		/**
+		 * async function
+		 */
+		/**
 		 * @description Event functions
 		 * @param {String} contents Current contents
-		 * @param {Object} core Core object
+		 * @param {String|null} key Root key
 		 */
 		onSave: null,
 
@@ -57,7 +45,7 @@ export default function () {
 		 * @param {Object} context The editor's context object (editor.getContext())
 		 * @param {Object} core Core object
 		 */
-		onShowInline: null,
+		onShowToolbar: null,
 
 		/**
 		 * @description Called just after the controller is positioned and displayed on the screen.
@@ -98,29 +86,6 @@ export default function () {
 		imageUploadHandler: null,
 
 		/**
-		 * @description It replaces the default callback function of the video upload
-		 * @param xmlHttp xmlHttpRequest object
-		 * @param info Input information
-		 * - inputWidth: Value of width input
-		 * - inputHeight: Value of height input
-		 * - align: Align Check Value
-		 * - isUpdate: Update video if true, create video if false
-		 * - element: If isUpdate is true, the currently selected video.
-		 * @param core Core object
-		 */
-		videoUploadHandler: null,
-
-		/**
-		 * @description It replaces the default callback function of the audio upload
-		 * @param xmlHttp xmlHttpRequest object
-		 * @param info Input information
-		 * - isUpdate: Update audio if true, create audio if false
-		 * - element: If isUpdate is true, the currently selected audio.
-		 * @param core Core object
-		 */
-		audioUploadHandler: null,
-
-		/**
 		 * @description Called before the image is uploaded
 		 * If true is returned, the internal upload process runs normally.
 		 * If false is returned, no image upload is performed.
@@ -150,6 +115,57 @@ export default function () {
 		 * @returns {Boolean|Array|undefined}
 		 */
 		onImageUploadBefore: null,
+
+		/**
+		 * @description Called when the image is uploaded, updated, deleted
+		 * @param {Element} targetElement Target element
+		 * @param {Number} index Uploaded index
+		 * @param {String} state Upload status ('create', 'update', 'delete')
+		 * @param {Object} info Image info object
+		 * - index: data index
+		 * - name: file name
+		 * - size: file size
+		 * - select: select function
+		 * - delete: delete function
+		 * - element: target element
+		 * - src: src attribute of tag
+		 * @param {Number} remainingFilesCount Count of remaining files to upload (0 when added as a url)
+		 * @param {Object} core Core object
+		 */
+		onImageUpload: null,
+
+		/**
+		 * @description Called when the image is upload failed
+		 * @param {String} errorMessage Error message
+		 * @param {Object} result Response Object
+		 * @param {Object} core Core object
+		 * @returns {Boolean}
+		 */
+		onImageUploadError: null,
+
+		/**
+		 * @description It replaces the default callback function of the video upload
+		 * @param xmlHttp xmlHttpRequest object
+		 * @param info Input information
+		 * - inputWidth: Value of width input
+		 * - inputHeight: Value of height input
+		 * - align: Align Check Value
+		 * - isUpdate: Update video if true, create video if false
+		 * - element: If isUpdate is true, the currently selected video.
+		 * @param core Core object
+		 */
+		videoUploadHandler: null,
+
+		/**
+		 * @description It replaces the default callback function of the audio upload
+		 * @param xmlHttp xmlHttpRequest object
+		 * @param info Input information
+		 * - isUpdate: Update audio if true, create audio if false
+		 * - element: If isUpdate is true, the currently selected audio.
+		 * @param core Core object
+		 */
+		audioUploadHandler: null,
+		
 		/**
 		 * @description Called before the video is uploaded
 		 * If true is returned, the internal upload process runs normally.
@@ -204,23 +220,8 @@ export default function () {
 		 */
 		onAudioUploadBefore: null,
 
-		/**
-		 * @description Called when the image is uploaded, updated, deleted
-		 * @param {Element} targetElement Target element
-		 * @param {Number} index Uploaded index
-		 * @param {String} state Upload status ('create', 'update', 'delete')
-		 * @param {Object} info Image info object
-		 * - index: data index
-		 * - name: file name
-		 * - size: file size
-		 * - select: select function
-		 * - delete: delete function
-		 * - element: target element
-		 * - src: src attribute of tag
-		 * @param {Number} remainingFilesCount Count of remaining files to upload (0 when added as a url)
-		 * @param {Object} core Core object
-		 */
-		onImageUpload: null,
+		
+
 		/**
 		 * @description Called when the video(iframe, video) is is uploaded, updated, deleted
 		 * -- arguments is same "onImageUpload" --
@@ -232,14 +233,7 @@ export default function () {
 		 */
 		onAudioUpload: null,
 
-		/**
-		 * @description Called when the image is upload failed
-		 * @param {String} errorMessage Error message
-		 * @param {Object} result Response Object
-		 * @param {Object} core Core object
-		 * @returns {Boolean}
-		 */
-		onImageUploadError: null,
+		
 		/**
 		 * @description Called when the video(iframe, video) upload failed
 		 * -- arguments is same "onImageUploadError" --

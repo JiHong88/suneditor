@@ -4,9 +4,10 @@
 
 import { _w } from '../../helper/env';
 import { getNodeFromPath, getNodePath } from '../../helper/domUtils';
+import { numbers } from '../../helper';
 
 export default function (editor, change) {
-	const rootTargets = editor.rootTargets;
+	const frameRoots = editor.frameRoots;
 	let delayTime = editor.options.get('historyStackDelayTime');
 	let pushDelay = null;
 	let stackIndex, stack, rootStack, rootInitContents;
@@ -21,7 +22,7 @@ export default function (editor, change) {
 		root.index += increase;
 
 		const item = root.value[root.index];
-		rootTargets.get(rootKey).get('wysiwyg').innerHTML = item.content;
+		frameRoots.get(rootKey).get('wysiwyg').innerHTML = item.content;
 
 		if (prevKey !== rootKey && increase < 0 && stackIndex === 1) {
 			stackIndex = 0;
@@ -49,45 +50,13 @@ export default function (editor, change) {
 		if (stackIndex < 0) stackIndex = 0;
 		else if (stackIndex >= stack.length) stackIndex = stack.length - 1;
 
-		if (stack.length <= 1) {
-			editor.applyCommandTargets('undo', function (e) {
-				e.setAttribute('disabled', true);
-			});
-			editor.applyCommandTargets('redo', function (e) {
-				e.setAttribute('disabled', true);
-			});
-		} else {
-			if (stackIndex === 0) {
-				editor.applyCommandTargets('undo', function (e) {
-					e.setAttribute('disabled', true);
-				});
-				editor.applyCommandTargets('redo', function (e) {
-					e.removeAttribute('disabled');
-				});
-			} else if (stackIndex === stack.length - 1) {
-				editor.applyCommandTargets('undo', function (e) {
-					e.removeAttribute('disabled');
-				});
-				editor.applyCommandTargets('redo', function (e) {
-					e.setAttribute('disabled', true);
-				});
-			} else {
-				editor.applyCommandTargets('undo', function (e) {
-					e.removeAttribute('disabled');
-				});
-				editor.applyCommandTargets('redo', function (e) {
-					e.removeAttribute('disabled');
-				});
-			}
-		}
-
 		editor._offCurrentController();
 		editor._checkComponents();
 		editor.char.display();
 		editor._resourcesStateChange(editor.frameContext);
 
 		// onChange
-		change();
+		change(editor.frameContext, root.index);
 	}
 
 	function setStack(content, range, rootKey, increase) {
@@ -115,7 +84,7 @@ export default function (editor, change) {
 			content: content,
 			s: s,
 			e: e,
-			frame: rootTargets.get(rootKey).get('wysiwyg')
+			frame: frameRoots.get(rootKey).get('wysiwyg')
 		};
 	}
 
@@ -128,13 +97,13 @@ export default function (editor, change) {
 			content: rootInitContents[rootKey],
 			s: { path: [0, 0], offset: [0, 0] },
 			e: { path: 0, offset: 0 },
-			frame: rootTargets.get(rootKey).get('wysiwyg')
+			frame: frameRoots.get(rootKey).get('wysiwyg')
 		};
 	}
 
 	function initRoot(rootKey) {
 		rootStack[rootKey] = { value: [], index: -1 };
-		rootInitContents[rootKey] = rootTargets.get(rootKey).get('wysiwyg').innerHTML;
+		rootInitContents[rootKey] = frameRoots.get(rootKey).get('wysiwyg').innerHTML;
 	}
 
 	function refreshRoots(root) {
@@ -146,7 +115,7 @@ export default function (editor, change) {
 
 		stack = stack.slice(0, stackIndex + 1);
 		root.value.splice(stackIndex + 1);
-		editor.applyCommandTargets('redo', function (e) {
+		editor.applyCommandTargets('redo', (e) => {
 			e.setAttribute('disabled', true);
 		});
 
@@ -158,7 +127,8 @@ export default function (editor, change) {
 	function pushStack(rootKey, range) {
 		editor._checkComponents();
 
-		const current = rootTargets.get(rootKey).get('wysiwyg').innerHTML;
+		const fc = frameRoots.get(rootKey);
+		const current = fc.get('wysiwyg').innerHTML;
 		const root = rootStack[rootKey];
 		if (!current || (root.value[root.index] && current === root.value[root.index].content)) return;
 		if (stack.length > stackIndex + 1) refreshRoots(root);
@@ -167,13 +137,13 @@ export default function (editor, change) {
 		setStack(current, range, rootKey, 1);
 
 		if (stackIndex === 1) {
-			editor.applyCommandTargets('undo', function (e) {
+			editor.applyCommandTargets('undo', (e) => {
 				e.removeAttribute('disabled');
 			});
 		}
 
 		editor.char.display();
-		change();
+		change(fc, root.index);
 	}
 
 	return {
@@ -188,7 +158,7 @@ export default function (editor, change) {
 			rootKey = rootKey || editor.status.rootKey;
 			const range = editor.status._range;
 
-			_w.setTimeout(editor._resourcesStateChange.bind(editor, rootTargets.get(rootKey)));
+			_w.setTimeout(editor._resourcesStateChange.bind(editor, frameRoots.get(rootKey)));
 			const time = typeof delay === 'number' ? (delay > 0 ? delay : 0) : !delay ? 0 : delayTime;
 
 			if (!time || pushDelay) {
@@ -233,24 +203,26 @@ export default function (editor, change) {
 		},
 
 		overwrite(rootKey) {
-			setStack(rootTargets.get(rootKey || editor.status.rootKey).get('wysiwyg').innerHTML, null, editor.status.rootKey, 0);
+			setStack(frameRoots.get(rootKey || editor.status.rootKey).get('wysiwyg').innerHTML, null, editor.status.rootKey, 0);
 		},
 
 		/**
 		 * @description Reset the history object
 		 */
 		reset() {
-			editor.applyCommandTargets('undo', function (e) {
+			editor.applyCommandTargets('undo', (e) => {
 				e.setAttribute('disabled', true);
 			});
-			editor.applyCommandTargets('redo', function (e) {
+			editor.applyCommandTargets('redo', (e) => {
 				e.setAttribute('disabled', true);
 			});
 
-			editor.status.isChanged = false;
-			editor.applyCommandTargets('save', function (e) {
+			editor.applyCommandTargets('save', (e) => {
 				e.setAttribute('disabled', true);
 			});
+
+			editor.applyFrameRoots((e) => e.set('historyIndex', -1));
+			editor.applyFrameRoots((e) => e.set('isChanged', false));
 
 			stackIndex = -1;
 			stack = [];
@@ -266,25 +238,38 @@ export default function (editor, change) {
 		/**
 		 * @description Reset the disabled state of the buttons to fit the current stack.
 		 */
-		resetButtons() {
-			if (stackIndex === 0) {
-				editor.applyCommandTargets('undo', function (e) {
-					e.setAttribute('disabled', true);
-				});
-				if (stackIndex === stack.length - 1) {
-					editor.applyCommandTargets('redo', function (e) {
-						e.setAttribute('disabled', true);
-					});
-				}
-				editor.status.isChanged = false;
-				editor.applyCommandTargets('save', function (e) {
-					e.setAttribute('disabled', true);
-				});
-			} else if (stackIndex === stack.length - 1) {
-				editor.applyCommandTargets('redo', function (e) {
-					e.setAttribute('disabled', true);
-				});
-			}
+		resetButtons(rootKey, index) {
+			const isReset = !numbers.is(index);
+			const root = rootStack[rootKey === undefined ? stack[stackIndex] : rootKey];
+			index = !isReset ? index : root.index;
+			const target = editor.frameRoots.get(rootKey);
+			const rootLen = root.value.length - 1;
+
+			editor.applyCommandTargets('undo', (e) => {
+				if (index > 0 && index <= rootLen) e.removeAttribute('disabled');
+				else e.setAttribute('disabled', true);
+			});
+			editor.applyCommandTargets('redo', (e) => {
+				if (index > -1 && index < rootLen) e.removeAttribute('disabled');
+				else e.setAttribute('disabled', true);
+			});
+
+			const savedIndex = target.get('savedIndex');
+			const historyIndex = target.get('historyIndex');
+			const isChanged = savedIndex > -1 ? savedIndex !== index : isReset ? root.length > 0 : index > 0 && historyIndex !== index;
+
+			target.set('historyIndex', index);
+			target.set('isChanged', isChanged);
+			editor.applyCommandTargets('save', (e) => {
+				if (isChanged) e.removeAttribute('disabled');
+				else e.setAttribute('disabled', true);
+			});
+
+			if (typeof editor.events.onResetButtons === 'function') editor.events.onResetButtons({ rootKey });
+		},
+
+		getRootStack() {
+			return rootStack;
 		},
 
 		/**

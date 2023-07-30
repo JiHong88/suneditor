@@ -589,7 +589,7 @@ Video.prototype = {
 	_error(message, response) {
 		if (typeof this.events.onVideoUploadError !== 'function' || this.events.onVideoUploadError(message, response)) {
 			this.notice.open(message);
-			throw Error('[SUNEDITOR.plugin.video.error] response: ' + message);
+			throw Error(`[SUNEDITOR.plugin.video.error] response: ${message}`);
 		}
 	},
 

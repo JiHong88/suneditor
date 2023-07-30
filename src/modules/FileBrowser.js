@@ -191,7 +191,7 @@ function CallBackGet(xmlHttp) {
 					this.list.innerHTML = res.nullMessage;
 				}
 			} catch (e) {
-				throw Error('[SUNEDITOR.fileBrowser.drawList.fail] cause : "' + e.message + '"');
+				throw Error(`[SUNEDITOR.fileBrowser.drawList.fail] cause: "${e.message}"`);
 			} finally {
 				this.closeBrowserLoading();
 				this.body.style.maxHeight = this._w.innerHeight - this.header.offsetHeight - 50 + 'px';
@@ -201,8 +201,7 @@ function CallBackGet(xmlHttp) {
 			this.closeBrowserLoading();
 			if (xmlHttp.status !== 0) {
 				const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
-				const err = '[SUNEDITOR.fileBrowser.get.serverException] status: ' + xmlHttp.status + ', response: ' + (res.errorMessage || xmlHttp.responseText);
-				throw Error(err);
+				throw Error(`[SUNEDITOR.fileBrowser.get.serverException] status: ${xmlHttp.status}, response: ${res.errorMessage || xmlHttp.responseText}`);
 			}
 		}
 	}

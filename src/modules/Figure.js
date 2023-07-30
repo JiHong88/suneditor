@@ -71,7 +71,7 @@ const Figure = function (inst, controls, params) {
 	// init
 	this.eventManager.addEvent(this.alignButton, 'click', OnClick_alignButton.bind(this));
 	this.eventManager.addEvent(this.resizeButton, 'click', OnClick_resizeButton.bind(this));
-	this.editor.applyRootTargets((e) => {
+	this.editor.applyFrameRoots((e) => {
 		if (!e.get('editorArea').querySelector('.se-controller.se-resizing-container')) {
 			const main = CreateHTML_resizeDot();
 			const handles = main.querySelectorAll('.se-resize-dot > span');
@@ -880,6 +880,7 @@ function OffFigureContainer() {
 	this.editor._figureContainer = null;
 	this.inst.init();
 	Figure.__figureControllerInst = null;
+	this.editor._offCurrentController();
 }
 
 function OnClick_alignButton() {
@@ -910,17 +911,18 @@ function OnClick_resizeButton() {
 
 function CreateHTML_resizeDot() {
 	const html = `
-<div class="se-resize-dot">
-    <span class="tl"></span>
-    <span class="tr"></span>
-    <span class="bl"></span>
-    <span class="br"></span>
-    <span class="lw"></span>
-    <span class="th"></span>
-    <span class="rw"></span>
-    <span class="bh"></span>
-    <div class="se-resize-display"></div>
-</div>`;
+		<div class="se-resize-dot">
+			<span class="tl"></span>
+			<span class="tr"></span>
+			<span class="bl"></span>
+			<span class="br"></span>
+			<span class="lw"></span>
+			<span class="th"></span>
+			<span class="rw"></span>
+			<span class="bh"></span>
+			<div class="se-resize-display"></div>
+		</div>`;
+
 	return domUtils.createElement('DIV', { class: 'se-controller se-resizing-container', style: 'display: none;' }, html);
 }
 

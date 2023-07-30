@@ -95,7 +95,7 @@ Viewer.prototype = {
 
 			if (!domUtils.isNonEditable(wysiwygFrame)) {
 				this.history.push(false);
-				this.history.resetButtons();
+				this.history.resetButtons(fc.get('key'), null);
 			}
 		}
 
@@ -103,7 +103,7 @@ Viewer.prototype = {
 		domUtils.setDisabled(this.editor._codeViewDisabledButtons, value);
 
 		// user event
-		if (typeof this.events.onToggleCodeView === 'function') this.events.onToggleCodeView(fc.get('isCodeView'));
+		if (typeof this.events.onToggleCodeView === 'function') this.events.onToggleCodeView({ frameContext: fc, is: fc.get('isCodeView') });
 	},
 
 	/**
@@ -187,7 +187,7 @@ Viewer.prototype = {
 			fc.get('topArea').style.marginTop = this.options.get('fullScreenOffset') + 'px';
 
 			const reductionIcon = this.icons.reduction;
-			this.editor.applyCommandTargets('fullScreen', function (e) {
+			this.editor.applyCommandTargets('fullScreen', (e) => {
 				domUtils.changeElement(e.firstElementChild, reductionIcon);
 				domUtils.addClass(e, 'active');
 			});
@@ -229,7 +229,7 @@ Viewer.prototype = {
 			fc.get('topArea').style.marginTop = '';
 
 			const expansionIcon = this.icons.expansion;
-			this.editor.applyCommandTargets('fullScreen', function (e) {
+			this.editor.applyCommandTargets('fullScreen', (e) => {
 				domUtils.changeElement(e.firstElementChild, expansionIcon);
 				fc;
 				domUtils.removeClass(e, 'active');
@@ -239,7 +239,7 @@ Viewer.prototype = {
 		if (wasToolbarHidden && !fc.get('isCodeView')) this.editor.toolbar.hide();
 
 		// user event
-		if (typeof this.events.onToggleFullScreen === 'function') this.events.onToggleFullScreen(fc.get('isFullScreen'));
+		if (typeof this.events.onToggleFullScreen === 'function') this.events.onToggleFullScreen({ frameContext: fc, is: fc.get('isFullScreen') });
 	},
 
 	/**
@@ -303,7 +303,7 @@ Viewer.prototype = {
 			);
 		}
 
-		this.editor._openLoading();
+		this.editor.showLoading();
 		setTimeout(() => {
 			try {
 				iframe.focus();
@@ -312,7 +312,7 @@ Viewer.prototype = {
 					try {
 						iframe.contentWindow.document.execCommand('print', false, null);
 					} catch (e) {
-						console.warn('[SUNEDITOR.print.warn] ' + e);
+						console.warn('[SUNEDITOR.print.warn]', e);
 						iframe.contentWindow.print();
 					}
 				} else {
@@ -320,9 +320,9 @@ Viewer.prototype = {
 					iframe.contentWindow.print();
 				}
 			} catch (error) {
-				throw Error('[SUNEDITOR.print.fail] error: ' + error.message);
+				throw Error(`[SUNEDITOR.print.fail] error: ${error.message}`);
 			} finally {
-				this.editor._closeLoading();
+				this.editor.hideLoading();
 				domUtils.removeItem(iframe);
 			}
 		}, 1000);
@@ -410,7 +410,7 @@ Viewer.prototype = {
 	 * @private
 	 */
 	_codeMirrorEditor(key, value, rootKey) {
-		const fo = rootKey ? this.rootTargets.get(rootKey).get('options') : this.editor.frameOptions;
+		const fo = rootKey ? this.frameRoots.get(rootKey).get('options') : this.editor.frameOptions;
 		switch (key) {
 			case 'set':
 				if (fo.has('codeMirror5Editor')) {

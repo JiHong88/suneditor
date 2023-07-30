@@ -35,7 +35,7 @@ FileManager.prototype = {
 	 * @example this.plugins.fileManager.upload.call(this, pluginOptions.uploadUrl, pluginOptions.uploadHeaders, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.events.onImageUploadError);
 	 */
 	upload(uploadUrl, uploadHeader, data, callBack, errorCallBack) {
-		this.editor._openLoading();
+		this.editor.showLoading();
 
 		let formData = null;
 		// create formData
@@ -150,7 +150,7 @@ FileManager.prototype = {
 					this.figure.setSize(size[0], size[1]);
 					this.inst.init();
 				} catch (error) {
-					console.warn('[SUNEDITOR.FileManager[' + this.kind + '].setInfo.error] ' + error.message);
+					console.warn(`[SUNEDITOR.FileManager[${this.kind}].setInfo.error]`, error.message);
 				} finally {
 					this.figure.__fileManagerInfo = false;
 				}
@@ -225,16 +225,14 @@ FileManager.prototype = {
 					tag = this.checkHandler(tag);
 					if (!tag) {
 						console.warn(
-							'[SUNEDITOR.FileManager[' +
-								this.kind +
-								'].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).'
+							`[SUNEDITOR.FileManager[${this.kind}].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).`
 						);
 					} else {
 						this.setInfo(tag, null);
 						this.inst.init();
 					}
 				} catch (error) {
-					console.warn('[SUNEDITOR.FileManager[' + this.kind + '].checkHandler.error] ' + error.message);
+					console.warn(`[SUNEDITOR.FileManager[${this.kind}].checkHandler.error]`, error.message);
 				} finally {
 					if (this.figure) this.figure.__fileManagerInfo = false;
 				}
@@ -293,23 +291,23 @@ FileManager.prototype = {
 	constructor: FileManager
 };
 
-function CallBackUpload(xmlHttp, callBack, errorCallBack) {
+async function CallBackUpload(xmlHttp, callBack, errorCallBack) {
 	if (xmlHttp.readyState === 4) {
 		if (xmlHttp.status === 200) {
 			try {
-				callBack(xmlHttp);
+				await callBack(xmlHttp);
 			} catch (error) {
-				throw Error('[SUNEDITOR.FileManager[' + this.kind + '].upload.callBack.fail] ' + error.message);
+				throw Error(`[SUNEDITOR.FileManager[${this.kind}].upload.callBack.fail] ${error.message}`);
 			} finally {
-				this.editor._closeLoading();
+				this.editor.hideLoading();
 			}
 		} else {
 			// exception
-			this.editor._closeLoading();
+			this.editor.hideLoading();
+			console.error(`[SUNEDITOR.FileManager[${this.kind}].upload.serverException]`, xmlHttp);
 			const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
 			if (typeof errorCallBack !== 'function' || errorCallBack.call(this.events, '', res)) {
-				const err =
-					'[SUNEDITOR.FileManager[' + this.kind + '].upload.serverException] status: ' + xmlHttp.status + ', response: ' + (res.errorMessage || xmlHttp.responseText);
+				const err = `[SUNEDITOR.FileManager[${this.kind}].upload.serverException] status: ${xmlHttp.status}, response: ${res.errorMessage || xmlHttp.responseText}`;
 				this.notice.open(err);
 				throw Error(err);
 			}

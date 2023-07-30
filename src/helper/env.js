@@ -103,8 +103,8 @@ export function getIncludePath(nameArray, extension) {
 		fileName += nameArray[i] + (i < len - 1 ? '|' : ')');
 	}
 
-	const regExp = new RegExp('(^|.*[\\/])' + fileName + '(\\.[^\\/]+)?.' + extension + '(?:\\?.*|;.*)?$', 'i');
-	const extRegExp = new RegExp('.+\\.' + extension + '(?:\\?.*|;.*)?$', 'i');
+	const regExp = new RegExp(`(^|.*[\\/])${fileName}(\\.[^\\/]+)?.${extension}(?:\\?.*|;.*)?$`, 'i');
+	const extRegExp = new RegExp(`.+\\.${extension}(?:\\?.*|;.*)?$`, 'i');
 
 	for (let c = _d.getElementsByTagName(tagName), i = 0; i < c.length; i++) {
 		if (extRegExp.test(c[i][src])) {
@@ -126,8 +126,9 @@ export function getIncludePath(nameArray, extension) {
 		'//' !== path.slice(0, 2) &&
 		(path = 0 === path.includes('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
 
-	if (!path)
-		throw '[SUNEDITOR.helper.env.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (name: +' + name + ', extension: ' + extension + ')';
+	if (!path) {
+		throw '[SUNEDITOR.helper.env.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (path: +' + path + ', extension: ' + extension + ')';
+	}
 
 	return path;
 }

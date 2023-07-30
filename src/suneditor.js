@@ -59,8 +59,7 @@ export default {
 			let props;
 			for (let key in target) {
 				props = target[key];
-				if (!props.target || props.target.nodeType !== 1)
-					throw Error('[SUNEDITOR.create.fail] suneditor multi root requires textarea\'s element at the "target" property.');
+				if (!props.target || props.target.nodeType !== 1) throw Error(`[SUNEDITOR.create.fail] suneditor multi root requires textarea's element at the "target" property.`);
 				props.key = key;
 				multiTargets.push(props);
 			}

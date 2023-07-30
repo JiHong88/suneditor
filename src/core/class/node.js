@@ -273,7 +273,7 @@ Node_.prototype = {
 		if (typeof validation === 'string') {
 			validation = function (current) {
 				return this.test(current.tagName);
-			}.bind(new RegExp('^(' + (validation ? validation : '.+') + ')$', 'i'));
+			}.bind(new RegExp(`^(${validation ? validation : '.+'})$`, 'i'));
 		} else if (typeof validation !== 'function') {
 			validation = function () {
 				return true;

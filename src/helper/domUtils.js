@@ -683,7 +683,7 @@ export function hasClass(element, className) {
 export function addClass(element, className) {
 	if (!element) return;
 
-	const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
+	const check = new RegExp(`(\\s|^)${className}(\\s|$)`);
 	for (const e of element instanceof window.NodeList || element instanceof window.Array ? element : [element]) {
 		if (!e) continue;
 		if (!check.test(e.className)) e.className += (e.className.length > 0 ? ' ' : '') + className;
@@ -698,7 +698,7 @@ export function addClass(element, className) {
 export function removeClass(element, className) {
 	if (!element) return;
 
-	const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
+	const check = new RegExp(`(\\s|^)${className}(\\s|$)`);
 	for (const e of element instanceof window.NodeList || element instanceof window.Array ? element : [element]) {
 		if (!e) continue;
 		e.className = e.className.replace(check, ' ').trim();
@@ -716,7 +716,7 @@ export function toggleClass(element, className) {
 	if (!element) return;
 	let result = false;
 
-	const check = new RegExp('(\\s|^)' + className + '(\\s|$)');
+	const check = new RegExp(`(\\s|^)${className}(\\s|$)`);
 	if (check.test(element.className)) {
 		element.className = element.className.replace(check, ' ').trim();
 	} else {

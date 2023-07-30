@@ -135,12 +135,12 @@ Toolbar.prototype = {
 		this.context.set(this.keyName + '.buttonTray', newToolbar.buttonTray);
 
 		this.editor._recoverButtonStates(this.isSub);
-		this.history.resetButtons();
+		this.history.resetButtons(this.editor.frameContext.get('key'), null);
 		this._resetSticky();
 
 		this.editor.effectNode = null;
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
-		if (this.status.isReadOnly) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
+		if (this.editor.frameContext.get('isReadOnly')) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
 		if (typeof this.events.onSetToolbarButtons === 'function') this.events.onSetToolbarButtons(newToolbar.buttonTray.querySelectorAll('button'));
 	},
 
@@ -251,6 +251,8 @@ Toolbar.prototype = {
 		}
 
 		this._setBalloonOffset(isDirTop, range);
+
+		if (typeof this.events.onShowToolbar === 'function') this.events.onShowToolbar({ toolbar, mode: 'balloon' });
 
 		setTimeout(() => {
 			toolbar.style.visibility = '';
@@ -367,10 +369,11 @@ Toolbar.prototype = {
 		this._inlineToolbarAttr.top = toolbar.style.top =
 			-1 + (this.offset.getGlobal(this.editor.frameContext.get('topArea')).top - this.offset.getGlobal(toolbar).top - toolbar.offsetHeight) + 'px';
 
-		if (typeof this.events.onShowInline === 'function') this.events.onShowInline(toolbar);
-
 		this._resetSticky();
 		this._inlineToolbarAttr.isShow = true;
+
+		if (typeof this.events.onShowToolbar === 'function') this.events.onShowToolbar({ toolbar, mode: 'inline' });
+
 		toolbar.style.visibility = '';
 	},
 

@@ -117,7 +117,7 @@ export function swapKeyValue(obj) {
  * @returns {RegExp}
  */
 export function createElementWhitelist(list) {
-	return new RegExp('<\\/?\\b(?!\\b' + (list || '').replace(/\|/g, '\\b|\\b') + '\\b)[^>]*>', 'gi');
+	return new RegExp(`<\\/?\\b(?!\\b${(list || '').replace(/\|/g, '\\b|\\b')}\\b)[^>]*>`, 'gi');
 }
 
 /**
@@ -127,7 +127,7 @@ export function createElementWhitelist(list) {
  * @returns {RegExp}
  */
 export function createElementBlacklist(list) {
-	return new RegExp('<\\/?\\b(?:\\b' + (list || '^').replace(/\|/g, '\\b|\\b') + '\\b)[^>]*>', 'gi');
+	return new RegExp(`<\\/?\\b(?:\\b${(list || '^').replace(/\|/g, '\\b|\\b')}\\b)[^>]*>`, 'gi');
 }
 
 /**
@@ -190,7 +190,7 @@ export function _setIframeStyleLinks(linkNames) {
 			if (/(^https?:\/\/)|(^data:text\/css,)/.test(linkNames[f])) {
 				path.push(linkNames[f]);
 			} else {
-				const CSSFileName = new RegExp('(^|.*[\\/])' + linkNames[f] + '(\\..+)?.css((\\??.+?)|\\b)$', 'i');
+				const CSSFileName = new RegExp(`(^|.*[\\/])${linkNames[f]}(\\..+)?.css((\\??.+?)|\\b)$`, 'i');
 				for (let c = _d.getElementsByTagName('link'), i = 0, len = c.length, styleTag; i < len; i++) {
 					styleTag = c[i].href.match(CSSFileName);
 					if (styleTag) path.push(styleTag[0]);

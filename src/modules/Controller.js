@@ -110,7 +110,7 @@ Controller.prototype = {
 		});
 
 		this.editor._antiBlur = true;
-		if (typeof this.events.onShowController === 'function') this.events.onShowController(this.kind, this.editor.opendControllers);
+		if (typeof this.events.onShowController === 'function') this.events.onShowController({ caller: this.kind, elements: this.editor.opendControllers });
 	},
 
 	/**

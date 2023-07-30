@@ -86,6 +86,7 @@ const Constructor = function (editorTargets, options) {
 	const o = optionMap.o;
 	const icons = optionMap.i;
 	const lang = optionMap.l;
+	const loadingBox = domUtils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>');
 
 	/** --- carrier wrapper --------------------------------------------------------------- */
 	const editor_carrier_wrapper = domUtils.createElement('DIV', { class: 'sun-editor sun-editor-carrier-wrapper sun-editor-common' + (o.get('_rtl') ? ' se-rtl' : '') });
@@ -103,7 +104,7 @@ const Constructor = function (editorTargets, options) {
 
 	// loding box, resizing back
 	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-resizing-back' }));
-	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-loading-box sun-editor-common' }, '<div class="se-loading-effect"></div>'));
+	editor_carrier_wrapper.appendChild(loadingBox.cloneNode(true));
 	_d.body.appendChild(editor_carrier_wrapper);
 
 	/** --- toolbar --------------------------------------------------------------- */
@@ -136,7 +137,7 @@ const Constructor = function (editorTargets, options) {
 	/** frame - root set - start -------------------------------------------------------------- */
 	const rootId = editorTargets[0].key || null;
 	const rootKeys = [];
-	const rootTargets = new Map();
+	const frameRoots = new Map();
 	const statusbarContainer = optionMap.statusbarContainer;
 	let default_status_bar = null;
 	for (let i = 0, len = editorTargets.length; i < len; i++) {
@@ -191,12 +192,15 @@ const Constructor = function (editorTargets, options) {
 			}
 		}
 
+		// loading bar
+		container.appendChild(loadingBox.cloneNode(true));
+
 		// root key
 		const key = editTarget.key || null;
 		textarea = _checkCodeMirror(o, to, textarea);
 		top_div.appendChild(container);
 		rootKeys.push(key);
-		rootTargets.set(key, CreateFrameContext(editTarget, top_div, wysiwyg_div, textarea, default_status_bar || statusbar, key));
+		frameRoots.set(key, CreateFrameContext(editTarget, top_div, wysiwyg_div, textarea, default_status_bar || statusbar, key));
 	}
 	/** frame - root set - end -------------------------------------------------------------- */
 
@@ -211,7 +215,7 @@ const Constructor = function (editorTargets, options) {
 		toolbar_container.appendChild(top_div);
 		toolbar_container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
 	} else {
-		const rootContainer = rootTargets.get(rootId).get('container');
+		const rootContainer = frameRoots.get(rootId).get('container');
 		rootContainer.insertBefore(toolbar, rootContainer.firstElementChild);
 		if (subbar) rootContainer.insertBefore(subbar, rootContainer.firstElementChild);
 	}
@@ -226,7 +230,7 @@ const Constructor = function (editorTargets, options) {
 		value: optionMap.v,
 		rootId: rootId,
 		rootKeys: rootKeys,
-		rootTargets: rootTargets,
+		frameRoots: frameRoots,
 		pluginCallButtons: tool_bar_main.pluginCallButtons,
 		responsiveButtons: tool_bar_main.responsiveButtons,
 		pluginCallButtons_sub: sub_main ? sub_main.pluginCallButtons : [],
@@ -299,10 +303,7 @@ export function InitOptions(options, editorTargets) {
 	/** Base */
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
 	o.set('fontSizeUnit', typeof options.fontSizeUnit === 'string' ? options.fontSizeUnit.trim().toLowerCase() || 'px' : 'px');
-	o.set(
-		'allowedClassName',
-		new RegExp((options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : '') + '^__se__|se-|katex')
-	);
+	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}^__se__|se-|katex`));
 	o.set('__allowedScriptTag', options.__allowedScriptTag === true);
 	// text style tags
 	const textTags = _mergeObject(
@@ -321,12 +322,9 @@ export function InitOptions(options, editorTargets) {
 	o.set('textTags', textTags);
 	o.set(
 		'_spanStylesRegExp',
-		new RegExp('\\s*[^-a-zA-Z](font-family|font-size|color|background-color' + (options.spanStyles ? '|' + options.spanStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi')
+		new RegExp(`\\s*[^-a-zA-Z](font-family|font-size|color|background-color${options.spanStyles ? '|' + options.spanStyles : ''})\\s*:[^;]+(?!;)*`, 'gi')
 	);
-	o.set(
-		'_formatStylesRegExp',
-		new RegExp('\\s*[^-a-zA-Z](text-align|margin-left|margin-right' + (options.formatStyles ? '|' + options.formatStyles : '') + ')\\s*:[^;]+(?!;)*', 'gi')
-	);
+	o.set('_formatStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](text-align|margin-left|margin-right${options.formatStyles ? '|' + options.formatStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
 	o.set('_defaultStyleTagMap', {
 		strong: textTags.bold,
 		b: textTags.bold,
@@ -789,7 +787,7 @@ function _createBlacklist(blacklist, defaultLine) {
 			if (v !== defaultLine) {
 				return true;
 			} else {
-				console.warn('[SUNEDITOR.constructor.createBlacklist.warn] defaultLine("<' + defaultLine + '>") cannot be included in the blacklist and will be removed.');
+				console.warn(`[SUNEDITOR.constructor.createBlacklist.warn] defaultLine("<${defaultLine}>") cannot be included in the blacklist and will be removed.`);
 				return false;
 			}
 		})
@@ -812,7 +810,7 @@ function _createFormatInfo(value, defaultValue, blacklist) {
 		})
 		.join('|');
 	return {
-		reg: new RegExp('^(' + str + ')$', 'i'),
+		reg: new RegExp(`^(${str})$`, 'i'),
 		str: str
 	};
 }
@@ -1024,7 +1022,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 					}
 
 					if (!modules) {
-						if (!plugin) throw Error('[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [' + button + ']');
+						if (!plugin) throw Error(`[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [${button}]`);
 						modules = [plugin.className, plugin.title, plugin.key, plugin.type, plugin.innerHTML, plugin._disabled];
 					}
 				}
