@@ -15,7 +15,7 @@ import Component from './class/component';
 import Format from './class/format';
 import HTML from './class/html';
 import Menu from './class/menu';
-import Node_ from './class/node';
+import NodeTransform from './class/nodeTransform';
 import Notice from './class/notice';
 import Offset from './class/offset';
 import Selection from './class/selection';
@@ -977,7 +977,7 @@ Editor.prototype = {
 			delete obj[k];
 		}
 
-		obj = ['eventManager', 'char', 'component', 'format', 'html', 'menu', 'node', 'notice', 'offset', 'selection', 'shortcuts', 'toolbar', 'viewer'];
+		obj = ['eventManager', 'char', 'component', 'format', 'html', 'menu', 'nodeTransform', 'notice', 'offset', 'selection', 'shortcuts', 'toolbar', 'viewer'];
 		for (let i = 0, len = obj.length, c; i < len; i++) {
 			c = this[obj[i]];
 			for (let k in c) {
@@ -1449,7 +1449,7 @@ Editor.prototype = {
 			});
 		this.selection = new Selection(this);
 		this.html = new HTML(this);
-		this.node = new Node_(this);
+		this.nodeTransform = new NodeTransform(this);
 		this.component = new Component(this);
 		this.format = new Format(this);
 		this.menu = new Menu(this);
@@ -1464,7 +1464,7 @@ Editor.prototype = {
 		ClassInjector.call(this.format, this);
 		ClassInjector.call(this.html, this);
 		ClassInjector.call(this.menu, this);
-		ClassInjector.call(this.node, this);
+		ClassInjector.call(this.nodeTransform, this);
 		ClassInjector.call(this.selection, this);
 		ClassInjector.call(this.toolbar, this);
 		ClassInjector.call(this.viewer, this);
@@ -1476,7 +1476,7 @@ Editor.prototype = {
 		delete this.format.format;
 		delete this.html.html;
 		delete this.menu.menu;
-		delete this.node.node;
+		delete this.nodeTransform.nodeTransform;
 		delete this.selection.selection;
 		delete this.toolbar.toolbar;
 		delete this.viewer.viewer;

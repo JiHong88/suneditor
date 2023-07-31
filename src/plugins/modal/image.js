@@ -273,7 +273,7 @@ Image_.prototype = {
 		this.init();
 
 		if (emptyDiv !== this.editor.frameContext.get('wysiwyg')) {
-			this.node.removeAllParents(
+			this.nodeTransform.removeAllParents(
 				emptyDiv,
 				function (current) {
 					return current.childNodes.length === 0;
@@ -466,15 +466,15 @@ Image_.prototype = {
 				});
 				existElement.insertBefore(container, refer);
 				domUtils.removeItem(imageEl);
-				this.node.removeEmptyNode(refer, null, true);
+				this.nodeTransform.removeEmptyNode(refer, null, true);
 			} else if (this.format.isLine(existElement)) {
 				const refer = domUtils.getParentElement(imageEl, function (current) {
 					return current.parentNode === existElement;
 				});
-				existElement = this.node.split(existElement, refer);
+				existElement = this.nodeTransform.split(existElement, refer);
 				existElement.parentNode.insertBefore(container, existElement);
 				domUtils.removeItem(imageEl);
-				this.node.removeEmptyNode(existElement, null, true);
+				this.nodeTransform.removeEmptyNode(existElement, null, true);
 			} else {
 				if (this.format.isLine(existElement.parentNode)) {
 					const formats = existElement.parentNode;

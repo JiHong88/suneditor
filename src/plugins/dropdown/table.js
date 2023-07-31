@@ -227,7 +227,7 @@ Table.prototype = {
 				this._closeController();
 
 				if (emptyDiv !== this.editor.frameContext.get('wysiwyg'))
-					this.node.removeAllParents(
+					this.nodeTransform.removeAllParents(
 						emptyDiv,
 						function (current) {
 							return current.childNodes.length === 0;

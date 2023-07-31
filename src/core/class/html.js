@@ -292,7 +292,7 @@ HTML.prototype = {
 				const depthFormat = domUtils.getParentElement(container, (current) => {
 					return this.format.isBlock(current) || domUtils.isListCell(current);
 				});
-				afterNode = this.node.split(container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
+				afterNode = this.nodeTransform.split(container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
 				if (!afterNode) {
 					tempAfterNode = afterNode = line;
 				} else if (insertListCell) {
@@ -786,7 +786,7 @@ HTML.prototype = {
 		}
 
 		if (!domUtils.isWysiwygFrame(container) && container.childNodes.length === 0) {
-			const rc = this.node.removeAllParents(container, null, null);
+			const rc = this.nodeTransform.removeAllParents(container, null, null);
 			if (rc) container = rc.sc || rc.ec || this.editor.frameContext.get('wysiwyg');
 		}
 
@@ -1002,7 +1002,7 @@ HTML.prototype = {
 
 		if (!domUtils.isListCell(line)) return;
 
-		this.node.removeAllParents(line, null, null);
+		this.nodeTransform.removeAllParents(line, null, null);
 
 		if (line && domUtils.isList(line.firstChild)) {
 			line.insertBefore(domUtils.createTextNode(unicode.zeroWidthSpace), line.firstChild);

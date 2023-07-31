@@ -1105,7 +1105,7 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 
 				if (!formatEl.contains(con)) {
 					startCon.textContent = '';
-					this.node.removeAllParents(startCon, null, formatEl);
+					this.nodeTransform.removeAllParents(startCon, null, formatEl);
 					break;
 				}
 			}
@@ -1531,7 +1531,7 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 
 						if (domUtils.isListCell(rangeEl.parentNode)) {
 							rangeEl = formatEl.parentNode.parentNode.parentNode;
-							newEl = this.node.split(formatEl, null, domUtils.getNodeDepth(formatEl) - 2);
+							newEl = this.nodeTransform.split(formatEl, null, domUtils.getNodeDepth(formatEl) - 2);
 							if (!newEl) {
 								const newListCell = domUtils.createElement('LI', null, '<br>');
 								rangeEl.insertBefore(newListCell, newEl);
@@ -1554,7 +1554,7 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 						}
 
 						newEl.innerHTML = '<br>';
-						this.node.removeAllParents(formatEl, null, null);
+						this.nodeTransform.removeAllParents(formatEl, null, null);
 						this.selection.setRange(newEl, 1, newEl, 1);
 						break;
 					}
@@ -1700,14 +1700,14 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 								newEl = newFormat;
 								offset = 0;
 							} else {
-								newEl = this.node.split(r.container, r.offset, domUtils.getNodeDepth(formatEl));
+								newEl = this.nodeTransform.split(r.container, r.offset, domUtils.getNodeDepth(formatEl));
 							}
 						}
 					} else {
 						if (domUtils.isZeroWith(formatEl)) {
 							newEl = this.format.addLine(formatEl, formatEl.cloneNode(false));
 						} else {
-							newEl = this.node.split(range.endContainer, range.endOffset, domUtils.getNodeDepth(formatEl));
+							newEl = this.nodeTransform.split(range.endContainer, range.endOffset, domUtils.getNodeDepth(formatEl));
 						}
 					}
 

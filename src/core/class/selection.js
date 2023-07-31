@@ -65,11 +65,11 @@ Selection.prototype = {
 		if (endOff > endCon.textContent.length) endOff = endCon.textContent.length;
 		if (this.format.isLine(startCon)) {
 			startCon = startCon.childNodes[startOff] || startCon.childNodes[startOff - 1] || startCon;
-			startOff = startOff > 0 ? (startCon.nodeType === 1 ? 1 : startCon.textContent ? startCon.textContent.length : 0) : 0;
+			startOff = startOff > 0 ? (startCon.nodeType === 1 && !domUtils.isBreak(startCon) ? 1 : startCon.textContent ? startCon.textContent.length : 0) : 0;
 		}
 		if (this.format.isLine(endCon)) {
 			endCon = endCon.childNodes[endOff] || endCon.childNodes[endOff - 1] || endCon;
-			endOff = endOff > 0 ? (endCon.nodeType === 1 ? 1 : endCon.textContent ? endCon.textContent.length : 0) : 0;
+			endOff = endOff > 0 ? (endCon.nodeType === 1 && !domUtils.isBreak(endCon) ? 1 : endCon.textContent ? endCon.textContent.length : 0) : 0;
 		}
 
 		const range = this.editor.frameContext.get('_wd').createRange();
@@ -317,9 +317,14 @@ Selection.prototype = {
 	 * @private
 	 */
 	_resetRangeToTextNode() {
-		const range = this.getRange();
-		if (this._isNone(range)) return false;
+		let rangeObj = this.getRange();
+		if (this._isNone(rangeObj)) {
+			if (!domUtils.isWysiwygFrame(rangeObj.startContainer) || !domUtils.isWysiwygFrame(rangeObj.endContainer)) return false;
+			const ww = rangeObj.startContainer;
+			rangeObj = this.setRange(ww.firstElementChild, 0, ww.lastElementChild, 1);
+		}
 
+		const range = rangeObj;
 		let startCon = range.startContainer;
 		let startOff = range.startOffset;
 		let endCon = range.endContainer;

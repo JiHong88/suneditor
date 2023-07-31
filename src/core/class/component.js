@@ -47,7 +47,7 @@ Component.prototype = {
 		} else {
 			if (this.selection.getRange().collapsed && (r.container.nodeType === 3 || domUtils.isBreak(r.container))) {
 				const depthFormat = domUtils.getParentElement(r.container, this.format.isBlock.bind(this.format));
-				oNode = this.node.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
+				oNode = this.nodeTransform.split(r.container, r.offset, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
 				if (oNode) formatEl = oNode.previousSibling;
 			}
 			this.html.insertNode(element, this.format.isBlock(formatEl) ? null : formatEl, true);

@@ -407,7 +407,7 @@ window.c = () => {
 			// 	src: Codemirror5
 			// },
 			iframe: false,
-			defaultLine: 'div',
+			// defaultLine: 'div',
 			toolbar_sticky: 0,
 			lineAttrReset: 'id',
 			buttonList: bl,
@@ -417,7 +417,7 @@ window.c = () => {
 				mode: 'balloon' // balloon, balloon-always, balloon-block
 			},
 			shortcuts: {
-				bold: ['s75r-underline', 'K'],
+				bold: ['s75', 'K'],
 				italic: [],
 				image: ['73', 'I'],
 				list: ['76', 'L']

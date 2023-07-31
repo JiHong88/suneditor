@@ -295,7 +295,7 @@ Format.prototype = {
 			let cc = null;
 			if (parent !== origin && !domUtils.isTable(origin)) {
 				if (origin && domUtils.getNodeDepth(parent) === domUtils.getNodeDepth(origin)) return before;
-				cc = this.node.removeAllParents(origin, null, parent);
+				cc = this.nodeTransform.removeAllParents(origin, null, parent);
 			}
 
 			return cc ? cc.ec : before;
@@ -380,8 +380,8 @@ Format.prototype = {
 		}
 
 		this.editor.effectNode = null;
-		this.node.mergeSameTags(block, null, false);
-		this.node.mergeNestedTags(block, function (current) {
+		this.nodeTransform.mergeSameTags(block, null, false);
+		this.nodeTransform.mergeNestedTags(block, function (current) {
 			return domUtils.isList(current);
 		});
 
@@ -390,7 +390,7 @@ Format.prototype = {
 			const depthFormat = domUtils.getParentElement(beforeTag, (current) => {
 				return this.isBlock(current) && !domUtils.isList(current);
 			});
-			const splitRange = this.node.split(beforeTag, null, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
+			const splitRange = this.nodeTransform.split(beforeTag, null, !depthFormat ? 0 : domUtils.getNodeDepth(depthFormat) + 1);
 			splitRange.parentNode.insertBefore(block, splitRange);
 		} else {
 			// basic
@@ -618,7 +618,7 @@ Format.prototype = {
 		if (rangeElement.children.length === 0 || rangeElement.textContent.length === 0) {
 			domUtils.removeItem(rangeElement);
 		} else {
-			this.node.removeEmptyNode(rangeElement, null, false);
+			this.nodeTransform.removeEmptyNode(rangeElement, null, false);
 		}
 
 		let edge = null;
@@ -1738,8 +1738,8 @@ Format.prototype = {
 			nodePath.e = domUtils.getNodePath(innerList.lastElementChild.firstChild, originList, null);
 			nodePath.el = originList;
 
-			this.node.mergeSameTags(originList, [nodePath.s, nodePath.e, slPath], false);
-			this.node.mergeNestedTags(originList);
+			this.nodeTransform.mergeSameTags(originList, [nodePath.s, nodePath.e, slPath], false);
+			this.nodeTransform.mergeNestedTags(originList);
 			if (slPath) nodePath.sl = domUtils.getNodeFromPath(slPath, originList);
 		}
 
@@ -1769,7 +1769,7 @@ Format.prototype = {
 		}
 
 		if (originList.children.length === 0) domUtils.removeItem(originList);
-		this.node.mergeSameTags(parentNode);
+		this.nodeTransform.mergeSameTags(parentNode);
 
 		const edge = domUtils.getEdgeChildNodes(first, last);
 
@@ -2327,7 +2327,7 @@ Format.prototype = {
 			}
 		}
 
-		this.node.removeEmptyNode(pNode, newInnerNode, false);
+		this.nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
 
 		if (collapsed) {
 			startOffset = startContainer.textContent.length;
@@ -2362,7 +2362,7 @@ Format.prototype = {
 		endOffset = collapsed ? startOffset : mergeEndCon ? startContainer.textContent.length : endConReset ? endOffset + newStartOffset.s : endOffset + newEndOffset.s;
 
 		// tag merge
-		const newOffsets = this.node.mergeSameTags(pNode, [startPath, endPath], true);
+		const newOffsets = this.nodeTransform.mergeSameTags(pNode, [startPath, endPath], true);
 
 		element.parentNode.replaceChild(pNode, element);
 
@@ -2649,7 +2649,7 @@ Format.prototype = {
 				element.appendChild(container);
 			}
 		} else {
-			this.node.removeEmptyNode(pNode, newInnerNode, false);
+			this.nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
 
 			if (domUtils.isZeroWith(pNode.textContent)) {
 				container = pNode.firstChild;
@@ -2665,7 +2665,7 @@ Format.prototype = {
 			offset += offsets.s;
 
 			// tag merge
-			const newOffsets = this.node.mergeSameTags(pNode, [path], true);
+			const newOffsets = this.nodeTransform.mergeSameTags(pNode, [path], true);
 
 			element.parentNode.replaceChild(pNode, element);
 
@@ -2807,8 +2807,8 @@ Format.prototype = {
 			}
 		}
 
-		this.node.removeEmptyNode(pNode, newInnerNode, false);
-		this.node.mergeSameTags(pNode, null, true);
+		this.nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
+		this.nodeTransform.mergeSameTags(pNode, null, true);
 
 		// node change
 		element.parentNode.replaceChild(pNode, element);
@@ -3094,7 +3094,7 @@ Format.prototype = {
 			}
 		} else {
 			if (!isRemoveNode && newInnerNode.textContent.length === 0) {
-				this.node.removeEmptyNode(pNode, null, false);
+				this.nodeTransform.removeEmptyNode(pNode, null, false);
 				return {
 					ancestor: null,
 					container: null,
@@ -3102,7 +3102,7 @@ Format.prototype = {
 				};
 			}
 
-			this.node.removeEmptyNode(pNode, newInnerNode, false);
+			this.nodeTransform.removeEmptyNode(pNode, newInnerNode, false);
 
 			if (domUtils.isZeroWith(pNode.textContent)) {
 				container = pNode.firstChild;
@@ -3121,7 +3121,7 @@ Format.prototype = {
 			offset += offsets.s;
 
 			// tag merge
-			const newOffsets = this.node.mergeSameTags(pNode, [path], true);
+			const newOffsets = this.nodeTransform.mergeSameTags(pNode, [path], true);
 
 			element.parentNode.replaceChild(pNode, element);
 

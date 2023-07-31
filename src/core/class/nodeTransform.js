@@ -5,11 +5,11 @@
 import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, env, numbers } from '../../helper';
 
-const Node_ = function (editor) {
+const NodeTransform = function (editor) {
 	CoreInjector.call(this, editor);
 };
 
-Node_.prototype = {
+NodeTransform.prototype = {
 	/**
 	 * @description Split all tags based on "baseNode"
 	 * Returns the last element of the splited tag.
@@ -380,7 +380,7 @@ Node_.prototype = {
 		}
 	},
 
-	constructor: Node_
+	constructor: NodeTransform
 };
 
-export default Node_;
+export default NodeTransform;
