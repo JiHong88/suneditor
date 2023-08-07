@@ -175,7 +175,7 @@ class Events extends EditorInterface {
 	 * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
 	 * @param core Core object
 	 */
-	onImageUpload: (targetElement: HTMLImageElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number) => void;
+	onImageAction: (targetElement: HTMLImageElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number) => void;
 
 	/**
 	 * @description Called when the video(iframe, video) is uploaded, updated, deleted
@@ -193,7 +193,7 @@ class Events extends EditorInterface {
 	 * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
 	 * @param core Core object
 	 */
-	onVideoUpload: (targetElement: HTMLIFrameElement | HTMLVideoElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number) => void;
+	onVideoAction: (targetElement: HTMLIFrameElement | HTMLVideoElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number) => void;
 
 	/**
 	 * @description Called when the audio is uploaded, updated, deleted
@@ -211,7 +211,7 @@ class Events extends EditorInterface {
 	 * @param remainingFilesCount Count of remaining files to upload (0 when added as a url)
 	 * @param core Core object
 	 */
-	onAudioUpload: (targetElement: HTMLAudioElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number) => void;
+	onAudioAction: (targetElement: HTMLAudioElement, index: number, state: 'create' | 'update' | 'delete', info: fileInfo, remainingFilesCount: number) => void;
 
 	/**
 	 * @description Called when the image is upload failed

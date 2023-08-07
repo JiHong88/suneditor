@@ -6,11 +6,21 @@ import { _w } from '../../helper/env';
 import { getNodeFromPath, getNodePath } from '../../helper/domUtils';
 import { numbers } from '../../helper';
 
-export default function (editor, change) {
+export default function (editor) {
 	const frameRoots = editor.frameRoots;
 	let delayTime = editor.options.get('historyStackDelayTime');
 	let pushDelay = null;
 	let stackIndex, stack, rootStack, rootInitContents;
+
+	function change(fc, index) {
+		if (editor.status.hasFocus) editor.eventManager.applyTagEffect();
+		editor.history.resetButtons(fc.get('key'), index);
+
+		// user event
+		if (editor.events.onChange) editor.events.onChange({ frameContext: fc, data: editor.html.get() });
+		if (editor.context.get('toolbar.main').style.display === 'block') editor.toolbar._showBalloon();
+		else if (editor.context.get('toolbar.sub.main').style.display === 'block') editor.subToolbar._showBalloon();
+	}
 
 	function setContentFromStack(increase) {
 		const prevKey = stack[stackIndex];

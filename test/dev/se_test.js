@@ -496,6 +496,14 @@ function loadEvent() {
 		await delayedFunction();
 		handler('http://suneditor.com/docs/cat.jpg')
 	};
+	window.editor_root.events.onImageUploadError = async (params) => {
+		await delayedFunction();
+		return 'aaa'
+	};
+	window.editor_root.events.onPaste = async (params) => {
+		await delayedFunction();
+		return 'bbb'
+	};
 }
 
 editor_root.events.onload = () => {

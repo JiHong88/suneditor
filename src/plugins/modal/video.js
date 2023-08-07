@@ -61,7 +61,7 @@ const Video = function (editor, pluginOptions) {
 	this.figure = new Figure(this, figureControls, { sizeUnit: sizeUnit, autoRatio: { current: defaultRatio, default: defaultRatio } });
 	this.fileManager = new FileManager(this, {
 		tagNames: ['iframe', 'video'],
-		eventHandler: typeof this.events.onVideoUpload !== 'function' ? this.events.onVideoUpload : null,
+		eventHandler: this.events.onVideoAction,
 		checkHandler: FileCheckHandler.bind(this),
 		figure: this.figure
 	});
@@ -358,7 +358,17 @@ Video.prototype = {
 		this.history.push(false);
 	},
 
-	_submitFile(fileList) {
+	_getInfo() {
+		return {
+			inputWidth: this.inputX.value,
+			inputHeight: this.inputY.value,
+			align: this._align,
+			isUpdate: this.modal.isUpdate,
+			element: this._element
+		};
+	},
+
+	async _submitFile(fileList) {
 		if (fileList.length === 0) return;
 
 		let fileSize = 0;
@@ -374,29 +384,28 @@ Video.prototype = {
 		const currentSize = this.fileManager.getSize();
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.video.submitFile.fail] Size of uploadable total videos: ' + limitSize / 1000 + 'KB';
-			if (
-				typeof this.events.onVideoUploadError !== 'function' ||
-				this.events.onVideoUploadError(err, { limitSize: limitSize, currentSize: currentSize, uploadSize: fileSize })
-			) {
-				this.notice.open(err);
+			let message = '';
+			if (typeof this.events.onVideoUploadError !== 'function') {
+				message = await this.events.onVideoUploadError({ error: err, limitSize, currentSize, uploadSize: fileSize });
 			}
+
+			this.notice.open(message || err);
+
 			return false;
 		}
 
-		const info = {
-			inputWidth: this.inputX.value,
-			inputHeight: this.inputY.value,
-			align: this._align,
-			isUpdate: this.modal.isUpdate,
-			element: this._element
-		};
-
+		const info = this._getInfo();
 		if (typeof this.events.onVideoUploadBefore === 'function') {
-			const result = this.events.onVideoUploadBefore(files, info, (data) => {
-				if (data && Array.isArray(data.result)) {
-					this._register(info, data);
-				} else {
-					this._serverUpload(info, data);
+			const result = await this.events.onVideoUploadBefore({
+				url: null,
+				files,
+				info,
+				handler: (data) => {
+					if (data && Array.isArray(data.result)) {
+						this._register(info, data);
+					} else {
+						this._serverUpload(info, data);
+					}
 				}
 			});
 
@@ -408,7 +417,7 @@ Video.prototype = {
 		this._serverUpload(info, files);
 	},
 
-	_submitURL(url) {
+	async _submitURL(url) {
 		if (!url) url = this._linkValue;
 		if (!url) return false;
 
@@ -442,15 +451,35 @@ Video.prototype = {
 			url = 'https://player.vimeo.com/video/' + url.slice(url.lastIndexOf('/') + 1);
 		}
 
-		this.create(
-			this[!/embed|iframe|player|\/e\/|\.php|\.html?/.test(url) && !/vimeo\.com/.test(url) ? '_createVideoTag' : '_createVideoTag'](),
-			url,
-			this.inputX.value,
-			this.inputY.value,
-			this._align,
-			this.modal.isUpdate,
-			{ name: url.split('/').pop(), size: 0 }
-		);
+		const file = { name: url.split('/').pop(), size: 0 };
+		const handler = function (url, url_) {
+			url = url_ || url;
+			this.create(
+				this[!/embed|iframe|player|\/e\/|\.php|\.html?/.test(url) && !/vimeo\.com/.test(url) ? '_createVideoTag' : '_createVideoTag'](),
+				url,
+				this.inputX.value,
+				this.inputY.value,
+				this._align,
+				this.modal.isUpdate,
+				{ name: url.split('/').pop(), size: 0 }
+			);
+		}.bind(this, url);
+
+		if (typeof this.events.onVideoUploadBefore === 'function') {
+			const result = await this.events.onVideoUploadBefore({
+				url,
+				files: file,
+				info: this._getInfo(),
+				handler
+			});
+
+			if (result === undefined) return true;
+			if (result === false) return false;
+			if (typeof result === 'string' && result.length > 0) handler(result);
+		} else {
+			handler(null);
+		}
+
 		return true;
 	},
 
@@ -528,14 +557,10 @@ Video.prototype = {
 
 	_serverUpload(info, files) {
 		if (!files) return;
-		if (typeof files === 'string') {
-			this._error(files, null);
-			return;
-		}
 
 		const videoUploadUrl = this.pluginOptions.uploadUrl;
 		if (typeof videoUploadUrl === 'string' && videoUploadUrl.length > 0) {
-			this.fileManager.upload(videoUploadUrl, this.pluginOptions.uploadHeaders, files, UploadCallBack.bind(this, info), this.events.onVideoUploadError);
+			this.fileManager.upload(videoUploadUrl, this.pluginOptions.uploadHeaders, files, UploadCallBack.bind(this, info), this._error.bind(this));
 		}
 	},
 
@@ -586,11 +611,15 @@ Video.prototype = {
 		return ratioSelected;
 	},
 
-	_error(message, response) {
-		if (typeof this.events.onVideoUploadError !== 'function' || this.events.onVideoUploadError(message, response)) {
-			this.notice.open(message);
-			throw Error(`[SUNEDITOR.plugin.video.error] response: ${message}`);
+	async _error(response) {
+		let message = '';
+		if (typeof this.events.onVideoUploadError !== 'function') {
+			message = await this.events.onVideoUploadError(response);
 		}
+
+		const err = message || response.errorMessage;
+		this.notice.open(err);
+		console.error('[SUNEDITOR.plugin.video.error]', message);
 	},
 
 	constructor: Video
@@ -604,13 +633,13 @@ function FileCheckHandler(element) {
 	return this._update(element) || element;
 }
 
-function UploadCallBack(info, xmlHttp) {
+async function UploadCallBack(info, xmlHttp) {
 	if (typeof this.events.videoUploadHandler === 'function') {
-		this.events.videoUploadHandler(xmlHttp, info);
+		await this.events.videoUploadHandler({ xmlHttp, info });
 	} else {
 		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {
-			this._error(response.errorMessage, response);
+			this._error(response);
 		} else {
 			this._register(info, response);
 		}

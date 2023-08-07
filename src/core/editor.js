@@ -1174,20 +1174,6 @@ Editor.prototype = {
 		}
 	},
 
-	/**
-	 * @description Called when after execute "history.push"
-	 * @private
-	 */
-	_onChange_historyStack(fc, index) {
-		if (this.status.hasFocus) this.eventManager.applyTagEffect();
-		this.history.resetButtons(this.status.rootKey, index);
-
-		// user event
-		if (this.events.onChange) this.events.onChange({ frameContext: fc, data: this.html.get() });
-		if (this.context.get('toolbar.main').style.display === 'block') this.toolbar._showBalloon();
-		else if (this.context.get('toolbar.sub.main').style.display === 'block') this.subToolbar._showBalloon();
-	},
-
 	_codeViewAutoHeight() {
 		if (this.frameContext.get('isFullScreen')) return;
 		this.frameContext.get('code').style.height = this.frameContext.get('code').scrollHeight + 'px';
@@ -1428,7 +1414,7 @@ Editor.prototype = {
 	__registerClass() {
 		// use events, history function
 		this.events = Events();
-		this.history = History(this, this._onChange_historyStack.bind(this));
+		this.history = History(this);
 
 		// eventManager
 		this.eventManager = new EventManager(this);

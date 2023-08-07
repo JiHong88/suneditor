@@ -513,10 +513,13 @@ EventManager.prototype = {
 		let plainText, cleanData;
 		plainText = data.getData('text/plain');
 		cleanData = data.getData('text/html');
-		if (this._setClipboardData(type, e, plainText, cleanData, data, frameContext) === false) {
+		try {
+			this._setClipboardData(type, e, plainText, cleanData, data, frameContext);
 			e.preventDefault();
 			e.stopPropagation();
 			return false;
+		} catch (err) {
+			console.warn('[SUNEDITOR.paste.error]', err);
 		}
 	},
 
@@ -550,6 +553,7 @@ EventManager.prototype = {
 				if (!value) return false;
 				cleanData = value;
 			}
+			console.log('cleanData', cleanData);
 		}
 		// user event - drop
 		if (type === 'drop' && typeof this.events.onDrop === 'function') {

@@ -32,7 +32,7 @@ const Audio_ = function (editor, pluginOptions) {
 	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
 	this.fileManager = new FileManager(this, {
 		tagNames: ['audio'],
-		eventHandler: typeof this.events.onAudioUpload !== 'function' ? this.events.onAudioUpload : null,
+		eventHandler: this.events.onAudioAction,
 		checkHandler: FileCheckHandler.bind(this),
 		figure: null
 	});
@@ -180,7 +180,19 @@ Audio_.prototype = {
 		this.history.push(false);
 	},
 
-	_submitFile(fileList) {
+	_register(info, response) {
+		const fileList = response.result;
+
+		for (let i = 0, len = fileList.length, file, oAudio; i < len; i++) {
+			if (info.isUpdate) oAudio = info.element;
+			else oAudio = this._createAudioTag();
+
+			file = { name: fileList[i].name, size: fileList[i].size };
+			this._createComp(oAudio, fileList[i].url, file, info.isUpdate);
+		}
+	},
+
+	async _submitFile(fileList) {
 		if (fileList.length === 0) return false;
 
 		let fileSize = 0;
@@ -195,12 +207,13 @@ Audio_.prototype = {
 		const limitSize = this.pluginOptions.uploadSizeLimit;
 		if (limitSize > 0 && fileSize + this.fileManager.getSize() > limitSize) {
 			const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable total audios: ' + limitSize / 1000 + 'KB';
-			if (
-				typeof this.events.onAudioUploadError !== 'function' ||
-				this.events.onAudioUploadError(err, { limitSize: limitSize, currentSize: this.fileManager.getSize(), uploadSize: fileSize })
-			) {
-				this.notice.open(err);
+			let message = '';
+			if (typeof this.events.onAudioUploadError !== 'function') {
+				message = await this.events.onAudioUploadError({ error: err, limitSize, currentSize: this.fileManager.getSize(), uploadSize: fileSize });
 			}
+
+			this.notice.open(message || err);
+
 			return false;
 		}
 
@@ -210,11 +223,15 @@ Audio_.prototype = {
 		};
 
 		if (typeof this.events.onAudioUploadBefore === 'function') {
-			const result = this.events.onAudioUploadBefore(files, info, (data) => {
-				if (data && Array.isArray(data.result)) {
-					this._register(info, data);
-				} else {
-					this._serverUpload(info, data);
+			const result = this.events.onAudioUploadBefore({
+				files,
+				info,
+				handler: (data) => {
+					if (data && Array.isArray(data.result)) {
+						this._register(info, data);
+					} else {
+						this._serverUpload(info, data);
+					}
 				}
 			});
 
@@ -226,21 +243,34 @@ Audio_.prototype = {
 		this._serverUpload(info, files);
 	},
 
-	_register(info, response) {
-		const fileList = response.result;
+	async _submitURL(url) {
+		if (url.length === 0) return false;
 
-		for (let i = 0, len = fileList.length, file, oAudio; i < len; i++) {
-			if (info.isUpdate) oAudio = info.element;
-			else oAudio = this._createAudioTag();
+		const file = { name: url.split('/').pop(), size: 0 };
+		const info = {
+			isUpdate: this.modal.isUpdate,
+			element: this._createAudioTag()
+		};
+		const handler = function (url, _url) {
+			url = _url || url;
+			this._createComp(info.element, url, null, info.isUpdate);
+		}.bind(this, url);
 
-			file = { name: fileList[i].name, size: fileList[i].size };
-			this._createComp(oAudio, fileList[i].url, file, info.isUpdate);
+		if (typeof this.events.onAudioUploadBefore === 'function') {
+			const result = this.events.onAudioUploadBefore({
+				url: url,
+				files: file,
+				info,
+				handler
+			});
+
+			if (typeof result === 'undefined') return;
+			if (!result) return false;
+			if (typeof result === 'string' && result.length > 0) handler(result);
+		} else {
+			handler(null);
 		}
-	},
 
-	_submitURL(src) {
-		if (src.length === 0) return false;
-		this._createComp(this._createAudioTag(), src, null, this.modal.isUpdate);
 		return true;
 	},
 
@@ -293,20 +323,20 @@ Audio_.prototype = {
 
 	_serverUpload(info, files) {
 		if (!files) return;
-		if (typeof files === 'string') {
-			this._error(files, null);
-			return true;
-		}
 
 		const uploadFiles = this.modal.isUpdate ? [files[0]] : files;
 		this.fileManager.upload(this.pluginOptions.uploadUrl, this.pluginOptions.uploadHeaders, uploadFiles, UploadCallBack.bind(this, info), this.events.onAudioUploadError);
 	},
 
-	_error(message, response) {
-		if (typeof this.events.onAudioUploadError !== 'function' || this.events.onAudioUploadError(message, response)) {
-			this.notice.open(message);
-			console.warn('[SUNEDITOR.plugin.audio.exception] response: ' + message);
+	async _error(response) {
+		let message = '';
+		if (typeof this.events.onAudioUploadError !== 'function') {
+			message = await this.events.onAudioUploadError(response);
 		}
+
+		const err = message || response.errorMessage;
+		this.notice.open(err);
+		console.error('[SUNEDITOR.plugin.audio.error]', message);
 	},
 
 	constructor: Audio_
@@ -358,13 +388,13 @@ function UnSelect(target) {
 	}
 }
 
-function UploadCallBack(info, xmlHttp) {
+async function UploadCallBack(info, xmlHttp) {
 	if (typeof this.events.audioUploadHandler === 'function') {
-		this.events.audioUploadHandler(xmlHttp, info);
+		await this.events.audioUploadHandler({ xmlHttp, info });
 	} else {
 		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {
-			this._error(response.errorMessage, response);
+			this._error(response);
 		} else {
 			this._register(info, response);
 		}

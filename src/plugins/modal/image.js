@@ -56,7 +56,7 @@ const Image_ = function (editor, pluginOptions) {
 	});
 	this.fileManager = new FileManager(this, {
 		tagNames: ['img'],
-		eventHandler: typeof this.events.onImageUpload !== 'function' ? this.events.onImageUpload : null,
+		eventHandler: this.events.onImageAction,
 		checkHandler: FileCheckHandler.bind(this),
 		figure: this.figure
 	});
@@ -148,7 +148,7 @@ Image_.prototype = {
 	 * @override modal
 	 * @returns {boolean | undefined}
 	 */
-	async modalAction() {
+	modalAction() {
 		this._align = this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
 
 		if (this.modal.isUpdate) {
@@ -157,9 +157,9 @@ Image_.prototype = {
 		}
 
 		if (this.imgInputFile && this.imgInputFile.files.length > 0) {
-			return await this._submitFile(this.imgInputFile.files);
+			return this._submitFile(this.imgInputFile.files);
 		} else if (this.imgUrlFile && this._linkValue.length > 0) {
-			return await this._submitURL(this._linkValue);
+			return this._submitURL(this._linkValue);
 		}
 
 		return false;
@@ -315,16 +315,18 @@ Image_.prototype = {
 		const currentSize = this.fileManager.getSize();
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + limitSize / 1000 + 'KB';
-			if (
-				typeof this.events.onImageUploadError !== 'function' ||
-				this.events.onImageUploadError(err, {
-					limitSize: limitSize,
-					currentSize: currentSize,
+			let message = '';
+			if (typeof this.events.onImageUploadError !== 'function') {
+				message = await this.events.onImageUploadError({
+					error: err,
+					limitSize,
+					currentSize,
 					uploadSize: fileSize
-				})
-			) {
-				this.notice.open(err);
+				});
 			}
+
+			this.notice.open(message || err);
+
 			return false;
 		}
 
@@ -359,10 +361,10 @@ Image_.prototype = {
 			name: url.split('/').pop(),
 			size: 0
 		};
-
 		const handler = function (url, url_) {
-			if (this.modal.isUpdate) this._updateSrc(url_ || url, this._element, file);
-			else this.create(url_ || url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
+			url = url_ || url;
+			if (this.modal.isUpdate) this._updateSrc(url, this._element, file);
+			else this.create(url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
 		}.bind(this, url);
 
 		if (typeof this.events.onImageUploadBefore === 'function') {
@@ -635,15 +637,11 @@ Image_.prototype = {
 
 	_serverUpload(info, files) {
 		if (!files) return;
-		if (typeof files === 'string') {
-			this._error(files, null);
-			return;
-		}
 
 		// server upload
 		const imageUploadUrl = this.pluginOptions.uploadUrl;
 		if (typeof imageUploadUrl === 'string' && imageUploadUrl.length > 0) {
-			this.fileManager.upload(imageUploadUrl, this.pluginOptions.uploadHeaders, files, UploadCallBack.bind(this, info), this.events.onImageUploadError);
+			this.fileManager.upload(imageUploadUrl, this.pluginOptions.uploadHeaders, files, UploadCallBack.bind(this, info), this._error.bind(this));
 		} else {
 			this._setBase64(files, info.anchor, info.inputWidth, info.inputHeight, info.align, info.alt, info.isUpdate);
 		}
@@ -702,11 +700,15 @@ Image_.prototype = {
 		return imgTag;
 	},
 
-	_error(message, response) {
-		if (typeof this.events.onImageUploadError !== 'function' || this.events.onImageUploadError(message, response)) {
-			this.notice.open(message);
-			throw Error(`[SUNEDITOR.plugin.image.error] response: ${message}`);
+	async _error(response) {
+		let message = '';
+		if (typeof this.events.onImageUploadError !== 'function') {
+			message = await this.events.onImageUploadError(response);
 		}
+
+		const err = message || response.errorMessage;
+		this.notice.open(err);
+		console.error('[SUNEDITOR.plugin.image.error]', err);
 	},
 
 	constructor: Image_
@@ -724,7 +726,7 @@ async function UploadCallBack(info, xmlHttp) {
 	} else {
 		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {
-			this._error(response.errorMessage, response);
+			this._error(response);
 		} else {
 			this._register(info, response);
 		}

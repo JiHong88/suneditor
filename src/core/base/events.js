@@ -132,7 +132,7 @@ export default function () {
 		 * @param {Number} remainingFilesCount Count of remaining files to upload (0 when added as a url)
 		 * @param {Object} core Core object
 		 */
-		onImageUpload: null,
+		onImageAction: null,
 
 		/**
 		 * @description Called when the image is upload failed
@@ -156,16 +156,6 @@ export default function () {
 		 */
 		videoUploadHandler: null,
 
-		/**
-		 * @description It replaces the default callback function of the audio upload
-		 * @param xmlHttp xmlHttpRequest object
-		 * @param info Input information
-		 * - isUpdate: Update audio if true, create audio if false
-		 * - element: If isUpdate is true, the currently selected audio.
-		 * @param core Core object
-		 */
-		audioUploadHandler: null,
-		
 		/**
 		 * @description Called before the video is uploaded
 		 * If true is returned, the internal upload process runs normally.
@@ -194,6 +184,29 @@ export default function () {
 		 * @returns {Boolean|Array|undefined}
 		 */
 		onVideoUploadBefore: null,
+
+		/**
+		 * @description Called when the video(iframe, video) upload failed
+		 * -- arguments is same "onImageUploadError" --
+		 */
+		onVideoUploadError: null,
+		
+		/**
+		 * @description Called when the video(iframe, video) is is uploaded, updated, deleted
+		 * -- arguments is same "onImageUpload" --
+		 */
+		onVideoAction: null,
+		
+		/**
+		 * @description It replaces the default callback function of the audio upload
+		 * @param xmlHttp xmlHttpRequest object
+		 * @param info Input information
+		 * - isUpdate: Update audio if true, create audio if false
+		 * - element: If isUpdate is true, the currently selected audio.
+		 * @param core Core object
+		 */
+		audioUploadHandler: null,
+		
 		/**
 		 * @description Called before the audio is uploaded
 		 * If true is returned, the internal upload process runs normally.
@@ -220,30 +233,17 @@ export default function () {
 		 */
 		onAudioUploadBefore: null,
 
-		
-
-		/**
-		 * @description Called when the video(iframe, video) is is uploaded, updated, deleted
-		 * -- arguments is same "onImageUpload" --
-		 */
-		onVideoUpload: null,
-		/**
-		 * @description Called when the audio is is uploaded, updated, deleted
-		 * -- arguments is same "onImageUpload" --
-		 */
-		onAudioUpload: null,
-
-		
-		/**
-		 * @description Called when the video(iframe, video) upload failed
-		 * -- arguments is same "onImageUploadError" --
-		 */
-		onVideoUploadError: null,
 		/**
 		 * @description Called when the audio upload failed
 		 * -- arguments is same "onImageUploadError" --
 		 */
 		onAudioUploadError: null,
+		
+		/**
+		 * @description Called when the audio is is uploaded, updated, deleted
+		 * -- arguments is same "onImageUpload" --
+		 */
+		onAudioAction: null,
 
 		/**
 		 * @description Called when the editor is resized using the bottom bar

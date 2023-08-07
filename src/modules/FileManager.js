@@ -32,7 +32,6 @@ FileManager.prototype = {
 	 * @param {Files|{FormData, size}} data FormData in body or Files array
 	 * @param {Function|null} callBack Success call back function
 	 * @param {Function|null} errorCallBack Error call back function
-	 * @example this.plugins.fileManager.upload.call(this, pluginOptions.uploadUrl, pluginOptions.uploadHeaders, formData, this.plugins.image.callBack_imgUpload.bind(this, info), this.events.onImageUploadError);
 	 */
 	upload(uploadUrl, uploadHeader, data, callBack, errorCallBack) {
 		this.editor.showLoading();
@@ -303,13 +302,21 @@ async function CallBackUpload(xmlHttp, callBack, errorCallBack) {
 			}
 		} else {
 			// exception
-			this.editor.hideLoading();
 			console.error(`[SUNEDITOR.FileManager[${this.kind}].upload.serverException]`, xmlHttp);
-			const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
-			if (typeof errorCallBack !== 'function' || errorCallBack.call(this.events, '', res)) {
-				const err = `[SUNEDITOR.FileManager[${this.kind}].upload.serverException] status: ${xmlHttp.status}, response: ${res.errorMessage || xmlHttp.responseText}`;
-				this.notice.open(err);
-				throw Error(err);
+			try {
+				const res = !xmlHttp.responseText ? xmlHttp : JSON.parse(xmlHttp.responseText);
+				let message = '';
+				if (typeof errorCallBack === 'function') {
+					message = await errorCallBack(res);
+				}
+				const err = `[SUNEDITOR.FileManager[${this.kind}].upload.serverException] status: ${xmlHttp.status}, response: ${
+					message || res.errorMessage || xmlHttp.responseText
+				}`;
+				this.editor.notice.open(err);
+			} catch (error) {
+				throw Error(`[SUNEDITOR.FileManager[${this.kind}].upload.errorCallBack.fail] ${error.message}`);
+			} finally {
+				this.editor.hideLoading();
 			}
 		}
 	}
