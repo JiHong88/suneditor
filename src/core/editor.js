@@ -1147,7 +1147,8 @@ Editor.prototype = {
 					  numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-right'))
 				: h;
 		if (fc.get('_editorHeight') !== h) {
-			if (typeof this.events.onResizeEditor === 'function') this.events.onResizeEditor(h, fc.get('_editorHeight'), resizeObserverEntry);
+			if (typeof this.events.onResizeEditor === 'function')
+				this.events.onResizeEditor({ height: h, prevHeight: fc.get('_editorHeight'), frameContext: fc, observerEntry: resizeObserverEntry });
 			fc.set('_editorHeight', h);
 		}
 	},

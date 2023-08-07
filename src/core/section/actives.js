@@ -104,12 +104,6 @@ export async function SAVE(editor) {
 	editor.applyCommandTargets('save', (e) => {
 		e.setAttribute('disabled', true);
 	});
-
-	// user event
-	if (typeof editor.events.onSave === 'function') {
-		editor.events.onSave({ frameContext: fc, data });
-		return;
-	}
 }
 
 export function FONT_STYLE(editor, command) {

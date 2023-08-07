@@ -223,7 +223,7 @@ Audio_.prototype = {
 		};
 
 		if (typeof this.events.onAudioUploadBefore === 'function') {
-			const result = this.events.onAudioUploadBefore({
+			const result = await this.events.onAudioUploadBefore({
 				files,
 				info,
 				handler: (data) => {
@@ -257,7 +257,7 @@ Audio_.prototype = {
 		}.bind(this, url);
 
 		if (typeof this.events.onAudioUploadBefore === 'function') {
-			const result = this.events.onAudioUploadBefore({
+			const result = await this.events.onAudioUploadBefore({
 				url: url,
 				files: file,
 				info,
@@ -331,7 +331,7 @@ Audio_.prototype = {
 	async _error(response) {
 		let message = '';
 		if (typeof this.events.onAudioUploadError !== 'function') {
-			message = await this.events.onAudioUploadError(response);
+			message = await this.events.onAudioUploadError({ error: response });
 		}
 
 		const err = message || response.errorMessage;

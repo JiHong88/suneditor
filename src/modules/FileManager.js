@@ -156,7 +156,8 @@ FileManager.prototype = {
 			}
 		}
 
-		if (typeof this.eventHandler === 'function') this.eventHandler(element, dataIndex, state, info, --this.uploadFileLength < 0 ? 0 : this.uploadFileLength);
+		if (typeof this.eventHandler === 'function')
+			this.eventHandler({ element, index: dataIndex, state, info, remainingFilesCount: --this.uploadFileLength < 0 ? 0 : this.uploadFileLength });
 	},
 
 	/**

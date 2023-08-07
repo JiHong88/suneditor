@@ -17,29 +17,6 @@ export default function () {
 		onChange: null,
 
 		/**
-		 * async function
-		 */
-		/**
-		 * @description Event functions
-		 * @param {String} contents Current contents
-		 * @param {String|null} key Root key
-		 */
-		onSave: null,
-
-		/**
-		 * @description Event functions (drop, paste)
-		 * When false is returned, the default behavior is stopped.
-		 * If the string is returned, the cleanData value is modified to the return value.
-		 * @param {Object} e Event object.
-		 * @param {String} cleanData HTML string modified for editor format.
-		 * @param {Boolean} maxChartCount option (true if max character is exceeded)
-		 * @param {Object} core Core object
-		 * @returns {Boolean|String}
-		 */
-		onDrop: null,
-		onPaste: null,
-
-		/**
 		 * @description Called just before the inline toolbar is positioned and displayed on the screen.
 		 * @param {Element} toolbar Toolbar Element
 		 * @param {Object} context The editor's context object (editor.getContext())
@@ -69,6 +46,43 @@ export default function () {
 		 * @param {Object} core Core object
 		 */
 		onToggleFullScreen: null,
+
+		/**
+		 * @description Called when the editor is resized using the bottom bar
+		 */
+		onResizeEditor: null,
+
+		/**
+		 * @description Called after the "setToolbarButtons" invocation.
+		 * Can be used to tweak buttons properties (useful for custom buttons)
+		 * @param {Array} buttonList Button list
+		 * @param {Object} core Core object
+		 */
+		onSetToolbarButtons: null,
+
+		/**
+		 * --------------------------------------------------- async function ---------------------------------------------------
+		 */
+
+		/**
+		 * @description Event functions
+		 * @param {String} contents Current contents
+		 * @param {String|null} key Root key
+		 */
+		onSave: null,
+
+		/**
+		 * @description Event functions (drop, paste)
+		 * When false is returned, the default behavior is stopped.
+		 * If the string is returned, the cleanData value is modified to the return value.
+		 * @param {Object} e Event object.
+		 * @param {String} cleanData HTML string modified for editor format.
+		 * @param {Boolean} maxChartCount option (true if max character is exceeded)
+		 * @param {Object} core Core object
+		 * @returns {Boolean|String}
+		 */
+		onDrop: null,
+		onPaste: null,
 
 		/**
 		 * @description It replaces the default callback function of the image upload
@@ -187,7 +201,6 @@ export default function () {
 
 		/**
 		 * @description Called when the video(iframe, video) upload failed
-		 * -- arguments is same "onImageUploadError" --
 		 */
 		onVideoUploadError: null,
 		
@@ -235,7 +248,6 @@ export default function () {
 
 		/**
 		 * @description Called when the audio upload failed
-		 * -- arguments is same "onImageUploadError" --
 		 */
 		onAudioUploadError: null,
 		
@@ -244,18 +256,5 @@ export default function () {
 		 * -- arguments is same "onImageUpload" --
 		 */
 		onAudioAction: null,
-
-		/**
-		 * @description Called when the editor is resized using the bottom bar
-		 */
-		onResizeEditor: null,
-
-		/**
-		 * @description Called after the "setToolbarButtons" invocation.
-		 * Can be used to tweak buttons properties (useful for custom buttons)
-		 * @param {Array} buttonList Button list
-		 * @param {Object} core Core object
-		 */
-		onSetToolbarButtons: null
 	};
 }

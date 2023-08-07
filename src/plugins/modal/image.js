@@ -703,7 +703,7 @@ Image_.prototype = {
 	async _error(response) {
 		let message = '';
 		if (typeof this.events.onImageUploadError !== 'function') {
-			message = await this.events.onImageUploadError(response);
+			message = await this.events.onImageUploadError({ error: response });
 		}
 
 		const err = message || response.errorMessage;

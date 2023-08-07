@@ -614,7 +614,7 @@ Video.prototype = {
 	async _error(response) {
 		let message = '';
 		if (typeof this.events.onVideoUploadError !== 'function') {
-			message = await this.events.onVideoUploadError(response);
+			message = await this.events.onVideoUploadError({ error: response });
 		}
 
 		const err = message || response.errorMessage;
