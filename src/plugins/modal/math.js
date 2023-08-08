@@ -48,7 +48,7 @@ Math_.prototype = {
 	 * @override core
 	 */
 	active(element) {
-		if (element && element.getAttribute('data-se-value')) {
+		if (element?.getAttribute('data-se-value')) {
 			this._element = element;
 			this.controller.open(element);
 			domUtils.addClass(element, 'se-focus');
@@ -69,9 +69,9 @@ Math_.prototype = {
 	/**
 	 * @override core
 	 */
-	preservedClass() {
+	maintainPattern() {
 		return {
-			className: 'katex',
+			query: '.katex',
 			method: (element) => {
 				if (!element.getAttribute('data-se-value') || !this.katex) return;
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(element.getAttribute('data-se-value'))));

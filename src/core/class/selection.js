@@ -19,7 +19,7 @@ Selection.prototype = {
 	 * @returns {Object}
 	 */
 	get() {
-		const selection = this._shadowRoot && this._shadowRoot.getSelection ? this._shadowRoot.getSelection() : this.editor.frameContext.get('_ww').getSelection();
+		const selection = this._shadowRoot?.getSelection() || this.editor.frameContext.get('_ww').getSelection();
 		if (!selection) return null;
 		if (!this.status._range && !this.editor.frameContext.get('wysiwyg').contains(selection.focusNode)) {
 			selection.removeAllRanges();
@@ -155,7 +155,7 @@ Selection.prototype = {
 	 * @returns
 	 */
 	getRects(range, position) {
-		const targetAbs = range && range.nodeType === 1 ? window.getComputedStyle(range).position === 'absolute' : false;
+		const targetAbs = range?.nodeType === 1 ? window.getComputedStyle(range).position === 'absolute' : false;
 		range = range || this.getRange();
 		const globalScroll = this.offset.getGlobalScroll();
 		let isStartPosition = position === 'start';
@@ -339,14 +339,14 @@ Selection.prototype = {
 				startCon = startCon.childNodes[startOff] || startCon;
 				startOff = 0;
 			}
-			while (startCon && startCon.nodeType === 1 && startCon.firstChild) {
+			while (startCon?.nodeType === 1 && startCon.firstChild) {
 				startCon = startCon.firstChild || startCon;
 				startOff = 0;
 			}
 		}
 		if (this.format.isLine(endCon)) {
 			endCon = endCon.childNodes[endOff] || endCon.lastChild || endCon;
-			while (endCon && endCon.nodeType === 1 && endCon.lastChild) {
+			while (endCon?.nodeType === 1 && endCon.lastChild) {
 				endCon = endCon.lastChild;
 			}
 			endOff = endCon.textContent.length;

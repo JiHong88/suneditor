@@ -189,7 +189,7 @@ Component.prototype = {
 		const container = info.container;
 		const t_style = fc.get('lineBreaker_t').style;
 		const b_style = fc.get('lineBreaker_b').style;
-		const target = this.editor._figureContainer && this.editor._figureContainer.style.display === 'block' ? this.editor._figureContainer : element;
+		const target = this.editor._figureContainer?.style.display === 'block' ? this.editor._figureContainer : element;
 		const toolbarH = this.editor.isClassic && !this.options.get('toolbar_container') ? this.context.get('toolbar.main').offsetHeight : 0;
 
 		const isList = domUtils.isListCell(container.parentNode);
@@ -256,7 +256,7 @@ Component.prototype = {
 };
 
 function CloseListener_mouse(e) {
-	if (this.currentTarget && this.currentTarget.contains(e.target)) return;
+	if (this.currentTarget?.contains(e.target)) return;
 	this.close();
 }
 
@@ -290,7 +290,7 @@ function OnKeyDown_component(e) {
 	if (ctrl) {
 		if (keyCode !== 17) {
 			const info = this.editor.shortcutsKeyMap.get(keyCode + (e.shiftKey ? 1000 : 0));
-			if (info && /^(redo|undo)$/.test(info.c)) {
+			if (/^(redo|undo)$/.test(info?.c)) {
 				e.preventDefault();
 				e.stopPropagation();
 				this.__removeGlobalEvent();
@@ -304,7 +304,7 @@ function OnKeyDown_component(e) {
 	if (keyCode === 8 || keyCode === 46) {
 		e.preventDefault();
 		e.stopPropagation();
-		if (this.currentPlugin && typeof this.currentPlugin.destroy === 'function') {
+		if (typeof this.currentPlugin?.destroy === 'function') {
 			this.currentPlugin.destroy(this.currentTarget);
 			this.editor._offCurrentController();
 			this.__removeGlobalEvent();

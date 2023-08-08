@@ -89,7 +89,7 @@ Audio_.prototype = {
 	 * @returns {boolean | undefined}
 	 */
 	modalAction() {
-		if (this.audioInputFile && this.audioInputFile.files.length > 0) {
+		if (this.audioInputFile && this.audioInputFile?.files.length > 0) {
 			return this._submitFile(this.audioInputFile.files);
 		} else if (this.audioUrlFile && this.urlValue.length > 0) {
 			return this._submitURL(this.urlValue);

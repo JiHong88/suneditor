@@ -124,19 +124,12 @@ HTML.prototype = {
 			console.warn('[SUNEDITOR.html.clean.fail]', error.message);
 		}
 
-		if (this.editor._MELInfo && this.editor._MELInfo.query) {
-			const textCompList = dom.querySelectorAll(this.editor._MELInfo.query);
-			for (let i = 0, len = textCompList.length, initMethod, classList; i < len; i++) {
-				classList = [].slice.call(textCompList[i].classList);
-				for (let c = 0, cLen = classList.length; c < cLen; c++) {
-					initMethod = this.editor._MELInfo.map[classList[c]];
-					if (initMethod) {
-						initMethod(textCompList[i]);
-						break;
-					}
-				}
+		this.editor._MELInfo.forEach((method, query) => {
+			const infoLst = dom.querySelectorAll(query);
+			for (let i = 0, len = infoLst.length; i < len; i++) {
+				method(infoLst[i]);
 			}
-		}
+		});
 
 		let domTree = dom.childNodes;
 		let cleanData = '';
@@ -197,7 +190,7 @@ HTML.prototype = {
 
 				let c, a, t, prev, firstCon;
 				while ((c = domTree[0])) {
-					if (prev && prev.nodeType === 3 && a && a.nodeType === 1 && domUtils.isBreak(c)) {
+					if (prev?.nodeType === 3 && a?.nodeType === 1 && domUtils.isBreak(c)) {
 						prev = c;
 						domUtils.removeItem(c);
 						continue;
@@ -208,7 +201,7 @@ HTML.prototype = {
 					prev = c;
 				}
 
-				if (prev.nodeType === 3 && a.nodeType === 1) a = prev;
+				if (prev?.nodeType === 3 && a?.nodeType === 1) a = prev;
 				const offset = a.nodeType === 3 ? t.endOffset || a.textContent.length : a.childNodes.length;
 				if (rangeSelection) this.selection.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
 				else this.selection.setRange(a, offset, a, offset);
@@ -344,7 +337,7 @@ HTML.prototype = {
 					} else {
 						if (!domUtils.isBreak(parentNode)) {
 							let c = parentNode.childNodes[startOff];
-							const focusNode = c && c.nodeType === 3 && domUtils.isZeroWith(c) && domUtils.isBreak(c.nextSibling) ? c.nextSibling : c;
+							const focusNode = c?.nodeType === 3 && domUtils.isZeroWith(c) && domUtils.isBreak(c.nextSibling) ? c.nextSibling : c;
 							if (focusNode) {
 								if (!focusNode.nextSibling && domUtils.isBreak(focusNode)) {
 									parentNode.removeChild(focusNode);
@@ -380,7 +373,7 @@ HTML.prototype = {
 						const container = removedTag.container;
 						const prevContainer = removedTag.prevContainer;
 
-						if (container && container.childNodes.length === 0 && isFormats) {
+						if (container?.childNodes.length === 0 && isFormats) {
 							if (this.format.isLine(container)) {
 								container.innerHTML = '<br>';
 							} else if (this.format.isBlock(container)) {
@@ -541,7 +534,7 @@ HTML.prototype = {
 
 			if ((this.format.isLine(oNode) || this.component.is(oNode)) && startCon === endCon) {
 				const cItem = this.format.getLine(commonCon, null);
-				if (cItem && cItem.nodeType === 1 && domUtils.isEmptyLine(cItem)) {
+				if (cItem?.nodeType === 1 && domUtils.isEmptyLine(cItem)) {
 					domUtils.removeItem(cItem);
 				}
 			}
@@ -563,7 +556,7 @@ HTML.prototype = {
 						domUtils.removeItem(previous);
 					}
 
-					if (next && next.length > 0) {
+					if (next && nextText.length > 0) {
 						oNode.textContent += nextText;
 						domUtils.removeItem(next);
 					}
@@ -649,7 +642,7 @@ HTML.prototype = {
 			};
 
 		if (startCon === endCon && range.collapsed) {
-			if (startCon.textContent && domUtils.isZeroWith(startCon.textContent.substr(startOff))) {
+			if (domUtils.isZeroWith(startCon.textContent?.substr(startOff))) {
 				return {
 					container: startCon,
 					offset: startOff,
@@ -1004,7 +997,7 @@ HTML.prototype = {
 
 		this.nodeTransform.removeAllParents(line, null, null);
 
-		if (line && domUtils.isList(line.firstChild)) {
+		if (domUtils.isList(line?.firstChild)) {
 			line.insertBefore(domUtils.createTextNode(unicode.zeroWidthSpace), line.firstChild);
 		}
 	},

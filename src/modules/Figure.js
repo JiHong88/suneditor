@@ -186,7 +186,7 @@ Figure.CalcRatio = function (w, h, defaultSizeUnit, ratio) {
  * @private
  */
 Figure.__is = function (element) {
-	return element && (/se-component/.test(element.className) || /^(TABLE|HR)$/.test(element.nodeName));
+	return /se-component/.test(element?.className) || /^(TABLE|HR)$/.test(element?.nodeName);
 };
 
 Figure.prototype = {

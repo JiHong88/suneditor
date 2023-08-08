@@ -156,7 +156,7 @@ Viewer.prototype = {
 			topArea.style.height = '100%';
 			topArea.style.zIndex = '2147483647';
 
-			if (fc.get('_stickyDummy').style.display !== ('none' && '')) {
+			if (fc.get('_stickyDummy').style.display !== 'none' && fc.get('_stickyDummy').style.display !== '') {
 				this.fullScreenSticky = true;
 				fc.get('_stickyDummy').style.display = 'none';
 				domUtils.removeClass(toolbar, 'se-toolbar-sticky');

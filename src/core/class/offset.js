@@ -34,7 +34,7 @@ Offset.prototype = {
 		}
 
 		const wFrame = this.editor.frameContext.get('wysiwygFrame');
-		const iframe = wFrame && /iframe/i.test(wFrame.nodeName);
+		const iframe = /iframe/i.test(wFrame?.nodeName);
 
 		return {
 			left: offsetLeft + (iframe ? wFrame.parentElement.offsetLeft : 0),

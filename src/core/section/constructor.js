@@ -461,7 +461,7 @@ export function InitOptions(options, editorTargets) {
 	/** subToolbar */
 	let subButtons = null;
 	const subbar = options.subToolbar;
-	if (subbar && subbar.buttonList && subbar.buttonList.length > 0) {
+	if (subbar?.buttonList?.length > 0) {
 		if (/balloon/.test(o.get('mode'))) {
 			console.warn('[SUNEDITOR.create.subToolbar.fail] When the "mode" option is "balloon-*", the "subToolbar" option is omitted.');
 		} else {

@@ -81,7 +81,7 @@ const Table = function (editor, pluginOptions) {
 Table.key = 'table';
 Table.type = 'dropdown-free';
 Table.className = '';
-Table.component = (node) => node && (/^table$/i.test(node.nodeName) ? Table.key : '');
+Table.component = (node) => (/^table$/i.test(node?.nodeName) ? Table.key : '');
 Table.prototype = {
 	/**
 	 * @override core
@@ -89,14 +89,11 @@ Table.prototype = {
 	action() {
 		const oTable = domUtils.createElement('TABLE');
 		const x = this._tableXY[0];
-		let y = this._tableXY[1];
-		let tableHTML = '<tbody>';
-		while (y > 0) {
-			tableHTML += '<tr>' + CreateCells('td', x, false) + '</tr>';
-			--y;
-		}
-		tableHTML += '</tbody>';
-		oTable.innerHTML = tableHTML;
+		const y = this._tableXY[1];
+
+		const body = `<tbody>${`<tr>${CreateCells('td', x, false)}</tr>`.repeat(y)}</tbody>`;
+		const colGroup = `<colgroup>${`<col style="width: ${numbers.get(100 / x, 4)}%;">`.repeat(x)}</colgroup>`;
+		oTable.innerHTML = colGroup + body;
 
 		if (this.component.insert(oTable, false, false)) {
 			const firstTd = oTable.querySelector('td div');
@@ -104,6 +101,29 @@ Table.prototype = {
 			this._resetTablePicker();
 			this.setController(domUtils.getParentElement(firstTd, 'TD'));
 		}
+	},
+
+	/**
+	 * @override core
+	 */
+	maintainPattern() {
+		return {
+			query: 'table',
+			method: (element) => {
+				const maxCount = GetMaxColumns(element);
+
+				let colgroup = element.querySelector('colgroup');
+				if (!colgroup) {
+					//
+				}
+
+				const cols = colgroup.querySelector('col');
+
+				if (cols?.length === maxCount) return;
+
+				for (let i = 0, len = maxCount; i < len; i++) {}
+			}
+		};
 	},
 
 	/**
@@ -898,6 +918,7 @@ Table.prototype = {
 		this.setCellInfo(tdElement, this._shift);
 		this.controller_table.open(tableElement, null, this.close.bind(this));
 		this.controller_cell.open(tdElement, this.cellControllerTop ? tableElement : null);
+		this.component.select(tableElement, Table.key);
 	},
 
 	setCellControllerPosition(tdElement, reset) {
@@ -1264,12 +1285,7 @@ function CreateCells(nodeName, cnt, returnElement) {
 	nodeName = nodeName.toLowerCase();
 
 	if (!returnElement) {
-		let cellsHTML = '';
-		while (cnt > 0) {
-			cellsHTML += '<' + nodeName + '><div><br></div></' + nodeName + '>';
-			cnt--;
-		}
-		return cellsHTML;
+		return `<${nodeName}><div><br></div></${nodeName}>`.repeat(cnt);
 	} else {
 		return domUtils.createElement(nodeName, null, '<div><br></div>');
 	}
@@ -1326,6 +1342,20 @@ function OffCellShift() {
 
 function OffCellTouch() {
 	this.close();
+}
+
+function GetMaxColumns(table) {
+	let maxColumns = 0;
+
+	for (let row of table.rows) {
+		let columnCount = 0;
+		for (let cell of row.cells) {
+			columnCount += cell.colSpan;
+		}
+		maxColumns = Math.max(maxColumns, columnCount);
+	}
+
+	return maxColumns;
 }
 
 // init element

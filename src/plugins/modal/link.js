@@ -34,7 +34,7 @@ Link.prototype = {
 	 * @override core
 	 */
 	active(element) {
-		if (element && domUtils.isAnchor(element)) {
+		if (domUtils.isAnchor(element)) {
 			const tempLink = this.controller.form.querySelector('a');
 			tempLink.href = element.href;
 			tempLink.title = element.textContent;

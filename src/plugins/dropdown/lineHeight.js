@@ -26,7 +26,7 @@ LineHeight.prototype = {
 	 * @override core
 	 */
 	active(element, target) {
-		if (element && element.style && element.style.lineHeight.length > 0) {
+		if (element?.style?.lineHeight.length > 0) {
 			domUtils.addClass(target, 'active');
 			return true;
 		}

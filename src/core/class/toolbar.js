@@ -199,7 +199,7 @@ Toolbar.prototype = {
 	},
 
 	_setResponsive() {
-		if (this._rButtonArray && this._rButtonArray.length === 0) {
+		if (this._rButtonArray?.length === 0) {
 			this._rButtonArray = null;
 			return;
 		}

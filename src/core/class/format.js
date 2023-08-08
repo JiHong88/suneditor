@@ -322,9 +322,9 @@ Format.prototype = {
 				lineArr.push(line);
 				nextLine = rangeLines[i + 1];
 
-				if (i === len - 1 || (nextLine && nextLine.parentNode !== originParent)) {
+				if (i === len - 1 || nextLine?.parentNode !== originParent) {
 					// nested list
-					if (nextLine && line.contains(nextLine.parentNode)) {
+					if (line.contains(nextLine?.parentNode)) {
 						nextList = nextLine.parentNode.cloneNode(false);
 					}
 
@@ -607,7 +607,7 @@ Format.prototype = {
 
 		const rangeParent = rangeElement.parentNode;
 		let rangeRight = rangeElement.nextSibling;
-		if (rangeEl && rangeEl.children.length > 0) {
+		if (rangeEl?.children.length > 0) {
 			rangeParent.insertBefore(rangeEl, rangeRight);
 		}
 
@@ -736,7 +736,7 @@ Format.prototype = {
 			}
 
 			const currentFormat = this.getBlock(firstSel);
-			const cancel = currentFormat && currentFormat.tagName === listTag;
+			const cancel = currentFormat?.tagName === listTag;
 			let rangeArr, tempList;
 			const passComponent = (current) => {
 				return !this.component.is(current);
@@ -793,8 +793,8 @@ Format.prototype = {
 			topEl = topElParent && !domUtils.isWysiwygFrame(topElParent) && topElParent.nodeName === listTag ? topElParent : topEl;
 			bottomEl = bottomElParent && !domUtils.isWysiwygFrame(bottomElParent) && bottomElParent.nodeName === listTag ? bottomElParent : bottomEl;
 
-			const mergeTop = topEl && topEl.tagName === listTag;
-			const mergeBottom = bottomEl && bottomEl.tagName === listTag;
+			const mergeTop = topEl?.tagName === listTag;
+			const mergeBottom = bottomEl?.tagName === listTag;
 
 			let list = mergeTop ? topEl : domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
 			let firstList = null;
@@ -854,7 +854,7 @@ Format.prototype = {
 					list = domUtils.createElement(listTag, { style: 'list-style-type: ' + listStyle });
 				}
 
-				if (rangeTag && rangeTag.children.length === 0) domUtils.removeItem(rangeTag);
+				if (rangeTag?.children.length === 0) domUtils.removeItem(rangeTag);
 			}
 
 			if (topNumber) {
@@ -1013,8 +1013,8 @@ Format.prototype = {
 
 		this.selection._resetRangeToTextNode();
 		let range = this.selection.getRangeAndAddLine(this.selection.getRange(), null);
-		styleArray = styleArray && styleArray.length > 0 ? styleArray : false;
-		removeNodeArray = removeNodeArray && removeNodeArray.length > 0 ? removeNodeArray : false;
+		styleArray = styleArray?.length > 0 ? styleArray : false;
+		removeNodeArray = removeNodeArray?.length > 0 ? removeNodeArray : false;
 
 		const isRemoveNode = !styleNode;
 		const isRemoveFormat = isRemoveNode && !removeNodeArray && !styleArray;
@@ -1172,7 +1172,7 @@ Format.prototype = {
 			if (isRemoveFormat) return null;
 
 			// remove node check
-			const tagRemove = (!removeNodeRegExp && isRemoveNode) || (removeNodeRegExp && removeNodeRegExp.test(vNode.nodeName));
+			const tagRemove = (!removeNodeRegExp && isRemoveNode) || removeNodeRegExp?.test(vNode.nodeName);
 
 			// tag remove
 			if (tagRemove && !strictRemove) {
@@ -1700,7 +1700,7 @@ Format.prototype = {
 	_attachNested(originList, innerList, prev, next, nodePath) {
 		let insertPrev = false;
 
-		if (prev && innerList.tagName === prev.tagName) {
+		if (innerList.tagName === prev?.tagName) {
 			const children = innerList.children;
 			while (children[0]) {
 				prev.appendChild(children[0]);
@@ -1710,7 +1710,7 @@ Format.prototype = {
 			insertPrev = true;
 		}
 
-		if (next && innerList.tagName === next.tagName) {
+		if (innerList.tagName === next?.tagName) {
 			const children = next.children;
 			while (children[0]) {
 				innerList.appendChild(children[0]);
@@ -1895,7 +1895,7 @@ Format.prototype = {
 
 		if (rNode) {
 			rNode.parentNode.insertBefore(rangeElement, rNode.nextSibling);
-			if (cNodes && cNodes.length === 0) domUtils.removeItem(rNode);
+			if (cNodes?.length === 0) domUtils.removeItem(rNode);
 		}
 
 		return rangeElement === baseNode ? rangeElement.parentNode : rangeElement;
@@ -2030,7 +2030,7 @@ Format.prototype = {
 
 					if (anchorNode) {
 						const a = _getMaintainedNode(ancestor);
-						if (a && a.parentNode !== line) {
+						if (a.parentNode !== line) {
 							let m = a;
 							let p = null;
 							while (m.parentNode !== line) {
@@ -2973,7 +2973,7 @@ Format.prototype = {
 					if (anchorNode) {
 						anchorNode = anchorNode.cloneNode(false);
 						const a = _getMaintainedNode(ancestor);
-						if (a && a.parentNode !== pNode) {
+						if (a.parentNode !== pNode) {
 							let m = a;
 							let p = null;
 							while (m.parentNode !== pNode) {

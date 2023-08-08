@@ -219,32 +219,7 @@ const Editor = function (multiTargets, options) {
 	this._componentsInfoReset = false;
 
 	/**
-	 * @description Information of tags that should maintain HTML structure, style, class name, etc. (In use by "math" plugin)
-	 * When inserting "html" such as paste, it is executed on the "html" to be inserted. (html.clean)
-	 * Basic Editor Actions:
-	 * 1. All classes not starting with "__se__" or "se-" in the editor are removed.
-	 * 2. The style of all tags except the "span" tag is removed from the editor.
-	 * "_MELInfo" structure ex:
-	 * _MELInfo: {
-	 *   query: ".__se__xxx, se-xxx"
-	 *   map: {
-	 *     "__se__xxx": method.bind(core),
-	 *     "se-xxx": method.bind(core),
-	 *   }
-	 * }
-	 * @example
-	 * Define in the following return format in the "_MELInfo" function of the plugin.
-	 * _MELInfo() => {
-	 *  return {
-	 *    className: "string", // Class name to identify the tag. ("__se__xxx", "se-xxx")
-	 *    // Change the html of the "element". ("element" is the element found with "className".)
-	 *    // "method" is executed by binding "core".
-	 *    method(element) {
-	 *      // this === core
-	 *      element.innerHTML = // (rendered html);
-	 *    }
-	 *  }
-	 * }
+	 * @description plugin maintainPattern info Map()
 	 * @private
 	 */
 	this._MELInfo = null;
@@ -839,10 +814,10 @@ Editor.prototype = {
 			this._offCurrentController();
 			this._offCurrentModal();
 
-			if (this.toolbar.currentMoreLayerActiveButton && this.toolbar.currentMoreLayerActiveButton.disabled) this.toolbar.moreLayerOff();
-			if (this.subToolbar && this.subToolbar.currentMoreLayerActiveButton && this.subToolbar.currentMoreLayerActiveButton.disabled) this.subToolbar.moreLayerOff();
-			if (this.menu.currentDropdownActiveButton && this.menu.currentDropdownActiveButton.disabled) this.menu.dropdownOff();
-			if (this.menu.currentContainerActiveButton && this.menu.currentContainerActiveButton.disabled) this.menu.containerOff();
+			if (this.toolbar?.currentMoreLayerActiveButton.disabled) this.toolbar.moreLayerOff();
+			if (this.subToolbar?.currentMoreLayerActiveButton?.disabled) this.subToolbar.moreLayerOff();
+			if (this.menu?.currentDropdownActiveButton.disabled) this.menu.dropdownOff();
+			if (this.menu?.currentContainerActiveButton.disabled) this.menu.containerOff();
 			if (this.modalForm) this.plugins.modal.close.call(this);
 
 			fc.get('code').setAttribute('readOnly', 'true');
@@ -1140,7 +1115,7 @@ Editor.prototype = {
 	__callResizeFunction(fc, h, resizeObserverEntry) {
 		h =
 			h === -1
-				? resizeObserverEntry && resizeObserverEntry.borderBoxSize && resizeObserverEntry.borderBoxSize[0]
+				? resizeObserverEntry?.borderBoxSize && resizeObserverEntry.borderBoxSize[0]
 					? resizeObserverEntry.borderBoxSize[0].blockSize
 					: resizeObserverEntry.contentRect.height +
 					  numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-left')) +
@@ -1235,10 +1210,7 @@ Editor.prototype = {
 		this._fileInfoPluginsReset = [];
 
 		// text components
-		this._MELInfo = {
-			query: '',
-			map: {}
-		};
+		this._MELInfo = new Map();
 
 		// Command and file plugins registration
 		this.activeCommands = ACTIVE_EVENT_COMMANDS;
@@ -1276,22 +1248,20 @@ Editor.prototype = {
 				this._componentManager.push(plugin.constructor.component);
 			}
 
-			if (typeof plugin.onPluginMousedown === 'function') {
+			if (typeof plugin.onMousedown === 'function') {
 				this._onMousedownPlugins.push(plugin.onMousedown.bind(plugin));
 			}
 
-			if (typeof plugin.onPluginKeyDown === 'function') {
+			if (typeof plugin.onKeyDown === 'function') {
 				this._onKeyDownPlugins.push(plugin.onKeyDown.bind(plugin));
 			}
 
-			if (plugin.preservedClass) {
-				const info = plugin.preservedClass();
-				managedClass.push('.' + info.className);
-				this._MELInfo.map[info.className] = info.method;
+			if (plugin.maintainPattern) {
+				const info = plugin.maintainPattern();
+				this._MELInfo.set(info.query, info.method);
 			}
 		}
 
-		this._MELInfo.query = managedClass.toString();
 		this._fileManager.queryString = this._fileManager.tags.join(',');
 		this._fileManager.regExp = new RegExp(`^(${this._fileManager.tags.join('|') || '\\^'})$`, 'i');
 		this._fileManager.pluginRegExp = new RegExp(`^(${filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')})$`, 'i');

@@ -32,7 +32,7 @@ FontSize.prototype = {
 				targetText,
 				this.status.hasFocus ? converter.fontSize(this.options.get('fontSizeUnit'), this.editor.frameContext.get('wwComputedStyle').fontSize) : this.lang.fontSize
 			);
-		} else if (element.style && element.style.fontSize.length > 0) {
+		} else if (element?.style.fontSize.length > 0) {
 			domUtils.changeTxt(targetText, converter.fontSize(this.options.get('fontSizeUnit'), element.style.fontSize));
 			return true;
 		}

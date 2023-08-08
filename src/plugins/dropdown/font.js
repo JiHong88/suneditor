@@ -35,7 +35,7 @@ Font.prototype = {
 			const font = this.status.hasFocus ? this.editor.frameContext.get('wwComputedStyle').fontFamily : this.lang.font;
 			domUtils.changeTxt(targetText, font);
 			domUtils.changeTxt(tooltip, this.status.hasFocus ? this.lang.font + (font ? ' (' + font + ')' : '') : font);
-		} else if (element.style && element.style.fontFamily.length > 0) {
+		} else if (element?.style.fontFamily.length > 0) {
 			const selectFont = element.style.fontFamily.replace(/["']/g, '');
 			domUtils.changeTxt(targetText, selectFont);
 			domUtils.changeTxt(tooltip, this.lang.font + ' (' + selectFont + ')');

@@ -20,7 +20,7 @@ const HR = function (editor, pluginOptions) {
 HR.key = 'hr';
 HR.type = 'dropdown';
 HR.className = '';
-HR.component = (node) => node && (/^hr$/i.test(node.nodeName) ? HR.key : '');
+HR.component = (node) => (/^hr$/i.test(node?.nodeName) ? HR.key : '');
 HR.prototype = {
 	select(element) {
 		domUtils.addClass(element, 'on');

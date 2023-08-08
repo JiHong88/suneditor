@@ -19,7 +19,7 @@ Blockquote.prototype = {
 	 * @override core
 	 */
 	active(element, target) {
-		if (element && /blockquote/i.test(element.nodeName)) {
+		if (/blockquote/i.test(element?.nodeName)) {
 			domUtils.addClass(target, 'active');
 			return true;
 		}

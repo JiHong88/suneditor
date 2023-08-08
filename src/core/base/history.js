@@ -19,7 +19,7 @@ export default function (editor) {
 		// user event
 		if (editor.events.onChange) editor.events.onChange({ frameContext: fc, data: editor.html.get() });
 		if (editor.context.get('toolbar.main').style.display === 'block') editor.toolbar._showBalloon();
-		else if (editor.context.get('toolbar.sub.main').style.display === 'block') editor.subToolbar._showBalloon();
+		else if (editor.isSubBalloon && editor.context.get('toolbar.sub.main').style.display === 'block') editor.subToolbar._showBalloon();
 	}
 
 	function setContentFromStack(increase) {

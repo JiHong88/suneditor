@@ -67,7 +67,7 @@ ColorPicker.prototype = {
 	 */
 	rgb2hex(rgb) {
 		const rgbMatch = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
-		return rgbMatch && rgbMatch.length === 4
+		return rgbMatch?.length === 4
 			? '#' +
 					('0' + parseInt(rgbMatch[1], 10).toString(16)).slice(-2) +
 					('0' + parseInt(rgbMatch[2], 10).toString(16)).slice(-2) +

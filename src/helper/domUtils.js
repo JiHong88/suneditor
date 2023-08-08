@@ -72,7 +72,7 @@ export function getAttributesToString(element, exceptAttrs) {
 	let attrString = '';
 
 	for (let i = 0, len = attrs.length; i < len; i++) {
-		if (exceptAttrs && exceptAttrs.includes(attrs[i].name)) continue;
+		if (exceptAttrs?.includes(attrs[i].name)) continue;
 		attrString += attrs[i].name + '="' + attrs[i].value + '" ';
 	}
 
@@ -116,7 +116,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 				_newOffsets.s = _newOffsets.e = 0;
 
 				let previous = el.previousSibling;
-				while (previous && previous.nodeType === 3) {
+				while (previous?.nodeType === 3) {
 					tempText = previous.textContent.replace(zeroWidthRegExp, '');
 					_newOffsets.s += tempText.length;
 					el.textContent = tempText + el.textContent;
@@ -126,7 +126,7 @@ export function getNodePath(node, parentNode, _newOffsets) {
 				}
 
 				let next = el.nextSibling;
-				while (next && next.nodeType === 3) {
+				while (next?.nodeType === 3) {
 					tempText = next.textContent.replace(zeroWidthRegExp, '');
 					_newOffsets.e += tempText.length;
 					el.textContent += tempText;
@@ -541,7 +541,7 @@ export function copyTagAttributes(originEl, copyEl, blacklist) {
 	const attrs = copyEl.attributes;
 	for (let i = 0, len = attrs.length, name; i < len; i++) {
 		name = attrs[i].name.toLowerCase();
-		if ((blacklist && blacklist.includes(name)) || !attrs[i].value) originEl.removeAttribute(name);
+		if (blacklist?.includes(name) || !attrs[i].value) originEl.removeAttribute(name);
 		else if (name !== 'style') originEl.setAttribute(attrs[i].name, attrs[i].value);
 	}
 }
@@ -615,7 +615,7 @@ export function changeElement(element, newElement) {
 			newElement = doc.firstChild;
 			element.parentNode.replaceChild(newElement, element);
 		}
-	} else if (newElement && newElement.nodeType === 1) {
+	} else if (newElement?.nodeType === 1) {
 		element.parentNode.replaceChild(newElement, element);
 	}
 }
@@ -750,7 +750,7 @@ export function isEdgePoint(container, offset, dir) {
  * @returns {boolean}
  */
 export function isWysiwygFrame(element) {
-	return element && element.nodeType === 1 && (hasClass(element, 'se-wrapper-wysiwyg') || /^BODY$/i.test(element.nodeName));
+	return element?.nodeType === 1 && (hasClass(element, 'se-wrapper-wysiwyg') || /^BODY$/i.test(element.nodeName));
 }
 
 /**
@@ -759,7 +759,7 @@ export function isWysiwygFrame(element) {
  * @returns {boolean}
  */
 export function isNonEditable(element) {
-	return element && element.nodeType === 1 && element.getAttribute('contenteditable') === 'false';
+	return element?.nodeType === 1 && element.getAttribute('contenteditable') === 'false';
 }
 
 /**
@@ -768,7 +768,7 @@ export function isNonEditable(element) {
  * @returns {boolean}
  */
 export function isList(node) {
-	return node && /^(OL|UL)$/i.test(typeof node === 'string' ? node : node.nodeName);
+	return /^(OL|UL)$/i.test(typeof node === 'string' ? node : node?.nodeName);
 }
 
 /**
@@ -777,7 +777,7 @@ export function isList(node) {
  * @returns {boolean}
  */
 export function isListCell(node) {
-	return node && /^LI$/i.test(typeof node === 'string' ? node : node.nodeName);
+	return /^LI$/i.test(typeof node === 'string' ? node : node?.nodeName);
 }
 
 /**
@@ -786,7 +786,7 @@ export function isListCell(node) {
  * @returns {boolean}
  */
 export function isTable(node) {
-	return node && /^(TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(typeof node === 'string' ? node : node.nodeName);
+	return /^(TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(typeof node === 'string' ? node : node?.nodeName);
 }
 
 /**
@@ -795,7 +795,7 @@ export function isTable(node) {
  * @returns {boolean}
  */
 export function isTableCell(node) {
-	return node && /^(TD|TH)$/i.test(typeof node === 'string' ? node : node.nodeName);
+	return /^(TD|TH)$/i.test(typeof node === 'string' ? node : node?.nodeName);
 }
 
 /**
@@ -804,7 +804,7 @@ export function isTableCell(node) {
  * @returns {boolean}
  */
 export function isBreak(node) {
-	return node && /^BR$/i.test(typeof node === 'string' ? node : node.nodeName);
+	return /^BR$/i.test(typeof node === 'string' ? node : node?.nodeName);
 }
 
 /**
@@ -813,7 +813,7 @@ export function isBreak(node) {
  * @returns {boolean}
  */
 export function isAnchor(node) {
-	return node && /^A$/i.test(typeof node === 'string' ? node : node.nodeName);
+	return /^A$/i.test(typeof node === 'string' ? node : node?.nodeName);
 }
 
 /**
@@ -822,7 +822,7 @@ export function isAnchor(node) {
  * @returns {boolean}
  */
 export function isMedia(node) {
-	return node && /^(IMG|IFRAME|AUDIO|VIDEO|CANVAS)$/i.test(typeof node === 'string' ? node : node.nodeName);
+	return /^(IMG|IFRAME|AUDIO|VIDEO|CANVAS)$/i.test(typeof node === 'string' ? node : node?.nodeName);
 }
 
 /**
@@ -831,7 +831,7 @@ export function isMedia(node) {
  * @returns {Boolean}
  */
 export function isFigures(node) {
-	return node && (isMedia(node) || /^(FIGURE)$/i.test(typeof node === 'string' ? node : node.nodeName));
+	return isMedia(node) || /^(FIGURE)$/i.test(typeof node === 'string' ? node : node?.nodeName);
 }
 
 /**
@@ -840,7 +840,7 @@ export function isFigures(node) {
  * @returns {Boolean}
  */
 export function isInputElement(element) {
-	return element && element.nodeType === 1 && /^(INPUT|TEXTAREA)$/i.test(element.nodeName);
+	return element?.nodeType === 1 && /^(INPUT|TEXTAREA)$/i.test(element.nodeName);
 }
 
 /**
@@ -849,9 +849,7 @@ export function isInputElement(element) {
  * @returns {boolean}
  */
 export function isEmptyLine(element) {
-	return (
-		!element || !element.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && element.children.length === 0 && isZeroWith(element.textContent))
-	);
+	return !element?.parentNode || (!element.querySelector('IMG, IFRAME, AUDIO, VIDEO, CANVAS, TABLE') && element.children.length === 0 && isZeroWith(element.textContent));
 }
 
 /**
@@ -860,7 +858,7 @@ export function isEmptyLine(element) {
  * @returns {Boolean}
  */
 export function isSpanWithoutAttr(element) {
-	return element && element.nodeType === 1 && /^SPAN$/i.test(element.nodeName) && !element.className && !element.style.cssText;
+	return element?.nodeType === 1 && /^SPAN$/i.test(element.nodeName) && !element.className && !element.style.cssText;
 }
 
 /**
@@ -870,7 +868,7 @@ export function isSpanWithoutAttr(element) {
  * @returns {boolean}
  */
 export function isUneditable(element) {
-	return element && hasClass(element, '__se__uneditable');
+	return hasClass(element, '__se__uneditable');
 }
 
 /**
@@ -887,7 +885,7 @@ export function isImportantDisabled(element) {
  * @returns {boolean}
  */
 export function isExcludeFormat(element) {
-	return element && /(\s|^)(katex|__se__exclude-format)(\s|$)/.test(element.className);
+	return /(\s|^)(katex|__se__exclude-format)(\s|$)/.test(element?.className);
 }
 
 /**
