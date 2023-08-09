@@ -114,15 +114,17 @@ Component.prototype = {
 	 * @param {Element} element Element tag (img, iframe, video)
 	 * @param {string} pluginName Plugin name (image, video)
 	 */
-	select(element, pluginName) {
+	select(element, pluginName, isInput) {
 		this.get(element);
 		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is.bind(this))) || domUtils.isUneditable(element)) return false;
 
-		this.editor._antiBlur = true;
-		this.editor.blur();
-
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;
+
+		if (!isInput) {
+			this.editor._antiBlur = true;
+			this.editor.blur();
+		}
 
 		setTimeout(
 			() => {
@@ -334,6 +336,7 @@ function OnKeyDown_component(e) {
 	if (keyCode === 38 || keyCode === 40) {
 		const compContext = this.get(this.currentTarget);
 		const el = keyCode === 38 ? compContext.container.previousElementSibling : compContext.container.nextElementSibling;
+		console.log('???', el);
 		if (!el) return;
 
 		this.close();

@@ -110,18 +110,12 @@ Table.prototype = {
 		return {
 			query: 'table',
 			method: (element) => {
+				if (element.querySelector('colgroup')) return;
+
+				// create colgroup
 				const maxCount = GetMaxColumns(element);
-
-				let colgroup = element.querySelector('colgroup');
-				if (!colgroup) {
-					//
-				}
-
-				const cols = colgroup.querySelector('col');
-
-				if (cols?.length === maxCount) return;
-
-				for (let i = 0, len = maxCount; i < len; i++) {}
+				const colGroup = domUtils.createElement(`colgroup`, null, `<col style="width: ${numbers.get(100 / maxCount, 4)}%;">`.repeat(maxCount));
+				element.insertBefore(colGroup, element.firstElementChild);
 			}
 		};
 	},
@@ -139,7 +133,7 @@ Table.prototype = {
 	 * @override core
 	 * @param {any} event Event object
 	 */
-	onMousedown(event) {
+	onMouseDown({ event }) {
 		const tableCell = domUtils.getParentElement(event.target, domUtils.isTableCell);
 		if (!tableCell || !(tableCell !== this._fixedCell && !this._shift)) return;
 		this.selectCells(tableCell, false);
@@ -151,11 +145,14 @@ Table.prototype = {
 	 * @param {any} range range object
 	 * @param {Element} line Current line element
 	 */
-	onKeyDown(event, range, line) {
-		// table
-		if (event.keyCode === 9) {
+	onKeyDown({ event, range, line }) {
+		const keyCode = event.keyCode;
+		// table tabkey
+		if (keyCode === 9) {
 			const tableCell = domUtils.getParentElement(line, domUtils.isTableCell);
 			if (tableCell && range.collapsed && domUtils.isEdgePoint(range.startContainer, range.startOffset)) {
+				this._closeController();
+
 				const shift = event.shiftKey;
 				const table = domUtils.getParentElement(tableCell, 'table');
 				const cells = domUtils.getListChildren(table, domUtils.isTableCell);
@@ -190,17 +187,26 @@ Table.prototype = {
 			}
 		}
 
-		if (!event.shiftKey || event.keyCode !== 16) return;
+		if (!event.shiftKey || keyCode !== 16) {
+			this._closeController();
+			return;
+		}
 
 		event.preventDefault();
 		event.stopPropagation();
 
 		if (this._shift || this._ref) return;
+
 		const cell = domUtils.getParentElement(line, domUtils.isTableCell);
 		if (cell) {
+			this._closeController();
 			this.selectCells(cell, true);
 			return false;
 		}
+	},
+
+	onMouseMove({ event }) {
+		if (!domUtils.isTableCell(event.target)) return;
 	},
 
 	/**
@@ -908,6 +914,8 @@ Table.prototype = {
 		}
 
 		const tableElement = this._element || this._selectedTable || domUtils.getParentElement(tdElement, 'TABLE');
+		this.component.select(tableElement, Table.key, true);
+
 		this._maxWidth =
 			domUtils.hasClass(tableElement, 'se-table-size-100') ||
 			tableElement.style.width === '100%' ||
@@ -918,7 +926,6 @@ Table.prototype = {
 		this.setCellInfo(tdElement, this._shift);
 		this.controller_table.open(tableElement, null, this.close.bind(this));
 		this.controller_cell.open(tdElement, this.cellControllerTop ? tableElement : null);
-		this.component.select(tableElement, Table.key);
 	},
 
 	setCellControllerPosition(tdElement, reset) {
@@ -1062,6 +1069,7 @@ Table.prototype = {
 	},
 
 	_closeController() {
+		this.component.close();
 		this.controller_table.close();
 		this.controller_cell.close();
 	},

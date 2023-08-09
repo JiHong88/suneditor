@@ -291,9 +291,9 @@ Audio_.prototype = {
 			if (this._element) element = this._element;
 			if (element && element.src !== src) {
 				element.src = src;
-				this.component.select(element, 'audio');
+				this.component.select(element, Audio_.key, false);
 			} else {
-				this.component.select(element, 'audio');
+				this.component.select(element, Audio_.key, false);
 				return;
 			}
 		}

@@ -155,7 +155,7 @@ EventManager.prototype = {
 
 		if (this.component.is(selectionNode)) {
 			const component = this.component.get(selectionNode);
-			this.component.select(component.target, component.pluginName);
+			this.component.select(component.target, component.pluginName, false);
 			return;
 		}
 
@@ -546,7 +546,7 @@ EventManager.prototype = {
 		const maxCharCount = this.char.test(this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText);
 		// user event - paste
 		if (type === 'paste' && typeof this.events.onPaste === 'function') {
-			const value = await this.events.onPaste({ frameContext, e, cleanData, maxCharCount });
+			const value = await this.events.onPaste({ frameContext, event: e, cleanData, maxCharCount });
 			if (value === false) {
 				return false;
 			} else if (typeof value === 'string') {
@@ -557,7 +557,7 @@ EventManager.prototype = {
 		}
 		// user event - drop
 		if (type === 'drop' && typeof this.events.onDrop === 'function') {
-			const value = await this.events.onDrop({ frameContext, e, cleanData, maxCharCount });
+			const value = await this.events.onDrop({ frameContext, event: e, cleanData, maxCharCount });
 			if (value === false) {
 				return false;
 			} else if (typeof value === 'string') {
@@ -809,6 +809,13 @@ EventManager.prototype = {
 		}
 	},
 
+	_callPluginEvent(name, e) {
+		const eventPlugins = this.editor._onPluginEvents.get(name);
+		for (let i = 0; i < eventPlugins.length; i++) {
+			if (eventPlugins[i](e) === false) return false;
+		}
+	},
+
 	constructor: EventManager
 };
 
@@ -882,12 +889,10 @@ function OnMouseDown_wysiwyg(frameContext, e) {
 	setTimeout(this.selection._init.bind(this.selection));
 
 	// user event
-	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown({ frameContext, e }) === false) return;
+	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown({ frameContext, event: e }) === false) return;
 
-	const eventPlugins = this.editor._onMousedownPlugins;
-	for (let i = 0; i < eventPlugins.length; i++) {
-		if (eventPlugins[i](e) === false) return;
-	}
+	// plugin event
+	if (this._callPluginEvent('onMouseDown', { event: e }) === false) return;
 
 	if (this.editor.isBalloon) {
 		this._hideToolbar();
@@ -912,12 +917,14 @@ function OnClick_wysiwyg(frameContext, e) {
 	if (domUtils.isNonEditable(this.editor.frameContext.get('wysiwyg'))) return;
 
 	// user event
-	if (typeof this.events.onClick === 'function' && this.events.onClick({ frameContext, e }) === false) return;
+	if (typeof this.events.onClick === 'function' && this.events.onClick({ frameContext, event: e }) === false) return;
+	// plugin event
+	if (this._callPluginEvent('onClick', { event: e }) === false) return;
 
 	const fileComponentInfo = this.component.get(targetElement);
 	if (fileComponentInfo) {
 		e.preventDefault();
-		this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
+		this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, false);
 		return;
 	} else {
 		this.component.currentTarget = null;
@@ -981,7 +988,9 @@ function OnInput_wysiwyg(frameContext, e) {
 	}
 
 	// user event
-	if (typeof this.events.onInput === 'function' && this.events.onInput({ frameContext, e }) === false) return;
+	if (typeof this.events.onInput === 'function' && this.events.onInput({ frameContext, event: e, data }) === false) return;
+	// plugin event
+	if (this._callPluginEvent('onInput', { event: e, data }) === false) return;
 
 	this.history.push(true);
 }
@@ -1011,7 +1020,7 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 	}
 
 	// user event
-	if (typeof this.events.onKeyDown === 'function' && this.events.onKeyDown({ frameContext, e }) === false) return;
+	if (typeof this.events.onKeyDown === 'function' && this.events.onKeyDown({ frameContext, event: e }) === false) return;
 
 	/** Shortcuts */
 	if (ctrl && this.shortcuts.command(keyCode, shift)) {
@@ -1029,10 +1038,8 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 	let formatEl = this.format.getLine(selectionNode, null) || selectionNode;
 	let rangeEl = this.format.getBlock(formatEl, null);
 
-	const eventPlugins = this.editor._onKeyDownPlugins;
-	for (let i = 0; i < eventPlugins.length; i++) {
-		if (eventPlugins[i](e, range, formatEl) === false) return;
-	}
+	// plugin event
+	if (this._callPluginEvent('onKeyDown', { event: e, range, line: formatEl }) === false) return;
 
 	switch (keyCode) {
 		case 8 /** backspace key */:
@@ -1225,7 +1232,7 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 						e.preventDefault();
 						e.stopPropagation();
 						if (formatEl.textContent.length === 0) domUtils.removeItem(formatEl);
-						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.editor.blur();
+						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, false) === false) this.editor.blur();
 					} else if (this.component.is(prev)) {
 						e.preventDefault();
 						e.stopPropagation();
@@ -1284,7 +1291,7 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 					const fileComponentInfo = this.component.get(nextEl);
 					if (fileComponentInfo) {
 						e.stopPropagation();
-						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName) === false) this.editor.blur();
+						if (this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, false) === false) this.editor.blur();
 					} else if (this.component.is(nextEl)) {
 						e.stopPropagation();
 						domUtils.removeItem(nextEl);
@@ -1839,7 +1846,9 @@ function OnKeyUp_wysiwyg(frameContext, e) {
 	this.char.test('');
 
 	// user event
-	if (typeof this.events.onKeyUp === 'function' && this.events.onKeyUp({ frameContext, e }) === false) return;
+	if (typeof this.events.onKeyUp === 'function' && this.events.onKeyUp({ frameContext, event: e }) === false) return;
+	// plugin event
+	if (this._callPluginEvent('onKeyUp', { event: e, range, line: formatEl }) === false) return;
 
 	if (!ctrl && !alt && !HISTORY_IGNORE_KEYCODE.test(keyCode)) {
 		this.history.push(true);
@@ -1856,7 +1865,7 @@ function OnCopy_wysiwyg(frameContext, e) {
 	const clipboardData = e.clipboardData;
 
 	// user event
-	if (typeof this.events.onCopy === 'function' && this.events.onCopy({ frameContext, e, clipboardData }) === false) {
+	if (typeof this.events.onCopy === 'function' && this.events.onCopy({ frameContext, event: e, clipboardData }) === false) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -1882,7 +1891,7 @@ function OnCut_wysiwyg(frameContext, e) {
 	const clipboardData = e.clipboardData;
 
 	// user event
-	if (typeof this.events.onCut === 'function' && this.events.onCut({ frameContext, e, clipboardData }) === false) {
+	if (typeof this.events.onCut === 'function' && this.events.onCut({ frameContext, event: e, clipboardData }) === false) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -1897,7 +1906,7 @@ function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 	this._moveContainer(eventWysiwyg);
 	this._scrollContainer();
 	// user event
-	if (typeof this.events.onScroll === 'function') this.events.onScroll({ frameContext, e });
+	if (typeof this.events.onScroll === 'function') this.events.onScroll({ frameContext, event: e });
 }
 
 function OnFocus_wysiwyg(frameContext, e) {
@@ -1911,12 +1920,17 @@ function OnFocus_wysiwyg(frameContext, e) {
 
 	this.editor.changeFrameContext(rootKey);
 	this.history.resetButtons(rootKey, null);
-	this.applyTagEffect();
 
-	if (this.editor.isInline) this.toolbar._showInline();
+	setTimeout(() => {
+		this.applyTagEffect();
 
-	// user event
-	if (typeof this.events.onFocus === 'function') this.events.onFocus({ frameContext, e });
+		if (this.editor.isInline) this.toolbar._showInline();
+
+		// user event
+		if (typeof this.events.onFocus === 'function') this.events.onFocus({ frameContext, event: e });
+		// plugin event
+		this._callPluginEvent('onFocus', { event: e });
+	});
 }
 
 function OnBlur_wysiwyg(frameContext, e) {
@@ -1940,7 +1954,9 @@ function OnBlur_wysiwyg(frameContext, e) {
 	this.history.check(frameContext.get('key'), this.status._range);
 
 	// user event
-	if (typeof this.events.onBlur === 'function') this.events.onBlur({ frameContext, e });
+	if (typeof this.events.onBlur === 'function') this.events.onBlur({ frameContext, event: e });
+	// plugin event
+	this._callPluginEvent('onBlur', { event: e });
 }
 
 function OnMouseMove_wysiwyg(frameContext, e) {
@@ -1987,10 +2003,13 @@ function OnMouseMove_wysiwyg(frameContext, e) {
 		lineBreakerStyle.top = top - wScroll + 'px';
 		this.editor._lineBreakerButton.style.left = this.offset.get(container).left + container.offsetWidth / 2 - 15 + 'px';
 		lineBreakerStyle.display = 'block';
-	} // off line breaker
-	else if (lineBreakerStyle.display !== 'none') {
+
+		return;
+	} else if (lineBreakerStyle.display !== 'none') {
 		lineBreakerStyle.display = 'none';
 	}
+
+	this._callPluginEvent('onMouseMove', { event: e });
 }
 
 function OnMouseDown_statusbar(e) {
@@ -2032,6 +2051,8 @@ function DisplayLineBreak(dir, e) {
 
 	component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
 	this.editor.frameContext.get('lineBreaker').style.display = 'none';
+
+	this.component.close();
 
 	const focusEl = isList ? format : format.firstChild;
 	this.selection.setRange(focusEl, 1, focusEl, 1);

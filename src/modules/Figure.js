@@ -448,7 +448,7 @@ Figure.prototype = {
 
 		this.history.push(false);
 		if (!/^remove|caption$/.test(command)) {
-			this.component.select(element, this.kind);
+			this.component.select(element, this.kind, false);
 		}
 	},
 
@@ -800,19 +800,19 @@ function ContainerResizingOff() {
 	if (this.isVertical) this.setTransform(this._element, w, h, 0);
 
 	this.history.push(false);
-	this.component.select(this._element, this.kind);
+	this.component.select(this._element, this.kind, false);
 }
 
 function ContainerResizingESC(e) {
 	if (!/^27$/.test(e.keyCode)) return;
 	this._offResizeEvent();
-	this.component.select(this._element, this.kind);
+	this.component.select(this._element, this.kind, false);
 }
 
 function SetMenuAlign(value) {
 	this.setAlign(this._element, value);
 	this.selectMenu_align.close();
-	this.component.select(this._element, this.kind);
+	this.component.select(this._element, this.kind, false);
 }
 
 function SetResize(value) {
@@ -831,7 +831,7 @@ function SetResize(value) {
 	}
 
 	this.selectMenu_resize.close();
-	this.component.select(this._element, this.kind);
+	this.component.select(this._element, this.kind, false);
 }
 
 function CreateAlign(editor, button) {

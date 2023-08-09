@@ -173,11 +173,10 @@ const Editor = function (multiTargets, options) {
 	this._shadowRoot = null;
 
 	/**
-	 * @description Plugin call
+	 * @description Plugin call event map
 	 * @private
 	 */
-	this._onMousedownPlugins = null;
-	this._onKeyDownPlugins = null;
+	this._onPluginEvents = null;
 
 	/**
 	 * @description Controller, modal relative
@@ -736,7 +735,7 @@ Editor.prototype = {
 
 		const fileComponentInfo = this.component.get(focusEl);
 		if (fileComponentInfo) {
-			this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName);
+			this.component.select(fileComponentInfo.target, fileComponentInfo.pluginName, false);
 		} else if (focusEl) {
 			focusEl = domUtils.getEdgeChild(
 				focusEl,
@@ -1214,14 +1213,21 @@ Editor.prototype = {
 
 		// Command and file plugins registration
 		this.activeCommands = ACTIVE_EVENT_COMMANDS;
-		this._onMousedownPlugins = [];
-		this._onKeyDownPlugins = [];
+		this._onPluginEvents = new Map([
+			['onMouseMove', []],
+			['onMouseDown', []],
+			['onClick', []],
+			['onInput', []],
+			['onKeyDown', []],
+			['onKeyUp', []],
+			['onFocus', []],
+			['onBlur', []]
+		]);
 		this._fileManager.tags = [];
 		this._fileManager.pluginMap = {};
 
 		const plugins = this.plugins;
 		const isArray = Array.isArray;
-		const managedClass = [];
 		let filePluginRegExp = [];
 		let plugin;
 		for (let key in plugins) {
@@ -1248,14 +1254,14 @@ Editor.prototype = {
 				this._componentManager.push(plugin.constructor.component);
 			}
 
-			if (typeof plugin.onMousedown === 'function') {
-				this._onMousedownPlugins.push(plugin.onMousedown.bind(plugin));
-			}
+			// plugin event
+			this._onPluginEvents.forEach((v, k) => {
+				if (typeof plugin[k] === 'function') {
+					v.push(plugin[k].bind(plugin));
+				}
+			});
 
-			if (typeof plugin.onKeyDown === 'function') {
-				this._onKeyDownPlugins.push(plugin.onKeyDown.bind(plugin));
-			}
-
+			// plugin maintain
 			if (plugin.maintainPattern) {
 				const info = plugin.maintainPattern();
 				this._MELInfo.set(info.query, info.method);
