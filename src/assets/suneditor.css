@@ -863,6 +863,30 @@
 }
 
 /* dropdown layer --- table selector */
+.sun-editor .sun-editor-editable table th:hover::after,
+.sun-editor .sun-editor-editable table td:hover::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	right: -2px;
+	width: 4px;
+	height: 100%;
+	background-color: transparent;
+	cursor: ew-resize;
+}
+
+.sun-editor .sun-editor-editable table th:hover::before,
+.sun-editor .sun-editor-editable table td:hover::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -2px;
+	width: 4px;
+	height: 100%;
+	background-color: transparent;
+	cursor: ew-resize;
+}
+
 .sun-editor .se-selector-table {
 	display: none;
 	position: absolute;

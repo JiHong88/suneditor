@@ -63,7 +63,7 @@ Toolbar.prototype = {
 			this._showBalloon();
 		} else {
 			this.context.get(this.keyName + '.main').style.display = '';
-			this.editor.frameContext.get('_stickyDummy').style.display = '';
+			if (!this.isSub) this.editor.frameContext.get('_stickyDummy').style.display = '';
 		}
 
 		if (!this.isSub) this.resetResponsiveToolbar();
@@ -79,7 +79,7 @@ Toolbar.prototype = {
 			this._inlineToolbarAttr.isShow = false;
 		} else {
 			this.context.get(this.keyName + '.main').style.display = 'none';
-			this.editor.frameContext.get('_stickyDummy').style.display = 'none';
+			if (!this.isSub) this.editor.frameContext.get('_stickyDummy').style.display = 'none';
 			if (this.editorisBalloon) {
 				this._balloonOffset = {
 					top: 0,
