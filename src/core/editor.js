@@ -1003,6 +1003,7 @@ Editor.prototype = {
 			else if (cont[i].form) cont[i].form.style.display = 'none';
 		}
 		this.opendControllers = fixedCont;
+		this.currentControllerName = '';
 		this.component.__removeGlobalEvent();
 	},
 

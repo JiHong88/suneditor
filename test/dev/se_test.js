@@ -385,6 +385,7 @@ window.c = () => {
 			// textDirection: 'rtl',
 			// value: 'Common value',
 			// editorStyle: 'font-size:40px',
+			value:`<p>aa<br></p><table><colgroup><col style="width: 25%;"><col style="width: 25%;"><col style="width: 25%;"><col style="width: 25%;"></colgroup><tbody><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table><p>aa<br></p>`,
 			plugins: plugins,
 			allowedClassName: '.+',
 			toolbar_container: '#root_toolbar_container',

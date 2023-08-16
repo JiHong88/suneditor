@@ -23,7 +23,7 @@ const Controller = function (inst, element, params, _name) {
 	this.position = params.position || 'bottom';
 	this.disabled = !!params.disabled;
 	this._initMethod = null;
-	this.__globalEventHandlers = [CloseListener_key.bind(this), CloseListener_mouse.bind(this)];
+	this.__globalEventHandlers = [CloseListener_keydown.bind(this), CloseListener_mousedown.bind(this)];
 	this._bindClose_key = null;
 	this._bindClose_mouse = null;
 	this.__offset = {};
@@ -62,10 +62,7 @@ Controller.prototype = {
 	 * The plugin's "init" method is called.
 	 */
 	close() {
-		if (this.disabled) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
-		this.editor.currentControllerName = null;
 		this.__offset = {};
-
 		this.__removeGlobalEvent();
 		this._controllerOff();
 
@@ -121,9 +118,13 @@ Controller.prototype = {
 	 */
 	_controllerOff() {
 		this.form.style.display = 'none';
+		if (this.editor.currentControllerName !== this.kind) return;
+
+		if (this.disabled) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
 		this.editor.frameContext.get('lineBreaker_t').style.display = this.editor.frameContext.get('lineBreaker_b').style.display = 'none';
 		this.editor.effectNode = null;
 		this.editor.opendControllers = [];
+		this.editor.currentControllerName = '';
 		this.editor._antiBlur = false;
 		this.editor._controllerTargetContext = null;
 		if (typeof this.inst.reset === 'function') this.inst.close();
@@ -196,7 +197,7 @@ function MouseLeave(e) {
 	e.target.style.zIndex = 2147483646;
 }
 
-function CloseListener_key(e) {
+function CloseListener_keydown(e) {
 	if (this._checkFixed()) return;
 	const keyCode = e.keyCode;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
@@ -208,9 +209,12 @@ function CloseListener_key(e) {
 	this.close();
 }
 
-function CloseListener_mouse(e) {
-	if (this._checkFixed()) return;
-	if (this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) return;
+function CloseListener_mousedown(e) {
+	if (this._checkFixed() || this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) {
+		e.preventDefault();
+		e.stopPropagation();
+		return;
+	}
 	this.close();
 }
 

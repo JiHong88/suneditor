@@ -136,7 +136,19 @@ Table.prototype = {
 	onMouseDown({ event }) {
 		const tableCell = domUtils.getParentElement(event.target, domUtils.isTableCell);
 		if (!tableCell || !(tableCell !== this._fixedCell && !this._shift)) return;
-		this.selectCells(tableCell, false);
+
+		const startX = event.clientX;
+		const startWidth = numbers.get(getComputedStyle(tableCell).width, 4);
+		const rect = tableCell.getBoundingClientRect();
+		const offsetX = startX - rect.left;
+		const isLeftEdge = offsetX > startWidth;
+		const isEdge = Math.abs(isLeftEdge ? offsetX - startWidth : startWidth - offsetX) <= 2;
+		if (isEdge) {
+			this.setCellInfo(tableCell, this._shift);
+			const col = this._element.querySelector('colgroup').querySelectorAll('col')[this._logical_cellIndex];
+		} else {
+			this.selectCells(tableCell, false);
+		}
 	},
 
 	/**
@@ -203,10 +215,6 @@ Table.prototype = {
 			this.selectCells(cell, true);
 			return false;
 		}
-	},
-
-	onMouseMove({ event }) {
-		if (!domUtils.isTableCell(event.target)) return;
 	},
 
 	/**
@@ -1332,10 +1340,10 @@ function OffCellMultiSelect(e) {
 	if (!this._fixedCell || !this._selectedTable) return;
 
 	this.setActiveButton(this._fixedCell, this._selectedCell);
-	this.setController(this._selectedCell || this._fixedCell);
-
 	this._selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
 	if (this._selectedCell && this._fixedCell) this.editor.focusEdge(this._selectedCell);
+
+	this.setController(this._selectedCell || this._fixedCell);
 
 	if (!this._shift) {
 		this._fixedCell = null;

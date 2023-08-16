@@ -146,6 +146,7 @@ Component.prototype = {
 		if (this.currentPlugin && typeof this.currentPlugin.close === 'function') {
 			this.currentPlugin.close(this.currentTarget);
 		}
+
 		this.__removeGlobalEvent();
 		this.editor._offCurrentController();
 	},
@@ -243,6 +244,7 @@ Component.prototype = {
 		if (this._bindClose_keydown) this._bindClose_keydown = this.eventManager.removeGlobalEvent(this._bindClose_keydown);
 		this.currentPlugin = null;
 		this.currentTarget = null;
+		this.currentPluginName = '';
 	},
 
 	__addNotFileGlobalEvent() {
@@ -257,8 +259,12 @@ Component.prototype = {
 	constructor: Component
 };
 
-function CloseListener_mouse(e) {
-	if (this.currentTarget?.contains(e.target)) return;
+function CloseListener_mouse({ target }) {
+	if (
+		this.currentTarget?.contains(target) ||
+		(this.currentPluginName === this.editor.currentControllerName && this.editor.opendControllers.some(({ form }) => form.contains(target)))
+	)
+		return;
 	this.close();
 }
 
@@ -336,7 +342,6 @@ function OnKeyDown_component(e) {
 	if (keyCode === 38 || keyCode === 40) {
 		const compContext = this.get(this.currentTarget);
 		const el = keyCode === 38 ? compContext.container.previousElementSibling : compContext.container.nextElementSibling;
-		console.log('???', el);
 		if (!el) return;
 
 		this.close();
