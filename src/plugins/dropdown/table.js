@@ -137,16 +137,20 @@ Table.prototype = {
 		const tableCell = domUtils.getParentElement(event.target, domUtils.isTableCell);
 		if (!tableCell || !(tableCell !== this._fixedCell && !this._shift)) return;
 
+		const SELECT_MARGIN = 2;
 		const startX = event.clientX;
 		const startWidth = numbers.get(getComputedStyle(tableCell).width, 4);
 		const rect = tableCell.getBoundingClientRect();
 		const offsetX = startX - rect.left;
-		const isLeftEdge = offsetX > startWidth;
-		const isEdge = Math.abs(isLeftEdge ? offsetX - startWidth : startWidth - offsetX) <= 2;
+		const isLeftEdge = offsetX <= SELECT_MARGIN;
+		console.log("isLeftEdge",isLeftEdge)
+		const isEdge = Math.abs(isLeftEdge ? offsetX - SELECT_MARGIN : startWidth - offsetX) <= SELECT_MARGIN;
 		if (isEdge) {
+			console.log("edge")
 			this.setCellInfo(tableCell, this._shift);
 			const col = this._element.querySelector('colgroup').querySelectorAll('col')[this._logical_cellIndex];
 		} else {
+			console.log("nnooo")
 			this.selectCells(tableCell, false);
 		}
 	},

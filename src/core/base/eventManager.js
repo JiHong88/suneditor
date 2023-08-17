@@ -6,10 +6,10 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils, unicode, numbers, env, converter } from '../../helper';
 
 const _w = env._w;
-const DIRECTION_KEYCODE = new RegExp('^(8|3[2-9]|40|46)$');
-const SPACE_DEL_DIR_KEYCODE = new RegExp('^(8|13|3[2-9]|40|46)$');
-const NON_TEXT_KEYCODE = new RegExp('^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$');
-const HISTORY_IGNORE_KEYCODE = new RegExp('^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$');
+const DIRECTION_KEYCODE = new RegExp(/^(8|3[2-9]|40|46)$/);
+const SPACE_DEL_DIR_KEYCODE = new RegExp(/^(8|13|3[2-9]|40|46)$/);
+const NON_TEXT_KEYCODE = new RegExp(/^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$/);
+const HISTORY_IGNORE_KEYCODE = new RegExp(/^(1[6-9]|20|27|3[3-9]|40|45|11[2-9]|12[0-3]|144|145)$/);
 const FRONT_ZEROWIDTH = new RegExp(unicode.zeroWidthSpace + '+', '');
 
 const EventManager = function (editor) {
