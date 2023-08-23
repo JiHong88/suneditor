@@ -706,8 +706,7 @@ Figure.prototype = {
 
 		this._displayResizeHandles(true);
 		this.editor._offCurrentController();
-		this.editor._resizeBackground.style.display = 'none';
-		this.editor._resizeBackground.style.cursor = 'default';
+		this.editor.disableBackWrapper();
 	},
 
 	constructor: Figure
@@ -733,8 +732,7 @@ function OnResizeContainer(e) {
 	inst._resizeClientX = e.clientX;
 	inst._resizeClientY = e.clientY;
 	inst.editor.frameContext.get('_figure').main.style.float = /l/.test(direction) ? 'right' : /r/.test(direction) ? 'left' : 'none';
-	inst.editor._resizeBackground.style.cursor = DIRECTION_CURSOR_MAP[direction];
-	inst.editor._resizeBackground.style.display = 'block';
+	this.editor.enableBackWrapper(DIRECTION_CURSOR_MAP[direction]);
 
 	inst.__onContainerEvent = inst.eventManager.addGlobalEvent('mousemove', inst.__containerResizing);
 	inst.__offContainerEvent = inst.eventManager.addGlobalEvent('mouseup', inst.__containerResizingOff);

@@ -103,7 +103,7 @@ const Constructor = function (editorTargets, options) {
 	editor_carrier_wrapper.appendChild(modal);
 
 	// loding box, resizing back
-	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-resizing-back' }));
+	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-back-wrapper' }));
 	editor_carrier_wrapper.appendChild(loadingBox.cloneNode(true));
 	_d.body.appendChild(editor_carrier_wrapper);
 

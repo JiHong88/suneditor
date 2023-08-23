@@ -887,6 +887,18 @@
 	cursor: ew-resize;
 }
 
+.sun-editor .sun-editor-editable .se-table-resize-line {
+	position: absolute;
+	top: 0;
+	width: 4px;
+	height: 100%;
+	margin-left: -2px;
+	background-color: #3f9dff;
+	opacity: 0.4;
+	pointer-events: none;
+	display: none;
+}
+
 .sun-editor .se-selector-table {
 	display: none;
 	position: absolute;
@@ -1154,7 +1166,7 @@
 	cursor: default;
 }
 
-.sun-editor .se-resizing-back {
+.sun-editor .se-back-wrapper {
 	position: fixed;
 	display: none;
 	cursor: default;

@@ -35,6 +35,7 @@ const Table = function (editor, pluginOptions) {
 	this.headerButton = controller_table.querySelector('._se_table_header');
 	this.mergeButton = controller_cell.querySelector('._se_table_merge_button');
 	this.insertRowAboveButton = controller_cell.querySelector('._se_table_insert_row_a');
+	this.resizeLine = domUtils.createElement('DIV', { class: 'se-table-resize-line' });
 	// members - private
 	this._element = null;
 	this._tdElement = null;
@@ -60,16 +61,14 @@ const Table = function (editor, pluginOptions) {
 	this._selectedTable = null;
 	this._ref = null;
 	// member - global events
-	this._bindClose_move = null;
-	this._bindClose_key = null;
-	this._bindClose_down = null;
-	this._bindClose_up = null;
-	this._bindClose_touch = null;
 	this.__globalEvents = {
 		on: OnCellMultiSelect.bind(this),
 		off: OffCellMultiSelect.bind(this),
 		shiftOff: OffCellShift.bind(this),
-		touchOff: OffCellTouch.bind(this)
+		touchOff: OffCellTouch.bind(this),
+		resize: null,
+		resizeStop: null,
+		resizeKeyDown: null
 	};
 
 	// init
@@ -135,7 +134,7 @@ Table.prototype = {
 	 */
 	onMouseDown({ event }) {
 		const tableCell = domUtils.getParentElement(event.target, domUtils.isTableCell);
-		if (!tableCell || !(tableCell !== this._fixedCell && !this._shift)) return;
+		if (!tableCell) return;
 
 		const SELECT_MARGIN = 2;
 		const startX = event.clientX;
@@ -143,14 +142,16 @@ Table.prototype = {
 		const rect = tableCell.getBoundingClientRect();
 		const offsetX = startX - rect.left;
 		const isLeftEdge = offsetX <= SELECT_MARGIN;
-		console.log("isLeftEdge",isLeftEdge)
-		const isEdge = Math.abs(isLeftEdge ? offsetX - SELECT_MARGIN : startWidth - offsetX) <= SELECT_MARGIN;
+		const isEdge = isLeftEdge || startWidth - offsetX <= SELECT_MARGIN;
+
 		if (isEdge) {
-			console.log("edge")
-			this.setCellInfo(tableCell, this._shift);
-			const col = this._element.querySelector('colgroup').querySelectorAll('col')[this._logical_cellIndex];
+			this._deleteStyleSelectedCells();
+			this.setCellInfo(tableCell, true);
+			const colIndex = this._logical_cellIndex - (isLeftEdge ? 1 : 0);
+			const col = this._element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
+			this._startCellResizing(col, startX, startWidth, isLeftEdge);
 		} else {
-			console.log("nnooo")
+			if (!(tableCell !== this._fixedCell && !this._shift)) return;
 			this.selectCells(tableCell, false);
 		}
 	},
@@ -324,14 +325,14 @@ Table.prototype = {
 		domUtils.addClass(tdElement, 'se-table-selected-cell');
 
 		if (!shift) {
-			this._bindClose_move = this.eventManager.addGlobalEvent('mousemove', this.__globalEvents.on, false);
+			this.__globalEvents.on = this.eventManager.addGlobalEvent('mousemove', this.__globalEvents.on, false);
 		} else {
-			this._bindClose_key = this.eventManager.addGlobalEvent('keyup', this.__globalEvents.shiftOff, false);
-			this._bindClose_down = this.eventManager.addGlobalEvent('mousedown', this.__globalEvents.on, false);
+			this.__globalEvents.shiftOff = this.eventManager.addGlobalEvent('keyup', this.__globalEvents.shiftOff, false);
+			this.__globalEvents.on = this.eventManager.addGlobalEvent('mousedown', this.__globalEvents.on, false);
 		}
 
-		this._bindClose_up = this.eventManager.addGlobalEvent('mouseup', this.__globalEvents.off, false);
-		this._bindClose_touch = this.eventManager.addGlobalEvent('touchmove', this.__globalEvents.touchOff, false);
+		this.__globalEvents.off = this.eventManager.addGlobalEvent('mouseup', this.__globalEvents.off, false);
+		this.__globalEvents.touchOff = this.eventManager.addGlobalEvent('touchmove', this.__globalEvents.touchOff, false);
 	},
 
 	setCellInfo(tdElement, reset) {
@@ -945,6 +946,49 @@ Table.prototype = {
 		this.controller_cell.resetPosition(tdElement);
 	},
 
+	_startCellResizing(col, startX, startWidth, isLeftEdge) {
+		this.editor.enableBackWrapper('ew-resize');
+
+		const tableEl = this._element;
+		const tdEl = this._tdElement;
+		this._setResizeLinePosition(tableEl, tdEl, this.resizeLine, isLeftEdge);
+		this.resizeLine.style.display = 'block';
+		tableEl.parentNode.appendChild(this.resizeLine);
+
+		this.__globalEvents.resize = this.eventManager.addGlobalEvent(
+			'mousemove',
+			this._cellResize.bind(this, col, tableEl, tdEl, this.resizeLine, isLeftEdge, startX, startWidth, tableEl.offsetWidth),
+			false
+		);
+		this.__globalEvents.resizeStop = this.eventManager.addGlobalEvent('mouseup', this.__removeGlobalEvents.bind(this), false);
+		this.__globalEvents.resizeKeyDown = this.eventManager.addGlobalEvent('keydown', this._stopResize.bind(this, col, col.style.width), false);
+	},
+
+	_cellResize(col, tableEl, tdEl, resizeLine, isLeftEdge, startX, startWidth, tableWidth, e) {
+		const deltaX = e.clientX - startX;
+		const newWidthPx = startWidth + deltaX;
+		const newWidthPercent = (newWidthPx / tableWidth) * 100;
+
+		if (newWidthPercent > 0) {
+			col.style.width = `${newWidthPercent}%`;
+			this._setResizeLinePosition(tableEl, tdEl, resizeLine, isLeftEdge);
+		}
+	},
+
+	_setResizeLinePosition(tableEl, tdEl, resizeLine, isLeftEdge) {
+		const tdOffset = this.offset.get(tdEl);
+		const tableOffset = this.offset.get(tableEl);
+		resizeLine.style.left = `${tdOffset.left + (isLeftEdge ? 0 : tdEl.offsetWidth)}px`;
+		resizeLine.style.top = `${tableOffset.top}px`;
+		resizeLine.style.height = `${tableEl.offsetHeight}px`;
+	},
+
+	_stopResize(col, prevWidth, e) {
+		if (e.keyCode !== 27) return;
+		this.__removeGlobalEvents();
+		col.style.width = prevWidth;
+	},
+
 	_deleteStyleSelectedCells() {
 		if (this._selectedTable) {
 			const selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
@@ -1087,11 +1131,12 @@ Table.prototype = {
 	},
 
 	__removeGlobalEvents() {
-		if (this._bindClose_touch) this._bindClose_touch = this.eventManager.removeGlobalEvent(this._bindClose_touch);
-		if (this._bindClose_move) this._bindClose_move = this.eventManager.removeGlobalEvent(this._bindClose_move);
-		if (this._bindClose_key) this._bindClose_key = this.eventManager.removeGlobalEvent(this._bindClose_key);
-		if (this._bindClose_down) this._bindClose_down = this.eventManager.removeGlobalEvent(this._bindClose_down);
-		if (this._bindClose_up) this._bindClose_up = this.eventManager.removeGlobalEvent(this._bindClose_up);
+		this.editor.disableBackWrapper();
+		domUtils.removeItem(this.resizeLine);
+		const globalEvents = this.__globalEvents;
+		for (const k in globalEvents) {
+			if (globalEvents[k]) globalEvents[k] = this.eventManager.removeGlobalEvent(globalEvents[k]);
+		}
 	},
 
 	constructor: Table
@@ -1337,8 +1382,8 @@ function OffCellMultiSelect(e) {
 	if (!this._shift) {
 		this.__removeGlobalEvents();
 		this._toggleEditor(true);
-	} else if (this._bindClose_touch) {
-		this._bindClose_touch = this.eventManager.removeGlobalEvent(this._bindClose_touch);
+	} else if (this.__globalEvents.touchOff) {
+		this.__globalEvents.touchOff = this.eventManager.removeGlobalEvent(this.__globalEvents.touchOff);
 	}
 
 	if (!this._fixedCell || !this._selectedTable) return;

@@ -2015,8 +2015,7 @@ function OnMouseMove_wysiwyg(frameContext, e) {
 function OnMouseDown_statusbar(e) {
 	e.stopPropagation();
 	this._resizeClientY = e.clientY;
-	this.editor._resizeBackground.style.display = 'block';
-	this.editor._resizeBackground.style.cursor = 'ns-resize';
+	this.editor.enableBackWrapper('ns-resize');
 	this.__resize_editor = this.addGlobalEvent('mousemove', __resizeEditor.bind(this));
 	this.__close_move = this.addGlobalEvent('mouseup', __closeMove.bind(this));
 }
@@ -2030,8 +2029,7 @@ function __resizeEditor(e) {
 }
 
 function __closeMove() {
-	this.editor._resizeBackground.style.display = 'none';
-	this.editor._resizeBackground.style.cursor = 'auto';
+	this.editor.disableBackWrapper();
 	if (this.__resize_editor) this.__resize_editor = this.removeGlobalEvent(this.__resize_editor);
 	if (this.__close_move) this.__close_move = this.removeGlobalEvent(this.__close_move);
 }

@@ -57,7 +57,7 @@ const Editor = function (multiTargets, options) {
 	 * @description Controllers carrier
 	 */
 	this._carrierWrapper = product.carrierWrapper;
-	this._resizeBackground = product.carrierWrapper.querySelector('.se-resizing-back');
+	this._backWrapper = product.carrierWrapper.querySelector('.se-back-wrapper');
 
 	/**
 	 * @description Editor options
@@ -905,6 +905,23 @@ Editor.prototype = {
 	 */
 	hideLoading(rootKey) {
 		(rootKey ? this.frameRoots.get(rootKey).get('container') : this._carrierWrapper).querySelector('.se-loading-box').style.display = 'none';
+	},
+
+	/**
+	 * @description Activate the transparent background "div" so that other elements are not affected during resizing.
+	 * @param {cursor} cursor cursor css property
+	 */
+	enableBackWrapper(cursor) {
+		this._backWrapper.style.cursor = cursor;
+		this._backWrapper.style.display = 'block';
+	},
+
+	/**
+	 * @description Disabled background "div"
+	 */
+	disableBackWrapper() {
+		this._backWrapper.style.display = 'none';
+		this._backWrapper.style.cursor = 'default';
 	},
 
 	/**
