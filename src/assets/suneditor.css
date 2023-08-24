@@ -1680,10 +1680,6 @@
 	background: rgba(0, 0, 0, 0);
 }
 
-.sun-editor .sun-editor-editable figure.se-scroll-figure {
-	overflow-x: auto;
-}
-
 .sun-editor .sun-editor-editable[contenteditable='true'] .se-component {
 	outline: 1px dashed #e1e1e1;
 }
