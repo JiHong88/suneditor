@@ -405,10 +405,6 @@
 	background-color: inherit;
 }
 
-.sun-editor-editable[contenteditable='true'] .se-component {
-	outline: 1px dashed #e1e1e1;
-}
-
 /* float */
 .sun-editor-editable .__se__float-left {
 	float: left;
@@ -439,39 +435,6 @@
 	width: auto;
 	height: auto;
 	max-width: 100%;
-}
-
-/*  image, video - select index  */
-.sun-editor-editable[contenteditable='true']:not(.se-read-only) figure::after {
-	position: absolute;
-	content: '';
-	z-index: 1;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	cursor: default;
-	display: block;
-	background: rgba(0, 0, 0, 0);
-}
-
-.sun-editor-editable[contenteditable='true'] figure a,
-.sun-editor-editable[contenteditable='true'] figure img,
-.sun-editor-editable[contenteditable='true'] figure iframe,
-.sun-editor-editable[contenteditable='true'] figure video {
-	z-index: 0;
-}
-
-.sun-editor-editable[contenteditable='true'] figure figcaption {
-	display: block;
-	z-index: 2;
-}
-
-.sun-editor-editable[contenteditable='true'] figure figcaption:focus {
-	border-color: #80bdff;
-	outline: 0;
-	-webkit-box-shadow: 0 0 0 0.2rem #c7deff;
-	box-shadow: 0 0 0 0.2rem #c7deff;
 }
 
 /** image, video iframe figure cover */

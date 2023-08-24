@@ -2,6 +2,8 @@ import EditorInjector from '../../editorInjector';
 import { domUtils, numbers } from '../../helper';
 import { Controller, SelectMenu } from '../../modules';
 
+const CELL_SELECT_MARGIN = 2;
+
 const Table = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -16,6 +18,10 @@ const Table = function (editor, pluginOptions) {
 	const controller_table = CreateHTML_controller_table(editor);
 	const controller_cell = CreateHTML_controller_cell(editor, this.cellControllerTop);
 	const splitMenu = CreateSplitMenu(this.lang);
+	editor.applyFrameRoots((e) => {
+		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: 'se-table-resize-line' }));
+		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: 'se-table-resize-line-prev' }));
+	});
 
 	// members
 	this.controller_table = new Controller(this, controller_table, { position: 'top' });
@@ -35,8 +41,9 @@ const Table = function (editor, pluginOptions) {
 	this.headerButton = controller_table.querySelector('._se_table_header');
 	this.mergeButton = controller_cell.querySelector('._se_table_merge_button');
 	this.insertRowAboveButton = controller_cell.querySelector('._se_table_insert_row_a');
-	this.resizeLine = domUtils.createElement('DIV', { class: 'se-table-resize-line' });
 	// members - private
+	this._resizeLine = null;
+	this._resizeLinePrev = null;
 	this._element = null;
 	this._tdElement = null;
 	this._trElement = null;
@@ -61,11 +68,15 @@ const Table = function (editor, pluginOptions) {
 	this._selectedTable = null;
 	this._ref = null;
 	// member - global events
+	this._bindMultiOn = OnCellMultiSelect.bind(this);
+	this._bindMultiOff = OffCellMultiSelect.bind(this);
+	this._bindShiftOff = OffCellShift.bind(this);
+	this._bindTouchOff = OffCellTouch.bind(this);
 	this.__globalEvents = {
-		on: OnCellMultiSelect.bind(this),
-		off: OffCellMultiSelect.bind(this),
-		shiftOff: OffCellShift.bind(this),
-		touchOff: OffCellTouch.bind(this),
+		on: null,
+		off: null,
+		shiftOff: null,
+		touchOff: null,
 		resize: null,
 		resizeStop: null,
 		resizeKeyDown: null
@@ -109,12 +120,29 @@ Table.prototype = {
 		return {
 			query: 'table',
 			method: (element) => {
-				if (element.querySelector('colgroup')) return;
+				const ColgroupEl = element.querySelector('colgroup');
+				const FigureEl = /^FIGURE$/i.test(element.parentNode?.nodeName);
+				if (ColgroupEl && FigureEl) return;
 
 				// create colgroup
-				const maxCount = GetMaxColumns(element);
-				const colGroup = domUtils.createElement(`colgroup`, null, `<col style="width: ${numbers.get(100 / maxCount, 4)}%;">`.repeat(maxCount));
-				element.insertBefore(colGroup, element.firstElementChild);
+				if (!ColgroupEl) {
+					const maxCount = GetMaxColumns(element);
+					const colGroup = domUtils.createElement(`colgroup`, null, `<col style="width: ${numbers.get(100 / maxCount, 4)}%;">`.repeat(maxCount));
+					element.insertBefore(colGroup, element.firstElementChild);
+				}
+
+				if (!FigureEl) {
+					const figure = domUtils.createElement('FIGURE', { class: 'se-non-select-figure se-scroll-figure' });
+					element.parentNode.insertBefore(figure, element);
+					figure.appendChild(element);
+				} else {
+					if (!domUtils.hasClass(FigureEl, 'se-non-select-figure')) {
+						domUtils.addClass(FigureEl, 'se-non-select-figure');
+					}
+					if (!domUtils.hasClass(FigureEl, 'se-scroll-figure')) {
+						domUtils.addClass(FigureEl, 'se-scroll-figure');
+					}
+				}
 			}
 		};
 	},
@@ -128,6 +156,27 @@ Table.prototype = {
 		this._resetTablePicker();
 	},
 
+	onMouseMove({ event }) {
+		const tableCell = domUtils.getParentElement(event.target, domUtils.isTableCell);
+		if (!tableCell) {
+			if (this._resizeLine) {
+				this._resizeLine.style.display = 'none';
+				this._resizeLine = null;
+			}
+			return;
+		}
+
+		const edge = CheckCellEdge(event, tableCell);
+		if (edge.is) {
+			this._resizeLine = this.editor.frameContext.get('wrapper').querySelector('.se-table-resize-line');
+			this._setResizeLinePosition(domUtils.getParentElement(tableCell, domUtils.isTable), tableCell, this._resizeLine, edge.isLeft);
+			this._resizeLine.style.display = 'block';
+		} else if (this._resizeLine) {
+			this._resizeLine.style.display = 'none';
+			this._resizeLine = null;
+		}
+	},
+
 	/**
 	 * @override core
 	 * @param {any} event Event object
@@ -136,20 +185,13 @@ Table.prototype = {
 		const tableCell = domUtils.getParentElement(event.target, domUtils.isTableCell);
 		if (!tableCell) return;
 
-		const SELECT_MARGIN = 2;
-		const startX = event.clientX;
-		const startWidth = numbers.get(getComputedStyle(tableCell).width, 4);
-		const rect = tableCell.getBoundingClientRect();
-		const offsetX = startX - rect.left;
-		const isLeftEdge = offsetX <= SELECT_MARGIN;
-		const isEdge = isLeftEdge || startWidth - offsetX <= SELECT_MARGIN;
-
-		if (isEdge) {
+		const edge = CheckCellEdge(event, tableCell);
+		if (edge.is) {
 			this._deleteStyleSelectedCells();
 			this.setCellInfo(tableCell, true);
-			const colIndex = this._logical_cellIndex - (isLeftEdge ? 1 : 0);
+			const colIndex = this._logical_cellIndex - (edge.isLeft ? 1 : 0);
 			const col = this._element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
-			this._startCellResizing(col, startX, startWidth, isLeftEdge);
+			this._startCellResizing(col, edge.startX, numbers.get(getComputedStyle(col).width, 4), edge.isLeft);
 		} else {
 			if (!(tableCell !== this._fixedCell && !this._shift)) return;
 			this.selectCells(tableCell, false);
@@ -325,14 +367,14 @@ Table.prototype = {
 		domUtils.addClass(tdElement, 'se-table-selected-cell');
 
 		if (!shift) {
-			this.__globalEvents.on = this.eventManager.addGlobalEvent('mousemove', this.__globalEvents.on, false);
+			this.__globalEvents.on = this.eventManager.addGlobalEvent('mousemove', this._bindMultiOn, false);
 		} else {
-			this.__globalEvents.shiftOff = this.eventManager.addGlobalEvent('keyup', this.__globalEvents.shiftOff, false);
-			this.__globalEvents.on = this.eventManager.addGlobalEvent('mousedown', this.__globalEvents.on, false);
+			this.__globalEvents.shiftOff = this.eventManager.addGlobalEvent('keyup', this._bindShiftOff, false);
+			this.__globalEvents.on = this.eventManager.addGlobalEvent('mousedown', this._bindMultiOn, false);
 		}
 
-		this.__globalEvents.off = this.eventManager.addGlobalEvent('mouseup', this.__globalEvents.off, false);
-		this.__globalEvents.touchOff = this.eventManager.addGlobalEvent('touchmove', this.__globalEvents.touchOff, false);
+		this.__globalEvents.off = this.eventManager.addGlobalEvent('mouseup', this._bindMultiOff, false);
+		this.__globalEvents.touchOff = this.eventManager.addGlobalEvent('touchmove', this._bindTouchOff, false);
 	},
 
 	setCellInfo(tdElement, reset) {
@@ -948,16 +990,15 @@ Table.prototype = {
 
 	_startCellResizing(col, startX, startWidth, isLeftEdge) {
 		this.editor.enableBackWrapper('ew-resize');
+		if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector('.se-table-resize-line');
 
-		const tableEl = this._element;
-		const tdEl = this._tdElement;
-		this._setResizeLinePosition(tableEl, tdEl, this.resizeLine, isLeftEdge);
-		this.resizeLine.style.display = 'block';
-		tableEl.parentNode.appendChild(this.resizeLine);
+		this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector('.se-table-resize-line-prev');
+		this._setResizeLinePosition(this._element, this._tdElement, this._resizeLinePrev, isLeftEdge);
+		this._resizeLinePrev.style.display = 'block';
 
 		this.__globalEvents.resize = this.eventManager.addGlobalEvent(
 			'mousemove',
-			this._cellResize.bind(this, col, tableEl, tdEl, this.resizeLine, isLeftEdge, startX, startWidth, tableEl.offsetWidth),
+			this._cellResize.bind(this, col, this._element, this._tdElement, this._resizeLine, isLeftEdge, startX, startWidth, this._element.offsetWidth),
 			false
 		);
 		this.__globalEvents.resizeStop = this.eventManager.addGlobalEvent('mouseup', this.__removeGlobalEvents.bind(this), false);
@@ -1132,7 +1173,14 @@ Table.prototype = {
 
 	__removeGlobalEvents() {
 		this.editor.disableBackWrapper();
-		domUtils.removeItem(this.resizeLine);
+		if (this._resizeLine) {
+			this._resizeLine.style.display = 'none';
+			this._resizeLine = null;
+		}
+		if (this._resizeLinePrev) {
+			this._resizeLinePrev.style.display = 'none';
+			this._resizeLinePrev = null;
+		}
 		const globalEvents = this.__globalEvents;
 		for (const k in globalEvents) {
 			if (globalEvents[k]) globalEvents[k] = this.eventManager.removeGlobalEvent(globalEvents[k]);
@@ -1141,6 +1189,21 @@ Table.prototype = {
 
 	constructor: Table
 };
+
+function CheckCellEdge(event, tableCell) {
+	const startX = event.clientX;
+	const startWidth = numbers.get(getComputedStyle(tableCell).width, 4);
+	const rect = tableCell.getBoundingClientRect();
+	const offsetX = Math.round(startX - rect.left);
+	const isLeft = offsetX <= CELL_SELECT_MARGIN;
+	const is = isLeft || startWidth - offsetX <= CELL_SELECT_MARGIN;
+
+	return {
+		is,
+		isLeft,
+		startX
+	};
+}
 
 function OnSplitCells(direction) {
 	const vertical = direction === 'vertical';

@@ -301,11 +301,18 @@ class domUtils {
 	isListCell(node: string | Node): boolean;
 
 	/**
-	 * @description Check the node is a table (table, thead, tbody, tr, th, td)
+	 * @description Check the node is a table
 	 * @param node The element or element name to check
 	 * @returns
 	 */
 	isTable(node: string | Node): boolean;
+
+	/**
+	 * @description Check the node is a table elements. (table, thead, tbody, tr, th, td)
+	 * @param node The element or element name to check
+	 * @returns
+	 */
+	isTableElements(node: string | Node): boolean;
 
 	/**
 	 * @description Check the node is a table cell (td, th)

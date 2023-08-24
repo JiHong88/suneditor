@@ -293,7 +293,7 @@ Format.prototype = {
 		const lineArr = [];
 		const removeItems = (parent, origin, before) => {
 			let cc = null;
-			if (parent !== origin && !domUtils.isTable(origin)) {
+			if (parent !== origin && !domUtils.isTableElements(origin)) {
 				if (origin && domUtils.getNodeDepth(parent) === domUtils.getNodeDepth(origin)) return before;
 				cc = this.nodeTransform.removeAllParents(origin, null, parent);
 			}
@@ -1540,13 +1540,13 @@ Format.prototype = {
 		let endIdx = null;
 
 		const onlyTable = function (current) {
-			return domUtils.isTable(current) ? /^TABLE$/i.test(current.nodeName) : true;
+			return domUtils.isTableElements(current) ? /^TABLE$/i.test(current.nodeName) : true;
 		};
 
 		let startRangeEl = this.getBlock(startLine, onlyTable);
 		let endRangeEl = this.getBlock(endLine, onlyTable);
-		if (domUtils.isTable(startRangeEl) && domUtils.isListCell(startRangeEl.parentNode)) startRangeEl = startRangeEl.parentNode;
-		if (domUtils.isTable(endRangeEl) && domUtils.isListCell(endRangeEl.parentNode)) endRangeEl = endRangeEl.parentNode;
+		if (domUtils.isTableElements(startRangeEl) && domUtils.isListCell(startRangeEl.parentNode)) startRangeEl = startRangeEl.parentNode;
+		if (domUtils.isTableElements(endRangeEl) && domUtils.isListCell(endRangeEl.parentNode)) endRangeEl = endRangeEl.parentNode;
 
 		const sameRange = startRangeEl === endRangeEl;
 		for (let i = 0, len = lineNodes.length, line; i < len; i++) {
@@ -1578,7 +1578,7 @@ Format.prototype = {
 	getLinesAndComponents(removeDuplicate) {
 		const commonCon = this.selection.getRange().commonAncestorContainer;
 		const myComponent = domUtils.getParentElement(commonCon, this.component.is.bind(this.component));
-		const selectedLines = domUtils.isTable(commonCon)
+		const selectedLines = domUtils.isTableElements(commonCon)
 			? this.getLines(null)
 			: this.getLines((current) => {
 					const component = domUtils.getParentElement(current, this.component.is.bind(this.component));

@@ -17,7 +17,7 @@ export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFram
 		['originElement', editorTarget.target],
 		['topArea', top],
 		['container', top.querySelector('.se-container')],
-		['editorArea', top.querySelector('.se-wrapper')],
+		['wrapper', top.querySelector('.se-wrapper')],
 		['wysiwygFrame', wwFrame],
 		['wysiwyg', wwFrame], // options.iframe ? wwFrame.contentDocument.body : wwFrame
 		['code', codeFrame],

@@ -29,7 +29,7 @@ const Controller = function (inst, element, params, _name) {
 	this.__offset = {};
 
 	// add element
-	this.editor._carrierWrapper.appendChild(element);
+	this.carrierWrapper.appendChild(element);
 
 	// init
 	this.eventManager.addEvent(element, 'click', Action.bind(this));

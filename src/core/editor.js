@@ -56,8 +56,7 @@ const Editor = function (multiTargets, options) {
 	/**
 	 * @description Controllers carrier
 	 */
-	this._carrierWrapper = product.carrierWrapper;
-	this._backWrapper = product.carrierWrapper.querySelector('.se-back-wrapper');
+	this.carrierWrapper = product.carrierWrapper;
 
 	/**
 	 * @description Editor options
@@ -164,7 +163,7 @@ const Editor = function (multiTargets, options) {
 	 */
 	this.effectNode = null;
 
-	// ----- private properties -----
+	// ------------------------------------------------------- private properties -------------------------------------------------------
 	/**
 	 * @description Closest ShadowRoot to editor if found
 	 * @type {ShadowRoot}
@@ -188,6 +187,7 @@ const Editor = function (multiTargets, options) {
 	this._controllerOnDisabledButtons = [];
 	this._codeViewDisabledButtons = [];
 	this._controllerTargetContext = null;
+	this._backWrapper = product.carrierWrapper.querySelector('.se-back-wrapper');
 
 	/**
 	 * @description Button List in Responsive Toolbar.
@@ -487,12 +487,12 @@ Editor.prototype = {
 			this.applyFrameRoots((e) => {
 				domUtils.addClass([e.get('topArea'), e.get('wysiwyg')], 'se-rtl');
 			});
-			domUtils.addClass([this._carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
+			domUtils.addClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 		} else {
 			this.applyFrameRoots((e) => {
 				domUtils.removeClass([e.get('topArea'), e.get('wysiwyg')], 'se-rtl');
 			});
-			domUtils.removeClass([this._carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
+			domUtils.removeClass([this.carrierWrapper, toolbarWrapper, statusbarWrapper], 'se-rtl');
 		}
 
 		const lineNodes = domUtils.getListChildren(fc.wysiwyg, (current) => {
@@ -896,7 +896,7 @@ Editor.prototype = {
 	 * @param {string|undefined} rootKey Root key
 	 */
 	showLoading(rootKey) {
-		(rootKey ? this.frameRoots.get(rootKey).get('container') : this._carrierWrapper).querySelector('.se-loading-box').style.display = 'block';
+		(rootKey ? this.frameRoots.get(rootKey).get('container') : this.carrierWrapper).querySelector('.se-loading-box').style.display = 'block';
 	},
 
 	/**
@@ -904,7 +904,7 @@ Editor.prototype = {
 	 * @param {string|undefined} rootKey Root key
 	 */
 	hideLoading(rootKey) {
-		(rootKey ? this.frameRoots.get(rootKey).get('container') : this._carrierWrapper).querySelector('.se-loading-box').style.display = 'none';
+		(rootKey ? this.frameRoots.get(rootKey).get('container') : this.carrierWrapper).querySelector('.se-loading-box').style.display = 'none';
 	},
 
 	/**
@@ -940,7 +940,7 @@ Editor.prototype = {
 		}
 
 		/** remove element */
-		domUtils.removeItem(this._carrierWrapper);
+		domUtils.removeItem(this.carrierWrapper);
 		domUtils.removeItem(this.context.get('toolbar._wrapper'));
 		domUtils.removeItem(this.context.get('toolbar.sub._wrapper'));
 		domUtils.removeItem(this.context.get('statusbar._wrapper'));
@@ -1498,7 +1498,7 @@ Editor.prototype = {
 				});
 			}
 
-			e.get('editorArea').appendChild(e.get('wysiwygFrame'));
+			e.get('wrapper').appendChild(e.get('wysiwygFrame'));
 		});
 
 		if (!iframeRootSize) {

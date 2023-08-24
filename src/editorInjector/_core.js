@@ -10,6 +10,7 @@ function CoreInjector(editor) {
 	this.eventManager = editor.eventManager;
 	this.history = editor.history;
 	this.events = editor.events;
+	this.carrierWrapper = editor.carrierWrapper;
 	// environment variables
 	this.plugins = editor.plugins;
 	this.status = editor.status;

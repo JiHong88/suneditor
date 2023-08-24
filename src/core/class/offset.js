@@ -17,7 +17,7 @@ const Offset = function (editor) {
 
 Offset.prototype = {
 	/**
-	 * @description Returns the position of the argument, "this.editor.frameContext.get('editorArea')" to inside the editor.Returns the position of the element in "this.editor.frameContext.get('editorArea')".
+	 * @description Returns the position of the argument, "this.editor.frameContext.get('wrapper')" to inside the editor.Returns the position of the element in "this.editor.frameContext.get('wrapper')".
 	 * @param {Node} node Target node
 	 * @returns {{top:boolean, left:boolean}}
 	 */
@@ -69,7 +69,7 @@ Offset.prototype = {
 		}
 
 		if (!targetAbs && !isTop && /^iframe$/i.test(this.editor.frameContext.get('wysiwygFrame').nodeName)) {
-			element = this.editor.frameContext.get('editorArea');
+			element = this.editor.frameContext.get('wrapper');
 			while (element) {
 				t += element.offsetTop;
 				l += element.offsetLeft;
@@ -139,7 +139,7 @@ Offset.prototype = {
 		}
 
 		if (!targetAbs && !isTop && /^iframe$/i.test(this.editor.frameContext.get('wysiwygFrame').nodeName)) {
-			el = this.editor.frameContext.get('editorArea');
+			el = this.editor.frameContext.get('wrapper');
 			ohOffsetEl = owOffsetEl = topArea;
 			while (el) {
 				t += el.scrollTop;

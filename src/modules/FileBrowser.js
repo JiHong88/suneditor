@@ -50,7 +50,7 @@ const FileBrowser = function (inst, params) {
 	// init
 	browserFrame.appendChild(domUtils.createElement('DIV', { class: 'se-file-browser-back' }));
 	browserFrame.appendChild(content);
-	this.editor._carrierWrapper.appendChild(browserFrame);
+	this.carrierWrapper.appendChild(browserFrame);
 
 	this.eventManager.addEvent(this.tagArea, 'click', OnClickTag.bind(this));
 	this.eventManager.addEvent(this.list, 'click', OnClickFile.bind(this));

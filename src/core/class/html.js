@@ -1122,7 +1122,7 @@ HTML.prototype = {
 			// empty tags
 			const nrtag = !domUtils.getParentElement(current, domUtils.isExcludeFormat);
 			if (
-				!domUtils.isTable(current) &&
+				!domUtils.isTableElements(current) &&
 				!domUtils.isListCell(current) &&
 				!domUtils.isAnchor(current) &&
 				(this.format.isLine(current) || this.format.isBlock(current) || this.format.isTextStyleNode(current)) &&
@@ -1295,7 +1295,7 @@ HTML.prototype = {
 					html += node.outerHTML;
 				} else if (this.format.isLine(node)) {
 					html += '<li>' + (node.innerHTML.trim() || '<br>') + '</li>';
-				} else if (this.format.isBlock(node) && !domUtils.isTable(node)) {
+				} else if (this.format.isBlock(node) && !domUtils.isTableElements(node)) {
 					html += this._convertListCell(node);
 				} else {
 					html += '<li>' + node.outerHTML + '</li>';

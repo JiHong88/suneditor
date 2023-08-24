@@ -150,7 +150,7 @@ Toolbar.prototype = {
 		if (this.editor.frameContext.get('isFullScreen') || toolbar.offsetWidth === 0 || this.options.get('toolbar_sticky') < 0) return;
 
 		const minHeight = this.editor.frameContext.get('_minHeight');
-		const editorHeight = this.editor.frameContext.get('editorArea').offsetHeight;
+		const editorHeight = this.editor.frameContext.get('wrapper').offsetHeight;
 		const editorOffset = this.offset.getGlobal(this.editor.frameContext.get('topArea'));
 		const y = (this._w.scrollY || this._d.documentElement.scrollTop) + this.options.get('toolbar_sticky');
 		const t =
@@ -192,7 +192,7 @@ Toolbar.prototype = {
 		const toolbar = this.context.get(this.keyName + '.main');
 		toolbar.style.top = this._isInline ? this._inlineToolbarAttr.top : '';
 		toolbar.style.width = this._isInline ? this._inlineToolbarAttr.width : '';
-		this.editor.frameContext.get('editorArea').style.marginTop = '';
+		this.editor.frameContext.get('wrapper').style.marginTop = '';
 
 		domUtils.removeClass(toolbar, 'se-toolbar-sticky');
 		this._sticky = false;

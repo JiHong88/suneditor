@@ -147,9 +147,9 @@ NodeTransform.prototype = {
 				if (!child) break;
 				if (
 					(onlyText && inst.format._isIgnoreNodeChange(child)) ||
-					(!onlyText && (domUtils.isTable(child) || domUtils.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrLine(child))))
+					(!onlyText && (domUtils.isTableElements(child) || domUtils.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrLine(child))))
 				) {
-					if (domUtils.isTable(child) || domUtils.isListCell(child)) {
+					if (domUtils.isTableElements(child) || domUtils.isListCell(child)) {
 						recursionFunc(child, depth + 1, i);
 					}
 					continue;

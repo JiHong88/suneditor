@@ -781,11 +781,20 @@ export function isListCell(node) {
 }
 
 /**
- * @description Check the node is a table (table, thead, tbody, tr, th, td)
+ * @description Check the node is a table
  * @param {Node|string} node The element or element name to check
  * @returns {boolean}
  */
 export function isTable(node) {
+	return /^TABLE$/i.test(typeof node === 'string' ? node : node?.nodeName);
+}
+
+/**
+ * @description Check the node is a table elements. (table, thead, tbody, tr, th, td)
+ * @param {Node|string} node The element or element name to check
+ * @returns {boolean}
+ */
+export function isTableElements(node) {
 	return /^(TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(typeof node === 'string' ? node : node?.nodeName);
 }
 
@@ -946,6 +955,7 @@ const domUtils = {
 	isList,
 	isListCell,
 	isTable,
+	isTableElements,
 	isTableCell,
 	isBreak,
 	isAnchor,

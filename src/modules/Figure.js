@@ -72,7 +72,7 @@ const Figure = function (inst, controls, params) {
 	this.eventManager.addEvent(this.alignButton, 'click', OnClick_alignButton.bind(this));
 	this.eventManager.addEvent(this.resizeButton, 'click', OnClick_resizeButton.bind(this));
 	this.editor.applyFrameRoots((e) => {
-		if (!e.get('editorArea').querySelector('.se-controller.se-resizing-container')) {
+		if (!e.get('wrapper').querySelector('.se-controller.se-resizing-container')) {
 			const main = CreateHTML_resizeDot();
 			const handles = main.querySelectorAll('.se-resize-dot > span');
 			e.set('_figure', {
@@ -81,7 +81,7 @@ const Figure = function (inst, controls, params) {
 				display: main.querySelector('.se-resize-display'),
 				handles: handles
 			});
-			e.get('editorArea').appendChild(main);
+			e.get('wrapper').appendChild(main);
 			this.eventManager.addEvent(handles, 'mousedown', OnResizeContainer.bind(this));
 		}
 	});

@@ -118,7 +118,7 @@ Viewer.prototype = {
 		fc.set('isFullScreen', value);
 		const topArea = fc.get('topArea');
 		const toolbar = this.context.get('toolbar.main');
-		const editorArea = fc.get('editorArea');
+		const editorArea = fc.get('wrapper');
 		const wysiwygFrame = fc.get('wysiwygFrame');
 		const codeFrame = fc.get('code');
 		const isCodeView = this.editor.frameContext.get('isCodeView');
@@ -396,7 +396,7 @@ Viewer.prototype = {
 				this.context.get('toolbar.main').offsetHeight -
 				(this.editor.frameContext.has('statusbar') ? this.editor.frameContext.get('statusbar').offsetHeight : 0) -
 				this.fullScreenInnerHeight;
-			this.editor.frameContext.get('editorArea').style.height = this.fullScreenInnerHeight + 'px';
+			this.editor.frameContext.get('wrapper').style.height = this.fullScreenInnerHeight + 'px';
 			return true;
 		}
 	},
