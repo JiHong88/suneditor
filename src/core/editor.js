@@ -473,6 +473,8 @@ Editor.prototype = {
 		const rtl = dir === 'rtl';
 		if (this.options.get('_rtl') === rtl) return;
 
+		this._offCurrentController();
+
 		const fc = this.frameContext;
 		this.options.set('_rtl', rtl);
 

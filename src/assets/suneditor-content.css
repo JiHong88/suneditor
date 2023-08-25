@@ -452,8 +452,20 @@
 	margin: 0;
 }
 
+.sun-editor-editable figure.se-scroll-figure-x {
+	overflow-x: auto;
+	padding-left: 1px;
+	padding-right: 1px;
+}
+.sun-editor-editable figure.se-scroll-figure-y {
+	overflow-y: auto;
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
 .sun-editor-editable figure.se-scroll-figure {
 	overflow-x: auto;
+	overflow-y: auto;
+	padding: 1px;
 }
 
 .sun-editor-editable .__se__float-left figure,

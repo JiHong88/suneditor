@@ -3,6 +3,7 @@ import { domUtils, numbers } from '../../helper';
 import { Controller, SelectMenu } from '../../modules';
 
 const CELL_SELECT_MARGIN = 2;
+const CELL_DECIMAL_END = 1;
 
 const Table = function (editor, pluginOptions) {
 	// plugin bisic properties
@@ -102,10 +103,13 @@ Table.prototype = {
 		const y = this._tableXY[1];
 
 		const body = `<tbody>${`<tr>${CreateCells('td', x, false)}</tr>`.repeat(y)}</tbody>`;
-		const colGroup = `<colgroup>${`<col style="width: ${numbers.get(100 / x, 4)}%;">`.repeat(x)}</colgroup>`;
+		const colGroup = `<colgroup>${`<col style="width: ${numbers.get(100 / x, CELL_DECIMAL_END)}%;">`.repeat(x)}</colgroup>`;
 		oTable.innerHTML = colGroup + body;
 
-		if (this.component.insert(oTable, false, false)) {
+		const figure = domUtils.createElement('FIGURE', { class: 'se-non-select-figure se-scroll-figure-x' });
+		figure.appendChild(oTable);
+
+		if (this.component.insert(figure, false, false)) {
 			const firstTd = oTable.querySelector('td div');
 			this.selection.setRange(firstTd, 0, firstTd, 0);
 			this._resetTablePicker();
@@ -121,26 +125,27 @@ Table.prototype = {
 			query: 'table',
 			method: (element) => {
 				const ColgroupEl = element.querySelector('colgroup');
-				const FigureEl = /^FIGURE$/i.test(element.parentNode?.nodeName);
+				const FigureEl = /^FIGURE$/i.test(element.parentNode?.nodeName) ? element.parentNode : null;
 				if (ColgroupEl && FigureEl) return;
 
 				// create colgroup
 				if (!ColgroupEl) {
 					const maxCount = GetMaxColumns(element);
-					const colGroup = domUtils.createElement(`colgroup`, null, `<col style="width: ${numbers.get(100 / maxCount, 4)}%;">`.repeat(maxCount));
+					const colGroup = domUtils.createElement(`colgroup`, null, `<col style="width: ${numbers.get(100 / maxCount, CELL_DECIMAL_END)}%;">`.repeat(maxCount));
 					element.insertBefore(colGroup, element.firstElementChild);
 				}
 
+				// figure
 				if (!FigureEl) {
-					const figure = domUtils.createElement('FIGURE', { class: 'se-non-select-figure se-scroll-figure' });
+					const figure = domUtils.createElement('FIGURE', { class: 'se-non-select-figure se-scroll-figure-x' });
 					element.parentNode.insertBefore(figure, element);
 					figure.appendChild(element);
 				} else {
 					if (!domUtils.hasClass(FigureEl, 'se-non-select-figure')) {
 						domUtils.addClass(FigureEl, 'se-non-select-figure');
 					}
-					if (!domUtils.hasClass(FigureEl, 'se-scroll-figure')) {
-						domUtils.addClass(FigureEl, 'se-scroll-figure');
+					if (!domUtils.hasClass(FigureEl, 'se-scroll-figure-x')) {
+						domUtils.addClass(FigureEl, 'se-scroll-figure-x');
 					}
 				}
 			}
@@ -159,10 +164,7 @@ Table.prototype = {
 	onMouseMove({ event }) {
 		const tableCell = domUtils.getParentElement(event.target, domUtils.isTableCell);
 		if (!tableCell) {
-			if (this._resizeLine) {
-				this._resizeLine.style.display = 'none';
-				this._resizeLine = null;
-			}
+			this.__hideResizeLine();
 			return;
 		}
 
@@ -171,9 +173,8 @@ Table.prototype = {
 			this._resizeLine = this.editor.frameContext.get('wrapper').querySelector('.se-table-resize-line');
 			this._setResizeLinePosition(domUtils.getParentElement(tableCell, domUtils.isTable), tableCell, this._resizeLine, edge.isLeft);
 			this._resizeLine.style.display = 'block';
-		} else if (this._resizeLine) {
-			this._resizeLine.style.display = 'none';
-			this._resizeLine = null;
+		} else {
+			this.__hideResizeLine();
 		}
 	},
 
@@ -191,7 +192,7 @@ Table.prototype = {
 			this.setCellInfo(tableCell, true);
 			const colIndex = this._logical_cellIndex - (edge.isLeft ? 1 : 0);
 			const col = this._element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
-			this._startCellResizing(col, edge.startX, numbers.get(getComputedStyle(col).width, 4), edge.isLeft);
+			this._startCellResizing(col, edge.startX, numbers.get(getComputedStyle(col).width, CELL_DECIMAL_END), edge.isLeft);
 		} else {
 			if (!(tableCell !== this._fixedCell && !this._shift)) return;
 			this.selectCells(tableCell, false);
@@ -1171,12 +1172,16 @@ Table.prototype = {
 		this.controller_cell.close();
 	},
 
-	__removeGlobalEvents() {
-		this.editor.disableBackWrapper();
+	__hideResizeLine() {
 		if (this._resizeLine) {
 			this._resizeLine.style.display = 'none';
 			this._resizeLine = null;
 		}
+	},
+
+	__removeGlobalEvents() {
+		this.editor.disableBackWrapper();
+		this.__hideResizeLine();
 		if (this._resizeLinePrev) {
 			this._resizeLinePrev.style.display = 'none';
 			this._resizeLinePrev = null;
@@ -1192,7 +1197,7 @@ Table.prototype = {
 
 function CheckCellEdge(event, tableCell) {
 	const startX = event.clientX;
-	const startWidth = numbers.get(getComputedStyle(tableCell).width, 4);
+	const startWidth = numbers.get(getComputedStyle(tableCell).width, CELL_DECIMAL_END);
 	const rect = tableCell.getBoundingClientRect();
 	const offsetX = Math.round(startX - rect.left);
 	const isLeft = offsetX <= CELL_SELECT_MARGIN;

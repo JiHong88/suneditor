@@ -28,8 +28,8 @@ Offset.prototype = {
 		const wysiwyg = getParentElement(node, isWysiwygFrame.bind(this));
 
 		while (offsetElement && !hasClass(offsetElement, 'se-wrapper') && offsetElement !== wysiwyg) {
-			offsetLeft += offsetElement.offsetLeft;
-			offsetTop += offsetElement.offsetTop;
+			offsetLeft += offsetElement.offsetLeft - offsetElement.scrollLeft;
+			offsetTop += offsetElement.offsetTop - offsetElement.scrollTop;
 			offsetElement = offsetElement.offsetParent;
 		}
 
@@ -60,11 +60,15 @@ Offset.prototype = {
 		const w = element.offsetWidth;
 		const h = element.offsetHeight;
 		let t = 0,
-			l = 0;
+			l = 0,
+			st = 0,
+			sl = 0;
 
 		while (element) {
 			t += element.offsetTop;
 			l += element.offsetLeft;
+			st += element.scrollTop;
+			sl += element.scrollLeft;
 			element = element.offsetParent;
 		}
 
@@ -78,10 +82,12 @@ Offset.prototype = {
 		}
 
 		return {
-			top: t,
-			left: l,
+			top: t + st,
+			left: l + sl,
 			width: w,
-			height: h
+			height: h,
+			scrollTop: st,
+			scrollLeft: sl
 		};
 	},
 
@@ -304,8 +310,9 @@ Offset.prototype = {
 		};
 		const position = params.position || 'bottom';
 		const inst = params.inst;
+		const isLTR = !this.options.get('_rtl');
 
-		if (this.options.get('_rtl')) {
+		if (!isLTR) {
 			addOffset.left *= -1;
 		}
 
@@ -349,8 +356,11 @@ Offset.prototype = {
 			let etmb = tmb < 0 || emb < 0 || targetScroll.heightEditorRefer || (tmb >= 0 && emb >= 0 && emb > tmb) ? tmb : tmb - emb;
 			etmb = vb < 0 && vb < etmb ? vb : etmb;
 			// marging result
-			rmt = (etmt < tmtw ? etmt : tmtw) - ((this.editor.toolbar._sticky && emt < this.context.get('toolbar.main').getBoundingClientRect().bottom) || toolbarH);
-			rmb = etmb < tmbw ? etmb : tmbw;
+			rmt =
+				(etmt < tmtw ? etmt : tmtw) -
+				((this.editor.toolbar._sticky && emt < this.context.get('toolbar.main').getBoundingClientRect().bottom) || toolbarH) +
+				(!isLTR ? -targetOffset.scrollTop : 0);
+			rmb = (etmb < tmbw ? etmb : tmbw) + (isLTR ? targetOffset.scrollTop : 0);
 		}
 
 		if (rmb + targetH <= 0 || rmt + targetH <= 0) return;
@@ -416,8 +426,8 @@ Offset.prototype = {
 			let etmr = emr < 0 || tmr < 0 || targetScroll.widthEditorRefer || (tmr >= 0 && emr >= 0 && emr > tmr) ? tmr : tmr - emr;
 			etmr = vr < 0 && vr < etmr ? vr : etmr;
 			// margin result
-			rml = etml < tmlw ? etml : tmlw;
-			rmr = etmr < tmrw ? etmr : tmrw;
+			rml = (etml < tmlw ? etml : tmlw) + (!isLTR ? -targetOffset.scrollLeft : 0);
+			rmr = (etmr < tmrw ? etmr : tmrw) + (isLTR ? targetOffset.scrollLeft : 0);
 		}
 
 		if (rml + targetW <= 0 || rmr + targetW <= 0) return;
@@ -430,7 +440,7 @@ Offset.prototype = {
 		let x = 0;
 		let ax = 0;
 		let awLimit = 0;
-		if (!this.options.get('_rtl')) {
+		if (isLTR) {
 			l += targetRect.left + window.scrollX - (rml < 0 ? rml : 0);
 			x = targetW + rml;
 			if (x < aw) {

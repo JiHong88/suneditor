@@ -352,6 +352,58 @@ export function getParentElement(element, query) {
 }
 
 /**
+ * @description Gets all ancestors of the argument value.
+ * Get all tags that satisfy the query condition.
+ * Returned in an array in order.
+ * @param {Node} element Reference element
+ * @param {string|Function|Node} query Query String (nodeName, .className, #ID, :name) or validation function.
+ * Not use it like jquery.
+ * Only one condition can be entered at a time.
+ * @returns {Element|null}
+ */
+export function getParentElements(element, query) {
+	let check;
+
+	if (typeof query === 'function') {
+		check = query;
+	} else if (typeof query === 'object') {
+		check = function (current) {
+			return current === query;
+		};
+	} else {
+		let attr;
+		if (/^\./.test(query)) {
+			attr = 'className';
+			query = '(\\s|^)' + query.split('.')[1] + '(\\s|$)';
+		} else if (/^#/.test(query)) {
+			attr = 'id';
+			query = '^' + query.split('#')[1] + '$';
+		} else if (/^:/.test(query)) {
+			attr = 'name';
+			query = '^' + query.split(':')[1] + '$';
+		} else {
+			attr = 'nodeName';
+			query = '^' + query + '$';
+		}
+
+		const regExp = new RegExp(query, 'i');
+		check = function (el) {
+			return regExp.test(el[attr]);
+		};
+	}
+
+	const elementList = [];
+	while (element && !isWysiwygFrame(element)) {
+		if (check(element)) {
+			elementList.push(element);
+		}
+		element = element.parentNode;
+	}
+
+	return elementList;
+}
+
+/**
  * @description Gets the element with "data-command" attribute among the parent elements.
  * @param {Element} target Target element
  * @returns {Element|null}
@@ -672,7 +724,8 @@ export function setDisabled(buttonList, disabled, important) {
  */
 export function hasClass(element, className) {
 	if (!element) return;
-	return new RegExp(className).test(element.className);
+	const check = new RegExp(`(\\s|^)${className}(\\s|$)`);
+	return check.test(element.className);
 }
 
 /**
@@ -929,6 +982,7 @@ const domUtils = {
 	sortNodeByDepth,
 	compareElements,
 	getParentElement,
+	getParentElements,
 	getCommandTarget,
 	getEdgeChild,
 	getEdgeChildNodes,
