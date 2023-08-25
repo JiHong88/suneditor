@@ -452,6 +452,10 @@
 	margin: 0;
 }
 
+.sun-editor-editable figure.se-non-select-figure {
+	margin: 0 0 10px;
+}
+
 .sun-editor-editable figure.se-scroll-figure-x {
 	overflow-x: auto;
 	padding-left: 1px;
@@ -462,7 +466,7 @@
 	padding-top: 1px;
 	padding-bottom: 1px;
 }
-.sun-editor-editable figure.se-scroll-figure {
+.sun-editor-editable figure.se-scroll-figure-xy {
 	overflow-x: auto;
 	overflow-y: auto;
 	padding: 1px;

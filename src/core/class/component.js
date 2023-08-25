@@ -175,7 +175,7 @@ Component.prototype = {
 
 	/**
 	 * @description Set line breaker of component
-	 * @param {Element} element Element tag (img, iframe, video)
+	 * @param {Element} element Element tag
 	 * @private
 	 */
 	_setComponentLineBreaker(element) {
@@ -189,18 +189,19 @@ Component.prototype = {
 
 		const yScroll = wysiwyg.scrollY || wysiwyg.scrollTop || 0;
 		const wScroll = wysiwyg.scrollX || wysiwyg.scrollLeft || 0;
-		const container = info.container;
+		const container = info.container || info.cover;
 		const t_style = fc.get('lineBreaker_t').style;
 		const b_style = fc.get('lineBreaker_b').style;
-		const target = this.editor._figureContainer?.style.display === 'block' ? this.editor._figureContainer : element;
+		const offsetTarget = container.offsetWidth < element.offsetWidth ? container : element;
+		const target = this.editor._figureContainer?.style.display === 'block' ? this.editor._figureContainer : offsetTarget;
 		const toolbarH = this.editor.isClassic && !this.options.get('toolbar_container') ? this.context.get('toolbar.main').offsetHeight : 0;
-
 		const isList = domUtils.isListCell(container.parentNode);
+
 		let componentTop, w;
 		// top
 		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
 			this.eventManager._lineBreakComp = container;
-			componentTop = this.offset.get(element).top + yScroll;
+			componentTop = this.offset.get(offsetTarget).top + yScroll;
 			w = target.offsetWidth / 2 / 2;
 
 			fc.get('lineBreaker_t').setAttribute('data-offset', componentTop - 12 + ',' + (this.offset.get(target).left + wScroll + w));
@@ -214,7 +215,7 @@ Component.prototype = {
 		if (isList ? !container.nextSibling : !this.format.isLine(container.nextElementSibling)) {
 			if (!componentTop) {
 				this.eventManager._lineBreakComp = container;
-				componentTop = this.offset.get(element).top + yScroll;
+				componentTop = this.offset.get(offsetTarget).top + yScroll;
 				w = target.offsetWidth / 2 / 2;
 			}
 

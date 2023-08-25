@@ -26,10 +26,11 @@ Offset.prototype = {
 		let offsetTop = 0;
 		let offsetElement = node.nodeType === 3 ? node.parentElement : node;
 		const wysiwyg = getParentElement(node, isWysiwygFrame.bind(this));
+		const self = offsetElement;
 
 		while (offsetElement && !hasClass(offsetElement, 'se-wrapper') && offsetElement !== wysiwyg) {
-			offsetLeft += offsetElement.offsetLeft - offsetElement.scrollLeft;
-			offsetTop += offsetElement.offsetTop - offsetElement.scrollTop;
+			offsetLeft += offsetElement.offsetLeft - (self !== offsetElement ? offsetElement.scrollLeft : 0);
+			offsetTop += offsetElement.offsetTop + (self !== offsetElement ? offsetElement.scrollTop : 0);
 			offsetElement = offsetElement.offsetParent;
 		}
 

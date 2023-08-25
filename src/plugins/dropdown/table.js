@@ -11,8 +11,12 @@ const Table = function (editor, pluginOptions) {
 	this.title = this.lang.table;
 	this.icon = 'table';
 
-	// create HTML
+	// pluginOptions options
 	const controllerPosition = typeof pluginOptions.cellControllerPosition === 'string' ? pluginOptions.cellControllerPosition.toLowerCase() : 'cell';
+	this.figureScroll = typeof pluginOptions.scrollType === 'string' ? pluginOptions.scrollType.toLowerCase() : 'x';
+	this.figureScrollList = ['se-scroll-figure-xy', 'se-scroll-figure-x', 'se-scroll-figure-y'];
+
+	// create HTML
 	this.cellControllerTop = controllerPosition === 'top';
 	const menu = CreateHTML(editor);
 	const commandArea = menu.querySelector('.se-controller-table-picker');
@@ -106,7 +110,7 @@ Table.prototype = {
 		const colGroup = `<colgroup>${`<col style="width: ${numbers.get(100 / x, CELL_DECIMAL_END)}%;">`.repeat(x)}</colgroup>`;
 		oTable.innerHTML = colGroup + body;
 
-		const figure = domUtils.createElement('FIGURE', { class: 'se-non-select-figure se-scroll-figure-x' });
+		const figure = domUtils.createElement('FIGURE', { class: 'se-non-select-figure se-scroll-figure' });
 		figure.appendChild(oTable);
 
 		if (this.component.insert(figure, false, false)) {
@@ -137,15 +141,18 @@ Table.prototype = {
 
 				// figure
 				if (!FigureEl) {
-					const figure = domUtils.createElement('FIGURE', { class: 'se-non-select-figure se-scroll-figure-x' });
+					const figure = domUtils.createElement('FIGURE', { class: 'se-non-select-figure se-scroll-figure' });
 					element.parentNode.insertBefore(figure, element);
 					figure.appendChild(element);
 				} else {
-					if (!domUtils.hasClass(FigureEl, 'se-non-select-figure')) {
-						domUtils.addClass(FigureEl, 'se-non-select-figure');
-					}
-					if (!domUtils.hasClass(FigureEl, 'se-scroll-figure-x')) {
-						domUtils.addClass(FigureEl, 'se-scroll-figure-x');
+					domUtils.addClass(FigureEl, 'se-non-select-figure');
+					// scroll
+					if (!this.figureScroll) {
+						domUtils.removeClass(FigureEl, this.figureScrollList.join('|'));
+					} else {
+						const scrollTypeClass = `se-scroll-figure-${this.figureScroll}`;
+						domUtils.addClass(FigureEl, scrollTypeClass);
+						domUtils.removeClass(FigureEl, this.figureScrollList.filter((v) => v !== scrollTypeClass).join('|'));
 					}
 				}
 			}
@@ -163,7 +170,7 @@ Table.prototype = {
 
 	onMouseMove({ event }) {
 		const tableCell = domUtils.getParentElement(event.target, domUtils.isTableCell);
-		if (!tableCell) {
+		if (!tableCell || this._fixedCell) {
 			this.__hideResizeLine();
 			return;
 		}
@@ -1018,11 +1025,12 @@ Table.prototype = {
 	},
 
 	_setResizeLinePosition(tableEl, tdEl, resizeLine, isLeftEdge) {
+		const figure = /^FIGURE$/i.test(tableEl.parentNode.nodeName) ? tableEl.parentNode : tableEl;
 		const tdOffset = this.offset.get(tdEl);
-		const tableOffset = this.offset.get(tableEl);
+		const tableOffset = this.offset.get(figure);
 		resizeLine.style.left = `${tdOffset.left + (isLeftEdge ? 0 : tdEl.offsetWidth)}px`;
 		resizeLine.style.top = `${tableOffset.top}px`;
-		resizeLine.style.height = `${tableEl.offsetHeight}px`;
+		resizeLine.style.height = `${figure.offsetHeight}px`;
 	},
 
 	_stopResize(col, prevWidth, e) {
