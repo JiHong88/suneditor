@@ -15,6 +15,7 @@ const Table = function (editor, pluginOptions) {
 	const controllerPosition = typeof pluginOptions.cellControllerPosition === 'string' ? pluginOptions.cellControllerPosition.toLowerCase() : 'cell';
 	this.figureScroll = typeof pluginOptions.scrollType === 'string' ? pluginOptions.scrollType.toLowerCase() : 'x';
 	this.figureScrollList = ['se-scroll-figure-xy', 'se-scroll-figure-x', 'se-scroll-figure-y'];
+	this.captionPosition = pluginOptions.captionPosition !== 'bottom' ? 'top' : 'bottom';
 
 	// create HTML
 	this.cellControllerTop = controllerPosition === 'top';
@@ -44,6 +45,7 @@ const Table = function (editor, pluginOptions) {
 	this.resizeText = controller_table.querySelector('._se_table_resize > span > span');
 	this.columnFixedButton = controller_table.querySelector('._se_table_fixed_column');
 	this.headerButton = controller_table.querySelector('._se_table_header');
+	this.captionButton = controller_table.querySelector('._se_table_caption');
 	this.mergeButton = controller_cell.querySelector('._se_table_merge_button');
 	this.insertRowAboveButton = controller_cell.querySelector('._se_table_insert_row_a');
 	// members - private
@@ -293,6 +295,9 @@ Table.prototype = {
 			case 'header':
 				this.toggleHeader();
 				break;
+			case 'caption':
+				this.toggleCaption();
+				break;
 			case 'onsplit':
 				this.selectMenu_split.open();
 				break;
@@ -391,11 +396,13 @@ Table.prototype = {
 		const table = (this._element = this._selectedTable || domUtils.getParentElement(tdElement, 'TABLE'));
 		this._figure = domUtils.getParentElement(table, (current) => /^FIGURE$/i.test(current.nodeName)) || table;
 
-		if (/THEAD/i.test(table.firstElementChild.nodeName)) {
-			domUtils.addClass(this.headerButton, 'active');
-		} else {
-			domUtils.removeClass(this.headerButton, 'active');
-		}
+		// hedaer
+		if (table.querySelector('thead')) domUtils.addClass(this.headerButton, 'active');
+		else domUtils.removeClass(this.headerButton, 'active');
+
+		// caption
+		if (table.querySelector('caption')) domUtils.addClass(this.captionButton, 'active');
+		else domUtils.removeClass(this.captionButton, 'active');
 
 		if (reset || this._physical_cellCnt === 0) {
 			if (this._tdElement !== tdElement) {
@@ -902,8 +909,8 @@ Table.prototype = {
 	},
 
 	toggleHeader() {
-		const headerButton = this.headerButton;
-		const active = domUtils.hasClass(headerButton, 'active');
+		const btn = this.headerButton;
+		const active = domUtils.hasClass(btn, 'active');
 		const table = this._element;
 
 		if (!active) {
@@ -914,13 +921,30 @@ Table.prototype = {
 			domUtils.removeItem(table.querySelector('thead'));
 		}
 
-		domUtils.toggleClass(headerButton, 'active');
+		domUtils.toggleClass(btn, 'active');
 
 		if (/TH/i.test(this._tdElement.nodeName)) {
 			this._closeController();
 		} else {
 			this.setCellControllerPosition(this._tdElement, false);
 		}
+	},
+
+	toggleCaption() {
+		const btn = this.captionButton;
+		const active = domUtils.hasClass(btn, 'active');
+		const table = this._element;
+
+		if (!active) {
+			const caption = domUtils.createElement('CAPTION', { class: `se-table-caption-${this.captionPosition}` });
+			caption.innerHTML = '<div><br></div>';
+			table.insertBefore(caption, table.firstElementChild);
+		} else {
+			domUtils.removeItem(table.querySelector('caption'));
+		}
+
+		domUtils.toggleClass(btn, 'active');
+		this.setCellControllerPosition(this._tdElement, false);
 	},
 
 	setTableStyle(styles) {
@@ -1560,6 +1584,12 @@ function CreateHTML_controller_table(editor) {
 				${icons.table_header}
 				<span class="se-tooltip-inner">
 					<span class="se-tooltip-text">${lang.tableHeader}</span>
+				</span>
+			</button>
+			<button type="button" data-command="caption" class="se-btn se-tooltip _se_table_caption">
+				${icons.caption}
+				<span class="se-tooltip-inner">
+					<span class="se-tooltip-text">${lang.caption}</span>
 				</span>
 			</button>
 			<button type="button" data-command="remove" class="se-btn se-tooltip">

@@ -346,6 +346,24 @@
 	margin: 0 0 10px auto;
 }
 
+.sun-editor-editable table caption {
+	caption-side: initial;
+	text-align: unset;
+	padding: 0.5em;
+	margin: 0;
+	background-color: #f9f9f9;
+	border: 1px solid #e1e1e1;
+	outline: none;
+}
+.sun-editor-editable table caption.se-table-caption-top {
+	caption-side: top;
+	border-bottom: 0;
+}
+.sun-editor-editable table caption.se-table-caption-bottom {
+	caption-side: bottom;
+	border-top: 0;
+}
+
 .sun-editor-editable table thead {
 	border-bottom: 2px solid #333;
 }
