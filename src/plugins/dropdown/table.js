@@ -49,6 +49,7 @@ const Table = function (editor, pluginOptions) {
 	// members - private
 	this._resizeLine = null;
 	this._resizeLinePrev = null;
+	this._figure = null;
 	this._element = null;
 	this._tdElement = null;
 	this._trElement = null;
@@ -311,8 +312,8 @@ Table.prototype = {
 				this.setCellControllerPosition(this._tdElement, this._shift);
 				break;
 			case 'remove':
-				const emptyDiv = this._element.parentNode;
-				domUtils.removeItem(this._element);
+				const emptyDiv = this._figure.parentNode;
+				domUtils.removeItem(this._figure);
 				this._closeController();
 
 				if (emptyDiv !== this.editor.frameContext.get('wysiwyg'))
@@ -337,6 +338,7 @@ Table.prototype = {
 		this._deleteStyleSelectedCells();
 		this._toggleEditor(true);
 
+		this._figure = null;
 		this._element = null;
 		this._tdElement = null;
 		this._trElement = null;
@@ -387,6 +389,7 @@ Table.prototype = {
 
 	setCellInfo(tdElement, reset) {
 		const table = (this._element = this._selectedTable || domUtils.getParentElement(tdElement, 'TABLE'));
+		this._figure = domUtils.getParentElement(table, (current) => /^FIGURE$/i.test(current.nodeName)) || table;
 
 		if (/THEAD/i.test(table.firstElementChild.nodeName)) {
 			domUtils.addClass(this.headerButton, 'active');
@@ -497,7 +500,7 @@ Table.prototype = {
 					return;
 				} else if (!tableAttr.nextElementSibling || !/^TBODY$/i.test(tableAttr.nextElementSibling.nodeName)) {
 					if (!option) {
-						domUtils.removeItem(this._element);
+						domUtils.removeItem(this._figure);
 						this._closeController();
 					} else {
 						table.innerHTML += '<tbody><tr>' + CreateCells('td', this._logical_cellCnt, false) + '</tr></tbody>';
