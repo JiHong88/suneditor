@@ -66,6 +66,7 @@ const Table = function (editor, pluginOptions) {
 	this.mergeButton = controller_cell.querySelector('._se_table_merge_button');
 
 	// members - private
+	this._resizing = false;
 	this._resizeLine = null;
 	this._resizeLinePrev = null;
 	this._figure = null;
@@ -220,6 +221,18 @@ Table.prototype = {
 			this._deleteStyleSelectedCells();
 			this.setCellInfo(tableCell, true);
 			const colIndex = this._logical_cellIndex - (edge.isLeft ? 1 : 0);
+
+			// ready
+			this.editor.enableBackWrapper('ew-resize');
+			if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector('.se-table-resize-line');
+			this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector('.se-table-resize-line-prev');
+
+			// select figure
+			if (colIndex < 0 || colIndex === this._logical_cellCnt - 1) {
+				this._startFigureResizing(edge.startX, colIndex < 0);
+				return;
+			}
+
 			const col = this._element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
 			this._startCellResizing(col, edge.startX, numbers.get(getComputedStyle(col).width, CELL_DECIMAL_END), edge.isLeft);
 		} else {
@@ -235,7 +248,7 @@ Table.prototype = {
 	 * @param {Element} line Current line element
 	 */
 	onKeyDown({ event, range, line }) {
-		if (this.editor.selectMenuOn) return;
+		if (this.editor.selectMenuOn || this._resizing) return;
 
 		const keyCode = event.keyCode;
 		// table tabkey
@@ -1047,46 +1060,70 @@ Table.prototype = {
 	},
 
 	_startCellResizing(col, startX, startWidth, isLeftEdge) {
-		this.editor.enableBackWrapper('ew-resize');
-		if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector('.se-table-resize-line');
-
-		this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector('.se-table-resize-line-prev');
-		this._setResizeLinePosition(this._element, this._tdElement, this._resizeLinePrev, isLeftEdge);
+		this._setResizeLinePosition(this._figure, this._tdElement, this._resizeLinePrev, isLeftEdge);
 		this._resizeLinePrev.style.display = 'block';
 
-		this.__globalEvents.resize = this.eventManager.addGlobalEvent(
-			'mousemove',
-			this._cellResize.bind(this, col, this._element, this._tdElement, this._resizeLine, isLeftEdge, startX, startWidth, this._element.offsetWidth),
-			false
+		this._addResizeGlobalEvents(
+			this._cellResize.bind(this, col, this._figure, this._tdElement, this._resizeLine, isLeftEdge, startX, startWidth, this._element.offsetWidth),
+			this.__removeGlobalEvents.bind(this),
+			this._stopResize.bind(this, col, col.style.width)
 		);
-		this.__globalEvents.resizeStop = this.eventManager.addGlobalEvent('mouseup', this.__removeGlobalEvents.bind(this), false);
-		this.__globalEvents.resizeKeyDown = this.eventManager.addGlobalEvent('keydown', this._stopResize.bind(this, col, col.style.width), false);
 	},
 
-	_cellResize(col, tableEl, tdEl, resizeLine, isLeftEdge, startX, startWidth, tableWidth, e) {
+	_cellResize(col, figure, tdEl, resizeLine, isLeftEdge, startX, startWidth, tableWidth, e) {
 		const deltaX = e.clientX - startX;
 		const newWidthPx = startWidth + deltaX;
 		const newWidthPercent = (newWidthPx / tableWidth) * 100;
 
 		if (newWidthPercent > 0) {
 			col.style.width = `${newWidthPercent}%`;
-			this._setResizeLinePosition(tableEl, tdEl, resizeLine, isLeftEdge);
+			this._setResizeLinePosition(figure, tdEl, resizeLine, isLeftEdge);
 		}
 	},
 
-	_setResizeLinePosition(tableEl, tdEl, resizeLine, isLeftEdge) {
-		const figure = /^FIGURE$/i.test(tableEl.parentNode.nodeName) ? tableEl.parentNode : tableEl;
-		const tdOffset = this.offset.get(tdEl);
+	_startFigureResizing(startX, isLeftEdge) {
+		const figure = this._figure;
+		this._setResizeLinePosition(figure, figure, this._resizeLinePrev, isLeftEdge);
+		this._resizeLinePrev.style.display = 'block';
+
+		this._addResizeGlobalEvents(
+			this._figureResize.bind(
+				this,
+				figure,
+				this._resizeLine,
+				isLeftEdge,
+				startX,
+				figure.offsetWidth,
+				/%$/.test(figure.style.width) ? numbers.get(figure.style.width, CELL_DECIMAL_END) : 100
+			),
+			this.__removeGlobalEvents.bind(this),
+			this._stopResize.bind(this, figure, figure.style.width)
+		);
+	},
+
+	_figureResize(figure, resizeLine, isLeftEdge, startX, startWidth, constNum, e) {
+		const deltaX = isLeftEdge ? startX - e.clientX : e.clientX - startX;
+		const newWidthPx = startWidth + deltaX;
+		const newWidthPercent = (newWidthPx / startWidth) * constNum;
+
+		if (newWidthPercent > 0) {
+			figure.style.width = `${newWidthPercent}%`;
+			this._setResizeLinePosition(figure, figure, resizeLine, isLeftEdge);
+		}
+	},
+
+	_setResizeLinePosition(figure, target, resizeLine, isLeftEdge) {
+		const tdOffset = this.offset.get(target);
 		const tableOffset = this.offset.get(figure);
-		resizeLine.style.left = `${tdOffset.left + (isLeftEdge ? 0 : tdEl.offsetWidth)}px`;
+		resizeLine.style.left = `${tdOffset.left + (isLeftEdge ? 0 : target.offsetWidth)}px`;
 		resizeLine.style.top = `${tableOffset.top}px`;
 		resizeLine.style.height = `${figure.offsetHeight}px`;
 	},
 
-	_stopResize(col, prevWidth, e) {
+	_stopResize(target, prevWidth, e) {
 		if (e.keyCode !== 27) return;
 		this.__removeGlobalEvents();
-		col.style.width = prevWidth;
+		target.style.width = prevWidth;
 	},
 
 	_deleteStyleSelectedCells() {
@@ -1096,6 +1133,13 @@ Table.prototype = {
 				domUtils.removeClass(selectedCells[i], 'se-table-selected-cell');
 			}
 		}
+	},
+
+	_addResizeGlobalEvents(resizeFn, stopFn, keyDownFn) {
+		this.__globalEvents.resize = this.eventManager.addGlobalEvent('mousemove', resizeFn, false);
+		this.__globalEvents.resizeStop = this.eventManager.addGlobalEvent('mouseup', stopFn, false);
+		this.__globalEvents.resizeKeyDown = this.eventManager.addGlobalEvent('keydown', keyDownFn, false);
+		this._resizing = true;
 	},
 
 	_toggleEditor(enabled) {
@@ -1240,6 +1284,7 @@ Table.prototype = {
 	__removeGlobalEvents() {
 		this.editor.disableBackWrapper();
 		this.__hideResizeLine();
+		this._resizing = false;
 		if (this._resizeLinePrev) {
 			this._resizeLinePrev.style.display = 'none';
 			this._resizeLinePrev = null;
