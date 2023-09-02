@@ -902,7 +902,7 @@ export function isFigures(node) {
  * @returns {Boolean}
  */
 export function isInputElement(element) {
-	return element?.nodeType === 1 && /^(INPUT|TEXTAREA)$/i.test(element.nodeName);
+	return element?.nodeType === 1 && /^(INPUT|TEXTAREA|SELECT|OPTION)$/i.test(element.nodeName);
 }
 
 /**

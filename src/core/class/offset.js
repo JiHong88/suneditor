@@ -171,7 +171,7 @@ Offset.prototype = {
 			}
 		}
 
-		el = this._shadowRoot ? this._shadowRoot.host : null;
+		el = this._shadowRoot?.host;
 		if (el) ohOffsetEl = owOffsetEl = topArea;
 		while (el) {
 			t += el.scrollTop;

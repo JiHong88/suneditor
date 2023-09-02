@@ -12,30 +12,47 @@ const Table = function (editor, pluginOptions) {
 	this.icon = 'table';
 
 	// pluginOptions options
-	const controllerPosition = typeof pluginOptions.cellControllerPosition === 'string' ? pluginOptions.cellControllerPosition.toLowerCase() : 'cell';
-	this.figureScroll = typeof pluginOptions.scrollType === 'string' ? pluginOptions.scrollType.toLowerCase() : 'x';
 	this.figureScrollList = ['se-scroll-figure-xy', 'se-scroll-figure-x', 'se-scroll-figure-y'];
+	this.figureScroll = typeof pluginOptions.scrollType === 'string' ? pluginOptions.scrollType.toLowerCase() : 'x';
 	this.captionPosition = pluginOptions.captionPosition !== 'bottom' ? 'top' : 'bottom';
+	this.cellControllerTop = (pluginOptions.cellControllerPosition !== 'cell' ? 'table' : 'cell') === 'table';
 
 	// create HTML
-	this.cellControllerTop = controllerPosition === 'top';
 	const menu = CreateHTML(editor);
 	const commandArea = menu.querySelector('.se-controller-table-picker');
 	const controller_table = CreateHTML_controller_table(editor);
 	const controller_cell = CreateHTML_controller_cell(editor, this.cellControllerTop);
-	const splitMenu = CreateSplitMenu(this.lang);
 	editor.applyFrameRoots((e) => {
 		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: 'se-table-resize-line' }));
 		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: 'se-table-resize-line-prev' }));
 	});
 
-	// members
+	// members - Controller
 	this.controller_table = new Controller(this, controller_table, { position: 'top' });
 	this.controller_cell = new Controller(this, controller_cell, { position: this.cellControllerTop ? 'top' : 'bottom' });
+
+	// members - SelectMenu - split
+	const splitMenu = CreateSplitMenu(this.lang);
 	this.splitButton = controller_cell.querySelector('[data-command="onsplit"]');
 	this.selectMenu_split = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
 	this.selectMenu_split.on(this.splitButton, OnSplitCells.bind(this));
 	this.selectMenu_split.create(splitMenu.items, splitMenu.menus);
+
+	// members - SelectMenu - column
+	const columnMenu = CreateColumnMenu(this.lang, this.icons);
+	const columnButton = controller_cell.querySelector('[data-command="oncolumn"]');
+	this.selectMenu_column = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+	this.selectMenu_column.on(columnButton, OnColumnEdit.bind(this));
+	this.selectMenu_column.create(columnMenu.items, columnMenu.menus);
+
+	// members - SelectMenu - row
+	const rownMenu = CreateRowMenu(this.lang, this.icons);
+	const rowButton = controller_cell.querySelector('[data-command="onrow"]');
+	this.selectMenu_row = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+	this.selectMenu_row.on(rowButton, OnRowEdit.bind(this));
+	this.selectMenu_row.create(rownMenu.items, rownMenu.menus);
+
+	// memberts - elements..
 	this.maxText = this.lang.maxSize;
 	this.minText = this.lang.minSize;
 	this.tableHighlight = menu.querySelector('.se-table-size-highlighted');
@@ -47,7 +64,7 @@ const Table = function (editor, pluginOptions) {
 	this.headerButton = controller_table.querySelector('._se_table_header');
 	this.captionButton = controller_table.querySelector('._se_table_caption');
 	this.mergeButton = controller_cell.querySelector('._se_table_merge_button');
-	this.insertRowAboveButton = controller_cell.querySelector('._se_table_insert_row_a');
+
 	// members - private
 	this._resizeLine = null;
 	this._resizeLinePrev = null;
@@ -67,6 +84,7 @@ const Table = function (editor, pluginOptions) {
 	this._logical_cellIndex = 0;
 	this._current_colSpan = 0;
 	this._current_rowSpan = 0;
+
 	// member - multi selecte
 	this._selectedCells = null;
 	this._shift = false;
@@ -75,6 +93,7 @@ const Table = function (editor, pluginOptions) {
 	this._selectedCell = null;
 	this._selectedTable = null;
 	this._ref = null;
+
 	// member - global events
 	this._bindMultiOn = OnCellMultiSelect.bind(this);
 	this._bindMultiOff = OffCellMultiSelect.bind(this);
@@ -216,6 +235,8 @@ Table.prototype = {
 	 * @param {Element} line Current line element
 	 */
 	onKeyDown({ event, range, line }) {
+		if (this.editor.selectMenuOn) return;
+
 		const keyCode = event.keyCode;
 		// table tabkey
 		if (keyCode === 9) {
@@ -281,17 +302,9 @@ Table.prototype = {
 	 * @returns
 	 */
 	controllerAction(target) {
-		if (target.getAttribute('disabled')) return;
-
 		const command = target.getAttribute('data-command');
-		const value = target.getAttribute('data-value');
-		const option = target.getAttribute('data-option');
 
 		switch (command) {
-			case 'insert':
-			case 'delete':
-				this.editTable(value, option);
-				break;
 			case 'header':
 				this.toggleHeader();
 				break;
@@ -300,6 +313,17 @@ Table.prototype = {
 				break;
 			case 'onsplit':
 				this.selectMenu_split.open();
+				break;
+			case 'oncolumn':
+				this.selectMenu_column.open();
+				break;
+			case 'onrow':
+				this.selectMenu_row.menus[0].style.display = this.selectMenu_row.menus[1].style.display = /^TH$/i.test(this._tdElement?.nodeName) ? 'none' : '';
+				this.selectMenu_row.open();
+				break;
+			case 'openTableProperties':
+				break;
+			case 'openCellProperties':
 				break;
 			case 'merge':
 				this.mergeCells();
@@ -982,18 +1006,12 @@ Table.prototype = {
 	},
 
 	setActiveButton(fixedCell, selectedCell) {
-		if (/^TH$/i.test(fixedCell.nodeName)) {
-			this.insertRowAboveButton.setAttribute('disabled', true);
-		} else {
-			this.insertRowAboveButton.removeAttribute('disabled');
-		}
-
 		if (!selectedCell || fixedCell === selectedCell) {
-			this.splitButton.removeAttribute('disabled');
-			this.mergeButton.setAttribute('disabled', true);
+			this.splitButton.style.display = 'block';
+			this.mergeButton.style.display = 'none';
 		} else {
-			this.splitButton.setAttribute('disabled', true);
-			this.mergeButton.removeAttribute('disabled');
+			this.splitButton.style.display = 'none';
+			this.mergeButton.style.display = 'block';
 		}
 	},
 
@@ -1014,13 +1032,18 @@ Table.prototype = {
 		this.setTableStyle(this._maxWidth ? 'width|column' : 'width');
 
 		this.setCellInfo(tdElement, this._shift);
-		this.controller_table.open(tableElement, null, this.close.bind(this));
-		this.controller_cell.open(tdElement, this.cellControllerTop ? tableElement : null);
+
+		// controller open
+		const figureEl = domUtils.getParentElement(tableElement, (current) => /^FIGURE$/i.test(current.nodeName));
+		this.controller_table.open(figureEl, null, this.close.bind(this), null);
+
+		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { left: this.controller_table.form.offsetWidth + 2 } : null;
+		this.controller_cell.open(tdElement, this.cellControllerTop ? figureEl : null, null, addOffset);
 	},
 
 	setCellControllerPosition(tdElement, reset) {
 		this.setCellInfo(tdElement, reset);
-		this.controller_cell.resetPosition(tdElement);
+		this.controller_cell.resetPosition(this.cellControllerTop ? domUtils.getParentElement(tdElement, domUtils.isTable) : tdElement);
 	},
 
 	_startCellResizing(col, startX, startWidth, isLeftEdge) {
@@ -1415,9 +1438,42 @@ function OnSplitCells(direction) {
 		}
 	}
 
+	this.history.push(false);
 	this.editor.focusEdge(currentCell);
 	this.setCellControllerPosition(currentCell, true);
 	this.selectMenu_split.close();
+}
+
+function OnColumnEdit(command) {
+	switch (command) {
+		case 'insert-left':
+			this.editTable('cell', 'left');
+			break;
+		case 'insert-right':
+			this.editTable('cell', 'right');
+			break;
+		case 'delete':
+			this.editTable('cell', null);
+	}
+
+	this.history.push(false);
+	this.selectMenu_column.close();
+}
+
+function OnRowEdit(command) {
+	switch (command) {
+		case 'insert-above':
+			this.editTable('row', 'up');
+			break;
+		case 'insert-below':
+			this.editTable('row', 'down');
+			break;
+		case 'delete':
+			this.editTable('row', null);
+	}
+
+	this.history.push(false);
+	this.selectMenu_row.close();
 }
 
 function OnMouseMoveTablePicker(e) {
@@ -1531,23 +1587,57 @@ function CreateSplitMenu(lang) {
 	const menus = domUtils.createElement(
 		'DIV',
 		null,
-		'<div title="' +
-			lang.verticalSplit +
-			'" aria-label="' +
-			lang.verticalSplit +
-			'">' +
-			lang.verticalSplit +
-			'</div>' +
-			'<div title="' +
-			lang.horizontalSplit +
-			'" aria-label="' +
-			lang.horizontalSplit +
-			'">' +
-			lang.horizontalSplit +
-			'</div>'
+		`
+		<div title="${lang.verticalSplit}" aria-label="${lang.verticalSplit}">
+			${lang.verticalSplit}
+		</div>
+		<div title="${lang.horizontalSplit}" aria-label="${lang.horizontalSplit}">
+			${lang.horizontalSplit}
+		</div>
+		`
 	);
 
 	return { items: ['vertical', 'horizontal'], menus: menus.querySelectorAll('div') };
+}
+
+function CreateColumnMenu(lang, icons) {
+	const menus = domUtils.createElement(
+		'DIV',
+		null,
+		`
+		<div title="${lang.insertColumnBefore}" aria-label="${lang.insertColumnBefore}">
+			<span class="se-list-icon">${icons.insert_column_left}</span><span class="txt">${lang.insertColumnBefore}</span>
+		</div>
+		<div title="${lang.insertColumnAfter}" aria-label="${lang.insertColumnAfter}">
+			<span class="se-list-icon">${icons.insert_column_right}</span><span class="txt">${lang.insertColumnAfter}</span>
+		</div>
+		<div title="${lang.deleteColumn}" aria-label="${lang.deleteColumn}">
+			<span class="se-list-icon">${icons.delete_column}</span><span class="txt">${lang.deleteColumn}</span>
+		</div>
+		`
+	);
+
+	return { items: ['insert-left', 'insert-right', 'delete'], menus: menus.querySelectorAll('div') };
+}
+
+function CreateRowMenu(lang, icons) {
+	const menus = domUtils.createElement(
+		'DIV',
+		null,
+		`
+		<div title="${lang.insertRowAbove}" aria-label="${lang.insertRowAbove}">
+			<span class="se-list-icon">${icons.insert_row_above}</span><span class="txt">${lang.insertRowAbove}</span>
+		</div>
+		<div title="${lang.insertRowBelow}" aria-label="${lang.insertRowBelow}">
+			<span class="se-list-icon">${icons.insert_row_below}</span><span class="txt">${lang.insertRowBelow}</span>
+		</div>
+		<div title="${lang.deleteRow}" aria-label="${lang.deleteRow}">
+			<span class="se-list-icon">${icons.delete_row}</span><span class="txt">${lang.deleteRow}</span>
+		</div>
+		`
+	);
+
+	return { items: ['insert-above', 'insert-below', 'delete'], menus: menus.querySelectorAll('div') };
 }
 
 function CreateHTML() {
@@ -1566,39 +1656,37 @@ function CreateHTML_controller_table(editor) {
 	const lang = editor.lang;
 	const icons = editor.icons;
 	const html = `
-	<div>
-		<div class="se-btn-group">
-			<button type="button" data-command="resize" class="se-btn se-tooltip _se_table_resize">
-				${icons.expansion}
-				<span class="se-tooltip-inner">
-					<span class="se-tooltip-text">${lang.maxSize}</span>
-				</span>
-			</button>
-			<button type="button" data-command="layout" class="se-btn se-tooltip _se_table_fixed_column">
-				${icons.fixed_column_width}
-				<span class="se-tooltip-inner">
-					<span class="se-tooltip-text">${lang.fixedColumnWidth}</span>
-				</span>
-			</button>
-			<button type="button" data-command="header" class="se-btn se-tooltip _se_table_header">
-				${icons.table_header}
-				<span class="se-tooltip-inner">
-					<span class="se-tooltip-text">${lang.tableHeader}</span>
-				</span>
-			</button>
-			<button type="button" data-command="caption" class="se-btn se-tooltip _se_table_caption">
-				${icons.caption}
-				<span class="se-tooltip-inner">
-					<span class="se-tooltip-text">${lang.caption}</span>
-				</span>
-			</button>
-			<button type="button" data-command="remove" class="se-btn se-tooltip">
-				${icons.delete}
-				<span class="se-tooltip-inner">
-					<span class="se-tooltip-text">${lang.remove}</span>
-				</span>
-			</button>
-		</div>
+	<div class="se-btn-group">
+		<button type="button" data-command="resize" class="se-btn se-tooltip _se_table_resize">
+			${icons.expansion}
+			<span class="se-tooltip-inner">
+				<span class="se-tooltip-text">${lang.maxSize}</span>
+			</span>
+		</button>
+		<button type="button" data-command="layout" class="se-btn se-tooltip _se_table_fixed_column">
+			${icons.fixed_column_width}
+			<span class="se-tooltip-inner">
+				<span class="se-tooltip-text">${lang.fixedColumnWidth}</span>
+			</span>
+		</button>
+		<button type="button" data-command="header" class="se-btn se-tooltip _se_table_header">
+			${icons.table_header}
+			<span class="se-tooltip-inner">
+				<span class="se-tooltip-text">${lang.tableHeader}</span>
+			</span>
+		</button>
+		<button type="button" data-command="caption" class="se-btn se-tooltip _se_table_caption">
+			${icons.caption}
+			<span class="se-tooltip-inner">
+				<span class="se-tooltip-text">${lang.caption}</span>
+			</span>
+		</button>
+		<button type="button" data-command="remove" class="se-btn se-tooltip">
+			${icons.delete}
+			<span class="se-tooltip-inner">
+				<span class="se-tooltip-text">${lang.remove}</span>
+			</span>
+		</button>
 	</div>`;
 
 	return domUtils.createElement('DIV', { class: 'se-controller se-controller-table' }, html);
@@ -1610,48 +1698,22 @@ function CreateHTML_controller_cell(editor, cellControllerTop) {
 	const html = `
     ${cellControllerTop ? '' : '<div class="se-arrow se-arrow-up"></div>'}
     <div class="se-btn-group">
-        <button type="button" data-command="insert" data-value="row" data-option="up" class="se-btn se-tooltip _se_table_insert_row_a">
-            ${icons.insert_row_above}
+        <button type="button" data-command="oncolumn" class="se-btn se-tooltip">
+            ${icons.table_column}
             <span class="se-tooltip-inner">
-                <span class="se-tooltip-text">${lang.insertRowAbove}</span>
+                <span class="se-tooltip-text">${lang.column}</span>
             </span>
         </button>
-        <button type="button" data-command="insert" data-value="row" data-option="down" class="se-btn se-tooltip _se_table_insert_row_b">
-            ${icons.insert_row_below}
+        <button type="button" data-command="onrow" class="se-btn se-tooltip">
+            ${icons.table_row}
             <span class="se-tooltip-inner">
-                <span class="se-tooltip-text">${lang.insertRowBelow}</span>
+                <span class="se-tooltip-text">${lang.row}</span>
             </span>
         </button>
-        <button type="button" data-command="delete" data-value="row" class="se-btn se-tooltip">
-            ${icons.delete_row}
-            <span class="se-tooltip-inner">
-                <span class="se-tooltip-text">${lang.deleteRow}</span>
-            </span>
-        </button>
-        <button type="button" data-command="merge" class="_se_table_merge_button se-btn se-tooltip" disabled>
+        <button type="button" data-command="merge" class="_se_table_merge_button se-btn se-tooltip" style="display: none;">
             ${icons.merge_cell}
             <span class="se-tooltip-inner">
                 <span class="se-tooltip-text">${lang.mergeCells}</span>
-            </span>
-        </button>
-    </div>
-    <div class="se-btn-group" style="padding-top: 0;">
-        <button type="button" data-command="insert" data-value="cell" data-option="left" class="se-btn se-tooltip">
-            ${icons.insert_column_left}
-            <span class="se-tooltip-inner">
-                <span class="se-tooltip-text">${lang.insertColumnBefore}</span>
-            </span>
-        </button>
-        <button type="button" data-command="insert" data-value="cell" data-option="right" class="se-btn se-tooltip">
-            ${icons.insert_column_right}
-            <span class="se-tooltip-inner">
-                <span class="se-tooltip-text">${lang.insertColumnAfter}</span>
-            </span>
-        </button>
-        <button type="button" data-command="delete" data-value="cell" class="se-btn se-tooltip">
-            ${icons.delete_column}
-            <span class="se-tooltip-inner">
-                <span class="se-tooltip-text">${lang.deleteColumn}</span>
             </span>
         </button>
         <button type="button" data-command="onsplit" class="se-btn se-tooltip">

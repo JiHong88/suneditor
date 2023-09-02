@@ -27,6 +27,7 @@ const Controller = function (inst, element, params, _name) {
 	this._bindClose_key = null;
 	this._bindClose_mouse = null;
 	this.__offset = {};
+	this.__addOffset = { left: 0, top: 0 };
 
 	// add element
 	this.carrierWrapper.appendChild(element);
@@ -41,7 +42,7 @@ Controller.prototype = {
 	/**
 	 * @description Open a modal plugin
 	 */
-	open(target, positionTarget, initMethod) {
+	open(target, positionTarget, initMethod, addOffset) {
 		if (this.editor.isBalloon) this.toolbar.hide();
 		else if (this.editor.isSubBalloon) this.subToolbar.hide();
 
@@ -51,6 +52,8 @@ Controller.prototype = {
 		this.currentPositionTarget = positionTarget || target;
 		this._initMethod = initMethod;
 		this.editor.currentControllerName = this.kind;
+
+		if (addOffset) this.__addOffset = { ...this.__addOffset, ...addOffset };
 
 		this.__addGlobalEvent();
 		this._setControllerPosition(this.form, this.currentPositionTarget);
@@ -63,6 +66,7 @@ Controller.prototype = {
 	 */
 	close() {
 		this.__offset = {};
+		this.__addOffset = { left: 0, top: 0 };
 		this.__removeGlobalEvent();
 		this._controllerOff();
 
@@ -136,11 +140,10 @@ Controller.prototype = {
 	 * @param {Element} referEl Element that is the basis of the controller's position.
 	 */
 	_setControllerPosition(controller, referEl) {
-		const addOffset = { left: 0, top: 0 };
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
-		if (!this.offset.setAbsPosition(controller, referEl, { addOffset: addOffset, position: this.position, inst: this })) {
+		if (!this.offset.setAbsPosition(controller, referEl, { addOffset: this.__addOffset, position: this.position, inst: this })) {
 			this.hide();
 			return;
 		}
@@ -161,6 +164,8 @@ Controller.prototype = {
 	},
 
 	_checkFixed() {
+		if (this.editor.selectMenuOn) return true;
+
 		const cont = this.editor.opendControllers;
 		for (let i = 0; i < cont.length; i++) {
 			if (cont[i].inst === this && cont[i].fixed) {

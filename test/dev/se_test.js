@@ -447,7 +447,8 @@ window.c = () => {
 				uploadUrl: 'http://localhost:3000/editor/upload'
 			},
 			table: {
-				scrollType: 'x'
+				scrollType: 'x',
+				cellControllerPosition: 'table'
 			}
 		}
 	);

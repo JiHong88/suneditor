@@ -823,7 +823,7 @@ function ButtonsHandler(e) {
 	let target = e.target;
 	if (this.menu._bindControllersOff) e.stopPropagation();
 
-	if (/^(input|textarea|select|option)$/i.test(target.nodeName)) {
+	if (domUtils.isInputElement(target)) {
 		this.editor._antiBlur = false;
 	} else if (!this.editor.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
 		this.editor.focus();

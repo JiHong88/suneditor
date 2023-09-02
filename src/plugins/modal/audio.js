@@ -148,7 +148,7 @@ Audio_.prototype = {
 		domUtils.addClass(target, 'active');
 		domUtils.addClass(target.parentElement, 'se-figure-selected');
 		this._element = target;
-		this.controller.open(target, null, UnSelect.bind(null, target));
+		this.controller.open(target, null, UnSelect.bind(null, target), null);
 	},
 
 	/**

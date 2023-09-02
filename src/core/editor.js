@@ -185,8 +185,9 @@ const Editor = function (multiTargets, options) {
 	this.opendControllers = [];
 	this.currentControllerName = '';
 	this._controllerOnDisabledButtons = [];
-	this._codeViewDisabledButtons = [];
 	this._controllerTargetContext = null;
+	this.selectMenuOn = false;
+	this._codeViewDisabledButtons = [];
 	this._backWrapper = product.carrierWrapper.querySelector('.se-back-wrapper');
 
 	/**

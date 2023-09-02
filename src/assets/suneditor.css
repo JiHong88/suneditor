@@ -313,6 +313,15 @@
 }
 
 /* se-btn-list inner icon */
+.sun-editor .se-select-item .se-list-icon {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin: 0 6px 6px 0;
+	vertical-align: middle;
+}
+
+/* select menu inner icon */
 .sun-editor .se-btn-list > .se-list-icon {
 	display: inline-block;
 	width: 16px;
@@ -1736,12 +1745,6 @@
 	touch-action: manipulation;
 }
 
-.sun-editor .se-controller .se-btn-group button span {
-	display: block;
-	padding: 5px 10px;
-	margin: 0;
-}
-
 /* controller - input */
 .sun-editor .se-controller .se-form-group input {
 	min-width: 120px;
@@ -1869,7 +1872,6 @@
 
 .sun-editor .se-controller-table-cell {
 	width: auto;
-	padding: 0;
 	font-size: 14px;
 	font-style: normal;
 	font-weight: normal;
@@ -1948,7 +1950,7 @@
 	line-height: 28px;
 	min-height: 28px;
 	font-size: 12px;
-	padding: 0 14px;
+	padding: 0 6px;
 	margin: 2px 0;
 	cursor: pointer;
 }
@@ -2382,6 +2384,11 @@
 	border-left-width: 0;
 	border-top: 0;
 	border-bottom: 0;
+}
+
+/* select menu inner icon */
+.sun-editor.se-rtl .se-select-item .se-list-icon {
+	margin: 0 0 6px 6px;
 }
 
 /* menu list - color picker */

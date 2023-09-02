@@ -292,6 +292,8 @@ function OnCut_component(e) {
 }
 
 function OnKeyDown_component(e) {
+	if (this.editor.selectMenuOn) return;
+
 	const keyCode = e.keyCode;
 	const ctrl = e.ctrlKey || e.metaKey || keyCode === 91 || keyCode === 92 || keyCode === 224;
 

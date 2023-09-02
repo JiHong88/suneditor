@@ -1,6 +1,8 @@
 import CoreInjector from '../editorInjector/_core';
 import { domUtils, env } from '../helper';
 
+const MENU_MIN_HEIGHT = 38;
+
 /**
  *
  * @param {*} inst
@@ -26,6 +28,7 @@ const SelectMenu = function (inst, params) {
 	this._dirSubPosition = /^(left|right)$/.test(this.subPosition) ? (this.subPosition === 'left' ? 'right' : 'left') : this.subPosition;
 	this._textDirDiff = params.dir === 'ltr' ? false : params.dir === 'rtl' ? true : null;
 	this._refer = null;
+	this._keydownTarget = null;
 	this._selectMethod = null;
 	this._bindClose_key = null;
 	this._bindClose_mousedown = null;
@@ -52,6 +55,7 @@ SelectMenu.prototype = {
 	on(referElement, selectMethod, attr) {
 		if (!attr) attr = {};
 		this._refer = referElement;
+		this._keydownTarget = domUtils.isInputElement(referElement) ? referElement : this._w;
 		this._selectMethod = selectMethod;
 		this.form = domUtils.createElement(
 			'DIV',
@@ -66,10 +70,11 @@ SelectMenu.prototype = {
 
 	/**
 	 * @description Select menu open
-	 * @param {string} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
+	 * @param {string|null|undefined} position "[left|right]-[middle|top|bottom] | [top|bottom]-[center|left|right]"
 	 * @param {string|null|undefined} onItemQuerySelector The querySelector string of the menu to be activated
 	 */
 	open(position, onItemQuerySelector) {
+		this.editor.selectMenuOn = true;
 		this.__addEvents();
 		this.__addGlobalEvent();
 		const positionItems = position ? position.split('-') : [];
@@ -79,6 +84,7 @@ SelectMenu.prototype = {
 	},
 
 	close() {
+		this.editor.selectMenuOn = false;
 		this._init();
 		if (this.form) this.form.style.cssText = '';
 	},
@@ -121,7 +127,7 @@ SelectMenu.prototype = {
 	 * @param {["middle"|"top"|"bottom"] | ["center"|"left"|"right"]} subPosition Sub position
 	 * @private
 	 */
-	_setPosition(position, subPosition, onItemQuerySelector) {
+	_setPosition(position, subPosition, onItemQuerySelector, _re) {
 		const originP = position;
 		const form = this.form;
 		const target = this._refer;
@@ -150,8 +156,9 @@ SelectMenu.prototype = {
 		const targetOffsetTop = target.offsetTop;
 		const targetGlobalTop = globalTarget.top;
 		const targetHeight = target.offsetHeight;
-		const wbottom = this._w.innerHeight - (targetGlobalTop + targetHeight);
+		const wbottom = this._w.innerHeight - (targetGlobalTop - this._w.scrollY + targetHeight);
 		const sideAddH = side ? targetHeight : 0;
+		let overH = 10000;
 		switch (position) {
 			case 'middle':
 				let h = form.offsetHeight;
@@ -179,16 +186,23 @@ SelectMenu.prototype = {
 				break;
 			case 'top':
 				if (targetGlobalTop < form.offsetHeight - sideAddH) {
-					form.style.height = targetGlobalTop - 4 + sideAddH + 'px';
+					overH = targetGlobalTop - 4 + sideAddH;
+					if (overH >= MENU_MIN_HEIGHT) form.style.height = overH + 'px';
 				}
 				t = targetOffsetTop - form.offsetHeight + sideAddH;
 				break;
 			case 'bottom':
 				if (wbottom < form.offsetHeight + sideAddH) {
-					form.style.height = wbottom - 4 + sideAddH + 'px';
+					overH = wbottom - 4 + sideAddH;
+					if (overH >= MENU_MIN_HEIGHT) form.style.height = overH + 'px';
 				}
 				t = targetOffsetTop + (side ? 0 : targetHeight);
 				break;
+		}
+
+		if (overH < MENU_MIN_HEIGHT && !_re && position !== 'middle') {
+			this._setPosition(position === 'top' ? 'bottpm' : 'top', subPosition, onItemQuerySelector, true);
+			return;
 		}
 
 		if (!side) {
@@ -206,27 +220,27 @@ SelectMenu.prototype = {
 		}
 
 		form.style.left = l + 'px';
-		let fl = this.editor.offset.getGlobal(form).left;
-		let over = 0;
+		const fl = this.editor.offset.getGlobal(form).left;
+		let overW = 0;
 		switch (side + '-' + (side ? originP : subPosition)) {
 			case 'true-left':
-				over = globalTarget.left + fl;
-				if (over < 0) l = l = targetL + targetW + 1;
+				overW = globalTarget.left - this._w.scrollX + fl;
+				if (overW < 0) l = l = targetL + targetW + 1;
 				break;
 			case 'true-right':
-				over = this._w.innerWidth - (fl + formW);
-				if (over < 0) l = targetL - formW - 1;
+				overW = this._w.innerWidth - (fl + formW);
+				if (overW < 0) l = targetL - formW - 1;
 				break;
 			case 'false-center':
-				over = this._w.innerWidth - (fl + formW);
-				if (over < 0) l += over - 4;
+				overW = this._w.innerWidth - (fl + formW);
+				if (overW < 0) l += overW - 4;
 				form.style.left = l + 'px';
-				fl = this.editor.offset.getGlobal(form).left;
-				if (fl < 0) l -= fl - 4;
+				const centerfl = this.editor.offset.getGlobal(form).left;
+				if (centerfl < 0) l -= centerfl - 4;
 				break;
 			case 'false-left':
-				over = this._w.innerWidth - (globalTarget.left + formW);
-				if (over < 0) l += over - 4;
+				overW = this._w.innerWidth - (globalTarget.left - this._w.scrollX + formW);
+				if (overW < 0) l += overW - 4;
 				break;
 			case 'false-right':
 				if (fl < 0) l -= fl - 4;
@@ -257,7 +271,7 @@ SelectMenu.prototype = {
 		this.form.addEventListener('mousedown', this.__events[0]);
 		this.form.addEventListener('mousemove', this.__events[1]);
 		this.form.addEventListener('click', this.__events[2]);
-		this._refer.addEventListener('keydown', this.__events[3]);
+		this._keydownTarget.addEventListener('keydown', this.__events[3]);
 	},
 
 	__removeEvents() {
@@ -265,7 +279,7 @@ SelectMenu.prototype = {
 		this.form.removeEventListener('mousedown', this.__events[0]);
 		this.form.removeEventListener('mousemove', this.__events[1]);
 		this.form.removeEventListener('click', this.__events[2]);
-		this._refer.removeEventListener('keydown', this.__events[3]);
+		this._keydownTarget.removeEventListener('keydown', this.__events[3]);
 		this.__events = [];
 	},
 
@@ -347,7 +361,7 @@ function CloseListener_mousedown(e) {
 	if (this.form.contains(e.target)) return;
 	if (e.target !== this._refer) {
 		this.close();
-	} else if (!/input|textarea/i.test(e.target.tagName)) {
+	} else if (!domUtils.isInputElement(e.target)) {
 		this._bindClose_click = this.eventManager.addGlobalEvent('click', this.__globalEventHandlers[2], true);
 	}
 }

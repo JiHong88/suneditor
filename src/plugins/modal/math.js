@@ -50,7 +50,7 @@ Math_.prototype = {
 	active(element) {
 		if (element?.getAttribute('data-se-value')) {
 			this._element = element;
-			this.controller.open(element);
+			this.controller.open(element, null, null, null);
 			domUtils.addClass(element, 'se-focus');
 			return true;
 		}

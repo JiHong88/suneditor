@@ -43,7 +43,7 @@ Link.prototype = {
 			domUtils.addClass(element, 'on');
 
 			this.anchor.set(element);
-			this.controller.open(element);
+			this.controller.open(element,null,null,null);
 
 			return true;
 		}
