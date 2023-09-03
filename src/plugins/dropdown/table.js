@@ -1702,10 +1702,10 @@ function CreateHTML_controller_table(editor) {
 	const icons = editor.icons;
 	const html = `
 	<div class="se-btn-group">
-		<button type="button" data-command="resize" class="se-btn se-tooltip _se_table_resize">
-			${icons.expansion}
+		<button type="button" data-command="openTableProperties" class="se-btn se-tooltip">
+			${icons.table_properties}
 			<span class="se-tooltip-inner">
-				<span class="se-tooltip-text">${lang.maxSize}</span>
+				<span class="se-tooltip-text">${lang.tableProperties}</span>
 			</span>
 		</button>
 		<button type="button" data-command="layout" class="se-btn se-tooltip _se_table_fixed_column">
@@ -1726,6 +1726,12 @@ function CreateHTML_controller_table(editor) {
 				<span class="se-tooltip-text">${lang.caption}</span>
 			</span>
 		</button>
+		<button type="button" data-command="resize" class="se-btn se-tooltip _se_table_resize">
+			${icons.expansion}
+			<span class="se-tooltip-inner">
+				<span class="se-tooltip-text">${lang.maxSize}</span>
+			</span>
+		</button>
 		<button type="button" data-command="remove" class="se-btn se-tooltip">
 			${icons.delete}
 			<span class="se-tooltip-inner">
@@ -1743,6 +1749,12 @@ function CreateHTML_controller_cell(editor, cellControllerTop) {
 	const html = `
     ${cellControllerTop ? '' : '<div class="se-arrow se-arrow-up"></div>'}
     <div class="se-btn-group">
+		<button type="button" data-command="openCellProperties" class="se-btn se-tooltip">
+			${icons.cell_properties}
+			<span class="se-tooltip-inner">
+				<span class="se-tooltip-text">${lang.cellProperties}</span>
+			</span>
+		</button>
         <button type="button" data-command="oncolumn" class="se-btn se-tooltip">
             ${icons.table_column}
             <span class="se-tooltip-inner">

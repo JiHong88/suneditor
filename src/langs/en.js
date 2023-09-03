@@ -28,7 +28,7 @@
 		basic: 'Basic',
 		bold: 'Bold',
 		caption: 'Insert description',
-		CellProperties: 'Cell properties',
+		cellProperties: 'Cell properties',
 		center: 'Center',
 		close: 'Close',
 		codeView: 'Code view',
