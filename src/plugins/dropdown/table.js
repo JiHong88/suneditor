@@ -22,6 +22,9 @@ const Table = function (editor, pluginOptions) {
 	const commandArea = menu.querySelector('.se-controller-table-picker');
 	const controller_table = CreateHTML_controller_table(editor);
 	const controller_cell = CreateHTML_controller_cell(editor, this.cellControllerTop);
+	const controller_table_prop = CreateHTML_controller_tableProperties(editor);
+	const controller_cell_prop = CreateHTML_controller_cellProperties(editor);
+
 	editor.applyFrameRoots((e) => {
 		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: 'se-table-resize-line' }));
 		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: 'se-table-resize-line-prev' }));
@@ -30,6 +33,8 @@ const Table = function (editor, pluginOptions) {
 	// members - Controller
 	this.controller_table = new Controller(this, controller_table, { position: 'top' });
 	this.controller_cell = new Controller(this, controller_cell, { position: this.cellControllerTop ? 'top' : 'bottom' });
+	this.controller_table_prop = new Controller(this, controller_table_prop, { position: 'bottom' });
+	this.controller_cell_prop = new Controller(this, controller_cell_prop, { position: 'bottom' });
 
 	// members - SelectMenu - split
 	const splitMenu = CreateSplitMenu(this.lang);
@@ -335,8 +340,18 @@ Table.prototype = {
 				this.selectMenu_row.open();
 				break;
 			case 'openTableProperties':
+				if (this.controller_table_prop.form?.style.display === 'block') {
+					this.controller_table_prop.close();
+				} else {
+					this.controller_table_prop.open(this.controller_table.form, null, null, null);
+				}
 				break;
 			case 'openCellProperties':
+				if (this.controller_cell_prop.form?.style.display === 'block') {
+					this.controller_cell_prop.close();
+				} else {
+					this.controller_cell_prop.open(this.controller_cell.form, null, null, null);
+				}
 				break;
 			case 'merge':
 				this.mergeCells();
@@ -1638,8 +1653,7 @@ function CreateSplitMenu(lang) {
 		</div>
 		<div title="${lang.horizontalSplit}" aria-label="${lang.horizontalSplit}">
 			${lang.horizontalSplit}
-		</div>
-		`
+		</div>`
 	);
 
 	return { items: ['vertical', 'horizontal'], menus: menus.querySelectorAll('div') };
@@ -1658,8 +1672,7 @@ function CreateColumnMenu(lang, icons) {
 		</div>
 		<div title="${lang.deleteColumn}" aria-label="${lang.deleteColumn}">
 			<span class="se-list-icon">${icons.delete_column}</span><span class="txt">${lang.deleteColumn}</span>
-		</div>
-		`
+		</div>`
 	);
 
 	return { items: ['insert-left', 'insert-right', 'delete'], menus: menus.querySelectorAll('div') };
@@ -1678,8 +1691,7 @@ function CreateRowMenu(lang, icons) {
 		</div>
 		<div title="${lang.deleteRow}" aria-label="${lang.deleteRow}">
 			<span class="se-list-icon">${icons.delete_row}</span><span class="txt">${lang.deleteRow}</span>
-		</div>
-		`
+		</div>`
 	);
 
 	return { items: ['insert-above', 'insert-below', 'delete'], menus: menus.querySelectorAll('div') };
@@ -1782,6 +1794,42 @@ function CreateHTML_controller_cell(editor, cellControllerTop) {
     </div>`;
 
 	return domUtils.createElement('DIV', { class: 'se-controller se-controller-table-cell' }, html);
+}
+
+function CreateHTML_controller_tableProperties(editor) {
+	const lang = editor.lang;
+	const icons = editor.icons;
+	const html = `
+		<div class="se-controller-content">
+			<div class="se-header">
+				<button type="button" data-command="close" class="se-btn se-controller-close" title="${lang.close}" aria-label="${lang.close}">
+					${icons.cancel}
+				</button>
+				<span class="se-title">${lang.tableProperties}</span>
+			</div>
+			<div class="se-form-group">
+				<div class="">
+					<label>${lang.audio_modal_url}</label>
+					<input class="se-input-form se-input-url" data-focus type="text" />
+					<pre class="se-link-preview"></pre>
+				</div>
+				<div class="se-btn-group">
+					<button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}">
+						<span>${lang.submitButton}</span>
+					</button>
+				</div>
+			</div>
+		</div>`;
+
+	return domUtils.createElement('DIV', { class: 'se-controller' }, html);
+}
+
+function CreateHTML_controller_cellProperties(editor) {
+	const lang = editor.lang;
+	const icons = editor.icons;
+	const html = ``;
+
+	return domUtils.createElement('DIV', { class: 'se-controller' }, html);
 }
 
 export default Table;

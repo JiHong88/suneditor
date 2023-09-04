@@ -1745,9 +1745,19 @@
 	touch-action: manipulation;
 }
 
-/* controller - input */
+/* controller - forum-group input */
 .sun-editor .se-controller .se-form-group input {
 	min-width: 120px;
+}
+
+/* controller - controller-content */
+.sun-editor .se-controller .se-controller-content {
+	position: relative;
+	display: flex;
+	padding: 0 0 2px 0;
+	margin: 0;
+	top: 0;
+	left: 0;
 }
 
 /* controller - resizing(image, iframe) */

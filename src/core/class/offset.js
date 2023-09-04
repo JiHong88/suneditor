@@ -204,6 +204,9 @@ Offset.prototype = {
 			? 0
 			: owOffsetEl.getBoundingClientRect().left + (!owOffsetEl.parentElement || /^html$/i.test(owOffsetEl.parentElement.nodeName) ? window.scrollX : 0);
 
+		oh = heightEditorRefer ? topArea.clientHeight : oh;
+		ow = widthEditorRefer ? topArea.clientWidth : ow;
+
 		return {
 			top: t,
 			ts: ts,
@@ -213,10 +216,10 @@ Offset.prototype = {
 			height: h,
 			x: x,
 			y: y,
-			ohOffsetEl: ohOffsetEl,
-			owOffsetEl: owOffsetEl,
-			oh: heightEditorRefer ? topArea.clientHeight : oh,
-			ow: widthEditorRefer ? topArea.clientWidth : ow,
+			ohOffsetEl: targetAbs ? window : ohOffsetEl,
+			owOffsetEl: targetAbs ? window : owOffsetEl,
+			oh: targetAbs ? window.innerHeight : oh,
+			ow: targetAbs ? window.innerWidth : ow,
 			heightEditorRefer: heightEditorRefer,
 			widthEditorRefer: widthEditorRefer
 		};
@@ -345,7 +348,7 @@ Offset.prototype = {
 		} else {
 			// top margin
 			const emt = editorOffset.top - editorScroll.top - editorScroll.ts;
-			const tmt = targetOffset.top - targetScroll.top - targetScroll.ts;
+			const tmt = targetOffset.top - targetScroll.top - (targetAbs ? 0 : targetScroll.ts);
 			const vt = target.offsetTop;
 			let etmt = tmt < 0 || emt < 0 || targetScroll.heightEditorRefer || (tmt >= 0 && emt >= 0 && emt > tmt) ? tmt : tmt - emt;
 			etmt = vt < 0 && vt < etmt ? vt : etmt;
@@ -353,8 +356,8 @@ Offset.prototype = {
 			toolbarH = editorH + emt <= 0 ? toolbarH : 0;
 			const emb = editorScroll.oh - (editorH + emt);
 			const tmb = targetScroll.oh - (targetH + tmt);
-			const vb = editorH - (target.offsetTop + targetH + toolbarH) + (targetAbs ? 0 : wwScroll.top);
-			let etmb = tmb < 0 || emb < 0 || targetScroll.heightEditorRefer || (tmb >= 0 && emb >= 0 && emb > tmb) ? tmb : tmb - emb;
+			const vb = editorH - ((targetAbs ? 0 : target.offsetTop) + targetH + toolbarH) + (targetAbs ? 0 : wwScroll.top);
+			let etmb = targetAbs || tmb < 0 || emb < 0 || targetScroll.heightEditorRefer || (tmb >= 0 && emb >= 0 && emb > tmb) ? tmb : tmb - emb;
 			etmb = vb < 0 && vb < etmb ? vb : etmb;
 			// marging result
 			rmt =
@@ -416,14 +419,14 @@ Offset.prototype = {
 		} else {
 			// left margin
 			const eml = editorOffset.left - editorScroll.left - editorScroll.ls;
-			const tml = targetOffset.left - targetScroll.left - targetScroll.ls;
+			const tml = targetOffset.left - targetScroll.left - (targetAbs ? 0 : targetScroll.ls);
 			const vl = target.offsetLeft - wwScroll.left;
 			let etml = eml < 0 || tml < 0 || targetScroll.widthEditorRefer || (tml >= 0 && eml >= 0 && eml < tml) ? tml : tml - eml;
 			etml = vl < 0 && vl < etml ? vl : etml;
 			// right margin
 			const emr = editorScroll.ow - (editorW + eml);
 			const tmr = targetScroll.ow - (targetW + tml);
-			const vr = editorW - (target.offsetLeft + targetW) + (targetAbs ? 0 : wwScroll.left);
+			const vr = editorW - ((targetAbs ? tmlw : target.offsetLeft) + targetW) + (targetAbs ? 0 : wwScroll.left);
 			let etmr = emr < 0 || tmr < 0 || targetScroll.widthEditorRefer || (tmr >= 0 && emr >= 0 && emr > tmr) ? tmr : tmr - emr;
 			etmr = vr < 0 && vr < etmr ? vr : etmr;
 			// margin result

@@ -448,7 +448,7 @@ window.c = () => {
 			},
 			table: {
 				scrollType: 'x',
-				cellControllerPosition: 'table'
+				cellControllerPosition: 'cell'
 			}
 		}
 	);
