@@ -1,7 +1,7 @@
 import suneditor from '../../src/suneditor';
 require('../../src/assets/suneditor.css');
 require('../../src/assets/suneditor-content.css');
-// require('../../src/assets/themes/test.css');
+// require('../../src/themes/test.css');
 
 // katex
 import Katex from 'katex';
