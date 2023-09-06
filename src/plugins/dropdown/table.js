@@ -1801,23 +1801,13 @@ function CreateHTML_controller_tableProperties(editor) {
 	const icons = editor.icons;
 	const html = `
 		<div class="se-controller-content">
-			<div class="se-header">
-				<button type="button" data-command="close" class="se-btn se-controller-close" title="${lang.close}" aria-label="${lang.close}">
+			<div class="se-controller-header">
+				<button type="button" data-command="close" class="se-btn se-close-btn" title="${lang.close}" aria-label="${lang.close}">
 					${icons.cancel}
 				</button>
-				<span class="se-title">${lang.tableProperties}</span>
+				<span class="se-controller-title">${lang.tableProperties}</span>
 			</div>
-			<div class="se-form-group">
-				<div class="">
-					<label>${lang.audio_modal_url}</label>
-					<input class="se-input-form se-input-url" data-focus type="text" />
-					<pre class="se-link-preview"></pre>
-				</div>
-				<div class="se-btn-group">
-					<button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}">
-						<span>${lang.submitButton}</span>
-					</button>
-				</div>
+			<div class="se-controller-body">
 			</div>
 		</div>`;
 

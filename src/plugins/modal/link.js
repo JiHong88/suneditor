@@ -154,7 +154,7 @@ function CreateHTML_modal(editor) {
 	const html = `
 	<form>
 		<div class="se-modal-header">
-			<button type="button" data-command="close" class="se-btn se-modal-close" title="${lang.close}" aria-label="${lang.close}">
+			<button type="button" data-command="close" class="se-btn se-close-btn" title="${lang.close}" aria-label="${lang.close}">
 				${icons.cancel}
 			</button>
 			<span class="se-modal-title">${lang.link_modal_title}</span>

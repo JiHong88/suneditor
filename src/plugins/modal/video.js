@@ -727,7 +727,7 @@ function CreateHTML_modal(editor, pluginOptions) {
 	let html = `
 	<form method="post" enctype="multipart/form-data">
 		<div class="se-modal-header">
-			<button type="button" data-command="close" class="se-btn se-modal-close" title="${lang.close}" aria-label="${lang.close}">
+			<button type="button" data-command="close" class="se-btn se-close-btn" title="${lang.close}" aria-label="${lang.close}">
 			${editor.icons.cancel}
 			</button>
 			<span class="se-modal-title">${lang.video_modal_title}</span>

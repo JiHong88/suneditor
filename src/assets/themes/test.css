@@ -12,7 +12,7 @@
 }
 
 .sun-editor .close>svg,
-.sun-editor .se-modal-close>svg {
+.sun-editor .se-modal .se-close-btn>svg {
     width: 10px;
     height: 10px;
 }

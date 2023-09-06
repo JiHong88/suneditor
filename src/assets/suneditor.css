@@ -300,7 +300,7 @@
 
 /* close class icon */
 .sun-editor .close > svg,
-.sun-editor .se-modal-close > svg {
+.sun-editor .se-close-btn > svg {
 	width: 10px;
 	height: 10px;
 }
@@ -1327,11 +1327,11 @@
 
 .sun-editor .se-modal .se-modal-inner .se-modal-header {
 	height: 50px;
-	padding: 6px 15px 6px 15px;
+	padding: 6px 15px;
 	border-bottom: 1px solid #e5e5e5;
 }
 
-.sun-editor .se-modal .se-modal-inner .se-modal-header .se-modal-close {
+.sun-editor .se-modal .se-modal-inner .se-modal-header .se-close-btn {
 	float: right;
 	font-weight: bold;
 	text-shadow: 0 1px 0 #fff;
@@ -1753,11 +1753,45 @@
 /* controller - controller-content */
 .sun-editor .se-controller .se-controller-content {
 	position: relative;
-	display: flex;
 	padding: 0 0 2px 0;
 	margin: 0;
 	top: 0;
 	left: 0;
+}
+
+/* controller - controller-content - header */
+.sun-editor .se-controller .se-controller-header {
+	width: 100%;
+	height: 38px;
+	padding: 4px;
+	border-bottom: 1px solid #e5e5e5;
+}
+
+/* controller - controller-content - body */
+.sun-editor .se-controller .se-controller-body {
+	position: relative;
+	width: 100%;
+	padding: 4px 4px 1px 4px;
+}
+
+.sun-editor .se-controller .se-controller-header .se-close-btn {
+	width: 28px;
+	height: 28px;
+	min-height: 28px;
+	float: right;
+	font-weight: bold;
+	text-shadow: 0 1px 0 #fff;
+	filter: alpha(opacity=100);
+	opacity: 1;
+}
+
+.sun-editor .se-controller .se-controller-header .se-controller-title {
+	float: left;
+	font-size: 13px;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	line-height: 2.2;
 }
 
 /* controller - resizing(image, iframe) */
@@ -2437,7 +2471,7 @@
 }
 
 /* modal - header */
-.sun-editor.se-rtl .se-modal .se-modal-inner .se-modal-header .se-modal-close {
+.sun-editor.se-rtl .se-modal .se-modal-inner .se-modal-header .se-close-btn {
 	float: left;
 }
 
@@ -2515,6 +2549,15 @@
 	direction: rtl;
 	right: auto;
 	left: 0;
+}
+
+/* controller - header */
+.sun-editor.se-rtl .se-controller .se-controller-header .se-close-btn {
+	float: left;
+}
+
+.sun-editor.se-rtl .se-controller .se-controller-header .se-controller-title {
+	float: right;
 }
 
 /** arrow--- */

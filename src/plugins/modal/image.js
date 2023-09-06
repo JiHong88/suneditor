@@ -868,7 +868,7 @@ function CreateHTML_modal(editor, pluginOptions) {
 
 	const html = `
 		<div class="se-modal-header">
-			<button type="button" data-command="close" class="se-btn se-modal-close close" title="${lang.close}" aria-label="${lang.close}">${editor.icons.cancel}</button>
+			<button type="button" data-command="close" class="se-btn se-close-btn close" title="${lang.close}" aria-label="${lang.close}">${editor.icons.cancel}</button>
 			<span class="se-modal-title">${lang.image_modal_title}</span>
 		</div>
 		<div class="se-modal-tabs">
