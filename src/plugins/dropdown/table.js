@@ -4,7 +4,7 @@ import { Controller, SelectMenu } from '../../modules';
 
 const ROW_SELECT_MARGIN = 4;
 const CELL_SELECT_MARGIN = 2;
-const CELL_DECIMAL_END = 1;
+const CELL_DECIMAL_END = 0;
 
 const RESIZE_CELL_CLASS = '.se-table-resize-line';
 const RESIZE_CELL_PREV_CLASS = '.se-table-resize-line-prev';
@@ -1125,11 +1125,19 @@ Table.prototype = {
 	_startCellResizing(col, startX, startWidth, isLeftEdge) {
 		this._setResizeLinePosition(this._figure, this._tdElement, this._resizeLinePrev, isLeftEdge);
 		this._resizeLinePrev.style.display = 'block';
+		const prevValue = col.style.width;
 
 		this._addResizeGlobalEvents(
 			this._cellResize.bind(this, col, this._figure, this._tdElement, this._resizeLine, isLeftEdge, startX, startWidth, this._element.offsetWidth),
-			this.__removeGlobalEvents.bind(this),
-			this._stopResize.bind(this, col, col.style.width, 'width')
+			() => {
+				this.__removeGlobalEvents();
+				if (startWidth >= col.offsetWidth) {
+					col.style.width = prevValue;
+				} else {
+					this.history.push(true);
+				}
+			},
+			this._stopResize.bind(this, col, prevValue, 'width')
 		);
 	},
 
@@ -1147,17 +1155,20 @@ Table.prototype = {
 	_startRowResizing(row, startY, startHeight) {
 		this._setResizeRowPosition(this._figure, row, this._resizeLinePrev);
 		this._resizeLinePrev.style.display = 'block';
+		const prevValue = row.style.height;
 
 		this._addResizeGlobalEvents(
 			this._rowResize.bind(this, row, this._figure, this._resizeLine, startY, startHeight),
 			() => {
 				this.__removeGlobalEvents(this);
-				if (startHeight > row.offsetHeight) {
-					row.style.height = '';
+				if (startHeight >= row.offsetHeight) {
+					row.style.height = prevValue;
+				} else {
+					this.history.push(true);
 				}
 			},
 
-			this._stopResize.bind(this, row, row.style.height, 'height')
+			this._stopResize.bind(this, row, prevValue, 'height')
 		);
 	},
 
