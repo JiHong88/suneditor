@@ -871,7 +871,19 @@
 	border-radius: 2px;
 }
 
-/* dropdown layer --- table selector */
+/* table resize */
+/* table resize - ew */
+.sun-editor .sun-editor-editable table th:hover::before,
+.sun-editor .sun-editor-editable table td:hover::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -2px;
+	width: 4px;
+	height: 100%;
+	background-color: transparent;
+	cursor: ew-resize;
+}
 .sun-editor .sun-editor-editable table th:hover::after,
 .sun-editor .sun-editor-editable table td:hover::after {
 	content: '';
@@ -884,24 +896,36 @@
 	cursor: ew-resize;
 }
 
-.sun-editor .sun-editor-editable table th:hover::before,
-.sun-editor .sun-editor-editable table td:hover::before {
-	content: '';
+/* table resize - ns */
+.sun-editor .sun-editor-editable table tr:hover::after {
+	content: ' ';
 	position: absolute;
-	top: 0;
-	left: -2px;
-	width: 4px;
-	height: 100%;
+	left: 0;
+	bottom: 0px;
+	width: 100%;
+	height: 4px;
 	background-color: transparent;
-	cursor: ew-resize;
+	cursor: ns-resize;
 }
 
+/* table resize - lines */
 .sun-editor .se-table-resize-line {
 	position: absolute;
 	top: 0;
 	width: 4px;
 	height: 100%;
 	margin-left: -2px;
+	background-color: #80bdff;
+	opacity: 0.4;
+	pointer-events: none;
+	display: none;
+}
+.sun-editor .se-table-resize-row {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	height: 4px;
+	margin-top: -2px;
 	background-color: #80bdff;
 	opacity: 0.4;
 	pointer-events: none;
@@ -920,7 +944,20 @@
 	pointer-events: none;
 	display: none;
 }
+.sun-editor .se-table-resize-row-prev {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	height: 4px;
+	margin-top: -1px;
+	border-top: 1px dashed #80bdff;
+	background-color: transparent;
+	opacity: 0.4;
+	pointer-events: none;
+	display: none;
+}
 
+/* dropdown layer --- table selector */
 .sun-editor .se-selector-table {
 	display: none;
 	position: absolute;

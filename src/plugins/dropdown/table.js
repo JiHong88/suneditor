@@ -2,8 +2,14 @@ import EditorInjector from '../../editorInjector';
 import { domUtils, numbers } from '../../helper';
 import { Controller, SelectMenu } from '../../modules';
 
+const ROW_SELECT_MARGIN = 4;
 const CELL_SELECT_MARGIN = 2;
 const CELL_DECIMAL_END = 1;
+
+const RESIZE_CELL_CLASS = '.se-table-resize-line';
+const RESIZE_CELL_PREV_CLASS = '.se-table-resize-line-prev';
+const RESIZE_ROW_CLASS = '.se-table-resize-row';
+const RESIZE_ROW_PREV_CLASS = '.se-table-resize-row-prev';
 
 const Table = function (editor, pluginOptions) {
 	// plugin bisic properties
@@ -26,8 +32,10 @@ const Table = function (editor, pluginOptions) {
 	const controller_cell_prop = CreateHTML_controller_cellProperties(editor);
 
 	editor.applyFrameRoots((e) => {
-		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: 'se-table-resize-line' }));
-		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: 'se-table-resize-line-prev' }));
+		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_CELL_CLASS.replace(/^\./, '') }));
+		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_CELL_PREV_CLASS.replace(/^\./, '') }));
+		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_ROW_CLASS.replace(/^\./, '') }));
+		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_ROW_PREV_CLASS.replace(/^\./, '') }));
 	});
 
 	// members - Controller
@@ -197,20 +205,32 @@ Table.prototype = {
 	},
 
 	onMouseMove({ event }) {
-		const tableCell = domUtils.getParentElement(event.target, domUtils.isTableCell);
+		const tableCell = domUtils.getParentElement(event.target, IsResizeEls);
 		if (!tableCell || this._fixedCell) {
 			this.__hideResizeLine();
 			return;
 		}
 
-		const edge = CheckCellEdge(event, tableCell);
-		if (edge.is) {
-			this._resizeLine = this.editor.frameContext.get('wrapper').querySelector('.se-table-resize-line');
-			this._setResizeLinePosition(domUtils.getParentElement(tableCell, domUtils.isTable), tableCell, this._resizeLine, edge.isLeft);
+		const cellEdge = CheckCellEdge(event, tableCell);
+		if (cellEdge.is) {
+			this.__removeGlobalEvents();
+			this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_CELL_CLASS);
+			this._setResizeLinePosition(domUtils.getParentElement(tableCell, domUtils.isTable), tableCell, this._resizeLine, cellEdge.isLeft);
 			this._resizeLine.style.display = 'block';
-		} else {
-			this.__hideResizeLine();
+			return;
 		}
+
+		// at here [tableCell] is tr element
+		const rowEdge = CheckRowEdge(event, tableCell);
+		if (rowEdge.is) {
+			this.__removeGlobalEvents();
+			this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
+			this._setResizeRowPosition(domUtils.getParentElement(tableCell, domUtils.isTable), tableCell, this._resizeLine);
+			this._resizeLine.style.display = 'block';
+			return;
+		}
+
+		this.__hideResizeLine();
 	},
 
 	/**
@@ -218,32 +238,48 @@ Table.prototype = {
 	 * @param {any} event Event object
 	 */
 	onMouseDown({ event }) {
-		const tableCell = domUtils.getParentElement(event.target, domUtils.isTableCell);
+		const tableCell = domUtils.getParentElement(event.target, IsResizeEls);
 		if (!tableCell) return;
 
-		const edge = CheckCellEdge(event, tableCell);
-		if (edge.is) {
+		const cellEdge = CheckCellEdge(event, tableCell);
+		if (cellEdge.is) {
 			this._deleteStyleSelectedCells();
 			this.setCellInfo(tableCell, true);
-			const colIndex = this._logical_cellIndex - (edge.isLeft ? 1 : 0);
+			const colIndex = this._logical_cellIndex - (cellEdge.isLeft ? 1 : 0);
 
 			// ready
 			this.editor.enableBackWrapper('ew-resize');
-			if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector('.se-table-resize-line');
-			this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector('.se-table-resize-line-prev');
+			if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_CELL_CLASS);
+			this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector(RESIZE_CELL_PREV_CLASS);
 
 			// select figure
 			if (colIndex < 0 || colIndex === this._logical_cellCnt - 1) {
-				this._startFigureResizing(edge.startX, colIndex < 0);
+				this._startFigureResizing(cellEdge.startX, colIndex < 0);
 				return;
 			}
 
 			const col = this._element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
-			this._startCellResizing(col, edge.startX, numbers.get(getComputedStyle(col).width, CELL_DECIMAL_END), edge.isLeft);
-		} else {
-			if (!(tableCell !== this._fixedCell && !this._shift)) return;
-			this.selectCells(tableCell, false);
+			this._startCellResizing(col, cellEdge.startX, numbers.get(getComputedStyle(col).width, CELL_DECIMAL_END), cellEdge.isLeft);
+			return;
 		}
+
+		// at here [tableCell] is tr element
+		const rowEdge = CheckRowEdge(event, tableCell);
+		if (rowEdge.is) {
+			this._deleteStyleSelectedCells();
+			this.setRowInfo(tableCell);
+
+			// ready
+			this.editor.enableBackWrapper('ns-resize');
+			if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
+			this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_PREV_CLASS);
+
+			this._startRowResizing(tableCell, rowEdge.startY, numbers.get(getComputedStyle(tableCell).height, CELL_DECIMAL_END));
+			return;
+		}
+
+		if (!(tableCell !== this._fixedCell && !this._shift)) return;
+		this.selectCells(tableCell, false);
 	},
 
 	/**
@@ -444,9 +480,14 @@ Table.prototype = {
 		this.__globalEvents.touchOff = this.eventManager.addGlobalEvent('touchmove', this._bindTouchOff, false);
 	},
 
-	setCellInfo(tdElement, reset) {
-		const table = (this._element = this._selectedTable || domUtils.getParentElement(tdElement, 'TABLE'));
+	seTableInfo(element) {
+		const table = (this._element = this._selectedTable || domUtils.getParentElement(element, 'TABLE'));
 		this._figure = domUtils.getParentElement(table, (current) => /^FIGURE$/i.test(current.nodeName)) || table;
+		return table;
+	},
+
+	setCellInfo(tdElement, reset) {
+		const table = this.seTableInfo(tdElement);
 
 		// hedaer
 		if (table.querySelector('thead')) domUtils.addClass(this.headerButton, 'active');
@@ -546,6 +587,13 @@ Table.prototype = {
 			rowSpanArr = null;
 			spanIndex = null;
 		}
+	},
+
+	setRowInfo(trElement) {
+		const table = this.seTableInfo(trElement);
+		const rows = (this._trElements = table.rows);
+		this._rowCnt = rows.length;
+		this._rowIndex = trElement.rowIndex;
 	},
 
 	editTable(type, option) {
@@ -1081,7 +1129,7 @@ Table.prototype = {
 		this._addResizeGlobalEvents(
 			this._cellResize.bind(this, col, this._figure, this._tdElement, this._resizeLine, isLeftEdge, startX, startWidth, this._element.offsetWidth),
 			this.__removeGlobalEvents.bind(this),
-			this._stopResize.bind(this, col, col.style.width)
+			this._stopResize.bind(this, col, col.style.width, 'width')
 		);
 	},
 
@@ -1094,6 +1142,30 @@ Table.prototype = {
 			col.style.width = `${newWidthPercent}%`;
 			this._setResizeLinePosition(figure, tdEl, resizeLine, isLeftEdge);
 		}
+	},
+
+	_startRowResizing(row, startY, startHeight) {
+		this._setResizeRowPosition(this._figure, row, this._resizeLinePrev);
+		this._resizeLinePrev.style.display = 'block';
+
+		this._addResizeGlobalEvents(
+			this._rowResize.bind(this, row, this._figure, this._resizeLine, startY, startHeight),
+			() => {
+				this.__removeGlobalEvents(this);
+				if (startHeight > row.offsetHeight) {
+					row.style.height = '';
+				}
+			},
+
+			this._stopResize.bind(this, row, row.style.height, 'height')
+		);
+	},
+
+	_rowResize(row, figure, resizeLine, startY, startHeight, e) {
+		const deltaY = e.clientY - startY;
+		const newHeightPx = startHeight + deltaY;
+		row.style.height = `${newHeightPx}px`;
+		this._setResizeRowPosition(figure, row, resizeLine);
 	},
 
 	_startFigureResizing(startX, isLeftEdge) {
@@ -1112,7 +1184,7 @@ Table.prototype = {
 				/%$/.test(figure.style.width) ? numbers.get(figure.style.width, CELL_DECIMAL_END) : 100
 			),
 			this.__removeGlobalEvents.bind(this),
-			this._stopResize.bind(this, figure, figure.style.width)
+			this._stopResize.bind(this, figure, figure.style.width, 'width')
 		);
 	},
 
@@ -1135,10 +1207,18 @@ Table.prototype = {
 		resizeLine.style.height = `${figure.offsetHeight}px`;
 	},
 
-	_stopResize(target, prevWidth, e) {
+	_setResizeRowPosition(figure, target, resizeLine) {
+		const rowOffset = this.offset.get(target);
+		const tableOffset = this.offset.get(figure);
+		resizeLine.style.top = `${rowOffset.top + target.offsetHeight}px`;
+		resizeLine.style.left = `${tableOffset.left}px`;
+		resizeLine.style.width = `${figure.offsetWidth}px`;
+	},
+
+	_stopResize(target, prevValue, styleProp, e) {
 		if (e.keyCode !== 27) return;
 		this.__removeGlobalEvents();
-		target.style.width = prevWidth;
+		target.style[styleProp] = prevValue;
 	},
 
 	_deleteStyleSelectedCells() {
@@ -1313,6 +1393,10 @@ Table.prototype = {
 	constructor: Table
 };
 
+function IsResizeEls(node) {
+	return /^(TD|TH|TR)$/i.test(node?.nodeName);
+}
+
 function CheckCellEdge(event, tableCell) {
 	const startX = event.clientX;
 	const startWidth = numbers.get(getComputedStyle(tableCell).width, CELL_DECIMAL_END);
@@ -1325,6 +1409,18 @@ function CheckCellEdge(event, tableCell) {
 		is,
 		isLeft,
 		startX
+	};
+}
+
+function CheckRowEdge(event, tableCell) {
+	const startY = event.clientY;
+	const startHeight = numbers.get(getComputedStyle(tableCell).height, CELL_DECIMAL_END);
+	const rect = tableCell.getBoundingClientRect();
+	const is = Math.ceil(startHeight + rect.top - startY) <= ROW_SELECT_MARGIN;
+
+	return {
+		is,
+		startY
 	};
 }
 
