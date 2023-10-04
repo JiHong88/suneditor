@@ -1,5 +1,6 @@
 import { domUtils } from '../helper';
 import CoreInjector from '../editorInjector/_core';
+import { HueSlider, Controller } from '../modules';
 
 /**
  * @description Create a color picker element and register for related events. (this.target)
@@ -15,16 +16,22 @@ const ColorPicker = function (inst, styles, colorList, _defaultColor) {
 	this.kind = inst.constructor.key;
 	this.inst = inst;
 	this.target = CreateHTML(inst.editor, colorList);
+	this.targetButton = null;
 	this.inputElement = this.target.querySelector('.se-color-input');
 	this.styleProperties = styles;
 	this.defaultColor = _defaultColor;
 	this.currentColor = '';
 	this.colorList = this.target.querySelectorAll('li button') || [];
 
+	// modules
+	this.controller_hue = new Controller(this, domUtils.createElement('DIV', { class: 'se-controller' }), { position: 'bottom' });
+	this.hue = new HueSlider(inst.editor, { form: this.controller_hue.form });
+
 	// init
 	this.eventManager.addEvent(this.inputElement, 'input', OnChangeInput.bind(this));
 	this.eventManager.addEvent(this.target.querySelector('form'), 'submit', Submit.bind(this), true);
 	this.eventManager.addEvent(this.target.querySelector('._se_color_picker_remove'), 'click', Remove.bind(this));
+	this.eventManager.addEvent(this.target.querySelector('._se_hue'), 'click', OnColorPalette.bind(this));
 };
 
 ColorPicker.prototype = {
@@ -33,7 +40,8 @@ ColorPicker.prototype = {
 	 * @param {Node} node Current Selected node
 	 * @param {string|null} color Color value
 	 */
-	init(node) {
+	init(node, target) {
+		this.targetButton = target;
 		const computedColor = this.editor.frameContext.get('wwComputedStyle')[this.styleProperties];
 		const defaultColor = this.defaultColor || this.isHexColor(computedColor) ? computedColor : this.rgb2hex(computedColor);
 
@@ -135,6 +143,11 @@ ColorPicker.prototype = {
 	constructor: ColorPicker
 };
 
+function OnColorPalette() {
+	this.hue.open();
+	this.controller_hue.open(this.targetButton);
+}
+
 function Submit(e) {
 	e.preventDefault();
 	this.inst.action(this.currentColor);
@@ -224,7 +237,9 @@ function CreateHTML(editor, colorList) {
 			list += `<div class="se-selector-color">${_makeColor(color)}</div>`;
 		}
 	}
-	list += `<form class="se-form-group">
+	list += `
+		<form class="se-form-group se-form-w0">
+			<button type="button" class="se-btn _se_hue" title="${lang.colorPicker}" aria-label="${lang.colorPicker}">${editor.icons.colorPalette}</button>
 			<input type="text" maxlength="9" class="se-color-input"/>
 			<button type="submit" class="se-btn" title="${lang.submitButton}" aria-label="${lang.submitButton}">${editor.icons.checked}</button>
 			<button type="button" class="se-btn _se_color_picker_remove" title="${lang.removeFormat}" aria-label="${lang.removeFormat}">${editor.icons.erase}</button>

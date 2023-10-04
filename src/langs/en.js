@@ -32,6 +32,7 @@
 		center: 'Center',
 		close: 'Close',
 		codeView: 'Code view',
+		colorPicker: 'Color picker',
 		column: 'Column',
 		default: 'Default',
 		deleteColumn: 'Delete column',

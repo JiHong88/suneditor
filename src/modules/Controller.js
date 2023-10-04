@@ -7,7 +7,7 @@ const NON_RESPONSE_KEYCODE = new RegExp(/^(13|1[7-9]|20|27|40|45|11[2-9]|12[0-3]
  *
  * @param {*} inst
  * @param {*} element
- * @param {{position: "top" | "bottom", disabled?: boolean}} params params
+ * @param {{position: "top" | "bottom" | "position", disabled?: boolean}} params params
  * When using the "top" position, there should not be an arrow on the controller.
  * When using the "bottom" position there should be an arrow on the controller.
  */

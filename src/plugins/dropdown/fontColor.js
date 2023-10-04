@@ -28,8 +28,8 @@ FontColor.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on() {
-		this.colorPicker.init(this.selection.getNode());
+	on(target) {
+		this.colorPicker.init(this.selection.getNode(), target);
 	},
 
 	/**

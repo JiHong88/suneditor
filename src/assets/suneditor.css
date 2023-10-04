@@ -1061,6 +1061,71 @@
 	border: 3px solid #fff;
 }
 
+/* --- hue slider -------------------------------------------------------------- */
+.sun-editor .se-hue-slider {
+	padding: 14px;
+}
+
+.sun-editor .se-hue-slider-container {
+	position: relative;
+	width: auto;
+	height: auto;
+	border-radius: 50%;
+	outline: 2px solid #fff;
+}
+
+.sun-editor .se-hue-slider-container .se-hue-wheel {
+	cursor: pointer;
+	border-radius: 50%;
+}
+
+.sun-editor .se-hue-slider-container .se-hue-wheel-pointer {
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	border: 2px solid #fff; /* 흰색 외각선 */
+	outline: 2px solid #000; /* 검은색 외각선 */
+	border-radius: 50%;
+	background-color: transparent;
+	box-shadow: 0 0 2px #000;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+.sun-editor .se-hue-gradient-container {
+	position: relative;
+	margin-top: 20px;
+	width: 250px;
+	height: 28px;
+	border-radius: 14px;
+	outline: 2px solid #fff;
+}
+
+.sun-editor .se-hue-gradient-container .se-hue-gradient-pointer {
+	position: absolute;
+	width: 14px;
+	height: 14px;
+	border: 2px solid #fff; /* 흰색 외각선 */
+	outline: 2px solid #000; /* 검은색 외각선 */
+	border-radius: 50%;
+	background-color: transparent;
+	box-shadow: 0 0 2px #000;
+	top: 14px;
+	left: calc(100% - 14px);
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+.sun-editor .se-hue-gradient-container .se-hue-gradient {
+	width: 250px;
+	height: 28px;
+	border-radius: 14px; /* 높이의 반만큼을 지정하여 완전한 원형 모양을 얻습니다. */
+	background: linear-gradient(to right, #000, #fff); /* 예시: 검은색에서 흰색으로의 그라데이션. 필요에 따라 수정하세요. */
+	position: relative; /* 포인터의 위치를 결정하기 위해 상대 위치 지정 */
+}
+
 /** --- form group - input -------------------------------------------------------------- */
 .sun-editor .se-form-group {
 	display: flex;
@@ -1068,6 +1133,16 @@
 	min-height: 40px;
 	height: auto;
 	padding: 4px;
+}
+
+.sun-editor .se-form-group.se-form-w0 {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.sun-editor .se-form-group.se-form-h0 {
+	padding-top: 0;
+	padding-bottom: 0;
 }
 
 .sun-editor .se-form-group input {
@@ -1078,7 +1153,7 @@
 	font-size: 12px;
 	margin: 1px 0 1px 0;
 	padding: 0;
-	border-radius: 0.25rem;
+	/* border-radius: 0.25rem; */
 	border: 1px solid #ccc;
 }
 
