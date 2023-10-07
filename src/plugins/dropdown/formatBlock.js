@@ -83,7 +83,7 @@ FormatBlock.prototype = {
 	action(target) {
 		// "line"|"br-line"|"block"
 		const command = target.getAttribute('data-command');
-		const tag = target.firstChild;
+		const tag = target.firstElementChild;
 		if (command === 'block') {
 			this.format.applyBlock(tag);
 		} else if (command === 'br-line') {

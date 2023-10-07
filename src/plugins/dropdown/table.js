@@ -1111,7 +1111,7 @@ Table.prototype = {
 
 		// controller open
 		const figureEl = domUtils.getParentElement(tableElement, (current) => /^FIGURE$/i.test(current.nodeName));
-		this.controller_table.open(figureEl, null, this.close.bind(this), null);
+		this.controller_table.open(figureEl, null, null, null);
 
 		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { left: this.controller_table.form.offsetWidth + 2 } : null;
 		this.controller_cell.open(tdElement, this.cellControllerTop ? figureEl : null, null, addOffset);

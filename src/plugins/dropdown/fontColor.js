@@ -9,7 +9,7 @@ const FontColor = function (editor, pluginOptions) {
 	this.icon = 'font_color';
 
 	// members
-	this.colorPicker = new ColorPicker(this, 'color', pluginOptions.items);
+	this.colorPicker = new ColorPicker(this, 'color', { colorList: pluginOptions.items, disableHEXInput: pluginOptions.disableHEXInput ?? true });
 
 	// create HTML
 	const menu = CreateHTML(this.colorPicker.target);
@@ -50,9 +50,6 @@ FontColor.prototype = {
 };
 
 function OnClickMenu(e) {
-	e.preventDefault();
-	e.stopPropagation();
-
 	const color = e.target.getAttribute('data-value');
 	if (!color) return;
 

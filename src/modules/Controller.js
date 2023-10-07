@@ -2,6 +2,8 @@ import EditorInjector from '../editorInjector';
 import { domUtils } from '../helper';
 
 const NON_RESPONSE_KEYCODE = new RegExp(/^(13|1[7-9]|20|27|40|45|11[2-9]|12[0-3]|144|145)$/);
+const INDEX_0 = 2147483647;
+const INDEX_1 = 2147483646;
 
 /**
  *
@@ -55,6 +57,10 @@ Controller.prototype = {
 
 		if (addOffset) this.__addOffset = { ...this.__addOffset, ...addOffset };
 
+		this.editor.opendControllers?.forEach((e) => {
+			e.form.style.zIndex = INDEX_1;
+		});
+
 		this.__addGlobalEvent();
 		this._setControllerPosition(this.form, this.currentPositionTarget);
 		this._controllerOn(this.form, target);
@@ -67,10 +73,12 @@ Controller.prototype = {
 	close() {
 		this.__offset = {};
 		this.__addOffset = { left: 0, top: 0 };
+
 		this.__removeGlobalEvent();
 		this._controllerOff();
 
 		if (typeof this._initMethod === 'function') this._initMethod();
+		else if (typeof this.inst.close === 'function') this.inst.close();
 	},
 
 	hide() {
@@ -97,7 +105,6 @@ Controller.prototype = {
 		form.style.display = 'block';
 		if (this._shadowRoot) {
 			form.addEventListener('mousedown', function (e) {
-				e.preventDefault();
 				e.stopPropagation();
 			});
 		}
@@ -131,7 +138,7 @@ Controller.prototype = {
 		this.editor.currentControllerName = '';
 		this.editor._antiBlur = false;
 		this.editor._controllerTargetContext = null;
-		if (typeof this.inst.reset === 'function') this.inst.close();
+		if (typeof this.inst.reset === 'function') this.inst.reset();
 	},
 
 	/**
@@ -195,11 +202,11 @@ function Action(e) {
 }
 
 function MouseEnter(e) {
-	e.target.style.zIndex = 2147483647;
+	e.target.style.zIndex = INDEX_0;
 }
 
 function MouseLeave(e) {
-	e.target.style.zIndex = 2147483646;
+	e.target.style.zIndex = INDEX_1;
 }
 
 function CloseListener_keydown(e) {
@@ -216,7 +223,6 @@ function CloseListener_keydown(e) {
 
 function CloseListener_mousedown(e) {
 	if (this._checkFixed() || this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) {
-		e.preventDefault();
 		e.stopPropagation();
 		return;
 	}

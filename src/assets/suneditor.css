@@ -3,6 +3,7 @@
 /* grey color #e1e1e1, #ececec, #d1d1d1 , #c1c1c1 , #b1b1b1 */
 /* blue color #eaf3ff, #dbeaff(shadow: #b7ccf2, #e6f2ff), #c4ddff, #d0e3ff , #80bdff , #3f9dff , #4592ff, #407dd1, #3288ff, #1275ff */
 /* red color #b94a48 , #f2dede , #eed3d7, #d9534f */
+/*  green color #008000 */
 
 /** --- suneditor main */
 .sun-editor {
@@ -144,6 +145,28 @@
 	padding: 0;
 	font-size: 12px;
 	line-height: 1.8;
+}
+
+.sun-editor .se-btn.se-btn-success {
+	float: left;
+	width: 34px;
+	height: auto;
+	min-height: 34px;
+	border: 0;
+	border-radius: 2px;
+	margin: 1px;
+	padding: 0;
+	font-size: 12px;
+	line-height: 1.8;
+}
+.sun-editor .se-btn.se-btn-info {
+	color: #3288ff;
+}
+.sun-editor .se-btn.se-btn-danger {
+	color: #b94a48;
+}
+.sun-editor .se-btn.se-btn-success {
+	color: #008000;
 }
 
 .sun-editor .se-btn-w-auto {
@@ -485,7 +508,7 @@
 	opacity: 0.75;
 	border-radius: 2px;
 	cursor: pointer;
-	z-index: 7;
+	z-index: 2147483647;
 }
 
 .sun-editor .se-line-breaker-component:hover {
@@ -681,7 +704,7 @@
 	left: 0px;
 	width: 100%;
 	height: 0px;
-	z-index: 2147483647;
+	z-index: 2147483646;
 }
 
 /** --- dropdown layer ---------------------------------------------------------- */
@@ -1026,7 +1049,7 @@
 .sun-editor .se-list-layer .se-selector-color {
 	display: flex;
 	width: max-content;
-	max-width: 270px;
+	max-width: 252px;
 	height: auto;
 	padding: 0;
 	margin: auto;
@@ -1048,10 +1071,11 @@
 .sun-editor .se-list-layer .se-selector-color .se-color-pallet button {
 	display: block;
 	cursor: default;
-	width: 30px;
-	height: 30px;
+	width: 28px;
+	height: 28px;
 	margin: 0;
 	border-radius: 0;
+	border: 1px solid #fff;
 	text-indent: -9999px;
 }
 
@@ -1083,8 +1107,8 @@
 	position: absolute;
 	width: 10px;
 	height: 10px;
-	border: 2px solid #fff; /* 흰색 외각선 */
-	outline: 2px solid #000; /* 검은색 외각선 */
+	border: 2px solid #fff;
+	outline: 2px solid #000;
 	border-radius: 50%;
 	background-color: transparent;
 	box-shadow: 0 0 2px #000;
@@ -1096,19 +1120,26 @@
 
 .sun-editor .se-hue-gradient-container {
 	position: relative;
-	margin-top: 20px;
-	width: 250px;
+	margin-top: 14px;
 	height: 28px;
 	border-radius: 14px;
 	outline: 2px solid #fff;
+}
+
+.sun-editor .se-hue-gradient-container .se-hue-gradient {
+	cursor: pointer;
+	height: 28px;
+	border-radius: 14px;
+	background: linear-gradient(to right, #000, #fff);
+	position: relative;
 }
 
 .sun-editor .se-hue-gradient-container .se-hue-gradient-pointer {
 	position: absolute;
 	width: 14px;
 	height: 14px;
-	border: 2px solid #fff; /* 흰색 외각선 */
-	outline: 2px solid #000; /* 검은색 외각선 */
+	border: 2px solid #fff;
+	outline: 2px solid #000;
 	border-radius: 50%;
 	background-color: transparent;
 	box-shadow: 0 0 2px #000;
@@ -1118,12 +1149,9 @@
 	pointer-events: none;
 }
 
-.sun-editor .se-hue-gradient-container .se-hue-gradient {
-	width: 250px;
-	height: 28px;
-	border-radius: 14px; /* 높이의 반만큼을 지정하여 완전한 원형 모양을 얻습니다. */
-	background: linear-gradient(to right, #000, #fff); /* 예시: 검은색에서 흰색으로의 그라데이션. 필요에 따라 수정하세요. */
-	position: relative; /* 포인터의 위치를 결정하기 위해 상대 위치 지정 */
+.sun-editor .se-hue-final-hex {
+	display: flex;
+	margin-top: 10px;
 }
 
 /** --- form group - input -------------------------------------------------------------- */
@@ -1165,6 +1193,11 @@
 	margin: 1px;
 }
 
+.sun-editor .se-form-group.se-form-flex-btn button {
+	float: none;
+	flex: auto;
+}
+
 .sun-editor .se-form-group button.se-btn,
 .sun-editor .se-form-group button.se-btn {
 	border: 1px solid #ccc;
@@ -1202,9 +1235,10 @@
 
 .sun-editor .se-dropdown .se-form-group .se-color-input {
 	width: 72px;
-	margin: 0 2px;
+	margin: 0 4px;
 	text-transform: uppercase;
 	border: none;
+	border-radius: 0;
 	border-bottom: 2px solid #b1b1b1;
 	outline: none;
 }

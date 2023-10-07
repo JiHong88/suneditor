@@ -1,17 +1,22 @@
-import { domUtils, numbers } from '../helper';
+import { domUtils } from '../helper';
 
-const SIZE = 250;
+const SIZE = 240;
+const BAR_H = 28;
 const MIDDLE = SIZE / 2;
 const LIGHTNESS_CONT_VALUE = 50;
 const CLOSE_TO_CENTER_THRESHOLD = 3;
 const FIXED_DEC = 10;
 const SATURATION = 1;
+const GRADIENT_RADIUS = 14;
+const DEFAULT_COLOR_VALUE = { hex: '#FFFFFF', r: 255, g: 255, b: 255, h: 0, s: 1, l: 1 };
 
 let LIGHTNESS = 0;
 let isWheelragging = false;
 let isBarDragging = false;
 let wheelX = SIZE / 2;
 let wheelY = SIZE / 2;
+let finalColor = DEFAULT_COLOR_VALUE;
+let ctx;
 
 function CreateSliderCtx() {
 	const offscreenCanvas = document.createElement('canvas');
@@ -24,27 +29,31 @@ function CreateSliderCtx() {
       <div class="se-hue-wheel-pointer"></div>
     </div>
     <div class="se-hue-gradient-container">
-      <canvas class="se-hue-gradient" width="${SIZE}" height="28"></canvas>
+      <canvas class="se-hue-gradient" width="${SIZE}" height="${BAR_H}"></canvas>
       <div class="se-hue-gradient-pointer"></div>
     </div>
-    <div class="se-hue-final-hex" style="width:240px; height: 30px; margin-top: 20px;"></div>
+    <div class="se-hue-final-hex" style="width:${SIZE}px; height: ${BAR_H}px;">
+		<div style="flex: 3; line-height: 1.5;">#FFFFFF</div>
+		<div style="flex: 1; height: 100%; border: 1px solid #fff; outline: 1px solid #000;"></div>
+	</div>
 	`;
 
 	const slider = domUtils.createElement('DIV', { class: 'se-hue-slider' }, html);
-	const wheel = slider.querySelector('.se-hue-wheel');
-	const gradientBar = slider.querySelector('.se-hue-gradient');
+	const wheelCanvas = slider.querySelector('.se-hue-wheel');
+	const gradientBarCanvas = slider.querySelector('.se-hue-gradient');
+	const currentColors = slider.querySelector('.se-hue-final-hex').children;
 
 	return {
 		slider,
 		offscreenCanvas,
 		offscreenCtx: offscreenCanvas.getContext('2d'),
-		wheel,
-		wheelCtx: wheel.getContext('2d'),
+		wheel: wheelCanvas,
+		wheelCtx: wheelCanvas.getContext('2d'),
 		wheelPointer: slider.querySelector('.se-hue-wheel-pointer'),
-		gradientBar,
+		gradientBar: gradientBarCanvas,
 		gradientPointer: slider.querySelector('.se-hue-gradient-pointer'),
-		gradientRadius: numbers.get(getComputedStyle(gradientBar).borderRadius),
-		currentColor: slider.querySelector('.se-hue-final-hex')
+		fanalColorHex: currentColors[0],
+		fanalColorBackground: currentColors[1]
 	};
 }
 
@@ -52,35 +61,103 @@ function CreateSliderCtx() {
  * @description Create a Hue slider. (only create one at a time)
  * @param {{form: Element}} params {form: Element}
  */
-const HueSlider = function (editor, params) {
-	this.eventManager = editor.eventManager;
+const HueSlider = function (inst, params) {
+	this.editor = inst.editor;
+	this.eventManager = inst.eventManager;
 
 	// members
 	this.form = params.form;
+	this.ctx = {
+		wheelX: wheelX,
+		wheelY: wheelY,
+		lightness: LIGHTNESS,
+		wheelPointerX: '50%',
+		wheelPointerY: '50%',
+		gradientPointerX: 'calc(100% - 14px)',
+		color: DEFAULT_COLOR_VALUE
+	};
+	this.__globalMouseDown = null;
 	this.__globalMouseMove = null;
 	this.__globalMouseUp = null;
 };
 
 HueSlider.prototype = {
-	open() {
+	get() {
+		return finalColor;
+	},
+
+	attach() {
+		// drow
+		this.init();
 		this.form.appendChild(slider);
-		this.__globalMouseMove = this.eventManager.addEvent(document, 'mousemove', (event) => {
-			if (isWheelragging) {
-				this.updatePointer_wheel(event.clientX, event.clientY);
-			} else if (isBarDragging) {
-				this.updatePointer_bar(event.clientX);
-			}
-		});
-		this.__globalMouseUp = this.eventManager.addEvent(document, 'mouseup', () => {
-			isWheelragging = false;
-			isBarDragging = false;
-		});
-		drawColorWheel();
+		ctx = this.ctx;
+		if (ctx) {
+			wheelX = ctx.wheelX;
+			wheelY = ctx.wheelY;
+			LIGHTNESS = ctx.lightness;
+			wheelPointer.style.left = ctx.wheelPointerX;
+			wheelPointer.style.top = ctx.wheelPointerY;
+			gradientPointer.style.left = ctx.gradientPointerX;
+			setHex(ctx.color.hex);
+
+			drawColorWheel();
+			createGradientBar(getDefaultColor());
+		}
+
+		// event
+		this.__globalMouseDown = this.eventManager.addGlobalEvent(
+			'mousedown',
+			({ target, clientX, clientY }) => {
+				if (target === wheel) {
+					isBarDragging = false;
+					isWheelragging = true;
+					updatePointer_wheel(clientX, clientY);
+				} else if (target === gradientBar) {
+					isBarDragging = true;
+					isWheelragging = false;
+					updatePointer_bar(clientX);
+				}
+			},
+			true
+		);
+		this.__globalMouseMove = this.eventManager.addGlobalEvent(
+			'mousemove',
+			({ clientX, clientY }) => {
+				if (isWheelragging) {
+					updatePointer_wheel(clientX, clientY);
+				} else if (isBarDragging) {
+					updatePointer_bar(clientX);
+				}
+			},
+			true
+		);
+		this.__globalMouseUp = this.eventManager.addGlobalEvent(
+			'mouseup',
+			() => {
+				isWheelragging = false;
+				isBarDragging = false;
+			},
+			true
+		);
 	},
 
 	close() {
+		this.ctx = {
+			gradientPointerX: gradientPointer.style.left,
+			wheelPointerX: wheelPointer.style.left,
+			wheelPointerY: wheelPointer.style.top,
+			wheelX: wheelX,
+			wheelY: wheelY,
+			lightness: LIGHTNESS,
+			color: ctx.color || getWheelColor(wheelCtx)
+		};
+		this.init();
+	},
+
+	init() {
 		isWheelragging = false;
 		isBarDragging = false;
+		if (this.__globalMouseDown) this.__globalMouseDown = this.eventManager.removeGlobalEvent(this.__globalMouseDown);
 		if (this.__globalMouseMove) this.__globalMouseMove = this.eventManager.removeGlobalEvent(this.__globalMouseMove);
 		if (this.__globalMouseUp) this.__globalMouseUp = this.eventManager.removeGlobalEvent(this.__globalMouseUp);
 	},
@@ -89,35 +166,35 @@ HueSlider.prototype = {
 };
 
 // init
-const { slider, offscreenCanvas, offscreenCtx, wheel, wheelCtx, wheelPointer, gradientBar, gradientPointer, gradientRadius, currentColor } = CreateSliderCtx();
+const { slider, offscreenCanvas, offscreenCtx, wheel, wheelCtx, wheelPointer, gradientBar, gradientPointer, fanalColorHex, fanalColorBackground } = CreateSliderCtx();
 
 function updatePointer_wheel(x, y) {
 	const rect = wheel.getBoundingClientRect();
-	x = x - rect.left - radius;
-	y = y - rect.top - radius;
+	x = x - rect.left - MIDDLE;
+	y = y - rect.top - MIDDLE;
 
 	const angle = (Math.atan2(y, x) * 180) / Math.PI;
-	const distance = Math.min(Math.sqrt(x * x + y * y), radius);
+	const distance = Math.min(Math.sqrt(x * x + y * y), MIDDLE);
 
-	const posX = radius + distance * Math.cos((angle * Math.PI) / 180);
-	const posY = radius + distance * Math.sin((angle * Math.PI) / 180);
+	const posX = MIDDLE + distance * Math.cos((angle * Math.PI) / 180);
+	const posY = MIDDLE + distance * Math.sin((angle * Math.PI) / 180);
 
 	wheelPointer.style.left = `${posX}px`;
 	wheelPointer.style.top = `${posY}px`;
 
 	wheelPickedColor(posX, posY);
-	getFinalColor();
+	setFinalColor();
 }
 
 function updatePointer_bar(x) {
 	const rect = gradientBar.getBoundingClientRect();
 	let posX = x - rect.left;
-	posX = Math.max(gradientRadius, Math.min(posX, rect.width - gradientRadius));
+	posX = Math.max(GRADIENT_RADIUS, Math.min(posX, rect.width - GRADIENT_RADIUS));
 
 	gradientPointer.style.left = `${posX}px`;
 
 	selectGradientColor(x);
-	getFinalColor();
+	setFinalColor();
 }
 
 function wheelPickedColor(posX, posY) {
@@ -141,8 +218,13 @@ function getDefaultColor() {
 	return getWheelColor(offscreenCtx);
 }
 
-function getFinalColor() {
-	return getWheelColor(wheelCtx);
+function setFinalColor() {
+	ctx.color = finalColor = getWheelColor(wheelCtx);
+	setHex(finalColor.hex);
+}
+
+function setHex(hex) {
+	fanalColorBackground.style.backgroundColor = fanalColorHex.textContent = hex;
 }
 
 function getWheelColor(wheelCtx) {
@@ -185,7 +267,7 @@ function selectGradientColor(x) {
 	if (posX < 0) posX = 0;
 	if (posX > boundingRect.width) posX = boundingRect.width;
 
-	const tolerance = gradientRadius;
+	const tolerance = GRADIENT_RADIUS;
 
 	// If a click occurs near the end, the value is corrected all the way to the end.
 	if (posX >= gradientBar.width - tolerance) {
@@ -320,33 +402,13 @@ function rgbToHex({ r, g, b }) {
 	return `${hexR}${hexG}${hexB}`.toUpperCase();
 }
 
-function hexToRgb(hex) {
-	const bigint = parseInt(hex.slice(1), 16);
-	const r = (bigint >> 16) & 255;
-	const g = (bigint >> 8) & 255;
-	const b = bigint & 255;
-
-	return { r, g, b };
-}
-
 function roundNumber(num) {
 	const factor = Math.pow(10, FIXED_DEC);
 	return Math.round(num * factor) / factor;
 }
 
-wheel.addEventListener('mousedown', (event) => {
-	isWheelragging = true;
-	isBarDragging = false;
-	updatePointer_wheel(event.clientX, event.clientY);
-});
-
-gradientBar.addEventListener('mousedown', (event) => {
-	isBarDragging = true;
-	isWheelragging = false;
-	updatePointer_bar(event.clientX);
-});
-
 // create
 drawColorWheelToContext(offscreenCtx);
+drawColorWheel();
 
 export default HueSlider;

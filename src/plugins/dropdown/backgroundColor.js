@@ -9,7 +9,7 @@ const BackgroundColor = function (editor, pluginOptions) {
 	this.icon = 'background_color';
 
 	// members
-	this.colorPicker = new ColorPicker(this, 'backgroundColor', pluginOptions.items);
+	this.colorPicker = new ColorPicker(this, 'backgroundColor', { colorList: pluginOptions.items, disableHEXInput: pluginOptions.disableHEXInput ?? true });
 
 	// create HTML
 	const menu = CreateHTML(this.colorPicker.target);
@@ -28,8 +28,8 @@ BackgroundColor.prototype = {
 	/**
 	 * @override dropdown
 	 */
-	on() {
-		this.colorPicker.init(this.selection.getNode());
+	on(target) {
+		this.colorPicker.init(this.selection.getNode(), target);
 	},
 
 	/**
@@ -50,9 +50,6 @@ BackgroundColor.prototype = {
 };
 
 function OnClickMenu(e) {
-	e.preventDefault();
-	e.stopPropagation();
-
 	const color = e.target.getAttribute('data-value');
 	if (!color) return;
 

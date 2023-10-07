@@ -1126,7 +1126,7 @@ Format.prototype = {
 		let newNode,
 			styleRegExp = '',
 			classRegExp = '',
-			removeNodeRegExp = '';
+			removeNodeRegExp = null;
 
 		if (styleArray) {
 			for (let i = 0, len = styleArray.length, s; i < len; i++) {
