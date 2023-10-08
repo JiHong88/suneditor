@@ -1909,12 +1909,17 @@ function CreateHTML_controller_tableProperties(editor) {
 	const html = `
 		<div class="se-controller-content">
 			<div class="se-controller-header">
-				<button type="button" data-command="close" class="se-btn se-close-btn" title="${lang.close}" aria-label="${lang.close}">
-					${icons.cancel}
-				</button>
 				<span class="se-controller-title">${lang.tableProperties}</span>
 			</div>
 			<div class="se-controller-body">
+				<div class="se-form-group se-form-w0 se-form-flex-btn">
+					<label>${lang.border}</label>
+					<button type="button" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>
+				</div>
+			</div>
+			<div class="se-form-group se-form-w0 se-form-flex-btn">
+				<button type="button" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>
+				<button type="button" class="se-btn se-btn-danger" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
 			</div>
 		</div>`;
 
@@ -1924,7 +1929,17 @@ function CreateHTML_controller_tableProperties(editor) {
 function CreateHTML_controller_cellProperties(editor) {
 	const lang = editor.lang;
 	const icons = editor.icons;
-	const html = ``;
+	const html = `
+		<div class="se-controller-header">
+			<span class="se-controller-title">${lang.cellProperties}</span>
+		</div>
+		<div class="se-controller-body">
+		</div>
+		<div class="se-form-group se-form-w0 se-form-flex-btn">
+			<button type="button" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>
+			<button type="button" class="se-btn se-btn-danger" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
+		</div>
+	`;
 
 	return domUtils.createElement('DIV', { class: 'se-controller' }, html);
 }

@@ -27,6 +27,7 @@
 		backgroundColor: 'Highlight Color',
 		basic: 'Basic',
 		bold: 'Bold',
+		border: 'Border',
 		caption: 'Insert description',
 		cellProperties: 'Cell properties',
 		center: 'Center',
