@@ -11,6 +11,8 @@ const RESIZE_CELL_PREV_CLASS = '.se-table-resize-line-prev';
 const RESIZE_ROW_CLASS = '.se-table-resize-row';
 const RESIZE_ROW_PREV_CLASS = '.se-table-resize-row-prev';
 
+const BORDER_LIST = ['none', 'dotted', 'dashed', 'solid', 'double', 'groove', 'ridge', 'inset', 'outset'];
+
 const Table = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -28,8 +30,7 @@ const Table = function (editor, pluginOptions) {
 	const commandArea = menu.querySelector('.se-controller-table-picker');
 	const controller_table = CreateHTML_controller_table(editor);
 	const controller_cell = CreateHTML_controller_cell(editor, this.cellControllerTop);
-	const controller_table_prop = CreateHTML_controller_tableProperties(editor);
-	const controller_cell_prop = CreateHTML_controller_cellProperties(editor);
+	const controller_props = CreateHTML_controller_properties(editor);
 
 	editor.applyFrameRoots((e) => {
 		e.get('wrapper').appendChild(domUtils.createElement('DIV', { class: RESIZE_CELL_CLASS.replace(/^\./, '') }));
@@ -41,8 +42,7 @@ const Table = function (editor, pluginOptions) {
 	// members - Controller
 	this.controller_table = new Controller(this, controller_table, { position: 'top' });
 	this.controller_cell = new Controller(this, controller_cell, { position: this.cellControllerTop ? 'top' : 'bottom' });
-	this.controller_table_prop = new Controller(this, controller_table_prop, { position: 'bottom' });
-	this.controller_cell_prop = new Controller(this, controller_cell_prop, { position: 'bottom' });
+	this.controller_props = new Controller(this, controller_props, { position: 'bottom' });
 
 	// members - SelectMenu - split
 	const splitMenu = CreateSplitMenu(this.lang);
@@ -64,6 +64,15 @@ const Table = function (editor, pluginOptions) {
 	this.selectMenu_row = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
 	this.selectMenu_row.on(rowButton, OnRowEdit.bind(this));
 	this.selectMenu_row.create(rownMenu.items, rownMenu.menus);
+
+	// members - SelectMenu - properties
+	const borderMenu = CreateBorderMenu();
+	const borderButton = controller_props.querySelector('[data-command="onborder"]');
+	this.selectMenu_props_border = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
+	this.selectMenu_props_border.on(borderButton, OnPropsBorderEdit.bind(this));
+	this.selectMenu_props_border.create(borderMenu.items, borderMenu.menus);
+
+	// members - Color Selector
 
 	// memberts - elements..
 	this.maxText = this.lang.maxSize;
@@ -146,7 +155,7 @@ Table.prototype = {
 		const colGroup = `<colgroup>${`<col style="width: ${numbers.get(100 / x, CELL_DECIMAL_END)}%;">`.repeat(x)}</colgroup>`;
 		oTable.innerHTML = colGroup + body;
 
-		const figure = domUtils.createElement('FIGURE', { class: 'se-non-select-figure se-scroll-figure' });
+		const figure = domUtils.createElement('FIGURE', { class: 'se-non-select-figure' });
 		figure.appendChild(oTable);
 
 		if (this.component.insert(figure, false, false)) {
@@ -177,7 +186,7 @@ Table.prototype = {
 
 				// figure
 				if (!FigureEl) {
-					const figure = domUtils.createElement('FIGURE', { class: 'se-non-select-figure se-scroll-figure' });
+					const figure = domUtils.createElement('FIGURE', { class: 'se-non-select-figure' });
 					element.parentNode.insertBefore(figure, element);
 					figure.appendChild(element);
 				} else {
@@ -279,6 +288,8 @@ Table.prototype = {
 		}
 
 		if (!(tableCell !== this._fixedCell && !this._shift)) return;
+		if (/^TR$/i.test(tableCell?.nodeName)) return;
+
 		this.selectCells(tableCell, false);
 	},
 
@@ -375,19 +386,24 @@ Table.prototype = {
 				this.selectMenu_row.menus[0].style.display = this.selectMenu_row.menus[1].style.display = /^TH$/i.test(this._tdElement?.nodeName) ? 'none' : '';
 				this.selectMenu_row.open();
 				break;
+			case 'onborder':
+				this.selectMenu_props_border.open();
+				break;
 			case 'openTableProperties':
-				if (this.controller_table_prop.form?.style.display === 'block') {
-					this.controller_table_prop.close();
+				if (this.controller_props.target === this.controller_table.form && this.controller_props.form?.style.display === 'block') {
+					this.controller_props.close();
 				} else {
-					this.controller_table_prop.open(this.controller_table.form, null, null, null);
+					this.controller_props.open(this.controller_table.form, null, null, null);
 				}
 				break;
 			case 'openCellProperties':
-				if (this.controller_cell_prop.form?.style.display === 'block') {
-					this.controller_cell_prop.close();
+				if (this.controller_props.target === this.controller_cell.form && this.controller_props.form?.style.display === 'block') {
+					this.controller_props.close();
 				} else {
-					this.controller_cell_prop.open(this.controller_cell.form, null, null, null);
+					this.controller_props.open(this.controller_cell.form, null, null, null);
 				}
+				break;
+			case 'onpalette':
 				break;
 			case 'merge':
 				this.mergeCells();
@@ -522,7 +538,7 @@ Table.prototype = {
 
 			// span
 			this._current_colSpan = this._tdElement.colSpan - 1;
-			this._current_rowSpan - this._trElement.cells[cellIndex].rowSpan - 1;
+			this._current_rowSpan = this._trElement.cells[cellIndex].rowSpan - 1;
 
 			// find logcal cell index
 			let rowSpanArr = [];
@@ -1804,6 +1820,21 @@ function CreateRowMenu(lang, icons) {
 	return { items: ['insert-above', 'insert-below', 'delete'], menus: menus.querySelectorAll('div') };
 }
 
+function CreateBorderMenu() {
+	let html = '';
+
+	for (let i = 0, len = BORDER_LIST.length, s; i < len; i++) {
+		s = BORDER_LIST[i];
+		html += `
+		<div title="${s}" aria-label="${s}" style="padding: 0 12px;">
+			<span class="txt">${s}</span>
+		</div>`;
+	}
+
+	const menus = domUtils.createElement('DIV', null, html);
+	return { items: BORDER_LIST, menus: menus.querySelectorAll('div') };
+}
+
 function CreateHTML() {
 	const html = `
 	<div class="se-table-size">
@@ -1903,7 +1934,18 @@ function CreateHTML_controller_cell(editor, cellControllerTop) {
 	return domUtils.createElement('DIV', { class: 'se-controller se-controller-table-cell' }, html);
 }
 
-function CreateHTML_controller_tableProperties(editor) {
+function OnPropsBorderEdit(command) {
+	if (command === 'none') {
+
+	} else {
+
+	}
+
+	this.history.push(false);
+	this.selectMenu_props_border.close();
+}
+
+function CreateHTML_controller_properties(editor) {
 	const lang = editor.lang;
 	const icons = editor.icons;
 	const html = `
@@ -1912,9 +1954,29 @@ function CreateHTML_controller_tableProperties(editor) {
 				<span class="se-controller-title">${lang.tableProperties}</span>
 			</div>
 			<div class="se-controller-body">
+				<label>${lang.border}</label>
 				<div class="se-form-group se-form-w0 se-form-flex-btn">
-					<label>${lang.border}</label>
-					<button type="button" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>
+					<button type="button" data-command="onborder" class="se-btn se-tooltip">
+						<span class="se-tooltip-inner">
+							<span class="se-tooltip-text">${lang.border}</span>
+						</span>
+					</button>
+					<input type="text" class="se-color-input" />
+					<button type="button" data-command="onpalette" class="se-btn se-tooltip">
+						<span class="se-tooltip-inner">
+							<span class="se-tooltip-text">${lang.colorPicker}</span>
+						</span>
+					</button>
+					<input type="text" class="se-input-control" />
+				</div>
+				<label>${lang.backgroundColor}</label>
+				<div class="se-form-group se-form-w0 se-form-flex-btn">
+					<input type="text" class="se-color-input" />
+					<button type="button" data-command="onpalette" class="se-btn se-tooltip">
+						<span class="se-tooltip-inner">
+							<span class="se-tooltip-text">${lang.colorPicker}</span>
+						</span>
+					</button>
 				</div>
 			</div>
 			<div class="se-form-group se-form-w0 se-form-flex-btn">
@@ -1922,24 +1984,6 @@ function CreateHTML_controller_tableProperties(editor) {
 				<button type="button" class="se-btn se-btn-danger" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
 			</div>
 		</div>`;
-
-	return domUtils.createElement('DIV', { class: 'se-controller' }, html);
-}
-
-function CreateHTML_controller_cellProperties(editor) {
-	const lang = editor.lang;
-	const icons = editor.icons;
-	const html = `
-		<div class="se-controller-header">
-			<span class="se-controller-title">${lang.cellProperties}</span>
-		</div>
-		<div class="se-controller-body">
-		</div>
-		<div class="se-form-group se-form-w0 se-form-flex-btn">
-			<button type="button" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>
-			<button type="button" class="se-btn se-btn-danger" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
-		</div>
-	`;
 
 	return domUtils.createElement('DIV', { class: 'se-controller' }, html);
 }

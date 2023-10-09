@@ -2,8 +2,8 @@ import EditorInjector from '../editorInjector';
 import { domUtils } from '../helper';
 
 const NON_RESPONSE_KEYCODE = new RegExp(/^(13|1[7-9]|20|27|40|45|11[2-9]|12[0-3]|144|145)$/);
-const INDEX_0 = 2147483647;
-const INDEX_1 = 2147483646;
+const INDEX_0 = 2147483646;
+const INDEX_1 = 2147483645;
 
 /**
  *
@@ -20,6 +20,7 @@ const Controller = function (inst, element, params, _name) {
 	this.kind = _name || inst.constructor.key;
 	this.inst = inst;
 	this.form = element;
+	this.isOpen = false;
 	this.currentTarget = null;
 	this.currentPositionTarget = null;
 	this.position = params.position || 'bottom';
@@ -64,6 +65,8 @@ Controller.prototype = {
 		this.__addGlobalEvent();
 		this._setControllerPosition(this.form, this.currentPositionTarget);
 		this._controllerOn(this.form, target);
+		this.isOpen = true;
+		this.editor._antiBlur = true;
 	},
 
 	/**
@@ -71,6 +74,9 @@ Controller.prototype = {
 	 * The plugin's "init" method is called.
 	 */
 	close() {
+		if(!this.isOpen) return;
+		this.isOpen = false;
+		this.editor._antiBlur = false;
 		this.__offset = {};
 		this.__addOffset = { left: 0, top: 0 };
 
@@ -110,12 +116,15 @@ Controller.prototype = {
 		}
 
 		this.editor._controllerTargetContext = this.editor.frameContext.get('topArea');
-		this.editor.opendControllers.push({
-			position: this.position,
-			form: form,
-			target: target,
-			inst: this
-		});
+
+		if (!this.isOpen) {
+			this.editor.opendControllers.push({
+				position: this.position,
+				form: form,
+				target: target,
+				inst: this
+			});
+		}
 
 		this.editor._antiBlur = true;
 		if (typeof this.events.onShowController === 'function')
@@ -222,10 +231,7 @@ function CloseListener_keydown(e) {
 }
 
 function CloseListener_mousedown(e) {
-	if (this._checkFixed() || this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) {
-		e.stopPropagation();
-		return;
-	}
+	if (this._checkFixed() || this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) return;
 	this.close();
 }
 

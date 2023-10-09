@@ -371,7 +371,6 @@
 .sun-editor-editable table tr {
 	position: relative;
 	box-sizing: border-box;
-	border: 1px solid #efefef;
 }
 
 .sun-editor-editable table th {

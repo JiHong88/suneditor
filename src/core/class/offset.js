@@ -2,7 +2,7 @@
  * @fileoverview Offset class
  */
 
-import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass } from '../../helper/domUtils';
+import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass, getViewportSize } from '../../helper/domUtils';
 import { numbers } from '../../helper';
 
 const Offset = function (editor) {
@@ -207,6 +207,7 @@ Offset.prototype = {
 		oh = heightEditorRefer ? topArea.clientHeight : oh;
 		ow = widthEditorRefer ? topArea.clientWidth : ow;
 
+		const viewportSize = getViewportSize();
 		return {
 			top: t,
 			ts: ts,
@@ -218,8 +219,8 @@ Offset.prototype = {
 			y: y,
 			ohOffsetEl: targetAbs ? window : ohOffsetEl,
 			owOffsetEl: targetAbs ? window : owOffsetEl,
-			oh: targetAbs ? window.innerHeight : oh,
-			ow: targetAbs ? window.innerWidth : ow,
+			oh: targetAbs ? viewportSize.h : oh,
+			ow: targetAbs ? viewportSize.w : ow,
 			heightEditorRefer: heightEditorRefer,
 			widthEditorRefer: widthEditorRefer
 		};
@@ -283,7 +284,7 @@ Offset.prototype = {
 			offsetEl = offsetEl.offsetParent;
 		}
 
-		const menuHeight_bottom = window.innerHeight - (containerTop - scrollTop + bt + target.offsetHeight);
+		const menuHeight_bottom = getViewportSize().h - (containerTop - scrollTop + bt + target.offsetHeight);
 		if (menuHeight_bottom < elHeight) {
 			let menuTop = -1 * (elHeight - bt + 3);
 			const insTop = containerTop - scrollTop + menuTop;
@@ -320,6 +321,7 @@ Offset.prototype = {
 			addOffset.left *= -1;
 		}
 
+		const viewportSize = getViewportSize();
 		const targetAbs = window.getComputedStyle(target).position === 'absolute';
 		const wwScroll = this.getWWScroll();
 		const editorOffset = this.getGlobal();
@@ -336,7 +338,7 @@ Offset.prototype = {
 		const targetH = target.offsetHeight;
 		// margin
 		const tmtw = targetRect.top;
-		const tmbw = window.innerHeight - targetRect.bottom;
+		const tmbw = viewportSize.h - targetRect.bottom;
 		let toolbarH =
 			!this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline || this.options.get('toolbar_container'))
 				? 0
@@ -411,7 +413,7 @@ Offset.prototype = {
 		const aw = arrow ? arrow.offsetWidth : 0;
 		// margin
 		const tmlw = targetRect.left;
-		const tmrw = window.innerWidth - targetRect.right;
+		const tmrw = viewportSize.w - targetRect.right;
 		let rml, rmr;
 		if (this.editor.frameContext.get('isFullScreen')) {
 			rml = tmlw;

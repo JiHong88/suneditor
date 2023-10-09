@@ -967,6 +967,17 @@ export function getScrollParent(element) {
 	}
 }
 
+/**
+ * @description Gets the size of the window viewport excluding the width of the scrollbar.
+ * @returns {{w, h}}
+ */
+export function getViewportSize() {
+	return {
+		w: document.documentElement.clientWidth,
+		h: document.documentElement.clientHeight
+	};
+}
+
 const domUtils = {
 	isZeroWith,
 	createElement,
@@ -1021,7 +1032,8 @@ const domUtils = {
 	isUneditable,
 	isImportantDisabled,
 	isExcludeFormat,
-	getScrollParent
+	getScrollParent,
+	getViewportSize
 };
 
 export default domUtils;

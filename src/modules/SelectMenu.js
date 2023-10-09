@@ -21,6 +21,7 @@ const SelectMenu = function (inst, params) {
 	this.menus = [];
 	this.index = -1;
 	this.item = null;
+	this.isOpen = false;
 	this.checkList = !!params.checkList;
 	this.position = positionItems[0];
 	this.subPosition = positionItems[1];
@@ -60,7 +61,7 @@ SelectMenu.prototype = {
 		this.form = domUtils.createElement(
 			'DIV',
 			{
-				class: 'se-select-menu ' + (attr.class || ''),
+				class: 'se-select-menu' + (attr.class ? ' ' + attr.class : ''),
 				style: attr.style || ''
 			},
 			'<div class="se-list-inner"></div>'
@@ -81,12 +82,14 @@ SelectMenu.prototype = {
 		const mainPosition = positionItems[0] || (this._textDirDiff !== null && this._textDirDiff !== this.options.get('_rtl') ? this._dirPosition : this.position);
 		const subPosition = positionItems[1] || (this._textDirDiff !== null && this._textDirDiff !== this.options.get('_rtl') ? this._dirSubPosition : this.subPosition);
 		this._setPosition(mainPosition, subPosition, onItemQuerySelector);
+		this.isOpen = true;
 	},
 
 	close() {
 		this.editor.selectMenuOn = false;
 		this._init();
 		if (this.form) this.form.style.cssText = '';
+		this.isOpen = false;
 	},
 
 	getItem(index) {
@@ -156,7 +159,7 @@ SelectMenu.prototype = {
 		const targetOffsetTop = target.offsetTop;
 		const targetGlobalTop = globalTarget.top;
 		const targetHeight = target.offsetHeight;
-		const wbottom = this._w.innerHeight - (targetGlobalTop - this._w.scrollY + targetHeight);
+		const wbottom = domUtils.getViewportSize().h - (targetGlobalTop - this._w.scrollY + targetHeight);
 		const sideAddH = side ? targetHeight : 0;
 		let overH = 10000;
 		switch (position) {

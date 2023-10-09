@@ -268,16 +268,6 @@
 	border-radius: 2px;
 }
 
-.sun-editor input:focus,
-.sun-editor select:focus,
-.sun-editor textarea:focus {
-	border: 1px solid #80bdff;
-	outline: 0;
-	-webkit-box-shadow: 0 0 0 0.2rem #d0e3ff;
-	box-shadow: 0 0 0 0.2rem #d0e3ff;
-	transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
 /* disabled buttons, icon blur */
 .sun-editor .se-btn:disabled,
 .sun-editor button:disabled {
@@ -1177,10 +1167,10 @@
 	flex: auto;
 	display: inline-block;
 	width: auto;
-	height: 33px;
+	height: 34px;
 	font-size: 12px;
 	margin: 1px 0 1px 0;
-	padding: 0;
+	padding: 0 4px;
 	/* border-radius: 0.25rem; */
 	border: 1px solid #ccc;
 }
@@ -1203,7 +1193,7 @@
 	border: 1px solid #ccc;
 }
 
-.sun-editor .se-form-group > div {
+.sun-editor .se-form-group .se-group-item {
 	position: relative;
 }
 
@@ -1229,7 +1219,7 @@
 /** form group - dropdown - color input */
 .sun-editor .se-dropdown .se-form-group input {
 	width: auto;
-	height: 33px;
+	height: 34px;
 	color: #555;
 }
 
@@ -1917,6 +1907,7 @@
 /* controller - controller-content - body */
 .sun-editor .se-controller .se-controller-body {
 	position: relative;
+	font-size: 13px;
 	width: 100%;
 	padding: 4px 4px 1px 4px;
 }
@@ -2120,8 +2111,6 @@
 	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 	outline: 0 none;
-	overflow-y: inherit;
-	overflow-x: inherit;
 }
 
 .sun-editor .se-select-menu ul {
@@ -2442,6 +2431,17 @@
 .sun-editor .se-notice button {
 	float: right;
 	padding: 7px;
+}
+
+/* --- Input focus */
+.sun-editor input:focus,
+.sun-editor select:focus,
+.sun-editor textarea:focus {
+	border-color: #80bdff;
+	outline: 0;
+	-webkit-box-shadow: 0 0 0 0.2rem #d0e3ff;
+	box-shadow: 0 0 0 0.2rem #d0e3ff;
+	transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 /** --- tooltip */

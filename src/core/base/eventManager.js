@@ -161,7 +161,6 @@ EventManager.prototype = {
 
 		const fc = this.editor.frameContext;
 		const notReadonly = !fc.get('isReadOnly');
-		this.editor._antiBlur = false;
 		for (let element = selectionNode; !domUtils.isWysiwygFrame(element); element = element.parentNode) {
 			if (!element) break;
 			if (element.nodeType !== 1 || domUtils.isBreak(element)) continue;
@@ -553,7 +552,6 @@ EventManager.prototype = {
 				if (!value) return false;
 				cleanData = value;
 			}
-			console.log('cleanData', cleanData);
 		}
 		// user event - drop
 		if (type === 'drop' && typeof this.events.onDrop === 'function') {
