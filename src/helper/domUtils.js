@@ -861,6 +861,15 @@ export function isTableCell(node) {
 }
 
 /**
+ * @description Check the node is a table row (tr)
+ * @param {Node|string} node The element or element name to check
+ * @returns {boolean}
+ */
+export function isTableRow(node) {
+	return /^TR$/i.test(typeof node === 'string' ? node : node?.nodeName);
+}
+
+/**
  * @description Check the node is a break node (BR)
  * @param {Node|string} node The element or element name to check
  * @returns {boolean}
@@ -1022,6 +1031,7 @@ const domUtils = {
 	isTable,
 	isTableElements,
 	isTableCell,
+	isTableRow,
 	isBreak,
 	isAnchor,
 	isMedia,
