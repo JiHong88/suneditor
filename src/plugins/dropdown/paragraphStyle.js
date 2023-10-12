@@ -63,20 +63,20 @@ ParagraphStyle.prototype = {
 	constructor: ParagraphStyle
 };
 
-function CreateHTML(editor, items) {
+function CreateHTML({ lang }, items) {
 	const defaultList = {
 		spaced: {
-			name: editor.lang.menu_spaced,
+			name: lang.menu_spaced,
 			class: '__se__p-spaced',
 			_class: ''
 		},
 		bordered: {
-			name: editor.lang.menu_bordered,
+			name: lang.menu_bordered,
 			class: '__se__p-bordered',
 			_class: ''
 		},
 		neon: {
-			name: editor.lang.menu_neon,
+			name: lang.menu_neon,
 			class: '__se__p-neon',
 			_class: ''
 		}

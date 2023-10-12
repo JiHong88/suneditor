@@ -98,7 +98,7 @@ FormatBlock.prototype = {
 	constructor: FormatBlock
 };
 
-function CreateHTML(editor, items) {
+function CreateHTML({ lang }, items) {
 	const defaultFormats = ['p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 	const formatList = !items || items.length === 0 ? defaultFormats : items;
 
@@ -113,7 +113,7 @@ function CreateHTML(editor, items) {
 			tagName = format.toLowerCase();
 			command = tagName === 'blockquote' ? 'block' : tagName === 'pre' ? 'br-line' : 'line';
 			h = /^h/.test(tagName) ? tagName.match(/\d+/)[0] : '';
-			name = editor.lang['tag_' + (h ? 'h' : tagName)] + h;
+			name = lang['tag_' + (h ? 'h' : tagName)] + h;
 			className = '';
 			attrs = '';
 		} else {

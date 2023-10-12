@@ -131,6 +131,29 @@ export function createElementBlacklist(list) {
 }
 
 /**
+ * @description Function to check hex format color
+ * @param {string} str Color value
+ */
+export function isHexColor(str) {
+	return /^#[0-9a-f]{3}(?:[0-9a-f]{3})?$/i.test(str);
+}
+
+/**
+ * @description Function to convert hex format to a rgb color
+ * @param {string} rgb RGB color format
+ * @returns {string}
+ */
+export function rgb2hex(rgb) {
+	const rgbMatch = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+	return rgbMatch?.length === 4
+		? '#' +
+				('0' + parseInt(rgbMatch[1], 10).toString(16)).slice(-2) +
+				('0' + parseInt(rgbMatch[2], 10).toString(16)).slice(-2) +
+				('0' + parseInt(rgbMatch[3], 10).toString(16)).slice(-2)
+		: '';
+}
+
+/**
  * @description Converts options-related styles and returns them for each frame.
  * @param {Object.<string, any>} fo frameOptions
  * @param {string} cssText Style string
@@ -226,6 +249,8 @@ const converter = {
 	swapKeyValue,
 	createElementWhitelist,
 	createElementBlacklist,
+	isHexColor,
+	rgb2hex,
 	_setDefaultOptionStyle,
 	_setIframeStyleLinks,
 	_setAutoHeightStyle

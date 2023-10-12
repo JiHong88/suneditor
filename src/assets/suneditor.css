@@ -1872,11 +1872,6 @@
 	touch-action: manipulation;
 }
 
-/* controller - forum-group input */
-.sun-editor .se-controller .se-form-group input {
-	min-width: 120px;
-}
-
 /* controller - controller-content */
 .sun-editor .se-controller .se-controller-content {
 	position: relative;
@@ -2050,6 +2045,16 @@
 	line-height: 1.42857143;
 }
 
+.sun-editor .se-controller.se-table-props button[data-command='onborder'] {
+	width: 80px;
+}
+.sun-editor .se-controller.se-table-props .se-color-input {
+	width: 84px;
+}
+.sun-editor .se-controller.se-table-props .__se__border_size {
+	width: 42px;
+}
+
 /* controller - link */
 .sun-editor .se-controller-link {
 	font-size: 14px;
@@ -2091,8 +2096,9 @@
 	display: none;
 	width: auto;
 	height: auto;
-	overflow-y: auto;
-	overflow-x: hidden;
+	overflow-y: visible;
+	overflow-x: visible;
+	overflow: visible;
 	background-color: #fff;
 	border-radius: 2px;
 	padding: 2px 0;
@@ -2101,6 +2107,10 @@
 	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 	box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
 	outline: 0 none;
+}
+
+.sun-editor .se-select-menu.se-select-menu-scroll {
+	overflow-y: auto;
 }
 
 .sun-editor .se-select-menu ul {

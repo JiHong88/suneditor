@@ -79,9 +79,7 @@ FontSize.prototype = {
 	constructor: FontSize
 };
 
-function CreateHTML(editor, items) {
-	const options = editor.options;
-	const lang = editor.lang;
+function CreateHTML({ lang, options }, items) {
 	const sizeList = items || [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
 
 	let list = `

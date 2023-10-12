@@ -265,13 +265,12 @@ function OnClick_browser(e) {
 	}
 }
 
-function CreateHTML(editor) {
-	const lang = editor.lang;
+function CreateHTML({ lang, icons }) {
 	return `
 		<div class="se-file-browser-content">
 			<div class="se-file-browser-header">
 				<button type="button" data-command="close" class="se-btn se-file-browser-close" class="close" title="${lang.close}" aria-label="${lang.close}">
-					${editor.icons.cancel}
+					${icons.cancel}
 				</button>
 				<span class="se-file-browser-title"></span>
 				<div class="se-file-browser-tags"></div>

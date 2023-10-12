@@ -215,8 +215,7 @@ function CheckKatex(katex) {
 	return katex;
 }
 
-function CreateHTML_modal(editor, math, fontSizeList) {
-	const lang = editor.lang;
+function CreateHTML_modal({ lang, icons }, math, fontSizeList) {
 	const fontSize = fontSizeList || [
 		{
 			text: '1',
@@ -240,7 +239,7 @@ function CreateHTML_modal(editor, math, fontSizeList) {
     <form>
         <div class="se-modal-header">
             <button type="button" data-command="close" class="se-btn se-close-btn" title="${lang.close}" aria-label="${lang.close}">
-                ${editor.icons.cancel}
+                ${icons.cancel}
             </button>
             <span class="se-modal-title">${lang.math_modal_title}</span>
         </div>
@@ -277,20 +276,19 @@ function CreateHTML_modal(editor, math, fontSizeList) {
 	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
-function CreateHTML_controller(core) {
-	const lang = core.lang;
+function CreateHTML_controller({ lang, icons }) {
 	const html = `
     <div class="se-arrow se-arrow-up"></div>
     <div class="link-content">
         <div class="se-btn-group">
             <button type="button" data-command="update" tabindex="-1" class="se-btn se-tooltip">
-                ${core.icons.edit}
+                ${icons.edit}
                 <span class="se-tooltip-inner">
                     <span class="se-tooltip-text">${lang.edit}</span>
                 </span>
             </button>
             <button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">
-                ${core.icons.delete}
+                ${icons.delete}
                 <span class="se-tooltip-inner">
                     <span class="se-tooltip-text">${lang.remove}</span>
                 </span>

@@ -87,6 +87,7 @@ SelectMenu.prototype = {
 
 	close() {
 		this.editor.selectMenuOn = false;
+		domUtils.removeClass(this._refer, 'on');
 		this._init();
 		if (this.form) this.form.style.cssText = '';
 		this.isOpen = false;
@@ -136,6 +137,8 @@ SelectMenu.prototype = {
 		const target = this._refer;
 		form.style.visibility = 'hidden';
 		form.style.display = 'block';
+		domUtils.removeClass(form, 'se-select-menu-scroll');
+		domUtils.addClass(target, 'on');
 
 		const formW = form.offsetWidth;
 		const targetW = target.offsetWidth;
@@ -189,6 +192,10 @@ SelectMenu.prototype = {
 				break;
 			case 'top':
 				if (targetGlobalTop < form.offsetHeight - sideAddH) {
+					if (!_re) {
+						overH = 0;
+						break;
+					}
 					overH = targetGlobalTop - 4 + sideAddH;
 					if (overH >= MENU_MIN_HEIGHT) form.style.height = overH + 'px';
 				}
@@ -196,6 +203,10 @@ SelectMenu.prototype = {
 				break;
 			case 'bottom':
 				if (wbottom < form.offsetHeight + sideAddH) {
+					if (!_re) {
+						overH = 0;
+						break;
+					}
 					overH = wbottom - 4 + sideAddH;
 					if (overH >= MENU_MIN_HEIGHT) form.style.height = overH + 'px';
 				}
@@ -326,8 +337,6 @@ function OnKeyDown_refer(e) {
 }
 
 function OnMousedown_list(e) {
-	e.preventDefault();
-	e.stopPropagation();
 	if (env.isGecko) {
 		const target = domUtils.getParentElement(e.target, '.se-select-item');
 		if (target) this._injectActiveEvent(target);
@@ -357,7 +366,6 @@ function OnClick_list(e) {
 function CloseListener_key(e) {
 	if (!/27/.test(e.keyCode)) return;
 	this.close();
-	e.stopPropagation();
 }
 
 function CloseListener_mousedown(e) {
@@ -372,7 +380,6 @@ function CloseListener_mousedown(e) {
 function CloseListener_click(e) {
 	this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
 	if (e.target === this._refer) {
-		e.stopPropagation();
 		this.close();
 	}
 }

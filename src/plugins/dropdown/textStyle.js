@@ -78,15 +78,15 @@ TextStyle.prototype = {
 	constructor: TextStyle
 };
 
-function CreateHTML(editor, items) {
+function CreateHTML({ lang }, items) {
 	const defaultList = {
 		code: {
-			name: editor.lang.menu_code,
+			name: lang.menu_code,
 			class: '__se__t-code',
 			tag: 'code'
 		},
 		shadow: {
-			name: editor.lang.menu_shadow,
+			name: lang.menu_shadow,
 			class: '__se__t-shadow',
 			tag: 'span'
 		}

@@ -432,13 +432,12 @@ function FileInputChange() {
 	}
 }
 
-function CreateHTML_modal(editor, pluginOptions) {
-	const lang = editor.lang;
+function CreateHTML_modal({ lang, icons }, pluginOptions) {
 	let html = `
     <form method="post" enctype="multipart/form-data">
         <div class="se-modal-header">
             <button type="button" data-command="close" class="se-btn se-close-btn" title="${lang.close}" aria-label="${lang.close}">
-                ${editor.icons.cancel}
+                ${icons.cancel}
             </button>
             <span class="se-modal-title">${lang.audio_modal_title}</span>
         </div>
@@ -452,7 +451,7 @@ function CreateHTML_modal(editor, pluginOptions) {
 			pluginOptions.allowMultiple ? ' multiple="multiple"' : ''
 		}/>
                 <button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">
-                    ${editor.icons.cancel}
+                    ${icons.cancel}
                 </button>
             </div>
         </div>`;
@@ -477,9 +476,7 @@ function CreateHTML_modal(editor, pluginOptions) {
 	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
-function CreateHTML_controller(editor) {
-	const lang = editor.lang;
-	const icons = editor.icons;
+function CreateHTML_controller({ lang, icons }) {
 	const html = `
     <div class="se-arrow se-arrow-up"></div>
     <div class="link-content">

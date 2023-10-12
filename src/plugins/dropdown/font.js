@@ -84,8 +84,7 @@ Font.prototype = {
 	constructor: Font
 };
 
-function CreateHTML(editor, fontList) {
-	const lang = editor.lang;
+function CreateHTML({ lang }, fontList) {
 	let list = `
 	<div class="se-list-inner">
 		<ul class="se-list-basic">

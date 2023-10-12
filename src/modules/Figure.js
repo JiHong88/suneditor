@@ -992,10 +992,7 @@ function GET_CONTROLLER_BUTTONS(group) {
 	};
 }
 
-function CreateHTML_controller(editor, controls) {
-	const lang = editor.lang;
-	const icons = editor.icons;
-
+function CreateHTML_controller({ lang, icons }, controls) {
 	let html = '<div class="se-arrow se-arrow-up"></div>';
 	for (let i = 0, group; i < controls.length; i++) {
 		group = controls[i];

@@ -722,13 +722,12 @@ function OnInputSize(xy, e) {
 	}
 }
 
-function CreateHTML_modal(editor, pluginOptions) {
-	const lang = editor.lang;
+function CreateHTML_modal({ lang, icons }, pluginOptions) {
 	let html = `
 	<form method="post" enctype="multipart/form-data">
 		<div class="se-modal-header">
 			<button type="button" data-command="close" class="se-btn se-close-btn" title="${lang.close}" aria-label="${lang.close}">
-			${editor.icons.cancel}
+			${icons.cancel}
 			</button>
 			<span class="se-modal-title">${lang.video_modal_title}</span>
 		</div>
@@ -741,7 +740,7 @@ function CreateHTML_modal(editor, pluginOptions) {
 				<div class="se-modal-form-files">
 					<input class="se-input-form _se_video_file" type="file" data-focus accept="${pluginOptions.acceptedFormats}"${pluginOptions.allowMultiple ? ' multiple="multiple"' : ''}/>
 					<button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">
-						${editor.icons.cancel}
+						${icons.cancel}
 					</button>
 				</div>
 			</div>`;
@@ -789,7 +788,7 @@ function CreateHTML_modal(editor, pluginOptions) {
 						)
 						.join('')}
 				</select>
-				<button type="button" title="${lang.revertButton}" aria-label="${lang.revertButton}" class="se-btn se-modal-btn-revert">${editor.icons.revert}</button>
+				<button type="button" title="${lang.revertButton}" aria-label="${lang.revertButton}" class="se-btn se-modal-btn-revert">${icons.revert}</button>
 			</div>
 			<div class="se-modal-form se-modal-form-footer"${onlyPercentDisplay}${onlyWidthDisplay}>
 				<label>

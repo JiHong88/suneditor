@@ -77,8 +77,7 @@ LineHeight.prototype = {
 	constructor: LineHeight
 };
 
-function CreateHTML(editor, items) {
-	const lang = editor.lang;
+function CreateHTML({ lang }, items) {
 	const sizeList = items || [
 		{ text: '1', value: 1 },
 		{ text: '1.15', value: 1.15 },

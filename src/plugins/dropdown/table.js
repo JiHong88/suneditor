@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils, numbers } from '../../helper';
+import { domUtils, numbers, converter } from '../../helper';
 import { Controller, SelectMenu } from '../../modules';
 
 const ROW_SELECT_MARGIN = 5;
@@ -65,7 +65,7 @@ const Table = function (editor, pluginOptions) {
 	this.selectMenu_row.on(rowButton, OnRowEdit.bind(this));
 	this.selectMenu_row.create(rownMenu.items, rownMenu.menus);
 
-	// members - SelectMenu - properties
+	// members - SelectMenu - properties - border
 	const borderMenu = CreateBorderMenu();
 	const borderButton = controller_props.querySelector('[data-command="onborder"]');
 	this.selectMenu_props_border = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
@@ -77,6 +77,12 @@ const Table = function (editor, pluginOptions) {
 	// memberts - elements..
 	this.maxText = this.lang.maxSize;
 	this.minText = this.lang.minSize;
+	this.propTargets = {
+		border_style: controller_props.querySelector('[data-command="onborder"] .txt'),
+		border_color: controller_props.querySelector('.__se_border_color'),
+		border_width: controller_props.querySelector('.__se__border_size'),
+		back_color: controller_props.querySelector('.__se_back_color')
+	};
 	this.tableHighlight = menu.querySelector('.se-table-size-highlighted');
 	this.tableUnHighlight = menu.querySelector('.se-table-size-unhighlighted');
 	this.tableDisplay = menu.querySelector('.se-table-size-display');
@@ -398,6 +404,7 @@ Table.prototype = {
 				if (this.controller_props.target === this.controller_table.form && this.controller_props.form?.style.display === 'block') {
 					this.controller_props.close();
 				} else {
+					this._setCtrlProps('table');
 					this.controller_props.open(this.controller_table.form, null, null, null);
 				}
 				break;
@@ -405,6 +412,7 @@ Table.prototype = {
 				if (this.controller_props.target === this.controller_cell.form && this.controller_props.form?.style.display === 'block') {
 					this.controller_props.close();
 				} else {
+					this._setCtrlProps('cell');
 					this.controller_props.open(this.controller_cell.form, null, null, null);
 				}
 				break;
@@ -1287,6 +1295,17 @@ Table.prototype = {
 		else domUtils.addClass(wysiwyg, 'se-disabled');
 	},
 
+	_setCtrlProps(type) {
+		const target = type === 'table' ? this._element : this._tdElement;
+		const { borderColor, borderStyle, borderWidth, backgroundColor } = window.getComputedStyle(target);
+		const { border_color, border_style, border_width, back_color } = this.propTargets;
+
+		border_style.textContent = borderStyle;
+		border_color.value = converter.isHexColor(borderColor) ? borderColor : converter.rgb2hex(borderColor);
+		border_width.value = borderWidth;
+		back_color.value = converter.isHexColor(backgroundColor) ? borderColor : converter.rgb2hex(backgroundColor);
+	},
+
 	_setMultiCells(startCell, endCell) {
 		const rows = this._selectedTable.rows;
 		this._deleteStyleSelectedCells();
@@ -1863,9 +1882,7 @@ function CreateHTML() {
 	return domUtils.createElement('DIV', { class: 'se-dropdown se-selector-table' }, html);
 }
 
-function CreateHTML_controller_table(editor) {
-	const lang = editor.lang;
-	const icons = editor.icons;
+function CreateHTML_controller_table({ lang, icons }) {
 	const html = `
 	<div class="se-btn-group">
 		<button type="button" data-command="openTableProperties" class="se-btn se-tooltip">
@@ -1909,9 +1926,7 @@ function CreateHTML_controller_table(editor) {
 	return domUtils.createElement('DIV', { class: 'se-controller se-controller-table' }, html);
 }
 
-function CreateHTML_controller_cell(editor, cellControllerTop) {
-	const lang = editor.lang;
-	const icons = editor.icons;
+function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
 	const html = `
     ${cellControllerTop ? '' : '<div class="se-arrow se-arrow-up"></div>'}
     <div class="se-btn-group">
@@ -1959,9 +1974,7 @@ function OnPropsBorderEdit(command) {
 	this.selectMenu_props_border.close();
 }
 
-function CreateHTML_controller_properties(editor) {
-	const lang = editor.lang;
-	const icons = editor.icons;
+function CreateHTML_controller_properties({ lang, icons }) {
 	const html = `
 		<div class="se-controller-content">
 			<div class="se-controller-header">
@@ -1969,23 +1982,25 @@ function CreateHTML_controller_properties(editor) {
 			</div>
 			<div class="se-controller-body">
 				<label>${lang.border}</label>
-				<div class="se-form-group se-form-w0 se-form-flex-btn">
-					<button type="button" data-command="onborder" class="se-btn se-tooltip">
+				<div class="se-form-group se-form-w0">
+					<button type="button" data-command="onborder" class="se-btn se-btn-select se-tooltip">
+						<span class="txt"></span>
+						${icons.arrow_down}
 						<span class="se-tooltip-inner">
 							<span class="se-tooltip-text">${lang.border}</span>
 						</span>
 					</button>
-					<input type="text" class="se-color-input" />
+					<input type="text" class="se-color-input __se_border_color" />
 					<button type="button" data-command="onpalette" class="se-btn se-tooltip">
 						<span class="se-tooltip-inner">
 							<span class="se-tooltip-text">${lang.colorPicker}</span>
 						</span>
 					</button>
-					<input type="text" class="se-input-control" />
+					<input type="text" class="se-input-control __se__border_size" />
 				</div>
 				<label>${lang.backgroundColor}</label>
-				<div class="se-form-group se-form-w0 se-form-flex-btn">
-					<input type="text" class="se-color-input" />
+				<div class="se-form-group se-form-w0">
+					<input type="text" class="se-color-input __se_back_color" />
 					<button type="button" data-command="onpalette" class="se-btn se-tooltip">
 						<span class="se-tooltip-inner">
 							<span class="se-tooltip-text">${lang.colorPicker}</span>
@@ -1999,7 +2014,7 @@ function CreateHTML_controller_properties(editor) {
 			</div>
 		</div>`;
 
-	return domUtils.createElement('DIV', { class: 'se-controller' }, html);
+	return domUtils.createElement('DIV', { class: 'se-controller se-table-props' }, html);
 }
 
 export default Table;

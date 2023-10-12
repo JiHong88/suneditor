@@ -821,8 +821,7 @@ function OnloadImg(oImg, _svgDefaultSize, container) {
 	delete oImg.onload;
 }
 
-function CreateHTML_modal(editor, pluginOptions) {
-	const lang = editor.lang;
+function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 	const createFileInputHtml = !pluginOptions.createFileInput
 		? ''
 		: `
@@ -830,7 +829,7 @@ function CreateHTML_modal(editor, pluginOptions) {
 			<label>${lang.image_modal_file}</label>
 			<div class="se-modal-form-files">
 				<input class="se-input-form _se_image_file" data-focus type="file" accept="${pluginOptions.acceptedFormats}"${pluginOptions.allowMultiple ? ' multiple="multiple"' : ''}/>
-				<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">${editor.icons.cancel}</button>
+				<button type="button" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">${icons.cancel}</button>
 			</div>
 		</div>`;
 
@@ -842,8 +841,8 @@ function CreateHTML_modal(editor, pluginOptions) {
 			<div class="se-modal-form-files">
 				<input class="se-input-form se-input-url _se_image_url" data-focus type="text" />
 				${
-					editor.plugins.imageGallery
-						? `<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="${lang.imageGallery}" aria-label="${lang.imageGallery}">${editor.icons.image_gallery}</button>`
+					plugins.imageGallery
+						? `<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="${lang.imageGallery}" aria-label="${lang.imageGallery}">${icons.image_gallery}</button>`
 						: ''
 				}
 			</div>
@@ -863,12 +862,12 @@ function CreateHTML_modal(editor, pluginOptions) {
 			<label class="se-modal-size-x">x</label>
 			<input type="text" class="se-input-control _se_image_size_y" placeholder="auto" />
 			<label><input type="checkbox" class="se-modal-btn-check _se_image_check_proportion" checked/>&nbsp;${lang.proportion}</label>
-			<button type="button" title="${lang.revertButton}" aria-label="${lang.revertButton}" class="se-btn se-modal-btn-revert">${editor.icons.revert}</button>
+			<button type="button" title="${lang.revertButton}" aria-label="${lang.revertButton}" class="se-btn se-modal-btn-revert">${icons.revert}</button>
 		</div>`;
 
 	const html = `
 		<div class="se-modal-header">
-			<button type="button" data-command="close" class="se-btn se-close-btn close" title="${lang.close}" aria-label="${lang.close}">${editor.icons.cancel}</button>
+			<button type="button" data-command="close" class="se-btn se-close-btn close" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
 			<span class="se-modal-title">${lang.image_modal_title}</span>
 		</div>
 		<div class="se-modal-tabs">

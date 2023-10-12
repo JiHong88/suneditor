@@ -43,7 +43,7 @@ Link.prototype = {
 			domUtils.addClass(element, 'on');
 
 			this.anchor.set(element);
-			this.controller.open(element,null,null,null);
+			this.controller.open(element, null, null, null);
 
 			return true;
 		}
@@ -148,9 +148,7 @@ Link.prototype = {
 	constructor: Link
 };
 
-function CreateHTML_modal(editor) {
-	const lang = editor.lang;
-	const icons = editor.icons;
+function CreateHTML_modal({ lang, icons }) {
 	const html = `
 	<form>
 		<div class="se-modal-header">
@@ -170,9 +168,7 @@ function CreateHTML_modal(editor) {
 	return domUtils.createElement('DIV', { class: 'se-modal-content' }, html);
 }
 
-function CreateHTML_controller(editor) {
-	const lang = editor.lang;
-	const icons = editor.icons;
+function CreateHTML_controller({ lang, icons }) {
 	const html = `
 	<div class="se-arrow se-arrow-up"></div>
 	<div class="link-content">

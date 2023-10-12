@@ -58,8 +58,7 @@ HR.prototype = {
 	constructor: HR
 };
 
-function CreateHTML(editor, HRItems) {
-	const lang = editor.lang;
+function CreateHTML({ lang }, HRItems) {
 	const items = HRItems || [
 		{
 			name: lang.hr_solid,
