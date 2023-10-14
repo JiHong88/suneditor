@@ -2,8 +2,9 @@ import EditorInjector from '../editorInjector';
 import { domUtils } from '../helper';
 
 const NON_RESPONSE_KEYCODE = new RegExp(/^(13|1[7-9]|20|27|40|45|11[2-9]|12[0-3]|144|145)$/);
-const INDEX_0 = 2147483646;
-const INDEX_1 = 2147483645;
+const INDEX_0 = 2147483647;
+const INDEX_1 = 2147483646;
+const INDEX_2 = 2147483645;
 
 /**
  *
@@ -23,7 +24,7 @@ const Controller = function (inst, element, params, _name) {
 	this.isOpen = false;
 	this.currentTarget = null;
 	this.currentPositionTarget = null;
-	this.position = params.position || 'bottom';
+	this.position = params.position;
 	this.disabled = !!params.disabled;
 	this._initMethod = null;
 	this.__globalEventHandlers = [CloseListener_keydown.bind(this), CloseListener_mousedown.bind(this)];
@@ -59,7 +60,7 @@ Controller.prototype = {
 		if (addOffset) this.__addOffset = { ...this.__addOffset, ...addOffset };
 
 		this.editor.opendControllers?.forEach((e) => {
-			e.form.style.zIndex = INDEX_1;
+			e.form.style.zIndex = INDEX_2;
 		});
 
 		this.__addGlobalEvent();
@@ -74,7 +75,7 @@ Controller.prototype = {
 	 * The plugin's "init" method is called.
 	 */
 	close() {
-		if(!this.isOpen) return;
+		if (!this.isOpen) return;
 		this.isOpen = false;
 		this.editor._antiBlur = false;
 		this.__offset = {};
@@ -156,6 +157,7 @@ Controller.prototype = {
 	 * @param {Element} referEl Element that is the basis of the controller's position.
 	 */
 	_setControllerPosition(controller, referEl) {
+		controller.style.zIndex = INDEX_0;
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
@@ -191,6 +193,10 @@ Controller.prototype = {
 		return false;
 	},
 
+	_checkForm(target) {
+		return domUtils.getParentElement(target, '.se-controller');
+	},
+
 	constructor: Controller
 };
 
@@ -211,11 +217,11 @@ function Action(e) {
 }
 
 function MouseEnter(e) {
-	e.target.style.zIndex = INDEX_0;
+	e.target.style.zIndex = INDEX_1;
 }
 
 function MouseLeave(e) {
-	e.target.style.zIndex = INDEX_1;
+	e.target.style.zIndex = INDEX_2;
 }
 
 function CloseListener_keydown(e) {
@@ -225,13 +231,16 @@ function CloseListener_keydown(e) {
 	if (ctrl || !NON_RESPONSE_KEYCODE.test(keyCode)) return;
 
 	this.editor.frameContext.get('lineBreaker').style.display = 'none';
-	if (this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) return;
+	if (this.form.contains(e.target) || this._checkForm(e.target)) return;
 	if (this.editor._fileManager.pluginRegExp.test(this.kind) && keyCode !== 27) return;
 	this.close();
 }
 
 function CloseListener_mousedown(e) {
-	if (this._checkFixed() || this.form.contains(e.target) || domUtils.getParentElement(e.target, '.se-controller')) return;
+	if (this._checkFixed() || this.form.contains(e.target) || this._checkForm(e.target)) {
+		e.stopPropagation();
+		return;
+	}
 	this.close();
 }
 

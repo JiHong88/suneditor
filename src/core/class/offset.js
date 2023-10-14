@@ -322,17 +322,12 @@ Offset.prototype = {
 		}
 
 		const viewportSize = getViewportSize();
-		const targetAbs = window.getComputedStyle(target).position === 'absolute';
 		const wwScroll = this.getWWScroll();
-		const editorOffset = this.getGlobal();
-		const editorScroll = this.getGlobalScroll();
 		const targetRect = this.editor.selection.getRects(target, 'start').rects;
 		const targetOffset = this.getGlobal(target);
-		const targetScroll = this.getGlobalScroll(target);
 		const arrow = hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null;
 
 		// top ----------------------------------------------------------------------------------------------------
-		const editorH = this.editor.frameContext.get('topArea').offsetHeight;
 		const ah = arrow ? arrow.offsetHeight : 0;
 		const elH = element.offsetHeight;
 		const targetH = target.offsetHeight;
@@ -348,25 +343,8 @@ Offset.prototype = {
 			rmt = tmtw - toolbarH;
 			rmb = tmbw;
 		} else {
-			// top margin
-			const emt = editorOffset.top - editorScroll.top - editorScroll.ts;
-			const tmt = targetOffset.top - targetScroll.top - (targetAbs ? 0 : targetScroll.ts);
-			const vt = target.offsetTop;
-			let etmt = tmt < 0 || emt < 0 || targetScroll.heightEditorRefer || (tmt >= 0 && emt >= 0 && emt > tmt) ? tmt : tmt - emt;
-			etmt = vt < 0 && vt < etmt ? vt : etmt;
-			// bottom margin
-			toolbarH = editorH + emt <= 0 ? toolbarH : 0;
-			const emb = editorScroll.oh - (editorH + emt);
-			const tmb = targetScroll.oh - (targetH + tmt);
-			const vb = editorH - ((targetAbs ? 0 : target.offsetTop) + targetH + toolbarH) + (targetAbs ? 0 : wwScroll.top);
-			let etmb = targetAbs || tmb < 0 || emb < 0 || targetScroll.heightEditorRefer || (tmb >= 0 && emb >= 0 && emb > tmb) ? tmb : tmb - emb;
-			etmb = vb < 0 && vb < etmb ? vb : etmb;
-			// marging result
-			rmt =
-				(etmt < tmtw ? etmt : tmtw) -
-				((this.editor.toolbar._sticky && emt < this.context.get('toolbar.main').getBoundingClientRect().bottom) || toolbarH) +
-				(!isLTR ? -targetOffset.scrollTop : 0);
-			rmb = (etmb < tmbw ? etmb : tmbw) + (isLTR ? targetOffset.scrollTop : 0);
+			rmt = targetRect.top;
+			rmb = viewportSize.h - targetRect.bottom;
 		}
 
 		if (rmb + targetH <= 0 || rmt + targetH <= 0) return;
@@ -384,7 +362,7 @@ Offset.prototype = {
 				y = rmt - (elH + ah);
 				if (y < 0) {
 					arrowDir = '';
-					t -= y + (rmt < 0 ? 0 : -rmt);
+					t -= y;
 				}
 			}
 		} else {
@@ -397,7 +375,7 @@ Offset.prototype = {
 				y = rmb - (elH + ah);
 				if (y < 0) {
 					arrowDir = '';
-					t += y + (rmb < 0 ? 0 : -rmb);
+					t += y;
 				}
 			}
 		}
@@ -406,7 +384,6 @@ Offset.prototype = {
 		element.style.top = `${t}px`;
 
 		// left ----------------------------------------------------------------------------------------------------
-		const editorW = this.editor.frameContext.get('topArea').offsetWidth;
 		const radius = numbers.get(window.getComputedStyle(element).borderRadius) || 0;
 		const targetW = targetOffset.width;
 		const elW = element.offsetWidth;
@@ -419,21 +396,8 @@ Offset.prototype = {
 			rml = tmlw;
 			rmr = tmrw;
 		} else {
-			// left margin
-			const eml = editorOffset.left - editorScroll.left - editorScroll.ls;
-			const tml = targetOffset.left - targetScroll.left - (targetAbs ? 0 : targetScroll.ls);
-			const vl = target.offsetLeft - wwScroll.left;
-			let etml = eml < 0 || tml < 0 || targetScroll.widthEditorRefer || (tml >= 0 && eml >= 0 && eml < tml) ? tml : tml - eml;
-			etml = vl < 0 && vl < etml ? vl : etml;
-			// right margin
-			const emr = editorScroll.ow - (editorW + eml);
-			const tmr = targetScroll.ow - (targetW + tml);
-			const vr = editorW - ((targetAbs ? tmlw : target.offsetLeft) + targetW) + (targetAbs ? 0 : wwScroll.left);
-			let etmr = emr < 0 || tmr < 0 || targetScroll.widthEditorRefer || (tmr >= 0 && emr >= 0 && emr > tmr) ? tmr : tmr - emr;
-			etmr = vr < 0 && vr < etmr ? vr : etmr;
-			// margin result
-			rml = (etml < tmlw ? etml : tmlw) + (!isLTR ? -targetOffset.scrollLeft : 0);
-			rmr = (etmr < tmrw ? etmr : tmrw) + (isLTR ? targetOffset.scrollLeft : 0);
+			rml = targetRect.left;
+			rmr = viewportSize.w - targetRect.right;
 		}
 
 		if (rml + targetW <= 0 || rmr + targetW <= 0) return;

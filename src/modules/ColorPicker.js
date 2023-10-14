@@ -1,6 +1,6 @@
 import { domUtils } from '../helper';
 import CoreInjector from '../editorInjector/_core';
-import { HueSlider, Controller } from '../modules';
+import { HueSlider } from '../modules';
 
 const DEFAULT_COLOR_LIST = [
 	'#ff0000',
@@ -67,49 +67,25 @@ const DEFAULT_COLOR_LIST = [
  * @param {Array.<string>} colorList color list
  * @param {string} _defaultColor default color
  */
-const ColorPicker = function (inst, styles, { colorList, defaultColor, disableHEXInput }) {
+const ColorPicker = function (inst, styles, params) {
 	const editor = inst.editor;
 	CoreInjector.call(this, editor);
 
 	// members
 	this.kind = inst.constructor.key;
 	this.inst = inst;
-	this.target = CreateHTML(editor, colorList, disableHEXInput);
+	this.target = CreateHTML(editor, params);
 	this.targetButton = null;
 	this.inputElement = this.target.querySelector('.se-color-input');
 	this.styleProperties = styles;
-	this.defaultColor = defaultColor;
+	this.defaultColor = params.defaultColor;
 	this.currentColor = '';
 	this.colorList = this.target.querySelectorAll('li button') || [];
-	this.hue = null;
 	this.controller_hue = null;
 
 	// modules - hex, hue slider
-	if (disableHEXInput) {
-		const hueController = domUtils.createElement(
-			'DIV',
-			{ class: 'se-controller' },
-			`
-			<div class="se-hue"></div>
-			<div class="se-form-group se-form-w0 se-form-flex-btn">
-				<button type="button" class="se-btn se-btn-success" title="${editor.lang.submitButton}" aria-label="${editor.lang.submitButton}">${editor.icons.checked}</button>
-				<button type="button" class="se-btn se-btn-danger" title="${editor.lang.close}" aria-label="${editor.lang.close}">${editor.icons.cancel}</button>
-			</div>
-		`
-		);
-
-		this.hue = new HueSlider(inst, { form: hueController.querySelector('.se-hue') });
-		this.controller_hue = new Controller(this.hue, hueController, { position: 'bottom' });
-
-		// hue controller buttons
-		this.eventManager.addEvent(hueController.querySelector('.se-btn-success'), 'click', () => {
-			this._setInputText(this.hue.get().hex);
-			this.controller_hue.close();
-		});
-		this.eventManager.addEvent(hueController.querySelector('.se-btn-danger'), 'click', () => {
-			this.controller_hue.close();
-		});
-
+	if (!params.disableHEXInput) {
+		this.controller_hue = new HueSlider(this, null);
 		// hue open
 		this.eventManager.addEvent(this.target.querySelector('.se-btn-info'), 'click', OnColorPalette.bind(this));
 	} else {
@@ -122,6 +98,9 @@ const ColorPicker = function (inst, styles, { colorList, defaultColor, disableHE
 };
 
 ColorPicker.prototype = {
+	hueSliderAction(color) {
+		this._setInputText(color.hex);
+	},
 	/**
 	 * @description Displays or resets the currently selected color at color list.
 	 * @param {Node} node Current Selected node
@@ -231,7 +210,6 @@ ColorPicker.prototype = {
 };
 
 function OnColorPalette() {
-	this.hue.attach();
 	this.controller_hue.open(this.targetButton);
 }
 
@@ -248,7 +226,7 @@ function OnChangeInput(e) {
 	this._setCurrentColor(e.target.value);
 }
 
-function CreateHTML({ lang, icons }, colorList, disableHEXInput) {
+function CreateHTML({ lang, icons }, { colorList, disableHEXInput }) {
 	colorList = colorList || DEFAULT_COLOR_LIST;
 
 	let list = '';

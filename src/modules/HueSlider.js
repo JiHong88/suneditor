@@ -1,4 +1,5 @@
 import { domUtils } from '../helper';
+import Controller from './Controller';
 
 const SIZE = 240;
 const BAR_H = 28;
@@ -24,7 +25,7 @@ function CreateSliderCtx() {
 	offscreenCanvas.height = SIZE;
 
 	const html = `
-	<div class="se-hue-slider-container">
+	<div class="se-hue-slider-container" style="width: ${SIZE}px; height: ${SIZE}px;">
       <canvas class="se-hue-wheel" width="${SIZE}" height="${SIZE}"></canvas>
       <div class="se-hue-wheel-pointer"></div>
     </div>
@@ -59,9 +60,13 @@ function CreateSliderCtx() {
 
 /**
  * @description Create a Hue slider. (only create one at a time)
+ * When you call the .attach() method, the hue slider is appended to the form element.
+ * It must be called every time it is used.
  * @param {{form: Element}} params {form: Element}
  */
 const HueSlider = function (inst, params) {
+	if (!params) params = {};
+
 	this.editor = inst.editor;
 	this.eventManager = inst.eventManager;
 
@@ -76,9 +81,27 @@ const HueSlider = function (inst, params) {
 		gradientPointerX: 'calc(100% - 14px)',
 		color: DEFAULT_COLOR_VALUE
 	};
+	this.isOpen = false;
+	this.controlle = null;
 	this.__globalMouseDown = null;
 	this.__globalMouseMove = null;
 	this.__globalMouseUp = null;
+
+	// init default controller
+	if (!params.isNewForm) {
+		const hueController = CreateHTML_basicControllerForm(inst.editor);
+		this.form = hueController.querySelector('.se-hue');
+		this.controller = new Controller(this, hueController, { position: params.position || 'top' });
+
+		// buttons
+		this.eventManager.addEvent(hueController.querySelector('.se-btn-success'), 'click', () => {
+			inst.hueSliderAction(this.get());
+			this.close();
+		});
+		this.eventManager.addEvent(hueController.querySelector('.se-btn-danger'), 'click', () => {
+			this.close();
+		});
+	}
 };
 
 HueSlider.prototype = {
@@ -86,10 +109,29 @@ HueSlider.prototype = {
 		return finalColor;
 	},
 
-	attach() {
+	open(target) {
+		this.attach();
+		this.controller.open(target);
+	},
+
+	close() {
+		this.ctx = {
+			gradientPointerX: gradientPointer.style.left,
+			wheelPointerX: wheelPointer.style.left,
+			wheelPointerY: wheelPointer.style.top,
+			wheelX: wheelX,
+			wheelY: wheelY,
+			lightness: LIGHTNESS,
+			color: ctx.color || getWheelColor(wheelCtx)
+		};
+		this.controller.close();
+		this.init();
+	},
+
+	attach(form) {
 		// drow
 		this.init();
-		this.form.appendChild(slider);
+		(form || this.form).appendChild(slider);
 		ctx = this.ctx;
 		if (ctx) {
 			wheelX = ctx.wheelX;
@@ -139,22 +181,11 @@ HueSlider.prototype = {
 			},
 			true
 		);
-	},
-
-	close() {
-		this.ctx = {
-			gradientPointerX: gradientPointer.style.left,
-			wheelPointerX: wheelPointer.style.left,
-			wheelPointerY: wheelPointer.style.top,
-			wheelX: wheelX,
-			wheelY: wheelY,
-			lightness: LIGHTNESS,
-			color: ctx.color || getWheelColor(wheelCtx)
-		};
-		this.init();
+		this.isOpen = true;
 	},
 
 	init() {
+		this.isOpen = false;
 		isWheelragging = false;
 		isBarDragging = false;
 		if (this.__globalMouseDown) this.__globalMouseDown = this.eventManager.removeGlobalEvent(this.__globalMouseDown);
@@ -410,5 +441,21 @@ function roundNumber(num) {
 // create
 drawColorWheelToContext(offscreenCtx);
 drawColorWheel();
+
+function CreateHTML_basicControllerForm({ lang, icons }) {
+	const hueController = domUtils.createElement(
+		'DIV',
+		{ class: 'se-controller' },
+		`
+		<div class="se-hue"></div>
+		<div class="se-form-group se-form-w0 se-form-flex-btn">
+			<button type="button" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>
+			<button type="button" class="se-btn se-btn-danger" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
+		</div>
+	`
+	);
+
+	return hueController;
+}
 
 export default HueSlider;

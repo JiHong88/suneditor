@@ -6,19 +6,19 @@ import { domUtils } from '../../helper';
 import CoreInjector from '../../editorInjector/_core';
 import { CreateToolBar } from '../section/constructor';
 
-const Toolbar = function (editor, params) {
+const Toolbar = function (editor, { keyName, balloon, inline, balloonAlways, res }) {
 	CoreInjector.call(this, editor);
 
 	// members
-	this.keyName = params.keyName;
-	this.isSub = /sub/.test(params.keyName);
+	this.keyName = keyName;
+	this.isSub = /sub/.test(keyName);
 	this.currentMoreLayerActiveButton = null;
-	this._isBalloon = params.balloon;
-	this._isInline = params.inline;
-	this._isBalloonAlways = params.balloonAlways;
+	this._isBalloon = balloon;
+	this._isInline = inline;
+	this._isBalloonAlways = balloonAlways;
 	this._responsiveCurrentSize = 'default';
-	this._originRes = params.res;
-	this._rButtonArray = params.res;
+	this._originRes = res;
+	this._rButtonArray = res;
 	this._rButtonsize = null;
 	this._sticky = false;
 	this._inlineToolbarAttr = {

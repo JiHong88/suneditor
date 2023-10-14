@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils, numbers, converter } from '../../helper';
-import { Controller, SelectMenu } from '../../modules';
+import { Controller, SelectMenu, HueSlider } from '../../modules';
 
 const ROW_SELECT_MARGIN = 5;
 const CELL_SELECT_MARGIN = 2;
@@ -43,6 +43,9 @@ const Table = function (editor, pluginOptions) {
 	this.controller_table = new Controller(this, controller_table, { position: 'top' });
 	this.controller_cell = new Controller(this, controller_cell, { position: this.cellControllerTop ? 'top' : 'bottom' });
 	this.controller_props = new Controller(this, controller_props, { position: 'bottom' });
+	// hue slider
+	this.controller_hue = new HueSlider(this, null);
+	this.sliderType = '';
 
 	// members - SelectMenu - split
 	const splitMenu = CreateSplitMenu(this.lang);
@@ -71,8 +74,6 @@ const Table = function (editor, pluginOptions) {
 	this.selectMenu_props_border = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
 	this.selectMenu_props_border.on(borderButton, OnPropsBorderEdit.bind(this));
 	this.selectMenu_props_border.create(borderMenu.items, borderMenu.menus);
-
-	// members - Color Selector
 
 	// memberts - elements..
 	this.maxText = this.lang.maxSize;
@@ -170,6 +171,10 @@ Table.prototype = {
 			this._resetTablePicker();
 			this.setController(domUtils.getParentElement(firstTd, 'TD'));
 		}
+	},
+
+	hueSliderAction(color) {
+		this.propTargets[this.sliderType === 'border' ? 'border_color' : 'back_color'].value = color.hex;
 	},
 
 	/**
@@ -417,6 +422,7 @@ Table.prototype = {
 				}
 				break;
 			case 'onpalette':
+				this._onColorPalette(target, target.getAttribute('data-value'));
 				break;
 			case 'merge':
 				this.mergeCells();
@@ -1425,6 +1431,15 @@ Table.prototype = {
 		this.menu.dropdownOff();
 	},
 
+	_onColorPalette(button, type) {
+		if (this.controller_hue.isOpen && type === this.sliderType) {
+			this.controller_hue.close();
+		} else {
+			this.sliderType = type;
+			this.controller_hue.open(button);
+		}
+	},
+
 	_closeController() {
 		this.component.close();
 		this.controller_table.close();
@@ -1991,7 +2006,8 @@ function CreateHTML_controller_properties({ lang, icons }) {
 						</span>
 					</button>
 					<input type="text" class="se-color-input __se_border_color" />
-					<button type="button" data-command="onpalette" class="se-btn se-tooltip">
+					<button type="button" data-command="onpalette" data-value="border" class="se-btn se-tooltip">
+						${icons.colorPalette}
 						<span class="se-tooltip-inner">
 							<span class="se-tooltip-text">${lang.colorPicker}</span>
 						</span>
@@ -2001,7 +2017,8 @@ function CreateHTML_controller_properties({ lang, icons }) {
 				<label>${lang.backgroundColor}</label>
 				<div class="se-form-group se-form-w0">
 					<input type="text" class="se-color-input __se_back_color" />
-					<button type="button" data-command="onpalette" class="se-btn se-tooltip">
+					<button type="button" data-command="onpalette" data-value="back" class="se-btn se-tooltip">
+						${icons.colorPalette}
 						<span class="se-tooltip-inner">
 							<span class="se-tooltip-text">${lang.colorPicker}</span>
 						</span>
