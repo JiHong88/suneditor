@@ -2007,7 +2007,7 @@ function CreateHTML_controller_properties({ lang, icons }) {
 					</button>
 					<input type="text" class="se-color-input __se_border_color" />
 					<button type="button" data-command="onpalette" data-value="border" class="se-btn se-tooltip">
-						${icons.colorPalette}
+						${icons.color_palette}
 						<span class="se-tooltip-inner">
 							<span class="se-tooltip-text">${lang.colorPicker}</span>
 						</span>
@@ -2018,7 +2018,7 @@ function CreateHTML_controller_properties({ lang, icons }) {
 				<div class="se-form-group se-form-w0">
 					<input type="text" class="se-color-input __se_back_color" />
 					<button type="button" data-command="onpalette" data-value="back" class="se-btn se-tooltip">
-						${icons.colorPalette}
+						${icons.color_palette}
 						<span class="se-tooltip-inner">
 							<span class="se-tooltip-text">${lang.colorPicker}</span>
 						</span>

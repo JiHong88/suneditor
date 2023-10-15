@@ -248,7 +248,7 @@ function CreateHTML({ lang, icons }, { colorList, disableHEXInput }) {
 	}
 	list += `
 		<form class="se-form-group se-form-w0">
-			${disableHEXInput ? '' : `<button type="button" class="se-btn se-btn-info" title="${lang.colorPicker}" aria-label="${lang.colorPicker}">${icons.colorPalette}</button>`}
+			${disableHEXInput ? '' : `<button type="button" class="se-btn se-btn-info" title="${lang.colorPicker}" aria-label="${lang.colorPicker}">${icons.color_palette}</button>`}
 			<input type="text" class="se-color-input" ${disableHEXInput ? 'readonly' : ''} />
 			${disableHEXInput ? '' : `<button type="submit" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>`}
 			<button type="button" class="se-btn __se_remove" title="${lang.removeFormat}" aria-label="${lang.removeFormat}">${icons.erase}</button>
