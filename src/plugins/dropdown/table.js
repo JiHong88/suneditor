@@ -42,9 +42,9 @@ const Table = function (editor, pluginOptions) {
 	// members - Controller
 	this.controller_table = new Controller(this, controller_table, { position: 'top' });
 	this.controller_cell = new Controller(this, controller_cell, { position: this.cellControllerTop ? 'top' : 'bottom' });
-	this.controller_props = new Controller(this, controller_props, { position: 'bottom' });
+	this.controller_props = new Controller(this, controller_props, { position: 'bottom', parents: [this.controller_table, this.controller_cell] });
 	// hue slider
-	this.controller_hue = new HueSlider(this, null);
+	this.controller_hue = new HueSlider(this, { controllerOptions: { parents: [this.controller_table, this.controller_cell, this.controller_props] } });
 	this.sliderType = '';
 
 	// members - SelectMenu - split
@@ -406,7 +406,7 @@ Table.prototype = {
 				this.selectMenu_props_border.open();
 				break;
 			case 'openTableProperties':
-				if (this.controller_props.target === this.controller_table.form && this.controller_props.form?.style.display === 'block') {
+				if (this.controller_props.currentTarget === this.controller_table.form && this.controller_props.form?.style.display === 'block') {
 					this.controller_props.close();
 				} else {
 					this._setCtrlProps('table');
@@ -414,7 +414,7 @@ Table.prototype = {
 				}
 				break;
 			case 'openCellProperties':
-				if (this.controller_props.target === this.controller_cell.form && this.controller_props.form?.style.display === 'block') {
+				if (this.controller_props.currentTarget === this.controller_cell.form && this.controller_props.form?.style.display === 'block') {
 					this.controller_props.close();
 				} else {
 					this._setCtrlProps('cell');

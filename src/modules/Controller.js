@@ -26,6 +26,7 @@ const Controller = function (inst, element, params, _name) {
 	this.currentPositionTarget = null;
 	this.position = params.position;
 	this.disabled = !!params.disabled;
+	this.parents = params.parents || [];
 	this._initMethod = null;
 	this.__globalEventHandlers = [CloseListener_keydown.bind(this), CloseListener_mousedown.bind(this)];
 	this._bindClose_key = null;
@@ -84,6 +85,8 @@ Controller.prototype = {
 		this.__removeGlobalEvent();
 		this._controllerOff();
 
+		if (this.parents.length > 0) return;
+
 		if (typeof this._initMethod === 'function') this._initMethod();
 		else if (typeof this.inst.close === 'function') this.inst.close();
 	},
@@ -139,12 +142,12 @@ Controller.prototype = {
 	 */
 	_controllerOff() {
 		this.form.style.display = 'none';
-		if (this.editor.currentControllerName !== this.kind) return;
+		this.editor.opendControllers = this.editor.opendControllers.filter((v) => v.form !== this.form);
+		if (this.editor.currentControllerName !== this.kind || this.editor.opendControllers.length > 0) return;
 
 		if (this.disabled) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
 		this.editor.frameContext.get('lineBreaker_t').style.display = this.editor.frameContext.get('lineBreaker_b').style.display = 'none';
 		this.editor.effectNode = null;
-		this.editor.opendControllers = [];
 		this.editor.currentControllerName = '';
 		this.editor._antiBlur = false;
 		this.editor._controllerTargetContext = null;
@@ -194,7 +197,8 @@ Controller.prototype = {
 	},
 
 	_checkForm(target) {
-		return domUtils.getParentElement(target, '.se-controller');
+		// return domUtils.getParentElement(target, '.se-controller');
+		return this.editor.opendControllers.some((v) => v.form.contains(target) && v.inst.kind === this.kind) || this.parents.some((v) => v.form.contains(target));
 	},
 
 	constructor: Controller

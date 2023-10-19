@@ -380,6 +380,7 @@ function CloseListener_mousedown(e) {
 function CloseListener_click(e) {
 	this._bindClose_click = this.eventManager.removeGlobalEvent(this._bindClose_click);
 	if (e.target === this._refer) {
+		e.stopPropagation();
 		this.close();
 	}
 }
