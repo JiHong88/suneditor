@@ -12,6 +12,18 @@ const RESIZE_ROW_CLASS = '.se-table-resize-row';
 const RESIZE_ROW_PREV_CLASS = '.se-table-resize-row-prev';
 
 const BORDER_LIST = ['none', 'dotted', 'dashed', 'solid', 'double', 'groove', 'ridge', 'inset', 'outset'];
+const BORDER_FORMATS = {
+	all: 'border_all',
+	inside: 'border_inside',
+	horizon: 'border_horizontal',
+	vertical: 'border_vertical',
+	outsize: 'border_outside',
+	left: 'border_left',
+	top: 'border_top',
+	right: 'border_right',
+	bottom: 'border_bottom',
+	none: 'border_none'
+};
 
 const Table = function (editor, pluginOptions) {
 	// plugin bisic properties
@@ -42,9 +54,11 @@ const Table = function (editor, pluginOptions) {
 	// members - Controller
 	this.controller_table = new Controller(this, controller_table, { position: 'top' });
 	this.controller_cell = new Controller(this, controller_cell, { position: this.cellControllerTop ? 'top' : 'bottom' });
-	this.controller_props = new Controller(this, controller_props, { position: 'bottom', parents: [this.controller_table, this.controller_cell] });
+	this.controller_props = new Controller(this, controller_props, { position: 'bottom', parents: [this.controller_table.form, this.controller_cell.form] });
 	// hue slider
-	this.controller_hue = new HueSlider(this, { controllerOptions: { parents: [this.controller_table, this.controller_cell, this.controller_props] } });
+	this.controller_hue = new HueSlider(this, {
+		controllerOptions: { parents: [this.controller_props.form], parentsHide: true, position: 'bottom' }
+	});
 	this.sliderType = '';
 
 	// members - SelectMenu - split
@@ -68,18 +82,26 @@ const Table = function (editor, pluginOptions) {
 	this.selectMenu_row.on(rowButton, OnRowEdit.bind(this));
 	this.selectMenu_row.create(rownMenu.items, rownMenu.menus);
 
-	// members - SelectMenu - properties - border
+	// members - SelectMenu - properties - border style
 	const borderMenu = CreateBorderMenu();
-	const borderButton = controller_props.querySelector('[data-command="onborder"]');
+	const borderButton = controller_props.querySelector('[data-command="onborder_style"]');
 	this.selectMenu_props_border = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
 	this.selectMenu_props_border.on(borderButton, OnPropsBorderEdit.bind(this));
 	this.selectMenu_props_border.create(borderMenu.items, borderMenu.menus);
+
+	// members - SelectMenu - properties - border format
+	const borderFormatMenu = CreateBorderFormatMenu(this.lang, this.icons);
+	const borderFormatButton = controller_props.querySelector('[data-command="onborder_format"]');
+	this.selectMenu_props_border_format = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 5 });
+	this.selectMenu_props_border_format.on(borderFormatButton, OnPropsBorderFormatEdit.bind(this));
+	this.selectMenu_props_border_format.create(borderFormatMenu.items, borderFormatMenu.menus);
 
 	// memberts - elements..
 	this.maxText = this.lang.maxSize;
 	this.minText = this.lang.minSize;
 	this.propTargets = {
-		border_style: controller_props.querySelector('[data-command="onborder"] .txt'),
+		border_format: controller_props.querySelector('[data-command="onborder_format"]'),
+		border_style: controller_props.querySelector('[data-command="onborder_style"] .txt'),
 		border_color: controller_props.querySelector('.__se_border_color'),
 		border_width: controller_props.querySelector('.__se__border_size'),
 		back_color: controller_props.querySelector('.__se_back_color')
@@ -402,10 +424,14 @@ Table.prototype = {
 				this.selectMenu_row.menus[0].style.display = this.selectMenu_row.menus[1].style.display = /^TH$/i.test(this._tdElement?.nodeName) ? 'none' : '';
 				this.selectMenu_row.open();
 				break;
-			case 'onborder':
+			case 'onborder_format':
+				this.selectMenu_props_border_format.open();
+				break;
+			case 'onborder_style':
 				this.selectMenu_props_border.open();
 				break;
 			case 'openTableProperties':
+				this.controller_hue.close();
 				if (this.controller_props.currentTarget === this.controller_table.form && this.controller_props.form?.style.display === 'block') {
 					this.controller_props.close();
 				} else {
@@ -414,6 +440,7 @@ Table.prototype = {
 				}
 				break;
 			case 'openCellProperties':
+				this.controller_hue.close();
 				if (this.controller_props.currentTarget === this.controller_cell.form && this.controller_props.form?.style.display === 'block') {
 					this.controller_props.close();
 				} else {
@@ -1304,7 +1331,7 @@ Table.prototype = {
 	_setCtrlProps(type) {
 		const target = type === 'table' ? this._element : this._tdElement;
 		const { borderColor, borderStyle, borderWidth, backgroundColor } = window.getComputedStyle(target);
-		const { border_color, border_style, border_width, back_color } = this.propTargets;
+		const { border_format, border_color, border_style, border_width, back_color } = this.propTargets;
 
 		border_style.textContent = borderStyle;
 		border_color.value = converter.isHexColor(borderColor) ? borderColor : converter.rgb2hex(borderColor);
@@ -1436,7 +1463,7 @@ Table.prototype = {
 			this.controller_hue.close();
 		} else {
 			this.sliderType = type;
-			this.controller_hue.open(button);
+			this.controller_hue.open(this.controller_props.currentTarget || button);
 		}
 	},
 
@@ -1885,6 +1912,26 @@ function CreateBorderMenu() {
 	return { items: BORDER_LIST, menus: menus.querySelectorAll('div') };
 }
 
+function CreateBorderFormatMenu(langs, icons) {
+	const items = [];
+	let html = '';
+
+	for (let k in BORDER_FORMATS) {
+		const s = BORDER_FORMATS[k];
+		items.push(s);
+		html += `
+			<button type="button" data-command="${k}" class="se-btn se-tooltip" style="width: 34px;">
+				${icons[s]}
+				<span class="se-tooltip-inner">
+					<span class="se-tooltip-text">${langs[s]}</span>
+				</span>
+			</button>`;
+	}
+
+	const menus = domUtils.createElement('DIV', null, html);
+	return { items, menus: menus.querySelectorAll('button') };
+}
+
 function CreateHTML() {
 	const html = `
 	<div class="se-table-size">
@@ -1989,6 +2036,10 @@ function OnPropsBorderEdit(command) {
 	this.selectMenu_props_border.close();
 }
 
+function OnPropsBorderFormatEdit(command) {
+	this.history.push(false);
+}
+
 function CreateHTML_controller_properties({ lang, icons }) {
 	const html = `
 		<div class="se-controller-content">
@@ -1998,7 +2049,13 @@ function CreateHTML_controller_properties({ lang, icons }) {
 			<div class="se-controller-body">
 				<label>${lang.border}</label>
 				<div class="se-form-group se-form-w0">
-					<button type="button" data-command="onborder" class="se-btn se-btn-select se-tooltip">
+					<button type="button" data-command="onborder_format" class="se-btn se-tooltip">
+						${icons[BORDER_FORMATS.all]}
+						<span class="se-tooltip-inner">
+							<span class="se-tooltip-text">${lang.border}</span>
+						</span>
+					</button>
+					<button type="button" data-command="onborder_style" class="se-btn se-btn-select se-tooltip se-border-style">
 						<span class="txt"></span>
 						${icons.arrow_down}
 						<span class="se-tooltip-inner">

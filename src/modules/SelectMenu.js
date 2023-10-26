@@ -19,6 +19,7 @@ const SelectMenu = function (inst, params) {
 	this.form = null;
 	this.items = [];
 	this.menus = [];
+	this.menuLen = 0;
 	this.index = -1;
 	this.item = null;
 	this.isOpen = false;
@@ -28,6 +29,8 @@ const SelectMenu = function (inst, params) {
 	this._dirPosition = /^(left|right)$/.test(this.position) ? (this.position === 'left' ? 'right' : 'left') : this.position;
 	this._dirSubPosition = /^(left|right)$/.test(this.subPosition) ? (this.subPosition === 'left' ? 'right' : 'left') : this.subPosition;
 	this._textDirDiff = params.dir === 'ltr' ? false : params.dir === 'rtl' ? true : null;
+	this.splitNum = params.splitNum || 0;
+	this.horizontal = !!this.splitNum;
 	this._refer = null;
 	this._keydownTarget = null;
 	this._selectMethod = null;
@@ -45,12 +48,17 @@ SelectMenu.prototype = {
 		menus = menus || items;
 		let html = '';
 		for (let i = 0, len = menus.length; i < len; i++) {
+			if (i > 0 && i % this.splitNum === 0) {
+				this._createFormat(html);
+				html = '';
+			}
 			html += `<li class="se-select-item" data-index="${i}">${typeof menus[i] === 'string' ? menus[i] : menus[i].outerHTML}</li>`;
 		}
+		this._createFormat(html);
 
 		this.items = items;
-		this.form.firstElementChild.innerHTML = `<ul class="se-list-basic se-list-checked">${html}</ul>`;
 		this.menus = this.form.querySelectorAll('li');
+		this.menuLen = this.menus.length;
 	},
 
 	on(referElement, selectMethod, attr) {
@@ -97,6 +105,10 @@ SelectMenu.prototype = {
 		return this.items[index];
 	},
 
+	_createFormat(html) {
+		this.form.firstElementChild.innerHTML += `<ul class="se-list-basic se-list-checked${this.horizontal ? ' se-list-horizontal' : ''}">${html}</ul>`;
+	},
+
 	_init() {
 		this.__removeEvents();
 		this.__removeGlobalEvent();
@@ -111,7 +123,7 @@ SelectMenu.prototype = {
 	_moveItem(num) {
 		domUtils.removeClass(this.form, 'se-select-menu-mouse-move');
 		num = this.index + num;
-		const len = this.menus.length;
+		const len = this.menuLen;
 		const selectIndex = (this.index = num >= len ? 0 : num < 0 ? len - 1 : num);
 
 		for (let i = 0; i < len; i++) {
@@ -313,17 +325,37 @@ SelectMenu.prototype = {
 };
 
 function OnKeyDown_refer(e) {
-	const keyCode = e.keyCode;
-	switch (keyCode) {
+	let moveIndex;
+	switch (e.keyCode) {
 		case 38: // up
 			e.preventDefault();
 			e.stopPropagation();
-			this._moveItem(-1);
+			if (this.horizontal && this.index > -1) {
+				const num = this.splitNum;
+				moveIndex = this.index - num < 0 ? num : -num;
+			} else {
+				moveIndex = -1;
+			}
 			break;
 		case 40: // down
 			e.preventDefault();
 			e.stopPropagation();
-			this._moveItem(1);
+			if (this.horizontal && this.index > -1) {
+				const num = this.splitNum;
+				moveIndex = this.index + num > this.menuLen ? -num : num;
+			} else {
+				moveIndex = 1;
+			}
+			break;
+		case 37: // left
+			e.preventDefault();
+			e.stopPropagation();
+			moveIndex = -1;
+			break;
+		case 39: //right
+			e.preventDefault();
+			e.stopPropagation();
+			moveIndex = 1;
 			break;
 		case 13:
 		case 32: // enter, space
@@ -334,6 +366,8 @@ function OnKeyDown_refer(e) {
 			}
 			break;
 	}
+
+	if (moveIndex) this._moveItem(moveIndex);
 }
 
 function OnMousedown_list(e) {
@@ -354,7 +388,7 @@ function OnClick_list(e) {
 	let target = e.target;
 	let index = null;
 
-	while (!index && !/UL/i.test(target.tagName) && !domUtils.hasClass(target, 'se-container')) {
+	while (!index && !/UL/i.test(target.tagName) && !domUtils.hasClass(target, 'se-select-menu')) {
 		index = target.getAttribute('data-index');
 		target = target.parentNode;
 	}

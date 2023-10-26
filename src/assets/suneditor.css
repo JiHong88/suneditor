@@ -303,8 +303,8 @@
 
 .sun-editor button > svg,
 .sun-editor .se-svg {
-	width: 14px;
-	height: 14px;
+	width: 15px;
+	height: 15px;
 	margin: auto;
 	fill: currentColor;
 	display: block;
@@ -750,6 +750,9 @@
 .sun-editor .se-list-inner .se-list-basic li {
 	width: 100%;
 }
+.sun-editor .se-list-inner button {
+	border-radius: 0;
+}
 
 /* dropdown layer - checked list */
 .sun-editor .se-list-inner .se-list-checked li .se-svg {
@@ -767,6 +770,16 @@
 
 .sun-editor .se-list-inner .se-list-checked li.se-checked .se-svg > svg {
 	display: block;
+}
+
+/* dropdown layer - se-list-horizontal */
+.sun-editor .se-list-inner .se-list-horizontal {
+	display: flex;
+	padding: 2px;
+}
+.sun-editor .se-list-inner .se-list-horizontal li {
+	padding: 0;
+	margin: 0 2px;
 }
 
 /** --- dropdown layer - se-list-inner > exception */
@@ -2045,11 +2058,10 @@
 	line-height: 1.42857143;
 }
 
-.sun-editor .se-controller.se-table-props button[data-command='onborder'] {
-	width: 80px;
-}
-.sun-editor .se-controller.se-table-props .se-color-input {
-	width: 84px;
+/* controller - table - props */
+.sun-editor .se-controller.se-table-props .se-color-input,
+.sun-editor .se-controller.se-table-props .se-border-style {
+	width: 72px;
 }
 .sun-editor .se-controller.se-table-props .__se__border_size {
 	width: 42px;
@@ -2689,6 +2701,10 @@
 
 /** controller--- */
 .sun-editor.se-rtl .se-controller .se-btn-group {
+	direction: rtl;
+}
+
+.sun-editor.se-rtl .se-controller .se-controller-body {
 	direction: rtl;
 }
 

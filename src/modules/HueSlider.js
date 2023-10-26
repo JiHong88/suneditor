@@ -122,7 +122,7 @@ HueSlider.prototype = {
 			wheelX: wheelX,
 			wheelY: wheelY,
 			lightness: LIGHTNESS,
-			color: ctx.color || getWheelColor(wheelCtx)
+			color: ctx?.color || getWheelColor(wheelCtx)
 		};
 		this.controller.close();
 		this.init();

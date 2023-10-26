@@ -27,6 +27,7 @@ const Controller = function (inst, element, params, _name) {
 	this.position = params.position;
 	this.disabled = !!params.disabled;
 	this.parents = params.parents || [];
+	this.parentsHide = !!params.parentsHide;
 	this._initMethod = null;
 	this.__globalEventHandlers = [CloseListener_keydown.bind(this), CloseListener_mousedown.bind(this)];
 	this._bindClose_key = null;
@@ -64,6 +65,12 @@ Controller.prototype = {
 			e.form.style.zIndex = INDEX_2;
 		});
 
+		if (this.parentsHide) {
+			this.parents.forEach((e) => {
+				e.style.display = 'none';
+			});
+		}
+
 		this.__addGlobalEvent();
 		this._setControllerPosition(this.form, this.currentPositionTarget);
 		this._controllerOn(this.form, target);
@@ -84,6 +91,12 @@ Controller.prototype = {
 
 		this.__removeGlobalEvent();
 		this._controllerOff();
+
+		if (this.parentsHide) {
+			this.parents.forEach((e) => {
+				e.style.display = 'block';
+			});
+		}
 
 		if (this.parents.length > 0) return;
 
@@ -197,8 +210,8 @@ Controller.prototype = {
 	},
 
 	_checkForm(target) {
-		// return domUtils.getParentElement(target, '.se-controller');
-		return this.editor.opendControllers.some((v) => v.form.contains(target) && v.inst.kind === this.kind) || this.parents.some((v) => v.form.contains(target));
+		return domUtils.getParentElement(target, '.se-controller');
+		// return this.editor.opendControllers.some((v) => v.form.contains(target) && v.inst.kind === this.kind) || this.parents.some((v) => v.form.contains(target));
 	},
 
 	constructor: Controller

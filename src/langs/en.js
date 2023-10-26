@@ -3,11 +3,11 @@
 		module.exports = global.document
 			? factory(global, true)
 			: function (w) {
-				if (!w.document) {
-					throw new Error('SUNEDITOR_LANG a window with a document');
-				}
-				return factory(w);
-			};
+					if (!w.document) {
+						throw new Error('SUNEDITOR_LANG a window with a document');
+					}
+					return factory(w);
+			  };
 	} else {
 		factory(global);
 	}
@@ -28,6 +28,16 @@
 		basic: 'Basic',
 		bold: 'Bold',
 		border: 'Border',
+		border_all: 'Border all',
+		border_inside: 'Border inside',
+		border_horizontal: 'Border horizontal',
+		border_vertical: 'Border vertical',
+		border_outside: 'Border outside',
+		border_left: 'Border left',
+		border_top: 'Border top',
+		border_right: 'Border right',
+		border_bottom: 'Border bottom',
+		border_none: 'Border none',
 		caption: 'Insert description',
 		cellProperties: 'Cell properties',
 		center: 'Center',
@@ -143,7 +153,7 @@
 		video_modal_file: 'Select from files',
 		video_modal_title: 'Insert Video',
 		video_modal_url: 'Media embed URL, YouTube/Vimeo',
-		width: 'Width',
+		width: 'Width'
 	};
 
 	if (typeof noGlobal === typeof undefined) {
