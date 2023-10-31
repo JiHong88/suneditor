@@ -5,13 +5,27 @@
 import CoreInjector from '../../editorInjector/_core';
 import { domUtils, converter, numbers, unicode, env } from '../../helper';
 
-const REQUIRED_DATA_ATTRS = 'data-se-index|data-se-key|data-se-value|data-se-type|data-se-size|data-se-file-name|data-se-file-size|data-se-embed';
+const REQUIRED_DATA_ATTRS = 'data-se-[a-z]+'; // data-se-index|data-se-key|data-se-value|data-se-type|data-se-size|data-se-file-name|data-se-file-size|data-se-embed
 
 const HTML = function (editor) {
 	CoreInjector.call(this, editor);
 
+	const tagStyles = this.options.get('tagStyles');
+	const splitTagStyles = {};
+	for (let k in tagStyles) {
+		const s = k.split('|');
+		for (let i = 0, len = s.length, n; i < len; i++) {
+			n = s[i];
+			if (!splitTagStyles[n]) splitTagStyles[n] = '';
+			else splitTagStyles[n] += '|';
+			splitTagStyles[n] += tagStyles[k];
+		}
+	}
+	for (let k in splitTagStyles) {
+		splitTagStyles[k] = new RegExp(`\\s*[^-a-zA-Z](${splitTagStyles[k]})\\s*:[^;]+(?!;)*`, 'gi');
+	}
+
 	// members
-	const wRegExp = RegExp;
 	this._parser = new DOMParser();
 	this._isAllowedClassName = function (v) {
 		return this.test(v) ? v : '';
@@ -27,16 +41,17 @@ const HTML = function (editor) {
 	this._attributeBlacklist = null;
 	this._attributeBlacklistRegExp = null;
 	this._cleanStyleRegExp = {
+		...splitTagStyles,
 		span: editor.options.get('_spanStylesRegExp'),
-		format: editor.options.get('_formatStylesRegExp'),
-		fontSizeUnit: new wRegExp('\\d+' + this.options.get('fontSizeUnit') + '$', 'i')
+		line: editor.options.get('_lineStylesRegExp'),
+		fontSizeUnit: new RegExp('\\d+' + this.options.get('fontSizeUnit') + '$', 'i')
 	};
 
 	const sPrefix = editor.options.get('__allowedScriptTag') ? '' : 'script|';
-	this.__scriptTagRegExp = new wRegExp('<(script)[^>]*>([\\s\\S]*?)<\\/\\1>|<script[^>]*\\/?>', 'gi');
-	this.__disallowedTagsRegExp = new wRegExp('<(' + sPrefix + 'style)[^>]*>([\\s\\S]*?)<\\/\\1>|<(' + sPrefix + 'style)[^>]*\\/?>', 'gi');
-	this.__disallowedTagNameRegExp = new wRegExp('^(' + sPrefix + 'meta|link|style|[a-z]+:[a-z]+)$', 'i');
-	this.__allowedScriptRegExp = new wRegExp('^' + (editor.options.get('__allowedScriptTag') ? 'script' : '') + '$', 'i');
+	this.__scriptTagRegExp = new RegExp('<(script)[^>]*>([\\s\\S]*?)<\\/\\1>|<script[^>]*\\/?>', 'gi');
+	this.__disallowedTagsRegExp = new RegExp('<(' + sPrefix + 'style)[^>]*>([\\s\\S]*?)<\\/\\1>|<(' + sPrefix + 'style)[^>]*\\/?>', 'gi');
+	this.__disallowedTagNameRegExp = new RegExp('^(' + sPrefix + 'meta|link|style|[a-z]+:[a-z]+)$', 'i');
+	this.__allowedScriptRegExp = new RegExp('^' + (editor.options.get('__allowedScriptTag') ? 'script' : '') + '$', 'i');
 
 	// set disallow text nodes
 	const options = this.options;
@@ -52,15 +67,15 @@ const HTML = function (editor) {
 	for (let i = 0; i < allowStyleNodes.length; i++) {
 		disallowStyleNodes.splice(disallowStyleNodes.indexOf(allowStyleNodes[i].toLowerCase()), 1);
 	}
-	this._disallowedStyleNodesRegExp = disallowStyleNodes.length === 0 ? null : new wRegExp('(<\\/?)(' + disallowStyleNodes.join('|') + ')\\b\\s*([^>^<]+)?\\s*(?=>)', 'gi');
+	this._disallowedStyleNodesRegExp = disallowStyleNodes.length === 0 ? null : new RegExp('(<\\/?)(' + disallowStyleNodes.join('|') + ')\\b\\s*([^>^<]+)?\\s*(?=>)', 'gi');
 
 	// whitelist
 	// tags
 	const defaultAttr = options.get('__defaultAttributeWhitelist');
 	this._allowHTMLComment = options.get('_editorElementWhitelist').includes('//') || options.get('_editorElementWhitelist') === '*';
 	// html check
-	this._htmlCheckWhitelistRegExp = new wRegExp('^(' + GetRegList(options.get('_editorElementWhitelist').replace('|//', ''), '') + ')$', 'i');
-	this._htmlCheckBlacklistRegExp = new wRegExp('^(' + (options.get('elementBlacklist') || '^') + ')$', 'i');
+	this._htmlCheckWhitelistRegExp = new RegExp('^(' + GetRegList(options.get('_editorElementWhitelist').replace('|//', ''), '') + ')$', 'i');
+	this._htmlCheckBlacklistRegExp = new RegExp('^(' + (options.get('elementBlacklist') || '^') + ')$', 'i');
 	// elements
 	this._elementWhitelistRegExp = converter.createElementWhitelist(GetRegList(options.get('_editorElementWhitelist').replace('|//', '|<!--|-->'), ''));
 	this._elementBlacklistRegExp = converter.createElementBlacklist(options.get('elementBlacklist').replace('|//', '|<!--|-->'));
@@ -75,12 +90,12 @@ const HTML = function (editor) {
 			if (k === '*') {
 				allAttr = GetRegList(_wAttr[k], defaultAttr);
 			} else {
-				tagsAttr[k] = new wRegExp('\\s(?:' + GetRegList(_wAttr[k], '') + ')' + regEndStr, 'ig');
+				tagsAttr[k] = new RegExp('\\s(?:' + GetRegList(_wAttr[k], '') + ')' + regEndStr, 'ig');
 			}
 		}
 	}
 
-	this._attributeWhitelistRegExp = new wRegExp('\\s(?:' + (allAttr || defaultAttr + '|' + REQUIRED_DATA_ATTRS) + ')' + regEndStr, 'ig');
+	this._attributeWhitelistRegExp = new RegExp('\\s(?:' + (allAttr || defaultAttr + '|' + REQUIRED_DATA_ATTRS) + ')' + regEndStr, 'ig');
 	this._attributeWhitelist = tagsAttr;
 
 	// blacklist
@@ -92,12 +107,12 @@ const HTML = function (editor) {
 			if (k === '*') {
 				allAttr = GetRegList(_bAttr[k], '');
 			} else {
-				tagsAttr[k] = new wRegExp('\\s(?:' + GetRegList(_bAttr[k], '') + ')' + regEndStr, 'ig');
+				tagsAttr[k] = new RegExp('\\s(?:' + GetRegList(_bAttr[k], '') + ')' + regEndStr, 'ig');
 			}
 		}
 	}
 
-	this._attributeBlacklistRegExp = new wRegExp('\\s(?:' + (allAttr || '^') + ')' + regEndStr, 'ig');
+	this._attributeBlacklistRegExp = new RegExp('\\s(?:' + (allAttr || '^') + ')' + regEndStr, 'ig');
 	this._attributeBlacklist = tagsAttr;
 };
 
@@ -1495,8 +1510,10 @@ function CleanElements(m, t) {
 	} else if (!v || !/style=/i.test(v.toString())) {
 		if (tagName === 'span') {
 			v = this._cleanStyle(m, v, 'span');
-		} else if (/^(P|DIV|H[1-6]|PRE)$/i.test(tagName)) {
-			v = this._cleanStyle(m, v, 'format');
+		} else if (this.format.isLine(tagName)) {
+			v = this._cleanStyle(m, v, 'line');
+		} else if (this._cleanStyleRegExp[tagName]) {
+			v = this._cleanStyle(m, v, tagName);
 		}
 	}
 

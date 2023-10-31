@@ -1,4 +1,4 @@
-import { domUtils } from '../helper';
+import { domUtils, converter } from '../helper';
 import CoreInjector from '../editorInjector/_core';
 import { HueSlider } from '../modules';
 
@@ -109,10 +109,10 @@ ColorPicker.prototype = {
 	init(node, target) {
 		this.targetButton = target;
 		const computedColor = this.editor.frameContext.get('wwComputedStyle')[this.styleProperties];
-		const defaultColor = this.defaultColor || this.isHexColor(computedColor) ? computedColor : this.rgb2hex(computedColor);
+		const defaultColor = this.defaultColor || converter.isHexColor(computedColor) ? computedColor : converter.rgb2hex(computedColor);
 
 		let fillColor = this._getColorInNode(node) || defaultColor;
-		fillColor = this.isHexColor(fillColor) ? fillColor : this.rgb2hex(fillColor) || fillColor;
+		fillColor = converter.isHexColor(fillColor) ? fillColor : converter.rgb2hex(fillColor) || fillColor;
 
 		const colorList = this.colorList;
 		for (let i = 0, len = colorList.length; i < len; i++) {
@@ -124,29 +124,6 @@ ColorPicker.prototype = {
 		}
 
 		this._setInputText(this._colorName2hex(fillColor));
-	},
-
-	/**
-	 * @description Function to check hex format color
-	 * @param {string} str Color value
-	 */
-	isHexColor(str) {
-		return /^#[0-9a-f]{3}(?:[0-9a-f]{3})?$/i.test(str);
-	},
-
-	/**
-	 * @description Function to convert hex format to a rgb color
-	 * @param {string} rgb RGB color format
-	 * @returns {string}
-	 */
-	rgb2hex(rgb) {
-		const rgbMatch = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
-		return rgbMatch?.length === 4
-			? '#' +
-					('0' + parseInt(rgbMatch[1], 10).toString(16)).slice(-2) +
-					('0' + parseInt(rgbMatch[2], 10).toString(16)).slice(-2) +
-					('0' + parseInt(rgbMatch[3], 10).toString(16)).slice(-2)
-			: '';
 	},
 
 	/**

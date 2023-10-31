@@ -3,7 +3,7 @@
 /* grey color #e1e1e1, #ececec, #d1d1d1 , #c1c1c1 , #b1b1b1 */
 /* blue color #eaf3ff, #dbeaff(shadow: #b7ccf2, #e6f2ff), #c4ddff, #d0e3ff , #80bdff , #3f9dff , #4592ff, #407dd1, #3288ff, #1275ff */
 /* red color #b94a48 , #f2dede , #eed3d7, #d9534f */
-/*  green color #008000 */
+/* green color #008000 */
 
 /** --- suneditor main */
 .sun-editor {
@@ -1224,16 +1224,6 @@
 	width: auto;
 	height: 34px;
 	color: #555;
-}
-
-.sun-editor .se-dropdown .se-form-group .se-color-input {
-	width: 72px;
-	margin: 0 4px;
-	text-transform: uppercase;
-	border: none;
-	border-radius: 0;
-	border-bottom: 2px solid #b1b1b1;
-	outline: none;
 }
 
 .sun-editor .se-dropdown .se-form-group .se-color-input:focus {
@@ -2530,6 +2520,25 @@
 .sun-editor .se-tooltip .se-tooltip-inner .se-tooltip-text .se-shortcut > .se-shortcut-key {
 	display: inline;
 	font-weight: bold;
+}
+
+/* -- color input */
+.sun-editor div input.se-color-input {
+	margin: 0 4px;
+	text-transform: uppercase;
+	border-top: 0;
+	border-left: 0;
+	border-right: 0;
+	border-radius: 0;
+	border-bottom: 2px solid #b1b1b1;
+	outline: none;
+}
+
+/** --- selected class */
+/* -- table */
+.sun-editor-editable table td.se-selected-table-cell,
+.sun-editor-editable table th.se-selected-table-cell {
+	outline: 1px double var(--se-edit-active);
 }
 
 /** --- RTL start -------------------------------------------------------------------------------------------------------------------------------------------------- */

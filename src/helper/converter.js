@@ -143,14 +143,26 @@ export function isHexColor(str) {
  * @param {string} rgb RGB color format
  * @returns {string}
  */
-export function rgb2hex(rgb) {
-	const rgbMatch = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
-	return rgbMatch?.length === 4
-		? '#' +
-				('0' + parseInt(rgbMatch[1], 10).toString(16)).slice(-2) +
-				('0' + parseInt(rgbMatch[2], 10).toString(16)).slice(-2) +
-				('0' + parseInt(rgbMatch[3], 10).toString(16)).slice(-2)
-		: '';
+export function rgb2hex(rgba) {
+	const rgbaMatch = rgba.match(/^rgba?[\s+]?\(([\d]+)[\s+]?,[\s+]?([\d]+)[\s+]?,[\s+]?([\d]+)[\s+]?/i);
+
+	if (rgbaMatch && rgbaMatch.length >= 4) {
+		const r = ('0' + parseInt(rgbaMatch[1], 10).toString(16)).slice(-2);
+		const g = ('0' + parseInt(rgbaMatch[2], 10).toString(16)).slice(-2);
+		const b = ('0' + parseInt(rgbaMatch[3], 10).toString(16)).slice(-2);
+
+		let a = '';
+		if (rgba.includes('rgba')) {
+			const alphaMatch = rgba.match(/[\s+]?([\d]+\.?[\d]*)[\s+]?/i);
+			if (alphaMatch) {
+				a = ('0' + Math.round(parseFloat(alphaMatch[1]) * 255).toString(16)).slice(-2);
+			}
+		}
+
+		return `#${r}${g}${b}${a}`;
+	} else {
+		return '';
+	}
 }
 
 /**

@@ -82,7 +82,7 @@ Controller.prototype = {
 	 * @description Close a modal plugin
 	 * The plugin's "init" method is called.
 	 */
-	close() {
+	close(force) {
 		if (!this.isOpen) return;
 		this.isOpen = false;
 		this.editor._antiBlur = false;
@@ -92,7 +92,7 @@ Controller.prototype = {
 		this.__removeGlobalEvent();
 		this._controllerOff();
 
-		if (this.parentsHide) {
+		if (this.parentsHide && !force) {
 			this.parents.forEach((e) => {
 				e.style.display = 'block';
 			});
@@ -211,7 +211,6 @@ Controller.prototype = {
 
 	_checkForm(target) {
 		return domUtils.getParentElement(target, '.se-controller');
-		// return this.editor.opendControllers.some((v) => v.form.contains(target) && v.inst.kind === this.kind) || this.parents.some((v) => v.form.contains(target));
 	},
 
 	constructor: Controller
@@ -258,7 +257,7 @@ function CloseListener_mousedown(e) {
 		e.stopPropagation();
 		return;
 	}
-	this.close();
+	this.close(true);
 }
 
 export default Controller;

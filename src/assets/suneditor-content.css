@@ -1,16 +1,26 @@
-/* All classes used must begin with "__se__". */
-/* used color #000 , #fff , #CCC, #f9f9f9 */
-/* font color #333, background color: #fff */
-/* grey color #e1e1e1 , #d1d1d1 , #c1c1c1 , #b1b1b1 */
-/* blue color #c7deff , #80bdff , #3f9dff , #4592ff */
-/* red color #b94a48 , #f2dede , #eed3d7 */
+:root {
+	--se-edit-font: #333;
+	--se-edit-font-sub: #666;
+	--se-edit-background: #fff;
+	--se-edit-background-sub: #f9f9f9;
+	--se-edit-border-light: #e1e1e1;
+	--se-edit-border-dark: #b1b1b1;
+	--se-edit-border-dark-n1: #c1c1c1;
+	--se-edit-border-dark-n2: #d1d1d1;
+	--se-edit-anchor: #004cff;
+	--se-edit-anchor-on-back: #e8f7ff;
+	--se-edit-anchor-on-font: #0093ff;
+	--se-edit-hr-on-back: #c7deff;
+	--se-edit-active: #4592ff;
+	--se-edit-active-n1: #80bdff;
+}
 
 /* suneditor content */
 .sun-editor-editable {
 	font-family: Helvetica Neue;
 	font-size: 13px;
-	color: #333;
-	background-color: #fff;
+	color: var(--se-edit-font);
+	background-color: var(--se-edit-background);
 	line-height: 1.5;
 	word-break: normal;
 	word-wrap: break-word;
@@ -68,7 +78,7 @@
 
 /* a */
 .sun-editor-editable a {
-	color: #004cff;
+	color: var(--se-edit-anchor);
 	text-decoration: none;
 }
 
@@ -79,13 +89,13 @@
 .sun-editor-editable a:hover,
 .sun-editor-editable a:focus {
 	cursor: pointer;
-	color: #0093ff;
+	color: var(--se-edit-anchor-on-font);
 	text-decoration: underline;
 }
 
 .sun-editor-editable a.on {
-	color: #0093ff;
-	background-color: #e8f7ff;
+	color: var(--se-edit-anchor-on-font);
+	background-color: var(--se-edit-anchor-on-back);
 }
 
 /* pre */
@@ -94,10 +104,10 @@
 	padding: 8px;
 	margin: 0 0 10px;
 	font-family: monospace;
-	color: #666;
+	color: var(--se-edit-font-sub);
 	line-height: 1.45;
-	background-color: #f9f9f9;
-	border: 1px solid #e1e1e1;
+	background-color: var(--se-edit-background-sub);
+	border: 1px solid var(--se-edit-border-light);
 	border-radius: 2px;
 	white-space: pre-wrap !important;
 	word-wrap: break-word;
@@ -206,7 +216,7 @@
 	border-width: 0;
 	padding-top: 0;
 	padding-bottom: 0;
-	border-color: #b1b1b1;
+	border-color: var(--se-edit-border-dark);
 	padding-left: 20px;
 	padding-right: 5px;
 	border-left-width: 5px;
@@ -214,15 +224,15 @@
 }
 
 .sun-editor-editable blockquote blockquote {
-	border-color: #c1c1c1;
+	border-color: var(--se-edit-border-dark-n1);
 }
 
 .sun-editor-editable blockquote blockquote blockquote {
-	border-color: #d1d1d1;
+	border-color: var(--se-edit-border-dark-n2);
 }
 
 .sun-editor-editable blockquote blockquote blockquote blockquote {
-	border-color: #e1e1e1;
+	border-color: var(--se-edit-border-light);
 }
 
 /* RTL - blockquote */
@@ -323,20 +333,22 @@
 }
 
 .sun-editor-editable hr.on {
-	border-color: #4592ff;
-	-webkit-box-shadow: 0 0 0 0.1rem #c7deff;
-	box-shadow: 0 0 0 0.1rem #c7deff;
+	border-color: var(--se-edit-active);
+	-webkit-box-shadow: 0 0 0 0.1rem var(--se-edit-hr-on-back);
+	box-shadow: 0 0 0 0.1rem var(--se-edit-hr-on-back);
 }
 
 /* table */
 .sun-editor-editable table {
 	display: table;
 	table-layout: auto !important;
-	border: 1px solid rgb(204, 204, 204);
+	border-width: 1px;
+	border-style: solid;
+	border-color: var(--se-edit-border-light);
 	width: 100%;
 	max-width: 100%;
 	margin: 0 0 10px;
-	background-color: transparent;
+	background-color: var(--se-edit-background);
 	border-spacing: 0;
 	border-collapse: collapse;
 }
@@ -344,6 +356,7 @@
 /* RTL - table */
 .sun-editor-editable.se-rtl table {
 	margin: 0 0 10px auto;
+	background-color: var(--se-edit-background);
 }
 
 .sun-editor-editable table caption {
@@ -351,8 +364,8 @@
 	text-align: unset;
 	padding: 0.5em;
 	margin: 0;
-	background-color: #f9f9f9;
-	border: 1px solid #e1e1e1;
+	background-color: var(--se-edit-background-sub);
+	border: 1px solid var(--se-edit-border-light);
 	outline: none;
 }
 .sun-editor-editable table caption.se-table-caption-top {
@@ -365,7 +378,7 @@
 }
 
 .sun-editor-editable table thead {
-	border-bottom: 2px solid #333;
+	border-bottom: 2px solid var(--se-edit-font);
 }
 
 .sun-editor-editable table tr {
@@ -379,9 +392,12 @@
 
 .sun-editor-editable table th,
 .sun-editor-editable table td {
-	border: 1px solid #e1e1e1;
+	border-width: 1px;
+	border-style: solid;
+	border-color: var(--se-edit-border-light);
 	padding: 0.4em;
 	background-clip: padding-box;
+	background-color: var(--se-edit-background);
 }
 
 /** table style class */
@@ -399,12 +415,6 @@
 
 .sun-editor-editable table.se-table-layout-fixed {
 	table-layout: fixed !important;
-}
-
-/** table - select class */
-.sun-editor-editable table td.se-table-selected-cell,
-.sun-editor-editable table th.se-table-selected-cell {
-	outline: 1px double #4592ff;
 }
 
 .sun-editor-editable.se-disabled * {
@@ -500,7 +510,7 @@
 .sun-editor-editable figure figcaption {
 	padding: 1em 0.5em;
 	margin: 0;
-	background-color: #f9f9f9;
+	background-color: var(--se-edit-background-sub);
 	outline: none;
 }
 
@@ -513,7 +523,7 @@
 .sun-editor-editable .se-image-container a img {
 	padding: 1px;
 	margin: 1px;
-	outline: 1px solid #4592ff;
+	outline: 1px solid var(--se-edit-active);
 }
 
 /** video */
@@ -541,15 +551,15 @@
 }
 
 .sun-editor-editable audio.active {
-	outline: 2px solid #80bdff;
+	outline: 2px solid var(--se-edit-active-n1);
 }
 
 /** -- Paragraph styles custom -- */
 /* Bordered */
 .sun-editor-editable .__se__p-bordered,
 .sun-editor .__se__p-bordered {
-	border-top: solid 1px #b1b1b1;
-	border-bottom: solid 1px #b1b1b1;
+	border-top: solid 1px var(--se-edit-border-dark);
+	border-bottom: solid 1px var(--se-edit-border-dark);
 	padding: 4px 0;
 }
 
@@ -565,9 +575,9 @@
 	font-weight: 200;
 	font-style: italic;
 	background: #000;
-	color: #fff;
+	color: var(--se-edit-background);
 	padding: 6px 4px;
-	border: 2px solid #fff;
+	border: 2px solid var(--se-edit-background);
 	border-radius: 6px;
 	text-transform: uppercase;
 	animation: neonFlicker 1.5s infinite alternate;
@@ -582,8 +592,8 @@
 	54%,
 	56%,
 	100% {
-		text-shadow: -0.2rem -0.2rem 1rem #fff, 0.2rem 0.2rem 1rem #fff, 0 0 2px #f40, 0 0 4px #f40, 0 0 6px #f40, 0 0 8px #f40, 0 0 10px #f40;
-		box-shadow: 0 0 0.5px #fff, inset 0 0 0.5px #fff, 0 0 2px #08f, inset 0 0 2px #08f, 0 0 4px #08f, inset 0 0 4px #08f;
+		text-shadow: -0.2rem -0.2rem 1rem var(--se-edit-background, 0.2rem 0.2rem 1rem --se-edit-background, 0 0 2px #f40, 0 0 4px #f40, 0 0 6px #f40, 0 0 8px #f40, 0 0 10px #f40);
+		box-shadow: 0 0 0.5px var(--se-edit-background, inset 0 0 0.5px --se-edit-background, 0 0 2px #08f, inset 0 0 2px #08f, 0 0 4px #08f, inset 0 0 4px #08f);
 	}
 
 	20%,
@@ -598,14 +608,15 @@
 /* Shadow */
 .sun-editor-editable .__se__t-shadow,
 .sun-editor .__se__t-shadow {
-	text-shadow: -0.2rem -0.2rem 1rem #fff, 0.2rem 0.2rem 1rem #fff, 0 0 0.2rem #999, 0 0 0.4rem #888, 0 0 0.6rem #777, 0 0 0.8rem #666, 0 0 1rem #555;
+	text-shadow: -0.2rem -0.2rem 1rem var(--se-edit-background, 0.2rem 0.2rem 1rem --se-edit-background, 0 0 0.2rem #999, 0 0 0.4rem #888, 0 0 0.6rem #777) 0 0 0.8rem var(--se-edit-font-sub, 0
+				0 1rem #555);
 }
 
 /* Code */
 .sun-editor-editable .__se__t-code,
 .sun-editor .__se__t-code {
 	font-family: monospace;
-	color: #666;
+	color: var(--se-edit-font-sub);
 	background-color: rgba(27, 31, 35, 0.05);
 	border-radius: 6px;
 	padding: 0.2em 0.4em;

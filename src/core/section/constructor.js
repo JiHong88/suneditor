@@ -17,7 +17,11 @@ const REQUIRED_FORMAT_LINE = 'div';
 const REQUIRED_ELEMENT_WHITELIST = 'br|div';
 const DEFAULT_ELEMENT_WHITELIST =
 	'p|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|caption|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
-const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|colspan|rowspan|target|href|download|rel|src|alt|class|type|controls';
+const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|target|href|download|rel|src|alt|class|type|controls|colspan|rowspan';
+const DEFAULT_TABLE_STYLES = {
+	'table|th|td': 'border|border-[a-zA-Z]+|background-color'
+};
+
 const DEFAULT_FORMAT_LINE = 'P|H[1-6]|LI|TH|TD|DETAILS';
 const DEFAULT_FORMAT_BR_LINE = 'PRE';
 const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
@@ -30,7 +34,8 @@ export const RO_UNAVAILABD = [
 	'textTags',
 	'fontSizeUnit',
 	'spanStyles',
-	'formatStyles',
+	'lineStyles',
+	'tagStyles',
 	'reverseCommands',
 	'shortcutsDisable',
 	'shortcuts',
@@ -320,11 +325,12 @@ export function InitOptions(options, editorTargets) {
 		options.textTags || {}
 	);
 	o.set('textTags', textTags);
+	o.set('tagStyles', { ...DEFAULT_TABLE_STYLES, ...(options.tagStyles || {}) });
 	o.set(
 		'_spanStylesRegExp',
 		new RegExp(`\\s*[^-a-zA-Z](font-family|font-size|color|background-color${options.spanStyles ? '|' + options.spanStyles : ''})\\s*:[^;]+(?!;)*`, 'gi')
 	);
-	o.set('_formatStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](text-align|margin-left|margin-right${options.formatStyles ? '|' + options.formatStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
+	o.set('_lineStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](text-align|margin-left|margin-right${options.lineStyles ? '|' + options.lineStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
 	o.set('_defaultStyleTagMap', {
 		strong: textTags.bold,
 		b: textTags.bold,

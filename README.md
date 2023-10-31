@@ -408,6 +408,11 @@ attributeBlacklist   : Add attribute blacklist of tags that should be deleted in
                             'input': 'style' // Apply to input tag
                             '???': '*' // "*" === all attributes
                         }
+tagStyles        : Add the allowable style items for each tag.      default: {'table|td|th':'border|border-[a-zA-Z]+|background-color'}
+                      ex) {
+                          'h1': 'id', // Apply to h1 tag
+                        }
+spanStyles    : Add the span tag style
 // Layout-------------------------------------------------------------------------------------------------------
 mode            : The mode of the editor ('classic', 'inline', 'balloon', 'balloon-always'). default: 'classic' {string}
 rtl             : If true, the editor is set to RTL(Right To Left) mode.   default: false {Boolean}

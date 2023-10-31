@@ -17,7 +17,7 @@ const BORDER_FORMATS = {
 	inside: 'border_inside',
 	horizon: 'border_horizontal',
 	vertical: 'border_vertical',
-	outsize: 'border_outside',
+	outside: 'border_outside',
 	left: 'border_left',
 	top: 'border_top',
 	right: 'border_right',
@@ -84,14 +84,14 @@ const Table = function (editor, pluginOptions) {
 
 	// members - SelectMenu - properties - border style
 	const borderMenu = CreateBorderMenu();
-	const borderButton = controller_props.querySelector('[data-command="onborder_style"]');
+	const borderButton = controller_props.querySelector('[data-command="props_onborder_style"]');
 	this.selectMenu_props_border = new SelectMenu(this, { checkList: false, position: 'bottom-center' });
 	this.selectMenu_props_border.on(borderButton, OnPropsBorderEdit.bind(this));
 	this.selectMenu_props_border.create(borderMenu.items, borderMenu.menus);
 
 	// members - SelectMenu - properties - border format
 	const borderFormatMenu = CreateBorderFormatMenu(this.lang, this.icons);
-	const borderFormatButton = controller_props.querySelector('[data-command="onborder_format"]');
+	const borderFormatButton = controller_props.querySelector('[data-command="props_onborder_format"]');
 	this.selectMenu_props_border_format = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 5 });
 	this.selectMenu_props_border_format.on(borderFormatButton, OnPropsBorderFormatEdit.bind(this));
 	this.selectMenu_props_border_format.create(borderFormatMenu.items, borderFormatMenu.menus);
@@ -100,8 +100,9 @@ const Table = function (editor, pluginOptions) {
 	this.maxText = this.lang.maxSize;
 	this.minText = this.lang.minSize;
 	this.propTargets = {
-		border_format: controller_props.querySelector('[data-command="onborder_format"]'),
-		border_style: controller_props.querySelector('[data-command="onborder_style"] .txt'),
+		cell_alignment: '',
+		border_format: borderFormatButton,
+		border_style: controller_props.querySelector('[data-command="props_onborder_style"] .txt'),
 		border_color: controller_props.querySelector('.__se_border_color'),
 		border_width: controller_props.querySelector('.__se__border_size'),
 		back_color: controller_props.querySelector('.__se_back_color')
@@ -196,7 +197,8 @@ Table.prototype = {
 	},
 
 	hueSliderAction(color) {
-		this.propTargets[this.sliderType === 'border' ? 'border_color' : 'back_color'].value = color.hex;
+		const target = this.propTargets[this.sliderType === 'border' ? 'border_color' : 'back_color'];
+		target.style.borderColor = target.value = color.hex;
 	},
 
 	/**
@@ -291,38 +293,50 @@ Table.prototype = {
 
 		const cellEdge = CheckCellEdge(event, target);
 		if (cellEdge.is) {
-			this._deleteStyleSelectedCells();
-			this.setCellInfo(target, true);
-			const colIndex = this._logical_cellIndex - (cellEdge.isLeft ? 1 : 0);
+			try {
+				this._deleteStyleSelectedCells();
+				this.setCellInfo(target, true);
+				const colIndex = this._logical_cellIndex - (cellEdge.isLeft ? 1 : 0);
 
-			// ready
-			this.editor.enableBackWrapper('ew-resize');
-			if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_CELL_CLASS);
-			this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector(RESIZE_CELL_PREV_CLASS);
+				// ready
+				this.editor.enableBackWrapper('ew-resize');
+				if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_CELL_CLASS);
+				this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector(RESIZE_CELL_PREV_CLASS);
 
-			// select figure
-			if (colIndex < 0 || colIndex === this._logical_cellCnt - 1) {
-				this._startFigureResizing(cellEdge.startX, colIndex < 0);
-				return;
+				// select figure
+				if (colIndex < 0 || colIndex === this._logical_cellCnt - 1) {
+					this._startFigureResizing(cellEdge.startX, colIndex < 0);
+					return;
+				}
+
+				const col = this._element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
+				this._startCellResizing(col, cellEdge.startX, numbers.get(getComputedStyle(col).width, CELL_DECIMAL_END), cellEdge.isLeft);
+			} catch (err) {
+				console.warn('[SUNEDITOR.plugins.table.error]', err);
+				this.__removeGlobalEvents();
 			}
 
-			const col = this._element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
-			this._startCellResizing(col, cellEdge.startX, numbers.get(getComputedStyle(col).width, CELL_DECIMAL_END), cellEdge.isLeft);
 			return;
 		}
 
 		const row = domUtils.getParentElement(target, domUtils.isTableRow);
 		const rowEdge = CheckRowEdge(event, row);
 		if (rowEdge.is) {
-			this._deleteStyleSelectedCells();
-			this.setRowInfo(row);
+			try {
+				this._deleteStyleSelectedCells();
+				this.setRowInfo(row);
 
-			// ready
-			this.editor.enableBackWrapper('ns-resize');
-			if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
-			this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_PREV_CLASS);
+				// ready
+				this.editor.enableBackWrapper('ns-resize');
+				if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
+				this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_PREV_CLASS);
 
-			this._startRowResizing(row, rowEdge.startY, numbers.get(getComputedStyle(row).height, CELL_DECIMAL_END));
+				this._startRowResizing(row, rowEdge.startY, numbers.get(getComputedStyle(row).height, CELL_DECIMAL_END));
+			} catch (err) {
+				console.warn('[SUNEDITOR.plugins.table.error]', err);
+				this.__removeGlobalEvents();
+			}
+
 			return;
 		}
 
@@ -406,6 +420,7 @@ Table.prototype = {
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
+		if (!command) return;
 
 		switch (command) {
 			case 'header':
@@ -423,12 +438,6 @@ Table.prototype = {
 			case 'onrow':
 				this.selectMenu_row.menus[0].style.display = this.selectMenu_row.menus[1].style.display = /^TH$/i.test(this._tdElement?.nodeName) ? 'none' : '';
 				this.selectMenu_row.open();
-				break;
-			case 'onborder_format':
-				this.selectMenu_props_border_format.open();
-				break;
-			case 'onborder_style':
-				this.selectMenu_props_border.open();
 				break;
 			case 'openTableProperties':
 				this.controller_hue.close();
@@ -448,8 +457,21 @@ Table.prototype = {
 					this.controller_props.open(this.controller_cell.form, null, null, null);
 				}
 				break;
-			case 'onpalette':
+			case 'props_onborder_format':
+				this.selectMenu_props_border_format.open();
+				break;
+			case 'props_onborder_style':
+				this.selectMenu_props_border.open();
+				break;
+			case 'props_onpalette':
 				this._onColorPalette(target, target.getAttribute('data-value'));
+				break;
+			case 'props_submit':
+				this._submitProps();
+				this.controller_props.close();
+				break;
+			case 'props_close':
+				this.controller_props.close();
 				break;
 			case 'merge':
 				this.mergeCells();
@@ -480,6 +502,11 @@ Table.prototype = {
 						null
 					);
 				this.editor.focus();
+		}
+
+		if (!/(^props_|Properties$)/.test(command)) {
+			this.controller_props.close();
+			this.controller_hue.close();
 		}
 
 		this.history.push(false);
@@ -529,7 +556,7 @@ Table.prototype = {
 		this._selectedTable = domUtils.getParentElement(tdElement, 'TABLE');
 
 		this._deleteStyleSelectedCells();
-		domUtils.addClass(tdElement, 'se-table-selected-cell');
+		domUtils.addClass(tdElement, 'se-selected-table-cell');
 
 		if (!shift) {
 			this.__globalEvents.on = this.eventManager.addGlobalEvent('mousemove', this._bindMultiOn, false);
@@ -857,10 +884,11 @@ Table.prototype = {
 		let rowSpanArr = [];
 		let spanIndex = [];
 		let passCell = 0;
+		let insertIndex;
 		const removeCell = [];
 		const removeSpanArr = [];
 
-		for (let i = 0, len = this._rowCnt, row, insertIndex, cells, newCell, applySpan, cellColSpan; i < len; i++) {
+		for (let i = 0, len = this._rowCnt, row, cells, newCell, applySpan, cellColSpan; i < len; i++) {
 			row = rows[i];
 			insertIndex = cellIndex;
 			applySpan = false;
@@ -968,6 +996,24 @@ Table.prototype = {
 					newCell = CreateCells(cells[0].nodeName, 0, true);
 					newCell = row.insertBefore(newCell, cells[insertIndex]);
 				}
+			}
+		}
+
+		const colgroup = this._element.querySelector('colgroup');
+		if (colgroup) {
+			const cols = colgroup.querySelectorAll('col');
+			if (remove) {
+				domUtils.removeItem(cols[insertIndex]);
+			} else {
+				let totalW = 0;
+				for (let i = 0, len = cols.length, w; i < len; i++) {
+					w = numbers.get(cols[i].style.width);
+					w -= Math.round((w * len * 0.1) / 2, CELL_DECIMAL_END);
+					totalW += w;
+					cols[i].style.width = `${w}%`;
+				}
+				const newCol = domUtils.createElement('col', { style: `width:${100 - totalW}%` });
+				colgroup.insertBefore(newCol, cols[insertIndex]);
 			}
 		}
 
@@ -1307,9 +1353,18 @@ Table.prototype = {
 
 	_deleteStyleSelectedCells() {
 		if (this._selectedTable) {
-			const selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
+			const selectedCells = this._selectedTable.querySelectorAll('.se-selected-table-cell');
 			for (let i = 0, len = selectedCells.length; i < len; i++) {
-				domUtils.removeClass(selectedCells[i], 'se-table-selected-cell');
+				domUtils.removeClass(selectedCells[i], 'se-selected-table-cell');
+			}
+		}
+	},
+
+	_recallStyleSelectedCells() {
+		if (this._selectedCells) {
+			const selectedCells = this._selectedCells;
+			for (let i = 0, len = selectedCells.length; i < len; i++) {
+				domUtils.addClass(selectedCells[i], 'se-selected-table-cell');
 			}
 		}
 	},
@@ -1330,13 +1385,156 @@ Table.prototype = {
 
 	_setCtrlProps(type) {
 		const target = type === 'table' ? this._element : this._tdElement;
+		if (!target) return;
+
 		const { borderColor, borderStyle, borderWidth, backgroundColor } = window.getComputedStyle(target);
 		const { border_format, border_color, border_style, border_width, back_color } = this.propTargets;
 
+		const borderColorHex = converter.isHexColor(borderColor) ? borderColor : converter.rgb2hex(borderColor);
+		const backColorHex = converter.isHexColor(backgroundColor) ? borderColor : converter.rgb2hex(backgroundColor);
+
+		// border
+		border_format.innerHTML = this.icons[BORDER_FORMATS.all];
+		border_format.setAttribute('se-border-format', 'all');
 		border_style.textContent = borderStyle;
-		border_color.value = converter.isHexColor(borderColor) ? borderColor : converter.rgb2hex(borderColor);
+		border_color.value = borderColorHex;
+		border_color.style.borderColor = borderColorHex;
 		border_width.value = borderWidth;
-		back_color.value = converter.isHexColor(backgroundColor) ? borderColor : converter.rgb2hex(backgroundColor);
+		// back
+		back_color.value = backColorHex;
+		back_color.style.borderColor = backColorHex;
+	},
+
+	_submitProps() {
+		const isTable = this.controller_props.currentTarget === this.controller_table.form;
+		const targets = isTable ? [this._element] : this._selectedCells;
+		const { border_format, border_color, border_style, border_width, back_color, cell_alignment } = this.propTargets;
+
+		const borderFormat = border_format.getAttribute('se-border-format') || '';
+		const hasFormat = borderFormat !== 'all';
+		const isNoneFormat = borderFormat === 'none';
+
+		const cellAlignment = ''; //cell_alignment.getAttribute('se-cell-align') || '';
+		const borderStyle = isNoneFormat ? '' : (border_style.textContent === 'none' ? '' : border_style.textContent) || '';
+		const borderColor = isNoneFormat ? '' : border_color.value || '';
+		const borderWidth = isNoneFormat ? '' : border_width.value || '';
+		const backColor = isNoneFormat ? '' : back_color.value || '';
+
+		for (let i = 0, len = targets.length, es; i < len; i++) {
+			es = targets[i].style;
+
+			// alignment
+			es.textAlign = cellAlignment;
+			// back
+			es.backgroundColor = backColor;
+
+			// border
+			if (!hasFormat || isNoneFormat) {
+				es.borderLeft = es.borderTop = es.borderRight = es.borderBottom = '';
+			}
+
+			es.borderStyle = borderStyle;
+			es.borderColor = borderColor;
+			es.borderWidth = borderWidth;
+		}
+
+		if (hasFormat && !isNoneFormat) {
+			this._setBorderStyles(borderFormat, targets);
+		}
+
+		this._deleteStyleSelectedCells();
+		this.history.push(false);
+		this._recallStyleSelectedCells();
+	},
+
+	/**
+	 * @description Set border format
+	 * @param {"all"|"inside"|"horizon"|"vertical"|"outside"|"left"|"top"|"right"|"bottom"} borderKey Border style
+	 * @param {number} width Border width
+	 * @param {Element[]} targets Target elements ([table] | [td,td,td..])
+	 */
+	_setBorderStyles(borderKey, targets) {
+		let left = '';
+		let top = '';
+		let right = '';
+		let bottom = '';
+
+		switch (borderKey) {
+			case 'inside':
+				break;
+			case 'horizon':
+				break;
+			case 'vertical':
+				break;
+			case 'outside':
+				break;
+			case 'left':
+				break;
+			case 'top':
+				break;
+			case 'right':
+				break;
+			case 'bottom':
+				break;
+		}
+
+		const bs = this._findBoundaryCells(targets);
+		console.log('bs', bs);
+		// targets.forEach((e) => {
+		// 	e.style.borderLeft = left;
+		// 	e.style.borderTop = top;
+		// 	e.style.borderRight = right;
+		// 	e.style.borderBottom = bottom;
+		// });
+	},
+
+	_findBoundaryCells(elements) {
+		let minRowIndex = Infinity;
+		let maxRowIndex = -Infinity;
+		let minCellIndex = Infinity;
+		let maxCellIndex = -Infinity;
+
+		const adjustIndex = (rowIndex, cellIndex) => {
+			let adjustedCellIndex = cellIndex;
+			elements.forEach((cell) => {
+				if (cell.parentNode.rowIndex === rowIndex) {
+					const cIndex = cell.cellIndex;
+					const colspan = cell.getAttribute('colspan') ? parseInt(cell.getAttribute('colspan')) : 1;
+					if (cIndex < cellIndex) {
+						adjustedCellIndex += colspan - 1;
+					}
+				}
+			});
+			return adjustedCellIndex;
+		};
+
+		elements.forEach((cell) => {
+			const rowIndex = cell.parentNode.rowIndex;
+			const cellIndex = adjustIndex(rowIndex, cell.cellIndex);
+			const colspan = cell.getAttribute('colspan') ? parseInt(cell.getAttribute('colspan')) : 1;
+			const rowspan = cell.getAttribute('rowspan') ? parseInt(cell.getAttribute('rowspan')) : 1;
+
+			minRowIndex = Math.min(minRowIndex, rowIndex);
+			maxRowIndex = Math.max(maxRowIndex, rowIndex + rowspan - 1);
+			minCellIndex = Math.min(minCellIndex, cellIndex);
+			maxCellIndex = Math.max(maxCellIndex, cellIndex + colspan - 1);
+		});
+
+		const boundaryCells = elements.filter((cell) => {
+			const rowIndex = cell.parentNode.rowIndex;
+			const cellIndex = adjustIndex(rowIndex, cell.cellIndex);
+			const colspan = cell.getAttribute('colspan') ? parseInt(cell.getAttribute('colspan')) : 1;
+			const rowspan = cell.getAttribute('rowspan') ? parseInt(cell.getAttribute('rowspan')) : 1;
+
+			const isTopBoundary = rowIndex === minRowIndex;
+			const isBottomBoundary = rowIndex + rowspan - 1 === maxRowIndex;
+			const isLeftBoundary = cellIndex === minCellIndex;
+			const isRightBoundary = cellIndex + colspan - 1 === maxCellIndex;
+
+			return isTopBoundary || isBottomBoundary || isLeftBoundary || isRightBoundary;
+		});
+
+		return boundaryCells;
 	},
 
 	_setMultiCells(startCell, endCell) {
@@ -1344,7 +1542,7 @@ Table.prototype = {
 		this._deleteStyleSelectedCells();
 
 		if (startCell === endCell) {
-			domUtils.addClass(startCell, 'se-table-selected-cell');
+			domUtils.addClass(startCell, 'se-selected-table-cell');
 			if (!this._shift) return;
 		}
 
@@ -1421,7 +1619,7 @@ Table.prototype = {
 						break;
 					}
 
-					domUtils.addClass(cell, 'se-table-selected-cell');
+					domUtils.addClass(cell, 'se-selected-table-cell');
 				}
 
 				if (rs > 0) {
@@ -1717,7 +1915,6 @@ function OnColumnEdit(command) {
 	}
 
 	this.history.push(false);
-	this.selectMenu_column.close();
 }
 
 function OnRowEdit(command) {
@@ -1733,7 +1930,6 @@ function OnRowEdit(command) {
 	}
 
 	this.history.push(false);
-	this.selectMenu_row.close();
 }
 
 function OnMouseMoveTablePicker(e) {
@@ -1808,7 +2004,7 @@ function OffCellMultiSelect(e) {
 	if (!this._fixedCell || !this._selectedTable) return;
 
 	this.setActiveButton(this._fixedCell, this._selectedCell);
-	this._selectedCells = this._selectedTable.querySelectorAll('.se-table-selected-cell');
+	this._selectedCells = Array.from(this._selectedTable.querySelectorAll('.se-selected-table-cell'));
 	if (this._selectedCell && this._fixedCell) this.editor.focusEdge(this._selectedCell);
 
 	this.setController(this._selectedCell || this._fixedCell);
@@ -1918,9 +2114,9 @@ function CreateBorderFormatMenu(langs, icons) {
 
 	for (let k in BORDER_FORMATS) {
 		const s = BORDER_FORMATS[k];
-		items.push(s);
+		items.push(k);
 		html += `
-			<button type="button" data-command="${k}" class="se-btn se-tooltip" style="width: 34px;">
+			<button type="button" class="se-btn se-tooltip" style="width: 34px;">
 				${icons[s]}
 				<span class="se-tooltip-inner">
 					<span class="se-tooltip-text">${langs[s]}</span>
@@ -2028,16 +2224,14 @@ function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
 }
 
 function OnPropsBorderEdit(command) {
-	if (command === 'none') {
-	} else {
-	}
-
-	this.history.push(false);
+	this.propTargets.border_style.textContent = command;
 	this.selectMenu_props_border.close();
 }
 
 function OnPropsBorderFormatEdit(command) {
-	this.history.push(false);
+	this.propTargets.border_format.setAttribute('se-border-format', command);
+	this.propTargets.border_format.innerHTML = this.icons[BORDER_FORMATS[command]];
+	this.selectMenu_props_border_format.close();
 }
 
 function CreateHTML_controller_properties({ lang, icons }) {
@@ -2049,13 +2243,13 @@ function CreateHTML_controller_properties({ lang, icons }) {
 			<div class="se-controller-body">
 				<label>${lang.border}</label>
 				<div class="se-form-group se-form-w0">
-					<button type="button" data-command="onborder_format" class="se-btn se-tooltip">
+					<button type="button" data-command="props_onborder_format" class="se-btn se-tooltip">
 						${icons[BORDER_FORMATS.all]}
 						<span class="se-tooltip-inner">
 							<span class="se-tooltip-text">${lang.border}</span>
 						</span>
 					</button>
-					<button type="button" data-command="onborder_style" class="se-btn se-btn-select se-tooltip se-border-style">
+					<button type="button" data-command="props_onborder_style" class="se-btn se-btn-select se-tooltip se-border-style">
 						<span class="txt"></span>
 						${icons.arrow_down}
 						<span class="se-tooltip-inner">
@@ -2063,7 +2257,7 @@ function CreateHTML_controller_properties({ lang, icons }) {
 						</span>
 					</button>
 					<input type="text" class="se-color-input __se_border_color" />
-					<button type="button" data-command="onpalette" data-value="border" class="se-btn se-tooltip">
+					<button type="button" data-command="props_onpalette" data-value="border" class="se-btn se-tooltip">
 						${icons.color_palette}
 						<span class="se-tooltip-inner">
 							<span class="se-tooltip-text">${lang.colorPicker}</span>
@@ -2074,7 +2268,7 @@ function CreateHTML_controller_properties({ lang, icons }) {
 				<label>${lang.backgroundColor}</label>
 				<div class="se-form-group se-form-w0">
 					<input type="text" class="se-color-input __se_back_color" />
-					<button type="button" data-command="onpalette" data-value="back" class="se-btn se-tooltip">
+					<button type="button" data-command="props_onpalette" data-value="back" class="se-btn se-tooltip">
 						${icons.color_palette}
 						<span class="se-tooltip-inner">
 							<span class="se-tooltip-text">${lang.colorPicker}</span>
@@ -2083,8 +2277,8 @@ function CreateHTML_controller_properties({ lang, icons }) {
 				</div>
 			</div>
 			<div class="se-form-group se-form-w0 se-form-flex-btn">
-				<button type="button" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>
-				<button type="button" class="se-btn se-btn-danger" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
+				<button type="button" class="se-btn se-btn-success" data-command="props_submit" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>
+				<button type="button" class="se-btn se-btn-danger" data-command="props_close" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
 			</div>
 		</div>`;
 
