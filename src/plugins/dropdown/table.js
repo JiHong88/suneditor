@@ -1454,10 +1454,7 @@ Table.prototype = {
 	 * @param {Element[]} targets Target elements ([table] | [td,td,td..])
 	 */
 	_setBorderStyles(borderKey, targets) {
-		let left = '';
-		let top = '';
-		let right = '';
-		let bottom = '';
+		const cellsInfo = this._findBoundaryCells(targets);
 
 		switch (borderKey) {
 			case 'inside':
@@ -1478,8 +1475,7 @@ Table.prototype = {
 				break;
 		}
 
-		const bs = this._findBoundaryCells(targets);
-		console.log('bs', bs);
+		console.log('cellsInfo', cellsInfo);
 		// targets.forEach((e) => {
 		// 	e.style.borderLeft = left;
 		// 	e.style.borderTop = top;
@@ -1489,52 +1485,62 @@ Table.prototype = {
 	},
 
 	_findBoundaryCells(elements) {
-		let minRowIndex = Infinity;
-		let maxRowIndex = -Infinity;
-		let minCellIndex = Infinity;
-		let maxCellIndex = -Infinity;
-
-		const adjustIndex = (rowIndex, cellIndex) => {
-			let adjustedCellIndex = cellIndex;
-			elements.forEach((cell) => {
-				if (cell.parentNode.rowIndex === rowIndex) {
-					const cIndex = cell.cellIndex;
-					const colspan = cell.getAttribute('colspan') ? parseInt(cell.getAttribute('colspan')) : 1;
-					if (cIndex < cellIndex) {
-						adjustedCellIndex += colspan - 1;
-					}
-				}
-			});
-			return adjustedCellIndex;
+		const cells = {
+			left: [],
+			top: [],
+			right: [],
+			bottom: [],
+			middle: []
 		};
 
-		elements.forEach((cell) => {
-			const rowIndex = cell.parentNode.rowIndex;
-			const cellIndex = adjustIndex(rowIndex, cell.cellIndex);
-			const colspan = cell.getAttribute('colspan') ? parseInt(cell.getAttribute('colspan')) : 1;
-			const rowspan = cell.getAttribute('rowspan') ? parseInt(cell.getAttribute('rowspan')) : 1;
+		const { cs, ce, rs, re } = this._ref;
+		const mergeInfo = {};
+		let prevRow = elements[0].parentNode;
+		for (let i = 0, len = elements.length, e, rowIndex = rs, cellIndex, colspan, rowspan, cm, m; i < len; i++) {
+			m = true;
+			e = elements[i];
+			colspan = e.colSpan;
+			rowspan = e.rowSpan;
+			cellIndex = e.cellIndex;
 
-			minRowIndex = Math.min(minRowIndex, rowIndex);
-			maxRowIndex = Math.max(maxRowIndex, rowIndex + rowspan - 1);
-			minCellIndex = Math.min(minCellIndex, cellIndex);
-			maxCellIndex = Math.max(maxCellIndex, cellIndex + colspan - 1);
-		});
+			if (prevRow !== e.parentNode) {
+				rowIndex++;
+				prevRow = e.parentNode;
+			}
 
-		const boundaryCells = elements.filter((cell) => {
-			const rowIndex = cell.parentNode.rowIndex;
-			const cellIndex = adjustIndex(rowIndex, cell.cellIndex);
-			const colspan = cell.getAttribute('colspan') ? parseInt(cell.getAttribute('colspan')) : 1;
-			const rowspan = cell.getAttribute('rowspan') ? parseInt(cell.getAttribute('rowspan')) : 1;
+			cm = mergeInfo[`${cellIndex}:${rowIndex}`];
+			cellIndex += cm;
 
-			const isTopBoundary = rowIndex === minRowIndex;
-			const isBottomBoundary = rowIndex + rowspan - 1 === maxRowIndex;
-			const isLeftBoundary = cellIndex === minCellIndex;
-			const isRightBoundary = cellIndex + colspan - 1 === maxCellIndex;
+			if (rowspan > 1) {
+				const rowspanNum = rowspan - 1;
+				for (let r = rowIndex; r <= rowIndex + rowspanNum; r++) {
+					for (let c = cellIndex, k; c <= ce; c++) {
+						k = `${c}:${r}`;
+						if (!mergeInfo[k]) mergeInfo[k] = 0;
+						mergeInfo[k] += colspan - (rowIndex === r ? 1 : 0);
+					}
+				}
+			} else if (colspan > 1) {
+				const colspanNum = colspan - 1;
+				for (let c = cellIndex + colspanNum, k; c <= ce; c++) {
+					k = `${c}:${rowIndex}`;
+					if (!mergeInfo[k]) mergeInfo[k] = 0;
+					mergeInfo[k] += colspanNum;
+				}
+			}
 
-			return isTopBoundary || isBottomBoundary || isLeftBoundary || isRightBoundary;
-		});
+			const isBottom = rowIndex + rowspan - 1 === re;
+			if (rowIndex === rs) cells.top.push(e);
+			if (rowIndex === re || isBottom) cells.bottom.push(e);
 
-		return boundaryCells;
+			cellIndex += colspan - 1;
+			if (cellIndex === cs) cells.left.push(e);
+			if (cellIndex === ce) cells.right.push(e);
+
+			if (!isBottom && rowIndex !== rs && rowIndex !== re && cellIndex !== cs && cellIndex !== ce) cells.middle.push(e);
+		}
+
+		return cells;
 	},
 
 	_setMultiCells(startCell, endCell) {
@@ -1634,7 +1640,7 @@ Table.prototype = {
 				colSpan += cell.colSpan - 1;
 			}
 
-			spanIndex = spanIndex.concat(rowSpanArr).sort(function (a, b) {
+			spanIndex = spanIndex.concat(rowSpanArr).sort((a, b) => {
 				return a.index - b.index;
 			});
 			rowSpanArr = [];
@@ -2009,11 +2015,11 @@ function OffCellMultiSelect(e) {
 
 	this.setController(this._selectedCell || this._fixedCell);
 
-	if (!this._shift) {
-		this._fixedCell = null;
-		this._selectedCell = null;
-		this._fixedCellName = null;
-	}
+	// if (!this._shift) {
+	// 	this._fixedCell = null;
+	// 	this._selectedCell = null;
+	// 	this._fixedCellName = null;
+	// }
 }
 
 function OffCellShift() {
