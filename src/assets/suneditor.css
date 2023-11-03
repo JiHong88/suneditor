@@ -173,14 +173,14 @@
 	width: auto !important;
 }
 
-.sun-editor .se-btn:enabled:hover,
-.sun-editor .se-btn:enabled:focus {
+.sun-editor .se-btn:not(.on):not(.active):enabled:hover,
+.sun-editor .se-btn:not(.on):not(.active):enabled:focus {
 	background-color: #e1e1e1;
-	border-color: #d1d1d1 !important;
+	border-color: #d1d1d1;
 }
 
-.sun-editor .se-btn:enabled:active,
-.sun-editor .se-btn:enabled.__se__active {
+.sun-editor .se-btn:not(.on):not(.active):enabled:active,
+.sun-editor .se-btn:not(.on):not(.active):enabled.__se__active {
 	background-color: #ececec;
 	border-color: #ececec !important;
 	outline: 1px solid #b1b1b1 !important;
@@ -193,12 +193,14 @@
 .sun-editor .se-btn:enabled.on {
 	background-color: #eaf3ff;
 	color: #4592ff;
+	border-color: #c4ddff;
 }
 
 .sun-editor .se-btn:enabled.on:hover,
 .sun-editor .se-btn:enabled.on:focus {
 	background-color: #d0e3ff;
 	color: #407dd1;
+	border-color: #c4ddff;
 }
 
 .sun-editor .se-btn:enabled.on:active,
@@ -217,12 +219,14 @@
 .sun-editor .se-btn:enabled.active {
 	background-color: #dbeaff;
 	color: #4592ff;
+	border-color: #80bdff;
 }
 
 .sun-editor .se-btn:enabled.active:hover,
 .sun-editor .se-btn:enabled.active:focus {
 	background-color: #c4ddff;
 	color: #1275ff;
+	border-color: #3f9dff;
 }
 
 .sun-editor .se-btn:enabled.active:active,
@@ -900,8 +904,8 @@
 
 /* table resize */
 /* table resize - ew */
-.sun-editor .sun-editor-editable table th:hover::before,
-.sun-editor .sun-editor-editable table td:hover::before {
+.sun-editor .sun-editor-editable table th:not(.se-selected-table-cell):hover::before,
+.sun-editor .sun-editor-editable table td:not(.se-selected-table-cell):hover::before {
 	content: '';
 	position: absolute;
 	top: 0;
@@ -911,8 +915,8 @@
 	background-color: transparent;
 	cursor: ew-resize;
 }
-.sun-editor .sun-editor-editable table th:hover::after,
-.sun-editor .sun-editor-editable table td:hover::after {
+.sun-editor .sun-editor-editable table th:not(.se-selected-table-cell):hover::after,
+.sun-editor .sun-editor-editable table td:not(.se-selected-table-cell):hover::after {
 	content: '';
 	position: absolute;
 	top: 0;
@@ -2536,9 +2540,24 @@
 
 /** --- selected class */
 /* -- table */
-.sun-editor-editable table td.se-selected-table-cell,
-.sun-editor-editable table th.se-selected-table-cell {
-	outline: 1px double var(--se-edit-active);
+.sun-editor .sun-editor-editable table td.se-selected-table-cell::after,
+.sun-editor .sun-editor-editable table th.se-selected-table-cell::after {
+	position: absolute;
+	content: '';
+	background-color: #80bdff;
+	border: 1px solid #1275ff;
+	opacity: 0.1;
+	width: 100%;
+	height: 100%;
+	bottom: -1px;
+	left: -1px;
+	right: -1px;
+	top: -1px;
+}
+.sun-editor .sun-editor-editable table td.se-selected-cell-focus,
+.sun-editor .sun-editor-editable table th.se-selected-cell-focus {
+	outline: 2px double #1275ff;
+	z-index: 1;
 }
 
 /** --- RTL start -------------------------------------------------------------------------------------------------------------------------------------------------- */

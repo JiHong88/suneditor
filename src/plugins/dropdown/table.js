@@ -319,10 +319,18 @@ Table.prototype = {
 			return;
 		}
 
-		const row = domUtils.getParentElement(target, domUtils.isTableRow);
-		const rowEdge = CheckRowEdge(event, row);
+		const rowEdge = CheckRowEdge(event, target);
 		if (rowEdge.is) {
 			try {
+				let row = domUtils.getParentElement(target, domUtils.isTableRow);
+				let rowSpan = target.rowSpan;
+				if (rowSpan > 1) {
+					while (domUtils.isTableRow(row) && rowSpan > 1) {
+						row = row.nextElementSibling;
+						--rowSpan;
+					}
+				}
+
 				this._deleteStyleSelectedCells();
 				this.setRowInfo(row);
 
@@ -556,7 +564,7 @@ Table.prototype = {
 		this._selectedTable = domUtils.getParentElement(tdElement, 'TABLE');
 
 		this._deleteStyleSelectedCells();
-		domUtils.addClass(tdElement, 'se-selected-table-cell');
+		domUtils.addClass(tdElement, 'se-selected-cell-focus');
 
 		if (!shift) {
 			this.__globalEvents.on = this.eventManager.addGlobalEvent('mousemove', this._bindMultiOn, false);
@@ -1205,6 +1213,7 @@ Table.prototype = {
 			return;
 		}
 
+		domUtils.addClass(tdElement, 'se-selected-cell-focus');
 		const tableElement = this._element || this._selectedTable || domUtils.getParentElement(tdElement, 'TABLE');
 		this.component.select(tableElement, Table.key, true);
 
@@ -1352,6 +1361,8 @@ Table.prototype = {
 	},
 
 	_deleteStyleSelectedCells() {
+		domUtils.removeClass(this._fixedCell, 'se-selected-cell-focus');
+		domUtils.removeClass(this._selectedCell, 'se-selected-cell-focus');
 		if (this._selectedTable) {
 			const selectedCells = this._selectedTable.querySelectorAll('.se-selected-table-cell');
 			for (let i = 0, len = selectedCells.length; i < len; i++) {
@@ -1393,13 +1404,17 @@ Table.prototype = {
 		const borderColorHex = converter.isHexColor(borderColor) ? borderColor : converter.rgb2hex(borderColor);
 		const backColorHex = converter.isHexColor(backgroundColor) ? borderColor : converter.rgb2hex(backgroundColor);
 
-		// border
+		// border - format
 		border_format.innerHTML = this.icons[BORDER_FORMATS.all];
 		border_format.setAttribute('se-border-format', 'all');
+		domUtils.removeClass(border_format, 'active');
+
+		// border - styles
 		border_style.textContent = borderStyle;
 		border_color.value = borderColorHex;
 		border_color.style.borderColor = borderColorHex;
 		border_width.value = borderWidth;
+
 		// back
 		back_color.value = backColorHex;
 		back_color.style.borderColor = backColorHex;
@@ -1454,7 +1469,7 @@ Table.prototype = {
 	 * @param {Element[]} targets Target elements ([table] | [td,td,td..])
 	 */
 	_setBorderStyles(borderKey, targets) {
-		const cellsInfo = this._findBoundaryCells(targets);
+		const cellsPosition = this._findCellsPosition(targets);
 
 		switch (borderKey) {
 			case 'inside':
@@ -1475,7 +1490,7 @@ Table.prototype = {
 				break;
 		}
 
-		console.log('cellsInfo', cellsInfo);
+		console.log('cellsPosition', cellsPosition);
 		// targets.forEach((e) => {
 		// 	e.style.borderLeft = left;
 		// 	e.style.borderTop = top;
@@ -1484,7 +1499,7 @@ Table.prototype = {
 		// });
 	},
 
-	_findBoundaryCells(elements) {
+	_findCellsPosition(elements) {
 		const cells = {
 			left: [],
 			top: [],
@@ -1493,51 +1508,51 @@ Table.prototype = {
 			middle: []
 		};
 
-		const { cs, ce, rs, re } = this._ref;
-		const mergeInfo = {};
+		let { rs, re, cs, ce } = this._ref;
+		const mergeInfo = new Array(re - rs + 1).fill(0).map(() => new Array(ce - cs + 1).fill(0));
+		const cellStartIndex = cs;
+		re -= rs;
+		rs -= rs;
+		ce -= cs;
+		cs -= cs;
 		let prevRow = elements[0].parentNode;
-		for (let i = 0, len = elements.length, e, rowIndex = rs, cellIndex, colspan, rowspan, cm, m; i < len; i++) {
-			m = true;
+		for (let i = 0, cellCnt = 0, len = elements.length, e, rowIndex = 0, cellIndex, colspan, rowspan; i < len; i++, cellCnt++) {
 			e = elements[i];
 			colspan = e.colSpan;
 			rowspan = e.rowSpan;
-			cellIndex = e.cellIndex;
+			cellIndex = e.cellIndex - cellStartIndex;
 
 			if (prevRow !== e.parentNode) {
 				rowIndex++;
+				cellCnt = 0;
 				prevRow = e.parentNode;
 			}
 
-			cm = mergeInfo[`${cellIndex}:${rowIndex}`];
-			cellIndex += cm;
+			let c = 0;
+			while (c <= cellIndex) {
+				cellIndex += mergeInfo[rowIndex][c] || 0;
+				c++;
+			}
 
 			if (rowspan > 1) {
 				const rowspanNum = rowspan - 1;
 				for (let r = rowIndex; r <= rowIndex + rowspanNum; r++) {
-					for (let c = cellIndex, k; c <= ce; c++) {
-						k = `${c}:${r}`;
-						if (!mergeInfo[k]) mergeInfo[k] = 0;
-						mergeInfo[k] += colspan - (rowIndex === r ? 1 : 0);
-					}
+					mergeInfo[r][cellIndex] += colspan - (rowIndex === r ? 1 : 0);
 				}
 			} else if (colspan > 1) {
-				const colspanNum = colspan - 1;
-				for (let c = cellIndex + colspanNum, k; c <= ce; c++) {
-					k = `${c}:${rowIndex}`;
-					if (!mergeInfo[k]) mergeInfo[k] = 0;
-					mergeInfo[k] += colspanNum;
-				}
+				mergeInfo[rowIndex][cellIndex] += colspan - 1;
 			}
 
 			const isBottom = rowIndex + rowspan - 1 === re;
 			if (rowIndex === rs) cells.top.push(e);
 			if (rowIndex === re || isBottom) cells.bottom.push(e);
-
-			cellIndex += colspan - 1;
 			if (cellIndex === cs) cells.left.push(e);
-			if (cellIndex === ce) cells.right.push(e);
-
+			if (cellIndex === ce || cellIndex + colspan - 1 === ce) cells.right.push(e);
 			if (!isBottom && rowIndex !== rs && rowIndex !== re && cellIndex !== cs && cellIndex !== ce) cells.middle.push(e);
+		}
+
+		if (cells.middle.length === 0) {
+			cells.middle = elements;
 		}
 
 		return cells;
@@ -2014,12 +2029,6 @@ function OffCellMultiSelect(e) {
 	if (this._selectedCell && this._fixedCell) this.editor.focusEdge(this._selectedCell);
 
 	this.setController(this._selectedCell || this._fixedCell);
-
-	// if (!this._shift) {
-	// 	this._fixedCell = null;
-	// 	this._selectedCell = null;
-	// 	this._fixedCellName = null;
-	// }
 }
 
 function OffCellShift() {
@@ -2235,8 +2244,13 @@ function OnPropsBorderEdit(command) {
 }
 
 function OnPropsBorderFormatEdit(command) {
-	this.propTargets.border_format.setAttribute('se-border-format', command);
-	this.propTargets.border_format.innerHTML = this.icons[BORDER_FORMATS[command]];
+	const { border_format } = this.propTargets;
+
+	border_format.setAttribute('se-border-format', command);
+	border_format.innerHTML = this.icons[BORDER_FORMATS[command]];
+	if (command !== 'all') domUtils.addClass(border_format, 'active');
+	else domUtils.removeClass(border_format, 'active');
+
 	this.selectMenu_props_border_format.close();
 }
 
