@@ -684,15 +684,19 @@ export function changeTxt(node, txt) {
 
 /**
  * @description Set style, if all styles are deleted, the style properties are deleted.
- * @param {Element} element Element to set style
+ * @param {Element|Element[]} elements Element to set style
  * @param {string} styleName Style attribute name (marginLeft, textAlign...)
  * @param {string|number} value Style value
  */
-export function setStyle(element, styleName, value) {
-	element.style[styleName] = value;
+export function setStyle(elements, styleName, value) {
+	elements = Array.isArray(elements) ? elements : [elements];
 
-	if (!value && !element.style.cssText) {
-		element.removeAttribute('style');
+	for (let i = 0, len = elements.length, e; i < len; i++) {
+		e = elements[i];
+		e.style[styleName] = value;
+		if (!value && !e.style.cssText) {
+			e.removeAttribute('style');
+		}
 	}
 }
 

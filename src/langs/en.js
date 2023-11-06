@@ -43,6 +43,7 @@
 		center: 'Center',
 		close: 'Close',
 		codeView: 'Code view',
+		color: 'Color',
 		colorPicker: 'Color picker',
 		column: 'Column',
 		default: 'Default',

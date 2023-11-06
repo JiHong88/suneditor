@@ -1,6 +1,6 @@
 /* used color #000 , #fff , #CCC, #f5f5f5, #f9f9f9 */
 /* font color #333, background color: #fff */
-/* grey color #e1e1e1, #ececec, #d1d1d1 , #c1c1c1 , #b1b1b1 */
+/* grey color #e1e1e1, #ececec, #d1d1d1 ,#bdbdbd, #c1c1c1 ,#b1b1b1 */
 /* blue color #eaf3ff, #dbeaff(shadow: #b7ccf2, #e6f2ff), #c4ddff, #d0e3ff , #80bdff , #3f9dff , #4592ff, #407dd1, #3288ff, #1275ff */
 /* red color #b94a48 , #f2dede , #eed3d7, #d9534f */
 /* green color #008000 */
@@ -274,9 +274,10 @@
 
 /* disabled buttons, icon blur */
 .sun-editor .se-btn:disabled,
-.sun-editor button:disabled {
+.sun-editor button:disabled,
+.sun-editor input:disabled {
 	cursor: not-allowed;
-	background-color: inherit;
+	background-color: #ececec;
 	color: #bdbdbd;
 }
 
@@ -2055,10 +2056,10 @@
 /* controller - table - props */
 .sun-editor .se-controller.se-table-props .se-color-input,
 .sun-editor .se-controller.se-table-props .se-border-style {
-	width: 72px;
+	width: 70px;
 }
 .sun-editor .se-controller.se-table-props .__se__border_size {
-	width: 42px;
+	width: 52px;
 }
 
 /* controller - link */
@@ -2529,7 +2530,6 @@
 /* -- color input */
 .sun-editor div input.se-color-input {
 	margin: 0 4px;
-	text-transform: uppercase;
 	border-top: 0;
 	border-left: 0;
 	border-right: 0;
