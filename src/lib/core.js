@@ -2143,7 +2143,9 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
             let endNextEl = null;
             if (isStartEdge) {
                 startPrevEl = util.getFormatElement(range.startContainer);
-                prevContainer = startPrevEl.previousElementSibling;
+                if (startPrevEl) {
+                	prevContainer = startPrevEl.previousElementSibling;
+                }
                 startPrevEl = startPrevEl ? prevContainer : startPrevEl;
             }
             if (isEndEdge) {
