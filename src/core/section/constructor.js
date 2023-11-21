@@ -19,7 +19,7 @@ const DEFAULT_ELEMENT_WHITELIST =
 	'p|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|caption|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|target|href|download|rel|src|alt|class|type|controls|colspan|rowspan';
 const DEFAULT_TABLE_STYLES = {
-	'table|th|td': 'border|border-[a-zA-Z]+|background-color'
+	'table|th|td': 'border|border-[a-z]+|background-color|text-align|float'
 };
 
 const DEFAULT_FORMAT_LINE = 'P|H[1-6]|LI|TH|TD|DETAILS';

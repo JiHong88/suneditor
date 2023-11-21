@@ -408,7 +408,7 @@ attributeBlacklist   : Add attribute blacklist of tags that should be deleted in
                             'input': 'style' // Apply to input tag
                             '???': '*' // "*" === all attributes
                         }
-tagStyles        : Add the allowable style items for each tag.      default: {'table|td|th':'border|border-[a-zA-Z]+|background-color'}
+tagStyles        : Add the allowable style items for each tag.      default: {'table|td|th':'border|border-[a-z]+|background-color|text-align|float'}
                       ex) {
                           'h1': 'id', // Apply to h1 tag
                         }

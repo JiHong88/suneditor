@@ -100,7 +100,7 @@ const Table = function (editor, pluginOptions) {
 	this.maxText = this.lang.maxSize;
 	this.minText = this.lang.minSize;
 	this.propTargets = {
-		cell_alignment: '',
+		cell_alignment: controller_props.querySelector('.se-table-props-align'),
 		border_format: borderFormatButton,
 		border_style: controller_props.querySelector('[data-command="props_onborder_style"] .txt'),
 		border_color: controller_props.querySelector('.__se_border_color'),
@@ -109,6 +109,8 @@ const Table = function (editor, pluginOptions) {
 		palette_border_button: controller_props.querySelector('[data-command="props_onpalette"][data-value="border"]'),
 		border_style_button: controller_props.querySelector('[data-command="props_onborder_style"]')
 	};
+	this._propsCache = [];
+	this._typeCache = '';
 	this.tableHighlight = menu.querySelector('.se-table-size-highlighted');
 	this.tableUnHighlight = menu.querySelector('.se-table-size-unhighlighted');
 	this.tableDisplay = menu.querySelector('.se-table-size-display');
@@ -248,6 +250,7 @@ Table.prototype = {
 	setDir(dir) {
 		this.tableHighlight.style.left = dir === 'rtl' ? 10 * 18 - 13 + 'px' : '';
 		this._resetTablePicker();
+		this._resetPropsAlign(dir === 'rtl');
 	},
 
 	onMouseMove({ event }) {
@@ -435,9 +438,11 @@ Table.prototype = {
 		switch (command) {
 			case 'header':
 				this.toggleHeader();
+				this._historyPush();
 				break;
 			case 'caption':
 				this.toggleCaption();
+				this._historyPush();
 				break;
 			case 'onsplit':
 				this.selectMenu_split.open();
@@ -479,8 +484,18 @@ Table.prototype = {
 			case 'props_submit':
 				this._submitProps(target);
 				break;
+			case 'props_cancel':
+				const propsCache = this._propsCache;
+				for (let i = 0, len = propsCache.length; i < len; i++) {
+					propsCache[i][0].style.cssText = propsCache[i][1];
+				}
+				this._setCtrlProps(this._typeCache);
+				break;
 			case 'props_close':
 				this.controller_props.close();
+				break;
+			case 'props_align':
+				this._setAlignProps(this.propTargets.cell_alignment, target.getAttribute('data-value'));
 				break;
 			case 'merge':
 				this.mergeCells();
@@ -495,6 +510,7 @@ Table.prototype = {
 				this._fixedColumn = !this._fixedColumn;
 				this.setTableStyle('column');
 				this.controller_table.resetPosition();
+				this._historyPush();
 				this.setCellControllerPosition(this._tdElement, this._shift);
 				break;
 			case 'remove':
@@ -511,14 +527,13 @@ Table.prototype = {
 						null
 					);
 				this.editor.focus();
+				this.history.push(false);
 		}
 
 		if (!/(^props_|Properties$)/.test(command)) {
 			this.controller_props.close();
 			this.controller_hue.close();
 		}
-
-		this.history.push(false);
 	},
 
 	/**
@@ -599,7 +614,7 @@ Table.prototype = {
 			if (this._tdElement !== tdElement) {
 				this._tdElement = tdElement;
 				this._trElement = tdElement.parentNode;
-				this._selectedCells = [tdElement];
+				if (!this._selectedCells || this._selectedCells.length === 0) this._selectedCells = [tdElement];
 			}
 
 			const rows = (this._trElements = table.rows);
@@ -1124,6 +1139,7 @@ Table.prototype = {
 		this.setController(mergeCell);
 
 		this.editor.focusEdge(mergeCell);
+		this._historyPush();
 	},
 
 	toggleHeader() {
@@ -1239,6 +1255,12 @@ Table.prototype = {
 	setCellControllerPosition(tdElement, reset) {
 		this.setCellInfo(tdElement, reset);
 		this.controller_cell.resetPosition(this.cellControllerTop ? domUtils.getParentElement(tdElement, domUtils.isTable) : tdElement);
+	},
+
+	_historyPush() {
+		this._deleteStyleSelectedCells();
+		this.history.push(false);
+		this._recallStyleSelectedCells();
 	},
 
 	_startCellResizing(col, startX, startWidth, isLeftEdge) {
@@ -1397,26 +1419,40 @@ Table.prototype = {
 	},
 
 	_setCtrlProps(type) {
-		const targets = type === 'table' ? this._element : this._selectedCells;
+		this._typeCache = type;
+		const isTable = type === 'table';
+		const targets = isTable ? [this._element] : this._selectedCells;
 		if (!targets || targets.length === 0) return;
 
-		const { border_format, border_color, border_style, border_width, back_color } = this.propTargets;
-		const { border, backgroundColor } = targets[0].style;
+		const { border_format, border_color, border_style, border_width, back_color, cell_alignment } = this.propTargets;
+		const { border, backgroundColor, textAlign, float } = targets[0].style;
 		const cellBorder = this._getBorderStyle(border);
+
+		cell_alignment.querySelector('[data-value="justify"]').style.display = isTable ? 'none' : '';
 
 		let color = cellBorder.c,
 			style = cellBorder.s,
 			width = cellBorder.w,
-			backColor = backgroundColor;
-		for (let i = 1, len = targets.length; i < len; i++) {
-			let { border, backgroundColor } = targets[i].style;
+			backColor = backgroundColor,
+			align = isTable ? float : textAlign;
+		this._propsCache = [];
+
+		for (let i = 0, len = targets.length, t, isBreak = false; i < len; i++) {
+			t = targets[i];
+			let { cssText, border, backgroundColor, textAlign, float } = t.style;
+			this._propsCache.push([t, cssText]);
+			if (isBreak) continue;
+
 			const { c, s, w } = this._getBorderStyle(border);
 
 			if (color && cellBorder.c !== c) color = '';
 			if (style && cellBorder.s !== s) style = '';
 			if (width && cellBorder.w !== w) width = '';
 			if (backColor !== backgroundColor) backColor = '';
-			if (!color || !style || !width || !backColor) break;
+			if (align !== (isTable ? float : textAlign)) align = '';
+			if (!color || !style || !width || !backColor) {
+				isBreak = true;
+			}
 		}
 
 		// set props
@@ -1437,6 +1473,15 @@ Table.prototype = {
 
 		// back
 		back_color.value = back_color.style.borderColor = backColorHex;
+
+		// align
+		this._setAlignProps(cell_alignment, align);
+	},
+
+	_setAlignProps(el, align) {
+		domUtils.removeClass(el.querySelectorAll(`button`), 'on');
+		domUtils.addClass(el.querySelector(`[data-value="${align}"]`), 'on');
+		el.setAttribute('se-cell-align', align);
 	},
 
 	_disableBorderProps(disabled) {
@@ -1496,11 +1541,11 @@ Table.prototype = {
 			const borderStyle = (border_style.textContent === 'none' ? '' : border_style.textContent) || '';
 			const isNoneFormat = borderFormat === 'none' || !borderStyle;
 
-			const cellAlignment = ''; //cell_alignment.getAttribute('se-cell-align') || '';
+			const cellAlignment = cell_alignment.getAttribute('se-cell-align') || '';
 			const borderColor = isNoneFormat ? '' : border_color.value.trim() || '';
 			let borderWidth = isNoneFormat ? '' : border_width.value.trim() || '';
 			borderWidth = numbers.is(borderWidth) ? borderWidth + 'px' : borderWidth;
-			const backColor = isNoneFormat ? '' : back_color.value.trim() || '';
+			const backColor = back_color.value.trim();
 
 			// --- targets roof
 			const hasBorder = hasFormat && !isNoneFormat && borderWidth;
@@ -1513,7 +1558,12 @@ Table.prototype = {
 				middle: []
 			};
 
-			let { rs, re, cs, ce } = this._ref;
+			let { rs, re, cs, ce } = this._ref || {
+				rs: targets[0].parentElement.rowIndex || 0,
+				re: targets[0].parentElement.rowIndex || 0,
+				cs: targets[0].cellIndex || 0,
+				ce: targets[0].cellIndex || 0
+			};
 			const mergeInfo = new Array(re - rs + 1).fill(0).map(() => new Array(ce - cs + 1).fill(0));
 			const cellStartIndex = cs;
 			re -= rs;
@@ -1539,13 +1589,17 @@ Table.prototype = {
 					c++;
 				}
 
-				if (rowspan > 1) {
-					const rowspanNum = rowspan - 1;
-					for (let r = rowIndex; r <= rowIndex + rowspanNum; r++) {
-						mergeInfo[r][cellIndex] += colspan - (rowIndex === r ? 1 : 0);
+				try {
+					if (rowspan > 1) {
+						const rowspanNum = rowspan - 1;
+						for (let r = rowIndex; r <= rowIndex + rowspanNum; r++) {
+							mergeInfo[r][cellIndex] += colspan - (rowIndex === r ? 1 : 0);
+						}
+					} else if (colspan > 1) {
+						mergeInfo[rowIndex][cellIndex] += colspan - 1;
 					}
-				} else if (colspan > 1) {
-					mergeInfo[rowIndex][cellIndex] += colspan - 1;
+				} catch (err) {
+					// ignore error
 				}
 
 				const isBottom = rowIndex + rowspan - 1 === re;
@@ -1558,7 +1612,8 @@ Table.prototype = {
 				// --- set styles
 				es = e.style;
 				// alignment
-				es.textAlign = cellAlignment;
+				if (isTable) es.float = cellAlignment;
+				else es.textAlign = cellAlignment;
 				// back
 				es.backgroundColor = backColor;
 				// border
@@ -1580,9 +1635,7 @@ Table.prototype = {
 				this._setBorderStyles(cells, borderFormat, borderCss);
 			}
 
-			this._deleteStyleSelectedCells();
-			this.history.push(false);
-			this._recallStyleSelectedCells();
+			this._historyPush();
 		} catch (err) {
 			console.warn('[SUNEDITOR.plugins.table.setProps.error]', err);
 		} finally {
@@ -1746,6 +1799,16 @@ Table.prototype = {
 
 		domUtils.changeTxt(this.tableDisplay, '1 x 1');
 		this.menu.dropdownOff();
+	},
+
+	_resetPropsAlign() {
+		const { cell_alignment } = this.propTargets;
+		const left = cell_alignment.querySelector('[data-value="left"]');
+		const right = cell_alignment.querySelector('[data-value="right"]');
+		const l_parent = left.parentElement;
+		const r_parent = right.parentElement;
+		l_parent.appendChild(right);
+		r_parent.appendChild(left);
 	},
 
 	_onColorPalette(button, type) {
@@ -1988,7 +2051,7 @@ function OnSplitCells(direction) {
 		}
 	}
 
-	this.history.push(false);
+	this._historyPush();
 	this.editor.focusEdge(currentCell);
 	this.setCellControllerPosition(currentCell, true);
 	this.selectMenu_split.close();
@@ -2006,7 +2069,7 @@ function OnColumnEdit(command) {
 			this.editTable('cell', null);
 	}
 
-	this.history.push(false);
+	this._historyPush();
 }
 
 function OnRowEdit(command) {
@@ -2021,7 +2084,7 @@ function OnRowEdit(command) {
 			this.editTable('row', null);
 	}
 
-	this.history.push(false);
+	this._historyPush();
 }
 
 function OnMouseMoveTablePicker(e) {
@@ -2311,6 +2374,7 @@ function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
 
 function OnPropsBorderEdit(command) {
 	this.propTargets.border_style.textContent = command;
+	this._disableBorderProps(command === BORDER_LIST[0]);
 	this.selectMenu_props_border.close();
 }
 
@@ -2325,10 +2389,27 @@ function OnPropsBorderFormatEdit(command) {
 	this.selectMenu_props_border_format.close();
 }
 
-function CreateHTML_controller_properties({ lang, icons }) {
+function CreateHTML_controller_properties({ lang, icons, options }) {
+	const alignItems = options.get('_rtl') ? ['right', 'center', 'left', 'justify'] : ['left', 'center', 'right', 'justify'];
+	let alignHtml = '';
+	for (let i = 0, item, text; i < alignItems.length; i++) {
+		item = alignItems[i];
+		text = lang['align' + item.charAt(0).toUpperCase() + item.slice(1)];
+		alignHtml += `
+		<li>
+			<button type="button" class="se-btn se-btn-list se-tooltip" data-command="props_align" data-value="${item}" title="${text}" aria-label="${text}">
+				${icons['align_' + item]}
+				<span class="se-tooltip-inner">
+					<span class="se-tooltip-text">${text}</span>
+				</span>
+			</button>
+		</li>`;
+	}
+
 	const html = `
 		<div class="se-controller-content">
 			<div class="se-controller-header">
+				<button type="button" data-command="props_close" class="se-btn se-close-btn close" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
 				<span class="se-controller-title">${lang.tableProperties}</span>
 			</div>
 			<div class="se-controller-body">
@@ -2366,10 +2447,16 @@ function CreateHTML_controller_properties({ lang, icons }) {
 						</span>
 					</button>
 				</div>
+				<div class="se-table-props-align">
+					<label>${lang.align}</label>
+					<div class="se-form-group se-form-w0 se-list-inner">
+						<ul class="se-form-group se-form-w0">${alignHtml}</ul>
+					</div>
+				</div>
 			</div>
 			<div class="se-form-group se-form-w0 se-form-flex-btn">
 				<button type="button" class="se-btn se-btn-success" data-command="props_submit" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>
-				<button type="button" class="se-btn se-btn-danger" data-command="props_close" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
+				<button type="button" class="se-btn se-btn-danger" data-command="props_cancel" title="${lang.undo}" aria-label="${lang.undo}">${icons.undo}</button>
 			</div>
 		</div>`;
 

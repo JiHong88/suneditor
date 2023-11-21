@@ -38,6 +38,7 @@
 		border_right: 'Border right',
 		border_bottom: 'Border bottom',
 		border_none: 'Border none',
+		cancel: 'Cancel',
 		caption: 'Insert description',
 		cellProperties: 'Cell properties',
 		center: 'Center',

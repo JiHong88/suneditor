@@ -277,7 +277,6 @@
 .sun-editor button:disabled,
 .sun-editor input:disabled {
 	cursor: not-allowed;
-	background-color: #ececec;
 	color: #bdbdbd;
 }
 
@@ -1905,6 +1904,12 @@
 	padding: 4px 4px 1px 4px;
 }
 
+.sun-editor .se-controller .se-controller-body .se-btn:disabled,
+.sun-editor .se-controller .se-controller-body button:disabled,
+.sun-editor .se-controller .se-controller-body input:disabled {
+	background-color: #ececec;
+}
+
 .sun-editor .se-controller .se-controller-header .se-close-btn {
 	width: 28px;
 	height: 28px;
@@ -2060,6 +2065,9 @@
 }
 .sun-editor .se-controller.se-table-props .__se__border_size {
 	width: 52px;
+}
+.sun-editor .se-controller.se-table-props .se-table-props-align li {
+	margin-right: 2px;
 }
 
 /* controller - link */
@@ -2749,6 +2757,12 @@
 
 .sun-editor.se-rtl .se-controller .se-controller-header .se-controller-title {
 	float: right;
+}
+
+/* controller - table - props */
+.sun-editor .se-controller.se-table-props .se-table-props-align li {
+	margin-right: 0;
+	margin-left: 2px;
 }
 
 /** arrow--- */
