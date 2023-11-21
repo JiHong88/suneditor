@@ -357,6 +357,7 @@
 .sun-editor-editable.se-rtl table {
 	margin: 0 0 10px auto;
 	background-color: var(--se-edit-background);
+	border-collapse: separate;
 }
 
 .sun-editor-editable table caption {

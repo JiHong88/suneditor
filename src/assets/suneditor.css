@@ -745,7 +745,7 @@
 	margin: auto;
 }
 
-.sun-editor .se-list-inner li > button {
+.sun-editor .se-list-inner :not(.se-list-horizontal) li > button {
 	min-width: 100%;
 	width: max-content;
 }

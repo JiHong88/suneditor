@@ -24,6 +24,13 @@ const BORDER_FORMATS = {
 	bottom: 'border_bottom',
 	none: 'border_none'
 };
+const BORDER_FORMAT_INSIDE = ['all', 'inside', 'horizon', 'vertical'];
+const BORDER_NS = {
+	l: 'borderLeft',
+	t: 'borderTop',
+	r: 'borderRight',
+	b: 'borderBottom'
+};
 
 const Table = function (editor, pluginOptions) {
 	// plugin bisic properties
@@ -90,11 +97,16 @@ const Table = function (editor, pluginOptions) {
 	this.selectMenu_props_border.create(borderMenu.items, borderMenu.menus);
 
 	// members - SelectMenu - properties - border format
-	const borderFormatMenu = CreateBorderFormatMenu(this.lang, this.icons);
+	const borderFormatMenu = CreateBorderFormatMenu(this.lang, this.icons, []);
 	const borderFormatButton = controller_props.querySelector('[data-command="props_onborder_format"]');
 	this.selectMenu_props_border_format = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 5 });
-	this.selectMenu_props_border_format.on(borderFormatButton, OnPropsBorderFormatEdit.bind(this));
+	this.selectMenu_props_border_format.on(borderFormatButton, OnPropsBorderFormatEdit.bind(this, 'all'));
 	this.selectMenu_props_border_format.create(borderFormatMenu.items, borderFormatMenu.menus);
+
+	const borderFormatMenu_oneCell = CreateBorderFormatMenu(this.lang, this.icons, BORDER_FORMAT_INSIDE);
+	this.selectMenu_props_border_format_oneCell = new SelectMenu(this, { checkList: false, position: 'bottom-left', dir: 'ltr', splitNum: 6 });
+	this.selectMenu_props_border_format_oneCell.on(borderFormatButton, OnPropsBorderFormatEdit.bind(this, 'outside'));
+	this.selectMenu_props_border_format_oneCell.create(borderFormatMenu_oneCell.items, borderFormatMenu_oneCell.menus);
 
 	// memberts - elements..
 	this.maxText = this.lang.maxSize;
@@ -473,7 +485,11 @@ Table.prototype = {
 				}
 				break;
 			case 'props_onborder_format':
-				this.selectMenu_props_border_format.open();
+				if (this._propsCache.length === 1) {
+					this.selectMenu_props_border_format_oneCell.open();
+				} else {
+					this.selectMenu_props_border_format.open();
+				}
 				break;
 			case 'props_onborder_style':
 				this.selectMenu_props_border.open();
@@ -1425,7 +1441,7 @@ Table.prototype = {
 		if (!targets || targets.length === 0) return;
 
 		const { border_format, border_color, border_style, border_width, back_color, cell_alignment } = this.propTargets;
-		const { border, backgroundColor, textAlign, float } = targets[0].style;
+		const { border, backgroundColor, textAlign } = targets[0].style;
 		const cellBorder = this._getBorderStyle(border);
 
 		cell_alignment.querySelector('[data-value="justify"]').style.display = isTable ? 'none' : '';
@@ -1434,7 +1450,7 @@ Table.prototype = {
 			style = cellBorder.s,
 			width = cellBorder.w,
 			backColor = backgroundColor,
-			align = isTable ? float : textAlign;
+			align = isTable ? this._figure?.style.float : textAlign;
 		this._propsCache = [];
 
 		for (let i = 0, len = targets.length, t, isBreak = false; i < len; i++) {
@@ -1460,7 +1476,7 @@ Table.prototype = {
 		const backColorHex = converter.isHexColor(backColor) ? backColor : converter.rgb2hex(backColor);
 
 		// border - format
-		border_format.firstElementChild.innerHTML = this.icons[BORDER_FORMATS.all];
+		border_format.firstElementChild.innerHTML = this.icons[BORDER_FORMATS[targets.length === 1 ? 'outside' : 'all']];
 		border_format.setAttribute('se-border-format', 'all');
 		domUtils.removeClass(border_format, 'active');
 
@@ -1618,8 +1634,11 @@ Table.prototype = {
 				// --- set styles
 				es = e.style;
 				// alignment
-				if (isTable) es.float = cellAlignment;
-				else es.textAlign = cellAlignment;
+				if (isTable) {
+					if (this._figure) this._figure.style.float = cellAlignment;
+				} else {
+					es.textAlign = cellAlignment;
+				}
 				// back
 				es.backgroundColor = backColor;
 				// border
@@ -1635,6 +1654,7 @@ Table.prototype = {
 			if (cells.middle.length === 0) {
 				cells.middle = targets;
 			}
+			cells.all = targets;
 
 			// border format
 			if (hasBorder) {
@@ -1650,42 +1670,64 @@ Table.prototype = {
 	},
 
 	/**
+	 * @private
 	 * @description Set border format
 	 * @param {Element[]} cells Target elements
 	 * @param {"all"|"inside"|"horizon"|"vertical"|"outside"|"left"|"top"|"right"|"bottom"} borderKey Border style
 	 * @param {number} s Border style
+	 * @param {boolean} isTable table selected
 	 */
 	_setBorderStyles(cells, borderKey, s) {
+		const { left, top, right, bottom, all } = cells;
 		switch (borderKey) {
 			case 'inside':
+				if (cells.length === 1) return;
+				domUtils.setStyle(
+					all.filter((c) => !bottom.includes(c)),
+					BORDER_NS.b,
+					s
+				);
+				domUtils.setStyle(
+					all.filter((c) => !right.includes(c)),
+					BORDER_NS.r,
+					s
+				);
 				break;
 			case 'horizon':
+				if (cells.length === 1) return;
+				domUtils.setStyle(
+					all.filter((c) => !bottom.includes(c)),
+					BORDER_NS.b,
+					s
+				);
 				break;
 			case 'vertical':
+				if (cells.length === 1) return;
+				domUtils.setStyle(
+					all.filter((c) => !right.includes(c)),
+					BORDER_NS.r,
+					s
+				);
 				break;
 			case 'outside':
-				domUtils.setStyle(cells.left, 'borderLeft', s);
-				domUtils.setStyle(cells.top, 'borderTop', s);
-				domUtils.setStyle(cells.right, 'borderRight', s);
-				domUtils.setStyle(cells.bottom, 'borderBottom', s);
+				domUtils.setStyle(left, BORDER_NS.l, s);
+				domUtils.setStyle(top, BORDER_NS.t, s);
+				domUtils.setStyle(right, BORDER_NS.r, s);
+				domUtils.setStyle(bottom, BORDER_NS.b, s);
 				break;
 			case 'left':
-				domUtils.setStyle(cells.left, 'borderLeft', s);
+				domUtils.setStyle(left, BORDER_NS.l, s);
 				break;
 			case 'top':
-				domUtils.setStyle(cells.top, 'borderTop', s);
+				domUtils.setStyle(top, BORDER_NS.t, s);
 				break;
 			case 'right':
-				domUtils.setStyle(cells.right, 'borderRight', s);
+				domUtils.setStyle(right, BORDER_NS.r, s);
 				break;
 			case 'bottom':
-				domUtils.setStyle(cells.bottom, 'borderBottom', s);
+				domUtils.setStyle(bottom, BORDER_NS.b, s);
 				break;
 		}
-	},
-
-	_findCellsPosition(elements) {
-		return cells;
 	},
 
 	_setMultiCells(startCell, endCell) {
@@ -2193,6 +2235,24 @@ function GetMaxColumns(table) {
 	return maxColumns;
 }
 
+function OnPropsBorderEdit(command) {
+	this.propTargets.border_style.textContent = command;
+	this._disableBorderProps(command === BORDER_LIST[0]);
+	this.selectMenu_props_border.close();
+}
+
+function OnPropsBorderFormatEdit(defaultCommand, command) {
+	const { border_format } = this.propTargets;
+
+	border_format.setAttribute('se-border-format', command);
+	border_format.firstElementChild.innerHTML = this.icons[BORDER_FORMATS[command]];
+	if (command !== defaultCommand) domUtils.addClass(border_format, 'active');
+	else domUtils.removeClass(border_format, 'active');
+
+	this.selectMenu_props_border_format.close();
+	this.selectMenu_props_border_format_oneCell.close();
+}
+
 // init element
 function CreateSplitMenu(lang) {
 	const menus = domUtils.createElement(
@@ -2263,15 +2323,16 @@ function CreateBorderMenu() {
 	return { items: BORDER_LIST, menus: menus.querySelectorAll('div') };
 }
 
-function CreateBorderFormatMenu(langs, icons) {
+function CreateBorderFormatMenu(langs, icons, indideFormats) {
 	const items = [];
 	let html = '';
 
 	for (let k in BORDER_FORMATS) {
+		if (indideFormats.includes(k)) continue;
 		const s = BORDER_FORMATS[k];
 		items.push(k);
 		html += `
-			<button type="button" class="se-btn se-tooltip" style="width: 34px;">
+			<button type="button" class="se-btn se-tooltip">
 				${icons[s]}
 				<span class="se-tooltip-inner">
 					<span class="se-tooltip-text">${langs[s]}</span>
@@ -2376,23 +2437,6 @@ function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
     </div>`;
 
 	return domUtils.createElement('DIV', { class: 'se-controller se-controller-table-cell' }, html);
-}
-
-function OnPropsBorderEdit(command) {
-	this.propTargets.border_style.textContent = command;
-	this._disableBorderProps(command === BORDER_LIST[0]);
-	this.selectMenu_props_border.close();
-}
-
-function OnPropsBorderFormatEdit(command) {
-	const { border_format } = this.propTargets;
-
-	border_format.setAttribute('se-border-format', command);
-	border_format.firstElementChild.innerHTML = this.icons[BORDER_FORMATS[command]];
-	if (command !== 'all') domUtils.addClass(border_format, 'active');
-	else domUtils.removeClass(border_format, 'active');
-
-	this.selectMenu_props_border_format.close();
 }
 
 function CreateHTML_controller_properties({ lang, icons, options }) {
