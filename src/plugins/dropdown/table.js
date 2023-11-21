@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils, numbers, converter } from '../../helper';
-import { Controller, SelectMenu, HueSlider } from '../../modules';
+import { Controller, SelectMenu, HueSlider, ColorPicker } from '../../modules';
 
 const ROW_SELECT_MARGIN = 5;
 const CELL_SELECT_MARGIN = 2;
@@ -31,6 +31,7 @@ const BORDER_NS = {
 	r: 'borderRight',
 	b: 'borderBottom'
 };
+const BORDER_COLORS = ['#000000', '#36454F', '#4169E1', '#DC143C', '#228B22', '#673AB7', '#CC5500', '#008080'];
 
 const Table = function (editor, pluginOptions) {
 	// plugin bisic properties
@@ -63,9 +64,17 @@ const Table = function (editor, pluginOptions) {
 	this.controller_cell = new Controller(this, controller_cell, { position: this.cellControllerTop ? 'top' : 'bottom' });
 	this.controller_props = new Controller(this, controller_props, { position: 'bottom', parents: [this.controller_table.form, this.controller_cell.form] });
 	// hue slider
-	this.controller_hue = new HueSlider(this, {
-		controllerOptions: { parents: [this.controller_props.form], parentsHide: true, position: 'bottom' }
+	this.colorPicker = new ColorPicker(this, 'borderColor', { colorList: pluginOptions.borderColors || BORDER_COLORS });
+	this.controller_colorPicker = new Controller(this, domUtils.createElement('DIV', { class: 'se-controller se-list-layer' }, this.colorPicker.target), {
+		position: 'bottom',
+		parents: [this.controller_props.form],
+		parentsInside: true
 	});
+
+	this.controller_hue = new HueSlider(this, {
+		controllerOptions: { parents: [this.controller_props.form], position: 'bottom' }
+	});
+
 	this.sliderType = '';
 
 	// members - SelectMenu - split
@@ -467,7 +476,7 @@ Table.prototype = {
 				this.selectMenu_row.open();
 				break;
 			case 'openTableProperties':
-				this.controller_hue.close();
+				this.controller_colorPicker.close();
 				if (this.controller_props.currentTarget === this.controller_table.form && this.controller_props.form?.style.display === 'block') {
 					this.controller_props.close();
 				} else {
@@ -476,7 +485,7 @@ Table.prototype = {
 				}
 				break;
 			case 'openCellProperties':
-				this.controller_hue.close();
+				this.controller_colorPicker.close();
 				if (this.controller_props.currentTarget === this.controller_cell.form && this.controller_props.form?.style.display === 'block') {
 					this.controller_props.close();
 				} else {
@@ -548,7 +557,7 @@ Table.prototype = {
 
 		if (!/(^props_|Properties$)/.test(command)) {
 			this.controller_props.close();
-			this.controller_hue.close();
+			this.controller_colorPicker.close();
 		}
 	},
 
@@ -1860,11 +1869,13 @@ Table.prototype = {
 	},
 
 	_onColorPalette(button, type) {
-		if (this.controller_hue.isOpen && type === this.sliderType) {
-			this.controller_hue.close();
+		if (this.controller_colorPicker.isOpen && type === this.sliderType) {
+			this.controller_colorPicker.close();
 		} else {
 			this.sliderType = type;
-			this.controller_hue.open(this.controller_props.currentTarget || button);
+			this.colorPicker.styles = type === 'border' ? 'borderColor' : 'backgroundColor';
+			this.colorPicker.init(this._typeCache === 'table' ? this._element : this._tdElement, button);
+			this.controller_colorPicker.open(button);
 		}
 	},
 

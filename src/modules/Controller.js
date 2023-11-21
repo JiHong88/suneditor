@@ -28,6 +28,7 @@ const Controller = function (inst, element, params, _name) {
 	this.disabled = !!params.disabled;
 	this.parents = params.parents || [];
 	this.parentsHide = !!params.parentsHide;
+	this.parentsInside = !!params.parentsInside;
 	this._initMethod = null;
 	this.__globalEventHandlers = [CloseListener_keydown.bind(this), CloseListener_mousedown.bind(this)];
 	this._bindClose_key = null;
@@ -237,6 +238,7 @@ function MouseEnter(e) {
 }
 
 function MouseLeave(e) {
+	if (this.parents.length > 0 && this.parentsInside) return;
 	e.target.style.zIndex = INDEX_2;
 }
 
