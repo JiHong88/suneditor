@@ -104,7 +104,7 @@
 		resize50: '50％ サイズ',
 		resize75: '75％ サイズ',
 		resize: 'Resize',
-		revertButton: '元に戻す',
+		revert: '元に戻す',
 		right: '右',
 		rotateLeft: '左に回転',
 		rotateRight: '右に回転',

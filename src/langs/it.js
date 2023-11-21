@@ -104,7 +104,7 @@
 		resize50: 'Ridimensiona 50%',
 		resize75: 'Ridimensiona 75%',
 		resize: 'Ridimensiona',
-		revertButton: 'Annulla',
+		revert: 'Annulla',
 		right: 'Destra',
 		rotateLeft: 'Ruota a sinistra',
 		rotateRight: 'Ruota a destra',

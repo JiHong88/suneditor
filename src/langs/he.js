@@ -104,7 +104,7 @@
 		resize50: 'הקטן 50%',
 		resize75: 'הקטן 75%',
 		resize: 'Resize',
-		revertButton: 'בטל',
+		revert: 'בטל',
 		right: 'ימין',
 		rotateLeft: 'סובב שמאלה',
 		rotateRight: 'סובב ימינה',

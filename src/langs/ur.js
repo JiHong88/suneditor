@@ -104,7 +104,7 @@
 		resize50: '50% کا حجم تبدیل کریں',
 		resize75: '75% کا حجم تبدیل کریں',
 		resize: 'Resize',
-		revertButton: 'واپس',
+		revert: 'واپس',
 		right: 'دائیں',
 		rotateLeft: 'بائیں گھومو',
 		rotateRight: 'دائیں گھمائیں',

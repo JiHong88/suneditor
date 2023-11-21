@@ -104,7 +104,7 @@
 		resize50: '50% 크기',
 		resize75: '75% 크기',
 		resize: '크기',
-		revertButton: '되돌리기',
+		revert: '되돌리기',
 		right: '오른쪽',
 		rotateLeft: '왼쪽으로 회전',
 		rotateRight: '오른쪽으로 회전',

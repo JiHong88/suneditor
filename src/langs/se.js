@@ -104,7 +104,7 @@
 		resize50: 'Förstora 50%',
 		resize75: 'Förstora 75%',
 		resize: 'Resize',
-		revertButton: 'Återgå',
+		revert: 'Återgå',
 		right: 'Höger',
 		rotateLeft: 'Rotera till vänster',
 		rotateRight: 'Rotera till höger',

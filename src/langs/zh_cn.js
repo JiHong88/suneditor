@@ -104,7 +104,7 @@
 		resize50: '放大 50%',
 		resize75: '放大 75%',
 		resize: 'Resize',
-		revertButton: '恢复',
+		revert: '恢复',
 		right: '右',
 		rotateLeft: '向左旋转',
 		rotateRight: '向右旋转',

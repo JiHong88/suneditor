@@ -104,7 +104,7 @@
 		resize50: 'Mainīt izmēru 50%',
 		resize75: 'Mainīt izmēru 75%',
 		resize: 'Resize',
-		revertButton: 'Atjaunot',
+		revert: 'Atjaunot',
 		right: 'Labajā pusē',
 		rotateLeft: 'Pagriezt pa kreisi',
 		rotateRight: 'Pagriezt pa labi',

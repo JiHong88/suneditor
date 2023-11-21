@@ -103,7 +103,7 @@
 		resize25: 'Redimensionner à 25%',
 		resize50: 'Redimensionner à 50%',
 		resize75: 'Redimensionner à 75%',
-		revertButton: 'Revenir en arrière',
+		revert: 'Revenir en arrière',
 		right: 'Droite',
 		rotateLeft: 'Rotation à gauche',
 		rotateRight: 'Rotation à droite',

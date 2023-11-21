@@ -788,7 +788,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 						)
 						.join('')}
 				</select>
-				<button type="button" title="${lang.revertButton}" aria-label="${lang.revertButton}" class="se-btn se-modal-btn-revert">${icons.revert}</button>
+				<button type="button" title="${lang.revert}" aria-label="${lang.revert}" class="se-btn se-modal-btn-revert">${icons.revert}</button>
 			</div>
 			<div class="se-modal-form se-modal-form-footer"${onlyPercentDisplay}${onlyWidthDisplay}>
 				<label>

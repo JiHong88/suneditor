@@ -966,7 +966,7 @@ function GET_CONTROLLER_BUTTONS(group) {
 			break;
 		case 'revert':
 			c = 'revert';
-			l = 'revertButton';
+			l = 'revert';
 			i = 'revert';
 			break;
 		case 'edit':

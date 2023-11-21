@@ -104,7 +104,7 @@
 		resize50: 'Formaat wijzigen: 50%',
 		resize75: 'Formaat wijzigen: 75%',
 		resize: 'Resize',
-		revertButton: 'Standaardwaarden herstellen',
+		revert: 'Standaardwaarden herstellen',
 		right: 'Rechts',
 		rotateLeft: 'Naar links draaien',
 		rotateRight: 'Naar rechts draaien',

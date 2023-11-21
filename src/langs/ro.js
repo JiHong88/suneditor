@@ -104,7 +104,7 @@
 		resize50: 'Redimensionare 50%',
 		resize75: 'Redimensionare 75%',
 		resize: 'Resize',
-		revertButton: 'Revenire',
+		revert: 'Revenire',
 		right: 'Dreapta',
 		rotateLeft: 'Rotește la stânga',
 		rotateRight: 'Rotește la dreapta',

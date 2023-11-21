@@ -104,7 +104,7 @@
 		resize50: 'Forstør 50%',
 		resize75: 'Forstør 75%',
 		resize: 'Resize',
-		revertButton: 'Gendan',
+		revert: 'Gendan',
 		right: 'Højre',
 		rotateLeft: 'Roter til venstre',
 		rotateRight: 'Toter til højre',

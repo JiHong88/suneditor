@@ -862,7 +862,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 			<label class="se-modal-size-x">x</label>
 			<input type="text" class="se-input-control _se_image_size_y" placeholder="auto" />
 			<label><input type="checkbox" class="se-modal-btn-check _se_image_check_proportion" checked/>&nbsp;${lang.proportion}</label>
-			<button type="button" title="${lang.revertButton}" aria-label="${lang.revertButton}" class="se-btn se-modal-btn-revert">${icons.revert}</button>
+			<button type="button" title="${lang.revert}" aria-label="${lang.revert}" class="se-btn se-modal-btn-revert">${icons.revert}</button>
 		</div>`;
 
 	const html = `

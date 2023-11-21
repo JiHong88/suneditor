@@ -1480,6 +1480,12 @@ Table.prototype = {
 
 	_setAlignProps(el, align) {
 		domUtils.removeClass(el.querySelectorAll(`button`), 'on');
+
+		if (el.getAttribute('se-cell-align') === align) {
+			el.setAttribute('se-cell-align', '');
+			return;
+		}
+
 		domUtils.addClass(el.querySelector(`[data-value="${align}"]`), 'on');
 		el.setAttribute('se-cell-align', align);
 	},
@@ -2456,7 +2462,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 			</div>
 			<div class="se-form-group se-form-w0 se-form-flex-btn">
 				<button type="button" class="se-btn se-btn-success" data-command="props_submit" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>
-				<button type="button" class="se-btn se-btn-danger" data-command="props_cancel" title="${lang.undo}" aria-label="${lang.undo}">${icons.undo}</button>
+				<button type="button" class="se-btn se-btn-danger" data-command="props_cancel" title="${lang.revert}" aria-label="${lang.revert}">${icons.revert}</button>
 			</div>
 		</div>`;
 

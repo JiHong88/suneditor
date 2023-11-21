@@ -104,7 +104,7 @@
 		resize50: 'Размер 50%',
 		resize75: 'Размер 75%',
 		resize: 'Resize',
-		revertButton: 'Сбросить',
+		revert: 'Сбросить',
 		right: 'Справа',
 		rotateLeft: 'Повернуть против часовой стрелки',
 		rotateRight: 'Повернуть по часовой стрелке',

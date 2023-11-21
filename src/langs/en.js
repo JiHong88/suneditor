@@ -120,7 +120,7 @@
 		resize50: 'Zoom 50%',
 		resize75: 'Zoom 75%',
 		resize: 'Resize',
-		revertButton: 'Revert',
+		revert: 'Revert',
 		right: 'Right',
 		rotateLeft: 'Rotate left',
 		rotateRight: 'Rotate right',
