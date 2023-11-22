@@ -76,7 +76,7 @@ function CreateHTML({ lang }, HRItems) {
 
 	let list = '';
 	for (let i = 0, len = items.length; i < len; i++) {
-		list += `
+		list += /*html*/ `
 		<li>
 			<button type="button" class="se-btn se-btn-list" data-command="hr" title="${items[i].name}" aria-label="${items[i].name}">
 				<hr${items[i].class ? ` class="${items[i].class}"` : ''}${items[i].style ? ` style="${items[i].style}"` : ''}/>
@@ -89,7 +89,8 @@ function CreateHTML({ lang }, HRItems) {
 		{
 			class: 'se-dropdown se-list-layer se-list-line'
 		},
-		`<div class="se-list-inner">
+		/*html*/ `
+		<div class="se-list-inner">
 			<ul class="se-list-basic">${list}</ul>
 		</div>`
 	);

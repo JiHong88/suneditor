@@ -841,16 +841,13 @@ function CreateAlign(editor, button) {
 	const html = [];
 	const items = [];
 	for (let i = 0; i < commands.length; i++) {
-		html.push(
-			'<button type="button" class="se-btn-list se-tooltip" data-command="' +
-				commands[i] +
-				'">' +
-				icons[i] +
-				'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-				langs[i] +
-				'</span></span>' +
-				'</button>'
-		);
+		html.push(/*html*/ `
+		<button type="button" class="se-btn-list se-tooltip" data-command="${commands[i]}">
+			${icons[i]}
+			<span class="se-tooltip-inner">
+				<span class="se-tooltip-text">${langs[i]}</span>
+			</span>
+		</button>`);
 		items.push(commands[i]);
 	}
 
@@ -908,7 +905,7 @@ function OnClick_resizeButton() {
 }
 
 function CreateHTML_resizeDot() {
-	const html = `
+	const html = /*html*/ `
 		<div class="se-resize-dot">
 			<span class="tl"></span>
 			<span class="tr"></span>
@@ -1000,7 +997,7 @@ function CreateHTML_controller({ lang, icons }, controls) {
 		for (let j = 0, len = group.length, m; j < len; j++) {
 			m = GET_CONTROLLER_BUTTONS(group[j]);
 			if (!m) continue;
-			html += `
+			html += /*html*/ `
 				<button type="button" data-command="${m.c}" data-value="${m.v}" class="${m.t ? 'se-btn-w-auto ' : ''}se-btn se-tooltip">
 					${icons[m.i] || m.t || '!'}
 					<span class="se-tooltip-inner"><span class="se-tooltip-text">${lang[m.l] || m.l}</span></span>

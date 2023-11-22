@@ -2269,7 +2269,7 @@ function CreateSplitMenu(lang) {
 	const menus = domUtils.createElement(
 		'DIV',
 		null,
-		`
+		/*html*/ `
 		<div title="${lang.verticalSplit}" aria-label="${lang.verticalSplit}">
 			${lang.verticalSplit}
 		</div>
@@ -2285,7 +2285,7 @@ function CreateColumnMenu(lang, icons) {
 	const menus = domUtils.createElement(
 		'DIV',
 		null,
-		`
+		/*html*/ `
 		<div title="${lang.insertColumnBefore}" aria-label="${lang.insertColumnBefore}">
 			<span class="se-list-icon">${icons.insert_column_left}</span><span class="txt">${lang.insertColumnBefore}</span>
 		</div>
@@ -2304,7 +2304,7 @@ function CreateRowMenu(lang, icons) {
 	const menus = domUtils.createElement(
 		'DIV',
 		null,
-		`
+		/*html*/ `
 		<div title="${lang.insertRowAbove}" aria-label="${lang.insertRowAbove}">
 			<span class="se-list-icon">${icons.insert_row_above}</span><span class="txt">${lang.insertRowAbove}</span>
 		</div>
@@ -2324,7 +2324,7 @@ function CreateBorderMenu() {
 
 	for (let i = 0, len = BORDER_LIST.length, s; i < len; i++) {
 		s = BORDER_LIST[i];
-		html += `
+		html += /*html*/ `
 		<div title="${s}" aria-label="${s}" style="padding: 0 12px;">
 			<span class="txt">${s}</span>
 		</div>`;
@@ -2342,7 +2342,7 @@ function CreateBorderFormatMenu(langs, icons, indideFormats) {
 		if (indideFormats.includes(k)) continue;
 		const s = BORDER_FORMATS[k];
 		items.push(k);
-		html += `
+		html += /*html*/ `
 			<button type="button" class="se-btn se-tooltip">
 				${icons[s]}
 				<span class="se-tooltip-inner">
@@ -2356,7 +2356,7 @@ function CreateBorderFormatMenu(langs, icons, indideFormats) {
 }
 
 function CreateHTML() {
-	const html = `
+	const html = /*html*/ `
 	<div class="se-table-size">
 		<div class="se-table-size-picker se-controller-table-picker"></div>
 		<div class="se-table-size-highlighted"></div>
@@ -2368,7 +2368,7 @@ function CreateHTML() {
 }
 
 function CreateHTML_controller_table({ lang, icons }) {
-	const html = `
+	const html = /*html*/ `
 	<div class="se-btn-group">
 		<button type="button" data-command="openTableProperties" class="se-btn se-tooltip">
 			${icons.table_properties}
@@ -2412,7 +2412,7 @@ function CreateHTML_controller_table({ lang, icons }) {
 }
 
 function CreateHTML_controller_cell({ lang, icons }, cellControllerTop) {
-	const html = `
+	const html = /*html*/ `
     ${cellControllerTop ? '' : '<div class="se-arrow se-arrow-up"></div>'}
     <div class="se-btn-group">
 		<button type="button" data-command="openCellProperties" class="se-btn se-tooltip">
@@ -2456,7 +2456,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 	for (let i = 0, item, text; i < alignItems.length; i++) {
 		item = alignItems[i];
 		text = lang['align' + item.charAt(0).toUpperCase() + item.slice(1)];
-		alignHtml += `
+		alignHtml += /*html*/ `
 		<li>
 			<button type="button" class="se-btn se-btn-list se-tooltip" data-command="props_align" data-value="${item}" title="${text}" aria-label="${text}">
 				${icons['align_' + item]}
@@ -2467,7 +2467,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 		</li>`;
 	}
 
-	const html = `
+	const html = /*html*/ `
 		<div class="se-controller-content">
 			<div class="se-controller-header">
 				<button type="button" data-command="props_close" class="se-btn se-close-btn close" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>

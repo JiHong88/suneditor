@@ -149,7 +149,7 @@ Link.prototype = {
 };
 
 function CreateHTML_modal({ lang, icons }) {
-	const html = `
+	const html = /*html*/ `
 	<form>
 		<div class="se-modal-header">
 			<button type="button" data-command="close" class="se-btn se-close-btn" title="${lang.close}" aria-label="${lang.close}">
@@ -169,7 +169,7 @@ function CreateHTML_modal({ lang, icons }) {
 }
 
 function CreateHTML_controller({ lang, icons }) {
-	const html = `
+	const html = /*html*/ `
 	<div class="se-arrow se-arrow-up"></div>
 	<div class="link-content">
 		<span><a target="_blank" href=""></a>&nbsp;</span>

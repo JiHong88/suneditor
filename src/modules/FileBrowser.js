@@ -266,7 +266,7 @@ function OnClick_browser(e) {
 }
 
 function CreateHTML({ lang, icons }) {
-	return `
+	return /*html*/ `
 		<div class="se-file-browser-content">
 			<div class="se-file-browser-header">
 				<button type="button" data-command="close" class="se-btn se-file-browser-close" class="close" title="${lang.close}" aria-label="${lang.close}">

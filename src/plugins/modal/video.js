@@ -723,7 +723,7 @@ function OnInputSize(xy, e) {
 }
 
 function CreateHTML_modal({ lang, icons }, pluginOptions) {
-	let html = `
+	let html = /*html*/ `
 	<form method="post" enctype="multipart/form-data">
 		<div class="se-modal-header">
 			<button type="button" data-command="close" class="se-btn se-close-btn" title="${lang.close}" aria-label="${lang.close}">
@@ -734,7 +734,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 		<div class="se-modal-body">`;
 
 	if (pluginOptions.createFileInput) {
-		html += `
+		html += /*html*/ `
 			<div class="se-modal-form">
 				<label>${lang.video_modal_file}</label>
 				<div class="se-modal-form-files">
@@ -747,7 +747,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 	}
 
 	if (pluginOptions.createUrlInput) {
-		html += `
+		html += /*html*/ `
 			<div class="se-modal-form">
 				<label>${lang.video_modal_url}</label>
 				<input class="se-input-form se-input-url" type="text" data-focus />
@@ -767,7 +767,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 		const heightDisplay = !pluginOptions.showHeightInput ? ' style="display: none !important;"' : '';
 		const ratioDisplay = !pluginOptions.showRatioOption ? ' style="display: none !important;"' : '';
 		const onlyWidthDisplay = !onlyPercentage && !pluginOptions.showHeightInput && !pluginOptions.showRatioOption ? ' style="display: none !important;"' : '';
-		html += `
+		html += /*html*/ `
 			<div class="se-modal-form">
 				<div class="se-modal-size-text">
 					<label class="size-w">${lang.width}</label>
@@ -798,7 +798,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 			</div>`;
 	}
 
-	html += `
+	html += /*html*/ `
 		</div>
 		<div class="se-modal-footer">
 			<div class="se-figure-align">

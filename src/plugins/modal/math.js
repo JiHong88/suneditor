@@ -235,7 +235,7 @@ function CreateHTML_modal({ lang, icons }, math, fontSizeList) {
 		}
 	];
 	let defaultFontSize = fontSize[0].value;
-	let html = `
+	let html = /*html*/ `
     <form>
         <div class="se-modal-header">
             <button type="button" data-command="close" class="se-btn se-close-btn" title="${lang.close}" aria-label="${lang.close}">
@@ -255,10 +255,10 @@ function CreateHTML_modal({ lang, icons }, math, fontSizeList) {
 	for (let i = 0, len = fontSize.length, f; i < len; i++) {
 		f = fontSize[i];
 		if (f.default) defaultFontSize = f.value;
-		html += `<option value="${f.value}"${f.default ? ' selected' : ''}>${f.text}</option>`;
+		html += /*html*/ `<option value="${f.value}"${f.default ? ' selected' : ''}>${f.text}</option>`;
 	}
 
-	html += `</select>
+	html += /*html*/ `</select>
             </div>
             <div class="se-modal-form">
                 <label>${lang.math_modal_previewLabel}</label>
@@ -277,7 +277,7 @@ function CreateHTML_modal({ lang, icons }, math, fontSizeList) {
 }
 
 function CreateHTML_controller({ lang, icons }) {
-	const html = `
+	const html = /*html*/ `
     <div class="se-arrow se-arrow-up"></div>
     <div class="link-content">
         <div class="se-btn-group">

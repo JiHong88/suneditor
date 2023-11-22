@@ -85,7 +85,7 @@ List.prototype = {
 };
 
 function CreateHTML({ lang, icons }) {
-	const html = `
+	const html = /*html*/ `
 	<div class="se-list-inner">
 		<ul class="se-list-basic">
 			<li>

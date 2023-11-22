@@ -376,10 +376,10 @@ function OnChange_downloadCheck(e) {
 function CreatetModalForm(editor, params, relList) {
 	const lang = editor.lang;
 	const icons = editor.icons;
-	const textDisplayShow = params.textToDisplay ? '' : ' style="display: none;"';
-	const titleShow = params.title ? '' : ' style="display: none;"';
+	const textDisplayShow = params.textToDisplay ? '' : 'style="display: none;"';
+	const titleShow = params.title ? '' : 'style="display: none;"';
 
-	let html = `
+	let html = /*html*/ `
 		<div class="se-modal-body">
 			<div class="se-modal-form">
 				<label>${lang.link_modal_url}</label>
@@ -394,17 +394,17 @@ function CreatetModalForm(editor, params, relList) {
 					<span class="se-svg se-anchor-preview-icon _se_anchor_download_icon">${icons.download}</span>
 					<pre class="se-link-preview"></pre>
 				</div>
-				<label${textDisplayShow}>${lang.link_modal_text}</label>
-				<input class="se-input-form _se_display_text" type="text"${textDisplayShow} />
-				<label${titleShow}>${lang.link_modal_title}</label>
-				<input class="se-input-form _se_title" type="text"${titleShow} />
+				<label ${textDisplayShow}>${lang.link_modal_text}</label>
+				<input class="se-input-form _se_display_text" type="text" ${textDisplayShow} />
+				<label ${titleShow}>${lang.link_modal_title}</label>
+				<input class="se-input-form _se_title" type="text" ${titleShow} />
 			</div>
 			<div class="se-modal-form-footer">
 				<label><input type="checkbox" class="se-modal-btn-check _se_anchor_check" />&nbsp;${lang.link_modal_newWindowCheck}</label>
 				<label><input type="checkbox" class="se-modal-btn-check _se_anchor_download" />&nbsp;${lang.link_modal_downloadLinkCheck}</label>`;
 
 	if (relList.length > 0) {
-		html += `
+		html += /*html*/ `
 			<div class="se-anchor-rel">
 				<button type="button" class="se-btn se-btn-select se-anchor-rel-btn">&lt;rel&gt;</button>
 				<div class="se-anchor-rel-wrapper"><pre class="se-link-preview se-anchor-rel-preview"></pre></div>

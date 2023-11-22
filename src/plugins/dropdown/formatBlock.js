@@ -102,7 +102,7 @@ function CreateHTML({ lang }, items) {
 	const defaultFormats = ['p', 'blockquote', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 	const formatList = !items || items.length === 0 ? defaultFormats : items;
 
-	let list = `
+	let list = /*html*/ `
 	<div class="se-list-inner">
 		<ul class="se-list-basic">`;
 
@@ -124,14 +124,14 @@ function CreateHTML({ lang }, items) {
 			attrs = className ? ' class="' + className + '"' : '';
 		}
 
-		list += `
+		list += /*html*/ `
 			<li>
 				<button type="button" class="se-btn se-btn-list" data-command="${command}" data-value="${tagName}" data-class="${className}" title="${name}" aria-label="${name}">
 					<${tagName}${attrs}>${name}</${tagName}>
 				</button>
 			</li>`;
 	}
-	list += `
+	list += /*html*/ `
 		</ul>
 	</div>`;
 

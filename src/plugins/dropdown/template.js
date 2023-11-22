@@ -50,7 +50,7 @@ function CreateHTML(templateList) {
 	let list = '<div class="se-dropdown se-list-inner"><ul class="se-list-basic">';
 	for (let i = 0, len = (templateList || []).length, t; i < len; i++) {
 		t = templateList[i];
-		list += `
+		list += /*html*/ `
 		<li>
 			<button 
 				type="button" 

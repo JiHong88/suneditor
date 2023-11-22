@@ -120,7 +120,7 @@ function CreateHTML({ lang, icons, options }, items) {
 	for (let i = 0, item, text; i < alignItems.length; i++) {
 		item = alignItems[i];
 		text = lang['align' + item.charAt(0).toUpperCase() + item.slice(1)];
-		html += `
+		html += /*html*/ `
 		<li>
 			<button type="button" class="se-btn se-btn-list" data-command="${item}" title="${text}" aria-label="${text}">
 				<span class="se-list-icon">${icons['align_' + item]}</span>${text}
@@ -133,7 +133,8 @@ function CreateHTML({ lang, icons, options }, items) {
 		{
 			class: 'se-dropdown se-list-layer se-list-align'
 		},
-		`<div class="se-list-inner">
+		/*html*/ `
+		<div class="se-list-inner">
 			<ul class="se-list-basic">${html}</ul>
 		</div>`
 	);

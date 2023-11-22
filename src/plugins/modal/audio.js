@@ -433,7 +433,7 @@ function FileInputChange() {
 }
 
 function CreateHTML_modal({ lang, icons }, pluginOptions) {
-	let html = `
+	let html = /*html*/ `
     <form method="post" enctype="multipart/form-data">
         <div class="se-modal-header">
             <button type="button" data-command="close" class="se-btn se-close-btn" title="${lang.close}" aria-label="${lang.close}">
@@ -443,7 +443,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
         </div>
         <div class="se-modal-body">`;
 	if (pluginOptions.createFileInput) {
-		html += `
+		html += /*html*/ `
         <div class="se-modal-form">
             <label>${lang.audio_modal_file}</label>
             <div class="se-modal-form-files">
@@ -457,14 +457,14 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
         </div>`;
 	}
 	if (pluginOptions.createUrlInput) {
-		html += `
+		html += /*html*/ `
         <div class="se-modal-form">
             <label>${lang.audio_modal_url}</label>
             <input class="se-input-form se-input-url" data-focus type="text" />
             <pre class="se-link-preview"></pre>
         </div>`;
 	}
-	html += `
+	html += /*html*/ `
         </div>
         <div class="se-modal-footer">
             <button type="submit" class="se-btn-primary" title="${lang.submitButton}" aria-label="${lang.submitButton}">
@@ -477,7 +477,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 }
 
 function CreateHTML_controller({ lang, icons }) {
-	const html = `
+	const html = /*html*/ `
     <div class="se-arrow se-arrow-up"></div>
     <div class="link-content">
         <div class="se-btn-group">

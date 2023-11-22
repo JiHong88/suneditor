@@ -446,7 +446,7 @@ function CreateHTML_basicControllerForm({ lang, icons }) {
 	const hueController = domUtils.createElement(
 		'DIV',
 		{ class: 'se-controller' },
-		`
+		/*html*/ `
 		<div class="se-hue"></div>
 		<div class="se-form-group se-form-w0 se-form-flex-btn">
 			<button type="button" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>

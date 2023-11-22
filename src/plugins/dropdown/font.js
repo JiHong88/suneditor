@@ -85,7 +85,7 @@ Font.prototype = {
 };
 
 function CreateHTML({ lang }, fontList) {
-	let list = `
+	let list = /*html*/ `
 	<div class="se-list-inner">
 		<ul class="se-list-basic">
 			<li>
@@ -95,12 +95,12 @@ function CreateHTML({ lang }, fontList) {
 	for (let i = 0, len = fontList.length, font, text; i < len; i++) {
 		font = fontList[i];
 		text = font.split(',')[0];
-		list += `
+		list += /*html*/ `
 			<li>
 				<button type="button" class="se-btn se-btn-list" data-command="${font}" data-txt="${text}" title="${text}" aria-label="${text}" style="font-family:${font};">${text}</button>
 			</li>`;
 	}
-	list += `
+	list += /*html*/ `
 		</ul>
 	</div>`;
 

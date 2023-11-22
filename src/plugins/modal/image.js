@@ -824,7 +824,7 @@ function OnloadImg(oImg, _svgDefaultSize, container) {
 function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 	const createFileInputHtml = !pluginOptions.createFileInput
 		? ''
-		: `
+		: /*html*/ `
 		<div class="se-modal-form">
 			<label>${lang.image_modal_file}</label>
 			<div class="se-modal-form-files">
@@ -835,7 +835,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 
 	const createUrlInputHtml = !pluginOptions.createUrlInput
 		? ''
-		: `
+		: /*html*/ `
 		<div class="se-modal-form">
 			<label>${lang.image_modal_url}</label>
 			<div class="se-modal-form-files">
@@ -851,7 +851,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 
 	const canResizeHtml = !pluginOptions.canResize
 		? ''
-		: `
+		: /*html*/ `
 		<div class="se-modal-form">
 			<div class="se-modal-size-text">
 				<label class="size-w">${lang.width}</label>
@@ -865,7 +865,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 			<button type="button" title="${lang.revert}" aria-label="${lang.revert}" class="se-btn se-modal-btn-revert">${icons.revert}</button>
 		</div>`;
 
-	const html = `
+	const html = /*html*/ `
 		<div class="se-modal-header">
 			<button type="button" data-command="close" class="se-btn se-close-btn close" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
 			<span class="se-modal-title">${lang.image_modal_title}</span>

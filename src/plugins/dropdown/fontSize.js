@@ -82,7 +82,7 @@ FontSize.prototype = {
 function CreateHTML({ lang, options }, items) {
 	const sizeList = items || [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
 
-	let list = `
+	let list = /*html*/ `
 	<div class="se-list-inner">
 		<ul class="se-list-basic">
 			<li>
@@ -91,12 +91,12 @@ function CreateHTML({ lang, options }, items) {
 
 	for (let i = 0, unit = options.get('fontSizeUnit'), len = sizeList.length, size; i < len; i++) {
 		size = sizeList[i];
-		list += `
+		list += /*html*/ `
 			<li>
 				<button type="button" class="se-btn se-btn-list" data-command="${size + unit}" title="${size + unit}" aria-label="${size + unit}" style="font-size:${size + unit};">${size}</button>
 			</li>`;
 	}
-	list += `
+	list += /*html*/ `
 		</ul>
 	</div>`;
 

@@ -85,7 +85,7 @@ function CreateHTML({ lang }, items) {
 		{ text: '2', value: 2 }
 	];
 
-	let list = `
+	let list = /*html*/ `
 	<div class="se-list-inner">
 		<ul class="se-list-basic">
 			<li>
@@ -96,7 +96,7 @@ function CreateHTML({ lang }, items) {
 
 	for (let i = 0, len = sizeList.length, size; i < len; i++) {
 		size = sizeList[i];
-		list += `
+		list += /*html*/ `
 			<li>
 				<button type="button" class="se-btn se-btn-list" data-command="${size.value}" title="${size.text}" aria-label="${size.text}">
 					${size.text}
@@ -104,7 +104,7 @@ function CreateHTML({ lang }, items) {
 			</li>`;
 	}
 
-	list += `
+	list += /*html*/ `
 		</ul>
 	</div>`;
 

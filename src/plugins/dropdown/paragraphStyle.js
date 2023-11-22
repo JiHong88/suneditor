@@ -83,7 +83,7 @@ function CreateHTML({ lang }, items) {
 	};
 	const paragraphStyles = !items || items.length === 0 ? ['spaced', 'bordered', 'neon'] : items;
 
-	let list = `
+	let list = /*html*/ `
 	<div class="se-list-inner">
 		<ul class="se-list-basic">`;
 
@@ -100,14 +100,14 @@ function CreateHTML({ lang }, items) {
 		attrs = p.class ? ` class="${p.class}"` : '';
 		_class = p._class;
 
-		list += `
+		list += /*html*/ `
 			<li>
 				<button type="button" class="se-btn se-btn-list${_class ? ' ' + _class : ''}" data-command="${p.class}" title="${name}" aria-label="${name}">
 					<div${attrs}>${name}</div>
 				</button>
 			</li>`;
 	}
-	list += `
+	list += /*html*/ `
 		</ul>
 	</div>`;
 

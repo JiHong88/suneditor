@@ -292,15 +292,15 @@ Viewer.prototype = {
 				linkHTML += styles[i].outerHTML;
 			}
 
-			printDocument.write(
-				'<!DOCTYPE html><html><head>' +
-					linkHTML +
-					'</head><body class="' +
-					(this.options.get('printClass') ? this.options.get('printClass') : this.options.get('_editableClass')) +
-					'">' +
-					contentHTML +
-					'</body></html>'
-			);
+			printDocument.write(/*html*/ `<!DOCTYPE html>
+				<html>
+					<head>
+						${linkHTML}
+					</head>
+					<body class="${this.options.get('printClass') ? this.options.get('printClass') : this.options.get('_editableClass')}">
+						${contentHTML} 
+					</body>
+				</html>`);
 		}
 
 		this.editor.showLoading();
@@ -349,15 +349,18 @@ Viewer.prototype = {
 				? domUtils.getAttributesToString(wDoc.body, ['contenteditable'])
 				: 'class="' + this.options.get('_editableClass') + '"';
 
-			windowObject.document.write(
-				'<!DOCTYPE html><html><head>' +
-					wDoc.head.innerHTML +
-					'<style>body {overflow:auto !important; margin: 10px auto !important; height:auto !important; outline:1px dashed #ccc;}</style></head><body ' +
-					arrts +
-					'>' +
-					contentHTML +
-					'</body></html>'
-			);
+			windowObject.document.write(/*html*/ `<!DOCTYPE html>
+				<html>
+					<head>
+						${wDoc.head.innerHTML}
+						<style>
+							body {overflow:auto !important; margin: 10px auto !important; height:auto !important; outline:1px dashed #ccc;}
+						</style>
+					</head>
+					<body ${arrts}>
+						${contentHTML}
+					</body>
+				</html>`);
 		} else {
 			const links = this._d.head.getElementsByTagName('link');
 			const styles = this._d.head.getElementsByTagName('style');
@@ -369,23 +372,20 @@ Viewer.prototype = {
 				linkHTML += styles[i].outerHTML;
 			}
 
-			windowObject.document.write(
-				'<!DOCTYPE html><html>' +
-					'<head>' +
-					'<meta charset="utf-8" />' +
-					'<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">' +
-					'<title>' +
-					this.lang.preview +
-					'</title>' +
-					linkHTML +
-					'</head>' +
-					'<body class="' +
-					(this.options.get('printClass') ? this.options.get('printClass') : this.options.get('_editableClass')) +
-					'" style="margin:10px auto !important; height:auto !important; outline:1px dashed #ccc;">' +
-					contentHTML +
-					'</body>' +
-					'</html>'
-			);
+			windowObject.document.write(/*html*/ `<!DOCTYPE html>
+				<html>
+					<head>
+						<meta charset="utf-8" />
+						<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+						<title>${this.lang.preview}</title>
+						${linkHTML}
+					</head>
+					<body class="${
+						this.options.get('printClass') ? this.options.get('printClass') : this.options.get('_editableClass')
+					}" style="margin:10px auto !important; height:auto !important; outline:1px dashed #ccc;">
+						${contentHTML}
+					</body>
+				</html>`);
 		}
 	},
 
