@@ -24,7 +24,7 @@ function CreateSliderCtx() {
 	offscreenCanvas.width = SIZE;
 	offscreenCanvas.height = SIZE;
 
-	const html = `
+	const html = /*html*/ `
 	<div class="se-hue-slider-container" style="width: ${SIZE}px; height: ${SIZE}px;">
       <canvas class="se-hue-wheel" width="${SIZE}" height="${SIZE}"></canvas>
       <div class="se-hue-wheel-pointer"></div>
@@ -34,7 +34,7 @@ function CreateSliderCtx() {
       <div class="se-hue-gradient-pointer"></div>
     </div>
     <div class="se-hue-final-hex" style="width:${SIZE}px; height: ${BAR_H}px;">
-		<div style="flex: 3; line-height: 1.5;">#FFFFFF</div>
+		<div style="flex: 3; line-height: 1.5;">${DEFAULT_COLOR_VALUE.hex}</div>
 		<div style="flex: 1; height: 100%; border: 1px solid #fff; outline: 1px solid #000;"></div>
 	</div>
 	`;
@@ -69,6 +69,7 @@ const HueSlider = function (inst, params) {
 
 	this.editor = inst.editor;
 	this.eventManager = inst.eventManager;
+	this.inst = inst;
 
 	// members
 	this.form = params.form;
@@ -124,8 +125,11 @@ HueSlider.prototype = {
 			lightness: LIGHTNESS,
 			color: ctx?.color || getWheelColor(wheelCtx)
 		};
+
 		this.controller.close();
 		this.init();
+
+		this.inst.hueSliderCancelAction();
 	},
 
 	attach(form) {

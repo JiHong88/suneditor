@@ -1024,6 +1024,8 @@ Editor.prototype = {
 		}
 		this.opendControllers = fixedCont;
 		this.currentControllerName = '';
+		this._antiBlur = false;
+		this.frameContext.get('lineBreaker_t').style.display = this.frameContext.get('lineBreaker_b').style.display = this.frameContext.get('lineBreaker').style.display = 'none';
 		this.component.__removeGlobalEvent();
 	},
 

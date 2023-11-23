@@ -59,6 +59,8 @@ const DEFAULT_COLOR_LIST = [
 	'#222222'
 ];
 
+const DEFAULLT_COLOR_SPLITNUM = 9;
+
 /**
  * @description Create a color picker element and register for related events. (this.target)
  * When calling the color selection, "submit", and "remove" buttons, the "action" method of the instance is called with the "color" value as an argument.
@@ -78,29 +80,48 @@ const ColorPicker = function (inst, styles, params) {
 	this.targetButton = null;
 	this.inputElement = this.target.querySelector('.se-color-input');
 	this.styleProperties = styles;
+	this.splitNum = params.splitNum || 0;
 	this.defaultColor = params.defaultColor;
+	this.hueSliderOptions = params.hueSliderOptions;
+	this.parentDisplay = '';
 	this.currentColor = '';
+	this.parentForm = null;
 	this.colorList = this.target.querySelectorAll('li button') || [];
-	this.controller_hue = null;
+	this.hueSlider = null;
 
 	// modules - hex, hue slider
 	if (!params.disableHEXInput) {
-		this.controller_hue = new HueSlider(this, null);
+		this.hueSlider = new HueSlider(this, params.hueSliderOptions);
+		this.parentFormDisplay = [];
+		this.parentForm =
+			params.hueSliderOptions?.controllerOptions?.parents?.length > 0 && !params.hueSliderOptions?.controllerOptions?.isInsideForm
+				? params.hueSliderOptions.controllerOptions.parents
+				: null;
 		// hue open
 		this.eventManager.addEvent(this.target.querySelector('.se-btn-info'), 'click', OnColorPalette.bind(this));
-	} else {
 		this.eventManager.addEvent(this.inputElement, 'input', OnChangeInput.bind(this));
 		this.eventManager.addEvent(this.target.querySelector('form'), 'submit', Submit.bind(this));
 	}
 
 	// remove style
-	this.eventManager.addEvent(this.target.querySelector('.__se_remove'), 'click', Remove.bind(this));
+	if (!params.disableRemove) {
+		this.eventManager.addEvent(this.target.querySelector('.__se_remove'), 'click', Remove.bind(this));
+	}
+
+	this.eventManager.addEvent(this.target, 'click', OnClickColor.bind(this));
 };
 
 ColorPicker.prototype = {
 	hueSliderAction(color) {
 		this._setInputText(color.hex);
 	},
+
+	hueSliderCancelAction() {
+		if (this.parentForm?.length > 0) {
+			this.parentFormDisplay.forEach((e) => (e[0].style.display = e[1]));
+		}
+	},
+
 	/**
 	 * @description Displays or resets the currently selected color at color list.
 	 * @param {Node} node Current Selected node
@@ -187,24 +208,42 @@ ColorPicker.prototype = {
 };
 
 function OnColorPalette() {
-	this.controller_hue.open(this.targetButton);
+	if (this.parentForm?.length > 0) {
+		this.parentForm.forEach((e) => {
+			this.parentFormDisplay.push([e, e.style.display]);
+			e.style.display = 'none';
+		});
+	}
+	this.hueSlider.open(this.targetButton);
 }
 
 function Submit(e) {
 	e.preventDefault();
-	this.inst.action(this.currentColor);
+
+	if (typeof this.inst.colorPickerAction !== 'function') return;
+	this.inst.colorPickerAction(this.currentColor);
+}
+
+function OnClickColor(e) {
+	const color = e.target.getAttribute('data-value');
+	if (!color) return;
+
+	if (typeof this.inst.colorPickerAction !== 'function') return;
+	this.inst.colorPickerAction(color);
 }
 
 function Remove() {
-	this.inst.action(null);
+	if (typeof this.inst.colorPickerAction !== 'function') return;
+	this.inst.colorPickerAction(null);
 }
 
 function OnChangeInput(e) {
 	this._setCurrentColor(e.target.value);
 }
 
-function CreateHTML({ lang, icons }, { colorList, disableHEXInput }) {
+function CreateHTML({ lang, icons }, { colorList, disableHEXInput, disableRemove, splitNum }) {
 	colorList = colorList || DEFAULT_COLOR_LIST;
+	splitNum = colorList === DEFAULT_COLOR_LIST ? DEFAULLT_COLOR_SPLITNUM : splitNum;
 
 	let list = '';
 	for (let i = 0, len = colorList.length, colorArr = [], color; i < len; i++) {
@@ -216,28 +255,28 @@ function CreateHTML({ lang, icons }, { colorList, disableHEXInput }) {
 			if (i < len - 1) continue;
 		}
 		if (colorArr.length > 0) {
-			list += `<div class="se-selector-color">${_makeColor(colorArr)}</div>`;
+			list += `<div class="se-selector-color">${_makeColor(colorArr, splitNum)}</div>`;
 			colorArr = [];
 		}
 		if (typeof color === 'object') {
-			list += `<div class="se-selector-color">${_makeColor(color)}</div>`;
+			list += `<div class="se-selector-color">${_makeColor(color, splitNum)}</div>`;
 		}
 	}
-	list += `
+	list += /*html*/ `
 		<form class="se-form-group se-form-w0">
 			${disableHEXInput ? '' : `<button type="button" class="se-btn se-btn-info" title="${lang.colorPicker}" aria-label="${lang.colorPicker}">${icons.color_palette}</button>`}
 			<input type="text" class="se-color-input" ${disableHEXInput ? 'readonly' : ''} />
 			${disableHEXInput ? '' : `<button type="submit" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>`}
-			<button type="button" class="se-btn __se_remove" title="${lang.removeFormat}" aria-label="${lang.removeFormat}">${icons.erase}</button>
+			${disableRemove ? '' : `<button type="button" class="se-btn __se_remove" title="${lang.remove}" aria-label="${lang.remove}">${icons.erase}</button>`}
 		</form>`;
 
 	return domUtils.createElement('DIV', { class: 'se-list-inner' }, list);
 }
 
-function _makeColor(colorList) {
-	let list = '';
+function _makeColor(colorList, splitNum) {
+	const ulHTML = `<ul class="se-color-pallet${splitNum ? ' se-list-horizontal' : ''}">`;
 
-	list += '<ul class="se-color-pallet">';
+	let list = ulHTML;
 	for (let i = 0, len = colorList.length, color, v, n; i < len; i++) {
 		color = colorList[i];
 		if (typeof color === 'string') {
@@ -247,7 +286,12 @@ function _makeColor(colorList) {
 			v = color.value;
 			n = color.name || v;
 		}
-		list += `<li><button type="button" data-value="${v}" title="${n}" aria-label="${n}" style="background-color:${v};"></button></li>`;
+
+		if (i > 0 && i % splitNum === 0) {
+			list += `</ul>${ulHTML}`;
+		}
+
+		list += /*html*/ `<li><button type="button" data-value="${v}" title="${n}" aria-label="${n}" style="background-color:${v};"></button></li>`;
 	}
 	list += '</ul>';
 

@@ -754,7 +754,7 @@
 .sun-editor .se-list-inner .se-list-basic li {
 	width: 100%;
 }
-.sun-editor .se-list-inner button {
+.sun-editor .se-list-inner input {
 	border-radius: 0;
 }
 
@@ -1044,7 +1044,7 @@
 
 /* dropdown layer --- color selector button */
 .sun-editor .se-list-layer .se-selector-color {
-	display: flex;
+	display: block;
 	width: max-content;
 	max-width: 252px;
 	height: auto;
@@ -1223,9 +1223,8 @@
 	font-weight: bold;
 }
 
-/** form group - dropdown - color input */
+/** form group - dropdown input */
 .sun-editor .se-dropdown .se-form-group input {
-	width: auto;
 	height: 34px;
 	color: #555;
 }
@@ -2536,8 +2535,9 @@
 }
 
 /* -- color input */
-.sun-editor div input.se-color-input {
-	margin: 0 4px;
+.sun-editor input.se-color-input {
+	width: 72px;
+	margin: 0 2px;
 	border-top: 0;
 	border-left: 0;
 	border-right: 0;

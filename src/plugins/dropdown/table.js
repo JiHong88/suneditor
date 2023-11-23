@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils, numbers, converter } from '../../helper';
-import { Controller, SelectMenu, HueSlider, ColorPicker } from '../../modules';
+import { Controller, SelectMenu, ColorPicker } from '../../modules';
 
 const ROW_SELECT_MARGIN = 5;
 const CELL_SELECT_MARGIN = 2;
@@ -31,7 +31,28 @@ const BORDER_NS = {
 	r: 'borderRight',
 	b: 'borderBottom'
 };
-const BORDER_COLORS = ['#000000', '#36454F', '#4169E1', '#DC143C', '#228B22', '#673AB7', '#CC5500', '#008080'];
+const BORDER_COLORS = [
+	'#000000',
+	'#36454F',
+	'#4169E1',
+	'#DC143C',
+	'#228B22',
+	'#673AB7',
+	'#CC5500',
+	'#008080',
+	'#FFD700',
+	'#FFA07A',
+	'#20B2AA',
+	'#778899',
+	'#FF69B4',
+	'#6A5ACD',
+	'#7FFF00',
+	'#D2691E',
+	'#6495ED',
+	'#FFF8DC',
+	'#DCDCDC',
+	'#F0E68C'
+];
 
 const Table = function (editor, pluginOptions) {
 	// plugin bisic properties
@@ -62,17 +83,27 @@ const Table = function (editor, pluginOptions) {
 	// members - Controller
 	this.controller_table = new Controller(this, controller_table, { position: 'top' });
 	this.controller_cell = new Controller(this, controller_cell, { position: this.cellControllerTop ? 'top' : 'bottom' });
-	this.controller_props = new Controller(this, controller_props, { position: 'bottom', parents: [this.controller_table.form, this.controller_cell.form] });
-	// hue slider
-	this.colorPicker = new ColorPicker(this, 'borderColor', { colorList: pluginOptions.borderColors || BORDER_COLORS });
-	this.controller_colorPicker = new Controller(this, domUtils.createElement('DIV', { class: 'se-controller se-list-layer' }, this.colorPicker.target), {
-		position: 'bottom',
-		parents: [this.controller_props.form],
-		parentsInside: true
+	// props
+	const propsTargetForms = [this.controller_table.form, this.controller_cell.form];
+	this.controller_props = new Controller(this, controller_props, { position: 'bottom', parents: propsTargetForms, isInsideForm: true });
+	// color picker
+	const colorForm = domUtils.createElement('DIV', { class: 'se-controller se-list-layer' }, null);
+	this.colorPicker = new ColorPicker(this, 'borderColor', {
+		colorList: pluginOptions.borderColors || BORDER_COLORS,
+		splitNum: 5,
+		disableRemove: true,
+		hueSliderOptions: { controllerOptions: { parents: [colorForm], isOutsideForm: true } }
 	});
 
-	this.controller_hue = new HueSlider(this, {
-		controllerOptions: { parents: [this.controller_props.form], position: 'bottom' }
+	colorForm.appendChild(this.colorPicker.target);
+	this.controller_colorPicker = new Controller(this, colorForm, {
+		position: 'bottom',
+		parents: propsTargetForms,
+		isInsideForm: true,
+		initMethod: () => {
+			this.colorPicker.hueSlider.close();
+			domUtils.removeClass(this.controller_colorPicker.currentTarget, 'on');
+		}
 	});
 
 	this.sliderType = '';
@@ -131,6 +162,7 @@ const Table = function (editor, pluginOptions) {
 		border_style_button: controller_props.querySelector('[data-command="props_onborder_style"]')
 	};
 	this._propsCache = [];
+	this._propsAlignCache = '';
 	this._typeCache = '';
 	this.tableHighlight = menu.querySelector('.se-table-size-highlighted');
 	this.tableUnHighlight = menu.querySelector('.se-table-size-unhighlighted');
@@ -219,11 +251,6 @@ Table.prototype = {
 			this._resetTablePicker();
 			this.setController(domUtils.getParentElement(firstTd, 'TD'));
 		}
-	},
-
-	hueSliderAction(color) {
-		const target = this.propTargets[this.sliderType === 'border' ? 'border_color' : 'back_color'];
-		target.style.borderColor = target.value = color.hex;
 	},
 
 	/**
@@ -448,6 +475,15 @@ Table.prototype = {
 	},
 
 	/**
+	 * @override ColorPicker
+	 */
+	colorPickerAction(color) {
+		const target = this.propTargets[this.sliderType === 'border' ? 'border_color' : 'back_color'];
+		target.style.borderColor = target.value = color;
+		this.controller_colorPicker.close();
+	},
+
+	/**
 	 * @override controller
 	 * @param {Element} target Target button element
 	 * @returns
@@ -506,21 +542,29 @@ Table.prototype = {
 			case 'props_onpalette':
 				this._onColorPalette(target, target.getAttribute('data-value'));
 				break;
+			case 'props_remove_back':
+				const { back_color } = this.propTargets;
+				back_color.style.borderColor = back_color.value = '';
+				break;
 			case 'props_submit':
 				this._submitProps(target);
 				break;
-			case 'props_cancel':
+			case 'revert':
 				const propsCache = this._propsCache;
 				for (let i = 0, len = propsCache.length; i < len; i++) {
 					propsCache[i][0].style.cssText = propsCache[i][1];
 				}
-				this._setCtrlProps(this._typeCache);
+				// alignment
+				this._setAlignProps(this.propTargets.cell_alignment, this._propsAlignCache, true);
+				if (domUtils.isTable(propsCache[0][0]) && this._figure) {
+					this._figure.style.float = this._propsAlignCache;
+				}
 				break;
-			case 'props_close':
+			case 'close_props':
 				this.controller_props.close();
 				break;
 			case 'props_align':
-				this._setAlignProps(this.propTargets.cell_alignment, target.getAttribute('data-value'));
+				this._setAlignProps(this.propTargets.cell_alignment, target.getAttribute('data-value'), false);
 				break;
 			case 'merge':
 				this.mergeCells();
@@ -529,14 +573,14 @@ Table.prototype = {
 				this._maxWidth = !this._maxWidth;
 				this.setTableStyle('width');
 				this.controller_table.resetPosition();
-				this.setCellControllerPosition(this._tdElement, this._shift);
+
 				break;
 			case 'layout':
 				this._fixedColumn = !this._fixedColumn;
 				this.setTableStyle('column');
 				this.controller_table.resetPosition();
 				this._historyPush();
-				this.setCellControllerPosition(this._tdElement, this._shift);
+
 				break;
 			case 'remove':
 				const emptyDiv = this._figure.parentNode;
@@ -555,9 +599,13 @@ Table.prototype = {
 				this.history.push(false);
 		}
 
-		if (!/(^props_|Properties$)/.test(command)) {
+		if (!/(^props_|^revert|Properties$)/.test(command)) {
 			this.controller_props.close();
 			this.controller_colorPicker.close();
+		}
+
+		if (!/^(remove|props_|on|open)/.test(command)) {
+			this.setCellControllerPosition(this._tdElement, this._shift);
 		}
 	},
 
@@ -1464,7 +1512,7 @@ Table.prototype = {
 
 		for (let i = 0, len = targets.length, t, isBreak = false; i < len; i++) {
 			t = targets[i];
-			let { cssText, border, backgroundColor, textAlign, float } = t.style;
+			let { cssText, border, backgroundColor, textAlign } = t.style;
 			this._propsCache.push([t, cssText]);
 			if (isBreak) continue;
 
@@ -1474,7 +1522,7 @@ Table.prototype = {
 			if (style && cellBorder.s !== s) style = '';
 			if (width && cellBorder.w !== w) width = '';
 			if (backColor !== backgroundColor) backColor = '';
-			if (align !== (isTable ? float : textAlign)) align = '';
+			if (align !== (isTable ? this._figure?.style.float : textAlign)) align = '';
 			if (!color || !style || !width || !backColor) {
 				isBreak = true;
 			}
@@ -1500,13 +1548,13 @@ Table.prototype = {
 		back_color.value = back_color.style.borderColor = backColorHex;
 
 		// align
-		this._setAlignProps(cell_alignment, align);
+		this._setAlignProps(cell_alignment, (this._propsAlignCache = align), true);
 	},
 
-	_setAlignProps(el, align) {
+	_setAlignProps(el, align, reset) {
 		domUtils.removeClass(el.querySelectorAll(`button`), 'on');
 
-		if (el.getAttribute('se-cell-align') === align) {
+		if (!reset && el.getAttribute('se-cell-align') === align) {
 			el.setAttribute('se-cell-align', '');
 			return;
 		}
@@ -1875,6 +1923,7 @@ Table.prototype = {
 			this.sliderType = type;
 			this.colorPicker.styles = type === 'border' ? 'borderColor' : 'backgroundColor';
 			this.colorPicker.init(this._typeCache === 'table' ? this._element : this._tdElement, button);
+			domUtils.addClass(button, 'on');
 			this.controller_colorPicker.open(button);
 		}
 	},
@@ -2470,7 +2519,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 	const html = /*html*/ `
 		<div class="se-controller-content">
 			<div class="se-controller-header">
-				<button type="button" data-command="props_close" class="se-btn se-close-btn close" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
+				<button type="button" data-command="close_props" class="se-btn se-close-btn close" title="${lang.close}" aria-label="${lang.close}">${icons.cancel}</button>
 				<span class="se-controller-title">${lang.tableProperties}</span>
 			</div>
 			<div class="se-controller-body">
@@ -2507,6 +2556,12 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 							<span class="se-tooltip-text">${lang.colorPicker}</span>
 						</span>
 					</button>
+					<button type="button" class="se-btn se-tooltip" data-command="props_remove_back" title="${lang.remove}" aria-label="${lang.remove}">
+						${icons.erase}
+						<span class="se-tooltip-inner">
+							<span class="se-tooltip-text">${lang.remove}</span>
+						</span>
+					</button>
 				</div>
 				<div class="se-table-props-align">
 					<label>${lang.align}</label>
@@ -2517,7 +2572,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 			</div>
 			<div class="se-form-group se-form-w0 se-form-flex-btn">
 				<button type="button" class="se-btn se-btn-success" data-command="props_submit" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>
-				<button type="button" class="se-btn se-btn-danger" data-command="props_cancel" title="${lang.revert}" aria-label="${lang.revert}">${icons.revert}</button>
+				<button type="button" class="se-btn se-btn-danger" data-command="revert" title="${lang.revert}" aria-label="${lang.revert}">${icons.revert}</button>
 			</div>
 		</div>`;
 

@@ -142,7 +142,8 @@ Component.prototype = {
 
 	close() {
 		this.editor._antiBlur = false;
-		this.editor.frameContext.get('lineBreaker').style.display = 'none';
+		const { frameContext } = this.editor;
+		frameContext.get('lineBreaker_t').style.display = frameContext.get('lineBreaker_b').style.display = frameContext.get('lineBreaker').style.display = 'none';
 		if (this.currentPlugin && typeof this.currentPlugin.close === 'function') {
 			this.currentPlugin.close(this.currentTarget);
 		}

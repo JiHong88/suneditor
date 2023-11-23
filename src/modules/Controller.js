@@ -28,8 +28,9 @@ const Controller = function (inst, element, params, _name) {
 	this.disabled = !!params.disabled;
 	this.parents = params.parents || [];
 	this.parentsHide = !!params.parentsHide;
-	this.parentsInside = !!params.parentsInside;
-	this._initMethod = null;
+	this.isInsideForm = !!params.isInsideForm;
+	this.isOutsideForm = !!params.isOutsideForm;
+	this._initMethod = typeof params.initMethod === 'function' ? params.initMethod : null;
 	this.__globalEventHandlers = [CloseListener_keydown.bind(this), CloseListener_mousedown.bind(this)];
 	this._bindClose_key = null;
 	this._bindClose_mouse = null;
@@ -57,13 +58,14 @@ Controller.prototype = {
 
 		this.currentTarget = target;
 		this.currentPositionTarget = positionTarget || target;
-		this._initMethod = initMethod;
+		if (typeof initMethod === 'function') this._initMethod = initMethod;
 		this.editor.currentControllerName = this.kind;
 
 		if (addOffset) this.__addOffset = { ...this.__addOffset, ...addOffset };
 
+		const parents = this.isOutsideForm ? this.parents : [];
 		this.editor.opendControllers?.forEach((e) => {
-			e.form.style.zIndex = INDEX_2;
+			if (!parents.includes(e.form)) e.form.style.zIndex = INDEX_2;
 		});
 
 		if (this.parentsHide) {
@@ -91,6 +93,8 @@ Controller.prototype = {
 		this.__addOffset = { left: 0, top: 0 };
 
 		this.__removeGlobalEvent();
+
+		if (typeof this._initMethod === 'function') this._initMethod();
 		this._controllerOff();
 
 		if (this.parentsHide && !force) {
@@ -100,9 +104,7 @@ Controller.prototype = {
 		}
 
 		if (this.parents.length > 0) return;
-
-		if (typeof this._initMethod === 'function') this._initMethod();
-		else if (typeof this.inst.close === 'function') this.inst.close();
+		if (typeof this.inst.close === 'function') this.inst.close();
 	},
 
 	hide() {
@@ -234,11 +236,12 @@ function Action(e) {
 }
 
 function MouseEnter(e) {
+	if (this.parents.length > 0 && this.isInsideForm) return;
 	e.target.style.zIndex = INDEX_1;
 }
 
 function MouseLeave(e) {
-	if (this.parents.length > 0 && this.parentsInside) return;
+	if (this.parents.length > 0 && this.isInsideForm) return;
 	e.target.style.zIndex = INDEX_2;
 }
 

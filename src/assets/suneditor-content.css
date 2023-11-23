@@ -398,7 +398,7 @@
 	border-color: var(--se-edit-border-light);
 	padding: 0.4em;
 	background-clip: padding-box;
-	background-color: var(--se-edit-background);
+	background-color: inherit;
 }
 
 /** table style class */

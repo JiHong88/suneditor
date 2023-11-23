@@ -8,17 +8,20 @@ const BackgroundColor = function (editor, pluginOptions) {
 	this.title = this.lang.backgroundColor;
 	this.icon = 'background_color';
 
-	// members
-	this.colorPicker = new ColorPicker(this, 'backgroundColor', { colorList: pluginOptions.items, disableHEXInput: pluginOptions.disableHEXInput ?? true });
-
 	// create HTML
-	const menu = CreateHTML(this.colorPicker.target);
+	const menu = CreateHTML();
+
+	// members
+	this.colorPicker = new ColorPicker(this, 'backgroundColor', {
+		colorList: pluginOptions.items,
+		splitNum: pluginOptions.splitNum,
+		disableHEXInput: pluginOptions.disableHEXInput,
+		hueSliderOptions: { controllerOptions: { parents: [menu], isOutsideForm: true } }
+	});
 
 	// itit
+	menu.appendChild(this.colorPicker.target);
 	this.menu.initDropdownTarget(BackgroundColor, menu);
-
-	// dropdown-free : register event
-	this.eventManager.addEvent(menu, 'click', OnClickMenu.bind(this));
 };
 
 BackgroundColor.key = 'backgroundColor';
@@ -30,6 +33,13 @@ BackgroundColor.prototype = {
 	 */
 	on(target) {
 		this.colorPicker.init(this.selection.getNode(), target);
+	},
+
+	/**
+	 *  @override ColorPicker
+	 */
+	colorPickerAction(value) {
+		this.action(value);
 	},
 
 	/**
@@ -49,15 +59,8 @@ BackgroundColor.prototype = {
 	constructor: BackgroundColor
 };
 
-function OnClickMenu(e) {
-	const color = e.target.getAttribute('data-value');
-	if (!color) return;
-
-	this.action(color);
-}
-
-function CreateHTML(colorList) {
-	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, colorList);
+function CreateHTML() {
+	return domUtils.createElement('DIV', { class: 'se-dropdown se-list-layer' }, null);
 }
 
 export default BackgroundColor;
