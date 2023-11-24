@@ -396,7 +396,7 @@ function CreatetModalForm(editor, params, relList) {
 				</div>
 				<label ${textDisplayShow}>${lang.link_modal_text}</label>
 				<input class="se-input-form _se_display_text" type="text" ${textDisplayShow} />
-				<label ${titleShow}>${lang.link_modal_title}</label>
+				<label ${titleShow}>${lang.title}</label>
 				<input class="se-input-form _se_title" type="text" ${titleShow} />
 			</div>
 			<div class="se-modal-form-footer">

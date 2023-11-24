@@ -268,11 +268,14 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 		}
 
 		if (!(t = values[i + 1])) continue;
-		if (tooptip)
-			tooptip.appendChild(
-				domUtils.createElement('SPAN', { class: 'se-shortcut' }, env.cmdIcon + (s ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + t + '</span>')
-			);
+		if (tooptip) _addTooltip(tooptip, s, t);
 	}
+}
+
+function _addTooltip(tooptipBtn, shift, shortcut) {
+	tooptipBtn.appendChild(
+		domUtils.createElement('SPAN', { class: 'se-shortcut' }, env.cmdIcon + (shift ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + shortcut + '</span>')
+	);
 }
 
 /**
@@ -489,6 +492,7 @@ export function InitOptions(options, editorTargets) {
 		? {}
 		: [
 				{
+					// default command
 					selectAll: ['65', 'A'],
 					bold: ['66', 'B'],
 					strike: ['s83', 'S'],
@@ -500,7 +504,9 @@ export function InitOptions(options, editorTargets) {
 					outdent: ['219', '['],
 					sup: ['187', '='],
 					sub: ['s187', '='],
-					save: ['83', 'S']
+					save: ['83', 'S'],
+					// plugins
+					link: ['75', 'K']
 				},
 				options.shortcuts || {}
 		  ].reduce(function (_default, _new) {
@@ -877,8 +883,8 @@ function _defaultButtons(options, icons, lang) {
 		dir_ltr: ['', lang.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
 		dir_rtl: ['', lang.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
 		save: ['se-resizing-enabled', lang.save, 'save', '', icons.save],
-		newDocument: ['se-resizing-enabled', lang.newDocument, 'newDocument', '', icons.newDocument],
-		selectAll: ['se-resizing-enabled', lang.selectAll, 'selectAll', '', icons.selectAll],
+		newDocument: ['se-resizing-enabled', lang.newDocument, 'newDocument', '', icons.new_document],
+		selectAll: ['se-resizing-enabled', lang.selectAll, 'selectAll', '', icons.select_all]
 	};
 }
 
@@ -940,7 +946,7 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 	};
 }
 
-export function UpdateButton(element, plugin, icons, lang) {
+export function UpdateButton(element, plugin, icons, lang, shortcut) {
 	if (!element) return;
 	element.innerHTML =
 		(icons[plugin.icon] || plugin.icon || '<span class="se-icon-text">!</span>') +
@@ -950,6 +956,15 @@ export function UpdateButton(element, plugin, icons, lang) {
 	element.setAttribute('aria-label', plugin.title);
 	if (plugin.type) element.setAttribute('data-type', plugin.type);
 	if (plugin.className) element.className += ' ' + plugin.className;
+
+	const tooptip = element.querySelector('.se-tooltip-text');
+	if (!shortcut || !tooptip) return;
+
+	for (let i = 0, s, t; i < shortcut.length; i += 2) {
+		s = /^s/i.test(shortcut[i]);
+		if (!(t = shortcut[i + 1])) continue;
+		_addTooltip(tooptip, s, t);
+	}
 }
 
 /**

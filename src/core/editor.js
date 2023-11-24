@@ -273,7 +273,7 @@ Editor.prototype = {
 	 * @param {Array.<Element>|null} targets Plugin target button (This is not necessary if you have a button list when creating the editor)
 	 * @param {object|null} pluginOptions Plugin's options
 	 */
-	registerPlugin(pluginName, targets, pluginOptions) {
+	registerPlugin(pluginName, targets, pluginOptions, shortcut) {
 		let plugin = this.plugins[pluginName];
 		if (!plugin) {
 			throw Error(`[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "${pluginName}")`);
@@ -284,7 +284,7 @@ Editor.prototype = {
 
 		if (targets) {
 			for (let i = 0, len = targets.length; i < len; i++) {
-				UpdateButton(targets[i], plugin, this.icons, this.lang);
+				UpdateButton(targets[i], plugin, this.icons, this.lang, shortcut);
 			}
 
 			if (!this.activeCommands.includes(pluginName) && typeof this.plugins[pluginName].active === 'function') {
@@ -1253,11 +1253,12 @@ Editor.prototype = {
 
 		const plugins = this.plugins;
 		const isArray = Array.isArray;
+		const shortcuts = this.options.get('shortcuts');
 		let filePluginRegExp = [];
 		let plugin;
 		for (let key in plugins) {
-			this.registerPlugin(key, this._pluginCallButtons[key], options[key]);
-			this.registerPlugin(key, this._pluginCallButtons_sub[key], options[key]);
+			this.registerPlugin(key, this._pluginCallButtons[key], options[key], shortcuts[key]);
+			this.registerPlugin(key, this._pluginCallButtons_sub[key], options[key], shortcuts[key]);
 			plugin = this.plugins[key];
 
 			// Filemanager
