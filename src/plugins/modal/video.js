@@ -191,7 +191,7 @@ Video.prototype = {
 	},
 
 	/**
-	 * @override fileManager, figure
+	 * @override component
 	 * @description Called when a container is selected.
 	 * @param {Element} element Target element
 	 */

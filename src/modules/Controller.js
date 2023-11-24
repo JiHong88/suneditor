@@ -159,7 +159,7 @@ Controller.prototype = {
 	_controllerOff() {
 		this.form.style.display = 'none';
 		this.editor.opendControllers = this.editor.opendControllers.filter((v) => v.form !== this.form);
-		if (this.editor.currentControllerName !== this.kind || this.editor.opendControllers.length > 0) return;
+		if (this.editor.currentControllerName !== this.kind && this.editor.opendControllers.length > 0) return;
 
 		if (this.disabled) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, false);
 		this.editor.frameContext.get('lineBreaker_t').style.display = this.editor.frameContext.get('lineBreaker_b').style.display = 'none';
@@ -176,7 +176,7 @@ Controller.prototype = {
 	 * @param {Element} referEl Element that is the basis of the controller's position.
 	 */
 	_setControllerPosition(controller, referEl) {
-		controller.style.zIndex = INDEX_0;
+		controller.style.zIndex = INDEX_1;
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
@@ -236,8 +236,9 @@ function Action(e) {
 }
 
 function MouseEnter(e) {
+	this.editor.currentControllerName = this.kind;
 	if (this.parents.length > 0 && this.isInsideForm) return;
-	e.target.style.zIndex = INDEX_1;
+	e.target.style.zIndex = INDEX_0;
 }
 
 function MouseLeave(e) {
@@ -258,10 +259,7 @@ function CloseListener_keydown(e) {
 }
 
 function CloseListener_mousedown(e) {
-	if (this._checkFixed() || this.form.contains(e.target) || this._checkForm(e.target)) {
-		e.stopPropagation();
-		return;
-	}
+	if (this._checkFixed() || this.form.contains(e.target) || this._checkForm(e.target)) return;
 	this.close(true);
 }
 

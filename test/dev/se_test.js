@@ -42,7 +42,7 @@ require('katex/dist/katex.css');
 import plugins from '../../src/plugins';
 
 const bl = [
-	['undo', 'redo', 'dir'],
+	['selectAll', 'newDocument', 'undo', 'redo', 'dir'],
 	['dir_ltr', 'dir_rtl'],
 	['font', 'fontSize', 'formatBlock'],
 	['paragraphStyle', 'blockquote'],
@@ -61,7 +61,7 @@ const bl = [
 	[
 		'%1565',
 		[
-			['undo', 'redo'],
+			['selectAll', 'newDocument', 'undo', 'redo'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -79,7 +79,7 @@ const bl = [
 	[
 		'%1455',
 		[
-			['undo', 'redo'],
+			['selectAll', 'newDocument', 'undo', 'redo'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -96,7 +96,7 @@ const bl = [
 	[
 		'%1326',
 		[
-			['undo', 'redo'],
+			['selectAll', 'newDocument', 'undo', 'redo'],
 			['font', 'fontSize', 'formatBlock'],
 			['paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
@@ -112,7 +112,7 @@ const bl = [
 	[
 		'%1123',
 		[
-			['undo', 'redo'],
+			['selectAll', 'newDocument', 'undo', 'redo'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
 			['fontColor', 'backgroundColor', 'textStyle'],
@@ -127,7 +127,7 @@ const bl = [
 	[
 		'%817',
 		[
-			['undo', 'redo'],
+			['selectAll', 'newDocument', 'undo', 'redo'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			['bold', 'underline', 'italic', 'strike'],
 			[':More Text-default.more_text', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
@@ -142,7 +142,7 @@ const bl = [
 	[
 		'%673',
 		[
-			['undo', 'redo'],
+			['selectAll', 'newDocument', 'undo', 'redo'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
 			['removeFormat'],
@@ -156,7 +156,7 @@ const bl = [
 	[
 		'%525',
 		[
-			['undo', 'redo'],
+			['selectAll', 'newDocument', 'undo', 'redo'],
 			[':More Paragraph-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle'],
 			['removeFormat'],
@@ -170,7 +170,7 @@ const bl = [
 	[
 		'%420',
 		[
-			['undo', 'redo'],
+			['selectAll', 'newDocument', 'undo', 'redo'],
 			[':lang.test-default.more_paragraph', 'font', 'fontSize', 'formatBlock', 'paragraphStyle', 'blockquote'],
 			[':More Text-default.more_text', 'bold', 'underline', 'italic', 'strike', 'subscript', 'superscript', 'fontColor', 'backgroundColor', 'textStyle', 'removeFormat'],
 			[':More Line-default.more_horizontal', 'outdent', 'indent', 'align', 'hr', 'list', 'lineHeight'],

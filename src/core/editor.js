@@ -355,9 +355,7 @@ Editor.prototype = {
 	 * @param {string} command Property of command button (data-value)
 	 */
 	async commandHandler(command) {
-		if (this.frameContext.get('isReadOnly') && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) {
-			return;
-		}
+		if (this.frameContext.get('isReadOnly') && !/copy|cut|selectAll|codeView|fullScreen|print|preview|showBlocks/.test(command)) return;
 
 		switch (command) {
 			case 'copy':
@@ -369,6 +367,11 @@ Editor.prototype = {
 				break;
 			case 'selectAll':
 				SELECT_ALL(this);
+				break;
+			case 'newDocument':
+				this.html.set(`<${this.options.get('defaultLine')}><br></${this.options.get('defaultLine')}>`);
+				this.focus();
+				this.history.push(false);
 				break;
 			case 'codeView':
 				this.viewer.codeView(!this.frameContext.get('isCodeView'));
@@ -1011,7 +1014,7 @@ Editor.prototype = {
 	 * @description Off current controllers
 	 * @private
 	 */
-	_offCurrentController() {
+	_offCurrentController(_componentClosed) {
 		const cont = this.opendControllers;
 		const fixedCont = [];
 		for (let i = 0; i < cont.length; i++) {
@@ -1020,13 +1023,12 @@ Editor.prototype = {
 				continue;
 			}
 			if (typeof cont[i].inst.close === 'function') cont[i].inst.close();
-			else if (cont[i].form) cont[i].form.style.display = 'none';
+			if (cont[i].form) cont[i].form.style.display = 'none';
 		}
 		this.opendControllers = fixedCont;
 		this.currentControllerName = '';
 		this._antiBlur = false;
-		this.frameContext.get('lineBreaker_t').style.display = this.frameContext.get('lineBreaker_b').style.display = this.frameContext.get('lineBreaker').style.display = 'none';
-		this.component.__removeGlobalEvent();
+		if (!_componentClosed) this.component.deselect(true);
 	},
 
 	/**

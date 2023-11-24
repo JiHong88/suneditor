@@ -22,11 +22,21 @@ HR.type = 'dropdown';
 HR.className = '';
 HR.component = (node) => (/^hr$/i.test(node?.nodeName) ? HR.key : '');
 HR.prototype = {
+	/**
+	 * @override component
+	 * @description Called when a container is selected.
+	 * @param {Element} element Target element
+	 */
 	select(element) {
 		domUtils.addClass(element, 'on');
 	},
 
-	close(element) {
+	/**
+	 * @override component
+	 * @description Called when a container is deselected.
+	 * @param {Element} element Target element
+	 */
+	deselect(element) {
 		domUtils.removeClass(element, 'on');
 	},
 

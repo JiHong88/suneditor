@@ -35,7 +35,15 @@ Selection.prototype = {
 	getRange() {
 		const range = this.status._range || this._createDefaultRange();
 		const selection = this.get();
-		if (range.collapsed === selection.isCollapsed || !this.editor.frameContext.get('wysiwyg').contains(selection.focusNode)) return range;
+		if (range.collapsed === selection.isCollapsed || !this.editor.frameContext.get('wysiwyg').contains(selection.focusNode)) {
+			if (this.component.is(range.startContainer)) {
+				const compInfo = this.component.get(range.startContainer);
+				const container = compInfo.container;
+				return this.setRange(container, 0, container, 0);
+			}
+
+			return range;
+		}
 
 		if (selection.rangeCount > 0) {
 			this.status._range = selection.getRangeAt(0);
@@ -117,9 +125,9 @@ Selection.prototype = {
 	 */
 	getRangeAndAddLine(range, container) {
 		if (this._isNone(range)) {
-			const wysiwyg = this.editor.frameContext.get('wysiwyg');
+			const parent = container?.parentElement || this.editor.frameContext.get('wysiwyg');
 			const op = domUtils.createElement(this.options.get('defaultLine'), null, '<br>');
-			wysiwyg.insertBefore(op, container && container !== wysiwyg ? container.nextElementSibling : wysiwyg.firstElementChild);
+			parent.insertBefore(op, container && container !== parent ? (!container.previousElementSibling ? container : container.nextElementSibling) : parent.firstElementChild);
 			this.setRange(op.firstElementChild, 0, op.firstElementChild, 1);
 			range = this.status._range;
 		}
@@ -361,6 +369,7 @@ Selection.prototype = {
 		if (domUtils.isBreak(tempCon) || (tempCon.nodeType === 1 && tempCon.childNodes.length > 0)) {
 			const onlyBreak = domUtils.isBreak(tempCon);
 			if (!onlyBreak) {
+				const tempConCache = tempCon;
 				while (tempCon && !domUtils.isBreak(tempCon) && tempCon.nodeType === 1) {
 					tempCon = tempCon.childNodes[tempOffset] || tempCon.nextElementSibling || tempCon.nextSibling;
 					tempOffset = 0;
@@ -368,13 +377,14 @@ Selection.prototype = {
 
 				let format = this.format.getLine(tempCon, null);
 				if (format === this.format.getBlock(format, null)) {
+					tempCon = tempCon || tempConCache;
 					format = domUtils.createElement(domUtils.getParentElement(tempCon, domUtils.isTableCell) ? 'DIV' : this.options.get('defaultLine'));
 					tempCon.parentNode.insertBefore(format, tempCon);
-					format.appendChild(tempCon);
+					if (tempCon !== tempConCache) format.appendChild(tempCon);
 				}
 			}
 
-			if (domUtils.isBreak(tempCon)) {
+			if (domUtils.isBreak(tempCon) || this.component.is(tempCon)) {
 				const emptyText = domUtils.createTextNode(unicode.zeroWidthSpace);
 				tempCon.parentNode.insertBefore(emptyText, tempCon);
 				tempCon = emptyText;

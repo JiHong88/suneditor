@@ -645,9 +645,17 @@ HTML.prototype = {
 		const commonCon =
 			range.commonAncestorContainer.nodeType === 3 && range.commonAncestorContainer.parentNode === startCon.parentNode ? startCon.parentNode : range.commonAncestorContainer;
 		if (commonCon === startCon && commonCon === endCon) {
-			startCon = commonCon.children[startOff];
-			endCon = commonCon.children[endOff];
-			startOff = endOff = 0;
+			if (this.component.is(commonCon)) {
+				const compInfo = this.component.get(commonCon);
+				return {
+					container: compInfo.container,
+					offset: 0
+				};
+			} else {
+				startCon = commonCon.children[startOff];
+				endCon = commonCon.children[endOff];
+				startOff = endOff = 0;
+			}
 		}
 
 		if (!startCon || !endCon)

@@ -228,7 +228,7 @@ const Table = function (editor, pluginOptions) {
 Table.key = 'table';
 Table.type = 'dropdown-free';
 Table.className = '';
-Table.component = (node) => (/^table$/i.test(node?.nodeName) ? Table.key : '');
+Table.component = (node) => domUtils.isTable(node) || (/^figure$/i.test(node?.nodeName) && domUtils.isTable(node.firstElementChild) ? Table.key : '');
 Table.prototype = {
 	/**
 	 * @override core
@@ -456,21 +456,42 @@ Table.prototype = {
 			}
 		}
 
+		let cell = null;
 		if (!event.shiftKey || keyCode !== 16) {
+			cell = domUtils.getParentElement(line, domUtils.isTableCell);
+			if (!domUtils.hasClass(cell, 'se-selected-cell-focus')) return;
+
+			this._deleteStyleSelectedCells();
+			this._toggleEditor(true);
+			this.__removeGlobalEvents();
 			this._closeController();
+
 			return;
 		}
 
-		event.preventDefault();
-		event.stopPropagation();
-
 		if (this._shift || this._ref) return;
 
-		const cell = domUtils.getParentElement(line, domUtils.isTableCell);
+		cell = cell || domUtils.getParentElement(line, domUtils.isTableCell);
 		if (cell) {
+			this._fixedCell = cell;
 			this._closeController();
 			this.selectCells(cell, true);
 			return false;
+		}
+	},
+
+	/**
+	 * @override core
+	 * @param {any} event Event object
+	 * @param {any} range range object
+	 * @param {Element} line Current line element
+	 */
+	onKeyUp({ event, range, line }) {
+		if (this._shift && domUtils.getParentElement(line, domUtils.isTableCell) === this._fixedCell) {
+			this._shift = false;
+			this._deleteStyleSelectedCells();
+			this._toggleEditor(true);
+			this.__removeGlobalEvents();
 		}
 	},
 
@@ -1929,7 +1950,7 @@ Table.prototype = {
 	},
 
 	_closeController() {
-		this.component.close();
+		this.component.deselect();
 		this.controller_table.close();
 		this.controller_cell.close();
 	},
@@ -2239,8 +2260,15 @@ function OnCellMultiSelect(e) {
 	const target = domUtils.getParentElement(e.target, domUtils.isTableCell);
 
 	if (this._shift) {
-		if (target === this._fixedCell) this._toggleEditor(true);
-		else this._toggleEditor(false);
+		if (target === this._fixedCell) {
+			this._shift = false;
+			this._deleteStyleSelectedCells();
+			this._toggleEditor(true);
+			this.__removeGlobalEvents();
+			return;
+		} else {
+			this._toggleEditor(false);
+		}
 	} else if (!this._ref) {
 		if (target === this._fixedCell) return;
 		else this._toggleEditor(false);

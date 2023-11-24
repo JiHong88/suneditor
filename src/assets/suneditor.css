@@ -484,10 +484,10 @@
 }
 
 .sun-editor .se-line-breaker > button.se-btn:hover {
-	color: #fff;
-	background-color: #4592ff;
-	border: 1px solid #3288ff;
-	opacity: 0.9;
+	color: #fff !important;
+	background-color: #4592ff !important;
+	border: 1px solid #3288ff !important;
+	opacity: 0.9 !important;
 }
 
 /** --- line breaker --- component - top, bottom */

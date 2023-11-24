@@ -324,7 +324,7 @@ Figure.prototype = {
 		if (!target) return { w: '', h: '' };
 
 		const figure = Figure.GetContainer(target);
-		if (!figure.container || !figure.cover) {
+		if (!figure.container) {
 			return {
 				w: '',
 				h: target.style.height
@@ -875,7 +875,6 @@ function OffFigureContainer() {
 	this.editor._figureContainer = null;
 	this.inst.init();
 	Figure.__figureControllerInst = null;
-	this.editor._offCurrentController();
 }
 
 function OnClick_alignButton() {

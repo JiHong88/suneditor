@@ -876,7 +876,9 @@ function _defaultButtons(options, icons, lang) {
 		dir: ['', lang[isRTL ? 'dir_ltr' : 'dir_rtl'], 'dir', '', icons[isRTL ? 'dir_ltr' : 'dir_rtl']],
 		dir_ltr: ['', lang.dir_ltr, 'dir_ltr', '', icons.dir_ltr],
 		dir_rtl: ['', lang.dir_rtl, 'dir_rtl', '', icons.dir_rtl],
-		save: ['se-resizing-enabled', lang.save, 'save', '', icons.save]
+		save: ['se-resizing-enabled', lang.save, 'save', '', icons.save],
+		newDocument: ['se-resizing-enabled', lang.newDocument, 'newDocument', '', icons.newDocument],
+		selectAll: ['se-resizing-enabled', lang.selectAll, 'selectAll', '', icons.selectAll],
 	};
 }
 

@@ -1,4 +1,5 @@
 :root {
+	--se-edit-font-size: 13px;
 	--se-edit-font: #333;
 	--se-edit-font-sub: #666;
 	--se-edit-background: #fff;
@@ -18,7 +19,7 @@
 /* suneditor content */
 .sun-editor-editable {
 	font-family: Helvetica Neue;
-	font-size: 13px;
+	font-size: var(--se-edit-font-size);
 	color: var(--se-edit-font);
 	background-color: var(--se-edit-background);
 	line-height: 1.5;
@@ -80,6 +81,16 @@
 .sun-editor-editable a {
 	color: var(--se-edit-anchor);
 	text-decoration: none;
+	white-space: nowrap;
+}
+
+.sun-editor-editable a[target='_blank']::after {
+	content: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE0LDNWNUgxNy41OUw3Ljc2LDE0LjgzTDkuMTcsMTYuMjRMMTksNi40MVYxMEgyMVYzTTE5LDE5SDVWNUgxMlYzSDVDMy44OSwzIDMsMy45IDMsNVYxOUEyLDIgMCAwLDAgNSwyMUgxOUEyLDIgMCAwLDAgMjEsMTlWMTJIMTlWMTlaIiAvPjwvc3ZnPg==');
+	display: inline-block;
+	width: var(--se-edit-font-size);
+	height: auto;
+	color: var(--se-edit-anchor);
+	vertical-align: middle;
 }
 
 .sun-editor-editable span[style~='color:'] a {

@@ -133,8 +133,8 @@ Audio_.prototype = {
 	},
 
 	/**
-	 * @override editor.component, fileManager
-	 * @description It is called from core.component.select
+	 * @override component
+	 * @description Called when a container is selected.
 	 * @param {Element} element Target element
 	 */
 	select(element) {

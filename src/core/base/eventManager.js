@@ -2048,7 +2048,7 @@ function DisplayLineBreak(dir, e) {
 	component.parentNode.insertBefore(format, dir === 't' ? component : component.nextSibling);
 	this.editor.frameContext.get('lineBreaker').style.display = 'none';
 
-	this.component.close();
+	this.component.deselect();
 
 	const focusEl = isList ? format : format.firstChild;
 	this.selection.setRange(focusEl, 1, focusEl, 1);

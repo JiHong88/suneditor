@@ -852,7 +852,7 @@ export function isTable(node) {
  * @returns {boolean}
  */
 export function isTableElements(node) {
-	return /^(TABLE|THEAD|TBODY|TR|TH|TD)$/i.test(typeof node === 'string' ? node : node?.nodeName);
+	return /^(TABLE|THEAD|TBODY|TR|TH|TD|COL)$/i.test(typeof node === 'string' ? node : node?.nodeName);
 }
 
 /**

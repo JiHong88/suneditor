@@ -141,7 +141,7 @@ FileManager.prototype = {
 			}
 
 			const figureInfo = Figure.GetContainer(element);
-			if (!figureInfo.container || !figureInfo.cover) {
+			if (!figureInfo.container) {
 				try {
 					const size = (element.getAttribute('data-se-size') || ',').split(',');
 					this.figure.__fileManagerInfo = true;

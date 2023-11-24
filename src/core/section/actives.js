@@ -17,35 +17,24 @@ export function SELECT_ALL(editor) {
 	const selectArea = figcaption || editor.frameContext.get('wysiwyg');
 
 	let first =
-		domUtils.getEdgeChild(
-			selectArea.firstChild,
-			function (current) {
-				return current.childNodes.length === 0 || current.nodeType === 3;
-			},
-			false
-		) || selectArea.firstChild;
-
+		domUtils.getEdgeChild(selectArea.firstChild, (current) => current.childNodes.length === 0 || current.nodeType === 3 || domUtils.isTable(current), false) ||
+		selectArea.firstChild;
 	let last =
-		domUtils.getEdgeChild(
-			selectArea.lastChild,
-			function (current) {
-				return current.childNodes.length === 0 || current.nodeType === 3;
-			},
-			true
-		) || selectArea.lastChild;
+		domUtils.getEdgeChild(selectArea.lastChild, (current) => current.childNodes.length === 0 || current.nodeType === 3 || domUtils.isTable(current), true) ||
+		selectArea.lastChild;
 
 	if (!first || !last) return;
 
-	if (domUtils.isMedia(first)) {
+	if (domUtils.isMedia(first) || domUtils.isTableElements(first)) {
 		const info = editor.component.get(first);
 		const br = domUtils.createElement('BR');
 		const format = domUtils.createElement(editor.options.get('defaultLine'), null, br);
-		first = info ? info.container : first;
+		first = info ? info.container || info.cover : first;
 		first.parentNode.insertBefore(format, first);
 		first = br;
 	}
 
-	if (domUtils.isMedia(last)) {
+	if (domUtils.isMedia(last) || domUtils.isTableElements(last)) {
 		last = domUtils.createElement('BR');
 		selectArea.appendChild(domUtils.createElement(editor.options.get('defaultLine'), null, last));
 	}

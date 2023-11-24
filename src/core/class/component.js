@@ -11,6 +11,7 @@ const Component = function (editor) {
 
 	// members
 	this.info = null;
+	this.isSelected = false;
 	this.currentTarget = null;
 	this.currentPlugin = null;
 	this.currentPluginName = '';
@@ -102,7 +103,7 @@ Component.prototype = {
 		return (this.info = {
 			target: target,
 			pluginName: pluginName || this.editor._fileManager.pluginMap[target.nodeName.toLowerCase()] || '',
-			container: figureInfo.container,
+			container: figureInfo.container || figureInfo.cover || target,
 			cover: figureInfo.cover,
 			caption: figureInfo.caption,
 			isFile: isFile
@@ -115,7 +116,7 @@ Component.prototype = {
 	 * @param {string} pluginName Plugin name (image, video)
 	 */
 	select(element, pluginName, isInput) {
-		this.get(element);
+		const info = this.get(element);
 		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is.bind(this))) || domUtils.isUneditable(element)) return false;
 
 		const plugin = this.plugins[pluginName];
@@ -123,9 +124,11 @@ Component.prototype = {
 
 		if (!isInput) {
 			this.editor._antiBlur = true;
+			this.selection.setRange(info.container, 0, info.container, 0);
 			this.editor.blur();
 		}
 
+		this.isSelected = true;
 		setTimeout(
 			() => {
 				if (typeof plugin.select === 'function') plugin.select(element);
@@ -140,16 +143,20 @@ Component.prototype = {
 		);
 	},
 
-	close() {
+	deselect(_globalClosed) {
 		this.editor._antiBlur = false;
 		const { frameContext } = this.editor;
 		frameContext.get('lineBreaker_t').style.display = frameContext.get('lineBreaker_b').style.display = frameContext.get('lineBreaker').style.display = 'none';
-		if (this.currentPlugin && typeof this.currentPlugin.close === 'function') {
-			this.currentPlugin.close(this.currentTarget);
+		if (this.currentPlugin && typeof this.currentPlugin.deselect === 'function') {
+			this.currentPlugin.deselect(this.currentTarget);
 		}
 
+		this.isSelected = false;
+		this.currentPlugin = null;
+		this.currentTarget = null;
+		this.currentPluginName = '';
 		this.__removeGlobalEvent();
-		this.editor._offCurrentController();
+		if (!_globalClosed) this.editor._offCurrentController(true);
 	},
 
 	/**
@@ -190,7 +197,7 @@ Component.prototype = {
 
 		const yScroll = wysiwyg.scrollY || wysiwyg.scrollTop || 0;
 		const wScroll = wysiwyg.scrollX || wysiwyg.scrollLeft || 0;
-		const container = info.container || info.cover;
+		const container = info.container;
 		const t_style = fc.get('lineBreaker_t').style;
 		const b_style = fc.get('lineBreaker_b').style;
 		const offsetTarget = container.offsetWidth < element.offsetWidth ? container : element;
@@ -244,9 +251,6 @@ Component.prototype = {
 		if (this._bindClose_copy) this._bindClose_copy = this.eventManager.removeGlobalEvent(this._bindClose_copy);
 		if (this._bindClose_cut) this._bindClose_cut = this.eventManager.removeGlobalEvent(this._bindClose_cut);
 		if (this._bindClose_keydown) this._bindClose_keydown = this.eventManager.removeGlobalEvent(this._bindClose_keydown);
-		this.currentPlugin = null;
-		this.currentTarget = null;
-		this.currentPluginName = '';
 	},
 
 	__addNotFileGlobalEvent() {
@@ -264,10 +268,11 @@ Component.prototype = {
 function CloseListener_mouse({ target }) {
 	if (
 		this.currentTarget?.contains(target) ||
+		domUtils.getParentElement(target, '.se-controller') ||
 		(this.currentPluginName === this.editor.currentControllerName && this.editor.opendControllers.some(({ form }) => form.contains(target)))
 	)
 		return;
-	this.close();
+	this.deselect();
 }
 
 function OnCopy_component(e) {
@@ -285,9 +290,8 @@ function OnCopy_component(e) {
 function OnCut_component(e) {
 	const info = this.info;
 	if (info) {
-		this.__removeGlobalEvent();
 		SetClipboardComponent(e, info.container, e.clipboardData);
-		this.editor._offCurrentController();
+		this.deselect();
 		domUtils.removeItem(info.container);
 	}
 }
@@ -305,7 +309,6 @@ function OnKeyDown_component(e) {
 			if (/^(redo|undo)$/.test(info?.c)) {
 				e.preventDefault();
 				e.stopPropagation();
-				this.__removeGlobalEvent();
 				this.editor.run(info.c, info.t, info.e);
 			}
 		}
@@ -318,8 +321,7 @@ function OnKeyDown_component(e) {
 		e.stopPropagation();
 		if (typeof this.currentPlugin?.destroy === 'function') {
 			this.currentPlugin.destroy(this.currentTarget);
-			this.editor._offCurrentController();
-			this.__removeGlobalEvent();
+			this.deselect();
 			return;
 		}
 	}
@@ -337,7 +339,7 @@ function OnKeyDown_component(e) {
 			newEl = domUtils.createElement(this.format.isLine(sibling) && !this.format.isBlock(sibling) ? sibling.nodeName : this.options.get('defaultLine'), null, '<br>');
 		}
 
-		this.editor._offCurrentController();
+		this.deselect();
 		container.parentNode.insertBefore(newEl, container);
 		if (this.select(compContext.target, this.currentPluginName) === false) this.editor.blur();
 	}
@@ -348,7 +350,7 @@ function OnKeyDown_component(e) {
 		const el = keyCode === 38 ? compContext.container.previousElementSibling : compContext.container.nextElementSibling;
 		if (!el) return;
 
-		this.close();
+		this.deselect();
 
 		const focusEl = this.eventManager.applyTagEffect(el);
 		if (focusEl) {
@@ -361,7 +363,7 @@ function OnKeyDown_component(e) {
 
 	// ESC
 	if (keyCode === 27) {
-		this.close();
+		this.deselect();
 		return;
 	}
 }
