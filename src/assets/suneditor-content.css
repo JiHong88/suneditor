@@ -89,7 +89,6 @@
 	display: inline-block;
 	width: var(--se-edit-font-size);
 	height: auto;
-	color: var(--se-edit-anchor);
 	vertical-align: middle;
 }
 

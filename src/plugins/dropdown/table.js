@@ -31,27 +31,31 @@ const BORDER_NS = {
 	r: 'borderRight',
 	b: 'borderBottom'
 };
-const BORDER_COLORS = [
-	'#000000',
-	'#36454F',
-	'#4169E1',
-	'#DC143C',
-	'#228B22',
-	'#673AB7',
-	'#CC5500',
-	'#008080',
-	'#FFD700',
-	'#FFA07A',
-	'#20B2AA',
-	'#778899',
-	'#FF69B4',
-	'#6A5ACD',
-	'#7FFF00',
-	'#D2691E',
-	'#6495ED',
-	'#FFF8DC',
-	'#DCDCDC',
-	'#F0E68C'
+const DEFAULT_COLOR_LIST = [
+	// row-1
+	'#b0dbb0',
+	'#efef7e',
+	'#f2acac',
+	'#dcb0f6',
+	'#99bdff',
+	// row-2
+	'#5dbd5d',
+	'#e7c301',
+	'#f64444',
+	'#e57ff4',
+	'#4387f1',
+	// row-3
+	'#27836a',
+	'#f69915',
+	'#ba0808',
+	'#a90bed',
+	'#134299',
+	// row-4
+	'#e4e4e4',
+	'#B3B3B3',
+	'#808080',
+	'#4D4D4D',
+	'#000000'
 ];
 
 const Table = function (editor, pluginOptions) {
@@ -89,7 +93,7 @@ const Table = function (editor, pluginOptions) {
 	// color picker
 	const colorForm = domUtils.createElement('DIV', { class: 'se-controller se-list-layer' }, null);
 	this.colorPicker = new ColorPicker(this, 'borderColor', {
-		colorList: pluginOptions.borderColors || BORDER_COLORS,
+		colorList: pluginOptions.colorList || DEFAULT_COLOR_LIST,
 		splitNum: 5,
 		disableRemove: true,
 		hueSliderOptions: { controllerOptions: { parents: [colorForm], isOutsideForm: true } }
