@@ -31,6 +31,7 @@ const BORDER_NS = {
 	r: 'borderRight',
 	b: 'borderBottom'
 };
+const DEFAULT_BORDER_UNIT = 'px';
 const DEFAULT_COLOR_LIST = [
 	// row-1
 	'#b0dbb0',
@@ -1648,10 +1649,8 @@ Table.prototype = {
 			const cellAlignment = cell_alignment.getAttribute('se-cell-align') || '';
 			const borderColor = isNoneFormat ? '' : border_color.value.trim() || '';
 			let borderWidth = isNoneFormat ? '' : border_width.value.trim() || '';
-			borderWidth = numbers.is(borderWidth) ? borderWidth + 'px' : borderWidth;
+			borderWidth = numbers.is(borderWidth) ? borderWidth + DEFAULT_BORDER_UNIT : borderWidth;
 			const backColor = back_color.value.trim();
-
-			// --- targets roof
 			const hasBorder = hasFormat && !isNoneFormat && borderWidth;
 			const borderCss = `${borderWidth} ${borderStyle} ${borderColor}`;
 			const cells = {
@@ -1662,80 +1661,98 @@ Table.prototype = {
 				middle: []
 			};
 
-			let { rs, re, cs, ce } = this._ref || {
-				rs: targets[0].parentElement.rowIndex || 0,
-				re: targets[0].parentElement.rowIndex || 0,
-				cs: targets[0].cellIndex || 0,
-				ce: targets[0].cellIndex || 0
-			};
-			const mergeInfo = new Array(re - rs + 1).fill(0).map(() => new Array(ce - cs + 1).fill(0));
-			const cellStartIndex = cs;
-			re -= rs;
-			rs -= rs;
-			ce -= cs;
-			cs -= cs;
-			let prevRow = targets[0].parentNode;
-			for (let i = 0, cellCnt = 0, len = targets.length, e, es, rowIndex = 0, cellIndex, colspan, rowspan; i < len; i++, cellCnt++) {
-				e = targets[i];
-				colspan = e.colSpan;
-				rowspan = e.rowSpan;
-				cellIndex = e.cellIndex - cellStartIndex;
+			if (!isTable) {
+				// --- target cells roof
+				let { rs, re, cs, ce } = this._ref || {
+					rs: targets[0].parentElement.rowIndex || 0,
+					re: targets[0].parentElement.rowIndex || 0,
+					cs: targets[0].cellIndex || 0,
+					ce: targets[0].cellIndex || 0
+				};
+				const mergeInfo = new Array(re - rs + 1).fill(0).map(() => new Array(ce - cs + 1).fill(0));
+				const cellStartIndex = cs;
+				re -= rs;
+				rs -= rs;
+				ce -= cs;
+				cs -= cs;
+				let prevRow = targets[0].parentNode;
+				for (let i = 0, cellCnt = 0, len = targets.length, e, es, rowIndex = 0, cellIndex, colspan, rowspan; i < len; i++, cellCnt++) {
+					e = targets[i];
+					colspan = e.colSpan;
+					rowspan = e.rowSpan;
+					cellIndex = e.cellIndex - cellStartIndex;
 
-				if (prevRow !== e.parentNode) {
-					rowIndex++;
-					cellCnt = 0;
-					prevRow = e.parentNode;
-				}
-
-				let c = 0;
-				while (c <= cellIndex) {
-					cellIndex += mergeInfo[rowIndex][c] || 0;
-					c++;
-				}
-
-				try {
-					if (rowspan > 1) {
-						const rowspanNum = rowspan - 1;
-						for (let r = rowIndex; r <= rowIndex + rowspanNum; r++) {
-							mergeInfo[r][cellIndex] += colspan - (rowIndex === r ? 1 : 0);
-						}
-					} else if (colspan > 1) {
-						mergeInfo[rowIndex][cellIndex] += colspan - 1;
+					if (prevRow !== e.parentNode) {
+						rowIndex++;
+						cellCnt = 0;
+						prevRow = e.parentNode;
 					}
-				} catch (err) {
-					// ignore error
-				}
 
-				const isBottom = rowIndex + rowspan - 1 === re;
-				if (rowIndex === rs) cells.top.push(e);
-				if (rowIndex === re || isBottom) cells.bottom.push(e);
-				if (cellIndex === cs) cells.left.push(e);
-				if (cellIndex === ce || cellIndex + colspan - 1 === ce) cells.right.push(e);
-				if (!isBottom && rowIndex !== rs && rowIndex !== re && cellIndex !== cs && cellIndex !== ce) cells.middle.push(e);
+					let c = 0;
+					while (c <= cellIndex) {
+						cellIndex += mergeInfo[rowIndex][c] || 0;
+						c++;
+					}
 
-				// --- set styles
-				es = e.style;
-				// alignment
-				if (isTable) {
-					if (this._figure) this._figure.style.float = cellAlignment;
-				} else {
+					try {
+						if (rowspan > 1) {
+							const rowspanNum = rowspan - 1;
+							for (let r = rowIndex; r <= rowIndex + rowspanNum; r++) {
+								mergeInfo[r][cellIndex] += colspan - (rowIndex === r ? 1 : 0);
+							}
+						} else if (colspan > 1) {
+							mergeInfo[rowIndex][cellIndex] += colspan - 1;
+						}
+					} catch (err) {
+						// ignore error
+					}
+
+					const isBottom = rowIndex + rowspan - 1 === re;
+					if (rowIndex === rs) cells.top.push(e);
+					if (rowIndex === re || isBottom) cells.bottom.push(e);
+					if (cellIndex === cs) cells.left.push(e);
+					if (cellIndex === ce || cellIndex + colspan - 1 === ce) cells.right.push(e);
+					if (!isBottom && rowIndex !== rs && rowIndex !== re && cellIndex !== cs && cellIndex !== ce) cells.middle.push(e);
+
+					// --- set styles
+					es = e.style;
+					// alignment
 					es.textAlign = cellAlignment;
+					// back
+					es.backgroundColor = backColor;
+					// border
+					if (hasBorder) continue;
+					// border - all || none
+					if (isNoneFormat) {
+						es.border = es.borderLeft = es.borderTop = es.borderRight = es.borderBottom = '';
+					} else {
+						es.border = borderCss;
+					}
 				}
+
+				if (cells.middle.length === 0) {
+					cells.middle = targets;
+				}
+			} else {
+				// -- table styles
+				const es = targets[0].style;
+				// alignment
+				if (this._figure) this._figure.style.float = cellAlignment;
 				// back
 				es.backgroundColor = backColor;
 				// border
-				if (hasBorder) continue;
-				// border - all || none
-				if (isNoneFormat) {
-					es.border = es.borderLeft = es.borderTop = es.borderRight = es.borderBottom = '';
-				} else {
-					es.border = borderCss;
+				if (!hasBorder) {
+					// border - all || none
+					if (isNoneFormat) {
+						es.border = es.borderLeft = es.borderTop = es.borderRight = es.borderBottom = '';
+					} else {
+						es.border = borderCss;
+					}
 				}
+
+				cells.left = cells.top = cells.right = cells.bottom = targets;
 			}
 
-			if (cells.middle.length === 0) {
-				cells.middle = targets;
-			}
 			cells.all = targets;
 
 			// border format
