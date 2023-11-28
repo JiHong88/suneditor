@@ -7,6 +7,7 @@ class Events extends EditorInterface {
 	onMouseDown: EventFn;
 	onClick: EventFn;
 	onInput: EventFn;
+	onMouseLeave: EventFn;
 	onKeyDown: EventFn;
 	onKeyUp: EventFn;
 	onChange: (content: string) => void;

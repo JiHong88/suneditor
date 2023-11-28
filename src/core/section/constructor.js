@@ -163,24 +163,15 @@ const Constructor = function (editorTargets, options) {
 		let textarea = initElements.codeView;
 
 		// line breaker
-		const line_breaker = domUtils.createElement('DIV', { class: 'se-line-breaker' }, '<button class="se-btn">' + icons.line_break + '</button>');
-		const line_breaker_t = domUtils.createElement(
-			'DIV',
-			{ class: 'se-line-breaker-component se-line-breaker-component-t' },
-			'<button class="se-btn">' + icons.line_break + '</button>'
-		);
-		const line_breaker_b = domUtils.createElement(
-			'DIV',
-			{ class: 'se-line-breaker-component se-line-breaker-component-b' },
-			'<button class="se-btn">' + icons.line_break + '</button>'
-		);
-		line_breaker_t.innerHTML = line_breaker_b.innerHTML = icons.line_break;
+		const line_breaker = domUtils.createElement('DIV', { class: 'se-line-breaker', title: lang.insertLine }, '<button class="se-btn">' + icons.line_break + '</button>');
+		const line_breaker_t = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-t', title: lang.insertLine }, icons.line_break);
+		const line_breaker_b = domUtils.createElement('DIV', { class: 'se-line-breaker-component se-line-breaker-component-b', title: lang.insertLine }, icons.line_break);
+
 		editor_div.appendChild(line_breaker);
 		editor_div.appendChild(line_breaker_t);
 		editor_div.appendChild(line_breaker_b);
 
 		// append container
-		editor_div.appendChild(textarea);
 		if (placeholder_span) editor_div.appendChild(placeholder_span);
 		container.appendChild(domUtils.createElement('DIV', { class: 'se-toolbar-sticky-dummy' }));
 		container.appendChild(editor_div);
@@ -202,10 +193,27 @@ const Constructor = function (editorTargets, options) {
 
 		// root key
 		const key = editTarget.key || null;
-		textarea = _checkCodeMirror(o, to, textarea);
+
+		// code view - wrapper
+		const codeWrapper = domUtils.createElement('DIV', { class: 'se-code-wrapper' }, textarea);
+		codeWrapper.style.setProperty('display', 'none', 'important');
+		editor_div.appendChild(codeWrapper);
+
+		// check code mirror
+		const codeMirrorEl = _checkCodeMirror(o, to, textarea);
+		// not used code mirror
+		if (textarea === codeMirrorEl) {
+			// add line nubers
+			const codeNumbers = domUtils.createElement('TEXTAREA', { class: 'se-code-view-line', readonly: 'true' }, null);
+			codeWrapper.insertBefore(codeNumbers, textarea);
+		} else {
+			textarea = codeMirrorEl;
+		}
+
+		// set container
 		top_div.appendChild(container);
 		rootKeys.push(key);
-		frameRoots.set(key, CreateFrameContext(editTarget, top_div, wysiwyg_div, textarea, default_status_bar || statusbar, key));
+		frameRoots.set(key, CreateFrameContext(editTarget, top_div, wysiwyg_div, codeWrapper, textarea, default_status_bar || statusbar, key));
 	}
 	/** frame - root set - end -------------------------------------------------------------- */
 
@@ -703,9 +711,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 	}
 
 	// textarea for code view
-	const textarea = domUtils.createElement('TEXTAREA', { class: 'se-wrapper-inner se-wrapper-code', style: editorStyles.frame });
-
-	textarea.style.setProperty('display', 'none', 'important');
+	const textarea = domUtils.createElement('TEXTAREA', { class: 'se-wrapper-inner se-code-viewer', style: editorStyles.frame });
 	if (targetOptions.get('height') === 'auto') textarea.style.overflow = 'hidden';
 
 	let placeholder = null;
@@ -777,8 +783,7 @@ function _checkCodeMirror(options, targetOptions, textarea) {
 	options.set('hasCodeMirror', hasCodeMirror);
 	if (cmeditor) {
 		domUtils.removeItem(textarea);
-		cmeditor.className += ' se-wrapper-code-mirror';
-		cmeditor.style.setProperty('display', 'none', 'important');
+		cmeditor.className += ' se-code-viewer-mirror';
 		return cmeditor;
 	}
 

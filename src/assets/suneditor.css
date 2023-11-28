@@ -113,7 +113,7 @@
 	max-height: 24px;
 }
 
-.sun-editor .se-wrapper .se-wrapper-code-mirror,
+.sun-editor .se-wrapper .se-code-viewer-mirror,
 .sun-editor .se-wrapper .cm-editor,
 .sun-editor .se-wrapper .CodeMirror {
 	font-size: 13px;
@@ -494,8 +494,8 @@
 .sun-editor .se-line-breaker-component {
 	position: absolute;
 	display: none;
-	width: 22px;
-	height: 22px;
+	width: 24px;
+	height: 24px;
 	color: #fff;
 	background-color: #4592ff;
 	border: 1px solid #3288ff;
@@ -1261,8 +1261,18 @@
 	outline: none;
 }
 
-.sun-editor .se-wrapper .se-wrapper-code {
-	background-color: #191919;
+.sun-editor .se-wrapper .se-code-wrapper .se-code-view-line {
+	background-color: #222;
+	color: #fff;
+	text-align: right;
+	width: 50px;
+	font-size: 13px;
+	padding-right: 6px;
+	overflow: hidden;
+}
+
+.sun-editor .se-wrapper .se-code-viewer {
+	background-color: #222;
 	color: #fff;
 	font-size: 13px;
 	word-break: break-all;

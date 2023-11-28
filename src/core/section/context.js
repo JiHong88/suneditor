@@ -5,12 +5,13 @@ import { get as getNumber } from '../../helper/numbers';
  * @param {Element} editorTargets Target textarea
  * @param {Element} top Editor top area
  * @param {Element} wwFrame Editor wysiwyg frame
+ * @param {Element} codeWrapper Editor code view wrapper
  * @param {Element} codeFrame Editor code view frame
  * @param {Element|null} statusbar Editor statusbar
  * @param {any} key root key
  * @returns {Map}
  */
-export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFrame, statusbar, key) {
+export const CreateFrameContext = function (editorTarget, top, wwFrame, codeWrapper, codeFrame, statusbar, key) {
 	const m = new Map([
 		['key', key],
 		['options', editorTarget.options],
@@ -20,7 +21,9 @@ export const CreateFrameContext = function (editorTarget, top, wwFrame, codeFram
 		['wrapper', top.querySelector('.se-wrapper')],
 		['wysiwygFrame', wwFrame],
 		['wysiwyg', wwFrame], // options.iframe ? wwFrame.contentDocument.body : wwFrame
+		['codeWrapper', codeWrapper],
 		['code', codeFrame],
+		['codeNumbers', codeWrapper?.querySelector('.se-code-view-line')],
 		['lineBreaker', top.querySelector('.se-line-breaker')],
 		['lineBreaker_t', top.querySelector('.se-line-breaker-component-t')],
 		['lineBreaker_b', top.querySelector('.se-line-breaker-component-b')],

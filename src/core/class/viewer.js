@@ -3,7 +3,7 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { domUtils, env, converter } from '../../helper';
+import { domUtils, env, converter, numbers } from '../../helper';
 
 const Viewer = function (editor) {
 	CoreInjector.call(this, editor);
@@ -36,12 +36,13 @@ Viewer.prototype = {
 		this.editor._offCurrentController();
 		this.editor._offCurrentModal();
 
+		const codeWrapper = fc.get('codeWrapper');
 		const codeFrame = fc.get('code');
 		const wysiwygFrame = fc.get('wysiwygFrame');
 
 		if (value) {
 			this._setEditorDataToCodeView();
-			codeFrame.style.setProperty('display', 'block', 'important');
+			codeWrapper.style.setProperty('display', 'flex', 'important');
 			wysiwygFrame.style.display = 'none';
 
 			if (fc.get('isFullScreen')) {
@@ -69,13 +70,15 @@ Viewer.prototype = {
 				this.subToolbar.hide();
 			}
 
+			CreateLineNumbers(fc);
+
 			this.status._range = null;
 			codeFrame.focus();
 			domUtils.addClass(this.editor.commandTargets.get('codeView'), 'active');
 		} else {
 			if (!domUtils.isNonEditable(wysiwygFrame)) this._setCodeDataToEditor();
 			wysiwygFrame.scrollTop = 0;
-			codeFrame.style.setProperty('display', 'none', 'important');
+			codeWrapper.style.setProperty('display', 'none', 'important');
 			wysiwygFrame.style.display = 'block';
 
 			if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) fc.get('code').style.height = '0px';
@@ -543,5 +546,36 @@ Viewer.prototype = {
 
 	constructor: Viewer
 };
+
+function CreateLineNumbers(fc) {
+	const lineNumbers = fc.get('codeNumbers');
+	if (!lineNumbers) return;
+
+	// const lineHeight = GetLineHeight(lineNumbers);
+	// const numberOfLines = lineNumbers.scrollHeight / lineHeight;
+
+	let n = '';
+	for (let i = 1; i <= 10000; i++) {
+		n += `${i}\n`;
+	}
+
+	const { padding, margin } = window.getComputedStyle(fc.get('code'));
+	lineNumbers.value = n;
+	lineNumbers.style.padding = padding || '';
+	lineNumbers.style.margin = margin || '';
+}
+
+// function GetLineHeight(textarea) {
+// 	let lineHeight = window.getComputedStyle(textarea).lineHeight;
+
+// 	if (!numbers.is(lineHeight)) {
+// 		const fontSize = window.getComputedStyle(textarea).fontSize;
+// 		lineHeight = numbers.get(fontSize) * 1.2;
+// 	} else {
+// 		lineHeight = numbers.get(lineHeight);
+// 	}
+
+// 	return lineHeight;
+// }
 
 export default Viewer;

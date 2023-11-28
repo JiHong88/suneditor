@@ -19,7 +19,7 @@ const EventManager = function (editor) {
 	this._onShortcutKey = false;
 	this.isComposing = false; // Old browsers: When there is no 'e.isComposing' in the keyup event.
 	this._balloonDelay = null;
-	this._resizeObserver = null;
+	this._wwFrameObserver = null;
 	this._toolbarObserver = null;
 	this._lineBreakDir = null;
 	this._lineBreakComp = null;
@@ -587,6 +587,7 @@ EventManager.prototype = {
 	_addCommonEvents() {
 		const buttonsHandler = ButtonsHandler.bind(this);
 		const toolbarHandler = OnClick_toolbar.bind(this);
+
 		/** menu event */
 		this.addEvent(this.context.get('menuTray'), 'mousedown', buttonsHandler, false);
 		this.addEvent(this.context.get('menuTray'), 'click', OnClick_menuTray.bind(this), true);
@@ -608,7 +609,7 @@ EventManager.prototype = {
 			this._toolbarObserver = new _w.ResizeObserver(() => {
 				this.toolbar.resetResponsiveToolbar();
 			});
-			this._resizeObserver = new _w.ResizeObserver((entries) => {
+			this._wwFrameObserver = new _w.ResizeObserver((entries) => {
 				entries.forEach((e) => {
 					this.editor.__callResizeFunction(this.editor.frameRoots.get(e.target.getAttribute('data-root-key')), -1, e);
 				});
@@ -630,6 +631,7 @@ EventManager.prototype = {
 		const wwClickEvent = OnClick_wysiwyg.bind(this, fc);
 		this.addEvent(eventWysiwyg, 'mousedown', wwMouseDown, false);
 		this.addEvent(eventWysiwyg, 'click', wwClickEvent, false);
+		this.addEvent(eventWysiwyg, 'mouseleave', OnMouseLeave_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'input', OnInput_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'keydown', OnKeyDown_wysiwyg.bind(this, fc), false);
 		this.addEvent(eventWysiwyg, 'keyup', OnKeyUp_wysiwyg.bind(this, fc), false);
@@ -700,9 +702,9 @@ EventManager.prototype = {
 
 		this._events = [];
 
-		if (this._resizeObserver) {
-			this._resizeObserver.disconnect();
-			this._resizeObserver = null;
+		if (this._wwFrameObserver) {
+			this._wwFrameObserver.disconnect();
+			this._wwFrameObserver = null;
 		}
 
 		if (this._toolbarObserver) {
@@ -890,7 +892,7 @@ function OnMouseDown_wysiwyg(frameContext, e) {
 	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown({ frameContext, event: e }) === false) return;
 
 	// plugin event
-	if (this._callPluginEvent('onMouseDown', { event: e }) === false) return;
+	if (this._callPluginEvent('onMouseDown', { frameContext, event: e }) === false) return;
 
 	if (this.editor.isBalloon) {
 		this._hideToolbar();
@@ -917,7 +919,7 @@ function OnClick_wysiwyg(frameContext, e) {
 	// user event
 	if (typeof this.events.onClick === 'function' && this.events.onClick({ frameContext, event: e }) === false) return;
 	// plugin event
-	if (this._callPluginEvent('onClick', { event: e }) === false) return;
+	if (this._callPluginEvent('onClick', { frameContext, event: e }) === false) return;
 
 	const fileComponentInfo = this.component.get(targetElement);
 	if (fileComponentInfo) {
@@ -969,6 +971,14 @@ function OnClick_wysiwyg(frameContext, e) {
 	if (this.editor.isBalloon || this.editor.isSubBalloon) setTimeout(this._toggleToolbarBalloon.bind(this));
 }
 
+function OnMouseLeave_wysiwyg(frameContext, e) {
+	frameContext.get('lineBreaker').style.display = 'none';
+	// user event
+	if (typeof this.events.onMouseLeave === 'function' && this.events.onMouseLeave({ frameContext, event: e }) === false) return;
+	// plugin event
+	if (this._callPluginEvent('onMouseLeave', { frameContext, event: e }) === false) return;
+}
+
 function OnInput_wysiwyg(frameContext, e) {
 	if (frameContext.get('isReadOnly') || frameContext.get('isDisabled')) {
 		e.preventDefault();
@@ -988,7 +998,7 @@ function OnInput_wysiwyg(frameContext, e) {
 	// user event
 	if (typeof this.events.onInput === 'function' && this.events.onInput({ frameContext, event: e, data }) === false) return;
 	// plugin event
-	if (this._callPluginEvent('onInput', { event: e, data }) === false) return;
+	if (this._callPluginEvent('onInput', { frameContext, event: e, data }) === false) return;
 
 	this.history.push(true);
 }
@@ -1037,7 +1047,7 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 	let rangeEl = this.format.getBlock(formatEl, null);
 
 	// plugin event
-	if (this._callPluginEvent('onKeyDown', { event: e, range, line: formatEl }) === false) return;
+	if (this._callPluginEvent('onKeyDown', { frameContext, event: e, range, line: formatEl }) === false) return;
 
 	switch (keyCode) {
 		case 8 /** backspace key */:
@@ -1846,7 +1856,7 @@ function OnKeyUp_wysiwyg(frameContext, e) {
 	// user event
 	if (typeof this.events.onKeyUp === 'function' && this.events.onKeyUp({ frameContext, event: e }) === false) return;
 	// plugin event
-	if (this._callPluginEvent('onKeyUp', { event: e, range, line: formatEl }) === false) return;
+	if (this._callPluginEvent('onKeyUp', { frameContext, event: e, range, line: formatEl }) === false) return;
 
 	if (!ctrl && !alt && !HISTORY_IGNORE_KEYCODE.test(keyCode)) {
 		this.history.push(true);
@@ -1927,7 +1937,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 		// user event
 		if (typeof this.events.onFocus === 'function') this.events.onFocus({ frameContext, event: e });
 		// plugin event
-		this._callPluginEvent('onFocus', { event: e });
+		this._callPluginEvent('onFocus', { frameContext, event: e });
 	});
 }
 
@@ -1954,7 +1964,7 @@ function OnBlur_wysiwyg(frameContext, e) {
 	// user event
 	if (typeof this.events.onBlur === 'function') this.events.onBlur({ frameContext, event: e });
 	// plugin event
-	this._callPluginEvent('onBlur', { event: e });
+	this._callPluginEvent('onBlur', { frameContext, event: e });
 }
 
 function OnMouseMove_wysiwyg(frameContext, e) {
@@ -2007,7 +2017,7 @@ function OnMouseMove_wysiwyg(frameContext, e) {
 		}
 	}
 
-	this._callPluginEvent('onMouseMove', { event: e });
+	this._callPluginEvent('onMouseMove', { frameContext, event: e });
 }
 
 function OnMouseDown_statusbar(e) {

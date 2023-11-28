@@ -413,6 +413,13 @@ Table.prototype = {
 
 	/**
 	 * @override core
+	 */
+	onMouseLeave() {
+		this.__hideResizeLine();
+	},
+
+	/**
+	 * @override core
 	 * @param {any} event Event object
 	 * @param {any} range range object
 	 * @param {Element} line Current line element
@@ -1649,7 +1656,7 @@ Table.prototype = {
 			const cellAlignment = cell_alignment.getAttribute('se-cell-align') || '';
 			const borderColor = isNoneFormat ? '' : border_color.value.trim() || '';
 			let borderWidth = isNoneFormat ? '' : border_width.value.trim() || '';
-			borderWidth = numbers.is(borderWidth) ? borderWidth + DEFAULT_BORDER_UNIT : borderWidth;
+			borderWidth = borderWidth + (numbers.is(borderWidth) ? DEFAULT_BORDER_UNIT : '');
 			const backColor = back_color.value.trim();
 			const hasBorder = hasFormat && !isNoneFormat && borderWidth;
 			const borderCss = `${borderWidth} ${borderStyle} ${borderColor}`;

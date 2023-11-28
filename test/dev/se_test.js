@@ -8,9 +8,9 @@ import Katex from 'katex';
 require('katex/dist/katex.css');
 
 // codemirror6
-// import { EditorView, basicSetup, minimalSetup } from 'codemirror';
-// import { javascript } from '@codemirror/lang-javascript';
-// import { html } from '@codemirror/lang-html';
+import { EditorView, basicSetup, minimalSetup } from 'codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { html } from '@codemirror/lang-html';
 
 // // codemirror5
 // import Codemirror5 from 'codemirror5';
@@ -392,6 +392,7 @@ window.c = () => {
 			attributeWhitelist: { '*': 'class' },
 			// statusbar_container: '#root_statusbar_container',
 			// shortcutsHint: false,
+			// codemirror6
 			// codeMirror: {
 			// 	EditorView: EditorView,
 			// 	extensions: [
@@ -404,6 +405,7 @@ window.c = () => {
 			// 	],
 			// 	minimalSetup: minimalSetup
 			// },
+			// codemirror5
 			// codeMirror: {
 			// 	src: Codemirror5
 			// },

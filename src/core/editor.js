@@ -1210,7 +1210,7 @@ Editor.prototype = {
 			this.applyFrameRoots((e) => {
 				if (typeof this._resourcesStateChange !== 'function') return;
 				// observer
-				if (this.eventManager._resizeObserver) this.eventManager._resizeObserver.observe(e.get('wysiwygFrame'));
+				if (this.eventManager._wwFrameObserver) this.eventManager._wwFrameObserver.observe(e.get('wysiwygFrame'));
 				if (this.eventManager._toolbarObserver) this.eventManager._toolbarObserver.observe(e.get('_toolbarShadow'));
 				// resource state
 				this._resourcesStateChange(e);
@@ -1241,6 +1241,7 @@ Editor.prototype = {
 		this._onPluginEvents = new Map([
 			['onMouseMove', []],
 			['onMouseDown', []],
+			['onMouseLeave', []],
 			['onClick', []],
 			['onInput', []],
 			['onKeyDown', []],

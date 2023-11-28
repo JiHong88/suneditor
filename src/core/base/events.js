@@ -8,6 +8,7 @@ export default function () {
 		onMouseDown: null,
 		onClick: null,
 		onInput: null,
+		onMouseLeave: null,
 		onKeyDown: null,
 		onKeyUp: null,
 		onCopy: null,

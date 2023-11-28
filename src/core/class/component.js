@@ -198,6 +198,7 @@ Component.prototype = {
 		const yScroll = wysiwyg.scrollY || wysiwyg.scrollTop || 0;
 		const wScroll = wysiwyg.scrollX || wysiwyg.scrollLeft || 0;
 		const container = info.container;
+		const isNonSelected = domUtils.hasClass(container, 'se-non-select-figure');
 		const t_style = fc.get('lineBreaker_t').style;
 		const b_style = fc.get('lineBreaker_b').style;
 		const offsetTarget = container.offsetWidth < element.offsetWidth ? container : element;
@@ -214,7 +215,7 @@ Component.prototype = {
 
 			fc.get('lineBreaker_t').setAttribute('data-offset', componentTop - 12 + ',' + (this.offset.get(target).left + wScroll + w));
 			t_style.top = componentTop - yScroll - toolbarH - 12 + 'px';
-			t_style.left = this.offset.get(target).left + w + 'px';
+			t_style.left = (isNonSelected ? 0 : this.offset.get(target).left + w) + 'px';
 			t_style.display = 'block';
 		} else {
 			t_style.display = 'none';
@@ -232,7 +233,14 @@ Component.prototype = {
 				componentTop + target.offsetHeight - 12 + ',' + (this.offset.get(target).left + wScroll + target.offsetWidth - w - 24)
 			);
 			b_style.top = componentTop + target.offsetHeight - yScroll - toolbarH - 12 + 'px';
-			b_style.left = this.offset.get(target).left + target.offsetWidth - w - 24 + 'px';
+			if (isNonSelected) {
+				b_style.left = '';
+				b_style.right = '0px';
+			} else {
+				b_style.right = '';
+				b_style.right = '';
+				b_style.left = this.offset.get(target).left + target.offsetWidth - w - 24 + 'px';
+			}
 			b_style.display = 'block';
 		} else {
 			b_style.display = 'none';
