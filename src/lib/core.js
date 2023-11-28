@@ -1162,10 +1162,10 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
          * @returns {Node}
          */
         getSelectionNode: function () {
-            if (!context.element.wysiwyg.contains(this._variable._selectionNode)) this._editorRange();
+            if (!context.element.wysiwyg.contains(this._variable._selectionNode)) this._editorRange();
             if (!this._variable._selectionNode) {
                 const selectionNode = util.getChildElement(context.element.wysiwyg.firstChild, function (current) { return current.childNodes.length === 0 || current.nodeType === 3; }, false);
-                if (!selectionNode) {
+                if (!selectionNode) {
                     this._editorRange();
                 } else {
                     this._variable._selectionNode = selectionNode;
@@ -5660,7 +5660,7 @@ export default function (context, pluginCallButtons, plugins, lang, options, _re
 
         /**
          * @description Remove events from document.
-         * When created as an Iframe, the event of the document inside the Iframe is also removed.
+         * When created as an Iframe, the event of the document inside the Iframe is also removed.
          * @param {String} type Event type
          * @param {Function} listener Event listener
          */
