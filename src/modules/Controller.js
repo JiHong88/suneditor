@@ -128,6 +128,20 @@ Controller.prototype = {
 	 * @param {any} arguments controller elements, function..
 	 */
 	_controllerOn(form, target) {
+		const params = {
+			position: this.position,
+			form: form,
+			target: target,
+			inst: this
+		};
+
+		if (
+			typeof this.events.onBeforeShowController === 'function' &&
+			this.events.onBeforeShowController({ caller: this.kind, frameContext: this.editor.frameContext, params }) === false
+		) {
+			return;
+		}
+
 		form.style.display = 'block';
 		if (this._shadowRoot) {
 			form.addEventListener('mousedown', function (e) {
@@ -147,8 +161,9 @@ Controller.prototype = {
 		}
 
 		this.editor._antiBlur = true;
-		if (typeof this.events.onShowController === 'function')
-			this.events.onShowController({ caller: this.kind, elements: this.editor.opendControllers, frameContext: this.editor.frameContext });
+		if (typeof this.events.onShowController === 'function') {
+			this.events.onShowController({ caller: this.kind, frameContext: this.editor.frameContext, params });
+		}
 	},
 
 	/**

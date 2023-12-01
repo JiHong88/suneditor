@@ -33,6 +33,7 @@ export default function () {
 		 * @param {Object} core Core object
 		 */
 		onShowController: null,
+		onBeforeShowController: null,
 
 		/**
 		 * @description An event when toggling between code view and wysiwyg view.
