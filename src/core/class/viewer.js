@@ -12,7 +12,9 @@ const Viewer = function (editor) {
 	this.bodyOverflow = '';
 	this.editorAreaOriginCssText = '';
 	this.wysiwygOriginCssText = '';
+	this.codeWrapperOriginCssText = '';
 	this.codeOriginCssText = '';
+	this.codeNumberOriginCssText = '';
 	this.toolbarOriginCssText = '';
 	this.arrowOriginCssText = '';
 	this.fullScreenInnerHeight = 0;
@@ -123,7 +125,9 @@ Viewer.prototype = {
 		const toolbar = this.context.get('toolbar.main');
 		const editorArea = fc.get('wrapper');
 		const wysiwygFrame = fc.get('wysiwygFrame');
-		const codeFrame = fc.get('code');
+		const codeWrapper = fc.get('codeWrapper');
+		const code = fc.get('code');
+		const codeNumbers = fc.get('codeNumbers');
 		const isCodeView = this.editor.frameContext.get('isCodeView');
 		const arrow = this.context.get('toolbar._arrow');
 
@@ -134,7 +138,9 @@ Viewer.prototype = {
 			this._originCssText = topArea.style.cssText;
 			this.editorAreaOriginCssText = editorArea.style.cssText;
 			this.wysiwygOriginCssText = wysiwygFrame.style.cssText;
-			this.codeOriginCssText = codeFrame.style.cssText;
+			this.codeWrapperOriginCssText = codeWrapper.style.cssText;
+			this.codeOriginCssText = code.style.cssText;
+			this.codeNumberOriginCssText = codeNumbers?.style.cssText;
 			this.toolbarOriginCssText = toolbar.style.cssText;
 			if (arrow) this.arrowOriginCssText = arrow.style.cssText;
 
@@ -168,14 +174,24 @@ Viewer.prototype = {
 			this.bodyOverflow = this._d.body.style.overflow;
 			this._d.body.style.overflow = 'hidden';
 
+			// frame
 			editorArea.style.cssText = toolbar.style.cssText = '';
 			wysiwygFrame.style.cssText =
 				(wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] +
 				this.editor.frameOptions.get('_defaultStyles').editor +
 				(isCodeView ? 'display: none;' : '');
-			codeFrame.style.cssText =
-				(codeFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + (!isCodeView ? 'display: none !important;' : 'display: block !important;');
-			toolbar.style.width = wysiwygFrame.style.height = codeFrame.style.height = '100%';
+
+			// code wrapper
+			codeWrapper.style.cssText = (codeWrapper.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + `display: ${!isCodeView ? 'none' : 'flex'} !important;`;
+			codeWrapper.style.overflow = 'auto';
+			codeWrapper.style.height = '100%';
+
+			// code
+			code.style.height = '';
+			if (codeNumbers) codeNumbers.style.height = code.clientHeight;
+
+			// toolbar, editor area
+			toolbar.style.width = wysiwygFrame.style.height = '100%';
 			toolbar.style.position = 'relative';
 			toolbar.style.display = 'block';
 
@@ -195,16 +211,24 @@ Viewer.prototype = {
 				domUtils.addClass(e, 'active');
 			});
 		} else {
+			// frame
 			wysiwygFrame.style.cssText = this.wysiwygOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + (isCodeView ? 'display: none;' : '');
-			codeFrame.style.cssText =
-				this.codeOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + (!isCodeView ? 'display: none !important;' : 'display: block !important;');
+
+			// code wrapper
+			codeWrapper.style.cssText = this.codeWrapperOriginCssText.replace(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/, '') + `display: ${!isCodeView ? 'none' : 'flex'} !important;`;
+
+			// code
+			code.style.cssText = this.codeOriginCssText;
+			if (codeNumbers) codeNumbers.style.cssText = this.codeNumberOriginCssText;
+
+			// toolbar, editor area
 			toolbar.style.cssText = this.toolbarOriginCssText;
 			editorArea.style.cssText = this.editorAreaOriginCssText;
 			topArea.style.cssText = this._originCssText;
 			if (arrow) arrow.style.cssText = this.arrowOriginCssText;
 			this._d.body.style.overflow = this.bodyOverflow;
 
-			if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) this.editor._codeViewAutoHeight();
+			if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) this._codeViewAutoHeight(fc);
 
 			if (this.toolbarParent) {
 				this.toolbarParent.appendChild(toolbar);
@@ -544,38 +568,64 @@ Viewer.prototype = {
 		this._setCodeView(codeValue);
 	},
 
+	_codeViewAutoHeight(code, codeNumbers, isAuto) {
+		if (isAuto) code.style.height = code.scrollHeight + 'px';
+		this._updateLineNumbers(codeNumbers, code);
+	},
+
+	_updateLineNumbers(lineNumbers, code) {
+		if (!lineNumbers) return;
+
+		const lineHeight = GetLineHeight(lineNumbers);
+		const numberOfLinesNeeded = Math.ceil(code.scrollHeight / lineHeight);
+
+		const currentLineCount = (lineNumbers.value.match(/\n/g) || []).length;
+		if (numberOfLinesNeeded > currentLineCount) {
+			let n = '';
+			for (let i = currentLineCount + 1; i <= numberOfLinesNeeded; i++) {
+				n += `${i}\n`;
+			}
+			lineNumbers.value += n;
+		}
+	},
+
+	_scrollLineNumbers(codeNumbers) {
+		codeNumbers.scrollTop = this.scrollTop;
+		codeNumbers.scrollLeft = this.scrollLeft;
+	},
+
 	constructor: Viewer
 };
 
 function CreateLineNumbers(fc) {
-	const lineNumbers = fc.get('codeNumbers');
-	if (!lineNumbers) return;
+	const codeNumbers = fc.get('codeNumbers');
+	if (!codeNumbers) return;
 
-	// const lineHeight = GetLineHeight(lineNumbers);
-	// const numberOfLines = lineNumbers.scrollHeight / lineHeight;
+	const lineHeight = GetLineHeight(codeNumbers);
+	const numberOfLines = fc.get('code').scrollHeight / lineHeight;
 
 	let n = '';
-	for (let i = 1; i <= 10000; i++) {
+	for (let i = 1; i <= numberOfLines; i++) {
 		n += `${i}\n`;
 	}
 
 	const { padding, margin } = window.getComputedStyle(fc.get('code'));
-	lineNumbers.value = n;
-	lineNumbers.style.padding = padding || '';
-	lineNumbers.style.margin = margin || '';
+	codeNumbers.value = n;
+	codeNumbers.style.padding = padding || '';
+	codeNumbers.style.margin = margin || '';
 }
 
-// function GetLineHeight(textarea) {
-// 	let lineHeight = window.getComputedStyle(textarea).lineHeight;
+function GetLineHeight(textarea) {
+	let lineHeight = window.getComputedStyle(textarea).lineHeight;
 
-// 	if (!numbers.is(lineHeight)) {
-// 		const fontSize = window.getComputedStyle(textarea).fontSize;
-// 		lineHeight = numbers.get(fontSize) * 1.2;
-// 	} else {
-// 		lineHeight = numbers.get(lineHeight);
-// 	}
+	if (!numbers.is(lineHeight)) {
+		const fontSize = window.getComputedStyle(textarea).fontSize;
+		lineHeight = numbers.get(fontSize) * 1.2;
+	} else {
+		lineHeight = numbers.get(lineHeight);
+	}
 
-// 	return lineHeight;
-// }
+	return lineHeight;
+}
 
 export default Viewer;

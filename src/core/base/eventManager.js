@@ -669,11 +669,16 @@ EventManager.prototype = {
 		});
 
 		/** code view area auto line */
-		if (this.editor.frameOptions.get('height') === 'auto' && !this.options.get('hasCodeMirror')) {
-			const cvAuthHeight = this.editor._codeViewAutoHeight.bind(this.editor);
+		if (!this.options.get('hasCodeMirror')) {
+			const codeNumbers = fc.get('codeNumbers');
+			const cvAuthHeight = this.viewer._codeViewAutoHeight.bind(this.viewer, fc.get('code'), codeNumbers, this.editor.frameOptions.get('height') === 'auto');
+
 			this.addEvent(codeArea, 'keydown', cvAuthHeight, false);
 			this.addEvent(codeArea, 'keyup', cvAuthHeight, false);
 			this.addEvent(codeArea, 'paste', cvAuthHeight, false);
+
+			/** code view numbers */
+			if (codeNumbers) this.addEvent(codeArea, 'scroll', this.viewer._scrollLineNumbers.bind(codeArea, codeNumbers), false);
 		}
 
 		if (fc.has('statusbar')) this.__addStatusbarEvent(fc, fc.get('options'));

@@ -1174,11 +1174,6 @@ Editor.prototype = {
 		}
 	},
 
-	_codeViewAutoHeight() {
-		if (this.frameContext.get('isFullScreen')) return;
-		this.frameContext.get('code').style.height = this.frameContext.get('code').scrollHeight + 'px';
-	},
-
 	/**
 	 * @description Initializ editor
 	 * @private

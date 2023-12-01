@@ -413,6 +413,7 @@ window.c = () => {
 			// defaultLine: 'div',
 			toolbar_sticky: 0,
 			lineAttrReset: 'id',
+			// height: '300px',
 			buttonList: bl,
 			subToolbar: {
 				buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
