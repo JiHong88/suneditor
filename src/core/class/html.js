@@ -218,8 +218,15 @@ HTML.prototype = {
 
 				if (prev?.nodeType === 3 && a?.nodeType === 1) a = prev;
 				const offset = a.nodeType === 3 ? t.endOffset || a.textContent.length : a.childNodes.length;
-				if (rangeSelection) this.selection.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
-				else this.selection.setRange(a, offset, a, offset);
+
+				let range = null;
+				if (rangeSelection) {
+					range = this.selection.setRange(firstCon.container || firstCon, firstCon.startOffset || 0, a, offset);
+				} else {
+					range = this.selection.setRange(a, offset, a, offset);
+				}
+
+				this.scrollTo(range);
 			} catch (error) {
 				if (this.editor.frameContext.get('isReadOnly') || this.editor.frameContext.get('isDisabled')) return;
 				console.warn('[SUNEDITOR.html.insert.warn]', error.message);
@@ -240,6 +247,27 @@ HTML.prototype = {
 		this.editor.effectNode = null;
 		this.editor.focus();
 		this.history.push(false);
+	},
+
+	/**
+	 * @description Scroll to the corresponding selection or range position.
+	 * @param {Selection|Range|Node} ref selection or range object
+	 */
+	scrollTo(ref) {
+		if (ref instanceof Selection) {
+			ref = ref.getRangeAt(0);
+		} else if (ref instanceof Node) {
+			ref = this.selection.setRange(ref, 1, ref, 1);
+		} else if (!(ref instanceof Range)) {
+			console.warn('[SUNEDITOR.html.scrollTo.warn] "selectionRange" must be Selection or Range or Node object.', ref);
+		}
+
+		const rect = ref.getBoundingClientRect();
+		const isVisible = rect.top >= 0 && rect.bottom <= this.frameContext.get('wysiwygFrame').innerHeight;
+
+		if (isVisible) return;
+
+		range.startContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 	},
 
 	/**
@@ -905,11 +933,13 @@ HTML.prototype = {
 			if (!this.editor.frameContext.get('isCodeView')) {
 				const temp = domUtils.createElement('DIV', null, convertValue);
 				const children = temp.children;
-				for (let i = 0, len = children.length; i < len; i++) {
+				const len = children.length;
+				for (let i = 0; i < len; i++) {
 					if (!children[i]) continue;
 					this.editor.frameContext.get('wysiwyg').appendChild(children[i]);
 				}
 				this.history.push(false, rootKey[i]);
+				this.scrollTo(children[len - 1]);
 			} else {
 				this.viewer._setCodeView(this.viewer._getCodeView() + '\n' + this._convertToCode(convertValue, false));
 			}

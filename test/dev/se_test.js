@@ -413,7 +413,7 @@ window.c = () => {
 			// defaultLine: 'div',
 			toolbar_sticky: 0,
 			lineAttrReset: 'id',
-			// height: '300px',
+			height: '300px',
 			buttonList: bl,
 			subToolbar: {
 				buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
@@ -458,6 +458,10 @@ window.c = () => {
 		}
 	);
 };
+
+window.aaa = function() {
+	editor_root.html.insert('<p>aaaaaaaaa</p>')
+}
 
 window.r = () => {
 	window.editor_root.resetOptions({
