@@ -38,13 +38,12 @@ Menu.prototype = {
 	/**
 	 * @description Method for managing dropdown element.
 	 * You must add the "dropdown" element using the this method at custom plugin.
-	 * @param {Element|string} key Key string
+	 * @param {{key: string, type: string}} classObj Class object
 	 * @param {Element} menu Dropdown element
 	 */
-	initDropdownTarget(classObj, menu) {
-		const key = classObj.key;
+	initDropdownTarget({ key, type }, menu) {
 		if (key) {
-			if (!/free$/.test(classObj.type)) {
+			if (!/free$/.test(type)) {
 				menu.setAttribute('data-key', key);
 				this._dropdownCommands.push(key);
 			}

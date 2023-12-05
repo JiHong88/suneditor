@@ -267,7 +267,7 @@ HTML.prototype = {
 
 		if (isVisible) return;
 
-		range.startContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+		ref.startContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 	},
 
 	/**

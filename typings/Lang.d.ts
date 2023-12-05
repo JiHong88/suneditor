@@ -22,8 +22,8 @@ export interface Lang {
 	alignCenter: string;
 	alignJustify: string;
 	list: string;
-	orderList: string;
-	unorderList: string;
+	numberedList: string;
+	bulletedList: string;
 	horizontalLine: string;
 	hr_solid: string;
 	hr_dotted: string;

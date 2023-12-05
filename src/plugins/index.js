@@ -1,5 +1,7 @@
 // command
 import blockquote from './command/blockquote';
+import list_bulleted from './command/list_bulleted';
+import list_numbered from './command/list_numbered';
 import mention from './command/mention';
 
 // dropdown
@@ -28,5 +30,55 @@ import math from './modal/math';
 // file browser
 import imageGallery from './fileBrowser/imageGallery';
 
-export { blockquote, mention, align, font, fontSize, fontColor, backgroundColor, list, table, formatBlock, hr, layout, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };
-export default { blockquote, mention, align, font, fontSize, fontColor, backgroundColor, list, table, formatBlock, hr, layout, lineHeight, template, paragraphStyle, textStyle, link, image, video, audio, math, imageGallery };
+export {
+	blockquote,
+	list_bulleted,
+	list_numbered,
+	mention,
+	align,
+	font,
+	fontSize,
+	fontColor,
+	backgroundColor,
+	list,
+	table,
+	formatBlock,
+	hr,
+	layout,
+	lineHeight,
+	template,
+	paragraphStyle,
+	textStyle,
+	link,
+	image,
+	video,
+	audio,
+	math,
+	imageGallery
+};
+export default {
+	blockquote,
+	list_bulleted,
+	list_numbered,
+	mention,
+	align,
+	font,
+	fontSize,
+	fontColor,
+	backgroundColor,
+	list,
+	table,
+	formatBlock,
+	hr,
+	layout,
+	lineHeight,
+	template,
+	paragraphStyle,
+	textStyle,
+	link,
+	image,
+	video,
+	audio,
+	math,
+	imageGallery
+};

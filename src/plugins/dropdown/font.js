@@ -5,7 +5,7 @@ const Font = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.font;
-	this.icon = '<span class="txt">' + this.lang.font + '</span>' + this.icons.arrow_down;
+	this.inner = '<span class="txt">' + this.lang.font + '</span>' + this.icons.arrow_down;
 
 	// create HTML
 	const fontList = pluginOptions.items || ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'];

@@ -180,6 +180,24 @@ const bl = [
 	]
 ];
 
+const bb = [
+	['selectAll', 'newDocument', 'undo', 'redo', 'dir'],
+	['dir_ltr', 'dir_rtl'],
+	['font', 'fontSize', 'formatBlock'],
+	['paragraphStyle', 'blockquote'],
+	['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+	['fontColor', 'backgroundColor', 'textStyle'],
+	['removeFormat'],
+	'/',
+	['outdent', 'indent'],
+	['align', 'hr', 'list', 'list_numbered', 'list_bulleted', 'lineHeight'],
+	['table', 'link', 'image', 'video', 'audio', 'math'],
+	['imageGallery'],
+	['fullScreen', 'showBlocks', 'codeView'],
+	['preview', 'print'],
+	['save', 'template', 'layout']
+];
+
 const begContent = `
 <p><span class="__se__katex katex" data-se-value="\begin{Bmatrix}
 a &amp;amp;amp; b \\
@@ -385,7 +403,8 @@ window.c = () => {
 			// textDirection: 'rtl',
 			// value: 'Common value',
 			// editorStyle: 'font-size:40px',
-			value:`<figure class="se-non-select-figure se-scroll-figure-x"><table class="se-table-size-100 se-table-layout-auto" ><colgroup><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"></colgroup><tbody><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="1" rowspan="4"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td colspan="1" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure>`,
+			value: `<figure class="se-non-select-figure se-scroll-figure-x"><table class="se-table-size-100 se-table-layout-auto" ><colgroup><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"></colgroup><tbody><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="1" rowspan="4"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td colspan="1" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure>`,
+			value: '',
 			plugins: plugins,
 			allowedClassName: '.+',
 			toolbar_container: '#root_toolbar_container',
@@ -414,7 +433,7 @@ window.c = () => {
 			toolbar_sticky: 0,
 			lineAttrReset: 'id',
 			height: '300px',
-			buttonList: bl,
+			buttonList: bb,
 			subToolbar: {
 				buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
 				width: 'auto',
@@ -459,9 +478,9 @@ window.c = () => {
 	);
 };
 
-window.aaa = function() {
-	editor_root.html.insert('<p>aaaaaaaaa</p>')
-}
+window.aaa = function () {
+	editor_root.html.insert('<p>aaaaaaaaa</p>');
+};
 
 window.r = () => {
 	window.editor_root.resetOptions({
@@ -517,7 +536,7 @@ function loadEvent() {
 		return 'aaa';
 	};
 	window.editor_root.events.onBlur = async () => {
-		console.log("blurrrr")
+		console.log('blurrrr');
 	};
 }
 

@@ -67,9 +67,8 @@
 .sun-editor-common dl,
 .sun-editor-common ul,
 .sun-editor-common ol,
-.sun-editor-common menu,
-.sun-editor-common li {
-	list-style: none !important;
+.sun-editor-common menu {
+	list-style: none;
 }
 
 .sun-editor-common hr {
@@ -314,6 +313,32 @@
 	display: block;
 	text-align: center;
 	float: none;
+}
+.sun-editor button.se-side-btn-sub svg {
+	width: 8px;
+}
+
+/* side button */
+.sun-editor button.se-side-btn {
+	float: left;
+	border-radius: 2px 0 0 2px;
+	margin-right: 0;
+}
+.sun-editor button.se-side-btn-sub {
+	width: 18px;
+	margin-left: 0;
+	border-radius: 0 2px 2px 0;
+}
+
+/* list button icons */
+.sun-editor button.se-btn-list > * li::before {
+	content: '';
+	display: inline-block;
+	width: 18px;
+	height: 13px;
+	background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTE5LDEzSDVWMTFIMTlWMTNaIiAvPjwvc3ZnPg==');
+	background-size: cover;
+	opacity: 0.5;
 }
 
 /* close class icon */
@@ -756,6 +781,9 @@
 }
 .sun-editor .se-list-inner input {
 	border-radius: 0;
+}
+.sun-editor .se-list-inner ul.se-list-carrier li ol {
+	font-size: 10px;
 }
 
 /* dropdown layer - checked list */
@@ -2601,6 +2629,17 @@
 	text-align: right;
 	direction: rtl;
 	margin-left: 4px;
+}
+
+/* side button */
+.sun-editor.se-rtl button.se-side-btn {
+	float: right;
+	margin-left: 0;
+	border-radius: 0 2px 2px 0;
+}
+.sun-editor.se-rtl button.se-side-btn-sub {
+	margin-right: 0;
+	border-radius: 2px 0 0 2px;
 }
 
 /* button - se-menu-list */

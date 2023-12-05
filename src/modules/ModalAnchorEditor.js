@@ -1,6 +1,6 @@
 import EditorInjector from '../editorInjector';
 import SelectMenu from './SelectMenu';
-import { domUtils } from '../helper';
+import { domUtils, numbers } from '../helper';
 
 /**
  * @param {*} inst
@@ -29,6 +29,10 @@ const ModalAnchorEditor = function (inst, modalForm, params) {
 	this.relList = Array.isArray(params.relList) ? params.relList : [];
 	this.defaultRel = params.defaultRel || {};
 	this.noAutoPrefix = !!params.noAutoPrefix;
+	// file upload
+	this.uploadUrl = typeof params.uploadUrl === 'string' ? params.uploadUrl : null;
+	this.uploadHeaders = params.uploadHeaders || null;
+	this.uploadSizeLimit = /\d+/.test(params.uploadSizeLimit) ? numbers.get(params.uploadSizeLimit, 0) : null;
 
 	// create HTML
 	const forms = CreatetModalForm(inst.editor, params, this.relList);

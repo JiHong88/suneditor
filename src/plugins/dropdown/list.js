@@ -5,7 +5,7 @@ const List = function (editor) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
 	this.title = this.lang.list;
-	this.icon = 'list_number';
+	this.icon = 'list_numbered';
 
 	// create HTML
 	const menu = CreateHTML(editor);
@@ -13,8 +13,8 @@ const List = function (editor) {
 	// members
 	this.listItems = menu.querySelectorAll('li button');
 	this.icons = {
-		bullets: editor.icons.list_bullets,
-		number: editor.icons.list_number
+		bulleted: editor.icons.list_bulleted,
+		numbered: editor.icons.list_numbered
 	};
 
 	// init
@@ -32,22 +32,22 @@ List.prototype = {
 		const icon = target.firstElementChild;
 
 		if (domUtils.isList(element)) {
-			const nodeName = /^OL$/i.test(element.nodeName) ? 'numbered' : 'bullet';
+			const nodeName = element.nodeName.toLowerCase();
 			target.setAttribute('data-focus', nodeName);
 			domUtils.addClass(target, 'active');
 
-			if (/UL/i.test(nodeName)) {
-				domUtils.changeElement(icon, this.icons.bullets);
+			if (/^ul$/.test(nodeName)) {
+				domUtils.changeElement(icon, this.icons.bulleted);
 			} else {
-				domUtils.changeElement(icon, this.icons.number);
+				domUtils.changeElement(icon, this.icons.numbered);
 			}
 
 			return true;
-		} else {
-			target.removeAttribute('data-focus');
-			domUtils.changeElement(icon, this.icons.number);
-			domUtils.removeClass(target, 'active');
 		}
+
+		target.removeAttribute('data-focus');
+		domUtils.changeElement(icon, this.icons.number);
+		domUtils.removeClass(target, 'active');
 
 		return false;
 	},
@@ -74,7 +74,7 @@ List.prototype = {
 	action(target) {
 		const command = target.getAttribute('data-command');
 		const type = target.getAttribute('data-value') || '';
-		const range = this.format.applyList(command + ':' + type, null, false);
+		const range = this.format.applyList(`${command}:${type}`, null, false);
 		if (range) this.selection.setRange(range.sc, range.so, range.ec, range.eo);
 
 		this.menu.dropdownOff();
@@ -89,13 +89,13 @@ function CreateHTML({ lang, icons }) {
 	<div class="se-list-inner">
 		<ul class="se-list-basic">
 			<li>
-				<button type="button" class="se-btn se-btn-list se-tooltip se-icon-flip-rtl" data-command="numbered" title="${lang.orderList}" aria-label="${lang.orderList}">
-					${icons.list_number}
+				<button type="button" class="se-btn se-btn-list se-tooltip se-icon-flip-rtl" data-command="ol" title="${lang.numberedList}" aria-label="${lang.numberedList}">
+					${icons.list_numbered}
 				</button>
 			</li>
 			<li>
-				<button type="button" class="se-btn se-btn-list se-tooltip se-icon-flip-rtl" data-command="bullet" title="${lang.unorderList}" aria-label="${lang.unorderList}">
-					${icons.list_bullets}
+				<button type="button" class="se-btn se-btn-list se-tooltip se-icon-flip-rtl" data-command="ul" title="${lang.bulletedList}" aria-label="${lang.bulletedList}">
+					${icons.list_bulleted}
 				</button>
 			</li>
 		</ul>

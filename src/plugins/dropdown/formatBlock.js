@@ -5,7 +5,7 @@ const FormatBlock = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.formats;
-	this.icon = '<span class="txt">' + this.lang.formats + '</span>' + this.icons.arrow_down;
+	this.inner = '<span class="txt">' + this.lang.formats + '</span>' + this.icons.arrow_down;
 
 	// create HTML
 	const menu = CreateHTML(editor, pluginOptions.items);

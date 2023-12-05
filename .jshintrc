@@ -19,6 +19,9 @@
     "laxbreak": true,
     "globals": {
         "ActiveXObject": true,
-        "window": true
+        "window": true,
+        "Selection": true,
+        "Node": true,
+        "Range": true
     }
 }

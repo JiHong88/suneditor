@@ -953,14 +953,21 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 
 export function UpdateButton(element, plugin, icons, lang, shortcut) {
 	if (!element) return;
+
 	element.innerHTML =
-		(icons[plugin.icon] || plugin.icon || '<span class="se-icon-text">!</span>') +
+		(plugin.inner || icons[plugin.icon] || plugin.icon || '<span class="se-icon-text">!</span>') +
 		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
 		(lang[plugin.title] || plugin.title) +
 		'</span></span>';
 	element.setAttribute('aria-label', plugin.title);
+
 	if (plugin.type) element.setAttribute('data-type', plugin.type);
 	if (plugin.className) element.className += ' ' + plugin.className;
+	if (plugin.sideButton) {
+		element.parentElement.appendChild(plugin.sideButton);
+		domUtils.addClass(element, 'se-side-btn');
+		domUtils.addClass(plugin.sideButton, 'se-side-btn-sub');
+	}
 
 	const tooptip = element.querySelector('.se-tooltip-text');
 	if (!shortcut || !tooptip) return;

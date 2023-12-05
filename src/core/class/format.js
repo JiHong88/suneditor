@@ -661,12 +661,12 @@ Format.prototype = {
 
 	/**
 	 * @description Append all selected format Element to the list and insert.
-	 * @param {string} type List type. (bullet | numbered):[listStyleType]
+	 * @param {string} type List type. (ol | ul):[listStyleType]
 	 * @param {Element} selectedCells Format elements or list cells.
 	 * @param {boolean} nested If true, indenting existing list cells.
 	 */
 	applyList(type, selectedCells, nested) {
-		const listTag = type.split(':')[0] === 'bullet' ? 'UL' : 'OL';
+		const listTag = (type.split(':')[0] || 'ol').toUpperCase();
 		const listStyle = type.split(':')[1] || '';
 
 		let range = this.selection.getRange();
@@ -705,13 +705,7 @@ Format.prototype = {
 		let isRemove = true;
 
 		for (let i = 0, len = selectedFormats.length; i < len; i++) {
-			if (
-				!domUtils.isList(
-					this.getBlock(selectedFormats[i], (current) => {
-						return this.getBlock(current) && current !== selectedFormats[i];
-					})
-				)
-			) {
+			if (!domUtils.isList(this.getBlock(selectedFormats[i], (current) => this.getBlock(current) && current !== selectedFormats[i]))) {
 				isRemove = false;
 				break;
 			}
@@ -1814,7 +1808,7 @@ Format.prototype = {
 					lastCell = lastCell.nextElementSibling;
 				}
 			}
-			range = this.applyList((/^OL$/i.test(originList.nodeName) ? 'numbered' : 'bullet') + ':' + originList.style.listStyleType, selectedCells, true);
+			range = this.applyList(originList.nodeName + ':' + originList.style.listStyleType, selectedCells, true);
 		} else {
 			let innerList = domUtils.createElement(originList.nodeName);
 			let prev = selectedCells[0].previousElementSibling;
