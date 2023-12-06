@@ -1783,6 +1783,23 @@ const util = {
         }.bind(this));
     },
 
+	/**
+	 * @description Escape a string for safe use in regular expressions.
+	 * @param {String} string String to escape
+	 * @returns {String}
+	 */
+	escapeStringRegexp: function (string) {
+		if (typeof string !== 'string') {
+			throw new TypeError('Expected a string');
+		}
+	
+		// Escape characters with special meaning either inside or outside character sets.
+		// Use a simple backslash escape when it’s always valid, and a `\xnn` escape when the simpler form would be disallowed by Unicode patterns’ stricter grammar.
+		return string
+			.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
+			.replace(/-/g, '\\x2d');
+	},
+
     _isExcludeSelectionElement: function (element) {
         return !/FIGCAPTION/i.test(element.nodeName) && (this.isComponent(element) || /FIGURE/i.test(element.nodeName));
     },
