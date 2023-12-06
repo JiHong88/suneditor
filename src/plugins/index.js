@@ -1,5 +1,6 @@
 // command
 import blockquote from './command/blockquote';
+import fileUpload from './command/fileUpload';
 import list_bulleted from './command/list_bulleted';
 import list_numbered from './command/list_numbered';
 import mention from './command/mention';
@@ -32,6 +33,7 @@ import imageGallery from './fileBrowser/imageGallery';
 
 export {
 	blockquote,
+	fileUpload,
 	list_bulleted,
 	list_numbered,
 	mention,
@@ -58,6 +60,7 @@ export {
 };
 export default {
 	blockquote,
+	fileUpload,
 	list_bulleted,
 	list_numbered,
 	mention,

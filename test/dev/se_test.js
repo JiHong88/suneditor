@@ -195,7 +195,7 @@ const bb = [
 	['imageGallery'],
 	['fullScreen', 'showBlocks', 'codeView'],
 	['preview', 'print'],
-	['save', 'template', 'layout']
+	['save', 'template', 'layout', 'fileUpload']
 ];
 
 const begContent = `

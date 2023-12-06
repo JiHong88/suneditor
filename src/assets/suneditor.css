@@ -782,6 +782,10 @@
 .sun-editor .se-list-inner input {
 	border-radius: 0;
 }
+.sun-editor .se-list-inner ul.se-list-carrier {
+	width: 165px;
+	height: 52px;
+}
 .sun-editor .se-list-inner ul.se-list-carrier li ol {
 	font-size: 10px;
 }

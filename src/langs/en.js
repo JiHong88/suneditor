@@ -54,6 +54,7 @@
 		dir_ltr: 'Left to right',
 		dir_rtl: 'Right to left',
 		edit: 'Edit',
+		fileUpload: 'File upload',
 		fixedColumnWidth: 'Fixed column width',
 		font: 'Font',
 		fontColor: 'Font color',
