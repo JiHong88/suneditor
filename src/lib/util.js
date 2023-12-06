@@ -38,7 +38,7 @@ const util = {
      * @private
      */
     _HTMLConvertor: function (contents) {
-        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&apos;', '"': '&quot;', '<': '&lt;', '>': '&gt;'};
+        const ec = {'&': '&amp;', '\u00A0': '&nbsp;', '\'': '&apos;', '"': '&quot;', '<': '&lt;', '>': '&gt;'};
         return contents.replace(/&|\u00A0|'|"|<|>/g, function (m) {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
@@ -170,7 +170,7 @@ const util = {
      * @returns {String}
      */
     HTMLEncoder: function (contents) {
-        const ec = {'<': '$lt;', '>': '$gt;'};
+        const ec = {'<': '$lt;', '>': '$gt;'};
         return contents.replace(/<|>/g, function (m) {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
@@ -184,7 +184,7 @@ const util = {
      * @returns {String}
      */
     HTMLDecoder: function (contents) {
-        const ec = {'$lt;': '<', '$gt;': '>'};
+        const ec = {'$lt;': '<', '$gt;': '>'};
         return contents.replace(/\$lt;|\$gt;/g, function (m) {
             return (typeof ec[m] === 'string') ? ec[m] : m;
         });
