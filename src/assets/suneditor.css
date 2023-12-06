@@ -314,18 +314,35 @@
 	text-align: center;
 	float: none;
 }
-.sun-editor button.se-side-btn-sub svg {
+.sun-editor button.se-arrow-icon {
+	width: 18px;
+}
+.sun-editor button.se-arrow-icon svg {
 	width: 8px;
 }
 
 /* side button */
 .sun-editor button.se-side-btn {
+	border-radius: 0;
+	margin-left: 0;
+	margin-right: 0;
+}
+.sun-editor button.se-side-btn-a {
 	float: left;
 	border-radius: 2px 0 0 2px;
 	margin-right: 0;
 }
-.sun-editor button.se-side-btn-sub {
-	width: 18px;
+.sun-editor button.se-side-btn-b {
+	float: left;
+	border-radius: 0 2px 2px 0;
+	margin-left: 0;
+}
+.sun-editor button.se-side-btn-before {
+	float: left;
+	margin-right: 0;
+	border-radius: 2px 0 0 2px;
+}
+.sun-editor button.se-side-btn-after {
 	margin-left: 0;
 	border-radius: 0 2px 2px 0;
 }
@@ -2638,12 +2655,25 @@
 /* side button */
 .sun-editor.se-rtl button.se-side-btn {
 	float: right;
+}
+.sun-editor.se-rtl button.se-side-btn-b {
+	float: right;
+	margin-right: 0;
+	border-radius: 2px 0 0 2px;
+}
+.sun-editor.se-rtl button.se-side-btn-a {
+	float: right;
 	margin-left: 0;
 	border-radius: 0 2px 2px 0;
 }
-.sun-editor.se-rtl button.se-side-btn-sub {
+.sun-editor.se-rtl button.se-side-btn-after {
 	margin-right: 0;
 	border-radius: 2px 0 0 2px;
+}
+.sun-editor.se-rtl button.se-side-btn-before {
+	float: right;
+	margin-left: 0;
+	border-radius: 0 2px 2px 0;
 }
 
 /* button - se-menu-list */

@@ -963,10 +963,22 @@ export function UpdateButton(element, plugin, icons, lang, shortcut) {
 
 	if (plugin.type) element.setAttribute('data-type', plugin.type);
 	if (plugin.className) element.className += ' ' + plugin.className;
-	if (plugin.sideButton) {
-		element.parentElement.appendChild(plugin.sideButton);
-		domUtils.addClass(element, 'se-side-btn');
-		domUtils.addClass(plugin.sideButton, 'se-side-btn-sub');
+
+	// side button
+	if (plugin.afterButton) {
+		element.parentElement.appendChild(plugin.afterButton);
+		domUtils.addClass(element, 'se-side-btn-a');
+		domUtils.addClass(plugin.afterButton, 'se-side-btn-after');
+	}
+	if (plugin.beforeButton) {
+		element.parentElement.insertBefore(plugin.beforeButton, element);
+		if (plugin.afterButton) {
+			domUtils.addClass(element, 'se-side-btn');
+			domUtils.removeClass(element, 'se-side-btn-a');
+		} else {
+			domUtils.addClass(element, 'se-side-btn-b');
+		}
+		domUtils.addClass(plugin.beforeButton, 'se-side-btn-before');
 	}
 
 	const tooptip = element.querySelector('.se-tooltip-text');
