@@ -32,6 +32,7 @@ const Audio_ = function (editor, pluginOptions) {
 	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
 	this.fileManager = new FileManager(this, {
 		tagNames: ['audio'],
+		loadHandler: this.events.onAudioLoad,
 		eventHandler: this.events.onAudioAction,
 		checkHandler: FileCheckHandler.bind(this),
 		figure: null
@@ -133,7 +134,7 @@ Audio_.prototype = {
 	},
 
 	/**
-	 * @override component
+	 * @override component, fileManager
 	 * @description Called when a container is selected.
 	 * @param {Element} element Target element
 	 */

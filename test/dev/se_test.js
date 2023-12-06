@@ -332,150 +332,162 @@ const mode = ['inline', 'balloon-always', 'balloon', 'classic'][1];
 // 	buttonList: bl
 // });
 
-window.c = () => {
-	window.editor_root = suneditor.create(
-		document.querySelector('#multi_editor_1'),
-		// {
-		// 	editor1: {
-		// 		target: document.querySelector('#multi_editor_1'),
-		// 		options: {
-		// 			value: `
-		// 			<p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
+window.editor_root = suneditor.create(
+	document.querySelector('#multi_editor_1'),
+	// {
+	// 	editor1: {
+	// 		target: document.querySelector('#multi_editor_1'),
+	// 		options: {
+	// 			value: `
+	// 			<p><a href="http://localhost:8088/dsa">http://localhost:808</a></p>
 
-		// 			<p>ed1</p>
+	// 			<p>ed1</p>
 
-		// 			<hr class="__se__solid">
+	// 			<hr class="__se__solid">
 
-		// 			<p><br>
-		// 			</p>
+	// 			<p><br>
+	// 			</p>
 
-		// 			<p>ed2</p>
+	// 			<p>ed2</p>
 
-		// 			<div class="se-component se-image-container __se__float-none">
-		// 			<figure>
-		// 				<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
-		// 			</figure>
-		// 			</div>
+	// 			<div class="se-component se-image-container __se__float-none">
+	// 			<figure>
+	// 				<img src="http://suneditor.com/docs/cat.jpg" alt="Tabby" data-se-size="auto,auto" data-se-file-name="cat.jpg" data-se-file-size="0" style="" data-se-index="0">
+	// 			</figure>
+	// 			</div>
 
-		// 			<p>ed3</p>
+	// 			<p>ed3</p>
 
-		// 			<p>ed4</p>
+	// 			<p>ed4</p>
 
-		// 			<p>edend--</p>
+	// 			<p>edend--</p>
 
-		// 			<div>					</div>
+	// 			<div>					</div>
 
-		// 			`,
-		// 			placeholder: 'place1',
-		// 			height: '400px',
-		// 			width: '500px',
-		// 			iframe: true,
-		// 			// iframe_fullPage: true,
-		// 			statusbar: true,
-		// 			statusbar_resizeEnable: true
-		// 		}
-		// 	},
-		// 	editor2: {
-		// 		target: document.querySelector('#multi_editor_2'),
-		// 		options: {
-		// 			value: '<p>ed2</p>',
-		// 			placeholder: 'place21'
-		// 		}
-		// 	},
-		// 	editor3: {
-		// 		target: document.querySelector('#multi_editor_3'),
-		// 		options: {
-		// 			value: '<p>ed3</p>',
-		// 			placeholder: 'place3'
-		// 		}
-		// 	},
-		// 	editor4: {
-		// 		target: document.querySelector('#multi_editor_4'),
-		// 		options: {
-		// 			// value: '<p>ed4</p>',
-		// 			placeholder: 'place4'
-		// 		}
-		// 	}
+	// 			`,
+	// 			placeholder: 'place1',
+	// 			height: '400px',
+	// 			width: '500px',
+	// 			iframe: true,
+	// 			// iframe_fullPage: true,
+	// 			statusbar: true,
+	// 			statusbar_resizeEnable: true
+	// 		}
+	// 	},
+	// 	editor2: {
+	// 		target: document.querySelector('#multi_editor_2'),
+	// 		options: {
+	// 			value: '<p>ed2</p>',
+	// 			placeholder: 'place21'
+	// 		}
+	// 	},
+	// 	editor3: {
+	// 		target: document.querySelector('#multi_editor_3'),
+	// 		options: {
+	// 			value: '<p>ed3</p>',
+	// 			placeholder: 'place3'
+	// 		}
+	// 	},
+	// 	editor4: {
+	// 		target: document.querySelector('#multi_editor_4'),
+	// 		options: {
+	// 			// value: '<p>ed4</p>',
+	// 			placeholder: 'place4'
+	// 		}
+	// 	}
+	// },
+	{
+		// mode: "inline",
+		// toolbar_width: 300,
+		// textDirection: 'rtl',
+		// value: 'Common value',
+		// editorStyle: 'font-size:40px',
+		value: `<figure class="se-non-select-figure se-scroll-figure-x"><table class="se-table-size-100 se-table-layout-auto" ><colgroup><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"></colgroup><tbody><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="1" rowspan="4"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td colspan="1" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure>`,
+		value: `<p>sadas<br></p><p>dsads<a href="http://localhost:3000/public/files/d5d13802a01dd4dea399c912f7b31e5e.png" download="1571311368279.png" name="1571311368279.png">1571311368279.png</a>​<br></p><div class="se-component se-image-container __se__float-none"><figure><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" style="" data-se-index="4" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="640,423"></figure></div>`,
+		plugins: plugins,
+		allowedClassName: '.+',
+		toolbar_container: '#root_toolbar_container',
+		attributeWhitelist: { '*': 'class' },
+		// statusbar_container: '#root_statusbar_container',
+		// shortcutsHint: false,
+		// codemirror6
+		// codeMirror: {
+		// 	EditorView: EditorView,
+		// 	extensions: [
+		// 		basicSetup,
+		// 		html({
+		// 			matchClosingTags: true,
+		// 			autoCloseTags: true
+		// 		}),
+		// 		javascript()
+		// 	],
+		// 	minimalSetup: minimalSetup
 		// },
-		{
-			// mode: "inline",
-			// toolbar_width: 300,
-			// textDirection: 'rtl',
-			// value: 'Common value',
-			// editorStyle: 'font-size:40px',
-			value: `<figure class="se-non-select-figure se-scroll-figure-x"><table class="se-table-size-100 se-table-layout-auto" ><colgroup><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"></colgroup><tbody><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="1" rowspan="4"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td colspan="1" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure>`,
-			value: '',
-			plugins: plugins,
-			allowedClassName: '.+',
-			toolbar_container: '#root_toolbar_container',
-			attributeWhitelist: { '*': 'class' },
-			// statusbar_container: '#root_statusbar_container',
-			// shortcutsHint: false,
-			// codemirror6
-			// codeMirror: {
-			// 	EditorView: EditorView,
-			// 	extensions: [
-			// 		basicSetup,
-			// 		html({
-			// 			matchClosingTags: true,
-			// 			autoCloseTags: true
-			// 		}),
-			// 		javascript()
-			// 	],
-			// 	minimalSetup: minimalSetup
-			// },
-			// codemirror5
-			// codeMirror: {
-			// 	src: Codemirror5
-			// },
-			iframe: false,
-			// defaultLine: 'div',
-			toolbar_sticky: 0,
-			lineAttrReset: 'id',
-			height: '300px',
-			buttonList: bb,
-			subToolbar: {
-				buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
-				width: 'auto',
-				mode: 'balloon' // balloon, balloon-always, balloon-block
+		// codemirror5
+		// codeMirror: {
+		// 	src: Codemirror5
+		// },
+		iframe: false,
+		// defaultLine: 'div',
+		toolbar_sticky: 0,
+		lineAttrReset: 'id',
+		height: '300px',
+		buttonList: bb,
+		subToolbar: {
+			buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
+			width: 'auto',
+			mode: 'balloon' // balloon, balloon-always, balloon-block
+		},
+		shortcuts: {
+			bold: ['s75', 'K'],
+			italic: [],
+			image: ['73', 'I'],
+			list: ['76', 'L']
+		},
+		math: {
+			katex: {
+				src: Katex
 			},
-			shortcuts: {
-				bold: ['s75', 'K'],
-				italic: [],
-				image: ['73', 'I'],
-				list: ['76', 'L']
-			},
-			math: {
-				katex: {
-					src: Katex
+			fontSizeList: [
+				{
+					text: '1',
+					value: '1em'
 				},
-				fontSizeList: [
-					{
-						text: '1',
-						value: '1em'
-					},
-					{
-						text: '1.5',
-						value: '1.5em'
-					}
-				]
+				{
+					text: '1.5',
+					value: '1.5em'
+				}
+			]
+		},
+		imageGallery: {
+			url: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo'
+		},
+		image: {
+			uploadUrl: 'http://localhost:3000/editor/upload'
+		},
+		table: {
+			scrollType: 'x',
+			cellControllerPosition: 'cell'
+		},
+		fontColor: {
+			disableHEXInput: true,
+			items: [{ name: 'red', value: '#ff0000' }, '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000']
+		},
+		fileUpload: {
+			uploadUrl: 'http://localhost:3000/editor/upload'
+		},
+		events: {
+			onFileAction: (data) => {
+				console.log('fileaa', data);
 			},
-			imageGallery: {
-				url: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo'
-			},
-			image: {
-				uploadUrl: 'http://localhost:3000/editor/upload'
-			},
-			table: {
-				scrollType: 'x',
-				cellControllerPosition: 'cell'
-			},
-			fontColor: {
-				disableHEXInput: true,
-				items: [{ name: 'red', value: '#ff0000' }, '#ff5e00', '#ffe400', '#abf200', '#00d8ff', '#0055ff', '#6600ff', '#ff00dd', '#000000']
-			}
 		}
-	);
+	}
+);
+
+editor_root.onload = () => {
+	// editor_root.events.onFileAction = () => {
+	// 	console.log('arguems', arguments);
+	// };
 };
 
 window.aaa = function () {
@@ -493,8 +505,6 @@ window.r = () => {
 window.d = () => {
 	// window.editor_root = window.editor_root.destroy()
 };
-
-c();
 
 function delay(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms));

@@ -1054,9 +1054,9 @@ Editor.prototype = {
 	 * @description Check the components such as image and video and modify them according to the format.
 	 * @private
 	 */
-	_checkComponents() {
+	_checkComponents(loaded) {
 		for (let i = 0, len = this._fileInfoPluginsCheck.length; i < len; i++) {
-			this._fileInfoPluginsCheck[i]();
+			this._fileInfoPluginsCheck[i](loaded);
 		}
 	},
 
@@ -1194,7 +1194,7 @@ Editor.prototype = {
 
 		this._componentsInfoInit = false;
 		this._componentsInfoReset = false;
-		this._checkComponents();
+		this._checkComponents(true);
 
 		this.eventManager._addCommonEvents();
 
@@ -1246,6 +1246,7 @@ Editor.prototype = {
 		]);
 		this._fileManager.tags = [];
 		this._fileManager.pluginMap = {};
+		this._fileManager.tagAttrs = {};
 
 		const plugins = this.plugins;
 		const isArray = Array.isArray;
@@ -1266,8 +1267,12 @@ Editor.prototype = {
 					const tagNames = fm.tagNames;
 					this._fileManager.tags = this._fileManager.tags.concat(tagNames);
 					filePluginRegExp.push(key);
-					for (let tag = 0, tLen = tagNames.length; tag < tLen; tag++) {
-						this._fileManager.pluginMap[tagNames[tag].toLowerCase()] = key;
+					for (let tag = 0, tLen = tagNames.length, t; tag < tLen; tag++) {
+						t = tagNames[tag].toLowerCase();
+						this._fileManager.pluginMap[t] = key;
+						if (fm.tagAttrs) {
+							this._fileManager.tagAttrs[t] = fm.tagAttrs;
+						}
 					}
 				}
 			}
@@ -1412,7 +1417,7 @@ Editor.prototype = {
 
 	__registerClass() {
 		// use events, history function
-		this.events = Events();
+		this.events = { ...Events(), ...this.options.get('events') };
 		this.history = History(this);
 
 		// eventManager

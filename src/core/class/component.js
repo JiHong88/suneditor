@@ -87,7 +87,7 @@ Component.prototype = {
 			if (this.editor._fileManager.queryString) target = element.querySelector(this.editor._fileManager.queryString);
 		}
 		if (!target && element.nodeName) {
-			if (this.editor._fileManager.regExp.test(element.nodeName)) {
+			if (this.editor._fileManager.regExp.test(element.nodeName) && this.editor._fileManager.tagAttrs[element.nodeName].every((v) => element.hasAttribute(v))) {
 				target = element;
 				isFile = true;
 			} else if ((pluginName = this.editor._componentManager.find((f) => f(element)))) {
@@ -171,7 +171,7 @@ Component.prototype = {
 			if (this.editor._fileManager.queryString) return true;
 		}
 		if (element.nodeName) {
-			if (this.editor._fileManager.regExp.test(element.nodeName)) {
+			if (this.editor._fileManager.regExp.test(element.nodeName) && this.editor._fileManager.tagAttrs[element.nodeName].every((v) => element.hasAttribute(v))) {
 				return true;
 			} else if (this.editor._componentManager.find((f) => f(element))) {
 				return true;

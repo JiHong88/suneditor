@@ -92,6 +92,14 @@
 	vertical-align: middle;
 }
 
+.sun-editor-editable a[download]::after {
+	content: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTIgMTJINFYxN0gyMFYxMkgyMlYxN0MyMiAxOC4xMSAyMS4xMSAxOSAyMCAxOUg0QzIuOSAxOSAyIDE4LjExIDIgMTdWMTJNMTIgMTVMMTcuNTUgOS41NEwxNi4xMyA4LjEzTDEzIDExLjI1VjJIMTFWMTEuMjVMNy44OCA4LjEzTDYuNDYgOS41NUwxMiAxNVoiIC8+PC9zdmc+');
+	display: inline-block;
+	width: var(--se-edit-font-size);
+	height: auto;
+	vertical-align: middle;
+}
+
 .sun-editor-editable span[style~='color:'] a {
 	color: inherit;
 }

@@ -5,7 +5,7 @@ import Figure from './Figure';
 /**
  *
  * @param {*} inst
- * @param {{ tagNames: array, eventHandler: Function, checkHandler: Function, figure: Figure instance | null }} params
+ * @param {{ tagNames: array, loadHandler: Function, eventHandler: Function, checkHandler: Function, figure: Figure instance | null }} params
  */
 const FileManager = function (inst, params) {
 	CoreInjector.call(this, inst.editor);
@@ -15,6 +15,8 @@ const FileManager = function (inst, params) {
 	this.kind = inst.constructor.key;
 	this.inst = inst;
 	this.tagNames = params.tagNames;
+	this.tagAttrs = params.tagAttrs ? `[${params.tagAttrs.join('][')}]` : [];
+	this.loadHandler = params.loadHandler;
 	this.eventHandler = params.eventHandler;
 	this.checkHandler = params.checkHandler;
 	this.figure = params.figure;
@@ -123,12 +125,12 @@ FileManager.prototype = {
 		// method bind
 		info.element = element;
 		info.delete = function (element) {
-			this.inst.destroy.call(this.inst, element);
+			if (typeof this.inst.destroy === 'function') this.inst.destroy.call(this.inst, element);
 			this._deleteInfo(element.getAttribute('data-se-index') * 1);
 		}.bind(this, element);
 		info.select = function (element) {
 			element.scrollIntoView(true);
-			setTimeout(this.inst.select.bind(this.inst, element));
+			if (typeof this.inst.select === 'function') setTimeout(this.inst.select.bind(this.inst, element));
 		}.bind(this, element);
 
 		// figure
@@ -156,8 +158,9 @@ FileManager.prototype = {
 			}
 		}
 
-		if (typeof this.eventHandler === 'function')
+		if (typeof this.eventHandler === 'function') {
 			this.eventHandler({ element, index: dataIndex, state, info, remainingFilesCount: --this.uploadFileLength < 0 ? 0 : this.uploadFileLength });
+		}
 	},
 
 	/**
@@ -176,13 +179,14 @@ FileManager.prototype = {
 	 * @description Checke the file's information and modify the tag that does not fit the format.
 	 * @private
 	 */
-	_checkInfo() {
+	_checkInfo(loaded) {
 		let tags = [];
 		for (let i = 0, len = this.tagNames.length; i < len; i++) {
-			tags = tags.concat([].slice.call(this.editor.frameContext.get('wysiwyg').querySelectorAll(this.tagNames[i] + ':not([data-se-embed="true"])')));
+			tags = tags.concat([].slice.call(this.editor.frameContext.get('wysiwyg').querySelectorAll(this.tagNames[i] + this.tagAttrs + ':not([data-se-embed="true"])')));
 		}
 
-		if (tags.length === this.infoList.length) {
+		const infoList = this.infoList;
+		if (tags.length === infoList.length) {
 			// reset
 			if (this._componentsInfoReset) {
 				for (let i = 0, len = tags.length; i < len; i++) {
@@ -191,8 +195,8 @@ FileManager.prototype = {
 				return;
 			} else {
 				let infoUpdate = false;
-				for (let i = 0, len = this.infoList.length, info; i < len; i++) {
-					info = this.infoList[i];
+				for (let i = 0, len = infoList.length, info; i < len; i++) {
+					info = infoList[i];
 					if (
 						tags.filter(function (t) {
 							return info.src === t.src && info.index.toString() === t.getAttribute('data-se-index');
@@ -210,8 +214,8 @@ FileManager.prototype = {
 		// check
 		const currentTags = [];
 		const infoIndex = [];
-		for (let i = 0, len = this.infoList.length; i < len; i++) {
-			infoIndex[i] = this.infoList[i].index;
+		for (let i = 0, len = infoList.length; i < len; i++) {
+			infoIndex[i] = infoList[i].index;
 		}
 
 		this.__updateTags = tags;
@@ -222,7 +226,7 @@ FileManager.prototype = {
 				currentTags.push(this.infoIndex);
 				try {
 					if (this.figure) this.figure.__fileManagerInfo = true;
-					tag = this.checkHandler(tag);
+					if (typeof this.checkHandler === 'function') tag = this.checkHandler(tag);
 					if (!tag) {
 						console.warn(
 							`[SUNEDITOR.FileManager[${this.kind}].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).`
@@ -245,12 +249,18 @@ FileManager.prototype = {
 			}
 		}
 
-		for (let i = 0, dataIndex; i < this.infoList.length; i++) {
-			dataIndex = this.infoList[i].index;
+		// editor load
+		if (loaded && typeof this.loadHandler === 'function') {
+			this.loadHandler(infoList);
+			return;
+		}
+
+		for (let i = 0, dataIndex; i < infoList.length; i++) {
+			dataIndex = infoList[i].index;
 			if (currentTags.includes(dataIndex)) continue;
 
-			this.infoList.splice(i, 1);
-			if (typeof this.eventHandler === 'function') this.eventHandler(null, dataIndex, 'delete', null, 0);
+			infoList.splice(i, 1);
+			if (typeof this.eventHandler === 'function') this.eventHandler({ element: null, index: dataIndex, state: 'delete', info: null, remainingFilesCount: 0 });
 			i--;
 		}
 	},
@@ -281,7 +291,7 @@ FileManager.prototype = {
 			for (let i = 0, len = this.infoList.length; i < len; i++) {
 				if (index === this.infoList[i].index) {
 					this.infoList.splice(i, 1);
-					if (typeof this.eventHandler === 'function') this.eventHandler(null, index, 'delete', null, 0);
+					if (typeof this.eventHandler === 'function') this.eventHandler({ element: null, index, state: 'delete', info: null, remainingFilesCount: 0 });
 					return;
 				}
 			}

@@ -56,6 +56,7 @@ const Image_ = function (editor, pluginOptions) {
 	});
 	this.fileManager = new FileManager(this, {
 		tagNames: ['img'],
+		loadHandler: this.events.onImageLoad,
 		eventHandler: this.events.onImageAction,
 		checkHandler: FileCheckHandler.bind(this),
 		figure: this.figure
@@ -196,7 +197,7 @@ Image_.prototype = {
 	},
 
 	/**
-	 * @override component
+	 * @override component, fileManager
 	 * @description Called when a container is selected.
 	 * @param {Element} element Target element
 	 */
@@ -261,7 +262,7 @@ Image_.prototype = {
 	},
 
 	/**
-	 * @override component
+	 * @override fileManager
 	 */
 	destroy(element) {
 		const targetEl = element || this._element;

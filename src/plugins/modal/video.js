@@ -61,6 +61,7 @@ const Video = function (editor, pluginOptions) {
 	this.figure = new Figure(this, figureControls, { sizeUnit: sizeUnit, autoRatio: { current: defaultRatio, default: defaultRatio } });
 	this.fileManager = new FileManager(this, {
 		tagNames: ['iframe', 'video'],
+		loadHandler: this.events.onVideoLoad,
 		eventHandler: this.events.onVideoAction,
 		checkHandler: FileCheckHandler.bind(this),
 		figure: this.figure
@@ -191,7 +192,7 @@ Video.prototype = {
 	},
 
 	/**
-	 * @override component
+	 * @override component, fileManager
 	 * @description Called when a container is selected.
 	 * @param {Element} element Target element
 	 */

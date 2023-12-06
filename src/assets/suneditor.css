@@ -803,7 +803,8 @@
 	width: 165px;
 	height: 52px;
 }
-.sun-editor .se-list-inner ul.se-list-carrier li ol {
+.sun-editor .se-list-inner ul.se-list-carrier li button > ol,
+.sun-editor .se-list-inner ul.se-list-carrier li button > ul {
 	font-size: 10px;
 }
 

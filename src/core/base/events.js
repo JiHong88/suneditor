@@ -133,6 +133,12 @@ export default function () {
 		onImageUploadBefore: null,
 
 		/**
+		 * @description Called when the editor loaded, file Current editor value
+		 * -- arguments is same "Image info object" --
+		 */
+		onImageLoad: null,
+
+		/**
 		 * @description Called when the image is uploaded, updated, deleted
 		 * @param {Element} targetElement Target element
 		 * @param {Number} index Uploaded index
@@ -205,13 +211,19 @@ export default function () {
 		 * @description Called when the video(iframe, video) upload failed
 		 */
 		onVideoUploadError: null,
-		
+
+		/**
+		 * @description Called when the editor loaded, file Current editor value
+		 * -- arguments is same "Image info object" --
+		 */
+		onVideoLoad: null,
+
 		/**
 		 * @description Called when the video(iframe, video) is is uploaded, updated, deleted
 		 * -- arguments is same "onImageUpload" --
 		 */
 		onVideoAction: null,
-		
+
 		/**
 		 * @description It replaces the default callback function of the audio upload
 		 * @param xmlHttp xmlHttpRequest object
@@ -221,7 +233,7 @@ export default function () {
 		 * @param core Core object
 		 */
 		audioUploadHandler: null,
-		
+
 		/**
 		 * @description Called before the audio is uploaded
 		 * If true is returned, the internal upload process runs normally.
@@ -252,11 +264,29 @@ export default function () {
 		 * @description Called when the audio upload failed
 		 */
 		onAudioUploadError: null,
-		
+
 		/**
 		 * @description Called when the audio is is uploaded, updated, deleted
 		 * -- arguments is same "onImageUpload" --
 		 */
 		onAudioAction: null,
+
+		/**
+		 * @description Called when the editor loaded, file Current editor value
+		 * -- arguments is same "Image info object" --
+		 */
+		onAudioLoad: null,
+
+		/**
+		 * @description Called when the file is is uploaded, updated, deleted
+		 * -- arguments is same "onImageUpload" --
+		 */
+		onFileAction: null,
+
+		/**
+		 * @description Called when the editor loaded, file Current editor value
+		 * -- arguments is same "Image info object" --
+		 */
+		onFileLoad: null
 	};
 }

@@ -320,6 +320,7 @@ export function InitOptions(options, editorTargets) {
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
 	o.set('fontSizeUnit', typeof options.fontSizeUnit === 'string' ? options.fontSizeUnit.trim().toLowerCase() || 'px' : 'px');
 	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}^__se__|se-|katex`));
+	o.set('events', options.events || {});
 	o.set('__allowedScriptTag', options.__allowedScriptTag === true);
 	// text style tags
 	const textTags = _mergeObject(
