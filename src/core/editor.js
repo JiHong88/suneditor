@@ -23,6 +23,10 @@ import Shortcuts from './class/shortcuts';
 import Toolbar from './class/toolbar';
 import Viewer from './class/viewer';
 
+const COMMAND_BUTTONS = '.se-menu-list .se-toolbar-btn[data-command]';
+const DISABLE_BUTTONS_CODEVIEW = `${COMMAND_BUTTONS}:not([class~="se-code-view-enabled"]):not([data-type="MORE"])`;
+const DISABLE_BUTTONS_CONTROLLER = `${COMMAND_BUTTONS}:not([class~="se-resizing-enabled"]):not([data-type="MORE"])`;
+
 /**
  * @description SunEditor constructor function.
  * @param {Array.<Element>} multiTargets Target textarea
@@ -184,11 +188,12 @@ const Editor = function (multiTargets, options) {
 	this.opendModal = null;
 	this.opendControllers = [];
 	this.currentControllerName = '';
-	this._controllerOnDisabledButtons = [];
 	this._controllerTargetContext = null;
 	this.selectMenuOn = false;
-	this._codeViewDisabledButtons = [];
 	this._backWrapper = product.carrierWrapper.querySelector('.se-back-wrapper');
+
+	this._controllerOnDisabledButtons = [];
+	this._codeViewDisabledButtons = [];
 
 	/**
 	 * @description Button List in Responsive Toolbar.
@@ -272,8 +277,9 @@ Editor.prototype = {
 	 * @param {string} pluginName The name of the plugin to call
 	 * @param {Array.<Element>|null} targets Plugin target button (This is not necessary if you have a button list when creating the editor)
 	 * @param {object|null} pluginOptions Plugin's options
+	 * @param {object} shortcuts this.options.get('shortcuts')
 	 */
-	registerPlugin(pluginName, targets, pluginOptions, shortcut) {
+	registerPlugin(pluginName, targets, pluginOptions, shortcuts) {
 		let plugin = this.plugins[pluginName];
 		if (!plugin) {
 			throw Error(`[SUNEDITOR.registerPlugin.fail] The called plugin does not exist or is in an invalid format. (pluginName: "${pluginName}")`);
@@ -284,7 +290,7 @@ Editor.prototype = {
 
 		if (targets) {
 			for (let i = 0, len = targets.length; i < len; i++) {
-				UpdateButton(targets[i], plugin, this.icons, this.lang, shortcut);
+				UpdateButton(targets[i], plugin, this.icons, this.lang, shortcuts);
 			}
 
 			if (!this.activeCommands.includes(pluginName) && typeof this.plugins[pluginName].active === 'function') {
@@ -330,10 +336,10 @@ Editor.prototype = {
 				this.menu.dropdownOn(button);
 				return;
 			} else if (/modal/.test(type)) {
-				this.plugins[command].open();
+				this.plugins[command].open(button);
 				return;
 			} else if (/command/.test(type)) {
-				this.plugins[command].action();
+				this.plugins[command].action(button);
 			} else if (/fileBrowser/.test(type)) {
 				this.plugins[command].open(null);
 			}
@@ -423,10 +429,11 @@ Editor.prototype = {
 
 	/**
 	 * @description Execute "editor.run" with command button.
-	 * @param {Element} target Command button
+	 * @param {Element} target Command target
 	 */
 	runFromTarget(target) {
-		if (!(target = domUtils.getCommandTarget(target))) return;
+		const isInput = domUtils.isInputElement(target);
+		if (isInput || !(target = domUtils.getCommandTarget(target))) return;
 
 		const command = target.getAttribute('data-command');
 		const type = target.getAttribute('data-type');
@@ -819,10 +826,10 @@ Editor.prototype = {
 			this._offCurrentController();
 			this._offCurrentModal();
 
-			if (this.toolbar?.currentMoreLayerActiveButton.disabled) this.toolbar.moreLayerOff();
+			if (this.toolbar?.currentMoreLayerActiveButton?.disabled) this.toolbar.moreLayerOff();
 			if (this.subToolbar?.currentMoreLayerActiveButton?.disabled) this.subToolbar.moreLayerOff();
-			if (this.menu?.currentDropdownActiveButton.disabled) this.menu.dropdownOff();
-			if (this.menu?.currentContainerActiveButton.disabled) this.menu.containerOff();
+			if (this.menu?.currentDropdownActiveButton?.disabled) this.menu.dropdownOff();
+			if (this.menu?.currentContainerActiveButton?.disabled) this.menu.containerOff();
 			if (this.modalForm) this.plugins.modal.close.call(this);
 
 			fc.get('code').setAttribute('readOnly', 'true');
@@ -856,7 +863,7 @@ Editor.prototype = {
 		if (this.options.get('hasCodeMirror')) {
 			this.viewer._codeMirrorEditor('readonly', true, rootKey);
 		} else {
-			fc.get('code').setAttribute('disabled', 'disabled');
+			fc.get('code').setAttribute('disabled', true);
 		}
 	},
 
@@ -1071,22 +1078,6 @@ Editor.prototype = {
 	},
 
 	/**
-	 * @description Recover the current buttons states from "allCommandButtons" map
-	 * @private
-	 */
-	_recoverButtonStates(isSub) {
-		const currentButtons = this.context.get(isSub ? 'toolbar.sub.buttonTray' : 'toolbar.buttonTray').querySelectorAll('.se-menu-list button[data-command]');
-		const btns = isSub ? this.subAllCommandButtons : this.allCommandButtons;
-		for (let i = 0, button, oldButton; i < currentButtons.length; i++) {
-			button = currentButtons[i];
-			oldButton = btns.get(button.getAttribute('data-command'));
-			if (oldButton) {
-				button.parentElement.replaceChild(oldButton, button);
-			}
-		}
-	},
-
-	/**
 	 * @description Initializ wysiwyg area (Only called from core._init)
 	 * @param {Map} e frameContext
 	 * @param {string} value initial html string
@@ -1222,8 +1213,6 @@ Editor.prototype = {
 	 * @private
 	 */
 	__init(options) {
-		this.__cachingButtons();
-
 		// file components
 		this._fileInfoPluginsCheck = [];
 		this._fileInfoPluginsReset = [];
@@ -1276,6 +1265,7 @@ Editor.prototype = {
 					}
 				}
 			}
+
 			// Not file component
 			if (typeof plugin.constructor.component === 'function') {
 				this._componentManager.push(plugin.constructor.component);
@@ -1301,6 +1291,8 @@ Editor.prototype = {
 
 		delete this._pluginCallButtons;
 		delete this._pluginCallButtons_sub;
+
+		this.__cachingButtons();
 	},
 
 	/**
@@ -1309,29 +1301,36 @@ Editor.prototype = {
 	 */
 	__cachingButtons() {
 		const ctx = this.context;
-		const codeDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-code-view-enabled"]):not([data-type="MORE"])';
-		const controllerDisabledQuery = '.se-menu-list button[data-command]:not([class~="se-resizing-enabled"]):not([data-type="MORE"])';
+		this.__setDisabledButtons();
+		this.__saveCommandButtons(this.allCommandButtons, ctx.get('toolbar.buttonTray'));
+		if (this.options.has('_subMode')) {
+			ctx.get('toolbar.sub.buttonTray');
+			this.__saveCommandButtons(this.subAllCommandButtons, ctx.get('toolbar.sub.buttonTray'));
+		}
+	},
 
-		this._codeViewDisabledButtons = converter.nodeListToArray(ctx.get('toolbar.buttonTray').querySelectorAll(codeDisabledQuery));
-		this._controllerOnDisabledButtons = converter.nodeListToArray(ctx.get('toolbar.buttonTray').querySelectorAll(controllerDisabledQuery));
+	__setDisabledButtons() {
+		const ctx = this.context;
+
+		this._codeViewDisabledButtons = converter.nodeListToArray(ctx.get('toolbar.buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW));
+		this._controllerOnDisabledButtons = converter.nodeListToArray(ctx.get('toolbar.buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER));
 
 		if (this.options.has('_subMode')) {
-			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(codeDisabledQuery)));
+			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(
+				converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW))
+			);
 			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(
-				converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(controllerDisabledQuery))
+				converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER))
 			);
 		}
-
-		this.__saveCommandButtons();
 	},
 
 	/**
-	 * @description Save the current buttons states to "allCommandButtons" map
+	 * @description Save the current buttons
 	 * @private
 	 */
-	__saveCommandButtons(isSub) {
-		const currentButtons = this.context.get(isSub ? 'toolbar.sub.buttonTray' : 'toolbar.buttonTray').querySelectorAll('.se-menu-list button[data-command]');
-		const cmdButtons = isSub ? this.subAllCommandButtons : this.allCommandButtons;
+	__saveCommandButtons(cmdButtons, tray) {
+		const currentButtons = tray.querySelectorAll(COMMAND_BUTTONS);
 		const shortcuts = this.options.get('shortcuts');
 		const reverseCommandArray = this.options.get('_reverseCommandArray');
 		const keyMap = this.shortcutsKeyMap;
@@ -1345,10 +1344,6 @@ Editor.prototype = {
 			this.__setCommandTargets(c, e);
 			// shortcuts
 			CreateShortcuts(c, e, shortcuts[c], keyMap, reverseCommandArray, reverseKeys);
-		}
-
-		if (!isSub && this.options.has('_subMode')) {
-			this.__saveCommandButtons(true);
 		}
 	},
 

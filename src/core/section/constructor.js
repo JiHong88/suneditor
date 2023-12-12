@@ -115,7 +115,7 @@ const Constructor = function (editorTargets, options) {
 	/** --- toolbar --------------------------------------------------------------- */
 	let subbar = null,
 		sub_main = null;
-	const tool_bar_main = CreateToolBar(optionMap.buttons, plugins, o, icons, lang);
+	const tool_bar_main = CreateToolBar(optionMap.buttons, plugins, o, icons, lang, false);
 	const toolbar = tool_bar_main.element;
 	toolbar.style.visibility = 'hidden';
 	// toolbar mode
@@ -130,7 +130,7 @@ const Constructor = function (editorTargets, options) {
 
 	/** --- subToolbar --------------------------------------------------------------- */
 	if (optionMap.subButtons) {
-		sub_main = CreateToolBar(optionMap.subButtons, plugins, o, icons, lang);
+		sub_main = CreateToolBar(optionMap.subButtons, plugins, o, icons, lang, false);
 		subbar = sub_main.element;
 		subbar.style.visibility = 'hidden';
 		// subbar mode must be balloon-*
@@ -922,9 +922,9 @@ function _createModuleGroup() {
 function _createButton(className, title, dataCommand, dataType, innerHTML, _disabled, icons) {
 	const oLi = domUtils.createElement('LI');
 	const label = title || '';
-	const oButton = domUtils.createElement('BUTTON', {
+	const oButton = domUtils.createElement(/^INPUT$/i.test(dataType) ? 'DIV' : 'BUTTON', {
 		type: 'button',
-		class: 'se-btn se-tooltip' + (className ? ' ' + className : ''),
+		class: 'se-toolbar-btn se-btn se-tooltip' + (className ? ' ' + className : ''),
 		'data-command': dataCommand,
 		'data-type': dataType,
 		'aria-label': label.replace(/<span .+<\/span>/, ''),
@@ -955,24 +955,37 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 export function UpdateButton(element, plugin, icons, lang, shortcut) {
 	if (!element) return;
 
-	element.innerHTML =
-		(plugin.inner || icons[plugin.icon] || plugin.icon || '<span class="se-icon-text">!</span>') +
-		'<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		(lang[plugin.title] || plugin.title) +
-		'</span></span>';
+	const noneInner = plugin.inner === false;
+
+	element.innerHTML = noneInner
+		? ''
+		: (plugin.inner || icons[plugin.icon] || plugin.icon || '<span class="se-icon-text">!</span>') +
+		  '<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
+		  (lang[plugin.title] || plugin.title) +
+		  '</span></span>';
+
 	element.setAttribute('aria-label', plugin.title);
 
-	if (plugin.type) element.setAttribute('data-type', plugin.type);
-	if (plugin.className) element.className += ' ' + plugin.className;
+	if (plugin.type) {
+		element.setAttribute('data-type', plugin.type);
+	}
 
-	// side button
+	if (plugin.className) {
+		element.className += ' ' + plugin.className;
+	}
+
+	// side, replace button
 	if (plugin.afterButton) {
+		domUtils.addClass(plugin.afterButton, 'se-toolbar-btn');
 		element.parentElement.appendChild(plugin.afterButton);
+
 		domUtils.addClass(element, 'se-side-btn-a');
 		domUtils.addClass(plugin.afterButton, 'se-side-btn-after');
 	}
 	if (plugin.beforeButton) {
+		domUtils.addClass(plugin.beforeButton, 'se-toolbar-btn');
 		element.parentElement.insertBefore(plugin.beforeButton, element);
+
 		if (plugin.afterButton) {
 			domUtils.addClass(element, 'se-side-btn');
 			domUtils.removeClass(element, 'se-side-btn-a');
@@ -980,6 +993,20 @@ export function UpdateButton(element, plugin, icons, lang, shortcut) {
 			domUtils.addClass(element, 'se-side-btn-b');
 		}
 		domUtils.addClass(plugin.beforeButton, 'se-side-btn-before');
+	}
+	if (plugin.replaceButton) {
+		element.parentElement.appendChild(plugin.replaceButton);
+		element.style.display = 'none';
+	}
+
+	if (!plugin.replaceButton && /^INPUT$/i.test(element.getAttribute('data-type'))) {
+		const inputTarget = element.querySelector('input');
+		if (inputTarget) {
+			domUtils.addClass(inputTarget, 'se-toolbar-btn');
+			inputTarget.setAttribute('data-command', element.getAttribute('data-command'));
+			inputTarget.setAttribute('data-type', element.getAttribute('data-type'));
+			if (element.hasAttribute('disabled')) inputTarget.setAttribute('disabled', true);
+		}
 	}
 
 	const tooptip = element.querySelector('.se-tooltip-text');
@@ -999,14 +1026,16 @@ export function UpdateButton(element, plugin, icons, lang, shortcut) {
  * @param {Array} options options
  * @param {Object} icons icons
  * @param {Object} lang lang
+ * @param {boolean} isUpdate Is update
  * @returns {Object} { element: (Element) Toolbar element, plugins: (Array|null) Plugins Array, pluginCallButtons: (Object), responsiveButtons: (Array) }
  */
-export function CreateToolBar(buttonList, plugins, options, icons, lang) {
+export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdate) {
 	/** create button list */
 	buttonList = JSON.parse(JSON.stringify(buttonList));
 	const defaultButtonList = _defaultButtons(options, icons, lang);
 	const pluginCallButtons = {};
 	const responsiveButtons = [];
+	const updateButtons = [];
 
 	let modules = null;
 	let button = null;
@@ -1038,9 +1067,18 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 					buttonList.splice(i--, 1);
 					continue buttonGroupLoop;
 				}
-
-				if (/function|object/.test(typeof plugin)) {
+				if (typeof plugin === 'function') {
 					modules = [plugin.className, plugin.title, button, plugin.type, plugin.innerHTML, plugin._disabled];
+				} else if (typeof plugin === 'object') {
+					const originFnc = plugin.constructor;
+					modules = [
+						plugin.className || originFnc.className,
+						plugin.title || originFnc.title,
+						button,
+						plugin.type || originFnc.type,
+						plugin.innerHTML || originFnc.innerHTML,
+						plugin._disabled || originFnc._disabled
+					];
 				} else {
 					// align
 					if (/^\-/.test(button)) {
@@ -1071,6 +1109,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 
 					if (!modules) {
 						if (!plugin) throw Error(`[SUNEDITOR.create.toolbar.fail] The button name of a plugin that does not exist. [${button}]`);
+						plugin = typeof plugin === 'object' ? plugin.constructor : plugin;
 						modules = [plugin.className, plugin.title, plugin.key, plugin.type, plugin.innerHTML, plugin._disabled];
 					}
 				}
@@ -1079,8 +1118,15 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 				(more ? moreContainer : moduleElement.ul).appendChild(buttonElement.li);
 
 				if (plugin) {
-					if (pluginCallButtons[button]) pluginCallButtons[button].push(buttonElement.button);
-					else pluginCallButtons[button] = [buttonElement.button];
+					if (pluginCallButtons[button]) {
+						pluginCallButtons[button].push(buttonElement.button);
+					} else {
+						pluginCallButtons[button] = [buttonElement.button];
+					}
+
+					if (isUpdate) {
+						updateButtons.push({ button: buttonElement.button, plugin, key: button });
+					}
 				}
 
 				// more button
@@ -1129,9 +1175,10 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang) {
 
 	return {
 		element: tool_bar,
-		pluginCallButtons: pluginCallButtons,
-		responsiveButtons: responsiveButtons,
-		buttonTray: buttonTray
+		pluginCallButtons,
+		responsiveButtons,
+		buttonTray,
+		updateButtons
 	};
 }
 

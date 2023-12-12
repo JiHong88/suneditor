@@ -86,15 +86,17 @@ Component.prototype = {
 		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
 			if (this.editor._fileManager.queryString) target = element.querySelector(this.editor._fileManager.queryString);
 		}
+
 		if (!target && element.nodeName) {
-			if (this.editor._fileManager.regExp.test(element.nodeName) && this.editor._fileManager.tagAttrs[element.nodeName].every((v) => element.hasAttribute(v))) {
-				target = element;
+			if (this.__isFiles(element)) {
 				isFile = true;
-			} else if ((pluginName = this.editor._componentManager.find((f) => f(element)))) {
+			}
+			if ((pluginName = this.editor._componentManager.find((f) => f(element)))) {
 				target = element;
 				pluginName = pluginName(element);
 			}
 		}
+
 		if (!target) {
 			return null;
 		}
@@ -170,15 +172,21 @@ Component.prototype = {
 		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
 			if (this.editor._fileManager.queryString) return true;
 		}
+
 		if (element.nodeName) {
-			if (this.editor._fileManager.regExp.test(element.nodeName) && this.editor._fileManager.tagAttrs[element.nodeName].every((v) => element.hasAttribute(v))) {
-				return true;
-			} else if (this.editor._componentManager.find((f) => f(element))) {
+			if (this.editor._componentManager.find((f) => f(element))) {
 				return true;
 			}
 		}
 
 		return false;
+	},
+
+	__isFiles(element) {
+		return (
+			this.editor._fileManager.regExp.test(element.nodeName) &&
+			(!this.editor._fileManager.tagAttrs[element.nodeName] || this.editor._fileManager.tagAttrs[element.nodeName]?.every((v) => element.hasAttribute(v)))
+		);
 	},
 
 	/**

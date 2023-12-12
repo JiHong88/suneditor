@@ -159,7 +159,7 @@ const Table = function (editor, pluginOptions) {
 	this.propTargets = {
 		cell_alignment: controller_props.querySelector('.se-table-props-align'),
 		border_format: borderFormatButton,
-		border_style: controller_props.querySelector('[data-command="props_onborder_style"] .txt'),
+		border_style: controller_props.querySelector('[data-command="props_onborder_style"] .se-txt'),
 		border_color: controller_props.querySelector('.__se_border_color'),
 		border_width: controller_props.querySelector('.__se__border_size'),
 		back_color: controller_props.querySelector('.__se_back_color'),
@@ -1599,10 +1599,10 @@ Table.prototype = {
 	_disableBorderProps(disabled) {
 		const { border_color, border_width, palette_border_button } = this.propTargets;
 		if (disabled) {
-			border_color.setAttribute('disabled', 'true');
-			border_width.setAttribute('disabled', 'true');
-			palette_border_button.setAttribute('disabled', 'true');
-			border_width.setAttribute('disabled', 'true');
+			border_color.setAttribute('disabled', true);
+			border_width.setAttribute('disabled', true);
+			palette_border_button.setAttribute('disabled', true);
+			border_width.setAttribute('disabled', true);
 		} else {
 			border_color.removeAttribute('disabled');
 			border_width.removeAttribute('disabled');
@@ -1642,7 +1642,7 @@ Table.prototype = {
 
 	_submitProps(target) {
 		try {
-			target.setAttribute('disabled', 'true');
+			target.setAttribute('disabled', true);
 
 			const isTable = this.controller_props.currentTarget === this.controller_table.form;
 			const targets = isTable ? [this._element] : this._selectedCells;
@@ -2392,13 +2392,13 @@ function CreateColumnMenu(lang, icons) {
 		null,
 		/*html*/ `
 		<div title="${lang.insertColumnBefore}" aria-label="${lang.insertColumnBefore}">
-			<span class="se-list-icon">${icons.insert_column_left}</span><span class="txt">${lang.insertColumnBefore}</span>
+			<span class="se-list-icon">${icons.insert_column_left}</span><span class="se-txt">${lang.insertColumnBefore}</span>
 		</div>
 		<div title="${lang.insertColumnAfter}" aria-label="${lang.insertColumnAfter}">
-			<span class="se-list-icon">${icons.insert_column_right}</span><span class="txt">${lang.insertColumnAfter}</span>
+			<span class="se-list-icon">${icons.insert_column_right}</span><span class="se-txt">${lang.insertColumnAfter}</span>
 		</div>
 		<div title="${lang.deleteColumn}" aria-label="${lang.deleteColumn}">
-			<span class="se-list-icon">${icons.delete_column}</span><span class="txt">${lang.deleteColumn}</span>
+			<span class="se-list-icon">${icons.delete_column}</span><span class="se-txt">${lang.deleteColumn}</span>
 		</div>`
 	);
 
@@ -2411,13 +2411,13 @@ function CreateRowMenu(lang, icons) {
 		null,
 		/*html*/ `
 		<div title="${lang.insertRowAbove}" aria-label="${lang.insertRowAbove}">
-			<span class="se-list-icon">${icons.insert_row_above}</span><span class="txt">${lang.insertRowAbove}</span>
+			<span class="se-list-icon">${icons.insert_row_above}</span><span class="se-txt">${lang.insertRowAbove}</span>
 		</div>
 		<div title="${lang.insertRowBelow}" aria-label="${lang.insertRowBelow}">
-			<span class="se-list-icon">${icons.insert_row_below}</span><span class="txt">${lang.insertRowBelow}</span>
+			<span class="se-list-icon">${icons.insert_row_below}</span><span class="se-txt">${lang.insertRowBelow}</span>
 		</div>
 		<div title="${lang.deleteRow}" aria-label="${lang.deleteRow}">
-			<span class="se-list-icon">${icons.delete_row}</span><span class="txt">${lang.deleteRow}</span>
+			<span class="se-list-icon">${icons.delete_row}</span><span class="se-txt">${lang.deleteRow}</span>
 		</div>`
 	);
 
@@ -2431,7 +2431,7 @@ function CreateBorderMenu() {
 		s = BORDER_LIST[i];
 		html += /*html*/ `
 		<div title="${s}" aria-label="${s}" style="padding: 0 12px;">
-			<span class="txt">${s}</span>
+			<span class="se-txt">${s}</span>
 		</div>`;
 	}
 
@@ -2588,7 +2588,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 						</span>
 					</button>
 					<button type="button" data-command="props_onborder_style" class="se-btn se-btn-select se-tooltip se-border-style">
-						<span class="txt"></span>
+						<span class="se-txt"></span>
 						${icons.arrow_down}
 						<span class="se-tooltip-inner">
 							<span class="se-tooltip-text">${lang.border}</span>

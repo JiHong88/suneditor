@@ -30,6 +30,9 @@ const EventManager = function (editor) {
 	this.__geckoActiveEvent = null;
 	this.__scrollparents = [];
 	this.__scrollID = '';
+	this.__inputPlugin = null;
+	this.__inputBlurEvent = null;
+	this.__inputKeyEvent = null;
 };
 
 EventManager.prototype = {
@@ -61,6 +64,7 @@ EventManager.prototype = {
 		return {
 			target: len > 1 ? target : target[0],
 			type: type,
+			listener,
 			handler: listener,
 			useCapture: useCapture
 		};
@@ -174,8 +178,8 @@ EventManager.prototype = {
 					if (
 						!commandMapNodes.includes(name) &&
 						commandTargets.get(name) &&
-						commandTargets.get(name).filter(function (e) {
-							return plugins[name] ? plugins[name].active(element, e) : false;
+						commandTargets.get(name).filter((e) => {
+							return plugins[name]?.active(element, e);
 						}).length > 0
 					) {
 						commandMapNodes.push(name);
@@ -820,15 +824,27 @@ EventManager.prototype = {
 			if (eventPlugins[i](e) === false) return false;
 		}
 	},
+	__removeInput() {
+		this.editor._antiBlur = false;
+		this.__inputBlurEvent = this.removeEvent(this.__inputBlurEvent);
+		this.__inputKeyEvent = this.removeEvent(this.__inputKeyEvent);
+		this.__inputPlugin = null;
+	},
 
 	constructor: EventManager
 };
 
 function ButtonsHandler(e) {
 	let target = e.target;
+
+	if (this.editor.isSubBalloon) {
+		this._hideToolbar_sub();
+	}
+
+	const isInput = domUtils.isInputElement(target);
 	if (this.menu._bindControllersOff) e.stopPropagation();
 
-	if (domUtils.isInputElement(target)) {
+	if (isInput) {
 		this.editor._antiBlur = false;
 	} else if (!this.editor.frameContext.get('wysiwyg').contains(this.selection.getNode())) {
 		this.editor.focus();
@@ -847,7 +863,52 @@ function ButtonsHandler(e) {
 			className = target.className;
 		}
 
-		if (!this.editor.frameContext.get('isCodeView')) {
+		// toolbar input button
+		if (isInput && /^INPUT$/i.test(target?.getAttribute('data-type'))) {
+			this.editor._antiBlur = true;
+			if (!this.status.hasFocus) this.applyTagEffect();
+			/* event */
+			const eventTarget = e.target;
+			if (!domUtils.isInputElement(eventTarget) || eventTarget.disabled) return;
+
+			const plugin = this.plugins[command];
+
+			if (this.__inputBlurEvent) this.__removeInput();
+
+			// blur event
+			if (typeof plugin.onInputChange === 'function') this.__inputPlugin = { obj: plugin, target: eventTarget, value: eventTarget.value };
+			this.__inputBlurEvent = this.addEvent(eventTarget, 'blur', (e) => {
+				if (plugin.__isActive) return;
+
+				try {
+					const value = eventTarget.value.trim();
+					if (typeof plugin.onInputChange === 'function' && value !== this.__inputPlugin.value) {
+						plugin.onInputChange({ target: eventTarget, value, event: e });
+					}
+				} finally {
+					this.__removeInput();
+				}
+
+				if (this.status.hasFocus) OnBlur_wysiwyg.call(this, this.editor.frameContext, { ...e, caller: `SUNEDITOR.plugin-command.${command}` });
+			});
+
+			if (!plugin) return;
+
+			// keydown event
+			if (typeof plugin.onInputKeyDown === 'function') {
+				this.__inputKeyEvent = this.addEvent(eventTarget, 'keydown', (event) => {
+					plugin.onInputKeyDown({ target: eventTarget, event });
+				});
+			}
+		} else if (this.__inputBlurEvent && this.__inputPlugin) {
+			const value = this.__inputPlugin.target.value.trim();
+			if (value !== this.__inputPlugin.value) {
+				this.__inputPlugin.obj.onInputChange({ target: this.__inputPlugin.target, value, event: e });
+			}
+
+			this.__removeInput();
+			return;
+		} else if (!this.editor.frameContext.get('isCodeView')) {
 			e.preventDefault();
 			if (env.isGecko && command) {
 				this._injectActiveEvent(target);

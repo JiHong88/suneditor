@@ -57,7 +57,7 @@ export default function () {
 		/**
 		 * @description Called after the "setToolbarButtons" invocation.
 		 * Can be used to tweak buttons properties (useful for custom buttons)
-		 * @param {Array} buttonList Button list
+		 * @param {Element} buttonTray Button tray element
 		 * @param {Object} core Core object
 		 */
 		onSetToolbarButtons: null,

@@ -102,7 +102,7 @@
 	padding: 0;
 }
 
-.sun-editor button .txt {
+.sun-editor button .se-txt {
 	display: block;
 	margin-top: 0;
 	white-space: nowrap;
@@ -314,11 +314,19 @@
 	text-align: center;
 	float: none;
 }
-.sun-editor button.se-arrow-icon {
+
+/* sub button size */
+.sun-editor button.se-sub-arrow-btn {
 	width: 18px;
 }
-.sun-editor button.se-arrow-icon svg {
+.sun-editor button.se-sub-arrow-btn svg {
 	width: 8px;
+}
+.sun-editor button.se-sub-btn {
+	width: 24px;
+}
+.sun-editor button.se-sub-btn svg {
+	width: 12px;
 }
 
 /* side button */
@@ -703,13 +711,19 @@
 	padding: 4px 6px;
 }
 
-.sun-editor .se-btn-select .txt {
+.sun-editor .se-btn-select .se-txt {
 	flex: auto;
 	text-align: left;
 	margin-right: 4px;
 }
 
-.sun-editor .se-btn-select.on .txt + svg {
+.sun-editor .se-btn-select .se-not-arrow-text {
+	flex: auto;
+	text-align: center;
+	margin: 0;
+}
+
+.sun-editor .se-btn-select.on .se-txt + svg {
 	transform: rotate(-180deg);
 }
 
@@ -721,8 +735,28 @@
 	width: 82px;
 }
 
-.sun-editor .se-btn-select.se-btn-tool-size {
-	width: 78px;
+.sun-editor .se-btn-select.se-btn-tool-font-size .se-txt {
+	width: 66px;
+	margin: 0;
+}
+.sun-editor .se-btn-select.se-btn-tool-font-size .se-not-arrow-text {
+	width: 50px;
+}
+
+/* tool bar input button (fontSize) */
+.sun-editor .se-btn-input {
+	padding-left: 0;
+	padding-right: 0;
+}
+.sun-editor .se-btn-input input {
+	font-size: 13px;
+	border: 0;
+}
+.sun-editor .se-btn-input input:hover {
+	border: 1px solid #c1c1c1;
+}
+.sun-editor .se-btn-input input:focus {
+	border: 1px solid #3288ff;
 }
 
 /** --- menu tray -------------------------------------------------------------- */
@@ -2646,7 +2680,7 @@
 
 /* button--- */
 /* button - select text */
-.sun-editor.se-rtl .se-btn-select .txt {
+.sun-editor.se-rtl .se-btn-select .se-txt {
 	flex: auto;
 	text-align: right;
 	direction: rtl;

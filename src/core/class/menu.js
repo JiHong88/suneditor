@@ -78,7 +78,7 @@ Menu.prototype = {
 
 		this._bindClose_dropdown_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandler[0], false);
 		if (this._dropdownCommands.includes(dropdownName)) {
-			this.menus = converter.nodeListToArray(menu.querySelectorAll('button[data-command]'));
+			this.menus = converter.nodeListToArray(menu.querySelectorAll('.se-toolbar-btn[data-command]'));
 			if (this.menus.length > 0) {
 				this._bindClose_dropdown_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandler[2], false);
 				menu.addEventListener('mousemove', this.__globalEventHandler[3], false);

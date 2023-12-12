@@ -121,6 +121,7 @@ const Video = function (editor, pluginOptions) {
 Video.key = 'video';
 Video.type = 'modal';
 Video.className = '';
+Video.component = (node) => (/^(VIDEO|IFRAME)$/i.test(node?.nodeName) ? Video.key : '');
 Video.prototype = {
 	/**
 	 * @override type = "modal"

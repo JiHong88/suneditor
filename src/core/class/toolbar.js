@@ -4,7 +4,7 @@
 
 import { domUtils } from '../../helper';
 import CoreInjector from '../../editorInjector/_core';
-import { CreateToolBar } from '../section/constructor';
+import { CreateToolBar, UpdateButton } from '../section/constructor';
 
 const Toolbar = function (editor, { keyName, balloon, inline, balloonAlways, res }) {
 	CoreInjector.call(this, editor);
@@ -43,14 +43,14 @@ Toolbar.prototype = {
 		this._moreLayerOff();
 		this.menu.dropdownOff();
 		this.menu.containerOff();
-		domUtils.setDisabled(this.context.get(this.keyName + '.buttonTray').querySelectorAll('.se-menu-list button[data-type]'), true);
+		domUtils.setDisabled(this.context.get(this.keyName + '.buttonTray').querySelectorAll('.se-menu-list .se-toolbar-btn[data-type]'), true);
 	},
 
 	/**
 	 * @description Enable the toolbar
 	 */
 	enable() {
-		domUtils.setDisabled(this.context.get(this.keyName + '.buttonTray').querySelectorAll('.se-menu-list button[data-type]'), false);
+		domUtils.setDisabled(this.context.get(this.keyName + '.buttonTray').querySelectorAll('.se-menu-list .se-toolbar-btn[data-type]'), false);
 	},
 
 	/**
@@ -130,19 +130,32 @@ Toolbar.prototype = {
 		this.menu.dropdownOff();
 		this.menu.containerOff();
 
-		const newToolbar = CreateToolBar(buttonList, this.plugins, this.options, this.icons, this.lang);
+		const { options, icons, lang, isSub } = this;
+		const newToolbar = CreateToolBar(buttonList, this.plugins, options, icons, lang, true);
+
+		const shortcutss = options.get('shortcuts');
+		newToolbar.updateButtons.forEach((v) => UpdateButton(v.button, v.plugin, this.icons, this.lang, shortcutss[v.key]));
+
+		let cmdButtons;
+		if (isSub) cmdButtons = this.editor.subAllCommandButtons = new Map();
+		else cmdButtons = this.editor.allCommandButtons = new Map();
+		this.editor.commandTargets = new Map();
+		this.editor.__saveCommandButtons(cmdButtons, newToolbar.buttonTray);
+
 		this.context.get(this.keyName + '.main').replaceChild(newToolbar.buttonTray, this.context.get(this.keyName + '.buttonTray'));
 		this.context.set(this.keyName + '.buttonTray', newToolbar.buttonTray);
 
-		this.editor._recoverButtonStates(this.isSub);
+		this.editor.__setDisabledButtons();
+
 		this.history.resetButtons(this.editor.frameContext.get('key'), null);
 		this._resetSticky();
 
 		this.editor.effectNode = null;
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
 		if (this.editor.frameContext.get('isReadOnly')) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
-		if (typeof this.events.onSetToolbarButtons === 'function')
-			this.events.onSetToolbarButtons({ buttonList: newToolbar.buttonTray.querySelectorAll('button'), frameContext: this.editor.frameContext });
+		if (typeof this.events.onSetToolbarButtons === 'function') {
+			this.events.onSetToolbarButtons({ buttonTray: newToolbar.buttonTray, frameContext: this.editor.frameContext });
+		}
 	},
 
 	_resetSticky() {

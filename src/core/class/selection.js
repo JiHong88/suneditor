@@ -230,7 +230,8 @@ Selection.prototype = {
 		return (
 			(domUtils.isWysiwygFrame(range.startContainer) && domUtils.isWysiwygFrame(range.endContainer)) ||
 			/FIGURE/i.test(comm.nodeName) ||
-			(this.editor._fileManager.regExp.test(comm.nodeName) && this.editor._fileManager.tagAttrs[comm.nodeName].every((v) => comm.hasAttribute(v))) ||
+			(this.editor._fileManager.regExp.test(comm.nodeName) &&
+				(!this.editor._fileManager.tagAttrs[comm.nodeName] || this.editor._fileManager.tagAttrs[comm.nodeName]?.every((v) => comm.hasAttribute(v)))) ||
 			this.component.is(comm)
 		);
 	},

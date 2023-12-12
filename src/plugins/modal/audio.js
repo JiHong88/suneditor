@@ -62,6 +62,7 @@ const Audio_ = function (editor, pluginOptions) {
 Audio_.key = 'audio';
 Audio_.type = 'modal';
 Audio_.className = '';
+Audio_.component = (node) => (/^AUDIO$/i.test(node?.nodeName) ? Audio_.key : '');
 Audio_.prototype = {
 	/**
 	 * @override type = "modal"

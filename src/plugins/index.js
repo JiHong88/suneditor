@@ -8,7 +8,6 @@ import mention from './command/mention';
 // dropdown
 import align from './dropdown/align';
 import font from './dropdown/font';
-import fontSize from './dropdown/fontSize';
 import fontColor from './dropdown/fontColor';
 import backgroundColor from './dropdown/backgroundColor';
 import hr from './dropdown/hr';
@@ -31,6 +30,9 @@ import math from './modal/math';
 // file browser
 import imageGallery from './fileBrowser/imageGallery';
 
+// input
+import fontSize from './input/fontSize';
+
 export {
 	blockquote,
 	fileUpload,
@@ -39,7 +41,6 @@ export {
 	mention,
 	align,
 	font,
-	fontSize,
 	fontColor,
 	backgroundColor,
 	list,
@@ -56,7 +57,8 @@ export {
 	video,
 	audio,
 	math,
-	imageGallery
+	imageGallery,
+	fontSize
 };
 export default {
 	blockquote,
@@ -66,7 +68,6 @@ export default {
 	mention,
 	align,
 	font,
-	fontSize,
 	fontColor,
 	backgroundColor,
 	list,
@@ -83,5 +84,6 @@ export default {
 	video,
 	audio,
 	math,
-	imageGallery
+	imageGallery,
+	fontSize
 };

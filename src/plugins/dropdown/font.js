@@ -5,7 +5,7 @@ const Font = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.font;
-	this.inner = '<span class="txt">' + this.lang.font + '</span>' + this.icons.arrow_down;
+	this.inner = '<span class="se-txt">' + this.lang.font + '</span>' + this.icons.arrow_down;
 
 	// create HTML
 	const fontList = pluginOptions.items || ['Arial', 'Comic Sans MS', 'Courier New', 'Impact', 'Georgia', 'tahoma', 'Trebuchet MS', 'Verdana'];
@@ -28,7 +28,7 @@ Font.prototype = {
 	 * @override core
 	 */
 	active(element, target) {
-		const targetText = target.querySelector('.txt');
+		const targetText = target.querySelector('.se-txt');
 		const tooltip = target.parentNode.querySelector('.se-tooltip-text');
 
 		if (!element) {
@@ -50,7 +50,7 @@ Font.prototype = {
 	 */
 	on(target) {
 		const fontList = this.fontList;
-		const currentFont = target.querySelector('.txt').textContent;
+		const currentFont = target.querySelector('.se-txt').textContent;
 
 		if (currentFont !== this.currentFont) {
 			for (let i = 0, len = fontList.length; i < len; i++) {

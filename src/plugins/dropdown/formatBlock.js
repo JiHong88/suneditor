@@ -5,7 +5,7 @@ const FormatBlock = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
 	// plugin basic properties
 	this.title = this.lang.formats;
-	this.inner = '<span class="txt">' + this.lang.formats + '</span>' + this.icons.arrow_down;
+	this.inner = '<span class="se-txt">' + this.lang.formats + '</span>' + this.icons.arrow_down;
 
 	// create HTML
 	const menu = CreateHTML(editor, pluginOptions.items);
@@ -27,7 +27,7 @@ FormatBlock.prototype = {
 	 */
 	active(element, target) {
 		let formatTitle = this.lang.formats;
-		const targetText = target.querySelector('.txt');
+		const targetText = target.querySelector('.se-txt');
 
 		if (!element) {
 			domUtils.changeTxt(targetText, formatTitle);
@@ -59,7 +59,7 @@ FormatBlock.prototype = {
 	 */
 	on(target) {
 		const formatList = this.formatList;
-		const targetText = target.querySelector('.txt');
+		const targetText = target.querySelector('.se-txt');
 		const currentFormat = (targetText.getAttribute('data-value') || '') + (targetText.getAttribute('data-class') || '');
 
 		if (currentFormat !== this.currentFormat) {

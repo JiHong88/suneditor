@@ -120,6 +120,7 @@ const Image_ = function (editor, pluginOptions) {
 
 Image_.key = 'image';
 Image_.type = 'modal';
+Image_.component = (node) => (/^IMG$/i.test(node?.nodeName) ? Image_.key : '');
 Image_.className = '';
 Image_.prototype = {
 	/**

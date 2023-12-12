@@ -253,10 +253,10 @@ class Events extends EditorInterface {
 	/**
 	 * @description Called after the "setToolbarButtons" invocation.
 	 * Can be used to tweak buttons properties (useful for custom buttons)
-	 * @param buttonList Button list
+	 * @param buttonTray Button tray element
 	 * @param core Core object
 	 */
-	onSetToolbarButtons: (buttonList: any[], core: Core) => void;
+	onSetToolbarButtons: (buttonTray: Element, core: Core) => void;
 }
 
 export default Events;
