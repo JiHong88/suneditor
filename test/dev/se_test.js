@@ -432,7 +432,7 @@ window.editor_root = suneditor.create(
 		toolbar_sticky: 0,
 		lineAttrReset: 'id',
 		height: '300px',
-		buttonList: bb,
+		buttonList: bl,
 		subToolbar: {
 			buttonList: [['bold', 'dir', 'dir_ltr', 'dir_rtl', 'save']],
 			width: 'auto',
@@ -478,12 +478,14 @@ window.editor_root = suneditor.create(
 		},
 		fontSize: {
 			// showIncDecControls: true,
-			// disableInput: true
+			// disableInput: true,
+			sizeUnit: 'text',
+			// showDefaultSizeLabel:true
 		},
 		events: {
 			onFileAction: (data) => {
 				console.log('fileaa', data);
-			}
+			},
 		}
 	}
 );

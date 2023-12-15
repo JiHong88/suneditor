@@ -44,7 +44,7 @@ const HTML = function (editor) {
 		...splitTagStyles,
 		span: editor.options.get('_spanStylesRegExp'),
 		line: editor.options.get('_lineStylesRegExp'),
-		fontSizeUnit: new RegExp('\\d+' + this.options.get('fontSizeUnit') + '$', 'i')
+		fontSizeUnit: new RegExp('\\d+(' + this.options.get('fontSizeUnits').join('|') + ')$', 'i')
 	};
 
 	const sPrefix = editor.options.get('__allowedScriptTag') ? '' : 'script|';
@@ -1409,7 +1409,7 @@ HTML.prototype = {
 							case 'fontSize':
 								if (!this.plugins.fontSize) continue;
 								if (!this._cleanStyleRegExp.fontSizeUnit.test(r[0])) {
-									r[0] = r[0].replace((r[0].match(/:\s*([^;]+)/) || [])[1], converter.fontSize.bind(null, this.options.get('fontSizeUnit')));
+									r[0] = r[0].replace((r[0].match(/:\s*([^;]+)/) || [])[1], converter.fontSize.bind(null, this.options.get('fontSizeUnits')[0]));
 								}
 								break;
 							case 'color':

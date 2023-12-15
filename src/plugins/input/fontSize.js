@@ -1,45 +1,83 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils } from '../../helper';
 
-const DEFAULT_ENABLE_UNITS = ['px', 'pt', 'em', 'rem'];
 const DEFAULT_UNIT_MAP = {
+	text: {
+		default: '13px',
+		list: [
+			{
+				title: 'XX-Small',
+				size: '8px'
+			},
+			{
+				title: 'X-Small',
+				size: '10px'
+			},
+			{
+				title: 'Small',
+				size: '13px'
+			},
+			{
+				title: 'Medium',
+				size: '16px'
+			},
+			{
+				title: 'Large',
+				size: '18px'
+			},
+			{
+				title: 'X-Large',
+				size: '24px'
+			},
+			{
+				title: 'XX-Large',
+				size: '32px'
+			}
+		]
+	},
 	px: {
+		default: 13,
 		inc: 1,
 		min: 8,
 		max: 72,
-		list: [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72]
+		list: [8, 10, 13, 15, 18, 20, 22, 26, 28, 36, 48, 72]
 	},
 	pt: {
+		default: 10,
 		inc: 1,
 		min: 6,
 		max: 72,
-		list: [6, 8, 10, 12, 14, 18, 22, 26, 30, 34, 38, 42, 48, 54, 60, 66, 72]
+		list: [6, 8, 10, 12, 14, 18, 22, 26, 32]
 	},
 	em: {
+		default: 1,
 		inc: 0.1,
 		min: 0.5,
 		max: 5,
-		list: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4, 4.5, 5]
+		list: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3]
 	},
 	rem: {
+		default: 1,
 		inc: 0.1,
 		min: 0.5,
 		max: 5,
-		list: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4, 4.5, 5]
+		list: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3]
 	},
 	vw: {
 		inc: 0.1,
 		min: 0.5,
 		max: 10,
-		list: [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+		list: [2, 3.5, 4, 4.5, 6, 8]
 	},
 	vh: {
+		default: 1.5,
 		inc: 0.1,
 		min: 0.5,
 		max: 10,
-		list: [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+		list: [1, 1.5, 2, 2.5, 3, 3.5, 4]
 	},
 	'%': {
+		default: 100,
 		inc: 1,
 		min: 50,
 		max: 200,
@@ -52,12 +90,14 @@ const FontSize = function (editor, pluginOptions) {
 
 	// create HTML
 	this.unitMap = { ...DEFAULT_UNIT_MAP, ...(pluginOptions.unitMap || {}) };
-	const unitMap = this.unitMap[this.options.get('fontSizeUnit')];
-	const menu = CreateHTML(editor, pluginOptions.items || unitMap.list);
+	this.sizeUnit = /text/.test(pluginOptions.sizeUnit) ? '' : pluginOptions.sizeUnit || this.options.get('fontSizeUnits')[0];
+
+	const unitMap = this.unitMap[this.sizeUnit || 'text'];
+	const menu = CreateHTML(editor, unitMap, this.sizeUnit, pluginOptions.showDefaultSizeLabel);
 
 	// plugin basic properties
-	const showIncDec = pluginOptions.showIncDecControls ?? false;
-	const disableInput = pluginOptions.disableInput ?? false;
+	const showIncDec = this.sizeUnit ? pluginOptions.showIncDecControls ?? false : false;
+	const disableInput = this.sizeUnit ? pluginOptions.disableInput ?? false : true;
 
 	this.title = this.lang.fontSize;
 	this.inner =
@@ -97,8 +137,6 @@ const FontSize = function (editor, pluginOptions) {
 
 	// members
 	this.currentSize = '';
-	this.enableUnits = pluginOptions.enableUnits || DEFAULT_ENABLE_UNITS;
-	this.sizeUnit = pluginOptions.sizeUnit || this.options.get('fontSizeUnit');
 	this.sizeList = menu.querySelectorAll('li button');
 	this.hasInputFocus = false;
 	this.__isActive = false; // input target event
@@ -118,7 +156,7 @@ FontSize.prototype = {
 	 */
 	active(element, target) {
 		if (!element) {
-			this._setSize(target, this.editor.frameContext.get('wwComputedStyle').fontSize);
+			this._setSize(target, this._getDefaultSize());
 		} else if (element?.style.fontSize.length > 0) {
 			this._setSize(target, element.style.fontSize);
 			return true;
@@ -217,7 +255,7 @@ FontSize.prototype = {
 	 * @param {Element} target Target command button
 	 */
 	action(target) {
-		const commandValue = target.getAttribute('data-command');
+		const commandValue = target.getAttribute('data-value');
 
 		if (commandValue === FontSize.key) {
 			const { value, unit } = this._getSize(target);
@@ -237,23 +275,30 @@ FontSize.prototype = {
 		this.menu.dropdownOff();
 	},
 
+	_getDefaultSize() {
+		return this.editor.frameContext.get('wwComputedStyle').fontSize;
+	},
+
 	_getSize(target) {
 		target = typeof target === 'string' ? target : target.parentElement.querySelector('.__se__font_size');
 		if (!target)
 			return {
-				unit: this.sizeUnit || this.options.get('fontSizeUnit'),
-				value: 0
+				unit: this.sizeUnit,
+				value: this.sizeUnit ? 0 : ''
 			};
 
-		const value = typeof target === 'string' ? target : /^INPUT$/i.test(target.nodeName) ? target.value : target.textContent;
-		const splitValue = value.split(/(\d+)/);
+		const size = typeof target === 'string' ? target : /^INPUT$/i.test(target.nodeName) ? target.value : target.textContent;
+		const splitValue = this.sizeUnit ? size.split(/(\d+)/) : [size, ''];
 
 		let unit = (splitValue.pop() || '').trim().toLowerCase();
-		unit = this.enableUnits.includes(unit) ? unit : this.sizeUnit || this.options.get('fontSizeUnit');
+		unit = this.options.get('fontSizeUnits').includes(unit) ? unit : this.sizeUnit;
+
+		let value = splitValue.pop();
+		value = unit ? value * 1 : value;
 
 		return {
 			unit,
-			value: (splitValue.pop() || 0) * 1
+			value
 		};
 	},
 
@@ -264,28 +309,40 @@ FontSize.prototype = {
 		if (/^INPUT$/i.test(target.nodeName)) {
 			return (target.value = value);
 		} else {
-			return (target.textContent = value);
+			return (target.textContent = this.sizeUnit ? value : this.unitMap.text.list.find((v) => v.size === value)?.title || value);
 		}
 	},
 
 	constructor: FontSize
 };
 
-function CreateHTML({ lang, options }, sizeList) {
+function CreateHTML({ lang }, unitMap, sizeUnit, showDefaultSizeLabel) {
+	const sizeList = unitMap.list;
+	const defaultSize = unitMap.default;
+	const defaultLang = showDefaultSizeLabel ? lang.default : '';
+
 	let list = /*html*/ `
 	<div class="se-list-inner">
-		<ul class="se-list-basic">
-			<li>
-				<button type="button" class="se-btn se-btn-list default_value" title="${lang.default}" aria-label="${lang.default}">(${lang.default})</button>
-			</li>`;
+		<ul class="se-list-basic">`;
 
-	for (let i = 0, unit = options.get('fontSizeUnit'), len = sizeList.length, size; i < len; i++) {
+	for (let i = 0, len = sizeList.length, size, t, v, d, l; i < len; i++) {
 		size = sizeList[i];
+
+		if (typeof size === 'object') {
+			t = size.title;
+			v = size.size;
+		} else {
+			t = v = size + sizeUnit;
+		}
+
+		d = defaultSize === v ? ' default_value' : '';
+		l = d ? defaultLang || t : t;
 		list += /*html*/ `
 			<li>
-				<button type="button" class="se-btn se-btn-list" data-command="${size + unit}" title="${size + unit}" aria-label="${size + unit}" style="font-size:${size + unit};">${size}</button>
+				<button type="button" class="se-btn se-btn-list${d}" data-command="${t}" data-value="${v}" title="${l}" aria-label="${l}" style="font-size:${v};">${l}</button>
 			</li>`;
 	}
+
 	list += /*html*/ `
 		</ul>
 	</div>`;

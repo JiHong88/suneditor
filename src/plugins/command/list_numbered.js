@@ -65,7 +65,7 @@ List_numbered.prototype = {
 	 */
 	action(target) {
 		const el = this.format.getBlock(this.selection.getNode());
-		const type = target?.querySelector('ol').style.listStyleType || '';
+		const type = target?.querySelector('ol')?.style.listStyleType || '';
 
 		if (domUtils.isList(el) && type) {
 			el.style.listStyleType = type;

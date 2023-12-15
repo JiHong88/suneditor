@@ -294,8 +294,7 @@
 }
 
 .sun-editor .se-btn-list.default_value {
-	background-color: #f3f3f3;
-	border: 1px dotted #e1e1e1;
+	border: 1px dashed #b1b1b1;
 }
 
 /** --- Icons ---------------------------------------------------------- */

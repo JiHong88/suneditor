@@ -28,11 +28,13 @@ const DEFAULT_FORMAT_CLOSURE_BR_LINE = '';
 const DEFAULT_FORMAT_BLOCK = 'BLOCKQUOTE|OL|UL|FIGCAPTION|TABLE|THEAD|TBODY|TR|CAPTION|DETAILS';
 const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 
+const DEFAULT_SIZE_UNITS = ['px', 'pt', 'em', 'rem'];
+
 export const RO_UNAVAILABD = [
 	'mode',
 	'iframe',
 	'textTags',
-	'fontSizeUnit',
+	'fontSizeUnits',
 	'spanStyles',
 	'lineStyles',
 	'tagStyles',
@@ -318,7 +320,7 @@ export function InitOptions(options, editorTargets) {
 
 	/** Base */
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
-	o.set('fontSizeUnit', typeof options.fontSizeUnit === 'string' ? options.fontSizeUnit.trim().toLowerCase() || 'px' : 'px');
+	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);
 	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}^__se__|se-|katex`));
 	o.set('events', options.events || {});
 	o.set('__allowedScriptTag', options.__allowedScriptTag === true);

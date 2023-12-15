@@ -65,7 +65,7 @@ List_bulleted.prototype = {
 	 */
 	action(target) {
 		const el = this.format.getBlock(this.selection.getNode());
-		const type = target?.querySelector('ul').style.listStyleType || '';
+		const type = target?.querySelector('ul')?.style.listStyleType || '';
 
 		if (domUtils.isList(el) && type) {
 			el.style.listStyleType = type;

@@ -7,7 +7,8 @@ const FONT_VALUES_MAP = {
 	medium: 4,
 	large: 5,
 	'x-large': 6,
-	'xx-large': 7
+	'xx-large': 7,
+	'xxx-large': 8
 };
 
 /**
