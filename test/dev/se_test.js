@@ -479,7 +479,7 @@ window.editor_root = suneditor.create(
 		fontSize: {
 			// showIncDecControls: true,
 			// disableInput: true,
-			sizeUnit: 'text',
+			// sizeUnit: 'text',
 			// showDefaultSizeLabel:true
 		},
 		events: {
@@ -551,8 +551,11 @@ function loadEvent() {
 		await delayedFunction();
 		return 'aaa';
 	};
-	window.editor_root.events.onBlur = async () => {
-		console.log('blurrrr');
+	window.editor_root.events.onBlur = async (e) => {
+		console.log('blurrrr', e.event);
+	};
+	window.editor_root.events.onFocus = async () => {
+		console.log('onFocusonFocusonFocus');
 	};
 }
 

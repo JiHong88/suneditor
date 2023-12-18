@@ -139,7 +139,7 @@ const FontSize = function (editor, pluginOptions) {
 	this.currentSize = '';
 	this.sizeList = menu.querySelectorAll('li button');
 	this.hasInputFocus = false;
-	this.__isActive = false; // input target event
+	this.isInputActive = false; // input target event
 	this._disableInput = disableInput;
 
 	// init
@@ -148,13 +148,14 @@ const FontSize = function (editor, pluginOptions) {
 
 FontSize.key = 'fontSize';
 FontSize.type = 'input';
-FontSize.option = 'increase';
 FontSize.className = 'se-btn-select se-btn-input se-btn-tool-font-size';
 FontSize.prototype = {
 	/**
 	 * @override core
 	 */
 	active(element, target) {
+		if (!domUtils.hasClass(target, '__se__font_size')) return false;
+
 		if (!element) {
 			this._setSize(target, this._getDefaultSize());
 		} else if (element?.style.fontSize.length > 0) {
@@ -196,14 +197,16 @@ FontSize.prototype = {
 		event.preventDefault();
 
 		try {
-			this.__isActive = true;
+			this.isInputActive = true;
+			const size = this._setSize(target, changeValue + unit);
+			if (this._disableInput) return;
 
-			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + this._setSize(target, changeValue + unit) + ';' });
+			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + size + ';' });
 			this.format.applyTextStyle(newNode, ['font-size'], null, null);
 
 			if (keyCode !== 13) target.focus();
 		} finally {
-			this.__isActive = false;
+			this.isInputActive = false;
 		}
 	},
 
@@ -214,7 +217,7 @@ FontSize.prototype = {
 		if (this._disableInput) return;
 
 		try {
-			this.__isActive = true;
+			this.isInputActive = true;
 
 			let { value, unit } = this._getSize(changeValue);
 			const { max, min } = this.unitMap[unit];
@@ -223,7 +226,7 @@ FontSize.prototype = {
 			const newNode = domUtils.createElement('SPAN', { style: 'font-size: ' + this._setSize(target, value + unit) + ';' });
 			this.format.applyTextStyle(newNode, ['font-size'], null, null);
 		} finally {
-			this.__isActive = false;
+			this.isInputActive = false;
 			event.preventDefault();
 			this.editor.focus();
 		}
@@ -239,7 +242,7 @@ FontSize.prototype = {
 
 		if (currentSize !== this.currentSize) {
 			for (let i = 0, len = sizeList.length; i < len; i++) {
-				if (currentSize === sizeList[i].getAttribute('data-command')) {
+				if (currentSize === sizeList[i].getAttribute('data-value')) {
 					domUtils.addClass(sizeList[i], 'active');
 				} else {
 					domUtils.removeClass(sizeList[i], 'active');
@@ -255,7 +258,7 @@ FontSize.prototype = {
 	 * @param {Element} target Target command button
 	 */
 	action(target) {
-		const commandValue = target.getAttribute('data-value');
+		const commandValue = target.getAttribute('data-command');
 
 		if (commandValue === FontSize.key) {
 			const { value, unit } = this._getSize(target);
@@ -339,7 +342,7 @@ function CreateHTML({ lang }, unitMap, sizeUnit, showDefaultSizeLabel) {
 		l = d ? defaultLang || t : t;
 		list += /*html*/ `
 			<li>
-				<button type="button" class="se-btn se-btn-list${d}" data-command="${t}" data-value="${v}" title="${l}" aria-label="${l}" style="font-size:${v};">${l}</button>
+				<button type="button" class="se-btn se-btn-list${d}" data-command="${v}" data-value="${t}" title="${l}" aria-label="${l}" style="font-size:${v};">${l}</button>
 			</li>`;
 	}
 

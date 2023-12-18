@@ -30,6 +30,8 @@ const EventManager = function (editor) {
 	this.__geckoActiveEvent = null;
 	this.__scrollparents = [];
 	this.__scrollID = '';
+	// input plugins
+	this._inputFocus = false;
 	this.__inputPlugin = null;
 	this.__inputBlurEvent = null;
 	this.__inputKeyEvent = null;
@@ -825,7 +827,7 @@ EventManager.prototype = {
 		}
 	},
 	__removeInput() {
-		this.editor._antiBlur = false;
+		this._inputFocus = this.editor._antiBlur = false;
 		this.__inputBlurEvent = this.removeEvent(this.__inputBlurEvent);
 		this.__inputKeyEvent = this.removeEvent(this.__inputKeyEvent);
 		this.__inputPlugin = null;
@@ -865,7 +867,7 @@ function ButtonsHandler(e) {
 
 		// toolbar input button
 		if (isInput && /^INPUT$/i.test(target?.getAttribute('data-type'))) {
-			this.editor._antiBlur = true;
+			this.editor._antiBlur = this._inputFocus = true;
 			if (!this.status.hasFocus) this.applyTagEffect();
 			/* event */
 			const eventTarget = e.target;
@@ -878,18 +880,15 @@ function ButtonsHandler(e) {
 			// blur event
 			if (typeof plugin.onInputChange === 'function') this.__inputPlugin = { obj: plugin, target: eventTarget, value: eventTarget.value };
 			this.__inputBlurEvent = this.addEvent(eventTarget, 'blur', (e) => {
-				if (plugin.__isActive) return;
+				if (plugin.isInputActive) return;
 
 				try {
 					const value = eventTarget.value.trim();
-					if (typeof plugin.onInputChange === 'function' && value !== this.__inputPlugin.value) {
-						plugin.onInputChange({ target: eventTarget, value, event: e });
-					}
+					if (typeof plugin.onInputChange === 'function' && value !== this.__inputPlugin.value) plugin.onInputChange({ target: eventTarget, value, event: e });
 				} finally {
+					setTimeout(() => (this._inputFocus = false));
 					this.__removeInput();
 				}
-
-				if (this.status.hasFocus) OnBlur_wysiwyg.call(this, this.editor.frameContext, { ...e, caller: `SUNEDITOR.plugin-command.${command}` });
 			});
 
 			if (!plugin) return;
@@ -1985,7 +1984,17 @@ function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 
 function OnFocus_wysiwyg(frameContext, e) {
 	const rootKey = frameContext.get('key');
+
+	if (this._inputFocus) {
+		setTimeout(() => {
+			this.applyTagEffect();
+			if (this.editor.isInline) this.toolbar._showInline();
+		});
+		return;
+	}
+
 	if (this.status.rootKey === rootKey && this.editor._antiBlur) return;
+
 	this.editor._offCurrentController();
 	this.status.hasFocus = true;
 
@@ -2008,7 +2017,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 }
 
 function OnBlur_wysiwyg(frameContext, e) {
-	if (this.editor._antiBlur || frameContext.get('isCodeView')) return;
+	if (this._inputFocus || this.editor._antiBlur || frameContext.get('isCodeView')) return;
 
 	this.status.hasFocus = false;
 	this.editor.effectNode = null;

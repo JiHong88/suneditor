@@ -119,7 +119,7 @@ Component.prototype = {
 	 */
 	select(element, pluginName, isInput) {
 		const info = this.get(element);
-		if (domUtils.isUneditable(domUtils.getParentElement(element, this.is.bind(this))) || domUtils.isUneditable(element)) return false;
+		if (!info || domUtils.isUneditable(domUtils.getParentElement(element, this.is.bind(this))) || domUtils.isUneditable(element)) return false;
 
 		const plugin = this.plugins[pluginName];
 		if (!plugin) return;
