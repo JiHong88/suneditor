@@ -486,6 +486,14 @@ window.editor_root = suneditor.create(
 			onFileAction: (data) => {
 				console.log('fileaa', data);
 			},
+			onVideoUploadBefore:({ handler, info, files, file, url })=>{
+				if(/youtu\.?be/.test(url)) return url;
+
+				editor_root.plugins.video.modal.close()
+
+				return false;
+
+			}
 		}
 	}
 );

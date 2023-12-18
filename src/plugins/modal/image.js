@@ -150,7 +150,7 @@ Image_.prototype = {
 	 * @override modal
 	 * @returns {boolean | undefined}
 	 */
-	modalAction() {
+	async modalAction() {
 		this._align = this.modal.form.querySelector('input[name="suneditor_image_radio"]:checked').value;
 
 		if (this.modal.isUpdate) {
@@ -159,9 +159,9 @@ Image_.prototype = {
 		}
 
 		if (this.imgInputFile && this.imgInputFile.files.length > 0) {
-			return this._submitFile(this.imgInputFile.files);
+			return await this._submitFile(this.imgInputFile.files);
 		} else if (this.imgUrlFile && this._linkValue.length > 0) {
-			return this._submitURL(this._linkValue);
+			return await this._submitURL(this._linkValue);
 		}
 
 		return false;
@@ -365,7 +365,7 @@ Image_.prototype = {
 		};
 		const handler = function (url, url_) {
 			url = url_ || url;
-			if (this.modal.isUpdate) this._updateSrc(url, this._element, file);
+			if (this.modal.isUpdate) this._updateSrc(url, this._element);
 			else this.create(url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
 		}.bind(this, url);
 
@@ -611,12 +611,11 @@ Image_.prototype = {
 		this.figure.setAlign(oImg, align);
 
 		oImg.onload = OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
-		if (this.component.insert(container, false, true)) this.fileManager.setInfo(oImg, file);
+		this.component.insert(container, false, true);
 	},
 
-	_updateSrc(src, element, file) {
+	_updateSrc(src, element) {
 		element.src = src;
-		this.fileManager.setInfo(element, file);
 		this.component.select(element, Image_.key, false);
 	},
 
@@ -629,7 +628,7 @@ Image_.prototype = {
 				size: fileList[i].size
 			};
 			if (info.isUpdate) {
-				this._updateSrc(fileList[i].url, info.element, file);
+				this._updateSrc(fileList[i].url, info.element);
 				break;
 			} else {
 				this.create(fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt);
@@ -686,7 +685,7 @@ Image_.prototype = {
 			if (update) {
 				this._element.setAttribute('data-se-file-name', filesStack[i].file.name);
 				this._element.setAttribute('data-se-file-size', filesStack[i].file.size);
-				this._updateSrc(filesStack[i].result, updateElement, filesStack[i].file);
+				this._updateSrc(filesStack[i].result, updateElement);
 			} else {
 				this.create(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt);
 			}

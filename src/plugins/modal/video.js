@@ -2,6 +2,9 @@ import EditorInjector from '../../editorInjector';
 import { Modal, Figure, FileManager } from '../../modules';
 import { domUtils, numbers } from '../../helper';
 
+const YOUTUBE_EMBED = '//www.youtube.com/embed/';
+const VIMEO_EMBED = 'https://player.vimeo.com/video/';
+
 const Video = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -153,14 +156,14 @@ Video.prototype = {
 	 * @override modal
 	 * @returns {boolean | undefined}
 	 */
-	modalAction() {
+	async modalAction() {
 		this._align = this.modal.form.querySelector('input[name="suneditor_video_radio"]:checked').value;
 
 		let result = false;
 		if (this.videoInputFile && this.videoInputFile.files.length > 0) {
-			result = this._submitFile(this.videoInputFile.files);
+			result = await this._submitFile(this.videoInputFile.files);
 		} else if (this.videoUrlFile && this._linkValue.length > 0) {
-			result = this._submitURL(this._linkValue);
+			result = await this._submitURL(this._linkValue);
 		}
 
 		if (result) setTimeout(this.component.select.bind(this.component, this._element, 'video'));
@@ -348,7 +351,7 @@ Video.prototype = {
 		// oFrame.onload = OnloadVideo.bind(this, oFrame);
 
 		if (!isUpdate) {
-			if (this.component.insert(container, false, true)) this.fileManager.setInfo(oFrame, file);
+			this.component.insert(container, false, true);
 			if (!this.options.get('mediaAutoSelect')) {
 				const line = this.format.addLine(container, null);
 				if (line) this.selection.setRange(line, 0, line, 0);
@@ -435,7 +438,7 @@ Video.prototype = {
 			if (!/^http/.test(url)) url = 'https://' + url;
 			url = url.replace('watch?v=', '');
 			if (!/^\/\/.+\/embed\//.test(url)) {
-				url = url.replace(url.match(/\/\/.+\//)[0], '//www.youtube.com/embed/').replace('&', '?&');
+				url = url.replace(url.match(/\/\/.+\//)[0], YOUTUBE_EMBED).replace('&', '?&');
 			}
 
 			if (this._youtubeQuery.length > 0) {
@@ -450,7 +453,7 @@ Video.prototype = {
 			if (url.endsWith('/')) {
 				url = url.slice(0, -1);
 			}
-			url = 'https://player.vimeo.com/video/' + url.slice(url.lastIndexOf('/') + 1);
+			url = VIMEO_EMBED + url.slice(url.lastIndexOf('/') + 1);
 		}
 
 		const file = { name: url.split('/').pop(), size: 0 };

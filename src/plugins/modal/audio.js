@@ -300,7 +300,6 @@ Audio_.prototype = {
 			}
 		}
 
-		this.fileManager.setInfo(element, file);
 		if (isUpdate) this.history.push(false);
 	},
 
