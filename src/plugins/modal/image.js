@@ -318,7 +318,7 @@ Image_.prototype = {
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + limitSize / 1000 + 'KB';
 			let message = '';
-			if (typeof this.events.onImageUploadError !== 'function') {
+			if (typeof this.events.onImageUploadError === 'function') {
 				message = await this.events.onImageUploadError({
 					error: err,
 					limitSize,
@@ -703,7 +703,7 @@ Image_.prototype = {
 
 	async _error(response) {
 		let message = '';
-		if (typeof this.events.onImageUploadError !== 'function') {
+		if (typeof this.events.onImageUploadError === 'function') {
 			message = await this.events.onImageUploadError({ error: response });
 		}
 

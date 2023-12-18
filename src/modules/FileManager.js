@@ -82,7 +82,6 @@ FileManager.prototype = {
 
 		// create
 		if (!dataIndex || this._componentsInfoInit) {
-			console.log("ccc??")
 			state = 'create';
 			dataIndex = this.infoIndex++;
 
@@ -100,7 +99,6 @@ FileManager.prototype = {
 			this.infoList.push(info);
 		} else {
 			// update
-			console.log("uuuu??")
 			state = 'update';
 			dataIndex *= 1;
 

@@ -210,7 +210,7 @@ Audio_.prototype = {
 		if (limitSize > 0 && fileSize + this.fileManager.getSize() > limitSize) {
 			const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable total audios: ' + limitSize / 1000 + 'KB';
 			let message = '';
-			if (typeof this.events.onAudioUploadError !== 'function') {
+			if (typeof this.events.onAudioUploadError === 'function') {
 				message = await this.events.onAudioUploadError({ error: err, limitSize, currentSize: this.fileManager.getSize(), uploadSize: fileSize });
 			}
 
@@ -331,7 +331,7 @@ Audio_.prototype = {
 
 	async _error(response) {
 		let message = '';
-		if (typeof this.events.onAudioUploadError !== 'function') {
+		if (typeof this.events.onAudioUploadError === 'function') {
 			message = await this.events.onAudioUploadError({ error: response });
 		}
 

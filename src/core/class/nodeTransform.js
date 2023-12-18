@@ -275,9 +275,7 @@ NodeTransform.prototype = {
 				return this.test(current.tagName);
 			}.bind(new RegExp(`^(${validation ? validation : '.+'})$`, 'i'));
 		} else if (typeof validation !== 'function') {
-			validation = function () {
-				return true;
-			};
+			validation = () => true;
 		}
 
 		(function recursionFunc(current) {

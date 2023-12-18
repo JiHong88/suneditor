@@ -95,7 +95,7 @@ FileUpload.prototype = {
 
 	async _error(response) {
 		let message = '';
-		if (typeof this.events.onFileUploadError !== 'function') {
+		if (typeof this.events.onFileUploadError === 'function') {
 			message = await this.events.onFileUploadError({ error: response });
 		}
 

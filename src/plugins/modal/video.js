@@ -292,7 +292,7 @@ Video.prototype = {
 		this.figure.setSize(w, h);
 	},
 
-	create(oFrame, src, width, height, align, isUpdate, file) {
+	create(oFrame, src, width, height, align, isUpdate) {
 		let cover = null;
 		let container = null;
 
@@ -390,7 +390,7 @@ Video.prototype = {
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.video.submitFile.fail] Size of uploadable total videos: ' + limitSize / 1000 + 'KB';
 			let message = '';
-			if (typeof this.events.onVideoUploadError !== 'function') {
+			if (typeof this.events.onVideoUploadError === 'function') {
 				message = await this.events.onVideoUploadError({ error: err, limitSize, currentSize, uploadSize: fileSize });
 			}
 
@@ -618,7 +618,7 @@ Video.prototype = {
 
 	async _error(response) {
 		let message = '';
-		if (typeof this.events.onVideoUploadError !== 'function') {
+		if (typeof this.events.onVideoUploadError === 'function') {
 			message = await this.events.onVideoUploadError({ error: response });
 		}
 

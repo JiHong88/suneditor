@@ -459,6 +459,10 @@ window.editor_root = suneditor.create(
 				}
 			]
 		},
+		video: {
+			uploadUrl:'http://localhost:3000/editor/upload',
+			createFileInput: true
+		},
 		imageGallery: {
 			url: 'https://etyswjpn79.execute-api.ap-northeast-1.amazonaws.com/suneditor-demo'
 		},
@@ -477,7 +481,7 @@ window.editor_root = suneditor.create(
 			uploadUrl: 'http://localhost:3000/editor/upload'
 		},
 		fontSize: {
-			// showIncDecControls: true,
+			showIncDecControls: true,
 			// disableInput: true,
 			// sizeUnit: 'text',
 			// showDefaultSizeLabel:true
@@ -487,11 +491,8 @@ window.editor_root = suneditor.create(
 				console.log('fileaa', data);
 			},
 			onVideoUploadBefore:({ handler, info, files, file, url })=>{
-				if(/youtu\.?be/.test(url)) return url;
-
-				editor_root.plugins.video.modal.close()
-
-				return false;
+				console.log("urlurl",files)
+				return true
 
 			}
 		}

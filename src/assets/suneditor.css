@@ -188,6 +188,12 @@
 	transition: box-shadow 0.1s ease-in-out;
 }
 
+.sun-editor .se-menu-list li:hover .se-toolbar-btn:not(.on):not(.active):enabled,
+.sun-editor .se-menu-list li:hover .se-side-btn-after:not(.on):not(.active):enabled,
+.sun-editor .se-menu-list li:hover .se-side-btn-before:not(.on):not(.active):enabled {
+	border-color: #e1e1e1;
+}
+
 /* se-btn.on */
 .sun-editor .se-btn:enabled.on {
 	background-color: #eaf3ff;
@@ -703,6 +709,10 @@
 	margin: 0;
 }
 
+.sun-editor .se-menu-list li .se-toolbar-btn:not(input) {
+	border: 1px solid transparent;
+}
+
 /* tool bar select button (font, fontSize, formatBlock) */
 .sun-editor .se-btn-select {
 	width: auto;
@@ -744,18 +754,20 @@
 
 /* tool bar input button (fontSize) */
 .sun-editor .se-btn-input {
-	padding-left: 0;
-	padding-right: 0;
+	padding: 0 !important;
+	border: 0 !important;
 }
 .sun-editor .se-btn-input input {
 	font-size: 13px;
+	height: 34px;
 	border: 0;
 }
 .sun-editor .se-btn-input input:hover {
 	border: 1px solid #c1c1c1;
 }
 .sun-editor .se-btn-input input:focus {
-	border: 1px solid #3288ff;
+	border: 1px solid #3288ff !important;
+	outline: 0;
 }
 
 /** --- menu tray -------------------------------------------------------------- */
@@ -2541,7 +2553,7 @@
 }
 
 /* --- Input focus */
-.sun-editor input:focus,
+.sun-editor input:not(.se-toolbar-btn):focus,
 .sun-editor select:focus,
 .sun-editor textarea:focus {
 	border-color: #80bdff;
