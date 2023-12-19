@@ -75,6 +75,18 @@ const Editor = function (multiTargets, options) {
 	this.plugins = product.plugins || {};
 
 	/**
+	 * @description Events object, call by triggerEvent function
+	 * @type {Object.<string, any>}
+	 */
+	this.events = null;
+
+	/**
+	 * @description Call the event function by injecting self: this.
+	 * @type {Function}
+	 */
+	this.triggerEvent = null;
+
+	/**
 	 * @description Default icons object
 	 * @type {Object.<string, string>}
 	 */
@@ -1137,8 +1149,7 @@ Editor.prototype = {
 					  numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-right'))
 				: h;
 		if (fc.get('_editorHeight') !== h) {
-			if (typeof this.events.onResizeEditor === 'function')
-				this.events.onResizeEditor({ height: h, prevHeight: fc.get('_editorHeight'), frameContext: fc, observerEntry: resizeObserverEntry });
+			this.triggerEvent('onResizeEditor', { height: h, prevHeight: fc.get('_editorHeight'), frameContext: fc, observerEntry: resizeObserverEntry });
 			fc.set('_editorHeight', h);
 		}
 	},
@@ -1204,7 +1215,7 @@ Editor.prototype = {
 			// history reset
 			this.history.reset();
 			// user event
-			if (typeof this.events.onload === 'function') this.events.onload();
+			this.triggerEvent('onload', {});
 		});
 	},
 
@@ -1411,8 +1422,17 @@ Editor.prototype = {
 	},
 
 	__registerClass() {
-		// use events, history function
+		// use events
 		this.events = { ...Events(), ...this.options.get('events') };
+		this.triggerEvent = async (eventName, eventData) => {
+			const eventHandler = this.events[eventName];
+			if (typeof eventHandler === 'function') {
+				return await eventHandler({ editor: this, ...eventData });
+			}
+			return env.NO_EVENT;
+		};
+
+		// history function
 		this.history = History(this);
 
 		// eventManager

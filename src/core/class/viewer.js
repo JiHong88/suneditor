@@ -108,7 +108,7 @@ Viewer.prototype = {
 		domUtils.setDisabled(this.editor._codeViewDisabledButtons, value);
 
 		// user event
-		if (typeof this.events.onToggleCodeView === 'function') this.events.onToggleCodeView({ frameContext: fc, is: fc.get('isCodeView') });
+		this.triggerEvent('onToggleCodeView', { frameContext: fc, is: fc.get('isCodeView') });
 	},
 
 	/**
@@ -266,7 +266,7 @@ Viewer.prototype = {
 		if (wasToolbarHidden && !fc.get('isCodeView')) this.editor.toolbar.hide();
 
 		// user event
-		if (typeof this.events.onToggleFullScreen === 'function') this.events.onToggleFullScreen({ frameContext: fc, is: fc.get('isFullScreen') });
+		this.triggerEvent('onToggleFullScreen', { frameContext: fc, is: fc.get('isFullScreen') });
 	},
 
 	/**

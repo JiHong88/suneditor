@@ -159,7 +159,7 @@ FileManager.prototype = {
 		}
 
 		if (typeof this.eventHandler === 'function') {
-			this.eventHandler({ element, index: dataIndex, state, info, remainingFilesCount: --this.uploadFileLength < 0 ? 0 : this.uploadFileLength });
+			this.eventHandler({ editor: this.editor, element, index: dataIndex, state, info, remainingFilesCount: --this.uploadFileLength < 0 ? 0 : this.uploadFileLength });
 		}
 	},
 
@@ -260,7 +260,9 @@ FileManager.prototype = {
 			if (currentTags.includes(dataIndex)) continue;
 
 			infoList.splice(i, 1);
-			if (typeof this.eventHandler === 'function') this.eventHandler({ element: null, index: dataIndex, state: 'delete', info: null, remainingFilesCount: 0 });
+			if (typeof this.eventHandler === 'function') {
+				this.eventHandler({ editor: this.editor, element: null, index: dataIndex, state: 'delete', info: null, remainingFilesCount: 0 });
+			}
 			i--;
 		}
 	},
@@ -273,7 +275,7 @@ FileManager.prototype = {
 	_resetInfo() {
 		if (typeof this.eventHandler === 'function') {
 			for (let i = 0, len = this.infoList.length; i < len; i++) {
-				this.eventHandler.call(this.events, null, this.infoList[i].index, 'delete', null, 0);
+				this.eventHandler.call(this.events, { editor: this.editor, element: null, index: this.infoList[i].index, state: 'delete', info: null, remainingFilesCount: 0 });
 			}
 		}
 
@@ -291,7 +293,9 @@ FileManager.prototype = {
 			for (let i = 0, len = this.infoList.length; i < len; i++) {
 				if (index === this.infoList[i].index) {
 					this.infoList.splice(i, 1);
-					if (typeof this.eventHandler === 'function') this.eventHandler({ element: null, index, state: 'delete', info: null, remainingFilesCount: 0 });
+					if (typeof this.eventHandler === 'function') {
+						this.eventHandler({ editor: this.editor, element: null, index, state: 'delete', info: null, remainingFilesCount: 0 });
+					}
 					return;
 				}
 			}

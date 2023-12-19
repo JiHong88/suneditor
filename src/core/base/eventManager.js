@@ -550,8 +550,8 @@ EventManager.prototype = {
 
 		const maxCharCount = this.char.test(this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? cleanData : plainText);
 		// user event - paste
-		if (type === 'paste' && typeof this.events.onPaste === 'function') {
-			const value = await this.events.onPaste({ frameContext, event: e, cleanData, maxCharCount });
+		if (type === 'paste') {
+			const value = await this.triggerEvent('onPaste', { frameContext, event: e, cleanData, maxCharCount });
 			if (value === false) {
 				return false;
 			} else if (typeof value === 'string') {
@@ -560,8 +560,8 @@ EventManager.prototype = {
 			}
 		}
 		// user event - drop
-		if (type === 'drop' && typeof this.events.onDrop === 'function') {
-			const value = await this.events.onDrop({ frameContext, event: e, cleanData, maxCharCount });
+		if (type === 'drop') {
+			const value = await this.triggerEvent('onDrop', { frameContext, event: e, cleanData, maxCharCount });
 			if (value === false) {
 				return false;
 			} else if (typeof value === 'string') {
@@ -954,7 +954,7 @@ function OnMouseDown_wysiwyg(frameContext, e) {
 	setTimeout(this.selection._init.bind(this.selection));
 
 	// user event
-	if (typeof this.events.onMouseDown === 'function' && this.events.onMouseDown({ frameContext, event: e }) === false) return;
+	if (this.triggerEvent('onMouseDown', { frameContext, event: e }) === false) return;
 
 	// plugin event
 	if (this._callPluginEvent('onMouseDown', { frameContext, event: e }) === false) return;
@@ -982,7 +982,7 @@ function OnClick_wysiwyg(frameContext, e) {
 	if (domUtils.isNonEditable(this.editor.frameContext.get('wysiwyg'))) return;
 
 	// user event
-	if (typeof this.events.onClick === 'function' && this.events.onClick({ frameContext, event: e }) === false) return;
+	if (this.triggerEvent('onClick', { frameContext, event: e }) === false) return;
 	// plugin event
 	if (this._callPluginEvent('onClick', { frameContext, event: e }) === false) return;
 
@@ -1039,7 +1039,7 @@ function OnClick_wysiwyg(frameContext, e) {
 function OnMouseLeave_wysiwyg(frameContext, e) {
 	frameContext.get('lineBreaker').style.display = 'none';
 	// user event
-	if (typeof this.events.onMouseLeave === 'function' && this.events.onMouseLeave({ frameContext, event: e }) === false) return;
+	if (this.triggerEvent('onMouseLeave', { frameContext, event: e }) === false) return;
 	// plugin event
 	if (this._callPluginEvent('onMouseLeave', { frameContext, event: e }) === false) return;
 }
@@ -1061,7 +1061,7 @@ function OnInput_wysiwyg(frameContext, e) {
 	}
 
 	// user event
-	if (typeof this.events.onInput === 'function' && this.events.onInput({ frameContext, event: e, data }) === false) return;
+	if (this.events('onInput', { frameContext, event: e, data }) === false) return;
 	// plugin event
 	if (this._callPluginEvent('onInput', { frameContext, event: e, data }) === false) return;
 
@@ -1093,7 +1093,7 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 	}
 
 	// user event
-	if (typeof this.events.onKeyDown === 'function' && this.events.onKeyDown({ frameContext, event: e }) === false) return;
+	if (this.triggerEvent('onKeyDown', { frameContext, event: e }) === false) return;
 
 	/** Shortcuts */
 	if (ctrl && this.shortcuts.command(keyCode, shift)) {
@@ -1919,7 +1919,7 @@ function OnKeyUp_wysiwyg(frameContext, e) {
 	this.char.test('');
 
 	// user event
-	if (typeof this.events.onKeyUp === 'function' && this.events.onKeyUp({ frameContext, event: e }) === false) return;
+	if (this.triggerEvent('onKeyUp', { frameContext, event: e }) === false) return;
 	// plugin event
 	if (this._callPluginEvent('onKeyUp', { frameContext, event: e, range, line: formatEl }) === false) return;
 
@@ -1938,7 +1938,7 @@ function OnCopy_wysiwyg(frameContext, e) {
 	const clipboardData = e.clipboardData;
 
 	// user event
-	if (typeof this.events.onCopy === 'function' && this.events.onCopy({ frameContext, event: e, clipboardData }) === false) {
+	if (this.triggerEvent('onCopy', { frameContext, event: e, clipboardData }) === false) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -1964,7 +1964,7 @@ function OnCut_wysiwyg(frameContext, e) {
 	const clipboardData = e.clipboardData;
 
 	// user event
-	if (typeof this.events.onCut === 'function' && this.events.onCut({ frameContext, event: e, clipboardData }) === false) {
+	if (this.triggerEvent('onCut', { frameContext, event: e, clipboardData }) === false) {
 		e.preventDefault();
 		e.stopPropagation();
 		return false;
@@ -1979,7 +1979,7 @@ function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 	this._moveContainer(eventWysiwyg);
 	this._scrollContainer();
 	// user event
-	if (typeof this.events.onScroll === 'function') this.events.onScroll({ frameContext, event: e });
+	this.triggerEvent('onScroll', { frameContext, event: e });
 }
 
 function OnFocus_wysiwyg(frameContext, e) {
@@ -2010,7 +2010,7 @@ function OnFocus_wysiwyg(frameContext, e) {
 		if (this.editor.isInline) this.toolbar._showInline();
 
 		// user event
-		if (typeof this.events.onFocus === 'function') this.events.onFocus({ frameContext, event: e });
+		this.triggerEvent('onFocus', { frameContext, event: e });
 		// plugin event
 		this._callPluginEvent('onFocus', { frameContext, event: e });
 	});
@@ -2037,7 +2037,7 @@ function OnBlur_wysiwyg(frameContext, e) {
 	this.history.check(frameContext.get('key'), this.status._range);
 
 	// user event
-	if (typeof this.events.onBlur === 'function') this.events.onBlur({ frameContext, event: e });
+	this.triggerEvent('onBlur', { frameContext, event: e });
 	// plugin event
 	this._callPluginEvent('onBlur', { frameContext, event: e });
 }

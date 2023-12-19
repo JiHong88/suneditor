@@ -127,7 +127,7 @@ Controller.prototype = {
 	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
 	 * @param {any} arguments controller elements, function..
 	 */
-	_controllerOn(form, target) {
+	async _controllerOn(form, target) {
 		const params = {
 			position: this.position,
 			form: form,
@@ -135,12 +135,7 @@ Controller.prototype = {
 			inst: this
 		};
 
-		if (
-			typeof this.events.onBeforeShowController === 'function' &&
-			this.events.onBeforeShowController({ caller: this.kind, frameContext: this.editor.frameContext, params }) === false
-		) {
-			return;
-		}
+		if ((await this.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.editor.frameContext, params })) === false) return;
 
 		form.style.display = 'block';
 		if (this._shadowRoot) {
@@ -161,9 +156,7 @@ Controller.prototype = {
 		}
 
 		this.editor._antiBlur = true;
-		if (typeof this.events.onShowController === 'function') {
-			this.events.onShowController({ caller: this.kind, frameContext: this.editor.frameContext, params });
-		}
+		this.triggerEvent('onShowController', { caller: this.kind, frameContext: this.editor.frameContext, params });
 	},
 
 	/**

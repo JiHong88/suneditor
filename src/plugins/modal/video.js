@@ -1,6 +1,7 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Figure, FileManager } from '../../modules';
-import { domUtils, numbers } from '../../helper';
+import { domUtils, numbers, env } from '../../helper';
+const { NO_EVENT } = env;
 
 const YOUTUBE_EMBED = '//www.youtube.com/embed/';
 const VIMEO_EMBED = 'https://player.vimeo.com/video/';
@@ -389,35 +390,30 @@ Video.prototype = {
 		const currentSize = this.fileManager.getSize();
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.video.submitFile.fail] Size of uploadable total videos: ' + limitSize / 1000 + 'KB';
-			let message = '';
-			if (typeof this.events.onVideoUploadError === 'function') {
-				message = await this.events.onVideoUploadError({ error: err, limitSize, currentSize, uploadSize: fileSize });
-			}
+			const message = await this.triggerEvent('onVideoUploadError', { error: err, limitSize, currentSize, uploadSize: fileSize });
 
-			this.notice.open(message || err);
+			this.notice.open(message === NO_EVENT ? err : message || err);
 
 			return false;
 		}
 
 		const info = this._getInfo();
-		if (typeof this.events.onVideoUploadBefore === 'function') {
-			const result = await this.events.onVideoUploadBefore({
-				url: null,
-				files,
-				info,
-				handler: (data) => {
-					if (data && Array.isArray(data.result)) {
-						this._register(info, data);
-					} else {
-						this._serverUpload(info, data);
-					}
+		const result = await this.triggerEvent('onVideoUploadBefore', {
+			url: null,
+			files,
+			info,
+			handler: (data) => {
+				if (data && Array.isArray(data.result)) {
+					this._register(info, data);
+				} else {
+					this._serverUpload(info, data);
 				}
-			});
+			}
+		});
 
-			if (result === undefined) return true;
-			if (result === false) return false;
-			if (Array.isArray(result) && result.length > 0) files = result;
-		}
+		if (result === undefined) return true;
+		if (result === false) return false;
+		if (Array.isArray(result) && result.length > 0) files = result;
 
 		this._serverUpload(info, files);
 	},
@@ -470,20 +466,18 @@ Video.prototype = {
 			);
 		}.bind(this, url);
 
-		if (typeof this.events.onVideoUploadBefore === 'function') {
-			const result = await this.events.onVideoUploadBefore({
-				url,
-				files: file,
-				info: this._getInfo(),
-				handler
-			});
+		const result = await this.triggerEvent('onVideoUploadBefore', {
+			url,
+			files: file,
+			info: this._getInfo(),
+			handler
+		});
 
-			if (result === undefined) return true;
-			if (result === false) return false;
-			if (typeof result === 'string' && result.length > 0) handler(result);
-		} else {
-			handler(null);
-		}
+		if (result === undefined) return true;
+		if (result === false) return false;
+		if (typeof result === 'string' && result.length > 0) handler(result);
+
+		if (result === NO_EVENT) handler(null);
 
 		return true;
 	},
@@ -617,12 +611,8 @@ Video.prototype = {
 	},
 
 	async _error(response) {
-		let message = '';
-		if (typeof this.events.onVideoUploadError === 'function') {
-			message = await this.events.onVideoUploadError({ error: response });
-		}
-
-		const err = message || response.errorMessage;
+		const message = await this.triggerEvent('onVideoUploadError', { error: response });
+		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
 		this.notice.open(err);
 		console.error('[SUNEDITOR.plugin.video.error]', message);
 	},
@@ -639,9 +629,7 @@ function FileCheckHandler(element) {
 }
 
 async function UploadCallBack(info, xmlHttp) {
-	if (typeof this.events.videoUploadHandler === 'function') {
-		await this.events.videoUploadHandler({ xmlHttp, info });
-	} else {
+	if ((await this.triggerEvent('videoUploadHandler', { xmlHttp, info })) === NO_EVENT) {
 		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {
 			this._error(response);

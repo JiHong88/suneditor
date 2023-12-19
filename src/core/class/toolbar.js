@@ -153,9 +153,8 @@ Toolbar.prototype = {
 		this.editor.effectNode = null;
 		if (this.status.hasFocus) this.eventManager.applyTagEffect();
 		if (this.editor.frameContext.get('isReadOnly')) domUtils.setDisabled(this.editor._controllerOnDisabledButtons, true);
-		if (typeof this.events.onSetToolbarButtons === 'function') {
-			this.events.onSetToolbarButtons({ buttonTray: newToolbar.buttonTray, frameContext: this.editor.frameContext });
-		}
+
+		this.triggerEvent('onSetToolbarButtons', { buttonTray: newToolbar.buttonTray, frameContext: this.editor.frameContext });
 	},
 
 	_resetSticky() {
@@ -266,7 +265,7 @@ Toolbar.prototype = {
 
 		this._setBalloonOffset(isDirTop, range);
 
-		if (typeof this.events.onShowToolbar === 'function') this.events.onShowToolbar({ toolbar, mode: 'balloon', frameContext: this.editor.frameContext });
+		this.triggerEvent('onShowToolbar', { toolbar, mode: 'balloon', frameContext: this.editor.frameContext });
 
 		setTimeout(() => {
 			toolbar.style.visibility = '';
@@ -386,7 +385,7 @@ Toolbar.prototype = {
 		this._resetSticky();
 		this._inlineToolbarAttr.isShow = true;
 
-		if (typeof this.events.onShowToolbar === 'function') this.events.onShowToolbar({ toolbar, mode: 'inline' });
+		this.triggerEvent('onShowToolbar', { toolbar, mode: 'inline' });
 
 		toolbar.style.visibility = '';
 	},

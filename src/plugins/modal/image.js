@@ -1,6 +1,7 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Figure, FileManager, ModalAnchorEditor } from '../../modules';
-import { domUtils, numbers } from '../../helper';
+import { domUtils, numbers, env } from '../../helper';
+const { NO_EVENT } = env;
 
 const Image_ = function (editor, pluginOptions) {
 	// plugin bisic properties
@@ -317,42 +318,37 @@ Image_.prototype = {
 		const currentSize = this.fileManager.getSize();
 		if (limitSize > 0 && fileSize + currentSize > limitSize) {
 			const err = '[SUNEDITOR.imageUpload.fail] Size of uploadable total images: ' + limitSize / 1000 + 'KB';
-			let message = '';
-			if (typeof this.events.onImageUploadError === 'function') {
-				message = await this.events.onImageUploadError({
-					error: err,
-					limitSize,
-					currentSize,
-					uploadSize: fileSize
-				});
-			}
+			const message = await this.triggerEvent('onImageUploadError', {
+				error: err,
+				limitSize,
+				currentSize,
+				uploadSize: fileSize
+			});
 
-			this.notice.open(message || err);
+			this.notice.open(message === NO_EVENT ? err : message || err);
 
 			return false;
 		}
 
 		const info = this._getInfo();
-		if (typeof this.events.onImageUploadBefore === 'function') {
-			const result = await this.events.onImageUploadBefore({
-				url: null,
-				files,
-				info,
-				handler: (data) => {
-					if (data && Array.isArray(data.result)) {
-						this._register(info, data);
-					} else {
-						this._serverUpload(info, data);
-					}
+		const result = await this.triggerEvent('onImageUploadBefore', {
+			url: null,
+			files,
+			info,
+			handler: (data) => {
+				if (data && Array.isArray(data.result)) {
+					this._register(info, data);
+				} else {
+					this._serverUpload(info, data);
 				}
-			});
+			}
+		});
 
-			if (result === undefined) return true;
-			if (result === false) return false;
-			if (Array.isArray(result) && result.length > 0) files = result;
-		}
+		if (result === undefined) return true;
+		if (result === false) return false;
+		if (Array.isArray(result) && result.length > 0) files = result;
 
-		this._serverUpload(info, files);
+		if (result === NO_EVENT) this._serverUpload(info, files);
 	},
 
 	async _submitURL(url) {
@@ -369,20 +365,18 @@ Image_.prototype = {
 			else this.create(url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
 		}.bind(this, url);
 
-		if (typeof this.events.onImageUploadBefore === 'function') {
-			const result = await this.events.onImageUploadBefore({
-				url,
-				files: file,
-				info: this._getInfo(),
-				handler
-			});
+		const result = await this.triggerEvent('onImageUploadBefore', {
+			url,
+			files: file,
+			info: this._getInfo(),
+			handler
+		});
 
-			if (result === undefined) return true;
-			if (result === false) return false;
-			if (typeof result === 'string' && result.length > 0) handler(result);
-		} else {
-			handler(null);
-		}
+		if (result === undefined) return true;
+		if (result === false) return false;
+		if (typeof result === 'string' && result.length > 0) handler(result);
+
+		if (result === NO_EVENT) handler(null);
 
 		return true;
 	},
@@ -702,12 +696,8 @@ Image_.prototype = {
 	},
 
 	async _error(response) {
-		let message = '';
-		if (typeof this.events.onImageUploadError === 'function') {
-			message = await this.events.onImageUploadError({ error: response });
-		}
-
-		const err = message || response.errorMessage;
+		const message = await this.triggerEvent('onImageUploadError', { error: response });
+		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
 		this.notice.open(err);
 		console.error('[SUNEDITOR.plugin.image.error]', err);
 	},
@@ -722,9 +712,7 @@ function FileCheckHandler(element) {
 }
 
 async function UploadCallBack(info, xmlHttp) {
-	if (typeof this.events.imageUploadHandler === 'function') {
-		await this.events.imageUploadHandler({ xmlHttp, info });
-	} else {
+	if ((await this.triggerEvent('imageUploadHandler', { xmlHttp, info })) === NO_EVENT) {
 		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {
 			this._error(response);

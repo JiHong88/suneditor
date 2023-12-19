@@ -1,7 +1,7 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils } from '../../helper';
+import { domUtils, env } from '../../helper';
 import { FileManager } from '../../modules';
-// import { domUtils } from '../../helper';
+const { NO_EVENT } = env;
 
 const FileUpload = function (editor, pluginOptions) {
 	EditorInjector.call(this, editor);
@@ -94,12 +94,8 @@ FileUpload.prototype = {
 	},
 
 	async _error(response) {
-		let message = '';
-		if (typeof this.events.onFileUploadError === 'function') {
-			message = await this.events.onFileUploadError({ error: response });
-		}
-
-		const err = message || response.errorMessage;
+		const message = await this.triggerEvent('onFileUploadError', { error: response });
+		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
 		this.notice.open(err);
 		console.error('[SUNEDITOR.plugin.fileUpload.error]', err);
 	},
@@ -111,18 +107,16 @@ async function OnChangeFile(e) {
 	let files = e.target.files;
 	if (!files[0]) return;
 
-	if (typeof this.events.onFileUploadBefore === 'function') {
-		const result = await this.events.onFileUploadBefore({
-			files,
-			handler: (data) => {
-				this.fileManager.upload(this.uploadUrl, this.uploadHeaders, data && Array.isArray(data.result) ? data : files, UploadCallBack.bind(this), this._error.bind(this));
-			}
-		});
+	const result = await this.triggerEvent('onFileUploadBefore', {
+		files,
+		handler: (data) => {
+			this.fileManager.upload(this.uploadUrl, this.uploadHeaders, data && Array.isArray(data.result) ? data : files, UploadCallBack.bind(this), this._error.bind(this));
+		}
+	});
 
-		if (result === undefined) return true;
-		if (result === false) return false;
-		if (Array.isArray(result) && result.length > 0) files = result;
-	}
+	if (result === undefined) return true;
+	if (result === false) return false;
+	if (Array.isArray(result) && result.length > 0) files = result;
 
 	this.fileManager.upload(this.uploadUrl, this.uploadHeaders, files, UploadCallBack.bind(this), this._error.bind(this));
 }

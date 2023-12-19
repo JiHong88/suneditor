@@ -1,6 +1,7 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Controller, FileManager, Figure } from '../../modules';
-import { domUtils, numbers } from '../../helper';
+import { domUtils, numbers, env } from '../../helper';
+const { NO_EVENT } = env;
 
 const Audio_ = function (editor, pluginOptions) {
 	// plugin bisic properties
@@ -209,12 +210,9 @@ Audio_.prototype = {
 		const limitSize = this.pluginOptions.uploadSizeLimit;
 		if (limitSize > 0 && fileSize + this.fileManager.getSize() > limitSize) {
 			const err = '[SUNEDITOR.audioUpload.fail] Size of uploadable total audios: ' + limitSize / 1000 + 'KB';
-			let message = '';
-			if (typeof this.events.onAudioUploadError === 'function') {
-				message = await this.events.onAudioUploadError({ error: err, limitSize, currentSize: this.fileManager.getSize(), uploadSize: fileSize });
-			}
+			const message = await this.triggerEvent('onAudioUploadError', { error: err, limitSize, currentSize: this.fileManager.getSize(), uploadSize: fileSize });
 
-			this.notice.open(message || err);
+			this.notice.open(message === NO_EVENT ? err : message || err);
 
 			return false;
 		}
@@ -224,23 +222,21 @@ Audio_.prototype = {
 			element: this._element
 		};
 
-		if (typeof this.events.onAudioUploadBefore === 'function') {
-			const result = await this.events.onAudioUploadBefore({
-				files,
-				info,
-				handler: (data) => {
-					if (data && Array.isArray(data.result)) {
-						this._register(info, data);
-					} else {
-						this._serverUpload(info, data);
-					}
+		const result = await this.triggerEvent('onAudioUploadBefore', {
+			files,
+			info,
+			handler: (data) => {
+				if (data && Array.isArray(data.result)) {
+					this._register(info, data);
+				} else {
+					this._serverUpload(info, data);
 				}
-			});
+			}
+		});
 
-			if (typeof result === 'undefined') return;
-			if (!result) return false;
-			if (typeof result === 'object' && result.length > 0) files = result;
-		}
+		if (typeof result === 'undefined') return;
+		if (!result) return false;
+		if (typeof result === 'object' && result.length > 0) files = result;
 
 		this._serverUpload(info, files);
 	},
@@ -258,20 +254,18 @@ Audio_.prototype = {
 			this._createComp(info.element, url, null, info.isUpdate);
 		}.bind(this, url);
 
-		if (typeof this.events.onAudioUploadBefore === 'function') {
-			const result = await this.events.onAudioUploadBefore({
-				url: url,
-				files: file,
-				info,
-				handler
-			});
+		const result = await this.triggerEvent('onAudioUploadBefore', {
+			url: url,
+			files: file,
+			info,
+			handler
+		});
 
-			if (typeof result === 'undefined') return;
-			if (!result) return false;
-			if (typeof result === 'string' && result.length > 0) handler(result);
-		} else {
-			handler(null);
-		}
+		if (typeof result === 'undefined') return;
+		if (!result) return false;
+		if (typeof result === 'string' && result.length > 0) handler(result);
+
+		if (result === NO_EVENT) handler(null);
 
 		return true;
 	},
@@ -330,14 +324,10 @@ Audio_.prototype = {
 	},
 
 	async _error(response) {
-		let message = '';
-		if (typeof this.events.onAudioUploadError === 'function') {
-			message = await this.events.onAudioUploadError({ error: response });
-		}
-
-		const err = message || response.errorMessage;
+		const message = await this.triggerEvent('onAudioUploadError', { error: response });
+		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
 		this.notice.open(err);
-		console.error('[SUNEDITOR.plugin.audio.error]', message);
+		console.error('[SUNEDITOR.plugin.audio.error]', err);
 	},
 
 	constructor: Audio_
@@ -390,9 +380,7 @@ function UnSelect(target) {
 }
 
 async function UploadCallBack(info, xmlHttp) {
-	if (typeof this.events.audioUploadHandler === 'function') {
-		await this.events.audioUploadHandler({ xmlHttp, info });
-	} else {
+	if ((await this.triggerEvent('audioUploadHandler', { xmlHttp, info })) === NO_EVENT) {
 		const response = JSON.parse(xmlHttp.responseText);
 		if (response.errorMessage) {
 			this._error(response);

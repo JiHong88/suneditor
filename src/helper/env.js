@@ -1,6 +1,8 @@
 export const _w = window;
 export const _d = document;
 
+export const NO_EVENT = Symbol('noEventHandler');
+
 const userAgent = _w.navigator.userAgent.toLowerCase();
 
 /**

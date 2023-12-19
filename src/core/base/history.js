@@ -17,7 +17,7 @@ export default function (editor) {
 		editor.history.resetButtons(fc.get('key'), index);
 
 		// user event
-		if (editor.events.onChange) editor.events.onChange({ frameContext: fc, data: editor.html.get() });
+		editor.triggerEvent('onChange', { frameContext: fc, data: editor.html.get() });
 		if (editor.context.get('toolbar.main').style.display === 'block') editor.toolbar._showBalloon();
 		else if (editor.isSubBalloon && editor.context.get('toolbar.sub.main').style.display === 'block') editor.subToolbar._showBalloon();
 	}
@@ -275,7 +275,7 @@ export default function (editor) {
 				else e.setAttribute('disabled', true);
 			});
 
-			if (typeof editor.events.onResetButtons === 'function') editor.events.onResetButtons({ rootKey });
+			editor.triggerEvent('onResetButtons', { rootKey });
 		},
 
 		getRootStack() {

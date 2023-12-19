@@ -1,4 +1,5 @@
-import { domUtils } from '../../helper';
+import { domUtils, env } from '../../helper';
+const { NO_EVENT } = env;
 
 const StyleMap = {
 	bold: ['font-weight'],
@@ -75,9 +76,7 @@ export async function SAVE(editor) {
 	if (!fc.get('isChanged')) return;
 
 	const data = editor.html.get();
-	if (typeof editor.events.onSave === 'function') {
-		await editor.events.onSave({ frameContext: fc, data });
-	} else {
+	if ((await editor.triggerEvent('onSave', { frameContext: fc, data })) === NO_EVENT) {
 		const origin = fc.get('originElement');
 		if (/^TEXTAREA$/i.test(origin.nodeName)) {
 			origin.value = data;
