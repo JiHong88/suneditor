@@ -131,7 +131,7 @@ Component.prototype = {
 		}
 
 		this.isSelected = true;
-		setTimeout(
+		this._w.setTimeout(
 			() => {
 				if (typeof plugin.select === 'function') plugin.select(element);
 				this._setComponentLineBreaker(element);
@@ -297,7 +297,7 @@ function OnCopy_component(e) {
 		SetClipboardComponent(e, info.container, e.clipboardData);
 		domUtils.addClass(info.container, 'se-component-copy');
 		// copy effect
-		setTimeout(() => {
+		this._w.setTimeout(() => {
 			domUtils.removeClass(info.container, 'se-component-copy');
 		}, 120);
 	}

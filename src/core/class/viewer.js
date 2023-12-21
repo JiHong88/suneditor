@@ -331,7 +331,7 @@ Viewer.prototype = {
 		}
 
 		this.editor.showLoading();
-		setTimeout(() => {
+		this._w.setTimeout(() => {
 			try {
 				iframe.focus();
 				// Edge, Chromium

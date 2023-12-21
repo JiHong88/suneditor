@@ -404,6 +404,7 @@ window.editor_root = suneditor.create(
 		// editorStyle: 'font-size:40px',
 		value: `<figure class="se-non-select-figure se-scroll-figure-x"><table class="se-table-size-100 se-table-layout-auto" ><colgroup><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"></colgroup><tbody><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="1" rowspan="4"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td colspan="1" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure>`,
 		value: `<p>sadas<br></p><p>dsads<a href="http://localhost:3000/public/files/d5d13802a01dd4dea399c912f7b31e5e.png" download="1571311368279.png" name="1571311368279.png">1571311368279.png</a>​<br></p><div class="se-component se-image-container __se__float-none"><figure><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" style="" data-se-index="4" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="640,423"></figure></div>`,
+		value: `<p><span style="color: #ff5e00;"><del><strong>fdsfdsafa</strong></del></span><br></p>`,
 		plugins: plugins,
 		allowedClassName: '.+',
 		toolbar_container: '#root_toolbar_container',
@@ -438,8 +439,9 @@ window.editor_root = suneditor.create(
 			width: 'auto',
 			mode: 'balloon' // balloon, balloon-always, balloon-block
 		},
+		keepStyleOnDelete: true,
 		shortcuts: {
-			bold: ['s75', 'K'],
+			// bold: ['s75', 'K'],
 			italic: [],
 			image: ['73', 'I'],
 			list: ['76', 'L']
@@ -560,12 +562,12 @@ function loadEvent() {
 		await delayedFunction();
 		return 'aaa';
 	};
-	window.editor_root.events.onBlur = async (e) => {
-		console.log('blurrrr', e.event);
-	};
-	window.editor_root.events.onFocus = async () => {
-		console.log('onFocusonFocusonFocus');
-	};
+	// window.editor_root.events.onBlur = async (e) => {
+	// 	console.log('blurrrr', e.event);
+	// };
+	// window.editor_root.events.onFocus = async () => {
+	// 	console.log('onFocusonFocusonFocus');
+	// };
 }
 
 editor_root.events.onload = () => {

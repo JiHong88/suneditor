@@ -291,7 +291,7 @@ Figure.prototype = {
 		this.controller.open(_figure.main, null, this.__offContainer);
 
 		// set members
-		setTimeout(domUtils.addClass.bind(null, this._cover, 'se-figure-selected'));
+		this._w.setTimeout(domUtils.addClass.bind(null, this._cover, 'se-figure-selected'));
 		this._element_w = this._resize_w = w;
 		this._element_h = this._resize_h = h;
 		this._element_l = l;
@@ -420,7 +420,7 @@ Figure.prototype = {
 					this.controller.close();
 				} else {
 					domUtils.removeItem(this._caption);
-					setTimeout(this.component.select.bind(this.component, element, this.kind));
+					this._w.setTimeout(this.component.select.bind(this.component, element, this.kind));
 				}
 
 				this._caption = !this._caption;

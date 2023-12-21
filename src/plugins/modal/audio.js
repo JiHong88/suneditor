@@ -320,7 +320,7 @@ Audio_.prototype = {
 		if (!files) return;
 
 		const uploadFiles = this.modal.isUpdate ? [files[0]] : files;
-		this.fileManager.upload(this.pluginOptions.uploadUrl, this.pluginOptions.uploadHeaders, uploadFiles, UploadCallBack.bind(this, info), this.events.onAudioUploadError);
+		this.fileManager.upload(this.pluginOptions.uploadUrl, this.pluginOptions.uploadHeaders, uploadFiles, UploadCallBack.bind(this, info), this._error.bind(this));
 	},
 
 	async _error(response) {

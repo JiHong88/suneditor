@@ -82,7 +82,7 @@ Char.prototype = {
 	 */
 	display() {
 		if (this.editor.frameContext.has('charCounter')) {
-			setTimeout(() => {
+			this._w.setTimeout(() => {
 				this.editor.frameContext.get('charCounter').textContent = this.getLength();
 			});
 		}

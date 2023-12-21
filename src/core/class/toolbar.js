@@ -267,7 +267,7 @@ Toolbar.prototype = {
 
 		this.triggerEvent('onShowToolbar', { toolbar, mode: 'balloon', frameContext: this.editor.frameContext });
 
-		setTimeout(() => {
+		this._w.setTimeout(() => {
 			toolbar.style.visibility = '';
 		});
 	},

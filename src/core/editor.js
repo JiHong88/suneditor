@@ -1123,13 +1123,13 @@ Editor.prototype = {
 	_iframeAutoHeight(fc) {
 		const autoFrame = fc.get('_iframeAuto');
 		if (autoFrame) {
-			setTimeout(() => {
+			this._w.setTimeout(() => {
 				fc.get('wysiwygFrame').style.height = autoFrame.offsetHeight + 'px';
 			});
 		}
 
 		if (autoFrame) {
-			setTimeout(() => {
+			this._w.setTimeout(() => {
 				const h = autoFrame.offsetHeight;
 				fc.get('wysiwygFrame').style.height = h + 'px';
 				if (!env.isResizeObserverSupported) this.__callResizeFunction(fc, h, null);

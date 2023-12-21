@@ -32,6 +32,7 @@ const DEFAULT_SIZE_UNITS = ['px', 'pt', 'em', 'rem'];
 
 export const RO_UNAVAILABD = [
 	'mode',
+	'keepStyleOnDelete',
 	'iframe',
 	'textTags',
 	'fontSizeUnits',
@@ -320,6 +321,7 @@ export function InitOptions(options, editorTargets) {
 
 	/** Base */
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
+	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);
 	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);
 	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}^__se__|se-|katex`));
 	o.set('events', options.events || {});
@@ -332,13 +334,12 @@ export function InitOptions(options, editorTargets) {
 			italic: 'em',
 			strike: 'del',
 			subscript: 'sub',
-			superscript: 'sup',
-			indent: 'indent',
-			outdent: 'outdent'
+			superscript: 'sup'
 		},
 		options.textTags || {}
 	);
 	o.set('textTags', textTags);
+	o.set('_textStyleTags', Object.values(textTags).concat(['span']));
 	o.set('tagStyles', { ...DEFAULT_TABLE_STYLES, ...(options.tagStyles || {}) });
 	o.set(
 		'_spanStylesRegExp',
