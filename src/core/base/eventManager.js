@@ -247,7 +247,7 @@ EventManager.prototype = {
 
 		// cache style nodes
 		if (styleChanged || !this.__cacheStyleNodes?.length) {
-			this.__cacheStyleNodes = styleNodes;
+			this.__cacheStyleNodes = styleNodes.reverse();
 		}
 
 		/** save current nodes */
@@ -1930,26 +1930,20 @@ function OnKeyUp_wysiwyg(frameContext, e) {
 		this.selection.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
 	}
 
-	if (DELETE_KEYCODE.test(keyCode) && this.__cacheStyleNodes?.length > 0 && domUtils.isZeroWith(frameContext.get('wysiwyg').textContent)) {
-		const line = this.format.getLine(selectionNode);
-		if (!line) {
-			this.__cacheStyleNodes = [];
-			return;
-		}
-
-		let sNode = this.__cacheStyleNodes.pop()?.cloneNode(false);
-		let n = sNode;
-		let el = sNode;
-
-		while ((sNode = this.__cacheStyleNodes.pop()?.cloneNode(false))) {
-			n.appendChild(sNode);
-			n = sNode;
+	if (DELETE_KEYCODE.test(keyCode) && this.__cacheStyleNodes?.length > 0 && domUtils.isZeroWith(formatEl?.textContent)) {
+		const sNode = this.__cacheStyleNodes;
+		const el = sNode[0].cloneNode(false);
+		let n = el;
+		for (let i = 1, len = sNode.length, t; i < len; i++) {
+			t = sNode[i].cloneNode(false);
+			n.appendChild(t);
+			n = t;
 		}
 
 		const zeroWidth = domUtils.createTextNode(unicode.zeroWidthSpace);
-		line.innerHTML = n.innerHTML = '';
+		formatEl.innerHTML = n.innerHTML = '';
 		n.appendChild(zeroWidth);
-		line.appendChild(el);
+		formatEl.appendChild(el);
 
 		this.selection.setRange(zeroWidth, 1, zeroWidth, 1);
 	}
