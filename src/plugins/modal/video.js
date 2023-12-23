@@ -293,7 +293,7 @@ Video.prototype = {
 		this.figure.setSize(w, h);
 	},
 
-	create(oFrame, src, width, height, align, isUpdate) {
+	create(oFrame, src, width, height, align, isUpdate, file) {
 		let cover = null;
 		let container = null;
 
@@ -351,6 +351,8 @@ Video.prototype = {
 		// select figure
 		// oFrame.onload = OnloadVideo.bind(this, oFrame);
 
+		this.fileManager.setFileData(oFrame, file);
+
 		if (!isUpdate) {
 			this.component.insert(container, false, true);
 			if (!this.options.get('mediaAutoSelect')) {
@@ -397,25 +399,27 @@ Video.prototype = {
 			return false;
 		}
 
-		const info = this._getInfo();
-		const result = await this.triggerEvent('onVideoUploadBefore', {
+		const videoInfo = {
 			url: null,
 			files,
-			info,
-			handler: (data) => {
-				if (data && Array.isArray(data.result)) {
-					this._register(info, data);
-				} else {
-					this._serverUpload(info, data);
-				}
-			}
+			...this._getInfo()
+		};
+
+		const handler = function (infos, newInfos) {
+			infos = newInfos || infos;
+			this._serverUpload(infos, infos.files);
+		}.bind(this, videoInfo);
+
+		const result = await this.triggerEvent('onVideoUploadBefore', {
+			...videoInfo,
+			handler
 		});
 
 		if (result === undefined) return true;
 		if (result === false) return false;
-		if (Array.isArray(result) && result.length > 0) files = result;
+		if (result !== null && typeof result === 'object') handler(result);
 
-		this._serverUpload(info, files);
+		if (result === true || result === NO_EVENT) handler(null);
 	},
 
 	async _submitURL(url) {
@@ -453,31 +457,32 @@ Video.prototype = {
 		}
 
 		const file = { name: url.split('/').pop(), size: 0 };
-		const handler = function (url, url_) {
-			url = url_ || url;
+		const videoInfo = { url, files: file, ...this._getInfo() };
+
+		const handler = function (infos, newInfos) {
+			infos = newInfos || infos;
+			const url = infos.url;
 			this.create(
 				this[!/embed|iframe|player|\/e\/|\.php|\.html?/.test(url) && !/vimeo\.com/.test(url) ? '_createVideoTag' : '_createVideoTag'](),
 				url,
-				this.inputX.value,
-				this.inputY.value,
-				this._align,
-				this.modal.isUpdate,
-				{ name: url.split('/').pop(), size: 0 }
+				infos.inputWidth,
+				infos.inputHeight,
+				infos.align,
+				infos.isUpdate,
+				infos.files
 			);
-		}.bind(this, url);
+		}.bind(this, videoInfo);
 
 		const result = await this.triggerEvent('onVideoUploadBefore', {
-			url,
-			files: file,
-			info: this._getInfo(),
+			...videoInfo,
 			handler
 		});
 
 		if (result === undefined) return true;
 		if (result === false) return false;
-		if (typeof result === 'string' && result.length > 0) handler(result);
+		if (result !== null && typeof result === 'object') handler(result);
 
-		if (result === NO_EVENT) handler(null);
+		if (result === true || result === NO_EVENT) handler(null);
 
 		return true;
 	},

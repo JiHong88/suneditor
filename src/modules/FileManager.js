@@ -63,12 +63,19 @@ FileManager.prototype = {
 		xmlHttp.send(formData);
 	},
 
+	setFileData(element, { name, size }) {
+		if (!element) return;
+		element.setAttribute('data-se-file-name', name);
+		element.setAttribute('data-se-file-size', size);
+	},
+
 	/**
 	 * @description Create info object of file and add it to "infoList"
+	 * @private
 	 * @param {Element} element
 	 * @param {Object|null} file
 	 */
-	setInfo(element, file) {
+	_setInfo(element, file) {
 		let dataIndex = element.getAttribute('data-se-index');
 		let info = null;
 		let state = '';
@@ -190,7 +197,7 @@ FileManager.prototype = {
 			// reset
 			if (this._componentsInfoReset) {
 				for (let i = 0, len = tags.length; i < len; i++) {
-					this.setInfo(tags[i], null);
+					this._setInfo(tags[i], null);
 				}
 				return;
 			} else {
@@ -232,7 +239,7 @@ FileManager.prototype = {
 							`[SUNEDITOR.FileManager[${this.kind}].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).`
 						);
 					} else {
-						this.setInfo(tag, null);
+						this._setInfo(tag, null);
 						this.inst.init();
 					}
 				} catch (error) {
@@ -243,7 +250,7 @@ FileManager.prototype = {
 			} else if (!tag.getAttribute('data-se-index') || !infoIndex.includes(tag.getAttribute('data-se-index') * 1)) {
 				currentTags.push(this.infoIndex);
 				tag.removeAttribute('data-se-index');
-				this.setInfo(tag, null);
+				this._setInfo(tag, null);
 			} else {
 				currentTags.push(tag.getAttribute('data-se-index') * 1);
 			}

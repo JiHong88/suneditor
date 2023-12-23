@@ -217,55 +217,57 @@ Audio_.prototype = {
 			return false;
 		}
 
-		const info = {
+		const audioInfo = {
+			files,
 			isUpdate: this.modal.isUpdate,
 			element: this._element
 		};
 
+		const handler = function (newInfos, infos) {
+			infos = newInfos || infos;
+			this._serverUpload(infos, infos.files);
+		}.bind(this, audioInfo);
+
 		const result = await this.triggerEvent('onAudioUploadBefore', {
-			files,
-			info,
-			handler: (data) => {
-				if (data && Array.isArray(data.result)) {
-					this._register(info, data);
-				} else {
-					this._serverUpload(info, data);
-				}
-			}
+			...audioInfo,
+			handler
 		});
 
-		if (typeof result === 'undefined') return;
+		if (typeof result === 'undefined') return true;
 		if (!result) return false;
-		if (typeof result === 'object' && result.length > 0) files = result;
+		if (result !== null && typeof result === 'object') handler(result);
 
-		this._serverUpload(info, files);
+		if (result === true || result === NO_EVENT) handler(null);
+
+		return true;
 	},
 
 	async _submitURL(url) {
 		if (url.length === 0) return false;
 
 		const file = { name: url.split('/').pop(), size: 0 };
-		const info = {
+		const audioInfo = {
+			url,
+			files: file,
 			isUpdate: this.modal.isUpdate,
 			element: this._createAudioTag()
 		};
-		const handler = function (url, _url) {
-			url = _url || url;
-			this._createComp(info.element, url, null, info.isUpdate);
+
+		const handler = function (newInfos, infos) {
+			infos = newInfos || infos;
+			this._createComp(infos.element, infos.url, infos.files, infos.isUpdate);
 		}.bind(this, url);
 
 		const result = await this.triggerEvent('onAudioUploadBefore', {
-			url: url,
-			files: file,
-			info,
+			...audioInfo,
 			handler
 		});
 
-		if (typeof result === 'undefined') return;
+		if (typeof result === 'undefined') return true;
 		if (!result) return false;
-		if (typeof result === 'string' && result.length > 0) handler(result);
+		if (result !== null && typeof result === 'object') handler(result);
 
-		if (result === NO_EVENT) handler(null);
+		if (result === true || result === NO_EVENT) handler(null);
 
 		return true;
 	},
@@ -273,6 +275,7 @@ Audio_.prototype = {
 	_createComp(element, src, file, isUpdate) {
 		// create new tag
 		if (!isUpdate) {
+			this.fileManager.setFileData(element, file);
 			element.src = src;
 			const figure = Figure.CreateContainer(element);
 			if (!this.component.insert(figure.container, false, !this.options.get('mediaAutoSelect'))) {
@@ -285,6 +288,7 @@ Audio_.prototype = {
 			}
 		} else {
 			if (this._element) element = this._element;
+			this.fileManager.setFileData(element, file);
 			if (element && element.src !== src) {
 				element.src = src;
 				this.component.select(element, Audio_.key, false);

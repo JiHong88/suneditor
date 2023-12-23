@@ -32,6 +32,7 @@ const FileUpload = function (editor, pluginOptions) {
 FileUpload.key = 'fileUpload';
 FileUpload.type = 'command';
 FileUpload.className = '';
+FileUpload.component = (node) => domUtils.isAnchor(node) && !domUtils.isMedia(node.firstElementChild);
 FileUpload.prototype = {
 	/**
 	 * @override core
@@ -89,8 +90,8 @@ FileUpload.prototype = {
 			name
 		);
 
+		this.fileManager.setFileData(a, file);
 		this.html.insert(a, false, false, true);
-		this.fileManager.setInfo(a, file);
 	},
 
 	async _error(response) {
@@ -107,18 +108,27 @@ async function OnChangeFile(e) {
 	let files = e.target.files;
 	if (!files[0]) return;
 
+	const fileInfo = {
+		url: this.uploadUrl,
+		uploadHeaders: this.uploadHeaders,
+		files
+	};
+
+	const handler = function (infos, newInfos) {
+		infos = newInfos || infos;
+		this.fileManager.upload(infos.url, infos.uploadHeaders, infos.files, UploadCallBack.bind(this), this._error.bind(this));
+	}.bind(this, fileInfo);
+
 	const result = await this.triggerEvent('onFileUploadBefore', {
-		files,
-		handler: (data) => {
-			this.fileManager.upload(this.uploadUrl, this.uploadHeaders, data && Array.isArray(data.result) ? data : files, UploadCallBack.bind(this), this._error.bind(this));
-		}
+		...fileInfo,
+		handler
 	});
 
 	if (result === undefined) return true;
 	if (result === false) return false;
-	if (Array.isArray(result) && result.length > 0) files = result;
+	if (result !== null && typeof result === 'object') handler(result);
 
-	this.fileManager.upload(this.uploadUrl, this.uploadHeaders, files, UploadCallBack.bind(this), this._error.bind(this));
+	if (result === true || result === NO_EVENT) handler(null);
 }
 
 async function UploadCallBack(xmlHttp) {

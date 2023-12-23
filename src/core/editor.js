@@ -1036,13 +1036,14 @@ Editor.prototype = {
 	_offCurrentController(_componentClosed) {
 		const cont = this.opendControllers;
 		const fixedCont = [];
-		for (let i = 0; i < cont.length; i++) {
-			if (cont[i].fixed) {
-				fixedCont.push(cont[i]);
+		for (let i = 0, c; i < cont.length; i++) {
+			c = cont[i];
+			if (c.fixed) {
+				fixedCont.push(c);
 				continue;
 			}
-			if (typeof cont[i].inst.close === 'function') cont[i].inst.close();
-			if (cont[i].form) cont[i].form.style.display = 'none';
+			if (typeof c.inst.close === 'function') c.inst.close();
+			if (c.form) c.form.style.display = 'none';
 		}
 		this.opendControllers = fixedCont;
 		this.currentControllerName = '';
@@ -1315,7 +1316,6 @@ Editor.prototype = {
 		this.__setDisabledButtons();
 		this.__saveCommandButtons(this.allCommandButtons, ctx.get('toolbar.buttonTray'));
 		if (this.options.has('_subMode')) {
-			ctx.get('toolbar.sub.buttonTray');
 			this.__saveCommandButtons(this.subAllCommandButtons, ctx.get('toolbar.sub.buttonTray'));
 		}
 	},

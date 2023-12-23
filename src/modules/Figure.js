@@ -873,7 +873,6 @@ function CreateResize(editor, button) {
 function OffFigureContainer() {
 	this.editor.frameContext.get('_figure').main.style.display = 'none';
 	this.editor._figureContainer = null;
-	this.inst.init();
 	Figure.__figureControllerInst = null;
 }
 

@@ -36,6 +36,7 @@ Modal.prototype = {
 	 * @description Open a modal plugin
 	 */
 	open() {
+		if (typeof this.inst.init === 'function') this.inst.init();
 		this.editor._offCurrentModal();
 		this._fixCurrentController(true);
 
@@ -71,7 +72,7 @@ Modal.prototype = {
 		this._modalBack.style.display = 'none';
 		this._modalArea.style.display = 'none';
 
-		if (typeof this.inst.init === 'function' && !this.isUpdate) this.inst.init();
+		if (typeof this.inst.init === 'function') this.inst.init();
 		this.editor.focus();
 	},
 

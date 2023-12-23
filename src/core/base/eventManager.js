@@ -785,7 +785,7 @@ EventManager.prototype = {
 
 		for (let i = 0; i < openCont.length; i++) {
 			if (openCont[i].notInCarrier) continue;
-			openCont[i].inst.hide();
+			openCont[i].inst?.hide();
 		}
 
 		this.__scrollID = _w.setTimeout(() => {
@@ -793,7 +793,7 @@ EventManager.prototype = {
 			this.__scrollID = '';
 			for (let i = 0; i < openCont.length; i++) {
 				if (openCont[i].notInCarrier) continue;
-				openCont[i].inst.show();
+				openCont[i].inst?.show();
 			}
 		}, 250);
 	},
@@ -1930,7 +1930,7 @@ function OnKeyUp_wysiwyg(frameContext, e) {
 		this.selection.setRange(selectionNode, so < 0 ? 0 : so, selectionNode, eo < 0 ? 0 : eo);
 	}
 
-	if (DELETE_KEYCODE.test(keyCode) && this.__cacheStyleNodes?.length > 0 && domUtils.isZeroWith(formatEl?.textContent)) {
+	if (DELETE_KEYCODE.test(keyCode) && this.__cacheStyleNodes?.length > 0 && domUtils.isZeroWith(formatEl?.textContent) && !formatEl.previousElementSibling) {
 		const sNode = this.__cacheStyleNodes;
 		const el = sNode[0].cloneNode(false);
 		let n = el;

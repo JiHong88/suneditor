@@ -232,11 +232,14 @@ Offset.prototype = {
 	 */
 	getWWScroll() {
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
+		const rects = this.editor.selection.getRects(eventWysiwyg, 'start').rects;
+
 		return {
 			top: eventWysiwyg.scrollY || eventWysiwyg.scrollTop || 0,
 			left: eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0,
 			width: eventWysiwyg.scrollWidth || 0,
-			height: eventWysiwyg.scrollHeight || 0
+			height: eventWysiwyg.scrollHeight || 0,
+			rects
 		};
 	},
 
@@ -343,11 +346,9 @@ Offset.prototype = {
 			rmt = tmtw - toolbarH;
 			rmb = tmbw;
 		} else {
-			rmt = targetRect.top;
-			rmb = viewportSize.h - targetRect.bottom;
+			rmt = targetRect.top - wwScroll.rects.top;
+			rmb = wwScroll.rects.bottom - targetRect.bottom;
 		}
-
-		if (rmb + targetH <= 0 || rmt + targetH <= 0) return;
 
 		let t = addOffset.top;
 		let y = 0;

@@ -955,7 +955,7 @@ function _createButton(className, title, dataCommand, dataType, innerHTML, _disa
 	};
 }
 
-export function UpdateButton(element, plugin, icons, lang, shortcut) {
+export function UpdateButton(element, plugin, icons, lang) {
 	if (!element) return;
 
 	const noneInner = plugin.inner === false;
@@ -1010,15 +1010,6 @@ export function UpdateButton(element, plugin, icons, lang, shortcut) {
 			inputTarget.setAttribute('data-type', element.getAttribute('data-type'));
 			if (element.hasAttribute('disabled')) inputTarget.setAttribute('disabled', true);
 		}
-	}
-
-	const tooptip = element.querySelector('.se-tooltip-text');
-	if (!shortcut || !tooptip) return;
-
-	for (let i = 0, s, t; i < shortcut.length; i += 2) {
-		s = /^s/i.test(shortcut[i]);
-		if (!(t = shortcut[i + 1])) continue;
-		_addTooltip(tooptip, s, t);
 	}
 }
 

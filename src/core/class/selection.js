@@ -38,7 +38,8 @@ Selection.prototype = {
 		if (range.collapsed === selection.isCollapsed || !this.editor.frameContext.get('wysiwyg').contains(selection.focusNode)) {
 			if (this.component.is(range.startContainer)) {
 				const compInfo = this.component.get(range.startContainer);
-				const container = compInfo.container;
+				const container = compInfo?.container;
+				if (!container) return range;
 				return this.setRange(container, 0, container, 0);
 			}
 

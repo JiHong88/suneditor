@@ -330,53 +330,52 @@ Image_.prototype = {
 			return false;
 		}
 
-		const info = this._getInfo();
+		const imgInfo = { files, ...this._getInfo() };
+		const handler = function (infos, newInfos) {
+			infos = newInfos || infos;
+			this._serverUpload(infos, infos.files);
+		}.bind(this, imgInfo);
+
 		const result = await this.triggerEvent('onImageUploadBefore', {
-			url: null,
-			files,
-			info,
-			handler: (data) => {
-				if (data && Array.isArray(data.result)) {
-					this._register(info, data);
-				} else {
-					this._serverUpload(info, data);
-				}
-			}
+			...imgInfo,
+			handler
 		});
 
 		if (result === undefined) return true;
 		if (result === false) return false;
-		if (Array.isArray(result) && result.length > 0) files = result;
+		if (result !== null && typeof result === 'object') handler(result);
 
-		if (result === NO_EVENT) this._serverUpload(info, files);
+		if (result === true || result === NO_EVENT) handler(null);
 	},
 
 	async _submitURL(url) {
 		if (!url) url = this._linkValue;
 		if (!url) return false;
 
-		const file = {
-			name: url.split('/').pop(),
-			size: 0
-		};
-		const handler = function (url, url_) {
-			url = url_ || url;
-			if (this.modal.isUpdate) this._updateSrc(url, this._element);
-			else this.create(url, this.anchor.create(true), this.inputX.value, this.inputY.value, this._align, file, this.altText.value);
-		}.bind(this, url);
-
-		const result = await this.triggerEvent('onImageUploadBefore', {
+		const file = { name: url.split('/').pop(), size: 0 };
+		const imgInfo = {
 			url,
 			files: file,
-			info: this._getInfo(),
+			...this._getInfo()
+		};
+
+		const handler = function (infos, newInfos) {
+			infos = newInfos || infos;
+			const url = infos.url;
+			if (this.modal.isUpdate) this._updateSrc(url, infos.element, infos.files);
+			else this.create(url, infos.anchor, infos.inputWidth, infos.inputHeight, infos.align, infos.files, infos.alt);
+		}.bind(this, imgInfo);
+
+		const result = await this.triggerEvent('onImageUploadBefore', {
+			...imgInfo,
 			handler
 		});
 
 		if (result === undefined) return true;
 		if (result === false) return false;
-		if (typeof result === 'string' && result.length > 0) handler(result);
+		if (result !== null && typeof result === 'object') handler(result);
 
-		if (result === NO_EVENT) handler(null);
+		if (result === true || result === NO_EVENT) handler(null);
 
 		return true;
 	},
@@ -604,12 +603,15 @@ Image_.prototype = {
 		// align
 		this.figure.setAlign(oImg, align);
 
+		this.fileManager.setFileData(oImg, file);
+
 		oImg.onload = OnloadImg.bind(this, oImg, this._svgDefaultSize, container);
 		this.component.insert(container, false, true);
 	},
 
-	_updateSrc(src, element) {
+	_updateSrc(src, element, file) {
 		element.src = src;
+		this.fileManager.setFileData(element, file);
 		this.component.select(element, Image_.key, false);
 	},
 
@@ -622,7 +624,7 @@ Image_.prototype = {
 				size: fileList[i].size
 			};
 			if (info.isUpdate) {
-				this._updateSrc(fileList[i].url, info.element);
+				this._updateSrc(fileList[i].url, info.element, file);
 				break;
 			} else {
 				this.create(fileList[i].url, info.anchor, info.inputWidth, info.inputHeight, info.align, file, info.alt);
@@ -677,9 +679,7 @@ Image_.prototype = {
 	_onRenderBase64(update, filesStack, updateElement, anchor, width, height, align, alt) {
 		for (let i = 0, len = filesStack.length; i < len; i++) {
 			if (update) {
-				this._element.setAttribute('data-se-file-name', filesStack[i].file.name);
-				this._element.setAttribute('data-se-file-size', filesStack[i].file.size);
-				this._updateSrc(filesStack[i].result, updateElement);
+				this._updateSrc(filesStack[i].result, updateElement, filesStack[i].file);
 			} else {
 				this.create(filesStack[i].result, anchor, width, height, align, filesStack[i].file, alt);
 			}

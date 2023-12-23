@@ -39,7 +39,7 @@ import { html } from '@codemirror/lang-html';
 // import image from '../../src/plugins/modal/image';
 // import video from '../../src/plugins/modal/video';
 // import imageGallery from '../../src/plugins/fileBrowser/imageGallery';
-import plugins from '../../src/plugins';
+import plugins, { audio } from '../../src/plugins';
 
 const bl = [
 	['selectAll', 'newDocument', 'undo', 'redo', 'dir'],
@@ -403,8 +403,8 @@ window.editor_root = suneditor.create(
 		// value: 'Common value',
 		// editorStyle: 'font-size:40px',
 		value: `<figure class="se-non-select-figure se-scroll-figure-x"><table class="se-table-size-100 se-table-layout-auto" ><colgroup><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"><col style="width: 10%;"></colgroup><tbody><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="1" rowspan="4"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td colspan="1" rowspan="2"><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td colspan="2" rowspan="1"><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr><tr><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td><td><div><br></div></td></tr></tbody></table></figure>`,
-		value: `<p>sadas<br></p><p>dsads<a href="http://localhost:3000/public/files/d5d13802a01dd4dea399c912f7b31e5e.png" download="1571311368279.png" name="1571311368279.png">1571311368279.png</a>​<br></p><div class="se-component se-image-container __se__float-none"><figure><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" style="" data-se-index="4" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="640,423"></figure></div>`,
-		value: `<p><span style="color: #ff5e00;"><del><strong>fdsfdsafa</strong></del></span><br></p>`,
+		value: `<p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>dsads<a href="http://localhost:3000/public/files/d5d13802a01dd4dea399c912f7b31e5e.png" download="1571311368279.png" name="1571311368279.png">1571311368279.png</a>​<br></p><div class="se-component se-image-container __se__float-none"><figure><img src="http://suneditor.com/docs/welsh Corgi.jpg" alt="Welsh Corgi" style="" data-se-index="4" data-se-file-name="welsh%20Corgi.jpg" data-se-file-size="0" data-se-size="640,423"></figure></div><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p><p>sadas<br></p>`,
+		// value: `<p><span style="color: #ff5e00;"><del><strong>fdsfdsafa</strong></del></span><br></p>`,
 		plugins: plugins,
 		allowedClassName: '.+',
 		toolbar_container: '#root_toolbar_container',
@@ -470,6 +470,10 @@ window.editor_root = suneditor.create(
 		},
 		image: {
 			uploadUrl: 'http://localhost:3000/editor/upload'
+		},
+		audio: {
+			uploadUrl:'http://localhost:3000/editor/upload',
+			createFileInput: true
 		},
 		table: {
 			scrollType: 'x',
@@ -547,12 +551,12 @@ function loadEvent() {
 		await delayedFunction();
 		console.log(xmlHttp);
 		console.log(info);
-		editor_root.plugins.image._register(info, JSON.parse(xmlHttp.response));
+		// editor_root.plugins.image._register(info, JSON.parse(xmlHttp.response));
 	};
-	window.editor_root.events.onImageUploadBefore = async ({ handler, info, files, file, url }) => {
+	window.editor_root.events.onImageUploadBefore = async (info) => {
 		await delayedFunction();
-		if (url) handler('http://suneditor.com/docs/cat.jpg');
-		else return true;
+		console.log("info", info)
+		info.handler();
 	};
 	window.editor_root.events.onImageUpload = async ({ handler, info, files, file, url }) => {
 		await delayedFunction();

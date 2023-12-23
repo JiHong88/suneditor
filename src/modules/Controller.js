@@ -77,8 +77,6 @@ Controller.prototype = {
 		this.__addGlobalEvent();
 		this._setControllerPosition(this.form, this.currentPositionTarget);
 		this._controllerOn(this.form, target);
-		this.isOpen = true;
-		this.editor._antiBlur = true;
 	},
 
 	/**
@@ -155,6 +153,7 @@ Controller.prototype = {
 			});
 		}
 
+		this.isOpen = true;
 		this.editor._antiBlur = true;
 		this.triggerEvent('onShowController', { caller: this.kind, frameContext: this.editor.frameContext, params });
 	},
