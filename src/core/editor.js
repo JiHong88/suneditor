@@ -260,7 +260,6 @@ const Editor = function (multiTargets, options) {
 	this._fileManager = {
 		tags: null,
 		regExp: null,
-		queryString: null,
 		pluginRegExp: null,
 		pluginMap: null
 	};
@@ -1280,7 +1279,15 @@ Editor.prototype = {
 
 			// Not file component
 			if (typeof plugin.constructor.component === 'function') {
-				this._componentManager.push(plugin.constructor.component);
+				this._componentManager.push(
+					function (element) {
+						if (!(element = this.component(element))) return null;
+						return {
+							target: element,
+							pluginName: this.key
+						};
+					}.bind(plugin.constructor)
+				);
 			}
 
 			// plugin event
@@ -1297,7 +1304,6 @@ Editor.prototype = {
 			}
 		}
 
-		this._fileManager.queryString = this._fileManager.tags.join(',');
 		this._fileManager.regExp = new RegExp(`^(${this._fileManager.tags.join('|') || '\\^'})$`, 'i');
 		this._fileManager.pluginRegExp = new RegExp(`^(${filePluginRegExp.length === 0 ? '\\^' : filePluginRegExp.join('|')})$`, 'i');
 

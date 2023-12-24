@@ -233,7 +233,9 @@ const Table = function (editor, pluginOptions) {
 Table.key = 'table';
 Table.type = 'dropdown-free';
 Table.className = '';
-Table.component = (node) => domUtils.isTable(node) || (/^figure$/i.test(node?.nodeName) && domUtils.isTable(node.firstElementChild) ? Table.key : '');
+Table.component = (node) => {
+	return domUtils.isTable(node) ? node : /^figure$/i.test(node?.nodeName) && domUtils.isTable(node.firstElementChild) ? node.firstElementChild : null;
+};
 Table.prototype = {
 	/**
 	 * @override core

@@ -20,7 +20,7 @@ const HR = function (editor, pluginOptions) {
 HR.key = 'hr';
 HR.type = 'dropdown';
 HR.className = '';
-HR.component = (node) => (/^hr$/i.test(node?.nodeName) ? HR.key : '');
+HR.component = (node) => (/^hr$/i.test(node?.nodeName) ? node : null);
 HR.prototype = {
 	/**
 	 * @override component

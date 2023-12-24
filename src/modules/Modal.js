@@ -36,7 +36,6 @@ Modal.prototype = {
 	 * @description Open a modal plugin
 	 */
 	open() {
-		if (typeof this.inst.init === 'function') this.inst.init();
 		this.editor._offCurrentModal();
 		this._fixCurrentController(true);
 
@@ -46,6 +45,7 @@ Modal.prototype = {
 		this.isUpdate = this.kind === this.editor.currentControllerName;
 		this.editor.opendModal = this;
 
+		if (!this.isUpdate && typeof this.inst.init === 'function') this.inst.init();
 		if (typeof this.inst.on === 'function') this.inst.on(this.isUpdate);
 
 		this._modalArea.style.display = 'block';

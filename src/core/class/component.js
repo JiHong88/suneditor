@@ -20,6 +20,8 @@ const Component = function (editor) {
 	this._bindClose_cut = null;
 	this._bindClose_keydown = null;
 	this._bindClose_mouse = null;
+	this._bindEvent_cancel_mouse = null;
+	this._bindEvent_cancel_touch = null;
 };
 
 Component.prototype = {
@@ -84,17 +86,21 @@ Component.prototype = {
 		let pluginName = '';
 		let isFile = false;
 		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
-			if (this.editor._fileManager.queryString) target = element.querySelector(this.editor._fileManager.queryString);
+			const comp = this.editor._componentManager.map((f) => f(element)).find((e) => e);
+			if (!comp) return null;
+			target = comp.target;
+			pluginName = comp.pluginName;
 		}
 
 		if (!target && element.nodeName) {
 			if (this.__isFiles(element)) {
 				isFile = true;
 			}
-			if ((pluginName = this.editor._componentManager.find((f) => f(element)))) {
-				target = element;
-				pluginName = pluginName(element);
-			}
+
+			const comp = this.editor._componentManager.map((f) => f(element)).find((e) => e);
+			if (!comp) return null;
+			target = comp.target;
+			pluginName = comp.pluginName;
 		}
 
 		if (!target) {
@@ -104,7 +110,7 @@ Component.prototype = {
 		const figureInfo = Figure.GetContainer(target);
 		return (this.info = {
 			target: target,
-			pluginName: pluginName || this.editor._fileManager.pluginMap[target.nodeName.toLowerCase()] || '',
+			pluginName: pluginName,
 			container: figureInfo.container || figureInfo.cover || target,
 			cover: figureInfo.cover,
 			caption: figureInfo.caption,
@@ -169,15 +175,8 @@ Component.prototype = {
 	is(element) {
 		if (!element) return false;
 
-		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
-			if (this.editor._fileManager.queryString) return true;
-		}
-
-		if (element.nodeName) {
-			if (this.editor._componentManager.find((f) => f(element))) {
-				return true;
-			}
-		}
+		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) return true;
+		if (this.editor._componentManager.find((f) => f(element))) return true;
 
 		return false;
 	},
@@ -260,6 +259,8 @@ Component.prototype = {
 		this._bindClose_copy = this.eventManager.addGlobalEvent('copy', this.__globalEvents[0]);
 		this._bindClose_cut = this.eventManager.addGlobalEvent('cut', this.__globalEvents[1]);
 		this._bindClose_keydown = this.eventManager.addGlobalEvent('keydown', this.__globalEvents[2]);
+		this._bindEvent_cancel_mouse = this.eventManager.addGlobalEvent('mousedown', () => this.__removeGlobalEvent());
+		this._bindEvent_cancel_touch = this.eventManager.addGlobalEvent('touchstart', () => this.__removeGlobalEvent());
 	},
 
 	__removeGlobalEvent() {
@@ -267,6 +268,8 @@ Component.prototype = {
 		if (this._bindClose_copy) this._bindClose_copy = this.eventManager.removeGlobalEvent(this._bindClose_copy);
 		if (this._bindClose_cut) this._bindClose_cut = this.eventManager.removeGlobalEvent(this._bindClose_cut);
 		if (this._bindClose_keydown) this._bindClose_keydown = this.eventManager.removeGlobalEvent(this._bindClose_keydown);
+		if (this._bindEvent_cancel_mouse) this._bindEvent_cancel_mouse = this.eventManager.removeGlobalEvent(this._bindEvent_cancel_mouse);
+		if (this._bindEvent_cancel_touch) this._bindEvent_cancel_touch = this.eventManager.removeGlobalEvent(this._bindEvent_cancel_touch);
 	},
 
 	__addNotFileGlobalEvent() {

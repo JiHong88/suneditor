@@ -32,7 +32,7 @@ const FileUpload = function (editor, pluginOptions) {
 FileUpload.key = 'fileUpload';
 FileUpload.type = 'command';
 FileUpload.className = '';
-FileUpload.component = (node) => domUtils.isAnchor(node) && !domUtils.isMedia(node.firstElementChild);
+// FileUpload.component = (node) => (domUtils.isAnchor(node) && !domUtils.isMedia(node.firstElementChild) ? node : null);
 FileUpload.prototype = {
 	/**
 	 * @override core
