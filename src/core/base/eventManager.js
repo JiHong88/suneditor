@@ -32,6 +32,7 @@ const EventManager = function (editor) {
 	this.__scrollparents = [];
 	this.__scrollID = '';
 	this.__cacheStyleNodes = [];
+	this.__selectionSyncEvent = null;
 	// input plugins
 	this._inputFocus = false;
 	this.__inputPlugin = null;
@@ -123,6 +124,8 @@ EventManager.prototype = {
 	 * @param {boolean|undefined} useCapture Use event capture
 	 */
 	removeGlobalEvent(type, listener, useCapture) {
+		if (!type) return;
+
 		if (typeof type === 'object') {
 			listener = type.listener;
 			useCapture = type.useCapture;
@@ -833,6 +836,14 @@ EventManager.prototype = {
 		}
 	},
 
+	_setSelectionSync() {
+		this.removeGlobalEvent(this.__selectionSyncEvent);
+		this.__selectionSyncEvent = this.addGlobalEvent('mouseup', () => {
+			this.selection._init();
+			this.removeGlobalEvent(this.__selectionSyncEvent);
+		});
+	},
+
 	_callPluginEvent(name, e) {
 		const eventPlugins = this.editor._onPluginEvents.get(name);
 		for (let i = 0; i < eventPlugins.length; i++) {
@@ -963,6 +974,8 @@ function OnMouseDown_wysiwyg(frameContext, e) {
 		e.preventDefault();
 		return;
 	}
+
+	this._setSelectionSync();
 
 	this._w.setTimeout(this.selection._init.bind(this.selection));
 
