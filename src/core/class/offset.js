@@ -346,9 +346,16 @@ Offset.prototype = {
 			rmt = tmtw - toolbarH;
 			rmb = tmbw;
 		} else {
+			const tMargin = targetRect.top;
+			const bMargin = viewportSize.h - targetRect.bottom;
 			rmt = targetRect.top - wwScroll.rects.top;
 			rmb = wwScroll.rects.bottom - targetRect.bottom;
+			// display margin
+			rmt = rmt > 0 ? tMargin : rmt;
+			rmb = rmb > 0 ? bMargin : rmb;
 		}
+
+		if (rmb + targetH <= 0 || rmt + targetH <= 0) return;
 
 		let t = addOffset.top;
 		let y = 0;
