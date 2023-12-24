@@ -122,7 +122,7 @@ const Image_ = function (editor, pluginOptions) {
 Image_.key = 'image';
 Image_.type = 'modal';
 Image_.component = (node) => {
-	node = /^figure$/i.test(node?.nodeName) ? node.firstElementChild : node;
+	node = domUtils.isFigure(node) ? node.firstElementChild : node;
 	return /^IMG$/i.test(node?.nodeName) ? node : domUtils.isAnchor(node) && /^IMG$/i.test(node?.firstElementChild?.nodeName) ? node?.firstElementChild : null;
 };
 Image_.className = '';

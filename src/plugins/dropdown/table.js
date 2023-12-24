@@ -234,7 +234,7 @@ Table.key = 'table';
 Table.type = 'dropdown-free';
 Table.className = '';
 Table.component = (node) => {
-	return domUtils.isTable(node) ? node : /^figure$/i.test(node?.nodeName) && domUtils.isTable(node.firstElementChild) ? node.firstElementChild : null;
+	return domUtils.isTable(node) ? node : domUtils.isFigure(node) && domUtils.isTable(node.firstElementChild) ? node.firstElementChild : null;
 };
 Table.prototype = {
 	/**
@@ -268,7 +268,7 @@ Table.prototype = {
 			query: 'table',
 			method: (element) => {
 				const ColgroupEl = element.querySelector('colgroup');
-				const FigureEl = /^FIGURE$/i.test(element.parentNode?.nodeName) ? element.parentNode : null;
+				const FigureEl = domUtils.isFigure(element.parentNode) ? element.parentNode : null;
 				if (ColgroupEl && FigureEl) return;
 
 				// create colgroup
@@ -703,7 +703,7 @@ Table.prototype = {
 
 	seTableInfo(element) {
 		const table = (this._element = this._selectedTable || domUtils.getParentElement(element, 'TABLE'));
-		this._figure = domUtils.getParentElement(table, (current) => /^FIGURE$/i.test(current.nodeName)) || table;
+		this._figure = domUtils.getParentElement(table, domUtils.isFigure) || table;
 		return table;
 	},
 
@@ -1353,7 +1353,7 @@ Table.prototype = {
 		this.setCellInfo(tdElement, this._shift);
 
 		// controller open
-		const figureEl = domUtils.getParentElement(tableElement, (current) => /^FIGURE$/i.test(current.nodeName));
+		const figureEl = domUtils.getParentElement(tableElement, domUtils.isFigure);
 		this.controller_table.open(figureEl, null, null, null);
 
 		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { left: this.controller_table.form.offsetWidth + 2 } : null;

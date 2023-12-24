@@ -64,7 +64,7 @@ Audio_.key = 'audio';
 Audio_.type = 'modal';
 Audio_.className = '';
 Audio_.component = (node) => {
-	return /^AUDIO$/i.test(node?.nodeName) ? node : /^figure$/i.test(node?.nodeName) && /^AUDIO$/i.test(node?.firstElementChild?.nodeName) ? node.firstElementChild : null;
+	return /^AUDIO$/i.test(node?.nodeName) ? node : domUtils.isFigure(node) && /^AUDIO$/i.test(node?.firstElementChild?.nodeName) ? node.firstElementChild : null;
 };
 Audio_.prototype = {
 	/**

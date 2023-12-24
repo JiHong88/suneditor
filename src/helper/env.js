@@ -217,6 +217,7 @@ export const KATEX_WEBSITE = 'https://katex.org/docs/supported.html';
 const env = {
 	_w,
 	_d,
+	NO_EVENT,
 	getValues,
 	camelToKebabCase,
 	kebabToCamelCase,

@@ -20,7 +20,7 @@ const FileUpload = function (editor, pluginOptions) {
 	// file manager
 	this.fileManager = new FileManager(this, {
 		tagNames: ['a'],
-		tagAttrs: ['download'],
+		tagAttrs: ['download', 'data-se-file-name'],
 		loadHandler: this.events.onFileLoad,
 		eventHandler: this.events.onFileAction
 	});

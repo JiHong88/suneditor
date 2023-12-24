@@ -126,11 +126,7 @@ Video.key = 'video';
 Video.type = 'modal';
 Video.className = '';
 Video.component = (node) => {
-	return /^(VIDEO|IFRAME)$/i.test(node?.nodeName)
-		? node
-		: /^figure$/i.test(node?.nodeName) && /^(VIDEO|IFRAME)$/i.test(node?.firstElementChild?.nodeName)
-		? node.firstElementChild
-		: null;
+	return /^(VIDEO|IFRAME)$/i.test(node?.nodeName) ? node : domUtils.isFigure(node) && /^(VIDEO|IFRAME)$/i.test(node?.firstElementChild?.nodeName) ? node.firstElementChild : null;
 };
 Video.prototype = {
 	/**

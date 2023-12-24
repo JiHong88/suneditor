@@ -901,12 +901,12 @@ export function isMedia(node) {
 }
 
 /**
- * @description Check the node is a figure tag or domUtils.isMedia()
+ * @description Check the node is a figure tag
  * @param {Node|String} node The element or element name to check
  * @returns {Boolean}
  */
-export function isFigures(node) {
-	return isMedia(node) || /^(FIGURE)$/i.test(typeof node === 'string' ? node : node?.nodeName);
+export function isFigure(node) {
+	return /^FIGURE$/i.test(typeof node === 'string' ? node : node?.nodeName);
 }
 
 /**
@@ -1039,7 +1039,7 @@ const domUtils = {
 	isBreak,
 	isAnchor,
 	isMedia,
-	isFigures,
+	isFigure,
 	isInputElement,
 	isEmptyLine,
 	isSpanWithoutAttr,

@@ -1556,7 +1556,7 @@ function CleanElements(m, t) {
 	}
 
 	// figure
-	if (domUtils.isFigures(tagName)) {
+	if (domUtils.isMedia(tagName) || domUtils.isFigure(tagName)) {
 		const sv = m.match(/style\s*=\s*(?:"|')[^"']*(?:"|')/);
 		if (!v) v = [];
 		if (sv) v.push(sv[0]);
