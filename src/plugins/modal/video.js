@@ -126,7 +126,7 @@ Video.key = 'video';
 Video.type = 'modal';
 Video.className = '';
 Video.component = (node) => {
-	return /^(VIDEO|IFRAME)$/i.test(node?.nodeName) ? node : domUtils.isFigure(node) && /^(VIDEO|IFRAME)$/i.test(node?.firstElementChild?.nodeName) ? node.firstElementChild : null;
+	return /^(VIDEO|IFRAME)$/i.test(node?.nodeName) ? node : null;
 };
 Video.prototype = {
 	/**
@@ -213,7 +213,7 @@ Video.prototype = {
 	 */
 	ready(target) {
 		if (!target) return;
-		const figureInfo = this.figure.open(target, this._nonResizing, false);
+		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing });
 
 		this._element = target;
 		this._cover = figureInfo.cover;
@@ -334,7 +334,7 @@ Video.prototype = {
 		this._element = oFrame;
 		this._cover = cover;
 		this._container = container;
-		this.figure.open(oFrame, this._nonResizing, true);
+		this.figure.open(oFrame, { nonResizing: this._nonResizing, __fileManagerInfo: true });
 
 		width = width || this._defaultSizeX;
 		height = height || this._videoRatio;
@@ -514,7 +514,7 @@ Video.prototype = {
 		}
 
 		// size
-		this.figure.open(oFrame, this._nonResizing, true);
+		this.figure.open(oFrame, { nonResizing: this._nonResizing, __fileManagerInfo: true });
 		const size = (oFrame.getAttribute('data-se-size') || ',').split(',');
 		this.applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
 

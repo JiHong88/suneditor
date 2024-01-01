@@ -15,7 +15,8 @@ const FileManager = function (inst, params) {
 	this.kind = inst.constructor.key;
 	this.inst = inst;
 	this.tagNames = params.tagNames;
-	this.tagAttrs = params.tagAttrs ? `[${params.tagAttrs.join('][')}]` : [];
+	this.tagAttrs = params.tagAttrs || [];
+	this._tagAttrStr = this.tagAttrs.length > 0 ? `[${this.tagAttrs.join('][')}]` : '';
 	this.loadHandler = params.loadHandler;
 	this.eventHandler = params.eventHandler;
 	this.checkHandler = params.checkHandler;
@@ -189,7 +190,7 @@ FileManager.prototype = {
 	_checkInfo(loaded) {
 		let tags = [];
 		for (let i = 0, len = this.tagNames.length; i < len; i++) {
-			tags = tags.concat([].slice.call(this.editor.frameContext.get('wysiwyg').querySelectorAll(this.tagNames[i] + this.tagAttrs + ':not([data-se-embed="true"])')));
+			tags = tags.concat([].slice.call(this.editor.frameContext.get('wysiwyg').querySelectorAll(this.tagNames[i] + this._tagAttrStr + ':not([data-se-embed="true"])')));
 		}
 
 		const infoList = this.infoList;

@@ -31,7 +31,7 @@ const Controller = function (inst, element, params, _name) {
 	this.isInsideForm = !!params.isInsideForm;
 	this.isOutsideForm = !!params.isOutsideForm;
 	this._initMethod = typeof params.initMethod === 'function' ? params.initMethod : null;
-	this.__globalEventHandlers = [CloseListener_keydown.bind(this), CloseListener_mousedown.bind(this)];
+	this.__globalEventHandlers = { keydown: CloseListener_keydown.bind(this), mousedown: CloseListener_mousedown.bind(this) };
 	this._bindClose_key = null;
 	this._bindClose_mouse = null;
 	this.__offset = {};
@@ -85,6 +85,7 @@ Controller.prototype = {
 	 */
 	close(force) {
 		if (!this.isOpen) return;
+
 		this.isOpen = false;
 		this.editor._antiBlur = false;
 		this.__offset = {};
@@ -197,8 +198,8 @@ Controller.prototype = {
 
 	__addGlobalEvent() {
 		this.__removeGlobalEvent();
-		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers[0], true);
-		this._bindClose_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers[1], true);
+		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers.keydown, true);
+		this._bindClose_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers.mousedown, true);
 	},
 
 	__removeGlobalEvent() {
@@ -266,7 +267,7 @@ function CloseListener_keydown(e) {
 }
 
 function CloseListener_mousedown(e) {
-	if (this._checkFixed() || this.form.contains(e.target) || this._checkForm(e.target)) return;
+	if (e.target === this.inst._element || this._checkFixed() || this.form.contains(e.target) || this._checkForm(e.target)) return;
 	this.close(true);
 }
 

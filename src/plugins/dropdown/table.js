@@ -234,7 +234,7 @@ Table.key = 'table';
 Table.type = 'dropdown-free';
 Table.className = '';
 Table.component = (node) => {
-	return domUtils.isTable(node) ? node : domUtils.isFigure(node) && domUtils.isTable(node.firstElementChild) ? node.firstElementChild : null;
+	return domUtils.isTable(node) ? node : null;
 };
 Table.prototype = {
 	/**
@@ -253,10 +253,10 @@ Table.prototype = {
 		figure.appendChild(oTable);
 
 		if (this.component.insert(figure, false, false)) {
-			const firstTd = oTable.querySelector('td div');
-			this.selection.setRange(firstTd, 0, firstTd, 0);
 			this._resetTablePicker();
-			this.setController(domUtils.getParentElement(firstTd, 'TD'));
+			const target = oTable.querySelector('td div');
+			this.selection.setRange(target, 0, target, 0);
+			this.eventManager.applyTagEffect();
 		}
 	},
 
@@ -639,7 +639,7 @@ Table.prototype = {
 			this.controller_colorPicker.close();
 		}
 
-		if (!/^(remove|props_|on|open)/.test(command)) {
+		if (!/^(remove|props_|on|open|merge)/.test(command)) {
 			this.setCellControllerPosition(this._tdElement, this._shift);
 		}
 	},
@@ -2210,10 +2210,14 @@ function OnSplitCells(direction) {
 		}
 	}
 
-	this._historyPush();
-	this.editor.focusEdge(currentCell);
-	this.setCellControllerPosition(currentCell, true);
 	this.selectMenu_split.close();
+	this.editor.focusEdge(currentCell);
+
+	this._deleteStyleSelectedCells();
+	this.history.push(false);
+
+	this.setController(currentCell);
+	this._selectedCell = this._fixedCell = currentCell;
 }
 
 function OnColumnEdit(command) {

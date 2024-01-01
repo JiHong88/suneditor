@@ -15,13 +15,17 @@ const Component = function (editor) {
 	this.currentTarget = null;
 	this.currentPlugin = null;
 	this.currentPluginName = '';
-	this.__globalEvents = [OnCopy_component.bind(this), OnCut_component.bind(this), OnKeyDown_component.bind(this), CloseListener_mouse.bind(this)];
+	this.__globalEvents = {
+		copy: OnCopy_component.bind(this),
+		cut: OnCut_component.bind(this),
+		keydown: OnKeyDown_component.bind(this),
+		mousedown: CloseListener_mousedown.bind(this)
+	};
 	this._bindClose_copy = null;
 	this._bindClose_cut = null;
 	this._bindClose_keydown = null;
-	this._bindClose_mouse = null;
-	this._bindEvent_cancel_mouse = null;
-	this._bindEvent_cancel_touch = null;
+	this._bindClose_mousedown = null;
+	this._bindClose_touchstart = null;
 };
 
 Component.prototype = {
@@ -86,6 +90,7 @@ Component.prototype = {
 		let pluginName = '';
 		let isFile = false;
 		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
+			element = element.firstElementChild;
 			const comp = this.editor._componentManager.map((f) => f(element)).find((e) => e);
 			if (!comp) return null;
 			target = comp.target;
@@ -182,9 +187,10 @@ Component.prototype = {
 	},
 
 	__isFiles(element) {
+		const nodeName = element.nodeName.toLowerCase();
 		return (
-			this.editor._fileManager.regExp.test(element.nodeName) &&
-			(!this.editor._fileManager.tagAttrs[element.nodeName] || this.editor._fileManager.tagAttrs[element.nodeName]?.every((v) => element.hasAttribute(v)))
+			this.editor._fileManager.regExp.test(nodeName) &&
+			(!this.editor._fileManager.tagAttrs[nodeName] || this.editor._fileManager.tagAttrs[nodeName]?.every((v) => element.hasAttribute(v)))
 		);
 	},
 
@@ -256,11 +262,9 @@ Component.prototype = {
 
 	__addGlobalEvent() {
 		this.__removeGlobalEvent();
-		this._bindClose_copy = this.eventManager.addGlobalEvent('copy', this.__globalEvents[0]);
-		this._bindClose_cut = this.eventManager.addGlobalEvent('cut', this.__globalEvents[1]);
-		this._bindClose_keydown = this.eventManager.addGlobalEvent('keydown', this.__globalEvents[2]);
-		this._bindEvent_cancel_mouse = this.eventManager.addGlobalEvent('mousedown', () => this.__removeGlobalEvent());
-		this._bindEvent_cancel_touch = this.eventManager.addGlobalEvent('touchstart', () => this.__removeGlobalEvent());
+		this._bindClose_copy = this.eventManager.addGlobalEvent('copy', this.__globalEvents.copy);
+		this._bindClose_cut = this.eventManager.addGlobalEvent('cut', this.__globalEvents.cut);
+		this._bindClose_keydown = this.eventManager.addGlobalEvent('keydown', this.__globalEvents.keydown);
 	},
 
 	__removeGlobalEvent() {
@@ -268,23 +272,23 @@ Component.prototype = {
 		if (this._bindClose_copy) this._bindClose_copy = this.eventManager.removeGlobalEvent(this._bindClose_copy);
 		if (this._bindClose_cut) this._bindClose_cut = this.eventManager.removeGlobalEvent(this._bindClose_cut);
 		if (this._bindClose_keydown) this._bindClose_keydown = this.eventManager.removeGlobalEvent(this._bindClose_keydown);
-		if (this._bindEvent_cancel_mouse) this._bindEvent_cancel_mouse = this.eventManager.removeGlobalEvent(this._bindEvent_cancel_mouse);
-		if (this._bindEvent_cancel_touch) this._bindEvent_cancel_touch = this.eventManager.removeGlobalEvent(this._bindEvent_cancel_touch);
 	},
 
 	__addNotFileGlobalEvent() {
 		this.__removeNotFileGlobalEvent();
-		this._bindClose_mouse = this.eventManager.addGlobalEvent('mousedown', this.__globalEvents[3], true);
+		this._bindClose_mousedown = this.eventManager.addGlobalEvent('mousedown', this.__globalEvents.mousedown, true);
+		this._bindClose_touchstart = this.eventManager.addGlobalEvent('touchstart', this.__globalEvents.mousedown, true);
 	},
 
 	__removeNotFileGlobalEvent() {
-		if (this._bindClose_mouse) this._bindClose_mouse = this.eventManager.removeGlobalEvent(this._bindClose_mouse);
+		if (this._bindClose_mousedown) this._bindClose_mousedown = this.eventManager.removeGlobalEvent(this._bindClose_mousedown);
+		if (this._bindClose_touchstart) this._bindClose_touchstart = this.eventManager.removeGlobalEvent(this._bindClose_touchstart);
 	},
 
 	constructor: Component
 };
 
-function CloseListener_mouse({ target }) {
+function CloseListener_mousedown({ target }) {
 	if (
 		this.currentTarget?.contains(target) ||
 		domUtils.getParentElement(target, '.se-controller') ||

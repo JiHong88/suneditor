@@ -39,8 +39,13 @@ const SelectMenu = function (inst, params) {
 	this._bindClose_click = null;
 	this._closeSignal = false;
 	this.__events = [];
-	this.__eventHandlers = [OnMousedown_list.bind(this.eventManager), OnMouseMove_list.bind(this), OnClick_list.bind(this), OnKeyDown_refer.bind(this)];
-	this.__globalEventHandlers = [CloseListener_key.bind(this), CloseListener_mousedown.bind(this), CloseListener_click.bind(this)];
+	this.__eventHandlers = {
+		mousedown: OnMousedown_list.bind(this.eventManager),
+		mousemove: OnMouseMove_list.bind(this),
+		click: OnClick_list.bind(this),
+		keydown: OnKeyDown_refer.bind(this)
+	};
+	this.__globalEventHandlers = { keydown: CloseListener_key.bind(this), mousedown: CloseListener_mousedown.bind(this), click: CloseListener_click.bind(this) };
 };
 
 SelectMenu.prototype = {
@@ -294,25 +299,25 @@ SelectMenu.prototype = {
 	__addEvents() {
 		this.__removeEvents();
 		this.__events = this.__eventHandlers;
-		this.form.addEventListener('mousedown', this.__events[0]);
-		this.form.addEventListener('mousemove', this.__events[1]);
-		this.form.addEventListener('click', this.__events[2]);
-		this._keydownTarget.addEventListener('keydown', this.__events[3]);
+		this.form.addEventListener('mousedown', this.__events.mousedown);
+		this.form.addEventListener('mousemove', this.__events.mousemove);
+		this.form.addEventListener('click', this.__events.click);
+		this._keydownTarget.addEventListener('keydown', this.__events.keydown);
 	},
 
 	__removeEvents() {
 		if (this.__events.length === 0) return;
-		this.form.removeEventListener('mousedown', this.__events[0]);
-		this.form.removeEventListener('mousemove', this.__events[1]);
-		this.form.removeEventListener('click', this.__events[2]);
-		this._keydownTarget.removeEventListener('keydown', this.__events[3]);
+		this.form.removeEventListener('mousedown', this.__events.mousedown);
+		this.form.removeEventListener('mousemove', this.__events.mousemove);
+		this.form.removeEventListener('click', this.__events.click);
+		this._keydownTarget.removeEventListener('keydown', this.__events.keydown);
 		this.__events = [];
 	},
 
 	__addGlobalEvent() {
 		this.__removeGlobalEvent();
-		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers[0], true);
-		this._bindClose_mousedown = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers[1], true);
+		this._bindClose_key = this.eventManager.addGlobalEvent('keydown', this.__globalEventHandlers.keydown, true);
+		this._bindClose_mousedown = this.eventManager.addGlobalEvent('mousedown', this.__globalEventHandlers.mousedown, true);
 	},
 
 	__removeGlobalEvent() {
@@ -407,7 +412,7 @@ function CloseListener_mousedown(e) {
 	if (e.target !== this._refer) {
 		this.close();
 	} else if (!domUtils.isInputElement(e.target)) {
-		this._bindClose_click = this.eventManager.addGlobalEvent('click', this.__globalEventHandlers[2], true);
+		this._bindClose_click = this.eventManager.addGlobalEvent('click', this.__globalEventHandlers.click, true);
 	}
 }
 

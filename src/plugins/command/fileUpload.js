@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { domUtils, env } from '../../helper';
-import { FileManager } from '../../modules';
+import { FileManager, Figure } from '../../modules';
 const { NO_EVENT } = env;
 
 const FileUpload = function (editor, pluginOptions) {
@@ -17,12 +17,18 @@ const FileUpload = function (editor, pluginOptions) {
 	this.uploadUrl = pluginOptions.uploadUrl;
 	this.uploadHeaders = pluginOptions.uploadHeaders;
 
+	// figure
+	const showAlign = (pluginOptions.showAlign === undefined ? true : !!pluginOptions.showAlign) ? 'align' : '';
+	const figureControls = [[showAlign, 'remove']];
+	this.figure = new Figure(this, figureControls, {});
+
 	// file manager
 	this.fileManager = new FileManager(this, {
 		tagNames: ['a'],
-		tagAttrs: ['download', 'data-se-file-name'],
+		tagAttrs: ['download', 'data-se-file-download'],
 		loadHandler: this.events.onFileLoad,
-		eventHandler: this.events.onFileAction
+		eventHandler: this.events.onFileAction,
+		figure: this.figure
 	});
 
 	// init
@@ -32,7 +38,9 @@ const FileUpload = function (editor, pluginOptions) {
 FileUpload.key = 'fileUpload';
 FileUpload.type = 'command';
 FileUpload.className = '';
-// FileUpload.component = (node) => (domUtils.isAnchor(node) && !domUtils.isMedia(node.firstElementChild) ? node : null);
+FileUpload.component = (node) => {
+	return domUtils.isAnchor(node) && node.hasAttribute('download') && node.hasAttribute('data-se-file-download') ? node : null;
+};
 FileUpload.prototype = {
 	/**
 	 * @override core
@@ -44,11 +52,10 @@ FileUpload.prototype = {
 
 	/**
 	 * @override fileManager
-	 * @param {Element} element Target element
+	 * @param {Element} target Target element
 	 */
-	select(element) {
-		this.selection.setRange(element, 0, element, 1);
-		domUtils.addClass(element, 'on');
+	select(target) {
+		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true });
 	},
 
 	/**
@@ -85,13 +92,29 @@ FileUpload.prototype = {
 			{
 				href: url,
 				title: name,
-				download: name
+				download: name,
+				target: '_blank',
+				'data-se-file-download': ''
 			},
 			name
 		);
 
 		this.fileManager.setFileData(a, file);
-		this.html.insert(a, false, false, true);
+
+		const figure = Figure.CreateContainer(a);
+		domUtils.addClass(figure.container, 'se-file-figure');
+
+		if (!this.component.insert(figure.container, false, !this.options.get('mediaAutoSelect'))) {
+			this.editor.focus();
+			return;
+		}
+
+		if (!this.options.get('mediaAutoSelect')) {
+			const line = this.format.addLine(figure.container, null);
+			if (line) this.selection.setRange(line, 0, line, 0);
+		} else {
+			this.component.select(a, FileUpload.key, false);
+		}
 	},
 
 	async _error(response) {

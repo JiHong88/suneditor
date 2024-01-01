@@ -13,7 +13,7 @@
 	--se-edit-anchor-on-font: #0093ff;
 	--se-edit-hr-on-back: #c7deff;
 	--se-edit-active: #4592ff;
-	--se-edit-active-n1: #80bdff;
+	--se-edit-hover: #80bdff;
 }
 
 /* suneditor content */
@@ -104,8 +104,8 @@
 	color: inherit;
 }
 
-.sun-editor-editable a:hover,
-.sun-editor-editable a:focus {
+.sun-editor-editable a:not([data-se-file-download]):hover,
+.sun-editor-editable a:not([data-se-file-download]):focus {
 	cursor: pointer;
 	color: var(--se-edit-anchor-on-font);
 	text-decoration: underline;
@@ -445,12 +445,20 @@
 	-ms-user-select: none;
 }
 
-/** component (image, iframe video) */
+/** component */
 .sun-editor-editable .se-component {
 	display: flex;
 	padding: 1px;
 	margin: 0 0 10px;
 	background-color: inherit;
+}
+
+/* file upload component */
+.sun-editor-editable .se-component.se-file-figure > figure {
+	padding: 0.5em;
+}
+.sun-editor-editable .se-component.se-file-figure > figure > a[data-se-file-download] {
+	color: var(--se-edit-font);
 }
 
 /* float */
@@ -570,7 +578,7 @@
 }
 
 .sun-editor-editable audio.active {
-	outline: 2px solid var(--se-edit-active-n1);
+	outline: 2px solid var(--se-edit-hover);
 }
 
 /** -- Paragraph styles custom -- */

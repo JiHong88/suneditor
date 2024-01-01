@@ -199,7 +199,7 @@ Figure.prototype = {
 		this.controller.close();
 	},
 
-	open(target, nonResizing, __fileManagerInfo) {
+	open(target, { nonResizing, nonSizeInfo, nonBorder, __fileManagerInfo }) {
 		this.editor._offCurrentController();
 		const figureInfo = Figure.GetContainer(target);
 		if (!figureInfo.container) return { container: null, cover: null };
@@ -287,6 +287,8 @@ Figure.prototype = {
 			}
 		}
 
+		_figure.display.style.display = nonSizeInfo ? 'none' : '';
+		_figure.border.style.display = nonBorder ? 'none' : '';
 		_figure.main.style.display = 'block';
 		this.controller.open(_figure.main, null, this.__offContainer);
 
