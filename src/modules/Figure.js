@@ -6,7 +6,8 @@ const Figure = function (inst, controls, params) {
 	EditorInjector.call(this, inst.editor);
 
 	// modules
-	const controllerEl = CreateHTML_controller(inst.editor, controls || []);
+	this._action = {};
+	const controllerEl = CreateHTML_controller(this, controls || []);
 	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, inst.constructor.key);
 	// align selectmenu
 	this.alignButton = controllerEl.querySelector('[data-command="onalign"]');
@@ -33,11 +34,11 @@ const Figure = function (inst, controls, params) {
 	this.isVertical = false;
 	this.percentageButtons = controllerEl.querySelectorAll('[data-command="resize_percent"]');
 	this.captionButton = controllerEl.querySelector('[data-command="caption"]');
+	this.align = 'none';
 	this._element = null;
 	this._cover = null;
 	this._container = null;
 	this._caption = null;
-	this.align = 'none';
 	this._width = 0;
 	this._height = 0;
 	this._element_w = 0;
@@ -438,12 +439,17 @@ Figure.prototype = {
 				this._setRevert();
 				break;
 			case 'edit':
-				this.inst.open();
+				this.inst.edit(element);
 				break;
 			case 'remove':
-				this.inst.destroy();
+				this.inst.destroy(element);
 				this.controller.close();
 				break;
+		}
+
+		if (/^__c__/.test(command)) {
+			this._action[command](element);
+			return;
 		}
 
 		if (/^edit$/.test(command)) return;
@@ -969,7 +975,7 @@ function GET_CONTROLLER_BUTTONS(group) {
 		case 'edit':
 			c = 'edit';
 			l = 'edit';
-			i = 'modify';
+			i = 'edit';
 			break;
 		case 'remove':
 			c = 'remove';
@@ -989,17 +995,31 @@ function GET_CONTROLLER_BUTTONS(group) {
 	};
 }
 
-function CreateHTML_controller({ lang, icons }, controls) {
+function CreateHTML_controller(inst, controls) {
+	const { lang, icons } = inst;
 	let html = '<div class="se-arrow se-arrow-up"></div>';
 	for (let i = 0, group; i < controls.length; i++) {
 		group = controls[i];
 		html += '<div class="se-btn-group">';
 		for (let j = 0, len = group.length, m; j < len; j++) {
-			m = GET_CONTROLLER_BUTTONS(group[j]);
-			if (!m) continue;
+			m = group[j];
+
+			if (typeof m?.action === 'function') {
+				const g = m;
+				m = {
+					c: `__c__${g.command}`,
+					l: g.title,
+					i: g.icon
+				};
+				inst._action[m.c] = g.action;
+			} else {
+				m = GET_CONTROLLER_BUTTONS(m);
+				if (!m) continue;
+			}
+
 			html += /*html*/ `
 				<button type="button" data-command="${m.c}" data-value="${m.v}" class="${m.t ? 'se-btn-w-auto ' : ''}se-btn se-tooltip">
-					${icons[m.i] || m.t || '!'}
+					${icons[m.i] || m.t || m.i}
 					<span class="se-tooltip-inner"><span class="se-tooltip-text">${lang[m.l] || m.l}</span></span>
 				</button>`;
 		}

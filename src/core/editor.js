@@ -1237,6 +1237,7 @@ Editor.prototype = {
 			['onMouseMove', []],
 			['onMouseDown', []],
 			['onMouseLeave', []],
+			['onScroll', []],
 			['onClick', []],
 			['onInput', []],
 			['onKeyDown', []],
@@ -1284,7 +1285,8 @@ Editor.prototype = {
 						if (!(element = this.component(element))) return null;
 						return {
 							target: element,
-							pluginName: this.key
+							pluginName: this.key,
+							options: this.options
 						};
 					}.bind(plugin.constructor)
 				);

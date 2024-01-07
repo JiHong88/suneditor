@@ -9,7 +9,6 @@
 
 # modules
 node_modules/**
-bower_components/**
 *.log
 
 #dev

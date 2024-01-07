@@ -221,7 +221,7 @@ Controller.prototype = {
 	},
 
 	_checkForm(target) {
-		return domUtils.getParentElement(target, '.se-controller');
+		return domUtils.getParentElement(target, '.se-controller') || target?.contains(this.inst._element);
 	},
 
 	constructor: Controller

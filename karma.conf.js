@@ -25,14 +25,7 @@ module.exports = function (config) {
 		webpack: {
 			mode: 'development'
 		},
-		plugins: [
-      'karma-jasmine', 
-      'karma-webpack',
-      'karma-chrome-launcher',
-      'karma-firefox-launcher',
-      'karma-opera-launcher',
-      'karma-safari-launcher'
-    ],
+		plugins: ['karma-jasmine', 'karma-webpack', 'karma-chrome-launcher', 'karma-firefox-launcher', 'karma-opera-launcher', 'karma-safari-launcher'],
 
 		// test results reporter to use
 		// possible values: 'dots', 'progress'

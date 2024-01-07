@@ -1,6 +1,6 @@
 import EditorInjector from '../../editorInjector';
 import { Modal, Controller, ModalAnchorEditor } from '../../modules';
-import { domUtils } from '../../helper';
+import { domUtils, numbers } from '../../helper';
 
 const Link = function (editor, pluginOptions) {
 	// plugin bisic properties
@@ -16,14 +16,22 @@ const Link = function (editor, pluginOptions) {
 	const modalEl = CreateHTML_modal(editor);
 	const controllerEl = CreateHTML_controller(editor);
 
+	// members
+	const uploadUrl = typeof pluginOptions.uploadUrl === 'string' ? pluginOptions.uploadUrl : null;
+	this.isUpdateState = false;
+	this.pluginOptions = {
+		...pluginOptions,
+		uploadUrl,
+		uploadHeaders: pluginOptions.uploadHeaders || null,
+		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
+		acceptedFormats: typeof pluginOptions.acceptedFormats === 'string' ? pluginOptions.acceptedFormats.trim() : null,
+		enableFileUpload: !!uploadUrl
+	};
+
 	// modules
-	this.anchor = new ModalAnchorEditor(this, modalEl, pluginOptions);
+	this.anchor = new ModalAnchorEditor(this, modalEl, this.pluginOptions);
 	this.modal = new Modal(this, modalEl);
 	this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true });
-
-	// members
-	this.pluginOptions = pluginOptions;
-	this.isUpdateState = false;
 };
 
 Link.key = 'link';
@@ -47,6 +55,8 @@ Link.prototype = {
 
 			return true;
 		}
+
+		this.controller.close();
 
 		return false;
 	},

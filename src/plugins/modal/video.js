@@ -137,6 +137,13 @@ Video.prototype = {
 	},
 
 	/**
+	 * @override Figure
+	 */
+	edit() {
+		this.modal.open();
+	},
+
+	/**
 	 * @override modal
 	 * @param {boolean} isUpdate open state is update
 	 */

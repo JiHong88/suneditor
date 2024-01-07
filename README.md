@@ -2,7 +2,7 @@
 Vanilla javscript based WYSIWYG web editor.
 SunEditor supports all modern browsers except IE without any dependencies and polyfills.
 Coded based on ES2018(ES9), Nodejs@v18 and written in "prototype" syntax.
-Nodejs version 14 is required to build or test this project.
+Nodejs version14 or higher is required to build or test this project.
 
 #### 🌤 Demo : <a href="http://suneditor.com" target="_blank">suneditor.com</a> 🌤
 
@@ -11,7 +11,6 @@ Nodejs version 14 is required to build or test this project.
 [![GitHub](https://img.shields.io/github/license/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/blob/master/LICENSE.txt)
 [![GitHub release](https://img.shields.io/github/release/jihong88/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases)
 [![npm version](https://img.shields.io/npm/v/suneditor.svg?style=flat-square)](https://www.npmjs.com/package/suneditor)
-[![bower version](https://img.shields.io/bower/v/suneditor.svg?style=flat-square)](https://github.com/JiHong88/SunEditor/releases/latest)
 [![](https://data.jsdelivr.com/v1/package/npm/suneditor/badge)](https://www.jsdelivr.com/package/npm/suneditor)
 [![npm](https://img.shields.io/npm/dt/suneditor.svg?style=flat-square)](https://www.npmjs.com/package/suneditor)
 ![npm bundle size (minified + gzip)](https://img.shields.io/bundlephobia/minzip/suneditor.svg?style=flat-square)
@@ -62,10 +61,6 @@ Nodejs version 14 is required to build or test this project.
 #### Npm
 ``` sh
 $ npm install suneditor --save
-```
-#### Bower
-``` sh
-$ bower install suneditor --save
 ```
 #### CDN
 ``` html

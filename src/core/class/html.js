@@ -229,8 +229,7 @@ HTML.prototype = {
 				this.scrollTo(range);
 			} catch (error) {
 				if (this.editor.frameContext.get('isReadOnly') || this.editor.frameContext.get('isDisabled')) return;
-				console.warn('[SUNEDITOR.html.insert.warn]', error.message);
-				this.editor.execCommand('insertHTML', false, html);
+				throw Error('[SUNEDITOR.html.insert.error]', error.message);
 			}
 		} else {
 			if (this.component.is(html)) {
@@ -263,7 +262,7 @@ HTML.prototype = {
 		}
 
 		const rect = ref.getBoundingClientRect();
-		const isVisible = rect.top >= 0 && rect.bottom <= this.frameContext.get('wysiwygFrame').innerHeight;
+		const isVisible = rect.top >= 0 && rect.bottom <= this.editor.frameContext.get('wysiwygFrame').innerHeight;
 
 		if (isVisible) return;
 

@@ -3,7 +3,7 @@
  */
 
 import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass, getViewportSize } from '../../helper/domUtils';
-import { numbers } from '../../helper';
+import { domUtils, numbers } from '../../helper';
 
 const Offset = function (editor) {
 	this.editor = editor;
@@ -355,7 +355,7 @@ Offset.prototype = {
 			rmb = rmb > 0 ? bMargin : rmb;
 		}
 
-		if (rmb + targetH <= 0 || rmt + targetH <= 0) return;
+		if (!domUtils.getParentElement(target, '.se-toolbar') && (rmb + targetH <= 0 || rmt + targetH <= 0)) return;
 
 		let t = addOffset.top;
 		let y = 0;

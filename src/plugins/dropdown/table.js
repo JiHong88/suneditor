@@ -236,6 +236,7 @@ Table.className = '';
 Table.component = (node) => {
 	return domUtils.isTable(node) ? node : null;
 };
+Table.options = { isInputComponent: true };
 Table.prototype = {
 	/**
 	 * @override core
@@ -268,7 +269,7 @@ Table.prototype = {
 			query: 'table',
 			method: (element) => {
 				const ColgroupEl = element.querySelector('colgroup');
-				const FigureEl = domUtils.isFigure(element.parentNode) ? element.parentNode : null;
+				let FigureEl = domUtils.isFigure(element.parentNode) ? element.parentNode : null;
 				if (ColgroupEl && FigureEl) return;
 
 				// create colgroup
@@ -280,19 +281,20 @@ Table.prototype = {
 
 				// figure
 				if (!FigureEl) {
-					const figure = domUtils.createElement('FIGURE', { class: 'se-non-select-figure' });
-					element.parentNode.insertBefore(figure, element);
-					figure.appendChild(element);
+					FigureEl = domUtils.createElement('FIGURE', { class: 'se-non-select-figure' });
+					element.parentNode.insertBefore(FigureEl, element);
+					FigureEl.appendChild(element);
 				} else {
 					domUtils.addClass(FigureEl, 'se-non-select-figure');
-					// scroll
-					if (!this.figureScroll) {
-						domUtils.removeClass(FigureEl, this.figureScrollList.join('|'));
-					} else {
-						const scrollTypeClass = `se-scroll-figure-${this.figureScroll}`;
-						domUtils.addClass(FigureEl, scrollTypeClass);
-						domUtils.removeClass(FigureEl, this.figureScrollList.filter((v) => v !== scrollTypeClass).join('|'));
-					}
+				}
+
+				// scroll
+				if (!this.figureScroll) {
+					domUtils.removeClass(FigureEl, this.figureScrollList.join('|'));
+				} else {
+					const scrollTypeClass = `se-scroll-figure-${this.figureScroll}`;
+					domUtils.addClass(FigureEl, scrollTypeClass);
+					domUtils.removeClass(FigureEl, this.figureScrollList.filter((v) => v !== scrollTypeClass).join('|'));
 				}
 			}
 		};
@@ -341,6 +343,13 @@ Table.prototype = {
 
 		if (this._element) this._element.style.cursor = '';
 		this.__hideResizeLine();
+	},
+
+	onScroll() {
+		if (this._resizeLine?.style.display !== 'block') return;
+		// delete resize line position
+		if (this._element) this._element.style.cursor = '';
+		this._resizeLine.style.display = 'none';
 	},
 
 	/**

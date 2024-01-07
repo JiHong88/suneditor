@@ -6,6 +6,9 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils } from '../../helper';
 import Figure from '../../modules/Figure';
 
+const DIR_KEYCODE = new RegExp(/^(3[7-9]|40)$/);
+const DIR_UP_KEYCODE = new RegExp(/^3[7-8]$/);
+
 const Component = function (editor) {
 	CoreInjector.call(this, editor);
 
@@ -88,24 +91,28 @@ Component.prototype = {
 
 		let target;
 		let pluginName = '';
+		let options = {};
 		let isFile = false;
-		if (/^FIGURE$/i.test(element.nodeName) || /se-component/.test(element.className)) {
-			element = element.firstElementChild;
+
+		if (this.is(element)) {
+			if (/se-component/.test(element.className)) element = element.firstElementChild;
+			if (/^FIGURE$/i.test(element.nodeName)) element = element.firstElementChild;
 			const comp = this.editor._componentManager.map((f) => f(element)).find((e) => e);
 			if (!comp) return null;
 			target = comp.target;
 			pluginName = comp.pluginName;
+			options = comp.options;
 		}
 
 		if (!target && element.nodeName) {
 			if (this.__isFiles(element)) {
 				isFile = true;
 			}
-
 			const comp = this.editor._componentManager.map((f) => f(element)).find((e) => e);
 			if (!comp) return null;
 			target = comp.target;
 			pluginName = comp.pluginName;
+			options = comp.options;
 		}
 
 		if (!target) {
@@ -114,8 +121,9 @@ Component.prototype = {
 
 		const figureInfo = Figure.GetContainer(target);
 		return (this.info = {
-			target: target,
-			pluginName: pluginName,
+			target,
+			pluginName,
+			options,
 			container: figureInfo.container || figureInfo.cover || target,
 			cover: figureInfo.cover,
 			caption: figureInfo.caption,
@@ -220,19 +228,21 @@ Component.prototype = {
 		const isList = domUtils.isListCell(container.parentNode);
 
 		let componentTop, w;
+
 		// top
 		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
 			this.eventManager._lineBreakComp = container;
 			componentTop = this.offset.get(offsetTarget).top + yScroll;
 			w = target.offsetWidth / 2 / 2;
 
-			fc.get('lineBreaker_t').setAttribute('data-offset', componentTop - 12 + ',' + (this.offset.get(target).left + wScroll + w));
 			t_style.top = componentTop - yScroll - toolbarH - 12 + 'px';
 			t_style.left = (isNonSelected ? 0 : this.offset.get(target).left + w) + 'px';
+			fc.get('lineBreaker_t').setAttribute('data-offset', yScroll + ',' + wScroll);
 			t_style.display = 'block';
 		} else {
 			t_style.display = 'none';
 		}
+
 		// bottom
 		if (isList ? !container.nextSibling : !this.format.isLine(container.nextElementSibling)) {
 			if (!componentTop) {
@@ -241,19 +251,19 @@ Component.prototype = {
 				w = target.offsetWidth / 2 / 2;
 			}
 
-			fc.get('lineBreaker_b').setAttribute(
-				'data-offset',
-				componentTop + target.offsetHeight - 12 + ',' + (this.offset.get(target).left + wScroll + target.offsetWidth - w - 24)
-			);
+			let bDir = '';
 			b_style.top = componentTop + target.offsetHeight - yScroll - toolbarH - 12 + 'px';
 			if (isNonSelected) {
 				b_style.left = '';
 				b_style.right = '0px';
+				bDir = 'right';
 			} else {
 				b_style.right = '';
-				b_style.right = '';
 				b_style.left = this.offset.get(target).left + target.offsetWidth - w - 24 + 'px';
+				bDir = 'left';
 			}
+
+			fc.get('lineBreaker_b').setAttribute('data-offset', yScroll + ',' + bDir + ',' + wScroll);
 			b_style.display = 'block';
 		} else {
 			b_style.display = 'none';
@@ -362,15 +372,16 @@ function OnKeyDown_component(e) {
 			newEl = domUtils.createElement(this.format.isLine(sibling) && !this.format.isBlock(sibling) ? sibling.nodeName : this.options.get('defaultLine'), null, '<br>');
 		}
 
+		const pluginName = this.currentPluginName;
 		this.deselect();
 		container.parentNode.insertBefore(newEl, container);
-		if (this.select(compContext.target, this.currentPluginName) === false) this.editor.blur();
+		if (this.select(compContext.target, pluginName) === false) this.editor.blur();
 	}
 
 	// up down
-	if (keyCode === 38 || keyCode === 40) {
+	if (DIR_KEYCODE.test(keyCode)) {
 		const compContext = this.get(this.currentTarget);
-		const el = keyCode === 38 ? compContext.container.previousElementSibling : compContext.container.nextElementSibling;
+		const el = DIR_UP_KEYCODE.test(keyCode) ? compContext.container.previousElementSibling : compContext.container.nextElementSibling;
 		if (!el) return;
 
 		this.deselect();

@@ -1,6 +1,8 @@
 import EditorInjector from '../editorInjector';
 import SelectMenu from './SelectMenu';
-import { domUtils, numbers } from '../helper';
+import FileManager from './FileManager';
+import { domUtils, numbers, env } from '../helper';
+const { NO_EVENT } = env;
 
 /**
  * @param {*} inst
@@ -30,9 +32,20 @@ const ModalAnchorEditor = function (inst, modalForm, params) {
 	this.defaultRel = params.defaultRel || {};
 	this.noAutoPrefix = !!params.noAutoPrefix;
 	// file upload
-	this.uploadUrl = typeof params.uploadUrl === 'string' ? params.uploadUrl : null;
-	this.uploadHeaders = params.uploadHeaders || null;
-	this.uploadSizeLimit = /\d+/.test(params.uploadSizeLimit) ? numbers.get(params.uploadSizeLimit, 0) : null;
+	if (params.enableFileUpload) {
+		this.uploadUrl = typeof params.uploadUrl === 'string' ? params.uploadUrl : null;
+		this.uploadHeaders = params.uploadHeaders || null;
+		this.uploadSizeLimit = /\d+/.test(params.uploadSizeLimit) ? numbers.get(params.uploadSizeLimit, 0) : null;
+		this.input = domUtils.createElement('input', { type: 'file', accept: params.acceptedFormats || '*' });
+		this.eventManager.addEvent(this.input, 'change', OnChangeFile.bind(this));
+		// file manager
+		this.fileManager = new FileManager(this, {
+			tagNames: ['a'],
+			tagAttrs: ['download', ':not(data-se-file-download)'],
+			loadHandler: this.events.onFileLoad,
+			eventHandler: this.events.onFileAction
+		});
+	}
 
 	// create HTML
 	const forms = CreatetModalForm(inst.editor, params, this.relList);
@@ -95,6 +108,7 @@ const ModalAnchorEditor = function (inst, modalForm, params) {
 	this.eventManager.addEvent(this.urlInput, 'input', OnChange_urlInput.bind(this));
 	this.eventManager.addEvent(this.urlInput, 'focus', OnFocus_urlInput.bind(this));
 	this.eventManager.addEvent(this.bookmarkButton, 'click', OnClick_bookmarkButton.bind(this));
+	this.eventManager.addEvent(forms.querySelector('._se_upload_button'), 'click', () => this.input.click());
 };
 
 ModalAnchorEditor.prototype = {
@@ -282,8 +296,60 @@ ModalAnchorEditor.prototype = {
 		return rels;
 	},
 
+	_register(response) {
+		const file = response.result[0];
+		this.linkValue = this.preview.textContent = this.urlInput.value = file.url;
+		this.displayInput.value = file.name;
+		this.downloadCheck.checked = true;
+		this.download.style.display = 'block';
+	},
+
+	async _error(response) {
+		const message = await this.triggerEvent('onFileUploadError', { error: response });
+		if (message === false) return;
+		const err = message === NO_EVENT ? response.errorMessage : message || response.errorMessage;
+		this.notice.open(err);
+		console.error('[SUNEDITOR.plugin.fileUpload.error]', err);
+	},
+
 	constructor: ModalAnchorEditor
 };
+
+async function OnChangeFile(e) {
+	let files = e.target.files;
+	if (!files[0]) return;
+
+	const fileInfo = {
+		url: this.uploadUrl,
+		uploadHeaders: this.uploadHeaders,
+		files
+	};
+
+	const handler = function (infos, newInfos) {
+		infos = newInfos || infos;
+		this.fileManager.upload(infos.url, infos.uploadHeaders, infos.files, UploadCallBack.bind(this), this._error.bind(this));
+	}.bind(this, fileInfo);
+
+	const result = await this.triggerEvent('onFileUploadBefore', {
+		...fileInfo,
+		handler
+	});
+
+	if (result === undefined) return true;
+	if (result === false) return false;
+	if (result !== null && typeof result === 'object') handler(result);
+
+	if (result === true || result === NO_EVENT) handler(null);
+}
+
+async function UploadCallBack(xmlHttp) {
+	const response = JSON.parse(xmlHttp.responseText);
+	if (response.errorMessage) {
+		this._error(response);
+	} else {
+		this._register(response);
+	}
+}
 
 function OnClick_relbutton() {
 	this.selectMenu_rel.open(this.options.get('_rtl') ? 'left-middle' : '');
@@ -389,6 +455,13 @@ function CreatetModalForm(editor, params, relList) {
 				<label>${lang.link_modal_url}</label>
 				<div class="se-modal-form-files">
 					<input data-focus class="se-input-form se-input-url" type="text" placeholder="${editor.options.get('protocol') || ''}" />
+					${
+						params.enableFileUpload
+							? `<button type="button" class="se-btn se-modal-files-edge-button _se_upload_button" title="${lang.fileUpload}" aria-label="${lang.fileUpload}">
+									${icons.file_upload}
+								</button>`
+							: ''
+					}
 					<button type="button" class="se-btn se-modal-files-edge-button _se_bookmark_button" title="${lang.link_modal_bookmark}" aria-label="${lang.link_modal_bookmark}">
 						${icons.bookmark}
 					</button>

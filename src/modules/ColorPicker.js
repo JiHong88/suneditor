@@ -91,7 +91,7 @@ const ColorPicker = function (inst, styles, params) {
 
 	// modules - hex, hue slider
 	if (!params.disableHEXInput) {
-		this.hueSlider = new HueSlider(this, params.hueSliderOptions);
+		this.hueSlider = new HueSlider(this, params.hueSliderOptions, 'se-dropdown');
 		this.parentFormDisplay = [];
 		this.parentForm =
 			params.hueSliderOptions?.controllerOptions?.parents?.length > 0 && !params.hueSliderOptions?.controllerOptions?.isInsideForm

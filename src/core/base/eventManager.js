@@ -7,6 +7,7 @@ import { domUtils, unicode, numbers, env, converter } from '../../helper';
 
 const _w = env._w;
 const DIRECTION_KEYCODE = new RegExp(/^(8|3[2-9]|40|46)$/);
+const DIR_KEYCODE = new RegExp(/^(3[7-9]|40)$/);
 const SPACE_DEL_DIR_KEYCODE = new RegExp(/^(8|13|3[2-9]|40|46)$/);
 const DELETE_KEYCODE = new RegExp(/^(8|46)$/);
 const NON_TEXT_KEYCODE = new RegExp(/^(8|13|1[6-9]|20|27|3[3-9]|40|45|46|11[2-9]|12[0-3]|144|145)$/);
@@ -179,6 +180,11 @@ EventManager.prototype = {
 		for (let element = selectionNode; !domUtils.isWysiwygFrame(element); element = element.parentNode) {
 			if (!element) break;
 			if (element.nodeType !== 1 || domUtils.isBreak(element)) continue;
+			if (this._isNonFocusNode(element)) {
+				this.editor.blur();
+				return;
+			}
+
 			nodeName = element.nodeName.toLowerCase();
 			currentNodes.push(nodeName);
 			if (styleTags.includes(nodeName)) styleNodes.push(element);
@@ -347,6 +353,10 @@ EventManager.prototype = {
 		}
 	},
 
+	_isNonFocusNode(node) {
+		return node.nodeType === 1 && (node.getAttribute('contenteditable') === 'false' || node.getAttribute('data-se-non-focus') === 'true');
+	},
+
 	_isUneditableNode(range, isFront) {
 		const container = isFront ? range.startContainer : range.endContainer;
 		const offset = isFront ? range.startOffset : range.endOffset;
@@ -446,7 +456,11 @@ EventManager.prototype = {
 		let focusNode, offset, format;
 
 		const fileComponent = domUtils.getParentElement(commonCon, this.component.is.bind(this.component));
-		if (fileComponent && !domUtils.isTable(fileComponent)) {
+		if (fileComponent && commonCon.nodeType === 3) {
+			const siblingEl = commonCon.nextElementSibling ? fileComponent : fileComponent.nextElementSibling;
+			const el = domUtils.createElement(this.options.get('defaultLine'), null, commonCon);
+			fileComponent.parentElement.insertBefore(el, siblingEl);
+			this.editor.focusEdge(el);
 			return;
 		} else if (commonCon.nodeType === 1 && commonCon.getAttribute('data-se-embed') === 'true') {
 			let el = commonCon.nextElementSibling;
@@ -757,19 +771,21 @@ EventManager.prototype = {
 
 		if (this.editor._lineBreaker_t) {
 			const t_style = this.editor._lineBreaker_t.style;
-			const t_offset = (this.editor._lineBreaker_t.getAttribute('data-offset') || ',').split(',');
 			if (t_style.display !== 'none') {
-				t_style.top = numbers.get(t_offset[0], 0) - y + 'px';
-				t_style.left = numbers.get(t_offset[1], 0) - x + 'px';
+				const t_offset = (this.editor._lineBreaker_t.getAttribute('data-offset') || ',').split(',');
+				t_style.top = numbers.get(t_style.top, 0) - (y - numbers.get(t_offset[0], 0)) + 'px';
+				t_style.left = numbers.get(t_style.left, 0) - (x - numbers.get(t_offset[1], 0)) + 'px';
+				this.editor._lineBreaker_t.setAttribute('data-offset', y + ',' + x);
 			}
 		}
 
 		if (this.editor._lineBreaker_b) {
 			const b_style = this.editor._lineBreaker_b.style;
-			const b_offset = (this.editor._lineBreaker_b.getAttribute('data-offset') || ',').split(',');
 			if (b_style.display !== 'none') {
-				b_style.top = numbers.get(b_offset[0], 0) - y + 'px';
-				b_style.left = numbers.get(b_offset[1], 0) - x + 'px';
+				const b_offset = (this.editor._lineBreaker_b.getAttribute('data-offset') || ',').split(',');
+				b_style.top = numbers.get(b_style.top, 0) - (y - numbers.get(b_offset[0], 0)) + 'px';
+				b_style[b_offset[1]] = numbers.get(b_style[b_offset[1]], 0) - (x - numbers.get(b_offset[2], 0)) + 'px';
+				this.editor._lineBreaker_b.setAttribute('data-offset', y + ',' + b_offset[1] + ',' + x);
 			}
 		}
 
@@ -863,7 +879,7 @@ EventManager.prototype = {
 function ButtonsHandler(e) {
 	let target = e.target;
 
-	if (this.editor.isSubBalloon) {
+	if (this.editor.isSubBalloon && !this.context.get('toolbar.sub.main')?.contains(target)) {
 		this._hideToolbar_sub();
 	}
 
@@ -1063,7 +1079,6 @@ function OnClick_wysiwyg(frameContext, e) {
 }
 
 function OnMouseLeave_wysiwyg(frameContext, e) {
-	frameContext.get('lineBreaker').style.display = 'none';
 	// user event
 	if (this.triggerEvent('onMouseLeave', { frameContext, event: e }) === false) return;
 	// plugin event
@@ -1860,6 +1875,38 @@ function OnKeyDown_wysiwyg(frameContext, e) {
 		this.selection._init();
 		this.applyTagEffect();
 	}
+
+	// next component
+	if (!DIR_KEYCODE.test(keyCode)) return;
+
+	let cmponentInfo = null;
+	switch (keyCode) {
+		case 38 /** up key */:
+			if (this.component.is(formatEl.previousElementSibling)) {
+				cmponentInfo = this.component.get(formatEl.previousElementSibling);
+			}
+			break;
+		case 37 /** left key */:
+			if (domUtils.isEdgePoint(selectionNode, range.startOffset, 'front') && this.component.is(formatEl.previousElementSibling)) {
+				cmponentInfo = this.component.get(formatEl.previousElementSibling);
+			}
+			break;
+		case 40 /** down key */:
+			if (this.component.is(formatEl.nextElementSibling)) {
+				cmponentInfo = this.component.get(formatEl.nextElementSibling);
+			}
+			break;
+		case 39 /** right key */:
+			if (domUtils.isEdgePoint(selectionNode, range.endOffset, 'end') && this.component.is(formatEl.nextElementSibling)) {
+				cmponentInfo = this.component.get(formatEl.nextElementSibling);
+			}
+			break;
+	}
+
+	if (cmponentInfo && !cmponentInfo.options?.isInputComponent) {
+		e.preventDefault();
+		if (this.component.select(cmponentInfo.target, cmponentInfo.pluginName, false) === false) this.editor.blur();
+	}
 }
 
 function OnKeyUp_wysiwyg(frameContext, e) {
@@ -2023,6 +2070,10 @@ function OnCut_wysiwyg(frameContext, e) {
 function OnScroll_wysiwyg(frameContext, eventWysiwyg, e) {
 	this._moveContainer(eventWysiwyg);
 	this._scrollContainer();
+
+	// plugin event
+	this._callPluginEvent('onScroll', { frameContext, event: e });
+
 	// user event
 	this.triggerEvent('onScroll', { frameContext, event: e });
 }
@@ -2091,10 +2142,10 @@ function OnMouseMove_wysiwyg(frameContext, e) {
 	if (frameContext.get('isReadOnly') || frameContext.get('isDisabled')) return false;
 
 	const info = this.component.get(e.target);
+	const lineBreakerStyle = frameContext.get('lineBreaker').style;
+
 	if (info && !domUtils.hasClass(info.cover, 'se-non-select-figure')) {
 		const container = info.container;
-		const lineBreakerStyle = frameContext.get('lineBreaker').style;
-
 		if (container && !this.editor.currentControllerName) {
 			let scrollTop = 0;
 			let el = frameContext.get('wysiwyg');
@@ -2131,9 +2182,11 @@ function OnMouseMove_wysiwyg(frameContext, e) {
 			lineBreakerStyle.display = 'block';
 
 			return;
-		} else if (lineBreakerStyle.display !== 'none') {
-			lineBreakerStyle.display = 'none';
 		}
+	}
+
+	if (lineBreakerStyle.display !== 'none') {
+		lineBreakerStyle.display = 'none';
 	}
 
 	this._callPluginEvent('onMouseMove', { frameContext, event: e });

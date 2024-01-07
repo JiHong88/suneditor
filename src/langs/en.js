@@ -53,6 +53,7 @@
 		deleteRow: 'Delete row',
 		dir_ltr: 'Left to right',
 		dir_rtl: 'Right to left',
+		download: 'Download',
 		edit: 'Edit',
 		decrease: 'Decrease',
 		increase: 'Increase',

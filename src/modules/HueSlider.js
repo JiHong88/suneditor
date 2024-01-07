@@ -64,7 +64,7 @@ function CreateSliderCtx() {
  * It must be called every time it is used.
  * @param {{form: Element}} params {form: Element}
  */
-const HueSlider = function (inst, params) {
+const HueSlider = function (inst, params, className) {
 	if (!params) params = {};
 
 	this.editor = inst.editor;
@@ -90,7 +90,7 @@ const HueSlider = function (inst, params) {
 
 	// init default controller
 	if (!params.isNewForm) {
-		const hueController = CreateHTML_basicControllerForm(inst.editor);
+		const hueController = CreateHTML_basicControllerForm(inst.editor, className);
 		this.form = hueController.querySelector('.se-hue');
 		this.controller = new Controller(this, hueController, { position: 'top', ...params.controllerOptions });
 
@@ -446,10 +446,10 @@ function roundNumber(num) {
 drawColorWheelToContext(offscreenCtx);
 drawColorWheel();
 
-function CreateHTML_basicControllerForm({ lang, icons }) {
+function CreateHTML_basicControllerForm({ lang, icons }, className) {
 	const hueController = domUtils.createElement(
 		'DIV',
-		{ class: 'se-controller' },
+		{ class: `se-controller ${className}` },
 		/*html*/ `
 		<div class="se-hue"></div>
 		<div class="se-form-group se-form-w0 se-form-flex-btn">

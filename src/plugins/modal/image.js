@@ -49,7 +49,8 @@ const Image_ = function (editor, pluginOptions) {
 		openNewWindow: Link.openNewWindow,
 		relList: Link.relList,
 		defaultRel: Link.defaultRel,
-		noAutoPrefix: Link.noAutoPrefix
+		noAutoPrefix: Link.noAutoPrefix,
+		enableFileUpload: pluginOptions.linkEnableFileUpload
 	});
 	this.modal = new Modal(this, modalEl);
 	this.figure = new Figure(this, figureControls, {
@@ -131,6 +132,13 @@ Image_.prototype = {
 	 * @override type = "modal"
 	 */
 	open() {
+		this.modal.open();
+	},
+
+	/**
+	 * @override Figure
+	 */
+	edit() {
 		this.modal.open();
 	},
 
