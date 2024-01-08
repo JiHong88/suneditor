@@ -49,7 +49,7 @@ export function DIR_BTN_ACTIVE(editor, rtl) {
 	const shortcutsKeyMap = editor.shortcutsKeyMap;
 
 	// change reverse shortcuts key
-	editor.reverseKeys.forEach(function (e) {
+	editor.reverseKeys.forEach((e) => {
 		const info = shortcutsKeyMap.get(e);
 		if (!info) return;
 		const temp = info.c;

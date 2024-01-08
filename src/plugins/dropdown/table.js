@@ -2275,10 +2275,10 @@ function OnMouseMoveTablePicker(e) {
 	this.tableHighlight.style.width = x + 'em';
 	this.tableHighlight.style.height = y + 'em';
 
-	// let x_u = x < 5 ? 5 : (x > 9 ? 10 : x + 1);
-	// let y_u = y < 5 ? 5 : (y > 9 ? 10 : y + 1);
-	// this.tableUnHighlight.style.width = x_u + 'em';
-	// this.tableUnHighlight.style.height = y_u + 'em';
+	let x_u = x < 5 ? 5 : (x > 8 ? 10 : x + 2);
+	let y_u = y < 5 ? 5 : (y > 8 ? 10 : y + 2);
+	this.tableUnHighlight.style.width = x_u + 'em';
+	this.tableUnHighlight.style.height = y_u + 'em';
 
 	domUtils.changeTxt(this.tableDisplay, x + ' x ' + y);
 	this._tableXY = [x, y];

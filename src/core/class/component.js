@@ -6,8 +6,8 @@ import CoreInjector from '../../editorInjector/_core';
 import { domUtils } from '../../helper';
 import Figure from '../../modules/Figure';
 
-const DIR_KEYCODE = new RegExp(/^(3[7-9]|40)$/);
-const DIR_UP_KEYCODE = new RegExp(/^3[7-8]$/);
+const DIR_KEYCODE = /^(3[7-9]|40)$/;
+const DIR_UP_KEYCODE = /^3[7-8]$/;
 
 const Component = function (editor) {
 	CoreInjector.call(this, editor);
@@ -153,7 +153,7 @@ Component.prototype = {
 		this._w.setTimeout(
 			() => {
 				if (typeof plugin.select === 'function') plugin.select(element);
-				this._setComponentLineBreaker(element);
+				this._setComponentLineBreaker(info.container || info.cover || element);
 				this.__addGlobalEvent();
 				if (!this.info.isFile) this.__addNotFileGlobalEvent();
 				this.currentTarget = element;
@@ -234,7 +234,6 @@ Component.prototype = {
 			this.eventManager._lineBreakComp = container;
 			componentTop = this.offset.get(offsetTarget).top + yScroll;
 			w = target.offsetWidth / 2 / 2;
-
 			t_style.top = componentTop - yScroll - toolbarH - 12 + 'px';
 			t_style.left = (isNonSelected ? 0 : this.offset.get(target).left + w) + 'px';
 			fc.get('lineBreaker_t').setAttribute('data-offset', yScroll + ',' + wScroll);
@@ -250,7 +249,6 @@ Component.prototype = {
 				componentTop = this.offset.get(offsetTarget).top + yScroll;
 				w = target.offsetWidth / 2 / 2;
 			}
-
 			let bDir = '';
 			b_style.top = componentTop + target.offsetHeight - yScroll - toolbarH - 12 + 'px';
 			if (isNonSelected) {

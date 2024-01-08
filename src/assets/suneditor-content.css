@@ -365,7 +365,7 @@
 	border-color: var(--se-edit-border-light);
 	width: 100%;
 	max-width: 100%;
-	margin: 0 0 10px;
+	margin: 0;
 	background-color: var(--se-edit-background);
 	border-spacing: 0;
 	border-collapse: collapse;

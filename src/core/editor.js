@@ -523,7 +523,7 @@ Editor.prototype = {
 			return this.format.isLine(current) && (current.style.marginRight || current.style.marginLeft || current.style.textAlign);
 		});
 
-		for (let i = 0, len = lineNodes.length, n, l, r; i < len; i++) {
+		for (let i = 0, n, l, r; (n = lineNodes[i]); i++) {
 			n = lineNodes[i];
 			// indent margin
 			r = n.style.marginRight;
@@ -593,10 +593,8 @@ Editor.prototype = {
 		// init options
 		const options = this.options;
 		const newMap = InitOptions(this._originOptions, newRoots).o;
-		for (let i = 0, len = newKeys.length, k; i < len; i++) {
-			k = newKeys[i];
-
-			/** --------- root start --------- */
+		/** --------- root start --------- */
+		for (let i = 0, k; (k = newKeys[i]); i++) {
 			if (newRootKeys[k]) {
 				const diff = rootDiff[k];
 				const fc = frameRoots.get(k);
@@ -1355,7 +1353,7 @@ Editor.prototype = {
 		const keyMap = this.shortcutsKeyMap;
 		const reverseKeys = this.reverseKeys;
 
-		for (let i = 0, e, c; i < currentButtons.length; i++) {
+		for (let i = 0, len = currentButtons.length, e, c; i < len; i++) {
 			e = currentButtons[i];
 			c = e.getAttribute('data-command');
 			// command set
