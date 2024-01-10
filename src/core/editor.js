@@ -1279,14 +1279,14 @@ Editor.prototype = {
 			// Not file component
 			if (typeof plugin.constructor.component === 'function') {
 				this._componentManager.push(
-					function (element) {
-						if (!(element = this.component(element))) return null;
+					function (launcher, element) {
+						if (!(element = launcher.component?.call(this, element))) return null;
 						return {
 							target: element,
-							pluginName: this.key,
-							options: this.options
+							pluginName: launcher.key,
+							options: launcher.options
 						};
-					}.bind(plugin.constructor)
+					}.bind(plugin, plugin.constructor)
 				);
 			}
 

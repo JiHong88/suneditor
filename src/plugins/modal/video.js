@@ -3,9 +3,6 @@ import { Modal, Figure, FileManager } from '../../modules';
 import { domUtils, numbers, env } from '../../helper';
 const { NO_EVENT } = env;
 
-const YOUTUBE_EMBED = '//www.youtube.com/embed/';
-const VIMEO_EMBED = 'https://player.vimeo.com/video/';
-
 const Video = function (editor, pluginOptions) {
 	// plugin bisic properties
 	EditorInjector.call(this, editor);
@@ -78,7 +75,6 @@ const Video = function (editor, pluginOptions) {
 	this.previewSrc = modalEl.querySelector('.se-link-preview');
 	this._linkValue = '';
 	this._align = 'none';
-	this._youtubeQuery = (pluginOptions.youtubeQueryString || '').replace('?', '');
 	this._videoRatio = defaultRatio;
 	this._defaultRatio = defaultRatio;
 	this._defaultSizeX = '100%';
@@ -97,6 +93,19 @@ const Video = function (editor, pluginOptions) {
 	this._resizing = this.pluginOptions.canResize;
 	this._onlyPercentage = this.pluginOptions.percentageOnlySize;
 	this._nonResizing = !this._resizing || !this.pluginOptions.showHeightInput || this._onlyPercentage;
+	this.query = {
+		youtube: {
+			pattern: /youtu\.?be/i,
+			action: this.convertUrlYoutube.bind(this),
+			tag: 'iframe'
+		},
+		vimeo: {
+			pattern: /vimeo\.com/i,
+			action: this.convertUrlVimeo.bind(this),
+			tag: 'iframe'
+		},
+		...pluginOptions.embedQuery
+	};
 
 	// init
 	if (this.videoInputFile) modalEl.querySelector('.se-file-remove').addEventListener('click', RemoveSelectedFiles.bind(this));
@@ -126,7 +135,12 @@ Video.key = 'video';
 Video.type = 'modal';
 Video.className = '';
 Video.component = (node) => {
-	return /^(VIDEO|IFRAME)$/i.test(node?.nodeName) ? node : null;
+	if (/^(VIDEO)$/i.test(node?.nodeName)) {
+		return node;
+	} else if (/^(IFRAME)$/i.test(node?.nodeName)) {
+		return this.findProcessUrl(node.src) ? node : null;
+	}
+	return null;
 };
 Video.prototype = {
 	/**
@@ -292,6 +306,39 @@ Video.prototype = {
 		this.history.push(false);
 	},
 
+	findProcessUrl(url) {
+		const query = this.query;
+		for (const key in query) {
+			const service = query[key];
+			if (service.pattern.test(url)) {
+				return {
+					origin: url,
+					url: service.action(url),
+					tag: service.tag
+				};
+			}
+		}
+
+		return null;
+	},
+
+	convertUrlYoutube(url) {
+		if (!/^http/.test(url)) url = 'https://' + url;
+		url = url.replace('watch?v=', '');
+		if (!/^\/\/.+\/embed\//.test(url)) {
+			url = url.replace(url.match(/\/\/.+\//)[0], '//www.youtube.com/embed/').replace('&', '?&');
+		}
+		return url;
+	},
+
+	convertUrlVimeo(url) {
+		if (url.endsWith('/')) {
+			url = url.slice(0, -1);
+		}
+		url = 'https://player.vimeo.com/video/' + url.slice(url.lastIndexOf('/') + 1);
+		return url;
+	},
+
 	applySize(w, h) {
 		if (!w) w = this.inputX.value || this.pluginOptions.defaultWidth;
 		if (!h) h = this.inputY.value || this.pluginOptions.defaultHeight;
@@ -310,15 +357,14 @@ Video.prototype = {
 		if (isUpdate) {
 			oFrame = this._element;
 			if (oFrame.src !== src) {
-				const isYoutube = /youtu\.?be/.test(src);
-				const isVimeo = /vimeo\.com/.test(src);
-				if ((isYoutube || isVimeo) && !/^iframe$/i.test(oFrame.nodeName)) {
-					const newTag = this._createVideoTag();
+				const processUrl = this.findProcessUrl(src);
+				if (/^iframe$/i.test(processUrl?.tag) && !/^iframe$/i.test(oFrame.nodeName)) {
+					const newTag = this.createIframeTag();
 					newTag.src = src;
 					oFrame.parentNode.replaceChild(newTag, oFrame);
 					this._element = oFrame = newTag;
-				} else if (!isYoutube && !isVimeo && !/^videoo$/i.test(oFrame.nodeName)) {
-					const newTag = this._createVideoTag();
+				} else if (/^video$/i.test(processUrl?.tag) && !/^video$/i.test(oFrame.nodeName)) {
+					const newTag = this.createVideoTag();
 					newTag.src = src;
 					oFrame.parentNode.replaceChild(newTag, oFrame);
 					this._element = oFrame = newTag;
@@ -373,6 +419,18 @@ Video.prototype = {
 
 		if (this._resizing && changeSize && this.figure.isVertical) this.figure.setTransform(oFrame, width, height, 0);
 		this.history.push(false);
+	},
+
+	createIframeTag() {
+		const iframeTag = domUtils.createElement('IFRAME');
+		this._setIframeAttrs(iframeTag);
+		return iframeTag;
+	},
+
+	createVideoTag: function () {
+		const videoTag = domUtils.createElement('VIDEO');
+		this._setTagAttrs(videoTag);
+		return videoTag;
 	},
 
 	_getInfo() {
@@ -442,37 +500,19 @@ Video.prototype = {
 			if (url.length === 0) return false;
 		}
 
-		/** youtube */
-		if (/youtu\.?be/.test(url)) {
-			if (!/^http/.test(url)) url = 'https://' + url;
-			url = url.replace('watch?v=', '');
-			if (!/^\/\/.+\/embed\//.test(url)) {
-				url = url.replace(url.match(/\/\/.+\//)[0], YOUTUBE_EMBED).replace('&', '?&');
-			}
-
-			if (this._youtubeQuery.length > 0) {
-				if (/\?/.test(url)) {
-					const splitUrl = url.split('?');
-					url = splitUrl[0] + '?' + this._youtubeQuery + '&' + splitUrl[1];
-				} else {
-					url += '?' + this._youtubeQuery;
-				}
-			}
-		} else if (/vimeo\.com/.test(url)) {
-			if (url.endsWith('/')) {
-				url = url.slice(0, -1);
-			}
-			url = VIMEO_EMBED + url.slice(url.lastIndexOf('/') + 1);
+		const processUrl = this.findProcessUrl(url);
+		if (processUrl) {
+			url = processUrl.url;
 		}
 
 		const file = { name: url.split('/').pop(), size: 0 };
-		const videoInfo = { url, files: file, ...this._getInfo() };
+		const videoInfo = { url, files: file, ...this._getInfo(), process: processUrl };
 
 		const handler = function (infos, newInfos) {
 			infos = newInfos || infos;
 			const url = infos.url;
 			this.create(
-				this[!/embed|iframe|player|\/e\/|\.php|\.html?/.test(url) && !/vimeo\.com/.test(url) ? '_createVideoTag' : '_createVideoTag'](),
+				this[/^iframe$/i.test(infos.process?.tag) ? 'createIframeTag' : 'createVideoTag'](),
 				url,
 				infos.inputWidth,
 				infos.inputHeight,
@@ -558,7 +598,7 @@ Video.prototype = {
 
 	_register(info, response) {
 		const fileList = response.result;
-		const videoTag = this._createVideoTag();
+		const videoTag = this.createVideoTag();
 
 		for (let i = 0, len = fileList.length; i < len; i++) {
 			this.create(info.isUpdate ? info.element : videoTag.cloneNode(false), fileList[i].url, info.inputWidth, info.inputHeight, info.align, info.isUpdate, {
@@ -598,12 +638,6 @@ Video.prototype = {
 		for (let key in attrs) {
 			element.setAttribute(key, attrs[key]);
 		}
-	},
-
-	_createVideoTag() {
-		const iframeTag = domUtils.createElement('IFRAME');
-		this._setIframeAttrs(iframeTag);
-		return iframeTag;
 	},
 
 	_setVideoRatioSelect(value) {

@@ -163,8 +163,7 @@ const Table = function (editor, pluginOptions) {
 		border_color: controller_props.querySelector('.__se_border_color'),
 		border_width: controller_props.querySelector('.__se__border_size'),
 		back_color: controller_props.querySelector('.__se_back_color'),
-		palette_border_button: controller_props.querySelector('[data-command="props_onpalette"][data-value="border"]'),
-		border_style_button: controller_props.querySelector('[data-command="props_onborder_style"]')
+		palette_border_button: controller_props.querySelector('[data-command="props_onpalette"][data-value="border"]')
 	};
 	this._propsCache = [];
 	this._propsAlignCache = '';
@@ -2275,8 +2274,8 @@ function OnMouseMoveTablePicker(e) {
 	this.tableHighlight.style.width = x + 'em';
 	this.tableHighlight.style.height = y + 'em';
 
-	let x_u = x < 5 ? 5 : (x > 8 ? 10 : x + 2);
-	let y_u = y < 5 ? 5 : (y > 8 ? 10 : y + 2);
+	let x_u = x < 5 ? 5 : x > 8 ? 10 : x + 2;
+	let y_u = y < 5 ? 5 : y > 8 ? 10 : y + 2;
 	this.tableUnHighlight.style.width = x_u + 'em';
 	this.tableUnHighlight.style.height = y_u + 'em';
 
