@@ -231,8 +231,7 @@ Selection.prototype = {
 		return (
 			(domUtils.isWysiwygFrame(range.startContainer) && domUtils.isWysiwygFrame(range.endContainer)) ||
 			/FIGURE/i.test(comm.nodeName) ||
-			(this.editor._fileManager.regExp.test(comm.nodeName) &&
-				(!this.editor._fileManager.tagAttrs[comm.nodeName] || this.editor._fileManager.tagAttrs[comm.nodeName]?.every((v) => comm.hasAttribute(v)))) ||
+			(this.editor._fileManager.regExp.test(comm.nodeName) && (!this.editor._fileManager.tagAttrs[comm.nodeName] || this.editor._fileManager.tagAttrs[comm.nodeName]?.every((v) => comm.hasAttribute(v)))) ||
 			this.component.is(comm)
 		);
 	},
@@ -413,10 +412,7 @@ Selection.prototype = {
 				while (tempCon && !domUtils.isBreak(tempCon) && tempCon.nodeType === 1) {
 					tempChild = tempCon.childNodes;
 					if (tempChild.length === 0) break;
-					tempCon =
-						tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName)
-							? tempChild[0]
-							: tempCon.previousElementSibling || tempCon.previousSibling || startCon;
+					tempCon = tempChild[tempOffset > 0 ? tempOffset - 1 : tempOffset] || !/FIGURE/i.test(tempChild[0].nodeName) ? tempChild[0] : tempCon.previousElementSibling || tempCon.previousSibling || startCon;
 					tempOffset = tempOffset > 0 ? tempCon.textContent.length : tempOffset;
 				}
 

@@ -165,9 +165,14 @@ const Table = function (editor, pluginOptions) {
 		border_width: controller_props.querySelector('.__se__border_size'),
 		back_color: controller_props.querySelector('.__se_back_color'),
 		font_color: controller_props.querySelector('.__se_font_color'),
-		palette_border_button: controller_props.querySelector('[data-command="props_onpalette"][data-value="border"]')
+		palette_border_button: controller_props.querySelector('[data-command="props_onpalette"][data-value="border"]'),
+		font_bold: controller_props.querySelector('[data-command="props_font_style"][data-value="bold"]'),
+		font_underline: controller_props.querySelector('[data-command="props_font_style"][data-value="underline"]'),
+		font_italic: controller_props.querySelector('[data-command="props_font_style"][data-value="italic"]'),
+		font_strike: controller_props.querySelector('[data-command="props_font_style"][data-value="strike"]')
 	};
 	this._propsCache = [];
+	this._currentFontStyles = [];
 	this._propsAlignCache = '';
 	this._typeCache = '';
 	this.tableHighlight = menu.querySelector('.se-table-size-highlighted');
@@ -588,12 +593,8 @@ Table.prototype = {
 			case 'props_onpalette':
 				this._onColorPalette(target, value, value === 'border' ? border_color : value === 'back' ? back_color : font_color);
 				break;
-			case 'props_remove_color':
-				if (value === 'back') {
-					back_color.style.borderColor = back_color.value = '';
-				} else {
-					font_color.style.borderColor = font_color.value = '';
-				}
+			case 'props_font_style':
+				domUtils.toggleClass(this.propTargets[`font_${value}`], 'on');
 				break;
 			case 'props_submit':
 				this._submitProps(target);
@@ -691,6 +692,9 @@ Table.prototype = {
 		this._fixedCell = null;
 		this._selectedCell = null;
 		this._fixedCellName = null;
+
+		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
+		domUtils.removeClass([border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, font_bold, font_underline, font_italic, font_strike], 'on');
 	},
 
 	selectCells(tdElement, shift) {
@@ -1357,10 +1361,7 @@ Table.prototype = {
 		const tableElement = this._element || this._selectedTable || domUtils.getParentElement(tdElement, 'TABLE');
 		this.component.select(tableElement, Table.key, true);
 
-		this._maxWidth =
-			domUtils.hasClass(tableElement, 'se-table-size-100') ||
-			tableElement.style.width === '100%' ||
-			(!tableElement.style.width && !domUtils.hasClass(tableElement, 'se-table-size-auto'));
+		this._maxWidth = domUtils.hasClass(tableElement, 'se-table-size-100') || tableElement.style.width === '100%' || (!tableElement.style.width && !domUtils.hasClass(tableElement, 'se-table-size-auto'));
 		this._fixedColumn = domUtils.hasClass(tableElement, 'se-table-layout-fixed') || tableElement.style.tableLayout === 'fixed';
 		this.setTableStyle(this._maxWidth ? 'width|column' : 'width');
 
@@ -1459,15 +1460,7 @@ Table.prototype = {
 		this._resizeLinePrev.style.display = 'block';
 
 		this._addResizeGlobalEvents(
-			this._figureResize.bind(
-				this,
-				figure,
-				this._resizeLine,
-				isLeftEdge,
-				startX,
-				figure.offsetWidth,
-				/%$/.test(figure.style.width) ? numbers.get(figure.style.width, CELL_DECIMAL_END) : 100
-			),
+			this._figureResize.bind(this, figure, this._resizeLine, isLeftEdge, startX, figure.offsetWidth, /%$/.test(figure.style.width) ? numbers.get(figure.style.width, CELL_DECIMAL_END) : 100),
 			this.__removeGlobalEvents.bind(this),
 			this._stopResize.bind(this, figure, figure.style.width, 'width')
 		);
@@ -1546,8 +1539,8 @@ Table.prototype = {
 		const targets = isTable ? [this._element] : this._selectedCells;
 		if (!targets || targets.length === 0) return;
 
-		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment } = this.propTargets;
-		const { border, backgroundColor, color, textAlign } = window.getComputedStyle(targets[0]);
+		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
+		const { border, backgroundColor, color, textAlign, fontWeight, textDecoration, fontStyle } = window.getComputedStyle(targets[0]);
 		const cellBorder = this._getBorderStyle(border);
 
 		cell_alignment.querySelector('[data-value="justify"]').style.display = isTable ? 'none' : '';
@@ -1557,11 +1550,15 @@ Table.prototype = {
 			b_width = cellBorder.w,
 			backColor = converter.rgb2hex(backgroundColor),
 			fontColor = converter.rgb2hex(color),
+			bold = /.+/.test(fontWeight),
+			underline = /underline/i.test(textDecoration),
+			strike = /line-through/i.test(textDecoration),
+			italic = /italic/i.test(fontStyle),
 			align = isTable ? this._figure?.style.float : textAlign;
 		this._propsCache = [];
 
 		for (let i = 0, t, isBreak; (t = targets[i]); i++) {
-			let { cssText, border, backgroundColor, color, textAlign } = t.style;
+			let { cssText, border, backgroundColor, color, textAlign, fontWeight, textDecoration, fontStyle } = t.style;
 			this._propsCache.push([t, cssText]);
 			if (isBreak) continue;
 
@@ -1573,7 +1570,11 @@ Table.prototype = {
 			if (backColor !== converter.rgb2hex(backgroundColor)) backColor = '';
 			if (fontColor !== converter.rgb2hex(color)) fontColor = '';
 			if (align !== (isTable ? this._figure?.style.float : textAlign)) align = '';
-			if (!b_color || !b_style || !b_width || !backColor) {
+			if (bold && bold !== /.+/.test(fontWeight)) bold = '';
+			if (underline && underline !== /underline/i.test(textDecoration)) underline = false;
+			if (strike && strike !== /line-through/i.test(textDecoration)) strike = false;
+			if (italic && italic !== /italic/i.test(fontStyle)) italic = false;
+			if (!b_color || !b_style || !b_width || !backColor || !fontColor) {
 				isBreak = true;
 			}
 		}
@@ -1593,6 +1594,12 @@ Table.prototype = {
 		// back, font color
 		back_color.value = back_color.style.borderColor = backColor;
 		font_color.value = font_color.style.borderColor = fontColor;
+
+		// font style
+		if (bold) domUtils.addClass(font_bold, 'on');
+		if (underline) domUtils.addClass(font_underline, 'on');
+		if (strike) domUtils.addClass(font_strike, 'on');
+		if (italic) domUtils.addClass(font_italic, 'on');
 
 		// align
 		this._setAlignProps(cell_alignment, (this._propsAlignCache = align), true);
@@ -1746,6 +1753,8 @@ Table.prototype = {
 					es.backgroundColor = backColor;
 					// font
 					es.color = fontColor;
+					// font style
+					this._setFontStyle(es);
 					// border
 					if (hasBorder) continue;
 					// border - all || none
@@ -1768,6 +1777,8 @@ Table.prototype = {
 				es.backgroundColor = backColor;
 				// font
 				es.color = fontColor;
+				// font style
+				this._setFontStyle(es);
 				// border
 				if (!hasBorder) {
 					// border - all || none
@@ -1794,6 +1805,13 @@ Table.prototype = {
 		} finally {
 			target.removeAttribute('disabled');
 		}
+	},
+
+	_setFontStyle(styles) {
+		const { font_bold, font_italic, font_strike, font_underline } = this.propTargets;
+		styles.fontWeight = domUtils.hasClass(font_bold, 'on') ? 'bold' : '';
+		styles.fontStyle = domUtils.hasClass(font_italic, 'on') ? 'italic' : '';
+		styles.textDecoration = ((domUtils.hasClass(font_strike, 'on') ? 'line-through ' : '') + (domUtils.hasClass(font_underline, 'on') ? 'underline' : '')).trim();
 	},
 
 	/**
@@ -2603,6 +2621,7 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 				<span class="se-controller-title">${lang.tableProperties}</span>
 			</div>
 			<div class="se-controller-body">
+
 				<label>${lang.border}</label>
 				<div class="se-form-group se-form-w0">
 					<button type="button" data-command="props_onborder_format" class="se-btn se-tooltip">
@@ -2627,7 +2646,8 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 					</button>
 					<input type="text" class="se-input-control __se__border_size" placeholder="${lang.width}" />
 				</div>
-				<label>${lang.launcher}</label>
+
+				<label>${lang.color}</label>
 				<div class="se-form-group se-form-w0">
 					<button type="button" data-command="props_onpalette" data-value="font" class="se-btn se-tooltip">
 						${icons.font_color}
@@ -2644,6 +2664,35 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 					</button>
 					<input type="text" class="se-color-input __se_back_color" placeholder="${lang.backgroundColor}" />
 				</div>
+
+				<label>${lang.font}</label>
+				<div class="se-form-group se-form-w0">
+					<button type="button" data-command="props_font_style" data-value="bold" class="se-btn se-tooltip">
+						${icons.bold}
+						<span class="se-tooltip-inner">
+							<span class="se-tooltip-text">${lang.bold}</span>
+						</span>
+					</button>
+					<button type="button" data-command="props_font_style" data-value="underline" class="se-btn se-tooltip">
+						${icons.underline}
+						<span class="se-tooltip-inner">
+							<span class="se-tooltip-text">${lang.underline}</span>
+						</span>
+					</button>
+					<button type="button" data-command="props_font_style" data-value="italic" class="se-btn se-tooltip">
+						${icons.italic}
+						<span class="se-tooltip-inner">
+							<span class="se-tooltip-text">${lang.italic}</span>
+						</span>
+					</button>
+					<button type="button" data-command="props_font_style" data-value="strike" class="se-btn se-tooltip">
+						${icons.strike}
+						<span class="se-tooltip-inner">
+							<span class="se-tooltip-text">${lang.strike}</span>
+						</span>
+					</button>
+				</div>
+
 				<div class="se-table-props-align">
 					<label>${lang.align}</label>
 					<div class="se-form-group se-form-w0 se-list-inner">

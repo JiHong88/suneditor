@@ -19,9 +19,7 @@ Char.prototype = {
 	check(html) {
 		const maxCharCount = this.editor.frameOptions.get('charCounter_max');
 		if (maxCharCount) {
-			const length = this.getLength(
-				typeof html === 'string' ? html : this.editor.frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? html.outerHTML : html.textContent
-			);
+			const length = this.getLength(typeof html === 'string' ? html : this.editor.frameOptions.get('charCounter_type') === 'byte-html' && html.nodeType === 1 ? html.outerHTML : html.textContent);
 			if (length > 0 && length + this.getLength() > maxCharCount) {
 				CounterBlink(this.editor.frameContext.get('charWrapper'));
 				return false;
@@ -38,10 +36,7 @@ Char.prototype = {
 	 */
 	getLength(content) {
 		if (typeof content !== 'string') {
-			content =
-				this.editor.frameOptions.get('charCounter_type') === 'byte-html'
-					? this.editor.frameContext.get('wysiwyg').innerHTML
-					: this.editor.frameContext.get('wysiwyg').textContent;
+			content = this.editor.frameOptions.get('charCounter_type') === 'byte-html' ? this.editor.frameContext.get('wysiwyg').innerHTML : this.editor.frameContext.get('wysiwyg').textContent;
 		}
 		return /byte/.test(this.editor.frameOptions.get('charCounter_type')) ? this.getByteLength(content) : content.length;
 	},

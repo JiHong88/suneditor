@@ -22,8 +22,7 @@ const Image_ = function (editor, pluginOptions) {
 		uploadHeaders: pluginOptions.uploadHeaders || null,
 		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
 		allowMultiple: !!pluginOptions.allowMultiple,
-		acceptedFormats:
-			typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*'
+		acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'image/*' : pluginOptions.acceptedFormats.trim() || 'image/*'
 	};
 
 	// create HTML
@@ -240,10 +239,7 @@ Image_.prototype = {
 
 		if (this.imgUrlFile) this._linkValue = this.previewSrc.textContent = this.imgUrlFile.value = this._element.src;
 
-		(
-			this.modal.form.querySelector('input[name="suneditor_image_radio"][value="' + this._align + '"]') ||
-			this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]')
-		).checked = true;
+		(this.modal.form.querySelector('input[name="suneditor_image_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_image_radio"][value="none"]')).checked = true;
 		this.captionCheckEl.checked = !!this._caption;
 
 		if (!this._resizing) return;
@@ -458,12 +454,7 @@ Image_.prototype = {
 		let existElement = null;
 		if (isNewContainer) {
 			imageEl = this._element;
-			existElement =
-				this.format.isBlock(imageEl.parentNode) || domUtils.isWysiwygFrame(imageEl.parentNode)
-					? imageEl
-					: domUtils.isAnchor(imageEl.parentNode)
-					? imageEl.parentNode
-					: this.format.getLine(imageEl) || imageEl;
+			existElement = this.format.isBlock(imageEl.parentNode) || domUtils.isWysiwygFrame(imageEl.parentNode) ? imageEl : domUtils.isAnchor(imageEl.parentNode) ? imageEl.parentNode : this.format.getLine(imageEl) || imageEl;
 
 			if (domUtils.getParentElement(this._element, domUtils.isExcludeFormat)) {
 				existElement = isNewAnchor ? anchor : this._element;
@@ -840,11 +831,7 @@ function CreateHTML_modal({ lang, icons, plugins }, pluginOptions) {
 			<label>${lang.image_modal_url}</label>
 			<div class="se-modal-form-files">
 				<input class="se-input-form se-input-url _se_image_url" data-focus type="text" />
-				${
-					plugins.imageGallery
-						? `<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="${lang.imageGallery}" aria-label="${lang.imageGallery}">${icons.image_gallery}</button>`
-						: ''
-				}
+				${plugins.imageGallery ? `<button type="button" class="se-btn se-modal-files-edge-button __se__gallery" title="${lang.imageGallery}" aria-label="${lang.imageGallery}">${icons.image_gallery}</button>` : ''}
 			</div>
 			<pre class="se-link-preview"></pre>
 		</div>`;

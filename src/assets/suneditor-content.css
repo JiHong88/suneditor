@@ -644,8 +644,7 @@
 /* Shadow */
 .sun-editor-editable .__se__t-shadow,
 .sun-editor .__se__t-shadow {
-	text-shadow: -0.2rem -0.2rem 1rem var(--se-edit-background, 0.2rem 0.2rem 1rem --se-edit-background, 0 0 0.2rem #999, 0 0 0.4rem #888, 0 0 0.6rem #777) 0 0 0.8rem var(--se-edit-font-sub, 0
-				0 1rem #555);
+	text-shadow: -0.2rem -0.2rem 1rem var(--se-edit-background, 0.2rem 0.2rem 1rem --se-edit-background, 0 0 0.2rem #999, 0 0 0.4rem #888, 0 0 0.6rem #777) 0 0 0.8rem var(--se-edit-font-sub, 0 0 1rem #555);
 }
 
 /* Code */

@@ -236,9 +236,7 @@ FileManager.prototype = {
 					if (this.figure) this.figure.__fileManagerInfo = true;
 					if (typeof this.checkHandler === 'function') tag = this.checkHandler(tag);
 					if (!tag) {
-						console.warn(
-							`[SUNEDITOR.FileManager[${this.kind}].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).`
-						);
+						console.warn(`[SUNEDITOR.FileManager[${this.kind}].checkHandler.fail] "checkHandler(element)" should return element(Argument element, or newly created element).`);
 					} else {
 						this._setInfo(tag, null);
 						this.inst.init();
@@ -332,9 +330,7 @@ async function CallBackUpload(xmlHttp, callBack, errorCallBack) {
 				if (typeof errorCallBack === 'function') {
 					message = await errorCallBack(res);
 				}
-				const err = `[SUNEDITOR.FileManager[${this.kind}].upload.serverException] status: ${xmlHttp.status}, response: ${
-					message || res.errorMessage || xmlHttp.responseText
-				}`;
+				const err = `[SUNEDITOR.FileManager[${this.kind}].upload.serverException] status: ${xmlHttp.status}, response: ${message || res.errorMessage || xmlHttp.responseText}`;
 				this.editor.notice.open(err);
 			} catch (error) {
 				throw Error(`[SUNEDITOR.FileManager[${this.kind}].upload.errorCallBack.fail] ${error.message}`);

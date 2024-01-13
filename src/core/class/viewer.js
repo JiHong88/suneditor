@@ -176,10 +176,7 @@ Viewer.prototype = {
 
 			// frame
 			editorArea.style.cssText = toolbar.style.cssText = '';
-			wysiwygFrame.style.cssText =
-				(wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] +
-				this.editor.frameOptions.get('_defaultStyles').editor +
-				(isCodeView ? 'display: none;' : '');
+			wysiwygFrame.style.cssText = (wysiwygFrame.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + this.editor.frameOptions.get('_defaultStyles').editor + (isCodeView ? 'display: none;' : '');
 
 			// code wrapper
 			codeWrapper.style.cssText = (codeWrapper.style.cssText.match(/\s?display(\s+)?:(\s+)?[a-zA-Z]+;/) || [''])[0] + `display: ${!isCodeView ? 'none' : 'flex'} !important;`;
@@ -407,9 +404,7 @@ Viewer.prototype = {
 						<title>${this.lang.preview}</title>
 						${linkHTML}
 					</head>
-					<body class="${
-						this.options.get('printClass') ? this.options.get('printClass') : this.options.get('_editableClass')
-					}" style="margin:10px auto !important; height:auto !important; outline:1px dashed #ccc;">
+					<body class="${this.options.get('printClass') ? this.options.get('printClass') : this.options.get('_editableClass')}" style="margin:10px auto !important; height:auto !important; outline:1px dashed #ccc;">
 						${contentHTML}
 					</body>
 				</html>`);
@@ -419,10 +414,7 @@ Viewer.prototype = {
 	_resetFullScreenHeight() {
 		if (this.editor.frameContext.get('isFullScreen')) {
 			this.fullScreenInnerHeight +=
-				this._w.innerHeight -
-				this.context.get('toolbar.main').offsetHeight -
-				(this.editor.frameContext.has('statusbar') ? this.editor.frameContext.get('statusbar').offsetHeight : 0) -
-				this.fullScreenInnerHeight;
+				this._w.innerHeight - this.context.get('toolbar.main').offsetHeight - (this.editor.frameContext.has('statusbar') ? this.editor.frameContext.get('statusbar').offsetHeight : 0) - this.fullScreenInnerHeight;
 			this.editor.frameContext.get('wrapper').style.height = this.fullScreenInnerHeight + 'px';
 			return true;
 		}
@@ -519,8 +511,7 @@ Viewer.prototype = {
 
 			let headers = parseDocument.head.innerHTML;
 			if (!parseDocument.head.querySelector('link[rel="stylesheet"]') || (this.editor.frameOptions.get('height') === 'auto' && !parseDocument.head.querySelector('style'))) {
-				headers +=
-					converter._setIframeStyleLinks(this.editor.frameOptions.get('iframe_cssFileName')) + converter._setAutoHeightStyle(this.editor.frameOptions.get('height'));
+				headers += converter._setIframeStyleLinks(this.editor.frameOptions.get('iframe_cssFileName')) + converter._setAutoHeightStyle(this.editor.frameOptions.get('height'));
 			}
 
 			wDoc.head.innerHTML = headers;
@@ -538,8 +529,7 @@ Viewer.prototype = {
 				}
 			}
 		} else {
-			this.editor.frameContext.get('wysiwyg').innerHTML =
-				code_html.length > 0 ? this.html.clean(code_html, true, null, null) : '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
+			this.editor.frameContext.get('wysiwyg').innerHTML = code_html.length > 0 ? this.html.clean(code_html, true, null, null) : '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
 		}
 	},
 
@@ -553,14 +543,7 @@ Viewer.prototype = {
 
 		if (this.editor.frameOptions.get('iframe_fullPage')) {
 			const attrs = domUtils.getAttributesToString(this.editor.frameContext.get('_wd').body, null);
-			codeValue =
-				'<!DOCTYPE html>\n<html>\n' +
-				this.editor.frameContext.get('_wd').head.outerHTML.replace(/>(?!\n)/g, '>\n') +
-				'<body ' +
-				attrs +
-				'>\n' +
-				codeContent +
-				'</body>\n</html>';
+			codeValue = '<!DOCTYPE html>\n<html>\n' + this.editor.frameContext.get('_wd').head.outerHTML.replace(/>(?!\n)/g, '>\n') + '<body ' + attrs + '>\n' + codeContent + '</body>\n</html>';
 		} else {
 			codeValue = codeContent;
 		}

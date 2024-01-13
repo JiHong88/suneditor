@@ -21,9 +21,7 @@ const FileUpload = function (editor, pluginOptions) {
 
 	// figure
 	const showAlign = (pluginOptions.showAlign === undefined ? true : !!pluginOptions.showAlign) ? 'align' : '';
-	const figureControls = [
-		[enableEdit ? 'edit' : '', showAlign, 'remove', { command: 'download', title: this.lang.download, icon: 'download', action: (target) => target.click() }]
-	];
+	const figureControls = [[enableEdit ? 'edit' : '', showAlign, 'remove', { command: 'download', title: this.lang.download, icon: 'download', action: (target) => target.click() }]];
 	this.figure = new Figure(this, figureControls, {});
 
 	// file manager

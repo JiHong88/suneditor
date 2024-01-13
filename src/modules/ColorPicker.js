@@ -93,10 +93,7 @@ const ColorPicker = function (inst, styles, params) {
 	if (!params.disableHEXInput) {
 		this.hueSlider = new HueSlider(this, params.hueSliderOptions, 'se-dropdown');
 		this.parentFormDisplay = [];
-		this.parentForm =
-			params.hueSliderOptions?.controllerOptions?.parents?.length > 0 && !params.hueSliderOptions?.controllerOptions?.isInsideForm
-				? params.hueSliderOptions.controllerOptions.parents
-				: null;
+		this.parentForm = params.hueSliderOptions?.controllerOptions?.parents?.length > 0 && !params.hueSliderOptions?.controllerOptions?.isInsideForm ? params.hueSliderOptions.controllerOptions.parents : null;
 		// hue open
 		this.eventManager.addEvent(this.target.querySelector('.se-btn-info'), 'click', OnColorPalette.bind(this));
 		this.eventManager.addEvent(this.inputElement, 'input', OnChangeInput.bind(this));

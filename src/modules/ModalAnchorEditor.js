@@ -242,17 +242,7 @@ ModalAnchorEditor.prototype = {
 		value =
 			this.linkValue =
 			preview.textContent =
-				!value
-					? ''
-					: noPrefix
-					? value
-					: protocol && !reservedProtocol && !sameProtocol
-					? protocol + value
-					: reservedProtocol
-					? value
-					: /^www\./.test(value)
-					? 'http://' + value
-					: this.host + (/^\//.test(value) ? '' : '/') + value;
+				!value ? '' : noPrefix ? value : protocol && !reservedProtocol && !sameProtocol ? protocol + value : reservedProtocol ? value : /^www\./.test(value) ? 'http://' + value : this.host + (/^\//.test(value) ? '' : '/') + value;
 
 		if (this._selfPathBookmark(value)) {
 			this.bookmark.style.display = 'block';

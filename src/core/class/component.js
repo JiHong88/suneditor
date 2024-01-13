@@ -196,10 +196,7 @@ Component.prototype = {
 
 	__isFiles(element) {
 		const nodeName = element.nodeName.toLowerCase();
-		return (
-			this.editor._fileManager.regExp.test(nodeName) &&
-			(!this.editor._fileManager.tagAttrs[nodeName] || this.editor._fileManager.tagAttrs[nodeName]?.every((v) => element.hasAttribute(v)))
-		);
+		return this.editor._fileManager.regExp.test(nodeName) && (!this.editor._fileManager.tagAttrs[nodeName] || this.editor._fileManager.tagAttrs[nodeName]?.every((v) => element.hasAttribute(v)));
 	},
 
 	/**
@@ -297,11 +294,7 @@ Component.prototype = {
 };
 
 function CloseListener_mousedown({ target }) {
-	if (
-		this.currentTarget?.contains(target) ||
-		domUtils.getParentElement(target, '.se-controller') ||
-		(this.currentPluginName === this.editor.currentControllerName && this.editor.opendControllers.some(({ form }) => form.contains(target)))
-	)
+	if (this.currentTarget?.contains(target) || domUtils.getParentElement(target, '.se-controller') || (this.currentPluginName === this.editor.currentControllerName && this.editor.opendControllers.some(({ form }) => form.contains(target))))
 		return;
 	this.deselect();
 }

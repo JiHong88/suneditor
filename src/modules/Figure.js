@@ -220,10 +220,7 @@ Figure.prototype = {
 		const w = sizeTarget.offsetWidth - 1;
 		const h = sizeTarget.offsetHeight - 1;
 		const t = offset.top - (this.editor.frameOptions.get('iframe') ? frameOffset.top : 0);
-		const l =
-			offset.left -
-			(this.editor.frameOptions.get('iframe') ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) -
-			this.editor.frameContext.get('wysiwygFrame').scrollLeft;
+		const l = offset.left - (this.editor.frameOptions.get('iframe') ? frameOffset.left + (eventWysiwyg.scrollX || eventWysiwyg.scrollLeft || 0) : 0) - this.editor.frameContext.get('wysiwygFrame').scrollLeft;
 		const dataSize = (target.getAttribute('data-se-size') || '').split(',');
 		const ratio = Figure.GetRatio(dataSize[0] || numbers.get(target.style.width, 2) || w, dataSize[1] || numbers.get(target.style.height, 2) || h, this.sizeUnit);
 		const targetInfo = {
@@ -365,11 +362,7 @@ Figure.prototype = {
 			cover.style.width = container.style.width;
 		} else {
 			container.style.minWidth = '';
-			cover.style.width = this.isVertical
-				? target.style.height || target.offsetHeight
-				: !target.style.width || target.style.width === 'auto'
-				? ''
-				: target.style.width || '100%';
+			cover.style.width = this.isVertical ? target.style.height || target.offsetHeight : !target.style.width || target.style.width === 'auto' ? '' : target.style.width || '100%';
 		}
 
 		if (!domUtils.hasClass(container, '__se__float-' + align)) {
@@ -567,8 +560,7 @@ Figure.prototype = {
 			element.style.maxWidth = '';
 		}
 
-		element.style.transform =
-			'rotate(' + r + 'deg)' + (x ? ' rotateX(' + x + 'deg)' : '') + (y ? ' rotateY(' + y + 'deg)' : '') + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
+		element.style.transform = 'rotate(' + r + 'deg)' + (x ? ' rotateX(' + x + 'deg)' : '') + (y ? ' rotateY(' + y + 'deg)' : '') + (translate ? ' translate' + translate + '(' + width + 'px)' : '');
 	},
 
 	_applySize(w, h, notResetPercentage, direction) {

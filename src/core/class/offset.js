@@ -200,9 +200,7 @@ Offset.prototype = {
 		ohOffsetEl = heightEditorRefer ? topArea : ohOffsetEl;
 		owOffsetEl = widthEditorRefer ? topArea : owOffsetEl;
 		const ts = !ohOffsetEl ? 0 : ohOffsetEl.getBoundingClientRect().top + (!ohOffsetEl.parentElement || /^html$/i.test(ohOffsetEl.parentElement.nodeName) ? window.scrollY : 0);
-		const ls = !owOffsetEl
-			? 0
-			: owOffsetEl.getBoundingClientRect().left + (!owOffsetEl.parentElement || /^html$/i.test(owOffsetEl.parentElement.nodeName) ? window.scrollX : 0);
+		const ls = !owOffsetEl ? 0 : owOffsetEl.getBoundingClientRect().left + (!owOffsetEl.parentElement || /^html$/i.test(owOffsetEl.parentElement.nodeName) ? window.scrollX : 0);
 
 		oh = heightEditorRefer ? topArea.clientHeight : oh;
 		ow = widthEditorRefer ? topArea.clientWidth : ow;
@@ -338,10 +336,7 @@ Offset.prototype = {
 		// margin
 		const tmtw = targetRect.top;
 		const tmbw = viewportSize.h - targetRect.bottom;
-		let toolbarH =
-			!this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline || this.options.get('toolbar_container'))
-				? 0
-				: this.context.get('toolbar.main').offsetHeight;
+		let toolbarH = !this.editor.toolbar._sticky && (this.editor.isBalloon || this.editor.isInline || this.options.get('toolbar_container')) ? 0 : this.context.get('toolbar.main').offsetHeight;
 		let rmt, rmb;
 		if (this.editor.frameContext.get('isFullScreen')) {
 			rmt = tmtw - toolbarH;

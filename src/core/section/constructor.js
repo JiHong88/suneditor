@@ -4,14 +4,7 @@ import { CreateContext, CreateFrameContext } from './context';
 import { domUtils, numbers, converter, env } from '../../helper';
 
 const _d = env._d;
-const DEFAULT_BUTTON_LIST = [
-	['undo', 'redo'],
-	['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-	['removeFormat'],
-	['outdent', 'indent'],
-	['fullScreen', 'showBlocks', 'codeView'],
-	['preview', 'print']
-];
+const DEFAULT_BUTTON_LIST = [['undo', 'redo'], ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'], ['removeFormat'], ['outdent', 'indent'], ['fullScreen', 'showBlocks', 'codeView'], ['preview', 'print']];
 
 const REQUIRED_FORMAT_LINE = 'div';
 const REQUIRED_ELEMENT_WHITELIST = 'br|div';
@@ -19,7 +12,7 @@ const DEFAULT_ELEMENT_WHITELIST =
 	'p|pre|blockquote|h1|h2|h3|h4|h5|h6|ol|ul|li|hr|figure|figcaption|img|iframe|audio|video|source|table|thead|tbody|tr|th|td|caption|a|b|strong|var|i|em|u|ins|s|span|strike|del|sub|sup|code|svg|path|details|summary';
 const DEFAULT_ATTRIBUTE_WHITELIST = 'contenteditable|target|href|download|rel|src|alt|class|type|controls|colspan|rowspan';
 const DEFAULT_TABLE_STYLES = {
-	'table|th|td': 'border|border-[a-z]+|background-color|text-align|float'
+	'table|th|td': 'border|border-[a-z]+|background-color|text-align|float|font-weight|text-decoration|font-style'
 };
 
 const DEFAULT_FORMAT_LINE = 'P|H[1-6]|LI|TH|TD|DETAILS';
@@ -284,9 +277,7 @@ export function CreateShortcuts(command, button, values, keyMap, rc, reverseKeys
 }
 
 function _addTooltip(tooptipBtn, shift, shortcut) {
-	tooptipBtn.appendChild(
-		domUtils.createElement('SPAN', { class: 'se-shortcut' }, env.cmdIcon + (shift ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + shortcut + '</span>')
-	);
+	tooptipBtn.appendChild(domUtils.createElement('SPAN', { class: 'se-shortcut' }, env.cmdIcon + (shift ? env.shiftIcon : '') + '+<span class="se-shortcut-key">' + shortcut + '</span>'));
 }
 
 /**
@@ -315,8 +306,7 @@ export function InitOptions(options, editorTargets) {
 
 	/** Multi root */
 	if (editorTargets.length > 1) {
-		if (!options.toolbar_container && !/inline|balloon/i.test(options.mode))
-			throw Error('[SUNEDITOR.create.fail] In multi root, The "mode" option cannot be "classic" without using the "toolbar_container" option.');
+		if (!options.toolbar_container && !/inline|balloon/i.test(options.mode)) throw Error('[SUNEDITOR.create.fail] In multi root, The "mode" option cannot be "classic" without using the "toolbar_container" option.');
 	}
 
 	/** Base */
@@ -341,10 +331,7 @@ export function InitOptions(options, editorTargets) {
 	o.set('textTags', textTags);
 	o.set('_textStyleTags', Object.values(textTags).concat(['span']));
 	o.set('tagStyles', { ...DEFAULT_TABLE_STYLES, ...(options.tagStyles || {}) });
-	o.set(
-		'_spanStylesRegExp',
-		new RegExp(`\\s*[^-a-zA-Z](font-family|font-size|color|background-color${options.spanStyles ? '|' + options.spanStyles : ''})\\s*:[^;]+(?!;)*`, 'gi')
-	);
+	o.set('_spanStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](font-family|font-size|color|background-color${options.spanStyles ? '|' + options.spanStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
 	o.set('_lineStylesRegExp', new RegExp(`\\s*[^-a-zA-Z](text-align|margin-left|margin-right${options.lineStyles ? '|' + options.lineStyles : ''})\\s*:[^;]+(?!;)*`, 'gi'));
 	o.set('_defaultStyleTagMap', {
 		strong: textTags.bold,
@@ -412,8 +399,7 @@ export function InitOptions(options, editorTargets) {
 		'formatClosureBrLine',
 		_createFormatInfo(
 			options.formatClosureBrLine,
-			(options.__defaultFormatClosureBrLine =
-				typeof options.__defaultFormatClosureBrLine === 'string' ? options.__defaultFormatClosureBrLine : DEFAULT_FORMAT_CLOSURE_BR_LINE).toLowerCase(),
+			(options.__defaultFormatClosureBrLine = typeof options.__defaultFormatClosureBrLine === 'string' ? options.__defaultFormatClosureBrLine : DEFAULT_FORMAT_CLOSURE_BR_LINE).toLowerCase(),
 			o.get('elementBlacklist')
 		)
 	);
@@ -437,8 +423,7 @@ export function InitOptions(options, editorTargets) {
 		'formatClosureBlock',
 		_createFormatInfo(
 			options.formatClosureBlock,
-			(options.__defaultFormatClosureBlock =
-				typeof options.__defaultFormatClosureBlock === 'string' ? options.__defaultFormatClosureBlock : DEFAULT_FORMAT_CLOSURE_BLOCK).toLowerCase(),
+			(options.__defaultFormatClosureBlock = typeof options.__defaultFormatClosureBlock === 'string' ? options.__defaultFormatClosureBlock : DEFAULT_FORMAT_CLOSURE_BLOCK).toLowerCase(),
 			o.get('elementBlacklist')
 		)
 	);
@@ -452,31 +437,15 @@ export function InitOptions(options, editorTargets) {
 	);
 
 	/** __defaults */
-	o.set(
-		'__defaultElementWhitelist',
-		REQUIRED_ELEMENT_WHITELIST + '|' + (typeof options.__defaultElementWhitelist === 'string' ? options.__defaultElementWhitelist : DEFAULT_ELEMENT_WHITELIST).toLowerCase()
-	);
-	o.set(
-		'__defaultAttributeWhitelist',
-		(typeof options.__defaultAttributeWhitelist === 'string' ? options.__defaultAttributeWhitelist : DEFAULT_ATTRIBUTE_WHITELIST).toLowerCase()
-	);
+	o.set('__defaultElementWhitelist', REQUIRED_ELEMENT_WHITELIST + '|' + (typeof options.__defaultElementWhitelist === 'string' ? options.__defaultElementWhitelist : DEFAULT_ELEMENT_WHITELIST).toLowerCase());
+	o.set('__defaultAttributeWhitelist', (typeof options.__defaultAttributeWhitelist === 'string' ? options.__defaultAttributeWhitelist : DEFAULT_ATTRIBUTE_WHITELIST).toLowerCase());
 	// --- create element whitelist (__defaultElementWhiteList + elementWhitelist + format[line, BrLine, Block, Closureblock, ClosureBrLine] - elementBlacklist)
 	o.set('_editorElementWhitelist', o.get('elementWhitelist') === '*' ? '*' : _createWhitelist(o));
 
 	/** Toolbar */
 	o.set('toolbar_width', options.toolbar_width ? (numbers.is(options.toolbar_width) ? options.toolbar_width + 'px' : options.toolbar_width) : 'auto');
-	o.set(
-		'toolbar_container',
-		options.toolbar_container && !/inline/i.test(o.get('mode'))
-			? typeof options.toolbar_container === 'string'
-				? _d.querySelector(options.toolbar_container)
-				: options.toolbar_container
-			: null
-	);
-	o.set(
-		'toolbar_sticky',
-		/balloon/i.test(o.get('mode')) ? -1 : options.toolbar_sticky === undefined ? 0 : /^\d+/.test(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1
-	);
+	o.set('toolbar_container', options.toolbar_container && !/inline/i.test(o.get('mode')) ? (typeof options.toolbar_container === 'string' ? _d.querySelector(options.toolbar_container) : options.toolbar_container) : null);
+	o.set('toolbar_sticky', /balloon/i.test(o.get('mode')) ? -1 : options.toolbar_sticky === undefined ? 0 : /^\d+/.test(options.toolbar_sticky) ? numbers.get(options.toolbar_sticky, 0) : -1);
 	o.set('toolbar_hide', !!options.toolbar_hide);
 
 	/** subToolbar */
@@ -843,19 +812,7 @@ function _createFormatInfo(value, defaultValue, blacklist) {
  */
 function _createWhitelist(o) {
 	const blacklist = o.get('elementBlacklist').split('|');
-	const whitelist = (
-		o.get('__defaultElementWhitelist') +
-		'|' +
-		o.get('elementWhitelist') +
-		'|' +
-		o.get('formatLine').str +
-		'|' +
-		o.get('formatBrLine').str +
-		'|' +
-		o.get('formatClosureBlock').str +
-		'|' +
-		o.get('formatClosureBrLine').str
-	)
+	const whitelist = (o.get('__defaultElementWhitelist') + '|' + o.get('elementWhitelist') + '|' + o.get('formatLine').str + '|' + o.get('formatBrLine').str + '|' + o.get('formatClosureBlock').str + '|' + o.get('formatClosureBrLine').str)
 		.replace(/(^\||\|$)/g, '')
 		.split('|')
 		.filter(function (v, i, a) {
@@ -962,10 +919,7 @@ export function UpdateButton(element, plugin, icons, lang) {
 
 	element.innerHTML = noneInner
 		? ''
-		: (plugin.inner || icons[plugin.icon] || plugin.icon || '<span class="se-icon-text">!</span>') +
-		  '<span class="se-tooltip-inner"><span class="se-tooltip-text">' +
-		  (lang[plugin.title] || plugin.title) +
-		  '</span></span>';
+		: (plugin.inner || icons[plugin.icon] || plugin.icon || '<span class="se-icon-text">!</span>') + '<span class="se-tooltip-inner"><span class="se-tooltip-text">' + (lang[plugin.title] || plugin.title) + '</span></span>';
 
 	element.setAttribute('aria-label', plugin.title);
 
@@ -1065,14 +1019,7 @@ export function CreateToolBar(buttonList, plugins, options, icons, lang, isUpdat
 					modules = [plugin.className, plugin.title, button, plugin.type, plugin.innerHTML, plugin._disabled];
 				} else if (typeof plugin === 'object') {
 					const originFnc = plugin.constructor;
-					modules = [
-						plugin.className || originFnc.className,
-						plugin.title || originFnc.title,
-						button,
-						plugin.type || originFnc.type,
-						plugin.innerHTML || originFnc.innerHTML,
-						plugin._disabled || originFnc._disabled
-					];
+					modules = [plugin.className || originFnc.className, plugin.title || originFnc.title, button, plugin.type || originFnc.type, plugin.innerHTML || originFnc.innerHTML, plugin._disabled || originFnc._disabled];
 				} else {
 					// align
 					if (/^\-/.test(button)) {

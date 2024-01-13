@@ -236,21 +236,21 @@ FontSize.prototype = {
 	 * @override dropdown
 	 */
 	on(target) {
-		const sizeList = this.sizeList;
 		const { value, unit } = this._getSize(target);
 		const currentSize = value + unit;
 
-		if (currentSize !== this.currentSize) {
-			for (let i = 0, len = sizeList.length; i < len; i++) {
-				if (currentSize === sizeList[i].getAttribute('data-value')) {
-					domUtils.addClass(sizeList[i], 'active');
-				} else {
-					domUtils.removeClass(sizeList[i], 'active');
-				}
-			}
+		if (currentSize === this.currentSize) return;
 
-			this.currentSize = currentSize;
+		const sizeList = this.sizeList;
+		for (let i = 0, len = sizeList.length; i < len; i++) {
+			if (currentSize === sizeList[i].getAttribute('data-value')) {
+				domUtils.addClass(sizeList[i], 'active');
+			} else {
+				domUtils.removeClass(sizeList[i], 'active');
+			}
 		}
+
+		this.currentSize = currentSize;
 	},
 
 	/**

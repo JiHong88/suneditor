@@ -124,9 +124,7 @@ export function getIncludePath(nameArray, extension) {
 
 	if (path === '') path = pathList.length > 0 ? pathList[0][src] : '';
 
-	!path.includes(':/') &&
-		'//' !== path.slice(0, 2) &&
-		(path = 0 === path.includes('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
+	!path.includes(':/') && '//' !== path.slice(0, 2) && (path = 0 === path.includes('/') ? location.href.match(/^.*?:\/\/[^\/]*/)[0] + path : location.href.match(/^[^\?]*\/(?:)/)[0] + path);
 
 	if (!path) {
 		throw '[SUNEDITOR.helper.env.getIncludePath.fail] The SUNEDITOR installation path could not be automatically detected. (path: +' + path + ', extension: ' + extension + ')';

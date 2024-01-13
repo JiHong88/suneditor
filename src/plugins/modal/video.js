@@ -13,18 +13,8 @@ const Video = function (editor, pluginOptions) {
 	this.pluginOptions = {
 		canResize: pluginOptions.canResize === undefined ? true : pluginOptions.canResize,
 		showHeightInput: pluginOptions.showHeightInput === undefined ? true : !!pluginOptions.showHeightInput,
-		defaultWidth:
-			!pluginOptions.defaultWidth || !numbers.get(pluginOptions.defaultWidth, 0)
-				? ''
-				: numbers.is(pluginOptions.defaultWidth)
-				? pluginOptions.defaultWidth + 'px'
-				: pluginOptions.defaultWidth,
-		defaultHeight:
-			!pluginOptions.defaultHeight || !numbers.get(pluginOptions.defaultHeight, 0)
-				? ''
-				: numbers.is(pluginOptions.defaultHeight)
-				? pluginOptions.defaultHeight + 'px'
-				: pluginOptions.defaultHeight,
+		defaultWidth: !pluginOptions.defaultWidth || !numbers.get(pluginOptions.defaultWidth, 0) ? '' : numbers.is(pluginOptions.defaultWidth) ? pluginOptions.defaultWidth + 'px' : pluginOptions.defaultWidth,
+		defaultHeight: !pluginOptions.defaultHeight || !numbers.get(pluginOptions.defaultHeight, 0) ? '' : numbers.is(pluginOptions.defaultHeight) ? pluginOptions.defaultHeight + 'px' : pluginOptions.defaultHeight,
 		percentageOnlySize: !!pluginOptions.percentageOnlySize,
 		createFileInput: !!pluginOptions.createFileInput,
 		createUrlInput: pluginOptions.createUrlInput === undefined || !pluginOptions.createFileInput ? true : pluginOptions.createUrlInput,
@@ -32,8 +22,7 @@ const Video = function (editor, pluginOptions) {
 		uploadHeaders: pluginOptions.uploadHeaders || null,
 		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
 		allowMultiple: !!pluginOptions.allowMultiple,
-		acceptedFormats:
-			typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'video/*' : pluginOptions.acceptedFormats.trim() || 'video/*',
+		acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'video/*' : pluginOptions.acceptedFormats.trim() || 'video/*',
 		defaultRatio: numbers.get(pluginOptions.defaultRatio, 4) || 0.5625,
 		showRatioOption: pluginOptions.showRatioOption === undefined ? true : !!pluginOptions.showRatioOption,
 		ratioOptions: !pluginOptions.ratioOptions ? null : pluginOptions.ratioOptions,
@@ -248,12 +237,8 @@ Video.prototype = {
 		let w = figureInfo.width || figureInfo.w || this._origin_w || '';
 		let h = figureInfo.height || figureInfo.h || this._origin_h || '';
 
-		if (this.videoUrlFile)
-			this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this._element.src || (this._element.querySelector('source') || '').src || '';
-		(
-			this.modal.form.querySelector('input[name="suneditor_video_radio"][value="' + this._align + '"]') ||
-			this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]')
-		).checked = true;
+		if (this.videoUrlFile) this._linkValue = this.previewSrc.textContent = this.videoUrlFile.value = this._element.src || (this._element.querySelector('source') || '').src || '';
+		(this.modal.form.querySelector('input[name="suneditor_video_radio"][value="' + this._align + '"]') || this.modal.form.querySelector('input[name="suneditor_video_radio"][value="none"]')).checked = true;
 
 		if (!this._resizing) return;
 
@@ -511,15 +496,7 @@ Video.prototype = {
 		const handler = function (infos, newInfos) {
 			infos = newInfos || infos;
 			const url = infos.url;
-			this.create(
-				this[/^iframe$/i.test(infos.process?.tag) ? 'createIframeTag' : 'createVideoTag'](),
-				url,
-				infos.inputWidth,
-				infos.inputHeight,
-				infos.align,
-				infos.isUpdate,
-				infos.files
-			);
+			this.create(this[/^iframe$/i.test(infos.process?.tag) ? 'createIframeTag' : 'createVideoTag'](), url, infos.inputWidth, infos.inputHeight, infos.align, infos.isUpdate, infos.files);
 		}.bind(this, videoInfo);
 
 		const result = await this.triggerEvent('onVideoUploadBefore', {
@@ -822,12 +799,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
 				${onlyPercentage ? ' type="number" min="1"' : 'type="text"'}${onlyPercentage ? ' max="100"' : ''}${heightDisplay}/>
 				<select class="se-input-select se-video-ratio" title="${lang.ratio}" aria-label="${lang.ratio}"${ratioDisplay}>
 					${!heightDisplay ? '<option value=""> - </option>' : ''} 
-					${ratioList
-						.map(
-							(ratioOption) =>
-								`<option value="${ratioOption.value}"${ratio.toString() === ratioOption.value.toString() ? ' selected' : ''}>${ratioOption.name}</option>`
-						)
-						.join('')}
+					${ratioList.map((ratioOption) => `<option value="${ratioOption.value}"${ratio.toString() === ratioOption.value.toString() ? ' selected' : ''}>${ratioOption.name}</option>`).join('')}
 				</select>
 				<button type="button" title="${lang.revert}" aria-label="${lang.revert}" class="se-btn se-modal-btn-revert">${icons.revert}</button>
 			</div>

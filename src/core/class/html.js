@@ -478,12 +478,7 @@ HTML.prototype = {
 						parentNode = afterNode.previousElementSibling || afterNode;
 					} else if (!originAfter && !afterNode) {
 						const r = this.remove();
-						const container =
-							r.container.nodeType === 3
-								? domUtils.isListCell(this.format.getLine(r.container, null))
-									? r.container
-									: this.format.getLine(r.container, null) || r.container.parentNode
-								: r.container;
+						const container = r.container.nodeType === 3 ? (domUtils.isListCell(this.format.getLine(r.container, null)) ? r.container : this.format.getLine(r.container, null) || r.container.parentNode) : r.container;
 						const rangeCon = domUtils.isWysiwygFrame(container) || this.format.isBlock(container);
 						parentNode = rangeCon ? container : container.parentNode;
 						afterNode = rangeCon ? null : container.nextSibling;
@@ -669,8 +664,7 @@ HTML.prototype = {
 		let endCon = range.endContainer;
 		let startOff = range.startOffset;
 		let endOff = range.endOffset;
-		const commonCon =
-			range.commonAncestorContainer.nodeType === 3 && range.commonAncestorContainer.parentNode === startCon.parentNode ? startCon.parentNode : range.commonAncestorContainer;
+		const commonCon = range.commonAncestorContainer.nodeType === 3 && range.commonAncestorContainer.parentNode === startCon.parentNode ? startCon.parentNode : range.commonAncestorContainer;
 		if (commonCon === startCon && commonCon === endCon) {
 			if (this.component.is(commonCon)) {
 				const compInfo = this.component.get(commonCon);
@@ -725,13 +719,7 @@ HTML.prototype = {
 			}
 		} else {
 			if (childNodes.length === 0) {
-				if (
-					this.format.isLine(commonCon) ||
-					this.format.isBlock(commonCon) ||
-					domUtils.isWysiwygFrame(commonCon) ||
-					domUtils.isBreak(commonCon) ||
-					domUtils.isMedia(commonCon)
-				) {
+				if (this.format.isLine(commonCon) || this.format.isBlock(commonCon) || domUtils.isWysiwygFrame(commonCon) || domUtils.isBreak(commonCon) || domUtils.isMedia(commonCon)) {
 					return {
 						container: commonCon,
 						offset: 0
@@ -1013,11 +1001,7 @@ HTML.prototype = {
 					continue;
 				}
 				if (node.childNodes.length === 0) {
-					returnHTML +=
-						(/^HR$/i.test(node.nodeName) ? brChar : '') +
-						(/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) +
-						node.outerHTML +
-						br;
+					returnHTML += (/^HR$/i.test(node.nodeName) ? brChar : '') + (/^PRE$/i.test(node.parentElement.nodeName) && /^BR$/i.test(node.nodeName) ? '' : elementIndent) + node.outerHTML + br;
 					continue;
 				}
 
@@ -1028,12 +1012,7 @@ HTML.prototype = {
 					tagIndent = elementIndent || nodeRegTest ? indent : '';
 					returnHTML += (lineBR || (elementRegTest ? '' : br)) + tagIndent + node.outerHTML.match(wRegExp('<' + tag + '[^>]*>', 'i'))[0] + br;
 					recursionFunc(node, indent + indentSize, '');
-					returnHTML +=
-						(/\n$/.test(returnHTML) ? tagIndent : '') +
-						'</' +
-						tag +
-						'>' +
-						(lineBR || br || elementRegTest ? brChar : '' || /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
+					returnHTML += (/\n$/.test(returnHTML) ? tagIndent : '') + '</' + tag + '>' + (lineBR || br || elementRegTest ? brChar : '' || /^(TH|TD)$/i.test(node.nodeName) ? brChar : '');
 				}
 			}
 		})(wDoc, '');
@@ -1110,14 +1089,7 @@ HTML.prototype = {
 				ch[i].outerHTML = ch[i].innerHTML;
 			}
 
-			if (
-				!requireFormat ||
-				this.format.isLine(node) ||
-				this.format.isBlock(node) ||
-				this.component.is(node) ||
-				domUtils.isMedia(node) ||
-				(domUtils.isAnchor(node) && domUtils.isMedia(node.firstElementChild))
-			) {
+			if (!requireFormat || this.format.isLine(node) || this.format.isBlock(node) || this.component.is(node) || domUtils.isMedia(node) || (domUtils.isAnchor(node) && domUtils.isMedia(node.firstElementChild))) {
 				return domUtils.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML;
 			} else {
 				return '<' + defaultLine + '>' + (domUtils.isSpanWithoutAttr(node) ? node.innerHTML : node.outerHTML) + '</' + defaultLine + '>';
@@ -1163,10 +1135,7 @@ HTML.prototype = {
 			}
 
 			// white list
-			if (
-				htmlCheckBlacklistRegExp.test(current.nodeName) ||
-				(!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && domUtils.isExcludeFormat(current))
-			) {
+			if (htmlCheckBlacklistRegExp.test(current.nodeName) || (!htmlCheckWhitelistRegExp.test(current.nodeName) && current.childNodes.length === 0 && domUtils.isExcludeFormat(current))) {
 				removeTags.push(current);
 				return false;
 			}
@@ -1211,9 +1180,7 @@ HTML.prototype = {
 				current.parentNode !== documentFragment &&
 				nrtag &&
 				((domUtils.isListCell(current) && !domUtils.isList(current.parentNode)) ||
-					((this.format.isLine(current) || this.component.is(current)) &&
-						!this.format.isBlock(current.parentNode) &&
-						!domUtils.getParentElement(current, this.component.is.bind(this.component))));
+					((this.format.isLine(current) || this.component.is(current)) && !this.format.isBlock(current.parentNode) && !domUtils.getParentElement(current, this.component.is.bind(this.component))));
 
 			return result;
 		});
@@ -1310,13 +1277,7 @@ HTML.prototype = {
 			n = tempTree[i];
 			if (n.nodeType === 8) {
 				value += '<!-- ' + n.textContent + ' -->';
-			} else if (
-				!this.format.isLine(n) &&
-				!this.format.isBlock(n) &&
-				!this.component.is(n) &&
-				!/meta/i.test(n.nodeName) &&
-				!/(\s|^)__se__exclude-format(\s|$)/.test(n.className)
-			) {
+			} else if (!this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !/meta/i.test(n.nodeName) && !/(\s|^)__se__exclude-format(\s|$)/.test(n.className)) {
 				if (!f) f = domUtils.createElement(this.options.get('defaultLine'));
 				f.appendChild(n);
 				i--;
@@ -1381,12 +1342,7 @@ HTML.prototype = {
 			const face = (m.match(/\sface="([^"]+)"/i) || [])[1];
 			const color = (m.match(/\scolor="([^"]+)"/i) || [])[1];
 			if (size || face || color) {
-				sv =
-					'style="' +
-					(size ? 'font-size:' + numbers.get(size / 3.333, 1) + 'rem;' : '') +
-					(face ? 'font-family:' + face + ';' : '') +
-					(color ? 'color:' + color + ';' : '') +
-					'"';
+				sv = 'style="' + (size ? 'font-size:' + numbers.get(size / 3.333, 1) + 'rem;' : '') + (face ? 'font-family:' + face + ';' : '') + (color ? 'color:' + color + ';' : '') + '"';
 			}
 		}
 

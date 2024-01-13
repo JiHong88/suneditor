@@ -145,10 +145,7 @@ NodeTransform.prototype = {
 				child = children[i];
 				next = children[i + 1];
 				if (!child) break;
-				if (
-					(onlyText && inst.format._isIgnoreNodeChange(child)) ||
-					(!onlyText && (domUtils.isTableElements(child) || domUtils.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrLine(child))))
-				) {
+				if ((onlyText && inst.format._isIgnoreNodeChange(child)) || (!onlyText && (domUtils.isTableElements(child) || domUtils.isListCell(child) || (inst.format.isLine(child) && !inst.format.isBrLine(child))))) {
 					if (domUtils.isTableElements(child) || domUtils.isListCell(child)) {
 						recursionFunc(child, depth + 1, i);
 					}
@@ -348,12 +345,7 @@ NodeTransform.prototype = {
 
 		(function recursionFunc(current) {
 			if (inst.format._notTextNode(current) || current === notRemoveNode || domUtils.isNonEditable(current)) return 0;
-			if (
-				current !== element &&
-				domUtils.isZeroWith(current.textContent) &&
-				(!current.firstChild || !domUtils.isBreak(current.firstChild)) &&
-				!current.querySelector(env._allowedEmptyNodeList)
-			) {
+			if (current !== element && domUtils.isZeroWith(current.textContent) && (!current.firstChild || !domUtils.isBreak(current.firstChild)) && !current.querySelector(env._allowedEmptyNodeList)) {
 				if (current.parentNode) {
 					current.parentNode.removeChild(current);
 					return -1;

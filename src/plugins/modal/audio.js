@@ -19,8 +19,7 @@ const Audio_ = function (editor, pluginOptions) {
 		uploadHeaders: pluginOptions.uploadHeaders || null,
 		uploadSizeLimit: /\d+/.test(pluginOptions.uploadSizeLimit) ? numbers.get(pluginOptions.uploadSizeLimit, 0) : null,
 		allowMultiple: !!pluginOptions.allowMultiple,
-		acceptedFormats:
-			typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'audio/*' : pluginOptions.acceptedFormats.trim() || 'audio/*',
+		acceptedFormats: typeof pluginOptions.acceptedFormats !== 'string' || pluginOptions.acceptedFormats.trim() === '*' ? 'audio/*' : pluginOptions.acceptedFormats.trim() || 'audio/*',
 		audioTagAttributes: pluginOptions.audioTagAttributes || null
 	};
 
@@ -442,9 +441,7 @@ function CreateHTML_modal({ lang, icons }, pluginOptions) {
         <div class="se-modal-form">
             <label>${lang.audio_modal_file}</label>
             <div class="se-modal-form-files">
-                <input class="se-input-form _se_audio_files" data-focus type="file" accept="${pluginOptions.acceptedFormats}"${
-			pluginOptions.allowMultiple ? ' multiple="multiple"' : ''
-		}/>
+                <input class="se-input-form _se_audio_files" data-focus type="file" accept="${pluginOptions.acceptedFormats}"${pluginOptions.allowMultiple ? ' multiple="multiple"' : ''}/>
                 <button type="button" data-command="filesRemove" class="se-btn se-modal-files-edge-button se-file-remove" title="${lang.remove}" aria-label="${lang.remove}">
                     ${icons.cancel}
                 </button>
