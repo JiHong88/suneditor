@@ -292,7 +292,7 @@ Figure.prototype = {
 		_figure.display.style.display = nonSizeInfo ? 'none' : '';
 		_figure.border.style.display = nonBorder ? 'none' : '';
 		_figure.main.style.display = 'block';
-		this.controller.open(_figure.main, null, this.__offContainer);
+		this.controller.open(_figure.main, null, { initMethod: this.__offContainer });
 
 		// set members
 		this._w.setTimeout(domUtils.addClass.bind(null, this._cover, 'se-figure-selected'));

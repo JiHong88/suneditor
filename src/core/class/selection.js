@@ -192,7 +192,7 @@ Selection.prototype = {
 				rects = {
 					left: nodeOffset.left,
 					top: nodeOffset.top,
-					right: nodeOffset.left,
+					right: nodeOffset.right,
 					bottom: nodeOffset.top + node.offsetHeight,
 					noText: true
 				};

@@ -93,7 +93,7 @@ const Table = function (editor, pluginOptions) {
 	this.controller_props = new Controller(this, controller_props, { position: 'bottom', parents: propsTargetForms, isInsideForm: true });
 	// color picker
 	const colorForm = domUtils.createElement('DIV', { class: 'se-controller se-list-layer' }, null);
-	this.colorPicker = new ColorPicker(this, 'borderColor', {
+	this.colorPicker = new ColorPicker(this, '', {
 		colorList: pluginOptions.colorList || DEFAULT_COLOR_LIST,
 		splitNum: 5,
 		disableRemove: true,
@@ -103,8 +103,9 @@ const Table = function (editor, pluginOptions) {
 	colorForm.appendChild(this.colorPicker.target);
 	this.controller_colorPicker = new Controller(this, colorForm, {
 		position: 'bottom',
-		parents: propsTargetForms,
+		parents: [this.controller_props.form].concat(propsTargetForms),
 		isInsideForm: true,
+		isWWTarget: false,
 		initMethod: () => {
 			this.colorPicker.hueSlider.close();
 			domUtils.removeClass(this.controller_colorPicker.currentTarget, 'on');
@@ -163,6 +164,7 @@ const Table = function (editor, pluginOptions) {
 		border_color: controller_props.querySelector('.__se_border_color'),
 		border_width: controller_props.querySelector('.__se__border_size'),
 		back_color: controller_props.querySelector('.__se_back_color'),
+		font_color: controller_props.querySelector('.__se_font_color'),
 		palette_border_button: controller_props.querySelector('[data-command="props_onpalette"][data-value="border"]')
 	};
 	this._propsCache = [];
@@ -378,7 +380,7 @@ Table.prototype = {
 				}
 
 				const col = this._element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
-				this._startCellResizing(col, cellEdge.startX, numbers.get(getComputedStyle(col).width, CELL_DECIMAL_END), cellEdge.isLeft);
+				this._startCellResizing(col, cellEdge.startX, numbers.get(window.getComputedStyle(col).width, CELL_DECIMAL_END), cellEdge.isLeft);
 			} catch (err) {
 				console.warn('[SUNEDITOR.plugins.table.error]', err);
 				this.__removeGlobalEvents();
@@ -407,7 +409,7 @@ Table.prototype = {
 				if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
 				this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_PREV_CLASS);
 
-				this._startRowResizing(row, rowEdge.startY, numbers.get(getComputedStyle(row).height, CELL_DECIMAL_END));
+				this._startRowResizing(row, rowEdge.startY, numbers.get(window.getComputedStyle(row).height, CELL_DECIMAL_END));
 			} catch (err) {
 				console.warn('[SUNEDITOR.plugins.table.error]', err);
 				this.__removeGlobalEvents();
@@ -508,7 +510,7 @@ Table.prototype = {
 	 * @param {any} range range object
 	 * @param {Element} line Current line element
 	 */
-	onKeyUp({ event, range, line }) {
+	onKeyUp({ line }) {
 		if (this._shift && domUtils.getParentElement(line, domUtils.isTableCell) === this._fixedCell) {
 			this._shift = false;
 			this._deleteStyleSelectedCells();
@@ -521,7 +523,7 @@ Table.prototype = {
 	 * @override ColorPicker
 	 */
 	colorPickerAction(color) {
-		const target = this.propTargets[this.sliderType === 'border' ? 'border_color' : 'back_color'];
+		const target = this.propTargets[`${this.sliderType}_color`];
 		target.style.borderColor = target.value = color;
 		this.controller_colorPicker.close();
 	},
@@ -534,6 +536,9 @@ Table.prototype = {
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
 		if (!command) return;
+
+		const { back_color, font_color, border_color } = this.propTargets;
+		const value = target.getAttribute('data-value');
 
 		switch (command) {
 			case 'header':
@@ -555,21 +560,19 @@ Table.prototype = {
 				this.selectMenu_row.open();
 				break;
 			case 'openTableProperties':
-				this.controller_colorPicker.close();
-				if (this.controller_props.currentTarget === this.controller_table.form && this.controller_props.form?.style.display === 'block') {
+				if (this.controller_props.currentTarget === target && this.controller_props.form?.style.display === 'block') {
 					this.controller_props.close();
 				} else {
 					this._setCtrlProps('table');
-					this.controller_props.open(this.controller_table.form, null, null, null);
+					this.controller_props.open(target, this.controller_table.form, null);
 				}
 				break;
 			case 'openCellProperties':
-				this.controller_colorPicker.close();
-				if (this.controller_props.currentTarget === this.controller_cell.form && this.controller_props.form?.style.display === 'block') {
+				if (this.controller_props.currentTarget === target && this.controller_props.form?.style.display === 'block') {
 					this.controller_props.close();
 				} else {
 					this._setCtrlProps('cell');
-					this.controller_props.open(this.controller_cell.form, null, null, null);
+					this.controller_props.open(target, this.controller_cell.form, null);
 				}
 				break;
 			case 'props_onborder_format':
@@ -583,11 +586,14 @@ Table.prototype = {
 				this.selectMenu_props_border.open();
 				break;
 			case 'props_onpalette':
-				this._onColorPalette(target, target.getAttribute('data-value'));
+				this._onColorPalette(target, value, value === 'border' ? border_color : value === 'back' ? back_color : font_color);
 				break;
-			case 'props_remove_back':
-				const { back_color } = this.propTargets;
-				back_color.style.borderColor = back_color.value = '';
+			case 'props_remove_color':
+				if (value === 'back') {
+					back_color.style.borderColor = back_color.value = '';
+				} else {
+					font_color.style.borderColor = font_color.value = '';
+				}
 				break;
 			case 'props_submit':
 				this._submitProps(target);
@@ -1362,7 +1368,7 @@ Table.prototype = {
 
 		// controller open
 		const figureEl = domUtils.getParentElement(tableElement, domUtils.isFigure);
-		this.controller_table.open(figureEl, null, null, null);
+		this.controller_table.open(figureEl, null, null);
 
 		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { left: this.controller_table.form.offsetWidth + 2 } : null;
 		this.controller_cell.open(tdElement, this.cellControllerTop ? figureEl : null, null, addOffset);
@@ -1540,40 +1546,37 @@ Table.prototype = {
 		const targets = isTable ? [this._element] : this._selectedCells;
 		if (!targets || targets.length === 0) return;
 
-		const { border_format, border_color, border_style, border_width, back_color, cell_alignment } = this.propTargets;
-		const { border, backgroundColor, textAlign } = targets[0].style;
+		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment } = this.propTargets;
+		const { border, backgroundColor, color, textAlign } = window.getComputedStyle(targets[0]);
 		const cellBorder = this._getBorderStyle(border);
 
 		cell_alignment.querySelector('[data-value="justify"]').style.display = isTable ? 'none' : '';
 
-		let color = cellBorder.c,
-			style = cellBorder.s,
-			width = cellBorder.w,
-			backColor = backgroundColor,
+		let b_color = converter.rgb2hex(cellBorder.c),
+			b_style = cellBorder.s,
+			b_width = cellBorder.w,
+			backColor = converter.rgb2hex(backgroundColor),
+			fontColor = converter.rgb2hex(color),
 			align = isTable ? this._figure?.style.float : textAlign;
 		this._propsCache = [];
 
-		for (let i = 0, len = targets.length, t, isBreak = false; i < len; i++) {
-			t = targets[i];
-			let { cssText, border, backgroundColor, textAlign } = t.style;
+		for (let i = 0, t, isBreak; (t = targets[i]); i++) {
+			let { cssText, border, backgroundColor, color, textAlign } = t.style;
 			this._propsCache.push([t, cssText]);
 			if (isBreak) continue;
 
 			const { c, s, w } = this._getBorderStyle(border);
 
-			if (color && cellBorder.c !== c) color = '';
-			if (style && cellBorder.s !== s) style = '';
-			if (width && cellBorder.w !== w) width = '';
-			if (backColor !== backgroundColor) backColor = '';
+			if (b_color && cellBorder.c !== c) b_color = '';
+			if (b_style && cellBorder.s !== s) b_style = '';
+			if (b_width && cellBorder.w !== w) b_width = '';
+			if (backColor !== converter.rgb2hex(backgroundColor)) backColor = '';
+			if (fontColor !== converter.rgb2hex(color)) fontColor = '';
 			if (align !== (isTable ? this._figure?.style.float : textAlign)) align = '';
-			if (!color || !style || !width || !backColor) {
+			if (!b_color || !b_style || !b_width || !backColor) {
 				isBreak = true;
 			}
 		}
-
-		// set props
-		const borderColorHex = converter.isHexColor(color) ? color : converter.rgb2hex(color);
-		const backColorHex = converter.isHexColor(backColor) ? backColor : converter.rgb2hex(backColor);
 
 		// border - format
 		border_format.firstElementChild.innerHTML = this.icons[BORDER_FORMATS[targets.length === 1 ? 'outside' : 'all']];
@@ -1581,14 +1584,15 @@ Table.prototype = {
 		domUtils.removeClass(border_format, 'active');
 
 		// border - styles
-		style = style || BORDER_LIST[0];
-		border_style.textContent = style;
-		border_color.style.borderColor = border_color.value = borderColorHex;
-		border_width.value = width;
-		this._disableBorderProps(style === BORDER_LIST[0]);
+		b_style = b_style || BORDER_LIST[0];
+		border_style.textContent = b_style;
+		border_color.style.borderColor = border_color.value = b_color;
+		border_width.value = b_width;
+		this._disableBorderProps(b_style === BORDER_LIST[0]);
 
-		// back
-		back_color.value = back_color.style.borderColor = backColorHex;
+		// back, font color
+		back_color.value = back_color.style.borderColor = backColor;
+		font_color.value = font_color.style.borderColor = fontColor;
 
 		// align
 		this._setAlignProps(cell_alignment, (this._propsAlignCache = align), true);
@@ -1622,7 +1626,7 @@ Table.prototype = {
 	},
 
 	_getBorderStyle(borderStyle) {
-		const parts = borderStyle.split(' ');
+		const parts = borderStyle.split(/\s(?![^()]*\))/);
 		let w = '',
 			s = '',
 			c = '';
@@ -1647,7 +1651,7 @@ Table.prototype = {
 			}
 		}
 
-		return { w, s, c };
+		return { w, s, c: converter.rgb2hex(c) };
 	},
 
 	_submitProps(target) {
@@ -1656,7 +1660,9 @@ Table.prototype = {
 
 			const isTable = this.controller_props.currentTarget === this.controller_table.form;
 			const targets = isTable ? [this._element] : this._selectedCells;
-			const { border_format, border_color, border_style, border_width, back_color, cell_alignment } = this.propTargets;
+			const tr = targets[0];
+			const trStyles = window.getComputedStyle(tr);
+			const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment } = this.propTargets;
 
 			const borderFormat = border_format.getAttribute('se-border-format') || '';
 			const hasFormat = borderFormat !== 'all';
@@ -1664,10 +1670,11 @@ Table.prototype = {
 			const isNoneFormat = borderFormat === 'none' || !borderStyle;
 
 			const cellAlignment = cell_alignment.getAttribute('se-cell-align') || '';
-			const borderColor = isNoneFormat ? '' : border_color.value.trim() || '';
-			let borderWidth = isNoneFormat ? '' : border_width.value.trim() || '';
+			const borderColor = isNoneFormat ? '' : border_color.value.trim() || trStyles.borderColor;
+			let borderWidth = isNoneFormat ? '' : border_width.value.trim() || trStyles.borderWidth;
 			borderWidth = borderWidth + (numbers.is(borderWidth) ? DEFAULT_BORDER_UNIT : '');
 			const backColor = back_color.value.trim();
+			const fontColor = font_color.value.trim();
 			const hasBorder = hasFormat && !isNoneFormat && borderWidth;
 			const borderCss = `${borderWidth} ${borderStyle} ${borderColor}`;
 			const cells = {
@@ -1681,10 +1688,10 @@ Table.prototype = {
 			if (!isTable) {
 				// --- target cells roof
 				let { rs, re, cs, ce } = this._ref || {
-					rs: targets[0].parentElement.rowIndex || 0,
-					re: targets[0].parentElement.rowIndex || 0,
-					cs: targets[0].cellIndex || 0,
-					ce: targets[0].cellIndex || 0
+					rs: tr.parentElement.rowIndex || 0,
+					re: tr.parentElement.rowIndex || 0,
+					cs: tr.cellIndex || 0,
+					ce: tr.cellIndex || 0
 				};
 				const mergeInfo = new Array(re - rs + 1).fill(0).map(() => new Array(ce - cs + 1).fill(0));
 				const cellStartIndex = cs;
@@ -1692,7 +1699,7 @@ Table.prototype = {
 				rs -= rs;
 				ce -= cs;
 				cs -= cs;
-				let prevRow = targets[0].parentNode;
+				let prevRow = tr.parentNode;
 				for (let i = 0, cellCnt = 0, len = targets.length, e, es, rowIndex = 0, cellIndex, colspan, rowspan; i < len; i++, cellCnt++) {
 					e = targets[i];
 					colspan = e.colSpan;
@@ -1737,6 +1744,8 @@ Table.prototype = {
 					es.textAlign = cellAlignment;
 					// back
 					es.backgroundColor = backColor;
+					// font
+					es.color = fontColor;
 					// border
 					if (hasBorder) continue;
 					// border - all || none
@@ -1752,11 +1761,13 @@ Table.prototype = {
 				}
 			} else {
 				// -- table styles
-				const es = targets[0].style;
+				const es = tr.style;
 				// alignment
 				if (this._figure) this._figure.style.float = cellAlignment;
 				// back
 				es.backgroundColor = backColor;
+				// font
+				es.color = fontColor;
 				// border
 				if (!hasBorder) {
 					// border - all || none
@@ -1975,15 +1986,14 @@ Table.prototype = {
 		r_parent.appendChild(left);
 	},
 
-	_onColorPalette(button, type) {
+	_onColorPalette(button, type, color) {
 		if (this.controller_colorPicker.isOpen && type === this.sliderType) {
 			this.controller_colorPicker.close();
 		} else {
 			this.sliderType = type;
-			this.colorPicker.styles = type === 'border' ? 'borderColor' : 'backgroundColor';
-			this.colorPicker.init(this._typeCache === 'table' ? this._element : this._tdElement, button);
 			domUtils.addClass(button, 'on');
-			this.controller_colorPicker.open(button);
+			this.colorPicker.init(color?.value || '', button);
+			this.controller_colorPicker.open(button, null, { isWWTarget: false });
 		}
 	},
 
@@ -2023,7 +2033,7 @@ function IsResizeEls(node) {
 
 function CheckCellEdge(event, tableCell) {
 	const startX = event.clientX;
-	const startWidth = numbers.get(getComputedStyle(tableCell).width, CELL_DECIMAL_END);
+	const startWidth = numbers.get(window.getComputedStyle(tableCell).width, CELL_DECIMAL_END);
 	const rect = tableCell.getBoundingClientRect();
 	const offsetX = Math.round(startX - rect.left);
 	const isLeft = offsetX <= CELL_SELECT_MARGIN;
@@ -2038,7 +2048,7 @@ function CheckCellEdge(event, tableCell) {
 
 function CheckRowEdge(event, tableCell) {
 	const startY = event.clientY;
-	const startHeight = numbers.get(getComputedStyle(tableCell).height, CELL_DECIMAL_END);
+	const startHeight = numbers.get(window.getComputedStyle(tableCell).height, CELL_DECIMAL_END);
 	const rect = tableCell.getBoundingClientRect();
 	const is = Math.ceil(startHeight + rect.top - startY) <= ROW_SELECT_MARGIN;
 
@@ -2617,21 +2627,22 @@ function CreateHTML_controller_properties({ lang, icons, options }) {
 					</button>
 					<input type="text" class="se-input-control __se__border_size" placeholder="${lang.width}" />
 				</div>
-				<label>${lang.backgroundColor}</label>
+				<label>${lang.launcher}</label>
 				<div class="se-form-group se-form-w0">
-					<input type="text" class="se-color-input __se_back_color" placeholder="${lang.backgroundColor}" />
+					<button type="button" data-command="props_onpalette" data-value="font" class="se-btn se-tooltip">
+						${icons.font_color}
+						<span class="se-tooltip-inner">
+							<span class="se-tooltip-text">${lang.fontColor}</span>
+						</span>
+					</button>
+					<input type="text" class="se-color-input __se_font_color" placeholder="${lang.fontColor}" />
 					<button type="button" data-command="props_onpalette" data-value="back" class="se-btn se-tooltip">
-						${icons.color_palette}
+						${icons.background_color}
 						<span class="se-tooltip-inner">
-							<span class="se-tooltip-text">${lang.colorPicker}</span>
+							<span class="se-tooltip-text">${lang.backgroundColor}</span>
 						</span>
 					</button>
-					<button type="button" class="se-btn se-tooltip" data-command="props_remove_back" title="${lang.remove}" aria-label="${lang.remove}">
-						${icons.erase}
-						<span class="se-tooltip-inner">
-							<span class="se-tooltip-text">${lang.remove}</span>
-						</span>
-					</button>
+					<input type="text" class="se-color-input __se_back_color" placeholder="${lang.backgroundColor}" />
 				</div>
 				<div class="se-table-props-align">
 					<label>${lang.align}</label>

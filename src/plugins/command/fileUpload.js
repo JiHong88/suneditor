@@ -77,7 +77,7 @@ FileUpload.prototype = {
 	edit(target) {
 		this.editInput.value = target.textContent;
 		this.figure.close();
-		this.controller.open(target, null, null, null);
+		this.controller.open(target, null, null);
 		this.editInput.focus();
 	},
 

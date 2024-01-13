@@ -145,6 +145,8 @@ export function isHexColor(str) {
  * @returns {string}
  */
 export function rgb2hex(rgba) {
+	if (isHexColor(rgba) || !rgba) return rgba;
+
 	const rgbaMatch = rgba.match(/^rgba?[\s+]?\(([\d]+)[\s+]?,[\s+]?([\d]+)[\s+]?,[\s+]?([\d]+)[\s+]?/i);
 
 	if (rgbaMatch && rgbaMatch.length >= 4) {

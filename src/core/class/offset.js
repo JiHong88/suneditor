@@ -3,7 +3,7 @@
  */
 
 import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass, getViewportSize } from '../../helper/domUtils';
-import { domUtils, numbers } from '../../helper';
+import { numbers } from '../../helper';
 
 const Offset = function (editor) {
 	this.editor = editor;
@@ -324,8 +324,9 @@ Offset.prototype = {
 			addOffset.left *= -1;
 		}
 
+		const isWWTarget = this.editor.frameContext.get('wysiwyg').contains(target) || params.isWWTarget;
 		const viewportSize = getViewportSize();
-		const wwScroll = this.getWWScroll();
+		const wwScroll = isWWTarget ? this.getWWScroll() : this._getWindowScroll();
 		const targetRect = this.editor.selection.getRects(target, 'start').rects;
 		const targetOffset = this.getGlobal(target);
 		const arrow = hasClass(element.firstElementChild, 'se-arrow') ? element.firstElementChild : null;
@@ -355,7 +356,7 @@ Offset.prototype = {
 			rmb = rmb > 0 ? bMargin : rmb;
 		}
 
-		if (!domUtils.getParentElement(target, '.se-toolbar') && (rmb + targetH <= 0 || rmt + targetH <= 0)) return;
+		if (isWWTarget && (rmb + targetH <= 0 || rmt + targetH <= 0)) return;
 
 		let t = addOffset.top;
 		let y = 0;
@@ -408,7 +409,7 @@ Offset.prototype = {
 			rmr = viewportSize.w - targetRect.right;
 		}
 
-		if (rml + targetW <= 0 || rmr + targetW <= 0) return;
+		if (isWWTarget && (rml + targetW <= 0 || rmr + targetW <= 0)) return;
 		if (arrow) {
 			arrow.style.left = '';
 			arrow.style.right = '';
@@ -472,6 +473,22 @@ Offset.prototype = {
 		} else {
 			if (arrow) arrow.style.visibility = 'hidden';
 		}
+	},
+
+	_getWindowScroll() {
+		return {
+			top: window.scrollY,
+			left: window.scrollX,
+			width: window.innerWidth,
+			height: window.innerHeight,
+			rects: {
+				left: 0,
+				top: 0,
+				right: window.innerWidth,
+				bottom: window.innerHeight,
+				noText: true
+			}
+		};
 	},
 
 	__removeGlobalEvent() {

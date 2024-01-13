@@ -24,6 +24,7 @@ const Controller = function (inst, element, params, _name) {
 	this.isOpen = false;
 	this.currentTarget = null;
 	this.currentPositionTarget = null;
+	this.isWWTarget = params?.isWWTarget ?? true;
 	this.position = params.position;
 	this.disabled = !!params.disabled;
 	this.parents = params.parents || [];
@@ -50,7 +51,7 @@ Controller.prototype = {
 	/**
 	 * @description Open a modal plugin
 	 */
-	open(target, positionTarget, initMethod, addOffset) {
+	open(target, positionTarget, params) {
 		if (this.editor.isBalloon) this.toolbar.hide();
 		else if (this.editor.isSubBalloon) this.subToolbar.hide();
 
@@ -58,9 +59,11 @@ Controller.prototype = {
 
 		this.currentTarget = target;
 		this.currentPositionTarget = positionTarget || target;
-		if (typeof initMethod === 'function') this._initMethod = initMethod;
+		this.isWWTarget = params?.isWWTarget ?? this.isWWTarget;
+		if (typeof params?.initMethod === 'function') this._initMethod = params.initMethod;
 		this.editor.currentControllerName = this.kind;
 
+		const addOffset = params?.addOffset;
 		if (addOffset) this.__addOffset = { ...this.__addOffset, ...addOffset };
 
 		const parents = this.isOutsideForm ? this.parents : [];
@@ -106,10 +109,16 @@ Controller.prototype = {
 		if (typeof this.inst.close === 'function') this.inst.close();
 	},
 
+	/**
+	 * @description Hide controller
+	 */
 	hide() {
 		this.form.style.display = 'none';
 	},
 
+	/**
+	 * @description Show controller
+	 */
 	show() {
 		this._setControllerPosition(this.form, this.currentPositionTarget);
 	},
@@ -188,7 +197,7 @@ Controller.prototype = {
 		controller.style.visibility = 'hidden';
 		controller.style.display = 'block';
 
-		if (!this.offset.setAbsPosition(controller, referEl, { addOffset: this.__addOffset, position: this.position, inst: this })) {
+		if (!this.offset.setAbsPosition(controller, referEl, { addOffset: this.__addOffset, position: this.position, isWWTarget: this.isWWTarget, inst: this })) {
 			this.hide();
 			return;
 		}
@@ -221,7 +230,17 @@ Controller.prototype = {
 	},
 
 	_checkForm(target) {
-		return domUtils.getParentElement(target, '.se-controller') || target?.contains(this.inst._element);
+		let isParentForm = false;
+		if (this.isInsideForm && this.parents?.length > 0) {
+			this.parents.some((e) => {
+				if (e.contains(target)) {
+					isParentForm = true;
+					return true;
+				}
+			});
+		}
+
+		return !isParentForm && (domUtils.getParentElement(target, '.se-controller') || target?.contains(this.inst._element));
 	},
 
 	constructor: Controller
@@ -263,11 +282,12 @@ function CloseListener_keydown(e) {
 	this.editor.frameContext.get('lineBreaker').style.display = 'none';
 	if (this.form.contains(e.target) || this._checkForm(e.target)) return;
 	if (this.editor._fileManager.pluginRegExp.test(this.kind) && keyCode !== 27) return;
+
 	this.close();
 }
 
-function CloseListener_mousedown(e) {
-	if (e.target === this.inst._element || this._checkFixed() || this.form.contains(e.target) || this._checkForm(e.target)) return;
+function CloseListener_mousedown({ target }) {
+	if (target === this.inst._element || target === this.currentTarget || this._checkFixed() || this.form.contains(target) || this._checkForm(target)) return;
 	this.close(true);
 }
 

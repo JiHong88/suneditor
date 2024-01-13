@@ -92,7 +92,7 @@ const HueSlider = function (inst, params, className) {
 	if (!params.isNewForm) {
 		const hueController = CreateHTML_basicControllerForm(inst.editor, className);
 		this.form = hueController.querySelector('.se-hue');
-		this.controller = new Controller(this, hueController, { position: 'top', ...params.controllerOptions });
+		this.controller = new Controller(this, hueController, { position: 'top', isWWTarget: false, ...params.controllerOptions });
 
 		// buttons
 		this.eventManager.addEvent(hueController.querySelector('.se-btn-success'), 'click', () => {
@@ -112,7 +112,7 @@ HueSlider.prototype = {
 
 	open(target) {
 		this.attach();
-		this.controller.open(target);
+		this.controller.open(target, null, null);
 	},
 
 	close() {

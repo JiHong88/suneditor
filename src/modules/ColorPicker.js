@@ -124,16 +124,17 @@ ColorPicker.prototype = {
 
 	/**
 	 * @description Displays or resets the currently selected color at color list.
-	 * @param {Node} node Current Selected node
+	 * @param {Node|String} nodeOrColor Current Selected node
 	 * @param {string|null} target target
 	 */
-	init(node, target) {
+	init(nodeOrColor, target) {
 		this.targetButton = target;
+
 		const computedColor = this.editor.frameContext.get('wwComputedStyle')[this.styleProperties];
 		const defaultColor = this.defaultColor || converter.isHexColor(computedColor) ? computedColor : converter.rgb2hex(computedColor);
 
-		let fillColor = this._getColorInNode(node) || defaultColor;
-		fillColor = converter.isHexColor(fillColor) ? fillColor : converter.rgb2hex(fillColor) || fillColor;
+		let fillColor = (typeof nodeOrColor === 'string' ? nodeOrColor : this._getColorInNode(nodeOrColor)) || defaultColor;
+		fillColor = converter.isHexColor(fillColor) ? fillColor : converter.rgb2hex(fillColor) || fillColor || '';
 
 		const colorList = this.colorList;
 		for (let i = 0, len = colorList.length; i < len; i++) {
@@ -150,9 +151,8 @@ ColorPicker.prototype = {
 	/**
 	 * @description Store color values
 	 * @param {string} hexColorStr Hax color value
-	 * @private
 	 */
-	_setCurrentColor(hexColorStr) {
+	setHexColor(hexColorStr) {
 		this.currentColor = hexColorStr;
 		this.inputElement.style.borderColor = hexColorStr;
 	},
@@ -165,7 +165,7 @@ ColorPicker.prototype = {
 	_setInputText(hexColorStr) {
 		hexColorStr = /^#/.test(hexColorStr) ? hexColorStr : '#' + hexColorStr;
 		this.inputElement.value = hexColorStr;
-		this._setCurrentColor.call(this, hexColorStr);
+		this.setHexColor.call(this, hexColorStr);
 	},
 
 	/**
@@ -238,7 +238,7 @@ function Remove() {
 }
 
 function OnChangeInput(e) {
-	this._setCurrentColor(e.target.value);
+	this.setHexColor(e.target.value);
 }
 
 function CreateHTML({ lang, icons }, { colorList, disableHEXInput, disableRemove, splitNum }) {
@@ -265,7 +265,7 @@ function CreateHTML({ lang, icons }, { colorList, disableHEXInput, disableRemove
 	list += /*html*/ `
 		<form class="se-form-group se-form-w0">
 			${disableHEXInput ? '' : `<button type="button" class="se-btn se-btn-info" title="${lang.colorPicker}" aria-label="${lang.colorPicker}">${icons.color_palette}</button>`}
-			<input type="text" class="se-color-input" ${disableHEXInput ? 'readonly' : ''} />
+			<input type="text" class="se-color-input" ${disableHEXInput ? 'readonly' : ''} placeholder="${lang.color}" />
 			${disableHEXInput ? '' : `<button type="submit" class="se-btn se-btn-success" title="${lang.submitButton}" aria-label="${lang.submitButton}">${icons.checked}</button>`}
 			${disableRemove ? '' : `<button type="button" class="se-btn __se_remove" title="${lang.remove}" aria-label="${lang.remove}">${icons.erase}</button>`}
 		</form>`;
