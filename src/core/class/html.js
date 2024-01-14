@@ -10,6 +10,23 @@ const REQUIRED_DATA_ATTRS = 'data-se-[^\\s]+';
 const HTML = function (editor) {
 	CoreInjector.call(this, editor);
 
+	// members
+	const options = this.options;
+	this._isAllowedClassName = function (v) {
+		return this.test(v) ? v : '';
+	}.bind(this.options.get('allowedClassName'));
+	this._allowHTMLComment = null;
+	this._disallowedStyleNodesRegExp = null;
+	this._htmlCheckWhitelistRegExp = null;
+	this._htmlCheckBlacklistRegExp = null;
+	this._elementWhitelistRegExp = null;
+	this._elementBlacklistRegExp = null;
+	this._attributeWhitelist = null;
+	this._attributeWhitelistRegExp = null;
+	this._attributeBlacklist = null;
+	this._attributeBlacklistRegExp = null;
+
+	// clean styles
 	const tagStyles = this.options.get('tagStyles');
 	const splitTagStyles = {};
 	for (let k in tagStyles) {
@@ -25,45 +42,36 @@ const HTML = function (editor) {
 		splitTagStyles[k] = new RegExp(`\\s*[^-a-zA-Z](${splitTagStyles[k]})\\s*:[^;]+(?!;)*`, 'gi');
 	}
 
-	// members
-	this._parser = new DOMParser();
-	this._isAllowedClassName = function (v) {
-		return this.test(v) ? v : '';
-	}.bind(editor.options.get('allowedClassName'));
-	this._allowHTMLComment = null;
-	this._disallowedStyleNodesRegExp = null;
-	this._htmlCheckWhitelistRegExp = null;
-	this._htmlCheckBlacklistRegExp = null;
-	this._elementWhitelistRegExp = null;
-	this._elementBlacklistRegExp = null;
-	this._attributeWhitelist = null;
-	this._attributeWhitelistRegExp = null;
-	this._attributeBlacklist = null;
-	this._attributeBlacklistRegExp = null;
-	this._cleanStyleRegExp = {
+	const stylesMap = new Map();
+	const stylesObj = {
 		...splitTagStyles,
-		span: editor.options.get('_spanStylesRegExp'),
-		line: editor.options.get('_lineStylesRegExp'),
-		fontSizeUnit: new RegExp('\\d+(' + this.options.get('fontSizeUnits').join('|') + ')$', 'i')
+		span: options.get('_spanStylesRegExp'),
+		line: options.get('_lineStylesRegExp')
 	};
+	for (let key in stylesObj) {
+		stylesMap.set(new RegExp(`^(${key})$`), stylesObj[key]);
+	}
+	this._cleanStyleTagKeyRegExp = new RegExp(`^(${Object.keys(stylesObj).join('|')})$`, 'i');
+	this._cleanStyleRegExpMap = stylesMap;
 
-	const sPrefix = editor.options.get('__allowedScriptTag') ? '' : 'script|';
-	this.__scriptTagRegExp = new RegExp('<(script)[^>]*>([\\s\\S]*?)<\\/\\1>|<script[^>]*\\/?>', 'gi');
-	this.__disallowedTagsRegExp = new RegExp('<(' + sPrefix + 'style)[^>]*>([\\s\\S]*?)<\\/\\1>|<(' + sPrefix + 'style)[^>]*\\/?>', 'gi');
-	this.__disallowedTagNameRegExp = new RegExp('^(' + sPrefix + 'meta|link|style|[a-z]+:[a-z]+)$', 'i');
-	this.__allowedScriptRegExp = new RegExp('^' + (editor.options.get('__allowedScriptTag') ? 'script' : '') + '$', 'i');
+	// font size unit
+	this.fontSizeUnitRegExp = new RegExp('\\d+(' + this.options.get('fontSizeUnits').join('|') + ')$', 'i');
+
+	// extra tags
+	const allowedExtraTags = options.get('_allowedExtraTag');
+	const disallowedExtraTags = options.get('_disallowedExtraTag');
+	this.__disallowedTagsRegExp = new RegExp(`<(${disallowedExtraTags})[^>]*>([\\s\\S]*?)<\\/\\1>|<(${disallowedExtraTags})[^>]*\\/?>`, 'gi');
+	this.__disallowedTagNameRegExp = new RegExp(`^(${disallowedExtraTags})$`, 'i');
+	this.__allowedTagNameRegExp = new RegExp(`^(${allowedExtraTags})$`, 'i');
 
 	// set disallow text nodes
-	const options = this.options;
 	const disallowStyleNodes = Object.keys(options.get('_defaultStyleTagMap'));
 	const allowStyleNodes = !options.get('elementWhitelist')
 		? []
 		: options
 				.get('elementWhitelist')
 				.split('|')
-				.filter(function (v) {
-					return /b|i|ins|s|strike/i.test(v);
-				});
+				.filter((v) => /b|i|ins|s|strike/i.test(v));
 	for (let i = 0; i < allowStyleNodes.length; i++) {
 		disallowStyleNodes.splice(disallowStyleNodes.indexOf(allowStyleNodes[i].toLowerCase()), 1);
 	}
@@ -128,45 +136,46 @@ HTML.prototype = {
 	 * @returns {string}
 	 */
 	clean(html, requireFormat, whitelist, blacklist) {
-		html = this._deleteDisallowedTags(this._parser.parseFromString(this.compress(html), 'text/html').body.innerHTML, this._elementWhitelistRegExp, this._elementBlacklistRegExp)
-			.replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this))
-			.replace(/<br\/?>$/i, '');
-
-		const dom = this._d.createRange().createContextualFragment(html, true);
-		try {
-			this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp);
-		} catch (error) {
-			console.warn('[SUNEDITOR.html.clean.fail]', error.message);
-		}
-
-		this.editor._MELInfo.forEach((method, query) => {
-			const infoLst = dom.querySelectorAll(query);
-			for (let i = 0, len = infoLst.length; i < len; i++) {
-				method(infoLst[i]);
-			}
-		});
-
-		let domTree = dom.childNodes;
 		let cleanData = '';
 
-		if (!requireFormat) requireFormat = this._isFormatData(domTree);
-		if (requireFormat) domTree = this._editFormat(dom).childNodes;
+		if (!this.options.get('strictMode')) {
+			html = this._deleteDisallowedTags(this.compress(html), this._elementWhitelistRegExp, this._elementBlacklistRegExp)
+				.replace(/<br\/?>$/i, '')
+				.replace(/(<[a-zA-Z0-9\-]+)[^>]*(?=>)/g, CleanElements.bind(this));
 
-		for (let i = 0, len = domTree.length, t; i < len; i++) {
-			t = domTree[i];
-			if (this.__allowedScriptRegExp.test(t.nodeName)) {
-				cleanData += t.outerHTML;
-				continue;
+			const dom = this._d.createRange().createContextualFragment(html, true);
+			try {
+				this._consistencyCheckOfHTML(dom, this._htmlCheckWhitelistRegExp, this._htmlCheckBlacklistRegExp);
+			} catch (error) {
+				console.warn('[SUNEDITOR.html.clean.fail]', error.message);
 			}
-			cleanData += this._makeLine(t, requireFormat);
+
+			this.editor._MELInfo.forEach((method, query) => {
+				const infoLst = dom.querySelectorAll(query);
+				for (let i = 0, len = infoLst.length; i < len; i++) {
+					method(infoLst[i]);
+				}
+			});
+
+			let domTree = dom.childNodes;
+			if (!requireFormat) requireFormat = this._isFormatData(domTree);
+			if (requireFormat) domTree = this._editFormat(dom).childNodes;
+
+			for (let i = 0, len = domTree.length, t; i < len; i++) {
+				t = domTree[i];
+				if (this.__allowedTagNameRegExp.test(t.nodeName)) {
+					cleanData += t.outerHTML;
+					continue;
+				}
+				cleanData += this._makeLine(t, requireFormat);
+			}
 		}
 
-		if (!cleanData) {
-			cleanData = html;
-		} else {
-			if (whitelist) cleanData = cleanData.replace(typeof whitelist === 'string' ? converter.createElementWhitelist(whitelist) : whitelist, '');
-			if (blacklist) cleanData = cleanData.replace(typeof blacklist === 'string' ? converter.createElementBlacklist(blacklist) : blacklist, '');
-		}
+		if (!cleanData) cleanData = html;
+
+		// whitelist, blacklist
+		if (whitelist) cleanData = cleanData.replace(typeof whitelist === 'string' ? converter.createElementWhitelist(whitelist) : whitelist, '');
+		if (blacklist) cleanData = cleanData.replace(typeof blacklist === 'string' ? converter.createElementBlacklist(blacklist) : blacklist, '');
 
 		return this._tagConvertor(cleanData);
 	},
@@ -946,8 +955,7 @@ HTML.prototype = {
 
 		for (let i = 0; i < rootKey.length; i++) {
 			this.editor.changeFrameContext(rootKey[i]);
-			if (ctx.head) this.editor.frameContext.get('_wd').head.innerHTML = ctx.head.replace(/<script[\s\S]*>[\s\S]*<\/script>/gi, '');
-			if (ctx.head) this.editor.frameContext.get('_wd').head.innerHTML = this.options.get('__allowedScriptTag') ? ctx.head : ctx.head.replace(this.__scriptTagRegExp, '');
+			if (ctx.head) this.editor.frameContext.get('_wd').head.innerHTML = ctx.head.replace(this.__disallowedTagsRegExp, '');
 			if (ctx.body) this.editor.frameContext.get('_wd').body.innerHTML = this.clean(ctx.body, true, null, null);
 			this.editor._resetComponents();
 		}
@@ -1077,9 +1085,8 @@ HTML.prototype = {
 		const defaultLine = this.options.get('defaultLine');
 		// element
 		if (node.nodeType === 1) {
-			if (DisallowedElements(node)) return '';
 			if (this.__disallowedTagNameRegExp.test(node.nodeName)) return '';
-			if (/(\s|^)__se__exclude-format(\s|$)/.test(node.className)) return node.outerHTML;
+			if (domUtils.isExcludeFormat(node)) return node.outerHTML;
 
 			const ch =
 				domUtils.getListChildNodes(node, function (current) {
@@ -1275,9 +1282,14 @@ HTML.prototype = {
 
 		for (let i = 0, len = tempTree.length, n; i < len; i++) {
 			n = tempTree[i];
+			if (this.__allowedTagNameRegExp.test(n.nodeName)) {
+				value += n.outerHTML;
+				continue;
+			}
+
 			if (n.nodeType === 8) {
 				value += '<!-- ' + n.textContent + ' -->';
-			} else if (!this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !/meta/i.test(n.nodeName) && !/(\s|^)__se__exclude-format(\s|$)/.test(n.className)) {
+			} else if (!this.format.isLine(n) && !this.format.isBlock(n) && !this.component.is(n) && !/meta/i.test(n.nodeName) && !domUtils.isExcludeFormat(n)) {
 				if (!f) f = domUtils.createElement(this.options.get('defaultLine'));
 				f.appendChild(n);
 				i--;
@@ -1348,40 +1360,50 @@ HTML.prototype = {
 
 		if (sv) {
 			if (!v) v = [];
-			const style = sv.replace(/&quot;/g, '').match(this._cleanStyleRegExp[name]);
-			if (style) {
-				const allowedStyle = [];
-				for (let i = 0, len = style.length, r; i < len; i++) {
-					r = style[i].match(/([a-zA-Z0-9-]+)(:)([^"]+)/);
-					if (r && !/inherit|initial|revert|unset/i.test(r[3])) {
-						const k = env.kebabToCamelCase(r[1].trim());
-						const v = this.editor.frameContext.get('wwComputedStyle')[k].replace(/"/g, '');
-						const c = r[3].trim();
-						switch (k) {
-							case 'fontFamily':
-								if (!this.plugins.font || !this.plugins.font.fontArray.includes(c)) continue;
-								break;
-							case 'fontSize':
-								if (!this.plugins.fontSize) continue;
-								if (!this._cleanStyleRegExp.fontSizeUnit.test(r[0])) {
-									r[0] = r[0].replace((r[0].match(/:\s*([^;]+)/) || [])[1], converter.fontSize.bind(null, this.options.get('fontSizeUnits')[0]));
-								}
-								break;
-							case 'color':
-								if (!this.plugins.fontColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
-								break;
-							case 'backgroundColor':
-								if (!this.plugins.backgroundColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
-								break;
-						}
 
-						if (v !== c) {
-							allowedStyle.push(r[0]);
-						}
+			let mv;
+			for (let [key, value] of this._cleanStyleRegExpMap) {
+				if (key.test(name)) {
+					mv = value;
+					break;
+				}
+			}
+			if (!mv) return v;
+
+			const style = sv.replace(/&quot;/g, '').match(mv);
+			if (!style) return v;
+
+			const allowedStyle = [];
+			for (let i = 0, len = style.length, r; i < len; i++) {
+				r = style[i].match(/([a-zA-Z0-9-]+)(:)([^"]+)/);
+				if (r && !/inherit|initial|revert|unset/i.test(r[3])) {
+					const k = env.kebabToCamelCase(r[1].trim());
+					const v = this.editor.frameContext.get('wwComputedStyle')[k].replace(/"/g, '');
+					const c = r[3].trim();
+					switch (k) {
+						case 'fontFamily':
+							if (!this.plugins.font || !this.plugins.font.fontArray.includes(c)) continue;
+							break;
+						case 'fontSize':
+							if (!this.plugins.fontSize) continue;
+							if (!this.fontSizeUnitRegExp.test(r[0])) {
+								r[0] = r[0].replace((r[0].match(/:\s*([^;]+)/) || [])[1], converter.fontSize.bind(null, this.options.get('fontSizeUnits')[0]));
+							}
+							break;
+						case 'color':
+							if (!this.plugins.fontColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
+							break;
+						case 'backgroundColor':
+							if (!this.plugins.backgroundColor || /rgba\(([0-9]+\s*,\s*){3}0\)|windowtext/i.test(c)) continue;
+							break;
+					}
+
+					if (v !== c) {
+						allowedStyle.push(r[0]);
 					}
 				}
-				if (allowedStyle.length > 0) v.push('style="' + allowedStyle.join(';') + '"');
 			}
+			if (allowedStyle.length > 0) v.push('style="' + allowedStyle.join(';') + '"');
 		}
 
 		return v;
@@ -1394,8 +1416,7 @@ HTML.prototype = {
 	 * @private
 	 */
 	_deleteDisallowedTags(html, whitelistRegExp, blacklistRegExp) {
-		html = html.replace(this.__disallowedTagsRegExp, '').replace(/<[a-z0-9]+\:[a-z0-9]+[^>^\/]*>[^>]*<\/[a-z0-9]+\:[a-z0-9]+>/gi, '');
-
+		html = html.replace(this.__disallowedTagsRegExp, '');
 		if (whitelistRegExp.test('<font>')) {
 			html = html.replace(/(<\/?)font(\s?)/gi, '$1span$2');
 		}
@@ -1460,16 +1481,6 @@ HTML.prototype = {
 };
 
 /**
- *
- * @param {Element} element Rmove the disallowed tag.
- * @returns {boolean}
- * @private
- */
-function DisallowedElements(element) {
-	return /^(meta|script|link|style|[a-z]+\:[a-z]+)$/i.test(element.nodeName);
-}
-
-/**
  * @description Tag and tag attribute check RegExp function.
  * @param {string} m RegExp value
  * @param {string} t RegExp value
@@ -1505,7 +1516,7 @@ function CleanElements(m, t) {
 			v = this._cleanStyle(m, v, 'span');
 		} else if (this.format.isLine(tagName)) {
 			v = this._cleanStyle(m, v, 'line');
-		} else if (this._cleanStyleRegExp[tagName]) {
+		} else if (this._cleanStyleTagKeyRegExp.test(tagName)) {
 			v = this._cleanStyle(m, v, tagName);
 		}
 	}

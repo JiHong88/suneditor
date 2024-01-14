@@ -23,6 +23,9 @@ const DEFAULT_FORMAT_CLOSURE_BLOCK = 'TH|TD';
 
 const DEFAULT_SIZE_UNITS = ['px', 'pt', 'em', 'rem'];
 
+const DEFAULT_CLASS_NAME = '^__se__|^se-|^katex';
+const DEFAULT_EXTRA_TAG_MAP = { script: false, style: false, meta: false, link: false, '[a-z]+:[a-z]+': false };
+
 export const RO_UNAVAILABD = [
 	'mode',
 	'keepStyleOnDelete',
@@ -311,11 +314,19 @@ export function InitOptions(options, editorTargets) {
 
 	/** Base */
 	o.set('mode', options.mode || 'classic'); // classic, inline, balloon, balloon-always
+	o.set('strictMode', options.strictMode ?? true);
 	o.set('keepStyleOnDelete', !!options.keepStyleOnDelete);
 	o.set('fontSizeUnits', Array.isArray(options.fontSizeUnits) && options.fontSizeUnits.length > 0 ? options.fontSizeUnits.map((v) => v.toLowerCase()) : DEFAULT_SIZE_UNITS);
-	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}^__se__|se-|katex`));
+	o.set('allowedClassName', new RegExp(`${options.allowedClassName && typeof options.allowedClassName === 'string' ? options.allowedClassName + '|' : ''}${DEFAULT_CLASS_NAME}`));
+
+	const allowedExtraTags = { ...DEFAULT_EXTRA_TAG_MAP, ...options.allowedExtraTags, '-': true };
+	const extraKeys = Object.keys(allowedExtraTags);
+	const allowedKeys = extraKeys.filter((k) => allowedExtraTags[k]).join('|');
+	const disallowedKeys = extraKeys.filter((k) => !allowedExtraTags[k]).join('|');
+	o.set('_allowedExtraTag', allowedKeys);
+	o.set('_disallowedExtraTag', disallowedKeys);
+
 	o.set('events', options.events || {});
-	o.set('__allowedScriptTag', options.__allowedScriptTag === true);
 	// text style tags
 	const textTags = _mergeObject(
 		{
@@ -389,8 +400,8 @@ export function InitOptions(options, editorTargets) {
 	// default line
 	o.set('defaultLine', typeof options.defaultLine === 'string' && options.defaultLine.length > 0 ? options.defaultLine : 'p');
 	// element
-	o.set('elementWhitelist', (typeof options.elementWhitelist === 'string' ? options.elementWhitelist : '').toLowerCase() + (o.get('__allowedScriptTag') ? '|script' : ''));
-	o.set('elementBlacklist', _createBlacklist((typeof options.elementBlacklist === 'string' ? options.elementBlacklist : '').toLowerCase(), o.get('defaultLine')));
+	o.set('elementWhitelist', (typeof options.elementWhitelist === 'string' ? options.elementWhitelist : '').toLowerCase() + (o.get('_allowedExtraTag') ? '|' + o.get('_allowedExtraTag') : ''));
+	o.set('elementBlacklist', _createBlacklist((typeof options.elementBlacklist === 'string' ? options.elementBlacklist : '').toLowerCase(), o.get('defaultLine'))) + (o.get('_disallowedExtraTag') ? '|' + o.get('_disallowedExtraTag') : '');
 	// attribute
 	o.set('attributeWhitelist', !options.attributeWhitelist || typeof options.attributeWhitelist !== 'object' ? null : options.attributeWhitelist);
 	o.set('attributeBlacklist', !options.attributeBlacklist || typeof options.attributeBlacklist !== 'object' ? null : options.attributeBlacklist);
