@@ -200,7 +200,7 @@ Figure.prototype = {
 		this.controller.close();
 	},
 
-	open(target, { nonResizing, nonSizeInfo, nonBorder, nonFigureTarget, __fileManagerInfo }) {
+	open(target, { nonResizing, nonSizeInfo, nonBorder, figureTarget, __fileManagerInfo }) {
 		this.editor._offCurrentController();
 		const figureInfo = Figure.GetContainer(target);
 		if (!figureInfo.container) return { container: null, cover: null };
@@ -214,7 +214,7 @@ Figure.prototype = {
 		this.isVertical = /^(90|270)$/.test(Math.abs(GetRotateValue(target).r).toString());
 
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
-		const sizeTarget = nonFigureTarget ? target : this._container || this._cover || target;
+		const sizeTarget = figureTarget ? this._container || this._cover || target : target;
 		const offset = this.offset.get(sizeTarget);
 		const frameOffset = this.offset.get(this.editor.frameContext.get('wysiwygFrame'));
 		const w = sizeTarget.offsetWidth - 1;

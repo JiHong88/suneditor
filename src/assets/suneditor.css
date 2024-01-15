@@ -2073,7 +2073,7 @@
 	pointer-events: none;
 }
 
-.sun-editor .sun-editor-editable[contenteditable='true'] .se-component.se-component-copy {
+.sun-editor .sun-editor-editable[contenteditable='true'] .se-copy {
 	background-color: #d1d1d1;
 	opacity: 0.3;
 	-webkit-box-shadow: 0 0 0 0.5rem #1275ff;

@@ -33,17 +33,16 @@ const Video = function (editor, pluginOptions) {
 	// create HTML
 	const sizeUnit = this.pluginOptions.percentageOnlySize ? '%' : 'px';
 	const modalEl = CreateHTML_modal(editor, this.pluginOptions);
-	const showAlign = (pluginOptions.showAlignRadio === undefined ? true : !!pluginOptions.showAlignRadio) ? 'align' : '';
 	const figureControls =
 		pluginOptions.controls || !this.pluginOptions.canResize
-			? [['mirror_h', 'mirror_v', showAlign, 'revert', 'edit', 'remove']]
+			? [['mirror_h', 'mirror_v', 'align', 'revert', 'edit', 'remove']]
 			: [
 					['resize_auto,75,50', 'rotate_l', 'rotate_r', 'mirror_h', 'mirror_v'],
-					['edit', showAlign, 'revert', 'remove']
+					['edit', 'align', 'revert', 'remove']
 			  ];
 
 	// show align
-	if (showAlign) modalEl.querySelector('.se-figure-align').style.display = 'none';
+	if (!figureControls.some((subArray) => subArray.includes('align'))) modalEl.querySelector('.se-figure-align').style.display = 'none';
 
 	// modules
 	const defaultRatio = this.pluginOptions.defaultRatio * 100 + '%';

@@ -301,23 +301,23 @@ function CloseListener_mousedown({ target }) {
 
 function OnCopy_component(e) {
 	const info = this.info;
-	if (info) {
-		SetClipboardComponent(e, info.container, e.clipboardData);
-		domUtils.addClass(info.container, 'se-component-copy');
-		// copy effect
-		this._w.setTimeout(() => {
-			domUtils.removeClass(info.container, 'se-component-copy');
-		}, 120);
-	}
+	if (!info) return;
+
+	SetClipboardComponent(e, info.container, e.clipboardData);
+	domUtils.addClass(info.container, 'se-copy');
+	// copy effect
+	this._w.setTimeout(() => {
+		domUtils.removeClass(info.container, 'se-copy');
+	}, 120);
 }
 
 function OnCut_component(e) {
 	const info = this.info;
-	if (info) {
-		SetClipboardComponent(e, info.container, e.clipboardData);
-		this.deselect();
-		domUtils.removeItem(info.container);
-	}
+	if (!info) return;
+
+	SetClipboardComponent(e, info.container, e.clipboardData);
+	this.deselect();
+	domUtils.removeItem(info.container);
 }
 
 function OnKeyDown_component(e) {

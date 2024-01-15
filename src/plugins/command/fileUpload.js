@@ -12,7 +12,6 @@ const FileUpload = function (editor, pluginOptions) {
 	if (!pluginOptions.uploadUrl) console.warn('[SUNEDITOR.fileUpload.warn] "fileUpload" plugin must be have "uploadUrl" option.');
 
 	// members
-	const enableEdit = pluginOptions.enableEdit ?? true;
 	this.uploadUrl = pluginOptions.uploadUrl;
 	this.uploadHeaders = pluginOptions.uploadHeaders;
 	this.acceptedFormats = typeof pluginOptions.acceptedFormats !== 'string' ? '*' : pluginOptions.acceptedFormats.trim() || '*';
@@ -20,8 +19,9 @@ const FileUpload = function (editor, pluginOptions) {
 	this._element = null;
 
 	// figure
-	const showAlign = (pluginOptions.showAlign === undefined ? true : !!pluginOptions.showAlign) ? 'align' : '';
-	const figureControls = [[enableEdit ? 'edit' : '', showAlign, 'remove', { command: 'download', title: this.lang.download, icon: 'download', action: (target) => target.click() }]];
+	const downloadCustom = { command: 'download', title: this.lang.download, icon: 'download', action: (target) => target.click() };
+	let figureControls = pluginOptions.controls || [['edit', 'align', 'remove', 'download']];
+	figureControls = figureControls.map((subArray) => subArray.map((item) => (item === 'download' ? downloadCustom : item)));
 	this.figure = new Figure(this, figureControls, {});
 
 	// file manager
@@ -34,7 +34,7 @@ const FileUpload = function (editor, pluginOptions) {
 	});
 
 	// controller
-	if (enableEdit) {
+	if (figureControls.includes('edit')) {
 		const controllerEl = CreateHTML_controller(this);
 		this.controller = new Controller(this, controllerEl, { position: 'bottom', disabled: true }, FileUpload.key);
 		this.editInput = controllerEl.querySelector('input');
@@ -114,7 +114,7 @@ FileUpload.prototype = {
 	},
 
 	_figureOpen(target) {
-		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true });
+		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true });
 	},
 
 	_register(response) {

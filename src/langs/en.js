@@ -48,6 +48,8 @@
 		color: 'Color',
 		colorPicker: 'Color picker',
 		column: 'Column',
+		copy: 'Copy',
+		cut: 'Cut',
 		default: 'Default',
 		deleteColumn: 'Delete column',
 		deleteRow: 'Delete row',

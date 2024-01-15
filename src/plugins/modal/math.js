@@ -48,13 +48,14 @@ Math_.prototype = {
 	 * @override core
 	 */
 	active(element) {
-		if (element?.getAttribute('data-se-value')) {
+		if (domUtils.hasClass(element, 'katex') && element?.getAttribute('data-se-value')) {
 			this._element = element;
 			this.controller.open(element, null, null, null);
 			domUtils.addClass(element, 'se-focus');
 			return true;
 		}
 
+		this.controller.close();
 		return false;
 	},
 
@@ -77,6 +78,7 @@ Math_.prototype = {
 				const dom = this._d.createRange().createContextualFragment(this._renderer(converter.entityToHTML(element.getAttribute('data-se-value'))));
 				element.innerHTML = dom.querySelector('.katex').innerHTML;
 				element.setAttribute('contenteditable', false);
+				// element.removeAttribute('contenteditable');
 			}
 		};
 	},
@@ -161,14 +163,18 @@ Math_.prototype = {
 	 */
 	controllerAction(target) {
 		const command = target.getAttribute('data-command');
-		if (/update/.test(command)) {
-			this.modal.open();
-		} else {
-			/** delete */
-			domUtils.removeItem(this.controller.currentTarget);
-			this.controller.close();
-			this.editor.focus();
-			this.history.push(false);
+		switch (command) {
+			case 'update':
+				this.modal.open();
+				break;
+			case 'copy':
+				copyTextToClipboard(this._element);
+				break;
+			case 'delete':
+				domUtils.removeItem(this.controller.currentTarget);
+				this.controller.close();
+				this.editor.focus();
+				this.history.push(false);
 		}
 	},
 
@@ -187,6 +193,22 @@ Math_.prototype = {
 
 	constructor: Math_
 };
+
+async function copyTextToClipboard(element) {
+	if (!navigator.clipboard || !element) return;
+
+	try {
+		const text = element.getAttribute('data-se-value');
+		await navigator.clipboard.writeText(text);
+		domUtils.addClass(element, 'se-copy');
+		// copy effect
+		window.setTimeout(() => {
+			domUtils.removeClass(element, 'se-copy');
+		}, 120);
+	} catch (err) {
+		console.error('[SUNEDITOR.math.copy.fail]', err);
+	}
+}
 
 function RenderMathExp(e) {
 	this.previewElement.innerHTML = this._renderer(e.target.value);
@@ -285,6 +307,12 @@ function CreateHTML_controller({ lang, icons }) {
                 ${icons.edit}
                 <span class="se-tooltip-inner">
                     <span class="se-tooltip-text">${lang.edit}</span>
+                </span>
+            </button>
+            <button type="button" data-command="copy" tabindex="-1" class="se-btn se-tooltip">
+                ${icons.copy}
+                <span class="se-tooltip-inner">
+                    <span class="se-tooltip-text">${lang.copy}</span>
                 </span>
             </button>
             <button type="button" data-command="delete" tabindex="-1" class="se-btn se-tooltip">

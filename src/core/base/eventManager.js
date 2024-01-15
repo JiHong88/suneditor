@@ -350,7 +350,7 @@ EventManager.prototype = {
 	},
 
 	_isNonFocusNode(node) {
-		return node.nodeType === 1 && (node.getAttribute('contenteditable') === 'false' || node.getAttribute('data-se-non-focus') === 'true');
+		return node.nodeType === 1 && node.getAttribute('data-se-non-focus') === 'true';
 	},
 
 	_isUneditableNode(range, isFront) {
