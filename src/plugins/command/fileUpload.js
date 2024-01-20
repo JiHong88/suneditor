@@ -47,7 +47,7 @@ const FileUpload = function (editor, pluginOptions) {
 FileUpload.key = 'fileUpload';
 FileUpload.type = 'command';
 FileUpload.className = '';
-FileUpload.component = (node) => {
+FileUpload.component = function (node) {
 	return domUtils.isAnchor(node) && node.hasAttribute('download') && node.hasAttribute('data-se-file-download') ? node : null;
 };
 FileUpload.prototype = {

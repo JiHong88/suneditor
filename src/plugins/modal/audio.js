@@ -62,7 +62,7 @@ const Audio_ = function (editor, pluginOptions) {
 Audio_.key = 'audio';
 Audio_.type = 'modal';
 Audio_.className = '';
-Audio_.component = (node) => {
+Audio_.component = function (node) {
 	return /^AUDIO$/i.test(node?.nodeName) ? node : null;
 };
 Audio_.prototype = {

@@ -239,7 +239,7 @@ const Table = function (editor, pluginOptions) {
 Table.key = 'table';
 Table.type = 'dropdown-free';
 Table.className = '';
-Table.component = (node) => {
+Table.component = function (node) {
 	return domUtils.isTable(node) ? node : null;
 };
 Table.options = { isInputComponent: true };

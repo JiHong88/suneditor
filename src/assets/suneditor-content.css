@@ -500,6 +500,7 @@
 	width: auto;
 	height: auto;
 	max-width: 100%;
+	cursor: pointer;
 }
 
 /** image, video iframe figure cover */

@@ -122,7 +122,7 @@ const Video = function (editor, pluginOptions) {
 Video.key = 'video';
 Video.type = 'modal';
 Video.className = '';
-Video.component = (node) => {
+Video.component = function (node) {
 	if (/^(VIDEO)$/i.test(node?.nodeName)) {
 		return node;
 	} else if (/^(IFRAME)$/i.test(node?.nodeName)) {
