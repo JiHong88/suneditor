@@ -75,7 +75,7 @@ FileUpload.prototype = {
 	edit(target) {
 		this.editInput.value = target.textContent;
 		this.figure.close();
-		this.controller.open(target, null, null);
+		this.controller.open(target, null, { isWWTarget: false, initMethod: null, addOffset: null });
 		this.editInput.focus();
 	},
 
@@ -114,7 +114,7 @@ FileUpload.prototype = {
 	},
 
 	_figureOpen(target) {
-		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true });
+		this.figure.open(target, { nonResizing: true, nonSizeInfo: true, nonBorder: true, figureTarget: true, __fileManagerInfo: false });
 	},
 
 	_register(response) {

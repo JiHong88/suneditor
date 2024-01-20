@@ -221,7 +221,7 @@ Image_.prototype = {
 	 */
 	ready(target) {
 		if (!target) return;
-		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing });
+		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: false });
 		this.anchor.set(domUtils.isAnchor(target.parentNode) ? target.parentNode : null);
 
 		this._linkElement = this.anchor.currentTarget;
@@ -401,7 +401,7 @@ Image_.prototype = {
 			const figureInfo = Figure.CreateContainer(imageEl, 'se-image-container');
 			cover = figureInfo.cover;
 			container = figureInfo.container;
-			this.figure.open(imageEl, { nonResizing: true, __fileManagerInfo: true });
+			this.figure.open(imageEl, { nonResizing: true, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
 		}
 
 		// check size
@@ -596,7 +596,7 @@ Image_.prototype = {
 		this._element = oImg;
 		this._cover = cover;
 		this._container = container;
-		this.figure.open(oImg, { nonResizing: this._nonResizing, __fileManagerInfo: true });
+		this.figure.open(oImg, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
 
 		// set size
 		this.applySize(width, height);

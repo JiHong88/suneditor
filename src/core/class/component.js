@@ -3,9 +3,10 @@
  */
 
 import CoreInjector from '../../editorInjector/_core';
-import { domUtils } from '../../helper';
+import { domUtils, env, numbers } from '../../helper';
 import Figure from '../../modules/Figure';
 
+const { _w } = env;
 const DIR_KEYCODE = /^(3[7-9]|40)$/;
 const DIR_UP_KEYCODE = /^3[7-8]$/;
 
@@ -217,23 +218,27 @@ Component.prototype = {
 		const wScroll = wysiwyg.scrollX || wysiwyg.scrollLeft || 0;
 		const container = info.container;
 		const isNonSelected = domUtils.hasClass(container, 'se-non-select-figure');
-		const t_style = fc.get('lineBreaker_t').style;
-		const b_style = fc.get('lineBreaker_b').style;
+		const lb_t = fc.get('lineBreaker_t');
+		const lb_b = fc.get('lineBreaker_b');
+		const t_style = lb_t.style;
+		const b_style = lb_b.style;
 		const offsetTarget = container.offsetWidth < element.offsetWidth ? container : element;
 		const target = this.editor._figureContainer?.style.display === 'block' ? this.editor._figureContainer : offsetTarget;
 		const toolbarH = this.editor.isClassic && !this.options.get('toolbar_container') ? this.context.get('toolbar.main').offsetHeight : 0;
 		const isList = domUtils.isListCell(container.parentNode);
 
-		let componentTop, w;
-
 		// top
+		let componentTop, w;
+		const dir = this.options.get('_rtl') ? ['right', 'left'] : ['left', 'right'];
 		if (isList ? !container.previousSibling : !this.format.isLine(container.previousElementSibling)) {
+			const tH = numbers.get(_w.getComputedStyle(lb_t).height, 1);
 			this.eventManager._lineBreakComp = container;
 			componentTop = this.offset.get(offsetTarget).top + yScroll;
 			w = target.offsetWidth / 2 / 2;
-			t_style.top = componentTop - yScroll - toolbarH - 12 + 'px';
-			t_style.left = (isNonSelected ? 0 : this.offset.get(target).left + w) + 'px';
-			fc.get('lineBreaker_t').setAttribute('data-offset', yScroll + ',' + wScroll);
+			t_style.top = componentTop - yScroll - toolbarH - tH / 2 + 'px';
+			t_style[dir[0]] = (isNonSelected ? 0 : this.offset.get(target).left + w) + 'px';
+			t_style[dir[1]] = '';
+			lb_t.setAttribute('data-offset', yScroll + ',' + wScroll);
 			t_style.display = 'block';
 		} else {
 			t_style.display = 'none';
@@ -241,24 +246,22 @@ Component.prototype = {
 
 		// bottom
 		if (isList ? !container.nextSibling : !this.format.isLine(container.nextElementSibling)) {
+			const cStyle = _w.getComputedStyle(lb_b);
+			const bH = numbers.get(cStyle.height, 1);
+			const bW = numbers.get(cStyle.width, 1);
+
 			if (!componentTop) {
 				this.eventManager._lineBreakComp = container;
 				componentTop = this.offset.get(offsetTarget).top + yScroll;
 				w = target.offsetWidth / 2 / 2;
 			}
-			let bDir = '';
-			b_style.top = componentTop + target.offsetHeight - yScroll - toolbarH - 12 + 'px';
-			if (isNonSelected) {
-				b_style.left = '';
-				b_style.right = '0px';
-				bDir = 'right';
-			} else {
-				b_style.right = '';
-				b_style.left = this.offset.get(target).left + target.offsetWidth - w - 24 + 'px';
-				bDir = 'left';
-			}
 
-			fc.get('lineBreaker_b').setAttribute('data-offset', yScroll + ',' + bDir + ',' + wScroll);
+			b_style.top = componentTop + target.offsetHeight - yScroll - toolbarH - bH / 2 + 'px';
+			b_style.right = '';
+			b_style.left = this.offset.get(target).left + target.offsetWidth - (isNonSelected ? 0 : w) - (isNonSelected ? bW / 2 : bW) + 'px';
+
+			const bDir = 'left';
+			lb_b.setAttribute('data-offset', yScroll + ',' + bDir + ',' + wScroll);
 			b_style.display = 'block';
 		} else {
 			b_style.display = 'none';

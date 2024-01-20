@@ -4,6 +4,7 @@
 
 import { getParentElement, isWysiwygFrame, hasClass, addClass, removeClass, getViewportSize } from '../../helper/domUtils';
 import { numbers } from '../../helper';
+import { _w } from '../../helper/env';
 
 const Offset = function (editor) {
 	this.editor = editor;
@@ -55,7 +56,7 @@ Offset.prototype = {
 		if (!element) element = topArea;
 		if (element === topArea) isTop = true;
 		if (!isTop) {
-			targetAbs = window.getComputedStyle(element).position === 'absolute';
+			targetAbs = _w.getComputedStyle(element).position === 'absolute';
 		}
 
 		const w = element.offsetWidth;
@@ -104,7 +105,7 @@ Offset.prototype = {
 		if (!element) element = topArea;
 		if (element === topArea) isTop = true;
 		if (!isTop) {
-			targetAbs = window.getComputedStyle(element).position === 'absolute';
+			targetAbs = _w.getComputedStyle(element).position === 'absolute';
 		}
 
 		let t = 0,
@@ -199,8 +200,8 @@ Offset.prototype = {
 		const widthEditorRefer = topArea.contains(owOffsetEl);
 		ohOffsetEl = heightEditorRefer ? topArea : ohOffsetEl;
 		owOffsetEl = widthEditorRefer ? topArea : owOffsetEl;
-		const ts = !ohOffsetEl ? 0 : ohOffsetEl.getBoundingClientRect().top + (!ohOffsetEl.parentElement || /^html$/i.test(ohOffsetEl.parentElement.nodeName) ? window.scrollY : 0);
-		const ls = !owOffsetEl ? 0 : owOffsetEl.getBoundingClientRect().left + (!owOffsetEl.parentElement || /^html$/i.test(owOffsetEl.parentElement.nodeName) ? window.scrollX : 0);
+		const ts = !ohOffsetEl ? 0 : ohOffsetEl.getBoundingClientRect().top + (!ohOffsetEl.parentElement || /^html$/i.test(ohOffsetEl.parentElement.nodeName) ? _w.scrollY : 0);
+		const ls = !owOffsetEl ? 0 : owOffsetEl.getBoundingClientRect().left + (!owOffsetEl.parentElement || /^html$/i.test(owOffsetEl.parentElement.nodeName) ? _w.scrollX : 0);
 
 		oh = heightEditorRefer ? topArea.clientHeight : oh;
 		ow = widthEditorRefer ? topArea.clientWidth : ow;
@@ -247,9 +248,9 @@ Offset.prototype = {
 			this._scrollEvent = this.editor.eventManager.addGlobalEvent('scroll', FixedScroll.bind(this, element, e_container, target, t_container), false);
 		}
 
-		this._scrollY = window.scrollY;
+		this._scrollY = _w.scrollY;
 		let wy = 0;
-		if ((this._isFixed = /^fixed$/i.test(window.getComputedStyle(t_container).position))) {
+		if ((this._isFixed = /^fixed$/i.test(_w.getComputedStyle(t_container).position))) {
 			wy += this._scrollY;
 		}
 
@@ -304,7 +305,7 @@ Offset.prototype = {
 			element.style.top = `${bt + target.offsetHeight}px`;
 		}
 
-		if (/^fixed$/i.test(window.getComputedStyle(t_container).position)) {
+		if (/^fixed$/i.test(_w.getComputedStyle(t_container).position)) {
 			this._elTop = element.offsetTop;
 		}
 	},
@@ -358,7 +359,7 @@ Offset.prototype = {
 		let arrowDir = '';
 		if (position === 'bottom') {
 			arrowDir = 'up';
-			t += targetRect.bottom + ah + window.scrollY;
+			t += targetRect.bottom + ah + _w.scrollY;
 			y = rmb - (elH + ah);
 			if (y < 0) {
 				arrowDir = 'down';
@@ -371,7 +372,7 @@ Offset.prototype = {
 			}
 		} else {
 			arrowDir = 'down';
-			t += targetRect.top - elH - ah + window.scrollY;
+			t += targetRect.top - elH - ah + _w.scrollY;
 			y = rmt - (elH + ah);
 			if (y < 0) {
 				arrowDir = 'up';
@@ -388,7 +389,7 @@ Offset.prototype = {
 		element.style.top = `${t}px`;
 
 		// left ----------------------------------------------------------------------------------------------------
-		const radius = numbers.get(window.getComputedStyle(element).borderRadius) || 0;
+		const radius = numbers.get(_w.getComputedStyle(element).borderRadius) || 0;
 		const targetW = targetOffset.width;
 		const elW = element.offsetWidth;
 		const aw = arrow ? arrow.offsetWidth : 0;
@@ -415,7 +416,7 @@ Offset.prototype = {
 		let ax = 0;
 		let awLimit = 0;
 		if (isLTR) {
-			l += targetRect.left + window.scrollX - (rml < 0 ? rml : 0);
+			l += targetRect.left + _w.scrollX - (rml < 0 ? rml : 0);
 			x = targetW + rml;
 			if (x < aw) {
 				awLimit = aw / 2 - 1 + (radius <= 2 ? 0 : radius - 2);
@@ -430,7 +431,7 @@ Offset.prototype = {
 			}
 			if (arrow && ax > 0) arrow.style.left = ax + 'px';
 		} else {
-			l += targetRect.right - elW + window.scrollX + (rmr < 0 ? rmr : 0);
+			l += targetRect.right - elW + _w.scrollX + (rmr < 0 ? rmr : 0);
 			x = targetW + rmr;
 			if (x < aw) {
 				awLimit = aw / 2 - 1 + (radius <= 2 ? 0 : radius - 2);
@@ -472,15 +473,15 @@ Offset.prototype = {
 
 	_getWindowScroll() {
 		return {
-			top: window.scrollY,
-			left: window.scrollX,
-			width: window.innerWidth,
-			height: window.innerHeight,
+			top: _w.scrollY,
+			left: _w.scrollX,
+			width: _w.innerWidth,
+			height: _w.innerHeight,
 			rects: {
 				left: 0,
 				top: 0,
-				right: window.innerWidth,
-				bottom: window.innerHeight,
+				right: _w.innerWidth,
+				bottom: _w.innerHeight,
 				noText: true
 			}
 		};
@@ -498,7 +499,7 @@ Offset.prototype = {
 };
 
 function FixedScroll(element, e_container, target, t_container) {
-	const isFixed = /^fixed$/i.test(window.getComputedStyle(t_container).position);
+	const isFixed = /^fixed$/i.test(_w.getComputedStyle(t_container).position);
 	if (!this._isFixed) {
 		if (isFixed) {
 			this.setRelPosition(element, e_container, target, t_container, true);
@@ -509,7 +510,7 @@ function FixedScroll(element, e_container, target, t_container) {
 		return;
 	}
 
-	element.style.top = `${this._elTop - (this._scrollY - window.scrollY - t_container.offsetTop)}px`;
+	element.style.top = `${this._elTop - (this._scrollY - _w.scrollY - t_container.offsetTop)}px`;
 }
 
 export default Offset;

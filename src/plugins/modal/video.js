@@ -222,7 +222,7 @@ Video.prototype = {
 	 */
 	ready(target) {
 		if (!target) return;
-		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing });
+		const figureInfo = this.figure.open(target, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: false });
 
 		this._element = target;
 		this._cover = figureInfo.cover;
@@ -371,7 +371,7 @@ Video.prototype = {
 		this._element = oFrame;
 		this._cover = cover;
 		this._container = container;
-		this.figure.open(oFrame, { nonResizing: this._nonResizing, __fileManagerInfo: true });
+		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
 
 		width = width || this._defaultSizeX;
 		height = height || this._videoRatio;
@@ -537,7 +537,7 @@ Video.prototype = {
 		}
 
 		// size
-		this.figure.open(oFrame, { nonResizing: this._nonResizing, __fileManagerInfo: true });
+		this.figure.open(oFrame, { nonResizing: this._nonResizing, nonSizeInfo: false, nonBorder: false, figureTarget: false, __fileManagerInfo: true });
 		const size = (oFrame.getAttribute('data-se-size') || ',').split(',');
 		this.applySize(size[0] || prevFrame.style.width || prevFrame.width || '', size[1] || prevFrame.style.height || prevFrame.height || '');
 

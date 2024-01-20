@@ -2198,6 +2198,22 @@
 	-moz-backface-visibility: hidden;
 }
 
+.sun-editor .se-resizing-container .se-drag-dot {
+	position: relative;
+	pointer-events: auto;
+	top: -18px;
+	left: calc(100% - 24px);
+	cursor: move;
+	width: 17px;
+	height: 16px;
+	background-color: #eaf3ff;
+	border: 1px solid #4592ff;
+	color: #1275ff;
+}
+.sun-editor .se-resizing-container .se-drag-dot > svg {
+	pointer-events: none;
+}
+
 .sun-editor .se-resizing-container .se-resize-dot {
 	position: absolute;
 	display: inline-block;
@@ -2709,6 +2725,7 @@
 .sun-editor .se-tooltip {
 	position: relative;
 	overflow: visible;
+	font-size: 13px;
 }
 
 .sun-editor .se-tooltip .se-tooltip-inner {
@@ -2801,7 +2818,8 @@
 	-webkit-appearance: none;
 	height: 15px;
 	width: 15px;
-	background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEzLjQ2LDEyTDE5LDE3LjU0VjE5SDE3LjU0TDEyLDEzLjQ2TDYuNDYsMTlINVYxNy41NEwxMC41NCwxMkw1LDYuNDZWNUg2LjQ2TDEyLDEwLjU0TDE3LjU0LDVIMTlWNi40NkwxMy40NiwxMloiIC8+PC9zdmc+') no-repeat center center;
+	background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZD0iTTEzLjQ2LDEyTDE5LDE3LjU0VjE5SDE3LjU0TDEyLDEzLjQ2TDYuNDYsMTlINVYxNy41NEwxMC41NCwxMkw1LDYuNDZWNUg2LjQ2TDEyLDEwLjU0TDE3LjU0LDVIMTlWNi40NkwxMy40NiwxMloiIC8+PC9zdmc+')
+		no-repeat center center;
 	background-size: cover;
 }
 
@@ -3049,9 +3067,14 @@
 }
 
 /* controller - table - props */
-.sun-editor .se-controller.se-table-props .se-table-props-align li {
+.sun-editor.se-rtl .se-controller.se-table-props .se-table-props-align li {
 	margin-right: 0;
 	margin-left: 2px;
+}
+
+/* controller - figure - drag handle */
+.sun-editor.se-rtl .se-resizing-container .se-drag-dot {
+	left: 12px;
 }
 
 /** arrow--- */
@@ -3184,6 +3207,14 @@ textarea.se-error:focus {
 	outline: none !important;
 	margin: 0 !important;
 	padding: 0 !important;
+}
+.sun-editor.sun-editor-carrier-wrapper .se-drag-cursor {
+	position: absolute;
+	display: none;
+	width: 10px;
+	height: 10px;
+	background-color: red;
+	border-radius: 50%;
 }
 
 /** animation */

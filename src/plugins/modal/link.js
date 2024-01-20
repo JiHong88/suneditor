@@ -51,7 +51,7 @@ Link.prototype = {
 			domUtils.addClass(element, 'on');
 
 			this.anchor.set(element);
-			this.controller.open(element, null, null, null);
+			this.controller.open(element, null, { isWWTarget: false, initMethod: null, addOffset: null });
 
 			return true;
 		}

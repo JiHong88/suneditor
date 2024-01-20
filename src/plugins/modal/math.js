@@ -50,7 +50,7 @@ Math_.prototype = {
 	active(element) {
 		if (domUtils.hasClass(element, 'katex') && element?.getAttribute('data-se-value')) {
 			this._element = element;
-			this.controller.open(element, null, null, null);
+			this.controller.open(element, null, { isWWTarget: false, initMethod: null, addOffset: null });
 			domUtils.addClass(element, 'se-focus');
 			return true;
 		}
@@ -202,7 +202,7 @@ async function copyTextToClipboard(element) {
 		await navigator.clipboard.writeText(text);
 		domUtils.addClass(element, 'se-copy');
 		// copy effect
-		window.setTimeout(() => {
+		env._w.setTimeout(() => {
 			domUtils.removeClass(element, 'se-copy');
 		}, 120);
 	} catch (err) {

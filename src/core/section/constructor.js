@@ -109,6 +109,12 @@ const Constructor = function (editorTargets, options) {
 	// loding box, resizing back
 	editor_carrier_wrapper.appendChild(domUtils.createElement('DIV', { class: 'se-back-wrapper' }));
 	editor_carrier_wrapper.appendChild(loadingBox.cloneNode(true));
+
+	// drag cursor
+	const dragCursor = domUtils.createElement('DIV', { class: 'se-drag-cursor' });
+	editor_carrier_wrapper.appendChild(dragCursor);
+
+	// set carrier wrapper
 	_d.body.appendChild(editor_carrier_wrapper);
 
 	/** --- toolbar --------------------------------------------------------------- */

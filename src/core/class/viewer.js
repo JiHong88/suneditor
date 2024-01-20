@@ -592,17 +592,17 @@ function CreateLineNumbers(fc) {
 		n += `${i}\n`;
 	}
 
-	const { padding, margin } = window.getComputedStyle(fc.get('code'));
+	const { padding, margin } = env._w.getComputedStyle(fc.get('code'));
 	codeNumbers.value = n;
 	codeNumbers.style.padding = padding || '';
 	codeNumbers.style.margin = margin || '';
 }
 
 function GetLineHeight(textarea) {
-	let lineHeight = window.getComputedStyle(textarea).lineHeight;
+	let lineHeight = env._w.getComputedStyle(textarea).lineHeight;
 
 	if (!numbers.is(lineHeight)) {
-		const fontSize = window.getComputedStyle(textarea).fontSize;
+		const fontSize = env._w.getComputedStyle(textarea).fontSize;
 		lineHeight = numbers.get(fontSize) * 1.2;
 	} else {
 		lineHeight = numbers.get(lineHeight);

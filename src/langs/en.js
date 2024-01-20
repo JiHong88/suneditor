@@ -56,6 +56,7 @@
 		dir_ltr: 'Left to right',
 		dir_rtl: 'Right to left',
 		download: 'Download',
+		drag: 'Drag',
 		edit: 'Edit',
 		decrease: 'Decrease',
 		increase: 'Increase',

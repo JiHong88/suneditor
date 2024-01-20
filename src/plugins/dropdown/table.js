@@ -1,5 +1,5 @@
 import EditorInjector from '../../editorInjector';
-import { domUtils, numbers, converter } from '../../helper';
+import { domUtils, numbers, converter, env } from '../../helper';
 import { Controller, SelectMenu, ColorPicker } from '../../modules';
 
 const ROW_SELECT_MARGIN = 5;
@@ -385,7 +385,7 @@ Table.prototype = {
 				}
 
 				const col = this._element.querySelector('colgroup').querySelectorAll('col')[colIndex < 0 ? 0 : colIndex];
-				this._startCellResizing(col, cellEdge.startX, numbers.get(window.getComputedStyle(col).width, CELL_DECIMAL_END), cellEdge.isLeft);
+				this._startCellResizing(col, cellEdge.startX, numbers.get(env._w.getComputedStyle(col).width, CELL_DECIMAL_END), cellEdge.isLeft);
 			} catch (err) {
 				console.warn('[SUNEDITOR.plugins.table.error]', err);
 				this.__removeGlobalEvents();
@@ -414,7 +414,7 @@ Table.prototype = {
 				if (!this._resizeLine) this._resizeLine = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_CLASS);
 				this._resizeLinePrev = this.editor.frameContext.get('wrapper').querySelector(RESIZE_ROW_PREV_CLASS);
 
-				this._startRowResizing(row, rowEdge.startY, numbers.get(window.getComputedStyle(row).height, CELL_DECIMAL_END));
+				this._startRowResizing(row, rowEdge.startY, numbers.get(env._w.getComputedStyle(row).height, CELL_DECIMAL_END));
 			} catch (err) {
 				console.warn('[SUNEDITOR.plugins.table.error]', err);
 				this.__removeGlobalEvents();
@@ -569,7 +569,7 @@ Table.prototype = {
 					this.controller_props.close();
 				} else {
 					this._setCtrlProps('table');
-					this.controller_props.open(target, this.controller_table.form, null);
+					this.controller_props.open(target, this.controller_table.form, { isWWTarget: false, initMethod: null, addOffset: null });
 				}
 				break;
 			case 'openCellProperties':
@@ -577,7 +577,7 @@ Table.prototype = {
 					this.controller_props.close();
 				} else {
 					this._setCtrlProps('cell');
-					this.controller_props.open(target, this.controller_cell.form, null);
+					this.controller_props.open(target, this.controller_cell.form, { isWWTarget: false, initMethod: null, addOffset: null });
 				}
 				break;
 			case 'props_onborder_format':
@@ -1369,10 +1369,10 @@ Table.prototype = {
 
 		// controller open
 		const figureEl = domUtils.getParentElement(tableElement, domUtils.isFigure);
-		this.controller_table.open(figureEl, null, null);
+		this.controller_table.open(figureEl, null, { isWWTarget: false, initMethod: null, addOffset: null });
 
 		const addOffset = !this.cellControllerTop ? null : this.controller_table.form.style.display === 'block' ? { left: this.controller_table.form.offsetWidth + 2 } : null;
-		this.controller_cell.open(tdElement, this.cellControllerTop ? figureEl : null, null, addOffset);
+		this.controller_cell.open(tdElement, this.cellControllerTop ? figureEl : null, { isWWTarget: false, initMethod: null, addOffset: addOffset });
 	},
 
 	setCellControllerPosition(tdElement, reset) {
@@ -1540,7 +1540,7 @@ Table.prototype = {
 		if (!targets || targets.length === 0) return;
 
 		const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment, font_bold, font_underline, font_italic, font_strike } = this.propTargets;
-		const { border, backgroundColor, color, textAlign, fontWeight, textDecoration, fontStyle } = window.getComputedStyle(targets[0]);
+		const { border, backgroundColor, color, textAlign, fontWeight, textDecoration, fontStyle } = env._w.getComputedStyle(targets[0]);
 		const cellBorder = this._getBorderStyle(border);
 
 		cell_alignment.querySelector('[data-value="justify"]').style.display = isTable ? 'none' : '';
@@ -1668,7 +1668,7 @@ Table.prototype = {
 			const isTable = this.controller_props.currentTarget === this.controller_table.form;
 			const targets = isTable ? [this._element] : this._selectedCells;
 			const tr = targets[0];
-			const trStyles = window.getComputedStyle(tr);
+			const trStyles = env._w.getComputedStyle(tr);
 			const { border_format, border_color, border_style, border_width, back_color, font_color, cell_alignment } = this.propTargets;
 
 			const borderFormat = border_format.getAttribute('se-border-format') || '';
@@ -2011,7 +2011,7 @@ Table.prototype = {
 			this.sliderType = type;
 			domUtils.addClass(button, 'on');
 			this.colorPicker.init(color?.value || '', button);
-			this.controller_colorPicker.open(button, null, { isWWTarget: false });
+			this.controller_colorPicker.open(button, null, { isWWTarget: false, initMethod: null, addOffset: null });
 		}
 	},
 
@@ -2051,7 +2051,7 @@ function IsResizeEls(node) {
 
 function CheckCellEdge(event, tableCell) {
 	const startX = event.clientX;
-	const startWidth = numbers.get(window.getComputedStyle(tableCell).width, CELL_DECIMAL_END);
+	const startWidth = numbers.get(env._w.getComputedStyle(tableCell).width, CELL_DECIMAL_END);
 	const rect = tableCell.getBoundingClientRect();
 	const offsetX = Math.round(startX - rect.left);
 	const isLeft = offsetX <= CELL_SELECT_MARGIN;
@@ -2066,7 +2066,7 @@ function CheckCellEdge(event, tableCell) {
 
 function CheckRowEdge(event, tableCell) {
 	const startY = event.clientY;
-	const startHeight = numbers.get(window.getComputedStyle(tableCell).height, CELL_DECIMAL_END);
+	const startHeight = numbers.get(env._w.getComputedStyle(tableCell).height, CELL_DECIMAL_END);
 	const rect = tableCell.getBoundingClientRect();
 	const is = Math.ceil(startHeight + rect.top - startY) <= ROW_SELECT_MARGIN;
 

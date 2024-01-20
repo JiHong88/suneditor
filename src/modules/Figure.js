@@ -74,7 +74,8 @@ const Figure = function (inst, controls, params) {
 	this.eventManager.addEvent(this.resizeButton, 'click', OnClick_resizeButton.bind(this));
 	this.editor.applyFrameRoots((e) => {
 		if (!e.get('wrapper').querySelector('.se-controller.se-resizing-container')) {
-			const main = CreateHTML_resizeDot();
+			// resizing
+			const main = CreateHTML_resizeDot(this);
 			const handles = main.querySelectorAll('.se-resize-dot > span');
 			e.set('_figure', {
 				main: main,
@@ -214,7 +215,7 @@ Figure.prototype = {
 		this.isVertical = /^(90|270)$/.test(Math.abs(GetRotateValue(target).r).toString());
 
 		const eventWysiwyg = this.editor.frameContext.get('eventWysiwyg');
-		const sizeTarget = figureTarget ? this._container || this._cover || target : target;
+		const sizeTarget = figureTarget ? this._cover || this._container || target : target;
 		const offset = this.offset.get(sizeTarget);
 		const frameOffset = this.offset.get(this.editor.frameContext.get('wysiwygFrame'));
 		const w = sizeTarget.offsetWidth - 1;
@@ -289,7 +290,7 @@ Figure.prototype = {
 		_figure.display.style.display = nonSizeInfo ? 'none' : '';
 		_figure.border.style.display = nonBorder ? 'none' : '';
 		_figure.main.style.display = 'block';
-		this.controller.open(_figure.main, null, { initMethod: this.__offContainer });
+		this.controller.open(_figure.main, null, { initMethod: this.__offContainer, isWWTarget: false, addOffset: null });
 
 		// set members
 		this._w.setTimeout(domUtils.addClass.bind(null, this._cover, 'se-figure-selected'));
@@ -903,8 +904,14 @@ function OnClick_resizeButton() {
 	this.selectMenu_resize.open('', '[data-command="' + command + '"]');
 }
 
-function CreateHTML_resizeDot() {
+function CreateHTML_resizeDot({ icons, lang }) {
 	const html = /*html*/ `
+		<div class="se-drag-dot se-tooltip" draggable="true">
+			${icons.move}
+			<span class="se-tooltip-inner">
+				<span class="se-tooltip-text">${lang.drag}</span>
+			</span>
+		</div>
 		<div class="se-resize-dot">
 			<span class="tl"></span>
 			<span class="tr"></span>

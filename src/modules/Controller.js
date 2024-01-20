@@ -24,7 +24,7 @@ const Controller = function (inst, element, params, _name) {
 	this.isOpen = false;
 	this.currentTarget = null;
 	this.currentPositionTarget = null;
-	this.isWWTarget = params?.isWWTarget ?? true;
+	this.isWWTarget = params.isWWTarget ?? true;
 	this.position = params.position;
 	this.disabled = !!params.disabled;
 	this.parents = params.parents || [];
@@ -51,7 +51,7 @@ Controller.prototype = {
 	/**
 	 * @description Open a modal plugin
 	 */
-	open(target, positionTarget, params) {
+	open(target, positionTarget, { isWWTarget, initMethod, addOffset }) {
 		if (this.editor.isBalloon) this.toolbar.hide();
 		else if (this.editor.isSubBalloon) this.subToolbar.hide();
 
@@ -59,11 +59,10 @@ Controller.prototype = {
 
 		this.currentTarget = target;
 		this.currentPositionTarget = positionTarget || target;
-		this.isWWTarget = params?.isWWTarget ?? this.isWWTarget;
-		if (typeof params?.initMethod === 'function') this._initMethod = params.initMethod;
+		this.isWWTarget = isWWTarget ?? this.isWWTarget;
+		if (typeof initMethod === 'function') this._initMethod = initMethod;
 		this.editor.currentControllerName = this.kind;
 
-		const addOffset = params?.addOffset;
 		if (addOffset) this.__addOffset = { ...this.__addOffset, ...addOffset };
 
 		const parents = this.isOutsideForm ? this.parents : [];
@@ -135,7 +134,7 @@ Controller.prototype = {
 	 * @description Show controller at editor area (controller elements, function, "controller target element(@Required)", "controller name(@Required)", etc..)
 	 * @param {any} arguments controller elements, function..
 	 */
-	async _controllerOn(form, target) {
+	_controllerOn(form, target) {
 		const params = {
 			position: this.position,
 			form: form,
@@ -143,7 +142,7 @@ Controller.prototype = {
 			inst: this
 		};
 
-		if ((await this.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.editor.frameContext, params })) === false) return;
+		if (this.triggerEvent('onBeforeShowController', { caller: this.kind, frameContext: this.editor.frameContext, params }) === false) return;
 
 		form.style.display = 'block';
 		if (this._shadowRoot) {

@@ -112,7 +112,7 @@ HueSlider.prototype = {
 
 	open(target) {
 		this.attach();
-		this.controller.open(target, null, null);
+		this.controller.open(target, null, { isWWTarget: false, initMethod: null, addOffset: null });
 	},
 
 	close() {
