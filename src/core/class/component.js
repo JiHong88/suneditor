@@ -19,6 +19,7 @@ const Component = function (editor) {
 	this.currentTarget = null;
 	this.currentPlugin = null;
 	this.currentPluginName = '';
+	this.currentInfo = null;
 	this.__globalEvents = {
 		copy: OnCopy_component.bind(this),
 		cut: OnCut_component.bind(this),
@@ -151,6 +152,7 @@ Component.prototype = {
 		}
 
 		this.isSelected = true;
+
 		this._w.setTimeout(
 			() => {
 				if (typeof plugin.select === 'function') plugin.select(element);
@@ -160,15 +162,20 @@ Component.prototype = {
 				this.currentTarget = element;
 				this.currentPlugin = plugin;
 				this.currentPluginName = pluginName;
+				this.currentInfo = info;
+				domUtils.addClass(info.container, 'se-component-selected');
 			},
 			this.editor.frameOptions.get('iframe') ? 100 : 0
 		);
 	},
 
-	deselect(_globalClosed) {
+	deselect() {
 		this.editor._antiBlur = false;
+		domUtils.removeClass(this.currentInfo?.container, 'se-component-selected');
+
 		const { frameContext } = this.editor;
 		frameContext.get('lineBreaker_t').style.display = frameContext.get('lineBreaker_b').style.display = frameContext.get('lineBreaker').style.display = 'none';
+
 		if (this.currentPlugin && typeof this.currentPlugin.deselect === 'function') {
 			this.currentPlugin.deselect(this.currentTarget);
 		}
@@ -177,8 +184,8 @@ Component.prototype = {
 		this.currentPlugin = null;
 		this.currentTarget = null;
 		this.currentPluginName = '';
+		this.currentInfo = null;
 		this.__removeGlobalEvent();
-		if (!_globalClosed) this.editor._offCurrentController(true);
 	},
 
 	/**

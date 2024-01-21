@@ -907,7 +907,7 @@ function OnClick_resizeButton() {
 function CreateHTML_resizeDot({ icons, lang }) {
 	const html = /*html*/ `
 		<div class="se-drag-dot se-tooltip" draggable="true">
-			${icons.move}
+			${icons.selection}
 			<span class="se-tooltip-inner">
 				<span class="se-tooltip-text">${lang.drag}</span>
 			</span>

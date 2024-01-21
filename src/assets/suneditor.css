@@ -2065,8 +2065,9 @@
 	outline: 1px dashed #e1e1e1;
 }
 
-.sun-editor .sun-editor-editable[contenteditable='true'] .se-component > figure:hover {
-	outline: 3px solid #80bdff;
+.sun-editor .sun-editor-editable[contenteditable='true'] .se-component > figure:hover,
+.sun-editor .sun-editor-editable[contenteditable='true'] .se-component.se-component-selected > figure {
+	outline: 2px solid #80bdff;
 }
 
 .sun-editor .sun-editor-editable .se-component figure.se-figure-selected::after {
@@ -2206,9 +2207,9 @@
 	cursor: move;
 	width: 17px;
 	height: 16px;
-	background-color: #eaf3ff;
+	background-color: #80bdff;
 	border: 1px solid #4592ff;
-	color: #1275ff;
+	color: #fff;
 }
 .sun-editor .se-resizing-container .se-drag-dot > svg {
 	pointer-events: none;

@@ -1030,7 +1030,7 @@ Editor.prototype = {
 	 * @description Off current controllers
 	 * @private
 	 */
-	_offCurrentController(_componentClosed) {
+	_offCurrentController() {
 		const cont = this.opendControllers;
 		const fixedCont = [];
 		for (let i = 0, c; i < cont.length; i++) {
@@ -1045,7 +1045,7 @@ Editor.prototype = {
 		this.opendControllers = fixedCont;
 		this.currentControllerName = '';
 		this._antiBlur = false;
-		if (!_componentClosed) this.component.deselect(true);
+		this.component.deselect();
 	},
 
 	/**
