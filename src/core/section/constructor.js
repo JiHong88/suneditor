@@ -682,8 +682,7 @@ function _initTargetElements(key, options, topDiv, targetOptions) {
 	// wysiwyg div or iframe
 	const wysiwygDiv = domUtils.createElement(!targetOptions.get('iframe') ? 'DIV' : 'IFRAME', {
 		class: 'se-wrapper-inner se-wrapper-wysiwyg',
-		'data-root-key': key,
-		draggable: 'true'
+		'data-root-key': key
 	});
 
 	if (!targetOptions.get('iframe')) {

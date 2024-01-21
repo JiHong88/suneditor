@@ -1031,6 +1031,15 @@ Editor.prototype = {
 	 * @private
 	 */
 	_offCurrentController() {
+		this.__offControllers();
+		this.component.deselect();
+	},
+
+	/**
+	 * @description Off controllers
+	 * @private
+	 */
+	__offControllers() {
 		const cont = this.opendControllers;
 		const fixedCont = [];
 		for (let i = 0, c; i < cont.length; i++) {
@@ -1045,7 +1054,6 @@ Editor.prototype = {
 		this.opendControllers = fixedCont;
 		this.currentControllerName = '';
 		this._antiBlur = false;
-		this.component.deselect();
 	},
 
 	/**
@@ -1095,12 +1103,8 @@ Editor.prototype = {
 	 */
 	_initWysiwygArea(e, value) {
 		e.get('wysiwyg').innerHTML =
-			this.html.clean(
-				typeof value === 'string' ? value : (/^TEXTAREA$/i.test(e.get('originElement').nodeName) ? e.get('originElement').value : e.get('originElement').innerHTML) || '',
-				true,
-				null,
-				null
-			) || '<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
+			this.html.clean(typeof value === 'string' ? value : (/^TEXTAREA$/i.test(e.get('originElement').nodeName) ? e.get('originElement').value : e.get('originElement').innerHTML) || '', true, null, null) ||
+			'<' + this.options.get('defaultLine') + '><br></' + this.options.get('defaultLine') + '>';
 
 		if (e.has('charCounter')) e.get('charCounter').textContent = this.char.getLength();
 	},
@@ -1142,9 +1146,7 @@ Editor.prototype = {
 			h === -1
 				? resizeObserverEntry?.borderBoxSize && resizeObserverEntry.borderBoxSize[0]
 					? resizeObserverEntry.borderBoxSize[0].blockSize
-					: resizeObserverEntry.contentRect.height +
-					  numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-left')) +
-					  numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-right'))
+					: resizeObserverEntry.contentRect.height + numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-left')) + numbers.get(fc.get('wwComputedStyle').getPropertyValue('padding-right'))
 				: h;
 		if (fc.get('_editorHeight') !== h) {
 			this.triggerEvent('onResizeEditor', { height: h, prevHeight: fc.get('_editorHeight'), frameContext: fc, observerEntry: resizeObserverEntry });
@@ -1333,12 +1335,8 @@ Editor.prototype = {
 		this._controllerOnDisabledButtons = converter.nodeListToArray(ctx.get('toolbar.buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER));
 
 		if (this.options.has('_subMode')) {
-			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(
-				converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW))
-			);
-			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(
-				converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER))
-			);
+			this._codeViewDisabledButtons = this._codeViewDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(DISABLE_BUTTONS_CODEVIEW)));
+			this._controllerOnDisabledButtons = this._controllerOnDisabledButtons.concat(converter.nodeListToArray(ctx.get('toolbar.sub.buttonTray').querySelectorAll(DISABLE_BUTTONS_CONTROLLER)));
 		}
 	},
 

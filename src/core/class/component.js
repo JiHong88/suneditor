@@ -186,6 +186,7 @@ Component.prototype = {
 		this.currentPluginName = '';
 		this.currentInfo = null;
 		this.__removeGlobalEvent();
+		this.editor.__offControllers();
 	},
 
 	/**
